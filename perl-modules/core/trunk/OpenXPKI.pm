@@ -7,7 +7,7 @@ no warnings;
 
 package OpenXPKI;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.3 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Rev$ =~ /(\d+)/g;
 
 use XSLoader;
 XSLoader::load ("OpenXPKI", $VERSION);
