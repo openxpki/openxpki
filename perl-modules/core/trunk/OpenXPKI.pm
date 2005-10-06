@@ -23,7 +23,7 @@ our $prefix;
 use vars qw(@ISA @EXPORT_OK);
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT_OK = qw(i18nGettext set_language get_language debug set_error errno errval read_file write_file);
+@EXPORT_OK = qw(i18nGettext set_language get_language debug read_file write_file);
 
 =head1 Exported functions
 
@@ -31,7 +31,7 @@ Exported function are function which can be imported by every other
 object. These function are exported to enforce a common behaviour of
 all OpenXPKI modules for debugging and error handling.
 
-C<use OpenXPKI::API qw (debug i18nGettext set_error errno errval);>
+C<use OpenXPKI::API qw (debug i18nGettext);>
 
 =head2 debug
 
@@ -67,139 +67,6 @@ sub debug
         print STDERR $msg;
     #}
 }
-
-=head2 set_error
-
-The error setting function supports four different types of parameter
-handling. This is necessary to support old module or modules which do
-not define errorcodes.
-
-An error name is C<I18N_OPENXPKI_MODULE_FUNCTION_ERROR>.
-
-Please note that we alway add the two parameters __OLD_ERRNO__ and
-__OLD_ERRVAL__ if we detect an old error. If the translator expect
-such stuff then you can display all errors. Otherwise you can see
-all errors if you deactivate all specific languages (LC_MESSAGES=C).
-
-If an error name is not translated (this is the case if the translation
-function returns the error name) then we take the error name and
-join it with all parameter/value pairs.
-
-=over
-
-=item 1. %ERRHASH exists for the module
-
-If the function has a global static hash ERRHASH then the function
-assumes the error name first followed by the parameter pairs. Example:
-
-C<$self-E<gt>set_error ("I18N_OPENXPKI_AC_CHECK_IDENT_USER_UNKNOWN", "__USER__" =E<gt> $user);>
-
-=item 2. direct error setting
-
-The second method is direct error setting. If you do not like to
-maintain a hash of errorcodes then you can set the error code directly
-followed by the error name and the parameters. Example:
-
-C<$self-E<gt>set_error (123456, "I18N_OPENXPKI_AC_CHECK_IDENT_USER_UNKNOWN", "__USER__" =E<gt> $user);>
-
-=item 3. forgotten %ERRHASH
-
-Sometimes you forgot to define errorcodes or you do not want to define
-errorcodes. We support in this case the same interface like for the
-first version. The errno is in this case always -1.
-
-=back
-
-=cut
-
-sub set_error
-{
-    my $self = shift;
-    my $code = shift;
-
-    if (not ref $self)
-    {
-        my $ref = {};
-        bless $ref, $self;
-        $self = $ref;
-    }
-
-    my ($package, $filename, $line, $subroutine, $hasargs,
-        $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
-
-    $self->debug ("package: $package");
-    $self->debug ("code:    $code");
-    my $name = $package."::ERRHASH";
-    my %hash = eval "\%${name}";
-
-    my $new_errno;
-    if ($hash{$code}) {
-        $self->debug ("1. method");
-        $new_errno = $hash{$code};
-    } elsif ($code =~ /^I18N_OPENXPKI_/ or not scalar @_) {
-        $self->debug ("3. method");
-        $new_errno = -1;
-    } else {
-        $self->debug ("2. method");
-        $new_errno = $code;
-    }
-
-    if ($new_errno == $code)
-    {
-        $self->debug ("parameter shift for 2. method");
-        $code = shift;
-    }
-
-    # deactivated error saving because it creates a lot of confusion
-    # bellmich 2005-jul-05
-    #if ($self->{errno})
-    #{
-    #    $self->{errval} = i18nGettext ($code, @_,
-    #                                   "__OLD_ERRVAL__", $self->{errval},
-    #                                   "__OLD_ERRNO__",  $self->{errno});
-    #} else {
-        $self->{errval} = i18nGettext ($code, @_);
-    #}
-    $self->{errval} = join ", ", $code, @_ if ($self->{errval} eq $code);
-
-    $self->{errno} = $new_errno;
-
-    $name = $package."::errno";
-    eval "\$$name = \$self->{errno};";
-    $name = $package."::errval";
-    eval "\$$name = \$self->{errval};";
-
-    $self->debug ("$self->{errno}: $self->{errval}");
-    return undef;
-}
-
-=head2 errno
-
-returns the actual error number of this object instance.
-
-=cut
-
-sub errno
-{
-    my $self = shift;
-    return $self->{errno} if (ref($self));
-    return eval ("\$".$self."::errno");
-}
-
-=head2 errval
-
-returns the actual error string of this object instance.
-
-=cut
-
-sub errval
-{
-    my $self = shift;
-    return $self->{errval} if (ref($self));
-    return eval ("\$".$self."::errval");
-}
-
-=pod
 
 =head1 Description
 
@@ -322,16 +189,16 @@ sub read_file
 
     if (not -e $filename)
     {
-        $self->set_error ("I18N_OPENXPKI_READ_FILE_NOT_EXIST",
-                          "__FILENAME__", $filename);
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_READ_FILE_NOT_EXIST",
+            params  => {"FILENAME" => $filename});
     }
 
     if (not open (FD, $filename))
     {
-        $self->set_error ("I18N_OPENXPKI_READ_FILE_OPEN_FAILED",
-                          "__FILENAME__", $filename);
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_READ_FILE_OPEN_FAILED",
+            params  => {"FILENAME" => $filename});
     }
 
     my $result = "";
@@ -359,16 +226,16 @@ sub write_file
 
     if (-e $filename)
     {
-        $self->set_error ("I18N_OPENXPKI_WRITE_FILE_ALREADY_EXIST",
-                          "__FILENAME__", $filename);
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXIST",
+            params  => {"FILENAME" => $filename});
     }
 
     if (not sysopen(FD, $filename, O_WRONLY | O_EXCL | O_CREAT))
     {
-        $self->set_error ("I18N_OPENXPKI_WRITE_FILE_OPEN_FAILED",
-                          "__FILENAME__", $filename);
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WRITE_FILE_OPEN_FAILED",
+            params  => {"FILENAME" => $filename});
     }
     print FD $content;
     close FD;

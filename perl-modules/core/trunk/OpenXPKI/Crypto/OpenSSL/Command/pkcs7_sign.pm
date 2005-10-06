@@ -59,18 +59,18 @@ sub get_command
         # check minimum requirements
         if (not exists $self->{PASSWD})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_PASSWD");
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_PASSWD");
         }
         if (not exists $self->{KEY})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY");
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY");
         }
         if (not exists $self->{CERT})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CERT");
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CERT");
         }
 
         # prepare parameters
@@ -80,15 +80,13 @@ sub get_command
 
         $self->{KEYFILE} = $self->{TMP}."/${$}_key.pem";
         $self->{CLEANUP}->{FILE}->{KEY} = $self->{KEYFILE};
-        return undef
-            if (not $self->write_file (FILENAME => $self->{KEYFILE},
-                                       CONTENT  => $self->{KEY}));
+        $self->write_file (FILENAME => $self->{KEYFILE},
+                           CONTENT  => $self->{KEY});
 
         $self->{CERTFILE} = $self->{TMP}."/${$}_cert.pem";
         $self->{CLEANUP}->{FILE}->{CERT} = $self->{CERTFILE};
-        return undef
-            if (not $self->write_file (FILENAME => $self->{CERTFILE},
-                                       CONTENT  => $self->{CERT}));
+        $self->write_file (FILENAME => $self->{CERTFILE},
+                           CONTENT  => $self->{CERT});
     } else {
         ## token signature
         $engine  = $self->{ENGINE}->get_engine();
@@ -102,18 +100,18 @@ sub get_command
 
     if (not $self->{CONTENT})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CONTENT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CONTENT");
     }
     if (not $self->{CERT})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CERT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CERT");
     }
     if (not $self->{KEY})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY");
     }
     if ($self->{ENC_ALG} ne "aes256" and
         $self->{ENC_ALG} ne "aes192" and
@@ -122,15 +120,14 @@ sub get_command
         $self->{ENC_ALG} ne "des3" and
         $self->{ENC_ALG} ne "des")
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_WRONG_ENC_ALG");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_WRONG_ENC_ALG");
     }
 
     ## prepare data
 
-    return undef
-        if (not $self->write_file (FILENAME => $self->{CONTENTFILE},
-                                   CONTENT  => $self->{CONTENT}));
+    $self->write_file (FILENAME => $self->{CONTENTFILE},
+                       CONTENT  => $self->{CONTENT});
 
     ## build the command
 

@@ -7,8 +7,10 @@ use warnings;
 
 package OpenXPKI::Crypto::Object;
 
-use OpenXPKI qw (i18nGettext set_error errno errval debug);
+use OpenXPKI qw(debug);
 use OpenXPKI::Crypto::Header;
+use OpenXPKI::Exception;
+use English;
 
 sub get_header
 {
@@ -39,8 +41,8 @@ sub get_parsed
     }
     if (ref($ref))
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OBJECT_GET_PARSED_NO_VALUE");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_PARSED_NO_VALUE");
     } else {
         return $ref;
     }
@@ -73,11 +75,18 @@ sub set_header_attribute
 
     ## if you call init then all information is lost !!!
     $self->debug ("reiniting object");
-    return $self->set_error ("I18N_OPENXPKI_CRYPTO_OBJECT_SET_HEADER_ATTRIBUTE_REINIT_FAILED",
-                             "__ERRNO__", $self->errno(),
-                             "__ERRVAL__", $self->errval())
-        if (not $self->__init());
-
+    eval
+    {
+        $self->__init();
+    };
+    if (my $exc = OpenXPKI::Exception->caught())
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OBJECT_SET_HEADER_ATTRIBUTE_REINIT_FAILED",
+            child   => $exc);
+    } elsif ($EVAL_ERROR) {
+        $EVAL_ERROR->rethrow();
+    }
     return 1;
 }
 

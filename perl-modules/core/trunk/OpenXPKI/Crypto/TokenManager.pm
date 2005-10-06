@@ -7,9 +7,8 @@ use warnings;
 
 package OpenXPKI::Crypto::TokenManager;
 
-use OpenXPKI qw (debug i18nGettext set_error errno errval);
-
-our ($errno, $errval);
+use OpenXPKI qw (debug);
+use OpenXPKI::Exception;
 
 sub new {
     my $that = shift;
@@ -27,8 +26,8 @@ sub new {
 
     if (not $self->{cache})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_NEW_MISSING_XML_CACHE");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_NEW_MISSING_XML_CACHE");
     }
 
     $self->debug ("token manager is ready");
@@ -57,26 +56,27 @@ sub get_token
 
     if (not $name)
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_NAME");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_NAME");
     }
     if (not $group)
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_CA_GROUP");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_CA_GROUP");
     }
     $self->debug ("$group: $name");
 
-    return undef
-        if (not $self->{TOKEN}->{$group}->{$name} and
-            not $self->add_token (NAME => $name, CA_GROUP => $group));
+    $self->add_token (NAME => $name, CA_GROUP => $group)
+        if (not $self->{TOKEN}->{$group}->{$name});
     $self->debug ("token added");
 
-    return $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_EXIST")
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_EXIST")
         if (not $self->{TOKEN}->{$group}->{$name});
     $self->debug ("token is present");
 
-    return $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE")
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE")
         if (not $self->use_token (NAME => $name, CA_GROUP => $group));
     $self->debug ("token is usable");
 
@@ -97,8 +97,9 @@ sub add_token
                           XPATH    => 'token_config/token');
     if (not defined $token_count)
     {
-        $self->set_error ($self->{cache}->errno(), $self->{cache}->errval());
-        return undef;
+        OpenXPKI::Exception->throw (
+            errno   => $self->{cache}->errno(),
+            message => $self->{cache}->errval());
     }
     for (my $i=0; $i<$token_count; $i++)
     {
@@ -186,22 +187,23 @@ sub add_token
                                XPATH    => [ 'token_config/token', 'type' ],
                                COUNTER  => [ $i, 0 ]);
         $self->debug ("try to setup $type token");
-        $self->{TOKEN}->{$group}->{$name} = $self->new_token ($type, @args);
-        if (not $self->{TOKEN}->{$group}->{$name})
+        eval {
+            $self->{TOKEN}->{$group}->{$name} = $self->new_token ($type, @args);
+        };
+        if (my $exc = OpenXPKI::Exception->caught())
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_CREATE_FAILED",
-                               "__ERRNO__", $self->errno,
-                               "__ERRVAL__", $self->errval);
             delete $self->{TOKEN}->{$group}->{$name}
                 if (exists $self->{TOKEN}->{$group}->{$name});
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_CREATE_FAILED",
+                child   => $exc);
         }
         $self->debug ("token $name for $group successfully added");
         return $self->{TOKEN}->{$group}->{$name};
     }
-    return $self->set_error ("I18N_OPENCA_CRYPTO_TOKENMANAGER_ADD_TOKEN_NOT_CONFIGURED",
-                              "__NAME__", $name,
-                              "__GROUP__", $group);
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_NOT_CONFIGURED",
+        params  => {"NAME" => $name, "GROUP" => $group});
 }
 
 sub new_token {
@@ -220,9 +222,8 @@ sub new_token {
     if ($@)
     {
         my $text = $@;
-        $self->debug ("compilation of driver $name failed");
-        $self->debug ($text);
-        return $self->set_error ($text);
+        $self->debug ("compilation of driver $name failed\n$text");
+        OpenXPKI::Exception->throw (message => $text);
     }
     $self->debug ("class: $name");
 
@@ -231,16 +232,13 @@ sub new_token {
     ## my $token = eval {$name->new ($self, @_)};
     my $token = eval {$name->new (@_)};
 
-    if ($@)
+    if (my $exc = OpenXPKI::Exception->caught())
     {
+        ## really stupid dummy exception handling
         $self->debug ("cannot get new instance of driver OpenCA::Token::$name");
-        return $self->set_error ($@);
+        $exc->rethrow();
     }
-    $self->debug ("no error during new");
-    ## FIXME: does this be correct Perl!?
-    return $self->set_error (eval "\$${name}::errno", eval "\$${name}::errval")
-        if (not $token);
-    $self->debug ("new token present");
+    $self->debug ("no error during new, new token present");
 
     return $token;
 }
@@ -254,7 +252,8 @@ sub use_token
     my $group = $keys->{CA_GROUP};
 
     ## the token must be present
-    return $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT")
+    OpenXPKI::Excepion->throw (
+        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT")
         if (not $self->{TOKEN}->{$group}->{$name});
 
     return $self->{TOKEN}->{$group}->{$name}->login()
@@ -278,7 +277,8 @@ sub stop_session
             $error = 1 if (not $self->{TOKEN}->{$group}->{$name}->logout());
         }
     }
-    return $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_STOP_SESSION_FAILED")
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_STOP_SESSION_FAILED")
         if ($error);
     return 1;
 }
@@ -300,9 +300,9 @@ sub start_daemon
         my $group = $self->{cache}->get_xpath (
                       XPATH    => [ 'token_config/token', 'ca_group' ],
                       COUNTER  => [ $i, 0 ]);
-        return $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_START_DAEMON_GET_TOKEN_FAILED",
-                                  "__NAME__", $name,
-                                  "__CA_GROUP__", $group)
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_START_DAEMON_GET_TOKEN_FAILED",
+            params  => {"NAME" => $name, "CA_GROUP" => $group})
             if (not $self->get_token(NAME => $name, CA_GROUP => $group));
     }
     return 1;
@@ -325,13 +325,14 @@ sub stop_daemon
         my $group = $self->{cache}->get_xpath (
                       XPATH    => [ 'token_config/token', 'ca_group' ],
                       COUNTER  => [ $i, 0 ]);
-        return $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_START_DAEMON_ADD_TOKEN_FAILED",
-                                "__NAME__", $name,
-                                "__CA_GROUP__", $group)
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_START_DAEMON_ADD_TOKEN_FAILED",
+            params  => {"NAME" => $name, "CA_GROUP" => $group})
             if (not $self->add_token(NAME => $name, CA_GROUP => $group));
         $error = 1 if (not $self->{TOKEN}->{$group}->{$name}->logout());
     }
-    return $self->set_error ("I18N_OPENXPKI_CRYPTO_TOKENMANAGER_STOP_DAEMON_TOKEN_FAILED")
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_STOP_DAEMON_TOKEN_FAILED")
         if ($error);
     return 1;
 }
@@ -352,7 +353,8 @@ sub DESTROY {
         }
     }
 
-    return $self->set_error ("I18N_OPENPKI_CRYPTO_TOKENMANAGER_DESTROY_TOKEN_FAILED")
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENPKI_CRYPTO_TOKENMANAGER_DESTROY_TOKEN_FAILED")
         if ($error);
     return 1;
 }

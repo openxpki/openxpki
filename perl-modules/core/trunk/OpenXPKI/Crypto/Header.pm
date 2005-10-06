@@ -6,10 +6,6 @@ use strict;
 
 package OpenXPKI::Crypto::Header;
 
-use OpenXPKI qw (debug i18nGettext set_error errno errval);
-
-our ($errno, $errval);
-
 our $beginHeader    = "-----BEGIN HEADER-----";
 our $endHeader      = "-----END HEADER-----";
 our $beginAttribute = "-----BEGIN ATTRIBUTE-----";

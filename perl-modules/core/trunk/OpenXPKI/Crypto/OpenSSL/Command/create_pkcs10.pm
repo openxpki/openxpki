@@ -51,13 +51,13 @@ sub get_command
         # check minimum requirements
         if (not exists $self->{PASSWD})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD");
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD");
         }
         if (not exists $self->{KEY})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEY");
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEY");
         }
 
         # prepare parameters
@@ -65,9 +65,8 @@ sub get_command
         $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
         $self->{KEYFILE} = $self->{TMP}."/${$}_key.pem";
         $self->{CLEANUP}->{FILE}->{KEY} = $self->{KEYFILE};
-        return undef
-            if (not $self->write_file (FILENAME => $self->{KEYFILE},
-                                       CONTENT  => $self->{KEY}));
+        $self->write_file (FILENAME => $self->{KEYFILE},
+                           CONTENT  => $self->{KEY});
     } else {
         ## token CSR generation
         $engine  = $self->{ENGINE}->get_engine();
@@ -83,25 +82,24 @@ sub get_command
 
     if (not exists $self->{SUBJECT})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_SUBJECT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_SUBJECT");
     }
     if (not $self->{KEYFILE})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEYFILE");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEYFILE");
     }
     if (not $self->{CONFIG})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_CONFIG");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_CONFIG");
     }
 
     ## prepare data
 
     ## fix DN-handling of OpenSSL
     my $subject = $self->__get_openssl_dn ($self->{SUBJECT});
-    return undef if (not $subject);
 
     ## build the command
 

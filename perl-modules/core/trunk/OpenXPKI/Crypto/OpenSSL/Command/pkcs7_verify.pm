@@ -50,23 +50,21 @@ sub get_command
 
     if (not $self->{CONTENT})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_CONTENT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_CONTENT");
     }
     if (not $self->{PKCS7})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_PKCS7");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_PKCS7");
     }
 
     ## prepare data
 
-    return undef
-        if (not $self->write_file (FILENAME => $self->{CONTENTFILE},
-                                   CONTENT  => $self->{CONTENT}));
-    return undef
-        if (not $self->write_file (FILENAME => $self->{PKCS7FILE},
-                                   CONTENT  => $self->{PKCS7}));
+    $self->write_file (FILENAME => $self->{CONTENTFILE},
+                       CONTENT  => $self->{CONTENT});
+    $self->write_file (FILENAME => $self->{PKCS7FILE},
+                       CONTENT  => $self->{PKCS7});
 
     ## build the command
 

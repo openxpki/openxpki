@@ -10,6 +10,7 @@ package OpenXPKI::Crypto::OpenSSL::Command::issue_crl;
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
 use Math::BigInt;
+use English;
 
 =head1 Parameters
 
@@ -59,19 +60,19 @@ sub get_command
 
     if (not $self->{KEYFILE} or not -e $self->{KEYFILE})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_KEYFILE");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_KEYFILE");
     }
     if (not $self->{CONFIG})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_CONFIG");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_CONFIG");
     }
     if (exists $self->{DAYS} and
         ($self->{DAYS} !~ /\d+/ or $self->{DAYS} <= 0))
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_WRONG_DAYS");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_WRONG_DAYS");
     }
 
     ## prepare data
@@ -94,12 +95,16 @@ sub get_command
             # get X509 object
             if (not ref($cert))
             {
-                $cert = $self->{ENGINE}->get_object(DATA => $cert, TYPE => "X509");
-                if (not $cert or not ref($cert))
+                eval {
+                    $cert = $self->{ENGINE}->get_object(DATA => $cert, TYPE => "X509");
+                };
+                if (my $exc = OpenXPKI::Exception->caught())
                 {
-                    $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
-                                      "__ERRVAL__", $self->{ENGINE}->errval());
-                    return undef;
+                    OpenXPKI::Exception->throw (
+                        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
+                        child   => $exc);
+                } elsif ($EVAL_ERROR) {
+                    $EVAL_ERROR->rethrow();
                 }
             }
             # prepare index.txt entry
@@ -119,7 +124,6 @@ sub get_command
     ## create serial, index and index attribute file
 
     my $config = $self->read_file ($self->{CONFIG});
-    return undef if (not $config);
     my $database = $self->__get_config_variable (NAME => "database", CONFIG => $config);
     my $serial   = $self->__get_config_variable (NAME => "crlnumber", CONFIG => $config);
 
@@ -127,29 +131,26 @@ sub get_command
     {
         if (not exists $self->{SERIAL})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_SERIAL");
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_SERIAL");
         }
         $self->{SERIAL} = Math::BigInt->new ($self->{SERIAL});
         if (not $self->{SERIAL})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_FAILED_SERIAL");
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_FAILED_SERIAL");
         }
         my $hex    = substr ($self->{SERIAL}->as_hex(), 2);
         $hex       = "0".$hex if (length ($hex) % 2);
-        return undef
-            if (not $self->write_file (FILENAME => $serial,
-                                       CONTENT  => $hex));
-        $self->{CLEANUP}->{FILE}->{SERIAL}        = $serial;
+        $self->write_file (FILENAME => $serial,
+                           CONTENT  => $hex);
+        $self->{CLEANUP}->{FILE}->{SERIAL} = $serial;
     }
 
-    return undef
-        if (not $self->write_file (FILENAME => $database,
-                                   CONTENT  => $index_txt));
-    return undef
-        if (not $self->write_file (FILENAME => "$database.attr",
-                                   CONTENT  => "unique_subject = no\n"));
+    $self->write_file (FILENAME => $database,
+                       CONTENT  => $index_txt);
+    $self->write_file (FILENAME => "$database.attr",
+                       CONTENT  => "unique_subject = no\n");
     $self->{CLEANUP}->{FILE}->{DATABASE}      = $database;
     $self->{CLEANUP}->{FILE}->{DATABASE_ATTR} = "$database.attr";
 

@@ -10,7 +10,6 @@ package OpenXPKI::Crypto::CRR;
 use Math::BigInt;
 
 use base qw(OpenXPKI::Crypto::Object);
-our ($errno, $errval);
 
 sub new
 {
@@ -25,11 +24,11 @@ sub new
 
     if (not $self->{DATA})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_CRR_NEW_MISSING_DATA");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_CRR_NEW_MISSING_DATA");
     }
 
-    return undef if (not $self->__init());
+    $self->__init();
 
     return $self;
 }

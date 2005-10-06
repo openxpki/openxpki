@@ -9,6 +9,4 @@ package OpenXPKI::Crypto::OpenSSL::Engine::OpenSSL;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Engine);
 
-our ($errno, $errval);
-
 1;

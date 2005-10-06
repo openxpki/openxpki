@@ -27,10 +27,12 @@ use OpenXPKI::Crypto::OpenSSL::Command::pkcs7_get_chain;
 
 package OpenXPKI::Crypto::OpenSSL::Command;
 
-use OpenXPKI qw(i18nGettext debug set_error errno errval read_file write_file);
+use OpenXPKI qw(debug read_file write_file);
 use OpenXPKI::DN;
 use Date::Parse;
 use POSIX qw(strftime);
+use OpenXPKI::Exception;
+use English;
 
 sub new
 {
@@ -44,14 +46,14 @@ sub new
 
     if (not exists $self->{ENGINE} or not ref $self->{ENGINE})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_ENGINE");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_ENGINE");
     }
 
     if (not exists $self->{TMP})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_TMP");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_TMP");
     }
 
     return $self;
@@ -66,9 +68,9 @@ sub cleanup
         unlink $self->{CLEANUP}->{FILE}->{$file};
         if (-e $self->{CLEANUP}->{FILE}->{$file})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_FILE_FAILED",
-                              "__FILENAME__", $self->{CLEANUP}->{FILE}->{$file});
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_FILE_FAILED",
+                params  => {"FILENAME" => $self->{CLEANUP}->{FILE}->{$file}});
         }
     }
 
@@ -77,9 +79,9 @@ sub cleanup
         delete $ENV{$self->{CLEANUP}->{ENV}->{$variable}};
         if (exists $ENV{$self->{CLEANUP}->{ENV}->{$variable}})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_ENV_FAILED",
-                              "__VARIABLE__", $self->{CLEANUP}->{ENV}->{$variable});
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_ENV_FAILED",
+                params  => {"VARIABLE" => $self->{CLEANUP}->{ENV}->{$variable}});
         }
     }
 
@@ -94,10 +96,9 @@ sub __get_openssl_dn
     $self->debug ("rfc2253: $dn");
     my $dn_obj = OpenXPKI::DN->new ($dn);
     if (not $dn_obj) {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_DN_FAILURE",
-                          "__DN__", $dn,
-                          "__ERRVAL__", $OpenXPKI::DN::errval);
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_DN_FAILURE",
+            param   => {"DN" => $dn});
     }
 
     ## this is necessary because OpenSSL needs the utf8 bytes
@@ -115,9 +116,9 @@ sub __get_config_variable
     my $name     = $keys->{NAME};
     my $config   = $keys->{CONFIG};
     my $filename = $keys->{FILENAME};
-    return undef
-        if (not $config and
-            not $self->read_file ($filename));
+
+    $config = $self->read_file ($filename)
+        if (not $config);
 
     return "" if ($config !~ /^(.*\n)*\s*${name}\s*=\s*([^\n^#]+).*$/s);
 
@@ -129,7 +130,8 @@ sub __get_config_variable
         my $dir = $result;
            $dir =~ s/^.*\$([a-zA-Z0-9_]+).*$/$1/s;
         my $value = $self->__get_config_variable (NAME => $dir, CONFIG => $config);
-        return undef if (not defined $dir);
+        ## why we use this check?
+        ## return undef if (not defined $dir);
         $result =~ s/\$$dir/$value/g;
     }
     return $result;
@@ -145,6 +147,12 @@ sub __get_openssl_time
     $time = POSIX::strftime ("%g%m%d%H%M%S",@{$time})."Z";
 
     return $time;
+}
+
+sub DESTROY
+{
+    my $self = shift;
+    $self->cleanup();
 }
 
 1;

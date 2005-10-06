@@ -29,26 +29,25 @@ sub get_command
     $self->{CLEANUP}->{FILE}->{IN} = $self->{INFILE};
     $self->{OUTFILE} = $self->{TMP}."/${$}_cert_new.pem";
     $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
-    return undef
-        if (not $self->write_file (FILENAME => $self->{INFILE},
-                                   CONTENT  => $self->{DATA}));
+    $self->write_file (FILENAME => $self->{INFILE},
+                       CONTENT  => $self->{DATA});
 
     ## check parameters
 
     if (not exists $self->{DATA})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_DATA");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_DATA");
     }
     if (not exists $self->{OUT})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_OUTPUT_FORMAT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_OUTPUT_FORMAT");
     }
     if ($self->{OUT} ne "DER" and $self->{OUT} ne "TXT")
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_WRONG_OUTPUT_FORMAT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_WRONG_OUTPUT_FORMAT");
     }
 
     ## build the command

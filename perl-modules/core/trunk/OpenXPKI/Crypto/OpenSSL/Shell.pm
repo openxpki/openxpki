@@ -7,9 +7,8 @@ use warnings;
 
 package OpenXPKI::Crypto::OpenSSL::Shell;
 
-our ($errno, $errval);
-
-use OpenXPKI qw (i18nGettext debug set_error errno errval read_file);
+use OpenXPKI qw (debug read_file);
+use OpenXPKI::Exception;
 
 sub new
 {
@@ -42,9 +41,9 @@ sub start
     $self->debug ($open);
     if (not open $self->{OPENSSL_FD}, $open)
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_START_OPEN_FAILED",
-                          "__ERRVAL__", $!);
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_START_OPEN_FAILED",
+            params  => {"ERRVAL" => $!});
     }
     $self->debug ("shell started");
     return 1;
@@ -71,9 +70,9 @@ sub init_engine
     $command .= "\n";
     if (not print {$self->{OPENSSL_FD}} $command)
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_INIT_ENGINE_SHELL_PRINT_FAILED",
-                          "__ERRVAL__", $!);
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_INIT_ENGINE_SHELL_PRINT_FAILED",
+            params  => {"ERRVAL" => $!});
     }
 
     $self->debug ("engine intialized");
@@ -92,6 +91,8 @@ sub stop
     close $self->{OPENSSL_FD};
     delete $self->{OPENSSL_FD};
 
+    $self->check_error();
+
     return 1;
 }
 
@@ -108,10 +109,10 @@ sub run_cmd
         $self->debug ("command: $command");
         if (not print {$self->{OPENSSL_FD}} $command)
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_RUN_CMD_FAILED",
-                              "__COMMAND__", $command,
-                              "__ERRVAL__", $!);
-            return undef;
+            OpenXPKI::Exception->throw (
+            messages => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_RUN_CMD_FAILED",
+            params   => {"COMMAND" => $command,
+                         "ERRVAL"  => $!});
         }
     }
     $self->debug ("all executed");
@@ -119,7 +120,7 @@ sub run_cmd
     return 1;
 }
 
-sub is_error
+sub check_error
 {
     my $self = shift;
 
@@ -140,10 +141,9 @@ sub is_error
             close(FD);
         } else {
             unlink ($self->{STDOUT});
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_CANNOT_OPEN_ERRLOG",
-                              "__FILENAME__", $self->{STDERR});
-            $self->debug ("error detected");
-            return 1;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_CANNOT_OPEN_ERRLOG",
+                params  => {"FILENAME" => $self->{STDERR}});
         }
         unlink ($self->{STDERR});
         $self->debug ("stderr (".$self->{STDERR}.": $ret)");
@@ -151,10 +151,9 @@ sub is_error
         if ($ret =~ /error/i)
         {
             unlink ($self->{STDOUT});
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_COMMAND_ERROR",
-                              "__ERRVAL__", $ret);
-            $self->debug ("error detected");
-            return 1;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_COMMAND_ERROR",
+                params  => {"ERRVAL" => $ret});
         }
     }
     $self->debug ("no errors");
@@ -172,7 +171,6 @@ sub get_result
     {
         ## there was an output
         $ret = $self->read_file($self->{STDOUT});
-        return undef if (not defined $ret);
         $ret = $self->{ENGINE}->filter_stdout($ret);
         $ret =~ s/^(OpenSSL>\s)*//s;
         $ret =~ s/OpenSSL>\s$//s;

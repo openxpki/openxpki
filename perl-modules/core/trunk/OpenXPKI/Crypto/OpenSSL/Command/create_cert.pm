@@ -58,13 +58,13 @@ sub get_command
         # check minimum requirements
         if (not exists $self->{PASSWD})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_PASSWD");
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_PASSWD");
         }
         if (not exists $self->{KEY})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_KEY");
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_KEY");
         }
 
         # prepare parameters
@@ -72,9 +72,8 @@ sub get_command
         $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
         $self->{KEYFILE} = $self->{TMP}."/${$}_key.pem";
         $self->{CLEANUP}->{FILE}->{KEY} = $self->{KEYFILE};
-        return undef
-            if (not $self->write_file (FILENAME => $self->{KEYFILE},
-                                       CONTENT  => $self->{KEY}));
+        $self->write_file (FILENAME => $self->{KEYFILE},
+                           CONTENT  => $self->{KEY});
         $self->{OUTFILE} = $self->{TMP}."/${$}_cert.pem";
         $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
     } else {
@@ -90,38 +89,36 @@ sub get_command
     {
         ## fix DN-handling of OpenSSL
         $subject = $self->__get_openssl_dn ($self->{SUBJECT});
-        return undef if (not $subject);
     }
 
     ## check parameters
 
     if (not $self->{KEYFILE} or not -e $self->{KEYFILE})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_KEYFILE");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_KEYFILE");
     }
     if (not $self->{CSR})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_CSRFILE");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_CSRFILE");
     }
     if (not $self->{CONFIG})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_CONFIG");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_CONFIG");
     }
     if (exists $self->{DAYS} and
         ($self->{DAYS} !~ /\d+/ or $self->{DAYS} <= 0))
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_WRONG_DAYS");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_WRONG_DAYS");
     }
 
     ## prepare data
 
-    return undef
-        if (not $self->write_file (FILENAME => $self->{CSRFILE},
-                                   CONTENT  => $self->{CSR}));
+    $self->write_file (FILENAME => $self->{CSRFILE},
+                       CONTENT  => $self->{CSR});
 
     ## build the command
 

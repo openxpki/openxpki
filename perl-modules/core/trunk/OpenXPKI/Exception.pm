@@ -20,6 +20,14 @@ sub full_message
 {
     my ($self) = @_;
 
+    ## respect child errors
+    if (ref $self->{child})
+    {
+        $self->{params}->{"ERRVAL"} = $self->{child}->as_string();
+        $self->{params}->{"ERRNO"}  = $self->{child}->get_errno()
+            if ($self->{errno} and $self->{child}->get_errno());
+    }
+
     ## enforce __NAME__ scheme
     foreach my $param (keys %{$self->{params}})
     {
@@ -30,17 +38,9 @@ sub full_message
         $self->{params}->{$param} = $value;
     }
 
-    ## respect child errors
-    my $message = "";
-       $message = $self->{child}->as_string()
-           if (ref $self->{child});
-
     ## put together and translate message
-    $message = i18nGettext ($self->{message},
-                            "__ERRVAL__", $message,
-                            %{$self->{params}});
-    print STDERR "OpenXPKI::Exception: $message\n";
-    return $message;
+    print STDERR i18nGettext ($self->{message}, %{$self->{params}})."\n";
+    return i18nGettext ($self->{message}, %{$self->{params}});
 }
 
 sub get_errno

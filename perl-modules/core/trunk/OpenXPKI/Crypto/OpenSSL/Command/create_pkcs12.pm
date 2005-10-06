@@ -62,28 +62,28 @@ sub get_command
 
     if (not $self->{KEY})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_MISSING_KEY");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_MISSING_KEY");
     }
     if (not $self->{CERT})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_MISSING_CERT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_MISSING_CERT");
     }
     if (not exists $self->{PASSWD})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_MISSING_PASSWD");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_MISSING_PASSWD");
     }
     if (not length ($self->{PASSWD}))
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_EMPTY_PASSWD");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_EMPTY_PASSWD");
     }
     if (length ($self->{PKCS12_PASSWD}) < 4)
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_PASSWD_TOO_SHORT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_PASSWD_TOO_SHORT");
     }
     if ($self->{ENC_ALG} ne "aes256" and
         $self->{ENC_ALG} ne "aes192" and
@@ -92,18 +92,16 @@ sub get_command
         $self->{ENC_ALG} ne "des3" and
         $self->{ENC_ALG} ne "des")
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_WRONG_ENC_ALG");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_WRONG_ENC_ALG");
     }
 
     ## prepare data
 
-    return undef
-        if (not $self->write_file (FILENAME => $self->{KEYFILE},
-                                   CONTENT  => $self->{KEY}));
-    return undef
-        if (not $self->write_file (FILENAME => $self->{CERTFILE},
-                                   CONTENT  => $self->{CERT}));
+    $self->write_file (FILENAME => $self->{KEYFILE},
+                       CONTENT  => $self->{KEY});
+    $self->write_file (FILENAME => $self->{CERTFILE},
+                       CONTENT  => $self->{CERT});
 
     ## build the command
 

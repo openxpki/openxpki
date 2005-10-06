@@ -45,9 +45,8 @@ sub get_command
     {
         $self->{CERTFILE} = $self->{TMP}."/${$}_cert.pem";
         $self->{CLEANUP}->{FILE}->{CERT} = $self->{CERTFILE};
-        return undef
-            if (not $self->write_file (FILENAME => $self->{CERTFILE},
-                                       CONTENT  => $self->{CERT}));
+        $self->write_file (FILENAME => $self->{CERTFILE},
+                           CONTENT  => $self->{CERT});
     } else {
         $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
     }
@@ -56,13 +55,13 @@ sub get_command
 
     if (not $self->{CONTENT})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_MISSING_CONTENT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_MISSING_CONTENT");
     }
     if (not $self->{CERT})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_MISSING_CERT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_MISSING_CERT");
     }
     if ($self->{ENC_ALG} ne "aes256" and
         $self->{ENC_ALG} ne "aes192" and
@@ -71,15 +70,14 @@ sub get_command
         $self->{ENC_ALG} ne "des3" and
         $self->{ENC_ALG} ne "des")
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_WRONG_ENC_ALG");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_WRONG_ENC_ALG");
     }
 
     ## prepare data
 
-    return undef
-        if (not $self->write_file (FILENAME => $self->{CONTENTFILE},
-                                   CONTENT  => $self->{CONTENT}));
+    $self->write_file (FILENAME => $self->{CONTENTFILE},
+                       CONTENT  => $self->{CONTENT});
 
     ## build the command
 

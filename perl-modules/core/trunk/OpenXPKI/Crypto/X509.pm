@@ -12,8 +12,7 @@ use Math::BigInt;
 ## use Date::Parse;
 
 use base qw(OpenXPKI::Crypto::Object);
-
-our ($errno, $errval);
+use English;
 
 sub new
 {
@@ -29,16 +28,16 @@ sub new
 
     if (not $self->{DATA})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_X509_NEW_MISSING_DATA");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_X509_NEW_MISSING_DATA");
     }
     if (not $self->{TOKEN})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_X509_NEW_MISSING_TOKEN");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_X509_NEW_MISSING_TOKEN");
     }
 
-    return undef if (not $self->__init());
+    $self->__init();
 
     return $self;
 }
@@ -54,13 +53,18 @@ sub __init
 
     $self->{header} = OpenXPKI::Crypto::Header->new (DEBUG => $self->{DEBUG},
                                                      DATA  => $self->{DATA});
-    $self->{x509} = $self->{TOKEN}->get_object(DATA => $self->{header}->get_body(),
-                                               TYPE => "X509");
-    if (not $self->{x509})
+    eval
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_X509_INIT_OBJECT_FAILED",
-                          "__ERRVAL__", $self->{TOKEN}->errval());
-        return undef;
+        $self->{x509} = $self->{TOKEN}->get_object(DATA => $self->{header}->get_body(),
+                                                   TYPE => "X509");
+    };
+    if (my $exc = OpenXPKI::Exception->caught())
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_X509_INIT_OBJECT_FAILED",
+            child   => $exc);
+    } elsif ($EVAL_ERROR) {
+        $EVAL_ERROR->rethrow();
     }
 
     ##########################
@@ -240,14 +244,14 @@ sub get_converted
 
     if (not $format)
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_MISSING_FORMAT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_MISSING_FORMAT");
     }
     if ($format ne "PEM" and $format ne "DER" and $format ne "TXT")
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_WRONG_FORMAT",
-                          "__FORMAT__", $format);
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_WRONG_FORMAT",
+            params  => {"FORMAT" => $format});
     }
 
     if ($format eq 'PEM' ) {
@@ -255,14 +259,16 @@ sub get_converted
     }
     else
     {
-        my $result = $self->{TOKEN}->command ("convert_cert",
-                                              DATA => $self->get_body(),
-                                              OUT  => $format);
-        if (not defined $result)
+        my $result = eval {$self->{TOKEN}->command ("convert_cert",
+                                                    DATA => $self->get_body(),
+                                                    OUT  => $format)};
+        if (my $exc = OpenXPKI::Exception->caught())
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_CONVERSION_FAILED",
-                              "__ERRVAL__", $self->{TOKEN}->errval());
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_CONVERSION_FAILED",
+                child   => $exc);
+        } elsif ($EVAL_ERROR) {
+            $EVAL_ERROR->rethrow();
         }
         return $result;
     }

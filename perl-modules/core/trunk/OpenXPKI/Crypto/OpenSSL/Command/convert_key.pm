@@ -59,9 +59,8 @@ sub get_command
     $self->{CLEANUP}->{FILE}->{KEY} = $self->{KEYFILE};
     $self->{OUTFILE} = $self->{TMP}."/${$}_key_new.pem";
     $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
-    return undef
-        if (not $self->write_file (FILENAME => $self->{KEYFILE},
-                                   CONTENT  => $self->{DATA}));
+    $self->write_file (FILENAME => $self->{KEYFILE},
+                       CONTENT  => $self->{DATA});
 
     ## check parameters
 
@@ -72,42 +71,42 @@ sub get_command
         $self->{ENC_ALG} ne "des3" and
         $self->{ENC_ALG} ne "des")
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_ENC_ALG");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_ENC_ALG");
     }
     if (not exists $self->{PASSWD})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_MISSING_PASSWD");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_MISSING_PASSWD");
     }
     if (not exists $self->{IN})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_MISSING_INPUT_FORMAT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_MISSING_INPUT_FORMAT");
     }
     if ($self->{IN} ne "RSA" and
         $self->{IN} ne "DSA" and
         $self->{IN} ne "PKCS8")
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_INPUT_FORMAT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_INPUT_FORMAT");
     }
     if (not exists $self->{OUT})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_MISSING_OUTPUT_FORMAT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_MISSING_OUTPUT_FORMAT");
     }
     if ($self->{OUT} ne "PEM" and
         $self->{OUT} ne "DER" and
         $self->{OUT} ne "PKCS8")
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_OUTPUT_FORMAT");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_OUTPUT_FORMAT");
     }
     if (not exists $self->{DATA})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_MISSING_DATA");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_MISSING_DATA");
     }
 
     ## build the command

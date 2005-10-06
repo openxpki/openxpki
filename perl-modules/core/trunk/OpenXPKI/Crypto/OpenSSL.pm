@@ -10,9 +10,9 @@ package OpenXPKI::Crypto::OpenSSL;
 use OpenXPKI::Crypto::OpenSSL::Shell;
 use OpenXPKI::Crypto::OpenSSL::Command;
 
-our ($errno, $errval);
-
-use OpenXPKI qw (i18nGettext debug set_error errno errval);
+use OpenXPKI qw(debug);
+use OpenXPKI::Exception;
+use English;
 
 sub new
 {
@@ -25,9 +25,9 @@ sub new
     my $keys = { @_ };
     $self->{DEBUG} = 1 if ($keys->{DEBUG});
 
-    return undef if (not $self->init_engine (@_));
-    return undef if (not $self->init_shell (@_));
-    return undef if (not $self->init_command (@_));
+    $self->init_engine (@_);
+    $self->init_shell (@_);
+    $self->init_command (@_);
 
     return $self;
 }
@@ -41,22 +41,18 @@ sub init_engine
     if ($@)
     {
         my $msg = $@;
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_USE_FAILED",
-                          "__ERRVAL__", $msg);
-        return undef;
+        OpenXPKI::Exception (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_USE_FAILED",
+            params  => {"ERRVAL" => $msg});
     }
-    $self->{ENGINE} = eval ("$engine->new ( \@_ )");
-    if ($@)
+    $self->{ENGINE} = eval {$engine->new (@_)};
+    if (my $exc = OpenXPKI::Exception->caught())
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_MODULE_FAILED",
-                          "__ERRVAL__", $@);
-        return undef;
-    }
-    if (not $self->{ENGINE})
-    {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_NEW_FAILED",
-                          "__ERRVAL__", eval ("\$${engine}::errval"));
-        return undef;
+        OpenXPKI::Exception (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_NEW_FAILED",
+            child   => $exc);
+    } elsif ($EVAL_ERROR) {
+        $EVAL_ERROR->rethrow();
     }
     return 1;
 }
@@ -68,8 +64,8 @@ sub init_shell
 
     if (not -e $keys->{SHELL})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_MISSING_OPENSSL_BINARY");
-        return undef;
+        OpenXPKI::Exception (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_MISSING_OPENSSL_BINARY");
     } else {
         $self->{OPENSSL} = $keys->{SHELL};
         $self->{SHELL}   = $keys->{SHELL};
@@ -80,16 +76,21 @@ sub init_shell
         $self->{SHELL} = $wrapper." ".$self->{OPENSSL};
     }
 
-    $self->{SHELL} = OpenXPKI::Crypto::OpenSSL::Shell->new (
-                         ENGINE => $self->{ENGINE},
-                         DEBUG  => $self->{DEBUG},
-                         SHELL  => $self->{SHELL},
-                         TMP    => $keys->{TMPDIR});
-    if (not $self->{SHELL})
+    eval
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_SHELL_FAILED",
-                          "__ERRVAL__", $OpenXPKI::Crypto::OpenSSL::Shell::errval);
-        return undef;
+        $self->{SHELL} = OpenXPKI::Crypto::OpenSSL::Shell->new (
+                             ENGINE => $self->{ENGINE},
+                             DEBUG  => $self->{DEBUG},
+                             SHELL  => $self->{SHELL},
+                             TMP    => $keys->{TMPDIR});
+    };
+    if (my $exc = OpenXPKI::Exception->caught())
+    {
+        OpenXPKI::Exception (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_SHELL_FAILED",
+            child   => $exc);
+    } elsif ($EVAL_ERROR) {
+        $EVAL_ERROR->rethrow();
     }
 
     return 1;
@@ -104,9 +105,9 @@ sub init_command
     {
         if (not exists $keys->{$key->[0]})
         {
-            $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_MISSING_COMMAND_PARAM",
-                              "__PARAM__", $key->[0]);
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_MISSING_COMMAND_PARAM",
+                params  => {"PARAM" => $key->[0]});
         }
         $self->{COMMAND_PARAMS}->{$key->[1]} = $keys->{$key->[0]};
     }
@@ -127,63 +128,42 @@ sub command
     my $cmd  = "OpenXPKI::Crypto::OpenSSL::Command::".shift;
     $self->debug ("Command: $cmd");
 
-    my $cmdref = $cmd->new (%{$self->{COMMAND_PARAMS}}, @_,
-                            ENGINE => $self);
-    if (not $cmdref)
+    return eval
     {
-        
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_NEW_FAILED",
-                          "__COMMAND__", $cmd,
-                          "__ERRVAL__", OpenXPKI::Crypto::OpenSSL::Command->errval());
-        return undef;
-    }
-    my $cmds = $cmdref->get_command();
-    if (not defined $cmds)
-    {
-        $self->set_error ($cmdref->errval());
-        return undef;
-    }
+        my $cmdref = $cmd->new (%{$self->{COMMAND_PARAMS}}, @_,
+                                ENGINE => $self);
+        my $cmds = $cmdref->get_command();
 
-    $self->{SHELL}->start();
-    $self->{SHELL}->init_engine($self->{ENGINE}) if ($self->{ENGINE}->get_engine());
-    if (not defined $self->{SHELL}->run_cmd ($cmds))
-    {
-        $self->set_error ($self->{SHELL}->errval());
+        $self->{SHELL}->start();
+        $self->{SHELL}->init_engine($self->{ENGINE}) if ($self->{ENGINE}->get_engine());
+        $self->{SHELL}->run_cmd ($cmds);
         $self->{SHELL}->stop();
-        $cmdref->cleanup();
-        return undef;
-    }
-    $self->{SHELL}->stop();
-    if ($self->{SHELL}->is_error())
-    {
-        $self->set_error ($self->{SHELL}->errval());
-        $cmdref->cleanup();
-        return undef;
-    }
-    my $result = $self->{SHELL}->get_result();
-    if (not defined $result)
-    {
-        $self->set_error ($self->{SHELL}->errval());
-        $cmdref->cleanup();
-        return undef;
-    }
-    $result = $cmdref->get_result ($result);
-    if (not defined $result)
-    {
-        $self->set_error ($cmdref->errval());
-        $cmdref->cleanup();
-        return undef;
-    }
+        my $result = $self->{SHELL}->get_result();
+        $result = $cmdref->get_result ($result);
 
-    if ($cmdref->hide_output())
+        if ($cmdref->hide_output())
+        {
+            $self->debug ("successfully completed");
+        } else {
+            $self->debug ("successfully completed: $result");
+        }
+
+        $cmdref->cleanup();
+        return $result;
+    };
+    if (my $exc = OpenXPKI::Exception->caught())
     {
-        $self->debug ("successfully completed");
+        $self->{SHELL}->stop(); ## this is safe
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_FAILED",
+            params  => {"COMMAND" => $cmd},
+            child   => $exc);
+    } elsif ($EVAL_ERROR) {
+        $EVAL_ERROR->rethrow();
     } else {
-        $self->debug ("successfully completed: $result");
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_UNEXPECTED_EVAL_FAILURE");
     }
-
-    $cmdref->cleanup();
-    return $result;
 }
 
 sub get_object
@@ -233,14 +213,14 @@ sub get_object
             $object = OpenXPKI::Crypto::OpenSSL::CRL::_new_from_pem ($data);
         }
     } else {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_UNKNOWN_TYPE",
-                          "__TYPE__", $type);
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_UNKNOWN_TYPE",
+            params  => {"TYPE" => $type});
     }
     if (not $object)
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_NO_REF");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_NO_REF");
     }
 
     $self->debug ("returning object");
@@ -298,18 +278,11 @@ sub AUTOLOAD {
         $AUTOLOAD eq "get_keyform" or
         $AUTOLOAD eq "get_passwd")
     {
-        my $result = $self->{ENGINE}->$AUTOLOAD (@_);
-        if (not defined $result)
-        {
-            $self->set_error ($self->{ENGINE}->errval());
-            return undef;
-        } else {
-            return $result;
-        }
+        return  $self->{ENGINE}->$AUTOLOAD (@_);
     }
-    $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_AUTOLOAD_MISSING_FUNCTION",
-                      "__FUNCTION__", $AUTOLOAD);
-    return undef;
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_AUTOLOAD_MISSING_FUNCTION",
+        params  => {"FUNCTION" => $AUTOLOAD});
 }
 
 1;

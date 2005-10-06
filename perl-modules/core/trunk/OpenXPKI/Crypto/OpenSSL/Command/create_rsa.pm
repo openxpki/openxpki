@@ -76,8 +76,8 @@ sub get_command
         $self->{ENC_ALG} ne "des3" and
         $self->{ENC_ALG} ne "des")
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_WRONG_ENC_ALG");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_WRONG_ENC_ALG");
     }
     if ($self->{KEY_LENGTH} != 512 and
         $self->{KEY_LENGTH} != 768 and
@@ -85,14 +85,14 @@ sub get_command
         $self->{KEY_LENGTH} != 2048 and
         $self->{KEY_LENGTH} != 4096)
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_WRONG_KEY_LENGTH");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_WRONG_KEY_LENGTH");
     }
     if ($keyform ne "engine" and not defined $passwd)
     {
         ## missing passphrase
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_MISSING_PASSWD");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_MISSING_PASSWD");
     }
 
     ## build the command

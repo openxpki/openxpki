@@ -18,22 +18,12 @@ my $cache = OpenXPKI::XML::Cache->new(DEBUG  => 0,
 ## parameter checks for TokenManager init
 
 my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0, CACHE => $cache);
-ok (defined $mgmt);
-if (not defined $mgmt)
-{
-    print STDERR "errno: ".OpenXPKI::Crypto::TokenManager::errno."\n";
-    print STDERR "errval: ".OpenXPKI::Crypto::TokenManager::errval."\n";
-}
+ok (1);
 
 ## parameter checks for get_token
 
 my $token = $mgmt->get_token (NAME => "INTERNAL_CA_1", CA_GROUP => "CA_GROUP_1");
-ok (defined $token);
-if (not defined $token)
-{
-    print STDERR "errno: ".$mgmt->errno()."\n";
-    print STDERR "errval: ".$mgmt->errval()."\n";
-}
+ok (1);
 
 ## load data
 my $passwd = OpenXPKI->read_file ("t/crypto/passwd.txt");
@@ -45,43 +35,28 @@ my $crl    = OpenXPKI->read_file ("t/crypto/crl.pem");
 ok($passwd and $dsa and $rsa and $csr and $cert and $crl);
 
 ## DSA KEY: PEM --> DER
-if ($token->command ("convert_key",
-                     DATA   => $dsa,
-                     IN     => "DSA",
-                     OUT    => "DER",
-                     PASSWD => $passwd))
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+$token->command ("convert_key",
+                 DATA   => $dsa,
+                 IN     => "DSA",
+                 OUT    => "DER",
+                 PASSWD => $passwd);
+ok(1);
 
 ## RSA KEY: PEM --> DER
-if ($token->command ("convert_key",
-                     DATA   => $rsa,
-                     IN     => "RSA",
-                     OUT    => "DER",
-                     PASSWD => $passwd))
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+$token->command ("convert_key",
+                 DATA   => $rsa,
+                 IN     => "RSA",
+                 OUT    => "DER",
+                 PASSWD => $passwd);
+ok(1);
 
 ## DSA KEY: PEM --> PKCS#8
-if ($token->command ("convert_key",
-                     DATA   => $dsa,
-                     IN     => "DSA",
-                     OUT    => "PKCS8",
-                     PASSWD => $passwd))
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+$token->command ("convert_key",
+                 DATA   => $dsa,
+                 IN     => "DSA",
+                 OUT    => "PKCS8",
+                 PASSWD => $passwd);
+ok(1);
 
 ## RSA KEY: PEM --> PKCS#8
 my $pkcs8 = $token->command ("convert_key",
@@ -89,80 +64,38 @@ my $pkcs8 = $token->command ("convert_key",
                              IN     => "RSA",
                              OUT    => "PKCS8",
                              PASSWD => $passwd);
-if ($pkcs8)
-{
-    ok(1);
-    print STDERR "PKCS#8 RSA key: $pkcs8\n" if ($ENV{DEBUG});
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+ok(1);
 
 ## PKCS#8: PEM --> DER
-if ($token->command ("convert_key",
-                     DATA   => $pkcs8,
-                     IN     => "PKCS8",
-                     OUT    => "DER",
-                     PASSWD => $passwd))
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+$token->command ("convert_key",
+                 DATA   => $pkcs8,
+                 IN     => "PKCS8",
+                 OUT    => "DER",
+                 PASSWD => $passwd);
+ok(1);
 
 ## PKCS10: PEM --> DER
-if ($token->command ("convert_pkcs10", DATA => $csr, OUT => "DER"))
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+$token->command ("convert_pkcs10", DATA => $csr, OUT => "DER");
+ok(1);
 
 ## PKCS10: PEM --> TXT
-if ($token->command ("convert_pkcs10", DATA => $csr, OUT => "TXT"))
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+$token->command ("convert_pkcs10", DATA => $csr, OUT => "TXT");
+ok(1);
 
 ## Cert: PEM --> DER
-if ($token->command ("convert_cert", DATA => $cert, OUT => "DER"))
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+$token->command ("convert_cert", DATA => $cert, OUT => "DER");
+ok(1);
 
 ## Cert: PEM --> TXT
-if ($token->command ("convert_cert", DATA => $cert, OUT => "TXT"))
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+$token->command ("convert_cert", DATA => $cert, OUT => "TXT");
+ok(1);
 
 ## CRL: PEM --> DER
-if ($token->command ("convert_crl", DATA => $crl, OUT => "DER"))
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+$token->command ("convert_crl", DATA => $crl, OUT => "DER");
+ok(1);
 
 ## CRL: PEM --> TXT
-if ($token->command ("convert_crl", DATA => $crl, OUT => "TXT"))
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: ".$token->errval()."\n";
-}
+$token->command ("convert_crl", DATA => $crl, OUT => "TXT");
+ok(1);
 
 1;

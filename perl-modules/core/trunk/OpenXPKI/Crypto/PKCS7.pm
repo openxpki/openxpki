@@ -8,8 +8,7 @@ use warnings;
 package OpenXPKI::Crypto::PKCS7;
 
 use Date::Parse;
-use OpenXPKI qw (set_error errno errval debug);
-our ($errno, $errval);
+use OpenXPKI::Exception;
 
 sub new
 {
@@ -26,13 +25,13 @@ sub new
 
     if (not $self->{PKCS7} and not $self->{CONTENT})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_CRL_NEW_MISSING_DATA");
-        return undef;
+        OpenXPKI::Exception (
+            message => "I18N_OPENXPKI_CRYPTO_CRL_NEW_MISSING_DATA");
     }
     if (not $self->{TOKEN})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_CRL_NEW_MISSING_TOKEN");
-        return undef;
+        OpenXPKI::Exception (
+            message => "I18N_OPENXPKI_CRYPTO_CRL_NEW_MISSING_TOKEN");
     }
 
     return $self;
@@ -53,14 +52,7 @@ sub sign
     $params{DETACH}     = $keys->{DETACH}     if (exists $keys->{DETACH});
 
     $self->{PKCS7} = $self->{TOKEN}->command ("pkcs7_sign", %params);
-    if (not $self->{PKCS7})
-    {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_PKCS7_SIGN_FAILED",
-                          "__ERRVAL__", $self->{TOKEN}->errval());
-        return undef;
-    } else {
-        return $self->{PKCS7};
-    }
+    return $self->{PKCS7};
 }
 
 sub verify
@@ -76,15 +68,7 @@ sub verify
     $params{NO_VERIFY}  = $keys->{NO_VERIFY}  if (exists $keys->{NO_VERIFY});
 
     $self->{SIGNER} = $self->{TOKEN}->command ("pkcs7_verify", %params);
-    if (not $self->{SIGNER})
-    {
-        $self->set_error ($self->{TOKEN}->errno(),
-                          "I18N_OPENXPKI_CRYPTO_PKCS7_VERIFY_FAILED",
-                          "__ERRVAL__", $self->{TOKEN}->errval());
-        return undef;
-    } else {
-        return $self->{SIGNER};
-    }
+    return $self->{SIGNER};
 }
 
 sub encrypt
@@ -99,14 +83,7 @@ sub encrypt
     $params{ENC_ALG}    = $keys->{ENC_ALG}    if (exists $keys->{ENC_ALG});
 
     $self->{PKCS7} = $self->{TOKEN}->command ("pkcs7_encrypt", %params);
-    if (not $self->{PKCS7})
-    {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_PKCS7_ENCRYPT_FAILED",
-                          "__ERRVAL__", $self->{TOKEN}->errval());
-        return undef;
-    } else {
-        return $self->{PKCS7};
-    }
+    return $self->{PKCS7};
 }
 
 sub decrypt
@@ -122,14 +99,7 @@ sub decrypt
     $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
 
     $self->{CONTENT} = $self->{TOKEN}->command ("pkcs7_decrypt", %params);
-    if (not $self->{CONTENT})
-    {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_PKCS7_DECRYPT_FAILED",
-                          "__ERRVAL__", $self->{TOKEN}->errval());
-        return undef;
-    } else {
-        return $self->{CONTENT};
-    }
+    return $self->{CONTENT};
 }
 
 sub get_chain
@@ -143,12 +113,6 @@ sub get_chain
     $params{SIGNER}     = $self->{SIGNER};
     $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
     $self->{CHAIN} = $self->{TOKEN}->command("pkcs7_get_chain", %params);
-    if (not $self->{CHAIN})
-    {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_PKCS7_GET_CHAIN_FAILED",
-                          "__ERRVAL__", $self->{TOKEN}->errval());
-        return undef;
-    }
     ## the chain is already sorted
     $self->{CHAIN} = [ split /\n\n/, $self->{CHAIN} ];
     return $self->{CHAIN};

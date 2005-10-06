@@ -8,6 +8,7 @@ use warnings;
 package OpenXPKI::Crypto::OpenSSL::Command::pkcs7_get_chain;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
+use English;
 
 =head1 Parameters
 
@@ -46,20 +47,19 @@ sub get_command
 
     if (not $self->{SIGNER})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_SIGNER");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_SIGNER");
     }
     if (not $self->{PKCS7})
     {
-        $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_PKCS7");
-        return undef;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_PKCS7");
     }
 
     ## prepare data
 
-    return undef
-        if (not $self->write_file (FILENAME => $self->{PKCS7FILE},
-                                   CONTENT  => $self->{PKCS7}));
+    $self->write_file (FILENAME => $self->{PKCS7FILE},
+                       CONTENT  => $self->{PKCS7});
 
     ## build the command
 
@@ -89,47 +89,47 @@ sub get_result
     my $self = shift;
 
     my $pkcs7 = $self->read_file ($self->{OUTFILE});
-    if ($pkcs7)
+    ## split certs
+    my %certs = ();
+    my @parts = split /\n\n/, $pkcs7;
+    foreach my $cert (@parts)
     {
-        ## split certs
-        my %certs = ();
-        my @parts = split /\n\n/, $pkcs7;
-        foreach my $cert (@parts)
-        {
-            my ($subject, $issuer) = ($cert, $cert);
-            $subject =~ s/^subject=([^\n]*)\n.*/$1/s;
-            $issuer  =~ s/^.*\nissuer=([^\n]*)\n.*/$1/s;
-            $cert    =~ s/^.*\n-----BEGIN/-----BEGIN/s;
-            $certs{$subject}->{ISSUER} = $issuer;
-            $certs{$subject}->{CERT}   = $cert;
-        }
-        
-        ## order certs
-        my $subject = $self->{SIGNER_SUBJECT};
-        if (not $subject)
+        my ($subject, $issuer) = ($cert, $cert);
+        $subject =~ s/^subject=([^\n]*)\n.*/$1/s;
+        $issuer  =~ s/^.*\nissuer=([^\n]*)\n.*/$1/s;
+        $cert    =~ s/^.*\n-----BEGIN/-----BEGIN/s;
+        $certs{$subject}->{ISSUER} = $issuer;
+        $certs{$subject}->{CERT}   = $cert;
+    }
+    
+    ## order certs
+    my $subject = $self->{SIGNER_SUBJECT};
+    if (not $subject)
+    {
+        eval
         {
             my $x509 = $self->{ENGINE}->get_object (DATA => $self->{SIGNER},
                                                     TYPE => "X509");
-            if (not $x509)
-            {
-                $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_WRONG_SIGNER",
-                                  "__ERRVAL__", $self->{TOKEN}->errval());
-                return undef;
-            }
             $subject = $x509->openssl_subject();
             $x509->free();
-        }
-        $pkcs7 = "";
-        while (exists $certs{$subject})
+        };
+        if (my $exc = OpenXPKI::Exception->caught())
         {
-            $pkcs7  .= $certs{$subject}->{CERT}."\n\n";
-            last if ($subject eq $certs{$subject}->{ISSUER});
-            $subject = $certs{$subject}->{ISSUER};
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_WRONG_SIGNER",
+                child   => $exc);
+        } elsif ($EVAL_ERROR) {
+            $EVAL_ERROR->rethrow();
         }
-        return $pkcs7;
-    } else {
-        return undef;
     }
+    $pkcs7 = "";
+    while (exists $certs{$subject})
+    {
+        $pkcs7  .= $certs{$subject}->{CERT}."\n\n";
+        last if ($subject eq $certs{$subject}->{ISSUER});
+        $subject = $certs{$subject}->{ISSUER};
+    }
+    return $pkcs7;
 }
 
 1;

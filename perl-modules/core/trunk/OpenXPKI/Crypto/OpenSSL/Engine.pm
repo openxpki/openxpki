@@ -7,9 +7,9 @@ use warnings;
 
 package OpenXPKI::Crypto::OpenSSL::Engine;
 
-use OpenXPKI qw (i18nGettext debug);
-
-our ($errno, $errval);
+use OpenXPKI qw (debug);
+use OpenXPKI::Exception;
+use English;
 
 sub new {
     my $that = shift;
@@ -43,8 +43,17 @@ sub login {
                           PARTS => $self->{PASSWD_PARTS},
                           TOKEN => $self->{NAME});
 
-    return $self->set_error ("I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED")
-        if (not $self->{OPENSSL}->command ("convert_key", OUTFORM=>"PKCS8"));
+    eval
+    {
+        $self->{OPENSSL}->command ("convert_key", OUTFORM=>"PKCS8");
+    };
+    if (my $exc = OpenXPKI::Excpetion->caught())
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED");
+    } elsif ($EVAL_ERROR) {
+        $EVAL_ERROR->rethrow();
+    }
 
     $self->{ONLINE} = 1;
     return 1;
@@ -52,7 +61,7 @@ sub login {
 
 sub logout {
     my $self = shift;
-    undef $self->{PASSWD};
+    delete $self->{PASSWD};
     $self->{ONLINE} = 0;
     return 1;
 }
@@ -64,7 +73,7 @@ sub online {
 
 sub key_online {
     my $self = shift;
-    return undef if (not $self->{ONLINE});
+    return 0 if (not $self->{ONLINE});
     return 1;
 }
 
@@ -92,7 +101,8 @@ sub get_passwd
 {
     my $self = shift;
     return $self->{PASSWD} if (exists $self->{PASSWD});
-    return undef;
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_GET_PASSWD_UNDEF");
 }
 
 sub get_certfile

@@ -16,24 +16,17 @@ my $cache = OpenXPKI::XML::Cache->new(DEBUG  => 0,
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0);
-ok (not defined $mgmt);
-$mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0, CACHE => $cache);
-ok (defined $mgmt);
-if (not defined $mgmt)
+eval
 {
-    print STDERR "errno: ".OpenXPKI::Crypto::TokenManager::errno."\n";
-    print STDERR "errval: ".OpenXPKI::Crypto::TokenManager::errval."\n";
-}
+    OpenXPKI::Crypto::TokenManager->new (DEBUG => 0);
+};
+ok (OpenXPKI::Exception->caught());
+my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0, CACHE => $cache);
+ok (1);
 
 ## parameter checks for get_token
 
 my $token = $mgmt->get_token (NAME => "INTERNAL_CA_1", CA_GROUP => "CA_GROUP_1");
-ok (defined $token);
-if (not defined $token)
-{
-    print STDERR "errno: ".$mgmt->errno()."\n";
-    print STDERR "errval: ".$mgmt->errval()."\n";
-}
+ok (1);
 
 1;
