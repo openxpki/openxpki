@@ -18,7 +18,8 @@ These parsers tolerate errors!
 use XML::Simple;
 use XML::Parser;
 $XML::Simple::PREFERRED_PARSER = "XML::Parser";
-use OpenXPKI qw(debug set_error errno errval);
+use OpenXPKI qw(debug);
+use OpenXPKI::Exception;
 
 #######################################
 ##          General functions        ##
@@ -64,10 +65,10 @@ sub init
         {
             my $msg = $@;
             delete $self->{cache} if (exists $self->{cache});
-            $self->set_error ("I18N_OPENXPKI_XML_CACHE_INIT_XML_ERROR",
-                              "__FILE__", $filename,
-                              "__ERRVAL__", $msg);
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_XML_CACHE_INIT_XML_ERROR",
+                params  => {"FILE"   => $filename,
+                            "ERRVAL" => $msg});
         }
         if (not exists $self->{cache})
         {
@@ -131,7 +132,9 @@ sub get_xpath
     my $keys = { @_ };
     $self->debug ("start");
 
-    return $self->set_error (400, "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_XPATH")
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_XPATH",
+        errno   => 400)
         if (not $keys->{XPATH});
 
     if (ref ($keys->{XPATH}) eq "ARRAY")
@@ -154,15 +157,16 @@ sub get_xpath
     my $item = $self->{cache};
     for (my $i=0; $i<scalar @{$keys->{XPATH}}; $i++)
     {
-        $item = $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]];
-        if (not $item)
+        if (not exists $item->{$keys->{XPATH}->[$i]} or
+            not exists $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]])
         {
-            $self->set_error ("I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT",
-                              "__XPATH__", $self->__get_serialized_xpath($keys),
-                              "__TAG__", $keys->{XPATH}->[$i],
-                              "__POSITION__", $keys->{COUNTER}->[$i]);
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT",
+                params  => {"XPATH" =>    $self->__get_serialized_xpath($keys),
+                            "TAG"   =>    $keys->{XPATH}->[$i],
+                            "POSITION" => $keys->{COUNTER}->[$i]});
         }
+        $item = $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]];
     }
     if (not exists $item->{content})
     {
@@ -190,9 +194,9 @@ sub get_xpath_list
     {
         if (not exists $item->{content})
         {
-            $self->set_error ("I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_CONTENT",
-                              "__XPATH__", $self->__get_serialized_xpath({@_}));
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_CONTENT",
+                params  => {"XPATH" => $self->__get_serialized_xpath({@_})});
         }
         push @list, pack "U0C*", unpack "C*", $item->{content};
     }
@@ -205,7 +209,9 @@ sub get_xpath_count
     my $keys = { @_ };
     $self->debug ("start");
 
-    return $self->set_error (400, "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_MISSING_XPATH")
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_MISSING_XPATH",
+        errno   => 400)
         if (not $keys->{XPATH});
 
     if (ref ($keys->{XPATH}) eq "ARRAY")
@@ -234,11 +240,11 @@ sub get_xpath_count
         $item = $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]];
         if (not $item)
         {
-            $self->set_error ("I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_MISSING_ELEMENT",
-                              "__XPATH__", $self->__get_serialized_xpath($keys),
-                              "__TAG__", $keys->{XPATH}->[$i],
-                              "__POSITION__", $keys->{COUNTER}->[$i]);
-            return undef;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_MISSING_ELEMENT",
+                params  => {"XPATH"    => $self->__get_serialized_xpath($keys),
+                            "TAG"      => $keys->{XPATH}->[$i],
+                            "POSITION" => $keys->{COUNTER}->[$i]});
         }
     }
     $self->debug ("scan complete");

@@ -7,6 +7,7 @@ LICENSE
 CHANGES
 Makefile.PL
 OpenXPKI.pm
+OpenXPKI/Exception.pm
 OpenXPKI/DN.pm
 OpenXPKI/XML/Cache.pm
 
@@ -87,6 +88,8 @@ t/crypto/ca_openssl.cnf
 t/dn/1.t
 t/dn/2.t
 t/dn/3.t
+
+t/exception/1.t
 
 t/xml/1.t
 t/xml/2.t
