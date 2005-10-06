@@ -1,0 +1,7 @@
+Please do not change the leading line because we use it
+to extract the VERSION.
+
+2005-Sep-30:
+    - first version of the new crypto stack
+    - SCEP and PKCS#7 are not migrated until now
+    - nCipher and LunaCA are not supported until now

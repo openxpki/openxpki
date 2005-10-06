@@ -1,0 +1,17 @@
+OpenXPKI is available under two licenses. This project based on
+work done for OpenCA originally. Due to some conflicts some authors
+of this code agreed to start a new project with their code. OpenCA
+had a tradition of using the most open license type which requires
+a non-copyleft license.
+
+Otherwise the most Perl modules are covered by the GPL. The FSF thinks 
+that the licenses of the Aapche Software Foundation are incompatibel
+with their GPL. Therefore we distribute all modules under the GPL
+too to avoid any trouble for GPLed projects.
+
+1.) Apache Software License 2.0 or later
+2.) GPL 2 or later
+
+Please note that the copyright holders are still the contributors.
+You can find any contributor in the file credits.
+We choose a way like Linux to ensure the future of this project.

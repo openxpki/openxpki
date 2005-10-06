@@ -1,0 +1,2 @@
+Please set OPENSSL_PREFIX, OPENSSL_LIB or OPENSSL_INCLUDE if ou want to
+use a special OpenSSL version.

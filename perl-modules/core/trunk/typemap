@@ -1,0 +1,21 @@
+
+OpenXPKI_Crypto_OpenSSL_X509	T_PTROBJ_SPECIAL
+OpenXPKI_Crypto_OpenSSL_CRL	T_PTROBJ_SPECIAL
+OpenXPKI_Crypto_OpenSSL_SPKAC	T_PTROBJ_SPECIAL
+OpenXPKI_Crypto_OpenSSL_PKCS10	T_PTROBJ_SPECIAL
+
+INPUT
+
+T_PTROBJ_SPECIAL
+	if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type,tmp);
+        }
+        else
+        	croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+
+OUTPUT
+
+T_PTROBJ_SPECIAL
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\",
+	(void*)$var);
