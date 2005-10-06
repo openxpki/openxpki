@@ -1,6 +1,6 @@
 ## OpenXPKI
 ## (C)opyright 2005 Michael Bell
-## $Revision$
+## $Rev$
 
 use strict;
 no warnings;
