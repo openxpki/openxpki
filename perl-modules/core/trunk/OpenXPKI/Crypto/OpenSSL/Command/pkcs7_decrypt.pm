@@ -7,9 +7,7 @@ use warnings;
 
 package OpenXPKI::Crypto::OpenSSL::Command::pkcs7_decrypt;
 
-use OpenXPKI::Crypto::OpenSSL::Command;
-use vars qw(@ISA);
-@ISA = qw(OpenXPKI::Crypto::OpenSSL::Command);
+use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
 =head1 Parameters
 
