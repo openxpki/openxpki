@@ -1,13 +1,13 @@
 ## OpenXPKI
 ## (C)opyright 2005 Michael Bell
-## $Rev$
+## $Revision$
 
 use strict;
 no warnings;
 
 package OpenXPKI;
 
-our $VERSION = sprintf "%d.%03d", q$Rev$ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 
 use XSLoader;
 XSLoader::load ("OpenXPKI", $VERSION);
