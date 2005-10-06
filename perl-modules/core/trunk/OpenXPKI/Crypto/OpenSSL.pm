@@ -7,8 +7,6 @@ use warnings;
 
 package OpenXPKI::Crypto::OpenSSL;
 
-($OpenXPKI::Crypto::OpenSSL::VERSION = '$Revision: 1.9 $' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg;
-
 use OpenXPKI::Crypto::OpenSSL::Shell;
 use OpenXPKI::Crypto::OpenSSL::Command;
 

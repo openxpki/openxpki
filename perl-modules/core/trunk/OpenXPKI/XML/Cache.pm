@@ -1,6 +1,6 @@
 ## OpenXPKI::XML::Cache
-##
 ## Copyright (C) 2003-2005 Michael Bell
+## $Revision$
 
 use strict;
 use warnings;
@@ -19,11 +19,6 @@ use XML::Simple;
 use XML::Parser;
 $XML::Simple::PREFERRED_PARSER = "XML::Parser";
 use OpenXPKI qw(debug set_error errno errval);
-
-## the other use directions depends from the used databases
-## $Revision: 0.1.1.2 
-
-($OpenXPKI::XML::Cache::VERSION = '$Revision: 1.21 $' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg; 
 
 #######################################
 ##          General functions        ##

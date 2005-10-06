@@ -1,7 +1,3 @@
-Please do not change the leading line because we use it
-to extract the VERSION.
-
-2005-Sep-30:
-    - first version of the new crypto stack
-    - SCEP and PKCS#7 are not migrated until now
-    - nCipher and LunaCA are not supported until now
+Please only document here release relevant changes. The change
+from CVS to subversion brings us really good changeset control.
+We can always identify every change via the complete changeset.

@@ -15,8 +15,6 @@ our $endHeader      = "-----END HEADER-----";
 our $beginAttribute = "-----BEGIN ATTRIBUTE-----";
 our $endAttribute   = "-----END ATTRIBUTE-----";
 
-($OpenXPKI::Crypto::Header::VERSION = '$Revision: 1.3 $' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg;
-
 =head1 DESCRIPTION
 
 This module is a parser for all OpenXPKI objects. It parses the complete
