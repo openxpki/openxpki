@@ -9,9 +9,7 @@ package OpenXPKI::Crypto::CRL;
 
 use Date::Parse;
 
-use OpenXPKI::Crypto::Object;
-use vars qw(@ISA);
-@ISA = qw(OpenXPKI::Crypto::Object);
+use base qw(OpenXPKI::Crypto::Object);
 
 our ($errno, $errval);
 

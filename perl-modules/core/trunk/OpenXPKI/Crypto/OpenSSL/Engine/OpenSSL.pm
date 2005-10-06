@@ -7,9 +7,7 @@ use warnings;
 
 package OpenXPKI::Crypto::OpenSSL::Engine::OpenSSL;
 
-use OpenXPKI::Crypto::OpenSSL::Engine;
-use vars qw(@ISA);
-@ISA = qw(OpenXPKI::Crypto::OpenSSL::Engine);
+use base qw(OpenXPKI::Crypto::OpenSSL::Engine);
 
 our ($errno, $errval);
 
