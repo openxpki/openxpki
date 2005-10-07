@@ -1,10 +1,17 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         OpenXPKI
-version:      0.9.3.009
+version:      0.9.3.012
 version_from: OpenXPKI.pm
 installdirs:  site
 requires:
+    Date::Parse:                   1
+    Locale::TextDomain:            1
+    Math::BigInt:                  1
+    Test:                          1
+    Time::HiRes:                   1
+    XML::Parser:                   1
+    XML::Simple:                   1
 
 distribution_type: module
 generated_by: ExtUtils::MakeMaker version 6.17
