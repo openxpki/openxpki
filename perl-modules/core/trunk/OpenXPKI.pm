@@ -13,7 +13,7 @@ use XSLoader;
 XSLoader::load ("OpenXPKI", $VERSION);
 
 use Date::Parse;
-use Locale::Messages qw (:locale_h :libintl_h);
+use Locale::Messages qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
 use Fcntl qw(:DEFAULT);
 
@@ -152,9 +152,14 @@ sub set_language
     {
         setlocale(LC_MESSAGES, "C");
         setlocale(LC_TIME,     "C");
+        nl_putenv("LC_MESSAGES=C");
+        nl_putenv("LC_TIME=C");
     } else {
-        setlocale(LC_MESSAGES, "${language}.UTF-8");
-        setlocale(LC_TIME,     "${language}.UTF-8");
+        my $loc = "${language}.UTF-8";
+        setlocale(LC_MESSAGES, $loc);
+        setlocale(LC_TIME,     $loc);
+        nl_putenv("LC_MESSAGES=$loc");
+        nl_putenv("LC_TIME=$loc");
     }
     textdomain("openxpki");
     bindtextdomain("openxpki", $prefix);

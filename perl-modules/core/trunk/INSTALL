@@ -1,0 +1,23 @@
+Configuration
+=============
+
+Please set OPENSSL_PREFIX, OPENSSL_LIB or OPENSSL_INCLUDE if ou want to
+use a special OpenSSL version.
+
+Dependencies
+============
+
+We use the Date::Parse package of Graham Barr's module TimeDate.
+This is not the module from Ralf Engelschall's module lcwa.
+
+Sometimes it happens that the depend flag in Makefile.PL is incomplete.
+If this happen then you can get the complete list of used modules with
+the following REGEX:
+
+find . -name "*.pm" -exec grep "^use" '{}' \; | \
+grep -v "warnings" | \
+grep -v "strict" | \
+grep -v "Test" | \
+grep -v "English | \
+grep -v "OpenXPKI" | \
+sort | uniq

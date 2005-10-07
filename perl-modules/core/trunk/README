@@ -1,2 +1,15 @@
-Please set OPENSSL_PREFIX, OPENSSL_LIB or OPENSSL_INCLUDE if ou want to
-use a special OpenSSL version.
+Installation
+============
+
+Please see INSTALL for more detailed installation instructions.
+
+Coding Style
+============
+
+If you want to contribute code or you are already a developer
+then please respect our coding style. We only enforce a style
+to make a better maintenance. If you do not like the style or
+you have an idea to improve the style then please start a
+discussion on our developer list.
+
+perltidy -b `find . -name "*.pm" | grep -v "/\.svn"`

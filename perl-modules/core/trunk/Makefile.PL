@@ -44,9 +44,18 @@ print STDOUT "OpenSSL version: $version\n";
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    'NAME'     => 'OpenXPKI',
-    'VERSION_FROM'  => 'OpenXPKI.pm',
-    'LIBS'     => ["-L$lib -lcrypto"],
-    'INC'      => "-I. -I$inc",
+    'NAME'      => 'OpenXPKI',
+    'VERSION_FROM' => 'OpenXPKI.pm',
+    'LIBS'      => ["-L$lib -lcrypto"],
+    'INC'       => "-I. -I$inc",
+    'PREREQ_PM' => {Date::Parse        => 1,
+                    ## includes the version of libintl-perl which includes Locale::Messages
+                    Locale::TextDomain => 1,
+                    Math::BigInt       => 1,
+                    Test               => 1,
+                    Time::HiRes        => 1,
+                    XML::Parser        => 1,
+                    XML::Simple        => 1,
+                   },
     test       => {TESTS => 't/*.t t/*/*.t'},
 );
