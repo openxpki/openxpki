@@ -2,7 +2,7 @@ Configuration
 =============
 
 Please set OPENSSL_PREFIX, OPENSSL_LIB or OPENSSL_INCLUDE if you want to
-use a special OpenSSL version.
+use a special OpenSSL version (e.g. in /usr7local/ssl).
 
 Dependencies
 ============
