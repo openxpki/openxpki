@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test;
+use English;
 BEGIN { plan tests => 17 };
 
 print STDERR "OpenXPKI::Crypto::CSR\n";
@@ -61,7 +62,22 @@ my $items = 1000;
 my $begin = [ Time::HiRes::gettimeofday() ];
 for (my $i=0; $i<$items; $i++)
 {
-    $csr = OpenXPKI::Crypto::CSR->new (TOKEN => $token, DATA => $data);
+    eval
+    {
+        $csr = OpenXPKI::Crypto::CSR->new (TOKEN => $token, DATA => $data);
+    };
+    if ($EVAL_ERROR)
+    {
+        if (my $exc = OpenXPKI::Exception->caught())
+        {
+            print STDERR "OpenXPKI::Exception => ".$exc->as_string()."\n";
+        }
+        else
+        {
+            print STDERR "unknown eval error: ${EVAL_ERROR}\n";
+        }
+        
+    }
 }
 ok (1);
 my $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);

@@ -9,39 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::convert_key;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Description
-
-This command should perform all conversions of keys. This includes
-simple format conversions from PEM to DER and real tranformations
-from proprietary OpenSSL RSA and DSA key to PKCS#8 format.
-
-If there is a conversion towards PKCS#8 the result is always PEM
-encoded. If you need a DER encoded PKCS#8 key then you must convert
-the returned PEM encoded key again to DER.
-
-If you convert a RSA or DSA key from OpenSSL's proprietary format
-towards PKCS#8 then you must support us with a passphrase.
-
-=head1 Parameters
-
-=over 4
-
-=item * IN (RSA, DSA, PKCS8)
-
-=item * OUT (DER, PEM, PKCS8)
-
-=item * DATA
-
-=item * PASSWD
-
-=item * OUT_PASSWD (optional)
-
-=item * ENC_ALG (optional)
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -171,3 +138,50 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Description
+
+This command should perform all conversions of keys. This includes
+simple format conversions from PEM to DER and real tranformations
+from proprietary OpenSSL RSA and DSA key to PKCS#8 format.
+
+If there is a conversion towards PKCS#8 the result is always PEM
+encoded. If you need a DER encoded PKCS#8 key then you must convert
+the returned PEM encoded key again to DER.
+
+If you convert a RSA or DSA key from OpenSSL's proprietary format
+towards PKCS#8 then you must support us with a passphrase.
+
+=head1 Functions
+
+=head2 get_command
+
+=over
+
+=item * IN (RSA, DSA, PKCS8)
+
+=item * OUT (DER, PEM, PKCS8)
+
+=item * DATA
+
+=item * PASSWD
+
+=item * OUT_PASSWD (optional)
+
+=item * ENC_ALG (optional)
+
+=back
+
+=head2 hide_output
+
+returns 1 (key will only be displayed in encrypted form but the passphrase is present)
+
+=head2 key_usage
+
+returns 1 (private key must be decoded first)
+
+=head2 get_result
+
+simply returns the converted key
+

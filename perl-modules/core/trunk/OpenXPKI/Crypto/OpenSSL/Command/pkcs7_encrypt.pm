@@ -9,22 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::pkcs7_encrypt;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Parameters
-
-=over
-
-=item * CONTENT
-
-=item * USE_ENGINE (optional)
-
-=item * CERT (optional)
-
-=item * ENC_ALG (optional)
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -94,7 +78,7 @@ sub get_command
 
 sub hide_output
 {
-    return 0;
+    return 1;
 }
 
 ## please notice that key_usage means usage of the engine's key
@@ -112,3 +96,32 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+=over
+
+=item * CONTENT
+
+=item * USE_ENGINE (optional)
+
+=item * CERT (optional)
+
+=item * ENC_ALG (optional)
+
+=back
+
+=head2 hide_output
+
+returns true
+
+=head2 key_usage
+
+returns true
+
+=head2 get_result
+
+returns the encrypted data

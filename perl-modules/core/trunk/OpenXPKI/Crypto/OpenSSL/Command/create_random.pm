@@ -9,23 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::create_random;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Parameters
-
-Please note that all length specification are bytes. The returned
-string only includes base64 characters. It is strongly recommended
-to specifiy the required number of secure bytes and not the required
-return length.
-
-=over
-
-=item * RETURN_LENGTH
-
-=item * RANDOM_LENGTH
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -88,3 +71,36 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+Does this module be up-to-date? Perhaps the engine stuff is a little
+bit outdated.
+
+=head2 get_command
+
+Please note that all length specification are bytes. The returned
+string only includes base64 characters. It is strongly recommended
+to specifiy the required number of secure bytes and not the required
+return length.
+
+=over
+
+=item * RETURN_LENGTH
+
+=item * RANDOM_LENGTH
+
+=back
+
+=head2 hide_output
+
+returns true
+
+=head2 key_usage
+
+returns false
+
+=head2 get_result
+
+returns the new passphrase

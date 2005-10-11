@@ -9,35 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::create_cert;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Parameters
-
-If you want to create a cert for the used engine then you have
-only to specify the CSR and the CONFIG.
-
-If you want to create a normal certificate then you must specify at minimum
-a KEY and a PASSWD. If you want to use the engine then you must use
-USE_ENGINE too.
-
-=over
-
-=item * SUBJECT (optional)
-
-=item * CONFIG (optional)
-
-=item * KEY (optional)
-
-=item * CSR
-
-=item * USE_ENGINE (optional)
-
-=item * PASSWD (optional)
-
-=item * DAYS (optional)
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -163,3 +134,48 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+If you want to create a cert for the used engine then you have
+only to specify the CSR and the CONFIG.
+
+If you want to create a normal certificate then you must specify at minimum
+a KEY and a PASSWD. If you want to use the engine then you must use
+USE_ENGINE too.
+
+=over
+
+=item * SUBJECT (optional)
+
+=item * CONFIG (optional)
+
+=item * KEY (optional)
+
+=item * CSR
+
+=item * USE_ENGINE (optional)
+
+=item * PASSWD (optional)
+
+=item * DAYS (optional)
+
+=back
+
+=cut
+
+=head2 hide_output
+
+returns false
+
+=head2 key_usage
+
+Returns true if you try to create a certificate for the engine's key.
+Otherwise false is returned.
+
+=head2 get_result
+
+returns the new self-signed certificate.

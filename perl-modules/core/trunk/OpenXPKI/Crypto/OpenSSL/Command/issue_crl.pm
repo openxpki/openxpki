@@ -12,31 +12,6 @@ use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 use Math::BigInt;
 use English;
 
-=head1 Parameters
-
-=over
-
-=item * SERIAL
-
-=item * DAYS
-
-=item * START
-
-=item * ENC
-
-=item * REVOKED
-
-This parameter is an ARRAY reference. The elements of this array
-are an ARRAY too which contains the certificate and the timestamp. The
-certificate can be a PEM encoded X.509v3 certificate or it must
-be a reference to an OpenXPKI::Crypto::OpenSSL::X509 object. The
-timestamp must be a timestamp which is automatically parseable
-by Date::Parse.
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -196,3 +171,41 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+=over
+
+=item * SERIAL
+
+=item * DAYS
+
+=item * START
+
+=item * ENC
+
+=item * REVOKED
+
+This parameter is an ARRAY reference. The elements of this array
+are an ARRAY too which contains the certificate and the timestamp. The
+certificate can be a PEM encoded X.509v3 certificate or it must
+be a reference to an OpenXPKI::Crypto::OpenSSL::X509 object. The
+timestamp must be a timestamp which is automatically parseable
+by Date::Parse.
+
+=back
+
+=head2 hide_output
+
+returns false
+
+=head2 key_usage
+
+returns true
+
+=head2 get_result
+
+returns the new CRL

@@ -11,28 +11,6 @@ use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
 use Math::BigInt;
 
-=head1 Parameters
-
-=over
-
-=item * SUBJECT (optional)
-
-=item * CONFIG (optional)
-
-=item * CSR
-
-=item * SERIAL
-
-=item * DAYS (optional)
-
-=item * START (optional)
-
-=item * END (optional)
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -187,3 +165,38 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+=over
+
+=item * SUBJECT (optional)
+
+=item * CONFIG (optional)
+
+=item * CSR
+
+=item * SERIAL
+
+=item * DAYS (optional)
+
+=item * START (optional)
+
+=item * END (optional)
+
+=back
+
+=head2 hide_output
+
+return false
+
+=head2 key_usage
+
+return true
+
+=head2 get_result
+
+returns the new certificate

@@ -10,24 +10,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::pkcs7_get_chain;
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 use English;
 
-=head1 Parameters
-
-You must specify the SIGNER or the SIGNER_SUBJECT.
-
-=over
-
-=item * PKCS7 (a signature)
-
-=item * USE_ENGINE (optional)
-
-=item * SIGNER (the signer to find the chain's begin)
-
-=item * SIGNER_SUBJECT (the subject of the signer's certificate)
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -133,3 +115,36 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+You must specify the SIGNER or the SIGNER_SUBJECT.
+
+=over
+
+=item * PKCS7 (a signature)
+
+=item * USE_ENGINE (optional)
+
+=item * SIGNER (the signer to find the chain's begin)
+
+=item * SIGNER_SUBJECT (the subject of the signer's certificate)
+
+=back
+
+=head2 hide_output
+
+returns false (chain verification is not a secret)
+
+=head2 key_usage
+
+returns false
+
+=head2 get_result
+
+Returns the PEM-encoded certificates in the correct order which are
+contained in the signature. The certificates are seperated by a blank
+line.

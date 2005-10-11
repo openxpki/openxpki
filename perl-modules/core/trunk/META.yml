@@ -9,7 +9,8 @@ requires:
     Locale::TextDomain:            1
     Math::BigInt:                  1
     Test:                          1
-    Test::POD:                     1.00
+    Test::Pod:                     1.00
+    Test::Pod::Coverage:           1.00
     Time::HiRes:                   1
     XML::Parser:                   1
     XML::Simple:                   1

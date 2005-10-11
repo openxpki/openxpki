@@ -9,35 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::create_pkcs12;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Parameters
-
-Only the engine is optional all other parameters must be present.
-This function was only designed for normal certificates. They are
-not designed for the tokens themselves.
-
-=over
-
-=item * KEY
-
-=item * USE_ENGINE (optional)
-
-=item * PASSWD
-
-=item * CERT
-
-=item * PKCS12_PASSWD (optional)
-
-If you do not specify this option then we use PASSWD to encrypt the new
-PKCS#12 file.
-
-=item * ENC_ALG (optional)
-
-=item * CHAIN (optional)
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -144,3 +115,45 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+Only the engine is optional all other parameters must be present.
+This function was only designed for normal certificates. They are
+not designed for the tokens themselves.
+
+=over
+
+=item * KEY
+
+=item * USE_ENGINE (optional)
+
+=item * PASSWD
+
+=item * CERT
+
+=item * PKCS12_PASSWD (optional)
+
+If you do not specify this option then we use PASSWD to encrypt the new
+PKCS#12 file.
+
+=item * ENC_ALG (optional)
+
+=item * CHAIN (optional)
+
+=back
+
+=head2 hide_output
+
+returns false
+
+=head2 key_usage
+
+returns true (FIXME: does this be correct?)
+
+=head2 get_result
+
+returns the newly created PKCS#12 container

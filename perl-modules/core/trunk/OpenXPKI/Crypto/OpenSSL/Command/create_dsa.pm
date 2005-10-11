@@ -9,32 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::create_dsa;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Parameters
-
-If you want to create a key for the used engine then you have
-only to specify the ENC_ALG and KEY_LENGTH. Perhaps you can specify
-the RANDOM_FILE too.
-
-If you want to create a normal key then you must specify at minimum
-a passwd and perhaps USE_ENGINE if you want to use the engine of the
-token too.
-
-=over
-
-=item * ENC_ALG
-
-=item * KEY_LENGTH
-
-=item * RANDOM_FILE
-
-=item * USE_ENGINE
-
-=item * PASSWD
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -143,3 +117,42 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+If you want to create a key for the used engine then you have
+only to specify the ENC_ALG and KEY_LENGTH. Perhaps you can specify
+the RANDOM_FILE too.
+
+If you want to create a normal key then you must specify at minimum
+a passwd and perhaps USE_ENGINE if you want to use the engine of the
+token too.
+
+=over
+
+=item * ENC_ALG
+
+=item * KEY_LENGTH
+
+=item * RANDOM_FILE
+
+=item * USE_ENGINE
+
+=item * PASSWD
+
+=back
+
+=head2 hide_output
+
+returns true
+
+=head2 key_usage
+
+returns true
+
+=head2 get_result
+
+returns the new encrypted DSA key

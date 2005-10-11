@@ -9,24 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::pkcs7_verify;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Parameters
-
-=over
-
-=item * CONTENT (original data which was signed)
-
-=item * PKCS7 (signature which should be verified)
-
-=item * USE_ENGINE (optional)
-
-=item * CHAIN (this must be a single file for security reasons!!!)
-
-=item * NO_VERIFY (do not check the signer certificate)
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -89,8 +71,7 @@ sub hide_output
 sub key_usage
 {
     my $self = shift;
-    return 0 if (exists $self->{CLEANUP}->{ENV}->{PWD});
-    return 1;
+    return 0;
 }
 
 sub get_result
@@ -109,3 +90,34 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+=over
+
+=item * CONTENT (original data which was signed)
+
+=item * PKCS7 (signature which should be verified)
+
+=item * USE_ENGINE (optional)
+
+=item * CHAIN (this must be a single file for security reasons!!!)
+
+=item * NO_VERIFY (do not check the signer certificate)
+
+=back
+
+=head2 hide_output
+
+returns false
+
+=head2 key_usage
+
+returns false
+
+=head2 get_result
+
+returns the signer on success

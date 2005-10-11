@@ -9,31 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::create_pkcs10;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Parameters
-
-If you want to create a csr for the used engine then you have
-only to specify the SUBJECT and the CONFIG.
-
-If you want to create a normal CSR then you must specify at minimum
-a KEY and a PASSWD. If you want to use the engine then you must use
-USE_ENGINE too.
-
-=over
-
-=item * SUBJECT
-
-=item * CONFIG
-
-=item * KEY
-
-=item * USE_ENGINE
-
-=item * PASSWD
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -139,3 +114,42 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+If you want to create a csr for the used engine then you have
+only to specify the SUBJECT and the CONFIG.
+
+If you want to create a normal CSR then you must specify at minimum
+a KEY and a PASSWD. If you want to use the engine then you must use
+USE_ENGINE too.
+
+=over
+
+=item * SUBJECT
+
+=item * CONFIG
+
+=item * KEY
+
+=item * USE_ENGINE
+
+=item * PASSWD
+
+=back
+
+=head2 hide_output
+
+returns false
+
+=head2 key_usage
+
+Returns true if the request is created for the engine's key.
+Otherwise returns false.
+
+=head2 get_result
+
+Returns the newly created PEM encoded PKCS#10 key.

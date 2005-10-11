@@ -9,35 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::pkcs7_sign;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Parameters
-
-If you want to create a signature with the used engine/token then you have
-only to specify the CONTENT.
-
-If you want to create a normal signature then you must specify at minimum
-a CERT, a KEY and a PASSWD. If you want to use the engine then you must use
-USE_ENGINE too.
-
-=over
-
-=item * CONTENT
-
-=item * USE_ENGINE (optional)
-
-=item * CERT
-
-=item * KEY
-
-=item * PASSWD
-
-=item * ENC_ALG (optional)
-
-=item * DETACH (strip off the content from the resulting PKCS#7 structure)
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -173,3 +144,45 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+If you want to create a signature with the used engine/token then you have
+only to specify the CONTENT.
+
+If you want to create a normal signature then you must specify at minimum
+a CERT, a KEY and a PASSWD. If you want to use the engine then you must use
+USE_ENGINE too.
+
+=over
+
+=item * CONTENT
+
+=item * USE_ENGINE (optional)
+
+=item * CERT
+
+=item * KEY
+
+=item * PASSWD
+
+=item * ENC_ALG (optional)
+
+=item * DETACH (strip off the content from the resulting PKCS#7 structure)
+
+=back
+
+=head2 hide_output
+
+returns false
+
+=head2 key_usage
+
+returns true
+
+=head2 get_result
+
+returns the PKCS#7 signature in PEM format

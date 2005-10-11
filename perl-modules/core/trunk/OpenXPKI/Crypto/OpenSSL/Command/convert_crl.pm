@@ -9,18 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::convert_crl;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Parameters
-
-=over
-
-=item * DATA
-
-=item * OUT (DER, TXT)
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -72,7 +60,7 @@ sub hide_output
 
 sub key_usage
 {
-    return 1;
+    return 0;
 }
 
 sub get_result
@@ -82,3 +70,29 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+=over
+
+=item * DATA
+
+=item * OUT (DER, TXT)
+
+=back
+
+=head2 hide_output
+
+returns 0
+
+=head2 key_usage
+
+returns 0
+
+=head2 get_result
+
+simply returns the converted CRL
+

@@ -9,31 +9,6 @@ package OpenXPKI::Crypto::OpenSSL::Command::pkcs7_decrypt;
 
 use base qw(OpenXPKI::Crypto::OpenSSL::Command);
 
-=head1 Parameters
-
-If you want to decrypt a PKCS#7 structure with the used engine/token then you have
-only to specify the PKCS7.
-
-If you want to decrypt a normal PKCS#7 structure then you must specify at minimum
-a CERT, a KEY and a PASSWD. If you want to use the engine then you must use
-USE_ENGINE too.
-
-=over
-
-=item * PKCS7
-
-=item * USE_ENGINE (optional)
-
-=item * CERT
-
-=item * KEY
-
-=item * PASSWD
-
-=back
-
-=cut
-
 sub get_command
 {
     my $self = shift;
@@ -136,7 +111,7 @@ sub get_command
 
 sub hide_output
 {
-    return 0;
+    return 1;
 }
 
 ## please notice that key_usage means usage of the engine's key
@@ -154,3 +129,41 @@ sub get_result
 }
 
 1;
+__END__
+
+=head1 Functions
+
+=head2 get_command
+
+If you want to decrypt a PKCS#7 structure with the used engine/token then you have
+only to specify the PKCS7.
+
+If you want to decrypt a normal PKCS#7 structure then you must specify at minimum
+a CERT, a KEY and a PASSWD. If you want to use the engine then you must use
+USE_ENGINE too.
+
+=over
+
+=item * PKCS7
+
+=item * USE_ENGINE (optional)
+
+=item * CERT
+
+=item * KEY
+
+=item * PASSWD
+
+=back
+
+=head2 hide_output
+
+returns true (if something is encrypted then it is usually secret)
+
+=head2 key_usage
+
+returns true
+
+=head2 get_result
+
+returns the decrpyted data
