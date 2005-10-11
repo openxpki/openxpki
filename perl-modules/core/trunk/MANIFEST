@@ -92,6 +92,9 @@ t/dn/3.t
 
 t/exception/1.t
 
+t/pod/1.t
+t/pod/2.t
+
 t/xml/1.t
 t/xml/2.t
 t/xml/test.xml

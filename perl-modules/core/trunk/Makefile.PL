@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 
 ## first we have to find a working OpenSSL 0.9.7 at minimum
@@ -19,10 +21,10 @@ my @paths = ("/usr/local/ssl", "/usr/local", "/usr", "");
 push @paths, $ENV{OPENSSL_PREFIX}
     if (exists $ENV{OPENSSL_PREFIX} and length $ENV{OPENSSL_PREFIX});
 
-$inc = $ENV{$OPENSSL_INC}
-    if (exists $ENV{$OPENSSL_INC} and length $ENV{$OPENSSL_INC});
-$lib = $ENV{$OPENSSL_LIB}
-    if (exists $ENV{$OPENSSL_LIB} and length $ENV{$OPENSSL_LIB});
+$inc = $ENV{OPENSSL_INC}
+    if (exists $ENV{OPENSSL_INC} and length $ENV{OPENSSL_INC});
+$lib = $ENV{OPENSSL_LIB}
+    if (exists $ENV{OPENSSL_LIB} and length $ENV{OPENSSL_LIB});
 
 foreach my $path (@paths)
 {
@@ -48,14 +50,15 @@ WriteMakefile(
     'VERSION_FROM' => 'OpenXPKI.pm',
     'LIBS'      => ["-L$lib -lcrypto"],
     'INC'       => "-I. -I$inc",
-    'PREREQ_PM' => {Date::Parse        => 1,
+    'PREREQ_PM' => {'Date::Parse'        => 1,
                     ## includes the version of libintl-perl which includes Locale::Messages
-                    Locale::TextDomain => 1,
-                    Math::BigInt       => 1,
-                    Test               => 1,
-                    Time::HiRes        => 1,
-                    XML::Parser        => 1,
-                    XML::Simple        => 1,
+                    'Locale::TextDomain' => 1,
+                    'Math::BigInt'       => 1,
+                    'Test'               => 1,
+                    'Test::POD'          => "1.00",
+                    'Time::HiRes'        => 1,
+                    'XML::Parser'        => 1,
+                    'XML::Simple'        => 1,
                    },
     test       => {TESTS => 't/*.t t/*/*.t'},
 );

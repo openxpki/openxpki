@@ -27,10 +27,10 @@ use English;
 =item * REVOKED
 
 This parameter is an ARRAY reference. The elements of this array
-are an ARRAY two which contains certificate and a timestamp. The
+are an ARRAY too which contains the certificate and the timestamp. The
 certificate can be a PEM encoded X.509v3 certificate or it must
-be references to OpenXPKI::Crypto::OpenSSL::X509 objects. The
-timestamp must be a timestamp which is automatically detected
+be a reference to an OpenXPKI::Crypto::OpenSSL::X509 object. The
+timestamp must be a timestamp which is automatically parseable
 by Date::Parse.
 
 =back
