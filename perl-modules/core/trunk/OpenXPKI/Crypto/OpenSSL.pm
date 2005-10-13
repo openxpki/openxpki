@@ -128,7 +128,7 @@ sub command
     my $cmd  = "OpenXPKI::Crypto::OpenSSL::Command::".shift;
     $self->debug ("Command: $cmd");
 
-    return eval
+    my $ret = eval
     {
         my $cmdref = $cmd->new (%{$self->{COMMAND_PARAMS}}, @_,
                                 ENGINE => $self);
@@ -161,8 +161,7 @@ sub command
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     } else {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_UNEXPECTED_EVAL_FAILURE");
+        return $ret;
     }
 }
 
