@@ -108,6 +108,8 @@ sub get_chain
     my $keys = { @_ };
     return $self->{CHAIN} if ($self->{CHAIN});
 
+    $self->verify() if (not exists $self->{SIGNER});
+
     my %params = (DEBUG => $self->{DEBUG});
     $params{PKCS7}      = $self->{PKCS7};
     $params{SIGNER}     = $self->{SIGNER};
