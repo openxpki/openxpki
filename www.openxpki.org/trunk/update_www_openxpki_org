@@ -13,7 +13,7 @@ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/openca checkout -P doc
 
 mkdir -p /var/www/htdocs
 cd /var/www/htdocs/
-cp -r /var/www/htdocs_cvs/www.openxpki.org/trunk/htdocs/* .
+cp -r /var/www/htdocs_cvs/trunk/htdocs/* .
 #cd docs
 #mkdir howto || echo howto dir already present
 #mkdir guide || echo guide dir already present
