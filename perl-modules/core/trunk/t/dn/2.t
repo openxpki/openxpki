@@ -53,9 +53,16 @@ my %example = (
          "C=ar,O=university,CN=ftp/ftp.example.com",
          "/C=ar/O=university/CN=ftp\\/ftp.example.com",
         ],
+    ## DC syntax
+    "CN=foo.example.com,DC=example,DC=com" =>
+        [
+         "CN=foo.example.com,DC=example,DC=com",
+         "DC=com,DC=example,CN=foo.example.com",
+         "/DC=com/DC=example/CN=foo.example.com",
+        ],
               );
 
-BEGIN { plan tests => 36 };
+BEGIN { plan tests => 42 };
 
 print STDERR "OUTPUT VALIDATION\n";
 

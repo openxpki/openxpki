@@ -5,16 +5,14 @@ BEGIN { plan tests => 4 };
 
 print STDERR "OpenXPKI::Crypto::TokenManager\n";
 
+use OpenXPKI;
 use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
+
+our $cache;
+eval `cat t/crypto/common.pl`;
+
 ok(1);
-
-## init the XML cache
-
-my $cache = OpenXPKI::XML::Cache->new(DEBUG  => 0,
-                                      CONFIG => [ "t/crypto/token.xml" ]);
-
-## parameter checks for TokenManager init
 
 eval
 {

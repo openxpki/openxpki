@@ -8,12 +8,11 @@ print STDERR "OpenXPKI::Crypto::Header\n";
 use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Header;
+
+our $cache;
+eval `cat t/crypto/common.pl`;
+
 ok(1);
-
-## init the XML cache
-
-my $cache = OpenXPKI::XML::Cache->new(DEBUG  => 0,
-                                      CONFIG => [ "t/crypto/token.xml" ]);
 
 ## parameter checks for TokenManager init
 

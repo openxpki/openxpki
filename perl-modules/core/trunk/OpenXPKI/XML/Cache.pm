@@ -49,10 +49,17 @@ sub init
                                  KeepRoot      => 1);
 
     delete $self->{cache} if (exists $self->{cache});
-    foreach my $filename (@{$self->{config}})
+    foreach my $input (@{$self->{config}})
     {
-        $self->debug ("filename: $filename");
-        my $xml = eval { $xs->XMLin ($filename); };
+	# if input contains '<>' characters, we are passed a raw XML string
+	# otherwise we assume a filename
+	my $filename = "[Literal XML string]";
+	if ($input !~ m{[<>]}) {
+	    $filename = $input;
+	}
+	$self->debug ("filename: $filename");
+
+        my $xml = eval { $xs->XMLin ($input); };
         if (not $xml and $@)
         {
             my $msg = $@;
@@ -330,13 +337,16 @@ These parsers tolerate errors!
 create the class instance and calls internally the function init to
 load the XML files for the first time. The supported parameters are
 DEBUG and CONFIG. DEBUG can be a true or false value. CONFIG is an
-array reference which contains all the filename which include the
-configuration.
+array reference which contains either filenames including the configuration
+or strings containing the XML configuration literally. Filenames
+and literal XML strings can be mixed. A parameter is considered a literal
+XML string if it contains a '<' or '>' character.
 
 =head2 init
 
-This function loads all XML files and initializes the internal data
-structures. After init you have a constant access performance.
+This function loads all XML files (or literal XML strings) and initializes 
+the internal data structures. After init you have a constant access 
+performance.
 
 =head2 dump
 

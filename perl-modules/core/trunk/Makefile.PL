@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+use File::Spec;
+
 ## first we have to find a working OpenSSL 0.9.7 at minimum
 ## a working 0.9.8 would be better
 
@@ -12,44 +14,83 @@ use ExtUtils::MakeMaker;
 # /usr/local
 # /usr
 # /
+# ...
 
-my $inc = "";
-my $lib = "";
+my $openssl_inc_dir = "";
+my $openssl_lib_dir = "";
+my $openssl_binary = "";
 
-my @paths = ("/usr/local/ssl", "/usr/local", "/usr", "");
+my @paths = qw( /usr/local/ssl
+                /opt/local/ssl
+                /usr/local
+                /opt/local
+                /usr
+                /opt
+              );
 
-push @paths, $ENV{OPENSSL_PREFIX}
-    if (exists $ENV{OPENSSL_PREFIX} and length $ENV{OPENSSL_PREFIX});
+if (exists $ENV{OPENSSL_PREFIX} && $ENV{OPENSSL_PREFIX} ne "") {
+    push @paths, $ENV{OPENSSL_PREFIX};
+}
 
-$inc = $ENV{OPENSSL_INC}
-    if (exists $ENV{OPENSSL_INC} and length $ENV{OPENSSL_INC});
-$lib = $ENV{OPENSSL_LIB}
-    if (exists $ENV{OPENSSL_LIB} and length $ENV{OPENSSL_LIB});
+
+my $tmp_ver;
 
 foreach my $path (@paths)
 {
-    $inc = $path."/include"
-        if (not $inc and -d $path."/include");
-    $lib = $path."/lib"
-        if (not $lib and -d $path."/lib");
+    my $tmp_inc = File::Spec->catfile($path, 'include');
+    $tmp_ver = File::Spec->catfile($tmp_inc, 'openssl', 'opensslv.h');
+    my $tmp_lib = File::Spec->catfile($path, 'lib');
+    my $tmp_bin = File::Spec->catfile($path, 'bin', 'openssl');
+
+    if (-d $tmp_inc &&
+	-d $tmp_lib &&
+	-r $tmp_ver &&
+	-r $tmp_bin && -x $tmp_bin) {
+
+	$openssl_inc_dir = $tmp_inc;
+	$openssl_lib_dir = $tmp_lib;
+	$openssl_binary  = $tmp_bin;
+	last;
+    }
 }
 
-print STDOUT "OpenSSL library: $lib\n";
-print STDOUT "OpenSSL headers: $inc\n";
+# accept settings from OPENSSL_INC and OPENSSL_LIB if BOTH exist
+if (exists $ENV{OPENSSL_INC} && $ENV{OPENSSL_INC} != "" &&
+    exists $ENV{OPENSSL_LIB} && $ENV{OPENSSL_LIB} != "") {
 
-my $version = `grep '#define OPENSSL_VERSION_TEXT' $inc/openssl/opensslv.h`;
+    $openssl_inc_dir = $ENV{OPENSSL_INC};
+    $openssl_lib_dir     = $ENV{OPENSSL_LIB};
+}
+
+die "Could not find usable OpenSSL installation. Stopped" 
+    unless defined $openssl_inc_dir;
+
+die "Could not find usable OpenSSL binary. Stopped" 
+    unless defined $openssl_binary;
+
+print STDOUT "OpenSSL library: $openssl_lib_dir\n";
+print STDOUT "OpenSSL headers: $openssl_inc_dir\n";
+print STDOUT "OpenSSL binary:  $openssl_binary\n";
+
+my $version = `grep '#define OPENSSL_VERSION_TEXT' $tmp_ver`;
+
 $version =~ s/^.*fips.*$//m;
 $version =~ s/\n//g;
 $version =~ s/^[^"]*"([^"]*)".*$/$1/;
 print STDOUT "OpenSSL version: $version\n";
+
+# make OpenSSL binary location available to tests
+open my $fh, ">", File::Spec->catfile("t", "cfg.binary.openssl");
+print $fh $openssl_binary;
+close $fh;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'      => 'OpenXPKI',
     'VERSION_FROM' => 'OpenXPKI.pm',
-    'LIBS'      => ["-L$lib -lcrypto"],
-    'INC'       => "-I. -I$inc",
+    'LIBS'      => ["-L$openssl_lib_dir -lcrypto"],
+    'INC'       => "-I. -I$openssl_inc_dir",
     'PREREQ_PM' => {'Date::Parse'         => 1,
                     'Exception::Class'    => "1.22",
                     ## includes the version of libintl-perl which includes Locale::Messages

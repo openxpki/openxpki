@@ -11,12 +11,10 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::CSR;
 use Time::HiRes;
 
+our $cache;
+eval `cat t/crypto/common.pl`;
+
 ok(1);
-
-## init the XML cache
-
-my $cache = OpenXPKI::XML::Cache->new(DEBUG  => 0,
-                                      CONFIG => [ "t/crypto/token.xml" ]);
 
 ## parameter checks for TokenManager init
 

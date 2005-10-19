@@ -19,8 +19,8 @@ use Locale::Messages qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
 use Fcntl qw (:DEFAULT);
 
-our $language;
-our $prefix;
+our $language = "";
+our $prefix = "";
 
 use vars qw (@ISA @EXPORT_OK);
 require Exporter;
@@ -104,7 +104,7 @@ C<I18N_OPENCA_MODULE_FUNCTION_SPECIFIC_STUFF>.
 Optionally there may follow a hash or a hash reference that maps parameter
 keywords to values that should be replaced in the original string.
 A parameter should have the format C<__NAME__>, but in fact every
-keyword is possible).
+keyword is possible.
 
 The function obtains the translation for the code string (if available)
 and then replaces each parameter keyword in the code string
@@ -277,8 +277,6 @@ sub read_file
 	# slurp mode
 	local $INPUT_RECORD_SEPARATOR;     # long version of $/
 	<$HANDLE>;
-
-	close $HANDLE;
     };
 
     return $result;
