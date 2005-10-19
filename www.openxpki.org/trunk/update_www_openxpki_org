@@ -1,24 +1,28 @@
 set -e
 
+if [ ! -z "$1" ] && [ -d "$1" ]; then 
+   target=$1;
+else
+   target=/var/www/htdocs
+fi
+
+echo "Installing to target $target";
+
 old=`pwd`
-mkdir -p /var/www/htdocs_cvs || echo /var/www/htdocs_cvs dir already present
-cd /var/www/htdocs_cvs
+cd $target
+
+## Legacy problem: cvs folger is named doc, should be docs - so we make a link
+
+if [ ! -a  ]; then 
+  ln -s docs doc 
+fi;
 
 ## update CVS
 
-svn checkout svn://svn.berlios.de/openxpki/www.openxpki.org/trunk 2>/dev/null >/dev/null
-cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/openca checkout -P doc 2>/dev/null >/dev/null
+svn checkout svn://svn.berlios.de/openxpki/www.openxpki.org/trunk/htdocs $target 2>/dev/null >/dev/null
+cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/openca/ checkout -P doc 2>/dev/null >/dev/null
 
 ## copy stuff to htdocs area
-
-mkdir -p /var/www/htdocs
-cd /var/www/htdocs/
-cp -r /var/www/htdocs_cvs/trunk/htdocs/* .
-#cd docs
-#mkdir howto || echo howto dir already present
-#mkdir guide || echo guide dir already present
-cp -r /var/www/htdocs_cvs/doc/* /var/www/htdocs/docs/
-#cp -r /var/www/htdocs_cvs/openca-0.9/docs/guide/* guide/
 
 ## create symlinks if necessary
 # images for One Page HTML Guide
@@ -35,7 +39,5 @@ cd html
 rm -rf images
 ln -s ../src/images
 
-# css
-cd /var/www/htdocs/css/
-
 cd $old
+
