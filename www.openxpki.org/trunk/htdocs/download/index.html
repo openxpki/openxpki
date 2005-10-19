@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <link rel="stylesheet" title="default" href="../css/openca.css" type="text/css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>OpenCA Project </title>
+  </head>
+  <body>
+    <div class="page">
+
+     <div class="navi">
+      <div class="menu">
+        <h2><a href="../">OpenCA Home</a></h2>
+        <div class="menu_item"><a href="../secadvs/">Security Advisories</a></div>
+        <div class="menu_item"><a href="../mirrors/">Mirrors</a></div>
+        <div class="menu_item"><a href="../news/">News</a></div>
+        <div class="menu_item"><a href="../docs/">Documentation</a></div>
+        <div class="menu_item"><a href="../demo/">Demo Installations</a></div>
+        <div class="menu_item"><a href="../download/">Download</a></div>
+        <div class="menu_sub_item"><a href="https://sourceforge.net/project/showfiles.php?group_id=20873">Sourceforge</a></div>
+        <div class="menu_sub_item"><a href="ftp://ftp.openca.org/pub/openca">FTP</a></div>
+        <div class="menu_sub_item"><a href="../mirrors/ftp.html">FTP Mirrors</a></div>
+        <div class="menu_item"><a href="../resources/">Resources</a></div>
+        <div class="menu_item"><a href="http://sourceforge.net/cvs/?group_id=20873">CVS (sf.net)</a></div>
+      </div>
+      <div class="w3c">
+        <a href="http://validator.w3.org/check?uri=http://www.openca.info/"><img class="noborder" src="../images/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88" /></a>
+      </div>
+     </div>  <!-- navi -->
+
+     <div class="info">
+      <div class="header">
+        <img src="../images/openca_project_blue.png" alt="OpenCA Project"/>
+      </div>
+      <div class="main">
+       <div class="content">
+        <h2>Download</h2>
+        <p>
+          You can use two different ways to download software from
+          OpenCA. The first option is the file release system from
+          Sourceforge. You have only to go to OpenCA's pages on
+          Sourceforge.net. There you find a link <tt>Files</tt> where
+          all downloadable files are listed. The second option is
+          OpenCA's own ftp service. Please use one of the mirrors close
+          to you to reduce the load on the lines of ftp.openca.org.
+          This server has only a 2 MBit line today.
+        </p>
+        <h3>OpenCA 0.9.2</h3>
+        <ul>
+          <li><a href="http://prdownloads.sourceforge.net/openca/openca-0.9.2.4.tar.gz?download">
+            0.9.2.4 (introduces UTF-8 support)
+          </a></li>
+          <li>
+            0.9.2.3 (revoked because buggy - database layer is broken !)
+          </li>
+          <li><a href="http://prdownloads.sourceforge.net/openca/openca-0.9.2.2.tar.gz?download">
+            0.9.2.2
+          </a></li>
+          <li><a href="http://prdownloads.sourceforge.net/openca/openca-0.9.2.1.tar.gz?download">
+            0.9.2.1
+          </a></li>
+          <li><a href="http://prdownloads.sourceforge.net/openca/openca-0.9.2.0.tar.gz?download">
+            0.9.2.0
+          </a></li>
+        </ul>
+        <h3>OpenCA 0.9.1</h3>
+        <ul>
+          <li><a href="http://prdownloads.sourceforge.net/openca/openca-0.9.1-10.tar.gz?download">
+            0.9.1-10
+          </a></li>
+        </ul>
+
+        <h2>Sub Projects</h2>
+        <p>
+          Usually the most people only notice OpenCA as a complete
+          trustcenter system but OpenCA contains three C programs which
+          can be used independently.
+        </p><p>
+          All three programs are included in our trustcenter software
+          but all of them have a complete own autoconf/automake system.
+          You can extract them from our releases and use them
+          seperately. They have the same license like OpenCA.
+        </p>
+        <p>
+          If you need a seperate release of one of these tools then
+          please contact us via the OpenCA users list. We don't publish
+          seperate releases today to reduce the management overhead.
+          This is a volunteer project without a commercial company in
+          the background and so we try to push the most human power into
+          the software and documentation.
+        </p>
+        <h3>OpenCA SV</h3>
+        <p>
+          This small tool can sign, verify, encrypt and decrypt any
+          (binary) data. This include signatures from HTML form made
+          with Internet Explorer or Mozilla. You can use this tool for
+          the encryption of your backups too. The syntax is exactly the
+          same like from OpenSSL. You can find the tool in our sources
+          at <tt>src/openca-sv</tt>.
+         </p>
+        <h3>OCSPD</h3>
+        <p>
+          The OCSPD implements an OCSP service which can use LDAP as
+          primary source of informations. This allows you to establish
+          an OCSP service for every other PKI platform even if this
+          platform does not support OCSP or requires extra licenses for
+          OCSP daemons. You can find the daemon in our sources at
+          <tt>src/ocspd</tt>.
+        </p>
+        <h3>SCEP</h3>
+        <p>
+          This tool can be used to create or extract SCEP messages. It
+          uses a syntax like OpenSSL and is used by OpenCA's scripts
+          to provide the SCEP functions operation and getcert. You can
+           find the tool in our sources at <tt>src/scep</tt>.
+        </p>
+       </div> <!-- content -->
+       <div class="footer">
+         $Author: oliwel $ $Date: 2005/09/06 13:57:50 $ - &copy; 2004 The OpenCA Project
+       </div>  <!-- footer -->
+      </div>   <!-- main -->
+     </div>    <!-- info -->
+    </div>     <!-- page -->
+  </body>
+</html>

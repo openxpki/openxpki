@@ -1,0 +1,212 @@
+/*
+ * (c) 2003 OpenCA project
+ * (c) 2004 OpenSC project
+ * (c) 2004 OpenCA
+ * (c) 2005 OpenXPKI
+ *
+ * the base of this file was the style1.css from the OpenSC project merged
+ * together with the original OpenCA style file
+ */
+
+/*******************
+ * element styling *
+ *******************/
+
+body {
+    margin: 15px;
+    /* background: #ffd; */
+    background-color: white;
+    color: black;
+    font-family: Arial, Helvetica;
+    font-size: 85%;
+    font-weight: normal;
+    margin: 0 20em 2em 2em;
+}
+
+.noborder {
+	border: none;
+	padding: 0px;
+}
+
+h1, h3 {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	color: #578;
+	border-bottom: dotted 1px;
+}
+
+a {
+	font-weight: bold;
+	color: #578;
+}
+
+a:link {
+	text-decoration: none; 
+}
+
+a:visited {
+	text-decoration: none; 
+}
+
+a:hover {
+	text-decoration: none; 
+	color: black;
+}
+
+.icenter {
+	text-align: center;
+}
+
+/******************************************
+ * General organization of an OpenCA page *
+ *                                        *
+ * page ::= navi + info                   *
+ *                                        *
+ * navi ::= menu + w3c                    *
+ * menu ::= item* + subitem*              *
+ *                                        *
+ * info ::= header  + main                *
+ * main ::= content + footer              *
+ *                                        *
+ ******************************************/
+
+/****************
+ *     page     *
+ ****************/
+
+div.page
+{
+    background: #ffffff;
+    width:    100%;
+    height:   100%;
+}
+
+div.navi
+{
+    position: absolute;
+    height:   100%;
+    width:    14em;
+    top:      0em;
+    right:    0em;
+    z-index:  100;
+}
+
+div.info
+{
+    position: absolute;
+    height:   100%;
+    width:    40em;
+    left:     0em;
+    top:      0em;
+    bottom:   0em;
+    z-index:  50;
+}
+
+/*********************
+ *    navi stuff     *
+ *********************/
+
+div.menu { 
+    position: absolute;
+    top:      1em;
+    right:    1em;
+
+    background: #eeeeff;
+    border: 1px solid black;
+    padding: 3pt;
+    text-align: center;
+}
+
+div.menu a {
+    color: white;
+}
+
+div.menu a:hover {
+    text-decoration: none; 
+    color: #ff8000;
+}
+
+div.menu h2 {
+    border: 1px solid black;
+    background: #3060c0;
+    text-align: center;
+    padding: 1pt;
+    margin: 0pt;
+}
+
+div.menu_item {
+    margin: 0.20em 0.5em 0.20em 0.1em;
+    padding: 0.38em 1em;
+    text-align: left;
+    background: #3060c0;
+    border: 1px solid white;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    color: white;
+    list-style: none;
+}
+
+div.menu_sub_item {
+    padding: 0.38em 1em;
+    text-indent: 0;
+    text-align: right;
+    list-style: none;
+}
+
+div.menu_sub_item a {
+    color: black;
+}
+
+div.w3c {
+    position: absolute;
+    bottom:   1em;
+    right:    1em;
+
+    border: 0px solid #3060c0;
+}
+
+/**********************
+ *    info stuff      *
+ **********************/
+
+div.main
+{
+    position: absolute;
+    top:      100px;
+    left:     0em;
+    width:    40em;
+    bottom:   0em;
+}
+
+div.header { 
+    position: absolute;
+    left:     1em;
+    right:    1em;
+    top:      1em;
+    bottom:   auto;
+
+    border: 0px solid black;
+    border-bottom: 1px solid black;
+    padding: 4pt;
+}
+
+div.content {
+    position: absolute;
+    top:      0em;
+    /* bottom:   1em; */
+    bottom:   auto;
+    left:     1em;
+    z-index:  50;
+}
+
+div.footer {
+    position: absolute;
+    bottom:   0em;
+    top:      auto;
+    z-index:  1;
+    color:    white;
+}
+
+div.sourcecode {
+    font-weight: bold;
+}
