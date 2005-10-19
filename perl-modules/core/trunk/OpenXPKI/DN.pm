@@ -18,40 +18,46 @@ sub new
     if (substr ($_[0],0, 1) eq "/")
     {
         ## proprietary OpenSSL oneline syntax
-        my $dn = $_[0];
-        $dn =~ s/^\///;
-        my @dn = ();
-        my $rdn = "";
-        for (my $i = 0; $i < length ($dn); $i++)
-        {
-            if (substr ($dn, $i, 1) eq "\\")
-            {
-                $rdn .= substr ($dn, $i, 2);
-                $i++;
-                next;
-            }
-            if (substr ($dn, $i, 1) eq ",")
-            {
-                $rdn .= "\\,";
-                next;
-            }
-            if (substr ($dn, $i, 1) eq "/")
-            {
-                push @dn, $rdn;
-                $rdn = "";
-                next;
-            }
-            $rdn .= substr ($dn, $i, 1);
-        }
-        $dn = join ", ", reverse @dn;
-        $self->{PARSED} = [ get_parsed_rfc_2253 ($dn) ];
+        my $dn = convert_openssl_dn($_[0]);
+        $self->{PARSED} = [ __get_parsed_rfc_2253 ($dn) ];
     } else {
         ## RFC2253 Syntax
-        $self->{PARSED} = [ get_parsed_rfc_2253 ($_[0]) ];
+        $self->{PARSED} = [ __get_parsed_rfc_2253 ($_[0]) ];
     }
-    $self->build_rdns();
+    $self->__build_rdns();
 
     return $self;
+}
+
+sub convert_openssl_dn
+{
+    my $dn = shift;
+    $dn =~ s/^\///;
+    my @dn = ();
+    my $rdn = "";
+    for (my $i = 0; $i < length ($dn); $i++)
+    {
+        if (substr ($dn, $i, 1) eq "\\")
+        {
+            $rdn .= substr ($dn, $i, 2);
+            $i++;
+            next;
+        }
+        if (substr ($dn, $i, 1) eq ",")
+        {
+            $rdn .= "\\,";
+            next;
+        }
+        if (substr ($dn, $i, 1) eq "/")
+        {
+            push @dn, $rdn;
+            $rdn = "";
+            next;
+        }
+        $rdn .= substr ($dn, $i, 1);
+    }
+    $dn = join ", ", reverse @dn;
+    return $dn;
 }
 
 ###################################
@@ -125,11 +131,11 @@ sub get_hashed_content
 ##   BEGIN of structure initialization   ##
 ###########################################
 
-sub build_rdns
+sub __build_rdns
 {
     my $self = shift;
     $self->{RDNS} = [];
-    $self->build_attributes() if (not $self->{ATTRIBUTES});
+    $self->__build_attributes() if (not $self->{ATTRIBUTES});
 
     for (my $i=0; $i < scalar @{$self->{ATTRIBUTES}}; $i++)
     {
@@ -144,7 +150,7 @@ sub build_rdns
     return 1;
 }
 
-sub build_attributes
+sub __build_attributes
 {
     my $self = shift;
     $self->{ATTRIBUTES} = ();
@@ -173,7 +179,7 @@ sub build_attributes
 ##   BEGIN of RFC 2253 parser   ##
 ##################################
 
-sub get_parsed_rfc_2253
+sub __get_parsed_rfc_2253
 {
     my $string = shift;
     while ($_[0])
@@ -184,14 +190,14 @@ sub get_parsed_rfc_2253
 
     while ($string)
     {
-        ($result[scalar @result], $string) = get_next_rdn ($string);
+        ($result[scalar @result], $string) = __get_next_rdn ($string);
         $string = substr ($string, 1) if ($string); ## remove seperator
     }
 
     return @result;
 }
 
-sub get_next_rdn
+sub __get_next_rdn
 {
     my $string = shift;
     my ($type, $value);
@@ -199,7 +205,7 @@ sub get_next_rdn
 
     while ($string)
     {
-        ($type, $value, $string) = get_attribute ($string);
+        ($type, $value, $string) = __get_attribute ($string);
         $result->[scalar @{$result}] = [ $type, $value ];
         last if (substr ($string, 0, 1) eq ","); ## stop at ,
         if (length ($string) > 1)
@@ -213,19 +219,19 @@ sub get_next_rdn
     return ($result, $string);
 }
 
-sub get_attribute
+sub __get_attribute
 {
     my $string = shift;
     my ($type, $value);
 
-    ($type, $string)  = get_attribute_type ($string);
+    ($type, $string)  = __get_attribute_type ($string);
     $string           = substr ($string, 1);
-    ($value, $string) = get_attribute_value ($string);
+    ($value, $string) = __get_attribute_value ($string);
 
     return ($type, $value, $string);
 }
 
-sub get_attribute_type
+sub __get_attribute_type
 {
     my $string = shift;
 
@@ -256,7 +262,7 @@ sub get_attribute_type
     return ($type, $string);
 }
 
-sub get_attribute_value
+sub __get_attribute_value
 {
     my $string = shift;
     my $value  = "";
@@ -283,3 +289,70 @@ sub get_attribute_value
 ##################################
 
 1;
+__END__
+
+=head1 Description
+
+This module was designed to implement a fast parser for RFC 2253
+distinguished names. It was designed to output RFC 2253 compliant
+and OpenSSL formatted DNs. Additionally you can get the parsed
+RDNs and the attributes in a hash (e.g. if you are looking for
+the organizational hierarchy via OUs).
+
+=head1 Initialization
+
+=head2 new
+
+The function new expects a RFC 2253 or OpenSSL DN as its only
+argument. The type of the DN will be detected from the first
+character. OpenSSL's DNs always begin with a leading slash "/".
+
+The return value is an object reference to the used instance of
+OpenXPKI::DN.
+
+=head2 convert_openssl_dn
+
+This is a static function which only expects an OpenSSL DN as
+argument. It returns a proper RFC 2253 DN. It is used by new
+to convert OpenSSL DNs ut you can use it too if you don't need
+a full parser which costs a little bit more performance.
+
+=head1 Output Functions
+
+=head2 get_parsed
+
+returns a three-dimensional array. The first level is the number
+of the RDN, the second level is the number of the attribute and
+third level contains at [0] the name of the attribute and at [1]
+the value of the attribute.
+
+=head2 get_attributes
+
+returns a two-dimensional array. The first level is the number
+of the RDN, the second level is the number of the attribute.
+The value is the attribute name and value concatenated with an
+equal sign "=".
+
+=head2 get_rdns
+
+returns an array. The array values are completely prepared
+strings of the RDNs. This works for multi-valued RDNs too.
+
+=head2 get_rfc_2253_dn
+
+returns the RFC 2253 DN.
+
+=head2 get_x500_dn
+
+returns the RFC 2253 DN in reversed order. Something like X.500
+style.
+
+=head2 get_openssl_dn
+
+returns the DN in OpenSSL's proprietary oneline format.
+
+=head2 get_hashed_content
+
+returns a hash which contains the attribute names as keys. The
+value of each hashentry is an array with the values inside which
+were found in the DN.

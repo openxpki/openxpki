@@ -47,7 +47,7 @@ ok (1);
 print "Checking examples ...\n";
 foreach my $dn (@example)
 {
-    my @result = OpenXPKI::DN->get_parsed_rfc_2253 ($dn);
+    my @result = OpenXPKI::DN->new($dn)->get_parsed();
     ok (1);
     next if (not $debug);
     print "Example: $dn\n";

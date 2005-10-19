@@ -4,6 +4,7 @@
 
 use strict;
 no warnings;
+use utf8;
 
 package OpenXPKI;
 
@@ -152,7 +153,9 @@ sub i18nGettext {
     }
 
     ## we need this for utf8
-    my $i18n_string = pack "U0C*", unpack "C*", gettext ($text);
+    #it's too slow, I try to use "use utf8;"
+    #my $i18n_string = pack "U0C*", unpack "C*", gettext ($text);
+    my $i18n_string = gettext ($text);
 
     if ($i18n_string ne $text)
     {
@@ -173,7 +176,8 @@ sub i18nGettext {
 				  map { $_ . " => " . $arg_ref->{$_}  } 
 				      keys %{$arg_ref});
 	
-        $i18n_string = pack "U0C*", unpack "C*", $untranslated;
+        #it's too slow, I try to use "use utf8;"
+        #$i18n_string = pack "U0C*", unpack "C*", $untranslated;
     }
 
     return $i18n_string;

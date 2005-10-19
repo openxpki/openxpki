@@ -6,6 +6,7 @@ version_from: OpenXPKI.pm
 installdirs:  site
 requires:
     Date::Parse:                   1
+    Exception::Class:              1.22
     Locale::TextDomain:            1
     Math::BigInt:                  1
     Test:                          1

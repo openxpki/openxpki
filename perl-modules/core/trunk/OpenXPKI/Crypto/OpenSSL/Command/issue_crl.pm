@@ -84,11 +84,17 @@ sub get_command
             }
             # prepare index.txt entry
             $timestamp = $self->__get_openssl_time ($timestamp);
-            my $start = $cert->notbefore();
+            my $start = $self->{ENGINE}->get_object_function (
+                            OBJECT   => $cert,
+                            FUNCTION => "notbefore");
             $start = $self->__get_openssl_time ($start);
-            my $subject = $cert->subject();
+            my $subject = $self->{ENGINE}->get_object_function (
+                              OBJECT   => $cert,
+                              FUNCTION => "subject");
             $subject = $self->__get_openssl_dn($subject);
-            my $serial = $cert->serial();
+            my $serial = $self->{ENGINE}->get_object_function (
+                             OBJECT   => $cert,
+                             FUNCTION => "serial");
             $serial = Math::BigInt->new ($serial);
             my $hex = substr ($serial->as_hex(), 2);
             $hex    = "0".$hex if (length ($hex) % 2);

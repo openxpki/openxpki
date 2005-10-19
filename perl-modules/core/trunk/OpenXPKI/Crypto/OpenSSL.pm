@@ -4,6 +4,7 @@
 	
 use strict;
 use warnings;
+use utf8; ## pack/unpack is too slow
 
 package OpenXPKI::Crypto::OpenSSL;
 
@@ -25,14 +26,14 @@ sub new
     my $keys = { @_ };
     $self->{DEBUG} = 1 if ($keys->{DEBUG});
 
-    $self->init_engine (@_);
-    $self->init_shell (@_);
-    $self->init_command (@_);
+    $self->__init_engine (@_);
+    $self->__init_shell (@_);
+    $self->__init_command (@_);
 
     return $self;
 }
 
-sub init_engine
+sub __init_engine
 {
     my $self = shift;
     my $keys = { @_ };
@@ -57,7 +58,7 @@ sub init_engine
     return 1;
 }
 
-sub init_shell
+sub __init_shell
 {
     my $self = shift;
     my $keys = { @_ };
@@ -96,7 +97,7 @@ sub init_shell
     return 1;
 }
 
-sub init_command
+sub __init_command
 {
     my $self = shift;
     my $keys = { @_ };
@@ -237,10 +238,13 @@ sub get_object_function
     return $object->free() if ($func eq "free");
 
     ## unicode handling
-    my $result = pack "U0C*", unpack "C*", $object->$func();
+    ## use utf8;
+    my $result = $object->$func();
+    ## pack/unpack is much too slow
+    #my $result = pack "U0C*", unpack "C*", $object->$func();
 
     ## fix proprietary "DirName:" of OpenSSL
-    if ($func eq "extensions")
+    if (defined $result and $func eq "extensions")
     {
         my @lines = split /\n/, $result;
         $result = "";
@@ -253,8 +257,8 @@ sub get_object_function
                 my ($name, $value) = ($line, $line);
                 $name  =~ s/^(\s*DirName:).*$/$1/;
                 $value =~ s/^\s*DirName:(.*)$/$1/;
-                my $dn = OpenXPKI::DN->new ($value);
-                $result .= $name.$dn->get_rfc_2253_dn()."\n";
+                my $dn = OpenXPKI::DN::convert_openssl_dn ($value);
+                $result .= $name.$dn."\n";
             }
         }
     }
@@ -285,3 +289,8 @@ sub AUTOLOAD {
 }
 
 1;
+__END__
+
+=head1 Description
+
+=head1 Functions

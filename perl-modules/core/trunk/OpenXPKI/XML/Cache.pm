@@ -4,16 +4,9 @@
 
 use strict;
 use warnings;
+use utf8;
 
 package OpenXPKI::XML::Cache;
-
-=head1 XML::Parser and XML::Simple
-
-We enforce the usage of XML::Parser by XML::Simple because some other
-parsers does not create an error if the XML document is malformed.
-These parsers tolerate errors!
-
-=cut
 
 use XML::Simple;
 use XML::Parser;
@@ -39,7 +32,7 @@ sub new
     $self->{DEBUG}  = $keys->{DEBUG};
     $self->{config} = $keys->{CONFIG};
 
-    return undef if (not $self->init (@_));
+    return undef if (not $self->init ());
 
     $self->debug("dump: ".$self->dump());
 
@@ -49,7 +42,6 @@ sub new
 sub init
 {
     my $self = shift;
-    my $keys = { @_ };
     $self->debug ("start");
     my $xs   = XML::Simple->new (ForceArray    => 1,
                                  ForceContent  => 1,
@@ -106,7 +98,7 @@ sub dump
 
     foreach my $key (keys %{$ref})
     {
-        $msg .= "$key\n";
+        $msg .= "name --> $key\n";
         if (not ref ($ref->{$key}))
         {
             $msg .= "value --> ".$ref->{$key}."\n";
@@ -176,8 +168,11 @@ sub get_xpath
     }
     ## WARNING: you need a utf8 capable terminal to see the correct characters
     ## $self->debug ("content: ".$item->{content});
-    $self->debug ("content: ".pack ("U0C*", unpack "C*", $item->{content}));
-    return pack "U0C*", unpack "C*", $item->{content};
+    #unpack/pack is too slow, try to use "use utf8;"
+    #$self->debug ("content: ".pack ("U0C*", unpack "C*", $item->{content}));
+    #return pack "U0C*", unpack "C*", $item->{content};
+    $self->debug ("content: ".$item->{content});
+    return $item->{content};
 }
 
 sub get_xpath_list
@@ -198,7 +193,9 @@ sub get_xpath_list
                 message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_CONTENT",
                 params  => {"XPATH" => $self->__get_serialized_xpath({@_})});
         }
-        push @list, pack "U0C*", unpack "C*", $item->{content};
+        # unpack/pack is too slow, try to use "use utf8;"
+        #push @list, pack "U0C*", unpack "C*", $item->{content};
+        push @list, $item->{content};
     }
     return \@list;
 }
@@ -316,3 +313,95 @@ sub __get_serialized_xpath
 }
 
 1;
+__END__
+
+=head1 Description
+
+=head1 XML::Parser and XML::Simple
+
+We enforce the usage of XML::Parser by XML::Simple because some other
+parsers does not create an error if the XML document is malformed.
+These parsers tolerate errors!
+
+=head1 Functions
+
+=head2 new
+
+create the class instance and calls internally the function init to
+load the XML files for the first time. The supported parameters are
+DEBUG and CONFIG. DEBUG can be a true or false value. CONFIG is an
+array reference which contains all the filename which include the
+configuration.
+
+=head2 init
+
+This function loads all XML files and initializes the internal data
+structures. After init you have a constant access performance.
+
+=head2 dump
+
+returns a human readable dump of the XML cache data.
+
+=head2 get_xpath
+
+This function returns the value of the submitted XML path. So
+please do not expect that xpath has something todo with the XML
+standard XPATH.
+
+There are two available options COUNTER and XPATH. Both can be
+single scalars or array references. First you have to understand
+the interpretation by an example.
+
+$cache->get_xpath (XPATH   => ["abc/def", "xyz"],
+                   COUNTER => [2, 3]);
+
+This means that you search the third tag (2+1) with the name
+"def" in the tag "abc". The returned value will be the value of
+the fourth (3+1) value of tag "xyz" in the defined tag "def". You
+can also write this as follows:
+
+$cache->get_xpath (XPATH   => ["abc", "def", "xyz"],
+                   COUNTER => [0, 2, 3]);
+
+If a path is definite then you can remove the zero and concatenate
+the tag names with slashes "/".
+
+You can use the following calling conventions:
+
+$cache->get_xpath (XPATH   => ["abc", "def", "xyz"],
+                   COUNTER => [0, 2, 3]);
+
+$cache->get_xpath (XPATH   => ["abc/def", "xyz"],
+                   COUNTER => [2, 3]);
+
+$cache->get_xpath (XPATH   => ["abc/def"],
+                   COUNTER => [0]);
+
+$cache->get_xpath (XPATH   => "abc/def",
+                   COUNTER => 0);
+
+$cache->get_xpath (XPATH   => "abc/def");
+
+It is strongly recommend to only use the three following use cases.
+All other use cases can be deprectaed in the future. The last variant
+will usually not used because the second is more readable.
+
+$cache->get_xpath (XPATH   => "abc/def");
+
+$cache->get_xpath (XPATH   => ["abc/def", "xyz"],
+                   COUNTER => [2, 3]);
+
+$cache->get_xpath (XPATH   => ["abc", "def", "xyz"],
+                   COUNTER => [0, 2, 3]);
+
+=head2 get_xpath_count
+
+The interface is exacatly the same like for get_xpath with one big
+exception. COUNTER is always one element shorter than XPATH. The
+result is the number of available values with the specified path.
+
+=head2 get_xpath_list
+
+The interface is the same like for get_xpath_count. Only the return
+value is different. It returns an array reference to the found
+values.

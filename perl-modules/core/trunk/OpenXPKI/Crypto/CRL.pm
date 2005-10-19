@@ -61,9 +61,11 @@ sub __init
     foreach my $attr ("version", "issuer", "next_update", "last_update",
                       "signature_algorithm", "revoked", "serial")
     {
-        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{crl}->$attr();
+        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function (
+                                                   OBJECT   => $self->{crl},
+                                                   FUNCTION => $attr);
     }
-    $self->{crl}->free();
+    $self->{TOKEN}->get_object_function (OBJECT => $self->{crl}, FUNCTION => "free");
     delete $self->{crl};
     $self->debug ("loaded crl attributes");
     my $ret = $self->{PARSED}->{BODY};
@@ -137,3 +139,32 @@ sub get_converted
 }
 
 1;
+__END__
+
+=head1 Description
+
+This is the module for managing CRLs. You can use this module to parse
+and convert CRLs. If you are missing some functions here please check
+OpenXPKI::Crypto::Object. OpenXPKI::Crypto::Object inherits from
+OpenXPKI::Crypto::Object several functions.
+
+=head1 Functions
+
+=head2 new
+
+The constructor support three option - DEBUG, DATA and TOKEN. DEBUG is
+a true or false value which activates or deactivates the debugging.
+DATA is a PEM encoded CRL. TOKEN is a token from the token manager
+(OpenXPKI::TokenManager). The token is needed to parse the CRL.
+
+=head2 get_serial
+
+returns the serial of the CRL. If there is no serial in the CRL
+because the CRL does not support this extension then the timestamp
+in seconds from the last update will be returned.
+
+=head2 get_converted
+
+The functions supports three formats - PEM, DER and TXT. All other
+formats create errors (or better exceptions). The CRL will be
+returned in the specified format on success.

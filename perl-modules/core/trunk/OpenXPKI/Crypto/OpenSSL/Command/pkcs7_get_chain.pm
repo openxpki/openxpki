@@ -92,8 +92,12 @@ sub get_result
         {
             my $x509 = $self->{ENGINE}->get_object (DATA => $self->{SIGNER},
                                                     TYPE => "X509");
-            $subject = $x509->openssl_subject();
-            $x509->free();
+            $subject = $self->{ENGINE}->get_object_function (
+                           OBJECT   => $x509,
+                           FUNCTION => "openssl_subject");
+            $self->{ENGINE}->get_object_function (
+                           OBJECT   => $x509,
+                           FUNCTION => "free");
         };
         if (my $exc = OpenXPKI::Exception->caught())
         {

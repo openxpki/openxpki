@@ -77,9 +77,11 @@ sub __init
                        "version", "pubkey_algorithm", "signature_algorithm", "exponent",
                        "keysize", "extensions", "openssl_subject" )
     {
-        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{x509}->$attr();
+        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function (
+                                                   OBJECT   => $self->{x509},
+                                                   FUNCTION => $attr);
     }
-    $self->{x509}->free();
+    $self->{TOKEN}->get_object_function (OBJECT => $self->{x509}, FUNCTION => "free");
     delete $self->{x509};
     $self->debug ("loaded cert attributes");
     my $ret = $self->{PARSED}->{BODY};
@@ -175,7 +177,7 @@ sub __init
                 push(@{$ret->{OPENSSL_EXTENSIONS}->{$key}}, $val);
             }
         } else {
-            ## FIXME: can this every happen?
+            ## FIXME: can this ever happen?
             $i++;
         }
     }
@@ -275,3 +277,8 @@ sub get_converted
 }
 
 1;
+__END__
+
+=head1 Description
+
+=head1 Functions

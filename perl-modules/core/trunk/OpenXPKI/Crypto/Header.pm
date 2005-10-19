@@ -11,20 +11,6 @@ our $endHeader      = "-----END HEADER-----";
 our $beginAttribute = "-----BEGIN ATTRIBUTE-----";
 our $endAttribute   = "-----END ATTRIBUTE-----";
 
-=head1 DESCRIPTION
-
-This module is a parser for all OpenXPKI objects. It parses the complete
-object before the normal modules take over.
-
-=head1 Public functions
-
-=head2 new
-
-The parameters are DEBUG and DATA. The result is an object reference to
-the parsed data.
-
-=cut
-
 sub new {
     my $that = shift;
     my $class = ref($that) || $that;
@@ -44,23 +30,11 @@ sub new {
     return $self;
 }
 
-=head2 get_header
-
-return the prepared header with begin and end lines.
-
-=cut
-
 sub get_header
 {
     my $self = shift;
     return $self->{header};
 }
-
-=head2 get_body
-
-returns the pure body of the object
-
-=cut
 
 sub get_body
 {
@@ -68,37 +42,17 @@ sub get_body
     return $self->{body};
 }
 
-=head2 get_item
-
-returns the complete plain object
-
-=cut
-
 sub get_item
 {
     my $self = shift;
     return $self->{item};
 }
 
-=head2 get_parsed
-
-returns the parsed header values. This is a deep copy.
-So you can manipulate it
-
-=cut
-
-
 sub get_parsed
 {
     my $self = shift;
     return \%{$self->{head}};
 }
-
-=head2 set_attribute
-
-sets a new header attribute which was not in the original data
-
-=cut
 
 sub set_attribute
 {
@@ -113,26 +67,12 @@ sub set_attribute
     return 1;
 }
 
-=head2 get_attribute
-
-returns a header attribute
-
-=cut
-
 sub get_attribute
 {
     my $self = shift;
     my $attr = shift;
     return $self->{head}->{uc($attr)};
 }
-
-=head1 Internal functions
-
-=head2 __parse
-
-parses the data from new
-
-=cut
 
 sub __parse
 {
@@ -184,12 +124,6 @@ sub __parse
     return 1;
 }
 
-=head2 __init
-
-initializes the internal variables for the public getter functions.
-
-=cut
-
 sub __init
 {
     my $self = shift;
@@ -225,3 +159,42 @@ sub __init
 }
 
 1;
+__END__
+
+=head1 DESCRIPTION
+
+This module is a parser for all OpenXPKI objects. It parses the complete
+object before the normal modules take over.
+
+=head1 Functions
+
+=head2 new
+
+The parameters are DEBUG and DATA. The result is an object reference to
+the parsed data.
+
+=head2 get_header
+
+return the prepared header with begin and end lines.
+
+=head2 get_body
+
+returns the pure body of the object
+
+=head2 get_item
+
+returns the complete plain object
+
+=head2 get_parsed
+
+returns the parsed header values. This is a deep copy.
+So you can manipulate it
+
+=head2 set_attribute
+
+sets a new header attribute which was not in the original data
+
+=head2 get_attribute
+
+returns a header attribute
+

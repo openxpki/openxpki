@@ -93,9 +93,11 @@ sub __init
     }
     foreach my $attr (@attrlist)
     {
-        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{csr}->$attr();
+        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function (
+                                                   OBJECT   => $self->{csr},
+                                                   FUNCTION => $attr);
     }
-    $self->{csr}->free();
+    $self->{TOKEN}->get_object_function (OBJECT => $self->{csr}, FUNCTION => "free");
     delete $self->{csr};
     $self->debug ("loaded CSR attributes");
     my $ret = $self->{PARSED}->{BODY};
@@ -284,3 +286,43 @@ sub get_converted
 }
 
 1;
+__END__
+
+=head1 Description
+
+This is the module for managing CSRs. You can use this module to parse
+and convert CSRs. If you are missing some functions here please check
+OpenXPKI::Crypto::Object. OpenXPKI::Crypto::Object inherits from
+OpenXPKI::Crypto::Object several functions.
+
+=head1 Functions
+
+=head2 new
+
+The constructor support four option - DEBUG, DATA, FORMAT and TOKEN.
+DEBUG is a true or false value which activates or deactivates the debugging.
+FORMAT is optional but can be specified. It can be set to PKCS10 or
+SPKAC. If the FORMAT is missing then the module tries to determine the
+type of the request from DATA with some REGEX. DATA is a the CSR.
+Please note that even PKCS#10 requests are only supported in PEM format.
+TOKEN is a token from the token manager (OpenXPKI::TokenManager).
+The token is needed to parse the requests.
+
+=head2 get_serial
+
+returns the serial of the CSR. The serial will be extracted from the
+header.
+
+=head2 get_converted
+
+The functions supports three formats - PEM, DER and TXT. All other
+formats create errors (or better exceptions). The CSR will be
+returned in the specified format on success. This functionality
+is only supported for PKCS#10 requests. If you try this with a SPKAC
+request then an exception will occur.
+
+=head2 get_emails
+
+returns an array with all available email addresses. Pleae note that
+this include PKCS#9 emailAddress, rfc822Mailbox and the subject
+alternative name email extensions.

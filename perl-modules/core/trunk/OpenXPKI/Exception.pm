@@ -43,23 +43,23 @@ sub full_message
     return i18nGettext ($self->{message}, %{$self->{params}});
 }
 
-sub get_errno
-{
-    ## the normal name errno is not possible
-    ## errno results in a redefinition warning
-    my $self = shift;
-    if ($self->{errno})
-    {
-        return $self->{errno};
-    } else {
-        if ($self->{child} and ref $self->{child})
-        {
-            return $self->{child}->errno();
-        } else {
-            return;
-        }
-    }
-}
+#sub get_errno
+#{
+#    ## the normal name errno is not possible
+#    ## errno results in a redefinition warning
+#    my $self = shift;
+#    if ($self->{errno})
+#    {
+#        return $self->{errno};
+#    } else {
+#        if ($self->{child} and ref $self->{child})
+#        {
+#            return $self->{child}->errno();
+#        } else {
+#            return;
+#        }
+#    }
+#}
 
 1;
 __END__
@@ -84,4 +84,36 @@ if (my $exc = OpenXPKI::Exception->caught())
     $EVAL_ERROR->rethrow();
 }
 
-Please note that FILENAME will be extended to __FILENAME__.
+Please note that FILENAME will be extended to __FILENAME__. If you want
+to send a specific errorcode to the caller then you can specify errno
+directly like message, child or params.
+
+=head1 New Functions
+
+usually all functions from Exception::Class will be used. Nevertheless
+one function will be overloaded and on new function will be specified
+to support other modules with errorcodes if one is available.
+
+=head2 full_message
+
+This function is used to build the new errormessages conforming to
+the specifications of OpenXPKI. This means in the first line the
+specification of i18n.
+
+=head2 Fields
+
+returns the names of the available parameters (message, errno, child, params).
+
+=head2 errno
+
+errno returns the errorcode if available.
+
+=head2 child
+
+returns the exception object of the child if this is
+a nested exception.
+
+=head2 params
+
+returns a hash reference with name and value pairs of the parameters for
+the error message (i18nGettext).

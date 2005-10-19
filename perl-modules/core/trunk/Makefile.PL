@@ -51,6 +51,7 @@ WriteMakefile(
     'LIBS'      => ["-L$lib -lcrypto"],
     'INC'       => "-I. -I$inc",
     'PREREQ_PM' => {'Date::Parse'         => 1,
+                    'Exception::Class'    => "1.22",
                     ## includes the version of libintl-perl which includes Locale::Messages
                     'Locale::TextDomain'  => 1,
                     'Math::BigInt'        => 1,

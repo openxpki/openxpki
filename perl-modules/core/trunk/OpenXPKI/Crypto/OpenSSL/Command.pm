@@ -4,6 +4,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use OpenXPKI::Crypto::OpenSSL::Command::create_random;
 use OpenXPKI::Crypto::OpenSSL::Command::create_rsa;
@@ -102,7 +103,9 @@ sub __get_openssl_dn
     }
 
     ## this is necessary because OpenSSL needs the utf8 bytes
-    $dn = pack "C*", unpack "C0U*", $dn_obj->get_openssl_dn ();
+    #pack/unpack is too slow, try to use "use utf8;"
+    #$dn = pack "C*", unpack "C0U*", $dn_obj->get_openssl_dn ();
+    $dn = $dn_obj->get_openssl_dn ();
     $self->debug ("OpenSSL X.500: $dn");
 
     return $dn;
