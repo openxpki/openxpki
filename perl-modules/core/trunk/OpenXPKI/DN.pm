@@ -6,6 +6,9 @@ use strict;
 use warnings;
 package OpenXPKI::DN;
 
+use Text::CSV_XS;
+use OpenXPKI::Exception;
+
 sub new
 {
     my $that  = shift;
@@ -13,51 +16,51 @@ sub new
     my $self  = {};
     bless $self, $class;
 
-    return undef if (not $_[0]);
+    my $arg = shift;
 
-    if (substr ($_[0],0, 1) eq "/")
+    return undef if (! defined $arg && ($arg eq ""));
+
+    if (substr ($arg, 0, 1) eq "/")
     {
         ## proprietary OpenSSL oneline syntax
-        my $dn = convert_openssl_dn($_[0]);
+        my $dn = convert_openssl_dn($arg);
         $self->{PARSED} = [ __get_parsed_rfc_2253 ($dn) ];
     } else {
         ## RFC2253 Syntax
-        $self->{PARSED} = [ __get_parsed_rfc_2253 ($_[0]) ];
+        $self->{PARSED} = [ __get_parsed_rfc_2253 ($arg) ];
     }
     $self->__build_rdns();
 
     return $self;
 }
 
+# convert OpenSSL DN to RFC2253 DN
 sub convert_openssl_dn
 {
     my $dn = shift;
-    $dn =~ s/^\///;
-    my @dn = ();
-    my $rdn = "";
-    for (my $i = 0; $i < length ($dn); $i++)
-    {
-        if (substr ($dn, $i, 1) eq "\\")
-        {
-            $rdn .= substr ($dn, $i, 2);
-            $i++;
-            next;
-        }
-        if (substr ($dn, $i, 1) eq ",")
-        {
-            $rdn .= "\\,";
-            next;
-        }
-        if (substr ($dn, $i, 1) eq "/")
-        {
-            push @dn, $rdn;
-            $rdn = "";
-            next;
-        }
-        $rdn .= substr ($dn, $i, 1);
+
+    my $openssl_format
+ 	= Text::CSV_XS->new({
+ 	    sep_char    => q{/},    # Fields are separated by /
+ 	    escape_char => q{\\},   # Backslashed characters are always data
+	});
+    
+    if (!$openssl_format->parse($dn)) {
+ 	OpenXPKI::Exception->throw (
+ 	    message => "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR",
+ 	    params  => {
+ 		DN          => $dn,
+ 		BADARGUMENT => $openssl_format->error_input(),
+ 	    });
     }
-    $dn = join ", ", reverse @dn;
-    return $dn;
+    
+    my @rdn = $openssl_format->fields();
+
+    # remove first empty element (OpenSSL DN starts with /)
+    shift @rdn;
+
+    # return comma separated list, escape commas include in rdns
+    return join(", ", reverse map { s{,}{\\,}xsg; $_; } @rdn);
 }
 
 ###################################
@@ -312,10 +315,10 @@ OpenXPKI::DN.
 
 =head2 convert_openssl_dn
 
-This is a static function which only expects an OpenSSL DN as
-argument. It returns a proper RFC 2253 DN. It is used by new
-to convert OpenSSL DNs ut you can use it too if you don't need
-a full parser which costs a little bit more performance.
+This is a static function which requires an OpenSSL DN as
+argument. It returns a proper RFC 2253 DN. It is used by the 'new'
+constructor to convert OpenSSL DNs but you can use it also if you 
+don't need a full parser (which is slower).
 
 =head1 Output Functions
 

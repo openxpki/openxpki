@@ -14,9 +14,12 @@ my @example = (
     "cn=Max Mustermann\\+uid=123456,ou=unit,o=example,c=uk",
     "cn=http/www.example.com,o=university,c=ar",
     "cn=ftp/ftp.example.com,o=university,c=ar",
+    "/DC=com/DC=example/O=Some Example/CN=foo.example.com",
+    "/DC=com/DC=example/O=Some Example, Some State/CN=foo.example.com",
+    "/DC=com/DC=example/O=Some Example, Some State/CN=ftp\\/foo.example.com",
               );
 
-BEGIN { plan tests => 8 };
+BEGIN { plan tests => 10 };
 
 print STDERR "PERFORMANCE VALIDATION\n";
 
