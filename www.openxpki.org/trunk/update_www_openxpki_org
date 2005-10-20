@@ -12,9 +12,9 @@ fi
 old=`pwd`
 cd $target
 
-## Legacy problem: cvs folger is named doc, should be docs - so we make a link
+## Legacy problem: cvs folder is named doc, should be docs - so we make a link
 
-if [ ! -a  ]; then 
+if [ ! -a doc ]; then 
   ln -s docs doc 
 fi;
 
