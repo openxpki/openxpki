@@ -318,7 +318,7 @@ modulus (csr)
 		BN_print(out,pkey->pkey.dsa->pub_key);
 	else
 		BIO_printf(out,"");
-	EVP_PKEY_free(pkey);
+	if (pkey != NULL) EVP_PKEY_free(pkey);
 	n = BIO_get_mem_data(out, &modulus);
 	SAFEFREE(char_ptr);
 	Newz(0, char_ptr, n+1, char);
@@ -347,7 +347,7 @@ exponent (csr)
 		BN_print(out,pkey->pkey.dsa->pub_key);
 	else
 		BIO_printf(out,"");
-	EVP_PKEY_free(pkey);
+	if (pkey != NULL) EVP_PKEY_free(pkey);
 	n = BIO_get_mem_data(out, &exponent);
 	SAFEFREE(char_ptr);
 	Newz(0, char_ptr, n+1, char);

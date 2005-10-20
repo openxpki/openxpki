@@ -85,6 +85,7 @@ t/crypto/certs/01.pem
 t/crypto/token.xml
 t/crypto/openssl.cnf
 t/crypto/ca_openssl.cnf
+t/crypto/common.pl
 
 t/dn/1.t
 t/dn/2.t
