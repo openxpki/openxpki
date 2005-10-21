@@ -14,7 +14,7 @@ cd $target
 
 ## Legacy problem: cvs folder is named doc, should be docs - so we make a link
 
-if [ ! -a doc ]; then 
+if [ ! -e doc ]; then 
   ln -s docs doc 
 fi;
 
@@ -42,3 +42,4 @@ ln -s ../src/images
 
 cd $old
 
+#echo "update succeeded"
