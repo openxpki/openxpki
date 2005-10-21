@@ -21,7 +21,7 @@ board. Otherwise they have to give back the rights or ownership.
 2. Roles
 
 OpenXPKI knows three kinds of peoples - users, active developers
-and board members. Users are all people which use OpenCA. Board
+and board members. Users are all people which use OpenXPKI. Board
 members are members of the board like defined below. Active
 developers are people who are actively developing the OpenXPKI
 software since the last two years. The term "devloping" includes
@@ -54,28 +54,30 @@ period is 2 years.
 4. Election
 
 The voting will happen on the OpenXPKI voting mailing list.
-Today this is OpenXPKI-vote@lists.berlios.de
+Currently this is OpenXPKI-vote@lists.berlios.de
 
 4.1. Users
 
 The users can have at maximum four representatives in the board.
-This results in the fact that every user has four votes. A user
+A user
 can only give one vote per candidate. The candidates with the
 most votes wins.
 
 4.2. Active Developers
 
 The active developers can have at maximum eight representatives
-in the board. This results in the fact that every active
+in the board. Every active
 developer has eight votes. An active developer can only give one
 vote per candidate. The candidates with the most votes wins.
 
 4.3. Protective clauses
 
-If there are more than two votes from employers or owners of one
-organization or company then only two votes are counted. The
-management of the organization or company can make the decision
-or if this does not happen then the old board decide about the
+If there are more than two votes from one 
+organization (company, research institute, university and the like)
+then only two votes are counted. 
+If there are more than two votes from one organization, the
+management of the organization can decide which votes shall 
+be counted. If this does not happen then the old board decide about the
 counting.
 
 If there are lesser than eight active developer representatives
@@ -83,24 +85,21 @@ in the board then the number of the user representatives will be
 automatically reduced to balance the board again.
 
 If a board member dismisses then a new election only for this
-position will be started. The legislative period ends with the
+position will be held. The term of the newly elected board member ends with the
 legislative period of the other board members.
 
-If all other board members agree then one other board member can
-be dismissed. Again this is only allowed if all other board
-members agree on this. If the dismissed board member is elected
-again then the next dismissal can only be after six months.
+A board member can be dismissed if all other board members agree.
+If the dismissed board member is elected
+again then the next dismissal can only occur after at least after six months.
 
 5. Responsibilities
 
 5.1. Community
 
-The community make all decisions related to the charter. The
-election of the board is an exclusive previleges of the whole
-community too.
+The community makes all decisions related to the charter and elects the board.
 
-If the charter should be changed then there must be a voting on
-this. The following points must be meet for a successful voting:
+If the charter is to be changed then there must be a voting on
+this. The following points must be met for a successful voting:
 
 * 50 percent of all active developers must vote for the charter
   change.
@@ -108,8 +107,8 @@ this. The following points must be meet for a successful voting:
   the charter change.
 * At minimum 2/3 of all voting users (including the active
   developers) must vote for the charter change.
-* Like for e normal elections only two vote per organization or
-  company are allowed.
+* Like for elections of board members only two votes per organization 
+  are allowed.
 
 5.2. Board
 
@@ -117,7 +116,7 @@ The board knows two types of responsibilities - critical issues
 and normal issues.
 
 Critical issues are the license and the name of OpenXPKI. Any
-decisions relating to these issues must be made by the board
+decisions related to these issues must be made by the board
 with majority of at minimum 2/3 of all board members.
 
 All other issues are normal issues. The decisions will be made
