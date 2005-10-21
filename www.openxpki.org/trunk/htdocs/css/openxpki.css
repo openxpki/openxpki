@@ -57,6 +57,11 @@ a:hover {
 	text-align: center;
 }
 
+img {
+	border: none;
+	padding: 0px;
+}
+
 /******************************************
  * General organization of an OpenCA page *
  *                                        *
@@ -118,17 +123,23 @@ div.menu {
 }
 
 div.menu a {
-    color: white;
+    /* color: white; */
+    /* color: #3060c0; */
+    color: black;
 }
 
 div.menu a:hover {
     text-decoration: none; 
-    color: #ff8000;
+    /* color: #ff8000; */
+    /* color: #3060c0; */
+    color: white;
 }
 
 div.menu h2 {
     border: 1px solid black;
-    background: #3060c0;
+    /* background: #3060c0; */
+    /* background: #ff8000; */
+    background: #ffaa33;
     text-align: center;
     padding: 1pt;
     margin: 0pt;
@@ -138,7 +149,8 @@ div.menu_item {
     margin: 0.20em 0.5em 0.20em 0.1em;
     padding: 0.38em 1em;
     text-align: left;
-    background: #3060c0;
+    /* background: #3060c0; */
+    background: #ffaa33;
     border: 1px solid white;
     border-bottom: 1px solid black;
     border-right: 1px solid black;
@@ -207,6 +219,6 @@ div.footer {
     color:    white;
 }
 
-div.sourcecode {
+.sourcecode {
     font-weight: bold;
 }

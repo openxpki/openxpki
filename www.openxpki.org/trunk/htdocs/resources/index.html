@@ -2,16 +2,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   <head>
-    <link rel="stylesheet" title="default" href="../css/openca.css" type="text/css" />
+    <link rel="stylesheet" title="default" href="../css/openxpki.css" type="text/css" />
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-    <title>OpenCA Project </title>
+    <title>The OpenXPKI Project </title>
   </head>
   <body>
     <div class="page">
 
      <div class="navi">
       <div class="menu">
-        <h2><a href="../">OpenCA Home</a></h2>
+        <h2><a href="../">OpenXPKI Home</a></h2>
         <div class="menu_item"><a href="../secadvs/">Security Advisories</a></div>
         <div class="menu_item"><a href="../mirrors/">Mirrors</a></div>
         <div class="menu_item"><a href="../news/">News</a></div>
@@ -19,33 +19,62 @@
         <div class="menu_item"><a href="../demo/">Demo Installations</a></div>
         <div class="menu_item"><a href="../download/">Download</a></div>
         <div class="menu_item"><a href="../resources/">Resources</a></div>
-        <div class="menu_sub_item"><a href="http://sf.net/mail/?group_id=20873">Mailing lists (sf.net)</a></div>
-        <div class="menu_sub_item"><a href="../resources/links.html">Links</a></div>
-        <div class="menu_sub_item"><a href="http://sf.net/tracker/?group_id=20873&atid=120873">Bugtracking (sf.net)</a></div>
-        <div class="menu_sub_item"><a href="http://sf.net/tracker/?group_id=20873&atid=370873">RFEs (sf.net)</a></div>
-        <div class="menu_item"><a href="http://sf.net/cvs/?group_id=20873">CVS (sf.net)</a></div>
-      </div>
-      <div class="w3c">
-        <a href="http://validator.w3.org/check?uri=http://www.openca.info/"><img class="noborder" src="../images/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88" /></a>
+        <div class="menu_item"><a href="../foundation/">Foundation</a></div>
+        <div class="w3c">
+          <a href="http://validator.w3.org/check?uri=http://www.openxpki.org/resources/"><img class="noborder" src="../images/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88" /></a>
+        </div>
       </div>
      </div>  <!-- navi -->
 
      <div class="info">
       <div class="header">
-        <img src="../images/openca_project_blue.png" alt="OpenCA Project"/>
+        <img src="../images/openxpki_logo.png" alt="The OpenXPKI Project"/>
       </div>
       <div class="main">
        <div class="content">
         <h2>Resources</h2>
+        <h3>
+          <a href="http://developer.berlios.de">
+            <img src="http://developer.berlios.de/bslogo.php?group_id=4898"
+                 width="124" height="32" alt="BerliOS Logo"/>
+          </a>
+        </h3>
+        <p>OpenXPKI uses the BerliOS platform for various things. The major
+          aspects why we choose BerliOS was the subversion and WiKi support.</p>
+        <ul>
+          <li><a href="http://developer.berlios.de/projects/openxpki/">OpenXPKI at Berlios</a></li>
+          <li><a href="http://developer.berlios.de/mail/?group_id=4898">Mailing Lists</a></li>
+          <li><a href="http://developer.berlios.de/bugs/?group_id=4898">Bug Tracking</a></li>
+          <li><a href="http://developer.berlios.de/feature/?group_id=4898">RFEs - Feature requests</a></li>
+          <li><a href="http://developer.berlios.de/svn/?group_id=4898">Subversion (Version Control System)</a></li>
+        </ul>
+        <h3>Subversion structure</h3>
         <p>
-          If you need more informations then there are several different
-          resources where you can find such information. Many of them
-          are hosted on sourceforge which provide a powerful
-          development platform for many Open Source projects.
-          We maintain an additional page of links to various security
-          relevant projects. You can find also many information in the
-          references of the OpenCA guide.
-        </p>
+          We use the version control system from BerliOS. The actual structure
+          is the following one:</p>
+        <dl>
+          <dt class="sourcecode">perl-modules/</dt>
+          <dd>
+            <dl>
+              <dt class="sourcecode">perl-modules/core/</dt>
+              <dd>
+                <dl>
+                  <dt class="sourcecode">perl-modules/core/trunk/</dt>
+                  <dd>the most up-to-date core development</dd>
+                </dl>
+              </dd>
+            </dl>
+          </dd>
+          <dt class="sourcecode">www.openxpki.org/</dt>
+          <dd>
+            <dl>
+              <dt class="sourcecode">www.openxpki.org/trunk/update_www_openxpki_org</dt>
+              <dd>A script to update the web servers</dd>
+              <dt class="sourcecode">www.openxpki.org/trunk/htdocs</dt>
+              <dd>The web pages itself</dd>
+            </dl>
+          </dd>
+        </dl>
        </div>  <!-- content -->
        <div class="footer">
          $Author: oliwel $ $Date: 2005/09/06 13:57:51 $ - &copy; 2004 The OpenCA Project
