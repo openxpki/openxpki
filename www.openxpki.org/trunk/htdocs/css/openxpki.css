@@ -158,7 +158,7 @@ div.menu_sub_item a {
 }
 
 div.w3c {
-    position: absolute;
+    /* position: absolute; */
     bottom:   1em;
     right:    1em;
 
