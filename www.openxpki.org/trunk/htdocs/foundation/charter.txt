@@ -1,52 +1,60 @@
 $Revision: 1.1 $
 
-Charter of OpenXPKI
+OpenXPKI Charter
 
 1. Mission
 
 The major goal of the OpenXPKI foundation is to support the
 OpenXPKI community to develop free PKI software.
 
-The foundation as the organizational backend of the project has
-to support the community with the management of the name, the
-license and the infrastructure. This includes the organization
-of isupport and promotion events like workshops and conferences.
+The foundation forms the organizational base of the project and
+supports the community with management of the project's name, 
+license and infrastructure. This includes organization
+of support and promotion events like workshops and conferences.
 
-The people who owns the domain openxpki.org and the basic
-infrastructure rights on the development platforms like Berlios
-or SourceForge have to guarantee via a written statement to
-every board member that they will respect the decisions of the
-board. Otherwise they have to give back the rights or ownership.
+Individuals owning or controlling infrastucture components 
+(such as the domain openxpki.org and basic infrastructure 
+rights on the development platforms like Berlios or SourceForge)
+must guarantee to every board member that they will comply with
+all decisions taken by the board.
+The commitment must be legally binding and hency may either be a signed 
+paper document or an electronic document that has been digitally signed 
+according to Digital Signature Law of the individual's country.
+Failure to comply with this requirement implies that the individual
+must return the corresponding rights or ownership back to the project
+(i. e. an individual complying with the requirements).
 
 2. Roles
 
-OpenXPKI knows three kinds of peoples - users, active developers
-and board members. Users are all people which use OpenXPKI. Board
-members are members of the board like defined below. Active
-developers are people who are actively developing the OpenXPKI
-software since the last two years. The term "devloping" includes
-explicitely every development task like testing, documenting and
-writing code. If you document the software then you are a
-developer too. All people who are accepted as active developers
-are publicly listed in file. If you think you should be on the
-list simply write a notice to the developer mailing list.
+OpenXPKI recognizes three categories of people - users, active developers
+and board members. Users are all people using OpenXPKI. Board
+members are members of the board as defined below. Active
+developers are people who have been actively developing OpenXPKI
+software within the past two years. The term "devlopment" explicitly
+includes all development related tasks like testing, bug fixing, 
+documenting and writing code. Hence e. g. documentation contributors are
+also considered to be developers.
+All people who are accepted as active developers are publicly listed in 
+a file. If you think you should be on the list simply write a notice 
+to the developer mailing list.
 
 3. Board
 
-The board of the project consists of elected members. There are two
-sorts of members. One group of members will be built from active
-developers and one group from all users. Yes developers are users
-two and they can vote twice.
+The project board consists of elected members. There are two
+categories of members. One group of members consists of active
+developers, the other group is formed by all users. Hence developers
+are also users and thus can vote twice.
 
-The group which will be elected from the active developers must
-have at minimum 2/3 of the elected board members. The background
-is that the developers can make all decisions if they agree on an
-issue and cannot be blocked by the users in this case.
+A minimum of 2/3 of the elected board members must consist of the 
+'active developers' group.
+The rationale behind this requirement is that the developers can
+make decision if all of them agree on an issue. In this case it
+is not possible for the users to block the decision.
 
-The group which is elected from all users which include the developers
-must not have more than 1/3 of the board members. This group should
-represent the interests of the users. If the developers find no
-consense then their vote should be a deciding factor.
+A maximum of 1/3 of the elected board members must consist of the
+'users' group (which may include developers as well).
+This group should represent the interests of the users. If the developers 
+find no consense then this group's vote should be a deciding factor.
 
 The maximum number of board members is 12. The normal legislative
 period is 2 years.
@@ -58,39 +66,37 @@ Currently this is OpenXPKI-vote@lists.berlios.de
 
 4.1. Users
 
-The users can have at maximum four representatives in the board.
-A user
-can only give one vote per candidate. The candidates with the
-most votes wins.
+There may be no more than four user representatives in the board.
+A user can only give one vote per candidate. The candidates with the
+most votes win.
 
 4.2. Active Developers
 
-The active developers can have at maximum eight representatives
-in the board. Every active
-developer has eight votes. An active developer can only give one
-vote per candidate. The candidates with the most votes wins.
+There may be no more than eight active developer representatives in the 
+board. Every active developer has eight votes. An active developer can 
+only give one vote per candidate. The candidates with the most votes win.
 
 4.3. Protective clauses
 
-If there are more than two votes from one 
-organization (company, research institute, university and the like)
-then only two votes are counted. 
+If there are more than two votes from one organization (company, 
+research institute, university and the like) then only two votes are 
+counted. 
 If there are more than two votes from one organization, the
-management of the organization can decide which votes shall 
+management of this organization can decide which votes shall 
 be counted. If this does not happen then the old board decide about the
 counting.
 
-If there are lesser than eight active developer representatives
+If there are less than eight active developer representatives
 in the board then the number of the user representatives will be
 automatically reduced to balance the board again.
 
-If a board member dismisses then a new election only for this
-position will be held. The term of the newly elected board member ends with the
-legislative period of the other board members.
+If a board member leaves the board, a new election only for this
+position will be held. The term of the newly elected board member 
+ends with the legislative period of the other board members.
 
-A board member can be dismissed if all other board members agree.
-If the dismissed board member is elected
-again then the next dismissal can only occur after at least after six months.
+A board member can be dismissed if all other board members agree unanimously.
+If the dismissed board member is elected again then the next dismissal 
+can only occur after at least after six months.
 
 5. Responsibilities
 
@@ -98,21 +104,21 @@ again then the next dismissal can only occur after at least after six months.
 
 The community makes all decisions related to the charter and elects the board.
 
-If the charter is to be changed then there must be a voting on
-this. The following points must be met for a successful voting:
+If the charter is to be changed, a ballot must happen on this.
+The following requirements must be met for the change to be accepted:
 
-* 50 percent of all active developers must vote for the charter
+* 50 percent of all active developers must vote in favor of a charter
   change.
-* At minimum 2/3 of all voting active developers must vote for
+* A minimum of 2/3 of all voting active developers must vote in favor of
   the charter change.
-* At minimum 2/3 of all voting users (including the active
-  developers) must vote for the charter change.
-* Like for elections of board members only two votes per organization 
+* A minimum of 2/3 of all voting users (including the active
+  developers) must vote in favor of the charter change.
+* Similarly to elections of board members only two votes per organization 
   are allowed.
 
 5.2. Board
 
-The board knows two types of responsibilities - critical issues
+The board recognizes two types of responsibilities - critical issues
 and normal issues.
 
 Critical issues are the license and the name of OpenXPKI. Any
@@ -120,8 +126,8 @@ decisions related to these issues must be made by the board
 with majority of at minimum 2/3 of all board members.
 
 All other issues are normal issues. The decisions will be made
-by the board with a normal majority of all board members.
-Normal issues can be administrative rights, workshops and
+by the board with the simple majority of all board members.
+Normal issues can be administrative permissions, workshops and
 infrastructure issues for example.
 
 Every vote for a decision of the board must be publicly
