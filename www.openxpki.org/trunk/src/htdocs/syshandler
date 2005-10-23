@@ -1,0 +1,8 @@
+<%once>
+</%once>
+<%init>
+</%init>
+<%flags>
+  inherit => undef
+</%flags>
+

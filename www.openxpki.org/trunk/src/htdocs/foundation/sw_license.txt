@@ -1,0 +1,10 @@
+Todays we still discuss about the licenses. We a need a non-copyleft, GPL
+compatible license. Any proposals are welcome. The LGPL is not listed
+because it looks like a copyleft license.
+
+1. Dual licensing with GPL v2 or later and Apache software License v2 or later
+
+2. Modified BSD license (http://www.xfree86.org/3.3.6/COPYRIGHT2.html#5)
+
+... perhaps you find another license. If yes then simply make
+proposal on the users list.

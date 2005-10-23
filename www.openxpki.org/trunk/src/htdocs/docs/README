@@ -1,0 +1,9 @@
+IGNORE this file if you mirror the OpenCA webserver via rsync.
+
+Please copy the following directory from CVS to this directory.
+
+openca-0.9/docs/
+
+You can do this with a cron job via user anoynmous over pserver.
+
+Michael Bell 2004-Sep-24

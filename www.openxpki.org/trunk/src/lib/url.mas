@@ -1,0 +1,50 @@
+<%args>
+   $scheme   => 'http'
+   $username => undef
+   $password => ''
+   $host     => undef
+   $port     => undef
+   $path
+   %query    => ( )
+   $fragment => undef
+</%args>
+<%init>
+   my $uri = URI->new;
+  
+   if ($host) {
+      $uri->scheme($scheme);
+  
+      if (defined $username) {
+        $uri->authority( "$username:$password" );
+      }
+  
+      $uri->host($host);
+      $uri->port($port) if $port;
+   }
+  
+   # Sometimes we may want to path in a query string
+   # but the URI module will escape the question mark.
+   my $q;
+  
+   if ( $path =~ s/\?(.*)$// ) {
+      $q = $1;
+   }
+  
+   $uri->path($path);
+  
+   # If there was a query string, we integrate it into the query
+   # parameter.
+   if ($q) {
+      %query = ( %query, split /[&=]/, $q );
+   }
+  
+   # $uri->query_form doesn't handle hash ref values properly
+   while ( my ( $key, $value ) = each %query ) {
+      $query{$key} = ref $value eq 'HASH' ? [ %$value ] : $value;
+   }
+  
+   $uri->query_form(%query) if %query;
+  
+   $uri->fragment($fragment) if $fragment;
+</%init>
+<% $uri->canonical | n %>\

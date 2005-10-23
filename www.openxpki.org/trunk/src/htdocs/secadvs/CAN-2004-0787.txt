@@ -1,0 +1,313 @@
+OpenCA Security Advisory: Cross Site Scripting vulnerability
+
+Authors
+  Martin Bartosch <mb-bugtraq@cynops.de>
+  Michael Bell <michael.bell@cms.hu-berlin.de>
+
+2004-09-01 Initial revision 
+2004-09-06 Public release 
+
+Summary
+-------
+
+The OpenCA Project is a collaborative effort to develop a robust, 
+full-featured and Open Source out-of-the-box Certification Authority 
+implementing the most used protocols with full-strength cryptography 
+world-wide. OpenCA is based on many Open-Source Projects. Among the 
+supported software is OpenLDAP, OpenSSL, Apache Project, Apache mod_ssl.
+
+A Cross Site Scripting (XSS) vulnerability was found in the OpenCA PKI 
+software, allowing users of the system to inject malicious HTML 
+code into the system. The malicious code may even affect offline 
+components.
+
+
+Affected versions
+-----------------
+
+All versions of OpenCA, including 0.9.1-8 and 0.9.2 RC6.
+
+
+Details
+-------
+
+Form input to the web frontends is not properly validated, making it
+possible to inject malicious HTML code into the system. Once the
+offending code has been inserted into the system, it may affect
+PKI staff or other users accessing the data.
+
+OpenCA advocates the separation between individual frontends and the
+use of an offline CA and RA. In this case data is exchanged using
+a removable medium such as a floppy disk. The offending code embedded
+in the user data may thus be transferred even to systems not connected
+to a network and might be used to attack offline nodes.
+
+
+Impact
+------
+
+Cross site scripting attacks primarily affect the client system 
+running the browser used to display the web page. OpenCA itself is
+not directly affected by such attacks. However, XSS exploit
+code may be deployed e. g. in order to gain session credentials, 
+allowing for session takeover. More advanced attacks (requiring
+specially crafted exploit code) could even be targeted at manipulating
+data on the OpenCA node on the user's behalf.
+
+
+Recommendations
+---------------
+
+All users of OpenCA should upgrade to a version that is not affected
+by the problem.
+
+OpenCA version 0.9.1 users are encouraged to upgrade to version 0.9.1-9.
+Users of the current development branch 0.9.2 should upgrade to CVS
+head.
+
+
+
+References
+----------
+
+The Common Vulnerabilities and Exposures project (cve.mitre.org) has
+assigned the name CAN-2004-0787 to this issue.
+
+http://cve.mitre.org/cgi-bin/cvename.cgi?name=CAN-2004-0787
+
+URL for this Security Advisory:
+http://www.openca.org/news/CAN-2004-0787.txt
+
+
+
+Appendix
+--------
+
+Security Patches
+
+###########################################################################
+## Patches against version 0.9.2
+###########################################################################
+
+Index: src/common/lib/functions/initServer
+===================================================================
+RCS file: /cvsroot/openca/openca-0.9/src/common/lib/functions/initServer,v
+retrieving revision 1.40
+diff -u -r1.40 initServer
+--- src/common/lib/functions/initServer	30 Aug 2004 12:31:53 -0000	1.40
++++ src/common/lib/functions/initServer	1 Sep 2004 13:27:27 -0000
+@@ -184,6 +184,10 @@
+     $query->set_gettext (\&i18nGettext);
+     close ($fh);
+ 
++    ## validate input data
++    ## 2004-08-27 Martin Bartosch <m.bartosch@cynops.de>
++    validateCGIParameters(\$query);
++
+     ## reinit configuration
+     my $CONFIG = $AUTOCONF {"etc_prefix"}.'/servers/'.$AUTOCONF {"config_prefix"}.'.conf';
+     if( not defined (my $ret = $config->loadCfg( "$CONFIG" )) ) {
+Index: src/common/lib/functions/misc-utils.lib
+===================================================================
+RCS file: /cvsroot/openca/openca-0.9/src/common/lib/functions/misc-utils.lib,v
+retrieving revision 1.50
+diff -u -r1.50 misc-utils.lib
+--- src/common/lib/functions/misc-utils.lib	26 Aug 2004 14:08:03 -0000	1.50
++++ src/common/lib/functions/misc-utils.lib	1 Sep 2004 13:27:27 -0000
+@@ -443,4 +443,39 @@
+     debug ($cmd, @_);
+ }
+ 
++# 2004-08-31 Martin Bartosch <m.bartosch@cynops.de>
++# clean up CGI parameters
++# input: reference to CGI class instance
++# This function modifies the object itself
++sub validateCGIParameters {
++    my $queryref = shift;
++    
++    ## validate input data
++    ## 2004-08-27 Martin Bartosch <m.bartosch@cynops.de>
++    foreach my $param (keys %{$$queryref->Vars}) {
++	my @values = $$queryref->param($param);
++
++	# replace < and > with &lt; and &rt; for all CGI parameters passed
++	# NOTE/FIXME: unescaping might be necessary when actually
++	# passing this data to e. g. certificate generation routines
++	# to prevent literal XML entities in certificate contents
++	map { 
++	    s/</&lt;/gm; 
++	    s/>/&gt;/gm; 
++	} @values;
++	$$queryref->param(-name => $param, -value => @values);
++
++	# extra sanity check just to be sure (redundant)
++	foreach (@values) {
++	    if (/<\S+.*?>/m) {
++		print "Content-type: text/html\n\n";
++		print "Security violation\n";
++		exit 101;
++	    }
++	}
++    }
++    return $queryref;
++}
++
++
+ 1;
+
+
+
+
+###########################################################################
+## Patches against version 0.9.1-8
+###########################################################################
+
+
+Index: src/common/lib/functions/misc-utils.lib
+===================================================================
+RCS file: /cvsroot/openca/openca-0.9/src/common/lib/functions/misc-utils.lib,v
+retrieving revision 1.16.2.2
+diff -u -r1.16.2.2 misc-utils.lib
+--- src/common/lib/functions/misc-utils.lib	16 Apr 2003 13:24:51 -0000	1.16.2.2
++++ src/common/lib/functions/misc-utils.lib	1 Sep 2004 11:49:14 -0000
+@@ -445,4 +445,38 @@
+ 
+ }
+ 
++# 2004-08-31 Martin Bartosch <m.bartosch@cynops.de>
++# clean up CGI parameters
++# input: reference to CGI class instance
++# This function modifies the object itself
++sub validateCGIParameters {
++    my $queryref = shift;
++    
++    ## validate input data
++    ## 2004-08-27 Martin Bartosch <m.bartosch@cynops.de>
++    foreach my $param (keys %{$$queryref->Vars}) {
++	my @values = $$queryref->param($param);
++
++	# replace < and > with &lt; and &rt; for all CGI parameters passed
++	# NOTE/FIXME: unescaping might be necessary when actually
++	# passing this data to e. g. certificate generation routines
++	# to prevent literal XML entities in certificate contents
++	map { 
++	    s/</&lt;/gm; 
++	    s/>/&gt;/gm; 
++	} @values;
++	$$queryref->param(-name => $param, -value => @values);
++
++	# extra sanity check just to be sure (redundant)
++	foreach (@values) {
++	    if (/<\S+.*?>/m) {
++		print "Content-type: text/html\n\n";
++		print "Security violation\n";
++		exit 101;
++	    }
++	}
++    }
++    return $queryref;
++}
++
+ 1;
+Index: src/web-interfaces/ca/ca.in
+===================================================================
+RCS file: /cvsroot/openca/openca-0.9/src/web-interfaces/ca/ca.in,v
+retrieving revision 1.8.2.1
+diff -u -r1.8.2.1 ca.in
+--- src/web-interfaces/ca/ca.in	10 Nov 2003 13:10:48 -0000	1.8.2.1
++++ src/web-interfaces/ca/ca.in	1 Sep 2004 11:49:16 -0000
+@@ -132,6 +132,9 @@
+ ##// Now it's time to get the parameters passed over the web
+ $query  = new OpenCA::TRIStateCGI;
+ 
++## validate input parameters 
++validateCGIParameters(\$query);
++
+ ## Generate a new reference to Configuration ( instance )
+ $dbconfig = new OpenCA::Configuration;
+ $dbiconfig = new OpenCA::Configuration;
+Index: src/web-interfaces/ldap/ldap.in
+===================================================================
+RCS file: /cvsroot/openca/openca-0.9/src/web-interfaces/ldap/ldap.in,v
+retrieving revision 1.7.2.1
+diff -u -r1.7.2.1 ldap.in
+--- src/web-interfaces/ldap/ldap.in	10 Nov 2003 13:10:48 -0000	1.7.2.1
++++ src/web-interfaces/ldap/ldap.in	1 Sep 2004 11:49:16 -0000
+@@ -138,6 +138,9 @@
+ ##// Now it's time to get the parameters passed over the web
+ $query  = new OpenCA::TRIStateCGI;
+ 
++## validate input parameters 
++validateCGIParameters(\$query);
++
+ ## Generate a new reference to Configuration ( instance )
+ $dbconfig = new OpenCA::Configuration;
+ $dbiconfig = new OpenCA::Configuration;
+Index: src/web-interfaces/node/node.in
+===================================================================
+RCS file: /cvsroot/openca/openca-0.9/src/web-interfaces/node/node.in,v
+retrieving revision 1.2.2.1
+diff -u -r1.2.2.1 node.in
+--- src/web-interfaces/node/node.in	10 Nov 2003 13:10:48 -0000	1.2.2.1
++++ src/web-interfaces/node/node.in	1 Sep 2004 11:49:17 -0000
+@@ -139,6 +139,9 @@
+ ##// Now it's time to get the parameters passed over the web
+ $query  = new OpenCA::TRIStateCGI;
+ 
++## validate input parameters 
++validateCGIParameters(\$query);
++
+ ## Generate a new reference to Configuration ( instance )
+ $dbconfig = new OpenCA::Configuration;
+ $dbiconfig = new OpenCA::Configuration;
+Index: src/web-interfaces/pub/pki.in
+===================================================================
+RCS file: /cvsroot/openca/openca-0.9/src/web-interfaces/pub/pki.in,v
+retrieving revision 1.7.2.1
+diff -u -r1.7.2.1 pki.in
+--- src/web-interfaces/pub/pki.in	10 Nov 2003 13:10:48 -0000	1.7.2.1
++++ src/web-interfaces/pub/pki.in	1 Sep 2004 11:49:17 -0000
+@@ -136,6 +136,9 @@
+ ##// Now it's time to get the parameters passed over the web
+ $query  = new OpenCA::TRIStateCGI;
+ 
++## validate input parameters 
++validateCGIParameters(\$query);
++
+ ## Generate a new reference to Configuration ( instance )
+ $dbconfig = new OpenCA::Configuration;
+ $dbiconfig = new OpenCA::Configuration;
+Index: src/web-interfaces/pub/scepd.in
+===================================================================
+RCS file: /cvsroot/openca/openca-0.9/src/web-interfaces/pub/Attic/scepd.in,v
+retrieving revision 1.2.2.1
+diff -u -r1.2.2.1 scepd.in
+--- src/web-interfaces/pub/scepd.in	10 Nov 2003 13:10:48 -0000	1.2.2.1
++++ src/web-interfaces/pub/scepd.in	1 Sep 2004 11:49:17 -0000
+@@ -121,6 +121,9 @@
+ ##// Now it's time to get the parameters passed over the web
+ $query  = new OpenCA::TRIStateCGI;
+ 
++## validate input parameters 
++validateCGIParameters(\$query);
++
+ ## Generate a new reference to Configuration ( instance )
+ $dbconfig = new OpenCA::Configuration;
+ $dbiconfig = new OpenCA::Configuration;
+Index: src/web-interfaces/ra/RAServer.in
+===================================================================
+RCS file: /cvsroot/openca/openca-0.9/src/web-interfaces/ra/RAServer.in,v
+retrieving revision 1.8.2.1
+diff -u -r1.8.2.1 RAServer.in
+--- src/web-interfaces/ra/RAServer.in	10 Nov 2003 13:10:49 -0000	1.8.2.1
++++ src/web-interfaces/ra/RAServer.in	1 Sep 2004 11:49:18 -0000
+@@ -138,6 +138,9 @@
+ ##// Now it's time to get the parameters passed over the web
+ $query  = new OpenCA::TRIStateCGI;
+ 
++## validate input parameters 
++validateCGIParameters(\$query);
++
+ ## Generate a new reference to Configuration ( instance )
+ $dbconfig = new OpenCA::Configuration;
+ $dbiconfig = new OpenCA::Configuration;

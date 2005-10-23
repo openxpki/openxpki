@@ -1,0 +1,66 @@
+<%attr>
+  title => 'Resources'
+</%attr>
+
+        <h2>Resources</h2>
+        <h3>
+          <a href="<& /lib/url.mas, 
+		   host => 'developer.berlios.de',
+		   path => '/' &>">
+            <img src="<& /lib/url.mas, 
+		      host => 'developer.berlios.de',
+		      path => '/bslogo.php?group_id=4898' &>"
+                 width="124" height="32" alt="BerliOS Logo"/>
+          </a>
+        </h3>
+        <p>OpenXPKI uses the BerliOS platform for various things. The major
+          aspects why we choose BerliOS was the subversion and WiKi support.</p>
+        <ul>
+          <li><a href="<& /lib/url.mas, 
+		       host => 'developer.berlios.de',
+		       path => '/projects/openxpki/' &>">
+	      OpenXPKI at Berlios</a></li>
+          <li><a href="<& /lib/url.mas, 
+		       host => 'developer.berlios.de',
+		       path => '/mail/?group_id=4898' &>">
+	      Mailing Lists</a></li>
+          <li><a href="<& /lib/url.mas, 
+		       host => 'developer.berlios.de',
+		       path => '/bugs/?group_id=4898' &>">
+	      Bug Tracking</a></li>
+          <li><a href="<& /lib/url.mas, 
+		       host => 'developer.berlios.de',
+		       path => '/feature/?group_id=4898' &>">
+	      RFEs - Feature requests</a></li>
+          <li><a href="<& /lib/url.mas, 
+		       host => 'developer.berlios.de',
+		       path => '/svn/?group_id=4898' &>">
+	      Subversion (Version Control System)</a></li>
+        </ul>
+        <h3>Subversion structure</h3>
+        <p>
+          We use the version control system from BerliOS. The actual structure
+          is the following one:</p>
+        <dl>
+          <dt class="sourcecode">perl-modules/</dt>
+          <dd>
+            <dl>
+              <dt class="sourcecode">perl-modules/core/</dt>
+              <dd>
+                <dl>
+                  <dt class="sourcecode">perl-modules/core/trunk/</dt>
+                  <dd>the most up-to-date core development</dd>
+                </dl>
+              </dd>
+            </dl>
+          </dd>
+          <dt class="sourcecode">www.openxpki.org/</dt>
+          <dd>
+            <dl>
+              <dt class="sourcecode">www.openxpki.org/trunk/update_www_openxpki_org</dt>
+              <dd>A script to update the web servers</dd>
+              <dt class="sourcecode">www.openxpki.org/trunk/htdocs</dt>
+              <dd>The web pages itself</dd>
+            </dl>
+          </dd>
+        </dl>

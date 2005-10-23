@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <& /lib/html-header.mas, title => $title &>
+  </head>
+  <body>
+    <div class="page">
+
+     <div class="navi">
+      <div class="menu">
+        <& /lib/menu.mas, title => $title &>
+      </div>
+     </div>
+
+     <div class="info">
+      <div class="header">
+        <& /lib/header.mas, title => $title &>
+      </div>
+
+
+      <div class="main">
+       <div class="content">
+%       $m->call_next;
+       </div>
+       <div class="footer">
+        <& /lib/footer.mas &>
+       </div>
+      </div> <!-- main -->
+     </div> <!-- info -->
+    </div>  <!-- page -->
+  </body>
+</html>
+
+<%init>
+  my $title = $m->base_comp->attr('title');
+</%init>
+
+<%flags>
+  inherit => '/syshandler'
+</%flags>
