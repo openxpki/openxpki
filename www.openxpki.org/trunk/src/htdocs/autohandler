@@ -18,7 +18,6 @@
         <& /lib/header.mas, title => $title &>
       </div>
 
-
       <div class="main">
        <div class="content">
 %       $m->call_next;
@@ -37,5 +36,5 @@
 </%init>
 
 <%flags>
-  inherit => '/syshandler'
+#  inherit => '/syshandler'
 </%flags>
