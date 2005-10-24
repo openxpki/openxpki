@@ -1,14 +1,14 @@
 #!/usr/bin/perl -w
 
-use strict;  # Always use strict!
+use strict;
 
 use Cwd;
+use Data::Dumper;
 use File::Basename;
 use File::Find;
 use File::Path;
 use File::Spec;
 use HTML::Mason;
-
 use URI;
 
 # These are directories.  The canonpath method removes any cruft
@@ -52,11 +52,11 @@ sub convert {
 	$interp->out_method(\$buffer);
 	$interp->exec("/$comp_path");
 
-    } elsif (/(\.png)$/) {
+    } elsif (/(\.png|\.txt)$/) {
 	# don't process, just copy
 	$buffer = do { local $/; 
-		       open my $fh, "<$_" or die "Could not open $_. Stopped";
-		       <$fh>;
+		       open my $FH, "<$_" or die "Could not open $_. Stopped";
+		       <$FH>;
 	}
     } else {
 	# ignore mason components et al.
@@ -66,8 +66,7 @@ sub convert {
     # In case the directory doesn't exist, we make it
     mkpath(dirname($out_file));
     
-    local *RESULT;
-    open RESULT, "> $out_file" or die "Cannot write to $out_file: $!";
-    print RESULT $buffer or die "Cannot write to $out_file: $!";
-    close RESULT or die "Cannot close $out_file: $!";
+    open my $RESULT, "> $out_file" or die "Cannot write to $out_file: $!";
+    print $RESULT $buffer or die "Cannot write to $out_file: $!";
+    close $RESULT or die "Cannot close $out_file: $!";
 }

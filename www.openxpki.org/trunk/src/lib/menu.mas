@@ -3,12 +3,28 @@
 	  path => '/secadvs/' &>">Security Advisories</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/mirrors/' &>">Mirrors</a></div>
+% if ($section eq 'mirrors') {
+        <div class="menu_sub_item"><a href="<& /lib/url.mas, 
+	  path => '/mirrors/www.html' &>">WWW</a></div>
+        <div class="menu_sub_item"><a href="<& /lib/url.mas, 
+	  path => '/mirrors/ftp.html' &>">FTP</a></div>
+% }
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/news/' &>">News</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/docs/' &>">Docs</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/download/' &>">Download</a></div>
+% if ($section eq 'download') {
+        <div class="menu_sub_item"><a href="<& /lib/url.mas, 
+	  host => 'sourceforge.net',
+	  path => '/project/showfiles.php?group_id=20873' &>">Sourceforge</a></div>
+        <div class="menu_sub_item"><a href="<& /lib/url.mas, 
+	  host => 'ftp.openca.org',
+	  path => '/pub/openca' &>">FTP</a></div>
+        <div class="menu_sub_item"><a href="<& /lib/url.mas, 
+	  path => '/mirrors/ftp.html' &>">FTP Mirrors</a></div>
+% }
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/demo/' &>">Demo Installations</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
@@ -18,3 +34,31 @@
         <div class="w3c">
           <a href="http://validator.w3.org/check?uri=http://www.openxpki.org/"><img class="noborder" src="images/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88" /></a>
         </div>
+
+<%init>
+# original component path (e. g. 'htdocs/news/index.html')
+my @path = File::Spec->splitdir($m->request_comp()->path());
+
+# remove target directory portion
+# e. g. ('news', 'index.html')
+shift @path;
+shift @path;
+
+# dirs will contain only the directories in the path (without the file itself,
+# e. g. ('news')
+my @dirs = @path;
+pop @dirs;
+
+# section name (e. g. "news")
+my $section = "";
+if (defined $dirs[0]) {
+   $section = $dirs[0];
+}
+
+# relative path (e. g. 'news/index.html')
+my $path = File::Spec->catfile(@path);
+
+# depth (e. g. 1)
+my $depth = scalar(@dirs);
+
+</%init>

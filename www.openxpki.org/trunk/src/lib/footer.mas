@@ -1,1 +1,10 @@
-$Author: oliwel $ $Date: 2005/09/06 13:57:50 $ - &copy; 2005  OpenXPKI Foundation
+Last modified by <% $author %> on <% $date %> <% $time %> - &copy; 2005  OpenXPKI Foundation
+
+<%init>
+my $vc_author = '$Author: oliwel $';
+my ($author) = ($vc_author =~ m/Author: (\S+)/);
+
+my $vc_time = '$Date: 2005/09/06 13:57:50 $';
+$vc_time =~ s{/}{-}xsg;
+my ($date, $time) = ($vc_time =~ m/Date: (\S+) (\S+)/);
+</%init>

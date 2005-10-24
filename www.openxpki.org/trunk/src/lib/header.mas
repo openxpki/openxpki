@@ -1,1 +1,3 @@
-        <img src="images/openxpki_logo.png" alt="OpenXPKI Project"/>
+<img src="<& /lib/url.mas, 
+             path => '/images/openxpki_logo.png' &>"
+     alt="OpenXPKI Project"/>
