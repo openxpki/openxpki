@@ -61,8 +61,8 @@ the diffs are from OpenCA 0.9.1.3.
  
  our ($errno, $errval);
  
--($OpenCA::PKCS7::VERSION = '$Revision: 1.1 $' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg;
-+($OpenCA::PKCS7::VERSION = '$Revision: 1.1 $' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg;
+-($OpenCA::PKCS7::VERSION = '$Revision$' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg;
++($OpenCA::PKCS7::VERSION = '$Revision$' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg;
  
  my %params = (
  	 inFile => undef,
