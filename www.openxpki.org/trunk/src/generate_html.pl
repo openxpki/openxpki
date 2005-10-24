@@ -46,7 +46,7 @@ sub convert {
     my $buffer;
     # We don't want to try to convert our autohandler or .mas
     # components.  $_ contains the filename
-    if (/\.html$/) {
+    if (/(\.html|\.css)$/) {
 
 	# This will save the component's output in $buffer
 	$interp->out_method(\$buffer);

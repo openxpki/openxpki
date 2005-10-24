@@ -32,7 +32,7 @@
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/foundation/' &>">Foundation</a></div>
         <div class="w3c">
-          <a href="http://validator.w3.org/check?uri=http://www.openxpki.org/"><img class="noborder" src="images/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88" /></a>
+          <a href="http://validator.w3.org/check?uri=http://www.openxpki.org/"><img class="noborder" src="/images/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88" /></a>
         </div>
 
 <%init>
