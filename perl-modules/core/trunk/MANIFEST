@@ -11,6 +11,7 @@ OpenXPKI.pm
 OpenXPKI/Exception.pm
 OpenXPKI/DN.pm
 OpenXPKI/XML/Cache.pm
+OpenXPKI/XML/Config.pm
 
 ## Crypto layer
 

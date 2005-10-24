@@ -5,7 +5,6 @@ BEGIN { plan tests => 17 };
 
 print STDERR "OpenXPKI::Crypto::OpenSSL::PKCS10\n";
 
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;

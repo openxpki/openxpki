@@ -3,7 +3,6 @@ BEGIN { plan tests => 3 };
 
 print STDERR "OpenXPKI::Crypto::SCEP (planned)\n";
 
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;

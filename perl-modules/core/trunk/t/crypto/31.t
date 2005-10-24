@@ -5,7 +5,6 @@ BEGIN { plan tests => 15 };
 
 print STDERR "OpenXPKI::Crypto::X509\n";
 
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::X509;
 use Time::HiRes;

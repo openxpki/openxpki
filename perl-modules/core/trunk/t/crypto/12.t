@@ -5,7 +5,6 @@ BEGIN { plan tests => 15 };
 
 print STDERR "OpenXPKI::Crypto::Command: Conversion tests\n";
 
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (read_file);
 

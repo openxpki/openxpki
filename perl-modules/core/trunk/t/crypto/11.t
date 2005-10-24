@@ -5,7 +5,6 @@ BEGIN { plan tests => 10 };
 
 print STDERR "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n";
 
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;

@@ -6,7 +6,6 @@ BEGIN { plan tests => 8 };
 
 print STDERR "OpenXPKI::Crypto::Command: Create a CA\n";
 
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;

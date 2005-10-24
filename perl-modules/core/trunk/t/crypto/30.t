@@ -5,7 +5,6 @@ BEGIN { plan tests => 11 };
 
 print STDERR "OpenXPKI::Crypto::Header\n";
 
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Header;
 

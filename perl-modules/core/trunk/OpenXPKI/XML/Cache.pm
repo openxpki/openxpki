@@ -131,28 +131,6 @@ sub get_xpath
     my $keys = { @_ };
     $self->debug ("start");
 
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_XPATH",
-        errno   => 400)
-        if (not $keys->{XPATH});
-
-    if (ref ($keys->{XPATH}) eq "ARRAY")
-    {
-        if (ref ($keys->{COUNTER}) ne "ARRAY")
-        {
-            $keys->{COUNTER} = [ $keys->{COUNTER} ];
-        }
-        $keys->{COUNTER} = [ @{$keys->{COUNTER}}, "0" ]
-            if (scalar @{$keys->{XPATH}} > scalar @{$keys->{COUNTER}});
-    } else {
-        $keys->{COUNTER} = 0 if (not $keys->{COUNTER});
-        $keys->{XPATH}   = [ $keys->{XPATH} ];
-        $keys->{COUNTER} = [ $keys->{COUNTER} ];
-    }
-
-    $keys = $self->__get_params (XPATH   => $keys->{XPATH},
-                                 COUNTER => $keys->{COUNTER});
-
     my $item = $self->{cache};
     for (my $i=0; $i<scalar @{$keys->{XPATH}}; $i++)
     {
@@ -213,31 +191,6 @@ sub get_xpath_count
     my $keys = { @_ };
     $self->debug ("start");
 
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_MISSING_XPATH",
-        errno   => 400)
-        if (not $keys->{XPATH});
-
-    if (ref ($keys->{XPATH}) eq "ARRAY")
-    {
-        if (exists $keys->{COUNTER} and
-            defined $keys->{COUNTER} and
-            ref ($keys->{COUNTER}) ne "ARRAY")
-        {
-            $keys->{COUNTER} = [ $keys->{COUNTER} ];
-        }
-    } else {
-        if (not $keys->{COUNTER})
-        {
-            $keys->{COUNTER} = undef;
-        } else {
-            $keys->{COUNTER} = [ $keys->{COUNTER} ];
-        }
-        $keys->{XPATH}   = [ $keys->{XPATH} ];
-    }
-
-    $keys = $self->__get_params (%{$keys});
-
     my $item = $self->{cache};
     for (my $i=0; $i<scalar @{$keys->{COUNTER}}; $i++)
     {
@@ -259,47 +212,6 @@ sub get_xpath_count
     return $item if ($keys->{REF});
     $self->debug ("content: ".scalar @{$item});
     return scalar @{$item};
-}
-
-sub __get_params
-{
-    my $self = shift;
-    my $keys = { @_ };
-
-    my $params = undef;
-    $params->{XPATH}   = [];
-    $params->{COUNTER} = [];
-
-    for (my $i=0; $i<scalar @{$keys->{XPATH}}; $i++)
-    {
-        $self->debug ("scan: ".$keys->{XPATH}->[$i]);
-        my @names = split /\//, $keys->{XPATH}->[$i];
-        foreach my $name (@names)
-        {
-            $self->debug ("part: $name");
-            $params->{XPATH}   = [ @{$params->{XPATH}},   $name ];
-            $params->{COUNTER} = [ @{$params->{COUNTER}}, 0 ];
-        }
-        if (not exists $keys->{COUNTER} or
-            not $keys->{COUNTER} or
-            $i == scalar @{$keys->{COUNTER}})
-        {
-            $self->debug ("removed counter");
-            delete $params->{COUNTER}->[scalar @{$params->{COUNTER}} -1];
-        } else {
-            $self->debug ("replaced counter");
-            $params->{COUNTER}->[scalar @{$params->{COUNTER}} -1] = $keys->{COUNTER}->[$i];
-        }
-    }
-    ## preserve other parameters
-    $keys->{XPATH}   = $params->{XPATH};
-    $keys->{COUNTER} = $params->{COUNTER};
-    if ($self->{DEBUG})
-    {
-        $self->debug ("xpath: ".join ", ", @{$keys->{XPATH}});
-        $self->debug ("counter: ".join ", ", @{$keys->{COUNTER}});
-    }
-    return $keys;
 }
 
 sub __get_serialized_xpath
@@ -358,55 +270,15 @@ This function returns the value of the submitted XML path. So
 please do not expect that xpath has something todo with the XML
 standard XPATH.
 
-There are two available options COUNTER and XPATH. Both can be
-single scalars or array references. First you have to understand
-the interpretation by an example.
-
-$cache->get_xpath (XPATH   => ["abc/def", "xyz"],
-                   COUNTER => [2, 3]);
-
-This means that you search the third tag (2+1) with the name
-"def" in the tag "abc". The returned value will be the value of
-the fourth (3+1) value of tag "xyz" in the defined tag "def". You
-can also write this as follows:
-
-$cache->get_xpath (XPATH   => ["abc", "def", "xyz"],
-                   COUNTER => [0, 2, 3]);
-
-If a path is definite then you can remove the zero and concatenate
-the tag names with slashes "/".
-
-You can use the following calling conventions:
-
-$cache->get_xpath (XPATH   => ["abc", "def", "xyz"],
-                   COUNTER => [0, 2, 3]);
-
-$cache->get_xpath (XPATH   => ["abc/def", "xyz"],
-                   COUNTER => [2, 3]);
-
-$cache->get_xpath (XPATH   => ["abc/def"],
-                   COUNTER => [0]);
-
-$cache->get_xpath (XPATH   => "abc/def",
-                   COUNTER => 0);
-
-$cache->get_xpath (XPATH   => "abc/def");
-
-It is strongly recommend to only use the three following use cases.
-All other use cases can be deprectaed in the future. The last variant
-will usually not used because the second is more readable.
-
-$cache->get_xpath (XPATH   => "abc/def");
-
-$cache->get_xpath (XPATH   => ["abc/def", "xyz"],
-                   COUNTER => [2, 3]);
+There are two available options COUNTER and XPATH. Both must be
+arrays. The example shows the usage.
 
 $cache->get_xpath (XPATH   => ["abc", "def", "xyz"],
                    COUNTER => [0, 2, 3]);
 
 =head2 get_xpath_count
 
-The interface is exacatly the same like for get_xpath with one big
+The interface is exactly the same like for get_xpath with one big
 exception. COUNTER is always one element shorter than XPATH. The
 result is the number of available values with the specified path.
 

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Test;
-use OpenXPKI::XML::Cache;
+use OpenXPKI::XML::Config;
 use Time::HiRes;
 
 BEGIN { plan tests => 3 };
@@ -11,8 +11,8 @@ print STDERR "SYNTAX VALIDATION\n";
 ok(1);
 
 ## create new object
-my $obj = OpenXPKI::XML::Cache->new(DEBUG  => 0,
-                                  CONFIG => [ "t/xml/test.xml" ]);
+my $obj = OpenXPKI::XML::Config->new(DEBUG  => 0,
+                                     CONFIG => [ "t/xml/test.xml" ]);
 
 if ($obj)
 {

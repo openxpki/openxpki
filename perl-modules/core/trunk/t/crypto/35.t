@@ -5,7 +5,6 @@ BEGIN { plan tests => 12 };
 
 print STDERR "OpenXPKI::Crypto::PKCS7\n";
 
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (read_file);
 use OpenXPKI::Crypto::PKCS7;

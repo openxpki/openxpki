@@ -3,6 +3,9 @@
 # test. Note that the tests are invoked from the top level directory,
 # so all file references must take this into account.
 
+use OpenXPKI;
+use OpenXPKI::XML::Config;
+
 ## init the XML cache
 my $tokenconfigfile = File::Spec->catfile('t', 'crypto', 'token.xml');
 
@@ -17,7 +20,7 @@ $config =~ s{ (<name>SHELL</name>\s*
                <value>) (.*?) (</value>) }
             {$1$openssl_binary$3}sx;
 
-$cache = OpenXPKI::XML::Cache->new(DEBUG  => 0,
-				   CONFIG => [ $config ]);
+$cache = OpenXPKI::XML::Config->new(DEBUG  => 0,
+                                    CONFIG => [ $config ]);
 
-
+die "Could not init XML config. Stopped" if (not $cache);

@@ -6,7 +6,6 @@ BEGIN { plan tests => 17 };
 
 print STDERR "OpenXPKI::Crypto::CSR\n";
 
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::CSR;
 use Time::HiRes;

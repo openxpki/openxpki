@@ -5,7 +5,6 @@ BEGIN { plan tests => 24 };
 
 print STDERR "OpenXPKI::Crypto::OpenSSL::X509\n";
 
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;

@@ -5,8 +5,6 @@ BEGIN { plan tests => 4 };
 
 print STDERR "OpenXPKI::Crypto::TokenManager\n";
 
-use OpenXPKI;
-use OpenXPKI::XML::Cache;
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
