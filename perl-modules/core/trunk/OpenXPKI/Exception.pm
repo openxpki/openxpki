@@ -1,6 +1,6 @@
 ## OpenXPKI::Exception
 ## Copyright (C) 2004-2005 Michael Bell
-## $Revision: 9 $
+## $Revision$
 
 use strict;
 use warnings;

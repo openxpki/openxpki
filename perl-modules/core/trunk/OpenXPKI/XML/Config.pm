@@ -1,6 +1,6 @@
 ## OpenXPKI::XML::Config
 ## Copyright (C) 2003-2005 The OpenXPKI Project
-## $Revision: 28 $
+## $Revision$
 
 use strict;
 use warnings;
