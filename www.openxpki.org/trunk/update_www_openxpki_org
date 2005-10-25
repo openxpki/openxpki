@@ -14,14 +14,14 @@ cd $target
 
 ## Legacy problem: cvs folder is named doc, should be docs - so we make a link
 
-if [ ! -e doc ]; then 
+if [ ! -L doc ] && [ ! -d doc ]; then
   ln -s docs doc 
 fi;
 
 ## update CVS
 
 svn checkout svn://svn.berlios.de/openxpki/www.openxpki.org/trunk/htdocs $target 2>/dev/null >/dev/null
-cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/openca/ checkout -P doc 2>/dev/null >/dev/null
+cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/openca checkout -P doc 2>/dev/null >/dev/null
 
 ## copy stuff to htdocs area
 
