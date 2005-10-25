@@ -4,7 +4,7 @@
 #
 
 SRCDIR=htdocs
-DSTDIR=../htdocs
+DSTDIR=static
 
 all: process
 
