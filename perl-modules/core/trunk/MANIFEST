@@ -99,5 +99,8 @@ t/pod/2.t
 
 t/xml/1.t
 t/xml/2.t
+t/xml/3.t
 t/xml/test.xml
+t/xml/top.xml
+t/xml/sub.xml
 META.yml                                 Module meta-data (added by MakeMaker)

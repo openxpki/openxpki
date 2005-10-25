@@ -12,7 +12,7 @@ ok(1);
 
 ## create new object
 my $obj = OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                     CONFIG => [ "t/xml/test.xml" ]);
+                                     CONFIG => "t/xml/test.xml");
 
 if ($obj)
 {

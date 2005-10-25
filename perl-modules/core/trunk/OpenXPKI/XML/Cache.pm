@@ -43,57 +43,194 @@ sub init
 {
     my $self = shift;
     $self->debug ("start");
-    my $xs   = XML::Simple->new (ForceArray    => 1,
-                                 ForceContent  => 1,
-                                 SuppressEmpty => undef,
-                                 KeepRoot      => 1);
+    $self->{xs} = XML::Simple->new (ForceArray    => 1,
+                                    ForceContent  => 1,
+                                    SuppressEmpty => undef,
+                                    KeepRoot      => 1);
 
     delete $self->{cache} if (exists $self->{cache});
-    foreach my $input (@{$self->{config}})
-    {
-	# if input contains '<>' characters, we are passed a raw XML string
-	# otherwise we assume a filename
-	my $filename = "[Literal XML string]";
-	if ($input !~ m{[<>]}) {
-	    $filename = $input;
-	}
-	$self->debug ("filename: $filename");
 
-        my $xml = eval { $xs->XMLin ($input); };
+    # if input contains '<>' characters, we are passed a raw XML string
+    # otherwise we assume a filename
+    my $filename = "[Literal XML string]";
+    if ($self->{config} !~ m{[<>]}) {
+        $filename = $self->{config};
+    }
+    $self->debug ("filename: $filename");
+
+    my $xml = eval { $self->{xs}->XMLin ($self->{config}); };
+    if (not $xml and $@)
+    {
+        my $msg = $@;
+        delete $self->{cache} if (exists $self->{cache});
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_XML_CACHE_INIT_XML_ERROR",
+            params  => {"FILE"   => $filename,
+                        "ERRVAL" => $msg});
+    }
+    $self->{cache} = $xml->{openxpki}->[0];
+    $self->{xtree}->{$filename}->{LEVEL} = 1;
+    $self->{xtree}->{$filename}->{REF}   = $self->{cache};
+
+    $self->__perform_xinclude();
+
+    return 1;
+}
+
+sub __perform_xinclude
+{
+    my $self = shift;
+    $self->debug ("start");
+
+    ## scan configuration for unresolved xincludes
+
+    my @xincludes = $self->__scan_xinclude ($self->{cache});
+    return 1 if (not scalar @xincludes);
+    $self->debug ("xinclude tag detected");
+
+    ## include the XML stuff
+
+    foreach my $xinclude (@xincludes)
+    {
+        ## find insert position for the new XML data
+        $self->debug ("integrate loaded XML data into XML tree");
+        my $ref = $self->{cache};
+        my $path = $self->{config};
+        my $elements = scalar @{$xinclude->{XPATH}} - 1;
+        for (my $i=0; $i < $elements; $i++)
+        {
+            my $xpath = $xinclude->{XPATH}->[$i];
+            my $count = $xinclude->{COUNTER}->[$i];
+            if (exists $self->{xref}->{$ref} and
+                exists $self->{xref}->{$ref}->{$xpath} and
+                exists $self->{xref}->{$ref}->{$xpath}->{$count})
+            {
+                $path = $self->{xref}->{$ref}->{$xpath}->{$count};
+            }
+            $ref = $ref->{$xpath};
+            $ref = $ref->[$count];
+        }
+
+        ## calculate the correct filename
+        $self->debug ("calculate filename from path $path");
+        my $filename = $xinclude->{XPATH}->[$elements];
+        if ($filename !~ /^\//)
+        {
+            $path =~ s%/[^/]*$%/%;
+            $filename = $path.$filename;
+        }
+
+        ## loop detection
+        ## protection against endless loops
+        $self->debug ("check for loop");
+        if (exists $self->{xtree} and
+            exists $self->{xtree}->{$filename})
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_LOOP_DETECTED",
+                params  => {"FILENAME"   => $filename});
+        }
+
+
+        ## load the xinclude file
+        $self->debug ("load the included file $filename");
+        my $xml = eval { $self->{xs}->XMLin ($filename) };
         if (not $xml and $@)
         {
             my $msg = $@;
             delete $self->{cache} if (exists $self->{cache});
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_XML_CACHE_INIT_XML_ERROR",
+                message => "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_XML_ERROR",
                 params  => {"FILE"   => $filename,
                             "ERRVAL" => $msg});
         }
-        if (not exists $self->{cache})
+        my $top = join "", keys %{$xml};
+        $self->debug ("top element of $filename is $top");
+
+        ## insert the data into the XML structure
+        if (exists $ref->{$top})
         {
-            $self->debug ("cache is empty");
-            $self->{cache} = $xml->{openxpki}->[0];
-            next;
+            $ref->{$top} = [ @{$ref->{$top}}, $xml->{$top}->[0] ];
+        } else {
+            $ref->{$top} = $xml->{$top};
         }
 
-        foreach my $key (sort keys %{$xml->{openxpki}->[0]})
+        ## store position of file in XML tree
+        $self->debug ("store reference for the filename");
+        $self->{xref}->{$ref}->{$top}->{scalar @{$ref->{$top}} -1} = $filename;
+        $self->{xtree}->{$filename}->{REF}   = $ref;
+        $self->{xtree}->{$filename}->{NAME}  = $top;
+        $self->{xtree}->{$filename}->{POS}   = scalar @{$ref->{$top}} -1;
+        $self->{xtree}->{$filename}->{LEVEL} = 0;
+    }
+
+    ## update the levels
+
+    $self->debug ("update tree level of the different files");
+    foreach my $file (keys %{$self->{xtree}})
+    {
+        $self->{xtree}->{$file}->{LEVEL}++;
+    }
+
+    ## resolve the new xincludes
+
+    $self->debug ("start next round of xinclude detection");
+    return $self->__perform_xinclude();
+}
+
+## this function returns an array
+## every array element is a hash
+## every hash includes two arrays - the path elements and number of the element
+## Example: my @ret = ({XPATH   => ["token", "/etc/token.xml],
+##                      COUNTER => ["1", "0"]});
+sub __scan_xinclude
+{
+    my $self = shift;
+    my $ref  = shift;
+    my @result = ();
+    $self->debug ("start");
+
+    ## scan hash for xi tags
+
+    foreach my $key (keys %{$ref})
+    {
+        if ($key ne "xi:include")
         {
-            $self->debug ("handling section $key");
-            if (not exists $self->{cache}->{$key})
+            next if (ref $ref->{$key} ne "ARRAY"); ## content
+            $self->debug ("scanning tag $key");
+            ## is a reference to other elements
+            for (my $i=0; $i < scalar @{$ref->{$key}}; $i++)
             {
-                $self->debug ("there is no such section until now");
-                $self->{cache}->{$key} = $xml->{openxpki}->[0]->{$key};
-                next;
-            }
-            $self->debug ("extending section");
-            foreach my $name (keys %{$xml->{openxpki}->[0]->{$key}->[0]})
-            {
-                $self->debug ("adding $name to $key");
-                $self->{cache}->{$key}->[0]->{$name} = $xml->{openxpki}->[0]->{$key}->[0]->{$name};
+                my @ret = $self->__scan_xinclude ($ref->{$key}->[$i]);
+                for (my $k=0; $k < scalar @ret; $k++)
+                {
+                    $ret[$k]->{XPATH}   = [$key, @{$ret[$k]->{XPATH}}];
+                    $ret[$k]->{COUNTER} = [$i, @{$ret[$k]->{COUNTER}}];
+                }
+                push @result, @ret;
             }
         }
+        else
+        {
+            $self->debug ("xi:include tag present");
+            for (my $i=0; $i < scalar @{$ref->{"xi:include"}}; $i++)
+            {
+                ## namespace must be correct
+                if ($ref->{"xi:include"}->[$i]->{"xmlns:xi"} !~ /XInclude/i)
+                {
+                }
+                $self->debug ("xi:include tag correct");
+                ## extracting data
+                push @result, {XPATH   => [ $ref->{"xi:include"}->[$i]->{"href"} ],
+                               COUNTER => [ $i ]};
+                $self->debug ("file ".$ref->{"xi:include"}->[$i]->{"href"}." ready for include");
+            }
+            ## delete xinclude tags to avoid loops
+            delete $ref->{"xi:include"};
+        }
     }
-    return 1;
+    $self->debug ("end");
+    return @result;
 }
 
 sub dump

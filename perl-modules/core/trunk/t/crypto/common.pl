@@ -21,6 +21,6 @@ $config =~ s{ (<name>SHELL</name>\s*
             {$1$openssl_binary$3}sx;
 
 $cache = OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                    CONFIG => [ $config ]);
+                                    CONFIG => $config);
 
 die "Could not init XML config. Stopped" if (not $cache);

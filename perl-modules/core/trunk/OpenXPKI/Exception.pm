@@ -39,8 +39,13 @@ sub full_message
     }
 
     ## put together and translate message
-    print STDERR i18nGettext ($self->{message}, %{$self->{params}})."\n";
-    return i18nGettext ($self->{message}, %{$self->{params}});
+    my $msg = i18nGettext ($self->{message}, %{$self->{params}});
+    if ($msg eq $self->{message})
+    {
+        $msg = join ", ", ($msg, %{$self->{params}});
+    }
+    print STDERR "$msg\n";
+    return $msg;
 }
 
 #sub get_errno
