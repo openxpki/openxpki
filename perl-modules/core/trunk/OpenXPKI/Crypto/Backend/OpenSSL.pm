@@ -1,4 +1,4 @@
-## OpenXPKI::Crypto::OpenSSL
+## OpenXPKI::Crypto::Backend::OpenSSL
 ## (C)opyright 2005 Michael Bell
 ## $Revision
 	
@@ -6,10 +6,10 @@ use strict;
 use warnings;
 use utf8; ## pack/unpack is too slow
 
-package OpenXPKI::Crypto::OpenSSL;
+package OpenXPKI::Crypto::Backend::OpenSSL;
 
-use OpenXPKI::Crypto::OpenSSL::Shell;
-use OpenXPKI::Crypto::OpenSSL::Command;
+use OpenXPKI::Crypto::Backend::OpenSSL::Shell;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command;
 
 use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
@@ -37,7 +37,7 @@ sub __init_engine
 {
     my $self = shift;
     my $keys = { @_ };
-    my $engine = "OpenXPKI::Crypto::OpenSSL::Engine::".$keys->{ENGINE};
+    my $engine = "OpenXPKI::Crypto::Backend::OpenSSL::Engine::".$keys->{ENGINE};
     eval "use $engine;";
     if ($@)
     {
@@ -79,7 +79,7 @@ sub __init_shell
 
     eval
     {
-        $self->{SHELL} = OpenXPKI::Crypto::OpenSSL::Shell->new (
+        $self->{SHELL} = OpenXPKI::Crypto::Backend::OpenSSL::Shell->new (
                              ENGINE => $self->{ENGINE},
                              DEBUG  => $self->{DEBUG},
                              SHELL  => $self->{SHELL},
@@ -126,7 +126,7 @@ sub set_config
 sub command
 {
     my $self = shift;
-    my $cmd  = "OpenXPKI::Crypto::OpenSSL::Command::".shift;
+    my $cmd  = "OpenXPKI::Crypto::Backend::OpenSSL::Command::".shift;
     $self->debug ("Command: $cmd");
 
     my $ret = eval
@@ -184,15 +184,15 @@ sub get_object
     {
         if ($format eq "DER")
         {
-            $object = OpenXPKI::Crypto::OpenSSL::X509::_new_from_der ($data);
+            $object = OpenXPKI::Crypto::Backend::OpenSSL::X509::_new_from_der ($data);
         } else {
-            $object = OpenXPKI::Crypto::OpenSSL::X509::_new_from_pem ($data);
+            $object = OpenXPKI::Crypto::Backend::OpenSSL::X509::_new_from_pem ($data);
         }
     } elsif ($type eq "CSR")
     {
         if ($format eq "DER")
         {
-            $object = OpenXPKI::Crypto::OpenSSL::PKCS10::_new_from_der ($data);
+            $object = OpenXPKI::Crypto::Backend::OpenSSL::PKCS10::_new_from_der ($data);
         }
         elsif ($format eq "SPKAC")
         {
@@ -200,17 +200,17 @@ sub get_object
             #$self->debug ("spkac is ".$data);
             #$self->debug ("length of spkac is ".length($data));
             #$self->debug ("data is ".$data);
-            $object = OpenXPKI::Crypto::OpenSSL::SPKAC::_new ($data);
+            $object = OpenXPKI::Crypto::Backend::OpenSSL::SPKAC::_new ($data);
         } else {
-            $object = OpenXPKI::Crypto::OpenSSL::PKCS10::_new_from_pem ($data);
+            $object = OpenXPKI::Crypto::Backend::OpenSSL::PKCS10::_new_from_pem ($data);
         }
     } elsif ($type eq "CRL")
     {
         if ($format eq "DER")
         {
-            $object = OpenXPKI::Crypto::OpenSSL::CRL::_new_from_der ($data);
+            $object = OpenXPKI::Crypto::Backend::OpenSSL::CRL::_new_from_der ($data);
         } else {
-            $object = OpenXPKI::Crypto::OpenSSL::CRL::_new_from_pem ($data);
+            $object = OpenXPKI::Crypto::Backend::OpenSSL::CRL::_new_from_pem ($data);
         }
     } else {
         OpenXPKI::Exception->throw (

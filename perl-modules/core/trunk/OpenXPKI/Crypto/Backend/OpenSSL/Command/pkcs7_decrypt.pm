@@ -1,13 +1,13 @@
-## OpenXPKI::Crypto::OpenSSL::Command::pkcs7_decrypt
+## OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_decrypt
 ## (C)opyright 2005 Michael Bell
 ## $Revision$
 
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::OpenSSL::Command::pkcs7_decrypt;
+package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_decrypt;
 
-use base qw(OpenXPKI::Crypto::OpenSSL::Command);
+use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {

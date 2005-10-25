@@ -3,7 +3,7 @@ use warnings;
 use Test;
 BEGIN { plan tests => 11 };
 
-print STDERR "OpenXPKI::Crypto::OpenSSL::SPKAC\n";
+print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::SPKAC\n";
 
 use OpenXPKI::Crypto::TokenManager;
 

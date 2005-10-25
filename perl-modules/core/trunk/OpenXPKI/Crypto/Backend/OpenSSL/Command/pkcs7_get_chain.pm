@@ -1,13 +1,13 @@
-## OpenXPKI::Crypto::OpenSSL::Command::pkcs7_get_chain
+## OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain
 ## (C)opyright 2005 Michael Bell
 ## $Revision$
 
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::OpenSSL::Command::pkcs7_get_chain;
+package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 
-use base qw(OpenXPKI::Crypto::OpenSSL::Command);
+use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 use English;
 
 sub get_command

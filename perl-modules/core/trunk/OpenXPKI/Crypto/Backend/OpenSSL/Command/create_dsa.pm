@@ -1,13 +1,13 @@
-## OpenXPKI::Crypto::OpenSSL::Command::create_dsa
+## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_dsa
 ## (C)opyright 2005 Michael Bell
 ## $Revision$
 
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::OpenSSL::Command::create_dsa;
+package OpenXPKI::Crypto::Backend::OpenSSL::Command::create_dsa;
 
-use base qw(OpenXPKI::Crypto::OpenSSL::Command);
+use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {

@@ -1,11 +1,11 @@
-## OpenXPKI::Crypto::OpenSSL::Engine 
+## OpenXPKI::Crypto::Backend::OpenSSL::Engine 
 ## Copyright (C) 2003-2005 Michael Bell
 ## $Revision$
 
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::OpenSSL::Engine;
+package OpenXPKI::Crypto::Backend::OpenSSL::Engine;
 
 use OpenXPKI qw (debug);
 use OpenXPKI::Exception;

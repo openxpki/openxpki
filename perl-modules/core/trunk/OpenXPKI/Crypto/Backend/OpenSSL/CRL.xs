@@ -1,6 +1,6 @@
-MODULE = OpenXPKI		PACKAGE = OpenXPKI::Crypto::OpenSSL::CRL
+MODULE = OpenXPKI		PACKAGE = OpenXPKI::Crypto::Backend::OpenSSL::CRL
 
-OpenXPKI_Crypto_OpenSSL_CRL
+OpenXPKI_Crypto_Backend_OpenSSL_CRL
 _new_from_der(sv)
 	SV * sv
     PREINIT:
@@ -12,7 +12,7 @@ _new_from_der(sv)
     OUTPUT:
 	RETVAL
 
-OpenXPKI_Crypto_OpenSSL_CRL
+OpenXPKI_Crypto_Backend_OpenSSL_CRL
 _new_from_pem(sv)
 	SV * sv
     PREINIT:
@@ -53,14 +53,14 @@ _new_from_pem(sv)
 
 void
 free(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     CODE:
 	if (crl != NULL) X509_CRL_free(crl);
         SAFEFREE(char_ptr);
 
 char *
 version(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	BIO *out;
 	char *version;
@@ -82,7 +82,7 @@ version(crl)
 
 char *
 issuer(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	BIO *out;
 	char *issuer;
@@ -102,7 +102,7 @@ issuer(crl)
 
 unsigned long
 issuer_hash(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
     CODE:
 	RETVAL = X509_NAME_hash(X509_CRL_get_issuer(crl));
@@ -111,7 +111,7 @@ issuer_hash(crl)
 
 char *
 last_update(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	char *not;
 	int n;
@@ -130,7 +130,7 @@ last_update(crl)
 
 char *
 next_update(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	char *not;
 	int n;
@@ -149,7 +149,7 @@ next_update(crl)
 
 char *
 fingerprint (crl, digest_name="sha1")
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
 	char *digest_name
     PREINIT:
 	BIO *out;
@@ -185,7 +185,7 @@ fingerprint (crl, digest_name="sha1")
 
 char *
 signature_algorithm(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	BIO *out;
 	char *sig;
@@ -205,7 +205,7 @@ signature_algorithm(crl)
 
 char *
 signature(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	BIO *out;
 	char *sig;
@@ -231,7 +231,7 @@ signature(crl)
 
 char *
 extensions(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	BIO *out;
 	char *ext;
@@ -255,7 +255,7 @@ extensions(crl)
 
 long
 serial(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	ASN1_INTEGER *aint;
     CODE:
@@ -271,7 +271,7 @@ serial(crl)
 
 char *
 revoked(crl)
-	OpenXPKI_Crypto_OpenSSL_CRL crl
+	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	BIO *out;
 	char *ext;

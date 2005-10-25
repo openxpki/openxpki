@@ -1,13 +1,13 @@
-## OpenXPKI::Crypto::OpenSSL::Command::issue_cert
+## OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_cert
 ## (C)opyright 2005 Michael Bell
 ## $Revision$
 
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::OpenSSL::Command::issue_cert;
+package OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_cert;
 
-use base qw(OpenXPKI::Crypto::OpenSSL::Command);
+use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 use Math::BigInt;
 

@@ -1,13 +1,13 @@
-## OpenXPKI::Crypto::OpenSSL::Command::issue_crl
+## OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl
 ## (C)opyright 2005 Michael Bell
 ## $Revision$
 
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::OpenSSL::Command::issue_crl;
+package OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl;
 
-use base qw(OpenXPKI::Crypto::OpenSSL::Command);
+use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 use Math::BigInt;
 use English;
@@ -198,7 +198,7 @@ __END__
 This parameter is an ARRAY reference. The elements of this array
 are an ARRAY too which contains the certificate and the timestamp. The
 certificate can be a PEM encoded X.509v3 certificate or it must
-be a reference to an OpenXPKI::Crypto::OpenSSL::X509 object. The
+be a reference to an OpenXPKI::Crypto::Backend::OpenSSL::X509 object. The
 timestamp must be a timestamp which is automatically parseable
 by Date::Parse.
 

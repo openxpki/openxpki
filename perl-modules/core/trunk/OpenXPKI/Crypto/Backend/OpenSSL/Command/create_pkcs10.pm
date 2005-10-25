@@ -1,13 +1,13 @@
-## OpenXPKI::Crypto::OpenSSL::Command::create_pkcs10
+## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs10
 ## (C)opyright 2005 Michael Bell
 ## $Revision$
 
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::OpenSSL::Command::create_pkcs10;
+package OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs10;
 
-use base qw(OpenXPKI::Crypto::OpenSSL::Command);
+use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {

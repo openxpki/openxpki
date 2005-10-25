@@ -1,11 +1,11 @@
-## OpenXPKI::Crypto::OpenSSL::Shell
+## OpenXPKI::Crypto::Backend::OpenSSL::Shell
 ## (C)opyright 2005 Michael Bell
 ## $Revision
 	
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::OpenSSL::Shell;
+package OpenXPKI::Crypto::Backend::OpenSSL::Shell;
 
 use OpenXPKI qw (debug read_file);
 use OpenXPKI::Exception;

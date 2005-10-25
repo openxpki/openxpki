@@ -1,4 +1,4 @@
-## OpenXPKI::Crypto::OpenSSL::Command
+## OpenXPKI::Crypto::Backend::OpenSSL::Command
 ## (C)opyright 2005 Michael Bell
 ## $Revision$
 
@@ -6,27 +6,27 @@ use strict;
 use warnings;
 use utf8;
 
-use OpenXPKI::Crypto::OpenSSL::Command::create_random;
-use OpenXPKI::Crypto::OpenSSL::Command::create_rsa;
-use OpenXPKI::Crypto::OpenSSL::Command::create_dsa;
-use OpenXPKI::Crypto::OpenSSL::Command::create_pkcs10;
-use OpenXPKI::Crypto::OpenSSL::Command::create_cert;
-use OpenXPKI::Crypto::OpenSSL::Command::create_pkcs12;
-use OpenXPKI::Crypto::OpenSSL::Command::issue_cert;
-use OpenXPKI::Crypto::OpenSSL::Command::issue_crl;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_random;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_rsa;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_dsa;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs10;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_cert;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_cert;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl;
 
-use OpenXPKI::Crypto::OpenSSL::Command::convert_key;
-use OpenXPKI::Crypto::OpenSSL::Command::convert_pkcs10;
-use OpenXPKI::Crypto::OpenSSL::Command::convert_cert;
-use OpenXPKI::Crypto::OpenSSL::Command::convert_crl;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs10;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_cert;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_crl;
 
-use OpenXPKI::Crypto::OpenSSL::Command::pkcs7_sign;
-use OpenXPKI::Crypto::OpenSSL::Command::pkcs7_encrypt;
-use OpenXPKI::Crypto::OpenSSL::Command::pkcs7_decrypt;
-use OpenXPKI::Crypto::OpenSSL::Command::pkcs7_verify;
-use OpenXPKI::Crypto::OpenSSL::Command::pkcs7_get_chain;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_sign;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_encrypt;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_decrypt;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 
-package OpenXPKI::Crypto::OpenSSL::Command;
+package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 
 use OpenXPKI qw(debug read_file write_file);
 use OpenXPKI::DN;

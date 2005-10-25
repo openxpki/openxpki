@@ -3,7 +3,7 @@ use warnings;
 use Test;
 BEGIN { plan tests => 24 };
 
-print STDERR "OpenXPKI::Crypto::OpenSSL::X509\n";
+print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::X509\n";
 
 use OpenXPKI::Crypto::TokenManager;
 

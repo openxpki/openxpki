@@ -1,4 +1,0 @@
-INCLUDE: OpenXPKI/Crypto/OpenSSL/X509.xs
-INCLUDE: OpenXPKI/Crypto/OpenSSL/PKCS10.xs
-INCLUDE: OpenXPKI/Crypto/OpenSSL/SPKAC.xs
-INCLUDE: OpenXPKI/Crypto/OpenSSL/CRL.xs

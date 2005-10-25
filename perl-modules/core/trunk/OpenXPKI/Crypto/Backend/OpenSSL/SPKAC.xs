@@ -1,6 +1,6 @@
-MODULE = OpenXPKI		PACKAGE = OpenXPKI::Crypto::OpenSSL::SPKAC
+MODULE = OpenXPKI		PACKAGE = OpenXPKI::Crypto::Backend::OpenSSL::SPKAC
 
-OpenXPKI_Crypto_OpenSSL_SPKAC
+OpenXPKI_Crypto_Backend_OpenSSL_SPKAC
 _new(sv)
 	SV * sv
     PREINIT:
@@ -38,7 +38,7 @@ _new(sv)
 
 char *
 pubkey_algorithm(spkac)
-	OpenXPKI_Crypto_OpenSSL_SPKAC spkac
+	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
 	BIO *out;
 	char *pubkey;
@@ -58,7 +58,7 @@ pubkey_algorithm(spkac)
 
 char *
 pubkey(spkac)
-	OpenXPKI_Crypto_OpenSSL_SPKAC spkac
+	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
 	BIO *out;
 	EVP_PKEY *pkey;
@@ -86,7 +86,7 @@ pubkey(spkac)
 
 char *
 pubkey_hash (spkac, digest_name="sha1")
-	OpenXPKI_Crypto_OpenSSL_SPKAC spkac
+	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
 	char *digest_name
     PREINIT:
 	EVP_PKEY *pkey;
@@ -136,7 +136,7 @@ pubkey_hash (spkac, digest_name="sha1")
 
 char *
 keysize (spkac)
-	OpenXPKI_Crypto_OpenSSL_SPKAC spkac
+	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
 	BIO *out;
 	EVP_PKEY *pkey;
@@ -162,7 +162,7 @@ keysize (spkac)
 
 char *
 modulus (spkac)
-	OpenXPKI_Crypto_OpenSSL_SPKAC spkac
+	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
 	char * modulus;
 	BIO *out;
@@ -191,7 +191,7 @@ modulus (spkac)
 
 char *
 exponent (spkac)
-	OpenXPKI_Crypto_OpenSSL_SPKAC spkac
+	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
 	BIO *out;
 	EVP_PKEY *pkey;
@@ -220,7 +220,7 @@ exponent (spkac)
 
 void
 free(spkac)
-	OpenXPKI_Crypto_OpenSSL_SPKAC spkac
+	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     CODE:
 	/* 
         if (spkac != NULL) NETSCAPE_SPKI_free(spkac);

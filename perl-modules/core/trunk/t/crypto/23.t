@@ -3,7 +3,7 @@ use warnings;
 use Test;
 BEGIN { plan tests => 15 };
 
-print STDERR "OpenXPKI::Crypto::OpenSSL::CRL\n";
+print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::CRL\n";
 
 use OpenXPKI::Crypto::TokenManager;
 
