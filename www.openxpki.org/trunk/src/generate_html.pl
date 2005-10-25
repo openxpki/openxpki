@@ -40,6 +40,11 @@ sub convert {
     my $name = $File::Find::name;
     $name =~ s/^$source//;
 
+    # We dont want to copy subversion dirs
+    if ($name =~ /\.svn/) {
+      return;
+    }
+
     # Generate absolute path to output file
     my $out_file = File::Spec->catfile( $target, $name );
 
