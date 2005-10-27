@@ -7,6 +7,7 @@
    $path
    %query    => ( )
    $fragment => undef
+   $relative => 1
 </%args>
 <%init>
    my $uri = URI->new;
@@ -20,6 +21,30 @@
   
       $uri->host($host);
       $uri->port($port) if $port;
+   }
+   elsif (defined $relative && $relative)
+   {
+       # this is a local link and conversion from absolute to relative
+       # links is desired
+
+       # original component path (e. g. 'htdocs/news/index.html')
+       my @caller_path = File::Spec->splitdir($m->request_comp()->path());
+
+       # remove target directory portion
+       # e. g. ('news', 'index.html')
+       shift @caller_path;
+       shift @caller_path;
+
+       # remove filename portion
+       # e. g. 'news'
+       pop @caller_path;
+
+       my $caller_dir = File::Spec->catfile("", @caller_path);
+       $caller_dir = "/" if ($caller_dir eq "");
+
+       $path = File::Spec->abs2rel($path, $caller_dir);
+
+       $path = "." if ($path eq "");
    }
   
    # Sometimes we may want to path in a query string
