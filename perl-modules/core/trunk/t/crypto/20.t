@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 17 };
+BEGIN { plan tests => 19 };
 
 print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::PKCS10\n";
 
@@ -32,12 +32,13 @@ ok(1);
 
 ## check that all required functions are available and work
 foreach my $func ("version", "subject", "subject_hash", "fingerprint",
-                  "emailaddress", # "extensions", "attributes",
+                  "emailaddress", "extensions", # "attributes",
                   "pubkey_algorithm", "pubkey", "keysize", "modulus", "exponent",
+                  "pubkey_hash",
                   "signature_algorithm", "signature")
 {
     my $result = $csr->$func();
-    if (defined $result)
+    if (defined $result or $func eq "extensions")
     {
         ok(1);
         print STDERR "$func: $result\n" if ($ENV{DEBUG});
