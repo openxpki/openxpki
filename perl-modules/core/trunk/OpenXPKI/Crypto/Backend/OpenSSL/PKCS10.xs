@@ -158,13 +158,16 @@ emailaddress (csr)
     CODE:
 	out = BIO_new(BIO_s_mem());
 	emlst = X509_REQ_get1_email(csr);
-	for (j = 0; j < sk_num(emlst); j++)
+	if (emlst != NULL)
 	{
-		BIO_printf(out, "%s", sk_value(emlst, j));
-		if (j+1 != (int)sk_num(emlst))
-			BIO_printf(out,"\n");
+		for (j = 0; j < sk_num(emlst); j++)
+		{
+			BIO_printf(out, "%s", sk_value(emlst, j));
+			if (j+1 != (int)sk_num(emlst))
+				BIO_printf(out,"\n");
+		}
+		X509_email_free(emlst);
 	}
-	X509_email_free(emlst);
 	n = BIO_get_mem_data(out, &emails);
 	SAFEFREE(char_ptr);
 	Newz(0, char_ptr, n+1, char);
