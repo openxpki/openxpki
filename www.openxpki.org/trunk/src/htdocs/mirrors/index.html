@@ -2,125 +2,32 @@
   title => 'Mirrors'
 </%attr>
 
-        <h2>Mirrors</h2>
+        <h2>OpenXPKI Mirror</h2>
         <p>
-          OpenCA uses two different networks of mirrors. One set of
-          mirrors is used to roll out releases. This network uses ftp.
-          Please check <a href="ftp.html">here</a> for a mirror close to
-          you.
-          <a href="www.html">The second set of mirrors</a> is used to
-          distribute our
-          web pages. This is necessary for two reasons - first we want
-          to reduce the load on the lines and second we need the
-          redundancy to compensate attacks against www.openca.org. If
-          the machine is down then it is possible to distribute
-          such things like advisories over the mirror network.
+          OpenXPKI uses a set of <a href="www.html">www mirrors</a> to 
+          distribute the projects website.<br/>
+          The current development is done on the berlios svn. Anonymous 
+          access to the repository is possible if you want to look at
+          the current development code. Currently there are no snapshots
+          or tarballs available - we will announce their date and kind of
+          distribution as soon as we decide to publish them here on the 
+          website an through our Mailinglists (see <a href="../resources">
+          resources</a>).
         </p>
+        <h2>Mirrors of the OpenCA Project</h2>
+        <p>
+          The former www mirror of the openca.info website is superseded
+          by this website. There is a ftp mirror system for releases of
+          OpenCA - you can find a mirror close to you <a href="ftp.html">
+          here</a>. 
+        </p> 
+
         <h2>Establishing a Mirror</h2>
         <p>
-          It's possible for you to mirror one or all of the projects
-          which you can find on sourecforge. The mirroring of
-          Sourceforge is documented by Sourceforge itself. We describe
-          here howto mirror the pages of OpenCA itself via RSYNC and FTP.
+          If you want to establish a www mirror for the OpenXPKI website, see
+          the <a href="www.html">www mirror section</a> for details.
         </p>
-        <h3>Setup a mirror through RSYNC</h3>
-        <p>
-          This is the preferred way, because it needs minimal bandwidth
-          to bring your mirror up to date due to the great RSYNC
-          algorithm. And all you need is to install the very portable
-          and robust RSYNC client.
+	<p>
+	  If you want to establish ftp mirrot for OpenCA release, please 
+          refer to the <tt>openca.org</tt> website.
         </p>
-        <ol>
-          <li>Make sure you have the excellent RSYNC client program
-            (`<tt>rsync</tt>') installed on your system. If not, please
-            grab the RSYNC distribution first and install it. You can
-            found RSYNC on
-            <a href="http://rsync.samba.org/rsync/">http://rsync.samba.org/rsync/</a>
-            and
-            <a href="ftp://rsync.samba.org/pub/rsync/">ftp://rsync.samba.org/pub/rsync/</a>.
-            We recommend you to install version 2.2.1 or higher.
-          </li>
-          <li>With the following command you now can check which
-            packages are available through the RSYNC service from
-            rsync://ftp.openca.org/:<br/>
-            <div class="sourcecode">
-              <pre>$ rsync rsync://ftp.openca.org/</pre>
-            </div>
-          </li>
-          <li>Now you have to decide to which local directory you want
-            to mirror at OpenCA SF server; say
-            <tt>/home/ftp/pub/openca/</tt>. Then all you have to do is
-            setup a Cron job which regularly runs the following command:<br/>
-            <div class="sourcecode">
-              <pre>$ rsync -rztpv --delete rsync://ftp.openca.org/openca/ \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /home/ftp/pub/openca/</pre>
-            </div>
-          </li>
-        </ol>
-        <h3>Setup a mirror through FTP</h3>
-        <p>
-          This is the good old portable way, because it uses the old FTP
-          protocol to bring your mirror up to date. The drawback is that
-          its less fast in updating and you have to install the mirror
-          package.
-        </p>
-        <ol>
-          <li>Make sure you have the Mirror package (`<tt>mirror</tt>')
-            installed on your system. If not, please grab the mirror
-            distribution first and install it. You can found mirror on
-            <a href="http://sunsite.org.uk/packages/mirror/">
-              http://sunsite.org.uk/packages/mirror/</a> and
-            <a href="ftp://sunsite.org.uk/packages/mirror/">
-              ftp://sunsite.org.uk/packages/mirror/</a>.
-            We recommend you to install version 2.9 or higher.
-          </li>
-          <li>You now can check which packages are available through the
-            FTP service from ftp.openca.org with the following command:<br/>
-            <div class="sourcecode">
-              <pre>$ ftp ftp.openca.org
-&nbsp;&nbsp;ftp> cd /
-&nbsp;&nbsp;ftp> ls -l</pre>
-            </div>
-          </li>
-          <li>Now you have to decide to which local directory you want
-            to mirror, let's say <tt>/home/ftp/pub/openca/</tt>. Then
-            you first setup a mirror configuration file (say
-            <tt>/home/ftp/etc/openca.mcf</tt>) as following:<br/>
-            <div class="sourcecode">
-              <pre>package=openca
-&nbsp;&nbsp;&nbsp; site=ftp.openca.org
-
-&nbsp;&nbsp;&nbsp; remote_dir=/
-&nbsp;&nbsp;&nbsp; local_dir=/home/ftp/pub/openca/
-&nbsp;&nbsp;&nbsp; recursive=true</pre>
-            </div>
-          </li>
-          <li>Finally all you have to do is setup a Cron job which
-            regularly runs the following command:<br/>
-            <div class="sourcecode">
-              <pre>$ mirror /home/ftp/etc/openca.mcf</pre>
-            </div>
-          </li>
-        </ol>
-        <h3>Final steps</h3>
-        <p>
-          When you mirror the OpenCA project (ftp or www) then please
-          notice the following to points:
-        </p>
-        <ul>
-          <li>It would be very friendly when you just sent a message to
-            <a href="mailto:madwolf@openca.org?subject=New%20Mirror">
-              madwolf@openca.org</a> or to
-            <a href="mailto:openca-users@lists.sf.net?subject=New%20Mirror">
-              openca-users@lists.sf.net</a>
-            to inform the team about the new established mirror. Your
-            mirror then can be added to the list of available mirror
-            locations.
-          </li>
-          <li>If you re-export the stuff from your mirror PLEASE PAY
-            CLOSE ATTENTION TO ANY APPLICABLE EXPORT/IMPORT LAWS. The
-            authors are not liable for any violations you make here.
-            So be carefully yourself.
-          </li>
-        </ul>
-

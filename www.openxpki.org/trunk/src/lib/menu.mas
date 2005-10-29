@@ -1,8 +1,10 @@
         <h2><a href="<& /lib/url.mas, path => '/' &>">OpenXPKI Home</a></h2>
         <div class="menu_item"><a href="<& /lib/url.mas, 
-	  path => '/secadvs/' &>">Security Advisories</a></div>
+	  path => '/secadvs/index.html' &>">Security Advisories</a></div>
+        <div class="menu_item"><a href="<& /lib/url.mas,
+          path => '/news/index.html' &>">News</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
-	  path => '/mirrors/' &>">Mirrors</a></div>
+	  path => '/mirrors/index.html' &>">Mirrors</a></div>
 % if ($section eq 'mirrors') {
         <div class="menu_sub_item"><a href="<& /lib/url.mas, 
 	  path => '/mirrors/www.html' &>">WWW</a></div>
@@ -10,27 +12,26 @@
 	  path => '/mirrors/ftp.html' &>">FTP</a></div>
 % }
         <div class="menu_item"><a href="<& /lib/url.mas, 
-	  path => '/news/' &>">News</a></div>
+	  path => '/docs/index.html' &>">Docs</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
-	  path => '/docs/' &>">Docs</a></div>
-        <div class="menu_item"><a href="<& /lib/url.mas, 
-	  path => '/download/' &>">Download</a></div>
+	  path => '/download/index.html' &>">Download</a></div>
 % if ($section eq 'download') {
         <div class="menu_sub_item"><a href="<& /lib/url.mas, 
 	  host => 'sourceforge.net',
 	  path => '/project/showfiles.php?group_id=20873' &>">Sourceforge</a></div>
-        <div class="menu_sub_item"><a href="<& /lib/url.mas, 
+        <div class="menu_sub_item"><a href="<& /lib/url.mas,
+	  scheme => 'ftp',       
 	  host => 'ftp.openca.org',
 	  path => '/pub/openca' &>">FTP</a></div>
         <div class="menu_sub_item"><a href="<& /lib/url.mas, 
 	  path => '/mirrors/ftp.html' &>">FTP Mirrors</a></div>
 % }
         <div class="menu_item"><a href="<& /lib/url.mas, 
-	  path => '/demo/' &>">Demo Installations</a></div>
+	  path => '/demo/index.html' &>">Demo Installations</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
-	  path => '/resources/' &>">Resources</a></div>
+	  path => '/resources/index.html' &>">Resources</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
-	  path => '/foundation/' &>">Foundation</a></div>
+	  path => '/foundation/index.html' &>">Foundation</a></div>
         <div class="w3c">
           <a href="http://validator.w3.org/check?uri=http://www.openxpki.org/"><img class="noborder" src="<& /lib/url.mas, path => '/images/valid-xhtml10.png' &>" alt="Valid XHTML 1.0!" height="31" width="88" /></a>
         </div>
