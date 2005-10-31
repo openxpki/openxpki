@@ -7,8 +7,7 @@ use warnings;
 use utf8;
 
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_random;
-use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_rsa;
-use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_dsa;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs10;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_cert;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12;
@@ -60,29 +59,65 @@ sub new
     return $self;
 }
 
+sub set_tmpfile
+{
+    my $self = shift;
+    my $keys = { @_ };
+
+    foreach my $key (keys %{$keys})
+    {
+        if (exists $self->{CLEANUP}->{FILE})
+        {
+            push @{$self->{CLEANUP}->{FILE}}, $keys->{$key};
+        } else {
+            $self->{CLEANUP}->{FILE} = [ $keys->{$key} ];
+        }
+        $self->{$key."FILE"} = $keys->{$key};
+    }
+    return 1;
+}
+
+sub set_env
+{
+    my $self = shift;
+    my $keys = { @_ };
+
+    foreach my $key (keys %{$keys})
+    {
+        if (exists $self->{CLEANUP}->{ENV})
+        {
+            push @{$self->{CLEANUP}->{ENV}}, $key;
+        } else {
+            $self->{CLEANUP}->{ENV} = [ $key ];
+        }
+        $ENV{$key} = $keys->{$key};
+    }
+    return 1;
+}
+
 sub cleanup
 {
     my $self = shift;
 
-    foreach my $file (keys %{$self->{CLEANUP}->{FILE}})
+    foreach my $file (@{$self->{CLEANUP}->{FILE}})
     {
-        unlink $self->{CLEANUP}->{FILE}->{$file};
-        if (-e $self->{CLEANUP}->{FILE}->{$file})
+        unlink $file;
+        if (-e $file)
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_FILE_FAILED",
-                params  => {"FILENAME" => $self->{CLEANUP}->{FILE}->{$file}});
+                params  => {"FILENAME" => $file});
         }
     }
 
-    foreach my $variable (keys %{$self->{CLEANUP}->{ENV}})
+    foreach my $variable (@{$self->{CLEANUP}->{ENV}})
     {
-        delete $ENV{$self->{CLEANUP}->{ENV}->{$variable}};
-        if (exists $ENV{$self->{CLEANUP}->{ENV}->{$variable}})
+        delete $ENV{$variable};
+        if (exists $ENV{$variable})
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_ENV_FAILED",
-                params  => {"VARIABLE" => $self->{CLEANUP}->{ENV}->{$variable}});
+                params  => {"VARIABLE" => $variable});
         }
     }
 

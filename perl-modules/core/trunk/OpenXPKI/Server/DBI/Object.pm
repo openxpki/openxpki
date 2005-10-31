@@ -2,7 +2,7 @@
 
 package OpenXPKI::Server::DBI::Object;
 
-use OpenXPKI qw(set_error errno errval debug);
+use OpenXPKI qw(debug);
 use OpenXPKI::Server::DBI::Schema;
 use Date::Parse;
 
@@ -232,9 +232,9 @@ sub select
                                                   SHELL => $self->{CRYPTO},
                                                   DEBUG => $self->{DEBUG});
         } elsif ($keys->{TABLE} eq "CRR") {
-            $object = OpenXPKI:Crypto::CRR->new (DATA   => $hashref->{DATA},
-                                                 SHELL  => $self->{CRYPTO},
-                                                 DEBUG  => $self->{DEBUG});
+            $object = OpenXPKI::Crypto::CRR->new (DATA   => $hashref->{DATA},
+                                                  SHELL  => $self->{CRYPTO},
+                                                  DEBUG  => $self->{DEBUG});
         } elsif ($keys->{TABLE} eq "CSR") {
             $object = OpenXPKI::Crypto::CSR->new (DATA   => $hashref->{DATA},
                                                   SHELL  => $self->{CRYPTO},

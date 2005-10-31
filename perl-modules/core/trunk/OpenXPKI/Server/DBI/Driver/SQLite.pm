@@ -8,6 +8,8 @@ use warnings;
 
 package OpenXPKI::Server::DBI::Driver::SQLite;
 
+use English;
+
 =head1 Description
 
 This is the SQLite driver for OpenXPKI's database interface. It

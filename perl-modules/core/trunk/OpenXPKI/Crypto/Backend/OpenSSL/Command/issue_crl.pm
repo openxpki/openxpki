@@ -18,8 +18,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->{OUTFILE} = $self->{TMP}."/${$}_crl.pem";
-    $self->{CLEANUP}->{FILE}->{CRL} = $self->{OUTFILE};
+    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_crl.pem");
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -125,15 +124,15 @@ sub get_command
         $hex       = "0".$hex if (length ($hex) % 2);
         $self->write_file (FILENAME => $serial,
                            CONTENT  => $hex);
-        $self->{CLEANUP}->{FILE}->{SERIAL} = $serial;
+        $self->set_tmpfile ("SERIAL" => $serial);
     }
 
     $self->write_file (FILENAME => $database,
                        CONTENT  => $index_txt);
     $self->write_file (FILENAME => "$database.attr",
                        CONTENT  => "unique_subject = no\n");
-    $self->{CLEANUP}->{FILE}->{DATABASE}      = $database;
-    $self->{CLEANUP}->{FILE}->{DATABASE_ATTR} = "$database.attr";
+    $self->set_tmpfile ("DATABASE"      => $database);
+    $self->set_tmpfile ("DATABASE_ATTR" => "$database.attr");
 
     ## build the command
 
@@ -149,8 +148,7 @@ sub get_command
     if (defined $passwd)
     {
         $command .= " -passin env:pwd";
-	$ENV{'pwd'} = $passwd;
-        $self->{CLEANUP}->{ENV}->{PWD} = "pwd";
+        $self->set_env ("pwd" => $passwd);
     }
 
 
@@ -166,7 +164,6 @@ sub hide_output
 sub key_usage
 {
     my $self = shift;
-    return 0 if (exists $self->{CLEANUP}->{ENV}->{PWD});
     return 1;
 }
 

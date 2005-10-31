@@ -8,6 +8,8 @@ use warnings;
 
 package OpenXPKI::Server::DBI::Driver::PostgreSQL;
 
+use English;
+
 =head1 Description
 
 This is the PostgreSQL driver for OpenXPKI's database interface. It

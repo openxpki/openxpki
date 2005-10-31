@@ -22,10 +22,8 @@ sub get_command
     my $engine = "";
        $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
 
-    $self->{KEYFILE} = $self->{TMP}."/${$}_key_org.pem";
-    $self->{CLEANUP}->{FILE}->{KEY} = $self->{KEYFILE};
-    $self->{OUTFILE} = $self->{TMP}."/${$}_key_new.pem";
-    $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
+    $self->set_tmpfile ("KEY" => $self->{TMP}."/${$}_key_org.pem");
+    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_key_new.pem");
     $self->write_file (FILENAME => $self->{KEYFILE},
                        CONTENT  => $self->{DATA});
 
@@ -107,15 +105,13 @@ sub get_command
     if ($self->{PASSWD})
     {
         $command .= " -passin env:pwd";
-        $ENV{'pwd'} = $self->{PASSWD};
-        $self->{CLEANUP}->{ENV}->{PWD} = "pwd";
+        $self->set_env ("pwd" => $self->{PASSWD});
     }
 
     if ($self->{OUT_PASSWD})
     {
         $command .= " -passout env:outpwd";
-        $ENV{'outpwd'} = $self->{OUT_PASSWD};
-        $self->{CLEANUP}->{ENV}->{PWD} = "outpwd";
+        $self->set_env ('outpwd' => $self->{OUT_PASSWD});
     }
 
     return [ $command ];

@@ -97,7 +97,7 @@ sub __init
                                                    OBJECT   => $self->{csr},
                                                    FUNCTION => $attr);
     }
-    $self->{TOKEN}->get_object_function (OBJECT => $self->{csr}, FUNCTION => "free");
+    $self->{TOKEN}->free_object ($self->{csr});
     delete $self->{csr};
     $self->debug ("loaded CSR attributes");
     my $ret = $self->{PARSED}->{BODY};

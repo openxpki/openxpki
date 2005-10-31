@@ -15,8 +15,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->{CSRFILE} = $self->{TMP}."/${$}_csr.pem";
-    $self->{CLEANUP}->{FILE}->{CSR} = $self->{CSRFILE};
+    $self->set_tmpfile ("CSR" => $self->{TMP}."/${$}_csr.pem");
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -41,12 +40,10 @@ sub get_command
         # prepare parameters
         $passwd = $self->{PASSWD};
         $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
-        $self->{KEYFILE} = $self->{TMP}."/${$}_key.pem";
-        $self->{CLEANUP}->{FILE}->{KEY} = $self->{KEYFILE};
+        $self->set_tmpfile ("KEY" => $self->{TMP}."/${$}_key.pem");
+        $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_cert.pem");
         $self->write_file (FILENAME => $self->{KEYFILE},
                            CONTENT  => $self->{KEY});
-        $self->{OUTFILE} = $self->{TMP}."/${$}_cert.pem";
-        $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
     } else {
         ## token cert generation
         $engine  = $self->{ENGINE}->get_engine();
@@ -107,8 +104,7 @@ sub get_command
     if (defined $passwd)
     {
         $command .= " -passin env:pwd";
-	$ENV{'pwd'} = $passwd;
-        $self->{CLEANUP}->{ENV}->{PWD} = "pwd";
+        $self->set_env ("pwd" => $passwd);
     }
 
     return [ $command ];
@@ -123,7 +119,6 @@ sub hide_output
 sub key_usage
 {
     my $self = shift;
-    return 0 if (exists $self->{CLEANUP}->{ENV}->{PWD});
     return 1;
 }
 

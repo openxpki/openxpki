@@ -16,10 +16,8 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->{PKCS7FILE} = $self->{TMP}."/${$}_pkcs7.pem";
-    $self->{CLEANUP}->{FILE}->{PKCS7} = $self->{PKCS7FILE};
-    $self->{OUTFILE} = $self->{TMP}."/${$}_out.pem";
-    $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
+    $self->set_tmpfile ("PKCS7" => $self->{TMP}."/${$}_pkcs7.pem");
+    $self->set_tmpfile ("OUT"   => $self->{TMP}."/${$}_out.pem");
 
     my $engine = "";
        $engine = $self->{ENGINE}->get_engine()
@@ -62,8 +60,7 @@ sub hide_output
 sub key_usage
 {
     my $self = shift;
-    return 0 if (exists $self->{CLEANUP}->{ENV}->{PWD});
-    return 1;
+    return 0;
 }
 
 sub get_result

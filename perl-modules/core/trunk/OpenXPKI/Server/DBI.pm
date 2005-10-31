@@ -25,7 +25,7 @@ use warnings;
 
 package OpenXPKI::Server::DBI;
 
-use OpenXPKI qw(debug i18nGettext set_error errno errval);
+use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;

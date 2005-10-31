@@ -13,10 +13,8 @@ sub get_command
 {
     my $self = shift;
 
-    $self->{INFILE} = $self->{TMP}."/${$}_cert_org.pem";
-    $self->{CLEANUP}->{FILE}->{IN} = $self->{INFILE};
-    $self->{OUTFILE} = $self->{TMP}."/${$}_cert_new.pem";
-    $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
+    $self->set_tmpfile ("IN"  => $self->{TMP}."/${$}_cert_org.pem");
+    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_cert_new.pem");
     $self->write_file (FILENAME => $self->{INFILE},
                        CONTENT  => $self->{DATA});
 

@@ -15,10 +15,8 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->{PKCS7FILE} = $self->{TMP}."/${$}_pkcs7.pem";
-    $self->{CLEANUP}->{FILE}->{PKCS7} = $self->{PKCS7FILE};
-    $self->{OUTFILE} = $self->{TMP}."/${$}_content.pem";
-    $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
+    $self->set_tmpfile ("PKCS7" => $self->{TMP}."/${$}_pkcs7.pem");
+    $self->set_tmpfile ("OUT"   => $self->{TMP}."/${$}_content.pem");
 
     my ($engine, $passwd, $keyform);
     if ($self->{PASSWD} or $self->{KEY})
@@ -47,13 +45,11 @@ sub get_command
         $passwd = $self->{PASSWD};
         $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
 
-        $self->{KEYFILE} = $self->{TMP}."/${$}_key.pem";
-        $self->{CLEANUP}->{FILE}->{KEY} = $self->{KEYFILE};
+        $self->set_tmpfile ("KEY" => $self->{TMP}."/${$}_key.pem");
         $self->write_file (FILENAME => $self->{KEYFILE},
                            CONTENT  => $self->{KEY});
 
-        $self->{CERTFILE} = $self->{TMP}."/${$}_cert.pem";
-        $self->{CLEANUP}->{FILE}->{CERT} = $self->{CERTFILE};
+        $self->set_tmpfile ("CERT" => $self->{TMP}."/${$}_cert.pem");
         $self->write_file (FILENAME => $self->{CERTFILE},
                            CONTENT  => $self->{CERT});
     } else {
@@ -102,8 +98,7 @@ sub get_command
     if (defined $passwd)
     {
         $command .= " -passin env:pwd";
-	$ENV{'pwd'} = $passwd;
-        $self->{CLEANUP}->{ENV}->{PWD} = "pwd";
+        $self->set_env ("pwd" => $passwd);
     }
 
     return [ $command ];
@@ -118,7 +113,6 @@ sub hide_output
 sub key_usage
 {
     my $self = shift;
-    return 0 if (exists $self->{CLEANUP}->{ENV}->{PWD});
     return 1;
 }
 

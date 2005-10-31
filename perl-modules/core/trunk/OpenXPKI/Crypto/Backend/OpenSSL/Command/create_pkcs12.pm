@@ -15,12 +15,9 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->{KEYFILE} = $self->{TMP}."/${$}_key.pem";
-    $self->{CLEANUP}->{FILE}->{KEY} = $self->{KEYFILE};
-    $self->{CERTFILE} = $self->{TMP}."/${$}_cert.pem";
-    $self->{CLEANUP}->{FILE}->{CERT} = $self->{CERTFILE};
-    $self->{OUTFILE} = $self->{TMP}."/${$}_pkcs12.pem";
-    $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
+    $self->set_tmpfile ("KEY"  => $self->{TMP}."/${$}_key.pem");
+    $self->set_tmpfile ("CERT" => $self->{TMP}."/${$}_cert.pem");
+    $self->set_tmpfile ("OUT"  => $self->{TMP}."/${$}_pkcs12.pem");
 
     my $engine = "";
        $engine = $self->{ENGINE}->get_engine()
@@ -85,12 +82,10 @@ sub get_command
     $command .= " -certfile ".$self->{CHAIN} if ($self->{CHAIN});
 
     $command .= " -passin env:pwd";
-    $ENV{'pwd'} = $self->{PASSWD};
-    $self->{CLEANUP}->{ENV}->{PWD} = "pwd";
+    $self->set_env ("pwd" => $self->{PASSWD});
 
     $command .= " -passout env:p12pwd";
-    $ENV{'p12pwd'} = $self->{PKCS12_PASSWD};
-    $self->{CLEANUP}->{ENV}->{PWD} = "p12pwd";
+    $self->set_env ('p12pwd' => $self->{PKCS12_PASSWD});
 
     return [ $command ];
 }
@@ -104,7 +99,6 @@ sub hide_output
 sub key_usage
 {
     my $self = shift;
-    return 0 if (exists $self->{CLEANUP}->{ENV}->{PWD});
     return 1;
 }
 

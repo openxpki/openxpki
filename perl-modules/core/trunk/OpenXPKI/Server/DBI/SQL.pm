@@ -1,7 +1,12 @@
+## (C) Copyright 2005 by The OpenXPKI Project
+
+use strict;
+use warnings;
 
 package OpenXPKI::Server::DBI::SQL;
 
-use OpenXPKI qw(debug set_error errno errval);
+use English;
+use OpenXPKI qw(debug);
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;
 

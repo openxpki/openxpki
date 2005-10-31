@@ -22,6 +22,9 @@ our %SEQUENCE = (
                  DATAEXCHANGE   => "sequence_dataexchange",
                 );
 our %COLUMN = (
+               PKI_REALM             => "pki_realm",
+               CA                    => "ca_name",
+
                SUBMIT_DATE           => "submit_date",
                TYPE                  => "format",
                DATA                  => "data",
@@ -82,16 +85,16 @@ our %COLUMN = (
 our %TABLE = (
     CSR => {
         NAME    => "request",
-        INDEX   => [ "CSR_SERIAL" ],
-        COLUMNS => [ "CSR_SERIAL",
+        INDEX   => [ "PKI_REALM", "CSR_SERIAL" ],
+        COLUMNS => [ "PKI_REALM", "CSR_SERIAL",
                      "TYPE", "DATA",
                      "SUBJECT", "EMAIL", "RA",
                      "STATUS", "ROLE", "PUBKEY",
                      "SCEP_TID", "LOA"]},
     CERTIFICATE => {
         NAME    => "certificate",
-        INDEX   => [ "CERTIFICATE_SERIAL", "CA_KEYID", "CA_ISSUER_NAME", "CA_ISSUER_SERIAL" ],
-        COLUMNS => [ "CERTIFICATE_SERIAL", "CA_KEYID", "CA_ISSUER_NAME", "CA_ISSUER_SERIAL",
+        INDEX   => [ "PKI_REALM", "CA", "CERTIFICATE_SERIAL" ],
+        COLUMNS => [ "PKI_REALM", "CA", "CERTIFICATE_SERIAL",
                      "TYPE", "DATA",
                      "SUBJECT", "EMAIL",
                      "STATUS", "ROLE", "PUBKEY", "KEYID",
@@ -99,15 +102,15 @@ our %TABLE = (
                    ]},
     CRR => {
         NAME    => "crr",
-        INDEX   => [ "CRR_SERIAL" ],
-        COLUMNS => [ "CRR_SERIAL",
+        INDEX   => [ "PKI_REALM", "CA", "CRR_SERIAL" ],
+        COLUMNS => [ "PKI_REALM", "CA", "CRR_SERIAL",
                      "REVOKE_CERTIFICATE_SERIAL", "SUBMIT_DATE",
                      "TYPE", "DATA",
                      "RA", "STATUS", "REASON" ]},
     CRL => {
         NAME    => "crl",
-        INDEX   => [ "CRL_SERIAL" ],
-        COLUMNS => [ "CRL_SERIAL",
+        INDEX   => [ "PKI_REALM", "CA", "CRL_SERIAL" ],
+        COLUMNS => [ "PKI_REALM", "CA", "CRL_SERIAL",
                      "TYPE", "DATA",
                      "LAST_UPDATE", "NEXT_UPDATE"]},
     AUDITTRAIL => {
@@ -148,7 +151,7 @@ our %TABLE = (
         NAME    => "dataexchange",
         INDEX   => [ "DATAEXCHANGE_SERIAL" ],
         COLUMNS => [ "DATAEXCHANGE_SERIAL",
-                     "TABLE", "SERIAL", "CA_KEYID", "CA_ISSUER_NAME", "CA_ISSUER_SERIAL",
+                     "TABLE", "PKI_REALM", "CA", "SERIAL",
                      "SERVERID", "EXPORTID" ]});
 
 our %INDEX = (

@@ -8,6 +8,8 @@ use warnings;
 
 package OpenXPKI::Server::DBI::Driver::DB2;
 
+use English;
+
 =head1 Description
 
 This is the IBM DB2 driver for OpenXPKI's database interface. It

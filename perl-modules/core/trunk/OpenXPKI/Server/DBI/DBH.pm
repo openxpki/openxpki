@@ -8,7 +8,7 @@ use warnings;
 
 package OpenXPKI::Server::DBI::DBH;
 
-use OpenXPKI qw(debug i18nGettext set_error errno errval);
+use OpenXPKI qw(debug);
 use DBI;
 use utf8;
 use OpenXPKI::Server::DBI::Schema;

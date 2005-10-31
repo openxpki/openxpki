@@ -235,7 +235,7 @@ sub new_token {
     if (my $exc = OpenXPKI::Exception->caught())
     {
         ## really stupid dummy exception handling
-        $self->debug ("cannot get new instance of driver OpenCA::Token::$name");
+        $self->debug ("cannot get new instance of driver $name");
         $exc->rethrow();
     }
     $self->debug ("no error during new, new token present");

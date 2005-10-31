@@ -65,7 +65,7 @@ sub __init
                                                    OBJECT   => $self->{crl},
                                                    FUNCTION => $attr);
     }
-    $self->{TOKEN}->get_object_function (OBJECT => $self->{crl}, FUNCTION => "free");
+    $self->{TOKEN}->free_object ($self->{crl});
     delete $self->{crl};
     $self->debug ("loaded crl attributes");
     my $ret = $self->{PARSED}->{BODY};

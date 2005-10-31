@@ -33,8 +33,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Engine/OpenSSL.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_random.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_dsa.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_rsa.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs10.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_cert.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs12.pm
@@ -63,6 +62,21 @@ OpenXPKI/Crypto/Backend/OpenSSL/PKCS10.xs
 OpenXPKI/Crypto/Backend/OpenSSL/SPKAC.xs
 OpenXPKI/Crypto/Backend/OpenSSL/CRL.xs
 
+## database interface of the server
+
+OpenXPKI/Server/DBI.pm
+OpenXPKI/Server/DBI/Object.pm
+OpenXPKI/Server/DBI/Hash.pm
+OpenXPKI/Server/DBI/SQL.pm
+OpenXPKI/Server/DBI/DBH.pm
+OpenXPKI/Server/DBI/Schema.pm
+OpenXPKI/Server/DBI/Driver.pm
+OpenXPKI/Server/DBI/Driver/DB2.pm
+OpenXPKI/Server/DBI/Driver/MySQL.pm
+#OpenXPKI/Server/DBI/Driver/Oracle.pm
+OpenXPKI/Server/DBI/Driver/PostgreSQL.pm
+OpenXPKI/Server/DBI/Driver/SQLite.pm
+
 ## test stuff
 
 t/crypto/01.t
@@ -87,6 +101,9 @@ t/crypto/token.xml
 t/crypto/openssl.cnf
 t/crypto/ca_openssl.cnf
 t/crypto/common.pl
+
+t/dbi/01.t
+t/dbi/common.pl
 
 t/dn/1.t
 t/dn/2.t

@@ -81,7 +81,7 @@ sub __init
                                                    OBJECT   => $self->{x509},
                                                    FUNCTION => $attr);
     }
-    $self->{TOKEN}->get_object_function (OBJECT => $self->{x509}, FUNCTION => "free");
+    $self->{TOKEN}->free_object ($self->{x509});
     delete $self->{x509};
     $self->debug ("loaded cert attributes");
     my $ret = $self->{PARSED}->{BODY};

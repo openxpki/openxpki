@@ -8,6 +8,8 @@ use warnings;
 
 package OpenXPKI::Server::DBI::Driver::MySQL;
 
+use English;
+
 =head1 Description
 
 This is the MySQL driver for OpenXPKI's database interface. It

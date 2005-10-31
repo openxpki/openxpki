@@ -1,7 +1,7 @@
 
 package OpenXPKI::Server::DBI::Hash;
 
-use OpenXPKI qw(set_error errno errval debug);
+use OpenXPKI qw(debug);
 use OpenXPKI::Server::DBI::SQL;
 use OpenXPKI::Server::DBI::Schema;
 
@@ -202,9 +202,20 @@ sub __log_write_action
             $index{SERIAL}  = $hash->{$col};
         } else {
             ## planned for index with more than one column
-            ## example: external_ca/internal_ca
+            ## example: pki_realm and ca for certificates, CSRs etc.
             $index{$col} = $hash->{$col};
         }
+    }
+
+    ## check that the schema is intact
+    foreach my $col (keys %index)
+    {
+        next if ($col eq "SERIAL");
+        next if ($col eq "PKI_REALM");
+        next if ($col eq "CA");
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_HASH_LOG_WRITE_ACTION_WRONG_INDEX_COLUMN",
+            params  => {COLUMN => $col});
     }
 
     ## log the action
@@ -237,7 +248,7 @@ sub __log_write_action
                                     "TABLE"        => $table,
                                     "SERVERID"     => -1,
                                     "EXPORTID"     => 0,
-                                    %index}));
+                                    %index});
 
     return 1;
 }

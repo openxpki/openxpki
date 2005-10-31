@@ -24,7 +24,10 @@ my $token = $mgmt->get_token (NAME => "INTERNAL_CA_1", CA_GROUP => "CA_GROUP_1")
 ok (1);
 
 ## create CA RSA key (use passwd from token.xml)
-my $key = $token->command ("create_rsa", KEY_LENGTH => "1024", ENC_ALG => "aes256");
+my $key = $token->command ("create_key",
+                           TYPE       => "RSA",
+                           KEY_LENGTH => "1024",
+                           ENC_ALG    => "aes256");
 ok (1);
 print STDERR "CA RSA: $key\n" if ($ENV{DEBUG});
 

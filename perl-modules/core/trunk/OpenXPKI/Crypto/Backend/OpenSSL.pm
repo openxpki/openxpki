@@ -266,6 +266,14 @@ sub get_object_function
     return $result;
 }
 
+sub free_object
+{
+    my $self   = shift;
+    my $object = shift;
+    $object->free();
+    return 1;
+}
+
 our $AUTOLOAD;
 sub AUTOLOAD {
     my $self = shift;

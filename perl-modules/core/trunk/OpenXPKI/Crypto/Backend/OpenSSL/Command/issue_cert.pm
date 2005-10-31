@@ -17,10 +17,8 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->{CSRFILE} = $self->{TMP}."/${$}_csr.pem";
-    $self->{CLEANUP}->{FILE}->{CSR} = $self->{CSRFILE};
-    $self->{OUTFILE} = $self->{TMP}."/${$}_cert.pem";
-    $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
+    $self->set_tmpfile ("CSR" => $self->{TMP}."/${$}_csr.pem");
+    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_cert.pem");
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -106,9 +104,9 @@ sub get_command
                        CONTENT  => "unique_subject = no\n");
     $self->write_file (FILENAME => $serial,
                        CONTENT  => $hex);
-    $self->{CLEANUP}->{FILE}->{DATABASE}      = $database;
-    $self->{CLEANUP}->{FILE}->{DATABASE_ATTR} = "$database.attr";
-    $self->{CLEANUP}->{FILE}->{SERIAL}        = $serial;
+    $self->set_tmpfile ("DATABASE"      => $database);
+    $self->set_tmpfile ("DATABASE_ATTR" => "$database.attr");
+    $self->set_tmpfile ("SERIAL"        => $serial);
 
     ## build the command
 
@@ -135,8 +133,7 @@ sub get_command
     if (defined $passwd)
     {
         $command .= " -passin env:pwd";
-	$ENV{'pwd'} = $passwd;
-        $self->{CLEANUP}->{ENV}->{PWD} = "pwd";
+        $self->set_env ("pwd" => $passwd);
     }
 
 
@@ -152,7 +149,6 @@ sub hide_output
 sub key_usage
 {
     my $self = shift;
-    return 0 if (exists $self->{CLEANUP}->{ENV}->{PWD});
     return 1;
 }
 

@@ -15,10 +15,8 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->{CONTENTFILE} = $self->{TMP}."/${$}_content.pem";
-    $self->{CLEANUP}->{FILE}->{CONTENT} = $self->{CONTENTFILE};
-    $self->{OUTFILE} = $self->{TMP}."/${$}_pkcs7.pem";
-    $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
+    $self->set_tmpfile ("CONTENT" => $self->{TMP}."/${$}_content.pem");
+    $self->set_tmpfile ("OUT"     => $self->{TMP}."/${$}_pkcs7.pem");
 
     my $engine = "";
        $engine = $self->{ENGINE}->get_engine()
@@ -27,8 +25,7 @@ sub get_command
 
     if ($self->{CERT})
     {
-        $self->{CERTFILE} = $self->{TMP}."/${$}_cert.pem";
-        $self->{CLEANUP}->{FILE}->{CERT} = $self->{CERTFILE};
+        $self->set_tmpfile ("CERT" => $self->{TMP}."/${$}_cert.pem");
         $self->write_file (FILENAME => $self->{CERTFILE},
                            CONTENT  => $self->{CERT});
     } else {
@@ -85,7 +82,6 @@ sub hide_output
 sub key_usage
 {
     my $self = shift;
-    return 0 if (exists $self->{CLEANUP}->{ENV}->{PWD});
     return 1;
 }
 

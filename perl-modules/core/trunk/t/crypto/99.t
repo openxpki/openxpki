@@ -10,6 +10,7 @@ unlink ("t/crypto/cacert.pem");
 
 unlink ("t/crypto/passwd.txt");
 unlink ("t/crypto/dsa.pem");
+unlink ("t/crypto/ec.pem");
 unlink ("t/crypto/rsa.pem");
 unlink ("t/crypto/pkcs10.pem");
 unlink ("t/crypto/cert.pem");

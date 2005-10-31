@@ -6,7 +6,7 @@
 package OpenXPKI::Server::DBI::Driver;
 
 use vars qw(@ISA);
-use OpenXPKI qw(set_error i18nGettext errno errval debug);
+use OpenXPKI qw(debug);
 
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::Driver::DB2;

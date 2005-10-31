@@ -38,8 +38,7 @@ sub get_command
         # prepare parameters
         $passwd = $self->{PASSWD};
         $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
-        $self->{KEYFILE} = $self->{TMP}."/${$}_key.pem";
-        $self->{CLEANUP}->{FILE}->{KEY} = $self->{KEYFILE};
+        $self->set_tmpfile ("KEY" => $self->{TMP}."/${$}_key.pem");
         $self->write_file (FILENAME => $self->{KEYFILE},
                            CONTENT  => $self->{KEY});
     } else {
@@ -49,8 +48,7 @@ sub get_command
         $passwd  = $self->{ENGINE}->get_passwd();
         $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
     }
-    $self->{OUTFILE} = $self->{TMP}."/${$}_csr.pem";
-    $self->{CLEANUP}->{FILE}->{OUT} = $self->{OUTFILE};
+    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_csr.pem");
 
 
     ## check parameters
@@ -90,8 +88,7 @@ sub get_command
     if (defined $passwd)
     {
         $command .= " -passin env:pwd";
-	$ENV{'pwd'} = $passwd;
-        $self->{CLEANUP}->{ENV}->{PWD} = "pwd";
+        $self->set_env ("pwd" => $passwd);
     }
 
     return [ $command ];
