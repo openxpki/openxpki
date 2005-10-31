@@ -12,6 +12,7 @@ OpenXPKI/Exception.pm
 OpenXPKI/DN.pm
 OpenXPKI/XML/Cache.pm
 OpenXPKI/XML/Config.pm
+openxpki.xsd
 
 ## Crypto layer
 
@@ -79,6 +80,8 @@ OpenXPKI/Server/DBI/Driver/SQLite.pm
 
 ## test stuff
 
+t/config.xml
+
 t/crypto/01.t
 t/crypto/10.t
 t/crypto/11.t
@@ -117,6 +120,7 @@ t/pod/2.t
 t/xml/1.t
 t/xml/2.t
 t/xml/3.t
+t/xml/4.t
 t/xml/test.xml
 t/xml/top.xml
 t/xml/sub.xml

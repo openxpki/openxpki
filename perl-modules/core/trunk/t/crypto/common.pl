@@ -12,6 +12,7 @@ my $tokenconfigfile = File::Spec->catfile('t', 'crypto', 'token.xml');
 # slurp in configuration file
 my $config = OpenXPKI->read_file($tokenconfigfile) 
     or die "Could not read config file $tokenconfigfile. Stopped";
+$config = "<openxpki>\n".$config."\n</openxpki>";
 
 # set correct OpenSSL binary in configuration
 my $openssl_binary = `cat t/cfg.binary.openssl`;

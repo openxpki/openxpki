@@ -7,7 +7,7 @@ use Time::HiRes;
 
 BEGIN { plan tests => 6 };
 
-print STDERR "SYNTAX VALIDATION\n";
+print STDERR "XINCLUDE SUPPORT\n";
 ok(1);
 
 ## create new object

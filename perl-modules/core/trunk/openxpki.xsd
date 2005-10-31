@@ -1,0 +1,51 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema">
+<!-- this is the XML schema definition of OpenXPKI -->
+
+  <element name="openxpki" type="openxpki_type"/>
+
+  <complexType name="openxpki_type">
+    <element name="token_config" type="token_config_type"/>
+  </complexType>
+
+  <!-- ================================= -->
+  <!-- cryptographic token configuration -->
+  <!-- ==============BEGIN============== -->
+
+  <complexType name="token_config_type">
+    <element name="token" type="token_type"/>
+  </complexType>
+
+  <complexType name="token_type">
+    <element name="name" type="string"/>
+    <element name="ca_group" type="string"/>
+    <element name="type" type="string"/>
+    <element name="mode" type="token_mode_type"/>
+    <element name="option" type="option_type" minOccurs="0" maxOccurs="unbounded"/>
+  </complexType>
+
+  <simpleType name="token_mode_type">
+    <restriction base="xsd:token">
+      <enumeration value="standby"/>
+      <enumeration value="session"/>
+      <enumeration value="daemon"/>
+    </restriction>
+  </simpleType>
+
+  <!-- ===============END=============== -->
+  <!-- cryptographic token configuration -->
+  <!-- ================================= -->
+
+  <!-- =================== -->
+  <!-- general definitions -->
+  <!-- ======BEGIN======== -->
+
+  <complexType name="option_type">
+    <element name="name" type="string"/>
+    <element name="value" type="string"/>
+  </complexType>
+
+  <!-- =======END========= -->
+  <!-- general definitions -->
+  <!-- =================== -->
+
+</schema>

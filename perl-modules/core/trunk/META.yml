@@ -14,8 +14,12 @@ requires:
     Test::Pod::Coverage:           1.00
     Text::CSV_XS:                  0.23
     Time::HiRes:                   1
+    XML::Filter::XInclude:         1
     XML::Parser:                   1
+    XML::SAX:                      0.12
+    XML::SAX::Writer:              0.44
     XML::Simple:                   1
+    XML::Validator::Schema:        1.08
 
 distribution_type: module
 generated_by: ExtUtils::MakeMaker version 6.17

@@ -8,11 +8,21 @@ use utf8;
 
 package OpenXPKI::XML::Cache;
 
+## this is for the caching itself
 use XML::Simple;
 use XML::Parser;
 $XML::Simple::PREFERRED_PARSER = "XML::Parser";
+
+## this is for the XML schema validation only
+use XML::SAX::Writer;
+use XML::Validator::Schema;
+use XML::Filter::XInclude;
+use XML::SAX::ParserFactory;
+$XML::SAX::ParserPackage = "XML::SAX::PurePerl";
+
 use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
+use English;
 
 #######################################
 ##          General functions        ##
@@ -31,6 +41,7 @@ sub new
 
     $self->{DEBUG}  = $keys->{DEBUG};
     $self->{config} = $keys->{CONFIG};
+    $self->{schema} = $keys->{SCHEMA} if (exists $keys->{SCHEMA});
 
     return undef if (not $self->init ());
 
@@ -43,6 +54,33 @@ sub init
 {
     my $self = shift;
     $self->debug ("start");
+
+    ## validate the XML file
+
+    if (exists $self->{schema})
+    {
+        my $writer    = XML::SAX::Writer->new();
+        my $validator = XML::Validator::Schema->new (Handler => $writer,
+                                                     file    => $self->{schema});
+        my $xinclude  = XML::Filter::XInclude->new  (Handler => $validator);
+        $self->{parser} = XML::SAX::ParserFactory->parser(
+                              Handler => $xinclude);
+        if ($self->{config} !~ m{[<>]}) {
+            eval { $self->{parser}->parse_uri ($self->{config}) };
+        } else {
+            eval { $self->{parser}->parse_string ($self->{config}) };
+        }
+        if ($EVAL_ERROR)
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_XML_CACHE_INIT_XML_SCHEMA_ERROR",
+                params  => {"ERRVAL" => $EVAL_ERROR });
+        }
+    }
+
+    ## load the data
+
+    $self->debug ("load the XML data");
     $self->{xs} = XML::Simple->new (ForceArray    => 1,
                                     ForceContent  => 1,
                                     SuppressEmpty => undef,
