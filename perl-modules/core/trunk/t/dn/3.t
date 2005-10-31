@@ -19,7 +19,7 @@ my @example = (
     "/DC=com/DC=example/O=Some Example, Some State/CN=ftp\\/foo.example.com",
               );
 
-BEGIN { plan tests => 10 };
+BEGIN { plan tests => 11 };
 
 print STDERR "PERFORMANCE VALIDATION\n";
 

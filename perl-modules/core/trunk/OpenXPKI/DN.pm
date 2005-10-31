@@ -6,8 +6,33 @@ use strict;
 use warnings;
 package OpenXPKI::DN;
 
+use Memoize;
 use Text::CSV_XS;
 use OpenXPKI::Exception;
+
+
+# OpenSSL style attribute name mapping
+my %mapping_of = (
+    SERIALNUMBER         => "serialNumber",
+    EMAILADDRESS         => "emailAddress",
+    MAIL                 => "mail",
+    UID                  => "UID",
+    X500UNIQUEIDENTIFIER => "x500UniqueIdentifier",
+    CN                   => "CN",
+    TITLE                => "title",
+    SN                   => "SN",
+    OU                   => "OU",
+    O                    => "O",
+    L                    => "L",
+    ST                   => "ST",
+    C                    => "C",
+    DC                   => "DC",
+    PSEUDONYM            => "pseudonym",
+    ROLE                 => "role",
+    DESCRIPTION          => "description",
+    );
+
+
 
 sub new
 {
@@ -100,12 +125,13 @@ sub get_x500_dn
 sub get_openssl_dn
 {
     my $self = shift;
-    my @rdns = reverse @{$self->{RDNS}};
-    for (my $i=0; $i < scalar @rdns; $i++)
-    {
-        $rdns[$i] =~ s/\//\\\//g;
-    }
-    return "/".join "/", @rdns;
+
+    # the map operation below modifies its arguments, so make a copy first
+    my @rdns = @{$self->{RDNS}};
+
+    # escape / to \/ and return /-separated DN
+    return "/" . join("/", 
+		      reverse map { s{/}{\\/}xsg; $_; } @rdns);
 }
 
 sub get_hashed_content
@@ -113,16 +139,14 @@ sub get_hashed_content
     my $self = shift;
     my %result = ();
 
-    for (my $i=0; $i < scalar @{$self->{PARSED}}; $i++)
-    {
-        ## RDN level
-        for (my $k=0; $k < scalar @{$self->{PARSED}[$i]}; $k++)
-        {
-            ## attribute level
-            push @{$result{uc $self->{PARSED}[$i][$k][0]}},
-                 $self->{PARSED}[$i][$k][1];
-        }
+    for my $rdn (@{$self->{PARSED}}) {
+	for my $attribute (@{$rdn}) {
+	    my $key = uc($attribute->[0]);
+
+	    push @{$result{$key}}, $attribute->[1];
+	}
     }
+
     return %result;
 }
 
@@ -140,14 +164,8 @@ sub __build_rdns
     $self->{RDNS} = [];
     $self->__build_attributes() if (not $self->{ATTRIBUTES});
 
-    for (my $i=0; $i < scalar @{$self->{ATTRIBUTES}}; $i++)
-    {
-        $self->{RDNS}[$i] = "";
-        for (my $k=0; $k < scalar @{$self->{ATTRIBUTES}[$i]}; $k++)
-        {
-            $self->{RDNS}[$i] .= "+" if ($k>0);
-            $self->{RDNS}[$i] .= $self->{ATTRIBUTES}[$i][$k];
-        }
+    for my $attribute (@{$self->{ATTRIBUTES}}) {
+	push(@{$self->{RDNS}}, join("+", @{$attribute}));
     }
 
     return 1;
@@ -158,18 +176,20 @@ sub __build_attributes
     my $self = shift;
     $self->{ATTRIBUTES} = ();
 
-    for (my $i=0; $i < scalar @{$self->{PARSED}}; $i++)
-    {
-        $self->{ATTRIBUTES}[$i] = ();
-        for (my $k=0; $k < scalar @{$self->{PARSED}[$i]}; $k++)
-        {
-            my $value = $self->{PARSED}[$i][$k][1];
-            $value =~ s/([+,])/\\$1/g;
-            $self->{ATTRIBUTES}[$i][$k]  = $self->{PARSED}[$i][$k][0];
-            $self->{ATTRIBUTES}[$i][$k] .= "=";
-            $self->{ATTRIBUTES}[$i][$k] .= $value;
-        }
-    }
+    for my $entry (@{$self->{PARSED}}) {
+	my @attributes = ();
+	
+ 	for my $item (@{$entry}) {
+ 	    my $key   = $item->[0];
+ 	    my $value = $item->[1];
+
+	    # escape + and , 
+	    $value =~ s{ ([+,]) }{\\$1}xs;
+ 	    push(@attributes, $key . '=' . $value);
+ 	}
+	
+ 	push(@{$self->{ATTRIBUTES}}, \@attributes);
+     }
 
     return 1;
 }
@@ -184,16 +204,25 @@ sub __build_attributes
 
 sub __get_parsed_rfc_2253
 {
-    my $string = shift;
-    while ($_[0])
-    {
-        $string = shift;
-    }
+    my $string = pop;
+
+    # FIXME??? Do we really mean the last argument? The original code was:
+#     my $string = shift;
+#     while ($_[0])
+#     {
+#         $string = shift;
+#     }
+
     my @result = ();
 
     while ($string)
     {
-        ($result[scalar @result], $string) = __get_next_rdn ($string);
+	my $rdn;
+        ($rdn, $string) = __get_next_rdn ($string);
+	if (defined $rdn && $rdn ne "") {
+	    push(@result, $rdn);
+	}
+
         $string = substr ($string, 1) if ($string); ## remove seperator
     }
 
@@ -244,23 +273,9 @@ sub __get_attribute_type
     $string  =~ s/^\s*[^=]+(=.*)/$1/;
 
     ## fix type to be comliant with OpenSSL
-    $type = "serialNumber" if (uc($type) eq "SERIALNUMBER");
-    $type = "emailAddress" if (uc($type) eq "EMAILADDRESS");
-    $type = "mail"         if (uc($type) eq "MAIL");
-    $type = "UID"          if (uc($type) eq "UID");
-    $type = "x500UniqueIdentifier" if (uc($type) eq "X500UNIQUEIDENTIFIER");
-    $type = "CN"           if (uc($type) eq "CN");
-    $type = "title"        if (uc($type) eq "TITLE");
-    $type = "SN"           if (uc($type) eq "SN");
-    $type = "OU"           if (uc($type) eq "OU");
-    $type = "O"            if (uc($type) eq "O");
-    $type = "L"            if (uc($type) eq "L");
-    $type = "ST"           if (uc($type) eq "ST");
-    $type = "C"            if (uc($type) eq "C");
-    $type = "DC"           if (uc($type) eq "DC");
-    $type = "pseudonym"    if (uc($type) eq "PSEUDONYM");
-    $type = "role"         if (uc($type) eq "ROLE");
-    $type = "description"  if (uc($type) eq "DESCRIPTION");
+    if (exists $mapping_of{uc($type)}) {
+	$type = $mapping_of{uc($type)};
+    }
 
     return ($type, $string);
 }
@@ -291,6 +306,16 @@ sub __get_attribute_value
 ##    END of RFC 2253 parser    ##
 ##################################
 
+foreach my $function (qw (__get_parsed_rfc_2253
+                          __get_next_rdn
+                          __get_attribute
+                          __get_attribute_type
+                          __get_attribute_value
+                          ) ) {
+    memoize($function);
+}
+
+		      
 1;
 __END__
 
@@ -306,7 +331,7 @@ the organizational hierarchy via OUs).
 
 =head2 new
 
-The function new expects a RFC 2253 or OpenSSL DN as its only
+The 'new' constructor expects a RFC 2253 or OpenSSL DN as its only
 argument. The type of the DN will be detected from the first
 character. OpenSSL's DNs always begin with a leading slash "/".
 
