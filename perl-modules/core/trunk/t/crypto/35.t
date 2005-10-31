@@ -84,7 +84,7 @@ ok (1);
 $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $items / $result;
 $result =~ s/\..*$//;
-print STDERR " - $result signatures/second (minimum: 100 per second)\n";
-ok ($result > 100);
+print STDERR " - $result signatures/second (minimum: 1000 per minute)\n";
+ok ($result > 17);
 
 1;

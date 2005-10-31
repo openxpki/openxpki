@@ -423,11 +423,28 @@ These parsers tolerate errors!
 
 create the class instance and calls internally the function init to
 load the XML files for the first time. The supported parameters are
-DEBUG and CONFIG. DEBUG can be a true or false value. CONFIG is an
-array reference which contains either filenames including the configuration
-or strings containing the XML configuration literally. Filenames
-and literal XML strings can be mixed. A parameter is considered a literal
-XML string if it contains a '<' or '>' character.
+DEBUG, CONFIG and SCHEMA.
+
+=over
+
+=item * DEBUG
+
+can be a true or false value. Default is false.
+
+=item * CONFIG
+
+is a string which contains either a filename including the configuration
+or a string containing the XML configuration literally.  A parameter is
+considered a literal XML string if it contains a '<' or '>' character.
+The parameter is required.
+
+=item * SCHEMA
+
+specifies the filename of the XML schema definition. If this
+parameter is present then the loaded XML file will be checked to
+be valid in the meaning of the schema. The parameter is optional.
+
+=back
 
 =head2 init
 

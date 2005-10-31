@@ -248,7 +248,7 @@ pubkey_hash (csr, digest_name="sha1")
 	if (pkey != NULL)
 	{
 		length = i2d_PublicKey (pkey, NULL);
-		data = OPENSSL_malloc(length+1);
+		/* data = OPENSSL_malloc(length+1); */
 		length = i2d_PublicKey (pkey, &data);
 		if (!strcmp ("sha1", digest_name))
 			digest = EVP_sha1();
@@ -264,7 +264,7 @@ pubkey_hash (csr, digest_name="sha1")
 				if (j+1 != (int)n) BIO_printf(out,":");
 			}
 		}
-		OPENSSL_free (data);
+		/* OPENSSL_free (data); */
 		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &fingerprint);
