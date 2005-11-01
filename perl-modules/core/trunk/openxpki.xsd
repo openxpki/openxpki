@@ -4,8 +4,60 @@
   <element name="openxpki" type="openxpki_type"/>
 
   <complexType name="openxpki_type">
+    <element name="common" type="common_type"/>
     <element name="token_config" type="token_config_type"/>
   </complexType>
+
+  <complexType name="common_type">
+    <element name="database" type="database_type"/>
+  </complexType>
+
+  <!-- ====================== -->
+  <!-- database configuration -->
+  <!-- ========BEGIN========= -->
+
+  <complexType name="database_type">
+    <element name="debug"     type="debug_type"/>
+    <element name="type"      type="database_type_type"/>
+    <element name="name"      type="string"/>
+    <element name="host"      type="string"/>
+    <element name="port"      type="positiveInteger"/>
+    <element name="user"      type="token"/>
+    <element name="passwd"    type="string"/>
+    <element name="namespace" type="token"/>
+    <element name="environment" type="database_environment_type"/>
+  </complexType>
+  
+  <simpleType name="database_type_type">
+    <restriction base="xsd:token">
+      <enumeration value="DB2"/>
+      <enumeration value="MySQL"/>
+      <enumeration value="PostgreSQL"/>
+      <enumeration value="Oracle"/>
+      <enumeration value="SQLite"/>
+    </restriction>
+  </simpleType>
+
+  <complexType name="database_environment_type">
+    <element name="vendor" type="database_env_vendor_type"/>
+  </complexType>
+
+  <complexType name="database_env_vendor_type">
+    <element name="type"   type="database_type_type"/>
+    <element name="option" type="option_type" minOccurs="0" maxOccurs="unbounded"/>
+  </complexType>
+
+  <!-- =========END========== -->
+  <!-- database configuration -->
+  <!-- ====================== -->
+
+  <!-- ======================= -->
+  <!-- PKI realm configuration -->
+  <!-- =========BEGIN========= -->
+
+  <!-- ==========END========== -->
+  <!-- PKI realm configuration -->
+  <!-- ======================= -->
 
   <!-- ================================= -->
   <!-- cryptographic token configuration -->
@@ -16,11 +68,11 @@
   </complexType>
 
   <complexType name="token_type">
-    <element name="name" type="string"/>
+    <element name="name"     type="string"/>
     <element name="ca_group" type="string"/>
-    <element name="type" type="string"/>
-    <element name="mode" type="token_mode_type"/>
-    <element name="option" type="option_type" minOccurs="0" maxOccurs="unbounded"/>
+    <element name="type"     type="string"/>
+    <element name="mode"     type="token_mode_type"/>
+    <element name="option"   type="option_type" minOccurs="0" maxOccurs="unbounded"/>
   </complexType>
 
   <simpleType name="token_mode_type">
@@ -43,6 +95,13 @@
     <element name="name" type="string"/>
     <element name="value" type="string"/>
   </complexType>
+
+  <simpleType name="debug_type">
+    <restriction base="xsd:token">
+      <enumeration value="0"/> <!-- on  -->
+      <enumeration value="1"/> <!-- off -->
+    </restriction>
+  </simpleType>
 
   <!-- =======END========= -->
   <!-- general definitions -->

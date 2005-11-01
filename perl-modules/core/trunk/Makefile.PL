@@ -91,7 +91,8 @@ WriteMakefile(
     'VERSION_FROM' => 'OpenXPKI.pm',
     'LIBS'      => ["-L$openssl_lib_dir -lcrypto"],
     'INC'       => "-I. -I$openssl_inc_dir",
-    'PREREQ_PM' => {'Date::Parse'            => 1,
+    'PREREQ_PM' => {'DBI'                    => 1,
+                    'Date::Parse'            => 1,
                     'Exception::Class'       => "1.22",
                     ## includes the version of libintl-perl which includes Locale::Messages
                     'Locale::TextDomain'     => 1,

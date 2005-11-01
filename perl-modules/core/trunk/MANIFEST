@@ -107,6 +107,7 @@ t/crypto/common.pl
 
 t/dbi/01.t
 t/dbi/common.pl
+t/dbi/database.xml
 
 t/dn/1.t
 t/dn/2.t
