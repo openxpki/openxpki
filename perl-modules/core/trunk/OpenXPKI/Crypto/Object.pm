@@ -95,4 +95,46 @@ __END__
 
 =head1 Description
 
+This class is a basic implementation for all cryptographic objects
+which are supported by OpenXPKI. It includes several basic function
+which are common for all crypto objects. The most common functions
+base on the OpenXPKI::Crypto::Header class which is used by OpenXPKI
+to store non-standard and dynamic information of objects.
+
 =head1 Functions
+
+=head2 get_header
+
+returns the plain header of the object.
+
+=head2 get_body
+
+returns the plain (cryptographic) body of the object.
+
+=head2 get_item
+
+returns the complete plain object.
+
+=head2 get_parsed
+
+expects an array which is a path to parsed value. Example:
+
+$obj->get_parsed ("HEADER", "SERIAL")
+
+=head2 get_serial
+
+returns the serial which is stored in the cryptographic body of
+the object. Some objects like CSRs store the SERIAL in the HEADER.
+Such types of objects must overwrite this function.
+
+=head2 get_status
+
+returns the status of the object.
+
+=head2 set_status
+
+sets the status of the object.
+
+=head2 set_header_attribute
+
+set an attribute in the header.

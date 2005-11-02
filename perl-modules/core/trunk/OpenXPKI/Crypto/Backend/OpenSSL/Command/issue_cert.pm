@@ -33,7 +33,7 @@ sub get_command
     if (exists $self->{SUBJECT} and length ($self->{SUBJECT}))
     {
         ## fix DN-handling of OpenSSL
-        $subject = $self->__get_openssl_dn ($self->{SUBJECT});
+        $subject = $self->get_openssl_dn ($self->{SUBJECT});
     }
 
     ## check parameters
@@ -86,8 +86,8 @@ sub get_command
     ## create serial, index and index attribute file
 
     my $config = $self->read_file ($self->{CONFIG});
-    my $database = $self->__get_config_variable (NAME => "database", CONFIG => $config);
-    my $serial   = $self->__get_config_variable (NAME => "serial", CONFIG => $config);
+    my $database = $self->get_config_variable (NAME => "database", CONFIG => $config);
+    my $serial   = $self->get_config_variable (NAME => "serial", CONFIG => $config);
 
     $self->{SERIAL} = Math::BigInt->new ($self->{SERIAL});
     if (not $self->{SERIAL})

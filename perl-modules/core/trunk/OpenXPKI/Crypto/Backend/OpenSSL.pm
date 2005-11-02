@@ -235,7 +235,7 @@ sub get_object_function
     my $object = $keys->{OBJECT};
     my $func   = $keys->{FUNCTION};
 
-    return $object->free() if ($func eq "free");
+    return $self->free_object ($object) if ($func eq "free");
 
     ## unicode handling
     ## use utf8;
@@ -279,6 +279,12 @@ sub AUTOLOAD {
     my $self = shift;
     $AUTOLOAD =~ s/^.*://;
     return if ($AUTOLOAD eq "DESTROY");
+    if (not $self->{ENGINE})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_AUTOLOAD_MISSING_ENGINE",
+            params  => {"FUNCTION" => $AUTOLOAD});
+    }
     if ($AUTOLOAD eq "online" or
         $AUTOLOAD eq "login" or
         $AUTOLOAD eq "get_mode" or
@@ -301,4 +307,80 @@ __END__
 
 =head1 Description
 
+This is the basic class to provide OpenXPKI with an OpenSSL based
+cryptographic token. Beside the documented function all functions
+in the class OpenXPKI::Crypto::Backend::OpenSSL::Engine are
+available here too because we map these engine specific functions
+directly to the engine (via AUTOLOAD).
+
 =head1 Functions
+
+=head2 new
+
+is the constructor. It requires five basic parameters which are
+described here. The other parameters are engine specific and
+are described in the related engine documentation. Please see
+OpenXPKI::Crypto::Backend::OpenSSL::Engine for more details.
+
+=over
+
+=item * RANDFILE (file to store the random informations)
+
+=item * DEBUG (switch on or off debugging)
+
+=item * SHELL (the OpenSSL binary)
+
+=item * TMPDIR (the used temporary directory which must be private)
+
+=item * CONFIG (the OpenSSL configuration)
+
+=back
+
+=head2 set_config
+
+set another OpenSSL configuration file.
+
+=head2 command
+
+execute an OpenSSL command. You must specify the name of the command
+as first parameter followed by a hash with parameter. Example:
+
+$token->command ("create_key", TYPE => "RSA", ...);
+
+=head2 get_object
+
+is used to get access to a cryptographic object. The following objects
+are supported today:
+
+=over
+
+=item * SPKAC
+
+=item * PKCS10
+
+=item * X509
+
+=item * CRL
+
+=back
+
+You must specify the type of the object in the parameter TYPE. Additionally
+you must specify the format if several different formats are supported. If
+you do not do this then PEM is assumed. The most important parameter is
+DATA which contains the plain object data which must be parsed.
+
+The returned value can be a scalar or a reference. You must not use this value
+directly. You have to use the functions get_object_function or free_object
+to access the object.
+
+=head2 get_object_function
+
+is used to execute functions on the object. The function expects two
+parameters the OBJECT and the FUNCTION which should be called. All
+functions have no parameters. The result of the function will be
+returned.
+
+=head2 free_object
+
+frees the object internally. The only parameter is the object which
+was returned by get_object.

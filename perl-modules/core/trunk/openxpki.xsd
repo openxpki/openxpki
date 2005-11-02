@@ -68,11 +68,11 @@
   </complexType>
 
   <complexType name="token_type">
-    <element name="name"     type="string"/>
-    <element name="ca_group" type="string"/>
-    <element name="type"     type="string"/>
-    <element name="mode"     type="token_mode_type"/>
-    <element name="option"   type="option_type" minOccurs="0" maxOccurs="unbounded"/>
+    <element name="name"      type="string"/>
+    <element name="pki_realm" type="string"/>
+    <element name="type"      type="string"/>
+    <element name="mode"      type="token_mode_type"/>
+    <element name="option"    type="option_type" minOccurs="0" maxOccurs="unbounded"/>
   </complexType>
 
   <simpleType name="token_mode_type">

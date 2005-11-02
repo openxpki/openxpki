@@ -208,7 +208,6 @@ pubkey(csr)
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
-	/* Do not free this pointer! It is from the X509_REQ structure. */
 	pkey=X509_REQ_get_pubkey(csr);
 	if (pkey != NULL)
 	{
@@ -216,7 +215,7 @@ pubkey(csr)
 			RSA_print(out,pkey->pkey.rsa,0);
 		else if (pkey->type == EVP_PKEY_DSA)
 			DSA_print(out,pkey->pkey.dsa,0);
-		/* EVP_PKEY_free(pkey); */
+		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
 	SAFEFREE(char_ptr);
@@ -245,7 +244,6 @@ pubkey_hash (csr, digest_name="sha1")
 	int length;
     CODE:
 	out = BIO_new(BIO_s_mem());
-	/* Do not free this pointer! It is from the X509_REQ structure. */
 	pkey=X509_REQ_get_pubkey(csr);
 	if (pkey != NULL)
 	{
@@ -268,7 +266,7 @@ pubkey_hash (csr, digest_name="sha1")
 			}
 		}
 		/* OPENSSL_free (data); */
-		/* EVP_PKEY_free(pkey); */
+		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &fingerprint);
 	SAFEFREE(char_ptr);
@@ -289,13 +287,12 @@ keysize (csr)
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
-	/* Do not free this pointer! It is from the X509_REQ structure. */
 	pkey=X509_REQ_get_pubkey(csr);
 	if (pkey != NULL)
 	{
 		if (pkey->type == EVP_PKEY_RSA)
 			BIO_printf(out,"%d", BN_num_bits(pkey->pkey.rsa->n));
-		/* EVP_PKEY_free(pkey); */
+		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
 	SAFEFREE(char_ptr);
@@ -316,7 +313,6 @@ modulus (csr)
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
-	/* Do not free this pointer! It is from the X509_REQ structure. */
 	pkey=X509_REQ_get_pubkey(csr);
 	if (pkey == NULL)
 		BIO_printf(out,"");
@@ -326,7 +322,7 @@ modulus (csr)
 		BN_print(out,pkey->pkey.dsa->pub_key);
 	else
 		BIO_printf(out,"");
-	/* if (pkey != NULL) EVP_PKEY_free(pkey); */
+	if (pkey != NULL) EVP_PKEY_free(pkey);
 	n = BIO_get_mem_data(out, &modulus);
 	SAFEFREE(char_ptr);
 	Newz(0, char_ptr, n+1, char);
@@ -346,7 +342,6 @@ exponent (csr)
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
-	/* Do not free this pointer! It is from the X509_REQ structure. */
 	pkey=X509_REQ_get_pubkey(csr);
 	if (pkey == NULL)
 		BIO_printf(out,"");
@@ -356,7 +351,7 @@ exponent (csr)
 		BN_print(out,pkey->pkey.dsa->pub_key);
 	else
 		BIO_printf(out,"");
-	/* if (pkey != NULL) EVP_PKEY_free(pkey); */
+	if (pkey != NULL) EVP_PKEY_free(pkey);
 	n = BIO_get_mem_data(out, &exponent);
 	SAFEFREE(char_ptr);
 	Newz(0, char_ptr, n+1, char);

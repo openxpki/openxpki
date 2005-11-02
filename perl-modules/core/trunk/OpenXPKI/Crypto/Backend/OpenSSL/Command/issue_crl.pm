@@ -82,15 +82,15 @@ sub get_command
                 }
             }
             # prepare index.txt entry
-            $timestamp = $self->__get_openssl_time ($timestamp);
+            $timestamp = $self->get_openssl_time ($timestamp);
             my $start = $self->{ENGINE}->get_object_function (
                             OBJECT   => $cert,
                             FUNCTION => "notbefore");
-            $start = $self->__get_openssl_time ($start);
+            $start = $self->get_openssl_time ($start);
             my $subject = $self->{ENGINE}->get_object_function (
                               OBJECT   => $cert,
                               FUNCTION => "subject");
-            $subject = $self->__get_openssl_dn($subject);
+            $subject = $self->get_openssl_dn($subject);
             my $serial = $self->{ENGINE}->get_object_function (
                              OBJECT   => $cert,
                              FUNCTION => "serial");
@@ -104,8 +104,8 @@ sub get_command
     ## create serial, index and index attribute file
 
     my $config = $self->read_file ($self->{CONFIG});
-    my $database = $self->__get_config_variable (NAME => "database", CONFIG => $config);
-    my $serial   = $self->__get_config_variable (NAME => "crlnumber", CONFIG => $config);
+    my $database = $self->get_config_variable (NAME => "database", CONFIG => $config);
+    my $serial   = $self->get_config_variable (NAME => "crlnumber", CONFIG => $config);
 
     if ($serial)
     {

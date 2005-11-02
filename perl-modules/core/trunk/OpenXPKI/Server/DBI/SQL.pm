@@ -308,6 +308,8 @@ $self-<gt>{db}-<gt>delete (TABLE =<gt> "CRR",
 $self-<gt>{db}-<gt>delete (TABLE =<gt> "CRR",
                            DATA  =<gt> {CRR_SERIAL => ["<", 3]});
 
+=back
+
 BTW CRRs should never be erased!
 
 =cut

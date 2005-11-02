@@ -91,7 +91,7 @@ sub stop
     close $self->{OPENSSL_FD};
     delete $self->{OPENSSL_FD};
 
-    $self->check_error();
+    $self->__check_error();
 
     return 1;
 }
@@ -120,7 +120,7 @@ sub run_cmd
     return 1;
 }
 
-sub check_error
+sub __check_error
 {
     my $self = shift;
 
@@ -191,3 +191,51 @@ sub DESTROY
 }
 
 1;
+__END__
+
+=head1 Desription
+
+This module implements the handling of the OpenSSL shell. This
+includes things like the initialization of the engines or the
+detection of errors.
+
+=head1 Functions
+
+=head2 new
+
+The new function creates a new instance of this class. There are
+the following parameters:
+
+=over
+
+=item * DEBUG
+
+=item * SHELL (the OpenSSL binary)
+
+=item * ENGINE (a reference to an OpenXPKI::Crypto::Backend::OpenSSL::Engine object)
+
+=item * TMP (the temporary directory)
+
+=back
+
+=head2 start
+
+This opens a new shell session.
+
+=head2 init_engine
+
+is used to initialize the engine which is used by this cryptographic token.
+
+=head2 stop
+
+This kills a shell session.
+
+=head2 run_cmd
+
+The functions expects an ARRAY reference which includes
+a sequence of OpenSSL commands. All commands are executed.
+
+=head2 get_result
+
+returns the result of the commands which were executed with run_cmd.
+If there was no output then 1 will be returned.

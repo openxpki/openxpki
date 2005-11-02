@@ -72,7 +72,7 @@ sub get_command
     ## prepare data
 
     ## fix DN-handling of OpenSSL
-    my $subject = $self->__get_openssl_dn ($self->{SUBJECT});
+    my $subject = $self->get_openssl_dn ($self->{SUBJECT});
 
     ## build the command
 

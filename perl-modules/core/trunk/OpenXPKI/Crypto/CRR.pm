@@ -65,4 +65,22 @@ __END__
 
 =head1 Description
 
+This class is used for the handling of certifcate revocation requests (CRR).
+All functions of OpenXPKI::Crypto::Object are supported. All functions
+which differ from the base class OpenXPKI::Crypto::Object are
+described below.
+
 =head1 Functions
+
+=head2 new
+
+The constructor supports three options - DEBUG and DATA.
+DEBUG is optional and must be a true or false value. Default is false. 
+The parameter DATA must contain an OpenXPKI::Crypto::Header. This is
+the base of the object because a CRR includes no cryptographic standard body.
+
+=head2 get_serial
+
+returns the serial which is stored in the header because CRRs get their
+serial directly from the database and do not store it in a cryptographic
+body because a CRR has no cryptographic body.

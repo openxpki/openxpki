@@ -56,7 +56,7 @@ sub get_command
     if (exists $self->{SUBJECT} and length ($self->{SUBJECT}))
     {
         ## fix DN-handling of OpenSSL
-        $subject = $self->__get_openssl_dn ($self->{SUBJECT});
+        $subject = $self->get_openssl_dn ($self->{SUBJECT});
     }
 
     ## check parameters

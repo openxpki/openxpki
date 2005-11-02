@@ -1,7 +1,7 @@
 <token_config>
     <token>
         <name>INTERNAL_CA_1</name>
-        <ca_group>CA_GROUP_1</ca_group>
+        <pki_realm>Test Root CA</pki_realm>
         <type>OpenXPKI::Crypto::Backend::OpenSSL</type>
         <!--
             if the token support sessions then you can use session and daemon too

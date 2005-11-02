@@ -281,4 +281,24 @@ __END__
 
 =head1 Description
 
+This class is used for the handling of X.509v3 certificates. All
+functions of OpenXPKI::Crypto::Object are supported. All functions
+which differ from the base class OpenXPKI::Crypto::Object are
+described below.
+
 =head1 Functions
+
+=head2 new
+
+The constructor supports three options - DEBUG, TOKEN and DATA.
+DEBUG is optional and must be a true or false value. Default is
+false. TOKEN must be a crypto token from the token manager. This
+is necessary to extract some informations from the data. The
+parameter DATA must contain a PEM encoded certificate. This is
+the base of the object.
+
+=head2 get_converted
+
+expects only one value - the requested format of the certificate.
+PEM, TXT and DER are supported. TXT is a plain text representation
+which can be directly displayed to the user.

@@ -21,13 +21,13 @@ sub new {
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{DEBUG}      = 1                   if ($keys->{DEBUG});
-    $self->{cache}      = $keys->{CACHE}      if ($keys->{CACHE});
+    $self->{DEBUG}  = 1               if ($keys->{DEBUG});
+    $self->{config} = $keys->{CONFIG} if ($keys->{CONFIG});
 
-    if (not $self->{cache})
+    if (not $self->{config})
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_NEW_MISSING_XML_CACHE");
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_NEW_MISSING_XML_CONFIG");
     }
 
     $self->debug ("token manager is ready");
@@ -52,88 +52,88 @@ sub get_token
     $self->debug ("entering function");
 
     my $name  = $keys->{NAME};
-    my $group = $keys->{CA_GROUP};
+    my $realm = $keys->{PKI_REALM};
 
     if (not $name)
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_NAME");
     }
-    if (not $group)
+    if (not $realm)
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_CA_GROUP");
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_PKI_REALM");
     }
-    $self->debug ("$group: $name");
+    $self->debug ("$realm: $name");
 
-    $self->add_token (NAME => $name, CA_GROUP => $group)
-        if (not $self->{TOKEN}->{$group}->{$name});
+    $self->__add_token (NAME => $name, PKI_REALM => $realm)
+        if (not $self->{TOKEN}->{$realm}->{$name});
     $self->debug ("token added");
 
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_EXIST")
-        if (not $self->{TOKEN}->{$group}->{$name});
+        if (not $self->{TOKEN}->{$realm}->{$name});
     $self->debug ("token is present");
 
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE")
-        if (not $self->use_token (NAME => $name, CA_GROUP => $group));
+        if (not $self->__use_token (NAME => $name, PKI_REALM => $realm));
     $self->debug ("token is usable");
 
-    return $self->{TOKEN}->{$group}->{$name};
+    return $self->{TOKEN}->{$realm}->{$name};
 }
 
-sub add_token
+sub __add_token
 {
     my $self = shift;
     my $keys = { @_ };
     $self->debug ("entering function");
 
     my $name  = $keys->{NAME};
-    my $group = $keys->{CA_GROUP};
+    my $realm = $keys->{PKI_REALM};
 
     ## get matching config
-    my $token_count = $self->{cache}->get_xpath_count (
+    my $token_count = $self->{config}->get_xpath_count (
                           XPATH    => 'token_config/token');
     if (not defined $token_count)
     {
         OpenXPKI::Exception->throw (
-            errno   => $self->{cache}->errno(),
-            message => $self->{cache}->errval());
+            errno   => $self->{config}->errno(),
+            message => $self->{config}->errval());
     }
     for (my $i=0; $i<$token_count; $i++)
     {
-        $self->debug ("checking ca group");
-        next if ($group ne $self->{cache}->get_xpath (
-                              XPATH    => [ 'token_config/token', 'ca_group' ],
+        $self->debug ("checking pki realm");
+        next if ($realm ne $self->{config}->get_xpath (
+                              XPATH    => [ 'token_config/token', 'pki_realm' ],
                               COUNTER  => [ $i, 0 ]));
         $self->debug ("checking name");
-        next if ($name ne $self->{cache}->get_xpath (
+        next if ($name ne $self->{config}->get_xpath (
                               XPATH    => [ 'token_config/token', 'name' ],
                               COUNTER  => [ $i, 0 ]));
-        $self->debug ("group and name ok");
-        my @args = ();
+        $self->debug ("pki realm and name ok");
+        my @args = (NAME => $name, PARENT => $self);
 
         ## load CRYPTO, GETTEXT, NAME and MODE to array
         $self->debug ("loading mode");
-        my $help = $self->{cache}->get_xpath (
+        my $help = $self->{config}->get_xpath (
                                XPATH    => [ 'token_config/token', 'mode' ],
                                COUNTER  => [ $i, 0 ]);
-        push @args, "TOKEN_MODE", $help;
+        push @args, "MODE", $help;
 
         ## load complete config in array
         $self->debug ("loading options");
-        my $option_count = $self->{cache}->get_xpath_count (
+        my $option_count = $self->{config}->get_xpath_count (
                                XPATH    => [ 'token_config/token', 'option' ],
                                COUNTER  => [ $i ]);
         for (my $k=0; $k<$option_count; $k++)
         {
-            $help = $self->{cache}->get_xpath (
+            $help = $self->{config}->get_xpath (
                                XPATH    => [ 'token_config/token', 'option', 'name' ],
                                COUNTER  => [ $i, $k, 0 ]),
             $self->debug ("option name: $help");
             push @args, $help;
-            $help = $self->{cache}->get_xpath (
+            $help = $self->{config}->get_xpath (
                                XPATH    => [ 'token_config/token', 'option', 'value' ],
                                COUNTER  => [ $i, $k, 0 ]);
             if (defined $help)
@@ -183,30 +183,30 @@ sub add_token
         $self->debug ("fixed multivalued options");
 
         ## init token
-        my $type = $self->{cache}->get_xpath (
+        my $type = $self->{config}->get_xpath (
                                XPATH    => [ 'token_config/token', 'type' ],
                                COUNTER  => [ $i, 0 ]);
         $self->debug ("try to setup $type token");
         eval {
-            $self->{TOKEN}->{$group}->{$name} = $self->new_token ($type, @args);
+            $self->{TOKEN}->{$realm}->{$name} = $self->__new_token ($type, @args);
         };
         if (my $exc = OpenXPKI::Exception->caught())
         {
-            delete $self->{TOKEN}->{$group}->{$name}
-                if (exists $self->{TOKEN}->{$group}->{$name});
+            delete $self->{TOKEN}->{$realm}->{$name}
+                if (exists $self->{TOKEN}->{$realm}->{$name});
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_CREATE_FAILED",
                 child   => $exc);
         }
-        $self->debug ("token $name for $group successfully added");
-        return $self->{TOKEN}->{$group}->{$name};
+        $self->debug ("token $name for $realm successfully added");
+        return $self->{TOKEN}->{$realm}->{$name};
     }
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_NOT_CONFIGURED",
-        params  => {"NAME" => $name, "GROUP" => $group});
+        params  => {"NAME" => $name, "PKI_REALM" => $realm});
 }
 
-sub new_token {
+sub __new_token {
 
     my $self = shift;
     my $name = shift;
@@ -243,21 +243,21 @@ sub new_token {
     return $token;
 }
 
-sub use_token
+sub __use_token
 {
     my $self = shift;
     my $keys = { @_ };
 
     my $name  = $keys->{NAME};
-    my $group = $keys->{CA_GROUP};
+    my $realm = $keys->{PKI_REALM};
 
     ## the token must be present
     OpenXPKI::Excepion->throw (
         message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT")
-        if (not $self->{TOKEN}->{$group}->{$name});
+        if (not $self->{TOKEN}->{$realm}->{$name});
 
-    return $self->{TOKEN}->{$group}->{$name}->login()
-        if (not $self->{TOKEN}->{$group}->{$name}->online());
+    return $self->{TOKEN}->{$realm}->{$name}->login()
+        if (not $self->{TOKEN}->{$realm}->{$name}->online());
 
     return 1;
 }
@@ -269,12 +269,12 @@ sub stop_session
     my $self = shift;
     my $error = 0;
 
-    foreach my $group (keys %{$self->{TOKEN}})
+    foreach my $realm (keys %{$self->{TOKEN}})
     {
-        foreach my $name (keys %{$self->{TOKEN}->{$group}})
+        foreach my $name (keys %{$self->{TOKEN}->{$realm}})
         {
-            next if (not $self->{TOKEN}->{$group}->{$name}->get_mode() !~ /^session$/i);
-            $error = 1 if (not $self->{TOKEN}->{$group}->{$name}->logout());
+            next if (not $self->{TOKEN}->{$realm}->{$name}->get_mode() !~ /^session$/i);
+            $error = 1 if (not $self->{TOKEN}->{$realm}->{$name}->logout());
         }
     }
     OpenXPKI::Exception->throw (
@@ -287,23 +287,23 @@ sub start_daemon
 {
     my $self = shift;
     my $error = 0;
-    my $token_count = $self->{cache}->get_xpath_count (
+    my $token_count = $self->{config}->get_xpath_count (
                           XPATH    => 'token_config/token');
     for (my $i=0; $i<$token_count; $i++)
     {
-        next if ($self->{cache}->get_xpath (
+        next if ($self->{config}->get_xpath (
                       XPATH    => [ 'token_config/token', 'mode' ],
                       COUNTER  => [ $i, 0 ]) !~ /^daemon$/i);
-        my $name = $self->{cache}->get_xpath (
+        my $name = $self->{config}->get_xpath (
                       XPATH    => [ 'token_config/token', 'name' ],
                       COUNTER  => [ $i, 0 ]);
-        my $group = $self->{cache}->get_xpath (
-                      XPATH    => [ 'token_config/token', 'ca_group' ],
+        my $realm = $self->{config}->get_xpath (
+                      XPATH    => [ 'token_config/token', 'pki_realm' ],
                       COUNTER  => [ $i, 0 ]);
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_START_DAEMON_GET_TOKEN_FAILED",
-            params  => {"NAME" => $name, "CA_GROUP" => $group})
-            if (not $self->get_token(NAME => $name, CA_GROUP => $group));
+            params  => {"NAME" => $name, "PKI_REALM" => $realm})
+            if (not $self->get_token(NAME => $name, PKI_REALM => $realm));
     }
     return 1;
 }
@@ -312,24 +312,24 @@ sub stop_daemon
 {
     my $self = shift;
     my $error = 0;
-    my $token_count = $self->{cache}->get_xpath_count (
+    my $token_count = $self->{config}->get_xpath_count (
                           XPATH    => 'token_config/token');
     for (my $i=0; $i<$token_count; $i++)
     {
-        next if ($self->{cache}->get_xpath (
+        next if ($self->{config}->get_xpath (
                       XPATH    => [ 'token_config/token', 'mode' ],
                       COUNTER  => [ $i, 0 ]) !~ /^daemon$/i);
-        my $name = $self->{cache}->get_xpath (
+        my $name = $self->{config}->get_xpath (
                       XPATH    => [ 'token_config/token', 'name' ],
                       COUNTER  => [ $i, 0 ]);
-        my $group = $self->{cache}->get_xpath (
-                      XPATH    => [ 'token_config/token', 'ca_group' ],
+        my $realm = $self->{config}->get_xpath (
+                      XPATH    => [ 'token_config/token', 'pki_realm' ],
                       COUNTER  => [ $i, 0 ]);
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_START_DAEMON_ADD_TOKEN_FAILED",
-            params  => {"NAME" => $name, "CA_GROUP" => $group})
-            if (not $self->add_token(NAME => $name, CA_GROUP => $group));
-        $error = 1 if (not $self->{TOKEN}->{$group}->{$name}->logout());
+            params  => {"NAME" => $name, "PKI_REALM" => $realm})
+            if (not $self->__add_token(NAME => $name, PKI_REALM => $realm));
+        $error = 1 if (not $self->{TOKEN}->{$realm}->{$name}->logout());
     }
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_STOP_DAEMON_TOKEN_FAILED")
@@ -342,14 +342,18 @@ sub DESTROY {
     my $self = shift;
 
     my $error = 0;
-    foreach my $group (keys %{$self->{TOKEN}})
+    foreach my $realm (keys %{$self->{TOKEN}})
     {
-        next if (not defined $group or not length $group);
-        foreach my $name (keys %{$self->{TOKEN}->{$group}})
+        next if (not defined $realm or not length $realm);
+        foreach my $name (keys %{$self->{TOKEN}->{$realm}})
         {
-            next if (not $self->{TOKEN}->{$group}->{$name});
-            next if (not $self->{TOKEN}->{$group}->{$name}->get_mode() =~ /^(session|daemon)$/i);
-            $error = 1 if (not $self->{TOKEN}->{$group}->{$name}->logout());
+            next if (not $self->{TOKEN}->{$realm}->{$name});
+            if ($self->{TOKEN}->{$realm}->{$name}->get_mode() eq "standby")
+            {
+                $error = 1 if (not $self->{TOKEN}->{$realm}->{$name}->logout());
+            }
+            ## init destruction of token
+            delete $self->{TOKEN}->{$realm}->{$name};
         }
     }
 
@@ -364,4 +368,36 @@ __END__
 
 =head1 Description
 
+This modules manages all cryptographic tokens. You can use it to simply
+get tokens and to manage the state of a token.
+
 =head1 Functions
+
+=head2 new
+
+The constructor only need an instance of the XML configuration. The
+parameter for this is called CONFIG. If you want to debug the module
+then must specify a true value for the parameter DEBUG.
+
+=head2 set_ui
+
+is used to set the user interface. This is required to enter the passpharse
+for a software token.
+
+=head2 get_token
+
+needs NAME and PKI_REALM of a token and will return a token which is ready to
+use. Please remember that all tokens inside of one PKI realm need
+distinguished names.
+
+=head2 stop_session
+
+stops all tokens which operate in session mode.
+
+=head2 start_daemon
+
+start all tokens which operate in daemon mode.
+
+=head2 stop_daemon
+
+stop all tokens which operate in daemon mode.

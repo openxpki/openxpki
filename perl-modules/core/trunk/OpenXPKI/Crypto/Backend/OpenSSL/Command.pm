@@ -124,7 +124,7 @@ sub cleanup
     return 1;
 }
 
-sub __get_openssl_dn
+sub get_openssl_dn
 {
     my $self = shift;
     my $dn   = shift;
@@ -146,7 +146,7 @@ sub __get_openssl_dn
     return $dn;
 }
 
-sub __get_config_variable
+sub get_config_variable
 {
     my $self = shift;
     my $keys = { @_ };
@@ -167,7 +167,7 @@ sub __get_config_variable
     {
         my $dir = $result;
            $dir =~ s/^.*\$([a-zA-Z0-9_]+).*$/$1/s;
-        my $value = $self->__get_config_variable (NAME => $dir, CONFIG => $config);
+        my $value = $self->get_config_variable (NAME => $dir, CONFIG => $config);
         ## why we use this check?
         ## return undef if (not defined $dir);
         $result =~ s/\$$dir/$value/g;
@@ -175,7 +175,7 @@ sub __get_config_variable
     return $result;
 }
 
-sub __get_openssl_time
+sub get_openssl_time
 {
     my $self = shift;
     my $time = shift;
@@ -194,3 +194,63 @@ sub DESTROY
 }
 
 1;
+__END__
+
+=head1 Description
+
+This function is the base class for all available OpenSSL commands
+from the OpenSSL command line interface. All commands are executed
+inside of the OpenSSL shell.
+
+=head1 Functions
+
+=head2 new
+
+is the constructor. The ENGINE and the TMP parameter must be always
+present. All other parameters will be passed without any checks to
+the hash of the class instance. The real checks must be implemented
+by the commands itself.
+
+=head2 set_tmpfile
+
+expects a hash with prefix infront of FILE and the filename which is
+a tmpfile. Example:
+
+$self->set_tmpfile ("IN" => "/tmp/example.txt")
+
+mapped to
+
+$self->{INFILE} = "/tmp/example.txt";
+
+All temporary file are cleaned up automatically.
+
+=head2 set_env
+
+This function works exactly like set_tmpfile but without any
+automatical prefixes or suffixes. The environment is also
+cleaned up automatically.
+
+=head2 cleanup
+
+performs the cleanup of any temporary stuff like files from
+set_tmpfile and environment variables from set_env.
+
+=head2 get_openssl_dn
+
+expects a RFC2253 compliant DN and returns an OpenSSL DN.
+
+=head2 get_openssl_time
+
+expects a time string compliant with Date::Parse and returns
+a timestring which is compliant with the format used in
+index.txt.
+
+=head2 get_config_variable
+
+is used to find a configuration variable inside of an OpenSSL
+configuration file. The parameters are the NAME of the configuration
+parameter and the FILENAME of the file which contains the parameter
+or the complete CONFIG itself.
+
+The function is able to resolve any used variables inside of the
+configuration. Defintions like $dir/certs are supported.

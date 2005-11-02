@@ -143,4 +143,137 @@ __END__
 
 =head1 Description
 
+This is an abstraction layer to handle PKCS#7 cryptographic
+messages. Such messages can be S/MIME and several other stuff
+like SCEP or normal encrypted/signed data. The object can also
+be used to create such signatures or encrypted data portions.
+
 =head1 Functions
+
+=head2 new
+
+The constructor only requires a minimal set of informations.
+First it needs the debugging state (which is optional) and
+the cryptographic token (which is required).
+
+Additionally you must specify a PKCS7 structure or some CONTENT.
+If you want to verify or decrypt some data then you must support PKCS7.
+If you want to sign or encrypt then you must support CONTENT.
+
+=head2 sign
+
+is used to sign some CONTENT which was specified during new. Nevertheless
+you can specify some different CONTENT here too. DEBUG is also supported
+here to run the used cryptographic token in debug mode. Additionally the
+following parameters are supported:
+
+=over
+
+=item * CERT (if you do not use the tokens key)
+
+=item * KEY (if you do not use the tokens key)
+
+=item * PASSWD (if you do not use the tokens key)
+
+=item * USE_ENGINE (if you do not use the tokens key but you want to use the engine)
+
+=item * ENC_ALG (used encryption algorithm - default is aes256)
+
+=item * DETACH (detach data from signature -default is attached data)
+
+=back
+
+The signature will be returned a PEM-formatted PKCS#7.
+
+=head2 verify
+
+is used to verify a PKCS7 signature which was specified during new. Nevertheless
+you can specify some different PKCS7 here too. DEBUG is also supported
+here to run the used cryptographic token in debug mode. Additionally the
+following parameters are supported:
+
+=over
+
+=item * CONTENT (can be specified to check the integrity of the CONTENT)
+
+=item * CHAIN (file with all trusted CAs)
+
+=item * USE_ENGINE (if you want to use the engine of the token)
+
+=item * NO_VERIFY (only check the integrity but not the signer)
+
+=back
+
+The signer's PEM encoded certificate will be returned.
+
+=head2 encrypt
+
+is used to encrypt some CONTENT which was specified during new. Nevertheless
+you can specify some different CONTENT here too. DEBUG is also supported
+here to run the used cryptographic token in debug mode. Additionally the
+following parameters are supported:
+
+=over
+
+=item * CERT (if you do not use the tokens key for decryption)
+
+=item * USE_ENGINE (if you do not use the tokens cert but you want to use the engine)
+
+=item * ENC_ALG (used encryption algorithm - default is aes256)
+
+=back
+
+The encrypted data is returned in PEM format.
+
+=head2 decrypt
+
+is used to decrypt a PKCS7 message which was specified during new. Nevertheless
+you can specify some different PKCS7 here too. DEBUG is also supported
+here to run the used cryptographic token in debug mode. Additionally the
+following parameters are supported:
+
+=over
+
+=item * CERT (if you do not use the tokens key)
+
+=item * KEY (if you do not use the tokens key)
+
+=item * PASSWD (if you do not use the tokens key)
+
+=item * USE_ENGINE (if you do not use the tokens key but you want to use the engine)
+
+=back
+
+The decrypted data will be returned.
+
+=head2 get_chain
+
+is used to egt the certificate chain of a signature which was specified during new.
+Nevertheless you can specify some different PKCS7 here too. DEBUG is also supported
+here to run the used cryptographic token in debug mode. Additionally the
+following parameters are supported:
+
+=over
+
+=item * USE_ENGINE (if you do not use the tokens key but you want to use the engine)
+
+=back
+
+The chain is cached and returned an ARRAY reference.
+
+If you do not verify the signature before you use this function
+then the signature is verified before the chain will be extracted.
+
+=head2 get_signer
+
+returns the signer of a signature. The functions verify or get_chain
+must be used before you can use this function.
+
+=head2 get_content
+
+returns the content. This makes sense for encrypted PKCS#7 structures.
+
+=head2 get_pkcs7
+
+returns the PKCS#7 structure. This makes sense for later access to
+newly created PKCS#7 structures.
