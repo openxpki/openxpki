@@ -1,6 +1,14 @@
 <openxpki>
   <common>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="dbi/database.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="crypto/token.xml"/>
   </common>
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="crypto/token.xml"/>
+  <pki_realm name="Test Root CA">
+    <common name="default">
+      <token super="common/token_config/token{default}"/>
+    </common>
+    <ca name="INTERNAL_CA_1">
+      <token super="common/token_config/token{ca}"/>
+    </ca>
+  </pki_realm>
 </openxpki>

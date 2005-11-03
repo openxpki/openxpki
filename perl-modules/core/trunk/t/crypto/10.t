@@ -9,7 +9,7 @@ print STDERR "OpenXPKI::Crypto::Command: Create a CA\n";
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
-eval `cat t/crypto/common.pl`;
+require 't/crypto/common.pl';
 
 ok(1);
 
@@ -20,7 +20,7 @@ ok (1);
 
 ## parameter checks for get_token
 
-my $token = $mgmt->get_token (NAME => "INTERNAL_CA_1", PKI_REALM => "Test Root CA");
+my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM => "Test Root CA");
 ok (1);
 
 ## create CA RSA key (use passwd from token.xml)

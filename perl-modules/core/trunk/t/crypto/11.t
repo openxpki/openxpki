@@ -19,7 +19,7 @@ ok (1);
 
 ## parameter checks for get_token
 
-my $token = $mgmt->get_token (NAME => "INTERNAL_CA_1", PKI_REALM => "Test Root CA");
+my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM => "Test Root CA");
 ok (1);
 
 ## create PIN (128 bit == 16 byte)

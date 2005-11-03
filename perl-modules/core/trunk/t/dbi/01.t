@@ -10,7 +10,7 @@ use OpenXPKI::Server::DBI;
 ok (1);
 
 our %config;
-eval `cat t/dbi/common.pl`;
+require 't/dbi/common.pl';
 
 ok (1);
 

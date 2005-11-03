@@ -11,19 +11,20 @@ package OpenXPKI::XML::Config;
 use OpenXPKI::XML::Cache;
 use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
+use English;
 
 sub new
 { 
     my $that  = shift;
     my $class = ref($that) || $that;
   
-    my $self = {};
+    my $self = {DEBUG => 0};
    
     bless $self, $class;
 
     my $keys = { @_ };
 
-    $self->{DEBUG} = $keys->{DEBUG};
+    $self->{DEBUG} = $keys->{DEBUG} if ($keys->{DEBUG});
     $self->{CACHE} = OpenXPKI::XML::Cache->new (@_);
 
     return $self;
@@ -36,7 +37,14 @@ sub get_xpath
 
     my %keys = $self->__get_fixed_params(@_);
 
-    return $self->{CACHE}->get_xpath (%keys);
+    my $return = eval {$self->{CACHE}->get_xpath (%keys)};
+    if ($EVAL_ERROR)
+    {
+        return $self->get_xpath ($self->__get_super_xpath(%keys));
+    } else {
+        delete $self->{SUPER_CACHE};
+        return $return;
+    }
 }
 
 sub get_xpath_list
@@ -47,7 +55,14 @@ sub get_xpath_list
     my %keys = $self->__get_fixed_params(@_);
     delete $keys{COUNTER}->[scalar @{$keys{COUNTER}}-1];
 
-    return $self->{CACHE}->get_xpath_list (%keys);
+    my $return = eval {$self->{CACHE}->get_xpath_list (%keys)};
+    if ($EVAL_ERROR)
+    {
+        return $self->get_xpath_list ($self->__get_super_xpath(%keys));
+    } else {
+        delete $self->{SUPER_CACHE};
+        return $return;
+    }
 }
 
 sub get_xpath_count
@@ -58,7 +73,14 @@ sub get_xpath_count
     my %keys = $self->__get_fixed_params(@_);
     delete $keys{COUNTER}->[scalar @{$keys{COUNTER}}-1];
 
-    return $self->{CACHE}->get_xpath_count (%keys);
+    my $return = eval {$self->{CACHE}->get_xpath_count (%keys)};
+    if ($EVAL_ERROR)
+    {
+        return $self->get_xpath_count ($self->__get_super_xpath(%keys));
+    } else {
+        delete $self->{SUPER_CACHE};
+        return $return;
+    }
 }
 
 sub __get_fixed_params
@@ -137,6 +159,133 @@ sub dump
     return $self->{CACHE}->dump (@_);
 }
 
+sub __get_super_xpath
+{
+    my $self = shift;
+    my $keys = { @_ };
+    $self->debug ("start");
+
+    my @xpath   = @{$keys->{XPATH}};
+    my @counter = @{$keys->{COUNTER}};
+
+    ## put the last element into the new path
+
+    my @new_xpath   = ($xpath[scalar @xpath -1]);
+    my @new_counter = ();
+    delete $xpath[scalar @xpath -1];
+    if (scalar @xpath < scalar @counter)
+    {
+        @new_counter = ($counter[scalar @xpath]);
+        delete $counter[scalar @xpath];
+    }
+
+    ## start scanning for a super attribute
+
+    $self->debug ("scanning for super attribute");
+    my $super = "";
+    while (not $super and scalar @xpath)
+    {
+        my $tmp_xpath   = [@xpath,   "super"];
+        my $tmp_counter = [@counter, 0];
+        $super = eval {$self->{CACHE}->get_xpath (XPATH   => $tmp_xpath,
+                                                  COUNTER => $tmp_counter)};
+        if ($EVAL_ERROR or not length $super)
+        {
+            ## go to the next element of the path
+            $super = "";
+            @new_xpath   = ($xpath[scalar @xpath -1], @new_xpath);
+            @new_counter = ($counter[scalar @counter -1], @new_counter);
+            delete $xpath[scalar @xpath -1];
+            delete $counter[scalar @counter -1];
+        } else {
+            ## found super reference, so nothing to do
+        }
+    }
+    if (not $super)
+    {
+        $super = "";
+        for (my $i=0; $i<scalar @new_xpath; $i++)
+        {
+            $super .= "/" if (length $super);
+            $super .= $new_xpath[$i]."[".$new_counter[$i]."]";
+        }
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND",
+            params  => {XPATH => $super});
+    }
+    if (exists $self->{SUPER_CACHE} and
+        exists $self->{SUPER_CACHE}->{$super})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_LOOP_BY_SUPER_FOUND",
+            params  => {"SUPER" => $super});
+    }
+    else
+    {
+        $self->{SUPER_CACHE}->{$super} = 1;
+    }
+    $self->debug ("super is $super");
+
+    ## build the new path prefix
+
+    my @super_list    = split /\//, $super;
+    my @super_xpath   = ();
+    my @super_counter = ();
+    foreach my $item (@super_list)
+    {
+        my $path = $item;
+        $path =~ s/\{.*$//;
+        @super_xpath = (@super_xpath, $path);
+        if ($item =~ /\{/)
+        {
+            ## determine the id
+            $item =~ s/^.*\{(.*)\}.*$/$1/;
+
+            ## how many possible jump targets exist?
+            my $count = $self->{CACHE}->get_xpath_count (
+                            XPATH   => [@super_xpath],
+                            COUNTER => [@super_counter]);
+
+            ## scan for the id
+            my $target = $count;
+            for (my $i=0; $i < $count; $i++)
+            {
+                my $id = eval {$self->get_xpath (XPATH   => [@super_xpath, "id"],
+                                                 COUNTER => [@super_counter, $i, 0])};
+                next if ($EVAL_ERROR);
+                next if ($id ne $item);
+                $target = $i;
+                $i = $count;
+            }
+            if ($target == $count)
+            {
+                ## jump id does not exist
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE",
+                    params  => {"SUPER" => $super});
+            }
+            @super_counter = (@super_counter, $target);
+        }
+        else
+        {
+            @super_counter = (@super_counter, 0);
+        }
+    }
+    $self->debug ("super_xpath is ".join "/", @super_xpath);
+    $self->debug ("super_counter is ".join "/", @super_counter);
+
+    ## concatenate the two paths
+
+    @super_xpath   = (@super_xpath,   @new_xpath);
+    @super_counter = (@super_counter, @new_counter);
+    $self->debug ("new xpath is ".join "/", @super_xpath);
+    $self->debug ("new counter is ".join "/", @super_counter);
+
+    ## finished
+
+    return (XPATH => [@super_xpath], COUNTER => [@super_counter]);
+}
+
 1;
 __END__
 
@@ -148,6 +297,15 @@ allows several simplifications for the use of the XML cache. The second
 feature which will be implemented later is configuration inheritance.
 The configuration inheritance will allow you to inherit the
 configuration from other sections.
+
+=head1 Inheritance and Path Discovery
+
+We only implement a very simple inheritance algorithm. If we do not find
+a specified path then we go back this path until we find a super attribute
+in a XML tag. After this we start the question again with the path from
+the super attribute plus the original search path below the super
+attribute carrying tag. A simple loop detection which is based on the
+super attributes is present.
 
 =head1 Functions
 

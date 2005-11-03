@@ -33,19 +33,21 @@ sub new
     my $that  = shift;
     my $class = ref($that) || $that;
   
-    my $self = {};
+    my $self = {DEBUG => 0};
    
     bless $self, $class;
 
     my $keys = { @_ };
 
-    $self->{DEBUG}  = $keys->{DEBUG};
+    $self->{DEBUG}  = $keys->{DEBUG}  if ($keys->{DEBUG});
     $self->{config} = $keys->{CONFIG};
     $self->{schema} = $keys->{SCHEMA} if (exists $keys->{SCHEMA});
 
     return undef if (not $self->init ());
 
-    $self->debug("dump: ".$self->dump());
+#    use Data::Dumper;
+#    print STDERR Dumper($self->{cache});
+#    $self->debug("dump: ".$self->dump());
 
     return $self;
 }
@@ -84,6 +86,7 @@ sub init
     $self->{xs} = XML::Simple->new (ForceArray    => 1,
                                     ForceContent  => 1,
                                     SuppressEmpty => undef,
+                                    KeyAttr       => [],
                                     KeepRoot      => 1);
 
     delete $self->{cache} if (exists $self->{cache});
@@ -309,14 +312,33 @@ sub get_xpath
     my $item = $self->{cache};
     for (my $i=0; $i<scalar @{$keys->{XPATH}}; $i++)
     {
+#        print STDERR "XPATH: ".$keys->{XPATH}->[$i]."\n";
+#        print STDERR "COUNTER: ".$keys->{COUNTER}->[$i]."\n";
+#        print STDERR "length ok\n" if ($i+1 == scalar @{$keys->{XPATH}});
+#        print STDERR "exists ok\n" if (exists $item->{$keys->{XPATH}->[$i]});
+#        print STDERR "no ref ok\n" if (not ref $item->{$keys->{XPATH}->[$i]});
+#        print STDERR "counter ok\n" if ($keys->{COUNTER}->[$i] == 0);
         if (not exists $item->{$keys->{XPATH}->[$i]} or
+            not ref $item->{$keys->{XPATH}->[$i]} or
             not exists $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]])
         {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT",
-                params  => {"XPATH" =>    $self->__get_serialized_xpath($keys),
-                            "TAG"   =>    $keys->{XPATH}->[$i],
-                            "POSITION" => $keys->{COUNTER}->[$i]});
+            if ($i+1 == scalar @{$keys->{XPATH}} and
+                exists $item->{$keys->{XPATH}->[$i]} and
+                not ref $item->{$keys->{XPATH}->[$i]} and
+                $keys->{COUNTER}->[$i] == 0)
+            {
+                ## this is an attribute request
+                $self->debug ("attribute request: ".$item->{$keys->{XPATH}->[$i]});
+                return $item->{$keys->{XPATH}->[$i]};
+            }
+            else
+            {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT",
+                    params  => {"XPATH" =>    $self->__get_serialized_xpath($keys),
+                                "TAG"   =>    $keys->{XPATH}->[$i],
+                                "POSITION" => $keys->{COUNTER}->[$i]});
+            }
         }
         $item = $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]];
     }
@@ -324,6 +346,7 @@ sub get_xpath
     {
         ## the tag is present but does not contain anything
         ## this is no error !
+        $self->debug ("no content");
         return "";
     }
     ## WARNING: you need a utf8 capable terminal to see the correct characters
@@ -369,8 +392,11 @@ sub get_xpath_count
     my $item = $self->{cache};
     for (my $i=0; $i<scalar @{$keys->{COUNTER}}; $i++)
     {
-        $item = $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]];
-        if (not $item)
+#        print STDERR "XPATH: ".$keys->{XPATH}->[$i]."\n";
+#        print STDERR "COUNTER: ".$keys->{COUNTER}->[$i]."\n";
+        if (not exists $item->{$keys->{XPATH}->[$i]} or
+            not ref $item->{$keys->{XPATH}->[$i]} or
+            not exists $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]])
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_MISSING_ELEMENT",
@@ -378,9 +404,14 @@ sub get_xpath_count
                             "TAG"      => $keys->{XPATH}->[$i],
                             "POSITION" => $keys->{COUNTER}->[$i]});
         }
+        $item = $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]];
     }
     $self->debug ("scan complete");
-    return 0 if (not exists $item->{$keys->{XPATH}->[scalar @{$keys->{COUNTER}}]});
+    if (not exists $item->{$keys->{XPATH}->[scalar @{$keys->{COUNTER}}]})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_NOTHING_FOUND");
+    }
     $self->debug ("at minimum one exists");
     $item = $item->{$keys->{XPATH}->[scalar @{$keys->{COUNTER}}]};
     ## this is a hack (internal feature) for get_xpath_list

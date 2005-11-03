@@ -18,8 +18,6 @@ sub get_command
     $self->set_tmpfile ("CONTENT" => $self->{TMP}."/${$}_content.pem");
     $self->set_tmpfile ("OUT"     => $self->{TMP}."/${$}_pkcs7.pem");
 
-    $self->{ENC_ALG} = "aes256" if (not exists $self->{ENC_ALG});
-
     my ($engine, $passwd, $keyform);
     if ($self->{PASSWD} or $self->{KEY})
     {
@@ -80,16 +78,6 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY");
     }
-    if ($self->{ENC_ALG} ne "aes256" and
-        $self->{ENC_ALG} ne "aes192" and
-        $self->{ENC_ALG} ne "aes128" and
-        $self->{ENC_ALG} ne "idea" and
-        $self->{ENC_ALG} ne "des3" and
-        $self->{ENC_ALG} ne "des")
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_WRONG_ENC_ALG");
-    }
 
     ## prepare data
 
@@ -108,7 +96,6 @@ sub get_command
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -outform PEM";
     $command .= " -certfile t/crypto/cacert.pem";
-    $command .= " -".$self->{ENC_ALG};
 
     if (defined $passwd)
     {
@@ -162,8 +149,6 @@ USE_ENGINE too.
 =item * KEY
 
 =item * PASSWD
-
-=item * ENC_ALG (optional)
 
 =item * DETACH (strip off the content from the resulting PKCS#7 structure)
 

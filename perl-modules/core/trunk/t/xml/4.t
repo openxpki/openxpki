@@ -6,16 +6,16 @@ use Test;
 use OpenXPKI::XML::Config;
 use Time::HiRes;
 
-BEGIN { plan tests => 3 };
+BEGIN { plan tests => 3, todo => [2] };
 
 print STDERR "SCHEMA VALIDATION\n";
 ok(1);
 
 ## create new object
-my $obj = OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                     CONFIG => "t/config.xml",
-                                     SCHEMA => "openxpki.xsd");
-if ($obj)
+my $obj = eval {OpenXPKI::XML::Config->new(DEBUG  => 0,
+                                           CONFIG => "t/config.xml",
+                                           SCHEMA => "openxpki.xsd")};
+if (not $EVAL_ERROR and $obj)
 {
     ok (1);
 } else {

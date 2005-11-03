@@ -1,51 +1,69 @@
-<schema xmlns="http://www.w3.org/2001/XMLSchema">
-<!-- this is the XML schema definition of OpenXPKI -->
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:xml="http://www.w3.org/XML/1998/namespace">
+  <xsd:import namespace="http://www.w3.org/XML/1998/namespace"
+              schemaLocation="http://www.w3.org/2001/03/xml.xsd"/>
+<!-- this is the XML schema definition of OpenXPKI               -->
+<!-- you can check this schema with the following command        -->
+<!-- xmllint -format -schema openxpki.xsd -xinclude t/config.xml -->
 
-  <element name="openxpki" type="openxpki_type"/>
+  <xsd:element name="openxpki" type="openxpki_type"/>
 
-  <complexType name="openxpki_type">
-    <element name="common" type="common_type"/>
-    <element name="token_config" type="token_config_type"/>
-  </complexType>
+  <xsd:complexType name="openxpki_type">
+    <xsd:sequence>
+      <xsd:element name="common" type="common_type"/>
+      <xsd:element name="pki_realm" type="pki_realm_type"/>
+    </xsd:sequence>
+  </xsd:complexType>
 
-  <complexType name="common_type">
-    <element name="database" type="database_type"/>
-  </complexType>
+  <xsd:complexType name="common_type">
+    <xsd:sequence>
+      <xsd:element name="database" type="database_type"/>
+      <xsd:element name="token_config" type="token_config_type"/>
+    </xsd:sequence>
+  </xsd:complexType>
 
   <!-- ====================== -->
   <!-- database configuration -->
   <!-- ========BEGIN========= -->
 
-  <complexType name="database_type">
-    <element name="debug"     type="debug_type"/>
-    <element name="type"      type="database_type_type"/>
-    <element name="name"      type="string"/>
-    <element name="host"      type="string"/>
-    <element name="port"      type="positiveInteger"/>
-    <element name="user"      type="token"/>
-    <element name="passwd"    type="string"/>
-    <element name="namespace" type="token"/>
-    <element name="environment" type="database_environment_type"/>
-  </complexType>
+  <xsd:complexType name="database_type">
+    <xsd:sequence>
+      <xsd:element name="debug"     type="debug_type"/>
+      <xsd:element name="type"      type="database_type_type"/>
+      <xsd:element name="name"      type="xsd:string"/>
+      <xsd:element name="host"      type="xsd:string"          minOccurs="0"/>
+      <xsd:element name="port"      type="xsd:positiveInteger" minOccurs="0"/>
+      <xsd:element name="user"      type="xsd:token"           minOccurs="0"/>
+      <xsd:element name="passwd"    type="xsd:string"          minOccurs="0"/>
+      <xsd:element name="namespace" type="xsd:token"           minOccurs="0"/>
+      <xsd:element name="environment" type="database_environment_type"/>
+    </xsd:sequence>
+    <xsd:attribute ref="xml:base"/>
+  </xsd:complexType>
   
-  <simpleType name="database_type_type">
-    <restriction base="xsd:token">
-      <enumeration value="DB2"/>
-      <enumeration value="MySQL"/>
-      <enumeration value="PostgreSQL"/>
-      <enumeration value="Oracle"/>
-      <enumeration value="SQLite"/>
-    </restriction>
-  </simpleType>
+  <xsd:simpleType name="database_type_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="DB2"/>
+      <xsd:enumeration value="MySQL"/>
+      <xsd:enumeration value="PostgreSQL"/>
+      <xsd:enumeration value="Oracle"/>
+      <xsd:enumeration value="SQLite"/>
+    </xsd:restriction>
+  </xsd:simpleType>
 
-  <complexType name="database_environment_type">
-    <element name="vendor" type="database_env_vendor_type"/>
-  </complexType>
+  <xsd:complexType name="database_environment_type">
+    <xsd:sequence>
+      <xsd:element name="vendor" type="database_env_vendor_type" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
 
-  <complexType name="database_env_vendor_type">
-    <element name="type"   type="database_type_type"/>
-    <element name="option" type="option_type" minOccurs="0" maxOccurs="unbounded"/>
-  </complexType>
+  <xsd:complexType name="database_env_vendor_type">
+    <xsd:sequence>
+      <xsd:element name="type"   type="database_type_type"/>
+      <xsd:element name="option" type="option_type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
 
   <!-- =========END========== -->
   <!-- database configuration -->
@@ -55,6 +73,29 @@
   <!-- PKI realm configuration -->
   <!-- =========BEGIN========= -->
 
+  <xsd:complexType name="pki_realm_type">
+    <xsd:all>
+      <xsd:element name="common" type="pki_realm_common_type"/>
+      <xsd:element name="ca"     type="ca_type"/>
+    </xsd:all>
+    <xsd:attribute name="name" type="xsd:string"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="pki_realm_common_type">
+    <xsd:sequence maxOccurs="unbounded">
+      <xsd:element name="token" type="token_type"/>
+    </xsd:sequence>
+    <xsd:attribute name="name" type="xsd:string"/>
+    <xsd:attribute ref="xml:base"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="ca_type">
+    <xsd:all>
+      <xsd:element   name="token" type="token_type"/>
+    </xsd:all>
+    <xsd:attribute name="name"  type="xsd:string"/>
+  </xsd:complexType>
+
   <!-- ==========END========== -->
   <!-- PKI realm configuration -->
   <!-- ======================= -->
@@ -63,25 +104,30 @@
   <!-- cryptographic token configuration -->
   <!-- ==============BEGIN============== -->
 
-  <complexType name="token_config_type">
-    <element name="token" type="token_type"/>
-  </complexType>
+  <xsd:complexType name="token_config_type">
+    <xsd:sequence maxOccurs="unbounded">
+      <xsd:element name="token" type="token_type"/>
+    </xsd:sequence>
+    <xsd:attribute ref="xml:base"/>
+  </xsd:complexType>
 
-  <complexType name="token_type">
-    <element name="name"      type="string"/>
-    <element name="pki_realm" type="string"/>
-    <element name="type"      type="string"/>
-    <element name="mode"      type="token_mode_type"/>
-    <element name="option"    type="option_type" minOccurs="0" maxOccurs="unbounded"/>
-  </complexType>
+  <xsd:complexType name="token_type">
+    <xsd:sequence minOccurs="0">
+      <xsd:element name="backend"   type="xsd:string"/>
+      <xsd:element name="mode"      type="token_mode_type"/>
+      <xsd:element name="option"    type="option_type" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute ref="super"/>
+    <xsd:attribute ref="id"/>
+  </xsd:complexType>
 
-  <simpleType name="token_mode_type">
-    <restriction base="xsd:token">
-      <enumeration value="standby"/>
-      <enumeration value="session"/>
-      <enumeration value="daemon"/>
-    </restriction>
-  </simpleType>
+  <xsd:simpleType name="token_mode_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="standby"/>
+      <xsd:enumeration value="session"/>
+      <xsd:enumeration value="daemon"/>
+    </xsd:restriction>
+  </xsd:simpleType>
 
   <!-- ===============END=============== -->
   <!-- cryptographic token configuration -->
@@ -91,20 +137,38 @@
   <!-- general definitions -->
   <!-- ======BEGIN======== -->
 
-  <complexType name="option_type">
-    <element name="name" type="string"/>
-    <element name="value" type="string"/>
-  </complexType>
+  <!-- this is a path for the configuration inheritance        -->
+  <!-- the value has the following format:                     -->
+  <!-- "openxpki/common/token_config/token{CA}/"               -->
+  <!-- we always assume that there is only one element         -->
+  <!-- if there are more than one element then we use          -->
+  <!-- the id attribute                                        -->
+  <!-- <token id="ca">                                         -->
+  <!-- ..                                                      -->
+  <!-- </token>                                                -->
+  <!-- ..                                                      -->
+  <!-- <token super="common/token_config/token{ca}"> -->
+  <!-- ..                                                      -->
+  <!-- </token>                                                -->
+  <xsd:attribute name="super" type="xsd:string"/>
+  <xsd:attribute name="id"     type="xsd:string"/>
 
-  <simpleType name="debug_type">
-    <restriction base="xsd:token">
-      <enumeration value="0"/> <!-- on  -->
-      <enumeration value="1"/> <!-- off -->
-    </restriction>
-  </simpleType>
+  <xsd:complexType name="option_type">
+    <xsd:sequence>
+      <xsd:element name="name" type="xsd:string"/>
+      <xsd:element name="value" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="debug_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="0"/> <!-- on  -->
+      <xsd:enumeration value="1"/> <!-- off -->
+    </xsd:restriction>
+  </xsd:simpleType>
 
   <!-- =======END========= -->
   <!-- general definitions -->
   <!-- =================== -->
 
-</schema>
+</xsd:schema>
