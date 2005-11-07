@@ -56,8 +56,10 @@ our %COLUMN = (
                "format"           => "TEXT",
                "data"             => "LONGTEXT",
 
-               "external_ca"      => "TEXT_KEY",
-               "internal_ca"      => "TEXT_KEY",
+               "pki_realm"        => "TEXT_KEY",
+               "ca_name"          => "TEXT_KEY",
+               "issuer_name"      => "TEXT_KEY",
+               "issuer_realm"     => "TEXT_KEY",
 
                "cert_key"         => "NUMERIC",
                "req_key"          => "BIGINT",

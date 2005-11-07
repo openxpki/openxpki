@@ -24,6 +24,8 @@ our %SEQUENCE = (
 our %COLUMN = (
                PKI_REALM             => "pki_realm",
                CA                    => "ca_name",
+               ISSUER                => "issuer_name",
+               ISSUER_REALM          => "issuer_realm",
 
                SUBMIT_DATE           => "submit_date",
                TYPE                  => "format",
@@ -83,6 +85,12 @@ our %COLUMN = (
               );
 
 our %TABLE = (
+    CA => {
+        NAME    => "ca",
+        INDEX   => [ "PKI_REALM", "CA" ],
+        COLUMNS => [ "PKI_REALM", "CA",
+                     "CERTIFICATE_SERIAL", "ISSUER", "ISSUER_REALM"
+                   ]},
     CSR => {
         NAME    => "request",
         INDEX   => [ "PKI_REALM", "CSR_SERIAL" ],
@@ -264,3 +272,89 @@ sub set_namespace
 }
 
 1;
+__END__
+
+=head1 Description
+
+The major job of this class is to define and manage the schema
+of the OpenXPKI database backend. This means that this class
+has no real internal logic. It only implements several functions
+to provide the other database classes with informations about
+the database schema.
+
+=head1 Functions
+
+=head2 Constructor
+
+=head3 new
+
+The constructor does not support any parameters. Even DEBUG is
+not supported.
+
+=head2 Column informations
+
+=head3 get_column
+
+returns the native SQL column name for a given column name.
+
+Example:  $schema->get_column ("CERTIFICATE_SERIAL");
+
+=head2 Table informations
+
+=head3 get_tables
+
+returns all available table names (these are not the native SQL
+table names).
+
+=head3 get_table_name
+
+returns the native SQL table name for a given table name.
+
+=head3 get_table_index
+
+returns an ARRAY reference to the columns which build the index of
+the specified table.
+
+=head3 get_table_columns
+
+returns an ARRAY reference to the columns which are in
+the specified table.
+
+=head2 Sequence informations
+
+=head3 get_sequences
+
+returns all available sequence names (these are not the native SQL
+sequence names).
+
+=head3  get_sequence_name
+
+returns the native SQL sequence name for a given sequence name.
+
+=head2 Index informations
+
+=head3 get_indexes
+
+returns all available index names (these are not the native SQL
+index names).
+
+=head3  get_index_name
+
+returns the native SQL index name for a given index name.
+
+=head3 get_index_table
+
+returns the table where an index is placed on.
+
+=head3 get_index_columns
+
+returns the columns which are used for an index.
+
+=head2 Namespace handling
+
+=head3 set_namespace
+
+This is the only function where something is manipulated in the schema
+during runtime. The namespace can be configured to seperate some users
+inside the same database management system. The result is that all tables
+are prefixed by the namespace.

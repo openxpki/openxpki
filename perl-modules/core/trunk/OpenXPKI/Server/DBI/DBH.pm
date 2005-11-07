@@ -2,6 +2,7 @@
 ##
 ## Written by Michael Bell for the OpenXPKI project
 ## Copyright (C) 2005 by The OpenXPKI Project
+## $Revision: 1.6 $
 
 use strict;
 use warnings;
@@ -15,28 +16,6 @@ use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::Driver;
 
 our ($errno, $errval);
-
-## $Revision: 1.6 $
-
-=head1 Description
-
-This module is the only module which uses Perl's DBI.
-It manages all database interaction.
-
-=head1 General Functions
-
-=head2 new
-
-is the constructor.
-The DEBUG flag is optional. All other parameters identical
-with the ones of OpenXPKI::Server::DBI::Driver because OpenXPKI::Server::DBI::DBH
-instanciates the driver for the specific database. Please
-check the driver documentation (OpenXPKI::Server::DBI::Driver)
-for more informations.
-
-You should add SERVER_ID and SERVER_SHIFT to the configuration.
-
-=cut
 
 sub new
 {
@@ -92,14 +71,6 @@ sub set_log_ref
 
 #######################################################################
 
-=head1 DBI related Functions
-
-=head2 connect
-
-has no parameters and starts a new database connection.
-
-=cut
-
 sub connect
 {
     my $self = shift;
@@ -135,12 +106,6 @@ sub connect
     return 1;
 }
 
-=head2 disconnect
-
-has no parameters and disconnects from the database.
-
-=cut
-
 sub disconnect
 {
     my $self = shift;
@@ -155,16 +120,6 @@ sub disconnect
 }
 
 #######################################################################
-
-=head2 do_query
-
-executes a query with the specified parameters. The query is defined
-in QUERY and the parameters must be as an array reference in the
-parameter BIND_VALUES. Please note that the value of QUERY is
-cached by the relating DBD driver. So please never put any
-dynamical parameters into the query.
-
-=cut
 
 sub do_query
 {
@@ -259,25 +214,12 @@ sub do_query
 
 #######################################################################
 
-=head2 get_next_sth
-
-returns the ID of the next statement handle. This cam be used to
-finish a statement handle explicitly via finish_sth.
-
-=cut
-
 sub get_next_sth
 {
     my $self = shift;
     return 0 if (not $self->{STH});
     return scalar @{$self->{STH}};
 }
-
-=head2 get_sth
-
-get the last statement handle or the specified statement handle.
-
-=cut
 
 sub get_sth
 {
@@ -288,13 +230,6 @@ sub get_sth
     return undef if (not exists $self->{STH}[$count]);
     return $self->{STH}[$count];
 }
-
-=head2 finish_sth
-
-finish the last statement or the specified statement. This is
-majorly a memory cleanup.
-
-=cut
 
 sub finish_sth
 {
@@ -314,12 +249,6 @@ sub finish_sth
 }
 
 #######################################################################
-
-=head2 rollback
-
-rollbacks an open transaction. No parameters.
-
-=cut
 
 sub rollback
 {
@@ -347,12 +276,6 @@ sub rollback
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_ROLLBACK_FAILED");
     }
 }
-
-=head2 commit
-
-commits an open transaction. No parameters.
-
-=cut
 
 sub commit
 {
@@ -382,14 +305,6 @@ sub commit
 
 #######################################################################
 
-=head2 get_new_serial
-
-is directly mapped to OpenXPKI::Server::DBI::Driver->get_new_serial
-The serial is processed after it is returned from the driver
-via the configuration parameters SERVER_ID and SERVER_SHIFT.
-
-=cut
-
 sub get_new_serial
 {
     my $self = shift;
@@ -410,23 +325,11 @@ sub get_new_serial
     return $serial;
 }
 
-=head2 sequence_exists
-
-is directly mapped to OpenXPKI::Server::DBI::Driver->sequence_exists
-
-=cut
-
 sub sequence_exists
 {
     my $self = shift;
     return $self->{driver}->sequence_exists(DBH => $self, @_);
 }
-
-=head2 create_sequence
-
-is directly mapped to OpenXPKI::Server::DBI::Driver->create_sequence
-
-=cut
 
 sub create_sequence
 {
@@ -434,23 +337,11 @@ sub create_sequence
     return $self->{driver}->create_sequence(DBH => $self, @_);
 }
 
-=head2 column_is_numeric
-
-is directly mapped to OpenXPKI::Server::DBI::Driver->column_is_numeric
-
-=cut
-
 sub column_is_numeric
 {
     my $self = shift;
     return $self->{driver}->column_is_numeric(@_);
 }
-
-=head2 column_is_string
-
-is directly mapped to OpenXPKI::Server::DBI::Driver->column_is_string
-
-=cut
 
 sub column_is_string
 {
@@ -459,13 +350,6 @@ sub column_is_string
 }
 
 #######################################################################
-
-=head1 Desctructor DESTROY
-
-rollbacks and finishs all open statement handles. Finally it disconnects
-from the database if a connection is still open.
-
-=cut
 
 sub DESTROY {
     my $self = shift;
@@ -485,10 +369,105 @@ sub DESTROY {
     $self->{DBH}->disconnect () if (exists $self->{DBH} and $self->{DBH});
 }
 
+1;
+__END__
+
+=head1 Description
+
+This module is the only module which uses Perl's DBI.
+It manages all database interaction.
+
+=head1 General Functions
+
+=head2 new
+
+is the constructor.
+The DEBUG flag is optional. All other parameters identical
+with the ones of OpenXPKI::Server::DBI::Driver because OpenXPKI::Server::DBI::DBH
+instanciates the driver for the specific database. Please
+check the driver documentation (OpenXPKI::Server::DBI::Driver)
+for more informations.
+
+You should add SERVER_ID and SERVER_SHIFT to the configuration.
+
+=head2 set_session_id
+
+configure the session ID which is used for logging.
+
+=head2 set_log_ref
+
+configure the instance of a logging class to support logging.
+This is necessary because the database module is one of the core
+modules which will be initialized first.
+
+=head1 DBI related Functions
+
+=head2 connect
+
+has no parameters and starts a new database connection.
+
+=head2 disconnect
+
+has no parameters and disconnects from the database.
+
+=head2 do_query
+
+executes a query with the specified parameters. The query is defined
+in QUERY and the parameters must be as an array reference in the
+parameter BIND_VALUES. Please note that the value of QUERY is
+cached by the relating DBD driver. So please never put any
+dynamical parameters into the query.
+
+=head2 get_next_sth
+
+returns the ID of the next statement handle. This cam be used to
+finish a statement handle explicitly via finish_sth.
+
+=head2 get_sth
+
+get the last statement handle or the specified statement handle.
+
+=head2 finish_sth
+
+finish the last statement or the specified statement. This is
+majorly a memory cleanup.
+
+=head2 rollback
+
+rollbacks an open transaction. No parameters.
+
+=head2 commit
+
+commits an open transaction. No parameters.
+
+=head2 get_new_serial
+
+is directly mapped to OpenXPKI::Server::DBI::Driver->get_new_serial
+The serial is processed after it is returned from the driver
+via the configuration parameters SERVER_ID and SERVER_SHIFT.
+
+=head2 sequence_exists
+
+is directly mapped to OpenXPKI::Server::DBI::Driver->sequence_exists
+
+=head2 create_sequence
+
+is directly mapped to OpenXPKI::Server::DBI::Driver->create_sequence
+
+=head2 column_is_numeric
+
+is directly mapped to OpenXPKI::Server::DBI::Driver->column_is_numeric
+
+=head2 column_is_string
+
+is directly mapped to OpenXPKI::Server::DBI::Driver->column_is_string
+
+=head1 Desctructor DESTROY
+
+rollbacks and finishs all open statement handles. Finally it disconnects
+from the database if a connection is still open.
+
 =head1 See also
 
 DBI, OpenXPKI::Server::DBI::Driver and OpenXPKI::Server::DBI::Schema
 
-=cut
-
-1;

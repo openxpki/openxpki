@@ -1,25 +1,9 @@
 ## OpenXPKI::Server::DBI
 ##
+## Written by Michael Bell for the OpenXPKI project
 ## Copyright (C) 2005 by The OpenXPKI Project
-##
+## $Revision: 1.163 $
  
-=head1 Design
-
-User ----------------------+
-                           |
-                           |
-       +----------------- DBI ---------------+
-       |                /  |  \              |
-       |              /    |    \            |
-    Object ----> Hash ----------> SQL ----> DBH ----> Database
-         \            \    |    /         /  |
-           \            \  |  /         /    |
-             ---------- Schema --------    Driver
-
-FIXME: THE EXPIRED HANDLING IS STILL NOT PORTED FROM THE OLD CODE.
-
-=cut
-
 use strict;
 use warnings;
 
@@ -35,8 +19,6 @@ use OpenXPKI::Server::DBI::Object;
 our ($errno, $errval);
 
 ## the other use directions depends from the used databases
-
-## $Revision: 1.163 $
 
 ($OpenXPKI::Server::DBI::VERSION = '$Revision: 1.163 $' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg; 
 
@@ -245,13 +227,6 @@ sub commit
 
 ########################################################################
 
-=head3 get_driver_name
-
-returns the name of driver.
-This is actually necessary for OpenXPKI::Server::Log::Appender::DBI.
-
-=cut
-
 sub get_driver_name
 {
     my $self = shift;
@@ -260,21 +235,6 @@ sub get_driver_name
 
 ########################################################################
 
-=head2 SQL write operations
-
-=head3 get_new_serial
-
-This function returns a new serial number for a requested objecttype.
-Usually you only specify the TABLE and get a new serial. If you
-need a serial for a CRL then you can simply count the CRLs
-to get the next serial. This function uses SQL sequence generators.
-
-Example:
-
-C<my $serial = $dbi->get_new_serial (TABLE =<lt> "CSR");
-
-=cut
-
 sub get_new_serial
 {
     my $self = shift;
@@ -282,17 +242,6 @@ sub get_new_serial
 }
 
 ########################################################################
-
-=head3 insert
-
-insert can be used in two way - object or hash based. If you specify
-a HASH reference then a hash is inserted. If you specify an
-OBJECT then the object oriented way is used.
-
-Example:
-
-my $result = $dbi->insert (TABLE => "DATA", HASH => $data);
-=cut
 
 sub insert
 {
@@ -314,24 +263,6 @@ sub insert
 
 ########################################################################
 
-=head3 update
-
-update can be used in two ways - object or hash based. If you specify an
-OBJECT then the object oriented way is used. Otherwise a hash oriented
-update is assumed.
-
-Please note that you must specify the where clause for an hash oriented
-update. The background is that the hash based interface supports mass
-updates. If the where clause is missing then we start an index scan
-on the parameter DATA.
-
-Example:
-
-my $result = $dbi->update (TABLE => "CSR", DATA => $data, WHERE => $index);
-my $result = $dbi->update (TABLE => "CSR", DATA => $data);
-
-=cut
-
 sub update
 {
     my $self = shift;
@@ -351,14 +282,6 @@ sub update
 
 ########################################################################
 
-=head3 delete
-
-This fucntion maps directly to the SQL layer. So please check the
-documentation of OpenXPKI::Server::DBI::SQL for a desription of the delete
-function.
-
-=cut
-
 sub delete
 {
     my $self = shift;
@@ -368,20 +291,6 @@ sub delete
 
 ########################################################################
 ########################################################################
-
-=head2 select based functionality
-
-We have several functions which use the select function but
-hide some complexity from the user.
-
-=head3 select
-
-implements an access method to the SQL select operation. Please
-look at OpenXPKI::Server::DBI::SQL to get an overview about the available
-query options. Please specify C<MODE =<gt> "OBJECT"> if you want
-an object instead of a hash reference per result.
-
-=cut
 
 sub select
 {
@@ -397,18 +306,6 @@ sub select
     }
 }
 
-=head3 get
-
-returns the result of a select. The important thing is that
-the SQL query only returns one row of the table. If the query uses
-a unique index then there can be only one result otherwise only
-the first result is returned. This means that the function has the
-exact same behaviour like first. It is only a psychological aspect
-that get usually includes a parameter for the SERIAL and first
-usually does not include a parameter with the serial.
-
-=cut
-
 sub get
 {
     my $self = shift;
@@ -416,13 +313,6 @@ sub get
     return undef if (not defined $result);
     return $result->[0];
 }
-
-=head3 first
-
-returns the first result of a select. The important thing is that
-the SQL query only returns one row of the table.
-
-=cut
 
 sub first
 {
@@ -432,13 +322,6 @@ sub first
     return $result->[0];
 }
 
-=head3 last
-
-returns the last result of a select. The important thing is that
-the SQL query only returns one row of the table.
-
-=cut
-
 sub last
 {
     my $self = shift;
@@ -446,13 +329,6 @@ sub last
     return undef if (not defined $result);
     return $result->[0];
 }
-
-=head3 next
-
-returns the next result of a select. The important thing is that
-the SQL query only returns one row of the table.
-
-=cut
 
 sub next
 {
@@ -463,13 +339,6 @@ sub next
     return undef if (not defined $result);
     return $result->[0];
 }
-
-=head3 prev
-
-returns the prev result of a select. The important thing is that
-the SQL query only returns one row of the table.
-
-=cut
 
 sub prev
 {
@@ -501,10 +370,195 @@ sub __extract_serial_from_params
 
 # If a DESTROY does nothing then do not define it.
 
+1;
+__END__
+
+=head1 Design
+
+User ----------------------+
+                           |
+                           |
+       +----------------- DBI ---------------+
+       |                /  |  \              |
+       |              /    |    \            |
+    Object ----> Hash ----------> SQL ----> DBH ----> Database
+         \            \    |    /         /  |
+           \            \  |  /         /    |
+             ---------- Schema --------    Driver
+
+FIXME: THE EXPIRED HANDLING IS STILL NOT PORTED FROM THE OLD CODE.
+
+=head1 Functions
+
+=head2 Instance Initialization
+
+=head3 new
+
+is the constructor. It supports DEBUG and CRYPTO as general parameters.
+DEBUG can be a true or false value and is false by default. CRYPTO
+is a required parameter and must be a crypto token which is able to
+parse certificates. The token must support the function which are
+required by the crypto objects. The TYPE is the last parameters which
+is understand by the module itself. It must be a valid
+OpenXPKI::Server::DBI::Driver class name. All other parameters are
+directly handled by the corresponding drivers. The following
+parameters are supported:
+
+=over
+
+=item * HOST
+
+=item * PORT
+
+=item * NAME
+
+=item * USER
+
+=item * PASSWD
+
+=item * NAMESPACE
+
+=item * SERVER_ID
+
+=item * SERVER_SHIFT
+
+=back
+
+Please remember that not all drivers can handle all parameters.
+
+=head3 set_session_id
+
+configure the session ID which is used for logging.
+
+=head3 set_log_ref
+
+configure the instance of a logging class to support logging.
+This is necessary because the database module is one of the core
+modules which will be initialized first.
+
+=head3 get_driver_name
+
+returns the name of driver.
+This is actually necessary for OpenXPKI::Server::Log::Appender::DBI.
+
+=head2 Database Initialization
+
+=head3 schema_exists
+
+returns true if the database is already (partly) initialized.
+
+=head3 init_schema
+
+initializes the database. If the parameter MODE is used and the value
+is DRYRUN then the function returns the SQL statements which are usually
+executed during an initialization.
+
+=head2 Transaction handling
+
+=head3 connect
+
+initiates the database connection.
+
+=head3 disconnect
+
+cuts the database connection.
+
+=head3 commit
+
+commits an active transaction.
+
+=head3 rollback
+
+aborts an active transaction.
+
+=head2 SQL write operations
+
+=head3 get_new_serial
+
+This function returns a new serial number for a requested objecttype.
+Usually you only specify the TABLE and get a new serial. If you
+need a serial for a CRL then you can simply count the CRLs
+to get the next serial. This function uses SQL sequence generators.
+
+Example:
+
+C<my $serial = $dbi->get_new_serial (TABLE =<lt> "CSR");
+
+=head3 insert
+
+insert can be used in two way - object or hash based. If you specify
+a HASH reference then a hash is inserted. If you specify an
+OBJECT then the object oriented way is used.
+
+Example:
+
+my $result = $dbi->insert (TABLE => "DATA", HASH => $data);
+
+=head3 update
+
+update can be used in two ways - object or hash based. If you specify an
+OBJECT then the object oriented way is used. Otherwise a hash oriented
+update is assumed.
+
+Please note that you must specify the where clause for an hash oriented
+update. The background is that the hash based interface supports mass
+updates. If the where clause is missing then we start an index scan
+on the parameter DATA.
+
+Example:
+
+my $result = $dbi->update (TABLE => "CSR", DATA => $data, WHERE => $index);
+my $result = $dbi->update (TABLE => "CSR", DATA => $data);
+
+=head3 delete
+
+This fucntion maps directly to the SQL layer. So please check the
+documentation of OpenXPKI::Server::DBI::SQL for a desription of the delete
+function.
+
+=head2 select based functionality
+
+We have several functions which use the select function but
+hide some complexity from the user.
+
+=head3 select
+
+implements an access method to the SQL select operation. Please
+look at OpenXPKI::Server::DBI::SQL to get an overview about the available
+query options. Please specify C<MODE =<gt> "OBJECT"> if you want
+an object instead of a hash reference per result.
+
+=head3 get
+
+returns the result of a select. The important thing is that
+the SQL query only returns one row of the table. If the query uses
+a unique index then there can be only one result otherwise only
+the first result is returned. This means that the function has the
+exact same behaviour like first. It is only a psychological aspect
+that get usually includes a parameter for the SERIAL and first
+usually does not include a parameter with the serial.
+
+=head3 first
+
+returns the first result of a select. The important thing is that
+the SQL query only returns one row of the table.
+
+=head3 last
+
+returns the last result of a select. The important thing is that
+the SQL query only returns one row of the table.
+
+=head3 next
+
+returns the next result of a select. The important thing is that
+the SQL query only returns one row of the table.
+
+=head3 prev
+
+returns the prev result of a select. The important thing is that
+the SQL query only returns one row of the table.
+
 =head1 See also
 
 OpenXPKI::Server::DBI::Object, OpenXPKI::Server::DBI::Hash, OpenXPKI::Server::DBI::DBH and OpenXPKI::Server::DBI::Schema
 
-=cut
-
-1;

@@ -5,20 +5,6 @@ use OpenXPKI qw(debug);
 use OpenXPKI::Server::DBI::SQL;
 use OpenXPKI::Server::DBI::Schema;
 
-=head1 Description
-
-The Hash module of OpenXPKI::Server::DBI implements the hash interface
-of the database.
-
-=head1 General Functions
-
-=head2 new
-
-is the constructor. It needs at minimum SQL with an instance
-of OpenXPKI::Server::DBI::SQL.  You can specify optionally DEBUG.
-
-=cut
-
 sub new
 {
     shift;
@@ -45,17 +31,6 @@ sub set_log_ref
 
 ########################################################################
 
-=head1 SQL related Functions
-
-=head2 insert
-
-inserts the columns which are found in the parameter HASH which is
-a hash reference into the table which is specififed with TABLE. The
-column TABLE_SERIAL is automatically set to HASH->{KEY} if it is not
-specified explicitly.
-
-=cut
-
 sub insert
 {
     my $self = shift;
@@ -77,18 +52,6 @@ sub insert
 }
 
 ########################################################################
-
-=head2 update
-
-updates the columns which are found in the parameter DATA which is
-a hash reference into the table which is specififed with TABLE. The
-column TABLE_SERIAL is automatically set to DATA->{KEY} if it is not
-specified explicitly. WHERE is a hash reference too and includes
-the filter of the update operation. All parameters are required.
-If WHERE is missing then we process one from the index of the table
-and the DATA parameter.
-
-=cut
 
 sub update
 {
@@ -124,16 +87,6 @@ sub update
 
 ########################################################################
 
-=head2 select
-
-implements an access method to the SQL select operation. Please
-look at OpenXPKI::Server::DBI::SQL to get an overview about the available
-query options.
-
-The function returns a reference to an array of hashes or undef on error.
-
-=cut
-
 sub select
 {
     my $self = shift;
@@ -159,20 +112,6 @@ sub select
 }
 
 ########################################################################
-
-=head2 __log_write_action
-
-Parameters are TABLE, MODE and HASH.
-MODE is update or insert.
-HASH is the inserted or updated HASH which must include the index.
-
-The function logs the write operations and creates or updates
-the entries in the dataexchange table.
-
-Never call this function from outside the module. It is fully internal and
-highly critical for the whole infrastructure.
-
-=cut
 
 sub __log_write_action
 {
@@ -255,10 +194,71 @@ sub __log_write_action
 
 ########################################################################
 
+1;
+__END__
+
+=head1 Description
+
+The Hash module of OpenXPKI::Server::DBI implements the hash interface
+of the database.
+
+=head1 General Functions
+
+=head2 new
+
+is the constructor. It needs at minimum SQL with an instance
+of OpenXPKI::Server::DBI::SQL.  You can specify optionally DEBUG.
+
+=head2 set_session_id
+
+configure the session ID which is used for logging.
+
+=head2 set_log_ref
+
+configure the instance of a logging class to support logging.
+This is necessary because the database module is one of the core
+modules which will be initialized first.
+
+=head1 SQL related Functions
+
+=head2 insert
+
+inserts the columns which are found in the parameter HASH which is
+a hash reference into the table which is specififed with TABLE. The
+column TABLE_SERIAL is automatically set to HASH->{KEY} if it is not
+specified explicitly.
+
+=head2 update
+
+updates the columns which are found in the parameter DATA which is
+a hash reference into the table which is specififed with TABLE. The
+column TABLE_SERIAL is automatically set to DATA->{KEY} if it is not
+specified explicitly. WHERE is a hash reference too and includes
+the filter of the update operation. All parameters are required.
+If WHERE is missing then we process one from the index of the table
+and the DATA parameter.
+
+=head2 select
+
+implements an access method to the SQL select operation. Please
+look at OpenXPKI::Server::DBI::SQL to get an overview about the available
+query options.
+
+The function returns a reference to an array of hashes or undef on error.
+
+=head2 __log_write_action
+
+Parameters are TABLE, MODE and HASH.
+MODE is update or insert.
+HASH is the inserted or updated HASH which must include the index.
+
+The function logs the write operations and creates or updates
+the entries in the dataexchange table.
+
+Never call this function from outside the module. It is fully internal and
+highly critical for the whole infrastructure.
+
 =head1 See also
 
 OpenXPKI::Server::DBI::SQL and OpenXPKI::Server::DBI::Schema
 
-=cut
-
-1;
