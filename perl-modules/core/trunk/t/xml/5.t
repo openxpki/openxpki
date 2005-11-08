@@ -6,7 +6,7 @@ use Test;
 use OpenXPKI::XML::Config;
 use Time::HiRes;
 
-BEGIN { plan tests => 5 };
+BEGIN { plan tests => 6 };
 
 print STDERR "CONFIGURATION INHERITANCE\n";
 ok(1);
@@ -47,6 +47,23 @@ if ($EVAL_ERROR)
 } else {
     ok(0);
     print STDERR "Error: no exception thrown on wrong path\n";
+}
+
+## validate with xmllint
+my $result = `xmllint -format -schema openxpki.xsd -xinclude t/config.xml 2>&1 1>/dev/null`;
+if ($CHILD_ERROR)
+{
+    ok(0);
+    print STDERR "Error: there is something wrong with xmllint (${CHILD_ERROR}: ${EVAL_ERROR})\n";
+} else {
+    $result =~ s/^(.*\n)?([^\n]+)\n?$/$2/s;
+    if ($result eq "t/config.xml validates")
+    {
+        ok(1);
+    } else {
+        ok(0);
+        print STDERR "xmllint reports some trouble with t/config.xml and openxpki.xsd\n";
+    }
 }
 
 1;

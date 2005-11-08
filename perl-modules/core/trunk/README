@@ -12,4 +12,4 @@ to make a better maintenance. If you do not like the style or
 you have an idea to improve the style then please start a
 discussion on our developer list.
 
-perltidy -b `find . -name "*.pm" | grep -v "/\.svn"`
+perltidy --profile=perltidyrc -b `find . -name "*.pm" | grep -v "/\.svn"`
