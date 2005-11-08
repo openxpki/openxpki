@@ -82,6 +82,9 @@ OpenXPKI/Server/DBI/Driver/SQLite.pm
 
 t/config.xml
 
+t/base/01.t
+t/base/02.t
+
 t/crypto/01.t
 t/crypto/10.t
 t/crypto/11.t
