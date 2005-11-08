@@ -24,8 +24,8 @@ our %SEQUENCE = (
 our %COLUMN = (
                PKI_REALM             => "pki_realm",
                CA                    => "ca_name",
-               ISSUER                => "issuer_name",
-               ISSUER_REALM          => "issuer_realm",
+               ISSUING_CA            => "issuing_ca",
+               ISSUING_PKI_REALM     => "issuing_pki_realm",
 
                SUBMIT_DATE           => "submit_date",
                TYPE                  => "format",
@@ -89,7 +89,7 @@ our %TABLE = (
         NAME    => "ca",
         INDEX   => [ "PKI_REALM", "CA" ],
         COLUMNS => [ "PKI_REALM", "CA",
-                     "CERTIFICATE_SERIAL", "ISSUER", "ISSUER_REALM"
+                     "CERTIFICATE_SERIAL", "ISSUING_CA", "ISSUING_PKI_REALM"
                    ]},
     CSR => {
         NAME    => "request",
@@ -281,6 +281,29 @@ of the OpenXPKI database backend. This means that this class
 has no real internal logic. It only implements several functions
 to provide the other database classes with informations about
 the database schema.
+
+=head1 Database Schema
+
+=head2 The CA table
+
+The CA table is used to define a CA. Sounds simple? Yes, but it is a little
+bit tricky. A certificate is identified via the primary key of the
+certificate table. This primary key consists of the PKI realm, the name of
+the issuing CA and the serial of the certificate. If such a certificate is
+used as a CA certificate then we must associated this CA with a PKI realm
+and we must give the CA a symbolic name.
+
+If you want to interpret the table in a semantical manner then the table is
+a connector which defines CAs inside of a PKI realm and connects certificates
+with this CA. The same CA name is used by the token configuration.
+
+=head2 GLOBAL_ID
+
+The GLOBAL_ID is more or less a KEY_ID. It is used to identify all objects
+which are related to one key. This is for example necessary to identify all
+related objects if a revocation starts because of a key compromise.
+
+FIXME: should we rename the GLOBAL_ID to KEY_ID?
 
 =head1 Functions
 

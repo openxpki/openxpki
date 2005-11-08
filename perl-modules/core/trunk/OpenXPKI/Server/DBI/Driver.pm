@@ -58,8 +58,8 @@ our %COLUMN = (
 
                "pki_realm"        => "TEXT_KEY",
                "ca_name"          => "TEXT_KEY",
-               "issuer_name"      => "TEXT_KEY",
-               "issuer_realm"     => "TEXT_KEY",
+               "issuing_ca"       => "TEXT_KEY",
+               "issuing_pki_realm"=> "TEXT_KEY",
 
                "cert_key"         => "NUMERIC",
                "req_key"          => "BIGINT",
