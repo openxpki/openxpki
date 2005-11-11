@@ -8,26 +8,28 @@
 % if ($section eq 'mirrors') {
         <div class="menu_sub_item"><a href="<& /lib/url.mas, 
 	  path => '/mirrors/www.html' &>">WWW</a></div>
-        <div class="menu_sub_item"><a href="<& /lib/url.mas, 
-	  path => '/mirrors/ftp.html' &>">FTP</a></div>
 % }
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/docs/index.html' &>">Docs</a></div>
+        <div class="menu_item"><a href="<& /lib/url.mas,
+          path => '/download/index.html' &>">Download</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
-	  path => '/download/index.html' &>">Download</a></div>
-% if ($section eq 'download') {
+	  path => '/legacy/index.html' &>">OpenCA Support</a></div>
+% if ($section eq 'legacy') {
+	<div class="menu_sub_item"><a href="<& /lib/url.mas,
+          path => '/legacy/docs.html' &>">Documentation</a></div>
         <div class="menu_sub_item"><a href="<& /lib/url.mas, 
 	  host => 'sourceforge.net',
-	  path => '/project/showfiles.php?group_id=20873' &>">Sourceforge</a></div>
+	  path => '/project/showfiles.php?group_id=20873' &>">OpenCA@Sourceforge</a></div>
         <div class="menu_sub_item"><a href="<& /lib/url.mas,
 	  scheme => 'ftp',       
 	  host => 'ftp.openca.org',
-	  path => '/pub/openca' &>">FTP</a></div>
+	  path => '/pub/openca' &>">ftp.openca.org</a></div>
         <div class="menu_sub_item"><a href="<& /lib/url.mas, 
-	  path => '/mirrors/ftp.html' &>">FTP Mirrors</a></div>
+	  path => '/legacy/ftp.html' &>">FTP Mirrors</a></div>
+        <div class="menu_sub_item"><a href="<& /lib/url.mas, 
+	  path => '/legacy/demo.html' &>">Demo Installations</a></div>
 % }
-        <div class="menu_item"><a href="<& /lib/url.mas, 
-	  path => '/demo/index.html' &>">Demo Installations</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/resources/index.html' &>">Resources</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
