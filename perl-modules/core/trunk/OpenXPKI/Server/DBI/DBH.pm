@@ -6,12 +6,12 @@
 
 use strict;
 use warnings;
+use utf8;
 
 package OpenXPKI::Server::DBI::DBH;
 
 use OpenXPKI qw(debug);
 use DBI;
-use utf8;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::Driver;
 
@@ -159,7 +159,8 @@ sub do_query
     ## have memory leaks otherwise
     ## notafter scans for expired or valid certs are a typical problem
     $self->debug ("prepare statement");
-    my $sth_nr = scalar (@{$self->{STH}});
+    my $sth_nr = 0;
+       $sth_nr = scalar (@{$self->{STH}}) if (exists $self->{STH} and $self->{STH});
     $self->debug ("statement nr.: ${sth_nr}");
     #FIXME: we expect clean database queries
     #if ($query =~ /[0-9]+/)
@@ -179,7 +180,7 @@ sub do_query
         $self->debug ("query: $query");
         $self->debug ("prepare returned undef");
         delete $self->{STH}[$sth_nr];
-        OpenXPKI::EXception->throw (
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_PREPARE_FAILED",
             params  => {"ERRNO"  => $self->{DBH}->err,
                         "ERRVAL" => $self->{DBH}->errstr,
@@ -337,6 +338,14 @@ sub create_sequence
     return $self->{driver}->create_sequence(DBH => $self, @_);
 }
 
+#######################################################################
+
+sub get_column_type
+{
+    my $self = shift;
+    return $self->{driver}->get_column_type(@_);
+}
+
 sub column_is_numeric
 {
     my $self = shift;
@@ -347,6 +356,12 @@ sub column_is_string
 {
     my $self = shift;
     return $self->{driver}->column_is_string(@_);
+}
+
+sub get_table_option
+{
+    my $self = shift;
+    return $self->{driver}->get_table_option(@_);
 }
 
 #######################################################################
@@ -454,13 +469,23 @@ is directly mapped to OpenXPKI::Server::DBI::Driver->sequence_exists
 
 is directly mapped to OpenXPKI::Server::DBI::Driver->create_sequence
 
-=head2 column_is_numeric
+=head2 Driver dependend schema infos
+
+=head3 get_column_type
+
+is directly mapped to OpenXPKI::Server::DBI::Driver->get_column_type
+
+=head3 column_is_numeric
 
 is directly mapped to OpenXPKI::Server::DBI::Driver->column_is_numeric
 
-=head2 column_is_string
+=head3 column_is_string
 
 is directly mapped to OpenXPKI::Server::DBI::Driver->column_is_string
+
+=head3 get_table_option
+
+is directly mapped to OpenXPKI::Server::DBI::Driver->get_table_option
 
 =head1 Desctructor DESTROY
 

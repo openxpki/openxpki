@@ -82,51 +82,58 @@ OpenXPKI/Server/DBI/Driver/SQLite.pm
 
 t/config.xml
 
-t/base/01.t
-t/base/02.t
+t/01_pod/1.t
+t/01_pod/1.t
+t/01_pod/2.t
 
-t/crypto/01.t
-t/crypto/10.t
-t/crypto/11.t
-t/crypto/12.t
-t/crypto/13.t
-t/crypto/20.t
-t/crypto/21.t
-t/crypto/22.t
-t/crypto/23.t
-t/crypto/30.t
-t/crypto/31.t
-t/crypto/32.t
-t/crypto/33.t
-t/crypto/34.t
-t/crypto/35.t
-t/crypto/40.t
-t/crypto/99.t
-t/crypto/certs/01.pem
-t/crypto/token.xml
-t/crypto/openssl.cnf
-t/crypto/ca_openssl.cnf
-t/crypto/common.pl
+t/05_base/01.t
+t/05_base/02.t
 
-t/dbi/01.t
-t/dbi/common.pl
-t/dbi/database.xml
+t/10_exception/1.t
 
-t/dn/1.t
-t/dn/2.t
-t/dn/3.t
+t/15_dn/1.t
+t/15_dn/2.t
+t/15_dn/3.t
 
-t/exception/1.t
+t/20_xml/1.t
+t/20_xml/2.t
+t/20_xml/3.t
+t/20_xml/4.t
+t/20_xml/5.t
+t/20_xml/test.xml
+t/20_xml/top.xml
+t/20_xml/sub.xml
 
-t/pod/1.t
-t/pod/2.t
+t/25_crypto/01.t
+t/25_crypto/10.t
+t/25_crypto/11.t
+t/25_crypto/12.t
+t/25_crypto/13.t
+t/25_crypto/20.t
+t/25_crypto/21.t
+t/25_crypto/22.t
+t/25_crypto/23.t
+t/25_crypto/30.t
+t/25_crypto/31.t
+t/25_crypto/32.t
+t/25_crypto/33.t
+t/25_crypto/34.t
+t/25_crypto/35.t
+t/25_crypto/40.t
+t/25_crypto/99.t
+t/25_crypto/certs/01.pem
+t/25_crypto/token.xml
+t/25_crypto/openssl.cnf
+t/25_crypto/ca_openssl.cnf
+t/25_crypto/common.pl
 
-t/xml/1.t
-t/xml/2.t
-t/xml/3.t
-t/xml/4.t
-t/xml/5.t
-t/xml/test.xml
-t/xml/top.xml
-t/xml/sub.xml
+t/30_dbi/01.t
+t/30_dbi/02.t
+t/30_dbi/03.t
+t/30_dbi/04.t
+t/30_dbi/70.t
+t/30_dbi/99.t
+t/30_dbi/common.pl
+t/30_dbi/database.xml
+
 META.yml                                 Module meta-data (added by MakeMaker)

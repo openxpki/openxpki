@@ -2,9 +2,11 @@
 ##
 ## Written by Michael Bell 2005 for the OpenXPKI project
 ## (c) Copyright 2005 by the OpenXPKI project
+## $Revision: 1.6 $
 
 use strict;
 use warnings;
+use utf8;
 
 package OpenXPKI::Server::DBI::Driver::PostgreSQL;
 

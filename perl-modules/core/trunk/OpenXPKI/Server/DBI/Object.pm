@@ -1,4 +1,12 @@
+## OpenXPKI::Server::DBI::Object
+##
+## Written by Michael Bell for the OpenXPKI::Server project 2005
+## Copyright (C) 2005 by The OpenXPKI Project
+## $Revision: 1.6 $
 
+use strict;
+use warnings;
+use utf8;
 
 package OpenXPKI::Server::DBI::Object;
 

@@ -1,9 +1,12 @@
 ## OpenXPKI::Exception
-## Copyright (C) 2004-2005 Michael Bell
+##
+## Written by Michael Bell for the OpenXPKI project
+## Copyright (C) 2005 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
 use warnings;
+use utf8;
 
 package OpenXPKI::Exception;
 

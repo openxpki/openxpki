@@ -1,5 +1,7 @@
 ## OpenXPKI::XML::Config
-## Copyright (C) 2003-2005 The OpenXPKI Project
+##
+## Written by Michael Bell for the OpenXPKI project
+## Copyright (C) 2003-2005 by The OpenXPKI Project
 ## $Revision$
 
 use strict;

@@ -6,6 +6,7 @@
  
 use strict;
 use warnings;
+use utf8;
 
 package OpenXPKI::Server::DBI;
 
@@ -153,12 +154,11 @@ sub init_schema
     my $keys = { @_ };
     $self->debug ("start");
 
-    my ($mode, $db, $force, $table, $dsn); 
-
     ## Accepted modes are
     ## NONE
     ## DRYRUN   to get SQL commands
-    $mode   = $keys->{MODE};
+    my $mode = ""; 
+       $mode = $keys->{MODE} if (exists $keys->{MODE});
     $self->debug ("MODE: $mode");
     if ( $mode eq "DRYRUN") {
         $self->{SQL_SCRIPT} = "";

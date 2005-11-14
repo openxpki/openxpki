@@ -2,11 +2,17 @@
 ##
 ## Written by Michael Bell for the OpenXPKI::Server project 2005
 ## Copyright (C) 2005 by The OpenXPKI Project
+## $Revision: 1.6 $
+
+use strict;
+use warnings;
+use utf8;
 
 package OpenXPKI::Server::DBI::Driver;
 
 use vars qw(@ISA);
 use OpenXPKI qw(debug);
+use OpenXPKI::Exception;
 
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::Driver::DB2;
@@ -74,7 +80,7 @@ our %COLUMN = (
                "global_id"        => "BIGINT",
                "dataexchange_key" => "BIGINT",
 
-               "subject"          => "subject",
+               "subject"          => "TEXT_KEY",
                "email"            => "TEXT",
                "ra"               => "TEXT",
                "last_update"      => "BIGINT",
@@ -144,6 +150,12 @@ sub new
     my %type = eval ("\%${driver}::TYPE");
     foreach my $key (keys %COLUMN)
     {
+        if (not exists $type{$COLUMN{$key}})
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_WRONG_TYPE_IN_SCHEMA",
+                params  => {"COLUMN" => $key, "TYPE" => $COLUMN{$key}});
+        }
         $self->{column}->{$key} = $type{$COLUMN{$key}};
     }
 
@@ -165,6 +177,7 @@ returns true if a column is numeric
 sub column_is_numeric
 {
     my $self = shift;
+    my $key  = shift;
     ## FIXME: SQL types are standardized but actually we check only for numeric
     return 1 if ($self->{column}->{$key} =~ /NUMERIC/i);
     return 0;
@@ -179,9 +192,45 @@ returns true if a column is a string
 sub column_is_string
 {
     my $self = shift;
+    my $key  = shift;
     ## FIXME: SQL types are standardized but actually we check only for numeric
     return 1 if ($self->{column}->{$key} !~ /NUMERIC/i);
     return 0;
+}
+
+=head2 get_table_option
+
+returns a string with options which can be attached to the SQL
+command which creates a table.
+
+=cut
+
+sub get_table_option
+{
+    my $self = shift;
+    return "" if (not exists $self->{table_option});
+    return $self->{table_option};
+}
+
+=head2 get_column_type
+
+returns the native SQL type of a specific database for the specified column.
+
+=cut
+
+sub get_column_type
+{
+    my $self = shift;
+    my $col  = shift;
+
+    if (not exists $self->{column}->{$col})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_DRIVER_GET_COLUMN_TYPE_UNKNOWN_NAME",
+            params  => {"COLUMN" => $col});
+    }
+
+    return $self->{column}->{$col};
 }
 
 =head1 Driver Specification

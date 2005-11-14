@@ -1,7 +1,12 @@
-## (C) Copyright 2005 by The OpenXPKI Project
+## OpenXPKI::Server::DBI::SQL
+##
+## Written by Michael Bell for the OpenXPKI::Server project 2005
+## Copyright (C) 2005 by The OpenXPKI Project
+## $Revision: 1.6 $
 
 use strict;
 use warnings;
+use utf8;
 
 package OpenXPKI::Server::DBI::SQL;
 
@@ -107,7 +112,7 @@ sub create_table
     foreach my $col (@{$self->{schema}->get_table_columns ($table)})
     {
         my $column = $self->{schema}->get_column ($col);
-        my $type   = $self->{DBH}->{driver}->{column}->{$column};
+        my $type   = $self->{DBH}->get_column_type ($column);
         $command .= "$column $type";
         $command .= " NOT NULL"
             if (scalar grep /^${col}$/, @{$self->{schema}->get_table_index($table)});
@@ -121,8 +126,7 @@ sub create_table
     }
     $command = substr ($command, 0, length($command)-2); ## erase the last ,
     $command .= "))";
-    $command .= " ".$self->{DBH}->{driver}->{table_option}
-        if (exists $self->{DBH}->{driver}->{table_option});
+    $command .= " ".$self->{DBH}->get_table_option();
 
     $self->debug ("command: $command");
 

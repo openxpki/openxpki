@@ -2,11 +2,15 @@
 ##
 ## Written by Michael Bell for the OpenXPKI project 2005
 ## Copyright (C) 2005 The OpenXPKI Project
-##
+## $Revision: 1.6 $
 
 use strict;
+use warnings;
+use utf8;
 
 package OpenXPKI::Server::DBI::Schema;
+
+use OpenXPKI::Exception;
 
 our %SEQUENCE = (
                  CRL            => "sequence_crl",
@@ -15,7 +19,7 @@ our %SEQUENCE = (
                  CRR            => "sequence_crr",
                  AUDITTRAIL     => "sequence_audittrail",
                  DATA           => "sequence_data",
-                 GLOBAL_ID      => "sequence_global_id",
+                 GLOBAL_KEY_ID  => "sequence_global_id",
                  PRIVATE        => "sequence_private",
                  SIGNATURE      => "sequence_signature",
                  VOTING         => "sequence_voting",
@@ -31,7 +35,7 @@ our %COLUMN = (
                TYPE                  => "format",
                DATA                  => "data",
 
-               GLOBAL_ID             => "global_id",
+               GLOBAL_KEY_ID         => "global_id",
                CERTIFICATE_SERIAL    => "cert_key",
                REVOKE_CERTIFICATE_SERIAL => "cert_key",
                CSR_SERIAL            => "req_key",
@@ -95,7 +99,7 @@ our %TABLE = (
         NAME    => "request",
         INDEX   => [ "PKI_REALM", "CSR_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "CSR_SERIAL",
-                     "TYPE", "DATA",
+                     "TYPE", "DATA", "GLOBAL_KEY_ID",
                      "SUBJECT", "EMAIL", "RA",
                      "STATUS", "ROLE", "PUBKEY",
                      "SCEP_TID", "LOA"]},
@@ -103,7 +107,7 @@ our %TABLE = (
         NAME    => "certificate",
         INDEX   => [ "PKI_REALM", "CA", "CERTIFICATE_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "CA", "CERTIFICATE_SERIAL",
-                     "TYPE", "DATA",
+                     "TYPE", "DATA", "GLOBAL_KEY_ID",
                      "SUBJECT", "EMAIL",
                      "STATUS", "ROLE", "PUBKEY", "KEYID",
                      "NOTAFTER", "LOA", "NOTBEFORE", "CSR_SERIAL"
@@ -113,7 +117,7 @@ our %TABLE = (
         INDEX   => [ "PKI_REALM", "CA", "CRR_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "CA", "CRR_SERIAL",
                      "REVOKE_CERTIFICATE_SERIAL", "SUBMIT_DATE",
-                     "TYPE", "DATA",
+                     "TYPE", "DATA", "GLOBAL_KEY_ID",
                      "RA", "STATUS", "REASON" ]},
     CRL => {
         NAME    => "crl",
@@ -131,14 +135,14 @@ our %TABLE = (
         NAME    => "data",
         INDEX   => [ "DATA_SERIAL" ],
         COLUMNS => [ "DATA_SERIAL",
-                     "GLOBAL_ID",
+                     "GLOBAL_KEY_ID",
                      "COLUMN_NAME", "ARRAY_COUNTER", "CONTENT_TYPE",
                      "NUMBER", "STRING" ]},
     PRIVATE => {
         NAME    => "private",
         INDEX   => [ "PRIVATE_SERIAL" ],
         COLUMNS => [ "PRIVATE_SERIAL",
-                     "DATA", "TYPE"]},
+                     "DATA", "TYPE", "GLOBAL_KEY_ID"]},
     STATEMACHINE => {
         NAME    => "statemachine",
         INDEX   => [ "STATEMACHINE_SERIAL" ],
@@ -167,14 +171,14 @@ our %INDEX = (
        NAME    => "data_column_name_index",
        TABLE   => "DATA",
        COLUMNS => [ "COLUMN_NAME" ]},
-   DATA_GLOBAL_ID   => {
+   DATA_GLOBAL_KEY_ID   => {
        NAME    => "data_global_id_index",
        TABLE   => "DATA",
-       COLUMNS => [ "GLOBAL_ID" ]},
+       COLUMNS => [ "GLOBAL_KEY_ID" ]},
    DATA_GLOBAL_COLUMN => {
        NAME    => "data_global_column_index",
        TABLE   => "DATA",
-       COLUMNS => [ "GLOBAL_ID", "COLUMN_NAME" ]},
+       COLUMNS => [ "GLOBAL_KEY_ID", "COLUMN_NAME" ]},
    DATA_COLUMN_STRING => {
        NAME    => "data_column_string_index",
        TABLE   => "DATA",
@@ -192,6 +196,22 @@ sub new
 sub get_column
 {
     my $self = shift;
+
+    if (not exists $_[0] or
+        not defined $_[0] or
+        not length $_[0])
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_COLUMN_MISSING_COLUMN_NAME");
+    }
+
+    if (not exists $COLUMN{$_[0]})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_COLUMN_UNKNOWN_COLUMN",
+            params  => {"COLUMN" => $_[0]});
+    }
+
     return $COLUMN{$_[0]};
 }
 
@@ -297,13 +317,12 @@ If you want to interpret the table in a semantical manner then the table is
 a connector which defines CAs inside of a PKI realm and connects certificates
 with this CA. The same CA name is used by the token configuration.
 
-=head2 GLOBAL_ID
+=head2 GLOBAL_KEY_ID
 
-The GLOBAL_ID is more or less a KEY_ID. It is used to identify all objects
+The GLOBAL_KEY_ID is more or less a KEY_ID. It is used to identify all objects
 which are related to one key. This is for example necessary to identify all
-related objects if a revocation starts because of a key compromise.
-
-FIXME: should we rename the GLOBAL_ID to KEY_ID?
+related objects if a revocation starts because of a key compromise. GLOBAL is
+used to signal everybody that this ID is a GLOBAL unique ID.
 
 =head1 Functions
 
