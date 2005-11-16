@@ -11,7 +11,7 @@ use OpenXPKI::Crypto::CSR;
 use Time::HiRes;
 
 our $cache;
-eval `cat t/crypto/common.pl`;
+eval `cat t/25_crypto/common.pl`;
 
 ok(1);
 
@@ -26,7 +26,7 @@ my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM =
 ok (1);
 
 ## load CSR
-my $data = OpenXPKI->read_file ("t/crypto/pkcs10.pem");
+my $data = OpenXPKI->read_file ("t/25_crypto/pkcs10.pem");
 ok(1);
 $data = "-----BEGIN HEADER-----\n".
         "ROLE=User\n".

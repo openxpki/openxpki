@@ -6,6 +6,7 @@ INSTALL
 CREDITS
 LICENSE
 CHANGES
+VERSION
 Makefile.PL
 OpenXPKI.pm
 OpenXPKI/Exception.pm
@@ -78,6 +79,11 @@ OpenXPKI/Server/DBI/Driver/MySQL.pm
 OpenXPKI/Server/DBI/Driver/PostgreSQL.pm
 OpenXPKI/Server/DBI/Driver/SQLite.pm
 
+## logging interface
+
+OpenXPKI/Server/Log.pm
+OpenXPKI/Server/Log/Appender/DBI.pm
+
 ## test stuff
 
 t/config.xml
@@ -120,20 +126,29 @@ t/25_crypto/33.t
 t/25_crypto/34.t
 t/25_crypto/35.t
 t/25_crypto/40.t
-t/25_crypto/99.t
 t/25_crypto/certs/01.pem
 t/25_crypto/token.xml
 t/25_crypto/openssl.cnf
 t/25_crypto/ca_openssl.cnf
 t/25_crypto/common.pl
 
+t/28_log/README
+t/28_log/01.t
+t/28_log/log.conf
+t/28_log/log_without_dbi.conf
+
+t/30_dbi/README
 t/30_dbi/01.t
 t/30_dbi/02.t
 t/30_dbi/03.t
 t/30_dbi/04.t
 t/30_dbi/70.t
-t/30_dbi/99.t
 t/30_dbi/common.pl
 t/30_dbi/database.xml
+
+t/00_cleanup/25_crypto.t
+t/00_cleanup/30_dbi.t
+t/99_cleanup/25_crypto.t
+t/99_cleanup/30_dbi.t
 
 META.yml                                 Module meta-data (added by MakeMaker)

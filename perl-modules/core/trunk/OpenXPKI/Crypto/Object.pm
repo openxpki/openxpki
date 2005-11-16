@@ -24,10 +24,10 @@ sub get_body
     return $self->{header}->get_body();
 }
 
-sub get_item
+sub get_raw
 {
     my $self = shift;
-    return $self->{header}->get_item();
+    return $self->{header}->get_raw();
 }
 
 sub get_parsed
@@ -37,12 +37,18 @@ sub get_parsed
 
     foreach my $name (@_)
     {
-        $ref = $ref->{$name};
+        if (defined $ref and exists $ref->{$name})
+        {
+            $ref = $ref->{$name};
+        } else {
+            $ref = undef;
+        }
     }
-    if (ref($ref))
+    if (not defined $ref or ref($ref) eq "HASH")
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_PARSED_NO_VALUE");
+            message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_PARSED_NO_VALUE",
+            params  => {"NAME" => join ("/", @_)});
     } else {
         return $ref;
     }
@@ -56,6 +62,11 @@ sub get_serial {
 sub get_status
 {
     my $self = shift;
+    if (not exists $self->{STATUS})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_STATUS_NOT_INITIALIZED");
+    }
     return $self->{STATUS};
 }
 
@@ -71,7 +82,7 @@ sub set_header_attribute
     my $self = shift;
     $self->debug ("entering function");
     $self->{header}->set_attribute (@_);
-    $self->{DATA} = $self->{header}->get_item();
+    $self->{DATA} = $self->{header}->get_raw();
 
     ## if you call init then all information is lost !!!
     $self->debug ("reiniting object");
@@ -111,7 +122,7 @@ returns the plain header of the object.
 
 returns the plain (cryptographic) body of the object.
 
-=head2 get_item
+=head2 get_raw
 
 returns the complete plain object.
 

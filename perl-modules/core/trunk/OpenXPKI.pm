@@ -8,7 +8,9 @@ use utf8;
 
 package OpenXPKI;
 
-our $VERSION = sprintf "0.9.3.%03d", q$Revision$ =~ /(\d+)/g;
+our $VERSION = OpenXPKI->read_file ("VERSION");
+    $VERSION =~ s/#[^\n]*\n//g;
+    $VERSION =~ s/\n//g;
 
 use English qw (-no_match_vars);
 use XSLoader;

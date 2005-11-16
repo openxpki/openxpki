@@ -1,8 +1,8 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         OpenXPKI
-version:      0.9.3.028
-version_from: OpenXPKI.pm
+version:      0.9.94
+version_from: 
 installdirs:  site
 requires:
     Date::Parse:                   1

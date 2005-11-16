@@ -10,6 +10,7 @@ use utf8;
 
 package OpenXPKI::Server::DBI::Object;
 
+use English;
 use OpenXPKI qw(debug);
 use OpenXPKI::Server::DBI::Schema;
 use Date::Parse;
@@ -43,6 +44,7 @@ sub new
     shift;
     my $self = { @_ };
     bless $self, "OpenXPKI::Server::DBI::Object";
+    #$self->{DEBUG} = 1;
     $self->{schema} = OpenXPKI::Server::DBI::Schema->new();
     $self->debug ("init complete");
     return $self;
@@ -73,26 +75,26 @@ sub insert
     {
         if ($key eq "DATA")
         {
-            $hash{DATA} = $object->getItem();
+            $hash{DATA} = $object->get_raw();
             next;
         }
         if ($key eq "STATUS")
         {
-            $hash{STATUS} = $object->getStatus();
+            $hash{STATUS} = $object->get_status();
             $hash{STATUS} = "VALID" if ($hash{STATUS} eq "EXPIRED");
             next;
         }
         if ($key eq "${table}_SERIAL")
         {
-            $hash{$key} = $object->getSerial();
+            $hash{$key} = $object->get_serial();
             next;
         }
         if ($key eq "EMAIL")
         {
-            if ( defined $object->getParsed()->{EMAILADDRESSES} )
+            if ( eval { $object->get_parsed("BODY", "EMAILADDRESSES") } )
             {
                 $hash{EMAIL} = "";
-                foreach my $email (@{$object->getParsed()->{EMAILADDRESSES}})
+                foreach my $email (@{$object->get_parsed("BODY", "EMAILADDRESSES")})
                 {
                     $hash{EMAIL} .= "," if ($hash{EMAIL});
                     $hash{EMAIL} .= $email;
@@ -104,22 +106,20 @@ sub insert
             $key eq "LAST_UPDATE" or $key eq "NEXT_UPDATE")
         {
             ## necessary to get consistent and easy to compare timestamps
-            $hash{$key} = str2time ($object->getParsed()->{$key})
-                if ($object->getParsed()->{$key});
+            $hash{$key} = eval {str2time ($object->get_parsed("BODY", $key)) };
+            delete $hash{$key} if ($EVAL_ERROR);
             next;
         }
-        if (exists $object->getParsed()->{$key})
+        $hash{$key} = eval { $object->get_parsed("BODY", $key) };
+        if ($EVAL_ERROR)
         {
-            $hash{$key} = $object->getParsed()->{$key};
-            next;
-        }
-        if (exists $object->getParsed()->{HEADER}->{$key})
-        {
-            $hash{$key} = $object->getParsed()->{HEADER}->{$key};
-            next;
+            ## take it from header
+            $hash{$key} = eval { $object->get_parsed("HEADER", $key) };
+            ## drop the column if it is not supported by the object
+            delete $hash{$key} if ($EVAL_ERROR);
         }
     }
-    $self->debug ("KEYS: ".join ", ", %hash);
+    $self->debug ("KEYS: ".join ", ", keys %hash);
 
     ## no let us use the hash interface
     $self->{HASH}->insert (TABLE => $table, HASH => \%hash);
@@ -151,26 +151,26 @@ sub update
     {
         if ($key eq "DATA")
         {
-            $hash{DATA} = $object->getItem();
+            $hash{DATA} = $object->get_raw();
             next;
         }
         if ($key eq "STATUS")
         {
-            $hash{STATUS} = $object->getStatus();
+            $hash{STATUS} = $object->get_status();
             $hash{STATUS} = "VALID" if ($hash{STATUS} eq "EXPIRED");
             next;
         }
         if ($key eq "${table}_SERIAL")
         {
-            $hash{$key} = $object->getSerial();
+            $hash{$key} = $object->get_serial();
             next;
         }
         if ($key eq "EMAIL")
         {
-            if ( defined $object->getParsed()->{EMAILADDRESSES} )
+            if ( eval { $object->get_parsed("BODY", "EMAILADDRESSES") } )
             {
                 $hash{EMAIL} = "";
-                foreach my $email (@{$object->getParsed()->{EMAILADDRESSES}})
+                foreach my $email (@{$object->get_parsed("BODY", "EMAILADDRESSES")})
                 {
                     $hash{EMAIL} .= "," if ($hash{EMAIL});
                     $hash{EMAIL} .= $email;
@@ -182,19 +182,17 @@ sub update
             $key eq "LAST_UPDATE" or $key eq "NEXT_UPDATE")
         {
             ## necessary to get consistent and easy to compare timestamps
-            $hash{$key} = str2time ($object->getParsed()->{$key})
-                if ($object->getParsed()->{$key});
+            $hash{$key} = eval {str2time ($object->get_parsed("BODY", $key)) };
+            delete $hash{$key} if ($EVAL_ERROR);
             next;
         }
-        if (exists $object->getParsed()->{$key})
+        $hash{$key} = eval { $object->get_parsed("BODY", $key) };
+        if ($EVAL_ERROR)
         {
-            $hash{$key} = $object->getParsed()->{$key};
-            next;
-        }
-        if (exists $object->getParsed()->{HEADER}->{$key})
-        {
-            $hash{$key} = $object->getParsed()->{HEADER}->{$key};
-            next;
+            ## take it from header
+            $hash{$key} = eval { $object->get_parsed("HEADER", $key) };
+            ## drop the column if it is not supported by the object
+            delete $hash{$key} if ($EVAL_ERROR);
         }
     }
 

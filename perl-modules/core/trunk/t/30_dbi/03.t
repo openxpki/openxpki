@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 3 };
+BEGIN { plan tests => 6 };
 
 print STDERR "OpenXPKI::Server::DBI: normal certificate workflow\n";
 
@@ -11,7 +11,7 @@ ok (1);
 
 our %config;
 our $dbi;
-require 't/dbi/common.pl';
+require 't/30_dbi/common.pl';
 
 ok (1);
 

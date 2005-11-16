@@ -1,7 +1,8 @@
 <openxpki>
   <common>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="dbi/database.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="crypto/token.xml"/>
+    <log_config>t/28_log/log.conf</log_config>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="30_dbi/database.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="25_crypto/token.xml"/>
   </common>
   <pki_realm name="Test Root CA">
     <common name="default">

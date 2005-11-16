@@ -12,7 +12,7 @@ use OpenXPKI::XML::Config;
 our $cache;
 
 # ## init the XML cache
-# my $tokenconfigfile = File::Spec->catfile('t', 'crypto', 'token.xml');
+# my $tokenconfigfile = File::Spec->catfile('t', '25_crypto', 'token.xml');
 # 
 # # slurp in configuration file
 # my $config = OpenXPKI->read_file($tokenconfigfile) 

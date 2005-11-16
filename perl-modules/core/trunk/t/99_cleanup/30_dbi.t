@@ -3,13 +3,13 @@ use warnings;
 use Test;
 BEGIN { plan tests => 2 };
 
-print STDERR "Cleanup\n";
+print STDERR "OpenXPKI::Server::DBI Cleanup\n";
 
-unlink ("t/dbi/sqlite.db");
+unlink ("t/30_dbi/sqlite.db");
 
 ok(1);
 
-if (-e "t/dbi/sqlite.db")
+if (-e "t/30_dbi/sqlite.db")
 {
     ok(0);
 } else {

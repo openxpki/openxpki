@@ -1,3 +1,20 @@
 Please only document here release relevant changes. The change
 from CVS to subversion brings us really good changeset control.
 We can always identify every change via the complete changeset.
+
+We only notice differences to former version here. Please note
+that the starting point was the OpenCA 0.9.2 series.
+
+OpenXPKI 1.0
+
+- make test
+- Exception based error handling (no silent ignorance possible)
+- Logging via Log::Log4perl
+- XML related changes
+    - schema for the configuration
+    - one single XML file for all
+    - xinclude support for local inclusions
+- Support for SQLite (replaced DBM support)
+- Cryptographic layer
+    - full isolation of OpenSSL
+    - modularization of commands

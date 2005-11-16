@@ -10,7 +10,7 @@ use OpenXPKI::Crypto::CRR;
 use Time::HiRes;
 
 our $cache;
-eval `cat t/crypto/common.pl`;
+eval `cat t/25_crypto/common.pl`;
 
 ok(1);
 

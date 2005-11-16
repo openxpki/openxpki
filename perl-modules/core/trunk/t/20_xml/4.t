@@ -25,7 +25,7 @@ if (not $EVAL_ERROR and $obj)
 
 ## try a wrong XML file
 eval { $obj = OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                         CONFIG => "t/crypto/token.xml",
+                                         CONFIG => "t/25_crypto/token.xml",
                                          SCHEMA => "openxpki.xsd"); };
 if ($EVAL_ERROR)
 {

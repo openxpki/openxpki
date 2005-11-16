@@ -9,7 +9,7 @@ print STDERR "OpenXPKI::Crypto::Command: Create a CA\n";
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
-require 't/crypto/common.pl';
+require 't/25_crypto/common.pl';
 
 ok(1);
 
@@ -43,14 +43,14 @@ ok (1);
 print STDERR "CA cert: $cert\n" if ($ENV{DEBUG});
 
 ## check that the CA is ready for further tests
-if (not -e "t/crypto/cakey.pem")
+if (not -e "t/25_crypto/cakey.pem")
 {
     ok(0);
     print STDERR "Missing CA key\n";
 } else {
     ok(1);
 }
-if (not -e "t/crypto/cacert.pem")
+if (not -e "t/25_crypto/cacert.pem")
 {
     ok(0);
     print STDERR "Missing CA cert\n";

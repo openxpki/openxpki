@@ -24,7 +24,7 @@
         </option>
         <option>
             <name>KEY</name>
-            <value>t/crypto/cakey.pem</value>
+            <value>t/25_crypto/cakey.pem</value>
         </option>
         <option>
             <name>PASSWD_PARTS</name>
@@ -32,7 +32,7 @@
         </option>
         <option>
             <name>PEM_CERT</name>
-            <value>t/crypto/cacert.pem</value>
+            <value>t/25_crypto/cacert.pem</value>
         </option>
         <option>
             <name>DER_CERT</name>
@@ -44,7 +44,7 @@
         </option>
         <option>
             <name>CHAIN</name>
-            <value>t/crypto/cacert.pem</value>
+            <value>t/25_crypto/cacert.pem</value>
         </option>
         <option>
             <name>OPENCA_SV</name>
@@ -52,15 +52,15 @@
         </option>
         <option>
             <name>TMPDIR</name>
-            <value>t/crypto</value>
+            <value>t/25_crypto</value>
         </option>
         <option>
             <name>CONFIG</name>
-            <value>t/crypto/ca_openssl.cnf</value>
+            <value>t/25_crypto/ca_openssl.cnf</value>
         </option>
         <option>
             <name>RANDFILE</name>
-            <value>t/crypto/rand</value>
+            <value>t/25_crypto/rand</value>
         </option>
         <option>
             <name>DEBUG</name>

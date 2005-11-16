@@ -49,8 +49,14 @@ sub insert
     my $hash  = $keys->{HASH};
 
     $hash->{$table."_SERIAL"} = $keys->{HASH}->{KEY}
-        if (not exists $hash->{$table."_SERIAL"});
-    $self->debug ("table: $table serial: ".$hash->{$table."_SERIAL"});
+        if (not exists $hash->{$table."_SERIAL"} and
+            exists $keys->{HASH}->{KEY});
+    if (exists $hash->{$table."_SERIAL"})
+    {
+        $self->debug ("table: $table serial: ".$hash->{$table."_SERIAL"});
+    } else {
+        $self->debug ("table $table without serial");
+    }
 
     $self->{SQL}->insert (TABLE => $table, DATA => $hash);
 
@@ -173,9 +179,14 @@ sub __log_write_action
     } else {
         $message = "Row inserted";
     }
-    $message .= "\ntable=".$table.
-                "\nstatus=".$status.
-                "\nsession=".$self->{SESSION_ID};
+    $message .= "\ntable=".$table;
+    $message .= "\nstatus=".$status if (defined $status);
+    if (exists $self->{SESSION_ID})
+    {
+        $message .= "\nsession=".$self->{SESSION_ID};
+    } else {
+        $message .= "\nsession=undef";
+    }
     foreach my $key (keys %index)
     {
         $message .= "\n".lc($key)."=".$index{$key};

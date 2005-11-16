@@ -9,7 +9,7 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Header;
 
 our $cache;
-eval `cat t/crypto/common.pl`;
+eval `cat t/25_crypto/common.pl`;
 
 ok(1);
 

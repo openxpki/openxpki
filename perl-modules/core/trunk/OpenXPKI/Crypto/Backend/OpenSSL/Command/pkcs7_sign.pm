@@ -95,7 +95,6 @@ sub get_command
     $command .= " -in ".$self->{CONTENTFILE};
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -outform PEM";
-    $command .= " -certfile t/crypto/cacert.pem";
 
     if (defined $passwd)
     {

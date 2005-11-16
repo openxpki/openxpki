@@ -6,7 +6,7 @@
 # This definition stops the following lines choking if HOME isn't
 # defined.
 HOME                    = .
-RANDFILE                = @var_prefix@/crypto/keys/.rand
+RANDFILE                = @var_prefix@/25_crypto/keys/.rand
 
 # Extra OBJECT IDENTIFIER info:
 #oid_file               = $ENV::HOME/.oid
@@ -37,7 +37,7 @@ default_ca	= CA_default		# The default ca section
 ####################################################################
 [ CA_default ]
 
-dir		= t/crypto	# Where everything is kept
+dir		= t/25_crypto	# Where everything is kept
 certs		= $dir/certs		# Where the issued certs are kept
 crl_dir		= $dir/crls		# Where the issued crl are kept
 database	= $dir/index.txt	# database index file.

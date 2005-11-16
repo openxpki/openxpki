@@ -53,8 +53,16 @@ if ($EVAL_ERROR)
 my $result = `xmllint -format -schema openxpki.xsd -xinclude t/config.xml 2>&1 1>/dev/null`;
 if ($CHILD_ERROR)
 {
-    ok(0);
-    print STDERR "Error: there is something wrong with xmllint (${CHILD_ERROR}: ${EVAL_ERROR})\n";
+    my $msg = "Error: there is something wrong with xmllint (${CHILD_ERROR}: ${EVAL_ERROR})\n";
+    $result = `ping www.w3.org`;
+    if ($CHILD_ERROR)
+    {
+        ok(1);
+        print STDERR "WARNING: Cannot validate the configuration with the schema because you are offline.\n";
+    } else {
+        ok(0);
+        print STDERR $msg;
+    }
 } else {
     $result =~ s/^(.*\n)?([^\n]+)\n?$/$2/s;
     if ($result eq "t/config.xml validates")

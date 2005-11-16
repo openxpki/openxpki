@@ -8,7 +8,7 @@ print STDERR "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n";
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
-eval `cat t/crypto/common.pl`;
+eval `cat t/25_crypto/common.pl`;
 
 ok(1);
 
@@ -26,7 +26,7 @@ ok (1);
 my $passwd = $token->command ("create_random", RANDOM_LENGTH => 16);
 ok (1);
 print STDERR "passwd: $passwd\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "t/crypto/passwd.txt", CONTENT => $passwd);
+OpenXPKI->write_file (FILENAME => "t/25_crypto/passwd.txt", CONTENT => $passwd);
 
 ## create DSA key
 my $key = $token->command ("create_key",
@@ -36,7 +36,7 @@ my $key = $token->command ("create_key",
                            PASSWD     => $passwd);
 ok (1);
 print STDERR "DSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "t/crypto/dsa.pem", CONTENT => $key);
+OpenXPKI->write_file (FILENAME => "t/25_crypto/dsa.pem", CONTENT => $key);
 
 ## create EC key
 $key = $token->command ("create_key",
@@ -46,7 +46,7 @@ $key = $token->command ("create_key",
                         PASSWD     => $passwd);
 ok (1);
 print STDERR "EC: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "t/crypto/ec.pem", CONTENT => $key);
+OpenXPKI->write_file (FILENAME => "t/25_crypto/ec.pem", CONTENT => $key);
 
 ## create RSA key
 $key = $token->command ("create_key",
@@ -56,26 +56,26 @@ $key = $token->command ("create_key",
                         PASSWD     => $passwd);
 ok (1);
 print STDERR "RSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "t/crypto/rsa.pem", CONTENT => $key);
+OpenXPKI->write_file (FILENAME => "t/25_crypto/rsa.pem", CONTENT => $key);
 
 ## create CSR
 my $csr = $token->command ("create_pkcs10",
-                           CONFIG  => "t/crypto/openssl.cnf",
+                           CONFIG  => "t/25_crypto/openssl.cnf",
                            KEY     => $key,
                            PASSWD  => $passwd,
                            SUBJECT => "cn=John Doe,dc=OpenCA,dc=info");
 ok (1);
 print STDERR "CSR: $csr\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "t/crypto/pkcs10.pem", CONTENT => $csr);
+OpenXPKI->write_file (FILENAME => "t/25_crypto/pkcs10.pem", CONTENT => $csr);
 
 ## create cert
 my $cert = $token->command ("issue_cert",
                             CSR    => $csr,
-                            CONFIG => "t/crypto/openssl.cnf",
+                            CONFIG => "t/25_crypto/openssl.cnf",
                             SERIAL => 1);
 ok (1);
 print STDERR "cert: $cert\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "t/crypto/cert.pem", CONTENT => $cert);
+OpenXPKI->write_file (FILENAME => "t/25_crypto/cert.pem", CONTENT => $cert);
 
 ## build the PKCS#12 file
 my $pkcs12 = $token->command ("create_pkcs12",
@@ -90,6 +90,6 @@ print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
 my $crl = $token->command ("issue_crl", REVOKED => [$cert], SERIAL => 1);
 ok (1);
 print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "t/crypto/crl.pem", CONTENT => $crl);
+OpenXPKI->write_file (FILENAME => "t/25_crypto/crl.pem", CONTENT => $crl);
 
 1;

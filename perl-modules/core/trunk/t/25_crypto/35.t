@@ -11,7 +11,7 @@ use OpenXPKI::Crypto::PKCS7;
 use Time::HiRes;
 
 our $cache;
-eval `cat t/crypto/common.pl`;
+eval `cat t/25_crypto/common.pl`;
 
 ok(1);
 
@@ -27,9 +27,9 @@ ok (1);
 
 ## load data
 
-my $passwd = OpenXPKI->read_file ("t/crypto/passwd.txt");
-my $rsa    = OpenXPKI->read_file ("t/crypto/rsa.pem");
-my $cert   = OpenXPKI->read_file ("t/crypto/cert.pem");
+my $passwd = OpenXPKI->read_file ("t/25_crypto/passwd.txt");
+my $rsa    = OpenXPKI->read_file ("t/25_crypto/rsa.pem");
+my $cert   = OpenXPKI->read_file ("t/25_crypto/cert.pem");
 my $content = "This is for example a passprase.";
 ok($passwd and $rsa and $cert);
 

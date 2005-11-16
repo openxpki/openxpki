@@ -8,7 +8,7 @@ print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::X509\n";
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
-eval `cat t/crypto/common.pl`;
+eval `cat t/25_crypto/common.pl`;
 
 ok(1);
 
@@ -23,7 +23,7 @@ my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM =
 ok (1);
 
 ## create cert
-my $cert = OpenXPKI->read_file ("t/crypto/cert.pem");
+my $cert = OpenXPKI->read_file ("t/25_crypto/cert.pem");
 ok(1);
 
 ## get object

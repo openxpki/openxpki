@@ -84,11 +84,34 @@ open my $fh, ">", File::Spec->catfile("t", "cfg.binary.openssl");
 print $fh $openssl_binary;
 close $fh;
 
+#determine version
+my $files = `find . -name entries -print`;
+if ($files)
+{
+    $files =~ s/\n/ /g;
+    my $commited = `grep "committed-rev" $files`;
+    my $revision = 0;
+    foreach my $line (split (/\n/, $commited))
+    {
+        $line =~ s/^.*:\s+committed-rev="([0-9]+)"\s*/$1/;
+        $revision = $line if ($line > $revision);
+    }
+    print STDOUT "Revision:        $revision\n";
+    $version = "0.9.$revision";
+    `echo \\# never commit this file to a version control system > VERSION`;
+    `echo $version >> VERSION`;
+} else {
+    $version = `cat VERSION`;
+    $version =~ s/#[^\n]*\n//g;
+    $version =~ s/\n//g;
+}
+print STDOUT "Version:         $version\n";
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'      => 'OpenXPKI',
-    'VERSION_FROM' => 'OpenXPKI.pm',
+    'VERSION'   => $version,
     'LIBS'      => ["-L$openssl_lib_dir -lcrypto"],
     'INC'       => "-I. -I$openssl_inc_dir",
     'PREREQ_PM' => {'DBI'                    => 1,

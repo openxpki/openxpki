@@ -21,7 +21,7 @@ sub new
 {
     my $that = shift;
     my $class = ref($that) || $that;
-    my $self = bless {}, $class;
+    my $self = bless {DEBUG => 0}, $class;
 
     $self->{params} = { @_ };
 
@@ -142,7 +142,12 @@ sub do_query
     undef $keys;
 
     $self->debug ("query: $query");
-    $self->debug ("bind_values: ".join "\n", @bind_values);
+    if (@bind_values)
+    {
+        $self->debug ("bind_values: ".join ("\n", @bind_values));
+    } else {
+        $self->debug ("no elements in bind_values present");
+    }
     #foreach my $help (@bind_values) {
     #  $self->debug ("doQuery: bind_values: $help");
     #}
@@ -381,7 +386,14 @@ sub DESTROY {
         $h->finish ();
     }
 
-    $self->{DBH}->disconnect () if (exists $self->{DBH} and $self->{DBH});
+    if (exists $self->{DBH} and $self->{DBH})
+    {
+        ## IF THERE IS A DATABASE HANDLE THEN THERE WAS CRASH
+        ## IF THERE WAS A CRASH THEN WE MUST ROLLBACK
+        $self->debug ("found open database handle, so enforcing rollback");
+        $self->{DBH}->rollback();
+        $self->{DBH}->disconnect();
+    }
 }
 
 1;

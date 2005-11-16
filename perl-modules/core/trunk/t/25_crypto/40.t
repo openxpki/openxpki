@@ -6,7 +6,7 @@ print STDERR "OpenXPKI::Crypto::SCEP (planned)\n";
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
-eval `cat t/crypto/common.pl`;
+eval `cat t/25_crypto/common.pl`;
 
 ok(1);
 

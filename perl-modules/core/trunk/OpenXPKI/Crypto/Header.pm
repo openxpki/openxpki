@@ -42,7 +42,7 @@ sub get_body
     return $self->{body};
 }
 
-sub get_item
+sub get_raw
 {
     my $self = shift;
     return $self->{item};
@@ -181,7 +181,7 @@ return the prepared header with begin and end lines.
 
 returns the pure body of the object
 
-=head2 get_item
+=head2 get_raw
 
 returns the complete plain object
 

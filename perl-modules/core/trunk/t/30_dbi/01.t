@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test;
-BEGIN { plan tests => 6 };
+BEGIN { plan tests => 8 };
 
 print STDERR "OpenXPKI::Server::DBI: Database Initialization\n";
 
@@ -12,11 +12,7 @@ ok (1);
 
 our %config;
 our $dbi;
-require 't/dbi/common.pl';
-
-ok (1);
-
-$dbi->connect();
+require 't/30_dbi/common.pl';
 
 ok(1);
 
