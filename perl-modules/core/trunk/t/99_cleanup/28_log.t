@@ -1,23 +1,20 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 2 };
+
+my @files = (
+             "t/28_log/sqlite.db",
+             "t/28_log/sqlite_log.db",
+             "t/28_log/stderr.log",
+            );
+BEGIN { plan tests => 6 };
 
 print STDERR "OpenXPKI::Server::Log Cleanup\n";
 
-unlink ("t/28_log/sqlite.db");
-unlink ("t/28_log/sqlite_log.db");
-unlink ("t/28_log/stderr.log");
-
-ok(1);
-
-if (-e "t/28_log/sqlite.db" or
-    -e "t/28_log/sqlite_log.db" or
-    -e "t/28_log/stderr.log")
+foreach my $filename (@files)
 {
-    ok(0);
-} else {
-    ok(1);
+    ok(not -e $filename or unlink ($filename));
+    ok(not -e $filename);
 }
 
 1;
