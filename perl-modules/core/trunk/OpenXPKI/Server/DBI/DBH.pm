@@ -351,6 +351,12 @@ sub get_column_type
     return $self->{driver}->get_column_type(@_);
 }
 
+sub get_abstract_column_type
+{
+    my $self = shift;
+    return $self->{driver}->get_abstract_column_type(@_);
+}
+
 sub column_is_numeric
 {
     my $self = shift;
@@ -486,6 +492,10 @@ is directly mapped to OpenXPKI::Server::DBI::Driver->create_sequence
 =head3 get_column_type
 
 is directly mapped to OpenXPKI::Server::DBI::Driver->get_column_type
+
+=head3 get_abstract_column_type
+
+is directly mapped to OpenXPKI::Server::DBI::Driver->get_abstract_column_type
 
 =head3 column_is_numeric
 

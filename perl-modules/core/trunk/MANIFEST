@@ -134,8 +134,9 @@ t/25_crypto/common.pl
 
 t/28_log/README
 t/28_log/01.t
+t/28_log/02.t
 t/28_log/log.conf
-t/28_log/log_without_dbi.conf
+t/28_log/common.pl
 
 t/30_dbi/README
 t/30_dbi/01.t
@@ -147,8 +148,10 @@ t/30_dbi/common.pl
 t/30_dbi/database.xml
 
 t/00_cleanup/25_crypto.t
+t/00_cleanup/28_log.t
 t/00_cleanup/30_dbi.t
 t/99_cleanup/25_crypto.t
+t/99_cleanup/28_log.t
 t/99_cleanup/30_dbi.t
 
 META.yml                                 Module meta-data (added by MakeMaker)

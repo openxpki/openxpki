@@ -89,11 +89,12 @@ my $files = `find . -name entries -print`;
 if ($files)
 {
     $files =~ s/\n/ /g;
-    my $commited = `grep "committed-rev" $files`;
+    my $commited = `grep -e "revision\\|committed-rev" $files`;
     my $revision = 0;
     foreach my $line (split (/\n/, $commited))
     {
-        $line =~ s/^.*:\s+committed-rev="([0-9]+)"\s*/$1/;
+        $line =~ s/^.*:\s+committed-rev="([0-9]+)".*$/$1/;
+        $line =~ s/^.*:\s+revision="([0-9]+)".*$/$1/;
         $revision = $line if ($line > $revision);
     }
     print STDOUT "Revision:        $revision\n";
@@ -119,12 +120,14 @@ WriteMakefile(
                     'Exception::Class'       => "1.22",
                     ## includes the version of libintl-perl which includes Locale::Messages
                     'Locale::TextDomain'     => 1,
+                    'Log::Log4perl'          => 1,
                     'Math::BigInt'           => 1,
                     'Test'                   => 1,
                     'Test::Pod'              => "1.00",
                     'Test::Pod::Coverage'    => "1.00",
                     'Text::CSV_XS'           => "0.23",
                     'Time::HiRes'            => 1,
+                    'Workflow'               => '0.15',
                     'XML::Filter::XInclude'  => 1,
                     'XML::Parser'            => 1,
                     'XML::SAX'               => '0.12',

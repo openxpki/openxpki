@@ -1,0 +1,2 @@
+Please note that the DBI test is also the first test of the DBI log appender.
+The related perl module is OpenXPKI::Server::Log::Appender::DBI.

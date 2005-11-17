@@ -28,6 +28,7 @@ increment feature for unique IDs in tables.
 =cut
 
 our %TYPE = (
+             SERIAL     => "INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT",
              TEXT       => "TEXT",
              TIMESTAMP  => "timestamp",
              LONGTEXT   => "TEXT",

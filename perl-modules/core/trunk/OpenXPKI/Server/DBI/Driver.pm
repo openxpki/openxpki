@@ -71,7 +71,7 @@ our %COLUMN = (
                "req_key"          => "BIGINT",
                "crr_key"          => "BIGINT",
                "crl_key"          => "NUMERIC",
-               "audittrail_key"   => "BIGINT",
+               "audittrail_key"   => "SERIAL",
                "global_id"        => "BIGINT",
                "data_key"         => "BIGINT",
                "private_key"      => "BIGINT",
@@ -233,6 +233,29 @@ sub get_column_type
     return $self->{column}->{$col};
 }
 
+=head2 get_abstract_column_type
+
+returns the original column type which is not database specific. This is
+useful if you want to detect how you have to handle a special column. Pleasde see
+the description of the driver requirements for more details about datatypes.
+
+=cut
+
+sub get_abstract_column_type
+{
+    my $self = shift;
+    my $col  = shift;
+
+    if (not exists $COLUMN{$col})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_DRIVER_GET_ABSTRACT_COLUMN_TYPE_UNKNOWN_NAME",
+            params  => {"COLUMN" => $col});
+    }
+
+    return $COLUMN{$col};
+}
+
 =head1 Driver Specification
 
 =head2 Variables
@@ -257,6 +280,13 @@ abstract types:
 =item * BIGINT
 
 =item * NUMERIC
+
+=item * SERIAL
+
+This must be a complete specification of an integer which
+increments itself - e.g. auto_increment or serial. Please
+see the other drivers for some examples. This is really critical
+for logging.
 
 =back
 

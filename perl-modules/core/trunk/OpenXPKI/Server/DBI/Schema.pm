@@ -17,7 +17,9 @@ our %SEQUENCE = (
                  CSR            => "sequence_csr",
                  CERTIFICATE    => "sequence_certificate",
                  CRR            => "sequence_crr",
-                 AUDITTRAIL     => "sequence_audittrail",
+                 # log entries mus use auto_increment
+                 # or whatever the name of this technology is on your database platform
+                 # AUDITTRAIL     => "sequence_audittrail",
                  DATA           => "sequence_data",
                  GLOBAL_KEY_ID  => "sequence_global_id",
                  PRIVATE        => "sequence_private",

@@ -24,6 +24,7 @@ BIGINT and NUMERIC are C<numeric (49)>.
 =cut
 
 our %TYPE = (
+             SERIAL     => "SERIAL",
              TEXT       => "TEXT",
              TIMESTAMP  => "timestamp",
              LONGTEXT   => "TEXT",

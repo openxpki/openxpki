@@ -11,10 +11,13 @@ OpenXPKI 1.0
 - Exception based error handling (no silent ignorance possible)
 - Logging via Log::Log4perl
 - XML related changes
-    - schema for the configuration
-    - one single XML file for all
-    - xinclude support for local inclusions
-- Support for SQLite (replaced DBM support)
+    - Schema for the configuration
+    - One single XML file for all
+    - Xinclude support for local inclusions
+- Database interface
+    - Layer oriented interface (object and hash based)
+    - Isolated driver classes
+    - Support for SQLite (replaced DBM support)
 - Cryptographic layer
-    - full isolation of OpenSSL
-    - modularization of commands
+    - Full isolation of OpenSSL
+    - Modularization of commands

@@ -12,13 +12,13 @@ our $token = $mgmt->get_token (TYPE => "DEFAULT", NAME => "default", PKI_REALM =
 
 ## prepare database configuration
 
+use OpenXPKI::Server::DBI;
 our %config = (
               DEBUG  => 0,
               TYPE   => "SQLite",
               NAME   => "t/30_dbi/sqlite.db",
               CRYPTO => $token,
              );
-
 our $dbi = OpenXPKI::Server::DBI->new (%config);
 
 ok($dbi and ref $dbi);

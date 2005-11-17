@@ -114,18 +114,38 @@ sub create_table
         my $column = $self->{schema}->get_column ($col);
         my $type   = $self->{DBH}->get_column_type ($column);
         $command .= "$column $type";
-        $command .= " NOT NULL"
-            if (scalar grep /^${col}$/, @{$self->{schema}->get_table_index($table)});
+        if ($self->{DBH}->get_abstract_column_type ($column) ne "SERIAL" and
+            scalar grep /^${col}$/, @{$self->{schema}->get_table_index($table)})
+        {
+            ## we need this extra handling of SERIAL primary key columns
+            ## because there is no standard related to such auto_increment
+            ## columns. each vendor implement it different. Examples:
+            ## PostgreSQL: SERIAL
+            ## MySQL:      AUTO_INCREMENT
+            ## SQLite:     PRIMARY KEY AUTOINCREMENT
+            $command .= " NOT NULL";
+        }
         $command .= ", ";
     }
-    $command .= "PRIMARY KEY (";
-    foreach my $col (@{$self->{schema}->get_table_index($table)})
+
+    ## a SERIAL column can contain a primary key statement
+    ## because some databases have really poor SQL capabilities
+    ## an example of such a poor SQL dialect is SQLite
+    if ($command !~ /primary\s+key/i)
     {
-        $command .= $self->{schema}->get_column ($col);
-        $command .= ", ";
+        $command .= "PRIMARY KEY (";
+        foreach my $col (@{$self->{schema}->get_table_index($table)})
+        {
+            $command .= $self->{schema}->get_column ($col);
+            $command .= ", ";
+        }
+        $command = substr ($command, 0, length($command)-2); ## erase the last ,
+        $command .= ")";
+    } else {
+        $command = substr ($command, 0, length($command)-2); ## erase the last ,
     }
-    $command = substr ($command, 0, length($command)-2); ## erase the last ,
-    $command .= "))";
+
+    $command .= ")";
     $command .= " ".$self->{DBH}->get_table_option();
 
     $self->debug ("command: $command");
@@ -135,6 +155,7 @@ sub create_table
         return $command.";";
     } else {
         $self->{DBH}->do_query ( QUERY => $command );
+        $self->{DBH}->finish_sth();
         return 1;
     }
 }

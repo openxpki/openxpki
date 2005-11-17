@@ -28,6 +28,7 @@ This driver uses InnoDB by default.
 =cut
 
 our %TYPE = (
+             SERIAL     => "BIGINT NOT NULL AUTO_INCREMENT",
              TEXT       => "TEXT",
              TIMESTAMP  => "timestamp",
              LONGTEXT   => "TEXT",

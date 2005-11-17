@@ -1,0 +1,3 @@
+Please note that the DBI log appender can only be tested with an activated
+OpenXPKI::Server::DBI. Therefore the DBI tests are performed by the tests
+in 30_dbi. The related perl module is OpenXPKI::Server::Log::Appender::DBI.
