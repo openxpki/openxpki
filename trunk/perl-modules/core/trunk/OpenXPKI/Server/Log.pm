@@ -15,7 +15,6 @@ use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 use Log::Log4perl;
 use Log::Log4perl::Level;
-use Log::Log4perl::MDC;
 use OpenXPKI::Server::Log::Appender::DBI;
 
 sub new {
