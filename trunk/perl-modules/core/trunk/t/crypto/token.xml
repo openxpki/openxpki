@@ -1,0 +1,75 @@
+<token_config>
+    <token id="default" super="common/token_config/token{ca}"/>
+    <token id="ca">
+        <backend>OpenXPKI::Crypto::Backend::OpenSSL</backend>
+        <!--
+            if the token support sessions then you can use session and daemon too
+
+            session - token will be logged out at end of session
+            daemon  - token will be only logged out explicitly
+        -->
+        <mode>standby</mode>
+        <option>
+            <name>ENGINE</name>
+            <!-- possible values are OpenSSL, nCipher, LunaCA -->
+            <value>OpenSSL</value>
+        </option>
+        <option>
+            <name>SHELL</name>
+            <value>/usr/local/ssl/bin/openssl</value>
+        </option>
+        <option>
+            <name>WRAPPER</name>
+            <value></value>
+        </option>
+        <option>
+            <name>KEY</name>
+            <value>t/crypto/cakey.pem</value>
+        </option>
+        <option>
+            <name>PASSWD_PARTS</name>
+            <value>1</value>
+        </option>
+        <option>
+            <name>PEM_CERT</name>
+            <value>t/crypto/cacert.pem</value>
+        </option>
+        <option>
+            <name>DER_CERT</name>
+            <value>@var_prefix@/crypto/cacerts/cacert.der</value>
+        </option>
+        <option>
+            <name>TXT_CERT</name>
+            <value>@var_prefix@/crypto/cacerts/cacert.txt</value>
+        </option>
+        <option>
+            <name>CHAIN</name>
+            <value>t/crypto/cacert.pem</value>
+        </option>
+        <option>
+            <name>OPENCA_SV</name>
+            <value>@EXEC_PREFIX@/bin/openca-sv</value>
+        </option>
+        <option>
+            <name>TMPDIR</name>
+            <value>t/crypto</value>
+        </option>
+        <option>
+            <name>CONFIG</name>
+            <value>t/crypto/ca_openssl.cnf</value>
+        </option>
+        <option>
+            <name>RANDFILE</name>
+            <value>t/crypto/rand</value>
+        </option>
+        <option>
+            <name>DEBUG</name>
+            <value>0</value>
+        </option>
+        <!-- This is only for Perl's "make test". Never use this for production. -->
+        <option>
+            <name>PASSWD</name>
+            <value>1234567890</value>
+        </option>
+    </token>
+</token_config>
