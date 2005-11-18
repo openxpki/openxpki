@@ -73,7 +73,8 @@ sub __init
         $self->{TYPE} = "HEADER" if ($self->{header}->get_body());
         return 1;
     }
-    $self->{csr} = $self->{TOKEN}->get_object(DATA   => $self->{header}->get_body(),
+    $self->{csr} = $self->{TOKEN}->get_object(DEBUG  => $self->{DEBUG},
+                                              DATA   => $self->{header}->get_body(),
                                               TYPE   => "CSR",
                                               FORMAT => $self->{TYPE});
 
@@ -94,6 +95,7 @@ sub __init
     foreach my $attr (@attrlist)
     {
         $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function (
+                                                   DEBUG    => $self->{DEBUG},
                                                    OBJECT   => $self->{csr},
                                                    FUNCTION => $attr);
     }

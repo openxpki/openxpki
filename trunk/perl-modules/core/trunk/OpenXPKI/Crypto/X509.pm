@@ -55,8 +55,9 @@ sub __init
                                                      DATA  => $self->{DATA});
     eval
     {
-        $self->{x509} = $self->{TOKEN}->get_object(DATA => $self->{header}->get_body(),
-                                                   TYPE => "X509");
+        $self->{x509} = $self->{TOKEN}->get_object(DEBUG => $self->{DEBUG},
+                                                   DATA  => $self->{header}->get_body(),
+                                                   TYPE  => "X509");
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
@@ -78,6 +79,7 @@ sub __init
                        "keysize", "extensions", "openssl_subject" )
     {
         $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function (
+                                                   DEBUG    => $self->{DEBUG},
                                                    OBJECT   => $self->{x509},
                                                    FUNCTION => $attr);
     }

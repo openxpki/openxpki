@@ -50,8 +50,9 @@ sub __init
 
     $self->{header} = OpenXPKI::Crypto::Header->new (DEBUG => $self->{DEBUG},
                                                      DATA  => $self->{DATA});
-    $self->{crl} = $self->{TOKEN}->get_object(DATA => $self->{header}->get_body(),
-                                              TYPE => "CRL");
+    $self->{crl} = $self->{TOKEN}->get_object(DEBUG => $self->{DEBUG},
+                                              DATA  => $self->{header}->get_body(),
+                                              TYPE  => "CRL");
 
     ##########################
     ##     core parsing     ##
@@ -62,6 +63,7 @@ sub __init
                       "signature_algorithm", "revoked", "serial")
     {
         $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function (
+                                                   DEBUG    => $self->{DEBUG},
                                                    OBJECT   => $self->{crl},
                                                    FUNCTION => $attr);
     }

@@ -171,6 +171,13 @@ sub get_object
     my $self = shift;
     my $keys = { @_ };
 
+    my $debug = undef;
+    if ($keys->{DEBUG})
+    {
+        my $debug = $self->{DEBUG};
+        $self->{DEBUG} = $keys->{DEBUG};
+    }
+
     my $format = ($keys->{FORMAT} or "PEM");
     my $data   = $keys->{DATA};
     my $type   = $keys->{TYPE};
@@ -213,18 +220,21 @@ sub get_object
             $object = OpenXPKI::Crypto::Backend::OpenSSL::CRL::_new_from_pem ($data);
         }
     } else {
+        $self->{DEBUG} = $debug if ($keys->{DEBUG});
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_UNKNOWN_TYPE",
             params  => {"TYPE" => $type});
     }
     if (not $object)
     {
+        $self->{DEBUG} = $debug if ($keys->{DEBUG});
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_NO_REF");
     }
 
     $self->debug ("returning object");
 
+    $self->{DEBUG} = $debug if ($keys->{DEBUG});
     return $object;
 }
 
@@ -232,10 +242,22 @@ sub get_object_function
 {
     my $self   = shift;
     my $keys   = { @_ };
+    my $debug = undef;
+    if ($keys->{DEBUG})
+    {
+        my $debug = $self->{DEBUG};
+        $self->{DEBUG} = $keys->{DEBUG};
+    }
     my $object = $keys->{OBJECT};
     my $func   = $keys->{FUNCTION};
+    $self->debug ("object:   $object");
+    $self->debug ("function: $func");
 
-    return $self->free_object ($object) if ($func eq "free");
+    if ($func eq "free")
+    {
+        $self->{DEBUG} = $debug if ($keys->{DEBUG});
+        return $self->free_object ($object);
+    }
 
     ## unicode handling
     ## use utf8;
@@ -263,6 +285,7 @@ sub get_object_function
         }
     }
 
+    $self->{DEBUG} = $debug if ($keys->{DEBUG});
     return $result;
 }
 
