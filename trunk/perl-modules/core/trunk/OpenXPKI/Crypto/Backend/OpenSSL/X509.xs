@@ -60,10 +60,15 @@ free(cert)
 char *
 serial(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
+    PREINIT:
+	char *serial;
     CODE:
+	serial = i2s_ASN1_INTEGER(NULL,X509_get_serialNumber(cert));
 	SAFEFREE(char_ptr);
-	char_ptr = i2s_ASN1_INTEGER(NULL,X509_get_serialNumber(cert));
+	Newz(0, char_ptr, strlen(serial)+1, char);
+	memcpy (char_ptr, serial, strlen(serial));
         RETVAL = char_ptr;
+	OPENSSL_free(serial);
     OUTPUT:
 	RETVAL
 
@@ -94,9 +99,16 @@ openssl_subject(cert)
 	char *subject;
 	int n;
     CODE:
+	// calculate aprox. string length
+	out = BIO_new(BIO_s_mem());
+	X509_NAME_print_ex(out, X509_get_subject_name(cert), 0, OPENXPKI_FLAG_RFC2253);
+	n = BIO_get_mem_data(out, &subject);
+	BIO_free(out);
+
 	SAFEFREE(char_ptr);
+	Newz(0, char_ptr, n+10, char);
 	// X509_NAME_print_ex(out, X509_get_subject_name(cert), 0, XN_FLAG_COMPAT);
-	char_ptr = X509_NAME_oneline (X509_get_subject_name(cert), NULL, 0);
+	char_ptr = X509_NAME_oneline (X509_get_subject_name(cert), char_ptr, n+10);
 	RETVAL = char_ptr;
     OUTPUT:
 	RETVAL

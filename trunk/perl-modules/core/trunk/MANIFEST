@@ -100,6 +100,7 @@ t/10_exception/1.t
 t/15_dn/1.t
 t/15_dn/2.t
 t/15_dn/3.t
+t/15_dn/4.t
 
 t/20_xml/1.t
 t/20_xml/2.t
