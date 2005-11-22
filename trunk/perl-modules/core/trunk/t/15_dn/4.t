@@ -8,22 +8,35 @@
 use strict;
 use warnings;
 use utf8;
+binmode STDERR, ":utf8";
 use Test;
 use OpenXPKI::DN;
 
 my %example = (
     ## normal DN
-    "CN=Иван Петрович Козлодоев,OU=employee,O=university,C=de" => 
-        [
-         "Иван Петрович Козлодоев",  ## common name
-        ],
-    "CN=Mäxchen Müller,OU=employee,O=university,C=de" => 
-        [
-         "Mäxchen Müller",  ## common name
-        ],
+    "CN=Иван Петрович Козлодоев,O=Организация объединённых наций,DC=UN,DC=org" =>
+    {
+        CN => [ "Иван Петрович Козлодоев" ],
+        O  => [ "Организация объединённых наций" ],
+        DC => [ "UN", "org" ]
+    },
+    "CN=Кузьма Ильич Дурыкин,OU=кафедра квантовой статистики и теории поля,OU=отделение экспериментальной и теоретической физики,OU=физический факультет,O=Московский государственный университет им. М.В.Ломоносова,C=ru" =>
+    {
+        CN => [ "Кузьма Ильич Дурыкин" ],
+        OU => [ "кафедра квантовой статистики и теории поля",
+                "отделение экспериментальной и теоретической физики",
+                "физический факультет" ],
+        O  => [ "Московский государственный университет им. М.В.Ломоносова" ],
+        C  => [ "ru" ]
+    },
+    "CN=Mäxchen Müller,O=Humboldt-Universität zu Berlin,C=DE" =>
+    {
+        CN => [ "Mäxchen Müller" ],
+        O  => [ "Humboldt-Universität zu Berlin" ]
+    }
               );
 
-BEGIN { plan tests => 6 };
+BEGIN { plan tests => 18 };
 
 print STDERR "UTF-8 VALIDATION\n";
 
@@ -40,7 +53,20 @@ foreach my $dn (keys %example)
     }
     ok ($object->get_rfc_2253_dn(), $dn);
     my %content = $object->get_hashed_content();
-    ok ($content{"CN"}[0] eq $example{$dn}[0]);
+    foreach my $key (keys %{$example{$dn}})
+    {
+        for (my $i=0; $i < scalar @{$example{$dn}->{$key}}; $i++)
+        {
+            if ($content{$key}[$i] eq $example{$dn}->{$key}->[$i])
+            {
+                ok(1);
+            } else {
+                ok(0);
+                print STDERR "Calculated: ".$content{$key}[$i]."\n";
+                print STDERR "Original:   ".$example{$dn}->{$key}->[$i]."\n";
+            }
+        }
+    }
 }
 
 1;

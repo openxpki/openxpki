@@ -6,11 +6,13 @@
 
 use strict;
 use warnings;
+use utf8;
 package OpenXPKI::DN;
 
 use Memoize;
 use Text::CSV_XS;
 use OpenXPKI::Exception;
+use OpenXPKI qw(debug);
 
 
 # OpenSSL style attribute name mapping
@@ -34,27 +36,28 @@ my %mapping_of = (
     DESCRIPTION          => "description",
     );
 
-
-
 sub new
 {
     my $that  = shift;
     my $class = ref($that) || $that;
-    my $self  = {};
+    my $self  = {DEBUG => 0};
     bless $self, $class;
 
     my $arg = shift;
 
     return undef if (! defined $arg && ($arg eq ""));
 
+    $self->debug ("scanning dn: $arg");
+    $self->debug ("length of dn: ".length $arg);
+
     if (substr ($arg, 0, 1) eq "/")
     {
         ## proprietary OpenSSL oneline syntax
         my $dn = convert_openssl_dn($arg);
-        $self->{PARSED} = [ __get_parsed_rfc_2253 ($dn) ];
+        $self->{PARSED} = [ $self->__get_parsed_rfc_2253 ($dn) ];
     } else {
         ## RFC2253 Syntax
-        $self->{PARSED} = [ __get_parsed_rfc_2253 ($arg) ];
+        $self->{PARSED} = [ $self->__get_parsed_rfc_2253 ($arg) ];
     }
     $self->__build_rdns();
 
@@ -206,21 +209,15 @@ sub __build_attributes
 
 sub __get_parsed_rfc_2253
 {
-    my $string = pop;
-
-    # FIXME??? Do we really mean the last argument? The original code was:
-#     my $string = shift;
-#     while ($_[0])
-#     {
-#         $string = shift;
-#     }
+    my $self   = shift;
+    my $string = shift;
 
     my @result = ();
 
     while ($string)
     {
 	my $rdn;
-        ($rdn, $string) = __get_next_rdn ($string);
+        ($rdn, $string) = $self->__get_next_rdn ($string);
 	if (defined $rdn && $rdn ne "") {
 	    push(@result, $rdn);
 	}
@@ -233,13 +230,14 @@ sub __get_parsed_rfc_2253
 
 sub __get_next_rdn
 {
+    my $self   = shift;
     my $string = shift;
     my ($type, $value);
     my $result = [];
 
     while ($string)
     {
-        ($type, $value, $string) = __get_attribute ($string);
+        ($type, $value, $string) = $self->__get_attribute ($string);
         $result->[scalar @{$result}] = [ $type, $value ];
         last if (substr ($string, 0, 1) eq ","); ## stop at ,
         if (length ($string) > 1)
@@ -255,12 +253,14 @@ sub __get_next_rdn
 
 sub __get_attribute
 {
+    my $self   = shift;
     my $string = shift;
     my ($type, $value);
 
     ($type, $string)  = __get_attribute_type ($string);
     $string           = substr ($string, 1);
     ($value, $string) = __get_attribute_value ($string);
+    $self->debug ("type:  $type\nvalue: $value");
 
     return ($type, $value, $string);
 }

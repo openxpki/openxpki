@@ -120,7 +120,7 @@ WriteMakefile(
                     'Exception::Class'       => "1.22",
                     ## includes the version of libintl-perl which includes Locale::Messages
                     'Locale::TextDomain'     => 1,
-                    'Log::Log4perl'          => 1,
+                    'Log::Log4perl'          => '0.51',
                     'Math::BigInt'           => 1,
                     'Test'                   => 1,
                     'Test::Pod'              => "1.00",
