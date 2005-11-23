@@ -45,6 +45,10 @@ sub start
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_START_OPEN_FAILED",
             params  => {"ERRVAL" => $!});
     }
+    ## this required to avoid:
+    ##     1. warnings about printing wide characters
+    ##     2. automatic iso8859-1 conversion if this is possible
+    binmode  $self->{OPENSSL_FD}, ":utf8";
     $self->debug ("shell started");
     return 1;
 }

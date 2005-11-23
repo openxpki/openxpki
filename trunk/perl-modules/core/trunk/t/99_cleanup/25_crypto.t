@@ -1,50 +1,49 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 2 };
+
+my @files = (
+             "t/25_crypto/cakey.pem",
+             "t/25_crypto/cacert.pem",
+
+             "t/25_crypto/passwd.txt",
+             "t/25_crypto/dsa.pem",
+             "t/25_crypto/ec.pem",
+             "t/25_crypto/rsa.pem",
+             "t/25_crypto/pkcs10.pem",
+             "t/25_crypto/cert.pem",
+             "t/25_crypto/crl.pem",
+
+             "t/25_crypto/utf8.0.pkcs10.pem",
+             "t/25_crypto/utf8.0.cert.pem",
+             "t/25_crypto/utf8.0.crl.pem",
+
+             "t/25_crypto/utf8.1.pkcs10.pem",
+             "t/25_crypto/utf8.1.cert.pem",
+             "t/25_crypto/utf8.1.crl.pem",
+
+             "t/25_crypto/utf8.2.pkcs10.pem",
+             "t/25_crypto/utf8.2.cert.pem",
+             "t/25_crypto/utf8.2.crl.pem",
+
+             "t/25_crypto/index.txt.attr",
+             "t/25_crypto/index.txt",
+             "t/25_crypto/serial",
+             "t/25_crypto/index.txt.attr.old",
+             "t/25_crypto/index.txt.old",
+             "t/25_crypto/serial.old",
+             "t/25_crypto/crlnumber",
+            );
+
+## 2 * number of file
+BEGIN { plan tests => 50 };
 
 print STDERR "OpenXPKI::Crypto Cleanup\n";
 
-unlink ("t/25_crypto/cakey.pem");
-unlink ("t/25_crypto/cacert.pem");
-
-unlink ("t/25_crypto/passwd.txt");
-unlink ("t/25_crypto/dsa.pem");
-unlink ("t/25_crypto/ec.pem");
-unlink ("t/25_crypto/rsa.pem");
-unlink ("t/25_crypto/pkcs10.pem");
-unlink ("t/25_crypto/cert.pem");
-unlink ("t/25_crypto/crl.pem");
-
-unlink ("t/25_crypto/index.txt.attr");
-unlink ("t/25_crypto/index.txt");
-unlink ("t/25_crypto/serial");
-unlink ("t/25_crypto/index.txt.attr.old");
-unlink ("t/25_crypto/index.txt.old");
-unlink ("t/25_crypto/serial.old");
-unlink ("t/25_crypto/crlnumber");
-
-ok(1);
-
-if (-e "t/25_crypto/cakey.pem" or
-    -e "t/25_crypto/cacert.pem" or
-    -e "t/25_crypto/passwd.txt" or
-    -e "t/25_crypto/dsa.pem" or
-    -e "t/25_crypto/rsa.pem" or
-    -e "t/25_crypto/pkcs10.pem" or
-    -e "t/25_crypto/cert.pem" or
-    -e "t/25_crypto/crl.pem" or
-    -e "t/25_crypto/index.txt.attr" or
-    -e "t/25_crypto/index.txt" or
-    -e "t/25_crypto/serial" or
-    -e "t/25_crypto/index.txt.attr.old" or
-    -e "t/25_crypto/index.txt.old" or
-    -e "t/25_crypto/serial.old" or
-    -e "t/25_crypto/crlnumber")
+foreach my $filename (@files)
 {
-    ok(0);
-} else {
-    ok(1);
+    ok(not -e $filename or unlink ($filename));
+    ok(not -e $filename);
 }
 
 1;

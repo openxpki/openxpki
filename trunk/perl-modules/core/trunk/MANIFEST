@@ -116,6 +116,7 @@ t/25_crypto/10.t
 t/25_crypto/11.t
 t/25_crypto/12.t
 t/25_crypto/13.t
+t/25_crypto/14.t
 t/25_crypto/20.t
 t/25_crypto/21.t
 t/25_crypto/22.t
