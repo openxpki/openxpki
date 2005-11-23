@@ -259,11 +259,10 @@ sub get_object_function
         return $self->free_object ($object);
     }
 
-    ## unicode handling
-    ## use utf8;
     my $result = $object->$func();
-    ## pack/unpack is much too slow
-    #my $result = pack "U0C*", unpack "C*", $object->$func();
+    ##without pack/unpack the conversion does not work
+    ##utf8::upgrade($result) if (defined $result);
+    $result = pack "U0C*", unpack "C*", $object->$func();
 
     ## fix proprietary "DirName:" of OpenSSL
     if (defined $result and $func eq "extensions")

@@ -1,7 +1,9 @@
 use strict;
 use warnings;
+use utf8;
+binmode STDERR, ":utf8";
 use Test;
-BEGIN { plan tests => 15 };
+BEGIN { plan tests => 18 };
 
 print STDERR "OpenXPKI::Crypto::X509\n";
 
@@ -63,5 +65,31 @@ $result = $items / $result;
 $result =~ s/\..*$//;
 print STDERR " - $result certs/second (minimum: 100 per second)\n";
 ok ($result > 100);
+
+## UTF-8 compatibility
+
+my @example = (
+    "CN=Иван Петрович Козлодоев,O=Организация объединённых наций,DC=UN,DC=org",
+    "CN=Кузьма Ильич Дурыкин,OU=кафедра квантовой статистики и теории поля,OU=отделение экспериментальной и теоретической физики,OU=физический факультет,O=Московский государственный университет им. М.В.Ломоносова,C=ru",
+    "CN=Mäxchen Müller,O=Humboldt-Universität zu Berlin,C=DE"
+              );
+
+for (my $i=0; $i < scalar @example; $i++)
+{
+    $data = OpenXPKI->read_file ("t/25_crypto/utf8.$i.cert.pem");
+    $data = "-----BEGIN HEADER-----\n".
+            "ROLE=User\n".
+            "-----END HEADER-----\n".
+            $data;
+    $cert = OpenXPKI::Crypto::X509->new (TOKEN => $token, DATA => $data);
+    if ($cert->get_parsed ("BODY", "SUBJECT") eq $example[$i])
+    {
+        ok(1);
+    } else {
+        ok(0);
+        print STDERR "Original:  ".$example[$i]."\n";
+        print STDERR "Generated: ".$cert->get_parsed ("BODY", "SUBJECT")."\n";
+    }
+}
 
 1;
