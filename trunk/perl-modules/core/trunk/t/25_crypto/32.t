@@ -1,8 +1,10 @@
 use strict;
 use warnings;
+use utf8;
+binmode STDERR, ":utf8";
 use Test;
 use English;
-BEGIN { plan tests => 17 };
+BEGIN { plan tests => 23 };
 
 print STDERR "OpenXPKI::Crypto::CSR\n";
 
@@ -82,5 +84,41 @@ $result = $items / $result;
 $result =~ s/\..*$//;
 print STDERR " - $result CSRs/second (minimum: 100 per second)\n";
 ok ($result > 100);
+
+## UTF-8 compatibility
+
+my @example = (
+    "CN=Иван Петрович Козлодоев,O=Организация объединённых наций,DC=UN,DC=org",
+    "CN=Кузьма Ильич Дурыкин,OU=кафедра квантовой статистики и теории поля,OU=отделение экспериментальной и теоретической физики,OU=физический факультет,O=Московский государственный университет им. М.В.Ломоносова,C=ru",
+    "CN=Mäxchen Müller,O=Humboldt-Universität zu Berlin,C=DE"
+              );
+
+for (my $i=0; $i < scalar @example; $i++)
+{
+    $data = OpenXPKI->read_file ("t/25_crypto/utf8.$i.pkcs10.pem");
+    $data = "-----BEGIN HEADER-----\n".
+            "ROLE=User\n".
+            "SERIAL=4321\n".
+            "SUBJECT=".$example[$i]."\n".
+            "-----END HEADER-----\n".
+            $data;
+    $csr = OpenXPKI::Crypto::CSR->new (TOKEN => $token, DATA => $data);
+    if ($csr->get_parsed ("BODY", "SUBJECT") eq $example[$i])
+    {
+        ok(1);
+    } else {
+        ok(0);
+        print STDERR "Original:  ".$example[$i]."\n";
+        print STDERR "Generated: ".$csr->get_parsed ("BODY", "SUBJECT")."\n";
+    }
+    if ($csr->get_parsed ("HEADER", "SUBJECT") eq $example[$i])
+    {
+        ok(1);
+    } else {
+        ok(0);
+        print STDERR "Original:  ".$example[$i]."\n";
+        print STDERR "Generated: ".$csr->get_parsed ("HEADER", "SUBJECT")."\n";
+    }
+}
 
 1;
