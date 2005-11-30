@@ -34,9 +34,6 @@ of OpenXPKI::Server::DBI::HASH. You can specify optionally DEBUG. All
 operations are mapped to hash operations. Please see OpenXPKI::Server::DBI
 for the general design of OpenXPKI's database interface.
 
-If you want to insert certificates or CRLs then you must supply
-the parameter CRYPTO with a reference to cryptographic token.
-
 =cut
 
 sub new
@@ -50,6 +47,19 @@ sub new
     return $self;
 }
 
+=head2 set_crypto
+
+configures the instance of the crypto token to support the
+instantiation of cryptographic objects like certificates.
+
+=cut
+
+sub set_crypto
+{
+    my $self = shift;
+    $self->{crypto} = shift;
+    return $self->{crypto};
+}
 ########################################################################
 
 =head1 SQL related Functions
@@ -231,19 +241,18 @@ sub select
         if ($keys->{TABLE} eq "CERTIFICATE")
         {
             $object = OpenXPKI::Crypto::X509->new (DATA  => $hashref->{DATA},
-                                                   SHELL => $self->{CRYPTO},
+                                                   TOKEN => $self->{crypto},
                                                    DEBUG => $self->{DEBUG});
         } elsif ($keys->{TABLE} eq "CRL") {
             $object = OpenXPKI::Crypto::CRL->new (DATA  => $hashref->{DATA},
-                                                  SHELL => $self->{CRYPTO},
+                                                  TOKEN => $self->{crypto},
                                                   DEBUG => $self->{DEBUG});
         } elsif ($keys->{TABLE} eq "CRR") {
             $object = OpenXPKI::Crypto::CRR->new (DATA   => $hashref->{DATA},
-                                                  SHELL  => $self->{CRYPTO},
                                                   DEBUG  => $self->{DEBUG});
         } elsif ($keys->{TABLE} eq "CSR") {
             $object = OpenXPKI::Crypto::CSR->new (DATA   => $hashref->{DATA},
-                                                  SHELL  => $self->{CRYPTO},
+                                                  TOKEN  => $self->{crypto},
                                                   DEBUG  => $self->{DEBUG});
         } else {
             OpenXPKI::Exception->throw (

@@ -20,11 +20,54 @@
 
   <xsd:complexType name="common_type">
     <xsd:sequence>
-      <xsd:element name="log_config" type="xsd:string"/> <!-- this must be a filename -->
-      <xsd:element name="database" type="database_type"/>
+      <xsd:element name="log_config"    type="xsd:string"/> <!-- this must be a filename -->
+      <xsd:element name="server"       type="server_type"/>
+      <xsd:element name="i18n"         type="i18n_type"/>
+      <xsd:element name="database"     type="database_type"/>
       <xsd:element name="token_config" type="token_config_type"/>
     </xsd:sequence>
   </xsd:complexType>
+
+  <!-- ==================== -->
+  <!-- server configuration -->
+  <!-- =======BEGIN======== -->
+
+  <xsd:complexType name="server_type">
+    <xsd:sequence>
+      <xsd:element name="user"        type="xsd:string"/> <!-- this must be a valid user or UID -->
+      <xsd:element name="group"       type="xsd:string"/> <!-- this must be a valid group or GID -->
+      <xsd:element name="socket_file" type="xsd:string"/> <!-- this must be a filename -->
+      <xsd:element name="pid_file"    type="xsd:string"/> <!-- this must be a filename -->
+      <xsd:element name="stderr"      type="xsd:string"/> <!-- this must be a filename -->
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ========END========= -->
+  <!-- server configuration -->
+  <!-- ==================== -->
+
+  <!-- ================== -->
+  <!-- i18n configuration -->
+  <!-- ======BEGIN======= -->
+
+  <xsd:complexType name="i18n_type">
+    <xsd:sequence>
+      <xsd:element name="locale_directory" type="xsd:string"/> <!-- this must be a filename -->
+      <xsd:element name="default_language" type="language_type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="language_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="C"/>
+      <xsd:enumeration value="en_GB"/>
+      <xsd:enumeration value="de_DE"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- =======END======== -->
+  <!-- i18n configuration -->
+  <!-- ====================== -->
 
   <!-- ====================== -->
   <!-- database configuration -->
@@ -32,15 +75,17 @@
 
   <xsd:complexType name="database_type">
     <xsd:sequence>
-      <xsd:element name="debug"     type="debug_type"/>
-      <xsd:element name="type"      type="database_type_type"/>
-      <xsd:element name="name"      type="xsd:string"/>
-      <xsd:element name="host"      type="xsd:string"          minOccurs="0"/>
-      <xsd:element name="port"      type="xsd:positiveInteger" minOccurs="0"/>
-      <xsd:element name="user"      type="xsd:token"           minOccurs="0"/>
-      <xsd:element name="passwd"    type="xsd:string"          minOccurs="0"/>
-      <xsd:element name="namespace" type="xsd:token"           minOccurs="0"/>
-      <xsd:element name="environment" type="database_environment_type"/>
+      <xsd:element name="debug"        type="debug_type"/>
+      <xsd:element name="server_id"    type="xsd:nonNegativeInteger"/>
+      <xsd:element name="server_shift" type="xsd:positiveInteger"/>
+      <xsd:element name="type"         type="database_type_type"/>
+      <xsd:element name="name"         type="xsd:string"/>
+      <xsd:element name="host"         type="xsd:string"          minOccurs="0"/>
+      <xsd:element name="port"         type="xsd:positiveInteger" minOccurs="0"/>
+      <xsd:element name="user"         type="xsd:token"           minOccurs="0"/>
+      <xsd:element name="passwd"       type="xsd:string"          minOccurs="0"/>
+      <xsd:element name="namespace"    type="xsd:token"           minOccurs="0"/>
+      <xsd:element name="environment"  type="database_environment_type"/>
     </xsd:sequence>
     <xsd:attribute ref="xml:base"/>
   </xsd:complexType>

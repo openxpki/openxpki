@@ -27,6 +27,7 @@ sub new
 
     $self->{DEBUG}  = 1 if ($self->{params}->{DEBUG});
     $self->debug ("start");
+    $self->{log} = $self->{params}->{LOG};
 
     ## init driver
     if (not $self->{params}->{TYPE})
@@ -62,12 +63,12 @@ sub set_session_id
     return $self->{SESSION_ID};
 }
 
-sub set_log_ref
-{
-    my $self = shift;
-    $self->{log} = shift;
-    return $self->{log};
-}
+#sub set_log_ref
+#{
+#    my $self = shift;
+#    $self->{log} = shift;
+#    return $self->{log};
+#}
 
 #######################################################################
 

@@ -84,6 +84,12 @@ OpenXPKI/Server/DBI/Driver/SQLite.pm
 OpenXPKI/Server/Log.pm
 OpenXPKI/Server/Log/Appender/DBI.pm
 
+## common server stuff
+
+OpenXPKI/Server.pm
+OpenXPKI/Server/API.pm
+OpenXPKI/Server/Init.pm
+
 ## test stuff
 
 t/config.xml
@@ -148,6 +154,9 @@ t/30_dbi/04.t
 t/30_dbi/70.t
 t/30_dbi/common.pl
 t/30_dbi/database.xml
+
+t/70_server/startup.pl
+t/70_server/01.t
 
 t/00_cleanup/25_crypto.t
 t/00_cleanup/28_log.t

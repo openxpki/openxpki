@@ -131,9 +131,8 @@ things to meet our requirements.
 
 =head2 new
 
-This function only accepts three parameters - C<DEBUG>, C<DBI> and C<CONFIG>.
-C<DBI> is a reference to an instance of OpenXPKI::Server::DBI. C<CONFIG>
-includes the filename of the Log::Log4perl configuration.
+This function only accepts two parameters - C<DEBUG> and C<CONFIG>.
+C<CONFIG> includes the filename of the Log::Log4perl configuration.
 
 =head2 log
 

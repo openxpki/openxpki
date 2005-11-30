@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 11 };
+BEGIN { plan tests => 12 };
 
 print STDERR "OpenXPKI::Server::DBI: CA setup and empty CRL\n";
 

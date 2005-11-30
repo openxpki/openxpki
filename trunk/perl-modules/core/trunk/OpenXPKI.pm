@@ -22,12 +22,12 @@ use POSIX qw (setlocale);
 use Fcntl qw (:DEFAULT);
 
 our $language = "";
-our $prefix = "";
+our $locale_prefix = "";
 
 use vars qw (@ISA @EXPORT_OK);
 require Exporter;
 @ISA = qw (Exporter);
-@EXPORT_OK = qw (i18nGettext set_language get_language debug read_file write_file);
+@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language get_language debug read_file write_file);
 
 =head1 Exported functions
 
@@ -84,16 +84,22 @@ instance.
 
 =head1 Functions
 
-=head2 set_prefix
+=head2 set_locale_prefix
 
 The only parameter is a directory in the filesystem. The function is used
 to set the path to the directory with the mo databases.
 
 =cut
 
-sub set_prefix
+sub set_locale_prefix
 {
-    $prefix = shift;
+    $locale_prefix = shift;
+    if (not -e $locale_prefix)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SET_LOCALE_PREFIX_DIR_DOES_NOT_EXIST",
+            params  => {"DIR" => $locale_prefix});
+    }
 }
 
 =pod
@@ -224,7 +230,7 @@ sub set_language
         nl_putenv("LC_TIME=$loc");
     }
     textdomain("openxpki");
-    bindtextdomain("openxpki", $prefix);
+    bindtextdomain("openxpki", $locale_prefix);
     bind_textdomain_codeset("openxpki", "UTF-8");
 }
 
@@ -257,7 +263,7 @@ sub read_file
     if (! -e $filename)
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_READ_FILE_NOT_EXISTENT",
+            message => "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST",
             params  => {"FILENAME" => $filename});
     }
 

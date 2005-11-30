@@ -1,14 +1,11 @@
 use strict;
 use warnings;
 
-## init crypto token
+## init logging module
 
-use OpenXPKI::Crypto::TokenManager;
-our $cache;
-require 't/25_crypto/common.pl';
-my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0, CONFIG => $cache);
-my $token = $mgmt->get_token (TYPE => "DEFAULT", NAME => "default", PKI_REALM => "Test Root CA");
-ok(1);
+use OpenXPKI::Server::Log;
+our $log = OpenXPKI::Server::Log->new (CONFIG => "t/28_log/log.conf");
+ok($log);
 
 ## init database module
 
@@ -17,7 +14,7 @@ my %config = (
               DEBUG  => 0,
               TYPE   => "SQLite",
               NAME   => "t/28_log/sqlite.db",
-              CRYPTO => $token,
+              LOG    => $log
              );
 our $dbi = OpenXPKI::Server::DBI->new (%config);
 ok($dbi->connect());

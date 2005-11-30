@@ -39,21 +39,15 @@ sub new {
     # $self->{DEBUG}          = 1;
     $self->debug ("start");
 
-    # non-DB-specific
-
-    $self->{crypto} = $keys->{CRYPTO};
-
-    $self->debug ("checking for crypto backend");
-
-    if (not $self->{crypto})
+    $self->{log} = $keys->{LOG};
+    if (not $self->{log})
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_DBI_MISSING_CRYPTO");
+            message => "I18N_OPENXPKI_SERVER_DBI_MISSING_LOG");
     }
 
     $self->debug ("defining the class parameters");
 
-    $self->{params}->{CRYPTO}       = $self->{crypto};
     $self->{params}->{DEBUG}        = $self->{DEBUG};
     $self->{params}->{TYPE}         = $keys->{TYPE};
     $self->{params}->{HOST}         = $keys->{HOST};
@@ -64,6 +58,7 @@ sub new {
     $self->{params}->{NAMESPACE}    = $keys->{NAMESPACE};
     $self->{params}->{SERVER_ID}    = $keys->{SERVER_ID};
     $self->{params}->{SERVER_SHIFT} = $keys->{SERVER_SHIFT};
+    $self->{params}->{LOG}          = $self->{log};
 
     # Check for all neccessary variables to initialize OpenXPKI::Server:DBI 
 
@@ -73,7 +68,8 @@ sub new {
     $self->{sql}    = OpenXPKI::Server::DBI::SQL->new (DEBUG => $self->{DEBUG},
                                                        DBH   => $self->{dbh});
     $self->{hash}   = OpenXPKI::Server::DBI::Hash->new (DEBUG => $self->{DEBUG},
-                                                        SQL   => $self->{sql});
+                                                        SQL   => $self->{sql},
+                                                        LOG   => $self->{log});
     $self->{object} = OpenXPKI::Server::DBI::Object->new (DEBUG  => $self->{DEBUG},
                                                           HASH   => $self->{hash},
                                                           CRYPTO => $self->{crypto});
@@ -83,14 +79,14 @@ sub new {
     return $self;
 }
 
-sub set_log_ref
-{
-    my $self = shift;
-    $self->{log} = shift;
-    $self->{dbh}->set_log_ref ($self->{log});
-    $self->{hash}->set_log_ref ($self->{log});
-    return $self->{log};
-}
+#sub set_log_ref
+#{
+#    my $self = shift;
+#    $self->{log} = shift;
+#    $self->{dbh}->set_log_ref ($self->{log});
+#    $self->{hash}->set_log_ref ($self->{log});
+#    return $self->{log};
+#}
 
 sub set_session_id
 {
@@ -99,6 +95,14 @@ sub set_session_id
     $self->{dbh}->set_session_id ($self->{SESSION_ID});
     $self->{hash}->set_session_id ($self->{SESSION_ID});
     return $self->{SESSION_ID};
+}
+
+sub set_crypto
+{
+    my $self = shift;
+    $self->{crypto} = shift;
+    $self->{object}->set_crypto ($self->{crypto});
+    return $self->{crypto};
 }
 
 ########################################################################
@@ -394,11 +398,9 @@ FIXME: THE EXPIRED HANDLING IS STILL NOT PORTED FROM THE OLD CODE.
 
 =head3 new
 
-is the constructor. It supports DEBUG and CRYPTO as general parameters.
-DEBUG can be a true or false value and is false by default. CRYPTO
-is a required parameter and must be a crypto token which is able to
-parse certificates. The token must support the function which are
-required by the crypto objects. The TYPE is the last parameters which
+is the constructor. It supports DEBUG and TYPE as general parameter.
+DEBUG can be a true or false value and is false by default.
+The TYPE is the last parameters which
 is understand by the module itself. It must be a valid
 OpenXPKI::Server::DBI::Driver class name. All other parameters are
 directly handled by the corresponding drivers. The following
@@ -428,13 +430,18 @@ Please remember that not all drivers can handle all parameters.
 
 =head3 set_session_id
 
-configure the session ID which is used for logging.
+configures the session ID which is used for logging.
 
 =head3 set_log_ref
 
-configure the instance of a logging class to support logging.
+configures the instance of a logging class to support logging.
 This is necessary because the database module is one of the core
 modules which will be initialized first.
+
+=head3 set_crypto
+
+configures the instance of the crypto token to support the
+instantiation of cryptographic objects like certificates.
 
 =head3 get_driver_name
 

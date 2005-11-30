@@ -1,5 +1,7 @@
 <database>
   <debug>0</debug>
+  <server_id>0</server_id>
+  <server_shift>8</server_shift>
   <type>SQLite</type>
   <name>t/dbi/sqlite.db</name>
   <environment>

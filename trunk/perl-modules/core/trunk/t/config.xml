@@ -1,6 +1,17 @@
 <openxpki>
   <common>
     <log_config>t/28_log/log.conf</log_config>
+    <server>
+        <user>root</user>
+        <group>root</group>
+        <socket_file>t/socket</socket_file>
+        <pid_file>t/pid</pid_file>
+        <stderr>t/stderr.log</stderr>
+    </server>
+    <i18n>
+        <locale_directory>t</locale_directory>
+        <default_language>C</default_language>
+    </i18n>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="30_dbi/database.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="25_crypto/token.xml"/>
   </common>

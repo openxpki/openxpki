@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test;
-BEGIN { plan tests => 8 };
+BEGIN { plan tests => 9 };
 
 print STDERR "OpenXPKI::Server::DBI: Database Initialization\n";
 

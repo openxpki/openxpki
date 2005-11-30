@@ -31,12 +31,12 @@ sub set_session_id
     return $self->{SESSION_ID};
 }
 
-sub set_log_ref
-{
-    my $self = shift;
-    $self->{log} = shift;
-    return $self->{log};
-}
+#sub set_log_ref
+#{
+#    my $self = shift;
+#    $self->{log} = shift;
+#    return $self->{log};
+#}
 
 ########################################################################
 
@@ -191,7 +191,7 @@ sub __log_write_action
     {
         $message .= "\n".lc($key)."=".$index{$key};
     }
-    $self->{log}->log (FACILITY => "audit",
+    $self->{LOG}->log (FACILITY => "audit",
                        PRIORITY => "info",
                        MESSAGE  => $message,
                        MODULE   => $package,
