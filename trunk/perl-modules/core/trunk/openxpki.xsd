@@ -6,7 +6,7 @@
 <!-- this is the XML schema definition of OpenXPKI               -->
 <!-- you can check this schema with the following command        -->
 <!-- xmllint -format -schema openxpki.xsd -xinclude t/config.xml -->
-<!-- if you are offline then please add the option - - no - net  -->
+<!-- if you are offline then please add the option - - nonet     -->
 <!-- otherwise xmllint tries to use the internet                 -->
 
   <xsd:element name="openxpki" type="openxpki_type"/>

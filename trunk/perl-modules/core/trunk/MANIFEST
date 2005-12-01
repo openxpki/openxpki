@@ -155,6 +155,7 @@ t/30_dbi/70.t
 t/30_dbi/common.pl
 t/30_dbi/database.xml
 
+t/70_server/fix_config.pl
 t/70_server/startup.pl
 t/70_server/01.t
 

@@ -2,7 +2,7 @@
 ##
 ## Written by Michael Bell for the OpenXPKI project
 ## Copyright (C) 2005 by The OpenXPKI Project
-## $Revision: 1.163 $
+## $Revision$
  
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ our ($errno, $errval);
 
 ## the other use directions depends from the used databases
 
-($OpenXPKI::Server::DBI::VERSION = '$Revision: 1.163 $' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg; 
+($OpenXPKI::Server::DBI::VERSION = '$Revision$' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg; 
 
 sub new {
   

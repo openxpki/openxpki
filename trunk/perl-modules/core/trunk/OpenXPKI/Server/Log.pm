@@ -76,7 +76,7 @@ sub log
     ## FIXME: errors are fatal for the logging system
 
     my ($facility, $prio, $msg) =
-       ("system", "FATAL", "EMPTY LOG MESSAGE WAS USED!");
+       ("monitor", "FATAL", "EMPTY LOG MESSAGE WAS USED!");
 
     my ($package, $filename, $line, $subroutine, $hasargs,
         $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);

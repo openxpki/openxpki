@@ -1,6 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key
 ## (C)opyright 2005 Michael Bell
-## $Revision: 56 $
+## $Revision$
 
 use strict;
 use warnings;

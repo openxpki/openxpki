@@ -6,28 +6,15 @@ BEGIN { plan tests => 6 };
 
 print STDERR "OpenXPKI::Server\n";
 
-my $check_user = "TRUE";
-if ($check_user eq "TRUE")
-{
-    my @pwentry = getpwuid ($UID);
-    if ($pwentry[0] ne "root")
-    {
-        ok(0);
-        print STDERR "These tests can only be performed by root.\n";
-        print STDERR "The tests change the UID and GID of the process.\n";
-        print STDERR "Please deactivate this check ".
-                     "if you use the actual user and group in t/config.xml.\n";
-        exit 1;
-    }
-}
+## fix the configuration file if needed
+require "t/70_server/fix_config.pl";
 ok(1);
 
 my $pid = fork();
 if ($pid)
 {
-    print STDERR " Waiting 5 seconds for starting server ...";
+    print STDERR "Waiting 5 seconds for starting server ...\n";
     sleep 5;
-    print STDERR "OK\n";
 } else {
     my $ret = `perl t/70_server/startup.pl 2>&1 &`;
     print STDERR $ret."\n" if ($?);

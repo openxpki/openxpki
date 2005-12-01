@@ -2,7 +2,7 @@
 ##
 ## Written by Michael Bell for the OpenXPKI project 2005
 ## Copyright (C) 2005 The OpenXPKI Project
-## $Revision: 1.6 $
+## $Revision$
 
 use strict;
 use warnings;
