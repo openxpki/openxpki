@@ -1,8 +1,6 @@
 ## OpenXPKI::Server::Init.pm 
 ##
-## Written by Michael Bell for the OpenCA project 2005
-## Migrated to the OpenXPKI Project 2005
-## Copyright transfered from Michael Bell to The OpenXPKI Project in 2005
+## Written by Michael Bell for the OpenXPKI project 2005
 ## Copyright (C) 2005 by The OpenXPKI Project
 ## $Revision$
 
@@ -14,6 +12,7 @@ package OpenXPKI::Server::Init;
 
 ## used modules
 
+use English;
 use OpenXPKI qw(debug set_language set_locale_prefix);
 use OpenXPKI::Exception;
 
@@ -83,6 +82,9 @@ sub init_i18n
 
     set_locale_prefix ($keys->{CONFIG}->get_xpath (XPATH => "common/i18n/locale_directory"));
     set_language      ($keys->{CONFIG}->get_xpath (XPATH => "common/i18n/default_language"));
+
+    binmode STDOUT, ":utf8";
+    binmode STDIN,  ":utf8";
 
     return 1;
 }
@@ -321,6 +323,44 @@ sub get_log
     return $log;
 }
 
+sub get_user_interfaces
+{
+    my $self = shift;
+    my $keys = { @_ };
+    $self->debug ("start");
+
+    if (not $keys->{CONFIG})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_UI_MISSING_CONFIG");
+    }
+
+    my $count = $keys->{CONFIG}->get_xpath_count (XPATH => "common/server/interface");
+    my %ui    = ();
+    for (my $i=0; $i < $count; $i++)
+    {
+        ## load interface class
+        my $class = $keys->{CONFIG}->get_xpath (
+                        XPATH   => "common/server/interface",
+                        COUNTER => $i);
+           $class = "OpenXPKI::UI::".$class;
+        eval "use $class;";
+        if ($EVAL_ERROR)
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_INIT_GET_USER_INTERFACE_USE_FAILED",
+                params  => {EVAL_ERROR => $EVAL_ERROR,
+                            MODULE     => $class});
+        }
+
+        ## initialize interface class
+        $ui{$class} = eval { $class->new (API => $self->{api}) };
+        $EVAL_ERROR->rethrow() if ($EVAL_ERROR);
+    }
+
+    return %ui;
+}
+
 sub get_server_config
 {
     my $self = shift;
@@ -445,6 +485,12 @@ requires only the usual instance of OpenXPKI::XML::Config in the parameter CONFI
 It returns an instance of the module OpenXPKI::Log.
 
 =head2 Server Configuration
+
+=head3 get_user_interfaces
+
+needs the usual CONFIG parameter with an instance of OpenXPKI::XML::Config
+and return a hash with the supported user interfaces. The value
+of each hash element is 1.
 
 =head3 get_server_config
 

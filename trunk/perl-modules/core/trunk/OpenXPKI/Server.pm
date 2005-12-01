@@ -1,8 +1,6 @@
 ## OpenXPKI::Server.pm 
 ##
-## Written by Michael Bell for the OpenCA project 2005
-## Migrated to the OpenXPKI Project 2005
-## Copyright transfered from Michael Bell to The OpenXPKI Project in 2005
+## Written by Michael Bell for the OpenXPKI project 2005
 ## Copyright (C) 2005 by The OpenXPKI Project
 ## $Revision$
 
@@ -15,6 +13,7 @@ use base qw(Net::Server::Fork);
 
 ## used modules
 
+use English;
 use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Init;
@@ -70,11 +69,91 @@ sub new
 
     $self->{umask} = umask 0007;
 
+    ## load the user interfaces
+
+    $self->{ui_list} = $init->get_user_interfaces (
+                           CONFIG => $self->{xml_config},
+                           API    => $self->{api});
+
     ## start the server
 
     my %params = $init->get_server_config (CONFIG => $self->{xml_config});
     unlink ($params{port});
     $self->run (%params);
+}
+
+sub process_request
+{
+    my $self = shift;
+
+    ## recover from umask of Net::Server->run
+    umask $self->{umask};
+
+    my $line = readline (*STDIN);
+
+    ## initialize user interface module
+
+    my $class = $line;
+    $class =~ s/^.* //s; ## filter something like START etc.
+    $class =~ s/\n$//s;
+    if (not $self->{ui_list}->{$class})
+    {
+        print STDOUT "OpenXPKI::Server: $class unsupported.\n";
+        $self->{log}->log (MESSAGE  => "$class unsupported.",
+                           PRIORITY => "fatal",
+                           FACILITY => "system");
+        return undef;
+    }
+    $self->{ui} = $self->{ui_list}->{$class};
+
+    ## update pre-initialized variables
+
+    eval { $self->{db}->connect() };
+    if ($EVAL_ERROR)
+    {
+        print STDOUT $EVAL_ERROR->message();
+        $self->{log}->log (MESSAGE  => "Database connection failed. ".
+                                       $EVAL_ERROR->message(),
+                           PRIORITY => "fatal",
+                           FACILITY => "system");
+        return undef;
+        
+    }
+
+    ## use user interface
+
+    $self->{ui}->init();
+    $self->{ui}->run();
+}
+
+################################################
+##                 WARNING                    ##
+################################################
+##                                            ##
+## Before you change the code please read the ##
+## following explanation and be sure that you ##
+## understand it.                             ##
+##                                            ##
+## The basic design idea is that if there is  ##
+## an error then it must be impossible that a ##
+## deeper layer can be reached. This will be  ##
+## guaranteed by the following rules:         ##
+##                                            ##
+## 1. Never use eval to handle thrown         ##
+##    exceptions.                             ##
+##                                            ##
+## 2. If you use eval to catch an exception   ##
+##    then the eval block must include all    ##
+##    lower layers.                           ##
+##                                            ##
+## The result is that if a layer throws an    ##
+## exception then it is impossible that a     ##
+## lower is reached.                          ##
+##                                            ##
+################################################
+
+sub command
+{
 }
 
 1;
@@ -108,3 +187,18 @@ are the following ones:
 =back
 
 All parameters are required, except of the DEBUG parameter.
+
+=head2 process_request
+
+is the function which is called by Net::Server to make the
+work. The only parameter is the class instance. The
+communication is handled via STDIN and STDOUT.
+
+The class selects the user interfaces and checks the
+pre-initialized variables. If all of this is fine then
+the user interface will be initialized and started.
+
+=head2 command
+
+is normal layer stack where the user interfaces can execute
+commands.

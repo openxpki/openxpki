@@ -39,8 +39,19 @@
       <xsd:element name="socket_file" type="xsd:string"/> <!-- this must be a filename -->
       <xsd:element name="pid_file"    type="xsd:string"/> <!-- this must be a filename -->
       <xsd:element name="stderr"      type="xsd:string"/> <!-- this must be a filename -->
+      <xsd:element name="interface"   type="server_interface_type"
+                                      minOccurs="1" maxOccurs="unbounded"/>
     </xsd:sequence>
   </xsd:complexType>
+
+  <xsd:simpleType name="server_interface_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="CLI"/>
+      <xsd:enumeration value="HTML"/>
+      <xsd:enumeration value="SCEP"/>
+      <xsd:enumeration value="Test"/>
+    </xsd:restriction>
+  </xsd:simpleType>
 
   <!-- ========END========= -->
   <!-- server configuration -->
