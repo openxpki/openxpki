@@ -20,9 +20,9 @@ sub get_command
 
     if (not exists $self->{RANDOM_FILE})
     {
-        $self->set_tmpfile ("RANDOM_" => $self->{TMP}."/.rand_${$}");
+	$self->get_tmpfile ('RANDOM_');
     }
-    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_key_new.pem");
+    $self->get_tmpfile ('OUT');
 
     ## ENGINE key: no parameters
     ## normal key: engine (optional), passwd
@@ -33,7 +33,7 @@ sub get_command
         ## external key generation
         $passwd = $self->{PASSWD};
         $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
-        $self->set_tmpfile ("KEY" => $self->{TMP}."/${$}_rsa.pem");
+        $self->get_tmpfile ('KEY');
     } else {
         ## token key generation
         $engine  = $self->{ENGINE}->get_engine();

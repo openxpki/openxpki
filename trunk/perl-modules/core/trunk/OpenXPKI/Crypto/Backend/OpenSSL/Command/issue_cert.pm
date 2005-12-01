@@ -17,8 +17,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->set_tmpfile ("CSR" => $self->{TMP}."/${$}_csr.pem");
-    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_cert.pem");
+    $self->get_tmpfile ('CSR', 'OUT');
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -75,7 +74,8 @@ sub get_command
     ## prepare data
 
     $self->write_file (FILENAME => $self->{CSRFILE},
-                       CONTENT  => $self->{CSR});
+                       CONTENT  => $self->{CSR},
+	               FORCE    => 1);
     my $spkac = 0;
     if ($self->{CSR} !~ /^-----BEGIN/s and
         $self->{CSR} =~ /\nSPKAC\s*=/s)

@@ -106,7 +106,7 @@ sub redirect_stderr
             message => "I18N_OPENXPKI_SERVER_INIT_REDIRECT_STDERR_MISSING_STDERR");
     }
     $self->debug ("switching stderr to $stderr");
-    if (not open STDERR, ">> ".$stderr)
+    if (not open STDERR, '>>', $stderr)
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_INIT_REDIRECT_STDERR_FAILED");

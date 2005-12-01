@@ -15,8 +15,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->set_tmpfile ("CONTENT" => $self->{TMP}."/${$}_content.pem");
-    $self->set_tmpfile ("OUT"     => $self->{TMP}."/${$}_pkcs7.pem");
+    $self->get_tmpfile ('CONTENT', 'OUT');
 
     my $engine = "";
        $engine = $self->{ENGINE}->get_engine()
@@ -25,9 +24,10 @@ sub get_command
 
     if ($self->{CERT})
     {
-        $self->set_tmpfile ("CERT" => $self->{TMP}."/${$}_cert.pem");
+        $self->get_tmpfile ('CERT');
         $self->write_file (FILENAME => $self->{CERTFILE},
-                           CONTENT  => $self->{CERT});
+                           CONTENT  => $self->{CERT},
+	                   FORCE    => 1);
     } else {
         $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
     }
@@ -58,7 +58,8 @@ sub get_command
     ## prepare data
 
     $self->write_file (FILENAME => $self->{CONTENTFILE},
-                       CONTENT  => $self->{CONTENT});
+                       CONTENT  => $self->{CONTENT},
+	               FORCE    => 1);
 
     ## build the command
 

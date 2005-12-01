@@ -15,7 +15,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->set_tmpfile ("CSR" => $self->{TMP}."/${$}_csr.pem");
+    $self->get_tmpfile ('CSR');
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -40,10 +40,10 @@ sub get_command
         # prepare parameters
         $passwd = $self->{PASSWD};
         $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
-        $self->set_tmpfile ("KEY" => $self->{TMP}."/${$}_key.pem");
-        $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_cert.pem");
+        $self->get_tmpfile ('KEY', 'OUT');
         $self->write_file (FILENAME => $self->{KEYFILE},
-                           CONTENT  => $self->{KEY});
+                           CONTENT  => $self->{KEY},
+	                   FORCE    => 1);
     } else {
         ## token cert generation
         $engine  = $self->{ENGINE}->get_engine();
@@ -86,7 +86,8 @@ sub get_command
     ## prepare data
 
     $self->write_file (FILENAME => $self->{CSRFILE},
-                       CONTENT  => $self->{CSR});
+                       CONTENT  => $self->{CSR},
+	               FORCE    => 1);
 
     ## build the command
 

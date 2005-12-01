@@ -30,6 +30,8 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 use OpenXPKI qw(debug read_file write_file);
 use OpenXPKI::DN;
 use Date::Parse;
+use File::Temp;
+use File::Spec;
 use POSIX qw(strftime);
 use OpenXPKI::Exception;
 use English;
@@ -50,10 +52,34 @@ sub new
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_ENGINE");
     }
 
-    if (not exists $self->{TMP})
+    # determine temporary directory to use:
+    # if a temporary directoy is specified, use it
+    # else try /var/tmp (because potentially large files may be written that
+    # are better left in the /var file system)
+    # if /var/tmp does not exist fallback to /tmp
+
+    my $requestedtmp = $self->{TMP};
+    delete $self->{TMP};
+  CHECKTMPDIRS:
+    for my $path ($requestedtmp,                      # user's preference
+		  File::Spec->catfile('var', 'tmp'),  # suitable for large files
+		  File::Spec->catfile('tmp'),         # present on all UNIXes
+	) {
+
+	# directory must be readable & writable to be usable as tmp
+	if (defined $path && 
+	    (-d $path) &&
+	    (-r $path) &&
+	    (-w $path)) {
+	    $self->{TMP} = $path;
+	    last CHECKTMPDIRS;
+	}
+    }
+
+    if (! (exists $self->{TMP} && -d $self->{TMP}))
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_TMP");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_TEMPORARY_DIRECTORY_UNAVAILABLE");
     }
 
     return $self;
@@ -66,15 +92,53 @@ sub set_tmpfile
 
     foreach my $key (keys %{$keys})
     {
-        if (exists $self->{CLEANUP}->{FILE})
-        {
-            push @{$self->{CLEANUP}->{FILE}}, $keys->{$key};
-        } else {
-            $self->{CLEANUP}->{FILE} = [ $keys->{$key} ];
-        }
+	push @{$self->{CLEANUP}->{FILE}}, $keys->{$key};
+
         $self->{$key."FILE"} = $keys->{$key};
     }
     return 1;
+}
+
+sub get_tmpfile
+{
+    my $self = shift;
+
+    
+    my $tmpdir = $self->{TMP} || File::Spec->catfile('tmp');
+    my $template = File::Spec->catfile($tmpdir, "openxpkiXXXXXX");
+
+    if (scalar(@_) == 0) {
+	my ($fh, $filename) = File::Temp::mkstemp($template);
+	print "get_tmpfile(void): filename $filename\n";
+	if (! $fh) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MAKE_TMPFILE_FAILED",
+		params  => {"FILENAME" => $filename});
+	}
+	close $fh;
+	chmod 0600, $filename;
+	
+	push @{$self->{CLEANUP}->{FILE}}, $filename;
+
+	return $filename;
+    }
+    else
+    {
+	print "get_tmpfile(...)\n";
+	while (my $arg = shift) {
+	    my ($fh, $filename) = File::Temp::mkstemp($template);
+	    print "  $arg: filename $filename\n";
+	    if (! $fh) {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MAKE_TMPFILE_FAILED",
+		    params  => {"FILENAME" => $filename});
+	    }
+	    close $fh;
+	    chmod 0600, $filename;
+
+	    $self->set_tmpfile($arg => $filename);
+	}
+    }
 }
 
 sub set_env
@@ -84,12 +148,7 @@ sub set_env
 
     foreach my $key (keys %{$keys})
     {
-        if (exists $self->{CLEANUP}->{ENV})
-        {
-            push @{$self->{CLEANUP}->{ENV}}, $key;
-        } else {
-            $self->{CLEANUP}->{ENV} = [ $key ];
-        }
+	push @{$self->{CLEANUP}->{ENV}}, $key;
         $ENV{$key} = $keys->{$key};
     }
     return 1;
@@ -101,7 +160,10 @@ sub cleanup
 
     foreach my $file (@{$self->{CLEANUP}->{FILE}})
     {
-        unlink $file;
+        if (-e $file) 
+	{
+	    unlink $file;
+	}
         if (-e $file)
         {
             OpenXPKI::Exception->throw (
@@ -223,6 +285,28 @@ mapped to
 $self->{INFILE} = "/tmp/example.txt";
 
 All temporary file are cleaned up automatically.
+
+=head2 get_tmpfile
+
+If called without arguments this method creates a temporary file and 
+returns its filename:
+
+  my $tmpfile = $self->get_tmpfile();
+
+If called with one or more arguments, the method creates a temporary
+file for each argument specified and calls $self->set_tmpfile() for
+this argument.
+
+Calling
+
+  $self->get_tmpfile(IN, OUT);
+
+is equivalent to
+
+  $self->set_tmpfile( IN  => $self->get_tmpfile(),
+                      OUT => $self->get_tmpfile() );
+
+All temporary file are set to mode 0600 and are cleaned up automatically.
 
 =head2 set_env
 

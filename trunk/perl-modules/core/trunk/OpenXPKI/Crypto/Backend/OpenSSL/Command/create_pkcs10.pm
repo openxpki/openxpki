@@ -38,9 +38,10 @@ sub get_command
         # prepare parameters
         $passwd = $self->{PASSWD};
         $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
-        $self->set_tmpfile ("KEY" => $self->{TMP}."/${$}_key.pem");
+        $self->get_tmpfile ('KEY');
         $self->write_file (FILENAME => $self->{KEYFILE},
-                           CONTENT  => $self->{KEY});
+                           CONTENT  => $self->{KEY},
+	                   FORCE    => 1);
     } else {
         ## token CSR generation
         $engine  = $self->{ENGINE}->get_engine();
@@ -48,7 +49,7 @@ sub get_command
         $passwd  = $self->{ENGINE}->get_passwd();
         $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
     }
-    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_csr.pem");
+    $self->get_tmpfile ('OUT');
 
 
     ## check parameters

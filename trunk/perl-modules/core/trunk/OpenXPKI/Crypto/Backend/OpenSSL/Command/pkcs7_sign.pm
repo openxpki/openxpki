@@ -15,8 +15,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->set_tmpfile ("CONTENT" => $self->{TMP}."/${$}_content.pem");
-    $self->set_tmpfile ("OUT"     => $self->{TMP}."/${$}_pkcs7.pem");
+    $self->get_tmpfile ('CONTENT', 'OUT');
 
     my ($engine, $passwd, $keyform);
     if ($self->{PASSWD} or $self->{KEY})
@@ -45,13 +44,14 @@ sub get_command
         $passwd = $self->{PASSWD};
         $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
 
-        $self->set_tmpfile ("KEY" => $self->{TMP}."/${$}_key.pem");
+        $self->get_tmpfile ('KEY', 'CERT');
         $self->write_file (FILENAME => $self->{KEYFILE},
-                           CONTENT  => $self->{KEY});
+                           CONTENT  => $self->{KEY},
+	                   FORCE    => 1);
 
-        $self->set_tmpfile ("CERT" => $self->{TMP}."/${$}_cert.pem");
         $self->write_file (FILENAME => $self->{CERTFILE},
-                           CONTENT  => $self->{CERT});
+                           CONTENT  => $self->{CERT},
+	                   FORCE    => 1);
     } else {
         ## token signature
         $engine  = $self->{ENGINE}->get_engine();
@@ -82,7 +82,8 @@ sub get_command
     ## prepare data
 
     $self->write_file (FILENAME => $self->{CONTENTFILE},
-                       CONTENT  => $self->{CONTENT});
+                       CONTENT  => $self->{CONTENT},
+	               FORCE    => 1);
 
     ## build the command
 

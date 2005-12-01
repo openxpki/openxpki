@@ -13,10 +13,10 @@ sub get_command
 {
     my $self = shift;
 
-    $self->set_tmpfile ("IN"  => $self->{TMP}."/${$}_csr_org.pem");
-    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_csr_new.pem");
+    $self->get_tmpfile ('IN', 'OUT');
     $self->write_file (FILENAME => $self->{INFILE},
-                       CONTENT  => $self->{DATA});
+                       CONTENT  => $self->{DATA},
+	               FORCE    => 1);
 
     ## check parameters
 

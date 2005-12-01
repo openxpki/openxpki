@@ -22,10 +22,10 @@ sub get_command
     my $engine = "";
        $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
 
-    $self->set_tmpfile ("KEY" => $self->{TMP}."/${$}_key_org.pem");
-    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_key_new.pem");
+    $self->get_tmpfile ('KEY', 'OUT');
     $self->write_file (FILENAME => $self->{KEYFILE},
-                       CONTENT  => $self->{DATA});
+                       CONTENT  => $self->{DATA},
+	               FORCE    => 1);
 
     ## check parameters
 

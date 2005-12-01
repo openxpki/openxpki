@@ -16,8 +16,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->set_tmpfile ("PKCS7" => $self->{TMP}."/${$}_pkcs7.pem");
-    $self->set_tmpfile ("OUT"   => $self->{TMP}."/${$}_out.pem");
+    $self->get_tmpfile ('PKCS7', 'OUT');
 
     my $engine = "";
        $engine = $self->{ENGINE}->get_engine()
@@ -39,7 +38,8 @@ sub get_command
     ## prepare data
 
     $self->write_file (FILENAME => $self->{PKCS7FILE},
-                       CONTENT  => $self->{PKCS7});
+                       CONTENT  => $self->{PKCS7},
+	               FORCE    => 1);
 
     ## build the command
 

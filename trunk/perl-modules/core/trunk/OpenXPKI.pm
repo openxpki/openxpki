@@ -294,6 +294,13 @@ sub read_file
 
 Example: $self->write_file (FILENAME => $filename, CONTENT => $data);
 
+The method will raise an exception if the file already exists unless
+the optional argument FORCE is set. In this case the method will overwrite
+the specified file.
+
+Example: $self->write_file (FILENAME => $filename, CONTENT => $data, FORCE => 1);
+
+
 =cut
 
 sub write_file
@@ -303,15 +310,35 @@ sub write_file
     my $filename = $keys->{FILENAME};
     my $content  = $keys->{CONTENT};
 
-    if (-e $filename)
+    if (! defined $filename)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WRITE_FILE_NO_FILENAME_SPECIFIED",
+	    );
+    }
+
+    if (! defined $content)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WRITE_FILE_NO_CONTENT_SPECIFIED",
+	    );
+    }
+
+    if ((-e $filename) && (! $keys->{FORCE}))
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS",
             params  => {"FILENAME" => $filename});
     }
 
+
+    my $mode = O_WRONLY;
+    if (! -e $filename) {
+	$mode |= O_EXCL | O_CREAT;
+    }
+
     my $HANDLE;
-    if (not sysopen($HANDLE, $filename, O_WRONLY | O_EXCL | O_CREAT))
+    if (not sysopen($HANDLE, $filename, $mode))
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WRITE_FILE_OPEN_FAILED",

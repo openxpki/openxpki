@@ -18,7 +18,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->set_tmpfile ("OUT" => $self->{TMP}."/${$}_crl.pem");
+    $self->get_tmpfile ('OUT');
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
