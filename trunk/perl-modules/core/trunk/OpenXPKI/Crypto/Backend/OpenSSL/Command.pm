@@ -109,7 +109,6 @@ sub get_tmpfile
 
     if (scalar(@_) == 0) {
 	my ($fh, $filename) = File::Temp::mkstemp($template);
-	print "get_tmpfile(void): filename $filename\n";
 	if (! $fh) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MAKE_TMPFILE_FAILED",
@@ -124,10 +123,8 @@ sub get_tmpfile
     }
     else
     {
-	print "get_tmpfile(...)\n";
 	while (my $arg = shift) {
 	    my ($fh, $filename) = File::Temp::mkstemp($template);
-	    print "  $arg: filename $filename\n";
 	    if (! $fh) {
 		OpenXPKI::Exception->throw (
 		    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MAKE_TMPFILE_FAILED",
