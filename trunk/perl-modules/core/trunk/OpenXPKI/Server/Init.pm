@@ -489,8 +489,8 @@ It returns an instance of the module OpenXPKI::Log.
 =head3 get_user_interfaces
 
 needs the usual CONFIG parameter with an instance of OpenXPKI::XML::Config
-and return a hash with the supported user interfaces. The value
-of each hash element is 1.
+and returns a hash with the supported user interfaces. The value
+of each hash element is an instance of the user interface class.
 
 =head3 get_server_config
 

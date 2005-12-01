@@ -14,8 +14,6 @@ package OpenXPKI::UI::Test;
 
 use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
-use OpenXPKI::Server::Init;
-use OpenXPKI::Server::API;
 
 sub new
 {
