@@ -36,7 +36,7 @@ if ($EVAL_ERROR)
 }
 ok ($name eq "OpenXPKI::Crypto::Backend::OpenSSL");
 
-## try a wring path
+## try a non-existing path
 $name = eval {$obj->get_xpath (
                   XPATH   => ["pki_realm", "ca", "token", "nom"],
                   COUNTER => [0, 0, 0, 0])
@@ -54,7 +54,7 @@ my $result = `xmllint -format -schema openxpki.xsd -xinclude t/config.xml 2>&1 1
 if ($CHILD_ERROR)
 {
     my $msg = "Error: there is something wrong with xmllint (${CHILD_ERROR}: ${EVAL_ERROR})\n";
-    $result = `ping www.w3.org`;
+    $result = `ping -c 1 -t 2 www.w3.org`;
     if ($CHILD_ERROR)
     {
         ok(1);

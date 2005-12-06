@@ -10,6 +10,7 @@ print STDERR "OpenXPKI::Crypto::Command: Create user certs and issue CRLs with U
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
+our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
 ok(1);
@@ -29,8 +30,8 @@ ok (1);
 ## create DSA key
 ## create RSA key
 
-my $passwd = OpenXPKI->read_file ("t/25_crypto/passwd.txt");
-my $key    = OpenXPKI->read_file ("t/25_crypto/rsa.pem");
+my $passwd = OpenXPKI->read_file ("$basedir/ca1/passwd.txt");
+my $key    = OpenXPKI->read_file ("$basedir/ca1/rsa.pem");
 ok (1);
 
 ######################################
@@ -49,22 +50,22 @@ for (my $i=0; $i < scalar @example; $i++)
 
     ## create CSR
     my $csr = $token->command ("create_pkcs10",
-                               CONFIG  => "t/25_crypto/openssl.cnf",
+                               CONFIG  => "$basedir/ca1/openssl.cnf",
                                KEY     => $key,
                                PASSWD  => $passwd,
                                SUBJECT => $dn);
     ok (1);
     print STDERR "CSR: $csr\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "t/25_crypto/utf8.$i.pkcs10.pem", CONTENT => $csr);
+    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.pkcs10.pem", CONTENT => $csr);
 
     ## create cert
     my $cert = $token->command ("issue_cert",
                                 CSR    => $csr,
-                                CONFIG => "t/25_crypto/openssl.cnf",
+                                CONFIG => "$basedir/ca1/openssl.cnf",
                                 SERIAL => 1);
     ok (1);
     print STDERR "cert: $cert\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "t/25_crypto/utf8.$i.cert.pem", CONTENT => $cert);
+    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.cert.pem", CONTENT => $cert);
 
     ## build the PKCS#12 file
     my $pkcs12 = $token->command ("create_pkcs12",
@@ -79,7 +80,7 @@ for (my $i=0; $i < scalar @example; $i++)
     my $crl = $token->command ("issue_crl", REVOKED => [$cert], SERIAL => 1);
     ok (1);
     print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "t/25_crypto/utf8.$i.crl.pem", CONTENT => $crl);
+    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.crl.pem", CONTENT => $crl);
 }
 
 1;

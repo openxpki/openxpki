@@ -8,6 +8,7 @@ print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::PKCS10\n";
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
+our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
 ok(1);
@@ -23,7 +24,7 @@ my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM =
 ok (1);
 
 ## create PKCS#10 request
-my $csr = OpenXPKI->read_file ("t/25_crypto/pkcs10.pem");
+my $csr = OpenXPKI->read_file ("$basedir/ca1/pkcs10.pem");
 ok(1);
 
 ## get object

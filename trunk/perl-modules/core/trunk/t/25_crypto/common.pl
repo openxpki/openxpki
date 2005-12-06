@@ -8,8 +8,11 @@ use warnings;
 use English;
 use OpenXPKI;
 use OpenXPKI::XML::Config;
+use File::Spec;
 
 our $cache;
+
+our $basedir = File::Spec->catfile('t', '25_crypto');
 
 # ## init the XML cache
 # my $tokenconfigfile = File::Spec->catfile('t', '25_crypto', 'token.xml');

@@ -10,6 +10,8 @@ package OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (debug);
 use OpenXPKI::Exception;
 
+use Data::Dumper;
+
 sub new {
     my $that = shift;
     my $class = ref($that) || $that;
@@ -55,6 +57,11 @@ sub get_token
     my $name  = $keys->{NAME};
     my $realm = $keys->{PKI_REALM};
 
+    if (not $type)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_TYPE");
+    }
     if (not $name)
     {
         OpenXPKI::Exception->throw (
@@ -106,7 +113,7 @@ sub __add_token
         $type_path = "common";
     } else {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_WRONG_TYPE",
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INCORRECT_TYPE",
             params  => {"TYPE" => $type});
     }
 
@@ -114,7 +121,7 @@ sub __add_token
 
     my $realm_count = $self->{config}->get_xpath_count (
                           XPATH => 'pki_realm');
-    my $realm_index = $realm_count;
+    my $realm_index;
     for (my $i=0; $i<$realm_count; $i++)
     {
         $self->debug ("checking pki_realm");
@@ -125,10 +132,10 @@ sub __add_token
         $realm_index = $i;
         last;
     }
-    if ($realm_index == $realm_count)
+    if (! defined $realm_index)
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_WRONG_PKI_REALM",
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_PKI_REALM_NOT_FOUND",
             params  => {"PKI_REALM" => $realm});
     }
  
@@ -136,7 +143,7 @@ sub __add_token
     my $type_count = $self->{config}->get_xpath_count (
                           XPATH   => [ 'pki_realm', $type_path ],
                           COUNTER => [ $realm_index ]);
-    my $type_index = $type_count;
+    my $type_index;
     for (my $i=0; $i<$type_count; $i++)
     {
         $self->debug ("checking name of type");
@@ -147,100 +154,118 @@ sub __add_token
         $type_index = $i;
         last;
     }
-    if ($type_index == $type_count)
+    if (! defined $type_index)
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_WRONG_NAME_OR_TYPE",
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INCORRECT_NAME_OR_TYPE",
             params  => {"NAME" => $name, "TYPE" => $type});
     }
- 
-    ## load always required parameters into config array
-    my @args = (NAME => $name, PARENT => $self);
-    $self->debug ("loading mode");
-    my $help = $self->{config}->get_xpath (
-                   XPATH    => [ 'pki_realm', $type_path, 'token', 'mode' ],
-                   COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
-    push @args, "MODE", $help;
 
-    ## load complete config in array
-    $self->debug ("loading options");
-    my $option_count = $self->{config}->get_xpath_count (
-                           XPATH    => [ 'pki_realm', $type_path, 'token', 'option' ],
-                           COUNTER  => [ $realm_index, $type_index, 0 ]);
-    for (my $k=0; $k<$option_count; $k++)
-    {
-        $help = $self->{config}->get_xpath (
-                           XPATH    => [ 'pki_realm', $type_path, 'token', 'option', 'name' ],
-                           COUNTER  => [ $realm_index, $type_index, 0, $k, 0 ]);
-        $self->debug ("option name: $help");
-        push @args, $help;
-        $help = $self->{config}->get_xpath (
-                           XPATH    => [ 'pki_realm', $type_path, 'token', 'option', 'value' ],
-                           COUNTER  => [ $realm_index, $type_index, 0, $k, 0 ]);
-        if (defined $help)
-        {
-            $self->debug ("option value: $help");
-        } else {
-            ## empty tag
-            $self->debug ("option value: <empty/>");
-        }
-        push @args, $help;
-    }
-    $self->debug ("loaded options");
 
-    ## handle multivalued parameters
 
-    my $count = scalar @args / 2;
-    my %hargs = ();
-    for (my $i=0; $i<$count; $i++)
-    {
-        my $name  = $args[2*$i];
-        my $value = $args[2*$i+1];
-        ## if global debug then local debug too
-        $value = $self->{DEBUG} if ($name =~ /DEBUG/i and not $value and $self->{DEBUG});
-        if (exists $hargs{$name})
-        {
-            $hargs{$name} = [ @{$hargs{$name}}, $value ];
-        } else
-        {
-            $hargs{$name} = [ $value ];
-        }
-        ## activate crypto layer debugging if a single token is in debug mode
-        $self->{DEBUG} = $value if ($name =~ /DEBUG/i and $value);
+    # build token parameters
+    my %token_args = ( NAME   => $name,
+		       PARENT => $self,
+	);
+
+    # any existing key in this hash is considered optional in %token_args
+    my %is_optional = ();
+
+    # default tokens don't need key, cert etc...
+    if ($type eq "DEFAULT") {
+	foreach (qw(key cert internal_chain passwd passwd_parts)) {
+	    $is_optional{uc($_)}++;
+	}
     }
-    @args = ();
-    foreach my $key (keys %hargs)
-    {
-        $self->debug ("argument: name: $key");
-        push @args, $key;
-        if (scalar @{$hargs{$key}} > 1)
-        {
-            push @args, $hargs{$key};
-        } else
-        {
-            push @args, $hargs{$key}->[0];
-        }
+
+    # FIXME: currently unused attributes:
+    # openca-sv
+    foreach my $key (qw(debug      backend       mode 
+                        engine     shell         wrapper 
+                        tmpdir     randfile
+                        config
+                        key        cert          internal_chain
+                        passwd     passwd_parts 
+                       )) {
+
+	my $attribute_count;
+	eval {
+	    $attribute_count = $self->{config}->get_xpath_count (
+		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
+		COUNTER  => [ $realm_index, $type_index, 0 ]);
+	};
+
+	if (my $exc = OpenXPKI::Exception->caught())
+	{
+	    $self->debug ("caught exception while reading config attribute $key");
+	    # only pass exception if attribute is not optional
+	    if (! $is_optional{uc($key)}) {
+		$self->debug ("argument $key is not optional, escalating");
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INCOMPLETE_CONFIGURATION",
+		    child   => $exc,
+		    params  => {"NAME" => $name, 
+				"TYPE" => $type, 
+				"ATTRIBUTE" => $key,
+		    },
+		    )
+	    }
+	    $attribute_count = 0;
+	}
+
+	# multivalue attributes are not desired/supported
+	if ($attribute_count > 1) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_DUPLICATE_ATTRIBUTE",
+		params  => {"NAME" => $name, 
+			    "TYPE" => $type, 
+			    "ATTRIBUTE" => $key,
+		});
+	}
+
+	if ($attribute_count == 1) {
+	    my $value = $self->{config}->get_xpath (
+		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
+		COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
+	    
+	    $token_args{uc($key)} = $value;
+	}
     }
-    $self->debug ("fixed multivalued options");
+    
 
     ## init token
-    my $backend = $self->{config}->get_xpath (
-                      XPATH    => [ 'pki_realm', $type_path, 'token', 'backend' ],
-                      COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
+    my $backend = $token_args{BACKEND};
+    delete $token_args{BACKEND};
+
+    if (! defined $backend) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_BACKEND_UNDEFINED",
+	    params  => {"NAME" => $name, 
+			"TYPE" => $type, 
+	    });
+    }
+
     $self->debug ("try to setup $backend token");
     eval {
-        $self->{TOKEN}->{$realm}->{$type}->{$name} = $self->__new_token ($backend, @args);
+        $self->{TOKEN}->{$realm}->{$type}->{$name} = $self->__new_token ($backend, %token_args);
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
         delete $self->{TOKEN}->{$realm}->{$type}->{$name}
-            if (exists $self->{TOKEN}->{$realm} and
-                exists $self->{TOKEN}->{$realm}->{$type} and
-                exists $self->{TOKEN}->{$realm}->{$type}->{$name});
+            if (exists $self->{TOKEN}->{$realm}->{$type}->{$name});
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_CREATE_FAILED",
             child   => $exc);
     }
+
+    if (! defined $self->{TOKEN}->{$realm}->{$type}->{$name}) {
+        delete $self->{TOKEN}->{$realm}->{$type}->{$name}
+            if (exists $self->{TOKEN}->{$realm}->{$type}->{$name});
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INIT_FAILED",
+	    );
+    }
+
     $self->debug ("$type token $name for $realm successfully added");
     return $self->{TOKEN}->{$realm}->{$type}->{$name};
 }
@@ -268,14 +293,22 @@ sub __new_token {
 
     ## get the token
     ## FIXME: why I send $self to the child!?
-    ## my $token = eval {$name->new ($self, @_)};
-    my $token = eval {$name->new (@_)};
+    my $token;
+    eval { 
+	$token = $name->new (@_) 
+    };
 
     if (my $exc = OpenXPKI::Exception->caught())
     {
         ## really stupid dummy exception handling
         $self->debug ("cannot get new instance of driver $name");
         $exc->rethrow();
+    }
+    $self->debug ("no exception during new()");
+
+    if (! defined $token) {
+	$self->debug ("initialization error (constructor returned undef)");
+	return;
     }
     $self->debug ("no error during new, new token present");
 

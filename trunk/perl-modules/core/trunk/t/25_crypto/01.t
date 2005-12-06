@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Data::Dumper;
 use Test;
 BEGIN { plan tests => 4 };
 
@@ -23,6 +24,6 @@ ok (1);
 ## parameter checks for get_token
 
 my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM => "Test Root CA");
-ok (1);
+ok (defined $token);
 
 1;

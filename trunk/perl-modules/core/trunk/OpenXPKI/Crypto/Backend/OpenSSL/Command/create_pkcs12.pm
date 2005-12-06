@@ -79,7 +79,7 @@ sub get_command
     $command .= " -in ".$self->{CERTFILE};
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -".$self->{ENC_ALG};
-    $command .= " -certfile ".$self->{CHAIN} if ($self->{CHAIN});
+    $command .= " -certfile ".$self->{INTERNAL_CHAIN} if ($self->{INTERNAL_CHAIN});
 
     $command .= " -passin env:pwd";
     $self->set_env ("pwd" => $self->{PASSWD});
@@ -136,7 +136,7 @@ PKCS#12 file.
 
 =item * ENC_ALG (optional)
 
-=item * CHAIN (optional)
+=item * INTERNAL_CHAIN (optional)
 
 =back
 

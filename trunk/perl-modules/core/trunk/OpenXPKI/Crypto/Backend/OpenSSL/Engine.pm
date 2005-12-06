@@ -25,16 +25,22 @@ sub new {
     $self->debug ("new: class instantiated");
 
     ## token mode will be ignored
-    $self->{DEBUG}        = $keys->{DEBUG} if ($keys->{DEBUG});;
-    $self->{OPENSSL}      = $keys->{OPENSSL};
-    $self->{NAME}         = $keys->{NAME};
-    $self->{KEY}          = $keys->{KEY};
-    $self->{PASSWD}       = $keys->{PASSWD} if (exists $keys->{PASSWD});
-    $self->{CERT}         = $keys->{PEM_CERT};
-    $self->{CHAIN}        = $keys->{CHAIN};
-    $self->{PASSWD_PARTS} = $keys->{PASSWD_PARTS};
-    $self->{PARENT}       = $keys->{PARENT};
+    foreach my $key (qw{DEBUG 
+                        OPENSSL
+                        NAME
+                        KEY
+                        PASSWD
+                        PASSWD_PARTS
+                        CERT
+                        INTERNAL_CHAIN
+                        PARENT
+                       }) {
 
+	if (exists $keys->{$key}) {
+	    $self->{$key} = $keys->{$key};
+	}
+    }
+    
     return $self;
 }
 
@@ -115,7 +121,7 @@ sub get_certfile
 sub get_chainfile
 {
     my $self = shift;
-    return $self->{CHAIN};
+    return $self->{INTERNAL_CHAIN};
 }
 
 sub get_keyform
@@ -177,7 +183,7 @@ The constructor supports the following parameters:
 
 =item * CERT (filename of the certificate)
 
-=item * CHAIN (filename of the certificate chain)
+=item * INTERNAL_CHAIN (filename of the certificate chain)
 
 =back
 
@@ -229,7 +235,7 @@ returns the filename of the certificate.
 
 =head2 get_chainfile
 
-returns the filename of the certificate chain.
+returns the filename of the internal (CA specific) certificate chain.
 
 =head2 get_keyform
 

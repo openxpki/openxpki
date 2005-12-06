@@ -9,6 +9,7 @@ print STDERR "OpenXPKI::Crypto::Command: Create a CA\n";
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
+our $basedir;
 require 't/25_crypto/common.pl';
 
 ok(1);
@@ -20,10 +21,14 @@ ok (1);
 
 ## parameter checks for get_token
 
-my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM => "Test Root CA");
+my $token = $mgmt->get_token (TYPE => "CA", 
+			      NAME => "INTERNAL_CA_1", 
+			      PKI_REALM => "Test Root CA",
+    );
 ok (1);
 
 ## create CA RSA key (use passwd from token.xml)
+## FIXME: CA key is *unencrypted*?
 my $key = $token->command ("create_key",
                            TYPE       => "RSA",
                            KEY_LENGTH => "1024",
@@ -43,14 +48,14 @@ ok (1);
 print STDERR "CA cert: $cert\n" if ($ENV{DEBUG});
 
 ## check that the CA is ready for further tests
-if (not -e "t/25_crypto/cakey.pem")
+if (not -e "$basedir/ca1/cakey.pem")
 {
     ok(0);
     print STDERR "Missing CA key\n";
 } else {
     ok(1);
 }
-if (not -e "t/25_crypto/cacert.pem")
+if (not -e "$basedir/ca1/cacert.pem")
 {
     ok(0);
     print STDERR "Missing CA cert\n";

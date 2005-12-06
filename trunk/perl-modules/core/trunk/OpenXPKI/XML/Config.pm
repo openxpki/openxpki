@@ -209,7 +209,11 @@ sub __get_super_xpath
         for (my $i=0; $i<scalar @new_xpath; $i++)
         {
             $super .= "/" if (length $super);
-            $super .= $new_xpath[$i]."[".$new_counter[$i]."]";
+	    my $counter = $new_counter[$i];
+	    if (! defined $counter) {
+		$counter = "undef";
+	    }
+            $super .= $new_xpath[$i] . "[$counter]";
         }
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND",

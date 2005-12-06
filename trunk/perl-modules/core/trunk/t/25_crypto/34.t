@@ -10,6 +10,7 @@ use OpenXPKI::Crypto::CRL;
 use Time::HiRes;
 
 our $cache;
+our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
 ok(1);
@@ -25,7 +26,7 @@ my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM =
 ok (1);
 
 ## load CRL
-my $data = OpenXPKI->read_file ("t/25_crypto/crl.pem");
+my $data = OpenXPKI->read_file ("$basedir/ca1/crl.pem");
 ok(1);
 $data = "-----BEGIN HEADER-----\n".
         "GLOBAL_ID=1234\n".

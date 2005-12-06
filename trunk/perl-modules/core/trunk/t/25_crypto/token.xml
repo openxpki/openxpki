@@ -1,6 +1,5 @@
 <token_config>
-    <token id="default" super="common/token_config/token{ca}"/>
-    <token id="ca">
+    <token id="default">
         <backend>OpenXPKI::Crypto::Backend::OpenSSL</backend>
         <!--
             if the token support sessions then you can use session and daemon too
@@ -9,67 +8,65 @@
             daemon  - token will be only logged out explicitly
         -->
         <mode>standby</mode>
-        <option>
-            <name>ENGINE</name>
-            <!-- possible values are OpenSSL, nCipher, LunaCA -->
-            <value>OpenSSL</value>
-        </option>
-        <option>
-            <name>SHELL</name>
-            <value>/usr/local/ssl/bin/openssl</value>
-        </option>
-        <option>
-            <name>WRAPPER</name>
-            <value></value>
-        </option>
-        <option>
-            <name>KEY</name>
-            <value>t/25_crypto/cakey.pem</value>
-        </option>
-        <option>
-            <name>PASSWD_PARTS</name>
-            <value>1</value>
-        </option>
-        <option>
-            <name>PEM_CERT</name>
-            <value>t/25_crypto/cacert.pem</value>
-        </option>
-        <option>
-            <name>DER_CERT</name>
-            <value>@var_prefix@/crypto/cacerts/cacert.der</value>
-        </option>
-        <option>
-            <name>TXT_CERT</name>
-            <value>@var_prefix@/crypto/cacerts/cacert.txt</value>
-        </option>
-        <option>
-            <name>CHAIN</name>
-            <value>t/25_crypto/cacert.pem</value>
-        </option>
-        <option>
-            <name>OPENCA_SV</name>
-            <value>@EXEC_PREFIX@/bin/openca-sv</value>
-        </option>
-        <option>
-            <name>TMPDIR</name>
-            <value>t/25_crypto</value>
-        </option>
-        <option>
-            <name>CONFIG</name>
-            <value>t/25_crypto/ca_openssl.cnf</value>
-        </option>
-        <option>
-            <name>RANDFILE</name>
-            <value>t/25_crypto/rand</value>
-        </option>
-        <option>
-            <name>DEBUG</name>
-            <value>0</value>
-        </option>
-        <!-- This is only for Perl's "make test". Never use this for production. -->
-        <option>
-            <name>PASSWD</name>
-            <value>1234567890</value>
-        </option>
+
+        <!-- possible values are OpenSSL, nCipher, LunaCA -->
+	<engine>OpenSSL</engine>
+
+	<!-- OpenSSL binary location -->
+        <!-- <shell>/usr/local/ssl/bin/openssl</shell> -->
+        <!-- <shell>/usr/bin/openssl</shell> -->
+        <shell>/opt/local/bin/openssl</shell>
+
+	<!-- OpenSSL binary call gets wrapped with this command -->
+        <wrapper></wrapper>
+
+	<!-- temporary directory to use for the token -->
+        <tmpdir>t/25_crypto</tmpdir>
+
+	<!-- random file to use for OpenSSL -->
+        <randfile>t/25_crypto/rand</randfile>
+
+	<!-- OpenSSL config, FIXME: migrate to XML-only configuration -->
+	<config>t/25_crypto/ca1/ca_openssl.cnf</config>
+
+	<!-- debugging: 0 (off), 1 (on) -->
+	<debug>0</debug>
     </token>
+
+
+
+    <token id="ca1" super="common/token_config/token{default}">
+        <!-- CA key (PEM encoded) -->
+        <key>t/25_crypto/ca1/cakey.pem</key>
+
+	<!-- CA certificate, must be in PEM format -->
+        <cert>t/25_crypto/ca1/cacert.pem</cert>
+
+	<!-- CA certificate chain for crypto operations -->
+	<internal_chain>t/25_crypto/ca1/cacert.pem</internal_chain>
+
+	<!-- OpenSSL config, FIXME: migrate to XML-only configuration -->
+	<config>t/25_crypto/ca1/ca_openssl.cnf</config>
+	
+	<!-- Number of CA passphrase fragments -->
+        <passwd_parts>1</passwd_parts>
+
+	<!-- CA passphrase -->
+        <passwd>1234567890</passwd>
+    </token>
+
+    <token id="ca2" super="common/token_config/token{ca1}">
+        <!-- CA key (PEM encoded) -->
+        <key>t/25_crypto/ca2/cakey.pem</key>
+
+	<!-- CA certificate, must be in PEM format -->
+        <cert>t/25_crypto/ca2/cacert.pem</cert>
+
+	<!-- CA certificate chain for crypto operations -->
+	<internal_chain>t/25_crypto/ca2/cacert.pem</internal_chain>
+
+	<!-- OpenSSL config, FIXME: migrate to XML-only configuration -->
+	<config>t/25_crypto/ca2/ca_openssl.cnf</config>
+    </token>
+
 </token_config>

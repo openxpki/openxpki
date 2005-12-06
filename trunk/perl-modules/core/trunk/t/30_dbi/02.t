@@ -15,9 +15,9 @@ require 't/30_dbi/common.pl';
 
 ok(1);
 
-my $cert = OpenXPKI->read_file ("t/25_crypto/cacert.pem");
+my $cert = OpenXPKI->read_file ("t/25_crypto/ca1/cacert.pem");
 $cert = OpenXPKI::Crypto::X509->new (DATA => $cert, TOKEN => $token);
-my $crl = OpenXPKI->read_file ("t/25_crypto/crl.pem");
+my $crl = OpenXPKI->read_file ("t/25_crypto/ca1/crl.pem");
 $crl = OpenXPKI::Crypto::CRL->new (DATA => $crl, TOKEN => $token);
 $cert->set_header_attribute (PKI_REALM => "Test Root CA",
                              CA        => "INTERNAL_CA_1");

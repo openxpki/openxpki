@@ -9,6 +9,7 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (read_file);
 
 our $cache;
+our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
 ok(1);
@@ -24,12 +25,12 @@ my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM =
 ok (1);
 
 ## load data
-my $passwd = OpenXPKI->read_file ("t/25_crypto/passwd.txt");
-my $dsa    = OpenXPKI->read_file ("t/25_crypto/dsa.pem");
-my $rsa    = OpenXPKI->read_file ("t/25_crypto/rsa.pem");
-my $csr    = OpenXPKI->read_file ("t/25_crypto/pkcs10.pem");
-my $cert   = OpenXPKI->read_file ("t/25_crypto/cert.pem");
-my $crl    = OpenXPKI->read_file ("t/25_crypto/crl.pem");
+my $passwd = OpenXPKI->read_file ("$basedir/ca1/passwd.txt");
+my $dsa    = OpenXPKI->read_file ("$basedir/ca1/dsa.pem");
+my $rsa    = OpenXPKI->read_file ("$basedir/ca1/rsa.pem");
+my $csr    = OpenXPKI->read_file ("$basedir/ca1/pkcs10.pem");
+my $cert   = OpenXPKI->read_file ("$basedir/ca1/cert.pem");
+my $crl    = OpenXPKI->read_file ("$basedir/ca1/crl.pem");
 ok($passwd and $dsa and $rsa and $csr and $cert and $crl);
 
 ## DSA KEY: PEM --> DER

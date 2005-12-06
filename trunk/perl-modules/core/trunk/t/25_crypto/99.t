@@ -1,50 +1,43 @@
 use strict;
 use warnings;
 use Test;
+use File::Spec;
+
+our $basedir;
+require 't/25_crypto/common.pl';
+
 BEGIN { plan tests => 2 };
 
 print STDERR "Cleanup\n";
 
-unlink ("t/crypto/cakey.pem");
-unlink ("t/crypto/cacert.pem");
+my @testfiles = qw(cakey.pem         cacert.pem        passwd.txt
+                   index.txt.attr    index.txt         index.txt.attr.old
+                   index.txt.old     serial            serial.old
+                   crlnumber         dsa.pem           ec.pem
+                   rsa.pem           crl.pem           pkcs10.pem
+                   cert.pem
+                   utf8.0.cert.pem   utf8.1.cert.pem   utf8.2.cert.pem
+                   utf8.0.crl.pem    utf8.1.crl.pem    utf8.2.crl.pem
+                   utf8.0.pkcs10.pem utf8.1.pkcs10.pem utf8.2.pkcs10.pem
+);
 
-unlink ("t/crypto/passwd.txt");
-unlink ("t/crypto/dsa.pem");
-unlink ("t/crypto/ec.pem");
-unlink ("t/crypto/rsa.pem");
-unlink ("t/crypto/pkcs10.pem");
-unlink ("t/crypto/cert.pem");
-unlink ("t/crypto/crl.pem");
+for my $dir (qw(ca1 ca2)) {
 
-unlink ("t/crypto/index.txt.attr");
-unlink ("t/crypto/index.txt");
-unlink ("t/crypto/serial");
-unlink ("t/crypto/index.txt.attr.old");
-unlink ("t/crypto/index.txt.old");
-unlink ("t/crypto/serial.old");
-unlink ("t/crypto/crlnumber");
+    my $cleanup_error = 0;
+    # clean up CA specific files
+    for my $file (@testfiles) {
 
-ok(1);
+	my $topurge = File::Spec->catfile($basedir, $dir, $file);
+	if (-e $topurge && !unlink $topurge) {
+	    $cleanup_error++;
+	}
 
-if (-e "t/crypto/cakey.pem" or
-    -e "t/crypto/cacert.pem" or
-    -e "t/crypto/passwd.txt" or
-    -e "t/crypto/dsa.pem" or
-    -e "t/crypto/rsa.pem" or
-    -e "t/crypto/pkcs10.pem" or
-    -e "t/crypto/cert.pem" or
-    -e "t/crypto/crl.pem" or
-    -e "t/crypto/index.txt.attr" or
-    -e "t/crypto/index.txt" or
-    -e "t/crypto/serial" or
-    -e "t/crypto/index.txt.attr.old" or
-    -e "t/crypto/index.txt.old" or
-    -e "t/crypto/serial.old" or
-    -e "t/crypto/crlnumber")
-{
-    ok(0);
-} else {
-    ok(1);
+	if (-e $topurge) {
+	    $cleanup_error++;
+	}
+    }
+
+    ok(! $cleanup_error);
 }
 
 1;

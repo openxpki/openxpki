@@ -9,6 +9,7 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (read_file);
 
 our $cache;
+our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
 ok(1);
@@ -25,9 +26,9 @@ ok(1);
 
 ## load data
 
-my $passwd = OpenXPKI->read_file ("t/25_crypto/passwd.txt");
-my $rsa    = OpenXPKI->read_file ("t/25_crypto/rsa.pem");
-my $cert   = OpenXPKI->read_file ("t/25_crypto/cert.pem");
+my $passwd = OpenXPKI->read_file ("$basedir/ca1/passwd.txt");
+my $rsa    = OpenXPKI->read_file ("$basedir/ca1/rsa.pem");
+my $cert   = OpenXPKI->read_file ("$basedir/ca1/cert.pem");
 ok($passwd and $rsa and $cert);
 
 my $content = "This is for example a passprase.";
@@ -65,7 +66,7 @@ ok ($content eq "This is for example a passprase.");
 my $result = $token->command ("pkcs7_verify",
                               CONTENT => $content,
                               PKCS7   => $sig,
-                              CHAIN   => "t/25_crypto/cacert.pem");
+                              CHAIN   => "$basedir/ca1/cacert.pem");
 ok(1);
 print STDERR "PKCS#7 external chain verify: $result\n" if ($ENV{DEBUG});
 $result = $token->command ("pkcs7_verify",

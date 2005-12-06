@@ -37,19 +37,26 @@ sub __init_engine
 {
     my $self = shift;
     my $keys = { @_ };
+
+    if (!exists $keys->{ENGINE} || $keys->{ENGINE} eq "") {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_UNDEFINED",
+	    );
+    }
+
     my $engine = "OpenXPKI::Crypto::Backend::OpenSSL::Engine::".$keys->{ENGINE};
     eval "use $engine;";
     if ($@)
     {
         my $msg = $@;
-        OpenXPKI::Exception (
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_USE_FAILED",
             params  => {"ERRVAL" => $msg});
     }
     $self->{ENGINE} = eval {$engine->new (@_)};
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        OpenXPKI::Exception (
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_NEW_FAILED",
             child   => $exc);
     } elsif ($EVAL_ERROR) {
@@ -63,10 +70,10 @@ sub __init_shell
     my $self = shift;
     my $keys = { @_ };
 
-    if (not -e $keys->{SHELL})
+    if (not -x $keys->{SHELL})
     {
-        OpenXPKI::Exception (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_MISSING_OPENSSL_BINARY");
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_BINARY_NOT_FOUND");
     } else {
         $self->{OPENSSL} = $keys->{SHELL};
         $self->{SHELL}   = $keys->{SHELL};
@@ -74,7 +81,7 @@ sub __init_shell
     my $wrapper = $self->{ENGINE}->get_wrapper();
     if ($wrapper)
     {
-        $self->{SHELL} = $wrapper." ".$self->{OPENSSL};
+        $self->{SHELL} = $wrapper . " " . $self->{OPENSSL};
     }
 
     eval
@@ -87,7 +94,7 @@ sub __init_shell
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        OpenXPKI::Exception (
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_SHELL_FAILED",
             child   => $exc);
     } elsif ($EVAL_ERROR) {
@@ -171,10 +178,10 @@ sub get_object
     my $self = shift;
     my $keys = { @_ };
 
-    my $debug = undef;
+    my $previous_debug = undef;
     if ($keys->{DEBUG})
     {
-        my $debug = $self->{DEBUG};
+        $previous_debug = $self->{DEBUG};
         $self->{DEBUG} = $keys->{DEBUG};
     }
 
@@ -220,21 +227,21 @@ sub get_object
             $object = OpenXPKI::Crypto::Backend::OpenSSL::CRL::_new_from_pem ($data);
         }
     } else {
-        $self->{DEBUG} = $debug if ($keys->{DEBUG});
+        $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_UNKNOWN_TYPE",
             params  => {"TYPE" => $type});
     }
     if (not $object)
     {
-        $self->{DEBUG} = $debug if ($keys->{DEBUG});
+        $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_NO_REF");
     }
 
     $self->debug ("returning object");
 
-    $self->{DEBUG} = $debug if ($keys->{DEBUG});
+    $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
     return $object;
 }
 
@@ -242,10 +249,10 @@ sub get_object_function
 {
     my $self   = shift;
     my $keys   = { @_ };
-    my $debug = undef;
+    my $previous_debug = undef;
     if ($keys->{DEBUG})
     {
-        my $debug = $self->{DEBUG};
+        $previous_debug = $self->{DEBUG};
         $self->{DEBUG} = $keys->{DEBUG};
     }
     my $object = $keys->{OBJECT};
@@ -255,7 +262,7 @@ sub get_object_function
 
     if ($func eq "free")
     {
-        $self->{DEBUG} = $debug if ($keys->{DEBUG});
+        $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
         return $self->free_object ($object);
     }
 
@@ -284,7 +291,7 @@ sub get_object_function
         }
     }
 
-    $self->{DEBUG} = $debug if ($keys->{DEBUG});
+    $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
     return $result;
 }
 

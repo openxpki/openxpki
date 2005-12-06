@@ -103,9 +103,7 @@ sub get_tmpfile
 {
     my $self = shift;
 
-    
-    my $tmpdir = $self->{TMP} || File::Spec->catfile('tmp');
-    my $template = File::Spec->catfile($tmpdir, "openxpkiXXXXXX");
+    my $template = File::Spec->catfile($self->{TMP}, "openxpkiXXXXXX");
 
     if (scalar(@_) == 0) {
 	my ($fh, $filename) = File::Temp::mkstemp($template);

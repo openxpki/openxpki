@@ -8,6 +8,7 @@ print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::SPKAC\n";
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
+our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
 ok(1);
@@ -23,9 +24,9 @@ my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM =
 ok (1);
 
 ## create SPKAC request
-$ENV{pwd} = OpenXPKI->read_file ("t/25_crypto/passwd.txt");
+$ENV{pwd} = OpenXPKI->read_file ("$basedir/ca1/passwd.txt");
 ok(1);
-my $spkac = `openssl spkac -key t/25_crypto/rsa.pem -passin env:pwd`;
+my $spkac = `openssl spkac -key $basedir/ca1/rsa.pem -passin env:pwd`;
 if ($spkac)
 {
     ok(1);
