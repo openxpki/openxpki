@@ -3,7 +3,7 @@
 ## $Revision$
 
 use strict;
-no warnings;
+use warnings;
 use utf8;
 
 package OpenXPKI;

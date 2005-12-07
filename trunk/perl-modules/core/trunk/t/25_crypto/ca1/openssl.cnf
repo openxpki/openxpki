@@ -37,7 +37,7 @@ default_ca	= CA_default		# The default ca section
 ####################################################################
 [ CA_default ]
 
-dir		= t/25_crypto	# Where everything is kept
+dir		= t/25_crypto/ca1	# Where everything is kept
 certs		= $dir/certs		# Where the issued certs are kept
 crl_dir		= $dir/crls		# Where the issued crl are kept
 database	= $dir/index.txt	# database index file.
