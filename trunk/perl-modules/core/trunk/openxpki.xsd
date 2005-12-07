@@ -133,10 +133,10 @@
   <!-- =========BEGIN========= -->
 
   <xsd:complexType name="pki_realm_type">
-    <xsd:all>
+    <xsd:sequence>
       <xsd:element name="common" type="pki_realm_common_type"/>
-      <xsd:element name="ca"     type="ca_type"/>
-    </xsd:all>
+      <xsd:element name="ca"     type="ca_type" maxOccurs="unbounded"/>
+    </xsd:sequence>
     <xsd:attribute name="name" type="xsd:string"/>
   </xsd:complexType>
 
@@ -172,8 +172,17 @@
 
   <xsd:complexType name="token_type">
     <xsd:sequence minOccurs="0">
-      <xsd:element name="backend"   type="xsd:string"/>
-      <xsd:element name="mode"      type="token_mode_type"/>
+      <xsd:element name="backend"   minOccurs="0" type="xsd:string"/>        <!-- perl module name -->
+      <xsd:element name="mode"      minOccurs="0" type="token_mode_type"/>
+      <xsd:element name="engine"    minOccurs="0" type="token_engine_type"/>
+      <xsd:element name="shell"     minOccurs="0" type="xsd:string"/>        <!-- filename of crypto binary    -->
+      <xsd:element name="wrapper"   minOccurs="0" type="xsd:string"/>        <!-- wrapper command around shell -->
+      <xsd:element name="key"       minOccurs="0" type="xsd:string"/>        <!-- filename of ca key           -->
+      <xsd:element name="cert"      minOccurs="0" type="xsd:string"/>        <!-- filename of ca cert          -->
+      <xsd:element name="internal_chain" minOccurs="0" type="xsd:string"/>   <!-- filename of internal chain   -->
+      <xsd:element name="config"    minOccurs="0" type="xsd:string"/>        <!-- filename of crypto config    -->
+      <xsd:element name="passwd_parts" minOccurs="0" type="xsd:nonNegativeInteger"/>
+      <xsd:element name="passwd"    minOccurs="0" type="xsd:string"/>
       <xsd:element name="option"    type="option_type" minOccurs="0" maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute ref="super"/>
@@ -185,6 +194,14 @@
       <xsd:enumeration value="standby"/>
       <xsd:enumeration value="session"/>
       <xsd:enumeration value="daemon"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="token_engine_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="OpenSSL"/>
+      <xsd:enumeration value="nCipher"/>
+      <xsd:enumeration value="Luna"/>
     </xsd:restriction>
   </xsd:simpleType>
 
