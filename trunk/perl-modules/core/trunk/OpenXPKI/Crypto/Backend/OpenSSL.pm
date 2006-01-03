@@ -1,6 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL
 ## (C)opyright 2005 Michael Bell
-## $Revision
+## $Revision$
 	
 use strict;
 use warnings;
