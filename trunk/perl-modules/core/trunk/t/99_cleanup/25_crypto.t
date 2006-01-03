@@ -36,8 +36,7 @@ my @files = (
             );
 
 ## 2 * number of file
-#BEGIN { plan tests => 50 };
-BEGIN { plan tests => 36 };
+BEGIN { plan tests => 50 };
 
 print STDERR "OpenXPKI::Crypto Cleanup\n";
 

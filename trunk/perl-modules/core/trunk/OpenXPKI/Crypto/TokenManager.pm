@@ -61,6 +61,7 @@ sub get_token
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_TYPE");
     }
+    $name = "default" if ($type  eq "DEFAULT");
     if (not $name)
     {
         OpenXPKI::Exception->throw (
