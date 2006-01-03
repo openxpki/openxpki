@@ -1,0 +1,42 @@
+<actions>
+
+  <!-- No-operation action -->
+  <action name="null"
+	  class="Workflow::Action::Null"/>
+
+  <action name ="certificate.request.dataonly.create"
+	  class="OpenXPKI::Server::Workflow::Activity::Request::Certificate::DataOnly::Create">
+    <description>Create a request from user submitted request data (without key)</description>
+    <field name="subject"
+	   label="Subject"
+	   description="Subject Common Name"
+	   is_required="yes"/>
+    <field name="profile"
+	   label="Certificate profile"
+	   description="Requested certificate profile"
+	   is_required="yes"/>
+    <field name="creator"
+	   label="Creator"
+	   description="User name or requester"
+	   is_required="yes"/>
+  </action>
+
+  <action name="token.get"
+	  class="OpenXPKI::Server::Workflow::Activity::Token::Get">
+    <description>Instantiate a crypto token</description>
+  </action>
+
+  <action name="key.generate"
+	  class="OpenXPKI::Server::Workflow::Activity::Key::Generate">
+    <description>Generate a key pair</description>
+  </action>
+
+  <action name="certificate.request.pkcs10.create"
+	  class="OpenXPKI::Server::Workflow::Activity::Request::Certificate::PKCS10::Create">
+    <description>Generate a PKCS#10 request</description>
+    <field name="request"
+	   label="Request Data"
+	   description="PKCS#10 encoded certificate request"
+	   is_required="yes"/>
+  </action>
+</actions>

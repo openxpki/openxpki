@@ -94,6 +94,13 @@ OpenXPKI/Server/API.pm
 OpenXPKI/Server/Init.pm
 OpenXPKI/UI/Test.pm
 
+## Workflow
+OpenXPKI/Server/Workflow/Activity.pm 
+OpenXPKI/Server/Workflow/Activity/Key/Generate.pm
+OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly/Create.pm
+OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
+OpenXPKI/Server/Workflow/Activity/Token/Get.pm
+
 ## test stuff
 
 t/config.xml
@@ -160,6 +167,14 @@ t/30_dbi/04.t
 t/30_dbi/70.t
 t/30_dbi/common.pl
 t/30_dbi/database.xml
+
+t/40_workflow/01.t
+t/40_workflow/02.t
+t/40_workflow/02_workflow_activity.xml
+t/40_workflow/02_workflow_persister.xml
+t/40_workflow/02_workflow_request_dataonly.xml
+t/40_workflow/99.t
+t/40_workflow/common.pl
 
 t/70_server/fix_config.pl
 t/70_server/startup.pl

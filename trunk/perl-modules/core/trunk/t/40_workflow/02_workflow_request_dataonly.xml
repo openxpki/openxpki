@@ -1,0 +1,31 @@
+<workflow>
+  <type>data only certificate request</type>
+  <description>Create a PKCS#10 request from user submitted request data</description>
+  <persister>FilePersister</persister>
+
+  <state name="INITIAL">
+    <description>Initial state for basic certificate requests</description>
+    <action name="certificate.request.dataonly.create"
+	    resulting_state="GET_TOKEN" />
+  </state>
+
+  <state name="GET_TOKEN">
+    <description>Obtain crypto token</description>
+    <action name="token.get"
+	    resulting_state="GENERATE_KEY"/>
+  </state>
+
+  <state name="GENERATE_KEY">
+    <description>Create key pair</description>
+    <action name="key.generate"
+	    resulting_state="CREATE_REQUEST"/>
+  </state>
+				   
+  <state name="CREATE_REQUEST">
+    <description>Create certificate request</description>
+    <action name="certificate.request.pkcs10.create"
+	    resulting_state="FINISHED"/>
+  </state>
+
+  <state name="FINISHED" />
+</workflow>

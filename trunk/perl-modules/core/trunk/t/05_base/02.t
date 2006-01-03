@@ -24,8 +24,8 @@ ok(OpenXPKI->write_file( FILENAME => $tmpfile,
    1,
    "Could not write temporary file");
 
-ok(OpenXPKI->read_file($tmpfile),
-   $data,
+ok(OpenXPKI->read_file($tmpfile) eq $data,
+   1,
    "Data read from file does not match original data");
 
 unlink $tmpfile;
