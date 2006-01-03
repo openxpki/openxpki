@@ -26,9 +26,8 @@ my $config = `xmllint -xinclude t/config.xml`;
 # set correct OpenSSL binary in configuration
 my $openssl_binary = `cat t/cfg.binary.openssl`;
 
-$config =~ s{ (<name>SHELL</name>\s*
-               <value>) (.*?) (</value>) }
-            {$1$openssl_binary$3}sx;
+$config =~ s{(<shell>)([^<]*)(</shell>\s*)}
+            {$1$openssl_binary$3}sgx;
 
 $cache = eval { OpenXPKI::XML::Config->new(DEBUG  => 0,
                                            CONFIG => $config) };

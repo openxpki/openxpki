@@ -1,5 +1,5 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl
-## (C)opyright 2005 Michael Bell
+## (C)opyright 2005-2006 Michael Bell
 ## $Revision$
 
 use strict;
@@ -18,6 +18,14 @@ sub get_command
 
     ## compensate missing parameters
 
+    if (not $self->{PROFILE} or
+        not ref $self->{PROFILE})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_PROFILE");
+    }
+    my $profile = $self->{PROFILE};
+
     $self->get_tmpfile ('OUT');
 
     ## ENGINE key's cert: no parameters
@@ -28,7 +36,8 @@ sub get_command
     $keyform = $self->{ENGINE}->get_keyform();
     $passwd  = $self->{ENGINE}->get_passwd();
     $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
-    $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
+    #this is now in the openssl config
+    #$self->{CERTFILE} = $self->{ENGINE}->get_certfile();
 
     ## check parameters
 
@@ -36,17 +45,6 @@ sub get_command
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_KEYFILE");
-    }
-    if (not $self->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_CONFIG");
-    }
-    if (exists $self->{DAYS} and
-        ($self->{DAYS} !~ /\d+/ or $self->{DAYS} <= 0))
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_WRONG_DAYS");
     }
 
     ## prepare data
@@ -100,57 +98,23 @@ sub get_command
             $index_txt = "R\t$start\t$timestamp\t$hex\tunknown\t$subject\n";
         }
     }
+    $self->{INDEX_TXT} = $index_txt;
 
-    ## create serial, index and index attribute file
-
-    my $config = $self->read_file ($self->{CONFIG});
-    my $database = $self->get_config_variable (NAME => "database", CONFIG => $config);
-    my $serial   = $self->get_config_variable (NAME => "crlnumber", CONFIG => $config);
-
-    if ($serial)
-    {
-        if (not exists $self->{SERIAL})
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_SERIAL");
-        }
-        $self->{SERIAL} = Math::BigInt->new ($self->{SERIAL});
-        if (not $self->{SERIAL})
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_FAILED_SERIAL");
-        }
-        my $hex    = substr ($self->{SERIAL}->as_hex(), 2);
-        $hex       = "0".$hex if (length ($hex) % 2);
-        $self->write_file (FILENAME => $serial,
-                           CONTENT  => $hex);
-        $self->set_tmpfile ("SERIAL" => $serial);
-    }
-
-    $self->write_file (FILENAME => $database,
-                       CONTENT  => $index_txt);
-    $self->write_file (FILENAME => "$database.attr",
-                       CONTENT  => "unique_subject = no\n");
-    $self->set_tmpfile ("DATABASE"      => $database);
-    $self->set_tmpfile ("DATABASE_ATTR" => "$database.attr");
+    $self->write_config ($profile);
 
     ## build the command
 
     my $command  = "ca -gencrl";
-    $command .= " -config ".$self->{CONFIG};
+    $command .= " -config ".$self->{CONFIGFILE};
     $command .= " -engine $engine" if ($engine);
     $command .= " -keyform $keyform" if ($keyform);
-    $command .= " -keyfile ".$self->{KEYFILE};
-    $command .= " -cert ".$self->{ENGINE}->get_certfile();
     $command .= " -out ".$self->{OUTFILE};
-    $command .= " -days ".$self->{DAYS} if (exists $self->{DAYS});
 
     if (defined $passwd)
     {
         $command .= " -passin env:pwd";
         $self->set_env ("pwd" => $passwd);
     }
-
 
     return [ $command ];
 }

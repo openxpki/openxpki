@@ -86,7 +86,7 @@
 
   <xsd:complexType name="database_type">
     <xsd:sequence>
-      <xsd:element name="debug"        type="debug_type"/>
+      <xsd:element name="debug"        type="xsd:boolean"/>
       <xsd:element name="server_id"    type="xsd:nonNegativeInteger"/>
       <xsd:element name="server_shift" type="xsd:positiveInteger"/>
       <xsd:element name="type"         type="database_type_type"/>
@@ -150,7 +150,8 @@
 
   <xsd:complexType name="ca_type">
     <xsd:all>
-      <xsd:element   name="token" type="token_type"/>
+      <xsd:element   name="token"    type="token_type"/>
+      <xsd:element   name="profiles" type="cert_profiles_type"/>
     </xsd:all>
     <xsd:attribute name="name"  type="xsd:string"/>
   </xsd:complexType>
@@ -184,6 +185,7 @@
       <xsd:element name="passwd_parts" minOccurs="0" type="xsd:nonNegativeInteger"/>
       <xsd:element name="passwd"    minOccurs="0" type="xsd:string"/>
       <xsd:element name="option"    type="option_type" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="debug"     type="xsd:boolean" minOccurs="0"/>
     </xsd:sequence>
     <xsd:attribute ref="super"/>
     <xsd:attribute ref="id"/>
@@ -209,6 +211,255 @@
   <!-- cryptographic token configuration -->
   <!-- ================================= -->
 
+  <!-- ================================== -->
+  <!-- certificate profiles configuration -->
+  <!-- ===============BEGIN============== -->
+
+  <xsd:complexType name="cert_profiles_type">
+    <xsd:sequence>
+      <xsd:element name="ca_certificate" type="cert_profile_type"/>
+      <xsd:element name="profile" type="cert_profile_type" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute ref="xml:base"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="cert_profile_type">
+    <xsd:sequence minOccurs="0">
+      <xsd:element name="digest"   type="digest_type"/>
+      <xsd:element name="lifetime" type="lifetime_type"/>
+      <xsd:element name="extensions" type="cert_extensions_type"/>
+    </xsd:sequence>
+    <xsd:attribute ref="role"/>
+    <xsd:attribute ref="id"/>
+  </xsd:complexType>
+
+  <xsd:simpleType name="digest_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="sha1"/>
+      <xsd:enumeration value="md5"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="lifetime_type">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:decimal">
+        <xsd:attribute name="format" type="lifetime_format_type" use="required"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:simpleType name="lifetime_format_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="days"/>     <!-- number:                 730 -->
+      <xsd:enumeration value="calendar"/> <!-- YY[MM[DD[HH[MM[SS]]]]]:  02 -->
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="cert_extensions_type">
+    <xsd:sequence minOccurs="0">
+      <xsd:element name="basic_constraints"        type="x509v3_basic_constraints"/>
+      <xsd:element name="key_usage"                type="x509v3_key_usage"/>
+      <xsd:element name="extended_key_usage"       type="x509v3_extended_key_usage"/>
+      <xsd:element name="subject_key_identifier"   type="x509v3_subject_key_identifier"/>
+      <xsd:element name="authority_key_identifier" type="x509v3_authority_key_identifier"/>
+      <xsd:element name="issuer_alt_name"          type="x509v3_issuer_alt_name"/>
+      <xsd:element name="crl_distribution_points"  type="x509v3_crl_distribution_points"/>
+      <xsd:element name="authority_info_access"    type="x509v3_authority_info_access"/>
+      <xsd:element name="user_notice"              type="x509v3_user_notice"/>
+      <xsd:element name="policy_identifier"        type="x509v3_policy_identifier"/>
+      <xsd:element name="cps"                      type="x509v3_cps"/>
+      <xsd:element name="oid"                      type="x509v3_oid"/>
+      <xsd:element name="netscape"                 type="x509v3_netscape"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_extension">
+    <xsd:attribute name="critical" type="xsd:boolean" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_basic_constraints">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="ca"          type="xsd:boolean"/>
+        <xsd:element name="path_length" type="xsd:nonNegativeInteger" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_key_usage">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="digital_signature" type="xsd:boolean"/>
+        <xsd:element name="non_repudiation"   type="xsd:boolean"/>
+        <xsd:element name="key_encipherment"  type="xsd:boolean"/>
+        <xsd:element name="data_encipherment" type="xsd:boolean"/>
+        <xsd:element name="key_agreement"     type="xsd:boolean"/>
+        <xsd:element name="key_cert_sign"     type="xsd:boolean"/>
+        <xsd:element name="crl_sign"          type="xsd:boolean"/>
+        <xsd:element name="encipher_only"     type="xsd:boolean"/>
+        <xsd:element name="decipher_only"     type="xsd:boolean"/>
+      </xsd:sequence>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_extended_key_usage">
+    <!-- these are OIDs                     -->
+    <!-- some OIDs are known and have names -->
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="client_auth"      type="xsd:boolean" minOccurs="0"/>
+        <xsd:element name="email_protection" type="xsd:boolean" minOccurs="0"/>
+        <xsd:element name="oid"              type="xsd:string"  minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_subject_key_identifier">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:attribute name="hash" type="xsd:boolean"/>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_authority_key_identifier">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:attribute name="keyid"  type="xsd:boolean"/>
+      <xsd:attribute name="issuer" type="xsd:boolean"/>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_issuer_alt_name">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:attribute name="copy" type="xsd:boolean"/>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_crl_distribution_points">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="uri" type="xsd:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_authority_info_access">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="ca_issuers" type="xsd:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="ocsp"       type="xsd:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_user_notice">
+    <xsd:complexContent mixed="true">
+    <xsd:extension base="x509v3_extension"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_policy_identifier">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="oid" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_cps">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="uri" type="xsd:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_oid">
+    <xsd:complexContent mixed="true">
+    <xsd:extension base="x509v3_extension">
+      <xsd:attribute name="number"   type="xsd:string"/>
+      <xsd:attribute name="format"   type="asn1_format_type"/>
+      <xsd:attribute name="encoding" type="asn1_encoding_type"/>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:simpleType name="asn1_format_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="DER"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="asn1_encoding_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="HEX"/> <!-- 0a:23:f1 -->
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- netscape extensions -->
+
+  <xsd:complexType name="x509v3_netscape">
+    <xsd:sequence minOccurs="0">
+      <xsd:element name="comment"          type="x509v3_netscape_comment"/>
+      <xsd:element name="certificate_type" type="x509v3_netscape_certificate_type"/>
+      <xsd:element name="cdp"              type="x509v3_netscape_cdp"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_netscape_comment">
+    <xsd:complexContent mixed="true">
+    <xsd:extension base="x509v3_extension"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_netscape_certificate_type">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="ssl_client"        type="xsd:boolean"/>
+        <xsd:element name="smime_client"      type="xsd:boolean"/>
+        <xsd:element name="object_signing"    type="xsd:boolean"/>
+        <xsd:element name="ssl_ca"            type="xsd:boolean"/>
+        <xsd:element name="smime_ca"          type="xsd:boolean"/>
+        <xsd:element name="object_signing_ca" type="xsd:boolean"/>
+      </xsd:sequence>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="x509v3_netscape_cdp">
+    <xsd:complexContent>
+    <xsd:extension base="x509v3_extension">
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="url"    type="xsd:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="ca_url" type="xsd:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <!-- ================END=============== -->
+  <!-- certificate profiles configuration -->
+  <!-- ================================== -->
+
   <!-- =================== -->
   <!-- general definitions -->
   <!-- ======BEGIN======== -->
@@ -227,7 +478,8 @@
   <!-- ..                                                      -->
   <!-- </token>                                                -->
   <xsd:attribute name="super" type="xsd:string"/>
-  <xsd:attribute name="id"     type="xsd:string"/>
+  <xsd:attribute name="id"    type="xsd:string"/>
+  <xsd:attribute name="role"  type="xsd:string"/>
 
   <xsd:complexType name="option_type">
     <xsd:sequence>
@@ -235,13 +487,6 @@
       <xsd:element name="value" type="xsd:string"/>
     </xsd:sequence>
   </xsd:complexType>
-
-  <xsd:simpleType name="debug_type">
-    <xsd:restriction base="xsd:token">
-      <xsd:enumeration value="0"/> <!-- on  -->
-      <xsd:enumeration value="1"/> <!-- off -->
-    </xsd:restriction>
-  </xsd:simpleType>
 
   <!-- =======END========= -->
   <!-- general definitions -->

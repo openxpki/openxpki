@@ -10,8 +10,6 @@ package OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (debug);
 use OpenXPKI::Exception;
 
-use Data::Dumper;
-
 sub new {
     my $that = shift;
     my $class = ref($that) || $that;
@@ -25,6 +23,7 @@ sub new {
     my $keys = { @_ };
     $self->{DEBUG}  = 1               if ($keys->{DEBUG});
     $self->{config} = $keys->{CONFIG} if ($keys->{CONFIG});
+    $self->{tmp}    = $keys->{TMPDIR} if ($keys->{TMPDIR});
 
     if (not $self->{config})
     {
@@ -182,8 +181,7 @@ sub __add_token
     # openca-sv
     foreach my $key (qw(debug      backend       mode 
                         engine     shell         wrapper 
-                        tmpdir     randfile
-                        config
+                        randfile
                         key        cert          internal_chain
                         passwd     passwd_parts 
                        )) {
@@ -247,7 +245,10 @@ sub __add_token
 
     $self->debug ("try to setup $backend token");
     eval {
-        $self->{TOKEN}->{$realm}->{$type}->{$name} = $self->__new_token ($backend, %token_args);
+        $self->{TOKEN}->{$realm}->{$type}->{$name} =
+            $self->__new_token ($backend,
+                                TMP => $self->{tmp},
+                                %token_args);
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
@@ -403,7 +404,9 @@ get tokens and to manage the state of a token.
 
 The constructor only need an instance of the XML configuration. The
 parameter for this is called CONFIG. If you want to debug the module
-then must specify a true value for the parameter DEBUG.
+then must specify a true value for the parameter DEBUG. If you want to
+use an explicit temporary directory then you must specifiy this
+directory in the variable TMPDIR.
 
 =head2 set_ui
 

@@ -49,28 +49,36 @@ if ($EVAL_ERROR)
     print STDERR "Error: no exception thrown on wrong path\n";
 }
 
-## validate with xmllint
-my $result = `xmllint -format -schema openxpki.xsd -xinclude t/config.xml 2>&1 1>/dev/null`;
-if ($CHILD_ERROR)
+if ($ENV{OFFLINE})
 {
-    my $msg = "Error: there is something wrong with xmllint (${CHILD_ERROR}: ${EVAL_ERROR})\n";
-    $result = `ping -c 1 -t 2 www.w3.org`;
+    ok(1);
+    print STDERR "WARNING: Cannot validate the configuration with the schema because you are offline.\n";
+}
+else
+{ 
+    ## validate with xmllint
+    my $result = `xmllint -format -schema openxpki.xsd -xinclude t/config.xml 2>&1 1>/dev/null`;
     if ($CHILD_ERROR)
     {
-        ok(1);
-        print STDERR "WARNING: Cannot validate the configuration with the schema because you are offline.\n";
+        my $msg = "Error: there is something wrong with xmllint (${CHILD_ERROR}: ${EVAL_ERROR})\n";
+        $result = `ping -c 1 -t 2 www.w3.org`;
+        if ($CHILD_ERROR)
+        {
+            ok(1);
+            print STDERR "WARNING: Cannot validate the configuration with the schema because you are offline.\n";
+        } else {
+            ok(0);
+            print STDERR $msg;
+        }
     } else {
-        ok(0);
-        print STDERR $msg;
-    }
-} else {
-    $result =~ s/^(.*\n)?([^\n]+)\n?$/$2/s;
-    if ($result eq "t/config.xml validates")
-    {
-        ok(1);
-    } else {
-        ok(0);
-        print STDERR "xmllint reports some trouble with t/config.xml and openxpki.xsd\n";
+        $result =~ s/^(.*\n)?([^\n]+)\n?$/$2/s;
+        if ($result eq "t/config.xml validates")
+        {
+            ok(1);
+        } else {
+            ok(0);
+            print STDERR "xmllint reports some trouble with t/config.xml and openxpki.xsd\n";
+        }
     }
 }
 

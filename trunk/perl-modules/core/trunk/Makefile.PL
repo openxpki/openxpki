@@ -117,6 +117,7 @@ WriteMakefile(
     'INC'       => "-I. -I$openssl_inc_dir",
     'PREREQ_PM' => {'DBI'                    => 1,
                     'Date::Parse'            => 1,
+                    'DateTime'               => "0.22",
                     'Exception::Class'       => "1.22",
                     ## includes the version of libintl-perl which includes Locale::Messages
                     'Locale::TextDomain'     => 1,

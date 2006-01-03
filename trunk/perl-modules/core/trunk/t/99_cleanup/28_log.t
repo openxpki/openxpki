@@ -5,7 +5,7 @@ use Test;
 my @files = (
              "t/28_log/sqlite.db",
              "t/28_log/sqlite_log.db",
-             "t/28_log/stderr.log",
+             "t/28_log/stderrr.log",
             );
 BEGIN { plan tests => 6 };
 

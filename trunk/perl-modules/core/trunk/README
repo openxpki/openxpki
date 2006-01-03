@@ -13,3 +13,16 @@ you have an idea to improve the style then please start a
 discussion on our developer list.
 
 perltidy --profile=perltidyrc -b `find . -name "*.pm" | grep -v "/\.svn"`
+
+Testing
+=======
+
+If you want to test the code with "make test" then you can
+activate the offline mode with the environment variable OFFLINE.
+If this variable is set to a true value of Perl then the test
+code knows that you are working offline and avoid any tests
+which need an internet connection.
+
+Example:
+
+OFFLINE=1 make test

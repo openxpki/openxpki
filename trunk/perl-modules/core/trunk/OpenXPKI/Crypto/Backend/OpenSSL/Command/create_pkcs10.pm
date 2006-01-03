@@ -13,6 +13,28 @@ sub get_command
 {
     my $self = shift;
 
+    ## create OpenSSL config
+
+    $self->get_tmpfile ('CONFIG',   'OUT');
+
+    ## utf8 support options
+    ## please do not touch or OpenXPKI's utf8 support breaks
+    ## utf8=yes                # needed for correct issue of cert. This is 
+    ##                         # interchangeable with -utf8 "subj" command line modifier.
+    ## string_mask=utf8only    # needed for correct issue of cert
+    ## will be ignored today by "openssl req"
+    ## name_opt = RFC2253,-esc_msb
+
+    my $config = "utf8              = yes\n".
+                 "string_mask       = utf8only\n".
+                 "distinguished_name = dn\n".
+                 "\n".
+                 "[ dn ]\n".
+                 "dc=optional\n";
+    $self->write_file (FILENAME => $self->{CONFIGFILE},
+                       CONTENT  => $config,
+	               FORCE    => 1);
+
     ## compensate missing parameters
 
     ## ENGINE key's CSR: no parameters
@@ -64,11 +86,6 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEYFILE");
     }
-    if (not $self->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_CONFIG");
-    }
 
     ## prepare data
 
@@ -78,7 +95,7 @@ sub get_command
     ## build the command
 
     my $command  = "req -new";
-    $command .= " -config ".$self->{CONFIG};
+    $command .= " -config ".$self->{CONFIGFILE};
     $command .= " -subj \"$subject\"";
     $command .= " -multivalue-rdn" if ($subject =~ /[^\\](\\\\)*\+/);
     $command .= " -engine $engine" if ($engine);
@@ -128,8 +145,6 @@ USE_ENGINE too.
 =over
 
 =item * SUBJECT
-
-=item * CONFIG
 
 =item * KEY
 

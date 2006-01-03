@@ -52,34 +52,11 @@ sub new
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_ENGINE");
     }
 
-    # determine temporary directory to use:
-    # if a temporary directoy is specified, use it
-    # else try /var/tmp (because potentially large files may be written that
-    # are better left in the /var file system)
-    # if /var/tmp does not exist fallback to /tmp
-
-    my $requestedtmp = $self->{TMP};
-    delete $self->{TMP};
-  CHECKTMPDIRS:
-    for my $path ($requestedtmp,                      # user's preference
-		  File::Spec->catfile('var', 'tmp'),  # suitable for large files
-		  File::Spec->catfile('tmp'),         # present on all UNIXes
-	) {
-
-	# directory must be readable & writable to be usable as tmp
-	if (defined $path && 
-	    (-d $path) &&
-	    (-r $path) &&
-	    (-w $path)) {
-	    $self->{TMP} = $path;
-	    last CHECKTMPDIRS;
-	}
-    }
-
-    if (! (exists $self->{TMP} && -d $self->{TMP}))
+    ## $self->{TMP} will be checked by the central OpenSSL module
+    if (not $self->{TMP})
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_TEMPORARY_DIRECTORY_UNAVAILABLE");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_TEMPORARY_DIRECTORY_UNAVAILABLE");
     }
 
     return $self;
@@ -242,6 +219,265 @@ sub get_openssl_time
     $time = POSIX::strftime ("%g%m%d%H%M%S",@{$time})."Z";
 
     return $time;
+}
+
+sub write_config
+{
+    my $self    = shift;
+    my $profile = shift;
+
+    ## create neaded files
+
+    $self->get_tmpfile ('CONFIG');
+    $self->get_tmpfile ('SERIAL');
+    $self->get_tmpfile ('DATABASE');
+
+    ## create serial, index and index attribute file
+
+    $self->{SERIAL} = Math::BigInt->new ($profile->get_serial());
+    my $hex = undef;
+    if ($self->{SERIAL})
+    {
+        $hex = substr ($self->{SERIAL}->as_hex(), 2);
+        $hex = "0".$hex if (length ($hex) % 2);
+    }
+
+    if (exists $self->{INDEX_TXT})
+    {
+        ## this is a CRL
+        $self->write_file (FILENAME => $self->{DATABASEFILE},
+                           CONTENT  => $self->{INDEX_TXT},
+                           FORCE    => 1);
+        ## some CRLs will be issued without a serial
+        $hex = "" if (not defined $profile->get_serial() or
+                      not length $profile->get_serial());
+    }
+    else
+    {
+        ## this is a certificate
+        $self->write_file (FILENAME => $self->{DATABASEFILE},
+                           CONTENT  => "",
+                           FORCE    => 1);
+    }
+    if (not $self->{SERIAL} and not defined $hex)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_WRITE_CONFIG_FAILED_SERIAL");
+    }
+
+    $self->write_file (FILENAME => $self->{DATABASEFILE}.".attr",
+                       CONTENT  => "unique_subject = no\n",
+                       FORCE    => 1);
+    $self->write_file (FILENAME => $self->{SERIALFILE},
+                       CONTENT  => $hex,
+                       FORCE    => 1);
+
+    ## create config
+
+    my $config = "";
+
+    ## CA/REQ/DEFAULT section
+
+    ## $config .= "[ ca ]\n";
+
+    $config .= "default_ca        = \n";
+    $config .= "new_certs_dir     = ".$self->{TMP}."\n";
+    $config .= "certificate       = ".$self->{ENGINE}->get_certfile()."\n";
+    $config .= "private_key       = ".$self->{KEYFILE}."\n";
+    $config .= "default_startdate = ".$profile->get_notbefore()->strftime("%g%m%d%H%M%SZ")."\n"
+        if ($profile->get_notbefore());
+    $config .= "default_enddate   = ".$profile->get_notafter()->strftime("%g%m%d%H%M%SZ")."\n"
+        if ($profile->get_notafter());
+    $config .= "default_md        = ".$profile->get_digest()."\n";
+    $config .= "database          = ".$self->{DATABASEFILE}."\n";
+    $config .= "serial            = ".$self->{SERIALFILE}."\n";
+    $config .= "crlnumber         = ".$self->{SERIALFILE}."\n" if (defined $hex and length $hex);
+    $config .= "default_crl_days  = ".$profile->get_nextupdate_in_days()."\n";
+    $config .= "x509_extensions   = v3ca\n";
+    $config .= "preserve          = YES\n";
+    $config .= "policy            = dn_policy\n";
+    $config .= "name_opt          = RFC2253,-esc_msb\n";
+    $config .= "utf8              = yes\n";
+    $config .= "string_mask       = utf8only\n";
+    $config .= "\n";
+
+    $config .= "[ dn_policy ]\n";
+    $config .= "# this is a dummy because of preserve\n";
+    $config .= "domainComponent = optional\n";
+    $config .= "\n";
+
+    ## extension section
+
+    $config .= "[ v3ca ]\n";
+    my $sections = "";
+
+    foreach my $name (sort $profile->get_named_extensions())
+    {
+        my $critical = "";
+        $critical = "critical," if ($profile->is_critical_extension ($name));
+
+        if ($name eq "authority_info_access")
+        {
+            $config .= "authorityInfoAccess = $critical";
+            foreach my $pair (@{$profile->get_extension("authority_info_access")})
+            {
+                my $type;
+                $type = "caIssuers" if ($pair->[0] eq "CA_ISSUERS");
+                $type = "OCSP"       if ($pair->[0] eq "OCSP");
+                foreach my $http (@{$pair->[1]})
+                {
+                    $config .= "$type;URI:$http,";
+                }
+            }
+            $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
+            $config .= "\n";
+        }
+        elsif ($name eq "authority_key_identifier")
+        {
+            $config .= "authorityKeyIdentifier = $critical";
+            foreach my $param (@{$profile->get_extension("authority_key_identifier")})
+            {
+                $config .= "issuer:always," if ($param eq "issuer");
+                $config .= "keyid:always,"  if ($param eq "keyid");
+            }
+            $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
+            $config .= "\n";
+        }
+        elsif ($name eq "basic_constraints")
+        {
+            $config .= "basicConstraints = $critical";
+            foreach my $pair (@{$profile->get_extension("basic_constraints")})
+            {
+                if ($pair->[0] eq "CA")
+                {
+                    if ($pair->[1])
+                    {
+                        $config .= "CA:true,";
+                    } else {
+                        $config .= "CA:false,";
+                    }
+                }
+                if ($pair->[0] eq "PATH_LENGTH")
+                {
+                    $config .= "pathlen:".$pair->[1].",";
+                }
+            }
+            $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
+            $config .= "\n";
+        }
+        elsif ($name eq "cdp")
+        {
+            $config .= "crlDistributionPoints = $critical\@cdp\n";
+            $sections .= "[ cdp ]\n";
+            my $i = 0;
+            foreach my $cdp (@{$profile->get_extension("cdp")})
+            {
+                $sections .= "URI.$i=$cdp\n";
+                $i++;
+            }
+            $sections .= "\n";
+        }
+        elsif ($name eq "extended_key_usage")
+        {
+            $config .= "extendedKeyUsage = $critical";
+            my @bits = @{$profile->get_extension("extended_key_usage")};
+            $config .= "clientAuth,"      if (grep /client_auth/,      @bits);
+            $config .= "emailProtection," if (grep /email_protection/, @bits);
+            my @oids = grep /\./, @bits;
+            foreach my $oid (@oids)
+            {
+                $config .= "$oid,";
+            }
+            $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
+            $config .= "\n";
+        }
+        elsif ($name eq "issuer_alt_name")
+        {
+            $config .= "issuerAltName = $critical";
+            my $issuer = join (",", @{$profile->get_extension("issuer_alt_name")});
+            $config .= "issuer:copy" if ($issuer eq "copy");
+            $config .= "\n";
+        }
+        elsif ($name eq "key_usage")
+        {
+            $config .= "keyUsage = $critical";
+            my @bits = @{$profile->get_extension("key_usage")};
+            $config .= "digitalSignature," if (grep /digital_signature/, @bits);
+            $config .= "nonRepudiation,"   if (grep /non_repudiation/,   @bits);
+            $config .= "keyEncipherment,"  if (grep /key_encipherment/,  @bits);
+            $config .= "dataEncipherment," if (grep /data_encipherment/, @bits);
+            $config .= "keyAgreement,"     if (grep /key_agreement/,     @bits);
+            $config .= "keyCertSign,"      if (grep /key_cert_sign/,     @bits);
+            $config .= "cRLSign,"          if (grep /crl_sign/,          @bits);
+            $config .= "encipherOnly,"     if (grep /encipher_only/,     @bits);
+            $config .= "decipherOnly,"     if (grep /decipher_only/,     @bits);
+            $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
+            $config .= "\n";
+        }
+        elsif ($name eq "subject_alt_name")
+        {
+            $config .= "subjectAltName = $critical\@subject_alt_name\n";
+            my $ref = $profile->get_extension("subject_alt_name");
+            my $i   = 0;
+            $sections .= "[ subject_alt_name ]\n";
+            foreach my $pair (@{$ref})
+            {
+                ## the hash only includes one key/value pair
+                $sections .= join (".", keys %{$pair}).".$i = ".
+                             $pair->{join (".", keys %{$pair})}."\n";
+                $i++;
+            }
+            $sections .= "\n";
+        }
+        elsif ($name eq "subject_key_identifier")
+        {
+            $config .= "subjectKeyIdentifier = $critical";
+            my @bits = @{$profile->get_extension("subject_key_identifier")};
+            $config .= "hash" if (grep /hash/, @bits);
+            $config .= "\n";
+        }
+        elsif ($name eq "netscape/ca_cdp")
+        {
+            $config .= "nsCaRevocationUrl = $critical".
+                       join ("", @{$profile->get_extension("netscape/ca_cdp")})."\n";
+        }
+        elsif ($name eq "netscape/cdp")
+        {
+            $config .= "nsRevocationUrl = $critical".
+                       join ("", @{$profile->get_extension("netscape/cdp")})."\n";
+        }
+        elsif ($name eq "netscape/certificate_type")
+        {
+            $config .= "nsCertType = $critical";
+            my @bits = @{$profile->get_extension("netscape/certificate_type")};
+            $config .= "client,"  if (grep /ssl_client/, @bits);
+            $config .= "objsign," if (grep /object_signing/, @bits);
+            $config .= "email,"   if (grep /smime_client/, @bits);
+            $config .= "sslCA,"   if (grep /ssl_client_ca/, @bits);
+            $config .= "objCA,"   if (grep /object_signing_ca/, @bits);
+            $config .= "emailCA," if (grep /smime_client_ca/, @bits);
+            $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
+            $config .= "\n";
+        }
+        elsif ($name eq "netscape/comment")
+        {
+            $config .= "nsComment = $critical\"";
+            my $string =  join ("", @{$profile->get_extension("netscape/comment")});
+               $string =~ s/\n/\\n/g;
+            $config .= "$string\"\n";
+        }
+        else
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_WRITE_CONFIG_UNKNOWN_NAMED_EXTENSION",
+                params  => {NAME => $name});
+        }
+    }
+
+    $self->debug ("config: $config\n$sections\n");
+    $self->write_file (FILENAME => $self->{CONFIGFILE},
+                       CONTENT  => $config."\n".$sections,
+	               FORCE    => 1);
 }
 
 sub DESTROY

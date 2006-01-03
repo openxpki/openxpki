@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 use utf8;
+#use encoding 'utf8';
 
 package OpenXPKI;
 
@@ -281,6 +282,10 @@ sub read_file
 		message => "I18N_OPENXPKI_READ_FILE_OPEN_FAILED",
 		params  => {"FILENAME" => $filename});
 	}
+        ## looks like this does not work
+        ## "\x82 is no utf8" is the message (10000010) - perhaps an encoding problem?
+        ## binmode $HANDLE, ":utf8";
+        ## print STDERR "filename: $filename\n";
 
 	# slurp mode
 	local $INPUT_RECORD_SEPARATOR;     # long version of $/
@@ -344,6 +349,8 @@ sub write_file
             message => "I18N_OPENXPKI_WRITE_FILE_OPEN_FAILED",
             params  => {"FILENAME" => $filename});
     }
+    ## deactivated because reading creates a lot of trouble
+    ## binmode $HANDLE, ":utf8";
     print {$HANDLE} $content;
     close $HANDLE;
 

@@ -15,6 +15,14 @@ sub get_command
 
     ## compensate missing parameters
 
+    if (not $self->{PROFILE} or
+        not ref $self->{PROFILE})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_PROFILE");
+    }
+    my $profile = $self->{PROFILE};
+
     $self->get_tmpfile ('CSR');
 
     ## ENGINE key's cert: no parameters
@@ -71,11 +79,6 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_CSRFILE");
     }
-    if (not $self->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_CONFIG");
-    }
     if (exists $self->{DAYS} and
         ($self->{DAYS} !~ /\d+/ or $self->{DAYS} <= 0))
     {
@@ -85,6 +88,7 @@ sub get_command
 
     ## prepare data
 
+    $self->write_config ($profile);
     $self->write_file (FILENAME => $self->{CSRFILE},
                        CONTENT  => $self->{CSR},
 	               FORCE    => 1);
@@ -92,7 +96,7 @@ sub get_command
     ## build the command
 
     my $command  = "req -x509";
-    $command .= " -config ".$self->{CONFIG};
+    $command .= " -config ".$self->{CONFIGFILE};
     $command .= " -subj \"$subject\"" if ($subject);
     $command .= " -multivalue-rdn" if ($subject and $subject =~ /[^\\](\\\\)*\+/);
     $command .= " -engine $engine" if ($engine);
@@ -107,6 +111,7 @@ sub get_command
         $command .= " -passin env:pwd";
         $self->set_env ("pwd" => $passwd);
     }
+    $self->debug ("command: $command");
 
     return [ $command ];
 }

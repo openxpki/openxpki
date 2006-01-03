@@ -25,12 +25,14 @@
     </common>
 
     <!-- Issuing CAs defined for this realm -->
-    <ca name="INTERNAL_CA_1">
+    <ca name="INTERNAL_CA_1" id="ca1">
       <token super="common/token_config/token{ca1}"/>
+      <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="25_crypto/profile.xml"/>
     </ca>
 
     <ca name="INTERNAL_CA_2">
-      <token super="common/token_config/token{ca2}"/>
+      <token    super="common/token_config/token{ca2}"/>
+      <profiles super="pki_realm/ca{ca1}/profiles"/>
     </ca>
 
   </pki_realm>

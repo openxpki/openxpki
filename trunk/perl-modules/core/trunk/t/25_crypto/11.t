@@ -1,11 +1,13 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 11 };
+BEGIN { plan tests => 12 };
 
 print STDERR "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n";
 
 use OpenXPKI::Crypto::TokenManager;
+use OpenXPKI::Crypto::Profile::Certificate;
+use OpenXPKI::Crypto::Profile::CRL;
 
 our $cache;
 our $basedir;
@@ -60,20 +62,30 @@ print STDERR "RSA: $key\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/rsa.pem", CONTENT => $key);
 
 ## create CSR
+my $subject = "cn=John Doe,dc=OpenCA,dc=info";
 my $csr = $token->command ("create_pkcs10",
-                           CONFIG  => "$basedir/ca1/openssl.cnf",
                            KEY     => $key,
                            PASSWD  => $passwd,
-                           SUBJECT => "cn=John Doe,dc=OpenCA,dc=info");
+                           SUBJECT => $subject);
 ok (1);
 print STDERR "CSR: $csr\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/pkcs10.pem", CONTENT => $csr);
 
+## create profile
+my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
+                  DEBUG     => 0,
+                  CONFIG    => $cache,
+                  PKI_REALM => "Test Root CA",
+                  CA        => "INTERNAL_CA_1",
+                  ROLE      => "User");
+$profile->set_serial  (1);
+$profile->set_subject ($subject);
+ok(1);
+
 ## create cert
 my $cert = $token->command ("issue_cert",
-                            CSR    => $csr,
-                            CONFIG => "$basedir/ca1/openssl.cnf",
-                            SERIAL => 1);
+                            CSR     => $csr,
+                            PROFILE => $profile);
 ok (1);
 print STDERR "cert: $cert\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/cert.pem", CONTENT => $cert);
@@ -88,9 +100,18 @@ ok (1);
 print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
 
 ## create CRL
-my $crl = $token->command ("issue_crl", REVOKED => [$cert], SERIAL => 1);
-ok (1);
+$profile = OpenXPKI::Crypto::Profile::CRL->new (
+                  DEBUG     => 0,
+                  CONFIG    => $cache,
+                  PKI_REALM => "Test Root CA",
+                  CA        => "INTERNAL_CA_1");
+## otherwise test 34 fails
+## $profile->set_serial (1);
+my $crl = $token->command ("issue_crl",
+                           REVOKED => [$cert],
+                           PROFILE => $profile);
 print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/crl.pem", CONTENT => $crl);
+ok (1);
 
 1;

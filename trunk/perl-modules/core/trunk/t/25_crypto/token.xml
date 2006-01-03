@@ -20,14 +20,9 @@
 	<!-- OpenSSL binary call gets wrapped with this command -->
         <wrapper></wrapper>
 
-	<!-- temporary directory to use for the token -->
-        <tmpdir>t/25_crypto</tmpdir>
-
-	<!-- random file to use for OpenSSL -->
+	<!-- random file to use for OpenSSL        -->
+        <!-- <randfile>t/25_crypto/rand</randfile> -->
         <randfile>t/25_crypto/rand</randfile>
-
-	<!-- OpenSSL config, FIXME: migrate to XML-only configuration -->
-	<config>t/25_crypto/ca1/ca_openssl.cnf</config>
 
 	<!-- debugging: 0 (off), 1 (on) -->
 	<debug>0</debug>
@@ -45,9 +40,6 @@
 	<!-- CA certificate chain for crypto operations -->
 	<internal_chain>t/25_crypto/ca1/cacert.pem</internal_chain>
 
-	<!-- OpenSSL config, FIXME: migrate to XML-only configuration -->
-	<config>t/25_crypto/ca1/ca_openssl.cnf</config>
-	
 	<!-- Number of CA passphrase fragments -->
         <passwd_parts>1</passwd_parts>
 
@@ -65,8 +57,6 @@
 	<!-- CA certificate chain for crypto operations -->
 	<internal_chain>t/25_crypto/ca2/cacert.pem</internal_chain>
 
-	<!-- OpenSSL config, FIXME: migrate to XML-only configuration -->
-	<config>t/25_crypto/ca2/ca_openssl.cnf</config>
     </token>
 
 </token_config>

@@ -17,7 +17,15 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->get_tmpfile ('CSR', 'OUT');
+    if (not $self->{PROFILE} or
+        not ref $self->{PROFILE})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_MISSING_PROFILE");
+    }
+    my $profile = $self->{PROFILE};
+
+    $self->get_tmpfile ('CSR',      'OUT');
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -27,13 +35,6 @@ sub get_command
     $keyform = $self->{ENGINE}->get_keyform();
     $passwd  = $self->{ENGINE}->get_passwd();
     $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
-
-    my $subject = undef;
-    if (exists $self->{SUBJECT} and length ($self->{SUBJECT}))
-    {
-        ## fix DN-handling of OpenSSL
-        $subject = $self->get_openssl_dn ($self->{SUBJECT});
-    }
 
     ## check parameters
 
@@ -47,32 +48,10 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_MISSING_CSRFILE");
     }
-    if (not $self->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_MISSING_CONFIG");
-    }
-    if (exists $self->{DAYS} and
-        ($self->{DAYS} !~ /\d+/ or $self->{DAYS} <= 0))
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_WRONG_DAYS");
-    }
-    if (exists $self->{START} and
-        ($self->{START} !~ /\d+/ or $self->{START} <= 0))
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_WRONG_START");
-    }
-    if (exists $self->{END} and
-        ($self->{END} !~ /\d+/ or $self->{END} <= 0))
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_WRONG_END");
-    }
 
     ## prepare data
 
+    $self->write_config ($profile);
     $self->write_file (FILENAME => $self->{CSRFILE},
                        CONTENT  => $self->{CSR},
 	               FORCE    => 1);
@@ -83,41 +62,15 @@ sub get_command
         $spkac = 1;
     }
 
-    ## create serial, index and index attribute file
-
-    my $config = $self->read_file ($self->{CONFIG});
-    my $database = $self->get_config_variable (NAME => "database", CONFIG => $config);
-    my $serial   = $self->get_config_variable (NAME => "serial", CONFIG => $config);
-
-    $self->{SERIAL} = Math::BigInt->new ($self->{SERIAL});
-    if (not $self->{SERIAL})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_FAILED_SERIAL");
-    }
-    my $hex    = substr ($self->{SERIAL}->as_hex(), 2);
-    $hex       = "0".$hex if (length ($hex) % 2);
-
-    $self->write_file (FILENAME => $database,
-                       CONTENT  => "");
-    $self->write_file (FILENAME => "$database.attr",
-                       CONTENT  => "unique_subject = no\n");
-    $self->write_file (FILENAME => $serial,
-                       CONTENT  => $hex);
-    $self->set_tmpfile ("DATABASE"      => $database);
-    $self->set_tmpfile ("DATABASE_ATTR" => "$database.attr");
-    $self->set_tmpfile ("SERIAL"        => $serial);
-
     ## build the command
 
     my $command  = "ca -batch";
-    $command .= " -config ".$self->{CONFIG};
-    $command .= " -subj \"$subject\"" if ($subject);
-    $command .= " -multivalue-rdn" if ($subject and $subject =~ /[^\\](\\\\)*\+/);
+    $command .= " -config ".$self->{CONFIGFILE};
+    ## fix DN-handling of OpenSSL
+    $command .= ' -subj "'.$self->get_openssl_dn($profile->get_subject()).'"';
+    $command .= " -multivalue-rdn" if ($profile->get_subject() =~ /[^\\](\\\\)*\+/);
     $command .= " -engine $engine" if ($engine);
     $command .= " -keyform $keyform" if ($keyform);
-    $command .= " -keyfile ".$self->{KEYFILE};
-    $command .= " -cert ".$self->{ENGINE}->get_certfile();
     $command .= " -out ".$self->{OUTFILE};
     if ($spkac)
     {
@@ -125,17 +78,12 @@ sub get_command
     } else {
         $command .= " -in ".$self->{CSRFILE};
     }
-    $command .= " -days ".$self->{DAYS} if (exists $self->{DAYS});
-    $command .= " -startdate ".$self->{START} if (exists $self->{END});
-    $command .= " -enddate ".$self->{START} if (exists $self->{END});
-    $command .= " -preserveDN";
 
     if (defined $passwd)
     {
         $command .= " -passin env:pwd";
         $self->set_env ("pwd" => $passwd);
     }
-
 
     return [ $command ];
 }
@@ -169,19 +117,9 @@ __END__
 
 =over
 
-=item * SUBJECT (optional)
-
-=item * CONFIG (optional)
+=item * PROFILE
 
 =item * CSR
-
-=item * SERIAL
-
-=item * DAYS (optional)
-
-=item * START (optional)
-
-=item * END (optional)
 
 =back
 

@@ -26,9 +26,41 @@ sub new
     my $keys = { @_ };
     $self->{DEBUG} = 1 if ($keys->{DEBUG});
 
-    $self->__init_engine (@_);
-    $self->__init_shell (@_);
-    $self->__init_command (@_);
+    # determine temporary directory to use:
+    # if a temporary directoy is specified, use it
+    # else try /var/tmp (because potentially large files may be written that
+    # are better left in the /var file system)
+    # if /var/tmp does not exist fallback to /tmp
+
+    ## removed FileSpec because it returns relative paths!!!
+
+    my $requestedtmp = $keys->{TMP};
+    delete $keys->{TMP};
+  CHECKTMPDIRS:
+    for my $path ($requestedtmp,    # user's preference
+		  "/var/tmp",       # suitable for large files
+		  "/tmp",           # present on all UNIXes
+	) {
+
+	# directory must be readable & writable to be usable as tmp
+	if (defined $path &&
+	    (-d $path) &&
+	    (-r $path) &&
+	    (-w $path)) {
+	    $self->{TMP} = $path;
+	    last CHECKTMPDIRS;
+	}
+    }
+
+    if (! (exists $self->{TMP} && -d $self->{TMP}))
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_TEMPORARY_DIRECTORY_UNAVAILABLE");
+    }
+
+    $self->__init_engine  (@_,TMP => $self->{TMP});
+    $self->__init_shell   (@_,TMP => $self->{TMP});
+    $self->__init_command (@_,TMP => $self->{TMP});
 
     return $self;
 }
@@ -90,7 +122,7 @@ sub __init_shell
                              ENGINE => $self->{ENGINE},
                              DEBUG  => $self->{DEBUG},
                              SHELL  => $self->{SHELL},
-                             TMP    => $keys->{TMPDIR});
+                             TMP    => $self->{TMP});
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
@@ -109,7 +141,7 @@ sub __init_command
     my $self = shift;
     my $keys = { @_ };
 
-    foreach my $key (["CONFIG", "CONFIG"], ["TMPDIR", "TMP"], ["RANDFILE", "RANDOM_FILE"])
+    foreach my $key (["TMP", "TMP"], ["RANDFILE", "RANDOM_FILE"])
     {
         if (not exists $keys->{$key->[0]})
         {
@@ -307,7 +339,6 @@ our $AUTOLOAD;
 sub AUTOLOAD {
     my $self = shift;
     $AUTOLOAD =~ s/^.*://;
-    return if ($AUTOLOAD eq "DESTROY");
     if (not $self->{ENGINE})
     {
         OpenXPKI::Exception->throw (
@@ -329,6 +360,12 @@ sub AUTOLOAD {
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_OPENSSL_AUTOLOAD_MISSING_FUNCTION",
         params  => {"FUNCTION" => $AUTOLOAD});
+}
+
+sub DESTROY
+{
+    my $self = shift;
+    return;
 }
 
 1;
@@ -359,9 +396,7 @@ OpenXPKI::Crypto::Backend::OpenSSL::Engine for more details.
 
 =item * SHELL (the OpenSSL binary)
 
-=item * TMPDIR (the used temporary directory which must be private)
-
-=item * CONFIG (the OpenSSL configuration)
+=item * TMP (the used temporary directory which must be private)
 
 =back
 

@@ -2,11 +2,12 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 8 };
+BEGIN { plan tests => 9 };
 
 print STDERR "OpenXPKI::Crypto::Command: Create a CA\n";
 
 use OpenXPKI::Crypto::TokenManager;
+use OpenXPKI::Crypto::Profile::Certificate;
 
 our $cache;
 our $basedir;
@@ -42,8 +43,19 @@ my $csr = $token->command ("create_pkcs10",
 ok (1);
 print STDERR "CA CSR: $csr\n" if ($ENV{DEBUG});
 
+## create profile
+my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
+                  CONFIG    => $cache,
+                  PKI_REALM => "Test Root CA",
+                  CA        => "INTERNAL_CA_1",
+                  TYPE      => "CA");
+$profile->set_serial(1);
+ok(1);
+
 ## create CA cert
-my $cert = $token->command ("create_cert", CSR => $csr);
+my $cert = $token->command ("create_cert",
+                            PROFILE => $profile,
+                            CSR     => $csr);
 ok (1);
 print STDERR "CA cert: $cert\n" if ($ENV{DEBUG});
 
