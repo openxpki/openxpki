@@ -77,6 +77,8 @@ Base class for OpenXPKI Activities. Deriving from this class is
 not mandatory, this class only provides some helper functions that
 make activity implementation easier.
 
+
+
 =head1 Functions
 
 =head2 setparams ( $workflow, \%expected_params )

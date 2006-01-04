@@ -26,6 +26,11 @@
     <description>Instantiate a crypto token</description>
   </action>
 
+  <action name="passphrase.generate"
+	  class="OpenXPKI::Server::Workflow::Activity::Passphrase::Generate">
+    <description>Generate a pass phrase</description>
+  </action>
+
   <action name="key.generate"
 	  class="OpenXPKI::Server::Workflow::Activity::Key::Generate">
     <description>Generate a key pair</description>

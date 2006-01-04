@@ -12,7 +12,28 @@
   <state name="GET_TOKEN">
     <description>Obtain crypto token</description>
     <action name="token.get"
-	    resulting_state="GENERATE_KEY"/>
+	    resulting_state="GENERATE_PASSPHRASE"/>
+  </state>
+
+  <state name="GENERATE_PASSPHRASE">
+    <description>Create pass phrase</description>
+    <!-- This is just a test to verify if branching in workflow definition
+	 works as expected. In this particular case, the passphrase generation
+	 activity does not overwrite an existing passphrase that is already
+	 in the context, so the activity could be called anyway in this case.
+      -->
+    <action name="passphrase.generate"
+	    resulting_state="GENERATE_KEY">
+      <!-- a bareword Perl expression is possible here but not user friendly,
+	   in real life this would probably be a condition class name that
+	   performs the verification instead 
+	-->
+      <condition test="! defined $context->{passphrase}"/>
+    </action>
+    <action name="null"
+	    resulting_state="GENERATE_KEY">
+      <condition test="defined $context->{passphrase}"/>
+    </action>
   </state>
 
   <state name="GENERATE_KEY">

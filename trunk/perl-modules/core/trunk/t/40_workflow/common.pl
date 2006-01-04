@@ -9,6 +9,10 @@ use warnings;
 use English;
 use File::Spec;
 
+use OpenXPKI::Server::Log;
+use OpenXPKI::Server::DBI;
+
+
 our $basedir = File::Spec->catfile('t', '40_workflow');
 
 
@@ -90,6 +94,22 @@ sub do_step {
 	ok(1);
     }
 }
+
+
+## init logging module
+
+our $log = OpenXPKI::Server::Log->new (CONFIG => "t/28_log/log.conf");
+ok($log);
+
+## init database module
+my %config = (
+              DEBUG  => 0,
+              TYPE   => "SQLite",
+              NAME   => "t/40_workflow/sqlite.db",
+              LOG    => $log
+             );
+our $dbi = OpenXPKI::Server::DBI->new (%config);
+ok($dbi->connect());
 
 
 1;

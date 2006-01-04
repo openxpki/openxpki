@@ -23,7 +23,7 @@ sub execute {
 			 key => {
 			     required => 1,
 			 },
-			 keypass => {
+			 passphrase => {
 			 },
 			 subject => {
 			     required => 1,
@@ -39,7 +39,7 @@ sub execute {
     ## create CSR
     my $csr = $token->command ("create_pkcs10",
 			       KEY     => $self->param('key'),
-			       PASSWD  => $self->param('keypass'),
+			       PASSWD  => $self->param('passphrase'),
 			       SUBJECT => $self->param('subject'));
     
 
@@ -74,6 +74,18 @@ Expects the following context parameters:
 =item creator
 
 User id of creator
+
+=item key
+
+Public key pair to use for creating the request.
+
+=item passphrase
+
+Passphrase protecting the private key.
+
+=item subject
+
+Request subject.
 
 =back
 

@@ -97,6 +97,7 @@ OpenXPKI/UI/Test.pm
 ## Workflow
 OpenXPKI/Server/Workflow/Activity.pm 
 OpenXPKI/Server/Workflow/Activity/Key/Generate.pm
+OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly/Create.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
 OpenXPKI/Server/Workflow/Activity/Token/Get.pm

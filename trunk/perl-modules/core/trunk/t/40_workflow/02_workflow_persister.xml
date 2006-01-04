@@ -2,4 +2,8 @@
    <persister name="FilePersister"
               class="Workflow::Persister::File"
               path="t/40_workflow/db/"/>
+   <persister name="OpenXPKIDBIPersister"
+              class="OpenXPKI::Server::Workflow::Persister::DBI"
+	      dsn="DBI:SQLite:t/40_workflow/sqlite_workflow.db"
+              />
 </persisters>

@@ -7,7 +7,7 @@ use Test;
 
 use Workflow::Factory qw( FACTORY );
 
-BEGIN { plan tests => 1 };
+BEGIN { plan tests => 3 };
 
 our $basedir;
 require 't/40_workflow/common.pl';

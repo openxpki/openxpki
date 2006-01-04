@@ -31,7 +31,8 @@ sub execute {
 			 keyencryptionalgorithm => {
 			     default => 'aes256',
 			 },
-			 keypass => {
+			 passphrase => {
+			     required => 1,
 			 },
 			 token => {
 			     required => 1,
@@ -53,25 +54,13 @@ sub execute {
 
     my $token = $self->param('token');
 
-    # encryption algorithm but no pass phrase specified
-    if (! $self->param('keypass')
-	&& $self->param('keyencryptionalgorithm')) {
-	
-	# generate a random pass phrase
-	$self->param('keypass',
-		     $token->command ("create_random", RANDOM_LENGTH => 16));
-
-	# export
-	$context->param(keypass => $self->param('keypass'));
-    }
-    
 
     my $key = $token->command("create_key",
 			      TYPE       => $self->param('keytype'),
 			      KEY_LENGTH => $self->param('keylength'),
 			      CURVE_NAME => $self->param('curvename'),
 			      ENC_ALG    => $self->param('keyencryptionalgorithm'),
-			      PASSWD     => $self->param('keypass'),
+			      PASSWD     => $self->param('passphrase'),
 	);
 
     # export
@@ -120,12 +109,9 @@ Key length in bit.
 
 Key encryption algorithm to use (defaults to 'AES256').
 
-=item keypass
+=item passphrase
 
-If specified (and keyencryptionalgorithm is not empty) uses the specified
-passphrase to protect the private key.
-If empty the activity generates a 16 character random pass phrase and
-uses this instead. This pass phrase is then exported via the context.
+Passphrase to protect the private key.
 
 =item curvename
 
@@ -139,13 +125,8 @@ After completion the following context parameters will be set:
 
 =item key
     
-PEM encoded public key pair (enrcypted with 'keypass' if 
+PEM encoded public key pair (encrypted with 'passphrase' if 
 'keyencryptionalgorithm' was not explicitly cleared)
-
-=item keypass
-
-Will be set to a random pass phrase if it was not set in 
-context before.
 
 =back
 
