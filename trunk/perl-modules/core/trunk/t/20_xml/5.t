@@ -61,7 +61,8 @@ else
     if ($CHILD_ERROR)
     {
         my $msg = "Error: there is something wrong with xmllint (${CHILD_ERROR}: ${EVAL_ERROR})\n";
-        $result = `ping -c 1 -t 2 www.w3.org`;
+        ## the w3c servers need really huge TTLs
+        $result = `ping -c 1 -t 30 www.w3.org`;
         if ($CHILD_ERROR)
         {
             ok(1);
