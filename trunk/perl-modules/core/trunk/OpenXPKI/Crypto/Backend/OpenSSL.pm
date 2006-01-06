@@ -15,6 +15,8 @@ use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 use English;
 
+use File::Spec;
+
 sub new
 {
     my $that = shift;
@@ -38,8 +40,8 @@ sub new
     delete $keys->{TMP};
   CHECKTMPDIRS:
     for my $path ($requestedtmp,    # user's preference
-		  "/var/tmp",       # suitable for large files
-		  "/tmp",           # present on all UNIXes
+		  File::Spec->catfile('', 'var', 'tmp'), # suitable for large files
+		  File::Spec->catfile('', 'tmp'),        # present on all UNIXes
 	) {
 
 	# directory must be readable & writable to be usable as tmp

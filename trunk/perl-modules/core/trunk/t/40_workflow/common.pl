@@ -65,10 +65,10 @@ sub do_step {
 	my %action_flag = map { $_ => 1 } @{$args{EXPECTED_ACTIONS}};
 
 	my $fail = 0;
-	foreach (@actions) {
-	    if (! exists $action_flag{$_}) {
+	foreach my $action (@actions) {
+	    if (! exists $action_flag{$action}) {
 		$fail++;
-		warn "unexpected action $_";
+		warn "unexpected action $action";
 	    }
 	}
 	ok($fail, 0, "Available actions: " . join(", ", @actions));

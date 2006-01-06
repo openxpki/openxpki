@@ -57,10 +57,6 @@ sub get_dsn
 {
     my $self = shift;
 
-    ## fix the type specification of ca_keyid before connect to the database
-    ## background: MySQL has problems with the index size of OpenXPKI's schema
-    $self->{column}->{"ca_keyid"} = "VARCHAR(128)";
-
     if (not exists $self->{params}->{NAME})
     {
         OpenXPKI::Exception->throw (

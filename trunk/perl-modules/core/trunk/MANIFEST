@@ -102,6 +102,7 @@ OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly/Create.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
 OpenXPKI/Server/Workflow/Activity/Token/Get.pm
+OpenXPKI/Server/Workflow/Persister/DBI.pm
 
 ## test stuff
 
@@ -190,5 +191,6 @@ t/00_cleanup/30_dbi.t
 t/99_cleanup/25_crypto.t
 t/99_cleanup/28_log.t
 t/99_cleanup/30_dbi.t
+t/99_cleanup/40_workflow.t
 
 META.yml                                 Module meta-data (added by MakeMaker)

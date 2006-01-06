@@ -12,85 +12,97 @@ package OpenXPKI::Server::DBI::Schema;
 
 use OpenXPKI::Exception;
 
-our %SEQUENCE = (
-                 CRL            => "sequence_crl",
-                 CSR            => "sequence_csr",
-                 CERTIFICATE    => "sequence_certificate",
-                 CRR            => "sequence_crr",
-                 # log entries mus use auto_increment
-                 # or whatever the name of this technology is on your database platform
-                 # AUDITTRAIL     => "sequence_audittrail",
-                 DATA           => "sequence_data",
-                 GLOBAL_KEY_ID  => "sequence_global_id",
-                 PRIVATE        => "sequence_private",
-                 SIGNATURE      => "sequence_signature",
-                 VOTING         => "sequence_voting",
-                 DATAEXCHANGE   => "sequence_dataexchange",
-                );
-our %COLUMN = (
-               PKI_REALM             => "pki_realm",
-               CA                    => "ca_name",
-               ISSUING_CA            => "issuing_ca",
-               ISSUING_PKI_REALM     => "issuing_pki_realm",
+my %SEQUENCE_of = (
+    CRL            => "sequence_crl",
+    CSR            => "sequence_csr",
+    CERTIFICATE    => "sequence_certificate",
+    CRR            => "sequence_crr",
+    # log entries must use auto_increment
+    # or whatever the name of this technology is on your database platform
+    # AUDITTRAIL     => "sequence_audittrail",
+    DATA           => "sequence_data",
+    GLOBAL_KEY_ID  => "sequence_global_id",
+    PRIVATE        => "sequence_private",
+    SIGNATURE      => "sequence_signature",
+    VOTING         => "sequence_voting",
+    DATAEXCHANGE   => "sequence_dataexchange",
+    WORKFLOW       => "sequence_workflow",
+    WORKFLOW_HISTORY => "sequence_workflow_history",
+    );
 
-               SUBMIT_DATE           => "submit_date",
-               TYPE                  => "format",
-               DATA                  => "data",
+my %COLUMN_of = (
+    PKI_REALM             => "pki_realm",
+    CA                    => "ca_name",
+    ISSUING_CA            => "issuing_ca",
+    ISSUING_PKI_REALM     => "issuing_pki_realm",
 
-               GLOBAL_KEY_ID         => "global_id",
-               CERTIFICATE_SERIAL    => "cert_key",
-               REVOKE_CERTIFICATE_SERIAL => "cert_key",
-               CSR_SERIAL            => "req_key",
-               CRR_SERIAL            => "crr_key",
-               CRL_SERIAL            => "crl_key",
-               AUDITTRAIL_SERIAL     => "audittrail_key",
-               DATA_SERIAL           => "data_key",
-               PRIVATE_SERIAL        => "private_key",
-               STATEMACHINE_SERIAL   => "statemachine_key",
-               SIGNATURE_SERIAL      => "signature_key",
-               VOTING_SERIAL         => "voting_key",
-               LOCK_SERIAL           => "global_id",
-               DATAEXCHANGE_SERIAL   => "dataexchange_key",
+    SUBMIT_DATE           => "submit_date",
+    TYPE                  => "format",
+    DATA                  => "data",
 
-               SUBJECT               => "subject",
-               EMAIL                 => "email",
-               RA                    => "ra",
-               LAST_UPDATE           => "last_update",
-               NEXT_UPDATE           => "next_update",
-               ROLE                  => "role",
-               PUBKEY                => "public_key",
-               NOTAFTER              => "notafter",
-               NOTBEFORE             => "notbefore",
-               SCEP_TID              => "scep_tid",
-               LOA                   => "loa",
-               PUBLIC                => "public_cert",
-                                  
-               STATUS                => "status",
-               REASON                => "reason",
-               SERIAL                => "object_serial",
-               TABLE                 => "object_type",
-               UNTIL                 => "valid_until",
-               SERVERID              => "server_id",
-               EXPORTID              => "export_id",
+    GLOBAL_KEY_ID         => "global_id",
+    CERTIFICATE_SERIAL    => "cert_key",
+    REVOKE_CERTIFICATE_SERIAL => "cert_key",
+    CSR_SERIAL            => "req_key",
+    CRR_SERIAL            => "crr_key",
+    CRL_SERIAL            => "crl_key",
+    AUDITTRAIL_SERIAL     => "audittrail_key",
+    DATA_SERIAL           => "data_key",
+    PRIVATE_SERIAL        => "private_key",
+    SIGNATURE_SERIAL      => "signature_key",
+    VOTING_SERIAL         => "voting_key",
+    LOCK_SERIAL           => "global_id",
+    DATAEXCHANGE_SERIAL   => "dataexchange_key",
+    WORKFLOW_SERIAL       => "workflow_id",
+    WORKFLOW_HISTORY_SERIAL  => "workflow_hist_id",
 
-               COLUMN_NAME           => "column_name",
-               ARRAY_COUNTER         => "array_counter",
-               CONTENT_TYPE          => "content_type",
-               NUMBER                => "int_content",
-               STRING                => "char_content",
+    SUBJECT               => "subject",
+    EMAIL                 => "email",
+    RA                    => "ra",
+    LAST_UPDATE           => "last_update",
+    NEXT_UPDATE           => "next_update",
+    ROLE                  => "role",
+    PUBKEY                => "public_key",
+    NOTAFTER              => "notafter",
+    NOTBEFORE             => "notbefore",
+    SCEP_TID              => "scep_tid",
+    LOA                   => "loa",
+    PUBLIC                => "public_cert",
+    
+    STATUS                => "status",
+    REASON                => "reason",
+    SERIAL                => "object_serial",
+    TABLE                 => "object_type",
+    UNTIL                 => "valid_until",
+    SERVERID              => "server_id",
+    EXPORTID              => "export_id",
 
-               TIMESTAMP             => "logtimestamp",
-               MESSAGE               => "message",
-               CATEGORY              => "category",
-               LEVEL                 => "level",
+    COLUMN_NAME           => "column_name",
+    ARRAY_COUNTER         => "array_counter",
+    CONTENT_TYPE          => "content_type",
+    NUMBER                => "int_content",
+    STRING                => "char_content",
 
-               "KEYID"               => "keyid",
-               "CA_KEYID"            => "ca_keyid",
-               "CA_ISSUER_NAME"      => "ca_issuer_name",
-               "CA_ISSUER_SERIAL"    => "ca_issuer_serial",
-              );
+    TIMESTAMP             => "logtimestamp",
+    MESSAGE               => "message",
+    CATEGORY              => "category",
+    LEVEL                 => "level",
 
-our %TABLE = (
+    "KEYID"               => "keyid",
+    "CA_ISSUER_NAME"      => "ca_issuer_name",
+    "CA_ISSUER_SERIAL"    => "ca_issuer_serial",
+
+    WORKFLOW_TYPE         => "workflow_type",
+    WORKFLOW_STATE        => "workflow_state",
+    WORKFLOW_LAST_UPDATE  => "workflow_last_update",
+    WORKFLOW_ACTION       => "workflow_action",
+    WORKFLOW_DESCRIPTION  => "workflow_description",
+    WORKFLOW_USER         => "workflow_user",
+    WORKFLOW_HISTORY_DATE => "workflow_history_date",
+
+    );
+
+my %TABLE_of = (
     CA => {
         NAME    => "ca",
         INDEX   => [ "PKI_REALM", "CA" ],
@@ -145,10 +157,7 @@ our %TABLE = (
         INDEX   => [ "PRIVATE_SERIAL" ],
         COLUMNS => [ "PRIVATE_SERIAL",
                      "DATA", "TYPE", "GLOBAL_KEY_ID"]},
-    STATEMACHINE => {
-        NAME    => "statemachine",
-        INDEX   => [ "STATEMACHINE_SERIAL" ],
-        COLUMNS => [ "STATEMACHINE_SERIAL", "STATUS" ]},
+
     SIGNATURE => {
         NAME    => "signature",
         INDEX   => [ "SIGNATURE_SERIAL" ],
@@ -161,14 +170,38 @@ our %TABLE = (
         COLUMNS => [ "LOCK_SERIAL",
                      "TABLE", "SERIAL",
                      "UNTIL" ]},
+
     DATAEXCHANGE => {
         NAME    => "dataexchange",
         INDEX   => [ "DATAEXCHANGE_SERIAL" ],
         COLUMNS => [ "DATAEXCHANGE_SERIAL",
                      "TABLE", "PKI_REALM", "CA", "SERIAL",
-                     "SERVERID", "EXPORTID" ]});
+                     "SERVERID", "EXPORTID" ]},
+    
+    WORKFLOW => {
+        NAME    => "workflow",
+        INDEX   => [ "WORKFLOW_SERIAL" ],
+        COLUMNS => [ "WORKFLOW_SERIAL",
+		     "WORKFLOW_TYPE",
+		     "WORKFLOW_STATE",
+		     "WORKFLOW_LAST_UPDATE",
+	    ]},
 
-our %INDEX = (
+    WORKFLOW_HISTORY => {
+        NAME    => "workflow_history",
+        INDEX   => [ "WORKFLOW_HISTORY_SERIAL" ],
+        COLUMNS => [ "WORKFLOW_HISTORY_SERIAL",
+		     "WORKFLOW_SERIAL",
+		     "WORKFLOW_ACTION",
+		     "WORKFLOW_DESCRIPTION",
+		     "WORKFLOW_STATE",
+		     "WORKFLOW_USER",
+		     "WORKFLOW_HISTORY_DATE",
+	    ]},
+
+    );
+
+my %INDEX_of = (
    DATA_COLUMN_NAME => {
        NAME    => "data_column_name_index",
        TABLE   => "DATA",
@@ -184,7 +217,8 @@ our %INDEX = (
    DATA_COLUMN_STRING => {
        NAME    => "data_column_string_index",
        TABLE   => "DATA",
-       COLUMNS => [ "COLUMN_NAME", "STRING" ]});
+       COLUMNS => [ "COLUMN_NAME", "STRING" ]},
+    );
 
 sub new
 {
@@ -198,86 +232,93 @@ sub new
 sub get_column
 {
     my $self = shift;
-
-    if (not exists $_[0] or
-        not defined $_[0] or
-        not length $_[0])
+    my $column = shift;
+    
+    if (! defined $column or
+        $column eq "")
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_COLUMN_MISSING_COLUMN_NAME");
     }
 
-    if (not exists $COLUMN{$_[0]})
+    if (not exists $COLUMN_of{$column})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_COLUMN_UNKNOWN_COLUMN",
-            params  => {"COLUMN" => $_[0]});
+            params  => {"COLUMN" => $column});
     }
 
-    return $COLUMN{$_[0]};
+    return $COLUMN_of{$column};
 }
 
 ########################################################################
 
 sub get_tables
 {
-    return [ keys %TABLE ];
+    return [ keys %TABLE_of ];
 }
 
 sub get_table_name
 {
     my $self = shift;
-    return $TABLE{$_[0]}->{NAME};
+    my $table = shift;
+    return $TABLE_of{$table}->{NAME};
 }
 
 sub get_table_index
 {
     my $self = shift;
-    return $TABLE{$_[0]}->{INDEX};
+    my $table = shift;
+    return $TABLE_of{$table}->{INDEX};
 }
 
 sub get_table_columns
 {
     my $self = shift;
-    return $TABLE{$_[0]}->{COLUMNS};
+    my $table = shift;
+    return $TABLE_of{$table}->{COLUMNS};
 }
 
 ########################################################################
 
 sub get_sequences
 {
-    return [ keys %SEQUENCE ];
+    return [ keys %SEQUENCE_of ];
 }
 
 sub get_sequence_name
 {
     my $self = shift;
-    return $SEQUENCE{$_[0]};
+    my $sequence = shift;
+    return $SEQUENCE_of{$sequence};
 }
 
 ########################################################################
 
 sub get_indexes
 {
-    return [ keys %INDEX ];
+    return [ keys %INDEX_of ];
 }
 
 sub get_index_name
 {
     my $self = shift;
-    return $INDEX{$_[0]}->{NAME};
+    my $index = shift;
+    return $INDEX_of{$index}->{NAME};
 }
 
 sub get_index_table
 {
     my $self = shift;
-    return $INDEX{$_[0]}->{TABLE};
+    my $index = shift;
+    return $INDEX_of{$index}->{TABLE};
 }
 
 sub get_index_columns
 {
     my $self = shift;
-    return $INDEX{$_[0]}->{COLUMNS};
+    my $index = shift;
+    return $INDEX_of{$index}->{COLUMNS};
 }
 
 ########################################################################
@@ -285,10 +326,13 @@ sub get_index_columns
 sub set_namespace
 {
     my $self = shift;
+    my $namespace = shift;
 
-    foreach my $table (keys %TABLE)
+    foreach my $table (keys %TABLE_of)
     {
-        $TABLE{$table}->{NAME} = $_[0].".".$TABLE{$table}->{NAME};
+        $TABLE_of{$table}->{NAME} = $namespace 
+	    . '.' 
+	    . $TABLE_of{$table}->{NAME};
     }
     return 1;
 }
