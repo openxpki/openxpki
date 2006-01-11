@@ -10,6 +10,7 @@ use utf8;
 
 package OpenXPKI::Server::DBI::DBH;
 
+# use Smart::Comments;
 use OpenXPKI qw(debug);
 use DBI;
 use OpenXPKI::Server::DBI::Schema;
@@ -145,7 +146,9 @@ sub do_query
     $self->debug ("query: $query");
     if (@bind_values)
     {
-        $self->debug ("bind_values: ".join ("\n", @bind_values));
+	### bind values: @bind_values
+        $self->debug ("bind_values: " . 
+		      join ("\n", map { defined $_ ? $_ : 'NULL' } @bind_values));
     } else {
         $self->debug ("no elements in bind_values present");
     }

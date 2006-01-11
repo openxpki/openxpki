@@ -147,7 +147,7 @@ sub schema_exists
 
     ## this is necessary to cleanup any errors
     $self->rollback();
-    return 0;
+    return;
 }
 
 ########################################################################
@@ -322,7 +322,7 @@ sub first
 {
     my $self = shift;
     my $result = $self->select (@_, LIMIT => 1);
-    return undef if (not defined $result);
+    return if (not defined $result);
     return $result->[0];
 }
 
@@ -330,7 +330,7 @@ sub last
 {
     my $self = shift;
     my $result = $self->select (@_, LIMIT => 1, REVERSE => 1);
-    return undef if (not defined $result);
+    return if (not defined $result);
     return $result->[0];
 }
 
@@ -340,7 +340,7 @@ sub next
     my $keys = { @_ };
     my $result = $self->select (GREATER => $self->__extract_serial_from_params($keys),
                                 %{$keys}, LIMIT => 1);
-    return undef if (not defined $result);
+    return if (not defined $result);
     return $result->[0];
 }
 
@@ -350,7 +350,7 @@ sub prev
     my $keys = { @_ };
     my $result = $self->select (LOWER => $self->__extract_serial_from_params($keys),
                                 %{$keys}, LIMIT => 1, REVERSE => 1);
-    return undef if (not defined $result);
+    return if (not defined $result);
     return $result->[0];
 }
 
@@ -363,7 +363,7 @@ sub __extract_serial_from_params
     $name = $keys->{TABLE}."_SERIAL" if (exists $keys->{$keys->{TABLE}."_SERIAL"});
     $name = "KEY"                    if (exists $keys->{KEY});
     $name = "SERIAL"                 if (exists $keys->{SERIAL});
-    return undef if (not $name);
+    return if (not $name);
 
     my $value = $keys->{$name};
     delete $keys->{$name};
@@ -489,7 +489,7 @@ to get the next serial. This function uses SQL sequence generators.
 
 Example:
 
-C<my $serial = $dbi->get_new_serial (TABLE =<lt> "CSR");
+  my $serial = $dbi->get_new_serial (TABLE => "CSR");
 
 =head3 insert
 
@@ -499,7 +499,7 @@ OBJECT then the object oriented way is used.
 
 Example:
 
-my $result = $dbi->insert (TABLE => "DATA", HASH => $data);
+  my $result = $dbi->insert (TABLE => "DATA", HASH => $data);
 
 =head3 update
 
@@ -514,12 +514,12 @@ on the parameter DATA.
 
 Example:
 
-my $result = $dbi->update (TABLE => "CSR", DATA => $data, WHERE => $index);
-my $result = $dbi->update (TABLE => "CSR", DATA => $data);
+  my $result = $dbi->update (TABLE => "CSR", DATA => $data, WHERE => $index);
+  my $result = $dbi->update (TABLE => "CSR", DATA => $data);
 
 =head3 delete
 
-This fucntion maps directly to the SQL layer. So please check the
+This function maps directly to the SQL layer. So please check the
 documentation of OpenXPKI::Server::DBI::SQL for a desription of the delete
 function.
 

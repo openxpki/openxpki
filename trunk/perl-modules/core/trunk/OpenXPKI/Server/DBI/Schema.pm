@@ -234,12 +234,7 @@ sub get_column
     my $self = shift;
     my $column = shift;
     
-    if (! defined $column or
-        $column eq "")
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_COLUMN_MISSING_COLUMN_NAME");
-    }
+    __check_param($column);
 
     if (not exists $COLUMN_of{$column})
     {
@@ -262,6 +257,9 @@ sub get_table_name
 {
     my $self = shift;
     my $table = shift;
+
+    __check_param($table);
+
     return $TABLE_of{$table}->{NAME};
 }
 
@@ -269,6 +267,9 @@ sub get_table_index
 {
     my $self = shift;
     my $table = shift;
+
+    __check_param($table);
+
     return $TABLE_of{$table}->{INDEX};
 }
 
@@ -276,6 +277,9 @@ sub get_table_columns
 {
     my $self = shift;
     my $table = shift;
+
+    __check_param($table);
+
     return $TABLE_of{$table}->{COLUMNS};
 }
 
@@ -290,6 +294,9 @@ sub get_sequence_name
 {
     my $self = shift;
     my $sequence = shift;
+
+    __check_param($sequence);
+
     return $SEQUENCE_of{$sequence};
 }
 
@@ -311,6 +318,9 @@ sub get_index_table
 {
     my $self = shift;
     my $index = shift;
+
+    __check_param($index);
+
     return $INDEX_of{$index}->{TABLE};
 }
 
@@ -318,6 +328,9 @@ sub get_index_columns
 {
     my $self = shift;
     my $index = shift;
+
+    __check_param($index);
+
     return $INDEX_of{$index}->{COLUMNS};
 }
 
@@ -328,6 +341,8 @@ sub set_namespace
     my $self = shift;
     my $namespace = shift;
 
+    __check_param($namespace);
+
     foreach my $table (keys %TABLE_of)
     {
         $TABLE_of{$table}->{NAME} = $namespace 
@@ -335,6 +350,61 @@ sub set_namespace
 	    . $TABLE_of{$table}->{NAME};
     }
     return 1;
+}
+
+###########################################################################
+# private methods.
+# check if parameter is a valid SQL identifier:
+# - defined
+# - not empty string
+# - only contains alphanumerics and underscores
+# - caps only
+
+sub __check_param {
+    my $arg = shift;
+
+    my $exception;
+
+    # check if argument is specified
+    if (! defined $arg || ($arg eq "")) {
+	$exception = "NOT_SET";
+    }
+
+    # argument should be only alphanumeric
+    if (! defined $exception &&
+	($arg !~ m{ \A \w+ \z }xms)) {
+	$exception = "NOT_ALPHANUMERIC";
+    }
+
+    # argument should be upper case only
+    if (! defined $exception &&
+	($arg ne uc($arg))) {
+	$exception = "NOT_UPPERCASE_ONLY";
+    }
+    
+    # NOTE: in order to add more checks here follow this pattern:
+    #if (! defined $exception &&
+    #    CONDITION) {
+    #    $exception = "DESCRIPTION";
+    #}
+
+    # checks passed
+    if (! defined $exception) {
+	return 1;
+    }
+
+    # throw exception with caller information
+    my ($package, $filename, $line, $subroutine, $hasargs,
+	$wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(1);
+    
+    OpenXPKI::Exception->throw (
+	message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_CHECK_PARAMETER_" . $exception,
+	params  => {
+	    PACKAGE => $package,
+	    CALLER  => $subroutine,
+	    PARAMETER => (defined $arg ? $arg : ""),
+	},
+	);
 }
 
 1;
@@ -446,3 +516,12 @@ This is the only function where something is manipulated in the schema
 during runtime. The namespace can be configured to seperate some users
 inside the same database management system. The result is that all tables
 are prefixed by the namespace.
+
+=head2 Private methods
+
+=head3 __check_param($)
+
+Checks validity of specified argument as an SQL argument. This includes
+checking if the argument is defined, not empty, alphanumeric and uppercase
+only. Throws an exception if it isn't.
+

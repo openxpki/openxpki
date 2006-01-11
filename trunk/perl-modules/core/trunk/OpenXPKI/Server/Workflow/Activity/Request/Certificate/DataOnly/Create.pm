@@ -1,11 +1,14 @@
 # OpenXPKI Workflow Activity
-# Copyright (c) 2005 Martin Bartosch
+# Written by Martin Bartosch for the OpenXPKI project 2005
+# Copyright (c) 2005 by The OpenXPKI Project
 # $Revision: 80 $
 
 package OpenXPKI::Server::Workflow::Activity::Request::Certificate::DataOnly::Create;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
+
+use OpenXPKI::Server::Context;
 use Log::Log4perl       qw( get_logger );
 
 # use Smart::Comments;
@@ -23,6 +26,7 @@ sub execute {
 
     my $context = $workflow->context;
     my $log = get_logger(); 
+    
 
     $workflow->add_history(
         Workflow::History->new({

@@ -7,11 +7,12 @@
 use strict;
 use warnings;
 use English;
+use Log::Log4perl qw(:easy);
 use File::Spec;
 
-use OpenXPKI::Server::Log;
-use OpenXPKI::Server::DBI;
+use OpenXPKI::Server::Context qw( CTX );
 
+# use Smart::Comments;
 
 our $basedir = File::Spec->catfile('t', '40_workflow');
 
@@ -83,12 +84,16 @@ sub do_step {
 	my $rc;
 	eval {
 	    ### execute: $args{EXECUTE_ACTION}
+	    ## workflow instance: $workflow
 	    ok($workflow->execute_action($args{EXECUTE_ACTION}));
 	};
 	if (my $exc = OpenXPKI::Exception->caught()) {
 	    #warn $@->error, "\n", $@->trace->as_string, "\n";
 	    warn $@->error, "\n";
 	    ok(0);
+	} elsif ($@) {
+	    warn "Non-OpenXPKI exception: ", $@->error, "Trace: ", $@->trace->as_string, "\n";
+	    ok(0)
 	}
     } else {
 	ok(1);
@@ -96,20 +101,19 @@ sub do_step {
 }
 
 
-## init logging module
+### initialize context
+OpenXPKI::Server::Context::create(CONFIG => 't/config.xml');
 
-our $log = OpenXPKI::Server::Log->new (CONFIG => "t/28_log/log.conf");
+### get logging module
+our $log = CTX('log');
 ok($log);
 
-## init database module
-my %config = (
-              DEBUG  => 0,
-              TYPE   => "SQLite",
-              NAME   => "t/40_workflow/sqlite.db",
-              LOG    => $log
-             );
-our $dbi = OpenXPKI::Server::DBI->new (%config);
-ok($dbi->connect());
+# FIXME: migrate to OpenXPKI logging
+### initialize log4perl
+Log::Log4perl->easy_init($ERROR);
 
+### try to connect to database
+our $dbi = CTX('dbi_workflow');
+ok($dbi->connect());
 
 1;

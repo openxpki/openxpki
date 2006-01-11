@@ -11,7 +11,8 @@ use utf8;
 package OpenXPKI::Server::API;
 
 ## used modules
-
+use English;
+use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
 ## we operate in static mode
@@ -27,14 +28,7 @@ sub new
 
     my $keys = { @_ };
     $self->{DEBUG}  = $keys->{DEBUG}  if ($keys->{DEBUG});
-    $self->{SERVER} = $keys->{SERVER} if ($keys->{SERVER});
-
-    if (not $self->{SERVER})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_API_NEW_MISSING_SERVER");
-    }
-
+    
     return $self;
 }
 
@@ -45,14 +39,15 @@ __END__
 
 This is the interface which should be used by all user interfaces of OpenXPKI.
 A user interface MUST NOT access the server directly. The only allowed
-access is via this API. Every function which is not available in this API is
+access is via this API. Any function which is not available in this API is
 not for public use.
+The API gets access to the server via the 'server' context object. This
+object must be set before instantiating the API.
 
 =head1 Functions
 
 =head2 new
 
-is the constructor. It accepts DEBUG and SERVER as parameters. SERVER is
-required and must be a reference to an instance of the server class.
+is the constructor. It accepts DEBUG as parameters. 
 If DEBUG is a true value then the debugging code will be activated. Please
 be warned that the general DEBUG mode is really noisy.

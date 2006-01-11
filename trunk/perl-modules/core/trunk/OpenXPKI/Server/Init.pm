@@ -89,33 +89,6 @@ sub init_i18n
     return 1;
 }
 
-sub redirect_stderr
-{
-    my $self = shift;
-    my $keys = { @_ };
-    $self->debug ("start");
-
-    if (not $keys->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_REDIRECT_STDERR_MISSING_CONFIG");
-    }
-
-    my $stderr = $keys->{CONFIG}->get_xpath (XPATH => "common/server/stderr");
-    if (not $stderr)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_REDIRECT_STDERR_MISSING_STDERR");
-    }
-    $self->debug ("switching stderr to $stderr");
-    if (not open STDERR, '>>', $stderr)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_REDIRECT_STDERR_FAILED");
-    }
-    binmode STDERR, ":utf8";
-    return 1;
-}
 
 sub get_crypto_layer
 {
@@ -323,94 +296,6 @@ sub get_log
     return $log;
 }
 
-sub get_user_interfaces
-{
-    my $self = shift;
-    my $keys = { @_ };
-    $self->debug ("start");
-
-    if (not $keys->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_UI_MISSING_CONFIG");
-    }
-
-    my $count = $keys->{CONFIG}->get_xpath_count (XPATH => "common/server/interface");
-    my %ui    = ();
-    for (my $i=0; $i < $count; $i++)
-    {
-        ## load interface class
-        my $class = $keys->{CONFIG}->get_xpath (
-                        XPATH   => "common/server/interface",
-                        COUNTER => $i);
-           $class = "OpenXPKI::UI::".$class;
-        eval "use $class;";
-        if ($EVAL_ERROR)
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_INIT_GET_USER_INTERFACE_USE_FAILED",
-                params  => {EVAL_ERROR => $EVAL_ERROR,
-                            MODULE     => $class});
-        }
-
-        ## initialize interface class
-        $ui{$class} = eval { $class->new (API => $self->{api}) };
-        $EVAL_ERROR->rethrow() if ($EVAL_ERROR);
-    }
-
-    return %ui;
-}
-
-sub get_server_config
-{
-    my $self = shift;
-    my $keys = { @_ };
-    $self->debug ("start");
-
-    if (not $keys->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_CRYPTO_LAYER_MISSING_CONFIG");
-    }
-
-    my %params = ();
-    $params{proto}      = "unix";
-    $params{background} = 1;
-    $params{user}       = $keys->{CONFIG}->get_xpath (XPATH => "common/server/user");
-    $params{group}      = $keys->{CONFIG}->get_xpath (XPATH => "common/server/group");
-    $params{port}       = $keys->{CONFIG}->get_xpath (XPATH => "common/server/socket_file")."|unix";
-    $params{pid_file}   = $keys->{CONFIG}->get_xpath (XPATH => "common/server/pid_file");
-
-    ## check daemon user
-
-    my ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
-        $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
-        getpwnam ($params{"user"});
-    ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
-     $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
-        getpwuid ($params{"user"}) if (not $pw_uid);
-    if (not defined $pw_name or length $pw_name < 1)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_SERVER_CONFIG_WRONG_USER",
-            params  => {"USER" => $params{"user"}});
-    }
-
-    ## check daemon group
-
-    my ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
-        getgrnam ($params{"group"});
-    ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
-        getgrgid ($params{"group"});
-    if (not defined $gr_name or length $gr_name < 1)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_SERVER_CONFIG_WRONG_DAEMON_GROUP",
-            params  => {"GROUP" => $params{"group"}});
-    }
-
-    return %params;
-}
 
 1;
 __END__
@@ -443,12 +328,6 @@ small. It returns an instance of OpenXPKI::XML::Config.
 =head3 init_i18n
 
 initializes the code for internationalization. It requires an instance
-of OpenXPKI::XML::Config in the parameter CONFIG.
-
-=head3 redirect_stderr
-
-send all messages to STDERR directly to a file. The file is specified in
-the XML configuration. The function requires an instance
 of OpenXPKI::XML::Config in the parameter CONFIG.
 
 =head2 Cryptographic Initialization
@@ -484,17 +363,3 @@ the database interface.
 requires only the usual instance of OpenXPKI::XML::Config in the parameter CONFIG.
 It returns an instance of the module OpenXPKI::Log.
 
-=head2 Server Configuration
-
-=head3 get_user_interfaces
-
-needs the usual CONFIG parameter with an instance of OpenXPKI::XML::Config
-and returns a hash with the supported user interfaces. The value
-of each hash element is an instance of the user interface class.
-
-=head3 get_server_config
-
-prepares the complete server configuration to startup a socket
-based server with Net::Server::Fork. It returns a hash which can be
-directly passed to the module. The only required parameter is an
-instance of OpenXPKI::XML::Config.

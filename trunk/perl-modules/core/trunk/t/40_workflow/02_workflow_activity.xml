@@ -4,7 +4,7 @@
   <action name="null"
 	  class="Workflow::Action::Null"/>
 
-  <action name ="certificate.request.dataonly.create"
+  <action name ="request.certificate.dataonly.create"
 	  class="OpenXPKI::Server::Workflow::Activity::Request::Certificate::DataOnly::Create">
     <description>Create a request from user submitted request data (without key)</description>
     <field name="subject"
@@ -36,7 +36,7 @@
     <description>Generate a key pair</description>
   </action>
 
-  <action name="certificate.request.pkcs10.create"
+  <action name="request.certificate.pkcs10.create"
 	  class="OpenXPKI::Server::Workflow::Activity::Request::Certificate::PKCS10::Create">
     <description>Generate a PKCS#10 request</description>
     <field name="request"

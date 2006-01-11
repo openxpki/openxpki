@@ -2,10 +2,11 @@
   <type>data only certificate request</type>
   <description>Create a PKCS#10 request from user submitted request data</description>
   <persister>OpenXPKIDBIPersister</persister>
+  <!-- <persister>FilePersister</persister> -->
 
   <state name="INITIAL">
     <description>Initial state for basic certificate requests</description>
-    <action name="certificate.request.dataonly.create"
+    <action name="request.certificate.dataonly.create"
 	    resulting_state="GET_TOKEN" />
   </state>
 
@@ -44,7 +45,7 @@
 				   
   <state name="CREATE_REQUEST">
     <description>Create certificate request</description>
-    <action name="certificate.request.pkcs10.create"
+    <action name="request.certificate.pkcs10.create"
 	    resulting_state="FINISHED"/>
   </state>
 

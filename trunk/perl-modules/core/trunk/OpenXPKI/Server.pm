@@ -16,7 +16,7 @@ use base qw(Net::Server::Fork);
 use English;
 use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
-use OpenXPKI::Server::Init;
+use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API;
 
 sub new
@@ -48,36 +48,29 @@ sub new
     }
 
     ## initialization
+    OpenXPKI::Server::Context::create(
+	DEBUG  => $self->{DEBUG},
+	CONFIG => $self->{CONFIG}
+	);
 
-    my $init = OpenXPKI::Server::Init->new (DEBUG => $self->{DEBUG});
-    $self->{xml_config}   = $init->get_xml_config   (CONFIG => $self->{"CONFIG"});
-    $init->init_i18n       (CONFIG => $self->{xml_config});
-    $init->redirect_stderr (CONFIG => $self->{xml_config});
-    $self->{crypto_layer} = $init->get_crypto_layer (CONFIG => $self->{xml_config});
-    $self->{pki_realm}    = $init->get_pki_realms   (CONFIG => $self->{xml_config},
-                                                     CRYPTO => $self->{crypto_layer});
-    $self->{log}          = $init->get_log (CONFIG => $self->{xml_config});
-    $self->{db}           = $init->get_dbi (CONFIG => $self->{xml_config},
-                                            LOG    => $self->{log});
+    $self->__redirect_stderr();
 
-    ## all is ready now so make the API available
-
-    $self->{"api"} = OpenXPKI::Server::API->new (DEBUG  => $self->{DEBUG},
-                                                 SERVER => $self);
+    # attach this server object and the API to the global context
+    # FIXME: move api initalization into Context package?
+    OpenXPKI::Server::Context::setcontext(
+	server => $self,
+	api    => OpenXPKI::Server::API->new(DEBUG => $self->{DEBUG}),
+	);
 
     ## group access is allowed
-
     $self->{umask} = umask 0007;
 
     ## load the user interfaces
-
-    $self->{ui_list} = $init->get_user_interfaces (
-                           CONFIG => $self->{xml_config},
-                           API    => $self->{api});
+    $self->{ui_list} = $self->__get_user_interfaces();
 
     ## start the server
 
-    my %params = $init->get_server_config (CONFIG => $self->{xml_config});
+    my %params = $self->__get_server_config();
     unlink ($params{port});
     $self->run (%params);
 }
@@ -85,6 +78,8 @@ sub new
 sub process_request
 {
     my $self = shift;
+
+    my $log = CTX('log');
 
     ## recover from umask of Net::Server->run
     umask $self->{umask};
@@ -99,16 +94,16 @@ sub process_request
     if (not $self->{ui_list}->{$class})
     {
         print STDOUT "OpenXPKI::Server: $class unsupported.\n";
-        $self->{log}->log (MESSAGE  => "$class unsupported.",
-                           PRIORITY => "fatal",
-                           FACILITY => "system");
-        return undef;
+        $log->log (MESSAGE  => "$class unsupported.",
+		   PRIORITY => "fatal",
+		   FACILITY => "system");
+        return;
     }
     $self->{ui} = $self->{ui_list}->{$class};
 
     ## update pre-initialized variables
 
-    eval { $self->{db}->connect() };
+    eval { CTX('dbi_backend')->connect() };
     if ($EVAL_ERROR)
     {
         print STDOUT $EVAL_ERROR->message();
@@ -116,15 +111,133 @@ sub process_request
                                        $EVAL_ERROR->message(),
                            PRIORITY => "fatal",
                            FACILITY => "system");
-        return undef;
+        return;
         
     }
+
+    # FIXME: do we need to connect to the workflow database as well?
 
     ## use user interface
 
     $self->{ui}->init();
     $self->{ui}->run();
 }
+
+###########################################################################
+# private methods
+
+sub __redirect_stderr
+{
+    my $self = shift;
+    $self->debug ("start");
+
+    my $config = CTX('xml_config');
+
+    my $stderr = $config->get_xpath (XPATH => "common/server/stderr");
+    if (not $stderr)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_MISSING_STDERR");
+    }
+    $self->debug ("switching stderr to $stderr");
+    if (not open STDERR, '>>', $stderr)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_FAILED");
+    }
+    binmode STDERR, ":utf8";
+    return 1;
+}
+
+
+sub __get_user_interfaces
+{
+    my $self = shift;
+    
+    $self->debug ("start");
+    
+    my $config = CTX('xml_config');
+    
+    my $count = $config->get_xpath_count (XPATH => "common/server/interface");
+    my %ui    = ();
+    for (my $i=0; $i < $count; $i++)
+    {
+        ## load interface class
+        my $class = $config->get_xpath (
+	    XPATH   => "common/server/interface",
+	    COUNTER => $i);
+	$class = "OpenXPKI::UI::".$class;
+        eval "use $class;";
+        if ($EVAL_ERROR)
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_USE_FAILED",
+                params  => {EVAL_ERROR => $EVAL_ERROR,
+                            MODULE     => $class});
+        }
+	
+        ## initialize interface class
+	# FIXME: should we pass in the API here?
+        $ui{$class} = eval { $class->new () };
+	#$ui{$class} = eval { $class->new (API => CTX('api')) };
+	$EVAL_ERROR->rethrow() if ($EVAL_ERROR);
+    }
+
+    return \%ui;
+}
+
+sub __get_server_config
+{
+    my $self = shift;
+
+    $self->debug ("start");
+
+    my $config = CTX('xml_config');
+
+    my %params = ();
+    $params{proto}      = "unix";
+    $params{background} = 1;
+    $params{user}       = $config->get_xpath (XPATH => "common/server/user");
+    $params{group}      = $config->get_xpath (XPATH => "common/server/group");
+    $params{port}       = $config->get_xpath (XPATH => "common/server/socket_file")."|unix";
+    $params{pid_file}   = $config->get_xpath (XPATH => "common/server/pid_file");
+
+    ## check daemon user
+
+    my ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
+        $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
+        getpwnam ($params{"user"});
+
+    ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
+     $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
+	 getpwuid ($params{"user"}) if (not $pw_uid);
+
+    if (! defined $pw_name || ($pw_name eq ""))
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_USER",
+            params  => {"USER" => $params{"user"}});
+    }
+
+    ## check daemon group
+
+    my ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
+        getgrnam ($params{"group"});
+
+    ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
+        getgrgid ($params{"group"});
+
+    if (! defined $gr_name || ($gr_name eq ""))
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_DAEMON_GROUP",
+            params  => {"GROUP" => $params{"group"}});
+    }
+
+    return %params;
+}
+
+
 
 ################################################
 ##                 WARNING                    ##
@@ -202,3 +315,21 @@ the user interface will be initialized and started.
 
 is normal layer stack where the user interfaces can execute
 commands.
+
+=head2 Server Configuration
+
+=head3 __redirect_stderr
+
+Send all messages to STDERR directly to a file. The file is specified in
+the XML configuration. 
+
+=head3 __get_user_interfaces
+
+Returns a hash reference with the supported user interfaces. The value
+of each hash element is an instance of the user interface class.
+
+=head3 __get_server_config
+
+Prepares the complete server configuration to startup a socket
+based server with Net::Server::Fork. It returns a hash which can be
+directly passed to the module. 

@@ -3,7 +3,7 @@
   <server_id>0</server_id>
   <server_shift>8</server_shift>
   <type>SQLite</type>
-  <name>t/dbi/sqlite.db</name>
+  <name>t/30_dbi/sqlite.db</name>
   <environment>
     <vendor>
       <type>DB2</type>

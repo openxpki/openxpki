@@ -1,5 +1,6 @@
 # OpenXPKI Workflow Activity
-# Copyright (c) 2005 Martin Bartosch
+# Written by Martin Bartosch for the OpenXPKI project 2005
+# Copyright (c) 2005 by The OpenXPKI Project
 # $Revision: 80 $
 
 package OpenXPKI::Server::Workflow::Activity::Token::Get;
@@ -11,7 +12,7 @@ use Log::Log4perl       qw( get_logger );
 # use Smart::Comments;
 
 use OpenXPKI::Crypto::TokenManager;  
-
+use OpenXPKI::Server::Context qw( CTX );
 
 sub execute {
     my $self = shift;
@@ -19,9 +20,6 @@ sub execute {
 
     $self->setparams($workflow, 
 		     {
-			 configcache => {
-			     required => 1,
-			 },
 			 tokentype => {
 			     default => 'DEFAULT',
 			 },
@@ -33,15 +31,20 @@ sub execute {
 		     });
     
     my $context = $workflow->context();
+    
+    my $config = CTX('xml_config');
+
     my $log = get_logger(); 
     
 
     my $mgmt = OpenXPKI::Crypto::TokenManager->new(DEBUG => 0, 
-						   CONFIG => $self->param('configcache'));
+						   CONFIG => $config,
+	);
 
     my $token = $mgmt->get_token(TYPE => $self->param('tokentype'), 
 				 NAME => $self->param('tokenname'),
-				 PKI_REALM => $self->param('pkirealm'));
+				 PKI_REALM => $self->param('pkirealm')
+	);
     
     # export
     $context->param(token => $token);
