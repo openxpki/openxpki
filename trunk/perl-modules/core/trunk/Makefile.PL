@@ -4,8 +4,7 @@ use ExtUtils::MakeMaker;
 
 use File::Spec;
 
-## first we have to find a working OpenSSL 0.9.7 at minimum
-## a working 0.9.8 would be better
+## first we have to find a working OpenSSL 0.9.8 at minimum
 
 # OPENSSL_LIB
 # OPENSSL_INC
@@ -29,7 +28,7 @@ my @paths = qw( /usr/local/ssl
               );
 
 if (exists $ENV{OPENSSL_PREFIX} && $ENV{OPENSSL_PREFIX} ne "") {
-    push @paths, $ENV{OPENSSL_PREFIX};
+    @paths = ($ENV{OPENSSL_PREFIX}, @paths);
 }
 
 
@@ -78,6 +77,14 @@ $version =~ s/^.*fips.*$//m;
 $version =~ s/\n//g;
 $version =~ s/^[^"]*"([^"]*)".*$/$1/;
 print STDOUT "OpenSSL version: $version\n";
+$version =~ s/^\s*OpenSSL\s*0\.9\.//i;
+$version =~ s/^([0-9]+).*$/$1/;
+if ($version < 8)
+{
+    print STDERR "==============================================\n";
+    print STDERR "WARNING: You need at minimum an OpenSSL 0.9.8!\n";
+    print STDERR "==============================================\n";
+}
 
 # make OpenSSL binary location available to tests
 open my $fh, ">", File::Spec->catfile("t", "cfg.binary.openssl");
@@ -119,6 +126,8 @@ WriteMakefile(
                     'DBI'                    => 1,
                     'Date::Parse'            => 1,
                     'DateTime'               => "0.22",
+                    'Digest::MD5'            => 1,
+                    'Digest::SHA1'           => 1,
                     'Exception::Class'       => "1.22",
                     ## includes the version of libintl-perl which includes Locale::Messages
                     'Locale::TextDomain'     => 1,
@@ -136,6 +145,7 @@ WriteMakefile(
                     'XML::SAX::Writer'       => '0.44',
                     'XML::Simple'            => 1,
                     'XML::Validator::Schema' => '1.08',
+                    'XML::SAX::PurePerl'     => '0.90',
                    },
     test       => {TESTS => 't/*/*.t',
                   },
