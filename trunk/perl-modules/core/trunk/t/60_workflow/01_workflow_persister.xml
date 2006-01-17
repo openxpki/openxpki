@@ -1,8 +1,5 @@
 <persisters>
-   <persister name="FilePersister"
-              class="Workflow::Persister::File"
-              path="t/40_workflow/db/"/>
-   <persister name="OpenXPKIDBIPersister"
+   <persister name="OpenXPKI"
               class="OpenXPKI::Server::Workflow::Persister::DBI"
               />
 </persisters>

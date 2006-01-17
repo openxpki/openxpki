@@ -14,7 +14,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 # use Smart::Comments;
 
-our $basedir = File::Spec->catfile('t', '40_workflow');
+our $basedir = File::Spec->catfile('t', '60_workflow');
 
 
 # print current state of the workflow instance
@@ -42,6 +42,8 @@ sub show_workflow_instance {
 # EXPECTED_STATE   string, checks if the wf instance is currently in this state
 # EXPECTED_ACTIONS arrayref (strings), expected possible actions for this state
 # EXECUTE_ACTION   string, execute this action on the wf instance
+# PASS_EXCEPTION   do not catch exceptions thrown by execute_action (and
+#                  don't call ok())
 sub do_step {
     my $workflow = shift;
     my %args = ( @_ );
@@ -79,24 +81,30 @@ sub do_step {
 	ok(1);
 	ok(1);
     }
-    
-    if (exists $args{EXECUTE_ACTION}) {
-	my $rc;
-	eval {
-	    ### execute: $args{EXECUTE_ACTION}
-	    ## workflow instance: $workflow
-	    ok($workflow->execute_action($args{EXECUTE_ACTION}));
-	};
-	if (my $exc = OpenXPKI::Exception->caught()) {
-	    #warn $@->error, "\n", $@->trace->as_string, "\n";
-	    warn $@->error, "\n";
-	    ok(0);
-	} elsif ($@) {
-	    warn "Non-OpenXPKI exception: ", $@->error, "Trace: ", $@->trace->as_string, "\n";
-	    ok(0)
+
+    if (! $args{PASS_EXCEPTION}) {
+	if (exists $args{EXECUTE_ACTION}) {
+	    my $rc;
+	    
+	    eval {
+		### execute: $args{EXECUTE_ACTION}
+		## workflow instance: $workflow
+		ok($workflow->execute_action($args{EXECUTE_ACTION}));
+	    };
+	    if (my $exc = OpenXPKI::Exception->caught()) {
+		#warn $@->error, "\n", $@->trace->as_string, "\n";
+		warn $@->error, "\n";
+		ok(0);
+	    } elsif ($@) {
+		warn "Non-OpenXPKI exception: ", $@->error, "Trace: ", $@->trace->as_string, "\n";
+		ok(0)
+	    }
+	} else {
+	    ok(1);
 	}
     } else {
-	ok(1);
+	# simply execute the action (let caller handle exceptions)
+	$workflow->execute_action($args{EXECUTE_ACTION});
     }
 }
 

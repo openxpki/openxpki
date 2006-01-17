@@ -68,6 +68,12 @@ sub setparams {
     } 
 }
 
+sub execute {
+    my $self = shift;
+    my $workflow = shift;
+
+}
+
 
 1;
 

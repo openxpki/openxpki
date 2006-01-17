@@ -1,8 +1,7 @@
 <workflow>
   <type>dummy workflow</type>
   <description>Workflow Base Test</description>
-  <persister>OpenXPKIDBIPersister</persister>
-  <!-- <persister>FilePersister</persister> -->
+  <persister>OpenXPKI</persister>
 
   <state name="INITIAL">
     <description>Initial state for workflow test</description>

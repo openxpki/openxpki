@@ -128,10 +128,19 @@ sub update_workflow {
     
     # ... and write new context
     my $params = $workflow->context()->param();
+
+  PARAMETER:
     while (my ($key, $value) = each %{ $params }) {
+	# parameters with undefined values are not stored
+	next PARAMETER if (! defined $value);
+
+	### persisting context parameter: $key
+	# ignore "volatile" context parameters starting with an underscore
+	next PARAMETER if ($key =~ m{ \A _ }xms);
 
 	# context parameter sanity checks 
 	if (length($value) > $context_value_max_length) {
+	    ### parameter length exceeded...
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG",
 		params  => {
@@ -143,7 +152,8 @@ sub update_workflow {
 	}
 
 	# check for illegal characters
-	if ($value !~ m{ \A \p{Any}* \z }xms) {
+	if ($value =~ m{ (?:\p{Unassigned}|\x00) }xms) {
+	    ### parameter contains illegal characters...
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_ILLEGAL_DATA",
 		params  => {
@@ -463,9 +473,28 @@ Fetches a workflow's context from persistant storage.
 =head2 update_workflow
 
 Updates a workflow instance object in persistant storage.
-Limitations: Context values must consist of valid Unicode characters. NULL
-bytes are explicitly not allowed. The maximum length of context values
-is 32 KByte.
+
+Limitation: Context values must consist of valid Unicode characters.
+NULL bytes are explicitly not allowed. Binary data storage is NOT possible.
+
+Limitation: The maximum length of context values is 32 KByte.
+
+Limitation: If the parameter value is 'undef' the parameter will not be
+persisted. After restoring the workflow instance from persistent storage
+the corresponding entry will not exist.
+
+=head3 Volative Context Parameters 
+
+Context parameters starting with an underscore '_' will NOT be 
+saved persistently in the database. You can use such parameters
+for storing truly temporary data that does not need to be stored in the
+database (and that will NOT survive saving and retrieving the workflow
+instance from the database!) or e. g. for caching objects that can also be
+retrieved from the database.
+
+Such volatile context parameters can have arbitrary size, may contain
+arbitrary Perl data structures (including Object references) or arbitrary
+binary data.
 
 =head2 create_history
 

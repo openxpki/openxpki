@@ -1,8 +1,7 @@
 <workflow>
   <type>data only certificate request</type>
   <description>Create a PKCS#10 request from user submitted request data</description>
-  <persister>OpenXPKIDBIPersister</persister>
-  <!-- <persister>FilePersister</persister> -->
+  <persister>OpenXPKI</persister>
 
   <state name="INITIAL">
     <description>Initial state for basic certificate requests</description>

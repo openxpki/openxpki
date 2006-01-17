@@ -16,7 +16,7 @@ our $basedir;
 
 print STDERR "OpenXPKI::Server::Workflow\n";
 
-require 't/40_workflow/common.pl';
+require 't/60_workflow/common.pl';
 
 
 my $debug = $ENV{DEBUG};

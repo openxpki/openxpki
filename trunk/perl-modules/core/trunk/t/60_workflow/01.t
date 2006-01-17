@@ -8,13 +8,13 @@ use Test;
 
 use Workflow::Factory;
 
-BEGIN { plan tests => 29; };
+BEGIN { plan tests => 40, todo => [ 12 ] };
 
 print STDERR "OpenXPKI::Server::Workflow - Persistence\n";
 
 our $basedir;
 
-require 't/40_workflow/common.pl';
+require 't/60_workflow/common.pl';
 
 
 my $debug = $ENV{DEBUG};
@@ -37,22 +37,55 @@ my $workflow = $factory->create_workflow('dummy workflow');
 my $workflow_id = $workflow->id();
 ### Workflow id: $workflow_id
 
-    
-# uncomment to show the workflow instance
-# show_workflow_instance($workflow);
 
 # save some dummy parameters in workflow context
 $workflow->context()->param(foo  => 'barbaz');
 $workflow->context()->param(pkirealm  => 'Test Root CA');
 
+# create some binary data (16 KB)
+my $binary_data = pack "C*", (0 .. 255) x (4 * 16);
+$workflow->context()->param(binarydata => $binary_data);
+
 # create some bulk (Unicode) data
-my $data = pack "U*", (1 .. 32768);
+#my $data = pack "U*", (1 .. 32768);
+my $data;
+foreach my $unicode_index (1 .. 32768) {
+    # chr returns the unicode character here
+    my $char = chr($unicode_index);
+    if (length($char) and $char =~ m{ \A \p{Assigned} \z }xms) {
+	$data .= $char;
+    }
+}
+
 $workflow->context()->param(bulkdata  => $data);
 
-# check if context entries are persistent
+
+### check if context entries are available...
 ok($workflow->context()->param('foo'), 'barbaz');
 ok($workflow->context()->param('pkirealm'), 'Test Root CA');
-ok($workflow->context()->param('bulkdata'), $data);
+
+
+### try to execute action (expect problems because of the binary data)
+eval {
+    do_step($workflow, 
+	    EXPECTED_STATE => 'INITIAL',
+	    EXPECTED_ACTIONS => [ 'null' ],
+	    EXECUTE_ACTION => 'null',
+	    PASS_EXCEPTION => 1,
+	);
+};
+if (my $exc = OpenXPKI::Exception->caught()) {
+    ### got expected exception
+    ok($exc->message(), 
+       "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_ILLEGAL_DATA"); # expected error
+} else {
+    ### no exception...
+    ok(0);
+}
+
+
+### now delete the offending parameter...
+$workflow->context()->param(binarydata => undef);
 
 do_step($workflow, 
 	EXPECTED_STATE => 'INITIAL',
@@ -65,7 +98,7 @@ $workflow = undef;
 # and resurrect it
 $workflow = $factory->fetch_workflow('dummy workflow', $workflow_id);
 
-# check if we got the correct workflow back
+### check if we got the correct workflow back...
 ok($workflow->id(), $workflow_id);
 
 # check if context entries are persistent
