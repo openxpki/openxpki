@@ -102,7 +102,10 @@ sub do_step {
 
 
 ### initialize context
-OpenXPKI::Server::Context::create(CONFIG => 't/config.xml');
+OpenXPKI::Server::Context::create(
+    CONFIG => 't/config.xml',
+#    DEBUG => 1,
+    );
 
 ### get logging module
 our $log = CTX('log');

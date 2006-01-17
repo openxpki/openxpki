@@ -76,7 +76,8 @@ sub table_exists
 
     $self->debug ("name: $name");
 
-    my $command = "select * from ".$self->{schema}->get_table_name ($name);
+    # get constant value from the table (avoid full table scan)
+    my $command = "select 1 from ".$self->{schema}->get_table_name ($name);
 
     $self->debug ("command: $command");
 
@@ -542,10 +543,20 @@ sub select
         } 
     }
 
+    # sanity check: there *must* be a where clause
+    if (scalar(@where) == 0) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_WHERE_CLAUSE",
+	    params  => {
+		TABLE  => $table,
+	    });
+    }
+
     ## execute query
 
     $query .= "select ".join ", ", @select_list;
-    $query .= " from $sqltable where ";
+    $query .= " from $sqltable";
+    $query .= " where ";
     $query .= join " and ", @where;
     if ($keys->{REVERSE})
     {

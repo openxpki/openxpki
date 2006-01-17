@@ -7,12 +7,24 @@ package OpenXPKI::Server::Workflow::Persister::DBI;
 
 use strict;
 use base qw( Workflow::Persister );
+use utf8;
+
 # use Smart::Comments;
 
 use OpenXPKI::Server::Workflow::Persister::DBI::SequenceId;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
+use DateTime::Format::Strptime;
 
+my $workflow_table = 'WORKFLOW';
+my $context_table  = 'WORKFLOW_CONTEXT';
+my $history_table  = 'WORKFLOW_HISTORY';
+
+# limits
+my $context_value_max_length = 32768;
+
+# tools
+my $parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d %H:%M' );
 
 sub init {
     my $self = shift;
@@ -30,7 +42,8 @@ sub init {
 	PRIORITY => "info",
 	FACILITY => "system"
 	);
-    return 1;
+
+    return; # no useful return value
 }
 
 sub create_workflow {
@@ -56,7 +69,7 @@ sub create_workflow {
 
     ### inserting data into workflow table
     $dbi->insert(
-	TABLE => "WORKFLOW", 
+	TABLE => $workflow_table,
 	HASH => \%data,
 	);
 
@@ -86,20 +99,179 @@ sub create_workflow {
 sub update_workflow {
     my $self = shift;
     my $workflow = shift;
-
+    
     ### update_workflow called...
+    my $id = $workflow->id();
+    
+    my %data = (
+	WORKFLOW_STATE       => $workflow->state(),
+	WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M' ),
+	);
+    
+    my $dbi = CTX('dbi_workflow');
+    
+    # save workflow instance...
+    $dbi->update(
+	TABLE  => $workflow_table,
+	DATA   => \%data,
+	WHERE  => {
+	    WORKFLOW_SERIAL => $id,
+	},
+	);
+    
+    # ... purge any existing context data...
+    $dbi->delete(TABLE => $context_table,
+ 		 DATA  => {
+ 		     WORKFLOW_SERIAL => $id,
+ 		 },
+ 	);
+    
+    # ... and write new context
+    my $params = $workflow->context()->param();
+    while (my ($key, $value) = each %{ $params }) {
 
+	# context parameter sanity checks 
+	if (length($value) > $context_value_max_length) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG",
+		params  => {
+		    WORKFLOW_ID => $id,
+		    CONTEXT_KEY => $key,
+		    CONTEXT_VALUE_LENGTH => length($value),
+		},
+		);
+	}
 
+	# check for illegal characters
+	if ($value !~ m{ \A \p{Any}* \z }xms) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_ILLEGAL_DATA",
+		params  => {
+		    WORKFLOW_ID => $id,
+		    CONTEXT_KEY => $key,
+		},
+		);
+	}
+	
+	### saving context for wf: $id
+ 	$dbi->insert(
+ 	    TABLE => $context_table,
+ 	    HASH => {
+ 		WORKFLOW_SERIAL        => $id,
+ 		WORKFLOW_CONTEXT_KEY   => $key,
+ 		WORKFLOW_CONTEXT_VALUE => $value
+ 	    }
+ 	    );
+    }
+    
+    $dbi->commit();
+    
+    CTX('log')->log(
+	MESSAGE  => "Updated workflow $id",
+	PRIORITY => "info",
+	FACILITY => "system"
+	);
+
+    return 1;
 }
 
 sub fetch_workflow {
-    OpenXPKI::Exception->throw (
-	message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_NOT_IMPLEMENTED",
-	params  => {
-	    METHOD    => 'fetch_workflow',
+    my $self = shift;
+    my $id   = shift;
+
+    ### fetch_workflow called...
+    ### workflow id: $id
+
+    my $dbi = CTX('dbi_workflow');
+
+    my $result = $dbi->get(
+	TABLE => $workflow_table,
+	SERIAL => $id);
+    
+    if (! $result ||
+	(! $result->{WORKFLOW_STATE}) ||
+	(! $result->{WORKFLOW_LAST_UPDATE})) {
+	CTX('log')->log(
+	    MESSAGE  => "Could not retrieve workflow entry $id",
+	    PRIORITY => "error",
+	    FACILITY => "system"
+	    );
+
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_FETCH_WORKFLOW_NOT_FOUND",
+	    params  => {
+		WORKFLOW_ID => $id,
+	    },
+	    );
+    }
+
+    # numerical comparison enforced, serials are always numbers
+    if ($result->{WORKFLOW_SERIAL} != $id) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_FETCH_WORKFLOW_INCORRECT_WORKFLOW_INSTANCE",
+	    params  => {
+		REQUESTED_ID => $id,
+		RETURNED_ID  => $result->{WORKFLOW_SERIAL},
+	    },
+	    );
+    }
+
+    return({
+	state       => $result->{WORKFLOW_STATE},
+	last_update => $parser->parse_datetime($result->{WORKFLOW_LAST_UPDATE}),
+	   });
+}
+
+
+sub fetch_extra_workflow_data {
+    my $self     = shift;
+    my $workflow = shift;
+
+    ### fetch_extra_workflow_data called...
+    my $id = $workflow->id();
+    my $dbi = CTX('dbi_workflow');
+
+    my $result = $dbi->select(
+	TABLE   => $context_table,
+	DYNAMIC => {
+	    WORKFLOW_SERIAL => $id,
 	},
 	);
+
+    # NOTE: work around a bug in Workflow::Context up to and including v0.17:
+    # clear context in order to prevent merging operation when attaching
+    # the new context to the workflow instance below.
+    if ($Workflow::Context::VERSION <= 1.03) {
+	# Workflow::Context workaround
+	### explicitly clear all context entries...
+	$workflow->context()->clear_params();
+
+	# set workflow ID (for compatibility with the non-workaround 
+	# version below)
+	$workflow->context()->param(workflow_id => $id);
+
+	foreach my $entry (@{$result}) {
+	    $workflow->context()->param($entry->{WORKFLOW_CONTEXT_KEY} =>
+					$entry->{WORKFLOW_CONTEXT_VALUE});
+	}
+    } else {
+	# new empty context
+	my $context = Workflow::Context->new();
+	foreach my $entry (@{$result}) {
+	    $context->param($entry->{WORKFLOW_CONTEXT_KEY} =>
+			    $entry->{WORKFLOW_CONTEXT_VALUE});
+	}
+
+	# merge context to workflow instance
+	$workflow->context($context);
+    }
+
+    ### done...
+    return; # no useful result
 }
+
+
+
 
 sub create_history {
     my $self = shift;
@@ -133,7 +305,7 @@ sub create_history {
 
 	### inserting data into workflow history table
 	$dbi->insert(
-	    TABLE => "WORKFLOW_HISTORY", 
+	    TABLE => $history_table,
 	    HASH => \%data,
 	    );
 	
@@ -167,13 +339,54 @@ sub create_history {
 
 
 sub fetch_history {
+    my $self = shift;
+    my $workflow = shift;
+
     ### fetch_history called...
-    OpenXPKI::Exception->throw (
-	message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_NOT_IMPLEMENTED",
-	params  => {
-	    METHOD    => 'fetch_history',
-	},
+    my $id = $workflow->id();
+    my $dbi = CTX('dbi_workflow');
+
+    # get all history objects for workflow $id, sorted descending by
+    # creation date
+
+    my @history = ();
+    
+    my $entry = $dbi->last(
+	TABLE           => $history_table,
+	WORKFLOW_SERIAL => $id,
 	);
+
+    # FIXME: get history sorted by timestamp (see Workflow::Persister::DBI)
+    while ($entry) {
+	my $histid = $entry->{WORKFLOW_HISTORY_SERIAL};
+        my $hist = Workflow::History->new(
+	    {
+		id          => $histid,
+		workflow_id => $entry->{WORKFLOW_SERIAL},
+		action      => $entry->{WORKFLOW_ACTION},
+		description => $entry->{WORKFLOW_DESCRIPTION},
+		state       => $entry->{WORKFLOW_STATE},
+		user        => $entry->{WORKFLOW_USER},
+		date        => $parser->parse_datetime($entry->{WORKFLOW_LAST_UPDATE}),
+	    });
+
+	CTX('log')->log(
+	    MESSAGE  => "Fetched history object '$histid'",
+	    PRIORITY => "debug",
+	    FACILITY => "system"
+	    );
+	
+        $hist->set_saved();
+        push @history, $hist;     
+
+	$entry = $dbi->prev(
+	    TABLE           => $history_table,
+	    WORKFLOW_SERIAL => $id,
+	    );
+	
+    }
+
+    return @history;
 }
 
 
@@ -199,8 +412,8 @@ sub assign_generators {
 sub init_OpenXPKI_generators {
     my $self = shift;
     my $params = shift;
-    $params->{workflow_table} ||= 'WORKFLOW';
-    $params->{history_table} ||= 'WORKFLOW_HISTORY';
+    $params->{workflow_table} ||= $workflow_table;
+    $params->{history_table}  ||= $history_table;
 
     return (
 	OpenXPKI::Server::Workflow::Persister::DBI::SequenceId->new( 
@@ -243,9 +456,16 @@ Creates a workflow instance object.
 
 Fetches a workflow instance object from the persistant storage.
 
+=head2 fetch_extra_workflow_data
+
+Fetches a workflow's context from persistant storage.
+
 =head2 update_workflow
 
 Updates a workflow instance object in persistant storage.
+Limitations: Context values must consist of valid Unicode characters. NULL
+bytes are explicitly not allowed. The maximum length of context values
+is 32 KByte.
 
 =head2 create_history
 

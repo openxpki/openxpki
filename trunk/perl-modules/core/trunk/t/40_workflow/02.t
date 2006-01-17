@@ -1,13 +1,14 @@
 use strict;
 use warnings;
+use English;
 use Data::Dumper;
 use Test;
 
-#use Smart::Comments;
+# use Smart::Comments;
 
 use Workflow::Factory;
 
-BEGIN { plan tests => 56 };
+BEGIN { plan tests => 56; };
 
 print STDERR "OpenXPKI::Server::Workflow - Sample workflow instance processing\n";
 
@@ -124,6 +125,7 @@ foreach my $testmode (qw( user_supplied_passphrase
 	    EXPECTED_ACTIONS => [ 'request.certificate.pkcs10.create', ],
 	    EXECUTE_ACTION => 'request.certificate.pkcs10.create',
 	);
+
 
     ### PKCS10 request: $context->param('pkcs10request')
     ok($context->param('pkcs10request') =~ /^-----BEGIN CERTIFICATE REQUEST-----/);

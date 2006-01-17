@@ -10,6 +10,8 @@ use utf8;
 
 package OpenXPKI::Server::DBI;
 
+# use Smart::Comments;
+
 use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 use OpenXPKI::Server::DBI::Schema;
@@ -314,7 +316,7 @@ sub get
 {
     my $self = shift;
     my $result = $self->select (@_, LIMIT => 1);
-    return undef if (not defined $result);
+    return if (not defined $result);
     return $result->[0];
 }
 
@@ -367,6 +369,7 @@ sub __extract_serial_from_params
 
     my $value = $keys->{$name};
     delete $keys->{$name};
+
     return $value;
 }
 

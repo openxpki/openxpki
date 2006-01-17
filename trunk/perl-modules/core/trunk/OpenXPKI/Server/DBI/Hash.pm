@@ -142,6 +142,7 @@ sub __log_write_action
     ## ignore management tables
     return 1 if ($table eq "AUDITTRAIL");
     return 1 if ($table eq "DATAEXCHANGE");
+    return 1 if ($table eq "WORKFLOW_CONTEXT");
 
     ## set status if available
     my $status = undef;
@@ -167,6 +168,7 @@ sub __log_write_action
         next if ($col eq "SERIAL");
         next if ($col eq "PKI_REALM");
         next if ($col eq "CA");
+
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_HASH_LOG_WRITE_ACTION_WRONG_INDEX_COLUMN",
             params  => {COLUMN => $col});

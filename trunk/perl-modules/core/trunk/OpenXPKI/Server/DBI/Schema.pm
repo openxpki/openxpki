@@ -88,9 +88,9 @@ my %COLUMN_of = (
     CATEGORY              => "category",
     LEVEL                 => "level",
 
-    "KEYID"               => "keyid",
-    "CA_ISSUER_NAME"      => "ca_issuer_name",
-    "CA_ISSUER_SERIAL"    => "ca_issuer_serial",
+    KEYID                 => "keyid",
+    CA_ISSUER_NAME        => "ca_issuer_name",
+    CA_ISSUER_SERIAL      => "ca_issuer_serial",
 
     WORKFLOW_TYPE         => "workflow_type",
     WORKFLOW_STATE        => "workflow_state",
@@ -99,7 +99,8 @@ my %COLUMN_of = (
     WORKFLOW_DESCRIPTION  => "workflow_description",
     WORKFLOW_USER         => "workflow_user",
     WORKFLOW_HISTORY_DATE => "workflow_history_date",
-
+    WORKFLOW_CONTEXT_KEY  => "workflow_context_key",
+    WORKFLOW_CONTEXT_VALUE => "workflow_context_value",
     );
 
 my %TABLE_of = (
@@ -176,6 +177,7 @@ my %TABLE_of = (
         INDEX   => [ "DATAEXCHANGE_SERIAL" ],
         COLUMNS => [ "DATAEXCHANGE_SERIAL",
                      "TABLE", "PKI_REALM", "CA", "SERIAL",
+		     "WORKFLOW_SERIAL", "WORKFLOW_CONTEXT_KEY",
                      "SERVERID", "EXPORTID" ]},
     
     WORKFLOW => {
@@ -199,6 +201,12 @@ my %TABLE_of = (
 		     "WORKFLOW_HISTORY_DATE",
 	    ]},
 
+    WORKFLOW_CONTEXT => {
+        NAME    => "workflow_context",
+        INDEX   => [ "WORKFLOW_SERIAL", "WORKFLOW_CONTEXT_KEY", ],
+        COLUMNS => [ "WORKFLOW_SERIAL", "WORKFLOW_CONTEXT_KEY",
+		     "WORKFLOW_CONTEXT_VALUE",
+	    ]},
     );
 
 my %INDEX_of = (
@@ -311,6 +319,9 @@ sub get_index_name
 {
     my $self = shift;
     my $index = shift;
+
+    __check_param($index);
+
     return $INDEX_of{$index}->{NAME};
 }
 

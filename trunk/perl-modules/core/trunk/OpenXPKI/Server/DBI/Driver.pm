@@ -125,6 +125,8 @@ our %COLUMN = (
     "workflow_description" => "TEXT_KEY",
     "workflow_user"    => "TEXT_KEY",
     "workflow_history_date"  => "TIMESTAMP",
+    "workflow_context_key"   => "TEXT_KEY",
+    "workflow_context_value"   => "TEXT",
     
     );
 
