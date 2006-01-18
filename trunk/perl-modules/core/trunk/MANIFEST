@@ -175,15 +175,17 @@ t/30_dbi/database.xml
 
 t/35_auth/01.t
 
-t/39_context/01.t
+t/40_context/01.t
 
-t/40_workflow/01.t
-t/40_workflow/02.t
-t/40_workflow/02_workflow_activity.xml
-t/40_workflow/02_workflow_persister.xml
-t/40_workflow/02_workflow_request_dataonly.xml
-t/40_workflow/99.t
-t/40_workflow/common.pl
+t/60_workflow/01.t
+t/60_workflow/01_workflow.xml
+t/60_workflow/01_workflow_activity.xml
+t/60_workflow/01_workflow_persister.xml
+t/60_workflow/02.t
+t/60_workflow/02_workflow_activity.xml
+t/60_workflow/02_workflow_persister.xml
+t/60_workflow/02_workflow_request_dataonly.xml
+t/60_workflow/common.pl
 
 t/70_server/fix_config.pl
 t/70_server/startup.pl
