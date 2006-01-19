@@ -9,7 +9,7 @@
 	    resulting_state="GET_TOKEN" />
   </state>
 
-  <state name="GET_TOKEN">
+  <state name="GET_TOKEN" autorun="yes">
     <description>Obtain crypto token</description>
     <action name="token.get"
 	    resulting_state="GENERATE_PASSPHRASE"/>

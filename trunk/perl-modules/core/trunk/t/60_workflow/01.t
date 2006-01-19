@@ -8,7 +8,7 @@ use Test;
 
 use Workflow::Factory;
 
-BEGIN { plan tests => 40, todo => [ 12 ] };
+BEGIN { plan tests => 35 };
 
 print STDERR "OpenXPKI::Server::Workflow - Persistence\n";
 
@@ -65,7 +65,7 @@ ok($workflow->context()->param('foo'), 'barbaz');
 ok($workflow->context()->param('pkirealm'), 'Test Root CA');
 
 
-### try to execute action (expect problems because of the binary data)
+### try to execute action (expect exception because of the binary data)
 eval {
     do_step($workflow, 
 	    EXPECTED_STATE => 'INITIAL',
@@ -85,13 +85,24 @@ if (my $exc = OpenXPKI::Exception->caught()) {
 
 
 ### now delete the offending parameter...
-$workflow->context()->param(binarydata => undef);
+# work around a bug in Workflow::Base::param() that does not allow to
+# set reset a single parameter. It works when called with a hash ref, though.
+$workflow->context()->param({ binarydata => undef });
+
+
+### create a volatile data object
+$workflow->context()->param(_binarydata => $binary_data);
+ok($workflow->context()->param('_binarydata') eq $binary_data);
+
 
 do_step($workflow, 
 	EXPECTED_STATE => 'INITIAL',
 	EXPECTED_ACTIONS => [ 'null' ],
 	EXECUTE_ACTION => 'null',
     );
+
+# expect that the volatile object is still around
+ok($workflow->context()->param('_binarydata') eq $binary_data);
 
 # delete context instance
 $workflow = undef;
@@ -100,6 +111,9 @@ $workflow = $factory->fetch_workflow('dummy workflow', $workflow_id);
 
 ### check if we got the correct workflow back...
 ok($workflow->id(), $workflow_id);
+
+# expect that the volatile object is now gone (does not survive resurrection)
+ok($workflow->context()->param('_binarydata'), undef);
 
 # check if context entries are persistent
 ok($workflow->context()->param('foo'), 'barbaz');

@@ -8,7 +8,7 @@ use Test;
 
 use Workflow::Factory;
 
-BEGIN { plan tests => 56; };
+BEGIN { plan tests => 48; };
 
 print STDERR "OpenXPKI::Server::Workflow - Sample workflow instance processing\n";
 
@@ -79,12 +79,13 @@ foreach my $testmode (qw( user_supplied_passphrase
 	    EXECUTE_ACTION => 'request.certificate.dataonly.create',
 	);
 
-    ### do_step - get token...
-    do_step($workflow, 
-	    EXPECTED_STATE => 'GET_TOKEN',
-	    EXPECTED_ACTIONS => [ 'token.get' ],
-	    EXECUTE_ACTION => 'token.get',
-	);
+    # this would be the next step if autorun were not true for GET_TOKEN
+#     ### do_step - get token...
+#     do_step($workflow, 
+# 	    EXPECTED_STATE => 'GET_TOKEN',
+# 	    EXPECTED_ACTIONS => [ 'token.get' ],
+# 	    EXECUTE_ACTION => 'token.get',
+# 	);
 
     ### check if branching the workflow works as expected
     if (! defined $context->param('passphrase')) {

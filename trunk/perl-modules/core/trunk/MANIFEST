@@ -103,7 +103,9 @@ OpenXPKI/Server/Authentication/X509.pm
 OpenXPKI/UI/Test.pm
 
 ## Workflow
+OpenXPKI/Server/Workflow.pm
 OpenXPKI/Server/Workflow/Activity.pm 
+OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 OpenXPKI/Server/Workflow/Activity/Key/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly/Create.pm

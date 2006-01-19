@@ -16,26 +16,29 @@ sub execute {
     my $self = shift;
     my $workflow = shift;
 
-    $self->setparams($workflow, 
-		     {
-			 token => {
-			     required => 1,
-			 },
-			 key => {
-			     required => 1,
-			 },
-			 passphrase => {
-			 },
-			 subject => {
-			     required => 1,
-			 },
-		     });    
+    $self->SUPER::execute($workflow,
+			  {
+			      ACTIVITYCLASS => 'PUBLIC',
+			      PARAMS => {
+				  _token => {
+				      required => 1,
+				  },
+				  key => {
+				      required => 1,
+				  },
+				  passphrase => {
+				  },
+				  subject => {
+				      required => 1,
+				  },
+			      },
+			  });    
 
 
     my $context = $workflow->context();
     my $log = get_logger(); 
     
-    my $token = $self->param('token');
+    my $token = $self->param('_token');
 
     ## create CSR
     my $csr = $token->command ("create_pkcs10",

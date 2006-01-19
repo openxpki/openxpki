@@ -8,7 +8,7 @@ package OpenXPKI::Server::Workflow::Activity::Request::Certificate::DataOnly::Cr
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
-use OpenXPKI::Server::Context;
+use OpenXPKI::Server::Context qw( CTX );
 use Log::Log4perl       qw( get_logger );
 
 # use Smart::Comments;
@@ -17,12 +17,15 @@ sub execute {
     my $self = shift;
     my $workflow = shift;
 
-    $self->setparams($workflow, 
-		     {
-			 creator => {
-			     required => 1,
-			 },
-		     });
+    $self->SUPER::execute($workflow,
+			  {
+			      ACTIVITYCLASS => 'PUBLIC',
+			      PARAMS => {
+				  creator => {
+				      required => 1,
+				  },
+			      },
+			  });
 
     my $context = $workflow->context;
     my $log = get_logger(); 

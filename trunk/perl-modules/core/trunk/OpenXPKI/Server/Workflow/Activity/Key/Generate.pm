@@ -19,26 +19,29 @@ sub execute {
     my $self = shift;
     my $workflow = shift;
 
-    $self->setparams($workflow, 
-		     {
-			 keytype => {
-			     default => 'RSA',
-			 },
-			 curvename => {
-			 },
-			 keylength => {
-			     default => 1024,
-			 },
-			 keyencryptionalgorithm => {
-			     default => 'aes256',
-			 },
-			 passphrase => {
-			     required => 1,
-			 },
-			 token => {
-			     required => 1,
-			 },
-		     });
+    $self->SUPER::execute($workflow,
+			  {
+			      ACTIVITYCLASS => 'PUBLIC',
+			      PARAMS => {
+				  keytype => {
+				      default => 'RSA',
+				  },
+				  curvename => {
+				  },
+				  keylength => {
+				      default => 1024,
+				  },
+				  keyencryptionalgorithm => {
+				      default => 'aes256',
+				  },
+				  passphrase => {
+				      required => 1,
+				  },
+				  _token => {
+				      required => 1,
+				  },
+			      },
+			  });
     
     my $context = $workflow->context();
     my $log = get_logger(); 
@@ -53,7 +56,7 @@ sub execute {
     }
 
 
-    my $token = $self->param('token');
+    my $token = $self->param('_token');
 
 
     my $key = $token->command("create_key",
@@ -93,7 +96,7 @@ Expects the following context parameters:
 
 =over 12
 
-=item token
+=item _token
 
 Cryptographic token to use for key generation. The default token is
 sufficient for this purpose.

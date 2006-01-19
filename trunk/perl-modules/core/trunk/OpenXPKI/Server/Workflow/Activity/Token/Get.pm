@@ -18,17 +18,20 @@ sub execute {
     my $self = shift;
     my $workflow = shift;
 
-    $self->setparams($workflow, 
-		     {
-			 tokentype => {
-			     default => 'DEFAULT',
-			 },
-			 tokenname => {
-			 },
-			 pkirealm => {
-			     required => 1,
-			 },
-		     });
+    $self->SUPER::execute($workflow,
+			  {
+			      ACTIVITYCLASS => 'PUBLIC',
+			      PARAMS => {
+				  tokentype => {
+				      default => 'DEFAULT',
+				  },
+				  tokenname => {
+				  },
+				  pkirealm => {
+				      required => 1,
+				  },
+			      },
+			  });
     
     my $context = $workflow->context();
     
@@ -47,7 +50,7 @@ sub execute {
 	);
     
     # export
-    $context->param(token => $token);
+    $context->param(_token => $token);
 
 
     $workflow->add_history(
@@ -98,9 +101,9 @@ After completion the following context parameters will be set:
 
 =over 12
 
-=item token
+=item _token
 
-Cryptographic token
+Cryptographic token. Volatile.
     
 =back
 

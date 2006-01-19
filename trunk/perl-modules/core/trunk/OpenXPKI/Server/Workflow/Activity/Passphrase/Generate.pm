@@ -19,14 +19,17 @@ sub execute {
     my $self = shift;
     my $workflow = shift;
 
-    $self->setparams($workflow, 
-		     {
-			 token => {
-			     required => 1,
-			 },
-			 passphrase => {
-			 },
-		     });
+    $self->SUPER::execute($workflow,
+			  {
+			      ACTIVITYCLASS => 'PUBLIC',
+			      PARAMS => {
+				  _token => {
+				      required => 1,
+				  },
+				  passphrase => {
+				  },
+			      },
+			  });
     
     my $context = $workflow->context();
     my $log = get_logger(); 
@@ -37,11 +40,11 @@ sub execute {
 	return 1;
     }
     
-    my $token = $self->param('token');
+    my $token = $self->param('_token');
     
     # generate a random pass phrase
     $self->param('passphrase',
-		 $token->command ("create_random", RANDOM_LENGTH => 16));
+		 $token->command("create_random", RANDOM_LENGTH => 16));
     
     # export
     $context->param(passphrase => $self->param('passphrase'));
@@ -69,10 +72,10 @@ Expects the following context parameters:
 
 =over 12
 
-=item token
+=item _token
 
 Cryptographic token to use for pass phrase generation. The default token is
-sufficient for this purpose. Required.
+sufficient for this purpose. Required. Volatile.
 
 =item passphrase
 

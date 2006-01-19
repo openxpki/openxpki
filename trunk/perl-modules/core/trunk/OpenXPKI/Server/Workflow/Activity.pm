@@ -9,7 +9,50 @@ use strict;
 use base qw( Workflow::Action );
 use Log::Log4perl       qw( get_logger );
 
+# use Smart::Comments;
+
+use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
+
+
+sub execute {
+    my $self     = shift;
+    my $workflow = shift;
+    my $params   = shift;
+
+    # check workflow context for parameters and import them to activity
+    # parameters
+    $self->setparams($workflow, $params->{PARAMS});
+
+    # activity class (role), defaults to "CA"
+    my $activityclass 
+	= exists $params->{ACTIVITYCLASS} 
+          ? $params->{ACTIVITYCLASS}
+          : "CA";
+
+    my $authorized = 1;
+    # FIXME: add call to authorization module
+#     my $authorized = CTX('authorization')->authorize(
+# 	ACTIVITYCLASS => $activityclass,
+# 	ACTIVITY      => $self->param('activity'),
+# 	# original creator of this workflow instance
+# 	CREATOR       => $workflow->context()->param('creator'),
+# 	# current user who executes this particular activity
+# 	USER          => $workflow->context()->param('user'),
+# 	);
+
+    if (! $authorized) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_AUTHORIZATION_FAILED",
+	    params  => { 
+		ACTIVITYCLASS => $activityclass,
+		ACTIVITY      => $self->param('activity'),
+		USER          => $workflow->context()->param('user'),
+	    });
+    }
+
+    return 1;
+}
 
 
 sub setparams {
@@ -20,13 +63,16 @@ sub setparams {
     # determine caller context
     my ($package, $filename, $line, $subroutine, $hasargs,
 	$wantarray, $evaltext, $is_require, $hints, $bitmask) 
-	= caller(0);
+	= $self->_caller();
     my $caller_activity = $package;
     $caller_activity =~ s/^OpenXPKI::Server::Workflow::Activity:://;
 
     # export canonical activity name to caller activity (for convenience)
     $self->param('activity' => $caller_activity);
-    
+
+    # no parameters: nothing to do
+    return if (! defined $expected_params);
+
     # check that we were passed a hash ref
     if (ref $expected_params ne "HASH") {
 	OpenXPKI::Exception->throw (
@@ -54,7 +100,7 @@ sub setparams {
 		    params  => { 
 			"PARAMETER"     => $field,
 			"CALLERPACKAGE" => $package,
-			"ACTIVITY"      => $caller_activity,
+			"ACTIVITY"      => $context->param('activity'),
 		    });
 	    }
 
@@ -68,12 +114,20 @@ sub setparams {
     } 
 }
 
-sub execute {
+
+# get caller activity (not THIS package, but the actual activity)
+sub _caller {
     my $self = shift;
-    my $workflow = shift;
 
+    my $level = 0;
+    my @caller = caller($level);
+
+    while ($caller[0] eq "OpenXPKI::Server::Workflow::Activity") {
+	$level++;
+	@caller = caller($level);
+    }
+    return @caller;
 }
-
 
 1;
 
@@ -83,9 +137,20 @@ Base class for OpenXPKI Activities. Deriving from this class is
 not mandatory, this class only provides some helper functions that
 make activity implementation easier.
 
+=head2 Subclassing
+
+Derived classes should call the execute() method of this class.
 
 
 =head1 Functions
+
+=head2 execute
+
+The execute() method wraps the activity execution and provides a framework
+that derived classes (i. e. actual Workflow Activities) can use to 
+consistently interface with the OpenXPKI system.
+
+
 
 =head2 setparams ( $workflow, \%expected_params )
 
