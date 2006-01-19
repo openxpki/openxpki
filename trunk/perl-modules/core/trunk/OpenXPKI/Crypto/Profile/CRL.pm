@@ -1,7 +1,7 @@
 # OpenXPKI::Crypto::Profile::CRL.pm 
 # Written by Michael Bell for the OpenXPKI project
 # Copyright (C) 2005-2006 by The OpenXPKI Project
-# $Revision: 119 $
+# $Revision$
 
 use strict;
 use warnings;
@@ -80,9 +80,19 @@ sub load_profile
     $self->{PROFILE}->{DIGEST} = $self->{config}->get_xpath (
                                      XPATH   => [@profile_path, "digest"],
                                      COUNTER => [@profile_counter, 0]);
-    $self->{PROFILE}->{DAYS}   = $self->{config}->get_xpath (
-                                     XPATH   => [@profile_path, "days"],
-                                     COUNTER => [@profile_counter, 0]);
+    my $format = $self->{config}->get_xpath (
+                     XPATH   => [@profile_path, "lifetime", "format"],
+                     COUNTER => [@profile_counter, 0, 0]);
+    my $lifetime = $self->{config}->get_xpath (
+                       XPATH   => [@profile_path, "lifetime"],
+                       COUNTER => [@profile_counter, 0]);
+    if ($format eq "days")
+    {
+        $self->{PROFILE}->{DAYS}  = $lifetime;
+    } else {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_NEW_UNSUPPORTED_FORMAT");
+    }
 
     ## load extensions
     #

@@ -29,6 +29,8 @@ sub full_message
         $self->{params}->{"ERRVAL"} = $self->{child}->as_string();
         $self->{params}->{"ERRNO"}  = $self->{child}->get_errno()
             if ($self->{errno} and $self->{child}->get_errno());
+    } elsif ($self->{child}) {
+        $self->{params}->{"ERRVAL"} = $self->{child};
     }
 
     ## enforce __NAME__ scheme

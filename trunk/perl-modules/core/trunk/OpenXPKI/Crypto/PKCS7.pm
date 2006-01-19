@@ -26,12 +26,12 @@ sub new
     if (not $self->{PKCS7} and not $self->{CONTENT})
     {
         OpenXPKI::Exception (
-            message => "I18N_OPENXPKI_CRYPTO_CRL_NEW_MISSING_DATA");
+            message => "I18N_OPENXPKI_CRYPTO_PKCS7_NEW_MISSING_DATA");
     }
     if (not $self->{TOKEN})
     {
         OpenXPKI::Exception (
-            message => "I18N_OPENXPKI_CRYPTO_CRL_NEW_MISSING_TOKEN");
+            message => "I18N_OPENXPKI_CRYPTO_PKCS7_NEW_MISSING_TOKEN");
     }
 
     return $self;

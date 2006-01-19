@@ -2,7 +2,7 @@
 ##
 ## Written by Michael Bell for the OpenXPKI project 2006
 ## Copyright (C) 2006 by The OpenXPKI Project
-## $Revision: 125 $
+## $Revision$
 
 use strict;
 use warnings;
@@ -156,7 +156,7 @@ sub set_user
 sub get_user
 {
     my $self = shift;
-    $self->{session}->param ("user");
+    return $self->{session}->param ("user");
 }
 
 sub set_role
@@ -169,7 +169,20 @@ sub set_role
 sub get_role
 {
     my $self = shift;
-    $self->{session}->param ("role");
+    return $self->{session}->param ("role");
+}
+
+sub set_pki_realm
+{
+    my $self = shift;
+    $self->{session}->param ("pki_realm" => shift);
+    $self->{session}->flush();
+}
+
+sub get_pki_realm
+{
+    my $self = shift;
+    return $self->{session}->param ("pki_realm");
 }
 
 sub get_id
@@ -251,6 +264,10 @@ returns a challenge string if such a string was set in the past.
 =item * set_role
 
 =item * get_role
+
+=item * set_pki_realm
+
+=item * get_pki_realm
 
 =item * get_id
 

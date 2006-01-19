@@ -12,7 +12,7 @@ ok(1);
 ## create new session
 my $session = OpenXPKI::Server::Session->new (
                   DEBUG     => 1,
-                  DIRECTORY => "t/35_auth/",
+                  DIRECTORY => "t/50_auth/",
                   LIFETIME  => 2);
 ok($session);
 
@@ -40,7 +40,7 @@ ok(not defined $session);
 ## load
 $session = OpenXPKI::Server::Session->new (
                DEBUG     => 1,
-               DIRECTORY => "t/35_auth/",
+               DIRECTORY => "t/50_auth/",
                LIFETIME  => 2,
                ID        => $id);
 ok($session);
@@ -64,7 +64,7 @@ ok(not defined $session);
 ## load
 $session = OpenXPKI::Server::Session->new (
                DEBUG     => 1,
-               DIRECTORY => "t/35_auth/",
+               DIRECTORY => "t/50_auth/",
                LIFETIME  => 2,
                ID        => $id);
 ok($session);
@@ -82,7 +82,7 @@ ok(sleep 2);
 ## try to load
 eval {$session = OpenXPKI::Server::Session->new (
                      DEBUG     => 1,
-                     DIRECTORY => "t/35_auth/",
+                     DIRECTORY => "t/50_auth/",
                      LIFETIME  => 2,
                      ID        => $id);};
 ok($EVAL_ERROR);
@@ -90,7 +90,7 @@ ok($EVAL_ERROR);
 ## create new session
 $session = OpenXPKI::Server::Session->new (
                DEBUG     => 1,
-               DIRECTORY => "t/35_auth/",
+               DIRECTORY => "t/50_auth/",
                LIFETIME  => 2);
 ok($session);
 $id = $session->get_id();
@@ -99,12 +99,12 @@ ok($id);
 ## delete session
 ok($session->delete());
 undef $session;
-ok(!-e "t/35_auth/cgisess_$id");
+ok(!-e "t/50_auth/cgisess_$id");
 
 ## try to load dropped session
 eval {$session = OpenXPKI::Server::Session->new (
                      DEBUG     => 1,
-                     DIRECTORY => "t/35_auth/",
+                     DIRECTORY => "t/50_auth/",
                      LIFETIME  => 2,
                      ID        => $id);};
 ok($EVAL_ERROR);

@@ -2,7 +2,7 @@
 
   <crl>
     <digest>sha1</digest>
-    <days>35</days>
+    <lifetime format="days">35</lifetime>
     <extensions>
     </extensions>
   </crl>

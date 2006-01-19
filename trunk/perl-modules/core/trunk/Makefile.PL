@@ -133,6 +133,7 @@ WriteMakefile(
                     'Locale::TextDomain'     => 1,
                     'Log::Log4perl'          => '0.51',
                     'Math::BigInt'           => 1,
+                    'Net::LDAP'              => "0.32",
                     'Test'                   => 1,
                     'Test::Pod'              => "1.00",
                     'Test::Pod::Coverage'    => "1.00",

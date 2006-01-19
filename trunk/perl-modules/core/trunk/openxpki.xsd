@@ -136,6 +136,7 @@
     <xsd:sequence>
       <xsd:element name="common" type="pki_realm_common_type"/>
       <xsd:element name="ca"     type="ca_type" maxOccurs="unbounded"/>
+      <xsd:element name="auth"   type="auth_type"/>
     </xsd:sequence>
     <xsd:attribute name="name" type="xsd:string"/>
   </xsd:complexType>
@@ -154,6 +155,8 @@
       <xsd:element   name="profiles" type="cert_profiles_type"/>
     </xsd:all>
     <xsd:attribute name="name"  type="xsd:string"/>
+    <xsd:attribute ref="super"/>
+    <xsd:attribute ref="id"/>
   </xsd:complexType>
 
   <!-- ==========END========== -->
@@ -182,6 +185,7 @@
       <xsd:element name="cert"      minOccurs="0" type="xsd:string"/>        <!-- filename of ca cert          -->
       <xsd:element name="internal_chain" minOccurs="0" type="xsd:string"/>   <!-- filename of internal chain   -->
       <xsd:element name="config"    minOccurs="0" type="xsd:string"/>        <!-- filename of crypto config    -->
+      <xsd:element name="randfile"  minOccurs="0" type="xsd:string"/>        <!-- filename of random -->
       <xsd:element name="passwd_parts" minOccurs="0" type="xsd:nonNegativeInteger"/>
       <xsd:element name="passwd"    minOccurs="0" type="xsd:string"/>
       <xsd:element name="option"    type="option_type" minOccurs="0" maxOccurs="unbounded"/>
@@ -216,11 +220,14 @@
   <!-- ===============BEGIN============== -->
 
   <xsd:complexType name="cert_profiles_type">
-    <xsd:sequence>
+    <xsd:sequence minOccurs="0">
+      <xsd:element name="crl"            type="cert_profile_type"/>
       <xsd:element name="ca_certificate" type="cert_profile_type"/>
       <xsd:element name="profile" type="cert_profile_type" maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute ref="xml:base"/>
+    <xsd:attribute ref="super"/>
+    <xsd:attribute ref="id"/>
   </xsd:complexType>
 
   <xsd:complexType name="cert_profile_type">
@@ -257,19 +264,19 @@
 
   <xsd:complexType name="cert_extensions_type">
     <xsd:sequence minOccurs="0">
-      <xsd:element name="basic_constraints"        type="x509v3_basic_constraints"/>
-      <xsd:element name="key_usage"                type="x509v3_key_usage"/>
-      <xsd:element name="extended_key_usage"       type="x509v3_extended_key_usage"/>
-      <xsd:element name="subject_key_identifier"   type="x509v3_subject_key_identifier"/>
-      <xsd:element name="authority_key_identifier" type="x509v3_authority_key_identifier"/>
-      <xsd:element name="issuer_alt_name"          type="x509v3_issuer_alt_name"/>
-      <xsd:element name="crl_distribution_points"  type="x509v3_crl_distribution_points"/>
-      <xsd:element name="authority_info_access"    type="x509v3_authority_info_access"/>
-      <xsd:element name="user_notice"              type="x509v3_user_notice"/>
-      <xsd:element name="policy_identifier"        type="x509v3_policy_identifier"/>
-      <xsd:element name="cps"                      type="x509v3_cps"/>
-      <xsd:element name="oid"                      type="x509v3_oid"/>
-      <xsd:element name="netscape"                 type="x509v3_netscape"/>
+      <xsd:element name="basic_constraints"        type="x509v3_basic_constraints" minOccurs="0"/>
+      <xsd:element name="key_usage"                type="x509v3_key_usage" minOccurs="0"/>
+      <xsd:element name="extended_key_usage"       type="x509v3_extended_key_usage" minOccurs="0"/>
+      <xsd:element name="subject_key_identifier"   type="x509v3_subject_key_identifier" minOccurs="0"/>
+      <xsd:element name="authority_key_identifier" type="x509v3_authority_key_identifier" minOccurs="0"/>
+      <xsd:element name="issuer_alt_name"          type="x509v3_issuer_alt_name" minOccurs="0"/>
+      <xsd:element name="crl_distribution_points"  type="x509v3_crl_distribution_points" minOccurs="0"/>
+      <xsd:element name="authority_info_access"    type="x509v3_authority_info_access" minOccurs="0"/>
+      <xsd:element name="user_notice"              type="x509v3_user_notice" minOccurs="0"/>
+      <xsd:element name="policy_identifier"        type="x509v3_policy_identifier" minOccurs="0"/>
+      <xsd:element name="cps"                      type="x509v3_cps" minOccurs="0"/>
+      <xsd:element name="oid"                      type="x509v3_oid" minOccurs="0"/>
+      <xsd:element name="netscape"                 type="x509v3_netscape" minOccurs="0"/>
     </xsd:sequence>
   </xsd:complexType>
 
@@ -459,6 +466,62 @@
   <!-- ================END=============== -->
   <!-- certificate profiles configuration -->
   <!-- ================================== -->
+
+  <!-- ============================ -->
+  <!-- authentication configuration -->
+  <!-- ============BEGIN=========== -->
+
+  <xsd:complexType name="auth_type">
+    <xsd:sequence>
+      <xsd:element name="stack"   type="auth_stack_type"   maxOccurs="unbounded"/>
+      <xsd:element name="handler" type="auth_handler_type" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute ref="xml:base"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="auth_stack_type">
+    <xsd:sequence>
+      <xsd:element name="handler" type="xsd:string" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="name" type="xsd:string"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="auth_handler_type">
+    <xsd:sequence>
+      <xsd:element name="role"
+                   type="xsd:string"
+                   minOccurs="0"/>
+      <xsd:element name="user"
+                   type="auth_handler_password_type"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="name" type="xsd:string"/>
+    <xsd:attribute name="type" type="auth_handler_class_type"/>
+  </xsd:complexType>
+
+  <xsd:simpleType name="auth_handler_class_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="Anonymous"/>
+      <xsd:enumeration value="External"/>
+      <xsd:enumeration value="LDAP"/>
+      <xsd:enumeration value="Password"/>
+      <xsd:enumeration value="X509"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="auth_handler_password_type">
+    <xsd:sequence>
+      <xsd:element name="name"      type="xsd:string"/>
+      <xsd:element name="algorithm" type="xsd:string"/>
+      <xsd:element name="digest"    type="xsd:string"/>
+      <xsd:element name="role"      type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- =============END============ -->
+  <!-- authentication configuration -->
+  <!-- ============================ -->
 
   <!-- =================== -->
   <!-- general definitions -->

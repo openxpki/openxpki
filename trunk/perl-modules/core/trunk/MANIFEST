@@ -94,6 +94,12 @@ OpenXPKI/Server/API.pm
 OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
 OpenXPKI/Server/Session.pm
+OpenXPKI/Server/Authentication.pm
+OpenXPKI/Server/Authentication/Anonymous.pm
+OpenXPKI/Server/Authentication/External.pm
+OpenXPKI/Server/Authentication/LDAP.pm
+OpenXPKI/Server/Authentication/Password.pm
+OpenXPKI/Server/Authentication/X509.pm
 OpenXPKI/UI/Test.pm
 
 ## Workflow
@@ -116,6 +122,8 @@ t/01_pod/2.t
 
 t/05_base/01.t
 t/05_base/02.t
+t/05_base/03.t
+t/05_base/fix_config.pl
 
 t/10_exception/1.t
 
@@ -173,9 +181,11 @@ t/30_dbi/70.t
 t/30_dbi/common.pl
 t/30_dbi/database.xml
 
-t/35_auth/01.t
-
 t/40_context/01.t
+
+t/50_auth/01.t
+t/50_auth/02.t
+t/50_auth/auth.xml
 
 t/60_workflow/01.t
 t/60_workflow/01_workflow.xml
@@ -187,7 +197,6 @@ t/60_workflow/02_workflow_persister.xml
 t/60_workflow/02_workflow_request_dataonly.xml
 t/60_workflow/common.pl
 
-t/70_server/fix_config.pl
 t/70_server/startup.pl
 t/70_server/01.t
 

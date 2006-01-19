@@ -99,7 +99,8 @@ sub process_request
 		   FACILITY => "system");
         return;
     }
-    $self->{ui} = $self->{ui_list}->{$class};
+    OpenXPKI::Server::Context::setcontext(
+        'ui' => $self->{ui_list}->{$class});
 
     ## update pre-initialized variables
 
@@ -119,8 +120,8 @@ sub process_request
 
     ## use user interface
 
-    $self->{ui}->init();
-    $self->{ui}->run();
+    CTX('ui')->init();
+    CTX('ui')->run();
 }
 
 ###########################################################################
@@ -267,6 +268,22 @@ sub __get_server_config
 
 sub command
 {
+    my $self = shift;
+
+    ## check that there is a session
+
+    if (not CTX('session'))
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_COMMAND_MISSING_SESSION");
+    }
+
+    ## try to authenticate the user
+
+    if (not CTX('session')->is_valid())
+    {
+        $self->{authentication}->login({SESSION => CTX('session')});
+    }
 }
 
 1;

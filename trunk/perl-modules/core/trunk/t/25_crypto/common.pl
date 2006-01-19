@@ -14,23 +14,8 @@ our $cache;
 
 our $basedir = File::Spec->catfile('t', '25_crypto');
 
-# ## init the XML cache
-# my $tokenconfigfile = File::Spec->catfile('t', '25_crypto', 'token.xml');
-# 
-# # slurp in configuration file
-# my $config = OpenXPKI->read_file($tokenconfigfile) 
-#     or die "Could not read config file $tokenconfigfile. Stopped";
-# $config = "<openxpki>\n".$config."\n</openxpki>";
-my $config = `xmllint -xinclude t/config.xml`;
-
-# set correct OpenSSL binary in configuration
-my $openssl_binary = `cat t/cfg.binary.openssl`;
-
-$config =~ s{(<shell>)([^<]*)(</shell>\s*)}
-            {$1$openssl_binary$3}sgx;
-
 $cache = eval { OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                           CONFIG => $config) };
+                                           CONFIG => "t/config.xml") };
 die $EVAL_ERROR."\n" if ($EVAL_ERROR and not ref $EVAL_ERROR);
 die $EVAL_ERROR->as_string()."\n" if ($EVAL_ERROR);
 die "Could not init XML config. Stopped" if (not $cache);

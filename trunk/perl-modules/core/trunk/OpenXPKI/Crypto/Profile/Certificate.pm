@@ -1,7 +1,7 @@
 # OpenXPKI::Crypto::Profile::Certificate.pm 
 # Written by Michael Bell for the OpenXPKI project
 # Copyright (C) 2005 by The OpenXPKI Project
-# $Revision: 119 $
+# $Revision$
 
 use strict;
 use warnings;
