@@ -19,7 +19,7 @@
       <algorithm>sha1</algorithm>
       <!-- this is Doe in sha1 -->
       <digest>yUetMg5m/GSZjoalXA2iEMjB2Bo=</digest>
-      <role>CA Operator</role>
+      <role>User</role>
     </user>
   </handler>
   <handler name="Operator Password" type="Password">

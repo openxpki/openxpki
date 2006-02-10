@@ -30,6 +30,7 @@ my $context = {
 	# user-settable
 	api          => undef,
 	server       => undef,
+        gui          => undef,
     },
 };
 

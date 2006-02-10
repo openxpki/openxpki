@@ -69,9 +69,10 @@ sub login
 {
     my $self = shift;
     $self->debug ("start");
-    my $gui = shift;
+    my $name = shift;
+    my $gui  = CTX('gui');
 
-    my ($account, $passwd) = $gui->get_passwd_login ("");
+    my ($account, $passwd) = $gui->get_passwd_login ($name);
 
     $self->debug ("credentials ... present");
     $self->debug ("account ... $account");
@@ -100,6 +101,9 @@ sub login
          my $ref = Digest::SHA1->new();
          $ref->add($passwd);
          $hash = $ref->b64digest();
+         ## normalize digests
+         $hash   =~ s/=*$//;
+         $digest =~ s/=*$//;
     } elsif ($algorithm eq"md5") {
          my $ref = Digest::MD5->new();
          $ref->add($passwd);
@@ -112,6 +116,7 @@ sub login
 
     ## compare passphrases
     if ($hash ne $digest) {
+        $self->debug ("mismatch with digest in database ($digest)");
         CTX('log')->log (FACILITY => "auth",
                          PRIORITY => "warn",
                          MESSAGE  => "Login to internal database failed (wrong passphrase).\n".

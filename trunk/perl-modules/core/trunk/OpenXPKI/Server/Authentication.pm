@@ -28,7 +28,7 @@ sub new {
     my $class = ref($that) || $that;
 
     my $self = {
-                DEBUG     => 0,
+                DEBUG     => 1,
                };
 
     bless $self, $class;
@@ -133,7 +133,7 @@ sub __load_handler
     $self->debug ("name ::= $name");
     $self->debug ("type ::= $type");
     $type = "OpenXPKI::Server::Authentication::$type";
-    $self->{PKI_REALM}->{$name}->{HANDLER}->{$name} = eval {
+    $self->{PKI_REALM}->{$realm}->{HANDLER}->{$name} = eval {
 
         $type->new ({DEBUG   => $self->{DEBUG},
                      XPATH   => ['pki_realm', 'auth', 'handler'],
@@ -168,21 +168,45 @@ sub login
                     STACKS => {%{$self->{PKI_REALM}->{$realm}->{STACK}}}
                                                       });
 
+    if (not $stack)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_NO_STACK_PRESENT");
+    }
+    if (not exists $self->{PKI_REALM}->{$realm}->{STACK}->{$stack} or
+        not scalar @{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK",
+            params  => {STACK => $stack});
+    }
+
     my $ok = 0;
     foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}})
     {
+        $self->debug ("handler $handler from stack $stack");
         my $ref = $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler};
+        if (not ref $ref)
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_WRONG_HANDLER",
+                params  => {PKI_REALM => $realm, HANDLER => $handler});
+        }
         eval
         {
-            $ref->login();
+            $ref->login($handler);
         };
         if (not $EVAL_ERROR)
         {
+            $self->debug ("login ok");
             $ok = 1;
             $keys->{SESSION}->set_user ($ref->get_user());
             $keys->{SESSION}->set_role ($ref->get_role());
-            $keys->{SESSION}->finish_authentication();
+            $keys->{SESSION}->make_valid();
+            $self->debug ("session configured");
             last;
+        } else {
+            $self->debug ("EVAL_ERROR detected");
         }
     }
     if (not $ok)
