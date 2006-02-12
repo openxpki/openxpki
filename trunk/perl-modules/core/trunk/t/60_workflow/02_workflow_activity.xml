@@ -21,9 +21,15 @@
 	   is_required="yes"/>
   </action>
 
-  <action name="token.get"
+  <action name="token.default.get"
 	  class="OpenXPKI::Server::Workflow::Activity::Token::Get">
-    <description>Instantiate a crypto token</description>
+    <description>Instantiate a default crypto token</description>
+  </action>
+
+  <action name="token.ca.get"
+	  class="OpenXPKI::Server::Workflow::Activity::Token::Get"
+	  tokentype="CA">
+    <description>Instantiate a CA crypto token</description>
   </action>
 
   <action name="passphrase.generate"
@@ -44,4 +50,15 @@
 	   description="PKCS#10 encoded certificate request"
 	   is_required="yes"/>
   </action>
+
+  <action name="profile.get"
+	  class="OpenXPKI::Server::Workflow::Activity::Profile::Create">
+    <description>Get certificate profile</description>
+  </action>
+
+  <action name="certificate.issue"
+	  class="OpenXPKI::Server::Workflow::Activity::Certificate::Issue">
+    <description>Issue certificate</description>
+  </action>
+
 </actions>

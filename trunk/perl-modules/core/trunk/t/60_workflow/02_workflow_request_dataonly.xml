@@ -11,7 +11,7 @@
 
   <state name="GET_TOKEN" autorun="yes">
     <description>Obtain crypto token</description>
-    <action name="token.get"
+    <action name="token.default.get"
 	    resulting_state="GENERATE_PASSPHRASE"/>
   </state>
 
@@ -45,6 +45,25 @@
   <state name="CREATE_REQUEST">
     <description>Create certificate request</description>
     <action name="request.certificate.pkcs10.create"
+	    resulting_state="GET_CA_TOKEN"/>
+  </state>
+
+  <state name="GET_CA_TOKEN">
+    <description>Get CA Token</description>
+    <action name="token.ca.get"
+	    resulting_state="GET_PROFILE"/>
+    <tokentype>CA</tokentype>
+  </state>
+
+  <state name="GET_PROFILE">
+    <description>Get certificate profile</description>
+    <action name="profile.get"
+	    resulting_state="ISSUE_CERTIFICATE"/>
+  </state>
+
+  <state name="ISSUE_CERTIFICATE">
+    <description>Issue requested certificate</description>
+    <action name="certificate.issue"
 	    resulting_state="FINISHED"/>
   </state>
 

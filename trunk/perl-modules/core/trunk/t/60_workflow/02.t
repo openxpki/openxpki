@@ -8,7 +8,7 @@ use Test;
 
 use Workflow::Factory;
 
-BEGIN { plan tests => 48; };
+BEGIN { plan tests => 74; };
 
 print STDERR "OpenXPKI::Server::Workflow - Sample workflow instance processing\n";
 
@@ -57,10 +57,10 @@ foreach my $testmode (qw( user_supplied_passphrase
 
     # other parameters
     $context->param(subject  => 'CN=John Doe, DC=example, DC=com');
-    $context->param(profile  => 'dummy');
+    $context->param(role  => 'User');
     # $context->param(keytype  => 'DSA');
     # $context->param(keylength  => 1024);
-    $context->param(tokentype => 'DEFAULT');
+    # $context->param(tokentype => 'DEFAULT'); # defined in configuration
     $context->param(pkirealm  => 'Test Root CA');
 
     if ($testmode eq "user_supplied_passphrase") {
@@ -131,14 +131,42 @@ foreach my $testmode (qw( user_supplied_passphrase
     ### PKCS10 request: $context->param('pkcs10request')
     ok($context->param('pkcs10request') =~ /^-----BEGIN CERTIFICATE REQUEST-----/);
 
+
+    # TODO: determine issuing CA for pki_realm
+    # simluation:
+    $context->param(ca => 'INTERNAL_CA_1');
+
+    ### do_step - get ca token...
+    do_step($workflow, 
+	    EXPECTED_STATE => 'GET_CA_TOKEN',
+	    EXPECTED_ACTIONS => [ 'token.ca.get', ],
+	    EXECUTE_ACTION => 'token.ca.get',
+	);
+
+    ### do_step - determine certificate profile
+    do_step($workflow, 
+	    EXPECTED_STATE => 'GET_PROFILE',
+	    EXPECTED_ACTIONS => [ 'profile.get', ],
+	    EXECUTE_ACTION => 'profile.get',
+	);
+
+
+    ### do_step - issue certificate
+    do_step($workflow, 
+	    EXPECTED_STATE => 'ISSUE_CERTIFICATE',
+	    EXPECTED_ACTIONS => [ 'certificate.issue', ],
+	    EXECUTE_ACTION => 'certificate.issue',
+	);
+
     ### do_step - finished...
     do_step($workflow, 
 	    EXPECTED_STATE => 'FINISHED',
 	    EXPECTED_ACTIONS => [  ],
 	);
 
-    ## $context
-
+    ### $context->param('certificate')
+    ok($context->param('certificate') =~ /^-----BEGIN CERTIFICATE-----/);
+    
 }
 
 

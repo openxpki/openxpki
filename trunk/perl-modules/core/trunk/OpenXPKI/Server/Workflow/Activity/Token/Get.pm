@@ -15,19 +15,22 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Server::Context qw( CTX );
 
 sub execute {
-    my $self = shift;
-    my $workflow = shift;
+    my ($self,
+	$workflow) = @_;
 
     $self->SUPER::execute($workflow,
 			  {
 			      ACTIVITYCLASS => 'PUBLIC',
 			      PARAMS => {
 				  tokentype => {
+				      accept_from => [ 'config', 'default' ],
 				      default => 'DEFAULT',
 				  },
-				  tokenname => {
+				  ca => {
+				      accept_from => [ 'context' ],
 				  },
 				  pkirealm => {
+				      accept_from => [ 'context' ],
 				      required => 1,
 				  },
 			      },
@@ -44,14 +47,18 @@ sub execute {
 						   CONFIG => $config,
 	);
 
+    ### tokentype: $self->param('tokentype')
+
     my $token = $mgmt->get_token(TYPE => $self->param('tokentype'), 
-				 NAME => $self->param('tokenname'),
-				 PKI_REALM => $self->param('pkirealm')
+				 # FIXME: can we imply here that
+				 # tokenname == internal CA name? Does this
+				 # work for multiple tokens for one
+				 # CA?
+				 NAME => $self->param('ca'), 
+				 PKI_REALM => $self->param('pkirealm'),
 	);
     
-    # export
     $context->param(_token => $token);
-
 
     $workflow->add_history(
         Workflow::History->new({

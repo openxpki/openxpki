@@ -19,25 +19,34 @@ sub execute {
     my $self = shift;
     my $workflow = shift;
 
+    my $_public = [ 'context', 'config', 'default' ];
+
     $self->SUPER::execute($workflow,
 			  {
 			      ACTIVITYCLASS => 'PUBLIC',
 			      PARAMS => {
 				  keytype => {
+				      accept_from => $_public,
 				      default => 'RSA',
 				  },
 				  curvename => {
+				      accept_from => $_public,
+				      default => 'prime192v1',
 				  },
 				  keylength => {
+				      accept_from => $_public,
 				      default => 1024,
 				  },
 				  keyencryptionalgorithm => {
+				      accept_from => $_public,
 				      default => 'aes256',
 				  },
 				  passphrase => {
+				      accept_from => [ 'context' ],
 				      required => 1,
 				  },
 				  _token => {
+				      accept_from => [ 'context' ],
 				      required => 1,
 				  },
 			      },

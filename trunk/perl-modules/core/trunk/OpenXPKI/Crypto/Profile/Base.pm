@@ -427,6 +427,7 @@ sub get_named_extensions
 our $AUTOLOAD;
 sub AUTOLOAD {
     my $self = shift;
+    return if ($AUTOLOAD =~ m{ \A .*::DESTROY \z}xms);
     return "" if ($AUTOLOAD =~ s/^.*:get_//);
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_AUTOLOAD_ILLEGAL_FUNCTION",

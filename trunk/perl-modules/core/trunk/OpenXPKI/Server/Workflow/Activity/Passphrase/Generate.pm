@@ -24,6 +24,7 @@ sub execute {
 			      ACTIVITYCLASS => 'PUBLIC',
 			      PARAMS => {
 				  _token => {
+				      accept_from => [ 'context' ],
 				      required => 1,
 				  },
 				  passphrase => {

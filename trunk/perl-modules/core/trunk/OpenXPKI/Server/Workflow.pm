@@ -34,6 +34,8 @@ for limitations that exist for data stored in Workflow Contexts.
 
 =head3 Creating new activities
 
+For creating a new Workflow activity it is advisable to start with the
+activity template available in OpenXPKI::Server::Workflow::Activity::Skeleton.
 
 =head3 Authorization and access control
 

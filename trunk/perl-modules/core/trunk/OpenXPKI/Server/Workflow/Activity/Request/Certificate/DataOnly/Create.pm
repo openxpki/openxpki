@@ -22,6 +22,7 @@ sub execute {
 			      ACTIVITYCLASS => 'PUBLIC',
 			      PARAMS => {
 				  creator => {
+				      accept_from => [ 'context' ],
 				      required => 1,
 				  },
 			      },
