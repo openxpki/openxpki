@@ -28,7 +28,7 @@ sub new {
     my $class = ref($that) || $that;
 
     my $self = {
-                DEBUG     => 1,
+                DEBUG     => 0,
                };
 
     bless $self, $class;

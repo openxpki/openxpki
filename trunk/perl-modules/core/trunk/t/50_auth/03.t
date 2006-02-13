@@ -26,7 +26,7 @@ ok($auth);
 
 ## create new session
 my $session = OpenXPKI::Server::Session->new (
-                  DEBUG     => 1,
+                  DEBUG     => 0,
                   DIRECTORY => "t/50_auth/",
                   LIFETIME  => 5);
 ok($session);
@@ -36,7 +36,7 @@ $session->set_pki_realm ("Test Root CA");
 
 ## create new test user interface
 my $gui = OpenXPKI::UI::Test->new({
-              "DEBUG"                => 1,
+              "DEBUG"                => 0,
               "AUTHENTICATION_STACK" => "Anonymous"});
 ok(OpenXPKI::Server::Context::setcontext ("gui" => $gui));
 

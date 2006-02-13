@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use English;
 use Test;
-BEGIN { plan tests => 7 };
+BEGIN { plan tests => 8 };
 
-print STDERR "OpenXPKI::Server::Authentication::Password\n";
+print STDERR "OpenXPKI::Server::Authentication::External\n";
 
 use OpenXPKI::UI::Test;
 use OpenXPKI::Server::Session;
@@ -36,10 +36,10 @@ $session->set_pki_realm ("Test Root CA");
 
 ## create new test user interface
 my $gui = OpenXPKI::UI::Test->new({
-              "DEBUG"                => 0,
-              "AUTHENTICATION_STACK" => "User",
-              "LOGIN"                => "John Doe",
-              "PASSWD"               => "Doe"});
+           "DEBUG"                => 0,
+           "AUTHENTICATION_STACK" => "External Static",
+           "LOGIN"                => "John Doe",
+           "PASSWD"               => "User"});
 ok(OpenXPKI::Server::Context::setcontext ("gui" => $gui));
 
 ## perform authentication
@@ -47,5 +47,6 @@ ok($auth->login ({"SESSION" => $session}));
 
 ## check session
 ok($session->is_valid());
+ok($session->get_role() eq "RA Operator"); # see auth.xml
 
 1;

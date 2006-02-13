@@ -29,42 +29,41 @@ sub new {
     $self->{DEBUG} = 1 if ($keys->{DEBUG});
     $self->debug ("start");
 
-    my $config = CTX->config();
+    my $config = CTX('xml_config');
 
-    $self->{COMMAND} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "command" ],
-                                           COUNTER => [ %{$keys->{COUNTER}}, 0 ]);
+    $self->{COMMAND} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "command" ],
+                                           COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
     $self->debug("command: ".$self->{COMMAND});
 
-    if ($config->get_xpath_count (XPATH   => [ %{$keys->{XPATH}},   "role" ],
-                                  COUNTER => [ %{$keys->{COUNTER}}, 0 ]))
+    $self->{ROLE} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "role" ],
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+    $self->debug("role: ".$self->{ROLE});
+    if (not length ($self->{ROLE}))
     {
-        $self->{ROLE} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "role" ],
-                                            COUNTER => [ %{$keys->{COUNTER}}, 0 ]);
-        $self->debug("role: ".$self->{ROLE});
-    } else {
-        $self->{PATTERN} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "pattern" ],
-                                               COUNTER => [ %{$keys->{COUNTER}}, 0 ]);
-        $self->{REPLACE} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "replacement" ],
-                                               COUNTER => [ %{$keys->{COUNTER}}, 0 ]);
+        delete $self->{ROLE};
+        $self->{PATTERN} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "pattern" ],
+                                               COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+        $self->{REPLACE} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "replacement" ],
+                                               COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
     }
 
     # get environment settings
     $self->debug ("loading environment variable settings");
 
     my @clearenv;
-    my $count = $config->get_xpath_count (XPATH    => [ %{$keys->{XPATH}}, 'env' ],
+    my $count = $config->get_xpath_count (XPATH    => [ @{$keys->{XPATH}}, 'env' ],
                                           COUNTER  => $keys->{COUNTER});
 		
     for (my $i = 0; $i < $count; $i++)
     {
-        my $name = $config->get_xpath (XPATH    => [ %{$keys->{XPATH}},   'env', 'name' ],
-                                       COUNTER  => [ %{$keys->{COUNTER}}, $i,    0 ]);
-        my $value = $config->get_xpath (XPATH    => [ %{$keys->{XPATH}},   'env', 'value' ],
-                                        COUNTER  => [ %{$keys->{COUNTER}}, $i,    0 ]);
+        my $name = $config->get_xpath (XPATH    => [ @{$keys->{XPATH}},   'env', 'name' ],
+                                       COUNTER  => [ @{$keys->{COUNTER}}, $i,    0 ]);
+        my $value = $config->get_xpath (XPATH    => [ @{$keys->{XPATH}},   'env', 'value' ],
+                                        COUNTER  => [ @{$keys->{COUNTER}}, $i,    0 ]);
         $self->{ENV}->{$name} = $value;
         if (exists $self->{CLEARENV})
         {
-            push (@{$self->{CLEARENV}}, $name);
+            push @{$self->{CLEARENV}}, $name;
         } else {
             $self->{CLEARENV} = [ $name ];
         }
@@ -80,9 +79,10 @@ sub login
 {
     my $self = shift;
     $self->debug ("start");
-    my $gui = shift;
+    my $name = shift;
+    my $gui  = CTX('gui');
 
-    my ($account, $passwd) = $gui->get_passwd_login ("");
+    my ($account, $passwd) = $gui->get_passwd_login ($name);
 
     $self->debug ("credentials ... present");
     $self->debug ("account ... $account");
@@ -114,7 +114,7 @@ sub login
     #   system.
     # SO DON'T EVEN THINK ABOUT IT!
     my $out = `$command`;
-    map { undef $ENV{$_} } @{$self->{CLEARENV}}; # clear environment
+    map { delete $ENV{$_} } @{$self->{CLEARENV}}; # clear environment
 
     $self->debug("command returned $?, STDOUT was: $out");
 		
