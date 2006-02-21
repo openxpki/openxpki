@@ -22,7 +22,7 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {DEBUG  => 0};
+    my $self = {DEBUG  => CTX('debug')};
 
     bless $self, $class;
 

@@ -31,25 +31,38 @@ sub execute {
           : "CA";
 
     my $authorized = 1;
+    # mbartosch
     # FIXME: add call to authorization module
-#     my $authorized = CTX('authorization')->authorize(
-# 	ACTIVITYCLASS => $activityclass,
-# 	ACTIVITY      => $self->param('activity'),
-# 	# original creator of this workflow instance
-# 	CREATOR       => $workflow->context()->param('creator'),
-# 	# current user who executes this particular activity
-# 	USER          => $workflow->context()->param('user'),
-# 	);
+    # my $authorized = CTX('authorization')->authorize(
+    #                      ACTIVITYCLASS => $activityclass,
+    #                      ACTIVITY      => $self->param('activity'),
+    #                      # original creator of this workflow instance
+    #                      CREATOR       => $workflow->context()->param('creator'),
+    #                      # current user who executes this particular activity
+    #                      USER          => $workflow->context()->param('user'),
+    #                  );
+    #
+    # if (! $authorized)
+    # {
+    #     OpenXPKI::Exception->throw (
+    #         message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_AUTHORIZATION_FAILED",
+    #         params  => { 
+    #             ACTIVITYCLASS => $activityclass,
+    #             ACTIVITY      => $self->param('activity'),
+    #             USER          => $workflow->context()->param('user'),
+    #         }
+    #     );
+    # }
 
-    if (! $authorized) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_AUTHORIZATION_FAILED",
-	    params  => { 
-		ACTIVITYCLASS => $activityclass,
-		ACTIVITY      => $self->param('activity'),
-		USER          => $workflow->context()->param('user'),
-	    });
-    }
+    # bellmich
+    # added authorization call
+    # FIXME: we can only support on operation. Please choose:
+    # FIXME:   1. ACTIVITYCLASS
+    # FIXME:   2. ACTIVITY
+    #    ACTIVITYCLASS => $activityclass,
+    CTX('acl')->authorize ({
+        ACTIVITY      => $self->param('activity'),
+        AFFECTED_ROLE => $workflow->context()->param('role')});
 
     return 1;
 }

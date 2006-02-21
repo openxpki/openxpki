@@ -100,6 +100,7 @@ OpenXPKI/Server/Authentication/External.pm
 OpenXPKI/Server/Authentication/LDAP.pm
 OpenXPKI/Server/Authentication/Password.pm
 OpenXPKI/Server/Authentication/X509.pm
+OpenXPKI/Server/ACL.pm
 OpenXPKI/UI/Test.pm
 
 ## Workflow
@@ -193,6 +194,9 @@ t/50_auth/03.t
 t/50_auth/04.t
 t/50_auth/05.t
 t/50_auth/06.t
+t/50_auth/07.t
+t/50_auth/08.t
+t/50_auth/acl.xml
 t/50_auth/auth.xml
 
 t/60_workflow/01.t

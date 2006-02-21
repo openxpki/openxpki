@@ -137,6 +137,7 @@
       <xsd:element name="common" type="pki_realm_common_type"/>
       <xsd:element name="ca"     type="ca_type" maxOccurs="unbounded"/>
       <xsd:element name="auth"   type="auth_type"/>
+      <xsd:element name="acl"    type="acl_type"/>
     </xsd:sequence>
     <xsd:attribute name="name" type="xsd:string"/>
   </xsd:complexType>
@@ -488,11 +489,24 @@
 
   <xsd:complexType name="auth_handler_type">
     <xsd:sequence>
+      <xsd:element name="command"
+                   type="xsd:string"
+                   minOccurs="0"/>
       <xsd:element name="role"
                    type="xsd:string"
                    minOccurs="0"/>
       <xsd:element name="user"
                    type="auth_handler_password_type"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="pattern"
+                   type="xsd:string"
+                   minOccurs="0"/>
+      <xsd:element name="replacement"
+                   type="xsd:string"
+                   minOccurs="0"/>
+      <xsd:element name="env"
+                   type="option_type"
                    minOccurs="0"
                    maxOccurs="unbounded"/>
     </xsd:sequence>
@@ -522,6 +536,39 @@
   <!-- =============END============ -->
   <!-- authentication configuration -->
   <!-- ============================ -->
+
+  <!-- ================= -->
+  <!-- ACL configuration -->
+  <!-- =====BEGIN======= -->
+
+  <xsd:complexType name="acl_type">
+    <xsd:sequence>
+      <xsd:element name="server"     type="acl_server_type"     maxOccurs="unbounded"/>
+      <xsd:element name="role"       type="xsd:string"          maxOccurs="unbounded"/>
+      <xsd:element name="permission" type="acl_permission_type" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute ref="xml:base"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="acl_server_type">
+    <xsd:sequence>
+      <xsd:element name="id"   type="xsd:nonNegativeInteger" maxOccurs="unbounded"/>
+      <xsd:element name="name" type="xsd:string"             maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="acl_permission_type">
+    <xsd:sequence>
+      <xsd:element name="server"        type="xsd:string" maxOccurs="unbounded"/>
+      <xsd:element name="activity"      type="xsd:string" maxOccurs="unbounded"/>
+      <xsd:element name="affected_role" type="xsd:string" maxOccurs="unbounded"/>
+      <xsd:element name="auth_role"     type="xsd:string" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ======END======== -->
+  <!-- ACL configuration -->
+  <!-- ================= -->
 
   <!-- =================== -->
   <!-- general definitions -->

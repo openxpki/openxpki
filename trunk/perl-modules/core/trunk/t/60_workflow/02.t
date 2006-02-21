@@ -8,7 +8,7 @@ use Test;
 
 use Workflow::Factory;
 
-BEGIN { plan tests => 74; };
+BEGIN { plan tests => 75; };
 
 print STDERR "OpenXPKI::Server::Workflow - Sample workflow instance processing\n";
 

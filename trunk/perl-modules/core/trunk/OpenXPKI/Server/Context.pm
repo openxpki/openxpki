@@ -31,6 +31,9 @@ my $context = {
 	api          => undef,
 	server       => undef,
         gui          => undef,
+        acl          => undef,
+        session      => undef,
+        debug        => undef,
     },
 };
 
@@ -56,6 +59,7 @@ sub CTX {
 	if (! exists $context->{exported}->{$object}) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND",
+                params  => {OBJECT => $object},
 		);
 	}
 	push @return, $context->{exported}->{$object};
@@ -114,6 +118,7 @@ sub create {
 	       log            => $log,
 	       dbi_backend    => $dbi_backend,
 	       dbi_workflow   => $dbi_workflow,
+               debug          => $params->{DEBUG},
 	);
 
     $context->{initialized} = 1;

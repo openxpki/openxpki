@@ -10,6 +10,8 @@ use English;
 use Log::Log4perl qw(:easy);
 use File::Spec;
 
+use OpenXPKI::Server::Session;
+use OpenXPKI::Server::ACL;
 use OpenXPKI::Server::Context qw( CTX );
 
 # use Smart::Comments;
@@ -126,5 +128,17 @@ Log::Log4perl->easy_init($ERROR);
 ### try to connect to database
 our $dbi = CTX('dbi_workflow');
 ok($dbi->connect());
+
+## create a valid session
+my $session = OpenXPKI::Server::Session->new (
+                  DEBUG     => 1,
+                  DIRECTORY => "t/60_workflow/",
+                  LIFETIME  => 100);
+$session->set_pki_realm ("Test Root CA");
+$session->set_role ("CA Operator");
+$session->make_valid ();
+ok(OpenXPKI::Server::Context::setcontext (
+       session => $session,
+       acl     => OpenXPKI::Server::ACL->new()));
 
 1;

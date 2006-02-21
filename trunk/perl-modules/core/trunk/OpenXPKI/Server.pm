@@ -17,6 +17,7 @@ use English;
 use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Server::ACL;
 use OpenXPKI::Server::API;
 
 sub new
@@ -57,9 +58,13 @@ sub new
 
     # attach this server object and the API to the global context
     # FIXME: move api initalization into Context package?
+    # FIXME: the context must be initialized in to phase
+    # FIXME:   1. minimum init with dbeug and config
+    # FIXME:   2. major init with server, api and acl
     OpenXPKI::Server::Context::setcontext(
 	server => $self,
-	api    => OpenXPKI::Server::API->new(DEBUG => $self->{DEBUG}),
+        acl    => OpenXPKI::Server::ACL->new(),
+	api    => OpenXPKI::Server::API->new(),
 	);
 
     ## group access is allowed
