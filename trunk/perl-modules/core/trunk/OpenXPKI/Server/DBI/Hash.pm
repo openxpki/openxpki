@@ -11,6 +11,7 @@ use utf8;
 package OpenXPKI::Server::DBI::Hash;
 
 use OpenXPKI qw(debug);
+use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::DBI::SQL;
 use OpenXPKI::Server::DBI::Schema;
 
@@ -23,20 +24,6 @@ sub new
     $self->debug ("init complete");
     return $self;
 }
-
-sub set_session_id
-{
-    my $self = shift;
-    $self->{SESSION_ID} = shift;
-    return $self->{SESSION_ID};
-}
-
-#sub set_log_ref
-#{
-#    my $self = shift;
-#    $self->{log} = shift;
-#    return $self->{log};
-#}
 
 ########################################################################
 
@@ -183,9 +170,9 @@ sub __log_write_action
     }
     $message .= "\ntable=".$table;
     $message .= "\nstatus=".$status if (defined $status);
-    if (exists $self->{SESSION_ID})
+    if (eval{ CTX('session') })
     {
-        $message .= "\nsession=".$self->{SESSION_ID};
+        $message .= "\nsession=".CTX('session')->get_id();
     } else {
         $message .= "\nsession=undef";
     }
@@ -230,16 +217,6 @@ of the database.
 
 is the constructor. It needs at minimum SQL with an instance
 of OpenXPKI::Server::DBI::SQL.  You can specify optionally DEBUG.
-
-=head2 set_session_id
-
-configure the session ID which is used for logging.
-
-=head2 set_log_ref
-
-configure the instance of a logging class to support logging.
-This is necessary because the database module is one of the core
-modules which will be initialized first.
 
 =head1 SQL related Functions
 

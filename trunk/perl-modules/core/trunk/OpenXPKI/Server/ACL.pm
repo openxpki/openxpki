@@ -27,8 +27,8 @@ sub new {
 
     bless $self, $class;
 
-    my $keys = { @_ };
-    $self->{DEBUG}       = 1 if ($keys->{DEBUG});
+    my $keys = shift;
+    $self->{DEBUG} = 1 if ($keys->{DEBUG});
     $self->debug ("start");
 
     return undef if (not $self->__load_config ());
@@ -66,7 +66,7 @@ sub __load_pki_realm
     my $realm = $keys->{PKI_REALM};
 
     my $name = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'name'],
-                                         COUNTER => [$realm, 0]);
+                                             COUNTER => [$realm, 0]);
     $self->{PKI_REALM}->{$name}->{POS} = $realm;
 
     $self->__load_server      ({PKI_REALM => $name});
@@ -121,12 +121,7 @@ sub __load_roles
         my $role = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'role'],
                        COUNTER => [ $pkiid, 0, $i]);
-        if ($i != 0)
-        {
-            push @{$self->{PKI_REALM}->{$realm}->{ROLES}}, $role;
-        } else {
-            $self->{PKI_REALM}->{$realm}->{ROLES} = [ $role ];
-        }
+        $self->{PKI_REALM}->{$realm}->{ROLES}->{$role} = 1;
     }
     return 1;
 }
@@ -169,12 +164,12 @@ sub __load_permissions
 
         ## evaluate owner
         my @owners = ($owner);
-           @owners = @{$self->{PKI_REALM}->{$realm}->{ROLES}}
+           @owners = keys %{$self->{PKI_REALM}->{$realm}->{ROLES}}
                if ($owner eq "*");
 
         ## evaluate user
         my @users = ($user);
-           @users = @{$self->{PKI_REALM}->{$realm}->{ROLES}}
+           @users = keys %{$self->{PKI_REALM}->{$realm}->{ROLES}}
                if ($user eq "*");
 
         ## an activity wildcard results in a *
@@ -185,14 +180,7 @@ sub __load_permissions
         {
             foreach $user (@users)
             {
-                if (exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user})
-                {
-                    push @{$self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}},
-                         $activity;
-                } else {
-                    $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user} =
-                        [ $activity ];
-                }
+                $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{$activity} = 1;
                 $self->debug ("permission: $realm, $owner, $user, $activity");
             }
         }
@@ -222,7 +210,7 @@ sub authorize
                                               defined $keys->{AFFECTED_ROLE});
     my $activity = $keys->{ACTIVITY};
 
-    if (not grep (/^$owner$/, @{$self->{PKI_REALM}->{$realm}->{ROLES}}))
+    if (not exists $self->{PKI_REALM}->{$realm}->{ROLES}->{$owner})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_ILLEGAL_AFFECTED_ROLE",
@@ -232,7 +220,7 @@ sub authorize
                         AUTH_ROLE     => $user});
     }
 
-    if (not grep (/^$user$/, @{$self->{PKI_REALM}->{$realm}->{ROLES}}))
+    if (not exists $self->{PKI_REALM}->{$realm}->{ROLES}->{$user})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_ILLEGAL_AUTH_ROLE",
@@ -242,11 +230,9 @@ sub authorize
                         AUTH_ROLE     => $user});
     }
 
-    if (not grep (/^$activity$/,
-                  @{$self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}})
+    if (not exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{$activity}
         and
-        not grep (/^\*$/,
-                  @{$self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}}))
+        not exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{'*'})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED",
@@ -260,3 +246,31 @@ sub authorize
 
 1;
 __END__
+=head1 Description
+
+The ACL module implements the authorization for the OpenXPKI core system.
+
+=head1 Functions
+
+=head2 new
+
+is the constructor of the module. Only one parameter is accepted - DEBUG.
+The constructor loads all ACLs of all PKI realms. Every PKI realm must include
+an ACL section in its configuration. This configuration includes a definition
+of all servers, all supported roles and all permissions.
+
+=head2 authorize
+
+is the function which grant the right to execute an activity. The function
+needs two parameters ACTIVITY and AFFECTED_ROLE. The activity is the activity
+which is performed by the workflow engine. The affected role is the role of
+the object which is handled by the activity. If you create a request for
+a certificate with the role "RA Operator" then the affected role is
+"RA Operator".
+
+The other needed parameters will be automatically determined via the active
+session. It is not necessary to specify a PKI realm or the role of the logged
+in user.
+
+If the access is granted then function returns a true value. If the access
+is denied then an exception is thrown.

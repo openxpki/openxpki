@@ -17,8 +17,7 @@ use English;
 use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::ACL;
-use OpenXPKI::Server::API;
+use OpenXPKI::Server::Init;
 
 sub new
 {
@@ -49,23 +48,11 @@ sub new
     }
 
     ## initialization
-    OpenXPKI::Server::Context::create(
-	DEBUG  => $self->{DEBUG},
-	CONFIG => $self->{CONFIG}
-	);
-
-    $self->__redirect_stderr();
-
-    # attach this server object and the API to the global context
-    # FIXME: move api initalization into Context package?
-    # FIXME: the context must be initialized in to phase
-    # FIXME:   1. minimum init with dbeug and config
-    # FIXME:   2. major init with server, api and acl
-    OpenXPKI::Server::Context::setcontext(
-	server => $self,
-        acl    => OpenXPKI::Server::ACL->new(),
-	api    => OpenXPKI::Server::API->new(),
-	);
+    OpenXPKI::Server::Init->new({
+        DEBUG  => $self->{DEBUG},
+        CONFIG => $self->{CONFIG},
+        SERVER => $self
+    });
 
     ## group access is allowed
     $self->{umask} = umask 0007;
@@ -104,8 +91,9 @@ sub process_request
 		   FACILITY => "system");
         return;
     }
-    OpenXPKI::Server::Context::setcontext(
-        'ui' => $self->{ui_list}->{$class});
+    OpenXPKI::Server::Context::setcontext({
+        'ui' => $self->{ui_list}->{$class}
+    });
 
     ## update pre-initialized variables
 
@@ -131,30 +119,6 @@ sub process_request
 
 ###########################################################################
 # private methods
-
-sub __redirect_stderr
-{
-    my $self = shift;
-    $self->debug ("start");
-
-    my $config = CTX('xml_config');
-
-    my $stderr = $config->get_xpath (XPATH => "common/server/stderr");
-    if (not $stderr)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_MISSING_STDERR");
-    }
-    $self->debug ("switching stderr to $stderr");
-    if (not open STDERR, '>>', $stderr)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_FAILED");
-    }
-    binmode STDERR, ":utf8";
-    return 1;
-}
-
 
 sub __get_user_interfaces
 {
@@ -287,7 +251,7 @@ sub command
 
     if (not CTX('session')->is_valid())
     {
-        $self->{authentication}->login({SESSION => CTX('session')});
+        CTX('authentication')->login();
     }
 }
 

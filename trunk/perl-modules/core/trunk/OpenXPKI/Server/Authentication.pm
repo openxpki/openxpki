@@ -28,13 +28,13 @@ sub new {
     my $class = ref($that) || $that;
 
     my $self = {
-                DEBUG     => 0,
+                DEBUG => CTX('debug'),
                };
 
     bless $self, $class;
 
-    my $keys = { @_ };
-    $self->{DEBUG}       = 1 if ($keys->{DEBUG});
+    my $keys       = shift;
+    $self->{DEBUG} = 1 if ($keys->{DEBUG});
     $self->debug ("start");
 
     return undef if (not $self->__load_config ());
@@ -157,13 +157,12 @@ sub __load_handler
 sub login
 {
     my $self = shift;
-    my $keys = shift;
 
     $self->debug ("Starting authentication ... ");
 
-    $keys->{SESSION}->start_authentication();
+    CTX('session')->start_authentication();
 
-    my $realm = $keys->{SESSION}->get_pki_realm();
+    my $realm = CTX('session')->get_pki_realm();
     my $stack = CTX('gui')->get_authentication_stack ({
                     STACKS => {%{$self->{PKI_REALM}->{$realm}->{STACK}}}
                                                       });
@@ -200,9 +199,9 @@ sub login
         {
             $self->debug ("login ok");
             $ok = 1;
-            $keys->{SESSION}->set_user ($ref->get_user());
-            $keys->{SESSION}->set_role ($ref->get_role());
-            $keys->{SESSION}->make_valid();
+            CTX('session')->set_user ($ref->get_user());
+            CTX('session')->set_role ($ref->get_role());
+            CTX('session')->make_valid();
             $self->debug ("session configured");
             last;
         } else {
@@ -219,3 +218,40 @@ sub login
 }
 
 1;
+__END__
+
+=head1 Description
+
+This module is the top class of OpenXPKI's authentication
+framework. Every authentication method is implemented in an
+extra class but you only have to init this class and then
+you have to call login if you need an authentication. The
+XMl configuration and session handling is done via the servers
+global context.
+
+=head1 Functions
+
+=head2 new
+
+is the constructor and accepts only one parameter - DEBUG.
+If you do not set DEBUG then the value of DEBUG in the
+server's context is used. If you call new then the complete
+configuration is loaded. This makes it possible to cash
+this object and to use login when it is required in a very
+fast way.
+
+=head2 login
+
+is the function which performs the authentication. You cannot
+specify any parameters. The function executes in the server's
+context and only uses the configuration as source for
+necessary informations. It returns true on success and throws
+an exception on failure.
+
+=head1 See Also
+
+OpenXPKI::Server::Authentication::Anonymous
+OpenXPKI::Server::Authentication::External
+OpenXPKI::Server::Authentication::LDAP
+OpenXPKI::Server::Authentication::Password
+OpenXPKI::Server::Authentication::X509

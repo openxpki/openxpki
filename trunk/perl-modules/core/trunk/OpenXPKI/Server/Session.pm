@@ -29,8 +29,8 @@ sub new {
 
     bless $self, $class;
 
-    my $keys = { @_ };
-    $self->{DEBUG}    = 1 if ($keys->{DEBUG});
+    my $keys = shift;
+    $self->{DEBUG} = 1 if ($keys->{DEBUG});
     if (exists $keys->{LIFETIME} and $keys->{LIFETIME} > 0)
     {
         $self->{LIFETIME} = $keys->{LIFETIME};

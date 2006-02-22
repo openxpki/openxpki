@@ -1,6 +1,6 @@
 ## OpenXPKI::Server::Authentication::LDAP.pm 
 ##
-## Written by Michael Bell 2003
+## Written by Peter Gietz 2005
 ## Re-Written by Michael Bell 2006
 ## Copyright (C) 2003-2006 by The OpenXPKI Project
 ## $Revision$
@@ -222,7 +222,7 @@ sub login
         if ( $is_rootdse and 
              not $root_dse->supported_extension ($starttls_OID))
         {
-            CTX->log->log (FACILITY => "system",
+            CTX('log')->log (FACILITY => "system",
                            PRIORITY => "error",
                            MESSAGE  => "LDAP Server does not support START_TLS.");
             OpenXPKI::Exception->throw (
@@ -239,7 +239,7 @@ sub login
                       "named using the hash value of the certificates\' subject names. ".
                       "To generate these names, use OpenSSL like this in Unix: ".
                       "ln -s cacert.pem \`openssl x509 -hash -noout \< cacert.pem\`.0";
-            CTX->log->log (FACILITY => "system",
+            CTX('log')->log (FACILITY => "system",
                            PRIORITY => "error",
                            MESSAGE  => "LDAP Server failed during start_tls.\n$msg\n".
                                        join ", ", $self->__get_ldap_error ($tlsmsg));
@@ -264,7 +264,7 @@ sub login
         } else {  
             $self->debug("LDAP bind: ", join ", ", $self->__get_ldap_error ($bindmsg));
         }
-        CTX->log->log (FACILITY => "system",
+        CTX('log')->log (FACILITY => "system",
                        PRIORITY => "error",
                        MESSAGE  => "LDAP bind to server failed.\n".
                                    join ", ", $self->__get_ldap_error ($bindmsg));
@@ -286,7 +286,7 @@ sub login
                          filter => $searchfilter);
     if ($searchmesg->is_error())
     {
-        CTX->log->log (FACILITY => "system",
+        CTX('log')->log (FACILITY => "system",
                        PRIORITY => "error",
                        MESSAGE  => "LDAP search on server failed.\n".
                                    join ", ", $self->__get_ldap_error ($searchmesg));
@@ -299,7 +299,7 @@ sub login
     ## no user found?
     if ( not $entrycount )
     {
-        CTX->log->log (FACILITY => "system",
+        CTX('log')->log (FACILITY => "system",
                        PRIORITY => "error",
                        MESSAGE  => "LDAP login found no matching user.");
         OpenXPKI::Exception->throw (
@@ -309,7 +309,7 @@ sub login
     ## more than one user found?
     if ( not $entrycount )
     {
-        CTX->log->log (FACILITY => "system",
+        CTX('log')->log (FACILITY => "system",
                        PRIORITY => "error",
                        MESSAGE  => "LDAP login found more then one matching entry.");
         OpenXPKI::Exception->throw (
@@ -382,7 +382,7 @@ sub login
         if ($ldapauthmeth eq "pwattr" and not $ldappwattrvaluecount )
         {
             # Error no value of ldap pw attribute 
-            CTX->log->log (FACILITY => "system",
+            CTX('log')->log (FACILITY => "system",
                            PRIORITY => "error",
                            MESSAGE  => "LDAP login found no password attribute in the entry.");
             OpenXPKI::Exception->throw (
@@ -431,7 +431,7 @@ sub login
         {
             $self->{DIGEST} = $passwd;
         } else {
-            CTX->log->log (FACILITY => "system",
+            CTX('log')->log (FACILITY => "system",
                            PRIORITY => "error",
                            MESSAGE  => "LDAP login found no hash algorithm for the entry.");
             OpenXPKI::Exception->throw (
@@ -455,7 +455,7 @@ sub login
 
         if ($self->{DIGEST} ne $ldapdigest)
         {
-             CTX->log->log (FACILITY => "auth",
+             CTX('log')->log (FACILITY => "auth",
                             PRIORITY => "warn",
                             MESSAGE  => "LDAP login failed. Password is wrong.");
              OpenXPKI::Exception->throw (
@@ -473,11 +473,11 @@ sub login
         {
             if ( $bindmsg->code() == 49 )
             {
-                CTX->log->log (FACILITY => "auth",
+                CTX('log')->log (FACILITY => "auth",
                                PRIORITY => "error",
                                MESSAGE  => "LDAP bind failed. Invalid configuration.");
             } else {   
-                CTX->log->log (FACILITY => "auth",
+                CTX('log')->log (FACILITY => "auth",
                                PRIORITY => "error",
                                MESSAGE  => "LDAP bind failed.\n".
                                            "bind error:     ".$bindmsg->error()."\n".
@@ -495,7 +495,7 @@ sub login
         }
 
     } else {
-        CTX->log->log (FACILITY => "auth",
+        CTX('log')->log (FACILITY => "auth",
                        PRIORITY => "error",
                        MESSAGE  => "LDAP config error. Unknown authentication method.");
         OpenXPKI::Exception->throw (
@@ -521,7 +521,7 @@ sub login
     }
     if ( not $found )
     {
-        CTX->log->log (FACILITY => "auth",
+        CTX('log')->log (FACILITY => "auth",
                        PRIORITY => "error",
                        MESSAGE  => "LDAP login: cannot find role for user $account.");
         OpenXPKI::Exception->throw (

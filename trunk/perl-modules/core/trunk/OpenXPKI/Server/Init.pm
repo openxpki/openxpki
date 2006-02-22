@@ -20,6 +20,11 @@ use OpenXPKI::XML::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Server::DBI;
 use OpenXPKI::Server::Log;
+use OpenXPKI::Server::ACL;
+use OpenXPKI::Server::API;
+use OpenXPKI::Server::Authentication;
+
+use OpenXPKI::Server::Context qw( CTX );
 
 ## we operate in static mode
 
@@ -34,8 +39,58 @@ sub new
 
     bless $self, $class;
 
-    my $keys = { @_ };
-    $self->{DEBUG} = $keys->{DEBUG} if ($keys->{DEBUG});
+    my $keys         = shift;
+    $self->{DEBUG}   = $keys->{DEBUG} if ($keys->{DEBUG});
+
+    ### getting xml config...
+    my $xml_config = $self->get_xml_config(CONFIG => $keys->{"CONFIG"});
+    $self->init_i18n(CONFIG => $xml_config);
+
+    ### getting crypto layer...
+    my $crypto_layer = $self->get_crypto_layer(CONFIG => $xml_config);
+
+    ### record these for later use...
+    OpenXPKI::Server::Context::setcontext({
+        xml_config   => $xml_config,
+        crypto_layer => $crypto_layer,
+        debug        => $keys->{DEBUG},
+    });
+    $self->redirect_stderr();
+
+    ### getting pki_realm...
+    my $pki_realm    = $self->get_pki_realms(CONFIG => $xml_config,
+					     CRYPTO => $crypto_layer);
+
+    ### getting logger...
+    my $log          = $self->get_log(CONFIG => $xml_config);
+
+    ### getting backend database...
+    my $dbi_backend  = $self->get_dbi(CONFIG => $xml_config,
+				      LOG    => $log);
+
+    ### getting workflow database...
+    my $dbi_workflow = $self->get_dbi(CONFIG => $xml_config,
+				      LOG    => $log);
+
+    OpenXPKI::Server::Context::setcontext({
+        pki_realm      => $pki_realm,
+        log            => $log,
+        dbi_backend    => $dbi_backend,
+        dbi_workflow   => $dbi_workflow,
+        acl            => OpenXPKI::Server::ACL->new(),
+        api            => OpenXPKI::Server::API->new(),
+        authentication => OpenXPKI::Server::Authentication->new (),
+    });
+
+    ## FIXME: why do we need a reference to our daemon?
+    ## FIXME: this sounds like a backdoor for me (bellmich)
+    ## FIXME: nevertheless I'm sure that I introduced  this :(
+    if (exists $keys->{SERVER})
+    {
+        OpenXPKI::Server::Context::setcontext({
+            server         => $keys->{SERVER},
+        });
+    }
 
     return $self;
 }
@@ -44,6 +99,11 @@ sub get_xml_config
 {
     my $self = shift;
     my $keys = { @_ };
+
+    ## this is a hack to support testing without a full initialization
+    my $debug = 0;
+       $debug = $self->{DEBUG} if (ref $self);
+
     $self->debug ("start");
 
     if (not $keys->{CONFIG})
@@ -64,7 +124,7 @@ sub get_xml_config
             params  => {"FILENAME" => $keys->{CONFIG}});
     }
 
-    return OpenXPKI::XML::Config->new (DEBUG  => $self->{"DEBUG"},
+    return OpenXPKI::XML::Config->new (DEBUG  => $debug,
                                        CONFIG => $keys->{"CONFIG"});
 }
 
@@ -296,6 +356,28 @@ sub get_log
     return $log;
 }
 
+sub redirect_stderr
+{
+    my $self = shift;
+    $self->debug ("start");
+
+    my $config = CTX('xml_config');
+
+    my $stderr = $config->get_xpath (XPATH => "common/server/stderr");
+    if (not $stderr)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_MISSING_STDERR");
+    }
+    $self->debug ("switching stderr to $stderr");
+    if (not open STDERR, '>>', $stderr)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_FAILED");
+    }
+    binmode STDERR, ":utf8";
+    return 1;
+}
 
 1;
 __END__
@@ -313,9 +395,19 @@ the customization of the code more easier.
 
 =head3 new
 
-is the constructor and exists only to support the class with a debugging
-feature. If you need to debug the class then simply specify a true value
-for the parameter DEBUG.
+Initialization must be done ONCE by the server process.
+Expects the XML configuration file via the named parameter CONFIG.
+The named parameter DEBUG may be set to a true value to enable debugging.
+
+Usage:
+
+  use OpenXPKI::Server::Init;
+
+  OpenXPKI::Server::Init::new({
+         CONFIG => 't/config.xml',
+         DEBUG => 0,
+     });
+
 
 =head3 get_xml_config
 
@@ -363,3 +455,14 @@ the database interface.
 requires only the usual instance of OpenXPKI::XML::Config in the parameter CONFIG.
 It returns an instance of the module OpenXPKI::Log.
 
+=head3 get_log
+
+requires no arguments.
+It returns an instance of the module OpenXPKI::Server::Authentication.
+The context must be already established because OpenXPKI::XML::Config is
+loaded from the context.
+
+=head3 redirect_stderr
+
+requires no arguments and is a simple function to send STDERR to
+configured file. This is useful to track all warnings and errors.

@@ -12,6 +12,7 @@ package OpenXPKI::Server::DBI::DBH;
 
 # use Smart::Comments;
 use OpenXPKI qw(debug);
+use OpenXPKI::Server::Context qw( CTX );
 use DBI;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::Driver;
@@ -56,20 +57,6 @@ sub new
 
     return $self;
 }
-
-sub set_session_id
-{
-    my $self = shift;
-    $self->{SESSION_ID} = shift;
-    return $self->{SESSION_ID};
-}
-
-#sub set_log_ref
-#{
-#    my $self = shift;
-#    $self->{log} = shift;
-#    return $self->{log};
-#}
 
 #######################################################################
 
@@ -275,7 +262,7 @@ sub rollback
         $self->{log}->log (FACILITY => "audit",
                            PRIORITY => "warn",
                            MESSAGE  => "Rollback performed.".
-                                       "\nsession=".$self->{SESSION_ID},
+                                       "\nsession=".CTX('session')->get_id(),
                            MODULE   => $package,
                            FILENAME => $filename,
                            LINE     => $line)
@@ -302,7 +289,7 @@ sub commit
         $self->{log}->log (FACILITY => "warn",
                            PRIORITY => "error",
                            MESSAGE  => "Commit failed.".
-                                       "\nsession=".$self->{SESSION_ID},
+                                       "\nsession=".CTX('session')->get_id(),
                            MODULE   => $package,
                            FILENAME => $filename,
                            LINE     => $line);
@@ -426,16 +413,6 @@ check the driver documentation (OpenXPKI::Server::DBI::Driver)
 for more informations.
 
 You should add SERVER_ID and SERVER_SHIFT to the configuration.
-
-=head2 set_session_id
-
-configure the session ID which is used for logging.
-
-=head2 set_log_ref
-
-configure the instance of a logging class to support logging.
-This is necessary because the database module is one of the core
-modules which will be initialized first.
 
 =head1 DBI related Functions
 

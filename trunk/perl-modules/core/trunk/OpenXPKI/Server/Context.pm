@@ -12,7 +12,6 @@ our @EXPORT_OK = qw( CTX );
 
 #use Smart::Comments;
 
-use OpenXPKI::Server::Init;
 use OpenXPKI::Exception;
 
 my $context = {
@@ -28,12 +27,13 @@ my $context = {
 	dbi_workflow => undef,
 
 	# user-settable
-	api          => undef,
-	server       => undef,
-        gui          => undef,
-        acl          => undef,
-        session      => undef,
-        debug        => undef,
+	api            => undef,
+	server         => undef,
+        gui            => undef,
+        acl            => undef,
+        session        => undef,
+        debug          => undef,
+        authentication => undef,
     },
 };
 
@@ -76,76 +76,52 @@ sub CTX {
     }
 }
 
-
-# only called statically (and is only executed ONCE)
-sub create {
-    my $params = { @_ };
-
-    if ($context->{initialized}) {
-	return 1;
-    }
-    
-    ### instantiating Init...
-    my $init = OpenXPKI::Server::Init->new(DEBUG => $params->{DEBUG});
-
-    ### getting xml config...
-    my $xml_config = $init->get_xml_config(CONFIG => $params->{"CONFIG"});
-    $init->init_i18n(CONFIG => $xml_config);
-
-    ### getting crypto layer...
-    my $crypto_layer = $init->get_crypto_layer(CONFIG => $xml_config);
-
-    ### getting pki_realm...
-    my $pki_realm    = $init->get_pki_realms(CONFIG => $xml_config,
-					     CRYPTO => $crypto_layer);
-
-    ### getting logger...
-    my $log          = $init->get_log(CONFIG => $xml_config);
-
-    ### getting backend database...
-    my $dbi_backend  = $init->get_dbi(CONFIG => $xml_config,
-				      LOG    => $log);
-
-    ### getting workflow database...
-    my $dbi_workflow = $init->get_dbi(CONFIG => $xml_config,
-				      LOG    => $log);
-
-
-    ### record these for later use...
-    setcontext(xml_config     => $xml_config,
-	       crypto_layer   => $crypto_layer,
-	       pki_realm      => $pki_realm,
-	       log            => $log,
-	       dbi_backend    => $dbi_backend,
-	       dbi_workflow   => $dbi_workflow,
-               debug          => $params->{DEBUG},
-	);
-
-    $context->{initialized} = 1;
-
-    return 1;
-}
-
+# you cannot initialize the stored objects in the context
+# itself because the modules uses the context too. If you
+# try it then a use statement tries to check for CTX before
+# all required modules for the Context module are loaded.
+# The export will be performed after all required module
+# are loaded.
+#
+# Example:
+# 
+# context depends on init and init on dbi
+# dbi uses CTX
+# 
+# Result Context loaded
+#        --> init must be loaded
+#        --> dbi must be loaded
+#        --> requires presence of CTX
+#        --> CTX present after context can be executed
+#        --> error CTX is no exported
+#
+# some people call this a deadlock
 
 # add new entries to the context
 sub setcontext {
-    my $params = { @_ };
+    my $params = shift;
     
+    if (not $context->{initialized}) {
+	$context->{initialized} = 1;
+    }
+
     foreach my $key (keys %{$params}) {
 	### setting $key in context...
 	if (! exists $context->{exported}->{$key} ) {
 	    ### unknown key...
 	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ILLEGAL_ENTRY",
-		);
+                message => "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ILLEGAL_ENTRY",
+                params  => {NAME => $key},
+            );
 	}
 
 	### already defined?
 	if (defined ($context->{exported}->{$key})) {
 	    ### yes, bail out
 	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ALREADY_DEFINED",
-		);
+                message => "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ALREADY_DEFINED",
+                params  => {NAME => $key},
+            );
 	}
 
 	### setting internal state...
@@ -240,22 +216,6 @@ context entries at once:
   my ($config, $log, $dbi) = CTX('xml_config', 'log', 'dbi_backend');
 
 
-=head2 create(%)
-
-Initialization must be done ONCE by the server process.
-Expects the XML configuration file via the named parameter CONFIG.
-The named parameter DEBUG may be set to a true value to enable debugging.
-
-Usage:
-
-  use OpenXPKI::Server::Context;
-
-  OpenXPKI::Server::Context::create(
-         CONFIG => 't/config.xml',
-         DEBUG => 0,
-     ));
-
-
 =head2 setcontext(%)
 
 Allows to set additional globally available Context information after
@@ -273,9 +233,9 @@ somebody tries to set an object that has already been attached.
 Usage:
 
   # attach this server object and the API to the global context
-  OpenXPKI::Server::Context::setcontext(
+  OpenXPKI::Server::Context::setcontext({
     server => $self,
     api    => OpenXPKI::Server::API->new(DEBUG => $self->{DEBUG}),
-  );
+  });
 
 

@@ -180,34 +180,34 @@ sub get_openssl_dn
     return $dn;
 }
 
-sub get_config_variable
-{
-    my $self = shift;
-    my $keys = { @_ };
-
-    my $name     = $keys->{NAME};
-    my $config   = $keys->{CONFIG};
-    my $filename = $keys->{FILENAME};
-
-    $config = $self->read_file ($filename)
-        if (not $config);
-
-    return "" if ($config !~ /^(.*\n)*\s*${name}\s*=\s*([^\n^#]+).*$/s);
-
-    my $result = $config;
-       $result =~ s/^(.*\n)*\s*${name}\s*=\s*([^\n^#]+).*$/$2/s;
-       $result =~ s/[\r\n\s]*$//s;
-    if ($result =~ /\$/)
-    {
-        my $dir = $result;
-           $dir =~ s/^.*\$([a-zA-Z0-9_]+).*$/$1/s;
-        my $value = $self->get_config_variable (NAME => $dir, CONFIG => $config);
-        ## why we use this check?
-        ## return undef if (not defined $dir);
-        $result =~ s/\$$dir/$value/g;
-    }
-    return $result;
-}
+# sub get_config_variable
+# {
+#     my $self = shift;
+#     my $keys = { @_ };
+# 
+#     my $name     = $keys->{NAME};
+#     my $config   = $keys->{CONFIG};
+#     my $filename = $keys->{FILENAME};
+# 
+#     $config = $self->read_file ($filename)
+#         if (not $config);
+# 
+#     return "" if ($config !~ /^(.*\n)*\s*${name}\s*=\s*([^\n^#]+).*$/s);
+# 
+#     my $result = $config;
+#        $result =~ s/^(.*\n)*\s*${name}\s*=\s*([^\n^#]+).*$/$2/s;
+#        $result =~ s/[\r\n\s]*$//s;
+#     if ($result =~ /\$/)
+#     {
+#         my $dir = $result;
+#            $dir =~ s/^.*\$([a-zA-Z0-9_]+).*$/$1/s;
+#         my $value = $self->get_config_variable (NAME => $dir, CONFIG => $config);
+#         ## why we use this check?
+#         ## return undef if (not defined $dir);
+#         $result =~ s/\$$dir/$value/g;
+#     }
+#     return $result;
+# }
 
 sub get_openssl_time
 {
@@ -560,7 +560,27 @@ expects a time string compliant with Date::Parse and returns
 a timestring which is compliant with the format used in
 index.txt.
 
-=head2 get_config_variable
+=head2 write_config
+
+expect an instance of the OpenXPKI crypto profile module. It writes
+a complete OpenSSL configuration to the filesystem. This includes
+an index.txt, an index.txt.attr, a serial file and an openssl.cnf.
+It depends heavily on the correct instance variables which must
+be configured by the commands. Such variables are:
+
+=over
+
+=item * SERIALFILE (with next serial in hex format)
+
+=item * INDEX_TXT (for CRL generation)
+
+=item * DATABASEFILE (index.txt filename)
+
+=item * CONFIGFILE
+
+=back
+
+=head2 get_config_variable (no longer supported)
 
 is used to find a configuration variable inside of an OpenSSL
 configuration file. The parameters are the NAME of the configuration

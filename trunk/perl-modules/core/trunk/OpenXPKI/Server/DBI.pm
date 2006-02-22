@@ -81,24 +81,6 @@ sub new {
     return $self;
 }
 
-#sub set_log_ref
-#{
-#    my $self = shift;
-#    $self->{log} = shift;
-#    $self->{dbh}->set_log_ref ($self->{log});
-#    $self->{hash}->set_log_ref ($self->{log});
-#    return $self->{log};
-#}
-
-sub set_session_id
-{
-    my $self = shift;
-    $self->{SESSION_ID} = shift;
-    $self->{dbh}->set_session_id ($self->{SESSION_ID});
-    $self->{hash}->set_session_id ($self->{SESSION_ID});
-    return $self->{SESSION_ID};
-}
-
 sub set_crypto
 {
     my $self = shift;
@@ -430,16 +412,6 @@ parameters are supported:
 =back
 
 Please remember that not all drivers can handle all parameters.
-
-=head3 set_session_id
-
-configures the session ID which is used for logging.
-
-=head3 set_log_ref
-
-configures the instance of a logging class to support logging.
-This is necessary because the database module is one of the core
-modules which will be initialized first.
 
 =head3 set_crypto
 

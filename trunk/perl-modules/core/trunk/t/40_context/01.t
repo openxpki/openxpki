@@ -5,6 +5,7 @@ use Data::Dumper;
 
 # use Smart::Comments;
 
+use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
@@ -13,14 +14,13 @@ BEGIN { plan tests => 10 };
 print STDERR "OpenXPKI::Server::Context\n";
 ok(1);
 
-### instantiating context...
-ok(OpenXPKI::Server::Context::create(
+## init XML cache
+ok(OpenXPKI::Server::Init->new ({
        CONFIG => 't/config.xml',
-       DEBUG => 0,
-   ));
+       DEBUG  => 0,
+   }));
 
 my $var;
-
 
 ### try to get basic (database) object...
 $var = undef;
@@ -35,7 +35,7 @@ if (my $exc = OpenXPKI::Exception->caught()) {
 
 ### try to set a supported custom context entry...
 eval {
-    OpenXPKI::Server::Context::setcontext(server => 'foobar');
+    OpenXPKI::Server::Context::setcontext({'server' => 'foobar'});
 };
 if (my $exc = OpenXPKI::Exception->caught()) {
     ok(0);
@@ -45,7 +45,7 @@ if (my $exc = OpenXPKI::Exception->caught()) {
 
 ### try to overwrite a supported custom context entry...
 eval {
-    OpenXPKI::Server::Context::setcontext(server => 'baz');
+    OpenXPKI::Server::Context::setcontext({'server' => 'baz'});
 };
 if (my $exc = OpenXPKI::Exception->caught()) {
     ok($exc->message(), 
@@ -65,10 +65,9 @@ if (my $exc = OpenXPKI::Exception->caught()) {
     ok($var, 'foobar');
 }
 
-
 ### try to set an illegal custom variable...
 eval {
-    OpenXPKI::Server::Context::setcontext(foo => 'bar');
+    OpenXPKI::Server::Context::setcontext({'foo' => 'bar'});
 };
 if (my $exc = OpenXPKI::Exception->caught()) {
     ok($exc->message(), 
@@ -89,7 +88,6 @@ if (my $exc = OpenXPKI::Exception->caught()) {
     ok(0);
 }
 
-
 ### trying to get multiple entries at once
 my $var1;
 my $var2;
@@ -105,7 +103,5 @@ if (my $exc = OpenXPKI::Exception->caught()) {
     $tmp = CTX('xml_config');
     ok($var2 == $tmp);
 }
-
-
 
 1;

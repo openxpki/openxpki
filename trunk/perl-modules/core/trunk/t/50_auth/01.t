@@ -10,10 +10,10 @@ use OpenXPKI::Server::Session;
 ok(1);
 
 ## create new session
-my $session = OpenXPKI::Server::Session->new (
+my $session = OpenXPKI::Server::Session->new ({
                   DEBUG     => 1,
                   DIRECTORY => "t/50_auth/",
-                  LIFETIME  => 2);
+                  LIFETIME  => 2});
 ok($session);
 
 ## get ID
@@ -38,11 +38,11 @@ undef $session;
 ok(not defined $session);
 
 ## load
-$session = OpenXPKI::Server::Session->new (
+$session = OpenXPKI::Server::Session->new ({
                DEBUG     => 1,
                DIRECTORY => "t/50_auth/",
                LIFETIME  => 2,
-               ID        => $id);
+               ID        => $id});
 ok($session);
 
 ## check that it is not valid
@@ -62,11 +62,11 @@ undef $session;
 ok(not defined $session);
 
 ## load
-$session = OpenXPKI::Server::Session->new (
+$session = OpenXPKI::Server::Session->new ({
                DEBUG     => 1,
                DIRECTORY => "t/50_auth/",
                LIFETIME  => 2,
-               ID        => $id);
+               ID        => $id});
 ok($session);
 
 ## check that it is valid
@@ -80,18 +80,18 @@ ok(not defined $session);
 ok(sleep 2);
 
 ## try to load
-eval {$session = OpenXPKI::Server::Session->new (
+eval {$session = OpenXPKI::Server::Session->new ({
                      DEBUG     => 1,
                      DIRECTORY => "t/50_auth/",
                      LIFETIME  => 2,
-                     ID        => $id);};
+                     ID        => $id});};
 ok($EVAL_ERROR);
 
 ## create new session
-$session = OpenXPKI::Server::Session->new (
+$session = OpenXPKI::Server::Session->new ({
                DEBUG     => 1,
                DIRECTORY => "t/50_auth/",
-               LIFETIME  => 2);
+               LIFETIME  => 2});
 ok($session);
 $id = $session->get_id();
 ok($id);
@@ -102,11 +102,11 @@ undef $session;
 ok(!-e "t/50_auth/cgisess_$id");
 
 ## try to load dropped session
-eval {$session = OpenXPKI::Server::Session->new (
+eval {$session = OpenXPKI::Server::Session->new ({
                      DEBUG     => 1,
                      DIRECTORY => "t/50_auth/",
                      LIFETIME  => 2,
-                     ID        => $id);};
+                     ID        => $id});};
 ok($EVAL_ERROR);
 
 1;

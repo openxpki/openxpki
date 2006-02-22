@@ -13,6 +13,7 @@ use File::Spec;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::ACL;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Server::Init;
 
 # use Smart::Comments;
 
@@ -112,10 +113,10 @@ sub do_step {
 
 
 ### initialize context
-OpenXPKI::Server::Context::create(
+OpenXPKI::Server::Init->new({
     CONFIG => 't/config.xml',
 #    DEBUG => 1,
-    );
+});
 
 ### get logging module
 our $log = CTX('log');
@@ -130,15 +131,13 @@ our $dbi = CTX('dbi_workflow');
 ok($dbi->connect());
 
 ## create a valid session
-my $session = OpenXPKI::Server::Session->new (
+my $session = OpenXPKI::Server::Session->new ({
                   DEBUG     => 1,
                   DIRECTORY => "t/60_workflow/",
-                  LIFETIME  => 100);
+                  LIFETIME  => 100});
 $session->set_pki_realm ("Test Root CA");
 $session->set_role ("CA Operator");
 $session->make_valid ();
-ok(OpenXPKI::Server::Context::setcontext (
-       session => $session,
-       acl     => OpenXPKI::Server::ACL->new()));
+ok(OpenXPKI::Server::Context::setcontext ({session => $session}));
 
 1;
