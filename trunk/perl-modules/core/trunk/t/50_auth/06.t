@@ -4,7 +4,7 @@ use English;
 use Test;
 BEGIN { plan tests => 8 };
 
-print STDERR "OpenXPKI::Server::Authentication::External\n";
+print STDERR "OpenXPKI::Server::Authentication::External (static role)\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;

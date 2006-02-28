@@ -10,6 +10,7 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Engine;
 use OpenXPKI qw (debug);
 use OpenXPKI::Exception;
 use English;
+use OpenXPKI::Server::Context qw( CTX );
 
 sub new {
     my $that = shift;
@@ -33,7 +34,6 @@ sub new {
                         PASSWD_PARTS
                         CERT
                         INTERNAL_CHAIN
-                        PARENT
                        }) {
 
 	if (exists $keys->{$key}) {
@@ -46,7 +46,7 @@ sub new {
 
 sub login {
     my $self = shift;
-    $self->{PASSWD} = $self->{PARENT}->get_ui()->get_token_passwd (
+    $self->{PASSWD} = CTX('gui')->get_token_passwd (
                           PARTS => $self->{PASSWD_PARTS},
                           TOKEN => $self->{NAME});
 

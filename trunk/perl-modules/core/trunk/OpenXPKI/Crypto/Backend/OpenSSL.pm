@@ -157,13 +157,6 @@ sub __init_command
     return 1;
 }
 
-sub set_config
-{
-    my $self = shift;
-    $self->{COMMAND_PARAMS}->{CONFIG} = shift;
-    return 1;
-}
-
 sub command
 {
     my $self = shift;
@@ -401,10 +394,6 @@ OpenXPKI::Crypto::Backend::OpenSSL::Engine for more details.
 =item * TMP (the used temporary directory which must be private)
 
 =back
-
-=head2 set_config
-
-set another OpenSSL configuration file.
 
 =head2 command
 

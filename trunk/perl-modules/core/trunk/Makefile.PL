@@ -114,6 +114,20 @@ if ($files)
     $version =~ s/\n//g;
 }
 print STDOUT "Version:         $version\n";
+print STDOUT "Statistics:\n";
+my $cmd = 'cat OpenXPKI.pm OpenXPKI.xs `find OpenXPKI -type f | grep -r -v "/\."`| wc -l';
+print STDOUT "    LOC: ".`$cmd`;
+$cmd = 'cat `find t -type f | grep -r -v "/\."`| wc -l';
+print STDOUT "    LOT: ".`$cmd`;
+$cmd = 'cat `find . -type f | grep -r -v "/\."`| wc -l';
+print STDOUT "    LOA: ".`$cmd`;
+
+## hack to avoid warnings from Log4perl
+eval
+{
+    use Log::Log4perl::Logger;
+    $Log::Log4perl::Logger::NON_INIT_WARNED = 1;
+};
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.

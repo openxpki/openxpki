@@ -35,13 +35,6 @@ sub new {
     return $self;
 }
 
-sub set_ui
-{
-    my $self    = shift;
-    $self->{UI} = shift;
-    return 1;
-}
-
 ######################################################################
 ##                     slot management                              ##
 ######################################################################
@@ -164,9 +157,7 @@ sub __add_token
 
 
     # build token parameters
-    my %token_args = ( NAME   => $name,
-		       PARENT => $self,
-	);
+    my %token_args = ( NAME   => $name );
 
     # any existing key in this hash is considered optional in %token_args
     my %is_optional = ();
@@ -408,11 +399,6 @@ parameter for this is called CONFIG. If you want to debug the module
 then must specify a true value for the parameter DEBUG. If you want to
 use an explicit temporary directory then you must specifiy this
 directory in the variable TMPDIR.
-
-=head2 set_ui
-
-is used to set the user interface. This is required to enter the passpharse
-for a software token.
 
 =head2 get_token
 
