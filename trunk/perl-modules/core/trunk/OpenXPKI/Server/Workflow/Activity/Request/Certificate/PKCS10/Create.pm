@@ -45,10 +45,10 @@ sub execute {
     my $token = $self->param('_token');
 
     ## create CSR
-    my $csr = $token->command ("create_pkcs10",
-			       KEY     => $self->param('key'),
-			       PASSWD  => $self->param('passphrase'),
-			       SUBJECT => $self->param('subject'));
+    my $csr = $token->command ({COMMAND => "create_pkcs10",
+			        KEY     => $self->param('key'),
+			        PASSWD  => $self->param('passphrase'),
+			        SUBJECT => $self->param('subject')});
     
 
     ### Creating PKCS10 request...

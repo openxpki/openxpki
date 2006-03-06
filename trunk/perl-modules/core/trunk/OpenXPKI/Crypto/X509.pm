@@ -55,9 +55,9 @@ sub __init
                                                      DATA  => $self->{DATA});
     eval
     {
-        $self->{x509} = $self->{TOKEN}->get_object(DEBUG => $self->{DEBUG},
-                                                   DATA  => $self->{header}->get_body(),
-                                                   TYPE  => "X509");
+        $self->{x509} = $self->{TOKEN}->get_object({DEBUG => $self->{DEBUG},
+                                                    DATA  => $self->{header}->get_body(),
+                                                    TYPE  => "X509"});
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
@@ -78,10 +78,10 @@ sub __init
                        "version", "pubkey_algorithm", "signature_algorithm", "exponent",
                        "keysize", "extensions", "openssl_subject" )
     {
-        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function (
+        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function ({
                                                    DEBUG    => $self->{DEBUG},
                                                    OBJECT   => $self->{x509},
-                                                   FUNCTION => $attr);
+                                                   FUNCTION => $attr});
     }
     $self->{TOKEN}->free_object ($self->{x509});
     delete $self->{x509};
@@ -263,9 +263,9 @@ sub get_converted
     }
     else
     {
-        my $result = eval {$self->{TOKEN}->command ("convert_cert",
-                                                    DATA => $self->get_body(),
-                                                    OUT  => $format)};
+        my $result = eval {$self->{TOKEN}->command ({COMMAND => "convert_cert",
+                                                     DATA    => $self->get_body(),
+                                                     OUT     => $format})};
         if (my $exc = OpenXPKI::Exception->caught())
         {
             OpenXPKI::Exception->throw (

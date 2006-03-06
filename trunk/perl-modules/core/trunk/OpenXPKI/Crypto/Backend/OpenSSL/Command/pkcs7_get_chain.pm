@@ -87,14 +87,14 @@ sub get_result
     {
         eval
         {
-            my $x509 = $self->{ENGINE}->get_object (DATA => $self->{SIGNER},
-                                                    TYPE => "X509");
-            $subject = $self->{ENGINE}->get_object_function (
+            my $x509 = $self->{ENGINE}->get_object ({DATA => $self->{SIGNER},
+                                                     TYPE => "X509"});
+            $subject = $self->{ENGINE}->get_object_function ({
                            OBJECT   => $x509,
-                           FUNCTION => "openssl_subject");
-            $self->{ENGINE}->get_object_function (
+                           FUNCTION => "openssl_subject"});
+            $self->{ENGINE}->get_object_function ({
                            OBJECT   => $x509,
-                           FUNCTION => "free");
+                           FUNCTION => "free"});
         };
         if (my $exc = OpenXPKI::Exception->caught())
         {

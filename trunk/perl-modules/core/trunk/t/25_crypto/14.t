@@ -52,10 +52,10 @@ for (my $i=0; $i < scalar @example; $i++)
     my $dn = $example[$i];
 
     ## create CSR
-    my $csr = $token->command ("create_pkcs10",
-                               KEY     => $key,
-                               PASSWD  => $passwd,
-                               SUBJECT => $dn);
+    my $csr = $token->command ({COMMAND => "create_pkcs10",
+                                KEY     => $key,
+                                PASSWD  => $passwd,
+                                SUBJECT => $dn});
     ok (1);
     print STDERR "CSR: $csr\n" if ($ENV{DEBUG});
     OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.pkcs10.pem", CONTENT => $csr);
@@ -72,19 +72,19 @@ for (my $i=0; $i < scalar @example; $i++)
     ok(1);
 
     ## create cert
-    my $cert = $token->command ("issue_cert",
-                                CSR     => $csr,
-                                PROFILE => $profile);
+    my $cert = $token->command ({COMMAND => "issue_cert",
+                                 CSR     => $csr,
+                                 PROFILE => $profile});
     ok (1);
     print STDERR "cert: $cert\n" if ($ENV{DEBUG});
     OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.cert.pem", CONTENT => $cert);
 
     ## build the PKCS#12 file
-    my $pkcs12 = $token->command ("create_pkcs12",
-                                  PASSWD  => $passwd,
-                                  KEY     => $key,
-                                  CERT    => $cert,
-                                  CHAIN   => $token->get_certfile());
+    my $pkcs12 = $token->command ({COMMAND => "create_pkcs12",
+                                   PASSWD  => $passwd,
+                                   KEY     => $key,
+                                   CERT    => $cert,
+                                   CHAIN   => $token->get_certfile()});
     ok (1);
     print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
 
@@ -95,9 +95,9 @@ for (my $i=0; $i < scalar @example; $i++)
                    PKI_REALM => "Test Root CA",
                    CA        => "INTERNAL_CA_1");
     $profile->set_serial (1);
-    my $crl = $token->command ("issue_crl",
-                               REVOKED => [$cert],
-                               PROFILE => $profile);
+    my $crl = $token->command ({COMMAND => "issue_crl",
+                                REVOKED => [$cert],
+                                PROFILE => $profile});
     ok (1);
     print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
     OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.crl.pem", CONTENT => $crl);

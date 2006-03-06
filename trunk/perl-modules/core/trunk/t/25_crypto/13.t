@@ -35,51 +35,51 @@ my $content = "This is for example a passprase.";
 
 ## sign content
 
-my $sig = $token->command ("pkcs7_sign",
-                           CONTENT   => $content,
-                           CERT      => $cert,
-                           KEY       => $rsa,
-                           PASSWD    => $passwd);
+my $sig = $token->command ({COMMAND   => "pkcs7_sign",
+                            CONTENT   => $content,
+                            CERT      => $cert,
+                            KEY       => $rsa,
+                            PASSWD    => $passwd});
 ok(1);
 print STDERR "PKCS#7 signature: $sig\n" if ($ENV{DEBUG});
 
 ## encrypt content
 
-$content = $token->command ("pkcs7_encrypt",
-                            CONTENT   => $content,
-                            CERT      => $cert);
+$content = $token->command ({COMMAND   => "pkcs7_encrypt",
+                             CONTENT   => $content,
+                             CERT      => $cert});
 ok(1);
 
 ## decrypt content
 
-$content = $token->command ("pkcs7_decrypt",
-                            PKCS7  => $content,
-                            CERT   => $cert,
-                            KEY    => $rsa,
-                            PASSWD => $passwd);
+$content = $token->command ({COMMAND => "pkcs7_decrypt",
+                             PKCS7   => $content,
+                             CERT    => $cert,
+                             KEY     => $rsa,
+                             PASSWD  => $passwd});
 ok(1);
 print STDERR "PKCS#7 content: $content\n" if ($ENV{DEBUG});
 ok ($content eq "This is for example a passprase.");
 
 ## verify signature
 
-my $result = $token->command ("pkcs7_verify",
-                              CONTENT => $content,
-                              PKCS7   => $sig,
-                              CHAIN   => "$basedir/ca1/cacert.pem");
+my $result = $token->command ({COMMAND => "pkcs7_verify",
+                               CONTENT => $content,
+                               PKCS7   => $sig,
+                               CHAIN   => "$basedir/ca1/cacert.pem"});
 ok(1);
 print STDERR "PKCS#7 external chain verify: $result\n" if ($ENV{DEBUG});
-$result = $token->command ("pkcs7_verify",
-                           CONTENT => $content,
-                           PKCS7   => $sig);
+$result = $token->command ({COMMAND => "pkcs7_verify",
+                            CONTENT => $content,
+                            PKCS7   => $sig});
 ok(1);
 print STDERR "PKCS#7 token chain verify: $result\n" if ($ENV{DEBUG});
 
 ## extract available chain from signature
 
-$result = $token->command ("pkcs7_get_chain",
-                           SIGNER => $result,
-                           PKCS7  => $sig);
+$result = $token->command ({COMMAND => "pkcs7_get_chain",
+                            SIGNER  => $result,
+                            PKCS7   => $sig});
 ok(1);
 print STDERR "PKCS#7 get_chain: $result\n" if ($ENV{DEBUG});
 

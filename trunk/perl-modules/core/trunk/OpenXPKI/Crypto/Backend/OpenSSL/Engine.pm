@@ -52,7 +52,7 @@ sub login {
 
     eval
     {
-        $self->{OPENSSL}->command ("convert_key", OUTFORM=>"PKCS8");
+        $self->{OPENSSL}->command ({COMMAND => "convert_key", OUTFORM=>"PKCS8"});
     };
     if (my $exc = OpenXPKI::Excpetion->caught())
     {

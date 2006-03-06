@@ -30,16 +30,16 @@ ok (1);
 
 ## create CA RSA key (use passwd from token.xml)
 ## FIXME: CA key is *unencrypted*?
-my $key = $token->command ("create_key",
-                           TYPE       => "RSA",
-                           KEY_LENGTH => "1024",
-                           ENC_ALG    => "aes256");
+my $key = $token->command ({COMMAND    => "create_key",
+                            TYPE       => "RSA",
+                            KEY_LENGTH => "1024",
+                            ENC_ALG    => "aes256"});
 ok (1);
 print STDERR "CA RSA: $key\n" if ($ENV{DEBUG});
 
 ## create CA CSR
-my $csr = $token->command ("create_pkcs10",
-                           SUBJECT => "cn=CA_1,dc=OpenXPKI,dc=info");
+my $csr = $token->command ({COMMAND => "create_pkcs10",
+                            SUBJECT => "cn=CA_1,dc=OpenXPKI,dc=info"});
 ok (1);
 print STDERR "CA CSR: $csr\n" if ($ENV{DEBUG});
 
@@ -53,9 +53,9 @@ $profile->set_serial(1);
 ok(1);
 
 ## create CA cert
-my $cert = $token->command ("create_cert",
-                            PROFILE => $profile,
-                            CSR     => $csr);
+my $cert = $token->command ({COMMAND => "create_cert",
+                             PROFILE => $profile,
+                             CSR     => $csr});
 ok (1);
 print STDERR "CA cert: $cert\n" if ($ENV{DEBUG});
 

@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL
-## (C)opyright 2005 Michael Bell
+## Written 2005 by Michael Bell
+## (C)opyright 2005-2006 OpenXPKI
 ## $Revision$
 	
 use strict;
@@ -160,12 +161,15 @@ sub __init_command
 sub command
 {
     my $self = shift;
-    my $cmd  = "OpenXPKI::Crypto::Backend::OpenSSL::Command::".shift;
+    my $keys = shift;
+
+    my $cmd  = "OpenXPKI::Crypto::Backend::OpenSSL::Command::".$keys->{COMMAND};
+    delete $keys->{COMMAND};
     $self->debug ("Command: $cmd");
 
     my $ret = eval
     {
-        my $cmdref = $cmd->new (%{$self->{COMMAND_PARAMS}}, @_,
+        my $cmdref = $cmd->new (%{$self->{COMMAND_PARAMS}}, %{$keys},
                                 ENGINE => $self);
         my $cmds = $cmdref->get_command();
 
@@ -203,7 +207,7 @@ sub command
 sub get_object
 {
     my $self = shift;
-    my $keys = { @_ };
+    my $keys = shift;
 
     my $previous_debug = undef;
     if ($keys->{DEBUG})
@@ -275,7 +279,7 @@ sub get_object
 sub get_object_function
 {
     my $self   = shift;
-    my $keys   = { @_ };
+    my $keys   = shift;
     my $previous_debug = undef;
     if ($keys->{DEBUG})
     {
@@ -400,7 +404,7 @@ OpenXPKI::Crypto::Backend::OpenSSL::Engine for more details.
 execute an OpenSSL command. You must specify the name of the command
 as first parameter followed by a hash with parameter. Example:
 
-$token->command ("create_key", TYPE => "RSA", ...);
+$token->command ({COMMAND => "create_key", TYPE => "RSA", ...});
 
 =head2 get_object
 

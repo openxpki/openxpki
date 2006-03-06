@@ -15,7 +15,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->get_tmpfile ('KEY', 'CERT', 'OUT');
+    $self->get_tmpfile ('KEY', 'CERT', 'CHAIN', 'OUT');
 
     my $engine = "";
        $engine = $self->{ENGINE}->get_engine()
@@ -70,6 +70,10 @@ sub get_command
     $self->write_file (FILENAME => $self->{CERTFILE},
                        CONTENT  => $self->{CERT},
 	               FORCE    => 1);
+    $self->write_file (FILENAME => $self->{CHAINFILE},
+                       CONTENT  => $self->{CHAIN},
+	               FORCE    => 1)
+        if ($self->{CHAIN});
 
     ## build the command
 
@@ -79,7 +83,14 @@ sub get_command
     $command .= " -in ".$self->{CERTFILE};
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -".$self->{ENC_ALG};
-    $command .= " -certfile ".$self->{INTERNAL_CHAIN} if ($self->{INTERNAL_CHAIN});
+    if ($self->{CHAIN})
+    {
+        $command .= " -certfile ".$self->{CHAIN};
+    }
+    elsif ($self->{INTERNAL_CHAIN})
+    {
+        $command .= " -certfile ".$self->{INTERNAL_CHAIN};
+    }
 
     $command .= " -passin env:pwd";
     $self->set_env ("pwd" => $self->{PASSWD});

@@ -9,6 +9,7 @@ package OpenXPKI::Crypto::TokenManager;
 
 use OpenXPKI qw (debug);
 use OpenXPKI::Exception;
+use OpenXPKI::Crypto::Backend::API;
 
 sub new {
     my $that = shift;
@@ -238,9 +239,11 @@ sub __add_token
     $self->debug ("try to setup $backend token");
     eval {
         $self->{TOKEN}->{$realm}->{$type}->{$name} =
-            $self->__new_token ($backend,
-                                TMP => $self->{tmp},
-                                %token_args);
+            OpenXPKI::Crypto::Backend::API->new ({
+                DEBUG => 0,
+                CLASS => $backend,
+                PARAMS => {TMP => $self->{tmp}, %token_args}
+        });
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
@@ -261,51 +264,6 @@ sub __add_token
 
     $self->debug ("$type token $name for $realm successfully added");
     return $self->{TOKEN}->{$realm}->{$type}->{$name};
-}
-
-sub __new_token {
-
-    my $self = shift;
-    my $name = shift;
-    $self->debug ("entering function");
-    foreach my $item (@_)
-    {
-        next if (not defined $item); ## happens on empty arrays
-        $self->debug ("argument: $item");
-    }
-
-    ## get the token class    
-    eval "require $name";
-    if ($@)
-    {
-        my $text = $@;
-        $self->debug ("compilation of driver $name failed\n$text");
-        OpenXPKI::Exception->throw (message => $text);
-    }
-    $self->debug ("class: $name");
-
-    ## get the token
-    ## FIXME: why I send $self to the child!?
-    my $token;
-    eval { 
-	$token = $name->new (@_) 
-    };
-
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        ## really stupid dummy exception handling
-        $self->debug ("cannot get new instance of driver $name");
-        $exc->rethrow();
-    }
-    $self->debug ("no exception during new()");
-
-    if (! defined $token) {
-	$self->debug ("initialization error (constructor returned undef)");
-	return;
-    }
-    $self->debug ("no error during new, new token present");
-
-    return $token;
 }
 
 sub __use_token

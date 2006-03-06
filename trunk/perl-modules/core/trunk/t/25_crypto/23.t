@@ -28,7 +28,7 @@ my $crl = OpenXPKI->read_file ("$basedir/ca1/crl.pem");
 ok(1);
 
 ## get object
-$crl = $token->get_object (DATA => $crl, TYPE => "CRL");
+$crl = $token->get_object ({DATA => $crl, TYPE => "CRL"});
 ok(1);
 
 ## check that all required functions are available and work
@@ -36,6 +36,7 @@ foreach my $func ("version", "issuer", "issuer_hash", "serial",
                   "last_update", "next_update", "fingerprint", #"extensions",
                   "revoked", "signature_algorithm", "signature")
 {
+    ## FIXME: this is a bypass of the API !!!
     my $result = $crl->$func();
     if (defined $result)
     {

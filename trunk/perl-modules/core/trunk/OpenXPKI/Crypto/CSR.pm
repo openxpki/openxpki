@@ -73,10 +73,10 @@ sub __init
         $self->{TYPE} = "HEADER" if ($self->{header}->get_body());
         return 1;
     }
-    $self->{csr} = $self->{TOKEN}->get_object(DEBUG  => $self->{DEBUG},
-                                              DATA   => $self->{header}->get_body(),
-                                              TYPE   => "CSR",
-                                              FORMAT => $self->{TYPE});
+    $self->{csr} = $self->{TOKEN}->get_object({DEBUG  => $self->{DEBUG},
+                                               DATA   => $self->{header}->get_body(),
+                                               TYPE   => "CSR",
+                                               FORMAT => $self->{TYPE}});
 
     ##########################
     ##     core parsing     ##
@@ -94,10 +94,10 @@ sub __init
     }
     foreach my $attr (@attrlist)
     {
-        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function (
+        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function ({
                                                    DEBUG    => $self->{DEBUG},
                                                    OBJECT   => $self->{csr},
-                                                   FUNCTION => $attr);
+                                                   FUNCTION => $attr});
     }
     $self->{TOKEN}->free_object ($self->{csr});
     delete $self->{csr};
@@ -281,9 +281,9 @@ sub get_converted
     }
     else
     {
-        return $self->{TOKEN}->command ("convert_pkcs10",
-                                        DATA => $self->get_body(),
-                                        OUT  => $format);
+        return $self->{TOKEN}->command ({COMMAND => "convert_pkcs10",
+                                         DATA    => $self->get_body(),
+                                         OUT     => $format});
     }
 }
 

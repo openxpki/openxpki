@@ -35,12 +35,13 @@ if ($spkac)
 }
 
 ## get object
-$spkac = $token->get_object (DATA => $spkac, TYPE => "CSR", FORMAT => "SPKAC");
+$spkac = $token->get_object ({DATA => $spkac, TYPE => "CSR", FORMAT => "SPKAC"});
 ok(1);
 
 ## check that all required functions are available and work
 foreach my $func ("pubkey_algorithm", "pubkey", "keysize", "modulus", "exponent")
 {
+    ## FIXME: this is a bypass of the API !!!
     my $result = $spkac->$func();
     if ($result)
     {

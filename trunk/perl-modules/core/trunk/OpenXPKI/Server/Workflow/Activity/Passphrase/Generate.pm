@@ -45,7 +45,7 @@ sub execute {
     
     # generate a random pass phrase
     $self->param('passphrase',
-		 $token->command("create_random", RANDOM_LENGTH => 16));
+		 $token->command({COMMAND => "create_random", RANDOM_LENGTH => 16}));
     
     # export
     $context->param(passphrase => $self->param('passphrase'));

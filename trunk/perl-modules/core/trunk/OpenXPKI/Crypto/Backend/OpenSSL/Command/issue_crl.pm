@@ -68,7 +68,7 @@ sub get_command
             if (not ref($cert))
             {
                 eval {
-                    $cert = $self->{ENGINE}->get_object(DATA => $cert, TYPE => "X509");
+                    $cert = $self->{ENGINE}->get_object({DATA => $cert, TYPE => "X509"});
                 };
                 if (my $exc = OpenXPKI::Exception->caught())
                 {
@@ -81,17 +81,17 @@ sub get_command
             }
             # prepare index.txt entry
             $timestamp = $self->get_openssl_time ($timestamp);
-            my $start = $self->{ENGINE}->get_object_function (
+            my $start = $self->{ENGINE}->get_object_function ({
                             OBJECT   => $cert,
-                            FUNCTION => "notbefore");
+                            FUNCTION => "notbefore"});
             $start = $self->get_openssl_time ($start);
-            my $subject = $self->{ENGINE}->get_object_function (
+            my $subject = $self->{ENGINE}->get_object_function ({
                               OBJECT   => $cert,
-                              FUNCTION => "subject");
+                              FUNCTION => "subject"});
             $subject = $self->get_openssl_dn($subject);
-            my $serial = $self->{ENGINE}->get_object_function (
+            my $serial = $self->{ENGINE}->get_object_function ({
                              OBJECT   => $cert,
-                             FUNCTION => "serial");
+                             FUNCTION => "serial"});
             $serial = Math::BigInt->new ($serial);
             my $hex = substr ($serial->as_hex(), 2);
             $hex    = "0".$hex if (length ($hex) % 2);

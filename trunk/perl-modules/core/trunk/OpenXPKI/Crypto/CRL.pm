@@ -50,9 +50,9 @@ sub __init
 
     $self->{header} = OpenXPKI::Crypto::Header->new (DEBUG => $self->{DEBUG},
                                                      DATA  => $self->{DATA});
-    $self->{crl} = $self->{TOKEN}->get_object(DEBUG => $self->{DEBUG},
-                                              DATA  => $self->{header}->get_body(),
-                                              TYPE  => "CRL");
+    $self->{crl} = $self->{TOKEN}->get_object({DEBUG => $self->{DEBUG},
+                                               DATA  => $self->{header}->get_body(),
+                                               TYPE  => "CRL"});
 
     ##########################
     ##     core parsing     ##
@@ -62,10 +62,10 @@ sub __init
     foreach my $attr ("version", "issuer", "next_update", "last_update",
                       "signature_algorithm", "revoked", "serial")
     {
-        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function (
+        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function ({
                                                    DEBUG    => $self->{DEBUG},
                                                    OBJECT   => $self->{crl},
-                                                   FUNCTION => $attr);
+                                                   FUNCTION => $attr});
     }
     $self->{TOKEN}->free_object ($self->{crl});
     delete $self->{crl};
@@ -134,9 +134,9 @@ sub get_converted
     }
     else
     {
-        return $self->{TOKEN}->command ("convert_crl",
-                                        DATA => $self->get_body(),
-                                        OUT  => $format);
+        return $self->{TOKEN}->command ({COMMAND => "convert_crl",
+                                         DATA    => $self->get_body(),
+                                         OUT     => $format});
     }
 }
 

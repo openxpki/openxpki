@@ -28,7 +28,7 @@ my $cert = OpenXPKI->read_file ("$basedir/ca1/cert.pem");
 ok(1);
 
 ## get object
-$cert = $token->get_object (DATA => $cert, TYPE => "X509");
+$cert = $token->get_object ({DATA => $cert, TYPE => "X509"});
 ok(1);
 
 ## check that all required functions are available and work
@@ -38,6 +38,7 @@ foreach my $func ("version", "serial", "subject", "openssl_subject", "issuer",
                   "pubkey_algorithm", "pubkey", "keysize", "modulus", "exponent",
                   "pubkey_hash", "signature_algorithm", "signature")
 {
+    ## FIXME: this is a bypass of the API !!!
     my $result = $cert->$func();
     if (defined $result)
     {

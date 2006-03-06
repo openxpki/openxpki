@@ -54,10 +54,10 @@ sub execute {
 
     $profile->set_subject($self->param('subject'));
 
-    my $cert = $token->command("issue_cert",
-			       PROFILE => $profile,
-			       CSR     => $self->param('pkcs10request'),
-	);
+    my $cert = $token->command({COMMAND => "issue_cert",
+			        PROFILE => $profile,
+			        CSR     => $self->param('pkcs10request'),
+                               });
 
     $context->param(certificate => $cert),
 

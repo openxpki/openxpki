@@ -68,13 +68,13 @@ sub execute {
     my $token = $self->param('_token');
 
 
-    my $key = $token->command("create_key",
-			      TYPE       => $self->param('keytype'),
-			      KEY_LENGTH => $self->param('keylength'),
-			      CURVE_NAME => $self->param('curvename'),
-			      ENC_ALG    => $self->param('keyencryptionalgorithm'),
-			      PASSWD     => $self->param('passphrase'),
-	);
+    my $key = $token->command({COMMAND    => "create_key",
+			       TYPE       => $self->param('keytype'),
+			       KEY_LENGTH => $self->param('keylength'),
+			       CURVE_NAME => $self->param('curvename'),
+			       ENC_ALG    => $self->param('keyencryptionalgorithm'),
+			       PASSWD     => $self->param('passphrase'),
+                              });
 
     # export
     $context->param(key => $key);

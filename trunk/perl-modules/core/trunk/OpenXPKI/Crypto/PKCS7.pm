@@ -51,7 +51,7 @@ sub sign
     $params{ENC_ALG}    = $keys->{ENC_ALG}    if (exists $keys->{ENC_ALG});
     $params{DETACH}     = $keys->{DETACH}     if (exists $keys->{DETACH});
 
-    $self->{PKCS7} = $self->{TOKEN}->command ("pkcs7_sign", %params);
+    $self->{PKCS7} = $self->{TOKEN}->command ({COMMAND => "pkcs7_sign", %params});
     return $self->{PKCS7};
 }
 
@@ -67,7 +67,7 @@ sub verify
     $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
     $params{NO_VERIFY}  = $keys->{NO_VERIFY}  if (exists $keys->{NO_VERIFY});
 
-    $self->{SIGNER} = $self->{TOKEN}->command ("pkcs7_verify", %params);
+    $self->{SIGNER} = $self->{TOKEN}->command ({COMMAND => "pkcs7_verify", %params});
     return $self->{SIGNER};
 }
 
@@ -82,7 +82,7 @@ sub encrypt
     $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
     $params{ENC_ALG}    = $keys->{ENC_ALG}    if (exists $keys->{ENC_ALG});
 
-    $self->{PKCS7} = $self->{TOKEN}->command ("pkcs7_encrypt", %params);
+    $self->{PKCS7} = $self->{TOKEN}->command ({COMMAND => "pkcs7_encrypt", %params});
     return $self->{PKCS7};
 }
 
@@ -98,7 +98,7 @@ sub decrypt
     $params{PASSWD}     = $keys->{PASSWD}     if (exists $keys->{PASSWD});
     $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
 
-    $self->{CONTENT} = $self->{TOKEN}->command ("pkcs7_decrypt", %params);
+    $self->{CONTENT} = $self->{TOKEN}->command ({COMMAND => "pkcs7_decrypt", %params});
     return $self->{CONTENT};
 }
 
@@ -114,7 +114,7 @@ sub get_chain
     $params{PKCS7}      = $self->{PKCS7};
     $params{SIGNER}     = $self->{SIGNER};
     $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
-    $self->{CHAIN} = $self->{TOKEN}->command("pkcs7_get_chain", %params);
+    $self->{CHAIN} = $self->{TOKEN}->command({COMMAND => "pkcs7_get_chain", %params});
     ## the chain is already sorted
     $self->{CHAIN} = [ split /\n\n/, $self->{CHAIN} ];
     return $self->{CHAIN};

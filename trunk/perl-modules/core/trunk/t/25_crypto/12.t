@@ -34,67 +34,79 @@ my $crl    = OpenXPKI->read_file ("$basedir/ca1/crl.pem");
 ok($passwd and $dsa and $rsa and $csr and $cert and $crl);
 
 ## DSA KEY: PEM --> DER
-$token->command ("convert_key",
-                 DATA   => $dsa,
-                 IN     => "DSA",
-                 OUT    => "DER",
-                 PASSWD => $passwd);
+$token->command ({COMMAND => "convert_key",
+                  DATA    => $dsa,
+                  IN      => "DSA",
+                  OUT     => "DER",
+                  PASSWD  => $passwd});
 ok(1);
 
 ## RSA KEY: PEM --> DER
-$token->command ("convert_key",
-                 DATA   => $rsa,
-                 IN     => "RSA",
-                 OUT    => "DER",
-                 PASSWD => $passwd);
+$token->command ({COMMAND => "convert_key",
+                  DATA    => $rsa,
+                  IN      => "RSA",
+                  OUT     => "DER",
+                  PASSWD  => $passwd});
 ok(1);
 
 ## DSA KEY: PEM --> PKCS#8
-$token->command ("convert_key",
-                 DATA   => $dsa,
-                 IN     => "DSA",
-                 OUT    => "PKCS8",
-                 PASSWD => $passwd);
+$token->command ({COMMAND => "convert_key",
+                  DATA    => $dsa,
+                  IN      => "DSA",
+                  OUT     => "PKCS8",
+                  PASSWD  => $passwd});
 ok(1);
 
 ## RSA KEY: PEM --> PKCS#8
-my $pkcs8 = $token->command ("convert_key",
-                             DATA   => $rsa,
-                             IN     => "RSA",
-                             OUT    => "PKCS8",
-                             PASSWD => $passwd);
+my $pkcs8 = $token->command ({COMMAND => "convert_key",
+                              DATA   => $rsa,
+                              IN     => "RSA",
+                              OUT    => "PKCS8",
+                              PASSWD => $passwd});
 ok(1);
 
 ## PKCS#8: PEM --> DER
-$token->command ("convert_key",
-                 DATA   => $pkcs8,
-                 IN     => "PKCS8",
-                 OUT    => "DER",
-                 PASSWD => $passwd);
+$token->command ({COMMAND => "convert_key",
+                  DATA    => $pkcs8,
+                  IN      => "PKCS8",
+                  OUT     => "DER",
+                  PASSWD  => $passwd});
 ok(1);
 
 ## PKCS10: PEM --> DER
-$token->command ("convert_pkcs10", DATA => $csr, OUT => "DER");
+$token->command ({COMMAND => "convert_pkcs10",
+                  DATA    => $csr,
+                  OUT => "DER"});
 ok(1);
 
 ## PKCS10: PEM --> TXT
-$token->command ("convert_pkcs10", DATA => $csr, OUT => "TXT");
+$token->command ({COMMAND => "convert_pkcs10",
+                  DATA    => $csr,
+                  OUT     => "TXT"});
 ok(1);
 
 ## Cert: PEM --> DER
-$token->command ("convert_cert", DATA => $cert, OUT => "DER");
+$token->command ({COMMAND => "convert_cert",
+                  DATA    => $cert,
+                  OUT     => "DER"});
 ok(1);
 
 ## Cert: PEM --> TXT
-$token->command ("convert_cert", DATA => $cert, OUT => "TXT");
+$token->command ({COMMAND => "convert_cert",
+                  DATA    => $cert,
+                  OUT     => "TXT"});
 ok(1);
 
 ## CRL: PEM --> DER
-$token->command ("convert_crl", DATA => $crl, OUT => "DER");
+$token->command ({COMMAND => "convert_crl",
+                  DATA    => $crl,
+                  OUT     => "DER"});
 ok(1);
 
 ## CRL: PEM --> TXT
-$token->command ("convert_crl", DATA => $crl, OUT => "TXT");
+$token->command ({COMMAND => "convert_crl",
+                  DATA    => $crl,
+                  OUT     => "TXT"});
 ok(1);
 
 1;

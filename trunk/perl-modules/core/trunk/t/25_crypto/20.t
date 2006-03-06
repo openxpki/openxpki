@@ -28,7 +28,7 @@ my $csr = OpenXPKI->read_file ("$basedir/ca1/pkcs10.pem");
 ok(1);
 
 ## get object
-$csr = $token->get_object (DATA => $csr, TYPE => "CSR");
+$csr = $token->get_object ({DATA => $csr, TYPE => "CSR"});
 ok(1);
 
 ## check that all required functions are available and work
@@ -38,6 +38,7 @@ foreach my $func ("version", "subject", "subject_hash", "fingerprint",
                   "pubkey_hash",
                   "signature_algorithm", "signature")
 {
+    ## FIXME: this is a bypass of the API !!!
     my $result = $csr->$func();
     if (defined $result or $func eq "extensions")
     {
