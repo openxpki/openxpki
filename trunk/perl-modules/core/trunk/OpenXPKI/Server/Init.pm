@@ -162,8 +162,7 @@ sub get_crypto_layer
             message => "I18N_OPENXPKI_SERVER_INIT_CRYPTO_LAYER_MISSING_CONFIG");
     }
 
-    return OpenXPKI::Crypto::TokenManager->new (DEBUG  => $self->{DEBUG},
-                                                CONFIG => $keys->{CONFIG});
+    return OpenXPKI::Crypto::TokenManager->new (DEBUG  => $self->{DEBUG});
 }
 
 sub get_pki_realms

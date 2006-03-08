@@ -10,6 +10,7 @@ package OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (debug);
 use OpenXPKI::Exception;
 use OpenXPKI::Crypto::Backend::API;
+use OpenXPKI::Server::Context qw( CTX );
 
 sub new {
     my $that = shift;
@@ -23,14 +24,7 @@ sub new {
 
     my $keys = { @_ };
     $self->{DEBUG}  = 1               if ($keys->{DEBUG});
-    $self->{config} = $keys->{CONFIG} if ($keys->{CONFIG});
     $self->{tmp}    = $keys->{TMPDIR} if ($keys->{TMPDIR});
-
-    if (not $self->{config})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_NEW_MISSING_XML_CONFIG");
-    }
 
     $self->debug ("token manager is ready");
     return $self;
@@ -113,13 +107,13 @@ sub __add_token
 
     ## get matching pki_realm
 
-    my $realm_count = $self->{config}->get_xpath_count (
+    my $realm_count = CTX('xml_config')->get_xpath_count (
                           XPATH => 'pki_realm');
     my $realm_index;
     for (my $i=0; $i<$realm_count; $i++)
     {
         $self->debug ("checking pki_realm");
-        next if ($realm ne $self->{config}->get_xpath (
+        next if ($realm ne CTX('xml_config')->get_xpath (
                               XPATH    => [ 'pki_realm', 'name' ],
                               COUNTER  => [ $i, 0 ]));
         $self->debug ("pki_realm ok");
@@ -134,14 +128,14 @@ sub __add_token
     }
  
     ## get matching type
-    my $type_count = $self->{config}->get_xpath_count (
+    my $type_count = CTX('xml_config')->get_xpath_count (
                           XPATH   => [ 'pki_realm', $type_path ],
                           COUNTER => [ $realm_index ]);
     my $type_index;
     for (my $i=0; $i<$type_count; $i++)
     {
         $self->debug ("checking name of type");
-        next if ($name ne $self->{config}->get_xpath (
+        next if ($name ne CTX('xml_config')->get_xpath (
                               XPATH    => [ 'pki_realm', $type_path, 'name' ],
                               COUNTER  => [ $realm_index, $i, 0 ]));
         $self->debug ("pki_realm and name ok");
@@ -155,78 +149,9 @@ sub __add_token
             params  => {"NAME" => $name, "TYPE" => $type});
     }
 
-
-
-    # build token parameters
-    my %token_args = ( NAME   => $name );
-
-    # any existing key in this hash is considered optional in %token_args
-    my %is_optional = ();
-
-    # default tokens don't need key, cert etc...
-    if ($type eq "DEFAULT") {
-	foreach (qw(key cert internal_chain passwd passwd_parts)) {
-	    $is_optional{uc($_)}++;
-	}
-    }
-
-    # FIXME: currently unused attributes:
-    # openca-sv
-    foreach my $key (qw(debug      backend       mode 
-                        engine     shell         wrapper 
-                        randfile
-                        key        cert          internal_chain
-                        passwd     passwd_parts 
-                       )) {
-
-	my $attribute_count;
-	eval {
-	    $attribute_count = $self->{config}->get_xpath_count (
-		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
-		COUNTER  => [ $realm_index, $type_index, 0 ]);
-	};
-
-	if (my $exc = OpenXPKI::Exception->caught())
-	{
-	    $self->debug ("caught exception while reading config attribute $key");
-	    # only pass exception if attribute is not optional
-	    if (! $is_optional{uc($key)}) {
-		$self->debug ("argument $key is not optional, escalating");
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INCOMPLETE_CONFIGURATION",
-		    child   => $exc,
-		    params  => {"NAME" => $name, 
-				"TYPE" => $type, 
-				"ATTRIBUTE" => $key,
-		    },
-		    )
-	    }
-	    $attribute_count = 0;
-	}
-
-	# multivalue attributes are not desired/supported
-	if ($attribute_count > 1) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_DUPLICATE_ATTRIBUTE",
-		params  => {"NAME" => $name, 
-			    "TYPE" => $type, 
-			    "ATTRIBUTE" => $key,
-		});
-	}
-
-	if ($attribute_count == 1) {
-	    my $value = $self->{config}->get_xpath (
-		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
+    my $backend = CTX('xml_config')->get_xpath (
+		XPATH    => [ 'pki_realm', $type_path, 'token', 'backend' ],
 		COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
-	    
-	    $token_args{uc($key)} = $value;
-	}
-    }
-    
-
-    ## init token
-    my $backend = $token_args{BACKEND};
-    delete $token_args{BACKEND};
 
     if (! defined $backend) {
 	OpenXPKI::Exception->throw (
@@ -242,8 +167,12 @@ sub __add_token
             OpenXPKI::Crypto::Backend::API->new ({
                 DEBUG => 0,
                 CLASS => $backend,
-                PARAMS => {TMP => $self->{tmp}, %token_args}
-        });
+                TMP   => $self->{tmp},
+                NAME  => $name,
+                PKI_REALM_INDEX => $realm_index,
+                TOKEN_TYPE      => $type_path,
+                TOKEN_INDEX     => $type_index
+            });
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
@@ -352,8 +281,7 @@ get tokens and to manage the state of a token.
 
 =head2 new
 
-The constructor only need an instance of the XML configuration. The
-parameter for this is called CONFIG. If you want to debug the module
+If you want to debug the module
 then must specify a true value for the parameter DEBUG. If you want to
 use an explicit temporary directory then you must specifiy this
 directory in the variable TMPDIR.

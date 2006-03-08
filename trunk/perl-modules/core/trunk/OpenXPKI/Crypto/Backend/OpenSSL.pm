@@ -11,6 +11,7 @@ package OpenXPKI::Crypto::Backend::OpenSSL;
 
 use OpenXPKI::Crypto::Backend::OpenSSL::Shell;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command;
+use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
@@ -26,7 +27,7 @@ sub new
     my $self = {DEBUG => 0};
     bless $self, $class;
 
-    my $keys = { @_ };
+    my $keys = shift;
     $self->{DEBUG} = 1 if ($keys->{DEBUG});
 
     # determine temporary directory to use:
@@ -61,25 +62,110 @@ sub new
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_TEMPORARY_DIRECTORY_UNAVAILABLE");
     }
 
-    $self->__init_engine  (@_,TMP => $self->{TMP});
-    $self->__init_shell   (@_,TMP => $self->{TMP});
-    $self->__init_command (@_,TMP => $self->{TMP});
+    $self->__load_config  ($keys);
+    $self->__init_engine  ();
+    $self->__init_shell   ();
+    $self->__init_command ();
 
     return $self;
+}
+
+sub __load_config
+{
+    my $self = shift;
+    my $keys = shift;
+
+    my $name        = $keys->{NAME};
+    my $realm_index = $keys->{PKI_REALM_INDEX};
+    my $type_path   = $keys->{TOKEN_TYPE};
+    my $type_index  = $keys->{TOKEN_INDEX};
+
+    $self->{PARAMS}->{TMP} = $self->{TMP};
+
+    # any existing key in this hash is considered optional in %token_args
+    my %is_optional = ();
+
+    # default tokens don't need key, cert etc...
+    if ($type_path eq "common") {
+	foreach (qw(key cert internal_chain passwd passwd_parts)) {
+	    $is_optional{uc($_)}++;
+	}
+    }
+
+    # FIXME: currently unused attributes:
+    # openca-sv
+    foreach my $key (qw(debug      backend       mode 
+                        engine     shell         wrapper 
+                        randfile
+                        key        cert          internal_chain
+                        passwd     passwd_parts 
+                       )) {
+
+	my $attribute_count;
+	eval {
+	    $self->debug ("try to get attribute_count");
+	    $attribute_count = CTX('xml_config')->get_xpath_count (
+		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
+		COUNTER  => [ $realm_index, $type_index, 0 ]);
+	    $self->debug ("attribute_count ::= ".$attribute_count);
+	};
+
+	if (my $exc = OpenXPKI::Exception->caught())
+	{
+	    $self->debug ("caught exception while reading config attribute $key");
+	    # only pass exception if attribute is not optional
+	    if (! $is_optional{uc($key)}) {
+		$self->debug ("argument $key is not optional, escalating");
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INCOMPLETE_CONFIGURATION",
+		    child   => $exc,
+		    params  => {"NAME" => $name, 
+				"TYPE" => $type_path, 
+				"ATTRIBUTE" => $key,
+		    },
+		    );
+	    }
+	    $attribute_count = 0;
+	}
+        elsif ($EVAL_ERROR)
+        {
+	    $self->debug ("caught system exception while reading config attribute $key");
+            OpenXPKI::Exception->throw (message => $EVAL_ERROR);
+        }
+
+	# multivalue attributes are not desired/supported
+	if ($attribute_count > 1) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_LOAD_CONFIG_DUPLICATE_ATTRIBUTE",
+		params  => {"NAME" => $name, 
+			    "TYPE" => $type_path, 
+			    "ATTRIBUTE" => $key,
+		});
+	}
+
+	if ($attribute_count == 1) {
+	    my $value = CTX('xml_config')->get_xpath (
+		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
+		COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
+
+	    $self->{PARAMS}->{uc($key)} = $value;
+	}
+    }
+    return 1;
 }
 
 sub __init_engine
 {
     my $self = shift;
-    my $keys = { @_ };
+    my $keys = shift;
 
-    if (!exists $keys->{ENGINE} || $keys->{ENGINE} eq "") {
+    if (!exists $self->{PARAMS}->{ENGINE} || $self->{PARAMS}->{ENGINE} eq "") {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_UNDEFINED",
 	    );
     }
 
-    my $engine = "OpenXPKI::Crypto::Backend::OpenSSL::Engine::".$keys->{ENGINE};
+    my $engine = "OpenXPKI::Crypto::Backend::OpenSSL::Engine::".$self->{PARAMS}->{ENGINE};
     eval "use $engine;";
     if ($@)
     {
@@ -88,7 +174,8 @@ sub __init_engine
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_USE_FAILED",
             params  => {"ERRVAL" => $msg});
     }
-    $self->{ENGINE} = eval {$engine->new (@_)};
+    delete $self->{PARAMS}->{ENGINE};
+    $self->{ENGINE} = eval {$engine->new (%{$self->{PARAMS}})};
     if (my $exc = OpenXPKI::Exception->caught())
     {
         OpenXPKI::Exception->throw (
@@ -103,15 +190,14 @@ sub __init_engine
 sub __init_shell
 {
     my $self = shift;
-    my $keys = { @_ };
 
-    if (not -x $keys->{SHELL})
+    if (not -x $self->{PARAMS}->{SHELL})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_BINARY_NOT_FOUND");
     } else {
-        $self->{OPENSSL} = $keys->{SHELL};
-        $self->{SHELL}   = $keys->{SHELL};
+        $self->{OPENSSL} = $self->{PARAMS}->{SHELL};
+        $self->{SHELL}   = $self->{PARAMS}->{SHELL};
     }
     my $wrapper = $self->{ENGINE}->get_wrapper();
     if ($wrapper)
@@ -142,17 +228,16 @@ sub __init_shell
 sub __init_command
 {
     my $self = shift;
-    my $keys = { @_ };
 
     foreach my $key (["TMP", "TMP"], ["RANDFILE", "RANDOM_FILE"])
     {
-        if (not exists $keys->{$key->[0]})
+        if (not exists $self->{PARAMS}->{$key->[0]})
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_OPENSSL_MISSING_COMMAND_PARAM",
                 params  => {"PARAM" => $key->[0]});
         }
-        $self->{COMMAND_PARAMS}->{$key->[1]} = $keys->{$key->[0]};
+        $self->{COMMAND_PARAMS}->{$key->[1]} = $self->{PARAMS}->{$key->[0]};
     }
 
     return 1;

@@ -24,8 +24,47 @@ sub new
     my $keys = shift;
 
     $self->{DEBUG}  = 1 if ($keys->{DEBUG});
-    $self->{CLASS}  = $keys->{CLASS};
-    $self->{PARAMS} = $keys->{PARAMS};
+
+    ## check for missing but required parameters
+
+    if (not $keys->{CLASS})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_CLASS");
+    }
+    if (not $keys->{NAME})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_NAME");
+    }
+    if (not exists $keys->{PKI_REALM_INDEX})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_PKI_REALM_INDEX");
+    }
+    if (not $keys->{TOKEN_TYPE})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_TOKEN_TYPE");
+    }
+    if (not exists $keys->{TOKEN_INDEX})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_TOKEN_INDEX");
+    }
+
+    $self->{CLASS} = $keys->{CLASS};
+    delete $keys->{CLASS};
+
+    foreach my $key (keys %{$keys})
+    {
+        next if (grep /^$key$/, ("DEBUG", "TMP", "NAME",
+                                 "PKI_REALM_INDEX",
+                                 "TOKEN_TYPE", "TOKEN_INDEX"));
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_ILLEGAL_PARAMETER",
+            params  => {NAME => $key, VALUE => $keys->{$key}});
+    }
 
     eval "require ".$self->{CLASS};
     if ($@)
@@ -37,15 +76,7 @@ sub new
     $self->debug ("class: ".$self->{CLASS});
 
     ## get the token
-    eval { 
-	$self->{INSTANCE} = $self->{CLASS}->new (%{$self->{PARAMS}}) 
-    };
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        ## really stupid dummy exception handling
-        $self->debug ("cannot get new instance of driver ".$self->{CLASS});
-        $exc->rethrow();
-    }
+    $self->{INSTANCE} = $self->{CLASS}->new ($keys);
     $self->debug ("no exception during new()");
 
     return $self;

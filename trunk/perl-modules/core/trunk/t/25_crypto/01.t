@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Test;
-BEGIN { plan tests => 4 };
+BEGIN { plan tests => 3 };
 
 print STDERR "OpenXPKI::Crypto::TokenManager\n";
 
@@ -13,12 +13,7 @@ eval `cat t/25_crypto/common.pl`;
 
 ok(1);
 
-eval
-{
-    OpenXPKI::Crypto::TokenManager->new (DEBUG => 0);
-};
-ok (OpenXPKI::Exception->caught());
-my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0, CONFIG => $cache);
+my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0);
 ok (1);
 
 ## parameter checks for get_token

@@ -43,9 +43,7 @@ sub execute {
     my $log = get_logger(); 
     
 
-    my $mgmt = OpenXPKI::Crypto::TokenManager->new(DEBUG => 0, 
-						   CONFIG => $config,
-	);
+    my $mgmt = OpenXPKI::Crypto::TokenManager->new(DEBUG => 0);
 
     ### tokentype: $self->param('tokentype')
 
