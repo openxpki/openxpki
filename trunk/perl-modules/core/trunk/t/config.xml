@@ -22,6 +22,12 @@
          private key operations) -->
     <common name="default">
       <token super="common/token_config/token{default}"/>
+      <!-- no role specified: default validity -->
+      <validity format="days">365</validity>
+      
+      <!-- specific validities override default -->
+      <validity role="User" format="days">365</validity>
+      <validity role="Server" format="days">365</validity>
     </common>
 
     <!-- Issuing CAs defined for this realm -->

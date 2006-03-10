@@ -2,7 +2,7 @@
 
   <crl>
     <digest>sha1</digest>
-    <lifetime format="days">35</lifetime>
+    <validity format="days">35</validity>
     <extensions>
     </extensions>
   </crl>
@@ -11,7 +11,7 @@
   <!-- WARNING: this is ONLY for SELF-SIGNED CA certificates       -->
   <ca_certificate>
     <digest>sha1</digest>
-    <lifetime format="days">730</lifetime>
+    <validity format="days">730</validity>
     <extensions>
       <basic_constraints critical="true">
         <ca>true</ca>
@@ -75,7 +75,7 @@ Generated with OpenXPKI trustcenter software.</comment>
   <!-- profile configuration for the role User -->
   <profile role="User" id="user">
     <digest>sha1</digest>
-    <lifetime format="days">365</lifetime>
+    <validity format="days">365</validity>
     <extensions>
       <basic_constraints critical="true">
         <ca>false</ca>

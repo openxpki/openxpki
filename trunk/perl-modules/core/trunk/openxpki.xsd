@@ -145,10 +145,27 @@
   <xsd:complexType name="pki_realm_common_type">
     <xsd:sequence maxOccurs="unbounded">
       <xsd:element name="token" type="token_type"/>
+      <xsd:element name="validity" type="validity_type"/>
     </xsd:sequence>
     <xsd:attribute name="name" type="xsd:string"/>
     <xsd:attribute ref="xml:base"/>
   </xsd:complexType>
+
+  <xsd:complexType name="validity_type">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:decimal">
+        <xsd:attribute name="format" type="validity_format_type" use="required"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+    <!-- FIXME: role -->
+  </xsd:complexType>
+
+  <xsd:simpleType name="validity_format_type">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="days"/>     <!-- number:                 730 -->
+      <xsd:enumeration value="calendar"/> <!-- YY[MM[DD[HH[MM[SS]]]]]:  02 -->
+    </xsd:restriction>
+  </xsd:simpleType>
 
   <xsd:complexType name="ca_type">
     <xsd:all>
@@ -234,7 +251,6 @@
   <xsd:complexType name="cert_profile_type">
     <xsd:sequence minOccurs="0">
       <xsd:element name="digest"   type="digest_type"/>
-      <xsd:element name="lifetime" type="lifetime_type"/>
       <xsd:element name="extensions" type="cert_extensions_type"/>
     </xsd:sequence>
     <xsd:attribute ref="role"/>
@@ -245,21 +261,6 @@
     <xsd:restriction base="xsd:token">
       <xsd:enumeration value="sha1"/>
       <xsd:enumeration value="md5"/>
-    </xsd:restriction>
-  </xsd:simpleType>
-
-  <xsd:complexType name="lifetime_type">
-    <xsd:simpleContent>
-      <xsd:extension base="xsd:decimal">
-        <xsd:attribute name="format" type="lifetime_format_type" use="required"/>
-      </xsd:extension>
-    </xsd:simpleContent>
-  </xsd:complexType>
-
-  <xsd:simpleType name="lifetime_format_type">
-    <xsd:restriction base="xsd:token">
-      <xsd:enumeration value="days"/>     <!-- number:                 730 -->
-      <xsd:enumeration value="calendar"/> <!-- YY[MM[DD[HH[MM[SS]]]]]:  02 -->
     </xsd:restriction>
   </xsd:simpleType>
 

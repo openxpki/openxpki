@@ -116,24 +116,24 @@ sub load_profile
                                      XPATH   => [@profile_path, "digest"],
                                      COUNTER => [@profile_counter, 0]);
     my $format = $self->{config}->get_xpath (
-                     XPATH   => [@profile_path, "lifetime", "format"],
+                     XPATH   => [@profile_path, "validity", "format"],
                      COUNTER => [@profile_counter, 0, 0]);
-    my $lifetime = $self->{config}->get_xpath (
-                       XPATH   => [@profile_path, "lifetime"],
+    my $validity = $self->{config}->get_xpath (
+                       XPATH   => [@profile_path, "validity"],
                        COUNTER => [@profile_counter, 0]);
     $self->{PROFILE}->{NOTBEFORE} = DateTime->now();
     $self->{PROFILE}->{NOTAFTER}  = DateTime->now();
     my ($year, $month, $day, $hour, $minute, $second) = (0, 0, 0, 0, 0, 0);
     if ($format eq "days")
     {
-        $day = $lifetime;
+        $day = $validity;
     } else {
-        $year   = substr ($lifetime,  0, 2) if (length ($lifetime) >  1);
-        $month  = substr ($lifetime,  2, 2) if (length ($lifetime) >  3);
-        $day    = substr ($lifetime,  4, 2) if (length ($lifetime) >  5);
-        $hour   = substr ($lifetime,  6, 2) if (length ($lifetime) >  7);
-        $minute = substr ($lifetime,  8, 2) if (length ($lifetime) >  9);
-        $second = substr ($lifetime, 10, 2) if (length ($lifetime) > 11);
+        $year   = substr ($validity,  0, 2) if (length ($validity) >  1);
+        $month  = substr ($validity,  2, 2) if (length ($validity) >  3);
+        $day    = substr ($validity,  4, 2) if (length ($validity) >  5);
+        $hour   = substr ($validity,  6, 2) if (length ($validity) >  7);
+        $minute = substr ($validity,  8, 2) if (length ($validity) >  9);
+        $second = substr ($validity, 10, 2) if (length ($validity) > 11);
     }
     $self->{PROFILE}->{NOTAFTER}->add (years   => $year,
                                        months  => $month,

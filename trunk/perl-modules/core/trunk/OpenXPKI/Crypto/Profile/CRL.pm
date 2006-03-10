@@ -81,14 +81,14 @@ sub load_profile
                                      XPATH   => [@profile_path, "digest"],
                                      COUNTER => [@profile_counter, 0]);
     my $format = $self->{config}->get_xpath (
-                     XPATH   => [@profile_path, "lifetime", "format"],
+                     XPATH   => [@profile_path, "validity", "format"],
                      COUNTER => [@profile_counter, 0, 0]);
-    my $lifetime = $self->{config}->get_xpath (
-                       XPATH   => [@profile_path, "lifetime"],
+    my $validity = $self->{config}->get_xpath (
+                       XPATH   => [@profile_path, "validity"],
                        COUNTER => [@profile_counter, 0]);
     if ($format eq "days")
     {
-        $self->{PROFILE}->{DAYS}  = $lifetime;
+        $self->{PROFILE}->{DAYS}  = $validity;
     } else {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_NEW_UNSUPPORTED_FORMAT");
