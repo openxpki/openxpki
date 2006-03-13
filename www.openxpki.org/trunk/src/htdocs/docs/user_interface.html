@@ -98,3 +98,21 @@ function which requires huge datastructures as answer.
     $href-&gt;{CERT}-&gt;[1]-&gt;{SUBJECT}-&gt;[0] = "dc=www,dc=openxpki,dc=org";
   </pre>
 </p>
+<p>
+* and + always mean MAX_LENGTH. Perhaps it is necessary for
+non-script language to split the scalar type into integer and
+string or something other.
+</p>
+<pre>
+hash         ::= hash_element+
+hash_element ::= [1-9][0-9]*.'\n'.    /* length of the hash key */
+                 [a-zA-Z0-9_]+.'\n'.  /* the hash key */
+                 array
+
+array         ::= array_element+
+array_element ::= [0-9]+.'\n'. /* position in the array */
+                  ('HASH\n'.hash|'SCALAR\n'.scalar)
+
+scalar ::= [0-9]+.'\n'. /* length of data */
+           data
+</pre>
