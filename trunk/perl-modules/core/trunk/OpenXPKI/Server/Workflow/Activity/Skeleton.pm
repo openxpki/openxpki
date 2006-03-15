@@ -36,7 +36,12 @@ sub execute {
 			  });    
 
 
-    my $context = $workflow->context();
+    # you may wish to use these shortcuts
+#     my $context      = $workflow->context();
+#     my $activity     = $self->{ACTIVITY};
+#     my $pki_realm    = $self->{PKI_REALM};
+#     my $session      = $self->{SESSION};
+#     my $defaulttoken = $self->{TOKEN_DEFAULT};
 
 
     $workflow->add_history(
@@ -66,6 +71,16 @@ Expects the following context parameters:
 =item ...
 
 Description...
+
+=item ...
+
+Description...
+
+=back
+
+After completion the following context parameters will be set:
+
+=over 12
 
 =item ...
 

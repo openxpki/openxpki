@@ -13,6 +13,7 @@ use Log::Log4perl       qw( get_logger );
 
 use OpenXPKI::Exception;
 use OpenXPKI::Crypto::TokenManager;  
+use OpenXPKI::Server::Context qw( CTX );
 
 
 sub execute {
@@ -23,10 +24,6 @@ sub execute {
 			  {
 			      ACTIVITYCLASS => 'PUBLIC',
 			      PARAMS => {
-				  _token => {
-				      accept_from => [ 'context' ],
-				      required => 1,
-				  },
 				  passphrase => {
 				  },
 			      },
@@ -38,14 +35,22 @@ sub execute {
     # NOP if already in context
     if (defined $self->param('passphrase')) {
 	# FIXME: should we log this?
+	$workflow->add_history(
+	    Workflow::History->new({
+		action      => 'Generate pass phrase pair',
+		description => sprintf( "Left supplied pass phrase unchanged" ),
+		user        => $self->param('creator'),
+				   })
+	    );
 	return 1;
     }
     
-    my $token = $self->param('_token');
+    my $token = $self->{TOKEN}->{DEFAULT};
     
     # generate a random pass phrase
     $self->param('passphrase',
-		 $token->command({COMMAND => "create_random", RANDOM_LENGTH => 16}));
+		 $token->command({COMMAND => "create_random", 
+				  RANDOM_LENGTH => 16}));
     
     # export
     $context->param(passphrase => $self->param('passphrase'));
@@ -72,11 +77,6 @@ Implements the 'pass phrase generation' workflow activity.
 Expects the following context parameters:
 
 =over 12
-
-=item _token
-
-Cryptographic token to use for pass phrase generation. The default token is
-sufficient for this purpose. Required. Volatile.
 
 =item passphrase
 

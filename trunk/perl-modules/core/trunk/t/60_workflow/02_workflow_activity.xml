@@ -21,17 +21,6 @@
 	   is_required="yes"/>
   </action>
 
-  <action name="token.default.get"
-	  class="OpenXPKI::Server::Workflow::Activity::Token::Get">
-    <description>Instantiate a default crypto token</description>
-  </action>
-
-  <action name="token.ca.get"
-	  class="OpenXPKI::Server::Workflow::Activity::Token::Get"
-	  tokentype="CA">
-    <description>Instantiate a CA crypto token</description>
-  </action>
-
   <action name="passphrase.generate"
 	  class="OpenXPKI::Server::Workflow::Activity::Passphrase::Generate">
     <description>Generate a pass phrase</description>

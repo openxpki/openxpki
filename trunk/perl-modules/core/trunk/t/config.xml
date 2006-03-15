@@ -22,12 +22,17 @@
          private key operations) -->
     <common name="default">
       <token super="common/token_config/token{default}"/>
-      <!-- no role specified: default validity -->
+
+      <!-- CA certificate validity (selfsigned) -->
+      <validity type="CA" format="days">730</validity>
+
+      <!-- no role specified: end entity certificate default validity -->
       <validity format="days">365</validity>
       
       <!-- specific validities override default -->
-      <validity role="User" format="days">365</validity>
-      <validity role="Server" format="days">365</validity>
+      <validity role="User" format="days">90</validity>
+      <validity role="Server" format="days">180</validity>
+
     </common>
 
     <!-- Issuing CAs defined for this realm -->

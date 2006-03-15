@@ -21,12 +21,12 @@ sub execute {
 			  {
 			      ACTIVITYCLASS => 'CA',
 			      PARAMS => {
-				  _token => {
+				  _profile => {
 				      accept_from => [ 'context' ],
 				      required => 1,
 				  },
-				  _profile => {
-				      accept_from => [ 'context' ],
+				  ca => {
+				      accept_from => [ 'context' ], 
 				      required => 1,
 				  },
 				  pkcs10request => {
@@ -43,7 +43,13 @@ sub execute {
 
     my $context = $workflow->context();
 
-    my $token   = $self->param('_token');
+    my $token = CTX('pki_realm')->{$self->{PKI_REALM}}->{ca}->{name}->{$self->param('ca')}->{crypto};
+    if (! defined $token) {
+	OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATE_ISSUE_TOKEN_UNAVAILABLE",
+            );
+    }
+
     my $profile = $self->param('_profile');
     ### $token
 
@@ -77,7 +83,7 @@ sub execute {
 
 =head1 Description
 
-Implements the FIXME workflow action.
+Implements the Certificate Issuance workflow activity.
 
 =head2 Context parameters
 
@@ -85,13 +91,31 @@ Expects the following context parameters:
 
 =over 12
 
-=item ...
+=item _profile
 
-Description...
+Certificate profile object to use for issuance.
 
-=item ...
+=item ca
 
-Description...
+Issuing CA name to delegate certificate issuance to.
+
+=item pkcs10request
+
+Certificate request (PKCS#10, PEM encoded) to process.
+
+=item subject
+
+Subject DN to use for certificate issuance.
+
+=back
+
+After completion the following context parameters will be set:
+
+=over 12
+
+=item certificate
+    
+PEM encoded certificate
 
 =back
 

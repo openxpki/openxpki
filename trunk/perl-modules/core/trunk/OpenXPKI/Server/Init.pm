@@ -12,7 +12,7 @@ package OpenXPKI::Server::Init;
 
 ## used modules
 
-# use Smart::Comments;
+#use Smart::Comments;
 
 use English;
 use OpenXPKI qw(debug set_language set_locale_prefix);
@@ -213,19 +213,22 @@ sub get_pki_realms
 
 	    my $format = $keys->{CONFIG}->get_xpath(
 		XPATH =>   ['pki_realm', 'common', 'validity', 'format'],
-		COUNTER => [0,           0,        $jj,         0 ],
+		COUNTER => [$i,           0,        $jj,         0 ],
 		);
 
 	    my $validity = $keys->{CONFIG}->get_xpath(
 		XPATH => ['pki_realm', 'common', 'validity'],
-		COUNTER => [0,           0,        $jj],
+		COUNTER => [$i,         0,        $jj],
 		);
 
+
+	    ############################################################
+	    # get role (optional, only for end entity certs)
 	    my $role;
 	    eval {
 		$role = $keys->{CONFIG}->get_xpath(
 		    XPATH => ['pki_realm', 'common', 'validity', 'role'],
-		    COUNTER => [0,           0,        $jj,         0 ],
+		    COUNTER => [$i,         0,        $jj,         0 ],
 		    );
 	    };
 
@@ -239,21 +242,53 @@ sub get_pki_realms
 		$EVAL_ERROR->rethrow();
 	    }
 
-	    # store validity
-	    if (defined $role) {
-		# register role specific end entity validity
-		$realms{$name}->{endentity}->{validity}->{role}->{$role} = {
-		    'format'   => $format,
-		    'validity' => $validity,
-		};
-	    } else {
-		# register default end entity validity
-		$realms{$name}->{endentity}->{validity}->{default} = {
+	    ############################################################
+	    # get type (optional, set to "CA" for CA certificates)
+	    my $type;
+	    eval {
+		$type = $keys->{CONFIG}->get_xpath(
+		    XPATH => ['pki_realm', 'common', 'validity', 'type'],
+		    COUNTER => [$i,         0,        $jj,         0 ],
+		    );
+	    };
+
+	    if (my $exc = OpenXPKI::Exception->caught()) {
+		# ignore exception for missing 'role' entry
+		if ($exc->message() 
+		    ne "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND") {
+		    $exc->rethrow();
+		}
+	    } elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
+		$EVAL_ERROR->rethrow();
+	    }
+
+	    if (defined $type && ($type eq "CA")) {
+		# store CA certificate validity
+		$realms{$name}->{ca}->{validity} =
+		{
 		    'format'   => $format,
 		    'validity' => $validity,
 		};
 	    }
+	    else
+	    {
+		# store end entity validity
+		if (defined $role) {
+		    # register role specific end entity validity
+		    $realms{$name}->{endentity}->{validity}->{role}->{$role} = {
+			'format'   => $format,
+			'validity' => $validity,
+		    };
+		} else {
+		    # register default end entity validity
+		    $realms{$name}->{endentity}->{validity}->{default} = {
+			'format'   => $format,
+			'validity' => $validity,
+		    };
+		}
+	    }
 	}
+
 	
 	# get all CA certificates for PKI realm
 	# $realms{$name}->{ca}->{$ca}->{certificate} =
@@ -266,14 +301,14 @@ sub get_pki_realms
 	for (my $jj = 0; $jj < $nr_of_ca_entries; $jj++) {
 	    my $ca_name = $keys->{CONFIG}->get_xpath(
 		XPATH =>   ['pki_realm', 'ca', 'name'],
-		COUNTER => [0,           $jj,  0 ],
+		COUNTER => [$i,          $jj,  0 ],
 		);
 	    
 	    my $ca_id;
 	    eval {
 		$ca_id = $keys->{CONFIG}->get_xpath(
 		    XPATH =>   ['pki_realm', 'ca', 'id'],
-		    COUNTER => [0,           $jj,  0 ],
+		    COUNTER => [$i,          $jj,  0 ],
 		    );
 	    };
 	    if (my $exc = OpenXPKI::Exception->caught()) {

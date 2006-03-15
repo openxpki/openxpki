@@ -75,7 +75,6 @@ Generated with OpenXPKI trustcenter software.</comment>
   <!-- profile configuration for the role User -->
   <profile role="User" id="user">
     <digest>sha1</digest>
-    <validity format="days">365</validity>
     <extensions>
       <basic_constraints critical="true">
         <ca>false</ca>

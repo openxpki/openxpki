@@ -9,6 +9,8 @@ use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 use Log::Log4perl       qw( get_logger );
 
+use OpenXPKI::Server::Context qw( CTX );
+
 # use Smart::Comments;
 
 
@@ -20,10 +22,6 @@ sub execute {
 			  {
 			      ACTIVITYCLASS => 'PUBLIC',
 			      PARAMS => {
-				  _token => {
-				      accept_from => [ 'context' ],
-				      required => 1,
-				  },
 				  key => {
 				      accept_from => [ 'context' ],
 				      required => 1,
@@ -41,8 +39,8 @@ sub execute {
 
     my $context = $workflow->context();
     my $log = get_logger(); 
-    
-    my $token = $self->param('_token');
+
+    my $token = $self->{TOKEN}->{DEFAULT};
 
     ## create CSR
     my $csr = $token->command ({COMMAND => "create_pkcs10",
@@ -100,6 +98,16 @@ Request subject.
 FIXME: This activity is the entry point as seen from the web interface. 
 We should list and require all parameters that have to be queried from
 the user.
+
+After completion the following context parameters will be set:
+
+=over 12
+
+=item pkcs10request
+
+PEM encoded PKCS#10 certificate request.
+
+=back
 
 =head1 Functions
 

@@ -210,6 +210,15 @@ sub authorize
                                               defined $keys->{AFFECTED_ROLE});
     my $activity = $keys->{ACTIVITY};
 
+    if (! defined $activity)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_ACTIVITY_UNDEFINED",
+            params  => {PKI_REALM     => $realm,
+                        AFFECTED_ROLE => $owner,
+                        AUTH_ROLE     => $user});
+    }
+
     if (not exists $self->{PKI_REALM}->{$realm}->{ROLES}->{$owner})
     {
         OpenXPKI::Exception->throw (

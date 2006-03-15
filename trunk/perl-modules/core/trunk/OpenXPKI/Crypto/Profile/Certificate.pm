@@ -16,6 +16,7 @@ use English;
 
 use DateTime;
 use Data::Dumper;
+# use Smart::Comments;
 
 sub new {
     my $that = shift;
@@ -115,33 +116,139 @@ sub load_profile
     $self->{PROFILE}->{DIGEST} = $self->{config}->get_xpath (
                                      XPATH   => [@profile_path, "digest"],
                                      COUNTER => [@profile_counter, 0]);
-    my $format = $self->{config}->get_xpath (
-                     XPATH   => [@profile_path, "validity", "format"],
-                     COUNTER => [@profile_counter, 0, 0]);
-    my $validity = $self->{config}->get_xpath (
-                       XPATH   => [@profile_path, "validity"],
-                       COUNTER => [@profile_counter, 0]);
+
+
+
+    # determine certificate validity
+    my $nr_of_validity_entries
+	= $self->{config}->get_xpath_count(
+	XPATH   => ['pki_realm', 'common', 'validity'],
+	COUNTER => [$pki_realm, 0]);
+    
+    ### validity entries: $nr_of_validity_entries
+    
+    my $format;
+    my $validity;
+
+  GETVALIDITY:
+    for (my $ii = 0; $ii < $nr_of_validity_entries; $ii++) {
+	### validity entry: $ii
+	my $tmp_format = $self->{config}->get_xpath(
+	    XPATH   => ['pki_realm', 'common', 'validity', 'format'],
+	    COUNTER => [$pki_realm,  0,        $ii,         0 ],
+	    );
+	
+	my $tmp_validity = $self->{config}->get_xpath(
+	    XPATH   => ['pki_realm', 'common', 'validity'],
+	    COUNTER => [$pki_realm,  0,        $ii],
+	    );
+
+	### format: $tmp_format
+	### validity: $tmp_validity
+
+	############################################################
+	# get role (optional, only for end entity certs)
+	my $role;
+	eval {
+	    $role = $self->{config}->get_xpath(
+		XPATH   => ['pki_realm', 'common', 'validity', 'role'],
+		COUNTER => [$pki_realm,  0,        $ii,         0 ],
+		);
+	};
+	if (my $exc = OpenXPKI::Exception->caught()) {
+	    # ignore exception for missing 'role' entry
+	    if ($exc->message() 
+		ne "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND") {
+		$exc->rethrow();
+	    }
+	} elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
+	    $EVAL_ERROR->rethrow();
+	}
+
+	### role: $role
+
+	############################################################
+	# get type (optional, set to "CA" for CA certificates)
+	my $type;
+	eval {
+	    $type = $self->{config}->get_xpath(
+		XPATH   => ['pki_realm', 'common', 'validity', 'type'],
+		COUNTER => [$pki_realm,   0,        $ii,         0 ],
+		);
+	};
+	
+	if (my $exc = OpenXPKI::Exception->caught()) {
+	    # ignore exception for missing 'role' entry
+	    if ($exc->message() 
+		ne "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND") {
+		$exc->rethrow();
+		}
+	} elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
+	    $EVAL_ERROR->rethrow();
+	}
+
+
+	# Use associated validity data if matching validity entry was found.
+
+	# Case 1: CA certificate profile
+	# Conditions: 
+	# $self->{TYPE} eq "CA" AND
+	# $type eq "CA"
+
+	if (defined $self->{TYPE} && defined $type &&
+	    ($self->{TYPE} eq $type) && ($self->{TYPE} eq "CA")) {
+	    $format   = $tmp_format;
+	    $validity = $tmp_validity;
+	    last GETVALIDITY;
+	}
+
+	# Case 2: End entity certificate profile
+	# Conditions:
+	# $self->{TYPE} ne "CA" AND
+	# ! defined $role        -> default validity
+	# $role eq $self->{ROLE} -> specific validity
+	if ((! defined $role) || ($role eq $self->{ROLE})) {
+	    # if role was undefined this is the default value
+	    #  -> remember it as fallback value
+	    # if it was defined it is "our" role
+	    #  -> remember it and leave loop
+	    $format   = $tmp_format;
+	    $validity = $tmp_validity;
+
+	    # exit if this was a direct hit (specified role is ours)
+	    last GETVALIDITY if (defined $role && ($role eq $self->{ROLE}));
+	}
+    }
+    
+    if (! defined $validity) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_NO_VALIDITY_CONFIGURED");
+    }
+
+    # FIXME: handle notbefore date
     $self->{PROFILE}->{NOTBEFORE} = DateTime->now();
+
     $self->{PROFILE}->{NOTAFTER}  = DateTime->now();
+
     my ($year, $month, $day, $hour, $minute, $second) = (0, 0, 0, 0, 0, 0);
     if ($format eq "days")
     {
-        $day = $validity;
+	$day = $validity;
     } else {
-        $year   = substr ($validity,  0, 2) if (length ($validity) >  1);
-        $month  = substr ($validity,  2, 2) if (length ($validity) >  3);
-        $day    = substr ($validity,  4, 2) if (length ($validity) >  5);
-        $hour   = substr ($validity,  6, 2) if (length ($validity) >  7);
-        $minute = substr ($validity,  8, 2) if (length ($validity) >  9);
-        $second = substr ($validity, 10, 2) if (length ($validity) > 11);
-    }
+	$year   = substr ($validity,  0, 2) if (length ($validity) >  1);
+	$month  = substr ($validity,  2, 2) if (length ($validity) >  3);
+	$day    = substr ($validity,  4, 2) if (length ($validity) >  5);
+	$hour   = substr ($validity,  6, 2) if (length ($validity) >  7);
+	$minute = substr ($validity,  8, 2) if (length ($validity) >  9);
+	$second = substr ($validity, 10, 2) if (length ($validity) > 11);
+     }
     $self->{PROFILE}->{NOTAFTER}->add (years   => $year,
-                                       months  => $month,
-                                       days    => $day,
-                                       hours   => $hour,
-                                       minutes => $minute,
-                                       seconds => $second);
-
+				       months  => $month,
+				       days    => $day,
+				       hours   => $hour,
+				       minutes => $minute,
+				       seconds => $second);
+    
     ## load extensions
 
     push @profile_path, "extensions";

@@ -12,7 +12,8 @@ use Log::Log4perl       qw( get_logger );
 # use Smart::Comments;
 
 use OpenXPKI::Exception;
-use OpenXPKI::Crypto::TokenManager;  
+use OpenXPKI::Crypto::TokenManager;
+use OpenXPKI::Server::Context qw( CTX );
 
 
 sub execute {
@@ -45,10 +46,6 @@ sub execute {
 				      accept_from => [ 'context' ],
 				      required => 1,
 				  },
-				  _token => {
-				      accept_from => [ 'context' ],
-				      required => 1,
-				  },
 			      },
 			  });
     
@@ -65,8 +62,26 @@ sub execute {
     }
 
 
-    my $token = $self->param('_token');
+    my $session = CTX('session');
+    if (! defined $session) {
+	OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INVALID_SESSION",
+            );
+    }
 
+    my $pki_realm = $session->get_pki_realm();
+    if (! defined $pki_realm) {
+	OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_PKI_REALM_UNDEFINED",
+            );
+    }
+    
+    my $token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    if (! defined $token) {
+	OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_TOKEN_UNAVAILABLE",
+            );
+    }
 
     my $key = $token->command({COMMAND    => "create_key",
 			       TYPE       => $self->param('keytype'),
@@ -104,11 +119,6 @@ Implements the 'key generation' workflow activity.
 Expects the following context parameters:
 
 =over 12
-
-=item _token
-
-Cryptographic token to use for key generation. The default token is
-sufficient for this purpose.
 
 =item keytype
 

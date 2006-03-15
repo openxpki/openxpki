@@ -30,12 +30,11 @@ sub execute {
           ? $params->{ACTIVITYCLASS}
           : "CA";
 
-    my $authorized = 1;
     # mbartosch
     # FIXME: add call to authorization module
     # my $authorized = CTX('authorization')->authorize(
     #                      ACTIVITYCLASS => $activityclass,
-    #                      ACTIVITY      => $self->param('activity'),
+    #                      ACTIVITY      => $self->{ACTIVITY},
     #                      # original creator of this workflow instance
     #                      CREATOR       => $workflow->context()->param('creator'),
     #                      # current user who executes this particular activity
@@ -48,7 +47,7 @@ sub execute {
     #         message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_AUTHORIZATION_FAILED",
     #         params  => { 
     #             ACTIVITYCLASS => $activityclass,
-    #             ACTIVITY      => $self->param('activity'),
+    #             ACTIVITY      => $self->{ACTIVITY},
     #             USER          => $workflow->context()->param('user'),
     #         }
     #     );
@@ -61,7 +60,7 @@ sub execute {
     # FIXME:   2. ACTIVITY
     #    ACTIVITYCLASS => $activityclass,
     CTX('acl')->authorize ({
-        ACTIVITY      => $self->param('activity'),
+        ACTIVITY      => $self->{ACTIVITY},
         AFFECTED_ROLE => $workflow->context()->param('role')});
 
     return 1;
@@ -82,7 +81,45 @@ sub setparams {
 
     # export canonical activity name to caller activity (for convenience)
     ### activity: $caller_activity
-    $self->param('activity' => $caller_activity);
+    $self->{ACTIVITY} = $caller_activity;
+
+    # export session to caller activity
+    $self->{SESSION} = CTX('session');
+    if (! defined $self->{SESSION}) {
+	OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_INVALID_SESSION",
+	    params  => { 
+		"CALLERPACKAGE" => $package,
+		"FILENAME"      => $filename,
+		"LINE"          => $line,
+	    },
+            );
+    }
+
+    # export PKI realm to caller activity
+    $self->{PKI_REALM} = $self->{SESSION}->get_pki_realm();
+    if (! defined $self->{PKI_REALM}) {
+	OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_PKI_REALM_UNDEFINED",
+	    params  => { 
+		"CALLERPACKAGE" => $package,
+		"FILENAME"      => $filename,
+		"LINE"          => $line,
+	    },
+            );
+    }
+    
+    $self->{TOKEN}->{DEFAULT} = CTX('pki_realm')->{$self->{PKI_REALM}}->{crypto}->{default};
+    if (! defined $self->{TOKEN}->{DEFAULT}) {
+	OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_DEFAULT_TOKEN_UNAVAILABLE",
+	    params  => { 
+		"CALLERPACKAGE" => $package,
+		"FILENAME"      => $filename,
+		"LINE"          => $line,
+	    },
+            );
+    }
 
     # check that we were passed a hash ref
     if (! defined $expected_params ||
@@ -252,6 +289,34 @@ named parameters to the Activity parameters.
 
 Modifies Activity parameters (accessible via $self->param(...) within
 the code). Does NOT modify the context itself!
+
+For convenience, the calling activity can rely on being able to 
+access the following internal settings that are read from the server 
+context:
+
+=over 4
+
+=item * 
+
+The current activity name via
+  $self->{ACTIVITY}
+
+=item * 
+
+The current session via
+  $self->{SESSION}
+
+=item * 
+
+The current PKI realm name via
+  $self->{PKI_REALM}
+
+=item * 
+
+A usable default token via
+  $self->{TOKEN}->{DEFAULT}
+
+=back
 
 The method expects the current workflow instance as first parameter.
 The second parameter must be a hash reference that contains the expected

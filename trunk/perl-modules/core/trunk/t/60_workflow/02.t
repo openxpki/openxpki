@@ -8,7 +8,7 @@ use Test;
 
 use Workflow::Factory;
 
-BEGIN { plan tests => 75; };
+BEGIN { plan tests => 67; };
 
 print STDERR "OpenXPKI::Server::Workflow - Sample workflow instance processing\n";
 
@@ -60,8 +60,6 @@ foreach my $testmode (qw( user_supplied_passphrase
     $context->param(role  => 'User');
     # $context->param(keytype  => 'DSA');
     # $context->param(keylength  => 1024);
-    # $context->param(tokentype => 'DEFAULT'); # defined in configuration
-    $context->param(pkirealm  => 'Test Root CA');
 
     if ($testmode eq "user_supplied_passphrase") {
 	$context->param(passphrase  => '123456');
@@ -78,14 +76,6 @@ foreach my $testmode (qw( user_supplied_passphrase
 	    EXPECTED_ACTIONS => [ 'request.certificate.dataonly.create' ],
 	    EXECUTE_ACTION => 'request.certificate.dataonly.create',
 	);
-
-    # this would be the next step if autorun were not true for GET_TOKEN
-#     ### do_step - get token...
-#     do_step($workflow, 
-# 	    EXPECTED_STATE => 'GET_TOKEN',
-# 	    EXPECTED_ACTIONS => [ 'token.get' ],
-# 	    EXECUTE_ACTION => 'token.get',
-# 	);
 
     ### check if branching the workflow works as expected
     if (! defined $context->param('passphrase')) {
@@ -131,17 +121,9 @@ foreach my $testmode (qw( user_supplied_passphrase
     ### PKCS10 request: $context->param('pkcs10request')
     ok($context->param('pkcs10request') =~ /^-----BEGIN CERTIFICATE REQUEST-----/);
 
-
     # TODO: determine issuing CA for pki_realm
     # simluation:
     $context->param(ca => 'INTERNAL_CA_1');
-
-    ### do_step - get ca token...
-    do_step($workflow, 
-	    EXPECTED_STATE => 'GET_CA_TOKEN',
-	    EXPECTED_ACTIONS => [ 'token.ca.get', ],
-	    EXECUTE_ACTION => 'token.ca.get',
-	);
 
     ### do_step - determine certificate profile
     do_step($workflow, 
@@ -149,7 +131,6 @@ foreach my $testmode (qw( user_supplied_passphrase
 	    EXPECTED_ACTIONS => [ 'profile.get', ],
 	    EXECUTE_ACTION => 'profile.get',
 	);
-
 
     ### do_step - issue certificate
     do_step($workflow, 

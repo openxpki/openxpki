@@ -6,13 +6,7 @@
   <state name="INITIAL">
     <description>Initial state for basic certificate requests</description>
     <action name="request.certificate.dataonly.create"
-	    resulting_state="GET_TOKEN" />
-  </state>
-
-  <state name="GET_TOKEN" autorun="yes">
-    <description>Obtain crypto token</description>
-    <action name="token.default.get"
-	    resulting_state="GENERATE_PASSPHRASE"/>
+	    resulting_state="GENERATE_PASSPHRASE" />
   </state>
 
   <state name="GENERATE_PASSPHRASE">
@@ -45,14 +39,7 @@
   <state name="CREATE_REQUEST">
     <description>Create certificate request</description>
     <action name="request.certificate.pkcs10.create"
-	    resulting_state="GET_CA_TOKEN"/>
-  </state>
-
-  <state name="GET_CA_TOKEN">
-    <description>Get CA Token</description>
-    <action name="token.ca.get"
 	    resulting_state="GET_PROFILE"/>
-    <tokentype>CA</tokentype>
   </state>
 
   <state name="GET_PROFILE">

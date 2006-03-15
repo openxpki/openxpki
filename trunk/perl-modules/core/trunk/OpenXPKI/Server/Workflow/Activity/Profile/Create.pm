@@ -22,10 +22,6 @@ sub execute {
 			  {
 			      ACTIVITYCLASS => 'CA',
 			      PARAMS => {
-				  pkirealm => {
-				      accept_from => [ 'context' ],
-				      required => 1,
-				  },
 				  ca => {
 				      accept_from => [ 'context' ], 
 				      required => 1,
@@ -40,10 +36,11 @@ sub execute {
 
     my $context = $workflow->context();
 
+
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
 	DEBUG     => 0,
 	CONFIG    => CTX('xml_config'),
-	PKI_REALM => $self->param('pkirealm'),
+	PKI_REALM => $self->{PKI_REALM},
 	CA        => $self->param('ca'),
 	ROLE      => $self->param('role')
 	);
@@ -66,7 +63,7 @@ sub execute {
 
 =head1 Description
 
-Implements the FIXME workflow action.
+Implements the Certificate Profile Generation workflow action.
 
 =head2 Context parameters
 
@@ -74,13 +71,23 @@ Expects the following context parameters:
 
 =over 12
 
-=item ...
+=item ca
 
-Description...
+Issuing CA to use for creating the certificate.
 
-=item ...
+=item role
 
-Description...
+Certificate role (profile name) to use for certifiate issuance.
+
+=back
+
+After completion the following context parameters will be set:
+
+=over 12
+
+=item _profile
+
+Certificate profile object to be used for issuance.
 
 =back
 
