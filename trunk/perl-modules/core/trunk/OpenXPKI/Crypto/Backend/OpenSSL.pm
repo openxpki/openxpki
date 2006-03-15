@@ -18,6 +18,10 @@ use OpenXPKI::Exception;
 use English;
 
 use File::Spec;
+use Date::Parse;
+use DateTime;
+
+# use Smart::Comments;
 
 sub new
 {
@@ -130,6 +134,7 @@ sub __load_config
         elsif ($EVAL_ERROR)
         {
 	    $self->debug ("caught system exception while reading config attribute $key");
+	    # FIXME: should we really throw an OpenXPKI exception here?
             OpenXPKI::Exception->throw (message => $EVAL_ERROR);
         }
 
@@ -407,6 +412,28 @@ sub get_object_function
         }
     }
 
+    ## parse dates
+    if (defined $result && (($func eq "notbefore") || ($func eq "notafter"))) {
+
+	# seconds since the epoch
+	my $epoch = str2time($result);
+	if (! defined $epoch) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_FUNCTION_DATE_PARSING_ERROR",
+		params  => {
+		    DATE => $result,
+		},
+		);
+	}
+	
+	my $dt_object = DateTime->from_epoch(epoch => $epoch);
+
+	# make sure we use UTC
+	$dt_object->set_time_zone('UTC');
+
+	$result = $dt_object;
+    }
+    
     $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
     return $result;
 }
@@ -489,7 +516,7 @@ OpenXPKI::Crypto::Backend::OpenSSL::Engine for more details.
 execute an OpenSSL command. You must specify the name of the command
 as first parameter followed by a hash with parameter. Example:
 
-$token->command ({COMMAND => "create_key", TYPE => "RSA", ...});
+  $token->command ({COMMAND => "create_key", TYPE => "RSA", ...});
 
 =head2 get_object
 
@@ -523,6 +550,14 @@ is used to execute functions on the object. The function expects two
 parameters the OBJECT and the FUNCTION which should be called. All
 functions have no parameters. The result of the function will be
 returned.
+
+When parsing an X.509 certificate the NotBefore and NotAfter dates are
+returned as hash references containing the following keys:
+  raw         => date as returned by the OpenSSL parser
+  epoch       => seconds since the epoch
+  object      => blessed DateTime object with TimeZone set to UTC
+  iso8601     => string containing the ISO8601 formatted date (UTC)
+  openssltime => string containing an OpenSSL compatible date string (UTC)
 
 =head2 free_object
 

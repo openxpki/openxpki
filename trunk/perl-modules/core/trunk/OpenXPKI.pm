@@ -18,9 +18,13 @@ use XSLoader;
 XSLoader::load ("OpenXPKI", $VERSION);
 
 use Date::Parse;
+use DateTime;
+use Scalar::Util qw( blessed );
 use Locale::Messages qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
 use Fcntl qw (:DEFAULT);
+
+# use Smart::Comments;
 
 our $language = "";
 our $locale_prefix = "";
@@ -28,25 +32,7 @@ our $locale_prefix = "";
 use vars qw (@ISA @EXPORT_OK);
 require Exporter;
 @ISA = qw (Exporter);
-@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language get_language debug read_file write_file);
-
-=head1 Exported functions
-
-Exported function are function which can be imported by every other
-object. These function are exported to enforce a common behaviour of
-all OpenXPKI modules for debugging and error handling.
-
-C<use OpenXPKI::API qw (debug i18nGettext);>
-
-=head2 debug
-
-You should call the function in the following way:
-
-C<$self-E<gt>debug ("help: $help");>
-
-All other stuff is generated fully automatically by the debug function.
-
-=cut
+@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language get_language debug read_file write_file convert_date);
 
 sub debug
 {
@@ -73,24 +59,6 @@ sub debug
     #}
 }
 
-=head1 Description
-
-This module manages all i18n stuff for the L<OpenCA::Server> daemon.
-The main job is the implementation of the translation function and
-the storage of the activated language.
-
-All functions work in static mode (static member functions). 
-This means that they are to be invoked directly and not via an object
-instance.
-
-=head1 Functions
-
-=head2 set_locale_prefix
-
-The only parameter is a directory in the filesystem. The function is used
-to set the path to the directory with the mo databases.
-
-=cut
 
 sub set_locale_prefix
 {
@@ -102,44 +70,6 @@ sub set_locale_prefix
             params  => {"DIR" => $locale_prefix});
     }
 }
-
-=pod
-
-=head2 i18nGettext
-
-The first parameter is the i18n code string that should be looked up
-in the translation table. Usually this identifier should look like
-C<I18N_OPENCA_MODULE_FUNCTION_SPECIFIC_STUFF>. 
-Optionally there may follow a hash or a hash reference that maps parameter
-keywords to values that should be replaced in the original string.
-A parameter should have the format C<__NAME__>, but in fact every
-keyword is possible.
-
-The function obtains the translation for the code string (if available)
-and then replaces each parameter keyword in the code string
-with the corresponding replacement value.
-
-The function always returns an UTF8 string.
-
-Examples:
-
-    my $text;
-    $text = i18nGettext("I18N_OPENCA_FOO_BAR");
-    $text = i18nGettext("I18N_OPENCA_FOO_BAR", 
-                        "__COUNT__" => 1,
-                        "__ORDER__" => "descending",
-                        );
-
-    %translation = ( "__COUNT__" => 1,
-                     "__ORDER__" => "descending" );
-    $text = i18nGettext("I18N_OPENCA_FOO_BAR", %translation);
-
-    $translation_ref = { "__COUNT__" => 1,
-                         "__ORDER__" => "descending" };
-    $text = i18nGettext("I18N_OPENCA_FOO_BAR", $translation_ref);
-
-
-=cut
 
 
 sub i18nGettext {
@@ -193,15 +123,6 @@ sub i18nGettext {
 }
 
 
-=pod
-
-=head2 set_language
-
-Switch complete language setup to the specified language. If no
-language is specified then the default language C is activated. This
-deactivates all translation databases.
-
-=cut
 
 sub set_language
 {
@@ -235,26 +156,12 @@ sub set_language
     bind_textdomain_codeset("openxpki", "UTF-8");
 }
 
-=pod
-
-=head2 get_language
-
-Returns the currently active language.
-
-=cut
 
 sub get_language
 {
     return $language;
 }
 
-=head1 File functionality
-
-=head2 read_file
-
-Example: $self->read_file($filename);
-
-=cut
 
 sub read_file
 {
@@ -295,18 +202,6 @@ sub read_file
     return $result;
 }
 
-=head2 write_file
-
-Example: $self->write_file (FILENAME => $filename, CONTENT => $data);
-
-The method will raise an exception if the file already exists unless
-the optional argument FORCE is set. In this case the method will overwrite
-the specified file.
-
-Example: $self->write_file (FILENAME => $filename, CONTENT => $data, FORCE => 1);
-
-
-=cut
 
 sub write_file
 {
@@ -357,4 +252,174 @@ sub write_file
     return 1;
 }
 
+
+# static function
+sub convert_date {
+    my $options = shift;
+    
+    my $outformat = exists $options->{OUTFORMAT} 
+        ? $options->{OUTFORMAT} 
+        : 'iso8601';
+
+    my $date = $options->{DATE};
+
+    if (! defined $date) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CONVERT_DATE_INVALID_DATE",
+	    );
+    }
+
+    # convert to UTC
+    eval {
+	$date->set_time_zone('UTC');
+    };
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CONVERT_DATE_INVALID_DATE",
+	    params => {
+		ERROR => $EVAL_ERROR,
+	    },
+	    );
+    }
+
+    return $date->epoch()                   if ($outformat eq 'epoch');
+    return $date->iso8601()                 if ($outformat eq 'iso8601');
+    return $date->strftime("%g%m%d%H%M%SZ") if ($outformat eq 'openssltime');
+    return $date->strftime("%Y%m%d%H%M%S")  if ($outformat eq 'terse');
+    return $date->strftime("%F %T")         if ($outformat eq 'printable');
+
+    OpenXPKI::Exception->throw (
+	message => "I18N_OPENXPKI_CONVERT_DATE_INVALID_FORMAT",
+	params => {
+	    OUTFORMAT => $outformat,
+	}
+	);
+ }
+
+
 1;
+
+__END__
+
+=head1 Exported functions
+
+Exported function are function which can be imported by every other
+object. These function are exported to enforce a common behaviour of
+all OpenXPKI modules for debugging and error handling.
+
+C<use OpenXPKI::API qw (debug i18nGettext);>
+
+=head2 debug
+
+You should call the function in the following way:
+
+C<$self-E<gt>debug ("help: $help");>
+
+All other stuff is generated fully automatically by the debug function.
+
+
+=head1 Description
+
+This module manages all i18n stuff for the L<OpenCA::Server> daemon.
+The main job is the implementation of the translation function and
+the storage of the activated language.
+
+All functions work in static mode (static member functions). 
+This means that they are to be invoked directly and not via an object
+instance.
+
+=head1 Functions
+
+=head2 set_locale_prefix
+
+The only parameter is a directory in the filesystem. The function is used
+to set the path to the directory with the mo databases.
+
+
+=head2 i18nGettext
+
+The first parameter is the i18n code string that should be looked up
+in the translation table. Usually this identifier should look like
+C<I18N_OPENCA_MODULE_FUNCTION_SPECIFIC_STUFF>. 
+Optionally there may follow a hash or a hash reference that maps parameter
+keywords to values that should be replaced in the original string.
+A parameter should have the format C<__NAME__>, but in fact every
+keyword is possible.
+
+The function obtains the translation for the code string (if available)
+and then replaces each parameter keyword in the code string
+with the corresponding replacement value.
+
+The function always returns an UTF8 string.
+
+Examples:
+
+    my $text;
+    $text = i18nGettext("I18N_OPENCA_FOO_BAR");
+    $text = i18nGettext("I18N_OPENCA_FOO_BAR", 
+                        "__COUNT__" => 1,
+                        "__ORDER__" => "descending",
+                        );
+
+    %translation = ( "__COUNT__" => 1,
+                     "__ORDER__" => "descending" );
+    $text = i18nGettext("I18N_OPENCA_FOO_BAR", %translation);
+
+    $translation_ref = { "__COUNT__" => 1,
+                         "__ORDER__" => "descending" };
+    $text = i18nGettext("I18N_OPENCA_FOO_BAR", $translation_ref);
+
+
+
+=head2 set_language
+
+Switch complete language setup to the specified language. If no
+language is specified then the default language C is activated. This
+deactivates all translation databases.
+
+
+=head2 get_language
+
+Returns the currently active language.
+
+
+=head2 read_file
+
+Example: $self->read_file($filename);
+
+
+=head2 write_file
+
+Example: $self->write_file (FILENAME => $filename, CONTENT => $data);
+
+The method will raise an exception if the file already exists unless
+the optional argument FORCE is set. In this case the method will overwrite
+the specified file.
+
+Example: $self->write_file (FILENAME => $filename, CONTENT => $data, FORCE => 1);
+
+
+=head2 convert_date
+
+Converts a DateTime object to various date formats used throughout
+OpenXPKI and returns the corresponding representation. Before converting
+the object the Time Zone is adjusted to UTC.
+
+If OUTFORMAT is not specified the output format defaults to iso8601.
+
+Possible output formats:
+  iso8601:     ISO 8601 formatted date (YYYY-MM-DDTHH:MM:SS), default
+  epoch:       seconds since the epoch
+  openssltime: time format used in OpenSSL index files (YYMMDDHHMMSSZ)
+  terse:       terse time format (YYYYMMDDHHMMSS)
+  printable:   human readable ISO-like time format (YYYY-MM-DD HH:MM:SS)
+
+Example:
+
+    my $dt = DateTime->now();
+
+    print OpenXPKI::convert_date({
+        DATE      => $dt,
+        OUTFORMAT => 'iso8601',
+    });
+    

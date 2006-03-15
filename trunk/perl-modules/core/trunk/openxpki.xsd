@@ -404,7 +404,7 @@
   <xsd:complexType name="x509v3_oid">
     <xsd:complexContent mixed="true">
     <xsd:extension base="x509v3_extension">
-      <xsd:attribute name="number"   type="xsd:string"/>
+      <xsd:attribute name="numeric"  type="xsd:string"/>
       <xsd:attribute name="format"   type="asn1_format_type"/>
       <xsd:attribute name="encoding" type="asn1_encoding_type"/>
     </xsd:extension>

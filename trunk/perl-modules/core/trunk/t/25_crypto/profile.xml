@@ -123,7 +123,7 @@ Generated with OpenXPKI trustcenter software.</comment>
         <uri>http://localhost/cps.html</uri>
       </cps>
       <!-- Microsoft Certificate Template "SmartcardUser" (bmp string) -->
-      <oid critical="false" number="1.3.6.1.4.1.311.20.2" format="DER" encoding="HEX">
+      <oid critical="false" numeric="1.3.6.1.4.1.311.20.2" format="DER" encoding="HEX">
         1e:1a:00:53:00:6d:00:61:00:72:00:74:00:63:00:61:00:72:00:64:00:55:00:73:00:65:00:72
       </oid>
       <netscape>

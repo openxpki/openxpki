@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 use Test;
+# use Smart::Comments;
+
 BEGIN { plan tests => 16 };
 
 print STDERR "OpenXPKI::Crypto::Command: Create a CA\n";
@@ -61,6 +63,8 @@ foreach my $ca_name (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
 	TYPE      => "CA");
     $profile->set_serial(1);
     ok(1);
+
+    ### profile: $profile
     
     ## create CA cert
     my $cert = $token->command ({COMMAND => "create_cert",

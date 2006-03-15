@@ -225,6 +225,9 @@ sub load_profile
 	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_NO_VALIDITY_CONFIGURED");
     }
 
+    ### Certificate validity: $validity
+    ### Certificate validity format: $format
+
     # FIXME: handle notbefore date
     $self->{PROFILE}->{NOTBEFORE} = DateTime->now();
 

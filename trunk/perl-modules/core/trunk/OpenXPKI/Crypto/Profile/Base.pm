@@ -273,7 +273,7 @@ sub load_extension
                                                       COUNTER => [@counter]);
         for (my $i=0; $i<$count; $i++)
         {
-            my $oid = $self->{config}->get_xpath (XPATH   => [@path, "number"],
+            my $oid = $self->{config}->get_xpath (XPATH   => [@path, "numeric"],
                                                   COUNTER => [@counter, $i, 0]);
             $values[0] = ["FORMAT",
                           $self->{config}->get_xpath (XPATH   => [@path, "format"],

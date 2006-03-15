@@ -9,6 +9,8 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
 use OpenXPKI::Crypto::Profile::CRL;
 
+use Smart::Comments;
+
 our $cache;
 our $basedir;
 eval `cat t/25_crypto/common.pl`;
@@ -104,7 +106,7 @@ my $pkcs12 = $default_token->command ({COMMAND => "create_pkcs12",
 ok (1);
 print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
 
-## create CRL
+### create CRL profile...
 $profile = OpenXPKI::Crypto::Profile::CRL->new (
                   DEBUG     => 0,
                   CONFIG    => $cache,
@@ -112,6 +114,7 @@ $profile = OpenXPKI::Crypto::Profile::CRL->new (
                   CA        => "INTERNAL_CA_1");
 ## otherwise test 34 fails
 ## $profile->set_serial (1);
+### issue crl...
 my $crl = $ca_token->command ({COMMAND => "issue_crl",
                                REVOKED => [$cert],
                                PROFILE => $profile});

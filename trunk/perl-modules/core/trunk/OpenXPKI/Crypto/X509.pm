@@ -9,10 +9,11 @@ package OpenXPKI::Crypto::X509;
 
 use OpenXPKI::DN;
 use Math::BigInt;
-## use Date::Parse;
 
 use base qw(OpenXPKI::Crypto::Object);
 use English;
+
+# use Smart::Comments;
 
 sub new
 {
@@ -78,15 +79,20 @@ sub __init
                        "version", "pubkey_algorithm", "signature_algorithm", "exponent",
                        "keysize", "extensions", "openssl_subject" )
     {
-        $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function ({
-                                                   DEBUG    => $self->{DEBUG},
-                                                   OBJECT   => $self->{x509},
-                                                   FUNCTION => $attr});
+        $self->{PARSED}->{BODY}->{uc($attr)} 
+	= $self->{TOKEN}->get_object_function (
+	    {
+		DEBUG    => $self->{DEBUG},
+		OBJECT   => $self->{x509},
+		FUNCTION => $attr,
+	    });
     }
     $self->{TOKEN}->free_object ($self->{x509});
     delete $self->{x509};
     $self->debug ("loaded cert attributes");
     my $ret = $self->{PARSED}->{BODY};
+
+    ### parsed body: $ret
 
     ###########################
     ##     parse subject     ##
