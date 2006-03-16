@@ -121,9 +121,15 @@ foreach my $testmode (qw( user_supplied_passphrase
     ### PKCS10 request: $context->param('pkcs10request')
     ok($context->param('pkcs10request') =~ /^-----BEGIN CERTIFICATE REQUEST-----/);
 
-    # TODO: determine issuing CA for pki_realm
-    # simluation:
-    $context->param(ca => 'INTERNAL_CA_1');
+    ### do_step - determine internal issuing CA
+    do_step($workflow, 
+	    EXPECTED_STATE => 'DETERMINE_ISSUING_CA',
+	    EXPECTED_ACTIONS => [ 'ca.determine', ],
+	    EXECUTE_ACTION => 'ca.determine',
+	);
+
+    ### Internal CA: $context->param('ca')
+    ok($context->param('ca'), 'INTERNAL_CA_2');
 
     ### do_step - determine certificate profile
     do_step($workflow, 

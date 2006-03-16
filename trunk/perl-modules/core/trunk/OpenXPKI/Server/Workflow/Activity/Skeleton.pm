@@ -24,11 +24,17 @@ sub execute {
 			      # PUBLIC: publicly available operation
 			      #ACTIVITYCLASS => 'CA',
 			      PARAMS => {
+#				  # accept_from values (first match wins):
+#				  # 'context': accept workflow context values
+#				  # 'config':  accept workflow config values
+#				  # 'default': accept defaults in source code
 # 				  _myvolatile => {
+#				      # accept_from => [ 'config', 'default' ],
 # 				      # default => '',
 # 				      # required => 1,
 # 				  },
 # 				  mypersistent => {
+#				      # accept_from => [ 'context', 'config', 'default' ],
 # 				      # default => '',
 # 				      # required => 1,
 # 				  },

@@ -40,6 +40,11 @@
 	   is_required="yes"/>
   </action>
 
+  <action name="ca.determine"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::DetermineIssuingCA">
+    <description>Determine internal issuing CA</description>
+  </action>
+
   <action name="profile.get"
 	  class="OpenXPKI::Server::Workflow::Activity::Profile::Create">
     <description>Get certificate profile</description>

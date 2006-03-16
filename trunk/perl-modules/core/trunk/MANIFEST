@@ -9,8 +9,9 @@ CHANGES
 VERSION
 Makefile.PL
 OpenXPKI.pm
-OpenXPKI/Exception.pm
+OpenXPKI/DateTime.pm
 OpenXPKI/DN.pm
+OpenXPKI/Exception.pm
 OpenXPKI/XML/Cache.pm
 OpenXPKI/XML/Config.pm
 openxpki.xsd
@@ -114,6 +115,7 @@ OpenXPKI/Server/Workflow/Activity/Key/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly/Create.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
+OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 OpenXPKI/Server/Workflow/Activity/Token/Get.pm
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
@@ -132,6 +134,9 @@ t/05_base/03.t
 t/05_base/fix_config.pl
 
 t/10_exception/1.t
+
+t/14_datetime/01.t
+t/14_datetime/02.t
 
 t/15_dn/1.t
 t/15_dn/2.t

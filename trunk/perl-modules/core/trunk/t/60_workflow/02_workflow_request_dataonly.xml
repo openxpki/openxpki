@@ -39,6 +39,12 @@
   <state name="CREATE_REQUEST">
     <description>Create certificate request</description>
     <action name="request.certificate.pkcs10.create"
+	    resulting_state="DETERMINE_ISSUING_CA"/>
+  </state>
+
+  <state name="DETERMINE_ISSUING_CA">
+    <description>Determine internal issuing CA</description>
+    <action name="ca.determine"
 	    resulting_state="GET_PROFILE"/>
   </state>
 

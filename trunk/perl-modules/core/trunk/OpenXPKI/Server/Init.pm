@@ -379,6 +379,12 @@ sub get_pki_realms
 	    }
 	    
 	    $realms{$name}->{ca}->{name}->{$ca_name}->{cacert} = $cacert;
+
+	    # for convenience and quicker accesss
+	    $realms{$name}->{ca}->{name}->{$ca_name}->{notbefore} = 
+		$cacert->get_parsed("BODY", "NOTBEFORE");
+	    $realms{$name}->{ca}->{name}->{$ca_name}->{notafter} = 
+		$cacert->get_parsed("BODY", "NOTAFTER");
 	}
 	    
     }
