@@ -10,6 +10,7 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 use OpenXPKI;
+use OpenXPKI::DateTime;
 
 use Math::BigInt;
 use English;
@@ -86,7 +87,7 @@ sub get_command
             my $start = $self->{ENGINE}->get_object_function ({
                             OBJECT   => $cert,
                             FUNCTION => "notbefore"});
-            $start = OpenXPKI::convert_date(
+            $start = OpenXPKI::DateTime::convert_date(
 		{
 		    DATE      => $start,
 		    OUTFORMAT => 'openssltime',

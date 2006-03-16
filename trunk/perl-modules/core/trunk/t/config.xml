@@ -24,14 +24,14 @@
       <token super="common/token_config/token{default}"/>
 
       <!-- CA certificate validity (selfsigned) -->
-      <validity type="CA" format="days">730</validity>
+      <validity type="CA" format="date">+02</validity>
 
       <!-- no role specified: end entity certificate default validity -->
       <validity format="days">365</validity>
       
       <!-- specific validities override default -->
       <validity role="User" format="days">90</validity>
-      <validity role="Server" format="days">180</validity>
+      <validity role="Server" format="date">+0006</validity>
 
     </common>
 

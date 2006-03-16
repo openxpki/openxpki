@@ -9,7 +9,7 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
 use OpenXPKI::Crypto::Profile::CRL;
 
-use Smart::Comments;
+# use Smart::Comments;
 
 our $cache;
 our $basedir;

@@ -3,13 +3,16 @@ use warnings;
 use utf8;
 binmode STDERR, ":utf8";
 use Test;
-BEGIN { plan tests => 18 };
+BEGIN { plan tests => 25 };
 
 print STDERR "OpenXPKI::Crypto::X509\n";
 
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::X509;
 use Time::HiRes;
+use DateTime;
+
+# use Smart::Comments;
 
 our $cache;
 our $basedir;
@@ -27,8 +30,11 @@ ok (1);
 my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM => "Test Root CA");
 ok (1);
 
-## load certificate
-my $data = OpenXPKI->read_file ("$basedir/ca1/cert.pem");
+my $data;
+
+###########################################################################
+## load end entity certificate
+$data = OpenXPKI->read_file ("$basedir/ca1/cert.pem");
 ok(1);
 $data = "-----BEGIN HEADER-----\n".
            "ROLE=User\n".
@@ -42,6 +48,17 @@ ok(1);
 ## test parser
 ok ($cert->get_parsed("BODY", "SUBJECT") eq "CN=John Doe,DC=OpenCA,DC=info");
 ok ($cert->get_parsed("BODY", "KEYSIZE") == 1024);
+
+my $notafter;
+my $now = DateTime->now( time_zone => 'UTC' );
+my $validity_duration;
+my $duration_string;
+
+$notafter = $cert->get_parsed("BODY", "NOTAFTER");
+$validity_duration = $notafter - $now;
+# 90 days as configured in the profile is always 2 full months plus some days
+ok($validity_duration->in_units('months'), 2);
+
 ok ($cert->get_parsed("HEADER", "ROLE") eq "User");
 
 ## test attribute setting
@@ -53,6 +70,45 @@ ok ($cert->get_converted ("PEM"));
 ok ($cert->get_converted ("DER"));
 ok ($cert->get_converted ("TXT"));
 
+
+###########################################################################
+# validate CA certificates
+
+
+$data = OpenXPKI->read_file("$basedir/ca1/cacert.pem");
+ok(defined $data);
+
+$cert = OpenXPKI::Crypto::X509->new (TOKEN => $token, DATA => $data);
+ok(defined $cert);
+
+$notafter = $cert->get_parsed("BODY", "NOTAFTER");
+$validity_duration = $notafter - $now;
+# 90 days as configured in the profile is always 2 full months plus some days
+$duration_string 
+    = join(',', $validity_duration->in_units('years', 'months', 'days'));
+
+ok($duration_string, "2,0,0");
+
+
+
+
+$data = OpenXPKI->read_file("$basedir/ca2/cacert.pem");
+ok(defined $data);
+
+$cert = OpenXPKI::Crypto::X509->new (TOKEN => $token, DATA => $data);
+ok(defined $cert);
+
+$notafter = $cert->get_parsed("BODY", "NOTAFTER");
+$validity_duration = $notafter - $now;
+# 90 days as configured in the profile is always 2 full months plus some days
+$duration_string 
+    = join(',', $validity_duration->in_units('years', 'months', 'days'));
+
+ok($duration_string, "2,0,0");
+
+
+
+###########################################################################
 ## performance
 my $items = 1000;
 my $begin = [ Time::HiRes::gettimeofday() ];

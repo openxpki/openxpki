@@ -253,49 +253,6 @@ sub write_file
 }
 
 
-# static function
-sub convert_date {
-    my $options = shift;
-    
-    my $outformat = exists $options->{OUTFORMAT} 
-        ? $options->{OUTFORMAT} 
-        : 'iso8601';
-
-    my $date = $options->{DATE};
-
-    if (! defined $date) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CONVERT_DATE_INVALID_DATE",
-	    );
-    }
-
-    # convert to UTC
-    eval {
-	$date->set_time_zone('UTC');
-    };
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CONVERT_DATE_INVALID_DATE",
-	    params => {
-		ERROR => $EVAL_ERROR,
-	    },
-	    );
-    }
-
-    return $date->epoch()                   if ($outformat eq 'epoch');
-    return $date->iso8601()                 if ($outformat eq 'iso8601');
-    return $date->strftime("%g%m%d%H%M%SZ") if ($outformat eq 'openssltime');
-    return $date->strftime("%Y%m%d%H%M%S")  if ($outformat eq 'terse');
-    return $date->strftime("%F %T")         if ($outformat eq 'printable');
-
-    OpenXPKI::Exception->throw (
-	message => "I18N_OPENXPKI_CONVERT_DATE_INVALID_FORMAT",
-	params => {
-	    OUTFORMAT => $outformat,
-	}
-	);
- }
-
 
 1;
 
@@ -399,27 +356,3 @@ the specified file.
 Example: $self->write_file (FILENAME => $filename, CONTENT => $data, FORCE => 1);
 
 
-=head2 convert_date
-
-Converts a DateTime object to various date formats used throughout
-OpenXPKI and returns the corresponding representation. Before converting
-the object the Time Zone is adjusted to UTC.
-
-If OUTFORMAT is not specified the output format defaults to iso8601.
-
-Possible output formats:
-  iso8601:     ISO 8601 formatted date (YYYY-MM-DDTHH:MM:SS), default
-  epoch:       seconds since the epoch
-  openssltime: time format used in OpenSSL index files (YYMMDDHHMMSSZ)
-  terse:       terse time format (YYYYMMDDHHMMSS)
-  printable:   human readable ISO-like time format (YYYY-MM-DD HH:MM:SS)
-
-Example:
-
-    my $dt = DateTime->now();
-
-    print OpenXPKI::convert_date({
-        DATE      => $dt,
-        OUTFORMAT => 'iso8601',
-    });
-    

@@ -4,10 +4,11 @@ use warnings;
 use Test;
 # use Smart::Comments;
 
-BEGIN { plan tests => 16 };
+BEGIN { plan tests => 24 };
 
 print STDERR "OpenXPKI::Crypto::Command: Create a CA\n";
 
+use OpenXPKI qw( read_file );
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
 
@@ -41,14 +42,20 @@ foreach my $ca_name (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
     ok (1);
     
     ## create CA RSA key (use passwd from token.xml)
-    ## FIXME: CA key is *unencrypted*?
     my $key = $token->command ({COMMAND    => "create_key",
 				TYPE       => "RSA",
 				KEY_LENGTH => "1024",
 				ENC_ALG    => "aes256"});
     ok (1);
     print STDERR "CA RSA: $key\n" if ($ENV{DEBUG});
+
+    # key is present
+    ok($key =~ /^-----BEGIN.*PRIVATE KEY-----/);
+
+    # key is encrypted
+    ok($key =~ /^-----BEGIN ENCRYPTED PRIVATE KEY-----/);
     
+
     ## create CA CSR
     my $csr = $token->command ({COMMAND => "create_pkcs10",
 				SUBJECT => "cn=$cn,dc=OpenXPKI,dc=info"});
@@ -81,6 +88,11 @@ foreach my $ca_name (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
     } else {
 	ok(1);
     }
+
+    my $content = OpenXPKI->read_file("$basedir/$dir/cakey.pem" );
+    ok($content =~ /^-----BEGIN.*PRIVATE KEY-----/);
+    ok($content =~ /^-----BEGIN ENCRYPTED PRIVATE KEY-----/);
+
     if (not -e "$basedir/$dir/cacert.pem")
     {
 	ok(0);

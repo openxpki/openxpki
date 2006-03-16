@@ -424,6 +424,7 @@ sub get_named_extensions
     return grep /^[^.]+$/, keys %{$self->{PROFILE}->{EXTENSIONS}};
 }
 
+
 our $AUTOLOAD;
 sub AUTOLOAD {
     my $self = shift;
@@ -436,3 +437,15 @@ sub AUTOLOAD {
 
 1;
 __END__
+
+=head1 Description
+
+Base class for profiles used in the CA.
+
+=head2 Subclassing
+
+...
+
+=head1 Functions
+
+=head2 ...

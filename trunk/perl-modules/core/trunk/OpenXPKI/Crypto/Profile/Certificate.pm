@@ -12,6 +12,7 @@ use base qw(OpenXPKI::Crypto::Profile::Base);
 
 use OpenXPKI qw (debug);
 use OpenXPKI::Exception;
+use OpenXPKI::DateTime;
 use English;
 
 use DateTime;
@@ -229,28 +230,15 @@ sub load_profile
     ### Certificate validity format: $format
 
     # FIXME: handle notbefore date
-    $self->{PROFILE}->{NOTBEFORE} = DateTime->now();
+    $self->{PROFILE}->{NOTBEFORE} = DateTime->now( time_zone => 'UTC' );
 
-    $self->{PROFILE}->{NOTAFTER}  = DateTime->now();
+    $self->{PROFILE}->{NOTAFTER} = OpenXPKI::DateTime::get_validity(
+	{
+	    VALIDITY => $validity,
+	    VALIDITYFORMAT => $format,
+	},
+	);
 
-    my ($year, $month, $day, $hour, $minute, $second) = (0, 0, 0, 0, 0, 0);
-    if ($format eq "days")
-    {
-	$day = $validity;
-    } else {
-	$year   = substr ($validity,  0, 2) if (length ($validity) >  1);
-	$month  = substr ($validity,  2, 2) if (length ($validity) >  3);
-	$day    = substr ($validity,  4, 2) if (length ($validity) >  5);
-	$hour   = substr ($validity,  6, 2) if (length ($validity) >  7);
-	$minute = substr ($validity,  8, 2) if (length ($validity) >  9);
-	$second = substr ($validity, 10, 2) if (length ($validity) > 11);
-     }
-    $self->{PROFILE}->{NOTAFTER}->add (years   => $year,
-				       months  => $month,
-				       days    => $day,
-				       hours   => $hour,
-				       minutes => $minute,
-				       seconds => $second);
     
     ## load extensions
 
