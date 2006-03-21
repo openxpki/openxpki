@@ -64,12 +64,22 @@ sub convert_date {
 sub get_validity {
     my $params = shift;
 
-    my $validity         = $params->{VALIDITY};
+    my $validity         
+	= defined $params->{VALIDITY}
+          ? $params->{VALIDITY}
+          : "";
+
     my $validityformat   
-	= exists $params->{VALIDITYFORMAT}
+	= defined $params->{VALIDITYFORMAT}
           ? $params->{VALIDITYFORMAT}
-          : 'date';
-    
+          : 'relativedate';
+
+    # referencedate is used for relative date computations
+    my $refdate 
+	= defined $params->{REFERENCEDATE} 
+          ? $params->{REFERENCEDATE}->clone()
+          : DateTime->now( time_zone => 'UTC' );
+
     if ($validityformat eq 'days') {
 	if ($validity !~ m{ \A [+\-]?\d+ \z }xms) {
 	    OpenXPKI::Exception->throw (
@@ -80,17 +90,21 @@ sub get_validity {
 		},
 		);
 	}
-	my $dt = DateTime->now( time_zone => 'UTC' );
-	$dt->add( days => $validity );
+	$refdate->add( days => $validity );
 
-	return $dt;
+	return $refdate;
     }
     
-    if ($validityformat eq 'date') {
-	my ($relative, $validity) 
-	    = ( $validity =~ m{ \A ([+\-]?)(\d+) \z }xms );
+    if (($validityformat eq 'absolutedate') ||
+	($validityformat eq 'relativedate')) {
 
-	if (! defined $validity) {
+	my $relative = "";
+	if ($validityformat eq 'relativedate') {
+	    ($relative, $validity) 
+		= ( $validity =~ m{ \A ([+\-]?)(\d+) \z }xms );
+	}
+	
+	if ((! defined $validity) || ($validity eq "")) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY",
 		params  => {
@@ -99,7 +113,7 @@ sub get_validity {
 		},
 		);
 	}
-
+	
 	my %date;
 	# get year
 	my $datelength = ( $relative eq "" ) ? 4 : 2;
@@ -116,7 +130,7 @@ sub get_validity {
 		}
 	    }
 	}
-
+	
 	# absolute validity
 	if ($relative eq "") {
 	    return DateTime->new(
@@ -126,23 +140,21 @@ sub get_validity {
 	}
 	else
 	{
-	    my $dt = DateTime->now( time_zone => 'UTC' );
-
 	    # append an 's' character to the has keys (year -> years)
 	    %date = map { $_ . 's' => $date{$_} } keys %date;
-
+	    
 	    if ($relative eq "+") {
-		$dt->add( %date );
-		return $dt;
+		$refdate->add( %date );
+		return $refdate;
 	    }
-
+	    
 	    if ($relative eq "-") {
-		$dt->subtract( %date );
-		return $dt;
+		$refdate->subtract( %date );
+		return $refdate;
 	    }
 	}
     }
-
+    
     OpenXPKI::Exception->throw (
 	message => "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT",
 	params  => {
@@ -153,19 +165,15 @@ sub get_validity {
 }
 
 
+
 1;
 __END__
 
 =head1 Description
 
-Base class for profiles used in the CA.
-
-=head2 Subclassing
-
-...
+Tools for date/time manipulation.
 
 =head1 Functions
-
 
 
 =head2 convert_date
@@ -183,7 +191,7 @@ Possible output formats:
   terse:       terse time format (YYYYMMDDHHMMSS)
   printable:   human readable ISO-like time format (YYYY-MM-DD HH:MM:SS)
 
-Example:
+=head3 Example
 
     my $dt = DateTime->now();
 
@@ -203,17 +211,33 @@ Possible validity formats (specified via VALIDITYFORMAT):
 
 =item *
 
-'date': the specified validity is interpreted as a terse date string,
-either absolute or relative. This is the default.
+'relativedate': the specified validity is interpreted as a relative
+terse date string. This is the default.
+
+=item *
+
+'absolutedate': the specified validity is interpreted as an absolute 
+terse date string.
 
 =item * 
 
 'days': the specified validity is interpreted as an integer number of days
-(positive or negative) as an offset to the current date
+(positive or negative) as an offset to the reference date.
 
 =back
 
+=head3 Reference date
+
+If a relative validity is specified the duration is added to a reference
+date that defaults to the current time (UTC).
+
+If the named parameter REFERENCEDATE is specified and contains a DateTime
+object this date is taken as the basis for calculating the relative
+date.
+
 =head3 Terse date strings
+
+The validity specification is passed in as the named parameter VALIDITY.
 
 Absolute validities are specified in the format
 
@@ -232,7 +256,7 @@ the format
   -YY[MM[DD[HH[MM[SS]]]]]
 
 Positive relative validities are interpreted as date offsets in the future
-as seen from the current time, negative relativie validities are interpreted
+as seen from reference date, negative relativie validities are interpreted
 as date offsets in the past.
 
 Examples:
@@ -240,4 +264,20 @@ Examples:
   -000001    (yesterday)
   +0003      (three months from now)
 
-    
+=head3 Usage example
+
+  my $offset = DateTime->now( timezone => 'UTC' );
+  $offset->add( months => 2 );
+
+  my $somedate = OpenXPKI::DateTime::get_validity(
+	    {
+		REFERENCEDATE => $offset,
+		VALIDITY => '+0205',
+		VALIDITYFORMAT => 'relativedate',
+	    },
+	);
+  print $somedate->datetime()
+
+After this has been executed a date should be printed that is 2 years
+and 7 months in the future: the relative validity 2 years, 5 months
+is added to the offset which is 2 months in the future from now.

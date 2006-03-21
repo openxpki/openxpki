@@ -9,11 +9,11 @@ use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use DateTime;
-
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
+use OpenXPKI::DateTime;
 
-use Smart::Comments;
+# use Smart::Comments;
 
 sub execute {
     my $self = shift;
@@ -27,7 +27,7 @@ sub execute {
 			      # PUBLIC: publicly available operation
 			      ACTIVITYCLASS => 'CA',
 			      PARAMS => {
-				  role => {
+				  profile => {
 				      accept_from => [ 'context' ],
 				      required => 1,
 				  },
@@ -43,10 +43,47 @@ sub execute {
 #     my $defaulttoken = $self->{TOKEN_DEFAULT};
 
 
-    # FIXME: determine requested end entity validity
-    my $requested_notbefore = DateTime->now( time_zone => 'UTC' );
-    my $requested_notafter = DateTime->now( time_zone => 'UTC' );
-    $requested_notafter->add( days => 15 );
+    my $realm_config = CTX('pki_realm')->{$pki_realm};
+
+    my $profilename = $self->param('profile');
+
+    if (! exists $realm_config->{endentity}->{id}->{$profilename}->{validity}) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_ACTIVITY_TOOLS_DETERMINEISSUINGCA_NO_MATCHING_PROFILE",
+	    params  => {
+		REQUESTED_PROFILE => $profilename,
+	    },
+	    );
+    }
+
+    # get validity as specified in the configuration
+    my $entry_validity 
+	= $realm_config->{endentity}->{id}->{$profilename}->{validity};
+
+
+    my $requested_notbefore;
+    my $requested_notafter;
+
+    if (! exists $entry_validity->{notbefore}) {
+	# assign default (current timestamp) if notbefore is not specified
+	$requested_notbefore = DateTime->now( time_zone => 'UTC' );
+    } else {
+	$requested_notbefore = OpenXPKI::DateTime::get_validity(
+	    {
+		VALIDITY => $entry_validity->{notbefore}->{validity},
+		VALIDITYFORMAT => $entry_validity->{notbefore}->{format},
+	    },
+	    );
+    }
+
+    $requested_notafter = OpenXPKI::DateTime::get_validity(
+	    {
+		REFERENCEDATE => $requested_notbefore,
+		VALIDITY => $entry_validity->{notafter}->{validity},
+		VALIDITYFORMAT => $entry_validity->{notafter}->{format},
+	    },
+	);
+
 
     # anticipate runtime differences, if the requested notafter is close
     # to the end a CA validity we might identify an issuing CA that is
@@ -55,20 +92,23 @@ sub execute {
     # FIXME: is this acceptable?
     $requested_notafter->add( minutes => 5 );
 
+    ### requested notbefore: $requested_notbefore->datetime()
+    ### requested notafter: $requested_notafter->datetime()
+
+
     # iterate through all issuing CAs and determine possible candidates
     # for issuing the requested certificate
     my $now = DateTime->now( time_zone => 'UTC' );
-    my $realm_config = CTX('pki_realm')->{$pki_realm};
     my $intca;
     my $mostrecent_notbefore;
   CANDIDATE:
-    foreach my $ca_name (sort keys %{ $realm_config->{ca}->{name} }) {
-	### Internal CA: $ca_name
+    foreach my $ca_id (sort keys %{ $realm_config->{ca}->{id} }) {
+	### Internal CA: $ca_id
 
-	my $ca_notbefore = $realm_config->{ca}->{name}->{$ca_name}->{notbefore};
-	###   NotBefore: $ca_notbefore->datetime()
+	my $ca_notbefore = $realm_config->{ca}->{id}->{$ca_id}->{notbefore};
+	###   NotAfter: $ca_notbefore->datetime()
 
-	my $ca_notafter = $realm_config->{ca}->{name}->{$ca_name}->{notafter};
+	my $ca_notafter = $realm_config->{ca}->{id}->{$ca_id}->{notafter};
 	###   NotBefore: $ca_notafter->datetime()
 
 	# check if issuing CA is valid now
@@ -98,14 +138,14 @@ sub execute {
 	    {
 		###    Issuing CA has a more recent NotBefore date than the previous one
 		$mostrecent_notbefore = $ca_notbefore;
-		$intca = $ca_name;
+		$intca = $ca_id;
 	    }
 	}
 	else
 	{
 	    ###    First candidate...
 	    $mostrecent_notbefore = $ca_notbefore;
-	    $intca = $ca_name;
+	    $intca = $ca_id;
 	}
     }
 

@@ -2,7 +2,6 @@
 
   <crl>
     <digest>sha1</digest>
-    <validity format="days">35</validity>
     <extensions>
     </extensions>
   </crl>
@@ -11,7 +10,6 @@
   <!-- WARNING: this is ONLY for SELF-SIGNED CA certificates       -->
   <ca_certificate>
     <digest>sha1</digest>
-    <validity format="days">730</validity>
     <extensions>
       <basic_constraints critical="true">
         <ca>true</ca>
@@ -72,7 +70,7 @@ Generated with OpenXPKI trustcenter software.</comment>
     </extensions>
   </ca_certificate>
 
-  <!-- profile configuration for the role User -->
+  <!-- configuration for the certificate profile 'User' -->
   <profile role="User" id="user">
     <digest>sha1</digest>
     <extensions>

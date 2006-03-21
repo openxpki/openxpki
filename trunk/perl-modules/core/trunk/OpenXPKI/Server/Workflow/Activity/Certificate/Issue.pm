@@ -43,7 +43,7 @@ sub execute {
 
     my $context = $workflow->context();
 
-    my $token = CTX('pki_realm')->{$self->{PKI_REALM}}->{ca}->{name}->{$self->param('ca')}->{crypto};
+    my $token = CTX('pki_realm')->{$self->{PKI_REALM}}->{ca}->{id}->{$self->param('ca')}->{crypto};
     if (! defined $token) {
 	OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATE_ISSUE_TOKEN_UNAVAILABLE",

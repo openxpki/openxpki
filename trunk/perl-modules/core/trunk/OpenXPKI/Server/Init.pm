@@ -12,7 +12,7 @@ package OpenXPKI::Server::Init;
 
 ## used modules
 
-#use Smart::Comments;
+# use Smart::Comments;
 
 use English;
 use OpenXPKI qw(debug set_language set_locale_prefix);
@@ -167,6 +167,8 @@ sub get_crypto_layer
     return OpenXPKI::Crypto::TokenManager->new (DEBUG  => $self->{DEBUG});
 }
 
+
+
 sub get_pki_realms
 {
     my $self = shift;
@@ -203,91 +205,75 @@ sub get_pki_realms
 
         $realms{$name}->{crypto}->{default} = $defaulttoken;
 
-	# get end entity validities
-	my $nr_of_validity_entries
-	    = $keys->{CONFIG}->get_xpath_count(
-	    XPATH   => ['pki_realm', 'common', 'validity'],
-	    COUNTER => [$i, 0]);
+	
+	foreach my $entrytype (qw( endentity selfsignedca crl )) {
+	    ### entrytype: $entrytype
 
-	for (my $jj = 0; $jj < $nr_of_validity_entries; $jj++) {
-
-	    my $format = $keys->{CONFIG}->get_xpath(
-		XPATH =>   ['pki_realm', 'common', 'validity', 'format'],
-		COUNTER => [$i,           0,        $jj,         0 ],
-		);
-
-	    my $validity = $keys->{CONFIG}->get_xpath(
-		XPATH => ['pki_realm', 'common', 'validity'],
-		COUNTER => [$i,         0,        $jj],
-		);
-
-
-	    ############################################################
-	    # get role (optional, only for end entity certs)
-	    my $role;
-	    eval {
-		$role = $keys->{CONFIG}->get_xpath(
-		    XPATH => ['pki_realm', 'common', 'validity', 'role'],
-		    COUNTER => [$i,         0,        $jj,         0 ],
+	    my $nr_of_entries = $keys->{CONFIG}->get_xpath_count(
+		XPATH   => ['pki_realm', 'common', $entrytype, 'validity'],
+		COUNTER => [$i,          0,        0 ]);
+	    
+	    ### entries: $nr_of_entries
+	    foreach (my $jj = 0; $jj < $nr_of_entries; $jj++) {
+ 		my $entryid = $keys->{CONFIG}->get_xpath(
+ 		    XPATH => ['pki_realm', 'common', $entrytype, 'validity', 'id'],
+ 		    COUNTER => [$i,         0,       0,          $jj,        0],
 		    );
-	    };
 
-	    if (my $exc = OpenXPKI::Exception->caught()) {
-		# ignore exception for missing 'role' entry
-		if ($exc->message() 
-		    ne "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND") {
-		    $exc->rethrow();
-		}
-	    } elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
-		$EVAL_ERROR->rethrow();
-	    }
+		### entryid: $entryid
+		    
+	      VALIDITYTYPE:
+		foreach my $validitytype (qw( notbefore notafter )) {
+		    next VALIDITYTYPE if (($entrytype eq "crl") &&
+					  ($validitytype eq "notbefore"));
+		    
+		    ### validitytype: $validitytype
 
-	    ############################################################
-	    # get type (optional, set to "CA" for CA certificates)
-	    my $type;
-	    eval {
-		$type = $keys->{CONFIG}->get_xpath(
-		    XPATH => ['pki_realm', 'common', 'validity', 'type'],
-		    COUNTER => [$i,         0,        $jj,         0 ],
-		    );
-	    };
+		    my $validity;
+		    my $format;
+		    # parse validity entry
+		    eval {
+			$format = $keys->{CONFIG}->get_xpath(
+			    XPATH   => [ 'pki_realm', 'common', $entrytype, 'validity', $validitytype, 'format' ],
+			    COUNTER => [ $i,          0,        0,          $jj,        0,             0 ],
+			    );
 
-	    if (my $exc = OpenXPKI::Exception->caught()) {
-		# ignore exception for missing 'role' entry
-		if ($exc->message() 
-		    ne "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND") {
-		    $exc->rethrow();
-		}
-	    } elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
-		$EVAL_ERROR->rethrow();
-	    }
-
-	    if (defined $type && ($type eq "CA")) {
-		# store CA certificate validity
-		$realms{$name}->{ca}->{validity} =
-		{
-		    'format'   => $format,
-		    'validity' => $validity,
-		};
-	    }
-	    else
-	    {
-		# store end entity validity
-		if (defined $role) {
-		    # register role specific end entity validity
-		    $realms{$name}->{endentity}->{validity}->{role}->{$role} = {
-			'format'   => $format,
-			'validity' => $validity,
+			$validity = $keys->{CONFIG}->get_xpath(
+			    XPATH   => [ 'pki_realm', 'common', $entrytype, 'validity', $validitytype ],
+			    COUNTER => [ $i,          0,        0,          $jj,        0 ],
+			    );
+			
 		    };
-		} else {
-		    # register default end entity validity
-		    $realms{$name}->{endentity}->{validity}->{default} = {
-			'format'   => $format,
-			'validity' => $validity,
-		    };
+		    if (my $exc = OpenXPKI::Exception->caught()) {
+			# ignore exception for missing 'notbefore' entry
+			if (($exc->message() 
+			    eq "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND")
+			    && ($validitytype eq "notbefore")) {
+			    # default: "now"
+			    $validity = undef;
+			}
+			else
+			{
+			    $exc->rethrow();
+			}
+		    } elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
+			$EVAL_ERROR->rethrow();
+		    }
+		    
+		    ### got format: $format
+		    ### got validity: $validity
+
+		    if (defined $validity) {
+			$realms{$name}->{$entrytype}->{id}->{$entryid}->{validity}->{$validitytype} = 
+			{
+			    'format' => $format,
+			    'validity' => $validity,
+			};
+		    }
 		}
 	    }
 	}
+
 
 	
 	# get all CA certificates for PKI realm
@@ -304,22 +290,23 @@ sub get_pki_realms
 		COUNTER => [$i,          $jj,  0 ],
 		);
 	    
-	    my $ca_id;
-	    eval {
-		$ca_id = $keys->{CONFIG}->get_xpath(
-		    XPATH =>   ['pki_realm', 'ca', 'id'],
-		    COUNTER => [$i,          $jj,  0 ],
+	    my $ca_id = $keys->{CONFIG}->get_xpath(
+		XPATH =>   ['pki_realm', 'ca', 'id'],
+		COUNTER => [$i,          $jj,  0 ],
+		);
+
+	    
+	    # sanity check: there must be a CRL validity configuration
+	    # for this issuing CA
+	    if (! exists $realms{$name}->{crl}->{id}->{$ca_id}->{validity}) {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERVER_INIT_PKI_REALMS_NO_CRL_VALIDITY",
+		    params => {
+			CAID   => $ca_id,
+		    },
 		    );
-	    };
-	    if (my $exc = OpenXPKI::Exception->caught()) {
-		# ignore exception for missing 'id' entry
-		if ($exc->message() 
-		    ne "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND") {
-		    $exc->rethrow();
-		}
-	    } elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
-		$EVAL_ERROR->rethrow();
 	    }
+	    
 
 	    my $token = 
 		$keys->{CRYPTO}->get_token (DEBUG     => $self->{DEBUG},
@@ -327,14 +314,7 @@ sub get_pki_realms
 					    NAME      => $ca_name,
 					    PKI_REALM => $name);
 	    
-	    $realms{$name}->{ca}->{name}->{$ca_name}->{crypto} = $token;
-
-# 	    # attach CA ID information if available
-# 	    # FIXME: do we need this?
-# 	    if (defined $ca_id) {
-# 		$realms{$name}->{ca}->{name}->{$ca_name}->{id} = $ca_id;
-# 		$realms{$name}->{ca}->{id}->{$ca_id}->{name} = $ca_name;
-# 	    }
+	    $realms{$name}->{ca}->{id}->{$ca_id}->{crypto} = $token;
 
 	    # attach CA certificate
 	    my $cacertfile = $token->get_certfile();
@@ -346,6 +326,7 @@ sub get_pki_realms
 		    params  => {
 			PKI_REALM => $name,
 			CA_NAME   => $ca_name,
+			CA_ID     => $ca_id,
 		    },
 		    );
 	    }
@@ -357,6 +338,7 @@ sub get_pki_realms
 		    params  => {
 			PKI_REALM => $name,
 			CA_NAME   => $ca_name,
+			CA_ID     => $ca_id,
 			CA_CERT_FILE => $cacertfile,
 		    },
 		    );
@@ -373,22 +355,24 @@ sub get_pki_realms
 		    params  => {
 			PKI_REALM => $name,
 			CA_NAME   => $ca_name,
+			CA_ID     => $ca_id,
 			CA_CERT_FILE => $cacertfile,
 		    },
 		    );
 	    }
 	    
-	    $realms{$name}->{ca}->{name}->{$ca_name}->{cacert} = $cacert;
+	    $realms{$name}->{ca}->{id}->{$ca_id}->{cacert} = $cacert;
 
 	    # for convenience and quicker accesss
-	    $realms{$name}->{ca}->{name}->{$ca_name}->{notbefore} = 
+	    $realms{$name}->{ca}->{id}->{$ca_id}->{notbefore} = 
 		$cacert->get_parsed("BODY", "NOTBEFORE");
-	    $realms{$name}->{ca}->{name}->{$ca_name}->{notafter} = 
+	    $realms{$name}->{ca}->{id}->{$ca_id}->{notafter} = 
 		$cacert->get_parsed("BODY", "NOTAFTER");
 	}
 	    
     }
 
+    ### realms: %realms
     return \%realms;
 }
 
@@ -628,6 +612,71 @@ The values are the default cryptographic token for each PKI realm.
 The parameters CONFIG and CRYPTO are required. The first parameter
 is the XML configuration object and the second parameter must
 be an instance of the TokenManager.
+
+The hash also includes validity information as defined in the configuration
+in the following sample format:
+
+  $hash{PKI_REALM_NAME} = {
+      endentity => {
+          id => {
+              'User' => {
+                  validity => {
+                      notbefore => {
+                          format => undef,
+                          validity => undef,
+                      },
+                      notafter => {
+                          format => 'relativedate',
+                          validity => '+0006',
+                      },
+                  },
+              },
+          },
+      },
+      selfsignedca => {
+          id => {
+              'INTERNAL_CA_1' => {
+                  validity => {
+                      notbefore => {
+                          format => 'absolutedate',
+                          validity => '20060101',
+                      },
+                      notafter => {
+                          format => 'relativedate',
+                          validity => '+02',
+                      },
+                  },
+              },
+          },
+      },
+      crl => {
+          id => {
+              'default' => {
+                  validity => {
+                      notbefore => {
+                          format => undef,
+                          validity => undef,
+                      },
+                      notafter => {
+                          format => 'relativedate',
+                          validity => '+000014',
+                      },
+                  },
+              },
+          },
+      },
+  };
+
+See OpenXPKI::DateTime for more information about the various time formats
+used here.
+Undefined 'notbefore' dates are interpreted as 'now' during issuance.
+Relative notafter dates relate to the corresponding notbefore date.
+
+Three sections are contained in the hash: 'endentity', 'selfsignedca'
+and 'crl'. 
+The ID of endentity validities is the corresponding role (profile). 
+The ID of self-signed CA or CRL validities is the internal CA name.
+
 
 =head2 Non-Cryptographic Object Initialization
 

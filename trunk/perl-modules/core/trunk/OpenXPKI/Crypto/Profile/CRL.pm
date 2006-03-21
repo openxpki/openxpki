@@ -16,6 +16,7 @@ use English;
 
 use DateTime;
 use Data::Dumper;
+#use Smart::Comments;
 
 sub new {
     my $that = shift;
@@ -80,19 +81,67 @@ sub load_profile
     $self->{PROFILE}->{DIGEST} = $self->{config}->get_xpath (
                                      XPATH   => [@profile_path, "digest"],
                                      COUNTER => [@profile_counter, 0]);
-    my $format = $self->{config}->get_xpath (
-                     XPATH   => [@profile_path, "validity", "format"],
-                     COUNTER => [@profile_counter, 0, 0]);
-    my $validity = $self->{config}->get_xpath (
-                       XPATH   => [@profile_path, "validity"],
-                       COUNTER => [@profile_counter, 0]);
-    if ($format eq "days")
-    {
-        $self->{PROFILE}->{DAYS}  = $validity;
-    } else {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_NEW_UNSUPPORTED_FORMAT");
+
+    # determine CRL validity
+    my $entrytype = "crl";
+    my $requested_id = $self->{CA};
+
+    my %entry_validity = $self->get_entry_validity(
+	{
+	    ENTRYTYPE => $entrytype,
+	    ENTRYID   => $requested_id,
+	});
+
+
+    # notafter specification is mandatory
+    if (! exists $entry_validity{notafter}) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_VALIDITY_NOT_FOUND",
+	    params => {
+		ENTRYTYPE => $entrytype,
+		ENTRYID   => $requested_id,
+	    },
+	    );
+	
     }
+
+    # notbefore is not applicable for CRLs (and may lead to incorrect
+    # datetime calculation for relative dates below)
+    if (exists $entry_validity{notbefore}) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_NOTBEFORE_SPECIFIED",
+	    params => $entry_validity{notbefore},
+	    );
+    }
+    
+
+    # for error handling
+    delete $self->{PROFILE}->{DAYS};
+
+    # plain days
+    if ($entry_validity{notafter}->{VALIDITYFORMAT} eq "days") {
+	$self->{PROFILE}->{DAYS}  = $entry_validity{notafter}->{VALIDITY};
+    }
+
+    # handle relative date formats ("+0002" for two months)
+    if ($entry_validity{notafter}->{VALIDITYFORMAT} eq "relativedate") {
+	my $notafter = OpenXPKI::DateTime::get_validity(
+	    $entry_validity{notafter});
+
+	my $days = sprintf("%d", ($notafter->epoch() - time) / (24 * 3600));
+	
+	$self->{PROFILE}->{DAYS}  = $days;
+    }
+
+    # only relative dates are allowed for CRLs
+    if (! exists $self->{PROFILE}->{DAYS}) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_INVALID_VALIDITY_FORMAT",
+	    params => $entry_validity{notafter},
+	    );
+    }
+
+    
 
     ## load extensions
     #

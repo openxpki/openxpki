@@ -26,7 +26,7 @@ sub execute {
 				      accept_from => [ 'context' ], 
 				      required => 1,
 				  },
-				  role => {
+				  profile => {
 				      accept_from => [ 'context' ], 
 				      required => 1,
 				  },
@@ -42,7 +42,7 @@ sub execute {
 	CONFIG    => CTX('xml_config'),
 	PKI_REALM => $self->{PKI_REALM},
 	CA        => $self->param('ca'),
-	ROLE      => $self->param('role')
+	ROLE      => $self->param('profile')
 	);
 
     $context->param(_profile => $profile);
@@ -75,9 +75,9 @@ Expects the following context parameters:
 
 Issuing CA to use for creating the certificate.
 
-=item role
+=item profile
 
-Certificate role (profile name) to use for certifiate issuance.
+Certificate profilename to use for certifiate issuance.
 
 =back
 

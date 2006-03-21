@@ -120,123 +120,53 @@ sub load_profile
 
 
 
+    ###########################################################################
     # determine certificate validity
-    my $nr_of_validity_entries
-	= $self->{config}->get_xpath_count(
-	XPATH   => ['pki_realm', 'common', 'validity'],
-	COUNTER => [$pki_realm, 0]);
-    
-    ### validity entries: $nr_of_validity_entries
-    
-    my $format;
-    my $validity;
 
-  GETVALIDITY:
-    for (my $ii = 0; $ii < $nr_of_validity_entries; $ii++) {
-	### validity entry: $ii
-	my $tmp_format = $self->{config}->get_xpath(
-	    XPATH   => ['pki_realm', 'common', 'validity', 'format'],
-	    COUNTER => [$pki_realm,  0,        $ii,         0 ],
-	    );
+    # assume end entity certificate
+    my $entrytype = "endentity";
+    my $requested_id = $self->{ROLE};
+
+    if ($self->{TYPE} eq "CA") {
+	$entrytype = "selfsignedca";
 	
-	my $tmp_validity = $self->{config}->get_xpath(
-	    XPATH   => ['pki_realm', 'common', 'validity'],
-	    COUNTER => [$pki_realm,  0,        $ii],
-	    );
+	# determine CA id
+	### ca: $self->{CA}
 
-	### format: $tmp_format
-	### validity: $tmp_validity
-
-	############################################################
-	# get role (optional, only for end entity certs)
-	my $role;
-	eval {
-	    $role = $self->{config}->get_xpath(
-		XPATH   => ['pki_realm', 'common', 'validity', 'role'],
-		COUNTER => [$pki_realm,  0,        $ii,         0 ],
-		);
-	};
-	if (my $exc = OpenXPKI::Exception->caught()) {
-	    # ignore exception for missing 'role' entry
-	    if ($exc->message() 
-		ne "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND") {
-		$exc->rethrow();
-	    }
-	} elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
-	    $EVAL_ERROR->rethrow();
-	}
-
-	### role: $role
-
-	############################################################
-	# get type (optional, set to "CA" for CA certificates)
-	my $type;
-	eval {
-	    $type = $self->{config}->get_xpath(
-		XPATH   => ['pki_realm', 'common', 'validity', 'type'],
-		COUNTER => [$pki_realm,   0,        $ii,         0 ],
-		);
-	};
-	
-	if (my $exc = OpenXPKI::Exception->caught()) {
-	    # ignore exception for missing 'role' entry
-	    if ($exc->message() 
-		ne "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND") {
-		$exc->rethrow();
-		}
-	} elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
-	    $EVAL_ERROR->rethrow();
-	}
-
-
-	# Use associated validity data if matching validity entry was found.
-
-	# Case 1: CA certificate profile
-	# Conditions: 
-	# $self->{TYPE} eq "CA" AND
-	# $type eq "CA"
-
-	if (defined $self->{TYPE} && defined $type &&
-	    ($self->{TYPE} eq $type) && ($self->{TYPE} eq "CA")) {
-	    $format   = $tmp_format;
-	    $validity = $tmp_validity;
-	    last GETVALIDITY;
-	}
-
-	# Case 2: End entity certificate profile
-	# Conditions:
-	# $self->{TYPE} ne "CA" AND
-	# ! defined $role        -> default validity
-	# $role eq $self->{ROLE} -> specific validity
-	if ((! defined $role) || ($role eq $self->{ROLE})) {
-	    # if role was undefined this is the default value
-	    #  -> remember it as fallback value
-	    # if it was defined it is "our" role
-	    #  -> remember it and leave loop
-	    $format   = $tmp_format;
-	    $validity = $tmp_validity;
-
-	    # exit if this was a direct hit (specified role is ours)
-	    last GETVALIDITY if (defined $role && ($role eq $self->{ROLE}));
-	}
+	$requested_id = $self->{CA};
     }
-    
-    if (! defined $validity) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_NO_VALIDITY_CONFIGURED");
-    }
+    ### entrytype: $entrytype
 
-    ### Certificate validity: $validity
-    ### Certificate validity format: $format
-
-    # FIXME: handle notbefore date
-    $self->{PROFILE}->{NOTBEFORE} = DateTime->now( time_zone => 'UTC' );
-
-    $self->{PROFILE}->{NOTAFTER} = OpenXPKI::DateTime::get_validity(
+    my %entry_validity = $self->get_entry_validity(
 	{
-	    VALIDITY => $validity,
-	    VALIDITYFORMAT => $format,
-	},
+	    ENTRYTYPE => $entrytype,
+	    ENTRYID   => $requested_id,
+	});
+
+
+    if (! exists $entry_validity{notafter}) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_VALIDITY_NOT_FOUND",
+	    params => {
+		ENTRYTYPE => $entrytype,
+		ENTRYID   => $requested_id,
+	    },
+	    );
+	
+    }
+
+    if (! exists $entry_validity{notbefore}) {
+	# assign default (current timestamp) if notbefore is not specified
+	$self->{PROFILE}->{NOTBEFORE} = DateTime->now( time_zone => 'UTC' );
+    } else {
+	$self->{PROFILE}->{NOTBEFORE} = OpenXPKI::DateTime::get_validity(
+	    $entry_validity{notbefore});
+    }
+
+    # relative notafter is always relative to notbefore
+    $entry_validity{notafter}->{REFERENCEDATE} = $self->{PROFILE}->{NOTBEFORE};
+    $self->{PROFILE}->{NOTAFTER} = OpenXPKI::DateTime::get_validity(
+	$entry_validity{notafter},
 	);
 
     

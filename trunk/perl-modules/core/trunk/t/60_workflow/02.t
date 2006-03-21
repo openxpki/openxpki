@@ -57,7 +57,8 @@ foreach my $testmode (qw( user_supplied_passphrase
 
     # other parameters
     $context->param(subject  => 'CN=John Doe, DC=example, DC=com');
-    $context->param(role  => 'User');
+    # requested end entity profile
+    $context->param(profile  => 'User');
     # $context->param(keytype  => 'DSA');
     # $context->param(keylength  => 1024);
 

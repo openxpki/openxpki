@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 binmode STDERR, ":utf8";
 use Test;
-BEGIN { plan tests => 25 };
+BEGIN { plan tests => 25, todo => [ 8, 17, 20 ] };
 
 print STDERR "OpenXPKI::Crypto::X509\n";
 

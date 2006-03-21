@@ -4,7 +4,7 @@ use warnings;
 use Test;
 # use Smart::Comments;
 
-BEGIN { plan tests => 24 };
+BEGIN { plan tests => 24, todo => [ 12, 23 ] };
 
 print STDERR "OpenXPKI::Crypto::Command: Create a CA\n";
 

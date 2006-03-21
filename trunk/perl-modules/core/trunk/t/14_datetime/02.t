@@ -3,7 +3,7 @@ use warnings;
 use Data::Dumper;
 use Test;
 
-BEGIN { plan tests => 18 };
+BEGIN { plan tests => 19 };
 
 print STDERR "DATETIME FUNCTIONS: VALIDITY COMPUTATION\n";
 
@@ -11,6 +11,7 @@ use DateTime;
 use OpenXPKI::DateTime;
 
 my $now;
+my $then;
 my $dt;
 my $offset;
 
@@ -24,6 +25,20 @@ $dt = OpenXPKI::DateTime::get_validity(
 
 $offset = $dt - $now;
 ok($offset->in_units('months'), 12);
+
+###########################################################################
+$then = DateTime->now( time_zone => 'UTC' );
+$then->add( months => 2);
+$dt = OpenXPKI::DateTime::get_validity(
+    {
+	REFERENCEDATE => $then,
+	VALIDITY => 365,
+	VALIDITYFORMAT => 'days',
+    });
+
+$offset = $dt - $now;
+ok($offset->in_units('months'), 14);
+
 
 ###########################################################################
 $now = DateTime->now( time_zone => 'UTC' ); 
@@ -42,7 +57,7 @@ $now = DateTime->now( time_zone => 'UTC' );
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "+01",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'relativedate',
     });
 
 $offset = $dt - $now;
@@ -54,7 +69,7 @@ $now = DateTime->now( time_zone => 'UTC' );
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "-01",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'relativedate',
     });
 
 $offset = $dt - $now;
@@ -66,7 +81,7 @@ $now = DateTime->now( time_zone => 'UTC' );
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "+0003",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'relativedate',
     });
 
 $offset = $dt - $now;
@@ -78,7 +93,7 @@ $now = DateTime->now( time_zone => 'UTC' );
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "-0003",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'relativedate',
     });
 
 $offset = $dt - $now;
@@ -90,7 +105,7 @@ $now = DateTime->now( time_zone => 'UTC' );
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "+000014",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'relativedate',
     });
 
 $offset = $dt - $now;
@@ -102,7 +117,7 @@ $now = DateTime->now( time_zone => 'UTC' );
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "-000014",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'relativedate',
     });
 
 $offset = $dt - $now;
@@ -114,7 +129,7 @@ $now = DateTime->now( time_zone => 'UTC' );
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "+00000012",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'relativedate',
     });
 
 $offset = $dt - $now;
@@ -126,7 +141,7 @@ $now = DateTime->now( time_zone => 'UTC' );
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "-00000012",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'relativedate',
     });
 
 $offset = $dt - $now;
@@ -137,7 +152,7 @@ $now = DateTime->now( time_zone => 'UTC' );
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "+0000000030",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'relativedate',
     });
 
 $offset = $dt - $now;
@@ -149,7 +164,7 @@ $now = DateTime->now( time_zone => 'UTC' );
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "-0000000030",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'relativedate',
     });
 
 $offset = $dt - $now;
@@ -162,7 +177,7 @@ ok($offset->in_units('minutes'), -30);
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "2006",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'absolutedate',
     });
 
 ok(OpenXPKI::DateTime::convert_date(
@@ -176,7 +191,7 @@ ok(OpenXPKI::DateTime::convert_date(
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "200603",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'absolutedate',
     });
 
 ok(OpenXPKI::DateTime::convert_date(
@@ -190,7 +205,7 @@ ok(OpenXPKI::DateTime::convert_date(
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "20060316",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'absolutedate',
     });
 
 ok(OpenXPKI::DateTime::convert_date(
@@ -203,7 +218,7 @@ ok(OpenXPKI::DateTime::convert_date(
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "2006031618",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'absolutedate',
     });
 
 ok(OpenXPKI::DateTime::convert_date(
@@ -216,7 +231,7 @@ ok(OpenXPKI::DateTime::convert_date(
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "200603161821",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'absolutedate',
     });
 
 ok(OpenXPKI::DateTime::convert_date(
@@ -230,7 +245,7 @@ ok(OpenXPKI::DateTime::convert_date(
 $dt = OpenXPKI::DateTime::get_validity(
     {
 	VALIDITY => "20060316182157",
-	VALIDITYFORMAT => 'date',
+	VALIDITYFORMAT => 'absolutedate',
     });
 
 ok(OpenXPKI::DateTime::convert_date(
