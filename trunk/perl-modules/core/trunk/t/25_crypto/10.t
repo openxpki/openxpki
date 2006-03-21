@@ -4,7 +4,7 @@ use warnings;
 use Test;
 # use Smart::Comments;
 
-BEGIN { plan tests => 24, todo => [ 12, 23 ] };
+BEGIN { plan tests => 24 };
 
 print STDERR "OpenXPKI::Crypto::Command: Create a CA\n";
 
@@ -44,8 +44,9 @@ foreach my $ca_name (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
     ## create CA RSA key (use passwd from token.xml)
     my $key = $token->command ({COMMAND    => "create_key",
 				TYPE       => "RSA",
-				KEY_LENGTH => "1024",
-				ENC_ALG    => "aes256"});
+                                PARAMETERS => {
+				    KEY_LENGTH => "1024",
+				    ENC_ALG    => "aes256"}});
     ok (1);
     print STDERR "CA RSA: $key\n" if ($ENV{DEBUG});
 

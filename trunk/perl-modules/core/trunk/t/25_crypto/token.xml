@@ -57,6 +57,11 @@
 	<!-- CA certificate chain for crypto operations -->
 	<internal_chain>t/25_crypto/ca2/cacert.pem</internal_chain>
 
+	<!-- Number of CA passphrase fragments -->
+        <passwd_parts>1</passwd_parts>
+
+	<!-- CA passphrase -->
+        <passwd>1234567890</passwd>
     </token>
 
 </token_config>

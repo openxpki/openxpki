@@ -116,7 +116,6 @@ OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly/Create.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
-OpenXPKI/Server/Workflow/Activity/Token/Get.pm
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
@@ -169,7 +168,6 @@ t/25_crypto/33.t
 t/25_crypto/34.t
 t/25_crypto/35.t
 t/25_crypto/40.t
-t/25_crypto/ca1/certs/01.pem
 t/25_crypto/token.xml
 t/25_crypto/profile.xml
 #t/25_crypto/certs/01.pem

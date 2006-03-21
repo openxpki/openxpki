@@ -41,9 +41,10 @@ OpenXPKI->write_file (FILENAME => "$basedir/ca1/passwd.txt", CONTENT => $passwd)
 ## create DSA key
 my $key = $default_token->command ({COMMAND    => "create_key",
                                     TYPE       => "DSA",
-                                    KEY_LENGTH => "1024",
-                                    ENC_ALG    => "aes256",
-                                    PASSWD     => $passwd});
+                                    PASSWD     => $passwd,
+                                    PARAMETERS => {
+                                        KEY_LENGTH => "1024",
+                                        ENC_ALG    => "aes256"}});
 ok (1);
 print STDERR "DSA: $key\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/dsa.pem", CONTENT => $key);
@@ -51,9 +52,10 @@ OpenXPKI->write_file (FILENAME => "$basedir/ca1/dsa.pem", CONTENT => $key);
 ## create EC key
 $key = $default_token->command ({COMMAND    => "create_key",
                                  TYPE       => "EC",
-                                 CURVE_NAME => "sect571r1",
-                                 ENC_ALG    => "aes256",
-                                 PASSWD     => $passwd});
+                                 PASSWD     => $passwd,
+                                 PARAMETERS => {
+                                     CURVE_NAME => "sect571r1",
+                                     ENC_ALG    => "aes256"}});
 ok (1);
 print STDERR "EC: $key\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/ec.pem", CONTENT => $key);
@@ -61,9 +63,10 @@ OpenXPKI->write_file (FILENAME => "$basedir/ca1/ec.pem", CONTENT => $key);
 ## create RSA key
 $key = $default_token->command ({COMMAND    => "create_key",
                                  TYPE       => "RSA",
-                                 KEY_LENGTH => "1024",
-                                 ENC_ALG    => "aes256",
-                                 PASSWD     => $passwd});
+                                 PASSWD     => $passwd,
+                                 PARAMETERS => {
+                                     KEY_LENGTH => "1024",
+                                     ENC_ALG    => "aes256"}});
 ok (1);
 print STDERR "RSA: $key\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/rsa.pem", CONTENT => $key);

@@ -15,6 +15,12 @@ our $cache;
 
 our $basedir = File::Spec->catfile('t', '25_crypto');
 
+foreach my $dir ("t/25_crypto/ca1/certs",
+                 "t/25_crypto/ca2/certs")
+{
+    `mkdir -p $dir` if (not -d $dir);
+}
+
 $cache = eval { OpenXPKI::XML::Config->new(DEBUG  => 0,
                                            CONFIG => "t/config.xml") };
 die $EVAL_ERROR."\n" if ($EVAL_ERROR and not ref $EVAL_ERROR);

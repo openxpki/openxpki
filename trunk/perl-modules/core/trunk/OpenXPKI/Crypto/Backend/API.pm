@@ -13,6 +13,116 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use English;
 
+## scalar value:
+##     - 0 means the parameter is optional
+##     - 1 means the parameter is required
+## array values:
+##     - an array represent the allowed parameters
+##     - element "__undef" in the array means that the parameter is optional
+## hash values:
+##     - "" => {...} (these are the default parameters
+##     - "TYPE:EC" => {...} means parameters if TYPE => "EC" is used
+
+our %COMMAND_PARAMS =
+(
+    "convert_cert"    => {"DATA" => 1,
+                          "OUT"  => ["DER","TXT"]},
+    "convert_crl"     => {"DATA" => 1,
+                          "OUT"  => ["DER","TXT"]},
+    "convert_key"     => {"PASSWD"     => 1,
+                          "OUT_PASSWD" => 0,
+                          "ENC_ALG"    => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
+                          "IN"         => ["RSA","DSA","PKCS8"],
+                          "OUT"        => ["PEM","DER","PKCS8"],
+                          "DATA"       => 1},
+    "convert_pkcs10"  => {"DATA" => 1,
+                          "OUT"  => ["DER","TXT"]},
+    "create_cert"     => {"PROFILE" => 1,
+                          "PASSWD"  => 0,
+                          "KEY"     => 0,
+                          "SUBJECT" => 1,
+                          "CSR"     => 1,
+                          "DAYS"    => 1},
+    "create_key"      => {"ENC_ALG"    => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
+                          "PASSWD"     => 0,
+                          "TYPE"       => ["RSA","DSA","EC"],
+                          "PARAMETERS" => {"TYPE:RSA" =>
+                                              {"ENC_ALG" =>
+                                                  ["__undef",
+                                                   "aes256",
+                                                   "aes192",
+                                                   "aes128",
+                                                   "idea",
+                                                   "des3",
+                                                   "des"
+                                                  ],
+                                               "KEY_LENGTH" =>
+                                                  [512, 768, 1024,
+                                                   2048, 4096
+                                                  ]
+                                              },
+                                           "TYPE:DSA" =>
+                                              {"ENC_ALG" =>
+                                                  ["__undef",
+                                                   "aes256",
+                                                   "aes192",
+                                                   "aes128",
+                                                   "idea",
+                                                   "des3",
+                                                   "des"
+                                                  ],
+                                               "KEY_LENGTH" =>
+                                                  [512, 768, 1024,
+                                                   2048, 4096
+                                                  ]
+                                              },
+                                           "TYPE:EC" =>
+                                              {"ENC_ALG" =>
+                                                  ["__undef",
+                                                   "aes256",
+                                                   "aes192",
+                                                   "aes128",
+                                                   "idea",
+                                                   "des3",
+                                                   "des"
+                                                  ],
+                                               "CURVE_NAME" => 0
+                                              },
+                                          }
+                         },
+    "create_pkcs10"   => {"PASSWD"  => 0,
+                          "KEY"     => 0,
+                          "SUBJECT" => 1},
+    "create_pkcs12"   => {"PKCS12_PASSWD"  => 0,
+                          "PASSWD"         => 1,
+                          "ENC_ALG"        => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
+                          "KEY"            => 1,
+                          "CERT"           => 1,
+                          "CHAIN"          => 0},
+    "create_random"   => {"RETURN_LENGTH" => 0,
+                          "RANDOM_LENGTH" => 0},
+    "issue_cert"      => {"PROFILE" => 1,
+                          "CSR"     => 1},
+    "issue_crl"       => {"PROFILE" => 1,
+                          "REVOKED" => 0},
+    "pkcs7_decrypt"   => {"PASSWD" => 0,
+                          "KEY"    => 0,
+                          "CERT"   => 0,
+                          "PKCS7"  => 1},
+    "pkcs7_encrypt"   => {"CERT"    => 0,
+                          "ENC_ALG" => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
+                          "CONTENT" => 1},
+    "pkcs7_get_chain" => {"SIGNER" => 1,
+                          "PKCS7"  => 1},
+    "pkcs7_sign"      => {"PASSWD"  => 0,
+                          "KEY"     => 0,
+                          "CERT"    => 0,
+                          "CONTENT" => 1},
+    "pkcs7_verify"    => {"CHAIN"   => 0,
+                          "CONTENT" => 1,
+                          "PKCS7"   => 1}
+);
+
 sub new
 {
     my $that = shift;
@@ -89,67 +199,6 @@ sub command
 
     my $command = $keys->{COMMAND};
 
-    ## 0 means the parameter is optional
-    ## 1 means the parameter is required
-    ## an array represent the allowed parameters
-    ## "__undef" in the array means that the parameter is optional
-    ## FIXME: actually we only check the correct names
-    my %params = (
-                  "convert_cert"    => {"DATA" => 1,
-                                        "OUT"  => ["DER","TXT"]},
-                  "convert_crl"     => {"DATA" => 1,
-                                        "OUT"  => ["DER","TXT"]},
-                  "convert_key"     => {"PASSWD"     => 1,
-                                        "OUT_PASSWD" => 0,
-                                        "ENC_ALG"    => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
-                                        "IN"         => ["RSA","DSA","PKCS8"],
-                                        "OUT"        => ["PEM","DER","PKCS8"],
-                                        "DATA"       => 1},
-                  "convert_pkcs10"  => {"DATA" => 1,
-                                        "OUT"  => ["DER","TXT"]},
-                  "create_cert"     => {"PROFILE" => 1,
-                                        "PASSWD"  => 0,
-                                        "KEY"     => 0,
-                                        "SUBJECT" => 1,
-                                        "CSR"     => 1,
-                                        "DAYS"    => 1},
-                  "create_key"      => {"ENC_ALG"    => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
-                                        "PASSWD"     => 0,
-                                        "TYPE"       => ["RSA","DSA","EC"],
-                                        "CURVE_NAME" => 0,
-                                        "KEY_LENGTH" => [512, 768, 1024, 2048, 4096]},
-                  "create_pkcs10"   => {"PASSWD"  => 0,
-                                        "KEY"     => 0,
-                                        "SUBJECT" => 1},
-                  "create_pkcs12"   => {"PKCS12_PASSWD"  => 0,
-                                        "PASSWD"         => 1,
-                                        "ENC_ALG"        => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
-                                        "KEY"            => 1,
-                                        "CERT"           => 1,
-                                        "CHAIN"          => 0},
-                  "create_random"   => {"RETURN_LENGTH" => 0,
-                                        "RANDOM_LENGTH" => 0},
-                  "issue_cert"      => {"PROFILE" => 1,
-                                        "CSR"     => 1},
-                  "issue_crl"       => {"PROFILE" => 1,
-                                        "REVOKED" => 0},
-                  "pkcs7_decrypt"   => {"PASSWD" => 0,
-                                        "KEY"    => 0,
-                                        "CERT"   => 0,
-                                        "PKCS7"  => 1},
-                  "pkcs7_encrypt"   => {"CERT"    => 0,
-                                        "ENC_ALG" => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
-                                        "CONTENT" => 1},
-                  "pkcs7_get_chain" => {"SIGNER" => 1,
-                                        "PKCS7"  => 1},
-                  "pkcs7_sign"      => {"PASSWD"  => 0,
-                                        "KEY"     => 0,
-                                        "CERT"    => 0,
-                                        "CONTENT" => 1},
-                  "pkcs7_verify"    => {"CHAIN"   => 0,
-                                        "CONTENT" => 1,
-                                        "PKCS7"   => 1}
-                 );
 
     ## FIXME: actually we check only for the allowed parameter
     ## FIXME: if want to make this a real API enforcer then we must check the content too
@@ -159,15 +208,119 @@ sub command
     {
         next if ($param eq "DEBUG");
         next if ($param eq "COMMAND");
-        if (not exists $params{$command}->{$param})
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_ILLEGAL_PARAM",
-                params  => {COMMAND => $command, PARAM => $param});
-        }
+
+        ## FIXME: missing parameters must be detected by the command itself
+
+        $self->__check_command_param ({
+            PARAMS       => $keys,
+            PARAM_PATH   => [ $param ],
+            COMMAND      => $command,
+            COMMAND_PATH => [ $param ]});
     }
 
     return $self->{INSTANCE}->command ($keys);
+}
+
+sub __check_command_param
+{
+    my $self = shift;
+    my $keys = shift;
+
+    ## we need a hash ref with path to actual hash ref
+    ## we need the command and the actual parameter path
+
+    my $params = $keys->{PARAMS};
+    foreach my $key (@{$keys->{PARAM_PATH}})
+    {
+        $params = $params->{$key};
+    }
+
+    my $cmd = $COMMAND_PARAMS{$keys->{COMMAND}};
+    foreach my $key (@{$keys->{COMMAND_PATH}})
+    {
+        ## check if the used parameter is legal (parameter => 0)
+        if (not exists $cmd->{$key})
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_ILLEGAL_PARAM",
+                params  => {COMMAND => $keys->{COMMAND},
+                            PARAM   => join (", ", @{$keys->{COMMAND_PATH}})});
+        }
+        $cmd = $cmd->{$key};
+    }
+
+    ## this is only a check for the existence
+    return 1 if (not ref $cmd);
+
+    ## if we have an array which we can check then do it
+    if (ref $cmd and ref $cmd eq "ARRAY")
+    {
+        if (not grep (/^$params$/, @{$cmd}))
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_ILLEGAL_VALUE",
+                params  => {COMMAND => $keys->{COMMAND},
+                            PARAM   => join (", ", @{$keys->{PARAM_PATH}}),
+                            VALUE   => $params});
+        } else {
+            return 1;
+        }
+    }
+
+    ## if we have a hash here then there is substructure in the config
+    if (ref $cmd    and ref $cmd    eq "HASH" and
+        ref $params and ref $params eq "HASH")
+    {
+        my $next = undef;
+
+        ## first try to identify the correct hash
+        foreach my $key (keys %{$cmd})
+        {
+            my $name = $key;
+               $name =~ s/:.*$//;
+            my $value = $key;
+               $value =~ s/^[^\:]*://;
+            my @path = @{$keys->{PARAM_PATH}};
+            pop @path;
+            push @path, $name;
+            my $root = $keys->{PARAMS};
+            foreach my $elem (@path)
+            {
+                $root = $root->{$elem} if ($root and ref $root and
+                                           exists $root->{$elem});
+            }
+            if ($root eq $value)
+            {
+                $next = $key;
+                last;
+            }
+        }
+
+        ## use the default if present and nothing else is found
+        $next = ""
+            if (not defined $next and exists $cmd->{""});
+        $next = ":"
+            if (not defined $next and exists $cmd->{":"});
+
+        ## restart the check
+        foreach my $key (keys %{$params})
+        {
+            $self->__check_command_param ({
+                PARAMS       => $keys->{PARAMS},
+                PARAM_PATH   => [ @{$keys->{PARAM_PATH}}, $key ],
+                COMMAND      => $keys->{COMMAND},
+                COMMAND_PATH => [ @{$keys->{COMMAND_PATH}}, $next, $key ]});
+        }
+
+        ## anything looks ok
+        return 1;
+    }
+
+    ## no more checks to perform and no error detected
+    ## nevertheless there is a wrong config
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_WRONG_CONFIG",
+        params  => {COMMAND => $keys->{COMMAND}});
 }
 
 sub get_object

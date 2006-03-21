@@ -16,8 +16,6 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->{ENC_ALG} = "aes256" if (not exists $self->{ENC_ALG});
-
     if (not exists $self->{RANDOM_FILE})
     {
 	$self->get_tmpfile ('RANDOM_');
@@ -43,37 +41,52 @@ sub get_command
 
     ## check parameters
 
-    if ($self->{ENC_ALG} ne "aes256" and
-        $self->{ENC_ALG} ne "aes192" and
-        $self->{ENC_ALG} ne "aes128" and
-        $self->{ENC_ALG} ne "idea" and
-        $self->{ENC_ALG} ne "des3" and
-        $self->{ENC_ALG} ne "des")
+    if ($self->{TYPE} eq "RSA" or
+        $self->{TYPE} eq "DSA" or
+        $self->{TYPE} eq "EC")
     {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG");
+        $self->{PARAMETERS}->{ENC_ALG} = "aes256"
+            if (not exists $self->{PARAMETERS}->{ENC_ALG});
+        if ($self->{PARAMETERS}->{ENC_ALG} ne "aes256" and
+            $self->{PARAMETERS}->{ENC_ALG} ne "aes192" and
+            $self->{PARAMETERS}->{ENC_ALG} ne "aes128" and
+            $self->{PARAMETERS}->{ENC_ALG} ne "idea" and
+            $self->{PARAMETERS}->{ENC_ALG} ne "des3" and
+            $self->{PARAMETERS}->{ENC_ALG} ne "des")
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG");
+        }
     }
 
     if ($self->{TYPE} eq "EC")
     {
-        if ($self->{CURVE_NAME} !~ /^(secp|prime|sect|c2pnb|c2tnb)[1-9][0-9]{2}?[krvw][1-3]$/i and
-            $self->{CURVE_NAME} !~ /^$/ and
-            $self->{CURVE_NAME} !~ /^Oakley-EC2N-[34]$/ and
-            $self->{CURVE_NAME} !~ /^wap-wsg-idm-ecid-wtls[0-9]*$/)
+        if ($self->{PARAMETERS}->{CURVE_NAME} !~ /^(secp|prime|sect|c2pnb|c2tnb)[1-9][0-9]{2}?[krvw][1-3]$/i and
+            $self->{PARAMETERS}->{CURVE_NAME} !~ /^$/ and
+            $self->{PARAMETERS}->{CURVE_NAME} !~ /^Oakley-EC2N-[34]$/ and
+            $self->{PARAMETERS}->{CURVE_NAME} !~ /^wap-wsg-idm-ecid-wtls[0-9]*$/)
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_EC_CURVE_NAME");
         }
-    } else {
-        if ($self->{KEY_LENGTH} != 512 and
-            $self->{KEY_LENGTH} != 768 and
-            $self->{KEY_LENGTH} != 1024 and
-            $self->{KEY_LENGTH} != 2048 and
-            $self->{KEY_LENGTH} != 4096)
+    }
+    elsif ($self->{TYPE} eq "RSA" or $self->{TYPE} eq "DSA")
+    {
+        if ($self->{PARAMETERS}->{KEY_LENGTH} != 512 and
+            $self->{PARAMETERS}->{KEY_LENGTH} != 768 and
+            $self->{PARAMETERS}->{KEY_LENGTH} != 1024 and
+            $self->{PARAMETERS}->{KEY_LENGTH} != 2048 and
+            $self->{PARAMETERS}->{KEY_LENGTH} != 4096)
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_KEY_LENGTH");
         }
+    }
+    else
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE",
+            params  => {"TYPE" => $self->{TYPE}});
     }
     if ($keyform ne "engine" and not defined $passwd)
     {
@@ -88,16 +101,16 @@ sub get_command
     if ($self->{TYPE} eq "DSA")
     {
         $command .= "dsaparam -genkey";
-        $command .= " -out ".$self->{KEYFILE};
+        $command .= " -out ".$self->{OUTFILE};
         $command .= " -engine $engine" if ($engine);
         $command .= " -rand ".$self->{RANDOM_FILE};
-        $command .= " ".$self->{KEY_LENGTH};
+        $command .= " ".$self->{PARAMETERS}->{KEY_LENGTH};
     }
     elsif ($self->{TYPE} eq "EC")
     {
         $command .= "ecparam -genkey";
-        $command .= " -out ".$self->{KEYFILE};
-        $command .= " -name ".$self->{CURVE_NAME};
+        $command .= " -out ".$self->{OUTFILE};
+        $command .= " -name ".$self->{PARAMETERS}->{CURVE_NAME};
         $command .= " -engine $engine" if ($engine);
         $command .= " -rand ".$self->{RANDOM_FILE};
     }
@@ -105,9 +118,9 @@ sub get_command
     {
         $command .= "genrsa";
         $command .= " -engine $engine" if ($engine);
-        $command .= " -out ".$self->{KEYFILE};
+        $command .= " -out ".$self->{OUTFILE};
         $command .= " -rand ".$self->{RANDOM_FILE};
-        $command .= " ".$self->{KEY_LENGTH};
+        $command .= " ".$self->{PARAMETERS}->{KEY_LENGTH};
     }
     else {
         OpenXPKI::Exception->throw (
@@ -120,10 +133,10 @@ sub get_command
     ## build the command
 
     my $pkcs8  = "pkcs8 -topk8";
-       $pkcs8 .= " -v2 ".$self->{ENC_ALG};
+       $pkcs8 .= " -v2 ".$self->{PARAMETERS}->{ENC_ALG};
        $pkcs8 .= " -engine $engine" if ($engine);
-       $pkcs8 .= " -in ".$self->{KEYFILE};
-       $pkcs8 .= " -out ".$self->{OUTFILE};
+       $pkcs8 .= " -in ".$self->{OUTFILE};
+       $pkcs8 .= " -out ".$self->{KEYFILE};
 
     if ($passwd)
     {
@@ -147,7 +160,7 @@ sub key_usage
 sub get_result
 {
     my $self = shift;
-    return $self->read_file ($self->{OUTFILE});
+    return $self->read_file ($self->{KEYFILE});
 }
 
 1;
@@ -189,6 +202,14 @@ token too.
 =item * PASSWD
 
 =back
+
+Example:
+
+$token->command ("COMMAND"    => "create_key",
+                 "TYPE"       => "RSA",
+                 "PARAMETERS" => {
+                     "ENC_ALG"    => "aes128",
+                     "KEY_LENGTH" => "1024"});
 
 =head2 hide_output
 
