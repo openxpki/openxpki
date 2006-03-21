@@ -43,8 +43,7 @@ our %COMMAND_PARAMS =
                           "SUBJECT" => 1,
                           "CSR"     => 1,
                           "DAYS"    => 1},
-    "create_key"      => {"ENC_ALG"    => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
-                          "PASSWD"     => 0,
+    "create_key"      => {"PASSWD"     => 0,
                           "TYPE"       => ["RSA","DSA","EC"],
                           "PARAMETERS" => {"TYPE:RSA" =>
                                               {"ENC_ALG" =>

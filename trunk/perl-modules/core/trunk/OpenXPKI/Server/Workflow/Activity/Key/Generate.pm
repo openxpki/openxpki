@@ -83,14 +83,31 @@ sub execute {
             );
     }
 
+    my %params = ();
+    if ($self->param('keytype') eq "RSA" or
+        $self->param('keytype') eq "DSA")
+    {
+        $params{KEY_LENGTH} = $self->param('keylength');
+        $params{ENC_ALG}    = $self->param('keyencryptionalgorithm');
+    }
+    elsif ($self->param('keytype') eq "EC")
+    {
+        $params{CURVE_NAME} = $self->param('curvename');
+        $params{ENC_ALG}    = $self->param('keyencryptionalgorithm');
+    }
+    else
+    {
+    	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INCORRECT_ALGORITHM",
+	    params  => { 
+		'KEYTYPE' => $self->param('keytype'),
+	    });
+    }
+
     my $key = $token->command({COMMAND    => "create_key",
 			       TYPE       => $self->param('keytype'),
 			       PASSWD     => $self->param('passphrase'),
-                               PARAMETERS => {
-			           KEY_LENGTH => $self->param('keylength'),
-			           CURVE_NAME => $self->param('curvename'),
-			           ENC_ALG    => $self->param('keyencryptionalgorithm'),
-                               },
+                               PARAMETERS => {%params}
                               });
 
     # export
