@@ -6,7 +6,7 @@
   </ca_certificate>
 
   <!-- profile configuration for the role User -->
-  <role name="User" id="user">
+  <profile id="User">
     <subject>
       <supported_attributes>mail</supported_attributes>
       <supported_attributes>CN</supported_attributes>

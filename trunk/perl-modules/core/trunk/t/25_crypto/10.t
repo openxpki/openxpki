@@ -24,9 +24,9 @@ my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0);
 ok (1);
 
 
-foreach my $ca_name (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
+foreach my $ca_id (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
 
-    my $cn = $ca_name;
+    my $cn = $ca_id;
     $cn =~ s{ INTERNAL_ }{}xms;
 
     my $dir = lc($cn);
@@ -36,7 +36,7 @@ foreach my $ca_name (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
     ## parameter checks for get_token
 
     my $token = $mgmt->get_token (TYPE => "CA", 
-				  NAME => $ca_name, 
+				  ID => $ca_id, 
 				  PKI_REALM => "Test Root CA",
 	);
     ok (1);
@@ -67,8 +67,8 @@ foreach my $ca_name (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
 	CONFIG    => $cache,
 	PKI_REALM => "Test Root CA",
-	CA        => $ca_name,
-	TYPE      => "CA");
+	CA        => $ca_id,
+	TYPE      => "SELFSIGNEDCA");
     $profile->set_serial(1);
     ok(1);
 

@@ -285,11 +285,6 @@ sub get_pki_realms
 	    COUNTER => [$i]);
 
 	for (my $jj = 0; $jj < $nr_of_ca_entries; $jj++) {
-	    my $ca_name = $keys->{CONFIG}->get_xpath(
-		XPATH =>   ['pki_realm', 'ca', 'name'],
-		COUNTER => [$i,          $jj,  0 ],
-		);
-	    
 	    my $ca_id = $keys->{CONFIG}->get_xpath(
 		XPATH =>   ['pki_realm', 'ca', 'id'],
 		COUNTER => [$i,          $jj,  0 ],
@@ -311,7 +306,7 @@ sub get_pki_realms
 	    my $token = 
 		$keys->{CRYPTO}->get_token (DEBUG     => $self->{DEBUG},
 					    TYPE      => "CA",
-					    NAME      => $ca_name,
+					    ID        => $ca_id,
 					    PKI_REALM => $name);
 	    
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{crypto} = $token;
@@ -325,7 +320,6 @@ sub get_pki_realms
 		    message => "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_NO_CA_CERTFILE",
 		    params  => {
 			PKI_REALM => $name,
-			CA_NAME   => $ca_name,
 			CA_ID     => $ca_id,
 		    },
 		    );
@@ -337,7 +331,6 @@ sub get_pki_realms
 		    message => "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_NO_CA_CERT",
 		    params  => {
 			PKI_REALM => $name,
-			CA_NAME   => $ca_name,
 			CA_ID     => $ca_id,
 			CA_CERT_FILE => $cacertfile,
 		    },
@@ -354,7 +347,6 @@ sub get_pki_realms
 		    message => "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_CA_CERT_PARSING_ERROR",
 		    params  => {
 			PKI_REALM => $name,
-			CA_NAME   => $ca_name,
 			CA_ID     => $ca_id,
 			CA_CERT_FILE => $cacertfile,
 		    },
@@ -395,7 +387,7 @@ sub __get_default_crypto_token
 
     return $keys->{CRYPTO}->get_token (DEBUG     => $self->{DEBUG},
                                        TYPE      => "DEFAULT",
-                                       NAME      => "default",
+                                       ID        => "default",
                                        PKI_REALM => $keys->{PKI_REALM});
 }
 
@@ -621,10 +613,6 @@ in the following sample format:
           id => {
               'User' => {
                   validity => {
-                      notbefore => {
-                          format => undef,
-                          validity => undef,
-                      },
                       notafter => {
                           format => 'relativedate',
                           validity => '+0006',
@@ -653,10 +641,6 @@ in the following sample format:
           id => {
               'default' => {
                   validity => {
-                      notbefore => {
-                          format => undef,
-                          validity => undef,
-                      },
                       notafter => {
                           format => 'relativedate',
                           validity => '+000014',

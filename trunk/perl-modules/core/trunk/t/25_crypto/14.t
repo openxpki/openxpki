@@ -25,7 +25,10 @@ ok (1);
 
 ## parameter checks for get_token
 
-my $token = $mgmt->get_token (TYPE => "CA", NAME => "INTERNAL_CA_1", PKI_REALM => "Test Root CA");
+my $token = $mgmt->get_token (
+    TYPE => "CA", 
+    ID => "INTERNAL_CA_1", 
+    PKI_REALM => "Test Root CA");
 ok (1);
 
 ## the following operations are already performed by other tests
@@ -65,8 +68,9 @@ for (my $i=0; $i < scalar @example; $i++)
                       DEBUG     => 0,
                       CONFIG    => $cache,
                       PKI_REALM => "Test Root CA",
+		      TYPE      => "ENDENTITY",
                       CA        => "INTERNAL_CA_1",
-                      ROLE      => "User");
+                      ID        => "User");
     $profile->set_serial  (1);
     $profile->set_subject ($dn);
     ok(1);

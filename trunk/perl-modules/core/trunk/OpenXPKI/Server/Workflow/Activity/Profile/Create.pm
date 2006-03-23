@@ -41,8 +41,9 @@ sub execute {
 	DEBUG     => 0,
 	CONFIG    => CTX('xml_config'),
 	PKI_REALM => $self->{PKI_REALM},
+	TYPE      => 'ENDENTITY',
 	CA        => $self->param('ca'),
-	ROLE      => $self->param('profile')
+	ID        => $self->param('profile')
 	);
 
     $context->param(_profile => $profile);

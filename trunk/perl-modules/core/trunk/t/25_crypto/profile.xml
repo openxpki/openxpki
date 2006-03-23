@@ -71,7 +71,7 @@ Generated with OpenXPKI trustcenter software.</comment>
   </ca_certificate>
 
   <!-- configuration for the certificate profile 'User' -->
-  <profile role="User" id="user">
+  <profile id="User">
     <digest>sha1</digest>
     <extensions>
       <basic_constraints critical="true">

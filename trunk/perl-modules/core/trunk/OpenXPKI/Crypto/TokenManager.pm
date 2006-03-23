@@ -41,7 +41,7 @@ sub get_token
     $self->debug ("entering function");
 
     my $type  = $keys->{TYPE};
-    my $name  = $keys->{NAME};
+    my $name  = $keys->{ID};
     my $realm = $keys->{PKI_REALM};
 
     if (not $type)
@@ -136,7 +136,7 @@ sub __add_token
     {
         $self->debug ("checking name of type");
         next if ($name ne CTX('xml_config')->get_xpath (
-                              XPATH    => [ 'pki_realm', $type_path, 'name' ],
+                              XPATH    => [ 'pki_realm', $type_path, 'id' ],
                               COUNTER  => [ $realm_index, $i, 0 ]));
         $self->debug ("pki_realm and name ok");
         $type_index = $i;

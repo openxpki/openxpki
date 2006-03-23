@@ -25,7 +25,7 @@ ok (1);
 ## parameter checks for get_token
 
 my $ca_token      = $mgmt->get_token (TYPE      => "CA",
-                                      NAME      => "INTERNAL_CA_1",
+                                      ID        => "INTERNAL_CA_1",
                                       PKI_REALM => "Test Root CA");
 my $default_token = $mgmt->get_token (TYPE      => "DEFAULT",
                                       PKI_REALM => "Test Root CA");
@@ -86,8 +86,10 @@ my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
                   DEBUG     => 0,
                   CONFIG    => $cache,
                   PKI_REALM => "Test Root CA",
+                  TYPE      => "ENDENTITY",
                   CA        => "INTERNAL_CA_1",
-                  ROLE      => "User");
+                  ID        => "User",
+		  );
 $profile->set_serial  (1);
 $profile->set_subject ($subject);
 ok(1);

@@ -170,12 +170,14 @@ sub get_digest
     return $self->{PROFILE}->{DIGEST};
 }
 
-sub set_days
-{
-    my $self = shift;
-    $self->{PROFILE}->{DAYS} = shift;
-    return 1;
-}
+# FIXME: this is not really needed, in fact it can damage the initial
+# validity computation
+# sub set_days
+# {
+#     my $self = shift;
+#     $self->{PROFILE}->{DAYS} = shift;
+#     return 1;
+# }
 
 1;
 __END__

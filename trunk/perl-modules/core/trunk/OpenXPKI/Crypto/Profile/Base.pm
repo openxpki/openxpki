@@ -46,7 +46,7 @@ sub get_path
                                                COUNTER => [$pki_realm]);
     for (my $i=0; $i < $ca; $i++)
     {
-        if ($self->{config}->get_xpath (XPATH   => ["pki_realm", "ca", "name"],
+        if ($self->{config}->get_xpath (XPATH   => ["pki_realm", "ca", "id"],
                                         COUNTER => [$pki_realm, $i, 0])
               eq $self->{CA})
         {

@@ -32,10 +32,10 @@ sub new {
     my $keys = { @_ };
     $self->{DEBUG}     = 1                  if ($keys->{DEBUG});
     $self->{config}    = $keys->{CONFIG}    if ($keys->{CONFIG});
-    $self->{TYPE}      = $keys->{TYPE}      if ($keys->{TYPE});
-    $self->{ROLE}      = $keys->{ROLE}      if ($keys->{ROLE});
     $self->{PKI_REALM} = $keys->{PKI_REALM} if ($keys->{PKI_REALM});
+    $self->{TYPE}      = $keys->{TYPE}      if ($keys->{TYPE});
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
+    $self->{ID}        = $keys->{ID}        if ($keys->{ID});
 
     if (not $self->{config})
     {
@@ -43,24 +43,51 @@ sub new {
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_XML_CONFIG");
     }
 
-    $self->{TYPE} = "CA"   if (not $self->{ROLE});
-    $self->{TYPE} = "ROLE" if (not $self->{TYPE});
-    if ($self->{TYPE} ne "CA" and $self->{TYPE} ne "ROLE")
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_WRONG_TYPE");
-    }
-
-    if (not $self->{PKI_REALM})
+    if (! defined $self->{PKI_REALM})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_PKI_REALM");
     }
-    if (not $self->{CA})
-    {
+
+    if (! defined $self->{TYPE}
+	|| (($self->{TYPE} ne 'ENDENTITY') 
+	    && ($self->{TYPE} ne 'SELFSIGNEDCA'))) {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_CA");
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_INCORRECT_TYPE",
+	    params => {
+		TYPE      => $keys->{TYPE},
+		PKI_REALM => $keys->{PKI_REALM},
+		CA        => $keys->{CA},
+		ID        => $keys->{ID},
+	    },
+	    );
     }
+
+    if (! defined $self->{CA}) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_CA",
+	    params => {
+		TYPE      => $keys->{TYPE},
+		PKI_REALM => $keys->{PKI_REALM},
+		ID        => $keys->{ID},
+	    },
+	    );
+    }
+
+
+    if ($self->{TYPE} eq 'ENDENTITY') {
+	if (! defined $self->{ID}) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_ID");
+	}
+    }
+    if ($self->{TYPE} eq 'SELFSIGNEDCA') {
+	if (defined $self->{ID}) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_ID_SPECIFIED_FOR_SELFSIGNED_CA");
+	}
+    }
+
 
     $self->debug ("parameters ok");
 
@@ -84,35 +111,40 @@ sub load_profile
  
     my @profile_path    = ("pki_realm", "ca", "profiles");
     my @profile_counter = ($pki_realm, $ca, 0);
-    if ($self->{TYPE} eq "CA")
+    if ($self->{TYPE} eq "SELFSIGNEDCA")
     {
         push @profile_path,    "ca_certificate";
         push @profile_counter, 0;
     } else {
         push @profile_path, "profile";
-        my $role = $self->{config}->get_xpath_count (XPATH   => [@profile_path],
-                                                     COUNTER => [@profile_counter]);
-        for (my $i=0; $i < $role; $i++)
+        my $nr_of_profiles 
+	    = $self->{config}->get_xpath_count (XPATH   => [@profile_path],
+						COUNTER => [@profile_counter]);
+	my $found = 0;
+      FINDPROFILE:
+        for (my $ii = 0; $ii < $nr_of_profiles; $ii++)
         {
-            if ($self->{config}->get_xpath (XPATH   => [@profile_path, "role"],
-                                            COUNTER => [@profile_counter, $i, 0])
-                  eq $self->{ROLE})
+            if ($self->{config}->get_xpath(
+		    XPATH   => [@profile_path, "id"],
+		    COUNTER => [@profile_counter, $ii, 0])
+		eq $self->{ID})
             {
-                $role = $i;
-                push @profile_counter, $role;
-            } else {
-                if ($role == $i+1)
-                {
-                    OpenXPKI::Exception->throw (
-                        message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_WRONG_ROLE");
-                }
+                push @profile_counter, $ii;
+		$found = 1;
+		last FINDPROFILE;
             }
-        }
+	}
+
+	if (! $found) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_WRONG_ROLE");
+	}
     }
 
     ## now we have a correct starting point to load the profile
 
     ## load general parameters
+
 
     $self->{PROFILE}->{DIGEST} = $self->{config}->get_xpath (
                                      XPATH   => [@profile_path, "digest"],
@@ -124,18 +156,15 @@ sub load_profile
     # determine certificate validity
 
     # assume end entity certificate
-    my $entrytype = "endentity";
-    my $requested_id = $self->{ROLE};
+    my $entrytype = lc($self->{TYPE});
+    my $requested_id = $self->{ID};
 
-    if ($self->{TYPE} eq "CA") {
-	$entrytype = "selfsignedca";
-	
-	# determine CA id
-	### ca: $self->{CA}
-
+    if ($self->{TYPE} eq "SELFSIGNEDCA") {
 	$requested_id = $self->{CA};
     }
+
     ### entrytype: $entrytype
+    ### requested_id: $requested_id
 
     my %entry_validity = $self->get_entry_validity(
 	{
@@ -207,13 +236,15 @@ sub get_digest
     return $self->{PROFILE}->{DIGEST};
 }
 
-sub set_days
-{
-    my $self = shift;
-    $self->{PROFILE}->{NOTAFTER} = $self->{PROFILE}->{NOTBEFORE}->clone();
-    $self->{PROFILE}->{NOTAFTER}->add (days => shift);
-    return 1;
-}
+# FIXME: this is not really needed, in fact it can damage the initial
+# validity computation
+# sub set_days
+# {
+#     my $self = shift;
+#     $self->{PROFILE}->{NOTAFTER} = $self->{PROFILE}->{NOTBEFORE}->clone();
+#     $self->{PROFILE}->{NOTAFTER}->add (days => shift);
+#     return 1;
+# }
 
 sub set_subject
 {

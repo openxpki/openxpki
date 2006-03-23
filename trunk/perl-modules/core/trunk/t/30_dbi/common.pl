@@ -8,7 +8,10 @@ use OpenXPKI::Crypto::TokenManager;
 our $cache;
 require 't/25_crypto/common.pl';
 my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0);
-our $token = $mgmt->get_token (TYPE => "DEFAULT", NAME => "default", PKI_REALM => "Test Root CA");
+our $token = $mgmt->get_token (
+    TYPE => "DEFAULT", 
+    ID => "default", 
+    PKI_REALM => "Test Root CA");
 ok($token);
 
 ## prepare log system
