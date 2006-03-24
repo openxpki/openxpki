@@ -80,83 +80,85 @@
   transport protocol and it must alos be possible to
   user other frontend language than Perl (e.g. PHP).
   The different layers are defined as follows:
-  <ol>
-    <li>The service layer
-      <p>
-        The messaging layer parses queries, executes necessary
-        commands and build resulting answers.
-        The format of the queries and answers are defined by
-        the interface itself but in the native language (Perl).
-        This means that a message can look like this:
+</p>
+<ol>
+  <li>The service layer
+    <p>
+      The messaging layer parses queries, executes necessary
+      commands and build resulting answers.
+      The format of the queries and answers are defined by
+      the interface itself but in the native language (Perl).
+      This means that a message can look like this:
 <pre>
   my %msg = (COMMAND => "search_csr",
              PARAMS  => {CN => "*Doe*"},
              LIMIT   => 20);
 </pre>
-        The service layer defines a communication protocol but
-        only on the level of native Perl messages. This means
-        that a client send the above message but the answer is:
+      The service layer defines a communication protocol but
+      only on the level of native Perl messages. This means
+      that a client send the above message but the answer is:
 <pre>
   my %msg = (ANSWER_TYPE => "COMMAND",
              COMMAND     => "GET_PKI_REALM",
              PKI_REALMS  => {"root_ca" => "Our super root CA",
                              "user_ca" => "User CA"});
 </pre>
-        If this happens then the client must answer with root_ca
-        or user_ca. Usually the next answer is the request for
-        a login stack followed by the real login. Additionally
-        the first answer can include a session ID. Like you see
-        it is possible to implement a real communication protocol
-        here. The only important thing is that we do not define
-        any aspect of the serialization (the message representation)
-        and the transport here.
-      </p>
-    </li>
-    <li>The messaging or serialization layer
-      <p>
-        The service layer only defines how messages should look
-        like in the used native language (Perl). This means a
-        message is usually a hash. The serialization layer must
-        produce now a plain text representation of this data.
-        This can be a XML file or every other specially formatted
-        text file. Please note that file does not mean that we
-        write it on the disk. It is only a string in the memory.
-      </p>
-      <p>
-        This layer only has to serialize datastructures and
-        to deserialize strings. It is not the job of this layer
-        to distinguish between different message types. This
-        is the job of the service layer which defines the
-        real protocol. It is possible of course that some
-        messages are serialized another way because they carry
-        a special flag but this makes no difference for the
-        interface usage and behaviour of this layer.
-      </p>
-    </li>
-    <li>The transport layer
-      <p>
-        The job of the transport layer is simple. It gets a plain
-        text string and must bring this string to the other peer.
-        The transport layer must not contain any knowledge about
-        the communication protocol.
-      </p>
-      <p>
-        The minimum interface looks like this until now:
-        <ul>
-          <li>new (incl. open)</li>
-          <li>close</li>
-          <li>write</li>
-          <li>read</li>
-        </ul>
-        The problem is that this interface is fully synchronous.
-        Actually I see no problem here but perhaps we must extend
-        this interface in the future to support asynchronous
-        mechanisms too. Nevertheless PKI is today mainly
-        a synchronous business.
-      </p>
-    </li>
-  </ol>
-</p>
+      If this happens then the client must answer with root_ca
+      or user_ca. Usually the next answer is the request for
+      a login stack followed by the real login. Additionally
+      the first answer can include a session ID. Like you see
+      it is possible to implement a real communication protocol
+      here. The only important thing is that we do not define
+      any aspect of the serialization (the message representation)
+      and the transport here.
+    </p>
+  </li>
+  <li>The messaging or serialization layer
+    <p>
+      The service layer only defines how messages should look
+      like in the used native language (Perl). This means a
+      message is usually a hash. The serialization layer must
+      produce now a plain text representation of this data.
+      This can be a XML file or every other specially formatted
+      text file. Please note that file does not mean that we
+      write it on the disk. It is only a string in the memory.
+    </p>
+    <p>
+      This layer only has to serialize datastructures and
+      to deserialize strings. It is not the job of this layer
+      to distinguish between different message types. This
+      is the job of the service layer which defines the
+      real protocol. It is possible of course that some
+      messages are serialized another way because they carry
+      a special flag but this makes no difference for the
+      interface usage and behaviour of this layer.
+    </p>
+  </li>
+  <li>The transport layer
+    <p>
+      The job of the transport layer is simple. It gets a plain
+      text string and must bring this string to the other peer.
+      The transport layer must not contain any knowledge about
+      the communication protocol.
+    </p>
+    <p>
+      The minimum interface looks like this until now:
+    </p>
+    <ul>
+      <li>new (incl. open)</li>
+      <li>close</li>
+      <li>write</li>
+      <li>read</li>
+    </ul>
+    <p>
+      The problem is that this interface is fully synchronous.
+      Actually I see no problem here but perhaps we must extend
+      this interface in the future to support asynchronous
+      mechanisms too. Nevertheless PKI is today mainly
+      a synchronous business.
+    </p>
+  </li>
+</ol>
 
 <h2>Reference Implementation</h2>
 
@@ -166,7 +168,8 @@
   The first step is that we define a normal protocol
   workflow. If it is possible then we should express
   the whole protocol as one formula.
-  <pre>
+</p>
+<pre>
     session ::= (init_session|continue_session).
                 use_session*.
                 (stop_session|nothing)
@@ -184,7 +187,8 @@
                     (answer_complete|error)
 
     stop_session ::= delete_session_id
-  </pre>
+</pre>
+<p>
   This is a first abstraction for a session. Please note
   that this works for web clients which cut the connection
   everytime and for shell clients which are connected until
@@ -205,16 +209,16 @@
   The problem is that we must implement this as a platform
   and language independent message which is really fast parseable.
   The idea is to allow only the following:
-  <pre>
+</p>
+<pre>
     (hashref.arrayref)* ::= scalar
 
     $href-&gt;{CERT}-&gt;[1]-&gt;{SUBJECT}-&gt;[0] = "dc=www,dc=openxpki,dc=org";
-  </pre>
-</p>
+</pre>
 <p>
-* and + always mean MAX_LENGTH. Perhaps it is necessary for
-non-script languages to split the scalar type into integer and
-string or something other.
+  * and + always mean MAX_LENGTH. Perhaps it is necessary for
+  non-script languages to split the scalar type into integer and
+  string or something other.
 </p>
 <pre>
 hash         ::= hash_element+
