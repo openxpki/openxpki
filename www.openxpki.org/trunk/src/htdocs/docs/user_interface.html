@@ -24,59 +24,131 @@
     <dd>
       The view is represented by the user interfaces. I have to
       admit though that the term is not fully correct. The
-      user interface consists of two parts - the user interface
-      and the transport layer.
+      user interface consists of several layers to get better code:
+      <ul>
+        <li>the service layer
+        <li>the messaging or serialization layer
+        <li>the transport layer
+      </ul>
     </dd>
   </dl>
 </p>
 <p>
-  The user interface receives queries and send answers.
-  The format of the queries and answers are defined by
-  the user interface. Such a query can be an XML document,
-  a text message or a hash reference. The format will
-  simply be defined by the user interface. The transport
-  of the messages is <i>NOT</i> the job of the user
-  interface.
+  The major idea is to make the user interfaces much
+  more flexible. It should be possible to use different
+  transport protocol and it must alos be possible to
+  user other frontend language than Perl (e.g. PHP).
+  The different layers are defined as follows:
+  <ol>
+    <li>The service layer
+      <p>
+        The messaging layer parses queries, executes necessary
+        commands and build resulting answers.
+        The format of the queries and answers are defined by
+        the interface itself but in the native language (Perl).
+        This means that a message can look like this:
+<pre>
+  my %msg = (COMMAND => "search_csr",
+             PARAMS  => {CN => "*Doe*"},
+             LIMIT   => 20);
+</pre>
+        The service layer defines a communication protocol but
+        only on the level of native Perl messages. This means
+        that a client send the above message but the answer is:
+<pre>
+  my %msg = (ANSWER_TYPE => "COMMAND",
+             COMMAND     => "GET_PKI_REALM",
+             PKI_REALMS  => {"root_ca" => "Our super root CA",
+                             "user_ca" => "User CA"});
+</pre>
+        If this happens then the client must answer with root_ca
+        or user_ca. Usually the next answer is the request for
+        a login stack followed by the real login. Additionally
+        the first answer can include a session ID. Like you see
+        it is possible to implement a real communication protocol
+        here. The only important thing is that we do not define
+        any aspect of the serialization (the message representation)
+        and the transport here.
+      </p>
+    </li>
+    <li>The messaging or serialization layer
+      <p>
+        The service layer only defines how messages should look
+        like in the used native language (Perl). This means a
+        message is usually a hash. The serialization layer must
+        produce now a plain text representation of this data.
+        This can be a XML file or every other specially formatted
+        text file. Please note that file does not mean that we
+        write it on the disk. It is only a string in the memory.
+      </p>
+      <p>
+        This layer only has to serialize datastructures and
+        to deserialize strings. It is not the job of this layer
+        to distinguish between different message types. This
+        is the job of the service layer which defines the
+        real protocol. It is possible of course that some
+        messages are serialized another way because they carry
+        a special flag but this makes no difference for the
+        interface usage and behaviour of this layer.
+      </p>
+    </li>
+    <li>The transport layer
+      <p>
+        The job of the transport layer is simple. It gets a plain
+        text string and must bring this string to the other peer.
+        The transport layer must not contain any knowledge about
+        the communication protocol.
+      </p>
+      <p>
+        The minimum interface looks like this until now:
+        <ul>
+          <li>new (incl. open)</li>
+          <li>close</li>
+          <li>write</li>
+          <li>read</li>
+        </ul>
+        The problem is that this interface is fully synchronous.
+        Actually I see no problem here but perhaps we must extend
+        this interface in the future to support asynchronous
+        mechanisms too. Nevertheless PKI is today mainly
+        a synchronous business.
+      </p>
+    </li>
+  </ol>
 </p>
+
+<h2>Reference Implementation</h2>
+
+<h3>Service Protocol</h3>
+
 <p>
-  The transport layer has a very minimalistic interface.
-  It has functions to establish and close a communication
-  path and to send and receive messages. That's all. This
-  means the transport layer must be able to serialize the
-  messages if necessary and to transport the serialized
-  messages to the other peer. If you need a good performance
-  then you should invest some time into a good interface
-  definition for the user interface to reduce the costs for
-  the serialization.
+  The first step is that we define a normal protocol
+  workflow. If it is possible then we should express
+  the whole protocol as one formula.
+  <pre>
+    session ::= (init_session|continue_session).
+                use_session*.
+                (stop_session|nothing)
+
+    init_session ::= create_session_id.
+                     select_pki_realm.
+                     select_auth_stack.
+                     login
+
+    use_session ::= request_command.
+                    (
+                     token_login*.
+                     send_answer*.
+                    )*.
+                    (answer_complete|error)
+
+    stop_session ::= delete_session_id
+  </pre>
+  This is a first abstraction for a session. Please note
+  that this works for web clients which cut the connection
+  everytime and for shell clients which are connected until
+  they logout.
 </p>
-
-<h2>Functional User Interface</h2>
-
-The most critical part will be to identify the necessary functions
-and to define a very minimalistic interface with an acceptable
-performance. The parts with most problems are huge jobs
-like backup, dataexchange or searches. If you want to show
-informations during backup and dataexchange then you need
-functions in the transport layer to send parts of the document
-without knowing how the complete message will be. This can
-be implemented by a simple flag like <i>INTERMEDIATE</i>.
-The search function is more critical because it is the only
-function which requires huge datastructures as answer.
-
-<h2>Transport Layer</h2>
-
-<h3>Interface Functions</h3>
-
-<p>
-  The minimum interface looks like this until now:
-</p>
-<ul>
-  <li>new (incl. open)</li>
-  <li>close</li>
-  <li>write</li>
-  <li>read</li>
-  <li>finished (read or write finished for long messages)</li>
-</ul>
 
 <h3>Serialization</h3>
 
@@ -100,7 +172,7 @@ function which requires huge datastructures as answer.
 </p>
 <p>
 * and + always mean MAX_LENGTH. Perhaps it is necessary for
-non-script language to split the scalar type into integer and
+non-script languages to split the scalar type into integer and
 string or something other.
 </p>
 <pre>
@@ -116,3 +188,45 @@ array_element ::= [0-9]+.'\n'. /* position in the array */
 scalar ::= [0-9]+.'\n'. /* length of data */
            data
 </pre>
+<p>
+  Finally the serialization must store in every serialized
+  message which service was used. This is necessary to be able
+  to detect the correct service if the service is reconnected
+  from the client and vice versa.
+</p>
+
+<h3>Example</h3>
+
+<h4>Server View</h4>
+<ul>
+  <li>Established network connection</li>
+  <li>Detected transport protocol</li>
+  <li>Initialized transport protocol</li>
+  <li>Read first message</li>
+  <li>Detected serialization mechanism</li>
+  <li>Initialized serialization mechanism</li>
+  <li>Deserialized message</li>
+  <li>Detected used service</li>
+  <li>Initialized service</li>
+  <li>Service performed the requested action</li>
+  <li>Perpared answer</li>
+  <li>Serialized answer</li>
+  <li>Send answer</li>
+  <li>Waiting for next message or terminating</li>
+</ul>
+<h4>Client View</h4>
+<ul>
+  <li>Creating query
+  <li>Serialize query
+  <li>Write query to transport layer
+  <li>Connecting server</li>
+  <li>Send transport protocol identifier</li>
+  <li>Send serialized message</li>
+  <li>Receive answer</li>
+  <li>Deserialize answer</li>
+  <li>Evaluate answer</li>
+  <li>Continue with waiting for the next message (e.g. exports),
+    sending a response or next query</li>
+</ul>
+  
+  
