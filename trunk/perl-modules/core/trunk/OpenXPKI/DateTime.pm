@@ -46,7 +46,7 @@ sub convert_date {
 
     return $date->epoch()                   if ($outformat eq 'epoch');
     return $date->iso8601()                 if ($outformat eq 'iso8601');
-    return $date->strftime("%g%m%d%H%M%SZ") if ($outformat eq 'openssltime');
+    return $date->strftime("%y%m%d%H%M%SZ") if ($outformat eq 'openssltime');
     return $date->strftime("%Y%m%d%H%M%S")  if ($outformat eq 'terse');
     return $date->strftime("%F %T")         if ($outformat eq 'printable');
 

@@ -29,12 +29,15 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 
 use OpenXPKI qw(debug read_file write_file);
 use OpenXPKI::DN;
+use OpenXPKI::DateTime;
 use Date::Parse;
 use File::Temp;
 use File::Spec;
 use POSIX qw(strftime);
 use OpenXPKI::Exception;
 use English;
+
+# use Smart::Comments;
 
 sub new
 {
@@ -216,7 +219,7 @@ sub get_openssl_time
 
     $time = str2time ($time);
     $time = [ gmtime ($time) ];
-    $time = POSIX::strftime ("%g%m%d%H%M%S",@{$time})."Z";
+    $time = POSIX::strftime ("%y%m%d%H%M%S",@{$time})."Z";
 
     return $time;
 }
@@ -231,6 +234,9 @@ sub write_config
     $self->get_tmpfile ('CONFIG');
     $self->get_tmpfile ('SERIAL');
     $self->get_tmpfile ('DATABASE');
+    # ATTRFILE should be databasefile.attr
+    # FIXME: we assume this file does not exist
+    $self->set_tmpfile (ATTR => $self->{DATABASEFILE} . ".attr");
 
     ## create serial, index and index attribute file
 
@@ -265,7 +271,7 @@ sub write_config
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_WRITE_CONFIG_FAILED_SERIAL");
     }
 
-    $self->write_file (FILENAME => $self->{DATABASEFILE}.".attr",
+    $self->write_file (FILENAME => $self->{ATTRFILE},
                        CONTENT  => "unique_subject = no\n",
                        FORCE    => 1);
     $self->write_file (FILENAME => $self->{SERIALFILE},
@@ -284,10 +290,26 @@ sub write_config
     $config .= "new_certs_dir     = ".$self->{TMP}."\n";
     $config .= "certificate       = ".$self->{ENGINE}->get_certfile()."\n";
     $config .= "private_key       = ".$self->{KEYFILE}."\n";
-    $config .= "default_startdate = ".$profile->get_notbefore()->strftime("%g%m%d%H%M%SZ")."\n"
-        if ($profile->get_notbefore());
-    $config .= "default_enddate   = ".$profile->get_notafter()->strftime("%g%m%d%H%M%SZ")."\n"
-        if ($profile->get_notafter());
+
+    if (my $notbefore = $profile->get_notbefore()) {
+	$config .= "default_startdate = " 
+	    . OpenXPKI::DateTime::convert_date(
+	    {
+		OUTFORMAT => 'openssltime',
+		DATE      => $notbefore,
+	    })
+	    . "\n";
+    }
+    
+    if (my $notafter = $profile->get_notafter()) {
+	$config .= "default_enddate = " 
+	    . OpenXPKI::DateTime::convert_date(
+	    {
+		OUTFORMAT => 'openssltime',
+		DATE      => $notafter,
+	    })
+	    . "\n";
+    }
     $config .= "default_md        = ".$profile->get_digest()."\n";
     $config .= "database          = ".$self->{DATABASEFILE}."\n";
     $config .= "serial            = ".$self->{SERIALFILE}."\n";
@@ -305,17 +327,17 @@ sub write_config
     $config .= "# this is a dummy because of preserve\n";
     $config .= "domainComponent = optional\n";
     $config .= "\n";
-
+    
     ## extension section
-
+    
     $config .= "[ v3ca ]\n";
     my $sections = "";
-
+    
     foreach my $name (sort $profile->get_named_extensions())
     {
         my $critical = "";
         $critical = "critical," if ($profile->is_critical_extension ($name));
-
+	
         if ($name eq "authority_info_access")
         {
             $config .= "authorityInfoAccess = $critical";
@@ -350,7 +372,7 @@ sub write_config
             {
                 if ($pair->[0] eq "CA")
                 {
-                    if ($pair->[1])
+                    if ($pair->[1] eq "true")
                     {
                         $config .= "CA:true,";
                     } else {
@@ -383,7 +405,7 @@ sub write_config
             my @bits = @{$profile->get_extension("extended_key_usage")};
             $config .= "clientAuth,"      if (grep /client_auth/,      @bits);
             $config .= "emailProtection," if (grep /email_protection/, @bits);
-            my @oids = grep /\./, @bits;
+            my @oids = grep m{\.}, @bits;
             foreach my $oid (@oids)
             {
                 $config .= "$oid,";
@@ -403,8 +425,8 @@ sub write_config
             $config .= "keyUsage = $critical";
             my @bits = @{$profile->get_extension("key_usage")};
             $config .= "digitalSignature," if (grep /digital_signature/, @bits);
-            $config .= "nonRepudiation,"   if (grep /non_repudiation/,   @bits);
-            $config .= "keyEncipherment,"  if (grep /key_encipherment/,  @bits);
+	    $config .= "nonRepudiation,"   if (grep /non_repudiation/,   @bits);
+	    $config .= "keyEncipherment,"  if (grep /key_encipherment/,  @bits);
             $config .= "dataEncipherment," if (grep /data_encipherment/, @bits);
             $config .= "keyAgreement,"     if (grep /key_agreement/,     @bits);
             $config .= "keyCertSign,"      if (grep /key_cert_sign/,     @bits);
@@ -463,7 +485,8 @@ sub write_config
         {
             $config .= "nsComment = $critical\"";
             my $string =  join ("", @{$profile->get_extension("netscape/comment")});
-               $string =~ s/\n/\\n/g;
+	    # FIXME: this inserts a literal \n - is this intended?
+	    $string =~ s/\n/\\\\n/g;
             $config .= "$string\"\n";
         }
         else
@@ -473,7 +496,7 @@ sub write_config
                 params  => {NAME => $name});
         }
     }
-
+    
     $self->debug ("config: $config\n$sections\n");
     $self->write_file (FILENAME => $self->{CONFIGFILE},
                        CONTENT  => $config."\n".$sections,

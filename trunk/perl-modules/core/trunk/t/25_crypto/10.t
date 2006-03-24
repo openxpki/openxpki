@@ -81,6 +81,14 @@ foreach my $ca_id (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
     ok (1);
     print STDERR "CA cert: $cert\n" if ($ENV{DEBUG});
 
+    # FIXME: create_cert should not write the text representation of the
+    # cert to the file specified in the configuration
+    OpenXPKI->write_file (
+	FILENAME => "$basedir/$dir/cacert.pem", 
+	CONTENT  => $cert,
+	FORCE    => 1,
+	);
+
     ## check that the CA is ready for further tests
     if (not -e "$basedir/$dir/cakey.pem")
     {

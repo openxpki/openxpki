@@ -9,6 +9,8 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command::create_cert;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
+# use Smart::Comments;
+
 sub get_command
 {
     my $self = shift;
@@ -23,7 +25,10 @@ sub get_command
     }
     my $profile = $self->{PROFILE};
 
+    my @result = ();
+
     $self->get_tmpfile ('CSR');
+    $self->get_tmpfile ('DUMMYCA');
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -95,25 +100,92 @@ sub get_command
 
     ## build the command
 
-    my $command  = "req -x509";
-    $command .= " -config ".$self->{CONFIGFILE};
-    $command .= " -subj \"$subject\"" if ($subject);
-    $command .= " -multivalue-rdn" if ($subject and $subject =~ /[^\\](\\\\)*\+/);
-    $command .= " -engine $engine" if ($engine);
-    $command .= " -keyform $keyform" if ($keyform);
-    $command .= " -key ".$self->{KEYFILE};
-    $command .= " -out ".$self->{OUTFILE};
-    $command .= " -in ".$self->{CSRFILE};
-    $command .= " -days ".$self->{DAYS} if (exists $self->{DAYS});
+    # Problem: OpenSSL does not support generation of a self-signed 
+    # certificate with absolute validity specification
+    # Our workaround works as follows:
 
-    if (defined $passwd)
-    {
-        $command .= " -passin env:pwd";
+    # STEP 1a: Create a selfsigned Dummy CA with 1 day validity
+    # record current serial number
+#    my $serialnumber = $self->read_file($self->{SERIALFILE});
+
+    ### serial number: $serialnumber
+
+    my @subject = ();
+    if ($subject) {
+	push(@subject, '-subj', qq("$subject"));
+
+	if ($subject =~ /[^\\](\\\\)*\+/) {
+	    push(@subject, '-multivalue-rdn');
+	}
+    }
+
+    my @engine = ();
+    if ($engine) {
+	push(@engine, '-engine', qq("$engine"));
+    }
+
+    my @keyform = ();
+    if ($keyform) {
+	push(@keyform, '-keyform', qq("$keyform"));
+    }
+    
+    my @password = ();
+    if (defined $passwd) {
+	push(@password, '-passin', 'env:pwd');
         $self->set_env ("pwd" => $passwd);
     }
-    $self->debug ("command: $command");
 
-    return [ $command ];
+    my @cmd;
+    @cmd = (
+	'req',     '-x509',
+	'-config', qq("$self->{CONFIGFILE}"),
+	@subject,
+	@engine,
+	@keyform,
+	'-key',    qq("$self->{KEYFILE}"),
+	'-out',    qq("$self->{DUMMYCAFILE}"),
+	'-in',     qq("$self->{CSRFILE}"),
+	'-set_serial', $self->{PROFILE}->get_serial(),
+	'-days',   '1',
+	@password,
+	);
+
+
+    $self->debug ("command: " . join(' ', @cmd));
+    push @result, join(' ', @cmd);
+
+
+    # STEP 1b: restore serial number (serial file content is incremented
+    # by previous OpenSSL command)
+    # NOTE:
+    # this will result in a call to the current command, similar to
+    # $self->write_file(FILENAME => $self->{SERIALFILE}, CONTENT => ...)
+#     push @result, {
+# 	method => '_restore_serialnumber',
+# 	arguments => {
+# 	    serial  => $serialnumber,
+# 	    },
+#     };
+
+    # STEP 2: Using the Dummy CA created above issue the actual CA certificate
+    @cmd = (
+	'ca',
+	'-batch',
+	'-config',  qq("$self->{CONFIGFILE}"),
+	@subject,
+	@engine,
+	@keyform,
+	'-keyfile', qq("$self->{KEYFILE}"),
+	'-cert',    qq("$self->{DUMMYCAFILE}"),
+	'-out',     qq("$self->{OUTFILE}"),
+	'-ss_cert', qq("$self->{DUMMYCAFILE}"),
+	@password,
+	);
+
+    $self->debug ("command: " . join(' ', @cmd));
+    push @result, join(' ', @cmd);
+
+    return \@result;
 }
 
 sub hide_output
@@ -131,8 +203,27 @@ sub key_usage
 sub get_result
 {
     my $self = shift;
-    return $self->read_file ($self->{OUTFILE});
+    my $result = $self->read_file ($self->{OUTFILE});
+    $result =~ s/^.*-----BEGIN/-----BEGIN/s;
+    return $result;
 }
+
+
+
+# # for callback from Shell.pm during command execution
+# sub _restore_serialnumber
+# {
+#     my $self = shift;
+#     my $params = shift;
+
+#     ### restore serial nubmer: $params->{serial}
+#     $self->write_file(
+# 	FILENAME => $self->{SERIALFILE},
+# 	CONTENT  => $params->{serial},
+# 	FORCE    => 1,
+# 	);
+# }
+
 
 1;
 __END__
@@ -161,8 +252,6 @@ USE_ENGINE too.
 =item * USE_ENGINE (optional)
 
 =item * PASSWD (optional)
-
-=item * DAYS (optional)
 
 =back
 

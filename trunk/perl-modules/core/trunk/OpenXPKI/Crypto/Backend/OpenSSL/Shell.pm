@@ -9,6 +9,7 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Shell;
 
 use OpenXPKI qw (debug read_file);
 use OpenXPKI::Exception;
+# use Smart::Comments;
 
 sub new
 {
@@ -104,23 +105,51 @@ sub run_cmd
 {
     my $self = shift;
     $self->debug ("start");
-    my $cmds = shift;
+    my $params = shift;
+
+    my $cmds = $params->{COMMANDS};
+    my $cmdref = $params->{CMDREF};
+
+    if (! defined $cmds) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_RUN_CMD_CMDS_NOT_SPECIFIED",
+	    );
+    }
+
+    if (! defined $cmdref) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_RUN_CMD_CMDREF_NOT_SPECIFIED",
+	    );
+    }
+
 
     foreach my $command (@{$cmds})
     {
-        $command =~ s/\n*$//;
-        $command .= "\n";
-        $self->debug ("command: $command");
-        if (not print {$self->{OPENSSL_FD}} $command)
-        {
-            OpenXPKI::Exception->throw (
-            messages => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_RUN_CMD_FAILED",
-            params   => {"COMMAND" => $command,
-                         "ERRVAL"  => $!});
-        }
+	# scalar
+	if (! ref $command) {
+	    $command =~ s/\n*$//;
+	    $command .= "\n";
+	    $self->debug ("command: $command");
+	    ### command: $command
+	    if (not print {$self->{OPENSSL_FD}} $command)
+	    {
+		OpenXPKI::Exception->throw (
+		    messages => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_RUN_CMD_FAILED",
+		    params   => {"COMMAND" => $command,
+				 "ERRVAL"  => $!});
+	    }
+	} else {
+	    if (exists $command->{perl}) {
+		eval $command->{perl};
+	    }
+	    if (exists $command->{method}) {
+		my $method = $command->{method};
+		$cmdref->$method($command->{arguments});
+	    }
+	}
     }
     $self->debug ("all executed");
-
+    
     return 1;
 }
 
@@ -236,8 +265,68 @@ This kills a shell session.
 
 =head2 run_cmd
 
-The functions expects an ARRAY reference which includes
-a sequence of OpenSSL commands. All commands are executed.
+=over
+
+=item * CMDREF (Object reference to the original OpenSSL command instance)
+
+=item * COMMANDS (Arrayref containing the commands to execute)
+
+The ARRAY reference contains a sequence of OpenSSL commands. 
+
+If the array entry is a normal scalar, the command is executed in the
+OpenSSL shell.
+
+If it is a hash reference, the presence of the key 'perl' indicates that
+the value should be eval'ed literally.
+
+If the key 'method' exists, the named method is called on the command
+reference CMDREF with the arguments contained in the hash entry 'arguments'
+
+Example from caller's perspective:
+
+    my $cmdref = ...
+    $self->{SHELL}->run_cmd (
+    {
+        COMMANDS => [ 'ca -batch ...', 'pkcs12 ...' ],
+        CMDREF   => $cmdref,
+    });
+
+This runs 'ca -batch...' and 'pkcs12...' commands in the OpenSSL shell.
+
+    my $cmdref = ...
+    $self->{SHELL}->run_cmd (
+    {
+        COMMANDS => [ 
+            'ca -batch ...', 
+            {
+                perl => 'print "Yohoo";',
+            },
+            'pkcs12 ...' ],
+        CMDREF   => $cmdref,
+    });
+
+Prints "Yohoo" between the commands (probably not very useful).
+
+    my $cmdref = ...
+    $self->{SHELL}->run_cmd (
+    {
+        COMMANDS => [ 
+            'ca -batch ...', 
+            {
+                method => 'my_method',
+                arguments => {
+                    foo => 'bar',
+                    baz => 1234,
+                },
+            },
+            'pkcs12 ...' ],
+        CMDREF   => $cmdref,
+    });
+
+Runs $cmdref->my_method({foo => 'bar', baz => 1234}) between OpenSSL commands.
+
+
+=back
 
 =head2 get_result
 

@@ -265,7 +265,12 @@ sub command
 
         $self->{SHELL}->start();
         $self->{SHELL}->init_engine($self->{ENGINE}) if ($self->{ENGINE}->get_engine());
-        $self->{SHELL}->run_cmd ($cmds);
+        $self->{SHELL}->run_cmd (
+	    {
+		COMMANDS => $cmds,
+		CMDREF   => $cmdref,
+	    }
+	    );
         $self->{SHELL}->stop();
         my $result = $self->{SHELL}->get_result();
         $result = $cmdref->get_result ($result);

@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 binmode STDERR, ":utf8";
 use Test;
-BEGIN { plan tests => 25, todo => [ 8, 17, 20 ] };
+BEGIN { plan tests => 25 };
 
 print STDERR "OpenXPKI::Crypto::X509\n";
 
@@ -59,8 +59,8 @@ my $duration_string;
 
 $notafter = $cert->get_parsed("BODY", "NOTAFTER");
 $validity_duration = $notafter - $now;
-# 90 days as configured in the profile is always 2 full months plus some days
-ok($validity_duration->in_units('months'), 2);
+# 6 months configured validity minus a few seconds evaluates to 5 months
+ok($validity_duration->in_units('months'), 5);
 
 ok ($cert->get_parsed("HEADER", "ROLE") eq "User");
 
@@ -81,7 +81,11 @@ ok ($cert->get_converted ("TXT"));
 $data = OpenXPKI->read_file("$basedir/ca1/cacert.pem");
 ok(defined $data);
 
-$cert = OpenXPKI::Crypto::X509->new (TOKEN => $token, DATA => $data);
+### reading CA certificate
+$cert = OpenXPKI::Crypto::X509->new (
+    TOKEN => $token, 
+    DATA => $data,
+    );
 ok(defined $cert);
 
 $notafter = $cert->get_parsed("BODY", "NOTAFTER");
@@ -90,7 +94,7 @@ $validity_duration = $notafter - $now;
 $duration_string 
     = join(',', $validity_duration->in_units('years', 'months', 'days'));
 
-ok($duration_string, "2,0,0");
+ok($duration_string, "1,0,0");
 
 
 
@@ -98,7 +102,10 @@ ok($duration_string, "2,0,0");
 $data = OpenXPKI->read_file("$basedir/ca2/cacert.pem");
 ok(defined $data);
 
-$cert = OpenXPKI::Crypto::X509->new (TOKEN => $token, DATA => $data);
+$cert = OpenXPKI::Crypto::X509->new (
+    TOKEN => $token, 
+    DATA => $data,
+    );
 ok(defined $cert);
 
 $notafter = $cert->get_parsed("BODY", "NOTAFTER");

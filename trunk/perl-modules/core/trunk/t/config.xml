@@ -37,12 +37,12 @@
 
 	<validity id="Server"
 		  super="pki_realm{root1}/common/endentity/validity{default}">
-	  <notafter format="relativedate">+000014</notafter>
+	  <notafter format="relativedate">+0003</notafter>
 	</validity>
 
 	<validity id="User"
 		  super="pki_realm{root1}/common/endentity/validity{default}">
-	  <notafter format="relativedate">+000010</notafter>
+	  <notafter format="relativedate">+0006</notafter>
 	</validity>
       </endentity>
 
@@ -55,18 +55,19 @@
 	<!-- default validity settings for self-signed CAs (2 years
 	     after NotBefore -->
 	<validity id="default">
-	  <!-- notbefore defaults to 'now' -->
-	  <notafter  format="relativedate">+02</notafter>
+	  <!-- notbefore defaults to 'now' if unset -->
+	  <!-- add two years and one hour (for testing purposes -->
+	  <notafter  format="relativedate">+02000001</notafter>
 	</validity>
 
 	<validity id="INTERNAL_CA_1"
 		  super="pki_realm{root1}/common/selfsignedca/validity{default}">
-	  <notbefore format="absolutedate">20060101</notbefore>
+	  <notbefore format="relativedate">-01</notbefore>
 	</validity>
 	
 	<validity id="INTERNAL_CA_2"
 		  super="pki_realm{root1}/common/selfsignedca/validity{default}">
-	  <notbefore format="absolutedate">20070101</notbefore>
+	  <!-- <notbefore format="absolutedate">20070101</notbefore> -->
 	</validity>
       </selfsignedca>
 
