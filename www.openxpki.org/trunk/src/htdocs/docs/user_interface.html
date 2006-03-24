@@ -7,32 +7,32 @@
 <p>
   OpenXPKI tries to implement a MVC design (Model-View-Controller).
   The parts are defined as follows:
-  <dl>
-    <dt>Model</dt>
-    <dd>
-      The model is implemented by a workflow engine. This
-      includes things like the configuration or the state
-      handling.
-    </dd>
-    <dt>Controller</dt>
-    <dd>
-      The controllers are represented by the different workflow
-      activities. Every activity can manipulate the state
-      of a workflow including its properties.
-    </dd>
-    <dt>View</dt>
-    <dd>
-      The view is represented by the user interfaces. I have to
-      admit though that the term is not fully correct. The
-      user interface consists of several layers to get better code:
-      <ul>
-        <li>the service layer
-        <li>the messaging or serialization layer
-        <li>the transport layer
-      </ul>
-    </dd>
-  </dl>
 </p>
+<dl>
+  <dt>Model</dt>
+  <dd>
+    The model is implemented by a workflow engine. This
+    includes things like the configuration or the state
+    handling.
+  </dd>
+  <dt>Controller</dt>
+  <dd>
+    The controllers are represented by the different workflow
+    activities. Every activity can manipulate the state
+    of a workflow including its properties.
+  </dd>
+  <dt>View</dt>
+  <dd>
+    The view is represented by the user interfaces. I have to
+    admit though that the term is not fully correct. The
+    user interface consists of several layers to get better code:
+    <ul>
+      <li>the service layer</li>
+      <li>the messaging or serialization layer</li>
+      <li>the transport layer</li>
+    </ul>
+  </dd>
+</dl>
 <p>
   The major idea is to make the user interfaces much
   more flexible. It should be possible to use different
