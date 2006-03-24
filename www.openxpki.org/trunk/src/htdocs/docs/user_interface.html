@@ -48,20 +48,24 @@
       The format of the queries and answers are defined by
       the interface itself but in the native language (Perl).
       This means that a message can look like this:
+    </p>
 <pre>
   my %msg = (COMMAND => "search_csr",
              PARAMS  => {CN => "*Doe*"},
              LIMIT   => 20);
 </pre>
+    <p>
       The service layer defines a communication protocol but
       only on the level of native Perl messages. This means
       that a client send the above message but the answer is:
+    </p>
 <pre>
   my %msg = (ANSWER_TYPE => "COMMAND",
              COMMAND     => "GET_PKI_REALM",
              PKI_REALMS  => {"root_ca" => "Our super root CA",
                              "user_ca" => "User CA"});
 </pre>
+    <p>
       If this happens then the client must answer with root_ca
       or user_ca. Usually the next answer is the request for
       a login stack followed by the real login. Additionally
@@ -160,9 +164,9 @@
   Until now it looks like we must only serialize data structures like:
 </p>
 <ul>
-  <li>hash references
-  <li>array references
-  <li>scalars
+  <li>hash references</li>
+  <li>array references</li>
+  <li>scalars</li>
 </ul>
 <p>
   The problem is that we must implement this as a platform
@@ -220,9 +224,9 @@ scalar ::= [0-9]+.'\n'. /* length of data */
 </ul>
 <h4>Client View</h4>
 <ul>
-  <li>Creating query
-  <li>Serialize query
-  <li>Write query to transport layer
+  <li>Creating query</li>
+  <li>Serialize query</li>
+  <li>Write query to transport layer</li>
   <li>Connecting server</li>
   <li>Send transport protocol identifier</li>
   <li>Send serialized message</li>
