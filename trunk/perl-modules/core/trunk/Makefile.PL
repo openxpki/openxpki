@@ -113,6 +113,54 @@ if ($files)
     $version =~ s/#[^\n]*\n//g;
     $version =~ s/\n//g;
 }
+
+## restore all formerly ignored modules
+
+my $list = `find . -name "*.pm.ignore" -print`;
+my @list = split /[\n\s+]/, $list;
+foreach my $module (@list)
+{
+    next if (not defined $module or not length $module);
+    $module =~ s/\.ignore$//;
+    print STDOUT "Restoring module $module ... ";
+    if (not rename $module.".ignore", $module)
+    {
+        print STDOUT "FAILED\n";
+        print STDERR "Cannot restore formerly ignored module!\n";
+        print STDERR "Aborting to ensrue the consistency of the OpenXPKI release.\n";
+        exit 1;
+    }
+    print STDOUT "OK\n";
+}
+
+## should we ignore some modules?
+
+if (exists $ENV{IGNORE_MODULES})
+{
+    my $line = $ENV{IGNORE_MODULES};
+       $line =~ s/\s+/ /g;
+    my @modules = split / /, $line;
+    foreach my $module (@modules)
+    {
+        print STDOUT "Module $module is not going to be installed.\n";
+        $module =~ s/::/\//g;
+        $module .= ".pm" if (substr ($module, length($module)-4,3) ne ".pm");
+        if (not rename $module, $module.".ignore")
+        {
+            print STDERR "Cannot deactivate the module $module!\n";
+            print STDERR "Aborting makefile generation to enforce your installation policy.\n";
+            exit 1;
+        }
+    }
+}
+else
+{
+    print STDOUT "All modules will be installed.\n";
+}
+
+
+## some information about the used OpenXPKI version
+
 print STDOUT "Version:         $version\n";
 print STDOUT "Statistics:\n";
 my $cmd = 'cat OpenXPKI.pm OpenXPKI.xs `find OpenXPKI -type f | grep -r -v "/\."`| wc -l';

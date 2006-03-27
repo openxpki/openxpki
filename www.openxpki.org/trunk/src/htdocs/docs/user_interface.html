@@ -36,14 +36,14 @@
 <p>
   The major idea is to make the user interfaces much
   more flexible. It should be possible to use different
-  transport protocol and it must alos be possible to
+  transport protocol and it must also be possible to
   user other frontend language than Perl (e.g. PHP).
   The different layers are defined as follows:
 </p>
 <ol>
   <li>The service layer
     <p>
-      The messaging layer parses queries, executes necessary
+      This layer parses queries, executes necessary
       commands and build resulting answers.
       The format of the queries and answers are defined by
       the interface itself but in the native language (Perl).
@@ -74,6 +74,12 @@
       here. The only important thing is that we do not define
       any aspect of the serialization (the message representation)
       and the transport here.
+    </p>
+    <p>
+      Please note that it is highly important that every message
+      contains a hash key <i>SERVICE</i>. This is necessary to
+      signal the receiver of a message which service should be
+      used after the deserialization of a message.
     </p>
   </li>
   <li>The messaging or serialization layer
@@ -125,6 +131,21 @@
 
 <h2>Reference Implementation</h2>
 
+<p>
+  The practical handling of this protocol stack is really
+  simple. The server gets an incoming connection. The
+  first line of the incoming connection must be
+  <i>start simple</i>. This signals the server which transport
+  protocol must be used. After the initialization of the
+  transport protocol the first message is read. The first
+  message is the name of the serialization protocol.
+  An example could be <i>simple</i>. The server answers
+  <i>OK</i> and the next message is parsed with the
+  appropriate class <i>OpenXPKI::Serialization::Simple</i>.
+  The parsed data structure must include a hash key
+  <i>SERVICE</i> which announces the used service class.
+</p>
+  
 <h3>Service Protocol</h3>
 
 <p>
@@ -161,47 +182,18 @@
 <h3>Serialization</h3>
 
 <p>
-  Until now it looks like we must only serialize data structures like:
+  Please see
+  <a href="http://svn.berlios.de/wsvn/openxpki/trunk/perl-modules/core/trunk/OpenXPKI/Serialization/Simple.pm?op=file&rev=0&sc=0">
+    "perldoc OpenXPKI::Serialization::Simple"
+  </a>.
 </p>
-<ul>
-  <li>hash references</li>
-  <li>array references</li>
-  <li>scalars</li>
-</ul>
-<p>
-  The problem is that we must implement this as a platform
-  and language independent message which is really fast parseable.
-  The idea is to allow only the following:
-</p>
-<pre>
-    (hashref.arrayref)* ::= scalar
 
-    $href-&gt;{CERT}-&gt;[1]-&gt;{SUBJECT}-&gt;[0] = "dc=www,dc=openxpki,dc=org";
-</pre>
-<p>
-  * and + always mean MAX_LENGTH. Perhaps it is necessary for
-  non-script languages to split the scalar type into integer and
-  string or something other.
-</p>
-<pre>
-hash         ::= hash_element+
-hash_element ::= [1-9][0-9]*.'\n'.    /* length of the hash key */
-                 [a-zA-Z0-9_]+.'\n'.  /* the hash key */
-                 array
+<h3>Transport</h3>
 
-array         ::= array_element+
-array_element ::= [0-9]+.'\n'. /* position in the array */
-                  ('HASH\n'.hash|'SCALAR\n'.scalar)
-
-scalar ::= [0-9]+.'\n'. /* length of data */
-           data
-</pre>
-<p>
-  Finally the serialization must store in every serialized
-  message which service was used. This is necessary to be able
-  to detect the correct service if the service is reconnected
-  from the client and vice versa.
-</p>
+  Please see
+  <a href="http://svn.berlios.de/wsvn/openxpki/trunk/perl-modules/core/trunk/OpenXPKI/Transport/Simple.pm?op=file&rev=0&sc=0">
+    "perldoc OpenXPKI::Transport::Simple"
+  </a>.
 
 <h3>Example</h3>
 
@@ -210,25 +202,36 @@ scalar ::= [0-9]+.'\n'. /* length of data */
   <li>Established network connection</li>
   <li>Detected transport protocol</li>
   <li>Initialized transport protocol</li>
+  <li>Send OK<li/>
   <li>Read first message</li>
   <li>Detected serialization mechanism</li>
   <li>Initialized serialization mechanism</li>
-  <li>Deserialized message</li>
-  <li>Detected used service</li>
-  <li>Initialized service</li>
-  <li>Service performed the requested action</li>
-  <li>Perpared answer</li>
-  <li>Serialized answer</li>
-  <li>Send answer</li>
+  <li>Send OK<li/>
+  <li>Read service request<li/>
+  <li>Deserialize service request</li>
+  <li>Initialize service with transport protocol and
+    serialization mechanism</li>
+  <li>Send OK</li>
+  <li>Run service</li>
+  <li>Service read next message</li>
+  <li>Service performes the requested action</li>
+  <li>Service prepares answer</li>
+  <li>Service serializes (part) answer</li>
+  <li>Service send answer</li>
   <li>Waiting for next message or terminating</li>
 </ul>
 <h4>Client View</h4>
 <ul>
+  <li>Connect server</li>
+  <li>Send transport protocol identifier</li>
+  <li>Read OK from server</li>
+  <li>Send serialization mechanism</li>
+  <li>Read OK from server</li>
+  <li>Send requested service</li>
+  <li>Read OK from server</li>
   <li>Creating query</li>
   <li>Serialize query</li>
   <li>Write query to transport layer</li>
-  <li>Connecting server</li>
-  <li>Send transport protocol identifier</li>
   <li>Send serialized message</li>
   <li>Receive answer</li>
   <li>Deserialize answer</li>

@@ -119,6 +119,10 @@ OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
+## User Interface Layers
+OpenXPKI/Transport/Simple.pm
+OpenXPKI/Serialization/Simple.pm
+
 ## test stuff
 
 t/config.xml
@@ -213,14 +217,19 @@ t/60_workflow/02_workflow_persister.xml
 t/60_workflow/02_workflow_request_dataonly.xml
 t/60_workflow/common.pl
 
+t/65_ui/10_transport_simple.t
+t/65_ui/20_serialization_simple.t
+
 t/70_server/startup.pl
 t/70_server/01.t
 
 t/00_cleanup/25_crypto.t
 t/00_cleanup/28_log.t
 t/00_cleanup/30_dbi.t
+t/00_cleanup/65_ui.t
 t/99_cleanup/25_crypto.t
 t/99_cleanup/28_log.t
 t/99_cleanup/30_dbi.t
+t/99_cleanup/65_ui.t
 
 META.yml                                 Module meta-data (added by MakeMaker)
