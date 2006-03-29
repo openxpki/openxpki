@@ -110,24 +110,16 @@ sub load_profile
                                      XPATH   => [@profile_path, "digest"],
                                      COUNTER => [@profile_counter, 0]);
 
-    # determine CRL validity
-    my $entrytype = "crl";
 
     my %entry_validity = $self->get_entry_validity(
 	{
-	    ENTRYTYPE => $entrytype,
-	    ENTRYID   => $requested_id,
+	    XPATH     => \@profile_path,
+	    COUNTER   => \@profile_counter,
 	});
 
-
-    # notafter specification is mandatory
     if (! exists $entry_validity{notafter}) {
 	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_VALIDITY_NOT_FOUND",
-	    params => {
-		ENTRYTYPE => $entrytype,
-		ENTRYID   => $requested_id,
-	    },
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
 	    );
 	
     }

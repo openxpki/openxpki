@@ -458,14 +458,14 @@ sub get_entry_validity {
 	my $format;
 	eval {
 	    $format = $self->{config}->get_xpath(
-		XPATH   => [ @{$params->{XPATH}},   'validity', 'format' ],
-		COUNTER => [ @{$params->{COUNTER}}, 0, 0 ],
+		XPATH   => [ @{$params->{XPATH}},   'validity', $validitytype, 'format' ],
+		COUNTER => [ @{$params->{COUNTER}}, 0,          0,             0 ],
 		);
 	    
 	    ### $format
 	    $validity = $self->{config}->get_xpath(
 		XPATH   => [ @{$params->{XPATH}},   'validity', $validitytype ],
-		COUNTER => [ @{$params->{COUNTER}}, 0, 0 ],
+		COUNTER => [ @{$params->{COUNTER}}, 0,          0 ],
 		);
 	    ### $validity
 	    

@@ -171,11 +171,7 @@ sub load_profile
 
     if (! exists $entry_validity{notafter}) {
 	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_VALIDITY_NOT_FOUND",
-	    params => {
-		ENTRYTYPE => $entrytype,
-		ENTRYID   => $requested_id,
-	    },
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
 	    );
 	
     }

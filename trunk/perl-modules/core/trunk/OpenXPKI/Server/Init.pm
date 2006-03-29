@@ -205,22 +205,22 @@ sub get_pki_realms
 
         $realms{$name}->{crypto}->{default} = $defaulttoken;
 
+	my @xpath   = ( 'pki_realm', 'common', 'profiles' );
+	my @counter = ( $i,         0,        0 );
 	
 	foreach my $entrytype (qw( endentity selfsignedca crl )) {
 	    ### entrytype: $entrytype
 
 	    my $nr_of_entries = $keys->{CONFIG}->get_xpath_count(
-		XPATH   => ['pki_realm', 'common', $entrytype, 'validity'],
-		COUNTER => [$i,          0,        0 ]);
+		XPATH   => [ @xpath,   $entrytype, 'profile' ],
+		COUNTER => [ @counter, 0 ]);
 	    
 	    ### entries: $nr_of_entries
 	    foreach (my $jj = 0; $jj < $nr_of_entries; $jj++) {
- 		my $entryid = $keys->{CONFIG}->get_xpath(
- 		    XPATH => ['pki_realm', 'common', $entrytype, 'validity', 'id'],
- 		    COUNTER => [$i,         0,       0,          $jj,        0],
-		    );
-
-		### entryid: $entryid
+		my $entryid = $keys->{CONFIG}->get_xpath(
+			    XPATH   => [ @xpath,   $entrytype, 'profile', 'id' ],
+			    COUNTER => [ @counter, 0,          $jj,       0 ],
+			    );
 		    
 	      VALIDITYTYPE:
 		foreach my $validitytype (qw( notbefore notafter )) {
@@ -234,13 +234,13 @@ sub get_pki_realms
 		    # parse validity entry
 		    eval {
 			$format = $keys->{CONFIG}->get_xpath(
-			    XPATH   => [ 'pki_realm', 'common', $entrytype, 'validity', $validitytype, 'format' ],
-			    COUNTER => [ $i,          0,        0,          $jj,        0,             0 ],
+			    XPATH   => [ @xpath,   $entrytype, 'profile', 'validity', $validitytype, 'format' ],
+			    COUNTER => [ @counter, 0,          $jj,       0,          0,             0 ],
 			    );
 
 			$validity = $keys->{CONFIG}->get_xpath(
-			    XPATH   => [ 'pki_realm', 'common', $entrytype, 'validity', $validitytype ],
-			    COUNTER => [ $i,          0,        0,          $jj,        0 ],
+			    XPATH   => [ @xpath,   $entrytype, 'profile', 'validity', $validitytype ],
+			    COUNTER => [ @counter, 0,          $jj,        0,         0 ],
 			    );
 			
 		    };
@@ -274,7 +274,7 @@ sub get_pki_realms
 	    }
 	}
 
-
+	### %realms
 	
 	# get all CA certificates for PKI realm
 	# $realms{$name}->{ca}->{$ca}->{certificate} =

@@ -27,7 +27,7 @@
       <validity>
 	<notafter  format="relativedate">+02000001</notafter>
       </validity>
-
+      
       <digest>sha1</digest>
       <extensions>
 	<basic_constraints critical="true">
@@ -105,12 +105,13 @@
   <!-- endentity profiles -->
   <endentity>
     <!-- default certificate profile -->
-    <validity>
-      <!-- notbefore defaults to 'now' -->
-      <notafter  format="relativedate">+01</notafter>
-    </validity>
-
+    
     <profile id="default">
+      <validity>
+	<!-- notbefore defaults to 'now' -->
+	<notafter  format="relativedate">+01</notafter>
+      </validity>
+
       <digest>sha1</digest>
       <extensions>
 	<basic_constraints critical="true">
