@@ -29,7 +29,7 @@ my $context = {
 	# user-settable
 	api            => undef,
 	server         => undef,
-        gui            => undef,
+        service        => undef,
         acl            => undef,
         session        => undef,
         debug          => undef,

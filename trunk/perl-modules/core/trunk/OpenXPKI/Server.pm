@@ -58,7 +58,7 @@ sub new
     $self->{umask} = umask 0007;
 
     ## load the user interfaces
-    $self->{ui_list} = $self->__get_user_interfaces();
+    $self->__get_user_interfaces();
 
     ## start the server
 
@@ -76,31 +76,85 @@ sub process_request
     ## recover from umask of Net::Server->run
     umask $self->{umask};
 
-    my $line = readline (*STDIN);
-
-    ## initialize user interface module
-
-    my $class = $line;
-    $class =~ s/^.* //s; ## filter something like START etc.
-    $class =~ s/\n$//s;
-    if (not $self->{ui_list}->{$class})
+    ## magic transport protocol detector
+    my $transport = undef
+    my $line      = "";
+    while (not $transport)
     {
-        print STDOUT "OpenXPKI::Server: $class unsupported.\n";
-        $log->log (MESSAGE  => "$class unsupported.",
-		   PRIORITY => "fatal",
-		   FACILITY => "system");
+        my $char;
+        if (not read STDIN, $char, 1)
+        {
+            print STDOUT "OpenXPKI::Server: Connection closed unexpectly.\n";
+            $log->log (MESSAGE  => "Connection closed unexpectly.",
+	               PRIORITY => "fatal",
+                       FACILITY => "system");
+            return;
+        }
+        $line .= $char;
+        ## protocol detection
+        if ($line eq "start simple\n")
+        {
+            $transport = OpenXPKI::Transport::Simple->new ({DEBUG => CTX('debug')});
+            print STDOUT "OK\n";
+        }
+        elsif ($char eq "\n")
+        {
+            print STDOUT "OpenXPKI::Server: Unsupported protocol.\n";
+            $log->log (MESSAGE  => "Unsupported protocol.",
+	               PRIORITY => "fatal",
+                       FACILITY => "system");
+            return;
+        }
+    }
+
+    ## serialization protocol detector
+    my $serializer = undef;
+    my $msg = $transport->read();
+    if ($msg eq "simple\n")
+    {
+        $serializer = OpenXPKI::Serialization::Simple->new ({DEBUG => CTX('debug')});
+        $transport->write ("OK\n");
+    }
+    else
+    {
+            $transport->write ("OpenXPKI::Server: Unsupported serializer.\n");
+            $log->log (MESSAGE  => "Unsupported serializer.",
+	               PRIORITY => "fatal",
+                       FACILITY => "system");
+            return;
+    }
+
+    ## service detector
+    my $data = $serializer->deserialize ($transport->read());
+    if ($data eq "default")
+    {
+        OpenXPKI::Server::Context::setcontext
+        ({
+            "service" => OpenXPKI::Service::Default->new
+                         ({
+                             DEBUG         => CTX('debug'),
+                             TRANSPORT     => $transport,
+                             SERIALIZATION => $serializer
+                         })
+        });
+        $transport->write ($serializer->serialize ("OK"));
+    }
+    else
+    {
+        $transport->write ($serializer->serialize ("OpenXPKI::Server: Unsupported service.\n"));
+        $log->log (MESSAGE  => "Unsupported service.",
+                   PRIORITY => "fatal",
+                   FACILITY => "system");
         return;
     }
-    OpenXPKI::Server::Context::setcontext({
-        'ui' => $self->{ui_list}->{$class}
-    });
+    CTX('service')->init();
 
     ## update pre-initialized variables
 
     eval { CTX('dbi_backend')->connect() };
     if ($EVAL_ERROR)
     {
-        print STDOUT $EVAL_ERROR->message();
+        $transport->write ($serializer->serialize ($EVAL_ERROR->message()));
         $self->{log}->log (MESSAGE  => "Database connection failed. ".
                                        $EVAL_ERROR->message(),
                            PRIORITY => "fatal",
@@ -113,8 +167,7 @@ sub process_request
 
     ## use user interface
 
-    CTX('ui')->init();
-    CTX('ui')->run();
+    CTX('service')->run();
 }
 
 ###########################################################################
@@ -127,33 +180,65 @@ sub __get_user_interfaces
     $self->debug ("start");
     
     my $config = CTX('xml_config');
-    
-    my $count = $config->get_xpath_count (XPATH => "common/server/interface");
-    my %ui    = ();
+
+    ## init transport protocols
+
+    my $count = $config->get_xpath_count (XPATH => "common/server/transport");
     for (my $i=0; $i < $count; $i++)
     {
-        ## load interface class
         my $class = $config->get_xpath (
-	    XPATH   => "common/server/interface",
+	    XPATH   => "common/server/transport",
 	    COUNTER => $i);
-	$class = "OpenXPKI::UI::".$class;
+	$class = "OpenXPKI::Transport::".$class;
         eval "use $class;";
         if ($EVAL_ERROR)
         {
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_USE_FAILED",
+                message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_TRANSPORT_FAILED",
                 params  => {EVAL_ERROR => $EVAL_ERROR,
                             MODULE     => $class});
         }
-	
-        ## initialize interface class
-	# FIXME: should we pass in the API here?
-        $ui{$class} = eval { $class->new () };
-	#$ui{$class} = eval { $class->new (API => CTX('api')) };
-	$EVAL_ERROR->rethrow() if ($EVAL_ERROR);
     }
 
-    return \%ui;
+    ## init serializers
+
+    $count = $config->get_xpath_count (XPATH => "common/server/serialization");
+    for (my $i=0; $i < $count; $i++)
+    {
+        my $class = $config->get_xpath (
+	    XPATH   => "common/server/serialization",
+	    COUNTER => $i);
+	$class = "OpenXPKI::Serialization::".$class;
+        eval "use $class;";
+        if ($EVAL_ERROR)
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_SERIALIZATION_FAILED",
+                params  => {EVAL_ERROR => $EVAL_ERROR,
+                            MODULE     => $class});
+        }
+    }
+
+    ## init services
+
+    $count = $config->get_xpath_count (XPATH => "common/server/service");
+    for (my $i=0; $i < $count; $i++)
+    {
+        my $class = $config->get_xpath (
+	    XPATH   => "common/server/service",
+	    COUNTER => $i);
+	$class = "OpenXPKI::Service::".$class;
+        eval "use $class;";
+        if ($EVAL_ERROR)
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_SERVICE_FAILED",
+                params  => {EVAL_ERROR => $EVAL_ERROR,
+                            MODULE     => $class});
+        }
+    }
+
+    return 1;
 }
 
 sub __get_server_config

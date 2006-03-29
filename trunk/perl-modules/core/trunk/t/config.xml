@@ -7,7 +7,9 @@
         <socket_file>t/socket</socket_file>
         <pid_file>t/pid</pid_file>
         <stderr>t/stderr.log</stderr>
-        <interface>Test</interface>
+        <transport>Simple</transport>
+        <serialization>Simple</serialization>
+        <service>Test</service>
     </server>
     <i18n>
         <locale_directory>t</locale_directory>

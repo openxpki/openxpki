@@ -103,7 +103,6 @@ OpenXPKI/Server/Authentication/LDAP.pm
 OpenXPKI/Server/Authentication/Password.pm
 OpenXPKI/Server/Authentication/X509.pm
 OpenXPKI/Server/ACL.pm
-OpenXPKI/UI/Test.pm
 
 ## Workflow
 OpenXPKI/Server/Workflow.pm
@@ -122,6 +121,7 @@ OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm
 OpenXPKI/Serialization/Simple.pm
+OpenXPKI/Service/Test.pm
 
 ## test stuff
 

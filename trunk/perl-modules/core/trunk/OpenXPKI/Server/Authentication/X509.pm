@@ -29,7 +29,7 @@ sub new {
     $self->{DEBUG} = 1 if ($keys->{DEBUG});
     $self->debug ("start");
 
-    my $config = CTX->config();
+    my $config = CTX('xml_config');
     $self->{CHAIN} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "chain" ],
                                          COUNTER => [ %{$keys->{COUNTER}}, 0 ]);
 
@@ -40,15 +40,18 @@ sub login
 {
     my $self = shift;
     $self->debug ("start");
-    my $gui = shift;
+    my $gui = CTX('service');
 
     $self->debug ("type ... x509");
 
-    my $challenge = CTX->session->get_id();
+    my $challenge = CTX('session')->get_id();
     my $signature = $gui->get_x509_login ($challenge);
 
-    my $token = CTX->crypto_shell->get_token (TYPE      => "DEFAULT",
-                                              PKI_REALM => CTX->pki_realm);
+    my $token = CTX('crypto_layer')->get_token
+                (
+                    TYPE      => "DEFAULT",
+                    PKI_REALM => CTX('session')->get_pki_realm()
+                );
 
     my $sig = OpenXPKI::Crypto::PKCS7->new (TOKEN => $token,
                                             PKCS7 => $signature);

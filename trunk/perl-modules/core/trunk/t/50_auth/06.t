@@ -8,7 +8,7 @@ print STDERR "OpenXPKI::Server::Authentication::External (static role)\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::UI::Test;
+use OpenXPKI::Service::Test;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
 ok(1);
@@ -39,12 +39,12 @@ OpenXPKI::Server::Context::setcontext ({'session' => $session});
 $session->set_pki_realm ("Test Root CA");
 
 ## create new test user interface
-my $gui = OpenXPKI::UI::Test->new({
+my $gui = OpenXPKI::Service::Test->new({
            "DEBUG"                => 0,
            "AUTHENTICATION_STACK" => "External Static",
            "LOGIN"                => "John Doe",
            "PASSWD"               => "User"});
-ok(OpenXPKI::Server::Context::setcontext ({"gui" => $gui}));
+ok(OpenXPKI::Server::Context::setcontext ({"service" => $gui}));
 
 ## perform authentication
 ok($auth->login ());

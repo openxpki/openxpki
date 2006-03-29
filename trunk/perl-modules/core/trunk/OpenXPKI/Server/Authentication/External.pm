@@ -80,7 +80,7 @@ sub login
     my $self = shift;
     $self->debug ("start");
     my $name = shift;
-    my $gui  = CTX('gui');
+    my $gui  = CTX('service');
 
     my ($account, $passwd) = $gui->get_passwd_login ($name);
 

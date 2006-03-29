@@ -163,7 +163,7 @@ sub login
     CTX('session')->start_authentication();
 
     my $realm = CTX('session')->get_pki_realm();
-    my $stack = CTX('gui')->get_authentication_stack ({
+    my $stack = CTX('service')->get_authentication_stack ({
                     STACKS => {%{$self->{PKI_REALM}->{$realm}->{STACK}}}
                                                       });
 

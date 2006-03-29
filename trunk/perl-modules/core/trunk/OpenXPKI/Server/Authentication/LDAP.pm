@@ -158,7 +158,7 @@ sub login
 {
     my $self = shift;
     $self->debug ("start");
-    my $gui = shift;
+    my $gui = CTX('service');
 
     my ($account, $passwd) = $gui->get_passwd_login ("");
 

@@ -1,4 +1,4 @@
-## OpenXPKI::UI::Test.pm 
+## OpenXPKI::Service::Test.pm 
 ##
 ## Written by Michael Bell for the OpenXPKI project 2005
 ## Copyright (C) 2005 by The OpenXPKI Project
@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use utf8;
 
-package OpenXPKI::UI::Test;
+package OpenXPKI::Service::Test;
 
 ## used modules
 
