@@ -431,88 +431,74 @@ sub get_entry_validity {
     my $self = shift;
     my $params = shift;
 
-    my %result       = $self->get_path();
-    my $pki_realm_id = $result{PKI_REALM};
-
-    
-    my $entrytype = $params->{ENTRYTYPE};
-    my $requested_id = $params->{ENTRYID};
-
-    ### entrytype: $entrytype
-    ### requested_id: $requested_id
-
-    my %entry_validity = ();
-
-    my $nr_of_entries = $self->{config}->get_xpath_count(
-	XPATH   => ['pki_realm',    'common', $entrytype, 'validity'],
-	COUNTER => [$pki_realm_id,  0,        0 ]);
-    
-    ### entries: $nr_of_entries
-
-  GETVALIDITY:
-    foreach (my $jj = 0; $jj < $nr_of_entries; $jj++) {
-	my $entryid = $self->{config}->get_xpath(
-	    XPATH => ['pki_realm',     'common', $entrytype, 'validity', 'id'],
-	    COUNTER => [$pki_realm_id, 0,        0,          $jj,        0],
-	    );
-	
-	### entryid: $entryid
-	
-	# check if the current entry matches the required one
-	if ($entryid eq $requested_id) {
-	
-	    foreach my $validitytype (qw( notbefore notafter )) {
-		
-		# parse validity entry
-		my $validity;
-		my $format;
-		eval {
-		    $format = $self->{config}->get_xpath(
-			XPATH   => [ 'pki_realm',    'common', $entrytype, 'validity', $validitytype, 'format' ],
-			COUNTER => [ $pki_realm_id,  0,        0,          $jj,        0,             0 ],
-			);
-		    
-		    $validity = $self->{config}->get_xpath(
-			XPATH   => [ 'pki_realm',   'common', $entrytype, 'validity', $validitytype ],
-			COUNTER => [ $pki_realm_id, 0,        0,          $jj,        0 ],
-			);
-		    
-		};
-		if (my $exc = OpenXPKI::Exception->caught()) {
-		    # ignore exception for missing 'notbefore' entry
-		    if (($exc->message() 
-			 eq "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND")
-			&& ($validitytype eq "notbefore")) {
-			# default: "now"
-			$validity = undef;
-		    }
-		    else
-		    {
-			$exc->rethrow();
-		    }
-		} elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
-		    $EVAL_ERROR->rethrow();
-		}
-		
-		### got format: $format
-		### got validity: $validity
-
-		if ((defined $format) &&
-		    (defined $validity)) {
-		    $entry_validity{$validitytype} = {
-			VALIDITYFORMAT => $format,
-			VALIDITY => $validity,
-		    };
-		}
-		
-	    }
-
-	    # found requested entry, leave loop
-	    ### match found...
-	    last GETVALIDITY;
-	}
+    if ((! exists $params->{XPATH}) || (ref $params->{XPATH} ne "ARRAY")) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_GET_ENTRY_VALIDITY_MISSING_PARAMETER",
+	    params  => {
+		PARAMETER => 'XPATH',
+	    });
     }
 
+    if ((! exists $params->{COUNTER}) || (ref $params->{COUNTER} ne "ARRAY")) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_GET_ENTRY_VALIDITY_MISSING_PARAMETER",
+	    params  => {
+		PARAMETER => 'COUNTER',
+	    });
+    }
+
+    
+    my %entry_validity = ();
+
+    foreach my $validitytype (qw( notbefore notafter )) {
+	
+	# parse validity entry
+	### $validitytype
+	my $validity;
+	my $format;
+	eval {
+	    $format = $self->{config}->get_xpath(
+		XPATH   => [ @{$params->{XPATH}},   'validity', 'format' ],
+		COUNTER => [ @{$params->{COUNTER}}, 0, 0 ],
+		);
+	    
+	    ### $format
+	    $validity = $self->{config}->get_xpath(
+		XPATH   => [ @{$params->{XPATH}},   'validity', $validitytype ],
+		COUNTER => [ @{$params->{COUNTER}}, 0, 0 ],
+		);
+	    ### $validity
+	    
+	};
+	if (my $exc = OpenXPKI::Exception->caught()) {
+	    # ignore exception for missing 'notbefore' entry
+	    if (($exc->message() 
+		 eq "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND")
+		&& ($validitytype eq "notbefore")) {
+		# default: "now"
+		$validity = undef;
+	    }
+	    else
+	    {
+		$exc->rethrow();
+	    }
+	} elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
+	    $EVAL_ERROR->rethrow();
+	}
+	
+	### got format: $format
+	### got validity: $validity
+	
+	if ((defined $format) &&
+	    (defined $validity)) {
+	    $entry_validity{$validitytype} = {
+		VALIDITYFORMAT => $format,
+		VALIDITY       => $validity,
+	    };
+	}
+	
+    }
+    
     return %entry_validity;
 }
 

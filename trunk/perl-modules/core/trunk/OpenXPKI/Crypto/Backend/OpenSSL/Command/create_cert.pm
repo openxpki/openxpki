@@ -84,12 +84,6 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_CSRFILE");
     }
-    if (exists $self->{DAYS} and
-        ($self->{DAYS} !~ /\d+/ or $self->{DAYS} <= 0))
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_WRONG_DAYS");
-    }
 
     ## prepare data
 

@@ -240,7 +240,7 @@
   <xsd:complexType name="cert_profiles_type">
     <xsd:sequence minOccurs="0">
       <xsd:element name="crl"            type="cert_profile_type"/>
-      <xsd:element name="ca_certificate" type="cert_profile_type"/>
+      <xsd:element name="selfsignedca"   type="cert_profile_type"/>
       <xsd:element name="profile" type="cert_profile_type" maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute ref="xml:base"/>

@@ -71,8 +71,36 @@ sub load_profile
 
     ## scan for correct profile
  
-    my @profile_path    = ("pki_realm", "ca", "profiles", "crl");
-    my @profile_counter = ($pki_realm, $ca, 0, 0);
+    my @profile_path    = ("pki_realm", "common", "profiles", "crl");
+    my @profile_counter = ($pki_realm, 0, 0, 0);
+
+    my $requested_id = $self->{CA};
+
+    push @profile_path, "profile";
+
+
+    my $nr_of_profiles 
+	= $self->{config}->get_xpath_count (XPATH   => [@profile_path],
+					    COUNTER => [@profile_counter]);
+    my $found = 0;
+  FINDPROFILE:
+    for (my $ii = 0; $ii < $nr_of_profiles; $ii++)
+    {
+	if ($self->{config}->get_xpath(
+		XPATH   => [@profile_path, "id"],
+		COUNTER => [@profile_counter, $ii, 0])
+	    eq $requested_id)
+	{
+	    push @profile_counter, $ii;
+	    $found = 1;
+	    last FINDPROFILE;
+	}
+    }
+    
+    if (! $found) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_UNDEFINED_PROFILE");
+    }
 
     ## now we have a correct starting point to load the profile
 
@@ -84,7 +112,6 @@ sub load_profile
 
     # determine CRL validity
     my $entrytype = "crl";
-    my $requested_id = $self->{CA};
 
     my %entry_validity = $self->get_entry_validity(
 	{

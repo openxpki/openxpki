@@ -105,40 +105,48 @@ sub load_profile
 
     my %result    = $self->get_path();
     my $pki_realm = $result{PKI_REALM};
-    my $ca        = $result{CA};
 
     ## scan for correct profile
  
-    my @profile_path    = ("pki_realm", "ca", "profiles");
-    my @profile_counter = ($pki_realm, $ca, 0);
+    my @profile_path    = ("pki_realm", "common", "profiles");
+    my @profile_counter = ($pki_realm, 0, 0);
+
+    my $requested_id = $self->{ID};
+
     if ($self->{TYPE} eq "SELFSIGNEDCA")
     {
-        push @profile_path,    "ca_certificate";
+        push @profile_path, "selfsignedca";
         push @profile_counter, 0;
-    } else {
-        push @profile_path, "profile";
-        my $nr_of_profiles 
-	    = $self->{config}->get_xpath_count (XPATH   => [@profile_path],
-						COUNTER => [@profile_counter]);
-	my $found = 0;
-      FINDPROFILE:
-        for (my $ii = 0; $ii < $nr_of_profiles; $ii++)
-        {
-            if ($self->{config}->get_xpath(
-		    XPATH   => [@profile_path, "id"],
-		    COUNTER => [@profile_counter, $ii, 0])
-		eq $self->{ID})
-            {
-                push @profile_counter, $ii;
-		$found = 1;
-		last FINDPROFILE;
-            }
-	}
 
-	if (! $found) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_WRONG_ROLE");
+	$requested_id = $self->{CA};
+    } else {
+        push @profile_path, "endentity";
+        push @profile_counter, 0;
+    };
+
+    push @profile_path, "profile";
+
+    my $nr_of_profiles 
+	= $self->{config}->get_xpath_count (XPATH   => [@profile_path],
+					    COUNTER => [@profile_counter]);
+    my $found = 0;
+  FINDPROFILE:
+    for (my $ii = 0; $ii < $nr_of_profiles; $ii++)
+    {
+	if ($self->{config}->get_xpath(
+		XPATH   => [@profile_path, "id"],
+		COUNTER => [@profile_counter, $ii, 0])
+	    eq $requested_id)
+	{
+	    push @profile_counter, $ii;
+	    $found = 1;
+	    last FINDPROFILE;
 	}
+    }
+    
+    if (! $found) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_UNDEFINED_PROFILE");
     }
 
     ## now we have a correct starting point to load the profile
@@ -155,23 +163,11 @@ sub load_profile
     ###########################################################################
     # determine certificate validity
 
-    # assume end entity certificate
-    my $entrytype = lc($self->{TYPE});
-    my $requested_id = $self->{ID};
-
-    if ($self->{TYPE} eq "SELFSIGNEDCA") {
-	$requested_id = $self->{CA};
-    }
-
-    ### entrytype: $entrytype
-    ### requested_id: $requested_id
-
     my %entry_validity = $self->get_entry_validity(
 	{
-	    ENTRYTYPE => $entrytype,
-	    ENTRYID   => $requested_id,
+	    XPATH     => \@profile_path,
+	    COUNTER   => \@profile_counter,
 	});
-
 
     if (! exists $entry_validity{notafter}) {
 	OpenXPKI::Exception->throw (

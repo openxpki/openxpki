@@ -1,0 +1,20 @@
+<openxpki>
+  <subordinate id="area1">
+    <item id="test3">
+      <value>foobar</value>
+    </item>
+    <item id="test4" super="subordinate/item{test3}"/>
+    <item id="test5" super="../item{test3}"/>
+    <item id="test6" super="../../subordinate{area2}/item{othertest1}"/>
+    <item mytag="test7">
+      <value>somevalue</value>
+    </item>
+    <item id="test8" super="../item{mytag:test7}"/>
+    <item id="test9" super="../item{test8}"/>
+  </subordinate>
+  <subordinate id="area2">
+    <item id="othertest1">
+      <value>yohoo</value>
+    </item>
+  </subordinate>
+</openxpki>

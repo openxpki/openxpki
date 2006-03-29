@@ -1,96 +1,103 @@
 <policy>
 
   <!-- profile configuration for the generation of CA certificates -->
-  <ca_certificate>
+  <selfsignedca>
     <!-- this must be filled                        -->
-  </ca_certificate>
+  </selfsignedca>
 
-  <!-- profile configuration for the role User -->
-  <profile id="User">
-    <subject>
-      <supported_attributes>mail</supported_attributes>
-      <supported_attributes>CN</supported_attributes>
-      <supported_attributes>SN</supported_attributes>
-      <supported_attributes>unstructuredName</supported_attributes>
-      <supported_attributes>unstructuredAddress</supported_attributes>
-      <supported_attributes>OU</supported_attributes>
-      <supported_attributes>L</supported_attributes>
-      <supported_attributes>ST</supported_attributes>
-      <supported_attributes>O</supported_attributes>
-      <supported_attributes>C</supported_attributes>
-      <supported_attributes>DC</supported_attributes>
-      <supported_attributes>serialNumber</supported_attributes>
-      <supported_attributes>uid</supported_attributes>
-      <allow_multivalued_attributes>YES</allow_multivalued_attributes>
-      <required_elements>CN</required_elements>
-      <required_elements>OU</required_elements>
-      <required_elements>DC</required_elements>
-      <enforce_base>EXIST</enforce_base>
-      <base index="1">
-        <attr>DC</attr>
-        <value>OpenXPKI</value>
-      </base>
-      <base>
-        <attr>DC</attr>
-        <value>org</value>
-      </base>
-      <set_request_serial>N</set_request_serial>
-      <request_serial_name>sn</request_serial_name>
-      <set_certificate_serial>N</set_certificate_serial>
-      <certificate_serial_name>serialNumber</certificate_serial_name>
-      <without_email>Y</without_email>
-      <unique>NO</unique>
-    </subject>
-    <subject_alt_name>
-      <supported_subject_alt_names>email</supported_subject_alt_names>
-      <supported_subject_alt_names>DNS</supported_subject_alt_names>
-      <supported_subject_alt_names>IP</supported_subject_alt_names>
-      <supported_subject_alt_names>DirName</supported_subject_alt_names>
-      <supported_subject_alt_names>URI</supported_subject_alt_names>
-      <supported_subject_alt_names>RID</supported_subject_alt_names>
-      <supported_subject_alt_names>otherName</supported_subject_alt_names>
-      <supported_subject_alt_names>Microsoft_GUID</supported_subject_alt_names>
-      <supported_subject_alt_names>Microsoft_UPN</supported_subject_alt_names>
-      <automatic>YES</automatic>
-      <default>email</default>
-    </subject_alt_name>
-    <use_loa>no</use_loa>
-    <loa>
-      <level>10</level>
-      <name>Test</name>
-      <!--
-        list all the policy OIDs here that are below
-        and equevilant to this level of assurance for example
-        loa basic has policy oid 1.2.3.4 , and basic is
-        higher than test and rudimentary and basic, so the
-        line would look like this
+  <endentity>
+    <!-- default profile configuration -->
+    <profile id="default">
+      <subject>
+	<supported_attributes>mail</supported_attributes>
+	<supported_attributes>CN</supported_attributes>
+	<supported_attributes>SN</supported_attributes>
+	<supported_attributes>unstructuredName</supported_attributes>
+	<supported_attributes>unstructuredAddress</supported_attributes>
+	<supported_attributes>OU</supported_attributes>
+	<supported_attributes>L</supported_attributes>
+	<supported_attributes>ST</supported_attributes>
+	<supported_attributes>O</supported_attributes>
+	<supported_attributes>C</supported_attributes>
+	<supported_attributes>DC</supported_attributes>
+	<supported_attributes>serialNumber</supported_attributes>
+	<supported_attributes>uid</supported_attributes>
+	<allow_multivalued_attributes>YES</allow_multivalued_attributes>
+	<required_elements>CN</required_elements>
+	<required_elements>OU</required_elements>
+	<required_elements>DC</required_elements>
+	<enforce_base>EXIST</enforce_base>
+	<base index="1">
+          <attr>DC</attr>
+          <value>OpenXPKI</value>
+	</base>
+	<base>
+          <attr>DC</attr>
+          <value>org</value>
+	</base>
+	<set_request_serial>N</set_request_serial>
+	<request_serial_name>sn</request_serial_name>
+	<set_certificate_serial>N</set_certificate_serial>
+	<certificate_serial_name>serialNumber</certificate_serial_name>
+	<without_email>Y</without_email>
+	<unique>NO</unique>
+      </subject>
+      <subject_alt_name>
+	<supported_subject_alt_names>email</supported_subject_alt_names>
+	<supported_subject_alt_names>DNS</supported_subject_alt_names>
+	<supported_subject_alt_names>IP</supported_subject_alt_names>
+	<supported_subject_alt_names>DirName</supported_subject_alt_names>
+	<supported_subject_alt_names>URI</supported_subject_alt_names>
+	<supported_subject_alt_names>RID</supported_subject_alt_names>
+	<supported_subject_alt_names>otherName</supported_subject_alt_names>
+	<supported_subject_alt_names>Microsoft_GUID</supported_subject_alt_names>
+	<supported_subject_alt_names>Microsoft_UPN</supported_subject_alt_names>
+	<automatic>YES</automatic>
+	<default>email</default>
+      </subject_alt_name>
+      <use_loa>no</use_loa>
+      <loa>
+	<level>10</level>
+	<name>Test</name>
+	<!--
+            list all the policy OIDs here that are below
+            and equevilant to this level of assurance for example
+            loa basic has policy oid 1.2.3.4 , and basic is
+            higher than test and rudimentary and basic, so the
+            line would look like this
 
-        <policy_identifier>1.2.3.1</policy_identifier>
-        <policy_identifier>1.2.3.3.5</policy_identifier>
+            <policy_identifier>1.2.3.1</policy_identifier>
+            <policy_identifier>1.2.3.3.5</policy_identifier>
 
-        ..... where
-        1.2.3.1 is the oid for test loa and 1.2.3.2 is for
-        Rudimantary. you get the picture NOTE they must be
-        COMMA separated
-      -->
-      <policy_identifier>1.2.3.3.4</policy_identifier>
-      <!--
-        you can have multiple CPS URIs
-        example
+            ..... where
+            1.2.3.1 is the oid for test loa and 1.2.3.2 is for
+            Rudimantary. you get the picture NOTE they must be
+            COMMA separated
+	    -->
+	<policy_identifier>1.2.3.3.4</policy_identifier>
+	<!--
+            you can have multiple CPS URIs
+            example
 
-          <cps>http://url1</cps>
-          <cps>http://url2</cps>
+            <cps>http://url1</cps>
+            <cps>http://url2</cps>
 
-      -->
-      <cps>http://some.url.org/cps</cps>
-    </loa>
-    <loa>
-      <level>20</level>
-      <name>Rudimentary</name>
-      <policy_identifier>1.2.3.3.4</policy_identifier>
-      <policy_identifier>1.2.3.3.5</policy_identifier>
-      <cps>http://some.url.org/cps</cps>
-    </loa>
-  </role>
+	    -->
+	<cps>http://some.url.org/cps</cps>
+      </loa>
+      <loa>
+	<level>20</level>
+	<name>Rudimentary</name>
+	<policy_identifier>1.2.3.3.4</policy_identifier>
+	<policy_identifier>1.2.3.3.5</policy_identifier>
+	<cps>http://some.url.org/cps</cps>
+      </loa>
+    </profile>
 
+    <profile id="User"
+	     super="../profile{default}"/>
+
+
+  </endentity>
+  
 </policy>

@@ -15,6 +15,8 @@ use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 use English;
 
+# use Smart::Comments;
+
 sub new
 { 
     my $that  = shift;
@@ -170,15 +172,15 @@ sub __get_super_xpath
     my @xpath   = @{$keys->{XPATH}};
     my @counter = @{$keys->{COUNTER}};
 
-    ## put the last element into the new path
+    my @new_xpath;
+    my @new_counter;
 
-    my @new_xpath   = ($xpath[scalar @xpath -1]);
-    my @new_counter = ();
-    delete $xpath[scalar @xpath -1];
+    ## put the last element into the new path
+    unshift @new_xpath, pop(@xpath);
+
     if (scalar @xpath < scalar @counter)
     {
-        @new_counter = ($counter[scalar @xpath]);
-        delete $counter[scalar @xpath];
+	unshift @new_counter, pop(@counter);
     }
 
     ## start scanning for a super attribute
@@ -195,14 +197,14 @@ sub __get_super_xpath
         {
             ## go to the next element of the path
             $super = "";
-            @new_xpath   = ($xpath[scalar @xpath -1], @new_xpath);
-            @new_counter = ($counter[scalar @counter -1], @new_counter);
-            delete $xpath[scalar @xpath -1];
-            delete $counter[scalar @counter -1];
+
+	    unshift @new_xpath, pop(@xpath);
+	    unshift @new_counter, pop(@counter);
         } else {
             ## found super reference, so nothing to do
         }
     }
+
     if (not $super)
     {
         $super = "";
@@ -234,19 +236,65 @@ sub __get_super_xpath
 
     ## build the new path prefix
 
-    my @super_list    = split /\//, $super;
+    my @super_list    = split m{\/}, $super;
     my @super_xpath   = ();
     my @super_counter = ();
+
+    ### ----------------------- start...
+    ### keys: $keys
+    ### super list: @super_list
+    ### @xpath
+    ### @counter
+
+    # handle relative paths
+    if ($super_list[0] =~ m{\A \.\.}xms) {
+	### identified relative specification
+	@super_xpath   = @xpath;
+	@super_counter = @counter;
+#	pop @super_xpath;
+#	pop @super_counter;
+    }
+
+
     foreach my $item (@super_list)
     {
+	### checkpoint 1...
+	### $item
         my $path = $item;
-        $path =~ s/\{.*$//;
-        @super_xpath = (@super_xpath, $path);
-        if ($item =~ /\{/)
-        {
-            ## determine the id
-            $item =~ s/^.*\{(.*)\}.*$/$1/;
+        $path =~ s{ \{ .* }{}xms;
+	my ($parent_id) = ($item =~ m{ \{ (.*?) \} }xms);
 
+	### $path
+	### $parent_id
+	### @super_xpath
+	### @super_counter
+
+
+	if ($path ne '..') {
+	    push @super_xpath, $path;
+	} else {
+	    # one level up
+	    pop @super_xpath;
+	    pop @super_counter;
+	    pop @super_counter;
+	}
+	
+	### checkpoint 2...
+	### @super_xpath
+	### @super_counter
+
+        if (defined $parent_id)
+        {
+	    my $idtag = 'id';
+	    if ($parent_id =~ m{ (.*?):(.*) }xms) {
+		$idtag     = $1;
+		$parent_id = $2;
+	    }
+	    
+	    ### checkpoint 3...
+	    ### idtag: $idtag
+	    ### parent_id: $parent_id
+	    
             ## how many possible jump targets exist?
             my $count = $self->{CACHE}->get_xpath_count (
                             XPATH   => [@super_xpath],
@@ -256,10 +304,10 @@ sub __get_super_xpath
             my $target = $count;
             for (my $i=0; $i < $count; $i++)
             {
-                my $id = eval {$self->get_xpath (XPATH   => [@super_xpath, "id"],
+                my $id = eval {$self->get_xpath (XPATH   => [@super_xpath, $idtag ],
                                                  COUNTER => [@super_counter, $i, 0])};
                 next if ($EVAL_ERROR);
-                next if ($id ne $item);
+                next if ($id ne $parent_id);
                 $target = $i;
                 $i = $count;
             }
@@ -270,24 +318,38 @@ sub __get_super_xpath
                     message => "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE",
                     params  => {"SUPER" => $super});
             }
-            @super_counter = (@super_counter, $target);
+	    push @super_counter, $target;
         }
         else
         {
-            @super_counter = (@super_counter, 0);
+	    # no super attribute defined -> use the first one
+	    push @super_counter, 0;
         }
+	### checkpoint 4...
+	### @super_xpath
+	### @super_counter
     }
     $self->debug ("super_xpath is ".join "/", @super_xpath);
     $self->debug ("super_counter is ".join "/", @super_counter);
 
     ## concatenate the two paths
+    ### checkpoint 5...
+    ### @new_xpath
+    ### @new_counter
+    ### @super_xpath
+    ### @super_counter
 
-    @super_xpath   = (@super_xpath,   @new_xpath);
-    @super_counter = (@super_counter, @new_counter);
+    push @super_xpath, @new_xpath;
+    push @super_counter, @new_counter;
     $self->debug ("new xpath is ".join "/", @super_xpath);
     $self->debug ("new counter is ".join "/", @super_counter);
 
-    ## finished
+    ### checkpoint 6...
+    ### @new_xpath
+    ### @new_counter
+    ### @super_xpath
+    ### @super_counter
+    ### -------------------finished...
 
     return (XPATH => [@super_xpath], COUNTER => [@super_counter]);
 }

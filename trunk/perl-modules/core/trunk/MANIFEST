@@ -151,9 +151,11 @@ t/20_xml/2.t
 t/20_xml/3.t
 t/20_xml/4.t
 t/20_xml/5.t
+t/20_xml/6.t
 t/20_xml/test.xml
 t/20_xml/top.xml
 t/20_xml/sub.xml
+t/20_xml/relative.xml
 
 t/25_crypto/01.t
 t/25_crypto/10.t
