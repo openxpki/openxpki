@@ -1,0 +1,72 @@
+OpenCA Security Advisory [16 January 2004]
+
+Vulnerability in signature validation
+=====================================
+
+A flaw in OpenCA before version 0.9.1.7 could cause OpenCA to accept a
+signature from a certificate if the certificate's chain is trusted by
+the chain directory of OpenCA. This means that a certificate from
+another PKI can authorize operations on the used PKI if the chain of the
+used signature certifcate can establish a trust relationship to the
+actually used PKI.
+
+Alexandru Matei found the bug during a source code verification.
+Alexandru Matei and Michael Bell of the OpenCA core team fixed the
+problem for OpenCA 0.9.1 and the CVS HEAD.
+
+Vulnerability
+-----------------
+
+OpenCA has a library for common crypto operations - crypto-utils.lib.
+This library includes a function to check a signature
+(libCheckSignature). The function load the used signature certificate
+from OpenCA's database and finally ensures that the used signature
+certificate is identical with the certificate in the database.
+
+The comparison of the certificate in the database and the certificate
+of the signer was only performed on base of the serial of the
+certificate. The design of the function can cause the acceptance
+of a signature if the chain of the signature can create a
+trustrelationship to the chain directory of OpenCA and a certificate
+with a matching serial exists in the used PKI.
+
+Who is affected?
+------------------
+
+All version of OpenCA including 0.9.1.6. A security risk is present for
+people who are using digital signatures to secure approved requests
+or role based access control (RBAC).
+
+Recommendations
+-----------------
+
+Upgrade to 0.9.1.7 and use newer snapshots than
+openca-SNAP-20040114.tar.gz. You can fix the problem by yourself too
+with the included patch. The original file which we used to create
+the diff is from OpenCA 0.9.1.6.
+
+-----BEGIN PATCH-----
+--- src/common/lib/functions/crypto-utils.lib	2004-01-15 12:10:45.000000000 +0100
++++ src/common/lib/functions/crypto-utils.lib.new	2004-01-15 12:10:06.000000000 +0100
+@@ -201,7 +201,7 @@
+ 		                	       "__ERRVAL__", $OpenCA::X509::errval);
+ 			return undef;
+ 		}
+-		last if ( $tmpCert->getSerial() eq $sigCert->getSerial() );
++		last if ( $tmpCert->getPEM() eq $sigCert->getPEM() );
+ 		$sigCert = undef;
+ 	}
+ 
+-----END PATCH-----
+
+References
+------------
+
+The Common Vulnerabilities and Exposures project (cve.mitre.org) has
+assigned the name CAN-2004-0004 to this issue.
+
+http://cve.mitre.org/cgi-bin/cvename.cgi?name=CAN-2004-0004
+
+URL for this Security Advisory:
+http://www.openca.org/news/CAN-2004-0004.txt
+

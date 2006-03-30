@@ -16,6 +16,10 @@
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/legacy/index.html' &>">OpenCA Support</a></div>
 % if ($section eq 'legacy') {
+        <div class="menu_sub_item"><a href="<& /lib/url.mas, 
+	  path => '/legacy/securityadvisories.html' &>">Security Advisories</a></div>
+	<div class="menu_sub_item"><a href="<& /lib/url.mas,
+          path => '/legacy/news.html' &>">Archived News</a></div>
 	<div class="menu_sub_item"><a href="<& /lib/url.mas,
           path => '/legacy/docs.html' &>">Documentation</a></div>
         <div class="menu_sub_item"><a href="<& /lib/url.mas, 
