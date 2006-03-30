@@ -197,6 +197,8 @@ t/30_dbi/common.pl
 t/30_dbi/database.xml
 
 t/40_context/01.t
+t/40_context/02.t
+t/40_context/03.t
 
 t/50_auth/01.t
 t/50_auth/02.t

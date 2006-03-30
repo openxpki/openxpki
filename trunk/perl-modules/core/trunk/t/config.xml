@@ -22,7 +22,6 @@
   <pki_realm name="Test Root CA" id="root1">
 
     <common id="default">
-<!--    <common> -->
       <!-- default token (used for general crypto operations not requiring
            private key operations) -->
       <token super="common/token_config/token{default}"/>
@@ -34,7 +33,6 @@
 
     <!-- Issuing CAs defined for this realm -->
     <!-- 'id' is the internal CA identifier -->
-    <!-- 'name' is deprecated and will go away -->
     <ca id="INTERNAL_CA_1">
       <token super="common/token_config/token{ca1}"/>
     </ca>

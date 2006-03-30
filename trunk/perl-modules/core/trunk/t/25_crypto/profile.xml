@@ -104,8 +104,8 @@
 
   <!-- endentity profiles -->
   <endentity>
+
     <!-- default certificate profile -->
-    
     <profile id="default">
       <validity>
 	<!-- notbefore defaults to 'now' -->
