@@ -37,7 +37,8 @@ sub verify_params
     }
 
     if ($self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^(secp|prime|sect|c2pnb|c2tnb)[1-9][0-9]{2}?[krvw][1-3]$/i and
-        $self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^$/ and
+        #there is no default algorithm!!!
+        #$self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^$/ and
         $self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^Oakley-EC2N-[34]$/ and
         $self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^wap-wsg-idm-ecid-wtls[0-9]*$/)
     {

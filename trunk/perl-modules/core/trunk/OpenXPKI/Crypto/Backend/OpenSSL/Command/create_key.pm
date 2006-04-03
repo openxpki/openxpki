@@ -58,7 +58,7 @@ sub get_command
 ## FIXME: $keyform was not set both in
 ## original and modified code. Michael, what it is for?
 
-    if ($keyform ne length($engine) and not defined $passwd)
+    if (length($engine) and not defined $passwd)
     {
         ## missing passphrase
         OpenXPKI::Exception->throw (

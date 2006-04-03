@@ -49,7 +49,9 @@ sub full_message
     {
         $msg = join ", ", ($msg, %{$self->{params}});
     }
-    print STDERR "$msg\n";
+    ## this is only for debugging of OpenXPKI::Exception
+    ## and creates a lot of noise
+    ## print STDERR "$msg\n";
     return $msg;
 }
 
