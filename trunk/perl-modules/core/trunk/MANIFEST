@@ -59,6 +59,10 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_decrypt.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_verify.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_chain.pm
 
+OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/RSA.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/DSA.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/EC.pm
+
 ## XS sources
 
 typemap

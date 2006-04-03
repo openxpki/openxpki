@@ -8,6 +8,7 @@ use warnings;
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
+use English;
 
 sub get_command
 {
@@ -38,57 +39,26 @@ sub get_command
         $passwd  = $self->{ENGINE}->get_passwd();
         $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
     }
+    my $algclass = __PACKAGE__."::".$self->{TYPE};
 
-    ## check parameters
-
-    if ($self->{TYPE} eq "RSA" or
-        $self->{TYPE} eq "DSA" or
-        $self->{TYPE} eq "EC")
-    {
-        $self->{PARAMETERS}->{ENC_ALG} = "aes256"
-            if (not exists $self->{PARAMETERS}->{ENC_ALG});
-        if ($self->{PARAMETERS}->{ENC_ALG} ne "aes256" and
-            $self->{PARAMETERS}->{ENC_ALG} ne "aes192" and
-            $self->{PARAMETERS}->{ENC_ALG} ne "aes128" and
-            $self->{PARAMETERS}->{ENC_ALG} ne "idea" and
-            $self->{PARAMETERS}->{ENC_ALG} ne "des3" and
-            $self->{PARAMETERS}->{ENC_ALG} ne "des")
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG");
-        }
-    }
-
-    if ($self->{TYPE} eq "EC")
-    {
-        if ($self->{PARAMETERS}->{CURVE_NAME} !~ /^(secp|prime|sect|c2pnb|c2tnb)[1-9][0-9]{2}?[krvw][1-3]$/i and
-            $self->{PARAMETERS}->{CURVE_NAME} !~ /^$/ and
-            $self->{PARAMETERS}->{CURVE_NAME} !~ /^Oakley-EC2N-[34]$/ and
-            $self->{PARAMETERS}->{CURVE_NAME} !~ /^wap-wsg-idm-ecid-wtls[0-9]*$/)
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_EC_CURVE_NAME");
-        }
-    }
-    elsif ($self->{TYPE} eq "RSA" or $self->{TYPE} eq "DSA")
-    {
-        if ($self->{PARAMETERS}->{KEY_LENGTH} != 512 and
-            $self->{PARAMETERS}->{KEY_LENGTH} != 768 and
-            $self->{PARAMETERS}->{KEY_LENGTH} != 1024 and
-            $self->{PARAMETERS}->{KEY_LENGTH} != 2048 and
-            $self->{PARAMETERS}->{KEY_LENGTH} != 4096)
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_KEY_LENGTH");
-        }
-    }
-    else
+    eval "require $algclass";
+    if ($EVAL_ERROR) 
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE",
             params  => {"TYPE" => $self->{TYPE}});
     }
-    if ($keyform ne "engine" and not defined $passwd)
+    my $algobj = $algclass->new ($self);
+
+    ## we do not need to check the result because 
+    ## verify_params function throws an algorithm-specific 
+    ## exception if any error occurs
+    $algobj->verify_params();
+
+## FIXME: $keyform was not set both in
+## original and modified code. Michael, what it is for?
+
+    if ($keyform ne length($engine) and not defined $passwd)
     {
         ## missing passphrase
         OpenXPKI::Exception->throw (
@@ -96,33 +66,9 @@ sub get_command
     }
 
     ## algorithm specific command
+    my $command = $algobj->get_command($engine);
 
-    my $command = "";
-    if ($self->{TYPE} eq "DSA")
-    {
-        $command .= "dsaparam -genkey";
-        $command .= " -out ".$self->{OUTFILE};
-        $command .= " -engine $engine" if ($engine);
-        $command .= " -rand ".$self->{RANDOM_FILE};
-        $command .= " ".$self->{PARAMETERS}->{KEY_LENGTH};
-    }
-    elsif ($self->{TYPE} eq "EC")
-    {
-        $command .= "ecparam -genkey";
-        $command .= " -out ".$self->{OUTFILE};
-        $command .= " -name ".$self->{PARAMETERS}->{CURVE_NAME};
-        $command .= " -engine $engine" if ($engine);
-        $command .= " -rand ".$self->{RANDOM_FILE};
-    }
-    elsif ($self->{TYPE} eq "RSA")
-    {
-        $command .= "genrsa";
-        $command .= " -engine $engine" if ($engine);
-        $command .= " -out ".$self->{OUTFILE};
-        $command .= " -rand ".$self->{RANDOM_FILE};
-        $command .= " ".$self->{PARAMETERS}->{KEY_LENGTH};
-    }
-    else {
+    if (! $command) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE",
             params  => {"TYPE" => $self->{TYPE}});
