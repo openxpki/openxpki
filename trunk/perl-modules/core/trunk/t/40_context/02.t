@@ -4,7 +4,7 @@ use Test;
 use Data::Dumper;
 use Scalar::Util qw( blessed );
 
-use Smart::Comments;
+# use Smart::Comments;
 
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
