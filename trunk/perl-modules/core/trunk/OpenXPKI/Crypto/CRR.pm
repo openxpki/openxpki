@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::CRR
-## (C)opyright 2005 Michael Bell
+## Written 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -7,6 +8,7 @@ use warnings;
 
 package OpenXPKI::Crypto::CRR;
 
+use OpenXPKI::Debug 'OpenXPKI::Crypto::CRR';
 use Math::BigInt;
 
 use base qw(OpenXPKI::Crypto::Object);
@@ -19,7 +21,6 @@ sub new
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
     $self->{DATA}  = $keys->{DATA};
 
     if (not $self->{DATA})
@@ -36,14 +37,13 @@ sub new
 sub __init
 {
     my $self = shift;
-    $self->debug ("entering function");
+    ##! 1: "start"
 
     ##########################
     ##     init objects     ##
     ##########################
 
-    $self->{header} = OpenXPKI::Crypto::Header->new (DEBUG => $self->{DEBUG},
-                                                     DATA  => $self->{DATA});
+    $self->{header} = OpenXPKI::Crypto::Header->new (DATA  => $self->{DATA});
 
     ##########################
     ##     core parsing     ##
@@ -74,8 +74,7 @@ described below.
 
 =head2 new
 
-The constructor supports three options - DEBUG and DATA.
-DEBUG is optional and must be a true or false value. Default is false. 
+The constructor supports two options - and DATA.
 The parameter DATA must contain an OpenXPKI::Crypto::Header. This is
 the base of the object because a CRR includes no cryptographic standard body.
 

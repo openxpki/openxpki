@@ -20,7 +20,7 @@ ok(1);
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0);
+my $mgmt = OpenXPKI::Crypto::TokenManager->new ();
 ok (1);
 
 ## parameter checks for get_token
@@ -65,7 +65,6 @@ for (my $i=0; $i < scalar @example; $i++)
 
     ## create profile
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
-                      DEBUG     => 0,
                       CONFIG    => $cache,
                       PKI_REALM => "Test Root CA",
 		      TYPE      => "ENDENTITY",
@@ -94,7 +93,6 @@ for (my $i=0; $i < scalar @example; $i++)
 
     ## create CRL
     $profile = OpenXPKI::Crypto::Profile::CRL->new (
-                   DEBUG     => 0,
                    CONFIG    => $cache,
                    PKI_REALM => "Test Root CA",
                    CA        => "INTERNAL_CA_1");

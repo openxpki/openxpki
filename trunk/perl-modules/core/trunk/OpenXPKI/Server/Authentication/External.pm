@@ -1,7 +1,8 @@
 ## OpenXPKI::Server::Authentication::External.pm 
 ##
-## Written by Michael Bell 2006
-## Copyright (C) 2006 by The OpenXPKI Project
+## Written 2005 by Martin Bartosch and Michael Bell
+## Rewritten 2006 by Michael Bell
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -9,7 +10,7 @@ use warnings;
 
 package OpenXPKI::Server::Authentication::External;
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::External';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -19,25 +20,22 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG     => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
-    $self->debug ("start");
+    ##! 1: "start"
 
     my $config = CTX('xml_config');
 
     $self->{COMMAND} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "command" ],
                                            COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
-    $self->debug("command: ".$self->{COMMAND});
+    ##! 2: "command: ".$self->{COMMAND}
 
     $self->{ROLE} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "role" ],
                                         COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
-    $self->debug("role: ".$self->{ROLE});
+    ##! 2: "role: ".$self->{ROLE}
     if (not length ($self->{ROLE}))
     {
         delete $self->{ROLE};
@@ -48,7 +46,7 @@ sub new {
     }
 
     # get environment settings
-    $self->debug ("loading environment variable settings");
+    ##! 2: "loading environment variable settings"
 
     my @clearenv;
     my $count = $config->get_xpath_count (XPATH    => [ @{$keys->{XPATH}}, 'env' ],
@@ -67,10 +65,10 @@ sub new {
         } else {
             $self->{CLEARENV} = [ $name ];
         }
-        $self->debug("setenv: $name ::= $value");
+        ##! 4: "setenv: $name ::= $value"
     }
 		
-    $self->debug("finished");
+    ##! 2: "finished"
 
     return $self;
 }
@@ -78,14 +76,14 @@ sub new {
 sub login
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     my $name = shift;
     my $gui  = CTX('service');
 
     my ($account, $passwd) = $gui->get_passwd_login ($name);
 
-    $self->debug ("credentials ... present");
-    $self->debug ("account ... $account");
+    ##! 2: "credentials ... present"
+    ##! 2: "account ... $account"
 
     # see security warning below (near $out=`$cmd`)
 
@@ -101,7 +99,7 @@ sub login
 	$ENV{$name} = $value;
     }
     my $command = $self->{COMMAND};
-    $self->debug("execute command");
+    ##! 2: "execute command"
 
     # execute external program. this is safe, since cmd
     # is taken literally from the configuration.
@@ -116,7 +114,7 @@ sub login
     my $out = `$command`;
     map { delete $ENV{$_} } @{$self->{CLEARENV}}; # clear environment
 
-    $self->debug("command returned $?, STDOUT was: $out");
+    ##! 2: "command returned $?, STDOUT was: $out"
 		
     if ($? != 0)
     {
@@ -142,14 +140,14 @@ sub login
 sub get_user
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     return $self->{USER};
 }
 
 sub get_role
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     return $self->{ROLE};
 }
 
@@ -165,7 +163,7 @@ via an external program. The parameters are passed as a hash reference.
 
 =head2 new
 
-is the constructor. The supported parameters are DEBUG, XPATH and COUNTER.
+is the constructor. The supported parameters are XPATH and COUNTER.
 This is the minimum parameter set for any authentication class.
 The XML configuration includes a command tag and a role or a regular expression
 configuration (pattern and replacement). Additionally it is possible to

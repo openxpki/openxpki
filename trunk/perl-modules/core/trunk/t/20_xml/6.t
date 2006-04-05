@@ -12,8 +12,7 @@ print STDERR "RELATIVE CONFIGURATION INHERITANCE\n";
 ok(1);
 
 ## create new object
-my $obj = OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                     CONFIG => "t/20_xml/relative.xml");
+my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/relative.xml");
 if ($obj)
 {
     ok (1);

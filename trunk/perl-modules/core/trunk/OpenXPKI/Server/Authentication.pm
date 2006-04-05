@@ -1,7 +1,8 @@
 ## OpenXPKI::Server::Authentication.pm 
 ##
-## Written by Michael Bell 2003
-## Copyright (C) 2003-2006 by The OpenXPKI Project
+## Written 2003 by Michael Bell
+## Rewritten 2005 and 2006 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -11,7 +12,7 @@ use utf8;
 package OpenXPKI::Server::Authentication;
 
 use English;
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::Authentication';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -27,19 +28,16 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG => CTX('debug'),
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys       = shift;
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
-    $self->debug ("start");
+    ##! 1: "start"
 
     return undef if (not $self->__load_config ());
 
-    $self->debug ("end");
+    ##! 1: "end"
     return $self;
 }
 
@@ -51,7 +49,7 @@ sub new {
 sub __load_config
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     ## load all PKI realms
 
@@ -61,7 +59,7 @@ sub __load_config
         $self->__load_pki_realm ({PKI_REALM => $i});
     }
 
-    $self->debug ("leaving function successfully");
+    ##! 2: "leaving function successfully"
     return 1;
 }
 
@@ -130,13 +128,12 @@ sub __load_handler
                                          COUNTER => [$realm_pos, 0, $handler_pos, 0]);
     my $type = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'handler', 'type'],
                                          COUNTER => [$realm_pos, 0, $handler_pos, 0]);
-    $self->debug ("name ::= $name");
-    $self->debug ("type ::= $type");
+    ##! 2: "name ::= $name"
+    ##! 2: "type ::= $type"
     $type = "OpenXPKI::Server::Authentication::$type";
     $self->{PKI_REALM}->{$realm}->{HANDLER}->{$name} = eval {
 
-        $type->new ({DEBUG   => $self->{DEBUG},
-                     XPATH   => ['pki_realm', 'auth', 'handler'],
+        $type->new ({XPATH   => ['pki_realm', 'auth', 'handler'],
                      COUNTER => [$realm_pos, 0, $handler_pos]});
 
                                                            };
@@ -158,7 +155,7 @@ sub login
 {
     my $self = shift;
 
-    $self->debug ("Starting authentication ... ");
+    ##! 1: "start"
 
     CTX('session')->start_authentication();
 
@@ -183,7 +180,7 @@ sub login
     my $ok = 0;
     foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}})
     {
-        $self->debug ("handler $handler from stack $stack");
+        ##! 4: "handler $handler from stack $stack"
         my $ref = $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler};
         if (not ref $ref)
         {
@@ -197,15 +194,15 @@ sub login
         };
         if (not $EVAL_ERROR)
         {
-            $self->debug ("login ok");
+            ##! 8: "login ok"
             $ok = 1;
             CTX('session')->set_user ($ref->get_user());
             CTX('session')->set_role ($ref->get_role());
             CTX('session')->make_valid();
-            $self->debug ("session configured");
+            ##! 8: "session configured"
             last;
         } else {
-            $self->debug ("EVAL_ERROR detected");
+            ##! 8: "EVAL_ERROR detected"
         }
     }
     if (not $ok)
@@ -233,9 +230,8 @@ global context.
 
 =head2 new
 
-is the constructor and accepts only one parameter - DEBUG.
-If you do not set DEBUG then the value of DEBUG in the
-server's context is used. If you call new then the complete
+is the constructor and accepts no parameters.
+If you call new then the complete
 configuration is loaded. This makes it possible to cash
 this object and to use login when it is required in a very
 fast way.

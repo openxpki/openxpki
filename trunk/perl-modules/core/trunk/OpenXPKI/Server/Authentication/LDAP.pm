@@ -1,8 +1,8 @@
 ## OpenXPKI::Server::Authentication::LDAP.pm 
 ##
-## Written by Peter Gietz 2005
-## Re-Written by Michael Bell 2006
-## Copyright (C) 2003-2006 by The OpenXPKI Project
+## Written 2005 by Peter Gietz
+## Rewritten 2006 by Michael Bell
+## (C) Copyright 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -10,7 +10,7 @@ use warnings;
 
 package OpenXPKI::Server::Authentication::LDAP;
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::LDAP';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -40,15 +40,12 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG     => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
-    $self->debug ("start");
+    ##! 1: "start"
 
     my $config = CTX('config');
 
@@ -66,11 +63,9 @@ sub new {
                                         COUNTER => [ %{$keys->{COUNTER}}, 0]);
     $self->{BIND_PW} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "bind_pw" ],
                                         COUNTER => [ %{$keys->{COUNTER}}, 0]);
-    $self->debug ("version ::= ".$self->{VERSION});
-    $self->debug ("server  ::= ldap://".$self->{HOST}.":".
-                                        $self->{PORT}."/".
-                                        $self->{BASE});
-    $self->debug ("user    ::= ".$self->{BIND_DN});
+    ##! 2: "version ::= ".$self->{VERSION}
+    ##! 2: "server  ::= ldap://".$self->{HOST}.":".$self->{PORT}."/".$self->{BASE}
+    ##! 2: "user    ::= ".$self->{BIND_DN}
 
     ## check for a TLS protected connection
     ## FIXME: who checks when that TLS is supported?
@@ -83,9 +78,9 @@ sub new {
     {
         $self->{CA_PATH} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "capath" ],
                                                COUNTER => [ %{$keys->{COUNTER}}, 0]);
-        $self->debug ("cacert ::= ".$self->{CA_CERT});
+        ##! 4: "cacert ::= ".$self->{CA_CERT}
     }
-    $self->debug ("use_tls ::= ".$self->{USE_TLS});
+    ##! 2: "use_tls ::= ".$self->{USE_TLS}
 
     ## load search config
 
@@ -95,8 +90,8 @@ sub new {
     $self->{SEARCH_VALUE_PREFIX} = $config->get_xpath (
                 XPATH   => [ %{$keys->{XPATH}},   "searchvalueprefix" ],
                 COUNTER => [ %{$keys->{COUNTER}}, 0]);
-    $self->debug ("search->attribute    ::= ".$self->{SEARCH_ATTRIBUTE});
-    $self->debug ("search->value_prefix ::= ".$self->{SEARCH_VALUE_PREFIX});
+    ##! 2: "search->attribute    ::= ".$self->{SEARCH_ATTRIBUTE}
+    ##! 2: "search->value_prefix ::= ".$self->{SEARCH_VALUE_PREFIX}
 
     ## load authentication config
 
@@ -125,17 +120,17 @@ sub new {
     $self->{PW_ATTR_HASH} = $config->get_xpath (
                 XPATH   => [ %{$keys->{XPATH}},   "pw_attr_hash" ],
                 COUNTER => [ %{$keys->{COUNTER}}, 0]);
-    $self->debug ("auth->method_attr    ::= ".$self->{AUTH_METH_ATTR});
-    $self->debug ("auth->default_method ::= ".$self->{DEFAULT_AUTH_METHOD});
-    $self->debug ("auth->pw_attr        ::= ".$self->{PW_ATTR});
-    $self->debug ("auth->pw_attr_hash   ::= ".$self->{PW_ATTR_HASH});
+    ##! 2: "auth->method_attr    ::= ".$self->{AUTH_METH_ATTR}
+    ##! 2: "auth->default_method ::= ".$self->{DEFAULT_AUTH_METHOD}
+    ##! 2: "auth->pw_attr        ::= ".$self->{PW_ATTR}
+    ##! 2: "auth->pw_attr_hash   ::= ".$self->{PW_ATTR_HASH}
 
     ## role mapping
 
     $self->{ROLE_ATTR} = $config->get_xpath (
                 XPATH   => [ %{$keys->{XPATH}},   "role_attr" ],
                 COUNTER => [ %{$keys->{COUNTER}}, 0]);
-    $self->debug ("role attribute ::= ".$self->{ROLE_ATTR});
+    ##! 2: "role attribute ::= ".$self->{ROLE_ATTR}
     $count = $config->get_xpath_count (
                  XPATH   => [ %{$keys->{XPATH}},   "role_map" ],
                  COUNTER => $keys->{COUNTER});
@@ -148,7 +143,7 @@ sub new {
                         XPATH   => [ %{$keys->{XPATH}},   "role_map", "role" ],
                         COUNTER => [ %{$keys->{COUNTER}}, $i, 0 ]);
         $self->{ROLE_MAP}->{$value} = $role;
-        $self->debug ("role map $value to $role");
+        ##! 4: "role map $value to $role"
     }
 
     return $self;
@@ -157,12 +152,12 @@ sub new {
 sub login
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     my $gui = CTX('service');
 
     my ($account, $passwd) = $gui->get_passwd_login ("");
 
-    $self->debug ("account ... $account");
+    ##! 2: "account ... $account"
 
 
     ## now start an LDAP connection
@@ -179,7 +174,7 @@ sub login
 
     if ( $self->{USE_TLS} )
     {  
-        $self->debug("starting a SSL (ldaps) session on");
+        ##! 4: "starting a SSL (ldaps) session on"
 
         $ldap = Net::LDAPS->new ($self->{HOST},
                                  port    => $self->{PORT},
@@ -197,7 +192,7 @@ sub login
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_LOGIN_CONNECTION_FAILED");
     }
-    $self->debug ("connect successfull");
+    ##! 2: "connect successfull"
 
     ## start TLS if necessary
 
@@ -213,11 +208,11 @@ sub login
                                                       asref => 0 );
             foreach (0..$#namingContext)
             {
-                $self->debug("naming context: $namingContext[$_]");
+                ##! 16: "naming context: $namingContext[$_]"
             }
             $is_rootdse = 1;
         } else {
-            $self->debug("root_dse unsuccessfull");
+            ##! 8: "root_dse unsuccessfull"
         }
         if ( $is_rootdse and 
              not $root_dse->supported_extension ($starttls_OID))
@@ -228,7 +223,7 @@ sub login
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_START_TLS_NOT_POSSIBLE");
         }
-        $self->debug("executing start_tls ...");
+        ##! 4: "executing start_tls ..."
 
         my $tlsmsg = $ldap->start_tls ( 
                          verify =>'require',
@@ -243,12 +238,12 @@ sub login
                            PRIORITY => "error",
                            MESSAGE  => "LDAP Server failed during start_tls.\n$msg\n".
                                        join ", ", $self->__get_ldap_error ($tlsmsg));
-            $self->debug (join ",", $self->__get_ldap_error ($tlsmsg));
+            ##! 8: join ",", $self->__get_ldap_error ($tlsmsg)
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_START_TLS_NOT_POSSIBLE",
                 params  => {$self->__get_ldap_error ($tlsmsg)});
         } else {
-            $self->debug("starttls successful");
+            ##! 8: "starttls successful"
         }
     } ## end of START_TLS
     
@@ -260,9 +255,9 @@ sub login
     if ($bindmsg->is_error())
     {
         if ( $bindmsg->code() == 49 ) {
-            $self->debug("invalid ldap credentials\n");
+            ##! 8: "invalid ldap credentials"
         } else {  
-            $self->debug("LDAP bind: ", join ", ", $self->__get_ldap_error ($bindmsg));
+            ##! 8: "LDAP bind: ", join ", ", $self->__get_ldap_error ($bindmsg)
         }
         CTX('log')->log (FACILITY => "system",
                        PRIORITY => "error",
@@ -272,14 +267,14 @@ sub login
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_BIND_NOT_POSSIBLE",
             params  => {$self->__get_ldap_error ($bindmsg)});
     }
-    $self->debug("bind successful");
+    ##! 2: "bind successful"
 		
     ## now search for an entry with an ID-attribute containing 
     ## the value inputted by the user
 
     my $searchfilter = "($self->{SEARCH_ATTRIBUTE}=".
                        "$self->{SEARCH_VALUE_PREFIX}$account)";
-    $self->debug("search filter: $searchfilter");
+    ##! 2: "search filter: $searchfilter"
 
     my $searchmesg = $ldap->search(
                          base   => $self->{BASE},
@@ -327,38 +322,38 @@ sub login
 
     my $entry = $searchmesg->entry ( 0 );
     $self->{DN} = $entry->dn();
-    $self->debug("analysing entry $self->{DN}");
+    ##! 2: "analysing entry $self->{DN}"
 
     foreach my $attr ( $entry->attributes )
     {
         foreach $value ( $entry->get_value( $attr ) )
         { 
-            #$self->debug("attr: |$attr| = $value");
+            ##! 8: "attr: |$attr| = $value"
             if ( lc($attr) eq lc($self->{ROLE_ATTR}) )
             {
-                #$self->debug ("Roleattribute = $value");
+                ##! 16: "Roleattribute = $value"
                 $rolevalues[$rolevaluecount] = $value;
                 $rolevaluecount ++;
             }
             elsif ( lc($attr) eq 
                     lc($self->{AUTH_METH_ATTR}) )
             {
-                #$self->debug ("ldapauthmethattribute = $value");
+                ##! 16: "ldapauthmethattribute = $value"
                 $ldapauthmethattrvalues[$ldapauthmethattrvaluecount] = $value;
                 $ldapauthmethattrvaluecount ++;
             }
             elsif ( lc($attr) eq 
                     lc($self->{PW_ATTR}) )
             {
-                #$self->debug ("ldappwattribute = $value");
+                ##! 16: "ldappwattribute = $value"
                 $ldappwattrvalues[$ldappwattrvaluecount] = $value;
                 $ldappwattrvaluecount ++;
             }
         }
     }
-    $self->debug("rolecount: $rolevaluecount; ".
-                 "authmethcount: $ldapauthmethattrvaluecount; ".
-                 "ldappwattrcount: $ldappwattrvaluecount");
+    ##! 2: "rolecount: $rolevaluecount;"
+    ##! 2: "authmethcount: $ldapauthmethattrvaluecount;"
+    ##! 2: "ldappwattrcount: $ldappwattrvaluecount"
 
     ## lets see which auth method to use:
     my $is_found = 0;
@@ -378,7 +373,7 @@ sub login
         last if ($is_found );
     }
     if ($is_found) {
-        $self->debug ("Found auth meth");		    
+        ##! 4: "Found auth meth"
         if ($ldapauthmeth eq "pwattr" and not $ldappwattrvaluecount )
         {
             # Error no value of ldap pw attribute 
@@ -391,7 +386,7 @@ sub login
     } else {
         $ldapauthmeth = $self->{DEFAULT_AUTH_METHOD};
     }
-    $self->debug("ldapauthmeth: $ldapauthmeth");
+    ##! 2: "ldapauthmeth: $ldapauthmeth"
 		
     ## Method pwattr 
     ## (use a configurable password attribute for authentication)
@@ -402,7 +397,7 @@ sub login
 
         my $ldapdigest = $ldappwattrvalues[0];
 
-        $self->debug("ldapdigest : |$ldapdigest| ");
+        ##! 4: "ldapdigest : |$ldapdigest| "
 
         ## create comparable value
         $self->{ALGORITHM} = lc ($self->{PW_ATTR_HASH});
@@ -412,9 +407,9 @@ sub login
         {
             $digest = Digest::SHA1->new;
             $digest->add ($passwd);
-            $self->debug( "Digest: SHA1\n");
+            ##! 8: "Digest: SHA1"
             my $b64digest = $digest->b64digest;
-            $self->debug( "SHA1: $b64digest");
+            ##! 8: "SHA1: $b64digest"
             $self->{DIGEST} = $b64digest;
         }
         elsif ($self->{ALGORITHM} eq "md5")
@@ -437,9 +432,9 @@ sub login
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MISSING_PW_ATTR_HASH_IN_ENTRY");
         }               
-        $self->debug ("ident name ... ".$account);
-        $self->debug ("ident algorithm ... ".$self->{ALGORITHM});
-        $self->debug ("ident digest ... ".$self->{DIGEST});
+        ##! 4: "ident name ... ".$account
+        ##! 4: "ident algorithm ... ".$self->{ALGORITHM}
+        ##! 4: "ident digest ... ".$self->{DIGEST}
   
         ## compare passphrases
 
@@ -449,9 +444,9 @@ sub login
         if ( $ldapdigest =~ /^\{\w+\}(.+)=$/ )
         {
             $ldapdigest = $1;
-            $self->debug ("value contains {X}Y=");
+            ##! 8: "value contains {X}Y="
         }
-        $self->debug ("comparing |".$self->{DIGEST}."| with |".$ldapdigest."|");
+        ##! 4: "comparing |".$self->{DIGEST}."| with |".$ldapdigest."|"
 
         if ($self->{DIGEST} ne $ldapdigest)
         {
@@ -487,11 +482,11 @@ sub login
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_LOGIN_FAILED");
         }
-        $self->debug ("        LDAP Login successfull");
+        ##! 8: "        LDAP Login successfull"
 
         my $unbindmesg = $ldap->unbind;
         if (not $unbindmesg->is_error ) {
-            $self->debug ("        ldap unbind success ");
+            ##! 16: "        ldap unbind success "
         }
 
     } else {
@@ -508,7 +503,7 @@ sub login
     my $found = 0;
     my $rolefound = undef;
 
-    $self->debug ("looking for the role");
+    ##! 2: "looking for the role"
 
     foreach my $role (@rolevalues)
     {
@@ -546,14 +541,14 @@ sub __get_ldap_error
 sub get_user
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 2: "start"
     return $self->{USER};
 }
 
 sub get_role
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 2: "start"
     return $self->{ROLE};
 }
 
@@ -572,7 +567,7 @@ FIXME:
 
 =head2 new
 
-is the constructor. The supported parameters are DEBUG, XPATH and COUNTER.
+is the constructor. The supported parameters are XPATH and COUNTER.
 This is the minimum parameter set for any authentication class.
 We need here a complete description of the LDAP config stuff.
 

@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::DBI::SQL
 ##
-## Written by Michael Bell for the OpenXPKI::Server project 2005
-## Copyright (C) 2005 by The OpenXPKI Project
+## Written 2005 by Michael Bell for the OpenXPKI::Server project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -11,7 +11,7 @@ use utf8;
 package OpenXPKI::Server::DBI::SQL;
 
 use English;
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::DBI::SQL';
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;
 
@@ -28,7 +28,7 @@ for the SQL operations.
 =head3 new
 
 this is the constructor. Only an instance of OpenXPKI::Server::DBI::DBH
-is expected in the parameter DBH. DEBUG is supported via OpenXPKI.
+is expected in the parameter DBH.
 
 =cut
 
@@ -74,16 +74,16 @@ sub table_exists
     my $keys = { @_ };
     my $name = $keys->{NAME};
 
-    $self->debug ("name: $name");
+    ##! 2: "name: $name"
 
     # get constant value from the table (avoid full table scan)
     my $command = "select 1 from ".$self->{schema}->get_table_name ($name);
 
-    $self->debug ("command: $command");
+    ##! 2: "command: $command"
 
     eval { $self->{DBH}->do_query ( QUERY => $command ); };
     if ($EVAL_ERROR) {
-        $self->debug ("query failed return");
+        ##! 4: "query failed return"
         return 0;
     } else {
         $self->{DBH}->finish_sth();
@@ -105,7 +105,7 @@ sub create_table
     my $table = $keys->{NAME};
     my $mode  = $keys->{MODE};
  
-    $self->debug ("table: $table; mode: $mode");
+    ##! 2: "table: $table; mode: $mode"
  
     my $command = "";
 
@@ -149,7 +149,7 @@ sub create_table
     $command .= ")";
     $command .= " ".$self->{DBH}->get_table_option();
 
-    $self->debug ("command: $command");
+    ##! 2: "command: $command"
 
     if ($mode eq "DRYRUN")
     {
@@ -175,7 +175,7 @@ sub create_index
     my $name = $keys->{NAME};
     my $mode = $keys->{MODE};
 
-    $self->debug ("name: $name, mode: $mode");
+    ##! 2: "name: $name, mode: $mode"
 
     my $index = $self->{schema}->get_index_name ($name);
     my $table = $self->{schema}->get_index_table ($name);
@@ -190,7 +190,7 @@ sub create_index
     $command = substr ($command, 0, length($command)-2); ## erase the last ,
     $command .= ")";
 
-    $self->debug ("command: $command");
+    ##! 2: "command: $command"
 
     if ($mode eq "DRYRUN")
     {

@@ -1,7 +1,8 @@
 ## OpenXPKI::XML::Cache
 ##
 ## Written by Michael Bell for the OpenXPKI project
-## Copyright (C) 2003-2005 by The OpenXPKI Project
+## Rewritten 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -22,7 +23,7 @@ use XML::Filter::XInclude;
 use XML::SAX::ParserFactory;
 $XML::SAX::ParserPackage = "XML::SAX::PurePerl";
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::XML::Cache';
 use OpenXPKI::Exception;
 use English;
 
@@ -35,21 +36,16 @@ sub new
     my $that  = shift;
     my $class = ref($that) || $that;
   
-    my $self = {DEBUG => 0};
+    my $self = {};
    
     bless $self, $class;
 
     my $keys = { @_ };
 
-    $self->{DEBUG}  = $keys->{DEBUG}  if ($keys->{DEBUG});
     $self->{config} = $keys->{CONFIG};
     $self->{schema} = $keys->{SCHEMA} if (exists $keys->{SCHEMA});
 
     return undef if (not $self->init ());
-
-#    use Data::Dumper;
-#    print STDERR Dumper($self->{cache});
-#    $self->debug("dump: ".$self->dump());
 
     return $self;
 }
@@ -57,7 +53,7 @@ sub new
 sub init
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     ## validate the XML file
 
@@ -84,7 +80,7 @@ sub init
 
     ## load the data
 
-    $self->debug ("load the XML data");
+    ##! 2: "load the XML data"
     $self->{xs} = XML::Simple->new (ForceArray    => 1,
                                     ForceContent  => 1,
                                     SuppressEmpty => undef,
@@ -99,7 +95,7 @@ sub init
     if ($self->{config} !~ m{[<>]}) {
         $filename = $self->{config};
     }
-    $self->debug ("filename: $filename");
+    ##! 2: "filename: $filename"
 
     my $xml = eval { $self->{xs}->XMLin ($self->{config}); };
     if (not $xml and $@)
@@ -123,20 +119,20 @@ sub init
 sub __perform_xinclude
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     ## scan configuration for unresolved xincludes
 
     my @xincludes = $self->__scan_xinclude ($self->{cache});
     return 1 if (not scalar @xincludes);
-    $self->debug ("xinclude tag detected");
+    ##! 2: "xinclude tag detected"
 
     ## include the XML stuff
 
     foreach my $xinclude (@xincludes)
     {
         ## find insert position for the new XML data
-        $self->debug ("integrate loaded XML data into XML tree");
+        ##! 4: "integrate loaded XML data into XML tree"
         my $ref = $self->{cache};
         my $path = $self->{config};
         my $elements = scalar @{$xinclude->{XPATH}} - 1;
@@ -155,7 +151,7 @@ sub __perform_xinclude
         }
 
         ## calculate the correct filename
-        $self->debug ("calculate filename from path $path");
+        ##! 4: "calculate filename from path $path"
         my $filename = $xinclude->{XPATH}->[$elements];
         if ($filename !~ /^\//)
         {
@@ -165,7 +161,7 @@ sub __perform_xinclude
 
         ## loop detection
         ## protection against endless loops
-        $self->debug ("check for loop");
+        ##! 4: "check for loop"
         if (exists $self->{xtree} and
             exists $self->{xtree}->{$filename})
         {
@@ -176,7 +172,7 @@ sub __perform_xinclude
 
 
         ## load the xinclude file
-        $self->debug ("load the included file $filename");
+        ##! 4: "load the included file $filename"
         my $xml = eval { $self->{xs}->XMLin ($filename) };
         if (not $xml and $@)
         {
@@ -188,7 +184,7 @@ sub __perform_xinclude
                             "ERRVAL" => $msg});
         }
         my $top = join "", keys %{$xml};
-        $self->debug ("top element of $filename is $top");
+        ##! 4: "top element of $filename is $top"
 
         ## insert the data into the XML structure
         if (exists $ref->{$top})
@@ -199,7 +195,7 @@ sub __perform_xinclude
         }
 
         ## store position of file in XML tree
-        $self->debug ("store reference for the filename");
+        ##! 4: "store reference for the filename"
         $self->{xref}->{$ref}->{$top}->{scalar @{$ref->{$top}} -1} = $filename;
         $self->{xtree}->{$filename}->{REF}   = $ref;
         $self->{xtree}->{$filename}->{NAME}  = $top;
@@ -209,7 +205,7 @@ sub __perform_xinclude
 
     ## update the levels
 
-    $self->debug ("update tree level of the different files");
+    ##! 2: "update tree level of the different files"
     foreach my $file (keys %{$self->{xtree}})
     {
         $self->{xtree}->{$file}->{LEVEL}++;
@@ -217,7 +213,7 @@ sub __perform_xinclude
 
     ## resolve the new xincludes
 
-    $self->debug ("start next round of xinclude detection");
+    ##! 1: "start next round of xinclude detection - end of function"
     return $self->__perform_xinclude();
 }
 
@@ -231,7 +227,7 @@ sub __scan_xinclude
     my $self = shift;
     my $ref  = shift;
     my @result = ();
-    $self->debug ("start");
+    ##! 1: "start"
 
     ## scan hash for xi tags
 
@@ -240,7 +236,7 @@ sub __scan_xinclude
         if ($key ne "xi:include")
         {
             next if (ref $ref->{$key} ne "ARRAY"); ## content
-            $self->debug ("scanning tag $key");
+            ##! 8: "scanning tag $key"
             ## is a reference to other elements
             for (my $i=0; $i < scalar @{$ref->{$key}}; $i++)
             {
@@ -255,24 +251,26 @@ sub __scan_xinclude
         }
         else
         {
-            $self->debug ("xi:include tag present");
+            ##! 8: "xi:include tag present"
             for (my $i=0; $i < scalar @{$ref->{"xi:include"}}; $i++)
             {
                 ## namespace must be correct
                 if ($ref->{"xi:include"}->[$i]->{"xmlns:xi"} !~ /XInclude/i)
                 {
+                    ## FIXME: any ideas what we are missing here?
+                    ##! 1: "this is an empty IF statement --> bug"
                 }
-                $self->debug ("xi:include tag correct");
+                ##! 16: "xi:include tag correct"
                 ## extracting data
                 push @result, {XPATH   => [ $ref->{"xi:include"}->[$i]->{"href"} ],
                                COUNTER => [ $i ]};
-                $self->debug ("file ".$ref->{"xi:include"}->[$i]->{"href"}." ready for include");
+                ##! 16: "file ".$ref->{"xi:include"}->[$i]->{"href"}." ready for include"
             }
             ## delete xinclude tags to avoid loops
             delete $ref->{"xi:include"};
         }
     }
-    $self->debug ("end");
+    ##! 1: "end"
     return @result;
 }
 
@@ -309,17 +307,29 @@ sub get_xpath
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     my $item = $self->{cache};
     for (my $i=0; $i<scalar @{$keys->{XPATH}}; $i++)
     {
-#        print STDERR "XPATH: ".$keys->{XPATH}->[$i]."\n";
-#        print STDERR "COUNTER: ".$keys->{COUNTER}->[$i]."\n";
-#        print STDERR "length ok\n" if ($i+1 == scalar @{$keys->{XPATH}});
-#        print STDERR "exists ok\n" if (exists $item->{$keys->{XPATH}->[$i]});
-#        print STDERR "no ref ok\n" if (not ref $item->{$keys->{XPATH}->[$i]});
-#        print STDERR "counter ok\n" if ($keys->{COUNTER}->[$i] == 0);
+        ##! 4: "XPATH: ".$keys->{XPATH}->[$i]
+        ##! 4: "COUNTER: ".$keys->{COUNTER}->[$i]
+        if ($i+1 == scalar @{$keys->{XPATH}})
+        {
+            ##! 8: "length ok"
+        }
+        if (exists $item->{$keys->{XPATH}->[$i]})
+        {
+            ##! 8: "exists ok"
+        }
+        if (not ref $item->{$keys->{XPATH}->[$i]})
+        {
+            ##! 8: "no ref ok"
+        }
+        if ($keys->{COUNTER}->[$i] == 0)
+        {
+            ##! 8: "counter ok"
+        }
         if (not exists $item->{$keys->{XPATH}->[$i]} or
             not ref $item->{$keys->{XPATH}->[$i]} or
             not exists $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]])
@@ -330,7 +340,7 @@ sub get_xpath
                 $keys->{COUNTER}->[$i] == 0)
             {
                 ## this is an attribute request
-                $self->debug ("attribute request: ".$item->{$keys->{XPATH}->[$i]});
+                ##! 16: "attribute request: ".$item->{$keys->{XPATH}->[$i]}
                 return $item->{$keys->{XPATH}->[$i]};
             }
             else
@@ -348,22 +358,23 @@ sub get_xpath
     {
         ## the tag is present but does not contain anything
         ## this is no error !
-        $self->debug ("no content");
+        ##! 4: "no content"
         return "";
     }
-    ## WARNING: you need a utf8 capable terminal to see the correct characters
-    ## $self->debug ("content: ".$item->{content});
     #unpack/pack is too slow, try to use "use utf8;"
-    #$self->debug ("content: ".pack ("U0C*", unpack "C*", $item->{content}));
+    ###! 99: "content: ".pack ("U0C*", unpack "C*", $item->{content})
     #return pack "U0C*", unpack "C*", $item->{content};
-    $self->debug ("content: ".$item->{content});
+
+    ## WARNING: you need an utf8 capable terminal to see the correct characters
+    ##! 99: "content: ".$item->{content}
+    ##! 1: "end"
     return $item->{content};
 }
 
 sub get_xpath_list
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     my $ref = $self->get_xpath_count (REF => 1, @_);
     return undef if (not defined $ref);
@@ -389,7 +400,7 @@ sub get_xpath_count
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     my $item = $self->{cache};
     for (my $i=0; $i<scalar @{$keys->{COUNTER}}; $i++)
@@ -408,17 +419,17 @@ sub get_xpath_count
         }
         $item = $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]];
     }
-    $self->debug ("scan complete");
+    ##! 2: "scan complete"
     if (not exists $item->{$keys->{XPATH}->[scalar @{$keys->{COUNTER}}]})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_NOTHING_FOUND");
     }
-    $self->debug ("at minimum one exists");
+    ##! 2: "at minimum one exists"
     $item = $item->{$keys->{XPATH}->[scalar @{$keys->{COUNTER}}]};
     ## this is a hack (internal feature) for get_xpath_list
     return $item if ($keys->{REF});
-    $self->debug ("content: ".scalar @{$item});
+    ##! 2: "content: ".scalar @{$item}
     return scalar @{$item};
 }
 
@@ -456,13 +467,9 @@ These parsers tolerate errors!
 
 create the class instance and calls internally the function init to
 load the XML files for the first time. The supported parameters are
-DEBUG, CONFIG and SCHEMA.
+CONFIG and SCHEMA.
 
 =over
-
-=item * DEBUG
-
-can be a true or false value. Default is false.
 
 =item * CONFIG
 

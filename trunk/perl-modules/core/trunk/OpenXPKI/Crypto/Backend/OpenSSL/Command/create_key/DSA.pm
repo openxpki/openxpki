@@ -1,7 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::DSA
 ## (C)opyright 2006 Michael Bell, Dmitry Belyavsky, and 
 ## Julia Dubenskaya for OpenXPKI project
-## $Revision: $
+## $Revision$
 
 use strict;
 use warnings;

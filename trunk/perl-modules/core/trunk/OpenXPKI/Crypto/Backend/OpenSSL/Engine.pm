@@ -7,7 +7,7 @@ use warnings;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine;
 
-use OpenXPKI qw (debug);
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Engine';
 use OpenXPKI::Exception;
 use English;
 use OpenXPKI::Server::Context qw( CTX );
@@ -16,18 +16,15 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG     => 0,
-               };
+    my $self = {};
 
     my $keys = { @_ };
 
     bless ($self, $class);
-    $self->debug ("new: class instantiated");
+    ##! 2: "new: class instantiated"
 
     ## token mode will be ignored
-    foreach my $key (qw{DEBUG 
-                        OPENSSL
+    foreach my $key (qw{OPENSSL
                         NAME
                         KEY
                         PASSWD
@@ -168,8 +165,6 @@ This defines the interface how HSMs are supported by OpenXPKI.
 The constructor supports the following parameters:
 
 =over
-
-=item * DEBUG
 
 =item * OPENSSL (the OpenSSL binary)
 

@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_cert
-## (C)opyright 2005 Michael Bell
+## Written 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -7,6 +8,7 @@ use warnings;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::create_cert;
 
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Command::create_cert';
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 # use Smart::Comments;
@@ -145,7 +147,7 @@ sub get_command
 	);
 
 
-    $self->debug ("command: " . join(' ', @cmd));
+    ##! 2: "command: " . join(' ', @cmd)
     push @result, join(' ', @cmd);
 
 
@@ -176,7 +178,7 @@ sub get_command
 	@password,
 	);
 
-    $self->debug ("command: " . join(' ', @cmd));
+    ##! 2: "command: " . join(' ', @cmd)
     push @result, join(' ', @cmd);
 
     return \@result;

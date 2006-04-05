@@ -1,5 +1,5 @@
 # OpenXPKI::Crypto::Profile::CRL.pm 
-# Written by Michael Bell for the OpenXPKI project
+# Written 2005 by Michael Bell for the OpenXPKI project
 # Copyright (C) 2005-2006 by The OpenXPKI Project
 # $Revision$
 
@@ -10,7 +10,7 @@ package OpenXPKI::Crypto::Profile::CRL;
 
 use base qw(OpenXPKI::Crypto::Profile::Base);
 
-use OpenXPKI qw (debug);
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Profile::CRL';
 use OpenXPKI::Exception;
 use English;
 
@@ -22,14 +22,11 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{DEBUG}     = 1                  if ($keys->{DEBUG});
     $self->{config}    = $keys->{CONFIG}    if ($keys->{CONFIG});
     $self->{PKI_REALM} = $keys->{PKI_REALM} if ($keys->{PKI_REALM});
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
@@ -51,10 +48,10 @@ sub new {
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_NEW_MISSING_CA");
     }
 
-    $self->debug ("parameters ok");
+    ##! 2: "parameters ok"
 
     $self->load_profile ();
-    $self->debug ("config loaded");
+    ##! 2: "config loaded"
 
     return $self;
 }
@@ -173,7 +170,8 @@ sub load_profile
     #                           COUNTER => [@profile_counter]);
     #}
 
-    $self->debug (Dumper($self->{PROFILE}));
+    ##! 2: Dumper($self->{PROFILE})
+    ##! 1: "end"
     return 1;
 }
 

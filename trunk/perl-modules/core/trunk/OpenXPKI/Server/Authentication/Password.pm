@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::Authentication::Password.pm 
 ##
-## Written by Michael Bell 2006
-## Copyright (C) 2006 by The OpenXPKI Project
+## Written 2006 by Michael Bell
+## (C) Copyright 2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 
 package OpenXPKI::Server::Authentication::Password;
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::Password';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -22,15 +22,12 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG     => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
-    $self->debug ("start");
+    ##! 1: "start"
 
     my $config = CTX('xml_config');
 
@@ -51,9 +48,9 @@ sub new {
         $self->{DATABASE}->{$name}->{DIGEST}    = $digest;
         $self->{DATABASE}->{$name}->{ALGORITHM} = lc $algorithm;
         $self->{DATABASE}->{$name}->{ROLE}      = $role;
-        $self->debug ("scanned user ... ".
-                      "(name, digest, algorithm, role) => ".
-                      "($name, $digest, $algorithm, $role)");
+        ##! 4: "scanned user ... "
+        ##! 4: "    (name, digest, algorithm, role) => "
+        ##! 4: "    ($name, $digest, $algorithm, $role)"
         if ($algorithm !~ /^(sha1|md5|crypt)$/)
         {
             OpenXPKI::Exception->throw (
@@ -68,14 +65,14 @@ sub new {
 sub login
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     my $name = shift;
     my $gui  = CTX('service');
 
     my ($account, $passwd) = $gui->get_passwd_login ($name);
 
-    $self->debug ("credentials ... present");
-    $self->debug ("account ... $account");
+    ##! 2: "credentials ... present"
+    ##! 2: "account ... $account"
 
     ## check account
 
@@ -112,11 +109,11 @@ sub login
          $hash = crypt ($passwd, $digest);
     }
 
-    $self->debug ("ident user ::= $account and digest ::= $hash");
+    ##! 2: "ident user ::= $account and digest ::= $hash"
 
     ## compare passphrases
     if ($hash ne $digest) {
-        $self->debug ("mismatch with digest in database ($digest)");
+        ##! 4: "mismatch with digest in database ($digest)"
         CTX('log')->log (FACILITY => "auth",
                          PRIORITY => "warn",
                          MESSAGE  => "Login to internal database failed (wrong passphrase).\n".
@@ -136,14 +133,14 @@ sub login
 sub get_user
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     return $self->{USER};
 }
 
 sub get_role
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     return $self->{DATABASE}->{$self->{USER}}->{ROLE};
 }
 
@@ -159,7 +156,7 @@ authentication method. The parameters are passed as a hash reference.
 
 =head2 new
 
-is the constructor. The supported parameters are DEBUG, XPATH and COUNTER.
+is the constructor. The supported parameters are XPATH and COUNTER.
 This is the minimum parameter set for any authentication class.
 Every user block in the configuration must include a name, algorithm, digest and role.
 

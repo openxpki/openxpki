@@ -1,7 +1,8 @@
 ## OpenXPKI::XML::Config
 ##
 ## Written by Michael Bell for the OpenXPKI project
-## Copyright (C) 2003-2005 by The OpenXPKI Project
+## Rewritten 2005 by Michael Bell for the OpenXPKI project
+## Copyright (C) 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -11,7 +12,7 @@ use utf8;
 package OpenXPKI::XML::Config;
 
 use OpenXPKI::XML::Cache;
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::XML::Config';
 use OpenXPKI::Exception;
 use English;
 
@@ -22,13 +23,12 @@ sub new
     my $that  = shift;
     my $class = ref($that) || $that;
   
-    my $self = {DEBUG => 0};
+    my $self = {};
    
     bless $self, $class;
 
     my $keys = { @_ };
 
-    $self->{DEBUG} = $keys->{DEBUG} if ($keys->{DEBUG});
     $self->{CACHE} = OpenXPKI::XML::Cache->new (@_);
 
     return $self;
@@ -37,7 +37,7 @@ sub new
 sub get_xpath
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     my %keys = $self->__get_fixed_params(@_);
 
@@ -54,7 +54,7 @@ sub get_xpath
 sub get_xpath_list
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     my %keys = $self->__get_fixed_params(@_);
     delete $keys{COUNTER}->[scalar @{$keys{COUNTER}}-1];
@@ -72,7 +72,7 @@ sub get_xpath_list
 sub get_xpath_count
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     my %keys = $self->__get_fixed_params(@_);
     delete $keys{COUNTER}->[scalar @{$keys{COUNTER}}-1];
@@ -91,7 +91,7 @@ sub __get_fixed_params
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     ## first make all parameters well-formed arrays
 
@@ -128,7 +128,7 @@ sub __get_fixed_params
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_XML_CONFIG_GET_FIXED_PARAMS_MISSING_COUNTER");
     }
-    $self->debug ("parameters serialized");
+    ##! 2: "parameters serialized"
 
     ## normalize parameters for XML cache
 
@@ -136,23 +136,20 @@ sub __get_fixed_params
 
     for (my $i=0; $i<scalar @xpath; $i++)
     {
-        $self->debug ("scan: ".$xpath[$i]);
+        ##! 4: "scan: ".$xpath[$i]
         my @names = split /\//, $xpath[$i];
         foreach my $name (@names)
         {
-            $self->debug ("part: $name");
+            ##! 8: "part: $name"
             $params{XPATH}   = [ @{$params{XPATH}},   $name ];
             $params{COUNTER} = [ @{$params{COUNTER}}, 0 ];
         }
-        $self->debug ("replaced counter");
+        ##! 4: "replaced counter"
         $params{COUNTER}->[scalar @{$params{COUNTER}} -1] = $counter[$i];
     }
-    if ($self->{DEBUG})
-    {
-        $self->debug ("xpath: ".join ", ", @{$params{XPATH}});
-        $self->debug ("counter: ".join ", ", @{$params{COUNTER}});
-    }
-    $self->debug ("parameters normalized");
+    ##! 2: "xpath: ".join ", ", @{$params{XPATH}}
+    ##! 2: "counter: ".join ", ", @{$params{COUNTER}}
+    ##! 2: "parameters normalized"
 
     return %params;
 }
@@ -167,7 +164,7 @@ sub __get_super_xpath
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     my @xpath   = @{$keys->{XPATH}};
     my @counter = @{$keys->{COUNTER}};
@@ -185,7 +182,7 @@ sub __get_super_xpath
 
     ## start scanning for a super attribute
 
-    $self->debug ("scanning for super attribute");
+    ##! 2: "scanning for super attribute"
     my $super = "";
     while (not $super and scalar @xpath)
     {
@@ -232,7 +229,7 @@ sub __get_super_xpath
     {
         $self->{SUPER_CACHE}->{$super} = 1;
     }
-    $self->debug ("super is $super");
+    ##! 2: "super is $super"
 
     ## build the new path prefix
 
@@ -329,8 +326,8 @@ sub __get_super_xpath
 	### @super_xpath
 	### @super_counter
     }
-    $self->debug ("super_xpath is ".join "/", @super_xpath);
-    $self->debug ("super_counter is ".join "/", @super_counter);
+    ##! 2: "super_xpath is ".join "/", @super_xpath
+    ##! 2: "super_counter is ".join "/", @super_counter
 
     ## concatenate the two paths
     ### checkpoint 5...
@@ -341,8 +338,8 @@ sub __get_super_xpath
 
     push @super_xpath, @new_xpath;
     push @super_counter, @new_counter;
-    $self->debug ("new xpath is ".join "/", @super_xpath);
-    $self->debug ("new counter is ".join "/", @super_counter);
+    ##! 2: "new xpath is ".join "/", @super_xpath
+    ##! 2: "new counter is ".join "/", @super_counter
 
     ### checkpoint 6...
     ### @new_xpath
@@ -380,8 +377,7 @@ super attributes is present.
 =head2 new
 
 create the class instance and instantiates the XML cache.
-The supported parameters are the same as for the XML cache. The function
-itself only uses the parameter DEBUG.
+The supported parameters are the same as for the XML cache.
 
 =head2 get_xpath
 

@@ -1,6 +1,6 @@
 # OpenXPKI::Crypto::Profile::Certificate.pm 
-# Written by Michael Bell for the OpenXPKI project
-# Copyright (C) 2005 by The OpenXPKI Project
+# Written 2005 by Michael Bell for the OpenXPKI project
+# Copyright (C) 2005-2006 by The OpenXPKI Project
 # $Revision$
 
 use strict;
@@ -10,7 +10,7 @@ package OpenXPKI::Crypto::Profile::Certificate;
 
 use base qw(OpenXPKI::Crypto::Profile::Base);
 
-use OpenXPKI qw (debug);
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Profile::Certificate';
 use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
 use English;
@@ -23,14 +23,11 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{DEBUG}     = 1                  if ($keys->{DEBUG});
     $self->{config}    = $keys->{CONFIG}    if ($keys->{CONFIG});
     $self->{PKI_REALM} = $keys->{PKI_REALM} if ($keys->{PKI_REALM});
     $self->{TYPE}      = $keys->{TYPE}      if ($keys->{TYPE});
@@ -89,10 +86,10 @@ sub new {
     }
 
 
-    $self->debug ("parameters ok");
+    ##! 2: "parameters ok"
 
     $self->load_profile ();
-    $self->debug ("config loaded");
+    ##! 2: "config loaded"
 
     return $self;
 }
@@ -206,7 +203,8 @@ sub load_profile
                                COUNTER => [@profile_counter]);
     }
 
-    $self->debug (Dumper($self->{PROFILE}));
+    ##! 2: Dumper($self->{PROFILE})
+    ##! 1: "end"
     return 1;
 }
 

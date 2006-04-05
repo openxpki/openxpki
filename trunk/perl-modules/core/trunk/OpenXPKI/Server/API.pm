@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::API.pm 
 ##
-## Written by Michael Bell for the OpenXPKI project 2005
-## Copyright (C) 2005 by The OpenXPKI Project
+## Written 2005 by Michael Bell for the OpenXPKI project
+## Copyright (C) 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -22,12 +22,11 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {DEBUG  => CTX('debug')};
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{DEBUG}  = $keys->{DEBUG}  if ($keys->{DEBUG});
     
     return $self;
 }
@@ -48,6 +47,4 @@ object must be set before instantiating the API.
 
 =head2 new
 
-is the constructor. It accepts DEBUG as parameters. 
-If DEBUG is a true value then the debugging code will be activated. Please
-be warned that the general DEBUG mode is really noisy.
+is the constructor.

@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::CRL
-## (C)opyright 2003-2005 Michael Bell
+## Rewritten 2005 by Michael Bell for the OpenXPKI project
+## (C)opyright 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -7,6 +8,7 @@ use warnings;
 
 package OpenXPKI::Crypto::CRL;
 
+use OpenXPKI::Debug 'OpenXPKI::Crypto::CRL';
 use Date::Parse;
 
 use base qw(OpenXPKI::Crypto::Object);
@@ -19,7 +21,6 @@ sub new
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
     $self->{DATA}  = $keys->{DATA};
     $self->{TOKEN} = $keys->{TOKEN};
 
@@ -42,16 +43,14 @@ sub new
 sub __init
 {
     my $self = shift;
-    $self->debug ("entering function");
+    ##! 1: "start"
 
     ##########################
     ##     init objects     ##
     ##########################
 
-    $self->{header} = OpenXPKI::Crypto::Header->new (DEBUG => $self->{DEBUG},
-                                                     DATA  => $self->{DATA});
-    $self->{crl} = $self->{TOKEN}->get_object({DEBUG => $self->{DEBUG},
-                                               DATA  => $self->{header}->get_body(),
+    $self->{header} = OpenXPKI::Crypto::Header->new (DATA  => $self->{DATA});
+    $self->{crl} = $self->{TOKEN}->get_object({DATA  => $self->{header}->get_body(),
                                                TYPE  => "CRL"});
 
     ##########################
@@ -63,13 +62,12 @@ sub __init
                       "signature_algorithm", "revoked", "serial")
     {
         $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function ({
-                                                   DEBUG    => $self->{DEBUG},
                                                    OBJECT   => $self->{crl},
                                                    FUNCTION => $attr});
     }
     $self->{TOKEN}->free_object ($self->{crl});
     delete $self->{crl};
-    $self->debug ("loaded crl attributes");
+    ##! 2: "loaded crl attributes"
     my $ret = $self->{PARSED}->{BODY};
 
     #################################
@@ -154,8 +152,7 @@ OpenXPKI::Crypto::Object several functions.
 
 =head2 new
 
-The constructor support three option - DEBUG, DATA and TOKEN. DEBUG is
-a true or false value which activates or deactivates the debugging.
+The constructor supports two options - DATA and TOKEN.
 DATA is a PEM encoded CRL. TOKEN is a token from the token manager
 (OpenXPKI::TokenManager). The token is needed to parse the CRL.
 

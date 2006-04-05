@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::DBI::Hash
 ##
-## Written by Michael Bell for the OpenXPKI::Server project 2005
-## Copyright (C) 2005 by The OpenXPKI Project
+## Written 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -10,7 +10,7 @@ use utf8;
 
 package OpenXPKI::Server::DBI::Hash;
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::DBI::Hash';
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::DBI::SQL;
 use OpenXPKI::Server::DBI::Schema;
@@ -21,7 +21,7 @@ sub new
     my $self = { @_ };
     bless $self, "OpenXPKI::Server::DBI::Hash";
     $self->{schema} = OpenXPKI::Server::DBI::Schema->new();
-    $self->debug ("init complete");
+    ##! 1: "init complete"
     return $self;
 }
 
@@ -40,9 +40,9 @@ sub insert
             exists $keys->{HASH}->{KEY});
     if (exists $hash->{$table."_SERIAL"})
     {
-        $self->debug ("table: $table serial: ".$hash->{$table."_SERIAL"});
+        ##! 4: "table: $table serial: ".$hash->{$table."_SERIAL"}
     } else {
-        $self->debug ("table $table without serial");
+        ##! 4: "table $table without serial"
     }
 
     $self->{SQL}->insert (TABLE => $table, DATA => $hash);
@@ -216,7 +216,7 @@ of the database.
 =head2 new
 
 is the constructor. It needs at minimum SQL with an instance
-of OpenXPKI::Server::DBI::SQL.  You can specify optionally DEBUG.
+of OpenXPKI::Server::DBI::SQL.
 
 =head1 SQL related Functions
 

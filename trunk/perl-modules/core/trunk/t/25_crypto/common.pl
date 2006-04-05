@@ -21,8 +21,7 @@ foreach my $dir ("t/25_crypto/ca1/certs",
     `mkdir -p $dir` if (not -d $dir);
 }
 
-$cache = eval { OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                           CONFIG => "t/config.xml") };
+$cache = eval { OpenXPKI::XML::Config->new(CONFIG => "t/config.xml") };
 die $EVAL_ERROR."\n" if ($EVAL_ERROR and not ref $EVAL_ERROR);
 die $EVAL_ERROR->as_string()."\n" if ($EVAL_ERROR);
 die "Could not init XML config. Stopped" if (not $cache);
@@ -30,7 +29,6 @@ die "Could not init XML config. Stopped" if (not $cache);
 ## create context
 OpenXPKI::Server::Context::setcontext({
     xml_config => $cache,
-    debug      => 0,
 });
 
 1;

@@ -12,7 +12,7 @@ package OpenXPKI::Service::Test;
 
 ## used modules
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Service::Test';
 use OpenXPKI::Exception;
 
 sub new
@@ -20,12 +20,11 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {DEBUG => 0};
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG}                = 1                             if ($keys->{DEBUG});
     $self->{AUTHENTICATION_STACK} = $keys->{AUTHENTICATION_STACK} if ($keys->{AUTHENTICATION_STACK});
     $self->{LOGIN}                = $keys->{LOGIN}                if ($keys->{LOGIN});
     $self->{PASSWD}               = $keys->{PASSWD}               if ($keys->{PASSWD});
@@ -48,15 +47,16 @@ sub run
 sub get_authentication_stack
 {
     my $self = shift;
-    $self->debug ("reached");
+    ##! 1: "start"
     return $self->{AUTHENTICATION_STACK};
 }
 
 sub get_passwd_login
 {
     my $self = shift;
+    ##! 1: "start"
     my $name = shift;
-    $self->debug ("handler $name");
+    ##! 2: "handler $name"
     return ($self->{LOGIN}, $self->{PASSWD});
 }
 

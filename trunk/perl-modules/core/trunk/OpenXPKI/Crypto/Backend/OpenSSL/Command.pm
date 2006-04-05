@@ -27,7 +27,8 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 
-use OpenXPKI qw(debug read_file write_file);
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Command';
+use OpenXPKI qw(read_file write_file);
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
 use Date::Parse;
@@ -45,7 +46,6 @@ sub new
     my $class = ref($that) || $that;
     my $self = { @_ };
     bless $self, $class;
-    #$self->{DEBUG} = 1;
 
     ## re-organize engine stuff
 
@@ -166,7 +166,7 @@ sub get_openssl_dn
     my $self = shift;
     my $dn   = shift;
 
-    $self->debug ("rfc2253: $dn");
+    ##! 2: "rfc2253: $dn"
     my $dn_obj = OpenXPKI::DN->new ($dn);
     if (not $dn_obj) {
         OpenXPKI::Exception->throw (
@@ -178,7 +178,7 @@ sub get_openssl_dn
     #pack/unpack is too slow, try to use "use utf8;"
     #$dn = pack "C*", unpack "C0U*", $dn_obj->get_openssl_dn ();
     $dn = $dn_obj->get_openssl_dn ();
-    $self->debug ("OpenSSL X.500: $dn");
+    ##! 2: "OpenSSL X.500: $dn"
 
     return $dn;
 }
@@ -497,7 +497,7 @@ sub write_config
         }
     }
     
-    $self->debug ("config: $config\n$sections\n");
+    ##! 2: "config: $config\n$sections\n"
     $self->write_file (FILENAME => $self->{CONFIGFILE},
                        CONTENT  => $config."\n".$sections,
 	               FORCE    => 1);

@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::X509
-## (C)opyright 2003-2005 Michael Bell
+## Rewritten 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -7,6 +8,7 @@ use warnings;
 
 package OpenXPKI::Crypto::X509;
 
+use OpenXPKI::Debug 'OpenXPKI::Crypto::X509';
 use OpenXPKI::DN;
 use Math::BigInt;
 
@@ -23,7 +25,6 @@ sub new
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
     $self->{DATA}  = $keys->{DATA};
     $self->{TOKEN} = $keys->{TOKEN};
 
@@ -46,18 +47,16 @@ sub new
 sub __init
 {
     my $self = shift;
-    $self->debug ("entering function");
+    ##! 1: "start"
 
     ##########################
     ##     init objects     ##
     ##########################
 
-    $self->{header} = OpenXPKI::Crypto::Header->new (DEBUG => $self->{DEBUG},
-                                                     DATA  => $self->{DATA});
+    $self->{header} = OpenXPKI::Crypto::Header->new (DATA  => $self->{DATA});
     eval
     {
-        $self->{x509} = $self->{TOKEN}->get_object({DEBUG => $self->{DEBUG},
-                                                    DATA  => $self->{header}->get_body(),
+        $self->{x509} = $self->{TOKEN}->get_object({DATA  => $self->{header}->get_body(),
                                                     TYPE  => "X509"});
     };
     if (my $exc = OpenXPKI::Exception->caught())
@@ -82,14 +81,13 @@ sub __init
         $self->{PARSED}->{BODY}->{uc($attr)} 
 	= $self->{TOKEN}->get_object_function (
 	    {
-		DEBUG    => $self->{DEBUG},
 		OBJECT   => $self->{x509},
 		FUNCTION => $attr,
 	    });
     }
     $self->{TOKEN}->free_object ($self->{x509});
     delete $self->{x509};
-    $self->debug ("loaded cert attributes");
+    ##! 2: "loaded cert attributes"
     my $ret = $self->{PARSED}->{BODY};
 
     ### parsed body: $ret
@@ -190,11 +188,14 @@ sub __init
         }
     }
 
-    $self->debug ("show all extensions and their values");
+    ##! 2: "show all extensions and their values"
     while(($key, $val) = each(%{$ret->{OPENSSL_EXTENSIONS}}))
     {
-        $self->debug ("found extension: $key");
-        $self->debug ("with value(s): $_") foreach(@{$val});
+        ##! 4: "found extension: $key"
+        foreach(@{$val})
+        {
+            ##! 8: "with value(s): $_"
+        }
     }
 
     ## signal CA certiticate
@@ -298,9 +299,8 @@ described below.
 
 =head2 new
 
-The constructor supports three options - DEBUG, TOKEN and DATA.
-DEBUG is optional and must be a true or false value. Default is
-false. TOKEN must be a crypto token from the token manager. This
+The constructor supports two options - TOKEN and DATA.
+TOKEN must be a crypto token from the token manager. This
 is necessary to extract some informations from the data. The
 parameter DATA must contain a PEM encoded certificate. This is
 the base of the object.

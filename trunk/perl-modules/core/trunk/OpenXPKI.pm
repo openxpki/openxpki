@@ -32,33 +32,34 @@ our $locale_prefix = "";
 use vars qw (@ISA @EXPORT_OK);
 require Exporter;
 @ISA = qw (Exporter);
-@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language get_language debug read_file write_file convert_date);
+#@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language get_language debug read_file write_file convert_date);
+@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language get_language read_file write_file convert_date);
 
-sub debug
-{
-    my $self     = shift;
-    return 1 if (not ref ($self) or not $self->{DEBUG});
-    my $msg      = shift;
-
-    my ($package, $filename, $line, $subroutine, $hasargs,
-        $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
-    $msg = "(line $line): $msg";
-
-    ($package, $filename, $line, $subroutine, $hasargs,
-     $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(1);
-    $msg = "$subroutine $msg\n";
-
-    #debugging output in syslog facilities is hard to read and a real flood
-    #if ($self->{api} and ref $self->{api})
-    #{
-    #    $self->{api}->log (FACILITY => "system",
-    #                       PRIORITY => "debug",
-    #                       MESSAGE  => $msg);
-    #} else {
-        print STDERR $msg;
-    #}
-}
-
+#sub debug
+#{
+#    my $self     = shift;
+#    return 1 if (not ref ($self) or not $self->{DEBUG});
+#    my $msg      = shift;
+#
+#    my ($package, $filename, $line, $subroutine, $hasargs,
+#        $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
+#    $msg = "(line $line): $msg";
+#
+#    ($package, $filename, $line, $subroutine, $hasargs,
+#     $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(1);
+#    $msg = "$subroutine $msg\n";
+#
+#    #debugging output in syslog facilities is hard to read and a real flood
+#    #if ($self->{api} and ref $self->{api})
+#    #{
+#    #    $self->{api}->log (FACILITY => "system",
+#    #                       PRIORITY => "debug",
+#    #                       MESSAGE  => $msg);
+#    #} else {
+#        print STDERR $msg;
+#    #}
+#}
+#
 
 sub set_locale_prefix
 {

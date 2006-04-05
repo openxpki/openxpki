@@ -18,7 +18,6 @@ ok(1);
 ## init Context
 ok(OpenXPKI::Server::Init->new ({
        CONFIG => 't/config.xml',
-       DEBUG  => 0,
    }));
 
 

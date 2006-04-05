@@ -1,14 +1,14 @@
 ## OpenXPKI::Crypto::Backend::API
-## Written 2006 by Michael Bell
-## (C)opyright 2006 OpenXPKI
-## $Revision: 151 $
+## Written 2006 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2006 by The OpenXPKI Project
+## $Revision$
 	
 use strict;
 use warnings;
 
 package OpenXPKI::Crypto::Backend::API;
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::API';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use English;
@@ -127,12 +127,10 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {DEBUG => CTX('debug')};
+    my $self = {};
     bless $self, $class;
 
     my $keys = shift;
-
-    $self->{DEBUG}  = 1 if ($keys->{DEBUG});
 
     ## check for missing but required parameters
 
@@ -167,7 +165,7 @@ sub new
 
     foreach my $key (keys %{$keys})
     {
-        next if (grep /^$key$/, ("DEBUG", "TMP", "NAME",
+        next if (grep /^$key$/, ("TMP", "NAME",
                                  "PKI_REALM_INDEX",
                                  "TOKEN_TYPE", "TOKEN_INDEX"));
         OpenXPKI::Exception->throw (
@@ -179,14 +177,14 @@ sub new
     if ($@)
     {
         my $text = $@;
-        $self->debug ("compilation of driver ".$self->{CLASS}." failed\n$text");
+        ##! 4: "compilation of driver ".$self->{CLASS}." failed\n$text"
         OpenXPKI::Exception->throw (message => $text);
     }
-    $self->debug ("class: ".$self->{CLASS});
+    ##! 2: "class: ".$self->{CLASS}
 
     ## get the token
     $self->{INSTANCE} = $self->{CLASS}->new ($keys);
-    $self->debug ("no exception during new()");
+    ##! 1: "end - no exception during new()"
 
     return $self;
 }
@@ -205,7 +203,6 @@ sub command
 
     foreach my $param (keys %{$keys})
     {
-        next if ($param eq "DEBUG");
         next if ($param eq "COMMAND");
 
         ## FIXME: missing parameters must be detected by the command itself
@@ -330,7 +327,6 @@ sub get_object
     foreach my $param (keys %{$keys})
     {
         if ($param ne "DATA" and
-            $param ne "DEBUG" and
             $param ne "FORMAT" and
             $param ne "TYPE")
         {
@@ -354,11 +350,6 @@ sub get_object
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_ILLEGAL_TYPE",
             params  => {TYPE => $keys->{TYPE}});
-    }
-
-    if (not $keys->{DEBUG})
-    {
-        $keys->{DEBUG} = CTX('debug');
     }
 
     $keys->{FORMAT} = "PEM" if (not $keys->{FORMAT});
@@ -391,19 +382,13 @@ sub get_object_function
 
     foreach my $param (keys %{$keys})
     {
-        if ($param ne "DEBUG" and
-            $param ne "OBJECT" and
+        if ($param ne "OBJECT" and
             $param ne "FUNCTION")
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_ILLEGAL_PARAM",
                 params  => {NAME => $param, VALUE => $keys->{$param}});
         }
-    }
-
-    if (not $keys->{DEBUG})
-    {
-        $keys->{DEBUG} = CTX('debug');
     }
 
     if (not ref $keys->{OBJECT})

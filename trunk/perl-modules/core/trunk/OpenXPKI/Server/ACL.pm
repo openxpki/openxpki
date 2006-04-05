@@ -2,7 +2,7 @@
 ##
 ## Written by Michael Bell 2006
 ## Copyright (C) 2006 by The OpenXPKI Project
-## $Revision: 148 $
+## $Revision$
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use utf8;
 package OpenXPKI::Server::ACL;
 
 use English;
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::ACL';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -21,19 +21,16 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG     => CTX('debug'),
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
-    $self->debug ("start");
+    ##! 1: "start"
 
     return undef if (not $self->__load_config ());
 
-    $self->debug ("end");
+    ##! 1: "end"
     return $self;
 }
 
@@ -45,7 +42,7 @@ sub new {
 sub __load_config
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     ## load all PKI realms
 
@@ -55,7 +52,7 @@ sub __load_config
         $self->__load_pki_realm ({PKI_REALM => $i});
     }
 
-    $self->debug ("leaving function successfully");
+    ##! 1: "leaving function successfully"
     return 1;
 }
 
@@ -181,7 +178,7 @@ sub __load_permissions
             foreach $user (@users)
             {
                 $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{$activity} = 1;
-                $self->debug ("permission: $realm, $owner, $user, $activity");
+                ##! 16: "permission: $realm, $owner, $user, $activity"
             }
         }
     }
@@ -263,7 +260,7 @@ The ACL module implements the authorization for the OpenXPKI core system.
 
 =head2 new
 
-is the constructor of the module. Only one parameter is accepted - DEBUG.
+is the constructor of the module.
 The constructor loads all ACLs of all PKI realms. Every PKI realm must include
 an ACL section in its configuration. This configuration includes a definition
 of all servers, all supported roles and all permissions.

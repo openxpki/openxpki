@@ -1,6 +1,6 @@
 # OpenXPKI::Serialization::Simple.pm
-# Written 2006 by Michael Bell
-# (C) Copyright by OpenXPKI 2006
+# Written 2006 by Michael Bell for the OpenXPKI project
+# (C) Copyright 2006 by The OpenXPKI Project
 
 use strict;
 use warnings;
@@ -15,14 +15,12 @@ sub new
     my $class = ref($that) || $that;
 
     my $self = {
-                "DEBUG"     => 0,
                 "SEPARATOR" => "\n",
                };
 
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG}     = $keys->{DEBUG}     if (exists $keys->{DEBUG});
     $self->{SEPARATOR} = $keys->{SEPARATOR} if (exists $keys->{SEPARATOR});
 
     if (length ($self->{SEPARATOR}) != 1)

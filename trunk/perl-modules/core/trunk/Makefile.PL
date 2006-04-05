@@ -191,6 +191,7 @@ WriteMakefile(
                     'Digest::MD5'            => 1,
                     'Digest::SHA1'           => 1,
                     'Exception::Class'       => "1.22",
+                    'Filter::Util::Call'     => 1,
                     ## includes the version of libintl-perl which includes Locale::Messages
                     'Locale::TextDomain'     => 1,
                     'Log::Log4perl'          => '0.51',

@@ -10,16 +10,14 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
-BEGIN { plan tests => 12 };
+BEGIN { plan tests => 11 };
 
 print STDERR "OpenXPKI::Server::Context - global context entries\n";
 ok(1);
 
 ## init Context
-my $debug = 0;
 ok(OpenXPKI::Server::Init->new ({
        CONFIG => 't/config.xml',
-       DEBUG  => $debug,
    }));
 
 
@@ -28,9 +26,6 @@ ok(blessed CTX('xml_config'),
 
 ok(blessed CTX('crypto_layer'),
    'OpenXPKI::Crypto::TokenManager');
-
-ok(CTX('debug'),
-   $debug);
 
 ok(blessed CTX('log'),
    'OpenXPKI::Server::Log');

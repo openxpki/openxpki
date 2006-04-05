@@ -12,8 +12,7 @@ print STDERR "SCHEMA VALIDATION\n";
 ok(1);
 
 ## create new object
-my $obj = eval {OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                           CONFIG => "t/config.xml",
+my $obj = eval {OpenXPKI::XML::Config->new(CONFIG => "t/config.xml",
                                            SCHEMA => "openxpki.xsd")};
 if (not $EVAL_ERROR and $obj)
 {
@@ -24,8 +23,7 @@ if (not $EVAL_ERROR and $obj)
 }
 
 ## try a wrong XML file
-eval { $obj = OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                         CONFIG => "t/25_crypto/token.xml",
+eval { $obj = OpenXPKI::XML::Config->new(CONFIG => "t/25_crypto/token.xml",
                                          SCHEMA => "openxpki.xsd"); };
 if ($EVAL_ERROR)
 {

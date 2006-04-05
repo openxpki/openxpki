@@ -30,10 +30,7 @@ eval
 ok($EVAL_ERROR);
 
 # test default separator
-my $ref = OpenXPKI::Serialization::Simple->new
-             ({
-                 DEBUG   => 0,
-             });
+my $ref = OpenXPKI::Serialization::Simple->new ();
 ok($ref);
 
 # using "-" to make testing easier

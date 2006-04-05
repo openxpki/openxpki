@@ -13,7 +13,6 @@ ok(1);
 # create client transport socket
 my $client = OpenXPKI::Transport::Simple->new
              ({
-                 DEBUG   => 1,
                  INFILE  => "t/65_ui/client.in",
                  OUTFILE => "t/65_ui/server.in"
              });
@@ -22,7 +21,6 @@ ok($client);
 # create server transport socket
 my $server = OpenXPKI::Transport::Simple->new
              ({
-                 DEBUG   => 1,
                  INFILE  => "t/65_ui/server.in",
                  OUTFILE => "t/65_ui/client.in"
              });

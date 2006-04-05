@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::Authentication::X509.pm 
 ##
-## Written by Michael Bell 2006
-## Copyright (C) 2006 by The OpenXPKI Project
+## Written 2006 by Michael Bell
+## (C) Copyright 2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 
 package OpenXPKI::Server::Authentication::X509;
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::X509';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -19,15 +19,12 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG     => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
-    $self->debug ("start");
+    ##! 1: "start"
 
     my $config = CTX('xml_config');
     $self->{CHAIN} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "chain" ],
@@ -39,10 +36,10 @@ sub new {
 sub login
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     my $gui = CTX('service');
 
-    $self->debug ("type ... x509");
+    ##! 2: "type ... x509"
 
     my $challenge = CTX('session')->get_id();
     my $signature = $gui->get_x509_login ($challenge);
@@ -63,14 +60,14 @@ sub login
 sub get_user
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     return $self->{USER};
 }
 
 sub get_role
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     ## how should we determine the role ???
     return $self->{USER};
 }
@@ -97,7 +94,7 @@ NEXT: use role from database
 
 =head2 new
 
-is the constructor. The supported parameters are DEBUG, XPATH and COUNTER.
+is the constructor. The supported parameters are XPATH and COUNTER.
 This is the minimum parameter set for any authentication class.
 The only parsed argument form the configuration is the used chain.
 This is used to support certificates from other CAs.

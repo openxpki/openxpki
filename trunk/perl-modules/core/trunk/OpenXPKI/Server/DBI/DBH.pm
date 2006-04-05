@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::DBI::DBH
 ##
-## Written by Michael Bell for the OpenXPKI project
-## Copyright (C) 2005 by The OpenXPKI Project
+## Written 2005 by Michael Bell for the OpenXPKI project
+## Copyright (C) 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -10,8 +10,7 @@ use utf8;
 
 package OpenXPKI::Server::DBI::DBH;
 
-# use Smart::Comments;
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::DBI::DBH';
 use OpenXPKI::Server::Context qw( CTX );
 use DBI;
 use OpenXPKI::Server::DBI::Schema;
@@ -23,12 +22,11 @@ sub new
 {
     my $that = shift;
     my $class = ref($that) || $that;
-    my $self = bless {DEBUG => 0}, $class;
+    my $self = bless {}, $class;
 
     $self->{params} = { @_ };
 
-    $self->{DEBUG}  = 1 if ($self->{params}->{DEBUG});
-    $self->debug ("start");
+    ##! 1: "start"
     $self->{log} = $self->{params}->{LOG};
 
     ## init driver
@@ -38,7 +36,7 @@ sub new
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_MISSING_DATABASE_TYPE");
     }
     $self->{driver} = OpenXPKI::Server::DBI::Driver->new (%{$self->{params}});
-    $self->debug ("driver: ".$self->{driver});
+    ##! 2: "driver: ".$self->{driver}
 
     ## get schema instance
     $self->{schema} = OpenXPKI::Server::DBI::Schema->new ();
@@ -63,16 +61,16 @@ sub new
 sub connect
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     $self->{STH} = [];
 
-    $self->debug ("try to connect");
+    ##! 2: "try to connect"
     my $dsn = $self->{driver}->get_dsn ();
-    $self->debug ("dsn: $dsn");
-    $self->debug ("USER: ".  ($self->{params}->{USER}   or ""));
-    $self->debug ("PASSWD: ".($self->{params}->{PASSWD} or ""));
-    $self->debug ("DBI_OPTION: ".$self->{driver}->{dbi_option});
+    ##! 2: "dsn: $dsn"
+    ##! 2: "USER: ".($self->{params}->{USER} or "")
+    ##! 2: "PASSWD: ".($self->{params}->{PASSWD} or "")
+    ##! 2: "DBI_OPTION: ".$self->{driver}->{dbi_option}
     $self->{DBH} = DBI->connect ($dsn,
                                  ($self->{params}->{USER}   or ""),
                                  ($self->{params}->{PASSWD} or ""),
@@ -84,13 +82,13 @@ sub connect
                         "ERRVAL" => $DBI::errstr});
     }
 
-    $self->debug ("Checking AutoCommit to be off ...");
+    ##! 2: "Checking AutoCommit to be off ..."
     if ($self->{DBH}->{AutoCommit} == 1) {
-        $self->debug ("AutoCommit is on so I'm aborting ...");
+        ##! 4: "AutoCommit is on so I'm aborting ..."
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_AUTOCOMMIT");
     }
-    $self->debug ("AutoCommit is off");
+    ##! 2: "AutoCommit is off"
 
     return 1;
 }
@@ -115,7 +113,7 @@ sub do_query
     my $self = shift;
     my $keys = { @_ };
 
-    $self->debug ("entering function");
+    ##! 1: "start"
 
     # these variables are in-vars
     my $query     = $keys->{QUERY};
@@ -130,17 +128,16 @@ sub do_query
        @bind_values = @{$keys->{BIND_VALUES}} if ($keys->{BIND_VALUES});
     undef $keys;
 
-    $self->debug ("query: $query");
+    ##! 2: "query: $query"
     if (@bind_values)
     {
 	### bind values: @bind_values
-        $self->debug ("bind_values: " . 
-		      join ("\n", map { defined $_ ? $_ : 'NULL' } @bind_values));
+        ##! 4: "bind_values: " .join ("\n", map { defined $_ ? $_ : 'NULL' } @bind_values)
     } else {
-        $self->debug ("no elements in bind_values present");
+        ##! 4: "no elements in bind_values present"
     }
     #foreach my $help (@bind_values) {
-    #  $self->debug ("doQuery: bind_values: $help");
+    #  ##! 4: "doQuery: bind_values: $help"
     #}
 
     ## query empty so not a DB-failure
@@ -154,17 +151,17 @@ sub do_query
     ## queries which contain dynamic data should not be cached or we
     ## have memory leaks otherwise
     ## notafter scans for expired or valid certs are a typical problem
-    $self->debug ("prepare statement");
+    ##! 2: "prepare statement"
     my $sth_nr = 0;
        $sth_nr = scalar (@{$self->{STH}}) if (exists $self->{STH} and $self->{STH});
-    $self->debug ("statement nr.: ${sth_nr}");
+    ##! 2: "statement nr.: ${sth_nr}"
     #FIXME: we expect clean database queries
     #if ($query =~ /[0-9]+/)
     #{
-    #    $self->debug ("do not cache query");
+    #    ##! 4: "do not cache query"
     #    $self->{STH}[$sth_nr] = $self->{DBH}->prepare ($query);
     #} else {
-    $self->debug ("caching query");
+    ##! 2: "caching query"
     $self->{STH}[$sth_nr] = $self->{DBH}->prepare_cached ($query);
     #}
     if (not exists $self->{STH}[$sth_nr] or
@@ -172,9 +169,9 @@ sub do_query
         not ref $self->{STH}[$sth_nr])
     {
         ## necessary for Oracle
-        $self->debug ("prepare failed");
-        $self->debug ("query: $query");
-        $self->debug ("prepare returned undef");
+        ##! 4: "prepare failed"
+        ##! 4: "query: $query"
+        ##! 4: "prepare returned undef"
         delete $self->{STH}[$sth_nr];
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_PREPARE_FAILED",
@@ -184,7 +181,7 @@ sub do_query
     }
 
     ## execute
-    $self->debug ("execute statement");
+    ##! 2: "execute statement"
     my $result;
     if (@bind_values)
     {
@@ -194,10 +191,10 @@ sub do_query
     }
     if ($result)
     {
-        $self->debug ("execute succeeded (leaving function - $result)");
+        ##! 4: "execute succeeded (leaving function - $result)"
         return $result;
     } else {
-        $self->debug ("execute failed (leaving function)");
+        ##! 4: "execute failed (leaving function)"
         my $err    = $self->{STH}[$sth_nr]->err;
         my $errstr = $self->{STH}[$sth_nr]->errstr;
         $self->finish_sth();
@@ -253,7 +250,7 @@ sub rollback
     my ($package, $filename, $line, $subroutine, $hasargs,
         $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
 
-    $self->debug ("entering function");
+    ##! 1: "start"
     return 1 if (not $self->{DBH});
  
     if ($self->{DBH}->rollback()) {
@@ -280,7 +277,7 @@ sub commit
     my ($package, $filename, $line, $subroutine, $hasargs,
         $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
 
-    $self->debug ("entering function");
+    ##! 1: "start"
     return 1 if (not $self->{DBH});
 
     if ($self->{DBH}->commit()) {
@@ -371,13 +368,13 @@ sub get_table_option
 sub DESTROY {
     my $self = shift;
 
-    $self->debug ("start");
+    ##! 1: "start"
     ## do not rollback or commit with a destructor
     ## if the code is unclean then it is a bug
     ## if the code is clean then rollback/commit is unnecessary
 
     ## finish the statement handles to reduce warnings by DBI
-    $self->debug ("call finish on all statement handles to avoid warnings by DBI");
+    ##! 2: "call finish on all statement handles to avoid warnings by DBI"
     for my $h (@{$self->{STH}}) {
         next if (not $h); ## can happen if []
         $h->finish ();
@@ -387,7 +384,7 @@ sub DESTROY {
     {
         ## IF THERE IS A DATABASE HANDLE THEN THERE WAS CRASH
         ## IF THERE WAS A CRASH THEN WE MUST ROLLBACK
-        $self->debug ("found open database handle, so enforcing rollback");
+        ##! 4: "found open database handle, so enforcing rollback"
         $self->{DBH}->rollback();
         $self->{DBH}->disconnect();
     }
@@ -405,8 +402,7 @@ It manages all database interaction.
 
 =head2 new
 
-is the constructor.
-The DEBUG flag is optional. All other parameters identical
+is the constructor. All parameters are identical
 with the ones of OpenXPKI::Server::DBI::Driver because OpenXPKI::Server::DBI::DBH
 instanciates the driver for the specific database. Please
 check the driver documentation (OpenXPKI::Server::DBI::Driver)

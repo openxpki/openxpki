@@ -457,8 +457,7 @@ used to signal everybody that this ID is a GLOBAL unique ID.
 
 =head3 new
 
-The constructor does not support any parameters. Even DEBUG is
-not supported.
+The constructor does not support any parameters.
 
 =head2 Column informations
 

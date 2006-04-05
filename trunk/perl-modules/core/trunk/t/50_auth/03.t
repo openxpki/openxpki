@@ -19,17 +19,14 @@ my $xml = OpenXPKI::Server::Init->get_xml_config (CONFIG => 't/config.xml');
 ## create context
 ok(OpenXPKI::Server::Context::setcontext({
        xml_config => $xml,
-       debug      => 0,
    }));
 
 ## load authentication configuration
-my $auth = OpenXPKI::Server::Authentication->new ({
-               DEBUG  => 0});
+my $auth = OpenXPKI::Server::Authentication->new ();
 ok($auth);
 
 ## create new session
 my $session = OpenXPKI::Server::Session->new ({
-                  DEBUG     => 0,
                   DIRECTORY => "t/50_auth/",
                   LIFETIME  => 5});
 ok($session);
@@ -40,7 +37,6 @@ $session->set_pki_realm ("Test Root CA");
 
 ## create new test user interface
 my $gui = OpenXPKI::Service::Test->new({
-              "DEBUG"                => 0,
               "AUTHENTICATION_STACK" => "Anonymous"});
 ok(OpenXPKI::Server::Context::setcontext ({"service" => $gui}));
 

@@ -1,7 +1,7 @@
 # OpenXPKI Workflow Activity
 # Written by Martin Bartosch for the OpenXPKI project 2005
 # Copyright (c) 2005 by The OpenXPKI Project
-# $Revision: 80 $
+# $Revision$
 
 package OpenXPKI::Server::Workflow::Activity::Profile::Create;
 
@@ -38,7 +38,6 @@ sub execute {
 
 
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
-	DEBUG     => 0,
 	CONFIG    => CTX('xml_config'),
 	PKI_REALM => $self->{PKI_REALM},
 	TYPE      => 'ENDENTITY',

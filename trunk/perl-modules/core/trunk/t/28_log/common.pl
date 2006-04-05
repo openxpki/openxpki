@@ -11,7 +11,6 @@ ok($log);
 
 use OpenXPKI::Server::DBI;
 my %config = (
-              DEBUG  => 0,
               TYPE   => "SQLite",
               NAME   => "t/28_log/sqlite.db",
               LOG    => $log

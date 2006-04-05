@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::Header
-## (C)opyright 2005 Michael Bell
+## Rewritten 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -21,7 +22,6 @@ sub new {
 
     my $keys = { @_ };
 
-    $self->{DEBUG} = $keys->{DEBUG};
     $self->{data}  = $keys->{DATA};
 
     $self->__parse();
@@ -170,7 +170,7 @@ object before the normal modules take over.
 
 =head2 new
 
-The parameters are DEBUG and DATA. The result is an object reference to
+The only parameter is DATA. The result is an object reference to
 the parsed data.
 
 =head2 get_header

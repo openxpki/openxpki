@@ -1,8 +1,8 @@
 ## OpenXPKI::Service::Default.pm 
 ##
-## Written by Michael Bell for the OpenXPKI project 2005-2006
-## Copyright (C) 2005-2006 by The OpenXPKI Project
-## $Revision: 146 $
+## Written 2005-2006 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
+## $Revision$
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ package OpenXPKI::Service::Default;
 
 ## used modules
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Service::Default';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
@@ -22,12 +22,11 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {DEBUG => 0};
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG}         = 1 if ($keys->{DEBUG});
 
     if (not $skeys->{TRANSPORT})
     {
@@ -90,7 +89,6 @@ sub __init_session
            
             $session = OpenXPKI::Server::Session->new
                        ({
-                           DEBUG     => $self->{DEBUG},
                            DIRECTORY => CTX('xml_config')->get_xpath_count
                                         (
                                             XPATH => "common/server/session_dir"
@@ -122,7 +120,6 @@ sub __init_session
     {
         $session = OpenXPKI::Server::Session->new
                    ({
-                       DEBUG     => $self->{DEBUG},
                        DIRECTORY => CTX('xml_config')->get_xpath_count
                                     (
                                         XPATH => "common/server/session_dir"
@@ -207,7 +204,7 @@ sub run
 sub get_authentication_stack
 {
     my $self = shift;
-    $self->debug ("reached");
+    ##! 1: "start"
     exit;
     return $self->{AUTHENTICATION_STACK};
 }
@@ -215,8 +212,9 @@ sub get_authentication_stack
 sub get_passwd_login
 {
     my $self = shift;
+    ##! 1: "start"
     my $name = shift;
-    $self->debug ("handler $name");
+    ##! 2: "handler $name"
     exit;
     return ($self->{LOGIN}, $self->{PASSWD});
 }

@@ -3,7 +3,7 @@
 ## Written by Michael Bell for the OpenCA project 2004
 ## Migrated to the OpenXPKI Project 2005
 ## Copyright transfered from Michael Bell to The OpenXPKI Project in 2005
-## Copyright (C) 2004-2005 by The OpenXPKI Project
+## (C) Copyright 2004-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -11,7 +11,6 @@ use warnings;
 
 package OpenXPKI::Server::Log;
 
-use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 use Log::Log4perl;
 use Log::Log4perl::Level;
@@ -21,9 +20,7 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG     => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
@@ -131,7 +128,7 @@ things to meet our requirements.
 
 =head2 new
 
-This function only accepts two parameters - C<DEBUG> and C<CONFIG>.
+This function only accepts one parameter - C<CONFIG>.
 C<CONFIG> includes the filename of the Log::Log4perl configuration.
 
 =head2 log

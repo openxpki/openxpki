@@ -15,7 +15,8 @@ package OpenXPKI::Server::Init;
 # use Smart::Comments;
 
 use English;
-use OpenXPKI qw(debug set_language set_locale_prefix);
+use OpenXPKI::Debug 'OpenXPKI::Server::Init';
+use OpenXPKI qw(set_language set_locale_prefix);
 use OpenXPKI::Exception;
 
 use OpenXPKI::XML::Config;
@@ -35,14 +36,11 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG     => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys         = shift;
-    $self->{DEBUG}   = $keys->{DEBUG} if ($keys->{DEBUG});
 
     ### getting xml config...
     my $xml_config = $self->get_xml_config(CONFIG => $keys->{"CONFIG"});
@@ -55,7 +53,6 @@ sub new
     OpenXPKI::Server::Context::setcontext({
         xml_config   => $xml_config,
         crypto_layer => $crypto_layer,
-        debug        => $keys->{DEBUG},
     });
     $self->redirect_stderr();
 
@@ -102,11 +99,7 @@ sub get_xml_config
     my $self = shift;
     my $keys = { @_ };
 
-    ## this is a hack to support testing without a full initialization
-    my $debug = 0;
-       $debug = $self->{DEBUG} if (ref $self);
-
-    $self->debug ("start");
+    ##! 1: "start"
 
     if (not $keys->{CONFIG})
     {
@@ -126,15 +119,14 @@ sub get_xml_config
             params  => {"FILENAME" => $keys->{CONFIG}});
     }
 
-    return OpenXPKI::XML::Config->new (DEBUG  => $debug,
-                                       CONFIG => $keys->{"CONFIG"});
+    return OpenXPKI::XML::Config->new (CONFIG => $keys->{"CONFIG"});
 }
 
 sub init_i18n
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     if (not $keys->{CONFIG})
     {
@@ -156,7 +148,7 @@ sub get_crypto_layer
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     if (not $keys->{CONFIG})
     {
@@ -164,7 +156,7 @@ sub get_crypto_layer
             message => "I18N_OPENXPKI_SERVER_INIT_CRYPTO_LAYER_MISSING_CONFIG");
     }
 
-    return OpenXPKI::Crypto::TokenManager->new (DEBUG  => $self->{DEBUG});
+    return OpenXPKI::Crypto::TokenManager->new ();
 }
 
 
@@ -173,7 +165,7 @@ sub get_pki_realms
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     if (not $keys->{CONFIG})
     {
@@ -304,8 +296,7 @@ sub get_pki_realms
 	    
 
 	    my $token = 
-		$keys->{CRYPTO}->get_token (DEBUG     => $self->{DEBUG},
-					    TYPE      => "CA",
+		$keys->{CRYPTO}->get_token (TYPE      => "CA",
 					    ID        => $ca_id,
 					    PKI_REALM => $name);
 	    
@@ -372,7 +363,7 @@ sub __get_default_crypto_token
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     if (not $keys->{CRYPTO})
     {
@@ -385,8 +376,7 @@ sub __get_default_crypto_token
             message => "I18N_OPENXPKI_SERVER_INIT_DEFAULT_CRYPTO_TOKEN_MISSING_PKI_REALM");
     }
 
-    return $keys->{CRYPTO}->get_token (DEBUG     => $self->{DEBUG},
-                                       TYPE      => "DEFAULT",
+    return $keys->{CRYPTO}->get_token (TYPE      => "DEFAULT",
                                        ID        => "default",
                                        PKI_REALM => $keys->{PKI_REALM});
 }
@@ -395,7 +385,7 @@ sub get_dbi
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     ## check logging module
 
@@ -414,13 +404,6 @@ sub get_dbi
             message => "I18N_OPENXPKI_SERVER_INIT_DBI_MISSING_CONFIG");
     }
     my $config = $keys->{CONFIG};
-
-    ## setup debugging
-
-    $params{DEBUG} = $config->get_xpath (
-                    XPATH    => [ 'common/database/debug' ],
-                    COUNTER  => [ 0 ]);
-    $params{DEBUG} = $self->{"DEBUG"} if (not $params{DEBUG});
 
     ## setup of the environment
 
@@ -464,9 +447,9 @@ sub get_dbi
                            XPATH    => [ 'common/database/environment/vendor', 'option', 'value' ],
                            COUNTER  => [ $vendor_number, $i, 0 ]);
         $ENV{$env_name} = $env_value;
-        $self->debug ("NUMBER: $i\n".
-                      "OPTION: $env_name\n".
-                      "VALUE:  $env_value\n");
+        ##! 4: "NUMBER: $i"
+        ##! 4: "OPTION: $env_name"
+        ##! 4: "VALUE:  $env_value"
     }
 
     ## load database config
@@ -496,7 +479,7 @@ sub get_log
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     ## check parameters
 
@@ -513,9 +496,7 @@ sub get_log
 
     ## init logging
 
-    my $log = OpenXPKI::Server::Log->new (
-                  DEBUG  => $self->{DEBUG},
-                  CONFIG => $config);
+    my $log = OpenXPKI::Server::Log->new (CONFIG => $config);
 
     return $log;
 }
@@ -523,7 +504,7 @@ sub get_log
 sub redirect_stderr
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     my $config = CTX('xml_config');
 
@@ -533,7 +514,7 @@ sub redirect_stderr
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_MISSING_STDERR");
     }
-    $self->debug ("switching stderr to $stderr");
+    ##! 2: "switching stderr to $stderr"
     if (not open STDERR, '>>', $stderr)
     {
         OpenXPKI::Exception->throw (
@@ -561,7 +542,6 @@ the customization of the code more easier.
 
 Initialization must be done ONCE by the server process.
 Expects the XML configuration file via the named parameter CONFIG.
-The named parameter DEBUG may be set to a true value to enable debugging.
 
 Usage:
 
@@ -569,7 +549,6 @@ Usage:
 
   OpenXPKI::Server::Init::new({
          CONFIG => 't/config.xml',
-         DEBUG => 0,
      });
 
 

@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::Object
-## (C)opyright 2005 Michael Bell
+## Rewritten 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -7,7 +8,7 @@ use warnings;
 
 package OpenXPKI::Crypto::Object;
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Object';
 use OpenXPKI::Crypto::Header;
 use OpenXPKI::Exception;
 use English;
@@ -80,12 +81,12 @@ sub set_status
 sub set_header_attribute
 {
     my $self = shift;
-    $self->debug ("entering function");
+    ##! 1: "start"
     $self->{header}->set_attribute (@_);
     $self->{DATA} = $self->{header}->get_raw();
 
     ## if you call init then all information is lost !!!
-    $self->debug ("reiniting object");
+    ##! 2: "reiniting object"
     eval
     {
         $self->__init();

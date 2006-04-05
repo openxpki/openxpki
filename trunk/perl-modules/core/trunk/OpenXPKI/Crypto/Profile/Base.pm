@@ -1,5 +1,5 @@
 # OpenXPKI::Crypto::Profile::Base.pm 
-# Written by Michael Bell for the OpenXPKI project
+# Written 2005 by Michael Bell for the OpenXPKI project
 # Copyright (C) 2005-2006 by The OpenXPKI Project
 # $Revision$
 
@@ -8,7 +8,6 @@ use warnings;
 
 package OpenXPKI::Crypto::Profile::Base;
 
-use OpenXPKI qw (debug);
 use OpenXPKI::Exception;
 use English;
 

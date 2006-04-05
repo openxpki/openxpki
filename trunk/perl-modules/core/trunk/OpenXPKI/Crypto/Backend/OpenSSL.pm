@@ -1,6 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL
-## Written 2005 by Michael Bell
-## (C)opyright 2005-2006 OpenXPKI
+## Written 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 	
 use strict;
@@ -13,7 +13,7 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Shell;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command;
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL';
 use OpenXPKI::Exception;
 use English;
 
@@ -28,11 +28,10 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {DEBUG => 0};
+    my $self = {};
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
 
     # determine temporary directory to use:
     # if a temporary directoy is specified, use it
@@ -98,7 +97,7 @@ sub __load_config
 
     # FIXME: currently unused attributes:
     # openca-sv
-    foreach my $key (qw(debug      backend       mode 
+    foreach my $key (qw(backend       mode 
                         engine     shell         wrapper 
                         randfile
                         key        cert          internal_chain
@@ -107,19 +106,19 @@ sub __load_config
 
 	my $attribute_count;
 	eval {
-	    $self->debug ("try to get attribute_count");
+	    ##! 8: "try to get attribute_count"
 	    $attribute_count = CTX('xml_config')->get_xpath_count (
 		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
 		COUNTER  => [ $realm_index, $type_index, 0 ]);
-	    $self->debug ("attribute_count ::= ".$attribute_count);
+	    ##! 8: "attribute_count ::= ".$attribute_count
 	};
 
 	if (my $exc = OpenXPKI::Exception->caught())
 	{
-	    $self->debug ("caught exception while reading config attribute $key");
+	    ##! 8: "caught exception while reading config attribute $key"
 	    # only pass exception if attribute is not optional
 	    if (! $is_optional{uc($key)}) {
-		$self->debug ("argument $key is not optional, escalating");
+		##! 16: "argument $key is not optional, escalating"
 		OpenXPKI::Exception->throw (
 		    message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INCOMPLETE_CONFIGURATION",
 		    child   => $exc,
@@ -133,7 +132,7 @@ sub __load_config
 	}
         elsif ($EVAL_ERROR)
         {
-	    $self->debug ("caught system exception while reading config attribute $key");
+	    ##! 8: "caught system exception while reading config attribute $key"
 	    # FIXME: should we really throw an OpenXPKI exception here?
             OpenXPKI::Exception->throw (message => $EVAL_ERROR);
         }
@@ -214,7 +213,6 @@ sub __init_shell
     {
         $self->{SHELL} = OpenXPKI::Crypto::Backend::OpenSSL::Shell->new (
                              ENGINE => $self->{ENGINE},
-                             DEBUG  => $self->{DEBUG},
                              SHELL  => $self->{SHELL},
                              TMP    => $self->{TMP});
     };
@@ -255,7 +253,7 @@ sub command
 
     my $cmd  = "OpenXPKI::Crypto::Backend::OpenSSL::Command::".$keys->{COMMAND};
     delete $keys->{COMMAND};
-    $self->debug ("Command: $cmd");
+    ##! 2: "Command: $cmd"
 
     my $ret = eval
     {
@@ -277,9 +275,9 @@ sub command
 
         if ($cmdref->hide_output())
         {
-            $self->debug ("successfully completed");
+            ##! 8: "successfully completed"
         } else {
-            $self->debug ("successfully completed: $result");
+            ##! 8: "successfully completed: $result"
         }
 
         $cmdref->cleanup();
@@ -304,20 +302,16 @@ sub get_object
     my $self = shift;
     my $keys = shift;
 
-    my $previous_debug = undef;
-    if ($keys->{DEBUG})
-    {
-        $previous_debug = $self->{DEBUG};
-        $self->{DEBUG} = $keys->{DEBUG};
-    }
-
     my $format = ($keys->{FORMAT} or "PEM");
     my $data   = $keys->{DATA};
     my $type   = $keys->{TYPE};
 
-    $self->debug ("format: $format") if($format);
-    $self->debug ("data:   $data");
-    $self->debug ("type:   $type");
+    if ($format)
+    {
+        ##! 2: "format: $format"
+    }
+    ##! 2: "data:   $data"
+    ##! 2: "type:   $type"
 
     my $object = undef;
     if ($type eq "X509")
@@ -337,9 +331,9 @@ sub get_object
         elsif ($format eq "SPKAC")
         {
             #$data =~ s/.*SPKAC\s*=\s*([^\s\n]*).*/$1/s;
-            #$self->debug ("spkac is ".$data);
-            #$self->debug ("length of spkac is ".length($data));
-            #$self->debug ("data is ".$data);
+            ###! 8: "spkac is ".$data
+            ###! 8: "length of spkac is ".length($data)
+            ###! 8: "data is ".$data
             $object = OpenXPKI::Crypto::Backend::OpenSSL::SPKAC::_new ($data);
         } else {
             $object = OpenXPKI::Crypto::Backend::OpenSSL::PKCS10::_new_from_pem ($data);
@@ -353,21 +347,18 @@ sub get_object
             $object = OpenXPKI::Crypto::Backend::OpenSSL::CRL::_new_from_pem ($data);
         }
     } else {
-        $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_UNKNOWN_TYPE",
             params  => {"TYPE" => $type});
     }
     if (not $object)
     {
-        $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_NO_REF");
     }
 
-    $self->debug ("returning object");
+    ##! 2: "returning object"
 
-    $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
     return $object;
 }
 
@@ -375,20 +366,13 @@ sub get_object_function
 {
     my $self   = shift;
     my $keys   = shift;
-    my $previous_debug = undef;
-    if ($keys->{DEBUG})
-    {
-        $previous_debug = $self->{DEBUG};
-        $self->{DEBUG} = $keys->{DEBUG};
-    }
     my $object = $keys->{OBJECT};
     my $func   = $keys->{FUNCTION};
-    $self->debug ("object:   $object");
-    $self->debug ("function: $func");
+    ##! 2: "object:   $object"
+    ##! 2: "function: $func"
 
     if ($func eq "free")
     {
-        $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
         return $self->free_object ($object);
     }
 
@@ -439,7 +423,6 @@ sub get_object_function
 	$result = $dt_object;
     }
     
-    $self->{DEBUG} = $previous_debug if ($keys->{DEBUG});
     return $result;
 }
 
@@ -507,8 +490,6 @@ OpenXPKI::Crypto::Backend::OpenSSL::Engine for more details.
 =over
 
 =item * RANDFILE (file to store the random informations)
-
-=item * DEBUG (switch on or off debugging)
 
 =item * SHELL (the OpenSSL binary)
 

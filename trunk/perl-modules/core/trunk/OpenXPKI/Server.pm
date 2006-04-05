@@ -1,7 +1,7 @@
 ## OpenXPKI::Server.pm 
 ##
-## Written by Michael Bell for the OpenXPKI project 2005
-## Copyright (C) 2005 by The OpenXPKI Project
+## Written 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -14,7 +14,7 @@ use base qw(Net::Server::Fork);
 ## used modules
 
 use English;
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
@@ -24,7 +24,7 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {DEBUG => 0};
+    my $self = {};
 
     bless $self, $class;
 
@@ -32,24 +32,22 @@ sub new
 
     ## get parameters
 
-    $self->{"DEBUG"}          = $keys->{DEBUG};
-    $self->{"CONFIG"}         = $keys->{CONFIG};
+    $self->{"CONFIG"} = $keys->{CONFIG};
 
     ## dump out startup configuration
 
     foreach my $key (keys %{$keys})
     {
-        if ($key ne "CONFIG" and $key ne "DEBUG")
+        if ($key ne "CONFIG")
         {
-            $self->debug ("IGNORED:  $key ::= $keys->{$key}");
+            ##! 8: "IGNORED:  $key ::= $keys->{$key}"
         } else {
-            $self->debug ("ACCEPTED: $key ::= $keys->{$key}");
+            ##! 8: "ACCEPTED: $key ::= $keys->{$key}"
         }
     }
 
     ## initialization
     OpenXPKI::Server::Init->new({
-        DEBUG  => $self->{DEBUG},
         CONFIG => $self->{CONFIG},
         SERVER => $self
     });
@@ -94,7 +92,7 @@ sub process_request
         ## protocol detection
         if ($line eq "start simple\n")
         {
-            $transport = OpenXPKI::Transport::Simple->new ({DEBUG => CTX('debug')});
+            $transport = OpenXPKI::Transport::Simple->new ();
             print STDOUT "OK\n";
         }
         elsif ($char eq "\n")
@@ -112,7 +110,7 @@ sub process_request
     my $msg = $transport->read();
     if ($msg eq "simple\n")
     {
-        $serializer = OpenXPKI::Serialization::Simple->new ({DEBUG => CTX('debug')});
+        $serializer = OpenXPKI::Serialization::Simple->new ();
         $transport->write ("OK\n");
     }
     else
@@ -132,7 +130,6 @@ sub process_request
         ({
             "service" => OpenXPKI::Service::Default->new
                          ({
-                             DEBUG         => CTX('debug'),
                              TRANSPORT     => $transport,
                              SERIALIZATION => $serializer
                          })
@@ -177,7 +174,7 @@ sub __get_user_interfaces
 {
     my $self = shift;
     
-    $self->debug ("start");
+    ##! 1: "start"
     
     my $config = CTX('xml_config');
 
@@ -245,7 +242,7 @@ sub __get_server_config
 {
     my $self = shift;
 
-    $self->debug ("start");
+    ##! 1: "start"
 
     my $config = CTX('xml_config');
 
@@ -366,11 +363,9 @@ are the following ones:
 
 =item * CONFIG
 
-=item * DEBUG
-
 =back
 
-All parameters are required, except of the DEBUG parameter.
+All parameters are required.
 
 =head2 process_request
 

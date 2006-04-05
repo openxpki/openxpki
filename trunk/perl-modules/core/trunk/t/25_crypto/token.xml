@@ -24,8 +24,6 @@
         <!-- <randfile>t/25_crypto/rand</randfile> -->
         <randfile>t/25_crypto/rand</randfile>
 
-	<!-- debugging: 0 (off), 1 (on) -->
-	<debug>0</debug>
     </token>
 
 

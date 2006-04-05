@@ -12,7 +12,7 @@ package OpenXPKI::DN;
 use Memoize;
 use Text::CSV_XS;
 use OpenXPKI::Exception;
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::DN';
 
 
 # OpenSSL style attribute name mapping
@@ -40,15 +40,15 @@ sub new
 {
     my $that  = shift;
     my $class = ref($that) || $that;
-    my $self  = {DEBUG => 0};
+    my $self  = {};
     bless $self, $class;
 
     my $arg = shift;
 
     return undef if (! defined $arg && ($arg eq ""));
 
-    $self->debug ("scanning dn: $arg");
-    $self->debug ("length of dn: ".length $arg);
+    ##! 2: "scanning dn: $arg"
+    ##! 2: "length of dn: ".length $arg
 
     if (substr ($arg, 0, 1) eq "/")
     {
@@ -260,7 +260,7 @@ sub __get_attribute
     ($type, $string)  = __get_attribute_type ($string);
     $string           = substr ($string, 1);
     ($value, $string) = __get_attribute_value ($string);
-    $self->debug ("type:  $type\nvalue: $value");
+    ##! 2: "type:  $type\nvalue: $value"
 
     return ($type, $value, $string);
 }

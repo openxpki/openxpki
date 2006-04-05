@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::Authentication::Anonymous.pm 
 ##
-## Written by Michael Bell 2006
-## Copyright (C) 2006 by The OpenXPKI Project
+## Written 2006 by Michael Bell
+## (C) Copyright 2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 
 package OpenXPKI::Server::Authentication::Anonymous;
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::Anonymous';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -19,15 +19,12 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG     => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
-    $self->debug ("start");
+    ##! 1: "start"
 
     $self->{ROLE} = CTX('xml_config')->get_xpath (
                         XPATH   => [@{$keys->{XPATH}},   "role"],
@@ -39,21 +36,21 @@ sub new {
 sub login
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     return 1;
 }
 
 sub get_user
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     return "";
 }
 
 sub get_role
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     return $self->{ROLE};
 }
 
@@ -69,7 +66,7 @@ authentication method. The parameters are passed as a hash reference.
 
 =head2 new
 
-is the constructor. The supported parameters are DEBUG, XPATH and COUNTER.
+is the constructor. The supported parameters are XPATH and COUNTER.
 This is the minimum parameter set for any authentication class.
 
 =head2 login

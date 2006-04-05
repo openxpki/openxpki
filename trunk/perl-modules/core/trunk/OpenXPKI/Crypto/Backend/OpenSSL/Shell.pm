@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Shell
-## (C)opyright 2005 Michael Bell
+## Written 2005 by Michael for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision
 	
 use strict;
@@ -7,7 +8,8 @@ use warnings;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Shell;
 
-use OpenXPKI qw (debug read_file);
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Shell';
+use OpenXPKI qw (read_file);
 use OpenXPKI::Exception;
 # use Smart::Comments;
 
@@ -19,11 +21,10 @@ sub new
     my $self = { @_ };
     bless $self, $class;
 
-    ## DEBUG, TMP, ENGINE and SHELL are required
+    ## TMP, ENGINE and SHELL are required
 
     $self->{STDOUT} = $self->{TMP}."/${$}_stdout.log";
     $self->{STDERR} = $self->{TMP}."/${$}_stderr.log";
-    #$self->{DEBUG}  = 1;
 
     return $self;
 }
@@ -31,7 +32,7 @@ sub new
 sub start
 {
     my $self = shift;
-    $self->debug ("try to start shell");
+    ##! 1: "start"
     my $keys = { @_ };
 
     return 1 if ($self->{OPENSSL_FD});
@@ -39,7 +40,7 @@ sub start
     my $open = "| ".$self->{SHELL}.
                " 1>".$self->{STDOUT}.
                " 2>".$self->{STDERR};
-    $self->debug ($open);
+    ##! 2: $open
     if (not open $self->{OPENSSL_FD}, $open)
     {
         OpenXPKI::Exception->throw (
@@ -50,7 +51,7 @@ sub start
     ##     1. warnings about printing wide characters
     ##     2. automatic iso8859-1 conversion if this is possible
     binmode  $self->{OPENSSL_FD}, ":utf8";
-    $self->debug ("shell started");
+    ##! 2: "shell started"
     return 1;
 }
 
@@ -59,11 +60,11 @@ sub init_engine
     my $self        = shift;
     $self->{ENGINE} = shift;
 
-    $self->debug ("start");
+    ##! 1: "start"
     return 1 if (not $self->{ENGINE}->is_dynamic() and
                  not $self->{ENGINE}->get_engine_params());
 
-    $self->debug ("initializing engine");
+    ##! 2: "initializing engine"
     my $command;
     if ($self->{ENGINE}->is_dynamic()) {
         $command = "engine dynamic -pre ID:".$self->{ENGINE}->get_engine();
@@ -80,7 +81,7 @@ sub init_engine
             params  => {"ERRVAL" => $!});
     }
 
-    $self->debug ("engine intialized");
+    ##! 2: "engine intialized"
 
     return 1;
 }
@@ -88,7 +89,7 @@ sub init_engine
 sub stop
 {
     my $self = shift;
-    $self->debug ("try to stop shell");
+    ##! 1: "start"
 
     return 1 if (not $self->{OPENSSL_FD});
 
@@ -104,7 +105,7 @@ sub stop
 sub run_cmd
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     my $params = shift;
 
     my $cmds = $params->{COMMANDS};
@@ -129,7 +130,7 @@ sub run_cmd
 	if (! ref $command) {
 	    $command =~ s/\n*$//;
 	    $command .= "\n";
-	    $self->debug ("command: $command");
+	    ##! 8: "command: $command"
 	    ### command: $command
 	    if (not print {$self->{OPENSSL_FD}} $command)
 	    {
@@ -148,7 +149,7 @@ sub run_cmd
 	    }
 	}
     }
-    $self->debug ("all executed");
+    ##! 2: "all executed"
     
     return 1;
 }
@@ -159,11 +160,11 @@ sub __check_error
 
     ## check for errors
 
-    $self->debug ("check for errors");
+    ##! 2: "check for errors"
 
     if (-e $self->{STDERR})
     {
-        $self->debug ("detected error log");
+        ##! 4: "detected error log"
         ## there was an error
         my $ret = "";
         if (open FD, $self->{STDERR})
@@ -179,7 +180,7 @@ sub __check_error
                 params  => {"FILENAME" => $self->{STDERR}});
         }
         unlink ($self->{STDERR});
-        $self->debug ("stderr (".$self->{STDERR}.": $ret)");
+        ##! 4: "stderr (".$self->{STDERR}.": $ret)"
         $ret = $self->{ENGINE}->filter_stderr($ret);
         if ($ret =~ /error/i)
         {
@@ -189,7 +190,7 @@ sub __check_error
                 params  => {"ERRVAL" => $ret});
         }
     }
-    $self->debug ("no errors");
+    ##! 2: "end - no errors"
 
     return 0;
 }
@@ -197,7 +198,7 @@ sub __check_error
 sub get_result
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
 
     my $ret = 1;
     if (-e $self->{STDOUT})
@@ -240,8 +241,6 @@ The new function creates a new instance of this class. There are
 the following parameters:
 
 =over
-
-=item * DEBUG
 
 =item * SHELL (the OpenSSL binary)
 

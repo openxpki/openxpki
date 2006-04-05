@@ -17,7 +17,7 @@ ok(1);
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0);
+my $mgmt = OpenXPKI::Crypto::TokenManager->new ();
 ok (1);
 
 ## parameter checks for get_token

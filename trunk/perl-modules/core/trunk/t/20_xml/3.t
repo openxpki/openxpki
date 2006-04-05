@@ -11,8 +11,7 @@ print STDERR "XINCLUDE SUPPORT\n";
 ok(1);
 
 ## create new object
-my $obj = OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                     CONFIG => "t/20_xml/top.xml");
+my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/top.xml");
 
 if ($obj)
 {

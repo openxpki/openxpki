@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::PKCS7
-## (C)opyright 2005 Michael Bell
+## Rewritten 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -18,7 +19,6 @@ sub new
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{DEBUG}   = 1 if ($keys->{DEBUG});
     $self->{PKCS7}   = $keys->{PKCS7};
     $self->{CONTENT} = $keys->{CONTENT};
     $self->{TOKEN}   = $keys->{TOKEN};
@@ -42,7 +42,7 @@ sub sign
     my $self = shift;
     my $keys = { @_ };
 
-    my %params = (DEBUG => $self->{DEBUG});
+    my %params = ();
     $params{CONTENT}    = $self->{CONTENT}    if (exists $self->{CONTENT});
     $params{CERT}       = $keys->{CERT}       if (exists $keys->{CERT});
     $params{KEY}        = $keys->{KEY}        if (exists $keys->{KEY});
@@ -60,7 +60,7 @@ sub verify
     my $self = shift;
     my $keys = { @_ };
 
-    my %params = (DEBUG => $self->{DEBUG});
+    my %params = ();
     $params{PKCS7}      = $self->{PKCS7};
     $params{CONTENT}    = $self->{CONTENT}    if (exists $self->{CONTENT});
     $params{CHAIN}      = $keys->{CHAIN}      if (exists $keys->{CHAIN});
@@ -76,7 +76,7 @@ sub encrypt
     my $self = shift;
     my $keys = { @_ };
 
-    my %params = (DEBUG => $self->{DEBUG});
+    my %params = ();
     $params{CONTENT}    = $self->{CONTENT};
     $params{CERT}       = $keys->{CERT}       if (exists $keys->{CERT});
     $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
@@ -91,7 +91,7 @@ sub decrypt
     my $self = shift;
     my $keys = { @_ };
 
-    my %params = (DEBUG => $self->{DEBUG});
+    my %params = ();
     $params{PKCS7}      = $self->{PKCS7};
     $params{CERT}       = $keys->{CERT}       if (exists $keys->{CERT});
     $params{KEY}        = $keys->{KEY}        if (exists $keys->{KEY});
@@ -110,7 +110,7 @@ sub get_chain
 
     $self->verify() if (not exists $self->{SIGNER});
 
-    my %params = (DEBUG => $self->{DEBUG});
+    my %params = ();
     $params{PKCS7}      = $self->{PKCS7};
     $params{SIGNER}     = $self->{SIGNER};
     $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
@@ -153,8 +153,7 @@ be used to create such signatures or encrypted data portions.
 =head2 new
 
 The constructor only requires a minimal set of informations.
-First it needs the debugging state (which is optional) and
-the cryptographic token (which is required).
+First it needs the cryptographic token (which is required).
 
 Additionally you must specify a PKCS7 structure or some CONTENT.
 If you want to verify or decrypt some data then you must support PKCS7.
@@ -163,8 +162,7 @@ If you want to sign or encrypt then you must support CONTENT.
 =head2 sign
 
 is used to sign some CONTENT which was specified during new. Nevertheless
-you can specify some different CONTENT here too. DEBUG is also supported
-here to run the used cryptographic token in debug mode. Additionally the
+you can specify some different CONTENT here too. Additionally the
 following parameters are supported:
 
 =over
@@ -188,8 +186,7 @@ The signature will be returned a PEM-formatted PKCS#7.
 =head2 verify
 
 is used to verify a PKCS7 signature which was specified during new. Nevertheless
-you can specify some different PKCS7 here too. DEBUG is also supported
-here to run the used cryptographic token in debug mode. Additionally the
+you can specify some different PKCS7 here too. Additionally the
 following parameters are supported:
 
 =over
@@ -209,8 +206,7 @@ The signer's PEM encoded certificate will be returned.
 =head2 encrypt
 
 is used to encrypt some CONTENT which was specified during new. Nevertheless
-you can specify some different CONTENT here too. DEBUG is also supported
-here to run the used cryptographic token in debug mode. Additionally the
+you can specify some different CONTENT here too. Additionally the
 following parameters are supported:
 
 =over
@@ -228,8 +224,7 @@ The encrypted data is returned in PEM format.
 =head2 decrypt
 
 is used to decrypt a PKCS7 message which was specified during new. Nevertheless
-you can specify some different PKCS7 here too. DEBUG is also supported
-here to run the used cryptographic token in debug mode. Additionally the
+you can specify some different PKCS7 here too. Additionally the
 following parameters are supported:
 
 =over
@@ -249,8 +244,7 @@ The decrypted data will be returned.
 =head2 get_chain
 
 is used to egt the certificate chain of a signature which was specified during new.
-Nevertheless you can specify some different PKCS7 here too. DEBUG is also supported
-here to run the used cryptographic token in debug mode. Additionally the
+Nevertheless you can specify some different PKCS7 here too. Additionally the
 following parameters are supported:
 
 =over

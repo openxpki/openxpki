@@ -10,6 +10,7 @@ VERSION
 Makefile.PL
 OpenXPKI.pm
 OpenXPKI/DateTime.pm
+OpenXPKI/Debug.pm
 OpenXPKI/DN.pm
 OpenXPKI/Exception.pm
 OpenXPKI/XML/Cache.pm

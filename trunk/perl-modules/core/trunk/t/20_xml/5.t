@@ -12,8 +12,7 @@ print STDERR "CONFIGURATION INHERITANCE\n";
 ok(1);
 
 ## create new object
-my $obj = OpenXPKI::XML::Config->new(DEBUG  => 0,
-                                     CONFIG => "t/config.xml");
+my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/config.xml");
 if ($obj)
 {
     ok (1);

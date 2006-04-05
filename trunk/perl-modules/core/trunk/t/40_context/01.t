@@ -17,7 +17,6 @@ ok(1);
 ## init XML cache
 ok(OpenXPKI::Server::Init->new ({
        CONFIG => 't/config.xml',
-       DEBUG  => 0,
    }));
 
 my $var;

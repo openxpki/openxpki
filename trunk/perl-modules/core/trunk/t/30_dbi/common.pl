@@ -7,7 +7,7 @@ use warnings;
 use OpenXPKI::Crypto::TokenManager;
 our $cache;
 require 't/25_crypto/common.pl';
-my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0);
+my $mgmt = OpenXPKI::Crypto::TokenManager->new ();
 our $token = $mgmt->get_token (
     TYPE => "DEFAULT", 
     ID => "default", 
@@ -24,7 +24,6 @@ ok($log);
 
 use OpenXPKI::Server::DBI;
 our %config = (
-              DEBUG  => 0,
               TYPE   => "SQLite",
               NAME   => "t/30_dbi/sqlite.db",
               LOG    => $log

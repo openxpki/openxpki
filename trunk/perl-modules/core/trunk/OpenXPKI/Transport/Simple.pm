@@ -1,6 +1,7 @@
 # OpenXPKI::Transport::Simple.pm
-# Written 2006 by Michael Bell
-# (C) Copyright by OpenXPKI 2006
+# Written 2006 by Michael Bell for the OpenXPKI project
+# (C) Copyright 2006 by The OpenXPKI Project
+# $Revision$
 
 use strict;
 use warnings;
@@ -9,6 +10,7 @@ package OpenXPKI::Transport::Simple;
 
 use English;
 use OpenXPKI::Exception;
+use OpenXPKI::Debug 'OpenXPKI::Transport::Simple';
 
 $OUTPUT_AUTOFLUSH = 1;
 our $MAX_MSG_LENGTH = 1048576; # 1024^2
@@ -19,7 +21,6 @@ sub new
     my $class = ref($that) || $that;
 
     my $self = {
-                "DEBUG"  => 0,
                 "STDIN"  => *STDIN,
                 "STDOUT" => *STDOUT
                };
@@ -27,7 +28,6 @@ sub new
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG}   = $keys->{DEBUG}   if (exists $keys->{DEBUG});
     $self->{INFILE}  = $keys->{INFILE}  if (exists $keys->{INFILE});
     $self->{OUTFILE} = $keys->{OUTFILE} if (exists $keys->{OUTFILE});
 
@@ -206,16 +206,14 @@ return partial messages.
 
 =head2 new
 
-accepts only DEBUG, INFILE and OUTFILE as parameters. It takes over the
+accepts only INFILE and OUTFILE as parameters. It takes over the
 complete communication via STDIN and STDOUT. If INFILE is specified then
 messages are written to INFILE instead of STDIN. If OUTFILE is
 present than messages are read from OUTFILE instead of STDOUT.
 
 Example:
 
-my $transport = OpenXPKI::Transport::Simple->new ({
-                    DEBUG => 1,
-                });
+my $transport = OpenXPKI::Transport::Simple->new ({});
 
 =head2 close
 

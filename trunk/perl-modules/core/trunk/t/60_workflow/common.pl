@@ -115,7 +115,6 @@ sub do_step {
 ### initialize context
 OpenXPKI::Server::Init->new({
     CONFIG => 't/config.xml',
-#    DEBUG => 1,
 });
 
 ### get logging module
@@ -132,7 +131,6 @@ ok($dbi->connect());
 
 ## create a valid session
 my $session = OpenXPKI::Server::Session->new ({
-                  DEBUG     => 1,
                   DIRECTORY => "t/60_workflow/",
                   LIFETIME  => 100});
 $session->set_pki_realm ("Test Root CA");

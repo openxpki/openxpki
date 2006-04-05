@@ -11,7 +11,6 @@ use utf8;
 package OpenXPKI::Server::DBI::Driver;
 
 use vars qw(@ISA);
-use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 
 use OpenXPKI::Server::DBI::Schema;
@@ -135,7 +134,7 @@ our %COLUMN = (
 =head2 new
 
 The constructor expects at minimum three parameters - DBH with an
-instance of OpenXPKI::Server::DBI::DBH, DB_Type with the driver name and DEBUG.
+instance of OpenXPKI::Server::DBI::DBH and DB_Type with the driver name.
 All other parameters are
 exclusively to initialize the driver instance. Please check
 the specification of the driver function get_dsn for the
@@ -152,7 +151,6 @@ sub new
     $self->{schema} = OpenXPKI::Server::DBI::Schema->new();
 
     $self->{params} = { @_ };
-    $self->{DEBUG} = $self->{params}->{DEBUG};
     my $driver = "OpenXPKI::Server::DBI::Driver::".$self->{params}->{TYPE};
 
     @ISA = ($driver);

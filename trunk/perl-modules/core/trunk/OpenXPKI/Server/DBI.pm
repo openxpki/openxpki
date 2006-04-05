@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::DBI
 ##
-## Written by Michael Bell for the OpenXPKI project
-## Copyright (C) 2005 by The OpenXPKI Project
+## Written 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
  
 use strict;
@@ -12,7 +12,7 @@ package OpenXPKI::Server::DBI;
 
 # use Smart::Comments;
 
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::DBI';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;
@@ -37,9 +37,7 @@ sub new {
 
     my $keys = { @_ };
 
-    $self->{DEBUG}          = 1 if ($keys->{DEBUG});
-    # $self->{DEBUG}          = 1;
-    $self->debug ("start");
+    ##! 1: "start"
 
     $self->{log} = $keys->{LOG};
     if (not $self->{log})
@@ -48,9 +46,8 @@ sub new {
             message => "I18N_OPENXPKI_SERVER_DBI_MISSING_LOG");
     }
 
-    $self->debug ("defining the class parameters");
+    ##! 2: "defining the class parameters"
 
-    $self->{params}->{DEBUG}        = $self->{DEBUG};
     $self->{params}->{TYPE}         = $keys->{TYPE};
     $self->{params}->{HOST}         = $keys->{HOST};
     $self->{params}->{PORT}         = $keys->{PORT};
@@ -67,16 +64,13 @@ sub new {
     $self->{schema} = OpenXPKI::Server::DBI::Schema->new ();
     $self->{dbh}    = OpenXPKI::Server::DBI::DBH->new (%{$self->{params}});
 
-    $self->{sql}    = OpenXPKI::Server::DBI::SQL->new (DEBUG => $self->{DEBUG},
-                                                       DBH   => $self->{dbh});
-    $self->{hash}   = OpenXPKI::Server::DBI::Hash->new (DEBUG => $self->{DEBUG},
-                                                        SQL   => $self->{sql},
+    $self->{sql}    = OpenXPKI::Server::DBI::SQL->new (DBH   => $self->{dbh});
+    $self->{hash}   = OpenXPKI::Server::DBI::Hash->new (SQL   => $self->{sql},
                                                         LOG   => $self->{log});
-    $self->{object} = OpenXPKI::Server::DBI::Object->new (DEBUG  => $self->{DEBUG},
-                                                          HASH   => $self->{hash},
+    $self->{object} = OpenXPKI::Server::DBI::Object->new (HASH   => $self->{hash},
                                                           CRYPTO => $self->{crypto});
 
-    $self->debug ("OpenXPKI::Server::DBI should now complete");
+    ##! 1: "end - should now complete"
 
     return $self;
 }
@@ -140,14 +134,14 @@ sub init_schema
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("start");
+    ##! 1: "start"
 
     ## Accepted modes are
     ## NONE
     ## DRYRUN   to get SQL commands
     my $mode = ""; 
        $mode = $keys->{MODE} if (exists $keys->{MODE});
-    $self->debug ("MODE: $mode");
+    ##! 2: "MODE: $mode"
     if ( $mode eq "DRYRUN") {
         $self->{SQL_SCRIPT} = "";
     }
@@ -158,9 +152,9 @@ sub init_schema
     {
         my $result = $self->{sql}->create_table (NAME => $table, MODE => $mode);
         $self->{SQL_SCRIPT} .= $result.";" if ($mode eq "DRYRUN");
-        $self->debug ("table $table successfully created");
+        ##! 4: "table $table successfully created"
     }
-    $self->debug ("tables created");
+    ##! 2: "tables created"
 
     ## initialize sequence generators
 
@@ -168,9 +162,9 @@ sub init_schema
     {
         my $result = $self->{dbh}->create_sequence (NAME => $seq, MODE => $mode);
         $self->{SQL_SCRIPT} .= $result.";" if ($mode eq "DRYRUN");
-        $self->debug ("sequence $seq successfully created");
+        ##! 4: "sequence $seq successfully created"
     }
-    $self->debug ("sequences created");
+    ##! 2: "sequences created"
 
     ## initialize indexes
 
@@ -178,15 +172,15 @@ sub init_schema
     {
         my $result = $self->{sql}->create_index (NAME => $index, MODE => $mode);
         $self->{SQL_SCRIPT} .= $result.";" if ($mode eq "DRYRUN");
-        $self->debug ("index $index successfully created");
+        ##! 4: "index $index successfully created"
     }
-    $self->debug ("indexes created");
+    ##! 2: "indexes created"
 
     ## finalize the stuff
 
     $self->commit ();
 
-    $self->debug ("successful completed");
+    ##! 2: "successful completed"
     return $self->{SQL_SCRIPT} if ($mode eq "DRYRUN");
     return 1;
 }
@@ -199,7 +193,7 @@ sub init_schema
 sub rollback
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     $self->{dbh}->rollback();
     return 1;
 }
@@ -208,7 +202,7 @@ sub rollback
 sub commit
 {
     my $self = shift;
-    $self->debug ("start");
+    ##! 1: "start"
     $self->{dbh}->commit();
     return 1;
 }
@@ -238,11 +232,11 @@ sub insert
 
     if ($keys->{OBJECT})
     {
-        $self->debug ("is an object");
+        ##! 4: "is an object"
         $self->{object}->insert (TABLE  => $keys->{TABLE},
                                  OBJECT => $keys->{OBJECT});
     } else {
-        $self->debug ("is an hash");
+        ##! 4: "is an hash"
         $self->{hash}->insert (TABLE => $keys->{TABLE},
                                HASH  => $keys->{HASH});
     }
@@ -383,8 +377,7 @@ FIXME: THE EXPIRED HANDLING IS STILL NOT PORTED FROM THE OLD CODE.
 
 =head3 new
 
-is the constructor. It supports DEBUG and TYPE as general parameter.
-DEBUG can be a true or false value and is false by default.
+is the constructor. It supports TYPE as general parameter.
 The TYPE is the last parameters which
 is understand by the module itself. It must be a valid
 OpenXPKI::Server::DBI::Driver class name. All other parameters are

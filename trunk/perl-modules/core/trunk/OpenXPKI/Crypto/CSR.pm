@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::CSR
-## (C)opyright 2003-2005 Michael Bell
+## Rewritten 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -20,7 +21,6 @@ sub new
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{DEBUG}  = 1 if ($keys->{DEBUG});
     $self->{DATA}   = $keys->{DATA};
     $self->{TOKEN}  = $keys->{TOKEN};
     $self->{FORMAT} = $keys->{FORMAT};
@@ -59,22 +59,20 @@ sub new
 sub __init
 {
     my $self = shift;
-    $self->debug ("entering function");
+    ##! 1: "start"
 
     ##########################
     ##     init objects     ##
     ##########################
 
-    $self->{header} = OpenXPKI::Crypto::Header->new (DEBUG => $self->{DEBUG},
-                                                     DATA  => $self->{DATA});
+    $self->{header} = OpenXPKI::Crypto::Header->new (DATA  => $self->{DATA});
     $self->{PARSED}->{HEADER} = $self->{header}->get_parsed();
     if (not $self->{header}->get_body())
     {
         $self->{TYPE} = "HEADER" if ($self->{header}->get_body());
         return 1;
     }
-    $self->{csr} = $self->{TOKEN}->get_object({DEBUG  => $self->{DEBUG},
-                                               DATA   => $self->{header}->get_body(),
+    $self->{csr} = $self->{TOKEN}->get_object({DATA   => $self->{header}->get_body(),
                                                TYPE   => "CSR",
                                                FORMAT => $self->{TYPE}});
 
@@ -95,13 +93,12 @@ sub __init
     foreach my $attr (@attrlist)
     {
         $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function ({
-                                                   DEBUG    => $self->{DEBUG},
                                                    OBJECT   => $self->{csr},
                                                    FUNCTION => $attr});
     }
     $self->{TOKEN}->free_object ($self->{csr});
     delete $self->{csr};
-    $self->debug ("loaded CSR attributes");
+    ##! 2: "loaded CSR attributes"
     my $ret = $self->{PARSED}->{BODY};
 
     ###########################
@@ -133,7 +130,7 @@ sub __init
     } else {
         $self->{PARSED}->{SUBJECT} = $ret->{SUBJECT};
     }
-    $self->debug ("SUBJECT: ".$self->{PARSED}->{SUBJECT});
+    ##! 2: "SUBJECT: ".$self->{PARSED}->{SUBJECT}
 
     ## load the differnt parts of the DN into DN_HASH
     if ($ret->{SUBJECT})
@@ -154,11 +151,14 @@ sub __init
     $self->{PARSED}->{EMAILADDRESSES} = [ $self->get_emails ($ret) ];
     $self->{PARSED}->{EMAILADDRESS} = $ret->{EMAILADDRESSES}->[0];
 
-    $self->debug ("SUBJECT_ALT_NAME: ".$self->{PARSED}->{HEADER}->{SUBJECT_ALT_NAME})
-        if ($self->{PARSED}->{HEADER}->{SUBJECT_ALT_NAME});
-    $self->debug ("EMAILADDRESS: ".$self->{PARSED}->{EMAILADDRESS})
-        if ($self->{PARSED}->{EMAILADDRESS});
-
+    if ($self->{PARSED}->{HEADER}->{SUBJECT_ALT_NAME})
+    {
+        ##! 4: "SUBJECT_ALT_NAME: ".$self->{PARSED}->{HEADER}->{SUBJECT_ALT_NAME}
+    }
+    if ($self->{PARSED}->{EMAILADDRESS})
+    {
+        ##! 4: "EMAILADDRESS: ".$self->{PARSED}->{EMAILADDRESS}
+    }
 
     ###############################
     ##     extension parsing     ##
@@ -197,11 +197,14 @@ sub __init
         }
     }
 
-    $self->debug ("show all extensions and their values");
+    ##! 2: "show all extensions and their values"
     while(($key, $val) = each(%{$ret->{OPENSSL_EXTENSIONS}}))
     {
-        $self->debug ("found extension: $key");
-        $self->debug ("with value(s): $_") foreach(@{$val});
+        ##! 4: "found extension: $key"
+        foreach(@{$val})
+        {
+            ##! 8: "with value(s): $_"
+        }
     }
 
     return 1;
@@ -301,8 +304,7 @@ OpenXPKI::Crypto::Object several functions.
 
 =head2 new
 
-The constructor support four option - DEBUG, DATA, FORMAT and TOKEN.
-DEBUG is a true or false value which activates or deactivates the debugging.
+The constructor supports three options - DATA, FORMAT and TOKEN.
 FORMAT is optional but can be specified. It can be set to PKCS10 or
 SPKAC. If the FORMAT is missing then the module tries to determine the
 type of the request from DATA with some REGEX. DATA is a the CSR.

@@ -1,5 +1,6 @@
 # OpenXPKI::Crypto::TokenManager.pm 
-# Copyright (C) 2003-2005 Michael Bell
+## Rewritten 2005 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2003-2006 by The OpenXPKI Project
 # $Revision$
 
 use strict;
@@ -7,7 +8,7 @@ use warnings;
 
 package OpenXPKI::Crypto::TokenManager;
 
-use OpenXPKI qw (debug);
+use OpenXPKI::Debug 'OpenXPKI::Crypto::TokenManager';
 use OpenXPKI::Exception;
 use OpenXPKI::Crypto::Backend::API;
 use OpenXPKI::Server::Context qw( CTX );
@@ -16,17 +17,14 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{DEBUG}  = 1               if ($keys->{DEBUG});
-    $self->{tmp}    = $keys->{TMPDIR} if ($keys->{TMPDIR});
+    $self->{tmp} = $keys->{TMPDIR} if ($keys->{TMPDIR});
 
-    $self->debug ("token manager is ready");
+    ##! 1: "end - token manager is ready"
     return $self;
 }
 
@@ -38,7 +36,7 @@ sub get_token
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("entering function");
+    ##! 1: "start"
 
     my $type  = $keys->{TYPE};
     my $name  = $keys->{ID};
@@ -60,21 +58,21 @@ sub get_token
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_PKI_REALM");
     }
-    $self->debug ("$realm: $type -> $name");
+    ##! 2: "$realm: $type -> $name"
 
     $self->__add_token (TYPE => $type, NAME => $name, PKI_REALM => $realm)
         if (not $self->{TOKEN}->{$realm}->{$type}->{$name});
-    $self->debug ("token added");
+    ##! 2: "token added"
 
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_EXIST")
         if (not $self->{TOKEN}->{$realm}->{$type}->{$name});
-    $self->debug ("token is present");
+    ##! 2: "token is present"
 
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE")
         if (not $self->__use_token (TYPE => $type, NAME => $name, PKI_REALM => $realm));
-    $self->debug ("token is usable");
+    ##! 2: "token is usable"
 
     return $self->{TOKEN}->{$realm}->{$type}->{$name};
 }
@@ -83,7 +81,7 @@ sub __add_token
 {
     my $self = shift;
     my $keys = { @_ };
-    $self->debug ("entering function");
+    ##! 1: "start"
 
     my $type  = $keys->{TYPE};
     my $name  = $keys->{NAME};
@@ -112,11 +110,11 @@ sub __add_token
     my $realm_index;
     for (my $i=0; $i<$realm_count; $i++)
     {
-        $self->debug ("checking pki_realm");
+        ##! 4: "checking pki_realm"
         next if ($realm ne CTX('xml_config')->get_xpath (
                               XPATH    => [ 'pki_realm', 'name' ],
                               COUNTER  => [ $i, 0 ]));
-        $self->debug ("pki_realm ok");
+        ##! 4: "pki_realm ok"
         $realm_index = $i;
         last;
     }
@@ -134,11 +132,11 @@ sub __add_token
     my $type_index;
     for (my $i=0; $i<$type_count; $i++)
     {
-        $self->debug ("checking name of type");
+        ##! 4: "checking name of type"
         next if ($name ne CTX('xml_config')->get_xpath (
                               XPATH    => [ 'pki_realm', $type_path, 'id' ],
                               COUNTER  => [ $realm_index, $i, 0 ]));
-        $self->debug ("pki_realm and name ok");
+        ##! 4: "pki_realm and name ok"
         $type_index = $i;
         last;
     }
@@ -161,11 +159,10 @@ sub __add_token
 	    });
     }
 
-    $self->debug ("try to setup $backend token");
+    ##! 2: "try to setup $backend token"
     eval {
         $self->{TOKEN}->{$realm}->{$type}->{$name} =
             OpenXPKI::Crypto::Backend::API->new ({
-                DEBUG => 0,
                 CLASS => $backend,
                 TMP   => $self->{tmp},
                 NAME  => $name,
@@ -191,7 +188,7 @@ sub __add_token
 	    );
     }
 
-    $self->debug ("$type token $name for $realm successfully added");
+    ##! 2: "$type token $name for $realm successfully added"
     return $self->{TOKEN}->{$realm}->{$type}->{$name};
 }
 
@@ -281,8 +278,7 @@ get tokens and to manage the state of a token.
 
 =head2 new
 
-If you want to debug the module
-then must specify a true value for the parameter DEBUG. If you want to
+If you want to
 use an explicit temporary directory then you must specifiy this
 directory in the variable TMPDIR.
 

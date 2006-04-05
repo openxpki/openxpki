@@ -20,7 +20,7 @@ ok(1);
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new (DEBUG => 0);
+my $mgmt = OpenXPKI::Crypto::TokenManager->new ();
 ok (1);
 
 ## parameter checks for get_token
@@ -301,7 +301,6 @@ OpenXPKI->write_file (FILENAME => "$basedir/ca1/pkcs10.pem", CONTENT => $csr);
 
 ## create profile
 my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
-                  DEBUG     => 0,
                   CONFIG    => $cache,
                   PKI_REALM => "Test Root CA",
                   TYPE      => "ENDENTITY",
@@ -331,7 +330,6 @@ print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
 
 ### create CRL profile...
 $profile = OpenXPKI::Crypto::Profile::CRL->new (
-                  DEBUG     => 0,
                   CONFIG    => $cache,
                   PKI_REALM => "Test Root CA",
                   CA        => "INTERNAL_CA_1");

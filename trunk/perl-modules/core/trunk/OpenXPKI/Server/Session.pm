@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::Session.pm 
 ##
-## Written by Michael Bell for the OpenXPKI project 2006
-## Copyright (C) 2006 by The OpenXPKI Project
+## Written 2006 by Michael Bell for the OpenXPKI project
+## (C) Copyright 2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -11,7 +11,6 @@ use utf8;
 package OpenXPKI::Server::Session;
 
 use English;
-use OpenXPKI qw(debug);
 use OpenXPKI::Exception;
 
 ## switch of IP checks
@@ -23,14 +22,11 @@ sub new {
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                DEBUG     => 0,
-               };
+    my $self = {};
 
     bless $self, $class;
 
     my $keys = shift;
-    $self->{DEBUG} = 1 if ($keys->{DEBUG});
     if (exists $keys->{LIFETIME} and $keys->{LIFETIME} > 0)
     {
         $self->{LIFETIME} = $keys->{LIFETIME};
@@ -211,8 +207,6 @@ This function creates a new or load an already existing session.
 It supports the following parameters:
 
 =over
-
-=item * DEBUG [true or false Perl value]
 
 =item * LIFETIME [seconds]
 

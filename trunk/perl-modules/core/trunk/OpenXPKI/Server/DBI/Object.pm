@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::DBI::Object
 ##
-## Written by Michael Bell for the OpenXPKI::Server project 2005
-## Copyright (C) 2005 by The OpenXPKI Project
+## Written 2005 by Michael Bell for the OpenXPKI::Server project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -11,7 +11,7 @@ use utf8;
 package OpenXPKI::Server::DBI::Object;
 
 use English;
-use OpenXPKI qw(debug);
+use OpenXPKI::Debug 'OpenXPKI::Server::DBI::Object';
 use OpenXPKI::Server::DBI::Schema;
 use Date::Parse;
 
@@ -30,7 +30,7 @@ interface of the database.
 =head2 new
 
 is the constructor. It needs at minimum HASH with an instance
-of OpenXPKI::Server::DBI::HASH. You can specify optionally DEBUG. All
+of OpenXPKI::Server::DBI::HASH. All
 operations are mapped to hash operations. Please see OpenXPKI::Server::DBI
 for the general design of OpenXPKI's database interface.
 
@@ -41,9 +41,8 @@ sub new
     shift;
     my $self = { @_ };
     bless $self, "OpenXPKI::Server::DBI::Object";
-    #$self->{DEBUG} = 1;
     $self->{schema} = OpenXPKI::Server::DBI::Schema->new();
-    $self->debug ("init complete");
+    ##! 2: "init complete"
     return $self;
 }
 
@@ -80,7 +79,7 @@ sub insert
     my $object = $keys->{OBJECT};
     my %hash = ();
 
-    $self->debug ("table: $table");
+    ##! 2: "table: $table"
     foreach my $key (@{$self->{schema}->get_table_columns ($table)})
     {
         if ($key eq "DATA")
@@ -129,7 +128,7 @@ sub insert
             delete $hash{$key} if ($EVAL_ERROR);
         }
     }
-    $self->debug ("KEYS: ".join ", ", keys %hash);
+    ##! 2: "KEYS: ".join ", ", keys %hash
 
     ## no let us use the hash interface
     $self->{HASH}->insert (TABLE => $table, HASH => \%hash);
@@ -241,19 +240,15 @@ sub select
         if ($keys->{TABLE} eq "CERTIFICATE")
         {
             $object = OpenXPKI::Crypto::X509->new (DATA  => $hashref->{DATA},
-                                                   TOKEN => $self->{crypto},
-                                                   DEBUG => $self->{DEBUG});
+                                                   TOKEN => $self->{crypto});
         } elsif ($keys->{TABLE} eq "CRL") {
             $object = OpenXPKI::Crypto::CRL->new (DATA  => $hashref->{DATA},
-                                                  TOKEN => $self->{crypto},
-                                                  DEBUG => $self->{DEBUG});
+                                                  TOKEN => $self->{crypto});
         } elsif ($keys->{TABLE} eq "CRR") {
-            $object = OpenXPKI::Crypto::CRR->new (DATA   => $hashref->{DATA},
-                                                  DEBUG  => $self->{DEBUG});
+            $object = OpenXPKI::Crypto::CRR->new (DATA   => $hashref->{DATA});
         } elsif ($keys->{TABLE} eq "CSR") {
             $object = OpenXPKI::Crypto::CSR->new (DATA   => $hashref->{DATA},
-                                                  TOKEN  => $self->{crypto},
-                                                  DEBUG  => $self->{DEBUG});
+                                                  TOKEN  => $self->{crypto});
         } else {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_DBI_OBJECT_SELECT_WRONG_TABLE",

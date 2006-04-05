@@ -1,6 +1,6 @@
 # OpenXPKI Server Context Singleton
 # Written by Martin Bartosch for the OpenXPKI project 2005
-# Copyright (c) 2005 by The OpenXPKI Project
+# Copyright (c) 2005-2006 by The OpenXPKI Project
 # $Revision$
 
 package OpenXPKI::Server::Context;
@@ -32,7 +32,6 @@ my $context = {
         service        => undef,
         acl            => undef,
         session        => undef,
-        debug          => undef,
         authentication => undef,
     },
 };
@@ -235,7 +234,7 @@ Usage:
   # attach this server object and the API to the global context
   OpenXPKI::Server::Context::setcontext({
     server => $self,
-    api    => OpenXPKI::Server::API->new(DEBUG => $self->{DEBUG}),
+    api    => OpenXPKI::Server::API->new(),
   });
 
 

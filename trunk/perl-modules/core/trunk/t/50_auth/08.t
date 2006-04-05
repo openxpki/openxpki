@@ -18,12 +18,10 @@ my $xml = OpenXPKI::Server::Init->get_xml_config (CONFIG => 't/config.xml');
 ## create context
 ok(OpenXPKI::Server::Context::setcontext({
        xml_config => $xml,
-       debug      => 0,
    }));
 
 ## create new session
 my $session = OpenXPKI::Server::Session->new ({
-                  DEBUG     => 0,
                   DIRECTORY => "t/50_auth/",
                   LIFETIME  => 5});
 ok($session);
