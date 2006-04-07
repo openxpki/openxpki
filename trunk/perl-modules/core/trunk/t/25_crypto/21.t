@@ -29,7 +29,9 @@ ok (1);
 ## create SPKAC request
 $ENV{pwd} = OpenXPKI->read_file ("$basedir/ca1/passwd.txt");
 ok(1);
-my $spkac = `openssl spkac -key $basedir/ca1/rsa.pem -passin env:pwd`;
+
+my $shell_path = $token->get_shell_path(); # openssl executable to use
+my $spkac = `$shell_path spkac -key $basedir/ca1/rsa.pem -passin env:pwd`;
 if ($spkac)
 {
     ok(1);

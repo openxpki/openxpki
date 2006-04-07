@@ -464,6 +464,17 @@ sub free_object
     return $self->{INSTANCE}->free_object ($object);
 }
 
+sub get_shell_path
+{
+    my $self = shift;
+    if (@_)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_SHELL_PATH_ILLEGAL_PARAM");
+    }
+    return $self->{INSTANCE}->get_shell_path ();
+}
+
 sub login
 {
     my $self = shift;
@@ -555,3 +566,18 @@ sub AUTOLOAD {
 
 1;
 __END__
+
+=head1 Description   
+    
+this is the basic class for crypto backend API.
+        
+=head1 Functions
+     
+=head2 new
+ 
+is the constructor.
+
+=head2 get_shell_path
+ 
+returns path to executable of cryptolibrary to be used
+with the installed OpenXPKI system.

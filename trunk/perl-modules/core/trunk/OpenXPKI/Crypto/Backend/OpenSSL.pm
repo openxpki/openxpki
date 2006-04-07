@@ -434,6 +434,12 @@ sub free_object
     return 1;
 }
 
+sub get_shell_path
+{
+    my $self = shift;
+    return $self->{OPENSSL};
+}
+
 our $AUTOLOAD;
 sub AUTOLOAD {
     my $self = shift;
@@ -549,3 +555,8 @@ returned as hash references containing the following keys:
 
 frees the object internally. The only parameter is the object which
 was returned by get_object.
+
+=head2 get_shell_path
+
+returns full path to openssl executable to use with the installed 
+OpenXPKI system. 

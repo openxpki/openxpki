@@ -12,7 +12,8 @@ my @grentry = getgrgid ($GID);
 replace_param (FILENAME => "t/config.xml",
                TAG      => "group",
                VALUE    => $grentry[0])
-    if ($pwentry[0] ne "root");
+    if ($grentry[0] ne "root"); # On BSDs user root belongs to group 'wheel'
+                                # and group 'root' is absent altogether
 
 if ($pwentry[0] ne "root")
 {
