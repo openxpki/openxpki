@@ -6,11 +6,12 @@
 
 use strict;
 use warnings;
+#use diagnostics;
 use utf8;
 
 package OpenXPKI::Exception;
 
-use OpenXPKI qw (i18nGettext);
+use OpenXPKI::Debug 'OpenXPKI::Exception';
 
 use Exception::Class (
     "OpenXPKI::Exception" =>
@@ -18,6 +19,8 @@ use Exception::Class (
         fields => [ "errno", "child", "params" ],
     }
 );
+
+use OpenXPKI qw( i18nGettext );
 
 sub full_message
 {
@@ -52,6 +55,9 @@ sub full_message
     ## this is only for debugging of OpenXPKI::Exception
     ## and creates a lot of noise
     ## print STDERR "$msg\n";
+
+    ##! 1: "exception thrown: $msg"
+
     return $msg;
 }
 

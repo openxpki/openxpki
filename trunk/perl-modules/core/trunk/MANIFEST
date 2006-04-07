@@ -6,9 +6,9 @@ INSTALL
 CREDITS
 LICENSE
 CHANGES
-VERSION
 Makefile.PL
 OpenXPKI.pm
+OpenXPKI/VERSION.pm
 OpenXPKI/DateTime.pm
 OpenXPKI/Debug.pm
 OpenXPKI/DN.pm

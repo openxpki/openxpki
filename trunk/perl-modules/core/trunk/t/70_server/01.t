@@ -16,8 +16,10 @@ foreach my $mode ('debug', '')
     my $pid = fork();
     if ($pid)
     {
-        print STDERR "Waiting 5 seconds for starting server ...\n";
-        sleep 5;
+        my $sleep = 5;
+           $sleep += 10 if ($mode eq 'debug');
+        print STDERR "Waiting $sleep seconds for starting server ...\n";
+        sleep $sleep;
     } else {
         my $options  = '';
            $options .= '--debug' if ($mode eq 'debug');

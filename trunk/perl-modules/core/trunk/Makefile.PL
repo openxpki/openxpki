@@ -106,12 +106,13 @@ if ($files)
     }
     print STDOUT "Revision:        $revision\n";
     $version = "0.9.$revision";
-    `echo \\# never commit this file to a version control system > VERSION`;
-    `echo $version >> VERSION`;
+    `echo \\# never commit this file to a version control system > OpenXPKI/VERSION.pm`;
+    `echo package OpenXPKI::VERSION\\; >> OpenXPKI/VERSION.pm`;
+    `echo our \\\$VERSION = \\'$version\\'\\; >> OpenXPKI/VERSION.pm`;
+    `echo \\1\\; >> OpenXPKI/VERSION.pm`;
 } else {
-    $version = `cat VERSION`;
-    $version =~ s/#[^\n]*\n//g;
-    $version =~ s/\n//g;
+    require OpenXPKI::VERSION;
+    $version = $OpenXPKI::VERSION::VERSION;
 }
 
 ## restore all formerly ignored modules

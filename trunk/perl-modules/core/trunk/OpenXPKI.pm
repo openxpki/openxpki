@@ -4,19 +4,20 @@
 
 use strict;
 use warnings;
+#use diagnostics;
 use utf8;
 #use encoding 'utf8';
 
 package OpenXPKI;
 
-our $VERSION = OpenXPKI->read_file ("VERSION");
-    $VERSION =~ s/#[^\n]*\n//g;
-    $VERSION =~ s/\n//g;
+use OpenXPKI::VERSION;
+our $VERSION = $OpenXPKI::VERSION::VERSION;
 
 use English qw (-no_match_vars);
 use XSLoader;
 XSLoader::load ("OpenXPKI", $VERSION);
 
+use OpenXPKI::Exception;
 use Date::Parse;
 use DateTime;
 use Scalar::Util qw( blessed );
