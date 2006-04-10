@@ -1,6 +1,8 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::DSA
-## (C)opyright 2006 Michael Bell, Dmitry Belyavsky, and 
-## Julia Dubenskaya for OpenXPKI project
+## Written 2006 by Michael Bell for the OpenXPKI project
+## Rewritten 2006 by Dmitry Belyavsky for the OpenXPKI project
+## Fixed 2006 by Julia Dubenskaya for the OpenXPKI project
+## (C) Copyright 2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
