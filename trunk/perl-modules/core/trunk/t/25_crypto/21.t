@@ -30,7 +30,7 @@ ok (1);
 $ENV{pwd} = OpenXPKI->read_file ("$basedir/ca1/passwd.txt");
 ok(1);
 
-my $shell_path = $token->get_shell_path(); # openssl executable to use
+my $shell_path = `cat t/cfg.binary.openssl`; # openssl executable to use
 my $spkac = `$shell_path spkac -key $basedir/ca1/rsa.pem -passin env:pwd`;
 if ($spkac)
 {
