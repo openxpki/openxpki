@@ -12,6 +12,11 @@ CFG="bin/openxpki-metaconf"
 TEMPLATEDIR=etc/templates
 TEMPLATE="default"
 
+# check that all required perl modules are present
+
+if ! perl check_modules.pl; then
+    exit 1;
+fi
 
 # provide fresh default configuration (if not already present)
 if [ ! -e openxpki.conf ] ; then
