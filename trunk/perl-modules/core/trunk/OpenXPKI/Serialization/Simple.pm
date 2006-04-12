@@ -7,6 +7,9 @@ use warnings;
 
 package OpenXPKI::Serialization::Simple;
 
+use OpenXPKI::VERSION;
+our $VERSION = $OpenXPKI::VERSION::VERSION;
+
 use OpenXPKI::Exception;
 
 sub new

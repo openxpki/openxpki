@@ -8,6 +8,9 @@ use warnings;
 
 package OpenXPKI::Transport::Simple;
 
+use OpenXPKI::VERSION;
+our $VERSION = $OpenXPKI::VERSION::VERSION;
+
 use English;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug 'OpenXPKI::Transport::Simple';
