@@ -212,6 +212,7 @@ sub query_config {
     my $params = shift;
     my $config = $params->{RAWCONFIG};
     my $active_sections = $params->{SECTIONS};
+    my $oneshot = $params->{ONESHOT} || 0;
 
     if (! defined $config && (ref $config ne 'HASH')) {
 	warn "Parameter RAWCONFIG missing or invalid";
@@ -223,12 +224,6 @@ sub query_config {
 	return;
     }
 
-    print "\n";
-    print "Entering interactive OpenXPKI configuration.\n\n";
-    print "Hit 'Return' to accept the displayed default.\n";
-    print "(You will be able to repeat the configuration procedure with your changed\n";
-    print "settings if you made a mistake.)\n";
-    
     my $config_ok = 0;
     my $validator;
     while (! $config_ok) {
@@ -311,9 +306,12 @@ sub query_config {
 	    }
 	}
 
-
-	print "\n\n";
-	$config_ok = prompt("Everything OK ('n' to repeat)? (y/n) ", -yes_no);
+	if ($oneshot) {
+	    $config_ok = 1;
+	} else {
+	    print "\n\n";
+	    $config_ok = prompt("Everything OK ('n' to repeat)? (y/n) ", -yes_no);
+	}
     }
 
     return 1;
@@ -430,10 +428,17 @@ if ($params{interactive}) {
 
     if (! defined $params{sectionsmenu}) {
 	# sequential configuration
+	print "\n";
+	print "Entering interactive OpenXPKI configuration.\n\n";
+	print "Hit 'Return' to accept the displayed default.\n";
+	print "(You will be able to repeat the configuration procedure with your changed\n";
+	print "settings if you made a mistake.)\n";
+
 	query_config(
 	    {
 		RAWCONFIG => $rawconfig,
 		SECTIONS  => \%active_sections,
+		ONESHOT   => 0,
 	    });
 	
     } else {
@@ -453,12 +458,14 @@ if ($params{interactive}) {
       SECTIONMENU:
 	while (1) {
 	    prompt("Select section to configure", -menu => \@menu);
+	    next SECTIONMENU unless defined $_;
 	    last SECTIONMENU if ($_ eq "Exit");
 
 	    query_config(
 		{
 		    RAWCONFIG => $rawconfig,
 		    SECTIONS  => { $section_map{$_} => 1 },
+		    ONESHOT   => 1,
 		});
 	    
 	}
@@ -468,8 +475,8 @@ if ($params{interactive}) {
     if (prompt("Write modified config? (Y/N) ", -Yes_No)) {
 	write_config($rawconfig => $params{writecfg});
     } else {
-	warn "Aborted configuration (unchanged)";
-	exit 0;
+	print "Aborted configuration (unchanged)\n";
+	exit 1;
     }
 
 } else {

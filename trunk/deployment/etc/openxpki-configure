@@ -16,7 +16,8 @@ TEMPLATE="default"
 
 reconfigure() {
     # interactively create initial configuration
-    $CFG --includesection file,database,deployment --interactive --force --writecfg $SYSCONFDIR/openxpki.conf
+    $CFG --sectionsmenu --interactive --force --writecfg $SYSCONFDIR/openxpki.conf
+    return $?
 }
 
 write_config() {
@@ -44,7 +45,10 @@ echo "OpenXPKI Configuration Script"
 echo "Copyright (c) 2006 by The OpenXPKI Project"
 echo
 
-reconfigure
+if ! reconfigure ; then
+    echo "Exiting..."
+    exit 0
+fi
 
 XMLSTYLE="`$CFG --getcfg deployment.xmlstyle `"
 
