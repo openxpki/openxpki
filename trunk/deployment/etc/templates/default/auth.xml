@@ -1,0 +1,78 @@
+<auth>
+  <stack name="Anonymous">
+    <handler>Anonymous</handler>
+  </stack>
+  <stack name="User">
+    <handler>User Password</handler>
+    <!-- <handler>LDAP</handler> -->
+  </stack>
+  <stack name="Operator">
+    <!-- <handler>Signing</handler> -->
+    <handler>Operator Password</handler>
+  </stack>
+  <stack name="External Dynamic">
+    <handler>External Dynamic Role</handler>
+  </stack>
+  <stack name="External Static">
+    <handler>External Static Role</handler>
+  </stack>
+
+
+  <handler name="Anonymous" type="Anonymous">
+    <role>anonymous</role>
+  </handler>
+  <handler name="User Password" type="Password">
+    <user>
+      <name>John Doe</name>
+      <algorithm>sha1</algorithm>
+      <!-- this is Doe in sha1 -->
+      <digest>yUetMg5m/GSZjoalXA2iEMjB2Bo=</digest>
+      <role>User</role>
+    </user>
+  </handler>
+  <handler name="Operator Password" type="Password">
+    <user>
+      <name>root</name>
+      <algorithm>sha1</algorithm>
+      <!-- this is root in sha1 -->
+      <digest>3Hbp8MAAbo+RngxRXGbbujmC94U</digest>
+      <role>CA Operator</role>
+    </user>
+  </handler>
+  <handler name="External Dynamic Role" type="External">
+    <!-- please note this is only a test configuration !!! -->
+    <!-- we use the passphrase to set the role             -->
+    <!-- never do this in real environments !!!            -->
+    <command>echo -n $PASSWD</command>
+    <!-- if this field is empty then the role is determined dynamically -->
+    <role></role>
+    <pattern>x</pattern>
+    <replacement>x</replacement>
+    <env>
+      <name>LOGIN</name>
+      <value>__USER__</value>
+    </env>
+    <env>
+      <name>PASSWD</name>
+      <value>__PASSWD__</value>
+    </env>
+  </handler>
+  <handler name="External Static Role" type="External">
+    <!-- please note this is only a test configuration !!! -->
+    <!-- we use the passphrase to set the role             -->
+    <!-- never do this in real environments !!!            -->
+    <command>echo -n $PASSWD</command>
+    <!-- if this field is empty then the role is determined dynamically -->
+    <role>RA Operator</role>
+    <pattern>x</pattern>
+    <replacement>x</replacement>
+    <env>
+      <name>LOGIN</name>
+      <value>__USER__</value>
+    </env>
+    <env>
+      <name>PASSWD</name>
+      <value>__PASSWD__</value>
+    </env>
+  </handler>
+</auth>

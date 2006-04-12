@@ -1,0 +1,51 @@
+<acl>
+  <!-- Wildcard definition area                             -->
+  <!--                                                      -->
+  <!-- First we define how wildcards has to be interpreted. -->
+  <!-- This is necessary to build a very fast ACL.          -->
+  <!-- Internally we extend every wildcard to single entry  -->
+  <!-- in the ACL. This allows us to implement the ACL as   -->
+  <!-- a very fast three dimensional hash.                  -->
+
+  <!-- we map the server_id (dbi) to a human readable value -->
+  <server>
+    <id>0</id>
+    <name>CA</name>
+  </server>
+  <server>
+    <id>1</id>
+    <name>RA</name>
+  </server>
+
+  <!-- FIXME: perhaps we should define roles somewhere else -->
+  <role>Anonymous</role>
+  <role>User</role>
+  <role>RA Operator</role>
+  <role>CA Operator</role>
+  <role>Web Server</role>
+  <role>Sub CA</role>
+
+  <!-- Permissions                                                -->
+  <!--                                                            -->
+  <!-- This is the real ACL area. Here we define the              -->
+  <!--     permissions. A permission consists of four things:     -->
+  <!--     1. server                                              -->
+  <!--     2. activity                                           -->
+  <!--     3. affected_role                                       -->
+  <!--     4. auth_role                                           -->
+  <!--                                                            -->
+  <!--     The server is simply the human readable name of a      -->
+  <!--     server or the wildcard '*'. The activity is the        -->
+  <!--     correct name of the workflow activity. The             -->
+  <!--     affected_role is like the name says the affected role. -->
+  <!--     If the CA itself is affected then the value is the     -->
+  <!--     empty string. The auth_role is role of the logged in   -->
+  <!--     user. This role is determinable from the session.      -->
+
+  <permission>
+    <server>*</server>
+    <activity>*</activity>
+    <affected_role>*</affected_role>
+    <auth_role>CA Operator</auth_role>
+  </permission>
+</acl>

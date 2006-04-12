@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# OpenXPKI Configuration Script
+#
+# Written by Martin Bartosch for the OpenXPKI project 2006
+# Copyright (c) 2006 by The OpenXPKI Project
+# $Revision: 80 $
+#
+
+CFG="bin/openxpki-metaconf"
+
+TEMPLATEDIR=etc/templates
+TEMPLATE="default"
+
+
+# provide fresh default configuration (if not already present)
+if [ ! -e openxpki.conf ] ; then
+    cp etc/openxpki.conf .
+fi
+
+if [ ! -e openxpki.conf ] ; then
+    echo "ERROR: could not find 'openxpki.conf' in current directory"
+    exit 1
+fi
+
+echo
+echo "OpenXPKI Installation Program"
+echo "Copyright (c) 2006 by The OpenXPKI Project"
+echo
+echo "Ready to begin initial configuration. First of all we will need to figure"
+echo "out the basic settings required for installation of the support programs."
+echo "This configuration script will ask you several questions about the desired"
+echo "setup and generate an installation Makefile."
+echo "Running 'make install' will then create the necessary directories and install"
+echo "a base configuration set."
+echo
+
+# interactively create initial configuration
+$CFG --config openxpki.conf --includesection dir,file,database,deployment --interactive --force --writecfg openxpki.conf
+
+# write makefile
+$CFG --config openxpki.conf --file $TEMPLATEDIR/$TEMPLATE/Makefile >Makefile
+
+echo "Initial configuration complete. You may now run"
+echo
+echo "make install"
+echo
+echo "in order to install the OpenXPKI server files."
+echo
+echo "You may wish to review the generated meta configuration file"
+echo "'openxpki.conf' in this directory before proceeding."
+echo

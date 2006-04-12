@@ -1,0 +1,575 @@
+#!/usr/bin/perl
+#
+# OpenXPKI Deployment Package
+#
+# Written by Martin Bartosch for the OpenXPKI project 2006
+# Copyright (c) 2006 by The OpenXPKI Project
+# $Revision: 80 $
+#
+
+use warnings;
+use strict;
+use English;
+
+###########################################################################
+# OpenXPKI Deployment tools
+# Written by Martin Bartosch for the OpenXPKI project 2006
+# Copyright (c) 2006 by The OpenXPKI Project
+# $Revision: 192 $
+
+package OpenXPKI::Deployment;
+
+use Template;
+
+sub expand {
+    my $config = shift;
+    my $param = shift;
+
+    my $orig = $param;
+
+    # regex matching a parenthesised expression, from perlre
+    my $re;
+    $re = qr{
+	\(
+	    (?:
+	     (?> [^()]+ )    # Non-parens without backtracking
+	     |
+	     (??{ $re })     # Group with matching parens
+	     )*
+	     \)
+	 }x;
+
+    while (my ($variable) = ($param =~ m{ \$($re) }xms)) {
+	$variable =~ s/\((.*)\)/$1/;
+	my $unexpanded_variable = $variable;
+
+	$variable = expand($config, $variable);
+	my ($section, $key) = split(m{\.}xms, $variable);
+
+	if (! exists $config->{$section}) {
+	    warn("Configuration section '$section' does not exist");
+	    return undef;
+	} 
+	
+	if (! defined $key) {
+	    # return configuration subtree if the whole section was referenced
+	    if ($param eq '$(' . $unexpanded_variable . ')') {
+		return $config->{$section};
+	    } else {
+		warn("ERROR: Section reference ('$section') in string context is not allowed.");
+		return undef;
+	    }
+	}
+
+	if (! exists $config->{$section}->{$key}) {
+	    warn("Configuration entry '$key' does not exist in section '$section'");
+	    #return undef;
+	    return "";
+	} 
+
+	my $value;
+	if (ref $config->{$section}->{$key} eq "") {
+	    $value = $config->{$section}->{$key};
+	} else {
+	    # this is OK if no surrounding string content is present
+	    if ($param eq '$(' . $unexpanded_variable . ')') {
+		return $config->{$section}->{$key};
+	    }
+
+	    # attempt to insert multi-value into string -> concatenate content
+	    warn("WARNING: Expanding multi-value ('$key' in section '$section') in string context");
+	    $value = join('', @{$config->{$section}->{$key}});
+	}
+
+	$param =~ s{ \$\(\Q$variable\E\) }{$value}xms;
+	$param = expand($config, $param);
+#	if (! defined $param || ($param eq "")) {
+#	    #warn("Could not expand configuration setting '$orig'.");
+#	    return "";
+#	}
+    }
+
+    return $param;
+}
+
+
+# flatten configuration (expand all indirect values)
+sub flatten_config {
+    my $configref = shift;
+    my $newconfig = {};
+    foreach my $section (keys %{$configref}) {
+	foreach my $key (keys %{$configref->{$section}}) {
+	    $newconfig->{$section}->{$key} 
+	    = expand($configref, $configref->{$section}->{$key});
+	}
+    }
+    return $newconfig;
+}
+
+sub process_template {
+    my $params = shift;
+
+    if (! exists $params->{VARS} || (ref $params->{VARS} ne 'HASH')) {
+	warn "Parameter VARS not specified.";
+	return;
+    }
+
+    if (! exists $params->{FILENAME} || (ref $params->{FILENAME} ne '')) {
+	warn "Parameter FILENAME not specified.";
+	return;
+    }
+
+    my %options = (    
+	PRE_CHOMP => 1, # remove whitespace before directives
+	RELATIVE => 1,
+	);
+
+    if (exists $params->{INCLUDE} && (ref $params->{INCLUDE} eq 'ARRAY')) {
+	$options{INCLUDE_PATH} = $params->{INCLUDE};
+    }
+
+    my $template = Template->new(\%options);
+
+    $template->process($params->{FILENAME}, 
+		       $params->{VARS}, 
+		       $params->{OUTFILE})
+	|| do {
+	    my $error = $template->error();
+	    print STDERR "File:       " . $params->{FILENAME} . "\n";
+	    print STDERR "Error type: " . $error->type() . "\n";
+	    print STDERR "Error info: " . $error->info() . "\n";
+	    print STDERR "Error msg:  " . $error . "\n";
+	    return;
+    };
+    return 1;
+}
+
+
+1;
+
+###########################################################################
+package main;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+#use OpenXPKI::Deployment;
+
+use Pod::Usage;
+use Getopt::Long;
+use File::Spec;
+use Config::Std;
+
+use Smart::Comments;
+
+my $have_io_prompt = 1;
+eval {
+    require IO::Prompt;
+    import IO::Prompt;
+};
+if ($EVAL_ERROR) {
+    $have_io_prompt = 0;
+}
+
+
+###########################################################################
+
+# interactive configuration
+sub query_config {
+    my $params = shift;
+    my $config = $params->{RAWCONFIG};
+    my $active_sections = $params->{SECTIONS};
+
+    if (! defined $config && (ref $config ne 'HASH')) {
+	warn "Parameter RAWCONFIG missing or invalid";
+	return;
+    }
+
+    if (defined $active_sections && (ref $active_sections ne 'HASH')) {
+	warn "Invalid data type for parameter SECTIONS";
+	return;
+    }
+
+    print "\n";
+    print "Entering interactive OpenXPKI configuration.\n\n";
+    print "Hit 'Return' to accept the displayed default.\n";
+    print "(You will be able to repeat the configuration procedure with your changed\n";
+    print "settings if you made a mistake.)\n";
+    
+    my $data_offset;
+
+    my $config_ok = 0;
+    my $validator;
+    while (! $config_ok) {
+	my $section = "";
+	
+	seek DATA, ($data_offset ||= tell DATA), 0;
+
+      DATA:
+	while (my $line = <DATA>) {
+	    chomp $line;
+	    last DATA if ($line eq '__END__');
+	    next DATA if ($line =~ m{ \A \s* \# }xms);
+	    
+	    if ($line =~ m{ \A SECTION: \s* (\S+) }xms) {
+		$section = $1;
+		next DATA;
+	    }
+
+	    # skip section?
+	    if (defined $active_sections && ($section ne "")) {
+		if (! $active_sections->{$section}) {
+		    next DATA;
+		}
+	    }
+
+	    if ($line =~ m{ \A \s* \z }xms) {
+		# propagate empty lines to output for formatting
+		print "\n";
+		next DATA;
+	    }
+	    
+	    if ($line =~ m{ \A ECHO: \s* (.*) }xms) {
+		print "$1\n";
+		next DATA;
+	    }
+
+	    if ($line =~ m{ \A \s* VALIDATE: \s* (.*) }xms) {
+		$validator = $1;
+		next DATA;
+	    }
+
+	    my $input_ok = 0;
+	  PROMPT:
+	    while (! $input_ok) {
+		my ($key) = ($line =~ m{ \A \s* (.*) }xms);
+		my $text = $key;
+		if ($key =~ m{ \A (.*?):\s*(.*) }xms) {
+		    ($key, $text) = ($1, $2);
+		}
+		
+		my $prompt = $text || $key;
+		my @default;
+		
+		if (! defined $config->{$section}->{$key}) {
+		    #warn "Section $section, key $key does not exist in configuration.";
+		} else {
+		    @default = (-default => $config->{$section}->{$key});
+		}
+		
+		if (prompt("$prompt: ", 
+			   @default,
+		    )) {
+
+		    $input_ok = 1;
+		    if (defined $validator) {
+			if (! eval $validator) {
+			    # validation failed
+			    $input_ok = 0;
+			    print "ERROR: Value not acceptable\n";
+			    next PROMPT;
+			}
+			$validator = undef;
+		    }
+
+		    if (exists $config->{$section}->{$key} ||
+			($_ ne "")) {
+			$config->{$section}->{$key} = $_;
+		    }
+		}
+	    }
+	}
+
+
+	print "\n\n";
+	$config_ok = prompt("Everything OK ('n' to repeat)? (y/n) ", -yes_no);
+    }
+
+    
+    return prompt("Write modified config? (Y/N) ", -Yes_No);
+}
+
+
+
+###########################################################################
+
+my %params;
+
+GetOptions(\%params,
+	   qw(
+	      help|?
+	      man
+	      cfg|cfgfile|conf|config=s
+	      writecfg=s
+              interactive
+              includesection=s@
+              excludesection=s@
+              dstdir|destdir=s
+              file=s@
+              includedir|include=s@
+              getcfgvalue|getcfg|get=s@
+              setcfgvalue|setcfg|set=s@
+              delcfgvalue|delcfg|del=s@
+              force
+	      )) or pod2usage(-verbose => 0);
+
+pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
+pod2usage(-verbose => 1) if ($params{help}
+			      ||  (! exists $params{cfg}));
+
+my @includedirs;
+if (exists $params{includedir}) {
+    push @includedirs, @{$params{includedir}};
+}
+
+my $rawconfig;
+read_config($params{cfg} => $rawconfig);
+
+# allow deleting config values
+if (exists $params{delcfgvalue}) {
+    # also allow comma separated list of objects to delete instead of multiple
+    # calls to --delcfgvalue
+    @{$params{delcfgvalue}} = split(m{,}, join(',', @{$params{delcfgvalue}}));
+
+  ENTRY:
+    foreach my $entry (@{$params{delcfgvalue}}) {
+
+	my ($section, $key) = split(m{\.}xms, $entry);
+	if (defined $section 
+	    && defined $key
+	    && exists $rawconfig->{$section}->{$key}) {
+
+	    delete $rawconfig->{$section}->{$key};
+	}
+    }
+}
+
+# allow overriding config values
+if (exists $params{setcfgvalue}) {
+  ENTRY:
+    foreach my $entry (@{$params{setcfgvalue}}) {
+	my ($var, $value) = ($entry =~ m{\A (.*?) = (.*) }xms);
+	my ($section, $key) = split(m{\.}xms, $var);
+	$rawconfig->{$section}->{$key} = $value;
+    }
+}
+
+my %active_sections;
+
+if (exists $params{includesection}) {
+    @{$params{includesection}} = split(m{,}, join(',', @{$params{includesection}}));
+    foreach my $section (@{$params{includesection}}) {
+	if (exists $rawconfig->{$section}) {
+	    $active_sections{$section} = 1;
+	} else {
+	    warn "Section $section does not exist in configuration";
+	}
+    }
+} else {
+    # all sections by default
+    %active_sections = map { $_ => 1 } keys %{$rawconfig};
+}
+
+if (exists $params{excludesection}) {
+    @{$params{excludesection}} = split(m{,}, join(',', @{$params{excludesection}}));
+    foreach my $section (@{$params{excludesection}}) {
+	if (exists $rawconfig->{$section}) {
+	    delete $active_sections{$section};
+	} else {
+	    warn "Section $section does not exist in configuration";
+	}
+    }
+}
+
+
+# will contain the flattened configuration later
+my $config;
+
+if ($params{interactive}) {
+    # interactive configuration
+    if (! $have_io_prompt) {
+	die "IO::Prompt not installed, interactive configuration not supported. Stopped";
+    }
+    
+    if (! exists $params{writecfg}) {
+	die "Interactive configuration requires --writecfg";
+    }
+    
+    die "File $params{writecfg} already exists. Stopped" if (-e $params{writecfg} && (! defined $params{force}));
+    if (query_config(
+	    {
+		RAWCONFIG => $rawconfig,
+		SECTIONS  => \%active_sections,
+	    },
+	)) {
+
+	$config = OpenXPKI::Deployment::flatten_config($rawconfig);
+	
+	write_config($rawconfig => $params{writecfg});
+    } else {
+	warn "Aborted configuration (unchanged)";
+	exit 0;
+    }
+} else {
+    # non-interactive use
+    $config = OpenXPKI::Deployment::flatten_config($rawconfig);
+    
+    if ($params{writecfg}) {
+	die "File $params{writecfg} already exists. Stopped" if (-e $params{writecfg});
+	write_config($rawconfig => $params{writecfg});
+    }
+}
+
+if (exists $params{getcfgvalue}) {
+    # also allow comma separated list of objects to get instead of multiple
+    # calls to --getcfgvalue
+    @{$params{getcfgvalue}} = split(m{,}, join(',', @{$params{getcfgvalue}}));
+
+    my $error = 0;
+  ENTRY:
+    foreach my $entry (@{$params{getcfgvalue}}) {
+	my ($section, $key) = split(m{\.}xms, $entry);
+	if (defined $section 
+	    && defined $key
+	    && exists $config->{$section}->{$key}) {
+	    my $value = $config->{$section}->{$key};
+	    if (ref $value eq "") {
+		print $config->{$section}->{$key} . "\n";
+		next ENTRY;
+	    }
+	    if (ref $value eq "ARRAY") {
+		print join("\n", @{$value}) . "\n";;
+		next ENTRY;
+	    }
+	    warn("Could not dereference configuration entry '$entry' (complex data type)");
+	    $error++;
+	} else {
+	    warn("Configuration entry '$entry' not defined");
+	    $error++;
+	    print "\n";
+	}
+    }
+    if ($error > 0) {
+	exit 1;
+    }
+    exit 0;
+}
+
+
+FILE:
+foreach my $filename (@{$params{file}}) {
+    my ($volume, $dirs, $basename) = File::Spec->splitpath($filename);
+
+    my $outfile;
+    if (defined $params{dstdir}) {
+	$outfile = File::Spec->catfile($params{dstdir}, $basename);
+	if (-e $outfile) {
+	    if (! $params{force}) {
+		warn("Target file $outfile already exists.");
+		next FILE;
+	    }
+	}
+    }
+    
+    if (! OpenXPKI::Deployment::process_template(
+	      {
+		  FILENAME => $filename,
+		  VARS     => $config,
+		  INCLUDE  => [ '.',
+				File::Spec->catpath($volume, $dirs), 
+			       @includedirs,
+		      ],
+		  OUTFILE  => $outfile,
+	      })) {
+	die "Could not process template file $filename. Stopped";
+    }
+}
+
+__DATA__
+# Interactive configuration layout
+
+SECTION: dir
+ECHO: Directories
+
+  prefix
+  sysconfdir
+  localstatedir
+  openxpkistatedir
+  tmpdir
+  installprefix: installprefix (only for package builds)
+
+SECTION: file
+ECHO: Auxiliary programs and files
+
+  VALIDATE: (-x $_ && (`$_ version` =~ /0\.9\.8/))
+  openssl: OpenSSL Binary (0.9.8 or higher)
+
+
+SECTION: server
+ECHO: OpenXPKI server settings
+
+  runuser
+  rungroup
+
+
+SECTION: database
+ECHO: Database setup
+
+  VALIDATE: m{ \A \d+ \z }xms
+  server_id: Server ID (unique for each distinct node)
+  VALIDATE: m{ \A \d+ \z }xms
+  server_shift: Server shift (must be the same for all nodes)
+  VALIDATE: m{ \A (?:SQLite|Oracle|DB2|mysql|Pg) }xms
+  type: Database type (SQLite, DB2, Oracle, MySQL, Pg)
+  name: Database name
+  host
+  port
+  user
+  passwd
+  namespace
+
+
+SECTION: deployment
+ECHO: Deployment options
+
+  VALIDATE: m{ \A (?:all-in-one|multi-file) }xms
+  xmlstyle: XML Configuration style (all-in-one or multi-file)
+
+__END__
+
+=head1 NAME
+
+openxpki-configure [options]
+
+ Options:
+   --help           brief help message
+   --man            full documentation
+   --config FILE    use configuration from FILE (mandatory)
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--config FILE>
+
+Read configuration file FILE. This option is mandatory.
+
+=back
+
+=head1 DESCRIPTION
+
+B<openxpki-configure> generates a usable OpenXPKI configuration from
+a set of base templates. The parameters that are inserted into the
+configuration are taken from a configuration file and can be modified
+interactively.
+
+=cut
+

@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# OpenXPKI (Re)configuration script
+#
+# Written by Martin Bartosch for the OpenXPKI project 2006
+# Copyright (c) 2006 by The OpenXPKI Project
+# $Revision: 80 $
+#
+
+echo
+echo "OpenXPKI Configuration Script"
+echo "Copyright (c) 2006 by The OpenXPKI Project"
+echo
+

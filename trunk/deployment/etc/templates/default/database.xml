@@ -1,0 +1,19 @@
+<database>
+  <debug>[% global.debug %]</debug>
+  [% FOREACH tag = ['server_id' 'server_shift' 'type' 'name' 'host' 'user' 'passwd' 'namespace' ] %]
+    [% IF database.$tag.defined %]
+    <[% tag %]>[% database.$tag %]</[% tag %]>
+    [% END %]
+  [% END %]
+  <environment>
+    <vendor>
+      <type>[% database.type %]</type>
+      [% FOREACH option = database.options.keys %]
+      <option>
+        <name>[% option %]</name>
+        <value>[% database.options.$option %]</value>
+      </option>
+      [% END %]
+    </vendor>
+  </environment>
+</database>

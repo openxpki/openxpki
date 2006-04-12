@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+#
+# Written by Martin Bartosch for the OpenXPKI project 2006
+# Copyright (c) 2006 by The OpenXPKI Project
+# $Revision: 80 $
+#
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+
+use OpenXPKI::Debug;
+require OpenXPKI::Server;
+
+my $configfile = "[% dir.sysconfdir %]/config.xml";
+
+my %params;
+
+GetOptions(\%params,
+	   qw(
+	      help|?
+	      man
+	      cfg|cfgfile|conf|config=s
+              debug=s
+	      )) or pod2usage(-verbose => 0);
+
+pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
+pod2usage(-verbose => 1) if ($params{help});
+
+if (defined $params{debug}) {
+    $OpenXPKI::Debug::LEVEL{'.*'} = 100;
+}
+
+if (defined $params{cfg}) {
+    $configfile = $params{cfg};
+}
+
+while (my $cmd = shift) {
+    if ($cmd eq 'start') {
+	OpenXPKI::Server->new ("CONFIG" => $configfile);
+    }
+}
+
+
+__END__
+
+=head1 NAME
+
+openxpkictl [options] COMMAND
+
+ Options:
+   --help           brief help message
+   --man            full documentation
+   --config FILE    use configuration from FILE
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--config FILE>
+
+Read configuration file FILE. Uses built-in default if not specified.
+
+=back
+
+=head1 COMMANDS
+
+=over 8
+
+=item B<start>
+
+Starts the OpenXPKI daemon.
+
+=back
+
+
+=head1 DESCRIPTION
+
+B<openxpkictl> is a front end to the OpenXPKI System. It is designed
+to help the  administrator control the functioning of the OpenXPKI
+server daemon.
+
+=over 8
+
+NOTE: This script was customized to the paths specified during 
+installation.
+You will have to modify this script to reflect any changes to the 
+installation directories.
+
+The openxpkictl script returns a 0 exit value on success, and >0 if  an
+error occurs.
+
+=back
+
+=cut
+

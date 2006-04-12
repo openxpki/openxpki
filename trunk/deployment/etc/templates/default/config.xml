@@ -1,0 +1,64 @@
+<openxpki>
+  <common>
+    <log_config>[% server.logconfig %]</log_config>
+    <server>
+        <user>[%          server.user %]</user>
+        <group>[%         server.group %]</group>
+        <socket_file>[%   server.socketfile %]</socket_file>
+        <pid_file>[%      server.pidfile %]</pid_file>
+        <stderr>[%        server.logfile %]</stderr>
+        <transport>[%     server.transport %]</transport>
+        <serialization>[% server.serialization %]</serialization>
+        <service>[%       server.service %]</service>
+    </server>
+    <i18n>
+        <locale_directory>[% i18n.localedir %]</locale_directory>
+        <default_language>[% i18n.defaultlanguage %]</default_language>
+    </i18n>
+
+    [% IF deployment.xmlstyle == 'multi-file' %]
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="token.xml"/>
+    [% ELSIF deployment.xmlstyle == 'all-in-one' %]
+      [% INCLUDE database.xml FILTER indent(4) %]
+      [% INCLUDE token.xml    FILTER indent(4) %]
+    [% ELSE %]
+      [% THROW configerror 'Invalid XML output style specification (deployment.xmlstyle)' %]
+    [% END %]
+  </common>
+
+  [% IF deployment.xmlstyle == 'multi-file' %]
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="auth.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="acl.xml"/>
+  [% ELSIF deployment.xmlstyle == 'all-in-one' %]
+    [% INCLUDE auth.xml  FILTER indent(2) %]
+    [% INCLUDE acl.xml   FILTER indent(2) %]
+  [% END %]
+
+
+[% FOREACH realmsection = global.pkirealm %]
+  <pki_realm name="[% $realmsection.name %]">
+    <common id="default">
+      <!-- default token (used for general crypto operations not requiring
+           private key operations) -->
+      <token super="common/token_config/token{default}"/>
+
+      [% IF deployment.xmlstyle == 'multi-file' %]
+      <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="profile.xml"/>
+      [% ELSIF deployment.xmlstyle == 'all-in-one' %]
+        [% INCLUDE profile.xml FILTER indent(6) %]
+      [% END %]
+    </common>
+
+    <!-- Issuing CAs defined for this realm -->
+    <!-- 'id' is the internal CA identifier -->
+    [% FOREACH ca = $realmsection.issuingca %]
+    <ca id="[% ca %]">
+      <token super="common/token_config/token{ca1}"/>
+    </ca>
+    [% END %]
+  </pki_realm>
+
+[% END %]
+
+</openxpki>
