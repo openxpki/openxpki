@@ -122,6 +122,7 @@ sub process_template {
     my %options = (    
 	PRE_CHOMP => 1, # remove whitespace before directives
 	RELATIVE => 1,
+	ABSOLUTE => 1,
 	);
 
     if (exists $params->{INCLUDE} && (ref $params->{INCLUDE} eq 'ARRAY')) {

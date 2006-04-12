@@ -7,8 +7,61 @@
 # $Revision: 80 $
 #
 
+SYSCONFDIR="[% dir.sysconfdir %]"
+CFG="[% dir.bindir %]/openxpki-metaconf --config $SYSCONFDIR/openxpki.conf"
+TEMPLATEDIR="$SYSCONFDIR/templates"
+TEMPLATE="default"
+
+
+
+reconfigure() {
+    # interactively create initial configuration
+    $CFG --includesection file,database,deployment --interactive --force --writecfg $SYSCONFDIR/openxpki.conf
+}
+
+write_config() {
+    echo
+    echo "Creating configuration files in $SYSCONFDIR"
+    for xmlfile in $* ; do
+	basename=`basename $xmlfile`
+	echo -n "$basename... "
+	$CFG --file $xmlfile --force --dstdir $SYSCONFDIR
+	if [ $? = 0 ] ; then
+	    echo "done"
+	else
+	    echo "FAILED"
+	    echo "*** Configuration incomplete (and probably broken)."
+	    echo "*** Please correct the problem and repeat."
+	    exit 1
+	fi
+    done
+}
+
+
+###########################################################################
 echo
 echo "OpenXPKI Configuration Script"
 echo "Copyright (c) 2006 by The OpenXPKI Project"
 echo
+
+reconfigure
+
+XMLSTYLE="`$CFG --getcfg deployment.xmlstyle `"
+
+case $XMLSTYLE in
+    multi-file)
+	echo "Creating configuration (multiple XML files)..."
+	FILES="`ls $TEMPLATEDIR/$TEMPLATE/*.xml`"
+	;;
+    all-in-one)
+	echo "Creating configuration (single XML file)..."
+	FILES=$TEMPLATEDIR/$TEMPLATE/config.xml
+	;;
+    *)
+	echo "Illegal deployment mode $XMLSTYLE"
+	exit 1
+	;;
+esac
+
+write_config $FILES
 
