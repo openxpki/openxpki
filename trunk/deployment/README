@@ -1,0 +1,56 @@
+Written 2006 by Martin Bartosch
+
+Base configuration
+==================
+(install paths, database etc.)
+
+> ./configure
+
+This will ask the user for the install path, daemon user and
+database settings. It creates an adapted configuration file
+openxpki.conf and the installation Makefile in the current
+directory. Implemented.
+
+Installation
+============
+
+> make install
+
+This installs the required shell scripts (daemon start script
+and config helper), the initial openxpki.conf and the XML
+configuration templates to the configured directories.
+Implemented.
+
+Configuration
+=============
+
+> cd ...etc/openxpki
+> ./openxpki-configure
+
+This step will ask the user for PKI details, such as the number
+and names of the PKI realms to configure, CA setup, profile etc.
+It writes the configuration changes to
+...etc/openxpki/openxpki.conf and creates the XML configuration
+files from the settings that were entered.
+
+From this on the user can decide how to go from there:
+
+1) Inexperienced users or those who are willing to use a
+   simplified configuration can continue to use the meta-
+   configuration in openxpki.conf, apply changes there and
+   generates the XML files from the templates. The XML
+   configuration files will be overwritten by this procedure.
+
+   In this case the user will usually:
+
+   > cd .../etc/openxpki
+   > ./openxpki-configure
+   > openxpkictl reload
+
+2) "Power users" will probably choose not to use the meta-
+   configuration and modify the XML files directly:
+
+   > cd .../etc/openxpki
+   > rm -f openxpki.conf openxpki-configure
+   > vi config.xml token.xml ...
+   > openxpkictl reload
