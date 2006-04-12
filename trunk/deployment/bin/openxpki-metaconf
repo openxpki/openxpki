@@ -164,6 +164,8 @@ use Config::Std;
 use Smart::Comments;
 
 my $have_io_prompt = 1;
+my $data_offset;
+
 eval {
     require IO::Prompt;
     import IO::Prompt;
@@ -172,8 +174,38 @@ if ($EVAL_ERROR) {
     $have_io_prompt = 0;
 }
 
-
 ###########################################################################
+
+# returns array reference
+sub get_sections {
+    my @sections;
+    seek DATA, ($data_offset ||= tell DATA), 0;
+
+    my $entry;
+  DATA:
+    while (my $line = <DATA>) {
+	chomp $line;
+	last DATA if ($line eq '__END__');
+	next DATA if ($line =~ m{ \A \s* \# }xms);
+	
+	# we assume that the DATA section contains a SECTION and an ECHO
+	# statement
+	if (defined $entry->{section} && defined $entry->{description}) {
+	    push @sections, $entry;
+	    $entry = {};
+	}
+	
+	if ($line =~ m{ \A SECTION: \s* (\S+) }xms) {
+	    $entry->{section} = $1;
+	    next DATA;
+	}
+	if ($line =~ m{ \A ECHO: \s* (.*) }xms) {
+	    $entry->{description} = $1;
+	    next DATA;
+	}
+    }
+    return \@sections;
+}
 
 # interactive configuration
 sub query_config {
@@ -197,8 +229,6 @@ sub query_config {
     print "(You will be able to repeat the configuration procedure with your changed\n";
     print "settings if you made a mistake.)\n";
     
-    my $data_offset;
-
     my $config_ok = 0;
     my $validator;
     while (! $config_ok) {
@@ -286,8 +316,7 @@ sub query_config {
 	$config_ok = prompt("Everything OK ('n' to repeat)? (y/n) ", -yes_no);
     }
 
-    
-    return prompt("Write modified config? (Y/N) ", -Yes_No);
+    return 1;
 }
 
 
@@ -305,6 +334,7 @@ GetOptions(\%params,
               interactive
               includesection=s@
               excludesection=s@
+              sectionsmenu
               dstdir|destdir=s
               file=s@
               includedir|include=s@
@@ -397,20 +427,51 @@ if ($params{interactive}) {
     }
     
     die "File $params{writecfg} already exists. Stopped" if (-e $params{writecfg} && (! defined $params{force}));
-    if (query_config(
+
+    if (! defined $params{sectionsmenu}) {
+	# sequential configuration
+	query_config(
 	    {
 		RAWCONFIG => $rawconfig,
 		SECTIONS  => \%active_sections,
-	    },
-	)) {
-
-	$config = OpenXPKI::Deployment::flatten_config($rawconfig);
+	    });
 	
+    } else {
+	# show a main menu and let the user select the sections
+	my $sections = get_sections();
+
+	my @menu;
+	my %section_map;
+	foreach my $entry (@{$sections}) {
+	    if (defined $active_sections{$entry->{section}}) {
+		push @menu, $entry->{description};
+		$section_map{$entry->{description}} = $entry->{section};
+	    }
+	}
+	push @menu, "Exit";
+
+      SECTIONMENU:
+	while (1) {
+	    prompt("Select section to configure", -menu => \@menu);
+	    last SECTIONMENU if ($_ eq "Exit");
+
+	    query_config(
+		{
+		    RAWCONFIG => $rawconfig,
+		    SECTIONS  => { $section_map{$_} => 1 },
+		});
+	    
+	}
+    }
+
+    $config = OpenXPKI::Deployment::flatten_config($rawconfig);
+    if (prompt("Write modified config? (Y/N) ", -Yes_No)) {
 	write_config($rawconfig => $params{writecfg});
     } else {
 	warn "Aborted configuration (unchanged)";
 	exit 0;
     }
+
 } else {
     # non-interactive use
     $config = OpenXPKI::Deployment::flatten_config($rawconfig);
