@@ -56,12 +56,13 @@ sub new
     });
     $self->redirect_stderr();
 
-    ### getting pki_realm...
-    my $pki_realm    = $self->get_pki_realms(CONFIG => $xml_config,
-					     CRYPTO => $crypto_layer);
-
     ### getting logger...
     my $log          = $self->get_log(CONFIG => $xml_config);
+
+    ### getting pki_realm...
+    my $pki_realm    = $self->get_pki_realms(CONFIG => $xml_config,
+					     CRYPTO => $crypto_layer,
+					     LOG    => $log);
 
     ### getting backend database...
     my $dbi_backend  = $self->get_dbi(CONFIG => $xml_config,
@@ -177,6 +178,11 @@ sub get_pki_realms
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_INIT_PKI_REALMS_LAYER_MISSING_CRYPTO");
     }
+    if (not $keys->{LOG})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_PKI_REALMS_LAYER_MISSING_LOG");
+    }
 
     ### get all PKI realms
 
@@ -276,6 +282,7 @@ sub get_pki_realms
 	    XPATH   => ['pki_realm', 'ca'],
 	    COUNTER => [$i]);
 
+      ISSUINGCA:
 	for (my $jj = 0; $jj < $nr_of_ca_entries; $jj++) {
 	    my $ca_id = $keys->{CONFIG}->get_xpath(
 		XPATH =>   ['pki_realm', 'ca', 'id'],
@@ -300,8 +307,6 @@ sub get_pki_realms
 					    ID        => $ca_id,
 					    PKI_REALM => $name);
 	    
-	    $realms{$name}->{ca}->{id}->{$ca_id}->{crypto} = $token;
-
 	    # attach CA certificate
 	    my $cacertfile = $token->get_certfile();
 
@@ -315,35 +320,72 @@ sub get_pki_realms
 		    },
 		    );
 	    }
-		
-	    my $cacertdata = OpenXPKI->read_file($cacertfile);
-	    if (! defined $cacertdata) {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_NO_CA_CERT",
-		    params  => {
-			PKI_REALM => $name,
-			CA_ID     => $ca_id,
-			CA_CERT_FILE => $cacertfile,
-		    },
-		    );
+
+
+	    my $cacertdata;
+	    eval {
+		$cacertdata = OpenXPKI->read_file($cacertfile);
+	    };
+	    if (my $exc = OpenXPKI::Exception->caught()) {
+		# ignore exception for missing 'notbefore' entry
+		if ($exc->message() 
+		    eq "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST") {
+		    $keys->{LOG}->log(
+			MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for ca '$ca_id' (PKI realm $name)",
+			PRIORITY => "warn",
+			FACILITY => "system");
+
+		    $keys->{LOG}->log(
+			MESSAGE  => "Issuing CA $ca_id (PKI realm $name) is unavailable",
+			PRIORITY => "warn",
+			FACILITY => "monitor");
+		    
+		    next ISSUINGCA;
+		}
+		else
+		{
+		    $exc->rethrow();
+		}
+	    } elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
+		$EVAL_ERROR->rethrow();
 	    }
 
 	    
+	    if (! defined $cacertdata) {
+		$keys->{LOG}->log(
+		    MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for ca '$ca_id' (PKI realm $name)",
+		    PRIORITY => "warn",
+		    FACILITY => "system");
+		
+		$keys->{LOG}->log(
+		    MESSAGE  => "Issuing CA $ca_id (PKI realm $name) is unavailable",
+		    PRIORITY => "warn",
+		    FACILITY => "monitor");
+		
+		next ISSUINGCA;
+	    }
+
 	    my $cacert
 		= OpenXPKI::Crypto::X509->new(TOKEN => $defaulttoken,
 					      DATA  => $cacertdata);
 	    
 	    if (! defined $cacert) {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_CA_CERT_PARSING_ERROR",
-		    params  => {
-			PKI_REALM => $name,
-			CA_ID     => $ca_id,
-			CA_CERT_FILE => $cacertfile,
-		    },
-		    );
+		$keys->{LOG}->log(
+		    MESSAGE  => "Could not parse issuing CA certificate '$cacertfile' for ca '$ca_id' (PKI realm $name)",
+		    PRIORITY => "warn",
+		    FACILITY => "system");
+		
+		$keys->{LOG}->log(
+		    MESSAGE  => "Issuing CA $ca_id (PKI realm $name) is unavailable",
+		    PRIORITY => "warn",
+		    FACILITY => "monitor");
+		
+		next ISSUINGCA;
 	    }
-	    
+
+
+	    $realms{$name}->{ca}->{id}->{$ca_id}->{crypto} = $token;
+
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{cacert} = $cacert;
 
 	    # for convenience and quicker accesss
@@ -432,9 +474,10 @@ sub get_dbi
                             COUNTER  => [ $k, 0 ]);
         next if ($vendor_name ne $params{TYPE});
         $vendor_number = $k;
-        $vendor_envs = $config->get_xpath_count (
-                            XPATH    => [ 'common/database/environment/vendor', 'option' ],
-                            COUNTER  => [ $k ]);
+        eval { $vendor_envs = $config->get_xpath_count (
+		   XPATH    => [ 'common/database/environment/vendor', 'option' ],
+		   COUNTER  => [ $k ]);
+	};
     }
 
     ## load environment

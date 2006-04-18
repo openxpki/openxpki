@@ -82,11 +82,11 @@ sub log
 
     $facility = lc($keys->{FACILITY})
         if (exists $keys->{FACILITY} and
-            $keys->{FACILITY} =~ /^(auth|audit|monitor|system)$/);
+            $keys->{FACILITY} =~ m{ \A (?:auth|audit|monitor|system) \z }xms);
 
     $prio = uc($keys->{PRIORITY})
         if (exists $keys->{PRIORITY} and
-            $keys->{PRIORITY} =~ /^(debug|info|warn|error|fatal)$/);
+            $keys->{PRIORITY} =~ m{ \A (?:debug|info|warn|error|fatal) \z }xms);
 
     if (exists $keys->{MESSAGE} and length ($keys->{MESSAGE}))
     {

@@ -256,6 +256,14 @@ sub __get_server_config
 
     ## check daemon user
 
+    foreach my $param (qw( user group port pid_file )) {
+	if (! defined $params{$param} || $params{$param} eq "") {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_CONFIG_MISSING_PARAMETER",
+		params  => {"PARAMETER" => $param});
+	}
+    }
+
     my ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
         $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
         getpwnam ($params{"user"});
@@ -277,7 +285,7 @@ sub __get_server_config
         getgrnam ($params{"group"});
 
     ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
-        getgrgid ($params{"group"});
+        getgrgid ($params{"group"}) if (! $gr_name);
 
     if (! defined $gr_name || ($gr_name eq ""))
     {
