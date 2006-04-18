@@ -2,11 +2,11 @@
   <common>
     <log_config>[% server.logconfig %]</log_config>
     <server>
-        <user>[%          server.user %]</user>
-        <group>[%         server.group %]</group>
+        <user>[%          server.runuser %]</user>
+        <group>[%         server.rungroup %]</group>
         <socket_file>[%   server.socketfile %]</socket_file>
         <pid_file>[%      server.pidfile %]</pid_file>
-        <stderr>[%        server.logfile %]</stderr>
+        <stderr>[%        server.stderrfile %]</stderr>
         <transport>[%     server.transport %]</transport>
         <serialization>[% server.serialization %]</serialization>
         <service>[%       server.service %]</service>
@@ -27,14 +27,6 @@
     [% END %]
   </common>
 
-  [% IF deployment.xmlstyle == 'multi-file' %]
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="auth.xml"/>
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="acl.xml"/>
-  [% ELSIF deployment.xmlstyle == 'all-in-one' %]
-    [% INCLUDE auth.xml  FILTER indent(2) %]
-    [% INCLUDE acl.xml   FILTER indent(2) %]
-  [% END %]
-
 
 [% FOREACH realmsection = global.pkirealm %]
   <pki_realm name="[% $realmsection.name %]">
@@ -53,9 +45,19 @@
     <!-- Issuing CAs defined for this realm -->
     <!-- 'id' is the internal CA identifier -->
     [% FOREACH ca = $realmsection.issuingca %]
-    <ca id="[% ca %]">
-      <token super="common/token_config/token{ca1}"/>
+    [% THROW config "No 'id' defined for issuing CA $ca" IF ! $ca.id.defined %]
+    <ca id="[% $ca.id %]">
+      <token super="common/token_config/token{[% $ca.id %]}"/>
     </ca>
+    [% END %]
+
+
+    [% IF deployment.xmlstyle == 'multi-file' %]
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="auth.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="acl.xml"/>
+    [% ELSIF deployment.xmlstyle == 'all-in-one' %]
+      [% INCLUDE auth.xml  FILTER indent(4) %]
+      [% INCLUDE acl.xml   FILTER indent(4) %]
     [% END %]
   </pki_realm>
 

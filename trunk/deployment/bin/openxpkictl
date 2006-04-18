@@ -27,6 +27,10 @@ GetOptions(\%params,
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
+if (scalar @ARGV == 0) {
+    print "Usage: openxpkictl [OPTIONS] start|stop\n";
+    exit 0;
+}
 
 if (defined $params{debug}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = 100;
@@ -36,9 +40,12 @@ if (defined $params{cfg}) {
     $configfile = $params{cfg};
 }
 
+
 while (my $cmd = shift) {
     if ($cmd eq 'start') {
-	OpenXPKI::Server->new ("CONFIG" => $configfile);
+	if (! OpenXPKI::Server->new ("CONFIG" => $configfile)) {
+	    die "Could not start OpenXPKI Server daemon. Stopped.";
+	}
     }
 }
 
@@ -53,6 +60,11 @@ openxpkictl [options] COMMAND
    --help           brief help message
    --man            full documentation
    --config FILE    use configuration from FILE
+
+ Commands:
+   start            Start OpenXPKI daemon
+   stop             Stop OpenXPKI daemon
+
 
 =head1 OPTIONS
 
@@ -79,6 +91,10 @@ Read configuration file FILE. Uses built-in default if not specified.
 =item B<start>
 
 Starts the OpenXPKI daemon.
+
+=item B<stop>
+
+Stops the OpenXPKI daemon.
 
 =back
 

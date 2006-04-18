@@ -52,8 +52,6 @@ CFG           = bin/openxpki-metaconf
 INSTALL       = /usr/bin/install
 CONFIGFILE    = etc/openxpki.conf
 
-XMLCONFIG     = config.xml database.xml acl.xml auth.xml token.xml profile.xml
-
 ###########################################################################
 # no user serviceable parts below this line
 
@@ -101,7 +99,7 @@ installetc:
 	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(SYSCONFDIR)/templates
 	@( cd etc && for template in templates/* ; do \
 		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(SYSCONFDIR)/$$template || exit 1 ;\
-		for file in $$template/*.xml ; do \
+		for file in $$template/*.xml $$template/*.conf ; do \
 			$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file $(INSTALLPREFIX)$(SYSCONFDIR)/$$template/`basename $$file` || exit 1 ; \
 		done ; \
 	done )

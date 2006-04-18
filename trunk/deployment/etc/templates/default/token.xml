@@ -13,30 +13,35 @@
 	<engine>OpenSSL</engine>
 
 	<!-- OpenSSL binary location -->
-        <!-- <shell>/usr/local/ssl/bin/openssl</shell> -->
-        <!-- <shell>/usr/bin/openssl</shell> -->
-        <shell>/opt/local/bin/openssl</shell>
+        <shell>[% file.openssl %]</shell>
 
 	<!-- OpenSSL binary call gets wrapped with this command -->
         <wrapper></wrapper>
 
 	<!-- random file to use for OpenSSL        -->
         <!-- <randfile>t/25_crypto/rand</randfile> -->
-        <randfile>t/25_crypto/rand</randfile>
+        <randfile>[% dir.openxpkistatedir %]/rand</randfile>
 
 	<!-- debugging: 0 (off), 1 (on) -->
 	<debug>0</debug>
     </token>
 
-    <token id="ca1" super="../token{default}">
+[% FOREACH realmsection = global.pkirealm %]
+
+    [% FOREACH ca = $realmsection.issuingca %]
+    
+    [% THROW config "No 'id' defined for issuing CA $ca" IF ! $ca.id.defined %]
+    [% THROW config "No 'dir' defined for issuing CA $ca" IF ! $ca.dir.defined %]
+
+    <token id="[% $ca.id %]" super="../token{default}">
         <!-- CA key (PEM encoded) -->
-        <key>t/25_crypto/ca1/cakey.pem</key>
+        <key>[% $ca.dir %]/cakey.pem</key>
 
 	<!-- CA certificate, must be in PEM format -->
-        <cert>t/25_crypto/ca1/cacert.pem</cert>
+        <cert>[% $ca.dir %]/cacert.pem</cert>
 
 	<!-- CA certificate chain for crypto operations -->
-	<internal_chain>t/25_crypto/ca1/cacert.pem</internal_chain>
+	<internal_chain>[% $ca.dir %]/cachain.pem</internal_chain>
 
 	<!-- Number of CA passphrase fragments -->
         <passwd_parts>1</passwd_parts>
@@ -44,22 +49,7 @@
 	<!-- CA passphrase -->
         <passwd>1234567890</passwd>
     </token>
-
-    <token id="ca2" super="../token{default}">
-        <!-- CA key (PEM encoded) -->
-        <key>t/25_crypto/ca2/cakey.pem</key>
-
-	<!-- CA certificate, must be in PEM format -->
-        <cert>t/25_crypto/ca2/cacert.pem</cert>
-
-	<!-- CA certificate chain for crypto operations -->
-	<internal_chain>t/25_crypto/ca2/cacert.pem</internal_chain>
-
-	<!-- Number of CA passphrase fragments -->
-        <passwd_parts>1</passwd_parts>
-
-	<!-- CA passphrase -->
-        <passwd>1234567890</passwd>
-    </token>
+    [% END %]
+[% END %]
 
 </token_config>

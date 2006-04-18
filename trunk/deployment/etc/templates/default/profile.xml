@@ -11,12 +11,13 @@
       </extensions>
     </profile>
 
-    <profile id="INTERNAL_CA_1"
+[% FOREACH realmsection = global.pkirealm %]
+    [% FOREACH ca = $realmsection.issuingca %]
+    [% THROW config "No 'id' defined for issuing CA $ca" IF ! $ca.id.defined %]
+    <profile id="[% $ca.id %]"
 	     super="../profile{default}"/>
-
-    <profile id="INTERNAL_CA_2"
-	     super="../profile{default}"/>
-
+    [% END %]
+[% END %]
   </crl>
 
   <!-- profile configuration for the generation of CA certificates -->
@@ -88,16 +89,17 @@
       </extensions>
     </profile>
 
-    <profile id="INTERNAL_CA_1"
+[% FOREACH realmsection = global.pkirealm %]
+    [% FOREACH ca = $realmsection.issuingca %]
+    [% THROW config "No 'id' defined for issuing CA $ca" IF ! $ca.id.defined %]
+    <profile id="[% $ca.id %]"
 	     super="../profile{default}">
-      <validity>
+      <!-- <validity>
 	<notbefore format="relativedate">-01</notbefore>
-      </validity>
+      </validity> -->
     </profile>
-    
-    <profile id="INTERNAL_CA_2"
-	     super="../profile{default}"/>
-    
+    [% END %]
+[% END %]
   </selfsignedca>
 
 

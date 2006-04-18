@@ -1,4 +1,10 @@
-Written 2006 by Martin Bartosch
+
+OpenXPKI Installation documentation
+
+Written by Martin Bartosch for the OpenXPKI project 2006
+Copyright (c) 2006 by The OpenXPKI Project
+
+
 
 Base configuration
 ==================
@@ -9,7 +15,7 @@ Base configuration
 This will ask the user for the install path, daemon user and
 database settings. It creates an adapted configuration file
 openxpki.conf and the installation Makefile in the current
-directory. Implemented.
+directory.
 
 Installation
 ============
@@ -45,7 +51,7 @@ From this on the user can decide how to go from there:
 
    > cd .../etc/openxpki
    > ./openxpki-configure
-   > openxpkictl reload
+   > openxpkictl restart
 
 2) "Power users" will probably choose not to use the meta-
    configuration and modify the XML files directly:
@@ -53,4 +59,4 @@ From this on the user can decide how to go from there:
    > cd .../etc/openxpki
    > rm -f openxpki.conf openxpki-configure
    > vi config.xml token.xml ...
-   > openxpkictl reload
+   > openxpkictl restart

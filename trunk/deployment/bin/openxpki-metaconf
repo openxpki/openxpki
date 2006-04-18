@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# OpenXPKI Deployment Package
+# OpenXPKI Meta Configuration Tool
 #
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
@@ -154,14 +154,12 @@ package main;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-#use OpenXPKI::Deployment;
-
 use Pod::Usage;
 use Getopt::Long;
 use File::Spec;
 use Config::Std;
 
-use Smart::Comments;
+#use Smart::Comments;
 
 my $have_io_prompt = 1;
 my $data_offset;
@@ -265,46 +263,113 @@ sub query_config {
 		next DATA;
 	    }
 
-	    my $input_ok = 0;
-	  PROMPT:
-	    while (! $input_ok) {
-		my ($key) = ($line =~ m{ \A \s* (.*) }xms);
-		my $text = $key;
-		if ($key =~ m{ \A (.*?):\s*(.*) }xms) {
-		    ($key, $text) = ($1, $2);
+	    my ($key) = ($line =~ m{ \A \s* (.*) }xms);
+	    my $text = $key;
+	    if ($key =~ m{ \A (.*?):\s*(.*) }xms) {
+		($key, $text) = ($1, $2);
+	    }
+	    
+	    my $multivalue = 0;
+	    if ($key =~ s{ \@ \z}{}xms) {
+		$multivalue = 1;
+	    }
+
+	    # useless...?
+	    if (! defined $config->{$section}->{$key}) {
+		#warn "Section $section, key $key does not exist in configuration.";
+	    }
+
+	    my @values;
+	    if (ref $config->{$section}->{$key} eq 'ARRAY') {
+		$multivalue = 1;
+		@values = @{$config->{$section}->{$key}};
+	    } else {
+		@values = ( $config->{$section}->{$key} );
+	    }
+	    
+	    my $prompt = $text || $key;
+
+	    if ($multivalue) {
+		print "> NOTE: This is a multi-valued setting with the following current values:\n";
+		foreach my $entry (@values) {
+		    print "> $entry\n";
 		}
-		
-		my $prompt = $text || $key;
-		my @default;
-		
-		if (! defined $config->{$section}->{$key}) {
-		    #warn "Section $section, key $key does not exist in configuration.";
-		} else {
-		    @default = (-default => $config->{$section}->{$key});
-		}
+		print "> To delete an existing entry: enter '*DELETE'\n";
+		# print "> To stop entering values:     enter '*DONE'\n";
+	    }
+	    
+	    # each configentry...
+	    my $configentry_finished = 0;
+	    # ... can have one or more values which may be ok or not
+	    my $value_ok = 0;
+	    my $entry_index = 0;
+	  VALUE:
+	    while(! $configentry_finished) {
+		my @default = ();
+		if (defined $values[$entry_index]) {
+		    @default = (-default => $values[$entry_index]);
+		};
 		
 		if (prompt("$prompt: ", 
 			   @default,
 		    )) {
-
-		    $input_ok = 1;
+		    
+		    $value_ok = 1;
 		    if (defined $validator) {
 			if (! eval $validator) {
 			    # validation failed
-			    $input_ok = 0;
+			    $value_ok = 0;
 			    print "ERROR: Value not acceptable\n";
-			    next PROMPT;
+				next VALUE;
 			}
 			$validator = undef;
 		    }
-
-		    if (exists $config->{$section}->{$key} ||
-			($_ ne "")) {
-			$config->{$section}->{$key} = $_;
+		    ### $_
+		    if ($_ ne "") {
+			if ($_ eq '*DELETE') {
+			    splice(@values, $entry_index, 1);
+			} elsif ($_ eq '*DONE') {
+			    ## splice...
+			    splice(@values, $entry_index);
+			    ## @values
+			    ## $entry_index
+			    $configentry_finished = 1;
+			} else {
+			    $values[$entry_index] = $_;
+			}
 		    }
 		}
+		## @values
+		
+		if (! $multivalue) {
+		    $configentry_finished = 1;
+		}
+
+		$entry_index++;
+
+		if ($entry_index > scalar(@values)) {
+#		    $entry_index = 0;
+#		    print "> Restarting multi-value query, enter '*DONE' do leave\n";
+		    $configentry_finished = 1;
+		}
+
 	    }
+
+	    ### finally...
+	    ### @values
+	    # propagate changes to configuration
+	    if (scalar @values <= 1) {
+		if (defined $values[0]) {
+		    $config->{$section}->{$key} = $values[0];
+		} else {
+		    $config->{$section}->{$key} = '';
+		}
+	    } else {
+		$config->{$section}->{$key} = \@values;
+	    }
+
 	}
+
 
 	if ($oneshot) {
 	    $config_ok = 1;
@@ -484,7 +549,7 @@ if ($params{interactive}) {
     $config = OpenXPKI::Deployment::flatten_config($rawconfig);
     
     if ($params{writecfg}) {
-	die "File $params{writecfg} already exists. Stopped" if (-e $params{writecfg});
+	die "File $params{writecfg} already exists. Stopped" if (-e $params{writecfg} && (! defined $params{force}));
 	write_config($rawconfig => $params{writecfg});
     }
 }
@@ -589,7 +654,7 @@ ECHO: Database setup
   VALIDATE: m{ \A \d+ \z }xms
   server_shift: Server shift (must be the same for all nodes)
   VALIDATE: m{ \A (?:SQLite|Oracle|DB2|mysql|Pg) }xms
-  type: Database type (SQLite, DB2, Oracle, MySQL, Pg)
+  type: Database type (SQLite, DB2, Oracle, mysql, Pg)
   name: Database name
   host
   port
@@ -601,8 +666,13 @@ ECHO: Database setup
 SECTION: deployment
 ECHO: Deployment options
 
-  VALIDATE: m{ \A (?:all-in-one|multi-file) }xms
+  VALIDATE: m{ \A (?:all-in-one|multi-file) \z }xms
   xmlstyle: XML Configuration style (all-in-one or multi-file)
+
+SECTION: global
+ECHO: Global configuration
+  pkirealm@: PKI Realms (symbolic keyword for any PKI Realm to be enabled)
+  
 
 __END__
 
