@@ -6,10 +6,13 @@
         <group>root</group>
         <socket_file>t/socket</socket_file>
         <pid_file>t/pid</pid_file>
+        <session_dir>t/50_auth</session_dir>
+        <session_lifetime>1200</session_lifetime> <!-- 20 minutes -->
         <stderr>t/stderr.log</stderr>
         <transport>Simple</transport>
         <serialization>Simple</serialization>
         <service>Test</service>
+        <service>Default</service>
     </server>
     <i18n>
         <locale_directory>t</locale_directory>

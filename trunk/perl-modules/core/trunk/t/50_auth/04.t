@@ -43,7 +43,14 @@ my $gui = OpenXPKI::Service::Test->new({
 ok(OpenXPKI::Server::Context::setcontext ({"service" => $gui}));
 
 ## perform authentication
-ok($auth->login ());
+eval {$auth->login ()};
+if ($EVAL_ERROR)
+{
+    print STDERR "\$auth->login() failed: ${EVAL_ERROR}\n";
+    ok(0);
+} else {
+    ok(1);
+}
 
 ## check session
 ok($session->is_valid());

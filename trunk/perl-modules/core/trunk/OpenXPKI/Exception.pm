@@ -20,7 +20,7 @@ use Exception::Class (
     }
 );
 
-use OpenXPKI qw( i18nGettext );
+use OpenXPKI;
 
 sub full_message
 {
@@ -47,7 +47,7 @@ sub full_message
     }
 
     ## put together and translate message
-    my $msg = i18nGettext ($self->{message}, %{$self->{params}});
+    my $msg = OpenXPKI::i18nGettext ($self->{message}, %{$self->{params}});
     if ($msg eq $self->{message})
     {
         $msg = join ", ", ($msg, %{$self->{params}});

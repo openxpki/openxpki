@@ -127,6 +127,8 @@ OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 OpenXPKI/Transport/Simple.pm
 OpenXPKI/Serialization/Simple.pm
 OpenXPKI/Service/Test.pm
+OpenXPKI/Service/Default.pm
+OpenXPKI/Client/CLI.pm
 
 ## test stuff
 
@@ -232,13 +234,19 @@ t/65_ui/20_serialization_simple.t
 t/70_server/startup.pl
 t/70_server/01.t
 
+t/80_client/01.t
+t/80_client/cli.conf
+t/80_client/cli.pl
+
 t/00_cleanup/25_crypto.t
 t/00_cleanup/28_log.t
 t/00_cleanup/30_dbi.t
 t/00_cleanup/65_ui.t
+t/00_cleanup/80_client.t
 t/99_cleanup/25_crypto.t
 t/99_cleanup/28_log.t
 t/99_cleanup/30_dbi.t
 t/99_cleanup/65_ui.t
+t/99_cleanup/80_client.t
 
 META.yml                                 Module meta-data (added by MakeMaker)

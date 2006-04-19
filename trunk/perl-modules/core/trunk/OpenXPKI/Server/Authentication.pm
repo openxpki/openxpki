@@ -104,11 +104,14 @@ sub __load_stack
     ## load stack name (this is what the user will see)
 
     my $stack = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'stack', 'name'],
-                                          COUNTER => [$realm_pos, 0, $stack_pos, 0]);
+                                              COUNTER => [$realm_pos, 0, $stack_pos, 0]);
+    my $desc  = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'stack', 'description'],
+                                              COUNTER => [$realm_pos, 0, $stack_pos, 0]);
 
     ## determine all used handlers
 
-    $self->{PKI_REALM}->{$realm}->{STACK}->{$stack} =
+    $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION} = $desc;
+    $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER} =
         CTX('xml_config')->get_xpath_list (XPATH   => ['pki_realm', 'auth', 'stack', 'handler'],
                                        COUNTER => [$realm_pos, 0, $stack_pos]);
     return 1;
@@ -159,10 +162,20 @@ sub login
 
     CTX('session')->start_authentication();
 
+    ##! 2: "get PKI realm"
     my $realm = CTX('session')->get_pki_realm();
-    my $stack = CTX('service')->get_authentication_stack ({
-                    STACKS => {%{$self->{PKI_REALM}->{$realm}->{STACK}}}
-                                                      });
+
+    ##! 2: "get authentication stack"
+    my %stacks = ();
+    foreach my $stack (sort keys %{$self->{PKI_REALM}->{$realm}->{STACK}})
+    {
+        $stacks{$stack}->{NAME}        = $stack;
+        $stacks{$stack}->{DESCRIPTION} = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION};
+    }
+    my $stack = CTX('service')->get_authentication_stack (
+                {
+                    STACKS => \%stacks
+                });
 
     if (not $stack)
     {
@@ -170,7 +183,7 @@ sub login
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_NO_STACK_PRESENT");
     }
     if (not exists $self->{PKI_REALM}->{$realm}->{STACK}->{$stack} or
-        not scalar @{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}})
+        not scalar @{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK",
@@ -178,7 +191,7 @@ sub login
     }
 
     my $ok = 0;
-    foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}})
+    foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}})
     {
         ##! 4: "handler $handler from stack $stack"
         my $ref = $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler};
@@ -207,8 +220,10 @@ sub login
     }
     if (not $ok)
     {
+        ## show at minimum the last error message
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED");
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
+            child   => $EVAL_ERROR);
     }
 
     return 1;

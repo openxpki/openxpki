@@ -27,6 +27,7 @@ sub new {
     bless $self, $class;
 
     my $keys = shift;
+
     if (exists $keys->{LIFETIME} and $keys->{LIFETIME} > 0)
     {
         $self->{LIFETIME} = $keys->{LIFETIME};
@@ -36,15 +37,20 @@ sub new {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME");
     }
-    if (exists $keys->{DIRECTORY} and -d $keys->{DIRECTORY})
-    {
-        $self->{DIRECTORY} = $keys->{DIRECTORY};
-    }
-    else
+
+    if (not exists $keys->{DIRECTORY})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_DIRECTORY");
     }
+    if (not -d $keys->{DIRECTORY})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_SESSION_NEW_DIRECTORY_DOES_NOT_EXIST",
+            params  => {DIRECTORY => $keys->{DIRECTORY}});
+    }
+    $self->{DIRECTORY} = $keys->{DIRECTORY};
+
     if (exists $keys->{ID})
     {
         $self->{ID} = $keys->{ID};
@@ -179,6 +185,19 @@ sub get_pki_realm
 {
     my $self = shift;
     return $self->{session}->param ("pki_realm");
+}
+
+sub set_language
+{
+    my $self = shift;
+    $self->{session}->param ("language" => shift);
+    $self->{session}->flush();
+}
+
+sub get_language
+{
+    my $self = shift;
+    return $self->{session}->param ("language");
 }
 
 sub get_id

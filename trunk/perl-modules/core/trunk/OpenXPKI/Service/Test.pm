@@ -57,7 +57,8 @@ sub get_passwd_login
     ##! 1: "start"
     my $name = shift;
     ##! 2: "handler $name"
-    return ($self->{LOGIN}, $self->{PASSWD});
+    return {LOGIN  => $self->{LOGIN},
+            PASSWD => $self->{PASSWD}};
 }
 
 1;

@@ -67,6 +67,8 @@ sub new
 
 sub process_request
 {
+    print STDERR "Do you know what's going on?\n";
+    ##! 2: "start"
     my $self = shift;
 
     my $log = CTX('log');
@@ -74,8 +76,8 @@ sub process_request
     ## recover from umask of Net::Server->run
     umask $self->{umask};
 
-    ## magic transport protocol detector
-    my $transport = undef
+    ##! 2: "transport protocol detector"
+    my $transport = undef;
     my $line      = "";
     while (not $transport)
     {
@@ -105,13 +107,13 @@ sub process_request
         }
     }
 
-    ## serialization protocol detector
+    ##! 2: "serialization protocol detector"
     my $serializer = undef;
     my $msg = $transport->read();
-    if ($msg eq "simple\n")
+    if ($msg eq "simple")
     {
         $serializer = OpenXPKI::Serialization::Simple->new ();
-        $transport->write ("OK\n");
+        $transport->write ("OK");
     }
     else
     {
@@ -122,7 +124,7 @@ sub process_request
             return;
     }
 
-    ## service detector
+    ##! 2: "service detector"
     my $data = $serializer->deserialize ($transport->read());
     if ($data eq "default")
     {
@@ -146,7 +148,7 @@ sub process_request
     }
     CTX('service')->init();
 
-    ## update pre-initialized variables
+    ##! 2: "update pre-initialized variables"
 
     eval { CTX('dbi_backend')->connect() };
     if ($EVAL_ERROR)

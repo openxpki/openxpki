@@ -31,6 +31,13 @@ sub new {
 
     my $config = CTX('xml_config');
 
+    ##! 2: "load name and description for handler"
+
+    $self->{DESC} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "description" ],
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+    $self->{NAME} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "name" ],
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+
     ## load user database
 
     my $count = $config->get_xpath_count (XPATH   => [@{$keys->{XPATH}}, "user"],
@@ -69,7 +76,10 @@ sub login
     my $name = shift;
     my $gui  = CTX('service');
 
-    my ($account, $passwd) = $gui->get_passwd_login ($name);
+    my $answer = $gui->get_passwd_login ({
+                     NAME        => $self->{NAME},
+                     DESCRIPTION => $self->{DESC}});
+    my ($account, $passwd) = ($answer->{LOGIN}, $answer->{PASSWD});
 
     ##! 2: "credentials ... present"
     ##! 2: "account ... $account"

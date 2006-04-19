@@ -7,21 +7,21 @@ use Test;
 
 use OpenXPKI;
 
-BEGIN { plan tests => 3 };
+BEGIN { plan tests => 2 };
 
 print STDERR "BASE FUNCTIONS: LANGUAGE HANDLING\n";
 
+## WARNING: get_language is only implemented in the session class
+
 my $language;
-ok(OpenXPKI::get_language(), "", "Incorrect default language settings");
+#ok(OpenXPKI::get_language(), "", "Incorrect default language settings");
 
 $language = "C";
-OpenXPKI::set_language($language);
-ok(OpenXPKI::get_language(), $language, "Language settings lost");
+ok(OpenXPKI::set_language($language));
+#ok(OpenXPKI::get_language(), $language, "Language settings lost");
 
 $language = "de-de";
-OpenXPKI::set_language($language);
-ok(OpenXPKI::get_language(), $language, "Language settings lost");
-
-
+ok(OpenXPKI::set_language($language));
+#ok(OpenXPKI::get_language(), $language, "Language settings lost");
 
 1;

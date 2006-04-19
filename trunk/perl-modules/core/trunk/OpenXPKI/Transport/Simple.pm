@@ -23,17 +23,17 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that;
 
-    my $self = {
-                "STDIN"  => *STDIN,
-                "STDOUT" => *STDOUT
-               };
+    my $self = {};
 
     bless $self, $class;
+    ##! 1: "initializing simple transport layer ..."
 
     my $keys = shift;
     $self->{INFILE}  = $keys->{INFILE}  if (exists $keys->{INFILE});
     $self->{OUTFILE} = $keys->{OUTFILE} if (exists $keys->{OUTFILE});
+    $self->{SOCKET}  = $keys->{SOCKET}  if (exists $keys->{SOCKET});
 
+    ##! 1: "transport layer successfully initialized"
     return $self;
 }
 
@@ -46,36 +46,21 @@ sub write
 {
     my $self = shift;
     my $data = shift;
+    ##! 1: "start"
 
-    ## open file for writing if necessary
-
-    if (exists $self->{OUTFILE} and
-        (
-         not delete $self->{STDOUT} or
-         not open $self->{STDOUT}, ">".$self->{OUTFILE}
-        )
-       )
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_NEW_OPEN_OUTFILE_FAILED",
-            params  => {OUTFILE => $self->{OUTFILE}}
-        );
-    }
-
-    ## send message
+    ##! 2: "send message"
 
     my @list = ();
 
     for (my $i=0; $i < length($data)/$MAX_MSG_LENGTH-1;$i++)
     {
+        ##! 4: "sending intermediate message"
         my $msg = substr ($data, 0, $MAX_MSG_LENGTH);
-        print {$self->{STDOUT}} "type::=intermediate\n".
-                                "length::=".length($msg)."\n";
-        print {$self->{STDOUT}} $msg;
-        $self->{STDOUT}->flush();
-        ## FIXME: we must flush the file descriptor ?!
+        $self->__send ("type::=intermediate\n".
+                       "length::=".length($msg)."\n".
+                       $msg);
         my $ok;
-        read {$self->{STDIN}}, $ok, 3;
+        $ok = $self->__receive (3);
         if ($ok ne "OK\n")
         {
             OpenXPKI::Exception->throw (
@@ -84,37 +69,29 @@ sub write
         }
         $data = substr ($data, $MAX_MSG_LENGTH);
     }
-    print {$self->{STDOUT}} "type::=last\n".
-                            "length::=".length($data)."\n";
-    print {$self->{STDOUT}} $data;
+    ##! 4: "sending last message"
+    my $msg = "type::=last\n".
+              "length::=".length($data)."\n".
+              $data;
+    $self->__send ($msg);
 
-    ## close file to flush data
+    if ($self->{STDOUT})
+    {
+        ##! 8: "close file"
+        CORE::close $self->{STDOUT};
+        delete $self->{STDOUT};
+    }
 
-    CORE::close $self->{STDOUT} if (exists $self->{OUTFILE});
-
+    ##! 1: "end"
     return 1;
 }
 
 sub read
 {
     my $self = shift;
+    ##! 1: "start"
 
-    ## open file to read new data if nessary
-
-    if (exists $self->{INFILE} and
-        (
-         not delete $self->{STDIN} or
-         not open $self->{STDIN}, "<".$self->{INFILE}
-        )
-       )
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_NEW_OPEN_INFILE_FAILED",
-            params  => {INFILE => $self->{INFILE}}
-        );
-    }
-
-    ## read new message
+    ##! 2: "read new message"
 
     my $type = "intermediate";
     my $msg = "";
@@ -125,43 +102,39 @@ sub read
         my $tmp    = "";
         my $length = 8;
 
-        ## read type line
+        ##! 4: "read type line"
 
         ## read until "type::=_"
-        if (not read $self->{STDIN}, $tmp, 8)
-        {
-            # connection closed
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION");
-        }
+        $tmp = $self->__receive (8);
+        ##! 4: "type line: $tmp"
         if (substr ($tmp, 7, 1) eq "i")
         {
-            # intermediate message part
+            ##! 8: "intermediate message part"
             $length = 12;
         }
         elsif (substr ($tmp, 7, 1) eq "l")
         {
-            # last message part
+            ##! 8: "last message part"
             $type   = "last"; 
             $length = 4;
         }
         else
         {
-            # illegal type
+            ##! 8: "illegal type"
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_WRONG_MESSAGE_TYPE");
         }
-        read $self->{STDIN}, $tmp, $length;
+        $tmp = $self->__receive ($length);
 
-        ## read length line
+        ##! 4: "read length line"
 
         ## read until "length::="
-        read $self->{STDIN}, $tmp, 9;
+        $tmp = $self->__receive (9);
         $line   = "";
         $length = 1;
         while ($length == 1)
         {
-            read $self->{STDIN}, $tmp, 1;
+            $tmp = $self->__receive (1);
             if ($tmp =~ /^[0-9]$/)
             {
                 $line .= $tmp;
@@ -171,26 +144,108 @@ sub read
             }
         }
         $length = $line;
+        ##! 4: "length: $length"
 
         my $mesg = "";
-        while (length ($mesg) < $length and read ($self->{STDIN}, $tmp, $length - length($mesg)))
+        while (length ($mesg) < $length)
         {
-            $mesg .= $tmp;
+            $mesg .= $self->__receive ($length - length($mesg));
         }
+        ##! 4: "$type message: $mesg"
 
         if (length($mesg) < $length)
         {
+            ## should never be reached
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_DAMAGED_MESSAGE");
         }
 
         $msg .= $mesg;
     }
+    ##! 2: "message read successfully - $msg"
 
-    ## close file if necessary
+    if ($self->{STDOUT})
+    {
+        ##! 8: "close file"
+        CORE::close $self->{STDIN};
+        delete $self->{STDIN};
+    }
 
-    CORE::close $self->{STDIN} if (exists $self->{INFILE});
+    return $msg;
+}
 
+sub __send
+{
+    my $self = shift;
+    my $msg  = shift;
+
+    if (exists $self->{OUTFILE})
+    {
+        ##! 8: "open file for writing"
+        if (not exists $self->{STDOUT} and
+            not open $self->{STDOUT}, ">".$self->{OUTFILE})
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_NEW_OPEN_OUTFILE_FAILED",
+                params  => {OUTFILE => $self->{OUTFILE}}
+            );
+        }
+        print {$self->{STDOUT}} $msg;
+    }
+    elsif (exists $self->{SOCKET})
+    {
+        ##! 8: "using socket to write some data"
+        send ($self->{SOCKET},$msg,0);
+        ## $self->{SOCKET}->flush();
+    }
+    else
+    {
+        ##! 8: "print message via STDOUT"
+        print STDOUT $msg;
+        ##! 8: "print completed"
+    }
+    ##! 4: "wrote message - $msg"
+    return 1;
+}
+
+sub __receive
+{
+    my $self   = shift;
+    my $length = shift;
+    my $msg    = "";
+    ##! 4: "start"
+
+    if (exists $self->{INFILE})
+    {
+        ##! 8: "using infile to read some data"
+        if (not exists $self->{STDIN} and
+            not open $self->{STDIN}, "<".$self->{INFILE})
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_NEW_OPEN_INFILE_FAILED",
+                params  => {INFILE => $self->{INFILE}}
+            );
+        }
+        $length = CORE::read $self->{STDIN}, $msg, $length;
+    }
+    elsif (exists $self->{SOCKET})
+    {
+        ##! 8: "using socket to read some data"
+        $length = CORE::read $self->{SOCKET}, $msg, $length;
+    }
+    else
+    {
+        ##! 8: "read via STDIN"
+        $length = CORE::read STDIN, $msg, $length;
+        ##! 8: "read $length bytes - $msg"
+    }
+    if (not $length)
+    {
+        ##! 8: "connection closed"
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION");
+    }
+    ##! 4: "read message - $msg"
     return $msg;
 }
 
