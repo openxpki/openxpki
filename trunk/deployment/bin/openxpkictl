@@ -7,16 +7,31 @@
 
 use strict;
 use warnings;
+use English;
 use Getopt::Long;
 use Pod::Usage;
 
+# use Smart::Comments;
+
 use OpenXPKI::Debug;
+use OpenXPKI::XML::Config;
 require OpenXPKI::Server;
 
-my $configfile = "[% dir.sysconfdir %]/config.xml";
+sub slurp {
+    my $filename = shift;
+
+    my $content = do {
+	open my $HANDLE, "<", $filename;
+	local $INPUT_RECORD_SEPARATOR;
+	<$HANDLE>;
+    };
+    return $content;
+}
+
+
+my $configfile = '[% dir.sysconfdir %]/config.xml';
 
 my %params;
-
 GetOptions(\%params,
 	   qw(
 	      help|?
@@ -27,7 +42,7 @@ GetOptions(\%params,
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
-if (scalar @ARGV == 0) {
+if (scalar @ARGV != 1) {
     print "Usage: openxpkictl [OPTIONS] start|stop\n";
     exit 0;
 }
@@ -40,15 +55,70 @@ if (defined $params{cfg}) {
     $configfile = $params{cfg};
 }
 
+my $config = OpenXPKI::XML::Config->new(CONFIG => $configfile);
 
-while (my $cmd = shift) {
-    if ($cmd eq 'start') {
-	if (! OpenXPKI::Server->new ("CONFIG" => $configfile)) {
-	    die "Could not start OpenXPKI Server daemon. Stopped.";
-	}
-    }
+if (! defined $config) {
+    print STDERR "ERROR: Could not read configuration file $configfile.";
+    exit 1;
 }
 
+my $pidfile;
+eval {
+    $pidfile = $config->get_xpath (
+	XPATH   => ["common", "server", "pid_file"],
+	COUNTER => [0, 0, 0],
+	);
+};
+if ($EVAL_ERROR)
+{
+    print "ERROR: Could not determine PID file from configuration: " . $EVAL_ERROR->as_string() . "\n";
+    exit 1;
+}
+
+### $pidfile
+
+my $pid;
+if (-r $pidfile) {
+    $pid = slurp($pidfile);
+    chomp $pid;
+}
+
+my $cmd = shift;
+if ($cmd eq 'start') {
+    if (defined $pid && kill(0, $pid)) {
+	print STDERR "OpenXPKI Server already running (pid $pid)\n";
+	exit 0;
+    }
+    print "Starting OpenXPKI...\n";
+    if (! OpenXPKI::Server->new ("CONFIG" => $configfile)) {
+	print STDERR "Could not start OpenXPKI Server daemon.\n";
+	exit 1;
+    }
+}
+if ($cmd eq 'stop') {
+    if (! defined $pid || (kill(0, $pid) == 0)) {
+	print STDERR "OpenXPKI Server is not running.\n";
+	exit 0;
+    }
+    print "Stopping OpenXPKI..";
+
+    my @signals = (2, 2, 3, 3, 9);
+  TERMINATE:
+    foreach my $sig (@signals) {
+	print '.';
+	kill($sig, $pid);
+	sleep 1;
+	last TERMINATE if (kill(0, $pid) == 0);
+    }
+    if (kill(0, $pid)) {
+	print " failure.\n";
+	print STDERR "Could not terminate OpenXPKI Server daemon.\n";
+	exit 1;
+    }
+    print " done.\n";
+}
+
+exit 0;
 
 __END__
 
