@@ -3,6 +3,10 @@
 	  path => '/secadvs/index.html' &>">Security Advisories</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas,
           path => '/news/index.html' &>">News</a></div>
+% if ($section eq 'news') {
+        <div class="menu_sub_item"><a href="<& /lib/url.mas, 
+	  path => '/news/roadmap.html' &>">Roadmap/ToDo</a></div>
+% }
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/mirrors/index.html' &>">Mirrors</a></div>
 % if ($section eq 'mirrors') {
