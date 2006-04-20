@@ -28,7 +28,7 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 
 use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Command';
-use OpenXPKI qw(read_file write_file);
+use OpenXPKI qw(read_file write_file get_safe_tmpfile);
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
 use Date::Parse;
@@ -83,34 +83,15 @@ sub get_tmpfile
 {
     my $self = shift;
 
-    my $template = File::Spec->catfile($self->{TMP}, "openxpkiXXXXXX");
-
     if (scalar(@_) == 0) {
-	my ($fh, $filename) = File::Temp::mkstemp($template);
-	if (! $fh) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MAKE_TMPFILE_FAILED",
-		params  => {"FILENAME" => $filename});
-	}
-	close $fh;
-	chmod 0600, $filename;
-	
+        my $filename = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
 	push @{$self->{CLEANUP}->{FILE}}, $filename;
-
 	return $filename;
     }
     else
     {
 	while (my $arg = shift) {
-	    my ($fh, $filename) = File::Temp::mkstemp($template);
-	    if (! $fh) {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MAKE_TMPFILE_FAILED",
-		    params  => {"FILENAME" => $filename});
-	    }
-	    close $fh;
-	    chmod 0600, $filename;
-
+            my $filename = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
 	    $self->set_tmpfile($arg => $filename);
 	}
     }
@@ -282,11 +263,30 @@ sub write_config
 
     my $config = "";
 
+    ## general part
+
+    $config .= "default_ca        = ca\n";
+    if (length ($self->{ENGINE}->get_engine_section()))
+    {
+        $config .= "openssl_conf = openssl_def\n".
+                   "\n".
+                   "[openssl_def]\n".
+                   "\n".
+                   "engines = engine_section\n".
+                   "\n".
+                   "[engine_section]\n".
+                   "\n".
+                   $self->{ENGINE}->get_engine()."=engine_config\n".
+                   "\n".
+                   "[engine_config]\n".
+                   "\n".
+                   $self->{ENGINE}->get_engine_section()."\n";
+    }
+
     ## CA/REQ/DEFAULT section
 
-    ## $config .= "[ ca ]\n";
+    $config .= "[ ca ]\n";
 
-    $config .= "default_ca        = \n";
     $config .= "new_certs_dir     = ".$self->{TMP}."\n";
     $config .= "certificate       = ".$self->{ENGINE}->get_certfile()."\n";
     $config .= "private_key       = ".$self->{KEYFILE}."\n";

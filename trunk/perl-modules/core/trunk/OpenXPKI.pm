@@ -25,7 +25,8 @@ use Locale::Messages qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
 use Fcntl qw (:DEFAULT);
 
-# use Smart::Comments;
+use File::Spec;
+use File::Temp;
 
 our $language = "";
 our $locale_prefix = "";
@@ -33,7 +34,7 @@ our $locale_prefix = "";
 use vars qw (@ISA @EXPORT_OK);
 require Exporter;
 @ISA = qw (Exporter);
-@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language read_file write_file convert_date);
+@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language read_file write_file convert_date get_safe_tmpfile);
 
 sub set_locale_prefix
 {
@@ -220,7 +221,43 @@ sub write_file
     return 1;
 }
 
+sub get_safe_tmpfile
+{
+    ##! 1: "start"
+    my $self = shift;
+    my $keys = shift;
 
+    ##! 2: "check TMP"
+    if (not exists $keys->{TMP})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_GET_SAFE_TMPFILE_MISSING_TMP");
+    }
+    if (not -d $keys->{TMP})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST",
+            params => {DIR => $keys->{TMP}});
+    }
+
+    ##! 2: "build template"
+    my $template = File::Spec->catfile($keys->{TMP}, "openxpkiXXXXXX");
+
+    ##! 2: "build tmp file"
+    my ($fh, $filename) = File::Temp::mkstemp($template);
+    if (! $fh) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_GET_SAFE_TMPFILE_MAKE_FAILED",
+            params  => {"FILENAME" => $filename});
+    }
+    close $fh;
+
+    ##! 2: "fix mode"
+    chmod 0600, $filename;
+
+    ##! 1: "end: $filename"
+    return $filename;
+}
 
 1;
 
@@ -317,4 +354,8 @@ the specified file.
 
 Example: $self->write_file (FILENAME => $filename, CONTENT => $data, FORCE => 1);
 
+=head2 get_safe_tmpfile
 
+Example: my $file = $self->get_tmpfile ({TMP => "/tmp"});
+
+This method creates a safe temporary file and return the filename.

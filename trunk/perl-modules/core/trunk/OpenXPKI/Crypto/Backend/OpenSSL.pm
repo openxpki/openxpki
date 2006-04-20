@@ -9,7 +9,7 @@ use utf8; ## pack/unpack is too slow
 
 package OpenXPKI::Crypto::Backend::OpenSSL;
 
-use OpenXPKI::Crypto::Backend::OpenSSL::Shell;
+use OpenXPKI::Crypto::Backend::OpenSSL::CLI;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -101,7 +101,8 @@ sub __load_config
                         engine     shell         wrapper 
                         randfile
                         key        cert          internal_chain
-                        passwd     passwd_parts 
+                        passwd     passwd_parts
+                        engine_section 
                        )) {
 
 	my $attribute_count;
@@ -160,6 +161,7 @@ sub __load_config
 
 sub __init_engine
 {
+    ##! 8: "start"
     my $self = shift;
     my $keys = shift;
 
@@ -188,11 +190,14 @@ sub __init_engine
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     }
+
+    ##! 8: "end"
     return 1;
 }
 
 sub __init_shell
 {
+    ##! 8: "start"
     my $self = shift;
 
     if (not -x $self->{PARAMS}->{SHELL})
@@ -211,20 +216,23 @@ sub __init_shell
 
     eval
     {
-        $self->{SHELL} = OpenXPKI::Crypto::Backend::OpenSSL::Shell->new (
+        $self->{CLI} = OpenXPKI::Crypto::Backend::OpenSSL::CLI->new
+                         ({
                              ENGINE => $self->{ENGINE},
                              SHELL  => $self->{SHELL},
-                             TMP    => $self->{TMP});
+                             TMP    => $self->{TMP}
+                         });
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_SHELL_FAILED",
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_CLI_FAILED",
             child   => $exc);
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     }
 
+    ##! 8: "end"
     return 1;
 }
 
@@ -248,6 +256,7 @@ sub __init_command
 
 sub command
 {
+    ##! 1: "start"
     my $self = shift;
     my $keys = shift;
 
@@ -256,21 +265,15 @@ sub command
     ##! 2: "Command: $cmd"
 
     my $ret = eval
+    ##! 2: "FIXME: do we need an eval here?"
     {
         my $cmdref = $cmd->new (%{$self->{COMMAND_PARAMS}}, %{$keys},
                                 ENGINE => $self);
         my $cmds = $cmdref->get_command();
 
-        $self->{SHELL}->start();
-        $self->{SHELL}->init_engine($self->{ENGINE}) if ($self->{ENGINE}->get_engine());
-        $self->{SHELL}->run_cmd (
-	    {
-		COMMANDS => $cmds,
-		CMDREF   => $cmdref,
-	    }
-	    );
-        $self->{SHELL}->stop();
-        my $result = $self->{SHELL}->get_result();
+        $self->{CLI}->prepare ({COMMAND => $cmds});
+        $self->{CLI}->execute ();
+        my $result = $self->{CLI}->get_result();
         $result = $cmdref->get_result ($result);
 
         if ($cmdref->hide_output())
@@ -285,7 +288,7 @@ sub command
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        $self->{SHELL}->stop(); ## this is safe
+        $self->{CLI}->cleanup(); ## this is safe
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_FAILED",
             params  => {"COMMAND" => $cmd},
@@ -293,6 +296,7 @@ sub command
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     } else {
+        ##! 4: "end"
         return $ret;
     }
 }
@@ -451,6 +455,7 @@ sub AUTOLOAD {
         $AUTOLOAD eq "get_certfile" or
         $AUTOLOAD eq "get_chainfile" or
         $AUTOLOAD eq "get_engine" or
+        $AUTOLOAD eq "get_engine_section" or
         $AUTOLOAD eq "get_keyform" or
         $AUTOLOAD eq "get_passwd")
     {

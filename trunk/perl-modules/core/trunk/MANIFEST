@@ -35,7 +35,7 @@ OpenXPKI/Crypto/Profile/CRL.pm
 ## OpenSSL layer
 
 OpenXPKI/Crypto/Backend/OpenSSL.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Shell.pm
+OpenXPKI/Crypto/Backend/OpenSSL/CLI.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/OpenSSL.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command.pm

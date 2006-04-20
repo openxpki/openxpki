@@ -95,6 +95,20 @@ sub get_engine
     return "";
 }
 
+sub get_engine_section
+{
+    my $self = shift;
+
+    if (length ($self->get_engine()) and
+        exists $self->{ENGINE_SECTION} and
+        length ($self->{ENGINE_SECTION}))
+    {
+        return $self->{ENGINE_SECTION};
+    } else {
+        return "";
+    }
+}
+
 sub get_keyfile
 {
     my $self = shift;
@@ -215,6 +229,11 @@ returns true if a dynamic OpenSSL engine is used.
 
 returns the used OpenSSL engine or the empty string if no engine
 is used.
+
+=head2 get_engine_section
+
+returns the OpenSSL engine section from the configuration or the empty string if no engine
+is used or the engine section is empty.
 
 =head2 get_keyfile
 
