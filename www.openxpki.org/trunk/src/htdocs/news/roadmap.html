@@ -23,7 +23,7 @@
           <dd>New performance neutral debugging technology integrated</dd>
           <dt>2006-Mar</dt>
           <dd>CA rollover usable</dd>
-          <dd>User interface splitted into three levels -
+          <dd>User interface split into three layers -
             transport, serialization and the service itself</dd>
           <dt>2006-Feb</dt>
           <dd>First version of the cryptographic backend available</dd>
@@ -35,7 +35,7 @@
           <dd>Published  Archtiecture Whitepaper</dd>
         </dl>
 
-        <h2>ToDo</h2>
+        <h2>Current actions/ToDo</h2>
         <p>
           The roadmap is only a very rough description of the
           next steps. Here you can find more detailed informations
@@ -46,8 +46,25 @@
             options - engine_usage and key_store</li>
           <li>Rewrite the OpenSSL shell usage and move it towards
             a normal CLI usage - use OpenSSL's engine section</li>
-          <li>Implement the first real workflow</li>
+          <li>System bootstrap workflows (database init etc.) (Martin Bartosch)</li>
+          <li>Basic PKI workflows (request, issuance, CRL issuance) (Martin Bartosch)</li>
           <li>Shibboleth support</li>
-          <li>Web Interface</li>
-          <li>SCEP Interface</li>
+          <li>Command line client (Martin Bartosch)</li>
+          <li>Web Interface: Mason (Martin Bartosch)</li>
+          <li>SCEP Interface (Martin Bartosch)</li>
         </ul>
+
+        <h2>Wishlist/Sometimes maybe</h2>
+	<p>
+	  These topics might be addressed in the future.
+	</p>
+        <ul>
+          <li>Native XS implementation of Certificate Issuance (instead of
+	    using the OpenSSL command line interface).</li>
+          <li>Workflow configuration history (pending workflow instances 
+	    remember the configuration that was active when the WF instance was 
+	    created).</li>
+          <li>Cron-like time based event trigger (either integrated in the server or triggered by the CLI client)</li>
+	  <li>Packaging for various Unix platforms</li>
+	</ul>
+	    
