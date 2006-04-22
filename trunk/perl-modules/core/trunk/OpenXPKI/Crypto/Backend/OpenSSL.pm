@@ -1,5 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL
 ## Written 2005 by Michael Bell for the OpenXPKI project
+## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 	
@@ -102,7 +103,8 @@ sub __load_config
                         randfile
                         key        cert          internal_chain
                         passwd     passwd_parts
-                        engine_section 
+                        engine_section
+                        key_store  engine_usage
                        )) {
 
 	my $attribute_count;
@@ -190,6 +192,10 @@ sub __init_engine
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     }
+    $self->{ENGINE_USAGE} = $self->{PARAMS}->{ENGINE_USAGE};
+    $self->{KEY_STORE} = $self->{PARAMS}->{KEY_STORE};
+    delete $self->{PARAMS}->{ENGINE_USAGE};
+    delete $self->{PARAMS}->{KEY_STORE};
 
     ##! 8: "end"
     return 1;

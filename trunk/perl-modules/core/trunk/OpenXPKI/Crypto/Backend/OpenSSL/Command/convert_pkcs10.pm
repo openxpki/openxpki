@@ -1,5 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs10
-## (C)opyright 2005 Michael Bell
+## Written 2005 by Michael Bell for the OpenXPKI project
+## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -39,6 +41,14 @@ sub get_command
     ## build the command
 
     my $command  = "req";
+
+    ## option '-engine' is needed here for correct req convertion
+    ## in a case when engine introduces new crypto algorithms (like GOST ones),
+    ## which are not available in a classical OpenSSL library
+    $command .= " -engine ".$self->{ENGINE}->get_engine()
+        if ($self->{ENGINE}->get_engine() and
+            ($self->{ENGINE}->{ENGINE_USAGE} =~ /NEW_ALG/i));
+
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -in ".$self->{INFILE};
     if ($self->{OUT} eq "DER")

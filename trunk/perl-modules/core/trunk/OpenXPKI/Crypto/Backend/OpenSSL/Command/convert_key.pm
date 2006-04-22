@@ -1,5 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key
-## (C)opyright 2005 Michael Bell
+## Written 2005 by Michael Bell for the OpenXPKI project
+## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -20,7 +22,13 @@ sub get_command
     $self->{ENC_ALG} = "aes256" if (not exists $self->{ENC_ALG});
 
     my $engine = "";
-       $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
+    if ($self->{ENGINE}->get_engine() and 
+        (($self->{ENGINE}->{ENGINE_USAGE} =~ /NEW_ALG/i) or 
+         ($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i) or 
+         ($self->{ENGINE}->{ENGINE_USAGE} =~ /PRIV_KEY_OPS/i))
+       ) {
+        $engine = $self->{ENGINE}->get_engine();
+    }
 
     $self->get_tmpfile ('KEY', 'OUT');
     $self->write_file (FILENAME => $self->{KEYFILE},
