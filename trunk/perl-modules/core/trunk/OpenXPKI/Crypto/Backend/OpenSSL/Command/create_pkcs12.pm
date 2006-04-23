@@ -1,5 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12
-## (C)opyright 2005 Michael Bell
+## Written 2005 by Michael Bell for the OpenXPKI project
+## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -18,8 +20,10 @@ sub get_command
     $self->get_tmpfile ('KEY', 'CERT', 'CHAIN', 'OUT');
 
     my $engine = "";
-       $engine = $self->{ENGINE}->get_engine()
-           if ($self->{USE_ENGINE} and $self->{ENGINE}->get_engine());
+    $engine = $self->{ENGINE}->get_engine()
+        if ($self->{ENGINE}->get_engine() and                                                  
+            (($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i) or
+             ($self->{ENGINE}->{ENGINE_USAGE} =~ /PRIV_KEY_OPS/i)));
     $self->{PKCS12_PASSWD} = $self->{PASSWD}
         if (not exists $self->{PKCS12_PASSWD});
     $self->{ENC_ALG} = "aes256" if (not exists $self->{ENC_ALG});
@@ -134,7 +138,7 @@ not designed for the tokens themselves.
 
 =item * KEY
 
-=item * USE_ENGINE (optional)
+=item * ENGINE_USAGE
 
 =item * PASSWD
 

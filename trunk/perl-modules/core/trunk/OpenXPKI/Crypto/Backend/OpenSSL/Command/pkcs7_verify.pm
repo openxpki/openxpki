@@ -1,5 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify
-## (C)opyright 2005 Michael Bell
+## Written 2005 by Michael Bell for the OpenXPKI project
+## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -18,8 +20,10 @@ sub get_command
     $self->get_tmpfile ('CONTENT', 'PKCS7', 'OUT');
 
     my $engine = "";
-       $engine = $self->{ENGINE}->get_engine()
-           if ($self->{USE_ENGINE} and $self->{ENGINE}->get_engine());
+    $engine = $self->{ENGINE}->get_engine()
+        if ($self->{ENGINE}->get_engine() and
+            ($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i));
+
     $self->{CHAIN} = $self->{ENGINE}->get_chainfile()
        if (not $self->{CHAIN} and $self->{ENGINE}->get_chainfile());
 
@@ -99,7 +103,7 @@ __END__
 
 =item * PKCS7 (signature which should be verified)
 
-=item * USE_ENGINE (optional)
+=item * ENGINE_USAGE
 
 =item * CHAIN (this must be a single file for security reasons!!!)
 

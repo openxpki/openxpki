@@ -47,7 +47,6 @@ sub sign
     $params{CERT}       = $keys->{CERT}       if (exists $keys->{CERT});
     $params{KEY}        = $keys->{KEY}        if (exists $keys->{KEY});
     $params{PASSWD}     = $keys->{PASSWD}     if (exists $keys->{PASSWD});
-    $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
     $params{ENC_ALG}    = $keys->{ENC_ALG}    if (exists $keys->{ENC_ALG});
     $params{DETACH}     = $keys->{DETACH}     if (exists $keys->{DETACH});
 
@@ -64,7 +63,6 @@ sub verify
     $params{PKCS7}      = $self->{PKCS7};
     $params{CONTENT}    = $self->{CONTENT}    if (exists $self->{CONTENT});
     $params{CHAIN}      = $keys->{CHAIN}      if (exists $keys->{CHAIN});
-    $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
     $params{NO_VERIFY}  = $keys->{NO_VERIFY}  if (exists $keys->{NO_VERIFY});
 
     $self->{SIGNER} = $self->{TOKEN}->command ({COMMAND => "pkcs7_verify", %params});
@@ -79,7 +77,6 @@ sub encrypt
     my %params = ();
     $params{CONTENT}    = $self->{CONTENT};
     $params{CERT}       = $keys->{CERT}       if (exists $keys->{CERT});
-    $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
     $params{ENC_ALG}    = $keys->{ENC_ALG}    if (exists $keys->{ENC_ALG});
 
     $self->{PKCS7} = $self->{TOKEN}->command ({COMMAND => "pkcs7_encrypt", %params});
@@ -96,7 +93,6 @@ sub decrypt
     $params{CERT}       = $keys->{CERT}       if (exists $keys->{CERT});
     $params{KEY}        = $keys->{KEY}        if (exists $keys->{KEY});
     $params{PASSWD}     = $keys->{PASSWD}     if (exists $keys->{PASSWD});
-    $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
 
     $self->{CONTENT} = $self->{TOKEN}->command ({COMMAND => "pkcs7_decrypt", %params});
     return $self->{CONTENT};
@@ -113,7 +109,6 @@ sub get_chain
     my %params = ();
     $params{PKCS7}      = $self->{PKCS7};
     $params{SIGNER}     = $self->{SIGNER};
-    $params{USE_ENGINE} = $keys->{USE_ENGINE} if (exists $keys->{USE_ENGINE});
     $self->{CHAIN} = $self->{TOKEN}->command({COMMAND => "pkcs7_get_chain", %params});
     ## the chain is already sorted
     $self->{CHAIN} = [ split /\n\n/, $self->{CHAIN} ];
@@ -173,8 +168,6 @@ following parameters are supported:
 
 =item * PASSWD (if you do not use the tokens key)
 
-=item * USE_ENGINE (if you do not use the tokens key but you want to use the engine)
-
 =item * ENC_ALG (used encryption algorithm - default is aes256)
 
 =item * DETACH (detach data from signature -default is attached data)
@@ -195,8 +188,6 @@ following parameters are supported:
 
 =item * CHAIN (file with all trusted CAs)
 
-=item * USE_ENGINE (if you want to use the engine of the token)
-
 =item * NO_VERIFY (only check the integrity but not the signer)
 
 =back
@@ -212,8 +203,6 @@ following parameters are supported:
 =over
 
 =item * CERT (if you do not use the tokens key for decryption)
-
-=item * USE_ENGINE (if you do not use the tokens cert but you want to use the engine)
 
 =item * ENC_ALG (used encryption algorithm - default is aes256)
 
@@ -235,8 +224,6 @@ following parameters are supported:
 
 =item * PASSWD (if you do not use the tokens key)
 
-=item * USE_ENGINE (if you do not use the tokens key but you want to use the engine)
-
 =back
 
 The decrypted data will be returned.
@@ -244,14 +231,7 @@ The decrypted data will be returned.
 =head2 get_chain
 
 is used to egt the certificate chain of a signature which was specified during new.
-Nevertheless you can specify some different PKCS7 here too. Additionally the
-following parameters are supported:
-
-=over
-
-=item * USE_ENGINE (if you do not use the tokens key but you want to use the engine)
-
-=back
+Nevertheless you can specify some different PKCS7 here too. 
 
 The chain is cached and returned an ARRAY reference.
 

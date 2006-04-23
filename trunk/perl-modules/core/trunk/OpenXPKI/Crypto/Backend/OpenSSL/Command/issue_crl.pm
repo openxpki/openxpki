@@ -1,5 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl
-## (C)opyright 2005-2006 Michael Bell
+## Written 2005 by Michael Bell for the OpenXPKI project
+## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -35,7 +37,10 @@ sub get_command
     ## normal cert: engine (optional), passwd, key
 
     my ($engine, $keyform, $passwd, $key) = ("", "", undef);
-    $engine  = $self->{ENGINE}->get_engine();
+    $engine  = $self->{ENGINE}->get_engine()
+        if ($self->{ENGINE}->get_engine() and
+            (($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i) or
+             ($self->{ENGINE}->{ENGINE_USAGE} =~ /PRIV_KEY_OPS/i)));
     $keyform = $self->{ENGINE}->get_keyform();
     $passwd  = $self->{ENGINE}->get_passwd();
     $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();

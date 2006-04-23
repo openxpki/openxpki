@@ -1,5 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_sign
-## (C)opyright 2005 Michael Bell
+## Written 2005 by Michael Bell for the OpenXPKI project
+## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -42,7 +44,10 @@ sub get_command
         # prepare parameters
 
         $passwd = $self->{PASSWD};
-        $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
+        $engine = $self->{ENGINE}->get_engine()
+            if ($self->{ENGINE}->get_engine() and
+                (($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i) or
+                 ($self->{ENGINE}->{ENGINE_USAGE} =~ /PRIV_KEY_OPS/i)));
 
         $self->get_tmpfile ('KEY', 'CERT');
         $self->write_file (FILENAME => $self->{KEYFILE},
@@ -136,13 +141,13 @@ only to specify the CONTENT.
 
 If you want to create a normal signature then you must specify at minimum
 a CERT, a KEY and a PASSWD. If you want to use the engine then you must use
-USE_ENGINE too.
+ENGINE_USAGE ::= ALWAYS||PRIV_KEY_OPS too.
 
 =over
 
 =item * CONTENT
 
-=item * USE_ENGINE (optional)
+=item * ENGINE_USAGE
 
 =item * CERT
 

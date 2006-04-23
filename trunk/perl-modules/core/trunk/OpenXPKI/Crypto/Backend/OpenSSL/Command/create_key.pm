@@ -1,6 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key
 ## Written 2005 by Michael Bell for the OpenXPKI project
 ## Rewritten 2006 by Dmitry Belyavsky for the OpenXPKI project 
+## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
@@ -33,7 +34,11 @@ sub get_command
     {
         ## external key generation
         $passwd = $self->{PASSWD};
-        $engine = $self->{ENGINE}->get_engine() if ($self->{USE_ENGINE});
+        $engine = $self->{ENGINE}->get_engine()
+             if ($self->{ENGINE}->get_engine() and
+                 (($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i) or
+                  ($self->{ENGINE}->{ENGINE_USAGE} =~ /PRIV_KEY_OPS/i)));
+
         $self->get_tmpfile ('KEY');
     } else {
         ## token key generation
@@ -130,7 +135,7 @@ only to specify the ENC_ALG and KEY_LENGTH. Perhaps you can specify
 the RANDOM_FILE too.
 
 If you want to create a normal key then you must specify at minimum
-a passwd and perhaps USE_ENGINE if you want to use the engine of the
+a passwd and perhaps ENGINE_USAGE if you want to use the engine of the
 token too.
 
 =over
@@ -145,7 +150,7 @@ token too.
 
 =item * RANDOM_FILE
 
-=item * USE_ENGINE
+=item * ENGINE_USAGE
 
 =item * PASSWD
 

@@ -1,5 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain
-## (C)opyright 2005 Michael Bell
+## Written 2005 by Michael Bell for the OpenXPKI project
+## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
+## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -19,8 +21,9 @@ sub get_command
     $self->get_tmpfile ('PKCS7', 'OUT');
 
     my $engine = "";
-       $engine = $self->{ENGINE}->get_engine()
-           if ($self->{USE_ENGINE} and $self->{ENGINE}->get_engine());
+    $engine = $self->{ENGINE}->get_engine()
+        if ($self->{ENGINE}->get_engine() and
+            ($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i));
 
     ## check parameters
 
@@ -128,7 +131,7 @@ You must specify the SIGNER or the SIGNER_SUBJECT.
 
 =item * PKCS7 (a signature)
 
-=item * USE_ENGINE (optional)
+=item * ENGINE_USAGE
 
 =item * SIGNER (the signer to find the chain's begin)
 
