@@ -33,10 +33,11 @@ sub get_command
     ## normal cert: engine (optional), passwd, key
 
     my ($engine, $keyform, $passwd, $key) = ("", "", undef);
+    my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $engine  = $self->{ENGINE}->get_engine()
         if ($self->{ENGINE}->get_engine() and
-            (($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i) or
-             ($self->{ENGINE}->{ENGINE_USAGE} =~ /PRIV_KEY_OPS/i)));
+            (($engine_usage =~ /ALWAYS/i) or
+             ($engine_usage =~ /PRIV_KEY_OPS/i)));
     $keyform = $self->{ENGINE}->get_keyform();
     $passwd  = $self->{ENGINE}->get_passwd();
     $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();

@@ -45,9 +45,10 @@ sub get_command
     ## option '-engine' is needed here for correct cert convertion 
     ## in a case when engine introduces new crypto algorithms (like GOST ones), 
     ## which are not available in a classical OpenSSL library 
+    my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $command .= " -engine ".$self->{ENGINE}->get_engine()
         if ($self->{ENGINE}->get_engine() and
-            ($self->{ENGINE}->{ENGINE_USAGE} =~ /NEW_ALG/i));
+            ($engine_usage =~ /NEW_ALG/i));
 
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -in ".$self->{INFILE};

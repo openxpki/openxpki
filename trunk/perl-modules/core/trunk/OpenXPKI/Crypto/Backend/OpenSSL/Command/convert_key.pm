@@ -22,10 +22,11 @@ sub get_command
     $self->{ENC_ALG} = "aes256" if (not exists $self->{ENC_ALG});
 
     my $engine = "";
+    my $engine_usage = $self->{ENGINE}->get_engine_usage();
     if ($self->{ENGINE}->get_engine() and 
-        (($self->{ENGINE}->{ENGINE_USAGE} =~ /NEW_ALG/i) or 
-         ($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i) or 
-         ($self->{ENGINE}->{ENGINE_USAGE} =~ /PRIV_KEY_OPS/i))
+        (($engine_usage =~ /NEW_ALG/i) or 
+         ($engine_usage =~ /ALWAYS/i) or 
+         ($engine_usage =~ /PRIV_KEY_OPS/i))
        ) {
         $engine = $self->{ENGINE}->get_engine();
     }

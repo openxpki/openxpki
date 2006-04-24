@@ -55,10 +55,11 @@ sub get_command
 
         # prepare parameters
         $passwd = $self->{PASSWD};
+        my $engine_usage = $self->{ENGINE}->get_engine_usage();
         $engine = $self->{ENGINE}->get_engine()
-        if ($self->{ENGINE}->get_engine() and
-            (($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i) or
-             ($self->{ENGINE}->{ENGINE_USAGE} =~ /PRIV_KEY_OPS/i)));
+            if ($self->{ENGINE}->get_engine() and
+                (($engine_usage =~ /ALWAYS/i) or
+                 ($engine_usage =~ /PRIV_KEY_OPS/i)));
 
         $self->get_tmpfile ('KEY', 'OUT');
         $self->write_file (FILENAME => $self->{KEYFILE},

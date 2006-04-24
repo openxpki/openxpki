@@ -21,9 +21,10 @@ sub get_command
     $self->get_tmpfile ('PKCS7', 'OUT');
 
     my $engine = "";
+    my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $engine = $self->{ENGINE}->get_engine()
         if ($self->{ENGINE}->get_engine() and
-            ($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i));
+            ($engine_usage =~ /ALWAYS/i));
 
     ## check parameters
 

@@ -462,6 +462,7 @@ sub AUTOLOAD {
         $AUTOLOAD eq "get_chainfile" or
         $AUTOLOAD eq "get_engine" or
         $AUTOLOAD eq "get_engine_section" or
+        $AUTOLOAD eq "get_engine_usage" or
         $AUTOLOAD eq "get_keyform" or
         $AUTOLOAD eq "get_passwd")
     {

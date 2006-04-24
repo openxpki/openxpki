@@ -31,6 +31,8 @@ sub new {
                         PASSWD_PARTS
                         CERT
                         INTERNAL_CHAIN
+                        ENGINE_SECTION
+                        ENGINE_USAGE
                        }) {
 
 	if (exists $keys->{$key}) {
@@ -104,6 +106,20 @@ sub get_engine_section
         length ($self->{ENGINE_SECTION}))
     {
         return $self->{ENGINE_SECTION};
+    } else {
+        return "";
+    }
+}
+
+sub get_engine_usage
+{
+    my $self = shift;
+
+    if (length ($self->get_engine()) and
+        exists $self->{ENGINE_USAGE} and
+        length ($self->{ENGINE_USAGE}))
+    {
+        return $self->{ENGINE_USAGE};
     } else {
         return "";
     }
@@ -234,6 +250,11 @@ is used.
 
 returns the OpenSSL engine section from the configuration or the empty string if no engine
 is used or the engine section is empty.
+
+=head2 get_engine_usage
+ 
+returns the OpenSSL engine_usage section from the configuration or the empty string if no engine
+is used or the engine_usage section is empty.
 
 =head2 get_keyfile
 

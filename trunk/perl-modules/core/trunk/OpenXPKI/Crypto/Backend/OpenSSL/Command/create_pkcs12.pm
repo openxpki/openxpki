@@ -20,10 +20,11 @@ sub get_command
     $self->get_tmpfile ('KEY', 'CERT', 'CHAIN', 'OUT');
 
     my $engine = "";
+    my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $engine = $self->{ENGINE}->get_engine()
         if ($self->{ENGINE}->get_engine() and                                                  
-            (($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i) or
-             ($self->{ENGINE}->{ENGINE_USAGE} =~ /PRIV_KEY_OPS/i)));
+            (($engine_usage =~ /ALWAYS/i) or
+             ($engine_usage =~ /PRIV_KEY_OPS/i)));
     $self->{PKCS12_PASSWD} = $self->{PASSWD}
         if (not exists $self->{PKCS12_PASSWD});
     $self->{ENC_ALG} = "aes256" if (not exists $self->{ENC_ALG});

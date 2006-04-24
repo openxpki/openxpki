@@ -29,13 +29,14 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RANDOM_MISSING_LENGTH");
     }
-
+    
+    my $engine_usage = $self->{ENGINE}->get_engine_usage();
     my $command = "";
     $command .= "rand -base64";
     $command .= " -engine ".$self->{ENGINE}->get_engine()
         if ($self->{ENGINE}->get_engine() and
-            (($self->{ENGINE}->{ENGINE_USAGE} =~ /ALWAYS/i) or
-             ($self->{ENGINE}->{ENGINE_USAGE} =~ /RANDOM/i)));
+            (($engine_usage =~ /ALWAYS/i) or
+             ($engine_usage =~ /RANDOM/i)));
     $command .= " $length";
 
     return [ $command ];
