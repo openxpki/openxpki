@@ -126,6 +126,7 @@ OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm
 OpenXPKI/Serialization/Simple.pm
+OpenXPKI/Serialization/JSON.pm
 OpenXPKI/Service/Test.pm
 OpenXPKI/Service/Default.pm
 OpenXPKI/Client/CLI.pm
@@ -230,6 +231,7 @@ t/60_workflow/common.pl
 
 t/65_ui/10_transport_simple.t
 t/65_ui/20_serialization_simple.t
+t/65_ui/21_serialization_json.t
 
 t/70_server/startup.pl
 t/70_server/01.t
