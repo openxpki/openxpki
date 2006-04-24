@@ -15,7 +15,7 @@ print STDERR "OpenXPKI::Server::Context\n";
 ok(1);
 
 ## init XML cache
-ok(OpenXPKI::Server::Init->new ({
+ok(OpenXPKI::Server::Init::init({
        CONFIG => 't/config.xml',
    }));
 

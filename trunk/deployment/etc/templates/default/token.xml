@@ -11,6 +11,9 @@
 
         <!-- possible values are OpenSSL, nCipher, LunaCA -->
 	<engine>OpenSSL</engine>
+        <engine_section></engine_section>
+        <key_store>OPENXPKI</key_store>
+        <engine_usage></engine_usage>
 
 	<!-- OpenSSL binary location -->
         <shell>[% file.openssl %]</shell>

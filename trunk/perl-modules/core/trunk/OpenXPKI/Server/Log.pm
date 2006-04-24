@@ -16,6 +16,9 @@ use Log::Log4perl;
 use Log::Log4perl::Level;
 use OpenXPKI::Server::Log::Appender::DBI;
 
+# cache for package filenames (truncate log entries)
+my %filename_of_package;
+
 sub new {
     my $that = shift;
     my $class = ref($that) || $that;
@@ -96,9 +99,18 @@ sub log
         $msg      = $keys->{MESSAGE};
     }
 
-    ## build and store message
+    # only write the full filename for this module once (don't clobber log
+    # with the same filename over and over again)
+    if (exists $filename_of_package{$package} && ($filename_of_package{$package} eq $filename)) {
+	$filename = undef;
+    } else {
+	# write out the full file name this time, but remember it for the
+	# next message
+	$filename_of_package{$package} = $filename;
+    }
 
-    $msg = "[$package ($filename:$line)] $msg\n";
+    ## build and store message
+    $msg = "[$package (" . (defined $filename ? $filename . ':' : '') . "$line)] $msg\n";
 
     ## get an ID for the message
 

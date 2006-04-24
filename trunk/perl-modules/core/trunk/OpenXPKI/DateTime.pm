@@ -194,7 +194,7 @@ Possible output formats:
 
     my $dt = DateTime->now();
 
-    print OpenXPKI::convert_date({
+    print OpenXPKI::DateTime::convert_date({
         DATE      => $dt,
         OUTFORMAT => 'iso8601',
     });

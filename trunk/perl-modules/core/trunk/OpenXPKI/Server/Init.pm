@@ -29,75 +29,190 @@ use OpenXPKI::Server::Authentication;
 
 use OpenXPKI::Server::Context qw( CTX );
 
-## we operate in static mode
+# define an array of hash refs mapping the task id to the corresponding
+# init code. the order of the array elements is also the default execution
+# order.
+my @init_tasks = qw(
+  xml_config
+  i18n
+  log
+  crypto_layer
+  redirect_stderr
+  pki_realm
+  dbi_backend
+  dbi_workflow
+  acl
+  api
+  authentication
+  server
+);
 
-sub new
-{
-    my $that = shift;
-    my $class = ref($that) || $that;
 
-    my $self = {};
+my %is_initialized = map { $_ => 0 } @init_tasks;
 
-    bless $self, $class;
+sub init {
+    my $keys = shift;
 
-    my $keys         = shift;
+    my @tasks;
 
-    ### getting xml config...
-    my $xml_config = $self->get_xml_config(CONFIG => $keys->{"CONFIG"});
-    $self->init_i18n(CONFIG => $xml_config);
-
-    ### getting crypto layer...
-    my $crypto_layer = $self->get_crypto_layer(CONFIG => $xml_config);
-
-    ### record these for later use...
-    OpenXPKI::Server::Context::setcontext({
-        xml_config   => $xml_config,
-        crypto_layer => $crypto_layer,
-    });
-    $self->redirect_stderr();
-
-    ### getting logger...
-    my $log          = $self->get_log(CONFIG => $xml_config);
-
-    ### getting pki_realm...
-    my $pki_realm    = $self->get_pki_realms(CONFIG => $xml_config,
-					     CRYPTO => $crypto_layer,
-					     LOG    => $log);
-
-    ### getting backend database...
-    my $dbi_backend  = $self->get_dbi(CONFIG => $xml_config,
-				      LOG    => $log);
-
-    ### getting workflow database...
-    my $dbi_workflow = $self->get_dbi(CONFIG => $xml_config,
-				      LOG    => $log);
-
-    OpenXPKI::Server::Context::setcontext({
-        pki_realm      => $pki_realm,
-        log            => $log,
-        dbi_backend    => $dbi_backend,
-        dbi_workflow   => $dbi_workflow,
-        acl            => OpenXPKI::Server::ACL->new(),
-        api            => OpenXPKI::Server::API->new(),
-        authentication => OpenXPKI::Server::Authentication->new (),
-    });
-
-    ## FIXME: why do we need a reference to our daemon?
-    ## FIXME: this sounds like a backdoor for me (bellmich)
-    ## FIXME: nevertheless I'm sure that I introduced  this :(
-    if (exists $keys->{SERVER})
-    {
-        OpenXPKI::Server::Context::setcontext({
-            server         => $keys->{SERVER},
-        });
+    if (defined $keys->{TASKS} && (ref $keys->{TASKS} eq 'ARRAY')) {
+	@tasks = @{$keys->{TASKS}};
+    } else {
+	@tasks = @init_tasks;
     }
 
-    return $self;
+    delete $keys->{TASKS};
+    
+  TASK:
+    foreach my $task (@tasks) {
+	if (! exists $is_initialized{$task}) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
+		params  => {
+		    task => $task,
+		});
+	}
+	next TASK if $is_initialized{$task};
+
+	eval "__do_init_$task(\$keys);";
+	$is_initialized{$task}++;
+
+	if ($is_initialized{'log'}) {
+	    CTX('log')->log(
+		MESSAGE  => "Initialization task '$task' finished",
+		PRIORITY => "info",
+		FACILITY => "system");
+	}
+    }
+    return 1;
 }
+
+sub get_remaining_init_tasks {
+    my @remaining_tasks;
+
+    foreach my $task (@init_tasks) {
+	if (! $is_initialized{$task}) {
+	    push @remaining_tasks, $task;
+	}
+    }
+
+    return @remaining_tasks;
+}
+
+
+
+###########################################################################
+# init functions to be called during init task processing
+sub __do_init_xml_config {
+    my $keys = shift;
+    ### init xml config...
+    my $xml_config = get_xml_config(CONFIG => $keys->{"CONFIG"});
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    xml_config => $xml_config,
+	});
+}
+
+sub __do_init_i18n {
+    ### init i18n...
+    init_i18n(CONFIG => CTX('xml_config'));
+};
+
+sub __do_init_log {
+    ### init log...
+    my $log          = get_log();
+    ### $log
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    log => $log,
+	});
+};
+
+sub __do_init_crypto_layer {
+    ### init crypto...
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    crypto_layer => get_crypto_layer(),
+	});
+};
+
+sub __do_init_redirect_stderr {
+    ### redirect stderr...
+    redirect_stderr();
+};
+
+
+sub __do_init_pki_realm {
+    ### init pki_realm...
+    my $pki_realm    = get_pki_realms();
+    
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    pki_realm => $pki_realm,
+	});
+};
+
+sub __do_init_dbi_backend {
+    ### init backend dbi...
+    my $dbi = get_dbi(CONFIG => CTX('xml_config'),
+		      LOG    => CTX('log'));
+    
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    dbi_backend => $dbi,
+	});
+};
+
+sub __do_init_dbi_workflow {
+    ### init backend dbi...
+    my $dbi = get_dbi(CONFIG => CTX('xml_config'),
+		      LOG    => CTX('log'));
+    
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    dbi_workflow => $dbi,
+	});
+};
+
+sub __do_init_acl {
+    ### init acl...
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    acl => OpenXPKI::Server::ACL->new(),
+	});
+};
+
+sub __do_init_api {
+    ### init api...
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    api => OpenXPKI::Server::API->new(),
+	});
+};
+
+sub __do_init_authentication {
+    ### init authentication...
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    authentication => OpenXPKI::Server::Authentication->new(),
+	});
+};
+
+sub __do_init_server {
+    my $keys = shift;
+    ### init server ref...
+    if (defined $keys->{SERVER}) {
+	OpenXPKI::Server::Context::setcontext(
+	    {
+		server => $keys->{SERVER},
+	    });
+    }
+};
+
+###########################################################################
 
 sub get_xml_config
 {
-    my $self = shift;
     my $keys = { @_ };
 
     ##! 1: "start"
@@ -125,7 +240,6 @@ sub get_xml_config
 
 sub init_i18n
 {
-    my $self = shift;
     my $keys = { @_ };
     ##! 1: "start"
 
@@ -147,75 +261,57 @@ sub init_i18n
 
 sub get_crypto_layer
 {
-    my $self = shift;
-    my $keys = { @_ };
     ##! 1: "start"
 
-    if (not $keys->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_CRYPTO_LAYER_MISSING_CONFIG");
-    }
-
-    return OpenXPKI::Crypto::TokenManager->new ();
+    return OpenXPKI::Crypto::TokenManager->new();
 }
 
 
 
 sub get_pki_realms
 {
-    my $self = shift;
     my $keys = { @_ };
     ##! 1: "start"
 
-    if (not $keys->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_PKI_REALMS_LAYER_MISSING_CONFIG");
-    }
-    if (not $keys->{CRYPTO})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_PKI_REALMS_LAYER_MISSING_CRYPTO");
-    }
-    if (not $keys->{LOG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_PKI_REALMS_LAYER_MISSING_LOG");
-    }
+    my $config = CTX('xml_config');
+    my $log    = CTX('log');
+    my $crypto = CTX('crypto_layer');
+
 
     ### get all PKI realms
-
     my %realms = ();
-    my $count = $keys->{CONFIG}->get_xpath_count (XPATH => "pki_realm");
+    my $count = $config->get_xpath_count (XPATH => "pki_realm");
     for (my $i = 0 ; $i < $count ; $i++)
     {
         ## prepare crypto stuff for every PKI realm
 
-        my $name = $keys->{CONFIG}->get_xpath (
+        my $name = $config->get_xpath (
                        XPATH    => [ 'pki_realm', 'name' ],
                        COUNTER  => [ $i, 0 ]);
 
-	my $defaulttoken = $self->__get_default_crypto_token (
-	    CONFIG => $keys->{CONFIG},
-	    CRYPTO => $keys->{CRYPTO},
-	    PKI_REALM => $name);
+	my $defaulttoken = __get_default_crypto_token (
+	    PKI_REALM => $name
+	    );
 
         $realms{$name}->{crypto}->{default} = $defaulttoken;
-
+	$log->log(
+	    MESSAGE  => "Attached default token for PKI realm '$name'",
+	    PRIORITY => "info",
+	    FACILITY => "system");
+	
 	my @xpath   = ( 'pki_realm', 'common', 'profiles' );
 	my @counter = ( $i,         0,        0 );
 	
 	foreach my $entrytype (qw( endentity selfsignedca crl )) {
 	    ### entrytype: $entrytype
 
-	    my $nr_of_entries = $keys->{CONFIG}->get_xpath_count(
+	    my $nr_of_entries = $config->get_xpath_count(
 		XPATH   => [ @xpath,   $entrytype, 'profile' ],
 		COUNTER => [ @counter, 0 ]);
 	    
 	    ### entries: $nr_of_entries
 	    foreach (my $jj = 0; $jj < $nr_of_entries; $jj++) {
-		my $entryid = $keys->{CONFIG}->get_xpath(
+		my $entryid = $config->get_xpath(
 			    XPATH   => [ @xpath,   $entrytype, 'profile', 'id' ],
 			    COUNTER => [ @counter, 0,          $jj,       0 ],
 			    );
@@ -231,12 +327,12 @@ sub get_pki_realms
 		    my $format;
 		    # parse validity entry
 		    eval {
-			$format = $keys->{CONFIG}->get_xpath(
+			$format = $config->get_xpath(
 			    XPATH   => [ @xpath,   $entrytype, 'profile', 'validity', $validitytype, 'format' ],
 			    COUNTER => [ @counter, 0,          $jj,       0,          0,             0 ],
 			    );
 
-			$validity = $keys->{CONFIG}->get_xpath(
+			$validity = $config->get_xpath(
 			    XPATH   => [ @xpath,   $entrytype, 'profile', 'validity', $validitytype ],
 			    COUNTER => [ @counter, 0,          $jj,        0,         0 ],
 			    );
@@ -267,6 +363,13 @@ sub get_pki_realms
 			    'format' => $format,
 			    'validity' => $validity,
 			};
+
+			$log->log(
+			    MESSAGE  => "Accepted $entrytype $validitytype validity ($format:$validity) for PKI realm '$name'",
+			    PRIORITY => "info",
+			    FACILITY => "system");
+			
+			
 		    }
 		}
 	    }
@@ -278,13 +381,15 @@ sub get_pki_realms
 	# $realms{$name}->{ca}->{$ca}->{certificate} =
 	# get end entity validities
 	my $nr_of_ca_entries
-	    = $keys->{CONFIG}->get_xpath_count(
+	    = $config->get_xpath_count(
 	    XPATH   => ['pki_realm', 'ca'],
 	    COUNTER => [$i]);
 
+	my $issuing_ca_count = 0;
+
       ISSUINGCA:
 	for (my $jj = 0; $jj < $nr_of_ca_entries; $jj++) {
-	    my $ca_id = $keys->{CONFIG}->get_xpath(
+	    my $ca_id = $config->get_xpath(
 		XPATH =>   ['pki_realm', 'ca', 'id'],
 		COUNTER => [$i,          $jj,  0 ],
 		);
@@ -301,9 +406,8 @@ sub get_pki_realms
 		    );
 	    }
 	    
-
-	    my $token = 
-		$keys->{CRYPTO}->get_token (TYPE      => "CA",
+	    
+	    my $token = $crypto->get_token (TYPE      => "CA",
 					    ID        => $ca_id,
 					    PKI_REALM => $name);
 	    
@@ -330,13 +434,13 @@ sub get_pki_realms
 		# ignore exception for missing 'notbefore' entry
 		if ($exc->message() 
 		    eq "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST") {
-		    $keys->{LOG}->log(
-			MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for ca '$ca_id' (PKI realm $name)",
+		    $log->log(
+			MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
 			PRIORITY => "warn",
 			FACILITY => "system");
 
-		    $keys->{LOG}->log(
-			MESSAGE  => "Issuing CA $ca_id (PKI realm $name) is unavailable",
+		    $log->log(
+			MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
 			PRIORITY => "warn",
 			FACILITY => "monitor");
 		    
@@ -352,13 +456,13 @@ sub get_pki_realms
 
 	    
 	    if (! defined $cacertdata) {
-		$keys->{LOG}->log(
-		    MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for ca '$ca_id' (PKI realm $name)",
+		$log->log(
+		    MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
 		    PRIORITY => "warn",
 		    FACILITY => "system");
 		
-		$keys->{LOG}->log(
-		    MESSAGE  => "Issuing CA $ca_id (PKI realm $name) is unavailable",
+		$log->log(
+		    MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
 		    PRIORITY => "warn",
 		    FACILITY => "monitor");
 		
@@ -370,13 +474,13 @@ sub get_pki_realms
 					      DATA  => $cacertdata);
 	    
 	    if (! defined $cacert) {
-		$keys->{LOG}->log(
-		    MESSAGE  => "Could not parse issuing CA certificate '$cacertfile' for ca '$ca_id' (PKI realm $name)",
+		$log->log(
+		    MESSAGE  => "Could not parse issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
 		    PRIORITY => "warn",
 		    FACILITY => "system");
 		
-		$keys->{LOG}->log(
-		    MESSAGE  => "Issuing CA $ca_id (PKI realm $name) is unavailable",
+		$log->log(
+		    MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
 		    PRIORITY => "warn",
 		    FACILITY => "monitor");
 		
@@ -385,16 +489,43 @@ sub get_pki_realms
 
 
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{crypto} = $token;
-
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{cacert} = $cacert;
-
+	    $log->log(
+		MESSAGE  => "Attached CA token for issuing CA '$ca_id' of PKI realm '$name'",
+		PRIORITY => "info",
+		FACILITY => "system");
+	    
 	    # for convenience and quicker accesss
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{notbefore} = 
 		$cacert->get_parsed("BODY", "NOTBEFORE");
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{notafter} = 
 		$cacert->get_parsed("BODY", "NOTAFTER");
+
+	    $issuing_ca_count++;
+
+	    $log->log(
+		MESSAGE  => "Issuing CA $ca_id of PKI realm '$name' validity is " 
+		. OpenXPKI::DateTime::convert_date(
+		    {
+			DATE => $realms{$name}->{ca}->{id}->{$ca_id}->{notbefore},
+			OUTFORMAT => 'printable',
+		    }) 
+		. ' - '
+		. OpenXPKI::DateTime::convert_date(
+		    {
+			DATE => $realms{$name}->{ca}->{id}->{$ca_id}->{notafter},
+			OUTFORMAT => 'printable',
+		    }
+		),
+		PRIORITY => "info",
+		FACILITY => "system");
 	}
 	    
+	$log->log(
+	    MESSAGE  => "Identified $issuing_ca_count issuing CAs for PKI realm '$name'",
+	    PRIORITY => "info",
+	    FACILITY => "system");
+
     }
 
     ### realms: %realms
@@ -403,49 +534,29 @@ sub get_pki_realms
 
 sub __get_default_crypto_token
 {
-    my $self = shift;
     my $keys = { @_ };
     ##! 1: "start"
 
-    if (not $keys->{CRYPTO})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DEFAULT_CRYPTO_TOKEN_MISSING_CRYPTO");
-    }
+    my $crypto = CTX('crypto_layer');
+
     if (not $keys->{PKI_REALM})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_INIT_DEFAULT_CRYPTO_TOKEN_MISSING_PKI_REALM");
     }
 
-    return $keys->{CRYPTO}->get_token (TYPE      => "DEFAULT",
-                                       ID        => "default",
-                                       PKI_REALM => $keys->{PKI_REALM});
+    return $crypto->get_token (TYPE      => "DEFAULT",
+			       ID        => "default",
+			       PKI_REALM => $keys->{PKI_REALM});
 }
 
 sub get_dbi
 {
-    my $self = shift;
-    my $keys = { @_ };
     ##! 1: "start"
 
-    ## check logging module
+    my $config = CTX('xml_config');
 
-    if (not $keys->{LOG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DBI_MISSING_LOG");
-    }
-    my %params = (LOG => $keys->{LOG});
-
-    ## check config
-
-    if (not $keys->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DBI_MISSING_CONFIG");
-    }
-    my $config = $keys->{CONFIG};
+    my %params = (LOG => CTX('log'));
 
     ## setup of the environment
 
@@ -520,25 +631,14 @@ sub get_dbi
 
 sub get_log
 {
-    my $self = shift;
-    my $keys = { @_ };
     ##! 1: "start"
-
-    ## check parameters
-
-    if (not $keys->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_LOG_MISSING_CONFIG");
-    }
-    my $config = $keys->{CONFIG};
+    my $config = CTX('xml_config');
 
     $config = $config->get_xpath (
                   XPATH    => [ 'common/log_config' ],
                   COUNTER  => [ 0 ]);
 
     ## init logging
-
     my $log = OpenXPKI::Server::Log->new (CONFIG => $config);
 
     return $log;
@@ -546,9 +646,7 @@ sub get_log
 
 sub redirect_stderr
 {
-    my $self = shift;
     ##! 1: "start"
-
     my $config = CTX('xml_config');
 
     my $stderr = $config->get_xpath (XPATH => "common/server/stderr");
@@ -581,7 +679,7 @@ the customization of the code more easier.
 
 =head2 Basic Initialization
 
-=head3 new
+=head3 init
 
 Initialization must be done ONCE by the server process.
 Expects the XML configuration file via the named parameter CONFIG.
@@ -590,10 +688,35 @@ Usage:
 
   use OpenXPKI::Server::Init;
 
-  OpenXPKI::Server::Init::new({
+  OpenXPKI::Server::Init::init({
          CONFIG => 't/config.xml',
      });
 
+If called this way, the init code processes all initialization steps.
+You may split the initialization sequence in order to do stuff in
+between steps by providing an array reference TASKS as a named argument:
+
+  OpenXPKI::Server::Init::init({
+         CONFIG => 't/config.xml',
+         TASKS  => [ 'xml_config', 'i18n', 'log' ],
+     });
+
+and later simply call
+
+  OpenXPKI::Server::Init::init({
+         CONFIG => 't/config.xml',
+     });
+
+to initialize the remaining tasks.
+
+If called without the TASKS argument the function will perform all steps
+that were not already executed before.
+
+=head3 get_remaining_init_tasks
+
+Returns an array of all remaining initialization task names (i. e. all
+tasks that have not yet been executed) in the order they would normally 
+be processed.
 
 =head3 get_xml_config
 
@@ -605,27 +728,23 @@ small. It returns an instance of OpenXPKI::XML::Config.
 
 =head3 init_i18n
 
-initializes the code for internationalization. It requires an instance
+Initializes the code for internationalization. It requires an instance
 of OpenXPKI::XML::Config in the parameter CONFIG.
 
 =head2 Cryptographic Initialization
 
 =head3 get_crypto_layer
 
-needs only an instance of the XML configuration in the parameter CONFIG.
-It return an instance of the TokenManager class which handles all
+Return an instance of the TokenManager class which handles all
 configured cryptographic tokens.
 
 =head3 get_pki_realms
 
-prepares a hash which has the following structure:
+Prepares a hash which has the following structure:
 
 $hash{PKI_REALM_NAME}->{"crypto"}->{"default"}
 
-The values are the default cryptographic token for each PKI realm.
-The parameters CONFIG and CRYPTO are required. The first parameter
-is the XML configuration object and the second parameter must
-be an instance of the TokenManager.
+Requires 'xml_config', 'log' and 'crypto_layer' in the Server Context.
 
 The hash also includes validity information as defined in the configuration
 in the following sample format:
@@ -688,15 +807,15 @@ The ID of self-signed CA or CRL validities is the internal CA name.
 
 =head3 get_dbi
 
-initializes the database interface. It needs an instance of OpenXPKI::XML::Config
-(parameter CONFIG) and an instance of OpenXPKI::Server::Log (parameter LOG). 
-The log parameter is needed to guarantee a correct logging behaviour of
-the database interface.
+Initializes the database interface and returns the database object reference.
+
+Requires 'log' and 'xml_config' in the Server Context.
 
 =head3 get_log
 
-requires only the usual instance of OpenXPKI::XML::Config in the parameter CONFIG.
-It returns an instance of the module OpenXPKI::Log.
+Returns an instance of the module OpenXPKI::Log.
+
+Requires 'xml_config' in the Server Context.
 
 =head3 get_log
 

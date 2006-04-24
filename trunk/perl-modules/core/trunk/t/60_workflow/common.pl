@@ -113,7 +113,7 @@ sub do_step {
 
 
 ### initialize context
-OpenXPKI::Server::Init->new({
+OpenXPKI::Server::Init::init({
     CONFIG => 't/config.xml',
 });
 

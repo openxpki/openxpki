@@ -46,28 +46,100 @@ sub new
         }
     }
 
-    ## initialization
-    OpenXPKI::Server::Init->new({
-        CONFIG => $self->{CONFIG},
-        SERVER => $self
-    });
+    # we need to get a usable logger as soon as possible, hence:
+    # initialize configuration, i18n and log
+    OpenXPKI::Server::Init::init(
+	{
+	    CONFIG => $self->{CONFIG},
+	    TASKS  => [ 'xml_config', 'i18n', 'log' ],
+	    });
+
+    # from now on we can assume that we have CTX('log') available
+
+    # perform the rest of the initialization
+    eval
+    {
+	OpenXPKI::Server::Init::init(
+	    {
+		CONFIG => $self->{CONFIG},
+		# FIXME: not needed?
+#		SERVER => $self,
+	    });
+    };
+    if ($EVAL_ERROR)
+    {
+        CTX('log')->log(
+	    MESSAGE  => "Uncaught exception during server initialization: " . $EVAL_ERROR->message(),
+	    PRIORITY => "fatal",
+	    FACILITY => "system",
+	    );
+	# die gracefully
+        exit 1;
+    }
 
     ## group access is allowed
     $self->{umask} = umask 0007;
 
     ## load the user interfaces
-    $self->__get_user_interfaces();
+    eval
+    {
+	$self->__get_user_interfaces();
+    };
+    if ($EVAL_ERROR)
+    {
+        CTX('log')->log(
+	    MESSAGE  => "Uncaught exception during interface initialization: " . $EVAL_ERROR->message(),
+	    PRIORITY => "fatal",
+	    FACILITY => "system",
+	    );
+	# die gracefully
+        exit 1;
+    }
 
     ## start the server
+    my %params;
+    eval
+    {
+	%params = $self->__get_server_config();
+    };
+    if ($EVAL_ERROR)
+    {
+        CTX('log')->log(
+	    MESSAGE  => "Uncaught exception during server parameter setup: " . $EVAL_ERROR->message(),
+	    PRIORITY => "fatal",
+	    FACILITY => "system",
+	    );
+	# die gracefully
+        exit 1;
+    }
 
-    my %params = $self->__get_server_config();
     unlink ($params{port});
     $self->run (%params);
 }
 
-sub process_request
+
+sub process_request {
+    my $rc;
+    eval
+    {
+        $rc = do_process_request(@_);
+    };
+    if ($EVAL_ERROR)
+    {
+        CTX('log')->log(
+	    MESSAGE  => "Uncaught exception: " . $EVAL_ERROR->message(),
+	    PRIORITY => "fatal",
+	    FACILITY => "system",
+	    );
+	# die gracefully
+        exit 1;
+    }
+    return $rc;
+}
+
+
+sub do_process_request
 {
-    print STDERR "Do you know what's going on?\n";
     ##! 2: "start"
     my $self = shift;
 

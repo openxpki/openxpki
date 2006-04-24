@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test;
-BEGIN { plan tests => 8 };
+BEGIN { plan tests => 7 };
 
 print STDERR "OpenXPKI::Server::ACL Performance\n";
 
@@ -13,12 +13,11 @@ use OpenXPKI::Server::ACL;
 ok(1);
 
 ## init XML cache
-my $xml = OpenXPKI::Server::Init->get_xml_config (CONFIG => 't/config.xml');
-
-## create context
-ok(OpenXPKI::Server::Context::setcontext({
-       xml_config => $xml,
-   }));
+OpenXPKI::Server::Init::init(
+    {
+	CONFIG => 't/config.xml',
+	TASKS => [ 'xml_config' ],
+    });
 
 ## create new session
 my $session = OpenXPKI::Server::Session->new ({

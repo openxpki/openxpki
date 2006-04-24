@@ -16,7 +16,7 @@ print STDERR "OpenXPKI::Server::Context - pki_realm\n";
 ok(1);
 
 ## init Context
-ok(OpenXPKI::Server::Init->new ({
+ok(OpenXPKI::Server::Init::init ({
        CONFIG => 't/config.xml',
    }));
 
