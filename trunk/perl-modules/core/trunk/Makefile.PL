@@ -216,4 +216,5 @@ WriteMakefile(
                   },
     macro      => { OPENSSL_BINARY => $openssl_binary,
                   },
+    'XSPROTOARG' => '-noprototypes',
 );
