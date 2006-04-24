@@ -185,6 +185,7 @@ WriteMakefile(
     'VERSION'   => $version,
     'LIBS'      => ["-L$openssl_lib_dir -lcrypto"],
     'INC'       => "-I. -I$openssl_inc_dir",
+    'CCFLAGS'   => '-O2 -g -Wall',
     'PREREQ_PM' => {'CGI::Session'           => '3.95',
                     'DBI'                    => 1,
                     'Date::Parse'            => 1,
