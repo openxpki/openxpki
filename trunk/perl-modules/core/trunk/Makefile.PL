@@ -67,16 +67,16 @@ die "Could not find usable OpenSSL installation. Stopped"
 die "Could not find usable OpenSSL binary. Stopped" 
     unless defined $openssl_binary;
 
-print STDOUT "OpenSSL library: $openssl_lib_dir\n";
-print STDOUT "OpenSSL headers: $openssl_inc_dir\n";
-print STDOUT "OpenSSL binary:  $openssl_binary\n";
+print STDERR "OpenSSL library: $openssl_lib_dir\n";
+print STDERR "OpenSSL headers: $openssl_inc_dir\n";
+print STDERR "OpenSSL binary:  $openssl_binary\n";
 
 my $version = `grep '#define OPENSSL_VERSION_TEXT' $tmp_ver`;
 
 $version =~ s/^.*fips.*$//m;
 $version =~ s/\n//g;
 $version =~ s/^[^"]*"([^"]*)".*$/$1/;
-print STDOUT "OpenSSL version: $version\n";
+print STDERR "OpenSSL version: $version\n";
 $version =~ s/^\s*OpenSSL\s*0\.9\.//i;
 $version =~ s/^([0-9]+).*$/$1/;
 if ($version < 8)
@@ -104,7 +104,7 @@ if ($files)
         $line =~ s/^.*:\s+revision="([0-9]+)".*$/$1/;
         $revision = $line if ($line > $revision);
     }
-    print STDOUT "Revision:        $revision\n";
+    print STDERR "Revision:        $revision\n";
     $version = "0.9.$revision";
     `echo \\# never commit this file to a version control system > OpenXPKI/VERSION.pm`;
     `echo package OpenXPKI::VERSION\\; >> OpenXPKI/VERSION.pm`;
@@ -123,15 +123,15 @@ foreach my $module (@list)
 {
     next if (not defined $module or not length $module);
     $module =~ s/\.ignore$//;
-    print STDOUT "Restoring module $module ... ";
+    print STDERR "Restoring module $module ... ";
     if (not rename $module.".ignore", $module)
     {
-        print STDOUT "FAILED\n";
+        print STDERR "FAILED\n";
         print STDERR "Cannot restore formerly ignored module!\n";
         print STDERR "Aborting to ensrue the consistency of the OpenXPKI release.\n";
         exit 1;
     }
-    print STDOUT "OK\n";
+    print STDERR "OK\n";
 }
 
 ## should we ignore some modules?
@@ -143,7 +143,7 @@ if (exists $ENV{IGNORE_MODULES})
     my @modules = split / /, $line;
     foreach my $module (@modules)
     {
-        print STDOUT "Module $module is not going to be installed.\n";
+        print STDERR "Module $module is not going to be installed.\n";
         $module =~ s/::/\//g;
         $module .= ".pm" if (substr ($module, length($module)-4,3) ne ".pm");
         if (not rename $module, $module.".ignore")
@@ -156,20 +156,20 @@ if (exists $ENV{IGNORE_MODULES})
 }
 else
 {
-    print STDOUT "All modules will be installed.\n";
+    print STDERR "All modules will be installed.\n";
 }
 
 
 ## some information about the used OpenXPKI version
 
-print STDOUT "Version:         $version\n";
-print STDOUT "Statistics:\n";
+print STDERR "Version:         $version\n";
+print STDERR "Statistics:\n";
 my $cmd = 'cat OpenXPKI.pm OpenXPKI.xs `find OpenXPKI -type f | grep -r -v "/\."`| wc -l';
-print STDOUT "    LOC: ".`$cmd`;
+print STDERR "    LOC: ".`$cmd`;
 $cmd = 'cat `find t -type f | grep -r -v "/\."`| wc -l';
-print STDOUT "    LOT: ".`$cmd`;
+print STDERR "    LOT: ".`$cmd`;
 $cmd = 'cat `find . -type f | grep -r -v "/\."`| wc -l';
-print STDOUT "    LOA: ".`$cmd`;
+print STDERR "    LOA: ".`$cmd`;
 
 ## hack to avoid warnings from Log4perl
 eval
