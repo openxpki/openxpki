@@ -42,7 +42,6 @@ pubkey_algorithm(spkac)
     PREINIT:
 	BIO *out;
 	char *pubkey;
-	X509_CINF *ci;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
@@ -69,11 +68,11 @@ pubkey(spkac)
 	pkey=X509_PUBKEY_get(spkac->spkac->pubkey);
 	if (pkey != NULL)
 	{
-		if (pkey->type == EVP_PKEY_RSA)
-			RSA_print(out,pkey->pkey.rsa,0);
-		else if (pkey->type == EVP_PKEY_DSA)
-			DSA_print(out,pkey->pkey.dsa,0);
-		EVP_PKEY_free(pkey);
+	    if (pkey->type == EVP_PKEY_RSA)
+		RSA_print(out,pkey->pkey.rsa,0);
+            if (pkey->type == EVP_PKEY_DSA)
+		DSA_print(out,pkey->pkey.dsa,0);
+	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
 	SAFEFREE(char_ptr);
@@ -90,14 +89,12 @@ pubkey_hash (spkac, digest_name="sha1")
 	char *digest_name
     PREINIT:
 	EVP_PKEY *pkey;
-	ASN1_BIT_STRING *key;
 	BIO *out;
 	int j;
 	unsigned int n;
 	const EVP_MD *digest;
 	char * fingerprint;
 	unsigned char md[EVP_MAX_MD_SIZE];
-	unsigned char str[3];
 	unsigned char *data = NULL;
 	int length;
     CODE:
@@ -171,15 +168,14 @@ modulus (spkac)
     CODE:
 	out = BIO_new(BIO_s_mem());
 	pkey=X509_PUBKEY_get(spkac->spkac->pubkey);
-	if (pkey == NULL)
-		BIO_printf(out,"");
-	else if (pkey->type == EVP_PKEY_RSA)
+	if (pkey != NULL)
+	{
+	    if (pkey->type == EVP_PKEY_RSA)
 		BN_print(out,pkey->pkey.rsa->n);
-	else if (pkey->type == EVP_PKEY_DSA)
+	    if (pkey->type == EVP_PKEY_DSA)
 		BN_print(out,pkey->pkey.dsa->pub_key);
-	else
-		BIO_printf(out,"");
-	EVP_PKEY_free(pkey);
+	    EVP_PKEY_free(pkey);
+	}
 	n = BIO_get_mem_data(out, &modulus);
 	SAFEFREE(char_ptr);
 	Newz(0, char_ptr, n+1, char);
@@ -200,15 +196,14 @@ exponent (spkac)
     CODE:
 	out = BIO_new(BIO_s_mem());
 	pkey=X509_PUBKEY_get(spkac->spkac->pubkey);
-	if (pkey == NULL)
-		BIO_printf(out,"");
-	else if (pkey->type == EVP_PKEY_RSA)
+	if (pkey != NULL)
+	{
+	    if (pkey->type == EVP_PKEY_RSA)
 		BN_print(out,pkey->pkey.rsa->e);
-	else if (pkey->type == EVP_PKEY_DSA)
+	    if (pkey->type == EVP_PKEY_DSA)
 		BN_print(out,pkey->pkey.dsa->pub_key);
-	else
-		BIO_printf(out,"");
-	EVP_PKEY_free(pkey);
+	    EVP_PKEY_free(pkey);
+	}
 	n = BIO_get_mem_data(out, &exponent);
 	SAFEFREE(char_ptr);
 	Newz(0, char_ptr, n+1, char);

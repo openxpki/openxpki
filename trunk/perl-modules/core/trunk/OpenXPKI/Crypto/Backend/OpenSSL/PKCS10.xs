@@ -55,7 +55,6 @@ version(csr)
     PREINIT:
 	BIO *out;
 	char *version;
-	unsigned char buf[1024];
 	long l, i;
 	const char *neg;
     CODE:
@@ -122,7 +121,6 @@ fingerprint (csr, digest_name="sha1")
 	const EVP_MD *digest;
 	char * fingerprint;
 	unsigned char md[EVP_MAX_MD_SIZE];
-	unsigned char str[3];
     CODE:
 	out = BIO_new(BIO_s_mem());
 	if (!strcmp ("sha1", digest_name))
@@ -232,14 +230,12 @@ pubkey_hash (csr, digest_name="sha1")
 	char *digest_name
     PREINIT:
 	EVP_PKEY *pkey;
-	ASN1_BIT_STRING *key;
 	BIO *out;
 	int j;
 	unsigned int n;
 	const EVP_MD *digest;
 	char * fingerprint;
 	unsigned char md[EVP_MAX_MD_SIZE];
-	unsigned char str[3];
 	unsigned char *data = NULL;
 	int length;
     CODE:
@@ -314,15 +310,14 @@ modulus (csr)
     CODE:
 	out = BIO_new(BIO_s_mem());
 	pkey=X509_REQ_get_pubkey(csr);
-	if (pkey == NULL)
-		BIO_printf(out,"");
-	else if (pkey->type == EVP_PKEY_RSA)
+	if (pkey != NULL)
+	{
+	    if (pkey->type == EVP_PKEY_RSA)
 		BN_print(out,pkey->pkey.rsa->n);
-	else if (pkey->type == EVP_PKEY_DSA)
+            if (pkey->type == EVP_PKEY_DSA)
 		BN_print(out,pkey->pkey.dsa->pub_key);
-	else
-		BIO_printf(out,"");
-	if (pkey != NULL) EVP_PKEY_free(pkey);
+	    EVP_PKEY_free(pkey);
+	}
 	n = BIO_get_mem_data(out, &modulus);
 	SAFEFREE(char_ptr);
 	Newz(0, char_ptr, n+1, char);
@@ -343,15 +338,14 @@ exponent (csr)
     CODE:
 	out = BIO_new(BIO_s_mem());
 	pkey=X509_REQ_get_pubkey(csr);
-	if (pkey == NULL)
-		BIO_printf(out,"");
-	else if (pkey->type == EVP_PKEY_RSA)
+	if (pkey != NULL)
+	{
+	    if (pkey->type == EVP_PKEY_RSA)
 		BN_print(out,pkey->pkey.rsa->e);
-	else if (pkey->type == EVP_PKEY_DSA)
+	    if (pkey->type == EVP_PKEY_DSA)
 		BN_print(out,pkey->pkey.dsa->pub_key);
-	else
-		BIO_printf(out,"");
-	if (pkey != NULL) EVP_PKEY_free(pkey);
+	    EVP_PKEY_free(pkey);
+	}
 	n = BIO_get_mem_data(out, &exponent);
 	SAFEFREE(char_ptr);
 	Newz(0, char_ptr, n+1, char);

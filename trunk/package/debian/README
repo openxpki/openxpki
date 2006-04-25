@@ -1,0 +1,17 @@
+How to create a debian package?
+===============================
+
+cd ${OPENXPKI_SVN}/trunk/perl-modules/core/trunk
+perl Makefile.PL
+cp OpenXPKI-0.9.221.tar.gz /tmp
+
+cd ${OPENXPKI_SVN}/trunk/package/
+tar -czf /tmp/openxpki-debian.tar.gz debian 
+
+cd /tmp
+tar -xzf OpenXPKI-0.9.221.tar.gz
+cd OpenXPKI-0.9.221/
+tar -xzf /tmp/openxpki-debian.tar.gz
+
+fakeroot dpkg-buildpackage
+

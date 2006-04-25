@@ -64,7 +64,6 @@ version(crl)
     PREINIT:
 	BIO *out;
 	char *version;
-	unsigned char buf[1024];
 	long l;
     CODE:
 	out = BIO_new(BIO_s_mem());
@@ -158,7 +157,6 @@ fingerprint (crl, digest_name="sha1")
 	const EVP_MD *digest;
 	char * fingerprint;
 	unsigned char md[EVP_MAX_MD_SIZE];
-	unsigned char str[3];
     CODE:
 	out = BIO_new(BIO_s_mem());
 	if (!strcmp ("sha1", digest_name))
@@ -189,7 +187,6 @@ signature_algorithm(crl)
     PREINIT:
 	BIO *out;
 	char *sig;
-	X509_CINF *ci;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
