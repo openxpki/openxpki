@@ -34,23 +34,27 @@ sub new
 
     my $keys = shift;
 
-    ##! 2: "check CONFIG parameter"
-    if (not exists $keys->{CONFIG})
-    {
-        OpenXPKI::Exception->throw
-        (
-            message => "I18N_OPENXPKI_CLIENT_CLI_NEW_MISSING_CONFIG"
-        );
+    if (exists $keys->{SOCKETFILE}) {
+	$self->{SOCKETFILE} = $keys->{SOCKETFILE};
+    } else {
+	##! 2: "check CONFIG parameter"
+	if (not exists $keys->{CONFIG})
+	{
+	    OpenXPKI::Exception->throw
+		(
+		 message => "I18N_OPENXPKI_CLIENT_CLI_NEW_MISSING_CONFIG"
+		);
+	}
+	
+	##! 2: "load configuration"
+	my $config = $self->read_file($keys->{CONFIG});
+	
+	##! 2: "parse configuration"
+	$config =~ s/^.*<server_socket>(.*)<\/server_socket>.*$/$1/s;
+	
+	##! 2: "set socket filename to $config"
+	$self->{SOCKETFILE} = $config;
     }
-
-    ##! 2: "load configuration"
-    my $config = $self->read_file($keys->{CONFIG});
-
-    ##! 2: "parse configuration"
-    $config =~ s/^.*<server_socket>(.*)<\/server_socket>.*$/$1/s;
-
-    ##! 2: "set socket filename to $config"
-    $self->{FILENAME} = $config;
 
     ##! 1: "end"
     return $self;
@@ -107,12 +111,12 @@ sub __init_connection
             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_CONNECTION_NO_SOCKET"
         );
     }
-    if (not connect($self->{SOCKET}, sockaddr_un($self->{FILENAME})))
+    if (not connect($self->{SOCKET}, sockaddr_un($self->{SOCKETFILE})))
     {
         OpenXPKI::Exception->throw
         (
             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_CONNECTION_FAILED",
-            params  => {FILENAME => $self->{FILENAME}}
+            params  => {SOCKETFILE => $self->{SOCKETFILE}}
         );
     }
     ##! 4: "end"
@@ -124,7 +128,7 @@ sub __init_transport_protocol
     ##! 4: "request simple transport protocol"
     my $self = shift;
 
-    my $msg = "start simple\n";
+    my $msg = "start Simple\n";
     ##! 8: "send requested protocol to server"
     ## print does not work perhaps because of connect?
     ## print {$self->{SOCKET}} $msg; ## send simple
@@ -153,7 +157,7 @@ sub __init_serialization_protocol
     my $self = shift;
 
     ##! 8: "send requested protocol to server"
-    $self->{TRANSPORT}->write ("simple"); ## send simple
+    $self->{TRANSPORT}->write ("Simple"); ## send simple
     ##! 8: "receive answer from server"
     my $msg = $self->{TRANSPORT}->read ();   ## read OK
     ##! 8: "evaluate answer"
@@ -460,14 +464,15 @@ sub DESTROY
     my $self = shift;
 
     ##! 2: "logout client and kill session"
-    $self->{TRANSPORT}->write
-    (
-        $self->{SERIALIZATION}->serialize
-        ({
-            SERVICE_MSG => "LOGOUT"
-        })
-    );
-    print STDOUT i18nGettext('I18N_OPENXPKI_CLIENT_CLI_DESTROY_LOGOUT_SUCCESSFUL');
+    if (defined $self->{TRANSPORT} && defined $self->{SERIALIZATION}) {
+	$self->{TRANSPORT}->write(
+	    $self->{SERIALIZATION}->serialize(
+		{
+		    SERVICE_MSG => "LOGOUT",
+		})
+	    );
+	print STDOUT i18nGettext('I18N_OPENXPKI_CLIENT_CLI_DESTROY_LOGOUT_SUCCESSFUL');
+    }
 
     ##! 2: "session is now terminated"
     return 1;

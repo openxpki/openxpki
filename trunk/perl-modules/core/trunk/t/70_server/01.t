@@ -35,7 +35,7 @@ foreach my $mode ('debug', '')
     ## should we check here that the server is really running?
 
     $pid = `cat t/pid`;
-    ok($pid);
+    ok($pid =~ m{ \d+ }xs);
 
     my $ret = `kill $pid`;
     if ($?)

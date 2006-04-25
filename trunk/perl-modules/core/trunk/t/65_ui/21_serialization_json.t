@@ -6,6 +6,8 @@ use English;
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::JSON' ); }
 
+print STDERR "OpenXPKI::Serialization::JSON\n";
+
 SKIP: {
     my $ref = OpenXPKI::Serialization::JSON->new();
     skip "OpenXPKI::Serialization::JSON not usable", 2 unless defined $ref;

@@ -6,6 +6,8 @@ use English;
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::Simple' ); }
 
+print STDERR "OpenXPKI::Serialization::Simple\n";
+
 # test illegal separators
 eval
 {

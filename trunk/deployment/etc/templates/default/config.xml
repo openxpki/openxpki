@@ -7,9 +7,15 @@
         <socket_file>[%   server.socketfile %]</socket_file>
         <pid_file>[%      server.pidfile %]</pid_file>
         <stderr>[%        server.stderrfile %]</stderr>
-        <transport>[%     server.transport %]</transport>
-        <serialization>[% server.serialization %]</serialization>
-        <service>[%       server.service %]</service>
+[% FOREACH item = server.transport %]
+        <transport>[%     item %]</transport>
+[% END %]
+[% FOREACH item = server.serialization %]
+        <serialization>[% item %]</serialization>
+[% END %]
+[% FOREACH item = server.service %]
+        <service>[%       item %]</service>
+[% END %]
     </server>
     <i18n>
         <locale_directory>[% i18n.localedir %]</locale_directory>

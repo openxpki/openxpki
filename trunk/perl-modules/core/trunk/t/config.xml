@@ -11,7 +11,7 @@
         <stderr>t/stderr.log</stderr>
         <transport>Simple</transport>
         <serialization>Simple</serialization>
-        <service>Test</service>
+        <serialization>JSON</serialization>
         <service>Default</service>
     </server>
     <i18n>

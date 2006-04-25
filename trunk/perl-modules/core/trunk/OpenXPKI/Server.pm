@@ -164,7 +164,7 @@ sub do_process_request
         }
         $line .= $char;
         ## protocol detection
-        if ($line eq "start simple\n")
+        if ($line eq "start Simple\n")
         {
             $transport = OpenXPKI::Transport::Simple->new ();
             print STDOUT "OK\n";
@@ -182,10 +182,19 @@ sub do_process_request
     ##! 2: "serialization protocol detector"
     my $serializer = undef;
     my $msg = $transport->read();
-    if ($msg eq "simple")
-    {
-        $serializer = OpenXPKI::Serialization::Simple->new ();
+
+    if ($msg =~ m{ \A (?:Simple|JSON) \z }xms) {
+	eval "\$serializer = OpenXPKI::Serialization::$msg->new();";
+
+	if (! defined $serializer) {
+            $transport->write ("OpenXPKI::Server: Serializer failed to initialize.\n");
+            $log->log (MESSAGE  => "Serializer '$msg' failed to initialize.",
+	               PRIORITY => "fatal",
+                       FACILITY => "system");
+            return;
+	}
         $transport->write ("OK");
+
     }
     else
     {
@@ -205,7 +214,7 @@ sub do_process_request
             "service" => OpenXPKI::Service::Default->new
                          ({
                              TRANSPORT     => $transport,
-                             SERIALIZATION => $serializer
+                             SERIALIZATION => $serializer,
                          })
         });
         $transport->write ($serializer->serialize ("OK"));

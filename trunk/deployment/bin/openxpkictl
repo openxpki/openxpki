@@ -37,7 +37,7 @@ GetOptions(\%params,
 	      help|?
 	      man
 	      cfg|cfgfile|conf|config=s
-              debug=s
+              debug=i
 	      )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
@@ -48,7 +48,7 @@ if (scalar @ARGV != 1) {
 }
 
 if (defined $params{debug}) {
-    $OpenXPKI::Debug::LEVEL{'.*'} = 100;
+    $OpenXPKI::Debug::LEVEL{'.*'} = $params{debug};
 }
 
 if (defined $params{cfg}) {
