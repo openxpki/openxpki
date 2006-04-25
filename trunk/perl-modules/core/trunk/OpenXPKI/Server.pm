@@ -124,7 +124,17 @@ sub process_request {
     {
         $rc = do_process_request(@_);
     };
-    if ($EVAL_ERROR)
+    if (my $exc = OpenXPKI::Exception->caught())
+    {
+        CTX('log')->log(
+	    MESSAGE  => "Uncaught exception: " . $exc->message(),
+	    PRIORITY => "fatal",
+	    FACILITY => "system",
+	    );
+	# die gracefully
+        exit 1;
+    }
+    elsif ($EVAL_ERROR)
     {
         CTX('log')->log(
 	    MESSAGE  => "Uncaught exception: " . $EVAL_ERROR->message(),
