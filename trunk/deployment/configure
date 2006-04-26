@@ -33,6 +33,10 @@ while [ -n "$1" ] ; do
 	    echo "Additional options to openxpki-metaconf: '$METACONF_OPTS'"
 	    shift $#
 	    ;;
+	*)
+	    echo "Unrecognized option $1"
+	    exit 1
+	    ;;
     esac
 done
 

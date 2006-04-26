@@ -92,6 +92,9 @@ installbin:
 	$(CFG) --config openxpki.conf --force --file bin/openxpkictl --dstdir $(INSTALLPREFIX)$(BINDIR)
 	chown $(ADMUSER):$(ADMGROUP) $(INSTALLPREFIX)$(BINDIR)/openxpkictl
 	chmod 0755 $(INSTALLPREFIX)$(BINDIR)/openxpkictl
+	$(CFG) --config openxpki.conf --force --file bin/openxpki-configure --dstdir $(INSTALLPREFIX)$(BINDIR)
+	chown $(ADMUSER):$(ADMGROUP) $(INSTALLPREFIX)$(BINDIR)/openxpki-configure
+	chmod 0755 $(INSTALLPREFIX)$(BINDIR)/openxpki-configure
 
 installetc:
 	@echo Installing configuration files to $(INSTALLPREFIX)$(SYSCONFDIR)
@@ -106,9 +109,6 @@ installetc:
 			$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file $(INSTALLPREFIX)$(SYSCONFDIR)/$$template/`basename $$file` || exit 1 ; \
 		done ; \
 	done )
-	$(CFG) --config openxpki.conf --force --file etc/openxpki-configure --dstdir $(INSTALLPREFIX)$(SYSCONFDIR)
-	chown $(ADMUSER):$(ADMGROUP) $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki-configure
-	chmod 0755 $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki-configure
 
 makedirs:
 	@echo Creating state directories
