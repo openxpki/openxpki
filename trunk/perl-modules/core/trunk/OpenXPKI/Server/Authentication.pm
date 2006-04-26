@@ -25,6 +25,7 @@ use OpenXPKI::Server::Authentication::X509;
 ## constructor and destructor stuff
 
 sub new {
+    ##! 1: "start"
     my $that = shift;
     my $class = ref($that) || $that;
 
@@ -33,9 +34,8 @@ sub new {
     bless $self, $class;
 
     my $keys       = shift;
-    ##! 1: "start"
 
-    return undef if (not $self->__load_config ());
+    $self->__load_config();
 
     ##! 1: "end"
     return $self;
@@ -48,10 +48,10 @@ sub new {
 
 sub __load_config
 {
+    ##! 4: "start"
     my $self = shift;
-    ##! 1: "start"
 
-    ## load all PKI realms
+    ##! 8: "load all PKI realms"
 
     my $realms = CTX('xml_config')->get_xpath_count (XPATH => 'pki_realm');
     for (my $i=0; $i < $realms; $i++)
@@ -59,12 +59,13 @@ sub __load_config
         $self->__load_pki_realm ({PKI_REALM => $i});
     }
 
-    ##! 2: "leaving function successfully"
+    ##! 4: "leaving function successfully"
     return 1;
 }
 
 sub __load_pki_realm
 {
+    ##! 4: "start"
     my $self  = shift;
     my $keys  = shift;
     my $realm = $keys->{PKI_REALM};
@@ -73,7 +74,7 @@ sub __load_pki_realm
                                          COUNTER => [$realm, 0]);
     $self->{PKI_REALM}->{$name}->{POS} = $realm;
 
-    ## load all handlers
+    ##! 8: "load all handlers"
 
     my $handlers = CTX('xml_config')->get_xpath_count (XPATH   => ['pki_realm', 'auth', 'handler'],
                                                    COUNTER => [$realm, 0]);
@@ -82,7 +83,7 @@ sub __load_pki_realm
         $self->__load_handler ({PKI_REALM => $name, HANDLER => $i});
     }
 
-    ## determine all authentication stacks
+    ##! 8: "determine all authentication stacks"
 
     my $stacks = CTX('xml_config')->get_xpath_count (XPATH   => ['pki_realm', 'auth', 'stack'],
                                                  COUNTER => [$realm, 0]);
@@ -90,49 +91,53 @@ sub __load_pki_realm
     {
         $self->__load_stack ({PKI_REALM => $name, STACK => $i});
     }
+    ##! 4: "end"
     return 1;
 }
 
 sub __load_stack
 {
+    ##! 4: "start"
     my $self  = shift;
     my $keys  = shift;
     my $realm     = $keys->{PKI_REALM};
     my $realm_pos = $self->{PKI_REALM}->{$realm}->{POS};
     my $stack_pos = $keys->{STACK};
 
-    ## load stack name (this is what the user will see)
+    ##! 8: "load stack name (this is what the user will see)"
 
     my $stack = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'stack', 'name'],
                                               COUNTER => [$realm_pos, 0, $stack_pos, 0]);
     my $desc  = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'stack', 'description'],
                                               COUNTER => [$realm_pos, 0, $stack_pos, 0]);
 
-    ## determine all used handlers
+    ##! 8: "determine all used handlers"
 
     $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION} = $desc;
     $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER} =
         CTX('xml_config')->get_xpath_list (XPATH   => ['pki_realm', 'auth', 'stack', 'handler'],
                                        COUNTER => [$realm_pos, 0, $stack_pos]);
+    ##! 4: "end"
     return 1;
 }
 
 sub __load_handler
 {
+    ##! 4: "start"
     my $self  = shift;
     my $keys  = shift;
     my $realm       = $keys->{PKI_REALM};
     my $realm_pos   = $self->{PKI_REALM}->{$realm}->{POS};
     my $handler_pos = $keys->{HANDLER};
 
-    ## load handler name and type
+    ##! 8: "load handler name and type"
 
     my $name = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'handler', 'name'],
                                          COUNTER => [$realm_pos, 0, $handler_pos, 0]);
     my $type = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'handler', 'type'],
                                          COUNTER => [$realm_pos, 0, $handler_pos, 0]);
-    ##! 2: "name ::= $name"
-    ##! 2: "type ::= $type"
+    ##! 8: "name ::= $name"
+    ##! 8: "type ::= $type"
     $type = "OpenXPKI::Server::Authentication::$type";
     $self->{PKI_REALM}->{$realm}->{HANDLER}->{$name} = eval {
 
@@ -140,13 +145,21 @@ sub __load_handler
                      COUNTER => [$realm_pos, 0, $handler_pos]});
 
                                                            };
-    if ($EVAL_ERROR)
+    if (my $exc = OpenXPKI::Exception->caught())
     {
+        ##! 16: "exception from authentication sub module $type detected"
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOAD_HANDLER_FAILED",
-            child   => $EVAL_ERROR);
+            child   => $exc);
+    }
+    elsif ($EVAL_ERROR)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOAD_HANDLER_CRASHED",
+            params  => {ERRVAL => $EVAL_ERROR->message()});
     }
 
+    ##! 4: "end"
     return 1;
 }
 
@@ -176,7 +189,6 @@ sub login
                 {
                     STACKS => \%stacks
                 });
-
     if (not $stack)
     {
         OpenXPKI::Exception->throw (
@@ -190,6 +202,7 @@ sub login
             params  => {STACK => $stack});
     }
 
+    ##! 2: "try the different available handlers for the stack $stack"
     my $ok = 0;
     foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}})
     {
@@ -220,10 +233,19 @@ sub login
     }
     if (not $ok)
     {
-        ## show at minimum the last error message
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
-            child   => $EVAL_ERROR);
+        ##! 4: "show at minimum the last error message"
+        if (my $exc = OpenXPKI::Exception->caught())
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
+                child   => $exc);
+        }
+        else
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
+                child   => $EVAL_ERROR->message());
+        }
     }
 
     return 1;
