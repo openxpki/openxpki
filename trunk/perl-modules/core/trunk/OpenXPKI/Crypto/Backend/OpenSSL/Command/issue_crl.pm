@@ -77,7 +77,8 @@ sub get_command
             if (not ref($cert))
             {
                 eval {
-                    $cert = $self->{ENGINE}->get_object({DATA => $cert, TYPE => "X509"});
+                    ##! 1: "FIXME: where is the related free_object call?"
+                    $cert = $self->{XS}->get_object({DATA => $cert, TYPE => "X509"});
                 };
                 if (my $exc = OpenXPKI::Exception->caught())
                 {
@@ -90,7 +91,7 @@ sub get_command
             }
             # prepare index.txt entry
             $timestamp = $self->get_openssl_time ($timestamp);
-            my $start = $self->{ENGINE}->get_object_function ({
+            my $start = $self->{XS}->get_object_function ({
                             OBJECT   => $cert,
                             FUNCTION => "notbefore"});
             $start = OpenXPKI::DateTime::convert_date(
@@ -101,11 +102,11 @@ sub get_command
 
 	    ### OpenSSL notbefore date: $start
 
-            my $subject = $self->{ENGINE}->get_object_function ({
+            my $subject = $self->{XS}->get_object_function ({
                               OBJECT   => $cert,
                               FUNCTION => "subject"});
             $subject = $self->get_openssl_dn($subject);
-            my $serial = $self->{ENGINE}->get_object_function ({
+            my $serial = $self->{XS}->get_object_function ({
                              OBJECT   => $cert,
                              FUNCTION => "serial"});
             $serial = Math::BigInt->new ($serial);

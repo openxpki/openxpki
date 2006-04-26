@@ -38,30 +38,36 @@ use POSIX qw(strftime);
 use OpenXPKI::Exception;
 use English;
 
-# use Smart::Comments;
-
 sub new
 {
+    ##! 1: "start"
     my $that = shift;
     my $class = ref($that) || $that;
     my $self = { @_ };
     bless $self, $class;
 
-    ## re-organize engine stuff
-
+    ##! 2: "check engine availability"
     if (not exists $self->{ENGINE} or not ref $self->{ENGINE})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_ENGINE");
     }
 
-    ## $self->{TMP} will be checked by the central OpenSSL module
+    ##! 2: "check XS availability"
+    if (not exists $self->{XS} or not ref $self->{XS})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_XS");
+    }
+
+    ##! 2: "$self->{TMP} will be checked by the central OpenSSL module"
     if (not $self->{TMP})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_TEMPORARY_DIRECTORY_UNAVAILABLE");
     }
 
+    ##! 1: "end"
     return $self;
 }
 

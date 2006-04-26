@@ -9,6 +9,7 @@ use warnings;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain';
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 use English;
 
@@ -72,7 +73,7 @@ sub get_result
     my $self = shift;
 
     my $pkcs7 = $self->read_file ($self->{OUTFILE});
-    ## split certs
+    ##! 2: "split certs"
     my %certs = ();
     my @parts = split /\n\n/, $pkcs7;
     foreach my $cert (@parts)
@@ -85,30 +86,33 @@ sub get_result
         $certs{$subject}->{CERT}   = $cert;
     }
     
-    ## order certs
+    ##! 2: "order certs"
     my $subject = $self->{SIGNER_SUBJECT};
     if (not $subject)
     {
+        ##! 4: "determine the subject of the end entity cert"
         eval
         {
-            my $x509 = $self->{ENGINE}->get_object ({DATA => $self->{SIGNER},
+            my $x509 = $self->{XS}->get_object ({DATA => $self->{SIGNER},
                                                      TYPE => "X509"});
-            $subject = $self->{ENGINE}->get_object_function ({
+            $subject = $self->{XS}->get_object_function ({
                            OBJECT   => $x509,
                            FUNCTION => "openssl_subject"});
-            $self->{ENGINE}->get_object_function ({
-                           OBJECT   => $x509,
-                           FUNCTION => "free"});
+            $self->{XS}->free_object ($x509);
         };
+        ##! 4: "eval finished"
         if (my $exc = OpenXPKI::Exception->caught())
         {
+            ##! 8: "OpenXPKI exception detected"
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_WRONG_SIGNER",
                 child   => $exc);
         } elsif ($EVAL_ERROR) {
+            ##! 8: "general exception detected"
             $EVAL_ERROR->rethrow();
         }
     }
+    ##! 2: "create ordered cert list"
     $pkcs7 = "";
     while (exists $certs{$subject})
     {
@@ -116,6 +120,7 @@ sub get_result
         last if ($subject eq $certs{$subject}->{ISSUER});
         $subject = $certs{$subject}->{ISSUER};
     }
+    ##! 2: "end"
     return $pkcs7;
 }
 

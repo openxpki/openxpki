@@ -5,7 +5,9 @@ BEGIN { plan tests => 11 };
 
 print STDERR "OpenXPKI::Crypto::Command: PKCS#7 tests\n";
 
-use OpenXPKI::Crypto::TokenManager;
+use OpenXPKI::Debug;
+##$OpenXPKI::Debug::LEVEL{'.*'} = 100;
+require OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (read_file);
 
 our $cache;

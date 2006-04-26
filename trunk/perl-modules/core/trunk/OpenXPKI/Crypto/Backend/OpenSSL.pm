@@ -12,6 +12,7 @@ package OpenXPKI::Crypto::Backend::OpenSSL;
 
 use OpenXPKI::Crypto::Backend::OpenSSL::CLI;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command;
+use OpenXPKI::Crypto::Backend::OpenSSL::XS;
 use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL';
@@ -65,6 +66,8 @@ sub new
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_TEMPORARY_DIRECTORY_UNAVAILABLE");
     }
+
+    $self->{XS} = OpenXPKI::Crypto::Backend::OpenSSL::XS->new();
 
     $self->__load_config  ($keys);
     $self->__init_engine  ();
@@ -256,6 +259,8 @@ sub __init_command
         }
         $self->{COMMAND_PARAMS}->{$key->[1]} = $self->{PARAMS}->{$key->[0]};
     }
+    $self->{COMMAND_PARAMS}->{ENGINE} = $self->{ENGINE};
+    $self->{COMMAND_PARAMS}->{XS}     = $self->{XS};
 
     return 1;
 }
@@ -273,8 +278,7 @@ sub command
     my $ret = eval
     ##! 2: "FIXME: do we need an eval here?"
     {
-        my $cmdref = $cmd->new (%{$self->{COMMAND_PARAMS}}, %{$keys},
-                                ENGINE => $self);
+        my $cmdref = $cmd->new (%{$self->{COMMAND_PARAMS}}, %{$keys});
         my $cmds = $cmdref->get_command();
 
         $self->{CLI}->prepare ({COMMAND => $cmds});
@@ -307,174 +311,95 @@ sub command
     }
 }
 
+###########################
+##     BEGIN XS code     ##
+###########################
+
 sub get_object
 {
+    ##! 1: "start"
     my $self = shift;
-    my $keys = shift;
-
-    my $format = ($keys->{FORMAT} or "PEM");
-    my $data   = $keys->{DATA};
-    my $type   = $keys->{TYPE};
-
-    if ($format)
-    {
-        ##! 2: "format: $format"
-    }
-    ##! 2: "data:   $data"
-    ##! 2: "type:   $type"
-
-    my $object = undef;
-    if ($type eq "X509")
-    {
-        if ($format eq "DER")
-        {
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::X509::_new_from_der ($data);
-        } else {
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::X509::_new_from_pem ($data);
-        }
-    } elsif ($type eq "CSR")
-    {
-        if ($format eq "DER")
-        {
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::PKCS10::_new_from_der ($data);
-        }
-        elsif ($format eq "SPKAC")
-        {
-            #$data =~ s/.*SPKAC\s*=\s*([^\s\n]*).*/$1/s;
-            ###! 8: "spkac is ".$data
-            ###! 8: "length of spkac is ".length($data)
-            ###! 8: "data is ".$data
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::SPKAC::_new ($data);
-        } else {
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::PKCS10::_new_from_pem ($data);
-        }
-    } elsif ($type eq "CRL")
-    {
-        if ($format eq "DER")
-        {
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::CRL::_new_from_der ($data);
-        } else {
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::CRL::_new_from_pem ($data);
-        }
-    } else {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_UNKNOWN_TYPE",
-            params  => {"TYPE" => $type});
-    }
-    if (not $object)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_NO_REF");
-    }
-
-    ##! 2: "returning object"
-
-    return $object;
+    return $self->{XS}->get_object(@_);
 }
 
 sub get_object_function
 {
+    ##! 1: "start"
     my $self   = shift;
-    my $keys   = shift;
-    my $object = $keys->{OBJECT};
-    my $func   = $keys->{FUNCTION};
-    ##! 2: "object:   $object"
-    ##! 2: "function: $func"
-
-    if ($func eq "free")
-    {
-        return $self->free_object ($object);
-    }
-
-    my $result = $object->$func();
-    ##without pack/unpack the conversion does not work
-    ##utf8::upgrade($result) if (defined $result);
-    $result = pack "U0C*", unpack "C*", $object->$func();
-
-    ## fix proprietary "DirName:" of OpenSSL
-    if (defined $result and $func eq "extensions")
-    {
-        my @lines = split /\n/, $result;
-        $result = "";
-        foreach my $line (@lines)
-        {
-            if ($line !~ /^\s*DirName:/)
-            {
-                $result .= $line."\n";
-            } else {
-                my ($name, $value) = ($line, $line);
-                $name  =~ s/^(\s*DirName:).*$/$1/;
-                $value =~ s/^\s*DirName:(.*)$/$1/;
-                my $dn = OpenXPKI::DN::convert_openssl_dn ($value);
-                $result .= $name.$dn."\n";
-            }
-        }
-    }
-
-    ## parse dates
-    if (defined $result && (($func eq "notbefore") || ($func eq "notafter"))) {
-
-	# seconds since the epoch
-	my $epoch = str2time($result);
-	if (! defined $epoch) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_FUNCTION_DATE_PARSING_ERROR",
-		params  => {
-		    DATE => $result,
-		},
-		);
-	}
-	
-	my $dt_object = DateTime->from_epoch(epoch => $epoch);
-
-	# make sure we use UTC
-	$dt_object->set_time_zone('UTC');
-
-	$result = $dt_object;
-    }
-    
-    return $result;
+    return $self->{XS}->get_object_function(@_);
 }
 
 sub free_object
 {
+    ##! 1: "start"
     my $self   = shift;
-    my $object = shift;
-    $object->free();
-    return 1;
+    return $self->{XS}->free_object(@_);
 }
 
-our $AUTOLOAD;
-sub AUTOLOAD {
-    my $self = shift;
-    $AUTOLOAD =~ s/^.*://;
-    if (not $self->{ENGINE})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_AUTOLOAD_MISSING_ENGINE",
-            params  => {"FUNCTION" => $AUTOLOAD});
-    }
-    if ($AUTOLOAD eq "online" or
-        $AUTOLOAD eq "login" or
-        $AUTOLOAD eq "get_mode" or
-        $AUTOLOAD eq "get_keyfile" or
-        $AUTOLOAD eq "get_certfile" or
-        $AUTOLOAD eq "get_chainfile" or
-        $AUTOLOAD eq "get_engine" or
-        $AUTOLOAD eq "get_engine_section" or
-        $AUTOLOAD eq "get_engine_usage" or
-        $AUTOLOAD eq "get_keyform" or
-        $AUTOLOAD eq "get_passwd")
-    {
-        return  $self->{ENGINE}->$AUTOLOAD (@_);
-    }
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_AUTOLOAD_MISSING_FUNCTION",
-        params  => {"FUNCTION" => $AUTOLOAD});
+#########################
+##     END XS code     ##
+#########################
+
+###############################
+##     BEGIN engine code     ##
+###############################
+
+sub get_mode
+{
+    ##! 1: "start"
+    my $self   = shift;
+    return $self->{ENGINE}->get_mode(@_);
 }
+
+sub online
+{
+    ##! 1: "start"
+    my $self   = shift;
+    return $self->{ENGINE}->online(@_);
+}
+
+sub key_online
+{
+    ##! 1: "start"
+    my $self   = shift;
+    return $self->{ENGINE}->key_online(@_);
+}
+
+sub login
+{
+    ##! 1: "start"
+    my $self   = shift;
+    return $self->{ENGINE}->login(@_);
+}
+
+sub logout
+{
+    ##! 1: "start"
+    my $self   = shift;
+    return $self->{ENGINE}->logout(@_);
+}
+
+sub get_certfile
+{
+    ##! 1: "start"
+    my $self   = shift;
+    return $self->{ENGINE}->get_certfile(@_);
+}
+
+sub get_chainfile
+{
+    ##! 1: "start"
+    my $self   = shift;
+    return $self->{ENGINE}->get_chainfile(@_);
+}
+
+#############################
+##     END engine code     ##
+#############################
 
 sub DESTROY
 {
+    ##! 1: "start"
     my $self = shift;
     return;
 }
@@ -516,48 +441,45 @@ as first parameter followed by a hash with parameter. Example:
 
   $token->command ({COMMAND => "create_key", TYPE => "RSA", ...});
 
-=head2 get_object
+=head1 XS functions
 
-is used to get access to a cryptographic object. The following objects
-are supported today:
+We support some library functions via our XS module. Please see
+our XS module for more informations.
 
 =over
 
-=item * SPKAC
+=item * get_object
 
-=item * PKCS10
+=item * get_object_function
 
-=item * X509
-
-=item * CRL
+=item * free_object
 
 =back
 
-You must specify the type of the object in the parameter TYPE. Additionally
-you must specify the format if several different formats are supported. If
-you do not do this then PEM is assumed. The most important parameter is
-DATA which contains the plain object data which must be parsed.
+=head1 Engine functions
 
-The returned value can be a scalar or a reference. You must not use this value
-directly. You have to use the functions get_object_function or free_object
-to access the object.
+The OpenSSL engines which are supported provide some functions to
+get more detailed infos about the used security token. Please see
+our engine module for more informations.
 
-=head2 get_object_function
+=over
 
-is used to execute functions on the object. The function expects two
-parameters the OBJECT and the FUNCTION which should be called. All
-functions have no parameters. The result of the function will be
-returned.
+=item * get_mode
 
-When parsing an X.509 certificate the NotBefore and NotAfter dates are
-returned as hash references containing the following keys:
-  raw         => date as returned by the OpenSSL parser
-  epoch       => seconds since the epoch
-  object      => blessed DateTime object with TimeZone set to UTC
-  iso8601     => string containing the ISO8601 formatted date (UTC)
-  openssltime => string containing an OpenSSL compatible date string (UTC)
+=item * online
 
-=head2 free_object
+=item * key_online
 
-frees the object internally. The only parameter is the object which
-was returned by get_object.
+=item * login
+
+=item * logout
+
+=item * get_certfile
+
+=item * get_chainfile
+
+=back
+
+=head1 See Also
+
+OpenXPKI::Crypto::Backend::OpenSSL::XS and OpenXPKI::Crypto::Backend::OpenSSL::Engine
