@@ -77,6 +77,9 @@ sub debug
 
     my ($package, $filename, $line, $subroutine, $hasargs,
         $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
+    if (! defined $msg) {
+	$msg = 'undef';
+    }
     $msg = "(line $line): $msg";
 
     ($package, $filename, $line, $subroutine, $hasargs,

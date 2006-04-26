@@ -1,11 +1,13 @@
 <openxpki>
   <common>
-    <log_config>[% server.logconfig %]</log_config>
+    <log_config>[%        server.logconfig %]</log_config>
     <server>
         <user>[%          server.runuser %]</user>
         <group>[%         server.rungroup %]</group>
         <socket_file>[%   server.socketfile %]</socket_file>
         <pid_file>[%      server.pidfile %]</pid_file>
+        <session_dir>[%   dir.openxpkisessiondir %]</session_dir>
+        <session_lifetime>[% server.session_lifetime %]</session_lifetime>
         <stderr>[%        server.stderrfile %]</stderr>
 [% FOREACH item = server.transport %]
         <transport>[%     item %]</transport>

@@ -48,6 +48,9 @@ SYSCONFDIR    = [% dir.sysconfdir %]
 INSTALLPREFIX = [% dir.installprefix %]
 PERLLIB       = [% dir.perllib %]
 
+STATEDIR      = [% dir.openxpkistatedir %]
+SESSIONDIR    = [% dir.openxpkisessiondir %]
+
 CFG           = bin/openxpki-metaconf
 INSTALL       = /usr/bin/install
 CONFIGFILE    = etc/openxpki.conf
@@ -80,7 +83,7 @@ checkuser:
 		echo ; \
 	fi
 
-install: checkuser installetc installbin postinstallhelp
+install: checkuser makedirs installetc installbin postinstallhelp
 
 installbin:
 	@echo Installing binary files to $(INSTALLPREFIX)$(BINDIR)
@@ -107,6 +110,10 @@ installetc:
 	chown $(ADMUSER):$(ADMGROUP) $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki-configure
 	chmod 0755 $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki-configure
 
+makedirs:
+	@echo Creating state directories
+	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0755 -d $(STATEDIR)
+	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0700 -d $(SESSIONDIR)
 
 clean:
 	rm -f Makefile openxpki.conf

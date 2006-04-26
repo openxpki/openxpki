@@ -59,9 +59,12 @@ sub init
 
     $self->__init_session();
     $self->__init_pki_realm();
-    CTX('authentication')->login()
-        if (not CTX('session')->get_user() or
-            not CTX('session')->get_role());
+    if (not CTX('session')->get_user() or
+	not CTX('session')->get_role()) {
+	my $authentication = CTX('authentication');
+        ##! 2: $authentication
+	$authentication->login()
+    }
     $self->{TRANSPORT}->write
     (
         $self->{SERIALIZATION}->serialize

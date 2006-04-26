@@ -66,10 +66,25 @@ sub new
 #		SERVER => $self,
 	    });
     };
-    if ($EVAL_ERROR)
+    if (my $exc = OpenXPKI::Exception->caught())
     {
+	my $msg = $exc->message() || '<no message>';
+	CTX('log')->log(
+	    MESSAGE  => "Exception during server initialization: " . $msg,
+	    PRIORITY => "fatal",
+	    FACILITY => "system",
+	    );
+	# die gracefully
+	$exc->rethrow();
+    }
+    elsif ($EVAL_ERROR)
+    {
+	my $msg = $EVAL_ERROR;
+	if (ref $EVAL_ERROR) {
+	    $msg = $EVAL_ERROR->message();
+	}
         CTX('log')->log(
-	    MESSAGE  => "Uncaught exception during server initialization: " . $EVAL_ERROR->message(),
+	    MESSAGE  => "Exception during server initialization: " . $msg,
 	    PRIORITY => "fatal",
 	    FACILITY => "system",
 	    );
@@ -85,10 +100,25 @@ sub new
     {
 	$self->__get_user_interfaces();
     };
-    if ($EVAL_ERROR)
+    if (my $exc = OpenXPKI::Exception->caught())
     {
+	my $msg = $exc->message() || '<no message>';
+	CTX('log')->log(
+	    MESSAGE  => "Uncaught exception during interface initialization: " . $msg,
+	    PRIORITY => "fatal",
+	    FACILITY => "system",
+	    );
+	# die gracefully
+	$exc->rethrow();
+    }
+    elsif ($EVAL_ERROR)
+    {
+	my $msg = $EVAL_ERROR;
+	if (ref $EVAL_ERROR) {
+	    $msg = $EVAL_ERROR->message();
+	}
         CTX('log')->log(
-	    MESSAGE  => "Uncaught exception during interface initialization: " . $EVAL_ERROR->message(),
+	    MESSAGE  => "Uncaught exception during interface initialization: " . $msg,
 	    PRIORITY => "fatal",
 	    FACILITY => "system",
 	    );
@@ -126,8 +156,9 @@ sub process_request {
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        CTX('log')->log(
-	    MESSAGE  => "Uncaught exception: " . $exc->message(),
+	my $msg = $exc->message() || '<no message>';
+	CTX('log')->log(
+	    MESSAGE  => "Uncaught exception: " . $msg,
 	    PRIORITY => "fatal",
 	    FACILITY => "system",
 	    );
@@ -136,8 +167,12 @@ sub process_request {
     }
     elsif ($EVAL_ERROR)
     {
+	my $msg = $EVAL_ERROR;
+	if (ref $EVAL_ERROR) {
+	    $msg = $EVAL_ERROR->message();
+	}
         CTX('log')->log(
-	    MESSAGE  => "Uncaught exception: " . $EVAL_ERROR->message(),
+	    MESSAGE  => "Uncaught exception: " . $msg,
 	    PRIORITY => "fatal",
 	    FACILITY => "system",
 	    );

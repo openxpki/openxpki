@@ -123,6 +123,15 @@ sub setcontext {
             );
 	}
 
+	##! 4: trying to set value for $key
+	##! 4: value: $value
+	if (! defined $params->{$key}) {
+	    OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_UNDEFINED_VALUE",
+                params  => {NAME => $key},
+            );
+	}
+
 	### setting internal state...
 	$context->{exported}->{$key} = $params->{$key};
     }

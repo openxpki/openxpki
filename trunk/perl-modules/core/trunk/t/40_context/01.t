@@ -9,7 +9,7 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
-BEGIN { plan tests => 10 };
+BEGIN { plan tests => 11 };
 
 print STDERR "OpenXPKI::Server::Context\n";
 ok(1);
@@ -31,6 +31,17 @@ if (my $exc = OpenXPKI::Exception->caught()) {
 } else {
     ok(defined $var);
 }
+
+### try to set a supported custom context entry to undef...
+eval {
+    OpenXPKI::Server::Context::setcontext({'server' => undef});
+};
+if (my $exc = OpenXPKI::Exception->caught()) {
+    ok(1);
+} else {
+    ok(0);
+}
+
 
 ### try to set a supported custom context entry...
 eval {

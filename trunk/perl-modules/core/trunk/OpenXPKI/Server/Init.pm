@@ -75,6 +75,40 @@ sub init {
 	next TASK if $is_initialized{$task};
 
 	eval "__do_init_$task(\$keys);";
+	if (my $exc = OpenXPKI::Exception->caught())
+	{
+	    my $msg = $exc->message() || '<no message>';
+	    CTX('log')->log(
+		MESSAGE  => "Exception during initialization task '$task': " . $msg,
+		PRIORITY => "fatal",
+		FACILITY => "system",
+		);
+
+	    $exc->rethrow();
+	}
+	elsif ($EVAL_ERROR)
+	{
+	    my $msg = $EVAL_ERROR;
+	    if (ref $EVAL_ERROR) {
+		$msg = $EVAL_ERROR->message();
+	    }
+	    CTX('log')->log(
+		MESSAGE  => "Exception during initialization task '$task': " . $msg,
+		PRIORITY => "fatal",
+		FACILITY => "system",
+		);
+
+	    if (ref $EVAL_ERROR) {
+		$EVAL_ERROR->rethrow();
+	    } else {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
+		    params  => {
+			task => $task,
+		    });
+	    }
+	}
+
 	$is_initialized{$task}++;
 
 	if ($is_initialized{'log'}) {
@@ -192,9 +226,14 @@ sub __do_init_api {
 
 sub __do_init_authentication {
     ### init authentication...
+    my $obj = OpenXPKI::Server::Authentication->new();
+    if (! defined $obj) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_FAILURE");
+    }
     OpenXPKI::Server::Context::setcontext(
 	{
-	    authentication => OpenXPKI::Server::Authentication->new(),
+	    authentication => $obj,
 	});
 };
 
@@ -365,7 +404,7 @@ sub get_pki_realms
 			};
 
 			$log->log(
-			    MESSAGE  => "Accepted $entrytype $validitytype validity ($format:$validity) for PKI realm '$name'",
+			    MESSAGE  => "Accepted $entrytype '$entryid' $validitytype validity ($format: $validity) for PKI realm '$name'",
 			    PRIORITY => "info",
 			    FACILITY => "system");
 			
