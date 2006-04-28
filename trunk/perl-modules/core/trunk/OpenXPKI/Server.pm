@@ -14,6 +14,7 @@ use base qw(Net::Server::Fork);
 ## used modules
 
 use English;
+use Socket;
 use OpenXPKI::Debug 'OpenXPKI::Server';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -374,12 +375,21 @@ sub __get_server_config
 
     my $config = CTX('xml_config');
 
+    my $socketfile = $config->get_xpath (XPATH => "common/server/socket_file");
+
+    # check if socket filename is too long
+    if (unpack_sockaddr_un(pack_sockaddr_un($socketfile)) ne $socketfile) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_CONFIG_SOCKETFILE_TOO_LONG",
+	    params  => {"SOCKETFILE" => $socketfile});
+    }
+
     my %params = ();
     $params{proto}      = "unix";
     $params{background} = 1;
     $params{user}       = $config->get_xpath (XPATH => "common/server/user");
     $params{group}      = $config->get_xpath (XPATH => "common/server/group");
-    $params{port}       = $config->get_xpath (XPATH => "common/server/socket_file")."|unix";
+    $params{port}       = $socketfile . '|unix';
     $params{pid_file}   = $config->get_xpath (XPATH => "common/server/pid_file");
 
     ## check daemon user
