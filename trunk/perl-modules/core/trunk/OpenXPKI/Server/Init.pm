@@ -78,11 +78,12 @@ sub init {
 	if (my $exc = OpenXPKI::Exception->caught())
 	{
 	    my $msg = $exc->message() || '<no message>';
-	    CTX('log')->log(
-		MESSAGE  => "Exception during initialization task '$task': " . $msg,
-		PRIORITY => "fatal",
-		FACILITY => "system",
-		);
+	    log_wrapper(
+		{
+		    MESSAGE  => "Exception during initialization task '$task': " . $msg,
+		    PRIORITY => "fatal",
+		    FACILITY => "system",
+		});
 
 	    $exc->rethrow();
 	}
@@ -92,12 +93,14 @@ sub init {
 	    if (ref $EVAL_ERROR) {
 		$msg = $EVAL_ERROR->message();
 	    }
-	    CTX('log')->log(
-		MESSAGE  => "Exception during initialization task '$task': " . $msg,
-		PRIORITY => "fatal",
-		FACILITY => "system",
-		);
 
+	    log_wrapper(
+		{
+		    MESSAGE  => "Exception during initialization task '$task': " . $msg,
+		    PRIORITY => "fatal",
+		    FACILITY => "system",
+		});
+	    
 	    if (ref $EVAL_ERROR) {
 		$EVAL_ERROR->rethrow();
 	    } else {
@@ -112,14 +115,31 @@ sub init {
 	$is_initialized{$task}++;
 
 	if ($is_initialized{'log'}) {
-	    CTX('log')->log(
-		MESSAGE  => "Initialization task '$task' finished",
-		PRIORITY => "info",
-		FACILITY => "system");
+	    log_wrapper(
+		{
+		    MESSAGE  => "Initialization task '$task' finished",
+		    PRIORITY => "info",
+		    FACILITY => "system",
+		});
 	}
     }
     return 1;
 }
+
+
+sub log_wrapper {
+    my $arg = shift;
+
+    if ($is_initialized{'log'}) {
+	CTX('log')->log(
+	    %{$arg},
+	    );
+    } else {
+	print STDERR $arg->{FACILITY} . '.' . $arg->{PRIORITY} . ': ' . $arg->{MESSAGE};
+    }
+    return 1;
+}
+
 
 sub get_remaining_init_tasks {
     my @remaining_tasks;
@@ -188,8 +208,7 @@ sub __do_init_pki_realm {
 
 sub __do_init_dbi_backend {
     ### init backend dbi...
-    my $dbi = get_dbi(CONFIG => CTX('xml_config'),
-		      LOG    => CTX('log'));
+    my $dbi = get_dbi();
     
     OpenXPKI::Server::Context::setcontext(
 	{
@@ -199,8 +218,7 @@ sub __do_init_dbi_backend {
 
 sub __do_init_dbi_workflow {
     ### init backend dbi...
-    my $dbi = get_dbi(CONFIG => CTX('xml_config'),
-		      LOG    => CTX('log'));
+    my $dbi = get_dbi();
     
     OpenXPKI::Server::Context::setcontext(
 	{
@@ -404,7 +422,7 @@ sub get_pki_realms
 			};
 
 			$log->log(
-			    MESSAGE  => "Accepted $entrytype '$entryid' $validitytype validity ($format: $validity) for PKI realm '$name'",
+			    MESSAGE  => "Accepted '$entryid' $entrytype $validitytype validity ($format: $validity) for PKI realm '$name'",
 			    PRIORITY => "info",
 			    FACILITY => "system");
 			

@@ -61,6 +61,12 @@ sub CTX {
                 params  => {OBJECT => $object},
 		);
 	}
+	if (! defined $context->{exported}->{$object}) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED",
+                params  => {OBJECT => $object},
+		);
+	}
 	push @return, $context->{exported}->{$object};
     }
 

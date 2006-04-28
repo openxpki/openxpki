@@ -8,8 +8,12 @@
 
 BINDIR        = [% dir.bindir %]
 SYSCONFDIR    = [% dir.sysconfdir %]
+LOCALEDIR     = [% dir.localedir %]
 INSTALLPREFIX = [% dir.installprefix %]
 PERLLIB       = [% dir.perllib %]
+
+STATEDIR      = [% dir.openxpkistatedir %]
+SESSIONDIR    = [% dir.openxpkisessiondir %]
 
 CFG           = bin/openxpki-metaconf
 INSTALL       = /usr/bin/install
@@ -22,38 +26,6 @@ RUNUSER    = [% server.runuser %]
 RUNGROUP   = [% server.rungroup %]
 ADMUSER    = [% server.admuser %]
 ADMGROUP   = [% server.admgroup %]
-
-ifneq ($(shell id -nu), 'root')
-	RUNUSER  = $(shell id -nu)
-	RUNGROUP = $(shell id -ng)
-	ADMUSER  = $(shell id -nu)
-	ADMGROUP = $(shell id -ng)
-	NONROOT  = 1
-endif
-
-###########################################################################
-
-all: help summary
-
-#
-# OpenXPKI Deployment Makefile
-#
-# Written by Martin Bartosch for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
-# $Revision: 80 $
-#
-
-BINDIR        = [% dir.bindir %]
-SYSCONFDIR    = [% dir.sysconfdir %]
-INSTALLPREFIX = [% dir.installprefix %]
-PERLLIB       = [% dir.perllib %]
-
-STATEDIR      = [% dir.openxpkistatedir %]
-SESSIONDIR    = [% dir.openxpkisessiondir %]
-
-CFG           = bin/openxpki-metaconf
-INSTALL       = /usr/bin/install
-CONFIGFILE    = etc/openxpki.conf
 
 ###########################################################################
 # no user serviceable parts below this line
@@ -114,6 +86,7 @@ makedirs:
 	@echo Creating state directories
 	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0755 -d $(STATEDIR)
 	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0700 -d $(SESSIONDIR)
+	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0700 -d $(LOCALEDIR)
 
 clean:
 	rm -f Makefile openxpki.conf

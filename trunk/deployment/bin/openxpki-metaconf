@@ -678,12 +678,29 @@ __END__
 
 =head1 NAME
 
-openxpki-configure [options]
+openxpki-metaconf [options]
 
  Options:
-   --help           brief help message
-   --man            full documentation
-   --config FILE    use configuration from FILE (mandatory)
+   --help              Brief help message
+   --man               Full documentation
+   --config FILE       Use configuration from FILE (mandatory)
+   --writecfg FILE     Write updated configuration to FILE
+   --interactive       Enter interactive configuration mode (default: batch 
+                       mode)
+   --force             Overwrite files without asking
+   --includesection SECTIONSPEC
+   --excludesection SECTIONSPEC
+                       Explicitly include/exclude sections in interactive 
+                       configuration
+                       
+   --sectionsmenu      Menu-driven configuration (default: sequential config)
+   --destdir DIR       Write processed files to this directory
+   --file FILE         Process input file FILE via Template Toolkit with
+                       the settings specified in the current configuration
+   --includedir DIR    Include directories for Template processing
+   --getcfgvalue VALUE Configuration value to get from current configuration
+   --setcfgvalue VALUE Configuration value to set in current configuration
+   --delcfgvalue VALUE Configuration value to delete in current configuration
 
 =head1 OPTIONS
 
@@ -705,10 +722,11 @@ Read configuration file FILE. This option is mandatory.
 
 =head1 DESCRIPTION
 
-B<openxpki-configure> generates a usable OpenXPKI configuration from
+B<openxpki-metaconf> generates a usable OpenXPKI configuration from
 a set of base templates. The parameters that are inserted into the
 configuration are taken from a configuration file and can be modified
 interactively.
+
 
 =cut
 

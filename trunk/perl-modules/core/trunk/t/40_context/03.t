@@ -45,8 +45,15 @@ ok(blessed CTX('api'),
 ok(blessed CTX('authentication'),
    'OpenXPKI::Server::Authentication');
 
-ok(CTX('server'),
-   undef);
+eval {
+    CTX('server');
+};
+if (my $exc = OpenXPKI::Exception->caught()) {
+    ok($exc->message(), 
+       "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED"); # expected error
+} else {
+    ok(0);
+}
 
 
 1;
