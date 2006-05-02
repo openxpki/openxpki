@@ -13,7 +13,7 @@ use Pod::Usage;
 use POSIX;
 use Errno;
 
-use Smart::Comments;
+# use Smart::Comments;
 
 use OpenXPKI::Debug;
 
