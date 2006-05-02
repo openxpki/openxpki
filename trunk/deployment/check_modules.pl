@@ -31,6 +31,7 @@ foreach my $module (sort @modules)
 {
     next if ($module =~ /\$/);  # no dynamic includes
     next if ($last eq $module); # no double checks
+    next if ($module =~ m{ use\ (?:Errno|POSIX) }xms ); # whitelisted modules
     $last = $module;
 
     if (not eval "use $module;" and $@)

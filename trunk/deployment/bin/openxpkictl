@@ -10,8 +10,10 @@ use warnings;
 use English;
 use Getopt::Long;
 use Pod::Usage;
+use POSIX;
+use Errno;
 
-# use Smart::Comments;
+use Smart::Comments;
 
 use OpenXPKI::Debug;
 
@@ -35,7 +37,7 @@ GetOptions(\%params,
 	      help|?
 	      man
 	      cfg|cfgfile|conf|config=s
-              debug=i
+              debug=s@
 	      )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
@@ -46,7 +48,19 @@ if (scalar @ARGV != 1) {
 }
 
 if (defined $params{debug}) {
-    $OpenXPKI::Debug::LEVEL{'.*'} = $params{debug};
+    @{$params{debug}} = split(m{,}, join(',', @{$params{debug}}));
+    
+    foreach my $param (@{$params{debug}}) {
+	my ($module, $level) = ($param =~ m{ \A (.*?):?(\d*) \z }xms);
+	if ($level eq '') {
+	    $level = 1;
+	}
+	if ($module eq '') {
+	    $module = '.*';
+	}
+	print STDERR "Debug level for module '$module': $level\n";
+ 	$OpenXPKI::Debug::LEVEL{$module} = $level;
+    }
 }
 
 use OpenXPKI::XML::Config;
@@ -59,7 +73,7 @@ if (defined $params{cfg}) {
 my $config = OpenXPKI::XML::Config->new(CONFIG => $configfile);
 
 if (! defined $config) {
-    print STDERR "ERROR: Could not read configuration file $configfile.";
+    print STDERR "ERROR: Could not read configuration file $configfile\n";
     exit 1;
 }
 
@@ -92,10 +106,54 @@ if ($cmd eq 'start') {
     }
     print "Starting OpenXPKI...\n";
     unlink $pidfile;
-    if (! OpenXPKI::Server->new ("CONFIG" => $configfile)) {
-	print STDERR "Could not start OpenXPKI Server daemon.\n";
-	exit 1;
+
+  FORK: 
+    {
+	if ($pid = fork) {
+	    # parent here
+	    # child process pid is available in $pid
+	    waitpid(-1, 0);
+	    
+	    # FIXME: find out if the server is REALLY running properly
+
+	    exit 0;
+	}
+	elsif (defined $pid) { # $pid is zero here if defined
+	    # child here
+	    # parent process pid is available with getppid
+	    
+	    # prepare daemonizing myself
+	    # redirect filehandles
+	    open STDOUT, ">/dev/null" or
+		die "unable to write to /dev/null!: $!";
+	    open STDIN, "/dev/null" or
+		die "unable to read from /dev/null!: $!";
+
+	    chdir '/';
+
+            # create new session
+	    POSIX::setsid or
+		die "unable to create new session!: $!";
+
+	    open STDERR, '>&STDOUT' or
+		die "unable to attach STDERR to STDOUT!: $!";
+	    
+	    if (! OpenXPKI::Server->new ("CONFIG" => $configfile)) {
+		print STDERR "Could not start OpenXPKI Server daemon.\n";
+		exit 1;
+	    }
+	}
+	elsif ($!{EAGAIN}) {
+	    # EAGAIN is the supposedly recoverable fork error
+	    sleep 5;
+	    redo FORK;
+	}
+	else {
+	    # weird fork error
+	    die "Can't fork: $!\n";
+	}
     }
+    
 }
 if ($cmd eq 'stop') {
     if (! defined $pid || (kill(0, $pid) == 0)) {
@@ -129,9 +187,13 @@ __END__
 openxpkictl [options] COMMAND
 
  Options:
-   --help           brief help message
-   --man            full documentation
-   --config FILE    use configuration from FILE
+   --help                brief help message
+   --man                 full documentation
+   --config FILE         use configuration from FILE
+   --debug  MODULE:LEVEL set MODULE debug level to LEVEL 
+                         (positive integer value).
+                         MODULE defaults to '.*'
+                         LEVEL defaults to 1
 
  Commands:
    start            Start OpenXPKI daemon
@@ -154,6 +216,33 @@ Prints the manual page and exits.
 
 Read configuration file FILE. Uses built-in default if not specified.
 
+=item B<--debug MODULE:LEVEL>
+
+Set specific module debug level to LEVEL (must be a positive integer). Higher
+values mean more debug output. Multiple --debug options can be specified.
+It is also possible to specify multiple debug settings in one --debug
+option by separating them with a comma.
+MODULE must be a module specification (e. g. OpenXPKI::Server) and may
+contain Perl Regular expressions.
+
+MODULE defaults to '.*' if not specified. LEVEL defaults to 1 if not specified.
+
+Examples:
+
+  --debug
+ (equivalent to --debug .*:1)
+
+  --debug OpenPKI::Server
+  (equivalent to --debug OpenXPKI::Server:1)
+
+  --debug OpenPKI::Server:100
+  (equivalent to --debug OpenXPKI::Server:100)
+
+  --debug OpenPKI::Server:10 --debug OpenXPKI::Crypto::.*:20
+  --debug OpenXPKI::Server:10,OpenXPKI::Crypto::.*:20
+  (these two are equivalent)
+
+
 =back
 
 =head1 COMMANDS
@@ -173,9 +262,7 @@ Stops the OpenXPKI daemon.
 
 =head1 DESCRIPTION
 
-B<openxpkictl> is a front end to the OpenXPKI System. It is designed
-to help the  administrator control the functioning of the OpenXPKI
-server daemon.
+B<openxpkictl> is the start script for the OpenXPKI server process. 
 
 =over 8
 

@@ -60,3 +60,12 @@ From this on the user can decide how to go from there:
    > rm -f openxpki.conf openxpki-configure
    > vi config.xml token.xml ...
    > openxpkictl restart
+
+
+3) Completely non-interactive batch mode example:
+
+  rm -f openxpki.conf
+  ./configure  --batch --nocheck -- --setcfg dir.prefix=/home/johndoe/local --setcfg file.openssl=/opt/local/bin/openssl --setcfg deployment.xmlstyle=multi-file --setcfg server.runuser=johndoe --setcfg server.rungroup=johndoe
+  rm /home/johndoe/local/etc/openxpki/openxpki.conf
+  make install
+  openxpki-configure --batch
