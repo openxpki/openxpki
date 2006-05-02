@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+LICENSE
+lib/OpenXPKI/Client.pm
+t/common.pl
+t/00.pod-coverage.t
+t/00.pod.t
+t/10.load.t
+t/20.init-openxpki.t
+t/30.client.t
+t/99.cleanup.t
