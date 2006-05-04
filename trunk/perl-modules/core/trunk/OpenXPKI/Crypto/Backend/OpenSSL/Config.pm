@@ -1,7 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Config
 ## Written 2005 and 2006 by Julia Dubenskaya and Michael Bell for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision: 218 $
+## $Revision$
 	
 use strict;
 use warnings;
@@ -28,7 +28,20 @@ sub new
     my $self = shift;
     bless $self, $class;
 
-    ##! 1: "WARNING:FIXME: missing all checks for the initialization"
+    ##! 2: "check XS availability"
+    if (not exists $self->{XS} or not ref $self->{XS})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CONFIG_MISSING_XS");
+    }
+
+    ##! 2: "$self->{TMP} will be checked by the central OpenSSL module"
+    if (not $self->{TMP})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CONFIG_TEMPORARY_DIRECTORY_UNAVAILABLE");
+    }
+
 
     return $self;
 }
@@ -551,7 +564,7 @@ sub __cleanup_files
     foreach my $filename (sort keys %{$self->{FILENAME}})
     {
         ##! 4: "filename: $filename"
-        unlink($filename);
+        unlink($self->{FILENAME}->{$filename});
     }
     delete $self->{FILENAME};
 

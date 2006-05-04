@@ -13,6 +13,11 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 use English;
 
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::DSA;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::EC;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::GOST94;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::RSA;
+
 sub get_command
 {
     my $self = shift;
@@ -49,13 +54,16 @@ sub get_command
     }
     my $algclass = __PACKAGE__."::".$self->{TYPE};
 
-    eval "require $algclass";
-    if ($EVAL_ERROR) 
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE",
-            params  => {"TYPE" => $self->{TYPE}});
-    }
+    # added some use statements at top of the class
+    # ##! 1: "FIXME: require should never be called in normal code"
+    # ##! 1: "FIXME: always use 'use ...;' at top of a module!"
+    # eval "require $algclass";
+    # if ($EVAL_ERROR) 
+    # {
+    #     OpenXPKI::Exception->throw (
+    #         message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE",
+    #         params  => {"TYPE" => $self->{TYPE}});
+    # }
     my $algobj = $algclass->new ($self);
 
     ## we do not need to check the result because 
@@ -66,7 +74,7 @@ sub get_command
 ## FIXME: $keyform was not set both in
 ## original and modified code. Michael, what it is for?
 
-    if (length($engine) and not defined $passwd)
+    if (not length($engine) and not defined $passwd)
     {
         ## missing passphrase
         OpenXPKI::Exception->throw (
@@ -98,6 +106,12 @@ sub get_command
         $self->set_env ('pwd' => $passwd);
     }
 
+    if (length($engine))
+    {
+        $self->{CONFIG}->dump();
+        $self->set_env('OPENSSL_CONF' => $self->{CONFIG}->get_config_filename());
+    }
+
     return [ $command, $pkcs8 ];
 }
 
@@ -114,6 +128,7 @@ sub key_usage
 sub get_result
 {
     my $self = shift;
+
     return $self->read_file ($self->{KEYFILE});
 }
 

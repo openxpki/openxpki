@@ -18,6 +18,9 @@
     <profile id="INTERNAL_CA_2"
 	     super="../profile{default}"/>
 
+    <profile id="INTERNAL_CA_GOST"
+	     super="../profile{default}"/>
+
   </crl>
 
   <!-- profile configuration for the generation of CA certificates -->

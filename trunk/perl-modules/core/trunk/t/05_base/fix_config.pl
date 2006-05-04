@@ -27,11 +27,24 @@ replace_param (FILENAME => "t/25_crypto/token.xml",
                TAG      => "shell",
                VALUE    => $openssl_binary);
 
+## prepare GOST configuration
+if (exists $ENV{GOST_OPENSSL_ENGINE})
+{
+    $ENV{GOST_OPENSSL} = $openssl_binary if (not exists $ENV{GOST_OPENSSL});
+    replace_param (FILENAME => "t/25_crypto/token.xml",
+                   PARAM    => "__GOST_ENGINE_LIBRARY__",
+                   VALUE    => $ENV{GOST_OPENSSL_ENGINE});
+    replace_param (FILENAME => "t/25_crypto/token.xml",
+                   PARAM    => "__GOST_OPENSSL__",
+                   VALUE    => $ENV{GOST_OPENSSL});
+}
+
 sub replace_param
 {
     my $keys     = { @_ };
     my $filename = $keys->{FILENAME};
     my $tag      = $keys->{TAG};
+    my $param    = $keys->{PARAM};
     my $value    = $keys->{VALUE};
 
     open FD, $filename or die "Cannot open configuration file $filename.\n";
@@ -42,8 +55,14 @@ sub replace_param
     }
     close FD;
 
-    $file =~ s{(<$tag>)([^<]*)(</$tag>\s*)}
-              {$1$value$3}sgx;
+    if (exists $keys->{TAG})
+    {
+        $file =~ s{(<$tag>)([^<]*)(</$tag>\s*)}
+                  {$1$value$3}sgx;
+    } else {
+        $file =~ s{$param}
+                  {$value}sgx;
+    }
 
     my $i = 0;
     while (-e sprintf ("%s.%03d", $filename, $i)) {$i++;}

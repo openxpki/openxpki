@@ -38,6 +38,7 @@ OpenXPKI/Crypto/Backend/OpenSSL.pm
 OpenXPKI/Crypto/Backend/OpenSSL/CLI.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Engine/GOST.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/OpenSSL.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Config.pm
 OpenXPKI/Crypto/Backend/OpenSSL/XS.pm
@@ -65,6 +66,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_chain.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/RSA.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/DSA.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/EC.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST94.pm
 
 ## XS sources
 
@@ -173,6 +175,7 @@ t/25_crypto/11.t
 t/25_crypto/12.t
 t/25_crypto/13.t
 t/25_crypto/14.t
+t/25_crypto/15_gost.t
 t/25_crypto/20.t
 t/25_crypto/21.t
 t/25_crypto/22.t

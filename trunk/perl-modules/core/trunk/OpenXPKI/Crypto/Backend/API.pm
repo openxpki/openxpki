@@ -44,7 +44,7 @@ our %COMMAND_PARAMS =
                           "CSR"     => 1,
                           "DAYS"    => 1},
     "create_key"      => {"PASSWD"     => 0,
-                          "TYPE"       => ["RSA","DSA","EC"],
+                          "TYPE"       => ["RSA","DSA","EC","GOST94"],
                           "PARAMETERS" => {"TYPE:RSA" =>
                                               {"ENC_ALG" =>
                                                   ["__undef",
@@ -86,6 +86,19 @@ our %COMMAND_PARAMS =
                                                    "des"
                                                   ],
                                                "CURVE_NAME" => 0
+                                              },
+                                           "TYPE:GOST94" =>
+                                              {"ENC_ALG" =>
+                                                  ["__undef",
+                                                   "aes256",
+                                                   "aes192",
+                                                   "aes128",
+                                                   "idea",
+                                                   "des3",
+                                                   "des"
+                                                  ],
+                                               "PASSWD" => 0,
+                                               "PARAMSET" => 0
                                               },
                                           }
                          },

@@ -5,8 +5,12 @@ INCLUDE: OpenXPKI/Crypto/Backend/OpenSSL/XS/CRL.xs
 
 MODULE = OpenXPKI		PACKAGE = OpenXPKI::Crypto::Backend::OpenSSL
 
-void
+int
 set_config(config)
 	const char * config
     CODE:
-	OPENSSL_config (config);
+        OPENSSL_load_builtin_modules();
+        ENGINE_load_builtin_engines();
+        RETVAL = CONF_modules_load_file(config, NULL, 0);
+    OUTPUT:
+        RETVAL
