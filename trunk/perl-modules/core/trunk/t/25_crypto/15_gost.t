@@ -16,7 +16,9 @@ else
 }
 
 use OpenXPKI qw( read_file write_file );
-use OpenXPKI::Crypto::TokenManager;
+use OpenXPKI::Debug;
+## $OpenXPKI::Debug::LEVEL{'OpenXPKI::Crypto::Backend::OpenSSL.*'} = 100;
+require OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
 use OpenXPKI::Crypto::Profile::CRL;
 

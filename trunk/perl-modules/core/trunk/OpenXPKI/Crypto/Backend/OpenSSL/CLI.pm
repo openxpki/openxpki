@@ -93,8 +93,8 @@ sub prepare
     for (my $i=0; $i < scalar @{$self->{COMMAND}}; $i++)
     {
         $self->{COMMAND}->[$i] = $self->{SHELL}."   ".$self->{COMMAND}->[$i].
-                                                " 1>".$self->{STDOUT}.
-                                                " 2>".$self->{STDERR};
+                                                " 1>>".$self->{STDOUT}.
+                                                " 2>>".$self->{STDERR};
         ##! 4: "prepared command: ".$self->{COMMAND}->[$i]
     }
 
@@ -119,6 +119,7 @@ sub execute
                 params  => {"ERRVAL" => $EVAL_ERROR});
         }
     }
+    unlink ($self->{STDIN});
 
     ##! 2: "try to detect other errors"
     $self->__find_error();
@@ -155,6 +156,7 @@ sub __find_error
     $ret = $self->{ENGINE}->filter_stderr($ret);
     if ($ret =~ /error/i)
     {
+        ##! 8: "error detected - firing exception"
         unlink ($self->{STDOUT});
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_ERROR",

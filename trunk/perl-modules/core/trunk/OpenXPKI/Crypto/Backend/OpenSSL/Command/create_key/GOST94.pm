@@ -45,7 +45,7 @@ sub get_command
     my $self   = shift;
     my $engine = shift;
 
-    my $command = "req -newkey gost94";
+    my $command = "req -newkey gost94:";
     $command .= " -engine $engine" if ($engine);
     $command .= " -keyout " . $self->{PARENT_REF}->{OUTFILE};
     $command .= " -rand " . $self->{PARENT_REF}->{RANDOM_FILE};
