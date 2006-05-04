@@ -27,6 +27,8 @@ use OpenXPKI::Transport::Simple;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Serialization::JSON;
 
+# use Smart::Comments;
+
 my %socketfile             : ATTR;
 my %socket                 : ATTR;
 
@@ -37,6 +39,7 @@ my %transport              : ATTR;
 my %serialization          : ATTR;
 
 my %sessionid              : ATTR;
+my %read_timeout           : ATTR;
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
@@ -45,6 +48,7 @@ sub BUILD {
 
     $transport_protocol{$ident}     = 'Simple';
     $serialization_protocol{$ident} = 'Simple';
+    $read_timeout{$ident}           = 30;
 }
 
 sub START {
@@ -64,7 +68,7 @@ sub START {
 
 # send message to server
 sub talk {
-    my $self = shift;
+    my $self  = shift;
     my $arg   = shift;
     my $ident = ident $self;
     
@@ -75,12 +79,28 @@ sub talk {
 
 # get server response
 sub collect {
-    my $self = shift;
+    my $self  = shift;
     my $ident = ident $self;
-    
-    return $serialization{$ident}->deserialize(
-	$transport{$ident}->read()
-	);
+
+    my $result;
+    eval {
+ 	local $SIG{ALRM} = sub { die "alarm\n" };
+	
+ 	alarm $read_timeout{$ident};
+ 	$result = $serialization{$ident}->deserialize(
+ 	    $transport{$ident}->read()
+ 	    );
+ 	alarm 0;
+    };
+    if ($EVAL_ERROR) {
+ 	if ($EVAL_ERROR eq "alarm\n") {
+ 	    return undef;
+ 	} else {
+	    # FIXME
+	    die $EVAL_ERROR;
+	}
+    }
+    return $result;
 }
 
 

@@ -105,20 +105,24 @@ sub __init_session
                            ID        => $msg->{SESSION_ID}
                        });
         };
-        if ($EVAL_ERROR)
-        {
-            $self->{TRANSPORT}->write
-            (
-                $self->{SERIALIZATION}->serialize
-                (
-                    {ERROR => "ILLEGAL_OLD_SESSION"}
-                )
-            );
-            OpenXPKI::Exception->throw
-            (
-                message => "I18N_OPENXPKI_SERIALIZATION_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED",
-                params  => {ID => $msg->{SESSION_ID}}
-            );
+	if ($EVAL_ERROR) {
+            $self->{TRANSPORT}->write(
+		$self->{SERIALIZATION}->serialize(
+		    {ERROR => "ILLEGAL_OLD_SESSION"}));
+	    
+	    if (my $exc = OpenXPKI::Exception->caught())
+	    {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERIALIZATION_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED",
+		    params  => {ID => $msg->{SESSION_ID}},
+		    child   => $exc);
+	    } else {
+		OpenXPKI::Exception->throw
+		    (
+		     message => "I18N_OPENXPKI_SERIALIZATION_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED",
+		     params  => {ID => $msg->{SESSION_ID}}
+		    );
+	    }
         }
     }
     elsif ($msg->{SERVICE_MSG} eq "NEW_SESSION")
@@ -255,13 +259,14 @@ sub run
 {
     my $self = shift;
 
+  MESSAGE:
     while (my $msg = $self->{TRANSPORT}->read())
     {
         my $data = $self->{SERIALIZATION}->deserialize($msg);
+	next MESSAGE unless defined $data->{SERVICED_MSG};
 
         ##! 4: "check for logout"
-        if (exists $data->{SERVICE_MSG} and
-            $data->{SERVICE_MSG} eq "LOGOUT")
+        if ($data->{SERVICE_MSG} eq "LOGOUT")
         {
             ##! 8: "logout received - killing session and connection"
             CTX('session')->delete();
@@ -288,36 +293,28 @@ sub get_authentication_stack
     my $self = shift;
     my $keys = shift;
 
-    ##! 2: "send all available authentication stacks"
-    $self->{TRANSPORT}->write
-    (
-        $self->{SERIALIZATION}->serialize
-        ({
-            SERVICE_MSG           => "GET_AUTHENTICATION_STACK",
-            AUTHENTICATION_STACKS => $keys->{STACKS},
-        })
-    );
-
-    ##! 2: "read answer"
-    my $msg = $self->{SERIALIZATION}->deserialize
-              (
-                  $self->{TRANSPORT}->read()
-              );
-    if (not exists $msg->{AUTHENTICATION_STACK} or
-        not exists $keys->{STACKS}->{$msg->{AUTHENTICATION_STACK}})
-    {
-        $self->{TRANSPORT}->write
-        (
-            $self->{SERIALIZATION}->serialize
-            (
-                {ERROR => "ILLEGAL_AUTHENTICATION_STACK"}
-            )
-        );
-        OpenXPKI::Exception->throw
-        (
-            message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_AUTH_STACK_ILLEGAL_STACK",
-            params  => {PKI_REALM => $msg->{AUTHENTICATION_STACK}}
-        );
+    my $msg;
+  GET_AUTH_STACK:
+    while (1) {
+	##! 2: "send all available authentication stacks"
+	$self->{TRANSPORT}->write
+	    (
+	     $self->{SERIALIZATION}->serialize
+	     ({
+		 SERVICE_MSG           => "GET_AUTHENTICATION_STACK",
+		 AUTHENTICATION_STACKS => $keys->{STACKS},
+	      })
+	    );
+	
+	##! 2: "read answer"
+	$msg = $self->{SERIALIZATION}->deserialize
+	    (
+	     $self->{TRANSPORT}->read()
+	    );
+	if (exists $msg->{AUTHENTICATION_STACK}
+	    && exists $keys->{STACKS}->{$msg->{AUTHENTICATION_STACK}}) {
+	    last GET_AUTH_STACK;
+	}
     }
 
     ##! 2: "return auth_stack ".$msg->{AUTHENTICATION_STACK}
@@ -332,48 +329,49 @@ sub get_passwd_login
     ##! 2: "handler ".$keys->{ID}
 
     $self->{TRANSPORT}->write
-    (
-        $self->{SERIALIZATION}->serialize
-        ({
-            SERVICE_MSG => "GET_PASSWD_LOGIN",
-            PARAMS      => $keys,
-        })
-    );
-
+	(
+	 $self->{SERIALIZATION}->serialize
+	 ({
+	     SERVICE_MSG => "GET_PASSWD_LOGIN",
+	     PARAMS      => $keys,
+	  })
+	);
+    
     ##! 2: "read answer"
     my $msg = $self->{SERIALIZATION}->deserialize
-              (
-                  $self->{TRANSPORT}->read()
-              );
+	(
+	 $self->{TRANSPORT}->read()
+	);
+    
     if (not exists $msg->{LOGIN})
     {
-        $self->{TRANSPORT}->write
-        (
-            $self->{SERIALIZATION}->serialize
-            (
-                {ERROR => "MISSING_LOGIN"}
-            )
-        );
-        OpenXPKI::Exception->throw
-        (
-            message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_MISSING_LOGIN",
-            params  => $keys
-        );
+	$self->{TRANSPORT}->write
+	    (
+	     $self->{SERIALIZATION}->serialize
+	     (
+	      {ERROR => "MISSING_LOGIN"}
+	     )
+	    );
+	OpenXPKI::Exception->throw
+	    (
+	     message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_MISSING_LOGIN",
+	     params  => $keys
+	    );
     }
     if (not exists $msg->{PASSWD})
     {
-        $self->{TRANSPORT}->write
-        (
-            $self->{SERIALIZATION}->serialize
-            (
-                {ERROR => "MISSING_PASSWD"}
-            )
-        );
-        OpenXPKI::Exception->throw
-        (
-            message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_MISSING_PASSWD",
-            params  => $keys
-        );
+	$self->{TRANSPORT}->write
+	    (
+	     $self->{SERIALIZATION}->serialize
+	     (
+	      {ERROR => "MISSING_PASSWD"}
+	     )
+	    );
+	OpenXPKI::Exception->throw
+	    (
+	     message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_MISSING_PASSWD",
+	     params  => $keys
+	    );
     }
 
     return ({LOGIN => $msg->{LOGIN}, PASSWD => $msg->{PASSWD}});
@@ -420,7 +418,7 @@ is always the same - the session ID or an error message.
 --> {PKI_REALM => $realm}
 
 <-- {SERVICE_MSG => "GET_AUTHENTICATION_STACK",
-     AUTH_STACKS => {
+     AUTHENTICATION_STACKS => {
                      "0" => {
                              NAME => "Basic Root Auth Stack",
                              DESCRIPTION => "This is the basic root authentication stack."
@@ -428,7 +426,7 @@ is always the same - the session ID or an error message.
                     }
     }
 
---> {AUTH_STACK => "0"}
+--> {AUTHENTICATION_STACK => "0"}
 
 Example 1: Anonymous Login
 
@@ -456,7 +454,7 @@ on failure ...
 
 =head3 Session continue
 
---> {SERVICE_MSG => "CONTINUE",
+--> {SERVICE_MSG => "CONTINUE_SESSION",
      SESSION_ID  => $ID}
 
 <-- {SESSION_ID => $ID}

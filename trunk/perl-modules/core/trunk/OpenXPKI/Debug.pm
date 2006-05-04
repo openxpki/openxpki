@@ -8,6 +8,8 @@ use warnings;
 
 package OpenXPKI::Debug;
 
+use POSIX;
+use English;
 use Filter::Util::Call;
 
 our %LEVEL;
@@ -86,7 +88,8 @@ sub debug
      $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(1);
     $msg = "$subroutine $msg\n";
 
-    print STDERR "DEBUGLEVEL $level: $msg";
+    my $timestamp = strftime("%F %T", localtime(time));
+    print STDERR "$timestamp DEBUG:$level PID:$PROCESS_ID $msg";
 }
 
 1 ;

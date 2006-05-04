@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+#
+# Written by Martin Bartosch for the OpenXPKI project 2006
+# Copyright (c) 2006 by The OpenXPKI Project
+# $Revision: 80 $
+#
+
+use strict;
+use warnings;
+use English;
+use Getopt::Long qw( :config permute pass_through );
+use Pod::Usage;
+use Term::ReadLine;
+
+use Smart::Comments;
+
+use OpenXPKI::Debug;
+use OpenXPKI::Client::CLI;
+
+my $configfile;
+
+$SIG{PIPE} = 'IGNORE';
+
+my %params;
+GetOptions(\%params,
+	   qw(
+	      help|?
+	      man
+	      socketfile=s
+              session=s
+              debug=i
+	      ));
+
+pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
+pod2usage(-verbose => 1) if ($params{help});
+
+if (defined $params{debug}) {
+    $OpenXPKI::Debug::LEVEL{'.*'} = $params{debug};
+}
+
+my $cli = OpenXPKI::Client::CLI->new(
+    {
+	SOCKETFILE => $params{socketfile},
+    });
+
+my %args;
+if (exists $params{session}) {
+    $args{SESSION_ID} = $params{session};
+}
+
+$cli->init_session(\%args);
+my $session_id = $cli->get_session_id();
+### $session_id
+
+if (scalar @ARGV == 0) {
+    print "Entering interactive OpenXPKI shell.\n";
+    print "Type 'help' for help, 'quit' to exit.\n\n";
+
+    my $term = new Term::ReadLine 'OpenXPKI';
+    my $OUT = $term->OUT || \*STDOUT;
+    my $state = '';
+
+    my $process_response = 1;
+
+  INTERACTION:
+    while (1) {
+
+	if ($process_response) {
+	    # handle response from last command and render output
+	    my $response;
+	    eval {
+		$response = $cli->collect();
+	    };
+	    if (my $exc = OpenXPKI::Exception->caught()) {
+		if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION') {
+		    print $OUT "Server terminated connection.\n";
+		    ### $session_id
+		    # re-initialize session
+		    $cli = OpenXPKI::Client::CLI->new(
+			{
+			    SOCKETFILE => $params{socketfile},
+			});
+		    $cli->init_session(
+			{
+			    SESSION_ID => $session_id,
+			});
+		    redo INTERACTION;
+		}
+		$exc->rethrow();
+	    }
+	    $cli->render($response) if defined $response;
+	    $process_response = 0;
+	}
+
+	my $prompt = 'OpenXPKI [' . $state . ']: ';
+	my $line = $term->readline($prompt);
+	last INTERACTION unless defined $line;  # accept EOF to leave shell
+
+	my $cmd_res;
+	eval {
+	    $cmd_res = $cli->process_command($line, 
+					     {
+						 READLINE => $term,
+					     }
+		);
+	};
+	if ($EVAL_ERROR) {
+	    print "error: $EVAL_ERROR\n";
+	    next INTERACTION;
+	    exit 1;
+	}
+
+	# command exit requested?
+	last INTERACTION if (! defined $cmd_res);
+
+	my @message;
+	if (exists $cmd_res->{MESSAGE}) {
+	    if (ref $cmd_res->{MESSAGE} eq '') {
+		push @message, $cmd_res->{MESSAGE};
+	    }
+	    if (ref $cmd_res->{MESSAGE} eq 'ARRAY') {
+		@message = @{$cmd_res->{MESSAGE}};
+	    }
+	}
+
+	if (! defined $cmd_res->{ERROR} ||
+	    ($cmd_res->{ERROR} == 0)) {
+	    print $OUT join("\n", @message);
+	    print "\n";
+	} else {
+	    print $OUT "ERROR $cmd_res->{ERROR}: ". join("\n", @message) . "\n";
+	}
+
+	if (exists $cmd_res->{SERVER_COMMAND} &&
+	    (ref $cmd_res->{SERVER_COMMAND} eq 'HASH')) {
+
+	    # send a message to the server...
+	    eval {
+		$cli->talk($cmd_res->{SERVER_COMMAND});
+	    };
+	    if (my $exc = OpenXPKI::Exception->caught()) {
+		print $OUT "Error sending server message.\n";
+#		redo INTERACTION;
+		exit 1;
+	    }
+	    # ... and make sure we read it during the next iteration
+	    $process_response = 1;
+	}
+
+	$term->addhistory($line) if ($line ne "");
+    }    
+    print $OUT "Exiting...\n";
+    exit 0;
+
+} else {
+    die "Non-interactive use currently under construction. Stopped";
+
+    my $res = $cli->process(join(' ', @ARGV));
+    my $rc = $res->{ERROR};
+    if ($res->{ERROR} == 0) {
+	if (scalar @{$res->{MESSAGE}}) {
+	    print join("\n", @{$res->{MESSAGE}});
+	}
+    } else {
+	print "ERROR $res->{ERROR}: ". join("\n", @{$res->{MESSAGE}}) . "\n";
+    }
+    exit $rc;
+}
+
+__END__
+
+=head1 NAME
+
