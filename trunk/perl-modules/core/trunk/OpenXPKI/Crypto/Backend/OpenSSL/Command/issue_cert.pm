@@ -25,6 +25,7 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_MISSING_PROFILE");
     }
+    $self->{CONFIG}->set_profile($self->{PROFILE});
     my $profile = $self->{PROFILE};
 
     $self->get_tmpfile ('CSR',      'OUT');
@@ -57,7 +58,8 @@ sub get_command
 
     ## prepare data
 
-    $self->write_config ($profile);
+    $self->{CONFIG}->dump();
+    my $config = $self->{CONFIG}->get_config_filename();
     $self->write_file (FILENAME => $self->{CSRFILE},
                        CONTENT  => $self->{CSR},
 	               FORCE    => 1);
@@ -71,7 +73,7 @@ sub get_command
     ## build the command
 
     my $command  = "ca -batch";
-    $command .= " -config ".$self->{CONFIGFILE};
+    $command .= " -config $config";
     ## fix DN-handling of OpenSSL
     $command .= ' -subj "'.$self->get_openssl_dn($profile->get_subject()).'"';
     $command .= " -multivalue-rdn" if ($profile->get_subject() =~ /[^\\](\\\\)*\+/);

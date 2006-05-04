@@ -29,7 +29,7 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_PROFILE");
     }
-    my $profile = $self->{PROFILE};
+    $self->{CONFIG}->set_profile($self->{PROFILE});
 
     $self->get_tmpfile ('OUT');
 
@@ -58,71 +58,17 @@ sub get_command
 
     ## prepare data
 
-    my $index_txt = "";
     if ($self->{REVOKED})
     {
-        foreach my $arrayref (@{$self->{REVOKED}})
-        {
-            # end of time_t datatype in C library
-            my ($cert, $timestamp) = (undef, "2038:01:16T23:59:59.9999999");
-            if (not ref $arrayref)
-            {
-                $cert      = $arrayref;
-            } else {
-                $cert      = $arrayref->[0];
-                $timestamp = $arrayref->[1]
-                    if (scalar @{$arrayref} > 1);
-            }
-            # get X509 object
-            if (not ref($cert))
-            {
-                eval {
-                    ##! 1: "FIXME: where is the related free_object call?"
-                    $cert = $self->{XS}->get_object({DATA => $cert, TYPE => "X509"});
-                };
-                if (my $exc = OpenXPKI::Exception->caught())
-                {
-                    OpenXPKI::Exception->throw (
-                        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
-                        child   => $exc);
-                } elsif ($EVAL_ERROR) {
-                    $EVAL_ERROR->rethrow();
-                }
-            }
-            # prepare index.txt entry
-            $timestamp = $self->get_openssl_time ($timestamp);
-            my $start = $self->{XS}->get_object_function ({
-                            OBJECT   => $cert,
-                            FUNCTION => "notbefore"});
-            $start = OpenXPKI::DateTime::convert_date(
-		{
-		    DATE      => $start,
-		    OUTFORMAT => 'openssltime',
-		});
-
-	    ### OpenSSL notbefore date: $start
-
-            my $subject = $self->{XS}->get_object_function ({
-                              OBJECT   => $cert,
-                              FUNCTION => "subject"});
-            $subject = $self->get_openssl_dn($subject);
-            my $serial = $self->{XS}->get_object_function ({
-                             OBJECT   => $cert,
-                             FUNCTION => "serial"});
-            $serial = Math::BigInt->new ($serial);
-            my $hex = substr ($serial->as_hex(), 2);
-            $hex    = "0".$hex if (length ($hex) % 2);
-            $index_txt = "R\t$start\t$timestamp\t$hex\tunknown\t$subject\n";
-        }
+        $self->{CONFIG}->set_cert_list($self->{REVOKED});
     }
-    $self->{INDEX_TXT} = $index_txt;
-
-    $self->write_config ($profile);
+    $self->{CONFIG}->dump ();
+    my $config = $self->{CONFIG}->get_config_filename();
 
     ## build the command
 
     my $command  = "ca -gencrl";
-    $command .= " -config ".$self->{CONFIGFILE};
+    $command .= " -config $config";
     $command .= " -engine $engine" if ($engine);
     $command .= " -keyform $keyform" if ($keyform);
     $command .= " -out ".$self->{OUTFILE};

@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Test;
+use English;
 # use Smart::Comments;
 
 BEGIN { plan tests => 24 };
@@ -58,9 +59,20 @@ foreach my $ca_id (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
     
 
     ## create CA CSR
-    my $csr = $token->command ({COMMAND => "create_pkcs10",
-				SUBJECT => "cn=$cn,dc=OpenXPKI,dc=info"});
-    ok (1);
+    my $csr;
+    eval
+    {
+        $csr = $token->command ({COMMAND => "create_pkcs10",
+                                 SUBJECT => "cn=$cn,dc=OpenXPKI,dc=info"});
+    };
+    if ($EVAL_ERROR)
+    {
+        print STDERR "Exception: ${EVAL_ERROR}\n";
+        ok(0);
+        exit 1;
+    } else {
+        ok (1);
+    }
     print STDERR "CA CSR: $csr\n" if ($ENV{DEBUG});
     
     ## create profile

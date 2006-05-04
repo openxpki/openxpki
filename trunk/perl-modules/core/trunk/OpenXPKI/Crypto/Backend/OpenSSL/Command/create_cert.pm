@@ -26,7 +26,7 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_PROFILE");
     }
-    my $profile = $self->{PROFILE};
+    $self->{CONFIG}->set_profile($self->{PROFILE});
 
     my @result = ();
 
@@ -95,7 +95,8 @@ sub get_command
 
     ## prepare data
 
-    $self->write_config ($profile);
+    $self->{CONFIG}->dump();
+    my $config = $self->{CONFIG}->get_config_filename();
     $self->write_file (FILENAME => $self->{CSRFILE},
                        CONTENT  => $self->{CSR},
 	               FORCE    => 1);
@@ -140,7 +141,7 @@ sub get_command
     my @cmd;
     @cmd = (
 	'req',     '-x509',
-	'-config', qq("$self->{CONFIGFILE}"),
+	'-config', $config,
 	@subject,
 	@engine,
 	@keyform,
@@ -173,7 +174,7 @@ sub get_command
     @cmd = (
 	'ca',
 	'-batch',
-	'-config',  qq("$self->{CONFIGFILE}"),
+	'-config', $config,
 	@subject,
 	@engine,
 	@keyform,

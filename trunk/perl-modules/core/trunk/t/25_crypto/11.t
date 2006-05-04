@@ -37,7 +37,9 @@ my $passwd = $default_token->command ({COMMAND       => "create_random",
                                        RANDOM_LENGTH => 16});
 ok (1);
 print STDERR "passwd: $passwd\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/passwd.txt", CONTENT => $passwd);
+OpenXPKI->write_file (FILENAME => "$basedir/ca1/passwd.txt",
+                      CONTENT  => $passwd,
+                      FORCE    => 1);
 
 ## create DSA key
 my $key = $default_token->command ({COMMAND    => "create_key",
@@ -48,7 +50,9 @@ my $key = $default_token->command ({COMMAND    => "create_key",
                                         ENC_ALG    => "aes256"}});
 ok (1);
 print STDERR "DSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/dsa.pem", CONTENT => $key);
+OpenXPKI->write_file (FILENAME => "$basedir/ca1/dsa.pem",
+                      CONTENT  => $key,
+                      FORCE    => 1);
 
 ## create EC key
 $key = $default_token->command ({COMMAND    => "create_key",
@@ -59,7 +63,9 @@ $key = $default_token->command ({COMMAND    => "create_key",
                                      ENC_ALG    => "aes256"}});
 ok (1);
 print STDERR "EC: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/ec.pem", CONTENT => $key);
+OpenXPKI->write_file (FILENAME => "$basedir/ca1/ec.pem",
+                      CONTENT  => $key,
+                      FORCE    => 1);
 
 ## create RSA key
 $key = $default_token->command ({COMMAND    => "create_key",
@@ -70,7 +76,9 @@ $key = $default_token->command ({COMMAND    => "create_key",
                                      ENC_ALG    => "aes256"}});
 ok (1);
 print STDERR "RSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/rsa.pem", CONTENT => $key);
+OpenXPKI->write_file (FILENAME => "$basedir/ca1/rsa.pem",
+                      CONTENT  => $key,
+                      FORCE    => 1);
 
 ## try to create UNSUPPORTED_ALGORITHM key 
 eval
@@ -297,7 +305,9 @@ my $csr = $default_token->command ({COMMAND => "create_pkcs10",
                                     SUBJECT => $subject});
 ok (1);
 print STDERR "CSR: $csr\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/pkcs10.pem", CONTENT => $csr);
+OpenXPKI->write_file (FILENAME => "$basedir/ca1/pkcs10.pem",
+                      CONTENT  => $csr,
+                      FORCE    => 1);
 
 ## create profile
 my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
@@ -317,7 +327,9 @@ my $cert = $ca_token->command ({COMMAND => "issue_cert",
                                 PROFILE => $profile});
 ok (1);
 print STDERR "cert: $cert\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/cert.pem", CONTENT => $cert);
+OpenXPKI->write_file (FILENAME => "$basedir/ca1/cert.pem",
+                      CONTENT  => $cert,
+                      FORCE    => 1);
 
 ## build the PKCS#12 file
 my $pkcs12 = $default_token->command ({COMMAND => "create_pkcs12",
@@ -336,11 +348,23 @@ $profile = OpenXPKI::Crypto::Profile::CRL->new (
 ## otherwise test 34 fails
 ## $profile->set_serial (1);
 ### issue crl...
-my $crl = $ca_token->command ({COMMAND => "issue_crl",
-                               REVOKED => [$cert],
-                               PROFILE => $profile});
-print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/crl.pem", CONTENT => $crl);
-ok (1);
+eval
+{
+    my $crl = $ca_token->command ({COMMAND => "issue_crl",
+                                   REVOKED => [$cert],
+                                   PROFILE => $profile});
+    print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
+    OpenXPKI->write_file (FILENAME => "$basedir/ca1/crl.pem",
+                          CONTENT  => $crl,
+                          FORCE    => 1);
+};
+if ($EVAL_ERROR)
+{
+    print STDERR "Exception: ${EVAL_ERROR}\n";
+    ok(0);
+    exit 1;
+} else {
+    ok (1);
+}
 
 1;

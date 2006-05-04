@@ -12,6 +12,7 @@ package OpenXPKI::Crypto::Backend::OpenSSL;
 
 use OpenXPKI::Crypto::Backend::OpenSSL::CLI;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command;
+use OpenXPKI::Crypto::Backend::OpenSSL::Config;
 use OpenXPKI::Crypto::Backend::OpenSSL::XS;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -70,6 +71,7 @@ sub new
     $self->{XS} = OpenXPKI::Crypto::Backend::OpenSSL::XS->new();
 
     $self->__load_config  ($keys);
+    $self->__init_config ();
     $self->__init_engine  ();
     $self->__init_shell   ();
     $self->__init_command ();
@@ -164,6 +166,16 @@ sub __load_config
     return 1;
 }
 
+sub __init_config
+{
+    my $self = shift;
+    $self->{CONFIG} = OpenXPKI::Crypto::Backend::OpenSSL::Config->new(
+                      {
+                          TMP => $self->{TMP},
+                          XS  => $self->{XS}
+                      });
+}
+
 sub __init_engine
 {
     ##! 8: "start"
@@ -195,10 +207,16 @@ sub __init_engine
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     }
+    ##! 16: "configure engine (ENGINE_USAGE and KEY_STORE)"
+    ##! 16: "why do we store these informations in OpenSSL and not in the engine?"
+    ##! 16: "why do we store the same information in two places (engine and openssl)?"
     $self->{ENGINE_USAGE} = $self->{PARAMS}->{ENGINE_USAGE};
     $self->{KEY_STORE} = $self->{PARAMS}->{KEY_STORE};
     delete $self->{PARAMS}->{ENGINE_USAGE};
     delete $self->{PARAMS}->{KEY_STORE};
+
+    ##! 16: "update profile"
+    $self->{CONFIG}->set_engine($self->{ENGINE});
 
     ##! 8: "end"
     return 1;
@@ -260,6 +278,7 @@ sub __init_command
         $self->{COMMAND_PARAMS}->{$key->[1]} = $self->{PARAMS}->{$key->[0]};
     }
     $self->{COMMAND_PARAMS}->{ENGINE} = $self->{ENGINE};
+    $self->{COMMAND_PARAMS}->{CONFIG} = $self->{CONFIG};
     $self->{COMMAND_PARAMS}->{XS}     = $self->{XS};
 
     return 1;
@@ -278,7 +297,7 @@ sub command
     my $ret = eval
     ##! 2: "FIXME: do we need an eval here?"
     {
-        my $cmdref = $cmd->new (%{$self->{COMMAND_PARAMS}}, %{$keys});
+        my $cmdref = $cmd->new ({%{$self->{COMMAND_PARAMS}}, %{$keys}});
         my $cmds = $cmdref->get_command();
 
         $self->{CLI}->prepare ({COMMAND => $cmds});

@@ -193,7 +193,12 @@ sub write_file
 	    );
     }
 
-    if ((-e $filename) && (! $keys->{FORCE}))
+    ## checks on safely created files are senseless
+    if ((-e $filename) and
+        not $keys->{FORCE} and
+        (not ref $self or
+         not $self->{SAFE_FILENAME} or
+         not $self->{SAFE_FILENAME}->{$filename}))
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS",
@@ -254,6 +259,7 @@ sub get_safe_tmpfile
 
     ##! 2: "fix mode"
     chmod 0600, $filename;
+    $self->{SAFE_FILENAME}->{$filename} = 1;
 
     ##! 1: "end: $filename"
     return $filename;
