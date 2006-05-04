@@ -3,7 +3,7 @@
 #
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision: 80 $
+# $Revision$
 #
 
 BINDIR        = [% dir.bindir %]
@@ -64,6 +64,9 @@ installbin:
 	$(CFG) --config openxpki.conf --force --file bin/openxpkictl --dstdir $(INSTALLPREFIX)$(BINDIR)
 	chown $(ADMUSER):$(ADMGROUP) $(INSTALLPREFIX)$(BINDIR)/openxpkictl
 	chmod 0755 $(INSTALLPREFIX)$(BINDIR)/openxpkictl
+	$(CFG) --config openxpki.conf --force --file bin/openxpkiadm --dstdir $(INSTALLPREFIX)$(BINDIR)
+	chown $(ADMUSER):$(ADMGROUP) $(INSTALLPREFIX)$(BINDIR)/openxpkiadm
+	chmod 0755 $(INSTALLPREFIX)$(BINDIR)/openxpkiadm
 	$(CFG) --config openxpki.conf --force --file bin/openxpki-configure --dstdir $(INSTALLPREFIX)$(BINDIR)
 	chown $(ADMUSER):$(ADMGROUP) $(INSTALLPREFIX)$(BINDIR)/openxpki-configure
 	chmod 0755 $(INSTALLPREFIX)$(BINDIR)/openxpki-configure

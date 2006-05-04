@@ -4,7 +4,7 @@
 #
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision: 80 $
+# $Revision$
 #
 
 use warnings;
@@ -15,7 +15,7 @@ use English;
 # OpenXPKI Deployment tools
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision: 192 $
+# $Revision$
 
 package OpenXPKI::Deployment;
 

@@ -25,7 +25,6 @@ Installation
 This installs the required shell scripts (daemon start script
 and config helper), the initial openxpki.conf and the XML
 configuration templates to the configured directories.
-Implemented.
 
 Configuration
 =============
@@ -38,6 +37,15 @@ and names of the PKI realms to configure, CA setup, profile etc.
 It writes the configuration changes to
 ...etc/openxpki/openxpki.conf and creates the XML configuration
 files from the settings that were entered.
+
+
+Database setup
+==============
+
+In order to initialize the database run
+
+openxpkiadm initdb
+
 
 From this on the user can decide how to go from there:
 

@@ -1,0 +1,193 @@
+#!/usr/bin/perl
+#
+# Written by Martin Bartosch for the OpenXPKI project 2006
+# Copyright (c) 2006 by The OpenXPKI Project
+# $Revision: 80 $
+#
+
+use strict;
+use warnings;
+use English;
+use Getopt::Long;
+use Pod::Usage;
+
+#use OpenXPKI::Server::DBI;
+#use OpenXPKI::XML::Config;
+#use OpenXPKI::Server::Log;
+
+use OpenXPKI::Server::Init;
+use OpenXPKI::Server::Context qw( CTX );
+
+
+my $configfile = '[% dir.sysconfdir %]/config.xml';
+
+my %params;
+GetOptions(\%params,
+	   qw(
+	      help|?
+	      man
+	      cfg|cfgfile|conf|config=s
+	      force
+	      dryrun
+	      )) or pod2usage(-verbose => 0);
+
+pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
+pod2usage(-verbose => 1) if ($params{help});
+if (scalar @ARGV != 1) {
+    print STDERR "Usage: openxpkiadm [OPTIONS] COMMAND\n";
+    exit 0;
+}
+
+if (defined $params{cfg}) {
+    $configfile = $params{cfg};
+}
+
+OpenXPKI::Server::Init::init(
+    {
+	CONFIG => $configfile,
+	TASKS  => [ 
+	    'xml_config', 
+	    'i18n', 
+	    'log', 
+	    ],
+    });
+
+
+my $cmd = shift;
+if ($cmd eq 'initdb') {
+
+    my $type = CTX('xml_config')->get_xpath (
+	XPATH    => [ 'common/database/type' ],
+	COUNTER  => [ 0 ]);
+    
+    print STDERR "Database type: $type\n";
+
+    my @databases = qw( log );
+
+    # SQLite needs special treatment: three databases instead of one must
+    # be initialized
+    if ($type eq 'SQLite') {
+	push @databases, 'workflow', 'backend';
+    }
+
+  DB:
+    foreach my $db (@databases) {
+	my $params = {};
+	if ($db ne 'log') {
+	    $params->{PURPOSE} = $db;
+	}
+
+	if (defined $params->{PURPOSE}) {
+	    print STDERR "Setting up database '$db'\n";
+	}
+	my $dbi = OpenXPKI::Server::Init::get_dbi($params);
+
+	eval { 
+	    $dbi->connect() 
+	};
+	if ($EVAL_ERROR)
+	{
+	    print STDERR "ERROR: Could not connect to '$db' database\n";
+	    exit 1;
+	}
+	
+	if ($params{dryrun}) {
+	    print $dbi->init_schema(MODE => 'DRYRUN') . "\n";
+	    last DB;
+	} else {
+	    if ($params{force}) {
+		print STDERR "ERROR: forced creation not yet implemented.\n";
+		exit 1;
+	    }
+
+	    eval {
+		$dbi->init_schema();
+	    };
+	    if ($EVAL_ERROR) {
+		print STDERR "ERROR: init_schema on '$db' failed (${EVAL_ERROR})\n";
+		exit 1;
+	    }
+	    print STDERR "Database '$db' initialized.\n";
+	}
+    }
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+openxpkiadm [OPTIONS] COMMAND
+
+ Options:
+   --help                brief help message
+   --man                 full documentation
+   --config FILE         use configuration from FILE
+   --force               Force operation (may be destructive)
+   --dryrun              Don't change anything, just print what would be done
+
+ Commands:
+   initdb                Initialize database
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--config FILE>
+
+Read configuration file FILE. Uses built-in default if not specified.
+
+=item B<--force>
+
+Force execution of command.
+
+WARNING: This may destroy existing data!
+
+=item B<--dryrun>
+
+Prints effects of a command without actually modifying anything.
+
+
+=back
+
+=head1 COMMANDS
+
+=over 8
+
+=item B<initdb>
+
+Initializes the OpenXPKI database schema. Will not destroy existing data
+unless called with --force.
+
+=back
+
+
+=head1 DESCRIPTION
+
+B<openxpkiadm> is the administrative frontend for controlling the OpenXPKI
+installation.
+
+=over 8
+
+NOTE: This script was customized to the paths specified during 
+installation.
+You will have to modify this script to reflect any changes to the 
+installation directories.
+
+The openxpkiadm script returns a 0 exit value on success, and >0 if  an
+error occurs.
+
+=back
+
+=cut
+
