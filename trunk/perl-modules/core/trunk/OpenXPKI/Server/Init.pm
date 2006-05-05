@@ -208,7 +208,10 @@ sub __do_init_pki_realm {
 
 sub __do_init_dbi_backend {
     ### init backend dbi...
-    my $dbi = get_dbi();
+    my $dbi = get_dbi(
+	{
+	    PURPOSE => 'backend',
+	});
     
     OpenXPKI::Server::Context::setcontext(
 	{
@@ -218,7 +221,10 @@ sub __do_init_dbi_backend {
 
 sub __do_init_dbi_workflow {
     ### init backend dbi...
-    my $dbi = get_dbi();
+    my $dbi = get_dbi(
+	{
+	    PURPOSE => 'workflow',
+	});
     
     OpenXPKI::Server::Context::setcontext(
 	{
@@ -609,6 +615,8 @@ sub __get_default_crypto_token
 
 sub get_dbi
 {
+    my $args = shift;
+
     ##! 1: "start"
 
     my $config = CTX('xml_config');
@@ -682,6 +690,13 @@ sub get_dbi
     eval{ $params{NAMESPACE} = $config->get_xpath (
                    XPATH    => [ 'common/database/namespace' ],
                    COUNTER  => [ 0 ]) };
+
+    # special handling for SQLite databases
+    if ($params{TYPE} eq 'SQLite') {
+	if (defined $args->{PURPOSE} && ($args->{PURPOSE} ne '')) {
+	    $params{NAME} .= '._' . $args->{PURPOSE} . '_';
+	}
+    }
 
     return OpenXPKI::Server::DBI->new (%params);
 }
@@ -867,6 +882,11 @@ The ID of self-signed CA or CRL validities is the internal CA name.
 Initializes the database interface and returns the database object reference.
 
 Requires 'log' and 'xml_config' in the Server Context.
+
+If database type is SQLite and the named parameter 'PURPOSE' exists,
+this parameter is appended to the SQLite database name.
+This is necessary because of a limitation in SQLite that prevents multiple
+open transactions on the same database.
 
 =head3 get_log
 

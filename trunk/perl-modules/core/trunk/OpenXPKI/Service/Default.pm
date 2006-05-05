@@ -94,11 +94,11 @@ sub __init_session
         {
             $session = OpenXPKI::Server::Session->new
                        ({
-                           DIRECTORY => CTX('xml_config')->get_xpath_count
+                           DIRECTORY => CTX('xml_config')->get_xpath
                                         (
                                             XPATH => "common/server/session_dir"
                                         ),
-                           LIFETIME  => CTX('xml_config')->get_xpath_count
+                           LIFETIME  => CTX('xml_config')->get_xpath
                                         (
                                             XPATH => "common/server/session_lifetime"
                                         ),
@@ -260,18 +260,75 @@ sub run
     my $self = shift;
 
   MESSAGE:
-    while (my $msg = $self->{TRANSPORT}->read())
+    while (1)
     {
+	my $msg;
+	eval {
+	    $msg = $self->{TRANSPORT}->read();
+	};
+	if (my $exc = OpenXPKI::Exception->caught()) {
+	    if ($exc->message() =~ m{I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION}xms) {
+		# client closed socket
+		last MESSAGE;
+	    } else {
+		$exc->rethrow();
+	    }
+	} elsif ($EVAL_ERROR) {
+	    if (ref $EVAL_ERROR) {
+		$EVAL_ERROR->rethrow();
+	    } else {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION",
+		    params  => {EVAL_ERROR => $EVAL_ERROR});
+	    }
+	}
+
+	last MESSAGE unless defined $msg;
+
         my $data = $self->{SERIALIZATION}->deserialize($msg);
-	next MESSAGE unless defined $data->{SERVICED_MSG};
+
+	my $service_msg = $data->{SERVICE_MSG};
+	next MESSAGE unless defined $service_msg;
+
+	##! 4: "$service_msg"
 
         ##! 4: "check for logout"
-        if ($data->{SERVICE_MSG} eq "LOGOUT")
+        if ($service_msg eq 'LOGOUT')
         {
             ##! 8: "logout received - killing session and connection"
-            CTX('session')->delete();
+	    CTX('log')->log(
+		MESSAGE  => 'Terminating session',
+		PRIORITY => 'info',
+		FACILITY => 'system',
+		);
+	    CTX('session')->delete();
             exit 0;
         }
+	
+	if ($service_msg eq 'COMMAND') {
+	    my $command = $data->{COMMAND};
+
+	    if (defined $command) {
+		CTX('log')->log(
+		    MESSAGE  => "Command request: '$command'",
+		    PRIORITY => 'info',
+		    FACILITY => 'system',
+		    );
+	    }
+	    
+
+	    $self->{TRANSPORT}->write(
+		$self->{SERIALIZATION}->serialize(
+		    {ERROR => "UNRECOGNIZED COMMAND"}
+		));
+	    next MESSAGE;
+	}
+
+
+	$self->{TRANSPORT}->write(
+	    $self->{SERIALIZATION}->serialize(
+		{ERROR => "UNRECOGNIZED SERVICE MESSAGE"}
+	    ));
     }
 
     return 1;

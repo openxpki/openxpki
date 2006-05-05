@@ -67,30 +67,15 @@ sub new
 #		SERVER => $self,
 	    });
     };
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-	my $msg = $exc->message() || '<no message>';
-	CTX('log')->log(
-	    MESSAGE  => "Exception during server initialization: " . $msg,
-	    PRIORITY => "fatal",
-	    FACILITY => "system",
-	    );
-	# die gracefully
-	$exc->rethrow();
-    }
-    elsif ($EVAL_ERROR)
-    {
-	my $msg = $EVAL_ERROR;
-	if (ref $EVAL_ERROR) {
-	    $msg = $EVAL_ERROR->message();
-	}
-        CTX('log')->log(
-	    MESSAGE  => "Exception during server initialization: " . $msg,
-	    PRIORITY => "fatal",
-	    FACILITY => "system",
-	    );
-	# die gracefully
-        exit 1;
+    if ($EVAL_ERROR) {
+ 	my $msg = exception_as_string($EVAL_ERROR);
+ 	CTX('log')->log(
+ 	    MESSAGE  => "Exception during server initialization: " . $msg,
+ 	    PRIORITY => "fatal",
+ 	    FACILITY => "system",
+ 	    );
+ 	# die gracefully
+	exit 1;
     }
 
     ## group access is allowed
@@ -101,30 +86,15 @@ sub new
     {
 	$self->__get_user_interfaces();
     };
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-	my $msg = $exc->message() || '<no message>';
-	CTX('log')->log(
-	    MESSAGE  => "Uncaught exception during interface initialization: " . $msg,
-	    PRIORITY => "fatal",
-	    FACILITY => "system",
-	    );
-	# die gracefully
-	$exc->rethrow();
-    }
-    elsif ($EVAL_ERROR)
-    {
-	my $msg = $EVAL_ERROR;
-	if (ref $EVAL_ERROR) {
-	    $msg = $EVAL_ERROR->message();
-	}
-        CTX('log')->log(
-	    MESSAGE  => "Uncaught exception during interface initialization: " . $msg,
-	    PRIORITY => "fatal",
-	    FACILITY => "system",
-	    );
-	# die gracefully
-        exit 1;
+    if ($EVAL_ERROR) {
+ 	my $msg = exception_as_string($EVAL_ERROR);
+ 	CTX('log')->log(
+ 	    MESSAGE  => "Exception during interface initialization: " . $msg,
+ 	    PRIORITY => "fatal",
+ 	    FACILITY => "system",
+ 	    );
+ 	# die gracefully
+	exit 1;
     }
 
     ## start the server
@@ -133,19 +103,51 @@ sub new
     {
 	%params = $self->__get_server_config();
     };
-    if ($EVAL_ERROR)
-    {
-        CTX('log')->log(
-	    MESSAGE  => "Uncaught exception during server parameter setup: " . $EVAL_ERROR->message(),
-	    PRIORITY => "fatal",
-	    FACILITY => "system",
-	    );
-	# die gracefully
-        exit 1;
+    if ($EVAL_ERROR) {
+ 	my $msg = exception_as_string($EVAL_ERROR);
+ 	CTX('log')->log(
+ 	    MESSAGE  => "Exception during server daemon setup: " . $msg,
+ 	    PRIORITY => "fatal",
+ 	    FACILITY => "system",
+ 	    );
+ 	# die gracefully
+	exit 1;
     }
 
     unlink ($params{port});
+    CTX('log')->log(
+	MESSAGE  => "Server initialization completed",
+	PRIORITY => "info",
+	FACILITY => "system",
+	);
+    
+    # clean up process list
+    $0 = "openxpkid -c $self->{CONFIG}";
+    
     $self->run (%params);
+}
+
+
+# called statically
+sub exception_as_string {
+    my $exc = shift;
+
+    my $msg = "";
+    ##! 8: ref $exc
+    if (ref $exc eq '') {
+	$msg = $exc;
+    } elsif (ref $exc eq 'OpenXPKI::Exception') {
+	$msg = $exc->full_message() || '<no message>';
+	if ($exc->child()) {
+	    $msg .= '; CHILD: [' . exception_as_string($exc->child()) . ']'
+	}
+    } elsif (ref $exc) {
+	$msg = $EVAL_ERROR->message();
+    } else {
+	$msg = "<not an exception>";
+    }
+
+    return $msg;
 }
 
 
@@ -155,31 +157,17 @@ sub process_request {
     {
         $rc = do_process_request(@_);
     };
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-	my $msg = $exc->message() || '<no message>';
-	CTX('log')->log(
-	    MESSAGE  => "Uncaught exception: " . $msg,
-	    PRIORITY => "fatal",
-	    FACILITY => "system",
-	    );
-	# die gracefully
-        exit 1;
+    if ($EVAL_ERROR) {
+ 	my $msg = exception_as_string($EVAL_ERROR);
+ 	CTX('log')->log(
+ 	    MESSAGE  => "Uncaught exception: " . $msg,
+ 	    PRIORITY => "fatal",
+ 	    FACILITY => "system",
+ 	    );
+ 	# die gracefully
+	exit 1;
     }
-    elsif ($EVAL_ERROR)
-    {
-	my $msg = $EVAL_ERROR;
-	if (ref $EVAL_ERROR) {
-	    $msg = $EVAL_ERROR->message();
-	}
-        CTX('log')->log(
-	    MESSAGE  => "Uncaught exception: " . $msg,
-	    PRIORITY => "fatal",
-	    FACILITY => "system",
-	    );
-	# die gracefully
-        exit 1;
-    }
+
     return $rc;
 }
 
@@ -193,6 +181,9 @@ sub do_process_request
 
     ## recover from umask of Net::Server->run
     umask $self->{umask};
+
+    # masquerade process...
+    $0 = 'openxpkid: idle';
 
     ##! 2: "transport protocol detector"
     my $transport = undef;
@@ -289,10 +280,31 @@ sub do_process_request
         
     }
 
-    # FIXME: do we need to connect to the workflow database as well?
+    eval { CTX('dbi_workflow')->connect() };
+    if ($EVAL_ERROR)
+    {
+        $transport->write ($serializer->serialize ($EVAL_ERROR->message()));
+        $self->{log}->log (MESSAGE  => "Database connection failed. ".
+                                       $EVAL_ERROR->message(),
+                           PRIORITY => "fatal",
+                           FACILITY => "system");
+        return;
+        
+    }
+
+
+    # masquerade process
+    my $user = '';
+    my $role = 'n/a';
+    eval {
+	$user = CTX('session')->get_user();
+    };
+    eval {
+	$role = CTX('session')->get_role();
+    };
+    $0 = "openxpkid: $user($role)";
 
     ## use user interface
-
     CTX('service')->run();
 }
 

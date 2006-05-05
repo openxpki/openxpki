@@ -7,7 +7,7 @@ package OpenXPKI::Client;
 use Class::Std;
 
 use version; 
-our $VERSION = '0.9.$Revision: 1 $';
+our $VERSION = '0.9.$Revision$';
 $VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
 $VERSION = qv($VERSION);
 

@@ -2,7 +2,7 @@
 #
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision: 80 $
+# $Revision$
 #
 
 use strict;
@@ -74,17 +74,18 @@ if (scalar @ARGV == 0) {
 	    if (my $exc = OpenXPKI::Exception->caught()) {
 		if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION') {
 		    print $OUT "Server terminated connection.\n";
+		    last INTERACTION;
 		    ### $session_id
 		    # re-initialize session
-		    $cli = OpenXPKI::Client::CLI->new(
-			{
-			    SOCKETFILE => $params{socketfile},
-			});
-		    $cli->init_session(
-			{
-			    SESSION_ID => $session_id,
-			});
-		    redo INTERACTION;
+# 		    $cli = OpenXPKI::Client::CLI->new(
+# 			{
+# 			    SOCKETFILE => $params{socketfile},
+# 			});
+# 		    $cli->init_session(
+# 			{
+# 			    SESSION_ID => $session_id,
+# 			});
+# 		    redo INTERACTION;
 		}
 		$exc->rethrow();
 	    }

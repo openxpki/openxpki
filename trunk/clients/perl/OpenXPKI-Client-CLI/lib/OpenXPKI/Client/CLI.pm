@@ -8,7 +8,7 @@ package OpenXPKI::Client::CLI;
 use base qw( OpenXPKI::Client );
 
 use version; 
-our $VERSION = '0.9.$Revision: 1 $';
+our $VERSION = '0.9.$Revision$';
 $VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
 $VERSION = qv($VERSION);
 
@@ -265,6 +265,43 @@ sub cmd_help : PRIVATE {
 }
 
 
+sub cmd_show : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+    my @msg = ( 'Usage: show OBJECT', 'Available objects:' );
+    push @msg, 'session';
+    
+    my %params;
+    if (! $self->getoptions($args, \%params, qw(
+    ))) {
+	print "Error during command line processing.\n";
+    }
+    
+    my @args = @{$ARGV_LOCAL{$ident}};
+    
+    if (scalar @args == 0) {
+	return {
+	    MESSAGE => \@msg,
+	},
+    } else {
+	foreach my $arg (@args) {
+	    if ($arg eq 'session') {
+		return {
+		    MESSAGE => $self->get_session_id(),
+		};
+	    }
+	    return {
+		MESSAGE => "No such object",
+	    };
+	}
+    }
+    
+    return {
+	MESSAGE => 'FIXME',
+    }
+}
+
 sub cmd_auth : PRIVATE {
     my $self  = shift;
     my $ident = ident $self;
@@ -382,7 +419,7 @@ sub cmd_list : PRIVATE {
     } else {
 	foreach my $arg (@args) {
 	    if ($arg eq 'workflows') {
-		return $self->listworkflows();
+		return $self->subcmd_list_workflows();
 	    }
 	    return {
 		MESSAGE => "No such object",
@@ -394,6 +431,26 @@ sub cmd_list : PRIVATE {
 	MESSAGE => 'FIXME',
     }
 }
+
+
+# subcommands
+sub subcmd_list_workflows : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+
+
+    return {
+	SERVER_COMMAND => {
+	    SERVICE_MSG => 'COMMAND',
+	    COMMAND     => 'list_workflows',
+	    PARAMS      => {
+	    }
+	},
+    };
+}
+
+
 
 1;
 

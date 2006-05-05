@@ -8,13 +8,16 @@ use Test;
 
 use Workflow::Factory;
 
-BEGIN { plan tests => 36 };
+BEGIN { plan tests => 37 };
 
 print STDERR "OpenXPKI::Server::Workflow - Persistence\n";
 
 our $basedir;
 
 require 't/60_workflow/common.pl';
+
+`cp t/30_dbi/sqlite.db t/30_dbi/sqlite.db._workflow_`;
+ok(not $CHILD_ERROR);
 
 
 my $debug = $ENV{DEBUG};
