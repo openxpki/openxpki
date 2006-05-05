@@ -13,7 +13,7 @@ use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Engine::GOST';
 use OpenXPKI::Exception;
 use English;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Crypto::Backend::OpenSSL qw(set_config);
+use OpenXPKI::Crypto::Backend::OpenSSL::Config;
 
 sub new {
     my $that = shift;
@@ -36,15 +36,21 @@ sub new {
                         INTERNAL_CHAIN
                         ENGINE_SECTION
                         ENGINE_USAGE
+                        XS
+                        TMP
                        }) {
-
         if (exists $keys->{$key}) {
             $self->{$key} = $keys->{$key};
         }
     }
-    ## !!! FIXME !!!
-    ## Automate getting path from somewhere
-    OpenXPKI::Crypto::Backend::OpenSSL::set_config("/home/svysh/qq/openssl.cnf");
+    my $config = OpenXPKI::Crypto::Backend::OpenSSL::Config->new (
+    {
+        TMP    => $self->{TMP},
+        XS     => $self->{XS}
+    });
+    
+    $config->set_engine($self);
+    $config->dump();
 
     return $self;
 }

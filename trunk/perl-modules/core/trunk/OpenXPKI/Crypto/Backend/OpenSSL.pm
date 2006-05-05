@@ -198,7 +198,7 @@ sub __init_engine
             params  => {"ERRVAL" => $msg});
     }
     delete $self->{PARAMS}->{ENGINE};
-    $self->{ENGINE} = eval {$engine->new (%{$self->{PARAMS}})};
+    $self->{ENGINE} = eval {$engine->new (%{$self->{PARAMS}}, XS => $self->{XS})};
     if (my $exc = OpenXPKI::Exception->caught())
     {
         OpenXPKI::Exception->throw (
