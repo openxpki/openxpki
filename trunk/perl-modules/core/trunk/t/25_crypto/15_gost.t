@@ -11,7 +11,7 @@ if( not exists $ENV{GOST_OPENSSL_ENGINE} or
 }
 else
 {
-    plan tests => 42;
+    plan tests => 37;
     print STDERR "OpenXPKI::Crypto::Command: Create CA and user certs and issue a CRL with GOST algorithm\n";
 }
 

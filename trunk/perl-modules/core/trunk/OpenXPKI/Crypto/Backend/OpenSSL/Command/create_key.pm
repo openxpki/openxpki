@@ -81,6 +81,13 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_MISSING_PASSWD");
     }
 
+    if (length($engine))
+    {
+        $self->{CONFIG}->set_engine($self->{ENGINE});
+        $self->{CONFIG}->dump();
+        $self->set_env('OPENSSL_CONF' => $self->{CONFIG}->get_config_filename());
+    }
+
     ## algorithm specific command
     my $command = $algobj->get_command($engine);
 
@@ -104,12 +111,6 @@ sub get_command
     {
         $pkcs8 .= " -passout env:pwd";
         $self->set_env ('pwd' => $passwd);
-    }
-
-    if (length($engine))
-    {
-        $self->{CONFIG}->dump();
-        $self->set_env('OPENSSL_CONF' => $self->{CONFIG}->get_config_filename());
     }
 
     return [ $command, $pkcs8 ];
