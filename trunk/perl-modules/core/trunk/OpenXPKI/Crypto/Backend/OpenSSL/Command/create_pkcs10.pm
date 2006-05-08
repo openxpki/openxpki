@@ -15,11 +15,6 @@ sub get_command
 {
     my $self = shift;
 
-    ## create OpenSSL config
-
-    $self->{CONFIG}->dump();
-    my $config = $self->{CONFIG}->get_config_filename();
-
     ## compensate missing parameters
 
     ## ENGINE key's CSR: no parameters
@@ -84,7 +79,8 @@ sub get_command
     ## build the command
 
     my $command  = "req -new";
-    $command .= " -config $config";
+    #done by CLI
+    #$command .= " -config $config";
     $command .= " -subj \"$subject\"";
     $command .= " -multivalue-rdn" if ($subject =~ /[^\\](\\\\)*\+/);
     $command .= " -engine $engine" if ($engine);

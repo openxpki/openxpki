@@ -62,13 +62,12 @@ sub get_command
     {
         $self->{CONFIG}->set_cert_list($self->{REVOKED});
     }
-    $self->{CONFIG}->dump ();
-    my $config = $self->{CONFIG}->get_config_filename();
 
     ## build the command
 
     my $command  = "ca -gencrl";
-    $command .= " -config $config";
+    #done by CLI
+    #$command .= " -config $config";
     $command .= " -engine $engine" if ($engine);
     $command .= " -keyform $keyform" if ($keyform);
     $command .= " -out ".$self->{OUTFILE};

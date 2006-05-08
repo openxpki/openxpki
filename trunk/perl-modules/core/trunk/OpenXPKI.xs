@@ -5,6 +5,7 @@
 /* #include "ppport.h" */
 
 /* #include <openssl/ossl_typ.h> */
+#include <openssl/engine.h>
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 #include <openssl/bn.h>

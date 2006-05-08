@@ -62,6 +62,14 @@ sub new
     }
     $self->{ENGINE} = $keys->{ENGINE};;
 
+    ##! 4: "check CONFIG"
+    if (not exists $keys->{CONFIG})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_MISSING_CONFIG");
+    }
+    $self->{CONFIG} = $keys->{CONFIG};;
+
     ##! 2: "create input, output and stderr files"
     $self->{STDIN}  = $self->get_safe_tmpfile({TMP => $self->{TMP}});
     $self->{STDOUT} = $self->get_safe_tmpfile({TMP => $self->{TMP}});
@@ -77,6 +85,7 @@ sub prepare
     my $keys = shift;
     ##! 1: "start"
 
+    ##! 2: "handle parameter COMMAND"
     if (ref $keys->{COMMAND} and
         ref $keys->{COMMAND} eq "ARRAY")
     {
@@ -107,6 +116,11 @@ sub execute
     my $self = shift;
     ##! 1: "start"
 
+    ##! 2: "set the configuration"
+    $self->{CONFIG}->dump();
+    $ENV{OPENSSL_CONF} = $self->{CONFIG}->get_config_filename();
+
+    ##! 2: "execute commands"
     for (my $i=0; $i < scalar @{$self->{COMMAND}}; $i++)
     {
         my $cmd = $self->{COMMAND}->[$i];
@@ -119,7 +133,7 @@ sub execute
                 params  => {"ERRVAL" => $EVAL_ERROR});
         }
     }
-    unlink ($self->{STDIN});
+    unlink ($self->{STDIN}) if (-e $self->{STDIN});
 
     ##! 2: "try to detect other errors"
     $self->__find_error();
@@ -154,7 +168,8 @@ sub __find_error
 
     ##! 4: "error log contains: $ret"
     $ret = $self->{ENGINE}->filter_stderr($ret);
-    if ($ret =~ /error/i)
+    if ($ret =~ /error/i or
+        $ret =~ /unable to load key/i)
     {
         ##! 8: "error detected - firing exception"
         unlink ($self->{STDOUT});
@@ -193,7 +208,9 @@ sub cleanup
 {
     ##! 1: "start"
     my $self = shift;
+    unlink ($self->{STDIN})  if (exists $self->{STDIN}  and -e $self->{STDIN});
     unlink ($self->{STDOUT}) if (exists $self->{STDOUT} and -e $self->{STDOUT});
+    unlink ($self->{STDERR}) if (exists $self->{STDERR} and -e $self->{STDERR});
     ##! 1: "end"
 }
 

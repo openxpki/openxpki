@@ -37,7 +37,7 @@ execute_test
     "perl t/80_client/cli.pl 1>t/80_client/cli.stdout 2>t/80_client/cli.stderr <<EOF\n".
     "YES\n". ## new session
     ## if there is only one PKI realm then it will be detected by the server
-    ## "0\n".   ## PKI realm
+    "1\n".   ## PKI realm
     "1\n".   ## anonymous authentication
     "EOF"
 );

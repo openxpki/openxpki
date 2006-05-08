@@ -38,6 +38,16 @@ if (exists $ENV{GOST_OPENSSL_ENGINE})
                    PARAM    => "__GOST_OPENSSL__",
                    VALUE    => $ENV{GOST_OPENSSL});
 }
+else
+{
+    ## drop all the GOST configuration to avoid exceptions during initialization
+    replace_param (FILENAME => "t/config.xml",
+                   PARAM    => "default_gost",
+                   VALUE    => "default");
+    replace_param (FILENAME => "t/config.xml",
+                   PARAM    => "cagost",
+                   VALUE    => "ca1");
+}
 
 sub replace_param
 {

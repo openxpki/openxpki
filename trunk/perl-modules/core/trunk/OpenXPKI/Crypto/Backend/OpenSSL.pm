@@ -247,7 +247,8 @@ sub __init_shell
                          ({
                              ENGINE => $self->{ENGINE},
                              SHELL  => $self->{SHELL},
-                             TMP    => $self->{TMP}
+                             TMP    => $self->{TMP},
+                             CONFIG => $self->{CONFIG}
                          });
     };
     if (my $exc = OpenXPKI::Exception->caught())
@@ -300,7 +301,7 @@ sub command
         my $cmdref = $cmd->new ({%{$self->{COMMAND_PARAMS}}, %{$keys}});
         my $cmds = $cmdref->get_command();
 
-        $self->{CLI}->prepare ({COMMAND => $cmds});
+        $self->{CLI}->prepare ({COMMAND => $cmds, CONFIG => $self->{CONFIG}});
         $self->{CLI}->execute ();
         my $result = $self->{CLI}->get_result();
         $result = $cmdref->get_result ($result);

@@ -12,7 +12,7 @@ if( not exists $ENV{GOST_OPENSSL_ENGINE} or
 else
 {
     plan tests => 37;
-    print STDERR "OpenXPKI::Crypto::Command: Create CA and user certs and issue a CRL with GOST algorithm\n";
+    print STDERR "OpenXPKI::Crypto::Command: Create CA and user certs and issue a CRL with GOST algorithms\n";
 }
 
 use OpenXPKI qw( read_file write_file );
@@ -43,7 +43,7 @@ $dir =~ s{ _ }{}xms;
 
 my $ca_token = $mgmt->get_token (TYPE => "CA", 
   		                 ID => $ca_id, 
-		                 PKI_REALM => "Test Root CA",
+		                 PKI_REALM => "Test GOST Root CA",
 	);
 ok (1, 'CA token');
 
@@ -72,7 +72,7 @@ print STDERR "CA CSR: $ca_csr\n" if ($ENV{DEBUG});
 ## create profile
 my $ca_profile = OpenXPKI::Crypto::Profile::Certificate->new (
 	CONFIG    => $cache,
-	PKI_REALM => "Test Root CA",
+	PKI_REALM => "Test GOST Root CA",
 	CA        => $ca_id,
 	TYPE      => "SELFSIGNEDCA");
 $ca_profile->set_serial(1);
@@ -121,7 +121,7 @@ if (not -e "$basedir/$dir/cacert.pem")
 
 ## parameter checks for get_token
 my $token = $mgmt->get_token (TYPE => "DEFAULT",
-                              PKI_REALM => "Test Root CA");
+                              PKI_REALM => "Test GOST Root CA");
 ok (1);
 
 ## create PIN - just want to check if filter_stdout works correctly
@@ -129,7 +129,9 @@ my $passwd = $token->command ({COMMAND       => "create_random",
                                RANDOM_LENGTH => 16});
 ok (1);
 print STDERR "passwd: $passwd\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/passwd.txt", CONTENT => $passwd);
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/passwd.txt",
+                      CONTENT  => $passwd,
+                      FORCE    => 1);
 
 ## create GOST94 key
 my $key = $token->command ({COMMAND    => "create_key",
@@ -139,12 +141,14 @@ my $key = $token->command ({COMMAND    => "create_key",
                                     ENC_ALG    => "aes256"}});
 ok (1);
 print STDERR "GOST94: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/key.pem", CONTENT => $key);
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/key.pem",
+                      CONTENT  => $key,
+                      FORCE    => 1);
 
 ## create profile
 my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
                   CONFIG    => $cache,
-                  PKI_REALM => "Test Root CA",
+                  PKI_REALM => "Test GOST Root CA",
                   TYPE      => "ENDENTITY",
                   CA        => "INTERNAL_CA_GOST",
                   ID        => "User",
@@ -185,7 +189,7 @@ print STDERR "PKCS#12 length: ".length ($pkcs12)."\n"
 ### create CRL profile...
 $profile = OpenXPKI::Crypto::Profile::CRL->new (
                   CONFIG    => $cache,
-                  PKI_REALM => "Test Root CA",
+                  PKI_REALM => "Test GOST Root CA",
                   CA        => "INTERNAL_CA_GOST");
 ## otherwise test 34 fails
 ## $profile->set_serial (1);

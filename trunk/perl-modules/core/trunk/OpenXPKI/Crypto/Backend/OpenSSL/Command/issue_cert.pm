@@ -58,8 +58,9 @@ sub get_command
 
     ## prepare data
 
-    $self->{CONFIG}->dump();
-    my $config = $self->{CONFIG}->get_config_filename();
+    #done by CLI
+    #$self->{CONFIG}->dump();
+    #my $config = $self->{CONFIG}->get_config_filename();
     $self->write_file (FILENAME => $self->{CSRFILE},
                        CONTENT  => $self->{CSR},
 	               FORCE    => 1);
@@ -73,8 +74,6 @@ sub get_command
     ## build the command
 
     my $command  = "ca -batch";
-    $command .= " -config $config";
-    ## fix DN-handling of OpenSSL
     $command .= ' -subj "'.$self->get_openssl_dn($profile->get_subject()).'"';
     $command .= " -multivalue-rdn" if ($profile->get_subject() =~ /[^\\](\\\\)*\+/);
     $command .= " -engine $engine" if ($engine);

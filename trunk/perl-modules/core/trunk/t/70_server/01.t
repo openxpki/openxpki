@@ -29,8 +29,13 @@ foreach my $mode ('debug', '')
     }
 
     ok(1);
-    ok("t/pid");
-    ok("t/socket");
+    if (not -e 't/pid')
+    {
+        print STDERR "Waiting 5 additional seconds to support very slow machines ...\n";
+        sleep 5;
+    }
+    ok(-e "t/pid");
+    ok(-e "t/socket");
 
     ## should we check here that the server is really running?
 

@@ -43,14 +43,6 @@ sub new {
             $self->{$key} = $keys->{$key};
         }
     }
-    my $config = OpenXPKI::Crypto::Backend::OpenSSL::Config->new (
-    {
-        TMP    => $self->{TMP},
-        XS     => $self->{XS}
-    });
-    
-    $config->set_engine($self);
-    $config->dump();
 
     return $self;
 }

@@ -176,7 +176,10 @@ sub dump
         my $serial = $self->{PROFILE}->get_serial();
         if (defined $serial)
         {
-            $self->{FILENAME}->{SERIAL}   = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
+            ##! 8: "get tempfilename for serial"
+            $self->{FILENAME}->{SERIAL}     = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
+            ##! 8: "defined old filename for serial to make later a correct cleanup"
+            $self->{FILENAME}->{SERIAL_OLD} = $self->{FILENAME}->{SERIAL}.".old";
             ##! 8: "serial present"
             $serial = Math::BigInt->new ($serial);
             if (not defined $serial)
@@ -190,6 +193,8 @@ sub dump
             ##! 8: "hex serial is $hex"
             $self->write_file (FILENAME => $self->{FILENAME}->{SERIAL},
                                CONTENT  => $hex);
+            ##! 8: "specify a special filename to remove the new cert from the temp file area (see new_certs_dir)"
+            $self->{FILENAME}->{NEW_CERT} = $self->{TMP}."/$hex.pem";
         }
 
         ##! 4: "write database files"
@@ -214,6 +219,9 @@ sub dump
         }
         $self->write_file (FILENAME => $self->{FILENAME}->{ATTR},
                            CONTENT  => "unique_subject = no\n");
+        ##! 4: "create filenames for a better cleanup"
+        $self->{FILENAME}->{DATABASE_OLD} = $self->{FILENAME}->{DATABASE}.".old";
+        $self->{FILENAME}->{ATTR_OLD}     = $self->{FILENAME}->{ATTR}.".old";
 
         ##! 4: "PROFILE exists => CRL or cert generation"
         $config .= $self->__get_ca();
@@ -231,7 +239,7 @@ sub dump
     ##! 2: "should we integrate this into the get_config function?"
     OpenXPKI::Crypto::Backend::OpenSSL::set_config ($self->{FILENAME}->{CONFIG});
 
-    ##! 1: "start"
+    ##! 1: "end"
     return 1;
 }
 
@@ -587,6 +595,8 @@ This module was designed to create an OpenSSL configuration on the fly for
 the various operations of OpenXPKI. The module support the following
 different section types:
 
+=over
+
 =item - general OpenSSL configuration
 
 =item - engine configuration
@@ -602,6 +612,8 @@ different section types:
 =item - CRL distribution points
 
 =item - subject alternative names
+
+=back
 
 =head1 Functions
 

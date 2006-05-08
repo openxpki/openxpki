@@ -95,8 +95,6 @@ sub get_command
 
     ## prepare data
 
-    $self->{CONFIG}->dump();
-    my $config = $self->{CONFIG}->get_config_filename();
     $self->write_file (FILENAME => $self->{CSRFILE},
                        CONTENT  => $self->{CSR},
 	               FORCE    => 1);
@@ -141,7 +139,8 @@ sub get_command
     my @cmd;
     @cmd = (
 	'req',     '-x509',
-	'-config', $config,
+        # done by CLI
+	# '-config', $config,
 	@subject,
 	@engine,
 	@keyform,
@@ -174,7 +173,8 @@ sub get_command
     @cmd = (
 	'ca',
 	'-batch',
-	'-config', $config,
+	#done by CLI
+	#'-config', $config,
 	@subject,
 	@engine,
 	@keyform,

@@ -295,7 +295,7 @@ sub __init_get_pki_realm
     print STDOUT i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_ENTER_ID");
     my $id = readline (*STDIN);
        $id =~ s/\n$//s;
-    if (not exists $list[$i])
+    if (not exists $list[$id])
     {
         print STDERR i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_WRONG_ID")."\n";
         OpenXPKI::Exception->throw

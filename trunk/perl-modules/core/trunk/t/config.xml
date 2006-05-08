@@ -44,12 +44,24 @@
       <token    super="common/token_config/token{ca2}"/>
     </ca>
 
-    <ca id="INTERNAL_CA_GOST">
-      <token    super="common/token_config/token{cagost}"/>
-    </ca>
-
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="50_auth/auth.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="50_auth/acl.xml"/>
 
   </pki_realm>
+
+  <pki_realm name="Test GOST Root CA" id="root_gost" super="pki_realm{root1}">
+
+    <common id="default">
+      <!-- default token (used for general crypto operations not requiring
+           private key operations) -->
+      <token super="common/token_config/token{default_gost}"/>
+
+    </common>
+
+    <ca id="INTERNAL_CA_GOST">
+      <token    super="common/token_config/token{cagost}"/>
+    </ca>
+
+  </pki_realm>
+
 </openxpki>

@@ -50,15 +50,13 @@ sub get_command
             "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_NO_ENGINE_FOR_GOST");
 
     }
-    my $command = "req -newkey gost94";
+    my $command = "req -newkey gost94:";
 
     ## req wants profile of request to be filled, although it is not needed for key generation
-    my $subject = $self->{PARENT_REF}->get_openssl_dn ("cn=placeholder,dc=placeholder");
     $command .= " -engine $engine";
-    $command .= " -subj $subject";
-    $command .= " -config " . $self->{PARENT_REF}->{CONFIG}->get_config_filename();
     $command .= " -keyout " . $self->{PARENT_REF}->{OUTFILE};
     $command .= " -rand " . $self->{PARENT_REF}->{RANDOM_FILE};
+    $command .= ' -subj "/dc=ru/dc=OpenXPKI/dc=key generation only/dc=gost94"';
     $command .= " -noout -batch -nodes";
 
     return $command;
