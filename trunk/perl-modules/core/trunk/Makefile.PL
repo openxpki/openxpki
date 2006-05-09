@@ -181,25 +181,34 @@ eval
 # check if we should add -shared
 # not all platforms support this feature
 my %flags = ();
-my $testc = <<EOF
-int main ()
-{
-}
-EOF
-;
-open FD, '>test.c' or die "Cannot open test.c\n";
-print FD $testc;
-close FD;
+
+open $fh, '>test.c' or die "Cannot open test.c. Stopped";
+print $fh "int main() {}\n";
+close $fh;
 use Config;
 my $cc = $Config{'cc'};
-`$cc -shared -o test test.c`;
-if ($EVAL_ERROR)
+
+my $cc_supports_shared = 1;
+open $fh, "$cc -shared -o test test.c 2>&1 |" 
+    or die "Could not run C compiler. Stopped";
+while (my $line = <$fh>) {
+    if ($line =~ m{ unrecognized .* option .* -shared }xms) {
+	$cc_supports_shared = 0;
+    }
+}
+close $fh;
+if ($CHILD_ERROR) {
+    $cc_supports_shared = 0;
+}
+
+if (! $cc_supports_shared)
 {
     print STDERR "C compiler does not support -shared.\n";
 } else {
     print STDERR "C compiler supports -share. Adding it to LDDLFLAGS.\n";
     $flags{'LDDLFLAGS'} = '-shared';
 }
+
 unlink('test.c');
 unlink('test');
 
