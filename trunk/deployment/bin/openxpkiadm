@@ -11,10 +11,6 @@ use English;
 use Getopt::Long;
 use Pod::Usage;
 
-#use OpenXPKI::Server::DBI;
-#use OpenXPKI::XML::Config;
-#use OpenXPKI::Server::Log;
-
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 
