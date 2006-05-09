@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use English;
 use ExtUtils::MakeMaker;
 
 use File::Spec;
@@ -159,7 +160,6 @@ else
     print STDERR "All modules will be installed.\n";
 }
 
-
 ## some information about the used OpenXPKI version
 
 print STDERR "Version:         $version\n";
@@ -178,13 +178,35 @@ eval
     $Log::Log4perl::Logger::NON_INIT_WARNED = 1;
 };
 
+# check if we should add -shared
+# not all platforms support this feature
+my %flags = ();
+my $testc = <<EOF
+int main ()
+{
+}
+EOF
+;
+open FD, '>test.c' or die "Cannot open test.c\n";
+print FD $testc;
+close FD;
+use Config;
+my $cc = $Config{'cc'};
+`$cc -shared -o test test.c`;
+if ($EVAL_ERROR)
+{
+    print STDERR "C compiler does not support -shared.\n";
+} else {
+    print STDERR "C compiler supports -share. Adding it to LDDLFLAGS.\n";
+    $flags{'LDDLFLAGS'} = '-shared';
+}
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'      => 'OpenXPKI',
     'VERSION'   => $version,
     'LIBS'      => ["-L$openssl_lib_dir -lcrypto"],
-    'LDDLFLAGS' => "-shared",
     'INC'       => "-I. -I$openssl_inc_dir",
     'CCFLAGS'   => '-O2 -g -Wall',
     'PREREQ_PM' => {'CGI::Session'           => '3.95',
@@ -219,4 +241,5 @@ WriteMakefile(
     macro      => { OPENSSL_BINARY => $openssl_binary,
                   },
     'XSPROTOARG' => '-noprototypes',
+    %flags,
 );
