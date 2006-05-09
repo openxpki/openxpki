@@ -5,9 +5,9 @@ _new_from_der(sv)
 	SV * sv
     PREINIT:
 	const unsigned char * dercrl;
-	SSize_t crllen;
+	STRLEN crllen;
     CODE:
-	dercrl = SvPV(sv, crllen);
+	dercrl = (unsigned char*) SvPV(sv, crllen);
 	RETVAL = d2i_X509_CRL(NULL,&dercrl,crllen);
     OUTPUT:
 	RETVAL
@@ -18,12 +18,12 @@ _new_from_pem(sv)
     PREINIT:
 	unsigned char * pemcrl;
 	const unsigned char * dercrl;
-	SSize_t crllen, inlen;
+	STRLEN crllen, inlen;
 	char inbuf[512];
 	BIO *bio_in, *bio_out, *b64;
 	X509_CRL *crl;
     CODE:
-	pemcrl = SvPV(sv, crllen);
+	pemcrl = (unsigned char*) SvPV(sv, crllen);
 	bio_in  = BIO_new(BIO_s_mem());
 	bio_out = BIO_new(BIO_s_mem());
 	b64     = BIO_new(BIO_f_base64());

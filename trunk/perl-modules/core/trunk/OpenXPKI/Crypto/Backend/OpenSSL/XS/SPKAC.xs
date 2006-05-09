@@ -5,13 +5,13 @@ _new(sv)
 	SV * sv
     PREINIT:
 	unsigned char * spkac;
-	SSize_t len;
+	STRLEN len;
 	BIO *bio;
 	CONF *conf = NULL;
 	int i;
 	char *spkstr = NULL;
     CODE:
-	spkac = SvPV(sv, len);
+	spkac = (unsigned char*) SvPV(sv, len);
 
 	bio  = BIO_new(BIO_s_mem());
 
