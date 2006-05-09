@@ -20,52 +20,65 @@ sub get_command
     $self->get_tmpfile ('CONTENT', 'OUT');
 
     my ($engine, $passwd, $keyform);
-    if ($self->{PASSWD} or $self->{KEY})
-    {
-        ## external signature
-
-        # check minimum requirements
-        if (not exists $self->{PASSWD})
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_PASSWD");
-        }
-        if (not exists $self->{KEY})
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY");
-        }
-        if (not exists $self->{CERT})
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CERT");
-        }
-
-        # prepare parameters
-
-        $passwd = $self->{PASSWD};
-        my $engine_usage = $self->{ENGINE}->get_engine_usage();
-        $engine = $self->{ENGINE}->get_engine()
-            if ($self->{ENGINE}->get_engine() and
-                (($engine_usage =~ m{ ALWAYS }xms) or
-                 ($engine_usage =~ m{ PRIV_KEY_OPS }xms)));
-
-        $self->get_tmpfile ('KEY', 'CERT');
-        $self->write_file (FILENAME => $self->{KEYFILE},
-                           CONTENT  => $self->{KEY},
-	                   FORCE    => 1);
-
-        $self->write_file (FILENAME => $self->{CERTFILE},
-                           CONTENT  => $self->{CERT},
-	                   FORCE    => 1);
-    } else {
-        ## token signature
+    my $key_store = $self->{ENGINE}->get_key_store();
+    if ((uc($self->{TOKEN_TYPE}) eq 'CA') and ($key_store eq 'ENGINE')) {
+        ## CA token signature
         $engine  = $self->{ENGINE}->get_engine();
         $keyform = $self->{ENGINE}->get_keyform();
         $passwd  = $self->{ENGINE}->get_passwd();
         $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
         $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
     }
+    else {  ## external signature
+        if ($self->{PASSWD} or $self->{KEY})
+        {
+            ## user signature
+
+            # check minimum requirements
+            if (not exists $self->{PASSWD})
+            {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_PASSWD");
+            }
+            if (not exists $self->{KEY})
+            {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY");
+            }
+            if (not exists $self->{CERT})
+            {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CERT");
+            }
+
+            # prepare parameters
+ 
+            $passwd = $self->{PASSWD};
+            my $engine_usage = $self->{ENGINE}->get_engine_usage();
+            $engine = $self->__get_used_engine(); 
+
+            $self->get_tmpfile ('KEY', 'CERT');
+            $self->write_file (FILENAME => $self->{KEYFILE},
+                               CONTENT  => $self->{KEY},
+	                       FORCE    => 1);
+
+            $self->write_file (FILENAME => $self->{CERTFILE},
+                               CONTENT  => $self->{CERT},
+	                       FORCE    => 1);
+        } else {
+            if (uc($self->{TOKEN_TYPE}) eq 'CA') {
+                ## CA external signature
+                $engine  = $self->__get_used_engine();
+                $passwd  = $self->{ENGINE}->get_passwd();
+                $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
+                $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
+            }
+            else {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_PASSWD_OR_KEY");
+            } # if TOKEN_TYPE = 'CA'
+        } # if PASSWD and KEY are not defined
+    } # if signature is external
 
     ## check parameters
 
@@ -110,6 +123,20 @@ sub get_command
     }
 
     return [ $command ];
+}
+
+sub __get_used_engine
+{
+    my $self = shift;
+    my $engine_usage = $self->{ENGINE}->get_engine_usage();
+    if ($self->{ENGINE}->get_engine() and
+        (($engine_usage =~ m{ ALWAYS }xms) or
+         ($engine_usage =~ m{ PRIV_KEY_OPS }xms))) {
+        return $self->{ENGINE}->get_engine();
+    }
+    else {
+        return "";
+    }
 }
 
 sub hide_output

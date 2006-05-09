@@ -46,6 +46,7 @@ sub new
 
     my $requestedtmp = $keys->{TMP};
     delete $keys->{TMP};
+    $self->{TOKEN_TYPE} = $keys->{TOKEN_TYPE};
   CHECKTMPDIRS:
     for my $path ($requestedtmp,    # user's preference
 		  File::Spec->catfile('', 'var', 'tmp'), # suitable for large files
@@ -298,7 +299,7 @@ sub command
     my $ret = eval
     ##! 2: "FIXME: do we need an eval here?"
     {
-        my $cmdref = $cmd->new ({%{$self->{COMMAND_PARAMS}}, %{$keys}});
+        my $cmdref = $cmd->new ({%{$self->{COMMAND_PARAMS}}, %{$keys}, TOKEN_TYPE => $self->{TOKEN_TYPE}});
         my $cmds = $cmdref->get_command();
 
         $self->{CLI}->prepare ({COMMAND => $cmds, CONFIG => $self->{CONFIG}});

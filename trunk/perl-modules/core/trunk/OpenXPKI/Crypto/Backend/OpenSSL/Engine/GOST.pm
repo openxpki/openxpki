@@ -36,14 +36,14 @@ sub new {
                         INTERNAL_CHAIN
                         ENGINE_SECTION
                         ENGINE_USAGE
-                        XS
-                        TMP
+                        KEY_STORE
                        }) {
         if (exists $keys->{$key}) {
             $self->{$key} = $keys->{$key};
         }
     }
     $self->__check_engine_usage();
+    $self->__check_key_store();
 
     return $self;
 }
@@ -62,9 +62,9 @@ sub filter_stdout
 {
     my $self = shift;
     my $stdout = $_[0];
-    $stdout =~ s/\n//g;
-    $stdout =~ s/\(dynamic\)\ Dynamic\ engine\ loading\ support//;
-    $stdout =~ s/\[Success\]:\ ID:gost//;
+    $stdout =~ s{ \n }{}xmsg;
+    $stdout =~ s{ \(dynamic\)\ Dynamic\ engine\ loading\ support }{}xms;
+    $stdout =~ s{ \[Success\]:\ ID:gost }{}xms;
     return $stdout;
 }
 

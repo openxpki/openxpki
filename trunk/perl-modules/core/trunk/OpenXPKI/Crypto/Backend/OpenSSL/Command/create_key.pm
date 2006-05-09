@@ -35,23 +35,31 @@ sub get_command
     ## normal key: engine (optional), passwd
 
     my ($engine, $keyform, $passwd) = ("", "", undef);
-    if ($self->{PASSWD})
+    my $key_store = $self->{ENGINE}->get_key_store();
+    if (uc($self->{TOKEN_TYPE}) eq 'CA')
     {
+        if ($key_store eq 'ENGINE') {
+            ## token CA key generation
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_CANNOT_CREATE_TOKEN_KEY"); 
+        }
+        else {
+            ## external CA key generation
+            $passwd  = $self->{ENGINE}->get_passwd();
+            $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
+        }
+
+    } else {
         ## external key generation
         $passwd = $self->{PASSWD};
-        my $engine_usage = $self->{ENGINE}->get_engine_usage();
-        $engine = $self->{ENGINE}->get_engine()
-             if ($self->{ENGINE}->get_engine() and
-                 (($engine_usage =~ m{ ALWAYS }xms) or
-                  ($engine_usage =~ m{ PRIV_KEY_OPS }xms)));
-
         $self->get_tmpfile ('KEY');
-    } else {
-        ## token key generation
-        $engine  = $self->{ENGINE}->get_engine();
-        $passwd  = $self->{ENGINE}->get_passwd();
-        $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
     }
+    my $engine_usage = $self->{ENGINE}->get_engine_usage();
+    $engine = $self->{ENGINE}->get_engine()
+         if ($self->{ENGINE}->get_engine() and
+             (($engine_usage =~ m{ ALWAYS }xms) or
+              ($engine_usage =~ m{ PRIV_KEY_OPS }xms)));
+
     my $algclass = __PACKAGE__."::".$self->{TYPE};
 
     # added some use statements at top of the class

@@ -33,6 +33,7 @@ sub new {
                         INTERNAL_CHAIN
                         ENGINE_SECTION
                         ENGINE_USAGE
+                        KEY_STORE
                        }) {
 
 	if (exists $keys->{$key}) {
@@ -40,6 +41,7 @@ sub new {
 	}
     }
     $self->__check_engine_usage();
+    $self->__check_key_store();
     
     return $self;
 }
@@ -65,6 +67,18 @@ sub __check_engine_usage {
             } # if NEVER is not the only one value
         } # foreach $part
     } # if ENGINE_USAGE is defined
+
+    return 1;
+}
+
+sub __check_key_store {
+    my $self = shift;
+    if ($self->{KEY_STORE} !~ m{( \A ENGINE \z )|( \A OPENXPKI \z ) }xms) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_WRONG_KEY_STORE",
+            params  => { "ATTRIBUTE" => $self->{KEY_STORE}},
+            );
+    }
 
     return 1;
 }
@@ -149,6 +163,12 @@ sub get_engine_usage
     } else {
         return "";
     }
+}
+
+sub get_key_store
+{
+    my $self = shift;
+    return $self->{KEY_STORE};
 }
 
 sub get_keyfile

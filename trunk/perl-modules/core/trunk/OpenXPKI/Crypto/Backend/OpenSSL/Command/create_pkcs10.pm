@@ -21,9 +21,30 @@ sub get_command
     ## normal CSR: engine (optional), passwd, key
 
     my ($engine, $keyform, $passwd, $key) = ("", "", undef);
-    if ($self->{PASSWD} or $self->{KEY})
+    if (uc($self->{TOKEN_TYPE}) eq 'CA')
     {
-        ## external CSR generation
+        ## CA CSR generation
+        my $key_store = $self->{ENGINE}->get_key_store();
+        if ($key_store eq 'ENGINE') {
+            ## token CA CSR generation
+            $engine  = $self->{ENGINE}->get_engine();
+            $keyform = $self->{ENGINE}->get_keyform();
+        }
+        else {
+            ## external CA CSR generation
+            $engine = $self->__get_used_engine();
+        }
+        $passwd  = $self->{ENGINE}->get_passwd();
+        $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
+
+        # check minimum requirements
+        if (not $passwd)
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD");
+        }
+    } else {
+        ## user CSR generation
 
         # check minimum requirements
         if (not exists $self->{PASSWD})
@@ -39,24 +60,15 @@ sub get_command
 
         # prepare parameters
         $passwd = $self->{PASSWD};
-        my $engine_usage = $self->{ENGINE}->get_engine_usage();
-        $engine = $self->{ENGINE}->get_engine() 
-            if ($self->{ENGINE}->get_engine() and
-                (($engine_usage =~ m{ ALWAYS }xms) or
-                 ($engine_usage =~ m{ PRIV_KEY_OPS }xms)));
+        $engine = $self->__get_used_engine();
         $self->get_tmpfile ('KEY');
         $self->write_file (FILENAME => $self->{KEYFILE},
                            CONTENT  => $self->{KEY},
-	                   FORCE    => 1);
-    } else {
-        ## token CSR generation
-        $engine  = $self->{ENGINE}->get_engine();
-        $keyform = $self->{ENGINE}->get_keyform();
-        $passwd  = $self->{ENGINE}->get_passwd();
-        $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
-    }
-    $self->get_tmpfile ('OUT');
+                           FORCE    => 1);
 
+    }
+
+    $self->get_tmpfile ('OUT');
 
     ## check parameters
 
@@ -95,6 +107,20 @@ sub get_command
     }
 
     return [ $command ];
+}
+
+sub __get_used_engine 
+{
+    my $self = shift;
+    my $engine_usage = $self->{ENGINE}->get_engine_usage();
+    if ($self->{ENGINE}->get_engine() and
+        (($engine_usage =~ m{ ALWAYS }xms) or
+         ($engine_usage =~ m{ PRIV_KEY_OPS }xms))) {
+        return $self->{ENGINE}->get_engine();
+    }
+    else {
+        return "";
+    }
 }
 
 sub hide_output
