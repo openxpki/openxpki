@@ -184,6 +184,7 @@ WriteMakefile(
     'NAME'      => 'OpenXPKI',
     'VERSION'   => $version,
     'LIBS'      => ["-L$openssl_lib_dir -lcrypto"],
+    'LDDLFLAGS' => "-shared",
     'INC'       => "-I. -I$openssl_inc_dir",
     'CCFLAGS'   => '-O2 -g -Wall',
     'PREREQ_PM' => {'CGI::Session'           => '3.95',
