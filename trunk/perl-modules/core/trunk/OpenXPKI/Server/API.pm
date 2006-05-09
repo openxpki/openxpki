@@ -31,6 +31,17 @@ sub new
     return $self;
 }
 
+sub list_workflow_instances {
+
+    return [ 123, 456, 789 ];
+}
+
+sub list_workflow_titles {
+
+    return [ 'foo', 'bar', 'baz' ];
+}
+
+
 1;
 __END__
 

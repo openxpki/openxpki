@@ -295,14 +295,14 @@ sub do_process_request
 
     # masquerade process
     my $user = '';
-    my $role = 'n/a';
+    my $role = '';
     eval {
 	$user = CTX('session')->get_user();
     };
     eval {
-	$role = CTX('session')->get_role();
+	$role = '(' . CTX('session')->get_role() . ')';
     };
-    $0 = "openxpkid: $user($role)";
+    $0 = 'openxpkid: ' . $user . $role;
 
     ## use user interface
     CTX('service')->run();

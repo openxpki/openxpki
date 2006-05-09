@@ -20,6 +20,9 @@ use English;
 package OpenXPKI::Deployment;
 
 use Template;
+use English;
+
+# use Smart::Comments;
 
 sub expand {
     my $config = shift;
@@ -142,6 +145,7 @@ sub process_template {
 	    print STDERR "Error msg:  " . $error . "\n";
 	    return;
     };
+
     return 1;
 }
 
@@ -159,7 +163,7 @@ use Getopt::Long;
 use File::Spec;
 use Config::Std;
 
-#use Smart::Comments;
+# use Smart::Comments;
 
 my $have_io_prompt = 1;
 my $data_offset;
@@ -589,6 +593,8 @@ if (exists $params{getcfgvalue}) {
     exit 0;
 }
 
+# mode, owner and group of meta configuration file
+my ($mode, $uid, $gid) = (stat $params{cfg})[2, 4, 5];
 
 FILE:
 foreach my $filename (@{$params{file}}) {
@@ -608,6 +614,9 @@ foreach my $filename (@{$params{file}}) {
     if (! OpenXPKI::Deployment::process_template(
 	      {
 		  FILENAME => $filename,
+		  MODE     => $mode,
+		  UID      => $uid,
+		  GID      => $gid,
 		  VARS     => $config,
 		  INCLUDE  => [ '.',
 				File::Spec->catpath($volume, $dirs), 
@@ -617,6 +626,12 @@ foreach my $filename (@{$params{file}}) {
 	      })) {
 	die "Could not process template file $filename. Stopped";
     }
+
+    if ($REAL_USER_ID == 0) {
+	chown $uid, $gid, $outfile;
+    }
+    
+    chmod $mode, $outfile;
 }
 
 __DATA__

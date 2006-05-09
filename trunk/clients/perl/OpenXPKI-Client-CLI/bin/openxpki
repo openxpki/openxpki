@@ -108,7 +108,6 @@ if (scalar @ARGV == 0) {
 	if ($EVAL_ERROR) {
 	    print "error: $EVAL_ERROR\n";
 	    next INTERACTION;
-	    exit 1;
 	}
 
 	# command exit requested?
@@ -150,7 +149,6 @@ if (scalar @ARGV == 0) {
 
 	$term->addhistory($line) if ($line ne "");
     }    
-    print $OUT "Exiting...\n";
     exit 0;
 
 } else {

@@ -21,6 +21,7 @@ use Class::Std;
 use Getopt::Long;
 use Text::CSV_XS;
 
+# FIXME: remove debugging modules
 use Smart::Comments;
 use Data::Dumper;
 
@@ -54,7 +55,7 @@ sub process_command {
 	my $method = 'cmd_' . $command;
 	$result = $self->$method($options);
     };
-    if ($EVAL_ERROR =~ m{ Can't\ locate\ object\ method }xms) {
+    if ($EVAL_ERROR =~ m{ Can\'t\ locate\ object\ method }xms) {
 	return {
 	    ERROR => 1,
 	    MESSAGE => "Unknown command '$command'",
@@ -410,16 +411,26 @@ sub cmd_list : PRIVATE {
 
     if (scalar @args == 0) {
 	my @msg = ( 'Usage: list OBJECT', 'Available objects:' );
-	push @msg, 'workflows';
+	push @msg, 'workflow instances';
+	push @msg, 'workflow titles';
 	push @msg, 'requests';
 	push @msg, 'certificates';
 	return {
 	    MESSAGE => \@msg,
 	},
     } else {
-	foreach my $arg (@args) {
-	    if ($arg eq 'workflows') {
-		return $self->subcmd_list_workflows();
+	while (my $arg = shift @args) {
+	    if ($arg eq 'workflow') {
+		my $obj = shift @args;
+		if ($obj eq 'instances') {
+		    return $self->subcmd_list_workflow_instances();
+		}
+		if ($obj eq 'titles') {
+		    return $self->subcmd_list_workflow_titles();
+		}
+		return {
+		    MESSAGE => "No such object",
+		};
 	    }
 	    return {
 		MESSAGE => "No such object",
@@ -434,7 +445,7 @@ sub cmd_list : PRIVATE {
 
 
 # subcommands
-sub subcmd_list_workflows : PRIVATE {
+sub subcmd_list_workflow_instances : PRIVATE {
     my $self  = shift;
     my $ident = ident $self;
     my $args  = shift;
@@ -443,7 +454,24 @@ sub subcmd_list_workflows : PRIVATE {
     return {
 	SERVER_COMMAND => {
 	    SERVICE_MSG => 'COMMAND',
-	    COMMAND     => 'list_workflows',
+	    COMMAND     => 'list_workflow_instances',
+	    PARAMS      => {
+	    }
+	},
+    };
+}
+
+# subcommands
+sub subcmd_list_workflow_titles : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+
+
+    return {
+	SERVER_COMMAND => {
+	    SERVICE_MSG => 'COMMAND',
+	    COMMAND     => 'list_workflow_titles',
 	    PARAMS      => {
 	    }
 	},

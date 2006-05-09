@@ -29,27 +29,17 @@ use OpenXPKI::Serialization::JSON;
 
 # use Smart::Comments;
 
-my %socketfile             : ATTR;
+my %socketfile             : ATTR( :init_arg<SOCKETFILE> );
+my %sessionid              : ATTR( :get<session_id> );
+my %read_timeout           : ATTR( :default(30) :set<timeout> );
+
 my %socket                 : ATTR;
-
-my %transport_protocol     : ATTR;
-my %serialization_protocol : ATTR;
-
+my %transport_protocol     : ATTR( :default('Simple') );
+my %serialization_protocol : ATTR( :default('Simple') );
 my %transport              : ATTR;
 my %serialization          : ATTR;
 
-my %sessionid              : ATTR;
-my %read_timeout           : ATTR;
 
-sub BUILD {
-    my ($self, $ident, $arg_ref) = @_;
-
-    $socketfile{$ident}             = $arg_ref->{SOCKETFILE};
-
-    $transport_protocol{$ident}     = 'Simple';
-    $serialization_protocol{$ident} = 'Simple';
-    $read_timeout{$ident}           = 30;
-}
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
@@ -102,15 +92,6 @@ sub collect {
     }
     return $result;
 }
-
-
-sub get_session_id {
-    my $self = shift;
-    my $ident = ident $self;
-
-    return $sessionid{$ident};
-}
-
 
 
 sub init_session {
@@ -342,6 +323,10 @@ is re-opened, otherwise a new session is created.
 =head2 get_session_id
 
 Returns current session ID (or undef if no session is active).
+
+=head2 set_timeout
+
+Set socket read timeout (seconds, default: 30).
 
 =head1 DIAGNOSTICS
 

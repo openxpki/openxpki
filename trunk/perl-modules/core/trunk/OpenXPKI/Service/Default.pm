@@ -18,6 +18,7 @@ use OpenXPKI::Debug 'OpenXPKI::Service::Default';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Service::Default::Command;
 
 sub new
 {
@@ -35,14 +36,14 @@ sub new
     {
         OpenXPKI::Exception->throw
         (
-            message => "I18N_OPENXPKI_SERIALIZATION_DEFAULT_NEW_MISSING_TRANSPORT",
+            message => "I18N_OPENXPKI_SERVICE_DEFAULT_NEW_MISSING_TRANSPORT",
         );
     }
     if (not $keys->{SERIALIZATION})
     {
         OpenXPKI::Exception->throw
         (
-            message => "I18N_OPENXPKI_SERIALIZATION_DEFAULT_NEW_MISSING_SERIALIZATION",
+            message => "I18N_OPENXPKI_SERVICE_DEFAULT_NEW_MISSING_SERIALIZATION",
         );
     }
     $self->{TRANSPORT}     = $keys->{TRANSPORT};
@@ -76,6 +77,43 @@ sub init
     return 1;
 }
 
+
+sub __get_error {
+    my $self = shift;
+    my $arg  = shift;
+    
+    if (! exist $arg->{ERROR} || (ref $arg->{ERROR} ne '')) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_ERROR_INVALID_PARAMETERS",
+	    params => {
+		PARAMETER => 'ERROR',
+	    }
+	    );
+    }
+
+    my $result = {
+	ERROR => $arg->{ERROR},
+    };
+
+    if (exists $arg->{PARAMS}) {
+	if (ref $arg->{PARAMS} ne 'HASH') {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_ERROR_INVALID_PARAMETERS",
+		params => {
+		    PARAMETER => 'PARAMS',
+		}
+		);
+	}
+	$result->{PARAMS} = $arg->{PARAMS};
+    }
+    
+    $result->{ERROR_MESSAGE} = OpenXPKI::i18nGettext($result->{ERROR}, 
+						     %{$result->{PARAMS}});
+    
+    return $result;
+}
+
+
 sub __init_session
 {
     ##! 1: "check if this is a ne session"
@@ -106,20 +144,24 @@ sub __init_session
                        });
         };
 	if ($EVAL_ERROR) {
+	    my $error = 'I18N_OPENXPKI_SEVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED';
             $self->{TRANSPORT}->write(
 		$self->{SERIALIZATION}->serialize(
-		    {ERROR => "ILLEGAL_OLD_SESSION"}));
+		    $self->__get_error(
+			{
+			    ERROR => $error,
+			})));
 	    
 	    if (my $exc = OpenXPKI::Exception->caught())
 	    {
 		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERIALIZATION_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED",
+		    message => $error,
 		    params  => {ID => $msg->{SESSION_ID}},
 		    child   => $exc);
 	    } else {
 		OpenXPKI::Exception->throw
 		    (
-		     message => "I18N_OPENXPKI_SERIALIZATION_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED",
+		     message => $error,
 		     params  => {ID => $msg->{SESSION_ID}}
 		    );
 	    }
@@ -152,18 +194,18 @@ sub __init_session
     else
     {
         ##! 4: "illegal session init"
-        $self->{TRANSPORT}->write
-        (
-            $self->{SERIALIZATION}->serialize
-            (
-                {ERROR => "UNKNOWN_COMMAND"}
-            )
-        );
-        OpenXPKI::Exception->throw
-        (
-            message => "I18N_OPENXPKI_SERIALIZATION_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND",
-            params  => {COMMAND => $msg->{COMMAND}}
-        );
+	my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND';
+        $self->{TRANSPORT}->write(
+            $self->{SERIALIZATION}->serialize(
+		$self->__get_error(
+		    {
+			ERROR => $error,
+		    })));
+
+        OpenXPKI::Exception->throw(
+	    message => $error,
+	    params  => {COMMAND => $msg->{COMMAND}}
+	    );
     }
     OpenXPKI::Server::Context::setcontext ({'session' => $session});
     ##! 4: "send answer to client"
@@ -236,16 +278,16 @@ sub __init_pki_realm
     if (not exists $msg->{PKI_REALM} or
         not exists CTX('pki_realm')->{$msg->{PKI_REALM}})
     {
-        $self->{TRANSPORT}->write
-        (
-            $self->{SERIALIZATION}->serialize
-            (
-                {ERROR => "ILLEGAL_PKI_REALM"}
-            )
-        );
-        OpenXPKI::Exception->throw
-        (
-            message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_ILLEGAL_REALM",
+	my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_ILLEGAL_REALM';
+        $self->{TRANSPORT}->write(
+            $self->{SERIALIZATION}->serialize(
+                $self->__get_error(
+		    {
+			ERROR => $error,
+			PARAMS => {PKI_REALM => $msg->{PKI_REALM}},
+		    })));
+        OpenXPKI::Exception->throw(
+            message => $error,
             params  => {PKI_REALM => $msg->{PKI_REALM}}
         );
     }
@@ -271,6 +313,7 @@ sub run
 		# client closed socket
 		last MESSAGE;
 	    } else {
+		# FIXME: return error instead of rethrowing
 		$exc->rethrow();
 	    }
 	} elsif ($EVAL_ERROR) {
@@ -288,7 +331,16 @@ sub run
         my $data = $self->{SERIALIZATION}->deserialize($msg);
 
 	my $service_msg = $data->{SERVICE_MSG};
-	next MESSAGE unless defined $service_msg;
+	if (! defined $service_msg) {
+	    $self->{TRANSPORT}->write(
+		$self->{SERIALIZATION}->serialize(
+		    $self->__get_error(
+			{
+			    ERROR => 'I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE',
+			})));
+	    
+	    next MESSAGE;
+	}			
 
 	##! 4: "$service_msg"
 
@@ -306,29 +358,70 @@ sub run
         }
 	
 	if ($service_msg eq 'COMMAND') {
-	    my $command = $data->{COMMAND};
+	    if (defined $data->{COMMAND}) {
+		##! 12: "command: $data->{COMMAND}"
 
-	    if (defined $command) {
-		CTX('log')->log(
-		    MESSAGE  => "Command request: '$command'",
-		    PRIORITY => 'info',
-		    FACILITY => 'system',
-		    );
+		my $command = OpenXPKI::Service::Default::Command->new(
+		    {
+			COMMAND => $data->{COMMAND},
+			PARAMS  => $data->{PARAMS},
+		    });
+
+		if (defined $command) {
+		    my $result;
+		    eval {
+			$result = $command->execute();
+		    };
+		    if ($EVAL_ERROR) {
+			##! 14: "Exception caught during command execution"
+			$self->{TRANSPORT}->write(
+			    $self->{SERIALIZATION}->serialize(
+				$self->__get_error(
+				    {
+					ERROR => 'I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED',
+				    })));
+			
+			next MESSAGE;
+		    }
+
+		    # sanity checks on command reply
+		    if (! defined $result || ref $result ne 'HASH') {
+			$self->{TRANSPORT}->write(
+			    $self->{SERIALIZATION}->serialize(
+				$self->__get_error(
+				    {
+					ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE",
+				    })));
+
+			next MESSAGE;
+		    }
+
+		    # FIXME: translate messages
+		    $self->{TRANSPORT}->write(
+			$self->{SERIALIZATION}->serialize(
+			    $result));
+
+		    next MESSAGE;
+		}
 	    }
-	    
 
 	    $self->{TRANSPORT}->write(
 		$self->{SERIALIZATION}->serialize(
-		    {ERROR => "UNRECOGNIZED COMMAND"}
-		));
+		    $self->__get_error(
+			{
+			    ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND",
+			})));
+
 	    next MESSAGE;
 	}
 
 
 	$self->{TRANSPORT}->write(
 	    $self->{SERIALIZATION}->serialize(
-		{ERROR => "UNRECOGNIZED SERVICE MESSAGE"}
-	    ));
+		$self->__get_error(
+		    {
+			ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
+		    })));
     }
 
     return 1;
@@ -402,32 +495,34 @@ sub get_passwd_login
     
     if (not exists $msg->{LOGIN})
     {
-	$self->{TRANSPORT}->write
-	    (
-	     $self->{SERIALIZATION}->serialize
-	     (
-	      {ERROR => "MISSING_LOGIN"}
-	     )
-	    );
+	my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_MISSING_LOGIN';
+	$self->{TRANSPORT}->write(
+	    $self->{SERIALIZATION}->serialize(
+		$self->__get_error(
+		    {
+			ERROR => $error,
+		    })));
+
 	OpenXPKI::Exception->throw
 	    (
-	     message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_MISSING_LOGIN",
-	     params  => $keys
+	     message => $error,
+	     params  => $keys,
 	    );
     }
     if (not exists $msg->{PASSWD})
     {
-	$self->{TRANSPORT}->write
-	    (
-	     $self->{SERIALIZATION}->serialize
-	     (
-	      {ERROR => "MISSING_PASSWD"}
-	     )
-	    );
+	my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_MISSING_PASSWD';
+	$self->{TRANSPORT}->write(
+	    $self->{SERIALIZATION}->serialize(
+		$self->__get_error(
+		    {
+			ERROR => $error,
+		    })));
+
 	OpenXPKI::Exception->throw
 	    (
-	     message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_MISSING_PASSWD",
-	     params  => $keys
+	     message => $error,
+	     params  => $keys,
 	    );
     }
 
@@ -536,5 +631,16 @@ with a working user interface dummy.
 =item * get_authentication_stack
 
 =item * get_passwd_login
+
+=item * __get_error
+
+Expects named arguments 'ERROR' (required) and 'PARAMS' (optional).
+ERROR must be a scalar indicating an I18N message, PARAMS are optional
+variables (just like params in OpenXPKI Exceptions).
+
+Returns a hash reference containing the original named parameters ERROR and
+PARAMS (if specified) the corresponding i18n translation (in ERROR_MESSAGE).
+
+Throws an exception if named argument ERROR is not a scalar.
 
 =back
