@@ -20,7 +20,7 @@ typedef X509_REQ      * OpenXPKI_Crypto_Backend_OpenSSL_PKCS10;
 
 /* general pointer to avoid memory leaks because fo char * returns */
 char * char_ptr = NULL;
-char * uchar_ptr = NULL;
+unsigned char * uchar_ptr = NULL;
 
 /* free is only safe if we test the pointer before free and
    reset the pointer to NULL after this macro */

@@ -170,7 +170,7 @@ notafter(cert)
     OUTPUT:
 	RETVAL
 
-unsigned char *
+char *
 alias(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -180,10 +180,10 @@ alias(cert)
 	alias = X509_alias_get0(cert, &n);
         if (alias != NULL)
         {
-	    SAFEFREE(uchar_ptr);
-	    Newz(0, uchar_ptr, n+1, char);
-	    memcpy (uchar_ptr, alias, n);
-	    RETVAL = uchar_ptr;
+	    SAFEFREE(char_ptr);
+	    Newz(0, char_ptr, n+1, char);
+	    memcpy (char_ptr, alias, n);
+	    RETVAL = char_ptr;
         } else {
             RETVAL = NULL;
         }
