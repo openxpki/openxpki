@@ -200,6 +200,8 @@ if ($EVAL_ERROR)
     print STDERR "C compiler supports -share. Adding it to LDDLFLAGS.\n";
     $flags{'LDDLFLAGS'} = '-shared';
 }
+unlink('test.c');
+unlink('test');
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
