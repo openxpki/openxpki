@@ -23,7 +23,7 @@ sub get_command
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $engine = $self->{ENGINE}->get_engine()
         if ($self->{ENGINE}->get_engine() and
-            ($engine_usage =~ /ALWAYS/i));
+            ($engine_usage =~ m{ ALWAYS }xms));
 
     $self->{ENC_ALG}  = "aes256" if (not exists $self->{ENC_ALG});
 

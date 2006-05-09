@@ -48,7 +48,7 @@ sub get_command
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $command .= " -engine ".$self->{ENGINE}->get_engine()
         if ($self->{ENGINE}->get_engine() and
-            ($engine_usage =~ /NEW_ALG/i));
+            ($engine_usage =~ m{ NEW_ALG }xms));
 
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -in ".$self->{INFILE};

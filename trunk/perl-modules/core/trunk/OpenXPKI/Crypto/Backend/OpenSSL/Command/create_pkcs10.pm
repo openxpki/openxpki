@@ -42,8 +42,8 @@ sub get_command
         my $engine_usage = $self->{ENGINE}->get_engine_usage();
         $engine = $self->{ENGINE}->get_engine() 
             if ($self->{ENGINE}->get_engine() and
-                (($engine_usage =~ /ALWAYS/i) or
-                 ($engine_usage =~ /PRIV_KEY_OPS/i)));
+                (($engine_usage =~ m{ ALWAYS }xms) or
+                 ($engine_usage =~ m{ PRIV_KEY_OPS }xms)));
         $self->get_tmpfile ('KEY');
         $self->write_file (FILENAME => $self->{KEYFILE},
                            CONTENT  => $self->{KEY},

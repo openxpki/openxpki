@@ -39,8 +39,34 @@ sub new {
 	    $self->{$key} = $keys->{$key};
 	}
     }
+    $self->__check_engine_usage();
     
     return $self;
+}
+
+sub __check_engine_usage {
+    my $self = shift;
+    my @engine_usage_parts = split (m{\|}, $self->{ENGINE_USAGE});
+
+    # if ENGINE_USAGE is defined
+    if ($#{engine_usage_parts} >= 0) {
+        foreach my $part(@engine_usage_parts) {
+            if ($part !~ m{( \A ALWAYS \z )|( \A NEVER \z )|( \A NEW_ALG \z )|( \A PRIV_KEY_OPS \z )|( \A RANDOM \z ) }xms) {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_WRONG_ENGINE_USAGE",
+                    params  => { "ATTRIBUTE" => $part},   
+                    );
+            }
+            # if NEVER is not the only one value
+            if (($part =~ m{ \A NEVER \z }xms) and 
+                ($#{engine_usage_parts} >= 1)) {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_WRONG_NEVER_ENGINE_USAGE" );
+            } # if NEVER is not the only one value
+        } # foreach $part
+    } # if ENGINE_USAGE is defined
+
+    return 1;
 }
 
 sub login {

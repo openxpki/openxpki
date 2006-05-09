@@ -35,8 +35,8 @@ sub get_command
     $command .= "rand -base64";
     $command .= " -engine ".$self->{ENGINE}->get_engine()
         if ($self->{ENGINE}->get_engine() and
-            (($engine_usage =~ /ALWAYS/i) or
-             ($engine_usage =~ /RANDOM/i)));
+            (($engine_usage =~ m{ ALWAYS }xms) or
+             ($engine_usage =~ m{ RANDOM }xms)));
     $command .= " $length";
 
     return [ $command ];

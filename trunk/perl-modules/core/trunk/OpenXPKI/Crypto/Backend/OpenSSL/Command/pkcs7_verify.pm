@@ -23,7 +23,7 @@ sub get_command
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $engine = $self->{ENGINE}->get_engine()
         if ($self->{ENGINE}->get_engine() and
-            ($engine_usage =~ /ALWAYS/i));
+            ($engine_usage =~ m{ ALWAYS }xms));
 
     $self->{CHAIN} = $self->{ENGINE}->get_chainfile()
        if (not $self->{CHAIN} and $self->{ENGINE}->get_chainfile());

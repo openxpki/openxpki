@@ -43,6 +43,7 @@ sub new {
             $self->{$key} = $keys->{$key};
         }
     }
+    $self->__check_engine_usage();
 
     return $self;
 }
