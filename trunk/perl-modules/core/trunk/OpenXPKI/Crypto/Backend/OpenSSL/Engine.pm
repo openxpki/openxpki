@@ -302,6 +302,10 @@ is used or the engine section is empty.
 returns the OpenSSL engine_usage section from the configuration or the empty string if no engine
 is used or the engine_usage section is empty.
 
+=head2 get_key_store
+ 
+returns the OpenSSL key_store section from the configuration.
+
 =head2 get_keyfile
 
 returns the filename of the private key.

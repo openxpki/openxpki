@@ -82,10 +82,19 @@ sub get_command
 
     ## check parameters
 
-    if (not $self->{KEYFILE} or not -e $self->{KEYFILE})
+    if (not $self->{KEYFILE})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_MISSING_KEYFILE");
+    }
+    my $key_store = $self->{ENGINE}->get_key_store();
+    if ( (uc($self->{TOKEN_TYPE}) ne 'CA') or ($key_store ne 'ENGINE'))
+    {
+        if (not -e $self->{KEYFILE})
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_KEYFILE_DOES_NOT_EXIST");
+        }
     }
     if (not $self->{CSR})
     {

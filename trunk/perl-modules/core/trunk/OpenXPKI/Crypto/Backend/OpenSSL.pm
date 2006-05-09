@@ -235,6 +235,12 @@ sub __init_shell
     } else {
         $self->{OPENSSL} = $self->{PARAMS}->{SHELL};
         $self->{SHELL}   = $self->{PARAMS}->{SHELL};
+	if (not -e $self->{SHELL})
+	{
+	    OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_DOES_NOT_EXIST",
+	        params  => {"SHELL" => $self->{SHELL}});
+	}
     }
     my $wrapper = $self->{ENGINE}->get_wrapper();
     if ($wrapper)

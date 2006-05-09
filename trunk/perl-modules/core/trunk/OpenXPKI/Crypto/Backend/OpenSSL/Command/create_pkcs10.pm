@@ -24,6 +24,7 @@ sub get_command
     if (uc($self->{TOKEN_TYPE}) eq 'CA')
     {
         ## CA CSR generation
+        $passwd  = $self->{ENGINE}->get_passwd();
         my $key_store = $self->{ENGINE}->get_key_store();
         if ($key_store eq 'ENGINE') {
             ## token CA CSR generation
@@ -33,16 +34,14 @@ sub get_command
         else {
             ## external CA CSR generation
             $engine = $self->__get_used_engine();
+            # check minimum requirements
+            if (not $passwd)
+            {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD");
+            }
         }
-        $passwd  = $self->{ENGINE}->get_passwd();
         $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
-
-        # check minimum requirements
-        if (not $passwd)
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD");
-        }
     } else {
         ## user CSR generation
 

@@ -46,12 +46,6 @@ sub new
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_MISSING_SHELL");
     }
-    if (not -e $keys->{SHELL})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_SHELL_DOES_NOT_EXIST",
-            params  => {"SHELL" => $keys->{SHELL}});
-    }
     $self->{SHELL} = $keys->{SHELL};;
 
     ##! 4: "check ENGINE"
