@@ -15,7 +15,7 @@ TEMPLATE="default"
 INTERACTIVE=1
 FORCE=""
 
-sub usage() {
+usage() {
     cat <<EOF
 Usage: openxpki-configure [OPTIONS]
 
