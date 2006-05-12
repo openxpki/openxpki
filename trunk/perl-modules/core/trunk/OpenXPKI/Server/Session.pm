@@ -187,6 +187,19 @@ sub get_pki_realm
     return $self->{session}->param ("pki_realm");
 }
 
+sub set_authentication_stack
+{
+    my $self = shift;
+    $self->{session}->param ("authentication_stack" => shift);
+    $self->{session}->flush();
+}
+
+sub get_authentication_stack
+{
+    my $self = shift;
+    return $self->{session}->param ("authentication_stack");
+}
+
 sub set_language
 {
     my $self = shift;

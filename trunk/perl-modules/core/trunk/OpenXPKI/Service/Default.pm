@@ -228,9 +228,10 @@ sub __init_session
 
 sub __init_pki_realm
 {
+    ##! 1: "start"
     my $self = shift;
 
-    ##! 2: "if we know the session then return the ID"
+    ##! 2: "if we know the PKI realm then return it"
     return CTX('session')->get_pki_realm()
         if (CTX('session')->get_pki_realm());
 
@@ -440,9 +441,15 @@ sub run
 
 sub get_authentication_stack
 {
+    ##! 1: "start"
     my $self = shift;
     my $keys = shift;
 
+    ##! 2: "if we know the authentication stack then return it"
+    return CTX('session')->get_authentication_stack()
+        if (CTX('session')->get_authentication_stack());
+
+    ##! 2: "determine the authentication stack"
     my $msg;
   GET_AUTH_STACK:
     while (1) {
@@ -463,11 +470,15 @@ sub get_authentication_stack
 	    );
 	if (exists $msg->{AUTHENTICATION_STACK}
 	    && exists $keys->{STACKS}->{$msg->{AUTHENTICATION_STACK}}) {
+            ##! 2: "authentication stack ".$msg->{AUTHENTICATION_STACK}." accepted"
 	    last GET_AUTH_STACK;
 	}
     }
 
-    ##! 2: "return auth_stack ".$msg->{AUTHENTICATION_STACK}
+    ##! 2: "put the authentication stack into the session"
+    CTX('session')->set_authentication_stack($msg->{AUTHENTICATION_STACK});
+
+    ##! 2: "end"
     return $msg->{AUTHENTICATION_STACK};
 }
 
