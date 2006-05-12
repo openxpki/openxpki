@@ -64,6 +64,11 @@ sub __write_data
         ## it's an array
         return $self->__write_array ($data);
     }
+    elsif (not defined $data)
+    {
+        ## it's an undef
+        return $self->__write_undef();
+    }
     else
     {
         ## it's a scalar
@@ -108,6 +113,12 @@ sub __write_array
            $msg;
 }
 
+sub __write_undef
+{
+    my $self = shift;
+    return "UNDEF".$self->{SEPARATOR};
+}
+
 sub __write_scalar
 {
     my $self = shift;
@@ -141,6 +152,11 @@ sub __read_data
     {
         ## it's an array
         return $self->__read_array ($msg);
+    }
+    elsif (substr ($msg, 0, 5) eq "UNDEF")
+    {
+        ## it's an undef
+        return $self->__read_undef($msg);
     }
     else
     {
@@ -208,6 +224,16 @@ sub __read_array
             msg  => $msg};
 }
 
+sub __read_undef
+{
+    my $self   = shift;
+    my $msg    = shift;
+       $msg    = substr ($msg, 6);  ## throw away "UNDEF\n"
+
+    return {data => undef,
+            msg  => $msg}
+}
+
 sub __read_scalar
 {
     my $self   = shift;
@@ -264,13 +290,15 @@ hash         ::= 'HASH'.SEPARATOR.
                  hash_element+
 hash_element ::= [1-9][0-9]*.SEPARATOR.    /* length of the hash key */
                  [a-zA-Z0-9_]+.SEPARATOR.  /* the hash key */
-                 (hash|array|scalar)
+                 (hash|array|undef|scalar)
 
 array         ::= 'ARRAY'.SEPARATOR.
                   [0-9]+.SEPARATOR. /* length of array data */
                   array_element+
 array_element ::= [0-9]+.SEPARATOR. /* position in the array */
                   (hash|array|scalar)
+
+undef ::= 'UNDEF'.SEPARATOR.
 
 scalar ::= 'SCALAR'.SEPARATOR.
            [0-9]+.SEPARATOR. /* length of data */

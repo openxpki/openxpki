@@ -1,7 +1,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 12;
 use English;
 # use Smart::Comments;
 
@@ -55,19 +55,19 @@ ok($ref);
 
 my $text = $ref->serialize ($hash);
 
-my $expected_serialization = "HASH-291-6-FOOTER-ARRAY-31-0-SCALAR-2-OK-1-SCALAR-5-Abort-4-LIST-ARRAY-184-0-HASH-82-6-Serial-ARRAY-28-0-SCALAR-2-10-1-SCALAR-2-12-4-Name-ARRAY-20-0-SCALAR-8-John Doe-1-HASH-82-6-Serial-ARRAY-28-0-SCALAR-2-11-1-SCALAR-2-13-4-Name-ARRAY-20-0-SCALAR-8-Jane Doe-6-HEADER-ARRAY-23-0-SCALAR-10-Testheader-";
-TODO: {
-    local $TODO = "Test data structure was modified to include undef'd values";
+my $expected_serialization = "HASH-328-6-FOOTER-ARRAY-31-0-SCALAR-2-OK-1-SCALAR-5-Abort-4-LIST-ARRAY-203-0-HASH-100-9-Undefined-UNDEF-6-Serial-ARRAY-28-0-SCALAR-2-10-1-SCALAR-2-12-4-Name-ARRAY-20-0-SCALAR-8-John Doe-1-HASH-82-6-Serial-ARRAY-28-0-SCALAR-2-11-1-SCALAR-2-13-4-Name-ARRAY-20-0-SCALAR-8-Jane Doe-6-HEADER-ARRAY-23-0-SCALAR-10-Testheader-9-UNDEFINED-UNDEF-";
 
-    ok($text eq $expected_serialization);
-}
+ok($text eq $expected_serialization);
 
 my $res = $ref->deserialize($text);
 ok($res);
 
-TODO: {
-    local $TODO = "Simple Serialization does not serialize 'undef' values properly";
-    is_deeply($res, $hash, "Data structure survived (de)serialization");
-}
+is_deeply($res, $hash, "Data structure survived (de)serialization");
+
+## check that undef really works
+ok (not defined $hash->{'UNDEFINED'});
+ok (not defined $res->{'UNDEFINED'});
+ok (not defined $hash->{'LIST'}->[0]->{'UNDEFINED'});
+ok (not defined $res->{'LIST'}->[0]->{'UNDEFINED'});
 
 1;
