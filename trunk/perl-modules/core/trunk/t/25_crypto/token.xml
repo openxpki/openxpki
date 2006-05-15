@@ -100,4 +100,41 @@
         <passwd>1234567890</passwd>
     </token>
 
+    <token id="default_nciph" super="common/token_config/token{default}">
+
+        <engine>nCipher</engine>
+        <engine_section>engine_id   = chil
+<!-- dynamic_path = /usr/local/openssl_dist/openssl/lib/engines/libchil.so -->
+<!-- SO_PATH = /opt/nfast/toolkits/hwcrhk/libnfhwcrhk.so -->
+dynamic_path = __CHIL_LIBRARY__
+SO_PATH = __NCIPHER_LIBRARY__
+THREAD_LOCKING = 1
+        </engine_section>
+        <key_store>ENGINE</key_store>
+        <engine_usage>ALWAYS</engine_usage>
+        <wrapper>/opt/nfast/bin/with-nfast -M</wrapper>
+
+	<!-- OpenSSL binary location -->
+        <!-- <shell>/usr/local/ssl/bin/openssl</shell> -->
+        <!-- <shell>/usr/bin/openssl</shell> -->
+        <shell>/opt/local/bin/openssl</shell>
+
+    </token>
+
+    <token id="canciph" super="common/token_config/token{default_nciph}">
+
+        <key>__NCIPHER_KEY__</key>
+
+        <!-- CA certificate, must be in PEM format -->
+        <cert>t/25_crypto/canciph/cacert.pem</cert>
+
+        <!-- CA certificate chain for crypto operations -->
+        <internal_chain>t/25_crypto/canciph/cacert.pem</internal_chain>
+
+        <passwd_parts></passwd_parts>
+
+        <passwd></passwd>
+
+    </token>
+
 </token_config>

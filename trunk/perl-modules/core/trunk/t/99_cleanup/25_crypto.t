@@ -4,7 +4,7 @@ use Test;
 
 my @files = ();
 
-foreach my $cadir (qw( ca1 ca2 cagost )) {
+foreach my $cadir (qw( ca1 ca2 cagost canciph )) {
     push @files, 
     "t/25_crypto/$cadir/cakey.pem",
     "t/25_crypto/$cadir/cacert.pem",
@@ -39,8 +39,8 @@ foreach my $cadir (qw( ca1 ca2 cagost )) {
     "t/25_crypto/$cadir/crlnumber",
 }
 
-## 2 * number of file
-BEGIN { plan tests => 156 };
+## 4 * number of files
+BEGIN { plan tests => 208 };
 
 print STDERR "OpenXPKI::Crypto Cleanup\n";
 

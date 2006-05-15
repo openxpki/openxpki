@@ -17,6 +17,7 @@ our $basedir = File::Spec->catfile('t', '25_crypto');
 
 foreach my $dir ("t/25_crypto/ca1/certs",
                  "t/25_crypto/ca2/certs",
+                 "t/25_crypto/canciph/certs",
                  "t/25_crypto/cagost/certs")
 {
     `mkdir -p $dir` if (not -d $dir);

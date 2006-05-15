@@ -20,6 +20,9 @@
 
     <profile id="INTERNAL_CA_GOST"
 	     super="../profile{default}"/>
+	     
+    <profile id="INTERNAL_CA_NCIPH"
+	     super="../profile{default}"/>
 
   </crl>
 
@@ -103,6 +106,9 @@
 	     super="../profile{default}"/>
 
     <profile id="INTERNAL_CA_GOST"
+             super="../profile{default}"/>
+    
+    <profile id="INTERNAL_CA_NCIPH"
              super="../profile{default}"/>
     
   </selfsignedca>

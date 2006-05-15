@@ -64,4 +64,19 @@
 
   </pki_realm>
 
+  <pki_realm name="Test nCipher Root CA" id="root_nciph" super="pki_realm{root1}">
+
+    <common id="default">
+      <!-- default token (used for general crypto operations not requiring
+           private key operations) -->
+      <token super="common/token_config/token{default_nciph}"/>
+
+    </common>
+
+    <ca id="INTERNAL_CA_NCIPH">
+      <token    super="common/token_config/token{canciph}"/>
+    </ca>
+
+  </pki_realm>
+
 </openxpki>

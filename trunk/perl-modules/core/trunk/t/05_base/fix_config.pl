@@ -49,6 +49,30 @@ else
                    VALUE    => "ca1");
 }
 
+## prepare nCipher configuration
+if ((exists $ENV{NCIPHER_LIBRARY}) and (exists $ENV{CHIL_LIBRARY}) and (exists $ENV{NCIPHER_KEY})) 
+{
+    replace_param (FILENAME => "t/25_crypto/token.xml",
+                   PARAM    => "__CHIL_LIBRARY__",
+                   VALUE    => $ENV{CHIL_LIBRARY});
+    replace_param (FILENAME => "t/25_crypto/token.xml",
+                   PARAM    => "__NCIPHER_LIBRARY__",
+                   VALUE    => $ENV{NCIPHER_LIBRARY});
+    replace_param (FILENAME => "t/25_crypto/token.xml",
+                   PARAM    => "__NCIPHER_KEY__",
+                   VALUE    => $ENV{NCIPHER_KEY});
+}
+else
+{
+    ## drop all the GOST configuration to avoid exceptions during initialization
+    replace_param (FILENAME => "t/config.xml",
+                   PARAM    => "default_nciph",
+                   VALUE    => "default");
+    replace_param (FILENAME => "t/config.xml",
+                   PARAM    => "canciph",
+                   VALUE    => "ca1");
+}
+
 sub replace_param
 {
     my $keys     = { @_ };

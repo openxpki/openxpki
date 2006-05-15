@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test;
-BEGIN { plan tests => 8 };
+BEGIN { plan tests => 9 };
 
 print STDERR "OpenXPKI::Client::CLI\n";
 
@@ -23,6 +23,13 @@ if ($pid)
     my $ret = `perl t/70_server/startup.pl $options 2>&1 &`;
     print STDERR $ret."\n" if ($CHILD_ERROR);
     exit 1;
+}
+
+ok(1);                                                                                                                                                     
+if (not -e 't/pid')                                                                                                                                        
+{
+    print STDERR "Waiting 5 additional seconds to support very slow machines ...\n";                                                                        
+    sleep 5;                                                                                                                                               
 }
 
 ok(-f "t/pid");
