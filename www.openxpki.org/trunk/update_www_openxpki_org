@@ -20,7 +20,8 @@ fi;
 
 ## update CVS
 
-svn checkout svn://svn.berlios.de/openxpki/www.openxpki.org/trunk/htdocs $target 2>/dev/null >/dev/null
+#svn co svn://svn.berlios.de/openxpki/www.openxpki.org/trunk/htdocs $target 2>/dev/null >/dev/null
+svn co https://svn.sourceforge.net/svnroot/openxpki/www.openxpki.org/trunk/htdocs $target 2>/dev/null >/dev/null
 cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/openca checkout -P doc 2>/dev/null >/dev/null
 
 ## copy stuff to htdocs area
