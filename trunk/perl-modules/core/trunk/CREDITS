@@ -1,7 +1,10 @@
 The following developers contributed code to this project. The
-order is alphabetical.
+order is alphabetical. 
 
 Martin Bartosch
 Michael Bell
 Dmitry Belyavsky
 Julia Dubenskaya
+
+Info: Before revision 262 julia means djulia. This is a migration
+      issue (BerliOS ==> SF.net).
