@@ -107,10 +107,27 @@ if ($files)
     }
     print STDERR "Revision:        $revision\n";
     $version = "0.9.$revision";
-    `echo \\# never commit this file to a version control system > OpenXPKI/VERSION.pm`;
-    `echo package OpenXPKI::VERSION\\; >> OpenXPKI/VERSION.pm`;
-    `echo our \\\$VERSION = \\'$version\\'\\; >> OpenXPKI/VERSION.pm`;
-    `echo \\1\\; >> OpenXPKI/VERSION.pm`;
+    my $module = <<EOF
+# never commit this file to a version control system
+package OpenXPKI::VERSION;
+our \$VERSION = '$version';
+1;
+__END__
+
+=head1 Description
+
+This file is only used to get a clean version number for the
+installed OpenXPKI core software. This is required by the XS
+library.
+
+=head1 Version
+
+$version
+EOF
+;
+    open FD, ">OpenXPKI/VERSION.pm" or die "Cannot open version module file OpenXPKI/VERSION.pm!\n";
+    print FD $module;
+    close FD;
 } else {
     require OpenXPKI::VERSION;
     $version = $OpenXPKI::VERSION::VERSION;
