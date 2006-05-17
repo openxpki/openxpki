@@ -5,6 +5,10 @@ use ExtUtils::MakeMaker;
 
 use File::Spec;
 
+# Major version part (OpenXPKI uses x.y.z version numbers, this string
+# represents x.y of this version. z is the SVN revision.)
+my $openxpki_major_version = "0.9";
+
 ## first we have to find a working OpenSSL 0.9.8 at minimum
 
 # OPENSSL_LIB
@@ -72,15 +76,15 @@ print STDERR "OpenSSL library: $openssl_lib_dir\n";
 print STDERR "OpenSSL headers: $openssl_inc_dir\n";
 print STDERR "OpenSSL binary:  $openssl_binary\n";
 
-my $version = `grep '#define OPENSSL_VERSION_TEXT' $tmp_ver`;
+my $openssl_version = `grep '#define OPENSSL_VERSION_TEXT' $tmp_ver`;
 
-$version =~ s/^.*fips.*$//m;
-$version =~ s/\n//g;
-$version =~ s/^[^"]*"([^"]*)".*$/$1/;
-print STDERR "OpenSSL version: $version\n";
-$version =~ s/^\s*OpenSSL\s*0\.9\.//i;
-$version =~ s/^([0-9]+).*$/$1/;
-if ($version < 8)
+$openssl_version =~ s/^.*fips.*$//m;
+$openssl_version =~ s/\n//g;
+$openssl_version =~ s/^[^"]*"([^"]*)".*$/$1/;
+print STDERR "OpenSSL version: $openssl_version\n";
+$openssl_version =~ s/^\s*OpenSSL\s*0\.9\.//i;
+$openssl_version =~ s/^([0-9]+).*$/$1/;
+if ($openssl_version < 8)
 {
     print STDERR "==============================================\n";
     print STDERR "WARNING: You need at minimum an OpenSSL 0.9.8!\n";
@@ -93,24 +97,60 @@ print $fh $openssl_binary;
 close $fh;
 
 #determine version
-my $files = `find . -name entries -print`;
-if ($files)
-{
-    $files =~ s/\n/ /g;
-    my $commited = `grep -e "revision\\|committed-rev" $files`;
-    my $revision = 0;
-    foreach my $line (split (/\n/, $commited))
-    {
-        $line =~ s/^.*:\s+committed-rev="([0-9]+)".*$/$1/;
-        $line =~ s/^.*:\s+revision="([0-9]+)".*$/$1/;
-        $revision = $line if ($line > $revision);
+
+my $openxpki_version;
+
+# check if we are using a SVN checkout
+open $fh, "svn info 2>/dev/null |";
+while (my $line = <$fh>) {
+    chomp $line;
+    if ($line =~ m{ \A Revision: \s* (\d+) }xms) {
+	$openxpki_version  = $openxpki_major_version . '.' . $1;
+	print STDERR "This is a development tree\n";
+	print STDERR "Revision from SVN: $1\n";
     }
-    print STDERR "Revision:        $revision\n";
-    $version = "0.9.$revision";
-    my $module = <<EOF
+}
+close $fh;
+
+# fallback methods to determine revision
+if (! defined $openxpki_version) {
+    # check for forced-revision file that should contain a single integer
+    # number
+    my $filename = 'revision';
+    if (-r $filename) {
+	my $revision = do {
+	    open my $fh, '<', $filename or die "Could not read $filename. Stopped";
+	    local $INPUT_RECORD_SEPARATOR;
+	    <$fh>;
+	};
+	($revision) = ($revision =~ m{ (\d+) }xms);
+	$openxpki_version = $openxpki_major_version . '.' . $revision;
+	print STDERR "This is a development tree\n";
+	print STDERR "Revision from '$filename' file: $revision\n";
+    }
+}
+
+if (! defined $openxpki_version) {
+    # make sure we really require OUR LOCAL version file (not some possibly
+    # already installed but outdated version file)
+    # this is mainly used in archives created from 'make dist' steps
+    eval {
+	local @INC = ( '.' );
+	require OpenXPKI::VERSION;
+	$openxpki_version = $OpenXPKI::VERSION::VERSION;
+	print STDERR "OpenXPKI distribution\n";
+	print STDERR "Version from OpenXPKI::Version: $openxpki_version\n";
+    };
+}
+
+if (! defined $openxpki_version) {
+    die "Could not determine OpenXPKI version. Stopped";
+}
+
+my $module = "\
 # never commit this file to a version control system
 package OpenXPKI::VERSION;
-our \$VERSION = '$version';
+our \$VERSION = '$openxpki_version';
 1;
 __END__
 
@@ -122,19 +162,15 @@ library.
 
 =head1 Version
 
-$version
-EOF
-;
-    open FD, ">OpenXPKI/VERSION.pm" or die "Cannot open version module file OpenXPKI/VERSION.pm!\n";
-    print FD $module;
-    close FD;
-} else {
-    require OpenXPKI::VERSION;
-    $version = $OpenXPKI::VERSION::VERSION;
-}
+$openxpki_version";
+
+open $fh, ">", File::Spec->catfile('OpenXPKI', 'VERSION.pm') 
+    or die "Cannot open version module file OpenXPKI/VERSION.pm!\n";
+print $fh $module;
+close $fh;
+
 
 ## restore all formerly ignored modules
-
 my $list = `find . -name "*.pm.ignore" -print`;
 my @list = split /[\n\s+]/, $list;
 foreach my $module (@list)
@@ -179,7 +215,7 @@ else
 
 ## some information about the used OpenXPKI version
 
-print STDERR "Version:         $version\n";
+print STDERR "This is OpenXPKI version $openxpki_version\n";
 print STDERR "Statistics:\n";
 my $cmd = 'cat OpenXPKI.pm OpenXPKI.xs `find OpenXPKI -type f | grep -r -v "/\."`| wc -l';
 print STDERR "    LOC: ".`$cmd`;
@@ -233,7 +269,7 @@ unlink('test');
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'      => 'OpenXPKI',
-    'VERSION'   => $version,
+    'VERSION'   => $openxpki_version,
     'LIBS'      => ["-L$openssl_lib_dir -lcrypto"],
     'INC'       => "-I. -I$openssl_inc_dir",
     'CCFLAGS'   => '-O2 -g -Wall',

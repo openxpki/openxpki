@@ -82,7 +82,7 @@ sub __get_error {
     my $self = shift;
     my $arg  = shift;
     
-    if (! exist $arg->{ERROR} || (ref $arg->{ERROR} ne '')) {
+    if (! exists $arg->{ERROR} || (ref $arg->{ERROR} ne '')) {
 	OpenXPKI::Exception->throw (
 	    message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_ERROR_INVALID_PARAMETERS",
 	    params => {
@@ -356,6 +356,23 @@ sub run
 		);
 	    CTX('session')->delete();
             exit 0;
+        }
+
+        ##! 4: "check for get_role"
+        if ($service_msg eq 'STATUS') {
+	    # FIXME: translate messages
+	    my $result = {
+		SESSION => {
+		    ROLE => CTX('session')->get_role(),
+		    USER => CTX('session')->get_user(),
+		},
+	    };
+
+	    $self->{TRANSPORT}->write(
+		$self->{SERIALIZATION}->serialize(
+		    $result));
+	    
+	    next MESSAGE;
         }
 	
 	if ($service_msg eq 'COMMAND') {

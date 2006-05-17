@@ -244,7 +244,7 @@ sub do_process_request
 
     ##! 2: "service detector"
     my $data = $serializer->deserialize ($transport->read());
-    if ($data eq "default")
+    if ($data eq "Default")
     {
         OpenXPKI::Server::Context::setcontext
         ({

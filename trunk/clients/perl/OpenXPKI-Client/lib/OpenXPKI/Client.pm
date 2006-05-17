@@ -30,15 +30,17 @@ use OpenXPKI::Serialization::JSON;
 # use Smart::Comments;
 
 my %socketfile             : ATTR( :init_arg<SOCKETFILE> );
+my %transport_protocol     : ATTR( :init_arg<TRANSPORT>     :default('Simple') );
+my %serialization_protocol : ATTR( :init_arg<SERIALIZATION> :default('Simple') );
+my %service_protocol       : ATTR( :init_arg<SERVICE>       :default('Default') );
+my %read_timeout           : ATTR( :init_arg<TIMEOUT>       :default(30) :set<timeout> );
+
 my %sessionid              : ATTR( :get<session_id> );
-my %read_timeout           : ATTR( :default(30) :set<timeout> );
 
 my %socket                 : ATTR;
-my %transport_protocol     : ATTR( :default('Simple') );
-my %serialization_protocol : ATTR( :default('Simple') );
 my %transport              : ATTR;
 my %serialization          : ATTR;
-
+my %communication_state    : ATTR( :get<communication_state> );
 
 
 sub START {
@@ -61,16 +63,36 @@ sub talk {
     my $self  = shift;
     my $arg   = shift;
     my $ident = ident $self;
-    
-    return $transport{$ident}->write(
-	$serialization{$ident}->serialize($arg)
-	);
+
+    if ($communication_state{$ident} eq 'can_send') {
+	my $rc = $transport{$ident}->write(
+	    $serialization{$ident}->serialize($arg)
+	    );
+	$communication_state{$ident} = 'can_receive';
+	return $rc;
+    } else {
+	OpenXPKI::Exception->throw(
+	    message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
+	    params => {
+		status => $communication_state{$ident},
+	    },
+	    );
+    }
 }
 
 # get server response
 sub collect {
     my $self  = shift;
     my $ident = ident $self;
+
+    if ($communication_state{$ident} ne 'can_receive') {
+	OpenXPKI::Exception->throw(
+	    message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
+	    params => {
+		status => $communication_state{$ident},
+	    },
+	    );
+    }
 
     my $result;
     eval {
@@ -90,7 +112,38 @@ sub collect {
 	    die $EVAL_ERROR;
 	}
     }
+    $communication_state{$ident} = 'can_send';
     return $result;
+}
+
+# send service message and read response
+sub send_service_msg {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $cmd   = shift;
+    my $arg   = shift;
+
+    my %arguments = (
+	SERVICE_MSG => $cmd,
+	%{$arg},
+	);
+
+    return $self->talk(\%arguments);
+}
+
+# send service command message and read response
+sub send_command_msg {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $cmd   = shift;
+    my $arg   = shift;
+
+    return $self->service_msg(
+	'COMMAND',
+	{
+	    COMMAND     => $cmd,
+	    PARAMS      => $arg,
+	});
 }
 
 
@@ -114,7 +167,7 @@ sub init_session {
     }
     
     ##! 4: "initialize session"
-    if (exists $args->{SESSION_ID}) {
+    if (defined $args->{SESSION_ID}) {
 	##! 8: "using existing session"
         $self->talk(
 	    {
@@ -132,7 +185,7 @@ sub init_session {
 
     my $msg = $self->collect();
     
-    if (! exists $msg->{SESSION_ID})
+    if (! defined $msg->{SESSION_ID})
     {
         OpenXPKI::Exception->throw(
 	    message => "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED",
@@ -239,6 +292,10 @@ sub __init_serialization_protocol : PRIVATE {
     # FIXME: dynamically attach serializer
     $serialization{$ident} = OpenXPKI::Serialization::Simple->new();
 
+    # initialize communication state; the first message must be a write
+    # operation to the socket
+    $communication_state{$ident} = 'can_send';
+
     ##! 4: "finished"
     return 1;
 }
@@ -247,8 +304,8 @@ sub __init_service_protocol : PRIVATE {
     my $self = shift;
     my $ident = ident $self;
 
-    ##! 4: "request default service protocol"
-    $self->talk('default');
+    ##! 4: "request service protocol"
+    $self->talk($service_protocol{$ident});
     my $msg = $self->collect();
 
     if ($msg ne "OK")
@@ -309,11 +366,36 @@ See perldoc Class::Std.
 
 Expects a hash reference as first argument. Serializes the argument and
 sends it to the OpenXPKI server.
+Throws an exception if the connection is not in communication state
+'can_send'.
 
 =head2 collect
 
 Reads an answer from the OpenXPKI server, deserializes the message and
 returns the corresponding data structure.
+Throws an exception if the connection is not in communication state
+'can_receive'.
+
+=head2 get_communication_state
+
+Get internal communication state. Returns 'can_send' if the next action
+should be a talk() call. Returns 'can_receive' if the next action should
+be a collect() call.
+
+=head2 send_service_msg
+
+Send a service message. 
+The first argument must be a string identifying the service command to send.
+The (optional) second argument is a hash reference containing the
+arguments to be sent along with the service message.
+The caller must assure that this argument is properly specified.
+
+=head2 send_command_msg
+
+Send a service command message.
+The first argument must be a string identifying the command to send.
+The (optional) second argument is a hash reference containing the
+arguments to be sent along with the command message.
 
 =head2 init_session
 

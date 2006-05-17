@@ -17,7 +17,7 @@ sub execute {
     my $ident   = ident $self;
 
     ##! 1: "execute"
-
+    
     return {
 	SERVICE_MSG => 'COMMAND',
 	COMMAND => 'list_workflows',
@@ -26,8 +26,6 @@ sub execute {
 	},
     };
 }
-
-1;
 
 1;
 

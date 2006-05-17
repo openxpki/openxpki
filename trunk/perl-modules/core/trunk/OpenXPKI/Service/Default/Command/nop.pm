@@ -15,9 +15,9 @@ sub execute {
     my $self    = shift;
     my $arg     = shift;
     my $ident   = ident $self;
-
+    
     ##! 1: "execute"
-
+    
     return {
 	SERVICE_MSG => 'COMMAND',
 	COMMAND => 'nop',
@@ -25,8 +25,6 @@ sub execute {
 	},
     };
 }
-
-1;
 
 1;
 

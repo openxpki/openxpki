@@ -126,6 +126,10 @@ distinct command implementations.
 =head2 BUILD
 =head2 START - new()
 
+This class derives from Class::Std. Please read the corresponding 
+documentation concerning BUILD, START construction methods and other
+class-specific internals.
+
 The new() constructor creates a new command object that is capable 
 of executing the referenced interface command.
 Expects the following named parameters:

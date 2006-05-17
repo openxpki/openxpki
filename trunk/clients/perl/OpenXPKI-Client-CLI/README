@@ -1,7 +1,7 @@
 OpenXPKI-Client-CLI version 0.0.1
 
 This module implements a CLI (command line interface) to a locally running
-OpenXPKI daemon process.
+OpenXPKI daemon process via the Default service.
 
 
 INSTALLATION

@@ -180,7 +180,7 @@ sub __init_service_protocol
     ##! 4: "request default service protocol"
     my $self = shift;
     
-    $self->{TRANSPORT}->write ($self->{SERIALIZATION}->serialize("default"));
+    $self->{TRANSPORT}->write ($self->{SERIALIZATION}->serialize("Default"));
     my $msg = $self->{SERIALIZATION}->deserialize ($self->{TRANSPORT}->read());
     if ($msg ne "OK")
     {

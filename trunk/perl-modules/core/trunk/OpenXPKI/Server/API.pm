@@ -12,6 +12,9 @@ package OpenXPKI::Server::API;
 
 ## used modules
 use English;
+
+use Workflow::Factory;
+
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
@@ -40,6 +43,8 @@ sub list_workflow_titles {
 
     return [ 'foo', 'bar', 'baz' ];
 }
+
+
 
 
 1;
