@@ -6,7 +6,7 @@ else
    target=/var/www/htdocs
 fi
 
-## if you activate this then every run via cronjib creates an email
+## if you activate this then every run via cronjob creates an email
 ## echo "Installing to target $target";
 
 old=`pwd`
@@ -20,8 +20,14 @@ fi;
 
 ## update CVS
 
-#svn co svn://svn.berlios.de/openxpki/www.openxpki.org/trunk/htdocs $target 2>/dev/null >/dev/null
-svn co https://svn.sourceforge.net/svnroot/openxpki/www.openxpki.org/trunk/htdocs $target 2>/dev/null >/dev/null
+#svn checkout svn://svn.berlios.de/openxpki/www.openxpki.org/trunk/htdocs $target 2>/dev/null >/dev/null
+if [ $DEBUG ]; then
+    CMD="svn checkout https://svn.sourceforge.net/svnroot/openxpki/www.openxpki.org/trunk/htdocs $target"
+    echo Command: $CMD
+    `$CMD`
+else
+    svn checkout https://svn.sourceforge.net/svnroot/openxpki/www.openxpki.org/trunk/htdocs $target 2>/dev/null >/dev/null
+fi
 cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/openca checkout -P doc 2>/dev/null >/dev/null
 
 ## copy stuff to htdocs area
