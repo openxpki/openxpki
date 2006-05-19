@@ -43,6 +43,10 @@ ln -s src/images
 rm -rf html_chunked
 ln -s html html_chunked
 
+# provide .css for /docs/guide/openca-guide.html 
+# NB: link does not work here!
+cp html/default.css .
+
 # images for chunked html
 cd html
 rm -rf images
