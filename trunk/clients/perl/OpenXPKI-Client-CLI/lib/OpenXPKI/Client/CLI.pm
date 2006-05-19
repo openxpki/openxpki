@@ -104,7 +104,7 @@ sub render {
 	    $result = $self->$method($response);
 	};
 	if ($EVAL_ERROR) {
-	    if ($EVAL_ERROR =~ m{ Can't\ locate\ object\ method }xms) {
+	    if ($EVAL_ERROR =~ m{ Can\'t\ locate\ object\ method }xms) {
 		return $self->show_default($response);
 	    } else {
 		carp("FIXME: unhandled exception $EVAL_ERROR during processing of $msg");
@@ -329,7 +329,7 @@ sub cmd_auth : PRIVATE {
 
     ### cmd_auth options ok...
     return {
-	SERVER_COMMAND => {
+	SERVICE_COMMAND => {
 	    AUTHENTICATION_STACK => $stack,
 	},
     };
@@ -362,7 +362,7 @@ sub cmd_login : PRIVATE {
 
     if (exists $params{user} && exists $params{pass}) {
 	return {
-	    SERVER_COMMAND => {
+	    SERVICE_COMMAND => {
 		SERVICE_MSG => 'GET_PASSWD_LOGIN',
 		LOGIN  => $params{user},
 		PASSWD => $params{pass},
@@ -383,11 +383,60 @@ sub cmd_logout : PRIVATE {
 
     ### cmd_logout options ok...
     return {
-	SERVER_COMMAND => {
+	SERVICE_COMMAND => {
 	    SERVICE_MSG => 'LOGOUT',
 	},
     };
 }
+
+sub cmd_get : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+
+    my %params;
+    if (! $self->getoptions($args, \%params, qw(
+        entries=i
+    ))) {
+	print "Error during command line processing.\n";
+    }
+
+    if (exists $params{entries}) {
+	print "limiting output to $params{entries} entries\n";
+    }
+
+    my @args = @{$ARGV_LOCAL{$ident}};
+
+    if (scalar @args == 0) {
+	my @msg = ( 'Usage: get OBJECT', 'Available objects:' );
+	push @msg, 'ca certificates';
+	return {
+	    MESSAGE => \@msg,
+	},
+    } else {
+	while (my $arg = shift @args) {
+	    if ($arg eq 'ca') {
+		my $obj = shift @args;
+		if ($obj eq 'certificates') {
+		    return $self->subcmd_get_ca_certificates();
+		}
+		return {
+		    MESSAGE => "No such object",
+		};
+	    }
+	    return {
+		MESSAGE => "No such object",
+	    };
+	}
+    }
+
+    return {
+	MESSAGE => 'FIXME',
+    }
+}
+
+
+
 
 
 
@@ -413,8 +462,7 @@ sub cmd_list : PRIVATE {
 	my @msg = ( 'Usage: list OBJECT', 'Available objects:' );
 	push @msg, 'workflow instances';
 	push @msg, 'workflow titles';
-	push @msg, 'requests';
-	push @msg, 'certificates';
+	push @msg, 'ca ids';
 	return {
 	    MESSAGE => \@msg,
 	},
@@ -427,6 +475,15 @@ sub cmd_list : PRIVATE {
 		}
 		if ($obj eq 'titles') {
 		    return $self->subcmd_list_workflow_titles();
+		}
+		return {
+		    MESSAGE => "No such object",
+		};
+	    }
+	    if ($arg eq 'ca') {
+		my $obj = shift @args;
+		if ($obj eq 'ids') {
+		    return $self->subcmd_list_ca_ids();
 		}
 		return {
 		    MESSAGE => "No such object",
@@ -451,14 +508,7 @@ sub subcmd_list_workflow_instances : PRIVATE {
     my $args  = shift;
 
 
-    return {
-	SERVER_COMMAND => {
-	    SERVICE_MSG => 'COMMAND',
-	    COMMAND     => 'list_workflow_instances',
-	    PARAMS      => {
-	    }
-	},
-    };
+    return $self->get_API()->list_workflow_instances();
 }
 
 # subcommands
@@ -468,14 +518,27 @@ sub subcmd_list_workflow_titles : PRIVATE {
     my $args  = shift;
 
 
-    return {
-	SERVER_COMMAND => {
-	    SERVICE_MSG => 'COMMAND',
-	    COMMAND     => 'list_workflow_titles',
-	    PARAMS      => {
-	    }
-	},
-    };
+    return $self->get_API()->list_workflow_titles();
+}
+
+# subcommands
+sub subcmd_get_ca_certificates : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+
+
+    return $self->get_API()->get_ca_certificates();
+}
+
+# subcommands
+sub subcmd_list_ca_ids : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+
+    ### try to get ca ids...
+    return $self->get_API()->list_ca_ids();
 }
 
 

@@ -132,11 +132,10 @@ OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 OpenXPKI/Transport/Simple.pm
 OpenXPKI/Serialization/Simple.pm
 OpenXPKI/Serialization/JSON.pm
+OpenXPKI/Service.pm
 OpenXPKI/Service/Test.pm
 OpenXPKI/Service/Default.pm
 OpenXPKI/Service/Default/Command.pm
-OpenXPKI/Service/Default/Command/list_workflow_instances.pm
-OpenXPKI/Service/Default/Command/list_workflow_titles.pm
 OpenXPKI/Service/Default/Command/nop.pm
 
 # Clients

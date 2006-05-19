@@ -7,6 +7,7 @@
         <socket_file>[%   server.socketfile %]</socket_file>
         <pid_file>[%      server.pidfile %]</pid_file>
         <session_dir>[%   dir.openxpkisessiondir %]</session_dir>
+        <connection_timeout>120</connection_timeout>
         <session_lifetime>[% server.session_lifetime %]</session_lifetime>
         <stderr>[%        server.stderrfile %]</stderr>
 [% FOREACH item = server.transport %]

@@ -862,6 +862,16 @@ in the following sample format:
               },
           },
       },
+      ca => {
+          id => {
+              CA1 => {
+                  crypto => OpenXPKI::Crypto::TokenManager->new(...),
+                  cacert => OpenXPKI::Crypto::X509->new(...),
+                  notbefore => DateTime->new(),
+                  notafter => DateTime->new(),
+              },
+          },
+      },
   };
 
 See OpenXPKI::DateTime for more information about the various time formats

@@ -18,12 +18,7 @@ sub execute {
     
     ##! 1: "execute"
     
-    return {
-	SERVICE_MSG => 'COMMAND',
-	COMMAND => 'nop',
-	PARAMS  => {
-	},
-    };
+    return $self->command_response();
 }
 
 1;

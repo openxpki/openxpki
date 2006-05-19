@@ -21,13 +21,14 @@ $OUTPUT_AUTOFLUSH = 1;
 use OpenXPKI::Debug 'OpenXPKI::Client';
 
 use Socket;
-use OpenXPKI qw( read_file i18nGettext );
+use OpenXPKI::Client::API;
 use OpenXPKI::Exception;
 use OpenXPKI::Transport::Simple;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Serialization::JSON;
+eval { use OpenXPKI::Serialization::JSON; };
 
-# use Smart::Comments;
+use Smart::Comments;
+use Data::Dumper;
 
 my %socketfile             : ATTR( :init_arg<SOCKETFILE> );
 my %transport_protocol     : ATTR( :init_arg<TRANSPORT>     :default('Simple') );
@@ -36,11 +37,12 @@ my %service_protocol       : ATTR( :init_arg<SERVICE>       :default('Default') 
 my %read_timeout           : ATTR( :init_arg<TIMEOUT>       :default(30) :set<timeout> );
 
 my %sessionid              : ATTR( :get<session_id> );
+my %api                    : ATTR( :get<API> );
+my %communication_state    : ATTR( :get<communication_state> :set<communication_state> );
 
 my %socket                 : ATTR;
 my %transport              : ATTR;
 my %serialization          : ATTR;
-my %communication_state    : ATTR( :get<communication_state> );
 
 
 sub START {
@@ -51,6 +53,12 @@ sub START {
     $self->__init_transport_protocol();
     $self->__init_serialization_protocol();
     $self->__init_service_protocol();
+
+    # attach API to this instance
+    $api{$ident} = OpenXPKI::Client::API->new(
+        {
+	    CLIENT => $self,
+	});
 
 }
 
@@ -64,17 +72,17 @@ sub talk {
     my $arg   = shift;
     my $ident = ident $self;
 
-    if ($communication_state{$ident} eq 'can_send') {
+    if ($self->get_communication_state() eq 'can_send') {
 	my $rc = $transport{$ident}->write(
 	    $serialization{$ident}->serialize($arg)
 	    );
-	$communication_state{$ident} = 'can_receive';
+	$self->set_communication_state('can_receive');
 	return $rc;
     } else {
 	OpenXPKI::Exception->throw(
 	    message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
 	    params => {
-		status => $communication_state{$ident},
+		status => $self->get_communication_state(),
 	    },
 	    );
     }
@@ -85,11 +93,11 @@ sub collect {
     my $self  = shift;
     my $ident = ident $self;
 
-    if ($communication_state{$ident} ne 'can_receive') {
+    if ($self->get_communication_state() ne 'can_receive') {
 	OpenXPKI::Exception->throw(
 	    message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
 	    params => {
-		status => $communication_state{$ident},
+		status => $self->get_communication_state(),
 	    },
 	    );
     }
@@ -112,16 +120,22 @@ sub collect {
 	    die $EVAL_ERROR;
 	}
     }
-    $communication_state{$ident} = 'can_send';
+    $self->set_communication_state('can_send');
     return $result;
 }
 
-# send service message and read response
+###########################################################################
+# send-only functions
+
+# send service message
 sub send_service_msg {
     my $self  = shift;
     my $ident = ident $self;
     my $cmd   = shift;
     my $arg   = shift;
+
+    ### send_service_msg...
+    ### $cmd
 
     my %arguments = (
 	SERVICE_MSG => $cmd,
@@ -131,14 +145,17 @@ sub send_service_msg {
     return $self->talk(\%arguments);
 }
 
-# send service command message and read response
+# send service command message
 sub send_command_msg {
     my $self  = shift;
     my $ident = ident $self;
     my $cmd   = shift;
     my $arg   = shift;
 
-    return $self->service_msg(
+    ### send_command_msg...
+    ### $cmd
+
+    return $self->send_service_msg(
 	'COMMAND',
 	{
 	    COMMAND     => $cmd,
@@ -146,6 +163,44 @@ sub send_command_msg {
 	});
 }
 
+###########################################################################
+# all-in-one functions
+
+# send service message and read response
+sub send_receive_service_msg {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $cmd   = shift;
+    my $arg   = shift;
+
+    ### send_receive_service_msg...
+    ### $cmd
+
+    $self->send_service_msg($cmd, $arg);
+    ### service msg sent...
+    return $self->collect();
+}
+
+
+# send service message and read response
+sub send_receive_command_msg {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $cmd   = shift;
+    my $arg   = shift;
+
+    ### send_receive_command_msg...
+    ### $cmd
+
+    $self->send_command_msg($cmd, $arg);
+    ### command sent...
+    my $rc = $self->collect();
+    ### Dumper $rc
+    return $rc;
+}
+
+
+###########################################################################
 
 sub init_session {
     my $self  = shift;
@@ -204,6 +259,8 @@ sub init_session {
     ##! 4: "finished"
     return 1;
 }
+
+
 
 
 
@@ -294,7 +351,7 @@ sub __init_serialization_protocol : PRIVATE {
 
     # initialize communication state; the first message must be a write
     # operation to the socket
-    $communication_state{$ident} = 'can_send';
+    $self->set_communication_state('can_send');
 
     ##! 4: "finished"
     return 1;
@@ -396,6 +453,17 @@ Send a service command message.
 The first argument must be a string identifying the command to send.
 The (optional) second argument is a hash reference containing the
 arguments to be sent along with the command message.
+
+=head2 send_receive_service_msg
+
+Send a service message, reads the response and returns it.
+See send_service_msg.
+
+=head2 send_receive_command_msg
+
+Send a service command message, reads the response and returns it.
+See send_command_msg.
+
 
 =head2 init_session
 

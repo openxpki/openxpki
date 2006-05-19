@@ -60,13 +60,11 @@ if (scalar @ARGV == 0) {
     my $OUT = $term->OUT || \*STDOUT;
     my $state = '';
 
-    my $process_response = 1;
-
   INTERACTION:
     while (1) {
-
-	if ($process_response) {
-	    # handle response from last command and render output
+	### $cli->get_communication_state()
+	if ($cli->get_communication_state() eq 'can_receive') {
+	    ### handle response from last command and render output...
 	    my $response;
 	    eval {
 		$response = $cli->collect();
@@ -90,7 +88,6 @@ if (scalar @ARGV == 0) {
 		$exc->rethrow();
 	    }
 	    $cli->render($response) if defined $response;
-	    $process_response = 0;
 	}
 
 	my $prompt = 'OpenXPKI [' . $state . ']: ';
@@ -131,21 +128,42 @@ if (scalar @ARGV == 0) {
 	    print $OUT "ERROR $cmd_res->{ERROR}: ". join("\n", @message) . "\n";
 	}
 
-	if (exists $cmd_res->{SERVER_COMMAND} &&
-	    (ref $cmd_res->{SERVER_COMMAND} eq 'HASH')) {
+	if (exists $cmd_res->{SERVICE_COMMAND} &&
+	    exists $cmd_res->{COMMAND}) {
+	    print $OUT "Internal error: command implementation requested ambiguous message\n";
+	    exit 1;
+	}
 
-	    # send a message to the server...
+	if (exists $cmd_res->{SERVICE_COMMAND} &&
+	    (ref $cmd_res->{SERVICE_COMMAND} eq 'HASH')) {
+
+	    ### send service message to the server...
 	    eval {
-		$cli->talk($cmd_res->{SERVER_COMMAND});
+		$cli->talk($cmd_res->{SERVICE_COMMAND});
 	    };
 	    if (my $exc = OpenXPKI::Exception->caught()) {
-		print $OUT "Error sending server message.\n";
+		print $OUT "Error sending service message.\n";
 #		redo INTERACTION;
 		exit 1;
 	    }
-	    # ... and make sure we read it during the next iteration
-	    $process_response = 1;
 	}
+
+	if (exists $cmd_res->{COMMAND} &&
+	    (ref $cmd_res->{COMMAND} eq '') &&
+	    (! exists $cmd_res->{PARAMS} || ($cmd_res->{PARAMS} eq 'HASH'))) {
+
+	    ### send command message to the server...
+	    ### $cmd->res->{COMMAND}
+	    eval {
+		$cli->send_command_msg($cmd_res->{COMMAND},
+				       $cmd_res->{PARAMS});
+	    };
+	    if (my $exc = OpenXPKI::Exception->caught()) {
+		print $OUT "Error sending service message.\n";
+		exit 1;
+	    }
+	}
+
 
 	$term->addhistory($line) if ($line ne "");
     }    
