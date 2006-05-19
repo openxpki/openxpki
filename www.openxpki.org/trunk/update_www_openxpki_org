@@ -28,7 +28,8 @@ if [ $DEBUG ]; then
 else
     svn checkout https://svn.sourceforge.net/svnroot/openxpki/www.openxpki.org/trunk/htdocs $target 2>/dev/null >/dev/null
 fi
-cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/openca checkout -P doc 2>/dev/null >/dev/null
+# new syntax at sf:
+cvs -z3 -d:pserver:anonymous@openca.cvs.sourceforge.net:/cvsroot/openca co -P doc >/dev/null 2>&1
 
 ## copy stuff to htdocs area
 
