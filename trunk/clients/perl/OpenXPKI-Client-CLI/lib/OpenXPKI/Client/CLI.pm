@@ -32,6 +32,21 @@ use OpenXPKI::Exception;
 my %ARGV_LOCAL : ATTR;
 
 
+my %command_map = {
+    nop => 'nop',
+    list => {
+	ca => {
+	    ids => 'list_ca_ids',
+	},
+	workflow => {
+	    instances => 'list_workflow_instances',
+	    titles => 'list_workflow_titles',
+	},
+    },
+};
+
+
+
 # process client command
 sub process_command {
     my $self = shift;
@@ -51,6 +66,9 @@ sub process_command {
     }
 
     my $result;
+
+
+
     eval {
 	my $method = 'cmd_' . $command;
 	$result = $self->$method($options);
