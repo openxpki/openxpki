@@ -51,13 +51,15 @@ sub convert {
     my $buffer;
     # We don't want to try to convert our autohandler or .mas
     # components.  $_ contains the filename
-    if (/(\.html|\.css)$/) {
+    # old: if (/(\.html|\.css)$/) {
+    if (/(\.html)$/) {
 
 	# This will save the component's output in $buffer
 	$interp->out_method(\$buffer);
 	$interp->exec("/$comp_path");
 
-    } elsif (/(\.png|\.txt)$/) {
+    # old: } elsif (/(\.png|\.txt)$/) {
+    } elsif (/(\.png|\.txt|\.css)$/) {
 	# don't process, just copy
 	$buffer = do { local $/; 
 		       open my $FH, "<$_" or die "Could not open $_. Stopped";

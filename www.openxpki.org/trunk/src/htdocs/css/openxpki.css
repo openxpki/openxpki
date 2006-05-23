@@ -1,8 +1,5 @@
 /*
- * (c) 2003 OpenCA project
- * (c) 2004 OpenSC project
- * (c) 2004 OpenCA
- * (c) 2005 OpenXPKI
+ * (c) 2005-2006 OpenXPKI
  *
  * the base of this file was the style1.css from the OpenSC project merged
  * together with the original OpenCA style file
@@ -28,16 +25,23 @@ body {
 	padding: 0px;
 }
 
-h1, h3 {
-	font-family: Arial, sans-serif;
-	font-weight: normal;
-	color: #578;
-	border-bottom: dotted 1px;
+h1, h2 {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    color: black;
+    border-bottom: solid 1px;
+}
+
+h3 {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    color: black;
+    border-bottom: dotted 1px;
 }
 
 a {
-	font-weight: bold;
-	color: #578;
+    font-style:  italic;
+    color:       blue;
 }
 
 a:link {
@@ -49,8 +53,7 @@ a:visited {
 }
 
 a:hover {
-	text-decoration: none; 
-	color: black;
+    text-decoration: underline; 
 }
 
 .icenter {
@@ -62,18 +65,14 @@ img {
 	padding: 0px;
 }
 
-/******************************************
- * General organization of an OpenCA page *
- *                                        *
- * page ::= navi + info                   *
- *                                        *
- * navi ::= menu + w3c                    *
- * menu ::= item* + subitem*              *
- *                                        *
- * info ::= header  + main                *
- * main ::= content + footer              *
- *                                        *
- ******************************************/
+/********************************************
+ * General organization of an OpenXPKI page *
+ *                                          *
+ * page ::= header + main + footer          *
+ *                                          *
+ * main ::= navi + content                  *
+ *                                          *
+ ********************************************/
 
 /****************
  *     page     *
@@ -83,33 +82,49 @@ div.page
 {
     background: #ffffff;
     width:    100%;
-    height:   100%;
 }
 
-div.navi
-{
+div.header { 
     position: absolute;
-    height:   100%;
-    width:    14em;
-    top:      0em;
-    right:    0em;
-    z-index:  100;
-}
-
-div.info
-{
-    position: absolute;
-    height:   100%;
-    width:    40em;
     left:     0em;
-    top:      0em;
+    right:    0em;
+    top:      1em;
+    bottom:   auto;
+    width:    100%;
+
+    border:        0px solid black;
+    border-bottom: 1px solid black;
+    padding:       0pt;
+    text-align:    right;
+}
+
+div.main
+{
+    position: absolute;
+    top:      80px;
+    left:     0em;
+    width:    100%;
     bottom:   0em;
-    z-index:  50;
+}
+
+div.footer {
+    position: absolute;
+    bottom:   0em;
+    left:     0em;
+    width:    100%;
 }
 
 /*********************
  *    navi stuff     *
  *********************/
+
+div.navi
+{
+    position: absolute;
+    width:    14em;
+    top:      0em;
+    left:     0em;
+}
 
 div.menu { 
     position: absolute;
@@ -130,9 +145,8 @@ div.menu a {
 
 div.menu a:hover {
     text-decoration: none; 
-    /* color: #ff8000; */
-    /* color: #3060c0; */
     color: white;
+    background: #0088ff;
 }
 
 div.menu h2 {
@@ -145,17 +159,28 @@ div.menu h2 {
     margin: 0pt;
 }
 
+div.menu h2:hover {
+    background: #0088ff;
+}
+
 div.menu_item {
     margin: 0.20em 0.5em 0.20em 0.1em;
     padding: 0.38em 1em;
     text-align: left;
-    /* background: #3060c0; */
     background: #ffaa33;
     border: 1px solid white;
     border-bottom: 1px solid black;
     border-right: 1px solid black;
     color: white;
     list-style: none;
+}
+
+div.menu_item:hover {
+    background: #0088ff;
+}
+
+div.menu_item a {
+    font-weight: normal;
 }
 
 div.menu_sub_item {
@@ -165,8 +190,13 @@ div.menu_sub_item {
     list-style: none;
 }
 
+div.menu_sub_item:hover {
+    background: #0088ff;
+}
+
+
 div.menu_sub_item a {
-    color: black;
+    font-weight: normal;
 }
 
 div.w3c {
@@ -181,49 +211,15 @@ div.w3c {
  *    info stuff      *
  **********************/
 
-div.main
-{
-    position: absolute;
-    top:      100px;
-    left:     0em;
-    width:    40em;
-    bottom:   0em;
-}
-
-div.header { 
-    position: absolute;
-    left:     1em;
-    right:    1em;
-    top:      1em;
-    bottom:   auto;
-
-    border: 0px solid black;
-    border-bottom: 1px solid black;
-    padding: 4pt;
-}
-
 div.content {
     position: absolute;
     top:      0em;
     /* bottom:   1em; */
     bottom:   auto;
-    left:     1em;
-    z-index:  50;
-}
-
-div.footer {
-    position: absolute;
-    bottom:   0em;
-    top:      auto;
-    z-index:  1;
-    color:    white;
+    left:     15em;
 }
 
 .sourcecode {
     font-weight: bold;
 }
 
-<%flags>
-   # don't process this via autohandler
-   inherit => undef
-</%flags>
