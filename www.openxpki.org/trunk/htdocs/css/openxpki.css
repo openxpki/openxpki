@@ -1,8 +1,5 @@
 /*
- * (c) 2003 OpenCA project
- * (c) 2004 OpenSC project
- * (c) 2004 OpenCA
- * (c) 2005 OpenXPKI
+ * (c) 2005-2006 OpenXPKI
  *
  * the base of this file was the style1.css from the OpenSC project merged
  * together with the original OpenCA style file
@@ -28,16 +25,22 @@ body {
 	padding: 0px;
 }
 
-h1, h3 {
-	font-family: Arial, sans-serif;
-	font-weight: normal;
-	color: #578;
-	border-bottom: dotted 1px;
+h1, h2 {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    border-bottom: solid 1px;
+}
+
+h3 {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    border-bottom: dotted 1px;
 }
 
 a {
-	font-weight: bold;
-	color: #578;
+    font-weight: normal;
+    font-style:  italic;
+    color:       blue;
 }
 
 a:link {
@@ -49,8 +52,9 @@ a:visited {
 }
 
 a:hover {
-	text-decoration: none; 
-	color: black;
+    font-weight:     bold;
+    text-decoration: none; 
+    color:           black;
 }
 
 .icenter {
@@ -62,18 +66,18 @@ img {
 	padding: 0px;
 }
 
-/******************************************
- * General organization of an OpenCA page *
- *                                        *
- * page ::= navi + info                   *
- *                                        *
- * navi ::= menu + w3c                    *
- * menu ::= item* + subitem*              *
- *                                        *
- * info ::= header  + main                *
- * main ::= content + footer              *
- *                                        *
- ******************************************/
+/********************************************
+ * General organization of an OpenXPKI page *
+ *                                          *
+ * page ::= navi + info                     *
+ *                                          *
+ * navi ::= menu + w3c                      *
+ * menu ::= item* + subitem*                *
+ *                                          *
+ * info ::= header  + main                  *
+ * main ::= content + footer                *
+ *                                          *
+ ********************************************/
 
 /****************
  *     page     *
@@ -92,7 +96,7 @@ div.navi
     height:   100%;
     width:    14em;
     top:      0em;
-    right:    0em;
+    left:     0em;
     z-index:  100;
 }
 
@@ -100,8 +104,8 @@ div.info
 {
     position: absolute;
     height:   100%;
-    width:    40em;
-    left:     0em;
+    /* width:    40em; */
+    left:     14em;
     top:      0em;
     bottom:   0em;
     z-index:  50;
@@ -123,33 +127,33 @@ div.menu {
 }
 
 div.menu a {
-    /* color: white; */
-    /* color: #3060c0; */
-    color: black;
+    color:      black;
 }
 
 div.menu a:hover {
+    font-weight: normal;
     text-decoration: none; 
-    /* color: #ff8000; */
-    /* color: #3060c0; */
     color: white;
+    background: #0088ff;
 }
 
 div.menu h2 {
     border: 1px solid black;
-    /* background: #3060c0; */
-    /* background: #ff8000; */
+    font-style: normal;
     background: #ffaa33;
     text-align: center;
     padding: 1pt;
     margin: 0pt;
 }
 
+div.menu h2:hover {
+    background: #0088ff;
+}
+
 div.menu_item {
     margin: 0.20em 0.5em 0.20em 0.1em;
     padding: 0.38em 1em;
     text-align: left;
-    /* background: #3060c0; */
     background: #ffaa33;
     border: 1px solid white;
     border-bottom: 1px solid black;
@@ -158,11 +162,19 @@ div.menu_item {
     list-style: none;
 }
 
+div.menu_item:hover {
+    background: #0088ff;
+}
+
 div.menu_sub_item {
     padding: 0.38em 1em;
     text-indent: 0;
     text-align: right;
     list-style: none;
+}
+
+div.menu_sub_item:hover {
+    background: #0088ff;
 }
 
 div.menu_sub_item a {
@@ -186,27 +198,27 @@ div.main
     position: absolute;
     top:      100px;
     left:     0em;
-    width:    40em;
     bottom:   0em;
 }
 
 div.header { 
     position: absolute;
+    width:    40em;
     left:     1em;
-    right:    1em;
+    /* right:    1em; */
     top:      1em;
     bottom:   auto;
 
     border: 0px solid black;
     border-bottom: 1px solid black;
     padding: 4pt;
+    text-align: right;
 }
 
 div.content {
     position: absolute;
     top:      0em;
-    /* bottom:   1em; */
-    bottom:   auto;
+    width:    40em;
     left:     1em;
     z-index:  50;
 }
