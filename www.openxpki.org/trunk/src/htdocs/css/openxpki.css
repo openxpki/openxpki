@@ -9,15 +9,30 @@
  * element styling *
  *******************/
 
+html, body, div.page {
+    min-height: 100%;
+    width: 100%;
+    height: 100%;
+}
+
+/*
+ * The "height" above is a hack for IE5+/Win.  Below we adjust
+ * it using the child selector to hide from IE5+/Win
+ */
+
+html>body, html>body div.page {
+    height: auto;
+}
+
 body {
-    margin: 15px;
+    margin: 0; /* Without this, Moz1.0 adds a vertical scrollbar */
     /* background: #ffd; */
     background-color: white;
     color: black;
     font-family: Arial, Helvetica;
     font-size: 85%;
     font-weight: normal;
-    margin: 0 20em 2em 2em;
+    /* margin: 0 20em 2em 2em; */
 }
 
 .noborder {
@@ -78,10 +93,11 @@ img {
  *     page     *
  ****************/
 
-div.page
-{
-    background: #ffffff;
-    width:    100%;
+div.page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
 }
 
 div.header { 
@@ -104,14 +120,17 @@ div.main
     top:      80px;
     left:     0em;
     width:    100%;
-    bottom:   0em;
+    margin-bottom: 2em;
+    height: auto;
+    padding: .5em;
 }
 
+/* div.footer { */
 div.footer {
     position: absolute;
     bottom:   0em;
-    left:     0em;
     width:    100%;
+    padding: 0 15%;
 }
 
 /*********************
@@ -212,11 +231,14 @@ div.w3c {
  **********************/
 
 div.content {
-    position: absolute;
+    position: relative;
     top:      0em;
     /* bottom:   1em; */
-    bottom:   auto;
-    left:     15em;
+    /* bottom:   auto; */
+    left:     14em;
+    margin-bottom: 2em;
+    height: auto;
+    padding: 1em;
 }
 
 .sourcecode {
