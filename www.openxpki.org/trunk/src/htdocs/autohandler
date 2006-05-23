@@ -7,26 +7,25 @@
   <body>
     <div class="page">
 
-     <div class="navi">
-      <div class="menu">
-        <& /lib/menu.mas, title => $title &>
-      </div>
-     </div>
-
-     <div class="info">
       <div class="header">
         <& /lib/header.mas, title => $title &>
       </div>
 
       <div class="main">
-       <div class="content">
+        <div class="navi">
+          <div class="menu">
+            <& /lib/menu.mas, title => $title &>
+          </div>
+        </div>
+        <div class="content">
 %       $m->call_next;
-       </div>
-       <div class="footer">
-        <& /lib/footer.mas &>
-       </div>
+        </div>
       </div> <!-- main -->
-     </div> <!-- info -->
+
+      <div class="footer">
+        <& /lib/footer.mas &>
+      </div>
+
     </div>  <!-- page -->
   </body>
 </html>
