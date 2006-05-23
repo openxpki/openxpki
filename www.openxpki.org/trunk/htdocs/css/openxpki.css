@@ -1,8 +1,5 @@
 /*
- * (c) 2003 OpenCA project
- * (c) 2004 OpenSC project
- * (c) 2004 OpenCA
- * (c) 2005 OpenXPKI
+ * (c) 2005-2006 OpenXPKI
  *
  * the base of this file was the style1.css from the OpenSC project merged
  * together with the original OpenCA style file
@@ -62,18 +59,18 @@ img {
 	padding: 0px;
 }
 
-/******************************************
- * General organization of an OpenCA page *
- *                                        *
- * page ::= navi + info                   *
- *                                        *
- * navi ::= menu + w3c                    *
- * menu ::= item* + subitem*              *
- *                                        *
- * info ::= header  + main                *
- * main ::= content + footer              *
- *                                        *
- ******************************************/
+/********************************************
+ * General organization of an OpenXPKI page *
+ *                                          *
+ * page ::= navi + info                     *
+ *                                          *
+ * navi ::= menu + w3c                      *
+ * menu ::= item* + subitem*                *
+ *                                          *
+ * info ::= header  + main                  *
+ * main ::= content + footer                *
+ *                                          *
+ ********************************************/
 
 /****************
  *     page     *
@@ -130,9 +127,8 @@ div.menu a {
 
 div.menu a:hover {
     text-decoration: none; 
-    /* color: #ff8000; */
-    /* color: #3060c0; */
     color: white;
+    background: #0088ff;
 }
 
 div.menu h2 {
@@ -145,17 +141,24 @@ div.menu h2 {
     margin: 0pt;
 }
 
+div.menu h2:hover {
+    background: #0088ff;
+}
+
 div.menu_item {
     margin: 0.20em 0.5em 0.20em 0.1em;
     padding: 0.38em 1em;
     text-align: left;
-    /* background: #3060c0; */
     background: #ffaa33;
     border: 1px solid white;
     border-bottom: 1px solid black;
     border-right: 1px solid black;
     color: white;
     list-style: none;
+}
+
+div.menu_item:hover {
+    background: #0088ff;
 }
 
 div.menu_sub_item {
