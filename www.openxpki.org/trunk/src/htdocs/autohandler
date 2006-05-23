@@ -5,6 +5,7 @@
     <& /lib/html-header.mas, title => $title &>
   </head>
   <body>
+    <div class="page">
 
       <div class="header">
         <& /lib/header.mas, title => $title &>
@@ -25,6 +26,7 @@
         <& /lib/footer.mas &>
       </div>
 
+    </div> <!-- page -->
   </body>
 </html>
 
