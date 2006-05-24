@@ -5,23 +5,23 @@
     <& /lib/html-header.mas, title => $title &>
   </head>
   <body>
-    <div class="page">
+    <div id="page">
 
-      <div class="header">
+      <div id="header">
         <& /lib/header.mas, title => $title &>
       </div> <!-- header -->
 
-      <div class="navi">
+      <div id="navi">
         <div class="menu">
           <& /lib/menu.mas, title => $title &>
         </div> <!-- menu -->
       </div> <!-- navi -->
 
-      <div class="content">
+      <div id="content">
 %       $m->call_next;
       </div> <!-- content -->
 
-      <div class="footer">
+      <div id="footer">
         <& /lib/footer.mas &>
       </div> <!-- footer -->
 
