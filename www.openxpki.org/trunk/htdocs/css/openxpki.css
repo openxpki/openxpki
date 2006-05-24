@@ -33,14 +33,12 @@ h1, h2 {
     font-family: Arial, sans-serif;
     font-weight: normal;
     color: black;
-    border-bottom: solid 1px;
 }
 
 h3 {
     font-family: Arial, sans-serif;
     font-weight: normal;
     color: black;
-    border-bottom: dotted 1px;
 }
 
 a {
@@ -114,7 +112,7 @@ img {
 #content {
   /* background-color: yellow; */
   position: relative;
-  padding-top: 1em;
+  padding-top: 0em;
   padding-bottom: 2em;
   padding-left: 15em;
   z-index: 5;
@@ -147,8 +145,8 @@ div.menu {
     top:      1em;
     right:    1em;
 
-    background: #eeeeff;
-    border: 1px solid black;
+    background: #dddddd;
+    border: 0px solid black;
     padding: 3pt;
     text-align: center;
 }
