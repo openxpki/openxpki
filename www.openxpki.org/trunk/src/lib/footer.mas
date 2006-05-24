@@ -1,10 +1,35 @@
-Last modified by <% $author %> on <% $date %> <% $time %> - &copy; 2005  OpenXPKI Foundation
+Last modified by <% $author %> on <% $change_date %> (Rev. <% $change_rev %>). Built on <% $build_date %> from Rev. <% $head_rev %>. &copy; 2005 - 2006  OpenXPKI Foundation
 
 <%init>
-my $vc_author = '$Author: oliwel $';
-my ($author) = ($vc_author =~ m/Author: (\S+)/);
+use POSIX qw( strftime );
 
-my $vc_time = '$Date: 2005/09/06 13:57:50 $';
-$vc_time =~ s{/}{-}xsg;
-my ($date, $time) = ($vc_time =~ m/Date: (\S+) (\S+)/);
+my ($volume, $dir, $file) = File::Spec->splitpath($m->request_comp()->path());
+
+my $svn_info;
+my $author;
+my $change_date;
+my $build_date;
+my $change_rev;
+my $head_rev;
+if (-f $file) {
+   open my $fh, "svn info $file 2>&1 |";
+   while (my $line = <$fh>) {
+       chomp $line;
+       if ($line =~ m{ \A Last\ Changed\ Author: \s* (.*) }xms) {
+           $author = $1;
+       }
+       if ($line =~ m{ \A Text\ Last\ Updated: \s* (.*) \s* \( }xms) {
+           $change_date = $1;
+       }
+       if ($line =~ m{ \A Last\ Changed\ Rev: \s* (.*) \z }xms) {
+           $change_rev = $1;
+       }
+       if ($line =~ m{ \A Revision: \s* (.*) \z }xms) {
+           $head_rev = $1;
+       }
+   }
+   close $fh;
+   # whent this HTML tree was generated
+   $build_date = strftime("%F %T %z", localtime(time));
+}
 </%init>
