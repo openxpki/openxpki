@@ -9,30 +9,19 @@
  * element styling *
  *******************/
 
-html, body, div.page {
-    min-height: 100%;
-    width: 100%;
+html {
+    margin: 0;
     height: 100%;
 }
 
-/*
- * The "height" above is a hack for IE5+/Win.  Below we adjust
- * it using the child selector to hide from IE5+/Win
- */
-
-html>body, html>body div.page {
-    height: auto;
-}
-
 body {
-    margin: 0; /* Without this, Moz1.0 adds a vertical scrollbar */
-    /* background: #ffd; */
+    margin: 0;
+    height: 100%;
     background-color: white;
     color: black;
     font-family: Arial, Helvetica;
     font-size: 85%;
     font-weight: normal;
-    /* margin: 0 20em 2em 2em; */
 }
 
 .noborder {
@@ -93,57 +82,61 @@ img {
  *     page     *
  ****************/
 
-div.page {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+#page {
+  /* background-color: blue; */
+  position:   relative;
+  min-height: 100%;
+  width:      100%
+  z-index:    0;
+  margin-right: 1em;
+  margin-left:  1em;
 }
 
-div.header { 
-    position: absolute;
-    left:     0em;
-    right:    0em;
-    top:      1em;
-    bottom:   auto;
-    width:    100%;
-
+#header {
+    /* background-color: darkgreen; */
+    top:0px;
+    left:0px;
+    width: 100%;
+    z-index: 10;
     border:        0px solid black;
     border-bottom: 1px solid black;
     padding:       0pt;
     text-align:    right;
 }
 
-div.main
-{
-    position: absolute;
-    top:      80px;
-    left:     0em;
-    width:    100%;
-    margin-bottom: 2em;
-    height: auto;
-    padding: .5em;
+#navi {
+  /* background-color: brown; */
+  position: relative;
+  left:0px;
+  width: 14em;
+  float: left;
+  z-index: 6;
 }
 
-/* div.footer { */
-div.footer {
-    position: absolute;
-    bottom:   0em;
-    width:    100%;
-    padding: 0 15%;
+#content {
+  /* background-color: yellow; */
+  position: relative;
+  padding-top: 1em;
+  padding-bottom: 2em;
+  padding-left: 15em;
+  z-index: 5;
+}
+
+#footer {
+  /* background-color: lightgreen; */
+  position:    absolute;
+  bottom:      0px;
+  left:        0px;
+  width:       100%;
+  z-index:     10;
+  padding-top: 1em;
+  font-size:   x-small;
+  text-align:  right;
 }
 
 /*********************
  *    navi stuff     *
  *********************/
-
-div.navi
-{
-    position: absolute;
-    width:    14em;
-    top:      0em;
-    left:     0em;
-}
 
 div.menu { 
     position: absolute;
@@ -229,17 +222,6 @@ div.w3c {
 /**********************
  *    info stuff      *
  **********************/
-
-div.content {
-    position: relative;
-    top:      0em;
-    /* bottom:   1em; */
-    /* bottom:   auto; */
-    left:     14em;
-    margin-bottom: 2em;
-    height: auto;
-    padding: 1em;
-}
 
 .sourcecode {
     font-weight: bold;
