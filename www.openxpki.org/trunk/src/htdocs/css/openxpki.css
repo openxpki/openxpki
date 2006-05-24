@@ -72,9 +72,7 @@ img {
 /********************************************
  * General organization of an OpenXPKI page *
  *                                          *
- * page ::= header + main + footer          *
- *                                          *
- * main ::= navi + content                  *
+ * page ::= header + navi + content + footer*
  *                                          *
  ********************************************/
 
@@ -132,6 +130,12 @@ img {
   padding-top: 1em;
   font-size:   x-small;
   text-align:  right;
+}
+
+/* *html will only be interpreted by IE */
+
+*html #footer {
+  display: none;
 }
 
 /*********************
