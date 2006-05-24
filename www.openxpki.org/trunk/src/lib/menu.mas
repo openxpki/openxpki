@@ -1,4 +1,5 @@
-        <h2><a href="<& /lib/url.mas, path => '/' &>">OpenXPKI Home</a></h2>
+        <div class="menu_item"><a href="<& /lib/url.mas, 
+	  path => '/' &>">Home</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/secadvs/index.html' &>">Security Advisories</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas,
