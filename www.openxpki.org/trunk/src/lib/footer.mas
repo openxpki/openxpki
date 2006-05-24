@@ -1,4 +1,4 @@
-Last modified by <% $author %> on <% $change_date %> (Rev. <% $change_rev %>). Built on <% $build_date %> from Rev. <% $head_rev %>. &copy; 2005 - 2006  OpenXPKI Foundation
+Last modified by <% $author %> on <% $change_date %> (Rev. <% $change_rev %>). &copy; 2005 - 2006  OpenXPKI Foundation
 
 <%init>
 use POSIX qw( strftime );
