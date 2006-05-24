@@ -9,22 +9,21 @@
 
       <div class="header">
         <& /lib/header.mas, title => $title &>
-      </div>
+      </div> <!-- header -->
 
-      <div class="main">
-        <div class="navi">
-          <div class="menu">
-            <& /lib/menu.mas, title => $title &>
-          </div>
-        </div>
-        <div class="content">
+      <div class="navi">
+        <div class="menu">
+          <& /lib/menu.mas, title => $title &>
+        </div> <!-- menu -->
+      </div> <!-- navi -->
+
+      <div class="content">
 %       $m->call_next;
-        </div>
-      </div> <!-- main -->
+      </div> <!-- content -->
 
       <div class="footer">
         <& /lib/footer.mas &>
-      </div>
+      </div> <!-- footer -->
 
     </div> <!-- page -->
   </body>
