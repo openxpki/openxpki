@@ -27,7 +27,7 @@ use OpenXPKI::Transport::Simple;
 use OpenXPKI::Serialization::Simple;
 eval { use OpenXPKI::Serialization::JSON; };
 
-use Smart::Comments;
+# use Smart::Comments;
 use Data::Dumper;
 
 my %socketfile             : ATTR( :init_arg<SOCKETFILE> );
@@ -376,7 +376,221 @@ sub __init_service_protocol : PRIVATE {
     return 1;
 }
 
+###########################################################################
+###########################################################################
+###########################################################################
+###########################################################################
+# FIXME: not yet ported from Michael's code
 
+# sub __init_pki_realm
+# {
+#     ##! 4: "init pki realm"
+#     my $self = shift;
+
+#     ##! 8: "get_pki_realms"
+#     if (not exists $self->{MESSAGE}->{PKI_REALMS})
+#     {
+#         OpenXPKI::Exception->throw
+#         (
+#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_PKI_REALM_LIST_FAILED",
+#             params  => {ERROR => $self->{MESSAGE}->{ERROR}}
+#         );
+#     }
+#     my $loop = 0;
+#     my $loop_max = 100;
+#     while (not exists $self->{PKI_REALM})
+#     {
+#         if ($loop > $loop_max)
+#         {
+#             OpenXPKI::Exception->throw
+#             (
+#                 message => "I18N_OPENXPKI_CLIENT_CLI_INIT_PKI_REALM_INFINITE_LOOP_DETECTED",
+#                 params  => {MAXIMUM => $loop_max}
+#             );
+#         }
+#         eval {$self->__init_get_pki_realm({PKI_REALMS => $self->{MESSAGE}->{PKI_REALMS}});};
+#         $loop++;
+#     }
+
+#     ##! 8: "set_pki_realm"
+#     $self->{TRANSPORT}->write ($self->{SERIALIZATION}->serialize(
+#     {
+#         PKI_REALM => $self->{PKI_REALM}
+#     }));
+
+#     ##! 4: "end"
+#     return 1;
+# }
+
+# sub __init_get_pki_realm
+# {
+#     my $self = shift;
+#     my $keys = shift;
+#     ##! 8: "read the pki realm from the CLI"
+
+#     print STDOUT i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_MESSAGE")."\n";
+#     my @list  = ();
+#     my $i = 1;
+#     foreach my $realm (sort keys %{$keys->{PKI_REALMS}})
+#     {
+#         $list[$i] = $realm;
+#         print STDOUT "    ".$keys->{PKI_REALMS}->{$realm}->{NAME}." [$i]\n";
+#         for (my $i=0; $i < length($keys->{PKI_REALMS}->{$realm}->{DESCRIPTION}) / 56; $i++)
+#         {
+#             print STDOUT "        ".
+#                          substr($keys->{PKI_REALMS}->{$realm}->{DESCRIPTION},$i*56,56).
+#                          "\n";
+#         }
+#         $i++;
+#     }
+#     print STDOUT i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_ENTER_ID");
+#     my $id = readline (*STDIN);
+#        $id =~ s/\n$//s;
+#     if (not exists $list[$id])
+#     {
+#         print STDERR i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_WRONG_ID")."\n";
+#         OpenXPKI::Exception->throw
+#         (
+#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_WRONG_ID",
+#         );
+#     }
+#     $self->{PKI_REALM} = $list[$id];
+
+#     ##! 8: "end"
+#     return $self->{PKI_REALM};
+# }
+
+# sub __init_user
+# {
+#     ##! 4: "init user"
+#     my $self = shift;
+
+#     ##! 8: "get_login_stack"
+#     if (not exists $self->{MESSAGE}->{AUTHENTICATION_STACKS})
+#     {
+#         OpenXPKI::Exception->throw
+#         (
+#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_AUTH_LIST_FAILED",
+#             params  => {ERROR => $self->{MESSAGE}->{ERROR}}
+#         );
+#     }
+#     my $loop = 0;
+#     my $loop_max = 100;
+#     while (not $self->{AUTH_STACK})
+#     {
+#         if ($loop > $loop_max)
+#         {
+#             OpenXPKI::Exception->throw
+#             (
+#                 message => "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_INFINITE_LOOP_DETECTED",
+#                 params  => {MAXIMUM => $loop_max}
+#             );
+#         }
+#         eval {$self->__init_get_auth_stack({AUTH_STACKS => $self->{MESSAGE}->{AUTHENTICATION_STACKS}});};
+#         $loop++;
+#     }
+
+#     ##! 8: "login via stack"
+#     $self->{TRANSPORT}->write ($self->{SERIALIZATION}->serialize(
+#     {
+#         SERVICE_MESSAGE      => "SET_AUTHENTICATION_STACK",
+#         AUTHENTICATION_STACK => $self->{AUTH_STACK}
+#     }));
+
+#     ##! 8: "login with passphrase or anonymous"
+#     $self->{MESSAGE} = $self->{SERIALIZATION}->deserialize ($self->{TRANSPORT}->read());
+#     if (not exists $self->{MESSAGE}->{SERVICE_MSG})
+#     {
+#         ##! 16: "we expect a service message and received something else"
+#         OpenXPKI::Exception->throw
+#         (
+#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNEXPECTED_MESSAGE",
+#         );
+#     }
+#     elsif ($self->{MESSAGE}->{SERVICE_MSG} eq "GET_LOGIN_PASSWD")
+#     {
+#         ##! 16: "passwd_login requested"
+#         $self->__init_passwd_login();
+#     }
+#     elsif ($self->{MESSAGE}->{SERVICE_MSG} ne "SERVICE_READY")
+#     {
+#         ##! 16: "unknown service message - ".$self->{MESSAGE}->{SERVICE_MSG}
+#         OpenXPKI::Exception->throw
+#         (
+#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG",
+#             params  => {SERVICE_MSG => $self->{MESSAGE}->{SERVICE_MSG}}
+#         );
+#     }
+
+#     ##! 4: "end"
+#     return 1;
+# }
+
+# sub __init_get_auth_stack
+# {
+#     my $self = shift;
+#     my $keys = shift;
+#     ##! 8: "read the auth stacks from the CLI"
+
+#     print STDOUT i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_AUTH_STACK_MESSAGE")."\n";
+#     my @list  = ();
+#     my $i = 1;
+#     foreach my $stack (sort keys %{$keys->{AUTH_STACKS}})
+#     {
+#         $list[$i] = $stack;
+#         print "    ".$keys->{AUTH_STACKS}->{$stack}->{NAME}." [$i]\n";
+#         for (my $i=0; $i < length($keys->{AUTH_STACKS}->{$stack}->{DESCRIPTION}) / 56; $i++)
+#         {
+#             print STDOUT "        ".
+#                          substr($keys->{AUTH_STACKS}->{$stack}->{DESCRIPTION},$i*56,56).
+#                          "\n";
+#         }
+#         $i++;
+#     }
+#     print STDOUT i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID");
+#     my $id = readline (*STDIN);
+#        $id =~ s/\n$//s;
+#     if (not exists $list[$id])
+#     {
+#         print STDERR i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_WRONG_ID")."\n";
+#         OpenXPKI::Exception->throw
+#         (
+#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_WRONG_ID",
+#         );
+#     }
+#     $self->{AUTH_STACK} = $list[$id];
+
+#     ##! 8: "end"
+#     return $self->{AUTH_STACK};
+# }
+
+# sub __init_passwd_login
+# {
+#     my $self = shift;
+#     ##! 8: "login with login and passphrase"
+#     print STDOUT "Login: ";
+#     my $login = readline (*STDIN);
+#     print STDOUT "Password: ";
+#     my $passwd = readline (*STDIN);
+    
+#     $self->{TRANSPORT}->write ($self->{SERIALIZATION}->serialize(
+#     {
+#         LOGIN  => $login,
+#         PASSWD => $passwd
+#     }));
+#     $self->{MESSAGE} = $self->{SERIALIZATION}->deserialize ($self->{TRANSPORT}->read());
+#     if (exists $self->{MESSAGE}->{ERROR})
+#     {
+#         OpenXPKI::Exception->throw
+#         (
+#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_PASSWD_LOGIN_FAILED",
+#             params  => {ERROR => $self->{MESSAGE}->{ERROR}}
+#         );
+#     }
+
+#     ##! 4: "end"
+#     return 1;
+# }
 
 
 1;

@@ -37,26 +37,27 @@ for collaboration use with GIT.
 <p>
 The OpenXPKI project supports three possible "development modes" for
 contributors:
+  <dl>
+    <dt><b>Subversion only</b></dt>
+    <dd>Good old way of contributing code to OpenXPKI. You are not
+      doing anything wrong this way. If you are happy, why are you
+      reading this document at all...?
+    </dd>
+    <dt><b>Subversion plus GIT</b></dt>
+    <dd>
+      Ideal for small teams collaborating on experimental features,
+      yielding maximum efficience without "polluting" the official
+      repository. This is appropriate if you are a registered 
+      OpenXPKI developer yourself.
+    </dd>
+    <dt><b>GIT only</b></dt>
+    <dd>Suitable for non-permanent developers or contributors. The easiest
+      way if you plan to collaborate with another developer who has already 
+      created and published an own GIT repository of OpenXPKI. 
+    </dd>
+  </dl>
 </p>
-<dl>
-  <dt><b>Subversion only</b></dt>
-  <dd>Good old way of contributing code to OpenXPKI. You are not
-    doing anything wrong this way. If you are happy, why are you
-    reading this document at all...?
-  </dd>
-  <dt><b>Subversion plus GIT</b></dt>
-  <dd>
-    Ideal for small teams collaborating on experimental features,
-    yielding maximum efficience without "polluting" the official
-    repository. This is appropriate if you are a registered 
-    OpenXPKI developer yourself.
-  </dd>
-  <dt><b>GIT only</b></dt>
-  <dd>Suitable for non-permanent developers or contributors. The easiest
-    way if you plan to collaborate with another developer who has already 
-    created and published an own GIT repository of OpenXPKI. 
-  </dd>
-</dl>
+
 
 <h2>Common prerequisites</h2>
 <p>
@@ -64,62 +65,59 @@ These steps should be performed if you wish to use GIT with OpenXPKI
 regardless of collaboration model.
 </p>
 <p>
-Set up proper author name and email address:
-</p>
+Set up proper author name and email address:<br/>
 <pre><tt>
 $ export GIT_AUTHOR_EMAIL="johndoe@example.com"
 $ export GIT_AUTHOR_NAME="John Doe"
 </tt></pre>
-<p>
 You can also set these values within the GIT repository (in which case
 they only apply to this single repository) by adding the following
-to .git/config
-</p>
+to .git/config<br/>
 <pre><tt>
 [user]
         email = johndoe@example.com
         name = "John Doe"
 </tt></pre>
+</p>
+
 
 <h2>Subversion plus GIT</h2>
 <p>
 We will assume that you have checked out OpenXPKI in your directory
-src/openxpki:
-</p>
+src/openxpki:<br/>
 <pre><tt>
 $ cd src
 $ svn co https://johndoe@svn.sourceforge.net/svnroot/openxpki openxpki
 </tt></pre>
+</p>
 <p>
 Change into the base directory of the OpenXPKI checkout (src/openxpki in
-our example) and create the GIT index:
-</p>
+our example) and create the GIT index:<br/>
 <pre><tt>
 $ cd openxpki
 $ git-init-db
 </tt></pre>
 <p>
 When working on OpenXPKI with both SVN and GIT we don't want to clutter
-GIT with SVN files (and vice-versa). So we add an exclude stance for GIT:
-</p>
+GIT with SVN files (and vice-versa). So we add an exclude stance for GIT:<br/>
 <pre><tt>
 $ echo "*.svn" &gt;&gt;.git/info/exclude
 </tt></pre>
-<p>
-Now let's add and commit the checked-out files to the GIT repository.
 </p>
+<p>
+Now let's add and commit the checked-out files to the GIT repository.<br/>
 <pre><tt>
 $ git add trunk
 $ git add www.openxpki.org
 $ git commit
 </tt></pre>
+</p>
 <p>
 This command checked in the local files to your GIT repositor into the
 "master" branch.
 </p>
 <p>
-Add remote GIT repositories for all people you want to collaborate with:
-</p>
+Add remote GIT repositories for all people you want to collaborate with:<br/>
 <pre><tt>
 $ mkdir .git/remotes
 $ cat &lt;&lt;EOF &gt;.git/remotes/martin
@@ -127,14 +125,13 @@ URL: http://www.cynops.de/oss/OpenXPKI/openxpki.git/
 Pull: master:incoming-martin
 EOF
 </tt></pre>
+</p>
 <p>
 You are now ready to fetch or pull changes from the remote repositories,
-e. g. from the "martin" remote we created above:
-</p>
+e. g. from the "martin" remote we created above:<bt/>
 <pre><tt>
 $ git fetch martin
 </tt></pre>
-<p>
 The changes "martin" published will now show up in your local 
 branch "incoming-martin".
 </p>
@@ -147,43 +144,37 @@ ssh and that others get access via HTTP.
 </p>
 <p>
 On the publicly available system create the remote repository 
-directory and create the GIT infrastructure:
-</p>
+directory and create the GIT infrastructure:<br/>
 <pre><tt>
 remote$ cd...
 remote$ mkdir -p git/openxpki.git
 remote$ cd git
 remote$ GIT_DIR=openxpki.git git-init-db
 </tt></pre>
-<p>
 Configure your system to provide read-only access to ...git/openxpki.git
 for the public via HTTP.
 </p>
 <p>
-Now add your own remote repository to your local git remotes:
-</p>
+Now add your own remote repository to your local git remotes:<br/>
 <pre><tt>
 cat &lt;&lt;EOF &gt;.git/remotes/mypublic
 URL: ssh://johndoe@somehost.example.com/path/to/openxpki.git/
 Push: master:master
 EOF
 </tt></pre>
-<p>
-And finally push your local directory to the public repository:
-</p>
+And finally push your local directory to the public repository:<br/>
 <pre><tt>
 $ git push mypublic
 </tt></pre>
+</p>
 
 <h2>GIT only</h2>
 <p>
 For GIT-only-mode you can skip the Subversion checkout. Instead choose
-a GIT repository to clone from and run:
-</p>
+a GIT repository to clone from and run:<br/>
 <pre><tt>
 $ git clone http://somehost.example.com/....git/openxpki.git
 </tt></pre>
-<p>
 This automatically sets up GIT to pull from this repository to the "origin"
 branch (check the .git/remotes/origin file for this). Setting up
 public repository replicas basically works the same as outlined in the above

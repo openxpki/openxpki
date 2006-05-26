@@ -3,6 +3,8 @@
 # perl 5.6.1 - Solaris Perl understand this too ;)
 use 5.006_001;
 
+# use Smart::Comments;
+
 # find all files
 
 my $result = `find . -type f -print`;
@@ -12,15 +14,14 @@ our @modules = ("OpenXPKI::Server");
 foreach my $filename (@list)
 {
     # extract use statements
-    my $file = "";
-    open FD, $filename or die "Cannot open file $filename.\n";
-    while (<FD>) {$file .= $_;};
-    close FD;
-    my @use = grep /^\s*use /, split /\n/, $file;
-    foreach my $module (@use)
-    {
-        $module =~ s/^\s*use\s*([a-zA-Z0-9:\._]+);$/$1/;
-        push @modules, $module;
+    open my $fh, $filename or die "Cannot open file $filename.\n";
+    ### $filename
+    while (my $line = <$fh>) {
+	chomp $line;
+	if (m{ \A use \s+ (\S+) }xms) {
+	    ### $1
+	    push @modules, $1;
+	}
     }
 }
 
@@ -34,6 +35,7 @@ foreach my $module (sort @modules)
     next if ($module =~ m{ use\ (?:Errno|POSIX) }xms ); # whitelisted modules
     $last = $module;
 
+    ### $module
     if (not eval "use $module;" and $@)
     {
         push @missing, $module;

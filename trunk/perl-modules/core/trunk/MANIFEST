@@ -138,9 +138,6 @@ OpenXPKI/Service/Default.pm
 OpenXPKI/Service/Default/Command.pm
 OpenXPKI/Service/Default/Command/nop.pm
 
-# Clients
-OpenXPKI/Client/CLI.pm
-
 ## test stuff
 
 t/config.xml
@@ -247,19 +244,13 @@ t/65_ui/21_serialization_json.t
 t/70_server/startup.pl
 t/70_server/01.t
 
-t/80_client/01.t
-t/80_client/cli.conf
-t/80_client/cli.pl
-
 t/00_cleanup/25_crypto.t
 t/00_cleanup/28_log.t
 t/00_cleanup/30_dbi.t
 t/00_cleanup/65_ui.t
-t/00_cleanup/80_client.t
 t/99_cleanup/25_crypto.t
 t/99_cleanup/28_log.t
 t/99_cleanup/30_dbi.t
 t/99_cleanup/65_ui.t
-t/99_cleanup/80_client.t
 
 META.yml                                 Module meta-data (added by MakeMaker)
