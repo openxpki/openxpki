@@ -17,7 +17,7 @@ use Class::Std;
 
 ## used modules
 
-use OpenXPKI qw (set_language);
+use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Debug 'OpenXPKI::Service::Default';
 use OpenXPKI::Exception;
 use OpenXPKI::Server;

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use utf8;
 
-package OpenXPKI;
+package OpenXPKI::i18n;
 
 use English;
 

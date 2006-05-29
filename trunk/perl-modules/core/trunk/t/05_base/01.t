@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test;
 
-use OpenXPKI;
+use OpenXPKI::i18n;
 
 BEGIN { plan tests => 2 };
 
@@ -17,11 +17,11 @@ my $language;
 #ok(OpenXPKI::get_language(), "", "Incorrect default language settings");
 
 $language = "C";
-ok(OpenXPKI::set_language($language));
+ok(OpenXPKI::i18n::set_language($language));
 #ok(OpenXPKI::get_language(), $language, "Language settings lost");
 
 $language = "de-de";
-ok(OpenXPKI::set_language($language));
+ok(OpenXPKI::i18n::set_language($language));
 #ok(OpenXPKI::get_language(), $language, "Language settings lost");
 
 1;

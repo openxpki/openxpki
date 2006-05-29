@@ -18,6 +18,7 @@ use Class::Std;
 use OpenXPKI::Debug 'OpenXPKI::Service';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API;
+use OpenXPKI::i18n qw( i18nGettext );
 
 my %transport              : ATTR( :init_arg<TRANSPORT> );
 my %serialization          : ATTR( :init_arg<SERIALIZATION> );
@@ -138,8 +139,7 @@ sub __get_error {
 	$result->{EXCEPTION_AS_STRING} = OpenXPKI::Server::exception_as_string($arg->{EXCEPTION});
     }
     
-    $result->{ERROR_MESSAGE} = OpenXPKI::i18nGettext($result->{ERROR}, 
-						     %{$result->{PARAMS}});
+    $result->{ERROR_MESSAGE} = i18nGettext($result->{ERROR}, %{$result->{PARAMS}});
     
     return $result;
 }

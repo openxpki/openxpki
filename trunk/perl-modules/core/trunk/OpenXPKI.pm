@@ -23,15 +23,13 @@ use DateTime;
 use Scalar::Util qw( blessed );
 use Fcntl qw (:DEFAULT);
 
-use OpenXPKI::i18n qw (i18nGettext set_locale_prefix set_language);
-
 use File::Spec;
 use File::Temp;
 
 use vars qw (@ISA @EXPORT_OK);
 require Exporter;
 @ISA = qw (Exporter);
-@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language read_file write_file convert_date get_safe_tmpfile);
+@EXPORT_OK = qw (read_file write_file convert_date get_safe_tmpfile);
 
 sub read_file
 {
@@ -176,7 +174,7 @@ Exported function are function which can be imported by every other
 object. These function are exported to enforce a common behaviour of
 all OpenXPKI modules for debugging and error handling.
 
-C<use OpenXPKI::API qw (debug i18nGettext);>
+C<use OpenXPKI::API qw (debug);>
 
 =head2 debug
 
@@ -185,32 +183,6 @@ You should call the function in the following way:
 C<$self-E<gt>debug ("help: $help");>
 
 All other stuff is generated fully automatically by the debug function.
-
-
-=head1 Description
-
-This module manages all i18n stuff for the L<OpenCA::Server> daemon.
-The main job is the implementation of the translation function and
-the storage of the activated language.
-
-All functions work in static mode (static member functions). 
-This means that they are to be invoked directly and not via an object
-instance.
-
-=head1 i18n Functions
-
-Please see OpenXPKI::i18n for more detailed description of these
-functions:
-
-=over
-
-=item * set_locale_prefix
-
-=item * i18nGettext
-
-=item * set_language
-
-=back
 
 =head1 Functions
 

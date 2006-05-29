@@ -16,7 +16,7 @@ package OpenXPKI::Server::Init;
 
 use English;
 use OpenXPKI::Debug 'OpenXPKI::Server::Init';
-use OpenXPKI qw(set_language set_locale_prefix);
+use OpenXPKI::i18n qw(set_language set_locale_prefix);
 use OpenXPKI::Exception;
 
 use OpenXPKI::XML::Config;

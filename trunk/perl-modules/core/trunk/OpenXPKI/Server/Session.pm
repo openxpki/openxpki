@@ -12,6 +12,7 @@ package OpenXPKI::Server::Session;
 
 use English;
 use OpenXPKI::Exception;
+use OpenXPKI::i18n;
 
 ## switch of IP checks
 use CGI::Session qw/-ip-match/;
@@ -66,6 +67,12 @@ sub new {
                 message => "I18N_OPENXPKI_SERVER_SESSION_NEW_LOAD_SESSION_FAILED",
                 params  => {ID        => $self->{ID},
                             DIRECTORY => $self->{DIRECTORY}});
+        }
+        ##! 4: "set language if it is configured in the session"
+        if ($self->get_language())
+        {
+            ##! 8: "setting language to ".$self->get_language()
+            OpenXPKI::i18n::set_language ($self->get_language());
         }
     }
     else
