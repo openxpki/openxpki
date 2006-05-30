@@ -19,12 +19,11 @@ use English;
 
 use Class::Std;
 
-# FIXME: remove debugging modules
-use Smart::Comments;
-use Data::Dumper;
+# use Smart::Comments;
+# use Data::Dumper;
 
 use OpenXPKI qw( i18nGettext );
-use OpenXPKI::Debug 'OpenXPKI::Client::CLI';
+use OpenXPKI::Debug 'OpenXPKI::Client::SOAP::Lite';
 use OpenXPKI::Exception;
 
 
