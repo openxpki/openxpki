@@ -57,7 +57,7 @@ period is 2 years.
 4. Election
 
 The voting will happen on the OpenXPKI voting mailing list.
-Today this is OpenXPKI-vote@lists.berlios.de
+Today this is OpenXPKI-vote@lists.sf.net
 
 4.1. Users
 
