@@ -12,10 +12,9 @@ use Getopt::Long qw( :config permute pass_through );
 use Pod::Usage;
 use Term::ReadLine;
 
-use Smart::Comments;
+# use Smart::Comments;
 
 use OpenXPKI::Debug;
-use OpenXPKI::Client::CLI;
 
 my $configfile;
 
@@ -28,15 +27,29 @@ GetOptions(\%params,
 	      man
 	      socketfile=s
               session=s
-              debug=i
+              debug=s@
 	      ));
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
 
 if (defined $params{debug}) {
-    $OpenXPKI::Debug::LEVEL{'.*'} = $params{debug};
+    @{$params{debug}} = split(m{,}, join(',', @{$params{debug}}));
+    
+    foreach my $param (@{$params{debug}}) {
+	my ($module, $level) = ($param =~ m{ \A (.*?):?(\d*) \z }xms);
+	if ($level eq '') {
+	    $level = 1;
+	}
+	if ($module eq '') {
+	    $module = '.*';
+	}
+	print STDERR "Debug level for module '$module': $level\n";
+ 	$OpenXPKI::Debug::LEVEL{$module} = $level;
+    }
 }
+
+require OpenXPKI::Client::CLI;
 
 my $cli = OpenXPKI::Client::CLI->new(
     {
@@ -63,30 +76,17 @@ if (scalar @ARGV == 0) {
   INTERACTION:
     while (1) {
 	### $cli->get_communication_state()
-	if ($cli->get_communication_state() eq 'can_receive') {
+	# this should not happen: after initialization the client
+	# should be able to send commands, and if we are re-iterating
+	# the process_command() method should have handled the server
+	# response
+	if ($cli->get_communication_state() ne 'can_send') {
 	    ### handle response from last command and render output...
+	    print $OUT "ERROR: Incorrect communication state\n";
 	    my $response;
 	    eval {
 		$response = $cli->collect();
 	    };
-	    if (my $exc = OpenXPKI::Exception->caught()) {
-		if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION') {
-		    print $OUT "Server terminated connection.\n";
-		    last INTERACTION;
-		    ### $session_id
-		    # re-initialize session
-# 		    $cli = OpenXPKI::Client::CLI->new(
-# 			{
-# 			    SOCKETFILE => $params{socketfile},
-# 			});
-# 		    $cli->init_session(
-# 			{
-# 			    SESSION_ID => $session_id,
-# 			});
-# 		    redo INTERACTION;
-		}
-		$exc->rethrow();
-	    }
 	    $cli->render($response) if defined $response;
 	}
 
@@ -102,13 +102,20 @@ if (scalar @ARGV == 0) {
 					     }
 		);
 	};
-	if ($EVAL_ERROR) {
+	if (my $exc = OpenXPKI::Exception->caught()) {
+	    if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION') {
+		print $OUT "Server terminated connection.\n";
+		last INTERACTION;
+	    }
+	} elsif ($EVAL_ERROR) {
 	    print "error: $EVAL_ERROR\n";
 	    next INTERACTION;
 	}
 
 	# command exit requested?
 	last INTERACTION if (! defined $cmd_res);
+
+	$cli->render($cmd_res) if defined $cmd_res;
 
 	my @message;
 	if (exists $cmd_res->{MESSAGE}) {
@@ -120,8 +127,8 @@ if (scalar @ARGV == 0) {
 	    }
 	}
 
-	if (! defined $cmd_res->{ERROR} ||
-	    ($cmd_res->{ERROR} == 0)) {
+	if (! defined $cmd_res->{ERROR}) {# ||
+	    #($cmd_res->{ERROR} == 0)) {
 	    print $OUT join("\n", @message);
 	    print "\n";
 	} else {

@@ -32,18 +32,140 @@ use OpenXPKI::Exception;
 my %ARGV_LOCAL : ATTR;
 
 
-my %command_map = {
-    nop => 'nop',
-    list => {
-	ca => {
-	    ids => 'list_ca_ids',
+my $command_map = {
+    CLI => {
+	auth => {
+	    ACTION => {
+		# Choosing the Authentication stack requires a raw service
+		# message
+		RAW_MSG => sub {
+		    return {
+			AUTHENTICATION_STACK => split(/\s+/, shift),
+		    };
+		},
+	    },
 	},
-	workflow => {
-	    instances => 'list_workflow_instances',
-	    titles => 'list_workflow_titles',
+
+	logout => {
+	    ACTION => {
+		SERVICE_MSG => 'LOGOUT',
+	    },
+	},
+
+	nop => {
+	    ACTION => {
+		APICALL => 'nop',
+	    },
+	},
+
+	list => {
+	    CLI => {
+		ca => {
+		    CLI => {
+			ids => {
+			    ACTION => {
+				APICALL => 'list_ca_ids',
+			    },
+			},
+		    },
+		},
+		workflow => {
+		    CLI => {
+			instances => {
+			    ACTION => {
+				APICALL => 'list_workflow_instances',
+			    },
+			},
+			titles => {
+			    ACTION => {
+				APICALL => 'list_workflow_titles',
+			    },
+			},
+		    },
+		}
+	    },
 	},
     },
 };
+		    
+
+sub getcommand {
+    my $self = shift;
+    my $ident = ident $self;
+    my $map_ref = shift;
+    my $cmd = shift;
+    my $options = shift;
+
+    ##! 1: "getcommand ($cmd, $options)"
+    
+    if (exists $map_ref->{CLI}->{$cmd}) {
+	##! 2: "command exists"
+
+	if (exists $map_ref->{CLI}->{$cmd}->{ACTION}) {
+	    my $action = $map_ref->{CLI}->{$cmd}->{ACTION};
+	    ##! 4: "action exists"
+	    if (exists $action->{APICALL}) {
+		my $method = $action->{APICALL};
+		return $self->get_API()->$method(
+		    {
+			# FIXME: get options
+		    });
+	    }
+
+	    if (exists $action->{RAW_MSG}) {
+		##! 8: "RAW message"
+		my $value = $action->{RAW_MSG};
+		if (ref $value eq 'CODE') {
+		    $value = &$value($options);
+		    ##! 12: $value
+		}
+		$self->talk($value);
+		return $self->collect();
+	    }
+
+	    if (exists $action->{SERVICE_MSG}) {
+		##! 8: "Service Message"
+		my $value = $action->{SERVICE_MSG};
+		if (ref $value eq 'CODE') {
+		    $value = &$value($options);
+		    ##! 12: $value
+		}
+		return $self->send_receive_service_msg($value,
+						       {
+							   # FIXME: get options
+						       });
+	    }
+	    if (exists $action->{COMMAND}) {
+		return $self->send_receive_command_msg($action->{COMMAND},
+						       {
+							   # FIXME: get options
+						       });
+	    }
+	    return;
+	}
+
+	my ($subcmd, $options) = ($options =~ m{ \A \s* (\S+)\s*(.*) }xms);
+
+	if (! defined $subcmd ||
+	    ! exists $map_ref->{CLI}->{$cmd}->{CLI}->{$subcmd}) {
+	    if (defined $subcmd) {
+		print "Command '$subcmd' is not allowed.\n";
+	    }
+	    print "Available commands:\n";
+	    print join("\n", sort keys %{$map_ref->{CLI}->{$cmd}->{CLI}});
+	    print "\n";
+	    return;
+	}
+	
+	if (exists $map_ref->{CLI}->{$cmd}->{CLI}->{$subcmd}) {
+	    return $self->getcommand($map_ref->{CLI}->{$cmd},
+				     $subcmd,
+				     $options);
+	}
+    }
+
+    return;
+}
 
 
 
@@ -52,6 +174,8 @@ sub process_command {
     my $self = shift;
     my $ident = ident $self;
     my $line = shift;
+    
+    ##! 1: "process_command ($line)"
 
     my ($command, $options) = ($line =~ m{ \A \s* (\S+)\s*(.*) }xms);
 
@@ -65,26 +189,30 @@ sub process_command {
 	};
     }
 
-    my $result;
+    ##! 2: "mapping command"
+    my $result = $self->getcommand($command_map, $command, $options);
+    ##! 2: $result
 
-
-
-    eval {
-	my $method = 'cmd_' . $command;
-	$result = $self->$method($options);
-    };
-    if ($EVAL_ERROR =~ m{ Can\'t\ locate\ object\ method }xms) {
-	return {
-	    ERROR => 1,
-	    MESSAGE => "Unknown command '$command'",
+    if (! defined $result) {
+	##! 4: "not mapped, searching method implementation"
+	eval {
+	    my $method = 'cmd_' . $command;
+	    $result = $self->$method($options);
 	};
+	if ($EVAL_ERROR =~ m{ Can\'t\ locate\ object\ method }xms) {
+	    return {
+		ERROR => 1,
+		MESSAGE => "Unknown command '$command'",
+	    };
+	}
+	if ($EVAL_ERROR) {
+	    return {
+		ERROR => 1,
+		MESSAGE => "Exception during command execution: '$EVAL_ERROR'",
+	    };
+	}
     }
-    if ($EVAL_ERROR) {
-	return {
-	    ERROR => 1,
-	    MESSAGE => "Exception during command execution: '$EVAL_ERROR'",
-	};
-    }
+
     if (ref $result ne 'HASH') {
 	return {
 	    ERROR => 1,
@@ -129,7 +257,7 @@ sub render {
 	    }
 	}
 	
-	### $msg
+	##! 2: $msg
 	return $result;
     }
     return 1;
@@ -190,7 +318,7 @@ sub show_error : PRIVATE {
     my $ident = ident $self;
     my $response = shift;
 
-    ### $response
+    ##! 1: "show_error ($response)"
     if (exists $response->{ERROR}) {
 	print "SERVER ERROR: " . $response->{ERROR} . "\n";
     }
@@ -321,37 +449,6 @@ sub cmd_show : PRIVATE {
     }
 }
 
-sub cmd_auth : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
-    
-    my @usage = ('Usage: auth METHOD');
-
-    my %params;
-    if (! $self->getoptions($args, \%params, qw(
-    ))) {
-	return {
-	    ERROR   => 1,
-	    MESSAGE => "Error during command line processing",
-	};
-    }
-
-    my $stack = $ARGV_LOCAL{$ident}->[0];
-
-    if (! defined $stack) {
-	return {
-	    MESSAGE => \@usage,
-	};
-    }
-
-    ### cmd_auth options ok...
-    return {
-	SERVICE_COMMAND => {
-	    AUTHENTICATION_STACK => $stack,
-	},
-    };
-}
 
 sub cmd_login : PRIVATE {
     my $self  = shift;
@@ -376,7 +473,7 @@ sub cmd_login : PRIVATE {
 	};
     }
 
-    ### cmd_login options ok...
+    ##! 2: "cmd_login options ok"
 
     if (exists $params{user} && exists $params{pass}) {
 	return {
@@ -394,18 +491,6 @@ sub cmd_login : PRIVATE {
 }
 
 
-
-sub cmd_logout : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-
-    ### cmd_logout options ok...
-    return {
-	SERVICE_COMMAND => {
-	    SERVICE_MSG => 'LOGOUT',
-	},
-    };
-}
 
 sub cmd_get : PRIVATE {
     my $self  = shift;
@@ -458,106 +543,106 @@ sub cmd_get : PRIVATE {
 
 
 
-sub cmd_list : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
+# sub cmd_list : PRIVATE {
+#     my $self  = shift;
+#     my $ident = ident $self;
+#     my $args  = shift;
 
-    my %params;
-    if (! $self->getoptions($args, \%params, qw(
-        entries=i
-    ))) {
-	print "Error during command line processing.\n";
-    }
+#     my %params;
+#     if (! $self->getoptions($args, \%params, qw(
+#         entries=i
+#     ))) {
+# 	print "Error during command line processing.\n";
+#     }
 
-    if (exists $params{entries}) {
-	print "limiting output to $params{entries} entries\n";
-    }
+#     if (exists $params{entries}) {
+# 	print "limiting output to $params{entries} entries\n";
+#     }
 
-    my @args = @{$ARGV_LOCAL{$ident}};
+#     my @args = @{$ARGV_LOCAL{$ident}};
 
-    if (scalar @args == 0) {
-	my @msg = ( 'Usage: list OBJECT', 'Available objects:' );
-	push @msg, 'workflow instances';
-	push @msg, 'workflow titles';
-	push @msg, 'ca ids';
-	return {
-	    MESSAGE => \@msg,
-	},
-    } else {
-	while (my $arg = shift @args) {
-	    if ($arg eq 'workflow') {
-		my $obj = shift @args;
-		if ($obj eq 'instances') {
-		    return $self->subcmd_list_workflow_instances();
-		}
-		if ($obj eq 'titles') {
-		    return $self->subcmd_list_workflow_titles();
-		}
-		return {
-		    MESSAGE => "No such object",
-		};
-	    }
-	    if ($arg eq 'ca') {
-		my $obj = shift @args;
-		if ($obj eq 'ids') {
-		    return $self->subcmd_list_ca_ids();
-		}
-		return {
-		    MESSAGE => "No such object",
-		};
-	    }
-	    return {
-		MESSAGE => "No such object",
-	    };
-	}
-    }
+#     if (scalar @args == 0) {
+# 	my @msg = ( 'Usage: list OBJECT', 'Available objects:' );
+# 	push @msg, 'workflow instances';
+# 	push @msg, 'workflow titles';
+# 	push @msg, 'ca ids';
+# 	return {
+# 	    MESSAGE => \@msg,
+# 	},
+#     } else {
+# 	while (my $arg = shift @args) {
+# 	    if ($arg eq 'workflow') {
+# 		my $obj = shift @args;
+# 		if ($obj eq 'instances') {
+# 		    return $self->subcmd_list_workflow_instances();
+# 		}
+# 		if ($obj eq 'titles') {
+# 		    return $self->subcmd_list_workflow_titles();
+# 		}
+# 		return {
+# 		    MESSAGE => "No such object",
+# 		};
+# 	    }
+# 	    if ($arg eq 'ca') {
+# 		my $obj = shift @args;
+# 		if ($obj eq 'ids') {
+# 		    return $self->subcmd_list_ca_ids();
+# 		}
+# 		return {
+# 		    MESSAGE => "No such object",
+# 		};
+# 	    }
+# 	    return {
+# 		MESSAGE => "No such object",
+# 	    };
+# 	}
+#     }
 
-    return {
-	MESSAGE => 'FIXME',
-    }
-}
-
-
-# subcommands
-sub subcmd_list_workflow_instances : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
+#     return {
+# 	MESSAGE => 'FIXME',
+#     }
+# }
 
 
-    return $self->get_API()->list_workflow_instances();
-}
-
-# subcommands
-sub subcmd_list_workflow_titles : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
+# # subcommands
+# sub subcmd_list_workflow_instances : PRIVATE {
+#     my $self  = shift;
+#     my $ident = ident $self;
+#     my $args  = shift;
 
 
-    return $self->get_API()->list_workflow_titles();
-}
+#     return $self->get_API()->list_workflow_instances();
+# }
 
-# subcommands
-sub subcmd_get_ca_certificates : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
+# # subcommands
+# sub subcmd_list_workflow_titles : PRIVATE {
+#     my $self  = shift;
+#     my $ident = ident $self;
+#     my $args  = shift;
 
 
-    return $self->get_API()->get_ca_certificates();
-}
+#     return $self->get_API()->list_workflow_titles();
+# }
 
-# subcommands
-sub subcmd_list_ca_ids : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
+# # subcommands
+# sub subcmd_get_ca_certificates : PRIVATE {
+#     my $self  = shift;
+#     my $ident = ident $self;
+#     my $args  = shift;
 
-    ### try to get ca ids...
-    return $self->get_API()->list_ca_ids();
-}
+
+#     return $self->get_API()->get_ca_certificates();
+# }
+
+# # subcommands
+# sub subcmd_list_ca_ids : PRIVATE {
+#     my $self  = shift;
+#     my $ident = ident $self;
+#     my $args  = shift;
+
+#     ### try to get ca ids...
+#     return $self->get_API()->list_ca_ids();
+# }
 
 
 

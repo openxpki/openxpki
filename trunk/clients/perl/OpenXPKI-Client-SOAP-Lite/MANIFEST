@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/OpenXPKI/Client/SOAP/Lite.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t

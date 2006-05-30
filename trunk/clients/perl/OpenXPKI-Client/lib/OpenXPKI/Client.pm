@@ -72,6 +72,7 @@ sub talk {
     my $arg   = shift;
     my $ident = ident $self;
 
+    ##! 1: "talk"
     if ($self->get_communication_state() eq 'can_send') {
 	my $rc = $transport{$ident}->write(
 	    $serialization{$ident}->serialize($arg)
@@ -93,6 +94,7 @@ sub collect {
     my $self  = shift;
     my $ident = ident $self;
 
+    ##! 1: "collect"
     if ($self->get_communication_state() ne 'can_receive') {
 	OpenXPKI::Exception->throw(
 	    message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
@@ -134,8 +136,8 @@ sub send_service_msg {
     my $cmd   = shift;
     my $arg   = shift;
 
-    ### send_service_msg...
-    ### $cmd
+    ##! 1: "send_service_msg"
+    ##! 2: $cmd
 
     my %arguments = (
 	SERVICE_MSG => $cmd,
@@ -152,8 +154,8 @@ sub send_command_msg {
     my $cmd   = shift;
     my $arg   = shift;
 
-    ### send_command_msg...
-    ### $cmd
+    ##! 1: "send_command_msg"
+    ##! 2: $cmd
 
     return $self->send_service_msg(
 	'COMMAND',
@@ -173,11 +175,10 @@ sub send_receive_service_msg {
     my $cmd   = shift;
     my $arg   = shift;
 
-    ### send_receive_service_msg...
-    ### $cmd
+    ##! 1: "send_receive_service_msg"
+    ##! 2: $cmd
 
     $self->send_service_msg($cmd, $arg);
-    ### service msg sent...
     return $self->collect();
 }
 
@@ -189,13 +190,12 @@ sub send_receive_command_msg {
     my $cmd   = shift;
     my $arg   = shift;
 
-    ### send_receive_command_msg...
-    ### $cmd
+    ##! 1: "send_receive_command_msg"
+    ##! 2: $cmd
 
     $self->send_command_msg($cmd, $arg);
-    ### command sent...
     my $rc = $self->collect();
-    ### Dumper $rc
+    ##! 4: Dumper $rc
     return $rc;
 }
 
@@ -255,9 +255,8 @@ sub init_session {
 	{
 	    SERVICE_MSG => 'SESSION_ID_ACCEPTED',
 	});
-
-    ##! 4: "finished"
-    return 1;
+    
+    return $self->collect();
 }
 
 
