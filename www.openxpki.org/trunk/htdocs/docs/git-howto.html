@@ -83,19 +83,19 @@ The OpenXPKI project supports three possible "development modes" for
 contributors:
 </p>
 <dl>
-  <dt><b>Subversion only</b></dt>
+  <dt>Subversion only</dt>
   <dd>Good old way of contributing code to OpenXPKI. You are not
     doing anything wrong this way. If you are happy, why are you
     reading this document at all...?
   </dd>
-  <dt><b>Subversion plus GIT</b></dt>
+  <dt>Subversion plus GIT</dt>
   <dd>
     Ideal for small teams collaborating on experimental features,
     yielding maximum efficience without "polluting" the official
     repository. This is appropriate if you are a registered 
     OpenXPKI developer yourself.
   </dd>
-  <dt><b>GIT only</b></dt>
+  <dt>GIT only</dt>
   <dd>Suitable for non-permanent developers or contributors. The easiest
     way if you plan to collaborate with another developer who has already 
     created and published an own GIT repository of OpenXPKI. 
@@ -110,53 +110,53 @@ regardless of collaboration model.
 <p>
 Set up proper author name and email address:
 </p>
-<pre><tt>
+<pre>
 $ export GIT_AUTHOR_EMAIL="johndoe@example.com"
 $ export GIT_AUTHOR_NAME="John Doe"
-</tt></pre>
+</pre>
 <p>
 You can also set these values within the GIT repository (in which case
 they only apply to this single repository) by adding the following
 to .git/config
 </p>
-<pre><tt>
+<pre>
 [user]
         email = johndoe@example.com
         name = "John Doe"
-</tt></pre>
+</pre>
 
 <h2>Subversion plus GIT</h2>
 <p>
 We will assume that you have checked out OpenXPKI in your directory
 src/openxpki:
 </p>
-<pre><tt>
+<pre>
 $ cd src
 $ svn co https://johndoe@svn.sourceforge.net/svnroot/openxpki openxpki
-</tt></pre>
+</pre>
 <p>
 Change into the base directory of the OpenXPKI checkout (src/openxpki in
 our example) and create the GIT index:
 </p>
-<pre><tt>
+<pre>
 $ cd openxpki
 $ git-init-db
-</tt></pre>
+</pre>
 <p>
 When working on OpenXPKI with both SVN and GIT we don't want to clutter
 GIT with SVN files (and vice-versa). So we add an exclude stance for GIT:
 </p>
-<pre><tt>
+<pre>
 $ echo "*.svn" &gt;&gt;.git/info/exclude
-</tt></pre>
+</pre>
 <p>
 Now let's add and commit the checked-out files to the GIT repository.
 </p>
-<pre><tt>
+<pre>
 $ git add trunk
 $ git add www.openxpki.org
 $ git commit
-</tt></pre>
+</pre>
 <p>
 This command checked in the local files to your GIT repositor into the
 "master" branch.
@@ -164,20 +164,20 @@ This command checked in the local files to your GIT repositor into the
 <p>
 Add remote GIT repositories for all people you want to collaborate with:
 </p>
-<pre><tt>
+<pre>
 $ mkdir .git/remotes
 $ cat &lt;&lt;EOF &gt;.git/remotes/martin
 URL: http://www.cynops.de/oss/OpenXPKI/openxpki.git/
 Pull: master:incoming-martin
 EOF
-</tt></pre>
+</pre>
 <p>
 You are now ready to fetch or pull changes from the remote repositories,
 e. g. from the "martin" remote we created above:
 </p>
-<pre><tt>
+<pre>
 $ git fetch martin
-</tt></pre>
+</pre>
 <p>
 The changes "martin" published will now show up in your local 
 branch "incoming-martin".
@@ -193,12 +193,12 @@ ssh and that others get access via HTTP.
 On the publicly available system create the remote repository 
 directory and create the GIT infrastructure:
 </p>
-<pre><tt>
+<pre>
 remote$ cd...
 remote$ mkdir -p git/openxpki.git
 remote$ cd git
 remote$ GIT_DIR=openxpki.git git-init-db
-</tt></pre>
+</pre>
 <p>
 Configure your system to provide read-only access to ...git/openxpki.git
 for the public via HTTP.
@@ -206,27 +206,27 @@ for the public via HTTP.
 <p>
 Now add your own remote repository to your local git remotes:
 </p>
-<pre><tt>
+<pre>
 cat &lt;&lt;EOF &gt;.git/remotes/mypublic
 URL: ssh://johndoe@somehost.example.com/path/to/openxpki.git/
 Push: master:master
 EOF
-</tt></pre>
+</pre>
 <p>
 And finally push your local directory to the public repository:
 </p>
-<pre><tt>
+<pre>
 $ git push mypublic
-</tt></pre>
+</pre>
 
 <h2>GIT only</h2>
 <p>
 For GIT-only-mode you can skip the Subversion checkout. Instead choose
 a GIT repository to clone from and run:
 </p>
-<pre><tt>
+<pre>
 $ git clone http://somehost.example.com/....git/openxpki.git
-</tt></pre>
+</pre>
 <p>
 This automatically sets up GIT to pull from this repository to the "origin"
 branch (check the .git/remotes/origin file for this). Setting up

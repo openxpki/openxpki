@@ -67,6 +67,17 @@ img {
 	padding: 0px;
 }
 
+dt {
+    font-weight: bold;
+}
+
+pre {
+    /*font-family: monospace,teletype,Courier-New,Courier;*/
+    font-family: Courier;
+    background-color: #dddddd;
+    padding: 1em;
+}
+
 /********************************************
  * General organization of an OpenXPKI page *
  *                                          *

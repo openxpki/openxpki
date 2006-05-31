@@ -1,0 +1,194 @@
+<%attr>
+  title => 'GIT Collaboration Example'
+</%attr>
+
+<h1>OpenXPKI GIT Collaboration Example</h1>
+
+<p>
+  This example explains how a collaboration with GIT during the
+  development of an HTML frontend for OpenXPKI can work.
+</p>
+
+<h2>Naming conventions</h2>
+
+<dl>
+  <dt>1. Branch: master</dt>
+  <dd>
+    The subversion tree will always be the master branch of the
+    GIT repository to avoid any confusions.
+  </dd>
+  <dt>2. Branch: html-local</dt>
+  <dd>
+    The local development snapshot is called html-local. This
+    branch is your working copy which you use to develop the
+    HTML interface.
+  </dd>
+  <dt>3. Branch: html-public</dt>
+  <dd>
+    This is the branch which will include the changes which you
+    want to publish. A good example is the HTML login component.
+    If you finished your work at a special login component then
+    you must merge these changes from the branch html-local to
+    the branch html-public.
+  </dd>
+  <dt>4. Branch: html-bellmich / html-martin</dt>
+  <dd>
+    If you want to download the latest changes from the user
+    bellmich then you must connect to its public GIT repository
+    and download its branch html-public into the local branch
+    html-bellmich.
+  </dd>
+</dl>
+
+<h2>General Tips</h2>
+
+<p>
+  Sometime this section is called warning. So please read it carefully. Otherwise
+  you will need some time to fix the resulting problems :)
+</p>
+<p>
+  First html-local and all other names are only names. You can choose the your
+  own names of course but it is helpful to first discuss with your development
+  partners which names you make public because it is really difficult to talk
+  about problems if the naming conventions are different.
+</p>
+<p>
+  Second always only edit on html-local or however you you call this branch.
+  Never use the master branch to implement or test something. The master branch
+  is only for commiting to SVN.
+</p>
+<p>
+  Third if you are a beginner then always use "git commit -a" to be sure that you
+  don't forget something.
+</p>
+<p>
+  Fourth if you decide to do something with the svn (escpecially if you call
+  update or commit etc.) then switch to the master branch and run "svn diff"
+  and "svn status" before you do something.
+</p>
+
+<h2>Common Workflow</h2>
+
+<h3>Setup SVN</h3>
+<pre>
+  mkdir test_svn
+  cd test_svn
+  svn checkout https://bellmich@svn.sourceforge.net/svnroot/openxpki
+</pre>
+
+<h3>GIT env</h3>
+<pre>
+  vi ~/.bashrc
+      export GIT_AUTHOR_EMAIL="johndoe@example.com"
+      export GIT_AUTHOR_NAME="John Doe"
+  cd test_svn/openxpki
+  git-init-db
+  echo "*.svn" >>.git/info/exclude
+</pre>
+
+<h3>Setup branch master</h3>
+
+<pre>
+  git add trunk
+  git add www.openxpki.org
+  git commit
+</pre>
+
+<h3>Create a new branch</h3>
+
+<pre>
+  git branch                 # show all available branches
+  git branch html-local      # create new branch
+  git checkout html-local    # switch to branch html-local
+</pre>
+
+<h3>Publish a new branch</h3>
+
+<ul>
+  <li>go to your web server with ssh
+    <pre>
+  cd /var/www/htdocs
+  mkdir -p git/openxpki.git
+  cd git
+  GIT_DIR=openxpki.git git-init-db
+    </pre>
+  </li>
+  <li>go to your local machine
+    <pre>
+  cd test_svn/openxpki
+  vim .git/remotes/html-public
+      URL: ssh://root@www1.openxpki.org/var/www/htdocs/git/openxpki.git/
+      Push: html-public:html-public
+    </pre>
+  </li>
+  <li>create public branch locally
+    <pre>
+  git checkout html-local
+  git branch html-public
+  git push html-public
+    </pre>
+  </li>
+</ul>
+<p>
+  Note you can publish from html-local too
+  but then you cannot hide local changes from publishing.
+</p>
+
+<h3>Commit changes to a branch</h3>
+
+<pre>
+  git commit  ## sometimes it is necessary to use -a
+</pre>
+
+<h3>Publish changes to a branch</h3>
+
+<pre>
+  git checkout html-public
+  git pull . html-local
+  git commit
+  git push html-public
+</pre>
+
+<h3>Download a new branch</h3>
+
+<pre>
+  vim .git/remotes/html-martin
+      URL: http://www.cynops.de/oss/OpenXPKI/openxpki.git/
+      Pull: master:html-martin
+  git fetch html-martin
+</pre>
+
+<h3>Update a downloaded branch</h3>
+
+<pre>
+  git fetch html-martin
+</pre>
+
+<h3>Merge changes from a downloaded branch</h3>
+
+<pre>
+  git checkout html-local
+  git pull . html-martin
+</pre>
+
+<h3>Merge changes to master branch</h3>
+
+<pre>
+  git checkout master
+  git pull . html-local
+  svn diff
+  svn commit
+  git commit
+  svn status
+</pre>
+
+<h2>Other useful examples</h2>
+
+<p>
+  Finally there is a good documentation with examples by the
+  Wine project:
+  <a href="<& /lib/url.mas, 
+	   host => 'wiki.winehq.org',
+	   path => '/GitBranches' &>">
+    http://wiki.winehq.org/GitBranches</a>.
+</p>
