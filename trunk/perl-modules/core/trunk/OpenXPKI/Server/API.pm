@@ -157,6 +157,14 @@ sub list_workflow_titles {
 }
 
 
+sub create_workflow_instance {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+
+    
+
+}
 
 
 1;

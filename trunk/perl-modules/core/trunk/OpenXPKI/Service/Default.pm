@@ -321,11 +321,30 @@ sub run
 	    if (defined $data->{COMMAND}) {
 		##! 12: "command: $data->{COMMAND}"
 
-		my $command = OpenXPKI::Service::Default::Command->new(
-		    {
-			COMMAND => $data->{COMMAND},
-			PARAMS  => $data->{PARAMS},
-		    });
+		my $command;
+		eval {
+		    $command = OpenXPKI::Service::Default::Command->new(
+			{
+			    COMMAND => $data->{COMMAND},
+			    PARAMS  => $data->{PARAMS},
+			});
+		};
+		if (my $exc = OpenXPKI::Exception->caught()) {
+		    if ($exc->message() =~ m{I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND}xms) {
+			##! 16: "Invalid command $data->{COMMAND}"
+			# fall-through intended
+		    } else {
+			$exc->rethrow();
+		    }
+		} elsif ($EVAL_ERROR) {
+		    if (ref $EVAL_ERROR) {
+			$EVAL_ERROR->rethrow();
+		    } else {
+			OpenXPKI::Exception->throw (
+			    message => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND",
+			    params  => {EVAL_ERROR => $EVAL_ERROR});
+		    }
+		}
 
 		if (defined $command) {
 		    my $result;
@@ -442,47 +461,26 @@ sub get_passwd_login
 
     ##! 2: "handler ".$keys->{ID}
 
-    $self->talk(
-        {
-	    SERVICE_MSG => "GET_PASSWD_LOGIN",
-	    PARAMS      => $keys,
-	});
-    
-    ##! 2: "read answer"
-    my $msg = $self->collect();
-    
-    if (not exists $msg->{LOGIN})
-    {
-	my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_MISSING_LOGIN';
+  GET_PASSWD_LOGIN:
+    while (1) {
 	$self->talk(
-	    $self->__get_error(
-	        {
-		    ERROR => $error,
-		}));
-
-	OpenXPKI::Exception->throw
-	    (
-	     message => $error,
-	     params  => $keys,
-	    );
+	    {
+		SERVICE_MSG => "GET_PASSWD_LOGIN",
+		PARAMS      => $keys,
+	    });
+	
+	##! 2: "read answer"
+	my $msg = $self->collect();
+	
+	next GET_PASSWD_LOGIN unless exists $msg->{PARAMS}->{LOGIN};
+	next GET_PASSWD_LOGIN unless exists $msg->{PARAMS}->{PASSWD};
+	
+	return (
+	    {
+		LOGIN => $msg->{PARAMS}->{LOGIN}, 
+		PASSWD => $msg->{PARAMS}->{PASSWD},
+	    });
     }
-    if (not exists $msg->{PASSWD})
-    {
-	my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_MISSING_PASSWD';
-	$self->talk(
-	    $self->__get_error(
-	        {
-		    ERROR => $error,
-		}));
-
-	OpenXPKI::Exception->throw
-	    (
-	     message => $error,
-	     params  => $keys,
-	    );
-    }
-
-    return ({LOGIN => $msg->{LOGIN}, PASSWD => $msg->{PASSWD}});
 }
 
 #########################################
