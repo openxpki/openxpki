@@ -1,0 +1,9 @@
+Main Index
+Status: <% Dumper $status %>
+<%once>
+  use Data::Dumper;
+</%once>
+<%init>
+  my $session_context = $m->comp('/lib/getsession.mhtml', %ARGS);
+  my $status = $session_context->{client}->get_API()->nop();
+</%init>

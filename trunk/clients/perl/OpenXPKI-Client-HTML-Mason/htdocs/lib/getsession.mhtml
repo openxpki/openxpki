@@ -1,0 +1,41 @@
+<%args>
+   $session_id => undef
+</%args>
+<%init>
+  # check if we are using an already existing and session and if there
+  # has been established a client connection for it.
+  if (defined $session_id
+      && defined $session_cache{$session_id}) {
+      # this session has already been established
+      return $session_cache{$session_id};
+  }
+
+  # FIXME: don't use environment but rather a proper configuration
+  my $socketfile = $ENV{OPENXPKI_SOCKET_FILE};
+  my $client = OpenXPKI::Client::HTML::Mason->new(
+      {
+          SOCKETFILE => $socketfile,
+      });
+
+  my %args;
+  if (defined $session_id) {
+      # this may happen after a restart: the client still knows its session
+      # ID, but we were restarted and the session cache is empty.
+      # try to recreate the session based on the given session_id.
+      $args{SESSION_ID} = $session_id;
+  }
+  $client->init_session(\%args);
+  $session_id = $client->get_session_id();
+  $session_cache{$session_id}->{client} = $client;
+  $session_cache{$session_id}->{session_id} = $session_id;
+
+  # reap the first server message and throw it away in order to get into
+  # the correct communication state
+  if ($client->get_communication_state() 
+      eq 'can_receive') {
+      $client->collect();  # discard first server message
+  }
+
+  return $session_cache{$session_id};
+
+</%init>

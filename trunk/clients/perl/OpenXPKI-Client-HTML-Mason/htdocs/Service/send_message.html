@@ -1,0 +1,15 @@
+Testing...
+<%perl>
+  $context{debug}("Send service message " . Dumper \%ARGS);
+
+  $m->comp('/lib/send_service_msg.mhtml',
+      command => '',
+      params => {
+          %ARGS,
+      });
+</%perl>
+<%once>
+  use Data::Dumper;
+</%once>
+<%init>
+</%init>

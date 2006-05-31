@@ -1,0 +1,11 @@
+<%args>
+  $session_id => undef
+</%args>
+<h2><a href="<& /lib/url.mhtml, 
+              path => '/index.html' &>">Main Menu</a></h2>
+<div class="menu_item"><a href="<& /lib/url.mhtml, 
+              path => '/Menu/Query/index.html' &>">Query</a></div>
+<div class="menu_item"><a href="<& /lib/url.mhtml, 
+              path => '/Menu/Request/index.html' &>">Request</a></div>
+<%init>
+</%init>

@@ -25,7 +25,7 @@ use Text::CSV_XS;
 use Smart::Comments;
 use Data::Dumper;
 
-use OpenXPKI qw( i18nGettext );
+use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Debug 'OpenXPKI::Client::CLI';
 use OpenXPKI::Exception;
 
@@ -33,7 +33,7 @@ my %ARGV_LOCAL : ATTR;
 
 
 my $command_map = {
-    CLI => {
+    SUBCMD => {
 	auth => {
 	    ACTION => {
 		# Choosing the Authentication stack requires a raw service
@@ -44,33 +44,48 @@ my $command_map = {
 		    };
 		},
 	    },
-	},
+	}, # auth
+
+	login => {
+	    SUBCMD => {
+		password => {
+		    GETOPT => [ qw( user=s pass=s ) ],
+		    MAPOPT => {
+			user => 'LOGIN',
+			pass => 'PASSWD',
+		    },
+		    ACTION => {
+			SERVICE_MSG => 'GET_PASSWD_LOGIN',
+		    },
+		}, # password
+	    },
+	}, # login
 
 	logout => {
 	    ACTION => {
 		SERVICE_MSG => 'LOGOUT',
 	    },
-	},
+	}, # logout
 
 	nop => {
 	    ACTION => {
 		APICALL => 'nop',
 	    },
-	},
+	}, # nop
 
 	list => {
-	    CLI => {
+	    SUBCMD => {
 		ca => {
-		    CLI => {
+		    SUBCMD => {
 			ids => {
 			    ACTION => {
 				APICALL => 'list_ca_ids',
 			    },
-			},
+			}, # ids
 		    },
-		},
+		}, # ca
 		workflow => {
-		    CLI => {
+		    SUBCMD => {
 			instances => {
 			    ACTION => {
 				APICALL => 'list_workflow_instances',
@@ -82,9 +97,19 @@ my $command_map = {
 			    },
 			},
 		    },
-		}
+		}, # workflow
 	    },
-	},
+	}, # list
+
+	create => {
+	    SUBCMD => {
+		workflow => {
+		    ACTION => {
+			APICALL => 'create_workflow_instance',
+		    },
+		}, # workflow
+	    },
+	}, # create
     },
 };
 		    
@@ -98,18 +123,33 @@ sub getcommand {
 
     ##! 1: "getcommand ($cmd, $options)"
     
-    if (exists $map_ref->{CLI}->{$cmd}) {
+    if (exists $map_ref->{SUBCMD}->{$cmd}) {
 	##! 2: "command exists"
 
-	if (exists $map_ref->{CLI}->{$cmd}->{ACTION}) {
-	    my $action = $map_ref->{CLI}->{$cmd}->{ACTION};
+	if (exists $map_ref->{SUBCMD}->{$cmd}->{ACTION}) {
+	    ##! 4: "action exists"
+	    my $action = $map_ref->{SUBCMD}->{$cmd}->{ACTION};
+
+	    my $parameters = {};
+	    ##! 4: Dumper $map_ref->{SUBCMD}->{$cmd}->{GETOPT}
+	    if (exists $map_ref->{SUBCMD}->{$cmd}->{GETOPT}) {
+		$self->getoptions($options, $parameters, @{$map_ref->{SUBCMD}->{$cmd}->{GETOPT}});
+	    }
+	    ##! 4: Dumper $parameters
+	    if (exists $map_ref->{SUBCMD}->{$cmd}->{MAPOPT}) {
+		while (my ($getopt_name, $param_name) = each %{$map_ref->{SUBCMD}->{$cmd}->{MAPOPT}}) {
+		    if (exists $parameters->{$getopt_name}) {
+			$parameters->{$param_name} = $parameters->{$getopt_name};
+			delete $parameters->{$getopt_name};
+		    }
+		}
+	    }
+	    ##! 4: Dumper $parameters
+
 	    ##! 4: "action exists"
 	    if (exists $action->{APICALL}) {
 		my $method = $action->{APICALL};
-		return $self->get_API()->$method(
-		    {
-			# FIXME: get options
-		    });
+		return $self->get_API()->$method($parameters);
 	    }
 
 	    if (exists $action->{RAW_MSG}) {
@@ -131,34 +171,34 @@ sub getcommand {
 		    ##! 12: $value
 		}
 		return $self->send_receive_service_msg($value,
-						       {
-							   # FIXME: get options
-						       });
+						       $parameters);
 	    }
+
+	    ##! 8: "Command Message"
 	    if (exists $action->{COMMAND}) {
 		return $self->send_receive_command_msg($action->{COMMAND},
-						       {
-							   # FIXME: get options
-						       });
+						       $parameters);
 	    }
+
+	    ##! 8: "No action defined"
 	    return;
 	}
 
 	my ($subcmd, $options) = ($options =~ m{ \A \s* (\S+)\s*(.*) }xms);
 
 	if (! defined $subcmd ||
-	    ! exists $map_ref->{CLI}->{$cmd}->{CLI}->{$subcmd}) {
+	    ! exists $map_ref->{SUBCMD}->{$cmd}->{SUBCMD}->{$subcmd}) {
 	    if (defined $subcmd) {
 		print "Command '$subcmd' is not allowed.\n";
 	    }
 	    print "Available commands:\n";
-	    print join("\n", sort keys %{$map_ref->{CLI}->{$cmd}->{CLI}});
+	    print join("\n", sort keys %{$map_ref->{SUBCMD}->{$cmd}->{SUBCMD}});
 	    print "\n";
 	    return;
 	}
 	
-	if (exists $map_ref->{CLI}->{$cmd}->{CLI}->{$subcmd}) {
-	    return $self->getcommand($map_ref->{CLI}->{$cmd},
+	if (exists $map_ref->{SUBCMD}->{$cmd}->{SUBCMD}->{$subcmd}) {
+	    return $self->getcommand($map_ref->{SUBCMD}->{$cmd},
 				     $subcmd,
 				     $options);
 	}
@@ -185,13 +225,13 @@ sub process_command {
 
     if (! defined $command || ($command eq '')) {
 	return { 
-	    ERROR => 0
+	    ERROR => 0,
 	};
     }
 
     ##! 2: "mapping command"
     my $result = $self->getcommand($command_map, $command, $options);
-    ##! 2: $result
+    ##! 2: Dumper $result
 
     if (! defined $result) {
 	##! 4: "not mapped, searching method implementation"
@@ -229,6 +269,7 @@ sub render {
     my $self = shift;
     my $ident = ident $self;
     my $response = shift;
+    ##! 1: "render " . Dumper $response
 
     return 1 unless defined $response;
 
@@ -412,131 +453,133 @@ sub cmd_help : PRIVATE {
 }
 
 
-sub cmd_show : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
-    my @msg = ( 'Usage: show OBJECT', 'Available objects:' );
-    push @msg, 'session';
+# sub cmd_show : PRIVATE {
+#     my $self  = shift;
+#     my $ident = ident $self;
+#     my $args  = shift;
+#     my @msg = ( 'Usage: show OBJECT', 'Available objects:' );
+#     push @msg, 'session';
     
-    my %params;
-    if (! $self->getoptions($args, \%params, qw(
-    ))) {
-	print "Error during command line processing.\n";
-    }
+#     my %params;
+#     if (! $self->getoptions($args, \%params, qw(
+#     ))) {
+# 	print "Error during command line processing.\n";
+#     }
     
-    my @args = @{$ARGV_LOCAL{$ident}};
+#     my @args = @{$ARGV_LOCAL{$ident}};
     
-    if (scalar @args == 0) {
-	return {
-	    MESSAGE => \@msg,
-	},
-    } else {
-	foreach my $arg (@args) {
-	    if ($arg eq 'session') {
-		return {
-		    MESSAGE => $self->get_session_id(),
-		};
-	    }
-	    return {
-		MESSAGE => "No such object",
-	    };
-	}
-    }
+#     if (scalar @args == 0) {
+# 	return {
+# 	    MESSAGE => \@msg,
+# 	},
+#     } else {
+# 	foreach my $arg (@args) {
+# 	    if ($arg eq 'session') {
+# 		return {
+# 		    MESSAGE => $self->get_session_id(),
+# 		};
+# 	    }
+# 	    return {
+# 		MESSAGE => "No such object",
+# 	    };
+# 	}
+#     }
     
-    return {
-	MESSAGE => 'FIXME',
-    }
-}
+#     return {
+# 	MESSAGE => 'FIXME',
+#     }
+# }
 
 
-sub cmd_login : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
+# sub cmd_login : PRIVATE {
+#     my $self  = shift;
+#     my $ident = ident $self;
+#     my $args  = shift;
 
-    my @usage = (
-	'Usage: login [OPTIONS]',
-	'Options:',
-	'  --user USERNAME',
-	'  --pass PASSWORD'
-	);
+#     my @usage = (
+# 	'Usage: login [OPTIONS]',
+# 	'Options:',
+# 	'  --user USERNAME',
+# 	'  --pass PASSWORD'
+# 	);
 
-    my %params;
-    if (! $self->getoptions($args, \%params, qw(
-        user:s
-        pass:s
-    ))) {
-	return {
-	    ERROR   => 1,
-	    MESSAGE => "Error during command line processing",
-	};
-    }
+#     my %params;
+#     if (! $self->getoptions($args, \%params, qw(
+#         user:s
+#         pass:s
+#     ))) {
+# 	return {
+# 	    ERROR   => 1,
+# 	    MESSAGE => "Error during command line processing",
+# 	};
+#     }
 
-    ##! 2: "cmd_login options ok"
+#     ##! 2: "cmd_login options ok"
 
-    if (exists $params{user} && exists $params{pass}) {
-	return {
-	    SERVICE_COMMAND => {
-		SERVICE_MSG => 'GET_PASSWD_LOGIN',
-		LOGIN  => $params{user},
-		PASSWD => $params{pass},
-	    },
-	};
-    }
+#     if (exists $params{user} && exists $params{pass}) {
+# 	return {
+# 	    SERVICE_COMMAND => {
+# 		SERVICE_MSG => 'GET_PASSWD_LOGIN',
+# 		PARAMS => {
+# 		    LOGIN  => $params{user},
+# 		    PASSWD => $params{pass},
+# 		},
+# 	    },
+# 	};
+#     }
 
-    return {
-	MESSAGE => \@usage,
-    };
-}
+#     return {
+# 	MESSAGE => \@usage,
+#     };
+# }
 
 
 
-sub cmd_get : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
+# sub cmd_get : PRIVATE {
+#     my $self  = shift;
+#     my $ident = ident $self;
+#     my $args  = shift;
 
-    my %params;
-    if (! $self->getoptions($args, \%params, qw(
-        entries=i
-    ))) {
-	print "Error during command line processing.\n";
-    }
+#     my %params;
+#     if (! $self->getoptions($args, \%params, qw(
+#         entries=i
+#     ))) {
+# 	print "Error during command line processing.\n";
+#     }
 
-    if (exists $params{entries}) {
-	print "limiting output to $params{entries} entries\n";
-    }
+#     if (exists $params{entries}) {
+# 	print "limiting output to $params{entries} entries\n";
+#     }
 
-    my @args = @{$ARGV_LOCAL{$ident}};
+#     my @args = @{$ARGV_LOCAL{$ident}};
 
-    if (scalar @args == 0) {
-	my @msg = ( 'Usage: get OBJECT', 'Available objects:' );
-	push @msg, 'ca certificates';
-	return {
-	    MESSAGE => \@msg,
-	},
-    } else {
-	while (my $arg = shift @args) {
-	    if ($arg eq 'ca') {
-		my $obj = shift @args;
-		if ($obj eq 'certificates') {
-		    return $self->subcmd_get_ca_certificates();
-		}
-		return {
-		    MESSAGE => "No such object",
-		};
-	    }
-	    return {
-		MESSAGE => "No such object",
-	    };
-	}
-    }
+#     if (scalar @args == 0) {
+# 	my @msg = ( 'Usage: get OBJECT', 'Available objects:' );
+# 	push @msg, 'ca certificates';
+# 	return {
+# 	    MESSAGE => \@msg,
+# 	},
+#     } else {
+# 	while (my $arg = shift @args) {
+# 	    if ($arg eq 'ca') {
+# 		my $obj = shift @args;
+# 		if ($obj eq 'certificates') {
+# 		    return $self->subcmd_get_ca_certificates();
+# 		}
+# 		return {
+# 		    MESSAGE => "No such object",
+# 		};
+# 	    }
+# 	    return {
+# 		MESSAGE => "No such object",
+# 	    };
+# 	}
+#     }
 
-    return {
-	MESSAGE => 'FIXME',
-    }
-}
+#     return {
+# 	MESSAGE => 'FIXME',
+#     }
+# }
 
 
 

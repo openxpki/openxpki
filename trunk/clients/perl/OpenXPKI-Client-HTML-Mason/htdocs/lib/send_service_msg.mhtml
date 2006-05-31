@@ -1,0 +1,10 @@
+<%args>
+  $command
+  $params
+</%args
+<%init>
+  my $session_context = $m->comp('/lib/getsession.mhtml', %ARGS);
+  $context{debug}("---> service command: $command, params:" . Dumper $params);
+  $session_context->{client}->send_service_msg($command, $params);
+  $context{debug}("Message sent");
+</%init>

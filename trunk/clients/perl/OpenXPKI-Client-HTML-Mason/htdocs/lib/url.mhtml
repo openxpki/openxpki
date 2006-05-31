@@ -1,0 +1,83 @@
+<%args>
+   $scheme   => 'http'
+   $username => undef
+   $password => ''
+   $host     => undef
+   $port     => undef
+   $path
+   %query    => ( )
+   $session_id => undef
+   $no_session => 0
+   $fragment => undef
+   $relative => 0
+</%args>
+<%init>
+   my $uri = URI->new;
+  
+   if ($host) {
+      $uri->scheme($scheme);
+  
+      if (defined $username) {
+        $uri->authority( "$username:$password" );
+      }
+  
+      $uri->host($host);
+      $uri->port($port) if $port;
+   }
+   elsif (defined $relative && $relative)
+   {
+       # this is a local link and conversion from absolute to relative
+       # links is desired
+
+       # original component path (e. g. 'htdocs/news/index.html')
+       my @caller_path = File::Spec->splitdir($m->request_comp()->path());
+
+       # remove target directory portion
+       # e. g. ('news', 'index.html')
+       shift @caller_path;
+       shift @caller_path;
+
+       # remove filename portion
+       # e. g. 'news'
+       pop @caller_path;
+
+       my $caller_dir = File::Spec->catfile("", @caller_path);
+       $caller_dir = "/" if ($caller_dir eq "");
+
+       $path = File::Spec->abs2rel($path, $caller_dir);
+
+       $path = "." if ($path eq "");
+   }
+  
+   # Sometimes we may want to path in a query string
+   # but the URI module will escape the question mark.
+   my $q;
+  
+   if ( $path =~ s/\?(.*)$// ) {
+      $q = $1;
+   }
+  
+   $uri->path($path);
+  
+   # If there was a query string, we integrate it into the query
+   # parameter.
+   if ($q) {
+      %query = ( %query, split /[&=]/, $q );
+   }
+
+   $query{session_id} ||= $session_id;
+   $query{session_id} ||= $context{session_id};
+
+
+   # $uri->query_form doesn't handle hash ref values properly
+   while ( my ( $key, $value ) = each %query ) {
+      $query{$key} = ref $value eq 'HASH' ? [ %$value ] : $value;
+   }
+
+   delete $query{session_id} if ($no_session or ($query{session_id} eq ''));
+  
+   $uri->query_form(%query) if %query;
+  
+   $uri->fragment($fragment) if $fragment;
+</%init>
+<% $uri->canonical | n %>\

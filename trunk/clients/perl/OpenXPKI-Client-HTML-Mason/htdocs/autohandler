@@ -1,0 +1,76 @@
+<%args>
+  $session_id => undef
+</%args>
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title><& SELF:title, %ARGS &></title>
+    <link rel="stylesheet" 
+          title="default" 
+          href="<& /lib/url.mhtml, 
+                   path => '/css/openxpki.css',
+                   no_session => 1 &>" 
+          type="text/css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+  </head>
+  <body>
+    <div class="page">
+
+     <div class="navi">
+      <div class="menu">
+        <& /lib/menu.mhtml &>
+      </div>
+     </div>
+
+     <div class="info">
+      <div class="header">
+        <img src="<& /lib/url.mhtml, 
+             path => '/images/openxpki_logo.png',
+             no_session => 1 &>"
+             alt="OpenXPKI"/>
+      </div>
+
+      <div class="main">
+       <div class="content">
+<%perl>
+       # normal processing may only happen if the client is in the "normal"
+       # state 'can_send'
+       #if ($session_context->{client}->get_communication_state() 
+       #    eq 'can_send') {
+       #    $m->call_next;
+       #}
+
+       $m->call_next;
+
+       # the server may wish to answer something - if this is the case
+       # the process_response component detects this and generates the
+       # corresponding output
+       $m->comp('/lib/process_response.mhtml');
+</%perl>
+       </div>
+
+       <div class="footer">
+       </div>
+      </div> <!-- main -->
+     </div> <!-- info -->
+    </div>  <!-- page -->
+  </body>
+</html>
+
+<%init>
+  my $session_context = $m->comp('/lib/getsession.mhtml', %ARGS);
+  # export session id globally
+  $context{session_id} = $session_context->{session_id};
+
+
+</%init>
+
+<%flags>
+  inherit => '/syshandler'
+</%flags>
+
+<%method title>
+  OpenXPKI
+</%method>

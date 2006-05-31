@@ -1,0 +1,10 @@
+<%args>
+  $response => {}
+</%args>
+<h1>Unhandled Service Response</h1>
+<pre>
+% print Dumper $response;
+</pre>
+<%once>
+  use Data::Dumper;
+</%once>

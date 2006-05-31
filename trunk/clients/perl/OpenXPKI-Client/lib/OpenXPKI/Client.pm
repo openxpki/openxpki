@@ -134,10 +134,11 @@ sub send_service_msg {
     my $self  = shift;
     my $ident = ident $self;
     my $cmd   = shift;
-    my $arg   = shift;
+    my $arg   = shift || {};
 
     ##! 1: "send_service_msg"
     ##! 2: $cmd
+    ##! 4: Dumper $arg
 
     my %arguments = (
 	SERVICE_MSG => $cmd,
@@ -156,6 +157,7 @@ sub send_command_msg {
 
     ##! 1: "send_command_msg"
     ##! 2: $cmd
+    ##! 4: Dumper $arg
 
     return $self->send_service_msg(
 	'COMMAND',
@@ -177,9 +179,12 @@ sub send_receive_service_msg {
 
     ##! 1: "send_receive_service_msg"
     ##! 2: $cmd
+    ##! 4: Dumper $arg
 
     $self->send_service_msg($cmd, $arg);
-    return $self->collect();
+    my $rc = $self->collect();
+    ##! 4: Dumper $rc
+    return $rc;
 }
 
 
@@ -192,6 +197,7 @@ sub send_receive_command_msg {
 
     ##! 1: "send_receive_command_msg"
     ##! 2: $cmd
+    ##! 4: Dumper $arg
 
     $self->send_command_msg($cmd, $arg);
     my $rc = $self->collect();
@@ -682,6 +688,7 @@ See send_command_msg.
 
 Initialize session. If the named argument SESSION_ID exists, this session
 is re-opened, otherwise a new session is created.
+Returns the first server response (see collect()).
 
 =head2 get_session_id
 

@@ -11,12 +11,13 @@ use English;
 use Getopt::Long qw( :config permute pass_through );
 use Pod::Usage;
 use Term::ReadLine;
+use File::Spec;
+use Config::Std;
 
-# use Smart::Comments;
-
+use Smart::Comments;
+use Data::Dumper;
 use OpenXPKI::Debug;
 
-my $configfile;
 
 $SIG{PIPE} = 'IGNORE';
 
@@ -27,43 +28,93 @@ GetOptions(\%params,
 	      man
 	      socketfile=s
               session=s
-              debug=s@
+              debug:s@
 	      ));
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
 
-if (defined $params{debug}) {
-    @{$params{debug}} = split(m{,}, join(',', @{$params{debug}}));
-    
-    foreach my $param (@{$params{debug}}) {
-	my ($module, $level) = ($param =~ m{ \A (.*?):?(\d*) \z }xms);
-	if ($level eq '') {
-	    $level = 1;
-	}
-	if ($module eq '') {
-	    $module = '.*';
-	}
-	print STDERR "Debug level for module '$module': $level\n";
- 	$OpenXPKI::Debug::LEVEL{$module} = $level;
+# read .openxpki/cli.conf file
+my $configdir = File::Spec->catfile($ENV{HOME}, '.openxpki');
+my $configfile = File::Spec->catfile($configdir, 'cli.conf');
+
+my $config;
+
+# only read configuration file for interactive sessions
+if (scalar @ARGV == 0 && -r $configfile) {
+    read_config $configfile => $config;
+}
+
+###########################################################################
+# override config file with command line arguments
+if (defined $params{socketfile}) {
+    $config->{server}->{socketfile} = $params{socketfile};
+}
+
+if (defined $params{session}) {
+    $config->{client}->{session} = $params{session};
+}
+
+###########################################################################
+
+my @debug_entries;
+# pull debug configuration from configuration file (if configured at all)
+if (defined $config->{client}->{debug}) {
+    if (ref $config->{client}->{debug} eq 'ARRAY') {
+	@debug_entries = @{$config->{client}->{debug}};
+    } else {
+	@debug_entries = ( $config->{client}->{debug} );
     }
 }
+
+# override debug settings from the command line
+if (defined $params{debug}) {
+    @debug_entries = split(m{,}, join(',', @{$params{debug}}));
+}
+
+foreach my $param (@debug_entries) {
+    my ($module, $level) = ($param =~ m{ \A (.*?):?(\d*) \z }xms);
+    if ($level eq '') {
+	$level = 1;
+    }
+    if ($module eq '') {
+	$module = '.*';
+    }
+    print STDERR "Debug level for module '$module': $level\n";
+    $OpenXPKI::Debug::LEVEL{$module} = $level;
+}
+
 
 require OpenXPKI::Client::CLI;
 
 my $cli = OpenXPKI::Client::CLI->new(
     {
-	SOCKETFILE => $params{socketfile},
+	SOCKETFILE => $config->{server}->{socketfile},
     });
 
+my $response;
+
 my %args;
-if (exists $params{session}) {
-    $args{SESSION_ID} = $params{session};
+if (exists $config->{client}->{session}) {
+    $args{SESSION_ID} = $config->{client}->{session},
 }
 
-$cli->init_session(\%args);
-my $session_id = $cli->get_session_id();
-### $session_id
+eval {
+    $response = $cli->init_session(\%args);
+};
+if (my $exc = OpenXPKI::Exception->caught()) {
+    if ($exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
+	print STDERR "Saved session is invalid, starting a new one\n";
+	$cli = undef;
+	$cli = OpenXPKI::Client::CLI->new(
+	    {
+		SOCKETFILE => $config->{server}->{socketfile},
+	    });
+	$response = $cli->init_session();
+    }
+}
+$config->{client}->{session} = $cli->get_session_id();
+
 
 if (scalar @ARGV == 0) {
     print "Entering interactive OpenXPKI shell.\n";
@@ -73,6 +124,10 @@ if (scalar @ARGV == 0) {
     my $OUT = $term->OUT || \*STDOUT;
     my $state = '';
 
+    # render first server message (as returned by init_session())
+    $cli->render($response) if defined $response;
+
+    my $exitcode = 0;
   INTERACTION:
     while (1) {
 	### $cli->get_communication_state()
@@ -83,11 +138,18 @@ if (scalar @ARGV == 0) {
 	if ($cli->get_communication_state() ne 'can_send') {
 	    ### handle response from last command and render output...
 	    print $OUT "ERROR: Incorrect communication state\n";
-	    my $response;
 	    eval {
 		$response = $cli->collect();
 	    };
 	    $cli->render($response) if defined $response;
+	}
+
+	# get current session status
+	$response = $cli->send_receive_service_msg('STATUS');
+	if (exists $response->{SESSION}->{ROLE}) {
+	    my $user = $response->{SESSION}->{USER} || 'nobody';
+	    my $role = $response->{SESSION}->{ROLE};
+	    $state = "$user/$role";
 	}
 
 	my $prompt = 'OpenXPKI [' . $state . ']: ';
@@ -138,7 +200,8 @@ if (scalar @ARGV == 0) {
 	if (exists $cmd_res->{SERVICE_COMMAND} &&
 	    exists $cmd_res->{COMMAND}) {
 	    print $OUT "Internal error: command implementation requested ambiguous message\n";
-	    exit 1;
+	    $exitcode = 1;
+	    last INTERACTION;
 	}
 
 	if (exists $cmd_res->{SERVICE_COMMAND} &&
@@ -150,8 +213,8 @@ if (scalar @ARGV == 0) {
 	    };
 	    if (my $exc = OpenXPKI::Exception->caught()) {
 		print $OUT "Error sending service message.\n";
-#		redo INTERACTION;
-		exit 1;
+   	        $exitcode = 1;
+		last INTERACTION;
 	    }
 	}
 
@@ -167,14 +230,19 @@ if (scalar @ARGV == 0) {
 	    };
 	    if (my $exc = OpenXPKI::Exception->caught()) {
 		print $OUT "Error sending service message.\n";
-		exit 1;
+		$exitcode = 1;
+		last INTERACTION;
 	    }
 	}
 
 
 	$term->addhistory($line) if ($line ne "");
     }    
-    exit 0;
+
+    # try to write configuration    
+    mkdir $configdir;
+    write_config %{$config}, $configfile;
+    exit $exitcode;
 
 } else {
     die "Non-interactive use currently under construction. Stopped";
