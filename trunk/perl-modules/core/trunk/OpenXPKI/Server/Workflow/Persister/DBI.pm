@@ -9,7 +9,7 @@ use strict;
 use base qw( Workflow::Persister );
 use utf8;
 
-# use Smart::Comments;
+use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Persister::DBI';
 
 use OpenXPKI::Server::Workflow::Persister::DBI::SequenceId;
 use OpenXPKI::Server::Context qw( CTX );
@@ -49,11 +49,11 @@ sub init {
 sub create_workflow {
     my $self = shift;
     my $workflow = shift;
-    ### create_workflow called...
+    ##! 1: "create workflow"
 
     my $id = $self->workflow_id_generator->pre_fetch_id();
 
-    ### workflow id: $id
+    ##! 1: "workflow id: $id"
 
     my $dbi = CTX('dbi_workflow');
 
@@ -67,7 +67,7 @@ sub create_workflow {
 	$data{WORKFLOW_SERIAL} = $id;
     }
 
-    ### inserting data into workflow table
+    ##! 1: "inserting data into workflow table"
     $dbi->insert(
 	TABLE => $workflow_table,
 	HASH => \%data,
@@ -100,7 +100,8 @@ sub update_workflow {
     my $self = shift;
     my $workflow = shift;
     
-    ### update_workflow called...
+    ##! 1: "update_workflow"
+
     my $id = $workflow->id();
     
     my %data = (
@@ -134,13 +135,13 @@ sub update_workflow {
 	# parameters with undefined values are not stored
 	next PARAMETER if (! defined $value);
 
-	### persisting context parameter: $key
+	##! 2: "persisting context parameter: $key"
 	# ignore "volatile" context parameters starting with an underscore
 	next PARAMETER if ($key =~ m{ \A _ }xms);
 
 	# context parameter sanity checks 
 	if (length($value) > $context_value_max_length) {
-	    ### parameter length exceeded...
+	    ##! 4: "parameter length exceeded"
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG",
 		params  => {
@@ -153,7 +154,7 @@ sub update_workflow {
 
 	# check for illegal characters
 	if ($value =~ m{ (?:\p{Unassigned}|\x00) }xms) {
-	    ### parameter contains illegal characters...
+	    ##! 4: "parameter contains illegal characters"
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_ILLEGAL_DATA",
 		params  => {
@@ -163,7 +164,7 @@ sub update_workflow {
 		);
 	}
 	
-	### saving context for wf: $id
+	##! 2: "saving context for wf: $id"
  	$dbi->insert(
  	    TABLE => $context_table,
  	    HASH => {
@@ -189,8 +190,8 @@ sub fetch_workflow {
     my $self = shift;
     my $id   = shift;
 
-    ### fetch_workflow called...
-    ### workflow id: $id
+    ##! 1: "fetch_workflow"
+    ##! 1: "workflow id: $id"
 
     my $dbi = CTX('dbi_workflow');
 
@@ -237,7 +238,7 @@ sub fetch_extra_workflow_data {
     my $self     = shift;
     my $workflow = shift;
 
-    ### fetch_extra_workflow_data called...
+    ##! 1: "fetch_extra_workflow_data"
     my $id = $workflow->id();
     my $dbi = CTX('dbi_workflow');
 
@@ -253,7 +254,7 @@ sub fetch_extra_workflow_data {
     # the new context to the workflow instance below.
     if ($Workflow::Context::VERSION <= 1.03) {
 	# Workflow::Context workaround
-	### explicitly clear all context entries...
+	##! 2: "explicitly clear all context entries"
 	$workflow->context()->clear_params();
 
 	# set workflow ID (for compatibility with the non-workaround 
@@ -276,7 +277,6 @@ sub fetch_extra_workflow_data {
 	$workflow->context($context);
     }
 
-    ### done...
     return; # no useful result
 }
 
@@ -288,7 +288,7 @@ sub create_history {
     my $workflow = shift;
     my @history = @_;
 
-    ### create_history called...
+    ##! 1: "create_history"
     my $generator = $self->history_id_generator();
     my $dbi = CTX('dbi_workflow');
 
@@ -298,7 +298,7 @@ sub create_history {
 
 	my $id = $generator->pre_fetch_id();
 	
-	### workflow history id: $id
+	##! 2: "workflow history id: $id"
 
 	my %data = (
 	    WORKFLOW_SERIAL          => $workflow->id(),
@@ -313,7 +313,7 @@ sub create_history {
 	    $data{WORKFLOW_HISTORY_SERIAL} = $id;
 	}
 
-	### inserting data into workflow history table
+	##! 2: "inserting data into workflow history table"
 	$dbi->insert(
 	    TABLE => $history_table,
 	    HASH => \%data,
@@ -352,7 +352,7 @@ sub fetch_history {
     my $self = shift;
     my $workflow = shift;
 
-    ### fetch_history called...
+    ##! 1: "fetch_history"
     my $id = $workflow->id();
     my $dbi = CTX('dbi_workflow');
 
@@ -400,7 +400,6 @@ sub fetch_history {
 }
 
 
-### get sequence generators
 sub assign_generators {
     my $self = shift;
     my $params = shift;
@@ -410,7 +409,7 @@ sub assign_generators {
     return if ( $self->workflow_id_generator and
                 $self->history_id_generator );
     
-    ### assigning ID generators for OpenXPKI DBI...
+    ##! 2: "assigning ID generators for OpenXPKI DBI"
     my ( $wf_gen, $history_gen ) =
 	$self->init_OpenXPKI_generators( $params );
 
@@ -483,7 +482,7 @@ Limitation: If the parameter value is 'undef' the parameter will not be
 persisted. After restoring the workflow instance from persistent storage
 the corresponding entry will not exist.
 
-=head3 Volative Context Parameters 
+=head3 Volatile Context Parameters 
 
 Context parameters starting with an underscore '_' will NOT be 
 saved persistently in the database. You can use such parameters

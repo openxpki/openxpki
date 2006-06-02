@@ -49,10 +49,10 @@ my $command_map = {
 	login => {
 	    SUBCMD => {
 		password => {
-		    GETOPT => [ qw( user=s pass=s ) ],
+		    GETOPT => [ qw( user=s password|pass=s ) ],
 		    MAPOPT => {
 			user => 'LOGIN',
-			pass => 'PASSWD',
+			password => 'PASSWD',
 		    },
 		    ACTION => {
 			SERVICE_MSG => 'GET_PASSWD_LOGIN',
@@ -101,9 +101,49 @@ my $command_map = {
 	    },
 	}, # list
 
+	show => {
+	    SUBCMD => {
+		workflow => {
+		    SUBCMD => {
+			instance => {
+			    GETOPT => [ qw( workflow|wf=s id=i ) ],
+			    MAPOPT => {
+				workflow => 'WORKFLOW',
+				id       => 'ID',
+			    },
+			    ACTION => {
+				APICALL => 'get_workflow_info',
+			    },
+			},
+		    }
+		}, # workflow
+	    },
+	}, # get
+
+	execute => {
+	    SUBCMD => {
+		workflow => {
+		    GETOPT => [ qw( workflow|wf=s id=i activity|action=s ) ],
+		    MAPOPT => {
+			workflow => 'WORKFLOW',
+			id       => 'ID',
+			activity => 'ACTIVITY',
+		    },
+		    ACTION => {
+			APICALL => 'execute_workflow_activity',
+		    },
+		}, # workflow
+	    },
+	}, # execute
+
+
 	create => {
 	    SUBCMD => {
 		workflow => {
+		    GETOPT => [ qw( workflow|wf=s ) ],
+		    MAPOPT => {
+			workflow => 'WORKFLOW',
+		    },
 		    ACTION => {
 			APICALL => 'create_workflow_instance',
 		    },
@@ -136,6 +176,8 @@ sub getcommand {
 		$self->getoptions($options, $parameters, @{$map_ref->{SUBCMD}->{$cmd}->{GETOPT}});
 	    }
 	    ##! 4: Dumper $parameters
+
+	    # remap parameters from getopt to serializable
 	    if (exists $map_ref->{SUBCMD}->{$cmd}->{MAPOPT}) {
 		while (my ($getopt_name, $param_name) = each %{$map_ref->{SUBCMD}->{$cmd}->{MAPOPT}}) {
 		    if (exists $parameters->{$getopt_name}) {
@@ -145,6 +187,7 @@ sub getcommand {
 		}
 	    }
 	    ##! 4: Dumper $parameters
+	    ### $parameters
 
 	    ##! 4: "action exists"
 	    if (exists $action->{APICALL}) {

@@ -33,6 +33,10 @@ my %allowed_command = map { $_ => 1 } qw(
 
     list_workflow_instances
     list_workflow_titles
+
+    get_workflow_info
+    create_workflow_instance
+    execute_workflow_activity
 );
 
 
@@ -65,6 +69,16 @@ sub attach_impl : PRIVATE {
     # command name
     my $cmd = $command{$ident};
     ##! 4: "command: $cmd"
+
+    # commands starting with an underscrore are not allowed (might be a
+    # private method in API or command implementation)
+    if ($cmd =~ m{ \A _ }xms) {
+	OpenXPKI::Exception->throw(
+	    message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PRIVATE_METHOD_REQUESTED",
+	    params  => {
+		COMMAND => $cmd,
+	    });
+    }
 
     my $base = 'OpenXPKI::Service::Default::Command';
 
@@ -117,7 +131,7 @@ sub execute {
 	##! 8: "automatic API mapping for $method"
 
 	return $self->command_response(
-	    $self->get_API()->$method($arg),
+	    $self->get_API()->$method($command_params{$ident}),
 	);
     } else {
 	##! 16: "ref child: " . ref $command_impl{$ident}

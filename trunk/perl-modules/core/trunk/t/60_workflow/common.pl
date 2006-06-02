@@ -111,6 +111,10 @@ sub do_step {
     }
 }
 
+# FIXME: migrate to OpenXPKI logging
+### initialize log4perl
+Log::Log4perl->easy_init($ERROR);
+
 
 ### initialize context
 OpenXPKI::Server::Init::init({
@@ -120,10 +124,6 @@ OpenXPKI::Server::Init::init({
 ### get logging module
 our $log = CTX('log');
 ok($log);
-
-# FIXME: migrate to OpenXPKI logging
-### initialize log4perl
-Log::Log4perl->easy_init($ERROR);
 
 ### try to connect to database
 our $dbi = CTX('dbi_workflow');

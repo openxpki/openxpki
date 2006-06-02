@@ -73,7 +73,7 @@ From this on the user can decide how to go from there:
 3) Completely non-interactive batch mode example:
 
   rm -f openxpki.conf
-  ./configure  --batch --nocheck -- --setcfg dir.prefix=/home/johndoe/local --setcfg file.openssl=/opt/local/bin/openssl --setcfg deployment.xmlstyle=multi-file --setcfg server.runuser=johndoe --setcfg server.rungroup=johndoe
-  rm /home/johndoe/local/etc/openxpki/openxpki.conf
+  ./configure  --batch --nocheck -- --setcfg dir.prefix=$HOME/local --setcfg file.openssl=/opt/local/bin/openssl --setcfg deployment.xmlstyle=multi-file --setcfg server.runuser=`id -n -u` --setcfg server.rungroup=`id -n -g`
+  rm -f $HOME/local/etc/openxpki/openxpki.conf
   make install
   openxpki-configure --batch

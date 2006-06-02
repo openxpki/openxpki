@@ -1,0 +1,64 @@
+<workflow>
+  <type>dataonly_cert_request</type>
+  <description>Create a PKCS#10 request from user submitted request data</description>
+  <persister>OpenXPKI</persister>
+
+  <state name="INITIAL">
+    <description>Initial state for basic certificate requests</description>
+    <action name="request.certificate.dataonly.create"
+	    resulting_state="GENERATE_PASSPHRASE" />
+  </state>
+
+  <state name="GENERATE_PASSPHRASE">
+    <description>Create pass phrase</description>
+    <!-- This is just a test to verify if branching in workflow definition
+	 works as expected. In this particular case, the passphrase generation
+	 activity does not overwrite an existing passphrase that is already
+	 in the context, so the activity could be called anyway in this case.
+      -->
+    <action name="passphrase.generate"
+	    resulting_state="GENERATE_KEY">
+      <!-- a bareword Perl expression is possible here but not user friendly,
+	   in real life this would probably be a condition class name that
+	   performs the verification instead 
+	-->
+      <condition test="! defined $context->{passphrase}"/>
+    </action>
+    <action name="null"
+	    resulting_state="GENERATE_KEY">
+      <condition test="defined $context->{passphrase}"/>
+    </action>
+  </state>
+
+  <state name="GENERATE_KEY" autorun="yes">
+    <description>Create key pair</description>
+    <action name="key.generate"
+	    resulting_state="CREATE_REQUEST"/>
+  </state>
+
+  <state name="CREATE_REQUEST" autorun="yes">
+    <description>Create certificate request</description>
+    <action name="request.certificate.pkcs10.create"
+	    resulting_state="DETERMINE_ISSUING_CA"/>
+  </state>
+
+  <state name="DETERMINE_ISSUING_CA" autorun="yes">
+    <description>Determine internal issuing CA</description>
+    <action name="ca.determine"
+	    resulting_state="GET_PROFILE"/>
+  </state>
+
+  <state name="GET_PROFILE" autorun="yes">
+    <description>Get certificate profile</description>
+    <action name="profile.get"
+	    resulting_state="ISSUE_CERTIFICATE"/>
+  </state>
+
+  <state name="ISSUE_CERTIFICATE" autorun="yes">
+    <description>Issue requested certificate</description>
+    <action name="certificate.issue"
+	    resulting_state="FINISHED"/>
+  </state>
+
+  <state name="FINISHED" />
+</workflow>

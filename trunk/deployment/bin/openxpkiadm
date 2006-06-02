@@ -11,9 +11,12 @@ use English;
 use Getopt::Long;
 use Pod::Usage;
 
+use Log::Log4perl qw( :easy );
+
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 
+Log::Log4perl->easy_init($ERROR);
 
 my $configfile = '[% dir.sysconfdir %]/config.xml';
 

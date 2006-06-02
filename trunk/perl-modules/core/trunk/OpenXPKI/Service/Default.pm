@@ -1,6 +1,6 @@
 ## OpenXPKI::Service::Default.pm 
 ##
-## Written 2005-2006 by Michael Bell for the OpenXPKI project
+## Written 2005-2006 by Michael Bell and Martin Bartosch for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
@@ -51,7 +51,7 @@ sub init
 	! $self->get_API()->get_role()) {
 	my $authentication = CTX('authentication');
         ##! 2: $authentication
-	$authentication->login()
+	$authentication->login();
     }
 
     $self->talk(
@@ -318,15 +318,14 @@ sub run
         }
 	
 	if ($service_msg eq 'COMMAND') {
-	    if (defined $data->{COMMAND}) {
-		##! 12: "command: $data->{COMMAND}"
+	    if (exists $data->{PARAMS}->{COMMAND}) {
 
 		my $command;
 		eval {
 		    $command = OpenXPKI::Service::Default::Command->new(
 			{
-			    COMMAND => $data->{COMMAND},
-			    PARAMS  => $data->{PARAMS},
+			    COMMAND => $data->{PARAMS}->{COMMAND},
+			    PARAMS  => $data->{PARAMS}->{PARAMS},
 			});
 		};
 		if (my $exc = OpenXPKI::Exception->caught()) {

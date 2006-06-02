@@ -64,9 +64,11 @@
     [% IF deployment.xmlstyle == 'multi-file' %]
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="auth.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="acl.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow.xml"/>
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
       [% INCLUDE auth.xml  FILTER indent(4) %]
       [% INCLUDE acl.xml   FILTER indent(4) %]
+      [% INCLUDE workflow.xml FILTER indent(4) %]
     [% END %]
   </pki_realm>
 

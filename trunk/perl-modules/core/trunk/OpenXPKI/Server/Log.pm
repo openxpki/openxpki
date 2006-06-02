@@ -6,14 +6,15 @@
 ## (C) Copyright 2004-2006 by The OpenXPKI Project
 ## $Revision$
 
-use strict;
-use warnings;
-
 package OpenXPKI::Server::Log;
 
-use OpenXPKI::Exception;
+use strict;
+use warnings;
+use English;
+
 use Log::Log4perl;
 use Log::Log4perl::Level;
+use OpenXPKI::Exception;
 use OpenXPKI::Server::Log::Appender::DBI;
 
 # cache for package filenames (truncate log entries)
@@ -110,7 +111,13 @@ sub log
     }
 
     ## build and store message
-    $msg = "[$package (" . (defined $filename ? $filename . ':' : '') . "$line)] $msg\n";
+    $msg = "[$package (" . (defined $filename ? $filename . ':' : '') . "$line)] $msg";
+
+    # remove trailing newline characters
+    {
+	local $INPUT_RECORD_SEPARATOR = '';
+	chomp $msg;    
+    }
 
     ## get an ID for the message
 

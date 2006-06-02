@@ -142,9 +142,10 @@ sub send_service_msg {
 
     my %arguments = (
 	SERVICE_MSG => $cmd,
-	%{$arg},
+	PARAMS => $arg,
 	);
 
+    ##! 4: Dumper \%arguments
     return $self->talk(\%arguments);
 }
 
