@@ -35,7 +35,12 @@ binary-indep-stamp: arrange
 	dh_builddeb
 	touch binary-indep-stamp
 
-build: build-stamp
+generate-man-pages:
+	PROGS=`ls bin/*`; for PROG in $$PROGS; do \
+	    if [ -x $$PROG ] && [ $$PROG != "bin/openxpki-configure" ]; then perldoc -d$$PROG.1 $$PROG; fi; \
+	done;
+
+build: build-stamp generate-man-pages
 build-stamp: config
 	dh_testdir
 	touch build-stamp
@@ -56,6 +61,8 @@ install-stamp: build
 	dh_testdir
 	dh_installdirs
 	dh_install
+	dh_installinit --no-start --init-script=openxpkid
+	dh_installman bin/*.1
 	dh_fixperms -a
 	touch install-stamp
 

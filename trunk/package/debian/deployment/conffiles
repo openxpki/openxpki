@@ -1,0 +1,14 @@
+/etc/openxpki/templates/default/Makefile
+/etc/openxpki/templates/default/acl.xml
+/etc/openxpki/templates/default/auth.xml
+/etc/openxpki/templates/default/config.xml
+/etc/openxpki/templates/default/database.xml
+/etc/openxpki/templates/default/log.conf
+/etc/openxpki/templates/default/profile.xml
+/etc/openxpki/templates/default/token.xml
+/etc/openxpki/templates/default/workflow.xml
+/etc/openxpki/templates/default/workflow_activity.xml
+/etc/openxpki/templates/default/workflow_persister.xml
+/etc/openxpki/templates/default/workflow_request_dataonly.xml
+/etc/openxpki/templates/openxpki.conf
+/etc/init.d/openxpkid

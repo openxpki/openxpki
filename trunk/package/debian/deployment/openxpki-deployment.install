@@ -1,7 +1,7 @@
-bin/openxpki-configure usr/bin
-bin/openxpki-metaconf usr/bin
-bin/openxpkiadm usr/bin
-bin/openxpkictl etc/init.d
+bin/openxpki-configure usr/sbin
+bin/openxpki-metaconf usr/sbin
+bin/openxpkiadm usr/sbin
+bin/openxpkictl usr/sbin
 
 etc/openxpki.conf etc/openxpki/templates
 
