@@ -1,0 +1,17 @@
+How to create these debian packages?
+====================================
+
+1. Completely checkout the major subversion trunk area.
+
+2. cd trunk/package/debian/
+
+3. make
+
+How to create a special debian package like libopenxpki-perl?
+=============================================================
+
+1. Completely checkout the major subversion trunk area.
+
+2. cd trunk/package/debian/core
+
+3. make
