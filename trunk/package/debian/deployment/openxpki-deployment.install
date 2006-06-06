@@ -1,0 +1,11 @@
+bin/openxpki-configure usr/bin
+bin/openxpki-metaconf usr/bin
+bin/openxpkiadm usr/bin
+bin/openxpkictl etc/init.d
+
+etc/openxpki.conf etc/openxpki/templates
+
+etc/templates/default/Makefile     etc/openxpki/templates/default
+etc/templates/default/*.xml      etc/openxpki/templates/default
+etc/templates/default/*.conf      etc/openxpki/templates/default
+

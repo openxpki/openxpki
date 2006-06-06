@@ -1,6 +1,7 @@
 
 PACKAGES=	\
-	core
+	core	\
+	deployment
 
 .PHONY : $(PACKAGES)
 

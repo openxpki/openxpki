@@ -12,5 +12,5 @@ Depends: ${perl:Depends}, ${shlibs:Depends}, make, openssl (>= 0.9.8), libdateti
 Description: OpenXPKI Perl core modules
  OpenXPKI is an Open Source PKI project.
  .
- This package contains al core modules which are required to run
+ This package contains all core modules which are required to run
  an OpenXPKI trustcenter.

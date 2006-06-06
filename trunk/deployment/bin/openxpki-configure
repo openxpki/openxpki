@@ -7,8 +7,13 @@
 # $Revision$
 #
 
-SYSCONFDIR="[% dir.sysconfdir %]"
-CFG="[% dir.bindir %]/openxpki-metaconf --config $SYSCONFDIR/openxpki.conf"
+for DIR in "/usr/local/etc/openxpki", "/etc/openxpki", ".", $OPENXPKI_SYSCONFDIR; do
+	if [ -e "$DIR/openxpki.conf" ]; then
+		SYSCONFDIR=$DIR
+	fi;
+done;
+
+CFG="openxpki-metaconf --config $SYSCONFDIR/openxpki.conf"
 TEMPLATEDIR="$SYSCONFDIR/templates"
 TEMPLATE="default"
 

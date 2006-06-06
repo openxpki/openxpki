@@ -15,7 +15,9 @@ PERLLIB       = [% dir.perllib %]
 STATEDIR      = [% dir.openxpkistatedir %]
 SESSIONDIR    = [% dir.openxpkisessiondir %]
 
-CFG           = bin/openxpki-metaconf
+TEMPLATES     = [% dir.templatedir %]
+
+CFG           = openxpki-metaconf
 INSTALL       = /usr/bin/install
 CONFIGFILE    = etc/openxpki.conf
 
@@ -57,6 +59,8 @@ checkuser:
 
 install: checkuser makedirs installetc installbin postinstallhelp
 
+package-install: checkuser makedirs installetc postinstallhelp
+
 installbin:
 	@echo Installing binary files to $(INSTALLPREFIX)$(BINDIR)
 	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0750 -d $(INSTALLPREFIX)$(BINDIR)
@@ -74,15 +78,17 @@ installbin:
 installetc:
 	@echo Installing configuration files to $(INSTALLPREFIX)$(SYSCONFDIR)
 	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0750 -d $(INSTALLPREFIX)$(SYSCONFDIR)
-	$(CFG) --config openxpki.conf --delcfgvalue dir.installprefix --writecfg $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
+	PATH=$$PATH:bin $(CFG) --config openxpki.conf --delcfgvalue dir.installprefix --writecfg $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
 	chown $(ADMUSER):$(ADMGROUP) $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
 	chmod 640 $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
 	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(SYSCONFDIR)/templates
-	@( cd etc && for template in templates/* ; do \
-		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(SYSCONFDIR)/$$template || exit 1 ;\
-		for file in $$template/*.xml $$template/*.conf ; do \
-			$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file $(INSTALLPREFIX)$(SYSCONFDIR)/$$template/`basename $$file` || exit 1 ; \
-		done ; \
+	@( cd $(TEMPLATES) && for template in * ; do \
+		if [ -d $$template ]; then \
+			$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(SYSCONFDIR)/templates/$$template || exit 1 ;\
+			for file in $$template/*.xml $$template/*.conf ; do \
+				$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file $(INSTALLPREFIX)$(SYSCONFDIR)/templates/$$template/`basename $$file` || exit 1 ; \
+			done ; \
+		fi; \
 	done )
 
 makedirs:
@@ -109,7 +115,7 @@ postinstallhelp:
 	@echo "Please run the following commands:"
 	@echo
 	@echo "cd $(SYSCONFDIR)"
-	@echo "./openxpki-configure"
+	@echo "OPENXPKI_SYSCONFDIR=$(SYSCONFDIR) openxpki-configure"
 	@echo
 
 summary:

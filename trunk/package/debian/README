@@ -15,3 +15,19 @@ How to create a special debian package like libopenxpki-perl?
 2. cd trunk/package/debian/core
 
 3. make
+
+How to handle missing Perl packages?
+====================================
+
+1. apt-get install dh-make-perl
+
+2. dh-make-perl --build --cpan MODULE (or you use dh-make-perl PERL_SRC_DIR)
+
+3. dpkg -i libMODULE-perl_*.deb
+
+Example:
+
+dh-make-perl --build --cpan XML::Filter::XInclude
+dh-make-perl --build --cpan XML::Validator::Schema
+dpkg -i libxml-filter-xinclude-perl_1.0-1_all.deb
+dpkg -i libxml-validator-schema-perl_1.08-1_all.deb
