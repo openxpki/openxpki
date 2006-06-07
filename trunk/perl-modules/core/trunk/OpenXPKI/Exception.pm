@@ -82,6 +82,10 @@ sub full_message
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Exception - central exception class of OpenXPKI.
+
 =head1 Description
 
 This is the basic exception class of OpenXPKI.

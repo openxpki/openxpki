@@ -165,6 +165,10 @@ sub get_role
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::Authentication::External - support for external authentication.
+
 =head1 Description
 
 This is the class which supports OpenXPKI with an authentication method

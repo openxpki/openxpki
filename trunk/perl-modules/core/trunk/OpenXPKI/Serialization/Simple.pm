@@ -270,7 +270,16 @@ sub __read_int
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Serialization::Simple
+
 =head1 Description
+
+Really simple serialization class for scalars, hashes and arrays.
+This is a platform neutral example implementation. It mainly
+demonstrates the interface and can easily be ported to other
+scripting languages.
 
 =head1 Functions
 

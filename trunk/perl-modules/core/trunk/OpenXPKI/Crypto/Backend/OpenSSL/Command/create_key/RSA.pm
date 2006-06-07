@@ -68,6 +68,10 @@ sub get_command
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::RSA
+
 =head1 Description
 
 The module should never be used directly.

@@ -15,23 +15,6 @@ use OpenXPKI::Debug 'OpenXPKI::Server::DBI::SQL';
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;
 
-=head1 Description
-
-This module implements the SQL interface of the database interface.
-It implements basic functions which accept hashes with parameters
-for the SQL operations.
-
-=head1 Functions
-
-=head2 General Functions
-
-=head3 new
-
-this is the constructor. Only an instance of OpenXPKI::Server::DBI::DBH
-is expected in the parameter DBH.
-
-=cut
-
 sub new
 {
     shift;
@@ -43,14 +26,6 @@ sub new
 
 #######################################################################
 
-=head2 Directly Mapped Functions
-
-=head3 get_new_serial
-
-is directly mapped to OpenXPKI::Server::DBI::DBH->get_new_serial
-
-=cut
-
 sub get_new_serial
 {
     my $self = shift;
@@ -58,15 +33,6 @@ sub get_new_serial
 }
 
 #######################################################################
-
-=head2 Functions which implement database initialization
-
-=head3 table_exists
-
-checks if the specified table exists. The parameter for the table name
-is NAME.
-
-=cut
 
 sub table_exists
 {
@@ -90,13 +56,6 @@ sub table_exists
         return 1;
     }
 }
-
-=head3 create_table
-
-creates a table which was specified with the parameter NAME.
-If DRYRUN is the value of MODE then the function returns the SQL commands.
-
-=cut
 
 sub create_table
 {
@@ -161,13 +120,6 @@ sub create_table
     }
 }
 
-=head3 create_index
-
-creates an index which was specified with the parameter NAME.
-If DRYRUN is the value of MODE then the function returns the SQL commands.
-
-=cut
-
 sub create_index
 {
     my $self = shift;
@@ -203,16 +155,6 @@ sub create_index
 }
 
 #######################################################################
-
-=head2 Functions which implement SQL commands
-
-=head3 insert
-
-expects TABLE and DATA. DATA is a hash reference which includes the
-names and values of the used columns of the table. A column is 
-NULL if the column is not present in the hash.
-
-=cut
 
 sub insert
 {
@@ -250,16 +192,6 @@ sub insert
 }
 
 #######################################################################
-
-=head3 update
-
-expects TABLE, WHERE and DATA. DATA is a hash reference which includes the
-names and values of the used columns of the table. A column is 
-NULL if the column is not present in the hash. WHERE is a hash reference
-which includes the parameters for the where clause. All parameters
-are required. General updates are not allowed.
-
-=cut
 
 sub update
 {
@@ -304,41 +236,6 @@ sub update
 }
 
 #######################################################################
-
-=head3 delete
-
-expects TABLE and DATA. DATA is a hash refrence which includes the
-names and values of the used columns of the table. These columns will
-be specified in the where clause of the SQL delete command.
-
-There must be at minimum one column with a value in the hash reference.
-We do not support complete table erasements for security reasons via this
-interface.
-
-If you need other operators for the columns in the data hash than C<=>
-then you can specify an array reference where the first element is
-the operator and the second element is the value. Please note that only
-simple operators are allowed (<, >, <=, >= and =).
-
-Examples:
-
-=over 4
-
-=item * erases CRR 3
-
-$self-<gt>{db}-<gt>delete (TABLE =<gt> "CRR",
-                           DATA  =<gt> {CRR_SERIAL => 3});
-
-=item * erases all CRRs lower than 3
-
-$self-<gt>{db}-<gt>delete (TABLE =<gt> "CRR",
-                           DATA  =<gt> {CRR_SERIAL => ["<", 3]});
-
-=back
-
-BTW CRRs should never be erased!
-
-=cut
 
 sub delete
 {
@@ -398,74 +295,6 @@ sub delete
 }
 
 #######################################################################
-
-=head3 update
-
-not implemented
-
-=cut
-
-#######################################################################
-
-=head3 select
-
-select is the most difficult function. It support the following statical
-parameters:
-
-=over 4
-
-=item * TABLE
-
-is the table which will be searched.
-
-=item * KEY
-
-is the serial of the table. See SERIAL for more informations.
-
-=item * SERIAL
-
-will be mapped to ${TABLE}_SERIAL. Please note that a SERIAL is perhaps
-not a unique index in a table. Certificates with identical serials
-can be present in a table if they were issued by different CAs.
-
-=item * FROM
-
-creates the SQL filter C<${FROM} <lt>= ${TABLE}_SERIAL>.
-
-=item * TO
-
-creates the SQL filter C<${TABLE}_SERIAL <lt> ${FROM}>.
-
-=item * GREATER
-
-creates the SQL filter C<${GREATER} <lt> ${TABLE}_SERIAL>.
-
-=item * LOWER
-
-creates the SQL filter C<${TABLE}_SERIAL <lt> ${FROM}>.
-
-=item * LIMIT
-
-is the number of returned items.
-
-=item * REVERSE
-
-reverse the ordering of the results.
-
-=back
-
-Additionally the function supports all table columns except of the
-data columns because they are perhaps too large. Many database does not
-support searching on high volume columns or columns with a flexible
-length. All dynamic parameters stored in hash which reference is submitted
-via the parameter DYNAMIC.
-
-You can use wildcards inside of text fields like subjects or emailaddresses.
-You have to ensure that C<%> is used as wildcard. This module expects SQL
-ready wildcards. It always binds parameters to queries so that SQL
-injection is impossible.
-
-=cut
 
 sub select
 {
@@ -591,13 +420,163 @@ sub select
 
     return [ @array ];
 }
+1;
+__END__
 
-#######################################################################
+=head1 Name
+
+OpenXPKI::Server::DBI::SQL
+
+=head1 Description
+
+This module implements the SQL interface of the database interface.
+It implements basic functions which accept hashes with parameters
+for the SQL operations.
+
+=head1 Functions
+
+=head2 General Functions
+
+=head3 new
+
+this is the constructor. Only an instance of OpenXPKI::Server::DBI::DBH
+is expected in the parameter DBH.
+
+=head2 Directly Mapped Functions
+
+=head3 get_new_serial
+
+is directly mapped to OpenXPKI::Server::DBI::DBH->get_new_serial
+
+=head2 Functions which implement database initialization
+
+=head3 table_exists
+
+checks if the specified table exists. The parameter for the table name
+is NAME.
+
+=head3 create_table
+
+creates a table which was specified with the parameter NAME.
+If DRYRUN is the value of MODE then the function returns the SQL commands.
+
+=head3 create_index
+
+creates an index which was specified with the parameter NAME.
+If DRYRUN is the value of MODE then the function returns the SQL commands.
+
+=head2 Functions which implement SQL commands
+
+=head3 insert
+
+expects TABLE and DATA. DATA is a hash reference which includes the
+names and values of the used columns of the table. A column is 
+NULL if the column is not present in the hash.
+
+=head3 update
+
+expects TABLE, WHERE and DATA. DATA is a hash reference which includes the
+names and values of the used columns of the table. A column is 
+NULL if the column is not present in the hash. WHERE is a hash reference
+which includes the parameters for the where clause. All parameters
+are required. General updates are not allowed.
+
+=head3 delete
+
+expects TABLE and DATA. DATA is a hash refrence which includes the
+names and values of the used columns of the table. These columns will
+be specified in the where clause of the SQL delete command.
+
+There must be at minimum one column with a value in the hash reference.
+We do not support complete table erasements for security reasons via this
+interface.
+
+If you need other operators for the columns in the data hash than C<=>
+then you can specify an array reference where the first element is
+the operator and the second element is the value. Please note that only
+simple operators are allowed (<, >, <=, >= and =).
+
+Examples:
+
+=over 4
+
+=item * erases CRR 3
+
+$self-<gt>{db}-<gt>delete (TABLE =<gt> "CRR",
+                           DATA  =<gt> {CRR_SERIAL => 3});
+
+=item * erases all CRRs lower than 3
+
+$self-<gt>{db}-<gt>delete (TABLE =<gt> "CRR",
+                           DATA  =<gt> {CRR_SERIAL => ["<", 3]});
+
+=back
+
+BTW CRRs should never be erased!
+
+=head3 update
+
+not implemented
+
+=head3 select
+
+select is the most difficult function. It support the following statical
+parameters:
+
+=over 4
+
+=item * TABLE
+
+is the table which will be searched.
+
+=item * KEY
+
+is the serial of the table. See SERIAL for more informations.
+
+=item * SERIAL
+
+will be mapped to ${TABLE}_SERIAL. Please note that a SERIAL is perhaps
+not a unique index in a table. Certificates with identical serials
+can be present in a table if they were issued by different CAs.
+
+=item * FROM
+
+creates the SQL filter C<${FROM} <lt>= ${TABLE}_SERIAL>.
+
+=item * TO
+
+creates the SQL filter C<${TABLE}_SERIAL <lt> ${FROM}>.
+
+=item * GREATER
+
+creates the SQL filter C<${GREATER} <lt> ${TABLE}_SERIAL>.
+
+=item * LOWER
+
+creates the SQL filter C<${TABLE}_SERIAL <lt> ${FROM}>.
+
+=item * LIMIT
+
+is the number of returned items.
+
+=item * REVERSE
+
+reverse the ordering of the results.
+
+=back
+
+Additionally the function supports all table columns except of the
+data columns because they are perhaps too large. Many database does not
+support searching on high volume columns or columns with a flexible
+length. All dynamic parameters stored in hash which reference is submitted
+via the parameter DYNAMIC.
+
+You can use wildcards inside of text fields like subjects or emailaddresses.
+You have to ensure that C<%> is used as wildcard. This module expects SQL
+ready wildcards. It always binds parameters to queries so that SQL
+injection is impossible.
 
 =head1 See also
 
 OpenXPKI::Server::DBI::DBH and OpenXPKI::Server::DBI::Schema
 
-=cut
-
-1;

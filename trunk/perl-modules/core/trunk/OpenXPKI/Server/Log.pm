@@ -135,6 +135,10 @@ sub log
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::Log - logging implementation for OpenXPKI
+
 =head1 Description
 
 This is the logging layer of OpenXPKI. Mainly we use Log::Log4perl.

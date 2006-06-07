@@ -117,6 +117,10 @@ __END__
 
 =head1 NAME
 
+openxpkiadm - tool for management operations of OpenXPKI instances
+
+=head1 USAGE
+
 openxpkiadm [OPTIONS] COMMAND
 
  Options:
@@ -187,6 +191,4 @@ The openxpkiadm script returns a 0 exit value on success, and >0 if  an
 error occurs.
 
 =back
-
-=cut
 

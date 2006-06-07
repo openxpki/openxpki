@@ -1,4 +1,4 @@
-# OpenXPKI Workflow Activity
+# OpenXPKI::Server::Workflow::Activity::Request::Certificate::DataOnly::Create
 # Written by Martin Bartosch for the OpenXPKI project 2005
 # Copyright (c) 2005 by The OpenXPKI Project
 # $Revision$
@@ -45,6 +45,11 @@ sub execute {
 
 
 1;
+__END__
+
+=head1 Name
+
+OpenXPKI::Server::Workflow::Activity::Request::Certificate::DataOnly::Create
 
 =head1 Description
 

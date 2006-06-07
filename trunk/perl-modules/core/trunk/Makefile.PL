@@ -154,6 +154,10 @@ our \$VERSION = '$openxpki_version';
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::VERSION - version number of OpenXPKI core modules.
+
 =head1 Description
 
 This file is only used to get a clean version number for the

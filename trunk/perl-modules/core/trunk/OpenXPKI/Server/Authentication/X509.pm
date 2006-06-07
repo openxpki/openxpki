@@ -75,6 +75,10 @@ sub get_role
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::Authentication::X509 - certificate based authentication.
+
 =head1 Description
 
 This is the class which supports OpenXPKI with a signature based

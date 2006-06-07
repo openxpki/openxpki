@@ -141,6 +141,10 @@ sub get_converted
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::CRL
+
 =head1 Description
 
 This is the module for managing CRLs. You can use this module to parse

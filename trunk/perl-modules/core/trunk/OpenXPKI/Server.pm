@@ -498,6 +498,10 @@ sub command
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server - central server class (the daemon class).
+
 =head1 Description
 
 This is the main server class of OpenXPKI. If you want to start an

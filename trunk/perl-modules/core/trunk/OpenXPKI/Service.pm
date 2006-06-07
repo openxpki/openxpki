@@ -148,6 +148,10 @@ sub __get_error {
 
 1;
 
+=head1 Name
+
+OpenXPKI::Service - base class for services.
+
 =head1 Description
 
 Base class for service implementations. The protocol definition itself

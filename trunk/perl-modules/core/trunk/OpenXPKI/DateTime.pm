@@ -168,6 +168,10 @@ sub get_validity {
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::DateTime - tools to handle various date and timestamp formats.
+
 =head1 Description
 
 Tools for date/time manipulation.

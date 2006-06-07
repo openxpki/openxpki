@@ -434,6 +434,10 @@ sub DESTROY
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL - OpenSSL cryptographic backend
+
 =head1 Description
 
 This is the basic class to provide OpenXPKI with an OpenSSL based

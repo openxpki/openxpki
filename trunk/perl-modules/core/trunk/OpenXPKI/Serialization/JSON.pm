@@ -53,6 +53,10 @@ sub deserialize
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Serialization::Simple
+
 =head1 Description
 
 Implements JSON Serialization.

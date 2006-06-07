@@ -515,6 +515,11 @@ sub AUTOLOAD {
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Profile::Base - base class for cryptographic profiles
+for certificates and CRLs.
+
 =head1 Description
 
 Base class for profiles used in the CA.

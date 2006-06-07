@@ -37,7 +37,7 @@ binary-indep-stamp: arrange
 
 generate-man-pages:
 	PROGS=`ls bin/*`; for PROG in $$PROGS; do \
-	    if [ -x $$PROG ] && [ $$PROG != "bin/openxpki-configure" ]; then perldoc -d$$PROG.1 $$PROG; fi; \
+	    if [ -x $$PROG ] && [ $$PROG != "bin/openxpki-configure" ]; then pod2man $$PROG $$PROG.1; fi; \
 	done;
 
 build: build-stamp generate-man-pages

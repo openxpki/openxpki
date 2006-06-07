@@ -222,7 +222,11 @@ sub _caller {
 }
 
 1;
+__END__
 
+=head1 Name
+
+OpenXPKI::Server::Workflow::Activity
 
 =head1 Description
 

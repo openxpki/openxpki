@@ -161,7 +161,11 @@ sub __init
 1;
 __END__
 
-=head1 DESCRIPTION
+=head1 Name
+
+OpenXPKI::Crypto::Header
+
+=head1 Description
 
 This module is a parser for all OpenXPKI objects. It parses the complete
 object before the normal modules take over.

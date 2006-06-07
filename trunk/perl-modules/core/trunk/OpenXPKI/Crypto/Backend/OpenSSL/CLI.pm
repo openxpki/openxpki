@@ -219,6 +219,10 @@ sub DESTROY
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::CLI
+
 =head1 Desription
 
 This module implements the handling of the OpenSSL shell. This

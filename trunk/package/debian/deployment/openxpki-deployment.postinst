@@ -45,7 +45,7 @@ case "$1" in
 	cp $TEMPLATES/$CONFIG $DEPLOYMENT
 
 	# configure openxpki.conf
-	openxpki-metaconf --config $DEPLOYMENT/$CONFIG --includesection dir,file,deployment --interactive --force --writecfg $DEPLOYMENT/$CONFIG --destdir $DEPLOYMENT --setcfgvalue dir.prefix=/ --setcfgvalue dir.sysconfdir=$INSTANCE --setcfgvalue dir.openxpkistatedir=/var/openxpki/trustcenter1 --setcfgvalue file.openssl=/usr/local/ssl/bin/openssl --setcfgvalue dir.datarootdir=/usr/share --setcfgvalue dir.templatedir=$TEMPLATES
+	openxpki-metaconf --config $DEPLOYMENT/$CONFIG --includesection dir,file,deployment --force --writecfg $DEPLOYMENT/$CONFIG --destdir $DEPLOYMENT --setcfgvalue dir.prefix=/ --setcfgvalue dir.sysconfdir=$INSTANCE --setcfgvalue dir.openxpkistatedir=/var/openxpki/trustcenter1 --setcfgvalue file.openssl=/usr/local/ssl/bin/openssl --setcfgvalue dir.datarootdir=/usr/share --setcfgvalue dir.templatedir=$TEMPLATES
 
 	# create makefile for deployment
 	openxpki-metaconf --config $DEPLOYMENT/$CONFIG --file $TEMPLATES/default/Makefile >$DEPLOYMENT/Makefile
@@ -55,7 +55,7 @@ case "$1" in
 
 	# configure trustcenter
 	cd $INSTANCE
-	OPENXPKI_SYSCONFDIR=$INSTANCE openxpki-configure
+	OPENXPKI_SYSCONFDIR=$INSTANCE openxpki-configure --batch
 
 	# force permissions
 	#for i in /var/lib/openca/session/cookie/node

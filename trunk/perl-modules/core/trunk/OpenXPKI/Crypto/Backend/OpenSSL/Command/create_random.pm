@@ -78,6 +78,10 @@ sub get_result
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Command::create_random
+
 =head1 Functions
 
 Does this module be up-to-date? Perhaps the engine stuff is a little

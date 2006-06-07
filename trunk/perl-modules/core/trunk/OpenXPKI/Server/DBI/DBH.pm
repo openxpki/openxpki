@@ -393,6 +393,10 @@ sub DESTROY {
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::DBI::DBH
+
 =head1 Description
 
 This module is the only module which uses Perl's DBI.

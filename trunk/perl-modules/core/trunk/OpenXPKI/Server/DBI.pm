@@ -356,6 +356,10 @@ sub __extract_serial_from_params
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::DBI - OpenXPKI database interface
+
 =head1 Design
 
 User ----------------------+

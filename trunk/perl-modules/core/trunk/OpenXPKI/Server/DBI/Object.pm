@@ -20,22 +20,6 @@ use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Crypto::CRR;
 use OpenXPKI::Crypto::CRL;
 
-=head1 Description
-
-The Object module of OpenXPKI::Server::DBI implements the object oriented
-interface of the database.
-
-=head1 General Functions
-
-=head2 new
-
-is the constructor. It needs at minimum HASH with an instance
-of OpenXPKI::Server::DBI::HASH. All
-operations are mapped to hash operations. Please see OpenXPKI::Server::DBI
-for the general design of OpenXPKI's database interface.
-
-=cut
-
 sub new
 {
     shift;
@@ -46,13 +30,6 @@ sub new
     return $self;
 }
 
-=head2 set_crypto
-
-configures the instance of the crypto token to support the
-instantiation of cryptographic objects like certificates.
-
-=cut
-
 sub set_crypto
 {
     my $self = shift;
@@ -60,15 +37,6 @@ sub set_crypto
     return $self->{crypto};
 }
 ########################################################################
-
-=head1 SQL related Functions
-
-=head2 insert
-
-inserts the object which is found in the parameter OBJECT into the table
-which is specififed with TABLE.
-
-=cut
 
 sub insert
 {
@@ -137,13 +105,6 @@ sub insert
 }
 
 ########################################################################
-
-=head2 update
-
-updates the object which is found in the parameter OBJECT into the table
-which is specififed with TABLE.
-
-=cut
 
 sub update
 {
@@ -214,16 +175,6 @@ sub update
 
 ########################################################################
 
-=head2 select
-
-implements an access method to the SQL select operation. Please
-look at OpenXPKI::Server::DBI::SQL to get an overview about the available
-query options.
-
-The function returns a reference to an array of objects or undef on error.
-
-=cut
-
 sub select
 {
     my $self = shift;
@@ -261,12 +212,53 @@ sub select
     return [ @array ];
 }
 
-########################################################################
+1;
+__END__
+
+=head1 Name
+
+OpenXPKI::Server::DBI::Object
+
+=head1 Description
+
+The Object module of OpenXPKI::Server::DBI implements the object oriented
+interface of the database.
+
+=head1 General Functions
+
+=head2 new
+
+is the constructor. It needs at minimum HASH with an instance
+of OpenXPKI::Server::DBI::HASH. All
+operations are mapped to hash operations. Please see OpenXPKI::Server::DBI
+for the general design of OpenXPKI's database interface.
+
+=head2 set_crypto
+
+configures the instance of the crypto token to support the
+instantiation of cryptographic objects like certificates.
+
+=head1 SQL related Functions
+
+=head2 insert
+
+inserts the object which is found in the parameter OBJECT into the table
+which is specififed with TABLE.
+
+=head2 update
+
+updates the object which is found in the parameter OBJECT into the table
+which is specififed with TABLE.
+
+=head2 select
+
+implements an access method to the SQL select operation. Please
+look at OpenXPKI::Server::DBI::SQL to get an overview about the available
+query options.
+
+The function returns a reference to an array of objects or undef on error.
 
 =head1 See also
 
 OpenXPKI::Server::DBI::Hash and OpenXPKI::Server::DBI::Schema
 
-=cut
-
-1;

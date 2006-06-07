@@ -12,21 +12,6 @@ package OpenXPKI::Server::DBI::Driver::MySQL;
 
 use English;
 
-=head1 Description
-
-This is the MySQL driver for OpenXPKI's database interface. It
-implements all MySQL specific stuff.
-
-=head1 Driver specific stuff
-
-BIGINT and NUMERIC are C<numeric (49)>.
-
-MySQL does not support sequence generators. Therefore we use the auto
-increment feature for unique IDs in tables.
-This driver uses InnoDB by default.
-
-=cut
-
 our %TYPE = (
              SERIAL     => "BIGINT NOT NULL AUTO_INCREMENT",
              TEXT       => "TEXT",
@@ -44,15 +29,6 @@ our $TABLE_OPTION = "TYPE=InnoDB";
 
 our $LIMIT = "__QUERY__ LIMIT __MAXITEMS__";
 
-=head1 Functions
-
-=head2 get_dsn
-
-MySQL uses NAME, PORT and HOST. NAME is required. The other
-parameters are optional. mysql_ssl is switched off.
-
-=cut
-
 sub get_dsn
 {
     my $self = shift;
@@ -69,13 +45,6 @@ sub get_dsn
 
     return "dbi:mysql:$dsn";
 }                 
-
-=head2 get_new_serial
-
-MySQL does not support sequence generators. We use the autoincrement feature
-to emulate this. Sequence generators are implemented as tables.
-
-=cut
 
 sub get_new_serial
 {
@@ -112,13 +81,6 @@ sub get_new_serial
     return $serial;
 }
 
-=head2 sequence_exists
-
-We try to detect an already existing squence by selecting the maximum
-inserted serial from the relating table.
-
-=cut
-
 sub sequence_exists
 {
     my $self = shift;
@@ -134,12 +96,6 @@ sub sequence_exists
     return 0 if ($err);
     return 1;
 }
-
-=head2 create_sequence
-
-creates a new table for the sequence emulation.
-
-=cut
 
 sub create_sequence
 {
@@ -158,3 +114,43 @@ sub create_sequence
 }
 
 1;
+__END__
+
+=head1 Name
+
+OpenXPKI::Server::DBI::Driver::MySQL
+
+=head1 Description
+
+This is the MySQL driver for OpenXPKI's database interface. It
+implements all MySQL specific stuff.
+
+=head1 Driver specific stuff
+
+BIGINT and NUMERIC are C<numeric (49)>.
+
+MySQL does not support sequence generators. Therefore we use the auto
+increment feature for unique IDs in tables.
+This driver uses InnoDB by default.
+
+=head1 Functions
+
+=head2 get_dsn
+
+MySQL uses NAME, PORT and HOST. NAME is required. The other
+parameters are optional. mysql_ssl is switched off.
+
+=head2 get_new_serial
+
+MySQL does not support sequence generators. We use the autoincrement feature
+to emulate this. Sequence generators are implemented as tables.
+
+=head2 sequence_exists
+
+We try to detect an already existing squence by selecting the maximum
+inserted serial from the relating table.
+
+=head2 create_sequence
+
+creates a new table for the sequence emulation.
+

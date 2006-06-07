@@ -137,6 +137,10 @@ sub get_result
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key
+
 =head1 Description
 
 This command creates keys. Actually we support EC, DSA and RSA

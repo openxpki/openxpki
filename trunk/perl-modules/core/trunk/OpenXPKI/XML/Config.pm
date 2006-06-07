@@ -354,6 +354,10 @@ sub __get_super_xpath
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::XML::Config - interface to configuration data.
+
 =head1 Description
 
 The config module is a layer directly above the XML cache. The layer has

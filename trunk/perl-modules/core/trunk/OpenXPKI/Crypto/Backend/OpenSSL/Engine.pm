@@ -229,6 +229,10 @@ sub filter_stdout
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Engine
+
 =head1 Description
 
 This class is the base class and the interface of all other engines.

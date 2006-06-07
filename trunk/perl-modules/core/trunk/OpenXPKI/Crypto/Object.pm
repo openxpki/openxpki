@@ -105,6 +105,10 @@ sub set_header_attribute
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Object
+
 =head1 Description
 
 This class is a basic implementation for all cryptographic objects

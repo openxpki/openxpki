@@ -403,6 +403,10 @@ sub __get_workflow_info : PRIVATE {
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::API
+
 =head1 Description
 
 This is the interface which should be used by all user interfaces of OpenXPKI.

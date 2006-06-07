@@ -184,6 +184,10 @@ sub DESTROY
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::XS
+
 =head1 Description
 
 This is the basic XS class to provide OpenXPKI with an OpenSSL based

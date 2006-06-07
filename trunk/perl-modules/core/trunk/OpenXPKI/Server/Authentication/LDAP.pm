@@ -555,6 +555,10 @@ sub get_role
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::Authentication::LDAP - LDAP based authentication.
+
 =head1 Description
 
 This is the class which supports OpenXPKI with an internal passphrase based

@@ -76,6 +76,10 @@ sub get_wrapper
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Engine::nCipher
+
 =head1 Description
 
 This class is the base class and the interface of all other engines.

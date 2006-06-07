@@ -569,6 +569,10 @@ sub AUTOLOAD {
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::API - API for cryptographic backends.
+
 =head1 Description   
     
 this is the basic class for crypto backend API.

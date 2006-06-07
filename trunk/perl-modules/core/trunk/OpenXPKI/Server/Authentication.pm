@@ -254,6 +254,10 @@ sub login
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::Authentication
+
 =head1 Description
 
 This module is the top class of OpenXPKI's authentication

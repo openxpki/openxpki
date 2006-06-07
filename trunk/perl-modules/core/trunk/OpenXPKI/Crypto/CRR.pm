@@ -63,6 +63,10 @@ sub get_serial
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::CRR
+
 =head1 Description
 
 This class is used for the handling of certifcate revocation requests (CRR).

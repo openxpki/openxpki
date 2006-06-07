@@ -127,6 +127,10 @@ sub get_result
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12
+
 =head1 Functions
 
 =head2 get_command

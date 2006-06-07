@@ -293,6 +293,10 @@ sub get_converted
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::CSR
+
 =head1 Description
 
 This is the module for managing CSRs. You can use this module to parse

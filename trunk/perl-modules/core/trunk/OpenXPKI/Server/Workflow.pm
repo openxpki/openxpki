@@ -3,6 +3,10 @@
 # Copyright (c) 2005 by The OpenXPKI Project
 # $Revision$
 
+=head1 Name
+
+OpenXPKI::Workflow::Activity - only documentation, no code
+
 =head1 Description
 
 OpenXPKI uses a flexible Workflow engine that controls all stateful

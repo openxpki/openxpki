@@ -198,3 +198,8 @@ sub get_digest
 
 1;
 __END__
+
+=head1 Name
+
+OpenXPKI::Crypto::Profile::CRL - cryptographic profile for CRLs.
+

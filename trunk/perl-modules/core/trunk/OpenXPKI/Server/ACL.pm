@@ -252,6 +252,11 @@ sub authorize
 
 1;
 __END__
+
+=head1 Name
+
+OpenXPKI::Server::ACL
+
 =head1 Description
 
 The ACL module implements the authorization for the OpenXPKI core system.

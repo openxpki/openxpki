@@ -288,6 +288,10 @@ sub get_converted
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::X509
+
 =head1 Description
 
 This class is used for the handling of X.509v3 certificates. All

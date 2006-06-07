@@ -57,6 +57,11 @@ sub get_role
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::Authentication::Anonymous - anonymous authentication
+implementation.
+
 =head1 Description
 
 This is the class which supports OpenXPKI with an anonymous

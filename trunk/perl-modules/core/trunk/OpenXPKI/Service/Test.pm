@@ -64,6 +64,10 @@ sub get_passwd_login
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Service::Test - only implemented for make test
+
 =head1 Description
 
 This module is only used to test the server. It is a simple dummy

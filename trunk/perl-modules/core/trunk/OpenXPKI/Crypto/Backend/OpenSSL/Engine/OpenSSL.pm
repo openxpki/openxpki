@@ -12,6 +12,10 @@ use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Engine::OpenSSL
+
 =head1 Description
 
 The real implementation is in OpenXPKI::Crypto::Backend::OpenSSL::Engine.

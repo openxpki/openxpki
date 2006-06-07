@@ -321,6 +321,11 @@ foreach my $function (qw (__get_parsed_rfc_2253
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::DN - RFC 2253 compatible dn parsing with support for OpenSSL's
+proprietary formatting rules.
+
 =head1 Description
 
 This module was designed to implement a fast parser for RFC 2253

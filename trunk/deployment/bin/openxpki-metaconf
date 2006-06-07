@@ -693,6 +693,10 @@ __END__
 
 =head1 NAME
 
+openxpki-metaconf - OpenXPKI meta configuration utility
+
+=head1 USAGE
+
 openxpki-metaconf [options]
 
  Options:
@@ -741,7 +745,4 @@ B<openxpki-metaconf> generates a usable OpenXPKI configuration from
 a set of base templates. The parameters that are inserted into the
 configuration are taken from a configuration file and can be modified
 interactively.
-
-
-=cut
 

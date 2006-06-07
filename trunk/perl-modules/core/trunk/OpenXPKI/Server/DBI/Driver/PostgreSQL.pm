@@ -12,17 +12,6 @@ package OpenXPKI::Server::DBI::Driver::PostgreSQL;
 
 use English;
 
-=head1 Description
-
-This is the PostgreSQL driver for OpenXPKI's database interface. It
-implements all PostgreSQL specific stuff.
-
-=head1 Driver specific stuff
-
-BIGINT and NUMERIC are C<numeric (49)>.
-
-=cut
-
 our %TYPE = (
              SERIAL     => "SERIAL",
              TEXT       => "TEXT",
@@ -37,15 +26,6 @@ our $DBI_OPTION = {
                    AutoCommit => 0};
 
 our $LIMIT = "__QUERY__ LIMIT __MAXITEMS__";
-
-=head1 Functions
-
-=head2 get_dsn
-
-PostgreSQL uses NAME, PORT and HOST. NAME is required. The other
-parameters are optional.
-
-=cut
 
 sub get_dsn
 {
@@ -62,12 +42,6 @@ sub get_dsn
 
     return "dbi:Pg:$dsn";
 }                 
-
-=head2 get_new_serial
-
-Normal sequence generator.
-
-=cut
 
 sub get_new_serial
 {
@@ -101,12 +75,6 @@ sub get_new_serial
     return $serial;
 }
 
-=head2 sequence_exists
-
-We try to detect an already existing squence by selecting the next value.
-
-=cut
-
 sub sequence_exists
 {
     my $self = shift;
@@ -122,12 +90,6 @@ sub sequence_exists
     return 0 if ($err);
     return 1;
 }
-
-=head2 create_sequence
-
-creates a new sequence.
-
-=cut
 
 sub create_sequence
 {
@@ -146,3 +108,37 @@ sub create_sequence
 }
 
 1;
+__END__
+
+=head1 Name
+
+OpenXPKI::Server::DBI::Driver::PostgreSQL
+
+=head1 Description
+
+This is the PostgreSQL driver for OpenXPKI's database interface. It
+implements all PostgreSQL specific stuff.
+
+=head1 Driver specific stuff
+
+BIGINT and NUMERIC are C<numeric (49)>.
+
+=head1 Functions
+
+=head2 get_dsn
+
+PostgreSQL uses NAME, PORT and HOST. NAME is required. The other
+parameters are optional.
+
+=head2 get_new_serial
+
+Normal sequence generator.
+
+=head2 sequence_exists
+
+We try to detect an already existing squence by selecting the next value.
+
+=head2 create_sequence
+
+creates a new sequence.
+

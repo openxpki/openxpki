@@ -136,6 +136,10 @@ sub get_pkcs7
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::PKCS7
+
 =head1 Description
 
 This is an abstraction layer to handle PKCS#7 cryptographic

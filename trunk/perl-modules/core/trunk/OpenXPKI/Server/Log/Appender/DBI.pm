@@ -34,6 +34,10 @@ sub create_statement
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::Log::Appender::DBI
+
 =head1 Description
 
 This is a special log appender for Log::Log4perl. It only implements a

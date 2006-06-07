@@ -253,6 +253,10 @@ sub __receive
 
 __END__
 
+=head1 Name
+
+OpenXPKI::Transport::Simple - basic transport protocol.
+
 =head1 Description
 
 This is the interface specification for all common OpenXPKI

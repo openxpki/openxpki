@@ -422,6 +422,10 @@ sub __check_param {
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::DBI::Schema
+
 =head1 Description
 
 The major job of this class is to define and manage the schema

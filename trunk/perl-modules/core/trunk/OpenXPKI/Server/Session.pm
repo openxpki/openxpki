@@ -229,6 +229,10 @@ sub get_id
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::Session
+
 =head1 Description
 
 This module implements the coomplete session mechanism for the

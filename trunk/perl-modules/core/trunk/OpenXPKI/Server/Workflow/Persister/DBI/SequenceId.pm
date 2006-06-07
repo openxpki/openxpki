@@ -1,4 +1,4 @@
-# OpenXPKI Workflow Persister
+# OpenXPKI::Server::Workflow::Persister::DBI::SequenceId
 # Written by Martin Bartosch for the OpenXPKI project 2005
 # Copyright (c) 2005 by The OpenXPKI Project
 # $Revision$
@@ -32,6 +32,11 @@ sub post_fetch_id {
 }
 
 1;
+__END__
+
+=head1 Name
+
+OpenXPKI::Server::Workflow::Persister::DBI::SequenceId
 
 =head1 Description
 

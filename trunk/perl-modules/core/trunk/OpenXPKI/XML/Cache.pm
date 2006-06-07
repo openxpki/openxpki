@@ -453,7 +453,13 @@ sub __get_serialized_xpath
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::XML::Cache - XML cache for configuration data.
+
 =head1 Description
+
+This class caches the complete XML configuration of OpenXPKI.
 
 =head1 XML::Parser and XML::Simple
 

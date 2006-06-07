@@ -20,42 +20,6 @@ use OpenXPKI::Server::DBI::Driver::MySQL;
 use OpenXPKI::Server::DBI::Driver::PostgreSQL;
 use OpenXPKI::Server::DBI::Driver::SQLite;
 
-=head1 SQL assumptions
-
-The most important and difficult stuff is the serial handling of X.509.
-The length of these serials was defined in RFC 3280 4.1.2.2.
-Such serials can have the size of a 20 byte integer. This is larger than
-the most supported integer types. It is an integer called 256^20. We
-have to perform a small aproximation for the decimal length:
-
-256^10 = 256^2)^10
-       = 65535^10
-       = (65535^2)^5
-       = 4294836225^5
-       < 4300000000^5 = (43*10^8)^5
-                      = 43^5*10^40
-                      = 147.008.443*10^40
-                      < 10^9*10^40 = 10^49
-
-Some systems support such large decimal numbers. Other systems have a
-problem with this. Otherwise we need a working ordering at minimum for
-requests. This does not work if we use C<varchar>.
-
-The idea is a small hack. We use BIGINT for real integers and NUMERIC
-for virtual integers. This means that BIGINT must be mapped to an
-integer datatype while NUMERIC can be mapped to a character datatype
-too. If there is a field which is an integer but it must support large
-certificate serials then we use NUMERIC. Otherwise we use BIGINT.
-
-=head1 Variables
-
-The only global variable is COLUMN which includes a mapping
-from SQL columns to abstract types. The module replaces the
-abstract types by the real types of the driver during the
-execution of the constructor function new.
-
-=cut
-
 our %COLUMN = (
     "submit_date"      => "TEXT",
     "format"           => "TEXT",
@@ -129,19 +93,6 @@ our %COLUMN = (
     
     );
 
-=head1 Functions
-
-=head2 new
-
-The constructor expects at minimum three parameters - DBH with an
-instance of OpenXPKI::Server::DBI::DBH and DB_Type with the driver name.
-All other parameters are
-exclusively to initialize the driver instance. Please check
-the specification of the driver function get_dsn for the
-additionally supported parameters.
-
-=cut
-
 sub new
 {
     my $self   = {};
@@ -177,12 +128,6 @@ sub new
     return $self;
 }
 
-=head2 column_is_numeric
-
-returns true if a column is numeric
-
-=cut
-
 sub column_is_numeric
 {
     my $self = shift;
@@ -191,12 +136,6 @@ sub column_is_numeric
     return 1 if ($self->{column}->{$key} =~ /NUMERIC/i);
     return 0;
 }
-
-=head2 column_is_string
-
-returns true if a column is a string
-
-=cut
 
 sub column_is_string
 {
@@ -207,25 +146,12 @@ sub column_is_string
     return 0;
 }
 
-=head2 get_table_option
-
-returns a string with options which can be attached to the SQL
-command which creates a table.
-
-=cut
-
 sub get_table_option
 {
     my $self = shift;
     return "" if (not exists $self->{table_option});
     return $self->{table_option};
 }
-
-=head2 get_column_type
-
-returns the native SQL type of a specific database for the specified column.
-
-=cut
 
 sub get_column_type
 {
@@ -242,14 +168,6 @@ sub get_column_type
     return $self->{column}->{$col};
 }
 
-=head2 get_abstract_column_type
-
-returns the original column type which is not database specific. This is
-useful if you want to detect how you have to handle a special column. Pleasde see
-the description of the driver requirements for more details about datatypes.
-
-=cut
-
 sub get_abstract_column_type
 {
     my $self = shift;
@@ -264,6 +182,81 @@ sub get_abstract_column_type
 
     return $COLUMN{$col};
 }
+
+1;
+__END__
+
+=head1 Name
+
+OpenXPKI::Server::DBI::Driver - base driver class.
+
+=head1 SQL assumptions
+
+The most important and difficult stuff is the serial handling of X.509.
+The length of these serials was defined in RFC 3280 4.1.2.2.
+Such serials can have the size of a 20 byte integer. This is larger than
+the most supported integer types. It is an integer called 256^20. We
+have to perform a small aproximation for the decimal length:
+
+256^10 = 256^2)^10
+       = 65535^10
+       = (65535^2)^5
+       = 4294836225^5
+       < 4300000000^5 = (43*10^8)^5
+                      = 43^5*10^40
+                      = 147.008.443*10^40
+                      < 10^9*10^40 = 10^49
+
+Some systems support such large decimal numbers. Other systems have a
+problem with this. Otherwise we need a working ordering at minimum for
+requests. This does not work if we use C<varchar>.
+
+The idea is a small hack. We use BIGINT for real integers and NUMERIC
+for virtual integers. This means that BIGINT must be mapped to an
+integer datatype while NUMERIC can be mapped to a character datatype
+too. If there is a field which is an integer but it must support large
+certificate serials then we use NUMERIC. Otherwise we use BIGINT.
+
+=head1 Variables
+
+The only global variable is COLUMN which includes a mapping
+from SQL columns to abstract types. The module replaces the
+abstract types by the real types of the driver during the
+execution of the constructor function new.
+
+=head1 Functions
+
+=head2 new
+
+The constructor expects at minimum three parameters - DBH with an
+instance of OpenXPKI::Server::DBI::DBH and DB_Type with the driver name.
+All other parameters are
+exclusively to initialize the driver instance. Please check
+the specification of the driver function get_dsn for the
+additionally supported parameters.
+
+=head2 column_is_numeric
+
+returns true if a column is numeric
+
+=head2 column_is_string
+
+returns true if a column is a string
+
+=head2 get_table_option
+
+returns a string with options which can be attached to the SQL
+command which creates a table.
+
+=head2 get_column_type
+
+returns the native SQL type of a specific database for the specified column.
+
+=head2 get_abstract_column_type
+
+returns the original column type which is not database specific. This is
+useful if you want to detect how you have to handle a special column. Pleasde see
+the description of the driver requirements for more details about datatypes.
 
 =head1 Driver Specification
 
@@ -360,6 +353,3 @@ to execute such critical code by themselves.
 
 OpenXPKI::Server::DBI::DBH, OpenXPKI::Server::DBI::Schema and OpenXPKI::Server::DBI::SQLite
 
-=cut
-
-1;

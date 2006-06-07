@@ -145,6 +145,10 @@ sub get_result
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key
+
 =head1 Description
 
 This command should perform all conversions of keys. This includes

@@ -1,4 +1,4 @@
-# OpenXPKI Workflow Persister
+# OpenXPKI::Server::Workflow::Persister::DBI
 # Written by Martin Bartosch for the OpenXPKI project 2005
 # Copyright (c) 2005 by The OpenXPKI Project
 # $Revision$
@@ -440,6 +440,11 @@ sub init_OpenXPKI_generators {
 
 
 1;
+__END__
+
+=head1 Name
+
+OpenXPKI::Server::Workflow::Persister::DBI
 
 =head1 Description
 

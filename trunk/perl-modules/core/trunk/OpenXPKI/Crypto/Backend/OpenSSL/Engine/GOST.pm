@@ -72,6 +72,10 @@ sub filter_stdout
 
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Engine::GOST - add support for Russion algorithms (GOST standards)
+
 =head1 Description
 
 This class is the base class and the interface of all other engines.

@@ -269,6 +269,10 @@ sub DESTROY {
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::TokenManager
+
 =head1 Description
 
 This modules manages all cryptographic tokens. You can use it to simply

@@ -95,6 +95,10 @@ sub debug
 1 ;
 __END__
 
+=head1 Name
+
+OpenXPKI::Debug - central debugging class of OpenXPKI.
+
 =head1 Description
 
 This is the central debugging module of OpenXPKI. If you write a new

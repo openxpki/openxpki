@@ -1,3 +1,4 @@
+# (C) Copyright 2006 by The OpenXPKI Project
 package OpenXPKI::Service::Default::Command::nop;
 
 use English;
@@ -22,8 +23,11 @@ sub execute {
 }
 
 1;
-
 __END__
+
+=head1 Name
+
+OpenXPKI::Service::Default::Command::nop
 
 =head1 Description
 

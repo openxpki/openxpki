@@ -188,6 +188,10 @@ sub DESTROY
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Command
+
 =head1 Description
 
 This function is the base class for all available OpenSSL commands

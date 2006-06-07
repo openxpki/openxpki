@@ -184,6 +184,10 @@ __END__
 
 =head1 NAME
 
+openxpkictl - start/stop script for OpenXPKI server
+
+=head1 USAGE
+
 openxpkictl [options] COMMAND
 
  Options:
@@ -242,7 +246,6 @@ Examples:
   --debug OpenXPKI::Server:10,OpenXPKI::Crypto::.*:20
   (these two are equivalent)
 
-
 =back
 
 =head1 COMMANDS
@@ -259,7 +262,6 @@ Stops the OpenXPKI daemon.
 
 =back
 
-
 =head1 DESCRIPTION
 
 B<openxpkictl> is the start script for the OpenXPKI server process. 
@@ -275,6 +277,4 @@ The openxpkictl script returns a 0 exit value on success, and >0 if  an
 error occurs.
 
 =back
-
-=cut
 

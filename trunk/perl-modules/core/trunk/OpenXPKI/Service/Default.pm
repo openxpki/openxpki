@@ -489,6 +489,10 @@ sub get_passwd_login
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Service::Default - basic service implementation
+
 =head1 Description
 
 This is the common Service implementation to be used by most interactive

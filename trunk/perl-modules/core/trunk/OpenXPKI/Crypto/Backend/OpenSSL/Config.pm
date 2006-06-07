@@ -589,6 +589,10 @@ sub DESTROY
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Config
+
 =head1 Description
 
 This module was designed to create an OpenSSL configuration on the fly for

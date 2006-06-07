@@ -173,8 +173,11 @@ sub command_response {
 
 
 1;
-
 __END__
+
+=head1 Name
+
+OpenXPKI::Service::Default::Command
 
 =head1 Description
 

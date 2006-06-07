@@ -257,3 +257,8 @@ sub get_subject
 
 1;
 __END__
+
+=head1 Name
+
+OpenXPKI::Crypto::Profile::Certificate - cryptographic profile for certifcates.
+

@@ -127,6 +127,10 @@ sub get_result
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_cert
+
 =head1 Functions
 
 =head2 get_command

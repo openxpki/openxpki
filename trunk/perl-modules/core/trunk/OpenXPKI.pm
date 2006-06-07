@@ -168,6 +168,10 @@ sub get_safe_tmpfile
 
 __END__
 
+=head1 Name
+
+OpenXPKI - base module for all OpenXPKI core modules.
+
 =head1 Exported functions
 
 Exported function are function which can be imported by every other

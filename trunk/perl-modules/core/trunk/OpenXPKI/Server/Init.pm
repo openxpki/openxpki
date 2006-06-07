@@ -740,6 +740,10 @@ sub redirect_stderr
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::Init - daemon initialization
+
 =head1 Description
 
 This class is used to initialize all the objects which are required. The

@@ -206,6 +206,10 @@ sub __log_write_action
 1;
 __END__
 
+=head1 Name
+
+OpenXPKI::Server::DBI::Hash
+
 =head1 Description
 
 The Hash module of OpenXPKI::Server::DBI implements the hash interface

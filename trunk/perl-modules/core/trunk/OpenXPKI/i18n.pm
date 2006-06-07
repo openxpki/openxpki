@@ -118,6 +118,14 @@ sub set_language
     bind_textdomain_codeset("openxpki", "UTF-8");
 }
 
+1;
+
+__END__
+
+=head1 Name
+
+OpenXPKI::i18n - internationalization (i18n) handling class.
+
 =head1 Exported functions
 
 Exported function are function which can be imported by every other
