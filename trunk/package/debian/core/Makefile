@@ -38,4 +38,4 @@ source-clean:
 	rm -f /tmp/openxpki-debian.tar.gz
 
 clean:	source-clean
-	rm -f *.dsc *.dsc.asc *.tar.gz *.deb
+	rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes

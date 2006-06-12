@@ -11,8 +11,10 @@ default:
 	make source-clean
 
 openxpki-archive:
-	cd ${OPENXPKI_SVN}/trunk/; \
-	tar -czf /tmp/openxpki-deployment.tar.gz deployment;
+	cd ${OPENXPKI_SVN}/trunk/clients/perl/OpenXPKI-Client-CLI; \
+	perl Makefile.PL; \
+	make dist; \
+	mv OpenXPKI-Client-CLI-*.tar.gz /tmp
 
 debian-archive:
 	## cd ${OPENXPKI_SVN}/trunk/package/
@@ -20,20 +22,19 @@ debian-archive:
 
 source:
 	cd /tmp; \
-	tar -xzf openxpki-deployment.tar.gz; \
-	cd deployment/; \
+	tar -xzf OpenXPKI-Client-CLI-*.tar.gz; \
+	cd OpenXPKI-Client-CLI-*/; \
 	mkdir debian; \
 	cd debian; \
 	tar -xzf /tmp/openxpki-debian.tar.gz;
 
 package:
-	cd /tmp/deployment/; \
+	cd /tmp/OpenXPKI-Client-CLI-*/; \
 	fakeroot dpkg-buildpackage || echo ignoring error - usually signing ...
-	mv /tmp/openxpki-deployment_* .
+	mv /tmp/libopenxpki-client-cli-perl_* .
 
 source-clean:
-	rm -rf /tmp/deployment
-	rm -f /tmp/openxpki-deployment.tar.gz
+	rm -rf /tmp/OpenXPKI-Client-CLI-*
 	rm -f /tmp/openxpki-debian.tar.gz
 
 clean:	source-clean

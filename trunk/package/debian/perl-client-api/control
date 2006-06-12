@@ -1,0 +1,16 @@
+Source: libopenxpki-client-perl
+Maintainer: Michael Bell <michael.bell@web.de>
+Priority: optional
+Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0)
+
+Package: libopenxpki-client-perl
+Architecture: any
+Recommends:
+Section: perl
+Priority: optional
+Depends: ${perl:Depends}, ${shlibs:Depends}, libopenxpki-perl
+Description: OpenXPKI Perl client API
+ OpenXPKI is an Open Source PKI project.
+ .
+ This package contains a common Perl API to develop Perl
+ based clients for an OpenXPKI server.

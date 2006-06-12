@@ -1,10 +1,15 @@
 Build.PL
 Changes
 MANIFEST
-META.yml # Will be created by "make dist"
 Makefile.PL
 README
+bin/openxpki.cgi
 lib/OpenXPKI/Client/HTML/Mason.pm
+lib/OpenXPKI/Client/HTML/Mason/Javascript.pm
+lib/OpenXPKI/Client/HTML/Mason/Menu.pm
 t/00.load.t
 t/pod-coverage.t
 t/pod.t
+t/05.t
+t/10.t
+t/99.t

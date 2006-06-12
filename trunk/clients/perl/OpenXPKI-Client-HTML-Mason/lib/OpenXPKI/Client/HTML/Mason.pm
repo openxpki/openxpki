@@ -5,8 +5,9 @@ use Class::Std;
 use base qw( OpenXPKI::Client );
 
 use version; 
-our $VERSION = '0.9.$Revision: 244 $';
-$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
+($OpenXPKI::Client::HTML::Mason::VERSION = '$Revision: 244 $' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
+#our $VERSION = '0.9.$Revision: 244 $';
+#$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
 $VERSION = qv($VERSION);
 
 use warnings;

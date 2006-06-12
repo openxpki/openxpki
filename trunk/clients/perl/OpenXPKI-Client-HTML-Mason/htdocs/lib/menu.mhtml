@@ -1,11 +1,64 @@
 <%args>
   $session_id => undef
+  @path       => undef
 </%args>
-<h2><a href="<& /lib/url.mhtml, 
-              path => '/index.html' &>">Main Menu</a></h2>
-<div class="menu_item"><a href="<& /lib/url.mhtml, 
-              path => '/Menu/Query/index.html' &>">Query</a></div>
-<div class="menu_item"><a href="<& /lib/url.mhtml, 
-              path => '/Menu/Request/index.html' &>">Request</a></div>
 <%init>
+  my $CONFIG = {
+                ROLE =>
+                {
+                    'RA Operator' =>
+                    {
+                        MENU => "ra_op_menu"
+                    }
+                },
+                MENU =>
+                {
+                    "ra_op_menu" =>
+                    [
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CERTS", "edit_certs"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT", "logout"]
+                    ],
+                    "edit_certs" =>
+                    [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_VALID_CERTS", "edit_valid_certs"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS", "edit_expired_certs"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS", "edit_revoked_certs"],
+                    ]
+                },
+                ACTION =>
+                {
+                    "edit_valid_certs" =>
+                    {
+                        CMD => "cert_list",
+                        PARAMS =>
+                        {
+                            "STATUS"        => "VALID",
+                            "REVOKE_BUTTON" => "YES",
+                            "RENEW_BUTTON"  => "YES"
+                        }
+                    },
+                    "edit_expired_certs" =>
+                    {
+                        CMD => "cert_list",
+                        PARAMS =>
+                        {
+                            "STATUS"        => "VALID",
+                            "REVOKE_BUTTON" => "YES",
+                            "RENEW_BUTTON"  => "YES"
+                        }
+                    },
+                    "edit_valid_certs" =>
+                    {
+                        CMD => "cert_list",
+                        PARAMS =>
+                        {
+                            "STATUS"        => "VALID",
+                            "REVOKE_BUTTON" => "YES",
+                            "RENEW_BUTTON"  => "YES"
+                        }
+                    },
+                }
+               };
+  my $menu   = Menu->new({CONFIG => $CONFIG},);
 </%init>
+<% print $menu->get(@path) %>
