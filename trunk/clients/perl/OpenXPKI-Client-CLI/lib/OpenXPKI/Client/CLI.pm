@@ -22,7 +22,7 @@ use Getopt::Long;
 use Text::CSV_XS;
 
 # FIXME: remove debugging modules
-use Smart::Comments;
+# use Smart::Comments;
 use Data::Dumper;
 
 use OpenXPKI::i18n qw( i18nGettext );
@@ -35,6 +35,7 @@ my %ARGV_LOCAL : ATTR;
 my $command_map = {
     SUBCMD => {
 	auth => {
+	    DESC => 'Choose authentication stack',
 	    ACTION => {
 		# Choosing the Authentication stack requires a raw service
 		# message
@@ -47,8 +48,10 @@ my $command_map = {
 	}, # auth
 
 	login => {
+	    DESC => 'Perform login using the specified login method',
 	    SUBCMD => {
 		password => {
+		    DESC => 'Password based login',
 		    GETOPT => [ qw( user=s password|pass=s ) ],
 		    MAPOPT => {
 			user => 'LOGIN',
@@ -62,18 +65,21 @@ my $command_map = {
 	}, # login
 
 	logout => {
+	    DESC => 'Logout and quit client',
 	    ACTION => {
 		SERVICE_MSG => 'LOGOUT',
 	    },
 	}, # logout
 
 	nop => {
+	    DESC => 'Dummy server function',
 	    ACTION => {
 		APICALL => 'nop',
 	    },
 	}, # nop
 
 	list => {
+	    DESC => 'List server information',
 	    SUBCMD => {
 		ca => {
 		    SUBCMD => {
@@ -102,6 +108,7 @@ my $command_map = {
 	}, # list
 
 	show => {
+	    DESC => 'Show details on specified item',
 	    SUBCMD => {
 		workflow => {
 		    SUBCMD => {
@@ -121,6 +128,7 @@ my $command_map = {
 	}, # get
 
 	execute => {
+	    DESC => 'Execute specified action on server',
 	    SUBCMD => {
 		workflow => {
 		    GETOPT => [ qw( workflow|wf=s id=i activity|action=s ) ],
@@ -138,6 +146,7 @@ my $command_map = {
 
 
 	create => {
+	    DESC => 'Create a new object on the server',
 	    SUBCMD => {
 		workflow => {
 		    GETOPT => [ qw( workflow|wf=s ) ],
@@ -162,7 +171,7 @@ sub getcommand {
     my $options = shift;
 
     ##! 1: "getcommand ($cmd, $options)"
-    
+
     if (exists $map_ref->{SUBCMD}->{$cmd}) {
 	##! 2: "command exists"
 
@@ -173,13 +182,16 @@ sub getcommand {
 	    my $parameters = {};
 	    ##! 4: Dumper $map_ref->{SUBCMD}->{$cmd}->{GETOPT}
 	    if (exists $map_ref->{SUBCMD}->{$cmd}->{GETOPT}) {
-		$self->getoptions($options, $parameters, @{$map_ref->{SUBCMD}->{$cmd}->{GETOPT}});
+		$self->getoptions($options, 
+				  $parameters, 
+				  @{$map_ref->{SUBCMD}->{$cmd}->{GETOPT}});
 	    }
 	    ##! 4: Dumper $parameters
 
 	    # remap parameters from getopt to serializable
 	    if (exists $map_ref->{SUBCMD}->{$cmd}->{MAPOPT}) {
-		while (my ($getopt_name, $param_name) = each %{$map_ref->{SUBCMD}->{$cmd}->{MAPOPT}}) {
+		while (my ($getopt_name, $param_name) 
+		       = each %{$map_ref->{SUBCMD}->{$cmd}->{MAPOPT}}) {
 		    if (exists $parameters->{$getopt_name}) {
 			$parameters->{$param_name} = $parameters->{$getopt_name};
 			delete $parameters->{$getopt_name};
@@ -404,7 +416,9 @@ sub show_error : PRIVATE {
 
     ##! 1: "show_error ($response)"
     if (exists $response->{ERROR}) {
-	print "SERVER ERROR: " . $response->{ERROR} . "\n";
+	if ($response->{ERROR} ne '0') {
+	    print "SERVER ERROR: " . $response->{ERROR} . "\n";
+	}
     }
     return 1;
 }
@@ -465,271 +479,57 @@ sub show_GET_PASSWD_LOGIN : PRIVATE {
 ###########################################################################
 # CLI command implementations
 
+
 my $data_offset;
 sub cmd_help : PRIVATE {
     my $self  = shift;
     my $ident = ident $self;
     my $args  = shift;
 
-    seek DATA, ($data_offset ||= tell DATA), 0;
-    
+    my $cmd_ptr = $command_map;
+
     my $helptext = "";
-    my $refsection = 0;
-    # FIXME: process this via pod2text
-  DATA:
-    while (my $line = <DATA>) {
-	if ($line =~ m{ \A =head1\ CLI\ COMMAND\ REFERENCE }xms) {
-	    $refsection = 1;
-	    next DATA;
-	}
-	if ($refsection) {
-	    if ($line =~ m{ \A =head1 }xms) {
-		$refsection = 0;
-		last DATA;
-	    }
-	    $helptext .= $line;
+
+  SUBCMD:
+    foreach my $subcmd (split(/\s+/, $args)) {
+	if (exists $cmd_ptr->{SUBCMD}->{$subcmd}) {
+	    $cmd_ptr = $cmd_ptr->{SUBCMD}->{$subcmd};
+	} else {
+	    last SUBCMD;
 	}
     }
+
+    $helptext .= "Available commands:\n";
+    foreach my $cmd (sort keys %{$cmd_ptr->{SUBCMD}}) {
+	my $desc = $cmd_ptr->{SUBCMD}->{$cmd}->{DESC} || '';
+	
+	$helptext .= sprintf("%-20s %s\n", $cmd, $desc);
+    }
+    
+    
+
+#     seek DATA, ($data_offset ||= tell DATA), 0;
+    
+#     my $refsection = 0;
+#     # FIXME: process this via pod2text
+#   DATA:
+#     while (my $line = <DATA>) {
+# 	if ($line =~ m{ \A =head1\ CLI\ COMMAND\ REFERENCE }xms) {
+# 	    $refsection = 1;
+# 	    next DATA;
+# 	}
+# 	if ($refsection) {
+# 	    if ($line =~ m{ \A =head1 }xms) {
+# 		$refsection = 0;
+# 		last DATA;
+# 	    }
+# 	    $helptext .= $line;
+# 	}
+#     }
     return {
-	MESSAGE => $helptext,
+ 	MESSAGE => $helptext,
     };
 }
-
-
-# sub cmd_show : PRIVATE {
-#     my $self  = shift;
-#     my $ident = ident $self;
-#     my $args  = shift;
-#     my @msg = ( 'Usage: show OBJECT', 'Available objects:' );
-#     push @msg, 'session';
-    
-#     my %params;
-#     if (! $self->getoptions($args, \%params, qw(
-#     ))) {
-# 	print "Error during command line processing.\n";
-#     }
-    
-#     my @args = @{$ARGV_LOCAL{$ident}};
-    
-#     if (scalar @args == 0) {
-# 	return {
-# 	    MESSAGE => \@msg,
-# 	},
-#     } else {
-# 	foreach my $arg (@args) {
-# 	    if ($arg eq 'session') {
-# 		return {
-# 		    MESSAGE => $self->get_session_id(),
-# 		};
-# 	    }
-# 	    return {
-# 		MESSAGE => "No such object",
-# 	    };
-# 	}
-#     }
-    
-#     return {
-# 	MESSAGE => 'FIXME',
-#     }
-# }
-
-
-# sub cmd_login : PRIVATE {
-#     my $self  = shift;
-#     my $ident = ident $self;
-#     my $args  = shift;
-
-#     my @usage = (
-# 	'Usage: login [OPTIONS]',
-# 	'Options:',
-# 	'  --user USERNAME',
-# 	'  --pass PASSWORD'
-# 	);
-
-#     my %params;
-#     if (! $self->getoptions($args, \%params, qw(
-#         user:s
-#         pass:s
-#     ))) {
-# 	return {
-# 	    ERROR   => 1,
-# 	    MESSAGE => "Error during command line processing",
-# 	};
-#     }
-
-#     ##! 2: "cmd_login options ok"
-
-#     if (exists $params{user} && exists $params{pass}) {
-# 	return {
-# 	    SERVICE_COMMAND => {
-# 		SERVICE_MSG => 'GET_PASSWD_LOGIN',
-# 		PARAMS => {
-# 		    LOGIN  => $params{user},
-# 		    PASSWD => $params{pass},
-# 		},
-# 	    },
-# 	};
-#     }
-
-#     return {
-# 	MESSAGE => \@usage,
-#     };
-# }
-
-
-
-# sub cmd_get : PRIVATE {
-#     my $self  = shift;
-#     my $ident = ident $self;
-#     my $args  = shift;
-
-#     my %params;
-#     if (! $self->getoptions($args, \%params, qw(
-#         entries=i
-#     ))) {
-# 	print "Error during command line processing.\n";
-#     }
-
-#     if (exists $params{entries}) {
-# 	print "limiting output to $params{entries} entries\n";
-#     }
-
-#     my @args = @{$ARGV_LOCAL{$ident}};
-
-#     if (scalar @args == 0) {
-# 	my @msg = ( 'Usage: get OBJECT', 'Available objects:' );
-# 	push @msg, 'ca certificates';
-# 	return {
-# 	    MESSAGE => \@msg,
-# 	},
-#     } else {
-# 	while (my $arg = shift @args) {
-# 	    if ($arg eq 'ca') {
-# 		my $obj = shift @args;
-# 		if ($obj eq 'certificates') {
-# 		    return $self->subcmd_get_ca_certificates();
-# 		}
-# 		return {
-# 		    MESSAGE => "No such object",
-# 		};
-# 	    }
-# 	    return {
-# 		MESSAGE => "No such object",
-# 	    };
-# 	}
-#     }
-
-#     return {
-# 	MESSAGE => 'FIXME',
-#     }
-# }
-
-
-
-
-
-
-# sub cmd_list : PRIVATE {
-#     my $self  = shift;
-#     my $ident = ident $self;
-#     my $args  = shift;
-
-#     my %params;
-#     if (! $self->getoptions($args, \%params, qw(
-#         entries=i
-#     ))) {
-# 	print "Error during command line processing.\n";
-#     }
-
-#     if (exists $params{entries}) {
-# 	print "limiting output to $params{entries} entries\n";
-#     }
-
-#     my @args = @{$ARGV_LOCAL{$ident}};
-
-#     if (scalar @args == 0) {
-# 	my @msg = ( 'Usage: list OBJECT', 'Available objects:' );
-# 	push @msg, 'workflow instances';
-# 	push @msg, 'workflow titles';
-# 	push @msg, 'ca ids';
-# 	return {
-# 	    MESSAGE => \@msg,
-# 	},
-#     } else {
-# 	while (my $arg = shift @args) {
-# 	    if ($arg eq 'workflow') {
-# 		my $obj = shift @args;
-# 		if ($obj eq 'instances') {
-# 		    return $self->subcmd_list_workflow_instances();
-# 		}
-# 		if ($obj eq 'titles') {
-# 		    return $self->subcmd_list_workflow_titles();
-# 		}
-# 		return {
-# 		    MESSAGE => "No such object",
-# 		};
-# 	    }
-# 	    if ($arg eq 'ca') {
-# 		my $obj = shift @args;
-# 		if ($obj eq 'ids') {
-# 		    return $self->subcmd_list_ca_ids();
-# 		}
-# 		return {
-# 		    MESSAGE => "No such object",
-# 		};
-# 	    }
-# 	    return {
-# 		MESSAGE => "No such object",
-# 	    };
-# 	}
-#     }
-
-#     return {
-# 	MESSAGE => 'FIXME',
-#     }
-# }
-
-
-# # subcommands
-# sub subcmd_list_workflow_instances : PRIVATE {
-#     my $self  = shift;
-#     my $ident = ident $self;
-#     my $args  = shift;
-
-
-#     return $self->get_API()->list_workflow_instances();
-# }
-
-# # subcommands
-# sub subcmd_list_workflow_titles : PRIVATE {
-#     my $self  = shift;
-#     my $ident = ident $self;
-#     my $args  = shift;
-
-
-#     return $self->get_API()->list_workflow_titles();
-# }
-
-# # subcommands
-# sub subcmd_get_ca_certificates : PRIVATE {
-#     my $self  = shift;
-#     my $ident = ident $self;
-#     my $args  = shift;
-
-
-#     return $self->get_API()->get_ca_certificates();
-# }
-
-# # subcommands
-# sub subcmd_list_ca_ids : PRIVATE {
-#     my $self  = shift;
-#     my $ident = ident $self;
-#     my $args  = shift;
-
-#     ### try to get ca ids...
-#     return $self->get_API()->list_ca_ids();
-# }
-
 
 
 1;

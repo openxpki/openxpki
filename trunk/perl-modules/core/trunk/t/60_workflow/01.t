@@ -8,7 +8,7 @@ use Test;
 
 use Workflow::Factory;
 
-BEGIN { plan tests => 37 };
+BEGIN { plan tests => 38 };
 
 print STDERR "OpenXPKI::Server::Workflow - Persistence\n";
 

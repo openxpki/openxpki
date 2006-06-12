@@ -231,7 +231,10 @@ sub __init_shell
     if (not -x $self->{PARAMS}->{SHELL})
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_BINARY_NOT_FOUND");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_BINARY_NOT_FOUND",
+	    params => {
+		SHELL => $self->{PARAMS}->{SHELL},
+	    });
     } else {
         $self->{OPENSSL} = $self->{PARAMS}->{SHELL};
         $self->{SHELL}   = $self->{PARAMS}->{SHELL};

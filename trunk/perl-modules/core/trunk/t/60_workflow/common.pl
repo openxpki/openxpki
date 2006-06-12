@@ -117,9 +117,22 @@ Log::Log4perl->easy_init($ERROR);
 
 
 ### initialize context
-OpenXPKI::Server::Init::init({
-    CONFIG => 't/config.xml',
-});
+ok(OpenXPKI::Server::Init::init(
+       {
+	   CONFIG => 't/config.xml',
+	   TASKS  => [ 'xml_config', 
+		       'i18n', 
+		       'log', 
+#		       'redirect_stderr', 
+		       'crypto_layer', 
+		       'pki_realm', 
+		       'dbi_backend', 
+		       'dbi_workflow', 
+		       'acl',
+		       'api',
+		       'authentication',
+		       ],
+       }));
 
 ### get logging module
 our $log = CTX('log');

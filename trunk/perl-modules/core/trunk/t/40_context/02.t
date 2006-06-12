@@ -16,9 +16,18 @@ print STDERR "OpenXPKI::Server::Context - pki_realm\n";
 ok(1);
 
 ## init Context
-ok(OpenXPKI::Server::Init::init ({
-       CONFIG => 't/config.xml',
-   }));
+ok(OpenXPKI::Server::Init::init(
+       {
+	   CONFIG => 't/config.xml',
+	   TASKS  => [ 'xml_config', 
+		       'i18n', 
+		       'log', 
+		       'redirect_stderr', 
+		       'crypto_layer', 
+		       'pki_realm', 
+		       'dbi_backend', 
+		       'dbi_workflow', ],
+       }));
 
 
 my $realms = CTX('pki_realm');

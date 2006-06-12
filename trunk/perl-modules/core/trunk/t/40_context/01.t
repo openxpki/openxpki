@@ -14,11 +14,21 @@ BEGIN { plan tests => 11 };
 print STDERR "OpenXPKI::Server::Context\n";
 ok(1);
 
-## init XML cache
-ok(OpenXPKI::Server::Init::init({
-       CONFIG => 't/config.xml',
-   }));
 
+## init XML cache
+ok(OpenXPKI::Server::Init::init(
+       {
+	   CONFIG => 't/config.xml',
+	   TASKS  => [ 'xml_config', 
+		       'i18n', 
+		       'log', 
+#		       'redirect_stderr', 
+		       'crypto_layer', 
+		       'pki_realm', 
+		       'dbi_backend', 
+		       'dbi_workflow', ],
+       }));
+   
 my $var;
 
 ### try to get basic (database) object...

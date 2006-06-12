@@ -268,7 +268,9 @@ sub do_process_request
 
     ##! 2: "update pre-initialized variables"
 
-    eval { CTX('dbi_backend')->connect() };
+    eval { 
+	CTX('dbi_backend')->connect() 
+    };
     if ($EVAL_ERROR)
     {
         $transport->write ($serializer->serialize ($EVAL_ERROR->message()));
@@ -280,7 +282,9 @@ sub do_process_request
         
     }
 
-    eval { CTX('dbi_workflow')->connect() };
+    eval { 
+	CTX('dbi_workflow')->connect() 
+    };
     if ($EVAL_ERROR)
     {
         $transport->write ($serializer->serialize ($EVAL_ERROR->message()));

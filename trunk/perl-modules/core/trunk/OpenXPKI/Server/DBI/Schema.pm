@@ -184,7 +184,7 @@ my %TABLE_of = (
         NAME    => "workflow",
         INDEX   => [ "WORKFLOW_SERIAL" ],
         COLUMNS => [ "WORKFLOW_SERIAL",
-#		     "PKI_REALM",
+		     "PKI_REALM",
 		     "WORKFLOW_TYPE",
 		     "WORKFLOW_STATE",
 		     "WORKFLOW_LAST_UPDATE",

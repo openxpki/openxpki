@@ -15,6 +15,7 @@ use Class::Std;
 
 use Data::Dumper;
 
+use Regexp::Common;
 use Params::Validate qw( validate :types );
 
 use OpenXPKI::Debug 'OpenXPKI::Server::API';
@@ -28,12 +29,9 @@ my %workflow_factory : ATTR;
 
 # regex definitions for parameter validation
 my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
-my $re_integer           = qr{ \A -? \d+ \z }xms;
-my $re_positive_integer  = qr{ \A \d+ \z }xms;
 
 my $re_workflow_title    = $re_alpha_string;
 my $re_workflow_activity = $re_alpha_string;
-my $re_workflow_id       = $re_positive_integer;
 
 
 sub BUILD {
@@ -51,6 +49,7 @@ sub BUILD {
 		});
 	},
 	);
+
 }
 
 
@@ -187,14 +186,30 @@ sub list_workflow_instances {
     return [ 123, 456, 789 ];
 }
 
+
 sub list_workflow_titles {
     my $self  = shift;
     my $ident = ident $self;
     my $args  = shift;
 
     ##! 1: "list_workflow_titles"
+    my $factory = $self->__get_workflow_factory();
 
-    return [ 'foo', 'bar', 'baz' ];
+    # FIXME: we are poking into Workflow::Factory's internal data
+    # structures here to get the required information.
+    # There really should be accessor methods for this instead in the
+    # Workflow class.
+    my $result = {};
+    if (ref $factory->{_workflow_config} eq 'HASH') {
+	foreach my $item (keys %{$factory->{_workflow_config}}) {
+	    my $type = $factory->{_workflow_config}->{$item}->{type};
+	    my $desc = $factory->{_workflow_config}->{$item}->{description};
+	    $result->{$type} = {
+		description => $desc,
+	    },
+	}
+    }
+    return $result;
 }
 
 
@@ -210,7 +225,7 @@ sub get_workflow_info {
 	    },
 	    ID => {
 		type => SCALAR,
-		regex => $re_workflow_id,
+		regex => $RE{num}{int},
 	    },
 	});	 
     my $args  = shift;
@@ -239,7 +254,7 @@ sub execute_workflow_activity {
 	    },
 	    ID => {
 		type => SCALAR,
-		regex => $re_workflow_id,
+		regex => $RE{num}{int},
 	    },
 	    ACTIVITY => {
 		type => SCALAR,
@@ -462,4 +477,12 @@ Return structure:
     }
 
   ]
+
+=head2 list_workflow_titles
+
+Returns a hash ref containing all available workflow titles including
+a description.
+
+Return structure:
+
 

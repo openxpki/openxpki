@@ -9,7 +9,7 @@ use Class::Std;
 use OpenXPKI::Debug 'OpenXPKI::Client::API';
 use OpenXPKI::Exception;
 
-use Smart::Comments;
+# use Smart::Comments;
 use Data::Dumper;
 
 my %client : ATTR( :init_arg<CLIENT> );

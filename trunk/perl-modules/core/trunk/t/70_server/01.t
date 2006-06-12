@@ -13,22 +13,34 @@ foreach my $mode ('debug', '')
 {
     print STDERR "Starting server in debug mode ...\n"
         if ($mode eq "debug");
-    my $pid = fork();
-    if ($pid)
-    {
-        my $sleep = 5;
-           $sleep += 10 if ($mode eq 'debug');
-        print STDERR "Waiting $sleep seconds for starting server ...\n";
-        sleep $sleep;
-    } else {
-        my $options  = '';
-           $options .= '--debug' if ($mode eq 'debug');
-        my $ret = `perl t/70_server/startup.pl $options 2>&1 &`;
-        print STDERR $ret."\n" if ($CHILD_ERROR);
-        exit 1;
+
+#     my $pid = fork();
+
+    my @cmd = qw( perl
+                  t/70_server/startup.pl );
+    my $sleep = 5;
+    if ($mode eq 'debug') {
+	push @cmd, '--debug';
+	$sleep += 10;
     }
 
-    ok(1);
+    ok(system(@cmd) == 0);
+    print STDERR "Waiting $sleep seconds for starting server ...\n";
+    sleep($sleep);
+#     if ($pid)
+#     {
+#         my $sleep = 5;
+#            $sleep += 10 if ($mode eq 'debug');
+#         print STDERR "Waiting $sleep seconds for starting server ...\n";
+#         sleep $sleep;
+#     } else {
+#         my $options  = '';
+#            $options .= '--debug' if ($mode eq 'debug');
+#         my $ret = `perl t/70_server/startup.pl $options 2>&1 &`;
+#         print STDERR $ret."\n" if ($CHILD_ERROR);
+#         exit 1;
+#     }
+
     if (not -e 't/pid')
     {
         print STDERR "Waiting 5 additional seconds to support very slow machines ...\n";
@@ -39,7 +51,7 @@ foreach my $mode ('debug', '')
 
     ## should we check here that the server is really running?
 
-    $pid = `cat t/pid`;
+    my $pid = `cat t/pid`;
     ok($pid =~ m{ \d+ }xs);
 
     my $ret = `kill $pid`;

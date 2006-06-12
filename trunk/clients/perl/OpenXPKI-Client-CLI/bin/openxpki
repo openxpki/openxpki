@@ -14,7 +14,7 @@ use Term::ReadLine;
 use File::Spec;
 use Config::Std;
 
-use Smart::Comments;
+# use Smart::Comments;
 use Data::Dumper;
 use OpenXPKI::Debug;
 
@@ -145,7 +145,20 @@ if (scalar @ARGV == 0) {
 	}
 
 	# get current session status
-	$response = $cli->send_receive_service_msg('STATUS');
+	eval {
+	    $response = $cli->send_receive_service_msg('STATUS');
+	};
+	if (my $exc = OpenXPKI::Exception->caught()) {
+	    if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION') {
+		print $OUT "Server terminated connection.\n";
+		last INTERACTION;
+	    }
+	} elsif ($EVAL_ERROR) {
+	    print "error: $EVAL_ERROR\n";
+	    next INTERACTION;
+	}
+
+
 	if (exists $response->{SESSION}->{ROLE}) {
 	    my $user = $response->{SESSION}->{USER} || 'nobody';
 	    my $role = $response->{SESSION}->{ROLE};
@@ -194,46 +207,11 @@ if (scalar @ARGV == 0) {
 	    print $OUT join("\n", @message);
 	    print "\n";
 	} else {
-	    print $OUT "ERROR $cmd_res->{ERROR}: ". join("\n", @message) . "\n";
-	}
-
-	if (exists $cmd_res->{SERVICE_COMMAND} &&
-	    exists $cmd_res->{COMMAND}) {
-	    print $OUT "Internal error: command implementation requested ambiguous message\n";
-	    $exitcode = 1;
-	    last INTERACTION;
-	}
-
-	if (exists $cmd_res->{SERVICE_COMMAND} &&
-	    (ref $cmd_res->{SERVICE_COMMAND} eq 'HASH')) {
-
-	    ### send service message to the server...
-	    eval {
-		$cli->talk($cmd_res->{SERVICE_COMMAND});
-	    };
-	    if (my $exc = OpenXPKI::Exception->caught()) {
-		print $OUT "Error sending service message.\n";
-   	        $exitcode = 1;
-		last INTERACTION;
+	    if ($cmd_res->{ERROR} ne '0') {
+		print $OUT "ERROR $cmd_res->{ERROR}: ". join("\n", @message) . "\n";
 	    }
 	}
 
-	if (exists $cmd_res->{COMMAND} &&
-	    (ref $cmd_res->{COMMAND} eq '') &&
-	    (! exists $cmd_res->{PARAMS} || ($cmd_res->{PARAMS} eq 'HASH'))) {
-
-	    ### send command message to the server...
-	    ### $cmd->res->{COMMAND}
-	    eval {
-		$cli->send_command_msg($cmd_res->{COMMAND},
-				       $cmd_res->{PARAMS});
-	    };
-	    if (my $exc = OpenXPKI::Exception->caught()) {
-		print $OUT "Error sending service message.\n";
-		$exitcode = 1;
-		last INTERACTION;
-	    }
-	}
 
 
 	$term->addhistory($line) if ($line ne "");

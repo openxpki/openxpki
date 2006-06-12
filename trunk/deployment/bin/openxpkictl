@@ -122,21 +122,21 @@ if ($cmd eq 'start') {
 	    # child here
 	    # parent process pid is available with getppid
 	    
-	    # prepare daemonizing myself
-	    # redirect filehandles
-	    open STDOUT, ">/dev/null" or
-		die "unable to write to /dev/null!: $!";
-	    open STDIN, "/dev/null" or
-		die "unable to read from /dev/null!: $!";
+# 	    # prepare daemonizing myself
+# 	    # redirect filehandles
+# 	    open STDOUT, ">/dev/null" or
+# 		die "unable to write to /dev/null!: $!";
+# 	    open STDIN, "/dev/null" or
+# 		die "unable to read from /dev/null!: $!";
 
-	    chdir '/';
+# 	    chdir '/';
 
-            # create new session
-	    POSIX::setsid or
-		die "unable to create new session!: $!";
+#             # create new session
+# 	    POSIX::setsid or
+# 		die "unable to create new session!: $!";
 
-	    open STDERR, '>&STDOUT' or
-		die "unable to attach STDERR to STDOUT!: $!";
+# 	    open STDERR, '>&STDOUT' or
+# 		die "unable to attach STDERR to STDOUT!: $!";
 	    
 	    if (! OpenXPKI::Server->new ("CONFIG" => $configfile)) {
 		print STDERR "Could not start OpenXPKI Server daemon.\n";

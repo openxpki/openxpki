@@ -278,7 +278,7 @@ WriteMakefile(
     'INC'       => "-I. -I$openssl_inc_dir",
     'CCFLAGS'   => '-O2 -g -Wall',
     'PREREQ_PM' => {
-	'Class::Std'             => 1,
+	'Class::Std'             => '0.0.8',
 	'CGI::Session'           => '3.95',
 	'DBI'                    => 1,
 	'Date::Parse'            => 1,
@@ -292,7 +292,7 @@ WriteMakefile(
 	'Log::Log4perl'          => '0.51',
 	'Math::BigInt'           => 1,
 	'Net::LDAP'              => "0.32",
-	'Params::Validate'       => 1,
+	'Params::Validate'       => '0.77',
 	'Test'                   => 1,
 	'Test::Pod'              => "1.00",
 	'Test::Pod::Coverage'    => "1.00",

@@ -36,8 +36,9 @@ my @init_tasks = qw(
   xml_config
   i18n
   log
-  crypto_layer
   redirect_stderr
+  prepare_daemon
+  crypto_layer
   pki_realm
   dbi_backend
   dbi_workflow
@@ -114,14 +115,12 @@ sub init {
 
 	$is_initialized{$task}++;
 
-	if ($is_initialized{'log'}) {
-	    log_wrapper(
-		{
-		    MESSAGE  => "Initialization task '$task' finished",
-		    PRIORITY => "info",
-		    FACILITY => "system",
-		});
-	}
+	log_wrapper(
+	    {
+		MESSAGE  => "Initialization task '$task' finished",
+		PRIORITY => "info",
+		FACILITY => "system",
+	    });
     }
     return 1;
 }
@@ -135,7 +134,7 @@ sub log_wrapper {
 	    %{$arg},
 	    );
     } else {
-	print STDERR $arg->{FACILITY} . '.' . $arg->{PRIORITY} . ': ' . $arg->{MESSAGE};
+	print STDERR $arg->{FACILITY} . '.' . $arg->{PRIORITY} . ': ' . $arg->{MESSAGE} . "\n";
     }
     return 1;
 }
@@ -170,7 +169,7 @@ sub __do_init_xml_config {
 sub __do_init_i18n {
     ### init i18n...
     init_i18n(CONFIG => CTX('xml_config'));
-};
+}
 
 sub __do_init_log {
     ### init log...
@@ -180,7 +179,26 @@ sub __do_init_log {
 	{
 	    log => $log,
 	});
-};
+}
+
+
+sub __do_init_prepare_daemon {
+    # create new session
+    POSIX::setsid or
+	die "unable to create new session!: $!";
+    
+    # prepare daemonizing myself
+    # redirect filehandles
+    open STDOUT, ">/dev/null" or
+	die "unable to write to /dev/null!: $!";
+    open STDIN, "/dev/null" or
+	die "unable to read from /dev/null!: $!";
+    
+    chdir '/';
+    
+#    open STDERR, '>&STDOUT' or
+#	die "unable to attach STDERR to STDOUT!: $!";
+}
 
 sub __do_init_crypto_layer {
     ### init crypto...
@@ -188,12 +206,12 @@ sub __do_init_crypto_layer {
 	{
 	    crypto_layer => get_crypto_layer(),
 	});
-};
+}
 
 sub __do_init_redirect_stderr {
     ### redirect stderr...
     redirect_stderr();
-};
+}
 
 
 sub __do_init_pki_realm {
@@ -204,7 +222,7 @@ sub __do_init_pki_realm {
 	{
 	    pki_realm => $pki_realm,
 	});
-};
+}
 
 sub __do_init_dbi_backend {
     ### init backend dbi...
@@ -217,7 +235,7 @@ sub __do_init_dbi_backend {
 	{
 	    dbi_backend => $dbi,
 	});
-};
+}
 
 sub __do_init_dbi_workflow {
     ### init backend dbi...
@@ -230,7 +248,7 @@ sub __do_init_dbi_workflow {
 	{
 	    dbi_workflow => $dbi,
 	});
-};
+}
 
 sub __do_init_acl {
     ### init acl...
@@ -238,7 +256,7 @@ sub __do_init_acl {
 	{
 	    acl => OpenXPKI::Server::ACL->new(),
 	});
-};
+}
 
 sub __do_init_api {
     ### init api...
@@ -246,7 +264,7 @@ sub __do_init_api {
 	{
 	    api => OpenXPKI::Server::API->new(),
 	});
-};
+}
 
 sub __do_init_authentication {
     ### init authentication...
@@ -259,7 +277,7 @@ sub __do_init_authentication {
 	{
 	    authentication => $obj,
 	});
-};
+}
 
 sub __do_init_server {
     my $keys = shift;
@@ -270,7 +288,7 @@ sub __do_init_server {
 		server => $keys->{SERVER},
 	    });
     }
-};
+}
 
 ###########################################################################
 
@@ -337,7 +355,6 @@ sub get_pki_realms
     ##! 1: "start"
 
     my $config = CTX('xml_config');
-    my $log    = CTX('log');
     my $crypto = CTX('crypto_layer');
 
 
@@ -357,10 +374,12 @@ sub get_pki_realms
 	    );
 
         $realms{$name}->{crypto}->{default} = $defaulttoken;
-	$log->log(
-	    MESSAGE  => "Attached default token for PKI realm '$name'",
-	    PRIORITY => "info",
-	    FACILITY => "system");
+	log_wrapper(
+	    {
+		MESSAGE  => "Attached default token for PKI realm '$name'",
+		PRIORITY => "info",
+		FACILITY => "system",
+	    });
 	
 	my @xpath   = ( 'pki_realm', 'common', 'profiles' );
 	my @counter = ( $i,         0,        0 );
@@ -427,11 +446,12 @@ sub get_pki_realms
 			    'validity' => $validity,
 			};
 
-			$log->log(
-			    MESSAGE  => "Accepted '$entryid' $entrytype $validitytype validity ($format: $validity) for PKI realm '$name'",
-			    PRIORITY => "info",
-			    FACILITY => "system");
-			
+			log_wrapper(
+			    {
+				MESSAGE  => "Accepted '$entryid' $entrytype $validitytype validity ($format: $validity) for PKI realm '$name'",
+				PRIORITY => "info",
+				FACILITY => "system",
+			    });
 			
 		    }
 		}
@@ -497,16 +517,20 @@ sub get_pki_realms
 		# ignore exception for missing 'notbefore' entry
 		if ($exc->message() 
 		    eq "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST") {
-		    $log->log(
-			MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
-			PRIORITY => "warn",
-			FACILITY => "system");
+		    log_wrapper(
+			{
+			    MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
+			    PRIORITY => "warn",
+			    FACILITY => "system",
+			});
 
-		    $log->log(
-			MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
-			PRIORITY => "warn",
-			FACILITY => "monitor");
-		    
+		    log_wrapper(
+			{
+			    MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
+			    PRIORITY => "warn",
+			    FACILITY => "monitor",
+			});
+			
 		    next ISSUINGCA;
 		}
 		else
@@ -519,15 +543,19 @@ sub get_pki_realms
 
 	    
 	    if (! defined $cacertdata) {
-		$log->log(
-		    MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
-		    PRIORITY => "warn",
-		    FACILITY => "system");
+		log_wrapper(
+		    {
+			MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
+			PRIORITY => "warn",
+			FACILITY => "system",
+		    });
 		
-		$log->log(
-		    MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
-		    PRIORITY => "warn",
-		    FACILITY => "monitor");
+		log_wrapper(
+		    {
+			MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
+			PRIORITY => "warn",
+			FACILITY => "monitor",
+		    });
 		
 		next ISSUINGCA;
 	    }
@@ -537,15 +565,19 @@ sub get_pki_realms
 					      DATA  => $cacertdata);
 	    
 	    if (! defined $cacert) {
-		$log->log(
-		    MESSAGE  => "Could not parse issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
-		    PRIORITY => "warn",
-		    FACILITY => "system");
+		log_wrapper(
+		    {
+			MESSAGE  => "Could not parse issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
+			PRIORITY => "warn",
+			FACILITY => "system",
+		    });
 		
-		$log->log(
-		    MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
-		    PRIORITY => "warn",
-		    FACILITY => "monitor");
+		log_wrapper(
+		    {
+			MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
+			PRIORITY => "warn",
+			FACILITY => "monitor",
+		    });
 		
 		next ISSUINGCA;
 	    }
@@ -553,10 +585,12 @@ sub get_pki_realms
 
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{crypto} = $token;
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{cacert} = $cacert;
-	    $log->log(
-		MESSAGE  => "Attached CA token for issuing CA '$ca_id' of PKI realm '$name'",
-		PRIORITY => "info",
-		FACILITY => "system");
+	    log_wrapper(
+		{
+		    MESSAGE  => "Attached CA token for issuing CA '$ca_id' of PKI realm '$name'",
+		    PRIORITY => "info",
+		    FACILITY => "system",
+		});
 	    
 	    # for convenience and quicker accesss
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{notbefore} = 
@@ -566,28 +600,32 @@ sub get_pki_realms
 
 	    $issuing_ca_count++;
 
-	    $log->log(
-		MESSAGE  => "Issuing CA $ca_id of PKI realm '$name' validity is " 
-		. OpenXPKI::DateTime::convert_date(
-		    {
-			DATE => $realms{$name}->{ca}->{id}->{$ca_id}->{notbefore},
-			OUTFORMAT => 'printable',
-		    }) 
-		. ' - '
-		. OpenXPKI::DateTime::convert_date(
-		    {
-			DATE => $realms{$name}->{ca}->{id}->{$ca_id}->{notafter},
-			OUTFORMAT => 'printable',
-		    }
-		),
-		PRIORITY => "info",
-		FACILITY => "system");
+	    log_wrapper(
+		{
+		    MESSAGE  => "Issuing CA $ca_id of PKI realm '$name' validity is " 
+			. OpenXPKI::DateTime::convert_date(
+			{
+			    DATE => $realms{$name}->{ca}->{id}->{$ca_id}->{notbefore},
+			    OUTFORMAT => 'printable',
+			}) 
+			. ' - '
+			. OpenXPKI::DateTime::convert_date(
+			{
+			    DATE => $realms{$name}->{ca}->{id}->{$ca_id}->{notafter},
+			    OUTFORMAT => 'printable',
+			}
+			),
+		    PRIORITY => "info",
+		    FACILITY => "system",
+		});
 	}
 	    
-	$log->log(
-	    MESSAGE  => "Identified $issuing_ca_count issuing CAs for PKI realm '$name'",
-	    PRIORITY => "info",
-	    FACILITY => "system");
+	log_wrapper(
+	    {
+		MESSAGE  => "Identified $issuing_ca_count issuing CAs for PKI realm '$name'",
+		PRIORITY => "info",
+		FACILITY => "system",
+	    });
 
     }
 

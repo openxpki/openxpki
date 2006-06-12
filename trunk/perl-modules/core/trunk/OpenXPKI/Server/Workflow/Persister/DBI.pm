@@ -58,6 +58,7 @@ sub create_workflow {
     my $dbi = CTX('dbi_workflow');
 
     my %data = (
+	PKI_REALM            => CTX('session')->get_pki_realm(),
 	WORKFLOW_TYPE        => $workflow->type(),
 	WORKFLOW_STATE       => $workflow->state(),
 	WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M' ),
@@ -197,7 +198,11 @@ sub fetch_workflow {
 
     my $result = $dbi->get(
 	TABLE => $workflow_table,
-	SERIAL => $id);
+	SERIAL => $id,
+	DYNAMIC => {
+	    PKI_REALM  => CTX('session')->get_pki_realm(),
+	},
+	);
     
     if (! $result ||
 	(! $result->{WORKFLOW_STATE}) ||

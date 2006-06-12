@@ -18,10 +18,10 @@ sub import
 {
     my($self,$module) = @_ ;
 
-    foreach my $key (keys %LEVEL)
-    {
-        print STDERR "Debugging module(s) '$key' with level $LEVEL{$key}.\n";
-    }
+#     foreach my $key (keys %LEVEL)
+#     {
+#         print STDERR "Debugging module(s) '$key' with level $LEVEL{$key}.\n";
+#     }
 
     ## import only be called to specify the different levels
     return if (not defined $module);
@@ -31,8 +31,10 @@ sub import
     {
         foreach my $regex (keys %LEVEL)
         {
-            $LEVEL{$module} = $LEVEL{$regex}
-                if ($module =~ /^$regex$/);
+	    if ($module =~ /^$regex$/) {
+		print STDERR "Debugging module(s) '$module' with level $LEVEL{$regex}.\n";
+		$LEVEL{$module} = $LEVEL{$regex};
+	    }
         }
     }
 

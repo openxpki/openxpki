@@ -3,6 +3,18 @@
 # Copyright (c) 2005 by The OpenXPKI Project
 # $Revision$
 
+package OpenXPKI::Server::Workflow;
+
+use strict;
+use warnings;
+use utf8;
+use English;
+
+
+1;
+__END__
+
+
 =head1 Name
 
 OpenXPKI::Workflow::Activity - only documentation, no code
