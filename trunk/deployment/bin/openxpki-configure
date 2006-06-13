@@ -20,33 +20,6 @@ TEMPLATE="default"
 INTERACTIVE=1
 FORCE=""
 
-usage() {
-    cat <<EOF
-Usage: openxpki-configure [OPTIONS]
-
-Create OpenXPKI configuration files from meta-configuration.
-
-Options:
-   --help         display this help text and exit
-   --batch        non-interactive configuration
-   --force        overwrite existing files
-
-This script generates the OpenXPKI configuration files from a set of
-templates (taken from $TEMPLATEDIR)
-by filling in values specified in the OpenXPKI meta configuration
-$SYSCONFDIR/openxpki.conf.
-
-Please note that this meta configuration is intended for getting
-OpenXPKI up and running quickly. Beyond basic configuration there 
-are many configuration parameters that cannot be set by this approach.
-
-(For a more advanced setup may be advisable to modify the settings in
-OpenXPKI's XML configuration files directly and NOT use openxpki-configure.)
-
-EOF
-
-}
-
 
 reconfigure() {
     # interactively create initial configuration
@@ -82,7 +55,7 @@ echo
 while [ -n "$1" ] ; do
     case "$1" in
 	--help)
-	    usage
+	    pod2man $0 | nroff -man -Tascii
 	    exit 0
 	    ;;
 	--batch)
@@ -131,3 +104,31 @@ esac
 
 write_config $FILES
 
+exit 0
+
+###########################################################################
+
+=head1 NAME
+
+openxpki-configure - Create OpenXPKI config files from meta-configuration.
+
+=head1 USAGE 
+
+openxpki-configure [OPTIONS]
+
+  Options:
+    --help         display this help text and exit
+    --batch        non-interactive configuration
+    --force        overwrite existing files
+
+This script generates the OpenXPKI configuration files from a set of
+templates (taken from $TEMPLATEDIR)
+by filling in values specified in the OpenXPKI meta configuration
+$SYSCONFDIR/openxpki.conf.
+
+Please note that this meta configuration is intended for getting
+OpenXPKI up and running quickly. Beyond basic configuration there 
+are many configuration parameters that cannot be set by this approach.
+
+(For a more advanced setup may be advisable to modify the settings in
+OpenXPKI's XML configuration files directly and NOT use openxpki-configure.)

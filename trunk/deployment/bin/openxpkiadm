@@ -209,6 +209,25 @@ openxpkiadm [OPTIONS] COMMAND
    initdb                Initialize database
 
 
+=head1 ARGUMENTS
+
+Available commands:
+
+=over 8
+
+=item B<deploy> DIR
+
+Creates a new OpenXPKI server installation including the required 
+configuration templates and control scripts to the specified directory.
+
+=item B<initdb>
+
+Initializes the OpenXPKI database schema. Will not destroy existing data
+unless called with --force.
+
+=back
+
+
 =head1 OPTIONS
 
 =over 8
@@ -239,25 +258,7 @@ WARNING: This may destroy existing data!
 
 Prints effects of a command without actually modifying anything.
 
-
 =back
-
-=head1 COMMANDS
-
-=over 8
-
-=item B<deploy> DIR
-
-Creates a new OpenXPKI server installation including the required 
-configuration templates and control scripts to the specified directory.
-
-=item B<initdb>
-
-Initializes the OpenXPKI database schema. Will not destroy existing data
-unless called with --force.
-
-=back
-
 
 =head1 DESCRIPTION
 

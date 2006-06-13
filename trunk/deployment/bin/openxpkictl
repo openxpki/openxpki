@@ -200,6 +200,22 @@ openxpkictl [options] COMMAND
    stop             Stop OpenXPKI daemon
 
 
+=head1 ARGUMENTS
+
+Available commands:
+
+=over 8
+
+=item B<start>
+
+Starts the OpenXPKI daemon.
+
+=item B<stop>
+
+Stops the OpenXPKI daemon.
+
+=back
+
 =head1 OPTIONS
 
 =over 8
@@ -245,20 +261,6 @@ Examples:
   --debug OpenPKI::Server:10 --debug OpenXPKI::Crypto::.*:20
   --debug OpenXPKI::Server:10,OpenXPKI::Crypto::.*:20
   (these two are equivalent)
-
-=back
-
-=head1 COMMANDS
-
-=over 8
-
-=item B<start>
-
-Starts the OpenXPKI daemon.
-
-=item B<stop>
-
-Stops the OpenXPKI daemon.
 
 =back
 
