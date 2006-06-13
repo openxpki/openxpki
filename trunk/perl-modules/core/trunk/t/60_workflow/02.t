@@ -6,8 +6,6 @@ use Test;
 
 # use Smart::Comments;
 
-use Workflow::Factory;
-
 BEGIN { plan tests => 78; };
 
 print STDERR "OpenXPKI::Server::Workflow - Sample workflow instance processing\n";
@@ -18,6 +16,9 @@ print STDERR "OpenXPKI::Server::Workflow\n";
 
 require 't/60_workflow/common.pl';
 
+# workflow requires an initialized Log4perl system and tries to access it
+# in its BEGIN block, hence require it here
+require Workflow::Factory;
 
 my $debug = $ENV{DEBUG};
 ### Debug: $debug

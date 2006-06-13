@@ -6,7 +6,6 @@ use Test;
 
 # use Smart::Comments;
 
-use Workflow::Factory;
 
 BEGIN { plan tests => 38 };
 
@@ -15,6 +14,10 @@ print STDERR "OpenXPKI::Server::Workflow - Persistence\n";
 our $basedir;
 
 require 't/60_workflow/common.pl';
+
+# workflow requires an initialized Log4perl system and tries to access it
+# in its BEGIN block, hence require it here
+require Workflow::Factory;
 
 `cp t/30_dbi/sqlite.db t/30_dbi/sqlite.db._workflow_`;
 ok(not $CHILD_ERROR);

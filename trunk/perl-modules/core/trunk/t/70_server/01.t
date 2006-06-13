@@ -14,8 +14,6 @@ foreach my $mode ('debug', '')
     print STDERR "Starting server in debug mode ...\n"
         if ($mode eq "debug");
 
-#     my $pid = fork();
-
     my @cmd = qw( perl
                   t/70_server/startup.pl );
     my $sleep = 5;
@@ -27,19 +25,6 @@ foreach my $mode ('debug', '')
     ok(system(@cmd) == 0);
     print STDERR "Waiting $sleep seconds for starting server ...\n";
     sleep($sleep);
-#     if ($pid)
-#     {
-#         my $sleep = 5;
-#            $sleep += 10 if ($mode eq 'debug');
-#         print STDERR "Waiting $sleep seconds for starting server ...\n";
-#         sleep $sleep;
-#     } else {
-#         my $options  = '';
-#            $options .= '--debug' if ($mode eq 'debug');
-#         my $ret = `perl t/70_server/startup.pl $options 2>&1 &`;
-#         print STDERR $ret."\n" if ($CHILD_ERROR);
-#         exit 1;
-#     }
 
     if (not -e 't/pid')
     {

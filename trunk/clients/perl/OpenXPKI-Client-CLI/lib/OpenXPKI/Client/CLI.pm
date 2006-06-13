@@ -532,6 +532,16 @@ sub cmd_help : PRIVATE {
 }
 
 
+sub cmd_showsession : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+
+    return {
+	MESSAGE => $self->get_session_id(),
+    }
+}
+
 1;
 
 __DATA__

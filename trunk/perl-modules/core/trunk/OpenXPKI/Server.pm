@@ -53,7 +53,7 @@ sub new
 	{
 	    CONFIG => $self->{CONFIG},
 	    TASKS  => [ 'xml_config', 'i18n', 'log' ],
-	    });
+	});
 
     # from now on we can assume that we have CTX('log') available
 

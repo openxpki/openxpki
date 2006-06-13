@@ -115,19 +115,20 @@ if (my $exc = OpenXPKI::Exception->caught()) {
 }
 $config->{client}->{session} = $cli->get_session_id();
 
+my $exitcode = 0;
+my $OUT = \*STDOUT;
 
 if (scalar @ARGV == 0) {
     print "Entering interactive OpenXPKI shell.\n";
     print "Type 'help' for help, 'quit' to exit.\n\n";
 
     my $term = new Term::ReadLine 'OpenXPKI';
-    my $OUT = $term->OUT || \*STDOUT;
+    $OUT = $term->OUT;
     my $state = '';
 
     # render first server message (as returned by init_session())
     $cli->render($response) if defined $response;
 
-    my $exitcode = 0;
   INTERACTION:
     while (1) {
 	### $cli->get_communication_state()
@@ -154,7 +155,7 @@ if (scalar @ARGV == 0) {
 		last INTERACTION;
 	    }
 	} elsif ($EVAL_ERROR) {
-	    print "error: $EVAL_ERROR\n";
+	    print $OUT "error: $EVAL_ERROR\n";
 	    next INTERACTION;
 	}
 
@@ -183,7 +184,7 @@ if (scalar @ARGV == 0) {
 		last INTERACTION;
 	    }
 	} elsif ($EVAL_ERROR) {
-	    print "error: $EVAL_ERROR\n";
+	    print $OUT "error: $EVAL_ERROR\n";
 	    next INTERACTION;
 	}
 
@@ -205,7 +206,7 @@ if (scalar @ARGV == 0) {
 	if (! defined $cmd_res->{ERROR}) {# ||
 	    #($cmd_res->{ERROR} == 0)) {
 	    print $OUT join("\n", @message);
-	    print "\n";
+	    print $OUT "\n";
 	} else {
 	    if ($cmd_res->{ERROR} ne '0') {
 		print $OUT "ERROR $cmd_res->{ERROR}: ". join("\n", @message) . "\n";
@@ -223,18 +224,44 @@ if (scalar @ARGV == 0) {
     exit $exitcode;
 
 } else {
-    die "Non-interactive use currently under construction. Stopped";
-
-    my $res = $cli->process(join(' ', @ARGV));
-    my $rc = $res->{ERROR};
-    if ($res->{ERROR} == 0) {
-	if (scalar @{$res->{MESSAGE}}) {
-	    print join("\n", @{$res->{MESSAGE}});
+    my $cmd_res;
+    eval {
+	$cmd_res = $cli->process_command(join(' ', @ARGV));
+    };
+    if (my $exc = OpenXPKI::Exception->caught()) {
+	if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION') {
+	    print STDERR "Server terminated connection.\n";
+	    exit 1;
 	}
-    } else {
-	print "ERROR $res->{ERROR}: ". join("\n", @{$res->{MESSAGE}}) . "\n";
+    } elsif ($EVAL_ERROR) {
+	print STDERR "error: $EVAL_ERROR\n";
+	exit 1;
     }
-    exit $rc;
+    
+    $cli->render($cmd_res) if defined $cmd_res;
+    
+    my @message;
+    if (exists $cmd_res->{MESSAGE}) {
+	if (ref $cmd_res->{MESSAGE} eq '') {
+	    push @message, $cmd_res->{MESSAGE};
+	}
+	if (ref $cmd_res->{MESSAGE} eq 'ARRAY') {
+	    @message = @{$cmd_res->{MESSAGE}};
+	}
+    }
+    
+    if (! defined $cmd_res->{ERROR}) {# ||
+	#($cmd_res->{ERROR} == 0)) {
+	print $OUT join("\n", @message);
+	print $OUT "\n";
+    } else {
+	if ($cmd_res->{ERROR} ne '0') {
+	    print STDERR "ERROR $cmd_res->{ERROR}: ". join("\n", @message) . "\n";
+	}
+	$exitcode = 1;
+    }
+
+    exit $exitcode;
 }
 
 __END__

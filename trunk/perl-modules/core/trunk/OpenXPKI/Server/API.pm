@@ -22,16 +22,13 @@ use OpenXPKI::Debug 'OpenXPKI::Server::API';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
-use Workflow::Factory;
 
 my %workflow_factory : ATTR;
 
 
 # regex definitions for parameter validation
 my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
-
-my $re_workflow_title    = $re_alpha_string;
-my $re_workflow_activity = $re_alpha_string;
+my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
 
 
 sub BUILD {
@@ -221,11 +218,11 @@ sub get_workflow_info {
 	{
 	    WORKFLOW => {
 		type => SCALAR,
-		regex => $re_workflow_title,
+		regex => $re_alpha_string,
 	    },
 	    ID => {
 		type => SCALAR,
-		regex => $RE{num}{int},
+		regex => $re_integer_string,
 	    },
 	});	 
     my $args  = shift;
@@ -250,15 +247,15 @@ sub execute_workflow_activity {
 	{
 	    WORKFLOW => {
 		type => SCALAR,
-		regex => $re_workflow_title,
+		regex => $re_alpha_string,
 	    },
 	    ID => {
 		type => SCALAR,
-		regex => $RE{num}{int},
+		regex => $re_integer_string,
 	    },
 	    ACTIVITY => {
 		type => SCALAR,
-		regex => $re_workflow_activity,
+		regex => $re_alpha_string,
 	    },
 	});	 
     my $args  = shift;
@@ -288,7 +285,7 @@ sub create_workflow_instance {
 	{
 	    WORKFLOW => {
 		type => SCALAR,
-		regex => $re_workflow_title,
+		regex => $re_alpha_string,
 	    },
 	});	 
     my $args  = shift;
@@ -337,6 +334,12 @@ sub __get_workflow_factory : PRIVATE {
     ##! 1: "__get_workflow_factory"
 
     return $workflow_factory{$ident} if defined $workflow_factory{$ident};
+
+    # lazy initialization is necessary because the Workflow::Factory
+    # class calls a Log::Log4perl function in its BEGIN block, causing
+    # a warning at runtime if the logging system has not been initialized
+    # before
+    require Workflow::Factory;
 
     $workflow_factory{$ident} = Workflow::Factory->instance();
 
@@ -484,5 +487,10 @@ Returns a hash ref containing all available workflow titles including
 a description.
 
 Return structure:
+{
+  title => description,
+  ...
+}
+
 
 
