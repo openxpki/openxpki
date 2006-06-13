@@ -4,10 +4,8 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'OpenXPKI::Client',
-#    VERSION_FROM        => 'lib/OpenXPKI/Client.pm',
-    VERSION             => '0.0.1',
+    VERSION_FROM        => 'lib/OpenXPKI/Client.pm',
     ABSTRACT_FROM       => 'lib/OpenXPKI/Client.pm',
-    PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
         'Class::Std' => 0,
@@ -18,6 +16,4 @@ WriteMakefile(
         'OpenXPKI::Serialization::JSON' => 0,
         'version'    => 0,
     },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'OpenXPKI-Client-*' },
 );

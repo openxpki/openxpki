@@ -7,8 +7,9 @@ package OpenXPKI::Client;
 use Class::Std;
 
 use version; 
-our $VERSION = '0.9.$Revision$';
-$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
+($OpenXPKI::Client::VERSION = '$Revision$' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
+#our $VERSION = '0.9.$Revision$';
+#$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
 $VERSION = qv($VERSION);
 
 use warnings;

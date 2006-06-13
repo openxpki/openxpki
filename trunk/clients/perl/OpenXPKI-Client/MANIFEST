@@ -5,6 +5,7 @@ Makefile.PL
 README
 LICENSE
 lib/OpenXPKI/Client.pm
+lib/OpenXPKI/Client/API.pm
 t/common.pl
 t/00.pod-coverage.t
 t/00.pod.t
