@@ -293,6 +293,7 @@ WriteMakefile(
 	'Math::BigInt'           => 1,
 	'Net::LDAP'              => "0.32",
 	'Params::Validate'       => '0.77',
+	'Regexp::Common'         => 2,
 	'Test'                   => 1,
 	'Test::Pod'              => "1.00",
 	'Test::Pod::Coverage'    => "1.00",
