@@ -5,55 +5,42 @@
 # $Revision: 80 $
 #
 
+our $VERSION = '0.9.$Revision: 244 $';
+$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
+
 use strict;
 use warnings;
 use English;
 use Getopt::Long;
 use Pod::Usage;
+use File::Spec;
 
-use Log::Log4perl qw( :easy );
-
+use OpenXPKI::Version;
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 
-Log::Log4perl->easy_init($ERROR);
+my $configfile  = '[% dir.sysconfdir %]/config.xml';
+my $templatedir = '[% dir.sysconfdir %]/config.xml';
 
-my $configfile = '[% dir.sysconfdir %]/config.xml';
 
-my %params;
-GetOptions(\%params,
-	   qw(
-	      help|?
-	      man
-	      cfg|cfgfile|conf|config=s
-	      force
-	      dryrun
-	      )) or pod2usage(-verbose => 0);
-
-pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
-pod2usage(-verbose => 1) if ($params{help});
-if (scalar @ARGV != 1) {
-    print STDERR "Usage: openxpkiadm [OPTIONS] COMMAND\n";
-    exit 0;
+# read configuration from deployed OpenXPKI instance
+sub get_config {
+    my $cfgfile = shift;
+    return OpenXPKI::Server::Init::init(
+	{
+	    CONFIG => $cfgfile,
+	    TASKS  => [ 
+		'xml_config', 
+		'i18n', 
+		'log', 
+		],
+	});
 }
 
-if (defined $params{cfg}) {
-    $configfile = $params{cfg};
-}
 
-OpenXPKI::Server::Init::init(
-    {
-	CONFIG => $configfile,
-	TASKS  => [ 
-	    'xml_config', 
-	    'i18n', 
-	    'log', 
-	    ],
-    });
+sub initdb {
+    my $args = shift;
 
-
-my $cmd = shift;
-if ($cmd eq 'initdb') {
 
     my $type = CTX('xml_config')->get_xpath (
 	XPATH    => [ 'common/database/type' ],
@@ -65,7 +52,7 @@ if ($cmd eq 'initdb') {
 
     # SQLite needs special treatment: three databases instead of one must
     # be initialized
-    if ($type eq 'SQLite') {
+    if ($type =~ m{ SQLite }xms) {
 	push @databases, 'workflow', 'backend';
     }
 
@@ -87,16 +74,16 @@ if ($cmd eq 'initdb') {
 	if ($EVAL_ERROR)
 	{
 	    print STDERR "ERROR: Could not connect to '$db' database\n";
-	    exit 1;
+	    return;
 	}
 	
-	if ($params{dryrun}) {
+	if ($args->{DRYRUN}) {
 	    print $dbi->init_schema(MODE => 'DRYRUN') . "\n";
 	    last DB;
 	} else {
-	    if ($params{force}) {
+	    if ($args->{FORCE}) {
 		print STDERR "ERROR: forced creation not yet implemented.\n";
-		exit 1;
+		return;
 	    }
 
 	    eval {
@@ -104,11 +91,98 @@ if ($cmd eq 'initdb') {
 	    };
 	    if ($EVAL_ERROR) {
 		print STDERR "ERROR: init_schema on '$db' failed (${EVAL_ERROR})\n";
-		exit 1;
+		return;
 	    }
 	    print STDERR "Database '$db' initialized.\n";
 	}
     }
+    return 1;
+}
+
+
+sub deploy {
+    my $args = shift;
+
+    my $dir         = $args->{DIR};
+    my $templatedir = $args->{TEMPLATEDIR};
+
+    if (! defined $dir || ($dir eq '')) {
+	print STDERR "No target directory specified.\n";
+	return;
+    }
+
+    if (! (-d $dir && -r $dir && -x $dir && -w $dir)) {
+	print STDERR "Directory $dir does not exist or is not writable.\n";
+	return;
+    }
+
+    print "Deploying new OpenXPKI instance to target directory $dir.\n";
+
+
+    return;
+}
+
+###########################################################################
+
+my %params;
+GetOptions(\%params,
+	   qw(
+	      help|?
+	      man
+	      cfg|cfgfile|conf|config=s
+              version
+	      force
+	      dryrun
+	      )) or pod2usage(-verbose => 0);
+
+if ($params{version}) {
+    my ($vol, $dir, $file) = File::Spec->splitpath($0);
+    print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
+    print "$file Version: $VERSION\n";
+    exit 0;
+}
+
+pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
+pod2usage(-verbose => 1) if ($params{help});
+if (scalar @ARGV < 1) {
+    print STDERR "Usage: openxpkiadm [OPTIONS] COMMAND\n";
+    exit 0;
+}
+
+if (defined $params{cfg}) {
+    $configfile = $params{cfg};
+}
+
+
+###########################################################################
+
+my $cmd = shift;
+
+if ($cmd eq 'initdb') {
+    if (! get_config($configfile)) {
+	print STDERR "Could not obtain OpenXPKI instance configuration\n";
+	exit 1;
+    }
+    if (! initdb(
+	     {
+		 DRYRUN => $params{dryrun},
+		 FORCE => $params{force},
+	     })) {
+	print STDERR "Could not initialize database.\n";
+	exit 1;
+    }
+} elsif ($cmd eq 'deploy') {
+    my $dir = shift;
+    if (! deploy(
+	{
+	    DIR => $dir,
+	})) {
+	print STDERR "Could not deploy OpenXPKI instance.\n";
+	exit 1;
+    }
+} else {
+    print STDERR "Unknown command '$cmd'.\n";
+    exit 1;
 }
 
 exit 0;
@@ -131,6 +205,7 @@ openxpkiadm [OPTIONS] COMMAND
    --dryrun              Don't change anything, just print what would be done
 
  Commands:
+   deploy DIR            Deploy a new OpenXPKI installation to directory DIR
    initdb                Initialize database
 
 
@@ -150,6 +225,10 @@ Prints the manual page and exits.
 
 Read configuration file FILE. Uses built-in default if not specified.
 
+=item B<--version>
+
+Print program version and exit.
+
 =item B<--force>
 
 Force execution of command.
@@ -166,6 +245,11 @@ Prints effects of a command without actually modifying anything.
 =head1 COMMANDS
 
 =over 8
+
+=item B<deploy> DIR
+
+Creates a new OpenXPKI server installation including the required 
+configuration templates and control scripts to the specified directory.
 
 =item B<initdb>
 

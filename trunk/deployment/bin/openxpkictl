@@ -5,6 +5,9 @@
 # $Revision$
 #
 
+our $VERSION = '0.9.$Revision$';
+$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
+
 use strict;
 use warnings;
 use English;
@@ -15,6 +18,7 @@ use Errno;
 
 # use Smart::Comments;
 
+use OpenXPKI::Version;
 use OpenXPKI::Debug;
 
 sub slurp {
@@ -37,8 +41,16 @@ GetOptions(\%params,
 	      help|?
 	      man
 	      cfg|cfgfile|conf|config=s
+              version
               debug=s@
 	      )) or pod2usage(-verbose => 0);
+
+if ($params{version}) {
+    my ($vol, $dir, $file) = File::Spec->splitpath($0);
+    print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
+    print "$file Version: $VERSION\n";
+    exit 0;
+}
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
@@ -122,22 +134,6 @@ if ($cmd eq 'start') {
 	    # child here
 	    # parent process pid is available with getppid
 	    
-# 	    # prepare daemonizing myself
-# 	    # redirect filehandles
-# 	    open STDOUT, ">/dev/null" or
-# 		die "unable to write to /dev/null!: $!";
-# 	    open STDIN, "/dev/null" or
-# 		die "unable to read from /dev/null!: $!";
-
-# 	    chdir '/';
-
-#             # create new session
-# 	    POSIX::setsid or
-# 		die "unable to create new session!: $!";
-
-# 	    open STDERR, '>&STDOUT' or
-# 		die "unable to attach STDERR to STDOUT!: $!";
-	    
 	    if (! OpenXPKI::Server->new ("CONFIG" => $configfile)) {
 		print STDERR "Could not start OpenXPKI Server daemon.\n";
 		exit 1;
@@ -219,6 +215,10 @@ Prints the manual page and exits.
 =item B<--config FILE>
 
 Read configuration file FILE. Uses built-in default if not specified.
+
+=item B<--version>
+
+Print program version and exit.
 
 =item B<--debug MODULE:LEVEL>
 

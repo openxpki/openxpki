@@ -7,6 +7,9 @@
 # $Revision$
 #
 
+our $VERSION = '0.9.$Revision$';
+$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
+
 use warnings;
 use strict;
 use English;
@@ -155,13 +158,12 @@ sub process_template {
 ###########################################################################
 package main;
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-
 use Pod::Usage;
 use Getopt::Long;
 use File::Spec;
 use Config::Std;
+
+use OpenXPKI::Version;
 
 # use Smart::Comments;
 
@@ -397,6 +399,7 @@ GetOptions(\%params,
 	      help|?
 	      man
 	      cfg|cfgfile|conf|config=s
+              version
 	      writecfg=s
               interactive
               includesection=s@
@@ -411,9 +414,17 @@ GetOptions(\%params,
               force
 	      )) or pod2usage(-verbose => 0);
 
+if ($params{version}) {
+    my ($vol, $dir, $file) = File::Spec->splitpath($0);
+    print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
+    print "$file Version: $VERSION\n";
+    exit 0;
+}
+
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help}
 			      ||  (! exists $params{cfg}));
+
 
 my @includedirs;
 if (exists $params{includedir}) {
@@ -702,6 +713,7 @@ openxpki-metaconf [options]
  Options:
    --help              Brief help message
    --man               Full documentation
+   --version           Print program version and exit
    --config FILE       Use configuration from FILE (mandatory)
    --writecfg FILE     Write updated configuration to FILE
    --interactive       Enter interactive configuration mode (default: batch 
