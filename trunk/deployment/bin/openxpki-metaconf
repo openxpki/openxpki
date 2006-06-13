@@ -14,6 +14,12 @@ use warnings;
 use strict;
 use English;
 
+
+# settings determined by autoconf
+my $prefix          = "@prefix@";
+my $exec_prefix     = "@exec_prefix@";
+my $template_prefix = "@template_prefix@";
+
 ###########################################################################
 # OpenXPKI Deployment tools
 # Written by Martin Bartosch for the OpenXPKI project 2006
@@ -708,13 +714,14 @@ openxpki-metaconf - OpenXPKI meta configuration utility
 
 =head1 USAGE
 
-openxpki-metaconf [options]
+openxpki-metaconf [OPTIONS]
 
  Options:
    --help              Brief help message
    --man               Full documentation
    --version           Print program version and exit
    --config FILE       Use configuration from FILE (mandatory)
+   --version           Print version information and exit
    --writecfg FILE     Write updated configuration to FILE
    --interactive       Enter interactive configuration mode (default: batch 
                        mode)
