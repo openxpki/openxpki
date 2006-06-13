@@ -19,9 +19,11 @@ use OpenXPKI::Version;
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 
-my $configfile  = '[% dir.sysconfdir %]/config.xml';
-my $templatedir = '[% dir.sysconfdir %]/config.xml';
+my $prefix          = "@prefix@";
+my $exec_prefix     = "@exec_prefix@";
+my $sysconfdir      = "@sysconfdir@";
 
+my $configfile      = "$sysconfdir/config.xml";
 
 # read configuration from deployed OpenXPKI instance
 sub get_config {
@@ -173,6 +175,10 @@ if ($cmd eq 'initdb') {
     }
 } elsif ($cmd eq 'deploy') {
     my $dir = shift;
+    if (! defined $dir) {
+	$dir = $sysconfdir;
+    }
+
     if (! deploy(
 	{
 	    DIR => $dir,

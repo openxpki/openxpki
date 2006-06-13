@@ -21,6 +21,13 @@ use Errno;
 use OpenXPKI::Version;
 use OpenXPKI::Debug;
 
+my $prefix          = "@prefix@";
+my $exec_prefix     = "@exec_prefix@";
+my $sysconfdir      = "@sysconfdir@";
+
+my $configfile      = "$sysconfdir/config.xml";
+
+
 sub slurp {
     my $filename = shift;
 
@@ -31,9 +38,6 @@ sub slurp {
     };
     return $content;
 }
-
-
-my $configfile = '[% dir.sysconfdir %]/config.xml';
 
 my %params;
 GetOptions(\%params,

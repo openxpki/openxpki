@@ -25,7 +25,7 @@ PROGS =	\
 	openxpkiadm		\
 	openxpkictl
 
-TEMPLATEDIR = etc/template
+TEMPLATEDIR = etc/templates
 
 TEMPLATES = default
 
@@ -36,10 +36,10 @@ TEMPLATES = default
 default:	build-man
 
 build-man:
-	if [ ! -e man ]; then mkdir man; fi
+	mkdir -p man
 	for PROG in $(PROGS); do pod2man bin/$$PROG man/$$PROG.1; done
 
-install:	$(PROGS) install-templates
+install:	install-progs install-templates
 
 install-progs:	$(DEST_BINDIR)
 	for PROG in $(PROGS); do \
@@ -48,11 +48,11 @@ install-progs:	$(DEST_BINDIR)
 	done
 
 install-templates:	$(CONF_DIRS)
-	for TEMPLATE in $(TEMPLATES); do \
-		$(INSTALL) -d -m 755 $(DEST_TEMPLATEDIR)/$$TEMPLATE; \
+	for TEMPLATE in $(TEMPLATES) ; do \
+		$(INSTALL) -d -m 755 $(DEST_TEMPLATEDIR)/$$TEMPLATE || exit 1; \
 		for FILE in `ls $(TEMPLATEDIR)/$$TEMPLATE`; do \
 			$(INSTALL) -m 644 $(TEMPLATEDIR)/$$TEMPLATE/$$FILE $(DEST_TEMPLATEDIR)/$$TEMPLATE; \
-		done; \
+		done ; \
 	done
 
 $(DEST_DIRS) $(CONF_DIRS):
