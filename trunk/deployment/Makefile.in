@@ -48,9 +48,6 @@ install-progs:	$(DEST_BINDIR)
 	done
 
 install-templates:	$(CONF_DIRS)
-	for DIR in $(CONF_DIRS); do \
-		$(INSTALL) -d -m 755 $(DEST_TEMPLATEDIR); \
-	done;
 	for TEMPLATE in $(TEMPLATES); do \
 		$(INSTALL) -d -m 755 $(DEST_TEMPLATEDIR)/$$TEMPLATE; \
 		for FILE in `ls $(TEMPLATEDIR)/$$TEMPLATE`; do \
