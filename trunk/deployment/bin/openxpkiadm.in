@@ -14,16 +14,20 @@ use English;
 use Getopt::Long;
 use Pod::Usage;
 use File::Spec;
+use File::Copy;
 
 use OpenXPKI::Version;
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 
+# settings determined by autoconf
 my $prefix          = "@prefix@";
 my $exec_prefix     = "@exec_prefix@";
+my $template_prefix = "@template_prefix@";
 my $sysconfdir      = "@sysconfdir@";
 
-my $configfile      = "$sysconfdir/config.xml";
+my $openxpkiconfdir = "$sysconfdir/openxpki/";
+my $configfile      = "$openxpkiconfdir/config.xml";
 
 # read configuration from deployed OpenXPKI instance
 sub get_config {
@@ -105,23 +109,58 @@ sub initdb {
 sub deploy {
     my $args = shift;
 
-    my $dir         = $args->{DIR};
-    my $templatedir = $args->{TEMPLATEDIR};
+    my $targetdir       = $args->{TARGETDIR};
+    my $template_prefix = $args->{TEMPLATE_PREFIX};
+    my $template        = $args->{TEMPLATE};
 
-    if (! defined $dir || ($dir eq '')) {
+    if (! defined $targetdir || ($targetdir eq '')) {
 	print STDERR "No target directory specified.\n";
 	return;
     }
 
-    if (! (-d $dir && -r $dir && -x $dir && -w $dir)) {
-	print STDERR "Directory $dir does not exist or is not writable.\n";
+    if (! (-d $targetdir && -r $targetdir && -x $targetdir && -w $targetdir)) {
+	print STDERR "Directory $targetdir does not exist or is not writable.\n";
 	return;
     }
 
-    print "Deploying new OpenXPKI instance to target directory $dir.\n";
+    print "Deploying OpenXPKI configuration file set.\n";
+    print "Source template directory: $template_prefix\n";
+    print "Template set:              $template\n";
+    print "Target directory:          $targetdir\n";
 
+    if ($args->{DRYRUN}) {
+	return 1;
+    }
 
-    return;
+    if (! -d $template_prefix) {
+	print STDERR "ERROR: template directory $template_prefix not found/n";
+	return;
+    }
+
+    if (! -d $template_prefix) {
+	print STDERR "ERROR: template directory $template_prefix not found/n";
+	return;
+    }
+
+    foreach my $file (qw( openxpki.conf )) {
+	my $srcfile = File::Spec->catfile($template_prefix, $template, $file);
+	my $dstfile = File::Spec->catfile($targetdir, $file);
+
+	if (-e $dstfile) {
+	    if (! $args->{FORCE}) {
+		print STDERR "ERROR: $dstfile already exists\n";
+		return;
+	    }
+	    move($dstfile, $dstfile . '.last');
+	}
+	if (! -e $srcfile) {
+	    print STDERR "ERROR: $srcfile not found/n";
+	    return;
+	}
+	print "wrote $dstfile\n";
+	copy($srcfile, $dstfile) or return;
+    }
+    return 1;
 }
 
 ###########################################################################
@@ -135,6 +174,8 @@ GetOptions(\%params,
               version
 	      force
 	      dryrun
+              templatedir=s
+              template=s
 	      )) or pod2usage(-verbose => 0);
 
 if ($params{version}) {
@@ -168,7 +209,7 @@ if ($cmd eq 'initdb') {
     if (! initdb(
 	     {
 		 DRYRUN => $params{dryrun},
-		 FORCE => $params{force},
+		 FORCE  => $params{force},
 	     })) {
 	print STDERR "Could not initialize database.\n";
 	exit 1;
@@ -176,12 +217,20 @@ if ($cmd eq 'initdb') {
 } elsif ($cmd eq 'deploy') {
     my $dir = shift;
     if (! defined $dir) {
-	$dir = $sysconfdir;
+	$dir = $openxpkiconfdir;
     }
-
+    if ($params{templatedir}) {
+	$template_prefix = $params{templatedir};
+    }
+    my $template = $params{template} || 'default';    
+    
     if (! deploy(
 	{
-	    DIR => $dir,
+	    TEMPLATE_PREFIX => $template_prefix,
+	    TEMPLATE    => $template,
+	    TARGETDIR   => $dir,
+	    FORCE       => $params{force},
+	    DRYRUN      => $params{dryrun},
 	})) {
 	print STDERR "Could not deploy OpenXPKI instance.\n";
 	exit 1;
@@ -209,9 +258,11 @@ openxpkiadm [OPTIONS] COMMAND
    --config FILE         use configuration from FILE
    --force               Force operation (may be destructive)
    --dryrun              Don't change anything, just print what would be done
+   --templatedir DIR     Use specified directory as base directory for templates
+   --template TEMPLATE   Use specified template (defaults to 'default')
 
  Commands:
-   deploy DIR            Deploy a new OpenXPKI installation to directory DIR
+   deploy [DIR]          Deploy a new OpenXPKI installation
    initdb                Initialize database
 
 
@@ -221,10 +272,19 @@ Available commands:
 
 =over 8
 
-=item B<deploy> DIR
+=item B<deploy> [DIR]
 
-Creates a new OpenXPKI server installation including the required 
-configuration templates and control scripts to the specified directory.
+Creates a new OpenXPKI server configuration file set in the specified 
+directory (defaults to @sysconfdir@/openxpki if no directory is specified).
+This command will not overwrite existing configuration files unless --force
+is specified.
+
+If the --templatedir argument is given the specified directory is used
+as template base directory.
+
+If --template is specified, its argument is used instead of 'default' for
+the source of the templates used.
+
 
 =item B<initdb>
 

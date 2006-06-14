@@ -7,15 +7,14 @@
 # $Revision$
 #
 
-for DIR in "/usr/local/etc/openxpki", "/etc/openxpki", ".", $OPENXPKI_SYSCONFDIR; do
-	if [ -e "$DIR/openxpki.conf" ]; then
-		SYSCONFDIR=$DIR
-	fi;
-done;
-
-CFG="openxpki-metaconf --config $SYSCONFDIR/openxpki.conf"
-TEMPLATEDIR="$SYSCONFDIR/templates"
+PREFIX="@prefix"
+EXEC_PREFIX="@exec_prefix"
+TEMPLATEDIR="@template_prefix@"
 TEMPLATE="default"
+SYSCONFDIR="@sysconfdir@"
+OPENXPKICONFDIR="$SYSCONFDIR/openxpki"
+
+CFG="openxpki-metaconf --config $OPENXPKICONFDIR/openxpki.conf"
 
 INTERACTIVE=1
 FORCE=""
@@ -23,17 +22,17 @@ FORCE=""
 
 reconfigure() {
     # interactively create initial configuration
-    $CFG --sectionsmenu --interactive --force --writecfg $SYSCONFDIR/openxpki.conf
+    $CFG --sectionsmenu --interactive --force --writecfg $OPENXPKICONFDIR/openxpki.conf
     return $?
 }
 
 write_config() {
     echo
-    echo "Creating configuration files in $SYSCONFDIR"
+    echo "Creating configuration files in $OPENXPKICONFDIR"
     for xmlfile in $* ; do
 	basename=`basename $xmlfile`
 	echo -n "$basename... "
-	$CFG --file $xmlfile $FORCE --dstdir $SYSCONFDIR
+	$CFG --file $xmlfile $FORCE --dstdir $OPENXPKICONFDIR
 	if [ $? = 0 ] ; then
 	    echo "done"
 	else
@@ -67,6 +66,10 @@ while [ -n "$1" ] ; do
 	    FORCE="$1"
 	    shift
 	    ;;
+	--template)
+	    TEMPLATE="$1"
+	    shift
+	    ;;
 	*)
 	    echo "Usage: $0 OPTIONS"
 	    echo "Options:"
@@ -75,6 +78,15 @@ while [ -n "$1" ] ; do
 	    ;;
     esac
 done
+
+
+for DIR in `pwd` "$OPENXPKICONFDIR" /usr/local/etc/openxpki /etc/openxpki ; do
+    if [ -e "$DIR/openxpki.conf" ]; then
+	OPENXPKICONFDIR="$DIR"
+    fi
+done
+
+echo "Configuring in $OPENXPKICONFDIR..."
 
 if [ "$INTERACTIVE" = "1" ] ; then
     if ! reconfigure ; then
@@ -124,7 +136,7 @@ openxpki-configure [OPTIONS]
 This script generates the OpenXPKI configuration files from a set of
 templates (taken from $TEMPLATEDIR)
 by filling in values specified in the OpenXPKI meta configuration
-$SYSCONFDIR/openxpki.conf.
+$OPENXPKICONFDIR/openxpki.conf.
 
 Please note that this meta configuration is intended for getting
 OpenXPKI up and running quickly. Beyond basic configuration there 
