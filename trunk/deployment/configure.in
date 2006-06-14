@@ -26,6 +26,6 @@ AC_SUBST( template_prefix)
 AC_PATH_PROG( POD2MAN, pod2man, pod2man,
 	$PATH:/sbin:/usr/sbin:/usr/local/sbin)
 
-AC_CONFIG_FILES( Makefile bin/openxpki-metaconf bin/openxpkictl bin/openxpkiadm )
+AC_CONFIG_FILES( Makefile bin/openxpki-metaconf bin/openxpkictl bin/openxpkiadm bin/openxpki-configure )
 
 AC_OUTPUT

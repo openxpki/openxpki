@@ -7,14 +7,12 @@
 # $Revision$
 #
 
-PREFIX="@prefix"
-EXEC_PREFIX="@exec_prefix"
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
 TEMPLATEDIR="@template_prefix@"
 TEMPLATE="default"
 SYSCONFDIR="@sysconfdir@"
 OPENXPKICONFDIR="$SYSCONFDIR/openxpki"
-
-CFG="openxpki-metaconf --config $OPENXPKICONFDIR/openxpki.conf"
 
 INTERACTIVE=1
 FORCE=""
@@ -85,6 +83,8 @@ for DIR in `pwd` "$OPENXPKICONFDIR" /usr/local/etc/openxpki /etc/openxpki ; do
 	OPENXPKICONFDIR="$DIR"
     fi
 done
+
+CFG="openxpki-metaconf --config $OPENXPKICONFDIR/openxpki.conf"
 
 echo "Configuring in $OPENXPKICONFDIR..."
 

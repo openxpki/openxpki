@@ -8,14 +8,12 @@ Copyright (c) 2006 by The OpenXPKI Project
 
 Base configuration
 ==================
-(install paths, database etc.)
+(install paths)
 
 > ./configure
 
-This will ask the user for the install path, daemon user and
-database settings. It creates an adapted configuration file
-openxpki.conf and the installation Makefile in the current
-directory.
+The configure script prepares the main operative tools for installation.
+
 
 Installation
 ============
@@ -23,14 +21,14 @@ Installation
 > make install
 
 This installs the required shell scripts (daemon start script
-and config helper), the initial openxpki.conf and the XML
-configuration templates to the configured directories.
+and config helper) and the XML configuration templates to the 
+configured directories.
 
 Configuration
 =============
 
 > cd ...etc/openxpki
-> ./openxpki-configure
+> openxpki-configure
 
 This step will ask the user for PKI details, such as the number
 and names of the PKI realms to configure, CA setup, profile etc.
@@ -38,14 +36,8 @@ It writes the configuration changes to
 ...etc/openxpki/openxpki.conf and creates the XML configuration
 files from the settings that were entered.
 
-
-Database setup
-==============
-
-In order to initialize the database run
-
-openxpkiadm initdb
-
+(It is possible to run the command in batch mode for automated 
+configuration.)
 
 From this on the user can decide how to go from there:
 
@@ -65,15 +57,26 @@ From this on the user can decide how to go from there:
    configuration and modify the XML files directly:
 
    > cd .../etc/openxpki
-   > rm -f openxpki.conf openxpki-configure
+   > rm -f openxpki.conf
    > vi config.xml token.xml ...
-   > openxpkictl restart
 
 
-3) Completely non-interactive batch mode example:
+Database setup
+==============
 
-  rm -f openxpki.conf
-  ./configure  --batch --nocheck -- --setcfg dir.prefix=$HOME/local --setcfg file.openssl=/opt/local/bin/openssl --setcfg deployment.xmlstyle=multi-file --setcfg server.runuser=`id -n -u` --setcfg server.rungroup=`id -n -g`
-  rm -f $HOME/local/etc/openxpki/openxpki.conf
-  make install
-  openxpki-configure --batch
+In order to initialize the database run
+
+> openxpkiadm initdb
+
+
+Running the server
+==================
+
+You can start OpenXPKI by running
+
+> openxpkictl start
+
+To stop the daemon use
+
+> openxpkictl stop
+
