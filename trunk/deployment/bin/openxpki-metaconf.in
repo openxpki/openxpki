@@ -169,7 +169,7 @@ use Getopt::Long;
 use File::Spec;
 use Config::Std;
 
-use OpenXPKI::Version;
+use OpenXPKI::VERSION;
 
 # use Smart::Comments;
 

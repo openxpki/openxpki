@@ -16,7 +16,7 @@ use Pod::Usage;
 use File::Spec;
 use File::Copy;
 
-use OpenXPKI::Version;
+use OpenXPKI::VERSION;
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 

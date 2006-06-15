@@ -10,5 +10,5 @@
 /etc/openxpki/templates/default/workflow_activity.xml
 /etc/openxpki/templates/default/workflow_persister.xml
 /etc/openxpki/templates/default/workflow_request_dataonly.xml
-/etc/openxpki/templates/openxpki.conf
+/etc/openxpki/templates/default/openxpki.conf
 /etc/init.d/openxpkid

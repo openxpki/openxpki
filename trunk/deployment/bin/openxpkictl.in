@@ -18,7 +18,7 @@ use Errno;
 
 # use Smart::Comments;
 
-use OpenXPKI::Version;
+use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
 
 my $prefix          = "@prefix@";

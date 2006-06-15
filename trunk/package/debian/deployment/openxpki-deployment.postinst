@@ -23,39 +23,17 @@ set -e
 #     installation fails and the `postinst' is called with `abort-upgrade',
 #     `abort-remove' or `abort-deconfigure'.
 
-ETC=/etc/openxpki
-TEMPLATES=$ETC/templates
-DEPLOYMENT=$ETC/deployment/trustcenter1
-INSTANCE=$ETC/instances/trustcenter1
-CONFIG=openxpki.conf
-
 case "$1" in
     configure)
 	# check for already configured trustcenter1
-	if [ -e $DEPLOYMENT/$CONFIG ]; then
+	if [ -e /etc/openxpki/instances/trustcenter1/openxpi.conf ]; then
 		echo Detected and respect an old deployment.
-		exit 0;
+	else
+		openxpkiadm deploy /etc/openxpki/instances/trustcenter1;
+		cd /etc/openxpki/instances/trustcenter1;
+		openxpki-configure --batch;
 	fi;
-	if [ -e $INSTANCE/$CONFIG ]; then
-		echo Detected and respect an old instance.
-		exit 0;
-	fi;
 
-	# copy openxpki.conf to deployment area
-	cp $TEMPLATES/$CONFIG $DEPLOYMENT
-
-	# configure openxpki.conf
-	openxpki-metaconf --config $DEPLOYMENT/$CONFIG --includesection dir,file,deployment --force --writecfg $DEPLOYMENT/$CONFIG --destdir $DEPLOYMENT --setcfgvalue dir.prefix=/ --setcfgvalue dir.sysconfdir=$INSTANCE --setcfgvalue dir.openxpkistatedir=/var/openxpki/trustcenter1 --setcfgvalue file.openssl=/usr/local/ssl/bin/openssl --setcfgvalue dir.datarootdir=/usr/share --setcfgvalue dir.templatedir=$TEMPLATES
-
-	# create makefile for deployment
-	openxpki-metaconf --config $DEPLOYMENT/$CONFIG --file $TEMPLATES/default/Makefile >$DEPLOYMENT/Makefile
-
-	# execute deployment
-	cd $DEPLOYMENT && make package-install
-
-	# configure trustcenter
-	cd $INSTANCE
-	OPENXPKI_SYSCONFDIR=$INSTANCE openxpki-configure --batch
 
 	# force permissions
 	#for i in /var/lib/openca/session/cookie/node

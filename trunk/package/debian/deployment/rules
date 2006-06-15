@@ -43,6 +43,7 @@ generate-man-pages:
 build: build-stamp generate-man-pages
 build-stamp: config
 	dh_testdir
+	make
 	touch build-stamp
 
 clean:
@@ -54,15 +55,17 @@ clean:
 config: config-stamp
 config-stamp:
 	dh_testdir
+	autoconf
+	automake --add-missing || echo ignoring automake noise
+	./configure --prefix=/usr --sysconfdir=/etc
 	touch config-stamp
 
 install: install-stamp
 install-stamp: build
 	dh_testdir
 	dh_installdirs
-	dh_install
+	DESTDIR=$(CURDIR)/debian/tmp make install
 	dh_installinit --no-start --init-script=openxpkid
-	dh_installman bin/*.1
 	dh_fixperms -a
 	touch install-stamp
 

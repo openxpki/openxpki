@@ -10,6 +10,7 @@ PACKAGES=	\
 default:	clean
 	make $(PACKAGES)
 	make resultlocal
+	make check
 
 $(PACKAGES):
 	cd $@ && make $(SUBTARGET)
@@ -20,6 +21,8 @@ resultlocal:
 	mv */*.tar.gz .  || echo No source file present.
 	mv */*.deb .     || echo No debian package file present.
 	mv */*.changes . || echo No changes file present.
+
+check:
 	# use -i to see more details
 	lintian *.deb
 
