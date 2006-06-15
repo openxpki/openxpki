@@ -77,7 +77,7 @@ while [ -n "$1" ] ; do
     esac
 done
 
-
+# FIXME: does this order be correct?
 for DIR in `pwd` "$OPENXPKICONFDIR" /usr/local/etc/openxpki /etc/openxpki ; do
     if [ -e "$DIR/openxpki.conf" ]; then
 	OPENXPKICONFDIR="$DIR"
