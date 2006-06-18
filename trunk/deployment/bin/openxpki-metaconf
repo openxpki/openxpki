@@ -15,11 +15,6 @@ use strict;
 use English;
 
 
-# settings determined by autoconf
-my $prefix          = "@prefix@";
-my $exec_prefix     = "@exec_prefix@";
-my $template_prefix = "@template_prefix@";
-
 ###########################################################################
 # OpenXPKI Deployment tools
 # Written by Martin Bartosch for the OpenXPKI project 2006
@@ -627,7 +622,6 @@ foreach my $filename (@{$params{file}}) {
 	    }
 	}
     }
-    
     if (! OpenXPKI::Deployment::process_template(
 	      {
 		  FILENAME => $filename,
@@ -644,11 +638,13 @@ foreach my $filename (@{$params{file}}) {
 	die "Could not process template file $filename. Stopped";
     }
 
-    if ($REAL_USER_ID == 0) {
-	chown $uid, $gid, $outfile;
+    if (defined $outfile) {
+	if ($REAL_USER_ID == 0) {
+	    chown $uid, $gid, $outfile;
+	}
+	
+	chmod $mode, $outfile;
     }
-    
-    chmod $mode, $outfile;
 }
 
 __DATA__

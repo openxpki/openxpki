@@ -1,67 +1,120 @@
-# file: src/scripts/Makefile
 #
-# © 2006 The OpenXPKI Project
+# OpenXPKI Deployment Makefile
+#
+# Written by Martin Bartosch for the OpenXPKI project 2006
+# Copyright (c) 2006 by The OpenXPKI Project
+# $Revision: 318 $
+#
 
-#FIXME what is with DEST_DIR
+BINDIR          = [% dir.bindir %]
+SYSCONFDIR      = [% dir.sysconfdir %]
+OPENXPKICONFDIR = [% dir.openxpkiconfdir %]
+DATADIR         = [% dir.datadir %]
+LOCALEDIR       = [% dir.localedir %]
+INSTALLPREFIX   = [% dir.installprefix %]
+PERLLIB         = [% dir.perllib %]
+TEMPLATEDIR     = [% dir.templatedir %]
+STATEDIR        = [% dir.openxpkistatedir %]
+SESSIONDIR      = [% dir.openxpkisessiondir %]
 
-INSTALL = @INSTALL@
+TEMPLATE        = default
 
-prefix = @prefix@
-exec_prefix = @exec_prefix@
+CFG             = openxpki-metaconf
+INSTALL         = /usr/bin/install
 
-DEST_BINDIR     = $(DESTDIR)@bindir@
-DEST_MANDIR     = $(DESTDIR)@mandir@
-DEST_SYSCONFDIR = $(DESTDIR)@sysconfdir@
-DEST_TEMPLATEDIR = $(DESTDIR)@template_prefix@
+RUNUSER         = [% server.runuser %]
+RUNGROUP        = [% server.rungroup %]
+ADMUSER         = [% server.admuser %]
+ADMGROUP        = [% server.admgroup %]
 
-DEST_DIRS = $(DEST_BINDIR) $(DEST_MANDIR) $(DEST_SYSCONFDIR)
+CONFIGFILE      = etc/templates/$(TEMPLATE)/openxpki.conf
 
-CONF_DIRS = \
-	$(DEST_TEMPLATEDIR)
+###########################################################################
+# no user serviceable parts below this line
 
-PROGS =	\
-	openxpki-configure	\
-	openxpki-metaconf	\
-	openxpkiadm		\
-	openxpkictl
+TOOLS_SRC = \
+	bin/openxpkiadm.in \
+	bin/openxpkictl.in \
+	bin/openxpki-configure.in \
 
-TEMPLATEDIR = etc/templates
+TOOLS_DST = $(patsubst %.in,%,$(TOOLS_SRC))
 
-TEMPLATES = default
+TOOLS =	$(TOOLS_DST) \
+	bin/openxpki-metaconf \
 
-#---- variable settings above, rules below ----
+all: tools
 
-.PHONY:	default install
+install: makedirs installtemplates installbin postinstallhelp
 
-default:	build-man
 
-build-man:
-	mkdir -p man
-	for PROG in $(PROGS); do pod2man bin/$$PROG man/$$PROG.1; done
+tools: $(TOOLS)
 
-install:	install-progs install-templates
-
-install-progs:	$(DEST_BINDIR)
-	for PROG in $(PROGS); do \
-		$(INSTALL) -m 755 bin/$$PROG $(DEST_BINDIR)/$$PROG; \
-		$(INSTALL) -m 644 man/$$PROG.1 $(DEST_MANDIR)/man1/$$PROG.1; \
+$(TOOLS_DST): $(TOOLS_SRC)
+	for file in $(TOOLS_DST) ; do \
+		$(CFG) --config $(CONFIGFILE) --file $$file.in >$$file ;\
 	done
 
-install-templates:	$(CONF_DIRS)
-	for TEMPLATE in $(TEMPLATES) ; do \
-		$(INSTALL) -d -m 755 $(DEST_TEMPLATEDIR)/$$TEMPLATE || exit 1; \
-		for FILE in `ls $(TEMPLATEDIR)/$$TEMPLATE`; do \
-			$(INSTALL) -m 644 $(TEMPLATEDIR)/$$TEMPLATE/$$FILE $(DEST_TEMPLATEDIR)/$$TEMPLATE; \
-		done ; \
+makedirs:
+	@echo Creating state directories
+	$(INSTALL) -o $(ADMUSER) -g $(RUNGROUP) -m 0750 -d $(INSTALLPREFIX)$(OPENXPKICONFDIR)
+	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(BINDIR)
+	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(LOCALEDIR)
+	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0750 -d $(INSTALLPREFIX)$(STATEDIR)
+	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0700 -d $(INSTALLPREFIX)$(SESSIONDIR)
+	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0755 -d $(INSTALLPREFIX)$(TEMPLATEDIR)
+
+
+installbin: tools
+	@echo "Installing binary files to $(INSTALLPREFIX)$(BINDIR)"
+	for file in $(TOOLS) ; do \
+		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 $$file $(INSTALLPREFIX)$(BINDIR)/ ;\
 	done
 
-$(DEST_DIRS) $(CONF_DIRS):
-	$(INSTALL) -d -m 755 $@
+installtemplates:
+	@echo "Installing template files to $(INSTALLPREFIX)$(TEMPLATEDIR)"
+	@( cd etc/templates && for template in * ; do \
+		if [ -d $$template ]; then \
+			$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(TEMPLATEDIR)/$$template || exit 1 ;\
+			for file in $$template/*.xml $$template/*.conf ; do \
+				$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file $(INSTALLPREFIX)$(TEMPLATEDIR)/$$template/`basename $$file` || exit 1 ; \
+			done ; \
+		fi; \
+	done )
 
-clean::
-	$(RM) -f man/*
-	$(RMDIR) -f man
+installetc:
+	@echo "Installing configuration files to $(INSTALLPREFIX)$(OPENXPKICONFDIR)"
+	PATH=$$PATH:bin $(CFG) --config openxpki.conf --delcfgvalue dir.installprefix --writecfg $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
+	chown $(ADMUSER):$(ADMGROUP) $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
+	chmod 640 $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
 
-distclean::
-	$(RM) -f man/*
-	$(RMDIR) -f man
+clean:
+	rm -f Makefile $(TOOLS_DST)
+
+help:
+	@echo "OpenXPKI Deployment Tool"
+	@echo
+	@echo "Usage:"
+	@echo "make              - build OpenXPKI administrative environment"
+	@echo "make install      - install OpenXPKI administrative environment"
+	@echo
+
+postinstallhelp:
+	@echo
+	@echo "Installation complete"
+	@echo
+	@echo "You should now run the deployment tool to create a new OpenXPKI instance"
+	@echo "in the default location $(OPENXPKICONFDIR):"
+	@echo
+	@echo "openxpkiadm deploy"
+	@echo
+
+summary:
+	@echo "Installation summary:"
+	@echo
+	@echo "Readonly file and directory ownership: $(ADMUSER):$(ADMGROUP)"
+	@echo "OpenXPKI daemon runtime user:          $(RUNUSER):$(RUNGROUP)"
+	@echo
+	@echo "Installation directories:"
+	@echo "Bindir:                    $(BINDIR)"
+	@echo "OpenXPKI config directory: $(OPENXPKICONFDIR)"
+	@echo "OpenXPKI templates:        $(TEMPLATEDIR)"

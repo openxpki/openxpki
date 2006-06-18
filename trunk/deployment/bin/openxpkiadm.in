@@ -20,13 +20,13 @@ use OpenXPKI::VERSION;
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 
-# settings determined by autoconf
-my $prefix          = "@prefix@";
-my $exec_prefix     = "@exec_prefix@";
-my $template_prefix = "@template_prefix@";
-my $sysconfdir      = "@sysconfdir@";
+# settings determined by openxpki-metaconf
+my $prefix          = "[% dir.prefix %]";
+my $exec_prefix     = "[% dir.exec_prefix %]";
+my $template_prefix = "[% dir.templatedir %]";
+my $sysconfdir      = "[% dir.sysconfdir %]";
 
-my $openxpkiconfdir = "$sysconfdir/openxpki/";
+my $openxpkiconfdir = "[% dir.openxpkiconfdir %]";
 my $configfile      = "$openxpkiconfdir/config.xml";
 
 # read configuration from deployed OpenXPKI instance

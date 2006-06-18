@@ -5,6 +5,9 @@ Makefile.PL
 README
 lib/OpenXPKI/Client/CLI.pm
 bin/openxpki
-t/00.load.t
-t/pod-coverage.t
-t/pod.t
+t/00.pod-coverage.t
+t/00.pod.t
+t/10.load.t
+t/20.init-openxpki.t
+t/30.client.t
+t/99.cleanup.t

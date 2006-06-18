@@ -63,7 +63,7 @@ xmlstyle: multi-file
 
 [dir]
 # common prefix
-prefix:           /usr/local
+prefix:           /usr
 
 # machine-specific files (libraries etc)
 exec_prefix:      $(dir.prefix)
@@ -79,8 +79,9 @@ datarootdir:      $(dir.prefix)/share
 datadir:          $(dir.datarootdir)/openxpki
 
 # read-only configuration files
-sysconfdir:       $(dir.prefix)/etc/openxpki
-cadir:            $(dir.sysconfdir)/ca
+sysconfdir:       $(dir.prefix)/etc
+openxpkiconfdir:  $(dir.sysconfdir)/openxpki
+cadir:            $(dir.openxpkiconfdir)/ca
 
 # data files modified by the application
 localstatedir:    $(dir.prefix)/var
@@ -97,7 +98,7 @@ tmpdir:           $(dir.localstatedir)/tmp
 perllib:
 
 # templates
-templatedir:      etc/templates
+templatedir:      $(dir.datadir)/templates
 
 ###########################################################################
 # Common files
@@ -120,8 +121,8 @@ admuser:         root
 admgroup:        root
 
 # configuration files
-config:          $(dir.sysconfdir)/openxpki.xml
-logconfig:       $(dir.sysconfdir)/log.conf
+config:          $(dir.openxpkiconfdir)/openxpki.xml
+logconfig:       $(dir.openxpkiconfdir)/log.conf
 
 # data files
 #pidfile:         $(dir.localstatedir)/run/openxpki.pid

@@ -21,12 +21,14 @@ use Errno;
 use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
 
-my $prefix          = "@prefix@";
-my $exec_prefix     = "@exec_prefix@";
-my $sysconfdir      = "@sysconfdir@";
+# settings determined by openxpki-metaconf
+my $prefix          = "[% dir.prefix %]";
+my $exec_prefix     = "[% dir.exec_prefix %]";
+my $template_prefix = "[% dir.templatedir %]";
+my $sysconfdir      = "[% dir.sysconfdir %]";
 
-my $configfile      = "$sysconfdir/config.xml";
-
+my $openxpkiconfdir = "[% dir.openxpkiconfdir %]";
+my $configfile      = "$openxpkiconfdir/config.xml";
 
 sub slurp {
     my $filename = shift;

@@ -1,10 +1,11 @@
 
+my $base = 't/srv';
 our %config = (
-    deployment_dir     => '../../../deployment/',
-    target_dir         => 't/tmp/',
-    tmp_dir            => 't/tmp/tmp',
-    server_dir         => 't/tmp/srv',
-    socket_file        => 't/tmp/srv/socket',
+    server_dir         => $base,
+    config_dir         => "$base/etc/openxpki",
+    var_dir            => "$base/var/openxpki",
+    config_file        => "$base/etc/openxpki/config.xml",
+    socket_file        => "/var/tmp/openxpki-client-test.socket",
     debug              => 1,
     );
 
