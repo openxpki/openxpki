@@ -75,7 +75,8 @@ sub new
  	    FACILITY => "system",
  	    );
  	# die gracefully
-	exit 1;
+ 	$ERRNO = 1;
+        die $msg;
     }
 
     ## group access is allowed
@@ -94,7 +95,8 @@ sub new
  	    FACILITY => "system",
  	    );
  	# die gracefully
-	exit 1;
+ 	$ERRNO = 1;
+        die $msg;
     }
 
     ## start the server
@@ -111,7 +113,8 @@ sub new
  	    FACILITY => "system",
  	    );
  	# die gracefully
-	exit 1;
+ 	$ERRNO = 1;
+        die $msg;
     }
 
     unlink ($params{port});
@@ -165,7 +168,8 @@ sub process_request {
  	    FACILITY => "system",
  	    );
  	# die gracefully
-	exit 1;
+ 	$ERRNO = 1;
+        die $msg;
     }
 
     return $rc;
