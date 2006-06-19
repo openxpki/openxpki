@@ -1,15 +1,9 @@
-use Test::More tests => 1;
+use Test::More tests => 3;
 
 BEGIN {
+    use_ok( 'OpenXPKI::Client::HTML::Mason::Javascript' );
+    use_ok( 'OpenXPKI::Client::HTML::Mason::Menu' );
     use_ok( 'OpenXPKI::Client::HTML::Mason' );
-
-    ## 
-
-    ## load the first page
-
-    ## login
-
-    ## show menu
 }
 
-diag( "Testing via CGI interface" );
+diag( "Testing syntax of used classes" );

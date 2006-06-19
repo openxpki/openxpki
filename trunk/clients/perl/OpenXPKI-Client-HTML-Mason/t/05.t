@@ -2,19 +2,21 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 17;
 
 use English;
 
 BEGIN {
-    ## configure test environment
 
-    my $PWD      = `pwd`;
-       $PWD      =~ s/\n//g;
-    my $INSTANCE = "$PWD/t/tc1";
-    my $CONFIG   = "openxpki.conf";
+    our ($INSTANCE, $CONFIG);
+    require "t/common.pl";
 
-    $INSTANCE   = $ENV{INSTANCE}   if (exists $ENV{INSTANCE});    
+    ## remove instance; from old test
+    if (length $INSTANCE > 10)
+    {
+        `rm -rf $INSTANCE`;
+    }
+    ok (! -d $INSTANCE);
 
     ## check for OpenXPKI::Server
     use_ok ("OpenXPKI::Server");
@@ -28,28 +30,41 @@ BEGIN {
     ok (-d $INSTANCE);
     mkdir "$INSTANCE/etc" if (! -d "$INSTANCE/etc");
     ok (-d "$INSTANCE/etc");
+    mkdir "$INSTANCE/etc/openxpki" if (! -d "$INSTANCE/etc/openxpki");
+    ok (-d "$INSTANCE/etc/openxpki");
 
     ## create openxpki.conf
-    `openxpkiadm deploy $INSTANCE/etc`;
-    ok (-e "$INSTANCE/etc/$CONFIG");
+    `openxpkiadm deploy $INSTANCE/etc/openxpki`;
+    ok (-e "$INSTANCE/etc/openxpki/$CONFIG");
 
     ## set correct prefix
-    `cd $INSTANCE/etc && openxpki-metaconf --setcfgvalue dir.prefix=$INSTANCE`;
+    ## set correct user and group
+    `cd $INSTANCE/etc/openxpki && openxpki-metaconf --config openxpki.conf --force --setcfgvalue dir.prefix=$INSTANCE --setcfgvalue server.runuser=$UID --setcfgvalue server.rungroup=$GID --writecfg openxpki.conf`;
     ok(! $EVAL_ERROR);
 
     ## configure new instance
-    `cd $INSTANCE/etc && openxpki-configure --batch`;
+    `cd $INSTANCE/etc/openxpki && openxpki-configure --batch --force`;
     ok (! $EVAL_ERROR);
+
+    # create some necessary directories
+    foreach my $name (qw( dir.datarootdir dir.localedir dir.localstatedir dir.openxpkistatedir dir.openxpkisessiondir ))
+    {
+        my $dir = `openxpki-metaconf --config $INSTANCE/etc/openxpki/$CONFIG --getcfgvalue $name`;
+           $dir =~ s{ (.*) \n+ }{$1}xms;
+        ok (-d $dir or mkdir $dir);
+    }
 
     ## start server
-    `openxpkictl --config $INSTANCE/etc/config.xml start`;
+    `openxpkictl --config $INSTANCE/etc/openxpki/config.xml start`;
     ok (! $EVAL_ERROR);
-    print STDERR "Waiting 10 seconds for server startup ...";
-    sleep 10;
+    #unncessary - openxpkictl performs waitpid
+    #print STDERR "Waiting 10 seconds for server startup ...";
+    #sleep 10;
 
     ## get socketfile
-    my $socketfile = `openxpki-metaconf --config $INSTANCE/etc/$CONFIG --getcfgvalue server.socketfile`;
+    my $socketfile = `openxpki-metaconf --config $INSTANCE/etc/openxpki/$CONFIG --getcfgvalue server.socketfile`;
        $socketfile =~ s{ (.*) \n+ }{$1}xms;
+    #print STDERR "Verifying server via socketfile $socketfile ...\n";
     ok (-e $socketfile);
 }
 

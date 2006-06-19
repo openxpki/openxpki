@@ -5,14 +5,15 @@
 
 package OpenXPKI::Client::CLI;
 
+use warnings;
+use strict;
+
 use base qw( OpenXPKI::Client );
 
 use version; 
-($OpenXPKI::Client::VERSION = '$Revision$' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
+($OpenXPKI::Client::CLI::VERSION = '$Revision$' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
 $VERSION = qv($VERSION);
 
-use warnings;
-use strict;
 use Carp;
 use English;
 

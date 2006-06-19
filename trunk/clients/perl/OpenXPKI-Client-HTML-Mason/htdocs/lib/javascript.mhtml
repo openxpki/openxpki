@@ -1,0 +1,10 @@
+<%args>
+</%args>
+
+<% $js->get_function() %>
+
+<%init>
+    use OpenXPKI::Client::HTML::Mason::Javascript;
+    ## translate all javascript messages
+    my $js = OpenXPKI::Client::HTML::Mason::Javascript->new();
+</%init>

@@ -1,30 +1,18 @@
-use Test::More tests => 2;
+use Test::More tests => 1;
 
 use English;
 
 BEGIN {
     ## configure test environment
 
-    my $INSTANCE   = "/tmp/openxpki-client-html-mason-test";
+    my $INSTANCE   = "t/tc1";
     $INSTANCE   = $ENV{INSTANCE}   if (exists $ENV{INSTANCE});    
 
-#    ## check for OpenXPKI::Server
-#    
-#    ## stop server
-#    if (-e "$INSTANCE/config.xml")
-#    {
-#        `openxpkictl --config $INSTANCE/config.xml stop`;
-#        ok (! $EVAL_ERROR);
-#    } else {
-        ok (1);
-#    }
-
-#    ## remove instance
-#    if (length $INSTANCE > 10)
-#    {
-#        `rm -rf $INSTANCE`;
-#    }
-    ok (! -d $INSTANCE);
+    ## check for OpenXPKI::Server
+    
+    ## stop server
+    `openxpkictl --config $INSTANCE/etc/openxpki/config.xml stop`;
+    ok (! $EVAL_ERROR);
 }
 
-diag( "Deploy an OpenXPKI trustcenter installation" );
+diag( "Stop OpenXPKI test server" );

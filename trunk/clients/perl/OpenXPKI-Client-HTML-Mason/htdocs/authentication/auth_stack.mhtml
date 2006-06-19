@@ -1,0 +1,28 @@
+<%args>
+  $session_id  => undef
+  $pki_realm   => undef
+  $auth_stack  => undef
+  $auth_stacks => undef
+</%args>
+
+<%perl>
+    ## if pki realm is not in the session cache
+    ## then ask the user
+    if (not exists $session_cache{$session_id}->{auth_stack})
+    {
+        ## let's print the available options
+        foreach my $stack (keys %{$auth_stacks})
+        {
+            print "<option value='$stack'>".
+                  $auth_stacks->{$stack}->{NAME}." - ".
+                  $auth_stacks->{$stack}->{DESCRIPTION}.
+                  "</option>\n";
+        }
+    }
+</%perl>
+
+<%init>
+    ## check if the pki realm is already present
+    return $session_cache{$session_id}->{auth_stack}
+        if (exists $session_cache{$session_id}->{auth_stack});
+</%init>

@@ -1,0 +1,27 @@
+<%args>
+  $session_id => undef
+  $pki_realm  => undef
+  $pki_realms => undef
+</%args>
+
+<%perl>
+    ## if pki realm is not in the session cache
+    ## then ask the user
+    if (not exists $session_cache{$session_id}->{pki_realm})
+    {
+        ## let's print the available options
+        foreach my $realm (keys %{$pki_realms})
+        {
+            print "<option value='$realm'>".
+                  $pki_realms->{$realm}->{NAME}." - ".
+                  $pki_realms->{$realm}->{DESCRIPTION}.
+                  "</option>\n";
+        }
+    }
+</%perl>
+
+<%init>
+    ## check if the pki realm is already present
+    return $session_cache{$session_id}->{pki_realm}
+        if (exists $session_cache{$session_id}->{pki_realm});
+</%init>

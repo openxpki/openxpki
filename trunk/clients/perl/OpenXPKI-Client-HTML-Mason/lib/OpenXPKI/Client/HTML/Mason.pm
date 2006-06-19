@@ -1,17 +1,18 @@
 package OpenXPKI::Client::HTML::Mason;
 
-use Class::Std;
+use strict;
+use warnings;
 
-use base qw( OpenXPKI::Client );
+use Class::Std;
 
 use version; 
 ($OpenXPKI::Client::HTML::Mason::VERSION = '$Revision: 244 $' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
 #our $VERSION = '0.9.$Revision: 244 $';
 #$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
-$VERSION = qv($VERSION);
+our $VERSION = qv($VERSION);
 
-use warnings;
-use strict;
+use base qw( OpenXPKI::Client );
+
 use Carp;
 use English;
 

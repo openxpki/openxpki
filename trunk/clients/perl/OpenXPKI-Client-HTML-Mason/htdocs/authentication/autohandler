@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title><& SELF:title, %ARGS &></title>
+    <link rel="stylesheet" 
+          title="default" 
+          href="<& /lib/url.mhtml, 
+                   path => '/css/openxpki.css',
+                   no_session => 1 &>" 
+          type="text/css" />
+<%perl>
+       $m->comp('/lib/javascript.mhtml');
+</%perl>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+  </head>
+  <body>
+    <div class="page">
+
+      <div class="header">
+        <img src="<& /lib/url.mhtml, 
+             path => '/images/openxpki_logo.png',
+             no_session => 1 &>"
+             alt="OpenXPKI"/>
+      </div> <!-- header -->
+
+      <div class="content">
+<%perl>
+    my $session_context = $m->comp('/authentication/session.mhtml');
+    my $session_id      = $session_context->{session_id};
+    my $client          = $session_context->{client};
+    my $msg = $client->collect();
+    if ($msg->{SERVICE_MSG} eq "GET_PKI_REALM")
+    {
+        $m->comp('/authentication/pki_realm.mhtml',
+                 'pki_realms' => $msg->{PKI_REALMS},
+                 'session_id' => $session_id);
+    }
+    else
+    {
+        my $pki_realm = $m->comp('/authentication/pki_realm.mhtml',
+                                 'session_id' => $session_id);
+        if ($msg->{SERVICE_MSG} eq "GET_AUTHENTICATION_STACK")
+        {
+            $m->comp('/authentication/auth_stack.mhtml',
+                     'auth_stacks' => $msg->{AUTHENTICATION_STACKS},
+                     'pki_realm'   => $pki_realm,
+                     'session_id'  => $session_id);
+        }
+        elsif ($msg->{SERVICE_MSG} eq "SERVICE_READY")
+        {
+            ## ok let's panic - session is ready and are inside of the auth autohandler !?
+            $m->comp('/service/autohandler', 'session_id' => $session_id);
+        }
+        else
+        {
+            ## ok let's panic - we are in an unexpected situation
+            ## FIXME: is this the correct reaction?
+            $m->comp('/service/autohandler', 'session_id' => $session_id);
+        }
+    }
+</%perl>
+      </div> <!-- content -->
+
+      <div class="footer">
+      </div>
+    </div>  <!-- page -->
+  </body>
+</html>

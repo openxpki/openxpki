@@ -82,7 +82,7 @@ sub talk {
 	OpenXPKI::Exception->throw(
 	    message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
 	    params => {
-		status => $self->get_communication_state(),
+		STATUS => $self->get_communication_state(),
 	    },
 	    );
     }
@@ -98,7 +98,7 @@ sub collect {
 	OpenXPKI::Exception->throw(
 	    message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
 	    params => {
-		status => $self->get_communication_state(),
+		STATUS => $self->get_communication_state(),
 	    },
 	    );
     }
@@ -257,12 +257,10 @@ sub init_session {
     
     $sessionid{$ident} = $msg->{SESSION_ID};
     
-    $self->talk(
+    return $self->talk(
 	{
 	    SERVICE_MSG => 'SESSION_ID_ACCEPTED',
 	});
-    
-    return $self->collect();
 }
 
 

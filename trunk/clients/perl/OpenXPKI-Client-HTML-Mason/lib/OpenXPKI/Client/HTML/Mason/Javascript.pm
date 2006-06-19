@@ -3,6 +3,8 @@
 
 package OpenXPKI::Client::HTML::Mason::Javascript;
 
+use OpenXPKI::i18n qw( i18nGettext );
+
 our %FUNCTION = ();
 
 sub new
@@ -16,7 +18,7 @@ sub new
     my @lines = ();
     foreach my $func (keys %FUNCTION)
     {
-        @lines = ( @lines, grep "I18N_", split /\n/, $FUNCTION{$func} );
+        push @lines, grep (/I18N_/, split (/\n/, $FUNCTION{$func}));
     }
     foreach my $line (@lines)
     {
@@ -33,9 +35,18 @@ sub new
 
 sub get_function
 {
+    my $self = shift;
+    if (not defined $_[0])
+    {
+        my $func = "";
+        foreach my $key (keys %FUNCTION)
+        {
+            $func .= $self->get_function ($key)."\n";
+        }
+        return $func;
+    }
     my $func = shift;
-       $func = shift if (ref($func));
-    my $func = $FUNCTION{$func};
+       $func = $FUNCTION{$func};
 
     ## replace i18n key in the function
     ## parameters are replaced by the javascript stuff itself
