@@ -133,12 +133,7 @@ sub deploy {
     }
 
     if (! -d $template_prefix) {
-	print STDERR "ERROR: template directory $template_prefix not found/n";
-	return;
-    }
-
-    if (! -d $template_prefix) {
-	print STDERR "ERROR: template directory $template_prefix not found/n";
+	print STDERR "ERROR: template directory $template_prefix not found\n";
 	return;
     }
 
@@ -154,12 +149,42 @@ sub deploy {
 	    move($dstfile, $dstfile . '.last');
 	}
 	if (! -e $srcfile) {
-	    print STDERR "ERROR: $srcfile not found/n";
+	    print STDERR "ERROR: $srcfile not found\n";
 	    return;
 	}
 	print "wrote $dstfile\n";
 	copy($srcfile, $dstfile) or return;
     }
+
+    # checking some necessary var directories
+    # tmpdir
+    # localedir
+    # openxpkistatedir
+    # openxpkisessiondir
+    my $user = CTX('xml_config')->get_xpath (
+	XPATH    => [ 'common/server/user' ],
+	COUNTER  => [ 0 ]);
+    my $group = CTX('xml_config')->get_xpath (
+	XPATH    => [ 'common/server/group' ],
+	COUNTER  => [ 0 ]);
+    foreach my $dir (qw( common/server/session_dir common/i18n/locale_directory ))
+    {
+        my $path = CTX('xml_config')->get_xpath (
+	    XPATH    => [ '$dir' ],
+	    COUNTER  => [ 0 ]);
+        if (not -d $path)
+        {
+            ## old autoconf supports @INSTALL@
+            ## FIXME: do we need an absolute path here?
+            `install -d -m 750 -o $user -g $group $path`;
+            if (@EVAL_ERROR)
+            {
+	        print STDERR "ERROR: directory for $path ($dir) cannot be created\n";
+	        return;
+            }
+        }
+    }
+
     return 1;
 }
 

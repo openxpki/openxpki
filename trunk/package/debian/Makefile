@@ -1,8 +1,9 @@
 
 PACKAGES=	\
-	core		\
-	deployment	\
-	perl-cli-client	\
+	core			\
+	deployment		\
+	mason-html-client	\
+	perl-cli-client		\
 	perl-client-api
 
 .PHONY : $(PACKAGES)
@@ -13,7 +14,7 @@ default:	clean
 	make check
 
 $(PACKAGES):
-	cd $@ && make $(SUBTARGET)
+	cd $@ && PATH=$(PATH):/usr/sbin make $(SUBTARGET)
 
 resultlocal:
 	mv */*.dsc .     || echo No dsc file present.

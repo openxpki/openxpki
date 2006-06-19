@@ -38,3 +38,5 @@ source-clean:
 
 clean:	source-clean
 	rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes
+
+distclean: clean

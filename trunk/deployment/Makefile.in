@@ -7,10 +7,13 @@
 #
 
 BINDIR          = [% dir.bindir %]
+MANDIR          = [% dir.mandir %]
 SYSCONFDIR      = [% dir.sysconfdir %]
 OPENXPKICONFDIR = [% dir.openxpkiconfdir %]
 DATADIR         = [% dir.datadir %]
 LOCALEDIR       = [% dir.localedir %]
+# FIXME: where will the installpreifx be defined?
+# FIXME: perhaps something like DESTDIR but inline of some config file?
 INSTALLPREFIX   = [% dir.installprefix %]
 PERLLIB         = [% dir.perllib %]
 TEMPLATEDIR     = [% dir.templatedir %]
@@ -42,7 +45,7 @@ TOOLS_DST = $(patsubst %.in,%,$(TOOLS_SRC))
 TOOLS =	$(TOOLS_DST) \
 	bin/openxpki-metaconf \
 
-all: tools
+all: tools build-man
 
 install: makedirs installtemplates installbin postinstallhelp
 
@@ -54,41 +57,49 @@ $(TOOLS_DST): $(TOOLS_SRC)
 		$(CFG) --config $(CONFIGFILE) --file $$file.in >$$file ;\
 	done
 
+build-man:
+	for PROG in $(TOOLS); do pod2man $$PROG $$PROG.1; done
+
 makedirs:
 	@echo Creating state directories
-	$(INSTALL) -o $(ADMUSER) -g $(RUNGROUP) -m 0750 -d $(INSTALLPREFIX)$(OPENXPKICONFDIR)
-	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(BINDIR)
-	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(LOCALEDIR)
-	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0750 -d $(INSTALLPREFIX)$(STATEDIR)
-	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0700 -d $(INSTALLPREFIX)$(SESSIONDIR)
-	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0755 -d $(INSTALLPREFIX)$(TEMPLATEDIR)
+	$(INSTALL) -o $(ADMUSER) -g $(RUNGROUP) -m 0750 -d $(DESTDIR)$(INSTALLPREFIX)$(OPENXPKICONFDIR)
+	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(BINDIR)
+	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)
+	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)/man1
+	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(LOCALEDIR)
+	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0750 -d $(DESTDIR)$(INSTALLPREFIX)$(STATEDIR)
+	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0700 -d $(DESTDIR)$(INSTALLPREFIX)$(SESSIONDIR)
+	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR)
 
 
 installbin: tools
-	@echo "Installing binary files to $(INSTALLPREFIX)$(BINDIR)"
+	@echo "Installing binary files to $(DESTDIR)$(INSTALLPREFIX)$(BINDIR)"
 	for file in $(TOOLS) ; do \
-		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 $$file $(INSTALLPREFIX)$(BINDIR)/ ;\
+		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 $$file $(DESTDIR)$(INSTALLPREFIX)$(BINDIR)/ ;\
+		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file.1 $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)/man1/ ;\
 	done
 
 installtemplates:
-	@echo "Installing template files to $(INSTALLPREFIX)$(TEMPLATEDIR)"
+	@echo "Installing template files to $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR)"
 	@( cd etc/templates && for template in * ; do \
 		if [ -d $$template ]; then \
-			$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(INSTALLPREFIX)$(TEMPLATEDIR)/$$template || exit 1 ;\
+			$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR)/$$template || exit 1 ;\
 			for file in $$template/*.xml $$template/*.conf ; do \
-				$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file $(INSTALLPREFIX)$(TEMPLATEDIR)/$$template/`basename $$file` || exit 1 ; \
+				$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR)/$$template/`basename $$file` || exit 1 ; \
 			done ; \
 		fi; \
 	done )
 
 installetc:
-	@echo "Installing configuration files to $(INSTALLPREFIX)$(OPENXPKICONFDIR)"
-	PATH=$$PATH:bin $(CFG) --config openxpki.conf --delcfgvalue dir.installprefix --writecfg $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
-	chown $(ADMUSER):$(ADMGROUP) $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
-	chmod 640 $(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
+	@echo "Installing configuration files to $(DESTDIR)$(INSTALLPREFIX)$(OPENXPKICONFDIR)"
+	PATH=$$PATH:bin $(CFG) --config openxpki.conf --delcfgvalue dir.installprefix --writecfg $(DESTDIR)$(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
+	chown $(ADMUSER):$(ADMGROUP) $(DESTDIR)$(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
+	chmod 640 $(DESTDIR)$(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
 
 clean:
 	rm -f Makefile $(TOOLS_DST)
+
+distclean: clean
 
 help:
 	@echo "OpenXPKI Deployment Tool"

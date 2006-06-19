@@ -35,12 +35,7 @@ binary-indep-stamp: arrange
 	dh_builddeb
 	touch binary-indep-stamp
 
-generate-man-pages:
-	PROGS=`ls bin/*`; for PROG in $$PROGS; do \
-	    if [ -x $$PROG ] && [ $$PROG != "bin/openxpki-configure" ]; then pod2man $$PROG $$PROG.1; fi; \
-	done;
-
-build: build-stamp generate-man-pages
+build: build-stamp
 build-stamp: config
 	dh_testdir
 	make
@@ -55,9 +50,7 @@ clean:
 config: config-stamp
 config-stamp:
 	dh_testdir
-	autoconf
-	automake --add-missing || echo ignoring automake noise
-	./configure --prefix=/usr --sysconfdir=/etc
+	./configure
 	touch config-stamp
 
 install: install-stamp

@@ -71,6 +71,9 @@ exec_prefix:      $(dir.prefix)
 # executable user programs
 bindir:           $(dir.exec_prefix)/bin
 
+# documentation of executable user programs
+mandir:           $(dir.exec_prefix)/man
+
 # auxiliary programs (not intended to be run by users)
 # libexecdir:       $(dir.exec_prefix)/lib/openxpki
 

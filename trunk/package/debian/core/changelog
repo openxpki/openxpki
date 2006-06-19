@@ -1,3 +1,10 @@
+libopenxpki-perl (0.9.20060617-1) unstable; urgency=low
+
+  * Replaced exit with die in OpenXPKI::Server->new.
+
+
+ -- Michael Bell <michael.bell@web.de>  Sat, 17 Jun 2006 12:00:00 +0200
+
 libopenxpki-perl (0.9.20060425-1) unstable; urgency=low
 
   * Fixed Makefile.PL to get correct perl module dependencies.

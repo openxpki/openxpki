@@ -13,7 +13,7 @@ use warnings;
 use English;
 use Getopt::Long;
 use Pod::Usage;
-use POSIX;
+use POSIX ":sys_wait_h";
 use Errno;
 
 # use Smart::Comments;
@@ -118,6 +118,16 @@ if (-r $pidfile) {
 
 my $cmd = shift;
 if ($cmd eq 'start') {
+
+    use File::Temp;
+    my ($fh, $filename) = File::Temp::mkstemp("/tmp/openxpkiXXXXXXXX");
+    if (! $fh) {
+        print STDERR "Cannot create tmp file to check correct server startup.\n";
+        exit 1;
+    }
+    close $fh;
+    chmod 0600, $filename;
+
     if (defined $pid && kill(0, $pid)) {
 	print STDERR "OpenXPKI Server already running (pid $pid)\n";
 	exit 0;
@@ -130,17 +140,43 @@ if ($cmd eq 'start') {
 	if ($pid = fork) {
 	    # parent here
 	    # child process pid is available in $pid
-	    waitpid(-1, 0);
-	    
-	    # FIXME: find out if the server is REALLY running properly
+	    #waitpid(-1, 0);
+            #waitpid($pid,WNOHANG);
+            my $kid;
+            do {
+                       $kid = waitpid(-1, WNOHANG);
+            } until $kid > 0;
 
+	    # find out if the server is REALLY running properly
+	    my $msg = "";
+	    open FH, $filename or die "Cannot open tmp file $filename.\n";
+            while (<FH>) {
+                $msg .= $_;
+            }
+            close FH;
+            if (length $msg)
+            {
+                print STDERR "FAILED.\n$msg\n";
+                exit 1;
+            }
+
+            print STDERR "DONE.\n";
 	    exit 0;
 	}
 	elsif (defined $pid) { # $pid is zero here if defined
 	    # child here
 	    # parent process pid is available with getppid
-	    
-	    if (! OpenXPKI::Server->new ("CONFIG" => $configfile)) {
+
+            eval
+            {
+	        OpenXPKI::Server->new ("CONFIG" => $configfile);
+            };
+            if ($EVAL_ERROR)
+            {
+		my $error = $EVAL_ERROR;
+                open FH, ">$filename" or die "Cannot open tmp file $filename\n";
+                print FH $error;
+                close FH;
 		print STDERR "Could not start OpenXPKI Server daemon.\n";
 		exit 1;
 	    }
