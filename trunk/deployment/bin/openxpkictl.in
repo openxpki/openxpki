@@ -20,26 +20,205 @@ use Errno;
 
 use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
+use OpenXPKI::Client;
 
 # settings determined by openxpki-metaconf
-my $prefix          = "[% dir.prefix %]";
-my $exec_prefix     = "[% dir.exec_prefix %]";
-my $template_prefix = "[% dir.templatedir %]";
-my $sysconfdir      = "[% dir.sysconfdir %]";
+# not really needed...
+# my $prefix          = "[% dir.prefix %]";
+# my $exec_prefix     = "[% dir.exec_prefix %]";
+# my $template_prefix = "[% dir.templatedir %]";
+# my $sysconfdir      = "[% dir.sysconfdir %]";
 
 my $openxpkiconfdir = "[% dir.openxpkiconfdir %]";
 my $configfile      = "$openxpkiconfdir/config.xml";
 
 sub slurp {
-    my $filename = shift;
+    my $arg = shift;
 
+    ### ref $arg
     my $content = do {
-	open my $HANDLE, "<", $filename;
 	local $INPUT_RECORD_SEPARATOR;
+
+	my $HANDLE;
+	# allow passing file handles
+
+	if (ref $arg eq '') {
+	    open $HANDLE, "<", $arg or return;
+	} elsif (ref $arg eq 'GLOB') {
+	    $HANDLE = $arg;
+	} else {
+	    die "slurp(): invalid data type " . ref $arg . ". Stopped";
+	}
 	<$HANDLE>;
     };
     return $content;
 }
+
+sub connect_openxpki_daemon {
+    my $socketfile = shift;
+
+    my $client;
+    eval {
+	$client = OpenXPKI::Client->new(
+	    {
+		SOCKETFILE => $socketfile,
+	    });
+    };
+
+    return unless defined $client;
+
+    return 1;
+}
+
+
+
+###########################################################################
+
+sub do_status {
+    my $arg = shift;
+
+    my $socketfile = $arg->{SOCKETFILE};
+
+    if (! connect_openxpki_daemon($socketfile)) {
+	print STDERR "OpenXPKI server is not running or does not accept requests.\n";
+	return;
+    }
+    return 1;
+}
+
+sub do_start {
+    my $arg = shift;
+
+    my $pid        = $arg->{PID};
+    my $pidfile    = $arg->{PIDFILE};
+    my $socketfile = $arg->{SOCKETFILE};
+
+    if (defined $pid && kill(0, $pid)) {
+	if (! do_status(
+		  {
+		      SOCKETFILE => $socketfile,
+		  })) {
+	    return;
+	}
+	print STDERR "OpenXPKI Server already running. PID: $pid\n";
+
+	return 1;
+    }
+    print STDERR "Starting OpenXPKI...\n";
+    unlink $pidfile;
+
+    # fork off server launcher
+    my $redo_count = 0;
+    my $READ_FROM_KID;
+  FORK:
+    do {
+	# this open call efectively does a fork and attaches the child's
+	# STDOUT to $READ_FROM_KID, allowing the child to send us data.
+	$pid = open($READ_FROM_KID, "-|");
+	if (! defined $pid) {
+	    if ($!{EAGAIN}) {
+		# recoverable fork error
+		if ($redo_count > 5) {
+		    print STDERR "FAILED.\n";
+		    print STDERR "Could not fork process\n";
+		    return;
+		}
+		print STDERR '.';
+		sleep 5;
+		$redo_count++;
+		redo FORK;
+	    }
+
+	    # other fork error
+	    print STDERR "FAILED.\n";
+	    print STDERR "Could not fork process: $ERRNO\n";
+	    return;
+	}
+    } until defined $pid;
+
+    if ($pid) {
+	# parent here
+	# child process pid is available in $pid
+
+	my $kid;
+	do {
+	    $kid = waitpid(-1, WNOHANG);
+	} until $kid > 0;
+
+	# check if child noticed a startup error
+	my $msg = slurp $READ_FROM_KID;
+
+	if (length $msg)
+	{
+	    print STDERR "FAILED.\n";
+	    print STDERR "$msg\n";
+	    return;
+	}
+
+	# find out if the server is REALLY running properly
+	if (! do_status(
+		  {
+		      SOCKETFILE => $socketfile,
+		  })) {
+	    return;
+	}
+	
+	print STDERR "DONE.\n";
+    } else {
+	# child here
+	# parent process pid is available with getppid
+	
+	# everything printed to STDOUT here will be available to the
+	# parent on its $READ_FROM_KID file descriptor
+	
+	eval
+	{
+	    OpenXPKI::Server->new ("CONFIG" => $configfile);
+	};
+	if ($EVAL_ERROR)
+	{
+	    print $EVAL_ERROR;
+	    return;
+	}
+    }
+
+    return 1;
+}
+
+sub do_stop {
+    my $arg = shift;
+
+    my $pid        = $arg->{PID};
+    my $pidfile    = $arg->{PIDFILE};
+    my $socketfile = $arg->{SOCKETFILE};
+
+    if (! defined $pid || (kill(0, $pid) == 0)) {
+	print STDERR "OpenXPKI Server is not running.\n";
+	return 1;
+    }
+    print STDERR "Stopping OpenXPKI..";
+
+    my @signals = (2, 2, 3, 3, 9);
+  TERMINATE:
+    foreach my $sig (@signals) {
+	print STDERR '.';
+	kill($sig, $pid);
+	sleep 1;
+	last TERMINATE if (kill(0, $pid) == 0);
+    }
+    print STDERR "\n";
+    if (kill(0, $pid)) {
+	print STDERR "FAILED.\n";
+	print STDERR "Could not terminate OpenXPKI Server daemon.\n";
+	return;
+    }
+    print STDERR "DONE.\n";
+    return 1;
+}
+
+
+###########################################################################
+
 
 my %params;
 GetOptions(\%params,
@@ -110,113 +289,68 @@ if ($EVAL_ERROR)
 
 ### $pidfile
 
+my $socketfile;
+eval {
+    $socketfile = $config->get_xpath (
+	XPATH   => ["common", "server", "socket_file"],
+	COUNTER => [0, 0, 0],
+	);
+};
+if ($EVAL_ERROR)
+{
+    print STDERR "ERROR: Could not determine socket file from configuration: " . $EVAL_ERROR->as_string() . "\n";
+    exit 1;
+}
+
+### $socketfile
+
 my $pid;
 if (-r $pidfile) {
     $pid = slurp($pidfile);
-    chomp $pid;
+    chomp $pid if defined $pid;
 }
 
 my $cmd = shift;
+
 if ($cmd eq 'start') {
-
-    use File::Temp;
-    my ($fh, $filename) = File::Temp::mkstemp("/tmp/openxpkiXXXXXXXX");
-    if (! $fh) {
-        print STDERR "Cannot create tmp file to check correct server startup.\n";
-        exit 1;
-    }
-    close $fh;
-    chmod 0600, $filename;
-
-    if (defined $pid && kill(0, $pid)) {
-	print STDERR "OpenXPKI Server already running (pid $pid)\n";
-	exit 0;
-    }
-    print STDERR "Starting OpenXPKI...\n";
-    unlink $pidfile;
-
-  FORK: 
-    {
-	if ($pid = fork) {
-	    # parent here
-	    # child process pid is available in $pid
-	    #waitpid(-1, 0);
-            #waitpid($pid,WNOHANG);
-            my $kid;
-            do {
-                       $kid = waitpid(-1, WNOHANG);
-            } until $kid > 0;
-
-	    # find out if the server is REALLY running properly
-	    my $msg = "";
-	    open FH, $filename or die "Cannot open tmp file $filename.\n";
-            while (<FH>) {
-                $msg .= $_;
-            }
-            close FH;
-            if (length $msg)
-            {
-                print STDERR "FAILED.\n$msg\n";
-                exit 1;
-            }
-
-            print STDERR "DONE.\n";
-	    exit 0;
-	}
-	elsif (defined $pid) { # $pid is zero here if defined
-	    # child here
-	    # parent process pid is available with getppid
-
-            eval
-            {
-	        OpenXPKI::Server->new ("CONFIG" => $configfile);
-            };
-            if ($EVAL_ERROR)
-            {
-		my $error = $EVAL_ERROR;
-                open FH, ">$filename" or die "Cannot open tmp file $filename\n";
-                print FH $error;
-                close FH;
-		print STDERR "Could not start OpenXPKI Server daemon.\n";
-		exit 1;
-	    }
-	}
-	elsif ($!{EAGAIN}) {
-	    # EAGAIN is the supposedly recoverable fork error
-	    sleep 5;
-	    redo FORK;
-	}
-	else {
-	    # weird fork error
-	    die "Can't fork: $!\n";
-	}
-    }
-    
-}
-if ($cmd eq 'stop') {
-    if (! defined $pid || (kill(0, $pid) == 0)) {
-	print STDERR "OpenXPKI Server is not running.\n";
-	exit 0;
-    }
-    print STDERR "Stopping OpenXPKI..";
-
-    my @signals = (2, 2, 3, 3, 9);
-  TERMINATE:
-    foreach my $sig (@signals) {
-	print STDERR '.';
-	kill($sig, $pid);
-	sleep 1;
-	last TERMINATE if (kill(0, $pid) == 0);
-    }
-    if (kill(0, $pid)) {
-	print STDERR " failure.\n";
-	print STDERR "Could not terminate OpenXPKI Server daemon.\n";
+    if (! do_start(
+	{
+	    PID        => $pid,
+	    PIDFILE    => $pidfile,
+	    SOCKETFILE => $socketfile,
+	})) {
 	exit 1;
     }
-    print STDERR " done.\n";
+    exit 0;
 }
 
-exit 0;
+if ($cmd eq 'stop') {
+    if (! do_stop(
+	{
+	    PID        => $pid,
+	    PIDFILE    => $pidfile,
+	    SOCKETFILE => $socketfile,
+	})) {
+	exit 1;
+    }
+    exit 0;
+}
+
+if ($cmd eq 'status') {
+    if (! do_status(
+	{
+	    PID        => $pid,
+	    PIDFILE    => $pidfile,
+	    SOCKETFILE => $socketfile,
+	})) {
+	exit 1;
+    }
+    print "OpenXPKI Server is operative.\n";
+    exit 0;
+}
+
+print STDERR "Unknown command: $cmd.\n";
+exit 1;
 
 __END__
 
@@ -240,6 +374,7 @@ openxpkictl [options] COMMAND
  Commands:
    start            Start OpenXPKI daemon
    stop             Stop OpenXPKI daemon
+   status           Get OpenXPKI daemon status
 
 
 =head1 ARGUMENTS
@@ -255,6 +390,10 @@ Starts the OpenXPKI daemon.
 =item B<stop>
 
 Stops the OpenXPKI daemon.
+
+=item B<status>
+
+Checks the OpenXPKI daemon status.
 
 =back
 
