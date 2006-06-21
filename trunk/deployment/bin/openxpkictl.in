@@ -345,7 +345,7 @@ if ($cmd eq 'status') {
 	})) {
 	exit 1;
     }
-    print "OpenXPKI Server is operative.\n";
+    print "OpenXPKI Server is running and accepting requests.\n";
     exit 0;
 }
 

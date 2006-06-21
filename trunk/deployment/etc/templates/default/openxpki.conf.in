@@ -200,7 +200,7 @@ server_id:    0
 server_shift: 8
 
 # Specify database backend to use, REQUIRED
-# Allowed values: SQLite, DB2, Oracle, mysql, Pg
+# Allowed values: SQLite, DB2, Oracle, mysql, PostgreSQL
 type:         SQLite
 
 # Database name (DB-specific, see perldoc DBD::<type>)
@@ -234,7 +234,7 @@ ORACLE_SID:   OPENXPKI01
 
 [DB-mysql-Options]
 
-[DB-Pg-Options]
+[DB-PostgreSQL-Options]
 
 
 ###########################################################################

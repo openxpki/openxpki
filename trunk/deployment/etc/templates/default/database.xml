@@ -7,7 +7,11 @@
   [% END %]
   <environment>
     <vendor>
-      <type>[% database.type %]</type>
+      <type>[%- IF database.type != 'PostgreSQL' -%]
+              [%- database.type -%]
+            [%- ELSE -%]
+Pg
+            [%- END -%]</type>
       [% FOREACH option = database.options.keys %]
       <option>
         <name>[% option %]</name>

@@ -164,22 +164,32 @@ sub deploy {
     my $user = CTX('xml_config')->get_xpath (
 	XPATH    => [ 'common/server/user' ],
 	COUNTER  => [ 0 ]);
+
     my $group = CTX('xml_config')->get_xpath (
 	XPATH    => [ 'common/server/group' ],
 	COUNTER  => [ 0 ]);
-    foreach my $dir (qw( common/server/session_dir common/i18n/locale_directory ))
-    {
-        my $path = CTX('xml_config')->get_xpath (
-	    XPATH    => [ '$dir' ],
-	    COUNTER  => [ 0 ]);
-        if (not -d $path)
+
+    foreach my $dir (qw( 
+        common/server/session_dir 
+        common/i18n/locale_directory 
+    )) {
+	my $path;
+	eval {
+	    $path = CTX('xml_config')->get_xpath (
+		XPATH    => [ $dir ],
+		COUNTER  => [ 0 ]);
+	};
+	if (! defined $path || $EVAL_ERROR) {
+	    print STDERR "ERROR: could not read '$dir' configuration value\n";
+	    return;
+	}
+        if (! -d $path)
         {
             ## old autoconf supports @INSTALL@
             ## FIXME: do we need an absolute path here?
-            `install -d -m 750 -o $user -g $group $path`;
-            if (@EVAL_ERROR)
-            {
-	        print STDERR "ERROR: directory for $path ($dir) cannot be created\n";
+	    print STDERR "Directory $path does not exist, creating it.\n";
+            if (system("install -d -m 750 -o $user -g $group $path") != 0) {
+	        print STDERR "ERROR: directory for $path ($dir) could not be created\n";
 	        return;
             }
         }
@@ -240,6 +250,11 @@ if ($cmd eq 'initdb') {
 	exit 1;
     }
 } elsif ($cmd eq 'deploy') {
+    if (! get_config($configfile)) {
+	print STDERR "Could not obtain OpenXPKI instance configuration\n";
+	exit 1;
+    }
+
     my $dir = shift;
     if (! defined $dir) {
 	$dir = $openxpkiconfdir;
