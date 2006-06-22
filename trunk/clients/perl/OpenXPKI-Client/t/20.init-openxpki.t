@@ -1,4 +1,4 @@
-use Test::More tests => 14;
+use Test::More tests => 15;
 use File::Path;
 use File::Spec;
 use Cwd;
@@ -30,6 +30,7 @@ ok(mkdir "$config{server_dir}/share");
 ok(mkdir "$config{server_dir}/share/locale");
 ok(mkdir $config{config_dir});
 ok(mkdir $config{var_dir});
+ok(mkdir "$config{server_dir}/var/openxpki/session");
 
 # deployment
 ok(system("openxpkiadm deploy $config{config_dir}") == 0);

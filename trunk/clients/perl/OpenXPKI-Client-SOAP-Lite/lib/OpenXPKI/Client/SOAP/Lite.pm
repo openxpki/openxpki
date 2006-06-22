@@ -8,8 +8,7 @@ package OpenXPKI::Client::SOAP::Lite;
 use base qw( OpenXPKI::Client );
 
 use version; 
-our $VERSION = '0.9.$Revision: 275 $';
-$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
+($OpenXPKI::Client::SOAP::LITE::VERSION = '$Revision: 342 $' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
 $VERSION = qv($VERSION);
 
 use warnings;

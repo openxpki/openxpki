@@ -4,14 +4,11 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'OpenXPKI::Client::SOAP::Lite',
-    AUTHOR              => 'Martin Bartosch <m.bartosch@cynops.de>',
-#    VERSION_FROM        => 'lib/OpenXPKI/Client/SOAP/Lite.pm',
-    ABSTRACT_FROM       => 'lib/OpenXPKI/Client/SOAP/Lite.pm',
-    PL_FILES            => {},
+    VERSION_FROM        => 'lib/OpenXPKI/Client/SOAP/LITE.pm',
+    ABSTRACT_FROM       => 'lib/OpenXPKI/Client/SOAP/LITE.pm',
     PREREQ_PM => {
         'Test::More' => 0,
         'version'    => 0,
+	'OpenXPKI::Client' => 0,
     },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'OpenXPKI-Client-SOAP-Lite-*' },
 );

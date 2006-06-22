@@ -3,36 +3,28 @@ use English;
 
 use strict;
 use warnings;
-use Smart::Comments;
 
-use OpenXPKI::Client;
+use Smart::Comments;
 
 our %config;
 require 't/common.pl';
 
-my $debug = $config{debug};
+diag("CLI client tests");
 
-diag("Client library tests");
+my $cli = "./bin/openxpki --socketfile $config{socket_file}";
 
-my $cli = OpenXPKI::Client->new(
-    {
-	SOCKETFILE => $config{socket_file},
-    });
+my $session_id = `$cli showsession`;
+chomp $session_id;
 
-ok(defined $cli);
-
-ok($cli->init_session());
-BAIL_OUT("exiting...");
-
-my $session_id;
-ok($session_id = $cli->get_session_id());
+ok($session_id =~ m{ \A [ \d a-f ]{20} \z }xms);
 diag("Got session id $session_id");
 
-ok($cli->get_communication_state() eq 'can_receive');
+my $res = `$cli --session $session_id nop`;
 
-my $response;
+### $res
 
-$response = $cli->collect();
+
+__END__
 
 ok($response->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK');
 ok(exists $response->{AUTHENTICATION_STACKS}->{Anonymous});
