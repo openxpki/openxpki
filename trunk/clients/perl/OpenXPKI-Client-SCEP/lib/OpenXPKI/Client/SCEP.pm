@@ -8,8 +8,8 @@ package OpenXPKI::Client::SCEP;
 use base qw( OpenXPKI::Client );
 
 use version; 
-our $VERSION = '0.9.$Revision: 244 $';
-$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
+use version; 
+($OpenXPKI::Client::SCEP::VERSION = '$Revision: 342 $' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
 $VERSION = qv($VERSION);
 
 use warnings;
