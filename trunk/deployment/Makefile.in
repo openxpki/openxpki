@@ -22,7 +22,7 @@ SESSIONDIR      = [% dir.openxpkisessiondir %]
 
 TEMPLATE        = default
 
-CFG             = openxpki-metaconf
+CFG             = ./bin/openxpki-metaconf
 INSTALL         = /usr/bin/install
 
 RUNUSER         = [% server.runuser %]
@@ -61,15 +61,11 @@ build-man:
 	for PROG in $(TOOLS); do pod2man $$PROG $$PROG.1; done
 
 makedirs:
-	@echo Creating state directories
-	$(INSTALL) -o $(ADMUSER) -g $(RUNGROUP) -m 0750 -d $(DESTDIR)$(INSTALLPREFIX)$(OPENXPKICONFDIR)
+	@echo Creating directories
 	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(BINDIR)
-	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)
 	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)/man1
-	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(LOCALEDIR)
-	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0750 -d $(DESTDIR)$(INSTALLPREFIX)$(STATEDIR)
-	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0700 -d $(DESTDIR)$(INSTALLPREFIX)$(SESSIONDIR)
 	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR)
+	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(LOCALEDIR)
 
 
 installbin: tools
@@ -89,12 +85,6 @@ installtemplates:
 			done ; \
 		fi; \
 	done )
-
-installetc:
-	@echo "Installing configuration files to $(DESTDIR)$(INSTALLPREFIX)$(OPENXPKICONFDIR)"
-	PATH=$$PATH:bin $(CFG) --config openxpki.conf --delcfgvalue dir.installprefix --writecfg $(DESTDIR)$(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
-	chown $(ADMUSER):$(ADMGROUP) $(DESTDIR)$(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
-	chmod 640 $(DESTDIR)$(INSTALLPREFIX)$(SYSCONFDIR)/openxpki.conf
 
 clean:
 	rm -f Makefile $(TOOLS_DST)

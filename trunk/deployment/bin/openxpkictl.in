@@ -15,6 +15,7 @@ use Getopt::Long;
 use Pod::Usage;
 use POSIX ":sys_wait_h";
 use Errno;
+use File::Spec;
 
 # use Smart::Comments;
 
@@ -266,6 +267,8 @@ require OpenXPKI::Server;
 if (defined $params{cfg}) {
     $configfile = $params{cfg};
 }
+
+$configfile = File::Spec->rel2abs($configfile);
 
 my $config = OpenXPKI::XML::Config->new(CONFIG => $configfile);
 

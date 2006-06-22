@@ -15,6 +15,7 @@ SYSCONFDIR="[% dir.sysconfdir %]"
 OPENXPKICONFDIR="[% dir.openxpkiconfdir %]"
 
 INTERACTIVE=1
+CREATE_DIRS=""
 FORCE=""
 
 
@@ -26,7 +27,7 @@ reconfigure() {
 
 write_config() {
     echo
-    echo "Creating configuration files in $OPENXPKICONFDIR"
+    echo "* Creating configuration files in $OPENXPKICONFDIR"
     for xmlfile in $* ; do
 	basename=`basename $xmlfile`
 	echo -n "$basename... "
@@ -40,6 +41,34 @@ write_config() {
 	    exit 1
 	fi
     done
+}
+
+# if no arguments are given this function only checks if the required
+# directories are present. otherwise these directories are also created
+check_dirs() {
+    echo
+    echo "* Checking directories"
+    error=0
+    for entry in openxpkistatedir openxpkisessiondir ; do
+	dir="`$CFG --getcfg dir.$entry`"
+	echo -n "$entry: "
+	if [ -d "$dir" ] ; then
+	    echo "$dir: OK"
+	else
+	    if [ "$1" != "" ] ; then
+		if install -o $RUNUSER -g $RUNGROUP -m 0750 -d $dir ; then
+		    echo "$dir: CREATED"
+		else
+		    echo "$dir: FAILED TO CREATE"
+		    error=1
+		fi
+	    else
+		echo "$dir: DOES NOT EXIST"
+		error=1
+	    fi
+	fi
+    done
+    return $error
 }
 
 
@@ -68,6 +97,10 @@ while [ -n "$1" ] ; do
 	    TEMPLATE="$1"
 	    shift
 	    ;;
+	--createdirs)
+	    CREATE_DIRS=1
+	    shift
+	    ;;
         --)
             shift
             METACONF_OPTS="$*"
@@ -83,7 +116,7 @@ while [ -n "$1" ] ; do
     esac
 done
 
-for DIR in /etc/openxpki /usr/local/etc/openxpki "$OPENXPKICONFDIR" "`pwd`"; do
+for DIR in /etc/openxpki /usr/local/etc/openxpki "$OPENXPKICONFDIR" "`pwd`/etc/openxpki" "`pwd`"; do
     if [ -e "$DIR/openxpki.conf" ]; then
 	OPENXPKICONFDIR="$DIR"
     fi
@@ -100,7 +133,9 @@ if [ "$INTERACTIVE" = "1" ] ; then
     fi
 fi
 
-XMLSTYLE="`$CFG --getcfg deployment.xmlstyle `"
+XMLSTYLE="`$CFG --getcfg deployment.xmlstyle`"
+RUNUSER="`$CFG --getcfg server.runuser`"
+RUNGROUP="`$CFG --getcfg server.rungroup`"
 
 FILES="$TEMPLATEDIR/$TEMPLATE/log.conf"
 
@@ -121,6 +156,21 @@ esac
 
 write_config $FILES
 
+if ! check_dirs $CREATE_DIRS ; then
+    echo
+    echo "One or more required directories do not exist. Please inspect the above"
+    echo "error output and either create the missing directories or run"
+    echo
+    echo "$0 [OPTIONS] --createdirs"
+    echo
+    echo "to automatically create them."
+    echo
+    exit 1
+fi
+
+echo
+echo "OpenXPKI instance configured successfully."
+
 exit 0
 
 ###########################################################################
@@ -137,6 +187,9 @@ openxpki-configure [OPTIONS]
     --help         display this help text and exit
     --batch        non-interactive configuration
     --force        overwrite existing files
+    --template     specify template (default: default)
+    --createdirs   create missing directories
+    --             args following -- are literally passed to openxpki-metaconf
 
 This script generates the OpenXPKI configuration files from a set of
 templates (taken from $TEMPLATEDIR)

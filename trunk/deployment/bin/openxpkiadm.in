@@ -15,19 +15,25 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Spec;
 use File::Copy;
+use File::Path;
+
+# use Smart::Comments;
 
 use OpenXPKI::VERSION;
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 
 # settings determined by openxpki-metaconf
-my $prefix          = "[% dir.prefix %]";
-my $exec_prefix     = "[% dir.exec_prefix %]";
-my $template_prefix = "[% dir.templatedir %]";
-my $sysconfdir      = "[% dir.sysconfdir %]";
+my %config = (
+    prefix          => "[% dir.prefix %]",
+    exec_prefix     => "[% dir.exec_prefix %]",
+    template_prefix => "[% dir.templatedir %]",
+    sysconfdir      => "[% dir.sysconfdir %]",
+    localedir       => "[% dir.localedir %]",
+    openxpkiconfdir => "[% dir.openxpkiconfdir %]",
+    );
 
-my $openxpkiconfdir = "[% dir.openxpkiconfdir %]";
-my $configfile      = "$openxpkiconfdir/config.xml";
+my $configfile      = "$config{openxpkiconfdir}/config.xml";
 
 # read configuration from deployed OpenXPKI instance
 sub get_config {
@@ -42,7 +48,6 @@ sub get_config {
 		],
 	});
 }
-
 
 sub initdb {
     my $args = shift;
@@ -118,15 +123,18 @@ sub deploy {
 	return;
     }
 
-    if (! (-d $targetdir && -r $targetdir && -x $targetdir && -w $targetdir)) {
+    if (! (-d $targetdir 
+	   && -r $targetdir 
+	   && -x $targetdir 
+	   && -w $targetdir)) {
 	print STDERR "Directory $targetdir does not exist or is not writable.\n";
 	return;
     }
 
-    print "Deploying OpenXPKI configuration file set.\n";
-    print "Source template directory: $template_prefix\n";
-    print "Template set:              $template\n";
-    print "Target directory:          $targetdir\n";
+    print STDERR "Deploying OpenXPKI configuration file set.\n";
+    print STDERR "Template set:              $template\n";
+    print STDERR "Template source directory: $template_prefix\n";
+    print STDERR "Target directory:          $targetdir\n";
 
     if ($args->{DRYRUN}) {
 	return 1;
@@ -137,63 +145,72 @@ sub deploy {
 	return;
     }
 
-    foreach my $file (qw( openxpki.conf )) {
-	my $srcfile = File::Spec->catfile($template_prefix, $template, $file);
-	my $dstfile = File::Spec->catfile($targetdir, $file);
+    my $srcfile = File::Spec->catfile($template_prefix, 
+				      $template, 
+				      'openxpki.conf');
 
-	if (-e $dstfile) {
-	    if (! $args->{FORCE}) {
-		print STDERR "ERROR: $dstfile already exists\n";
-		return;
-	    }
-	    move($dstfile, $dstfile . '.last');
-	}
-	if (! -e $srcfile) {
-	    print STDERR "ERROR: $srcfile not found\n";
+    # 2006-06-21 Martin Bartosch:
+    # The deployment procedure now will create a new meta configuration 
+    # file from the one that is installed in the template directory.
+    
+    # determine new configuration file directory (below $targetdir)
+    my @cmd;
+    @cmd = (
+	'openxpki-metaconf',
+	'--config', qq( $srcfile ),
+	'--setcfg', "dir.prefix='$targetdir'",
+	'--getcfg', 'dir.openxpkiconfdir',
+	);
+    
+    my $cmd = join(' ', @cmd);
+    my $openxpkiconfdir = `$cmd`;
+    chomp($openxpkiconfdir);
+    
+    ### $openxpkiconfdir
+    if (! -d $openxpkiconfdir) {
+	if (! mkpath($openxpkiconfdir, 1, 0750)) {
+	    print STDERR "Could not create configuration directory $openxpkiconfdir\n";
 	    return;
 	}
-	print "wrote $dstfile\n";
-	copy($srcfile, $dstfile) or return;
     }
-
-    # checking some necessary var directories
-    # tmpdir
-    # localedir
-    # openxpkistatedir
-    # openxpkisessiondir
-    my $user = CTX('xml_config')->get_xpath (
-	XPATH    => [ 'common/server/user' ],
-	COUNTER  => [ 0 ]);
-
-    my $group = CTX('xml_config')->get_xpath (
-	XPATH    => [ 'common/server/group' ],
-	COUNTER  => [ 0 ]);
-
-    foreach my $dir (qw( 
-        common/server/session_dir 
-        common/i18n/locale_directory 
-    )) {
-	my $path;
-	eval {
-	    $path = CTX('xml_config')->get_xpath (
-		XPATH    => [ $dir ],
-		COUNTER  => [ 0 ]);
-	};
-	if (! defined $path || $EVAL_ERROR) {
-	    print STDERR "ERROR: could not read '$dir' configuration value\n";
+    
+    my $dstfile = File::Spec->catfile($openxpkiconfdir, 'openxpki.conf');
+    
+    if (-e $dstfile) {
+	if (! $args->{FORCE}) {
+	    print STDERR "ERROR: $dstfile already exists\n";
 	    return;
 	}
-        if (! -d $path)
-        {
-            ## old autoconf supports @INSTALL@
-            ## FIXME: do we need an absolute path here?
-	    print STDERR "Directory $path does not exist, creating it.\n";
-            if (system("install -d -m 750 -o $user -g $group $path") != 0) {
-	        print STDERR "ERROR: directory for $path ($dir) could not be created\n";
-	        return;
-            }
-        }
+	move($dstfile, $dstfile . '.last');
     }
+
+    if (! -e $srcfile) {
+	print STDERR "ERROR: $srcfile not found\n";
+	return;
+    }
+
+    # the new configuration file will reference two types of files/dirs:
+    # - files/dirs that are specific for this particular deployment
+    #   (e. g. configuration, log files, server socket...)
+    # - files/dirs that are shared among ALL installed instances
+    #   (e. g. locales)
+    #
+    
+    ### $config{localedir}
+    @cmd = (
+	'openxpki-metaconf',
+	'--config', qq( $srcfile ),
+	'--writecfg', qq( $dstfile ),
+	'--setcfg', "dir.prefix='$targetdir'",
+	'--setcfg', "dir.localedir='$config{localedir}'"
+	);
+    
+    if (system(join(' ', @cmd)) != 0) {
+	print STDERR "ERROR: could not deploy target configuration file $dstfile\n";
+	return;
+    }
+    
+    print STDERR "wrote $dstfile\n";
 
     return 1;
 }
@@ -249,7 +266,10 @@ if ($cmd eq 'initdb') {
 	print STDERR "Could not initialize database.\n";
 	exit 1;
     }
-} elsif ($cmd eq 'deploy') {
+    exit 0;
+} 
+
+if ($cmd eq 'deploy') {
     if (! get_config($configfile)) {
 	print STDERR "Could not obtain OpenXPKI instance configuration\n";
 	exit 1;
@@ -257,30 +277,35 @@ if ($cmd eq 'initdb') {
 
     my $dir = shift;
     if (! defined $dir) {
-	$dir = $openxpkiconfdir;
+	$dir = $config{openxpkiconfdir};
     }
     if ($params{templatedir}) {
-	$template_prefix = $params{templatedir};
+	$config{template_prefix} = $params{templatedir};
     }
     my $template = $params{template} || 'default';    
     
     if (! deploy(
 	{
-	    TEMPLATE_PREFIX => $template_prefix,
+	    TEMPLATE_PREFIX => $config{template_prefix},
 	    TEMPLATE    => $template,
-	    TARGETDIR   => $dir,
+	    TARGETDIR   => File::Spec->rel2abs($dir),
 	    FORCE       => $params{force},
 	    DRYRUN      => $params{dryrun},
 	})) {
 	print STDERR "Could not deploy OpenXPKI instance.\n";
 	exit 1;
     }
-} else {
-    print STDERR "Unknown command '$cmd'.\n";
-    exit 1;
-}
 
-exit 0;
+    print STDERR "OpenXPKI instance successfully deployed to $dir.\n";
+    print STDERR "You may now want to run\n\n";
+    print STDERR "cd $dir\n";
+    print STDERR "openxpki-configure\n";
+
+    exit 0;
+} 
+
+print STDERR "Unknown command '$cmd'.\n";
+exit 1;
 
 __END__
 
@@ -315,7 +340,8 @@ Available commands:
 =item B<deploy> [DIR]
 
 Creates a new OpenXPKI server configuration file set in the specified 
-directory (defaults to @sysconfdir@/openxpki if no directory is specified).
+directory (defaults to [% dir.openxpkiconfdir %] if no directory is 
+specified).
 This command will not overwrite existing configuration files unless --force
 is specified.
 

@@ -41,16 +41,43 @@ EOF
 
 
 METACONF_OPTS=""
-if [ "`id -nu`" != "root" ] ; then
-    USER=`id -nu`
-    GROUP=`id -ng`
-    echo "Preparing for non-root installation (user: $USER, group: $GROUP)"
-    METACONF_OPTS="$METACONF_OPTS --setcfg server.runuser=$USER"
-    METACONF_OPTS="$METACONF_OPTS --setcfg server.rungroup=$GROUP"
-    METACONF_OPTS="$METACONF_OPTS --setcfg server.admuser=$USER"
-    METACONF_OPTS="$METACONF_OPTS --setcfg server.admgroup=$GROUP"
+
+# check infrastructure
+ERRORS=0
+echo "Checking required OpenXPKI Perl modules..."
+for module in OpenXPKI OpenXPKI::Client ; do
+    echo -n "$module: "
+    if perl -e "use $module;" >/dev/null 2>&1 ; then
+	echo "OK"
+    else
+	echo "NOT FOUND"
+	ERRORS=1
+    fi
+done
+
+if [ "$ERRORS" != "0" ] ; then
+    echo "Pre-installation check found errors."
+    echo "Please install the missing Perl modules before proceeding."
+    exit 1
 fi
 
+
+USER=`id -nu`
+GROUP=`id -ng`
+
+ADMUSER="$USER"
+ADMGROUP="$GROUP"
+if [ "$USER" != "root" ] ; then
+    echo "Preparing for non-root installation (user: $USER, group: $GROUP)"
+    RUNUSER="$USER"
+    RUNGROUP="$GROUP"
+fi
+
+
+[ -n "$RUNUSER" ] && METACONF_OPTS="$METACONF_OPTS --setcfg server.runuser=$RUNUSER"
+[ -n "$RUNGROUP" ] && METACONF_OPTS="$METACONF_OPTS --setcfg server.rungroup=$RUNGROUP"
+METACONF_OPTS="$METACONF_OPTS --setcfg server.admuser=$ADMUSER"
+METACONF_OPTS="$METACONF_OPTS --setcfg server.admgroup=$ADMGROUP"
 
 while [ -n "$1" ] ; do
     case "$1" in
