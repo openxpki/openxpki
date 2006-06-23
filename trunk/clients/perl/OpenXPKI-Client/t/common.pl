@@ -1,5 +1,5 @@
 
-my $base = 't/srv';
+my $base = 't/instance';
 our %config = (
     server_dir         => $base,
     config_dir         => "$base/etc/openxpki",

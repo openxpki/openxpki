@@ -5,15 +5,15 @@
        XML structure. 
     -->
   <persisters> 
-    <configfile>[% dir.sysconfdir %]/workflow_persister.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_persister.xml</configfile>
   </persisters>
 
   <activities>
-    <configfile>[% dir.sysconfdir %]/workflow_activity.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_activity.xml</configfile>
   </activities>
 
   <workflows>
-    <configfile>[% dir.sysconfdir %]/workflow_request_dataonly.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_request_dataonly.xml</configfile>
   </workflows>
     
 </workflow_config>

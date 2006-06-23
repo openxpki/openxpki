@@ -4,7 +4,6 @@
 # $Revision$
 
 package OpenXPKI::Client;
-use Class::Std;
 
 use version; 
 ($OpenXPKI::Client::VERSION = '$Revision$' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
@@ -15,16 +14,19 @@ use strict;
 use Carp;
 use English;
 
-$OUTPUT_AUTOFLUSH = 1;
+use Class::Std;
+
+use Socket;
 
 use OpenXPKI::Debug 'OpenXPKI::Client';
 
-use Socket;
 use OpenXPKI::Client::API;
 use OpenXPKI::Exception;
 use OpenXPKI::Transport::Simple;
 use OpenXPKI::Serialization::Simple;
 eval { use OpenXPKI::Serialization::JSON; };
+
+$OUTPUT_AUTOFLUSH = 1;
 
 # use Smart::Comments;
 use Data::Dumper;

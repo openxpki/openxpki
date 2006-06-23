@@ -12,6 +12,7 @@ use Getopt::Long qw( :config permute pass_through );
 use Pod::Usage;
 use Term::ReadLine;
 use File::Spec;
+use File::Path;
 use Config::Std;
 
 # use Smart::Comments;
@@ -115,6 +116,10 @@ if (my $exc = OpenXPKI::Exception->caught()) {
 }
 $config->{client}->{session} = $cli->get_session_id();
 
+# render first server message (as returned by init_session())
+### $response
+$cli->render($response) if defined $response;
+
 my $exitcode = 0;
 my $OUT = \*STDOUT;
 
@@ -126,9 +131,6 @@ if (scalar @ARGV == 0) {
     $OUT = $term->OUT;
     my $state = '';
 
-    # render first server message (as returned by init_session())
-    $cli->render($response) if defined $response;
-
   INTERACTION:
     while (1) {
 	### $cli->get_communication_state()
@@ -136,9 +138,8 @@ if (scalar @ARGV == 0) {
 	# should be able to send commands, and if we are re-iterating
 	# the process_command() method should have handled the server
 	# response
-	if ($cli->get_communication_state() ne 'can_send') {
+	if ($cli->get_communication_state() eq 'can_receive') {
 	    ### handle response from last command and render output...
-	    print $OUT "ERROR: Incorrect communication state\n";
 	    eval {
 		$response = $cli->collect();
 	    };
@@ -218,12 +219,23 @@ if (scalar @ARGV == 0) {
 	$term->addhistory($line) if ($line ne "");
     }    
 
-    # try to write configuration    
-    mkdir $configdir;
+    # try to write configuration (only in interactive mode)
+    mkpath $configdir;
     write_config %{$config}, $configfile;
+
     exit $exitcode;
 
 } else {
+    # non-interactive
+    if ($cli->get_communication_state() eq 'can_receive') {
+	### handle response from last command and render output...
+	eval {
+	    $response = $cli->collect();
+	};
+	# discard output
+	#$cli->render($response) if defined $response;
+    }
+
     my $cmd_res;
     eval {
 	$cmd_res = $cli->process_command(join(' ', @ARGV));
@@ -231,7 +243,7 @@ if (scalar @ARGV == 0) {
     if (my $exc = OpenXPKI::Exception->caught()) {
 	if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION') {
 	    print STDERR "Server terminated connection.\n";
-	    exit 1;
+	    exit 0;
 	}
     } elsif ($EVAL_ERROR) {
 	print STDERR "error: $EVAL_ERROR\n";

@@ -63,6 +63,55 @@ sub init
 }
 
 
+# macro function get a setting required for session init safely
+sub __get_setting : PRIVATE {
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $arg     = shift;
+
+    my $params            = $arg->{PARAMS};
+    my $setting           = $arg->{SETTING};     # e. g. 'PKI_REALM'
+
+    my $service_msg       = 'GET_' . $setting;   # e. g. 'GET_PKI_REALM'
+    my $param_name        = $setting . "S";      # e. g. 'PKI_REALMS'
+    my $expected_response = $setting;
+
+    ##! 2: "get setting from client"
+    my $msg;
+    my $value;
+  GET_SETTING:
+    while (1) {
+	##! 2: "send all available values"
+	$self->talk(
+	    {
+		SERVICE_MSG => $service_msg,
+		PARAMS => {
+		    $param_name => $params,
+		},
+	    });
+	
+	##! 2: "read answer, expected service msg: $service_msg, expected parameter: $expected_response"
+	$msg = $self->collect();
+
+	if (defined $msg->{SERVICE_MSG} 
+	    && ($msg->{SERVICE_MSG} eq $service_msg)
+	    && (defined $msg->{PARAMS}->{$expected_response})) {
+
+	    $value = $msg->{PARAMS}->{$expected_response};
+	    ##! 2: "requested value: $value"
+
+	    if (exists $params->{$value}) {
+		##! 4: "value accepted"
+		last GET_SETTING;
+	    }
+	    ##! 4: "value rejected"
+	}
+    }
+
+    ##! 1: "returning $value"
+    return $value;
+}
+
 
 sub __init_session : PRIVATE {
     my $self    = shift;
@@ -179,7 +228,7 @@ sub __init_pki_realm
 
     ##! 1: "start"
 
-    ##! 2: "if we know the PKI realm then return it"
+    ##! 2: "check if PKI realm is already known"
     eval {
 	my $realm = $self->get_API()->get_pki_realm();
 	return $realm if defined $realm;
@@ -211,36 +260,16 @@ sub __init_pki_realm
         $realms{$realm}->{DESCRIPTION} = $realm;
     }
 
-    ##! 2: "send all available pki realms"
-    $self->talk(
-        {
-            SERVICE_MSG => "GET_PKI_REALM",
-            PKI_REALMS  => \%realms,
-        });
 
-    ##! 2: "read answer"
-    my $msg = $self->collect();
-
-    if (not exists $msg->{PKI_REALM} or
-        not exists CTX('pki_realm')->{$msg->{PKI_REALM}})
-    {
-	my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_ILLEGAL_REALM';
-	$self->talk(
-	    $self->__get_error(
-	        {
-		    ERROR => $error,
-		    PARAMS => {PKI_REALM => $msg->{PKI_REALM}},
-		}));
-
-        OpenXPKI::Exception->throw(
-            message => $error,
-            params  => {PKI_REALM => $msg->{PKI_REALM}}
-        );
-    }
+    my $requested_realm = $self->__get_setting(
+	{
+	    SETTING => 'PKI_REALM',
+	    PARAMS  => \%realms,
+	});
 
     ##! 2: "update session with PKI realm"
-    CTX('session')->set_pki_realm ($msg->{PKI_REALM});
-    return $msg->{PKI_REALM};
+    CTX('session')->set_pki_realm ($requested_realm);
+    return $requested_realm;
 }
 
 sub run
@@ -329,7 +358,9 @@ sub run
 			});
 		};
 		if (my $exc = OpenXPKI::Exception->caught()) {
-		    if ($exc->message() =~ m{I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND}xms) {
+		    if ($exc->message() =~ m{
+                            I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND
+                        }xms) {
 			##! 16: "Invalid command $data->{COMMAND}"
 			# fall-through intended
 		    } else {
@@ -341,7 +372,9 @@ sub run
 		    } else {
 			OpenXPKI::Exception->throw (
 			    message => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND",
-			    params  => {EVAL_ERROR => $EVAL_ERROR});
+			    params  => {
+				EVAL_ERROR => $EVAL_ERROR,
+			    });
 		    }
 		}
 
@@ -403,10 +436,7 @@ sub run
 ##     begin native service messages     ##
 ###########################################
 
-# ok was brauche ich?
-# get_pki_realm (erledigt)
-# authentication stack
-# passwd_login
+# missing login methods:
 # x509_login
 # token_login
 
@@ -422,32 +452,17 @@ sub get_authentication_stack
     return CTX('session')->get_authentication_stack()
         if (CTX('session')->get_authentication_stack());
 
-    ##! 2: "determine the authentication stack"
-    my $msg;
-  GET_AUTH_STACK:
-    while (1) {
-	##! 2: "send all available authentication stacks"
-	$self->talk(
-	    {
-		SERVICE_MSG           => "GET_AUTHENTICATION_STACK",
-		AUTHENTICATION_STACKS => $keys->{STACKS},
-	    });
-	
-	##! 2: "read answer"
-	$msg = $self->collect();
-
-	if (exists $msg->{AUTHENTICATION_STACK}
-	    && exists $keys->{STACKS}->{$msg->{AUTHENTICATION_STACK}}) {
-            ##! 2: "authentication stack ".$msg->{AUTHENTICATION_STACK}." accepted"
-	    last GET_AUTH_STACK;
-	}
-    }
-
+    my $requested_stack = $self->__get_setting(
+	{
+	    SETTING => 'AUTHENTICATION_STACK',
+	    PARAMS  => $keys->{STACKS},
+	});
+    
     ##! 2: "put the authentication stack into the session"
-    CTX('session')->set_authentication_stack($msg->{AUTHENTICATION_STACK});
+    CTX('session')->set_authentication_stack($requested_stack);
 
     ##! 2: "end"
-    return $msg->{AUTHENTICATION_STACK};
+    return $requested_stack;
 }
 
 sub get_passwd_login
@@ -462,6 +477,8 @@ sub get_passwd_login
 
   GET_PASSWD_LOGIN:
     while (1) {
+	### FIXME: enforce maximum number of retries?
+	### FIXME: delay for incorrect login?
 	$self->talk(
 	    {
 		SERVICE_MSG => "GET_PASSWD_LOGIN",
@@ -517,27 +534,39 @@ is always the same - the session ID or an error message.
 --> {SERVICE_MSG => "SESSION_ID_ACCEPTED"}
 
 <-- {SERVICE_MSG => "GET_PKI_REALM",
-     PKI_REALMS  => {
+     PARAMS => {
+         PKI_REALM  => {
                      "0" => {
                              NAME => "Root Realm",
                              DESCRIPTION => "This is an example root realm."
                             }
                     }
+              }
+         }
     }
 
---> {PKI_REALM => $realm}
+--> {SERVICE_MSG => "GET_PKI_REALM",
+     PARAMS => {
+         PKI_REALM => $realm,
+     }
+    }
 
 <-- {SERVICE_MSG => "GET_AUTHENTICATION_STACK",
-     AUTHENTICATION_STACKS => {
-                     "0" => {
+     PARAMS => {
+          AUTHENTICATION_STACKS => {
+                    "0" => {
                              NAME => "Basic Root Auth Stack",
                              DESCRIPTION => "This is the basic root authentication stack."
                             }
                     }
+             }
     }
 
---> {AUTHENTICATION_STACK => "0"}
-
+--> {SERVICE_MSG => "GET_AUTHENTICATION_STACK",
+     PARAMS => {
+        AUTHENTICATION_STACK => "0"
+     }
+    }
 Example 1: Anonymous Login
 
 <-- {SERVICE_MSG => "SERVICE_READY"}

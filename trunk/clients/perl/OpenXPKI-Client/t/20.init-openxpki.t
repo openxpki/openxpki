@@ -1,4 +1,4 @@
-use Test::More tests => 15;
+use Test::More tests => 8;
 use File::Path;
 use File::Spec;
 use Cwd;
@@ -23,17 +23,10 @@ if (-d $config{server_dir}) {
     rmtree($config{server_dir});
 }
 
-ok(mkdir $config{server_dir});
-ok(mkdir "$config{server_dir}/etc");
-ok(mkdir "$config{server_dir}/var");
-ok(mkdir "$config{server_dir}/share");
-ok(mkdir "$config{server_dir}/share/locale");
-ok(mkdir $config{config_dir});
-ok(mkdir $config{var_dir});
-ok(mkdir "$config{server_dir}/var/openxpki/session");
+ok(mkpath $config{server_dir});
 
 # deployment
-ok(system("openxpkiadm deploy $config{config_dir}") == 0);
+ok(system("openxpkiadm deploy $config{server_dir}") == 0);
 
 # meta config should now exist
 ok(-e "$config{config_dir}/openxpki.conf");
@@ -49,33 +42,32 @@ my %configure_settings = (
 
 # configure in this directory
 my $dir = getcwd;
-ok(chdir $config{config_dir});
-my $args = "--batch --";
+ok(chdir $config{server_dir});
+
+my $args = "--batch --createdirs --";
 foreach my $key (keys %configure_settings) {
     $args .= " --setcfgvalue $key=$configure_settings{$key}";
 }
 diag "Configuring with local options $args";
 ok(system("openxpki-configure $args") == 0);
+
 # and back
 ok(chdir($dir));
 
-if (!ok(-e $config{config_file})) {
-    rmtree($config{server_dir}) unless $debug;
+if (! ok(-e $config{config_file})) {
     BAIL_OUT("No server configuration file present ($config{config_file})");
 }
 
 diag "Starting OpenXPKI Server.";
 
-if (system("openxpkictl --config $config{config_file} start") != 0) {
+$args = "--debug 100" if ($debug);
+if (system("openxpkictl --config $config{config_file} $args start") != 0) {
     unlink $config{socket_file};
     BAIL_OUT("Could not start OpenXPKI.");
 }
 
-diag "Server started.";
-sleep(3);
 if (! ok(-e $config{socket_file})) {
     unlink $config{socket_file};
     BAIL_OUT("Server did not start (no socket file)");
 }
 
-diag "Done.";

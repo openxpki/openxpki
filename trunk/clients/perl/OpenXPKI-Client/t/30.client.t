@@ -3,7 +3,7 @@ use English;
 
 use strict;
 use warnings;
-use Smart::Comments;
+# use Smart::Comments;
 
 use OpenXPKI::Client;
 
@@ -22,7 +22,7 @@ my $cli = OpenXPKI::Client->new(
 ok(defined $cli);
 
 ok($cli->init_session());
-BAIL_OUT("exiting...");
+#BAIL_OUT("exiting...");
 
 my $session_id;
 ok($session_id = $cli->get_session_id());
@@ -35,21 +35,24 @@ my $response;
 $response = $cli->collect();
 
 ok($response->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK');
-ok(exists $response->{AUTHENTICATION_STACKS}->{Anonymous});
-ok($response->{AUTHENTICATION_STACKS}->{Anonymous}->{NAME} eq 'Anonymous');
+ok(exists $response->{PARAMS}->{AUTHENTICATION_STACKS}->{Anonymous});
 
+### $response
 # try to login
 $response = $cli->send_receive_service_msg('GET_AUTHENTICATION_STACK',
 					   {
 					       AUTHENTICATION_STACK => 'Anonymous',
 					   });
 ok($response->{SERVICE_MSG} eq 'SERVICE_READY');
+### $response
 
 # try to operate a simple Server API function
 $response = $cli->get_API()->nop();
 ### $response
+
 ok(ref $response eq 'HASH');
 ok($response->{SERVICE_MSG} eq 'COMMAND');
 ok($response->{COMMAND} eq 'nop');
-ok(ref $response->{PARAMS} eq 'HASH');
+ok(exists $response->{PARAMS});
+ok(! defined $response->{PARAMS});
 

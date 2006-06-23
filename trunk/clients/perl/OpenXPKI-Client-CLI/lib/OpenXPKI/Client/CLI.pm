@@ -5,28 +5,27 @@
 
 package OpenXPKI::Client::CLI;
 
-use warnings;
-use strict;
-
-use base qw( OpenXPKI::Client );
-
 use version; 
 ($OpenXPKI::Client::CLI::VERSION = '$Revision$' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
 $VERSION = qv($VERSION);
 
+use warnings;
+use strict;
 use Carp;
 use English;
 
 use Class::Std;
+
+use base qw( OpenXPKI::Client );
+
 use Getopt::Long;
 use Text::CSV_XS;
 
-# FIXME: remove debugging modules
 # use Smart::Comments;
 use Data::Dumper;
+use OpenXPKI::Debug 'OpenXPKI::Client::CLI';
 
 use OpenXPKI::i18n qw( i18nGettext );
-use OpenXPKI::Debug 'OpenXPKI::Client::CLI';
 use OpenXPKI::Exception;
 
 my %ARGV_LOCAL : ATTR;
@@ -34,16 +33,34 @@ my %ARGV_LOCAL : ATTR;
 
 my $command_map = {
     SUBCMD => {
+	realm => {
+	    DESC => 'Choose PKI realm',
+	    GETOPT => [ qw( name=s ) ],
+	    MAPOPT => {
+		name => 'PKI_REALM',
+	    },
+	    ACTION => {
+		SERVICE_MSG => 'GET_PKI_REALM',
+	    },
+	}, # realm
+
 	auth => {
 	    DESC => 'Choose authentication stack',
+#	    ACTION => {
+#		# Choosing the Authentication stack requires a raw service
+#		# message
+# 		RAW_MSG => sub {
+# 		    return {
+# 			AUTHENTICATION_STACK => split(/\s+/, shift),
+# 		    };
+# 		},
+#	    },
+	    GETOPT => [ qw( stack=s ) ],
+	    MAPOPT => {
+		stack => 'AUTHENTICATION_STACK',
+	    },
 	    ACTION => {
-		# Choosing the Authentication stack requires a raw service
-		# message
-		RAW_MSG => sub {
-		    return {
-			AUTHENTICATION_STACK => split(/\s+/, shift),
-		    };
-		},
+		SERVICE_MSG => 'GET_AUTHENTICATION_STACK',
 	    },
 	}, # auth
 
@@ -327,11 +344,7 @@ sub render {
     ##! 1: "render " . Dumper $response
 
     return 1 unless defined $response;
-
-    if (ref $response ne 'HASH') {
-	carp("Illegal parameters");
-	return;
-    } 
+    return 1 unless (ref $response eq 'HASH');
 
     if (exists $response->{ERROR}) {
 	$self->show_error($response);
@@ -451,9 +464,9 @@ sub show_GET_AUTHENTICATION_STACK : PRIVATE {
     my $response = shift;
 
     print i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_AUTH_STACK_MESSAGE") . "\n";
-    foreach my $stack (sort keys %{$response->{AUTHENTICATION_STACKS}}) {
-	my $name = $response->{AUTHENTICATION_STACKS}->{$stack}->{NAME};
-	my $desc = $response->{AUTHENTICATION_STACKS}->{$stack}->{DESCRIPTION};
+    foreach my $stack (sort keys %{$response->{PARAMS}->{AUTHENTICATION_STACKS}}) {
+	my $name = $response->{PARAMS}->{AUTHENTICATION_STACKS}->{$stack}->{NAME};
+	my $desc = $response->{PARAMS}->{AUTHENTICATION_STACKS}->{$stack}->{DESCRIPTION};
 
 	print "'$stack' ($name): $desc\n";
     }

@@ -1,6 +1,7 @@
-use Test::More tests => 7;
+use Test::More tests => 8;
 use File::Path;
 use File::Spec;
+use Cwd;
 use English;
 
 use strict;
@@ -22,21 +23,16 @@ if (-d $config{server_dir}) {
     rmtree($config{server_dir});
 }
 
-ok(mkdir $config{server_dir});
-
-exit
+ok(mkpath $config{server_dir});
 
 # deployment
-ok(system("tar -C $config{deployment_dir} -c -f - . | tar -C $config{tmp_dir} -x -f -") == 0);
+ok(system("openxpkiadm deploy $config{server_dir}") == 0);
 
-if (! -x "$config{tmp_dir}/configure") {
-    rmtree($config{target_dir});
-}
-
+# meta config should now exist
+ok(-e "$config{config_dir}/openxpki.conf");
 
 my ($pw_name) = getpwuid($EUID);
 my ($gr_name) = getgrgid($EUID);
-
 my %configure_settings = (
     'dir.prefix' => File::Spec->rel2abs($config{server_dir}),
     'server.socketfile' => File::Spec->rel2abs($config{socket_file}),
@@ -44,39 +40,34 @@ my %configure_settings = (
     'server.rungroup' => $pw_name,
     );
 
-my $args = "--batch --";
+# configure in this directory
+my $dir = getcwd;
+ok(chdir $config{server_dir});
+
+my $args = "--batch --createdirs --";
 foreach my $key (keys %configure_settings) {
     $args .= " --setcfgvalue $key=$configure_settings{$key}";
 }
 diag "Configuring with local options $args";
+ok(system("openxpki-configure $args") == 0);
 
-if (system("cd $config{tmp_dir} && ./configure $args") != 0) {
-    rmtree($config{target_dir}) unless $debug;
-    BAIL_OUT("Could not configure local OpenXPKI installation.");
-}
+# and back
+ok(chdir($dir));
 
-diag "Installing OpenXPKI Server to $config{server_dir}.";
-if (system("cd $config{tmp_dir} && make install") != 0) {
-    rmtree($config{target_dir}) unless $debug;
-    BAIL_OUT("Could not install OpenXPKI.");
-}
-
-diag "Creating OpenXPKI XML configuration in $config{server_dir}/etc.";
-if (system("$config{server_dir}/bin/openxpki-configure --batch") != 0) {
-    rmtree($config{target_dir}) unless $debug;
-    BAIL_OUT("Could not create OpenXPKI XML configuration.");
+if (! ok(-e $config{config_file})) {
+    BAIL_OUT("No server configuration file present ($config{config_file})");
 }
 
 diag "Starting OpenXPKI Server.";
 
-if (system("openxpkictl --configfile start") != 0) {
-    rmtree($config{target_dir}) unless $debug;
+$args = "--debug 100" if ($debug);
+if (system("openxpkictl --config $config{config_file} $args start") != 0) {
+    unlink $config{socket_file};
     BAIL_OUT("Could not start OpenXPKI.");
 }
 
-diag "Server started.";
+if (! ok(-e $config{socket_file})) {
+    unlink $config{socket_file};
+    BAIL_OUT("Server did not start (no socket file)");
+}
 
-sleep(3);
-ok(-e $config{socket_file});
-
-diag "Done.";

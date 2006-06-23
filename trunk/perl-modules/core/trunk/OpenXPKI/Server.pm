@@ -156,20 +156,38 @@ sub exception_as_string {
 
 sub process_request {
     my $rc;
+    my $msg;
+
     eval
     {
         $rc = do_process_request(@_);
     };
-    if ($EVAL_ERROR) {
- 	my $msg = exception_as_string($EVAL_ERROR);
+    if (my $exc = OpenXPKI::Exception->caught()) {
+	if ($exc->message() =~ m{ (?:
+                I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION
+                | I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT 
+            ) }xms) {
+	    # exit quietly
+	    return 1;
+	}
+
+	# other OpenXPKI exceptions
+	$msg = exception_as_string($EVAL_ERROR);
+    } elsif ($EVAL_ERROR) {
+	# non-OpenXPKI exception
+ 	$msg = exception_as_string($EVAL_ERROR);
+    }
+
+    if (defined $msg) {
  	CTX('log')->log(
  	    MESSAGE  => "Uncaught exception: " . $msg,
  	    PRIORITY => "fatal",
  	    FACILITY => "system",
  	    );
  	# die gracefully
+	##! 1: "Uncaught exception: $msg"
  	$ERRNO = 1;
-        die $msg;
+        return;
     }
 
     return $rc;

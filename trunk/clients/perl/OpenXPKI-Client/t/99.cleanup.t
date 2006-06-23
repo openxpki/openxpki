@@ -1,4 +1,4 @@
-use Test::More tests => 2;
+use Test::More tests => 1;
 use File::Path;
 use File::Spec;
 use English;
@@ -12,6 +12,6 @@ require 't/common.pl';
 diag("Cleaning up");
 
 diag "Stopping OpenXPKI Server.";
-BAIL_OUT("aborted");
 ok(system("openxpkictl --config $config{config_file} stop") == 0);
-ok(rmtree($config{server_dir}));
+# leaving this intact for debugging
+#ok(rmtree($config{server_dir}));
