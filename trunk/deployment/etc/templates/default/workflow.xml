@@ -4,10 +4,6 @@
        In the future the workflow configuration should be part of this
        XML structure. 
     -->
-  <persisters> 
-    <configfile>[% dir.openxpkiconfdir %]/workflow_persister.xml</configfile>
-  </persisters>
-
   <activities>
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity.xml</configfile>
   </activities>

@@ -1,5 +1,0 @@
-<persisters>
-  <persister name="OpenXPKI"
-             class="OpenXPKI::Server::Workflow::Persister::DBI"
-             />
-</persisters>

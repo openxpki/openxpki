@@ -25,6 +25,8 @@ use OpenXPKI::Server::Context qw( CTX );
 
 my %workflow_factory : ATTR;
 
+my $workflow_table = 'WORKFLOW';
+
 
 # regex definitions for parameter validation
 my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
@@ -180,7 +182,16 @@ sub list_workflow_instances {
 
     ##! 1: "list_workflow_instances"
 
-    return [ 123, 456, 789 ];
+    my $dbi = CTX('dbi_workflow');
+
+    my $instances = $dbi->select(
+	TABLE => $workflow_table,
+	DYNAMIC => {
+	    PKI_REALM  => CTX('session')->get_pki_realm(),
+	},
+	);
+
+    return $instances;
 }
 
 
@@ -277,6 +288,42 @@ sub execute_workflow_activity {
     return $self->__get_workflow_info($workflow);
 }
 
+
+sub set_workflow_fields {
+    my $self  = shift;
+    my $ident = ident $self;
+    validate(
+	@_,
+	{
+	    WORKFLOW => {
+		type => SCALAR,
+		regex => $re_alpha_string,
+	    },
+	    ID => {
+		type => SCALAR,
+		regex => $re_integer_string,
+	    },
+	    PARAMS => {
+		type => HASHREF,
+	    },
+	}); 
+    my $args  = shift;
+
+    ##! 1: "get_workflow_context"
+
+    my $wf_title    = $args->{WORKFLOW};
+    my $wf_id       = $args->{ID};
+
+    my $workflow = $self->__get_workflow_factory()->fetch_workflow(
+	$wf_title,
+	$wf_id);
+
+    ##! 64: Dumper $workflow
+
+    return $workflow->context()->params();
+}
+
+
 sub create_workflow_instance {
     my $self  = shift;
     my $ident = ident $self;
@@ -345,12 +392,6 @@ sub __get_workflow_factory : PRIVATE {
 
     my $realm_index = 0; # FIXME: compute the correct index!!!
 
-    my $persister_file = CTX('xml_config')->get_xpath (
-	XPATH   => [ 'pki_realm', 'workflow_config', 'persisters', 'configfile' ],
-	COUNTER => [ $realm_index, 0,          0,            0 ],
-	);
-    ##! 2: $persister_file
-
     my $activity_file = CTX('xml_config')->get_xpath (
 	XPATH   => [ 'pki_realm', 'workflow_config', 'activities', 'configfile' ],
 	COUNTER => [ $realm_index, 0,          0,            0 ],
@@ -363,10 +404,21 @@ sub __get_workflow_factory : PRIVATE {
 	);
     ##! 2: $workflow_file
 
+
     $workflow_factory{$ident}->add_config_from_file(
 	workflow  => $workflow_file,
 	action    => $activity_file,
-	persister => $persister_file,
+	);
+
+    # persister configuration should not be user-configurable and is
+    # static and identical throughout OpenXPKI
+    $workflow_factory{$ident}->add_config(
+	persister => {
+	    name           => 'OpenXPKI',
+	    class          => 'OpenXPKI::Server::Workflow::Persister::DBI',
+	    workflow_table => 'WORKFLOW',
+	    history_table  => 'WORKFLOW_HISTORY',
+	},
 	);
 
     return $workflow_factory{$ident};

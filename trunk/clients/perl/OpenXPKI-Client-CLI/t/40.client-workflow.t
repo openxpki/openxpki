@@ -57,13 +57,15 @@ ok($res =~ m{ OK }xms);
 
 ###########################################################################
 $res = `$cli --session $session_id create workflow instance --workflow dataonly_cert_request`;
+### $res
+
 TODO: {
     local $TODO = "Does not work properly yet";
 
     ok($CHILD_ERROR == 0);
     chomp $res;
     
-    ok($res =~ m{ 'ID' \s+ => \s+'(\d+)'  }xms);
+    ok($res =~ m{ 'ID' \s+ => \s+ '(\d+)'  }xms);
     ### $res
     
     my $workflow_id = $1;

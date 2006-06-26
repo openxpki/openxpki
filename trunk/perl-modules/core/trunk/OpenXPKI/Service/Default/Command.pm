@@ -35,6 +35,8 @@ my %allowed_command = map { $_ => 1 } qw(
     list_workflow_titles
 
     get_workflow_info
+    set_workflow_fields
+
     create_workflow_instance
     execute_workflow_activity
 );
@@ -70,7 +72,7 @@ sub attach_impl : PRIVATE {
     my $cmd = $command{$ident};
     ##! 4: "command: $cmd"
 
-    # commands starting with an underscrore are not allowed (might be a
+    # commands starting with an underscore are not allowed (might be a
     # private method in API or command implementation)
     if ($cmd =~ m{ \A _ }xms) {
 	OpenXPKI::Exception->throw(
@@ -92,12 +94,6 @@ sub attach_impl : PRIVATE {
 	    # expected error if no implementation is available. 
 	    # We leave command_impl undefine to let execute() know
 	    # that it should do automatic API mapping.
-
-	    ##! 16: "$class does not seem to be available, falling back to default API mapping"
-# 	    OpenXPKI::Exception->throw(
-# 	        message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_IMPL_LOAD_FAILED",
-# 	        params  => {EVAL_ERROR => $EVAL_ERROR,
-# 			    MODULE     => $class});
 	} else {
 	    ##! 8: "instantiating class $class"
 	    $command_impl{$ident} = eval "$class->new()";
@@ -132,6 +128,7 @@ sub execute {
 
 	return $self->command_response(
 	    $self->get_API()->$method($command_params{$ident}),
+	    $method, # explicitly provide command name to returned structure
 	);
     } else {
 	##! 16: "ref child: " . ref $command_impl{$ident}
@@ -157,16 +154,21 @@ sub command_response {
     my $self  = shift;
     my $arg   = shift;
     my $ident = ident $self;
+    my $command_name = shift; # optional
 
-    my ($package, $filename, $line, $subroutine, $hasargs,
-        $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
-
-    # only leave the last part of the package name
-    my ($cmd) = ($package =~ m{ ([^:]+) \z }xms);
+    # autodetect command name (only works if called from a dedicated
+    # command implementation, not via automatic API call mapping)
+    if (! defined $command_name) {
+	my ($package, $filename, $line, $subroutine, $hasargs,
+	    $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
+	
+	# only leave the last part of the package name
+	($command_name) = ($package =~ m{ ([^:]+) \z }xms);
+    }
 
     return {
 	SERVICE_MSG => 'COMMAND',
-	COMMAND => $cmd,
+	COMMAND => $command_name,
 	PARAMS  => $arg,
     };
 }

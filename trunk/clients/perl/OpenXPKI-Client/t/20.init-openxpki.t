@@ -19,14 +19,20 @@ if (system("openxpkiadm >/dev/null 2>&1") != 0) {
     BAIL_OUT("OpenXPKI deployment environment is not installed");
 }
 
-if (-d $config{server_dir}) {
-    rmtree($config{server_dir});
+my $instancedir = $config{server_dir};
+
+if (length($instancedir) < 10) {
+    BAIL_OUT("Instance directory $instancedir not acceptable.");
 }
 
-ok(mkpath $config{server_dir});
+if (-d $instancedir) {
+    rmtree($instancedir);
+}
+
+ok(mkpath $instancedir);
 
 # deployment
-ok(system("openxpkiadm deploy $config{server_dir}") == 0);
+ok(system("openxpkiadm deploy $instancedir") == 0);
 
 # meta config should now exist
 ok(-e "$config{config_dir}/openxpki.conf");
@@ -34,15 +40,15 @@ ok(-e "$config{config_dir}/openxpki.conf");
 my ($pw_name) = getpwuid($EUID);
 my ($gr_name) = getgrgid($EUID);
 my %configure_settings = (
-    'dir.prefix' => File::Spec->rel2abs($config{server_dir}),
+    'dir.prefix' => File::Spec->rel2abs($instancedir),
     'server.socketfile' => File::Spec->rel2abs($config{socket_file}),
     'server.runuser' => $pw_name,
-    'server.rungroup' => $pw_name,
+    'server.rungroup' => $gr_name,
     );
 
 # configure in this directory
 my $dir = getcwd;
-ok(chdir $config{server_dir});
+ok(chdir $instancedir);
 
 my $args = "--batch --createdirs --";
 foreach my $key (keys %configure_settings) {

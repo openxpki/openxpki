@@ -95,7 +95,27 @@ my $command_map = {
 	    },
 	}, # nop
 
-	list => {
+	set => {
+	    DESC => 'Modify data',
+	    SUBCMD => {
+		workflow => {
+		    SUBCMD => {
+			fields => {
+			    GETOPT => [ qw( workflow|wf=s id=i ) ],
+			    MAPOPT => {
+				workflow => 'WORKFLOW',
+				id       => 'ID',
+			    },
+			    ACTION => {
+				APICALL => 'set_workflow_fields',
+			    },
+			}, # fields
+		    },
+		}, # workflow
+	    },
+	}, # list
+	
+	show => {
 	    DESC => 'List server information',
 	    SUBCMD => {
 		ca => {
@@ -107,28 +127,21 @@ my $command_map = {
 			}, # ids
 		    },
 		}, # ca
-		workflow => {
-		    SUBCMD => {
-			instances => {
-			    ACTION => {
-				APICALL => 'list_workflow_instances',
-			    },
-			},
-			titles => {
-			    ACTION => {
-				APICALL => 'list_workflow_titles',
-			    },
-			},
-		    },
-		}, # workflow
 	    },
-	}, # list
-
-	show => {
 	    DESC => 'Show details on specified item',
 	    SUBCMD => {
 		workflow => {
 		    SUBCMD => {
+			titles => {
+			    ACTION => {
+				APICALL => 'list_workflow_titles',
+			    },
+			}, # titles
+			instances => {
+			    ACTION => {
+				APICALL => 'list_workflow_instances',
+			    },
+			}, # instances
 			instance => {
 			    GETOPT => [ qw( workflow|wf=s id=i ) ],
 			    MAPOPT => {
@@ -138,7 +151,7 @@ my $command_map = {
 			    ACTION => {
 				APICALL => 'get_workflow_info',
 			    },
-			},
+			}, # instance
 		    }
 		}, # workflow
 	    },
@@ -436,7 +449,7 @@ sub show_error : PRIVATE {
     return 1;
 }
 
-
+###########################################################################
 # Service Messages
 
 sub show_default : PRIVATE {
@@ -449,12 +462,35 @@ sub show_default : PRIVATE {
     return 1;
 }
 
+sub show_COMMAND : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $response = shift;
+
+    my $cmd = $response->{COMMAND};
+    
+    if (defined $cmd && (ref $cmd eq '')) {
+	my $result;
+	eval {
+	    my $method = 'showcmd_' . $cmd;
+	    $result = $self->$method($response);
+	};
+	if (! $EVAL_ERROR) {
+	    return $result;
+	}
+    }
+
+    print "Unhandled command response:\n";
+    print Dumper $response;
+    return 1;
+}
+
 sub show_SERVICE_READY : PRIVATE {
     my $self  = shift;
     my $ident = ident $self;
     my $response = shift;
 
-    print "OK\n";
+    # do nothing...
     return 1;
 }
 
@@ -473,7 +509,6 @@ sub show_GET_AUTHENTICATION_STACK : PRIVATE {
     return 1;
 }
 
-
 sub show_GET_PASSWD_LOGIN : PRIVATE {
     my $self  = shift;
     my $ident = ident $self;
@@ -487,6 +522,61 @@ sub show_GET_PASSWD_LOGIN : PRIVATE {
 
     return 1;
 }
+
+
+###########################################################################
+# Render command messages
+
+sub showcmd_nop : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $response = shift;
+
+    print "OK\n";
+
+    return 1;
+}
+
+sub showcmd_list_workflow_titles : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $response = shift;
+
+    foreach my $title (sort keys %{$response->{PARAMS}}) {
+	my $desc = $response->{PARAMS}->{$title}->{description};
+	print "$title\n";
+	print "  $desc\n";
+    }
+
+    return 1;
+}
+
+sub showcmd_list_workflow_instances : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $response = shift;
+
+    my $format = "%-10s %-30s %-20s %-16s\n";
+    printf($format, 
+	   'ID',
+	   'Workflow',
+	   'State',
+	   'Last Update');
+
+    foreach my $entry (@{$response->{PARAMS}}) {
+	printf($format,
+	       $entry->{WORKFLOW_SERIAL},
+	       $entry->{WORKFLOW_TYPE},
+	       $entry->{WORKFLOW_STATE},
+	       $entry->{WORKFLOW_LAST_UPDATE},
+	    );
+    }
+
+    return 1;
+}
+
+
+
 
 
 ###########################################################################

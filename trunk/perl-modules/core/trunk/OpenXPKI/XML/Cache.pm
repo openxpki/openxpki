@@ -5,11 +5,13 @@
 ## (C) Copyright 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::XML::Cache;
+
 use strict;
 use warnings;
 use utf8;
 
-package OpenXPKI::XML::Cache;
+use File::Spec;
 
 ## this is for the caching itself
 use XML::Simple;
@@ -155,8 +157,9 @@ sub __perform_xinclude
         my $filename = $xinclude->{XPATH}->[$elements];
         if ($filename !~ /^\//)
         {
-            $path =~ s%/[^/]*$%/%;
-            $filename = $path.$filename;
+	    # relative path detected
+	    my ($vol, $dir, $file) = File::Spec->splitpath( File::Spec->rel2abs($path) );
+            $filename = File::Spec->catfile($dir, $filename);
         }
 
         ## loop detection

@@ -19,8 +19,48 @@ use Config::Std;
 use Data::Dumper;
 use OpenXPKI::Debug;
 
-
 $SIG{PIPE} = 'IGNORE';
+
+# global CLI client handle
+my $cli;
+
+# global client configuration
+my $config;
+
+
+# side effect: sets $cli
+sub reopen_connection {
+    my %args;
+    if (exists $config->{client}->{session}) {
+	$args{SESSION_ID} = $config->{client}->{session},
+    }
+
+    $cli = undef;
+    $cli = OpenXPKI::Client::CLI->new(
+	{
+	    SOCKETFILE => $config->{server}->{socketfile},
+	});
+    my $response;
+    eval {
+	$response = $cli->init_session(\%args);
+    };
+    if (my $exc = OpenXPKI::Exception->caught()) {
+	if ($exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
+	    # create new session
+	    print STDERR "Session expired, starting a new one.\n";
+	    $cli = undef;
+	    $cli = OpenXPKI::Client::CLI->new(
+		{
+		    SOCKETFILE => $config->{server}->{socketfile},
+		});
+	    $response = $cli->init_session();
+	}
+    }
+
+    $config->{client}->{session} = $cli->get_session_id();
+    return $response;
+}
+
 
 my %params;
 GetOptions(\%params,
@@ -38,8 +78,6 @@ pod2usage(-verbose => 1) if ($params{help});
 # read .openxpki/cli.conf file
 my $configdir = File::Spec->catfile($ENV{HOME}, '.openxpki');
 my $configfile = File::Spec->catfile($configdir, 'cli.conf');
-
-my $config;
 
 # only read configuration file for interactive sessions
 if (scalar @ARGV == 0 && -r $configfile) {
@@ -88,33 +126,8 @@ foreach my $param (@debug_entries) {
 
 require OpenXPKI::Client::CLI;
 
-my $cli = OpenXPKI::Client::CLI->new(
-    {
-	SOCKETFILE => $config->{server}->{socketfile},
-    });
-
-my $response;
-
-my %args;
-if (exists $config->{client}->{session}) {
-    $args{SESSION_ID} = $config->{client}->{session},
-}
-
-eval {
-    $response = $cli->init_session(\%args);
-};
-if (my $exc = OpenXPKI::Exception->caught()) {
-    if ($exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
-	print STDERR "Saved session is invalid, starting a new one\n";
-	$cli = undef;
-	$cli = OpenXPKI::Client::CLI->new(
-	    {
-		SOCKETFILE => $config->{server}->{socketfile},
-	    });
-	$response = $cli->init_session();
-    }
-}
-$config->{client}->{session} = $cli->get_session_id();
+# get a CLI instance
+my $response = reopen_connection();
 
 # render first server message (as returned by init_session())
 ### $response
@@ -151,9 +164,11 @@ if (scalar @ARGV == 0) {
 	    $response = $cli->send_receive_service_msg('STATUS');
 	};
 	if (my $exc = OpenXPKI::Exception->caught()) {
+	    # check for timed-out client session
 	    if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION') {
-		print $OUT "Server terminated connection.\n";
-		last INTERACTION;
+
+		$response = reopen_connection();
+		redo INTERACTION;
 	    }
 	} elsif ($EVAL_ERROR) {
 	    print $OUT "error: $EVAL_ERROR\n";
@@ -171,9 +186,8 @@ if (scalar @ARGV == 0) {
 	my $line = $term->readline($prompt);
 	last INTERACTION unless defined $line;  # accept EOF to leave shell
 
-	my $cmd_res;
 	eval {
-	    $cmd_res = $cli->process_command($line, 
+	    $response = $cli->process_command($line, 
 					     {
 						 READLINE => $term,
 					     }
@@ -182,7 +196,17 @@ if (scalar @ARGV == 0) {
 	if (my $exc = OpenXPKI::Exception->caught()) {
 	    if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION') {
 		print $OUT "Server terminated connection.\n";
-		last INTERACTION;
+		$response = reopen_connection();
+
+		$cli->render($response) if defined $response;
+
+		# resend user query
+		$response = $cli->process_command($line, 
+						  {
+						      READLINE => $term,
+						  }
+		    );
+		redo INTERACTION;
 	    }
 	} elsif ($EVAL_ERROR) {
 	    print $OUT "error: $EVAL_ERROR\n";
@@ -190,31 +214,29 @@ if (scalar @ARGV == 0) {
 	}
 
 	# command exit requested?
-	last INTERACTION if (! defined $cmd_res);
+	last INTERACTION if (! defined $response);
 
-	$cli->render($cmd_res) if defined $cmd_res;
+	$cli->render($response) if defined $response;
 
 	my @message;
-	if (exists $cmd_res->{MESSAGE}) {
-	    if (ref $cmd_res->{MESSAGE} eq '') {
-		push @message, $cmd_res->{MESSAGE};
+	if (exists $response->{MESSAGE}) {
+	    if (ref $response->{MESSAGE} eq '') {
+		push @message, $response->{MESSAGE};
 	    }
-	    if (ref $cmd_res->{MESSAGE} eq 'ARRAY') {
-		@message = @{$cmd_res->{MESSAGE}};
+	    if (ref $response->{MESSAGE} eq 'ARRAY') {
+		@message = @{$response->{MESSAGE}};
 	    }
 	}
 
-	if (! defined $cmd_res->{ERROR}) {# ||
-	    #($cmd_res->{ERROR} == 0)) {
+	if (! defined $response->{ERROR}) {# ||
+	    #($response->{ERROR} == 0)) {
 	    print $OUT join("\n", @message);
 	    print $OUT "\n";
 	} else {
-	    if ($cmd_res->{ERROR} ne '0') {
-		print $OUT "ERROR $cmd_res->{ERROR}: ". join("\n", @message) . "\n";
+	    if ($response->{ERROR} ne '0') {
+		print $OUT "ERROR $response->{ERROR}: ". join("\n", @message) . "\n";
 	    }
 	}
-
-
 
 	$term->addhistory($line) if ($line ne "");
     }    
@@ -236,9 +258,8 @@ if (scalar @ARGV == 0) {
 	#$cli->render($response) if defined $response;
     }
 
-    my $cmd_res;
     eval {
-	$cmd_res = $cli->process_command(join(' ', @ARGV));
+	$response = $cli->process_command(join(' ', @ARGV));
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
 	if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION') {
@@ -250,25 +271,25 @@ if (scalar @ARGV == 0) {
 	exit 1;
     }
     
-    $cli->render($cmd_res) if defined $cmd_res;
+    $cli->render($response) if defined $response;
     
     my @message;
-    if (exists $cmd_res->{MESSAGE}) {
-	if (ref $cmd_res->{MESSAGE} eq '') {
-	    push @message, $cmd_res->{MESSAGE};
+    if (exists $response->{MESSAGE}) {
+	if (ref $response->{MESSAGE} eq '') {
+	    push @message, $response->{MESSAGE};
 	}
-	if (ref $cmd_res->{MESSAGE} eq 'ARRAY') {
-	    @message = @{$cmd_res->{MESSAGE}};
+	if (ref $response->{MESSAGE} eq 'ARRAY') {
+	    @message = @{$response->{MESSAGE}};
 	}
     }
     
-    if (! defined $cmd_res->{ERROR}) {# ||
-	#($cmd_res->{ERROR} == 0)) {
+    if (! defined $response->{ERROR}) {# ||
+	#($response->{ERROR} == 0)) {
 	print $OUT join("\n", @message);
 	print $OUT "\n";
     } else {
-	if ($cmd_res->{ERROR} ne '0') {
-	    print STDERR "ERROR $cmd_res->{ERROR}: ". join("\n", @message) . "\n";
+	if ($response->{ERROR} ne '0') {
+	    print STDERR "ERROR $response->{ERROR}: ". join("\n", @message) . "\n";
 	}
 	$exitcode = 1;
     }

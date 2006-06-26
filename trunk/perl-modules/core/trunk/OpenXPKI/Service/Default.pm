@@ -361,7 +361,7 @@ sub run
 		    if ($exc->message() =~ m{
                             I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND
                         }xms) {
-			##! 16: "Invalid command $data->{COMMAND}"
+			##! 16: "Invalid command $data->{PARAMS}->{COMMAND}"
 			# fall-through intended
 		    } else {
 			$exc->rethrow();
