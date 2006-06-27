@@ -21,7 +21,7 @@
 [% END %]
     </server>
     <i18n>
-        <locale_directory>[% i18n.localedir %]</locale_directory>
+        <locale_directory>[% dir.localedir %]</locale_directory>
         <default_language>[% i18n.defaultlanguage %]</default_language>
     </i18n>
 

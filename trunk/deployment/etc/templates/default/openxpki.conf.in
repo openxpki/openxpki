@@ -188,7 +188,6 @@ syslog_facility: local7
 # Internationalization
 [i18n]
 # Language specific settings, REQUIRED
-localedir:       $(dir.localedir)
 defaultlanguage: C
 
 
