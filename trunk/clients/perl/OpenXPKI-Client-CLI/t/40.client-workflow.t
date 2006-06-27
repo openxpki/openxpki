@@ -52,7 +52,7 @@ $res = `$cli --session $session_id login password --user root --pass root`;
 ok($CHILD_ERROR == 0);
 chomp $res;
 
-ok($res =~ m{ OK }xms);
+ok($res =~ m{ \A \z }xms);
 ### $res
 
 ###########################################################################

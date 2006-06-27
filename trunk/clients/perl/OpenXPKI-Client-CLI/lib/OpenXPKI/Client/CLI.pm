@@ -537,6 +537,40 @@ sub showcmd_nop : PRIVATE {
     return 1;
 }
 
+sub showcmd_get_workflow_info : PRIVATE {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $response = shift;
+
+    printf("Workflow instance ID: %s\n", 
+	   $response->{PARAMS}->{WORKFLOW}->{ID});
+    printf("Workflow instance state: %s\n", 
+	   $response->{PARAMS}->{WORKFLOW}->{STATE});
+
+    print "\n";
+    print "Context:\n";
+    foreach my $key (sort keys %{$response->{PARAMS}->{WORKFLOW}->{CONTEXT}}) {
+	my $value = $response->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$key};
+	print "  $key: $value\n";
+    }
+    foreach my $activity (sort keys %{$response->{PARAMS}->{ACTIVITY}}) {
+	print "\n";
+	print "Activity: $activity\n";
+	foreach my $field (sort keys %{$response->{PARAMS}->{ACTIVITY}->{$activity}->{FIELD}}) {
+	    my $required = ( $response->{PARAMS}->{ACTIVITY}->{$activity}->{FIELD}->{$field}->{REQUIRED} eq 'yes' ) 
+		? '*' 
+		: '';
+	    my $desc = $response->{PARAMS}->{ACTIVITY}->{$activity}->{FIELD}->{$field}->{DESCRIPTION};
+	    printf("  %1s%-20s %s\n",
+		   $required,
+		   $field,
+		   $desc);
+	}
+    }
+
+    return 1;
+}
+
 sub showcmd_list_workflow_titles : PRIVATE {
     my $self  = shift;
     my $ident = ident $self;

@@ -1,4 +1,4 @@
-use Test::More tests => 13;
+use Test::More tests => 11;
 use English;
 
 use strict;
@@ -44,19 +44,11 @@ $res = `$cli --session $session_id auth --stack Anonymous`;
 ok($CHILD_ERROR == 0);
 chomp $res;
 
-ok($res =~ m{ OK }xms);
+ok($res =~ m{ \A \z }xms);
 ### $res
 
 ###########################################################################
-$res = `$cli --session $session_id list workflow titles`;
-ok($CHILD_ERROR == 0);
-chomp $res;
-
-ok($res =~ m{ dataonly_cert_request }xms);
-### $res
-
-###########################################################################
-$res = `$cli --session $session_id list workflow titles`;
+$res = `$cli --session $session_id show workflow titles`;
 ok($CHILD_ERROR == 0);
 chomp $res;
 

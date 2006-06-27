@@ -9,5 +9,6 @@ t/00.pod-coverage.t
 t/00.pod.t
 t/10.load.t
 t/20.init-openxpki.t
-t/30.client.t
+t/30.client-anonymous.t
+t/40.client-workflow.t
 t/99.cleanup.t
