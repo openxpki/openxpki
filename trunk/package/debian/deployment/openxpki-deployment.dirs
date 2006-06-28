@@ -5,7 +5,5 @@ etc/openxpki/instances
 etc/openxpki/instances/trustcenter1
 etc/openxpki/deployment
 etc/openxpki/deployment/trustcenter1
-usr
-usr/share
-usr/share/man
-usr/share/man/man1
+var/openxpki
+var/openxpki/session

@@ -158,14 +158,15 @@ sub deploy {
     @cmd = (
 	'openxpki-metaconf',
 	'--config', qq( $srcfile ),
-	'--setcfg', "dir.prefix='$targetdir'",
-	'--getcfg', 'dir.openxpkiconfdir',
+	'--setcfg', "dir.openxpkiconfdir='$targetdir'",
+	'--getcfg', 'dir.prefix',
 	);
+    my $openxpkiconfdir = $targetdir;
     
     my $cmd = join(' ', @cmd);
-    my $openxpkiconfdir = `$cmd`;
-    chomp($openxpkiconfdir);
-    
+    my $prefix = `$cmd`;
+    chomp($prefix);
+ 
     ### $openxpkiconfdir
     if (! -d $openxpkiconfdir) {
 	if (! mkpath($openxpkiconfdir, 1, 0750)) {
@@ -201,7 +202,7 @@ sub deploy {
 	'openxpki-metaconf',
 	'--config', qq( $srcfile ),
 	'--writecfg', qq( $dstfile ),
-	'--setcfg', "dir.prefix='$targetdir'",
+	'--setcfg', "dir.prefix='$prefix'",
 	'--setcfg', "dir.localedir='$config{localedir}'"
 	);
     
@@ -270,11 +271,6 @@ if ($cmd eq 'initdb') {
 } 
 
 if ($cmd eq 'deploy') {
-    if (! get_config($configfile)) {
-	print STDERR "Could not obtain OpenXPKI instance configuration\n";
-	exit 1;
-    }
-
     my $dir = shift;
     if (! defined $dir) {
 	$dir = $config{openxpkiconfdir};

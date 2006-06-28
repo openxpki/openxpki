@@ -8,7 +8,7 @@ set -e
 case "$1" in
     install)
         COUNT=`grep openxpki /etc/passwd | wc -l`;
-        if [ $$COUNT -eq 0 ]; then
+        if [ $COUNT -eq 0 ]; then
             useradd --system --no-create-home --disabled-password --disabled-login --group openxpki;
         fi;
     ;;

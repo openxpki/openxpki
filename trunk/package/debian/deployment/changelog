@@ -2,7 +2,7 @@ openxpki-deployment (0.9.20060615-2) unstable; urgency=low
 
   * openxpkictl detects now a failed server startup.
 
- -- Michael Bell <michael.bell@web.de>  Tue, 15 Jun 2006 12:00:00 +0200
+ -- Michael Bell <michael.bell@web.de>  Tue, 20 Jun 2006 12:00:00 +0200
 
 openxpki-deployment (0.9.20060615-1) unstable; urgency=low
 

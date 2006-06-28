@@ -50,7 +50,7 @@ clean:
 config: config-stamp
 config-stamp:
 	dh_testdir
-	./configure
+	./configure -- --setcfg dir.mandir=/usr/share/man --setcfg dir.sysconfdir=/etc --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 --setcfg dir.localedir=/usr/share/locale --setcfg dir.localstatedir=/var
 	touch config-stamp
 
 install: install-stamp
