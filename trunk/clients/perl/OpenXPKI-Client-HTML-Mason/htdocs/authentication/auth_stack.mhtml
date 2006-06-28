@@ -10,14 +10,16 @@
     ## then ask the user
     if (not exists $session_cache{$session_id}->{auth_stack})
     {
+        print '<select name="auth_stack">'."\n";
         ## let's print the available options
         foreach my $stack (keys %{$auth_stacks})
         {
-            print "<option value='$stack'>".
+            print "  <option value='$stack'>".
                   $auth_stacks->{$stack}->{NAME}." - ".
                   $auth_stacks->{$stack}->{DESCRIPTION}.
                   "</option>\n";
         }
+        print '</select>'."\n";
     }
 </%perl>
 

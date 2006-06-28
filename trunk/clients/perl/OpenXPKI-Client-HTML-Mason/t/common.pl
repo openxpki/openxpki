@@ -8,6 +8,7 @@ our $PWD      = `pwd`;
     $PWD      =~ s/\n//g;
 our $INSTANCE = "$PWD/t/tc1";
 our $CONFIG   = "openxpki.conf";
+our $OUTPUT   = "t/html_output";
 
 $INSTANCE   = $ENV{INSTANCE}   if (exists $ENV{INSTANCE});    
 

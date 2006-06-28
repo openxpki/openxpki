@@ -4,6 +4,7 @@
   # FIXME: move this to Apache handler?
   use URI;
   use OpenXPKI::Client::HTML::Mason;
+  use OpenXPKI::i18n qw( i18nGettext );
   use English;
 
   $context{socket_file} = $ENV{OPENXPKI_SOCKET_FILE};

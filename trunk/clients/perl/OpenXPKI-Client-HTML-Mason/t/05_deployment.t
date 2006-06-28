@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 use English;
 
@@ -39,7 +39,7 @@ BEGIN {
 
     ## set correct prefix
     ## set correct user and group
-    `cd $INSTANCE/etc/openxpki && openxpki-metaconf --config openxpki.conf --force --setcfgvalue dir.prefix=$INSTANCE --setcfgvalue server.runuser=$UID --setcfgvalue server.rungroup=$GID --writecfg openxpki.conf`;
+    `cd $INSTANCE/etc/openxpki && openxpki-metaconf --config openxpki.conf --force --setcfgvalue dir.prefix=$INSTANCE --setcfgvalue server.runuser=$UID --setcfgvalue server.rungroup=$GID --setcfg dir.localstatedir=$INSTANCE/var --setcfg dir.sysconfdir=$INSTANCE/etc --setcfg dir.openxpkiconfdir=$INSTANCE/etc/openxpki --writecfg openxpki.conf`;
     ok(! $EVAL_ERROR);
 
     ## configure new instance
@@ -57,15 +57,24 @@ BEGIN {
     ## start server
     `openxpkictl --config $INSTANCE/etc/openxpki/config.xml start`;
     ok (! $EVAL_ERROR);
-    #unncessary - openxpkictl performs waitpid
+    #unnecessary - openxpkictl performs waitpid
     #print STDERR "Waiting 10 seconds for server startup ...";
-    #sleep 10;
+    #sleep 5;
 
     ## get socketfile
     my $socketfile = `openxpki-metaconf --config $INSTANCE/etc/openxpki/$CONFIG --getcfgvalue server.socketfile`;
        $socketfile =~ s{ (.*) \n+ }{$1}xms;
     #print STDERR "Verifying server via socketfile $socketfile ...\n";
     ok (-e $socketfile);
+
+    ## create a directory for the generated HTML pages
+    our $OUTPUT;
+    if (not -d $OUTPUT)
+    {
+        ok(mkdir $OUTPUT);
+    } else {
+        ok(1);
+    }
 }
 
 diag( "Deploy an OpenXPKI trustcenter installation" );

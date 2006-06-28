@@ -24,7 +24,6 @@
              alt="OpenXPKI"/>
       </div> <!-- header -->
 
-      <div class="content">
 <%perl>
     my $session_context = $m->comp('/authentication/session.mhtml');
     my $session_id      = $session_context->{session_id};
@@ -32,9 +31,11 @@
     my $msg = $client->collect();
     if ($msg->{SERVICE_MSG} eq "GET_PKI_REALM")
     {
+        $m->comp('/authentication/open_form.mhtml');
         $m->comp('/authentication/pki_realm.mhtml',
-                 'pki_realms' => $msg->{PKI_REALMS},
+                 'pki_realms' => $msg->{PARAMS}->{PKI_REALMS},
                  'session_id' => $session_id);
+        $m->comp('/authentication/close_form.mhtml');
     }
     else
     {
@@ -42,14 +43,16 @@
                                  'session_id' => $session_id);
         if ($msg->{SERVICE_MSG} eq "GET_AUTHENTICATION_STACK")
         {
+            $m->comp('/authentication/open_form.mhtml');
             $m->comp('/authentication/auth_stack.mhtml',
-                     'auth_stacks' => $msg->{AUTHENTICATION_STACKS},
+                     'auth_stacks' => $msg->{PARAMS}->{AUTHENTICATION_STACKS},
                      'pki_realm'   => $pki_realm,
                      'session_id'  => $session_id);
+            $m->comp('/authentication/close_form.mhtml');
         }
         elsif ($msg->{SERVICE_MSG} eq "SERVICE_READY")
         {
-            ## ok let's panic - session is ready and are inside of the auth autohandler !?
+            ## ok let's panic - session is ready and we are inside of the auth autohandler !?
             $m->comp('/service/autohandler', 'session_id' => $session_id);
         }
         else
