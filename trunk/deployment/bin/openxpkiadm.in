@@ -158,14 +158,13 @@ sub deploy {
     @cmd = (
 	'openxpki-metaconf',
 	'--config', qq( $srcfile ),
-	'--setcfg', "dir.openxpkiconfdir='$targetdir'",
-	'--getcfg', 'dir.prefix',
+	'--setcfg', "dir.prefix='$targetdir'",
+	'--getcfg', 'dir.openxpkiconfdir',
 	);
-    my $openxpkiconfdir = $targetdir;
-    
+
     my $cmd = join(' ', @cmd);
-    my $prefix = `$cmd`;
-    chomp($prefix);
+    my $openxpkiconfdir = `$cmd`;
+    chomp($openxpkiconfdir);
  
     ### $openxpkiconfdir
     if (! -d $openxpkiconfdir) {
@@ -202,7 +201,7 @@ sub deploy {
 	'openxpki-metaconf',
 	'--config', qq( $srcfile ),
 	'--writecfg', qq( $dstfile ),
-	'--setcfg', "dir.prefix='$prefix'",
+	'--setcfg', "dir.prefix='$targetdir'",
 	'--setcfg', "dir.localedir='$config{localedir}'"
 	);
     
@@ -273,7 +272,7 @@ if ($cmd eq 'initdb') {
 if ($cmd eq 'deploy') {
     my $dir = shift;
     if (! defined $dir) {
-	$dir = $config{openxpkiconfdir};
+	$dir = $config{prefix};
     }
     if ($params{templatedir}) {
 	$config{template_prefix} = $params{templatedir};
