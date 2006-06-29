@@ -17,7 +17,7 @@ use File::Spec;
 use File::Copy;
 use File::Path;
 
-use Smart::Comments;
+# use Smart::Comments;
 
 use OpenXPKI::VERSION;
 use OpenXPKI::Server::Init;
