@@ -34,7 +34,8 @@ BEGIN {
     ok (-d "$INSTANCE/etc/openxpki");
 
     ## create openxpki.conf
-    `openxpkiadm deploy $INSTANCE/etc/openxpki`;
+    ## openxpki-metaconf does not use sysconfdir therefor we must set openxpkiconfdir
+    `openxpkiadm deploy --prefix $INSTANCE -- --setcfg dir.openxpkiconfdir=$INSTANCE/etc/openxpki`;
     ok (-e "$INSTANCE/etc/openxpki/$CONFIG");
 
     ## set correct prefix

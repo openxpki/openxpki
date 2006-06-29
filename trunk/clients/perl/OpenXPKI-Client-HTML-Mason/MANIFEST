@@ -3,6 +3,7 @@ Changes
 MANIFEST
 Makefile.PL
 README
+VERSION  ## never check in this file to SVN !!!
 
 bin/openxpki.cgi
 

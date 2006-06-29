@@ -10,7 +10,15 @@
     ## then ask the user
     if (not exists $session_cache{$session_id}->{auth_stack})
     {
-        print '<select name="auth_stack">'."\n";
+</%perl>
+        <div class="title">
+            <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE') %>
+        </div>
+        <div class="description">
+            <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION') %>
+        </div>
+        <select name="auth_stack">
+<%perl>
         ## let's print the available options
         foreach my $stack (keys %{$auth_stacks})
         {
@@ -19,7 +27,9 @@
                   $auth_stacks->{$stack}->{DESCRIPTION}.
                   "</option>\n";
         }
-        print '</select>'."\n";
+</%perl>
+        </select>
+<%perl>
     }
 </%perl>
 

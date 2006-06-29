@@ -30,7 +30,7 @@ case "$1" in
 		echo Detected and respect an old deployment.
 	else
 		echo -n deploy instance trustcenter1 ...
-		openxpkiadm --config=/etc/openxpki/templates/default/config.xml deploy /etc/openxpki/instances/trustcenter1;
+		openxpkiadm --config=/etc/openxpki/templates/default/config.xml deploy -- --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1;
 		echo DONE.
 		cd /etc/openxpki/instances/trustcenter1;
 		echo -n configure instance trustcenter1

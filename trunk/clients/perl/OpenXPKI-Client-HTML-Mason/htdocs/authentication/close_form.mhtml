@@ -6,3 +6,4 @@
               <input type="reset" name="reset" value="<% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_RESET") %>"/>
             </div>
           </div> <!-- form button bar -->
+        </form>

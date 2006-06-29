@@ -64,19 +64,19 @@ $FUNCTION{default} = qq^
     <!-- Use the Microsoft ActiveX control to install the certificate -->
     <object
         classid="clsid:43f8f289-7a20-11d0-8f06-00c04fc295e1"
-        codebase=xenroll.dll
-        id=certHelperOld>
+        codebase="xenroll.dll"
+        id="certHelperOld">
     </object>
     <object
         classid= "clsid:127698e4-e730-4e5c-a2b1-21490a70c8a1"
-        codebase=xenroll.dll
-        id=certHelperNew>
+        codebase="xenroll.dll"
+        id="certHelperNew">
     </object>
 ^;
 
 $FUNCTION{install_cert_ie} = qq^
 <script type="text/javascript">
-
+<!--
     function InstallCertIE (form)
     {
         // Explorer Installation
@@ -101,14 +101,14 @@ $FUNCTION{install_cert_ie} = qq^
         }
         document.all.result.innerText = "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS";
     }
-
+-->
 </script>
 ^;
 
 
 $FUNCTION{sign_form} = qq^
 <script type="text/javascript">
-
+<!--
 function signForm(theForm, theWindow){
   if (navigator.appName == "Netscape"){
     if (signFormN(theForm, theWindow))
@@ -149,9 +149,10 @@ function signFormN(theForm, theWindow) {
   theForm.signature.value = signedText;
   return true;
 }
-
+-->
 </script>
 <script type="text/vbscript">
+<!--
 Function UnicodeToAscii(ByRef pstrUnicode)
      Dim i, result
      
@@ -196,12 +197,14 @@ If Err.Number <> 0 then
 End If
 
 End Function
+-->
 </script>
 ^;
 
 
 $FUNCTION{gen_csr_ie} = qq^
     <script type="text/vbscript">
+    <!--
         dim PROV_RSA_FULL
         dim OLD_XENROLL
         dim NEW_XENROLL
@@ -394,7 +397,7 @@ $FUNCTION{gen_csr_ie} = qq^
             document.OPENXPKI.elements[0].focus()
 
         end sub
-
+    -->
     </script>
 ^;
 

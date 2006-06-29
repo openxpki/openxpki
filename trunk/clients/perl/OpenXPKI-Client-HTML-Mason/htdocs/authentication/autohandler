@@ -70,3 +70,7 @@
     </div>  <!-- page -->
   </body>
 </html>
+
+<%init>
+  $r->content_type('text/html; charset=utf-8');
+</%init>
