@@ -17,7 +17,7 @@ use File::Spec;
 use File::Copy;
 use File::Path;
 
-# use Smart::Comments;
+use Smart::Comments;
 
 use OpenXPKI::VERSION;
 use OpenXPKI::Server::Init;
@@ -117,6 +117,7 @@ sub deploy {
     my $targetdir       = $args->{TARGETDIR};
     my $template_prefix = $args->{TEMPLATE_PREFIX};
     my $template        = $args->{TEMPLATE};
+    my @metaconf_opts   = @{$args->{METACONF_OPTS}};
 
     if (! defined $targetdir || ($targetdir eq '')) {
 	print STDERR "No target directory specified.\n";
@@ -135,6 +136,9 @@ sub deploy {
     print STDERR "Template set:              $template\n";
     print STDERR "Template source directory: $template_prefix\n";
     print STDERR "Target directory:          $targetdir\n";
+    if (scalar @metaconf_opts) {
+	print STDERR "openxpki-metaconf options: " . join(' ', @metaconf_opts) . "\n";
+    }
 
     if ($args->{DRYRUN}) {
 	return 1;
@@ -160,6 +164,7 @@ sub deploy {
 	'--config', qq( $srcfile ),
 	'--setcfg', "dir.prefix='$targetdir'",
 	'--getcfg', 'dir.openxpkiconfdir',
+	@metaconf_opts,
 	);
 
     my $cmd = join(' ', @cmd);
@@ -202,7 +207,8 @@ sub deploy {
 	'--config', qq( $srcfile ),
 	'--writecfg', qq( $dstfile ),
 	'--setcfg', "dir.prefix='$targetdir'",
-	'--setcfg', "dir.localedir='$config{localedir}'"
+	'--setcfg', "dir.localedir='$config{localedir}'",
+	@metaconf_opts,
 	);
     
     if (system(join(' ', @cmd)) != 0) {
@@ -228,6 +234,7 @@ GetOptions(\%params,
 	      dryrun
               templatedir=s
               template=s
+              prefix=s
 	      )) or pod2usage(-verbose => 0);
 
 if ($params{version}) {
@@ -270,22 +277,35 @@ if ($cmd eq 'initdb') {
 } 
 
 if ($cmd eq 'deploy') {
-    my $dir = shift;
+    # get arguments following --
+    my @metaconf_opts = @ARGV;
+
+    ### @metaconf_opts
+
+    # first non-options argument is target prefix
+    my $dir;
+    if ($params{prefix}) {
+	$dir = $params{prefix};
+    }
+
     if (! defined $dir) {
 	$dir = $config{prefix};
     }
+
     if ($params{templatedir}) {
 	$config{template_prefix} = $params{templatedir};
     }
+
     my $template = $params{template} || 'default';    
     
     if (! deploy(
 	{
 	    TEMPLATE_PREFIX => $config{template_prefix},
-	    TEMPLATE    => $template,
-	    TARGETDIR   => File::Spec->rel2abs($dir),
-	    FORCE       => $params{force},
-	    DRYRUN      => $params{dryrun},
+	    TEMPLATE        => $template,
+	    TARGETDIR       => File::Spec->rel2abs($dir),
+	    METACONF_OPTS   => \@metaconf_opts,
+	    FORCE           => $params{force},
+	    DRYRUN          => $params{dryrun},
 	})) {
 	print STDERR "Could not deploy OpenXPKI instance.\n";
 	exit 1;
@@ -318,11 +338,12 @@ openxpkiadm [OPTIONS] COMMAND
    --config FILE         use configuration from FILE
    --force               Force operation (may be destructive)
    --dryrun              Don't change anything, just print what would be done
+   --prefix DIR          Use specified prefix during deployment
    --templatedir DIR     Use specified directory as base directory for templates
    --template TEMPLATE   Use specified template (defaults to 'default')
 
  Commands:
-   deploy [DIR]          Deploy a new OpenXPKI installation
+   deploy                Deploy a new OpenXPKI installation
    initdb                Initialize database
 
 
@@ -332,11 +353,11 @@ Available commands:
 
 =over 8
 
-=item B<deploy> [DIR]
+=item B<deploy>
 
-Creates a new OpenXPKI server configuration file set in the specified 
-directory (defaults to [% dir.openxpkiconfdir %] if no directory is 
-specified).
+Creates a new OpenXPKI server configuration file set below the specified 
+prefix directory (defaults to [% dir.prefix %] 
+if no other directory is specified via --prefix).
 This command will not overwrite existing configuration files unless --force
 is specified.
 
@@ -345,6 +366,9 @@ as template base directory.
 
 If --template is specified, its argument is used instead of 'default' for
 the source of the templates used.
+
+All options following -- are literally passed to openxpki-metaconf during
+deployment.
 
 
 =item B<initdb>
@@ -384,6 +408,18 @@ WARNING: This may destroy existing data!
 =item B<--dryrun>
 
 Prints effects of a command without actually modifying anything.
+
+=item B<--prefix>
+
+Specify deployment prefix for deploy command.
+
+=item B<--templatedir>
+
+Specify template directory to use for configuration files.
+
+=item B<--template>
+
+Specify template to use during deployment.
 
 =back
 
