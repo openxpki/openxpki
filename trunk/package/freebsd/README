@@ -1,0 +1,39 @@
+OpenXPKI is included into the distribution of the basic 
+FreeBSD system as a regular port under the FreeBSD name
+"security/p5-openxpki":
+
+http://www.freebsd.org/ports/security.html
+
+This port installs all tools of openxpki 
+(server-side, client-side, deployment) in one move.
+You have to undergo subsequent deployment stage by hand.
+This will specify the role, which your computer plays inside the 
+PKI infrastructure.
+
+It is very much NOT recommended to copy only one port
+security/p5-openxpki onto your computer, if you wish to install it.
+This port depends on about 100 other ports. 
+Thus it is vitally important to have the entire port collection 
+(present on your computer) in a self-consistent state and 
+in accord with your base system.
+
+Recommended procedure to make use of the port is:
+
+1. Get/upgrade the entire port collection as described in
+
+http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/ports-using.html 
+
+2. cd /usr/ports/security/p5-openxpki && make install clean
+
+3. perform deployment procedure for openxpki in a regular way.
+
+Just in case: FreeBSD employs one and the same port collection 
+in ALL (stable, current, legacy) versions of FreeBSD.
+
+If you find issues with this FreeBSD port, please contact
+port maintainer svysh@cryptocom.ru
+
+The latest security/p5-openxpki port aims at version openxpki-0.9.342,
+which has a status of intermediate snapshot meant for 
+preliminary experiments with openxpki.
+
