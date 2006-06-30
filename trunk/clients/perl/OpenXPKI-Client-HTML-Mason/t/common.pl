@@ -28,9 +28,10 @@ our $XS = XML::Simple->new (ForceArray    => 1,
 
 sub check_html
 {
-    my $keys = shift;
-    my $path = $keys->{PATH};
-    my $page = $keys->{PAGE};
+    my $keys  = shift;
+    my $path  = $keys->{PATH};
+    my $page  = $keys->{PAGE};
+    my $value = $keys->{VALUE};
 
     my @list = split "\/", $path;
     my @path = ();
@@ -43,10 +44,65 @@ sub check_html
     {
         return  $count if (not exists $page->{$item->[0]});
         $page = $page->{$item->[0]};
-        return -$count if (not exists $page->[$item->[1]]);
-        $page = $page->[$item->[1]];
+        if (defined $item->[1])
+        {
+            return -$count if (not exists $page->[$item->[1]]);
+            $page = $page->[$item->[1]];
+        }
+        $count++;
+    }
+    if (exists $keys->{VALUE})
+    {
+        return $count if (ref $page);
+        return -$count if ($value ne $page);
     }
     return 0;
 }
-    
+
+sub check_session_id
+{
+    my $page = shift;
+    return 1 if (not exists $page->{html}->[0]->{body}->[0]->{div}->[0]->{div}->[1]->{form}->[0]->{input}->[0]);
+    $page = $page->{html}->[0]->{body}->[0]->{div}->[0]->{div}->[1]->{form}->[0]->{input}->[0];
+    return 2 if ($page->{type} ne "hidden");
+    return 3 if ($page->{name} ne "session_id");
+    return 4 if (length $page->{value} < 16);
+    return 0;
+}
+
+sub get_session_id
+{
+    my $page = shift;
+    return undef if (0 != check_session_id($page));
+    return $page->{html}->[0]->{body}->[0]->{div}->[0]->{div}->[1]->{form}->[0]->{input}->[0]->{value};
+}
+
+sub dump_page
+{
+    my $page = shift;
+    use Data::Dumper;
+    print STDERR Dumper($page);
+}
+
+sub write_html
+{
+    my $keys     = shift;
+    my $filename = $keys->{FILENAME};
+    my $data     = $keys->{DATA};
+
+    ## strip off http header
+    $data =~ s/^.*\n\n<\?xml/<?xml/s;
+
+    return 1 if (not open FD, ">$OUTPUT/$filename");
+    return 2 if (not print FD $data);
+    return 3 if (not close FD);
+    return 0;
+}
+
+sub get_parsed_xml
+{
+    my $filename = shift;
+    return $XS->XMLin ("$OUTPUT/$filename");
+}
+
 1;

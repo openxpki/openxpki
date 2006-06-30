@@ -19,6 +19,13 @@
           SOCKETFILE => $socketfile,
       });
 
+  if (not defined $session_id)
+  {
+      ## try to get session_id directly from the form data
+      my %request = $m->request_args();
+      $session_id = $request{'session_id'} if (exists $request{'session_id'});
+  }
+  
   my %args;
   if (defined $session_id) {
       # this may happen after a restart: the client still knows its session

@@ -1,23 +1,16 @@
 <%args>
-  $session_id  => undef
-  $pki_realm   => undef
-  $auth_stack  => undef
-  $auth_stacks => undef
+  $msg             => undef
+  $session_context => undef
 </%args>
 
-<%perl>
-    ## if pki realm is not in the session cache
-    ## then ask the user
-    if (not exists $session_cache{$session_id}->{auth_stack})
-    {
-</%perl>
-        <div class="title">
-            <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE') %>
-        </div>
-        <div class="description">
-            <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION') %>
-        </div>
-        <select name="auth_stack">
+    <& '/authentication/open_form.mhtml', 'session_id' => $session_id &>
+    <div class="title">
+    <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE') %>
+    </div>
+    <div class="description">
+        <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION') %>
+    </div>
+    <select name="auth_stack">
 <%perl>
         ## let's print the available options
         foreach my $stack (keys %{$auth_stacks})
@@ -28,13 +21,28 @@
                   "</option>\n";
         }
 </%perl>
-        </select>
-<%perl>
-    }
-</%perl>
+    </select>
+    <& '/authentication/close_form.mhtml' &>
 
 <%init>
-    ## check if the pki realm is already present
-    return $session_cache{$session_id}->{auth_stack}
-        if (exists $session_cache{$session_id}->{auth_stack});
+    my $session_id = $session_context->{session_id};
+    my $client     = $session_context->{client};
+
+    ## check that we must handle this message
+    return $msg if ($msg->{SERVICE_MSG} ne "GET_AUTHENTICATION_STACK");
+
+    ## was the pki realm specified by the user?
+    my %data = $m->request_args();
+    if (exists $data{'auth_stacks'})
+    {
+        $client->send_service_msg ('GET_AUTHENTICATION_STACK', 'AUTHENTICATION_STACKS' => $data{'auth_stack'});
+        $msg = $client->collect();
+        if ($msg->{'SERVICE_MSG'} ne 'GET_AUTHENTICATION_STACK')
+        {
+            return $msg;
+        }
+    }
+
+    ## ok let's ask the user for the auth stacks
+    my $auth_stacks = $msg->{PARAMS}->{AUTHENTICATION_STACKS};
 </%init>

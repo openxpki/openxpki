@@ -1,2 +1,8 @@
+<%args>
+    $session_id => undef
+</%args>
+
       <div class="content">
         <form action="authentication/index.html" method="post">
+          <input type="hidden" name="session_id" value="<% $session_id %>"/>
+

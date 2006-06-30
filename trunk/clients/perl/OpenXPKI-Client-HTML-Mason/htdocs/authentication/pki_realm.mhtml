@@ -1,27 +1,48 @@
 <%args>
-  $session_id => undef
-  $pki_realm  => undef
-  $pki_realms => undef
+  $msg             => undef
+  $session_context => undef
 </%args>
 
+    <& '/authentication/open_form.mhtml', 'session_id' => $session_id &>
+    <div class="title">
+    <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_TITLE') %>
+    </div>
+    <div class="description">
+        <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_DESCRIPTION') %>
+    </div>
+    <select name="auth_stack">
 <%perl>
-    ## if pki realm is not in the session cache
-    ## then ask the user
-    if (not exists $session_cache{$session_id}->{pki_realm})
+    ## let's print the available options
+    foreach my $realm (keys %{$pki_realms})
     {
-        ## let's print the available options
-        foreach my $realm (keys %{$pki_realms})
-        {
-            print "<option value='$realm'>".
-                  $pki_realms->{$realm}->{NAME}." - ".
-                  $pki_realms->{$realm}->{DESCRIPTION}.
-                  "</option>\n";
-        }
+        print "<option value='$realm'>".
+              $pki_realms->{$realm}->{NAME}." - ".
+              $pki_realms->{$realm}->{DESCRIPTION}.
+              "</option>\n";
     }
 </%perl>
+    </select>
+    <& '/authentication/close_form.mhtml' &>
 
 <%init>
-    ## check if the pki realm is already present
-    return $session_cache{$session_id}->{pki_realm}
-        if (exists $session_cache{$session_id}->{pki_realm});
+    my $session_id = $session_context->{session_id};
+    my $client     = $session_context->{client};
+
+    ## check that we must handle this message
+    return $msg if ($msg->{SERVICE_MSG} ne "GET_PKI_REALM");
+
+    ## was the pki realm specified by the user?
+    my %data = $m->request_args();
+    if (exists $data{'pki_realm'})
+    {
+        $client->send_service_msg ('GET_PKI_REALM', 'PKI_REALMS' => $data{'pki_realm'});
+        $msg = $client->collect();
+        if ($msg->{'SERVICE_MSG'} ne 'GET_PKI_REALM')
+        {
+            return $msg;
+        }
+    }
+
+    ## ok let's ask the user for the PKI realm
+    my $pki_realms = $msg->{PARAMS}->{PKI_REALMS};
 </%init>

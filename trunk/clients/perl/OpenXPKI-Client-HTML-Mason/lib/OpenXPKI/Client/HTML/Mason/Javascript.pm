@@ -402,3 +402,44 @@ $FUNCTION{gen_csr_ie} = qq^
 ^;
 
 1;
+__END__
+
+=head1 Name
+
+OpenXPKI::Client::HTML::Mason::Javascript
+
+=head1 Description
+
+This class provides the web interface with all needed Javascript and
+Visual Basic Script code. Such code is needed to create signatures and
+PKCS#10 requests. The code supports i18n.
+
+=head1 Functions
+
+=head2 new
+
+is the constructor and should not be called with any parameters.
+This constructor translates all function to the current locale. This
+means that you should not call new before the locale environment is
+set.
+
+=head2 get_function
+
+can be used in two ways with the name of a Javascript functionality or
+without. If you specify no name then you get all translated Javascript
+functions as one string. If you specify a name then you only get the
+code for a single functionality. The following functions are available:
+
+=over
+
+=item * default
+
+initializes Microsoft's CAPI objects.
+
+=item * install_cert_ie
+
+=item * sign_form
+
+=item * gen_csr_ie
+
+=back

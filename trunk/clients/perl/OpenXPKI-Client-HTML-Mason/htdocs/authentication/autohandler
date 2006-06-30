@@ -29,38 +29,15 @@
     my $session_id      = $session_context->{session_id};
     my $client          = $session_context->{client};
     my $msg = $client->collect();
-    if ($msg->{SERVICE_MSG} eq "GET_PKI_REALM")
+       $msg = $m->comp('/authentication/pki_realm.mhtml',
+                       'msg' => $msg, 'session_context' => $session_context);
+       $msg = $m->comp('/authentication/auth_stack.mhtml',
+                       'msg' => $msg, 'session_context' => $session_context);
+
+    if ($msg->{SERVICE_MSG} eq "SERVICE_READY")
     {
-        $m->comp('/authentication/open_form.mhtml');
-        $m->comp('/authentication/pki_realm.mhtml',
-                 'pki_realms' => $msg->{PARAMS}->{PKI_REALMS},
-                 'session_id' => $session_id);
-        $m->comp('/authentication/close_form.mhtml');
-    }
-    else
-    {
-        my $pki_realm = $m->comp('/authentication/pki_realm.mhtml',
-                                 'session_id' => $session_id);
-        if ($msg->{SERVICE_MSG} eq "GET_AUTHENTICATION_STACK")
-        {
-            $m->comp('/authentication/open_form.mhtml');
-            $m->comp('/authentication/auth_stack.mhtml',
-                     'auth_stacks' => $msg->{PARAMS}->{AUTHENTICATION_STACKS},
-                     'pki_realm'   => $pki_realm,
-                     'session_id'  => $session_id);
-            $m->comp('/authentication/close_form.mhtml');
-        }
-        elsif ($msg->{SERVICE_MSG} eq "SERVICE_READY")
-        {
-            ## ok let's panic - session is ready and we are inside of the auth autohandler !?
-            $m->comp('/service/autohandler', 'session_id' => $session_id);
-        }
-        else
-        {
-            ## ok let's panic - we are in an unexpected situation
-            ## FIXME: is this the correct reaction?
-            $m->comp('/service/autohandler', 'session_id' => $session_id);
-        }
+        ## ok let's panic - session is ready and we are inside of the auth autohandler !?
+        $m->comp('/service/autohandler', 'session_id' => $session_id);
     }
 </%perl>
       </div> <!-- content -->
