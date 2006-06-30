@@ -85,19 +85,35 @@ sub __check_key_store {
 
 sub login {
     my $self = shift;
-    $self->{PASSWD} = CTX('gui')->get_token_passwd (
-                          PARTS => $self->{PASSWD_PARTS},
-                          TOKEN => $self->{NAME});
+    my $keys = shift;
 
+    ## check the supplied parameter
+    if (not exists $keys->{PASSWD})
+    {
+        ## enforce passphrases
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_MISSING_PASSWD");
+    }
+    if (length $keys->{PASSWD} < 4)
+    {
+        ## enforce OpenSSL default passphrase length
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_PASSWD_TOO_SHORT");
+    }
+    $self->{PASSWD} = $keys->{PASSWD};
+
+    ## test the passphrase
     eval
     {
         $self->{OPENSSL}->command ({COMMAND => "convert_key", OUTFORM=>"PKCS8"});
     };
-    if (my $exc = OpenXPKI::Excpetion->caught())
+    if (my $exc = OpenXPKI::Exception->caught())
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED");
     } elsif ($EVAL_ERROR) {
+        ## FIXME: doe snormal EVAL_ERRORs support rethrow?
+        ## FIXME: usually this ends with die :)
         $EVAL_ERROR->rethrow();
     }
 
@@ -264,11 +280,12 @@ The constructor supports the following parameters:
 
 =head2 login
 
-enforces a login into the token.
+set the passphrase for the used token and checks the passphrase for its
+correctness. If the passhrase is missing, shorter than 4 characters or
+simply wrong then an exception is thrown. The only parameter is PASSWD
+with the passphrase.
 
-FIXME: the user interface is used via the tokenmanager
-
-FIXME: but there is no reference to the tokenmanager
+Examples: $engine->login ({PASSWD => "12345678"});
 
 =head2 logout
 
