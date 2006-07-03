@@ -23,9 +23,13 @@ Recommended procedure to make use of the port is:
 
 http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/ports-using.html 
 
-2. cd /usr/ports/security/p5-openxpki && make install clean
+2. 
+cd /usr/ports/sysutils/portupgrade && make reinstall clean && rehash
+portupgrade -NrR security/p5-openxpki
 
-3. perform deployment procedure for openxpki in a regular way.
+3. Install your favorite database and web server.
+
+4. perform deployment procedure for openxpki in a regular way.
 
 Just in case: FreeBSD employs one and the same port collection 
 in ALL (stable, current, legacy) versions of FreeBSD.

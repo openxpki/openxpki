@@ -1,7 +1,7 @@
 Build.PL
 Changes
 MANIFEST
-META.yml # Will be created by "make dist"
+#META.yml # Will be created by "make dist" # NO! "make dist" dies if this string is active
 Makefile.PL
 README
 lib/OpenXPKI/Client/SCEP.pm
