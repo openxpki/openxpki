@@ -1,4 +1,4 @@
-use Test::More tests => 15;
+use Test::More tests => 18;
 
 use English;
 
@@ -35,7 +35,7 @@ BEGIN {
     $xml = get_parsed_xml ("anonymous_index.html");
     ok ($xml);
     ok (0 == check_html ({PAGE  => $xml,
-                          PATH  => "html:0/body:0/div:0/div:1/class",
+                          PATH  => "html:0/body:0/div:0/div:1/id",
                           VALUE => "navi"}));
     ok (0 == check_html ({PAGE  => $xml,
                           PATH  => "html:0/body:0/div:0/div:1/div:0/class",
@@ -43,6 +43,14 @@ BEGIN {
     ok (0 == check_html ({PAGE  => $xml,
                           PATH  => "html:0/body:0/div:0/div:1/div:0/div:0/class",
                           VALUE => "menu_level_0"}));
+    ok (0 == check_html ({PAGE  => $xml,
+                          PATH  => "html:0/body:0/div:0/div:1/div:0/div:0/div:0/class",
+                          VALUE => "menu_level_0_item_type_menu"}));
+    ok (0 == check_html ({PAGE  => $xml,
+                          PATH  => "html:0/body:0/div:0/div:1/div:0/div:0/div:0/a:0"}));
+    ok (0 == check_html ({PAGE  => $xml,
+                          PATH  => "html:0/body:0/div:0/div:1/div:0/div:0/div:0/a:0/href",
+                          REGEX => "__session_id=[0-9a-f]+;"}));
 }
 
 diag( "Testing anonymous authentication" );

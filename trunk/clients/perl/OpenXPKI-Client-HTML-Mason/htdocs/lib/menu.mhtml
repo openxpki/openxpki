@@ -19,12 +19,12 @@
                 {
                     "ra_op_menu" =>
                     [
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CERTS", "edit_certs"],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CERTS",  "edit_certs"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT", "logout"]
                     ],
                     "edit_certs" =>
                     [
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_VALID_CERTS", "edit_valid_certs"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_VALID_CERTS",   "edit_valid_certs"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS", "edit_expired_certs"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS", "edit_revoked_certs"],
                     ]
@@ -63,13 +63,15 @@
                     },
                 }
                };
-  my $menu = OpenXPKI::Client::HTML::Mason::Menu->new(
-             {
-                 CONFIG => $CONFIG,
-                 ROLE   => $context->{role}
-             });
+  my %params = ( MASON => $m, CONFIG => $CONFIG );
+
+  foreach my $key ("ROLE", "SESSION_ID")
+  {
+      $params{$key} = $context->{lc $key} if (exists $context->{lc $key});
+  }
+  my $menu = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
 </%init>
-<% print $menu->get(@path) %>
+<% $menu->get() %>
 <%flags>
   inherit => '/syshandler'
 </%flags>

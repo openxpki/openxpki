@@ -2,13 +2,13 @@
   $session_id => undef
   @menu_path  => ()
 </%args>
-     <div class="navi">
+     <div id="navi">
       <div class="menu">
         <& /lib/menu.mhtml, path => [ @menu_path ] &>
-      </div>
-     </div>
+      </div> <!-- menu -->
+     </div> <!-- navi -->
 
-     <div class="content">
+     <div id="content">
 <%perl>
        # normal processing may only happen if the client is in the "normal"
        # state 'can_send'

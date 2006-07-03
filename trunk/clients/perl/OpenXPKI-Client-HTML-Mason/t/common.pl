@@ -31,7 +31,6 @@ sub check_html
     my $keys  = shift;
     my $path  = $keys->{PATH};
     my $page  = $keys->{PAGE};
-    my $value = $keys->{VALUE};
 
     my @list = split "\/", $path;
     my @path = ();
@@ -54,7 +53,12 @@ sub check_html
     if (exists $keys->{VALUE})
     {
         return $count if (ref $page);
-        return -$count if ($value ne $page);
+        return -$count if ($keys->{VALUE} ne $page);
+    }
+    if (exists $keys->{REGEX})
+    {
+        return $count if (ref $page);
+        return -$count if ($page !~ /^.*$keys->{REGEX}.*$/);
     }
     return 0;
 }

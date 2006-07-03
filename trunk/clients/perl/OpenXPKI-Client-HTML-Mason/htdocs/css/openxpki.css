@@ -1,8 +1,5 @@
 /*
- * (c) 2003 OpenCA project
- * (c) 2004 OpenSC project
- * (c) 2004 OpenCA
- * (c) 2005 OpenXPKI
+ * (c) 2005-2006 OpenXPKI
  *
  * the base of this file was the style1.css from the OpenSC project merged
  * together with the original OpenCA style file
@@ -12,15 +9,19 @@
  * element styling *
  *******************/
 
+html {
+    margin: 0;
+    height: 100%;
+}
+
 body {
-    margin: 15px;
-    /* background: #ffd; */
+    margin: 0;
+    height: 100%;
     background-color: white;
     color: black;
     font-family: Arial, Helvetica;
     font-size: 85%;
     font-weight: normal;
-    margin: 0 20em 2em 2em;
 }
 
 .noborder {
@@ -28,16 +29,21 @@ body {
 	padding: 0px;
 }
 
-h1, h3 {
-	font-family: Arial, sans-serif;
-	font-weight: normal;
-	color: #578;
-	border-bottom: dotted 1px;
+h1, h2 {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    color: black;
+}
+
+h3 {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    color: black;
 }
 
 a {
-	font-weight: bold;
-	color: #578;
+    font-style:  italic;
+    color:       blue;
 }
 
 a:link {
@@ -49,8 +55,7 @@ a:visited {
 }
 
 a:hover {
-	text-decoration: none; 
-	color: black;
+    text-decoration: underline; 
 }
 
 .icenter {
@@ -62,49 +67,83 @@ img {
 	padding: 0px;
 }
 
-/******************************************
- * General organization of an OpenCA page *
- *                                        *
- * page ::= navi + info                   *
- *                                        *
- * navi ::= menu + w3c                    *
- * menu ::= item* + subitem*              *
- *                                        *
- * info ::= header  + main                *
- * main ::= content + footer              *
- *                                        *
- ******************************************/
+dt {
+    font-weight: bold;
+}
+
+pre {
+    /*font-family: monospace,teletype,Courier-New,Courier;*/
+    font-family: Courier;
+    background-color: #dddddd;
+    padding: 1em;
+    margin-right: 1em;
+}
+
+/********************************************
+ * General organization of an OpenXPKI page *
+ *                                          *
+ * page ::= header + navi + content + footer*
+ *                                          *
+ ********************************************/
 
 /****************
  *     page     *
  ****************/
 
-div.page
-{
-    background: #ffffff;
-    width:    100%;
-    height:   100%;
+#page {
+  /* background-color: blue; */
+  position:   relative;
+  min-height: 100%;
+  width:      100%;
+  z-index:    0;
 }
 
-div.navi
-{
-    position: absolute;
-    height:   100%;
-    width:    14em;
-    top:      0em;
-    right:    0em;
-    z-index:  100;
+#header {
+    /* background-color: darkgreen; */
+    top:0px;
+    left:0px;
+    width: 100%;
+    z-index: 10;
+    border:        0px solid black;
+    border-bottom: 1px solid black;
+    padding:       0pt;
+    text-align:    right;
 }
 
-div.info
-{
-    position: absolute;
-    height:   100%;
-    width:    40em;
-    left:     0em;
-    top:      0em;
-    bottom:   0em;
-    z-index:  50;
+#navi {
+  /* background-color: brown; */
+  position: relative;
+  left:0px;
+  width: 14em;
+  float: left;
+  z-index: 6;
+}
+
+#content {
+  /* background-color: yellow; */
+  position: relative;
+  padding-top: 0em;
+  padding-bottom: 2em;
+  padding-left: 15em;
+  z-index: 5;
+}
+
+#footer {
+  /* background-color: lightgreen; */
+  position:    absolute;
+  bottom:      0px;
+  left:        0px;
+  width:       100%;
+  z-index:     10;
+  padding-top: 1em;
+  font-size:   x-small;
+  text-align:  right;
+}
+
+/* *html will only be interpreted by IE */
+
+*html #footer {
+  display: none;
 }
 
 /*********************
@@ -116,8 +155,8 @@ div.menu {
     top:      1em;
     right:    1em;
 
-    background: #eeeeff;
-    border: 1px solid black;
+    background: #dddddd;
+    border: 0px solid black;
     padding: 3pt;
     text-align: center;
 }
@@ -130,9 +169,8 @@ div.menu a {
 
 div.menu a:hover {
     text-decoration: none; 
-    /* color: #ff8000; */
-    /* color: #3060c0; */
     color: white;
+    background: #0088ff;
 }
 
 div.menu h2 {
@@ -145,11 +183,20 @@ div.menu h2 {
     margin: 0pt;
 }
 
-div.menu_item {
+div.menu h2:hover {
+    background: #0088ff;
+}
+
+/* level 0 */
+
+/* menu_level_0">
+  <div class="menu_level_0_item_type_menu">
+*/
+
+div.menu_level_0_item_type_menu {
     margin: 0.20em 0.5em 0.20em 0.1em;
     padding: 0.38em 1em;
     text-align: left;
-    /* background: #3060c0; */
     background: #ffaa33;
     border: 1px solid white;
     border-bottom: 1px solid black;
@@ -158,6 +205,36 @@ div.menu_item {
     list-style: none;
 }
 
+div.menu_level_item_type_menu_0:hover {
+    background: #0088ff;
+}
+
+div.menu_level_item_type_menu_0 a {
+    font-weight: normal;
+}
+
+div.menu_level_0_item_type_action {
+    margin: 0.20em 0.5em 0.20em 0.1em;
+    padding: 0.38em 1em;
+    text-align: left;
+    background: #ffaa33;
+    border: 1px solid white;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    color: white;
+    list-style: none;
+}
+
+div.menu_level_0_item_type_menu:hover {
+    background: #0088ff;
+}
+
+div.menu_level_0_item_type_menu a {
+    font-weight: normal;
+}
+
+/* level 1 */
+
 div.menu_sub_item {
     padding: 0.38em 1em;
     text-indent: 0;
@@ -165,8 +242,13 @@ div.menu_sub_item {
     list-style: none;
 }
 
+div.menu_sub_item:hover {
+    background: #0088ff;
+}
+
+
 div.menu_sub_item a {
-    color: black;
+    font-weight: normal;
 }
 
 div.w3c {
@@ -180,44 +262,6 @@ div.w3c {
 /**********************
  *    info stuff      *
  **********************/
-
-div.main
-{
-    position: absolute;
-    top:      100px;
-    left:     0em;
-    width:    40em;
-    bottom:   0em;
-}
-
-div.header { 
-    position: absolute;
-    left:     1em;
-    right:    1em;
-    top:      1em;
-    bottom:   auto;
-
-    border: 0px solid black;
-    border-bottom: 1px solid black;
-    padding: 4pt;
-}
-
-div.content {
-    position: absolute;
-    top:      0em;
-    /* bottom:   1em; */
-    bottom:   auto;
-    left:     1em;
-    z-index:  50;
-}
-
-div.footer {
-    position: absolute;
-    bottom:   0em;
-    top:      auto;
-    z-index:  1;
-    color:    white;
-}
 
 .sourcecode {
     font-weight: bold;
