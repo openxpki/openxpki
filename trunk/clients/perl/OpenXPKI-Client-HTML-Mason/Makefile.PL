@@ -26,6 +26,7 @@ WriteMakefile(
         'OpenXPKI::Client' => 0,
         'OpenXPKI::i18n'   => 0,
     },
+    test => {TESTS => 't/*/*.t t/*.t'},
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'OpenXPKI-Client-HTML-Mason-*' },
 );

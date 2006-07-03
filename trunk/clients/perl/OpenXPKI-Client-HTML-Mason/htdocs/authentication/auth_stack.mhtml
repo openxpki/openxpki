@@ -1,6 +1,5 @@
 <%args>
   $msg             => undef
-  $session_context => undef
 </%args>
 
     <& '/authentication/open_form.mhtml', 'session_id' => $session_id &>
@@ -25,22 +24,24 @@
     <& '/authentication/close_form.mhtml' &>
 
 <%init>
-    my $session_id = $session_context->{session_id};
-    my $client     = $session_context->{client};
+    my $session_id = $context->{session_id};
+    my $client     = $context->{client};
 
     ## check that we must handle this message
     return $msg if ($msg->{SERVICE_MSG} ne "GET_AUTHENTICATION_STACK");
 
     ## was the pki realm specified by the user?
     my %data = $m->request_args();
-    if (exists $data{'auth_stacks'})
+    if (exists $data{'auth_stack'})
     {
-        $client->send_service_msg ('GET_AUTHENTICATION_STACK', 'AUTHENTICATION_STACKS' => $data{'auth_stack'});
-        $msg = $client->collect();
+        #print  STDERR "DATA: ".$data{'auth_stack'}."\n";
+        $msg = $client->send_receive_service_msg ('GET_AUTHENTICATION_STACK',
+                                                  {'AUTHENTICATION_STACK' => $data{'auth_stack'}});
         if ($msg->{'SERVICE_MSG'} ne 'GET_AUTHENTICATION_STACK')
         {
             return $msg;
         }
+        #print  STDERR "second: ".$data{'auth_stack'}."\n";
     }
 
     ## ok let's ask the user for the auth stacks

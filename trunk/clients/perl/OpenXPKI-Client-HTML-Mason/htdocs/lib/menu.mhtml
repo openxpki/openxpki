@@ -1,11 +1,15 @@
 <%args>
   $session_id => undef
-  @path       => undef
+  @path       => ()
 </%args>
 <%init>
   my $CONFIG = {
                 ROLE =>
                 {
+                    'anonymous' =>
+                    {
+                        MENU => "ra_op_menu"
+                    },
                     'RA Operator' =>
                     {
                         MENU => "ra_op_menu"
@@ -59,6 +63,13 @@
                     },
                 }
                };
-  my $menu   = Menu->new({CONFIG => $CONFIG},);
+  my $menu = OpenXPKI::Client::HTML::Mason::Menu->new(
+             {
+                 CONFIG => $CONFIG,
+                 ROLE   => $context->{role}
+             });
 </%init>
 <% print $menu->get(@path) %>
+<%flags>
+  inherit => '/syshandler'
+</%flags>

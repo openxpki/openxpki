@@ -1,6 +1,5 @@
 <%args>
   $msg             => undef
-  $session_context => undef
 </%args>
 
     <& '/authentication/open_form.mhtml', 'session_id' => $session_id &>
@@ -25,8 +24,8 @@
     <& '/authentication/close_form.mhtml' &>
 
 <%init>
-    my $session_id = $session_context->{session_id};
-    my $client     = $session_context->{client};
+    my $session_id = $context->{session_id};
+    my $client     = $context->{client};
 
     ## check that we must handle this message
     return $msg if ($msg->{SERVICE_MSG} ne "GET_PKI_REALM");
@@ -35,8 +34,8 @@
     my %data = $m->request_args();
     if (exists $data{'pki_realm'})
     {
-        $client->send_service_msg ('GET_PKI_REALM', 'PKI_REALMS' => $data{'pki_realm'});
-        $msg = $client->collect();
+        $msg = $client->send_receive_service_msg ('GET_PKI_REALM',
+                                                  {'PKI_REALMS' => $data{'pki_realm'}});
         if ($msg->{'SERVICE_MSG'} ne 'GET_PKI_REALM')
         {
             return $msg;

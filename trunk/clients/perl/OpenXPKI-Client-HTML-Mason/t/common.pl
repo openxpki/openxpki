@@ -91,7 +91,7 @@ sub write_html
     my $data     = $keys->{DATA};
 
     ## strip off http header
-    $data =~ s/^.*\n\n<\?xml/<?xml/s;
+    $data =~ s/^.*\r\n\r\n//s;
 
     return 1 if (not open FD, ">$OUTPUT/$filename");
     return 2 if (not print FD $data);

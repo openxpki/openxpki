@@ -1,0 +1,35 @@
+<%args>
+  $session_id => undef
+  @menu_path  => ()
+</%args>
+     <div class="navi">
+      <div class="menu">
+        <& /lib/menu.mhtml, path => [ @menu_path ] &>
+      </div>
+     </div>
+
+     <div class="content">
+<%perl>
+       # normal processing may only happen if the client is in the "normal"
+       # state 'can_send'
+       #if ($session_context->{client}->get_communication_state() 
+       #    eq 'can_send') {
+       #    $m->call_next;
+       #}
+
+       $m->call_next;
+
+#       # the server may wish to answer something - if this is the case
+#       # the process_response component detects this and generates the
+#       # corresponding output
+#       $m->comp('/lib/process_response.mhtml');
+</%perl>
+     </div> <!-- content -->
+
+<%init>
+  $r->content_type('text/html; charset=utf-8');
+</%init>
+
+<%method title>
+  OpenXPKI
+</%method>

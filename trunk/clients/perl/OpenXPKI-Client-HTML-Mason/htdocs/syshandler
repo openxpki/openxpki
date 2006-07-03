@@ -4,17 +4,19 @@
   # FIXME: move this to Apache handler?
   use URI;
   use OpenXPKI::Client::HTML::Mason;
+  use OpenXPKI::Client::HTML::Mason::Javascript;
+  use OpenXPKI::Client::HTML::Mason::Menu;
   use OpenXPKI::i18n qw( i18nGettext );
   use English;
 
-  $context{socket_file} = $ENV{OPENXPKI_SOCKET_FILE};
+  $context->{socket_file} = $ENV{OPENXPKI_SOCKET_FILE};
 
   if (defined $ENV{OPENXPKI_DEBUG_FILE}) {
-    open $context{debugfh}, ">>", $ENV{OPENXPKI_DEBUG_FILE};
+    open $context->{debugfh}, ">>", $ENV{OPENXPKI_DEBUG_FILE};
   }
-  $context{debug}       = sub {
+  $context->{debug}       = sub {
     my $arg = shift;
-    my $fh = $context{debugfh};
+    my $fh = $context->{debugfh};
     if (defined $fh) {
       local $OUTPUT_AUTOFLUSH = 1;
       print $fh $arg . "\n";

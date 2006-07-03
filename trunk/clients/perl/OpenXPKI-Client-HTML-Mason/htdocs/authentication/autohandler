@@ -1,38 +1,12 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-  <head>
-    <title><& SELF:title, %ARGS &></title>
-    <link rel="stylesheet" 
-          title="default" 
-          href="<& /lib/url.mhtml, 
-                   path => '/css/openxpki.css',
-                   no_session => 1 &>" 
-          type="text/css" />
 <%perl>
-       $m->comp('/lib/javascript.mhtml');
-</%perl>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
-  </head>
-  <body>
-    <div class="page">
-
-      <div class="header">
-        <img src="<& /lib/url.mhtml, 
-             path => '/images/openxpki_logo.png',
-             no_session => 1 &>"
-             alt="OpenXPKI"/>
-      </div> <!-- header -->
-
-<%perl>
-    my $session_context = $m->comp('/authentication/session.mhtml');
-    my $session_id      = $session_context->{session_id};
-    my $client          = $session_context->{client};
+    $m->comp('/authentication/session.mhtml');
+    my $session_id = $context->{session_id};
+    my $client     = $context->{client};
     my $msg = $client->collect();
-       $msg = $m->comp('/authentication/pki_realm.mhtml',
-                       'msg' => $msg, 'session_context' => $session_context);
-       $msg = $m->comp('/authentication/auth_stack.mhtml',
-                       'msg' => $msg, 'session_context' => $session_context);
+       $msg = $m->comp('/authentication/pki_realm.mhtml',  'msg' => $msg);
+       $msg = $m->comp('/authentication/auth_stack.mhtml', 'msg' => $msg);
+              $m->comp('/authentication/role.mhtml',       'msg' => $msg);
+    #print STDERR "session_id ::= ".$context->{session_id}."\n";
 
     if ($msg->{SERVICE_MSG} eq "SERVICE_READY")
     {
@@ -40,14 +14,6 @@
         $m->comp('/service/autohandler', 'session_id' => $session_id);
     }
 </%perl>
-      </div> <!-- content -->
-
-      <div class="footer">
-      </div>
-    </div>  <!-- page -->
-  </body>
-</html>
-
 <%init>
   $r->content_type('text/html; charset=utf-8');
 </%init>

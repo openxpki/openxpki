@@ -66,7 +66,7 @@
    }
 
    $query{session_id} ||= $session_id;
-   $query{session_id} ||= $context{session_id};
+   $query{session_id} ||= $context->{session_id};
 
 
    # $uri->query_form doesn't handle hash ref values properly

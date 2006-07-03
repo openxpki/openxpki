@@ -6,10 +6,10 @@
 
   # check if we are using an already existing and session and if there
   # has been established a client connection for it.
-  if (exists $context{session_id})
+  if (exists $context->{session_id})
   {
       # this session has already been established and is in the context
-      return $session_cache{$context{session_id}};
+      return $session_cache{$context->{session_id}};
   }
 
   # FIXME: don't use environment but rather a proper configuration
@@ -37,9 +37,7 @@
   $session_id = $client->get_session_id();
   $session_cache{$session_id}->{client} = $client;
   $session_cache{$session_id}->{session_id} = $session_id;
+  $context = $session_cache{$session_id};
 
   ## the next message is get_pki_realm, get_auth_stack, login or service_ready
-
-  return $session_cache{$session_id};
-
 </%init>

@@ -28,6 +28,8 @@ my %api            : ATTR( :get<API> );
 my %allowed_command = map { $_ => 1 } qw(
     nop
 
+    get_role
+
     get_ca_certificate
     list_ca_ids
 

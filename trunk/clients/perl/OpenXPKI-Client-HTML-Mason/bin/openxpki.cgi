@@ -14,7 +14,7 @@ $ENV{QUERY_STRING} = "";            ## GET parameters
 
 my $h = HTML::Mason::CGIHandler->new(
     data_dir => "$ENV{DOCUMENT_ROOT}/../mason-data",
-    allow_globals => [ qw( %context %session_cache ) ],
+    allow_globals => [ qw( $context %session_cache ) ],
     );
 
 $h->handle_request();
