@@ -3,12 +3,10 @@
 </%args>
 
     <& '/authentication/open_form.mhtml', 'session_id' => $session_id &>
-    <div class="title">
-    <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE') %>
-    </div>
-    <div class="description">
-        <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION') %>
-    </div>
+    <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE') %></h1>
+    <p>
+      <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION') %>
+    </p>
     <select name="auth_stack">
 <%perl>
         ## let's print the available options
@@ -45,5 +43,7 @@
     }
 
     ## ok let's ask the user for the auth stacks
+    ## cache the last message in the context
     my $auth_stacks = $msg->{PARAMS}->{AUTHENTICATION_STACKS};
+    $context->{msg} = $msg;
 </%init>

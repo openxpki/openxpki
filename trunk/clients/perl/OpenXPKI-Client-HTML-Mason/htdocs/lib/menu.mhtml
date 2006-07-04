@@ -1,9 +1,6 @@
-<%args>
-  $session_id => undef
-  @path       => ()
-</%args>
 <%init>
   my $CONFIG = {
+                NESTED => 1,
                 ROLE =>
                 {
                     'anonymous' =>
@@ -63,7 +60,7 @@
                     },
                 }
                };
-  my %params = ( MASON => $m, CONFIG => $CONFIG );
+  my %params = ( MASON => $m, CONFIG => $CONFIG, ACTION => "../service/index.html" );
 
   foreach my $key ("ROLE", "SESSION_ID")
   {

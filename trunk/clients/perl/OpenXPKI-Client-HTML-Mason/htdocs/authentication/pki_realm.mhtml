@@ -43,5 +43,7 @@
     }
 
     ## ok let's ask the user for the PKI realm
-    my $pki_realms = $msg->{PARAMS}->{PKI_REALMS};
+    ## cache the last message in the context
+    my $pki_realms  = $msg->{PARAMS}->{PKI_REALMS};
+    $context->{msg} = $msg;
 </%init>

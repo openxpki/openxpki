@@ -1,5 +1,5 @@
 <%args>
-  $session_id => undef
+  $__session_id => undef
 </%args>
 % if ($m->request_comp() !~ /^bin/) {
 <?xml version="1.0" encoding="utf-8"?>
@@ -9,8 +9,12 @@
     <title><& SELF:title, %ARGS &></title>
     <link rel="stylesheet" 
           title="default" 
+% my $path = $m->request_comp()->dir_path();
+%    $path = substr ($path, 1);
+%    $path =~ s/[^\/]+/../g;
+%    $path .= "/" if (length $path);
           href="<& /lib/url.mhtml, 
-                   path => '/css/openxpki.css',
+                   path => "${path}css/openxpki.css",
                    no_session => 1 &>" 
           type="text/css" />
     <& /lib/javascript.mhtml &>
@@ -21,7 +25,7 @@
 
       <div id="header">
         <img src="<& /lib/url.mhtml, 
-             path => '/images/openxpki_logo.png',
+             path => "${path}images/openxpki_logo.png",
              no_session => 1 &>"
              alt="OpenXPKI"/>
       </div> <!-- header -->
@@ -55,11 +59,16 @@
 <%init>
     # check if we are using an already existing session and if there
     # has been established a client connection for it.
-    if (defined $session_id and
-        defined $session_cache{$session_id})
+    if (defined $__session_id)
     {
-        # this session has already been established
-        $context = $session_cache{$session_id};
+        if (defined $session_cache{$__session_id})
+        {
+            # this session has already been established
+            $context = $session_cache{$__session_id};
+        } else {
+            # try to establish session again
+            $m->comp('/authentication/session.mhtml');
+        }
     } else {
         delete $context->{session_id} if (exists $context->{session_id});
     }

@@ -36,6 +36,7 @@ sub new
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_ROLE");
     }
+    $self->__build_env();
 
     ## check config
     if (not exists $self->{CONFIG})
@@ -58,24 +59,7 @@ sub new
     return $self;
 }
 
-sub __calculate
-{
-    my $self   = shift;
-    my $return = "";
-
-    ## determine level and path from mason object
-    $self->__get_menu_path();
-
-    ## get the different menus and submenus
-    for (my $i=0; $i <= $self->{LEVEL}; $i++)
-    {
-        $return .= $self->__get_level ({LEVEL => $i});
-    }
-
-    return $return;
-}
-
-sub __get_menu_path
+sub __build_env
 {
     my $self = shift;
     my %args = $self->{MASON}->request_args();
@@ -104,7 +88,6 @@ sub __get_menu_path
     return $self->{LEVEL};
 }
 
-
 sub __get_level
 {
     my $self   = shift;
@@ -121,7 +104,7 @@ sub __get_level
     } else {
         ## menus are not security relevant
         ## so it is safe to not check the input from the browser
-        $menu = $self->{PATH}->{$level};
+        $menu = $self->{PATH}->[$level-1];
     }
     ##! 2: "MENU ::= $menu"
 
@@ -164,6 +147,12 @@ sub __get_level
         $return .= "      $label\n";
         $return .= "    </a>\n";
         $return .= "  </div>\n";
+        if ($params->{NESTED} and
+            $level < $self->{LEVEL} and
+            $name eq $self->{PATH}->[$level])
+        {
+            $return .= $self->__get_level ({LEVEL => $level+1, NESTED => 1});
+        }
     }
     $return .= "</div>\n";
 
@@ -185,6 +174,7 @@ sub __get_menu_link
         $link .= ";" if (length $link > 1);
         $link .= $item."=".$result{$item};
     }
+    $link = $self->{ACTION}.$link if (exists $self->{ACTION});
 
     return $link;
 }
@@ -192,7 +182,21 @@ sub __get_menu_link
 sub get
 {
     my $self = shift;
-    return $self->__calculate();
+
+    if ($self->{CONFIG}->{NESTED})
+    {
+        return $self->__get_level({LEVEL => 0, NESTED => 1});
+    } else {
+        my $return = "";
+
+        ## get the different menus and submenus
+        for (my $i=0; $i <= $self->{LEVEL}; $i++)
+        {
+            $return .= $self->__get_level ({LEVEL => $i, NESTED => 0});
+        }
+
+        return $return;
+    }
 }
 
 sub get_menu_hash
@@ -206,11 +210,13 @@ sub get_menu_hash
     ## add basic path
     $link{__session_id} = $self->{SESSION_ID};
     $link{__role}       = $self->{ROLE};
+    $link{__menu_level} = $level;
+    $link{__menu_level}++ if ($params->{MENU});
 
     ## build menu path
     for (my $i=0; $i < $level; $i++)
     {
-        $link{"__menu_item_$i"} = $self->{PATH}-[$i];
+        $link{"__menu_item_$i"} = $self->{PATH}->[$i];
     }
 
     # complete link
@@ -251,6 +257,8 @@ as hash reference:
 =item * ROLE - required if __role is not set as http parameter
 
 =item * CONFIG - configuration like defined in lib/menu.mhtml
+
+=item * ACTION - the name of the used page in the links
 
 =back
 

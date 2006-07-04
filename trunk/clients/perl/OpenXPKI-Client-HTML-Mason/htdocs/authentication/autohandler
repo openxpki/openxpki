@@ -2,16 +2,20 @@
     $m->comp('/authentication/session.mhtml');
     my $session_id = $context->{session_id};
     my $client     = $context->{client};
-    my $msg = $client->collect();
-       $msg = $m->comp('/authentication/pki_realm.mhtml',  'msg' => $msg);
-       $msg = $m->comp('/authentication/auth_stack.mhtml', 'msg' => $msg);
-              $m->comp('/authentication/role.mhtml',       'msg' => $msg);
+    my $msg        = $context->{msg};
+    if ($client->get_communication_state eq "can_receive")
+    {
+        $msg = $client->collect();
+    }
+    $msg = $m->comp('/authentication/pki_realm.mhtml',  'msg' => $msg);
+    $msg = $m->comp('/authentication/auth_stack.mhtml', 'msg' => $msg);
+           $m->comp('/authentication/role.mhtml',       'msg' => $msg);
     #print STDERR "session_id ::= ".$context->{session_id}."\n";
 
     if ($msg->{SERVICE_MSG} eq "SERVICE_READY")
     {
         ## ok let's panic - session is ready and we are inside of the auth autohandler !?
-        $m->comp('/service/autohandler', 'session_id' => $session_id);
+        $m->comp('/service/autohandler', '__session_id' => $session_id);
     }
 </%perl>
 <%init>

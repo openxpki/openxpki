@@ -1,5 +1,5 @@
 <%args>
-    $session_id => undef
+    $__session_id => undef
 </%args>
 <%init>
   ## print STDERR "try to get session\n";
@@ -19,25 +19,25 @@
           SOCKETFILE => $socketfile,
       });
 
-  if (not defined $session_id)
+  if (not defined $__session_id)
   {
       ## try to get session_id directly from the form data
       my %request = $m->request_args();
-      $session_id = $request{'session_id'} if (exists $request{'session_id'});
+      $__session_id = $request{'__session_id'} if (exists $request{'__session_id'});
   }
   
   my %args;
-  if (defined $session_id) {
+  if (defined $__session_id) {
       # this may happen after a restart: the client still knows its session
       # ID, but we were restarted and the session cache is empty.
       # try to recreate the session based on the given session_id.
-      $args{SESSION_ID} = $session_id;
+      $args{SESSION_ID} = $__session_id;
   }
   $client->init_session(\%args);
-  $session_id = $client->get_session_id();
-  $session_cache{$session_id}->{client} = $client;
-  $session_cache{$session_id}->{session_id} = $session_id;
-  $context = $session_cache{$session_id};
+  $__session_id = $client->get_session_id();
+  $session_cache{$__session_id}->{client} = $client;
+  $session_cache{$__session_id}->{session_id} = $__session_id;
+  $context = $session_cache{$__session_id};
 
   ## the next message is get_pki_realm, get_auth_stack, login or service_ready
 </%init>

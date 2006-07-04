@@ -1,5 +1,5 @@
 <%args>
-  $session_id => undef
+  $__session_id => undef
   @menu_path  => ()
 </%args>
      <div id="navi">
@@ -17,7 +17,13 @@
        #    $m->call_next;
        #}
 
-       $m->call_next;
+       if ($m->fetch_next()->name() eq "dhandler")
+       {
+           ## autohandler called directly - usually from authentication
+           $m->comp ('/service/index.html');
+       } else {
+           $m->call_next;
+       }
 
 #       # the server may wish to answer something - if this is the case
 #       # the process_response component detects this and generates the
