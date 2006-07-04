@@ -20,6 +20,7 @@ htdocs/lib/javascript.mhtml
 htdocs/lib/url.mhtml
 htdocs/lib/menu.mhtml
 
+htdocs/authentication/dhandler
 htdocs/authentication/autohandler
 htdocs/authentication/session.mhtml
 htdocs/authentication/pki_realm.mhtml
@@ -51,3 +52,7 @@ t/05_deployment.t
 t/10_syntax.t
 t/11_login/01_anonymous.t
 t/99_cleanup.t
+
+eg/openxpki-mason-apachehandler.pl
+eg/openxpki-mason-cgi.conf
+eg/openxpki-mason-mod_perl.conf

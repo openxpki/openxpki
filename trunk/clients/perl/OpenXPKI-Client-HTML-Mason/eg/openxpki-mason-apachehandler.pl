@@ -25,7 +25,7 @@ sub handler {
     $ah{$host} ||= HTML::Mason::ApacheHandler->new(
 	comp_root => '/FIXME/OpenXPKI-Client-HTML-Mason/htdocs',
 	data_dir  => '/FIXME/var/cache/mason',
-	allow_globals => [ '%context', '%session_cache', ],
+	allow_globals => [ '$context', '%session_cache', ],
 	);
     
     return $ah{$host}->handle_request($r);

@@ -78,9 +78,20 @@ sub connect_openxpki_daemon {
 sub do_status {
     my $arg = shift;
 
+    if (exists $arg->{SLEEP} and $arg->{SLEEP} > 0)
+    {
+        ## this helps to give the server some reaction time
+        sleep $arg->{SLEEP};
+    }
+
     my $socketfile = $arg->{SOCKETFILE};
 
     if (! connect_openxpki_daemon($socketfile)) {
+        if (not exists $arg->{SLEEP})
+        {
+            ## wait for a starting server ...
+            return do_status ({SOCKETFILE -> $arg->{SOCKETFILE}, SLEEP => 5});
+        }
 	print STDERR "OpenXPKI server is not running or does not accept requests.\n";
 	return;
     }

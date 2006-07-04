@@ -1,5 +1,5 @@
 #! /bin/sh
-# postinst script for openxpki-deplyment
+# postinst script for libopenxpki-client-html-mason-perl
 #
 # see: dh_installdeb(1)
 
@@ -25,35 +25,14 @@ set -e
 
 case "$1" in
     configure)
-	# check for already configured trustcenter1
-	if [ -e /etc/openxpki/instances/trustcenter1/openxpki.conf ]; then
-		echo Detected and respect an old deployment.
-	else
-		echo -n deploy instance trustcenter1 ...
-		openxpkiadm --config=/etc/openxpki/templates/default/config.xml deploy -- --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1;
-		echo DONE.
-		cd /etc/openxpki/instances/trustcenter1;
-		echo -n configure instance trustcenter1
-		openxpki-configure --batch --createdirs;
-		echo DONE.
-	fi;
+        # add mod_env to modules.conf
+        apache-modconf apache enable mod_env
 
-        # restart the daemon
-        /etc/init.d/openxpkid stop || echo openxpkid cannot be stopped ...
-        /etc/init.d/openxpkid start
+        # restart apache
+        /etc/init.d/apache reload
 
-	# force permissions
-	#for i in /var/lib/openca/session/cookie/node
-	#do
-	#	dpkg-statoverride --list ${i} >/dev/null 2>&1 ||
-	#		dpkg-statoverride --add --update openca openca 0750 ${i}
-	#done
-
-        #for i in /etc/openca/access_control/node.xml.template
-        #do
-	#	dpkg-statoverride --list ${i} >/dev/null 2>&1 ||
-	#		dpkg-statoverride --add --update root openca 0640 ${i}
-        #done
+        # add apache user to openxpki group (to allow connecting the socket)
+        usermod --groups openxpki --append openxpki www-data
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

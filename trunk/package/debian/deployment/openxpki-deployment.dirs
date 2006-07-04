@@ -1,5 +1,0 @@
-etc/openxpki
-etc/openxpki/instances
-etc/openxpki/instances/trustcenter1
-var/openxpki
-var/openxpki/session

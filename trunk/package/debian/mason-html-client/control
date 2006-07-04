@@ -1,0 +1,15 @@
+Source: libopenxpki-client-html-mason-perl
+Maintainer: Michael Bell <michael.bell@web.de>
+Priority: optional
+Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0)
+
+Package: libopenxpki-client-html-mason-perl
+Architecture: any
+Recommends:
+Section: perl
+Priority: optional
+Depends: ${perl:Depends}, ${shlibs:Depends}, libopenxpki-client-perl, apache, libhtml-mason-perl, libapache-mod-perl, libapache-request-perl
+Description: OpenXPKI Mason based web frontend
+ OpenXPKI is an Open Source PKI project.
+ .
+ This package contains a Mason based web frontend for an OpenXPKI server.

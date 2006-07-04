@@ -64,8 +64,7 @@ sub new
     }
     $self->{CONFIG} = $keys->{CONFIG};;
 
-    ##! 2: "create input, output and stderr files"
-    $self->{STDIN}  = $self->get_safe_tmpfile({TMP => $self->{TMP}});
+    ##! 2: "create output and stderr files"
     $self->{STDOUT} = $self->get_safe_tmpfile({TMP => $self->{TMP}});
     $self->{STDERR} = $self->get_safe_tmpfile({TMP => $self->{TMP}});
 
@@ -107,8 +106,16 @@ sub prepare
 
 sub execute
 {
-    my $self = shift;
     ##! 1: "start"
+    my $self   = shift;
+    my $return = "";
+    my $keys   = undef;
+    my $params = undef;
+    if ($_[0])
+    {
+        $keys   = shift;
+        $params = $keys->{PARAMS};
+    }
 
     ##! 2: "set the configuration"
     $self->{CONFIG}->dump();
@@ -119,7 +126,46 @@ sub execute
     {
         my $cmd = $self->{COMMAND}->[$i];
         ##! 4: "command: $cmd"
-        `$cmd`;
+        if (defined $params and
+            exists $params->[$i] and
+            ref $params->[$i] and ref $params->[$i] eq "HASH" and
+            ($params->[$i]->{TYPE} eq "STDIN" or
+             $params->[$i]->{TYPE} eq "STDOUT")
+           )
+        {
+            if ($params->[$i]->{TYPE} eq "STDIN")
+            {
+                ## read data from STDIN
+                if (not open FD, "|$cmd" or
+                    not print FD $params->[$i]->{DATA} or
+                    not close FD)
+                {
+                    OpenXPKI::Exception->throw (
+                        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_PIPED_STDIN_FAILED",
+                        params  => {"ERRVAL" => $EVAL_ERROR});
+                }
+            }
+            else
+            {
+                ## capture STDOUT
+                if (not open FD, "$cmd|")
+                {
+                    OpenXPKI::Exception->throw (
+                        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_PIPED_STDOUT_FAILED",
+                        params  => {"ERRVAL" => $EVAL_ERROR});
+                }
+                $params->[$i]->{STDOUT} = "";
+                while (<FD>)
+                {
+                    $params->[$i]->{STDOUT} .= $_;
+                }
+                $return .= $params->[$i]->{STDOUT};
+                close FD;
+            }
+        } else {
+            ## simply execute the command
+            `$cmd`;
+        }
         if ($EVAL_ERROR)
         {
             OpenXPKI::Exception->throw (
@@ -127,13 +173,12 @@ sub execute
                 params  => {"ERRVAL" => $EVAL_ERROR});
         }
     }
-    unlink ($self->{STDIN}) if (-e $self->{STDIN});
 
     ##! 2: "try to detect other errors"
     $self->__find_error();
 
     ##! 1: "end"
-    return 1;
+    return $return;
 }
 
 sub __find_error
@@ -202,7 +247,6 @@ sub cleanup
 {
     ##! 1: "start"
     my $self = shift;
-    unlink ($self->{STDIN})  if (exists $self->{STDIN}  and -e $self->{STDIN});
     unlink ($self->{STDOUT}) if (exists $self->{STDOUT} and -e $self->{STDOUT});
     unlink ($self->{STDERR}) if (exists $self->{STDERR} and -e $self->{STDERR});
     ##! 1: "end"
@@ -253,7 +297,40 @@ COMMAND which must contain an string or an array reference.
 
 =head2 execute
 
-performs the commands. It throws an exception on error.
+performs the commands. It throws an exception on error. The behaviour of
+this function is a little bit difficult. The simplest way is that you
+use the function without any arguments. This means that you have passed
+all parameters via the command line parameters and you get the the
+result via the function get_result or you used an explicit output
+file.
+
+Example: $cli->execute();
+
+The function supports a little bit different way too. Sometimes it is
+necessary to pass input directly or to read the output directly beause
+it is critical data which should never be stored on a disk. You can use
+the parameter PARAMS in this case. You have to specify for each
+command which you specified via prepare a type and if necessary the data.
+
+Example: $cli->prepare ({COMMAND => ["command1 -params ...",
+                                     "command2 -params ...",
+                                     "command3 -params ...",
+                                     "command4 -params ..."]});
+         my $params = [
+                       {TYPE => "STDIN", DATA => "the input data"},
+                       {TYPE => "STDOUT"},
+                       {TYPE => "NOTHING"},
+                       {TYPE => "STDOUT"},
+                      ];
+         my $result = $cli->execute ({PARAMS => $params});
+ 
+The first command is an example for using STDIN. The specified data
+will be passed via STDIN to the command. The second command passes the
+result via STDOUT directly into the code. This means that $result
+contains the result from the queries two and four. If you need the
+results seperately the please look into $params->[1]->{STDOUT} and
+$params->[3]->{STDOUT}. The third query simply enforce normal
+behaviour via files.
 
 =head2 get_result
 
