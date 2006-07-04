@@ -69,7 +69,7 @@ sub check_session_id
     return 1 if (not exists $page->{html}->[0]->{body}->[0]->{div}->[0]->{div}->[1]->{form}->[0]->{input}->[0]);
     $page = $page->{html}->[0]->{body}->[0]->{div}->[0]->{div}->[1]->{form}->[0]->{input}->[0];
     return 2 if ($page->{type} ne "hidden");
-    return 3 if ($page->{name} ne "session_id");
+    return 3 if ($page->{name} ne "__session_id");
     return 4 if (length $page->{value} < 16);
     return 0;
 }
