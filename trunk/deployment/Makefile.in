@@ -98,7 +98,7 @@ dist:
 		rm -rf openxpki-deployment-$(REVISION)/ ; \
 	fi
 	mkdir openxpki-deployment-$(REVISION)
-	tar -c -p -S -f - \
+	tar -c -p -f - \
 		--exclude "*.svn" \
 		--exclude "openxpki-deployment-*" \
 		--exclude "*.1" \
