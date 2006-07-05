@@ -6,7 +6,7 @@
   use OpenXPKI::Client::HTML::Mason;
   use OpenXPKI::Client::HTML::Mason::Javascript;
   use OpenXPKI::Client::HTML::Mason::Menu;
-  use OpenXPKI::i18n qw( i18nGettext );
+  use OpenXPKI::i18n qw( i18nGettext set_language );
   use English;
 
   $context->{socket_file} = $ENV{OPENXPKI_SOCKET_FILE};

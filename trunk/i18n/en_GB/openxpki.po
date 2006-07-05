@@ -1,11 +1,8 @@
-
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -67,7 +64,9 @@ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION"
-msgstr "Please choose the authentication method which you will use to identify yourself."
+msgstr ""
+"Please choose the authentication method which you will use to identify "
+"yourself."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE"
 msgstr "Choose authentication method"
@@ -103,12 +102,6 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_WRONG_ROLE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_DESCRIPTION"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_PAGE_DESCRIPTION"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_PAGE_TITLE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
@@ -1301,6 +1294,3 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
-
-
-

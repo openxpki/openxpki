@@ -2,6 +2,7 @@
 PACKAGES=	\
 	core			\
 	deployment		\
+	i18n			\
 	mason-html-client	\
 	perl-cli-client		\
 	perl-client-api

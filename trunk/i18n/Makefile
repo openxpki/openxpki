@@ -12,7 +12,8 @@ POT_SOURCES  = ../perl-modules ../clients
 default::	$(LANG)
 	@echo Languages: $(LANG)
 
-$(LANG):	openxpki.pot
+## do not depend on openxpki.pot - this does not work
+$(LANG):
 	@if (test ! -d $@); then echo creating directory for $@; mkdir $@; fi
 	@if (test ! -e $@/openxpki.po); then echo creating po file for $@; cp openxpki.pot $@/openxpki.po; fi
 	msgmerge --update $@/openxpki.po openxpki.pot
@@ -30,7 +31,7 @@ install::	$(LANG)
 	set -e; for lang in $(LANG); do \
 		make install_dir DIR=$(LOCALE_DIR)/$$lang; \
 		make install_dir DIR=$(LOCALE_DIR)/$$lang/LC_MESSAGES; \
-		make install_dir DIR=$(LOCALE_DIR)/$$lang/LC_MESSAGES/$(MO_FILE); \
+		$(INSTALL) -m 644 $$lang/$(MO_FILE) $(LOCALE_DIR)/$$lang/LC_MESSAGES/$(MO_FILE); \
 	done
 
 install_dir:
@@ -47,8 +48,8 @@ install_dir:
 
 test install clean distclean::
 
-distclean::
-		#$(RM)
+distclean clean::
+	rm -f */*.po~
 
 dist:	REVISION=`svn info | grep Revision | awk '{ print $$2 }'`
 dist:

@@ -1,0 +1,62 @@
+<%args>
+    $session_id => undef
+</%args>
+<%init>
+    ## check for a session
+    ## try to detect the language from the session
+    if ($session_id and
+        exists $session_cache{$session_id}->{language} and
+        length $session_cache{$session_id}->{language})
+    {
+        return set_language ($session_cache{$session_id}->{language});
+    }
+    ## try to detect the language from a parameter
+    my %args = $m->request_args();
+    if (exists $args{"__language"})
+    {
+        return set_language ($session_cache{$session_id}->{language});
+    }
+
+    ## try to detect the language from the browser env
+    #my $browser = $args{'HTTP_ACCEPT_LANGUAGE'};
+    my $browser = $ENV{'HTTP_ACCEPT_LANGUAGE'};
+
+    ## supported languages so far
+    my %translations = (
+        C  => 'C',     ## this should only be used for debugging and testing
+        en => 'en_GB',
+    );
+
+    ## get languages
+    ## example firebird:
+    ##  language: en,en-us;q=0.8,de;q=0.7,de-de;q=0.5,ja;q=0.3,ar;q=0.2
+    ##  charset : ISO-8859-1,utf-8;q=0.7,*;q=0.7
+    ## example explorer:
+    ##  language: de,de-at;q=0.7,ja;q=0.3
+    ##  charset :
+
+    ## if first lang matches one of our support chooes it
+    ## if not - take next
+    ## if none matches - choose default C
+
+    ## BTW we enforce utf8 as charset
+
+    my @list = split (/,/ , $browser);
+
+    ## check every browser supported lang until one matches our supported ones
+    my $found = 0;
+    foreach my $lang (@list){
+      ## get only the firt two characters for each supported language
+      ## skip country details and rating q=0.7 or something
+      ## since they are usally in order from first to last supported
+      my $choose = substr($lang,0,2);
+      if ($translations{$choose})
+      {
+          return set_language($translations{$choose});
+      }
+    }
+
+    ## use the system default language
+print STDERR "system language is used\n";
+    return;
+</%init>

@@ -19,6 +19,7 @@ htdocs/images/openxpki_logo.png
 htdocs/lib/javascript.mhtml
 htdocs/lib/url.mhtml
 htdocs/lib/menu.mhtml
+htdocs/lib/language.mhtml
 
 htdocs/authentication/dhandler
 htdocs/authentication/autohandler
