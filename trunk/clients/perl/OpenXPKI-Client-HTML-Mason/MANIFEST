@@ -33,6 +33,7 @@ htdocs/authentication/close_form.mhtml
 htdocs/service/autohandler
 htdocs/service/dhandler
 htdocs/service/index.html
+htdocs/service/logout.html
 
 #htdocs/Service/send_message.html
 #htdocs/Menu/Query/index.html

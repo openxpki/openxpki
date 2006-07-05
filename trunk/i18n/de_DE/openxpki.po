@@ -1,11 +1,8 @@
-
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -67,10 +64,10 @@ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION"
-msgstr ""
+msgstr "Bitte wählen Sie eine Methode zur Authentifizierung (Anmeldung) aus."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE"
-msgstr ""
+msgstr "Auswählen des Anmeldeverfahrens"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_DESCRIPTION"
 msgstr ""
@@ -80,24 +77,35 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_DESCRIPTION"
 msgstr ""
+"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
+"informieren Sie sich bitte im Info-Menü."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE"
-msgstr ""
+msgstr "Web-Schnittstelle des Trustcenters"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr ""
+"Dass Abmelden ist fehlgeschlagen. "
+"Bitte kontaktieren Sie unbedingt die für Sie zuständigen Administratoren. "
+"Um sich sicher abzumelden, müssen Sie auf eine andere Webseite gehen (z.B. http://127.0.0.1) "
+"und danach sofort den Cache Ihres Browsers löschen. "
+"Hierbei ist es nicht wichtig, ob das Laden der neuen Webseite funktioniert hat."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_TITLE"
-msgstr ""
+msgstr "Fehler beim Abmelden"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_NEW_LOGIN"
-msgstr ""
+msgstr "Erneut anmelden"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_DESCRIPTION"
 msgstr ""
+"Das Abmelden war erfolgreich. "
+"Wenn Sie sich erneut anmelden wollen, so benutzen Sie bitte den folgenden Link."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_TITLE"
-msgstr ""
+msgstr "Erfolgreich abgemeldet"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_CONFIG"
 msgstr ""
@@ -118,16 +126,16 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_WRONG_ROLE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_DESCRIPTION"
-msgstr ""
+msgstr "Die von Ihnen gewünschte Funktion ist derzeit nicht vorhanden."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
-msgstr ""
+msgstr "Fehlende Funktionalität"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET"
-msgstr ""
+msgstr "Zurücksetzen"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT"
-msgstr ""
+msgstr "Abschicken"
 
 msgid "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
@@ -808,19 +816,19 @@ msgid "I18N_OPENXPKI_GET_SAFE_TMPFILE_MISSING_TMP"
 msgstr ""
 
 msgid "I18N_OPENXPKI_HTML_MENU_CERTS"
-msgstr ""
+msgstr "Zertifikate"
 
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
-msgstr ""
+msgstr "Abgelaufene"
 
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
-msgstr ""
+msgstr "Abmelden"
 
 msgid "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS"
-msgstr ""
+msgstr "Zurückgerufene"
 
 msgid "I18N_OPENXPKI_HTML_MENU_VALID_CERTS"
-msgstr ""
+msgstr "Gültige"
 
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""
@@ -1310,6 +1318,3 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
-
-
-

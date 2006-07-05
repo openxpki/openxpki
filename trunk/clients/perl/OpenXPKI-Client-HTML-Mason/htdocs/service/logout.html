@@ -1,0 +1,33 @@
+<%perl>
+    eval
+    {
+        $context->{client}->collect();
+    };
+    if (! $EVAL_ERROR)
+    {
+        ## HORROR: the session is still open !!!
+</%perl>
+        <h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_TITLE') %></h1>
+        <p>
+          <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION') %>
+        </p>
+%   } else {
+        <h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_TITLE') %></h1>
+        <p>
+          <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_DESCRIPTION') %>
+        </p>
+        <p>
+          <a href="../index.html">
+           <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_NEW_LOGIN') %>
+          </a>
+        </p>
+%   }
+<%init>
+    ## this is so unclean that Mason cannot handle it via syshandler
+    use English;
+
+    ## kill the session on the server
+    $context->{client}->send_service_msg ("LOGOUT");
+
+    ## the connection should now be closed by the server
+</%init>

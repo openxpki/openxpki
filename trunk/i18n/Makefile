@@ -2,29 +2,30 @@
 LOCALE_DIR   = $(DESTDIR)/usr/share/locale
 MO_FILE      = openxpki.mo
 INSTALL      = install
-LANG         = en_GB
+LANG         = en_GB de_DE
+PO_SOURCES   = $(LANG:%=%/openxpki.po)
+MO_TRANSLATIONS = $(LANG:%=%/$(MO_FILE))
 POT_SOURCES  = ../perl-modules ../clients
 
 #---- variable settings above, rules below ----
 
 .PHONY:	default test install clean clean.local distclean openxpki.pot
 
-default::	$(LANG)
+default::	$(MO_TRANSLATIONS)
 	@echo Languages: $(LANG)
 
-## do not depend on openxpki.pot - this does not work
-$(LANG):
-	@if (test ! -d $@); then echo creating directory for $@; mkdir $@; fi
-	@if (test ! -e $@/openxpki.po); then echo creating po file for $@; cp openxpki.pot $@/openxpki.po; fi
-	msgmerge --update $@/openxpki.po openxpki.pot
-	@rm -f $@/openca.po~
-	@perl convert.pl $@/openxpki.po > $@/openxpki.po_utf8 2>/dev/null
-	@if (test ! -z `diff $@/openxpki.po $@/openxpki.po_utf8`); then echo no utf8; exit 1; fi
-	@rm -f $@/openxpki.po_utf8
-	msgfmt -o $@/openxpki.mo $@/openxpki.po
+$(PO_SOURCES):	openxpki.pot
+	@if (test ! -d $(@:openxpki.po=)); then echo creating directory for $(@:openxpki.po=); mkdir $(@:openxpki.po=); fi
+	@if (test ! -e $@); then echo creating po file $@; cp openxpki.pot $@; fi
+	msgmerge --update $@ openxpki.pot
+	@rm -f $@~
+	@perl convert.pl $@ > $@_utf8 2>/dev/null
+	@if (test ! -z `diff $@ $@_utf8`); then echo no utf8; exit 1; fi
+	@rm -f $@_utf8
 
-openxpki.pot:	$(POT_SOURCES) build-pot.sh
-	sh build-pot.sh $(POT_SOURCES) > $@
+## do not depend on openxpki.pot or some directories - this does not work
+scan:
+	sh build-pot.sh $(POT_SOURCES) > openxpki.pot
 
 install::	$(LANG)
 	make install_dir DIR=$(LOCALE_DIR)

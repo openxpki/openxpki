@@ -5,6 +5,7 @@ use warnings;
 package OpenXPKI::Client::HTML::Mason::Menu;
 
 use OpenXPKI::Exception;
+use OpenXPKI::i18n qw( i18nGettext );
 use HTML::Mason::Request; # we only use this because we get $m as parameter
 
 sub new
@@ -144,7 +145,7 @@ sub __get_level
                        }).
                        "\">\n";
         }
-        $return .= "      $label\n";
+        $return .= "      ".i18nGettext($label)."\n";
         $return .= "    </a>\n";
         $return .= "  </div>\n";
         if ($params->{NESTED} and

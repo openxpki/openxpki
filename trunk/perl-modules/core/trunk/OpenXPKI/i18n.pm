@@ -116,6 +116,7 @@ sub set_language
     textdomain("openxpki");
     bindtextdomain("openxpki", $locale_prefix);
     bind_textdomain_codeset("openxpki", "UTF-8");
+
 }
 
 1;

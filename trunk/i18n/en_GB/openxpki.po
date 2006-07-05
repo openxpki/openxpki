@@ -79,9 +79,35 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_DESCRIPTION"
 msgstr ""
+"You are logged in to the web interface of the trustcenter. Please note that "
+"this software support several instances of certification authorities (CAs). "
+"If you are not sure which CA you actually use then please check the info "
+"menu."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE"
+msgstr "Trustcenter Web Interface"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr ""
+"The logout failed. "
+"Please contact immediately the reponsible administrators. "
+"If you still want to logout securely then you have to go to another web page (e.g. http://127.0.0.1) "
+"and after this you must delete the cache of your browser. "
+"It is not relevant if the the webpage can be successfully loaded."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_TITLE"
+msgstr "Logout failed"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_NEW_LOGIN"
+msgstr "Login again"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_DESCRIPTION"
+msgstr ""
+"You are now logged out. "
+"If you want to login again then please use the following link."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_TITLE"
+msgstr "Logged out"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_CONFIG"
 msgstr ""
@@ -108,10 +134,10 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET"
-msgstr ""
+msgstr "reset"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT"
-msgstr ""
+msgstr "OK"
 
 msgid "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""

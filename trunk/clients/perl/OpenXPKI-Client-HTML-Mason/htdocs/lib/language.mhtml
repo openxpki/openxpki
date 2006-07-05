@@ -1,20 +1,22 @@
 <%args>
-    $session_id => undef
+    $__session_id => undef
 </%args>
 <%init>
     ## check for a session
     ## try to detect the language from the session
-    if ($session_id and
-        exists $session_cache{$session_id}->{language} and
-        length $session_cache{$session_id}->{language})
+    if ($__session_id and
+        exists $session_cache{$__session_id}->{language} and
+        length $session_cache{$__session_id}->{language})
     {
-        return set_language ($session_cache{$session_id}->{language});
+        return set_language ($session_cache{$__session_id}->{language});
     }
     ## try to detect the language from a parameter
     my %args = $m->request_args();
     if (exists $args{"__language"})
     {
-        return set_language ($session_cache{$session_id}->{language});
+        $session_cache{$__session_id}->{language} = $args{"__language"}
+            if (defined $__session_id);
+        return set_language ($args{"__language"});
     }
 
     ## try to detect the language from the browser env
@@ -25,6 +27,7 @@
     my %translations = (
         C  => 'C',     ## this should only be used for debugging and testing
         en => 'en_GB',
+        de => 'de_DE',
     );
 
     ## get languages
@@ -52,11 +55,13 @@
       my $choose = substr($lang,0,2);
       if ($translations{$choose})
       {
-          return set_language($translations{$choose});
+          #print "LANG: ".$translations{$choose}."\n";
+          set_language($translations{$choose});
+          $ENV{LANGUAGE} = "de_DE";
+          return;
       }
     }
 
     ## use the system default language
-print STDERR "system language is used\n";
     return;
 </%init>
