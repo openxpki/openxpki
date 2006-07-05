@@ -91,6 +91,28 @@ clean:
 
 distclean: clean
 
+
+dist:	REVISION=`svn info | grep Revision | awk '{ print $$2 }'`
+dist:
+	if [ -d openxpki-deployment-$(REVISION) ] ; then \
+		rm -rf openxpki-deployment-$(REVISION)/ ; \
+	fi
+	mkdir openxpki-deployment-$(REVISION)
+	tar -c -p -S -f - \
+		--exclude "*.svn" \
+		--exclude "openxpki-deployment-*" \
+		--exclude "*.1" \
+		--exclude "*~" \
+		. | \
+		tar -C openxpki-deployment-$(REVISION)/ -x -f -
+	find openxpki-deployment-$(REVISION) -name "*.in" | \
+		sed -e 's/\.in//g' | while read file ; do \
+			rm $$file ; \
+		done
+	tar czf openxpki-deployment-$(REVISION).tar.gz openxpki-deployment-$(REVISION)
+	rm -rf openxpki-deployment-$(REVISION)/
+
+
 help:
 	@echo "OpenXPKI Deployment Tool"
 	@echo
