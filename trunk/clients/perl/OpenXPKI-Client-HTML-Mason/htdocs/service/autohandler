@@ -20,7 +20,7 @@
        if ($m->fetch_next()->name() eq "dhandler")
        {
            ## autohandler called directly - usually from authentication
-           $m->comp ('/service/index.html');
+           $m->comp ('/service/dhandler');
        } else {
            $m->call_next;
        }

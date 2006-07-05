@@ -11,9 +11,8 @@ default:
 	make source-clean
 
 openxpki-archive:
-	cd ${OPENXPKI_SVN}/trunk/deployment; \
-	make -f Makefile.in dist; \
-	mv openxpki-deployment-*.tar.gz /tmp
+	cd ${OPENXPKI_SVN}/trunk/; \
+	tar -czf /tmp/openxpki-i18n.tar.gz deployment;
 
 debian-archive:
 	## cd ${OPENXPKI_SVN}/trunk/package/
@@ -21,16 +20,20 @@ debian-archive:
 
 source:
 	cd /tmp; \
-	tar -xzf openxpki-deployment-*.tar.gz; \
-	cd openxpki-deployment-*/; \
+	if [ -d deployment ]; then \
+	    echo source directory /tmp/i18n exists from old build; \
+	    exit 1; \
+	fi; \
+	tar -xzf openxpki-i18n.tar.gz; \
+	cd deployment/; \
 	mkdir debian; \
 	cd debian; \
-	tar -xzf /tmp/openxpki-debian.tar.gz;
+	tar -xzf /tmp/openxpki-i18n.tar.gz;
 
 package:
-	cd /tmp/openxpki-deployment-*/; \
+	cd /tmp/i18n/; \
 	fakeroot dpkg-buildpackage || echo ignoring error - usually signing ...
-	mv /tmp/openxpki-deployment_* .
+	mv /tmp/openxpki-i18n_* .
 
 source-clean:
 	#rm -rf /tmp/deployment

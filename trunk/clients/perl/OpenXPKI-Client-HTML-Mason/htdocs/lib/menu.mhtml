@@ -58,6 +58,10 @@
                             "RENEW_BUTTON"  => "YES"
                         }
                     },
+                    "logout" =>
+                    {
+                        CMD => "logout"
+                    }
                 }
                };
   my %params = ( MASON => $m, CONFIG => $CONFIG, ACTION => "../service/index.html" );

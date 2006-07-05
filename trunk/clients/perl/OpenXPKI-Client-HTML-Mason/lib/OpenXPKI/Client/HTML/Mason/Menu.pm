@@ -171,10 +171,32 @@ sub __get_menu_link
     foreach my $item (keys %result)
     {
         next if (not defined $item);
+        next if ($item eq "__menu_action");
         $link .= ";" if (length $link > 1);
         $link .= $item."=".$result{$item};
     }
-    $link = $self->{ACTION}.$link if (exists $self->{ACTION});
+    if ($result{"__menu_action"})
+    {
+        ## get action configuration
+        my $config = $self->{CONFIG}->{ACTION}->{$result{"__menu_action"}};
+        ## set real command name
+        $link = $config->{CMD}.".html".$link;
+        if (exists $self->{ACTION})
+        {
+            ## determine path length
+            my $path = $self->{ACTION};
+               $path =~ s/[^\/]*\/[^\/]*$//g;
+            $link = "../service/".$link if (length $path);
+        }
+        ## set parameters
+        foreach my $param (keys %{$config->{PARAMS}})
+        {
+            next if (not defined $param);
+            $link .= ";__action_param_$param=".$config->{PARAMS}->{$param};
+        }
+    } else {
+        $link = $self->{ACTION}.$link if (exists $self->{ACTION});
+    }
 
     return $link;
 }
