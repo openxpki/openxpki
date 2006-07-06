@@ -29,6 +29,7 @@ use MIME::Base64;
     my %token         : ATTR( :init_arg<TOKEN> );
 
     my %algorithm     : ATTR( :init_arg<ALGORITHM> :get<algorithm> :default('aes-256-cbc') );
+    my %encoding      : ATTR( :init_arg<ENCODING> :default('base64-oneline') );
 
     sub START {
 	my ($self, $ident, $arg_ref) = @_;
@@ -77,61 +78,56 @@ use MIME::Base64;
 	my $self = shift;
 	my $ident = ident $self;
 	my $args = shift;
-	
-	if (ref $args eq '') {
-	    $args = {
-		DATA => $args,
-	    };
+
+	my $data;
+	my $encoding = $encoding{$ident};
+
+	if (defined $args && (ref $args eq 'HASH')) {
+	    $data     = $args->{DATA};
+	    $encoding = $args->{ENCODING};
+	} elsif (defined $args && (ref $args eq '')) {
+	    $data     = $args;
 	}
 	
-	if ((ref $args ne 'HASH') 
-	    || (! exists $args->{DATA})) {
+	if (! defined $data) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_PARAMETER");
 	}
 	
-	if (! exists $args->{DATA}) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_MISSING_PARAMETER",
-		params => {
-		    PARAMETER => 'DATA',
-		},	
-		);
-	}
-	
-	$args->{ENCODING} ||= 'base64-oneline';
-
 	my $encrypted = $token{$ident}->command(
 	    {
                 COMMAND => 'symmetric_cipher',
                 MODE    => 'ENCRYPT',
 		KEY     => $session_key{$ident},
 		IV      => $session_iv{$ident},
-                DATA    => $args->{DATA},
+                DATA    => $data,
             });
 
 	my $blob;
 
-	if ($args->{ENCODING} eq 'base64') {
+	if ($encoding eq 'base64') {
 	    $blob = MIME::Base64::encode_base64($encrypted);
 	}
 
-	if ($args->{ENCODING} eq 'base64-oneline') {
+	if ($encoding eq 'base64-oneline') {
 	    $blob = MIME::Base64::encode_base64($encrypted, '');
 	}
 
-	if ($args->{ENCODING} eq 'raw') {	 
+	if ($encoding eq 'raw') {	 
 	    $blob = $encrypted;
 	}
 
 	if (! defined $blob) {	 
 	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_ENCODING");
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_ENCODING"),
+		params => {
+		    ENCODING => $encoding,
+	    },
 	}
 
 	return join(';', 
 		    $ident, 
-		    $args->{ENCODING}, 
+		    $encoding, 
 		    $blob);
     }
 
@@ -232,6 +228,11 @@ trying to do so.
 Creates a new vault object instance. Requires an initialized
 default token to be passed via the named parameter TOKEN.
 
+Accepts a named parameter ENCODING which sets the instance's default
+encoding for the encrypted data string. ENCODING may be one of
+'raw' (binary), 'base64' (Base64 with newlines) and 'base64-oneline'
+(Base64 without any whitespace or newlines). Default is 'base64-oneline'.
+
 =head2 encrypt()
 
 If the first argument to encrypt() is a hash reference the method 
@@ -239,9 +240,10 @@ accepts the named arguments 'DATA' and 'ENCODING'.
 
 DATA contains the scalar data to encrypt.
 
-ENCODING defaults to 'base64-oneline' and may be one of 'base64' (base64 
-encoding), 'base64-oneline' (base64 encoding on one single line without
-any whitespace or line breaks) or 'raw' (binary data).
+ENCODING defaults to the default encoding for the instance and may be 
+one of 'base64' (base64 encoding), 'base64-oneline' (base64 encoding 
+on one single line without any whitespace or line breaks) or 
+'raw' (binary data).
 
 If the first argument to encrypt() is a scalar instead of a hash reference
 it is assumed to contain the data to encrypt (just like a DATA named 
