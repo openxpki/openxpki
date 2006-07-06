@@ -90,7 +90,7 @@ sub do_status {
         if (not exists $arg->{SLEEP})
         {
             ## wait for a starting server ...
-            return do_status ({SOCKETFILE -> $arg->{SOCKETFILE}, SLEEP => 5});
+            return do_status ({SOCKETFILE => $arg->{SOCKETFILE}, SLEEP => 5});
         }
 	print STDERR "OpenXPKI server is not running or does not accept requests.\n";
 	return;
