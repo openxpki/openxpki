@@ -21,6 +21,7 @@ openxpki.xsd
 ## Crypto layer
 
 OpenXPKI/Crypto/TokenManager.pm
+OpenXPKI/Crypto/VolatileVault.pm
 OpenXPKI/Crypto/Backend/API.pm
 OpenXPKI/Crypto/Object.pm
 OpenXPKI/Crypto/Header.pm
