@@ -222,6 +222,20 @@ sub get
     }
 }
 
+sub get_link_params
+{
+    my $self   = shift;
+    my %params = $self->get_menu_hash();
+    my $link   = "";
+
+    foreach my $key (keys %params)
+    {
+        $link .= ";" if (length $link);
+        $link .= $key."=".$params{$key};
+    }
+    return $link;
+}
+
 sub get_menu_hash
 {
     my $self   = shift;
@@ -298,3 +312,7 @@ parameter then the complete menu is dumped.
 
 The function get uses this funtion to to build its links.
 
+=head2 get_link_params
+
+returns a line which is ready to be included into an HTML link to get
+the actual menu.

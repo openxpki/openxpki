@@ -89,11 +89,10 @@ msgstr "Trustcenter Web Interface"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr ""
-"The logout failed. "
-"Please contact immediately the reponsible administrators. "
-"If you still want to logout securely then you have to go to another web page (e.g. http://127.0.0.1) "
-"and after this you must delete the cache of your browser. "
-"It is not relevant if the the webpage can be successfully loaded."
+"The logout failed. Please contact immediately the reponsible administrators. "
+"If you still want to logout securely then you have to go to another web page "
+"(e.g. http://127.0.0.1) and after this you must delete the cache of your "
+"browser. It is not relevant if the the webpage can be successfully loaded."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_TITLE"
 msgstr "Logout failed"
@@ -101,10 +100,14 @@ msgstr "Logout failed"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_NEW_LOGIN"
 msgstr "Login again"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_OK"
+msgstr "Login again"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_DESCRIPTION"
 msgstr ""
-"You are now logged out. "
-"If you want to login again then please use the following link."
+"You are now logged out. If you want to login again then please use the "
+"following link."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_TITLE"
 msgstr "Logged out"
@@ -133,11 +136,47 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKI_REALM"
+msgstr "PKI Realm"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET"
 msgstr "reset"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT"
 msgstr "OK"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_DESCRIPTION"
+msgstr ""
+"You can create a new instance of workflow type here. Please choose one."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_TITLE"
+msgstr "Create workflow instance"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
+msgstr "Last update"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
+msgstr ""
+"You can see now the active workflow instances."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_TITLE"
+msgstr "Workflow instances"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_DESCRIPTION"
+msgstr ""
+"You can see now the available types of workflows."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_TITLE"
+msgstr "Workflow types"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL"
+msgstr "Workflow serial"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE"
+msgstr "Workflow state"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE"
+msgstr "Workflow type"
 
 msgid "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
@@ -818,19 +857,31 @@ msgid "I18N_OPENXPKI_GET_SAFE_TMPFILE_MISSING_TMP"
 msgstr ""
 
 msgid "I18N_OPENXPKI_HTML_MENU_CERTS"
-msgstr ""
+msgstr "Certificates"
 
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
-msgstr ""
+msgstr "Expired"
 
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
-msgstr ""
+msgstr "Logout"
 
 msgid "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS"
-msgstr ""
+msgstr "Revoked"
 
 msgid "I18N_OPENXPKI_HTML_MENU_VALID_CERTS"
-msgstr ""
+msgstr "Valid"
+
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW"
+msgstr "Workflow"
+
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
+msgstr "Create instance"
+
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
+msgstr "List instances"
+
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES"
+msgstr "List types"
 
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""

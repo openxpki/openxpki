@@ -33,7 +33,11 @@
      </div> <!-- content -->
 
 <%init>
+  ## fix content type
   $r->content_type('text/html; charset=utf-8');
+
+  ## check that we are in the correct state
+  
 </%init>
 
 <%method title>

@@ -68,6 +68,8 @@
         } else {
             # try to establish session again
             $m->comp('/authentication/session.mhtml');
+            $context->{client}->collect()
+                if ($context->{client}->get_communication_state() eq "can_receive");
         }
     } else {
         delete $context->{session_id} if (exists $context->{session_id});

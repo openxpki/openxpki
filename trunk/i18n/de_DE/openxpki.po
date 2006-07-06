@@ -87,11 +87,11 @@ msgstr "Web-Schnittstelle des Trustcenters"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr ""
-"Dass Abmelden ist fehlgeschlagen. "
-"Bitte kontaktieren Sie unbedingt die für Sie zuständigen Administratoren. "
-"Um sich sicher abzumelden, müssen Sie auf eine andere Webseite gehen (z.B. http://127.0.0.1) "
-"und danach sofort den Cache Ihres Browsers löschen. "
-"Hierbei ist es nicht wichtig, ob das Laden der neuen Webseite funktioniert hat."
+"Dass Abmelden ist fehlgeschlagen. Bitte kontaktieren Sie unbedingt die für "
+"Sie zuständigen Administratoren. Um sich sicher abzumelden, müssen Sie auf "
+"eine andere Webseite gehen (z.B. http://127.0.0.1) und danach sofort den "
+"Cache Ihres Browsers löschen. Hierbei ist es nicht wichtig, ob das Laden der "
+"neuen Webseite funktioniert hat."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_TITLE"
 msgstr "Fehler beim Abmelden"
@@ -99,10 +99,14 @@ msgstr "Fehler beim Abmelden"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_NEW_LOGIN"
 msgstr "Erneut anmelden"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_OK"
+msgstr "Das Abmelden war erfolgreich."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_DESCRIPTION"
 msgstr ""
-"Das Abmelden war erfolgreich. "
-"Wenn Sie sich erneut anmelden wollen, so benutzen Sie bitte den folgenden Link."
+"Das Abmelden war erfolgreich. Wenn Sie sich erneut anmelden wollen, so "
+"benutzen Sie bitte den folgenden Link."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_TITLE"
 msgstr "Erfolgreich abgemeldet"
@@ -131,11 +135,47 @@ msgstr "Die von Ihnen gewünschte Funktion ist derzeit nicht vorhanden."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr "Fehlende Funktionalität"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKI_REALM"
+msgstr "PKI Realm"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET"
 msgstr "Zurücksetzen"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT"
 msgstr "Abschicken"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_DESCRIPTION"
+msgstr ""
+"Sie können nun einen neuen Prozess starten. Bitte suchen Sie sich dazu einen Workflow aus."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_TITLE"
+msgstr "Neuer Workflow-Prozess"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
+msgstr "Letzte Aktualisierung"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
+msgstr ""
+"Die derzeit aktiven Prozesse können Sie der Tabelle entnehmen."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_TITLE"
+msgstr "Aktive Workflow-Prozesse"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_DESCRIPTION"
+msgstr ""
+"Im Folgenden werden die derzeit verfügbaren Workflows beschrieben."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_TITLE"
+msgstr "Workflows"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL"
+msgstr "Seriennummer des Workflowprozesses"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE"
+msgstr "Status des Workflows"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE"
+msgstr "Name des Workflows"
 
 msgid "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
@@ -829,6 +869,18 @@ msgstr "Zurückgerufene"
 
 msgid "I18N_OPENXPKI_HTML_MENU_VALID_CERTS"
 msgstr "Gültige"
+
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW"
+msgstr "Workflow"
+
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
+msgstr "Neuer Prozess"
+
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
+msgstr "Prozesse anzeigen"
+
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES"
+msgstr "Arten anzeigen"
 
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""

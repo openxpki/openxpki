@@ -43,7 +43,6 @@
     ## if none matches - choose default C
 
     ## BTW we enforce utf8 as charset
-
     my @list = split (/,/ , $browser);
 
     ## check every browser supported lang until one matches our supported ones
@@ -57,7 +56,6 @@
       {
           #print "LANG: ".$translations{$choose}."\n";
           set_language($translations{$choose});
-          $ENV{LANGUAGE} = "de_DE";
           return;
       }
     }

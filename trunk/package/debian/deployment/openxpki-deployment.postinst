@@ -29,8 +29,11 @@ case "$1" in
 	if [ -e /etc/openxpki/instances/trustcenter1/openxpki.conf ]; then
 		echo Detected and respect an old deployment.
 	else
+		for DIR in "/etc/openxpki" "/etc/openxpki/instances" "/etc/openxpki/instances/trustcenter1"; do
+			install -d -m 750 -o root -g openxpki $DIR
+		done
 		echo -n Deploy instance trustcenter1 ...
-		openxpkiadm --config=/etc/openxpki/templates/default/config.xml deploy -- --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 2>>/var/log/messages
+		openxpkiadm deploy -- --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 2>>/var/log/messages
 		echo DONE.
 		cd /etc/openxpki/instances/trustcenter1
 		echo -n Configure instance trustcenter1 ...

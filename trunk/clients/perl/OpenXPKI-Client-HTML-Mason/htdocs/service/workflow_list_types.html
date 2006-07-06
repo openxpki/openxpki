@@ -1,0 +1,22 @@
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_DESCRIPTION') %>
+</p>
+%   my $msg = $context->{client}->send_receive_command_msg ("list_workflow_titles");
+%   ## I expect the following:
+%   ## SERVICE_MSG => "COMMAND",
+%   ## COMMAND     => $cmd,
+%   ## PARAMS      => {$name => {description => $desc}, ... }
+%
+<dl>
+%
+%   foreach my $type (keys %{$msg->{PARAMS}})
+%   {
+  <dt>
+    <a href="../service/workflow_list_instances.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>">
+      <% i18nGettext($type) %>
+    </a>
+  </dt>
+  <dd><% i18nGettext($msg->{PARAMS}->{$type}->{description}) %></dd>
+%   }
+</dl>

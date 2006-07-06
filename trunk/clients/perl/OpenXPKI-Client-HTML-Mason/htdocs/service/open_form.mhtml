@@ -1,0 +1,10 @@
+<%args>
+    $session_id => undef
+</%args>
+
+        <form action="<% $m->request_comp()->name() %>" method="post">
+%    my %hash = $context->{menu}->get_menu_hash();
+%    foreach my $key (keys %hash)
+%    {
+          <input type="hidden" name="<% $key %>" value="<% $hash{$key} %>"/>
+%    }

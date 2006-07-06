@@ -1,7 +1,11 @@
 <%perl>
     eval
     {
-        $context->{client}->collect();
+        my $msg = $context->{client}->collect();
+        die i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_OK")
+            if (not $msg);
+        use Data::Dumper;
+        print Dumper ($msg);
     };
     if (! $EVAL_ERROR)
     {
@@ -22,12 +26,19 @@
           </a>
         </p>
 %   }
+%   undef $context; # cleanup the context
 <%init>
     ## this is so unclean that Mason cannot handle it via syshandler
     use English;
 
     ## kill the session on the server
     $context->{client}->send_service_msg ("LOGOUT");
+
+    ## erase the session from the session cache
+    delete $session_cache{$context->{"session_id"}};
+
+    ## make the session unavailable in the context
+    delete $context->{"session_id"};
 
     ## the connection should now be closed by the server
 </%init>

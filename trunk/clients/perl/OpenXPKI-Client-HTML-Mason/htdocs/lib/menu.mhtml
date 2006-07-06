@@ -5,7 +5,7 @@
                 {
                     'anonymous' =>
                     {
-                        MENU => "ra_op_menu"
+                        MENU => "anonymous_menu"
                     },
                     'RA Operator' =>
                     {
@@ -14,10 +14,26 @@
                 },
                 MENU =>
                 {
+                    "anonymous_menu" =>
+                    [
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",
+                                   "workflow"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
+                                   "logout"]
+                    ],
                     "ra_op_menu" =>
                     [
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_CERTS",  "edit_certs"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT", "logout"]
+                    ],
+                    "workflow" =>
+                    [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES",
+                                   "workflow_list_types"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE",
+                                   "workflow_create_instance"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES",
+                                   "workflow_list_instances"],
                     ],
                     "edit_certs" =>
                     [
@@ -28,6 +44,18 @@
                 },
                 ACTION =>
                 {
+                    "workflow_list_types" =>
+                    {
+                        CMD => "workflow_list_types"
+                    },
+                    "workflow_list_instances" =>
+                    {
+                        CMD => "workflow_list_instances"
+                    },
+                    "workflow_create_instance" =>
+                    {
+                        CMD => "workflow_create_instance"
+                    },
                     "edit_valid_certs" =>
                     {
                         CMD => "cert_list",
@@ -70,9 +98,9 @@
   {
       $params{$key} = $context->{lc $key} if (exists $context->{lc $key});
   }
-  my $menu = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
+  $context->{menu} = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
 </%init>
-<% $menu->get() %>
+<% $context->{menu}->get() %>
 <%flags>
   inherit => '/syshandler'
 </%flags>
