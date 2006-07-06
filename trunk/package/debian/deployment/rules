@@ -58,7 +58,8 @@ install-stamp: build
 	dh_testdir
 	dh_installdirs
 	DESTDIR=$(CURDIR)/debian/tmp make install
-	dh_installinit --no-start --init-script=openxpkid
+	#dh_installinit --no-start --init-script=openxpkid
+	dh_installinit --name=openxpkid
 	dh_fixperms -a
 	touch install-stamp
 

@@ -29,18 +29,22 @@ case "$1" in
 	if [ -e /etc/openxpki/instances/trustcenter1/openxpki.conf ]; then
 		echo Detected and respect an old deployment.
 	else
-		echo -n deploy instance trustcenter1 ...
-		openxpkiadm --config=/etc/openxpki/templates/default/config.xml deploy -- --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1;
+		echo -n Deploy instance trustcenter1 ...
+		openxpkiadm --config=/etc/openxpki/templates/default/config.xml deploy -- --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 2>>/var/log/messages
 		echo DONE.
-		cd /etc/openxpki/instances/trustcenter1;
-		echo -n configure instance trustcenter1
-		openxpki-configure --batch --createdirs;
+		cd /etc/openxpki/instances/trustcenter1
+		echo -n Configure instance trustcenter1 ...
+		openxpki-configure --batch --createdirs >>/var/log/messages
 		echo DONE.
 	fi;
-
-        # restart the daemon
-        /etc/init.d/openxpkid stop || echo openxpkid cannot be stopped ...
-        /etc/init.d/openxpkid start
+	# check for already initialized database
+	if [ -e /var/openxpki/sqlite.db._backend_ ] || [ -e /var/openxpki/sqlite.db._workflow_ ]; then
+		echo Detected and respect an old database.
+	else
+		echo -n Initialize database ...
+                openxpkiadm --config=/etc/openxpki/instances/trustcenter1/config.xml initdb 2>>/var/log/messages
+		echo DONE.
+	fi;
 
 	# force permissions
 	#for i in /var/lib/openca/session/cookie/node
