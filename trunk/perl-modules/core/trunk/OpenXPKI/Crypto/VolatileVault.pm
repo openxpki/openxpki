@@ -1,0 +1,270 @@
+## OpenXPKI::Crypto::VolatileVault.pm 
+##
+## Written 2006 by Martin Bartosch for the OpenXPKI project
+## Copyright (C) 2005-2006 by The OpenXPKI Project
+## $Revision: 350 $
+
+package OpenXPKI::Crypto::VolatileVault;
+
+use Class::Std;
+
+use strict;
+use warnings;
+use English;
+
+use OpenXPKI::Debug 'OpenXPKI::Crypto::VolatileVault';
+use OpenXPKI::Exception;
+
+use OpenXPKI::Crypto::TokenManager;
+
+use MIME::Base64;
+
+# use Smart::Comments;
+
+{
+    # using a block here protects private instance data from access
+    # from the outside
+    my %session_key   : ATTR;
+    my %session_iv    : ATTR;
+    my %token         : ATTR( :init_arg<TOKEN> );
+
+    my %algorithm     : ATTR( :init_arg<ALGORITHM> :get<algorithm> :default('aes-256-cbc') );
+
+    sub START {
+	my ($self, $ident, $arg_ref) = @_;
+
+	if (! exists $token{$ident}) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_MISSING_TOKEN");
+	}
+
+	
+	my $key = $token{$ident}->command(
+	    {
+		COMMAND => 'create_random',
+		RANDOM_LENGTH => 32,
+	    });
+
+	# create_random chops of the trailing '=' which is frowned upon
+	# by MIME::Base64
+	$key .= '=' unless $key =~ m{ = \z }xms;
+
+	# convert base64 to binary and get hex representation of this data
+	$session_key{$ident} = uc(unpack('H*', MIME::Base64::decode_base64($key)));
+
+	my $iv = $token{$ident}->command(
+	    {
+		COMMAND => 'create_random',
+		RANDOM_LENGTH => 16,
+	    });
+
+	# create_random chops of the trailing '=' which is frowned upon
+	# by MIME::Base64
+	$iv .= '=' unless $key =~ m{ = \z }xms;
+
+	# convert base64 to binary and get hex representation of this data
+	$session_iv{$ident} = uc(unpack('H*', MIME::Base64::decode_base64($iv)));
+
+	if (! length($session_key{$ident}) || ! length ($session_iv{$ident})) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INITIALIZATION_ERROR");
+	}
+	
+    }
+
+
+    sub encrypt {
+	my $self = shift;
+	my $ident = ident $self;
+	my $args = shift;
+	
+	if (ref $args eq '') {
+	    $args = {
+		DATA => $args,
+	    };
+	}
+	
+	if ((ref $args ne 'HASH') 
+	    || (! exists $args->{DATA})) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_PARAMETER");
+	}
+	
+	if (! exists $args->{DATA}) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_MISSING_PARAMETER",
+		params => {
+		    PARAMETER => 'DATA',
+		},	
+		);
+	}
+	
+	$args->{ENCODING} ||= 'base64-oneline';
+
+	my $encrypted = $token{$ident}->command(
+	    {
+                COMMAND => 'symmetric_cipher',
+                MODE    => 'ENCRYPT',
+		KEY     => $session_key{$ident},
+		IV      => $session_iv{$ident},
+                DATA    => $args->{DATA},
+            });
+
+	my $blob;
+
+	if ($args->{ENCODING} eq 'base64') {
+	    $blob = MIME::Base64::encode_base64($encrypted);
+	}
+
+	if ($args->{ENCODING} eq 'base64-oneline') {
+	    $blob = MIME::Base64::encode_base64($encrypted, '');
+	}
+
+	if ($args->{ENCODING} eq 'raw') {	 
+	    $blob = $encrypted;
+	}
+
+	if (! defined $blob) {	 
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_ENCODING");
+	}
+
+	return join(';', 
+		    $ident, 
+		    $args->{ENCODING}, 
+		    $blob);
+    }
+
+    sub can_decrypt {
+	my $self = shift;
+	my $ident = ident $self;
+	my $arg = shift;
+
+	my ($creator_ident, $encoding, $encrypted_data) = 
+	    ($arg =~ m{ (.*?) ; ([\w\-]+) ; (.*) }xms);
+
+	if (! defined $encrypted_data) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA");
+	}
+
+	# check if we created this cookie
+	if ($ident eq $creator_ident) {
+	    return 1;
+	}
+	return;
+    }
+
+    sub decrypt {
+	my $self = shift;
+	my $ident = ident $self;
+	my $arg = shift;
+
+	my ($creator_ident, $encoding, $encrypted_data) = 
+	    ($arg =~ m{ (.*?) ; ([\w\-]+) ; (.*) }xms);
+
+	if (! defined $encrypted_data) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA");
+	}
+
+	# check if we created this cookie
+	if ($ident ne $creator_ident) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_VAULT_INSTANCE");
+	}
+
+	if (($encoding eq 'base64') || ($encoding eq 'base64-oneline')) {
+	    $encrypted_data = MIME::Base64::decode_base64($encrypted_data);
+	}
+
+	return $token{$ident}->command(
+	    {
+                COMMAND => 'symmetric_cipher',
+                MODE    => 'DECRYPT',
+		KEY     => $session_key{$ident},
+		IV      => $session_iv{$ident},
+                DATA    => $encrypted_data,
+            });
+    }    
+    
+	
+
+}
+
+1;
+__END__
+
+=head1 Name
+
+OpenXPKI::Crypto::VolatileVault
+
+=head1 Description
+
+This class implements a volatile storage for holding sensitive information
+during the runtime of a program.
+
+  use OpenXPKI::Crypto::VolatileVault;
+  my $token = ...
+  my $vault = OpenXPKI::Crypto::VolatileVault->new(
+    {
+        TOKEN => $token,
+    });
+  my $encrypted = $vault->encrypt('supersecretdata');
+
+  ...
+
+  my $tmp = $vault->decrypt($encrypted);  
+
+The constructor will generate a random symmetric key and store it in an
+instance variable. 
+The class uses inside-out objects via Class::Std to make sure that 
+the secret key is strictly internal to the instance and not
+accessible from the outside.
+
+Encrypted data includes an instance ID that allows a particular instance
+to determine if it has created a given piece of encrypted data, hence
+it can check if it is capable of decrypting the data without actually
+trying to do so.
+
+=head2 new()
+
+Creates a new vault object instance. Requires an initialized
+default token to be passed via the named parameter TOKEN.
+
+=head2 encrypt()
+
+If the first argument to encrypt() is a hash reference the method 
+accepts the named arguments 'DATA' and 'ENCODING'.
+
+DATA contains the scalar data to encrypt.
+
+ENCODING defaults to 'base64-oneline' and may be one of 'base64' (base64 
+encoding), 'base64-oneline' (base64 encoding on one single line without
+any whitespace or line breaks) or 'raw' (binary data).
+
+If the first argument to encrypt() is a scalar instead of a hash reference
+it is assumed to contain the data to encrypt (just like a DATA named 
+argument).
+
+During the lifetime of the instance the caller may call the encrypt() 
+method in order to protect sensitive data. The method encrypts the
+specified data with the secret key and returns the encrypted value.
+This encrypted data may now be stored in insecure places because the
+decryption is only possible via the same class instance that encrypted
+it in the first plase.
+
+WARNING: after destruction of the class instance decryption of data
+encrypted by this instance is impossible.
+
+The method returns the enrypted data that may be stored in unsafe storage
+and may be passed to decrypt() of the same instance in order to access
+the stored data.
+
+=head2 decrypt()
+
+Accepts a scalar argument containing the encrypted data to encrypt and
+returns the original clear text.
+This only works if the encrypted data was created by the same object
+instance of this class.
+

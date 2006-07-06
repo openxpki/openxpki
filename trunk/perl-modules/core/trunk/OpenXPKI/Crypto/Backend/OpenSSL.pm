@@ -311,8 +311,38 @@ sub command
         my $cmdref = $cmd->new ({%{$self->{COMMAND_PARAMS}}, %{$keys}, TOKEN_TYPE => $self->{TOKEN_TYPE}});
         my $cmds = $cmdref->get_command();
 
-        $self->{CLI}->prepare ({COMMAND => $cmds, CONFIG => $self->{CONFIG}});
-        $self->{CLI}->execute ();
+	if (ref $cmds ne 'HASH') {
+	    # standard invocation
+	    $self->{CLI}->prepare (
+		{
+		    COMMAND => $cmds, 
+		    CONFIG => $self->{CONFIG},
+		});
+	    $self->{CLI}->execute();
+	} else {
+	    # command returned a hash instead of a arrayref, this means
+	    # that we need to extract parameters for execute
+	    
+	    if (! exists $cmds->{COMMAND}) {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_SUBPARAMETER_COMMAND");
+	    }
+	    if (! exists $cmds->{PARAMS}) {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_SUBPARAMETER_PARAMS");
+	    }
+
+	    $self->{CLI}->prepare (
+		{
+		    COMMAND => $cmds->{COMMAND}, 
+		    CONFIG => $self->{CONFIG},
+		});
+	    $self->{CLI}->execute(
+		{
+		    PARAMS => $cmds->{PARAMS},
+		});
+	}
+
         my $result = $self->{CLI}->get_result();
         $result = $cmdref->get_result ($result);
 

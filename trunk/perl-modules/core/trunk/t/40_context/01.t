@@ -23,8 +23,9 @@ ok(OpenXPKI::Server::Init::init(
 		       'i18n', 
 		       'log', 
 #		       'redirect_stderr', 
-		       'crypto_layer', 
+		       'crypto_layer',
 		       'pki_realm', 
+		       'volatile_vault',
 		       'dbi_backend', 
 		       'dbi_workflow', ],
        }));

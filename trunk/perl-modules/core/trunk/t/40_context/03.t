@@ -10,7 +10,7 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
-BEGIN { plan tests => 11 };
+BEGIN { plan tests => 12 };
 
 print STDERR "OpenXPKI::Server::Context - global context entries\n";
 ok(1);
@@ -25,6 +25,7 @@ ok(OpenXPKI::Server::Init::init(
 #		       'redirect_stderr', 
 		       'crypto_layer', 
 		       'pki_realm', 
+		       'volatile_vault',
 		       'dbi_backend', 
 		       'dbi_workflow', 
 		       'acl',
@@ -39,6 +40,9 @@ ok(blessed CTX('xml_config'),
 
 ok(blessed CTX('crypto_layer'),
    'OpenXPKI::Crypto::TokenManager');
+
+ok(blessed CTX('volatile_vault'),
+   'OpenXPKI::Crypto::VolatileVault');
 
 ok(blessed CTX('log'),
    'OpenXPKI::Server::Log');

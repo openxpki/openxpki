@@ -2,7 +2,7 @@
 ## Written 2005 by Michael Bell for the OpenXPKI project
 ## Rewritten 2006 by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision
+## $Revision$
 	
 use strict;
 use warnings;
@@ -65,6 +65,7 @@ sub new
     $self->{CONFIG} = $keys->{CONFIG};;
 
     ##! 2: "create output and stderr files"
+    $self->{STDIN}  = $self->get_safe_tmpfile({TMP => $self->{TMP}});
     $self->{STDOUT} = $self->get_safe_tmpfile({TMP => $self->{TMP}});
     $self->{STDERR} = $self->get_safe_tmpfile({TMP => $self->{TMP}});
 
@@ -108,12 +109,12 @@ sub execute
 {
     ##! 1: "start"
     my $self   = shift;
+    my $keys   = shift;
+
     my $return = "";
-    my $keys   = undef;
-    my $params = undef;
-    if ($_[0])
-    {
-        $keys   = shift;
+    my $params;
+
+    if (defined $keys) {
         $params = $keys->{PARAMS};
     }
 
@@ -247,6 +248,7 @@ sub cleanup
 {
     ##! 1: "start"
     my $self = shift;
+    unlink ($self->{STDIN})  if (exists $self->{STDIN}  and -e $self->{STDIN});
     unlink ($self->{STDOUT}) if (exists $self->{STDOUT} and -e $self->{STDOUT});
     unlink ($self->{STDERR}) if (exists $self->{STDERR} and -e $self->{STDERR});
     ##! 1: "end"

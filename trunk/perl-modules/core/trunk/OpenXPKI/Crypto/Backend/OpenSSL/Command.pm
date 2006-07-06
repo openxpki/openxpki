@@ -25,6 +25,8 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_decrypt;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::symmetric_cipher;
+
 package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 
 use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Command';

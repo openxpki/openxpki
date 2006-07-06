@@ -19,12 +19,13 @@ my $context = {
 
     exported => {
 	# always created by this package
-	xml_config   => undef,
-	crypto_layer => undef,
-	pki_realm    => undef,
-	log          => undef,
-	dbi_backend  => undef,
-	dbi_workflow => undef,
+	xml_config     => undef,
+	crypto_layer   => undef,
+	pki_realm      => undef,
+	volatile_vault => undef,
+	log            => undef,
+	dbi_backend    => undef,
+	dbi_workflow   => undef,
 
 	# user-settable
 	api            => undef,
@@ -179,6 +180,8 @@ by calling CTX('...') once create() has been called:
 =item * crypto_layer
 
 =item * pki_realm
+
+=item * volatile_vault
 
 =item * log
 

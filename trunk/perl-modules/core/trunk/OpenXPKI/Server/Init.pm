@@ -21,6 +21,7 @@ use OpenXPKI::Exception;
 
 use OpenXPKI::XML::Config;
 use OpenXPKI::Crypto::TokenManager;
+use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Server::DBI;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::ACL;
@@ -40,6 +41,7 @@ my @init_tasks = qw(
   prepare_daemon
   crypto_layer
   pki_realm
+  volatile_vault
   dbi_backend
   dbi_workflow
   acl
@@ -158,7 +160,7 @@ sub get_remaining_init_tasks {
 # init functions to be called during init task processing
 sub __do_init_xml_config {
     my $keys = shift;
-    ### init xml config...
+    ##! 1: "init xml config"
     my $xml_config = get_xml_config(CONFIG => $keys->{"CONFIG"});
     OpenXPKI::Server::Context::setcontext(
 	{
@@ -167,12 +169,12 @@ sub __do_init_xml_config {
 }
 
 sub __do_init_i18n {
-    ### init i18n...
+    ##! 1: "init i18n"
     init_i18n(CONFIG => CTX('xml_config'));
 }
 
 sub __do_init_log {
-    ### init log...
+    ##! 1: "init log"
     my $log          = get_log();
     ### $log
     OpenXPKI::Server::Context::setcontext(
@@ -183,6 +185,8 @@ sub __do_init_log {
 
 
 sub __do_init_prepare_daemon {
+    ##! 1: "init prepare daemon"
+
     # create new session
     POSIX::setsid or
 	die "unable to create new session!: $!";
@@ -206,7 +210,7 @@ sub __do_init_prepare_daemon {
 }
 
 sub __do_init_crypto_layer {
-    ### init crypto...
+    ##! 1: "init crypto layer"
     OpenXPKI::Server::Context::setcontext(
 	{
 	    crypto_layer => get_crypto_layer(),
@@ -214,18 +218,50 @@ sub __do_init_crypto_layer {
 }
 
 sub __do_init_redirect_stderr {
-    ### redirect stderr...
+    ##! 1: "init stderr redirection"
     redirect_stderr();
 }
 
 
 sub __do_init_pki_realm {
-    ### init pki_realm...
+    ##! 1: "init pki_realm"
     my $pki_realm    = get_pki_realms();
     
     OpenXPKI::Server::Context::setcontext(
 	{
 	    pki_realm => $pki_realm,
+	});
+}
+
+sub __do_init_volatile_vault {
+    ##! 1: "init volatile vault"
+
+    my $realms = CTX('pki_realm');
+    
+    # get a default token
+    # FIXME: We use the first PKI realm's default token. This is an 
+    # arbitrary choice - we should consider to have a "global" default 
+    # token that is not bound to a specific realm.
+
+    my $firstrealm = (sort keys %{$realms})[0];
+    if (! defined $firstrealm) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_PKI_REALM");
+	
+    }
+    my $token =  $realms->{$firstrealm}->{crypto}->{default};
+
+    if (! defined $token) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_TOKEN");
+    }
+
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    volatile_vault => OpenXPKI::Crypto::VolatileVault->new(
+		{
+		    TOKEN => $token,
+		}),
 	});
 }
 

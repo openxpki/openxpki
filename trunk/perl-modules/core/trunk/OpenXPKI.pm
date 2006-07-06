@@ -36,6 +36,12 @@ sub read_file
     my $self     = shift;
     my $filename = shift;
 
+    if (! defined $filename) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_READ_FILE_MISSING_PARAMETER",
+	    );
+    }
+
     if (! -e $filename)
     {
         OpenXPKI::Exception->throw (

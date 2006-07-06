@@ -70,6 +70,8 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/DSA.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/EC.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST94.pm
 
+OpenXPKI/Crypto/Backend/OpenSSL/Command/symmetric_cipher.pm
+
 ## XS sources
 
 typemap
@@ -191,6 +193,8 @@ t/25_crypto/33.t
 t/25_crypto/34.t
 t/25_crypto/35.t
 t/25_crypto/40.t
+t/25_crypto/50.t
+t/25_crypto/51.t
 t/25_crypto/token.xml
 t/25_crypto/profile.xml
 #t/25_crypto/certs/01.pem
