@@ -58,7 +58,7 @@ dist:
 		rm -rf openxpki-i18n-$(REVISION)/ ; \
 	fi
 	mkdir openxpki-i18n-$(REVISION)
-	tar -c -p -S -f - \
+	tar -c -p -f - \
 		--exclude "*.svn" \
 		--exclude "openxpki-i18n-*" \
 		--exclude "*.1" \
