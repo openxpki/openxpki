@@ -99,7 +99,6 @@ msgstr "Fehler beim Abmelden"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_NEW_LOGIN"
 msgstr "Erneut anmelden"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_OK"
 msgstr "Das Abmelden war erfolgreich."
 
@@ -146,7 +145,8 @@ msgstr "Abschicken"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_DESCRIPTION"
 msgstr ""
-"Sie können nun einen neuen Prozess starten. Bitte suchen Sie sich dazu einen Workflow aus."
+"Sie können nun einen neuen Prozess starten. Bitte suchen Sie sich dazu einen "
+"Workflow aus."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_TITLE"
 msgstr "Neuer Workflow-Prozess"
@@ -155,15 +155,13 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Letzte Aktualisierung"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
-msgstr ""
-"Die derzeit aktiven Prozesse können Sie der Tabelle entnehmen."
+msgstr "Die derzeit aktiven Prozesse können Sie der Tabelle entnehmen."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_TITLE"
 msgstr "Aktive Workflow-Prozesse"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_DESCRIPTION"
-msgstr ""
-"Im Folgenden werden die derzeit verfügbaren Workflows beschrieben."
+msgstr "Im Folgenden werden die derzeit verfügbaren Workflows beschrieben."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_TITLE"
 msgstr "Workflows"
@@ -245,6 +243,41 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_SIGN_ERROR"
 msgstr ""
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL"
+msgstr ""
+"Ihre Identität wird über eine externes Programm geprüft. Bitte geben Sie "
+"hierfür Ihren Account und Ihr Passwort ein."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD"
+msgstr "Bitte geben Sie zur Anmeldung Ihren Account und Ihr Passwort ein."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_ANONYMOUS"
+msgstr ""
+"Bitte wählen Sie dieses Anmeldeverfahren, wenn Sie sich nicht "
+"authentifizieren wollen oder können. Sie können dann unkritische Funktionen "
+"oder Funktionen, bei denen die Echtheit später geprüft wird, nutzen."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_DYNAMIC"
+msgstr ""
+"Dieses Anmeldeverfahren lässt die Überprüfung Ihrer Angaben durch ein "
+"externes Programm durchführen und übernimmt von diesem Programm die "
+"vorgegebene Rolle."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_STATIC"
+msgstr ""
+"Dieses Anmeldeverfahren lässt die Überprüfung Ihrer Angaben durch ein "
+"externes Programm durchführen und benutzt danach die konfigurierte Rolle.Bei "
+"diesem Verfahren wird die Rolle nicht dynamisch vom externen Programm "
+"übernommen."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_OPERATOR"
+msgstr ""
+"Dies ist das Standardanmeldeverfahren für das betreuende Personal der PKI "
+"(Operator)."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER"
+msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_ILLEGAL_PARAM"
 msgstr ""
@@ -570,6 +603,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_ENGINE"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_SUBPARAMETER_COMMAND"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_SUBPARAMETER_PARAMS"
+msgstr ""
+
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_XS"
 msgstr ""
 
@@ -625,6 +664,24 @@ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_CONTENT"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_PKCS7"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_ILLEGAL_IV"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_ILLEGAL_KEY"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_INCORRECT_MODE"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_MISSING_DATA"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_MISSING_KEY_SPEC"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_MUTUAL_EXCLUSIVE_PARAMETERS"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_TEMPORARY_DIRECTORY_UNAVAILABLE"
@@ -810,6 +867,24 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_VAULT_INSTANCE"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_ENCODING"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_PARAMETER"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INITIALIZATION_ERROR"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_MISSING_TOKEN"
+msgstr ""
+
 msgid "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_CONVERSION_FAILED"
 msgstr ""
 
@@ -840,6 +915,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT"
 msgstr ""
 
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA"
+msgstr "Test Dummy CA"
+
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA"
+msgstr "Test User CA"
+
 msgid "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR"
 msgstr ""
 
@@ -860,6 +941,15 @@ msgstr "Zertifikate"
 
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
 msgstr "Abgelaufene"
+
+msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
+msgstr "Sprache"
+
+msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
+msgstr "Deutsch"
+
+msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
+msgstr "English"
 
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
 msgstr "Abmelden"
@@ -886,6 +976,9 @@ msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST"
+msgstr ""
+
+msgid "I18N_OPENXPKI_READ_FILE_MISSING_PARAMETER"
 msgstr ""
 
 msgid "I18N_OPENXPKI_READ_FILE_NOT_READABLE"
@@ -1129,6 +1222,12 @@ msgid "I18N_OPENXPKI_SERVER_INIT_DEFAULT_CRYPTO_TOKEN_MISSING_PKI_REALM"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_FAILURE"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_PKI_REALM"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_TOKEN"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_NO_CA_CERTFILE"

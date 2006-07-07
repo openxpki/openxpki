@@ -1,43 +1,31 @@
 <auth>
   <stack name="Anonymous">
-    <description>
-      Common anonymous authentication.
-    </description>
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_ANONYMOUS</description>
     <handler>Anonymous</handler>
   </stack>
   <stack name="User">
-    <description>
-      Normal user authentication.
-    </description>
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER</description>
     <handler>User Password</handler>
     <!-- <handler>LDAP</handler> -->
   </stack>
   <stack name="Operator">
-    <description>
-      PKI Operator authentication.
-    </description>
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_OPERATOR</description>
     <!-- <handler>Signing</handler> -->
     <handler>Operator Password</handler>
   </stack>
   <stack name="External Dynamic">
-    <description>
-      External authentication with the possibility to determine the role dynamically.
-    </description>
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_DYNAMIC</description>
     <handler>External Dynamic Role</handler>
   </stack>
   <stack name="External Static">
-    <description>
-      External authentication with static role assignment.
-    </description>
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_STATIC</description>
     <handler>External Static Role</handler>
   </stack>
   <handler name="Anonymous" type="Anonymous">
     <role>anonymous</role>
   </handler>
   <handler name="User Password" type="Password">
-    <description>
-      This is the passphrase based login for normal users.
-    </description>
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD</description>
     <user>
       <name>John Doe</name>
       <algorithm>sha1</algorithm>
@@ -47,9 +35,7 @@
     </user>
   </handler>
   <handler name="Operator Password" type="Password">
-    <description>
-      This is the passphrase based login for PKI operators.
-    </description>
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD</description>
     <user>
       <name>root</name>
       <algorithm>sha1</algorithm>
@@ -59,9 +45,7 @@
     </user>
   </handler>
   <handler name="External Dynamic Role" type="External">
-    <description>
-      This is the external login which supports dynamic roles.
-    </description>
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL</description>
     <!-- please note this is only a test configuration !!! -->
     <!-- we use the passphrase to set the role             -->
     <!-- never do this in real environments !!!            -->
@@ -80,9 +64,7 @@
     </env>
   </handler>
   <handler name="External Static Role" type="External">
-    <description>
-      This is the external login with a static role.
-    </description>
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL</description>
     <!-- please note this is only a test configuration !!! -->
     <!-- we use the passphrase to set the role             -->
     <!-- never do this in real environments !!!            -->

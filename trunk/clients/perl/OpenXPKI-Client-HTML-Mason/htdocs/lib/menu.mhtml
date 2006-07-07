@@ -18,6 +18,8 @@
                     [
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",
                                    "workflow"],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",
+                                   "language"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
                                    "logout"]
                     ],
@@ -34,6 +36,13 @@
                                    "workflow_create_instance"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES",
                                    "workflow_list_instances"],
+                    ],
+                    "language" =>
+                    [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB",
+                                   "set_language_en_gb"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE",
+                                   "set_language_de_de"],
                     ],
                     "edit_certs" =>
                     [
@@ -55,6 +64,16 @@
                     "workflow_create_instance" =>
                     {
                         CMD => "workflow_create_instance"
+                    },
+                    "set_language_en_gb" =>
+                    {
+                        CMD    => "index",
+                        PARAMS => { "__language" => "en_GB" }
+                    },
+                    "set_language_de_de" =>
+                    {
+                        CMD    => "index",
+                        PARAMS => { "__language" => "de_DE" }
                     },
                     "edit_valid_certs" =>
                     {
@@ -94,7 +113,7 @@
                };
   my %params = ( MASON => $m, CONFIG => $CONFIG, ACTION => "../service/index.html" );
 
-  foreach my $key ("ROLE", "SESSION_ID")
+  foreach my $key ("ROLE", "SESSION_ID", "LANGUAGE")
   {
       $params{$key} = $context->{lc $key} if (exists $context->{lc $key});
   }

@@ -5,7 +5,7 @@ INSTALL      = install
 LANG         = en_GB de_DE
 PO_SOURCES   = $(LANG:%=%/openxpki.po)
 MO_TRANSLATIONS = $(LANG:%=%/$(MO_FILE))
-POT_SOURCES  = ../perl-modules ../clients
+POT_SOURCES  = ../perl-modules ../clients ../deployment
 
 #---- variable settings above, rules below ----
 

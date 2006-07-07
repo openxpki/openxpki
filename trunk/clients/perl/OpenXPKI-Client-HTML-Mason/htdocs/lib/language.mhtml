@@ -1,22 +1,23 @@
 <%args>
-    $__session_id => undef
+    $session_id => undef
 </%args>
 <%init>
-    ## check for a session
-    ## try to detect the language from the session
-    if ($__session_id and
-        exists $session_cache{$__session_id}->{language} and
-        length $session_cache{$__session_id}->{language})
-    {
-        return set_language ($session_cache{$__session_id}->{language});
-    }
     ## try to detect the language from a parameter
     my %args = $m->request_args();
     if (exists $args{"__language"})
     {
-        $session_cache{$__session_id}->{language} = $args{"__language"}
-            if (defined $__session_id);
+        $session_cache{$session_id}->{language} = $args{"__language"}
+            if (defined $session_id);
         return set_language ($args{"__language"});
+    }
+
+    ## check for a session
+    ## try to detect the language from the session
+    if ($session_id and
+        exists $session_cache{$session_id}->{language} and
+        length $session_cache{$session_id}->{language})
+    {
+        return set_language ($session_cache{$session_id}->{language});
     }
 
     ## try to detect the language from the browser env

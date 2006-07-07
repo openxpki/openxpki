@@ -193,7 +193,20 @@ sub __get_menu_link
         foreach my $param (keys %{$config->{PARAMS}})
         {
             next if (not defined $param);
-            $link .= ";__action_param_$param=".$config->{PARAMS}->{$param};
+            if (substr ($param,0, 2) eq "__")
+            {
+                ## special control parameter
+                if (0 > index ($link, $param))
+                {
+                    ## set value for the first time
+                    $link .= ";$param=".$config->{PARAMS}->{$param};
+                } else {
+                    ## replace original value
+                    $link =~ s/$param=[^;]*/$param=$config->{PARAMS}->{$param}/;
+                }
+            } else {
+                $link .= ";__action_param_$param=".$config->{PARAMS}->{$param};
+            }
         }
     } else {
         $link = $self->{ACTION}.$link if (exists $self->{ACTION});
@@ -247,6 +260,7 @@ sub get_menu_hash
     ## add basic path
     $link{__session_id} = $self->{SESSION_ID};
     $link{__role}       = $self->{ROLE};
+    $link{__language}   = $self->{LANGUAGE} if (exists $self->{LANGUAGE});
     $link{__menu_level} = $level;
     $link{__menu_level}++ if ($params->{MENU});
 

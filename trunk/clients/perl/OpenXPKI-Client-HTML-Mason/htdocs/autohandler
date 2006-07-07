@@ -74,7 +74,7 @@
     } else {
         delete $context->{session_id} if (exists $context->{session_id});
     }
-    $m->comp ('/lib/language.mhtml');
+    $m->comp ('/lib/language.mhtml', "session_id" => $__session_id);
 </%init>
 
 <%flags>

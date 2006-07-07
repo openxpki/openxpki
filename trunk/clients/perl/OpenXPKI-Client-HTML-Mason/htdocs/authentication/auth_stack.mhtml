@@ -8,18 +8,21 @@
       <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION') %>
     </p>
     <select name="auth_stack">
-<%perl>
-        ## let's print the available options
-        foreach my $stack (keys %{$auth_stacks})
-        {
-            print "  <option value='$stack'>".
-                  $auth_stacks->{$stack}->{NAME}." - ".
-                  $auth_stacks->{$stack}->{DESCRIPTION}.
-                  "</option>\n";
-        }
-</%perl>
+%   ## let's print the available options
+%   foreach my $stack (keys %{$auth_stacks})
+%   {
+      <option value="<% $stack %>"><% $auth_stacks->{$stack}->{NAME} %></option>
+%   }
     </select>
     <& '/authentication/close_form.mhtml' &>
+    <dl>
+%   ## let's print the available options
+%   foreach my $stack (keys %{$auth_stacks})
+%   {
+      <dt><% $auth_stacks->{$stack}->{NAME} %></dt>
+      <dd><% i18nGettext($auth_stacks->{$stack}->{DESCRIPTION}) %></dd>
+%   }
+    </dl>
 
 <%init>
     my $session_id = $context->{session_id};

@@ -100,9 +100,8 @@ msgstr "Logout failed"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_NEW_LOGIN"
 msgstr "Login again"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_OK"
-msgstr "Login again"
+msgstr "Logged out."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_DESCRIPTION"
 msgstr ""
@@ -156,15 +155,13 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Last update"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
-msgstr ""
-"You can see now the active workflow instances."
+msgstr "You can see now the active workflow instances."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_TITLE"
 msgstr "Workflow instances"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_DESCRIPTION"
-msgstr ""
-"You can see now the available types of workflows."
+msgstr "You can see now the available types of workflows."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_TITLE"
 msgstr "Workflow types"
@@ -246,6 +243,40 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_SIGN_ERROR"
 msgstr ""
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL"
+msgstr ""
+"Here we use an external program to authenticate you. Simply enter your "
+"normal account and passphrase. All other stuff will be done automatically in "
+"the background."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD"
+msgstr "Please enter your account and passphrase."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_ANONYMOUS"
+msgstr ""
+"If you don't want or cannot identify yourself to the system then you can use "
+"the anonymous authentication which means that you can use some basic "
+"function which are not critical and so it is no problem to use them "
+"anonymously."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_DYNAMIC"
+msgstr ""
+"Please use this authentication method to identify youself to the external "
+"authentication method. Your role will be determined automatically by the "
+"external program."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_STATIC"
+msgstr ""
+"Please use this authentication method to identify youself to the external "
+"authentication method. Your role is statically configured by an "
+"administrator."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_OPERATOR"
+msgstr "This is the normal operator authentication."
+
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER"
+msgstr "This is the normal user authentication."
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_ILLEGAL_PARAM"
 msgstr ""
@@ -571,6 +602,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_ENGINE"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_SUBPARAMETER_COMMAND"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_SUBPARAMETER_PARAMS"
+msgstr ""
+
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_XS"
 msgstr ""
 
@@ -626,6 +663,24 @@ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_CONTENT"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_PKCS7"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_ILLEGAL_IV"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_ILLEGAL_KEY"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_INCORRECT_MODE"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_MISSING_DATA"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_MISSING_KEY_SPEC"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_MUTUAL_EXCLUSIVE_PARAMETERS"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_TEMPORARY_DIRECTORY_UNAVAILABLE"
@@ -811,6 +866,24 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_VAULT_INSTANCE"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_ENCODING"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_PARAMETER"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INITIALIZATION_ERROR"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_MISSING_TOKEN"
+msgstr ""
+
 msgid "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_CONVERSION_FAILED"
 msgstr ""
 
@@ -841,6 +914,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT"
 msgstr ""
 
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA"
+msgstr "Test Dummy CA"
+
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA"
+msgstr "Test User CA"
+
 msgid "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR"
 msgstr ""
 
@@ -861,6 +940,15 @@ msgstr "Certificates"
 
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
 msgstr "Expired"
+
+msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
+msgstr "Language"
+
+msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
+msgstr "Deutsch"
+
+msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
+msgstr "English"
 
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
 msgstr "Logout"
@@ -887,6 +975,9 @@ msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST"
+msgstr ""
+
+msgid "I18N_OPENXPKI_READ_FILE_MISSING_PARAMETER"
 msgstr ""
 
 msgid "I18N_OPENXPKI_READ_FILE_NOT_READABLE"
@@ -1130,6 +1221,12 @@ msgid "I18N_OPENXPKI_SERVER_INIT_DEFAULT_CRYPTO_TOKEN_MISSING_PKI_REALM"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_FAILURE"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_PKI_REALM"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_TOKEN"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_NO_CA_CERTFILE"

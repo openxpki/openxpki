@@ -251,13 +251,13 @@ pkirealm: Realm 1
 ###########################################################################
 # Realm definitions
 [Realm 1]
-name: OpenXPKI Test CA
+name: I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA
 issuingca: TEST_DUMMY_CA_1
 issuingca: TEST_DUMMY_CA_2
 profiles:  $(profiles)
 
 [Realm 2]
-name: Test User CA
+name: I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA
 issuingca: TEST_USER_CA_1
 issuingca: TEST_USER_CA_2
 profiles:  $(profiles)

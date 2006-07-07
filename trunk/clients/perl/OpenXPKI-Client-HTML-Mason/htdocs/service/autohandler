@@ -20,7 +20,8 @@
        if ($m->fetch_next()->name() eq "dhandler")
        {
            ## autohandler called directly - usually from authentication
-           $m->comp ('/service/dhandler');
+           ## this is no error and so we only call index.html and not the dhandler
+           $m->comp ('/service/index.html');
        } else {
            $m->call_next;
        }
