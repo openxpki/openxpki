@@ -46,12 +46,13 @@ use MIME::Base64;
 		RANDOM_LENGTH => 32,
 	    });
 
-	# create_random chops of the trailing '=' which is frowned upon
+	# create_random chops off the trailing '=' which is frowned upon
 	# by MIME::Base64
 	$key .= '=' unless $key =~ m{ = \z }xms;
 
 	# convert base64 to binary and get hex representation of this data
-	$session_key{$ident} = uc(unpack('H*', MIME::Base64::decode_base64($key)));
+	$session_key{$ident} = uc(unpack('H*', 
+					 MIME::Base64::decode_base64($key)));
 
 	my $iv = $token{$ident}->command(
 	    {
@@ -59,12 +60,13 @@ use MIME::Base64;
 		RANDOM_LENGTH => 16,
 	    });
 
-	# create_random chops of the trailing '=' which is frowned upon
+	# create_random chops off the trailing '=' which is frowned upon
 	# by MIME::Base64
 	$iv .= '=' unless $key =~ m{ = \z }xms;
 
 	# convert base64 to binary and get hex representation of this data
-	$session_iv{$ident} = uc(unpack('H*', MIME::Base64::decode_base64($iv)));
+	$session_iv{$ident} = uc(unpack('H*', 
+					MIME::Base64::decode_base64($iv)));
 
 	if (! length($session_key{$ident}) || ! length ($session_iv{$ident})) {
 	    OpenXPKI::Exception->throw (
@@ -89,7 +91,7 @@ use MIME::Base64;
 	    $data     = $args;
 	}
 	
-	if (! defined $data) {
+	if (! defined $data || ! defined $encoding) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_PARAMETER");
 	}
@@ -119,10 +121,10 @@ use MIME::Base64;
 
 	if (! defined $blob) {	 
 	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_ENCODING"),
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_ENCODING",
 		params => {
 		    ENCODING => $encoding,
-	    },
+		});
 	}
 
 	return join(';', 
