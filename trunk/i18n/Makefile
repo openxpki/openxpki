@@ -65,6 +65,7 @@ dist:
 		--exclude "*~" \
 		. | \
 		tar -C openxpki-i18n-$(REVISION)/ -x -f -
-	tar czf openxpki-i18n-$(REVISION).tar.gz openxpki-i18n-$(REVISION)
+	tar cf openxpki-i18n-$(REVISION).tar openxpki-i18n-$(REVISION)
+	gzip --best openxpki-i18n-$(REVISION).tar
 	rm -rf openxpki-i18n-$(REVISION)/
 

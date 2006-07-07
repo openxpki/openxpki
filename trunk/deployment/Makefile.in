@@ -109,7 +109,8 @@ dist:
 		sed -e 's/\.in//g' | while read file ; do \
 			rm -f $$file ; \
 		done
-	tar czf openxpki-deployment-$(REVISION).tar.gz openxpki-deployment-$(REVISION)
+	tar cf openxpki-deployment-$(REVISION).tar openxpki-deployment-$(REVISION)
+	gzip --best openxpki-deployment-$(REVISION).tar
 	rm -rf openxpki-deployment-$(REVISION)/
 
 
