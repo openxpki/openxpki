@@ -290,13 +290,12 @@ sub __get_attribute_value
 
     my $i = 0;
     my $next = substr ($string, $i, 1);
-    while ($next !~ /[,+]/)
+    while ($length > $i and $next !~ /[,+]/)
     {
         $i++ if ($next eq "\\");
         $value .= substr ($string, $i, 1);
         $i++;
         $next = substr ($string, $i, 1);
-        last if ($length == $i);
     }
 
     $string = substr ($string, $i);
