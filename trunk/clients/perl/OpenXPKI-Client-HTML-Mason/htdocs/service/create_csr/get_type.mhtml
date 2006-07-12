@@ -1,8 +1,11 @@
 <%args>
+    $profile   => undef
     $config_nr => undef
-    $CONFIG    => $CONFIG
+    $CONFIG    => undef
 </%args>
 <& /service/open_form.mhtml &>
+<& /lib/html/hidden.mhtml, 'name' => 'profile', 'value' => $profile &>
+
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_TYPE_TITLE') %></h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_TYPE_DESCRIPTION') %>
@@ -10,8 +13,9 @@
 <select name="config_nr">
 %   for (my $i=0; $i < scalar @{$CONFIG}; $i++)
 %   {
+%       next if (not exists $types{$CONFIG->[$i]->{NAME}});
   <option value="<% $i %>">
-    <% i18nGettext($CONFIG->[$i]->{NAME}) %>
+    <% i18nGettext($types{$CONFIG->[$i]->{NAME}}->{LABEL}) %>
   </option>
 %   }
 </select>
@@ -19,16 +23,24 @@
 <& /service/close_form.mhtml &>
 <dl>
 %
-%   for (my $i=0; $i < scalar @{$CONFIG}; $i++)
+%   foreach my $type (sort keys %types)
 %   {
-  <dt><% i18nGettext($CONFIG->[$i]->{NAME}) %></dt>
-  <dd><% i18nGettext($CONFIG->[$i]->{DESCRIPTION}) %></dd>
+  <dt><% i18nGettext($types{$type}->{LABEL}) %></dt>
+  <dd><% i18nGettext($types{$type}->{DESCRIPTION}) %></dd>
 %   }
 </dl>
 <%init>
+    ## load available subject profiles from server
+    my $msg = $context->{client}->send_receive_command_msg (
+                   "get_cert_subject_profiles",
+                   {PROFILE => $profile});
+    my %types = %{$msg->{PARAMS}};
+
     ## return the configuration number if it exists
     return $config_nr
-        if (defined $config_nr and exists $CONFIG->[$config_nr]);
+        if (defined $config_nr and
+            exists $CONFIG->[$config_nr] and
+            grep $CONFIG->[$config_nr]->{NAME}, keys %types);
 
     ## if we have only one configuration
     ## then we have not to ask the user

@@ -81,6 +81,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
 msgstr "Select the way of the key generation"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_DESCRIPTION"
+msgstr ""
+"This form supports several different templates to create a certificate "
+"signing request (CSR). Please choose the one which matches your requirements "
+"best."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_TITLE"
+msgstr "Choose a template"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_DESCRIPTION"
 msgstr ""
 "The name of the certificate is build from the values of the following form "
@@ -200,6 +211,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_TITLE"
 msgstr "Logged out"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_ACTION"
+msgstr "Login again"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_COMP"
+msgstr "Login again"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_CONFIG"
 msgstr ""
@@ -1072,10 +1091,10 @@ msgstr "Country"
 msgid "I18N_OPENXPKI_HTML_COUNTRY_DESCRIPTION"
 msgstr "The Country (c) is the nothing else then country."
 
-msgid "I18N_OPENXPKI_HTML_CREATE_CSR_USER_DC"
-msgstr "User CSR with DC-style"
+msgid "I18N_OPENXPKI_HTML_CREATE_CSR_DC_STYLE"
+msgstr "CSR with DC-style"
 
-msgid "I18N_OPENXPKI_HTML_CREATE_CSR_USER_DC_DESCRIPTION"
+msgid "I18N_OPENXPKI_HTML_CREATE_CSR_DC_STYLE_DESCRIPTION"
 msgstr ""
 "DC-style means the we use domain components at the of the certificates name. "
 "An old style DN looks like this: cn=John Doe, o=OpenXPKI, c=DE. The last "
@@ -1084,14 +1103,14 @@ msgstr ""
 "advantage is that we can use now the more correct name: cn=John Doe, "
 "dc=OpenXPKI, dc=org. We have no longer to use a country."
 
-msgid "I18N_OPENXPKI_HTML_CREATE_CSR_USER_OU"
-msgstr "User CSR with OU-style"
+msgid "I18N_OPENXPKI_HTML_CREATE_CSR_OU_STYLE"
+msgstr "CSR with OU-style"
 
-msgid "I18N_OPENXPKI_HTML_CREATE_CSR_USER_OU_DESCRIPTION"
+msgid "I18N_OPENXPKI_HTML_CREATE_CSR_OU_STYLE_DESCRIPTION"
 msgstr ""
-"OU-style means that we use the attributes organization and country at the end "
-"of the certifcates name. Such a DN looks like this: cn=John Doe, o=OpenXPKI, "
-"c=DE. Please note that country only allows two letters."
+"OU-style means that we use the attributes organization and country at the "
+"end of the certifcates name. Such a DN looks like this: cn=John Doe, "
+"o=OpenXPKI, c=DE. Please note that country only allows two letters."
 
 msgid "I18N_OPENXPKI_HTML_DEFAULT_CN"
 msgstr "John Doe"
@@ -1214,6 +1233,9 @@ msgid "I18N_OPENXPKI_SERVER_API_GET_CA_CERTIFICATES_PKI_REALM_CONFIGURATION_UNAV
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_GET_CA_CERTIFICATES_PKI_REALM_NOT_SET"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_API_GET_PKI_REALM_INDEX_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER"

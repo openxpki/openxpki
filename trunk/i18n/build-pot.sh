@@ -26,5 +26,5 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 '
 
-grep -r 'I18N_OPENXPKI' $@ | sed "s/.*I18N_OPENXPKI/I18N_OPENXPKI/" | sed "s/[\"'].*//" | sed "s/[<].*//" | sed "s/.*=>.*/XX_ERASE_XX/" | sed "s/.*).*/XX_ERASE_XX/" | sort | uniq | sed "s/^I/msgid \"I/g" | sed "s/\$/\"msgstr \"\"\n/g" | sed "s/.*XX_ERASE_XX.*//g" | sed "s/msgstr/\nmsgstr/g"
+grep -r 'I18N_OPENXPKI' $@ | grep -v ".svn" | sed "s/.*I18N_OPENXPKI/I18N_OPENXPKI/" | sed "s/[\"'].*//" | sed "s/[<].*//" | sed "s/.*=>.*/XX_ERASE_XX/" | sed "s/.*).*/XX_ERASE_XX/" | sort | uniq | sed "s/^I/msgid \"I/g" | sed "s/\$/\"msgstr \"\"\n/g" | sed "s/.*XX_ERASE_XX.*//g" | sed "s/msgstr/\nmsgstr/g"
 

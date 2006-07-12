@@ -1,4 +1,5 @@
 <%args>
+    $profile   => undef
     $config_nr => undef
     $keygen    => undef
     $subject   => undef
@@ -6,14 +7,21 @@
 <%init>
     my %args = $m->request_args();
 
+    ## which profile and role
+    my $role = $m->comp ('/service/create_csr/get_role.mhtml',
+                         'profile' => $profile);
+    return if (not defined $role);
+
     ## which config
     $config_nr = $m->comp ('/service/create_csr/get_type.mhtml',
+                           'profile'   => $profile,
                            'config_nr' => $config_nr,
                            'CONFIG'    => $CONFIG);
     return if (not defined $config_nr);
 
     ## which key generation
     $keygen = $m->comp ('/service/create_csr/get_keygen.mhtml',
+                        'profile'   => $profile,
                         'config_nr' => $config_nr,
                         'keygen'    => $keygen,
                         'CONFIG'    => $CONFIG);
@@ -22,9 +30,10 @@
     ## get PKCS#10 if available
     my $key = "";
     my $csr;
-    if ($keygen eq "pkcs10")
+    if ($keygen eq "PKCS10")
     {
         $csr = $m->comp ('/service/create_csr/get_pkcs10.mhtml',
+                         'profile'   => $profile,
                          'config_nr' => $config_nr,
                          'keygen'    => $keygen,
                          'csr'       => $csr,
@@ -35,6 +44,7 @@
 
     ## get subject
     $subject = $m->comp ('/service/create_csr/get_subject.mhtml',
+                         'profile'   => $profile,
                          'config_nr' => $config_nr,
                          'keygen'    => $keygen,
                          'csr'       => $csr,
@@ -58,9 +68,9 @@
     return if (not $infos);
 
     ## get generated request
-    if ($keygen ne "pkcs10")
+    if ($keygen ne "PKCS10")
     {
-        if ($keygen eq "ie")
+        if ($keygen eq "IE")
         {
             $csr = $m->comp ('/service/create_csr/get_ie_pkcs10.mhtml',
                              'config_nr' => $config_nr,
@@ -68,7 +78,7 @@
                              'SUBJECT'   => $subject,
                              'ARGS'      => \%args);
         }
-        elsif ($keygen eq "spkac")
+        elsif ($keygen eq "SPKAC")
         {
             $csr = $m->comp ('/service/create_csr/get_spkac.mhtml',
                              'config_nr' => $config_nr,
@@ -78,6 +88,7 @@
         }
         else
         {
+            ## serverside
             $key = $m->comp ('/service/create_csr/get_server_key.mhtml',
                              'config_nr' => $config_nr,
                              'CONFIG'    => $CONFIG,
@@ -109,8 +120,7 @@
 <%once>
     my $CONFIG = [
                   {
-                   NAME        => "I18N_OPENXPKI_HTML_CREATE_CSR_USER_OU",
-                   DESCRIPTION => "I18N_OPENXPKI_HTML_CREATE_CSR_USER_OU_DESCRIPTION",
+                   NAME        => "ou_style",
                    ROLE        => [ "User", "RA Operator" ],
                    KEY_GENERATION => ["SPKAC", "IE", "SERVER", "AUTO"],
                    SUBJECT     =>
@@ -168,8 +178,7 @@
                    ]
                   },
                   {
-                   NAME        => "I18N_OPENXPKI_HTML_CREATE_CSR_USER_DC",
-                   DESCRIPTION => "I18N_OPENXPKI_HTML_CREATE_CSR_USER_DC_DESCRIPTION",
+                   NAME        => "dc_style",
                    ROLE        => [ "User", "RA Operator" ],
                    KEY_GENERATION => ["SPKAC", "IE", "SERVER", "PKCS10", "AUTO"],
                    SUBJECT     =>

@@ -21,7 +21,7 @@ use Params::Validate qw( validate :types );
 use OpenXPKI::Debug 'OpenXPKI::Server::API';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-
+use OpenXPKI::DN;
 
 my %workflow_factory : ATTR;
 
@@ -171,6 +171,154 @@ sub list_ca_ids {
     return;
 }
 
+sub __get_pki_realm_index
+{
+    my $self = shift;
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    ## scan for correct pki realm
+    my $index = CTX('xml_config')->get_xpath_count (XPATH => "pki_realm");
+    for (my $i=0; $i < $index; $i++)
+    {
+        if (CTX('xml_config')->get_xpath (XPATH   => ["pki_realm", "name"],
+                                          COUNTER => [$i, 0])
+            eq $pki_realm)
+        {
+            $index = $i;
+        } else {
+            if ($index == $i+1)
+            {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_SERVER_API_GET_PKI_REALM_INDEX_FAILED");
+            }
+        }
+    }
+
+    return $index;
+}
+
+sub get_cert_profiles
+{
+    my $self = shift;
+    my $args = shift;
+
+    my $index = $self->__get_pki_realm_index();
+
+    ## get all available profiles
+    my %profiles = ();
+    my $count = CTX('xml_config')->get_xpath_count (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile"],
+                    COUNTER => [$index, 0, 0, 0]);
+    for (my $i=0; $i <$count; $i++)
+    {
+        my $id = CTX('xml_config')->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "id"],
+                    COUNTER => [$index, 0, 0, 0, $i, 0]);
+        next if ($id eq "default");
+        $profiles{$i} = $id;
+    }
+
+    return \%profiles;
+}
+
+sub get_cert_subject_profiles
+{
+    my $self = shift;
+    my $args = shift;
+
+    my $index   = $self->__get_pki_realm_index();
+    my $profile = $args->{PROFILE};
+
+    ## get all available profiles
+    my %profiles = ();
+    my $count = CTX('xml_config')->get_xpath_count (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject"],
+                    COUNTER => [$index, 0, 0, 0, $profile]);
+    for (my $i=0; $i <$count; $i++)
+    {
+        my $id = CTX('xml_config')->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "id"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $i, 0]);
+        my $label = CTX('xml_config')->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "label"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $i, 0]);
+        my $desc = CTX('xml_config')->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "description"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $i, 0]);
+        $profiles{$id}->{LABEL}       = $label;
+        $profiles{$id}->{DESCRIPTION} = $desc;
+    }
+
+    return \%profiles;
+}
+
+sub check_cert_subject
+{
+    my $self = shift;
+    my $args = shift;
+
+    my $index   = $self->__get_pki_realm_index();
+    my $profile = $args->{PROFILE}; ## index of ¼profil
+    my $subject = $args->{SUBJECT}; ## RFC 2253 subject
+    my $type    = $args->{TYPE};    ## subject type e.g. dc_style or ou_style
+
+    ## check correctness of subject
+    my $object = OpenXPKI::DN->new ($subject);
+
+    ## find subject specification
+    my $count = CTX('xml_config')->get_xpath_count (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject"],
+                    COUNTER => [$index, 0, 0, 0, $profile]);
+    for (my $i=0; $i <$count; $i++)
+    {
+        my $id = CTX('xml_config')->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "id"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $i, 0]);
+        if ($id eq $type)
+        {
+            $type = $i;
+            last;
+        }
+    }
+    ## $type is no an index
+
+    ## check always block
+    $count = CTX('xml_config')->get_xpath_count (
+                 XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
+                 COUNTER => [$index, 0, 0, 0, $profile, $type, 0]);
+    for (my $i=0; $i <$count; $i++)
+    {
+        my $regex = CTX('xml_config')->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $type, 0, $i]);
+        if (not $subject =~ m{$regex}xs)
+        {
+            OpenXPKI::Exception->throw (
+                message => 'I18N_OPENXPKI_SERVER_API_CHECK_CERT_SUBJECT_FAILED_ALWAYS_REGEX',
+                params  => {REGEX => $regex, SUBJECT => $subject});
+        }
+    }
+
+    ## check never block
+    $count = CTX('xml_config')->get_xpath_count (
+                 XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
+                 COUNTER => [$index, 0, 0, 0, $profile, $type, 0]);
+    for (my $i=0; $i <$count; $i++)
+    {
+        my $regex = CTX('xml_config')->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $type, 0, $i]);
+        if (not $subject !~ m{$regex}xs)
+        {
+            OpenXPKI::Exception->throw (
+                message => 'I18N_OPENXPKI_SERVER_API_CHECK_CERT_SUBJECT_FAILED_NEVER_REGEX',
+                params  => {REGEX => $regex, SUBJECT => $subject});
+        }
+    }
+
+    ## send ok
+    return $subject;
+}
 
 ###########################################################################
 # lowlevel workflow functions

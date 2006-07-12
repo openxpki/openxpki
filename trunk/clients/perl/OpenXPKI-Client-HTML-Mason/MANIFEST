@@ -49,6 +49,7 @@ htdocs/service/workflow_list_instances.html
 htdocs/service/workflow_create_instance.html
 
 htdocs/service/create_csr/index.html
+htdocs/service/create_csr/get_role.mhtml
 htdocs/service/create_csr/get_type.mhtml
 htdocs/service/create_csr/get_keygen.mhtml
 htdocs/service/create_csr/get_subject.mhtml

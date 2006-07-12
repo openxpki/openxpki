@@ -182,6 +182,10 @@
     <!-- User profile -->
     <profile id="User"
 	     super="../profile{default}">
+
+      <subject super="../../subject{ou_style}"/>
+      <subject super="../../subject{dc_style}"/>
+
       <validity>
 	<notafter format="relativedate">+0006</notafter>
       </validity>
@@ -228,6 +232,10 @@
     <!-- TLS Server profile -->
     <profile id="TLS Server"
 	     super="../profile{default}">
+
+      <subject super="../../subject{ou_style}"/>
+      <subject super="../../subject{dc_style}"/>
+
       <validity>
 	<notafter format="relativedate">+0003</notafter>
       </validity>
@@ -264,6 +272,33 @@
       </extensions>
     </profile>
       
+    <subject id="ou_style">
+      <label>I18N_OPENXPKI_HTML_CREATE_CSR_OU_STYLE</label>
+      <description>I18N_OPENXPKI_HTML_CREATE_CSR_OU_STYLE_DESCRIPTION</description>
+      <!-- regex are executed with m{$regex}xs !!! -->
+      <always>
+        <regex>^uid=[^+]+\+cn=</regex>
+        <regex>,ou=[^,]+,o=OpenXPKI,c=DE$</regex>
+      </always>
+      <never>
+        <regex>dc=</regex>
+      </never>
+    </subject>
+
+    <subject id="dc_style">
+      <label>I18N_OPENXPKI_HTML_CREATE_CSR_DC_STYLE</label>
+      <description>I18N_OPENXPKI_HTML_CREATE_CSR_DC_STYLE_DESCRIPTION</description>
+      <!-- regex are executed with m{$regex}xs !!! -->
+      <always>
+        <regex>^uid=[^+]+\+cn=</regex>
+        <regex>,ou=[^,]+,dc=OpenXPKI,dc=org$</regex>
+      </always>
+      <never>
+        <regex>,o=</regex>
+        <regex>,c=</regex>
+      </never>
+    </subject>
+
   </endentity>
 
 </profiles>

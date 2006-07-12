@@ -1,11 +1,13 @@
 <%args>
-    $keygen    => undef
+    $profile   => undef
     $config_nr => undef
+    $keygen    => undef
     $CONFIG    => $CONFIG
 </%args>
 
 <& /service/open_form.mhtml &>
 
+<& /lib/html/hidden.mhtml, 'name' => 'profile', 'value' => $profile &>
 <& /lib/html/hidden.mhtml, 'name' => 'config_nr', 'value' => $config_nr &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE') %></h1>
