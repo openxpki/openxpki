@@ -57,6 +57,18 @@ sub new
             params  => {ROLE => $self->{ROLE}});
     }
 
+    ## check info about paths
+    if (not exists $self->{COMP})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_COMP");
+    }
+    if (not exists $self->{ACTION})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_ACTION");
+    }
+
     return $self;
 }
 
@@ -165,10 +177,32 @@ sub __get_menu_link
 {
     my $self   = shift;
     my $params = shift;
+    my $link   = "";
 
+    ## build the correct root component path
+    my $pos  = 1; ## ignore first /
+    while (length ($self->{COMP}) > $pos)
+    {
+        my $index = index ($self->{COMP}, "/", $pos);
+        last if ($index < $pos);
+        $pos   = $index+1;
+        $link .= "../";
+    }
+
+    ## get the menu configuration
     my %result = $self->get_menu_hash ($params);
 
-    my $link = "?";
+    ## build the component link
+    if ($result{"__menu_action"})
+    {
+        my $config = $self->{CONFIG}->{ACTION}->{$result{"__menu_action"}};
+        $link .= $config->{CMD};
+    } else {
+        $link .= $self->{ACTION};
+    }
+
+    ## include all common parameters
+    $link .= "?";
     foreach my $item (keys %result)
     {
         next if (not defined $item);
@@ -176,19 +210,11 @@ sub __get_menu_link
         $link .= ";" if (length $link > 1);
         $link .= $item."=".$result{$item};
     }
+
+    ## add parameters for command
     if ($result{"__menu_action"})
     {
-        ## get action configuration
         my $config = $self->{CONFIG}->{ACTION}->{$result{"__menu_action"}};
-        ## set real command name
-        $link = $config->{CMD}.".html".$link;
-        if (exists $self->{ACTION})
-        {
-            ## determine path length
-            my $path = $self->{ACTION};
-               $path =~ s/[^\/]*\/[^\/]*$//g;
-            $link = "../service/".$link if (length $path);
-        }
         ## set parameters
         foreach my $param (keys %{$config->{PARAMS}})
         {
@@ -208,8 +234,6 @@ sub __get_menu_link
                 $link .= ";__action_param_$param=".$config->{PARAMS}->{$param};
             }
         }
-    } else {
-        $link = $self->{ACTION}.$link if (exists $self->{ACTION});
     }
 
     return $link;

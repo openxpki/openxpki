@@ -57,6 +57,8 @@
 % }
 
 <%init>
+    use English;
+
     # check if we are using an already existing session and if there
     # has been established a client connection for it.
     if (defined $__session_id)
@@ -67,9 +69,19 @@
             $context = $session_cache{$__session_id};
         } else {
             # try to establish session again
-            $m->comp('/authentication/session.mhtml');
-            $context->{client}->collect()
-                if ($context->{client}->get_communication_state() eq "can_receive");
+            #eval
+            #{
+                $m->comp('/authentication/session.mhtml', '__session_id' => $__session_id);
+                $context->{client}->collect()
+                    if ($context->{client}->get_communication_state() eq "can_receive");
+            #};
+            #if ($EVAL_ERROR)
+            #{
+            #    ## session timeout
+            #    ## server restarted
+            #    ## conclusion: session no longer available
+            #    delete $context->{session_id} if (exists $context->{session_id});
+            #}
         }
     } else {
         delete $context->{session_id} if (exists $context->{session_id});

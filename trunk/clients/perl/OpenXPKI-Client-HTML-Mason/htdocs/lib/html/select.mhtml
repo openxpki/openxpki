@@ -1,0 +1,18 @@
+<%args>
+    $name    => undef
+    $default => undef
+    $values  => undef
+</%args>
+<select name="<& '/lib/html/safe.mhtml', 'data' => $name &>">
+% foreach my $value (@{$values})
+% {
+%   if (defined $default and grep /^$value->{VALUE}$/, @{$default})
+%   {
+      <option selected value="<& '/lib/html/safe.mhtml', 'data' => $value->{VALUE} &>">
+%   } else {
+      <option value="<& '/lib/html/safe.mhtml', 'data' => $value->{VALUE} &>">
+%   }
+        <& '/lib/html/safe.mhtml', 'data' => i18nGettext($value->{LABEL}) &>
+      </option>
+% }
+</select>

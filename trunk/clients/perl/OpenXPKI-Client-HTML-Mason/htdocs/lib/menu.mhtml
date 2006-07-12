@@ -16,6 +16,8 @@
                 {
                     "anonymous_menu" =>
                     [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",
+                                   "create_csr"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",
                                    "workflow"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",
@@ -53,31 +55,35 @@
                 },
                 ACTION =>
                 {
+                    "create_csr" =>
+                    {
+                        CMD => "service/create_csr/index.html"
+                    },
                     "workflow_list_types" =>
                     {
-                        CMD => "workflow_list_types"
+                        CMD => "service/workflow_list_types.html"
                     },
                     "workflow_list_instances" =>
                     {
-                        CMD => "workflow_list_instances"
+                        CMD => "service/workflow_list_instances.html"
                     },
                     "workflow_create_instance" =>
                     {
-                        CMD => "workflow_create_instance"
+                        CMD => "service/workflow_create_instance.html"
                     },
                     "set_language_en_gb" =>
                     {
-                        CMD    => "index",
+                        CMD    => "service/index.html",
                         PARAMS => { "__language" => "en_GB" }
                     },
                     "set_language_de_de" =>
                     {
-                        CMD    => "index",
+                        CMD    => "service/index.html",
                         PARAMS => { "__language" => "de_DE" }
                     },
                     "edit_valid_certs" =>
                     {
-                        CMD => "cert_list",
+                        CMD => "service/cert_list.html",
                         PARAMS =>
                         {
                             "STATUS"        => "VALID",
@@ -87,7 +93,7 @@
                     },
                     "edit_expired_certs" =>
                     {
-                        CMD => "cert_list",
+                        CMD => "service/cert_list.html",
                         PARAMS =>
                         {
                             "STATUS"        => "VALID",
@@ -97,7 +103,7 @@
                     },
                     "edit_revoked_certs" =>
                     {
-                        CMD => "cert_list",
+                        CMD => "service/cert_list.html",
                         PARAMS =>
                         {
                             "STATUS"        => "REVOKED",
@@ -107,11 +113,15 @@
                     },
                     "logout" =>
                     {
-                        CMD => "logout"
+                        CMD => "service/logout.html"
                     }
                 }
                };
-  my %params = ( MASON => $m, CONFIG => $CONFIG, ACTION => "../service/index.html" );
+
+  my %params = ( MASON  => $m,
+                 CONFIG => $CONFIG,
+                 ACTION => "service/index.html",
+                 COMP   => $m->request_comp()->title() );
 
   foreach my $key ("ROLE", "SESSION_ID", "LANGUAGE")
   {

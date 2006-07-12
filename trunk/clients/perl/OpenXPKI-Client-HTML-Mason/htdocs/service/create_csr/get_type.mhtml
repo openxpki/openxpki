@@ -1,0 +1,38 @@
+<%args>
+    $config_nr => undef
+    $CONFIG    => $CONFIG
+</%args>
+<& /service/open_form.mhtml &>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_TYPE_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_TYPE_DESCRIPTION') %>
+</p>
+<select name="config_nr">
+%   for (my $i=0; $i < scalar @{$CONFIG}; $i++)
+%   {
+  <option value="<% $i %>">
+    <% i18nGettext($CONFIG->[$i]->{NAME}) %>
+  </option>
+%   }
+</select>
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+<dl>
+%
+%   for (my $i=0; $i < scalar @{$CONFIG}; $i++)
+%   {
+  <dt><% i18nGettext($CONFIG->[$i]->{NAME}) %></dt>
+  <dd><% i18nGettext($CONFIG->[$i]->{DESCRIPTION}) %></dd>
+%   }
+</dl>
+<%init>
+    ## return the configuration number if it exists
+    return $config_nr
+        if (defined $config_nr and exists $CONFIG->[$config_nr]);
+
+    ## if we have only one configuration
+    ## then we have not to ask the user
+    return 0 if (scalar @{$CONFIG} == 1);
+
+    ## ok, we have to ask the user
+</%init>

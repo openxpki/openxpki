@@ -1,0 +1,28 @@
+<%args>
+  $level => undef
+  $msg   => undef
+</%args>
+% foreach my $line (split "\n", $msg)
+% {
+    <% $prefix %><% $line %><br/>
+% }
+<%init>
+    return if (not defined $DEBUG);
+    return if ($DEBUG < $level);
+
+    my $caller = $m->caller();
+    my $label  = $caller->title();
+    my $interp = $caller->interp();
+    my $compiler = $interp->compiler();
+    my $lexer    = $compiler->lexer();
+
+    print "<br/>wrong debug statement: $label: $msg<br/>\n"
+        if (not defined $level or not defined $label);
+
+    ## start debugging and set the prefix
+    ## my $prefix = "$label\[".$lexer->line_number()."]: ";
+    my $prefix = "$label: ";
+</%init>
+<%once>
+    my $DEBUG = 0;
+</%once>

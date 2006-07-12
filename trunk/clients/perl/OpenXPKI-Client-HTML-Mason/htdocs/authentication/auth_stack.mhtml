@@ -49,4 +49,10 @@
     ## cache the last message in the context
     my $auth_stacks = $msg->{PARAMS}->{AUTHENTICATION_STACKS};
     $context->{msg} = $msg;
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => "CONTEXT->MSG: ".Dumper($context->{msg}));
 </%init>
+<%once>
+    use Data::Dumper;
+</%once>

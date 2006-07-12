@@ -1,23 +1,69 @@
 <%perl>
+    ## let's init the environment
     $m->comp('/authentication/session.mhtml');
     my $session_id = $context->{session_id};
     my $client     = $context->{client};
-    my $msg        = $context->{msg};
-    if ($client->get_communication_state eq "can_receive")
+    my $msg        = undef;
+       $msg        = $context->{msg} if (exists $context->{msg});
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => Dumper($context->{msg}));
+
+    ## check the message
+    if (not defined $msg and
+        $client->get_communication_state ne "can_receive")
+    {
+        ## let's kill the connection and start again
+        delete $context->{client};
+        $m->comp('/authentication/session.mhtml');
+        $session_id = $context->{session_id};
+        $client     = $context->{client};
+        $msg        = $context->{msg} if (exists $context->{msg});
+    }
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => Dumper($context->{msg}));
+    if (not defined $msg or
+        $client->get_communication_state eq "can_receive")
     {
         $msg = $client->collect();
     }
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => Dumper($context->{msg}));
     $msg = $m->comp('/authentication/pki_realm.mhtml',  'msg' => $msg);
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => Dumper($context->{msg}));
     $msg = $m->comp('/authentication/auth_stack.mhtml', 'msg' => $msg);
-           $m->comp('/authentication/role.mhtml',       'msg' => $msg);
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => Dumper($context->{msg}));
+    $m->comp('/authentication/role.mhtml', 'msg' => $msg);
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => Dumper($context->{msg}));
     #print STDERR "session_id ::= ".$context->{session_id}."\n";
 
-    if ($msg->{SERVICE_MSG} eq "SERVICE_READY")
+    ## msg can be undef on relaod
+    if ($msg->{SERVICE_MSG} eq "SERVICE_READY" or
+        not defined $msg)
     {
         ## ok let's panic - session is ready and we are inside of the auth autohandler !?
-        $m->comp('/service/autohandler', '__session_id' => $session_id);
+        $m->comp ('/lib/debug.mhtml',
+                  'level' => 4,
+                  'msg'   => "calling index.html of service area");
+        $m->comp('/service/autohandler',
+                 '__session_id' => $session_id,
+                 '__comp'       => '/service/index.html');
     }
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 1,
+              'msg'   => "authentication autohandler finished");
 </%perl>
 <%init>
   $r->content_type('text/html; charset=utf-8');
 </%init>
+<%once>
+  use Data::Dumper;
+</%once>

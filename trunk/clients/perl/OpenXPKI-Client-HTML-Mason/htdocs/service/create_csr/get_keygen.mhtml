@@ -1,0 +1,96 @@
+<%args>
+    $keygen    => undef
+    $config_nr => undef
+    $CONFIG    => $CONFIG
+</%args>
+
+<& /service/open_form.mhtml &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'config_nr', 'value' => $config_nr &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_DESCRIPTION') %>
+</p>
+
+<& /lib/html/select.mhtml, 'name' => 'keygen', values => \@values &>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<dl>
+  <dt><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_INTERNET_EXPLORER") %></dt>
+  <dd><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_INTERNET_EXPLORER_KEYGEN") %></dd>
+  <dt><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC") %></dt>
+  <dd><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC_KEYGEN") %></dd>
+  <dt><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE") %></dt>
+  <dd><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE_KEYGEN") %></dd>
+  <dt><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10") %></dt>
+  <dd><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10_KEYGEN") %></dd>
+</dl>
+
+<%init>
+    ## if AUTO was choosen then we must detect the browser here
+    if (defined $keygen and $keygen eq "AUTO")
+    {
+        if ($ENV{HTTP_USER_AGENT} =~ /Opera/i)
+        {
+            $keygen = "SPKAC";
+        }
+        elsif ($ENV{HTTP_USER_AGENT} =~ /MSIE/i)
+        {
+            $keygen = "IE";
+        }
+        elsif ($ENV{HTTP_USER_AGENT} =~ /Mozilla/i)
+        {
+            $keygen = "SPKAC";
+        }
+        else
+        {
+            $keygen = "SERVER";
+        }
+
+    }
+    $m->comp ('/lib/debug.mhtml', 'level' => 2, 'msg' => "KEYGEN: $keygen");
+
+    ## return the configuration number if it exists
+    return $keygen
+        if (defined $keygen and 
+            grep $keygen, @{$CONFIG->[$config_nr]->{KEY_GENERATION}});
+
+    ## if we have only one key generation type
+    ## then we have not to ask the user
+    return $CONFIG->[$config_nr]->{KEY_GENERATION}->[0]
+        if (scalar @{$CONFIG->[$config_nr]->{KEY_GENERATION}} == 1);
+
+    ## ok, we have to ask the user
+    my @values = ();
+    foreach my $entry (@{$CONFIG->[$config_nr]->{KEY_GENERATION}})
+    {
+        if ($entry eq "IE")
+        {
+            push @values, {VALUE => "IE", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_INTERNET_EXPLORER"};
+        }
+        elsif ($entry eq "SPKAC")
+        {
+            push @values, {VALUE => "SPKAC", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC"};
+        }
+        elsif ($entry eq "SERVER")
+        {
+            push @values, {VALUE => "SERVER", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"};
+        }
+        elsif ($entry eq "PKCS10")
+        {
+            push @values, {VALUE => "PKCS10", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10"};
+        }
+        elsif ($entry eq "AUTO")
+        {
+            push @values, {VALUE => "AUTO", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"};
+        }
+        else
+        {
+            ## classical configuration error
+            print STDERR "OpenXPKI HTML frontend: wrong key generation type specified - $entry\n";
+        }
+    }
+</%init>

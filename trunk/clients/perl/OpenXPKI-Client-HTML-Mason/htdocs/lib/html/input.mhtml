@@ -1,0 +1,7 @@
+<%args>
+    $name  => undef
+    $value => undef
+    $min   => undef
+    $max   => undef
+</%args>
+<input type="text" name="<& '/lib/html/safe.mhtml', 'data' => $name &>" value="<& '/lib/html/safe.mhtml', 'data' => $value &>" maxlength="<& '/lib/html/safe.mhtml', 'data' => $max &>"/>

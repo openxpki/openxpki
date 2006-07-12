@@ -74,10 +74,9 @@ sub i18nGettext {
 	## by all parameters (and values) passed to the function
 
 	## append arguments passed to the function
-	my $untranslated .= join ("; ", 
-				  $text,
-				  map { $_ . " => " . $arg_ref->{$_}  } 
-				      keys %{$arg_ref});
+        $i18n_string = join ("; ", $text,
+                                   map { $_ . " => " . $arg_ref->{$_}  } 
+                                       keys %{$arg_ref});
 	
         #it's too slow, I try to use "use utf8;"
         #$i18n_string = pack "U0C*", unpack "C*", $untranslated;

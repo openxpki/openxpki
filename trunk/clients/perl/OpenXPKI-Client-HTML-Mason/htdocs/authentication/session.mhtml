@@ -2,13 +2,22 @@
     $__session_id => undef
 </%args>
 <%init>
-  ## print STDERR "try to get session\n";
+  $m->comp ('/lib/debug.mhtml',
+            level => 1,
+            msg   => "try to get session\n");
+
+  $m->comp ('/lib/debug.mhtml',
+            level => 2,
+            msg   => "__session_id::=".$__session_id."\n".
+                     "context->session_id::=".$context->{session_id});
 
   # check if we are using an already existing and session and if there
   # has been established a client connection for it.
-  if (exists $context->{session_id})
+  if (exists $context->{session_id} and
+      exists $context->{client})
   {
       # this session has already been established and is in the context
+      # we ignore the context if the client connection is down
       return $session_cache{$context->{session_id}};
   }
 
@@ -39,5 +48,8 @@
   $session_cache{$__session_id}->{session_id} = $__session_id;
   $context = $session_cache{$__session_id};
 
+  $m->comp ('/lib/debug.mhtml',
+            'level' => 1,
+            'msg'   => 'finished with session_id '.$context->{session_id});
   ## the next message is get_pki_realm, get_auth_stack, login or service_ready
 </%init>

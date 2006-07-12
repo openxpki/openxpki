@@ -1,5 +1,6 @@
 <%args>
   $__session_id => undef
+  $__comp       => undef
   @menu_path  => ()
 </%args>
      <div id="navi">
@@ -17,7 +18,12 @@
        #    $m->call_next;
        #}
 
-       if ($m->fetch_next()->name() eq "dhandler")
+       $m->comp ('/lib/debug.mhtml',
+                 'level' => 2,
+                 'msg'   => "next component name: ".$m->fetch_next()->name());
+       if ($m->fetch_next()->name() eq "dhandler" and
+           defined $__comp and
+           $__comp eq '/service/index.html')
        {
            ## autohandler called directly - usually from authentication
            ## this is no error and so we only call index.html and not the dhandler

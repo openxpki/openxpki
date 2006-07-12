@@ -1,0 +1,231 @@
+<%args>
+    $config_nr => undef
+    $keygen    => undef
+    $subject   => undef
+</%args>
+<%init>
+    my %args = $m->request_args();
+
+    ## which config
+    $config_nr = $m->comp ('/service/create_csr/get_type.mhtml',
+                           'config_nr' => $config_nr,
+                           'CONFIG'    => $CONFIG);
+    return if (not defined $config_nr);
+
+    ## which key generation
+    $keygen = $m->comp ('/service/create_csr/get_keygen.mhtml',
+                        'config_nr' => $config_nr,
+                        'keygen'    => $keygen,
+                        'CONFIG'    => $CONFIG);
+    return if (not $keygen);
+
+    ## get PKCS#10 if available
+    my $key = "";
+    my $csr;
+    if ($keygen eq "pkcs10")
+    {
+        $csr = $m->comp ('/service/create_csr/get_pkcs10.mhtml',
+                         'config_nr' => $config_nr,
+                         'keygen'    => $keygen,
+                         'csr'       => $csr,
+                         'CONFIG'    => $CONFIG,
+                         'ARGS'      => \%args);
+        return if (not $csr);
+    }
+
+    ## get subject
+    $subject = $m->comp ('/service/create_csr/get_subject.mhtml',
+                         'config_nr' => $config_nr,
+                         'keygen'    => $keygen,
+                         'csr'       => $csr,
+                         'subject'   => $subject,
+                         'CONFIG'    => $CONFIG,
+                         'ARGS'      => \%args);
+    return if (not $subject);
+
+    ## get subject alt name
+    my $subject_alt_name = $m->comp ('/service/create_csr/get_subject_alt_name.mhtml',
+                                     'config_nr' => $config_nr,
+                                     'CONFIG'    => $CONFIG,
+                                     'ARGS'      => \%args);
+    return if (not $subject_alt_name);
+
+    ## get additional_infos
+    my $infos = $m->comp ('/service/create_csr/get_info.mhtml',
+                          'config_nr' => $config_nr,
+                          'CONFIG'    => $CONFIG,
+                          'ARGS'      => \%args);
+    return if (not $infos);
+
+    ## get generated request
+    if ($keygen ne "pkcs10")
+    {
+        if ($keygen eq "ie")
+        {
+            $csr = $m->comp ('/service/create_csr/get_ie_pkcs10.mhtml',
+                             'config_nr' => $config_nr,
+                             'CONFIG'    => $CONFIG,
+                             'SUBJECT'   => $subject,
+                             'ARGS'      => \%args);
+        }
+        elsif ($keygen eq "spkac")
+        {
+            $csr = $m->comp ('/service/create_csr/get_spkac.mhtml',
+                             'config_nr' => $config_nr,
+                             'CONFIG'    => $CONFIG,
+                             'SUBJECT'   => $subject,
+                             'ARGS'      => \%args);
+        }
+        else
+        {
+            $key = $m->comp ('/service/create_csr/get_server_key.mhtml',
+                             'config_nr' => $config_nr,
+                             'CONFIG'    => $CONFIG,
+                             'ARGS'      => \%args);
+            return if (not $key);
+            $csr = $m->comp ('/service/create_csr/get_server_pkcs10.mhtml',
+                             'config_nr' => $config_nr,
+                             'CONFIG'    => $CONFIG,
+                             'KEY'       => $key,
+                             'SUBJECT'   => $subject,
+                             'ARGS'      => \%args);
+        }
+        return if (not $csr);
+    }
+
+    ## store and display CSR
+    $csr = $m->comp ('/service/create_csr/finalize.mhtml',
+                             'config_nr' => $config_nr,
+                             'CONFIG'    => $CONFIG,
+                     'KEYGEN'           => $keygen,
+                     'KEY'              => $key,
+                     'CSR'              => $csr,
+                     'SUBJECT'          => $subject,
+                     'SUBJECT_ALT_NAME' => $subject_alt_name,
+                     'INFOS'            => $infos);
+    $m->comp ('/service/csr_show.html', 'serial' => $csr)
+        if ($csr);
+</%init>
+<%once>
+    my $CONFIG = [
+                  {
+                   NAME        => "I18N_OPENXPKI_HTML_CREATE_CSR_USER_OU",
+                   DESCRIPTION => "I18N_OPENXPKI_HTML_CREATE_CSR_USER_OU_DESCRIPTION",
+                   ROLE        => [ "User", "RA Operator" ],
+                   KEY_GENERATION => ["SPKAC", "IE", "SERVER", "AUTO"],
+                   SUBJECT     =>
+                   [
+                       [    ## 1.RDN
+                           {
+                               NAME    => "uid",
+                               LABEL   => "I18N_OPENXPKI_HTML_UID",
+                               DESCRIPTION => "I18N_OPENXPKI_HTML_UID_DESCRIPTION",
+                               MAXIMUM => "8",
+                               MINIMUM => "4",
+                               TYPE    => "ascii",
+                               DEFAULT => "I18N_OPENXPKI_HTML_DEFAULT_UID"
+                           },
+                           {
+                               NAME    => "cn",
+                               LABEL   => "I18N_OPENXPKI_HTML_COMMON_NAME",
+                               DESCRIPTION => "I18N_OPENXPKI_HTML_COMMON_NAME_DESCRIPTION",
+                               MAXIMUM => "64",
+                               MINIMUM => "2",
+                               TYPE    => "utf8",
+                               DEFAULT => "I18N_OPENXPKI_HTML_DEFAULT_CN"
+                           },
+                       ],
+                       [    ## 2.RDN
+                           {
+                               NAME    => "ou",
+                               LABEL   => "I18N_OPENXPKI_HTML_OU",
+                               DESCRIPTION => "I18N_OPENXPKI_HTML_OU_DESCRIPTION",
+                               MAXIMUM => "64",
+                               MINIMUM => "1",
+                               TYPE    => "utf8",
+                               DEFAULT => ["IT Service"],
+                               SELECT  => [{LABEL => "Sales",      VALUE => "Sales"},
+                                           {LABEL => "Marketing",  VALUE => "Marketing"},
+                                           {LABEL => "IT Service", VALUE => "IT Service"}]
+                           }
+                       ],
+                       [    ## 3.RDN
+                           {
+                               NAME  => "o",
+                               LABEL => "I18N_OPENXPKI_HTML_ORGANIZATION",
+                               DESCRIPTION => "I18N_OPENXPKI_HTML_ORGANIZATION_DESCRIPTION",
+                               VALUE => "OpenXPKI"
+                           }
+                       ],
+                       [    ## 4.RDN
+                           {
+                               NAME  => "c",
+                               LABEL => "I18N_OPENXPKI_HTML_COUNTRY",
+                               DESCRIPTION => "I18N_OPENXPKI_HTML_COUNTRY_DESCRIPTION",
+                               VALUE => "DE"
+                           }
+                       ],
+                   ]
+                  },
+                  {
+                   NAME        => "I18N_OPENXPKI_HTML_CREATE_CSR_USER_DC",
+                   DESCRIPTION => "I18N_OPENXPKI_HTML_CREATE_CSR_USER_DC_DESCRIPTION",
+                   ROLE        => [ "User", "RA Operator" ],
+                   KEY_GENERATION => ["SPKAC", "IE", "SERVER", "PKCS10", "AUTO"],
+                   SUBJECT     =>
+                   [
+                       [    ## 1.RDN
+                           {
+                               NAME    => "uid",
+                               LABEL   => "I18N_OPENXPKI_HTML_UID",
+                               DESCRIPTION => "I18N_OPENXPKI_HTML_UID_DESCRIPTION",
+                               MAXIMUM => "8",
+                               MINIMUM => "4",
+                               TYPE    => "ascii",
+                               DEFAULT => "I18N_OPENXPKI_HTML_DEFAULT_UID"
+                           },
+                           {
+                               NAME    => "cn",
+                               LABEL   => "I18N_OPENXPKI_HTML_COMMON_NAME",
+                               DESCRIPTION => "I18N_OPENXPKI_HTML_COMMON_NAME_DESCRIPTION",
+                               MAXIMUM => "64",
+                               MINIMUM => "2",
+                               TYPE    => "utf8",
+                               DEFAULT => "I18N_OPENXPKI_HTML_DEFAULT_CN"
+                           },
+                       ],
+                       [    ## 2.RDN
+                           {
+                               NAME    => "ou",
+                               LABEL   => "I18N_OPENXPKI_HTML_OU",
+                               DESCRIPTION => "I18N_OPENXPKI_HTML_OU_DESCRIPTION",
+                               MAXIMUM => "64",
+                               MINIMUM => "1",
+                               TYPE    => "utf8",
+                               DEFAULT => ["Development"],
+                               SELECT  => [{LABEL => "Development", VALUE => "Development"},
+                                           {LABEL => "Marketing",   VALUE => "Marketing"},
+                                           {LABEL => "Support",     VALUE => "Support"},
+                                           {LABEL => "Customers",   VALUE => "Customers"}]
+                           }
+                       ],
+                       [    ## 3.RDN
+                           {
+                               NAME  => "dc",
+                               LABEL => "I18N_OPENXPKI_HTML_ORGANIZATION",
+                               DESCRIPTION => "I18N_OPENXPKI_HTML_ORGANIZATION_DESCRIPTION",
+                               VALUE => "OpenXPKI"
+                           }
+                       ],
+                       [    ## 4.RDN
+                           {
+                               NAME  => "dc",
+                               LABEL => "I18N_OPENXPKI_HTML_DOMAIN_COMPONENT",
+                               DESCRIPTION => "I18N_OPENXPKI_HTML_DOMAIN_COMPONENT_DESCRIPTION",
+                               VALUE => "org"
+                           }
+                       ],
+                   ]
+                  },
+                 ];
+</%once>

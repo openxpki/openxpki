@@ -63,6 +63,99 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
+msgstr "Automatische Browsererkennung"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST"
+msgstr "Aufgetretene Fehler"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS"
+msgstr "Beschreibungen zu den Feldern"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. "
+"Es wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, "
+"sondern ob die Schlüsselerzeugung auf dem Client oder auf dem Browser "
+"erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+"bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
+msgstr "Auswahl der Schlüsselerzeugung"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_DESCRIPTION"
+msgstr ""
+"Der eindeutige Name des Zertifikates wird aus den Feldern dieses Formulars "
+"erstellt. Bitte geben Sie die benötigten Informationen ein. Wenn Sie sich "
+"bezüglich eines Feldes nicht sicher sind, so finden Sie am Ende dieser Seite "
+"Beschreibungen für jedes genutzte Feld."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_TITLE"
+msgstr "Erstellung des Zertifikatsnamens"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_TYPE_DESCRIPTION"
+msgstr ""
+"Diese Formular unterstützt mehrere verschiedene vorkonfigurierte Arten "
+"von Zertifizierungsanträgen (CSR). Bitte wählen Sie die für Sie am "
+"besten passende aus."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_TYPE_TITLE"
+msgstr "Art des Zertifizierungsantrages"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII"
+msgstr ""
+"Das Feld __LABEL__ darf nur mit ASCII-Daten gefüllt werden."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_DATE"
+msgstr ""
+"Das Feld __LABEL__ muss ein Datum enthalten."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_UTF8"
+msgstr ""
+"Das Feld __LABEL__ darf nur mit UTF-8-kodierte Daten gefüllt werden."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TOO_LONG"
+msgstr ""
+"Das Feld __LABEL__ hat eine Länge von __LENGTH__. "
+"Die eingegebenen Daten dürfen nur __MAX__ Zeichen lang sein."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TOO_SHORT"
+msgstr ""
+"Das Feld __LABEL__ hat eine Länge von __LENGTH__. "
+"Die eingegebenen Daten müssen mindestens __MIN__ Zeichen lang sein."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TYPE_UNKNOWN"
+msgstr ""
+"Die Art des Feldes __LABEL__ is unbekannt. Die Art lt. Konfiguration ist __TYPE__. "
+"Der interne RFC 2253 kompatible Name ist __NAME__. Bitte informieren Sie die "
+"Administratoren, da dies eine Fehlkonfiguration ist."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_WRONG_SELECT"
+msgstr ""
+"Cool, Sie haben einen Wert ausgewählt, der garnicht angeboten wurde. "
+"Bitte versuchen Sie dies nicht weiter. "
+"Wenn Sie eine andere Konfiguration benötigen, so kontaktieren Sie die Administratoren. "
+"Ach ja und hören sie bitte auf an dieser Seite herumzuhacken. "
+"Manche Admins überwachen Ihre Logs ;-D"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_WRONG_VALUE"
+msgstr ""
+"Herzlichen Glückwunsch, Sie haben es geschafft ein verstecktes Feld zu editieren. "
+"Leider wird dies von der Konfiguration nicht akzeptiert. "
+"Es ist also sinnlos. "
+"Wenn Sie eine andere Konfiguration benötigen, so kontaktieren Sie die Administratoren. "
+"Ach ja und hören sie bitte auf an dieser Seite herumzuhacken. "
+"Manche Admins überwachen Ihre Logs ;-D"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_NO_RFC_2253"
+msgstr ""
+"Der erzeugte Name (__SUBJECT__) ist nicht RFC 2253 kompatibel. "
+"Normalerweise liegt das an einer fehlenden oder fehlerhaften Escapesequenz. "
+"Bitte wenden Sie sich an die Administratoren, um herauszufinden welche "
+"Eingabedaten den Fehler verursachen. "
+"Bitte beachten Sie, dass dies nicht Ihr Fehler sondern ein Systemfehler ist."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION"
 msgstr "Bitte wählen Sie eine Methode zur Authentifizierung (Anmeldung) aus."
 
@@ -74,6 +167,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_TITLE"
 msgstr ""
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTERNET_EXPLORER"
+msgstr "Microsoft Internet Explorer"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTERNET_EXPLORER_KEYGEN"
+msgstr ""
+"Diese Art der Schlüsselerstellung wird durch den Microsoft Internet Explorer benutzt."
+"Wenn Sie diesen benutzen und dien Schlüssel auf Ihrem lokalen Computer erstellen "
+"und speichern wollen, dann ist dies die richtige Auswahl."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_DESCRIPTION"
 msgstr ""
@@ -134,11 +236,47 @@ msgstr "Die von Ihnen gewünschte Funktion ist derzeit nicht vorhanden."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr "Fehlende Funktionalität"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10"
+msgstr "PKCS#10"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10_KEYGEN"
+msgstr ""
+"Dies ist genaugenommen keine Schlüsselerzeugung. Es besagt vielmehr, "
+"das Sie bereits eine Zertifizierungsantrag (CSR) im Format PKCS#10 besitzen. "
+"Dies passiert normalerweise, wenn Sie einen Schlüssel und einen CSR "
+"für einen Server erzeugen bevor Sie auf die Webseiten dieses Trustcenters gehen. "
+"In diesem Fall benötigen sie folglich keine Schlüsselerzeugung mehr, "
+"weil Sie bereits im Besitz eines CSRs sind und Sie diesen nur noch "
+"in die Datenbank des Trustcenters überspielen müssen."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKI_REALM"
 msgstr "PKI Realm"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET"
 msgstr "Zurücksetzen"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"
+msgstr "Serverseitige Schlüsselgenerierung"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE_KEYGEN"
+msgstr ""
+"Wenn Sie sich nicht sicher sind, was Sie tun sollen und Sie "
+"auch nicht wissen, ob sich Ihre Clientumgebung bis zur Erstellung des "
+"Zertifikates durch das Trustcenter evtl. ändert, dann sollten "
+"Sie diese Art der Schlüsselerstellung auswählen."
+"Der Schlüssel ist trotzdem nicht durch einen Administrator lesbar, "
+"weil sie die einzige Person sind, die das Passwort kennt."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC"
+msgstr "SPKAC"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC_KEYGEN"
+msgstr ""
+"SPKAC ist ursprünglich von Netscape entwickelt. Heute wird dieses Format "
+"von vielen verschiedenen Browsern benutzt. Solche Browser sind zum Beispiel "
+"Netscape, Mozilla, Firefox und Opera. "
+"Wenn Sie einen solchen Browser benutzen und den Schlüssel mit Ihrem Client "
+"generieren wollen, dann ist dies die richtige Option für Sie."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT"
 msgstr "Abschicken"
@@ -936,8 +1074,70 @@ msgstr ""
 msgid "I18N_OPENXPKI_GET_SAFE_TMPFILE_MISSING_TMP"
 msgstr ""
 
+msgid "I18N_OPENXPKI_HTML_COMMON_NAME"
+msgstr "Name"
+
+msgid "I18N_OPENXPKI_HTML_COMMON_NAME_DESCRIPTION"
+msgstr ""
+"Dieser Name kann benutzt werden, um Personen oder Objekte eindeutig "
+"zu identifizieren. Beispiele für Name sind Max Mustermann und www.openxpki.org."
+
+msgid "I18N_OPENXPKI_HTML_COUNTRY"
+msgstr "Land"
+
+msgid "I18N_OPENXPKI_HTML_COUNTRY_DESCRIPTION"
+msgstr ""
+"Unter Land versteht man hier die ISO-Code bestehend aus zwei Buchstaben, "
+"der einen Staat eindeutig ientifiziert. Bitte beachten Sie, dass dieses Feld "
+"nicht für Toplevel-Domainen mit mehr als zwei Buchstaben genutzt werden können."
+
+msgid "I18N_OPENXPKI_HTML_CREATE_CSR_USER_DC"
+msgstr "Nutzer-Antrag im DC-Stil"
+
+msgid "I18N_OPENXPKI_HTML_CREATE_CSR_USER_DC_DESCRIPTION"
+msgstr ""
+"DC-Stil bedeutet, dass am Ende des Zertifikats-Namens "
+"die Komponenten der DNS-Domain benutzt werden. "
+"Ein alter eindeutiger Name (DN) sieht wie folgt aus: cn=Max Mustermann, o=OpenXPKI, c=DE. "
+"Die letzte Namenskomponente c des DN akzeptiert aber nur zwei-buchstabige Länderkennungen "
+"und keine Domainnamen. "
+"Der gleiche Name im DC-Stil sieht wie folgt aus: cn=Max Musterman, dc=OpenXPKI, dc=DE. "
+"Der Vorteil ist, dass wir nun die mehr korrekte Variante nutzen können: "
+"cn=Max Mustermann, dc=OpenXPKI, dc=org. Es muss nicht länger auf "
+"eine Landeskennung ausgewichen werden."
+
+msgid "I18N_OPENXPKI_HTML_CREATE_CSR_USER_OU"
+msgstr "Nutzer-Antrag im OU-Stil"
+
+msgid "I18N_OPENXPKI_HTML_CREATE_CSR_USER_OU_DESCRIPTION"
+msgstr ""
+"OU-Stil bedeutet, dass die Namenskomponenten Organisation (o) und Land (c) am "
+"Ende des eindeutigen Namens (DN) benutzt werden. Solche DN sehen wie folgt aus: "
+"cn=Max Mustermann, o=OpenXPKI, c=DE. Bitte beachten Sie, dass das Land nur aus "
+"zwie Buchstaben bestehen darf."
+
+msgid "I18N_OPENXPKI_HTML_DEFAULT_CN"
+msgstr "Max Mustermann"
+
+msgid "I18N_OPENXPKI_HTML_DEFAULT_UID"
+msgstr "testuser"
+
+msgid "I18N_OPENXPKI_HTML_DOMAIN_COMPONENT"
+msgstr "dc"
+
+msgid "I18N_OPENXPKI_HTML_DOMAIN_COMPONENT_DESCRIPTION"
+msgstr ""
+"Ein Domain Component (dc) ist Teil eines Namens aus dem Domain Name System (DNS). "
+"Wenn Sie zum Beispiel den Server www.openxpki.org nehmen, so besteht dieser Name "
+"aus den Domain Components www, openxpki und org. Wenn Sie nur eine Komponente "
+"eingeben können, so ist meist die letzte gemeint, es sei denn, andere "
+"Komponenten sind schon vorgegeben."
+
 msgid "I18N_OPENXPKI_HTML_MENU_CERTS"
 msgstr "Zertifikate"
+
+msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
+msgstr "Neuer Antrag (CSR)"
 
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
 msgstr "Abgelaufene"
@@ -971,6 +1171,30 @@ msgstr "Prozesse anzeigen"
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES"
 msgstr "Arten anzeigen"
+
+msgid "I18N_OPENXPKI_HTML_ORGANIZATION"
+msgstr "Organisation"
+
+msgid "I18N_OPENXPKI_HTML_ORGANIZATION_DESCRIPTION"
+msgstr ""
+"Die Organisation (o) bestimmt die Einrichtung, auf die sich das Zertifikat bezieht."
+
+msgid "I18N_OPENXPKI_HTML_OU"
+msgstr "Organisationseinheit"
+
+msgid "I18N_OPENXPKI_HTML_OU_DESCRIPTION"
+msgstr ""
+"Die Organisationseinheit (ou) kann benutzt werden, um organisatorische Strukturen "
+"wie Abteilungen, Institute oder Fakultäten abzubilden."
+
+msgid "I18N_OPENXPKI_HTML_UID"
+msgstr "uid"
+
+msgid "I18N_OPENXPKI_HTML_UID_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account oder "
+"auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+"Dies dient der sichern Identifikation von Personen oder Objekten."
 
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""

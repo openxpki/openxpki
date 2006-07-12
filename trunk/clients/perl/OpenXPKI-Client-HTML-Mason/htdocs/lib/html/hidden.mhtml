@@ -1,0 +1,5 @@
+<%args>
+    $name  => undef
+    $value => undef
+</%args>
+<input type="hidden" name="<& '/lib/html/safe.mhtml', 'data' => $name &>" value="<& '/lib/html/safe.mhtml', 'data' => $value &>"/>

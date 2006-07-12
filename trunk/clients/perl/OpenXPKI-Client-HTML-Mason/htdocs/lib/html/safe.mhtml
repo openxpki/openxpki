@@ -1,0 +1,20 @@
+<%args>
+    $data => undef
+</%args>
+<%init>
+    return "" if (not defined $data);
+
+    if (exists $ENV{MOD_PERL} and $ENV{MOD_PERL})
+    {
+        ## script is operated by apache with mod_perl
+        print Apache::Util::escape_html ($data);
+    } else {
+        ## script runs without mod_perl
+        print HTML::Entities::encode ($data);
+    }
+    ## always return here !!!
+    ## if the normal perl area will be executed
+    ## then the output can include newlines
+    ## which is horrible for form fields
+    return "";
+</%init>

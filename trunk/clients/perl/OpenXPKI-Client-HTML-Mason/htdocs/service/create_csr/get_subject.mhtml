@@ -1,0 +1,265 @@
+<%args>
+    $subject   => undef
+    $keygen    => undef
+    $config_nr => undef
+    $CONFIG    => $CONFIG
+    $ARGS      => undef
+</%args>
+
+<& /service/open_form.mhtml &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'config_nr', 'value' => $config_nr &>
+<& /lib/html/hidden.mhtml, 'name' => 'keygen',    'value' => $keygen &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_DESCRIPTION') %>
+</p>
+
+<table>
+% for (my $i=0; $i < scalar @{$CONFIG->[$config_nr]->{SUBJECT}}; $i++)
+% {
+    <tr>
+%   ## scan RDN $i
+%   for (my $k=0; $k < scalar @{$CONFIG->[$config_nr]->{SUBJECT}->[$i]}; $k++)
+%   {
+%     ## attribute $k of RDN $i
+%     if ($k > 0) {
+      <td>+</td>
+%     }
+      <td><div id="help">
+%     my $label = i18nGettext ($CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{LABEL});
+      <a href="#dummy"><span><% $label %></span><span class="onOver"><% $descriptions{$label} %></span></a>
+      </div></td>
+      <td>=</td>
+      <td>
+%     if ($CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{SELECT})
+%     {
+        <& '/lib/html/select.mhtml',
+           'name'    => "SUBJECT_${i}_$k",
+           'default' => $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{DEFAULT},
+           'values'  => $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{SELECT} &>
+%     } elsif (exists $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{VALUE}) {
+        <& '/lib/html/hidden.mhtml',
+           'name'  => "SUBJECT_${i}_$k",
+           'value' => $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{VALUE} &>
+        <& '/lib/html/safe.mhtml', 'data' => $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{VALUE} &>
+%     } else {
+        <& '/lib/html/input.mhtml',
+           'name'  => "SUBJECT_${i}_$k",
+           'value' => i18nGettext ($CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{DEFAULT}),
+           'max'   => $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{MAXIMUM},
+           'min'   => $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{MINIMUM} &>
+%     }
+      </td>
+%   }
+    </tr>
+% }
+</table>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+% if (scalar @errors and not $new_form)
+% {
+    <h2><% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST") %></h2>
+    <ul>
+%   foreach my $error (@errors)
+%   {
+      <li><% $error %></li>
+%   }
+    </ul>
+% }
+
+<h2><% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS") %></h2>
+<dl>
+% foreach my $label (sort keys %descriptions)
+% {
+    <dt><% $label %></dt>
+    <dd>
+      <% $descriptions{$label} %>
+    </dd>
+% }
+</dl>
+
+<%init>
+    my @errors = ();
+
+    my $new_form = 1;
+       $new_form = 0
+           if (defined $subject or exists $ARGS->{"SUBJECT_0_0"});
+    my $error_form = 0;
+       $error_form = 1
+           if (exists $ARGS->{"SUBJECT_0_0"});
+
+    #####################################################
+    ##    build a description for every form field     ##
+    #####################################################
+
+    my %descriptions = ();
+    for (my $i=0; $i < scalar @{$CONFIG->[$config_nr]->{SUBJECT}}; $i++)
+    {
+        ## scan RDN $i
+        for (my $k=0; $k < scalar @{$CONFIG->[$config_nr]->{SUBJECT}->[$i]}; $k++)
+        {
+            ## scan attribute $k of RDN $i
+            $descriptions{i18nGettext ($CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{LABEL})} =
+                i18nGettext ($CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{DESCRIPTION});
+        }
+    }
+ 
+    ###########################################################
+    ##     build a DN if some informations are available     ##
+    ###########################################################
+
+    if ($new_form or $error_form)
+    {
+        for (my $i=0; $i < scalar @{$CONFIG->[$config_nr]->{SUBJECT}}; $i++)
+        {
+            ## scan RDN $i
+            for (my $k=0; $k < scalar @{$CONFIG->[$config_nr]->{SUBJECT}->[$i]}; $k++)
+            {
+                ## scan attribute $k of RDN $i
+
+                ## check maximum length
+                if (exists $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{MAXIMUM} and
+                    length $ARGS->{"SUBJECT_${i}_$k"} > $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{MAXIMUM})
+                {
+                    push @errors,
+                         i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TOO_LONG",
+                                      "__MAX__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{MAXIMUM},
+                                      "__LENGTH__", length $ARGS->{"SUBJECT_${i}_$k"},
+                                      "__LABEL__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{LABEL});
+                }
+
+                ## check minimum length
+                if ($CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{MINIMUM} and
+                    length $ARGS->{"SUBJECT_${i}_$k"} < $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{MINIMUM})
+                {
+                    push @errors,
+                         i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TOO_SHORT",
+                                      "__MIN__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{MINIMUM},
+                                      "__LENGTH__", length $ARGS->{"SUBJECT_${k}_$i"},
+                                      "__LABEL__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{LABEL});
+                }
+
+                ## check content of fields
+                if ($CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{TYPE} eq "ascii")
+                {
+                    if ($ARGS->{"SUBJECT_${i}_$k"} !~ /^[ -\@a-zA-Z]*$/)
+                    {
+                        push @errors,
+                             i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII",
+                                          "__LABEL__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{LABEL});
+                    }
+                }
+                elsif ($CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{TYPE} eq "utf8")
+                {
+                    if ($ARGS->{"SUBJECT_${i}_$k"} !~ /^\X*$/)
+                    {
+                        push @errors,
+                             i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_UTF8",
+                                          "__LABEL__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{LABEL});
+                    }
+                }
+                elsif ($CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{TYPE} eq "date")
+                {
+                    if ($ARGS->{"SUBJECT_${i}_$k"} !~ /^[0-9\-\/]*$/)
+                    {
+                        push @errors,
+                             i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_DATE",
+                                          "__LABEL__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{LABEL});
+                    }
+                }
+                elsif (exists $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{TYPE})
+                {
+                push @errors,
+                         i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TYPE_UNKNOWN",
+                                      "__NAME__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{NAME},
+                                      "__TYPE__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{TYPE},
+                                      "__LABEL__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{LABEL});
+                }
+                ## if TYPE does not exists then it is a hardcoded value
+
+                ## check select statement
+                if (exists $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{SELECT})
+                {
+                    my @values = ();
+                    foreach my $option (@{$CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{SELECT}})
+                    {
+                        push @values, $option->{VALUE};
+                    }
+                    if (length $ARGS->{"SUBJECT_${i}_$k"} and
+                        not grep /^$ARGS->{"SUBJECT_${i}_$k"}$/, @values)
+                    {
+                        push @errors,
+                             i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_WRONG_SELECT",
+                                          "__LABEL__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{LABEL});
+                    }
+                }
+
+                ## check hardcoded value
+                if (exists $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{VALUE} and
+                    length $ARGS->{"SUBJECT_${i}_$k"} and
+                    $ARGS->{"SUBJECT_${i}_$k"} ne $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{VALUE})
+                {
+                    push @errors,
+                         i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_WRONG_VALUE",
+                                      "__LABEL__", $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{LABEL});
+                }
+
+                ## build subject
+                $subject .= "," if ($i > 0);
+                $subject .= "+" if ($k > 0);
+                $subject .= $CONFIG->[$config_nr]->{SUBJECT}->[$i]->[$k]->{NAME}.
+                            "=".
+                            $ARGS->{"SUBJECT_${i}_$k"};
+            }
+        }
+    }
+
+    ############################################################
+    ##     create DN object and let it scan by the server     ##
+    ############################################################
+
+    ## is DN parseable?
+    my $object = undef;
+    eval
+    {
+        $object = OpenXPKI::DN->new ($subject)
+            if (length $subject and not @errors);
+    };
+    if ($EVAL_ERROR)
+    {
+        push @errors,
+             i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_NO_RFC_2253",
+                          "__SUBJECT__", $subject);
+        $subject = "";
+    }
+
+    ## let's the server validate the subject
+    if ($subject and not scalar @errors)
+    {
+        my $msg = $context->{client}->send_receive_command_msg ("check_subject",
+                                                                {SUBJECT => $subject});
+        ## perhaps we should put this into a component like get_error.mhtml?
+        if (exists $msg->{ERROR})
+        {
+            if (exists $msg->{ERROR_MESSAGE})
+            {
+                push @errors, i18nGettext ($msg->{ERROR_MESSAGE});
+            } else {
+                push @errors, i18nGettext ($msg->{ERROR});
+            }
+        }
+    }
+
+    ###############################
+    ##     decide what to do     ##
+    ###############################
+
+    $subject = "" if (@errors);
+    return $subject if (length $subject);
+
+    ## ok we have to display the whoe stuff
+</%init>
