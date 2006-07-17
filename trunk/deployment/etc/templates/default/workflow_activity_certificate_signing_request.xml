@@ -1,7 +1,38 @@
 <actions>
   <!-- No-operation action -->
   <action name="create"
-	  class="Workflow::Action::Null"/>
+	  class="Workflow::Action::Null">
+
+      <field name="pki_realm" is_required="yes"/>
+      <field name="cert_role" is_required="yes"/>
+      <field name="cert_profile" is_required="yes"/>
+      <field name="cert_subject" is_required="yes"/>
+      <field name="cert_subject_alt_name" is_required="yes"/>
+      <field name="cert_info" is_required="yes"/>
+      <field name="csr_type" is_required="yes"/>
+      <field name="spkac" is_required="no"/>
+      <field name="pkcs10" is_required="no"/>
+
+      <validator name="PKIRealm">
+        <arg>$pki_realm</arg>
+      </validator>
+      <validator name="CertProfile">
+        <arg>$cert_role</arg>
+        <arg>$cert_profile</arg>
+      </validator>
+      <validator name="CertSubject">
+        <arg>$cert_profile</arg>
+        <arg>$cert_subject_style</arg>
+        <arg>$cert_subject</arg>
+      </validator>
+      <validator name="CertSubjectAltName">
+        <arg>$cert_subject_alt_name</arg>
+      </validator>
+      <validator name="SPKAC">
+        <arg>$csr_type</arg>
+        <arg>$spkac</arg>
+      </validator>
+  </action>
   <action name="csr.finish"
 	  class="Workflow::Action::Null"/>
 </actions>

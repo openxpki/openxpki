@@ -470,34 +470,53 @@ sub create_workflow_instance {
     # - it must have a state called 'CREATED' that is reached by executing
     #   'create'
 
-    my $state = $workflow->execute_action('create');
+    eval
+    {
+        my $state = $workflow->execute_action('create');
 
-    if ($state ne 'CREATED') {
-	my $error = $workflow->context->param('__error');
-	if (defined $error) {
-	    if (ref $error eq '') {
-		return {
-		    ERROR => {
-			MESSAGE => $error,
-			TYPE => 'PLAIN',
-		    }
-		}
-	    }
-	    if (ref $error eq 'ARRAY') {
-		return {
-		    ERROR => {
-			STACK => $error,
-			TYPE => 'STACK',
-		    }
-		}
-	    } 
-	}
-	return {
-	    ERROR => {
-		MESSAGE => 'I18N_WF_ERROR_ILLEGAL_STATE',
-		TYPE => 'PLAIN',
-	    }
-	}
+        if ($state ne 'CREATED') {
+            my $error = $workflow->context->param('__error');
+            if (defined $error) {
+                if (ref $error eq '')
+                {
+                    return
+                    {
+                     ERROR =>
+                     {
+                      MESSAGE => $error,
+                      TYPE => 'PLAIN',
+                     }
+                    }
+                }
+                if (ref $error eq 'ARRAY')
+                {
+                    return {
+                        ERROR => {
+                                  STACK => $error,
+                                  TYPE => 'STACK',
+                        }
+                    }
+                } 
+            }
+            return {
+                ERROR => {
+                MESSAGE => 'I18N_WF_ERROR_ILLEGAL_STATE',
+                TYPE => 'PLAIN',
+                }
+            }
+        }
+    };
+    if ($EVAL_ERROR)
+    {
+        if ($workflow->context->param('__error'))
+        {
+            return {
+                ERROR => {
+                    STACK => $workflow->context->param('__error'),
+                    TYPE => 'STACK',
+                }
+            }
+        }
     }
     
     # commit changes (this is normally not required, as save_workflow()

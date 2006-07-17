@@ -13,7 +13,7 @@ sub validate {
     ## prepare the environment
     my $context = $wf->context();
     my $api     = CTX('api');
-    my $config  = CTX('config');
+    my $config  = CTX('xml_config');
     my $errors  = $context->param ("__error");
        $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
@@ -23,12 +23,12 @@ sub validate {
     ## first calculate the expected index
     my $realm = $api->get_pki_realm_index();
     my $index = undef;
-    my $count = CTX('xml_config')->get_xpath_count (
+    my $count = $config->get_xpath_count (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile"],
                     COUNTER => [$realm, 0, 0, 0]);
     for (my $i=0; $i <$count; $i++)
     {
-        my $id = CTX('xml_config')->get_xpath (
+        my $id = $config->get_xpath (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "id"],
                     COUNTER => [$realm, 0, 0, 0, $i, 0]);
         next if ($id ne $role);

@@ -12,7 +12,7 @@ sub validate {
 
     ## prepare the environment
     my $context = $wf->context();
-    my $config  = CTX('config');
+    my $config  = CTX('xml_config');
     my $errors  = $context->param ("__error");
        $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
@@ -20,7 +20,7 @@ sub validate {
     return if (not defined $pki_realm);
 
     ## enforce correct realm
-    if ($pki_realm eq CTX('session')->get_pki_realm())
+    if ($pki_realm ne CTX('session')->get_pki_realm())
     {
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKI_REALM_WRONG_PKI_REALM',
                          {USED_PKI_REALM => $pki_realm,
@@ -33,7 +33,7 @@ sub validate {
     my $index = $config->get_xpath_count (XPATH => "pki_realm");
     for (my $i=0; $i < $index; $i++)
     {
-        if (CTX('xml_config')->get_xpath (XPATH   => ["pki_realm", "name"],
+        if ($config->get_xpath (XPATH   => ["pki_realm", "name"],
                                           COUNTER => [$i, 0])
             eq $pki_realm)
         {

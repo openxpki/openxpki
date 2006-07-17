@@ -7,36 +7,6 @@
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>
     <action name="create" 
 	    resulting_state="CREATED">
-
-      <field name="pki_realm" is_required="yes"/>
-      <field name="cert_role" is_required="yes"/>
-      <field name="cert_profile" is_required="yes"/>
-      <field name="cert_subject" is_required="yes"/>
-      <field name="cert_subject_alt_name" is_required="yes"/>
-      <field name="cert_info" is_required="yes"/>
-      <field name="csr_type" is_required="yes"/>
-      <field name="spkac" is_required="no"/>
-      <field name="pkcs10" is_required="no"/>
-
-      <validator name="PKIRealm">
-        <arg value="$pki_realm"/>
-      </validator>
-      <validator name="CertProfile">
-        <arg value="$cert_role"/>
-        <arg value="$cert_profile"/>
-      </validator>
-      <validator name="CertSubject">
-        <arg value="$cert_profile"/>
-        <arg value="$cert_subject_style"/>
-        <arg value="$cert_subject"/>
-      </validator>
-      <validator name="CertSubjectAltName">
-        <arg value="$cert_subject_alt_name"/>
-      </validator>
-      <validator name="SPKAC">
-        <arg value="$csr_type"/>
-        <arg value="$spkac"/>
-      </validator>
     </action>
   </state>
 
