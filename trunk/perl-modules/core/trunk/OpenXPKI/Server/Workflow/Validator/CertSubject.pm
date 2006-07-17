@@ -1,0 +1,123 @@
+package OpenXPKI::Server::Workflow::Validator::CertSubject;
+
+use strict;
+use warnings;
+use base qw( Workflow::Validator );
+use Workflow::Exception qw( validation_error );
+use OpenXPKI::Server::Context qw( CTX );
+use English;
+
+sub validate {
+    my ( $self, $wf ) = @_;
+
+    ## prepare the environment
+    my $context = $wf->context();
+    my $subject = $context->param("subject");
+    my $api     = CTX('api');
+    my $config  = CTX('config');
+    my $errors = $context->param ("__errors");
+       $errors = [] if (not defined $errors);
+    my $old_errors = scalar @{$errors};
+
+    return if (not defined $subject);
+
+    my $index   = $api->get_pki_realm_index();
+    my $profile = $context->param ("profile_index");
+    my $type    = $context->param ("subject_type");  ## e.g. dc_style or ou_style
+
+    ## check correctness of subject
+    eval {
+        my $object = OpenXPKI::DN->new ($subject);#
+    };
+    if ($EVAL_ERROR)
+    {
+        push @{$errors}, [$EVAL_ERROR];
+        $context->param ("__errors" => $errors);
+        validation_error ($errors->[scalar @{$errors} -1]);
+    }
+
+    ## find subject specification
+    my $count = $config->get_xpath_count (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject"],
+                    COUNTER => [$index, 0, 0, 0, $profile]);
+    for (my $i=0; $i <$count; $i++)
+    {
+        my $id = $config->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "id"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $i, 0]);
+        if ($id eq $type)
+        {
+            $type = $i;
+            last;
+        }
+    }
+    ## $type is now an index
+
+    ## check always block
+    $count = $config->get_xpath_count (
+                 XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
+                 COUNTER => [$index, 0, 0, 0, $profile, $type, 0]);
+    for (my $i=0; $i <$count; $i++)
+    {
+        my $regex = $config->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $type, 0, $i]);
+        if (not $subject =~ m{$regex}xs)
+        {
+            push @{$errors}, [ 'I18N_OPENXPKI_SERVER_API_CHECK_CERT_SUBJECT_FAILED_ALWAYS_REGEX',
+                               {REGEX => $regex, SUBJECT => $subject} ];
+        }
+    }
+
+    ## check never block
+    $count = CTX('xml_config')->get_xpath_count (
+                 XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
+                 COUNTER => [$index, 0, 0, 0, $profile, $type, 0]);
+    for (my $i=0; $i <$count; $i++)
+    {
+        my $regex = CTX('xml_config')->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $type, 0, $i]);
+        if (not $subject !~ m{$regex}xs)
+        {
+            push @{$errors}, [ 'I18N_OPENXPKI_SERVER_API_CHECK_CERT_SUBJECT_FAILED_NEVER_REGEX',
+                               {REGEX => $regex, SUBJECT => $subject} ];
+        }
+    }
+
+    ## did we find some errors?
+    if (scalar @{$errors} and scalar @{$errors} > $old_errors)
+    {
+        $context->param ("__errors" => $errors);
+        validation_error ($errors->[scalar @{$errors} -1]);
+    }
+
+    ## return true is senselesse because only exception will be used
+    ## but good style :)
+    return 1;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+OpenXPKI::Server::Workflow::Validator::CertSubject
+
+=head1 SYNOPSIS
+
+<action name="CreateCSR">
+  <validator name="CertSubjectValidator"
+           class="OpenXPKI::Server::Workflow::Validator::CertSubject">
+  </validator>
+</action>
+
+=head1 DESCRIPTION
+
+This validator checks a given subject according to the profile configuration.
+
+B<NOTE>: If you pass an empty string (or no string) to this validator
+it will not throw an error. Why? If you want a value to be defined it
+is more appropriate to use the 'is_required' attribute of the input
+field to ensure it has a value.

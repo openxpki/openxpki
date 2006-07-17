@@ -172,7 +172,7 @@ sub list_ca_ids {
     return;
 }
 
-sub __get_pki_realm_index
+sub get_pki_realm_index
 {
     my $self = shift;
     my $pki_realm = CTX('session')->get_pki_realm();
@@ -203,7 +203,7 @@ sub get_cert_profiles
     my $self = shift;
     my $args = shift;
 
-    my $index = $self->__get_pki_realm_index();
+    my $index = $self->get_pki_realm_index();
 
     ## get all available profiles
     my %profiles = ();
@@ -227,7 +227,7 @@ sub get_cert_subject_profiles
     my $self = shift;
     my $args = shift;
 
-    my $index   = $self->__get_pki_realm_index();
+    my $index   = $self->get_pki_realm_index();
     my $profile = $args->{PROFILE};
 
     ## get all available profiles
@@ -258,7 +258,7 @@ sub check_cert_subject
     my $self = shift;
     my $args = shift;
 
-    my $index   = $self->__get_pki_realm_index();
+    my $index   = $self->get_pki_realm_index();
     my $profile = $args->{PROFILE}; ## index of ¼profil
     my $subject = $args->{SUBJECT}; ## RFC 2253 subject
     my $type    = $args->{TYPE};    ## subject type e.g. dc_style or ou_style

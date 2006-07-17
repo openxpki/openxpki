@@ -120,6 +120,7 @@ OpenXPKI/Server/ACL.pm
 
 ## Workflow
 OpenXPKI/Server/Workflow.pm
+
 OpenXPKI/Server/Workflow/Activity.pm 
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 OpenXPKI/Server/Workflow/Activity/Certificate/Issue.pm
@@ -129,8 +130,15 @@ OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly/Create.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
+
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
+
+OpenXPKI/Server/Workflow/Validator/CertProfile.pm
+OpenXPKI/Server/Workflow/Validator/CertSubject.pm
+OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
+OpenXPKI/Server/Workflow/Validator/PKIRealm.pm
+OpenXPKI/Server/Workflow/Validator/SPKAC.pm
 
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm
