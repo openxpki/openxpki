@@ -14,7 +14,7 @@ sub validate {
     my $context = $wf->context();
     my $api     = CTX('api');
     my $config  = CTX('config');
-    my $errors  = $context->param ("__errors");
+    my $errors  = $context->param ("__error");
        $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
@@ -40,7 +40,7 @@ sub validate {
     {
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_UNSUPPORTED_ROLE',
                          {ROLE      => $role} ];
-        $context->param ("__errors" => $errors);
+        $context->param ("__error" => $errors);
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -56,7 +56,7 @@ sub validate {
             ## nevertheless this issue is critical
             push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_PROFILE_MISMATCH',
                              {ROLE      => $role} ];
-            $context->param ("__errors" => $errors);
+            $context->param ("__error" => $errors);
             validation_error ($errors->[scalar @{$errors} -1]);
         }
     } else {

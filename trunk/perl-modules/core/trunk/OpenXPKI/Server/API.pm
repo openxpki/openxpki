@@ -465,7 +465,7 @@ sub create_workflow_instance {
     my $state = $workflow->execute_action('create');
 
     if ($state ne 'CREATED') {
-	my $error = $workflow->context->param('error');
+	my $error = $workflow->context->param('__error');
 	if (defined $error) {
 	    if (ref $error eq '') {
 		return {

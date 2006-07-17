@@ -14,7 +14,7 @@ sub validate {
     my $context = $wf->context();
     my $api     = CTX('api');
     my $config  = CTX('config');
-    my $errors  = $context->param ("__errors");
+    my $errors  = $context->param ("__error");
        $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
@@ -31,7 +31,7 @@ sub validate {
     if ($EVAL_ERROR)
     {
         push @{$errors}, [$EVAL_ERROR];
-        $context->param ("__errors" => $errors);
+        $context->param ("__error" => $errors);
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -87,7 +87,7 @@ sub validate {
     ## did we find some errors?
     if (scalar @{$errors} and scalar @{$errors} > $old_errors)
     {
-        $context->param ("__errors" => $errors);
+        $context->param ("__error" => $errors);
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 

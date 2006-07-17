@@ -13,7 +13,7 @@ sub validate {
     ## prepare the environment
     my $context = $wf->context();
     my $config  = CTX('config');
-    my $errors  = $context->param ("__errors");
+    my $errors  = $context->param ("__error");
        $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
@@ -25,7 +25,7 @@ sub validate {
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKI_REALM_WRONG_PKI_REALM',
                          {USED_PKI_REALM => $pki_realm,
                           AUTH_PKI_REALM => CTX('session')->get_pki_realm()} ];
-        $context->param ("__errors" => $errors);
+        $context->param ("__error" => $errors);
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -43,7 +43,7 @@ sub validate {
             {
                 push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKI_REALM_MISSING_CONFIG',
                                  {PKI_REALM => $pki_realm} ];
-                $context->param ("__errors" => $errors);
+                $context->param ("__error" => $errors);
                 validation_error ($errors->[scalar @{$errors} -1]);
             }
         }
