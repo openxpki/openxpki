@@ -8,22 +8,20 @@ use OpenXPKI::Server::Context qw( CTX );
 use English;
 
 sub validate {
-    my ( $self, $wf ) = @_;
+    my ( $self, $wf, $role, $profile ) = @_;
 
     ## prepare the environment
-    my $context   = $wf->context();
-    my $pki_realm = $context->param("pki_realm");
-    my $role      = $context->param("role");
+    my $context = $wf->context();
     my $api     = CTX('api');
     my $config  = CTX('config');
-    my $errors = $context->param ("__errors");
-       $errors = [] if (not defined $errors);
+    my $errors  = $context->param ("__errors");
+       $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
     return if (not defined $role);
 
     ## first calculate the expected index
-    my $realm = $self->get_pki_realm_index();
+    my $realm = $api->get_pki_realm_index();
     my $index = undef;
     my $count = CTX('xml_config')->get_xpath_count (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile"],
@@ -41,31 +39,29 @@ sub validate {
     if (not defined $index)
     {
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_UNSUPPORTED_ROLE',
-                         {PKI_REALM => $pki_realm,
-                          ROLE      => $role} ];
+                         {ROLE      => $role} ];
         $context->param ("__errors" => $errors);
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
     ## check the cert profile
-    if (defined $context->param ("cert_profile"))
+    if (defined $profile)
     {
         ## compare the calculated and the set cert_profile
-        if ($context->param ("cert_profile") ne $index)
+        if ($profile ne $index)
         {
             ## the stored cert_profile and the needed profile by the role mismatch
             ## this can happen because of wrong code or
             ## this can happen because of a configuration change
             ## nevertheless this issue is critical
             push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_PROFILE_MISMATCH',
-                             {PKI_REALM => $pki_realm,
-                              ROLE      => $role} ];
+                             {ROLE      => $role} ];
             $context->param ("__errors" => $errors);
             validation_error ($errors->[scalar @{$errors} -1]);
         }
     } else {
         ## set the cert profile
-        $context->param ("cert_profile");
+        $context->param ("cert_profile" => $index);
     }
 
     ## return true is senselesse because only exception will be used
@@ -86,6 +82,8 @@ OpenXPKI::Server::Workflow::Validator::CertProfile
 <action name="CreateCSR">
   <validator name="CertProfile"
            class="OpenXPKI::Server::Workflow::Validator::CertProfile">
+    <arg value="$cert_role"/>
+    <arg value="$cert_profile"/>
   </validator>
 </action>
 
@@ -97,14 +95,3 @@ for the profile is already set then the index will be verified.
 
 B<NOTE>: If you have no profile set then we check for a role and the we
 calculate the profile index from the PKI realm and the role.
-
-=======================================================================================
-sub get_cert_profiles
-{
-    my $self = shift;
-    my $args = shift;
-
-
-
-    return \%profiles;
-}

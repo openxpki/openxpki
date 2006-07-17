@@ -9,15 +9,14 @@ use English;
 use OpenXPKI::Serialization::Simple;
 
 sub validate {
-    my ( $self, $wf ) = @_;
+    my ( $self, $wf, $subject_alt_name ) = @_;
 
     ## prepare the environment
     my $context = $wf->context();
-    my $subject_alt_name = $context->param("subject_alt_name");
     my $api     = CTX('api');
     my $config  = CTX('config');
-    my $errors = $context->param ("__errors");
-       $errors = [] if (not defined $errors);
+    my $errors  = $context->param ("__errors");
+       $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
     return if (not defined $subject_alt_name);
@@ -28,7 +27,7 @@ sub validate {
     {
         my $serializer = OpenXPKI::Serialization::Simple->new();
         $list = $serializer->deserialize($subject_alt_name);
-    }
+    };
     if ($EVAL_ERROR)
     {
         push @{$errors}, [$EVAL_ERROR];
@@ -180,13 +179,14 @@ OpenXPKI::Server::Workflow::Validator::CertSubjectAltName
 <action name="CreateCSR">
   <validator name="CertSubjectAltNameValidator"
            class="OpenXPKI::Server::Workflow::Validator::CertSubjectAltName">
+    <arg value="cert_subject_alt_name"/>
   </validator>
 </action>
 
 =head1 DESCRIPTION
 
 This validator checks a given subject alternative name. This
-includes rhe types and the values.
+includes the types and the values.
 
 B<NOTE>: If you pass an empty string (or no string) to this validator
 it will not throw an error. Why? If you want a value to be defined it

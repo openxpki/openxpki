@@ -216,7 +216,7 @@ sub get_cert_profiles
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "id"],
                     COUNTER => [$index, 0, 0, 0, $i, 0]);
         next if ($id eq "default");
-        $profiles{$i} = $id;
+        $profiles{$id} = $i;
     }
 
     return \%profiles;
@@ -251,74 +251,6 @@ sub get_cert_subject_profiles
     }
 
     return \%profiles;
-}
-
-sub check_cert_subject
-{
-    my $self = shift;
-    my $args = shift;
-
-    my $index   = $self->get_pki_realm_index();
-    my $profile = $args->{PROFILE}; ## index of ¼profil
-    my $subject = $args->{SUBJECT}; ## RFC 2253 subject
-    my $type    = $args->{TYPE};    ## subject type e.g. dc_style or ou_style
-
-    ## check correctness of subject
-    my $object = OpenXPKI::DN->new ($subject);
-
-    ## find subject specification
-    my $count = CTX('xml_config')->get_xpath_count (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject"],
-                    COUNTER => [$index, 0, 0, 0, $profile]);
-    for (my $i=0; $i <$count; $i++)
-    {
-        my $id = CTX('xml_config')->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "id"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $i, 0]);
-        if ($id eq $type)
-        {
-            $type = $i;
-            last;
-        }
-    }
-    ## $type is no an index
-
-    ## check always block
-    $count = CTX('xml_config')->get_xpath_count (
-                 XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
-                 COUNTER => [$index, 0, 0, 0, $profile, $type, 0]);
-    for (my $i=0; $i <$count; $i++)
-    {
-        my $regex = CTX('xml_config')->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $type, 0, $i]);
-        if (not $subject =~ m{$regex}xs)
-        {
-            OpenXPKI::Exception->throw (
-                message => 'I18N_OPENXPKI_SERVER_API_CHECK_CERT_SUBJECT_FAILED_ALWAYS_REGEX',
-                params  => {REGEX => $regex, SUBJECT => $subject});
-        }
-    }
-
-    ## check never block
-    $count = CTX('xml_config')->get_xpath_count (
-                 XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
-                 COUNTER => [$index, 0, 0, 0, $profile, $type, 0]);
-    for (my $i=0; $i <$count; $i++)
-    {
-        my $regex = CTX('xml_config')->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $type, 0, $i]);
-        if (not $subject !~ m{$regex}xs)
-        {
-            OpenXPKI::Exception->throw (
-                message => 'I18N_OPENXPKI_SERVER_API_CHECK_CERT_SUBJECT_FAILED_NEVER_REGEX',
-                params  => {REGEX => $regex, SUBJECT => $subject});
-        }
-    }
-
-    ## send ok
-    return $subject;
 }
 
 ###########################################################################

@@ -8,23 +8,21 @@ use OpenXPKI::Server::Context qw( CTX );
 use English;
 
 sub validate {
-    my ( $self, $wf ) = @_;
+    my ( $self, $wf, $pki_realm ) = @_;
 
     ## prepare the environment
-    my $context   = $wf->context();
-    my $pki_realm = $context->param("pki_realm");
-    my $api     = CTX('api');
+    my $context = $wf->context();
     my $config  = CTX('config');
-    my $errors = $context->param ("__errors");
-       $errors = [] if (not defined $errors);
+    my $errors  = $context->param ("__errors");
+       $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
-    return if (not defined $subject);
+    return if (not defined $pki_realm);
 
     ## enforce correct realm
     if ($pki_realm eq CTX('session')->get_pki_realm())
     {
-        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_API_CHECK_PKI_REALM_WRONG_PKI_REALM',
+        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKI_REALM_WRONG_PKI_REALM',
                          {USED_PKI_REALM => $pki_realm,
                           AUTH_PKI_REALM => CTX('session')->get_pki_realm()} ];
         $context->param ("__errors" => $errors);
@@ -43,7 +41,7 @@ sub validate {
         } else {
             if ($index <= $i+1)
             {
-                push @{$errors}, [ 'I18N_OPENXPKI_SERVER_API_CHECK_PKI_REALM_MISSING_CONFIG',
+                push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKI_REALM_MISSING_CONFIG',
                                  {PKI_REALM => $pki_realm} ];
                 $context->param ("__errors" => $errors);
                 validation_error ($errors->[scalar @{$errors} -1]);
@@ -69,6 +67,7 @@ OpenXPKI::Server::Workflow::Validator::PKIRealm
 <action name="CreateCSR">
   <validator name="PKIRealm"
            class="OpenXPKI::Server::Workflow::Validator::PKIRealm">
+    <arg value="pki_realm"/>
   </validator>
 </action>
 

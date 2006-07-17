@@ -8,20 +8,19 @@ use OpenXPKI::Server::Context qw( CTX );
 use English;
 
 sub validate {
-    my ( $self, $wf ) = @_;
+    my ( $self, $wf, $spkac ) = @_;
 
     ## prepare the environment
     my $context = $wf->context();
-    my $spkac   = $context->param("spkac");
-    my $errors = $context->param ("__errors");
-       $errors = [] if (not defined $errors);
+    my $errors  = $context->param ("__errors");
+       $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
     return if (not defined $spkac);
 
     ## check that it is clean
     if ($spkac =~ /^[A-Za-z\-_=]*$/ or ## RFC 3548 URL and filename safe
-        $spkac =~ /^[A-Za-z+\/=]*$/ or ## RFC 1421,2045 and 3548
+        $spkac =~ /^[A-Za-z+\/=]*$/    ## RFC 1421,2045 and 3548
        )
     {
         ## SPKAC is base64 and this is no base64
@@ -50,6 +49,7 @@ OpenXPKI::Server::Workflow::Validator::SPKAC
 <action name="CreateCSR">
   <validator name="SPKAC"
            class="OpenXPKI::Server::Workflow::Validator::SPKAC">
+    <arg value="$spkac"/>
   </validator>
 </action>
 
