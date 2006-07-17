@@ -177,7 +177,7 @@ OpenXPKI::Server::Workflow::Validator::CertSubjectAltName
 =head1 SYNOPSIS
 
 <action name="CreateCSR">
-  <validator name="CertSubjectAltNameValidator"
+  <validator name="CertSubjectAltName"
            class="OpenXPKI::Server::Workflow::Validator::CertSubjectAltName">
     <arg value="cert_subject_alt_name"/>
   </validator>

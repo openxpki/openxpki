@@ -27,6 +27,7 @@ $(PO_SOURCES):	openxpki.pot
 ## do not depend on openxpki.pot or some directories - this does not work
 scan:
 	sh build-pot.sh $(POT_SOURCES) > openxpki.pot
+	make $(PO_SOURCES)
 
 install::	$(LANG)
 	make install_dir DIR=$(LOCALE_DIR)

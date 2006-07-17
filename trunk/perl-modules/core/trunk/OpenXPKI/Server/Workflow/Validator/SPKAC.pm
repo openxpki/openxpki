@@ -8,7 +8,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use English;
 
 sub validate {
-    my ( $self, $wf, $spkac ) = @_;
+    my ( $self, $wf, $csr_type, $spkac ) = @_;
 
     ## prepare the environment
     my $context = $wf->context();
@@ -16,6 +16,8 @@ sub validate {
        $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
+    return if (not defined $csr_type);
+    return if ($csr_type ne "spkac");
     return if (not defined $spkac);
 
     ## check that it is clean
@@ -49,6 +51,7 @@ OpenXPKI::Server::Workflow::Validator::SPKAC
 <action name="CreateCSR">
   <validator name="SPKAC"
            class="OpenXPKI::Server::Workflow::Validator::SPKAC">
+    <arg value="$csr_type"/>
     <arg value="$spkac"/>
   </validator>
 </action>
@@ -57,7 +60,8 @@ OpenXPKI::Server::Workflow::Validator::SPKAC
 
 This validator checks a SPKAC string. The only implemented check today
 is a base64 validation. The validator does not check the SPKAC
-structure actually.
+structure actually. If the CSR type is not "spkac" then the validator
+does nothing to alarm on PKCS#10 requests.
 
 B<NOTE>: If you pass an empty string (or no string) to this validator
 it will not throw an error. Why? If you want a value to be defined it

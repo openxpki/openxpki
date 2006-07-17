@@ -81,16 +81,24 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
 msgstr "Select the way of the key generation"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_DESCRIPTION"
 msgstr ""
-"This form supports several different templates to create a certificate "
-"signing request (CSR). Please choose the one which matches your requirements "
-"best."
+"Please choose the role for which you would like to request a certificate."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_TITLE"
-msgstr "Choose a template"
+msgstr "Choose a role"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_ALT_NAME_DESCRIPTION"
+msgstr ""
+"A certificate can have several so called alternative names. "
+"These names gives more informations about the certificate users. "
+"Certificates for servers usually include the DNS names and IP addresses of the server. "
+"Normal user certificates include the email address. "
+"If you use Microsoft Smartcardlogin then you must set the UPN. "
+"So please set now your required alternative names."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_ALT_NAME_TITLE"
+msgstr "Subject alternative name"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_DESCRIPTION"
 msgstr ""
@@ -110,6 +118,83 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_TYPE_TITLE"
 msgstr "Choose a template"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME"
+msgstr "DirName"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME_DESCRIPTION"
+msgstr ""
+"The DirName is a reference to an entry in a directory server which includes information "
+"about the certificate owner."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS"
+msgstr "DNS"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS_DESCRIPTION"
+msgstr ""
+"A DNS name is the human readable name of a machine. Example: www.openxpki.org."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL"
+msgstr "emailAddress"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL_DESCRIPTION"
+msgstr ""
+"This field can contain an email address. "
+"Email addresses should not be included in the name of the certificate (subject). "
+"Therefore you should add it to the subject alternative name. "
+"You can add several different email addresses to the subject alternative name "
+"but please add only one address per form field."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID"
+msgstr "Microsoft GUID"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID_DESCRIPTION"
+msgstr ""
+"Microsoft GUID which is compatible with the UUID of RFC 4122 is used to identify "
+"machines like domain controllers. "
+"If you need a certificate for a domain controller then you must specify "
+"the GUID or it will not work."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP"
+msgstr "IP"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP_DESCRIPTION"
+msgstr ""
+"The IP address is the real address of any computer. An IPv4 address looks "
+"like 123.123.123.123 and IPv6 address looks like 11ad::de01:adf. "
+"This field should be filled if you request a certificate for a server "
+"because sometimes the server will be addressed directly by its IP address "
+"and not by its DNS name. If this happens then the DNS entries in the "
+"subject alternative name does not help."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID"
+msgstr "Registered ID"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID_DESCRIPTION"
+msgstr "No description available today."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN"
+msgstr "Microsoft UPN"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN_DESCRIPTION"
+msgstr ""
+"The Microsoft Universal Prinicipal Name (UPN) looks like an email address "
+"but it is no email address. It is the account plus the domain. "
+"Example: testuser@openxpki.org. Here it is the account testuser of the domain openxpki.org. "
+"Please see Microsoft's documentation if you need more informations. "
+"Their whitepapers are really good in this case."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI"
+msgstr "URI"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI_DESCRIPTION"
+msgstr ""
+"Uniform Ressource Identifier (URI) can be any address or reference to "
+"an information source. "
+"Example: www.openxpki.org/~testuser."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII"
 msgstr "The attribute __LABEL__ can only be filled with ASCII data."
@@ -155,6 +240,32 @@ msgstr ""
 "Usually something with the escaping of special characters is wrong. Please "
 "contact the administrators to find out what is wrong the input data. Please "
 "note that this is not your mistake. It is a system error."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_UNKNOWN_SUBJECT_ALT_NAME_TYPE"
+msgstr ""
+"The choosen subject alternative name type __TYPE__ is not known."
+"Usually this is a misconfiguration."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_DNS"
+msgstr ""
+"The name __DNS__ is not a valid DNS name."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_EMAIL"
+msgstr ""
+"The email address __EMAIL__ is not a valid RFC 822 address."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_GUID"
+msgstr ""
+"The GUID __GUID__ has a wrong format. We support the formats of "
+"RFC 4122 and Microsoft."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_IP"
+msgstr ""
+"The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_UPN"
+msgstr ""
+"The UPN __UPN__ is not a valid UPN. We support only UPN which are compatible with RFC 822."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION"
 msgstr ""
@@ -212,13 +323,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_TITLE"
 msgstr "Logged out"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_ACTION"
-msgstr "Login again"
+msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_COMP"
-msgstr "Login again"
+msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_CONFIG"
 msgstr ""
@@ -1224,6 +1333,12 @@ msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_ILLEGAL_AUTH_ROLE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_API_CHECK_CERT_SUBJECT_FAILED_ALWAYS_REGEX"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_API_CHECK_CERT_SUBJECT_FAILED_NEVER_REGEX"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_ILLEGAL_WORKFLOW_TITLE"

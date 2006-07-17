@@ -61,10 +61,15 @@ sub validate {
         my $regex = $config->get_xpath (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
                     COUNTER => [$index, 0, 0, 0, $profile, $style, 0, $i]);
+        my $label = CTX('xml_config')->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex", "label"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $style, 0, $i, 0]);
         if (not $subject =~ m{$regex}xs)
         {
             push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_ALWAYS_REGEX',
-                               {REGEX => $regex, SUBJECT => $subject} ];
+                               {LABEL => $label,
+                                REGEX => $regex,
+                                SUBJECT => $subject} ];
         }
     }
 
@@ -77,10 +82,15 @@ sub validate {
         my $regex = CTX('xml_config')->get_xpath (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
                     COUNTER => [$index, 0, 0, 0, $profile, $style, 0, $i]);
+        my $label = CTX('xml_config')->get_xpath (
+                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex", "label"],
+                    COUNTER => [$index, 0, 0, 0, $profile, $style, 0, $i, 0]);
         if (not $subject !~ m{$regex}xs)
         {
             push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_NEVER_REGEX',
-                               {REGEX => $regex, SUBJECT => $subject} ];
+                               {LABEL => $label,
+                                REGEX => $regex,
+                                SUBJECT => $subject} ];
         }
     }
 
@@ -107,7 +117,7 @@ OpenXPKI::Server::Workflow::Validator::CertSubject
 =head1 SYNOPSIS
 
 <action name="CreateCSR">
-  <validator name="CertSubjectValidator"
+  <validator name="CertSubject"
            class="OpenXPKI::Server::Workflow::Validator::CertSubject">
     <arg value="$cert_profile"/>
     <arg value="$cert_subject_style"/>

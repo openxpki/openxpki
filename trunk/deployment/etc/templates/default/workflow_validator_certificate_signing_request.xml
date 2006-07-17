@@ -1,0 +1,17 @@
+<validators>
+  <validator name="PKIRealm"
+             class="OpenXPKI::Server::Workflow::Validator::PKIRealm">
+  </validator>
+  <validator name="CertProfile"
+             class="OpenXPKI::Server::Workflow::Validator::CertProfile">
+  </validator>
+  <validator name="CertSubject"
+             class="OpenXPKI::Server::Workflow::Validator::CertSubject">
+  </validator>
+  <validator name="CertSubjectAltName"
+             class="OpenXPKI::Server::Workflow::Validator::CertSubjectAltName">
+  </validator>
+  <validator name="SPKAC"
+             class="OpenXPKI::Server::Workflow::Validator::SPKAC">
+  </validator>
+</validators>

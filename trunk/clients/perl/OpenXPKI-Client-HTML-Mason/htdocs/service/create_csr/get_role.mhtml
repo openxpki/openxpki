@@ -1,15 +1,15 @@
 <%args>
-    $profile => undef
+    $role => undef
 </%args>
 <& /service/open_form.mhtml &>
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_TITLE') %></h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_DESCRIPTION') %>
 </p>
-<select name="profile">
-%   foreach my $index (sort keys %roles)
+<select name="role">
+%   foreach my $hrole (sort keys %roles)
 %   {
-  <option value="<% $index %>"><% $roles{$index} %></option>
+  <option value="<% $hrole %>"><% $hrole %></option>
 %   }
 </select>
 <& /service/send_form.mhtml &>
@@ -22,10 +22,11 @@
     my %roles = %{$msg->{PARAMS}};
 
     ## return the configuration number if it exists
-    if (defined $profile and
-        exists $roles{$profile})
+    if (defined $role and
+        exists $roles{$role})
     {
-        return $roles{$profile};
+        ## this is the ID of the profile
+        return $role;
     }
 
     ## if we have only one configuration
@@ -33,8 +34,8 @@
     if (scalar keys %roles == 1)
     {
         my @array = keys %roles;
-        my $index = pop @array;
-        return $roles{$index};
+        $role = pop @array;
+        return $role;
     }
 
     ## ok, we have to ask the user

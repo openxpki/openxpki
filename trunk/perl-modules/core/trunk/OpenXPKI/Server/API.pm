@@ -230,6 +230,10 @@ sub get_cert_subject_profiles
     my $index   = $self->get_pki_realm_index();
     my $profile = $args->{PROFILE};
 
+    ## get index of profile
+    my $profiles = $self->get_cert_profiles();
+       $profile  = $profiles->{$profile};
+
     ## get all available profiles
     my %profiles = ();
     my $count = CTX('xml_config')->get_xpath_count (
@@ -421,6 +425,10 @@ sub create_workflow_instance {
 	    WORKFLOW => {
 		type => SCALAR,
 		regex => $re_alpha_string,
+	    },
+	    PARAMS => {
+		type => HASHREF,
+		optional => 1,
 	    },
 	});	 
     my $args  = shift;

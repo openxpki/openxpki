@@ -31,7 +31,6 @@ my %allowed_command = map { $_ => 1 } qw(
     get_role
     get_cert_profiles
     get_cert_subject_profiles
-    check_cert_subject
 
     get_ca_certificate
     list_ca_ids

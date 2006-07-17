@@ -1,0 +1,53 @@
+<%args>
+    $role          => undef
+    $subject_style => undef
+    $CONFIG        => undef
+</%args>
+<& /service/open_form.mhtml &>
+<& /lib/html/hidden.mhtml, 'name' => 'role', 'value' => $role &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_DESCRIPTION') %>
+</p>
+<select name="subject_style">
+%   foreach my $style (sort keys %{$CONFIG})
+%   {
+%       next if (not exists $types{$style});
+  <option value="<% $style %>">
+    <% i18nGettext($types{$style}->{LABEL}) %>
+  </option>
+%   }
+</select>
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+<dl>
+%
+%   foreach my $type (sort keys %types)
+%   {
+  <dt><% i18nGettext($types{$type}->{LABEL}) %></dt>
+  <dd><% i18nGettext($types{$type}->{DESCRIPTION}) %></dd>
+%   }
+</dl>
+<%init>
+    ## load available subject profiles from server
+    my $msg = $context->{client}->send_receive_command_msg (
+                   "get_cert_subject_profiles",
+                   {PROFILE => $role});
+    my %types = %{$msg->{PARAMS}};
+
+    ## if we have only one configuration
+    ## then we have not to ask the user
+    if (scalar keys %{$CONFIG} == 1)
+    {
+        $subject_style = join "", keys %{$CONFIG};
+    }
+
+    ## return the configuration number if it exists
+    return $subject_style
+        if (defined $subject_style and
+            exists $CONFIG->{$subject_style} and
+            exists $types{$subject_style});
+
+    ## ok, we have to ask the user
+</%init>

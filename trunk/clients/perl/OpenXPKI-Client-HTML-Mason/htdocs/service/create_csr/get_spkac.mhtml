@@ -1,0 +1,43 @@
+<%args>
+    $profile   => undef
+    $config_nr => undef
+    $keygen    => undef
+    $subject   => undef
+    $subject_alt_name => undef
+    $info      => undef
+    $spkac     => undef
+    $CONFIG    => $CONFIG
+    $ARGS      => undef
+</%args>
+
+<& /service/open_form.mhtml &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'profile',   'value' => $profile &>
+<& /lib/html/hidden.mhtml, 'name' => 'config_nr', 'value' => $config_nr &>
+<& /lib/html/hidden.mhtml, 'name' => 'keygen',    'value' => $keygen &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject',   'value' => $subject &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name', 'value' => $subject_alt_name &>
+<& /lib/html/hidden.mhtml, 'name' => 'info',      'value' => $info &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_DESCRIPTION') %>
+</p>
+
+<keygen name="spkac" challange=""/>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<%init>
+    return $spkac if (defined $spkac);
+
+    if (defined $ARGS->{SPKAC})
+    {
+        $spkac = $ARGS->{SPKAC};
+        $spkac =~ s/[\n\r]//g;
+        return if (length $spkac);
+    }
+
+    ## ok we have to display the whole stuff
+</%init>

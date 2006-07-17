@@ -1,0 +1,77 @@
+<%args>
+    $role             => undef
+    $profile          => undef
+    $subject_style    => undef
+    $subject          => undef
+    $subject_alt_name => undef
+    $info             => undef
+    $spkac            => undef
+    $pkcs10           => undef
+    $key              => undef
+</%args>
+<%init>
+    ## we must know which workflow we should use for the validation
+    return if (not defined $subject_style);
+
+    ## build PARAMS
+    my %params = ();
+
+    $params{"cert_role"}             = $role             if (defined $role);
+    $params{"cert_profile"}          = $profile          if (defined $profile);
+    $params{"cert_subject_style"}    = $subject_style    if (defined $subject_style);
+    $params{"cert_subject"}          = $subject          if (defined $subject);
+    $params{"cert_subject_alt_name"} = $subject_alt_name if (defined $subject_alt_name);
+    $params{"cert_info"}             = $info             if (defined $info);
+    $params{"spkac"}                 = $spkac            if (defined $spkac);
+    $params{"csr_type"}              = "spkac"           if (defined $spkac);
+    $params{"pkcs10"}                = $pkcs10           if (defined $pkcs10);
+    $params{"csr_type"}              = "pkcs10"          if (defined $pkcs10);
+    $params{"private_key"}           = $key              if (defined $key);
+
+    ## create the workflow for the new CSR
+    my $msg = $context->{client}->send_receive_command_msg (
+                   "create_workflow_instance",
+                   {WORKFLOW => "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST",
+                    PARAMS   => \%params});
+print Dumper ($msg)."\n";
+return [ [ Dumper ($msg) ] ];
+    if (not ref $msg)
+    {
+        return [ $msg ];
+    }
+    if (exists $msg->{ERROR})
+    {
+        if ($msg->{ERROR}->{TYPE} eq "STACK")
+        {
+            return $msg->{ERROR}->{STACK};
+        } else {
+            return [ [ $msg->{ERROR}->{MESSAGE}] ];
+        }
+    }
+
+    ## now store the private key
+    if ($key)
+    {
+        my $key_msg = $context->{client}->send_receive_command_msg (
+                          "create_workflow_instance",
+                          {WORKFLOW => "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY",
+                           PARAMS   => {"private_key" => $key,
+                                        "workflow_id" => $msg->{WORKFLOW}->{ID}}});
+        if (exists $key_msg->{ERROR})
+        {
+            ## FIXME: uups, we got a real problem the CSR is in the database
+            ## FIXME: but not the private key !!!
+            ## FIXME: can we log this event to system.fatal ?
+            if ($key_msg->{ERROR}->{TYPE} eq "STACK")
+            {
+                return $key_msg->{ERROR}->{STACK};
+            } else {
+                return [ $key_msg->{ERROR}->{MESSAGE} ];
+            }
+        }
+    }
+
+    ## this should be a serial number of the workflow
+    use Data::Dumper;
+    return Dumper($msg);
+</%init>

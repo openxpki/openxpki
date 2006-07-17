@@ -288,11 +288,11 @@
       <description>I18N_OPENXPKI_HTML_CREATE_CSR_OU_STYLE_DESCRIPTION</description>
       <!-- regex are executed with m{$regex}xs !!! -->
       <always>
-        <regex>^uid=[^+]+\+cn=</regex>
-        <regex>,ou=[^,]+,o=OpenXPKI,c=DE$</regex>
+        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN">^uid=[^+]+\+cn=</regex>
+        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_OU_O_C_REQUIRED">,ou=[^,]+,o=OpenXPKI,c=DE$</regex>
       </always>
       <never>
-        <regex>dc=</regex>
+        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_DC_NOT_ALLOWED">dc=</regex>
       </never>
     </subject>
 
@@ -301,12 +301,12 @@
       <description>I18N_OPENXPKI_HTML_CREATE_CSR_DC_STYLE_DESCRIPTION</description>
       <!-- regex are executed with m{$regex}xs !!! -->
       <always>
-        <regex>^uid=[^+]+\+cn=</regex>
-        <regex>,ou=[^,]+,dc=OpenXPKI,dc=org$</regex>
+        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN">^uid=[^+]+\+cn=</regex>
+        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_OU_DC_DC_REQUIRED">,ou=[^,]+,dc=OpenXPKI,dc=org$</regex>
       </always>
       <never>
-        <regex>,\s*o=</regex>
-        <regex>,\s*c=</regex>
+        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_O_NOT_ALLOWED">,\s*o=</regex>
+        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_C_NOT_ALLOWED">,\s*c=</regex>
       </never>
     </subject>
 

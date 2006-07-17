@@ -3,6 +3,8 @@
 <%once>
   # FIXME: move this to Apache handler?
   use URI;
+  use Mail::RFC822::Address;
+  use Net::IP;
   use OpenXPKI::Client::HTML::Mason;
   use OpenXPKI::Client::HTML::Mason::Javascript;
   use OpenXPKI::Client::HTML::Mason::Menu;

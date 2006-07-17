@@ -1,126 +1,95 @@
 <%args>
-    $profile   => undef
-    $config_nr => undef
-    $keygen    => undef
-    $subject   => undef
+    $role             => undef
+    $subject_style    => undef
+    $keygen           => undef
+    $subject          => undef
+    $subject_alt_name => undef
+    $info             => undef
+    $spkac            => undef
+    $pkcs10           => undef
+    $key              => undef
 </%args>
 <%init>
-    my %args = $m->request_args();
+    my %args   = $m->request_args();
+    my %params = (CONFIG => $CONFIG);
 
-    ## which profile and role
-    my $role = $m->comp ('/service/create_csr/get_role.mhtml',
-                         'profile' => $profile);
-    return if (not defined $role);
+    ## which role
+    $params{role} = $m->comp ('/service/create_csr/get_role.mhtml',
+                              'role' => $role);
+    return if (not defined $params{role});
 
-    ## which config
-    $config_nr = $m->comp ('/service/create_csr/get_type.mhtml',
-                           'profile'   => $profile,
-                           'config_nr' => $config_nr,
-                           'CONFIG'    => $CONFIG);
-    return if (not defined $config_nr);
+    ## which subject style
+    $params{subject_style} = $m->comp ('/service/create_csr/get_subject_style.mhtml',
+                                       %params, 'subject_style' => $subject_style);
+    return if (not defined $params{subject_style});
 
     ## which key generation
-    $keygen = $m->comp ('/service/create_csr/get_keygen.mhtml',
-                        'profile'   => $profile,
-                        'config_nr' => $config_nr,
-                        'keygen'    => $keygen,
-                        'CONFIG'    => $CONFIG);
-    return if (not $keygen);
+    ## this is necessary in this phase
+    ## because PKCS#10 parsing must before subject reading
+    $params{keygen} = $m->comp ('/service/create_csr/get_keygen.mhtml',
+                                %params, 'keygen' => $keygen);
+    return if (not defined $params{keygen});
 
     ## get PKCS#10 if available
-    my $key = "";
-    my $csr;
-    if ($keygen eq "PKCS10")
+    if ($params{keygen} eq "PKCS10")
     {
-        $csr = $m->comp ('/service/create_csr/get_pkcs10.mhtml',
-                         'profile'   => $profile,
-                         'config_nr' => $config_nr,
-                         'keygen'    => $keygen,
-                         'csr'       => $csr,
-                         'CONFIG'    => $CONFIG,
-                         'ARGS'      => \%args);
-        return if (not $csr);
+        $params{pkcs10} = $m->comp ('/service/create_csr/get_pkcs10.mhtml',
+                                    %params, 'pkcs10' => $pkcs10);
+        return if (not $params{pkcs10});
     }
 
     ## get subject
-    $subject = $m->comp ('/service/create_csr/get_subject.mhtml',
-                         'profile'   => $profile,
-                         'config_nr' => $config_nr,
-                         'keygen'    => $keygen,
-                         'csr'       => $csr,
-                         'subject'   => $subject,
-                         'CONFIG'    => $CONFIG,
-                         'ARGS'      => \%args);
-    return if (not $subject);
+    $params{subject} = $m->comp ('/service/create_csr/get_subject.mhtml',
+                                 %params, 'subject' => $subject);
+    return if (not $params{subject});
 
     ## get subject alt name
-    my $subject_alt_name = $m->comp ('/service/create_csr/get_subject_alt_name.mhtml',
-                                     'config_nr' => $config_nr,
-                                     'CONFIG'    => $CONFIG,
-                                     'ARGS'      => \%args);
-    return if (not $subject_alt_name);
+    $params{subject_alt_name} = $m->comp ('/service/create_csr/get_subject_alt_name.mhtml',
+                                          %params, 'subject_alt_name' => $subject_alt_name);
+    return if (not $params{subject_alt_name});
 
     ## get additional_infos
-    my $infos = $m->comp ('/service/create_csr/get_info.mhtml',
-                          'config_nr' => $config_nr,
-                          'CONFIG'    => $CONFIG,
-                          'ARGS'      => \%args);
-    return if (not $infos);
+    $params{info} = $m->comp ('/service/create_csr/get_info.mhtml',
+                              %params, 'info' => $info);
+    return if (not $params{info});
 
     ## get generated request
-    if ($keygen ne "PKCS10")
+    my $serial = undef;
+    if ($params{keygen} ne "PKCS10")
     {
-        if ($keygen eq "IE")
+        if ($params{keygen} eq "IE")
         {
-            $csr = $m->comp ('/service/create_csr/get_ie_pkcs10.mhtml',
-                             'config_nr' => $config_nr,
-                             'CONFIG'    => $CONFIG,
-                             'SUBJECT'   => $subject,
-                             'ARGS'      => \%args);
+            $serial = $m->comp ('/service/create_csr/get_ie_pkcs10.mhtml',
+                                %params, 'pkcs10' => $pkcs10);
         }
         elsif ($keygen eq "SPKAC")
         {
-            $csr = $m->comp ('/service/create_csr/get_spkac.mhtml',
-                             'config_nr' => $config_nr,
-                             'CONFIG'    => $CONFIG,
-                             'SUBJECT'   => $subject,
-                             'ARGS'      => \%args);
+            $serial = $m->comp ('/service/create_csr/get_spkac.mhtml',
+                                %params, 'spkac' => $spkac);
         }
         else
         {
             ## serverside
-            $key = $m->comp ('/service/create_csr/get_server_key.mhtml',
-                             'config_nr' => $config_nr,
-                             'CONFIG'    => $CONFIG,
-                             'ARGS'      => \%args);
-            return if (not $key);
-            $csr = $m->comp ('/service/create_csr/get_server_pkcs10.mhtml',
-                             'config_nr' => $config_nr,
-                             'CONFIG'    => $CONFIG,
-                             'KEY'       => $key,
-                             'SUBJECT'   => $subject,
-                             'ARGS'      => \%args);
+            $params{key} = $m->comp ('/service/create_csr/get_server_key.mhtml',
+                                     %params);
+            return if (not $params{key});
+            $serial = $m->comp ('/service/create_csr/get_server_pkcs10.mhtml',
+                                %params);
         }
-        return if (not $csr);
+    } else {
+        $serial = $m->comp ('/service/create_csr/store_pkcs10.mhtml',
+                            %params);
     }
+    return if (not defined $serial);
+    ## if we reach this point then the workflow is already created
 
     ## store and display CSR
-    $csr = $m->comp ('/service/create_csr/finalize.mhtml',
-                             'config_nr' => $config_nr,
-                             'CONFIG'    => $CONFIG,
-                     'KEYGEN'           => $keygen,
-                     'KEY'              => $key,
-                     'CSR'              => $csr,
-                     'SUBJECT'          => $subject,
-                     'SUBJECT_ALT_NAME' => $subject_alt_name,
-                     'INFOS'            => $infos);
-    $m->comp ('/service/csr_show.html', 'serial' => $csr)
-        if ($csr);
+    $m->comp ('/service/csr_show.html', 'serial' => $serial);
 </%init>
 <%once>
-    my $CONFIG = [
+    my $CONFIG = {
+                  "ou_style" =>
                   {
-                   NAME        => "ou_style",
                    ROLE        => [ "User", "RA Operator" ],
                    KEY_GENERATION => ["SPKAC", "IE", "SERVER", "AUTO"],
                    SUBJECT     =>
@@ -175,10 +144,25 @@
                                VALUE => "DE"
                            }
                        ],
-                   ]
+                   ],
+                   SUBJECT_ALT_NAME => ["email", "email", "UPN", "GUID", "DNS", "IP", "IP", "URI", "RID", "DirName"],
+                   INFOS => [
+                             {NAME        => "telephoneNumber",
+                              LABEL       => "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER",
+                              DESCRIPTION => "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER_DESCRIPTION",
+                              TYPE        => "text"},
+                             {NAME        => "faxNumber",
+                              LABEL       => "I18N_OPENXPKI_HTML_FAX_NUMBER",
+                              DESCRIPTION => "I18N_OPENXPKI_HTML_FAX_NUMBER_DESCRIPTION",
+                              TYPE        => "text"},
+                             {NAME        => "comment",
+                              LABEL       => "I18N_OPENXPKI_HTML_COMMENT",
+                              DESCRIPTION => "I18N_OPENXPKI_HTML_COMMENT_DESCRIPTION",
+                              TYPE        => "textarea"}
+                            ]
                   },
+                  "dc_style" => 
                   {
-                   NAME        => "dc_style",
                    ROLE        => [ "User", "RA Operator" ],
                    KEY_GENERATION => ["SPKAC", "IE", "SERVER", "PKCS10", "AUTO"],
                    SUBJECT     =>
@@ -234,7 +218,22 @@
                                VALUE => "org"
                            }
                        ],
-                   ]
+                   ],
+                   SUBJECT_ALT_NAME => ["email", "email", "UPN", "GUID", "DNS", "IP", "IP", "URI", "RID", "DirName"],
+                   INFOS => [
+                             {NAME        => "telephoneNumber",
+                              LABEL       => "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER",
+                              DESCRIPTION => "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER_DESCRIPTION",
+                              TYPE        => "text"},
+                             {NAME        => "faxNumber",
+                              LABEL       => "I18N_OPENXPKI_HTML_FAX_NUMBER",
+                              DESCRIPTION => "I18N_OPENXPKI_HTML_FAX_NUMBER_DESCRIPTION",
+                              TYPE        => "text"},
+                             {NAME        => "comment",
+                              LABEL       => "I18N_OPENXPKI_HTML_COMMENT",
+                              DESCRIPTION => "I18N_OPENXPKI_HTML_COMMENT_DESCRIPTION",
+                              TYPE        => "textarea"}
+                            ]
                   },
-                 ];
+                 };
 </%once>
