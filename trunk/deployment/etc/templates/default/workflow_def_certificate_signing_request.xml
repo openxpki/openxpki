@@ -19,7 +19,7 @@
       <field name="pkcs10" is_required="no"/>
 
       <validator name="PKIRealm">
-        <arg value="pki_realm"/>
+        <arg value="$pki_realm"/>
       </validator>
       <validator name="CertProfile">
         <arg value="$cert_role"/>
@@ -31,7 +31,7 @@
         <arg value="$cert_subject"/>
       </validator>
       <validator name="CertSubjectAltName">
-        <arg value="cert_subject_alt_name"/>
+        <arg value="$cert_subject_alt_name"/>
       </validator>
       <validator name="SPKAC">
         <arg value="$csr_type"/>
