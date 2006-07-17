@@ -26,6 +26,7 @@ use OpenXPKI::DN;
 my %workflow_factory : ATTR;
 
 my $workflow_table = 'WORKFLOW';
+my $workflow_history_table = 'WORKFLOW_HISTORY';
 
 
 # regex definitions for parameter validation
@@ -453,6 +454,7 @@ sub set_workflow_fields {
 	    },
 	    PARAMS => {
 		type => HASHREF,
+		optional => 1,
 	    },
 	}); 
     my $args  = shift;
@@ -468,7 +470,13 @@ sub set_workflow_fields {
 
     ##! 64: Dumper $workflow
 
-    return $workflow->context()->params();
+    my $context = $workflow->context();
+    ##! 64: Dumper $context
+
+    my $params = $context->param();
+    ##! 64: Dumper $params
+
+    return $params;
 }
 
 
@@ -501,6 +509,14 @@ sub create_workflow_instance {
 	    });
     }
 
+    # pass in specified parameters
+    if (exists $args->{PARAMS} &&
+	(ref $args->{PARAMS} eq 'HASH')) {
+	foreach my $key (keys %{$args->{PARAMS}}) {
+	    $workflow->context->param($key => $args->{PARAMS}->{$key});
+	}
+    }
+
     my $creator = $self->get_user();
     ##! 2: $creator
     if (! defined $creator) {
@@ -509,10 +525,45 @@ sub create_workflow_instance {
 
     $workflow->context->param(creator => $creator);
 
+    # our convention is that every workflow MUST have the following properties:
+    # - it must have an activity called 'create'
+    # - it must have a state called 'CREATED' that is reached by executing
+    #   'create'
+
+    my $state = $workflow->execute_action('create');
+
+    if ($state ne 'CREATED') {
+	my $error = $workflow->context->param('error');
+	if (defined $error) {
+	    if (ref $error eq '') {
+		return {
+		    ERROR => {
+			MESSAGE => $error,
+			TYPE => 'PLAIN',
+		    }
+		}
+	    }
+	    if (ref $error eq 'ARRAY') {
+		return {
+		    ERROR => {
+			STACK => $error,
+			TYPE => 'STACK',
+		    }
+		}
+	    } 
+	}
+	return {
+	    ERROR => {
+		MESSAGE => 'I18N_WF_ERROR_ILLEGAL_STATE',
+		TYPE => 'PLAIN',
+	    }
+	}
+    }
+    
     # commit changes (this is normally not required, as save_workflow()
     # is usually called by execute_action() but in this case we are destroying
     # the workflow instance right after creation.
-    $self->__get_workflow_factory()->save_workflow($workflow);
+    #$self->__get_workflow_factory()->save_workflow($workflow);
 
     return $self->__get_workflow_info($workflow);
 }
@@ -538,25 +589,91 @@ sub __get_workflow_factory : PRIVATE {
 
     $workflow_factory{$ident} = Workflow::Factory->instance();
 
-    my $realm_index = 0; # FIXME: compute the correct index!!!
 
-    my $activity_file = CTX('xml_config')->get_xpath (
-	XPATH   => [ 'pki_realm', 'workflow_config', 'activities', 'configfile' ],
-	COUNTER => [ $realm_index, 0,          0,            0 ],
+    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm_index;
+    
+    my $pki_realm_count = CTX('xml_config')->get_xpath_count (XPATH => "pki_realm");
+
+  FINDREALM:
+    for (my $ii = 0; $ii < $pki_realm_count; $ii++)
+    {
+        if (CTX('xml_config')->get_xpath (XPATH   => ["pki_realm", "name"],
+					  COUNTER => [$ii,         0])
+	    eq $pki_realm) {
+
+            $pki_realm_index = $ii;
+	    last FINDREALM;
+        }
+    }
+
+    if (! defined $pki_realm_index) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_INCORRECT_PKI_REALM");
+    }
+
+    my %workflow_config = (
+	# how we name it in our XML configuration file
+	workflows => {
+	    # how the parameter is called for Workflow::Factory 
+	    factory_param => 'workflow',
+	},
+	activities => {
+	    factory_param => 'action',
+	},
+	validators => {
+	    factory_param => 'validator',
+	},
+	conditions => {
+	    factory_param => 'condition',
+	},
 	);
-    ##! 2: $activity_file
-	
-    my $workflow_file = CTX('xml_config')->get_xpath (
-	XPATH   => [ 'pki_realm', 'workflow_config', 'workflows',  'configfile' ],
-	COUNTER => [ $realm_index, 0,          0,            0 ],
-	);
-    ##! 2: $workflow_file
+    
+    foreach my $type (keys %workflow_config) {
+	##! 2: "getting workflow '$type' configuration files"
+
+	my $count;
+	eval {
+	    $count = CTX('xml_config')->get_xpath_count(
+		XPATH =>   [ 'pki_realm',      'workflow_config', $type, 'configfile' ],
+		COUNTER => [ $pki_realm_index, 0,                 0,      ],
+		);
+	};
+	if (my $exc = OpenXPKI::Exception->caught()) {
+	    # ignore missing configuration
+	    if (($exc->message() 
+		 eq "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND")
+		&& (($type eq 'validators') || ($type eq 'conditions'))) {
+		$count = 0;
+	    }
+	    else
+	    {
+		$exc->rethrow();
+	    }
+	} elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
+	    $EVAL_ERROR->rethrow();
+	}
+
+	if (! defined $count) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_MISSING_WORKFLOW_CONFIGURATION",
+		params => {
+		    configtype => $type,
+		});
+	}
 
 
-    $workflow_factory{$ident}->add_config_from_file(
-	workflow  => $workflow_file,
-	action    => $activity_file,
-	);
+	for (my $ii = 0; $ii < $count; $ii++) {
+	    my $entry = CTX('xml_config')->get_xpath (
+		XPATH   => [ 'pki_realm', 'workflow_config', $type, 'configfile' ],
+		COUNTER => [ $pki_realm_index, 0,            0,     $ii ],
+		);
+	    ##! 4: "config file: $entry"
+	    $workflow_factory{$ident}->add_config_from_file(
+		$workflow_config{$type}->{factory_param}  => $entry,
+		);
+	}
+    }
 
     # persister configuration should not be user-configurable and is
     # static and identical throughout OpenXPKI
@@ -564,10 +681,12 @@ sub __get_workflow_factory : PRIVATE {
 	persister => {
 	    name           => 'OpenXPKI',
 	    class          => 'OpenXPKI::Server::Workflow::Persister::DBI',
-	    workflow_table => 'WORKFLOW',
-	    history_table  => 'WORKFLOW_HISTORY',
+	    workflow_table => $workflow_table,
+	    history_table  => $workflow_history_table,
 	},
 	);
+
+    ##! 64: Dumper $workflow_factory{$ident}
 
     return $workflow_factory{$ident};
 }

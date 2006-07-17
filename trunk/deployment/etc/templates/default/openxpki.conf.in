@@ -245,7 +245,7 @@ debug:    0
 
 # PKI Realm identifiers (sections in this configuration file)
 pkirealm: Realm 1
-#pkirealm: Realm 2
+# pkirealm: Realm 2
 
 
 ###########################################################################
@@ -269,12 +269,25 @@ profiles:  $(profiles)
 [TEST_DUMMY_CA_1]
 # internal CA ID
 id:  testdummyca1
-dir: $(dir.cadir)/testca1
+dir: $(dir.cadir)/testdummyca1
 
 [TEST_DUMMY_CA_2]
 # internal CA ID
 id:  testdummyca2
-dir: $(dir.cadir)/testca2
+dir: $(dir.cadir)/testdummyca2
+
+
+
+# for Realm 2 (Test User CA)
+[TEST_USER_CA_1]
+# internal CA ID
+id:  testuserca1
+dir: $(dir.cadir)/testuserca1
+
+[TEST_USER_CA_2]
+# internal CA ID
+id:  testuserca2
+dir: $(dir.cadir)/testuserca2
 
 
 ###########################################################################

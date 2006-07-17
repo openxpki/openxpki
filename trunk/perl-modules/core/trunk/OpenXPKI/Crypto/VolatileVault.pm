@@ -272,3 +272,14 @@ returns the original clear text.
 This only works if the encrypted data was created by the same object
 instance of this class.
 
+=head2 can_decrypt()
+
+Accepts one scalar attribute and checks if the class instance would
+be able to decrypt the data. Returns true if this instance can decrypt
+it.
+
+There is a small probability that the method returns a false positive
+(if a previous instance used the same instance ID).
+
+The method throws an exception if the data to be decrypted is not 
+recognized to be a valid VolatileVault data block.

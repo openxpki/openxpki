@@ -1,0 +1,6 @@
+<actions>
+
+  <!-- No-operation action -->
+  <action name="null"
+	  class="Workflow::Action::Null"/>
+</actions>

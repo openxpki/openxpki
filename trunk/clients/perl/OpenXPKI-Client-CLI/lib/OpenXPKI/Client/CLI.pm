@@ -446,6 +446,9 @@ sub show_error : PRIVATE {
 	    print "SERVER ERROR: " . $response->{ERROR} . "\n";
 	}
     }
+    if (exists $response->{EXCEPTION_AS_STRING}) {
+	print "EXCEPTION: " . $response->{EXCEPTION_AS_STRING} . "\n";
+    }
     return 1;
 }
 

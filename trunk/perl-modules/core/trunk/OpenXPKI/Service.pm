@@ -13,6 +13,7 @@ use English;
 
 use Class::Std;
 
+use Data::Dumper;
 ## used modules
 
 use OpenXPKI::Debug 'OpenXPKI::Service';
@@ -109,6 +110,8 @@ sub __get_error {
     my $self  = shift;
     my $ident = ident $self;
     my $arg   = shift;
+
+    ##! 128: Dumper $arg
     
     if (! exists $arg->{ERROR} || (ref $arg->{ERROR} ne '')) {
 	OpenXPKI::Exception->throw (
@@ -138,8 +141,9 @@ sub __get_error {
 	$result->{EXCEPTION} = $arg->{EXCEPTION};
 	$result->{EXCEPTION_AS_STRING} = OpenXPKI::Server::exception_as_string($arg->{EXCEPTION});
     }
-    
+
     $result->{ERROR_MESSAGE} = i18nGettext($result->{ERROR}, %{$result->{PARAMS}});
+    ##! 128: Dumper $result
     
     return $result;
 }

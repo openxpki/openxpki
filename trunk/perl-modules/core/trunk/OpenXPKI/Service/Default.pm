@@ -229,10 +229,11 @@ sub __init_pki_realm
     ##! 1: "start"
 
     ##! 2: "check if PKI realm is already known"
+    my $realm;
     eval {
-	my $realm = $self->get_API()->get_pki_realm();
-	return $realm if defined $realm;
+	$realm = $self->get_API()->get_pki_realm();
     };
+    return $realm if defined $realm;
 
     ##! 2: "check if there is more than one pki"
     my @list = sort keys %{CTX('pki_realm')};

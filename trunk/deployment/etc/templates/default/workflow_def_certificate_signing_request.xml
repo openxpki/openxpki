@@ -1,0 +1,20 @@
+<workflow>
+  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
+  <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST</description>
+  <persister>OpenXPKI</persister>
+
+  <state name="INITIAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>
+    <action name="create" 
+	    resulting_state="CREATED">
+    </action>
+  </state>
+
+  <state name="CREATED">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_CREATED</description>
+    <action name="csr.finish"
+	    resulting_state="FINISHED" />
+  </state>
+
+  <state name="FINISHED" />
+</workflow>

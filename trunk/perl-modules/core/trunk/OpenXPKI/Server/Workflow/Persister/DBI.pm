@@ -209,7 +209,7 @@ sub fetch_workflow {
 	(! $result->{WORKFLOW_LAST_UPDATE})) {
 	CTX('log')->log(
 	    MESSAGE  => "Could not retrieve workflow entry $id",
-	    PRIORITY => "error",
+	    PRIORITY => "info",
 	    FACILITY => "system"
 	    );
 

@@ -1,0 +1,8 @@
+<actions>
+  <!-- No-operation action -->
+  <action name="create"
+	  class="Workflow::Action::Null"/>
+  <action name="csr.finish"
+	  class="Workflow::Action::Null"/>
+</actions>
+
