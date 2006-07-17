@@ -1,4 +1,5 @@
 
+OPENXPKI_MAJOR_VERSION = "0.9"
 LOCALE_DIR   = $(DESTDIR)/usr/share/locale
 MO_FILE      = openxpki.mo
 INSTALL      = install
@@ -52,7 +53,7 @@ test install clean distclean::
 distclean clean::
 	rm -f */*.po~
 
-dist:	REVISION=`svn info | grep Revision | awk '{ print $$2 }'`
+dist:	REVISION=${OPENXPKI_MAJOR_VERSION}.`svn info | grep Revision | awk '{ print $$2 }'`
 dist:
 	if [ -d openxpki-i18n-$(REVISION) ] ; then \
 		rm -rf openxpki-i18n-$(REVISION)/ ; \
