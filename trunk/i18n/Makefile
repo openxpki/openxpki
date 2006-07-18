@@ -1,6 +1,7 @@
 
 OPENXPKI_MAJOR_VERSION = "0.9"
-LOCALE_DIR   = $(DESTDIR)/usr/share/locale
+PREFIX?=	/usr
+LOCALE_DIR   = $(DESTDIR)$(PREFIX)/share/locale
 MO_FILE      = openxpki.mo
 INSTALL      = install
 LANG         = en_GB de_DE
