@@ -72,6 +72,12 @@ msgstr "Errors"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS"
 msgstr "Descriptions of the form fields"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_INFO_DESCRIPTION"
+msgstr "Please enter now some additional informations."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_INFO_TITLE"
+msgstr "Additional informations"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_DESCRIPTION"
 msgstr ""
 "Please choose one of the following available options for the key generation. "
@@ -88,14 +94,20 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_TITLE"
 msgstr "Choose a role"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_DESCRIPTION"
+msgstr "Now you can generate a new SPKAC key with your browser."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_TITLE"
+msgstr "Create private key"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_ALT_NAME_DESCRIPTION"
 msgstr ""
-"A certificate can have several so called alternative names. "
-"These names gives more informations about the certificate users. "
-"Certificates for servers usually include the DNS names and IP addresses of the server. "
-"Normal user certificates include the email address. "
-"If you use Microsoft Smartcardlogin then you must set the UPN. "
-"So please set now your required alternative names."
+"A certificate can have several so called alternative names. These names "
+"gives more informations about the certificate users. Certificates for "
+"servers usually include the DNS names and IP addresses of the server. Normal "
+"user certificates include the email address. If you use Microsoft "
+"Smartcardlogin then you must set the UPN. So please set now your required "
+"alternative names."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_ALT_NAME_TITLE"
 msgstr "Subject alternative name"
@@ -107,17 +119,14 @@ msgstr ""
 "what to enter then please read the descriptions of the fields at the end of "
 "this page."
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_DESCRIPTION"
+msgstr "Please choose now a style for the certificates name."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_TITLE"
+msgstr "Choose a naming style"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_TITLE"
 msgstr "Creating the name of the certificate"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_TYPE_DESCRIPTION"
-msgstr ""
-"This form supports several different templates to create a certificate "
-"signing request (CSR). Please choose the one which matches your requirements "
-"best."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_TYPE_TITLE"
-msgstr "Choose a template"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_"
 msgstr ""
@@ -127,36 +136,36 @@ msgstr "DirName"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME_DESCRIPTION"
 msgstr ""
-"The DirName is a reference to an entry in a directory server which includes information "
-"about the certificate owner."
+"The DirName is a reference to an entry in a directory server which includes "
+"information about the certificate owner."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS"
 msgstr "DNS"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS_DESCRIPTION"
 msgstr ""
-"A DNS name is the human readable name of a machine. Example: www.openxpki.org."
+"A DNS name is the human readable name of a machine. Example: www.openxpki."
+"org."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL"
 msgstr "emailAddress"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL_DESCRIPTION"
 msgstr ""
-"This field can contain an email address. "
-"Email addresses should not be included in the name of the certificate (subject). "
-"Therefore you should add it to the subject alternative name. "
-"You can add several different email addresses to the subject alternative name "
-"but please add only one address per form field."
+"This field can contain an email address. Email addresses should not be "
+"included in the name of the certificate (subject). Therefore you should add "
+"it to the subject alternative name. You can add several different email "
+"addresses to the subject alternative name but please add only one address "
+"per form field."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID"
 msgstr "Microsoft GUID"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID_DESCRIPTION"
 msgstr ""
-"Microsoft GUID which is compatible with the UUID of RFC 4122 is used to identify "
-"machines like domain controllers. "
-"If you need a certificate for a domain controller then you must specify "
-"the GUID or it will not work."
+"Microsoft GUID which is compatible with the UUID of RFC 4122 is used to "
+"identify machines like domain controllers. If you need a certificate for a "
+"domain controller then you must specify the GUID or it will not work."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP"
 msgstr "IP"
@@ -164,11 +173,11 @@ msgstr "IP"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP_DESCRIPTION"
 msgstr ""
 "The IP address is the real address of any computer. An IPv4 address looks "
-"like 123.123.123.123 and IPv6 address looks like 11ad::de01:adf. "
-"This field should be filled if you request a certificate for a server "
-"because sometimes the server will be addressed directly by its IP address "
-"and not by its DNS name. If this happens then the DNS entries in the "
-"subject alternative name does not help."
+"like 123.123.123.123 and IPv6 address looks like 11ad::de01:adf. This field "
+"should be filled if you request a certificate for a server because sometimes "
+"the server will be addressed directly by its IP address and not by its DNS "
+"name. If this happens then the DNS entries in the subject alternative name "
+"does not help."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID"
 msgstr "Registered ID"
@@ -182,90 +191,18 @@ msgstr "Microsoft UPN"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN_DESCRIPTION"
 msgstr ""
 "The Microsoft Universal Prinicipal Name (UPN) looks like an email address "
-"but it is no email address. It is the account plus the domain. "
-"Example: testuser@openxpki.org. Here it is the account testuser of the domain openxpki.org. "
-"Please see Microsoft's documentation if you need more informations. "
-"Their whitepapers are really good in this case."
+"but it is no email address. It is the account plus the domain. Example: "
+"testuser@openxpki.org. Here it is the account testuser of the domain "
+"openxpki.org. Please see Microsoft's documentation if you need more "
+"informations. Their whitepapers are really good in this case."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI"
 msgstr "URI"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI_DESCRIPTION"
 msgstr ""
-"Uniform Ressource Identifier (URI) can be any address or reference to "
-"an information source. "
-"Example: www.openxpki.org/~testuser."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII"
-msgstr "The attribute __LABEL__ can only be filled with ASCII data."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_DATE"
-msgstr "The attribute __LABEL__ must be a date."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_UTF8"
-msgstr "The attribute __LABEL__ can only be filled with UTF8 data."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TOO_LONG"
-msgstr ""
-"The attribute __LABEL__ has a length of __LENGTH__ characters. The maximum "
-"length is __MAX__."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TOO_SHORT"
-msgstr ""
-"The attribute __LABEL__ has only a length of __LENGTH__ characters. The "
-"minimum length is __MIN__."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TYPE_UNKNOWN"
-msgstr ""
-"The type of the attribute __LABEL__ is unkown. The type is __TYPE__. The "
-"internal RFC 2253 attribute is __NAME__. Please contact the administrators "
-"because this is a misconfiguration."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_WRONG_SELECT"
-msgstr ""
-"Cool, you selected a value which is not one of the options.Please don't do "
-"this. If you need another configuration then contact the administrators. Oh, "
-"and please stop hacking this site. Some admins check the logs ;-D"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_WRONG_VALUE"
-msgstr ""
-"Hey guy, you manipulated a hidden value which is enforced by the "
-"configuration. Please don't do this. If you need another configuration then "
-"contact the administrators. Oh, and please stop hacking this site. Some "
-"admins check the logs ;-D"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_NO_RFC_2253"
-msgstr ""
-"The resulting subject (__SUBJECT__) is no RFC 2253 compliant subject. "
-"Usually something with the escaping of special characters is wrong. Please "
-"contact the administrators to find out what is wrong the input data. Please "
-"note that this is not your mistake. It is a system error."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_UNKNOWN_SUBJECT_ALT_NAME_TYPE"
-msgstr ""
-"The choosen subject alternative name type __TYPE__ is not known."
-"Usually this is a misconfiguration."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_DNS"
-msgstr ""
-"The name __DNS__ is not a valid DNS name."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_EMAIL"
-msgstr ""
-"The email address __EMAIL__ is not a valid RFC 822 address."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_GUID"
-msgstr ""
-"The GUID __GUID__ has a wrong format. We support the formats of "
-"RFC 4122 and Microsoft."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_IP"
-msgstr ""
-"The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_UPN"
-msgstr ""
-"The UPN __UPN__ is not a valid UPN. We support only UPN which are compatible with RFC 822."
+"Uniform Ressource Identifier (URI) can be any address or reference to an "
+"information source. Example: www.openxpki.org/~testuser."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION"
 msgstr ""
@@ -395,6 +332,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT"
 msgstr "OK"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME"
+msgstr "Name"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE"
+msgstr "Value"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_DESCRIPTION"
 msgstr ""
 "You can create a new instance of workflow type here. Please choose one."
@@ -419,6 +362,12 @@ msgstr "Workflow types"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL"
 msgstr "Workflow serial"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DESCRIPTION"
+msgstr "Here you can see the details of the workflow instance."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE"
+msgstr "Workflow instance"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE"
 msgstr "Workflow state"
@@ -1186,6 +1135,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_GET_SAFE_TMPFILE_MISSING_TMP"
 msgstr ""
 
+msgid "I18N_OPENXPKI_HTML_COMMENT"
+msgstr "Comment"
+
+msgid "I18N_OPENXPKI_HTML_COMMENT_DESCRIPTION"
+msgstr "This fiedl can be used for a normal comment."
+
 msgid "I18N_OPENXPKI_HTML_COMMON_NAME"
 msgstr "Common name"
 
@@ -1236,6 +1191,12 @@ msgstr ""
 "you have a server www.openxpki.org then the domain components are www, "
 "openxpki and org. If you can only enter one component then it must be "
 "usually the last one."
+
+msgid "I18N_OPENXPKI_HTML_FAX_NUMBER"
+msgstr "Fax number"
+
+msgid "I18N_OPENXPKI_HTML_FAX_NUMBER_DESCRIPTION"
+msgstr "The field contains a normal fax number."
 
 msgid "I18N_OPENXPKI_HTML_MENU_CERTS"
 msgstr "Certificates"
@@ -1293,6 +1254,12 @@ msgstr ""
 "different departments (e.g. in companies) or institutes (e.g. in "
 "universites)."
 
+msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER"
+msgstr "Telephone number"
+
+msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER_DESCRIPTION"
+msgstr "You can enter here a normal telephone number."
+
 msgid "I18N_OPENXPKI_HTML_UID"
 msgstr "uid"
 
@@ -1335,12 +1302,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER_API_CHECK_CERT_SUBJECT_FAILED_ALWAYS_REGEX"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVER_API_CHECK_CERT_SUBJECT_FAILED_NEVER_REGEX"
-msgstr ""
-
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_ILLEGAL_WORKFLOW_TITLE"
 msgstr ""
 
@@ -1353,6 +1314,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_API_GET_PKI_REALM_INDEX_FAILED"
 msgstr ""
 
+msgid "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_INCORRECT_PKI_REALM"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_MISSING_WORKFLOW_CONFIGURATION"
+msgstr ""
+
 msgid "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER"
 msgstr ""
 
@@ -1361,6 +1328,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
 msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS"
+msgstr "The workflow is missing some required fields (__FIELDS__) for the next action."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED"
 msgstr ""
@@ -1638,6 +1608,48 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG"
 msgstr ""
 
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_PROFILE_MISMATCH"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_UNSUPPORTED_ROLE"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_MISSING_TYPE"
+msgstr "The type of a subject alternative name field is missing."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_MISSING_VALUE"
+msgstr "The value of a subject alternative name field is missing."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_UNKNOWN_TYPE"
+msgstr "The type __TYPE__ is not supported for a subject alternative name field."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_WRONG_DNS"
+msgstr "The name __DNS__ is not a valid DNS entry."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_WRONG_EMAIL"
+msgstr "The email address __EMAIL__ is not a valid email address."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_WRONG_GUID"
+msgstr "The GUID __GUID__ is not a valid Microsoft GUID and not a valid RFC 4122 UUID."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_WRONG_IP"
+msgstr "The IP address __IP__ is not compliant to IPv4 and IPv6."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_WRONG_UPN"
+msgstr "The Microsoft UPN __UPN__ is no valid RFC 822 address and we only support such names."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_ALWAYS_REGEX"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_NEVER_REGEX"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_BASE64"
+msgstr "The submitted SPKAC data is not correctly base 64 encoded."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_DATA"
+msgstr "The SPKAC string is empty."
+
 msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_DSN_NO_DATABASE_NAME"
 msgstr ""
 
@@ -1701,6 +1713,24 @@ msgstr ""
 msgid "I18N_OPENXPKI_SEVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
 msgstr ""
 
+msgid "I18N_OPENXPKI_SUBJECT_STYLE_C_NOT_ALLOWED"
+msgstr "The used suject style does not allow the use of a country."
+
+msgid "I18N_OPENXPKI_SUBJECT_STYLE_DC_NOT_ALLOWED"
+msgstr "The used subject style does not allow the use of a domain component."
+
+msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_DC_DC_REQUIRED"
+msgstr "The used subject style requires at minimum one organizational unit and two domain components."
+
+msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_O_C_REQUIRED"
+msgstr "The used subject style requires at minimum one organizational unit, one organization and one country."
+
+msgid "I18N_OPENXPKI_SUBJECT_STYLE_O_NOT_ALLOWED"
+msgstr "The used suject style does not allow the use of an organization."
+
+msgid "I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN"
+msgstr "The used suject style requires a UID plus a common name."
+
 msgid "I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION"
 msgstr ""
 
@@ -1720,6 +1750,21 @@ msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_WRONG_MESSAGE_TYPE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
+msgstr ""
+
+msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
+msgstr ""
+
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_CREATED"
+msgstr ""
+
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL"
+msgstr ""
+
+msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"
+msgstr ""
+
+msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
 msgstr ""
 
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_AUTHORIZATION_FAILED"
@@ -1808,3 +1853,73 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII"
+#~ msgstr "The attribute __LABEL__ can only be filled with ASCII data."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_DATE"
+#~ msgstr "The attribute __LABEL__ must be a date."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_UTF8"
+#~ msgstr "The attribute __LABEL__ can only be filled with UTF8 data."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TOO_LONG"
+#~ msgstr ""
+#~ "The attribute __LABEL__ has a length of __LENGTH__ characters. The "
+#~ "maximum length is __MAX__."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TOO_SHORT"
+#~ msgstr ""
+#~ "The attribute __LABEL__ has only a length of __LENGTH__ characters. The "
+#~ "minimum length is __MIN__."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_TYPE_UNKNOWN"
+#~ msgstr ""
+#~ "The type of the attribute __LABEL__ is unkown. The type is __TYPE__. The "
+#~ "internal RFC 2253 attribute is __NAME__. Please contact the "
+#~ "administrators because this is a misconfiguration."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_WRONG_SELECT"
+#~ msgstr ""
+#~ "Cool, you selected a value which is not one of the options.Please don't "
+#~ "do this. If you need another configuration then contact the "
+#~ "administrators. Oh, and please stop hacking this site. Some admins check "
+#~ "the logs ;-D"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_WRONG_VALUE"
+#~ msgstr ""
+#~ "Hey guy, you manipulated a hidden value which is enforced by the "
+#~ "configuration. Please don't do this. If you need another configuration "
+#~ "then contact the administrators. Oh, and please stop hacking this site. "
+#~ "Some admins check the logs ;-D"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_NO_RFC_2253"
+#~ msgstr ""
+#~ "The resulting subject (__SUBJECT__) is no RFC 2253 compliant subject. "
+#~ "Usually something with the escaping of special characters is wrong. "
+#~ "Please contact the administrators to find out what is wrong the input "
+#~ "data. Please note that this is not your mistake. It is a system error."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_UNKNOWN_SUBJECT_ALT_NAME_TYPE"
+#~ msgstr ""
+#~ "The choosen subject alternative name type __TYPE__ is not known.Usually "
+#~ "this is a misconfiguration."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_DNS"
+#~ msgstr "The name __DNS__ is not a valid DNS name."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_EMAIL"
+#~ msgstr "The email address __EMAIL__ is not a valid RFC 822 address."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_GUID"
+#~ msgstr ""
+#~ "The GUID __GUID__ has a wrong format. We support the formats of RFC 4122 "
+#~ "and Microsoft."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_IP"
+#~ msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_UPN"
+#~ msgstr ""
+#~ "The UPN __UPN__ is not a valid UPN. We support only UPN which are "
+#~ "compatible with RFC 822."
