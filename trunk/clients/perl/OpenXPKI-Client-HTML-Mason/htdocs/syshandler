@@ -3,14 +3,13 @@
 <%once>
   # FIXME: move this to Apache handler?
   use URI;
-  use Mail::RFC822::Address;
-  use Net::IP;
   use OpenXPKI::Client::HTML::Mason;
   use OpenXPKI::Client::HTML::Mason::Javascript;
   use OpenXPKI::Client::HTML::Mason::Menu;
   use OpenXPKI::i18n qw( i18nGettext set_language );
   use OpenXPKI::DN;
   use English;
+  use Data::Dumper;
 
   $context->{socket_file} = $ENV{OPENXPKI_SOCKET_FILE};
 

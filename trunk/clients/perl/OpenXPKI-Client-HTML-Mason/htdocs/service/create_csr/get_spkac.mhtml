@@ -1,23 +1,22 @@
 <%args>
-    $profile   => undef
-    $config_nr => undef
-    $keygen    => undef
-    $subject   => undef
+    $role          => undef
+    $subject_style => undef
+    $keygen        => undef
+    $subject       => undef
     $subject_alt_name => undef
-    $info      => undef
-    $spkac     => undef
-    $CONFIG    => $CONFIG
-    $ARGS      => undef
+    $info          => undef
+    $spkac         => undef
+    $CONFIG        => undef
 </%args>
 
 <& /service/open_form.mhtml &>
 
-<& /lib/html/hidden.mhtml, 'name' => 'profile',   'value' => $profile &>
-<& /lib/html/hidden.mhtml, 'name' => 'config_nr', 'value' => $config_nr &>
-<& /lib/html/hidden.mhtml, 'name' => 'keygen',    'value' => $keygen &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject',   'value' => $subject &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name', 'value' => $subject_alt_name &>
-<& /lib/html/hidden.mhtml, 'name' => 'info',      'value' => $info &>
+<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
+<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name',   'value' => $subject_alt_name &>
+<& /lib/html/hidden.mhtml, 'name' => 'info',          'value' => $info &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_TITLE') %></h1>
 <p>
@@ -29,14 +28,33 @@
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 
-<%init>
-    return $spkac if (defined $spkac);
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
 
-    if (defined $ARGS->{SPKAC})
+<%init>
+    my @errors = ();
+
+    if ($spkac)
     {
-        $spkac = $ARGS->{SPKAC};
         $spkac =~ s/[\n\r]//g;
-        return if (length $spkac);
+
+        my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
+                            'role' => $role,
+                            'subject_style' => $subject_style,
+                            'subject'       => $subject,
+                            'subject_alt_name' => $subject_alt_name,
+                            'info'          => $info,
+                            'spkac'         => $spkac);
+        ## perhaps we should put this into a component like get_error.mhtml?
+        ## errors are returned in an array reference
+        ## fresh workflow instance is returned as a hash reference
+        if (ref $msg and ref $msg eq "ARRAY")
+        {
+            ## this must be an error
+            push @errors, @{$msg};
+        } else {
+            ## this is a hash
+            return $msg;
+        }
     }
 
     ## ok we have to display the whole stuff

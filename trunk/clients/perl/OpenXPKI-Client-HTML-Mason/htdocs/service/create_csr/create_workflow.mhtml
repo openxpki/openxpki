@@ -5,6 +5,7 @@
     $subject          => undef
     $subject_alt_name => undef
     $info             => undef
+    $keygen           => undef
     $spkac            => undef
     $pkcs10           => undef
     $key              => undef
@@ -23,31 +24,57 @@
     $params{"cert_subject_alt_name"} = $subject_alt_name if (defined $subject_alt_name);
     $params{"cert_info"}             = $info             if (defined $info);
     $params{"spkac"}                 = $spkac            if (defined $spkac);
-    $params{"csr_type"}              = "spkac"           if (defined $spkac);
     $params{"pkcs10"}                = $pkcs10           if (defined $pkcs10);
-    $params{"csr_type"}              = "pkcs10"          if (defined $pkcs10);
     $params{"private_key"}           = $key              if (defined $key);
+
+    ## this type must always be set to intercept empty CSRs
+    if ($spkac or $keygen eq "SPKAC")
+    {
+        $params{"csr_type"} = "spkac";
+    } else {
+        $params{"csr_type"} = "pkcs10";
+    }
 
     ## create the workflow for the new CSR
     my $msg = $context->{client}->send_receive_command_msg (
                    "create_workflow_instance",
                    {WORKFLOW => "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST",
                     PARAMS   => \%params});
-print Dumper ($msg)."\n";
-return [ [ Dumper ($msg) ] ];
+    my $errors = [];
     if (not ref $msg)
     {
-        return [ $msg ];
+        ## ups, this is completely unexpected
+        $errors = [ [ $msg ] ];
     }
-    if (exists $msg->{ERROR})
+    elsif (exists $msg->{PARAMS} and
+        exists $msg->{PARAMS}->{ERROR})
     {
-        if ($msg->{ERROR}->{TYPE} eq "STACK")
+        ## detected workflow error
+        if ($msg->{PARAMS}->{ERROR}->{TYPE} eq "STACK")
         {
-            return $msg->{ERROR}->{STACK};
+            $errors = $msg->{PARAMS}->{ERROR}->{STACK};
         } else {
-            return [ [ $msg->{ERROR}->{MESSAGE}] ];
+            $errors = [ [ $msg->{PARAMS}->{ERROR}->{MESSAGE}] ];
         }
     }
+    elsif (exists $msg->{ERROR})
+    {
+        ## general error
+        if (not ref $msg->{ERROR})
+        {
+            ## this is CODE exception from the server !!!
+            $errors = [ [ Dumper ($msg) ] ];
+        }
+        elsif ($msg->{ERROR}->{TYPE} eq "STACK")
+        {
+            $errors = $msg->{ERROR}->{STACK};
+        }
+        else
+        {
+            $errors = [ [ $msg->{ERROR}->{MESSAGE} ] ];
+        }
+    }
+    $key = "" if (scalar @{$errors});
 
     ## now store the private key
     if ($key)
@@ -64,14 +91,24 @@ return [ [ Dumper ($msg) ] ];
             ## FIXME: can we log this event to system.fatal ?
             if ($key_msg->{ERROR}->{TYPE} eq "STACK")
             {
-                return $key_msg->{ERROR}->{STACK};
+                $errors = $key_msg->{ERROR}->{STACK};
             } else {
-                return [ $key_msg->{ERROR}->{MESSAGE} ];
+                $errors = [ [ $key_msg->{ERROR}->{MESSAGE} ] ];
             }
         }
     }
 
+    ## handle errors
+    if (scalar @{$errors})
+    {
+        my @list = ();
+        foreach my $item (@{$errors})
+        {
+            push @list, [ $item->[0], %{$item->[1]} ];
+        }
+        return \@list;
+    }
+
     ## this should be a serial number of the workflow
-    use Data::Dumper;
-    return Dumper($msg);
+    return $msg;
 </%init>

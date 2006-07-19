@@ -290,7 +290,9 @@ WriteMakefile(
 	## includes the version of libintl-perl which includes Locale::Messages
 	'Locale::TextDomain'     => 1,
 	'Log::Log4perl'          => '0.51',
+        'Mail::RFC822::Address'  => 1,
 	'Math::BigInt'           => 1,
+        'Net::IP'                => 1,
 	'Net::LDAP'              => "0.32",
 	'Params::Validate'       => '0.77',
 	'Regexp::Common'         => 2,
@@ -307,6 +309,7 @@ WriteMakefile(
 	'XML::Simple'            => 1,
 	'XML::Validator::Schema' => '1.08',
 	'XML::SAX::PurePerl'     => '0.90',
+
     },
     test       => {TESTS => 't/*/*.t',
                   },

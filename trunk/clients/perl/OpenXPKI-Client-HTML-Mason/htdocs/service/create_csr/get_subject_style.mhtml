@@ -21,14 +21,9 @@
 </select>
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
-<dl>
-%
-%   foreach my $type (sort keys %types)
-%   {
-  <dt><% i18nGettext($types{$type}->{LABEL}) %></dt>
-  <dd><% i18nGettext($types{$type}->{DESCRIPTION}) %></dd>
-%   }
-</dl>
+
+<& /service/create_csr/print_descriptions.mhtml, descriptions => \%descriptions &>
+
 <%init>
     ## load available subject profiles from server
     my $msg = $context->{client}->send_receive_command_msg (
@@ -50,4 +45,10 @@
             exists $types{$subject_style});
 
     ## ok, we have to ask the user
+    my %descriptions = ();
+    foreach my $type (sort keys %types)
+    {
+        $descriptions{i18nGettext($types{$type}->{LABEL})} = 
+            i18nGettext($types{$type}->{DESCRIPTION});
+    }
 </%init>

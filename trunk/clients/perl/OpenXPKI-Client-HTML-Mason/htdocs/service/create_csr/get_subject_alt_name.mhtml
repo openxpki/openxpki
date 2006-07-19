@@ -1,19 +1,18 @@
 <%args>
-    $profile   => undef
-    $config_nr => undef
-    $keygen    => undef
-    $subject   => undef
+    $role          => undef
+    $subject_style => undef
+    $keygen        => undef
+    $subject       => undef
     $subject_alt_name => undef
-    $CONFIG    => $CONFIG
-    $ARGS      => undef
+    $CONFIG        => undef
 </%args>
 
 <& /service/open_form.mhtml &>
 
-<& /lib/html/hidden.mhtml, 'name' => 'profile',   'value' => $profile &>
-<& /lib/html/hidden.mhtml, 'name' => 'config_nr', 'value' => $config_nr &>
-<& /lib/html/hidden.mhtml, 'name' => 'keygen',    'value' => $keygen &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject',   'value' => $subject &>
+<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
+<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
 <& /lib/html/hidden.mhtml, 'name' => 'FILLED_SUBJECT_ALT_NAME_FORM', 'value' => 1 &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_ALT_NAME_TITLE') %></h1>
@@ -22,13 +21,13 @@
 </p>
 
 <table>
-% for (my $i=0; $i < scalar @{$CONFIG->[$config_nr]->{SUBJECT_ALT_NAME}}; $i++)
+% for (my $i=0; $i < scalar @{$CONFIG->{$subject_style}->{SUBJECT_ALT_NAME}}; $i++)
 % {
     <tr>
       <td>
         <& /lib/html/select.mhtml,
            'name'    => "SUBJECT_ALT_NAME_${i}_TYPE",
-           'default' => [ $CONFIG->[$config_nr]->{SUBJECT_ALT_NAME}->[$i] ],
+           'default' => [ $CONFIG->{$subject_style}->{SUBJECT_ALT_NAME}->[$i] ],
            'values'  => \@values &>
       </td>
       <td>
@@ -41,147 +40,57 @@
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 
-% if (scalar @errors)
-% {
-    <h2><% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST") %></h2>
-    <ul>
-%   foreach my $error (@errors)
-%   {
-      <li><% $error %></li>
-%   }
-    </ul>
-% }
-
-<h2><% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS") %></h2>
-<dl>
-% foreach my $label (sort keys %descriptions)
-% {
-    <dt><% $label %></dt>
-    <dd>
-      <% $descriptions{$label} %>
-    </dd>
-% }
-</dl>
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+<& /service/create_csr/print_descriptions.mhtml, 'descriptions' => \%descriptions &>
 
 <%init>
-    return $subject_alt_name if (defined $subject_alt_name);
     my @errors = ();
+    my $ARGS   = {$m->request_args()};
 
     # try to build subject alt name
-    my $range = scalar @{$CONFIG->[$config_nr]->{SUBJECT_ALT_NAME}};
-    my @list  = ();
-    for (my $i=0; $i < $range; $i++)
+    if (not defined $subject_alt_name)
     {
-        ## check the field is filled
-        next if (not exists $ARGS->{"SUBJECT_ALT_NAME_${i}_TYPE"});
-        next if (not length $ARGS->{"SUBJECT_ALT_NAME_${i}_TYPE"});
-        next if (not exists $ARGS->{"SUBJECT_ALT_NAME_${i}_VALUE"});
-        next if (not length $ARGS->{"SUBJECT_ALT_NAME_${i}_VALUE"});
-        my $type  = $ARGS->{"SUBJECT_ALT_NAME_${i}_TYPE"};
-        my $value = $ARGS->{"SUBJECT_ALT_NAME_${i}_VALUE"};
+        my $range = scalar @{$CONFIG->{$subject_style}->{SUBJECT_ALT_NAME}};
+        my @list  = ();
+        for (my $i=0; $i < $range; $i++)
+        {
+            ## check the field is filled
+            next if (not exists $ARGS->{"SUBJECT_ALT_NAME_${i}_TYPE"});
+            next if (not length $ARGS->{"SUBJECT_ALT_NAME_${i}_TYPE"});
+            next if (not exists $ARGS->{"SUBJECT_ALT_NAME_${i}_VALUE"});
+            next if (not length $ARGS->{"SUBJECT_ALT_NAME_${i}_VALUE"});
+            my $type  = $ARGS->{"SUBJECT_ALT_NAME_${i}_TYPE"};
+            my $value = $ARGS->{"SUBJECT_ALT_NAME_${i}_VALUE"};
 
-        ## check the values
-        if ($type eq "email")
-        {
-            if (not Mail::RFC822::Address::valid ($value))
-            {
-                push @errors,
-                     i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_EMAIL",
-                                  "__EMAIL__", $value);
-            }
+            ## accept the value
+            push @list, [ $type, $value ];
         }
-        elsif ($type eq "DNS")
+        if ($ARGS->{"FILLED_SUBJECT_ALT_NAME_FORM"})
         {
-            ## www.openxpki.org
-            if ($value !~ /^[0-9a-zA-Z\-]+(\.[0-9a-zA-Z\-]+)+$/)
-            {
-                push @errors,
-                     i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_DNS",
-                                  "__DNS__", $value);
-            }
+            ## warnings we must be safe against \n truncation
+            my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
+            $subject_alt_name = $serializer->serialize(\@list);
         }
-        elsif ($type eq "IP")
-        {
-            ## IPv4: 123.123.123.123
-            ## IPv6: abcd:abcd:abcd:abcd:abcd:abcd:abcd:abcd
-            ## IPv6: fe80::20a:e4ff:fe2f:6acd
-            my $object = Net::IP->new($value);
-            if (not Net::IP::ip_is_ipv4($value) and
-                not Net::IP::ip_is_ipv6($value))
-            {
-                push @errors,
-                     i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_IP",
-                                  "__IP__", $value);
-            }
-        }
-        elsif ($type eq "URI")
-        {
-            ## actually we have no URI validator
-        }
-        elsif ($type eq "GUID")
-        {
-            ## UUID (RFC 4122): f81d4fae-7dec-11d0-a765-00a0c91e6bf6
-            ## Microsoft GUID:  F8:1d:4F ...
-            ## totally 128 Bit
-            if ($value =~ /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/i)
-            {
-                ## RFC 4122 syntax used
-                $value = substr ($value, 0,  8).substr($value,  9);
-                $value = substr ($value, 0, 12).substr($value, 13);
-                $value = substr ($value, 0, 16).substr($value, 17);
-                $value = substr ($value, 0, 20).substr($value, 21);
-                for (my $i=15; $i > 0; $i--)
-                {
-                    $value = substr($value, 0, $i*2).":".substr($value, $i*2);
-                }
-                ## now we have the normal Microsoft representation
-            }
-            if ($value =~ /^[0-9a-f]{2}(:[0-9a-f]{2}){15}$/i)
-            {
-                ## Mircosoft GUID representation
-                $value = uc($value);
-            }
-            else
-            {
-                push @errors,
-                     i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_GUID",
-                                  "__GUID__", $value);
-            }
-        }
-        elsif ($type eq "UPN")
-        {
-            ## this should look like an emailaddress
-            if (not Mail::RFC822::Address::valid ($value))
-            {
-                push @errors,
-                     i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_UPN",
-                                  "__EMAIL__", $value);
-            }
-        }
-        elsif ($type eq "DirName")
-        {
-            ## actually we have no checks for DirName
-        }
-        elsif ($type eq "RID")
-        {
-            ## we have no checks for RIDs
-        }
-        else
-        {
-            push @errors,
-                 i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_UNKNOWN_SUBJECT_ALT_NAME_TYPE",
-                              "__TYPE__", $value);
-        }
-
-        ## accept the value
-        push @list, [ $type, $value ];
     }
-    if ($ARGS->{"FILLED_SUBJECT_ALT_NAME_FORM"} and not @errors)
+
+    ## now validate the input
+    if (defined $subject_alt_name)
     {
-        my $serializer = OpenXPKI::Serialization::Simple->new();
-        $subject_alt_name = $serializer->serialize(\@list);
-        return $subject_alt_name;
+        my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
+                            'role' => $role,
+                            'subject_style'    => $subject_style,
+                            'keygen'           => $keygen,
+                            'subject'          => $subject,
+                            'subject_alt_name' => $subject_alt_name);
+        ## perhaps we should put this into a component like get_error.mhtml?
+        if (ref $msg and ref $msg eq "ARRAY" and
+            $msg->[0]->[0] ne 'I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS')
+        {
+            ## this must be an error
+            push @errors, @{$msg};
+        }
     }
+    return $subject_alt_name if (not @errors and defined $subject_alt_name);
 
     ## build hash for select fields and descriptions
     my %descriptions = ();

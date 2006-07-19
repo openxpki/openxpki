@@ -1,0 +1,13 @@
+<%args>
+    @errors => undef
+</%args>
+% if (scalar @errors)
+% {
+    <h2><% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST") %></h2>
+    <ul>
+%   foreach my $error (@errors)
+%   {
+      <li><% i18nGettext(@{$error}) %></li>
+%   }
+    </ul>
+% }

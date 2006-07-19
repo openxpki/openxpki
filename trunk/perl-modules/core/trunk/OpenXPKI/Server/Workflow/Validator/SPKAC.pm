@@ -18,7 +18,15 @@ sub validate {
 
     return if (not defined $csr_type);
     return if ($csr_type ne "spkac");
-    return if (not defined $spkac);
+
+    if (not defined $spkac)
+    {
+        ## empty SPKAC must be intercepted here because require cannot be used here
+        ## SPKAC or PKCS10 must required and this is not possible with Workflow
+        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_DATA' ];
+        $context->param ("__error" => $errors);
+        validation_error ($errors->[scalar @{$errors} -1]);
+    }
 
     ## check that it is clean
     if ($spkac =~ /^[A-Za-z\-_=]*$/ or ## RFC 3548 URL and filename safe

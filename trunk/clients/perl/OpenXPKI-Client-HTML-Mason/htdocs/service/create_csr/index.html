@@ -54,17 +54,17 @@
     return if (not $params{info});
 
     ## get generated request
-    my $serial = undef;
+    my $msg = undef;
     if ($params{keygen} ne "PKCS10")
     {
         if ($params{keygen} eq "IE")
         {
-            $serial = $m->comp ('/service/create_csr/get_ie_pkcs10.mhtml',
+            $msg = $m->comp ('/service/create_csr/get_ie_pkcs10.mhtml',
                                 %params, 'pkcs10' => $pkcs10);
         }
         elsif ($keygen eq "SPKAC")
         {
-            $serial = $m->comp ('/service/create_csr/get_spkac.mhtml',
+            $msg = $m->comp ('/service/create_csr/get_spkac.mhtml',
                                 %params, 'spkac' => $spkac);
         }
         else
@@ -73,18 +73,18 @@
             $params{key} = $m->comp ('/service/create_csr/get_server_key.mhtml',
                                      %params);
             return if (not $params{key});
-            $serial = $m->comp ('/service/create_csr/get_server_pkcs10.mhtml',
+            $msg = $m->comp ('/service/create_csr/get_server_pkcs10.mhtml',
                                 %params);
         }
     } else {
-        $serial = $m->comp ('/service/create_csr/store_pkcs10.mhtml',
+        $msg = $m->comp ('/service/create_csr/store_pkcs10.mhtml',
                             %params);
     }
-    return if (not defined $serial);
+    return if (not defined $msg);
     ## if we reach this point then the workflow is already created
 
     ## store and display CSR
-    $m->comp ('/service/csr_show.html', 'serial' => $serial);
+    $m->comp ('/service/workflow_show_instance.html', 'msg' => $msg);
 </%init>
 <%once>
     my $CONFIG = {

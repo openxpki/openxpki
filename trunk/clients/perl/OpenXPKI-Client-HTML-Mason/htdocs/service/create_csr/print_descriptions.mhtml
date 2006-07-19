@@ -1,0 +1,14 @@
+<%args>
+    $descriptions => undef
+</%args>
+<h2><% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS") %></h2>
+<dl>
+% foreach my $label (sort keys %{$descriptions})
+% {
+    <dt><% $label %></dt>
+    <dd>
+      <% $descriptions->{$label} %>
+    </dd>
+% }
+</dl>
+

@@ -137,7 +137,6 @@ OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 OpenXPKI/Server/Workflow/Validator/CertProfile.pm
 OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
-OpenXPKI/Server/Workflow/Validator/PKIRealm.pm
 OpenXPKI/Server/Workflow/Validator/SPKAC.pm
 
 ## User Interface Layers

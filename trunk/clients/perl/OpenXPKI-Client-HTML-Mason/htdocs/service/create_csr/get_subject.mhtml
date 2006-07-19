@@ -61,27 +61,8 @@
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 
-% if (scalar @errors and not $new_form)
-% {
-    <h2><% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST") %></h2>
-    <ul>
-%   foreach my $error (@errors)
-%   {
-      <li><% $error %></li>
-%   }
-    </ul>
-% }
-
-<h2><% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS") %></h2>
-<dl>
-% foreach my $label (sort keys %descriptions)
-% {
-    <dt><% $label %></dt>
-    <dd>
-      <% $descriptions{$label} %>
-    </dd>
-% }
-</dl>
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+<& /service/create_csr/print_descriptions.mhtml, 'descriptions' => \%descriptions &>
 
 <%init>
     my @errors = ();
@@ -146,12 +127,11 @@
                             'keygen'        => $keygen,
                             'subject'       => $subject);
         ## perhaps we should put this into a component like get_error.mhtml?
-        if (scalar @{$msg})
+        if (ref $msg and ref $msg eq "ARRAY" and
+            $msg->[0]->[0] ne 'I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS')
         {
-            foreach my $error (@{$msg})
-            {
-                push @errors, i18nGettext (@{$error});
-            }
+            ## this must be an error
+            push @errors, @{$msg};
         }
     }
 
@@ -163,4 +143,5 @@
     return $subject if (length $subject);
 
     ## ok we have to display the whole stuff
+    @errors = () if ($new_form);
 </%init>

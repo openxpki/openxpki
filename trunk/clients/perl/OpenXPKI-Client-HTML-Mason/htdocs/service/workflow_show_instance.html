@@ -1,0 +1,100 @@
+<%args>
+    $type => undef
+    $id   => undef
+    $msg  => undef
+</%args>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DESCRIPTION') %>
+</p>
+
+%    ## I expect the following:
+%    ## SERVICE_MSG => "COMMAND",
+%    ## COMMAND     => $cmd,
+%    ## PARAMS      => 
+%    ## {
+%    ##     WORKFLOW =>
+%    ##     {
+%    ##         ID      => $id,
+%    ##         STATE   => $state,
+%    ##         CONTEXT => { ... a simple hash ... }
+%    ##     }
+%    ## }
+
+<table>
+  <tr>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE') %></th>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></td>
+    <td><% $msg->{PARAMS}->{WORKFLOW}->{ID} %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE') %></td>
+    <td><% $msg->{PARAMS}->{WORKFLOW}->{STATE} %></td>
+  </tr>
+% foreach my $param (sort keys %{$msg->{PARAMS}->{WORKFLOW}->{CONTEXT}})
+% {
+  <tr>
+    <td><% i18nGettext($param) %></td>
+    <td>
+%   my $value = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param};
+%   if ($value =~ /^(ARRAY|HASH)/)
+%   {
+%      ## serialized stuff
+%      my $ser = OpenXPKI::Serialization::Simple->new();
+%      my $ref = $ser->deserialize($value);
+       <pre>
+%      if ($param eq "cert_info")
+%      {
+%          ## simple hash
+%          foreach my $key (sort keys %{$ref})
+%          {
+<% $key %>::=<% $ref->{$key} %>
+%          }
+%      }
+%      elsif ($param eq "cert_subject_alt_name")
+%      {
+%          ## array of arrays
+%          foreach my $pair (@{$ref})
+%          {
+%              next if (not $pair); ## empty array
+<% $pair->[0] %>::=<% $pair->[1] %>
+%          }
+%      }
+%      else
+%      {
+<% $value %>
+%      }
+       </pre>
+%   } elsif ($param eq "spkac") {
+%      for (my $i = int(length ($value) / 64); $i > 0; $i--)
+%      {
+%          $value = substr ($value, 0, $i*64)."\n".substr($value,$i*64);
+%      }
+       <pre><% $value %></pre>
+%   } else {
+       <% $value %>
+%   }
+    </td>
+  </tr>
+% }
+</table>
+
+<%init>
+    if (not defined $msg or
+        not ref $msg or
+        not ref $msg eq "HASH")
+    {
+        ## ok we have to get the info from the server
+        $msg = $context->{client}->send_receive_command_msg
+               (
+                   "get_workflow_info",
+                   {
+                       "WORKFLOW" => $type,
+                       "ID"       => $id
+                   }
+               );
+    }
+</%init>

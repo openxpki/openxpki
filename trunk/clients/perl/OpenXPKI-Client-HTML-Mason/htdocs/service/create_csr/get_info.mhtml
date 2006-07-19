@@ -1,21 +1,20 @@
 <%args>
-    $profile   => undef
-    $config_nr => undef
-    $keygen    => undef
-    $subject   => undef
+    $role          => undef
+    $subject_style => undef
+    $keygen        => undef
+    $subject       => undef
     $subject_alt_name => undef
-    $info      => undef
-    $CONFIG    => $CONFIG
-    $ARGS      => undef
+    $info          => undef
+    $CONFIG        => undef
 </%args>
 
 <& /service/open_form.mhtml &>
 
-<& /lib/html/hidden.mhtml, 'name' => 'profile',   'value' => $profile &>
-<& /lib/html/hidden.mhtml, 'name' => 'config_nr', 'value' => $config_nr &>
-<& /lib/html/hidden.mhtml, 'name' => 'keygen',    'value' => $keygen &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject',   'value' => $subject &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name', 'value' => $subject_alt_name &>
+<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
+<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name',   'value' => $subject_alt_name &>
 <& /lib/html/hidden.mhtml, 'name' => 'FILLED_INFO_FORM', 'value' => 1 &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_INFO_TITLE') %></h1>
@@ -24,7 +23,7 @@
 </p>
 
 <table>
-% foreach my $item (@{$CONFIG->[$config_nr]->{INFOS}})
+% foreach my $item (@{$CONFIG->{$subject_style}->{INFOS}})
 % {
     <tr>
       <td><% i18nGettext ($item->{LABEL}) %></td>
@@ -38,34 +37,33 @@
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 
-<h2><% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS") %></h2>
-<dl>
-% foreach my $item (@{$CONFIG->[$config_nr]->{INFOS}})
-% {
-    <dt><% i18nGettext ($item->{LABEL}) %></dt>
-    <dd>
-      <% i18nGettext ($item->{DESCRIPTION}) %>
-    </dd>
-% }
-</dl>
+<& /service/create_csr/print_descriptions.mhtml, descriptions => \%descriptions &>
 
 <%init>
     return $info if (defined $info);
     my @errors = ();
+    my $ARGS   = {$m->request_args()};
 
     if ($ARGS->{'FILLED_INFO_FORM'})
     {
         # try to build info
-        foreach my $item (@{$CONFIG->[$config_nr]->{INFOS}})
+        foreach my $item (@{$CONFIG->{$subject_style}->{INFOS}})
         {
             $info->{$item->{NAME}} = $ARGS->{$item->{NAME}};
         }
 
         ## serialize info
-        my $serializer = OpenXPKI::Serialization::Simple->new();
+        ## warnings we must be safe against \n truncation
+        my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
         $info = $serializer->serialize($info);
         return $info;
     }
 
     ## ok we have to display the whole stuff
+    my %descriptions = ();
+    foreach my $item (@{$CONFIG->{$subject_style}->{INFOS}})
+    {
+        $descriptions{i18nGettext ($item->{LABEL})} =
+            i18nGettext ($item->{DESCRIPTION});
+    }
 </%init>

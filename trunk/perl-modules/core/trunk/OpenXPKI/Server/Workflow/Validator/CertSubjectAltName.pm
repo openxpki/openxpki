@@ -7,6 +7,8 @@ use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
 use English;
 use OpenXPKI::Serialization::Simple;
+use Mail::RFC822::Address;
+use Net::IP;
 
 sub validate {
     my ( $self, $wf, $subject_alt_name ) = @_;
@@ -35,6 +37,7 @@ sub validate {
     }
 
     ## now check every subject alternative name component
+    my @fixed = ();
     foreach my $pair (@{$list})
     {
         my $type  = $pair->[0];
@@ -151,6 +154,7 @@ sub validate {
                   "TYPE", $value];
             next;
         }
+        push @fixed, [$type, $value];
     }
 
     ## did we find some errors?
@@ -159,6 +163,12 @@ sub validate {
         $context->param ("__error" => $errors);
         validation_error ($errors->[scalar @{$errors} -1]);
     }
+
+    ## serialize and store the fixed context
+    ## the serialized text must be safe against \n truncation
+    my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
+    $subject_alt_name = $serializer->serialize(\@fixed);
+    $context->param ("cert_subject_alt_name" => $subject_alt_name);
 
     ## return true is senselesse because only exception will be used
     ## but good style :)
