@@ -60,10 +60,13 @@ name: OpenXPKI
 #xmlstyle: all-in-one
 xmlstyle: multi-file
 
-
 [dir]
+
+# common root of distribution ${DESTDIR}
+dest:             /
+
 # common prefix
-prefix:           /usr
+prefix:           $(dir.dest)/usr
 
 # machine-specific files (libraries etc)
 exec_prefix:      $(dir.prefix)
@@ -87,7 +90,7 @@ openxpkiconfdir:  $(dir.sysconfdir)/openxpki
 cadir:            $(dir.openxpkiconfdir)/ca
 
 # data files modified by the application
-localstatedir:    $(dir.prefix)/var
+localstatedir:    $(dir.dest)/var/run
 openxpkistatedir: $(dir.localstatedir)/openxpki
 openxpkisessiondir: $(dir.openxpkistatedir)/session
 
