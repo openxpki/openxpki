@@ -32,7 +32,7 @@ if (-d $instancedir) {
 ok(mkpath $instancedir);
 
 # deployment
-ok(system("openxpkiadm deploy $instancedir") == 0);
+ok(system("openxpkiadm deploy --prefix $instancedir") == 0);
 
 # meta config should now exist
 ok(-e "$config{config_dir}/openxpki.conf");
