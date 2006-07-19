@@ -110,6 +110,7 @@ OpenXPKI/Server/API.pm
 OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
 OpenXPKI/Server/Session.pm
+OpenXPKI/Server/Session/Mock.pm
 OpenXPKI/Server/Authentication.pm
 OpenXPKI/Server/Authentication/Anonymous.pm
 OpenXPKI/Server/Authentication/External.pm
