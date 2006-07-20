@@ -61,6 +61,7 @@
     if (defined $__session_id)
     {
         $m->comp('/authentication/session.mhtml', '__session_id' => $__session_id);
+        $m->comp('/authentication/role.mhtml') if ($context and not exists $context->{role});
     } else {
         undef $context;
     }

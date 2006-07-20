@@ -3,6 +3,10 @@
 </%args>
 
       <div class="content">
-        <form action="authentication/index.html" method="post">
+% my $title = $m->request_comp()->title();
+%    $title =~ s/[^\/]+\//..\//g;
+%    $title =~ s/\/[^\/]*$/\//;
+%    $title =~ s/^\///;
+        <form action="<% $title %>authentication/index.html" method="post">
           <input type="hidden" name="__session_id" value="<% $session_id %>"/>
 
