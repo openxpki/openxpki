@@ -117,7 +117,7 @@ sub collect {
     };
     if ($EVAL_ERROR) {
  	if ($EVAL_ERROR eq "alarm\n") {
- 	    return undef;
+ 	    return;
  	} else {
 	    # FIXME
 	    die $EVAL_ERROR;
@@ -272,7 +272,7 @@ sub is_connected
     # get current session status
     eval
     {
-        my $msg = $self->send_receive_service_msg('STATUS');
+        my $msg = $self->send_receive_service_msg('PING');
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
@@ -283,11 +283,11 @@ sub is_connected
             return 0;
         } else {
             # OpenXPKI::Exception but from where ? => undef
-            return undef;
+            return;
         }
     } elsif ($EVAL_ERROR) {
         # completely unkown die => undef
-        return undef;
+        return;
     }
     return 1;
 }

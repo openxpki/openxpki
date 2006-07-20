@@ -332,6 +332,13 @@ sub run
             exit 0;
         }
 
+        ##! 4: "check for ping"
+        if ($service_msg eq 'PING') {
+	    $self->talk({});
+	    
+	    next MESSAGE;
+        }
+
         ##! 4: "check for get_role"
         if ($service_msg eq 'STATUS') {
 	    # FIXME: translate messages
