@@ -8,6 +8,7 @@ package OpenXPKI::Server::Workflow::Persister::DBI;
 use strict;
 use base qw( Workflow::Persister );
 use utf8;
+use English;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Persister::DBI';
 
@@ -49,47 +50,14 @@ sub init {
 sub create_workflow {
     my $self = shift;
     my $workflow = shift;
-    ##! 1: "create workflow"
+    ##! 1: "create workflow (only id)"
 
     my $id = $self->workflow_id_generator->pre_fetch_id();
 
-    ##! 1: "workflow id: $id"
-
-    my $dbi = CTX('dbi_workflow');
-
-    my %data = (
-	PKI_REALM            => CTX('session')->get_pki_realm(),
-	WORKFLOW_TYPE        => $workflow->type(),
-	WORKFLOW_STATE       => $workflow->state(),
-	WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M' ),
-	);
-
-    if ($id) {
-	$data{WORKFLOW_SERIAL} = $id;
-    }
-
-    ##! 1: "inserting data into workflow table"
-    $dbi->insert(
-	TABLE => $workflow_table,
-	HASH => \%data,
-	);
-
-    if (! $id) {
-	$id = $self->workflow_id_generator->post_fetch_id();
-	if (! $id) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_NO_ID_FROM_SEQUENCE",
-		params  => {
-		    GENERATOR    => ref( $self->workflow_id_generator ),
-		},
-		);
-	}
-    }
-
-    $dbi->commit();
+    ##! 2: "BTW we shredder many workflow IDs here"
 
     CTX('log')->log(
-	MESSAGE  => "Created workflow $id",
+	MESSAGE  => "Created workflow ID $id.",
 	PRIORITY => "info",
 	FACILITY => "system"
 	);
@@ -103,30 +71,59 @@ sub update_workflow {
     
     ##! 1: "update_workflow"
 
-    my $id = $workflow->id();
-    
+    my $id   = $workflow->id();
+    my $dbi  = CTX('dbi_workflow');
     my %data = (
 	WORKFLOW_STATE       => $workflow->state(),
 	WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M' ),
 	);
     
-    my $dbi = CTX('dbi_workflow');
     
-    # save workflow instance...
-    $dbi->update(
-	TABLE  => $workflow_table,
-	DATA   => \%data,
-	WHERE  => {
-	    WORKFLOW_SERIAL => $id,
-	},
-	);
+    ##! 2: "check if the workflow is in the database"
+
+    eval
+    { 
+        my $oldwf = $self->fetch_workflow ($id);
+    };
+    if ($EVAL_ERROR)
+    {
+        ##! 4: "we cannot get the workflow so we try to create it"
+        $data{PKI_REALM}       = CTX('session')->get_pki_realm();
+        $data{WORKFLOW_TYPE}   = $workflow->type();
+	$data{WORKFLOW_SERIAL} = $id;
+
+        ##! 1: "inserting data into workflow table"
+        $dbi->insert(
+            TABLE => $workflow_table,
+            HASH  => \%data,
+        );
+
+        CTX('log')->log(
+            MESSAGE  => "Created workflow $id",
+            PRIORITY => "info",
+            FACILITY => "system"
+        );
+    }
+    else
+    {
+        ##! 4: "really update the workflow"
+
+        # save workflow instance...
+        $dbi->update(
+            TABLE  => $workflow_table,
+            DATA   => \%data,
+            WHERE  => {
+                WORKFLOW_SERIAL => $id,
+            },
+        );
     
-    # ... purge any existing context data...
-    $dbi->delete(TABLE => $context_table,
- 		 DATA  => {
- 		     WORKFLOW_SERIAL => $id,
- 		 },
- 	);
+        # ... purge any existing context data...
+        $dbi->delete(TABLE => $context_table,
+                     DATA  => {
+                         WORKFLOW_SERIAL => $id,
+                     },
+                    );
+    }
     
     # ... and write new context
     my $params = $workflow->context()->param();

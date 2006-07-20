@@ -508,6 +508,7 @@ sub create_workflow_instance {
     };
     if ($EVAL_ERROR)
     {
+        my $eval = $EVAL_ERROR;
         if ($workflow->context->param('__error'))
         {
             return {
@@ -517,20 +518,19 @@ sub create_workflow_instance {
                 }
             }
         }
-        if (substr ($EVAL_ERROR, "The following fields require a value:") > -1)
+        if (index ($eval, "The following fields require a value:") > -1)
         {
             ## missing field(s) in workflow
-            my $fields = $EVAL_ERROR;
-               $fields =~ s/^.*://;
+            $eval =~ s/^.*://;
             return {
                 ERROR => {
                     STACK => [ ["I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
-                                {FIELDS => $fields} ] ],
+                                {FIELDS => $eval} ] ],
                     TYPE  => 'STACK',
                 }
             }
         }
-        $EVAL_ERROR->rethrow();
+        $eval->rethrow();
     }
     
     # commit changes (this is normally not required, as save_workflow()

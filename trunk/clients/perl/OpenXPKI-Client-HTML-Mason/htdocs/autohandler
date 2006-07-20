@@ -56,6 +56,10 @@
 </html>
 % }
 
+% ## connection caching does not really work
+% ## delete $context->{client};
+% delete $session_cache{$context->{session_id}};
+
 <%init>
     use English;
 
