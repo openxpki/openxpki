@@ -56,10 +56,6 @@
 </html>
 % }
 
-% ## connection caching does not really work
-% ## delete $context->{client};
-% delete $session_cache{$context->{session_id}};
-
 <%init>
     use English;
 
@@ -67,7 +63,9 @@
     # has been established a client connection for it.
     if (defined $__session_id)
     {
-        if (defined $session_cache{$__session_id})
+        if (defined $session_cache{$__session_id} and
+            $session_cache{$__session_id}->{client} and
+            $session_cache{$__session_id}->{client}->is_connected())
         {
             # this session has already been established
             $context = $session_cache{$__session_id};

@@ -265,9 +265,32 @@ sub init_session {
 	});
 }
 
+sub is_connected
+{
+    my $self = shift;
 
-
-
+    # get current session status
+    eval
+    {
+        my $msg = $self->send_receive_service_msg('STATUS');
+    };
+    if (my $exc = OpenXPKI::Exception->caught())
+    {
+        if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION')
+        {
+            # could be a timed-out client session
+            # normal missing connection => 0
+            return 0;
+        } else {
+            # OpenXPKI::Exception but from where ? => undef
+            return undef;
+        }
+    } elsif ($EVAL_ERROR) {
+        # completely unkown die => undef
+        return undef;
+    }
+    return 1;
+}
 
 ###########################################################################
 # private methods
@@ -700,6 +723,10 @@ Set socket read timeout (seconds, default: 30).
 
 =head1 DIAGNOSTICS
 
+=head2 is_connected
+
+returns true on a normal established connection. Returns false if the
+connection is missing or something goes wrong during the check.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
