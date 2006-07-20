@@ -60,6 +60,7 @@
     $m->comp ('/lib/debug.mhtml',
               'level' => 1,
               'msg'   => "authentication autohandler finished");
+
 </%perl>
 <%init>
   $r->content_type('text/html; charset=utf-8');

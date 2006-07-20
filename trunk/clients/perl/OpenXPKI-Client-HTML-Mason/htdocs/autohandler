@@ -57,36 +57,12 @@
 % }
 
 <%init>
-    use English;
-
-    # check if we are using an already existing session and if there
-    # has been established a client connection for it.
+    ## if there is a session then re-use it
     if (defined $__session_id)
     {
-        if (defined $session_cache{$__session_id} and
-            $session_cache{$__session_id}->{client} and
-            $session_cache{$__session_id}->{client}->is_connected())
-        {
-            # this session has already been established
-            $context = $session_cache{$__session_id};
-        } else {
-            # try to establish session again
-            #eval
-            #{
-                $m->comp('/authentication/session.mhtml', '__session_id' => $__session_id);
-                $context->{client}->collect()
-                    if ($context->{client}->get_communication_state() eq "can_receive");
-            #};
-            #if ($EVAL_ERROR)
-            #{
-            #    ## session timeout
-            #    ## server restarted
-            #    ## conclusion: session no longer available
-            #    delete $context->{session_id} if (exists $context->{session_id});
-            #}
-        }
+        $m->comp('/authentication/session.mhtml', '__session_id' => $__session_id);
     } else {
-        delete $context->{session_id} if (exists $context->{session_id});
+        undef $context;
     }
     $m->comp ('/lib/language.mhtml', "session_id" => $__session_id);
 </%init>

@@ -11,14 +11,27 @@
             msg   => "__session_id::=".$__session_id."\n".
                      "context->session_id::=".$context->{session_id});
 
-  # check if we are using an already existing and session and if there
-  # has been established a client connection for it.
-  if (exists $context->{session_id} and
-      exists $context->{client})
+  ## prepare the context if necessary
+  if (defined $__session_id and
+      exists $session_cache{$__session_id})
+  {
+      ## the session ID is defined an it is cached
+      ## we have to update the context appropriately
+      $context = $session_cache{$__session_id};
+  } else {
+      undef $context;
+  }
+      
+  # check if we are using an already existing session
+  # check if the session has working connection
+  if (defined $context and
+      exists $context->{session_id} and
+      exists $context->{client} and
+      $context->{client}->is_connected())
   {
       # this session has already been established and is in the context
       # we ignore the context if the client connection is down
-      return $session_cache{$context->{session_id}};
+      return 1;
   }
 
   # FIXME: don't use environment but rather a proper configuration
@@ -28,21 +41,23 @@
           SOCKETFILE => $socketfile,
       });
 
-  if (not defined $__session_id)
-  {
-      ## try to get session_id directly from the form data
-      my %request = $m->request_args();
-      $__session_id = $request{'__session_id'} if (exists $request{'__session_id'});
-  }
-  
   my %args;
   if (defined $__session_id) {
       # this may happen after a restart: the client still knows its session
       # ID, but we were restarted and the session cache is empty.
       # try to recreate the session based on the given session_id.
-      $args{SESSION_ID} = $__session_id;
+      eval {
+          $client->init_session({SESSION_ID => $__session_id});
+      };
+      if ($EVAL_ERROR)
+      {
+          ## kill session
+          undef $context;
+          return undef;
+      }
+  } else {
+      $client->init_session();
   }
-  $client->init_session(\%args);
   $__session_id = $client->get_session_id();
   $session_cache{$__session_id}->{client} = $client;
   $session_cache{$__session_id}->{session_id} = $__session_id;
@@ -51,5 +66,10 @@
   $m->comp ('/lib/debug.mhtml',
             'level' => 1,
             'msg'   => 'finished with session_id '.$context->{session_id});
-  ## the next message is get_pki_realm, get_auth_stack, login or service_ready
+
+   ## bring the interface in a safe state if necessary
+   $context->{msg} = $context->{client}->collect()
+       if ($context->{client}->get_communication_state() eq "can_receive");
+
+   ## the message is get_pki_realm, get_auth_stack, login or service_ready
 </%init>
