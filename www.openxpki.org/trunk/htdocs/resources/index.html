@@ -74,31 +74,40 @@
         </ul>
         <h3>Subversion structure</h3>
         <p>
-          We use the version control system from SourceForge. The actual structure under trunk
-          is the following one:</p>
-        <dl>
-          <dt class="sourcecode">trunk/perl-modules/</dt>
-          <dd>
-            <dl>
-              <dt class="sourcecode">trunk/perl-modules/core/</dt>
-              <dd>
-                <dl>
-                  <dt class="sourcecode">trunk/perl-modules/core/trunk/</dt>
-                  <dd>the most up-to-date core development</dd>
-                </dl>
-              </dd>
-            </dl>
-          </dd>
-          <dt class="sourcecode">www.openxpki.org/</dt>
-          <dd>
-            <dl>
-              <dt class="sourcecode">www.openxpki.org/trunk/update_www_openxpki_org</dt>
-              <dd>A script to update the web servers</dd>
-              <dt class="sourcecode">www.openxpki.org/trunk/htdocs</dt>
-              <dd>The web pages itself</dd>
-            </dl>
-          </dd>
-        </dl>
+          We use the version control system from SourceForge. 
+          It contains the most up-to-date development code.
+          The actual structure under /
+          (svn root) is the following one:</p>
+<dl>
+<dt class="sourcecode">/trunk/</dt>
+  <dd><dl>
+  <dt class="sourcecode">perl-modules/core/trunk/</dt>
+    <dd>Core for server part</dd>
+  <dt class="sourcecode">clients/perl/</dt>
+    <dd>Client parts</dd>
+  <dt class="sourcecode">deployment/</dt>
+    <dd>Deployment tools</dd>
+  <dt class="sourcecode">i18n/</dt>
+    <dd>Internationalization of the user interface</dd>
+  <dt class="sourcecode">package/</dt>
+    <dd><dl>
+    <dt class="sourcecode">debian/</dt>
+      <dd>Tools to build fresh Debian Linux package</dd>
+    <dt class="sourcecode">freebsd/</dt>
+      <dd>FreeBSD port and tools to update it</dd>
+    </dl></dd>
+  </dl></dd>
+<dt class="sourcecode">/www.openxpki.org/trunk/</dt>
+  <dd><dl>
+  <dt class="sourcecode">src/</dt>
+    <dd>Sources for the web pages</dd>
+  <dt class="sourcecode">htdocs/</dt>
+    <dd>The web pages themselves</dd>
+  <dt class="sourcecode">update_www_openxpki_org</dt>
+    <dd>A script to update the web servers</dd>
+  </dl></dd>
+</dl>
+
       </div> <!-- content -->
 
       <div id="footer">
