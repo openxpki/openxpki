@@ -1,9 +1,12 @@
 #!/bin/sh
 
-MAKE=gmake
+MAJOR_VERSION="0.9"
+
 MAIN_DIR=`cd ../../../.. && pwd`
-TARBALLS_DIR=${MAIN_DIR}
-echo MAIN_DIR is ${MAIN_DIR} 
+PORTS="${MAIN_DIR}/openxpki/trunk/package/freebsd/usr/ports"
+TARBALLS_DIR="${PORTS}/distfiles/openxpki"
+PORTFILE="${PORTS}/security/p5-openxpki/Makefile"
+MAKE=gmake
 MV="mv -f"
 
 make-clean () {
@@ -90,6 +93,39 @@ do
 	make clean	
 done
 
+#---------------- Makefile for port ----------------------
+
+cd ${TARBALLS_DIR}
+S=`ls OpenXPKI-${MAJOR_VERSION}.*.gz`
+C1=`ls OpenXPKI-Client-${MAJOR_VERSION}.*.gz`
+C2=`ls OpenXPKI-Client-SCEP-${MAJOR_VERSION}.*.gz`
+C3=`ls OpenXPKI-Client-SOAP-Lite-${MAJOR_VERSION}.*.gz`
+C4=`ls OpenXPKI-Client-CLI-${MAJOR_VERSION}.*.gz`
+C5=`ls OpenXPKI-Client-HTML-Mason-${MAJOR_VERSION}.*.gz`
+D=`ls openxpki-deployment-${MAJOR_VERSION}.*.gz`
+I=`ls openxpki-i18n-${MAJOR_VERSION}.*.gz`
+
+MINOR_VERSION=`echo $S | sed -e "s/OpenXPKI-${MAJOR_VERSION}\.\(.*\)\.tar\.gz/\1/"`
+
+sed \
+ -e "s/\(PORTVERSION=	${MAJOR_VERSION}\.\).*$/\1${MINOR_VERSION}/" \
+ -e "s/OpenXPKI-${MAJOR_VERSION}\..*\.gz/${S}/" \
+ -e "s/OpenXPKI-Client-${MAJOR_VERSION}\..*\.gz/${C1}/" \
+ -e "s/OpenXPKI-Client-SCEP-${MAJOR_VERSION}\..*\.gz/${C2}/" \
+ -e "s/OpenXPKI-Client-SOAP-Lite-${MAJOR_VERSION}\..*\.gz/${C3}/" \
+ -e "s/OpenXPKI-Client-CLI-${MAJOR_VERSION}\..*\.gz/${C4}/" \
+ -e "s/OpenXPKI-Client-HTML-Mason-${MAJOR_VERSION}\..*\.gz/${C5}/" \
+ -e "s/openxpki-deployment-${MAJOR_VERSION}\..*\.gz/${D}/" \
+ -e "s/openxpki-i18n-${MAJOR_VERSION}\..*\.gz/${I}/" -i .bak ${PORTFILE}
+
+cd ${PORTS} 
+cp -R /usr/ports/Mk .
+cd security/p5-openxpki
+make makesum PORTSDIR=${PORTS}
+rm -r ${PORTS}/Mk
+
 echo Your TARBALLS have gone into directory ${TARBALLS_DIR}
+echo Makefile and distinfo files modified in directory ${PORTS}/security/p5-openxpki
+
 exit
 

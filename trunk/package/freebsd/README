@@ -1,3 +1,5 @@
+== PORT FOR RELEASE ==
+
 OpenXPKI is included into the distribution of the basic 
 FreeBSD system as a regular port under the FreeBSD name
 "security/p5-openxpki":
@@ -5,15 +7,16 @@ FreeBSD system as a regular port under the FreeBSD name
 http://www.freebsd.org/ports/security.html
 
 This port installs all tools of openxpki 
-(server-side, client-side, deployment) in one move.
+(server-side, client-side, deployment, i18n) in one move.
+
 You have to undergo subsequent deployment stage by hand.
-This will specify the role, which your computer plays inside the 
+This will specify the role, which your computer plays in the 
 PKI infrastructure.
 
 It is very much NOT recommended to copy only one port
 security/p5-openxpki onto your computer, if you wish to install it.
-This port depends on about 100 other ports. 
-Thus it is vitally important to have the entire port collection 
+This port depends on dozens of other ports. 
+Thus it is essential to have the entire port collection 
 (present on your computer) in a self-consistent state and 
 in accord with your base system.
 
@@ -24,8 +27,12 @@ Recommended procedure to make use of the port is:
 http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/ports-using.html 
 
 2. 
-cd /usr/ports/sysutils/portupgrade && make reinstall clean && rehash
-portupgrade -NrR security/p5-openxpki
+cd /usr/ports/sysutils/portupgrade && make reinstall clean
+/usr/local/sbin/portupgrade -NrR security/p5-openxpki
+
+(Appropriate tarballs of openxpki will be fetched automatically. 
+Alternatively, you can fetch tarballs of openxpki by hand 
+and place them into /usr/ports/distfiles/openxpki/)
 
 3. Install your favorite database and web server.
 
@@ -34,10 +41,26 @@ portupgrade -NrR security/p5-openxpki
 Just in case: FreeBSD employs one and the same port collection 
 in ALL (stable, current, legacy) versions of FreeBSD.
 
+The latest security/p5-openxpki port aims at version openxpki-0.9.402,
+which has a status of intermediate snapshot meant for 
+experiments with openxpki suite.
+
+== PORT FOR SNAPSHOT ==
+
+If you are impatient and want to play with more recent snapshots of 
+openxpki, you may try "svn update" and run script 
+".../trunk/package/freebsd/build-dist-and-update-port.sh".
+This will build tarballs and place them into 
+".../trunk/package/freebsd/usr/ports/distfiles/openxpki/".
+Then it will attempt to modify Makefile of the port located in the 
+".../trunk/package/freebsd/usr/ports/security/openxpki/Makefile".
+Checksums for tarballs will be updated too.
+
+Please note, that thus modified port may need manual trimming especially 
+in the case when files has been added or removed since last 
+revision of openxpki, which was officially submitted to the FreeBSD repository.
+
 If you find issues with this FreeBSD port, please contact
 port maintainer svysh@cryptocom.ru
 
-The latest security/p5-openxpki port aims at version openxpki-0.9.342,
-which has a status of intermediate snapshot meant for 
-preliminary experiments with openxpki.
 
