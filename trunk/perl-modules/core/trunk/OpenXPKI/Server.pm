@@ -141,8 +141,11 @@ sub exception_as_string {
 	$msg = $exc;
     } elsif (ref $exc eq 'OpenXPKI::Exception') {
 	$msg = $exc->full_message() || '<no message>';
-	if ($exc->child()) {
-	    $msg .= '; CHILD: [' . exception_as_string($exc->child()) . ']'
+	if ($exc->message()->{children}) {
+            foreach my $child (@{$exc->message()->{children}})
+            {
+	        $msg .= '; CHILD: [' . exception_as_string($child) . ']';
+            }
 	}
     } elsif (ref $exc) {
 	$msg = $EVAL_ERROR->message();

@@ -145,19 +145,15 @@ sub __init_session : PRIVATE {
         };
 	if ($EVAL_ERROR) {
 	    my $error = 'I18N_OPENXPKI_SEVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED';
-	    $self->talk(
-	        $self->__get_error(
-		    {
-			ERROR => $error,
-			EXCEPTION => $EVAL_ERROR,
-		    }));
+            $self->__send_error ({ERROR     => $error,
+                                  EXCEPTION => $EVAL_ERROR});
 	    
 	    if (my $exc = OpenXPKI::Exception->caught())
 	    {
 		OpenXPKI::Exception->throw (
-		    message => $error,
-		    params  => {ID => $msg->{SESSION_ID}},
-		    child   => $exc);
+		    message  => $error,
+		    params   => {ID => $msg->{SESSION_ID}},
+		    children => [ $exc ]);
 	    } else {
 		OpenXPKI::Exception->throw
 		    (
@@ -195,12 +191,8 @@ sub __init_session : PRIVATE {
     {
         ##! 4: "illegal session init"
 	my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND';
-	$self->talk(
-	    $self->__get_error(
-	        {
-		    ERROR => $error,
-		}));
-
+	$self->__send_error ({ ERROR => $error });
+ 
         OpenXPKI::Exception->throw(
 	    message => $error,
 	    params  => {COMMAND => $msg->{COMMAND}}
@@ -307,13 +299,9 @@ sub run
 	last MESSAGE unless defined $data;
 
 	my $service_msg = $data->{SERVICE_MSG};
-	if (! defined $service_msg) {
-	    $self->talk(
-	        $self->__get_error(
-		    {
-			ERROR => 'I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE',
-		    }));
-	    
+	if (! defined $service_msg) 
+        {
+	    $self->__send_error({ ERROR => 'I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE' });
 	    next MESSAGE;
 	}			
 
@@ -393,23 +381,23 @@ sub run
 		    };
 		    if ($EVAL_ERROR) {
 			##! 14: "Exception caught during command execution"
-			$self->talk(
-			    $self->__get_error(
-			        {
-				    ERROR => 'I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED',
-				    EXCEPTION => $EVAL_ERROR,
-				}));
+			$self->__send_error(
+			{
+                            ## this error is senseless and it breaks the error tree
+                            ## we already have useful error message
+			    ## ERROR     => 'I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED',
+			    EXCEPTION => $EVAL_ERROR,
+			});
 			
 			next MESSAGE;
 		    }
 
 		    # sanity checks on command reply
 		    if (! defined $result || ref $result ne 'HASH') {
-			$self->talk(
-			    $self->__get_error(
-			        {
-				    ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE",
-				}));
+			$self->__send_error(
+			{
+			    ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE",
+			});
 
 			next MESSAGE;
 		    }
@@ -421,20 +409,18 @@ sub run
 		}
 	    }
 
-	    $self->talk(
-	        $self->__get_error(
-		    {
-			ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND",
-		    }));
+	    $self->__send_error(
+	    {
+		ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND",
+	    });
 
 	    next MESSAGE;
 	}
 
-	$self->talk(
-	    $self->__get_error(
-	        {
-		    ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
-		}));
+	$self->__send_error(
+	{
+	    ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
+	});
     }
 
     return 1;
@@ -510,6 +496,23 @@ sub get_passwd_login
 #########################################
 ##     end native service messages     ##
 #########################################
+
+##################################
+##     begin error handling     ##
+##################################
+
+sub __send_error
+{
+    my $self = shift;
+    my $params = shift;
+
+    return $self->talk({SERVICE_MSG => "ERROR",
+                        LIST        => [ $self->__get_error ($params) ] });
+}
+
+################################
+##     end error handling     ##
+################################
 
 1;
 __END__

@@ -1,0 +1,28 @@
+<%args>
+    $msg => undef
+</%args>
+<%init>
+    return if (not $msg);
+    return if (not ref $msg);
+    return if ($msg->{SERVICE_MSG} ne "ERROR");
+
+    ## print Dumper($msg);
+    return get_deep_errors ($msg->{LIST});
+
+    sub get_deep_errors
+    {
+        my $list  = shift;
+        my @error = ();
+
+        foreach my $item (@{$list})
+        {
+            if (exists $item->{CHILDREN})
+            {
+                push @error, get_deep_errors ($item->{CHILDREN});
+            } else {
+                push @error, $item;
+            }
+        }
+        return @error;
+    }
+</%init>

@@ -113,42 +113,49 @@ sub __get_error {
 
     ##! 128: Dumper $arg
     
-    if (! exists $arg->{ERROR} || (ref $arg->{ERROR} ne '')) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_ERROR_INVALID_PARAMETERS",
-	    params => {
-		PARAMETER => 'ERROR',
-	    }
-	    );
+    ##! 2: "setup errors array"
+    my @errors = ();
+    if ($arg->{ERRORS})
+    {
+        push @errors, @{$arg->{ERRORS}};
+    }
+    if (exists $arg->{ERROR})
+    {
+        push @errors, $arg->{ERROR};
+    }
+    if (exists $arg->{EXCEPTION})
+    {
+        push @errors, $arg->{EXCEPTION};
+    }
+    if (exists $arg->{EXCEPTIONS})
+    {
+        push @errors, @{$arg->{EXCEPTIONS}};
     }
 
-    my $result = {
-	ERROR => $arg->{ERROR},
-    };
-
-    if (exists $arg->{PARAMS}) {
-	if (ref $arg->{PARAMS} ne 'HASH') {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVICE_DEFAULT_GET_ERROR_INVALID_PARAMETERS",
-		params => {
-		    PARAMETER => 'PARAMS',
-		}
-		);
-	}
-	$result->{PARAMS} = $arg->{PARAMS};
+    ##! 2: "normalize error list"
+    my @list = ();
+    foreach my $error (@errors)
+    {
+        if (not ref $error)
+        {
+            ## this is an error
+            push @list, {LABEL => $error};
+        }
+        else
+        {
+            ## this is an exception
+            my %hash = (LABEL => $error->message()->{message});
+            $hash{PARAMS} = $error->message()->{params}
+                if (exists $error->message()->{params});
+            $hash{CHILDREN} = [ $self->__get_error ({EXCEPTIONS => $error->message()->{children}}) ]
+                if (exists $error->message()->{children});
+            push @list, \%hash;
+        }
     }
-    if (exists $arg->{EXCEPTION}) {
-	$result->{EXCEPTION} = $arg->{EXCEPTION};
-	$result->{EXCEPTION_AS_STRING} = OpenXPKI::Server::exception_as_string($arg->{EXCEPTION});
-    }
 
-    $result->{ERROR_MESSAGE} = i18nGettext($result->{ERROR}, %{$result->{PARAMS}});
-    ##! 128: Dumper $result
-    
-    return $result;
+    ##! 1: "return serialized error list"
+    return @list;
 }
-
-
 
 1;
 
@@ -186,12 +193,26 @@ Gets OpenXPKI::Server::API object.
 
 =head3 __get_error
 
-Expects named arguments 'ERROR' (required) and 'PARAMS' (optional).
-ERROR must be a scalar indicating an I18N message, PARAMS are optional
-variables (just like params in OpenXPKI Exceptions).
+Expects the following named parameters:
 
-Returns a hash reference containing the original named parameters ERROR and
-PARAMS (if specified) the corresponding i18n translation (in ERROR_MESSAGE).
+=over
 
-Throws an exception if named argument ERROR is not a scalar.
+=item * ERROR
+
+a single error string or an array reference (please see the array
+description below)
+
+=item * ERRORS
+
+a list of error like described for the ERROR parameter
+
+=item * EXCEPTION
+
+a single OpenXPKI::Exception
+
+=item * EXCEPTIONS
+
+an array of OpenXPKI::Exception
+
+=back
 

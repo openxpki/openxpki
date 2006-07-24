@@ -44,35 +44,13 @@
     if (not ref $msg)
     {
         ## ups, this is completely unexpected
-        $errors = [ [ $msg ] ];
+        $errors = [ {LABEL => $msg} ];
     }
-    elsif (exists $msg->{PARAMS} and
-        exists $msg->{PARAMS}->{ERROR})
+    elsif (exists $msg->{SERVICE_MSG} and
+           $msg->{SERVICE_MSG} eq "ERROR")
     {
-        ## detected workflow error
-        if ($msg->{PARAMS}->{ERROR}->{TYPE} eq "STACK")
-        {
-            $errors = $msg->{PARAMS}->{ERROR}->{STACK};
-        } else {
-            $errors = [ [ $msg->{PARAMS}->{ERROR}->{MESSAGE}] ];
-        }
-    }
-    elsif (exists $msg->{ERROR})
-    {
-        ## general error
-        if (not ref $msg->{ERROR})
-        {
-            ## this is CODE exception from the server !!!
-            $errors = [ [ Dumper ($msg) ] ];
-        }
-        elsif ($msg->{ERROR}->{TYPE} eq "STACK")
-        {
-            $errors = $msg->{ERROR}->{STACK};
-        }
-        else
-        {
-            $errors = [ [ $msg->{ERROR}->{MESSAGE} ] ];
-        }
+        ## detected error
+        $errors = [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ];
     }
     $key = "" if (scalar @{$errors});
 
@@ -84,30 +62,18 @@
                           {WORKFLOW => "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY",
                            PARAMS   => {"private_key" => $key,
                                         "workflow_id" => $msg->{WORKFLOW}->{ID}}});
-        if (exists $key_msg->{ERROR})
+        if (exists $key_msg->{SERVICE_MSG} and
+            $key_msg->{SERVICE_MSG} eq "ERROR")
         {
             ## FIXME: uups, we got a real problem the CSR is in the database
             ## FIXME: but not the private key !!!
             ## FIXME: can we log this event to system.fatal ?
-            if ($key_msg->{ERROR}->{TYPE} eq "STACK")
-            {
-                $errors = $key_msg->{ERROR}->{STACK};
-            } else {
-                $errors = [ [ $key_msg->{ERROR}->{MESSAGE} ] ];
-            }
+            $errors = [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ];
         }
     }
 
     ## handle errors
-    if (scalar @{$errors})
-    {
-        my @list = ();
-        foreach my $item (@{$errors})
-        {
-            push @list, [ $item->[0], %{$item->[1]} ];
-        }
-        return \@list;
-    }
+    return $errors if (scalar @{$errors});
 
     ## this should be a serial number of the workflow
     return $msg;

@@ -94,8 +94,8 @@ sub set_header_attribute
     if (my $exc = OpenXPKI::Exception->caught())
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OBJECT_SET_HEADER_ATTRIBUTE_REINIT_FAILED",
-            child   => $exc);
+            message  => "I18N_OPENXPKI_CRYPTO_OBJECT_SET_HEADER_ATTRIBUTE_REINIT_FAILED",
+            children => [ $exc ]);
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     }

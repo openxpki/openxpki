@@ -176,8 +176,8 @@ sub __add_token
         delete $self->{TOKEN}->{$realm}->{$type}->{$name}
             if (exists $self->{TOKEN}->{$realm}->{$type}->{$name});
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_CREATE_FAILED",
-            child   => $exc);
+            message  => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_CREATE_FAILED",
+            children => [ $exc ]);
     }
 
     if (! defined $self->{TOKEN}->{$realm}->{$type}->{$name}) {

@@ -97,8 +97,8 @@ sub set_cert_list
             if (my $exc = OpenXPKI::Exception->caught())
             {
                 OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
-                    child   => $exc);
+                    message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
+                    children => [ $exc ]);
             } elsif ($EVAL_ERROR) {
                 $EVAL_ERROR->rethrow();
             }

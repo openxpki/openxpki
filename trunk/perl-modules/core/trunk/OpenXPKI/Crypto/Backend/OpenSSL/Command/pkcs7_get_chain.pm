@@ -105,8 +105,8 @@ sub get_result
         {
             ##! 8: "OpenXPKI exception detected"
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_WRONG_SIGNER",
-                child   => $exc);
+                message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_WRONG_SIGNER",
+                children => [ $exc ]);
         } elsif ($EVAL_ERROR) {
             ##! 8: "general exception detected"
             $EVAL_ERROR->rethrow();

@@ -7,7 +7,7 @@
     <ul>
 %   foreach my $error (@errors)
 %   {
-      <li><% i18nGettext(@{$error}) %></li>
+      <li><% i18nGettext($error->{LABEL}, %{$error->{PARAMS}}) %></li>
 %   }
     </ul>
 % }

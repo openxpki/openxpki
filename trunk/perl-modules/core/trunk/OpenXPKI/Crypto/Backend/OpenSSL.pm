@@ -129,11 +129,11 @@ sub __load_config
 	    if (! $is_optional{uc($key)}) {
 		##! 16: "argument $key is not optional, escalating"
 		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INCOMPLETE_CONFIGURATION",
-		    child   => $exc,
-		    params  => {"NAME" => $name, 
-				"TYPE" => $type_path, 
-				"ATTRIBUTE" => $key,
+		    message  => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INCOMPLETE_CONFIGURATION",
+		    children => [ $exc ],
+		    params   => {"NAME" => $name, 
+			 	 "TYPE" => $type_path, 
+			 	 "ATTRIBUTE" => $key,
 		    },
 		    );
 	    }
@@ -203,8 +203,8 @@ sub __init_engine
     if (my $exc = OpenXPKI::Exception->caught())
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_NEW_FAILED",
-            child   => $exc);
+            message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_NEW_FAILED",
+            children => [ $exc ]);
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     }
@@ -264,8 +264,8 @@ sub __init_shell
     if (my $exc = OpenXPKI::Exception->caught())
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_CLI_FAILED",
-            child   => $exc);
+            message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_CLI_FAILED",
+            children => [ $exc ]);
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     }
@@ -360,9 +360,9 @@ sub command
     {
         $self->{CLI}->cleanup(); ## this is safe
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_FAILED",
-            params  => {"COMMAND" => $cmd},
-            child   => $exc);
+            message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_FAILED",
+            params   => {"COMMAND" => $cmd},
+            children => [ $exc ]);
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     } else {

@@ -149,8 +149,8 @@ sub __load_handler
     {
         ##! 16: "exception from authentication sub module $type detected"
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOAD_HANDLER_FAILED",
-            child   => $exc);
+            message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOAD_HANDLER_FAILED",
+            children => [ $exc ]);
     }
     elsif ($EVAL_ERROR)
     {
@@ -237,14 +237,14 @@ sub login
         if (my $exc = OpenXPKI::Exception->caught())
         {
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
-                child   => $exc);
+                message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
+                children => [ $exc ]);
         }
         else
         {
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
-                child   => $EVAL_ERROR->message());
+                message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
+                children => [ $EVAL_ERROR->message() ]);
         }
     }
 

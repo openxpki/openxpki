@@ -84,7 +84,7 @@
                             'subject_alt_name' => $subject_alt_name);
         ## perhaps we should put this into a component like get_error.mhtml?
         if (ref $msg and ref $msg eq "ARRAY" and
-            $msg->[0]->[0] ne 'I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS')
+            $msg->[0]->{LABEL} ne 'I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS')
         {
             ## this must be an error
             push @errors, @{$msg};

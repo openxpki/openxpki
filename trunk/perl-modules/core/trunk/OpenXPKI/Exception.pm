@@ -17,7 +17,7 @@ use OpenXPKI::i18n qw( i18nGettext );
 use Exception::Class (
     "OpenXPKI::Exception" =>
     {
-        fields => [ "errno", "child", "params" ],
+        fields => [ "children", "params" ],
     }
 );
 
@@ -27,13 +27,19 @@ sub full_message
     my ($self) = @_;
 
     ## respect child errors
-    if (ref $self->{child})
+    if (ref $self->{children})
     {
-        $self->{params}->{"ERRVAL"} = $self->{child}->as_string();
-        $self->{params}->{"ERRNO"}  = $self->{child}->get_errno()
-            if ($self->{errno} and $self->{child}->get_errno());
-    } elsif ($self->{child}) {
-        $self->{params}->{"ERRVAL"} = $self->{child};
+        foreach my $child (@{$self->{children}})
+        {
+            next if (not $child); ## empty array
+            $self->{params}->{"ERRVAL"} .= " " if ($self->{params}->{"ERRVAL"});
+            if (ref $child)
+            {
+                $self->{params}->{"ERRVAL"} .= $child->as_string();
+            } else {
+                $self->{params}->{"ERRVAL"} = $self->{child};
+            }
+        }
     }
 
     ## enforce __NAME__ scheme

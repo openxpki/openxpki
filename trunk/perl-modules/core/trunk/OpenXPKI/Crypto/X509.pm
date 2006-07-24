@@ -62,8 +62,8 @@ sub __init
     if (my $exc = OpenXPKI::Exception->caught())
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_X509_INIT_OBJECT_FAILED",
-            child   => $exc);
+            message  => "I18N_OPENXPKI_CRYPTO_X509_INIT_OBJECT_FAILED",
+            children => [ $exc ]);
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
     }
@@ -276,8 +276,8 @@ sub get_converted
         if (my $exc = OpenXPKI::Exception->caught())
         {
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_CONVERSION_FAILED",
-                child   => $exc);
+                message  => "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_CONVERSION_FAILED",
+                children => [ $exc ]);
         } elsif ($EVAL_ERROR) {
             $EVAL_ERROR->rethrow();
         }

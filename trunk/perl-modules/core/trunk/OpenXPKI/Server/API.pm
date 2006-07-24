@@ -470,68 +470,54 @@ sub create_workflow_instance {
     # - it must have a state called 'CREATED' that is reached by executing
     #   'create'
 
+    my $state = undef;
     eval
     {
-        my $state = $workflow->execute_action('create');
-
-        if ($state ne 'CREATED') {
-            my $error = $workflow->context->param('__error');
-            if (defined $error) {
-                if (ref $error eq '')
-                {
-                    return
-                    {
-                     ERROR =>
-                     {
-                      MESSAGE => $error,
-                      TYPE => 'PLAIN',
-                     }
-                    }
-                }
-                if (ref $error eq 'ARRAY')
-                {
-                    return {
-                        ERROR => {
-                                  STACK => $error,
-                                  TYPE => 'STACK',
-                        }
-                    }
-                } 
-            }
-            return {
-                ERROR => {
-                MESSAGE => 'I18N_WF_ERROR_ILLEGAL_STATE',
-                TYPE => 'PLAIN',
-                }
-            }
-        }
+        $state = $workflow->execute_action('create');
     };
-    if ($EVAL_ERROR)
-    {
+
+    if ($EVAL_ERROR or $state ne 'CREATED') {
         my $eval = $EVAL_ERROR;
-        if ($workflow->context->param('__error'))
-        {
-            return {
-                ERROR => {
-                    STACK => $workflow->context->param('__error'),
-                    TYPE  => 'STACK',
-                }
+        my $error = $workflow->context->param('__error');
+        if (defined $error) {
+            if (ref $error eq '')
+            {
+                OpenXPKI::Exception->throw (
+                    message => $error);
             }
-        }
-        if (index ($eval, "The following fields require a value:") > -1)
-        {
-            ## missing field(s) in workflow
-            $eval =~ s/^.*://;
-            return {
-                ERROR => {
-                    STACK => [ ["I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
-                                {FIELDS => $eval} ] ],
-                    TYPE  => 'STACK',
+            if (ref $error eq 'ARRAY')
+            {
+                my @list = ();
+                foreach my $item (@{$error})
+                {
+                    eval {
+                        use Data::Dumper;
+                        OpenXPKI::Exception->throw ({
+                            message => $item->[0],
+                            params  => $item->[1]});
+                    };
+                    push @list, $EVAL_ERROR;
                 }
-            }
+                OpenXPKI::Exception->throw ({
+                    message  => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED",
+                    children => [ @list ]});
+            } 
         }
-        $eval->rethrow();
-    }
+        if ($eval)
+        {
+            if (index ($eval, "The following fields require a value:") > -1)
+            {
+                ## missing field(s) in workflow
+                $eval =~ s/^.*://;
+                OpenXPKI::Exception->throw ({
+                    message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
+                    params  => {FIELDS => $eval}});
+            }
+            $eval->rethrow();
+        }
+        OpenXPKI::Exception->throw ({
+                message => 'I18N_WF_ERROR_ILLEGAL_STATE'});
+    };
     
     # commit changes (this is normally not required, as save_workflow()
     # is usually called by execute_action() but in this case we are destroying
