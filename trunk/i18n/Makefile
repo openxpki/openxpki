@@ -4,9 +4,9 @@ PREFIX?=	/usr
 LOCALE_DIR   = $(DESTDIR)$(PREFIX)/share/locale
 MO_FILE      = openxpki.mo
 INSTALL      = install
-LANG         = en_GB de_DE
-PO_SOURCES   = $(LANG:%=%/openxpki.po)
-MO_TRANSLATIONS = $(LANG:%=%/$(MO_FILE))
+LANGS         = en_GB de_DE
+PO_SOURCES   = $(LANGS:%=%/openxpki.po)
+MO_TRANSLATIONS = $(LANGS:%=%/$(MO_FILE))
 POT_SOURCES  = ../perl-modules ../clients ../deployment
 
 #---- variable settings above, rules below ----
@@ -14,7 +14,7 @@ POT_SOURCES  = ../perl-modules ../clients ../deployment
 .PHONY:	default test install clean clean.local distclean openxpki.pot
 
 default::	$(MO_TRANSLATIONS)
-	@echo Languages: $(LANG)
+	@echo Languages: $(LANGS)
 
 $(PO_SOURCES):	openxpki.pot
 	@if (test ! -d $(@:openxpki.po=)); then echo creating directory for $(@:openxpki.po=); mkdir $(@:openxpki.po=); fi
@@ -30,9 +30,9 @@ scan:
 	sh build-pot.sh $(POT_SOURCES) > openxpki.pot
 	make $(PO_SOURCES)
 
-install::	$(LANG)
+install::	$(LANGS)
 	make install_dir DIR=$(LOCALE_DIR)
-	set -e; for lang in $(LANG); do \
+	set -e; for lang in $(LANGS); do \
 		make install_dir DIR=$(LOCALE_DIR)/$$lang; \
 		make install_dir DIR=$(LOCALE_DIR)/$$lang/LC_MESSAGES; \
 		$(INSTALL) -m 644 $$lang/$(MO_FILE) $(LOCALE_DIR)/$$lang/LC_MESSAGES/$(MO_FILE); \
