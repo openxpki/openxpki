@@ -1,45 +1,97 @@
 # OpenXPKI::Client::SCEP
-# Written 2006 by Martin Bartosch for the OpenXPKI project
+# Written 2006 by Alexander Klink for the OpenXPKI project
 # (C) Copyright 2006 by The OpenXPKI Project
 # $Revision: 244 $
 
 package OpenXPKI::Client::SCEP;
 
 use base qw( OpenXPKI::Client );
+use OpenXPKI::Server::Context qw( CTX );
 
 use version; 
 use version; 
 ($OpenXPKI::Client::SCEP::VERSION = '$Revision: 342 $' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
 $VERSION = qv($VERSION);
 
-use warnings;
-use strict;
-use Carp;
-use English;
+{
+    use warnings;
+    use strict;
+    use Carp;
+    use English;
 
-use Class::Std;
+    use Class::Std;
 
-#use Smart::Comments;
-#use Data::Dumper;
+    use OpenXPKI::i18n qw( i18nGettext );
+    use OpenXPKI::Debug 'OpenXPKI::Client::SCEP';
+    use OpenXPKI::Exception;
 
-use OpenXPKI qw( i18nGettext );
-use OpenXPKI::Debug 'OpenXPKI::Client::SCEP';
-use OpenXPKI::Exception;
+    my %operation_of :ATTR( :init_arg<OPERATION> ); # SCEP operation
+    my %message_of   :ATTR( :init_arg<MESSAGE>   ); # SCEP message
+    my %realm_of     :ATTR( :init_arg<REALM>     ); # PKI realm to use
 
+    my %allowed_op = map { $_ => 1 } qw(
+        GetCACaps
+        GetCACert
+        GetNextCACert
+        GetCACertChain
 
+        PKIOperation
+    );
 
+    sub START {
+        my ($self, $ident, $arg_ref) = @_;
+        my $realm = $realm_of{$ident};
+        
+        # send configured realm, collect response
+        ##! 4: "before talk"
+        $self->talk('SELECT_PKI_REALM ' . $realm);
+        my $message = $self->collect();
+        if ($message eq 'NOTFOUND') {
+            die('The configured realm was not found on the server');
+        }
+    }
 
+    sub send_request {
+        my $self = shift;
+        my $ident = ident $self;
+        my $op = $operation_of{$ident};
+        my $message = $operation_of{$ident};
+
+        if ($allowed_op{$op}) {
+            my $command;
+            my $args;
+            
+            if ($op eq 'PKIOperation') {
+                # TODO: parse message and set $command and $args accordingly
+            }
+            else { # the command is just the operation
+                $command = $op;
+                # TODO parse message and set $args accordingly
+            }
+            # send command message to server
+            $self->send_command_msg($command, $args);
+        }
+        else { # OP is invalid, throw corresponding exception
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_CLIENT_SCEP_INVALID_OP",
+            );
+        }
+        # get resulting command message from server
+        my $server_result = $self->collect();
+        return $server_result->{PARAMS};
+    }
+}
 1; # Magic true value required at end of module
 __END__
 
 =head1 NAME
 
-OpenXPKI::Client::SCEP - [One line description of module's purpose here]
+OpenXPKI::Client::SCEP - OpenXPKI Simple Certificate Enrollment Protocol Client
 
 
 =head1 VERSION
 
-This document describes OpenXPKI::Client::SCEP version 0.0.1
+This document describes OpenXPKI::Client::SCEP version $VERSION
 
 
 =head1 SYNOPSIS
@@ -61,12 +113,32 @@ This document describes OpenXPKI::Client::SCEP version 0.0.1
 
 =head1 INTERFACE 
 
-=for author to fill in:
-    Write a separate section listing the public components of the modules
-    interface. These normally consist of either subroutines that may be
-    exported, or methods that may be called on objects belonging to the
-    classes provided by the module.
+=head2 START
 
+Constructor, see Class::Std.
+
+Expects the following named parameters:
+
+=over
+
+=item REALM
+
+PKI Realm to access (must match server configuration).
+
+=item OPERATION
+
+SCEP operation to send. For allowed operations, see the %allowed_op
+hash.
+
+=item MESSAGE
+
+SCEP message to send.
+
+=back
+
+=head2 send_request
+
+Sends SCEP request to OpenXPKI server.
 
 =head1 DIAGNOSTICS
 

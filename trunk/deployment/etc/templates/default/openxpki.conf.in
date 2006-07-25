@@ -147,6 +147,7 @@ serialization:   JSON
 
 service:         Test
 service:         Default
+service:         SCEP
 
 ###########################################################################
 # System log configuration

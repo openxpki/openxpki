@@ -6,5 +6,11 @@ Makefile.PL
 README
 lib/OpenXPKI/Client/SCEP.pm
 t/00.load.t
-t/pod-coverage.t
+t/00.pod.t
+t/00.pod-coverage.t
+t/20.init-openxpki.t
+t/30.scep-getca.t
+t/common.pl
+t/http_server.pl
 t/pod.t
+bin/scep

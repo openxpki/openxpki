@@ -25,8 +25,10 @@ use English;
 
 our %COMMAND_PARAMS =
 (
-    "convert_cert"    => {"DATA" => 1,
-                          "OUT"  => ["DER","TXT"]},
+    "convert_cert"    => {"DATA"             => 1,
+                          "OUT"              => ["DER","TXT","PEM"],
+                          "CONTAINER_FORMAT" => 0,
+                          },
     "convert_crl"     => {"DATA" => 1,
                           "OUT"  => ["DER","TXT"]},
     "convert_key"     => {"PASSWD"     => 1,

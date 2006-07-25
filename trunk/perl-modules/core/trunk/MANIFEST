@@ -152,6 +152,9 @@ OpenXPKI/Service/Test.pm
 OpenXPKI/Service/Default.pm
 OpenXPKI/Service/Default/Command.pm
 OpenXPKI/Service/Default/Command/nop.pm
+OpenXPKI/Service/SCEP.pm
+OpenXPKI/Service/SCEP/Command.pm
+OpenXPKI/Service/SCEP/Command/GetCACert.pm
 
 ## test stuff
 

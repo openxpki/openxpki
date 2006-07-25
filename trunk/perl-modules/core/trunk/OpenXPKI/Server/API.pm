@@ -111,32 +111,28 @@ sub get_ca_certificate {
 
     if (exists $realms->{$thisrealm}->{ca}) {
 	# if no ca certificates could be found this key will not exist
-	
-	foreach my $caid (keys %{$realms->{$thisrealm}->{ca}}) {
-	    my $notbefore = 
-		$response{$caid} = $realms->{$thisrealm}->{ca}->{id}->{$caid}->{notbefore};
-	    my $notafter = 
-		$response{$caid} = $realms->{$thisrealm}->{ca}->{id}->{$caid}->{notafter};
-	    
-
+        ##! 4: "ca cert exists"
+	foreach my $caid (keys %{$realms->{$thisrealm}->{ca}->{id}}) {
+            my $notbefore = $realms->{$thisrealm}->{ca}->{id}->{$caid}->{notbefore};
+            my $notafter  = $realms->{$thisrealm}->{ca}->{id}->{$caid}->{notafter};
 	    $response{$caid} = 
 	    {
 		notbefore => OpenXPKI::DateTime::convert_date(
 		    {
-			DATE => $realms->{$thisrealm}->{ca}->{id}->{$caid}->{notbefore},
+			DATE => $notbefore,
 			OUTFORMAT => 'printable',
 		    }),
 		notafter => OpenXPKI::DateTime::convert_date(
 		    {
-			DATE => $realms->{$thisrealm}->{ca}->{id}->{$caid}->{notafter},
+			DATE => $notafter,
 			OUTFORMAT => 'printable',
 		    }),
 		cacert => $realms->{$thisrealm}->{ca}->{id}->{$caid}->{crypto}->get_certfile(),
 
-	    }
+	    };
 	}
     }
-
+    ##! 64: "response: " . Dumper(%response)
     return \%response;
 }
 

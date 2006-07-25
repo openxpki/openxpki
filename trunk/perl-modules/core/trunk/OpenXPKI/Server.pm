@@ -152,7 +152,6 @@ sub exception_as_string {
     } else {
 	$msg = "<not an exception>";
     }
-
     return $msg;
 }
 
@@ -280,6 +279,18 @@ sub do_process_request
                          })
         });
         $transport->write ($serializer->serialize ("OK"));
+    }
+    elsif ($data eq 'SCEP')
+    {
+        OpenXPKI::Server::Context::setcontext
+        ({
+            "service" => OpenXPKI::Service::SCEP->new
+                         ({
+                            TRANSPORT     => $transport,
+                            SERIALIZATION => $serializer,
+                         })
+        });
+        $transport->write($serializer->serialize('OK'));
     }
     else
     {
