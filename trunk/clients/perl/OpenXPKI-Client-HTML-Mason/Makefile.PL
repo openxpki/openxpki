@@ -2,11 +2,13 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+my $openxpki_major_version = "0.9";
+
 if (-e ".svn")
 {
     my $result = `svn info`;
-       $result =~ s/.*\nRevision:\s*([0-9]+).*/$1/s;
-       open FD, ">VERSION" and print FD "0.9.$result" and close FD or
+       $result =~ s{ .*\n Last\ Changed\ Rev: \s* (\d+) .* }{$1}xs;
+       open FD, ">VERSION" and print FD "$openxpki_major_version.$result" and close FD or
            die "Cannot write revision file.\n";
 }
 

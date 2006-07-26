@@ -55,7 +55,7 @@ test install clean distclean::
 distclean clean::
 	rm -f */*.po~
 
-dist:	REVISION=${OPENXPKI_MAJOR_VERSION}.`svn info | grep Revision | awk '{ print $$2 }'`
+dist:	REVISION=${OPENXPKI_MAJOR_VERSION}.`svn info | grep -e "Last Changed Rev" | awk '{ print $$4 }'`
 dist:
 	if [ -d openxpki-i18n-$(REVISION) ] ; then \
 		rm -rf openxpki-i18n-$(REVISION)/ ; \

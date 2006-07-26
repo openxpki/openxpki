@@ -4,6 +4,7 @@ MANIFEST
 #META.yml # Will be created by "make dist" # NO! "make dist" dies if this string is active
 Makefile.PL
 README
+VERSION  ## never check in this file to SVN !!!
 lib/OpenXPKI/Client/SCEP.pm
 t/00.load.t
 t/00.pod.t

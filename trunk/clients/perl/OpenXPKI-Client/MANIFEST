@@ -3,6 +3,7 @@ Changes
 MANIFEST
 Makefile.PL
 README
+VERSION  ## never check in this file to SVN !!!
 LICENSE
 lib/OpenXPKI/Client.pm
 lib/OpenXPKI/Client/API.pm

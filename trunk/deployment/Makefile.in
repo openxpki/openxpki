@@ -94,7 +94,7 @@ clean:
 distclean: clean
 
 
-dist:	REVISION=${OPENXPKI_MAJOR_VERSION}.`svn info | grep Revision | awk '{ print $$2 }'`
+dist:	REVISION=${OPENXPKI_MAJOR_VERSION}.`svn info | grep -e "Last Changed Rev" | awk '{ print $$4 }'`
 dist:
 	if [ -d openxpki-deployment-$(REVISION) ] ; then \
 		rm -rf openxpki-deployment-$(REVISION)/ ; \

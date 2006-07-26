@@ -104,10 +104,10 @@ my $openxpki_version;
 open $fh, "svn info 2>/dev/null |";
 while (my $line = <$fh>) {
     chomp $line;
-    if ($line =~ m{ \A Revision: \s* (\d+) }xms) {
+    if ($line =~ m{ \A Last\ Changed\ Rev: \s* (\d+) }xms) {
 	$openxpki_version  = $openxpki_major_version . '.' . $1;
 	print STDERR "This is a development tree\n";
-	print STDERR "Revision from SVN: $1\n";
+	print STDERR "Last Changed Revision from SVN: $1\n";
     }
 }
 close $fh;
@@ -229,11 +229,14 @@ $cmd = 'cat `find . -type f | grep -r -v "/\."`| wc -l';
 print STDERR "    LOA: ".`$cmd`;
 
 ## hack to avoid warnings from Log4perl
-eval
-{
-    use Log::Log4perl::Logger;
-    $Log::Log4perl::Logger::NON_INIT_WARNED = 1;
-};
+
+eval 'use Log::Log4perl::Logger';
+if ($@ eq '') {
+  eval '$Log::Log4perl::Logger::NON_INIT_WARNED = 1;';
+}
+else {
+  print STDERR "Logger is not installed. Continue anyway.\n";
+}
 
 # check if we should add -shared
 # not all platforms support this feature
@@ -246,24 +249,27 @@ use Config;
 my $cc = $Config{'cc'};
 
 my $cc_supports_shared = 1;
-open $fh, "$cc -shared -o test test.c 2>&1 |" 
-    or die "Could not run C compiler. Stopped";
-while (my $line = <$fh>) {
-    if ($line =~ m{ unrecognized .* option .* -shared }xms) {
-	$cc_supports_shared = 0;
+if (open $fh, "$cc -shared -o test test.c 2>&1 |") {
+    while (my $line = <$fh>) {
+        if ($line =~ m{ unrecognized .* option .* -shared }xms) {
+	    $cc_supports_shared = 0;
+        }
+    }
+    close $fh;
+    if ($CHILD_ERROR) {
+        $cc_supports_shared = 0;
+    }
+
+    if (! $cc_supports_shared)
+    {
+        print STDERR "C compiler does not support -shared.\n";
+    } else {
+        print STDERR "C compiler supports -share. Adding it to LDDLFLAGS.\n";
+        $flags{'LDDLFLAGS'} = '-shared';
     }
 }
-close $fh;
-if ($CHILD_ERROR) {
-    $cc_supports_shared = 0;
-}
-
-if (! $cc_supports_shared)
-{
-    print STDERR "C compiler does not support -shared.\n";
-} else {
-    print STDERR "C compiler supports -share. Adding it to LDDLFLAGS.\n";
-    $flags{'LDDLFLAGS'} = '-shared';
+else {
+    print STDERR "Could not run C compiler. Continue anyway.\n";
 }
 
 unlink('test.c');
