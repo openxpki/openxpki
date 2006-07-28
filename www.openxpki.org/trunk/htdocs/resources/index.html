@@ -68,9 +68,9 @@
           <li><a href="http://sf.net/svn/?group_id=150124">
 	      Subversion (Version Control System)</a></li>
           <li><a href="http://svn.sf.net/viewcvs.cgi/openxpki/">
-	      ViewCVS (but with Subversion content)</a></li>
+	      ViewCVS (but with Subversion content)</a> updates with each commit</li>
           <li><a href="http://www3.openxpki.org/svn/">
-	      WebSVN (sponsored by Cryptocom)</a></li>
+	      WebSVN at www3</a> updates once in 5 min</li>
         </ul>
         <h3>Subversion structure</h3>
         <p>
@@ -84,7 +84,18 @@
   <dt class="sourcecode">perl-modules/core/trunk/</dt>
     <dd>Core for server part</dd>
   <dt class="sourcecode">clients/perl/</dt>
-    <dd>Client parts</dd>
+    <dd><dl>
+    <dt class="sourcecode">OpenXPKI-Client/</dt>
+      <dd>Base class for actual clients</dd>
+    <dt class="sourcecode">OpenXPKI-Client-CLI/</dt>
+      <dd>Command line interface to a locally running OpenXPKI daemon</dd>
+    <dt class="sourcecode">OpenXPKI-Client-HTML-Mason/</dt>
+      <dd>Web interface to a locally running OpenXPKI daemon</dd>
+    <dt class="sourcecode">OpenXPKI-Client-SCEP/</dt>
+      <dd>SCEP tools</dd>
+    <dt class="sourcecode">OpenXPKI-Client-SOAP-Lite/</dt>
+      <dd>SOAP-Lite tools</dd>
+    </dl></dd>
   <dt class="sourcecode">deployment/</dt>
     <dd>Deployment tools</dd>
   <dt class="sourcecode">i18n/</dt>
