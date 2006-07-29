@@ -296,7 +296,7 @@ WriteMakefile(
 	## includes the version of libintl-perl which includes Locale::Messages
 	'Locale::TextDomain'     => 1,
 	'Log::Log4perl'          => '0.51',
-        'Mail::RFC822::Address'  => 1,
+        'Mail::RFC822::Address'  => '0.3',
 	'Math::BigInt'           => 1,
         'Net::IP'                => 1,
 	'Net::LDAP'              => "0.32",
