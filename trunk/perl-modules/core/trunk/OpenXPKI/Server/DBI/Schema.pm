@@ -41,6 +41,7 @@ my %COLUMN_of = (
     DATA                  => "data",
 
     GLOBAL_KEY_ID         => "global_id",
+    OBJECT_ID             => "object_id",
     CERTIFICATE_SERIAL    => "cert_key",
     REVOKE_CERTIFICATE_SERIAL => "cert_key",
     CSR_SERIAL            => "req_key",
@@ -150,7 +151,7 @@ my %TABLE_of = (
         NAME    => "data",
         INDEX   => [ "DATA_SERIAL" ],
         COLUMNS => [ "DATA_SERIAL",
-                     "GLOBAL_KEY_ID",
+                     "GLOBAL_KEY_ID", "OBJECT_ID",
                      "COLUMN_NAME", "ARRAY_COUNTER", "CONTENT_TYPE",
                      "NUMBER", "STRING" ]},
     PRIVATE => {
