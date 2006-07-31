@@ -487,16 +487,15 @@ sub create_workflow_instance {
                 foreach my $item (@{$error})
                 {
                     eval {
-                        use Data::Dumper;
-                        OpenXPKI::Exception->throw ({
+                        OpenXPKI::Exception->throw (
                             message => $item->[0],
-                            params  => $item->[1]});
+                            params  => $item->[1]);
                     };
                     push @list, $EVAL_ERROR;
                 }
-                OpenXPKI::Exception->throw ({
+                OpenXPKI::Exception->throw (
                     message  => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED",
-                    children => [ @list ]});
+                    children => [ @list ]);
             } 
         }
         if ($eval)
@@ -505,14 +504,14 @@ sub create_workflow_instance {
             {
                 ## missing field(s) in workflow
                 $eval =~ s/^.*://;
-                OpenXPKI::Exception->throw ({
+                OpenXPKI::Exception->throw (
                     message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
-                    params  => {FIELDS => $eval}});
+                    params  => {FIELDS => $eval});
             }
             $eval->rethrow();
         }
-        OpenXPKI::Exception->throw ({
-                message => 'I18N_WF_ERROR_ILLEGAL_STATE'});
+        OpenXPKI::Exception->throw (
+                message => 'I18N_WF_ERROR_ILLEGAL_STATE');
     };
     
     # commit changes (this is normally not required, as save_workflow()

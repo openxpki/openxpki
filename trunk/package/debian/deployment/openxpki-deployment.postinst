@@ -1,5 +1,5 @@
 #! /bin/sh
-# postinst script for openxpki-deplyment
+# postinst script for openxpki-deployment
 #
 # see: dh_installdeb(1)
 

@@ -144,11 +144,11 @@ sub __get_error {
         else
         {
             ## this is an exception
-            my %hash = (LABEL => $error->message()->{message});
-            $hash{PARAMS} = $error->message()->{params}
-                if (exists $error->message()->{params});
-            $hash{CHILDREN} = [ $self->__get_error ({EXCEPTIONS => $error->message()->{children}}) ]
-                if (exists $error->message()->{children});
+            my %hash = (LABEL => $error->message());
+            $hash{PARAMS} = $error->params()
+                if (defined $error->params());
+            $hash{CHILDREN} = [ $self->__get_error ({EXCEPTIONS => $error->children()}) ]
+                if (defined $error->children());
             push @list, \%hash;
         }
     }

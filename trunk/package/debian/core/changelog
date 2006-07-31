@@ -1,3 +1,9 @@
+libopenxpki-perl (0.9.20060731-1) unstable; urgency=low
+
+  * Initiate a restart of openxpkid if openxpki-deployment is installed.
+
+ -- Michael Bell <michael.bell@web.de>  Mon, 31 Jul 2006 12:00:00 +0200
+
 libopenxpki-perl (0.9.20060617-1) unstable; urgency=low
 
   * Replaced exit with die in OpenXPKI::Server->new.

@@ -1,3 +1,9 @@
+openxpki-deployment (0.9.20060731-1) unstable; urgency=low
+
+  * added debugging hints to /etc/init.d/openxpkid.
+
+ -- Michael Bell <michael.bell@web.de>  Mon, 31 Jul 2006 12:00:00 +0200
+
 openxpki-deployment (0.9.20060615-2) unstable; urgency=low
 
   * openxpkictl detects now a failed server startup.

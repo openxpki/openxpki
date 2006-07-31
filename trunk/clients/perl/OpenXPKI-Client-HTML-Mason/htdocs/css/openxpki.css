@@ -230,6 +230,40 @@ div.menu_level_0_item_type_action a {
 
 /* level 1 */
 
+div.menu_level_1_item_type_menu {
+    margin: 0.20em 0.5em 0.20em 0.1em;
+    padding: 0.1em 0.2em;
+    text-align: right;
+    background: #dddddd;
+    color: black;
+    list-style: none;
+}
+
+div.menu_level_1_item_type_menu:hover {
+    background: #0088ff;
+}
+
+div.menu_level_1_item_type_menu a {
+    font-weight: normal;
+}
+div.menu_level_1_item_type_action {
+    margin: 0.20em 0.5em 0.20em 0.1em;
+    padding: 0.1em 0.2em;
+    text-align: right;
+    background: #dddddd;
+    color: black;
+    list-style: none;
+}
+
+div.menu_level_1_item_type_action:hover {
+    background: #0088ff;
+}
+
+div.menu_level_1_item_type_action a {
+    font-weight: normal;
+}
+
+/*
 div.menu_sub_item {
     padding: 0.38em 1em;
     text-indent: 0;
@@ -245,7 +279,7 @@ div.menu_sub_item:hover {
 div.menu_sub_item a {
     font-weight: normal;
 }
-
+*/
 div.w3c {
     /* position: absolute; */
     bottom:   1em;
