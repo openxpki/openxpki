@@ -13,7 +13,6 @@ CONFDIR="etc"
 TEMPLATEDIR="$CONFDIR/templates"
 TEMPLATE="default"
 
-DESTDIR="/"
 PREFIX="/usr"
 
 usage() {
@@ -25,7 +24,6 @@ Prepare OpenXPKI for installation.
 Options:
    --help         display this help text and exit
    --prefix       set installation prefix (Default: $PREFIX)
-   --dest         set root of the installation (Default: $DESTDIR)
    --             all options following -- are passed to openxpki-metaconf
 
 This script prepares the OpenXPKI deployment environment for installation
@@ -92,11 +90,6 @@ while [ -n "$1" ] ; do
 	    shift
 	    shift
 	    ;;
-	--dest)
-	    DESTDIR="$2"
-	    shift
-	    shift
-	    ;;
 	--)
 	    shift
 	    METACONF_OPTS="$METACONF_OPTS $*"
@@ -119,7 +112,6 @@ for TEMPLATE in $TEMPLATEDIR/* ; do
 	    --writecfg $TEMPLATE/openxpki.conf \
 	    --force \
 	    --setcfg dir.prefix="$PREFIX" \
-	    --setcfg dir.dest="$DESTDIR" \
 	    $METACONF_OPTS
     fi
 done
