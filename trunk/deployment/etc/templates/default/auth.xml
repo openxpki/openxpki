@@ -22,7 +22,7 @@
     <handler>External Static Role</handler>
   </stack>
   <handler name="Anonymous" type="Anonymous">
-    <role>anonymous</role>
+    <role>Anonymous</role>
   </handler>
   <handler name="User Password" type="Password">
     <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD</description>

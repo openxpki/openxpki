@@ -4,6 +4,10 @@
 	  class="Workflow::Action::Null">
       <!-- do not use field with is_required                -->
       <!-- because this ignores the order of the validators -->
+      <validator name="ACL">
+        <arg>create_csr</arg>
+        <arg>$cert_role</arg>
+      </validator>
       <validator name="HasRequiredField">
         <arg>cert_role</arg>
       </validator>

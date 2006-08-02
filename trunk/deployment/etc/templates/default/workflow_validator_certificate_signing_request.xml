@@ -1,4 +1,7 @@
 <validators>
+  <validator name="ACL"
+             class="OpenXPKI::Server::Workflow::Validator::ACL">
+  </validator>
   <validator name="HasRequiredField"
              class="Workflow::Validator::HasRequiredField">
   </validator>

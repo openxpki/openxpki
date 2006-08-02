@@ -3,7 +3,7 @@
                 NESTED => 1,
                 ROLE =>
                 {
-                    'anonymous' =>
+                    'Anonymous' =>
                     {
                         MENU => "anonymous_menu"
                     },

@@ -138,6 +138,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
+OpenXPKI/Server/Workflow/Validator/ACL.pm
 OpenXPKI/Server/Workflow/Validator/CertProfile.pm
 OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm

@@ -48,4 +48,10 @@
     <affected_role>*</affected_role>
     <auth_role>CA Operator</auth_role>
   </permission>
+  <permission>
+    <server>*</server>
+    <activity>create_csr</activity>
+    <affected_role>*</affected_role>
+    <auth_role>*</auth_role>
+  </permission>
 </acl>
