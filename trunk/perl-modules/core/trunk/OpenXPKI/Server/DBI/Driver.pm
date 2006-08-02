@@ -57,6 +57,7 @@ our %COLUMN = (
     
     "status"           => "TEXT",
     "reason"           => "TEXT",
+    "object_id"        => "BIGINT", # FIXME: is this correct?
     "object_serial"    => "NUMERIC",
     "object_type"      => "TEXT_KEY",
     "object_status"    => "TEXT_KEY",
