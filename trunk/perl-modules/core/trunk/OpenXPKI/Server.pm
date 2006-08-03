@@ -89,6 +89,7 @@ sub new
     };
     if ($EVAL_ERROR) {
  	my $msg = exception_as_string($EVAL_ERROR);
+        ## FIXME: this error message does not reach the startup script and the log!
  	CTX('log')->log(
  	    MESSAGE  => "Exception during interface initialization: " . $msg,
  	    PRIORITY => "fatal",
@@ -138,20 +139,29 @@ sub exception_as_string {
     my $msg = "";
     ##! 8: ref $exc
     if (ref $exc eq '') {
+        ##! 16: "no ref"
 	$msg = $exc;
     } elsif (ref $exc eq 'OpenXPKI::Exception') {
+        ##! 16: "OpenXPKI::Exception detected"
 	$msg = $exc->full_message() || '<no message>';
-	if ($exc->message()->{children}) {
-            foreach my $child (@{$exc->message()->{children}})
+        ##! 16: "do there be any children?"
+	if ($exc->children()) {
+            ##! 32: "has children"
+            foreach my $child (@{$exc->children()})
             {
+                ##! 64: "call exception_as_string"
 	        $msg .= '; CHILD: [' . exception_as_string($child) . ']';
             }
 	}
+        ##! 16: "children finished"
     } elsif (ref $exc) {
+        ##! 16: "other exception detected"
 	$msg = $EVAL_ERROR->message();
     } else {
+        ##! 16: "no exception detected"
 	$msg = "<not an exception>";
     }
+    ##! 4: "final message: $msg"
     return $msg;
 }
 
@@ -359,7 +369,7 @@ sub __get_user_interfaces
     
     my $config = CTX('xml_config');
 
-    ## init transport protocols
+    ##! 2: "init transport protocols"
 
     my $count = $config->get_xpath_count (XPATH => "common/server/transport");
     for (my $i=0; $i < $count; $i++)
@@ -378,7 +388,7 @@ sub __get_user_interfaces
         }
     }
 
-    ## init serializers
+    ##! 2: "init serializers"
 
     $count = $config->get_xpath_count (XPATH => "common/server/serialization");
     for (my $i=0; $i < $count; $i++)
@@ -397,7 +407,7 @@ sub __get_user_interfaces
         }
     }
 
-    ## init services
+    ##! 2: "init services"
 
     $count = $config->get_xpath_count (XPATH => "common/server/service");
     for (my $i=0; $i < $count; $i++)
@@ -409,6 +419,7 @@ sub __get_user_interfaces
         eval "use $class;";
         if ($EVAL_ERROR)
         {
+            ##! 8: "use $class failed"
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_SERVICE_FAILED",
                 params  => {EVAL_ERROR => $EVAL_ERROR,
@@ -416,6 +427,7 @@ sub __get_user_interfaces
         }
     }
 
+    ##! 1: "finished"
     return 1;
 }
 

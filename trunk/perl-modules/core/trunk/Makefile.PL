@@ -291,6 +291,7 @@ WriteMakefile(
 	'DateTime'               => "0.22",
 	'Digest::MD5'            => 1,
 	'Digest::SHA1'           => 1,
+	'English'                => 1, ## for broken Perl installations like on Ubuntu Drapper
 	'Exception::Class'       => "1.22",
 	'Filter::Util::Call'     => 1,
 	## includes the version of libintl-perl which includes Locale::Messages

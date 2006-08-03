@@ -345,6 +345,26 @@ sub run
 	if ($service_msg eq 'COMMAND') {
 	    if (exists $data->{PARAMS}->{COMMAND}) {
 
+                ##! 16: "executing access control before doing anything else"
+                eval
+                {
+                    CTX('acl')->authorize ({
+                        ACTIVITY      => "Service::".$data->{PARAMS}->{COMMAND},
+                        AFFECTED_ROLE => ""});
+                };
+                if ($EVAL_ERROR)
+                {
+                    ##! 1: "Permission denied for Service::".$data->{PARAMS}->{COMMAND}."."
+                    if (my $exc = OpenXPKI::Exception->caught())
+                    {
+                        $self->__send_error ({EXCEPTION => $exc});
+                    } else {
+                        $self->__send_error ({ERROR => $EVAL_ERROR});
+                    }
+                    next MESSAGE;
+                }
+                ##! 16: "access to command granted"
+
 		my $command;
 		eval {
 		    $command = OpenXPKI::Service::Default::Command->new(
@@ -360,9 +380,11 @@ sub run
 			##! 16: "Invalid command $data->{PARAMS}->{COMMAND}"
 			# fall-through intended
 		    } else {
+                        ##! 16: "FIXME: this means that we simply crash without sending something to the client!"
 			$exc->rethrow();
 		    }
 		} elsif ($EVAL_ERROR) {
+                    ##! 8: "FIXME: this means that we simply crash without sending something to the client!"
 		    if (ref $EVAL_ERROR) {
 			$EVAL_ERROR->rethrow();
 		    } else {

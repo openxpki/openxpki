@@ -120,6 +120,8 @@ sub __load_roles
                        COUNTER => [ $pkiid, 0, $i]);
         $self->{PKI_REALM}->{$realm}->{ROLES}->{$role} = 1;
     }
+    ## add empty role for things which have no owner or are owned by the CA
+    $self->{PKI_REALM}->{$realm}->{ROLES}->{""} = 1;
     return 1;
 }
 
@@ -202,10 +204,12 @@ sub authorize
 
     my $realm    = CTX('session')->get_pki_realm();
     my $user     = CTX('session')->get_role();
-    my $owner    = "Anonymous";
+    my $owner    = "";
        $owner    = $keys->{AFFECTED_ROLE} if (exists $keys->{AFFECTED_ROLE} and
                                               defined $keys->{AFFECTED_ROLE});
     my $activity = $keys->{ACTIVITY};
+
+    ##! 99: "user:realm:activity:owner - $user:$realm:$activity:$owner"
 
     if (! defined $activity)
     {
@@ -236,7 +240,10 @@ sub authorize
                         AUTH_ROLE     => $user});
     }
 
+    my $class = substr($activity,0,index($activity, "::"))."::*";
     if (not exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{$activity}
+        and
+        not exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{$class}
         and
         not exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{'*'})
     {

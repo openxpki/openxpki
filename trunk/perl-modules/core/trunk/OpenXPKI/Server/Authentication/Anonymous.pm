@@ -30,6 +30,8 @@ sub new {
                         XPATH   => [@{$keys->{XPATH}},   "role"],
                         COUNTER => [@{$keys->{COUNTER}}, 0]);
 
+    ##! 2: "role: ".$self->{ROLE}
+
     return $self;
 }
 

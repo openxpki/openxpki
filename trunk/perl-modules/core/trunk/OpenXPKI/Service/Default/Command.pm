@@ -86,6 +86,10 @@ sub attach_impl : PRIVATE {
 	    });
     }
 
+    ## return true is senselesse because only exception will be used
+    ## but good style :)
+    return 1;
+
     my $base = 'OpenXPKI::Service::Default::Command';
 
     if (defined $cmd && $allowed_command{$cmd}) {

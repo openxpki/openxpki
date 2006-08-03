@@ -32,7 +32,7 @@
     <handler>External Static Role</handler>
   </stack>
   <handler name="Anonymous" type="Anonymous">
-    <role>anonymous</role>
+    <role></role>
   </handler>
   <handler name="User Password" type="Password">
     <description>

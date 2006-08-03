@@ -18,7 +18,6 @@
   </server>
 
   <!-- FIXME: perhaps we should define roles somewhere else -->
-  <role>Anonymous</role>
   <role>User</role>
   <role>RA Operator</role>
   <role>CA Operator</role>

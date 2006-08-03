@@ -34,7 +34,7 @@ sub validate {
     eval
     {
         CTX('acl')->authorize ({
-            ACTIVITY      => $action,
+            ACTIVITY      => "Workflow::".$action,
             AFFECTED_ROLE => $role});
     };
     if (my $exc = OpenXPKI::Exception->caught())
