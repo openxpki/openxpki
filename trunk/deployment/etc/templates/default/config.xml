@@ -60,6 +60,16 @@
     </ca>
     [% END %]
 
+    <!-- Subsystems defined for this realm -->
+    <!-- 'id' is the subsystem identifier -->
+    [% FOREACH entry = $realmsection.subsystem %]
+    [% THROW config "No 'id' defined for subsystem $entry" IF ! $entry.id.defined %]
+    [% THROW config "No 'type' defined for subsystem $entry" IF ! $entry.type.defined %]
+    <[% $entry.type %] id="[% $entry.id %]">
+      <token super="common/token_config/token{[% $entry.id %]}"/>
+    </[% $entry.type %]>
+    [% END %]
+
 
     [% IF deployment.xmlstyle == 'multi-file' %]
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="auth.xml"/>

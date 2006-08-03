@@ -53,6 +53,32 @@
         <passwd>1234567890</passwd>
     </token>
     [% END %]
+
+
+    [% FOREACH entry = $realmsection.subsystem %]
+    
+    [% THROW config "No 'id' defined for subsystem $entry" IF ! $entry.id.defined %]
+    [% THROW config "No 'dir' defined for subsystem $entry" IF ! $entry.dir.defined %]
+
+    <token id="[% $entry.id %]" super="../token{default}">
+        <!-- Backend class -->
+        <backend>[% $entry.backend %]</backend>
+
+        <!-- Private key (PEM encoded) -->
+        <key>[% $entry.dir %]/key.pem</key>
+
+	<!-- Certificate, must be in PEM format -->
+        <cert>[% $entry.dir %]/cert.pem</cert>
+
+	<!-- Number of CA passphrase fragments -->
+        <passwd_parts>1</passwd_parts>
+
+	<!-- CA passphrase -->
+        <passwd>1234567890</passwd>
+    </token>
+    [% END %]
+
+
 [% END %]
 
 </token_config>

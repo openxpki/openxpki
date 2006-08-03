@@ -200,7 +200,7 @@ server_id:    0
 server_shift: 8
 
 # Specify database backend to use, REQUIRED
-# Allowed values: SQLite, DB2, Oracle, mysql, PostgreSQL
+# Allowed values: SQLite, DB2, Oracle, MySQL, PostgreSQL
 type:         SQLite
 
 # Database name (DB-specific, see perldoc DBD::<type>)
@@ -232,7 +232,7 @@ INSTHOME:     /home/db2inst1
 ORACLE_HOME:  /opt/oracle/OraHome
 ORACLE_SID:   OPENXPKI01
 
-[DB-mysql-Options]
+[DB-MySQL-Options]
 
 [DB-PostgreSQL-Options]
 
@@ -255,6 +255,7 @@ pkirealm: Realm 1
 name: I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA
 issuingca: TEST_DUMMY_CA_1
 issuingca: TEST_DUMMY_CA_2
+subsystem: TEST_SCEP_SERVER_1
 profiles:  $(profiles)
 
 [Realm 2]
@@ -262,6 +263,16 @@ name: I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA
 issuingca: TEST_USER_CA_1
 issuingca: TEST_USER_CA_2
 profiles:  $(profiles)
+
+###########################################################################
+# Auxiliary subsystems:
+# SCEP
+
+[TEST_SCEP_SERVER_1]
+id: testscepserver1
+type: scep
+backend: OpenXPKI::Crypto::Tool::SCEP
+dir: $(dir.cadir)/scepdummyserver1
 
 ###########################################################################
 # Issuing CAs
