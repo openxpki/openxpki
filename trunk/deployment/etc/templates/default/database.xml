@@ -1,6 +1,6 @@
 <database>
   <debug>[% global.debug %]</debug>
-  [% FOREACH tag = ['server_id' 'server_shift' 'type' 'name' 'host' 'user' 'passwd' 'namespace' ] %]
+  [% FOREACH tag = ['server_id' 'server_shift' 'type' 'name' 'host' 'port' 'user' 'passwd' 'namespace' ] %]
     [% IF database.$tag.defined %]
     <[% tag %]>[% database.$tag %]</[% tag %]>
     [% END %]

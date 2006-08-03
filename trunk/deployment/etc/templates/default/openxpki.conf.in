@@ -108,6 +108,7 @@ templatedir:      $(dir.datadir)/templates
 [file]
 # OpenSSL binary loation, REQUIRED
 openssl: /usr/bin/openssl
+openca_scep: /usr/bin/openca-scep
 
 
 ###########################################################################
@@ -271,6 +272,7 @@ profiles:  $(profiles)
 [TEST_SCEP_SERVER_1]
 id: testscepserver1
 type: scep
+shell: $(file.openca_scep)
 backend: OpenXPKI::Crypto::Tool::SCEP
 dir: $(dir.cadir)/scepdummyserver1
 

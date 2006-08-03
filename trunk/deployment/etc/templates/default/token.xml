@@ -63,6 +63,11 @@
     <token id="[% $entry.id %]" super="../token{default}">
         <!-- Backend class -->
         <backend>[% $entry.backend %]</backend>
+	
+	[% IF $entry.shell.defined %]
+        <!-- Backend shell command -->
+        <shell>[% $entry.shell %]</shell>
+	[% END %]
 
         <!-- Private key (PEM encoded) -->
         <key>[% $entry.dir %]/key.pem</key>
