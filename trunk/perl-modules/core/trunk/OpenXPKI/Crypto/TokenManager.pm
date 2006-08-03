@@ -2,16 +2,18 @@
 ## Rewritten 2005 by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2003-2006 by The OpenXPKI Project
 # $Revision$
+package OpenXPKI::Crypto::TokenManager;
 
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::TokenManager;
-
 use OpenXPKI::Debug 'OpenXPKI::Crypto::TokenManager';
 use OpenXPKI::Exception;
-use OpenXPKI::Crypto::Backend::API;
 use OpenXPKI::Server::Context qw( CTX );
+use Data::Dumper;
+use English;
+use OpenXPKI::Crypto::Backend::API;
+use OpenXPKI::Crypto::Tool::SCEP::API;
 
 sub new {
     my $that = shift;
@@ -94,6 +96,10 @@ sub __add_token
     {
         $type_path = "ca";
     }
+    elsif ($type eq 'SCEP')
+    {
+        $type_path = 'scep';
+    }
     elsif ($type eq "DEFAULT")
     {
         $type_path = "common";
@@ -161,15 +167,23 @@ sub __add_token
 
     ##! 2: "try to setup $backend token"
     eval {
+        my $backend_api_class;
+        if ($type eq 'SCEP') { # SCEP uses its own API
+            $backend_api_class = 'OpenXPKI::Crypto::Tool::SCEP::API';
+        }
+        else { # use the 'default' backend
+            $backend_api_class = 'OpenXPKI::Crypto::Backend::API';
+        }
+        ##! 16: 'instantiating token, API class: ' . $backend_api_class
         $self->{TOKEN}->{$realm}->{$type}->{$name} =
-            OpenXPKI::Crypto::Backend::API->new ({
-                CLASS => $backend,
-                TMP   => $self->{tmp},
-                NAME  => $name,
-                PKI_REALM_INDEX => $realm_index,
-                TOKEN_TYPE      => $type_path,
-                TOKEN_INDEX     => $type_index
-            });
+                $backend_api_class->new ({
+                    CLASS => $backend,
+                    TMP   => $self->{tmp},
+                    NAME  => $name,
+                    PKI_REALM_INDEX => $realm_index,
+                    TOKEN_TYPE      => $type_path,
+                    TOKEN_INDEX     => $type_index
+                });
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
@@ -178,6 +192,14 @@ sub __add_token
         OpenXPKI::Exception->throw (
             message  => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_CREATE_FAILED",
             children => [ $exc ]);
+    }
+    elsif ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_EVAL_ERROR',
+            params => {
+                'EVAL_ERROR' => $EVAL_ERROR,
+            }
+        );
     }
 
     if (! defined $self->{TOKEN}->{$realm}->{$type}->{$name}) {
@@ -194,6 +216,7 @@ sub __add_token
 
 sub __use_token
 {
+    ##! 16: 'start'
     my $self = shift;
     my $keys = { @_ };
 
@@ -202,14 +225,19 @@ sub __use_token
     my $realm = $keys->{PKI_REALM};
 
     ## the token must be present
-    OpenXPKI::Excepion->throw (
-        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT")
-        if (not $self->{TOKEN}->{$realm}->{$type}->{$name});
 
-    return $self->{TOKEN}->{$realm}->{$type}->{$name}->login()
-        if (not $self->{TOKEN}->{$realm}->{$type}->{$name}->online());
+    if (! defined $self->{TOKEN}->{$realm}->{$type}->{$name}) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT");
+    } 
+
+    my $instance = $self->{TOKEN}->{$realm}->{$type}->{$name};
+    
+    return $instance->login()
+        if (not $instance->online());
 
     return 1;
+    ##! 16: 'end'
 }
 
 ## functions to handle token which can operate as daemons

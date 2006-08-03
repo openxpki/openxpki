@@ -17,6 +17,8 @@ use OpenXPKI::Debug 'OpenXPKI::Server::Session::Mock';
 use OpenXPKI::Exception;
 
 my %pki_realm : ATTR( :get<pki_realm> :set<pki_realm> );
+my %id        : ATTR( :get<id>   :default<-1> );
+my %user      : ATTR( :get<user> :default<> );
 
 
 1;

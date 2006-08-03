@@ -16,9 +16,10 @@ use Class::Std;
 use OpenXPKI::Debug 'OpenXPKI::Service::SCEP::Command';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API;
+use Data::Dumper;
 
 my %command        : ATTR;
-my %command_params : ATTR;
+my %command_params : ATTR( :get<PARAMS> );
 
 my %command_impl   : ATTR;
 my %api            : ATTR( :get<API> );
@@ -28,21 +29,27 @@ my %api            : ATTR( :get<API> );
 # TODO: add commands as they are implemented
 my %allowed_command = map { $_ => 1 } qw(
     GetCACert
+    PKIOperation
 );
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
-
+    ##! 1: "BUILD"
+    ##! 2: ref $self
+ 
     $command{$ident}        = $arg_ref->{COMMAND};
     $command_params{$ident} = $arg_ref->{PARAMS};
     $api{$ident}            = OpenXPKI::Server::API->new();
+    ##! 16: $command{$ident}
 }
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
-
+    ##! 1: "START"
+    ##! 2: ref $self
     # only in Command.pm base class: get implementation
     if (ref $self eq 'OpenXPKI::Service::SCEP::Command') {
+        ##! 4: Dumper $arg_ref
 	$self->attach_impl($arg_ref);
     }
 }
@@ -59,6 +66,7 @@ sub attach_impl : PRIVATE {
     # command name
     my $cmd = $command{$ident};
     ##! 4: "command: $cmd"
+    ##! 4: Dumper $arg
 
     # commands starting with an underscore are not allowed (might be a
     # private method in command implementation)
@@ -85,7 +93,7 @@ sub attach_impl : PRIVATE {
             );
 	} else {
 	    ##! 8: "instantiating class $class"
-	    $command_impl{$ident} = eval "$class->new()";
+	    $command_impl{$ident} = eval "$class->new(\$arg)";
 
 	    if ($EVAL_ERROR) {
 		OpenXPKI::Exception->throw(

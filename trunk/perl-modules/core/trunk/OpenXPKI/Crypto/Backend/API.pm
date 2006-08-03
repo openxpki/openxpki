@@ -1,16 +1,20 @@
 ## OpenXPKI::Crypto::Backend::API
 ## Written 2006 by Michael Bell for the OpenXPKI project
+## Converted to use Class::Std and OpenXPKI::Crypto::API
+## 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
 ## $Revision$
+package OpenXPKI::Crypto::Backend::API;
+use base qw( OpenXPKI::Crypto::API );
 	
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::Backend::API;
-
+use Class::Std;
 use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::API';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use Data::Dumper;
 use English;
 
 ## scalar value:
@@ -23,8 +27,14 @@ use English;
 ##     - "" => {...} (these are the default parameters
 ##     - "TYPE:EC" => {...} means parameters if TYPE => "EC" is used
 
-our %COMMAND_PARAMS =
-(
+
+my %object_cache_of :ATTR; # the object cache attribute
+
+sub __init_command_params : PRIVATE {
+    ##! 16: 'start'
+    my $self = shift;
+
+    $self->set_command_params({
     "convert_cert"    => {"DATA"             => 1,
                           "OUT"              => ["DER","TXT","PEM"],
                           "CONTAINER_FORMAT" => 0,
@@ -168,209 +178,54 @@ our %COMMAND_PARAMS =
 						"des-ede3-ofb",
 						"des3",
 			       ],
-     },
-);
+                            },
+    });
+   ##! 16: 'end'
+}
 
-sub new
-{
-    my $that = shift;
-    my $class = ref($that) || $that;
-
-    my $self = {};
-    bless $self, $class;
-
-    my $keys = shift;
+sub START {
+    ##! 16: 'start'
+    my ($self, $ident, $arg_ref) = @_;
 
     ## check for missing but required parameters
 
-    if (not $keys->{CLASS})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_CLASS");
-    }
-    if (not $keys->{NAME})
-    {
+    $self->__init_command_params();
+    
+    ##! 16: 'after __init_command_params()'
+    ##! 16: 'get_command_params() child: ' . Dumper($self->get_command_params())
+    if (not exists $arg_ref->{NAME}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_NAME");
     }
-    if (not exists $keys->{PKI_REALM_INDEX})
-    {
+    if (not exists $arg_ref->{PKI_REALM_INDEX}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_PKI_REALM_INDEX");
     }
-    if (not $keys->{TOKEN_TYPE})
-    {
+    if (not exists $arg_ref->{TOKEN_TYPE}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_TOKEN_TYPE");
     }
-    if (not exists $keys->{TOKEN_INDEX})
-    {
+    if (not exists $arg_ref->{TOKEN_INDEX}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_TOKEN_INDEX");
     }
 
-    $self->{CLASS} = $keys->{CLASS};
-    delete $keys->{CLASS};
+    delete $arg_ref->{CLASS};
 
-    foreach my $key (keys %{$keys})
+    foreach my $key (keys %{$arg_ref})
     {
         next if (grep /^$key$/, ("TMP", "NAME",
                                  "PKI_REALM_INDEX",
                                  "TOKEN_TYPE", "TOKEN_INDEX"));
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_ILLEGAL_PARAMETER",
-            params  => {NAME => $key, VALUE => $keys->{$key}});
+            params  => {NAME => $key, VALUE => $arg_ref->{$key}});
     }
-
-    eval "require ".$self->{CLASS};
-    if ($@)
-    {
-        my $text = $@;
-        ##! 4: "compilation of driver ".$self->{CLASS}." failed\n$text"
-        OpenXPKI::Exception->throw (message => $text);
-    }
-    ##! 2: "class: ".$self->{CLASS}
-
-    ## get the token
-    $self->{INSTANCE} = $self->{CLASS}->new ($keys);
-    ##! 1: "end - no exception during new()"
-
-    return $self;
 }
 
-sub command
-{
+sub get_object {
     my $self = shift;
-    my $keys = shift;
-
-    my $command = $keys->{COMMAND};
-
-
-    ## FIXME: actually we check only for the allowed parameter
-    ## FIXME: if want to make this a real API enforcer then we must check the content too
-    ## FIXME: perhaps Sergei or Julia could do this?
-
-    foreach my $param (keys %{$keys})
-    {
-        next if ($param eq "COMMAND");
-
-        ## FIXME: missing parameters must be detected by the command itself
-
-        $self->__check_command_param ({
-            PARAMS       => $keys,
-            PARAM_PATH   => [ $param ],
-            COMMAND      => $command,
-            COMMAND_PATH => [ $param ]});
-    }
-
-    return $self->{INSTANCE}->command ($keys);
-}
-
-sub __check_command_param
-{
-    my $self = shift;
-    my $keys = shift;
-
-    ## we need a hash ref with path to actual hash ref
-    ## we need the command and the actual parameter path
-
-    my $params = $keys->{PARAMS};
-    foreach my $key (@{$keys->{PARAM_PATH}})
-    {
-        $params = $params->{$key};
-    }
-
-    my $cmd = $COMMAND_PARAMS{$keys->{COMMAND}};
-    foreach my $key (@{$keys->{COMMAND_PATH}})
-    {
-        ## check if the used parameter is legal (parameter => 0)
-        if (not exists $cmd->{$key})
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_ILLEGAL_PARAM",
-                params  => {COMMAND => $keys->{COMMAND},
-                            PARAM   => join (", ", @{$keys->{COMMAND_PATH}})});
-        }
-        $cmd = $cmd->{$key};
-    }
-
-    ## this is only a check for the existence
-    return 1 if (not ref $cmd);
-
-    ## if we have an array which we can check then do it
-    if (ref $cmd and ref $cmd eq "ARRAY")
-    {
-        if (not grep (/^$params$/, @{$cmd}))
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_ILLEGAL_VALUE",
-                params  => {COMMAND => $keys->{COMMAND},
-                            PARAM   => join (", ", @{$keys->{PARAM_PATH}}),
-                            VALUE   => $params});
-        } else {
-            return 1;
-        }
-    }
-
-    ## if we have a hash here then there is substructure in the config
-    if (ref $cmd    and ref $cmd    eq "HASH" and
-        ref $params and ref $params eq "HASH")
-    {
-        my $next = undef;
-
-        ## first try to identify the correct hash
-        foreach my $key (keys %{$cmd})
-        {
-            my $name = $key;
-               $name =~ s/:.*$//;
-            my $value = $key;
-               $value =~ s/^[^\:]*://;
-            my @path = @{$keys->{PARAM_PATH}};
-            pop @path;
-            push @path, $name;
-            my $root = $keys->{PARAMS};
-            foreach my $elem (@path)
-            {
-                $root = $root->{$elem} if ($root and ref $root and
-                                           exists $root->{$elem});
-            }
-            if ($root eq $value)
-            {
-                $next = $key;
-                last;
-            }
-        }
-
-        ## use the default if present and nothing else is found
-        $next = ""
-            if (not defined $next and exists $cmd->{""});
-        $next = ":"
-            if (not defined $next and exists $cmd->{":"});
-
-        ## restart the check
-        foreach my $key (keys %{$params})
-        {
-            $self->__check_command_param ({
-                PARAMS       => $keys->{PARAMS},
-                PARAM_PATH   => [ @{$keys->{PARAM_PATH}}, $key ],
-                COMMAND      => $keys->{COMMAND},
-                COMMAND_PATH => [ @{$keys->{COMMAND_PATH}}, $next, $key ]});
-        }
-
-        ## anything looks ok
-        return 1;
-    }
-
-    ## no more checks to perform and no error detected
-    ## nevertheless there is a wrong config
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_WRONG_CONFIG",
-        params  => {COMMAND => $keys->{COMMAND}});
-}
-
-sub get_object
-{
-    my $self = shift;
+    my $ident = ident $self;
     my $keys = shift;
 
     foreach my $param (keys %{$keys})
@@ -414,19 +269,19 @@ sub get_object
             params  => {TYPE => $keys->{TYPE}, FORMAT => $keys->{FORMAT}});
     }
 
-    my $ref = $self->{INSTANCE}->get_object ($keys);
+    my $ref = $self->get_instance()->get_object($keys);
     if ($keys->{TYPE} eq "CSR" and $keys->{FORMAT} eq "SPKAC")
     {
-        $self->{OBJECT_CACHE}->{$ref} = "SPKAC"
+        $object_cache_of{$ident}->{$ref} = "SPKAC";
     } else {
-        $self->{OBJECT_CACHE}->{$ref} = $keys->{TYPE};
+        $object_cache_of{$ident}->{$ref} = $keys->{TYPE};
     }
     return $ref;
 }
 
-sub get_object_function
-{
+sub get_object_function {
     my $self = shift;
+    my $ident = ident $self;
     my $keys = shift;
 
     foreach my $param (keys %{$keys})
@@ -446,14 +301,14 @@ sub get_object_function
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NO_REF");
     }
 
-    if (not exists $self->{OBJECT_CACHE} or
-        not exists $self->{OBJECT_CACHE}->{$keys->{OBJECT}})
+    if (not exists $object_cache_of{$ident} or
+        not exists $object_cache_of{$ident}->{$keys->{OBJECT}})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NOT_IN_CACHE");
     }
 
-    my $type = $self->{OBJECT_CACHE}->{$keys->{OBJECT}};
+    my $type = $object_cache_of{$ident}->{$keys->{OBJECT}};
 
     my @functions = ();
     if ($type eq "X509")
@@ -488,12 +343,12 @@ sub get_object_function
              params  => {FUNCTION => $keys->{FUNCTION}, TYPE => $type});
     }
 
-    return $self->{INSTANCE}->get_object_function ($keys);
+    return $self->get_instance()->get_object_function($keys);
 }
 
-sub free_object
-{
+sub free_object {
     my $self   = shift;
+    my $ident  = ident $self;
     my $object = shift;
 
     if (not ref $object)
@@ -502,105 +357,17 @@ sub free_object
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NO_REF");
     }
 
-    if (not exists $self->{OBJECT_CACHE} or
-        not exists $self->{OBJECT_CACHE}->{$object})
+    if (not exists $object_cache_of{$ident} or
+        not exists $object_cache_of{$ident}->{$object})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NOT_IN_CACHE");
     }
 
-    delete $self->{OBJECT_CACHE}->{$object};
-    return $self->{INSTANCE}->free_object ($object);
+    delete $object_cache_of{$ident}->{$object};
+    return $self->get_instance()->free_object ($object);
 }
 
-sub login
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_LOGIN_ILLEGAL_PARAM");
-    }
-    $self->{INSTANCE}->login();
-}
-
-sub logout
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_LOGOUT_ILLEGAL_PARAM");
-    }
-    $self->{INSTANCE}->logout();
-}
-
-sub online
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_ONLINE_ILLEGAL_PARAM");
-    }
-    $self->{INSTANCE}->online();
-}
-
-sub key_online
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_KEY_ONLINE_ILLEGAL_PARAM");
-    }
-    $self->{INSTANCE}->key_online();
-}
-
-sub get_mode
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_MODE_ILLEGAL_PARAM");
-    }
-    $self->{INSTANCE}->get_mode();
-}
-
-sub get_certfile
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_CERTFILE_ILLEGAL_PARAM");
-    }
-    $self->{INSTANCE}->get_certfile();
-}
-
-sub DESTROY
-{
-    my $self = shift;
-
-    ## enforce destruction of backend instance
-    delete $self->{INSTANCE};
-}
-
-our $AUTOLOAD;
-sub AUTOLOAD {
-    my $self = shift;
-
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_UNSUPPORTED_FUNCTION",
-        params  => {"FUNCTION" => $AUTOLOAD});
-}
 
 1;
 __END__
@@ -611,10 +378,11 @@ OpenXPKI::Crypto::Backend::API - API for cryptographic backends.
 
 =head1 Description   
     
-this is the basic class for crypto backend API.
+this is the basic class for crypto backend API. It inherits from
+OpenXPKI::Crypto::API
         
 =head1 Functions
      
-=head2 new
+=head2 START
  
 is the constructor.

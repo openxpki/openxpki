@@ -26,6 +26,7 @@ use OpenXPKI::DN;
 my %workflow_factory : ATTR;
 
 my $workflow_table = 'WORKFLOW';
+my $context_table  = 'WORKFLOW_CONTEXT';
 my $workflow_history_table = 'WORKFLOW_HISTORY';
 
 
@@ -523,6 +524,51 @@ sub create_workflow_instance {
 }
 
 
+sub search_workflow_instances {
+    ##! 0: "FIXME TODO: query only within the current PKI realm!!!"
+    my $self  = shift;
+    my $ident = ident $self;
+    validate(
+	@_,
+	{
+	    CONTEXT => {
+		type => HASHREF,
+		optional => 1,
+	    },
+	});	 
+    my $arg_ref  = shift;
+
+    my $dbi = CTX('dbi_workflow');
+
+    if (exists $arg_ref->{CONTEXT}) {
+
+	# SELECT workflow_serial FROM workflow_context
+	#   WHERE ((workflow_context.workflow_context_key = $key)
+	#       AND (workflow_context.workflow_context_value like $value))
+
+        my $key   = $arg_ref->{CONTEXT}->{KEY};
+        my $value = $arg_ref->{CONTEXT}->{VALUE};
+	
+	# SELECT workflow_serial FROM workflow, workflow_context
+	#   WHERE ((workflow_context.workflow_context_key = $key)
+	#       AND (workflow_context.workflow_context_value like $value)
+	#       AND (workflow.workflow_serial = workflow_context.workflow_serial)
+	#       AND (workflow.pki_realm = $pki_realm))
+        # !!! FIXME: implement above query !!!
+	my $result = $dbi->select(
+	    TABLE   => $context_table,
+	    DYNAMIC => {
+		WORKFLOW_CONTEXT_KEY    => $key,
+		WORKFLOW_CONTEXT_VALUE  => $value,
+	    },
+	);
+
+	return map { $_->{WORKFLOW_SERIAL} } @{$result};
+    }
+    return;
+}
+
+
 ###########################################################################
 # private functions
 
@@ -618,6 +664,7 @@ sub __get_workflow_factory : PRIVATE {
 
 
 	for (my $ii = 0; $ii < $count; $ii++) {
+	    ##! 4: "entry index: $ii/$count"
 	    my $entry = CTX('xml_config')->get_xpath (
 		XPATH   => [ 'pki_realm', 'workflow_config', $type, 'configfile' ],
 		COUNTER => [ $pki_realm_index, 0,            0,     $ii ],
@@ -765,5 +812,38 @@ Return structure:
   ...
 }
 
+
+=head2 search_workflow_instances
+
+This function accesses the database directly in order to find
+Workflow instances matching the specified search criteria.
+
+Returns an array of the workflow instance IDs matching the
+query.
+
+Named parameters:
+
+=over
+
+=item * CONTEXT
+
+The named parameter CONTEXT must be a hash reference.
+Apply search filter to search using the KEY/VALUE pair passed in
+CONTEXT and match all Workflow instances whose context contain all
+of the specified tuples.
+It is possible to use SQL wildcards such as % in the VALUE field.
+
+=back
+
+Examples:
+
+  my @workflow_ids = $api->search_workflow_instances(
+      {
+	  CONTEXT =>
+	      {
+		  KEY   => 'SCEP_TID',
+		  VALUE => 'ECB001D912E2A357E6E813D87A72E641',
+	      },
+      }
 
 

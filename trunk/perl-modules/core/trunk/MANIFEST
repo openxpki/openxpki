@@ -13,6 +13,7 @@ OpenXPKI/DateTime.pm
 OpenXPKI/Debug.pm
 OpenXPKI/DN.pm
 OpenXPKI/Exception.pm
+OpenXPKI/FileUtils.pm
 OpenXPKI/XML/Cache.pm
 OpenXPKI/XML/Config.pm
 OpenXPKI/i18n.pm
@@ -20,6 +21,7 @@ openxpki.xsd
 
 ## Crypto layer
 
+OpenXPKI/Crypto/API.pm
 OpenXPKI/Crypto/TokenManager.pm
 OpenXPKI/Crypto/Secret.pm
 OpenXPKI/Crypto/Secret/Plain.pm
@@ -29,6 +31,7 @@ OpenXPKI/Crypto/Backend/API.pm
 OpenXPKI/Crypto/Object.pm
 OpenXPKI/Crypto/Header.pm
 OpenXPKI/Crypto/X509.pm
+OpenXPKI/Crypto/CLI.pm
 OpenXPKI/Crypto/CSR.pm
 OpenXPKI/Crypto/CRR.pm
 OpenXPKI/Crypto/CRL.pm
@@ -36,6 +39,13 @@ OpenXPKI/Crypto/PKCS7.pm
 OpenXPKI/Crypto/Profile/Base.pm
 OpenXPKI/Crypto/Profile/Certificate.pm
 OpenXPKI/Crypto/Profile/CRL.pm
+OpenXPKI/Crypto/Tool/SCEP.pm
+OpenXPKI/Crypto/Tool/SCEP/API.pm
+OpenXPKI/Crypto/Tool/SCEP/CLI.pm
+OpenXPKI/Crypto/Tool/SCEP/Command/get_message_type.pm
+OpenXPKI/Crypto/Tool/SCEP/Command/get_transaction_id.pm
+OpenXPKI/Crypto/Tool/SCEP/Engine/OpenSSL.pm
+OpenXPKI/Crypto/Toolkit.pm
 
 ## OpenSSL layer
 
