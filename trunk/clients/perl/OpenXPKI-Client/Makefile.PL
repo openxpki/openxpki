@@ -30,4 +30,5 @@ WriteMakefile(
         'OpenXPKI::Serialization::JSON' => 0,
         'version'    => 0,
     },
+    PL_FILES => {},
 );
