@@ -25,4 +25,5 @@ WriteMakefile(
         'version'    => 0,
 	'OpenXPKI::Client' => 0,
     },
+    PL_FILES => {},
 );
