@@ -27,6 +27,7 @@ case "$1" in
     configure)
         # add mod_env to modules.conf
         apache-modconf apache enable mod_env
+        apache-modconf apache enable mod_perl
 
         # restart apache
         /etc/init.d/apache reload
