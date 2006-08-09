@@ -198,7 +198,7 @@ sub do_query
         my $err    = $self->{STH}[$sth_nr]->err;
         my $errstr = $self->{STH}[$sth_nr]->errstr;
         $self->finish_sth();
-        OpenXPKI::EXception->throw (
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_EXECUTE_FAILED", 
             params  => {"QUERY"  => $query,
                         "ERRNO"  => $err,
