@@ -105,7 +105,7 @@ sub __load_config {
 
     # default tokens don't need key, cert etc...
     if ($type_path eq "common") {
-	foreach (qw(key cert internal_chain passwd passwd_parts)) {
+	foreach (qw(key cert internal_chain secret)) {
 	    $is_optional{uc($_)}++;
 	}
     }
@@ -121,7 +121,7 @@ sub __load_config {
                         engine     shell         wrapper 
                         randfile
                         key        cert          internal_chain
-                        passwd     passwd_parts
+                        secret
                         engine_section
                         key_store  engine_usage
                        )) {
@@ -176,7 +176,12 @@ sub __load_config {
 	    my $value = CTX('xml_config')->get_xpath(
 		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
 		COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
-	    $params_of{$ident}->{uc($key)} = $value;
+            if ($key ne 'secret') {
+    	        $params_of{$ident}->{uc($key)} = $value;
+            }
+            else { # todo: support more then secret method literal
+                $params_of{$ident}->{PASSWD} = $value;
+            }
 	}
     }
 }

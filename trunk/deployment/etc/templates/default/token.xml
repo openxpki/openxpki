@@ -46,11 +46,8 @@
 	<!-- CA certificate chain for crypto operations -->
 	<internal_chain>[% $ca.dir %]/cachain.pem</internal_chain>
 
-	<!-- Number of CA passphrase fragments -->
-        <passwd_parts>1</passwd_parts>
-
-	<!-- CA passphrase -->
-        <passwd>1234567890</passwd>
+	<!-- CA passphrase fragments -->
+        <secret method="Literal">1234567890</secret>
     </token>
     [% END %]
 
@@ -75,11 +72,8 @@
 	<!-- Certificate, must be in PEM format -->
         <cert>[% $entry.dir %]/cert.pem</cert>
 
-	<!-- Number of CA passphrase fragments -->
-        <passwd_parts>1</passwd_parts>
-
 	<!-- CA passphrase -->
-        <passwd>1234567890</passwd>
+        <secret method="Literal">1234567890</secret>
     </token>
     [% END %]
 

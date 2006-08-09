@@ -16,9 +16,9 @@
         <engine_usage></engine_usage>
 
 	<!-- OpenSSL binary location -->
-        <!-- <shell>/usr/local/ssl/bin/openssl</shell> -->
         <!-- <shell>/usr/bin/openssl</shell> -->
-        <shell>/opt/local/bin/openssl</shell>
+        <!-- <shell>/usr/bin/openssl</shell> -->
+        <shell>/usr/bin/openssl</shell>
 
 	<!-- OpenSSL binary call gets wrapped with this command -->
         <wrapper></wrapper>
@@ -39,11 +39,8 @@
 	<!-- CA certificate chain for crypto operations -->
 	<internal_chain>t/25_crypto/ca1/cacert.pem</internal_chain>
 
-	<!-- Number of CA passphrase fragments -->
-        <passwd_parts>1</passwd_parts>
-
 	<!-- CA passphrase -->
-        <passwd>1234567890</passwd>
+        <secret method="Literal">1234567890</secret>
     </token>
 
     <token id="ca2" super="common/token_config/token{ca1}">
@@ -75,9 +72,9 @@
         <engine_usage>ALWAYS</engine_usage>
 
 	<!-- OpenSSL binary location -->
-        <!-- <shell>/usr/local/ssl/bin/openssl</shell> -->
         <!-- <shell>/usr/bin/openssl</shell> -->
-        <shell>__GOST_OPENSSL__</shell>
+        <!-- <shell>/usr/bin/openssl</shell> -->
+        <shell>/usr/bin/openssl</shell>
 
     </token>
 
@@ -115,9 +112,9 @@ THREAD_LOCKING = 1
         <wrapper>/opt/nfast/bin/with-nfast -M</wrapper>
 
 	<!-- OpenSSL binary location -->
-        <!-- <shell>/usr/local/ssl/bin/openssl</shell> -->
         <!-- <shell>/usr/bin/openssl</shell> -->
-        <shell>/opt/local/bin/openssl</shell>
+        <!-- <shell>/usr/bin/openssl</shell> -->
+        <shell>/usr/bin/openssl</shell>
 
     </token>
 

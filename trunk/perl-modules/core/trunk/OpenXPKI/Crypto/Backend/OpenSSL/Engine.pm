@@ -28,7 +28,6 @@ sub new {
                         NAME
                         KEY
                         PASSWD
-                        PASSWD_PARTS
                         CERT
                         INTERNAL_CHAIN
                         ENGINE_SECTION
@@ -269,8 +268,6 @@ The constructor supports the following parameters:
 =item * KEY (filename of the key)
 
 =item * PASSWD (sometimes keys are passphrase protected)
-
-=item * PASSWD_PARTS (number of the parts of the passphrase)
 
 =item * CERT (filename of the certificate)
 

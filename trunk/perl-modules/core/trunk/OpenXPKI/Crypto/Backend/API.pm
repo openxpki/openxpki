@@ -97,7 +97,7 @@ sub __init_command_params : PRIVATE {
                                                    "des3",
                                                    "des"
                                                   ],
-                                               "CURVE_NAME" => 0
+                                               "CURVE_NAME" => 1
                                               },
                                            "TYPE:GOST94" =>
                                               {"ENC_ALG" =>
