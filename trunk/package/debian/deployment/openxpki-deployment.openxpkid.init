@@ -4,11 +4,7 @@
 #		This file should be used to construct scripts to be
 #		placed in /etc/init.d.
 #
-# Author:	Miquel van Smoorenburg <miquels@cistron.nl>.
-#		Ian Murdock <imurdock@gnu.ai.mit.edu>.
-#
-#		Please remove the "Author" lines above and replace them
-#		with your own name if you copy and modify this script.
+# Author:	Michael Bell <michael.bell@web.de>.
 #
 # Version:	@(#)skeleton  2.85-23  28-Jul-2004  miquels@cistron.nl
 #

@@ -45,7 +45,7 @@
     {
        $m->call_next;
     } else {
-       $m->comp('/authentication/autohandler');
+       $m->comp('/authentication/autohandler', '__session_id' => $__session_id);
     }
 </%perl>
 % if ($m->request_comp() !~ /^bin/) {
@@ -57,8 +57,10 @@
 % }
 
 <%init>
-    ## if there is a session then re-use it
-    if (defined $__session_id)
+    ## if there is a session and we are not in the authentication process
+    ## then re-use the session
+    if (defined $__session_id and
+        0 > substr ($m->fetch_next()->title(), "authentication/"))
     {
         $m->comp('/authentication/session.mhtml', '__session_id' => $__session_id);
         $m->comp('/authentication/role.mhtml') if ($context and not exists $context->{role});

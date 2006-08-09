@@ -2,7 +2,7 @@
     $msg             => undef
 </%args>
 <%init>
-  return if (defined $msg and $msg->{SERVICE_MSG} ne "SERVICE_READY");
+  return if (not defined $msg or $msg->{SERVICE_MSG} ne "SERVICE_READY");
   my $api = $context->{client}->get_API();
   $context->{role} = $api->get_role()->{PARAMS};
 </%init>

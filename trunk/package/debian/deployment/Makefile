@@ -33,9 +33,9 @@ package:
 	mv /tmp/openxpki-deployment_* .
 
 source-clean:
-	#rm -rf /tmp/openxpki-deployment-*
-	#rm -f /tmp/openxpki-deployment-*.tar.gz
-	#rm -f /tmp/openxpki-debian.tar.gz
+	rm -rf /tmp/openxpki-deployment-*
+	rm -f /tmp/openxpki-deployment-*.tar.gz
+	rm -f /tmp/openxpki-debian.tar.gz
 
 clean:	source-clean
 	rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes

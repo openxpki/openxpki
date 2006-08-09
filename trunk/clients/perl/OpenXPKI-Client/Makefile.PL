@@ -22,13 +22,13 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/OpenXPKI/Client.pm',
     PREREQ_PM => {
         'Test::More' => 0,
-        'Class::Std' => 0,
+        'Class::Std' => '0.0.7',
         'OpenXPKI::Debug' => 0,
         'OpenXPKI::Exception' => 0,
         'OpenXPKI::Transport::Simple' => 0,
         'OpenXPKI::Serialization::Simple' => 0,
         'OpenXPKI::Serialization::JSON' => 0,
-        'version'    => 0,
+        'version'    => '0.600',
     },
     PL_FILES => {},
 );

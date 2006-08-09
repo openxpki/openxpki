@@ -7,9 +7,9 @@
                     {
                         MENU => "anonymous_menu"
                     },
-                    'RA Operator' =>
+                    'CA Operator' =>
                     {
-                        MENU => "ra_op_menu"
+                        MENU => "ca_op_menu"
                     }
                 },
                 MENU =>
@@ -18,17 +18,16 @@
                     [
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",
                                    "create_csr"],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",
-                                   "workflow"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",
                                    "language"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
                                    "logout"]
                     ],
-                    "ra_op_menu" =>
+                    "ca_op_menu" =>
                     [
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CERTS",  "edit_certs"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT", "logout"]
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW", "workflow"],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE", "language"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",   "logout"]
                     ],
                     "workflow" =>
                     [

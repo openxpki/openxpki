@@ -31,7 +31,7 @@
     ## check that we must handle this message
     return $msg if ($msg->{SERVICE_MSG} ne "GET_AUTHENTICATION_STACK");
 
-    ## was the pki realm specified by the user?
+    ## was the authentication stack specified by the user?
     my %data = $m->request_args();
     if (exists $data{'auth_stack'})
     {

@@ -8,7 +8,7 @@ Architecture: any
 Recommends: libdbd-pg-perl | libdbd-mysql-perl
 Section: perl
 Priority: optional
-Depends: ${perl:Depends}, ${shlibs:Depends}, make, openssl (>= 0.9.8), libdatetime-perl, libxml-sax-perl, libxml-simple-perl, libtest-pod-perl, libcgi-session-perl, libfilter-perl, libtext-csv-perl, libxml-parser-perl, libdbi-perl, libtest-pod-coverage-perl, libdigest-sha1-perl, libintl-perl, libtimedate-perl, libexception-class-perl, libxml-sax-writer-perl, libnet-ldap-perl, liblog-log4perl-perl, libxml-filter-xinclude-perl, libxml-validator-schema-perl, libnet-server-perl, libtemplate-perl, libconfig-std-perl, libnet-server-perl, libregexp-common-perl
+Depends: ${perl:Depends}, ${shlibs:Depends}, make, openssl (>= 0.9.8), libdatetime-perl, libxml-sax-perl, libxml-simple-perl, libtest-pod-perl, libcgi-session-perl, libfilter-perl, libtext-csv-perl, libxml-parser-perl, libdbi-perl, libtest-pod-coverage-perl, libdigest-sha1-perl, libintl-perl, libtimedate-perl, libexception-class-perl, libxml-sax-writer-perl, libnet-ldap-perl, liblog-log4perl-perl, libxml-filter-xinclude-perl, libxml-validator-schema-perl, libnet-server-perl, libtemplate-perl, libnet-server-perl, libregexp-common-perl
 Description: OpenXPKI Perl core modules
  OpenXPKI is an Open Source PKI project.
  .

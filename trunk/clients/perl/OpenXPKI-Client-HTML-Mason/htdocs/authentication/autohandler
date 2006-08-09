@@ -1,6 +1,9 @@
+<%args>
+  $__session_id => undef
+</%args>
 <%perl>
     ## let's init the environment
-    $m->comp('/authentication/session.mhtml');
+    $m->comp('/authentication/session.mhtml', '__session_id' => $__session_id);
     my $session_id = $context->{session_id};
     my $client     = $context->{client};
     my $msg        = undef;
@@ -36,6 +39,10 @@
               'level' => 99,
               'msg'   => Dumper($context->{msg}));
     $msg = $m->comp('/authentication/auth_stack.mhtml', 'msg' => $msg);
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => Dumper($context->{msg}));
+    $msg = $m->comp('/authentication/passwd.mhtml', 'msg' => $msg);
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
               'msg'   => Dumper($context->{msg}));
