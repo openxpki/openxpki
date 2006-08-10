@@ -2,8 +2,8 @@
   <common>
     <log_config>t/28_log/log.conf</log_config>
     <server>
-        <user>klink</user>
-        <group>klink</group>
+        <user>root</user>
+        <group>root</group>
         <socket_file>t/socket</socket_file>
         <pid_file>t/pid</pid_file>
         <session_dir>t/50_auth</session_dir>
@@ -55,12 +55,12 @@
     <common id="default">
       <!-- default token (used for general crypto operations not requiring
            private key operations) -->
-      <token super="common/token_config/token{default}"/>
+      <token super="common/token_config/token{default_gost}"/>
 
     </common>
 
     <ca id="INTERNAL_CA_GOST">
-      <token    super="common/token_config/token{ca1}"/>
+      <token    super="common/token_config/token{cagost}"/>
     </ca>
 
   </pki_realm>
@@ -70,12 +70,12 @@
     <common id="default">
       <!-- default token (used for general crypto operations not requiring
            private key operations) -->
-      <token super="common/token_config/token{default}"/>
+      <token super="common/token_config/token{default_nciph}"/>
 
     </common>
 
     <ca id="INTERNAL_CA_NCIPH">
-      <token    super="common/token_config/token{ca1}"/>
+      <token    super="common/token_config/token{canciph}"/>
     </ca>
 
   </pki_realm>
