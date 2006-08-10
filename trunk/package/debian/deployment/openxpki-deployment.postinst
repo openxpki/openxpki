@@ -48,6 +48,8 @@ case "$1" in
                 openxpkiadm --config=/etc/openxpki/instances/trustcenter1/config.xml initdb 2>>/var/log/messages
 		echo DONE.
 	fi;
+	## fix var directory
+	chown openxpki:openxpki /var/openxpki/*
 
 	# force permissions
 	#for i in /var/lib/openca/session/cookie/node

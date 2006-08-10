@@ -60,15 +60,15 @@
                     },
                     "workflow_list_types" =>
                     {
-                        CMD => "service/workflow_list_types.html"
+                        CMD => "service/workflow/list_types.html"
                     },
                     "workflow_list_instances" =>
                     {
-                        CMD => "service/workflow_list_instances.html"
+                        CMD => "service/workflow/list_instances.html"
                     },
                     "workflow_create_instance" =>
                     {
-                        CMD => "service/workflow_create_instance.html"
+                        CMD => "service/workflow/create_instance.html"
                     },
                     "set_language_en_gb" =>
                     {

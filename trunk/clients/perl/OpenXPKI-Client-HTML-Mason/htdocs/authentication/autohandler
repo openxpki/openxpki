@@ -3,7 +3,9 @@
 </%args>
 <%perl>
     ## let's init the environment
-    $m->comp('/authentication/session.mhtml', '__session_id' => $__session_id);
+    $m->comp('/authentication/session.mhtml',
+             'init'         => 1,
+             '__session_id' => $__session_id);
     my $session_id = $context->{session_id};
     my $client     = $context->{client};
     my $msg        = undef;

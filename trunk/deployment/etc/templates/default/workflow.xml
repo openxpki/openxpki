@@ -24,4 +24,8 @@
     <configfile>[% dir.openxpkiconfdir %]/workflow_validator_certificate_signing_request.xml</configfile>
   </validators>
 
+  <conditions>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_condition.xml</configfile>
+  </conditions>
+
 </workflow_config>

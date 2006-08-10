@@ -13,7 +13,7 @@
 %   foreach my $type (keys %{$msg->{PARAMS}})
 %   {
   <dt>
-    <a href="../service/workflow_list_instances.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>">
+    <a href="list_instances.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>">
       <% i18nGettext($type) %>
     </a>
   </dt>

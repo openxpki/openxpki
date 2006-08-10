@@ -10,6 +10,7 @@ use warnings;
 
 package OpenXPKI::Service::Default::Command;
 use English;
+use Data::Dumper;
 
 use Class::Std;
 
@@ -25,26 +26,26 @@ my %api            : ATTR( :get<API> );
 
 
 # command registry
-my %allowed_command = map { $_ => 1 } qw(
-    nop
+my %allowed_command = (
+    nop                       => 1,
 
-    get_role
-    get_cert_profiles
-    get_cert_subject_profiles
+    get_role                  => {API => 'Info'},
+    get_cert_profiles         => {API => 'Info'},
+    get_cert_subject_profiles => {API => 'Info'},
 
-    get_ca_certificate
-    list_ca_ids
+    get_ca_certificate        => {API => 'Info'},
+    list_ca_ids               => {API => 'Info'},
 
-    list_workflow_instances
-    list_workflow_titles
+    list_workflow_instances   => {API => 'Workflow'},
+    list_workflow_titles      => {API => 'Workflow'},
 
-    get_workflow_info
-    set_workflow_fields
+    get_workflow_info         => {API => 'Workflow'},
+    set_workflow_fields       => {API => 'Workflow'},
+    get_workflow_activities   => {API => 'Workflow'},
 
-    create_workflow_instance
-    execute_workflow_activity
+    create_workflow_instance  => {API => 'Workflow'},
+    execute_workflow_activity => {API => 'Workflow'},
 );
-
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
@@ -134,8 +135,12 @@ sub execute {
 	my $method = $command{$ident};
 	##! 8: "automatic API mapping for $method"
 
+        ##! 8: "get correct API for the method"
+        my $used_api = $self->get_API();
+           $used_api = $used_api->get_api ($allowed_command{$method}->{API});
+        ##! 8: "call function at API"
 	return $self->command_response(
-	    $self->get_API()->$method($command_params{$ident}),
+	    $used_api->$method($command_params{$ident}),
 	    $method, # explicitly provide command name to returned structure
 	);
     } else {
@@ -174,6 +179,7 @@ sub command_response {
 	($command_name) = ($package =~ m{ ([^:]+) \z }xms);
     }
 
+    ##! 50: "result: ".Dumper($arg)
     return {
 	SERVICE_MSG => 'COMMAND',
 	COMMAND => $command_name,

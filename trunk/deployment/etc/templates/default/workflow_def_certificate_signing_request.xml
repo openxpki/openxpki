@@ -5,16 +5,35 @@
 
   <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>
-    <action name="create" 
-	    resulting_state="CREATED">
+    <action name="create_csr" 
+	    resulting_state="PENDING">
     </action>
   </state>
 
-  <state name="CREATED">
-    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_CREATED</description>
-    <action name="csr.finish"
-	    resulting_state="FINISHED" />
+  <state name="PENDING">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
+	    resulting_state="PENDING" />
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
+	    resulting_state="PENDING" />
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
+	    resulting_state="PENDING" />
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
+	    resulting_state="PENDING" />
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
+	    resulting_state="PENDING" />
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+	    resulting_state="APPROVED" />
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+	    resulting_state="REJECTED" />
   </state>
 
-  <state name="FINISHED" />
+  <state name="APPROVED">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED</description>
+    <action name="create_cert"
+	    resulting_state="EXECUTED" />
+  </state>
+
+  <state name="REJECTED" />
+  <state name="EXECUTED" />
 </workflow>

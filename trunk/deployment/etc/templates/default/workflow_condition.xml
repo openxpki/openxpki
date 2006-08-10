@@ -1,0 +1,6 @@
+<conditions>
+  <condition name="ACL::create_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="create_csr"/>
+  </condition>
+</conditions>
+

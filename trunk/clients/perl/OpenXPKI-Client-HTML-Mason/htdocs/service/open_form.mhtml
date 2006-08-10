@@ -1,8 +1,9 @@
 <%args>
     $session_id => undef
+    $action     => $m->request_comp()->name()
 </%args>
 
-        <form action="<% $m->request_comp()->name() %>" method="post">
+        <form action="<% $action %>" method="post">
 %    my %hash = $context->{menu}->get_menu_hash();
 %    foreach my $key (keys %hash)
 %    {

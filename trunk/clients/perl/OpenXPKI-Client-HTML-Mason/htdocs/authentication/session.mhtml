@@ -1,5 +1,6 @@
 <%args>
     $__session_id => undef
+    $init         => 0
 </%args>
 <%init>
   $m->comp ('/lib/debug.mhtml',
@@ -51,9 +52,11 @@
       };
       if ($EVAL_ERROR)
       {
-          ## kill session
+          ## kill the session
+          ## usually this is a timeout of the session
           undef $context;
-          return undef;
+          return undef if (not $init);
+          $client->init_session();
       }
   } else {
       $client->init_session();
@@ -72,4 +75,5 @@
        if ($context->{client}->get_communication_state() eq "can_receive");
 
    ## the message is get_pki_realm, get_auth_stack, login or service_ready
+   return $__session_id;
 </%init>

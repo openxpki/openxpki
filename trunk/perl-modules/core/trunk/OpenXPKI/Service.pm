@@ -144,12 +144,19 @@ sub __get_error {
         else
         {
             ## this is an exception
-            my %hash = (LABEL => $error->message());
-            $hash{PARAMS} = $error->params()
-                if (defined $error->params());
-            $hash{CHILDREN} = [ $self->__get_error ({EXCEPTIONS => $error->children()}) ]
-                if (defined $error->children());
-            push @list, \%hash;
+            if (ref($error) eq "OpenXPKI::Exception")
+            {
+                ## openxpki exception
+                my %hash = (LABEL => $error->message());
+                $hash{PARAMS} = $error->params()
+                    if (defined $error->params());
+                $hash{CHILDREN} = [ $self->__get_error ({EXCEPTIONS => $error->children()}) ]
+                    if (defined $error->children());
+                push @list, \%hash;
+            } else {
+                ## other exception or software error
+                push @list, scalar $error;
+            }
         }
     }
 

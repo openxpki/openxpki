@@ -32,7 +32,7 @@
 % {
   <tr>
     <td><% i18nGettext($instance->{'WORKFLOW_TYPE'}) %></td>
-    <td><a href="workflow_show_instance.html?type=<% $instance->{'WORKFLOW_TYPE'} %>;id=<% $instance->{'WORKFLOW_SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $instance->{'WORKFLOW_SERIAL'} %></a></td>
+    <td><a href="show_instance.html?type=<% $instance->{'WORKFLOW_TYPE'} %>;id=<% $instance->{'WORKFLOW_SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $instance->{'WORKFLOW_SERIAL'} %></a></td>
     <td><% $instance->{'WORKFLOW_STATE'} %></td>
     <td><% $instance->{'WORKFLOW_LAST_UPDATE'} %></td>
     <td><% i18nGettext ($instance->{'PKI_REALM'}) %></td>

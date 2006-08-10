@@ -2,6 +2,7 @@
     $type => undef
     $id   => undef
     $msg  => undef
+    $activities => undef
 </%args>
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE') %></h1>
 <p>
@@ -81,8 +82,24 @@
   </tr>
 % }
 </table>
-
-<input type="button" name="print" value="<% i18nGettext ('I18N_OPENXPKI_HTML_PRINT_BUTTON') %>" onClick="window.print();"/>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES') %></h1>
+<div class="openxpki_command_list">
+% foreach my $activity (@{$activities})
+% {
+%   my $filename = lc($activity);
+%      $filename =~ s/i18n_openxpki_wf_[^_]*_//;
+  <div class="openxpki_command_list_item">
+    <& /service/open_form.mhtml, 'action' => "activity/$filename.html" &>
+    <& /lib/html/hidden.mhtml, 'name' => 'type', 'value' => $type &>
+    <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
+    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext($activity) &>
+    <& /service/close_form.mhtml &>
+  </div>
+% }
+  <div class="openxpki_command_list_item">
+    <input type="button" name="print" value="<% i18nGettext ('I18N_OPENXPKI_HTML_PRINT_BUTTON') %>" onClick="window.print();"/>
+  </div>
+</div>
 
 <%init>
     if (not defined $msg or
@@ -98,5 +115,18 @@
                        "ID"       => $id
                    }
                );
+    }
+    if (not defined $activities)
+    {
+        ## ok we have to get the info from the server
+        my $hmsg = $context->{client}->send_receive_command_msg
+               (
+                   "get_workflow_activities",
+                   {
+                       "WORKFLOW" => $type,
+                       "ID"       => $id
+                   }
+               );
+        $activities = $hmsg->{PARAMS};
     }
 </%init>
