@@ -54,8 +54,14 @@
       {
           ## kill the session
           ## usually this is a timeout of the session
+          ## disconnect the client to make a clean start
           undef $context;
+          undef $client;
           return undef if (not $init);
+          $client = OpenXPKI::Client::HTML::Mason->new(
+                    {
+                        SOCKETFILE => $socketfile,
+                    });
           $client->init_session();
       }
   } else {

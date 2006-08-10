@@ -98,22 +98,27 @@ close $fh;
 
 #determine version
 
-my $openxpki_version;
+my $openxpki_version = 0;
 
 # check if we are using a SVN checkout
-open $fh, "svn info 2>/dev/null |";
+open $fh, "svn info -R 2>/dev/null |";
 while (my $line = <$fh>) {
     chomp $line;
     if ($line =~ m{ \A Last\ Changed\ Rev: \s* (\d+) }xms) {
-	$openxpki_version  = $openxpki_major_version . '.' . $1;
-	print STDERR "This is a development tree\n";
-	print STDERR "Last Changed Revision from SVN: $1\n";
+        next if ($1 <= $openxpki_version);
+        $openxpki_version = $1;
     }
+}
+if ($openxpki_version)
+{
+    print STDERR "This is a development tree\n";
+    print STDERR "Last Changed Revision from SVN: $openxpki_version\n";
+    $openxpki_version = $openxpki_major_version.".".$openxpki_version;
 }
 close $fh;
 
 # fallback methods to determine revision
-if (! defined $openxpki_version) {
+if (not $openxpki_version) {
     # check for forced-revision file that should contain a single integer
     # number
     my $filename = 'revision';

@@ -40,7 +40,8 @@
     ## EXCEPTION: if shibboleth is in use then the client forwards
     ##            the session id from its environment (a session injection
     ##            from the browser is not possible)
-    if (exists $context->{session_id} and
+    if (defined $context and
+        exists $context->{session_id} and
         length $context->{session_id})
     {
        $m->call_next;
