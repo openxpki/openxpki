@@ -189,7 +189,7 @@ Usage example: simple multi-part pin
 
 =head2 Methods
 
-=head new
+=head3 new
 
 Constructor. If a hash reference is given the following named parameters
 are accepted:
