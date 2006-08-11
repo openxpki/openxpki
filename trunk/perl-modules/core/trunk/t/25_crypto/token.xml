@@ -39,11 +39,8 @@
 	<!-- CA certificate chain for crypto operations -->
 	<internal_chain>t/25_crypto/ca1/cacert.pem</internal_chain>
 
-	<!-- Number of CA passphrase fragments -->
-        <passwd_parts>1</passwd_parts>
-
 	<!-- CA passphrase -->
-        <passwd>1234567890</passwd>
+        <secret method="Literal">1234567890</secret>
     </token>
 
     <token id="ca2" super="common/token_config/token{ca1}">
@@ -56,11 +53,8 @@
 	<!-- CA certificate chain for crypto operations -->
 	<internal_chain>t/25_crypto/ca2/cacert.pem</internal_chain>
 
-	<!-- Number of CA passphrase fragments -->
-        <passwd_parts>1</passwd_parts>
-
 	<!-- CA passphrase -->
-        <passwd>1234567890</passwd>
+        <secret method="Literal">1234567890</secret>
     </token>
 
     <token id="default_gost" super="common/token_config/token{default}">
@@ -93,11 +87,8 @@
         <!-- CA certificate chain for crypto operations -->
         <internal_chain>t/25_crypto/cagost/cacert.pem</internal_chain>
 
-        <!-- Number of CA passphrase fragments -->
-        <passwd_parts>1</passwd_parts>
-
         <!-- CA passphrase -->
-        <passwd>1234567890</passwd>
+        <secret method="Literal">1234567890</secret>
     </token>
 
     <token id="default_nciph" super="common/token_config/token{default}">
@@ -131,9 +122,7 @@ THREAD_LOCKING = 1
         <!-- CA certificate chain for crypto operations -->
         <internal_chain>t/25_crypto/canciph/cacert.pem</internal_chain>
 
-        <passwd_parts></passwd_parts>
-
-        <passwd></passwd>
+        <secret method="Literal"></secret>
 
     </token>
 
