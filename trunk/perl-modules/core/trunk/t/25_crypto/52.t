@@ -1,4 +1,6 @@
-use Test::More tests => 28;
+use Test::More tests => 31;
+use OpenXPKI::Crypto::TokenManager;
+use Data::Dumper;
 
 print STDERR "OpenXPKI::Crypto::Secret\n";
 
@@ -10,6 +12,18 @@ BEGIN { use_ok( 'OpenXPKI::Crypto::Secret' ) }
 
 ok(1);
 
+eval `cat t/25_crypto/common.pl`;
+
+ok(1);
+
+## parameter checks for TokenManager init
+
+my $mgmt = OpenXPKI::Crypto::TokenManager->new ();
+ok (1);
+
+
+my $default_token = $mgmt->get_token (TYPE      => "DEFAULT",
+                                      PKI_REALM => "Test Root CA");
 ###########################################################################
 # plain secrets
 my $secret = OpenXPKI::Crypto::Secret->new();
@@ -73,6 +87,7 @@ eval {
 		K => 3,
 		N => 5,
 	    },
+            TOKEN => $default_token,
 	});   # 'Split' secret, 3 out of 5 shares
 };
 
@@ -83,27 +98,42 @@ SKIP: {
 
     ok(defined $secret);
     
-    my @shares = $secret->compute('foobarbaz');
-    
-    ok(! $secret->is_complete());
-    ok(! defined $secret->get_secret());
+    my @shares = $secret->compute();
+    print STDERR "Shares: " . Dumper(@shares) . "\n" if ($ENV{DEBUG});
+   
+    my $created_secret = $secret->get_secret();
+
+    print STDERR "created secret: $created_secret\n" if ($ENV{DEBUG});
+ 
+    $recover_secret = OpenXPKI::Crypto::Secret->new(
+	{
+	    TYPE => 'Split',
+	    QUORUM => 
+	    {
+		K => 3,
+		N => 5,
+	    },
+            TOKEN => $default_token,
+	});   # 'Split' secret, 3 out of 5 shares
+    ok(! $recover_secret->is_complete());
+    ok(! defined $recover_secret->get_secret());
     
     # share #2
-    ok($secret->set_secret($shares[2]));
+    ok($recover_secret->set_secret($shares[2]));
     
-    ok(! $secret->is_complete());
-    ok(! defined $secret->get_secret());
+    ok(! $recover_secret->is_complete());
+    ok(! defined $recover_secret->get_secret());
     
 
     # share #4
-    ok($secret->set_secret($shares[4]));
+    ok($recover_secret->set_secret($shares[4]));
     
-    ok(! $secret->is_complete());
-    ok(! defined $secret->get_secret());
+    ok(! $recover_secret->is_complete());
+    ok(! defined $recover_secret->get_secret());
     
     # share #1
-    ok($secret->set_secret($shares[1]));
+    ok($recover_secret->set_secret($shares[1]));
     
-    ok($secret->is_complete());
-    ok($secret->get_secret(), 'foobarbaz');
+    ok($recover_secret->is_complete());
+    ok($recover_secret->get_secret(), $created_secret);
 }

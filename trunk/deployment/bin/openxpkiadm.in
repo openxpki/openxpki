@@ -262,7 +262,9 @@ sub list_keys {
                 XPATH   => [ 'pki_realm' , $type, 'id' ],
                 COUNTER => [ $realm_index, $i   , 0    ],
             );
-            print '  Key for purpose ' . uc($type) . ' with ID: ' . $type_id . "\n";
+            print '  Key for purpose ' . uc($type) . ' with ID: '
+                . $type_id . "\n";
+
             my $token_count = $config->get_xpath_count(
                 XPATH   => [ 'pki_realm' , $type, 'token' ],
                 COUNTER => [ $realm_index, $i ],
@@ -281,13 +283,14 @@ sub list_keys {
                     COUNTER => [ @token_counter           ],
                     );
 
-            if ($key_count != 1) { # there should only be one key per
-# token!
-                print STDERR "    ! Misconfiguration detected: $key_count keys configured!\n";
+            if ($key_count != 1) { # there should only be one key per token!
+                print STDERR "    ! Misconfiguration detected: $key_count"
+                           . " keys configured!\n";
             }
             if ($secret_count != 1) { # there should only be one secret
-# definition per token
-                print STDERR "    ! Misconfiguration detected: $secret_count secret definitions configured!\n";
+                                      # definition per token
+                print STDERR "    ! Misconfiguration detected: $secret_count"
+                           . " secret definitions configured!\n";
             }
 
             if ($key_count == 1 && $secret_count == 1) { # everything is fine
@@ -312,19 +315,21 @@ sub list_keys {
                         );
                 if ($secret_method ne 'Literal') { # all others have quorum
                     my $quorum_n = $config->get_xpath(
-                            XPATH   => [ @token_path   , 'secret', 'quorum', 'n' ],
-                            COUNTER => [ @token_counter, 0       , 0       , 0   ],
-                            );
+                        XPATH   => [ @token_path   , 'secret', 'quorum', 'n' ],
+                        COUNTER => [ @token_counter, 0       , 0       , 0   ],
+                    );
 
                     my $quorum_k = __get_quorum_k({
                         CONFIG        => $config,
                         TOKEN_PATH    => \@token_path,
                         TOKEN_COUNTER => \@token_counter,
                     });
-                    if (! defined $quorum_k) { # if it is not defined, n is the default value
+                    if (! defined $quorum_k) { # if it is not defined, n is
+                                               # the default value
                         $quorum_k = $quorum_n;
                     }
-                    $secret_method .= ' (n = ' . $quorum_n . ', k = ' .$quorum_k . ')';
+                    $secret_method .= ' (n = ' . $quorum_n . ', k = ' 
+                        . $quorum_k . ')';
                 }
                 print '      Secret method: ' . $secret_method . "\n";
             }
@@ -362,16 +367,16 @@ sub generate_key {
         COUNTER => [ $realm_index ],
     );
     my $purpose_index;
-    for (my $i=0; $i < $nr_of_purpose_items; $i++) { # look for matching token id
+    for (my $i=0; $i < $nr_of_purpose_items; $i++) { # look for matching id
         next if ($key_id ne $config->get_xpath(
-                            XPATH   => [ 'pki_realm' , $purpose, 'token', 'id' ],
-                            COUNTER => [ $realm_index, $i      , 0      , 0    ],
+                        XPATH   => [ 'pki_realm' , $purpose, 'token', 'id' ],
+                        COUNTER => [ $realm_index, $i      , 0      , 0    ],
                 ));
         $purpose_index = $i;
         last;
     }
     if (! defined($purpose_index)) {
-        print STDERR "Could not find configuration item for this ID and purpose.\n";
+        print STDERR "Could not find configuration for this ID and purpose.\n";
         exit 1;
     }
     my @token_path    = ( 'pki_realm' , $purpose      , 'token' );
@@ -384,25 +389,33 @@ sub generate_key {
         );
     };
     if ($EVAL_ERROR) {
-        print STDERR "Could not read key filename from config file, configuration error?\n";
+        print STDERR "Could not read key filename from config file, "
+            . "configuration error?\n";
         print STDERR "$EVAL_ERROR\n";
         exit 1;
     }
     if (-s $key_filename) {
-        print STDERR "Key file is non-empty, cowardly refusing to create new key.\n";
+        print STDERR "Key file is non-empty, cowardly refusing to create "
+            . "new key.\n";
         exit 1;
     }
     my $secret_method = $config->get_xpath(
             XPATH   => [ @token_path   , 'secret', 'method' ],
             COUNTER => [ @token_counter, 0       , 0        ],
     );
+
+    my $default_token = CTX('crypto_layer')->get_token(
+            TYPE      => 'DEFAULT',
+            PKI_REALM => $realm,
+    );
+
     print "Creating new key with secret method $secret_method\n";
+    my $passwd;
     if ($secret_method eq 'Literal') {
-        my $password = $config->get_xpath(
+        $passwd = $config->get_xpath(
             XPATH   => [ @token_path   , 'secret' ],
             COUNTER => [ @token_counter, 0        ],
         ); 
-        # TODO: create new key with $password 
     }
     else { # all others have quorum_n
         my $quorum_n = $config->get_xpath(
@@ -418,13 +431,15 @@ sub generate_key {
                 PARTS => $quorum_n,                
             });
             for (my $i = 1; $i <= $quorum_n; $i++) {
-                my $secret = __prompt_password("Please enter password share $i/$quorum_n: ");
+                my $secret = __prompt_password("Please enter "
+                    . "password share $i/$quorum_n: ");
                 $crypto_secret->set_secret({
                     PART   => $i,                    
                     SECRET => "$secret", # $secret is of type IO::Prompt::Return
                 });
                 print "\n";
             }
+            $passwd = $crypto_secret->get_secret();
         }
         elsif ($secret_method eq 'Split') {
             my $quorum_k = __get_quorum_k({
@@ -432,7 +447,7 @@ sub generate_key {
                     TOKEN_PATH    => \@token_path,
                     TOKEN_COUNTER => \@token_counter,
             });
-            if (! defined $quorum_k) { # if k is undefined, n is the default value
+            if (! defined $quorum_k) { # if k is undefined, n is the default
                 $quorum_k = $quorum_n;
             }
             $crypto_secret = OpenXPKI::Crypto::Secret->new({
@@ -441,132 +456,171 @@ sub generate_key {
                     N => $quorum_n,
                     K => $quorum_k,
                 },
+                TOKEN  => $default_token,
             });
-            my @shares = $crypto_secret->compute(); 
+            my @shares = $crypto_secret->compute(); # TODO: use bitlength
+                                                    # based on chosen algo
+            for (my $i = 0; $i < scalar(@shares); $i++) {
+                my $nr = $i+1;
+                prompt("Please make sure that share holder number $nr is ready"
+                    . " to copy the share,\n"
+                    . "then press enter to view the share.");
+                for (my $j = 0; $j < 100; $j++) {
+                    print "\n"; # pseudo clearscreen
+                }
+                print "Please copy the following share:\n";
+                print $shares[$i] . "\n";
+                print "Press enter to continue (next share will not "
+                    . "yet be shown).\n";
+                prompt();
+                for (my $j = 0; $j < 100; $j++) {
+                    print "\n"; # pseudo clearscreen
+                }
+            }
+            ### test recovering
+            #my $recover_secret = OpenXPKI::Crypto::Secret->new({
+            #    TYPE   => 'Split',
+            #    QUORUM => {
+            #        N => $quorum_n,
+            #        K => $quorum_k,
+            #    },
+            #    TOKEN  => $default_token,
+            #});
+            #$recover_secret->set_secret($shares[0]);
+            #$recover_secret->set_secret($shares[1]);
+            #$recover_secret->set_secret($shares[2]);
+            #print "recovered secret:  " . $recover_secret->get_secret() . "\n";
+            #print "'enrolled' secert: " . $crypto_secret->get_secret() . "\n";
         }
-        my $default_token = CTX('crypto_layer')->get_token(
-                TYPE      => 'DEFAULT',
-                PKI_REALM => $realm,
-        );
-        # get possible types and options from token
-        my %command_params = %{$default_token->get_cmd_param('create_key')};
+        $passwd = $crypto_secret->get_secret();
+    }
 
-        print "Please choose one of the following key types:\n";
-        foreach my $possible_type ( @{$command_params{TYPE}} ) {
-            print "  - $possible_type\n";
-        }
-        my $type = prompt('Key type: ');
-        my $type_parameters = $command_params{PARAMETERS}->{"TYPE:" . $type};
+    # Parameter configuration
 
-        while (! defined $type_parameters) {
-            # no parameter entry in command_params available for the chosen type
-            print "Invalid type chosen, please try again.\n";
-            $type = prompt('Key type: ');
-            $type_parameters = $command_params{PARAMETERS}->{"TYPE:" . $type};
-        }
-        
-        my $parameters; # parameter hash used in the token command
+    # get possible types and options from token
+    my %command_params = %{$default_token->get_cmd_param('create_key')};
+
+    print "Please choose one of the following key types:\n";
+    foreach my $possible_type ( @{$command_params{TYPE}} ) {
+        print "  - $possible_type\n";
+    }
+    my $type = prompt('Key type: ');
+    my $type_parameters = $command_params{PARAMETERS}->{"TYPE:" . $type};
+
+    while (! defined $type_parameters) {
+        # no parameter entry in command_params available for the chosen type
+        print "Invalid type chosen, please try again.\n";
+        $type = prompt('Key type: ');
+        $type_parameters = $command_params{PARAMETERS}->{"TYPE:" . $type};
+    }
+
+    my $parameters; # parameter hash used in the token command
         my %already_configured_parameters;
 
-        if (defined $type_parameters->{KEY_LENGTH}) { # key length is only possible for some algos
-            print "\nPlease choose one of the following key lengths:\n";
-            my %valid_keylength = ( );
-            foreach my $possible_keylength ( @{$type_parameters->{KEY_LENGTH}} ) {
-                print "  - $possible_keylength\n";
-                $valid_keylength{$possible_keylength} = 1;
-            }
-
-            my $key_length = prompt('Key length: ');
-            while (! defined $valid_keylength{$key_length}) {
-                print "Invalid key length chosen, please try again.\n";
-                $key_length = prompt('Key length: ');
-            }
-            # implicit cast, $key_length is of type IO::Prompt::ReturnVal!
-            $parameters->{KEY_LENGTH} = "$key_length";
-
-            # delete $type_parameters->{KEY_LENGTH}; 
-            $already_configured_parameters{KEY_LENGTH} = 1;
+    if (defined $type_parameters->{KEY_LENGTH}) {
+        # key length is only possible for some algos
+        print "\nPlease choose one of the following key lengths:\n";
+        my %valid_keylength = ( );
+        foreach my $possible_kl ( @{$type_parameters->{KEY_LENGTH}} ) {
+            print "  - $possible_kl\n";
+            $valid_keylength{$possible_kl} = 1;
         }
 
-        if (defined $type_parameters->{ENC_ALG}) { # currently defined for all, but you never know
-            print "\nPlease choose one of the following key encryption algorithms:\n";
-            my %valid_enc_alg = ( );
-            foreach my $possible_enc_alg ( @{$type_parameters->{ENC_ALG}} ) {
-                if ($possible_enc_alg eq '__undef') { # present __undef as default
-                    $possible_enc_alg = 'default';
-                }
-                print "  - $possible_enc_alg\n";
-                $valid_enc_alg{$possible_enc_alg} = 1;
-            }
-            my $enc_alg = prompt('Encryption algorithm: ');
-            while (! defined $valid_enc_alg{$enc_alg}) {
-                print "Invalid encryption algorithm chosen, please try again.\n";
-                $enc_alg = prompt('Encryption algorithm: ');
-            }
-            if ("$enc_alg" ne 'default') { # specific algorithm requested
-                $parameters->{ENC_ALG} = "$enc_alg"; # implicit type cast!
-            }
-            # delete $type_parameters->{ENC_ALG}; # this deletes in command_params!!!
-            $already_configured_parameters{ENC_ALG} = 1;
+        my $key_length = prompt('Key length: ');
+        while (! defined $valid_keylength{$key_length}) {
+            print "Invalid key length chosen, please try again.\n";
+            $key_length = prompt('Key length: ');
         }
+        # implicit cast, $key_length is of type IO::Prompt::ReturnVal!
+        $parameters->{KEY_LENGTH} = "$key_length";
 
-        # configure optional parameters
-        foreach my $param (keys %{$type_parameters}) {
-            if (! defined $already_configured_parameters{$param} ) {
-                my $optional = 0;
-                if (ref $type_parameters->{$param} eq '') { # type param is number
-                    if ($type_parameters->{$param} == 0) {
-                        $optional = 1;
-                    }
+        $already_configured_parameters{KEY_LENGTH} = 1;
+    }
+
+    if (defined $type_parameters->{ENC_ALG}) { # currently defined for all,
+                                               # but you never know
+        print "\nPlease choose one of the following key encryption "
+            . "algorithms:\n";
+        my %valid_enc_alg = ( );
+        foreach my $possible_enc_alg ( @{$type_parameters->{ENC_ALG}} ) {
+            if ($possible_enc_alg eq '__undef') { 
+                $possible_enc_alg = 'default'; # present __undef as default
+            }
+            print "  - $possible_enc_alg\n";
+            $valid_enc_alg{$possible_enc_alg} = 1;
+        }
+        my $enc_alg = prompt('Encryption algorithm: ');
+        while (! defined $valid_enc_alg{$enc_alg}) {
+            print "Invalid encryption algorithm chosen, please try "
+                . "again.\n";
+            $enc_alg = prompt('Encryption algorithm: ');
+        }
+        if ("$enc_alg" ne 'default') { # specific algorithm requested
+            $parameters->{ENC_ALG} = "$enc_alg"; # implicit type cast!
+        }
+        $already_configured_parameters{ENC_ALG} = 1;
+    }
+
+    # configure optional parameters
+    foreach my $param (keys %{$type_parameters}) {
+        if (! defined $already_configured_parameters{$param} ) {
+            my $optional = 0;
+            if (ref $type_parameters->{$param} eq '') { # type param is int
+                if ($type_parameters->{$param} == 0) {
+                    $optional = 1;
                 }
-                elsif (ref $type_parameters->{$param} eq 'ARRAY') {
-                    # print Dumper($type_parameters->{$param});
-                    $optional = __string_is_in_array({
+            }
+            elsif (ref $type_parameters->{$param} eq 'ARRAY') {
+                $optional = __string_is_in_array({
                         STRING => '__undef',
                         ARRAY  => $type_parameters->{$param},
-                    });
-                }
-                my $want_config = 0;
-                if ($optional == 1) {
-                    my $answer = prompt "Do you want to configure the optional parameter $param (y/n)? ", '-y';
-                    if ($answer =~ /^[yY]$/) {
-                        $want_config = 1;
-                    }
-                }
-                if ($optional != 1 || $want_config == 1) {
-                    if (ref $type_parameters->{$param} eq 'ARRAY') {
-                        print "Please choose one of the following values for $param: \n";
-                        foreach my $elem (@{$type_parameters->{$param}}) {
-                            print "  - $elem\n";
-                        }
-                    }
-                    my $param_value = prompt("Value for $param: ");
-                    if (ref $type_parameters->{$param} eq 'ARRAY') { # check validity
-                        while (! __string_is_in_array({
-                                        STRING => $param_value,
-                                        ARRAY  => $type_parameters->{$param},
-                                    })) {
-                            print "Invalid value, please try again.\n";
-                            $param_value = prompt("Value for $param: ");
-                        }
-                    }
-                    $parameters->{$param} = "$param_value"; # implicit type cast!
+                });
+            }
+            my $want_config = 0;
+            if ($optional == 1) {
+                my $answer = prompt "Do you want to configure the optional"
+                    . " parameter $param (y/n)? ", '-y';
+                if ($answer =~ /^[yY]$/) {
+                    $want_config = 1;
                 }
             }
+            if ($optional != 1 || $want_config == 1) {
+                if (ref $type_parameters->{$param} eq 'ARRAY') {
+                    print "Please choose one of the following values "
+                        . "for $param: \n";
+                    foreach my $elem (@{$type_parameters->{$param}}) {
+                        print "  - $elem\n";
+                    }
+                }
+                my $param_value = prompt("Value for $param: ");
+                if (ref $type_parameters->{$param} eq 'ARRAY') { 
+                    # check validity
+                    while (! __string_is_in_array({
+                                STRING => $param_value,
+                                ARRAY  => $type_parameters->{$param},
+                                })) {
+                        print "Invalid value, please try again.\n";
+                        $param_value = prompt("Value for $param: ");
+                    }
+                }
+                $parameters->{$param} = "$param_value"; # implicit cast!
+            }
         }
+    }
 
-        print "Creating key, please be patient ...\n";
 
-        my $key = $default_token->command({
+    print "Creating key, please be patient ...\n";
+
+    my $key = $default_token->command({
             COMMAND => 'create_key',
             TYPE    => "$type",
-            PASSWD  => $crypto_secret->get_secret(),
+            PASSWD  => $passwd,
             PARAMETERS => $parameters,
-        });
-        if ($key ne '') {
-            my $key_path = $key_filename;
-            $key_path =~ s/(.*)\/.*/$1/; # perl is greedy, so this is the path
-            if (! -d $key_path) { # key path does not yet exist, create it
+    });
+    if ($key ne '') {
+        my $key_path = $key_filename;
+        $key_path =~ s/(.*)\/.*/$1/; # perl is greedy, so this is the path
+            if (! -d $key_path) {    # key path does not yet exist, create it
                 eval { # try to create
                     mkpath($key_path);
                 };
@@ -575,20 +629,20 @@ sub generate_key {
                     exit 1; 
                 }
             }
-            my $fu = OpenXPKI::FileUtils->new();
-            $fu->write_file({
+        my $fu = OpenXPKI::FileUtils->new();
+        $fu->write_file({
                 FILENAME => $key_filename,
                 CONTENT  => $key,
-            });
-            if (-s $key_filename) { # key file exists and is nonzero
-                print "Key successfully written to $key_filename\n";
-            }
-        }
-        else {
-            print STDERR "Key creation failed.\n";
-            exit 1;
+                });
+        if (-s $key_filename) { # key file exists and is nonzero
+            print "Key successfully written to $key_filename\n";
         }
     }
+    else {
+        print STDERR "Key creation failed.\n";
+        exit 1;
+    }
+
     1;
 }
 

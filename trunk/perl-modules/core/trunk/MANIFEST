@@ -65,6 +65,8 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs10.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_cert.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs12.pm
 
+OpenXPKI/Crypto/Backend/OpenSSL/Command/is_prime.pm
+
 OpenXPKI/Crypto/Backend/OpenSSL/Command/issue_cert.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/issue_crl.pm
 

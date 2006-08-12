@@ -16,6 +16,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 use English;
+#use Smart::Comments;
 
 ## scalar value:
 ##     - 0 means the parameter is optional
@@ -97,7 +98,11 @@ sub __init_command_params : PRIVATE {
                                                    "des3",
                                                    "des"
                                                   ],
-                                               "CURVE_NAME" => 1
+                                               "CURVE_NAME" => 
+                                                    [ "sect571r1",
+                                                      "sect571r2",
+                                                      "__undef",
+                                                     ]
                                               },
                                            "TYPE:GOST94" =>
                                               {"ENC_ALG" =>
@@ -125,6 +130,8 @@ sub __init_command_params : PRIVATE {
                           "CHAIN"          => 0},
     "create_random"   => {"RETURN_LENGTH" => 0,
                           "RANDOM_LENGTH" => 0},
+    "is_prime"        => {"PRIME"   => 1,
+                         },
     "issue_cert"      => {"PROFILE" => 1,
                           "CSR"     => 1},
     "issue_crl"       => {"PROFILE" => 1,
@@ -221,6 +228,17 @@ sub START {
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_ILLEGAL_PARAMETER",
             params  => {NAME => $key, VALUE => $arg_ref->{$key}});
     }
+}
+
+sub get_cmd_param {
+    my $self = shift;
+    my $arg = shift;
+
+    my $command_params = $self->get_command_params();
+    my %rc = %{$command_params->{$arg}};
+    ### %rc
+    #return $command_params->{$arg};
+    return \%rc;
 }
 
 sub get_object {
@@ -386,3 +404,8 @@ OpenXPKI::Crypto::API
 =head2 START
  
 is the constructor.
+
+=head2 get_cmd_param
+
+get the command_params entry for the specified command
+
