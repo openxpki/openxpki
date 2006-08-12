@@ -98,11 +98,7 @@ sub __init_command_params : PRIVATE {
                                                    "des3",
                                                    "des"
                                                   ],
-                                               "CURVE_NAME" => 
-                                                    [ "sect571r1",
-                                                      "sect571r2",
-                                                      "__undef",
-                                                     ]
+                                               "CURVE_NAME" => 1,
                                               },
                                            "TYPE:GOST94" =>
                                               {"ENC_ALG" =>
