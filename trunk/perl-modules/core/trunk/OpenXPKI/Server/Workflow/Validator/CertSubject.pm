@@ -98,7 +98,7 @@ sub validate {
     if (scalar @{$errors} and scalar @{$errors} > $old_errors)
     {
         $context->param ("__error" => $errors);
-        validation_error ($errors->[scalar @{$errors} -1]);
+        validation_error ($errors->[scalar @{$errors} -1]->[0]);
     }
 
     ## return true is senselesse because only exception will be used

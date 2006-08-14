@@ -53,6 +53,7 @@ sub execute {
     #     );
     # }
 
+    # FIXME: this is fully senseless because activities has not to inherit from this activity
     # bellmich
     # added authorization call
     # FIXME: we can only support on operation. Please choose:

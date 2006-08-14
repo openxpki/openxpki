@@ -146,6 +146,10 @@ sub execute_workflow_activity {
 		type => SCALAR,
 		regex => $re_alpha_string,
 	    },
+	    PARAMS => {
+		type => HASHREF,
+		optional => 1,
+	    },
 	});	 
     my $args  = shift;
 
@@ -154,60 +158,83 @@ sub execute_workflow_activity {
     my $wf_title    = $args->{WORKFLOW};
     my $wf_id       = $args->{ID};
     my $wf_activity = $args->{ACTIVITY};
+    my $wf_params   = $args->{PARAMS};
 
+    ##! 2: "load workflow"
     my $workflow = $self->__get_workflow_factory()->fetch_workflow(
 	$wf_title,
 	$wf_id);
 
+    ##! 2: "check parameters"
+    my %fields = ();
+    foreach my $field ($workflow->get_action_fields($wf_activity))
+    {
+        $fields{$field->name()} = $field->description();
+    }
+    foreach my $key (keys %{$wf_params})
+    {
+        if (not exists $fields{$key})
+        {
+	    OpenXPKI::Exception->throw (
+	        message => "I18N_OPENXPKI_SERVER_API_EXECUTE_ACTION_ILLEGAL_PARAM",
+	        params => {
+		    WORKFLOW => $wf_title,
+                    ID       => $wf_id,
+                    ACTIVITY => $wf_activity,
+                    PARAM    => $key,
+                    VALUE    => $wf_params->{$key}
+	        });
+        }
+    }
+
+    ##! 2: "set parameters"
+    my $context = $workflow->context();
+    $context->param ($wf_params);
+
     ##! 64: Dumper $workflow
-    $workflow->execute_action($wf_activity);
+    eval {
+        $workflow->execute_action($wf_activity);
+    };
+    if ($EVAL_ERROR) {
+        my $eval = $EVAL_ERROR;
+
+        ## normal OpenXPKI exception
+        $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
+
+        ## workflow exception
+        my $error = $workflow->context->param('__error');
+        if (defined $error)
+        {
+            if (ref $error eq '')
+            {
+                OpenXPKI::Exception->throw (
+                    message => $error);
+            }
+            if (ref $error eq 'ARRAY')
+            {
+                my @list = ();
+                foreach my $item (@{$error})
+                {
+                    eval {
+                        OpenXPKI::Exception->throw (
+                            message => $item->[0],
+                            params  => $item->[1]);
+                    };
+                    push @list, $EVAL_ERROR;
+                }
+                OpenXPKI::Exception->throw (
+                    message  => "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED",
+                    children => [ @list ]);
+            } 
+        }
+
+        ## unknown exception
+        OpenXPKI::Exception->throw (message => scalar $eval);
+    };
     ##! 64: Dumper $workflow
 
     return $self->__get_workflow_info($workflow);
 }
-
-
-sub set_workflow_fields {
-    my $self  = shift;
-    my $ident = ident $self;
-    validate(
-	@_,
-	{
-	    WORKFLOW => {
-		type => SCALAR,
-		regex => $re_alpha_string,
-	    },
-	    ID => {
-		type => SCALAR,
-		regex => $re_integer_string,
-	    },
-	    PARAMS => {
-		type => HASHREF,
-		optional => 1,
-	    },
-	}); 
-    my $args  = shift;
-
-    ##! 1: "get_workflow_context"
-
-    my $wf_title    = $args->{WORKFLOW};
-    my $wf_id       = $args->{ID};
-
-    my $workflow = $self->__get_workflow_factory()->fetch_workflow(
-	$wf_title,
-	$wf_id);
-
-    ##! 64: Dumper $workflow
-
-    my $context = $workflow->context();
-    ##! 64: Dumper $context
-
-    my $params = $context->param();
-    ##! 64: Dumper $params
-
-    return $params;
-}
-
 
 sub create_workflow_instance {
     my $self  = shift;
@@ -568,8 +595,6 @@ sub __get_workflow_info : PRIVATE {
 
     return $result;
 }
-
-
 
 1;
 __END__

@@ -267,6 +267,7 @@ sub get_link_params
 
     foreach my $key (keys %params)
     {
+        next if (not defined $key); ## empty array
         $link .= ";" if (length $link);
         $link .= $key."=".$params{$key};
     }

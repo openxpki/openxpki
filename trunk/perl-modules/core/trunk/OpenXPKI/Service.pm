@@ -155,7 +155,7 @@ sub __get_error {
                 push @list, \%hash;
             } else {
                 ## other exception or software error
-                push @list, scalar $error;
+                push @list, {LABEL => scalar $error};
             }
         }
     }

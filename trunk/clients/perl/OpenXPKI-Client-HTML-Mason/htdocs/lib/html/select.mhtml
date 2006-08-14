@@ -6,6 +6,7 @@
 <select name="<& '/lib/html/safe.mhtml', 'data' => $name &>">
 % foreach my $value (@{$values})
 % {
+%   $value = {VALUE => $value, LABEL => $value} if (not ref $value);
 %   if (defined $default and grep /^$value->{VALUE}$/, @{$default})
 %   {
       <option selected value="<& '/lib/html/safe.mhtml', 'data' => $value->{VALUE} &>">

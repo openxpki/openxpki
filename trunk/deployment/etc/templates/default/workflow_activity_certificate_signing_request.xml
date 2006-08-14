@@ -1,5 +1,6 @@
 <actions>
-  <!-- No-operation action -->
+  <!-- this action name has not to be human readable      -->
+  <!-- because it is only used to initialize the workflow -->
   <action name="create_csr"
 	  class="Workflow::Action::Null">
       <condition name="ACL::create_csr"/>
@@ -36,7 +37,17 @@
         <arg>$spkac</arg>
       </validator>
   </action>
-  <action name="csr.finish"
-	  class="Workflow::Action::Null"/>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
+	  class="Workflow::Action::Null">
+      <condition name="ACL::change_csr_subject"/>
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_subject"/>
+      <validator name="CertSubject">
+        <arg>$cert_profile</arg>
+        <arg>$cert_subject_style</arg>
+        <arg>$cert_subject</arg>
+      </validator>
+  </action>
 </actions>
 

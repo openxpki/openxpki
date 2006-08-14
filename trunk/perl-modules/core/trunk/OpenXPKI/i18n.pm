@@ -38,6 +38,7 @@ sub set_locale_prefix
 
 sub i18nGettext {
     my $text = shift;
+    return $text if (not defined $text or length($text) == 0);
 
     my $arg_ref;
     my $ref_of_first_argument = ref($_[0]);
@@ -159,7 +160,9 @@ to set the path to the directory with the mo databases.
 
 The first parameter is the i18n code string that should be looked up
 in the translation table. Usually this identifier should look like
-C<I18N_OPENCA_MODULE_FUNCTION_SPECIFIC_STUFF>. 
+C<I18N_OPENCA_MODULE_FUNCTION_SPECIFIC_STUFF>. If the first parameter is
+undefined or has the length zero then the function returns the first
+parameter itself.
 Optionally there may follow a hash or a hash reference that maps parameter
 keywords to values that should be replaced in the original string.
 A parameter should have the format C<__NAME__>, but in fact every

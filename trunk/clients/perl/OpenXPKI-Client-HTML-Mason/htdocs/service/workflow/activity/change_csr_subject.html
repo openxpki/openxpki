@@ -1,0 +1,143 @@
+<%args>
+    $type   => undef
+    $id     => undef
+    $filled => undef
+</%args>
+
+<& /service/open_form.mhtml, action => 'change_csr_subject.html' &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'type',   'value' => $type &>
+<& /lib/html/hidden.mhtml, 'name' => 'id',     'value' => $id &>
+<& /lib/html/hidden.mhtml, 'name' => 'filled', 'value' => '1' &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_DESCRIPTION') %>
+</p>
+
+<table>
+% my @parsed = $dn->get_parsed();
+% my $i;
+% for ($i=0; $i < scalar @parsed; $i++)
+% {
+    <tr>
+%   ## scan RDN $i
+%   my $k;
+%   for ($k=0; $k < scalar @{$parsed[$i]}; $k++)
+%   {
+%     ## attribute $k of RDN $i
+%     if ($k > 0) {
+      <td>+</td>
+%     }
+      <td>
+        <& /lib/html/select.mhtml,
+           'name'    => "subject_type_${i}_${k}",
+           'default' => [ $parsed[$i]->[$k]->[0] ],
+           'values'  => [ "", OpenXPKI::DN::get_attribute_names() ] &>
+      </td>
+      <td>=</td>
+      <td>
+        <& '/lib/html/input.mhtml',
+           'name'  => "subject_value_${i}_$k",
+           'value' => $parsed[$i]->[$k]->[1] &>
+      </td>
+%   }
+      <td>+</td>
+      <td>
+        <& /lib/html/select.mhtml,
+           'name'    => "subject_type_${i}_${k}",
+           'values'  => [ "", OpenXPKI::DN::get_attribute_names() ] &>
+      </td>
+      <td>=</td>
+      <td>
+        <& '/lib/html/input.mhtml',
+           'name'  => "subject_value_${i}_$k" &>
+      </td>
+    </tr>
+% }
+  <tr>
+    <td>
+      <& /lib/html/select.mhtml,
+         'name'    => "subject_type_${i}_0",
+         'values'  => [ "", OpenXPKI::DN::get_attribute_names() ] &>
+    </td>
+    <td>=</td>
+    <td>
+      <& '/lib/html/input.mhtml',
+         'name'  => "subject_value_${i}_0" &>
+    </td>
+  </tr>
+</table>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+
+<%init>
+    my @errors = ();
+    my $dn = undef;
+    my $subject = "";
+
+    if ($filled)
+    {
+        ## this is the second step - so we have a filled form
+
+        ## build the DN
+        my $ARGS   = {$m->request_args()};
+        for (my $i=0; exists $ARGS->{"subject_type_${i}_0"}; $i++)
+        {
+            ## scan RDN $i
+            for (my $k=0; exists $ARGS->{"subject_type_${i}_${k}"}; $k++)
+            {
+                ## scan attribute $k of RDN $i
+                next if (length ($ARGS->{"subject_type_${i}_${k}"}) == 0);
+
+                ## build subject
+                $subject .= "," if ($i > 0);
+                $subject .= "+" if ($k > 0);
+                $subject .= $ARGS->{"subject_type_${i}_${k}"}.
+                            "=".
+                            $ARGS->{"subject_value_${i}_${k}"};
+            }
+        }
+
+        ## let it scan by the server
+        my $msg = $context->{client}->send_receive_command_msg (
+                      "execute_workflow_activity",
+                      {WORKFLOW => $type,
+                       ID       => $id,
+                       ACTIVITY => "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT",
+                       PARAMS   => {"cert_subject" => $subject}});
+        if (exists $msg->{SERVICE_MSG} and
+            $msg->{SERVICE_MSG} eq "ERROR")
+        {
+            @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
+        }
+        else
+        {
+            return $m->comp ('/service/workflow/show_instance.html',
+                             'msg'  => $msg,
+                             'type' => $type,
+                             'id'   => $id);
+        }
+    }
+
+    ## this is the first step - so we have to prepare an HTML form
+
+    if (not $filled)
+    {
+        ## load the workflow and extract the distinguished name
+        my $msg = $context->{client}->send_receive_command_msg
+                  (
+                      "get_workflow_info",
+                      {
+                          "WORKFLOW" => $type,
+                          "ID"       => $id
+                      }
+                  );
+        $subject = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_subject};
+    }
+    $dn = OpenXPKI::DN->new ($subject);
+
+</%init>

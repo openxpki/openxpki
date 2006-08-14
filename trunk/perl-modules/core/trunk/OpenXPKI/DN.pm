@@ -31,6 +31,7 @@ my %mapping_of = (
     ST                   => "ST",
     C                    => "C",
     DC                   => "DC",
+    DOMAINCOMPONENT      => "DC",
     PSEUDONYM            => "pseudonym",
     ROLE                 => "role",
     DESCRIPTION          => "description",
@@ -303,6 +304,16 @@ sub __get_attribute_value
     return ($value, $string);
 }
 
+sub get_attribute_names
+{
+    my @values = sort values %mapping_of;
+    for (my $i=scalar @values -1; $i > 0; $i--)
+    {
+        splice @values, $i, 1 if ($values[$i] eq $values[$i-1]);
+    }
+    return @values;
+}
+
 ##################################
 ##    END of RFC 2253 parser    ##
 ##################################
@@ -390,3 +401,8 @@ returns the DN in OpenSSL's proprietary oneline format.
 returns a hash which contains the attribute names as keys. The
 value of each hashentry is an array with the values inside which
 were found in the DN.
+
+=head2 get_attribute_names
+
+is a static function which returns all supported attribute names
+as a normal array. It is not relevant how you call this function.
