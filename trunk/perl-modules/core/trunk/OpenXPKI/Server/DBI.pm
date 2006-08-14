@@ -4,11 +4,13 @@
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
  
+package OpenXPKI::Server::DBI;
+
 use strict;
 use warnings;
 use utf8;
 
-package OpenXPKI::Server::DBI;
+use English;
 
 # use Smart::Comments;
 
@@ -18,6 +20,8 @@ use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;
 use OpenXPKI::Server::DBI::Hash;
 use OpenXPKI::Server::DBI::Object;
+
+use Data::Dumper;
 
 our ($errno, $errval);
 
@@ -130,6 +134,7 @@ sub schema_exists
 
 ########################################################################
 
+
 sub init_schema
 {
     my $self = shift;
@@ -138,11 +143,12 @@ sub init_schema
 
     ## Accepted modes are
     ## NONE
+    ## FORCE (overwrite existing tables)
     ## DRYRUN   to get SQL commands
     my $mode = ""; 
        $mode = $keys->{MODE} if (exists $keys->{MODE});
     ##! 2: "MODE: $mode"
-    if ( $mode eq "DRYRUN") {
+    if ($mode eq "DRYRUN") {
         $self->{SQL_SCRIPT} = "";
     }
 
@@ -150,7 +156,17 @@ sub init_schema
 
     foreach my $table (@{$self->{schema}->get_tables()})
     {
-        my $result = $self->{sql}->create_table (NAME => $table, MODE => $mode);
+	my $result;
+	
+	if ($mode eq "FORCE") {
+	    if ($self->{sql}->table_exists (NAME => $table)) {
+		$result = $self->{sql}->drop_table (NAME => $table, MODE => $mode);
+	    }
+	    # FORCE and DRYRUN are mutually exclusive, so we don't need
+	    # to remember the SQL executed.
+	}
+
+        $result = $self->{sql}->create_table (NAME => $table, MODE => $mode);
         $self->{SQL_SCRIPT} .= $result.";" if ($mode eq "DRYRUN");
         ##! 4: "table $table successfully created"
     }
@@ -160,7 +176,16 @@ sub init_schema
 
     foreach my $seq (@{$self->{schema}->get_sequences()})
     {
-        my $result = $self->{dbh}->create_sequence (NAME => $seq, MODE => $mode);
+	my $result;
+	if ($mode eq "FORCE") {
+	    if ($self->{dbh}->sequence_exists(NAME => $seq)) {
+		$result = $self->{dbh}->drop_sequence(NAME => $seq, MODE => $mode);
+	    }
+	    # FORCE and DRYRUN are mutually exclusive, so we don't need
+	    # to remember the SQL executed.
+	}
+
+        $result = $self->{dbh}->create_sequence (NAME => $seq, MODE => $mode);
         $self->{SQL_SCRIPT} .= $result.";" if ($mode eq "DRYRUN");
         ##! 4: "sequence $seq successfully created"
     }
@@ -170,7 +195,22 @@ sub init_schema
 
     foreach my $index (@{$self->{schema}->get_indexes()})
     {
-        my $result = $self->{sql}->create_index (NAME => $index, MODE => $mode);
+	my $result;
+	if ($mode eq "FORCE") {
+	    # this may fail if the table does not exist already, henc eval:
+	    eval {
+		$result = $self->{sql}->drop_index(NAME => $index, MODE => $mode);
+	    };
+	    if ($EVAL_ERROR) {
+		##! 4: Dumper $EVAL_ERROR
+		;
+		# FIXME: log error?
+	    }
+	    # FORCE and DRYRUN are mutually exclusive, so we don't need
+	    # to remember the SQL executed.
+	}
+
+        $result = $self->{sql}->create_index (NAME => $index, MODE => $mode);
         $self->{SQL_SCRIPT} .= $result.";" if ($mode eq "DRYRUN");
         ##! 4: "index $index successfully created"
     }

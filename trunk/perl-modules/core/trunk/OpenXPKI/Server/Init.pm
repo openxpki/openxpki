@@ -530,6 +530,10 @@ sub get_pki_realms
 		    );
 	    }
 	    
+
+	    # record this issuing CA as potentially present in the 
+	    # PKI Realm configuration
+	    $realms{$name}->{ca}->{id}->{$ca_id}->{status} = 0;
 	    
 	    my $token = $crypto->get_token (TYPE      => "CA",
 					    ID        => $ca_id,
@@ -626,6 +630,7 @@ sub get_pki_realms
 
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{crypto} = $token;
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{cacert} = $cacert;
+	    $realms{$name}->{ca}->{id}->{$ca_id}->{status} = 1;
 	    log_wrapper(
 		{
 		    MESSAGE  => "Attached CA token for issuing CA '$ca_id' of PKI realm '$name'",
@@ -948,6 +953,7 @@ in the following sample format:
       ca => {
           id => {
               CA1 => {
+                  status = 1,    # (0: unavailable, 1: available)
                   crypto => OpenXPKI::Crypto::TokenManager->new(...),
                   cacert => OpenXPKI::Crypto::X509->new(...),
                   notbefore => DateTime->new(),

@@ -102,6 +102,28 @@ sub create_sequence
     return 1;
 }
 
+sub drop_sequence
+{
+    my $self = shift;
+    my $keys = { @_ };
+    
+    my $dbh  = $keys->{DBH};
+    my $seq = $self->{schema}->get_sequence_name ($keys->{NAME});
+    my $mode = $keys->{MODE};
+
+    my $query = "DROP TABLE $seq";
+    return $query if ($mode and $mode eq "DRYRUN");
+
+    if (defined $mode && $mode eq 'FORCE') {
+	$dbh->do_query (QUERY => $query);
+	$dbh->finish_sth();
+	return 1;
+    }
+
+    OpenXPKI::Exception->throw (
+	message => "I18N_OPENXPKI_SERVER_DBI_DRIVER_SQLITE_DROP_SEQUENCE_NOT_FORCED");
+}
+
 1;
 __END__
 
@@ -143,4 +165,10 @@ inserted serial from the relating table.
 =head2 create_sequence
 
 creates a new table for the sequence emulation.
+
+=head2 drop_sequence
+
+deletes table for the sequence emulation. Must be called with MODE set
+to FORCE.
+
 

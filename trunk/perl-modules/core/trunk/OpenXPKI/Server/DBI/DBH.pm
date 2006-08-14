@@ -67,6 +67,13 @@ sub connect
 
     ##! 2: "try to connect"
     my $dsn = $self->{driver}->get_dsn ();
+
+    # default options for all connection, can be overridden by the drivers
+    my %dbi_options = (
+	PrintError => 0,
+	%{$self->{driver}->{dbi_option}},
+	);
+
     ##! 2: "dsn: $dsn"
     ##! 2: "USER: ".($self->{params}->{USER} or "")
     ##! 2: "PASSWD: ".($self->{params}->{PASSWD} or "")
@@ -74,7 +81,7 @@ sub connect
     $self->{DBH} = DBI->connect ($dsn,
                                  ($self->{params}->{USER}   or ""),
                                  ($self->{params}->{PASSWD} or ""),
-                                 $self->{driver}->{dbi_option});
+                                 \%dbi_options);
     if (not $self->{DBH}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_CONNECT_FAILED",
@@ -112,6 +119,12 @@ sub do_query
 {
     my $self = shift;
     my $keys = { @_ };
+
+    if (! defined $self->{DBH}) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED",
+	    );
+    }
 
     ##! 1: "start"
 
@@ -331,6 +344,12 @@ sub create_sequence
     return $self->{driver}->create_sequence(DBH => $self, @_);
 }
 
+sub drop_sequence
+{
+    my $self = shift;
+    return $self->{driver}->drop_sequence(DBH => $self, @_);
+}
+
 #######################################################################
 
 sub get_column_type
@@ -467,6 +486,10 @@ is directly mapped to OpenXPKI::Server::DBI::Driver->sequence_exists
 =head2 create_sequence
 
 is directly mapped to OpenXPKI::Server::DBI::Driver->create_sequence
+
+=head2 drop_sequence
+
+is directly mapped to OpenXPKI::Server::DBI::Driver->drop_sequence
 
 =head2 Driver dependend schema infos
 

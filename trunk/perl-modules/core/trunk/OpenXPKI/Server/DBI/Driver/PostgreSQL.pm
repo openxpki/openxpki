@@ -107,6 +107,28 @@ sub create_sequence
     return 1;
 }
 
+sub drop_sequence
+{
+    my $self = shift;
+    my $keys = { @_ };
+    
+    my $dbh  = $keys->{DBH};
+    my $seq = $self->{schema}->get_sequence_name ($keys->{NAME});
+    my $mode = $keys->{MODE};
+
+    my $query = "DROP SEQUENCE $seq";
+    return $query if ($mode and $mode eq "DRYRUN");
+
+    if (defined $mode && $mode eq 'FORCE') {
+	$dbh->do_query (QUERY => $query);
+	$dbh->finish_sth();
+	return 1;
+    }
+
+    OpenXPKI::Exception->throw (
+	message => "I18N_OPENXPKI_SERVER_DBI_DRIVER_POSTGRESQL_DROP_SEQUENCE_NOT_FORCED");
+}
+
 1;
 __END__
 
@@ -142,3 +164,6 @@ We try to detect an already existing squence by selecting the next value.
 
 creates a new sequence.
 
+=head2 drop_sequence
+
+deletes sequence. Must be called with MODE set to FORCE.

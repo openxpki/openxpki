@@ -27,6 +27,7 @@ my %SEQUENCE_of = (
     VOTING         => "sequence_voting",
     DATAEXCHANGE   => "sequence_dataexchange",
     WORKFLOW       => "sequence_workflow",
+    WORKFLOW_VERSION => "sequence_workflow_version",
     WORKFLOW_HISTORY => "sequence_workflow_history",
     );
 
@@ -55,6 +56,7 @@ my %COLUMN_of = (
     LOCK_SERIAL           => "global_id",
     DATAEXCHANGE_SERIAL   => "dataexchange_key",
     WORKFLOW_SERIAL       => "workflow_id",
+    WORKFLOW_VERSION_SERIAL  => "workflow_version_id",
     WORKFLOW_HISTORY_SERIAL  => "workflow_hist_id",
 
     SUBJECT               => "subject",
@@ -187,9 +189,19 @@ my %TABLE_of = (
         COLUMNS => [ "WORKFLOW_SERIAL",
 		     "PKI_REALM",
 		     "WORKFLOW_TYPE",
+		     "WORKFLOW_VERSION_SERIAL",
 		     "WORKFLOW_STATE",
 		     "WORKFLOW_LAST_UPDATE",
 	    ]},
+
+    WORKFLOW_VERSION => {
+        NAME    => "workflow_version",
+        INDEX   => [ "WORKFLOW_VERSION_SERIAL" ],
+        COLUMNS => [ "WORKFLOW_VERSION_SERIAL",
+                     # TODO:
+                     # - identify workflow configuration used for this instance
+                     # - link it to workflow_config table (TODO: define table)
+            ]},
 
     WORKFLOW_HISTORY => {
         NAME    => "workflow_history",
@@ -224,10 +236,10 @@ my %INDEX_of = (
        NAME    => "data_global_column_index",
        TABLE   => "DATA",
        COLUMNS => [ "GLOBAL_KEY_ID", "COLUMN_NAME" ]},
-   DATA_COLUMN_STRING => {
-       NAME    => "data_column_string_index",
-       TABLE   => "DATA",
-       COLUMNS => [ "COLUMN_NAME", "STRING" ]},
+#    DATA_COLUMN_STRING => {
+#        NAME    => "data_column_string_index",
+#        TABLE   => "DATA",
+#        COLUMNS => [ "COLUMN_NAME", "STRING" ]},
     );
 
 sub new

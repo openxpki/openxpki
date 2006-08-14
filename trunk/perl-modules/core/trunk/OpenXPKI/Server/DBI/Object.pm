@@ -66,6 +66,11 @@ sub insert
             $hash{$key} = $object->get_serial();
             next;
         }
+        if ($key eq "${table}_HANDLE")
+        {
+            $hash{$key} = $object->get_handle();
+            next;
+        }
         if ($key eq "EMAIL")
         {
             if ( eval { $object->get_parsed("BODY", "EMAILADDRESSES") } )

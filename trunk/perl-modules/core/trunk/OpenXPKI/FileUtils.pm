@@ -12,10 +12,6 @@ use English;
 
 use Class::Std;
 
-use OpenXPKI::Crypto::Backend::OpenSSL::Config;
-use OpenXPKI::Crypto::Backend::OpenSSL::XS;
-use OpenXPKI::Server::Context qw( CTX );
-
 use OpenXPKI::Debug 'OpenXPKI::FileUtils';
 use OpenXPKI::Exception;
 

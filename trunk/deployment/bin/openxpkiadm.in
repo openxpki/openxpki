@@ -19,6 +19,8 @@ use File::Copy;
 use File::Path;
 use IO::Prompt;
 
+use Data::Dumper;
+
 use OpenXPKI::VERSION;
 use OpenXPKI::FileUtils;
 use OpenXPKI::Server::Init;
@@ -225,6 +227,20 @@ sub deploy {
     print STDERR "wrote $dstfile\n";
 
     return 1;
+}
+
+sub list_certificates {
+    my $args = shift;
+
+    my $realm = $args->{REALM};
+
+    print Dumper CTX('pki_realm');
+
+    foreach my $int_ca (sort keys %{CTX('pki_realm')->{$realm}->{ca}->{id}}) {
+	print "Issuing CA: $int_ca\n";
+    }
+
+    1;
 }
 
 
@@ -811,6 +827,87 @@ if ($cmd eq 'deploy') {
     exit 0;
 } 
 
+if ($cmd eq 'certificate') {
+    my $subcommand = shift || '';
+
+    if (! get_config($configfile, qw( crypto_layer pki_realm dbi_backend ))) {
+	print STDERR "Could not obtain OpenXPKI instance configuration\n";
+	exit 1;
+    }
+
+    if (! defined $params{realm} ||
+	! exists CTX('pki_realm')->{$params{realm}}) {
+	print STDERR "Please specify one of the following PKI realms via --realm:\n";
+	foreach my $realm (keys %{CTX('pki_realm')}) {
+	    print "  $realm\n";
+	}
+
+	exit 1;
+    }
+    ## CTX('pki_realm')
+
+    my $defaulttoken = CTX('crypto_layer')->get_token(
+	TYPE      => 'DEFAULT',
+	ID        => 'default',
+	PKI_REALM => $params{realm},
+	);
+
+    if (! defined $defaulttoken) {
+	print STDERR "ERROR: Could not get default token for specified realm\n";
+	exit 1;
+    }
+
+    my $dbi = CTX('dbi_backend');
+    if (! defined $dbi) {
+	print STDERR "ERROR: Could not instantiate database backend\n";
+	exit 1;
+    }
+    $dbi->connect();
+
+
+    if ($subcommand eq 'list') {
+	list_certificates(
+	    {
+		REALM => $params{realm},
+	    });
+	exit 0;
+    }
+
+    if ($subcommand eq 'add') {
+	my $filename = shift;
+
+	if (! -r $filename) {
+	    print STDERR "ERROR: filename '$filename' is not readable\n";
+	    exit 1;
+	}
+	
+	my $FileUtils = OpenXPKI::FileUtils->new();
+	my $certdata = $FileUtils->read_file($filename);
+	
+	if (! defined $certdata) {
+	    print STDERR "ERROR: Could not parse certificate data\n";
+	    exit 1;
+	}
+
+	my $cert
+	    = OpenXPKI::Crypto::X509->new(TOKEN => $defaulttoken,
+					  DATA  => $certdata);
+
+	$cert->set_status('DUMMY');
+	$cert->set_handle('HANDLE');
+	### Dumper $cert
+	$dbi->insert(
+	    TABLE => 'CERTIFICATE',
+	    OBJECT => $cert);
+	
+	exit 0;
+
+    }
+
+    print STDERR "Unknown certificate subcommand '$subcommand'.\n";
+    exit 1;
+}
+
 if ($cmd eq 'key') {
     my $subcommand = shift || '';
 
@@ -889,6 +986,7 @@ openxpkiadm [OPTIONS] COMMAND
    deploy                Deploy a new OpenXPKI installation
    initdb                Initialize database
    key                   Manage keys
+   certificate           Manage certificates
 
 =head1 ARGUMENTS
 
@@ -985,6 +1083,70 @@ Example:
 
 
 =back
+
+=head2 certificate
+
+Command options:
+
+   --realm               PKI Realm to operate on
+
+Starts a certificate management command and allows to list, install,
+delete and connect certificates for the configured PKI Realms.
+
+  openxpkiadm --realm <realm> certificate <subcommand> <options>
+
+=head3 certificate management subcommands
+
+=over 8
+
+=item B<list>
+
+Lists all non-endentity certificates present in the database for 
+the specified realm. 
+
+=item B<import>
+
+Adds a certificate to the specified realm. Please note that this
+only imports the certificate into the database but does NOT connect
+it to another certificate.
+Use the --handle option to specify a certificate handle (must be unique
+within a PKI realm). If no --handle is specified the command will 
+automatically generate a unique handle for the certificate.
+
+You will have to call the B<chain> function in order to create a certificate
+chain.
+
+Example: 
+
+  openxpkiadm --realm 'Root CA' certificate add --file cacert.pem \
+              --handle 'Root CA 1'
+
+=item B<remove>
+
+Removes a certificate from the database.
+
+Example: 
+
+  openxpkiadm --realm 'Root CA' certificate remove --handle 'Root CA 1'
+
+=item B<chain>
+
+Specifies subject/issuer relationship in order to set up certificate
+chains. The certificates to be connected must already be present in
+the database (see B<add>).
+
+Example: 
+
+openxpkiadm --realm 'Root CA' certificate chain 'Root CA 1' 'Subordinate CA 1'
+
+
+=item B<unchain>
+
+Breaks the subject/issuer relationsship between two certificates.
+
+Example: 
+
+openxpkiadm --realm 'Root CA' certificate unchain 'Root CA 1' 'Subordinate CA 1'
 
 
 

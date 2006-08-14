@@ -32,7 +32,7 @@ use File::Temp;
 use vars qw (@ISA @EXPORT_OK);
 require Exporter;
 @ISA = qw (Exporter);
-@EXPORT_OK = qw (read_file write_file convert_date get_safe_tmpfile);
+@EXPORT_OK = qw (read_file write_file get_safe_tmpfile);
 
 sub read_file
 {

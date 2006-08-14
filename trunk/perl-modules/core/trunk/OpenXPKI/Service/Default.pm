@@ -47,8 +47,8 @@ sub init
     
     $self->__init_session();
     $self->__init_pki_realm();
-    if (! $self->get_API()->get_user() ||
-	! $self->get_API()->get_role()) {
+    if (! $self->get_API('Session')->get_user() ||
+	! $self->get_API('Session')->get_role()) {
 	my $authentication = CTX('authentication');
         ##! 2: $authentication
 	$authentication->login();
@@ -223,7 +223,7 @@ sub __init_pki_realm
     ##! 2: "check if PKI realm is already known"
     my $realm;
     eval {
-	$realm = $self->get_API()->get_pki_realm();
+	$realm = $self->get_API('Session')->get_pki_realm();
     };
     return $realm if defined $realm;
 
@@ -332,8 +332,8 @@ sub run
 	    # FIXME: translate messages
 	    my $result = {
 		SESSION => {
-		    ROLE => $self->get_API()->get_role(),
-		    USER => $self->get_API()->get_user(),
+		    ROLE => $self->get_API('Session')->get_role(),
+		    USER => $self->get_API('Session')->get_user(),
 		},
 	    };
 

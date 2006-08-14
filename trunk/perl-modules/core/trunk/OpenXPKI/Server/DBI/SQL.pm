@@ -154,6 +154,71 @@ sub create_index
     }
 }
 
+
+sub drop_table
+{
+    my $self = shift;
+    my $keys = { @_ };
+    my $table = $keys->{NAME};
+    my $mode  = $keys->{MODE};
+ 
+    ##! 2: "table: $table; mode: $mode"
+ 
+    my $command = "";
+
+    $command = "drop table " . $self->{schema}->get_table_name($table);
+
+    if ($mode eq "DRYRUN")
+    {
+        return $command.";";
+    } elsif ($mode eq 'FORCE') {
+        $self->{DBH}->do_query ( QUERY => $command );
+        $self->{DBH}->finish_sth();
+        return 1;
+    } else {
+	## must be forced...
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_TABLE_NOT_FORCED",
+	    params  => 
+	    {
+		"TABLE"  => $table,
+	    });
+    }
+}
+
+sub drop_index
+{
+    my $self = shift;
+    my $keys = { @_ };
+    my $name = $keys->{NAME};
+    my $mode = $keys->{MODE};
+
+    ##! 2: "name: $name, mode: $mode"
+
+    my $index = $self->{schema}->get_index_name ($name);
+    my $table = $self->{schema}->get_index_table ($name);
+       $table = $self->{schema}->get_table_name ($table);
+
+    my $command = "drop index $index on $table";
+
+    if ($mode eq "DRYRUN")
+    {
+        return $command.";";
+    } elsif ($mode eq 'FORCE') {
+        $self->{DBH}->do_query ( QUERY => $command );
+        $self->{DBH}->finish_sth();
+        return 1;
+    } else {
+	## must be forced...
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_INDEX_NOT_FORCED",
+	    params  => 
+	    {
+		"NAME"   => $name,
+	    });
+    }
+}
+
 #######################################################################
 
 sub insert
@@ -460,10 +525,22 @@ is NAME.
 creates a table which was specified with the parameter NAME.
 If DRYRUN is the value of MODE then the function returns the SQL commands.
 
+=head3 drop_table
+
+drops the table which was specified with the parameter NAME.
+If DRYRUN is the value of MODE then the function returns the SQL commands.
+MODE must be FORCE, otherwise this method will throw an exception.
+
 =head3 create_index
 
 creates an index which was specified with the parameter NAME.
 If DRYRUN is the value of MODE then the function returns the SQL commands.
+
+=head3 drop_index
+
+drops the index which was specified with the parameter NAME.
+If DRYRUN is the value of MODE then the function returns the SQL commands.
+MODE must be FORCE, otherwise this method will throw an exception.
 
 =head2 Functions which implement SQL commands
 

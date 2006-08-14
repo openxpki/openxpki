@@ -15,7 +15,7 @@ use File::Spec;
 use File::Path;
 use Config::Std;
 
-# use Smart::Comments;
+use Smart::Comments;
 use Data::Dumper;
 use OpenXPKI::Debug;
 
@@ -54,7 +54,11 @@ sub reopen_connection {
 		    SOCKETFILE => $config->{server}->{socketfile},
 		});
 	    $response = $cli->init_session();
+	} else {
+	    print STDERR "ERROR: " . $exc->full_message() . "\n";
 	}
+    } elsif ($EVAL_ERROR) {
+	print STDERR "ERROR: $EVAL_ERROR\n";
     }
 
     $config->{client}->{session} = $cli->get_session_id();
@@ -175,7 +179,7 @@ if (scalar @ARGV == 0) {
 	    next INTERACTION;
 	}
 
-
+	### $response
 	if (exists $response->{SESSION}->{ROLE}) {
 	    my $user = $response->{SESSION}->{USER} || 'nobody';
 	    my $role = $response->{SESSION}->{ROLE};

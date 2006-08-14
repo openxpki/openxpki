@@ -82,6 +82,7 @@ our %COLUMN = (
     
     "workflow_hist_id" => "BIGINT",
     "workflow_id"      => "BIGINT",
+    "workflow_version_id" => "BIGINT",
     "workflow_type"    => "TEXT_KEY",
     "workflow_state"   => "TEXT_KEY",
     "workflow_last_update" => "TIMESTAMP",

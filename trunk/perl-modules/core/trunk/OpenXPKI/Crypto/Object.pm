@@ -78,6 +78,24 @@ sub set_status
     return $self->get_status();
 }
 
+sub get_handle
+{
+    my $self = shift;
+    if (not exists $self->{HANDLE})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_HANDLE_NOT_INITIALIZED");
+    }
+    return $self->{HANDLE};
+}
+
+sub set_handle
+{
+    my $self = shift;
+    $self->{HANDLE} = shift;
+    return $self->get_handle();
+}
+
 sub set_header_attribute
 {
     my $self = shift;
@@ -150,6 +168,14 @@ returns the status of the object.
 =head2 set_status
 
 sets the status of the object.
+
+=head2 get_handle
+
+returns the object handle (symbolic id)
+
+=head2 set_status
+
+sets the object handle (symbolic id)
 
 =head2 set_header_attribute
 

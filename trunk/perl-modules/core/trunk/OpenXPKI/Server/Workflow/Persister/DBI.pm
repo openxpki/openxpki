@@ -89,6 +89,10 @@ sub update_workflow {
     {
         ##! 4: "we cannot get the workflow so we try to create it"
         $data{PKI_REALM}       = CTX('session')->get_pki_realm();
+
+	##! 1: "TODO: Workflow versions not yet implemented"
+	$data{WORKFLOW_VERSION} = -1;
+
         $data{WORKFLOW_TYPE}   = $workflow->type();
 	$data{WORKFLOW_SERIAL} = $id;
 
