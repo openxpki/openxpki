@@ -118,7 +118,7 @@ use OpenXPKI::Crypto::TokenManager;
             )
         }
         if (! defined $received_shares_of{$ident}) {
-            @{$received_shares_of{$ident}}[0] = $share;
+            ${$received_shares_of{$ident}}[0] = $share;
             # reconstruct prime number used
             my $deconstructed_share = $self->__deconstruct_share($share);
             $prime_of{$ident} = $self->__get_smallest_prime_of_bitlength({
@@ -126,7 +126,7 @@ use OpenXPKI::Crypto::TokenManager;
             });
         }
         else {
-            @{$received_shares_of{$ident}}
+            ${$received_shares_of{$ident}}
                 [scalar @{$received_shares_of{$ident}}]
                 = $share;
         }
