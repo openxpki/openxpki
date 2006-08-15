@@ -122,7 +122,6 @@ OpenXPKI/Server/Log/Appender/DBI.pm
 
 OpenXPKI/Server.pm
 OpenXPKI/Server/API.pm
-OpenXPKI/Server/API/Session.pm
 OpenXPKI/Server/API/Workflow.pm
 OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
