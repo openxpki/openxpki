@@ -35,7 +35,11 @@ my %COLUMN_of = (
     PKI_REALM             => "pki_realm",
     CA                    => "ca_name",
     ISSUING_CA            => "issuing_ca",
-    ISSUING_PKI_REALM     => "issuing_pki_realm",
+    ISSUING_PKI_REALM     => "issuing_pki_realm",  # FIXME: remove this
+    REFERENCED_REALM      => "referenced_realm",
+    ISSUER_ALIAS          => "issuer_alias",
+    ALIAS                 => "alias",
+    IDENTIFIER            => "identifier",
 
     SUBMIT_DATE           => "submit_date",
     TYPE                  => "format",
@@ -123,13 +127,21 @@ my %TABLE_of = (
                      "SCEP_TID", "LOA"]},
     CERTIFICATE => {
         NAME    => "certificate",
-        INDEX   => [ "PKI_REALM", "CA", "CERTIFICATE_SERIAL" ],
-        COLUMNS => [ "PKI_REALM", "CA", "CERTIFICATE_SERIAL",
-                     "TYPE", "DATA", "GLOBAL_KEY_ID",
+        INDEX   => [ "PKI_REALM", "ISSUER_ALIAS", "CERTIFICATE_SERIAL" ],
+        COLUMNS => [ "PKI_REALM", "ISSUER_ALIAS", "CERTIFICATE_SERIAL",
+		     "IDENTIFIER", "DATA", 
+                     # "GLOBAL_KEY_ID",
                      "SUBJECT", "EMAIL",
                      "STATUS", "ROLE", "PUBKEY", "KEYID",
                      "NOTAFTER", "LOA", "NOTBEFORE", "CSR_SERIAL"
                    ]},
+
+    ALIASES => {
+	NAME    => 'aliases',
+	INDEX   => [ 'IDENTIFIER', 'PKI_REALM', ],
+	COLUMNS => [ 'IDENTIFIER', 'PKI_REALM', 'ALIAS', 'REFERENCED_REALM', ],
+    },
+
     CRR => {
         NAME    => "crr",
         INDEX   => [ "PKI_REALM", "CA", "CRR_SERIAL" ],
