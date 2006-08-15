@@ -1,5 +1,6 @@
 <%args>
     $role          => undef
+    $profile       => undef
     $subject_style => undef
     $keygen        => undef
     $subject       => undef
@@ -12,6 +13,7 @@
 <& /service/open_form.mhtml &>
 
 <& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
 <& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
 <& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
 <& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
@@ -38,7 +40,8 @@
         $spkac =~ s/[\n\r]//g;
 
         my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
-                            'role' => $role,
+                            'role'          => $role,
+                            'profile'       => $profile,
                             'subject_style' => $subject_style,
                             'subject'       => $subject,
                             'subject_alt_name' => $subject_alt_name,

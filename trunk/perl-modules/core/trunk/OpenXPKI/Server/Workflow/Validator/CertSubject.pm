@@ -8,7 +8,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use English;
 
 sub validate {
-    my ( $self, $wf, $profile, $style, $subject,  ) = @_;
+    my ( $self, $wf, $profile_id, $style, $subject,  ) = @_;
 
     ## prepare the environment
     my $context = $wf->context();
@@ -18,7 +18,7 @@ sub validate {
        $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
-    return if (not defined $profile);
+    return if (not defined $profile_id);
     return if (not defined $style);
     return if (not defined $subject);
 
@@ -38,12 +38,12 @@ sub validate {
     ## find subject specification
     my $count = $config->get_xpath_count (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject"],
-                    COUNTER => [$index, 0, 0, 0, $profile]);
+                    COUNTER => [$index, 0, 0, 0, $profile_id]);
     for (my $i=0; $i <$count; $i++)
     {
         my $id = $config->get_xpath (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "id"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $i, 0]);
+                    COUNTER => [$index, 0, 0, 0, $profile_id, $i, 0]);
         if ($id eq $style)
         {
             $style = $i;
@@ -55,15 +55,15 @@ sub validate {
     ## check always block
     $count = $config->get_xpath_count (
                  XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
-                 COUNTER => [$index, 0, 0, 0, $profile, $style, 0]);
+                 COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0]);
     for (my $i=0; $i <$count; $i++)
     {
         my $regex = $config->get_xpath (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $style, 0, $i]);
+                    COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0, $i]);
         my $label = CTX('xml_config')->get_xpath (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex", "label"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $style, 0, $i, 0]);
+                    COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0, $i, 0]);
         if (not $subject =~ m{$regex}xs)
         {
             push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_ALWAYS_REGEX',
@@ -76,15 +76,15 @@ sub validate {
     ## check never block
     $count = CTX('xml_config')->get_xpath_count (
                  XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
-                 COUNTER => [$index, 0, 0, 0, $profile, $style, 0]);
+                 COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0]);
     for (my $i=0; $i <$count; $i++)
     {
         my $regex = CTX('xml_config')->get_xpath (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $style, 0, $i]);
+                    COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0, $i]);
         my $label = CTX('xml_config')->get_xpath (
                     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex", "label"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $style, 0, $i, 0]);
+                    COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0, $i, 0]);
         if (not $subject !~ m{$regex}xs)
         {
             push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_NEVER_REGEX',

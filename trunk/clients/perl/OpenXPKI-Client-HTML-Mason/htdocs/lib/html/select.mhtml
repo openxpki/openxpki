@@ -17,3 +17,14 @@
       </option>
 % }
 </select>
+<%init>
+  if (ref $values eq "HASH")
+  {
+      my @help = ();
+      foreach my $key (keys %{$values})
+      {
+          push @help, {VALUE => $key, LABEL => $values->{$key}};
+      }
+      $values = [ @help ];
+  }
+</%init>

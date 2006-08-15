@@ -14,6 +14,8 @@
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING</description>
     <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
 	    resulting_state="PENDING" />
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
+	    resulting_state="PENDING" />
     <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 	    resulting_state="PENDING" />
     <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"

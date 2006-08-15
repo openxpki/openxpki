@@ -30,6 +30,7 @@ my %allowed_command = (
     nop                       => 1,
 
     get_role                  => {API => 'Info'},
+    get_roles                 => {API => 'Info'},
     get_cert_profiles         => {API => 'Info'},
     get_cert_subject_profiles => {API => 'Info'},
 

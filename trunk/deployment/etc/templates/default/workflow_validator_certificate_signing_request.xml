@@ -2,6 +2,9 @@
   <validator name="HasRequiredField"
              class="Workflow::Validator::HasRequiredField">
   </validator>
+  <validator name="CertRole"
+             class="OpenXPKI::Server::Workflow::Validator::CertRole">
+  </validator>
   <validator name="CertProfile"
              class="OpenXPKI::Server::Workflow::Validator::CertProfile">
   </validator>

@@ -1,10 +1,12 @@
 <%args>
     $role          => undef
+    $profile       => undef
     $subject_style => undef
     $CONFIG        => undef
 </%args>
 <& /service/open_form.mhtml &>
-<& /lib/html/hidden.mhtml, 'name' => 'role', 'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'role',    'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'profile', 'value' => $profile &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_TITLE') %></h1>
 <p>
@@ -28,7 +30,7 @@
     ## load available subject profiles from server
     my $msg = $context->{client}->send_receive_command_msg (
                    "get_cert_subject_profiles",
-                   {PROFILE => $role});
+                   {PROFILE => $profile});
     my %types = %{$msg->{PARAMS}};
 
     ## if we have only one configuration

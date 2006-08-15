@@ -1,5 +1,6 @@
 <%args>
     $role             => undef
+    $profile          => undef
     $subject_style    => undef
     $keygen           => undef
     $subject          => undef
@@ -17,6 +18,11 @@
     $params{role} = $m->comp ('/service/create_csr/get_role.mhtml',
                               'role' => $role);
     return if (not defined $params{role});
+
+    ## which profile
+    $params{profile} = $m->comp ('/service/create_csr/get_profile.mhtml',
+                                 %params, 'profile' => $profile);
+    return if (not defined $params{profile});
 
     ## which subject style
     $params{subject_style} = $m->comp ('/service/create_csr/get_subject_style.mhtml',

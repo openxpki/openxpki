@@ -1,0 +1,43 @@
+<%args>
+    $role    => undef
+    $profile => undef
+</%args>
+<& /service/open_form.mhtml &>
+<& /lib/html/hidden.mhtml, 'name' => 'role', 'value' => $role &>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_DESCRIPTION') %>
+</p>
+<select name="profile">
+%   foreach my $hprofile (sort keys %profiles)
+%   {
+  <option value="<% $hprofile %>"><% $hprofile %></option>
+%   }
+</select>
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+<dl>
+
+<%init>
+    ## read all profiles from the server
+    my $msg = $context->{client}->send_receive_command_msg("get_cert_profiles");
+    my %profiles = %{$msg->{PARAMS}};
+
+    ## return the configuration number if it exists
+    if (defined $profile and
+        exists $profiles{$profile})
+    {
+        return $profile;
+    }
+
+    ## if we have only one configuration
+    ## then we have not to ask the user
+    if (scalar keys %profiles == 1)
+    {
+        my @array = keys %profiles;
+        $profile = pop @array;
+        return $profile;
+    }
+
+    ## ok, we have to ask the user
+</%init>

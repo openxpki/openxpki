@@ -51,10 +51,14 @@ htdocs/service/workflow/list_instances.html
 htdocs/service/workflow/create_instance.html
 htdocs/service/workflow/show_instance.html
 htdocs/service/workflow/activity/dhandler
+htdocs/service/workflow/activity/change_csr_role.html
+htdocs/service/workflow/activity/change_csr_profile.html
+htdocs/service/workflow/activity/change_csr_subject_style.html
 htdocs/service/workflow/activity/change_csr_subject.html
 
 htdocs/service/create_csr/index.html
 htdocs/service/create_csr/get_role.mhtml
+htdocs/service/create_csr/get_profile.mhtml
 htdocs/service/create_csr/get_subject_style.mhtml
 htdocs/service/create_csr/get_keygen.mhtml
 htdocs/service/create_csr/get_subject.mhtml

@@ -1,5 +1,6 @@
 <%args>
     $role          => undef
+    $profile       => undef
     $subject_style => undef
     $keygen        => undef
     $CONFIG        => undef
@@ -7,7 +8,8 @@
 
 <& /service/open_form.mhtml &>
 
-<& /lib/html/hidden.mhtml, 'name' => 'role', 'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
 <& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE') %></h1>

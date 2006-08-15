@@ -6,36 +6,33 @@
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_DESCRIPTION') %>
 </p>
-<select name="role">
-%   foreach my $hrole (sort keys %roles)
-%   {
-  <option value="<% $hrole %>"><% $hrole %></option>
-%   }
-</select>
+<p>
+<& /lib/html/select.mhtml,
+   'name'    => "role",
+   'default' => [ $role ],
+   'values'  => [ @roles ] &>
+</p>
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 <dl>
 
 <%init>
     ## read all roles from the server
-    my $msg = $context->{client}->send_receive_command_msg("get_cert_profiles");
-    my %roles = %{$msg->{PARAMS}};
+    my $msg = $context->{client}->send_receive_command_msg("get_roles");
+    my @roles = @{$msg->{PARAMS}};
 
-    ## return the configuration number if it exists
+    ## return the role if it exists
     if (defined $role and
-        exists $roles{$role})
+        grep /^$role$/, @roles)
     {
-        ## this is the ID of the profile
         return $role;
     }
 
     ## if we have only one configuration
     ## then we have not to ask the user
-    if (scalar keys %roles == 1)
+    if (scalar @roles == 1)
     {
-        my @array = keys %roles;
-        $role = pop @array;
-        return $role;
+        return $roles[0];
     }
 
     ## ok, we have to ask the user

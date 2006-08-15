@@ -196,6 +196,12 @@ sub get_pki_realm_index
     return $index;
 }
 
+sub get_roles
+{
+    my $self = shift;
+    return [ CTX('acl')->get_roles() ];
+}
+
 sub get_cert_profiles
 {
     my $self = shift;

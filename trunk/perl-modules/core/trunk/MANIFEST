@@ -153,6 +153,7 @@ OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
 OpenXPKI/Server/Workflow/Condition/ACL.pm
 
+OpenXPKI/Server/Workflow/Validator/CertRole.pm
 OpenXPKI/Server/Workflow/Validator/CertProfile.pm
 OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm

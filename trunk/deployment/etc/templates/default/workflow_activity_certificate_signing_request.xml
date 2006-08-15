@@ -9,16 +9,22 @@
       <validator name="HasRequiredField">
         <arg>cert_role</arg>
       </validator>
-      <validator name="CertProfile">
+      <validator name="CertRole">
         <arg>$cert_role</arg>
+      </validator>
+      <validator name="HasRequiredField">
+        <arg>cert_profile</arg>
+      </validator>
+      <validator name="CertProfile">
         <arg>$cert_profile</arg>
+        <arg>$cert_profile_id</arg>
       </validator>
       <validator name="HasRequiredField">
         <arg>cert_subject_style</arg>
         <arg>cert_subject</arg>
       </validator>
       <validator name="CertSubject">
-        <arg>$cert_profile</arg>
+        <arg>$cert_profile_id</arg>
         <arg>$cert_subject_style</arg>
         <arg>$cert_subject</arg>
       </validator>
@@ -37,6 +43,34 @@
         <arg>$spkac</arg>
       </validator>
   </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
+	  class="Workflow::Action::Null">
+      <condition name="ACL::change_csr_role"/>
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_role"/>
+      <validator name="CertRole">
+        <arg>$cert_role</arg>
+      </validator>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
+	  class="Workflow::Action::Null">
+      <condition name="ACL::change_csr_profile"/>
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_profile"/>
+      <validator name="CertProfile">
+        <arg>$cert_profile</arg>
+        <arg>$cert_profile_id</arg>
+      </validator>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
+	  class="Workflow::Action::Null">
+      <condition name="ACL::change_csr_subject_style"/>
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_subject_style"/>
+  </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
 	  class="Workflow::Action::Null">
       <condition name="ACL::change_csr_subject"/>
@@ -48,6 +82,27 @@
         <arg>$cert_subject_style</arg>
         <arg>$cert_subject</arg>
       </validator>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
+	  class="Workflow::Action::Null">
+      <condition name="ACL::change_csr_subject_alt_name"/>
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_subject_alt_name"/>
+      <validator name="CertSubjectAltName">
+        <arg>$cert_subject_alt_name</arg>
+      </validator>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
+	  class="Workflow::Action::Null">
+      <condition name="ACL::change_csr_info"/>
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_info"/>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+	  class="Workflow::Action::Null">
+      <condition name="ACL::reject_csr"/>
   </action>
 </actions>
 

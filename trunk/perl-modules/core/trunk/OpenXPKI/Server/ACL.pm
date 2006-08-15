@@ -257,6 +257,12 @@ sub authorize
     return 1;
 }
 
+sub get_roles
+{
+    my $self  = shift;
+    return keys %{$self->{PKI_REALM}->{CTX('session')->get_pki_realm()}->{ROLES}};
+}
+
 1;
 __END__
 
@@ -292,3 +298,8 @@ in user.
 
 If the access is granted then function returns a true value. If the access
 is denied then an exception is thrown.
+
+=head2 get_roles
+
+returns all available roles for the actual PKI realm.
+
