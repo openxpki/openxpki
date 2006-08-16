@@ -4,7 +4,7 @@ OpenXPKI is included into the distribution of the basic
 FreeBSD system as a regular port under the FreeBSD name
 "security/p5-openxpki":
 
-http://www.freebsd.org/ports/security.html
+http://www.freebsd.org/cgi/ports.cgi?query=openxpki
 
 This port installs all tools of openxpki 
 (server-side, client-side, deployment, i18n) in one move.
@@ -36,14 +36,11 @@ and place them into /usr/ports/distfiles/openxpki/)
 
 3. Install your favorite database and web server.
 
-4. perform deployment procedure for openxpki in a regular way.
+4. Perform deployment procedure for openxpki in a regular way.
 
 Just in case: FreeBSD employs one and the same port collection 
 in ALL (stable, current, legacy) versions of FreeBSD.
 
-The latest security/p5-openxpki port aims at version openxpki-0.9.402,
-which has a status of intermediate snapshot meant for 
-experiments with openxpki suite.
 
 == PORT FOR SNAPSHOT ==
 

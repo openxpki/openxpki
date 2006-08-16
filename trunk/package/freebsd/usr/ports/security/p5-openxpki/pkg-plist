@@ -11,6 +11,7 @@ bin/openxpkictl
 %%SITE_PERL%%/OpenXPKI/Client/SCEP.pm
 %%SITE_PERL%%/OpenXPKI/Client/SOAP/Lite.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/API.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Backend/API.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Backend/OpenSSL.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Backend/OpenSSL.xs
@@ -47,6 +48,7 @@ bin/openxpkictl
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Backend/OpenSSL/XS/PKCS10.xs
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Backend/OpenSSL/XS/SPKAC.xs
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Backend/OpenSSL/XS/X509.xs
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/CLI.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/CRL.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/CRR.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/CSR.pm
@@ -56,18 +58,30 @@ bin/openxpkictl
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Profile/Base.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Profile/CRL.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Profile/Certificate.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Secret.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Secret/Plain.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Secret/Split.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/TokenManager.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Tool/SCEP.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Tool/SCEP/API.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Tool/SCEP/CLI.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Tool/SCEP/Command/get_message_type.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Tool/SCEP/Command/get_transaction_id.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Tool/SCEP/Engine/OpenSSL.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Toolkit.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/VolatileVault.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/X509.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/DN.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/DateTime.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Debug.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Exception.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/FileUtils.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Serialization/JSON.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Serialization/Simple.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/ACL.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/API.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/API/Workflow.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Authentication.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Authentication/Anonymous.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Authentication/External.pm
@@ -101,6 +115,7 @@ bin/openxpkictl
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Condition/ACL.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Persister/DBI.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Validator/CertProfile.pm
@@ -111,6 +126,10 @@ bin/openxpkictl
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/Default.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/Default/Command.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/Default/Command/nop.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/SCEP.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/SCEP/Command.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/SCEP/Command/GetCACert.pm
+%%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/SCEP/Command/PKIOperation.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/Test.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Transport/Simple.pm
 %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/VERSION.pm
@@ -139,14 +158,17 @@ share/locale/en_GB/LC_MESSAGES/openxpki.mo
 %%DATADIR%%/templates/default/workflow_activity.xml
 %%DATADIR%%/templates/default/workflow_activity_certificate_signing_request.xml
 %%DATADIR%%/templates/default/workflow_activity_null.xml
+%%DATADIR%%/templates/default/workflow_condition.xml
 %%DATADIR%%/templates/default/workflow_def_certificate_signing_request.xml
 %%DATADIR%%/templates/default/workflow_request_dataonly.xml
 %%DATADIR%%/templates/default/workflow_validator_certificate_signing_request.xml
-@dirrm %%DATADIR%%/templates/default
-@dirrm %%DATADIR%%/templates
-@dirrm %%DATADIR%%
+@dirrmtry %%DATADIR%%/templates/default
+@dirrmtry %%DATADIR%%/templates
+@dirrmtry %%DATADIR%%
 @dirrmtry share/locale/de_DE/LC_MESSAGES
 @dirrmtry share/locale/de_DE
+@dirrmtry share/locale/en_GB/LC_MESSAGES
+@dirrmtry share/locale/en_GB
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/auto/OpenXPKI/Client/SOAP/Lite
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/auto/OpenXPKI/Client/SOAP
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/auto/OpenXPKI/Client/SCEP
@@ -157,12 +179,15 @@ share/locale/en_GB/LC_MESSAGES/openxpki.mo
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/auto/OpenXPKI
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/XML
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Transport
+@dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/SCEP/Command
+@dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/SCEP
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/Default/Command
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service/Default
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Service
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Validator
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Persister/DBI
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Persister
+@dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Condition
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Activity/Tools
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly
@@ -180,8 +205,14 @@ share/locale/en_GB/LC_MESSAGES/openxpki.mo
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/DBI/Driver
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/DBI
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/Authentication
+@dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server/API
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Server
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Serialization
+@dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Tool/SCEP/Engine
+@dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Tool/SCEP/Command
+@dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Tool/SCEP
+@dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Tool
+@dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Secret
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Profile
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Backend/OpenSSL/XS
 @dirrm %%SITE_PERL%%/%%PERL_ARCH%%/OpenXPKI/Crypto/Backend/OpenSSL/Engine
@@ -196,4 +227,3 @@ share/locale/en_GB/LC_MESSAGES/openxpki.mo
 @dirrm %%SITE_PERL%%/OpenXPKI/Client/HTML
 @dirrm %%SITE_PERL%%/OpenXPKI/Client
 @dirrm %%SITE_PERL%%/OpenXPKI
-@dirrmtry etc/openxpki
