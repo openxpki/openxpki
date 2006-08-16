@@ -29,12 +29,21 @@ sub validate {
     }
 
     ## check that it is clean
-    if ($spkac =~ /^[A-Za-z\-_=]*$/ or ## RFC 3548 URL and filename safe
-        $spkac =~ /^[A-Za-z+\/=]*$/    ## RFC 1421,2045 and 3548
+    if ($spkac !~ /^[0-9A-Za-z\-_=]*$/ and ## RFC 3548 URL and filename safe
+        $spkac !~ /^[0-9A-Za-z+\/=]*$/     ## RFC 1421,2045 and 3548
        )
     {
         ## SPKAC is base64 and this is no base64
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_BASE64' ];
+        $context->param ("__error" => $errors);
+        validation_error ($errors->[scalar @{$errors} -1]);
+    }
+
+    ## sometimes keygen simply sends "1024 (some text)"
+    if (length ($spkac) < 64)
+    {
+        ## SPKAC is base64 and this is no base64
+        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT' ];
         $context->param ("__error" => $errors);
         validation_error ($errors->[scalar @{$errors} -1]);
     }

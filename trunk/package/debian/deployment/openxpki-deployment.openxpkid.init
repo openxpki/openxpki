@@ -33,6 +33,8 @@ test -x $DAEMON || exit 0
 d_start() {
 	start-stop-daemon --start --quiet --pidfile $PIDFILE \
 		--exec $DAEMON start
+	# do not enable debugging
+	#	--exec $DAEMON start
 	# enable full debugging
 	#	--exec $DAEMON start -- --debug :100
 	# enable rudimentary debugging

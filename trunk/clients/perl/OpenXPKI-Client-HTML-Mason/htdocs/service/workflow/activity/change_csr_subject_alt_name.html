@@ -1,0 +1,137 @@
+<%args>
+    $type   => undef
+    $id     => undef
+    $filled => undef
+</%args>
+
+<& /service/open_form.mhtml, action => 'change_csr_subject_alt_name.html' &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'type',   'value' => $type &>
+<& /lib/html/hidden.mhtml, 'name' => 'id',     'value' => $id &>
+<& /lib/html/hidden.mhtml, 'name' => 'filled', 'value' => '1' &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_ALT_NAME_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_ALT_NAME_DESCRIPTION') %>
+</p>
+
+<table>
+% for (my $i=0; $i < scalar @subject_alt_name; $i++)
+% {
+    <tr>
+      <td>
+        <& /lib/html/select.mhtml,
+           'name'    => "subject_alt_name_${i}_type",
+           'default' => [ $subject_alt_name[$i]->[0] ],
+           'values'  => \@values &>
+      </td>
+      <td>
+        <& /lib/html/input.mhtml,
+           'name' => "subject_alt_name_${i}_value",
+           'value' => $subject_alt_name[$i]->[1] &>
+      </td>
+    </tr>
+% }
+% for (my $i=scalar @subject_alt_name; $i < $range; $i++)
+% {
+    <tr>
+      <td>
+        <& /lib/html/select.mhtml,
+           'name'    => "subject_alt_name_${i}_type",
+           'values'  => \@values &>
+      </td>
+      <td>
+        <& /lib/html/input.mhtml,
+           'name' => "subject_alt_name_${i}_value" &>
+      </td>
+    </tr>
+% }
+</table>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+<& /service/create_csr/print_descriptions.mhtml, 'descriptions' => \%descriptions &>
+
+<%init>
+    my @errors           = ();
+    my @subject_alt_name = ();
+    my $text             = "";
+    my $range            = 5;
+    my $serializer       = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
+
+    ## load the workflow and extract the subject alternative name
+    my $msg = $context->{client}->send_receive_command_msg
+              (
+                  "get_workflow_info",
+                  {
+                      "WORKFLOW" => $type,
+                      "ID"       => $id
+                  }
+              );
+    $text = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_subject_alt_name};
+    ## serialized stuff
+    @subject_alt_name = @{$serializer->deserialize($text)};
+    $range           += scalar @subject_alt_name;
+
+    if ($filled)
+    {
+        ## this is the second step - so we have a filled form
+
+        ## build the subject alternative name
+        my $ARGS   = {$m->request_args()};
+        @subject_alt_name = ();
+        for (my $i=0; $i < $range; $i++)
+        {
+            ## check the field is filled
+            next if (not exists $ARGS->{"subject_alt_name_${i}_type"});
+            next if (not length $ARGS->{"subject_alt_name_${i}_type"});
+            next if (not exists $ARGS->{"subject_alt_name_${i}_value"});
+            next if (not length $ARGS->{"subject_alt_name_${i}_value"});
+            my $type  = $ARGS->{"subject_alt_name_${i}_type"};
+            my $value = $ARGS->{"subject_alt_name_${i}_value"};
+
+            ## accept the value
+            push @subject_alt_name, [ $type, $value ];
+        }
+
+        ## serialize subject alternative name
+        ## warnings we must be safe against \n truncation
+        $text = $serializer->serialize(\@subject_alt_name);
+
+        ## fix the workflow
+        my $msg = $context->{client}->send_receive_command_msg (
+                      "execute_workflow_activity",
+                      {WORKFLOW => $type,
+                       ID       => $id,
+                       ACTIVITY => "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME",
+                       PARAMS   => {"cert_subject_alt_name" => $text}});
+        if (exists $msg->{SERVICE_MSG} and
+            $msg->{SERVICE_MSG} eq "ERROR")
+        {
+            @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
+        }
+        else
+        {
+            return $m->comp ('/service/workflow/show_instance.html',
+                             'msg'  => $msg,
+                             'type' => $type,
+                             'id'   => $id);
+        }
+    }
+
+    ## ok we have to display the whole stuff
+
+    ## build hash for select fields and descriptions
+    my %descriptions = ();
+    my @values       = ();
+    my @raw          = ("email", "DNS", "IP", "URI", "DirName", "GUID", "UPN", "RID");
+
+    foreach my $key (@raw)
+    {
+        my $label = "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_".uc($key);
+        $descriptions{i18nGettext($label)} = i18nGettext($label."_DESCRIPTION");
+        push @values, {LABEL => i18nGettext($label), VALUE => $key};
+    }
+</%init>

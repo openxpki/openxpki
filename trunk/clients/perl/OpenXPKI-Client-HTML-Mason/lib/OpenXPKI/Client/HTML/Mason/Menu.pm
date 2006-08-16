@@ -177,17 +177,7 @@ sub __get_menu_link
 {
     my $self   = shift;
     my $params = shift;
-    my $link   = "";
-
-    ## build the correct root component path
-    my $pos  = 1; ## ignore first /
-    while (length ($self->{COMP}) > $pos)
-    {
-        my $index = index ($self->{COMP}, "/", $pos);
-        last if ($index < $pos);
-        $pos   = $index+1;
-        $link .= "../";
-    }
+    my $link   = $self->get_root();
 
     ## get the menu configuration
     my %result = $self->get_menu_hash ($params);
@@ -234,6 +224,24 @@ sub __get_menu_link
                 $link .= ";__action_param_$param=".$config->{PARAMS}->{$param};
             }
         }
+    }
+
+    return $link;
+}
+
+sub get_root
+{
+    my $self = shift;
+    my $link = "";
+
+    ## build the correct root component path
+    my $pos  = 1; ## ignore first /
+    while (length ($self->{COMP}) > $pos)
+    {
+        my $index = index ($self->{COMP}, "/", $pos);
+        last if ($index < $pos);
+        $pos   = $index+1;
+        $link .= "../";
     }
 
     return $link;

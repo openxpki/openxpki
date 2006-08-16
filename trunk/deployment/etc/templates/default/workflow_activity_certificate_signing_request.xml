@@ -100,6 +100,20 @@
       <!-- because this ignores the order of the validators -->
       <field name="cert_info"/>
   </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+	  class="Workflow::Action::Null">
+      <condition name="ACL::approve_csr"/>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
+	  class="Workflow::Action::Null"
+          cert_workflow_type="I18N_OPENXPKI_WF_TYPE_ISSUE_CERTIFICATE">
+      <condition name="ACL::execute_csr"/>
+      <condition name="Workflow::check_csr_approvals"/>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
+	  class="Workflow::Action::Null">
+      <condition name="ACL::cancel_csr_approval"/>
+  </action>
   <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
 	  class="Workflow::Action::Null">
       <condition name="ACL::reject_csr"/>

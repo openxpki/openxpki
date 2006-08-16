@@ -55,6 +55,9 @@ htdocs/service/workflow/activity/change_csr_role.html
 htdocs/service/workflow/activity/change_csr_profile.html
 htdocs/service/workflow/activity/change_csr_subject_style.html
 htdocs/service/workflow/activity/change_csr_subject.html
+htdocs/service/workflow/activity/change_csr_subject_alt_name.html
+htdocs/service/workflow/activity/change_csr_info.html
+htdocs/service/workflow/activity/reject_csr.html
 
 htdocs/service/create_csr/index.html
 htdocs/service/create_csr/get_role.mhtml

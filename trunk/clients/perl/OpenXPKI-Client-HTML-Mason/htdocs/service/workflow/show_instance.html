@@ -84,15 +84,15 @@
 </table>
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES') %></h1>
 <div class="openxpki_command_list">
-% foreach my $activity (@{$activities})
+% foreach my $action (sort keys %actions)
 % {
-%   my $filename = lc($activity);
+%   my $filename = lc($actions{$action});
 %      $filename =~ s/i18n_openxpki_wf_[^_]*_//;
   <div class="openxpki_command_list_item">
-    <& /service/open_form.mhtml, 'action' => "activity/$filename.html" &>
+    <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/activity/$filename.html" &>
     <& /lib/html/hidden.mhtml, 'name' => 'type', 'value' => $type &>
     <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
-    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext($activity) &>
+    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => $action &>
     <& /service/close_form.mhtml &>
   </div>
 % }
@@ -128,5 +128,12 @@
                    }
                );
         $activities = $hmsg->{PARAMS};
+    }
+
+    my %actions = ();
+    foreach my $key (@{$activities})
+    {
+        ## I hope that nobody will translate two actions with the same string
+        $actions{i18nGettext($key)} = $key;
     }
 </%init>

@@ -2,5 +2,9 @@
   <condition name="ACL::create_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="create_csr"/>
   </condition>
+  <condition name="Workflow::check_csr_approvals" class="OpenXPKI::Server::Workflow::Condition::Approved">
+    <param name="role"          value="RA Operator"/>
+    <param name="affected_role" value="cert_role"/>
+  </condition>
 </conditions>
 
