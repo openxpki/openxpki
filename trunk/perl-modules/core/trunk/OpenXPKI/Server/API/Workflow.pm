@@ -176,7 +176,7 @@ sub execute_workflow_activity {
         if (not exists $fields{$key})
         {
 	    OpenXPKI::Exception->throw (
-	        message => "I18N_OPENXPKI_SERVER_API_EXECUTE_ACTION_ILLEGAL_PARAM",
+	        message => "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_ILLEGAL_PARAM",
 	        params => {
 		    WORKFLOW => $wf_title,
                     ID       => $wf_id,
@@ -246,6 +246,11 @@ sub create_workflow_instance {
 		type => SCALAR,
 		regex => $re_alpha_string,
 	    },
+	    FILTER_PARAMS => {
+		type    => SCALAR,
+		regex   => $re_alpha_string,
+                default => 0
+	    },
 	    PARAMS => {
 		type => HASHREF,
 		optional => 1,
@@ -269,14 +274,6 @@ sub create_workflow_instance {
 	    });
     }
 
-    # pass in specified parameters
-    if (exists $args->{PARAMS} &&
-	(ref $args->{PARAMS} eq 'HASH')) {
-	foreach my $key (keys %{$args->{PARAMS}}) {
-	    $workflow->context->param($key => $args->{PARAMS}->{$key});
-	}
-    }
-
     my $creator = CTX('session')->get_user();
     ##! 2: $creator
     if (! defined $creator) {
@@ -293,6 +290,7 @@ sub create_workflow_instance {
     my $state = undef;
     eval
     {
+        ##! 4: "determine the first action"
         my @list = $workflow->get_current_actions();
         if (not scalar @list)
         {
@@ -301,6 +299,34 @@ sub create_workflow_instance {
 	        params => {
 		    WORKFLOW => $wf_title,
 	        });
+        }
+        ##! 4: "pass in specified parameters if available"
+        if (exists $args->{PARAMS} &&
+            (ref $args->{PARAMS} eq 'HASH'))
+        {
+            ##! 8: "load allowed parameters"
+            my %fields = ();
+            foreach my $field ($workflow->get_action_fields($list[0]))
+            {
+                $fields{$field->name()} = $field->description();
+            }
+            ##! 8: "store the allowed parameters"
+	    foreach my $key (keys %{$args->{PARAMS}})
+            {
+                next if (not exists $fields{$key} and $args->{FILTER_PARAMS});
+                if (not exists $fields{$key})
+                {
+                    OpenXPKI::Exception->throw (
+                        message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_ILLEGAL_PARAM",
+                        params => {
+                                   WORKFLOW => $wf_title,
+                                   ACTIVITY => $list[0],
+                                   PARAM    => $key,
+                                   VALUE    => $args->{PARAMS}->{$key}
+                                  });
+                }
+	        $workflow->context->param($key => $args->{PARAMS}->{$key});
+            }
         }
         $state = $workflow->execute_action($list[0]);
     };

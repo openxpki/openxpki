@@ -36,7 +36,7 @@ sub get_dsn
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_DSN_NO_DATABASE_NAME");
     }
-    my $dsn  = "dbname=".$self->{params}->{NAME};
+    my $dsn  = "sslmode=allow;dbname=".$self->{params}->{NAME};
        $dsn .= ";"."host=".$self->{params}->{HOST} if ($self->{params}->{HOST});
        $dsn .= ";"."port=".$self->{params}->{PORT} if ($self->{params}->{PORT});
 

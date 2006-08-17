@@ -320,10 +320,9 @@ sub do_process_request
     if ($EVAL_ERROR)
     {
         $transport->write ($serializer->serialize ($EVAL_ERROR->message()));
-        $self->{log}->log (MESSAGE  => "Database connection failed. ".
-                                       $EVAL_ERROR->message(),
-                           PRIORITY => "fatal",
-                           FACILITY => "system");
+        $log->log (MESSAGE  => "Database connection failed. ".$EVAL_ERROR,
+                   PRIORITY => "fatal",
+                   FACILITY => "system");
         return;
         
     }
@@ -334,7 +333,7 @@ sub do_process_request
     if ($EVAL_ERROR)
     {
         $transport->write ($serializer->serialize ($EVAL_ERROR->message()));
-        $self->{log}->log (MESSAGE  => "Database connection failed. ".
+        $log->log (MESSAGE  => "Database connection failed. ".
                                        $EVAL_ERROR->message(),
                            PRIORITY => "fatal",
                            FACILITY => "system");

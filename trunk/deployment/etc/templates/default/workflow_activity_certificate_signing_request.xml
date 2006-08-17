@@ -3,6 +3,14 @@
   <!-- because it is only used to initialize the workflow -->
   <action name="create_csr"
 	  class="Workflow::Action::Null">
+      <field name="cert_role"/>
+      <field name="cert_profile"/>
+      <field name="cert_subject_style"/>
+      <field name="cert_subject"/>
+      <field name="cert_subject_alt_name"/>
+      <field name="cert_info"/>
+      <field name="csr_type"/>
+      <field name="spkac"/>
       <condition name="ACL::create_csr"/>
       <!-- do not use field with is_required                -->
       <!-- because this ignores the order of the validators -->
@@ -101,17 +109,17 @@
       <field name="cert_info"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
-	  class="Workflow::Action::Null">
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve">
       <condition name="ACL::approve_csr"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
-	  class="Workflow::Action::Null"
-          cert_workflow_type="I18N_OPENXPKI_WF_TYPE_ISSUE_CERTIFICATE">
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::CreateProcess"
+          workflow_type="I18N_OPENXPKI_WF_TYPE_ISSUE_CERTIFICATE">
       <condition name="ACL::execute_csr"/>
       <condition name="Workflow::check_csr_approvals"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
-	  class="Workflow::Action::Null">
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
       <condition name="ACL::cancel_csr_approval"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"

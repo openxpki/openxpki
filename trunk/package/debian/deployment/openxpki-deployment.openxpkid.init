@@ -88,7 +88,7 @@ case "$1" in
 	#	just the same as "restart".
 	#
 	echo -n "Restarting $DESC: $NAME"
-	d_stop
+	d_stop || echo -n " - stop failed but trying to start"
 	sleep 1
 	d_start
 	echo "."

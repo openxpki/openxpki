@@ -146,12 +146,16 @@ OpenXPKI/Server/Workflow/Activity/Key/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly/Create.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
+OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
+OpenXPKI/Server/Workflow/Activity/Tools/CreateProcess.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
 OpenXPKI/Server/Workflow/Condition/ACL.pm
+OpenXPKI/Server/Workflow/Condition/Approved.pm
 
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
 OpenXPKI/Server/Workflow/Validator/CertProfile.pm

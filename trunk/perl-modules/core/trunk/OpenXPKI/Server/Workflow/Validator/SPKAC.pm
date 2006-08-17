@@ -42,7 +42,7 @@ sub validate {
     ## sometimes keygen simply sends "1024 (some text)"
     if (length ($spkac) < 64)
     {
-        ## SPKAC is base64 and this is no base64
+        ## definitely too short for a SPKAC
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT' ];
         $context->param ("__error" => $errors);
         validation_error ($errors->[scalar @{$errors} -1]);

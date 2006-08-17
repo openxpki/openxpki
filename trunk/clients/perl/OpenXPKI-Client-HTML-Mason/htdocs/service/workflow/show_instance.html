@@ -38,7 +38,11 @@
 % foreach my $param (sort keys %{$msg->{PARAMS}->{WORKFLOW}->{CONTEXT}})
 % {
   <tr>
-    <td><% i18nGettext($param) %></td>
+%   if ($param eq "approvals") {
+      <td><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_APPROVALS") %></td>
+%   } else {
+      <td><% i18nGettext($param) %></td>
+%   }
     <td>
 %   my $value = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param};
 %   if ($value =~ /^(ARRAY|HASH)/)
@@ -62,6 +66,15 @@
 %          {
 %              next if (not $pair); ## empty array
 <% $pair->[0] %>::=<% $pair->[1] %>
+%          }
+%      }
+%      elsif ($param eq "approvals")
+%      {
+%          ## hash: user to role
+%          foreach my $user (sort keys %{$ref})
+%          {
+%              next if (not defined $user); ## empty hash
+<% $user %>&rarr;<% $ref->{$user} %>
 %          }
 %      }
 %      else

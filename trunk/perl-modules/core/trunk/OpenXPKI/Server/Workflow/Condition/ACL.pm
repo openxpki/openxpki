@@ -7,7 +7,7 @@ use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use English;
 
-__PACKAGE__->mk_accessors( 'admin_group_id' );
+__PACKAGE__->mk_accessors( 'activity' );
 
 sub _init
 {
@@ -18,7 +18,7 @@ sub _init
              "You must define one value for 'activity' in ",
              "declaration of condition ", $self->name;
     }
-    $self->admin_group_id($params->{activity});
+    $self->activity($params->{activity});
 }
 
 sub evaluate

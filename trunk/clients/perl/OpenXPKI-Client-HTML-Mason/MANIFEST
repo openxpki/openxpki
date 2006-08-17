@@ -57,6 +57,9 @@ htdocs/service/workflow/activity/change_csr_subject_style.html
 htdocs/service/workflow/activity/change_csr_subject.html
 htdocs/service/workflow/activity/change_csr_subject_alt_name.html
 htdocs/service/workflow/activity/change_csr_info.html
+htdocs/service/workflow/activity/approve_csr.html
+htdocs/service/workflow/activity/cancel_csr_approval.html
+htdocs/service/workflow/activity/execute_csr.html
 htdocs/service/workflow/activity/reject_csr.html
 
 htdocs/service/create_csr/index.html
