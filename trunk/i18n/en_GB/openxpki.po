@@ -21,6 +21,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_ACTIVITY_TOOLS_DETERMINEISSUINGCA_NO_MATCHING_PROFILE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_BACKEND_OPENSSL_EVAL_ERROR"
+msgstr "Valid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_BACKEND_OPENSSL_INIT_ENGINE_NEW_FAILED"
+msgstr "Microsoft Internet Explorer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_BACKEND_OPENSSL_INSTANTIATE_CLI_FAILED"
+msgstr "Trustcenter Web Interface"
+
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID"
 msgstr ""
 
@@ -63,6 +75,107 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_DESCRIPTION"
+msgstr ""
+"You are logged in to the web interface of the trustcenter. Please note that "
+"this software support several instances of certification authorities (CAs). "
+"If you are not sure which CA you actually use then please check the info "
+"menu."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_TITLE"
+msgstr "Trustcenter Web Interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CSR_APPROVAL_DESCRIPTION"
+msgstr ""
+"Please choose the role for which you would like to request a certificate."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CSR_APPROVAL_TITLE"
+msgstr "Choose a role"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_INFO_DESCRIPTION"
+msgstr "Please enter now some additional informations."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_INFO_TITLE"
+msgstr "Additional informations"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_PROFILE_DESCRIPTION"
+msgstr ""
+"Please choose the role for which you would like to request a certificate."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_PROFILE_TITLE"
+msgstr "Choose a role"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_ROLE_DESCRIPTION"
+msgstr ""
+"Please choose the role for which you would like to request a certificate."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_ROLE_TITLE"
+msgstr "Choose a role"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_ALT_NAME_DESCRIPTION"
+msgstr ""
+"The IP address is the real address of any computer. An IPv4 address looks "
+"like 123.123.123.123 and IPv6 address looks like 11ad::de01:adf. This field "
+"should be filled if you request a certificate for a server because sometimes "
+"the server will be addressed directly by its IP address and not by its DNS "
+"name. If this happens then the DNS entries in the subject alternative name "
+"does not help."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_ALT_NAME_TITLE"
+msgstr "Subject alternative name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_DESCRIPTION"
+msgstr ""
+"The name of the certificate is build from the values of the following form "
+"fields. Please enter the required informations. If you are not sure about "
+"what to enter then please read the descriptions of the fields at the end of "
+"this page."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_STYLE_DESCRIPTION"
+msgstr "Please choose now a style for the certificates name."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_STYLE_TITLE"
+msgstr "Choose a naming style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_TITLE"
+msgstr "Creating the name of the certificate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXECUTE_CSR_DESCRIPTION"
+msgstr "Descriptions of the form fields"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXECUTE_CSR_TITLE"
+msgstr "Trustcenter Web Interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_DESCRIPTION"
+msgstr ""
+"You are logged in to the web interface of the trustcenter. Please note that "
+"this software support several instances of certification authorities (CAs). "
+"If you are not sure which CA you actually use then please check the info "
+"menu."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_TITLE"
+msgstr "Trustcenter Web Interface"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatic browser detection"
 
@@ -86,6 +199,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
 msgstr "Select the way of the key generation"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_DESCRIPTION"
+msgstr ""
+"Please choose the role for which you would like to request a certificate."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_TITLE"
+msgstr "Choose a role"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_DESCRIPTION"
 msgstr ""
@@ -236,6 +358,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE"
 msgstr "Trustcenter Web Interface"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN"
+msgstr "Logged out."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr ""
 "The logout failed. Please contact immediately the reponsible administrators. "
@@ -290,6 +416,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWD"
+msgstr "SPKAC"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10"
 msgstr "PKCS#10"
 
@@ -338,6 +468,17 @@ msgstr "Name"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE"
 msgstr "Value"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
+msgstr "You can see now the available types of workflows."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_TITLE"
+msgstr "Workflow types"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_APPROVALS"
+msgstr "Approvals"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_DESCRIPTION"
 msgstr ""
 "You can create a new instance of workflow type here. Please choose one."
@@ -362,6 +503,10 @@ msgstr "Workflow types"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL"
 msgstr "Workflow serial"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES"
+msgstr "Workflow instance"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DESCRIPTION"
 msgstr "Here you can see the details of the workflow instance."
@@ -398,6 +543,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_INIT_TRANSPORT_PROTOCOL_REJECTED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_SCEP_INVALID_OP"
+msgstr "SPKAC"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR"
 msgstr ""
@@ -478,8 +627,26 @@ msgstr "This is the normal operator authentication."
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER"
 msgstr "This is the normal user authentication."
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_ILLEGAL_PARAM"
+msgid "I18N_OPENXPKI_CRYPTO_API_CHECK_COMMAND_PARAM_PARAM_PATH_MISMATCH"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_API_COMMAND_ILLEGAL_PARAM"
+msgstr "Common name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_API_EVAL_ERROR"
+msgstr "Valid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_API_IS_ABSTRACT_CLASS"
+msgstr "Test User CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_API_NEW_MISSING_CLASS"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_ILLEGAL_VALUE"
 msgstr ""
@@ -535,9 +702,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_ILLEGAL_PARAMETER"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_CLASS"
-msgstr ""
-
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_NAME"
 msgstr ""
 
@@ -553,14 +717,32 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_ONLINE_ILLEGAL_PARAM"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_UNSUPPORTED_FUNCTION"
-msgstr ""
-
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_LOAD_CONFIG_DUPLICATE_ATTRIBUTE"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDIN_FAILED"
+msgstr "CSR with DC-style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_IS_ABSTRACT_CLASS"
+msgstr "New Request (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_MISSING_ENGINE"
+msgstr "reset"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_MISSING_SHELL"
+msgstr "reset"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_MISSING_TMP"
+msgstr "SPKAC"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_TMP_DOES_NOT_EXIST"
+msgstr "reset"
 
 msgid "I18N_OPENXPKI_CRYPTO_CRL_GET_CONVERTED_MISSING_FORMAT"
 msgstr ""
@@ -598,6 +780,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_CSR_NEW_WRONG_TYPE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OBJECT_GET_HANDLE_NOT_INITIALIZED"
+msgstr "The used suject style does not allow the use of an organization."
+
 msgid "I18N_OPENXPKI_CRYPTO_OBJECT_GET_PARSED_NO_VALUE"
 msgstr ""
 
@@ -605,9 +791,6 @@ msgid "I18N_OPENXPKI_CRYPTO_OBJECT_GET_STATUS_NOT_INITIALIZED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OBJECT_SET_HEADER_ATTRIBUTE_REINIT_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_BINARY_NOT_FOUND"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_CANNOT_OPEN_ERRLOG"
@@ -619,25 +802,7 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_FAILED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_PIPED_STDIN_FAILED"
-msgstr ""
-
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_PIPED_STDOUT_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_MISSING_CONFIG"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_MISSING_ENGINE"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_MISSING_SHELL"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_MISSING_TMP"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_TMP_DOES_NOT_EXIST"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_ENV_FAILED"
@@ -646,14 +811,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_FILE_FAILED"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_ILLEGAL_CONTAINER_FORMAT"
+msgstr ""
+
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_DATA"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_OUTPUT_FORMAT"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_WRONG_OUTPUT_FORMAT"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_WRONG_DATATYPE"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_MISSING_DATA"
 msgstr ""
@@ -772,9 +941,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_DN_FAILURE"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_FAILED"
-msgstr ""
-
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_KEYFILE_DOES_NOT_EXIST"
 msgstr ""
 
@@ -796,16 +962,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_IS_PRIME_MISSING_PRIME"
+msgstr ""
+
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_CONFIG"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_ENGINE"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_SUBPARAMETER_COMMAND"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_SUBPARAMETER_PARAMS"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_XS"
@@ -910,9 +1073,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_PASSWD_TOO_SHORT"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_UNDEFINED"
-msgstr ""
-
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_WRONG_ENGINE_USAGE"
 msgstr ""
 
@@ -929,24 +1089,6 @@ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_NO_REF"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_UNKNOWN_TYPE"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_CLI_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_NEW_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_INIT_ENGINE_USE_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_MISSING_COMMAND_PARAM"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_SHELL_DOES_NOT_EXIST"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_TEMPORARY_DIRECTORY_UNAVAILABLE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_PKCS7_NEW_MISSING_DATA"
@@ -1024,14 +1166,64 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_NEW_MISSING_XML_CONFIG"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_IMPLEMENTATION_UNAVAILABLE"
+msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_INSTANTIATION_FAILED"
+msgstr "Choose authentication method"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER"
+msgstr "Valid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_MISSING_PARAMETER"
+msgstr "reset"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPIT_N_OR_K_MISSING"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
+msgstr "New Request (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_INVALID_SHARE_VERSION"
+msgstr ""
+"DC-style means the we use domain components at the of the certificates name. "
+"An old style DN looks like this: cn=John Doe, o=OpenXPKI, c=DE. The last "
+"attribute c only accepts two letters and no domain names. The same thing "
+"with the new DC-style looks like this: cn=John Doe, dc=OpenXPKI, dc=DE. The "
+"advantage is that we can use now the more correct name: cn=John Doe, "
+"dc=OpenXPKI, dc=org. We have no longer to use a country."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_QUORUM_MISSING"
+msgstr "CSR with OU-style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_TOKEN_MISSING"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_WRONG_CHECKSUM"
+msgstr "The email address __EMAIL__ is not a valid RFC 822 address."
+
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_BACKEND_UNDEFINED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_CREATE_FAILED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INCOMPLETE_CONFIGURATION"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_EVAL_ERROR"
+msgstr "Deutsch"
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INCORRECT_NAME_OR_TYPE"
 msgstr ""
@@ -1065,6 +1257,26 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_INCOMPLETE_CONFIGURATION"
+msgstr ""
+"A domain component is a part of a name from the domain name system (DNS). If "
+"you have a server www.openxpki.org then the domain components are www, "
+"openxpki and org. If you can only enter one component then it must be "
+"usually the last one."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_IS_ABSTRACT_CLASS"
+msgstr "SPKAC"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_LOAD_CONFIG_DUPLICATE_ATTRIBUTE"
+msgstr "Trustcenter Web Interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_LOAD_CONFIG_EVAL_ERROR"
+msgstr "Errors"
 
 msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA"
 msgstr ""
@@ -1115,6 +1327,10 @@ msgid "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT"
 msgstr ""
 
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA"
+msgstr "Test Dummy CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA\n"
 msgstr "Test Dummy CA"
 
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA"
@@ -1198,9 +1414,6 @@ msgstr "Fax number"
 msgid "I18N_OPENXPKI_HTML_FAX_NUMBER_DESCRIPTION"
 msgstr "The field contains a normal fax number."
 
-msgid "I18N_OPENXPKI_HTML_MENU_CERTS"
-msgstr "Certificates"
-
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "New Request (CSR)"
 
@@ -1254,6 +1467,10 @@ msgstr ""
 "different departments (e.g. in companies) or institutes (e.g. in "
 "universites)."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_PRINT_BUTTON"
+msgstr "Organization"
+
 msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER"
 msgstr "Telephone number"
 
@@ -1302,8 +1519,38 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_ILLEGAL_PARAM"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_ILLEGAL_WORKFLOW_TITLE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_NO_FIRST_ACTIVITY"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_ILLEGAL_PARAM"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 msgid "I18N_OPENXPKI_SERVER_API_GET_CA_CERTIFICATES_PKI_REALM_CONFIGURATION_UNAVAILABLE"
 msgstr ""
@@ -1329,8 +1576,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_INVALID_PARAMETER"
+msgstr "The SPKAC string is empty."
+
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS"
-msgstr "The workflow is missing some required fields (__FIELDS__) for the next action."
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED"
 msgstr ""
@@ -1434,6 +1687,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DISCONNECT_FAILED"
 msgstr ""
 
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED"
+msgstr ""
+
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_EXECUTE_FAILED"
 msgstr ""
 
@@ -1444,6 +1700,9 @@ msgid "I18N_OPENXPKI_SERVER_DBI_DBH_PREPARE_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_ROLLBACK_FAILED"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_DB2_DROP_SEQUENCE_NOT_FORCED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_DB2_GET_DSN_NO_DATABASE_NAME"
@@ -1461,6 +1720,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_GET_COLUMN_TYPE_UNKNOWN_NAME"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_MYSQL_DROP_SEQUENCE_NOT_FORCED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_MYSQL_GET_DSN_NO_DATABASE_NAME"
 msgstr ""
 
@@ -1473,8 +1738,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_WRONG_TYPE_IN_SCHEMA"
 msgstr ""
 
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_POSTGRESQL_DROP_SEQUENCE_NOT_FORCED"
+msgstr ""
+
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_SQLITE_DROP_SEQUENCE_NOT_FORCED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_SQLITE_GET_DSN_NO_DATABASE_NAME"
 msgstr ""
@@ -1505,6 +1779,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_DELETE_WRONG_OPERATOR"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_INDEX_NOT_FORCED"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_TABLE_NOT_FORCED"
+msgstr "The used suject style does not allow the use of an organization."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_TABLE"
 msgstr ""
@@ -1593,6 +1875,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ACL_NO_ACTIVITY"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVED_MISSING_APPROVAL"
+msgstr "The value of a subject alternative name field is missing."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVED_NO_ROLE_LIST"
+msgstr "The SPKAC string is empty."
+
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_FETCH_WORKFLOW_INCORRECT_WORKFLOW_INSTANCE"
 msgstr ""
 
@@ -1608,11 +1902,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_PROFILE_MISMATCH"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_ID_MISMATCH"
+msgstr "The SPKAC string is empty."
 
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_UNSUPPORTED_ROLE"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_UNSUPPORTED_PROFILE"
+msgstr "The IP address __IP__ is not compliant to IPv4 and IPv6."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_ROLE_NOT_EXISTS"
+msgstr "The SPKAC string is empty."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_MISSING_TYPE"
 msgstr "The type of a subject alternative name field is missing."
@@ -1621,7 +1921,8 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_MISSING_VAL
 msgstr "The value of a subject alternative name field is missing."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_UNKNOWN_TYPE"
-msgstr "The type __TYPE__ is not supported for a subject alternative name field."
+msgstr ""
+"The type __TYPE__ is not supported for a subject alternative name field."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_WRONG_DNS"
 msgstr "The name __DNS__ is not a valid DNS entry."
@@ -1630,13 +1931,17 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_WRONG_EMAIL
 msgstr "The email address __EMAIL__ is not a valid email address."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_WRONG_GUID"
-msgstr "The GUID __GUID__ is not a valid Microsoft GUID and not a valid RFC 4122 UUID."
+msgstr ""
+"The GUID __GUID__ is not a valid Microsoft GUID and not a valid RFC 4122 "
+"UUID."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_WRONG_IP"
 msgstr "The IP address __IP__ is not compliant to IPv4 and IPv6."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_ALT_NAME_WRONG_UPN"
-msgstr "The Microsoft UPN __UPN__ is no valid RFC 822 address and we only support such names."
+msgstr ""
+"The Microsoft UPN __UPN__ is no valid RFC 822 address and we only support "
+"such names."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_ALWAYS_REGEX"
 msgstr ""
@@ -1648,6 +1953,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_BASE64"
 msgstr "The submitted SPKAC data is not correctly base 64 encoded."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_DATA"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT"
 msgstr "The SPKAC string is empty."
 
 msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_DSN_NO_DATABASE_NAME"
@@ -1672,9 +1981,6 @@ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PRIVATE_METHOD_REQUESTED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_ERROR_INVALID_PARAMETERS"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_NO_REALM_CONFIGURED"
@@ -1704,6 +2010,79 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_IMPL_INSTANTIATE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_INVALID_COMMAND"
+msgstr "The used suject style does not allow the use of a country."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_NO_COMMAND_IMPL"
+msgstr "The used suject style does not allow the use of a country."
+
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_WORKFLOW_FOUND"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_UNSUPPORTED_MESSAGE_TYPE"
+msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PRIVATE_METHOD_REQUESTED"
+msgstr ""
+"The used subject style requires at minimum one organizational unit and two "
+"domain components."
+
+msgid "I18N_OPENXPKI_SERVICE_SCEP_GET_PKI_REALM_NO_REALM_CONFIGURED"
+msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_REALM_REQUESTED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_PKI_REALM_RECEIVED"
+msgstr ""
+"The used subject style requires at minimum one organizational unit and two "
+"domain components."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_COMMAND_EXECUTION_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_COULD_NOT_INSTANTIATE_COMMAND"
+msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
+msgstr ""
+"The used subject style requires at minimum one organizational unit, one "
+"organization and one country."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_MISSING_SERVICE_MESSAGE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_READ_EXCEPTION"
+msgstr "The Country (c) is the nothing else then country."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_UNRECOGNIZED_COMMAND"
+msgstr "The used suject style requires a UID plus a common name."
+
+msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
+msgstr ""
+
 msgid "I18N_OPENXPKI_SERVICE_TALK_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
 
@@ -1720,16 +2099,78 @@ msgid "I18N_OPENXPKI_SUBJECT_STYLE_DC_NOT_ALLOWED"
 msgstr "The used subject style does not allow the use of a domain component."
 
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_DC_DC_REQUIRED"
-msgstr "The used subject style requires at minimum one organizational unit and two domain components."
+msgstr ""
+"The used subject style requires at minimum one organizational unit and two "
+"domain components."
 
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_O_C_REQUIRED"
-msgstr "The used subject style requires at minimum one organizational unit, one organization and one country."
+msgstr ""
+"The used subject style requires at minimum one organizational unit, one "
+"organization and one country."
 
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_O_NOT_ALLOWED"
 msgstr "The used suject style does not allow the use of an organization."
 
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN"
 msgstr "The used suject style requires a UID plus a common name."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_BINARY_NOT_EXECUTABLE"
+msgstr "Fax number"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_BINARY_NOT_FOUND"
+msgstr "testuser"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_COMMAND_EVAL_ERROR"
+msgstr "Common name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_COMMAND_FAILED"
+msgstr "Common name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_COMMAND_MISSING_SUBPARAMETER_COMMAND"
+msgstr ""
+"The common name can be used to identify persons or objects by its name. "
+"Example are John Doe or www.openxpki.org."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_COMMAND_MISSING_SUBPARAMETER_PARAMS"
+msgstr "Common name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_COMMAND_REQUIRE_FAILED"
+msgstr "Common name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_ENGINE_UNDEFINED"
+msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_INIT_ENGINE_NEW_FAILED"
+msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_INIT_ENGINE_USE_FAILED"
+msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_INIT_SHELL_USE_FAILED"
+msgstr "Logout failed"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_INSTANTIATE_CLI_FAILED"
+msgstr "List instances"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_MISSING_COMMAND_PARAM"
+msgstr "Common name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOOLKIT_TEMPORARY_DIRECTORY_UNAVAILABLE"
+msgstr "Trustcenter Web Interface"
 
 msgid "I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION"
 msgstr ""
@@ -1752,17 +2193,70 @@ msgstr ""
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+msgstr "New Request (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
+msgstr "CSR with OU-style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
+msgstr "New Request (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
+msgstr "CSR with OU-style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
+msgstr "CSR with OU-style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
+msgstr "Creating the name of the certificate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
+msgstr "IP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
+msgstr "CSR with OU-style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
+msgstr "New Request (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+msgstr "New Request (CSR)"
+
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
 msgstr ""
 
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_CREATED"
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL"
 msgstr ""
 
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING"
+msgstr ""
+
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_ISSUE_CERTIFICATE"
+msgstr "Certificates"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
+msgstr ""
+"The used subject style requires at minimum one organizational unit, one "
+"organization and one country."
 
 msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
 msgstr ""
@@ -1908,16 +2402,10 @@ msgstr ""
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_DNS"
 #~ msgstr "The name __DNS__ is not a valid DNS name."
 
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_EMAIL"
-#~ msgstr "The email address __EMAIL__ is not a valid RFC 822 address."
-
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_GUID"
 #~ msgstr ""
 #~ "The GUID __GUID__ has a wrong format. We support the formats of RFC 4122 "
 #~ "and Microsoft."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_IP"
-#~ msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_UPN"
 #~ msgstr ""

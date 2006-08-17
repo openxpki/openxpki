@@ -37,6 +37,7 @@
   </tr>
 % foreach my $param (sort keys %{$msg->{PARAMS}->{WORKFLOW}->{CONTEXT}})
 % {
+%   next if ($param eq "approvals" and length $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param} == 0);
   <tr>
 %   if ($param eq "approvals") {
       <td><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_APPROVALS") %></td>

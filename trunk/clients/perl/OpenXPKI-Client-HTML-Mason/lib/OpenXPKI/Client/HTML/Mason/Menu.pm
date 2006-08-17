@@ -177,7 +177,7 @@ sub __get_menu_link
 {
     my $self   = shift;
     my $params = shift;
-    my $link   = $self->get_root();
+    my $link   = $self->get_root()."/";
 
     ## get the menu configuration
     my %result = $self->get_menu_hash ($params);
@@ -241,7 +241,8 @@ sub get_root
         my $index = index ($self->{COMP}, "/", $pos);
         last if ($index < $pos);
         $pos   = $index+1;
-        $link .= "../";
+        $link .= "/" if (length $link);
+        $link .= "..";
     }
 
     return $link;

@@ -22,7 +22,10 @@ sub execute
     my $context = $workflow->context();
 
     ## delete approvals
-    $context->param ('approvals' => undef);
+    ## do not replace the hasref by a hash
+    ## Workflow::Base->param conatins a typical Perl bug
+    ## BUG: unless ( $value )
+    $context->param ({'approvals' => ""});
 }
 
 

@@ -14,6 +14,7 @@ sub _init
 {
     my ( $self, $params ) = @_;
 
+print STDERR "Condition instantiated.\n";
     ## check for the required config params
     unless ( $params->{role} )
     {
@@ -29,6 +30,7 @@ sub _init
         $params->{role} = [ $params->{role} ];
     }
     $self->role($params->{role});
+print STDERR "Condition successfully instantiated.\n";
 }
 
 sub evaluate
@@ -36,6 +38,7 @@ sub evaluate
     my ( $self, $wf ) = @_;
     my $context = $wf->context();
 
+print STDERR "Check approvals called.\n";
     ## load config
     my $roles = $self->role();
     if (not $roles or not scalar @{$roles})
@@ -90,6 +93,8 @@ sub evaluate
         $context->param ("__error" => $errors);
         condition_error ($errors->[0]);
     }
+
+print STDERR "All approvals are present.\n";
 
     ## return true is senselesse because only exception will be used
     ## but good style :)

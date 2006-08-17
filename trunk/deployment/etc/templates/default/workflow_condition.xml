@@ -2,8 +2,38 @@
   <condition name="ACL::create_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="create_csr"/>
   </condition>
+  <condition name="ACL::change_csr_role" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_role"/>
+  </condition>
+  <condition name="ACL::change_csr_profile" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_profile"/>
+  </condition>
+  <condition name="ACL::change_csr_subject_style" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_subject_style"/>
+  </condition>
+  <condition name="ACL::change_csr_subject" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_subject"/>
+  </condition>
+  <condition name="ACL::change_csr_subject_alt_name" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_subject_alt_name"/>
+  </condition>
+  <condition name="ACL::change_csr_info" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_info"/>
+  </condition>
+  <condition name="ACL::approve_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="approve_csr"/>
+  </condition>
+  <condition name="ACL::cancel_csr_approval" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="cancel_csr_approval"/>
+  </condition>
+  <condition name="ACL::execute_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="execute_csr"/>
+  </condition>
   <condition name="Workflow::check_csr_approvals" class="OpenXPKI::Server::Workflow::Condition::Approved">
     <param name="role" value="RA Operator"/>
+  </condition>
+  <condition name="ACL::reject_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="reject_csr"/>
   </condition>
 </conditions>
 
