@@ -11,7 +11,6 @@
       <field name="cert_info"/>
       <field name="csr_type"/>
       <field name="spkac"/>
-      <condition name="ACL::create_csr"/>
       <!-- do not use field with is_required                -->
       <!-- because this ignores the order of the validators -->
       <validator name="HasRequiredField">
@@ -53,7 +52,6 @@
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
 	  class="Workflow::Action::Null">
-      <condition name="ACL::change_csr_role"/>
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
       <field name="cert_role"/>
@@ -63,7 +61,6 @@
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
 	  class="Workflow::Action::Null">
-      <condition name="ACL::change_csr_profile"/>
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
       <field name="cert_profile"/>
@@ -74,14 +71,12 @@
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 	  class="Workflow::Action::Null">
-      <condition name="ACL::change_csr_subject_style"/>
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
       <field name="cert_subject_style"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
 	  class="Workflow::Action::Null">
-      <condition name="ACL::change_csr_subject"/>
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
       <field name="cert_subject"/>
@@ -93,7 +88,6 @@
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
 	  class="Workflow::Action::Null">
-      <condition name="ACL::change_csr_subject_alt_name"/>
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
       <field name="cert_subject_alt_name"/>
@@ -103,28 +97,22 @@
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
 	  class="Workflow::Action::Null">
-      <condition name="ACL::change_csr_info"/>
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
       <field name="cert_info"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve">
-      <condition name="ACL::approve_csr"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::CreateProcess"
           workflow_type="I18N_OPENXPKI_WF_TYPE_ISSUE_CERTIFICATE">
-      <condition name="ACL::execute_csr"/>
-      <condition name="Workflow::check_csr_approvals"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
-      <condition name="ACL::cancel_csr_approval"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
 	  class="Workflow::Action::Null">
-      <condition name="ACL::reject_csr"/>
   </action>
 </actions>
 
