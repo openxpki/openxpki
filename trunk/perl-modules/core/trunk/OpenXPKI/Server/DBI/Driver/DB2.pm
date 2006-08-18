@@ -79,7 +79,7 @@ sub sequence_exists
     my $keys = { @_ };
     
     my $dbh  = $keys->{DBH};
-    my $seq  = $keys->{NAME};
+    my $seq = $self->{schema}->get_sequence_name ($keys->{NAME});
 
     my $query = "VALUES NEXTVAL FOR $seq";
     eval {$dbh->do_query (QUERY => $query)};

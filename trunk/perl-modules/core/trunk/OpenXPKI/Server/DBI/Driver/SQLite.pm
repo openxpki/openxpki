@@ -76,9 +76,9 @@ sub sequence_exists
     my $keys = { @_ };
     
     my $dbh  = $keys->{DBH};
-    my $seq  = $keys->{NAME};
+    my $seq = $self->{schema}->get_sequence_name ($keys->{NAME});
 
-    my $query = "SELECT MAX(seq_number) FROM $seq";
+    my $query = "SELECT 1 FROM $seq";
     eval { $dbh->do_query (QUERY => $query); };
     my $err = $EVAL_ERROR;
     $dbh->finish_sth();
