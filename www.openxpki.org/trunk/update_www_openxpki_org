@@ -1,3 +1,4 @@
+#!/bin/sh
 set -e
 
 if [ ! -z "$1" ] && [ -d "$1" ]; then 
@@ -51,6 +52,10 @@ cp html/default.css .
 cd html
 rm -rf images
 ln -s ../src/images
+
+## Update nightly snapshot
+cd $target
+${old}/fetch.sh                                                                                   
 
 cd $old
 
