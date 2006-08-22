@@ -67,10 +67,12 @@ htdocs/service/create_csr/get_role.mhtml
 htdocs/service/create_csr/get_profile.mhtml
 htdocs/service/create_csr/get_subject_style.mhtml
 htdocs/service/create_csr/get_keygen.mhtml
+htdocs/service/create_csr/get_pkcs10.mhtml
 htdocs/service/create_csr/get_subject.mhtml
 htdocs/service/create_csr/get_subject_alt_name.mhtml
 htdocs/service/create_csr/get_info.mhtml
 htdocs/service/create_csr/get_spkac.mhtml
+htdocs/service/create_csr/store_pkcs10.mhtml
 htdocs/service/create_csr/create_workflow.mhtml
 htdocs/service/create_csr/print_errors.mhtml
 htdocs/service/create_csr/print_descriptions.mhtml

@@ -46,7 +46,7 @@
 %   }
     <td>
 %   my $value = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param};
-%   if ($value =~ /^(ARRAY|HASH)/)
+%   if ($value =~ /^(ARRAY|HASH|-----BEGIN)/)
 %   {
 %      ## serialized stuff
 %      my $ser = OpenXPKI::Serialization::Simple->new();

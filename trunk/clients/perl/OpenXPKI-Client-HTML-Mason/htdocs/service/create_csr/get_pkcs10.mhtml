@@ -1,0 +1,60 @@
+<%args>
+    $role          => undef
+    $profile       => undef
+    $subject_style => undef
+    $keygen        => undef
+    $pkcs10        => undef
+    $subject       => undef
+</%args>
+
+<& /service/open_form.mhtml &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
+<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_DESCRIPTION') %>
+</p>
+
+<& /lib/html/input.mhtml, 'type' => 'file', name => 'upload' &>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+
+<%init>
+    my @errors = ();
+
+    return ($pkcs10, $subject) if ($pkcs10);
+    my %args = $m->request_args();
+
+    my $file = $r->upload('upload');
+    $file = $file->fh() if (index (ref $file, "::Upload") > -1);
+    if ($file)
+    {
+        $pkcs10 = "";
+        while (<$file>) {
+            $pkcs10 .= $_;
+        }
+    
+        ## parse the CSR
+        my $msg = $context->{client}->send_receive_command_msg (
+                      "get_csr_info_hash_from_data",
+                      {DATA => $pkcs10});
+        if (exists $msg->{SERVICE_MSG} and
+            $msg->{SERVICE_MSG} eq "ERROR")
+        {
+            @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
+        } else {
+            ## set the parameters
+            $subject = $msg->{PARAMS}->{BODY}->{SUBJECT} if (not defined $subject);
+            return ($pkcs10, $subject);
+        }
+    }
+
+    ## ok we have to display the whole stuff
+</%init>

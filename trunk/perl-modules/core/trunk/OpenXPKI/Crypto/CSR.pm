@@ -10,6 +10,8 @@ package OpenXPKI::Crypto::CSR;
 
 use OpenXPKI::DN;
 use Math::BigInt;
+use Data::Dumper;
+use English;
 
 use base qw(OpenXPKI::Crypto::Object);
 
@@ -290,6 +292,28 @@ sub get_converted
     }
 }
 
+sub get_info_hash
+{
+    ##! 1: "start"
+    my $self = shift;
+
+    ##! 2: "create dump for deep copy"
+    my $help = Dumper($self->{PARSED});
+    ##! 2: "fix dump"
+    $help =~ s/^\s*\$VAR1\s*=//s;
+    ##! 2: "create deep copy"
+    $help = eval ($help);
+    if ($EVAL_ERROR)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_CSR_GET_INFO_HASH_EVAL_OF_DUMP_FAILED",
+            params  => {"MESSAGE" => $EVAL_ERROR});
+    }
+
+    ##! 1: "finished"
+    return $help;
+}
+
 1;
 __END__
 
@@ -334,3 +358,10 @@ request then an exception will occur.
 returns an array with all available email addresses. Pleae note that
 this include PKCS#9 emailAddress, rfc822Mailbox and the subject
 alternative name email extensions.
+
+=head2 get_info_hash
+
+returns a hash reference with all parsed informations. Please note that
+this function makes a deep copy of the parsed information to protect
+the object. This costs time. So please only do this if you really need
+it.

@@ -3,6 +3,7 @@
     $profile       => undef
     $subject_style => undef
     $keygen        => undef
+    $pkcs10        => undef
     $subject       => undef
     $subject_alt_name => undef
     $info          => undef
@@ -15,6 +16,7 @@
 <& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
 <& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
 <& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
+<& /lib/html/hidden.mhtml, 'name' => 'pkcs10',        'value' => $pkcs10 &>
 <& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
 <& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name',   'value' => $subject_alt_name &>
 <& /lib/html/hidden.mhtml, 'name' => 'FILLED_INFO_FORM', 'value' => 1 &>

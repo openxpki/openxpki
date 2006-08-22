@@ -1,0 +1,38 @@
+<%args>
+    $role          => undef
+    $profile       => undef
+    $subject_style => undef
+    $keygen        => undef
+    $pkcs10        => undef
+    $subject       => undef
+    $subject_alt_name => undef
+    $info          => undef
+    $CONFIG        => undef
+</%args>
+<%init>
+    ## if (not $pkcs10)
+    ## this can never happen because get_pkcs10 handle this failure
+
+    my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
+                        'role'          => $role,
+                        'profile'       => $profile,
+                        'subject_style' => $subject_style,
+                        'subject'       => $subject,
+                        'subject_alt_name' => $subject_alt_name,
+                        'info'          => $info,
+                        'pkcs10'        => $pkcs10);
+    ## perhaps we should put this into a component like get_error.mhtml?
+    ## errors are returned in an array reference
+    ## fresh workflow instance is returned as a hash reference
+    if (ref $msg and ref $msg eq "ARRAY")
+    {
+        ## this must be an error - panic - no fallback possible
+        $m->comp ('/service/create_csr/print_errors.mhtml', 'errors' => $msg);
+        return;
+    } else {
+        ## this is a hash
+        return $msg;
+    }
+
+    ## ok we have to display the whole stuff
+</%init>

@@ -23,8 +23,10 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DN;
 use OpenXPKI::Server::API::Workflow;
+use OpenXPKI::Server::API::Object;
 
 my %workflow :ATTR;
+my %object   :ATTR;
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
@@ -43,6 +45,7 @@ sub BUILD {
 	);
 
     $workflow{$ident} = OpenXPKI::Server::API::Workflow->new ($arg_ref);
+    $object{$ident}   = OpenXPKI::Server::API::Object->new ($arg_ref);
 }
 
 sub get_api
@@ -52,6 +55,7 @@ sub get_api
     my $api   = shift;
 
     return $workflow{$ident} if ($api eq "Workflow");
+    return $object{$ident}   if ($api eq "Object");
     return $self; ## unknown APIs are handled by the core API
 }
 
@@ -336,5 +340,6 @@ expects the name of the requested API and returns an instance of this API.
 Example:
 
 my $workflow_api = $api->get_api('Workflow');
+my $object_api   = $api->get_api('Object');
 my $api          = $api->get_api('Unknown API');
 

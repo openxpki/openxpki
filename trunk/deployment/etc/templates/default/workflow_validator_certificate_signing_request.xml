@@ -17,4 +17,7 @@
   <validator name="SPKAC"
              class="OpenXPKI::Server::Workflow::Validator::SPKAC">
   </validator>
+  <validator name="PKCS10"
+             class="OpenXPKI::Server::Workflow::Validator::PKCS10">
+  </validator>
 </validators>

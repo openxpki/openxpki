@@ -25,7 +25,7 @@
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_DESCRIPTION') %>
 </p>
 
-<keygen name="spkac" challange=""/>
+<keygen name="spkac" challenge=""/>
 
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>

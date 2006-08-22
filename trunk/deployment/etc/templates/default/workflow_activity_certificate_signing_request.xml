@@ -11,6 +11,7 @@
       <field name="cert_info"/>
       <field name="csr_type"/>
       <field name="spkac"/>
+      <field name="pkcs10"/>
       <!-- do not use field with is_required                -->
       <!-- because this ignores the order of the validators -->
       <validator name="HasRequiredField">
@@ -48,6 +49,10 @@
       <validator name="SPKAC">
         <arg>$csr_type</arg>
         <arg>$spkac</arg>
+      </validator>
+      <validator name="PKCS10">
+        <arg>$csr_type</arg>
+        <arg>$pkcs10</arg>
       </validator>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"

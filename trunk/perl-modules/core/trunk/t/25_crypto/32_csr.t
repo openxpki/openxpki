@@ -4,7 +4,7 @@ use utf8;
 binmode STDERR, ":utf8";
 use Test;
 use English;
-BEGIN { plan tests => 23 };
+BEGIN { plan tests => 25 };
 
 print STDERR "OpenXPKI::Crypto::CSR\n";
 
@@ -54,6 +54,11 @@ ok ($csr->get_serial() == 4321);
 ## test attribute setting
 ok ($csr->set_header_attribute(GLOBAL_ID => 1234));
 ok ($csr->get_parsed("HEADER", "GLOBAL_ID") == 1234);
+
+## test deep copy for client interfaces
+my $ref = $csr->get_info_hash();
+ok (ref $ref eq "HASH");
+ok ($ref->{BODY}->{SUBJECT} eq "CN=John Doe,DC=OpenCA,DC=info");
 
 ## test conversion
 ok ($csr->get_converted ("PEM"));

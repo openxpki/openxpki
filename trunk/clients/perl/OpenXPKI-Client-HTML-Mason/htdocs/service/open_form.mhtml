@@ -3,7 +3,7 @@
     $action     => $m->request_comp()->name()
 </%args>
 
-        <form action="<% $action %>" method="post">
+        <form action="<% $action %>" method="post" enctype="multipart/form-data">
 %    my %hash = $context->{menu}->get_menu_hash();
 %    foreach my $key (keys %hash)
 %    {

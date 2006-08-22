@@ -39,8 +39,10 @@
     ## get PKCS#10 if available
     if ($params{keygen} eq "PKCS10")
     {
-        $params{pkcs10} = $m->comp ('/service/create_csr/get_pkcs10.mhtml',
-                                    %params, 'pkcs10' => $pkcs10);
+        ## get the CSR
+        ($params{pkcs10}, $subject) =
+             $m->comp ('/service/create_csr/get_pkcs10.mhtml',
+                       %params, 'pkcs10' => $pkcs10, 'subject' => $subject);
         return if (not $params{pkcs10});
     }
 
@@ -84,7 +86,8 @@
         }
     } else {
         $msg = $m->comp ('/service/create_csr/store_pkcs10.mhtml',
-                            %params);
+                         %params);
+        return if (not $msg);
     }
     return if (not defined $msg);
     ## if we reach this point then the workflow is already created

@@ -46,6 +46,8 @@ my %allowed_command = (
 
     create_workflow_instance  => {API => 'Workflow'},
     execute_workflow_activity => {API => 'Workflow'},
+
+    get_csr_info_hash_from_data => {API => 'Object'},
 );
 
 sub BUILD {
