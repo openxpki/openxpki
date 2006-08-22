@@ -221,19 +221,21 @@ $FUNCTION{gen_csr_ie} = qq^
             tester = certHelperOld.MyStoreName
             if Len (tester) > 0 then
                 getXEnroll = OLD_XENROLL
+                ' it is important to harry the users with the info that they use a completely outdated IE
                 'MsgBox ("You are using an old Internet Explorer with a security bug in XEnroll.dll (MS02-48).")
                 MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED")
             else
                 tester = certHelperNew.MyStoreName
                 if Len (tester) > 0 then
                     getXEnroll = NEW_XENROLL
+                    ' it is not necessary to harry the users with the info that they use a patched IE
                     'MsgBox ("You are using patched Internet Explorer.")
-                    MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED")
+                    'MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED")
                 end if
             end if
         End Function
 
-        Sub GenReq
+        Sub CreateCSR
             dim theForm 
             dim options
             dim index
@@ -269,9 +271,9 @@ $FUNCTION{gen_csr_ie} = qq^
                 MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP")
             end if
 
-            csr = ""
+            alternate_subject = "cn=unsupported,dc=subject,dc=by,dc=MSIE"
     
-            szName = theForm.dn.value
+            szName = theForm.subject.value
 
             re.Pattern = "__SUBJECT__"
             'MsgBox ("SUBJECT is " & szName)
@@ -318,7 +320,9 @@ $FUNCTION{gen_csr_ie} = qq^
             '                        0x02000003
             '                        33554435
 
+            ' try pragmatical failover - we simply set another subject
             if Len(sz10) = 0 then 
+                Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER", alternate_subject))
                 if xenroll = OLD_XENROLL then
                     certHelperOld.GenKeyFlags = 134217730
                     if theForm.bits.value =  512 then
@@ -330,7 +334,7 @@ $FUNCTION{gen_csr_ie} = qq^
                     if theForm.bits.value =  2048 then
                         certHelperOld.GenKeyFlags = 134217730
                     end if
-                    sz10 = certHelperOld.CreatePKCS10(csr, "1.3.6.1.4.1.311.2.1.21")
+                    sz10 = certHelperOld.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
                 else
                     certHelperNew.GenKeyFlags = 134217730
                     if theForm.bits.value =  512 then
@@ -342,10 +346,10 @@ $FUNCTION{gen_csr_ie} = qq^
                     if theForm.bits.value =  2048 then
                         certHelperNew.GenKeyFlags = 134217730
                     end if
-                    sz10 = certHelperNew.CreatePKCS10(csr, "1.3.6.1.4.1.311.2.1.21")
+                    sz10 = certHelperNew.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
                 end if
 
-                if Len(theForm.asn1.value) = 0 then 
+                if Len(sz10) = 0 then 
                     'MsgBox ("The generation of the request failed") 
                     MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED") 
                     Exit Sub
@@ -353,8 +357,8 @@ $FUNCTION{gen_csr_ie} = qq^
 
             end if 
 
-            theForm.request.value = sz10
-            'msgbox (theForm.request.value)
+            theForm.pkcs10.value = sz10
+            'msgbox (theForm.pkcs10.value)
 
             'msgbox ("The certificate service request was successfully generated.")
             MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED") 

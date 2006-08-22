@@ -7,7 +7,6 @@
     $subject       => undef
     $subject_alt_name => undef
     $info          => undef
-    $CONFIG        => undef
 </%args>
 <%init>
     ## if (not $pkcs10)

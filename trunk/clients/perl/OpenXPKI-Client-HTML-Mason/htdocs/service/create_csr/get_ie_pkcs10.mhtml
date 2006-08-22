@@ -1,0 +1,91 @@
+<%args>
+    $role          => undef
+    $profile       => undef
+    $subject_style => undef
+    $keygen        => undef
+    $subject       => undef
+    $subject_alt_name => undef
+    $info          => undef
+    $pkcs10        => undef
+    $CONFIG        => undef
+</%args>
+
+<& /service/open_form.mhtml &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
+<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name',   'value' => $subject_alt_name &>
+<& /lib/html/hidden.mhtml, 'name' => 'info',          'value' => $info &>
+<& /lib/html/hidden.mhtml, 'name' => 'pkcs10',        'value' => '' &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DESCRIPTION') %>
+</p>
+
+<table>
+  <tr>
+    <td>
+      <% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_KEY_LENGTH") %>
+    </td>
+    <td>
+      <& '/lib/html/select.mhtml',
+         'name'    => "bits",
+         'default' => ["1024"],
+         'values'  => [1024, 2048, 4096] &>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_CSP") %>
+    </td>
+    <td>
+      <select name="csp" size=1 id="csp">
+        <option value="" selected>
+          <% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DEFAULT_CSP") %>
+        </option>
+      </select>
+    </td>
+  </tr>
+</table>
+
+<input type="button"
+       name="continue"
+       value="<% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_IE_PKCS10") %>"
+       OnClick="CreateCSR()"/>
+
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+
+<%init>
+    my @errors = ();
+
+    if ($pkcs10)
+    {
+        ## fix it if it is a MSIE PKCS#10 CSR
+        if ($keygen !~ m{^-----BEGIN}xs)
+        {
+            $pkcs10 = "-----BEGIN CERTIFICATE REQUEST-----\n".
+                      $pkcs10.
+                      "-----END CERTIFICATE REQUEST-----";
+        }
+
+        ## parse the CSR
+        my $msg = $context->{client}->send_receive_command_msg (
+                      "get_csr_info_hash_from_data",
+                      {DATA => $pkcs10});
+        if (exists $msg->{SERVICE_MSG} and
+            $msg->{SERVICE_MSG} eq "ERROR")
+        {
+            @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
+        } else {
+            return $pkcs10;
+        }
+    }
+
+    ## ok we have to display the whole stuff
+</%init>

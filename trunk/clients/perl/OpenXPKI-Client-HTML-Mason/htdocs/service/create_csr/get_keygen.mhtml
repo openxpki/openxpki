@@ -51,7 +51,7 @@
         }
         else
         {
-            $keygen = "SERVER";
+            $keygen = "SERVERSIDE";
         }
 
     }
@@ -79,9 +79,9 @@
         {
             push @values, {VALUE => "SPKAC", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC"};
         }
-        elsif ($entry eq "SERVER")
+        elsif ($entry eq "SERVERSIDE")
         {
-            push @values, {VALUE => "SERVER", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"};
+            push @values, {VALUE => "SERVERSIDE", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"};
         }
         elsif ($entry eq "PKCS10")
         {

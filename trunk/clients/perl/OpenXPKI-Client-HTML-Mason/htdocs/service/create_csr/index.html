@@ -12,6 +12,7 @@
 </%args>
 <%init>
     my %args   = $m->request_args();
+
     my %params = (CONFIG => $CONFIG);
 
     ## which role
@@ -63,28 +64,28 @@
 
     ## get generated request
     my $msg = undef;
-    if ($params{keygen} ne "PKCS10")
+    if ($params{keygen} eq "SPKAC")
+    {
+        $msg = $m->comp ('/service/create_csr/get_spkac.mhtml',
+                         %params, 'spkac' => $spkac);
+    }
+    elsif ($params{keygen} eq "SERVERSIDE")
+    {
+        ## serverside
+        $params{key} = $m->comp ('/service/create_csr/get_server_key.mhtml',
+                                 %params);
+        return if (not $params{key});
+        $msg = $m->comp ('/service/create_csr/get_server_pkcs10.mhtml',
+                         %params);
+    }
+    else
     {
         if ($params{keygen} eq "IE")
         {
-            $msg = $m->comp ('/service/create_csr/get_ie_pkcs10.mhtml',
-                                %params, 'pkcs10' => $pkcs10);
+            $params{pkcs10} = $m->comp ('/service/create_csr/get_ie_pkcs10.mhtml',
+                                        %params, 'pkcs10' => $pkcs10);
+            return if (not $params{pkcs10});
         }
-        elsif ($keygen eq "SPKAC")
-        {
-            $msg = $m->comp ('/service/create_csr/get_spkac.mhtml',
-                                %params, 'spkac' => $spkac);
-        }
-        else
-        {
-            ## serverside
-            $params{key} = $m->comp ('/service/create_csr/get_server_key.mhtml',
-                                     %params);
-            return if (not $params{key});
-            $msg = $m->comp ('/service/create_csr/get_server_pkcs10.mhtml',
-                                %params);
-        }
-    } else {
         $msg = $m->comp ('/service/create_csr/store_pkcs10.mhtml',
                          %params);
         return if (not $msg);
@@ -100,7 +101,7 @@
                   "ou_style" =>
                   {
                    ROLE        => [ "User", "RA Operator" ],
-                   KEY_GENERATION => ["SPKAC", "IE", "SERVER", "AUTO"],
+                   KEY_GENERATION => ["SPKAC", "IE", "SERVERSIDE", "AUTO"],
                    SUBJECT     =>
                    [
                        [    ## 1.RDN
@@ -173,7 +174,7 @@
                   "dc_style" => 
                   {
                    ROLE        => [ "User", "RA Operator" ],
-                   KEY_GENERATION => ["SPKAC", "IE", "SERVER", "PKCS10", "AUTO"],
+                   KEY_GENERATION => ["SPKAC", "IE", "SERVERSIDE", "PKCS10", "AUTO"],
                    SUBJECT     =>
                    [
                        [    ## 1.RDN

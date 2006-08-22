@@ -33,8 +33,9 @@
       <td>+</td>
 %     }
       <td><div id="help">
-%     my $label = i18nGettext ($CONFIG->{$subject_style}->{SUBJECT}->[$i]->[$k]->{LABEL});
-      <a href="#dummy"><span><% $label %></span><span class="onOver"><% $descriptions{$label} %></span></a>
+%     # my $label = i18nGettext ($CONFIG->{$subject_style}->{SUBJECT}->[$i]->[$k]->{LABEL});
+%     #  <a href="#dummy"><span><% $label %></span><span class="onOver"><% $descriptions{$label} %></span></a>
+        <% i18nGettext ($CONFIG->{$subject_style}->{SUBJECT}->[$i]->[$k]->{LABEL}) %>
       </div></td>
       <td>=</td>
       <td>
