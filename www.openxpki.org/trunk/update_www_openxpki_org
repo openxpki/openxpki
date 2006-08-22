@@ -55,7 +55,7 @@ ln -s ../src/images
 
 ## Update nightly snapshot
 cd $target
-${old}/fetch.sh                                                                                   
+${old}/fetch.sh 2>/dev/null >/dev/null
 
 cd $old
 
