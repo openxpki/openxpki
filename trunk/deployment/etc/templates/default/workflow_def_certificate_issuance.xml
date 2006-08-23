@@ -1,0 +1,37 @@
+<workflow>
+<type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
+  <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE</description>
+  <persister>OpenXPKI</persister>
+
+  <state name="INITIAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL</description>
+    <action name="determine_issuing_ca" 
+	    resulting_state="ISSUING_CA_DETERMINED">
+      <condition name="ACL::system_internal"/>
+    </action>
+  </state>
+  
+  <state name="ISSUING_CA_DETERMINED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED</description>
+    <action name="get_cert_profile" 
+	    resulting_state="PREPARED">
+    </action>
+    
+  </state>
+
+  <state name="PREPARED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED</description>
+    <action name="wait_for_ca"
+	    resulting_state="PREPARED">
+      <condition name="CA::key_is_not_usable"/>
+    </action>
+
+    <action name="issue_certificate" 
+	    resulting_state="ISSUED">
+      <condition name="CA::key_is_usable"/>
+    </action>
+  </state>
+
+  <state name="ISSUED"/>
+
+</workflow>

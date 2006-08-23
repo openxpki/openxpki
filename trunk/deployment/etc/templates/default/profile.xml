@@ -180,7 +180,7 @@
     </profile>
 
     <!-- User profile -->
-    <profile id="User"
+    <profile id="I18N_OPENXPKI_PROFILE_USER"
 	     super="../profile{default}">
 
       <subject super="../../subject{ou_style}"/>
@@ -230,7 +230,7 @@
 
 
     <!-- TLS Server profile -->
-    <profile id="TLS Server"
+    <profile id="I18N_OPENXPKI_PROFILE_TLS_SERVER"
 	     super="../profile{default}">
 
       <subject super="../../subject{ou_style}"/>

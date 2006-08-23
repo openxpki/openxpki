@@ -1,0 +1,47 @@
+<actions>
+  <!-- implicit autorun and no user interaction - so no I18N name for this
+       activity -->
+  <action name="determine_issuing_ca"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::DetermineIssuingCA">
+    <field name="pkcs10"/>
+    <field name="spkac"/>
+    <field name="csr_type"/>
+    <field name="cert_profile"/>
+    <validator name="HasRequiredField">
+      <arg>cert_profile</arg>
+      <arg>csr_type</arg>
+    </validator>
+    <validator name="CertProfile">
+      <arg>$cert_profile</arg>
+      <arg>$cert_profile_id</arg>
+    </validator>
+    <validator name="SPKAC">
+      <arg>$csr_type</arg>
+      <arg>$spkac</arg>
+    </validator>
+    <validator name="PKCS10">
+      <arg>$csr_type</arg>
+      <arg>$pkcs10</arg>
+    </validator>
+  </action>
+
+  <!-- autorun and no user interaction - so no I18N name for this
+       activity -->
+  <action name="get_cert_profile"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::GetCertProfile">
+  </action>
+
+  <!-- autorun and no user interaction - so no I18N name for this
+       activity -->
+  <action name="wait_for_ca"
+	  class="Workflow::Action::Null">
+  </action>
+
+  <!-- autorun and no user interaction - so no I18N name for this
+       activity -->
+  <action name="issue_certificate"
+	  class="OpenXPKI::Server::Workflow::Activity::CA::IssueCertificate">
+  </action>
+
+
+</actions>
