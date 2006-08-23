@@ -5,12 +5,14 @@
 WGET="/usr/local/bin/wget"
 THIS_DIR=`pwd`
 
-# Fetch new or partly downloaded files from the master server
-# (do NOT shorten the name "sourceforge" below, this would ruin the operation of wget):
+# Fetch newer files from the master server
+# (do NOT shorten the name "sourceforge" below, 
+# this would ruin the operation of wget):
 
-${WGET} -c -nH --random-wait -r -I lastmidnight http://openxpki.sourceforge.net/lastmidnight/index.html
+${WGET} -nH -m -I lastmidnight http://openxpki.sourceforge.net/lastmidnight/index.html
 
-# Remove those files at the mirror, which are not referenced by newly fetched index.html any more:
+# Remove those files at the mirror, which are 
+# not referenced by new index.html any more:
 
 cd ${THIS_DIR}/lastmidnight
 FILES_LIST=`ls`
