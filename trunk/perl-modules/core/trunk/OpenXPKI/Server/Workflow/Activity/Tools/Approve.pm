@@ -8,10 +8,8 @@ package OpenXPKI::Server::Workflow::Activity::Tools::Approve;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
-use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use OpenXPKI::DateTime;
 use OpenXPKI::Serialization::Simple;
 
 sub execute

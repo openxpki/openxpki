@@ -151,12 +151,14 @@ OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CreateProcess.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
 OpenXPKI/Server/Workflow/Condition/ACL.pm
 OpenXPKI/Server/Workflow/Condition/Approved.pm
+OpenXPKI/Server/Workflow/Condition/Server.pm
 
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
 OpenXPKI/Server/Workflow/Validator/CertProfile.pm
@@ -164,6 +166,7 @@ OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
 OpenXPKI/Server/Workflow/Validator/PKCS10.pm
 OpenXPKI/Server/Workflow/Validator/SPKAC.pm
+OpenXPKI/Server/Workflow/Validator/SetExportConfiguration.pm
 
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm

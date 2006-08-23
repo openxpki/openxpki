@@ -1,4 +1,5 @@
 <%args>
+    $workflow_type    => undef
     $role             => undef
     $profile          => undef
     $subject_style    => undef
@@ -38,7 +39,7 @@
     ## create the workflow for the new CSR
     my $msg = $context->{client}->send_receive_command_msg (
                    "create_workflow_instance",
-                   {WORKFLOW => "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST",
+                   {WORKFLOW => $workflow_type,
                     PARAMS   => \%params});
     my $errors = [];
     if (not ref $msg)

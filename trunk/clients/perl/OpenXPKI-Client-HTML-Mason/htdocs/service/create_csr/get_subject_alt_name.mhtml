@@ -1,4 +1,5 @@
 <%args>
+    $workflow_type => undef
     $role          => undef
     $profile       => undef
     $subject_style => undef
@@ -11,6 +12,7 @@
 
 <& /service/open_form.mhtml &>
 
+<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
 <& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
 <& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
 <& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
@@ -81,6 +83,7 @@
     if (defined $subject_alt_name)
     {
         my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
+                            'workflow_type' => $workflow_type,
                             'role'             => $role,
                             'profile'          => $profile,
                             'subject_style'    => $subject_style,

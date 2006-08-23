@@ -13,7 +13,7 @@ use Log::Log4perl       qw( get_logger );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-
+use Workflow::Exception qw( workflow_error );
 
 sub execute {
     my ($self, 

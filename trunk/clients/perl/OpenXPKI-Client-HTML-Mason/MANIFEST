@@ -61,8 +61,10 @@ htdocs/service/workflow/activity/approve_csr.html
 htdocs/service/workflow/activity/cancel_csr_approval.html
 htdocs/service/workflow/activity/execute_csr.html
 htdocs/service/workflow/activity/reject_csr.html
+htdocs/service/workflow/activity/export_csr.html
 
 htdocs/service/create_csr/index.html
+htdocs/service/create_csr/get_workflow_type.mhtml
 htdocs/service/create_csr/get_role.mhtml
 htdocs/service/create_csr/get_profile.mhtml
 htdocs/service/create_csr/get_subject_style.mhtml

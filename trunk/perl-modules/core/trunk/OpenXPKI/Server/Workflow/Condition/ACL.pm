@@ -32,7 +32,7 @@ sub evaluate
         ## this is a critical event because we don't know what to verify
         my $errors = [[ 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ACL_NO_ACTIVITY' ]];
         $context->param ("__error" => $errors);
-        condition_error ($errors->[0]);
+        configuration_error ($errors->[0]);
     }
 
     my $role = "";

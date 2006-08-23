@@ -1,6 +1,6 @@
 <workflow>
-  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
-  <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST</description>
+  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE</type>
+  <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_ONLINE</description>
   <persister>OpenXPKI</persister>
 
   <state name="INITIAL">
@@ -8,6 +8,7 @@
     <action name="create_csr" 
 	    resulting_state="PENDING">
       <condition name="ACL::create_csr"/>
+      <condition name="Condition::server_0"/>
     </action>
   </state>
 
@@ -49,10 +50,10 @@
 
   <state name="APPROVED">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
-	    resulting_state="EXECUTED">
-      <condition name="ACL::execute_csr"/>
-      <condition name="Condition::check_csr_approvals"/>
+    <action name="I18N_OPENXPKI_WF_ACTION_EXPORT_CSR"
+	    resulting_state="EXPORTED">
+      <condition name="ACL::export_csr"/>
+      <condition name="Condition::check_csr_approvals_online"/>
     </action>
     <!-- perhaps we need more than one approval or                 -->
     <!-- perhaps the first approval was from a not authorized role -->
@@ -71,5 +72,5 @@
   </state>
 
   <state name="REJECTED" />
-  <state name="EXECUTED" />
+  <state name="EXPORTED" />
 </workflow>

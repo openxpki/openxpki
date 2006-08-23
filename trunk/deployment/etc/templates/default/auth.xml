@@ -26,6 +26,8 @@
   </handler>
   <handler name="User Password" type="Password">
     <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD</description>
+    <!-- howto generate sha1 passphrases?                     -->
+    <!-- echo -n root | openssl sha1 -binary | openssl base64 -->
     <user>
       <name>John Doe</name>
       <algorithm>sha1</algorithm>
@@ -42,6 +44,13 @@
       <!-- this is root in sha1 -->
       <digest>3Hbp8MAAbo+RngxRXGbbujmC94U</digest>
       <role>CA Operator</role>
+    </user>
+    <user>
+      <name>raop</name>
+      <algorithm>sha1</algorithm>
+      <!-- this is raop in sha1 -->
+      <digest>fXR0BfkSrEHvv1yCBBBIVBDw1qM</digest>
+      <role>RA Operator</role>
     </user>
   </handler>
   <handler name="External Dynamic Role" type="External">

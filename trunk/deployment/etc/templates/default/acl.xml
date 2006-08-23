@@ -9,10 +9,12 @@
 
   <!-- we map the server_id (dbi) to a human readable value -->
   <server>
+    <!-- offline system if server 1 really exists -->
     <id>0</id>
     <name>CA</name>
   </server>
   <server>
+    <!-- online system if server 1 really exists -->
     <id>1</id>
     <name>RA</name>
   </server>
@@ -46,6 +48,14 @@
     <activity>*</activity>
     <affected_role>*</affected_role>
     <auth_role>CA Operator</auth_role>
+  </permission>
+  <permission>
+    <!-- if you use a real RA and you really have CA and RA operators -->
+    <!-- then you must change this from CA to RA                      -->
+    <server>CA</server>
+    <activity>*</activity>
+    <affected_role>*</affected_role>
+    <auth_role>RA Operator</auth_role>
   </permission>
   <permission>
     <server>*</server>

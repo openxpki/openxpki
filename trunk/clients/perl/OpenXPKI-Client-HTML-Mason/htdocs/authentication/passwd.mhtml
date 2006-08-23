@@ -31,7 +31,7 @@
     print STDERR "let's look for the login ...\n";
     if (exists $data{'login'})
     {
-        print  STDERR "DATA: ".$data{'login'}."\n";
+        #print  STDERR "DATA: ".$data{'login'}."\n";
         $msg = $client->send_receive_service_msg (
                             'GET_PASSWD_LOGIN',
                             {

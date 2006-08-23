@@ -14,7 +14,6 @@ sub _init
 {
     my ( $self, $params ) = @_;
 
-print STDERR "Condition instantiated.\n";
     ## check for the required config params
     unless ( $params->{role} )
     {
@@ -30,7 +29,6 @@ print STDERR "Condition instantiated.\n";
         $params->{role} = [ $params->{role} ];
     }
     $self->role($params->{role});
-print STDERR "Condition successfully instantiated.\n";
 }
 
 sub evaluate
@@ -107,13 +105,13 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::Approve
+OpenXPKI::Server::Workflow::Condition::Approved
 
 =head1 SYNOPSIS
 
 <action name="CreateCSR">
-  <condition name="ACL::create_csr"
-             class="OpenXPKI::Server::Workflow::Condition::ACL">
+  <condition name="Condition::Approved"
+             class="OpenXPKI::Server::Workflow::Condition::Approved">
     <param name="role" value="RA Operator"/>
     <param name="role" value="RA Operator"/>
     <param name="role" value="Privacy Officer"/>

@@ -24,6 +24,14 @@
         <locale_directory>[% dir.localedir %]</locale_directory>
         <default_language>[% i18n.defaultlanguage %]</default_language>
     </i18n>
+    <data_exchange>
+        <export>
+            <dir>[% dir.dataexchange %]/export</dir>
+        </export>
+        <import>
+            <dir>[% dir.dataexchange %]/import</dir>
+        </import>
+    </data_exchange>
 
     [% IF deployment.xmlstyle == 'multi-file' %]
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database.xml"/>

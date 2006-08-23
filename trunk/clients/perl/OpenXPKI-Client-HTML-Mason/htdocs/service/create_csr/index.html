@@ -1,4 +1,5 @@
 <%args>
+    $workflow_type    => undef
     $role             => undef
     $profile          => undef
     $subject_style    => undef
@@ -15,15 +16,20 @@
 
     my %params = (CONFIG => $CONFIG);
 
+    ## which workflow type
+    $params{workflow_type} = $m->comp ('/service/create_csr/get_workflow_type.mhtml',
+                                       %params, 'workflow_type' => $workflow_type);
+    return if (not defined $params{workflow_type});
+
     ## which role
     $params{role} = $m->comp ('/service/create_csr/get_role.mhtml',
-                              'role' => $role);
-    return if (not defined $params{role});
+                              %params, 'role' => $role);
+    return if (not defined $params{role} or not length ($params{role}));
 
     ## which profile
     $params{profile} = $m->comp ('/service/create_csr/get_profile.mhtml',
                                  %params, 'profile' => $profile);
-    return if (not defined $params{profile});
+    return if (not defined $params{profile} or not length ($params{profile}));
 
     ## which subject style
     $params{subject_style} = $m->comp ('/service/create_csr/get_subject_style.mhtml',

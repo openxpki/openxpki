@@ -1,12 +1,14 @@
 <%args>
+    $workflow_type => undef
     $role          => undef
     $profile       => undef
     $subject_style => undef
     $CONFIG        => undef
 </%args>
 <& /service/open_form.mhtml &>
-<& /lib/html/hidden.mhtml, 'name' => 'role',    'value' => $role &>
-<& /lib/html/hidden.mhtml, 'name' => 'profile', 'value' => $profile &>
+<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
+<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_TITLE') %></h1>
 <p>

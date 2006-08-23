@@ -7,6 +7,8 @@
   <workflows>
 <!--    <configfile>[% dir.openxpkiconfdir %]/workflow_def_init_ca.xml</configfile> -->
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_signing_request.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_signing_request_online.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_signing_request_offline.xml</configfile>
 <!--    <configfile>[% dir.openxpkiconfdir %]/workflow_def_request_pkcs10.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_request_dataonly.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_crl_issuance.xml</configfile>

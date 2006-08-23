@@ -90,6 +90,7 @@ cadir:            $(dir.openxpkiconfdir)/ca
 localstatedir:    $(dir.prefix)/var
 openxpkistatedir: $(dir.localstatedir)/openxpki
 openxpkisessiondir: $(dir.openxpkistatedir)/session
+dataexchange:     $(dir.openxpkistatedir)/dataexchange
 
 # locales
 localedir:        $(dir.datarootdir)/locale

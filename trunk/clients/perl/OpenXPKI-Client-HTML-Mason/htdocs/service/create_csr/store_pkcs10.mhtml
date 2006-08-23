@@ -1,4 +1,5 @@
 <%args>
+    $workflow_type => undef
     $role          => undef
     $profile       => undef
     $subject_style => undef
@@ -13,6 +14,7 @@
     ## this can never happen because get_pkcs10 handle this failure
 
     my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
+                        'workflow_type' => $workflow_type,
                         'role'          => $role,
                         'profile'       => $profile,
                         'subject_style' => $subject_style,

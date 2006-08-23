@@ -8,10 +8,8 @@ package OpenXPKI::Server::Workflow::Activity::Tools::CreateProcess;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
-use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use OpenXPKI::DateTime;
 
 sub execute
 {
