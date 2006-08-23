@@ -114,8 +114,8 @@
       <validator name="SetExportConfigForOnlineCSR"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
-	  class="OpenXPKI::Server::Workflow::Activity::Tools::CreateProcess"
-          workflow_type="I18N_OPENXPKI_WF_TYPE_ISSUE_CERTIFICATE">
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::CreateProcess">
+      <validator name="SetExecuteCSRWorkflowType"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">

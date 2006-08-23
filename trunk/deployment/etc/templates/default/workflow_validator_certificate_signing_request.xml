@@ -20,10 +20,14 @@
   <validator name="PKCS10"
              class="OpenXPKI::Server::Workflow::Validator::PKCS10">
   </validator>
+  <validator name="SetExecuteCSRWorkflowType"
+             class="OpenXPKI::Server::Workflow::Validator::SetContextParameter">
+    <param name="create_workflow_type" value="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"/>
+  </validator>
   <validator name="SetExportConfigForOnlineCSR"
-             class="OpenXPKI::Server::Workflow::Validator::SetExportConfiguration">
-    <param name="workflow_type" value="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE"/>
-    <param name="destination"   value="0"/>
-    <param name="params"        value="*"/>
+             class="OpenXPKI::Server::Workflow::Validator::SetContextParameter">
+    <param name="export_workflow_type" value="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE"/>
+    <param name="export_destination"   value="0"/>
+    <param name="export_params"        value="*"/>
   </validator>
 </validators>

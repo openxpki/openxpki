@@ -37,6 +37,7 @@ sub execute
     $msg->{'parent'}->{'workflow_serial'} = $workflow->id();
     $msg->{'parent'}->{'workflow_type'}   = $workflow->type();
     $msg->{'parent'}->{'server_id'}       = $server;
+    $params = [ split ",", $params ];
     if ($params->[0] eq "*")
     {
         $msg->{'params'} = $context->param();

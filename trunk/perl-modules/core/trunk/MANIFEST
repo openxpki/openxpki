@@ -166,7 +166,7 @@ OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
 OpenXPKI/Server/Workflow/Validator/PKCS10.pm
 OpenXPKI/Server/Workflow/Validator/SPKAC.pm
-OpenXPKI/Server/Workflow/Validator/SetExportConfiguration.pm
+OpenXPKI/Server/Workflow/Validator/SetContextParameter.pm
 
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm

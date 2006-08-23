@@ -18,14 +18,14 @@ sub execute
 
     ## get needed informations
     my $context = $workflow->context();
-    my $type    = $context->param('workflow_type');
+    my $type    = $context->param('create_workflow_type');
     my $api     = CTX('api');
 
     ## create new workflow
     $api = $api->get_api('Workflow');
-    $api->create_workflow ({WORKFLOW      => $type,
-                            FILTER_PARAMS => 1,
-                            PARAMS        => $context->param()});
+    $api->create_workflow_instance ({WORKFLOW      => $type,
+                                     FILTER_PARAMS => 1,
+                                     PARAMS        => $context->param()});
 }
 
 1;
