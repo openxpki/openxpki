@@ -61,5 +61,24 @@
     <param name="role" value="CA Operator"/>
   </condition>
 
+  <!-- check for system-instantiated workflow -->
+  <condition name="ACL::system_internal" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <!-- FIXME: insert proper arguments here -->
+    <param name="caller" value="system"/>
+  </condition>
+
+  <!-- key online checks -->
+  <condition name="CA::key_is_usable" class="OpenXPKI::Server::Workflow::Condition::Key">
+    <!-- FIXME: insert proper arguments here -->
+    <param name="key" value="ca"/>
+    <param name="status" value="usable"/>
+  </condition>
+
+  <condition name="CA::key_is_not_usable" class="OpenXPKI::Server::Workflow::Condition::Key">
+    <!-- FIXME: insert proper arguments here -->
+    <param name="key" value="ca"/>
+    <param name="status" value="unusable"/>
+  </condition>
+
 </conditions>
 
