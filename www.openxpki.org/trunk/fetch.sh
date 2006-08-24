@@ -2,7 +2,10 @@
 
 # Script for updating OpenXPKI nightly snapshot at a www mirror.
 
-WGET="/usr/local/bin/wget"
+WGET=`which wget`
+if [ ! -x ${WGET} ]; then
+    WGET="/usr/local/bin/wget"
+fi
 THIS_DIR=`pwd`
 
 # Fetch newer files from the master server
