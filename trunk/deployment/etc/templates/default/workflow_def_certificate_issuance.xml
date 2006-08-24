@@ -7,7 +7,7 @@
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL</description>
     <action name="determine_issuing_ca" 
 	    resulting_state="ISSUING_CA_DETERMINED">
-      <condition name="ACL::system_internal"/>
+      <condition name="ACL::start_certificate_issuance"/>
     </action>
   </state>
   

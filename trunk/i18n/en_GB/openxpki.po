@@ -165,6 +165,14 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXECUTE_CSR_TITLE"
 msgstr "Trustcenter Web Interface"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXPORT_CSR_DESCRIPTION"
+msgstr "Descriptions of the form fields"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXPORT_CSR_TITLE"
+msgstr "Trustcenter Web Interface"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_DESCRIPTION"
 msgstr ""
 "You are logged in to the web interface of the trustcenter. Please note that "
@@ -185,6 +193,26 @@ msgstr "Errors"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS"
 msgstr "Descriptions of the form fields"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_CSP"
+msgstr "Create private key"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DEFAULT_CSP"
+msgstr "Now you can generate a new SPKAC key with your browser."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DESCRIPTION"
+msgstr "Now you can generate a new SPKAC key with your browser."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_KEY_LENGTH"
+msgstr "Create private key"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_TITLE"
+msgstr "Create private key"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_INFO_DESCRIPTION"
 msgstr "Please enter now some additional informations."
 
@@ -199,6 +227,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
 msgstr "Select the way of the key generation"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_DESCRIPTION"
+msgstr "Now you can generate a new SPKAC key with your browser."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_TITLE"
+msgstr "Create private key"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_DESCRIPTION"
@@ -249,6 +285,15 @@ msgstr "Choose a naming style"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_TITLE"
 msgstr "Creating the name of the certificate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_WORKFLOW_TYPE_DESCRIPTION"
+msgstr ""
+"Please choose the role for which you would like to request a certificate."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_WORKFLOW_TYPE_TITLE"
+msgstr "Choose a role"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_"
 msgstr ""
@@ -326,6 +371,10 @@ msgstr ""
 "Uniform Ressource Identifier (URI) can be any address or reference to an "
 "information source. Example: www.openxpki.org/~testuser."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_IE_PKCS10"
+msgstr "PKCS#10"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION"
 msgstr ""
 "Please choose the authentication method which you will use to identify "
@@ -358,9 +407,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE"
 msgstr "Trustcenter Web Interface"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN"
-msgstr "Logged out."
+msgstr "Login"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr ""
@@ -416,9 +464,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWD"
-msgstr "SPKAC"
+msgstr "Password"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10"
 msgstr "PKCS#10"
@@ -486,6 +533,54 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_TITLE"
 msgstr "Create workflow instance"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATOR"
+msgstr "Workflow state"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_INFO"
+msgstr "Workflow serial"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_PROFILE"
+msgstr "Workflow serial"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_ROLE"
+msgstr "Workflow serial"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT"
+msgstr "Workflow state"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_ALT_NAME"
+msgstr "Subject alternative name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_STYLE"
+msgstr "Creating the name of the certificate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_EXPORT_DESTINATION"
+msgstr "You can see now the available types of workflows."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_EXPORT_PARAMS"
+msgstr "Workflow serial"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_EXPORT_WORKFLOW_TYPE"
+msgstr "Choose a role"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_KEYGEN"
+msgstr "Workflow type"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_TYPE"
+msgstr "Workflow type"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Last update"
 
@@ -501,6 +596,10 @@ msgstr "You can see now the available types of workflows."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_TITLE"
 msgstr "Workflow types"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_PKCS10"
+msgstr "Workflow type"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL"
 msgstr "Workflow serial"
 
@@ -513,6 +612,10 @@ msgstr "Here you can see the details of the workflow instance."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE"
 msgstr "Workflow instance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SPKAC"
+msgstr "Workflow state"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE"
 msgstr "Workflow state"
@@ -568,6 +671,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER"
+msgstr "Additional informations"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED"
 msgstr ""
@@ -767,6 +874,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_CSR_GET_CONVERTED_WRONG_FORMAT"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CSR_GET_INFO_HASH_EVAL_OF_DUMP_FAILED"
+msgstr "Choose authentication method"
 
 msgid "I18N_OPENXPKI_CRYPTO_CSR_INIT_MISSING_SUBJECT"
 msgstr ""
@@ -1489,6 +1600,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
+msgstr "Serverside key generation"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_USER"
+msgstr "Organizational Unit"
+
 msgid "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST"
 msgstr ""
 
@@ -1876,6 +1995,18 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MKDIR_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_OPEN_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ACL_NO_ACTIVITY"
 msgstr "The SPKAC string is empty."
 
@@ -1885,6 +2016,10 @@ msgstr "The value of a subject alternative name field is missing."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVED_NO_ROLE_LIST"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SERVER_WRONG_SERVER"
 msgstr "The SPKAC string is empty."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_FETCH_WORKFLOW_INCORRECT_WORKFLOW_INSTANCE"
@@ -1949,6 +2084,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_NEVER_REGEX"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_DAMAGED"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
+msgstr "The SPKAC string is empty."
+
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_BASE64"
 msgstr "The submitted SPKAC data is not correctly base 64 encoded."
 
@@ -1985,6 +2128,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_NO_REALM_CONFIGURED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
 msgstr ""
@@ -2087,9 +2236,6 @@ msgid "I18N_OPENXPKI_SERVICE_TALK_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SET_LOCALE_PREFIX_DIR_DOES_NOT_EXIST"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SEVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_C_NOT_ALLOWED"
@@ -2230,11 +2376,39 @@ msgid "I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
 msgstr "New Request (CSR)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CSR"
+msgstr "New Request (CSR)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
 msgstr "New Request (CSR)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE"
+msgstr "Certificates"
+
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE"
+msgstr "Certificates"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_ONLINE"
+msgstr "Certificates"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
+msgstr "Certificates"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
+msgstr "Certificates"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
+msgstr "Certificates"
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED"
 msgstr ""
@@ -2245,12 +2419,24 @@ msgstr ""
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
+msgstr "Certificates"
+
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_ISSUE_CERTIFICATE"
-msgstr "Certificates"
+msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE"
+msgstr ""
+"The used subject style requires at minimum one organizational unit, one "
+"organization and one country."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
+msgstr ""
+"The used subject style requires at minimum one organizational unit, one "
+"organization and one country."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"

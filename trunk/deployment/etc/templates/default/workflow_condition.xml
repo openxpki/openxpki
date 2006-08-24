@@ -62,9 +62,8 @@
   </condition>
 
   <!-- check for system-instantiated workflow -->
-  <condition name="ACL::system_internal" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <!-- FIXME: insert proper arguments here -->
-    <param name="caller" value="system"/>
+  <condition name="ACL::start_certificate_issuance" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="certificate_issuance_start"/>
   </condition>
 
   <!-- key online checks -->

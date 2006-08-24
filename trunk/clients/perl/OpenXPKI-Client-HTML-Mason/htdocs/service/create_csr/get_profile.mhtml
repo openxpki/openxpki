@@ -13,7 +13,7 @@
 <select name="profile">
 %   foreach my $hprofile (sort keys %profiles)
 %   {
-  <option value="<% $hprofile %>"><% $hprofile %></option>
+  <option value="<% $hprofile %>"><% i18nGettext($hprofile) %></option>
 %   }
 </select>
 <& /service/send_form.mhtml &>

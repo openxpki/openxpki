@@ -144,7 +144,7 @@ sub __init_session : PRIVATE {
                        });
         };
 	if ($EVAL_ERROR) {
-	    my $error = 'I18N_OPENXPKI_SEVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED';
+	    my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED';
             $self->__send_error ({ERROR     => $error,
                                   EXCEPTION => $EVAL_ERROR});
 	    

@@ -22,6 +22,8 @@ sub validate {
     ## prepare the environment
     my $context = $wf->context();
     my $params  = $self->params();
+    delete $params->{name};
+    delete $params->{class};
 
     ## set the parameters
     $context->param ($params);

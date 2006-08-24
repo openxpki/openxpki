@@ -10,7 +10,7 @@
 %
 <dl>
 %
-%   foreach my $type (keys %{$msg->{PARAMS}})
+%   foreach my $type (sort keys %{$msg->{PARAMS}})
 %   {
   <dt>
     <a href="list_instances.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>">
