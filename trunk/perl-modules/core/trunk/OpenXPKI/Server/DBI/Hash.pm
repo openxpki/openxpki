@@ -136,32 +136,34 @@ sub __log_write_action
     my $status = undef;
        $status = $hash->{STATUS} if (exists $hash->{STATUS});
 
-    ## set the index
-    my %index = ();
-    foreach my $col (@{$self->{schema}->get_table_index($table)})
-    {
-        if ($col eq "${table}_SERIAL")
-        {
-            $index{SERIAL}  = $hash->{$col};
-        } else {
-            ## planned for index with more than one column
-            ## example: pki_realm and ca for certificates, CSRs etc.
-            $index{$col} = $hash->{$col};
-        }
-    }
-
-    ## check that the schema is intact
-    foreach my $col (keys %index)
-    {
-        next if ($col eq "SERIAL");
-        next if ($col eq "PKI_REALM");
-        next if ($col eq "IDENTIFIER");
-        next if ($col eq "ISSUER_ALIAS");
-
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_DBI_HASH_LOG_WRITE_ACTION_WRONG_INDEX_COLUMN",
-            params  => {COLUMN => $col});
-    }
+### FIXME: move to DBI instantiation, makes more sense there
+###        (loop through all tables and check if indices are correct)
+#    ## set the index
+#    my %index = ();
+#    foreach my $col (@{$self->{schema}->get_table_index($table)})
+#    {
+#        if ($col eq "${table}_SERIAL")
+#        {
+#            $index{SERIAL}  = $hash->{$col};
+#        } else {
+#            ## planned for index with more than one column
+#            ## example: pki_realm and ca for certificates, CSRs etc.
+#            $index{$col} = $hash->{$col};
+#        }
+#    }
+#
+#    ## check that the schema is intact
+#    foreach my $col (keys %index)
+#    {
+#        next if ($col eq "SERIAL");
+#        next if ($col eq "PKI_REALM");
+#        next if ($col eq "CA");
+#        next if ($col eq 'IDENTIFIER'); # is a SHA1 hash, thus unique enough
+#
+#        OpenXPKI::Exception->throw (
+#            message => "I18N_OPENXPKI_SERVER_DBI_HASH_LOG_WRITE_ACTION_WRONG_INDEX_COLUMN",
+#            params  => {COLUMN => $col});
+#    }
 
     ## log the action
     if ($mode eq "UPDATE")
@@ -178,10 +180,11 @@ sub __log_write_action
     } else {
         $message .= "\nsession=undef";
     }
-    foreach my $key (keys %index)
-    {
-        $message .= "\n".lc($key)."=".$index{$key};
-    }
+# TODO: do we really need to log this?
+#    foreach my $key (keys %index)
+#    {
+#        $message .= "\n".lc($key)."=".$index{$key};
+#    }
     $self->{LOG}->log (FACILITY => "audit",
                        PRIORITY => "info",
                        MESSAGE  => $message,

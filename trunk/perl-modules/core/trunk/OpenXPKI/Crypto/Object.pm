@@ -60,42 +60,6 @@ sub get_serial {
     return $self->get_parsed ("BODY", "SERIAL");
 }
 
-sub get_status
-{
-    my $self = shift;
-    if (not exists $self->{STATUS})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_STATUS_NOT_INITIALIZED");
-    }
-    return $self->{STATUS};
-}
-
-sub set_status
-{
-    my $self = shift;
-    $self->{STATUS} = shift;
-    return $self->get_status();
-}
-
-sub get_issuer_alias
-{
-    my $self = shift;
-    if (not exists $self->{ISSUER_ALIAS})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_ISSUER_ALIAS_NOT_INITIALIZED");
-    }
-    return $self->{ISSUER_ALIAS};
-}
-
-sub set_issuer_alias
-{
-    my $self = shift;
-    $self->{ISSUER_ALIAS} = shift;
-    return $self->get_issuer_alias();
-}
-
 sub set_header_attribute
 {
     my $self = shift;
@@ -160,22 +124,6 @@ $obj->get_parsed ("HEADER", "SERIAL")
 returns the serial which is stored in the cryptographic body of
 the object. Some objects like CSRs store the SERIAL in the HEADER.
 Such types of objects must overwrite this function.
-
-=head2 get_status
-
-returns the status of the object.
-
-=head2 set_status
-
-sets the status of the object.
-
-=head2 get_handle
-
-returns the object handle (symbolic id)
-
-=head2 set_status
-
-sets the object handle (symbolic id)
 
 =head2 set_header_attribute
 

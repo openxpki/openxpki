@@ -28,7 +28,6 @@ ok($cert and $crl);
 
 # insert CA certificate
 $cert->set_status ("VALID");
-$cert->set_issuer_alias ("Dummy");
 ok($cert);
 $dbi->insert (TABLE => "CERTIFICATE", OBJECT => $cert);
 ok(1);

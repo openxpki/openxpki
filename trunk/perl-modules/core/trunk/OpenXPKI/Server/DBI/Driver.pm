@@ -30,7 +30,10 @@ our %COLUMN = (
     "issuing_ca"       => "TEXT_KEY",
     "issuing_pki_realm"=> "TEXT_KEY", # FIXME: remove this
     "referenced_realm" => "TEXT_KEY",
-    "issuer_alias"     => "TEXT_KEY",
+    "issuer_identifier"=> "TEXT_KEY",
+    "issuer_dn"        => "TEXT_KEY",
+    "subject_key_identifier"   => "TEXT_KEY",
+    "authority_key_identifier" => "TEXT_KEY",
 
     "identifier"       => "TEXT_KEY",
     "alias"            => "TEXT_KEY",

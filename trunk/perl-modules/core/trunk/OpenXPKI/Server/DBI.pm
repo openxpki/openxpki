@@ -184,7 +184,6 @@ sub init_schema
 	    # FORCE and DRYRUN are mutually exclusive, so we don't need
 	    # to remember the SQL executed.
 	}
-
         $result = $self->{dbh}->create_sequence (NAME => $seq, MODE => $mode);
         $self->{SQL_SCRIPT} .= $result.";" if ($mode eq "DRYRUN");
         ##! 4: "sequence $seq successfully created"
@@ -235,6 +234,8 @@ sub rollback
     my $self = shift;
     ##! 1: "start"
     $self->{dbh}->rollback();
+    # TODO: maybe log that a rollback appeared, so that the audit trail
+    # makes more sense
     return 1;
 }
 

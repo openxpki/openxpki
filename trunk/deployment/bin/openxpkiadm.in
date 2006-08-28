@@ -19,7 +19,8 @@ use File::Copy;
 use File::Path;
 use IO::Prompt;
 
-use Data::Dumper;
+#use Data::Dumper;
+#use Smart::Comments;
 
 use OpenXPKI::VERSION;
 use OpenXPKI::FileUtils;
@@ -27,6 +28,7 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::XML::Config;
 use OpenXPKI::Crypto::Secret;
+use OpenXPKI::DateTime;
 
 # settings determined by openxpki-metaconf
 my %config = (
@@ -52,8 +54,10 @@ sub get_config {
 		'xml_config', 
 		'i18n', 
 		'log', 
+                'api',
 		@additional_tasks,
 		],
+            SILENT => 1,
 	});
 }
 
@@ -105,6 +109,7 @@ sub initdb {
 		$args{MODE} = 'FORCE';
 	    }
 
+            #### args for init_schema : Dumper(\%args)
 	    eval {
 		$dbi->init_schema(%args);
 	    };
@@ -228,21 +233,6 @@ sub deploy {
 
     return 1;
 }
-
-sub list_certificates {
-    my $args = shift;
-
-    my $realm = $args->{REALM};
-
-    print Dumper CTX('pki_realm');
-
-    foreach my $int_ca (sort keys %{CTX('pki_realm')->{$realm}->{ca}->{id}}) {
-	print "Issuing CA: $int_ca\n";
-    }
-
-    1;
-}
-
 
 sub list_keys {
     my $arg_ref = shift;
@@ -727,36 +717,135 @@ sub __string_is_in_array {
     return 0;
 }
 
+sub __resolve_alias {
+    my $arg_ref = shift;
+    my $dbi     = $arg_ref->{DBI};
+    my $name    = $arg_ref->{NAME};
+    my $realm   = $arg_ref->{REALM};
+
+    my $alias = $dbi->first(
+            TABLE   => 'ALIASES',
+            DYNAMIC => {
+            ALIAS      => $name,
+            PKI_REALM  => $realm,
+            },
+    );
+    if (defined $alias) {
+        return $alias->{IDENTIFIER};
+    }
+    else {
+        return $name;
+    }
+}
+
 ###########################################################################
 
-my %params;
-GetOptions(\%params,
-	   qw(
-	      help|?
-	      man
-	      cfg|cfgfile|conf|config=s
-              version
-	      force
-	      dryrun
-              templatedir=s
-              template=s
-              prefix=s
-              realm=s
-              purpose=s
-	      )) or pod2usage(-verbose => 0);
+my @options_spec = qw(
+                     cfg|cfgfile|config|config=s
+                     ); # config is the only global option
 
-if ($params{version}) {
+my $cmd = shift @ARGV;
+my $subcmd;
+if ($cmd eq 'certificate' || $cmd eq 'key') { # those have subcommands
+    $subcmd = shift @ARGV || '';
+}
+
+# set command/subcommand specific allowed options
+if ($cmd eq 'initdb') {
+    push @options_spec, qw(
+                          force
+                          dryrun
+                          );
+}
+
+if ($cmd eq 'deploy') {
+    push @options_spec, qw(
+                          prefix=s
+                          templatedir=s
+                          template=s
+                          force
+                          );
+}
+
+if ($cmd eq 'key' || $cmd eq 'certificate') {
+    push @options_spec, qw(
+                          realm=s
+                          );
+}
+
+if ($cmd eq 'key' && $subcmd eq 'generate') {
+    push @options_spec, qw(
+                          purpose=s
+                          );
+}
+
+if ($cmd eq 'certificate' && $subcmd eq 'import') {
+    push @options_spec, qw(
+                          file=s
+                          issuer=s
+                          issuer-realm=s
+                          role=s
+                          force-really-self-signed
+                          force-issuer-not-found
+                          force-certificate-already-exists
+                          );
+}
+
+if ($cmd eq 'certificate' && $subcmd eq 'list') {
+    push @options_spec, qw(
+                          all
+                          v+
+                          );
+}
+
+if ($cmd eq 'certificate' && $subcmd eq 'alias') {
+    push @options_spec, qw(
+                          alias=s
+                          identifier=s
+                          force-certificate-not-found
+                          );
+}
+
+if ($cmd eq 'certificate' && $subcmd eq 'remove') {
+    push @options_spec, qw(
+                           name=s
+                           force-is-issuer
+                          );
+}
+ 
+if ($cmd eq 'certificate' && $subcmd eq 'chain') {
+    push @options_spec, qw(
+                          issuer=s
+                          issuer-realm=s
+                          name=s
+                          force-certificate-not-found
+                          force-issuer-certificate-not-found
+                          );
+}
+
+
+my %params;
+GetOptions(\%params, @options_spec) or pod2usage(-verbose => 0);
+
+if ($cmd eq 'version') {
     my ($vol, $dir, $file) = File::Spec->splitpath($0);
     print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
     print "$file Version: $VERSION\n";
     exit 0;
 }
 
-pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
-pod2usage(-verbose => 1) if ($params{help});
-if (scalar @ARGV < 1) {
-    print STDERR "Usage: openxpkiadm [OPTIONS] COMMAND\n";
+pod2usage(-exitstatus => 0, -verbose => 2) if ($cmd eq 'man');
+pod2usage(-verbose => 1) if ($cmd eq 'help');
+if ($cmd eq '') {
+    print STDERR "Usage: openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]\n";
     exit 0;
+}
+
+if ((($cmd eq 'certificate' || $cmd eq 'key') && $subcmd eq '') ||
+    (($cmd eq 'certificate' || $cmd eq 'key') && substr($subcmd, 0, 1) eq '-')
+   ) {
+        print STDERR "Usage: openxpkiadm $cmd SUBCOMMAND [OPTIONS]\n";
+        exit 0;
 }
 
 if (defined $params{cfg}) {
@@ -766,7 +855,7 @@ if (defined $params{cfg}) {
 
 ###########################################################################
 
-my $cmd = shift;
+#my $cmd = shift;
 
 if ($cmd eq 'initdb') {
     if (! get_config($configfile)) {
@@ -828,28 +917,26 @@ if ($cmd eq 'deploy') {
 } 
 
 if ($cmd eq 'certificate') {
-    my $subcommand = shift || '';
-
     if (! get_config($configfile, qw( crypto_layer pki_realm dbi_backend ))) {
 	print STDERR "Could not obtain OpenXPKI instance configuration\n";
 	exit 1;
     }
 
-    if (! defined $params{realm} ||
-	! exists CTX('pki_realm')->{$params{realm}}) {
-	print STDERR "Please specify one of the following PKI realms via --realm:\n";
-	foreach my $realm (keys %{CTX('pki_realm')}) {
-	    print "  $realm\n";
-	}
-
-	exit 1;
-    }
     ## CTX('pki_realm')
 
+    # FIXME: compare OpenXPKI::Server::Init, we use the first realm if none
+    # is available, this is a completely arbitrary choice!
+    my $realms = CTX('pki_realm');
+    my $firstrealm = (sort keys %{$realms})[0];
+    
+    my $realm = $params{realm};
+    if (! defined $realm || $realm eq '') {
+        $realm = $firstrealm;
+    }
     my $defaulttoken = CTX('crypto_layer')->get_token(
 	TYPE      => 'DEFAULT',
 	ID        => 'default',
-	PKI_REALM => $params{realm},
+	PKI_REALM => $realm,
 	);
 
     if (! defined $defaulttoken) {
@@ -859,22 +946,222 @@ if ($cmd eq 'certificate') {
 
     my $dbi = CTX('dbi_backend');
     if (! defined $dbi) {
-	print STDERR "ERROR: Could not instantiate database backend\n";
-	exit 1;
+        print STDERR "ERROR: Could not instantiate database backend\n";
+        exit 1;
     }
     $dbi->connect();
 
+    if ($subcmd eq 'list') {
+        my @realms;
+        if (defined $params{realm}) {
+            $realms[0] = $params{realm};
+        }
+        else {
+            @realms = keys %{CTX('pki_realm')};
+            $realms[scalar @realms] = ''; # add the magic empty realm
+        }
 
-    if ($subcommand eq 'list') {
-	list_certificates(
-	    {
-		REALM => $params{realm},
-	    });
+        foreach my $realm (@realms) {
+            if ($realm ne '') {
+                print "Certificates in $realm:\n";
+            }
+            else {
+                print "Certificates in self-signed pseudo-realm:\n";
+            }
+            my $certificates;
+            if (defined $params{all}) {
+                $certificates = $dbi->select(
+                    TABLE   => 'CERTIFICATE',
+                    DYNAMIC => {
+                        PKI_REALM => $realm,
+                    },
+                );
+            }
+            else {
+                $certificates = $dbi->select(
+                    TABLE   => [ 'ALIASES', 'CERTIFICATE' ],
+                    COLUMNS => [ 'ALIASES.ALIAS',
+                                 'ALIASES.IDENTIFIER',
+                                 'CERTIFICATE.SUBJECT',
+                                 'CERTIFICATE.ISSUER_DN',
+                                 'CERTIFICATE.CERTIFICATE_SERIAL',
+                                 'CERTIFICATE.ISSUER_IDENTIFIER',
+                                 'CERTIFICATE.DATA',
+                                 'CERTIFICATE.EMAIL',
+                                 'CERTIFICATE.STATUS',
+                                 'CERTIFICATE.ROLE',
+                                 'CERTIFICATE.PUBKEY',
+                                 'CERTIFICATE.SUBJECT_KEY_IDENTIFIER',
+                                 'CERTIFICATE.AUTHORITY_KEY_IDENTIFIER',
+                                 'CERTIFICATE.NOTAFTER',
+                                 'CERTIFICATE.LOA',
+                                 'CERTIFICATE.NOTBEFORE',
+                                 'CERTIFICATE.CSR_SERIAL',
+                               ],
+                    JOIN    => [
+                                    [ 'IDENTIFIER',
+                                      'IDENTIFIER',
+                                    ],
+                               ],
+                    DYNAMIC => {
+                        'ALIASES.PKI_REALM' => $realm,
+                    },
+                );
+            }
+            for (my $i = 0; $i < scalar @{$certificates}; $i++) {
+                my $cert = $certificates->[$i];
+                my $identifier;
+                if (defined $params{all}) { # look up aliases
+                    $identifier = $cert->{IDENTIFIER};
+                    print "  Identifier: " . $cert->{IDENTIFIER} . "\n";
+                    my $aliases = $dbi->select(
+                        TABLE   => 'ALIASES',
+                        DYNAMIC => {
+                          IDENTIFIER => $cert->{IDENTIFIER},
+                        },
+                    );
+                    for (my $j = 0; $j < scalar @{$aliases}; $j++) {
+                        print "    Alias:\n      "
+                            . $aliases->[$j]->{ALIAS}
+                            . " (in realm: " . $aliases->[$j]->{PKI_REALM}
+                            . ")\n";
+                    }
+                }
+                else {
+                    $identifier = $cert->{'ALIASES.IDENTIFIER'};
+                    print "  Identifier: "
+                        . $cert->{'ALIASES.IDENTIFIER'} . "\n";
+                    print "    Alias:\n       "
+                        . $cert->{'ALIASES.ALIAS'} . "\n";
+                }
+                my $prefix = '';
+                if (!defined $params{all}) {
+                    $prefix = 'CERTIFICATE.';
+                }
+                if (defined $params{v} && $params{v} > 0) {
+                    # show subject and issuer dn
+                    my $subject   = $cert->{$prefix . 'SUBJECT'};
+                    my $issuer_dn = $cert->{$prefix . 'ISSUER_DN'};
+                    print "    Subject:\n      " . $subject . "\n";
+                    print "    Issuer DN:\n      " . $issuer_dn . "\n";
+                }
+                if (defined $params{v} && $params{v} > 1) {
+                    # show chain
+                    my $api = CTX('api');
+                    my $chain = $api->get_chain({
+                        START_IDENTIFIER => $identifier,      
+                    });
+                    my $chain_str
+                        = join (' -> ', @{$chain->{IDENTIFIERS}});
+
+                    print "    Chain: $chain_str ";
+                    if ($chain->{COMPLETE} == 1) {
+                        print "(complete)\n";
+                    }
+                    else {
+                        print "(INcomplete!)\n";
+                    }
+                }
+                if (defined $params{v} && $params{v} > 2) {
+                    # show database entry
+                    my @fields = qw(
+                                 SUBJECT_KEY_IDENTIFIER
+                                 AUTHORITY_KEY_IDENTIFIER
+                                 CERTIFICATE_SERIAL
+                                 ISSUER_IDENTIFIER
+                                 EMAIL
+                                 STATUS
+                                 ROLE
+                                 NOTAFTER
+                                 NOTBEFORE
+                                 CSR_SERIAL
+                                 LOA
+                                );
+                    if ($params{v} > 3) {
+                        push @fields, qw(PUBKEY DATA);
+                    }
+        
+                    foreach my $field (@fields) {
+                        my $value;
+                        if (defined $cert->{$prefix . $field}) {
+                            $value = $cert->{$prefix . $field};
+                        }
+                        else {
+                            $value = 'NULL';
+                        }
+                        print "    $field:\n      " 
+                            . $value . "\n";
+                    } 
+                }
+            }
+        }
 	exit 0;
     }
 
-    if ($subcommand eq 'add') {
-	my $filename = shift;
+    if ($subcmd eq 'remove') {
+        my $name  = $params{name};
+        my $realm = $params{realm};
+
+        my $identifier = $name;
+        if (defined $realm) {
+            $identifier = __resolve_alias({
+                    DBI    => $dbi,
+                    NAME   => $name,
+                    REALM  => $realm,
+            });
+        }
+        # check if certificate is issuer of something
+        my $children_dbi = $dbi->select(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => {
+                ISSUER_IDENTIFIER => $identifier,
+            },
+        );
+        my @children = @{$children_dbi};
+
+        my $is_issuer = 0;
+        if (scalar @children > 0) {
+            $is_issuer = 1;
+            if (scalar @children == 1) {
+                if ($children[0]->{'ISSUER_IDENTIFIER'} eq $identifier) {
+                    # only self-signed certificate, delete even though
+                    # it formally is the issuer of a certificate in the DB
+                    $is_issuer = 0;
+                }
+            }
+        }
+
+        if ($is_issuer && ! defined $params{'force-is-issuer'}) {
+            print STDERR "ERROR: Certificate not deleted because it is referenced as the issuer of " . scalar @children . " certificate(s) in the database.\n";
+            exit 1;
+        }
+        my $certificate = $dbi->first(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => {
+                IDENTIFIER => $identifier,
+            },
+        );
+        if (defined $certificate) {
+            $dbi->delete(
+                TABLE => 'CERTIFICATE',
+                DATA  => {
+                    IDENTIFIER => $identifier,
+                },
+            );
+            $dbi->commit();
+            print "Successfully deleted certificate $name "
+                . "(identifier: $identifier) from database.\n";
+            exit 0;
+        }
+        else {
+            print STDERR "ERROR: Certificate $name "
+                . "(identifier: $identifier) not found in database.\n";
+            exit 1;
+        }
+    }
+
+    if ($subcmd eq 'import') {
+	my $filename = $params{file};
 
 	if (! -r $filename) {
 	    print STDERR "ERROR: filename '$filename' is not readable\n";
@@ -889,28 +1176,320 @@ if ($cmd eq 'certificate') {
 	    exit 1;
 	}
 
+        if ((! defined $params{issuer} || $params{issuer} eq '')
+                                    && (defined $params{realm})) {
+            print STDERR "ERROR: You have to specify an issuer (or leave "
+              . "out --realm for self-signed certificates).\n";
+        }
+
 	my $cert
 	    = OpenXPKI::Crypto::X509->new(TOKEN => $defaulttoken,
 					  DATA  => $certdata);
+        #### cert : Dumper($cert)
 
-	$cert->set_status('DUMMY');
-	$cert->set_handle('HANDLE');
-	### Dumper $cert
+        my $realm = '';
+        my $issuer_identifier;
+        if (! defined $params{realm} || $params{realm} eq '') {
+            # user wants to import a self-signed
+            # cert, let's check if it really is one
+            ### subject key id : $cert->get_subject_key_id()
+            ### authority key id : $cert->get_authority_key_id()
+            if (defined $cert->get_subject_key_id()
+                && defined $cert->get_authority_key_id()
+                && ref $cert->get_authority_key_id() eq '' # TODO: check if hash
+                && ($cert->get_subject_key_id()
+                   ne $cert->get_authority_key_id())) {
+                if (! defined $params{'force-really-self-signed'}) {
+                    print STDERR "ERROR: This is not a self-signed "
+                    . "certificate, "
+                    . "(subject key id and authority key id do not match) "
+                    . "please specify --realm if you want to import a "
+                    . "normal certificate.\n";
+                    exit 1;
+                }
+            }
+            if (   $cert->{PARSED}->{BODY}->{SUBJECT}
+                ne $cert->{PARSED}->{BODY}->{ISSUER}) {
+                if (! defined $params{'force-really-self-signed'}) {
+                    print STDERR "ERROR: This is not a self-signed "
+                    . "certificate, "
+                    . "(subject and issuer do not match) "
+                    . "please specify --realm if you want to import a "
+                    . "normal certificate.\n";
+                    exit 1;
+                }
+            }
+            # we are our own issuer
+            $issuer_identifier = $cert->get_identifier();
+        }
+        else { # we have a "normal" certificate
+            if (defined $params{'issuer-realm'}) {
+                $realm = $params{'issuer-realm'};
+            }
+            else {
+                $realm = $params{realm};
+            }
+            # maybe the issuer name is an alias, try to resolve it
+            $issuer_identifier = __resolve_alias({
+                    DBI    => $dbi,
+                    NAME   => $params{issuer},
+                    REALM  => $realm,
+            });
+            ### issuer_identifier : $issuer_identifier
+            # check whether the certificate is in the DB
+            my $issuer = $dbi->first(
+                    TABLE   => 'CERTIFICATE',
+                    DYNAMIC => {
+                        IDENTIFIER => $issuer_identifier,
+                    },
+            );
+            if (! defined $issuer &&
+                ! defined $params{'force-issuer-not-found'}) {
+                print STDERR "ERROR: Issuer '$params{issuer}' not found in "
+                    . "the database.\n";
+                exit 1;
+            }
+        }
+
+        # compile all relevant data for the database
+        my %insert_hash;
+        $insert_hash{PKI_REALM}          = $realm;
+        $insert_hash{CERTIFICATE_SERIAL} = $cert->get_serial();
+        $insert_hash{IDENTIFIER}         = $cert->get_identifier();
+        $insert_hash{DATA}               = $certdata;
+        $insert_hash{SUBJECT}            = $cert->{PARSED}->{BODY}->{SUBJECT};
+        $insert_hash{ISSUER_DN}          = $cert->{PARSED}->{BODY}->{ISSUER};
+        $insert_hash{ISSUER_IDENTIFIER}  = $issuer_identifier;
+        # combine email addresses
+        if (exists $cert->{PARSED}->{BODY}->{EMAILADDRESSES}) {
+            $insert_hash{EMAIL} = '';
+            foreach my $email (@{$cert->{PARSED}->{BODY}->{EMAILADDRESSES}}) {
+                $insert_hash{EMAIL} .= "," if ($insert_hash{EMAIL} ne '');
+                $insert_hash{EMAIL} .= $email;
+            }
+        }
+        $insert_hash{PUBKEY}             = $cert->{PARSED}->{BODY}->{PUBKEY};
+        # set subject key id and authority key id, if defined.
+        if (defined $cert->get_subject_key_id()) {
+            $insert_hash{SUBJECT_KEY_IDENTIFIER}
+                = $cert->get_subject_key_id();
+        }
+        if (defined $cert->get_authority_key_id() &&
+            ref $cert->get_authority_key_id() eq '') {
+                # TODO: do we save if authority key id is hash, and if
+                # yes, in which format?
+            $insert_hash{AUTHORITY_KEY_IDENTIFIER}
+                = $cert->get_authority_key_id();
+        }
+        if (defined $params{role} && $params{role} ne '') {
+            # TODO: check if role is valid (from acl.xml)
+            $insert_hash{ROLE} = $params{role}
+        }
+        
+        $insert_hash{NOTAFTER}           
+            = OpenXPKI::DateTime::convert_date({
+                DATE      => $cert->{PARSED}->{BODY}->{NOTAFTER},
+                OUTFORMAT => 'epoch',
+        });
+        $insert_hash{NOTBEFORE}
+            = OpenXPKI::DateTime::convert_date({
+                DATE      => $cert->{PARSED}->{BODY}->{NOTBEFORE},
+                OUTFORMAT => 'epoch',
+        });
+        # fields which are explicitly NOT set:
+        # LOA          (we don't know it)
+        # CSR_SERIAL   ( " " )
+
+        # check whether there is already a certificate with the given
+        # identifier anywhere
+        my $certificate = $dbi->first(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => {
+                IDENTIFIER => $insert_hash{IDENTIFIER},
+            },
+        );
+        if (defined $certificate &&
+            ! defined $params{'force-certificate-already-exists'}) {
+            if ($certificate->{PKI_REALM} ne '') {
+                print STDERR "ERROR: The same certificate already exists "
+                  . "in the $certificate->{PKI_REALM} realm. Use openxpkiadm "
+                  . "certificate alias to reference it.\n";
+            }
+            else {
+                print STDERR "ERROR: The same certificate already exists  "
+                  . "as a global self-signed certificate. Use openxpkiadm "
+                  . "certificate alias to reference it.\n";
+            }
+            exit 1;
+        }
 	$dbi->insert(
-	    TABLE => 'CERTIFICATE',
-	    OBJECT => $cert);
-	
-	exit 0;
+	    TABLE => 'CERTIFICATE', # use hash method
+	    HASH  => \%insert_hash,
+        );	
+        $dbi->commit();
 
+        print "Successfully imported certificate into database:\n";
+        print "  Subject:    " . $insert_hash{SUBJECT} . "\n";
+        print "  Issuer:     " . $insert_hash{ISSUER_DN} . "\n";
+        print "  Identifier: " . $insert_hash{IDENTIFIER} . "\n";
+	exit 0;
     }
 
-    print STDERR "Unknown certificate subcommand '$subcommand'.\n";
+    if ($subcmd eq 'alias') {
+        my %insert_hash = ();
+
+        $insert_hash{PKI_REALM} = $params{realm};
+
+        if (! exists($params{alias}) || $params{alias} eq '') {
+            print STDERR "Please specify an alias with --alias\n";
+            exit 1;
+        }
+        else {
+            $insert_hash{ALIAS} = $params{alias};
+        }
+        if (! exists($params{identifier}) || $params{identifier} eq '') {
+            print STDERR "Please specify an identifier with --identifier\n";
+            exit 1;
+        }
+        else {
+            $insert_hash{IDENTIFIER} = $params{identifier};
+        }
+
+        # query certificate table to check whether --identifer actually exists
+        my $certificate = $dbi->first(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => {
+                IDENTIFIER => $insert_hash{IDENTIFIER},
+            },
+        );
+        
+        if (! defined $certificate &&
+            ! defined $params{'force-certificate-not-found'}) { # there is no cert with given identifier
+            print STDERR "ERROR: Could not find a certificate with "
+                . "identifier '$insert_hash{IDENTIFIER}', "
+                . "are you sure it is correct?\n";
+            exit 1;
+        }
+        #### insert_hash : Dumper(\%insert_hash)
+        $dbi->insert(
+                TABLE => 'ALIASES',
+                HASH  => \%insert_hash,
+        );
+        $dbi->commit();
+        print "Successfully created alias in realm $params{realm}:\n";
+        print "  Alias     : $insert_hash{ALIAS}\n";
+        print "  Identifier: $insert_hash{IDENTIFIER}\n";
+        exit 0;
+    }
+
+    if ($subcmd eq 'chain') {
+        my $cert_name;
+        my $issuer_name;
+        if (! exists($params{name}) || $params{name} eq '') {
+            print STDERR "Please specify a certificate name with --name\n";
+            exit 1;
+        }
+        else {
+            $cert_name = $params{name};
+        }
+        if (! exists($params{issuer}) || $params{issuer} eq '') {
+            print STDERR "Please specify an issuer name with --issuer\n";
+            exit 1;
+        }
+        else {
+            $issuer_name = $params{issuer};
+        }
+
+        # maybe the certificate name is an alias, try to resolve it
+        my $cert_identifier = __resolve_alias({
+            DBI   => $dbi,
+            NAME  => $cert_name,
+            REALM => $params{realm},
+        });
+        # check whether the certificate is in the DB
+        my $certificate = $dbi->first(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => {
+                IDENTIFIER => $cert_identifier,
+                PKI_REALM  => $params{realm}
+            },
+        );
+        if (! defined $certificate &&
+            ! defined $params{'force-certificate-not-found'}) {
+            print STDERR "ERROR: Certificate '$cert_name' not found in realm "
+                . "$params{realm}.\n";
+            exit 1;
+        }
+        
+        my $issuer_identifier;
+        # maybe the issuer name is an alias, try resolve it
+        my $realm;
+        if (defined $params{'issuer-realm'}) {
+            $realm = $params{'issuer-realm'};
+        }
+        else {
+            $realm = $params{realm};
+        }
+        $issuer_identifier = __resolve_alias({
+            DBI   => $dbi,
+            NAME  => $issuer_name,
+            REALM => $realm,
+        });
+        # check whether the issuer is in the DB
+        my $issuer = $dbi->first(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => {
+                IDENTIFIER => $issuer_identifier,
+            },
+        );
+        if (! defined $issuer &&
+            ! defined $params{'force-issuer-certificate-not-found'}) {
+            print STDERR "ERROR: Issuer certificate '$issuer_name' "
+                . "(identifier: $issuer_identifier) not found in database.\n";
+            exit 1;
+        }
+
+        # set the issuer_identifier for the given certificate
+        $dbi->update(
+            TABLE   => 'CERTIFICATE',
+            DATA    => {
+                ISSUER_IDENTIFIER => $issuer_identifier,
+            },
+            WHERE   => {
+                CERTIFICATE_SERIAL => $certificate->{CERTIFICATE_SERIAL},
+                IDENTIFIER         => $cert_identifier,
+                PKI_REALM          => $certificate->{PKI_REALM},
+            },
+        );
+        $dbi->commit();
+        print "Successfully set $issuer_name (identifier: $issuer_identifier) "
+            . "as issuer of certificate $cert_name (identifier: "
+            . "$cert_identifier).\n";
+        # TODO: maybe don't warn only, but let the user use --force to
+        # specify that he knows what he is doing ...?
+        if ($issuer->{SUBJECT_KEY_IDENTIFIER}
+                ne $certificate->{AUTHORITY_KEY_IDENTIFIER}) {
+            print STDERR "WARNING: The issuer's subject key identifier "
+                . "extension ($issuer->{SUBJECT_KEY_IDENTIFIER}) does not "
+                . "match the authority key identifier extension contained "
+                . "in the certificate "
+                . "($certificate->{AUTHORITY_KEY_IDENTIFIER}). Are you sure "
+                . "your chain is correct?\n";
+        }
+        if ($issuer->{SUBJECT} ne $certificate->{ISSUER_DN}) {
+            print STDERR "WARNING: The issuer's subject ($issuer->{SUBJECT}) "
+                . "does not match the issuer DN contained in the certificate "
+                . "($certificate->{ISSUER_DN}). Are you sure your chain is "
+                . "correct?\n";
+        }
+        exit 0;
+    }
+
+    print STDERR "Unknown certificate subcommand '$subcmd'.\n";
     exit 1;
 }
 
 if ($cmd eq 'key') {
-    my $subcommand = shift || '';
-
     if (! get_config($configfile, qw( crypto_layer pki_realm ))) {
 	print STDERR "Could not obtain OpenXPKI instance configuration\n";
 	exit 1;
@@ -938,7 +1517,7 @@ if ($cmd eq 'key') {
 	exit 1;
     }
 
-    if ($subcommand eq 'list') {
+    if ($subcmd eq 'list') {
 	my $rc = list_keys(
 	    {
 		REALM => $params{realm},
@@ -946,7 +1525,7 @@ if ($cmd eq 'key') {
 	exit 0;
     }
 
-    if ($subcommand eq 'generate') {
+    if ($subcmd eq 'generate') {
         my $key_id = shift || '';
         if ($key_id eq '') {
             print STDERR "Please specify a token ID after generate (see output of key list for a list of possible values).\n";
@@ -960,7 +1539,7 @@ if ($cmd eq 'key') {
 	exit 0;
     }
 
-    print STDERR "Unknown key subcommand '$subcommand'.\n";
+    print STDERR "Unknown key subcommand '$subcmd'.\n";
     exit 1;
 }
 
@@ -975,14 +1554,15 @@ openxpkiadm - tool for management operations of OpenXPKI instances
 
 =head1 USAGE
 
-openxpkiadm [OPTIONS] COMMAND
+openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
 
  Global options:
-   --help                brief help message
-   --man                 full documentation
    --config FILE         use configuration from FILE
 
  Commands:
+   help                  brief help message
+   man                   full documentation
+   version               print program version and exit
    deploy                Deploy a new OpenXPKI installation
    initdb                Initialize database
    key                   Manage keys
@@ -997,7 +1577,8 @@ Available commands:
 Command options:
 
    --prefix DIR          Use specified prefix during deployment
-   --templatedir DIR     Use specified directory as base directory for templates
+   --templatedir DIR     Use specified directory as base directory for
+                         templates
    --template TEMPLATE   Use specified template (defaults to 'default')
    --force               Force operation (may be destructive)
 
@@ -1023,7 +1604,8 @@ deployment.
 Command options:
 
    --force               Force operation (may be destructive)
-   --dryrun              Don't change anything, just print what would be done
+   --dryrun              Don't change anything, just print what would
+                         be done
 
 Initializes the OpenXPKI database schema. Will not destroy existing data
 unless called with --force.
@@ -1054,7 +1636,7 @@ following:
 
 Example:
 
-  openxpkiadm --realm 'Root CA' key list
+  openxpkiadm key list --realm 'Root CA' 
 
 =item B<generate> I<Key ID>
 
@@ -1062,6 +1644,7 @@ Command options:
 
    --realm               PKI Realm to operate on
    --purpose             The purpose of the key (e.g. CA, SCEP)
+   --id                  The name of the configured key
 
 Generates an asymmetric key pair. The command will use the secret 
 splitting method specified in the token configuration. For valid key IDs,
@@ -1079,21 +1662,17 @@ regarding key generation with the particular product.
 
 Example:
 
-  openxpkiadm --realm 'Root CA' --purpose 'CA' key generate 'Root CA 1'
-
+  openxpkiadm key generate --realm 'Root CA' --purpose 'CA' \
+     --id 'Root CA 1'
 
 =back
 
 =head2 certificate
 
-Command options:
-
-   --realm               PKI Realm to operate on
-
 Starts a certificate management command and allows to list, install,
 delete and connect certificates for the configured PKI Realms.
 
-  openxpkiadm --realm <realm> certificate <subcommand> <options>
+  openxpkiadm certificate <subcommand> <options>
 
 =head3 certificate management subcommands
 
@@ -1101,74 +1680,137 @@ delete and connect certificates for the configured PKI Realms.
 
 =item B<list>
 
-Lists all non-endentity certificates present in the database for 
-the specified realm. 
+Subcommand options (optional):
+
+   --realm                  PKI realm to operate on
+   --all                    Show all certificates
+   -v                       Show subject and issuer DN as well
+   -v -v                    Show chain as well
+   -v -v -v                 Show (nearly complete) database entry
+   -v -v -v -v              Show pubkey and certificate data, too
+
+Lists certificates present in the database for 
+the specified realm. If --all is not specified, only certificates
+that have an alias defined for them are listed. --all lists all
+certificates, regardless of whether they have an alias or not.
+If --realm is left out, the certificates in all realms are listed
+The number of -v's increases the verbosity (see above for what is
+listed in which case).
 
 =item B<import>
 
-Adds a certificate to the specified realm. Please note that this
-only imports the certificate into the database but does NOT connect
-it to another certificate.
-Use the --handle option to specify a certificate handle (must be unique
-within a PKI realm). If no --handle is specified the command will 
-automatically generate a unique handle for the certificate.
+Subcommand options:
 
-You will have to call the B<chain> function in order to create a certificate
-chain.
+Mandatory:
+  --realm                   PKI realm to import certificate to
+  --file                    the PEM file to import from
+  --issuer                  the issuer alias or identifier
 
-Example: 
+Optional:
+  --issuer-realm            the realm where the issuer alias
+                            is defined
+  --role                    the role of the certificate owner 
 
-  openxpkiadm --realm 'Root CA' certificate add --file cacert.pem \
-              --handle 'Root CA 1'
+Force options (use only if you exactly now what you are doing!):
+  --force-really-self-signed 
+        The certificate is really self-signed
+  --force-issuer-not-found
+        Don't care that the issuer is not in the database
+  --force-certificate-already-exists
+        Don't care that the certificate is already in database
+
+Once again, only use these options if you actually have to (the
+occasions where this happens should be really, really rare).
+
+Adds a certificate to the database. There are two different ways to
+call it, depending on whether you have a self-signed certificate
+or not. With a self-signed certificate, the --realm and --issuer options
+are left out, with a "normal" certificate, they are mandatory.
+
+The command outputs the subject's DN and the issuer's DN for you to
+verify that you imported the correct certificate as well as a unique
+identifier which can be used to globally reference the certificate
+(i.e. for configuration or as an issuer). If you don't want to remember
+the identifier, look into openxpkiadm certificate alias to find out
+how to create a symbolic name for an identifier.
+
+Examples: 
+
+  openxpkiadm certificate import --file cacert.pem 
+
+Imports a self-signed CA certificate.
+
+  openxpkiadm certificate import --realm 'Root CA' \
+        --file subca1.pem --issuer 'Root CA 1'
+
+Imports a Sub CA certificate which is signed by Root CA 1.
 
 =item B<remove>
+
+Subcommand options:
+
+Mandatory:
+  --name            The alias or identifier of the certificate
+
+Optional:
+  --realm           The PKI realm in which the alias is defined
+
+Force options (use only if you now what you are doing!):
+  --force-is-issuer Delete certificate even though it is the
+                    issuer of another certificate in the database
 
 Removes a certificate from the database.
 
 Example: 
 
-  openxpkiadm --realm 'Root CA' certificate remove --handle 'Root CA 1'
+  openxpkiadm certificate remove --realm 'Root CA' \
+        --name 'Root CA 1'
 
 =item B<chain>
 
+Subcommand options:
+
+Mandatory:
+  --realm               The PKI realm to operate in
+  --name                The alias or identifier of the child
+  --issuer              The alias or identifier of the parent
+
+Optional:
+  --issuer-realm        The realm in which the issuer alias
+                        is defined
+
+Force options (use only if you now what you are doing!):
+  --force-certificate-not-found
+        Ignore that the certificate of the child was not found
+        in the DB
+  --force-issuer-certificate-not-found
+        Ignore that the certificate of the parent was not found
+        in the DB
+
+Once again, only use these options if you actually have to (the
+occasions where this happens should be really, really rare).
+
 Specifies subject/issuer relationship in order to set up certificate
 chains. The certificates to be connected must already be present in
-the database (see B<add>).
+the database (see B<import>). As those connections are already set up
+during --import, this command exists for changing the issuer if you
+made an error. It also allows to specify an issuer that does not
+agree with the information contained in the certificate (but outputs
+an warning)
 
 Example: 
 
-openxpkiadm --realm 'Root CA' certificate chain 'Root CA 1' 'Subordinate CA 1'
-
-
-=item B<unchain>
-
-Breaks the subject/issuer relationsship between two certificates.
-
-Example: 
-
-openxpkiadm --realm 'Root CA' certificate unchain 'Root CA 1' 'Subordinate CA 1'
-
+openxpkiadm certificate chain --name 'Subordinate CA 1' \
+    --issuer 'Root CA'
 
 
 =head1 OPTIONS
 
 =over 8
 
-=item B<--help>
-
-Print a brief help message and exits.
-
-=item B<--man>
-
-Prints the manual page and exits.
-
 =item B<--config FILE>
 
 Read configuration file FILE. Uses built-in default if not specified.
-
-=item B<--version>
-
-Print program version and exit.
 
 =item B<--force>
 

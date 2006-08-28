@@ -32,14 +32,17 @@ my %SEQUENCE_of = (
     );
 
 my %COLUMN_of = (
-    PKI_REALM             => "pki_realm",
-    CA                    => "ca_name",
-    ISSUING_CA            => "issuing_ca",
-    ISSUING_PKI_REALM     => "issuing_pki_realm",  # FIXME: remove this
-    REFERENCED_REALM      => "referenced_realm",
-    ISSUER_ALIAS          => "issuer_alias",
-    ALIAS                 => "alias",
-    IDENTIFIER            => "identifier",
+    PKI_REALM                => "pki_realm",
+    CA                       => "ca_name",
+    ISSUING_CA               => "issuing_ca",
+    ISSUING_PKI_REALM        => "issuing_pki_realm",  # FIXME: remove this
+    REFERENCED_REALM         => "referenced_realm",
+    ISSUER_IDENTIFIER        => "issuer_identifier",
+    ISSUER_DN                => "issuer_dn",
+    ALIAS                    => "alias",
+    IDENTIFIER               => "identifier",
+    SUBJECT_KEY_IDENTIFIER   => "subject_key_identifier",
+    AUTHORITY_KEY_IDENTIFIER => "authority_key_identifier",
 
     SUBMIT_DATE           => "submit_date",
     TYPE                  => "format",
@@ -127,19 +130,20 @@ my %TABLE_of = (
                      "SCEP_TID", "LOA"]},
     CERTIFICATE => {
         NAME    => "certificate",
-        INDEX   => [ "PKI_REALM", "ISSUER_ALIAS", "CERTIFICATE_SERIAL" ],
-        COLUMNS => [ "PKI_REALM", "ISSUER_ALIAS", "CERTIFICATE_SERIAL",
-		     "IDENTIFIER", "DATA", 
+        INDEX   => [ "PKI_REALM", "ISSUER_DN", "CERTIFICATE_SERIAL" ],
+        COLUMNS => [ "PKI_REALM", "ISSUER_DN", "CERTIFICATE_SERIAL",
+		     "ISSUER_IDENTIFIER", "IDENTIFIER", "DATA", 
                      # "GLOBAL_KEY_ID",
                      "SUBJECT", "EMAIL",
-                     "STATUS", "ROLE", "PUBKEY", "KEYID",
+                     "STATUS", "ROLE", "PUBKEY",
+                     "SUBJECT_KEY_IDENTIFIER", "AUTHORITY_KEY_IDENTIFIER",
                      "NOTAFTER", "LOA", "NOTBEFORE", "CSR_SERIAL"
                    ]},
 
     ALIASES => {
 	NAME    => 'aliases',
 	INDEX   => [ 'IDENTIFIER', 'PKI_REALM', ],
-	COLUMNS => [ 'IDENTIFIER', 'PKI_REALM', 'ALIAS', 'REFERENCED_REALM', ],
+	COLUMNS => [ 'IDENTIFIER', 'PKI_REALM', 'ALIAS', ],
     },
 
     CRR => {
@@ -151,8 +155,8 @@ my %TABLE_of = (
                      "RA", "STATUS", "REASON" ]},
     CRL => {
         NAME    => "crl",
-        INDEX   => [ "PKI_REALM", "ISSUER_ALIAS", "CRL_SERIAL" ],
-        COLUMNS => [ "PKI_REALM", "ISSUER_ALIAS", "CRL_SERIAL",
+        INDEX   => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CRL_SERIAL" ],
+        COLUMNS => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CRL_SERIAL",
                      "TYPE", "DATA",
                      "LAST_UPDATE", "NEXT_UPDATE"]},
     AUDITTRAIL => {

@@ -90,7 +90,67 @@ sub get_role {
 }
 
 
+sub get_chain {
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $arg_ref = shift;
+    my $return_ref;
+    my @identifiers;
+    my @certificates;
+    my $finished = 0;
+    my $complete = 0;
+    my %already_seen; # hash of identifiers that have already been seen
+
+    if (! defined $arg_ref->{START_IDENTIFIER}) {
+	OpenXPKI::Exception->throw(
+	    message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
+        );
+    }
+    if (defined $arg_ref->{OUTFORMAT}) {
+	OpenXPKI::Exception->throw(
+	    message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_OUTFORMAT_NOT_IMPLEMENTED_YET",
+        );
+    }
+    my $start = $arg_ref->{START_IDENTIFIER};
+    my $current_identifier = $start;
+    my $dbi = CTX('dbi_backend');
+
+    while (! $finished) {
+        push @identifiers, $current_identifier;
+        my $cert = $dbi->first(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => {
+                IDENTIFIER => $current_identifier,
+            },
+        );
+        if (! defined $cert) { #certificate not found
+            $finished = 1;
+        }
+        else {
+            if ($cert->{ISSUER_IDENTIFIER} eq $current_identifier) {
+                # self-signed, this is the end of the chain
+                $finished = 1;
+                $complete = 1;
+            }
+            else { # go to parent
+                $current_identifier = $cert->{ISSUER_IDENTIFIER};
+                if (defined $already_seen{$current_identifier}) {
+                    # we've run into a loop!
+                    $finished = 1;
+                }
+                $already_seen{$current_identifier} = 1;
+            }
+        }
+        # TODO: fill @certificate array
+    }
+    $return_ref->{IDENTIFIERS} = \@identifiers;
+    $return_ref->{COMPLETE}    = $complete;
+
+    return $return_ref;
+}
+
 # get one or more CA certificates
+# FIXME: this still assumes we have files in the config
 sub get_ca_certificate {
     my $self  = shift;
     my $ident = ident $self;
@@ -333,6 +393,20 @@ Return structure:
     }
 
   ]
+
+=head2 get_chain
+
+Returns the certificate chain starting at a specified certificate.
+Expects a hash ref with the named parameter START_IDENTIFIER (the
+identifier from which to compute the chain) and optionally a parameter
+OUTFORMAT, which can be either 'PEM' or 'DER'.
+Returns a hash ref with the following entries:
+
+    IDENTIFIERS   the chain of certificate identifiers as an array
+    CERTIFICATES  the certificates as an array of data in outformat
+                  (if requested)
+    COMPLETE      1 if the complete chain was found in the database
+                  0 otherwise
 
 =head2 get_api
 

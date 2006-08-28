@@ -71,9 +71,9 @@ sub insert
             $hash{$key} = $object->get_serial();
             next;
         }
-        if ($key eq "${table}_HANDLE")
+        if ($key eq 'IDENTIFIER')
         {
-            $hash{$key} = $object->get_handle();
+            $hash{$key} = $object->get_identifier();
             next;
         }
         if ($key eq "EMAIL")

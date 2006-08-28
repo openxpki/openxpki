@@ -11,6 +11,7 @@ package OpenXPKI::Crypto::X509;
 use OpenXPKI::Debug 'OpenXPKI::Crypto::X509';
 use OpenXPKI::DN;
 use Math::BigInt;
+use Digest::SHA1 qw(sha1_base64);
 
 use base qw(OpenXPKI::Crypto::Object);
 use English;
@@ -68,6 +69,18 @@ sub __init
         $EVAL_ERROR->rethrow();
     }
 
+    ###############################################
+    ##  compute SHA1 hash of DER representation  ##
+    ###############################################
+    
+    my $cert_der = $self->{TOKEN}->command({
+                        COMMAND => 'convert_cert',
+                        DATA    => $self->{DATA},
+                        OUT     => 'DER',
+    });
+    $self->{SHA1} = sha1_base64($cert_der);
+
+    
     ##########################
     ##     core parsing     ##
     ##########################
@@ -227,7 +240,7 @@ sub __init
             $value = "0x$value";
             $value = Math::BigInt->new ($value);
             $value = $value->bstr();
-            $ret->{EXTENSIONS}->{AUTHORITY_KEY_IDENTIFIER}->{CA_ISSUER_SERIAL} = $value
+            $ret->{EXTENSIONS}->{AUTHORITY_KEY_IDENTIFIER}->{CA_ISSUER_SERIAL} = $value;
         }
     }
     if ($ret->{OPENSSL_EXTENSIONS}->{"X509v3 Subject Key Identifier"}[0])
@@ -285,6 +298,64 @@ sub get_converted
     }
 }
 
+sub get_identifier {
+    my $self = shift;
+
+    if (! exists $self->{SHA1}) {
+        OpenXPKI::Exception->throw(
+            message =>
+                'I18N_OPENXPKI_CRYPTO_X509_GET_IDENTIFIER_NOT_INITIALIZED',
+        );
+    }
+    return $self->{SHA1};
+}
+
+sub get_status {
+    my $self = shift;
+    if (not exists $self->{STATUS}) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_X509_GET_STATUS_NOT_INITIALIZED");
+    }
+    return $self->{STATUS};
+}
+
+sub set_status {
+    my $self = shift;
+
+    $self->{STATUS} = shift;
+    return $self->get_status();
+}
+
+sub get_subject_key_id {
+    my $self = shift;
+    if (exists $self->{PARSED}->{BODY}->{EXTENSIONS}->{SUBJECT_KEY_IDENTIFIER}) {
+        return $self->{PARSED}->{BODY}->{EXTENSIONS}->{SUBJECT_KEY_IDENTIFIER};
+    }
+    else {
+        return undef;
+    }
+}
+
+sub get_authority_key_id {
+    my $self = shift;
+
+    my $authkeyid
+        = $self->{PARSED}->{BODY}->{EXTENSIONS}->{AUTHORITY_KEY_IDENTIFIER};
+    if (exists $authkeyid->{CA_KEYID}) {
+        return $authkeyid->{CA_KEYID};
+    }
+    elsif (exists $authkeyid->{CA_ISSUER_NAME}
+        && exists $authkeyid->{CA_ISSUER_SERIAL}) {
+        my $return_hashref;
+        $return_hashref->{ISSUER_NAME}   = $authkeyid->{CA_ISSUER_NAME};
+        $return_hashref->{ISSUER_SERIAL} = $authkeyid->{CA_ISSUER_SERIAL};
+        return $return_hashref;
+    }
+    else {
+        return undef;
+    }
+}
+
 1;
 __END__
 
@@ -314,3 +385,28 @@ the base of the object.
 expects only one value - the requested format of the certificate.
 PEM, TXT and DER are supported. TXT is a plain text representation
 which can be directly displayed to the user.
+
+=head2 get_identifier
+
+returns the base64-encoded SHA1 hash of the DER representation of the
+certificate, which is used as an identifier in the database
+
+=head2 set_status
+
+sets the certificate status, i.e. VALID, SUSPENDED, REVOKED
+
+=head2 get_status
+
+gets the certificate status
+
+=head2 get_subject_key_id
+
+gets the subject key identifier from the extension, if present.
+If not, returns undef.
+
+=head2 get_authority_key_id
+
+gets the authority key identifier from the extension, if present.
+Returns either the key identifier as a string or a hash reference
+containing the ISSUER_NAME and ISSUER_SERIAL field, if the key identifier
+is not present. If none of the above are available, returns undef.
