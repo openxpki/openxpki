@@ -131,6 +131,7 @@ ok(OpenXPKI::Server::Init::init(
 		       'api',
 		       'authentication',
 		       ],
+	   SILENT => 1,
        }));
 
 ### get logging module

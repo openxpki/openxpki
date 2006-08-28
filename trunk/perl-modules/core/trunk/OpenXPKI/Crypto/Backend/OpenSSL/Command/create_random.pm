@@ -60,7 +60,9 @@ sub get_result
     ## remove trailing newline
     ## remove trailing =
     $random =~ s/\n//gs;
-    $random =~ s/=*$//gs;
+    if (! (exists $self->{INCLUDE_PADDING} && $self->{INCLUDE_PADDING})) {
+	$random =~ s/=*$//gs;
+    }
 
     if ($self->{RETURN_LENGTH} and not $self->{RANDOM_LENGTH}) {
         $random = substr ($random, 0, $self->{RETURN_LENGTH});
@@ -99,6 +101,11 @@ return length.
 =item * RETURN_LENGTH
 
 =item * RANDOM_LENGTH
+
+=item * INCLUDE_PADDING
+
+If set to a true value trailing '=' characters are not removed from
+the output.
 
 =back
 

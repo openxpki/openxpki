@@ -117,12 +117,15 @@ sub init {
 
 	$is_initialized{$task}++;
 
-	log_wrapper(
-	    {
-		MESSAGE  => "Initialization task '$task' finished",
-		PRIORITY => "info",
-		FACILITY => "system",
-	    });
+	# suppress informational output if SILENT is specified
+	if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
+	    log_wrapper(
+		{
+		    MESSAGE  => "Initialization task '$task' finished",
+		    PRIORITY => "info",
+		    FACILITY => "system",
+		});
+	}
     }
     return 1;
 }
@@ -871,6 +874,9 @@ to initialize the remaining tasks.
 
 If called without the TASKS argument the function will perform all steps
 that were not already executed before.
+
+If called with the named argument SILENT set to a true value the 
+init method does not log successful initialization steps.
 
 =head3 get_remaining_init_tasks
 

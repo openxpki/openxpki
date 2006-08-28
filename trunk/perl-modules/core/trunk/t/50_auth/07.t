@@ -17,6 +17,7 @@ OpenXPKI::Server::Init::init(
     {
 	CONFIG => 't/config.xml',
 	TASKS => [ 'xml_config' ],
+	SILENT => 1,
     });
 
 ## create new session

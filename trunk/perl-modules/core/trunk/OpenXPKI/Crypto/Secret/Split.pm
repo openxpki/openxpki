@@ -187,11 +187,8 @@ use OpenXPKI::Crypto::TokenManager;
             COMMAND       => 'create_random',
             RETURN_LENGTH => $byte_length,
             RANDOM_LENGTH => $byte_length,
+	    INCLUDE_PADDING => 1,
         });
-
-	# create_random chops off the trailing '=' which is frowned upon
-	# by MIME::Base64
-	$random .= '=' unless $random =~ m{ = \z }xms;
 
         my $secret_data = decode_base64($random);
         #open my $OPENSSL, "openssl rand $byte_length|";

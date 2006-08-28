@@ -44,11 +44,8 @@ use MIME::Base64;
 	    {
 		COMMAND => 'create_random',
 		RANDOM_LENGTH => 32,
+		INCLUDE_PADDING => 1,
 	    });
-
-	# create_random chops off the trailing '=' which is frowned upon
-	# by MIME::Base64
-	$key .= '=' unless $key =~ m{ = \z }xms;
 
 	# convert base64 to binary and get hex representation of this data
 	$session_key{$ident} = uc(unpack('H*', 
@@ -58,11 +55,8 @@ use MIME::Base64;
 	    {
 		COMMAND => 'create_random',
 		RANDOM_LENGTH => 16,
+		INCLUDE_PADDING => 1,
 	    });
-
-	# create_random chops off the trailing '=' which is frowned upon
-	# by MIME::Base64
-	$iv .= '=' unless $iv =~ m{ = \z }xms;
 
 	# convert base64 to binary and get hex representation of this data
 	$session_iv{$ident} = uc(unpack('H*', 
