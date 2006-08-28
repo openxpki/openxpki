@@ -95,8 +95,7 @@ sub do_step {
 		ok($workflow->execute_action($args{EXECUTE_ACTION}));
 	    };
 	    if (my $exc = OpenXPKI::Exception->caught()) {
-		#warn $@->error, "\n", $@->trace->as_string, "\n";
-		warn $@->error, "\n";
+		warn $exc->full_message() . "\n";
 		ok(0);
 	    } elsif ($@) {
 		warn "Non-OpenXPKI exception: ", $@->error, "Trace: ", $@->trace->as_string, "\n";

@@ -78,22 +78,22 @@ sub set_status
     return $self->get_status();
 }
 
-sub get_handle
+sub get_issuer_alias
 {
     my $self = shift;
-    if (not exists $self->{HANDLE})
+    if (not exists $self->{ISSUER_ALIAS})
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_HANDLE_NOT_INITIALIZED");
+            message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_ISSUER_ALIAS_NOT_INITIALIZED");
     }
-    return $self->{HANDLE};
+    return $self->{ISSUER_ALIAS};
 }
 
-sub set_handle
+sub set_issuer_alias
 {
     my $self = shift;
-    $self->{HANDLE} = shift;
-    return $self->get_handle();
+    $self->{ISSUER_ALIAS} = shift;
+    return $self->get_issuer_alias();
 }
 
 sub set_header_attribute

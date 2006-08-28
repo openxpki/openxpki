@@ -142,7 +142,7 @@ use OpenXPKI::Crypto::TokenManager;
             return 1;
         }
         else {
-            return undef;
+            return;
         }
     }
 
@@ -163,7 +163,7 @@ use OpenXPKI::Crypto::TokenManager;
                 return uc(substr($reconstructed->as_hex(), 2));
             }
             else {
-                return undef; # not enough shares yet
+                return; # not enough shares yet
             }
         }
     }
@@ -188,6 +188,11 @@ use OpenXPKI::Crypto::TokenManager;
             RETURN_LENGTH => $byte_length,
             RANDOM_LENGTH => $byte_length,
         });
+
+	# create_random chops off the trailing '=' which is frowned upon
+	# by MIME::Base64
+	$random .= '=' unless $random =~ m{ = \z }xms;
+
         my $secret_data = decode_base64($random);
         #open my $OPENSSL, "openssl rand $byte_length|";
         #my $secret_data = <$OPENSSL>;

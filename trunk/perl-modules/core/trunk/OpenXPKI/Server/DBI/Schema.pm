@@ -151,8 +151,8 @@ my %TABLE_of = (
                      "RA", "STATUS", "REASON" ]},
     CRL => {
         NAME    => "crl",
-        INDEX   => [ "PKI_REALM", "CA", "CRL_SERIAL" ],
-        COLUMNS => [ "PKI_REALM", "CA", "CRL_SERIAL",
+        INDEX   => [ "PKI_REALM", "ISSUER_ALIAS", "CRL_SERIAL" ],
+        COLUMNS => [ "PKI_REALM", "ISSUER_ALIAS", "CRL_SERIAL",
                      "TYPE", "DATA",
                      "LAST_UPDATE", "NEXT_UPDATE"]},
     AUDITTRAIL => {
@@ -187,13 +187,13 @@ my %TABLE_of = (
                      "TABLE", "SERIAL",
                      "UNTIL" ]},
 
-    DATAEXCHANGE => {
-        NAME    => "dataexchange",
-        INDEX   => [ "DATAEXCHANGE_SERIAL" ],
-        COLUMNS => [ "DATAEXCHANGE_SERIAL",
-                     "TABLE", "PKI_REALM", "CA", "SERIAL",
-		     "WORKFLOW_SERIAL", "WORKFLOW_CONTEXT_KEY",
-                     "SERVERID", "EXPORTID" ]},
+#     DATAEXCHANGE => {
+#         NAME    => "dataexchange",
+#         INDEX   => [ "DATAEXCHANGE_SERIAL" ],
+#         COLUMNS => [ "DATAEXCHANGE_SERIAL",
+#                      "TABLE", "PKI_REALM", "CA", "SERIAL",
+# 		     "WORKFLOW_SERIAL", "WORKFLOW_CONTEXT_KEY",
+#                      "SERVERID", "EXPORTID" ]},
     
     WORKFLOW => {
         NAME    => "workflow",
@@ -294,6 +294,14 @@ sub get_table_name
 
     __check_param($table);
 
+    if (not exists $TABLE_of{$table})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_NAME_UNKNOWN_TABLE",
+            params  => {
+		TABLE => $table,
+	    });
+    }
     return $TABLE_of{$table}->{NAME};
 }
 
@@ -304,6 +312,15 @@ sub get_table_index
 
     __check_param($table);
 
+    if (not exists $TABLE_of{$table})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_INDEX_UNKNOWN_TABLE",
+            params  => {
+		TABLE => $table,
+	    });
+    }
+
     return $TABLE_of{$table}->{INDEX};
 }
 
@@ -313,6 +330,15 @@ sub get_table_columns
     my $table = shift;
 
     __check_param($table);
+
+    if (not exists $TABLE_of{$table})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_COLUMNS_UNKNOWN_TABLE",
+            params  => {
+		TABLE => $table,
+	    });
+    }
 
     return $TABLE_of{$table}->{COLUMNS};
 }
@@ -331,6 +357,14 @@ sub get_sequence_name
 
     __check_param($sequence);
 
+    if (not exists $SEQUENCE_of{$sequence})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_SEQUENCE_NAME_UNKNOWN_SEQUENCE",
+            params  => {
+		SEQUENCE => $sequence,
+	    });
+    }
     return $SEQUENCE_of{$sequence};
 }
 
@@ -348,6 +382,15 @@ sub get_index_name
 
     __check_param($index);
 
+    if (not exists $INDEX_of{$index})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_INDEX_NAME_UNKNOWN_INDEX",
+            params  => {
+		INDEX => $index,
+	    });
+    }
+
     return $INDEX_of{$index}->{NAME};
 }
 
@@ -358,6 +401,15 @@ sub get_index_table
 
     __check_param($index);
 
+    if (not exists $INDEX_of{$index})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_INDEX_TABLE_UNKNOWN_INDEX",
+            params  => {
+		INDEX => $index,
+	    });
+    }
+
     return $INDEX_of{$index}->{TABLE};
 }
 
@@ -367,6 +419,15 @@ sub get_index_columns
     my $index = shift;
 
     __check_param($index);
+
+    if (not exists $INDEX_of{$index})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_INDEX_COLUMNS_UNKNOWN_INDEX",
+            params  => {
+		INDEX => $index,
+	    });
+    }
 
     return $INDEX_of{$index}->{COLUMNS};
 }

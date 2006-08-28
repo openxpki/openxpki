@@ -61,6 +61,11 @@ sub insert
             $hash{STATUS} = "VALID" if ($hash{STATUS} eq "EXPIRED");
             next;
         }
+        if ($key eq "ISSUER_ALIAS")
+        {
+            $hash{ISSUER_ALIAS} = $object->get_issuer_alias();
+            next;
+        }
         if ($key eq "${table}_SERIAL")
         {
             $hash{$key} = $object->get_serial();

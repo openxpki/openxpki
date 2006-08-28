@@ -62,7 +62,7 @@ use MIME::Base64;
 
 	# create_random chops off the trailing '=' which is frowned upon
 	# by MIME::Base64
-	$iv .= '=' unless $key =~ m{ = \z }xms;
+	$iv .= '=' unless $iv =~ m{ = \z }xms;
 
 	# convert base64 to binary and get hex representation of this data
 	$session_iv{$ident} = uc(unpack('H*', 

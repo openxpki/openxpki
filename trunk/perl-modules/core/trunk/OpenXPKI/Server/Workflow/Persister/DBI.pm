@@ -10,6 +10,8 @@ use base qw( Workflow::Persister );
 use utf8;
 use English;
 
+# use Smart::Comments;
+
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Persister::DBI';
 
 use OpenXPKI::Server::Workflow::Persister::DBI::SequenceId;
@@ -81,12 +83,33 @@ sub update_workflow {
     
     ##! 2: "check if the workflow is in the database"
 
+    my $mode = 'UPDATE';
     eval
     { 
         my $oldwf = $self->fetch_workflow ($id);
+	### $oldwf
+	### $EVAL_ERROR
     };
-    if ($EVAL_ERROR)
+    if (my $exc = OpenXPKI::Exception->caught()) {
+	if ($exc->message() eq 'I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_FETCH_WORKFLOW_NOT_FOUND') {
+	    $mode = 'INSERT';
+	} else {
+	    ### $exc->full_message()
+	    $exc->rethrow();
+	}
+    } elsif ($EVAL_ERROR) {
+	if (ref $EVAL_ERROR) {
+	    $EVAL_ERROR->rethrow();
+	} else {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_FETCH_WORKFLOW_FAILURE",
+		params  => {EVAL_ERROR => $EVAL_ERROR});
+	}
+    }
+    
+    if ($mode eq 'INSERT')
     {
+	
         ##! 4: "we cannot get the workflow so we try to create it"
         $data{PKI_REALM}       = CTX('session')->get_pki_realm();
 
@@ -204,7 +227,8 @@ sub fetch_workflow {
 	    PKI_REALM  => CTX('session')->get_pki_realm(),
 	},
 	);
-    
+    ### $result
+
     if (! $result ||
 	(! $result->{WORKFLOW_STATE}) ||
 	(! $result->{WORKFLOW_LAST_UPDATE})) {

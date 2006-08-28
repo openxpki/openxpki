@@ -4,11 +4,11 @@
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::Server::DBI::Hash;
+
 use strict;
 use warnings;
 use utf8;
-
-package OpenXPKI::Server::DBI::Hash;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::DBI::Hash';
 use OpenXPKI::Server::Context qw( CTX );
@@ -98,14 +98,15 @@ sub select
     ## build a hash from the returned array
 
     my @array = ();
-    my $cols  = $self->{schema}->get_table_columns ($keys->{TABLE});
+    my @cols  = $self->{SQL}->get_symbolic_query_columns($keys);
+
     foreach my $arrayref (@{$result})
     {
         my $hashref = undef;
         next if (not $arrayref);
-        for (my $i=0; $i<scalar @{$cols}; $i++)
+        for (my $i=0; $i<scalar @cols; $i++)
         {
-            $hashref->{$cols->[$i]} = $arrayref->[$i];
+            $hashref->{$cols[$i]} = $arrayref->[$i];
         }
         push @array, $hashref;
     }
@@ -154,7 +155,8 @@ sub __log_write_action
     {
         next if ($col eq "SERIAL");
         next if ($col eq "PKI_REALM");
-        next if ($col eq "CA");
+        next if ($col eq "IDENTIFIER");
+        next if ($col eq "ISSUER_ALIAS");
 
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_HASH_LOG_WRITE_ACTION_WRONG_INDEX_COLUMN",
@@ -187,16 +189,16 @@ sub __log_write_action
                        FILENAME => $filename,
                        LINE     => $line);
 
-    ## write dataexchange log
-    $self->{SQL}->delete (TABLE => "DATAEXCHANGE",
-                          DATA  => {TABLE => $table, %index});
-    my $serial = $self->{SQL}->get_new_serial (NAME => "DATAEXCHANGE");
-    $self->{SQL}->insert (TABLE => "DATAEXCHANGE",
-                          DATA  => {"DATAEXCHANGE_SERIAL" => $serial,
-                                    "TABLE"        => $table,
-                                    "SERVERID"     => -1,
-                                    "EXPORTID"     => 0,
-                                    %index});
+#     ## write dataexchange log
+#     $self->{SQL}->delete (TABLE => "DATAEXCHANGE",
+#                           DATA  => {TABLE => $table, %index});
+#     my $serial = $self->{SQL}->get_new_serial (NAME => "DATAEXCHANGE");
+#     $self->{SQL}->insert (TABLE => "DATAEXCHANGE",
+#                           DATA  => {"DATAEXCHANGE_SERIAL" => $serial,
+#                                     "TABLE"        => $table,
+#                                     "SERVERID"     => -1,
+#                                     "EXPORTID"     => 0,
+#                                     %index});
 
     return 1;
 }

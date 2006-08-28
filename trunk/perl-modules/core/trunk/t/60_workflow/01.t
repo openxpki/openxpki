@@ -100,25 +100,25 @@ $workflow->context()->param({ binarydata => undef });
 $workflow->context()->param(_binarydata => $binary_data);
 ok($workflow->context()->param('_binarydata') eq $binary_data);
 
-
+### execute null action
 do_step($workflow, 
 	EXPECTED_STATE => 'INITIAL',
 	EXPECTED_ACTIONS => [ 'null' ],
 	EXECUTE_ACTION => 'null',
     );
 
-# expect that the volatile object is still around
+### expect that the volatile object is still around
 ok($workflow->context()->param('_binarydata') eq $binary_data);
 
-# delete context instance
+### delete context instance
 $workflow = undef;
-# and resurrect it
+### and resurrect it
 $workflow = $factory->fetch_workflow('dummy workflow', $workflow_id);
 
 ### check if we got the correct workflow back...
 ok($workflow->id(), $workflow_id);
 
-# expect that the volatile object is now gone (does not survive resurrection)
+### expect that the volatile object is now gone
 ok($workflow->context()->param('_binarydata'), undef);
 
 # check if context entries are persistent

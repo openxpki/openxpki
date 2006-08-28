@@ -5,7 +5,7 @@ use Test;
 use OpenXPKI::XML::Config;
 use Time::HiRes;
 
-BEGIN { plan tests => 6 };
+BEGIN { plan tests => 7, todo => [ 7 ] };
 
 print STDERR "XINCLUDE SUPPORT\n";
 ok(1);
@@ -38,5 +38,15 @@ ok ($obj->get_xpath (COUNTER => 1, XPATH => $xpath),
     "after xi");
 ok ($obj->get_xpath (COUNTER => 2, XPATH => $xpath),
     "testdata");
+
+
+# test multiple includes
+## create new object
+$obj = undef;
+eval {
+    $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/top2.xml");
+};
+
+ok($obj);
 
 1;

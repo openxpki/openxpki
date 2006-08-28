@@ -28,6 +28,7 @@ ok($cert and $crl);
 
 # insert CA certificate
 $cert->set_status ("VALID");
+$cert->set_issuer_alias ("Dummy");
 ok($cert);
 $dbi->insert (TABLE => "CERTIFICATE", OBJECT => $cert);
 ok(1);
@@ -36,17 +37,20 @@ ok(1);
 
 my %hash = (
             PKI_REALM          => "Test Root CA",
-            CA                 => "INTERNAL_CA_1",
             CERTIFICATE_SERIAL => $cert->get_serial(),
             ISSUING_REALM      => "Test Root CA",
+            ISSUER_ALIAS       => "foobar-02",
             ISSUING_CA         => "INTERNAL_CA_1"
            );
-$dbi->insert (TABLE => "CA", HASH => \%hash);
+$dbi->insert (TABLE => "CERTIFICATE", HASH => \%hash);
 ok(1);
 
 # insert first CRL
 
+$crl->set_issuer_alias ("Dummy");
 $dbi->insert (TABLE => "CRL", OBJECT => $crl);
+$dbi->commit();
+
 ok(1);
 
 1;

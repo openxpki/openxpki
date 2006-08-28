@@ -1,0 +1,6 @@
+<openxpki>
+    <config>before xi</config>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="sub.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="sub.xml"/>
+    <config>after xi</config>
+</openxpki>
