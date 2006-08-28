@@ -54,7 +54,7 @@ install: makedirs installtemplates installbin postinstallhelp
 
 tools: $(TOOLS)
 
-$(TOOLS_DST): $(TOOLS_SRC)
+$(TOOLS_DST): $(TOOLS_SRC) $(CONFIGFILE)
 	for file in $(TOOLS_DST) ; do \
 		$(CFG) --config $(CONFIGFILE) --file $$file.in >$$file ;\
 	done
