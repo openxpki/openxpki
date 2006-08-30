@@ -41,6 +41,7 @@ my %COLUMN_of = (
     ISSUER_DN                => "issuer_dn",
     ALIAS                    => "alias",
     IDENTIFIER               => "identifier",
+    CERTIFICATE_IDENTIFIER   => "identifier",
     SUBJECT_KEY_IDENTIFIER   => "subject_key_identifier",
     AUTHORITY_KEY_IDENTIFIER => "authority_key_identifier",
 
@@ -66,12 +67,16 @@ my %COLUMN_of = (
     WORKFLOW_VERSION_SERIAL  => "workflow_version_id",
     WORKFLOW_HISTORY_SERIAL  => "workflow_hist_id",
 
+    ATTRIBUTE_KEY         => 'attribute_key',
+    ATTRIBUTE_VALUE       => 'attribute_value',
     SUBJECT               => "subject",
     EMAIL                 => "email",
     RA                    => "ra",
     LAST_UPDATE           => "last_update",
     NEXT_UPDATE           => "next_update",
+    PUBLICATION_DATE      => "publication_date",
     ROLE                  => "role",
+    PROFILE               => "profile",
     PUBKEY                => "public_key",
     NOTAFTER              => "notafter",
     NOTBEFORE             => "notbefore",
@@ -80,7 +85,7 @@ my %COLUMN_of = (
     PUBLIC                => "public_cert",
     
     STATUS                => "status",
-    REASON                => "reason",
+    REVOCATION_REASON     => "reason",
     SERIAL                => "object_serial",
     TABLE                 => "object_type",
     UNTIL                 => "valid_until",
@@ -124,10 +129,27 @@ my %TABLE_of = (
         NAME    => "request",
         INDEX   => [ "PKI_REALM", "CSR_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "CSR_SERIAL",
-                     "TYPE", "DATA", "GLOBAL_KEY_ID",
-                     "SUBJECT", "EMAIL", "RA",
-                     "STATUS", "ROLE", "PUBKEY",
-                     "SCEP_TID", "LOA"]},
+                     "TYPE",  # SPKAC, PKCS#10, IE...
+		     "DATA",  # the pkcs#10/spkac request
+		     "PROFILE", 
+		     "LOA",
+		     # "PUBKEY",
+		     # "RA",
+	    ]},
+
+    # CSR attributes, e. g.
+    #"GLOBAL_KEY_ID",
+    #"SUBJECT", "EMAIL"
+    # "SCEP_TID"
+    CSR_ATTRIBUTES => {
+        NAME    => "csr_attributes",
+        INDEX   => [ "PKI_REALM", "CSR_SERIAL", ],
+        COLUMNS => [ "PKI_REALM", "CSR_SERIAL",
+		     "ATTRIBUTE_KEY", 
+		     "ATTRIBUTE_VALUE",
+	    ],
+    },
+    
     CERTIFICATE => {
         NAME    => "certificate",
         INDEX   => [ "PKI_REALM", "ISSUER_DN", "CERTIFICATE_SERIAL" ],
@@ -140,6 +162,16 @@ my %TABLE_of = (
                      "NOTAFTER", "LOA", "NOTBEFORE", "CSR_SERIAL"
                    ]},
 
+    CERTIFICATE_ATTRIBUTES => {
+        NAME    => "certificate_attributes",
+        INDEX   => [ "IDENTIFIER", ],
+        COLUMNS => [ "IDENTIFIER", 
+		     "ATTRIBUTE_KEY", 
+		     "ATTRIBUTE_VALUE",
+	    ],
+    },
+
+
     ALIASES => {
 	NAME    => 'aliases',
 	INDEX   => [ 'IDENTIFIER', 'PKI_REALM', ],
@@ -148,17 +180,23 @@ my %TABLE_of = (
 
     CRR => {
         NAME    => "crr",
-        INDEX   => [ "PKI_REALM", "CA", "CRR_SERIAL" ],
-        COLUMNS => [ "PKI_REALM", "CA", "CRR_SERIAL",
-                     "REVOKE_CERTIFICATE_SERIAL", "SUBMIT_DATE",
-                     "TYPE", "DATA", "GLOBAL_KEY_ID",
-                     "RA", "STATUS", "REASON" ]},
+        INDEX   => [ "PKI_REALM", "CRR_SERIAL" ],
+        COLUMNS => [ "PKI_REALM", "CRR_SERIAL",
+                     "CERTIFICATE_IDENTIFIER", 
+		     "SUBMIT_DATE",
+		     "REVOCATION_REASON",
+                     #"TYPE", "DATA", "GLOBAL_KEY_ID",
+                     #"RA", "STATUS", "REASON",
+	    ]},
     CRL => {
         NAME    => "crl",
         INDEX   => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CRL_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CRL_SERIAL",
                      "TYPE", "DATA",
-                     "LAST_UPDATE", "NEXT_UPDATE"]},
+                     "LAST_UPDATE", 
+		     "NEXT_UPDATE",
+		     "PUBLICATION_DATE",
+	    ]},
     AUDITTRAIL => {
         NAME    => "audittrail",
         INDEX   => [ "AUDITTRAIL_SERIAL" ],
