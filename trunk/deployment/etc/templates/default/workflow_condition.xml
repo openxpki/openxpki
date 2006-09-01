@@ -31,8 +31,8 @@
   <condition name="ACL::cancel_csr_approval" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="cancel_csr_approval"/>
   </condition>
-  <condition name="ACL::execute_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="execute_csr"/>
+  <condition name="ACL::insert_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="insert_csr"/>
   </condition>
   <condition name="ACL::reject_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="reject_csr"/>
@@ -77,6 +77,10 @@
     <!-- FIXME: insert proper arguments here -->
     <param name="key" value="ca"/>
     <param name="status" value="unusable"/>
+  </condition>
+
+  <condition name="CONTEXT::no_csr_serial_present" class="OpenXPKI::Server::Workflow::Condition::ContextParameterExistence">
+    <param name="parameter" value="csr_serial"/>
   </condition>
 
 </conditions>

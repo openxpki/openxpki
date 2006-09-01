@@ -1,9 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::CreateProcess.pm
+# OpenXPKI::Server::Workflow::Activity::Tools::CreateWorkflowInstance.pm
 # Written by Michael Bell for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
 # $Revision: 320 $
 
-package OpenXPKI::Server::Workflow::Activity::Tools::CreateProcess;
+package OpenXPKI::Server::Workflow::Activity::Tools::CreateWorkflowInstance;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
@@ -18,7 +18,7 @@ sub execute
 
     ## get needed informations
     my $context = $workflow->context();
-    my $type    = $context->param('create_workflow_type');
+    my $type    = $self->param('workflow_type');
     my $api     = CTX('api');
 
     ## create new workflow
@@ -33,15 +33,17 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::CreateProcess
+OpenXPKI::Server::Workflow::Activity::Tools::CreateWorkflowInstance
 
 =head1 Description
 
 If you need to create a new instance of a workflow from within another
 workflow then this is the right class. It takes the class which should
-be instantiated from the context parameter workflow_type. Please note
-that it is a good idea to configure this workflow type in the workflow
-configuration and do not accept dynamic parameters.
+be instantiated from the activity parameter workflow_type. 
 
-The class name was choosen because we usually talk about processes as
-instances from workflows.
+Example:
+  <action name="I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::CreateWorkfowInstance"
+	  workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE">
+  </action>
+

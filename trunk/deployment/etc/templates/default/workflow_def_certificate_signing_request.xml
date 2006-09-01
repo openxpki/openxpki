@@ -38,7 +38,7 @@
       <condition name="ACL::change_csr_info"/>
     </action>
     <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
-	    resulting_state="APPROVED">
+	    resulting_state="APPROVAL">
       <condition name="ACL::approve_csr"/>
     </action>
     <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
@@ -47,17 +47,17 @@
     </action>
   </state>
 
-  <state name="APPROVED">
-    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
-	    resulting_state="EXECUTED">
-      <condition name="ACL::execute_csr"/>
+  <state name="APPROVAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVAL</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_INSERT_CSR"
+	    resulting_state="CSR_INSERTED">
+      <condition name="ACL::insert_csr"/>
       <condition name="Condition::check_csr_approvals"/>
     </action>
     <!-- perhaps we need more than one approval or                 -->
     <!-- perhaps the first approval was from a not authorized role -->
     <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
-	    resulting_state="APPROVED">
+	    resulting_state="APPROVAL">
       <condition name="ACL::approve_csr"/>
     </action>
     <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
@@ -70,6 +70,12 @@
     </action>
   </state>
 
+  <state name="CSR_INSERTED" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
+	    resulting_state="FINISHED">
+    </action>
+  </state>
+
   <state name="REJECTED" />
-  <state name="EXECUTED" />
+  <state name="FINISHED" />
 </workflow>

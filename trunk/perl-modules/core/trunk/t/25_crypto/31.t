@@ -60,7 +60,8 @@ my $duration_string;
 $notafter = $cert->get_parsed("BODY", "NOTAFTER");
 $validity_duration = $notafter - $now;
 # 6 months configured validity minus a few seconds evaluates to 5 months
-ok($validity_duration->in_units('months'), 5);
+my $tmp = $validity_duration->in_units('months');
+ok($tmp == 5 || $tmp == 6);
 
 ok ($cert->get_parsed("HEADER", "ROLE") eq "User");
 

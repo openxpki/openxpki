@@ -9,6 +9,12 @@
 	    resulting_state="ISSUING_CA_DETERMINED">
       <condition name="ACL::start_certificate_issuance"/>
     </action>
+    <!-- no 'required' field here because we want this WF to terminate with
+	 an error immediately -->
+    <action name="null" 
+	    resulting_state="FAILED">
+      <condition name="CONTEXT::no_csr_serial_present"/>
+    </action>
   </state>
   
   <state name="ISSUING_CA_DETERMINED" autorun="yes">
@@ -27,11 +33,12 @@
     </action>
 
     <action name="issue_certificate" 
-	    resulting_state="ISSUED">
+	    resulting_state="FINISHED">
       <condition name="CA::key_is_usable"/>
     </action>
   </state>
 
-  <state name="ISSUED"/>
+  <state name="FINISHED"/>
+  <state name="FAILED"/>
 
 </workflow>

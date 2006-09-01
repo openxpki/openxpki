@@ -28,7 +28,7 @@
   <!-- autorun and no user interaction - so no I18N name for this
        activity -->
   <action name="get_cert_profile"
-	  class="OpenXPKI::Server::Workflow::Activity::Tools::GetCertProfile">
+	  class="OpenXPKI::Server::Workflow::Activity::CertIssuance::GetCertProfile">
   </action>
 
   <!-- autorun and no user interaction - so no I18N name for this
@@ -40,7 +40,7 @@
   <!-- autorun and no user interaction - so no I18N name for this
        activity -->
   <action name="issue_certificate"
-	  class="OpenXPKI::Server::Workflow::Activity::CA::IssueCertificate">
+	  class="OpenXPKI::Server::Workflow::Activity::CertIssuance::IssueCertificate">
   </action>
 
 

@@ -37,8 +37,7 @@ ok(1);
 my %hash = (
             PKI_REALM          => "Test Root CA",
             CERTIFICATE_SERIAL => $cert->get_serial(),
-            ISSUING_REALM      => "Test Root CA",
-            ISSUER_ALIAS       => "foobar-02",
+            ISSUER_DN          => "foobar-02",
             ISSUING_CA         => "INTERNAL_CA_1"
            );
 $dbi->insert (TABLE => "CERTIFICATE", HASH => \%hash);

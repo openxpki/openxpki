@@ -113,15 +113,18 @@
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export">
       <validator name="SetExportConfigForOnlineCSR"/>
   </action>
-  <action name="I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
-	  class="OpenXPKI::Server::Workflow::Activity::Tools::CreateProcess">
-      <validator name="SetExecuteCSRWorkflowType"/>
+  <action name="I18N_OPENXPKI_WF_ACTION_INSERT_CSR"
+	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::InsertRequest">
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
 	  class="Workflow::Action::Null">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::CreateWorkflowInstance"
+	  workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE">
   </action>
 </actions>
 
