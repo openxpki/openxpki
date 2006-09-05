@@ -12,6 +12,7 @@ use OpenXPKI::Debug 'OpenXPKI::Crypto::X509';
 use OpenXPKI::DN;
 use Math::BigInt;
 use Digest::SHA1 qw(sha1_base64);
+use OpenXPKI::DateTime;
 
 use base qw(OpenXPKI::Crypto::Object);
 use English;
@@ -75,7 +76,7 @@ sub __init
     
     my $cert_der = $self->{TOKEN}->command({
                         COMMAND => 'convert_cert',
-                        DATA    => $self->{DATA},
+                        DATA    => $self->get_body(),
                         OUT     => 'DER',
     });
     $self->{SHA1} = sha1_base64($cert_der);
@@ -356,6 +357,48 @@ sub get_authority_key_id {
     }
 }
 
+sub to_db_hash {
+    my $self = shift;
+
+    my %insert_hash;
+    $insert_hash{CERTIFICATE_SERIAL} = $self->get_serial();
+    $insert_hash{IDENTIFIER}         = $self->get_identifier();
+    $insert_hash{DATA}               = $self->{DATA};
+    $insert_hash{SUBJECT}            = $self->{PARSED}->{BODY}->{SUBJECT};
+    $insert_hash{ISSUER_DN}          = $self->{PARSED}->{BODY}->{ISSUER};
+    # combine email addresses
+    if (exists $self->{PARSED}->{BODY}->{EMAILADDRESSES}) {
+        $insert_hash{EMAIL} = '';
+        foreach my $email (@{$self->{PARSED}->{BODY}->{EMAILADDRESSES}}) {
+            $insert_hash{EMAIL} .= "," if ($insert_hash{EMAIL} ne '');
+            $insert_hash{EMAIL} .= $email;
+        }
+    }
+    $insert_hash{PUBKEY}             = $self->{PARSED}->{BODY}->{PUBKEY};
+    # set subject key id and authority key id, if defined.
+    if (defined $self->get_subject_key_id()) {
+        $insert_hash{SUBJECT_KEY_IDENTIFIER} = $self->get_subject_key_id();
+    }
+    if (defined $self->get_authority_key_id() &&
+            ref $self->get_authority_key_id() eq '') {
+        # TODO: do we save if authority key id is hash, and if
+        # yes, in which format?
+        $insert_hash{AUTHORITY_KEY_IDENTIFIER}
+            = $self->get_authority_key_id();
+    }
+
+    $insert_hash{NOTAFTER}           
+        = OpenXPKI::DateTime::convert_date({
+            DATE      => $self->{PARSED}->{BODY}->{NOTAFTER},
+            OUTFORMAT => 'epoch',
+    });
+    $insert_hash{NOTBEFORE}
+        = OpenXPKI::DateTime::convert_date({
+            DATE      => $self->{PARSED}->{BODY}->{NOTBEFORE},
+            OUTFORMAT => 'epoch',
+    });
+    return %insert_hash;
+}
 1;
 __END__
 
@@ -410,3 +453,8 @@ gets the authority key identifier from the extension, if present.
 Returns either the key identifier as a string or a hash reference
 containing the ISSUER_NAME and ISSUER_SERIAL field, if the key identifier
 is not present. If none of the above are available, returns undef.
+
+=head2 to_db_hash
+
+returns the certificate data in a format that can be inserted into the
+database table 'CERTIFICATE'.

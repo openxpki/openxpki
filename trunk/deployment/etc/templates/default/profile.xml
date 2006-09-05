@@ -255,7 +255,11 @@
 	<extended_key_usage critical="false">
           <!-- these are OIDs                     -->
           <!-- some OIDs are known and have names -->
+          <!-- at least for server_auth, this is not true (server_auth
+               is not found within the whole source tree except for here
           <server_auth>     1</server_auth>
+          -->
+          <oid>1.3.6.1.5.5.7.3.1</oid> <!-- = serverAuth -->
 	</extended_key_usage>
 	<netscape>
           <comment critical="false">This is a TLS Server certificate.

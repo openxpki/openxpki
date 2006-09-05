@@ -45,8 +45,9 @@
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES",
                                    "workflow_list_types"],
                         ## please be really sure what you do if you uncomment this
-                        ## ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE",
-                        ##            "workflow_create_instance"],
+                        ## why? not having a menu entry does not protect against entering the URL manually! (Alex, 2006-09-05)
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE",
+                                    "workflow_create_instance"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES",
                                    "workflow_list_instances"],
                     ],
@@ -79,10 +80,11 @@
                         CMD => "service/workflow/list_instances.html"
                     },
                     ## please be really sure what you do if you uncomment this
-                    ## "workflow_create_instance" =>
-                    ## {
-                    ##     CMD => "service/workflow/create_instance.html"
-                    ## },
+                    ## cf. above (Alex)
+                    "workflow_create_instance" =>
+                     {
+                         CMD => "service/workflow/create_instance.html"
+                     },
                     "set_language_en_gb" =>
                     {
                         CMD    => "service/index.html",

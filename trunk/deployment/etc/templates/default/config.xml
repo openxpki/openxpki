@@ -65,6 +65,30 @@
     [% THROW config "No 'id' defined for issuing CA $ca" IF ! $ca.id.defined %]
     <ca id="[% $ca.id %]">
       <token super="common/token_config/token{[% $ca.id %]}"/>
+      <!-- CONFIG -->
+      <cert>
+        [% IF $ca.cacert_alias %]
+          <alias>[% $ca.cacert_alias %]</alias>
+          <realm>[% $realmsection.name %]</realm>
+        [% ELSIF $ca.cacert_identifier %]
+          <identifier>[% $ca.cacert_identifier %]</identifier>
+        [% ELSE %]
+            [% THROW configerror 'Neither alias nor identifier specified for CA certificate.' %]
+        [% END %]
+      </cert>
+      [% IF $ca.crl_publication_file_format && $ca.crl_publication_file_name %]
+      <crl_publication>
+        <file>
+            <filename>[% $ca.crl_publication_file_name %]</filename>
+            <format>[% $ca.crl_publication_file_format %]</format>
+        </file>
+        [% IF $ca.crl_issue_for %]
+          [% FOREACH identifier = $ca.crl_issue_for %]
+                <issue_for>[% $identifier %]</issue_for>
+          [% END %]
+        [% END %]
+      </crl_publication>
+      [% END %]
     </ca>
     [% END %]
 

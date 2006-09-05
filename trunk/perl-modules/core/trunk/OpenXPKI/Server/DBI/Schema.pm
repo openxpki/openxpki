@@ -36,7 +36,6 @@ my %COLUMN_of = (
     CA                       => "ca_name",
     ISSUING_CA               => "issuing_ca",
     ISSUING_PKI_REALM        => "issuing_pki_realm",  # FIXME: remove this
-    REFERENCED_REALM         => "referenced_realm",
     ISSUER_IDENTIFIER        => "issuer_identifier",
     ISSUER_DN                => "issuer_dn",
     ALIAS                    => "alias",

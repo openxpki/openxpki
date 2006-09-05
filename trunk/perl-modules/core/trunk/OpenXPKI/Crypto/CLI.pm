@@ -90,7 +90,7 @@ sub prepare {
         $command_of{$ident}->[$i] = $shell_of{$ident} . " "
                                     . $command_of{$ident}->[$i]
                                     . " 1>>" . $stdout_file_of{$ident}
-                                    . " 2>>" . $stdout_file_of{$ident};
+                                    . " 2>>" . $stderr_file_of{$ident};
         ##! 4: "prepared command: " . $command_of{$ident}->[$i]
     }
     ##! 1: "end"

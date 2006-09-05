@@ -20,6 +20,8 @@ use OpenXPKI::DateTime;
 use Date::Parse;
 use English;
 
+use Data::Dumper;
+
 sub new
 {
     my $that = shift;
@@ -446,6 +448,7 @@ sub __get_extensions
             $config .= "issuerAltName = $critical";
             my $issuer = join (",", @{$profile->get_extension("issuer_alt_name")});
             $config .= "issuer:copy" if ($issuer eq "copy");
+            # FIXME: issuer:copy apparently does not work!
             $config .= "\n";
         }
         elsif ($name eq "key_usage")
@@ -466,18 +469,16 @@ sub __get_extensions
         }
         elsif ($name eq "subject_alt_name")
         {
-            $config .= "subjectAltName = $critical\@subject_alt_name\n";
-            my $ref = $profile->get_extension("subject_alt_name");
-            my $i   = 0;
-            $sections .= "\n[ subject_alt_name ]\n";
-            foreach my $pair (@{$ref})
-            {
-                ## the hash only includes one key/value pair
-                $sections .= join (".", keys %{$pair}).".$i = ".
-                             $pair->{join (".", keys %{$pair})}."\n";
-                $i++;
+            my $subj_alt_name = $profile->get_extension("subject_alt_name");
+            my @tmp_array;
+            foreach my $entry (@{$subj_alt_name}) {
+                push @tmp_array, join(q{:}, @{$entry});
             }
-            $sections .= "\n";
+            my $string = join(q{,}, @tmp_array);
+            
+            if ($string ne '') {
+                $config .= "subjectAltName=" . $string . "\n";
+            }
         }
         elsif ($name eq "subject_key_identifier")
         {

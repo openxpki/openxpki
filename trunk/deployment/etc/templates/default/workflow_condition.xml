@@ -34,6 +34,9 @@
   <condition name="ACL::insert_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="insert_csr"/>
   </condition>
+  <condition name="ACL::execute_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="execute_csr"/>
+  </condition>
   <condition name="ACL::reject_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="reject_csr"/>
   </condition>
@@ -67,21 +70,33 @@
   </condition>
 
   <!-- key online checks -->
-  <condition name="CA::key_is_usable" class="OpenXPKI::Server::Workflow::Condition::Key">
+  <condition name="CA::key_is_usable" class="OpenXPKI::Server::Workflow::Condition::Key"> 
     <!-- FIXME: insert proper arguments here -->
     <param name="key" value="ca"/>
+    <!-- use condition name ($self->name) to determine what we want to do -->
     <param name="status" value="usable"/>
   </condition>
 
   <condition name="CA::key_is_not_usable" class="OpenXPKI::Server::Workflow::Condition::Key">
     <!-- FIXME: insert proper arguments here -->
     <param name="key" value="ca"/>
+    <!-- use condition name ($self->name) to determine what we want to do -->
     <param name="status" value="unusable"/>
+  </condition>
+
+  <!-- conditions relevant for CRL issuance -->
+  <condition name="ACL::start_crl_issuance" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="start_crl_issuance"/>
+  </condition>
+  <condition name="crl_signing_cas_left" class="OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft">
+    <!-- use condition name ($self->name) to determine what we want to do -->
+  </condition>
+  <condition name="no_crl_signing_cas_left" class="OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft">
+    <!-- use condition name ($self->name) to determine what we want to do -->
   </condition>
 
   <condition name="CONTEXT::no_csr_serial_present" class="OpenXPKI::Server::Workflow::Condition::ContextParameterExistence">
     <param name="parameter" value="csr_serial"/>
   </condition>
-
 </conditions>
 

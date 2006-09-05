@@ -285,13 +285,23 @@ dir: $(dir.cadir)/scepdummyserver1
 # internal CA ID
 id:  testdummyca1
 dir: $(dir.cadir)/testdummyca1
+cacert_alias: testdummyca1
+#cacert_identifier:
+crl_publication_file_format: PEM
+crl_publication_file_name: $(dir.cadir)/testdummyca1/crl.pem
+# Issue for other CA identifiers as well
+# If none specified, only issue for self
+#crl_issue_for:
+#crl_issue_for:
 
 [TEST_DUMMY_CA_2]
 # internal CA ID
 id:  testdummyca2
 dir: $(dir.cadir)/testdummyca2
-
-
+cacert_alias: testdummyca2
+#cacert_identifier:
+crl_publication_file_format: PEM
+crl_publication_file_name: $(dir.cadir)/testdummyca2/crl.pem
 
 # for Realm 2 (Test User CA)
 [TEST_USER_CA_1]

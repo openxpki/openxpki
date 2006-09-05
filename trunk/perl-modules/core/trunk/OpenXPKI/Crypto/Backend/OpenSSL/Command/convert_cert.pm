@@ -54,6 +54,11 @@ sub get_command
         ##! 16: "DATA is scalar"
         ## build the command
 
+        my $inform = 'PEM';
+        if (exists $self->{IN}) {
+            $inform = $self->{IN};
+        }
+
         my $command  = "x509";
 
         ## option '-engine' is needed here for correct cert convertion 
@@ -66,10 +71,15 @@ sub get_command
 
         $command .= " -out ".$self->{OUTFILE};
         $command .= " -in ".$self->{INFILE};
-        if ($self->{OUT} eq "DER")
-        {
+        $command .= " -inform " . $inform;
+
+        if ($self->{OUT} eq "DER") {
             $command .= " -outform DER";
-        } else {
+        }
+        elsif ($self->{OUT} eq "PEM") {
+            $command .= " -outform PEM";
+        }
+        else {
             $command .= " -noout -text -nameopt RFC2253,-esc_msb";
         }
         ##! 8: "command: $command"
@@ -154,6 +164,8 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_cert
 =over
 
 =item * DATA
+
+=item * IN (DER, PEM)
 
 =item * OUT (DER, PEM, TXT)
 

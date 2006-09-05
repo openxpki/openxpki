@@ -225,10 +225,13 @@ sub list_ca_ids {
 	    message => "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
 	);
     }
-
+    
+    ##! 32: Dumper($realms->{$thisrealm}->{ca})
     if (exists $realms->{$thisrealm}->{ca}) {
-	
-	return sort keys %{$realms->{$thisrealm}->{ca}->{id}};
+        ##! 64: 'if!'
+        my @return = sort keys %{$realms->{$thisrealm}->{ca}->{id}};
+        ##! 64: Dumper(\@return)
+	return @return;
     }
     
     return;

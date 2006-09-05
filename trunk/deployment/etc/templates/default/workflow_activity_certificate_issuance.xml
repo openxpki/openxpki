@@ -7,9 +7,19 @@
     <field name="spkac"/>
     <field name="csr_type"/>
     <field name="cert_profile"/>
+    <field name="cert_subject"/>
+    <field name="cert_subject_style"/>
+    <field name="cert_subject_alt_name"/>
+    <field name="csr_serial"/>
+    <field name="cert_role"/>
     <validator name="HasRequiredField">
+      <arg>cert_subject</arg>
       <arg>cert_profile</arg>
       <arg>csr_type</arg>
+      <arg>cert_subject_style</arg>
+      <arg>cert_subject_alt_name</arg>
+      <arg>csr_serial</arg>
+      <arg>cert_role</arg>
     </validator>
     <validator name="CertProfile">
       <arg>$cert_profile</arg>
@@ -40,8 +50,10 @@
   <!-- autorun and no user interaction - so no I18N name for this
        activity -->
   <action name="issue_certificate"
-	  class="OpenXPKI::Server::Workflow::Activity::CertIssuance::IssueCertificate">
+	  class="OpenXPKI::Server::Workflow::Activity::CertIssuance::Issue">
   </action>
 
-
+  <action name="insert_certificate"
+          class="OpenXPKI::Server::Workflow::Activity::CertIssuance::InsertCertificate">
+  </action>
 </actions>

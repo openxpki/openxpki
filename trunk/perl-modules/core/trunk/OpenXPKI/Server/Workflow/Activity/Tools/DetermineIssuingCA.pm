@@ -27,7 +27,7 @@ sub execute {
 			      # PUBLIC: publicly available operation
 			      ACTIVITYCLASS => 'CA',
 			      PARAMS => {
-				  profile => {
+				  'cert_profile' => { # was 'profile'
 				      accept_from => [ 'context' ],
 				      required => 1,
 				  },
@@ -45,7 +45,7 @@ sub execute {
 
     my $realm_config = CTX('pki_realm')->{$pki_realm};
 
-    my $profilename = $self->param('profile');
+    my $profilename = $self->param('cert_profile'); # was 'profile'
 
     if (! exists $realm_config->{endentity}->{id}->{$profilename}->{validity}) {
 	OpenXPKI::Exception->throw (
@@ -155,7 +155,7 @@ sub execute {
 	    params  => {
 		REQUESTED_NOTAFTER => $requested_notafter->iso8601(),
 	    },
-	    );
+	);
     }
 
     $context->param(ca => $intca);
@@ -166,9 +166,8 @@ sub execute {
             description => sprintf( "Determined issuing CA: %s",
 		$intca),
             user        => $self->param('creator'),
-			       })
-	);
-    
+	})
+    );
 }
 
 

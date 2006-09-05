@@ -24,6 +24,7 @@ sub set_environment {
     ##! 2: "set the configuration"
     $config_of{$ident}->dump();
     $ENV{OPENSSL_CONF} = $config_of{$ident}->get_config_filename();
+    ##! 16: 'OPENSSL_CONF: ' . $ENV{OPENSSL_CONF}
 }
 
 sub error_ispresent {

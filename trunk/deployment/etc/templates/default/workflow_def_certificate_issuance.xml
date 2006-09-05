@@ -11,10 +11,14 @@
     </action>
     <!-- no 'required' field here because we want this WF to terminate with
 	 an error immediately -->
+    <!-- this is obsolete for now, as we pass on most of the data via
+         the context and not via the DB -->
+<!--
     <action name="null" 
 	    resulting_state="FAILED">
       <condition name="CONTEXT::no_csr_serial_present"/>
     </action>
+-->
   </state>
   
   <state name="ISSUING_CA_DETERMINED" autorun="yes">
@@ -27,17 +31,24 @@
 
   <state name="PREPARED" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED</description>
+    <!-- for testing, assume CA key is always available 
     <action name="wait_for_ca"
 	    resulting_state="PREPARED">
       <condition name="CA::key_is_not_usable"/>
     </action>
-
+    -->
     <action name="issue_certificate" 
-	    resulting_state="FINISHED">
+	    resulting_state="CERTIFICATE_ISSUED">
       <condition name="CA::key_is_usable"/>
     </action>
   </state>
 
+  <state name="CERTIFICATE_ISSUED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED</description>
+    <action name="insert_certificate"
+            resulting_state="FINISHED">
+    </action>
+  </state>
   <state name="FINISHED"/>
   <state name="FAILED"/>
 

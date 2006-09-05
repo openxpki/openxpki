@@ -255,6 +255,18 @@ sub get_subject
     return $self->{PROFILE}->{SUBJECT};
 }
 
+sub set_subject_alt_name {
+    my $self = shift;
+    my $subj_alt_name = shift;
+
+    $self->set_extension(
+        NAME     => 'subject_alt_name',
+        CRITICAL => 'false', # TODO: is this correct?
+        VALUES   => $subj_alt_name,
+    );
+
+    return 1;
+}
 1;
 __END__
 

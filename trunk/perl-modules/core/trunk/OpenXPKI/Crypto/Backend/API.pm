@@ -37,6 +37,7 @@ sub __init_command_params : PRIVATE {
 
     $self->set_command_params({
     "convert_cert"    => {"DATA"             => 1,
+                          "IN"               => ["DER", "PEM"],
                           "OUT"              => ["DER","TXT","PEM"],
                           "CONTAINER_FORMAT" => 0,
                           },

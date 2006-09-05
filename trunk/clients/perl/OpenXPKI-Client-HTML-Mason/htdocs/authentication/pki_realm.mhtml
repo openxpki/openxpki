@@ -9,7 +9,7 @@
     <div class="description">
         <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_DESCRIPTION') %>
     </div>
-    <select name="auth_stack">
+    <select name="pki_realm">
 <%perl>
     ## let's print the available options
     foreach my $realm (keys %{$pki_realms})
@@ -35,7 +35,7 @@
     if (exists $data{'pki_realm'})
     {
         $msg = $client->send_receive_service_msg ('GET_PKI_REALM',
-                                                  {'PKI_REALMS' => $data{'pki_realm'}});
+                                                  {'PKI_REALM' => $data{'pki_realm'}});
         if ($msg->{'SERVICE_MSG'} ne 'GET_PKI_REALM')
         {
             return $msg;

@@ -271,16 +271,19 @@ sub insert
     my $self = shift;
     my $keys = { @_ };
 
-    if ($keys->{OBJECT})
-    {
-        ##! 4: "is an object"
-        $self->{object}->insert (TABLE  => $keys->{TABLE},
-                                 OBJECT => $keys->{OBJECT});
-    } else {
-        ##! 4: "is an hash"
-        $self->{hash}->insert (TABLE => $keys->{TABLE},
-                               HASH  => $keys->{HASH});
-    }
+    $self->{hash}->insert (TABLE => $keys->{TABLE},
+                           HASH  => $keys->{HASH});
+# TODO: object inserting is deprecated, deleted relevant code
+#    if ($keys->{OBJECT})
+#    {
+#        ##! 4: "is an object"
+#        $self->{object}->insert (TABLE  => $keys->{TABLE},
+#                                 OBJECT => $keys->{OBJECT});
+#    } else {
+#        ##! 4: "is an hash"
+#        $self->{hash}->insert (TABLE => $keys->{TABLE},
+#                               HASH  => $keys->{HASH});
+#    }
     return 1;
 }
 

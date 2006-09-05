@@ -141,9 +141,9 @@ OpenXPKI/Server/Workflow.pm
 
 OpenXPKI/Server/Workflow/Activity.pm 
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
-OpenXPKI/Server/Workflow/Activity/Certificate/Issue.pm
+OpenXPKI/Server/Workflow/Activity/CertIssuance/Issue.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/GetCertProfile.pm
-OpenXPKI/Server/Workflow/Activity/CertIssuance/IssueCertificate.pm
+OpenXPKI/Server/Workflow/Activity/CertIssuance/InsertCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Profile/Create.pm
 OpenXPKI/Server/Workflow/Activity/Key/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
@@ -154,6 +154,10 @@ OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CreateWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
+OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
+OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
+OpenXPKI/Server/Workflow/Activity/CRLIssuance/IssueCRL.pm
+OpenXPKI/Server/Workflow/Activity/CRLIssuance/PublishCRL.pm
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
@@ -163,6 +167,7 @@ OpenXPKI/Server/Workflow/Condition/Approved.pm
 OpenXPKI/Server/Workflow/Condition/ContextParameterExistence.pm
 OpenXPKI/Server/Workflow/Condition/Key.pm
 OpenXPKI/Server/Workflow/Condition/Server.pm
+OpenXPKI/Server/Workflow/Condition/CRLSigningCAsLeft.pm
 
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
 OpenXPKI/Server/Workflow/Validator/CertProfile.pm

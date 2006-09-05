@@ -776,6 +776,7 @@ if ($cmd eq 'key' || $cmd eq 'certificate') {
 if ($cmd eq 'key' && $subcmd eq 'generate') {
     push @options_spec, qw(
                           purpose=s
+                          id=s
                           );
 }
 
@@ -1013,7 +1014,14 @@ if ($cmd eq 'certificate') {
                 my $identifier;
                 if (defined $params{all}) { # look up aliases
                     $identifier = $cert->{IDENTIFIER};
-                    print "  Identifier: " . $cert->{IDENTIFIER} . "\n";
+                    my $status = $cert->{STATUS};
+                    if (defined $status && $status eq 'REVOKED') {
+                        print "  Identifier: " . $cert->{IDENTIFIER}
+                            . " (REVOKED)\n";
+                    }
+                    else {
+                        print "  Identifier: " . $cert->{IDENTIFIER} . "\n";
+                    }
                     my $aliases = $dbi->select(
                         TABLE   => 'ALIASES',
                         DYNAMIC => {
@@ -1029,8 +1037,15 @@ if ($cmd eq 'certificate') {
                 }
                 else {
                     $identifier = $cert->{'ALIASES.IDENTIFIER'};
-                    print "  Identifier: "
-                        . $cert->{'ALIASES.IDENTIFIER'} . "\n";
+                    my $status = $cert->{'CERTIFICATE.STATUS'};
+                    if (defined $status && $status eq 'REVOKED') {
+                        print "  Identifier: "
+                            . $cert->{'ALIASES.IDENTIFIER'} . " (REVOKED)\n";
+                    }
+                    else {
+                        print "  Identifier: " . $cert->{'ALIASES.IDENTIFIER'}
+                            . "\n";
+                    }
                     print "    Alias:\n       "
                         . $cert->{'ALIASES.ALIAS'} . "\n";
                 }
@@ -1252,7 +1267,10 @@ if ($cmd eq 'certificate') {
         }
 
         # compile all relevant data for the database
+        # TODO: use $cert->to_db_hash();
         my %insert_hash;
+        $insert_hash{STATUS}             = 'VALID'; # we assume everything that
+                                                    # is imported is valid
         $insert_hash{PKI_REALM}          = $realm;
         $insert_hash{CERTIFICATE_SERIAL} = $cert->get_serial();
         $insert_hash{IDENTIFIER}         = $cert->get_identifier();
@@ -1526,9 +1544,9 @@ if ($cmd eq 'key') {
     }
 
     if ($subcmd eq 'generate') {
-        my $key_id = shift || '';
+        my $key_id = $params{id};
         if ($key_id eq '') {
-            print STDERR "Please specify a token ID after generate (see output of key list for a list of possible values).\n";
+            print STDERR "Please specify a token ID with --id (see output of key list for a list of possible values).\n";
             exit 1;
         }
 	my $rc = generate_key({

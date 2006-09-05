@@ -29,6 +29,8 @@ use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;
 
 use OpenXPKI::Server::Context qw( CTX );
+                
+use Data::Dumper;
 
 # define an array of hash refs mapping the task id to the corresponding
 # init code. the order of the array elements is also the default execution
@@ -40,10 +42,10 @@ my @init_tasks = qw(
   redirect_stderr
   prepare_daemon
   crypto_layer
-  pki_realm
-  volatile_vault
   dbi_backend
   dbi_workflow
+  pki_realm
+  volatile_vault
   acl
   api
   authentication
@@ -647,6 +649,91 @@ sub get_pki_realms
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{notafter} = 
 		$cacert->get_parsed("BODY", "NOTAFTER");
 
+
+            # cert
+            
+            eval {
+                my $cert_identifier;
+                eval {
+                  ##! 128: 'eval'
+                  $cert_identifier = $config->get_xpath(
+                    XPATH   => [ 'pki_realm', 'ca', 'cert', 'identifier' ],
+                    COUNTER => [ $i,           $jj, 0     , 0            ],
+                  );
+                };
+                if (!defined $cert_identifier) {
+                  ##! 128: 'undefined'
+                  my $cert_alias = $config->get_xpath(
+                    XPATH   => [ 'pki_realm', 'ca', 'cert', 'alias' ],
+                    COUNTER => [ $i,          $jj,  0     , 0       ],
+                  );
+                  my $cert_realm = $config->get_xpath(
+                    XPATH   => [ 'pki_realm', 'ca', 'cert', 'realm' ],
+                    COUNTER => [ $i,          $jj,  0     , 0       ],
+                  );
+                  ##! 128: 'cert_alias: ' . $cert_alias
+                  ##! 128: 'cert_realm: ' . $cert_realm
+                  my $dbi = CTX('dbi_backend');
+                  $dbi->connect();
+                  my $cert = $dbi->first(
+                      TABLE   => 'ALIASES',
+                      DYNAMIC => {
+                          ALIAS     => $cert_alias,
+                          PKI_REALM => $cert_realm,
+                      },
+                  );
+                  $dbi->disconnect();
+                  ##! 128: 'cert: ' . Dumper($cert)
+                  if (defined $cert) {
+                      $cert_identifier = $cert->{IDENTIFIER};
+                  }
+                  else {
+                      # TODO: complain
+                  }
+                }
+                ##! 16: 'identifier: ' . $cert_identifier
+                $realms{$name}->{ca}->{id}->{$ca_id}->{identifier} = $cert_identifier;
+            };
+            ##! 128: 'eval_error: ' . $EVAL_ERROR
+            # TODO: complain if $EVAL_ERROR
+            # crl_publication info
+
+            my @base_path = ('pki_realm', 'ca', 'crl_publication');
+            my @base_ctr  = ($i,          $jj,   0);
+            eval {
+	        my $crl_publication_id = $config->get_xpath(
+		   XPATH   => [ @base_path ],
+		   COUNTER => [ @base_ctr  ],
+		);
+                $realms{$name}->{ca}->{id}->{$ca_id}->{crl_publication} = 1; # only executed if get_xpath does not crash
+            };
+            eval {
+                my $number_of_files = $config->get_xpath_count(
+                    XPATH   => [ @base_path, 'file'],
+                    COUNTER => [ @base_ctr ],
+                );
+                my @files;
+                ##! 16: 'nr_of_files: ' . $number_of_files
+                for (my $kkk = 0; $kkk < $number_of_files; $kkk++) {
+                    my $filename = $config->get_xpath(
+                        XPATH   => [ @base_path, 'file', 'filename' ],
+                        COUNTER => [ @base_ctr, $kkk   , 0          ],
+                    );
+                    ##! 16: 'filename: ' . $filename
+                    my $format = $config->get_xpath(
+                        XPATH   => [ @base_path, 'file', 'format'   ],
+                        COUNTER => [ @base_ctr, $kkk   , 0          ],
+                    );
+                    ##! 16: 'format: ' . $format
+                    push @files, {
+                        'FILENAME' => $filename,
+                        'FORMAT'   => $format,
+                    };
+                }
+                ##! 16: '@files: ' . Dumper(\@files)
+                $realms{$name}->{ca}->{id}->{$ca_id}->{crl_files} = \@files;
+            };
+
 	    $issuing_ca_count++;
 
 	    log_wrapper(
@@ -960,6 +1047,7 @@ in the following sample format:
           id => {
               CA1 => {
                   status = 1,    # (0: unavailable, 1: available)
+                  identifier => 'ABCDEFGHIJK',
                   crypto => OpenXPKI::Crypto::TokenManager->new(...),
                   cacert => OpenXPKI::Crypto::X509->new(...),
                   notbefore => DateTime->new(),
