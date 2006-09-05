@@ -144,6 +144,7 @@ OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/Issue.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/GetCertProfile.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/InsertCertificate.pm
+OpenXPKI/Server/Workflow/Activity/CertRequest/InsertRequest.pm
 OpenXPKI/Server/Workflow/Activity/Profile/Create.pm
 OpenXPKI/Server/Workflow/Activity/Key/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
