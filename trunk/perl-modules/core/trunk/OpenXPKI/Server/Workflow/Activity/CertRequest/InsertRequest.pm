@@ -31,7 +31,9 @@ sub execute
     if ($type eq 'spkac') {
         $data = $context->param('spkac');
     }
-    # TODO: PKCS#10, IE
+    elsif ($type eq 'pkcs10') {
+        $data = $context->param('pkcs10');
+    }
     else {
         OpenXPKI::Exception->throw(
             message   => 'I18N_OPENXPKI_ACTIVITY_CERTREQUEST_INSERTREQUEST_UNSUPPORTED_CSR_TYPE',

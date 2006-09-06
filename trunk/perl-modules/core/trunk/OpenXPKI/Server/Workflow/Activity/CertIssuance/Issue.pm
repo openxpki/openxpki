@@ -32,7 +32,7 @@ sub execute {
 				      accept_from => [ 'context' ], 
 				      required => 1,
 				  },
-				  pkcs10request => {
+				  pkcs10 => {
 				      accept_from => [ 'context' ],
 				      required => 0,
 				  },
@@ -89,14 +89,13 @@ sub execute {
     my $csr;
     my $csr_type = $self->param('csr_type');
     ##! 16: 'csr_type: ' . $csr_type
-    if ($csr_type eq 'pkcs10request') { # TODO: is this correct?
-        $csr = $self->param('pkcs10request');
+    if ($csr_type eq 'pkcs10') {
+        $csr = $self->param('pkcs10');
     }
     elsif ($csr_type eq 'spkac') {
         $csr = "\nSPKAC=" . $self->param('spkac');
-        # TODO: maybe add more information to the file?
     }
-    else { # TODO: what about the IE stuff, which format is that?
+    else { 
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_UNSUPPORTED_CSR_TYPE',
         );
@@ -105,13 +104,19 @@ sub execute {
     my $cert = $token->command({COMMAND => "issue_cert",
 			        PROFILE => $profile,
 			        CSR     => $csr,
-                               });
-    my $cert_pem = $token->command({
+    });
+    my $cert_pem;
+    if ($csr_type eq 'spkac') {
+        $cert_pem = $token->command({
                         COMMAND => "convert_cert",
                         DATA    => $cert,
                         OUT     => "PEM",
                         IN      => "DER",
-    });
+        });
+    }
+    elsif ($csr_type eq 'pkcs10') {
+        $cert_pem = $cert;
+    }
     ##! 16: 'cert_pem: ' . $cert_pem
     $context->param(certificate => $cert_pem),
 

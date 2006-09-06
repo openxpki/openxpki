@@ -34,7 +34,8 @@
     return ($pkcs10, $subject) if ($pkcs10);
     my %args = $m->request_args();
 
-    my $file = $r->upload('upload');
+    # FIXME: the following fails when not using mod_perl
+    my $file = $r->upload('upload'); 
     $file = $file->fh() if (index (ref $file, "::Upload") > -1);
     if ($file)
     {
