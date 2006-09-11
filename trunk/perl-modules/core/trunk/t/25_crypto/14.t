@@ -13,6 +13,7 @@ use OpenXPKI::Crypto::Profile::Certificate;
 use OpenXPKI::Crypto::Profile::CRL;
 
 our $cache;
+our $cacert;
 our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
@@ -28,7 +29,9 @@ ok (1);
 my $token = $mgmt->get_token (
     TYPE => "CA", 
     ID => "INTERNAL_CA_1", 
-    PKI_REALM => "Test Root CA");
+    PKI_REALM => "Test Root CA",
+    CERTIFICATE => $cacert,
+);
 ok (1);
 
 ## the following operations are already performed by other tests
@@ -83,13 +86,20 @@ for (my $i=0; $i < scalar @example; $i++)
     OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.cert.pem", CONTENT => $cert);
 
     ## build the PKCS#12 file
+    my @chain = [ $cacert ];
     my $pkcs12 = $token->command ({COMMAND => "create_pkcs12",
                                    PASSWD  => $passwd,
                                    KEY     => $key,
                                    CERT    => $cert,
-                                   CHAIN   => $token->get_certfile()});
-    ok (1);
+                                   CHAIN   => @chain});
+    ok ($pkcs12);
     print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
+    # FIXME: this test fails since at least 495, so it has nothing to
+    # do with the changes from 495 to 496. 
+    # It just was not noticed because it had ok(1) and the CLI did
+    # not catch the error
+    # The openssl error is
+    # No certificate matches private key
 
     ## create CRL
     $profile = OpenXPKI::Crypto::Profile::CRL->new (

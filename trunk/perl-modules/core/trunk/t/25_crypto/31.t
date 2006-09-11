@@ -15,6 +15,7 @@ use DateTime;
 # use Smart::Comments;
 
 our $cache;
+our $cacert;
 our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
@@ -30,7 +31,9 @@ ok (1);
 my $token = $mgmt->get_token (
     TYPE => "CA", 
     ID => "INTERNAL_CA_1", 
-    PKI_REALM => "Test Root CA");
+    PKI_REALM => "Test Root CA",
+    CERTIFICATE => $cacert,
+);
 ok (1);
 
 my $data;
@@ -121,7 +124,7 @@ ok($duration_string, "2,0,0");
 
 ###########################################################################
 ## performance
-my $items = 1000;
+my $items = 200;
 my $begin = [ Time::HiRes::gettimeofday() ];
 for (my $i=0; $i<$items; $i++)
 {

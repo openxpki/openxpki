@@ -9,6 +9,7 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Header;
 
 our $cache;
+our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
 ok(1);
@@ -23,7 +24,9 @@ ok (1);
 my $token = $mgmt->get_token (
     TYPE => "CA", 
     ID => "INTERNAL_CA_1", 
-    PKI_REALM => "Test Root CA");
+    PKI_REALM => "Test Root CA",
+    CERTIFICATE => $cacert,
+);
 ok (1);
 
 ## define a test object

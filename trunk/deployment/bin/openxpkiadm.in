@@ -918,7 +918,7 @@ if ($cmd eq 'deploy') {
 } 
 
 if ($cmd eq 'certificate') {
-    if (! get_config($configfile, qw( crypto_layer pki_realm dbi_backend ))) {
+    if (! get_config($configfile, qw( crypto_layer pki_realm_light dbi_backend ))) {
 	print STDERR "Could not obtain OpenXPKI instance configuration\n";
 	exit 1;
     }
@@ -964,10 +964,10 @@ if ($cmd eq 'certificate') {
 
         foreach my $realm (@realms) {
             if ($realm ne '') {
-                print "Certificates in $realm:\n";
+                print "\nCertificates in $realm:\n";
             }
             else {
-                print "Certificates in self-signed pseudo-realm:\n";
+                print "\nCertificates in self-signed pseudo-realm:\n";
             }
             my $certificates;
             if (defined $params{all}) {
@@ -1016,11 +1016,11 @@ if ($cmd eq 'certificate') {
                     $identifier = $cert->{IDENTIFIER};
                     my $status = $cert->{STATUS};
                     if (defined $status && $status eq 'REVOKED') {
-                        print "  Identifier: " . $cert->{IDENTIFIER}
+                        print "\n  Identifier: " . $cert->{IDENTIFIER}
                             . " (REVOKED)\n";
                     }
                     else {
-                        print "  Identifier: " . $cert->{IDENTIFIER} . "\n";
+                        print "\n  Identifier: " . $cert->{IDENTIFIER} . "\n";
                     }
                     my $aliases = $dbi->select(
                         TABLE   => 'ALIASES',
@@ -1039,11 +1039,11 @@ if ($cmd eq 'certificate') {
                     $identifier = $cert->{'ALIASES.IDENTIFIER'};
                     my $status = $cert->{'CERTIFICATE.STATUS'};
                     if (defined $status && $status eq 'REVOKED') {
-                        print "  Identifier: "
+                        print "\n  Identifier: "
                             . $cert->{'ALIASES.IDENTIFIER'} . " (REVOKED)\n";
                     }
                     else {
-                        print "  Identifier: " . $cert->{'ALIASES.IDENTIFIER'}
+                        print "\n  Identifier: " . $cert->{'ALIASES.IDENTIFIER'}
                             . "\n";
                     }
                     print "    Alias:\n       "
@@ -1508,7 +1508,7 @@ if ($cmd eq 'certificate') {
 }
 
 if ($cmd eq 'key') {
-    if (! get_config($configfile, qw( crypto_layer pki_realm ))) {
+    if (! get_config($configfile, qw( crypto_layer pki_realm_light ))) {
 	print STDERR "Could not obtain OpenXPKI instance configuration\n";
 	exit 1;
     }

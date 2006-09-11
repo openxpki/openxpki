@@ -39,6 +39,7 @@ foreach my $ca_id (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
     my $token = $mgmt->get_token (TYPE => "CA", 
 				  ID => $ca_id, 
 				  PKI_REALM => "Test Root CA",
+                                  CERTIFICATE => 'dummy',
 	);
     ok (1);
     

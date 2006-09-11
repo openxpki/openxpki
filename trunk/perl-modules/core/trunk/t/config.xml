@@ -38,10 +38,18 @@
     <!-- Issuing CAs defined for this realm -->
     <!-- 'id' is the internal CA identifier -->
     <ca id="INTERNAL_CA_1">
+      <cert>
+        <alias>INTERNAL_CA_1</alias>
+        <realm>Test Root CA</realm>
+      </cert>
       <token super="common/token_config/token{ca1}"/>
     </ca>
 
     <ca id="INTERNAL_CA_2">
+      <cert>
+         <alias>INTERNAL_CA_2</alias>
+         <realm>Test Root CA</realm>
+      </cert>
       <token    super="common/token_config/token{ca2}"/>
     </ca>
 

@@ -14,6 +14,7 @@ use OpenXPKI::Crypto::Profile::CRL;
 
 our $cache;
 our $basedir;
+our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
 ok(1);
@@ -27,7 +28,9 @@ ok (1);
 
 my $ca_token      = $mgmt->get_token (TYPE      => "CA",
                                       ID        => "INTERNAL_CA_1",
-                                      PKI_REALM => "Test Root CA");
+                                      PKI_REALM => "Test Root CA",
+                                      CERTIFICATE => $cacert,
+);
 my $default_token = $mgmt->get_token (TYPE      => "DEFAULT",
                                       PKI_REALM => "Test Root CA");
 ok (1);
@@ -331,13 +334,14 @@ OpenXPKI->write_file (FILENAME => "$basedir/ca1/cert.pem",
                       CONTENT  => $cert,
                       FORCE    => 1);
 
+my @chain = [ $cert ];
 ## build the PKCS#12 file
 my $pkcs12 = $default_token->command ({COMMAND => "create_pkcs12",
                                        PASSWD  => $passwd,
                                        KEY     => $key,
                                        CERT    => $cert,
-                                       CHAIN   => $ca_token->get_certfile()});
-ok (1);
+                                       CHAIN   => @chain});
+ok ($pkcs12);
 print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
 
 ### create CRL profile...

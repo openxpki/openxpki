@@ -13,6 +13,7 @@ use OpenXPKI::Crypto::CSR;
 use Time::HiRes;
 
 our $cache;
+our $cacert;
 our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
@@ -28,7 +29,9 @@ ok (1);
 my $token = $mgmt->get_token (
     TYPE => "CA", 
     ID => "INTERNAL_CA_1", 
-    PKI_REALM => "Test Root CA");
+    PKI_REALM => "Test Root CA",
+    CERTIFICATE => $cacert,
+);
 ok (1);
 
 ## load CSR

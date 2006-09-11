@@ -21,7 +21,9 @@ ok (1);
 my $token = $mgmt->get_token (
    TYPE => "CA", 
    ID => "INTERNAL_CA_1", 
-   PKI_REALM => "Test Root CA");
+   PKI_REALM => "Test Root CA",
+   CERTIFICATE => "DUMMY",
+);
 ok (defined $token);
 
 1;

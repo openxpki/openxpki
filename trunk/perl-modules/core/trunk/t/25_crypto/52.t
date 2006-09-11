@@ -99,7 +99,7 @@ SKIP: {
     ok(defined $secret);
     
     my @shares = $secret->compute();
-    print STDERR "Shares: " . Dumper(@shares) . "\n" if ($ENV{DEBUG});
+    print STDERR "Shares: " . Dumper(\@shares) . "\n" if ($ENV{DEBUG});
    
     my $created_secret = $secret->get_secret();
 

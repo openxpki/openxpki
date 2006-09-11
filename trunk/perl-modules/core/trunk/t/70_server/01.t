@@ -2,12 +2,15 @@ use strict;
 use warnings;
 use English;
 use Test;
-BEGIN { plan tests => 11 };
+BEGIN { plan tests => 12 };
 
 print STDERR "OpenXPKI::Server\n";
 
 use OpenXPKI::Server;
 ok(1);
+
+`cp t/30_dbi/sqlite.db t/30_dbi/sqlite.db._backend_`;
+ok(not $CHILD_ERROR);
 
 foreach my $mode ('debug', '')
 {

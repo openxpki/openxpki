@@ -10,6 +10,7 @@ use OpenXPKI;
 use OpenXPKI::XML::Config;
 use OpenXPKI::Server::Context qw( CTX );
 use File::Spec;
+use OpenXPKI::FileUtils;
 
 our $cache;
 
@@ -33,4 +34,11 @@ OpenXPKI::Server::Context::setcontext({
     xml_config => $cache,
 });
 
+our $cacert;
+my $cacertfile = "$basedir/ca1/cacert.pem";
+my $fu = OpenXPKI::FileUtils->new();
+if (-e $cacertfile) { # if the CA certificate exists, make it available globally
+                      # for use with CA tokens
+  $cacert = $fu->read_file($cacertfile);
+}
 1;

@@ -40,12 +40,6 @@
         <!-- CA key (PEM encoded) -->
         <key>[% $ca.dir %]/cakey.pem</key>
 
-	<!-- CA certificate, must be in PEM format -->
-        <cert>[% $ca.dir %]/cacert.pem</cert>
-
-	<!-- CA certificate chain for crypto operations -->
-	<internal_chain>[% $ca.dir %]/cachain.pem</internal_chain>
-
 	<!-- CA passphrase fragments -->
         <secret method="Literal">1234567890</secret>
     </token>
@@ -68,9 +62,6 @@
 
         <!-- Private key (PEM encoded) -->
         <key>[% $entry.dir %]/key.pem</key>
-
-	<!-- Certificate, must be in PEM format -->
-        <cert>[% $entry.dir %]/cert.pem</cert>
 
 	<!-- CA passphrase -->
         <secret method="Literal">1234567890</secret>

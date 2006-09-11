@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 11 };
+BEGIN { plan tests => 10 };
 
 print STDERR "OpenXPKI::Crypto::Command: PKCS#7 tests\n";
 
@@ -12,6 +12,7 @@ use OpenXPKI qw (read_file);
 
 our $cache;
 our $basedir;
+our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
 ok(1);
@@ -26,7 +27,9 @@ ok(1);
 my $token = $mgmt->get_token (
     TYPE => "CA", 
     ID => "INTERNAL_CA_1", 
-    PKI_REALM => "Test Root CA");
+    PKI_REALM => "Test Root CA",
+    CERTIFICATE => $cacert,
+);
 ok(1);
 
 ## load data
@@ -68,17 +71,14 @@ ok ($content eq "This is for example a passprase.");
 
 ## verify signature
 
+my @chain = [ $cacert ];
+
 my $result = $token->command ({COMMAND => "pkcs7_verify",
                                CONTENT => $content,
                                PKCS7   => $sig,
-                               CHAIN   => "$basedir/ca1/cacert.pem"});
+                               CHAIN   => @chain});
 ok(1);
 print STDERR "PKCS#7 external chain verify: $result\n" if ($ENV{DEBUG});
-$result = $token->command ({COMMAND => "pkcs7_verify",
-                            CONTENT => $content,
-                            PKCS7   => $sig});
-ok(1);
-print STDERR "PKCS#7 token chain verify: $result\n" if ($ENV{DEBUG});
 
 ## extract available chain from signature
 

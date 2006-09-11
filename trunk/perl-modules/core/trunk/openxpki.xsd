@@ -200,8 +200,6 @@
       <xsd:element name="shell"     minOccurs="0" type="xsd:string"/>        <!-- filename of crypto binary    -->
       <xsd:element name="wrapper"   minOccurs="0" type="xsd:string"/>        <!-- wrapper command around shell -->
       <xsd:element name="key"       minOccurs="0" type="xsd:string"/>        <!-- filename of ca key           -->
-      <xsd:element name="cert"      minOccurs="0" type="xsd:string"/>        <!-- filename of ca cert          -->
-      <xsd:element name="internal_chain" minOccurs="0" type="xsd:string"/>   <!-- filename of internal chain   -->
       <xsd:element name="config"    minOccurs="0" type="xsd:string"/>        <!-- filename of crypto config    -->
       <xsd:element name="randfile"  minOccurs="0" type="xsd:string"/>        <!-- filename of random -->
       <xsd:element name="passwd_parts" minOccurs="0" type="xsd:nonNegativeInteger"/>

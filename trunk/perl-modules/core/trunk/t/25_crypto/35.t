@@ -11,6 +11,7 @@ use OpenXPKI::Crypto::PKCS7;
 use Time::HiRes;
 
 our $cache;
+our $cacert;
 our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
@@ -26,7 +27,9 @@ ok (1);
 my $token = $mgmt->get_token (
     TYPE => "CA", 
     ID => "INTERNAL_CA_1", 
-    PKI_REALM => "Test Root CA");
+    PKI_REALM => "Test Root CA",
+    CERTIFICATE => $cacert,
+);
 ok (1);
 
 ## load data
@@ -64,7 +67,9 @@ ok ($content eq "This is for example a passprase.");
 ## verify signature
 
 $pkcs7 = OpenXPKI::Crypto::PKCS7->new (TOKEN => $token, CONTENT => $content, PKCS7 => $sig);
-my $result = $pkcs7->verify ();
+my $result = $pkcs7->verify (
+    CHAIN => [ $cacert ],
+);
 ok(1);
 print STDERR "PKCS#7 verify: $result\n" if ($ENV{DEBUG});
 
@@ -76,12 +81,14 @@ print STDERR "PKCS#7 get_chain: ".scalar @{$result}."\n" if ($ENV{DEBUG});
 
 ## performance
 
-my $items = 100;
+my $items = 20;
 my $begin = [ Time::HiRes::gettimeofday() ];
 for (my $i=0; $i<$items; $i++)
 {
     $pkcs7 = OpenXPKI::Crypto::PKCS7->new (TOKEN => $token, CONTENT => $content, PKCS7 => $sig);
-    $pkcs7->verify();
+    $pkcs7->verify(
+        CHAIN => [ $cacert ],
+    );
     $pkcs7->get_chain();
 }
 ok (1);
