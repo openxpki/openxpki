@@ -20,7 +20,7 @@ ${WGET} -nH -m -I lastmidnight http://openxpki.sourceforge.net/lastmidnight/inde
 cd ${THIS_DIR}/lastmidnight
 # Find files which names begin with a letter and contain only appropriate 
 # characters (letters, digits, '-' and '.')
-FILES_LIST=`find ./ -type f -maxdepth 1 -regex "\./[a-zA-Z][a-zA-Z0-9\.-]*"`
+FILES_LIST=`find ./ -maxdepth 1 -type f -regex "\./[a-zA-Z][a-zA-Z0-9\.-]*"`
 
 for file in ${FILES_LIST}; do
     file=`echo $file | sed -e 's/\.\///'`
