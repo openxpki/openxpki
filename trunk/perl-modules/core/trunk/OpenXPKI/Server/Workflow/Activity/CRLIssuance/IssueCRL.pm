@@ -51,12 +51,14 @@ sub execute {
     my $current_ca = $ca_ids[0];
     my $pki_realm = CTX('api')->get_api('Session')->get_pki_realm();
     my $ca_identifier = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$current_ca}->{identifier};
+    my $certificate = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$current_ca}->{certificate};
     ##! 16: 'ca_identifier: ' . $ca_identifier
     my $tm = OpenXPKI::Crypto::TokenManager->new();
     my $ca_token = $tm->get_token(
         TYPE      => 'CA',
         ID        => $current_ca,
         PKI_REALM => $pki_realm,
+        CERTIFICATE => $certificate,
     );
 
     # FIXME: iterate over all <issue_for> identifiers, if present
@@ -110,14 +112,15 @@ sub execute {
             DATA  => $crl,
         );
         ##! 128: 'crl: ' . Dumper($crl)
-        # TODO: create and use $crl->to_db_hash()
-        my %insert_hash;
+        
+        my $serial = $dbi->get_new_serial(
+            TABLE => 'CRL',
+        );
+        my %insert_hash = $crl_obj->to_db_hash();
         $insert_hash{'PKI_REALM'} = $pki_realm;
         $insert_hash{'ISSUER_IDENTIFIER'} = $ca_identifier;
         #$insert_hash{'TYPE'} = # FIXME: what is the meaning of this field?
-        $insert_hash{'DATA'} = $crl;
-        $insert_hash{'LAST_UPDATE'} = str2time($crl_obj->get_parsed("BODY", "LAST_UPDATE"));
-        $insert_hash{'NEXT_UPDATE'} = str2time($crl_obj->get_parsed("BODY", "NEXT_UPDATE"));
+        $insert_hash{'CRL_SERIAL'} = $serial;
         $dbi->insert(
             TABLE => 'CRL',
             HASH  => \%insert_hash,

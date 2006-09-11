@@ -138,6 +138,16 @@ sub get_converted
     }
 }
 
+sub to_db_hash {
+    my $self = shift;
+
+    my %insert_hash;
+    $insert_hash{'DATA'} = $self->get_body();
+    $insert_hash{'LAST_UPDATE'} = str2time($self->get_parsed("BODY", "LAST_UPDATE"));
+    $insert_hash{'NEXT_UPDATE'} = str2time($self->get_parsed("BODY", "NEXT_UPDATE"));
+    return %insert_hash;
+}
+
 1;
 __END__
 
@@ -171,3 +181,9 @@ in seconds from the last update will be returned.
 The functions supports three formats - PEM, DER and TXT. All other
 formats create errors (or better exceptions). The CRL will be
 returned in the specified format on success.
+
+=head2 to_db_hash
+
+Converts the CRL into a hash that can (with a few additions) be
+inserted in to a database using $dbi->insert()
+
