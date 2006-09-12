@@ -190,7 +190,7 @@ following parameters are supported:
 
 =item * CONTENT (can be specified to check the integrity of the CONTENT)
 
-=item * CHAIN (file with all trusted CAs)
+=item * CHAIN (array with all trusted CA certificates (PEM))
 
 =item * NO_VERIFY (only check the integrity but not the signer)
 

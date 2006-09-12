@@ -75,8 +75,9 @@ sub get_command
     $self->write_file (FILENAME => $self->{CERTFILE},
                        CONTENT  => $self->{CERT},
 	               FORCE    => 1);
+    my $chain = join('', @{$self->{CHAIN}});
     $self->write_file (FILENAME => $self->{CHAINFILE},
-                       CONTENT  => $self->{CHAIN},
+                       CONTENT  => $chain,
 	               FORCE    => 1)
         if ($self->{CHAIN});
 
@@ -90,11 +91,7 @@ sub get_command
     $command .= " -".$self->{ENC_ALG};
     if ($self->{CHAIN})
     {
-        $command .= " -certfile ".$self->{CHAIN};
-    }
-    elsif ($self->{INTERNAL_CHAIN})
-    {
-        $command .= " -certfile ".$self->{INTERNAL_CHAIN};
+        $command .= " -certfile ".$self->{CHAINFILE};
     }
 
     $command .= " -passin env:pwd";
@@ -155,8 +152,6 @@ If you do not specify this option then we use PASSWD to encrypt the new
 PKCS#12 file.
 
 =item * ENC_ALG (optional)
-
-=item * INTERNAL_CHAIN (optional)
 
 =back
 

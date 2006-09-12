@@ -32,7 +32,10 @@ sub error_ispresent {
     my $ident = ident $self;
     my $stderr = shift;
 
-    if ($stderr =~ m{ error | unable\ to\ load\ key }xms) {
+    if ($stderr =~ m{ [eE]rror |
+                      unable\ to\ load\ key |
+                      No\ certificate\ matches\ private\ key
+                    }xms) {
         return 1;
     }
     else {

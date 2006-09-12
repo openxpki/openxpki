@@ -1,6 +1,8 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify
 ## Written 2005 by Michael Bell for the OpenXPKI project
 ## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
+## changes for CHAIN passing by Alexander Klink for the OpenXPKI
+## project 2006.
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
@@ -11,13 +13,15 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
+use Data::Dumper;
+
 sub get_command
 {
     my $self = shift;
 
     ## compensate missing parameters
 
-    $self->get_tmpfile ('CONTENT', 'PKCS7', 'OUT');
+    $self->get_tmpfile ('CONTENT', 'PKCS7', 'CHAIN', 'OUT');
 
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
@@ -25,8 +29,15 @@ sub get_command
         if ($self->{ENGINE}->get_engine() and
             ($engine_usage =~ m{ ALWAYS }xms));
 
-    $self->{CHAIN} = $self->{ENGINE}->get_chainfile()
-       if (not $self->{CHAIN} and $self->{ENGINE}->get_chainfile());
+# we do not want chains in tokens any longer
+#    $self->{CHAIN} = $self->{ENGINE}->get_chainfile()
+#       if (not $self->{CHAIN} and $self->{ENGINE}->get_chainfile());
+
+    if (! defined $self->{CHAIN}) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_CHAIN',
+        );
+    }
 
     ## check parameters
 
@@ -43,6 +54,14 @@ sub get_command
 
     ## prepare data
 
+    my $chain = join('', @{$self->{CHAIN}});
+
+    $self->write_file(
+        FILENAME => $self->{CHAINFILE},
+        CONTENT  => $chain,
+        FORCE    => 1,
+    );
+
     $self->write_file (FILENAME => $self->{CONTENTFILE},
                        CONTENT  => $self->{CONTENT},
 	               FORCE    => 1);
@@ -58,7 +77,7 @@ sub get_command
     $command .= " -in ".$self->{PKCS7FILE};
     $command .= " -noverify" if ($self->{NO_VERIFY});
     $command .= " -engine $engine" if ($engine);
-    $command .= " -CAfile ".$self->{CHAIN};
+    $command .= " -CAfile ".$self->{CHAINFILE};
     $command .= " -signer ".$self->{OUTFILE};
 
     return [ $command ];
@@ -110,7 +129,9 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify
 
 =item * ENGINE_USAGE
 
-=item * CHAIN (this must be a single file for security reasons!!!)
+=item * CHAIN
+
+is an array of PEM encoded certificates
 
 =item * NO_VERIFY (do not check the signer certificate)
 
