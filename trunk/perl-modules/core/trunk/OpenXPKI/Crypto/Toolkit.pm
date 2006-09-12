@@ -17,6 +17,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Debug 'OpenXPKI::Crypto::Toolkit';
 use OpenXPKI::Exception;
+use OpenXPKI::FileUtils;
 use English;
 use Data::Dumper;
 
@@ -84,7 +85,7 @@ sub START {
     $self->__init_command();
 }
 
-sub __init_local { # to be implemented in the childrens
+sub __init_local { # to be implemented in the children
 }
 
 sub __load_config {
@@ -97,30 +98,62 @@ sub __load_config {
     my $realm_index = $arg_ref->{PKI_REALM_INDEX};
     my $type_path   = $arg_ref->{TOKEN_TYPE};
     my $type_index  = $arg_ref->{TOKEN_INDEX};
+    my $certificate = $arg_ref->{CERTIFICATE};
+
+    my $realm;
+    my $type_id;
 
     $params_of{$ident}->{TMP} = $tmp_dir_of{$ident};
+
+
+    eval {
+        $realm = CTX('xml_config')->get_xpath(
+            XPATH   => [ 'pki_realm' , 'name' ],
+            COUNTER => [ $realm_index, 0      ],
+        );
+    };
+    if (! defined $realm) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_COULD_NOT_READ_REALM_FROM_CONFIG',
+            params => {
+                'EVAL_ERROR' => $EVAL_ERROR,
+            },
+        );
+    }
+    ##! 16: 'realm: ' . $realm
+
+    eval {
+        $type_id = CTX('xml_config')->get_xpath(
+            XPATH   => [ 'pki_realm' , $type_path , 'id' ],
+            COUNTER => [ $realm_index, $type_index, 0    ],
+        );
+    };
+    if (! defined $type_id) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_COULD_NOT_READ_TYPE_ID_FROM_CONFIG',
+            params => {
+                'EVAL_ERROR' => $EVAL_ERROR,
+            },
+        );
+    }
+    ##! 16: 'type_id: ' . $type_id
 
     # any existing key in this hash is considered optional in %token_args
     my %is_optional = ();
 
     # default tokens don't need key, cert etc...
     if ($type_path eq "common") {
-	foreach (qw(key cert internal_chain secret)) {
+	foreach (qw(key secret)) {
 	    $is_optional{uc($_)}++;
 	}
     }
-
-    if ($type_path eq 'scep') {
-        $is_optional{INTERNAL_CHAIN} = 1;
-    }
-    ##! 16: 'is_optional done'
     # FIXME: currently unused attributes:
     # openca-sv
     # FIXME: engine_section is OpenSSL-specific
     foreach my $key (qw(backend       mode 
                         engine     shell         wrapper 
                         randfile
-                        key        cert          internal_chain
+                        key
                         secret
                         engine_section
                         key_store  engine_usage
@@ -179,11 +212,37 @@ sub __load_config {
             if ($key ne 'secret') {
     	        $params_of{$ident}->{uc($key)} = $value;
             }
-            else { # todo: support more then secret method literal
+            else {
+                # FIXME: support more than secret method literal
                 $params_of{$ident}->{PASSWD} = $value;
             }
 	}
     }
+    if ($type_path eq 'ca') { # default tokens don't have a certificate
+        # FIXME: SCEP needs certificates as well
+        # certificate files are no longer defined in token.xml, thus
+        # create a temporary file with the certificate in it
+        # every time a token is instantiated.
+        # TODO: maybe just forget about the file and pass the certificate
+        # as data where needed.
+        if (!defined $certificate) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CERTIFICATE_NOT_DEFINED',
+            );
+        }
+        ##! 16: 'certificate: ' . $certificate
+        my $fu = OpenXPKI::FileUtils->new();
+        my $cert_filename = $fu->get_safe_tmpfile({
+            TMP => $tmp_dir_of{$ident},
+        });
+        $fu->write_file({
+            FILENAME => $cert_filename,
+            CONTENT  => $certificate,
+            FORCE    => 1,
+        });
+        $params_of{$ident}->{CERT} = $cert_filename;
+    }
+    ##! 1: 'end'
 }
 
 sub __init_engine

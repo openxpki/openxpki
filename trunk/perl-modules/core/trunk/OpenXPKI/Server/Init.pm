@@ -70,7 +70,7 @@ sub init {
     
   TASK:
     foreach my $task (@tasks) {
-	if (! exists $is_initialized{$task}) {
+	if (! exists $is_initialized{$task} && $task ne 'pki_realm_light') {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
 		params  => {
@@ -238,6 +238,18 @@ sub __do_init_pki_realm {
 	});
 }
 
+sub __do_init_pki_realm_light {
+    ##! 1: 'start'
+    my $pki_realm  = get_pki_realms({
+        LIGHT => 1,
+    });
+
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    pki_realm => $pki_realm,
+	});
+}
+    
 sub __do_init_volatile_vault {
     ##! 1: "init volatile vault"
 
@@ -397,7 +409,7 @@ sub get_crypto_layer
 
 sub get_pki_realms
 {
-    my $keys = { @_ };
+    my $arg_ref = shift;
     ##! 1: "start"
 
     my $config = CTX('xml_config');
@@ -532,170 +544,166 @@ sub get_pki_realms
 		    params => {
 			CAID   => $ca_id,
 		    },
-		    );
+		);
 	    }
 	    
 
 	    # record this issuing CA as potentially present in the 
 	    # PKI Realm configuration
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{status} = 0;
-	    
-	    my $token = $crypto->get_token (TYPE      => "CA",
-					    ID        => $ca_id,
-					    PKI_REALM => $name);
-	    
-	    # attach CA certificate
-	    my $cacertfile = $token->get_certfile();
 
-	    if ((! defined $cacertfile) 
-		|| ($cacertfile eq "")) {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_NO_CA_CERTFILE",
-		    params  => {
-			PKI_REALM => $name,
-			CA_ID     => $ca_id,
-		    },
-		    );
-	    }
-
-
-	    my $cacertdata;
-	    eval {
-		$cacertdata = OpenXPKI->read_file($cacertfile);
-	    };
-	    if (my $exc = OpenXPKI::Exception->caught()) {
-		# ignore exception for missing 'notbefore' entry
-		if ($exc->message() 
-		    eq "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST") {
-		    log_wrapper(
-			{
-			    MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
+            # cert identifier
+            if (! $arg_ref->{LIGHT}) { 
+                eval {
+                    my $cert_identifier;
+                    eval {
+                      ##! 128: 'eval'
+                      $cert_identifier = $config->get_xpath(
+                        XPATH   => [ 'pki_realm', 'ca', 'cert', 'identifier' ],
+                        COUNTER => [ $i,           $jj, 0     , 0            ],
+                      );
+                    };
+                    if (!defined $cert_identifier) {
+                      ##! 128: 'undefined'
+                      my $cert_alias = $config->get_xpath(
+                        XPATH   => [ 'pki_realm', 'ca', 'cert', 'alias' ],
+                        COUNTER => [ $i,          $jj,  0     , 0       ],
+                      );
+                      my $cert_realm = $config->get_xpath(
+                        XPATH   => [ 'pki_realm', 'ca', 'cert', 'realm' ],
+                        COUNTER => [ $i,          $jj,  0     , 0       ],
+                      );
+                      ##! 128: 'cert_alias: ' . $cert_alias
+                      ##! 128: 'cert_realm: ' . $cert_realm
+                      my $dbi = CTX('dbi_backend');
+                      $dbi->connect();
+                      my $cert = $dbi->first(
+                          TABLE   => 'ALIASES',
+                          DYNAMIC => {
+                              ALIAS     => $cert_alias,
+                              PKI_REALM => $cert_realm,
+                          },
+                      );
+                      $dbi->disconnect();
+                      ##! 128: 'cert: ' . Dumper($cert)
+                      if (defined $cert) {
+                          $cert_identifier = $cert->{IDENTIFIER};
+                      }
+                      else {
+                        OpenXPKI::Exception->throw(
+                            message => 'I18N_OPENXPKI_SERVER_INIT_NO_IDENTIFIER_FOUND_IN_ALIASES_DB',
+                            params  => {
+                                'ALIAS'     => $cert_alias,
+                                'PKI_REALM' => $cert_realm,
+                            },
+                        );
+                      }
+                    }
+                    ##! 16: 'identifier: ' . $cert_identifier
+                    $realms{$name}->{ca}->{id}->{$ca_id}->{identifier} = $cert_identifier;
+                };
+                if ($EVAL_ERROR) {
+                    OpenXPKI::Exception->throw(
+                        message => 'I18N_OPENXPKI_SERVER_INIT_COULD_NOT_DETERMINE_CA_IDENTIFIER',
+                        params  => {
+                            CA => $ca_id,
+                        },
+                    );
+                }
+    
+                ###########################################################
+                # get certificate from DB and save it in the pki_realms CTX
+    
+                my $dbi = CTX('dbi_backend');
+                $dbi->connect();
+                my $certificate_db_entry = $dbi->first(
+                    TABLE   => 'CERTIFICATE',
+                    DYNAMIC => {
+                        IDENTIFIER => $realms{$name}->{ca}->{id}->{$ca_id}->{identifier},
+                    },
+                );
+                $dbi->disconnect();
+                my $certificate = $certificate_db_entry->{DATA}; # in PEM
+                ##! 16: 'certificate: ' . $certificate
+                if (! defined $certificate_db_entry
+                 || ! defined $certificate) {
+    		    log_wrapper({
+			    MESSAGE  => "Could not read issuing CA certificate from database for CA '$ca_id' (PKI realm $name)",
 			    PRIORITY => "warn",
 			    FACILITY => "system",
-			});
+		    });
 
-		    log_wrapper(
-			{
+		    log_wrapper({
 			    MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
 			    PRIORITY => "warn",
 			    FACILITY => "monitor",
-			});
+		    });
 			
 		    next ISSUINGCA;
-		}
-		else
-		{
-		    $exc->rethrow();
-		}
-	    } elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
-		$EVAL_ERROR->rethrow();
-	    }
-
-	    
-	    if (! defined $cacertdata) {
-		log_wrapper(
-		    {
-			MESSAGE  => "Could not read issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
-			PRIORITY => "warn",
-			FACILITY => "system",
+                }
+    	        my $cacert
+    		  = OpenXPKI::Crypto::X509->new(TOKEN => $defaulttoken,
+    		    			        DATA  => $certificate);
+    	    
+    	        if (! defined $cacert) {
+    		    log_wrapper({
+    			MESSAGE  => "Could not parse issuing CA certificate from database for CA '$ca_id' (PKI realm $name)",
+    			PRIORITY => "warn",
+    			FACILITY => "system",
 		    });
 		
-		log_wrapper(
-		    {
+		    log_wrapper({
 			MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
 			PRIORITY => "warn",
 			FACILITY => "monitor",
 		    });
 		
-		next ISSUINGCA;
-	    }
+		    next ISSUINGCA;
+	        }
 
-	    my $cacert
-		= OpenXPKI::Crypto::X509->new(TOKEN => $defaulttoken,
-					      DATA  => $cacertdata);
-	    
-	    if (! defined $cacert) {
-		log_wrapper(
-		    {
-			MESSAGE  => "Could not parse issuing CA certificate '$cacertfile' for CA '$ca_id' (PKI realm $name)",
-			PRIORITY => "warn",
-			FACILITY => "system",
-		    });
-		
-		log_wrapper(
-		    {
-			MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
-			PRIORITY => "warn",
-			FACILITY => "monitor",
-		    });
-		
-		next ISSUINGCA;
-	    }
+                ##! 16: 'certificate: ' . $certificate
+                my $token = $crypto->get_token(
+                    TYPE        => "CA",
+                    ID          => $ca_id,
+                    PKI_REALM   => $name,
+                    CERTIFICATE => $certificate,
+                );
+            
+                $realms{$name}->{ca}->{id}->{$ca_id}->{certificate}
+                    = $certificate;
+	        $realms{$name}->{ca}->{id}->{$ca_id}->{crypto} = $token;
+	        $realms{$name}->{ca}->{id}->{$ca_id}->{cacert} = $cacert;
+	        $realms{$name}->{ca}->{id}->{$ca_id}->{status} = 1;
+                $realms{$name}->{ca}->{id}->{$ca_id}->{notbefore} 
+                    = $cacert->get_parsed("BODY", "NOTBEFORE");
+                $realms{$name}->{ca}->{id}->{$ca_id}->{notafter} 
+                    = $cacert->get_parsed("BODY", "NOTAFTER");
 
-
-	    $realms{$name}->{ca}->{id}->{$ca_id}->{crypto} = $token;
-	    $realms{$name}->{ca}->{id}->{$ca_id}->{cacert} = $cacert;
-	    $realms{$name}->{ca}->{id}->{$ca_id}->{status} = 1;
-	    log_wrapper(
-		{
+	        log_wrapper({
 		    MESSAGE  => "Attached CA token for issuing CA '$ca_id' of PKI realm '$name'",
 		    PRIORITY => "info",
 		    FACILITY => "system",
+	        });
+
+    	        log_wrapper({
+		    MESSAGE  => "Issuing CA $ca_id of PKI realm '$name' validity is " 
+			. OpenXPKI::DateTime::convert_date(
+			{
+			    DATE => $realms{$name}->{ca}->{id}->{$ca_id}->{notbefore},
+			    OUTFORMAT => 'printable',
+		        }) 
+			. ' - '
+			. OpenXPKI::DateTime::convert_date(
+			{
+			    DATE => $realms{$name}->{ca}->{id}->{$ca_id}->{notafter},
+			    OUTFORMAT => 'printable',
+			}
+			),
+		    PRIORITY => "info",
+		    FACILITY => "system",
 		});
-	    
-	    # for convenience and quicker accesss
-	    $realms{$name}->{ca}->{id}->{$ca_id}->{notbefore} = 
-		$cacert->get_parsed("BODY", "NOTBEFORE");
-	    $realms{$name}->{ca}->{id}->{$ca_id}->{notafter} = 
-		$cacert->get_parsed("BODY", "NOTAFTER");
-
-
-            # cert
-            
-            eval {
-                my $cert_identifier;
-                eval {
-                  ##! 128: 'eval'
-                  $cert_identifier = $config->get_xpath(
-                    XPATH   => [ 'pki_realm', 'ca', 'cert', 'identifier' ],
-                    COUNTER => [ $i,           $jj, 0     , 0            ],
-                  );
-                };
-                if (!defined $cert_identifier) {
-                  ##! 128: 'undefined'
-                  my $cert_alias = $config->get_xpath(
-                    XPATH   => [ 'pki_realm', 'ca', 'cert', 'alias' ],
-                    COUNTER => [ $i,          $jj,  0     , 0       ],
-                  );
-                  my $cert_realm = $config->get_xpath(
-                    XPATH   => [ 'pki_realm', 'ca', 'cert', 'realm' ],
-                    COUNTER => [ $i,          $jj,  0     , 0       ],
-                  );
-                  ##! 128: 'cert_alias: ' . $cert_alias
-                  ##! 128: 'cert_realm: ' . $cert_realm
-                  my $dbi = CTX('dbi_backend');
-                  $dbi->connect();
-                  my $cert = $dbi->first(
-                      TABLE   => 'ALIASES',
-                      DYNAMIC => {
-                          ALIAS     => $cert_alias,
-                          PKI_REALM => $cert_realm,
-                      },
-                  );
-                  $dbi->disconnect();
-                  ##! 128: 'cert: ' . Dumper($cert)
-                  if (defined $cert) {
-                      $cert_identifier = $cert->{IDENTIFIER};
-                  }
-                  else {
-                      # TODO: complain
-                  }
-                }
-                ##! 16: 'identifier: ' . $cert_identifier
-                $realms{$name}->{ca}->{id}->{$ca_id}->{identifier} = $cert_identifier;
-            };
-            ##! 128: 'eval_error: ' . $EVAL_ERROR
-            # TODO: complain if $EVAL_ERROR
+            }
+            #############################################################
             # crl_publication info
 
             my @base_path = ('pki_realm', 'ca', 'crl_publication');
@@ -735,25 +743,6 @@ sub get_pki_realms
             };
 
 	    $issuing_ca_count++;
-
-	    log_wrapper(
-		{
-		    MESSAGE  => "Issuing CA $ca_id of PKI realm '$name' validity is " 
-			. OpenXPKI::DateTime::convert_date(
-			{
-			    DATE => $realms{$name}->{ca}->{id}->{$ca_id}->{notbefore},
-			    OUTFORMAT => 'printable',
-			}) 
-			. ' - '
-			. OpenXPKI::DateTime::convert_date(
-			{
-			    DATE => $realms{$name}->{ca}->{id}->{$ca_id}->{notafter},
-			    OUTFORMAT => 'printable',
-			}
-			),
-		    PRIORITY => "info",
-		    FACILITY => "system",
-		});
 	}
 	    
 	log_wrapper(
@@ -993,7 +982,11 @@ configured cryptographic tokens.
 
 =head3 get_pki_realms
 
-Prepares a hash which has the following structure:
+Prepares a hash which has the following structure.
+
+If the named parameter LIGHT is true, it does not try to initialize
+the CA certificate, which is particularly useful if it has not been
+imported/aliased yet and openxpkiadm uses Server::Init.
 
 $hash{PKI_REALM_NAME}->{"crypto"}->{"default"}
 

@@ -43,6 +43,7 @@ sub get_token
     my $type  = $keys->{TYPE};
     my $name  = $keys->{ID};
     my $realm = $keys->{PKI_REALM};
+    my $cert  = $keys->{CERTIFICATE};
 
     if (not $type)
     {
@@ -62,8 +63,14 @@ sub get_token
     }
     ##! 2: "$realm: $type -> $name"
 
-    $self->__add_token (TYPE => $type, NAME => $name, PKI_REALM => $realm)
-        if (not $self->{TOKEN}->{$realm}->{$type}->{$name});
+    if (not $self->{TOKEN}->{$realm}->{$type}->{$name}) {
+        $self->__add_token(
+            TYPE        => $type,
+            NAME        => $name,
+            PKI_REALM   => $realm,
+            CERTIFICATE => $cert,
+        );
+    }
     ##! 2: "token added"
 
     OpenXPKI::Exception->throw (
@@ -88,6 +95,7 @@ sub __add_token
     my $type  = $keys->{TYPE};
     my $name  = $keys->{NAME};
     my $realm = $keys->{PKI_REALM};
+    my $cert  = $keys->{CERTIFICATE};
 
     ## build path from token type
 
@@ -182,7 +190,8 @@ sub __add_token
                     NAME  => $name,
                     PKI_REALM_INDEX => $realm_index,
                     TOKEN_TYPE      => $type_path,
-                    TOKEN_INDEX     => $type_index
+                    TOKEN_INDEX     => $type_index,
+                    CERTIFICATE     => $cert,
                 });
     };
     if (my $exc = OpenXPKI::Exception->caught())
