@@ -605,12 +605,26 @@ sub get_pki_realms
                     $realms{$name}->{ca}->{id}->{$ca_id}->{identifier} = $cert_identifier;
                 };
                 if ($EVAL_ERROR) {
-                    OpenXPKI::Exception->throw(
-                        message => 'I18N_OPENXPKI_SERVER_INIT_COULD_NOT_DETERMINE_CA_IDENTIFIER',
-                        params  => {
-                            CA => $ca_id,
-                        },
-                    );
+    		    log_wrapper({
+    			MESSAGE  => "Could not determine CA identifier for CA '$ca_id' (PKI realm $name)",
+    			PRIORITY => "warn",
+    			FACILITY => "system",
+		    });
+		
+		    log_wrapper({
+			MESSAGE  => "Issuing CA '$ca_id' (PKI realm $name) is unavailable",
+			PRIORITY => "warn",
+			FACILITY => "monitor",
+		    });
+		
+		    next ISSUINGCA;
+                    # we don't want this to be fatal!
+                    #OpenXPKI::Exception->throw(
+                    #    message => 'I18N_OPENXPKI_SERVER_INIT_COULD_NOT_DETERMINE_CA_IDENTIFIER',
+                    #    params  => {
+                    #        CA => $ca_id,
+                    #    },
+                    #);
                 }
     
                 ###########################################################
