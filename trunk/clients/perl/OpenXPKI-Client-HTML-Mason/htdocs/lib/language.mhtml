@@ -29,6 +29,7 @@
         C  => 'C',     ## this should only be used for debugging and testing
         en => 'en_GB',
         de => 'de_DE',
+        ru => 'ru_RU',
     );
 
     ## get languages

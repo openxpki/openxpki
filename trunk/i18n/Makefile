@@ -4,7 +4,7 @@ PREFIX?=	/usr
 LOCALE_DIR   = $(DESTDIR)$(PREFIX)/share/locale
 MO_FILE      = openxpki.mo
 INSTALL      = install
-LANGS         = en_GB de_DE
+LANGS         = en_GB de_DE ru_RU
 PO_SOURCES   = $(LANGS:%=%/openxpki.po)
 MO_TRANSLATIONS = $(LANGS:%=%/$(MO_FILE))
 POT_SOURCES  = ../perl-modules ../clients ../deployment

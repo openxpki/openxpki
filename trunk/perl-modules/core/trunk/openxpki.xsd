@@ -73,6 +73,7 @@
       <xsd:enumeration value="C"/>
       <xsd:enumeration value="en_GB"/>
       <xsd:enumeration value="de_DE"/>
+      <xsd:enumeration value="ru_RU"/>
     </xsd:restriction>
   </xsd:simpleType>
 

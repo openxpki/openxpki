@@ -57,6 +57,8 @@
                                    "set_language_en_gb"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE",
                                    "set_language_de_de"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU",
+                                   "set_language_ru_ru"],
                     ],
                     "edit_certs" =>
                     [
@@ -94,6 +96,11 @@
                     {
                         CMD    => "service/index.html",
                         PARAMS => { "__language" => "de_DE" }
+                    },
+                    "set_language_ru_ru" =>
+                    {
+                        CMD    => "service/index.html",
+                        PARAMS => { "__language" => "ru_RU" }
                     },
                     "edit_valid_certs" =>
                     {

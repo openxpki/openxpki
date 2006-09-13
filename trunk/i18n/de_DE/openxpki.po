@@ -1568,6 +1568,9 @@ msgstr "Deutsch"
 msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
 msgstr "English"
 
+msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
+msgstr "Russian"
+
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
 msgstr "Abmelden"
 
