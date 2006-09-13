@@ -1,11 +1,15 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 13 };
+BEGIN { plan tests => 14 };
 
 print STDERR "OpenXPKI::Server::DBI: CA setup and empty CRL\n";
 
 use OpenXPKI::Server::DBI;
+use OpenXPKI::Crypto::X509;
+use OpenXPKI::Crypto::CRL;
+
+use Data::Dumper;
 
 ok(1);
 
@@ -82,9 +86,16 @@ ok(1);
 # insert first CRL
 
 # TODO: write CRL->to_db_hash() and use here
-#$dbi->insert (TABLE => "CRL", OBJECT => $crl);
-#$dbi->commit();
-#
-#ok(1);
+my %db_hash = $crl->to_db_hash();
+$db_hash{PKI_REALM} = 'Test Root CA';
+$db_hash{ISSUER_IDENTIFIER} = $cert->get_identifier();
+my $serial = $dbi->get_new_serial(
+        TABLE => 'CRL',
+);
+$db_hash{'CRL_SERIAL'} = $serial;
+$dbi->insert (TABLE => "CRL", HASH => \%db_hash);
+$dbi->commit();
+
+ok(1);
 
 1;

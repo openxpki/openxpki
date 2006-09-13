@@ -4,7 +4,7 @@ use utf8;
 binmode STDERR, ":utf8";
 binmode STDOUT, ":utf8";
 use Test;
-BEGIN { plan tests => 19 };
+BEGIN { plan tests => 20 };
 
 print STDERR "OpenXPKI::Crypto::Command: Create user certs and issue CRLs with UTF-8 characters\n";
 
@@ -34,6 +34,10 @@ my $token = $mgmt->get_token (
 );
 ok (1);
 
+my $default_token = $mgmt->get_token (TYPE      => "DEFAULT",
+                                      PKI_REALM => "Test Root CA");
+ok (1);
+
 ## the following operations are already performed by other tests
 ## create PIN (128 bit == 16 byte)
 ## create DSA key
@@ -58,13 +62,13 @@ for (my $i=0; $i < scalar @example; $i++)
     my $dn = $example[$i];
 
     ## create CSR
-    my $csr = $token->command ({COMMAND => "create_pkcs10",
+    my $csr = $default_token->command ({COMMAND => "create_pkcs10",
                                 KEY     => $key,
                                 PASSWD  => $passwd,
                                 SUBJECT => $dn});
     ok (1);
     print STDERR "CSR: $csr\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.pkcs10.pem", CONTENT => $csr);
+    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.pkcs10.pem", CONTENT => $csr, FORCE => 1);
 
     ## create profile
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
@@ -83,11 +87,11 @@ for (my $i=0; $i < scalar @example; $i++)
                                  PROFILE => $profile});
     ok (1);
     print STDERR "cert: $cert\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.cert.pem", CONTENT => $cert);
+    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.cert.pem", CONTENT => $cert, FORCE => 1);
 
     ## build the PKCS#12 file
     my @chain = [ $cacert ];
-    my $pkcs12 = $token->command ({COMMAND => "create_pkcs12",
+    my $pkcs12 = $default_token->command ({COMMAND => "create_pkcs12",
                                    PASSWD  => $passwd,
                                    KEY     => $key,
                                    CERT    => $cert,
@@ -112,7 +116,7 @@ for (my $i=0; $i < scalar @example; $i++)
                                 PROFILE => $profile});
     ok (1);
     print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.crl.pem", CONTENT => $crl);
+    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.crl.pem", CONTENT => $crl, FORCE => 1);
 }
 
 1;

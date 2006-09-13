@@ -101,7 +101,6 @@ OpenXPKI/Crypto/Backend/OpenSSL/XS/CRL.xs
 ## database interface of the server
 
 OpenXPKI/Server/DBI.pm
-OpenXPKI/Server/DBI/Object.pm
 OpenXPKI/Server/DBI/Hash.pm
 OpenXPKI/Server/DBI/SQL.pm
 OpenXPKI/Server/DBI/DBH.pm
@@ -245,7 +244,6 @@ t/25_crypto/32_csr.t
 t/25_crypto/33.t
 t/25_crypto/34.t
 t/25_crypto/35.t
-t/25_crypto/40.t
 t/25_crypto/50.t
 t/25_crypto/51.t
 t/25_crypto/52.t

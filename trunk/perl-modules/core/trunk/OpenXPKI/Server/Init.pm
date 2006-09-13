@@ -30,6 +30,8 @@ use OpenXPKI::Server::Authentication;
 
 use OpenXPKI::Server::Context qw( CTX );
                 
+use OpenXPKI::Crypto::X509;
+
 use Data::Dumper;
 
 # define an array of hash refs mapping the task id to the corresponding

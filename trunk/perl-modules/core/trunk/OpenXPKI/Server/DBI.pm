@@ -19,7 +19,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;
 use OpenXPKI::Server::DBI::Hash;
-use OpenXPKI::Server::DBI::Object;
 
 use Data::Dumper;
 
@@ -71,9 +70,6 @@ sub new {
     $self->{sql}    = OpenXPKI::Server::DBI::SQL->new (DBH   => $self->{dbh});
     $self->{hash}   = OpenXPKI::Server::DBI::Hash->new (SQL   => $self->{sql},
                                                         LOG   => $self->{log});
-    $self->{object} = OpenXPKI::Server::DBI::Object->new (HASH   => $self->{hash},
-                                                          CRYPTO => $self->{crypto});
-
     ##! 1: "end - should now complete"
 
     return $self;
@@ -83,7 +79,6 @@ sub set_crypto
 {
     my $self = shift;
     $self->{crypto} = shift;
-    $self->{object}->set_crypto ($self->{crypto});
     return $self->{crypto};
 }
 
@@ -294,15 +289,9 @@ sub update
     my $self = shift;
     my $keys = { @_ };
 
-    if ($keys->{OBJECT})
-    {
-        $self->{object}->update (TABLE  => $keys->{TABLE},
-                                 OBJECT => $keys->{OBJECT});
-    } else {
-        $self->{hash}->update (TABLE => $keys->{TABLE},
-                               DATA  => $keys->{DATA},
-                               WHERE => $keys->{WHERE});
-    }
+    $self->{hash}->update (TABLE => $keys->{TABLE},
+                           DATA  => $keys->{DATA},
+                           WHERE => $keys->{WHERE});
     return 1;
 }
 
@@ -323,13 +312,7 @@ sub select
     my $self = shift;
     my $keys = { @_ };
 
-    if (exists $keys->{MODE} and $keys->{MODE} eq "OBJECT")
-    {
-        delete $keys->{MODE};
-        return $self->{object}->select (%{$keys});
-    } else {
-        return $self->{hash}->select (%{$keys});
-    }
+    return $self->{hash}->select (%{$keys});
 }
 
 sub get
@@ -509,9 +492,9 @@ Example:
 
 =head3 insert
 
-insert can be used in two way - object or hash based. If you specify
-a HASH reference then a hash is inserted. If you specify an
-OBJECT then the object oriented way is used.
+To insert, specify a hash reference so that the values corresponding
+to the hash keys are inserted.
+Please note that object oriented inserts are no longer available.
 
 Example:
 
@@ -519,11 +502,8 @@ Example:
 
 =head3 update
 
-update can be used in two ways - object or hash based. If you specify an
-OBJECT then the object oriented way is used. Otherwise a hash oriented
-update is assumed.
-
-Please note that you must specify the where clause for an hash oriented
+Specify a hash for DATA.
+Please note that you must specify the where clause for an
 update. The background is that the hash based interface supports mass
 updates. If the where clause is missing then we start an index scan
 on the parameter DATA.
@@ -548,8 +528,7 @@ hide some complexity from the user.
 
 implements an access method to the SQL select operation. Please
 look at OpenXPKI::Server::DBI::SQL to get an overview about the available
-query options. Please specify C<MODE =<gt> "OBJECT"> if you want
-an object instead of a hash reference per result.
+query options. 
 
 =head3 get
 
