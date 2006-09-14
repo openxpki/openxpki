@@ -16,6 +16,7 @@ use Pod::Usage;
 use POSIX ":sys_wait_h";
 use Errno;
 use File::Spec;
+use Proc::ProcessTable;
 
 # use Smart::Comments;
 
@@ -53,6 +54,20 @@ sub slurp {
 	<$HANDLE>;
     };
     return $content;
+}
+
+sub __get_processgroup_pids {
+    # returns a list of PIDs that belong to a given process group
+    my $process_group = shift;
+    my @result;
+
+    my $pt = new Proc::ProcessTable;
+    foreach my $process (@{$pt->table}) {
+        if (getpgrp($process->pid) == $process_group) {
+            push @result, $process->pid;
+        }
+    } 
+    return @result;
 }
 
 sub connect_openxpki_daemon {
@@ -204,25 +219,33 @@ sub do_stop {
     my $pidfile    = $arg->{PIDFILE};
     my $socketfile = $arg->{SOCKETFILE};
 
+    my $process_group = getpgrp($pid);
+
     if (! defined $pid || (kill(0, $pid) == 0)) {
 	print STDERR "OpenXPKI Server is not running.\n";
 	return 1;
     }
-    print STDERR "Stopping OpenXPKI..";
+    print STDERR "Stopping OpenXPKI\n";
 
     my @signals = (2, 2, 3, 3, 9);
-  TERMINATE:
-    foreach my $sig (@signals) {
-	print STDERR '.';
-	kill($sig, $pid);
-	sleep 1;
-	last TERMINATE if (kill(0, $pid) == 0);
-    }
-    print STDERR "\n";
-    if (kill(0, $pid)) {
-	print STDERR "FAILED.\n";
-	print STDERR "Could not terminate OpenXPKI Server daemon.\n";
-	return;
+
+    # get all PIDs which belong to the current process group
+    my @pids = __get_processgroup_pids($process_group);
+    foreach my $p (@pids) {
+        print STDERR "[$p] ";
+        TERMINATE:
+        foreach my $sig (@signals) {
+	    print STDERR '.';
+    	    kill($sig, $p);
+	    sleep 1;
+	    last TERMINATE if (kill(0, $p) == 0);
+        }
+        print STDERR "\n";
+        if (kill(0, $p)) {
+            print STDERR "FAILED.\n";
+            print STDERR "Could not terminate OpenXPKI process $p.\n";
+            return;
+        }
     }
     print STDERR "DONE.\n";
     return 1;

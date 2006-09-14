@@ -44,6 +44,8 @@ METACONF_OPTS=""
 
 # check infrastructure
 ERRORS=0
+# TODO: we should check non-standard modules used in the openxpki[adm|ctl]
+# as well
 echo "Checking required OpenXPKI Perl modules..."
 for module in OpenXPKI OpenXPKI::Client ; do
     echo -n "$module: "
