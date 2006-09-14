@@ -1,7 +1,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 15;
 use English;
 # use Smart::Comments;
 
@@ -69,5 +69,20 @@ ok (not defined $hash->{'UNDEFINED'});
 ok (not defined $res->{'UNDEFINED'});
 ok (not defined $hash->{'LIST'}->[0]->{'UNDEFINED'});
 ok (not defined $res->{'LIST'}->[0]->{'UNDEFINED'});
+
+## testing utf-8 encoding
+
+$hash = {
+	 "uid"   => ["Тестиров"],
+         "cn"    => ["Иван Петров"]
+        };
+$text = $ref->serialize ($hash);
+
+$expected_serialization = "HASH-92-3-uid-ARRAY-29-0-SCALAR-16-Тестиров-2-cn-ARRAY-34-0-SCALAR-21-Иван Петров-";
+ok($text eq $expected_serialization);
+
+$res = $ref->deserialize($text);
+ok($res);
+is_deeply($res, $hash, "Data structure survived (de)serialization");
 
 1;

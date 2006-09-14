@@ -45,7 +45,7 @@ case "$1" in
 		echo Detected and respect an old database.
 	else
 		echo -n Initialize database ...
-                openxpkiadm --config=/etc/openxpki/instances/trustcenter1/config.xml initdb 2>>/var/log/messages
+                openxpkiadm initdb --config=/etc/openxpki/instances/trustcenter1/config.xml 2>>/var/log/messages
 		echo DONE.
 	fi;
 	## fix var directory

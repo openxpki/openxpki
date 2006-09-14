@@ -162,6 +162,8 @@ OpenXPKI/Server/Workflow/Activity/CRLIssuance/PublishCRL.pm
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
+OpenXPKI/Server/Workflow/Observer/AddExecuteHistory.pm
+
 OpenXPKI/Server/Workflow/Condition/ACL.pm
 OpenXPKI/Server/Workflow/Condition/Approved.pm
 OpenXPKI/Server/Workflow/Condition/ContextParameterExistence.pm

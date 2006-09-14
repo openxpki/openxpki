@@ -51,6 +51,7 @@ install: install-stamp
 install-stamp: build
 	dh_testdir
 	DESTDIR=$(CURDIR)/debian/tmp make install
+	dh_installdocs
 	dh_fixperms -a
 	touch install-stamp
 

@@ -4,6 +4,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 package OpenXPKI::Serialization::Simple;
 
@@ -11,6 +12,7 @@ use OpenXPKI::VERSION;
 our $VERSION = $OpenXPKI::VERSION::VERSION;
 
 use OpenXPKI::Exception;
+use Encode;
 
 sub new
 {
@@ -123,6 +125,7 @@ sub __write_scalar
 {
     my $self = shift;
     my $data = shift;
+    $data = pack("C*", unpack("U0C*", $data)); ## downgrade unicode characters to bytes
     return "SCALAR".$self->{SEPARATOR}.
            length($data).$self->{SEPARATOR}.
            $data.$self->{SEPARATOR};
@@ -245,6 +248,9 @@ sub __read_scalar
     my $ret = $self->__read_int ($msg);
     $scalar = substr ($ret->{msg}, 0, $ret->{int});
     $msg    = substr ($ret->{msg}, $ret->{int}+1);
+
+    ## convert bytes to unicode characters
+    $scalar = pack("U0C*", unpack("C*", $scalar));
 
     return {data => $scalar,
             msg  => $msg}

@@ -21,6 +21,7 @@ use Params::Validate qw( validate :types );
 use OpenXPKI::Debug 'OpenXPKI::Server::API::Workflow';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 
 my %workflow_factory : ATTR;
 
@@ -164,6 +165,7 @@ sub execute_workflow_activity {
     my $workflow = $self->__get_workflow_factory()->fetch_workflow(
 	$wf_title,
 	$wf_id);
+    $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
 
     ##! 2: "check parameters"
     my %fields = ();
