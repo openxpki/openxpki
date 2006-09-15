@@ -98,5 +98,11 @@
   <condition name="CONTEXT::no_csr_serial_present" class="OpenXPKI::Server::Workflow::Condition::ContextParameterExistence">
     <param name="parameter" value="csr_serial"/>
   </condition>
+
+  <!-- conditions for child workflow control -->
+  <condition name="wf_child_instance_not_finished" class="OpenXPKI::Server::Workflow::Condition::IsWorkflowChildInstanceFinished">
+  </condition>
+  <condition name="wf_child_instance_finished" class="OpenXPKI::Server::Workflow::Condition::IsWorkflowChildInstanceFinished">
+  </condition>
 </conditions>
 

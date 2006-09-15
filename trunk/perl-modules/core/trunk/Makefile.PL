@@ -308,6 +308,7 @@ WriteMakefile(
 	'Net::LDAP'              => "0.32",
 	'Params::Validate'       => '0.77',
 	'Regexp::Common'         => 2,
+        'Sys::SigAction'         => '0.06',
 	'Test'                   => 1,
 	'Test::Pod'              => "1.00",
 	'Test::Pod::Coverage'    => "1.00",

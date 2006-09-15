@@ -18,7 +18,10 @@ sub evaluate
 {
     my ( $self, $wf ) = @_;
 
-
+    # FIXME: do some real work here to determine usability ...
+    if ($self->name() eq 'CA::key_is_not_usable') {
+        condition_error("I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE");
+    }
     return 1;
 }
 
@@ -33,15 +36,16 @@ OpenXPKI::Server::Workflow::Condition::Key
 =head1 SYNOPSIS
 
 <action name="do_something">
-  <condition name="Condition::Key"
+  <condition name="CA::key_is_usable"
              class="OpenXPKI::Server::Workflow::Condition::Key">
     <param name="key" value="ca"/>
-    <param name="status" value="usable"/>
   </condition>
 </action>
 
 =head1 DESCRIPTION
 
-The condition checks if the specified key (token id) is usable
-(status == 'usable') or unusable (status == 'unusable').
-
+The condition checks if the specified key (token id) is unusable
+(with the condition name CA::key_is_not_usable) or usable (with
+any other condition name).
+FIXME:
+Currently, it just assumes that the key is always available ...

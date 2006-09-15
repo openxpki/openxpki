@@ -134,6 +134,8 @@
     if (not defined $activities)
     {
         ## ok we have to get the info from the server
+        ## FIXME: this fails if type and id are undefined, id can
+        ## be extracted from $msg, but what about type?
         my $hmsg = $context->{client}->send_receive_command_msg
                (
                    "get_workflow_activities",

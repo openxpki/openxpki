@@ -1,8 +1,6 @@
 <actions>
-  <!-- implicit autorun and no user interaction - so no I18N name for this
-       activity -->
-  <action name="determine_issuing_ca"
-	  class="OpenXPKI::Server::Workflow::Activity::Tools::DetermineIssuingCA">
+  <action name="import"
+	  class="Workflow::Action::Null">
     <field name="pkcs10"/>
     <field name="spkac"/>
     <field name="csr_type"/>
@@ -35,6 +33,16 @@
     </validator>
   </action>
 
+  <action name="null"
+          class="Workflow::Action::Null">
+  </action>
+
+  <!-- implicit autorun and no user interaction - so no I18N name for this
+       activity -->
+  <action name="I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::DetermineIssuingCA">
+  </action>
+
   <!-- autorun and no user interaction - so no I18N name for this
        activity -->
   <action name="get_cert_profile"
@@ -43,17 +51,23 @@
 
   <!-- autorun and no user interaction - so no I18N name for this
        activity -->
-  <action name="wait_for_ca"
-	  class="Workflow::Action::Null">
-  </action>
-
-  <!-- autorun and no user interaction - so no I18N name for this
-       activity -->
   <action name="issue_certificate"
 	  class="OpenXPKI::Server::Workflow::Activity::CertIssuance::Issue">
   </action>
 
-  <action name="insert_certificate"
-          class="OpenXPKI::Server::Workflow::Activity::CertIssuance::InsertCertificate">
+  <action name="persist_certificate"
+          class="OpenXPKI::Server::Workflow::Activity::CertIssuance::PersistCertificate">
   </action>
+
+  <!-- TODO: implement this action! -->
+  <action name="I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
+          class="Workflow::Action::Null">
+  </action>
+  
+<!-- for testing only
+  <action name="I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"
+          time="60">
+  </action>
+-->
 </actions>

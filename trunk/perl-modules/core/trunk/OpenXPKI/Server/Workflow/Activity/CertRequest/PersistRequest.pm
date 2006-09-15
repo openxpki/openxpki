@@ -1,18 +1,16 @@
-# OpenXPKI::Server::Workflow::Activity::CertRequest::InsertRequest
+# OpenXPKI::Server::Workflow::Activity::CertRequest:PersistRequest:
 # Written by Alexander Klink for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
 # $Revision: 320 $
 
-package OpenXPKI::Server::Workflow::Activity::CertRequest::InsertRequest;
+package OpenXPKI::Server::Workflow::Activity::CertRequest::PersistRequest;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CertRequest::InsertRequest';
-
-use Data::Dumper;
+use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CertRequest::PersistRequest';
 
 sub execute
 {
@@ -56,7 +54,6 @@ sub execute
     );
     $dbi->commit();
     $context->param('csr_serial' => $csr_serial);
-    ##! 32: 'context: ' . Dumper($context)
 }
 
 1;
@@ -64,9 +61,9 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::CertRequest::InsertRequest
+OpenXPKI::Server::Workflow::Activity::CertRequest::PersistRequest
 
 =head1 Description
 
-inserts the Certificate Signing Request into the database, so that
+persists the Certificate Signing Request into the database, so that
 it can then be used by the certificate issuance workflow.

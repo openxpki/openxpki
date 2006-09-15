@@ -2,17 +2,19 @@
 <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
   <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE</description>
   <persister>OpenXPKI</persister>
+  <observer class="OpenXPKI::Server::Workflow::Observer::Log"/>
+  <observer class="OpenXPKI::Server::Workflow::Observer::AddExecuteHistory"/>
 
   <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL</description>
-    <action name="determine_issuing_ca" 
-	    resulting_state="ISSUING_CA_DETERMINED">
-      <condition name="ACL::start_certificate_issuance"/>
+    <action name="import"
+            resulting_state="I18N_OPENXPKI_WF_STATE_WAITING_FOR_START">
     </action>
     <!-- no 'required' field here because we want this WF to terminate with
 	 an error immediately -->
     <!-- this is obsolete for now, as we pass on most of the data via
-         the context and not via the DB -->
+         the context and not via the DB, so we don't need the CSR
+         serial as reference -->
 <!--
     <action name="null" 
 	    resulting_state="FAILED">
@@ -20,36 +22,76 @@
     </action>
 -->
   </state>
-  
+
+  <!-- this state is implicitly autostarted by the parent workflow -->
+  <state name="I18N_OPENXPKI_WF_STATE_WAITING_FOR_START">
+    <action name="I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+	    resulting_state="ISSUING_CA_DETERMINED">
+      <condition name="ACL::start_certificate_issuance"/>
+    </action>
+  </state>
+
   <state name="ISSUING_CA_DETERMINED" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED</description>
-    <action name="get_cert_profile" 
-	    resulting_state="PREPARED">
+    <action name="get_cert_profile"
+            resulting_state="PREPARED">
     </action>
-    
   </state>
 
   <state name="PREPARED" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED</description>
-    <!-- for testing, assume CA key is always available 
-    <action name="wait_for_ca"
-	    resulting_state="PREPARED">
+    <!-- at the moment, this action is never triggered as the condition
+         always fails. This is useful for testing, but will change
+         in the future -->
+    <action name="null"
+            resulting_state="CA_KEY_NOT_USABLE">
       <condition name="CA::key_is_not_usable"/>
     </action>
-    -->
+
+    <action name="null"
+            resulting_state="CA_KEY_USABLE">
+      <condition name="CA::key_is_usable"/>
+    </action>
+  </state>
+
+  <!-- TODO: maybe loop back to prepared if the key is not usable
+             _right now_ (might have become unusable for some reason).
+             Or am I just _too_ paranoid? ;-)
+   -->
+  <state name="CA_KEY_USABLE" autorun="yes">
     <action name="issue_certificate" 
 	    resulting_state="CERTIFICATE_ISSUED">
-      <condition name="CA::key_is_usable"/>
+    </action>
+  </state>
+
+  <state name="CA_KEY_NOT_USABLE">
+    <action name="I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY" 
+	    resulting_state="CA_KEY_USABLE">
     </action>
   </state>
 
   <state name="CERTIFICATE_ISSUED" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED</description>
+    <action name="persist_certificate"
+            resulting_state="FINISHED">
+    </action>
+  </state>
+
+<!-- for testing forked workflows, sleeps 60 seconds after issuance -->
+<!--
+  <state name="CERTIFICATE_ISSUED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED</description>
+    <action name="I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
+            resulting_state="SLEPT">
+    </action>
+  </state>
+
+  <state name="SLEPT" autorun="yes">
     <action name="insert_certificate"
             resulting_state="FINISHED">
     </action>
   </state>
-  <state name="FINISHED"/>
-  <state name="FAILED"/>
+-->
 
+  <state name="FINISHED"/>
 </workflow>

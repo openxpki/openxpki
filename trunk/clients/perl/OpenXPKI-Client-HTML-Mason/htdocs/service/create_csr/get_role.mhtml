@@ -24,6 +24,8 @@
 <%init>
     ## read all roles from the server
     my $msg = $context->{client}->send_receive_command_msg("get_roles");
+    # FIXME: the following fails in both Konqueror and Opera with
+    # "not an array reference". Weird.
     my @roles = @{$msg->{PARAMS}};
 
     ## return the role if it exists

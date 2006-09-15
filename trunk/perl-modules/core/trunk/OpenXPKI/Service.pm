@@ -12,6 +12,9 @@ use utf8;
 use English;
 
 use Class::Std;
+# the following is more secure than the standard $SIG{ALRM} code,
+# see http://search.cpan.org/~lbaxter/Sys-SigAction/dbd-oracle-timeout.POD
+use Sys::SigAction qw( set_sig_handler );
 
 use Data::Dumper;
 ## used modules
@@ -81,7 +84,7 @@ sub collect {
 
     my $result;
     eval {
-	local $SIG{ALRM} = sub { die "alarm\n" };
+        my $h = set_sig_handler('ALRM', sub { die "alarm\n"; });
 	if (defined $read_timeout{$ident}) {
 	    alarm $read_timeout{$ident};
 	}

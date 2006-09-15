@@ -1,17 +1,17 @@
-# OpenXPKI::Server::Workflow::Activity::CertIssuance::InsertCertificate
+# OpenXPKI::Server::Workflow::Activity::CertIssuance::PersistCertificate
 # Written by Alexander Klink for 
 # the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
 # $Revision: 320 $
 
-package OpenXPKI::Server::Workflow::Activity::CertIssuance::InsertCertificate;
+package OpenXPKI::Server::Workflow::Activity::CertIssuance::PersistCertificate;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CertIssuance::InsertCertificate';
+use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CertIssuance::PersistCertificate';
 use OpenXPKI::Crypto::X509;
 use OpenXPKI::Crypto::TokenManager;
 
@@ -65,11 +65,11 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Certificate::InsertCertificate
+OpenXPKI::Server::Workflow::Activity::Certificate::PersistCertificate
 
 =head1 Description
 
-Inserts the issued certificate into the certificate database
+Persists the issued certificate into the certificate database
 
 =head2 Context parameters
 

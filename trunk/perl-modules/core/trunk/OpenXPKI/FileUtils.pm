@@ -27,19 +27,19 @@ sub read_file {
 
     if (! defined $filename) {
 	OpenXPKI::Exception->throw (
-	    message => 'I18N_OPENXPKI_READ_FILE_MISSING_PARAMETER',
+	    message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_MISSING_PARAMETER',
 	    );
     }
 
     if (! -e $filename) {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST',
+            message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_DOES_NOT_EXIST',
             params  => {'FILENAME' => $filename});
     }
 
     if (! -r $filename) {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_READ_FILE_NOT_READABLE',
+            message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_NOT_READABLE',
             params  => {'FILENAME' => $filename});
     }
 
@@ -47,7 +47,7 @@ sub read_file {
 	open my $HANDLE, '<', $filename;
 	if (! $HANDLE) {
 	    OpenXPKI::Exception->throw (
-		message => 'I18N_OPENXPKI_READ_FILE_OPEN_FAILED',
+		message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_OPEN_FAILED',
 		params  => {'FILENAME' => $filename});
 	}
 	# slurp mode
@@ -68,13 +68,13 @@ sub write_file {
 
     if (! defined $filename) {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_WRITE_FILE_NO_FILENAME_SPECIFIED',
+            message => 'I18N_OPENXPKI_FILEUTILS_WRITE_FILE_NO_FILENAME_SPECIFIED',
 	    );
     }
 
     if (! defined $content) {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_WRITE_FILE_NO_CONTENT_SPECIFIED',
+            message => 'I18N_OPENXPKI_FILEUTILS_WRITE_FILE_NO_CONTENT_SPECIFIED',
 	    );
     }
 
@@ -84,7 +84,7 @@ sub write_file {
          not $safe_filename_of{$ident} or
          not $safe_filename_of{$ident}->{$filename})) {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS',
+            message => 'I18N_OPENXPKI_FILEUTILS_WRITE_FILE_ALREADY_EXISTS',
             params  => {'FILENAME' => $filename});
     }
 
@@ -97,7 +97,7 @@ sub write_file {
     if (not sysopen($HANDLE, $filename, $mode))
     {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_WRITE_FILE_OPEN_FAILED',
+            message => 'I18N_OPENXPKI_FILEUTILS_WRITE_FILE_OPEN_FAILED',
             params  => {'FILENAME' => $filename});
     }
     print {$HANDLE} $content;
@@ -113,11 +113,11 @@ sub get_safe_tmpfile {
     ##! 2: 'check TMP'
     if (not exists $arg_ref->{TMP}) {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_GET_SAFE_TMPFILE_MISSING_TMP');
+            message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MISSING_TMP');
     }
     if (not -d $arg_ref->{TMP}) {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST',
+            message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST',
             params => {DIR => $arg_ref->{TMP}});
     }
 
@@ -128,7 +128,7 @@ sub get_safe_tmpfile {
     my ($fh, $filename) = File::Temp::mkstemp($template);
     if (! $fh) {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_GET_SAFE_TMPFILE_MAKE_FAILED',
+            message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MAKE_FAILED',
             params  => {'FILENAME' => $filename});
     }
     close $fh;
