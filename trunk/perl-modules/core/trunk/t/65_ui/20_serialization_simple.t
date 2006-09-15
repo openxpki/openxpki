@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::More tests => 15;
 use English;
+use utf8; # otherwise the utf8 tests does not work
 # use Smart::Comments;
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::Simple' ); }
@@ -79,7 +80,14 @@ $hash = {
 $text = $ref->serialize ($hash);
 
 $expected_serialization = "HASH-92-3-uid-ARRAY-29-0-SCALAR-16-Тестиров-2-cn-ARRAY-34-0-SCALAR-21-Иван Петров-";
+## downgrade from utf8 to byte level
+$expected_serialization = pack ("C*", unpack ("U0C*", $expected_serialization));
 ok($text eq $expected_serialization);
+if ($text ne $expected_serialization)
+{
+    print STDERR "EXPECT: =>$expected_serialization<=\n";
+    print STDERR "GOT:    =>$text<=\n";
+}
 
 $res = $ref->deserialize($text);
 ok($res);
