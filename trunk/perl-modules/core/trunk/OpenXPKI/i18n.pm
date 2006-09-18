@@ -117,10 +117,10 @@ sub set_language
     textdomain("openxpki");
     bindtextdomain("openxpki", $locale_prefix);
     bind_textdomain_codeset("openxpki", "UTF-8");
-    bind_textdomain_filter ('openxpki', \&set_utf8_flag);
+    bind_textdomain_filter ('openxpki', \&__set_utf8_flag);
 }
 
-sub set_utf8_flag
+sub __set_utf8_flag
 {
     my $string = shift;
     Encode::_utf8_on ($string);

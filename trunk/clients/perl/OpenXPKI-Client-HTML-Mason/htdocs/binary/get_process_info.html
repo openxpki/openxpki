@@ -1,0 +1,49 @@
+<%args>
+    $id     => undef
+    $format => "png"
+    $filled => undef
+</%args>
+<%init>
+    my $msg = $context->{client}->send_receive_command_msg (
+                  "get_process_info", {ID       => $id});
+    if (exists $msg->{SERVICE_MSG} and
+        $msg->{SERVICE_MSG} eq "ERROR")
+    {
+        $m->comp ('/service/create_csr/print_errors.mhtml',
+	          'errors' => [
+                      $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg)
+		              ]);
+    }
+    else
+    {
+        my $data = $msg->{PARAMS};
+        if ($format eq "png")
+        {
+            $r->content_type ("image/png");
+        }
+        elsif ($format eq "ps")
+        {
+            $r->content_type ("application/postscript");
+        }
+        else
+        {
+            $r->content_type ("application/octet-stream");
+        }
+	my ($ofh, $ifh);
+        my $pid = open2 ($ofh, $ifh, "/usr/bin/dot -T$format");
+        if (not $pid)
+	{
+	    print "ups - small error\n";
+	}
+        print $ifh $data."\n";
+	close $ifh;
+        $data = "";
+	while (<$ofh>) {$data .= $_;}
+        close $ofh;
+        print $data."\n";
+	waitpid $pid, 0;
+    }
+</%init>
+<%once>
+  use IPC::Open2;
+</%once>

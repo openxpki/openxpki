@@ -165,6 +165,7 @@ sub execute_workflow_activity {
     my $workflow = $self->__get_workflow_factory()->fetch_workflow(
 	$wf_title,
 	$wf_id);
+    $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
     $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
 
     ##! 2: "check parameters"
@@ -275,6 +276,8 @@ sub create_workflow_instance {
 		WORKFLOW => $wf_title,
 	    });
     }
+    $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
+    $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
 
     my $creator = CTX('session')->get_user();
     ##! 2: $creator

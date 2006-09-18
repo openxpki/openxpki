@@ -342,6 +342,11 @@ sub create_history {
 	if ($id) {
 	    $data{WORKFLOW_HISTORY_SERIAL} = $id;
 	}
+        if ($entry->user() eq 'n/a')
+        {
+            ## user set by workflow factory class
+            $data{WORKFLOW_USER} = CTX('session')->get_user();
+        }
 
 	##! 2: "inserting data into workflow history table"
 	$dbi->insert(

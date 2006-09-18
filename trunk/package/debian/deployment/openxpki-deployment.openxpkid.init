@@ -39,6 +39,8 @@ d_start() {
 	#	--exec $DAEMON start -- --debug :100
 	# enable rudimentary debugging
 	#	--exec $DAEMON start -- --debug :
+	# enable debugging of the visualization API
+	#	--exec $DAEMON start -- --debug "OpenXPKI::Server::API::Visualization:100"
 }
 
 #

@@ -24,9 +24,11 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DN;
 use OpenXPKI::Server::API::Workflow;
 use OpenXPKI::Server::API::Object;
+use OpenXPKI::Server::API::Visualization;
 
 my %workflow :ATTR;
 my %object   :ATTR;
+my %visualization :ATTR;
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
@@ -46,6 +48,7 @@ sub BUILD {
 
     $workflow{$ident} = OpenXPKI::Server::API::Workflow->new ($arg_ref);
     $object{$ident}   = OpenXPKI::Server::API::Object->new ($arg_ref);
+    $visualization{$ident} = OpenXPKI::Server::API::Visualization->new ($arg_ref);
 }
 
 sub get_api
@@ -56,6 +59,7 @@ sub get_api
 
     return $workflow{$ident} if ($api eq "Workflow");
     return $object{$ident}   if ($api eq "Object");
+    return $visualization{$ident}   if ($api eq "Visualization");
     return $self; ## unknown APIs are handled by the core API
 }
 
@@ -418,5 +422,6 @@ Example:
 
 my $workflow_api = $api->get_api('Workflow');
 my $object_api   = $api->get_api('Object');
+my $visual_api   = $api->get_api('Visualization');
 my $api          = $api->get_api('Unknown API');
 

@@ -28,7 +28,7 @@
 
     ## was the login specified by the user?
     my %data = $m->request_args();
-    print STDERR "let's look for the login ...\n";
+    #print STDERR "let's look for the login ...\n";
     if (exists $data{'login'})
     {
         #print  STDERR "DATA: ".$data{'login'}."\n";
@@ -38,14 +38,14 @@
                              'LOGIN'  => $data{'login'},
                              'PASSWD' => $data{'passwd'},
                             });
-        print  STDERR "second: ".$data{'login'}."\n";
+        #print  STDERR "second: ".$data{'login'}."\n";
         if ($msg->{'SERVICE_MSG'} ne 'GET_PASSWD_LOGIN')
         {
             return $msg;
         }
-        print  STDERR "third: ".$data{'login'}."\n";
+        #print  STDERR "third: ".$data{'login'}."\n";
     }
-    print STDERR "login passed\n";
+    #print STDERR "login passed\n";
 
     ## ok let's ask the user for the login and password
     ## cache the last message in the context

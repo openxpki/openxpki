@@ -48,6 +48,8 @@ my %allowed_command = (
     execute_workflow_activity => {API => 'Workflow'},
 
     get_csr_info_hash_from_data => {API => 'Object'},
+
+    get_process_info => {API => 'Visualization'},
 );
 
 sub BUILD {
