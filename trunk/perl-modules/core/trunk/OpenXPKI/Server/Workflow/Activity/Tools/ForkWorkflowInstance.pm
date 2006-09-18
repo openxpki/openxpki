@@ -12,6 +12,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::Tools::ForkWorkflowInstance';
+use OpenXPKI::Serialization::Simple;
 
 use Data::Dumper;
 
@@ -23,6 +24,7 @@ sub execute {
     my $context                = $workflow->context();
     my $wf_child_instance_type = $self->param('workflow_type');
     my $api                    = CTX('api');
+    my $serializer             = OpenXPKI::Serialization::Simple->new();
 
     ##! 16: 'context: ' . Dumper($context->param())
     ## create new workflow
@@ -32,18 +34,28 @@ sub execute {
             FILTER_PARAMS => 1,
             PARAMS        => $context->param(),
     });
+    my $wf_child_instance_id = $wf_info->{WORKFLOW}->{ID};
 
-    my $wf_child_instance_id   = $wf_info->{WORKFLOW}->{ID};
-    # TODO: use serialized array for the case where we have
-    # more than one child?
+    my $wf_child_info_ref = {
+        'ID'   => $wf_child_instance_id,
+        'TYPE' => $wf_child_instance_type,
+    };
+
+    # fetch wf_child_instances from workflow context
+    # and add $wf_child_info_ref
+    my @wf_children;
+    my $wf_children_instances = $context->param('wf_children_instances');
+    if (defined $wf_children_instances) {
+        @wf_children = @{$serializer->deserialize($wf_children_instances)};
+    }
+    push @wf_children, $wf_child_info_ref;
+    ##! 16: '@wf_children: ' . Dumper \@wf_children
+    
     $context->param(
-        'wf_child_instance_id'   => $wf_child_instance_id,
+        'wf_children_instances'   => $serializer->serialize(\@wf_children),
     );
-    $context->param(
-        'wf_child_instance_type' => $wf_child_instance_type,
-    );
-    ##! 16: 'child workflow created, id: ' . $wf_child_instance_id
-    # TODO: can we force this to be inserted into the DB _right now_?
+
+    ##! 16: 'child workflow created, id: ' . $wf_child_info_ref->{ID}
 
     # disconnect DB handles as they can not be forked connected
     CTX('dbi_workflow')->disconnect();
@@ -54,6 +66,8 @@ sub execute {
     my $pid;
     $SIG{CHLD} = 'IGNORE'; # avoids zombies, TODO: research on
                            # which systems this actually works
+                           # Martin suggests to set up a handler for
+                           # SIGCHLD that does waitpid ...
     while (!defined $pid && $redo_count < 5) {
         ##! 32: 'trying to fork'
 	$pid = fork();

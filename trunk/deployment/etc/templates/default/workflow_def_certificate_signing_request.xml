@@ -88,7 +88,7 @@
   <!-- if child is not yet finished, this goes out of autorun -->
   <state name="CHECK_CHILD_FINISHED" autorun="yes">
     <action name="null"
-            resulting_state="FINISHED">
+            resulting_state="SUCCESS">
       <condition name="wf_child_instance_finished"/>
     </action>
   </state>
@@ -108,6 +108,11 @@
   </state>
 -->
 
-  <state name="REJECTED" />
-  <state name="FINISHED" />
+  <state name="REJECTED" autorun="yes">
+    <action name="null"
+            resulting_state="FAILURE">
+    </action>
+  </state>
+  <state name="FAILURE" />
+  <state name="SUCCESS" />
 </workflow>

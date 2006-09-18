@@ -10,11 +10,13 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
+use OpenXPKI::Serialization::Simple;
 
 sub execute
 {
     my $self = shift;
     my $workflow = shift;
+    my $serializer = OpenXPKI::Serialization::Simple->new();
 
     ## get needed informations
     my $context = $workflow->context();
@@ -23,9 +25,29 @@ sub execute
 
     ## create new workflow
     $api = $api->get_api('Workflow');
-    $api->create_workflow_instance ({WORKFLOW      => $type,
-                                     FILTER_PARAMS => 1,
-                                     PARAMS        => $context->param()});
+    my $wf_info = $api->create_workflow_instance({
+            WORKFLOW      => $type,
+            FILTER_PARAMS => 1,
+            PARAMS        => $context->param(),
+    });
+
+    my $wf_child_info_ref = {
+        'ID'   => $wf_info->{WORKFLOW}->{ID},
+        'TYPE' => $type,
+    };
+
+    # fetch wf_child_instances from workflow context
+    # and add $wf_child_info_ref
+    my @wf_children;
+    my $wf_children_instances = $context->param('wf_children_instances');
+    if (defined $wf_children_instances) {
+        @wf_children = @{$serializer->deserialize($wf_children_instances)};
+    }
+    push @wf_children, $wf_child_info_ref;
+    
+    $context->param(
+        'wf_children_instances'   => $serializer->serialize(\@wf_children),
+    );
 }
 
 1;
@@ -40,6 +62,9 @@ OpenXPKI::Server::Workflow::Activity::Tools::CreateWorkflowInstance
 If you need to create a new instance of a workflow from within another
 workflow then this is the right class. It takes the class which should
 be instantiated from the activity parameter workflow_type. 
+
+The workflow ID and type are saved in the serialized workflow context
+parameter array wf_child_instances.
 
 Example:
   <action name="I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"

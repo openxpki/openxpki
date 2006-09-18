@@ -172,7 +172,7 @@ OpenXPKI/Server/Workflow/Condition/ContextParameterExistence.pm
 OpenXPKI/Server/Workflow/Condition/Key.pm
 OpenXPKI/Server/Workflow/Condition/Server.pm
 OpenXPKI/Server/Workflow/Condition/CRLSigningCAsLeft.pm
-OpenXPKI/Server/Workflow/Condition/IsWorkflowChildInstanceFinished.pm
+OpenXPKI/Server/Workflow/Condition/WorkflowChildrenSuccessfullyFinished.pm
 
 OpenXPKI/Server/Workflow/Observer/Log.pm
 

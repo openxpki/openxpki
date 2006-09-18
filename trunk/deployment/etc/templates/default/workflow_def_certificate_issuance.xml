@@ -73,7 +73,7 @@
   <state name="CERTIFICATE_ISSUED" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED</description>
     <action name="persist_certificate"
-            resulting_state="FINISHED">
+            resulting_state="SUCCESS">
     </action>
   </state>
 
@@ -88,10 +88,10 @@
 
   <state name="SLEPT" autorun="yes">
     <action name="insert_certificate"
-            resulting_state="FINISHED">
+            resulting_state="SUCCESS">
     </action>
   </state>
 -->
 
-  <state name="FINISHED"/>
+  <state name="SUCCESS"/>
 </workflow>
