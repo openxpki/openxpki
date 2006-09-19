@@ -595,8 +595,11 @@ sub __get_workflow_info : PRIVATE {
 
     my $result = {
 	WORKFLOW => {
-	    ID    => $workflow->id(),
-	    STATE => $workflow->state(),
+	    ID          => $workflow->id(),
+	    STATE       => $workflow->state(),
+	    TYPE        => $workflow->type(),
+	    DESCRIPTION => $workflow->description(),
+	    LAST_UPDATE => $workflow->last_update(),
 	    CONTEXT => { 
 		%{$workflow->context()->param()} 
 	    },

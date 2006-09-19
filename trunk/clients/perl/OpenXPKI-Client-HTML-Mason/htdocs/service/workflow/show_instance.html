@@ -33,7 +33,19 @@
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE') %></td>
-    <td><% $msg->{PARAMS}->{WORKFLOW}->{STATE} %></td>
+    <td><% i18nGettext($msg->{PARAMS}->{WORKFLOW}->{STATE}) %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE') %></td>
+    <td><% i18nGettext($msg->{PARAMS}->{WORKFLOW}->{TYPE}) %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION') %></td>
+    <td><% i18nGettext($msg->{PARAMS}->{WORKFLOW}->{DESCRIPTION}) %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></td>
+    <td><% $msg->{PARAMS}->{WORKFLOW}->{LAST_UPDATE} %></td>
   </tr>
 % foreach my $param (sort keys %{$msg->{PARAMS}->{WORKFLOW}->{CONTEXT}})
 % {
@@ -116,7 +128,7 @@
     <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
     <!-- the format is optional -->
     <& /lib/html/hidden.mhtml, 'name' => 'format', 'value' => 'png' &>
-    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => 'I18N_OPENXPKI_HTML_GET_PROCESS_INFO' &>
+    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext ('I18N_OPENXPKI_HTML_GET_PROCESS_INFO') &>
     <& /service/close_form.mhtml &>
   </div>
   <div class="openxpki_command_list_item">
@@ -142,7 +154,8 @@
     else
     {
         ## sometimes we have only the message
-        $id = $msg->{PARAMS}->{WORKFLOW}->{ID} if (not defined $id);
+        $id   = $msg->{PARAMS}->{WORKFLOW}->{ID}   if (not defined $id);
+        $type = $msg->{PARAMS}->{WORKFLOW}->{TYPE} if (not defined $type);
     }
     if (not defined $activities)
     {

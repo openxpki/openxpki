@@ -23,7 +23,7 @@ use vars qw (@ISA @EXPORT_OK);
 use base qw( Exporter );
 #require Exporter;
 #@ISA = qw (Exporter);
-@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language);
+@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language get_language);
 
 sub set_locale_prefix
 {
@@ -127,6 +127,11 @@ sub __set_utf8_flag
     return $string;
 }
 
+sub get_language
+{
+    return $language;
+}
+
 1;
 
 __END__
@@ -205,3 +210,7 @@ Examples:
 Switch complete language setup to the specified language. If no
 language is specified then the default language C is activated. This
 deactivates all translation databases.
+
+=head2 get_language
+
+returns the actually configured language.

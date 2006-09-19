@@ -1,11 +1,17 @@
 <%args>
-    $id     => undef
-    $format => "png"
-    $filled => undef
+    $id       => undef
+    $format   => "png"
+    $language => "png"
+    $filled   => undef
 </%args>
 <%init>
     my $msg = $context->{client}->send_receive_command_msg (
-                  "get_process_info", {ID => $id, FORMAT => $format});
+                  "get_process_info", 
+                  {
+                   ID       => $id,
+                   FORMAT   => $format,
+                   LANGUAGE => $language
+                  });
     if (exists $msg->{SERVICE_MSG} and
         $msg->{SERVICE_MSG} eq "ERROR")
     {

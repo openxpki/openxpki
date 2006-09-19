@@ -6,7 +6,7 @@
   use OpenXPKI::Client::HTML::Mason;
   use OpenXPKI::Client::HTML::Mason::Javascript;
   use OpenXPKI::Client::HTML::Mason::Menu;
-  use OpenXPKI::i18n qw( i18nGettext set_language );
+  use OpenXPKI::i18n qw( i18nGettext set_language get_language );
   use OpenXPKI::DN;
   use English;
   use Data::Dumper;

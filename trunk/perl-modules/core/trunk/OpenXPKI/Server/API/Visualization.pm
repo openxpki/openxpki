@@ -20,6 +20,7 @@ use Params::Validate qw( validate :types );
 use OpenXPKI::Debug 'OpenXPKI::Server::API::Visualization';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::i18n;
 
 my %workflow_factory : ATTR;
 
@@ -89,6 +90,9 @@ sub get_process_info
             FORMAT => {
 		type => SCALAR,
 		regex => $re_image_format,
+            },
+            LANGUAGE => {
+		type => SCALAR
             }
 	});	 
     my $args  = shift;
@@ -98,6 +102,7 @@ sub get_process_info
     my $wf_id  = $args->{ID};
     my $format = $args->{FORMAT};
     my $data   = "";
+    OpenXPKI::i18n::set_language ($args->{LANGUAGE});
 
     ##! 2: "prepare preamble of graphic file"
 
@@ -138,6 +143,9 @@ sub get_process_info
             $old_state = "NEW";
             $new_state = "INITIAL";
         }
+        $old_state = OpenXPKI::i18n::i18nGettext($old_state);
+        $new_state = OpenXPKI::i18n::i18nGettext($new_state);
+        $action    = OpenXPKI::i18n::i18nGettext($action);
 
         ##! 4: "build the node"
         $nodes .= qq{    $new_state [label="$new_state"};
@@ -153,7 +161,7 @@ sub get_process_info
         ##! 4: "build the edge"
         $edges .= "    $old_state -> $new_state [label=".
                   '"'.$action.'\nby '.$user.'\n'.$time.'\n\n"'; ## trailing newlines are for better output
-        if ($autorun == 1 || $old_state eq "INITIAL") {
+        if ($autorun || $old_state eq "INITIAL") {
             # INITIAL is implicit autorun
             $edges .= qq{,style="$AUTORUN_STYLE"};    
         }
@@ -189,11 +197,12 @@ sub __get_preamble {
     my $self    = shift;
     my $arg_ref = shift;
 
-    my $type     = $arg_ref->{TYPE};
-    my $id       = $arg_ref->{ID};
+    my $type  = $arg_ref->{TYPE};
+    my $id    = $arg_ref->{ID};
+    my $label = OpenXPKI::i18n::i18nGettext ($type);
 
     return "digraph $type" . '_' . "$id {\n".
-           qq{    graph [rankdir=$RANKDIR,ratio=$RATIO,rotate=$ROTATE,center=1,fontname="$GRAPH_FONTNAME",fontsize=$GRAPH_FONTSIZE,labeljust=c,labelloc=$LABEL_LOCATION,margin=$MARGIN,label="$type\\n$id"];\n}.
+           qq{    graph [rankdir=$RANKDIR,ratio=$RATIO,rotate=$ROTATE,center=1,fontname="$GRAPH_FONTNAME",fontsize=$GRAPH_FONTSIZE,labeljust=c,labelloc=$LABEL_LOCATION,margin=$MARGIN,label="$label\\n$id"];\n}.
            qq{    node [shape="rect",style="filled",fontname="Futura-CondensedMedium",fontsize=16];\n}.
            qq{    edge [fontname="Futura-CondensedMedium",fontsize=8];\n};
 }

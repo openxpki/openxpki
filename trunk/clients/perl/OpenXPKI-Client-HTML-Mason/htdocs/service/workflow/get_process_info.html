@@ -4,7 +4,8 @@
 
 <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/binary/get_process_info.html" &>
 
-<& /lib/html/hidden.mhtml, 'name' => 'id',     'value' => $id &>
+<& /lib/html/hidden.mhtml, 'name' => 'id',       'value' => $id &>
+<& /lib/html/hidden.mhtml, 'name' => 'language', 'value' => get_language() &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_GET_INSTANCE_INFO_TITLE') %></h1>
 <p>
