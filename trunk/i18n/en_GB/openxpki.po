@@ -594,7 +594,9 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE"
 msgstr "Value"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
-msgstr "The requested activity is not implemented yet. Please contact the administrators."
+msgstr ""
+"The requested activity is not implemented yet. Please contact the "
+"administrators."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_TITLE"
 msgstr "Activity not implemented"
@@ -650,8 +652,8 @@ msgstr "Description"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_GET_INSTANCE_INFO_DESCRIPTION"
 msgstr ""
-"Please enter the format which you want to use "
-"if you get the graphical presentation of the workflow instances flow."
+"Please enter the format which you want to use if you get the graphical "
+"presentation of the workflow instances flow."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_GET_INSTANCE_INFO_TITLE"
 msgstr "Get workflow instance information"
@@ -1678,15 +1680,6 @@ msgstr "Expired"
 msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
 msgstr "Language"
 
-msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
-msgstr "Deutsch"
-
-msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
-msgstr "English"
-
-msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
-msgstr "Russian"
-
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
 msgstr "Logout"
 
@@ -2671,11 +2664,10 @@ msgstr "Sleep"
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
 msgstr "Wait for other workflow instance"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr ""
-# only in documentation
 
+# only in documentation
 msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
 msgstr "Unlock CA key"
 
@@ -2689,10 +2681,14 @@ msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
 msgstr "This is the workflow to handle a certificate signing request at once."
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE"
-msgstr "This is the workflow to handle the offline issues a certificate signing request at once."
+msgstr ""
+"This is the workflow to handle the offline issues a certificate signing "
+"request at once."
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-msgstr "This is the workflow to handle the online issues a certificate signing request at once."
+msgstr ""
+"This is the workflow to handle the online issues a certificate signing "
+"request at once."
 
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "This is the workflow to issue fresh CRLs."
@@ -2855,6 +2851,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
+#~ msgstr "Deutsch"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
+#~ msgstr "English"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
+#~ msgstr "Russian"
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII"
 #~ msgstr "The attribute __LABEL__ can only be filled with ASCII data."

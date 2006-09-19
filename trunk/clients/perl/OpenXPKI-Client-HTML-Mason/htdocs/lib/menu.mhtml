@@ -53,11 +53,11 @@
                     ],
                     "language" =>
                     [
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB",
+                        ["ACTION", "English",
                                    "set_language_en_gb"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE",
+                        ["ACTION", "Deutsch",
                                    "set_language_de_de"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU",
+                        ["ACTION", "Русский",
                                    "set_language_ru_ru"],
                     ],
                     "edit_certs" =>

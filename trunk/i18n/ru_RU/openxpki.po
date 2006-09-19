@@ -1725,15 +1725,6 @@ msgstr "С истекшим сроком действия"
 msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
 msgstr "Язык (Language)"
 
-msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
-msgstr "Deutsch"
-
-msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
-msgstr "English"
-
-msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
-msgstr "Русский"
-
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
 msgstr "Выход"
 
@@ -2972,6 +2963,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
+#~ msgstr "Deutsch"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
+#~ msgstr "English"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
+#~ msgstr "Русский"
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII"
 #~ msgstr "Атрибут __LABEL__ может содержать только ASCII-символы."

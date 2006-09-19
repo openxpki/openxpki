@@ -7,7 +7,10 @@
     if (exists $ENV{MOD_PERL} and $ENV{MOD_PERL})
     {
         ## script is operated by apache with mod_perl
-        print Apache::Util::escape_html ($data);
+        ## FIXME: escape_html includes a bug which removes the iutf8 flag from the string
+        $data = Apache::Util::escape_html ($data);
+        Encode::_utf8_on ($data);
+        print $data;
     } else {
         ## script runs without mod_perl
         print HTML::Entities::encode ($data);
@@ -18,3 +21,6 @@
     ## which is horrible for form fields
     return "";
 </%init>
+<%once>
+    use Encode;
+</%once>

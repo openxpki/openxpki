@@ -1434,15 +1434,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
 msgstr ""
 
-msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
-msgstr ""
-
-msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
-msgstr ""
-
-msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
-msgstr ""
-
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
 msgstr ""
 
