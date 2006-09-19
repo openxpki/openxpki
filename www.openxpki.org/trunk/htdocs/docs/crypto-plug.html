@@ -49,6 +49,72 @@
 <h2>Cryptography abstraction concept</h2> 
 <h3>High level language for cryptographic needs of PKI at server side</h3>
 
+<dl>
+<dt>convert_cert</dt>
+  <dd>
+	if given a cert, transform it from PEM into DER or TXT<br/>
+	if given more than one certs, transform them into pkcs7 structure in PEM, 
+                DER or TXT
+  </dd>
+<dt>convert_crl</dt>
+	<dd>transform CRL from PEM into DER or TXT</dd>
+<dt>convert_key</dt> 
+	<dd>transform a key from RSA, DSA or PKCS8 into PEM, DER or PKCS8</dd> 
+<dt>convert_pkcs10</dt>
+	<dd>transform a request from PEM into DER or TXT</dd>
+<dt>create_cert</dt>
+	<dd>create self-signed cert</dd>
+<dt>create_key</dt>
+	<dd>create a secret key</dd>
+<dt>create_pkcs10</dt>
+	<dd>create a cert request</dd>
+<dt>create_pkcs12</dt>
+	<dd>store a secret key and related chain of certs into a pkcs12 structure</dd>
+<dt>create_random</dt>
+	<dd>generate a random number</dd>
+<dt>is_prime</dt>
+	<dd>check if a number is prime</dd>
+<dt>issue_cert</dt>
+	<dd>issue a cert which is signed by CA</dd>
+<dt>issue_crl</dt>
+	<dd>issue a CRL</dd>
+<dt>pkcs7_decrypt</dt>
+	<dd>decrypt data</dd>
+<dt>pkcs7_encrypt</dt>
+	<dd>encrypt data
+<dt>pkcs7_get_chain</dt>
+	<dd>check a chain of certs, used for signature</dd>
+<dt>pkcs7_sign</dt>
+	<dd>sign data</dd>
+<dt>pkcs7_verify</dt>
+	<dd>verify signature for data</dd>
+<dt>symmetric_cipher</dt>
+	<dd>encrypt/decrypt data with one of algorithms for symmetric encryption</dd> 
+</dl>
+<p>
+<hr/>
+ N.B.:
+</p>
+<dl>
+<dt>pkcs7</dt> 
+    <dd>
+Cryptographic Message Syntax Standard. 
+See RFC 2315. Used to sign and/or encrypt messages under a PKI. 
+Used also for certificate dissemination (for instance as a response to a PKCS#10 message).
+Structure contains data and (possibly) a signature, which signs the data.
+</dd>
+<dt>pkcs8</dt> 
+    <dd>Private-Key Information Syntax Standard. 
+            Structure contains encrypted (or not encrypted) secret key</dd>
+<dt>pkcs10</dt> 
+   <dd>Certification Request Standard.
+See RFC 2986. Format of messages sent to a Certification Authority to
+request certification of a public key. Structure contains a request.</dd>
+<dt>pkcs12</dt> 
+   <dd>Personal Information Exchange Syntax Standard.
+Defines a file format commonly used to store private keys with accompanying 
+chain of public key certificates protected with a password-based symmetric key.</dd>
+</dl>
 <p>
 </p>
 <dl>
@@ -72,7 +138,7 @@
       </div> <!-- content -->
 
       <div id="footer">
-        Last modified by  on  (Rev. ). &copy; 2005 - 2006  OpenXPKI Foundation
+        Last modified by svysh on 2006-09-19 19:36:24 +0400  (Rev. 517). &copy; 2005 - 2006  OpenXPKI Foundation
 
 
       </div> <!-- footer -->
