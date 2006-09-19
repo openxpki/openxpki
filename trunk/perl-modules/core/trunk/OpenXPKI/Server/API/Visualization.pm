@@ -46,19 +46,13 @@ sub BUILD {
 
 ### Configuration variables
 
-my $FINAL_STATE = { # a list of states that are considered final
-    FINISHED => 1,
-    FAILED   => 1,
-    REJECTED => 1,
-};
+my $SUCCESS_STATE = 'SUCCESS';
 
-my $FINAL_COLOR = 'firebrick';
+my $SUCCESS_COLOR = 'darkgreen';
 
-my $INITIAL_STATE = {
-    INITIAL => 1,
-};
+my $FAILURE_STATE = 'FAILURE';
 
-my $INITIAL_COLOR = 'darkgreen';
+my $FAILURE_COLOR = 'firebrick';
 
 my $AUTORUN_STYLE = 'dashed';
 
@@ -129,32 +123,37 @@ sub get_process_info
         my $old_state = $item->{WORKFLOW_STATE};
         my $new_state = $item->{WORKFLOW_DESCRIPTION};
         my $time      = $item->{WORKFLOW_HISTORY_DATE};
-        if ($new_state =~ /NEW_STATE/)
+        my $autorun;
+
+        if ($new_state =~ /NEW_STATE_AUTORUN/)
+        {
+            $new_state =~ s/^.*NEW_STATE_AUTORUN:\s*//;
+            $autorun = 1;
+        }
+        elsif ($new_state =~ /NEW_STATE/)
         {
             $new_state =~ s/^.*NEW_STATE:\s*//;
-        } else {
+        }
+        else {
             $old_state = "NEW";
             $new_state = "INITIAL";
         }
 
         ##! 4: "build the node"
-        if ($new_state eq "INITIAL")
-        {
-            $nodes .= qq{    $new_state [label="$new_state",fillcolor=$INITIAL_COLOR]\n};
+        $nodes .= qq{    $new_state [label="$new_state"};
+
+        if ($new_state eq $SUCCESS_STATE) {
+            $nodes .= ",fillcolor=$SUCCESS_COLOR";
         }
-        else
-        {
-            $nodes .= qq{    $new_state [label="$new_state"]\n};
-            ## these is no global method to determine a final state
-            ##if ($FINAL_STATE->{$new_state}) {
-            ##    $node .= ",fillcolor=$FINAL_COLOR";
-            ##}
+        elsif ($new_state eq $FAILURE_STATE) {
+            $nodes .= ",fillcolor=$FAILURE_COLOR";
         }
+        $nodes .= qq{]\n};
 
         ##! 4: "build the edge"
         $edges .= "    $old_state -> $new_state [label=".
                   '"'.$action.'\nby '.$user.'\n'.$time.'\n\n"'; ## trailing newlines are for better output
-        if ($old_state eq "INITIAL") {
+        if ($autorun == 1 || $old_state eq "INITIAL") {
             # INITIAL is implicit autorun
             $edges .= qq{,style="$AUTORUN_STYLE"};    
         }

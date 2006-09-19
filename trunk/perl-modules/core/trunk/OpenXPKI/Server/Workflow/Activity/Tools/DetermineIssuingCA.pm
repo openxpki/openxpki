@@ -159,15 +159,6 @@ sub execute {
     }
 
     $context->param(ca => $intca);
-
-    $workflow->add_history(
-        Workflow::History->new({
-            action      => 'Determine Issuing CA',
-            description => sprintf( "Determined issuing CA: %s",
-		$intca),
-            user        => $self->param('creator'),
-	})
-    );
 }
 
 

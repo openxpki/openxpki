@@ -77,7 +77,7 @@ sub update_workflow {
     my $dbi  = CTX('dbi_workflow');
     my %data = (
 	WORKFLOW_STATE       => $workflow->state(),
-	WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M' ),
+	WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),
 	);
     
     
@@ -336,7 +336,7 @@ sub create_history {
 	    WORKFLOW_DESCRIPTION     => $entry->description(),
 	    WORKFLOW_STATE           => $entry->state(),
 	    WORKFLOW_USER            => $entry->user(),
-	    WORKFLOW_HISTORY_DATE    => DateTime->now->strftime( '%Y-%m-%d %H:%M' ),
+	    WORKFLOW_HISTORY_DATE    => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),
 	    );
 
 	if ($id) {

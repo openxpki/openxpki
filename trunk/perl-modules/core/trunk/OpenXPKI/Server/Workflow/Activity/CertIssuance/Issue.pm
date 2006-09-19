@@ -119,15 +119,6 @@ sub execute {
     }
     ##! 16: 'cert_pem: ' . $cert_pem
     $context->param(certificate => $cert_pem),
-
-    # TODO: I18N?
-    $workflow->add_history(
-        Workflow::History->new({
-            action      => 'Issue certificate',
-            description => "Issued certificate",
-            user        => $self->param('creator'),
-	})
-    );
 }
 
 
