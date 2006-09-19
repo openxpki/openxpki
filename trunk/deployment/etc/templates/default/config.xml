@@ -10,6 +10,7 @@
         <connection_timeout>120</connection_timeout>
         <session_lifetime>[% server.session_lifetime %]</session_lifetime>
         <stderr>[%        server.stderrfile %]</stderr>
+        <tmpdir>[%        dir.tmpdir %]</tmpdir>
 [% FOREACH item = server.transport %]
         <transport>[%     item %]</transport>
 [% END %]

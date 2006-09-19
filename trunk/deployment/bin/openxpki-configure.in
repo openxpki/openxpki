@@ -49,7 +49,7 @@ check_dirs() {
     echo
     echo "* Checking directories"
     error=0
-    for entry in openxpkistatedir openxpkisessiondir dataexchange ; do
+    for entry in openxpkistatedir openxpkisessiondir dataexchange tmpdir; do
 	dir="`$CFG --getcfg dir.$entry`"
 	echo -n "$entry: "
 	if [ -d "$dir" ] ; then
