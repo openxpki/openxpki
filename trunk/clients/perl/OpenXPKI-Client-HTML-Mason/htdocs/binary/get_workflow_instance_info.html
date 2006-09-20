@@ -6,7 +6,7 @@
 </%args>
 <%init>
     my $msg = $context->{client}->send_receive_command_msg (
-                  "get_process_info", 
+                  "get_workflow_instance_info", 
                   {
                    ID       => $id,
                    FORMAT   => $format,
@@ -39,7 +39,6 @@
             case "ps"    { $r->content_type ("application/postscript") }
             case "svg"   { $r->content_type ("image/svg+xml") }
             case "svgz"  { $r->content_type ("image/svg+xml") }
-            case "NULL"  { $r->content_type ("text/plain") }
             else         { $r->content_type ("application/octet-stream") }
         }
         print $data;

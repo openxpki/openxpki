@@ -49,7 +49,7 @@ my %allowed_command = (
 
     get_csr_info_hash_from_data => {API => 'Object'},
 
-    get_process_info => {API => 'Visualization'},
+    get_workflow_instance_info => {API => 'Visualization'},
 );
 
 sub BUILD {

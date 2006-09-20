@@ -52,7 +52,7 @@ my $cert = OpenXPKI::Crypto::X509->new (TOKEN => $token, DATA => $data);
 ok(1);
 
 ## test parser
-ok ($cert->get_parsed("BODY", "SUBJECT") eq "CN=John Doe,DC=OpenCA,DC=info");
+ok ($cert->get_parsed("BODY", "SUBJECT") eq "CN=John Doe,DC=OpenXPKI,DC=org");
 ok ($cert->get_parsed("BODY", "KEYSIZE") == 1024);
 
 my $notafter;

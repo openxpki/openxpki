@@ -124,11 +124,11 @@
   </div>
 % }
   <div class="openxpki_command_list_item">
-    <& /service/open_form.mhtml, 'action' => "get_process_info.html" &>
+    <& /service/open_form.mhtml, 'action' => "get_workflow_instance_info.html" &>
     <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
     <!-- the format is optional -->
     <& /lib/html/hidden.mhtml, 'name' => 'format', 'value' => 'png' &>
-    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext ('I18N_OPENXPKI_HTML_GET_PROCESS_INFO') &>
+    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext ('I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO') &>
     <& /service/close_form.mhtml &>
   </div>
   <div class="openxpki_command_list_item">

@@ -154,7 +154,7 @@ i18nGettext ("I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE");>
 
 =head1 Description
 
-This module manages all i18n stuff for the L<OpenCA::Server> daemon.
+This module manages all i18n stuff for the L<OpenXPKi> system.
 The main job is the implementation of the translation function and
 the storage of the activated language.
 
@@ -173,7 +173,7 @@ to set the path to the directory with the mo databases.
 
 The first parameter is the i18n code string that should be looked up
 in the translation table. Usually this identifier should look like
-C<I18N_OPENCA_MODULE_FUNCTION_SPECIFIC_STUFF>. If the first parameter is
+C<I18N_OPENXPKI_MODULE_FUNCTION_SPECIFIC_STUFF>. If the first parameter is
 undefined or has the length zero then the function returns the first
 parameter itself.
 Optionally there may follow a hash or a hash reference that maps parameter
@@ -190,19 +190,19 @@ The function always returns an UTF8 string.
 Examples:
 
     my $text;
-    $text = i18nGettext("I18N_OPENCA_FOO_BAR");
-    $text = i18nGettext("I18N_OPENCA_FOO_BAR", 
+    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR");
+    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR", 
                         "__COUNT__" => 1,
                         "__ORDER__" => "descending",
                         );
 
     %translation = ( "__COUNT__" => 1,
                      "__ORDER__" => "descending" );
-    $text = i18nGettext("I18N_OPENCA_FOO_BAR", %translation);
+    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR", %translation);
 
     $translation_ref = { "__COUNT__" => 1,
                          "__ORDER__" => "descending" };
-    $text = i18nGettext("I18N_OPENCA_FOO_BAR", $translation_ref);
+    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR", $translation_ref);
 
 
 =head2 set_language

@@ -301,7 +301,7 @@ else
 }
 
 ## create CSR
-my $subject = "cn=John Doe,dc=OpenCA,dc=info";
+my $subject = "cn=John Doe,dc=OpenXPKI,dc=org";
 my $csr = $default_token->command ({COMMAND => "create_pkcs10",
                                     KEY     => $key,
                                     PASSWD  => $passwd,

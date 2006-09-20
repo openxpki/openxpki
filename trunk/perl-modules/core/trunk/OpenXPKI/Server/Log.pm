@@ -47,7 +47,7 @@ sub new {
         ## FIXME: we should display here an error message from Log4perl
         ## FIXME: how we can get the error from Log4perl
         OpenXPKI::Exception->throw (
-            message => "OPENCA_I18M_LOG_NEW_LOG4PERL_INIT_FAILED");
+            message => "I18N_OPENXPKI_SERVER_LOG_NEW_LOG4PERL_INIT_FAILED");
     }
 
     ## ensure that all relevant loggers are present

@@ -2,7 +2,7 @@
     $id     => undef
 </%args>
 
-<& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/binary/get_process_info.html" &>
+<& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/binary/get_workflow_instance_info.html" &>
 
 <& /lib/html/hidden.mhtml, 'name' => 'id',       'value' => $id &>
 <& /lib/html/hidden.mhtml, 'name' => 'language', 'value' => get_language() &>
@@ -27,7 +27,6 @@
                   {LABEL => "GIF",                                       VALUE => "gif"},
                   {LABEL => "image map for HTML",                        VALUE => "imap"},
                   {LABEL => "client side image map for HTML",            VALUE => "cmapx"},
-                  {LABEL => "GraphViz dot",                              VALUE => "NULL"},
                 ] &>
 
 </p>

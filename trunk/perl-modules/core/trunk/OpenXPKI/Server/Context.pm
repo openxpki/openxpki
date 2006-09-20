@@ -8,6 +8,8 @@ package OpenXPKI::Server::Context;
 use strict;
 use base qw( Exporter );
 
+use Storable qw(dclone);
+
 our @EXPORT_OK = qw( CTX );
 
 #use Smart::Comments;
@@ -68,7 +70,9 @@ sub CTX {
                 params  => {OBJECT => $object},
 		);
 	}
-	push @return, $context->{exported}->{$object};
+
+	# FIXME: handle objects properly?
+	push @return, dclone($context->{exported}->{$object});
     }
 
     if (wantarray) {

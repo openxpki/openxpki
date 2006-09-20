@@ -155,7 +155,7 @@ my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
 	      );
 
 ## create CSR
-my $subject = "cn=John Doe,dc=OpenCA,dc=info";
+my $subject = "cn=John Doe,dc=OpenXPKI,dc=org";
 my $csr = $token->command ({COMMAND => "create_pkcs10",
                             KEY     => $key,
                             PASSWD  => $passwd,

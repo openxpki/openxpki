@@ -76,7 +76,7 @@ my $NODE_FONTSIZE  = 16;
 my $EDGE_FONTNAME  = $GRAPH_FONTNAME;
 my $EDGE_FONTSIZE  = 8;
 
-sub get_process_info
+sub get_workflow_instance_info
 {
     my $self  = shift;
     my $ident = ident $self;
@@ -97,7 +97,7 @@ sub get_process_info
 	});	 
     my $args  = shift;
 
-    ##! 1: "get_process_info"
+    ##! 1: "get_workflow_instance_info"
 
     my $wf_id  = $args->{ID};
     my $format = $args->{FORMAT};
@@ -183,7 +183,7 @@ sub get_process_info
         if (not open FH, "|dot -T$format > $filename")
         {
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_API_VISUALIZATION_GET_PROCESS_INFO_DOT_FAILED");
+                message => "I18N_OPENXPKI_SERVER_API_VISUALIZATION_GET_WORKFLOW_INFO_DOT_FAILED");
         }
         print FH $data;
         close FH;
@@ -225,7 +225,7 @@ handling of the PKI workflow. Generally spoke, it implements
 
 =head1 Functions
 
-=head2 get_process_info
+=head2 get_workflow_instance_info
 
 It accepts only one parameter ID which is the ID of the workflow
 which should be monitored.
