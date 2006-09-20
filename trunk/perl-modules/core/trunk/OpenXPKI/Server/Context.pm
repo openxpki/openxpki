@@ -72,7 +72,8 @@ sub CTX {
 	}
 
 	# FIXME: handle objects properly?
-	push @return, dclone($context->{exported}->{$object});
+	#push @return, dclone($context->{exported}->{$object});
+	push @return, $context->{exported}->{$object};
     }
 
     if (wantarray) {
