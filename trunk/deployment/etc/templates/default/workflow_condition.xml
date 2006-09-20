@@ -104,5 +104,14 @@
   </condition>
   <condition name="wf_child_instance_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
   </condition>
+
+  <!-- conditions for the data exchange -->
+  <condition name="ACL::dataexchange_export" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="dataexchange_export"/>
+  </condition>
+  <condition name="ACL::dataexchange_import" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="dataexchange_import"/>
+  </condition>
+
 </conditions>
 

@@ -29,10 +29,11 @@
                     ],
                     "ra_op_menu" =>
                     [
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR", "create_csr"],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",   "workflow"],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",   "language"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",     "logout"]
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr"],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",     "workflow"],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE", "dataexchange"],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",     "language"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",       "logout"]
                     ],
                     "ca_op_menu" =>
                     [
@@ -50,6 +51,13 @@
                                     "workflow_create_instance"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES",
                                    "workflow_list_instances"],
+                    ],
+                    "dataexchange" =>
+                    [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT",
+                                   "dataexchange_export"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_IMPORT",
+                                   "dataexchange_import"],
                     ],
                     "language" =>
                     [
@@ -87,6 +95,15 @@
                      {
                          CMD => "service/workflow/create_instance.html"
                      },
+                    "dataexchange_export" =>
+                    {
+                         CMD    => "service/workflow/create_instance.html",
+                         PARAMS => {"type" => "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"}
+                    },
+                    "dataexchange_import" =>
+                    {
+                        CMD => "service/dataexchange/import.html"
+                    },
                     "set_language_en_gb" =>
                     {
                         CMD    => "service/index.html",

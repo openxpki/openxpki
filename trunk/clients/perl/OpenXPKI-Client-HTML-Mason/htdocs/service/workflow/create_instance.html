@@ -43,7 +43,13 @@
                       "create_workflow_instance",
                       {"WORKFLOW" => $type}
                   );
-        return $m->comp ('/service/workflow/list_instances.html', 'type' => $type)
-            if ($msg);
+        if (exists $msg->{SERVICE_MSG} and
+            $msg->{SERVICE_MSG} eq "ERROR")
+        {
+            my $errors = [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ];
+            return $m->comp ('/service/create_csr/print_errors.mhtml', 'errors' => $errors);
+        } else {
+            return $m->comp ('/service/workflow/list_instances.html', 'type' => $type)
+        }
     }
 </%init>

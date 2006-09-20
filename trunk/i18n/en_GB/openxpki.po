@@ -1674,6 +1674,15 @@ msgstr "Get a graphical workflow instance overview"
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "New Request (CSR)"
 
+msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
+msgstr "Data Exchange"
+
+msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT"
+msgstr "Export"
+
+msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_IMPORT"
+msgstr "Import"
+
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
 msgstr "Expired"
 
@@ -2208,6 +2217,18 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MKDIR_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -2640,6 +2661,15 @@ msgstr "Change subject alternative name"
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Change subject style"
 
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_BUILD_ARCHIVE"
+msgstr "Build archive"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PREPARE_ENV"
+msgstr "Prepare environment"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_ARCHIVE"
+msgstr "Write Archive"
+
 msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
 msgstr "Determine issuing CA"
 
@@ -2693,6 +2723,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "This is the workflow to issue fresh CRLs."
 
+msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
+msgstr "This workflow exports workflow instances to other servers."
+
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
 msgstr "CA certificate determined"
 
@@ -2732,6 +2765,18 @@ msgstr "Next CA determined"
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "Profile was prepared"
 
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
+msgstr "Archive ready"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
+msgstr "Environment for export prepared"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
+msgstr "Initializing ..."
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
+msgstr "Export succeeded"
+
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Waiting to start"
 
@@ -2749,6 +2794,9 @@ msgstr "Offline part of a Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "CRL Issuance"
+
+msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
+msgstr "Export"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP Certificate Signing Request"
@@ -2851,6 +2899,22 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_IMPORT_LOG"
+#~ msgstr "Change role"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_INSTANCES"
+#~ msgstr "Create a new workflow instance for certificate issuance"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
+#~ msgstr "Waiting to start"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_INSTANCES"
+#~ msgstr "Waiting to start"
 
 #~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
 #~ msgstr "Deutsch"

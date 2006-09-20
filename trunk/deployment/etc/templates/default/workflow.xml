@@ -11,6 +11,7 @@
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_signing_request_offline.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_issuance.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_crl_issuance.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_def_dataexchange_export.xml</configfile>
 <!--    <configfile>[% dir.openxpkiconfdir %]/workflow_def_request_pkcs10.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_request_dataonly.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_crl_issuance.xml</configfile>
@@ -24,6 +25,7 @@
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_certificate_signing_request.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_certificate_issuance.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_crl_issuance.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_dataexchange.xml</configfile>
   </activities>
 
   <validators>

@@ -26,7 +26,7 @@ my %workflow_factory : ATTR;
 
 # regex definitions for parameter validation
 my $re_integer_string = qr{ \A $RE{num}{int} \z }xms;
-my $re_image_format   = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl) \z }xms;
+my $re_image_format   = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
@@ -143,12 +143,12 @@ sub get_process_info
             $old_state = "NEW";
             $new_state = "INITIAL";
         }
-        $old_state = OpenXPKI::i18n::i18nGettext($old_state);
-        $new_state = OpenXPKI::i18n::i18nGettext($new_state);
-        $action    = OpenXPKI::i18n::i18nGettext($action);
+        my $i18n_old_state = OpenXPKI::i18n::i18nGettext($old_state);
+        my $i18n_new_state = OpenXPKI::i18n::i18nGettext($new_state);
+        my $i18n_action    = OpenXPKI::i18n::i18nGettext($action);
 
         ##! 4: "build the node"
-        $nodes .= qq{    $new_state [label="$new_state"};
+        $nodes .= qq{    $new_state [label="$i18n_new_state"};
 
         if ($new_state eq $SUCCESS_STATE) {
             $nodes .= ",fillcolor=$SUCCESS_COLOR";
@@ -160,7 +160,7 @@ sub get_process_info
 
         ##! 4: "build the edge"
         $edges .= "    $old_state -> $new_state [label=".
-                  '"'.$action.'\nby '.$user.'\n'.$time.'\n\n"'; ## trailing newlines are for better output
+                  '"'.$i18n_action.'\nby '.$user.'\n'.$time.'\n\n"'; ## trailing newlines are for better output
         if ($autorun || $old_state eq "INITIAL") {
             # INITIAL is implicit autorun
             $edges .= qq{,style="$AUTORUN_STYLE"};    
@@ -175,18 +175,21 @@ sub get_process_info
     $data .= "}\n";
     ##! 64: $data
  
-    ##! 2: "create image"
 
-    my $filename = $self->get_safe_tmpfile({TMP => CTX('xml_config')->get_xpath(XPATH => 'common/server/tmpdir')});
-    if (not open FH, "|dot -T$format > $filename")
+    if ($format ne "NULL")
     {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_API_VISUALIZATION_GET_PROCESS_INFO_DOT_FAILED");
+        ##! 4: "create image"
+        my $filename = $self->get_safe_tmpfile({TMP => CTX('xml_config')->get_xpath(XPATH => 'common/server/tmpdir')});
+        if (not open FH, "|dot -T$format > $filename")
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_API_VISUALIZATION_GET_PROCESS_INFO_DOT_FAILED");
+        }
+        print FH $data;
+        close FH;
+        $data = $self->read_file ($filename);
+        ##! 64: $data
     }
-    print FH $data;
-    close FH;
-    $data = $self->read_file ($filename);
-    ##! 64: $data
 
     ##! 1: "finished"
 

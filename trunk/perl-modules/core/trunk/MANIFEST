@@ -161,6 +161,9 @@ OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/IssueCRL.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/PublishCRL.pm
+OpenXPKI/Server/Workflow/Activity/DataExchange/PrepareExportEnv.pm
+OpenXPKI/Server/Workflow/Activity/DataExchange/BuildArchive.pm
+OpenXPKI/Server/Workflow/Activity/DataExchange/WriteArchive.pm
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm

@@ -674,7 +674,8 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
 msgstr "Beschreibung"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_GET_INSTANCE_INFO_DESCRIPTION"
-msgstr "Bitte Wählen Sie ein Format aus, in dem die Grafik erstellt werden soll."
+msgstr ""
+"Bitte Wählen Sie ein Format aus, in dem die Grafik erstellt werden soll."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_GET_INSTANCE_INFO_TITLE"
 msgstr "Anzeige der Historie der Workflow-Instanz"
@@ -1726,6 +1727,15 @@ msgstr "Anzeigen einer grafischen Übersicht der Instanz"
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "Neuer Antrag (CSR)"
 
+msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
+msgstr "Datenaustausch"
+
+msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT"
+msgstr "Export"
+
+msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_IMPORT"
+msgstr "Import"
+
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
 msgstr "Abgelaufene"
 
@@ -2233,6 +2243,14 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MKDIR_FAILED"
 msgstr "PKI Realm"
 
@@ -2653,6 +2671,15 @@ msgstr "Ändern des alternativen Namens"
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Ändern des Stils des Namens"
 
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_BUILD_ARCHIVE"
+msgstr "Erstellen des Archivs"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PREPARE_ENV"
+msgstr "Vorbereiten der Export-Umgebung"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_ARCHIVE"
+msgstr "Schreiben des Archivs"
+
 msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
 msgstr "Bestimmung der ausstellenden CA"
 
@@ -2703,6 +2730,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "Dieser Workflow erstellt neue CRLs."
 
+msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
+msgstr "Dieser Workflow dient dem Export von Workflow-Instanzen und Import-Logs zu anderen Servern."
+
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
 msgstr "Ausstellende CA für das Zertifikat bestimmt"
 
@@ -2742,6 +2772,18 @@ msgstr "Ausstellende CA für die CRL bestimmt"
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "CRL-Profile vorbereitet"
 
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
+msgstr "Zu exportierendes Archiv fertig"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
+msgstr "Exportumgebung fertig"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
+msgstr "Initialisiere ..."
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
+msgstr "Export erfolgreich"
+
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Auf Start wartend"
 
@@ -2759,6 +2801,9 @@ msgstr "Zertifizierungsantrag (Online-Teil)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "Erstellen von CRLs"
+
+msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
+msgstr "Export"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP-Zertifizierungsantrag"
@@ -2862,6 +2907,22 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_IMPORT_LOG"
+#~ msgstr "Ändern der Rolle"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_INSTANCES"
+#~ msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
+#~ msgstr "Auf Start wartend"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_INSTANCES"
+#~ msgstr "Auf Start wartend"
+
 #~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
 #~ msgstr "Deutsch"
 
@@ -2870,9 +2931,6 @@ msgstr ""
 
 #~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
 #~ msgstr "Russian"
-
-#~ msgid "I18N_OPENXPKI_HTML_MENU_CERTS"
-#~ msgstr "Zertifikate"
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII"
 #~ msgstr "Das Feld __LABEL__ darf nur mit ASCII-Daten gefüllt werden."

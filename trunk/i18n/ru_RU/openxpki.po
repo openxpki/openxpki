@@ -1719,6 +1719,18 @@ msgstr "Иван Петров"
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "Создание новой заявки на сертификат (CSR)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
+msgstr "Язык (Language)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT"
+msgstr "С истекшим сроком действия"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_IMPORT"
+msgstr "Создание новой заявки на сертификат (CSR)"
+
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
 msgstr "С истекшим сроком действия"
 
@@ -2267,6 +2279,18 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MKDIR_FAILED"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
@@ -2719,6 +2743,18 @@ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "CSR с OU-структурой уникального имени"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_BUILD_ARCHIVE"
+msgstr "CSR с OU-структурой уникального имени"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PREPARE_ENV"
+msgstr "CSR с OU-структурой уникального имени"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_ARCHIVE"
+msgstr "CSR с OU-структурой уникального имени"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
 msgstr "Новая завка на сертификат (CSR)"
 
@@ -2782,6 +2818,10 @@ msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "Сертификаты"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
+msgstr "Новая завка на сертификат (CSR)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
 msgstr "Сертификаты"
 
@@ -2833,6 +2873,22 @@ msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "Сертификаты"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
+msgstr "Новая завка на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
+msgstr "Новая завка на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
+msgstr "Сертификаты"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
+msgstr "Сертификаты"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Новая завка на сертификат (CSR)"
 
@@ -2858,6 +2914,12 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "Сертификаты"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
+msgstr ""
+"Используемая структура требует наличия, как минимум, названий одного "
+"подразделения  организации, одной организации и одной страны."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
@@ -2963,6 +3025,22 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_IMPORT_LOG"
+#~ msgstr "CSR с OU-структурой уникального имени"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_INSTANCES"
+#~ msgstr "Сертификаты"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
+#~ msgstr "Новая завка на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_INSTANCES"
+#~ msgstr "Новая завка на сертификат (CSR)"
 
 #~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
 #~ msgstr "Deutsch"

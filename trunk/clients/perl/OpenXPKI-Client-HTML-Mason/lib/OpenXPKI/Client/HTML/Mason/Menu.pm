@@ -221,7 +221,9 @@ sub __get_menu_link
                     $link =~ s/$param=[^;]*/$param=$config->{PARAMS}->{$param}/;
                 }
             } else {
-                $link .= ";__action_param_$param=".$config->{PARAMS}->{$param};
+                ## FIXME: why do we introduce __action_param ?
+                ## $link .= ";__action_param_$param=".$config->{PARAMS}->{$param};
+                $link .= ";$param=".$config->{PARAMS}->{$param};
             }
         }
     }

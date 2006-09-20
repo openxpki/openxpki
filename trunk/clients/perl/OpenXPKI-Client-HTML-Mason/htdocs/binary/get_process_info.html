@@ -39,6 +39,7 @@
             case "ps"    { $r->content_type ("application/postscript") }
             case "svg"   { $r->content_type ("image/svg+xml") }
             case "svgz"  { $r->content_type ("image/svg+xml") }
+            case "NULL"  { $r->content_type ("text/plain") }
             else         { $r->content_type ("application/octet-stream") }
         }
         print $data;
