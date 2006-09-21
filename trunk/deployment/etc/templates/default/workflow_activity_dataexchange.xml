@@ -1,0 +1,16 @@
+<actions>
+  <!-- this action name has not to be human readable      -->
+  <!-- because it is only used to initialize the workflow -->
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PREPARE_ENV"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::PrepareExportEnv"
+          device="/tmp/fd0">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_BUILD_ARCHIVE"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::BuildArchive"
+          command="tar -c __EXPORT_DIR__ __LOG_DIR__ | gzip > __ARCHIVE__">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_ARCHIVE"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::WriteArchive"
+          command="tar -cf __DEVICE__ __ARCHIVE__">
+  </action>
+</actions>
