@@ -6,77 +6,76 @@
 
 <p>
 OpenXPKI as a software product is a collection of building blocks and construction
-tools meant for deployment of arbitrary complex and fully functional private key
-infrastructure (PKI) as specified by X.509 collection of documents. Sure 
+tools meant for deployment of an arbitrary complex and fully functional Public Key Infrastructure (PKI) as specified by the X.509 standard. Sure <!-- secure? of course? -->
 full functionality is a goal to be reached in versions to come.
 </p><p>
-From the system point of view PKI is a special purpose information system for processing, 
-storing and propagation of a certain class of data units: requests, certificates,
-revocation notes. At a certain stages of the data processing, PKI deals with cryptographic 
-calculations and transformations. But general structure and workflow of data processing
-is invariant of the imployed cryptography.
+From the system point of view, PKI is a special purpose information system for processing, 
+storing and propagation of a certain class of data units: requests, certificates and
+revocation lists. At certain stages of the data processing, PKI deals with cryptographic 
+calculations and transformations. But the general structure and workflow of data processing
+is independent of the employed cryptography.
 </p><p>
-For the first time in the opensource world OpenXPKI is offering a trustcenter concept
+For the first time in the open source world, OpenXPKI is offering a trustcenter concept
 which is totally decoupled from the cryptographic details.
 </p><p>
-Technically it is achieved by providing a <em>cryptographic layer</em> (see
+Technically, this is achieved by providing a <em>cryptographic layer</em> (see
 <a href="OpenXPKI-Architecture-Overview.pdf">Architecture White Paper</a>). It forms a
-universal cryptographic interface, to which arbitrary software or hardware cryptographic plug 
+universal cryptographic interface, to which arbitrary software or hardware cryptographic backends
 can be plugged in. Also, all constituents of PKI in their OpenXPKI realization are only allowed
 to speak to cryptographic tools in a specially designed <em>high level language for cryptographic 
-needs of PKI</em>.
+needs of PKI</em>. <!-- API != language ... -->
 </p>
 <h2>High level language for cryptographic needs of PKI at server side</h2>
 <p>
-Our analisys shows that all cryptographic needs of PKI at server side can be 
-expressed by just the following 18 commands. Please note, that only one of these commands, 
-namely <em>create_key</em>, obligatory requires apriori knowledge of the fact that 
+Our analysis shows that all cryptographic needs of PKI at the server side can be 
+expressed by just the following 18 commands. Please note that only one of these commands, 
+namely <em>create_key</em>, obligatoryly requires apriori knowledge of the fact that 
 a certain cryptographic 
-set of tools exists with a definite name (like RSA, DSA, GOST, etc). All other commands could 
-deduce necessary cryptographic details from the data, which they process.
+set of tools exists with a specific name (like RSA, DSA, GOST, etc). All other commands could 
+deduce necessary cryptographic details from the data which they process.
 </p>
 
 <dl>
 <dt>convert_cert</dt>
   <dd>
-	if given a cert, transform it from PEM into DER or TXT<br/>
-	if given more than one certs, transform them into pkcs7 structure in PEM, 
+	if given a certificate, transform it from PEM into DER or TXT<br/>
+	if given more than one certificates, transform them into a PKCS#7 structure in PEM, 
                 DER or TXT
   </dd>
 <dt>convert_crl</dt>
 	<dd>transform CRL from PEM into DER or TXT</dd>
 <dt>convert_key</dt> 
-	<dd>transform a key from RSA, DSA or PKCS8 into PEM, DER or PKCS8</dd> 
+	<dd>transform a key from RSA, DSA or PKCS#8 into PEM, DER or PKCS8</dd> 
 <dt>convert_pkcs10</dt>
 	<dd>transform a request from PEM into DER or TXT</dd>
 <dt>create_cert</dt>
-	<dd>create self-signed cert</dd>
+	<dd>create self-signed certificate</dd>
 <dt>create_key</dt>
 	<dd>create a secret key</dd>
 <dt>create_pkcs10</dt>
-	<dd>create a cert request</dd>
+	<dd>create a certificate request</dd>
 <dt>create_pkcs12</dt>
-	<dd>store a secret key and related chain of certs into a pkcs12 structure</dd>
+	<dd>store a secret key and related chain of certificates into a pkcs12 structure</dd>
 <dt>create_random</dt>
 	<dd>generate a random number</dd>
 <dt>is_prime</dt>
 	<dd>check if a number is prime</dd>
 <dt>issue_cert</dt>
-	<dd>issue a cert which is signed by CA</dd>
+	<dd>issue a certificate which is signed by a Certificate Authority (CA)</dd>
 <dt>issue_crl</dt>
-	<dd>issue a CRL</dd>
+	<dd>issue a Certificate Revocation List (CRL)</dd>
 <dt>pkcs7_decrypt</dt>
 	<dd>decrypt data</dd>
 <dt>pkcs7_encrypt</dt>
 	<dd>encrypt data
 <dt>pkcs7_get_chain</dt>
-	<dd>check a chain of certs, used for signature</dd>
+	<dd>check a chain of certificates, used for signature</dd>
 <dt>pkcs7_sign</dt>
 	<dd>sign data</dd>
 <dt>pkcs7_verify</dt>
 	<dd>verify signature for data</dd>
 <dt>symmetric_cipher</dt>
-	<dd>encrypt/decrypt data with one of algorithms for symmetric encryption</dd> 
+	<dd>encrypt/decrypt data with one of the algorithms for symmetric encryption</dd> 
 </dl>
 <p>
 <hr width=50% align="right" />
@@ -84,21 +83,21 @@ deduce necessary cryptographic details from the data, which they process.
  N.B.:
 </p>
 <dl>
-<dt>pkcs7</dt> 
+<dt>PKCS#7</dt> 
     <dd>
 Cryptographic Message Syntax Standard. 
 See RFC 2315. Used to sign and/or encrypt messages under a PKI. 
 Used also for certificate dissemination (for instance as a response to a PKCS#10 message).
 Structure contains data and (possibly) a signature, which signs the data.
 </dd>
-<dt>pkcs8</dt> 
+<dt>PKCS#8</dt> 
     <dd>Private-Key Information Syntax Standard. 
             Structure contains encrypted (or not encrypted) secret key</dd>
-<dt>pkcs10</dt> 
+<dt>PKCS#10</dt> 
    <dd>Certification Request Standard.
 See RFC 2986. Format of messages sent to a Certification Authority to
 request certification of a public key. Structure contains a request.</dd>
-<dt>pkcs12</dt> 
+<dt>PKCS#12</dt> 
    <dd>Personal Information Exchange Syntax Standard.
 Defines a file format commonly used to store private keys with accompanying 
 chain of public key certificates protected with a password-based symmetric key.</dd>
@@ -127,12 +126,12 @@ cryptographic product, then we have a ready template to fill in for adding suppo
 for this product in OpenXPKI.
 </p><p>
 More to that. OpenSSL version 0.9.9 is scheduled to support arbitrary asymmetric cryptography.
-The one which is used to generate electronic digital signature. Since 18. September 2006 this 
+The one which is used to generate electronic digital signature. Since September 18th, 2006 this 
 support is in production snapshots of 0.9.9 branch. The only example of asymmetric cryptography
 which is present in the snapshot and is not RSA and not DSA, 
-is Russian national cryptogpraphic algorithms
-GOST. And OpenXPKI already supports this foreign cryptography. See
+but the Russian national cryptogpraphic algorithms
+GOST. And OpenXPKI already supports this foreign <!-- well, this is only foreign if you're not in Russia :-) --> cryptography. See
 <a href="gost-howto.html">Working with Russian (GOST) cryptography</a>.
-And this is the very first example of the opensource trustcenter product which supports two
+And this is the very first example of an open source trustcenter product which supports two
 absolutely different sets of cryptography at the same time.
 </p>
