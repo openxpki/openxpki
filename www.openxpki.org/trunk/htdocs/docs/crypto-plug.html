@@ -50,24 +50,35 @@
 
 <p>
 OpenXPKI as a software product is a collection of building blocks and construction
-tools meant for deployment of an arbitrary complex and fully functional Public Key Infrastructure (PKI) as specified by the X.509 standard. Sure <!-- secure? of course? -->
+tools meant for deployment of an arbitrary complex and fully functional 
+Public Key Infrastructure (PKI) as specified by the X.509 standard. 
+Of course
 full functionality is a goal to be reached in versions to come.
 </p><p>
 From the system point of view, PKI is a special purpose information system for processing, 
 storing and propagation of a certain class of data units: requests, certificates and
-revocation lists. At certain stages of the data processing, PKI deals with cryptographic 
+revocation stuff. At certain stages of the data processing, PKI deals with cryptographic 
 calculations and transformations. But the general structure and workflow of data processing
 is independent of the employed cryptography.
 </p><p>
 For the first time in the open source world, OpenXPKI is offering a trustcenter concept
 which is totally decoupled from the cryptographic details.
 </p><p>
-Technically, this is achieved by providing a <em>cryptographic layer</em> (see
+Technically, this is achieved by 
+<ol>
+<li>
+providing a <em>cryptographic layer</em> (see
 <a href="OpenXPKI-Architecture-Overview.pdf">Architecture White Paper</a>). It forms a
-universal cryptographic interface, to which arbitrary software or hardware cryptographic backends
-can be plugged in. Also, all constituents of PKI in their OpenXPKI realization are only allowed
-to speak to cryptographic tools in a specially designed <em>high level language for cryptographic 
-needs of PKI</em>. <!-- API != language ... -->
+universal cryptographic interface, to which arbitrary (software or hardware) cryptographic backends
+can be plugged in. 
+</li><li>
+introducing a cryptographic talking policy: all constituents of PKI in their OpenXPKI realization 
+(ones that are higher than the cryptographic layer)
+are only allowed
+to speak to cryptographic tools in a specially designed 
+<em>high level language for cryptographic needs of PKI</em>. <!-- API != language ... -->
+</li>
+</ol>
 </p>
 <h2>High level language for cryptographic needs of PKI at server side</h2>
 <p>
@@ -136,7 +147,7 @@ Structure contains data and (possibly) a signature, which signs the data.
 </dd>
 <dt>PKCS#8</dt> 
     <dd>Private-Key Information Syntax Standard. 
-            Structure contains encrypted (or not encrypted) secret key</dd>
+            Structure contains encrypted (or not encrypted) secret key.</dd>
 <dt>PKCS#10</dt> 
    <dd>Certification Request Standard.
 See RFC 2986. Format of messages sent to a Certification Authority to
@@ -170,19 +181,29 @@ cryptographic product, then we have a ready template to fill in for adding suppo
 for this product in OpenXPKI.
 </p><p>
 More to that. OpenSSL version 0.9.9 is scheduled to support arbitrary asymmetric cryptography.
-The one which is used to generate electronic digital signature. Since September 18th, 2006 this 
-support is in production snapshots of 0.9.9 branch. The only example of asymmetric cryptography
-which is present in the snapshot and is not RSA and not DSA, 
-but the Russian national cryptogpraphic algorithms
-GOST. And OpenXPKI already supports this foreign <!-- well, this is only foreign if you're not in Russia :-) --> cryptography. See
+The one which is used to generate electronic digital signature. 
+(Support for arbitrary symmetric cryptography was already there.)
+Since September 18th, 2006 this 
+support is in production snapshots of 0.9.9 branch. 
+The only example of asymmetric cryptography
+(apart from the classical RSA and DSA set)
+given in the snapshot, is a set of 
+Russian national cryptographic algorithms
+GOST. Due to a lucky coincidence, OpenXPKI already supports this <em>foreign</em> 
+<!-- well, this is only foreign if you're not in Russia :-) 
+And you are not. Are you, Alex? --> 
+cryptography. See
 <a href="gost-howto.html">Working with Russian (GOST) cryptography</a>.
-And this is the very first example of an open source trustcenter product which supports two
-absolutely different sets of cryptography at the same time.
+This makes OpenXPKI the very first example of an open source trustcenter product 
+which supports two
+absolutely different sets of cryptography (western and Russian) at the same time.
+So that RSA, DSA, and GOST certificates can coexist in the same 
+working database and move around the same PKI.
 </p>
       </div> <!-- content -->
 
       <div id="footer">
-        Last modified by svysh on 2006-09-21 09:27:40 +0200  (Rev. 525). &copy; 2005 - 2006  OpenXPKI Foundation
+        Last modified by alech on 2006-09-21 16:15:40 +0400  (Rev. 527). &copy; 2005 - 2006  OpenXPKI Foundation
 
 
       </div> <!-- footer -->
