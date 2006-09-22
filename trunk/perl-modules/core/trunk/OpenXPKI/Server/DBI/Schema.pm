@@ -15,6 +15,7 @@ use OpenXPKI::Exception;
 my %SEQUENCE_of = (
     CRL            => "sequence_crl",
     CSR            => "sequence_csr",
+    CSR_ATTRIBUTES => "sequence_csr_attributes",
     CERTIFICATE    => "sequence_certificate",
     CRR            => "sequence_crr",
     # log entries must use auto_increment
@@ -66,8 +67,10 @@ my %COLUMN_of = (
     WORKFLOW_VERSION_SERIAL  => "workflow_version_id",
     WORKFLOW_HISTORY_SERIAL  => "workflow_hist_id",
 
-    ATTRIBUTE_KEY         => 'attribute_key',
+    ATTRIBUTE_SERIAL      => 'attribute_key',
+    ATTRIBUTE_KEY         => 'attribute_contentkey',
     ATTRIBUTE_VALUE       => 'attribute_value',
+    ATTRIBUTE_SOURCE      => 'attribute_source',
     SUBJECT               => "subject",
     EMAIL                 => "email",
     RA                    => "ra",
@@ -124,7 +127,8 @@ my %TABLE_of = (
         COLUMNS => [ "PKI_REALM", "CA",
                      "CERTIFICATE_SERIAL", "ISSUING_CA", "ISSUING_PKI_REALM"
                    ]},
-    CSR => {
+    CSR => { # this table contains what is requested, which might not
+             # necessarily match what is in the DATA column
         NAME    => "request",
         INDEX   => [ "PKI_REALM", "CSR_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "CSR_SERIAL",
@@ -132,20 +136,23 @@ my %TABLE_of = (
 		     "DATA",  # the pkcs#10/spkac request
 		     "PROFILE", 
 		     "LOA",
+                     "SUBJECT",
+                     "ROLE",
 		     # "PUBKEY",
 		     # "RA",
 	    ]},
 
     # CSR attributes, e. g.
-    #"GLOBAL_KEY_ID",
-    #"SUBJECT", "EMAIL"
+    # 'subject_alt_name'
+    # "GLOBAL_KEY_ID",
     # "SCEP_TID"
     CSR_ATTRIBUTES => {
-        NAME    => "csr_attributes",
-        INDEX   => [ "PKI_REALM", "CSR_SERIAL", ],
-        COLUMNS => [ "PKI_REALM", "CSR_SERIAL",
+        NAME    => "request_attributes",
+        INDEX   => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CSR_SERIAL" ],
+        COLUMNS => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CSR_SERIAL",
 		     "ATTRIBUTE_KEY", 
 		     "ATTRIBUTE_VALUE",
+                     "ATTRIBUTE_SOURCE", # "USER" | "OPERATOR" | "EXTERNAL"
 	    ],
     },
     

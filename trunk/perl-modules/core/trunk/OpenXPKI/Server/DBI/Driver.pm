@@ -50,8 +50,10 @@ our %COLUMN = (
     "global_id"        => "BIGINT",
     "dataexchange_key" => "BIGINT",
 
-    "attribute_key"    => "TEXT_KEY",
+    "attribute_key"    => "BIGINT",
+    "attribute_contentkey" => "TEXT_KEY",
     "attribute_value"  => "TEXT",
+    "attribute_source" => "TEXT",
     "subject"          => "TEXT_KEY",
     "email"            => "TEXT",
     "ra"               => "TEXT",

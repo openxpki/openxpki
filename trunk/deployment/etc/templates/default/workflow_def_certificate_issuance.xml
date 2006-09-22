@@ -9,15 +9,12 @@
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL</description>
     <action name="import"
             resulting_state="I18N_OPENXPKI_WF_STATE_WAITING_FOR_START">
+<!-- TODO: -->
+<!--      <condition name="CONTEXT::csr_serial_present"/> -->
     </action>
-    <!-- no 'required' field here because we want this WF to terminate with
-	 an error immediately -->
-    <!-- this is obsolete for now, as we pass on most of the data via
-         the context and not via the DB, so we don't need the CSR
-         serial as reference -->
-<!--
-    <action name="null" 
-	    resulting_state="FAILED">
+<!-- TODO: -->
+<!--    <action name="null" 
+	    resulting_state="FAILURE">
       <condition name="CONTEXT::no_csr_serial_present"/>
     </action>
 -->
@@ -93,5 +90,6 @@
   </state>
 -->
 
+  <state name="FAILURE"/>
   <state name="SUCCESS"/>
 </workflow>

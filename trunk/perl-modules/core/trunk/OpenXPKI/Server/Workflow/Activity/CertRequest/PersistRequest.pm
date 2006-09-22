@@ -11,20 +11,32 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CertRequest::PersistRequest';
+use OpenXPKI::Serialization::Simple;
+
+use Data::Dumper;
 
 sub execute
 {
-    my $self = shift;
-    my $workflow = shift;
-    my $context = $workflow->context();
-    my $pki_realm = CTX('api')->get_api('Session')->get_pki_realm();
-
-    my $dbi = CTX('dbi_backend');
+    my $self       = shift;
+    my $workflow   = shift;
+    my $context    = $workflow->context();
+    my $pki_realm  = CTX('api')->get_api('Session')->get_pki_realm();
+    my $serializer = OpenXPKI::Serialization::Simple->new();
+    my $dbi        = CTX('dbi_backend');
     my $csr_serial = $dbi->get_new_serial(
         TABLE => 'CSR',
     );
+
     my $type    = $context->param('csr_type');
     my $profile = $context->param('cert_profile');
+    my $subject = $context->param('cert_subject');
+    my $role    = $context->param('cert_role');
+
+    my $subj_alt_names = $serializer->deserialize($context->param('cert_subject_alt_name'));
+
+    my @subj_alt_names = @{$subj_alt_names};
+    ##! 16: '$subj_alt_names: ' . Dumper($subj_alt_names)
+    ##! 16: '@subj_alt_names: ' . Dumper(\@subj_alt_names)
     my $data;
     if ($type eq 'spkac') {
         $data = $context->param('spkac');
@@ -50,8 +62,42 @@ sub execute
             'TYPE'       => $type,
             'DATA'       => $data,
             'PROFILE'    => $profile,
+            'SUBJECT'    => $subject,
+            'ROLE'       => $role,
         },
     );
+
+    my $source_ref = $serializer->deserialize($context->param('sources'));
+    if (! defined $source_ref) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTREQUEST_PERSISTREQUEST_SOURCES_UNDEFINED',
+        );
+    }
+    my $san_source = $source_ref->{'cert_subject_alt_name'};
+
+    if (! defined $san_source) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTREQUEST_PERSISTREQUEST_SUBJECT_ALT_NAME_SOURCE_UNDEFINED',
+        );
+    }
+
+    foreach my $san (@subj_alt_names) {
+        ##! 64: 'san: ' . $san
+        my $attrib_serial = $dbi->get_new_serial(
+            TABLE => 'CSR_ATTRIBUTES',
+        );
+        $dbi->insert(
+            TABLE => 'CSR_ATTRIBUTES',
+            HASH  => {
+                'ATTRIBUTE_SERIAL' => $attrib_serial,
+                'PKI_REALM'        => $pki_realm,
+                'CSR_SERIAL'       => $csr_serial,
+                'ATTRIBUTE_KEY'    => 'subject_alt_name',
+                'ATTRIBUTE_VALUE'  => $serializer->serialize($san),
+                'ATTRIBUTE_SOURCE' => $san_source,
+            },
+        );
+    }
     $dbi->commit();
     $context->param('csr_serial' => $csr_serial);
 }

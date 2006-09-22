@@ -1,35 +1,14 @@
 <actions>
   <action name="import"
-	  class="Workflow::Action::Null">
-    <field name="pkcs10"/>
-    <field name="spkac"/>
-    <field name="csr_type"/>
-    <field name="cert_profile"/>
-    <field name="cert_subject"/>
-    <field name="cert_subject_style"/>
-    <field name="cert_subject_alt_name"/>
+	  class="OpenXPKI::Server::Workflow::Activity::CertIssuance::ImportCertData">
+    <!-- we now read all relevant CSR data from the database, so only
+         CSR serial is required. Disadvantage: we assume the data from
+         the database is good and do not have any validation for it.
+         Advantage: the database can easily be filled by something other
+         than a workflow -->
     <field name="csr_serial"/>
-    <field name="cert_role"/>
     <validator name="HasRequiredField">
-      <arg>cert_subject</arg>
-      <arg>cert_profile</arg>
-      <arg>csr_type</arg>
-      <arg>cert_subject_style</arg>
-      <arg>cert_subject_alt_name</arg>
       <arg>csr_serial</arg>
-      <arg>cert_role</arg>
-    </validator>
-    <validator name="CertProfile">
-      <arg>$cert_profile</arg>
-      <arg>$cert_profile_id</arg>
-    </validator>
-    <validator name="SPKAC">
-      <arg>$csr_type</arg>
-      <arg>$spkac</arg>
-    </validator>
-    <validator name="PKCS10">
-      <arg>$csr_type</arg>
-      <arg>$pkcs10</arg>
     </validator>
   </action>
 
