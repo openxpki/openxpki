@@ -12,6 +12,7 @@
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_issuance.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_crl_issuance.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_dataexchange_export.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_def_dataexchange_import.xml</configfile>
 <!--    <configfile>[% dir.openxpkiconfdir %]/workflow_def_request_pkcs10.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_request_dataonly.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_crl_issuance.xml</configfile>

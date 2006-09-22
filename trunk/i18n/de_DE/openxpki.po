@@ -1598,16 +1598,20 @@ msgid "I18N_OPENXPKI_FAILED"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST"
+msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_DIR_DOES_NOT_EXIST"
 msgstr "Zurücksetzen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_MISSING_TMP"
+msgstr "SPKAC"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPDIR_MAKE_FAILED"
+msgstr "Fehler beim Abmelden"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MAKE_FAILED"
 msgstr "Fehler beim Abmelden"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MISSING_TMP"
-msgstr "SPKAC"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_READ_FILE_DOES_NOT_EXIST"
@@ -2243,7 +2247,51 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_CLEANUP_RMTREE_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_COPY_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_MKDIR_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_WHO_AM_I_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES_COPY_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES_MKDIR_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_LOG_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_MKDIR_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_PACK_ARCHIVE_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_READ_ARCHIVE_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_UNPACK_ARCHIVE_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_DIR_MISSING"
 msgstr "PKI Realm"
 
 #, fuzzy
@@ -2671,14 +2719,35 @@ msgstr "Ändern des alternativen Namens"
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Ändern des Stils des Namens"
 
-msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_BUILD_ARCHIVE"
-msgstr "Erstellen des Archivs"
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_CLEANUP"
+msgstr "Aufräumen"
 
-msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PREPARE_ENV"
-msgstr "Vorbereiten der Export-Umgebung"
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_LOGS"
+msgstr "Exportieren der Logs"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PACK_ARCHIVE"
+msgstr "Packen des Archivs"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES"
+msgstr "Exportieren der Workflow-Instanzen"
 
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_ARCHIVE"
 msgstr "Schreiben des Archivs"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_LOGS"
+msgstr "Importieren der Logs"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_READ_ARCHIVE"
+msgstr "Lesen des Archivs"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_UNPACK_ARCHIVE"
+msgstr "Auspacken des Archivs"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES"
+msgstr "Importieren der Workflow-Instanzen"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
+msgstr "Vorbereiten der Umgebung"
 
 msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
 msgstr "Bestimmung der ausstellenden CA"
@@ -2731,7 +2800,14 @@ msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "Dieser Workflow erstellt neue CRLs."
 
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
-msgstr "Dieser Workflow dient dem Export von Workflow-Instanzen und Import-Logs zu anderen Servern."
+msgstr ""
+"Dieser Workflow dient dem Export von Workflow-Instanzen und Import-Logs zu "
+"anderen Servern."
+
+msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
+msgstr ""
+"Dieser Workflow dient dem Import von Workflow-Instanzen und Import-Logs von "
+"anderen Servern."
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
 msgstr "Ausstellende CA für das Zertifikat bestimmt"
@@ -2772,17 +2848,47 @@ msgstr "Ausstellende CA für die CRL bestimmt"
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "CRL-Profile vorbereitet"
 
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
+msgstr "Logs exportiert"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
+msgstr "Workflow-Instanzen exportiert"
+
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
 msgstr "Zu exportierendes Archiv fertig"
 
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
+msgstr "Export komplett"
+
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
-msgstr "Exportumgebung fertig"
+msgstr "Exportumgebung bereit"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
 msgstr "Initialisiere ..."
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
 msgstr "Export erfolgreich"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_READY"
+msgstr "Zu importierendes Archiv fertig"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_UNPACKED"
+msgstr "Archiv ausgepackt"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_COMPLETED"
+msgstr "Import komplett"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ENV_READY"
+msgstr "Importumgebung bereit"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_INITIAL"
+msgstr "Initialisiere ..."
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_LOGS_DONE"
+msgstr "Logs importiert"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
+msgstr "Import erfolgreich"
 
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Auf Start wartend"
@@ -2804,6 +2910,9 @@ msgstr "Erstellen von CRLs"
 
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
 msgstr "Export"
+
+msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT"
+msgstr "Import"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP-Zertifizierungsantrag"
@@ -2908,19 +3017,11 @@ msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_IMPORT_LOG"
-#~ msgstr "Ändern der Rolle"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_INSTANCES"
-#~ msgstr "Start der Zertifikatserstellung"
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_FINISHED"
+#~ msgstr "Initialisiere ..."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
-#~ msgstr "Auf Start wartend"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_INSTANCES"
 #~ msgstr "Auf Start wartend"
 
 #~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"

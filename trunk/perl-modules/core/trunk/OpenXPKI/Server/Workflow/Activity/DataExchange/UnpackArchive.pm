@@ -1,9 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::DataExchange::BuildArchive.pm
+# OpenXPKI::Server::Workflow::Activity::DataExchange::UnpackArchive.pm
 # Written by Michael Bell for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
 # $Revision: 320 $
 
-package OpenXPKI::Server::Workflow::Activity::DataExchange::BuildArchive;
+package OpenXPKI::Server::Workflow::Activity::DataExchange::UnpackArchive;
 
 use strict;
 use warnings;
@@ -20,20 +20,19 @@ sub execute
     my $workflow = shift;
 
     ## get needed informations
-    my $context = $workflow->context();
-    my $command = $self->param ('command');
-    my $export  = $context->param ('export');
-    my $logs    = $context->param ('logs');
-    my $archive = $context->param ('archive');
+    my $context  = $workflow->context();
+    my $command  = $self->param ('command');
+    my $export   = $context->param ('tmpdir');
+    my $archive  = $context->param ('archive_directory');
+    my $filename = $context->param ('archive_filename');
 
-    $command =~ s/__EXPORT_DIR__/$export/;
-    $command =~ s/__LOG_DIR__/$logs/;
-    $command =~ s/__ARCHIVE__/$archive/;
+    $command =~ s/__DIR__/$export/;
+    $command =~ s/__ARCHIVE__/$archive\/$filename/;
 
     `$command`;
     if ($EVAL_ERROR)
     {
-        my $errors = [[ 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED',
+        my $errors = [[ 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_UNPACK_ARCHIVE_FAILED',
                         {COMMAND => $command} ]];
         $context->param ("__error" => $errors);
         workflow_error ($errors->[0]);
@@ -45,21 +44,20 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::DataExchange::BuildArchive
+OpenXPKI::Server::Workflow::Activity::DataExchange::UnpackArchive
 
 =head1 Description
 
-This activity builds the archive for an export. The only accepted parameter
+This activity unpacks the archive for an import. The only accepted parameter
 is command where you can specify the command to create the archive. Command
 knows to three special variables:
 
 =over
 
-=item * __EXPORT_DIR__ which is the directory with exported workflows
-
-=item * __LOG_DIR__ which is the directory with the import logs
-
 =item * __ARCHIVE__ which is the name of the archive which should be created
+
+=item * __DIR__ which is the name of the directory where the content of the
+        archive should be restored
 
 =back
 

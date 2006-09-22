@@ -124,7 +124,7 @@
   </div>
 % }
   <div class="openxpki_command_list_item">
-    <& /service/open_form.mhtml, 'action' => "get_workflow_instance_info.html" &>
+    <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/get_workflow_instance_info.html" &>
     <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
     <!-- the format is optional -->
     <& /lib/html/hidden.mhtml, 'name' => 'format', 'value' => 'png' &>

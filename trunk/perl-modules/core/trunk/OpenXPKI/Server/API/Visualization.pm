@@ -57,7 +57,8 @@ my $FAILURE_COLOR = 'firebrick';
 
 my $AUTORUN_STYLE = 'dashed';
 
-my $RANKDIR     = "LR"; # GraphViz's rank direction, either LR or TB
+## replaced LR by TB for better printing and smaller paper sizes
+my $RANKDIR     = ""; # GraphViz's rank direction, either LR or TB
                         # (left to right or top to bottom)
 
 my $RATIO       = 0.71; # useful for A4 paper

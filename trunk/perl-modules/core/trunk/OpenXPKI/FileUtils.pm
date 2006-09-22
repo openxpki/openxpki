@@ -16,9 +16,11 @@ use OpenXPKI::Debug 'OpenXPKI::FileUtils';
 use OpenXPKI::Exception;
 
 use File::Spec;
+use File::Temp;
 use Fcntl qw( :DEFAULT );
 
 my %safe_filename_of :ATTR; # a hash of filenames created with safe_tmpfile
+my %safe_dir_of      :ATTR; # a hash of directories created with safe_tmpdir
 
 sub read_file {
     my $self = shift;
@@ -110,19 +112,8 @@ sub get_safe_tmpfile {
     my $ident = ident $self;
     my $arg_ref = shift;
 
-    ##! 2: 'check TMP'
-    if (not exists $arg_ref->{TMP}) {
-        OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MISSING_TMP');
-    }
-    if (not -d $arg_ref->{TMP}) {
-        OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST',
-            params => {DIR => $arg_ref->{TMP}});
-    }
-
     ##! 2: 'build template'
-    my $template = File::Spec->catfile($arg_ref->{TMP}, 'openxpkiXXXXXX');
+    my $template = $self->__get_safe_template ($arg_ref);
 
     ##! 2: 'build tmp file'
     my ($fh, $filename) = File::Temp::mkstemp($template);
@@ -139,6 +130,53 @@ sub get_safe_tmpfile {
 
     ##! 1: 'end: $filename'
     return $filename;
+}
+
+sub get_safe_tmpdir {
+    ##! 1: 'start'
+    my $self = shift;
+    my $ident = ident $self;
+    my $arg_ref = shift;
+
+    ##! 2: 'build template'
+    my $template = $self->__get_safe_template ($arg_ref);
+
+    ##! 2: 'build tmp file'
+    my $dir = File::Temp::mkdtemp($template);
+    if (! -d $dir) {
+        OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPDIR_MAKE_FAILED',
+            params  => {'DIR' => $dir});
+    }
+
+    ##! 2: 'fix mode'
+    chmod 0700, $dir;
+    $safe_dir_of{$ident}->{$dir} = 1;
+
+    ##! 1: 'end: $filename'
+    return $dir;
+}
+
+sub __get_safe_template
+{
+    ##! 1: 'start'
+    my $self = shift;
+    my $ident = ident $self;
+    my $arg_ref = shift;
+
+    ##! 2: 'check TMP'
+    if (not exists $arg_ref->{TMP}) {
+        OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_MISSING_TMP');
+    }
+    if (not -d $arg_ref->{TMP}) {
+        OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_DIR_DOES_NOT_EXIST',
+            params => {DIR => $arg_ref->{TMP}});
+    }
+
+    ##! 2: 'build template'
+    return File::Spec->catfile($arg_ref->{TMP}, 'openxpkiXXXXXX');
 }
 
 1;

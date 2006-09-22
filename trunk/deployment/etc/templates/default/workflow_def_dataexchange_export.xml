@@ -5,7 +5,7 @@
 
   <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PREPARE_ENV" 
+    <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV" 
 	    resulting_state="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY">
       <condition name="ACL::dataexchange_export"/>
       <condition name="Condition::server_0"/>
@@ -14,7 +14,23 @@
 
   <state name="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_BUILD_ARCHIVE"
+    <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_LOGS"
+	    resulting_state="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS">
+      <condition name="ACL::dataexchange_export"/>
+    </action>
+  </state>
+
+  <state name="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES"
+	    resulting_state="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES">
+      <condition name="ACL::dataexchange_export"/>
+    </action>
+  </state>
+
+  <state name="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PACK_ARCHIVE"
 	    resulting_state="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY">
       <condition name="ACL::dataexchange_export"/>
     </action>
@@ -23,6 +39,14 @@
   <state name="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY</description>
     <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_ARCHIVE"
+	    resulting_state="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED">
+      <condition name="ACL::dataexchange_export"/>
+    </action>
+  </state>
+
+  <state name="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_CLEANUP"
 	    resulting_state="I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED">
       <condition name="ACL::dataexchange_export"/>
     </action>

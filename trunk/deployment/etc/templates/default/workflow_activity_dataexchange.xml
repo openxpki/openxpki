@@ -1,16 +1,45 @@
 <actions>
   <!-- this action name has not to be human readable      -->
   <!-- because it is only used to initialize the workflow -->
-  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PREPARE_ENV"
-	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::PrepareExportEnv"
+
+  <!-- common activities -->
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::PrepareEnv"
           device="/tmp/fd0">
   </action>
-  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_BUILD_ARCHIVE"
-	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::BuildArchive"
-          command="tar -c __EXPORT_DIR__ __LOG_DIR__ | gzip > __ARCHIVE__">
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_CLEANUP"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::Cleanup">
+  </action>
+
+  <!-- Export activities -->
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_LOGS"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::ExportLogs">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::ExportWorkflowInstances">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PACK_ARCHIVE"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::PackArchive"
+          command="tar -f - -C __DIR__ -c . | gzip -c > __ARCHIVE__">
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_ARCHIVE"
 	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::WriteArchive"
           command="tar -cf __DEVICE__ __ARCHIVE__">
+  </action>
+
+  <!-- Import activities -->
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_READ_ARCHIVE"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::ReadArchive"
+          command="tar -xf __DEVICE__ -C __DIR__">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_UNPACK_ARCHIVE"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::UnpackArchive"
+          command="gzip -d __ARCHIVE__ -c | tar -f - -x -C __DIR__">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_LOGS"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::ImportLogs">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES"
+	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::ImportWorkflowInstances">
   </action>
 </actions>

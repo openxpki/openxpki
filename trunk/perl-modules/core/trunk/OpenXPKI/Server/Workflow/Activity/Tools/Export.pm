@@ -73,6 +73,7 @@ sub execute
 
     ## write message to the correct export directory
     my $filename = $dir."/".$dest."/".$workflow->id().".wfe";
+    $context->param ('export_filename' => $filename);
     if (not open FD, ">$filename")
     {
         my $errors = [[ 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_OPEN_FAILED',

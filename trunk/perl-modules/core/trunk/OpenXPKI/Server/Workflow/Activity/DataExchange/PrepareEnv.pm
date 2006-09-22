@@ -1,12 +1,13 @@
-# OpenXPKI::Server::Workflow::Activity::DataExchange::PrepareExportEnv.pm
+# OpenXPKI::Server::Workflow::Activity::DataExchange::PrepareEnv.pm
 # Written by Michael Bell for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
 # $Revision: 320 $
 
-package OpenXPKI::Server::Workflow::Activity::DataExchange::PrepareExportEnv;
+package OpenXPKI::Server::Workflow::Activity::DataExchange::PrepareEnv;
 
 use strict;
 use warnings;
+use English;
 use base qw( OpenXPKI::Server::Workflow::Activity OpenXPKI::FileUtils );
 
 ## FIXME: why does the inheritance from Activity does not work?
@@ -30,18 +31,25 @@ sub execute
     }
 
     ## dirs of dataexchange
-    $context->param ('export' => CTX('xml_config')->get_xpath (
-                                     XPATH   => [ 'common/data_exchange/export/dir' ],
-                                     COUNTER => [ 0 ]));
-    $context->param ('logs' => CTX('xml_config')->get_xpath (
-                                     XPATH   => [ 'common/data_exchange/import/dir' ],
-                                     COUNTER => [ 0 ]));
+    $context->param ('local_export_dir' => CTX('xml_config')->get_xpath (
+                     XPATH   => [ 'common/data_exchange/export/dir' ],
+                     COUNTER => [ 0 ]));
+    $context->param ('local_import_dir' => CTX('xml_config')->get_xpath (
+                     XPATH   => [ 'common/data_exchange/import/dir' ],
+                     COUNTER => [ 0 ]));
 
-    ## name of archive
+    ## name of archive and export directory
     my $filename = CTX('xml_config')->get_xpath (
                        XPATH   => [ 'common/server/tmpdir' ],
                        COUNTER => [ 0 ]);
-    $context->param ('archive' => $self->get_safe_tmpfile ({TMP => $filename}));
+    $context->param ('archive_directory' => $self->get_safe_tmpdir ({TMP => $filename}));
+    $context->param ('tmpdir'  => $self->get_safe_tmpdir ({TMP => $filename}));
+    $context->param ('archive_filename' => "export.tar.gz");
+
+    ## who am I
+    $context->param ('who_am_i' => CTX('xml_config')->get_xpath (
+                      XPATH   => [ 'common/database/server_id' ],
+                      COUNTER => [ 0 ]));
 }
 
 1;
@@ -49,7 +57,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::DataExchange::PrepareExportEnv
+OpenXPKI::Server::Workflow::Activity::DataExchange::PrepareEnv
 
 =head1 Description
 

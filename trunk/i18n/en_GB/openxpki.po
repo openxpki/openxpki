@@ -1553,16 +1553,20 @@ msgid "I18N_OPENXPKI_FAILED"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST"
+msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_DIR_DOES_NOT_EXIST"
 msgstr "reset"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_MISSING_TMP"
+msgstr "SPKAC"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPDIR_MAKE_FAILED"
+msgstr "Logout failed"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MAKE_FAILED"
 msgstr "Logout failed"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MISSING_TMP"
-msgstr "SPKAC"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_READ_FILE_DOES_NOT_EXIST"
@@ -2217,7 +2221,73 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_CLEANUP_RMTREE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_COPY_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_MKDIR_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_WHO_AM_I_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES_COPY_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES_MKDIR_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_LOG_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_MKDIR_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_PACK_ARCHIVE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_READ_ARCHIVE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_UNPACK_ARCHIVE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_DIR_MISSING"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
@@ -2661,14 +2731,35 @@ msgstr "Change subject alternative name"
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Change subject style"
 
-msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_BUILD_ARCHIVE"
-msgstr "Build archive"
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_CLEANUP"
+msgstr "Cleanup"
 
-msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PREPARE_ENV"
-msgstr "Prepare environment"
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_LOGS"
+msgstr "Export logs"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PACK_ARCHIVE"
+msgstr "Pack archive"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES"
+msgstr "Export workflow instances"
 
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_ARCHIVE"
-msgstr "Write Archive"
+msgstr "Write archive"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_LOGS"
+msgstr "Import logs"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_READ_ARCHIVE"
+msgstr "Read archive"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_UNPACK_ARCHIVE"
+msgstr "Unpack archive"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES"
+msgstr "Import workflow instances"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
+msgstr "Prepare environment"
 
 msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
 msgstr "Determine issuing CA"
@@ -2726,6 +2817,9 @@ msgstr "This is the workflow to issue fresh CRLs."
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
 msgstr "This workflow exports workflow instances to other servers."
 
+msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
+msgstr "This workflow imports workflow instances from other servers."
+
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
 msgstr "CA certificate determined"
 
@@ -2765,17 +2859,47 @@ msgstr "Next CA determined"
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "Profile was prepared"
 
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
+msgstr "Exported logs"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
+msgstr "Exported workflow instances"
+
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
 msgstr "Archive ready"
 
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
+msgstr "Export completed"
+
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
-msgstr "Environment for export prepared"
+msgstr "Environment for export ready"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
 msgstr "Initializing ..."
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
 msgstr "Export succeeded"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_READY"
+msgstr "Archive ready"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_UNPACKED"
+msgstr "Unpacked archive"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_COMPLETED"
+msgstr "Import completed"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ENV_READY"
+msgstr "Environment for import ready"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_INITIAL"
+msgstr "Initializing ..."
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_LOGS_DONE"
+msgstr "Imported Logs"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
+msgstr "Import succeeded"
 
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Waiting to start"
@@ -2787,16 +2911,19 @@ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"
 msgstr "Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE"
-msgstr "Online part of a Certificate Signing Request (CSR)"
+msgstr "Offline part of a Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-msgstr "Offline part of a Certificate Signing Request (CSR)"
+msgstr "Online part of a Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "CRL Issuance"
 
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
 msgstr "Export"
+
+msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT"
+msgstr "Import"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP Certificate Signing Request"
@@ -2900,20 +3027,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_IMPORT_LOG"
-#~ msgstr "Change role"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_INSTANCES"
-#~ msgstr "Create a new workflow instance for certificate issuance"
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_FINISHED"
+#~ msgstr "Import completed"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
-#~ msgstr "Waiting to start"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_INSTANCES"
 #~ msgstr "Waiting to start"
 
 #~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"

@@ -1593,16 +1593,20 @@ msgid "I18N_OPENXPKI_FAILED"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST"
+msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_DIR_DOES_NOT_EXIST"
 msgstr "сброс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_MISSING_TMP"
+msgstr "SPKAC"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPDIR_MAKE_FAILED"
+msgstr "При попытке выхода из системы произошла ошибка"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MAKE_FAILED"
 msgstr "При попытке выхода из системы произошла ошибка"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MISSING_TMP"
-msgstr "SPKAC"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_READ_FILE_DOES_NOT_EXIST"
@@ -2279,7 +2283,73 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_CLEANUP_RMTREE_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_COPY_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_MKDIR_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_WHO_AM_I_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES_COPY_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES_MKDIR_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_LOG_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_MKDIR_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_PACK_ARCHIVE_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_READ_ARCHIVE_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_UNPACK_ARCHIVE_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_DIR_MISSING"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
 "некоторых данных (__FIELDS__)."
@@ -2743,15 +2813,43 @@ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "CSR с OU-структурой уникального имени"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_BUILD_ARCHIVE"
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_CLEANUP"
 msgstr "CSR с OU-структурой уникального имени"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PREPARE_ENV"
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_LOGS"
 msgstr "CSR с OU-структурой уникального имени"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PACK_ARCHIVE"
+msgstr "CSR с OU-структурой уникального имени"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES"
+msgstr "Сертификаты"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_ARCHIVE"
+msgstr "CSR с OU-структурой уникального имени"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_LOGS"
+msgstr "CSR с OU-структурой уникального имени"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_READ_ARCHIVE"
+msgstr "CSR с OU-структурой уникального имени"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_UNPACK_ARCHIVE"
+msgstr "CSR с OU-структурой уникального имени"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES"
+msgstr "Сертификаты"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
 msgstr "CSR с OU-структурой уникального имени"
 
 #, fuzzy
@@ -2822,6 +2920,10 @@ msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
 msgstr "Новая завка на сертификат (CSR)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
+msgstr "Новая завка на сертификат (CSR)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
 msgstr "Сертификаты"
 
@@ -2873,8 +2975,20 @@ msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "Сертификаты"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
+msgstr "Сертификаты"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
+msgstr "Новая завка на сертификат (CSR)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
 msgstr "Новая завка на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
+msgstr "Сертификаты"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
@@ -2886,6 +3000,34 @@ msgstr "Сертификаты"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
+msgstr "Сертификаты"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_READY"
+msgstr "Новая завка на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_UNPACKED"
+msgstr "Новая завка на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_COMPLETED"
+msgstr "Сертификаты"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ENV_READY"
+msgstr "Новая завка на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_INITIAL"
+msgstr "Сертификаты"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_LOGS_DONE"
+msgstr "Сертификаты"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
 msgstr "Сертификаты"
 
 #, fuzzy
@@ -2917,6 +3059,12 @@ msgstr "Сертификаты"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
+msgstr ""
+"Используемая структура требует наличия, как минимум, названий одного "
+"подразделения  организации, одной организации и одной страны."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT"
 msgstr ""
 "Используемая структура требует наличия, как минимум, названий одного "
 "подразделения  организации, одной организации и одной страны."
@@ -3027,19 +3175,11 @@ msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_IMPORT_LOG"
-#~ msgstr "CSR с OU-структурой уникального имени"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_INSTANCES"
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_FINISHED"
 #~ msgstr "Сертификаты"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
-#~ msgstr "Новая завка на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_INSTANCES"
 #~ msgstr "Новая завка на сертификат (CSR)"
 
 #~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
