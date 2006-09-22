@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ "$SED" == "" ]; then
+    SED=sed
+fi
+
 if test ! -d "$1"; then
    echo "Directory '$1' for scan not found." > /dev/stderr
    exit 1
@@ -26,5 +30,5 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 '
 
-grep -r 'I18N_OPENXPKI' $@ | grep -v ".svn" | sed "s/.*I18N_OPENXPKI/I18N_OPENXPKI/" | sed "s/[\"'].*//" | sed "s/[<].*//" | sed "s/.*=>.*/XX_ERASE_XX/" | sed "s/.*).*/XX_ERASE_XX/" | sort | uniq | sed "s/^I/msgid \"I/g" | sed "s/\$/\"msgstr \"\"\n/g" | sed "s/.*XX_ERASE_XX.*//g" | sed "s/msgstr/\nmsgstr/g"
+grep -Ir 'I18N_OPENXPKI' $@ | grep -v ".svn" |  $SED "s/.*I18N_OPENXPKI_\([A-Z0-9_]*\).*/I18N_OPENXPKI_\1/" | sort | uniq | $SED "s/^I/msgid \"I/g" | $SED "s/\$/\"msgstr \"\"\n/g" | $SED "s/.*XX_ERASE_XX.*//g" | $SED "s/msgstr/\nmsgstr/g"
 
