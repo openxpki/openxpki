@@ -86,7 +86,7 @@
       <!-- because this ignores the order of the validators -->
       <field name="cert_subject"/>
       <validator name="CertSubject">
-        <arg>$cert_profile</arg>
+        <arg>$cert_profile_id</arg>
         <arg>$cert_subject_style</arg>
         <arg>$cert_subject</arg>
       </validator>
