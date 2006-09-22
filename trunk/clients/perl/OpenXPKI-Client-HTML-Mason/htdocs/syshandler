@@ -1,16 +1,18 @@
 % $m->call_next;
-
 <%once>
   # FIXME: move this to Apache handler?
   use URI;
   use OpenXPKI::Client::HTML::Mason;
   use OpenXPKI::Client::HTML::Mason::Javascript;
   use OpenXPKI::Client::HTML::Mason::Menu;
-  use OpenXPKI::i18n qw( i18nGettext set_language get_language );
+  use OpenXPKI::i18n qw( i18nGettext set_language get_language set_locale_prefix );
   use OpenXPKI::DN;
   use English;
   use Data::Dumper;
 
+  if (defined $ENV{OPENXPKI_LOCALE_PREFIX}) {
+    set_locale_prefix($ENV{OPENXPKI_LOCALE_PREFIX});
+  }
   $context->{socket_file} = $ENV{OPENXPKI_SOCKET_FILE};
 
   if (defined $ENV{OPENXPKI_DEBUG_FILE}) {
@@ -43,3 +45,4 @@
   # this is the toplevel handler
   inherit => undef
 </%flags>
+
