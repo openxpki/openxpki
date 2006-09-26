@@ -169,53 +169,65 @@ chain of public key certificates protected with a password-based symmetric key.<
 
 <h2>A list of cryptographic backends recognized by OpenXPKI</h2>
 <p>
-Today this list consists of the single entry: 
+Today this list consists of the following entries: 
+</p>
+
+<ol>
+<li><a href="http://www.openssl.org/">OpenSSL</a> cryptographic library 
+ver. 0.9.8x with x = a, b, c.</li>
+<li><a href="gost-howto.html">OpenSSL-0.9.8b-gost</a> a clone of OpenSSL cryptographic library
+with additional support for russian national (GOST) cryptographic algorithms.</li>
+</ol>
+
+<p>
+Our <em>Cryptography abstraction concept</em> still pays a lot even with that modest
+choice:
 </p>
 
 <ul>
-<li><a href="http://www.openssl.org/">OpenSSL</a> cryptographic library.</li>
-</ul>
-
-<p>
-But our <em>Cryptography abstraction concept</em> still pays a lot even with that modest
-choice.
-</p><p>
-If one day OpenSSL acquires a new cryptographic algorithm, then it will take a minute 
+<li>If one day OpenSSL acquires a new cryptographic algorithm, then it will take a minute 
 to add support of it to the OpenXPKI.
-</p><p>
+</li><li>
 If one day OpenSSL acquires a support for new hardware security module, 
 then it will take a minute to add support of it to the OpenXPKI.
-</p><p>
+</li><li>
 If one day we get an alternative to OpenSSL, that is some totally different (software or hardware) 
 cryptographic product, then we have a ready template to fill in to add support 
 of this product to the OpenXPKI.
-</p><p>
-More to that. OpenSSL version 0.9.9 is scheduled to support arbitrary asymmetric cryptography.
-The one which is used to generate electronic digital signature. 
-(Support for arbitrary symmetric cryptography was already there.)
-Since September 18th, 2006 this 
-support is in production snapshots of 0.9.9 branch. 
-The only example of asymmetric cryptography
-(apart from the classical RSA and DSA set)
-given in the snapshot, is a set of 
-Russian national cryptographic algorithms
-GOST. Due to a lucky coincidence, OpenXPKI already supports this <em>foreign</em> 
-<!-- well, this is only foreign if you're not in Russia :-) 
-And you are not. Are you, Alex? --> 
-cryptography. See
-<a href="gost-howto.html">Working with Russian (GOST) cryptography</a>.
+</li>
+</ul>
+
+<p>
+With cryptographic backend #2 plugged in, OpenXPKI
+supports both sets of cryptography:
+</p>
+
+<ol>
+<li>classical RSA and DSA set (the same as with cryptographic backend #1).
+</li>
+<li>russian national cryptographic algorithms GOST.
+See <a href="gost-howto.html">Working with russian (GOST) cryptography</a>.
+</li>
+</ol>
+
 </p><p>
 This makes OpenXPKI the very first example of an open source trustcenter product 
 which supports two
-absolutely different sets of cryptography (western and Russian) at the same time.
+absolutely different sets of cryptography (western and russian) at the same time.
 So that RSA, DSA, and GOST certificates can coexist in the same 
 working database and move around the same PKI.
+</p><p>
+Future version OpenSSL-0.9.9 is scheduled to link together both cryptographic 
+backends listed above into a single product. It will provide
+simultaneous and default support of arbitrary cryptographic sets.
+And OpenXPKI is ready to support this new version of OpenSSL due to the same 
+<em>Cryptography abstraction concept</em>.
 </p>
 
       </div> <!-- content -->
 
       <div id="footer">
-        Last modified by svysh on 2006-09-22 17:22:51 +0200  (Rev. 532). &copy; 2005 - 2006  OpenXPKI Foundation
+        Last modified by svysh on 2006-09-21 23:39:59 +0400  (Rev. 532). &copy; 2005 - 2006  OpenXPKI Foundation
 
 
       </div> <!-- footer -->

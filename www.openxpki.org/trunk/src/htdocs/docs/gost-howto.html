@@ -1,27 +1,112 @@
 <%attr>
-  title => 'Working with Russian (GOST) cryptography'
+  title => 'Working with russian (GOST) cryptography'
 </%attr>
 
-<h2>Working with Russian (GOST) cryptography</h2> 
+<h2>Working with russian (GOST) cryptography</h2> 
 <h3>An example of using OpenXPKI with alternative cryptography</h3>
 
 <p>
+Since September 18th, 2006 a production branch of OpenSSL version 0.9.9 has a built-in support 
+for arbitrary asymmetric cryptography, and provides an extended set 
+of russian national algorithms (GOST) as an example of <em>foreign</em>
+cryptography.
+Today this OpenSSL-0.9.9 branch is far from the stable state. As soon as it 
+stabilizes, the OpenXPKI project will surely support it. That is both 
+classical RSA - DSA cryptography, and GOST cryptography will be supported 
+simultaneously and by default and out of the box.
 </p>
-<dl>
-  <dt></dt>
-  <dd>
-  </dd>
-  <dt></dt>
-  <dd>
-  </dd>
-  <dt></dt>
-  <dd>
-    <ul>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-  </dd>
-</dl>
 <p>
+For those who can not wait, we provide here a patched version of 
+OpenSSL-0.9.8b equipped with the (same as in ver.0.9.9) set of GOST algorithms. 
+We call this collection OpenSSL-0.9.8b-gost. It has  
+full and simultaneous support of both western 
+and russian cryptography. The recipes that follow have been tested to work with OpenXPKI
+at FreeBSD@Intel-32, FreeBSD@AMD-64, Debian@Intel-32 platforms. <em>Tested to work</em>
+here means that all built-in tests of OpenXPKI run ok, and that we have found no
+cryptographic-backend-related errors while 
+working with OpenXPKI via web interface. 
 </p>
+<p>
+Roughly today's procedure to prepare support for GOST in OpenXPKI is as follows:
+</p>
+    <ul>
+      <li>unzip a regular 
+<a href="http://www.openssl.org/source/openssl-0.9.8b.tar.gz">OpenSSL-0.9.8b version</a>
+</li>
+      <li>apply
+<a href="http://prdownloads.sourceforge.net/openxpki/openssl-asymm-0.9.8b-20060626.diff.gz">
+a patch</a>
+which enables support of arbitrary asymmetric cryptography,</li>
+      <li>install thus patched OpenSSL version to a specially dedicated directory 
+           OPENSSL_INSTALLDIR, so that your system's OpenSSL installation is not violated,</li>
+      <li>configure 
+<a href="http://prdownloads.sourceforge.net/openxpki/engine-gost-20060626.tar.gz">
+engine-gost</a> (which is a set of GOST algoritms)
+to work with this OpenSSL and install it,</li>
+    </ul>
+<p>
+The details of the above procedure are given in 
+<a href="openssl-gost.sh.gz">
+a shell script</a>. 
+For simplicity it knows internet references for only one of many 
+SourceForge mirrors to get tarballs from. To run this script you need to install <tt>wget</tt>.
+You may have to edit first lines of the script to match your system and preferences:
+</p>
+    <ul>
+      <li><tt>OPENSSL_SOURCEDIR</tt> points to the directory to which tarballs will be unzipped.</li>
+      <li><tt>OPENSSL_INSTALLDIR</tt> points to the directory to which OpenSSL-gost software collection 
+          will be installed. Beware: this directrory will be cleaned before installing.</li>
+      <li><tt>MAKE</tt> points to your gmake (on Linux it could be named just make).</li>
+    </ul>
+
+<p>
+If the script fails at a download stage, you can help it by downloading 3 needed tarballs 
+manually from the references above, and placing all of them into <tt>OPENSSL_SOURCEDIR</tt>. 
+After that re-run the script.
+<p>
+If successful, the above procedure adds support for the following cryptographic 
+algorithms (named here as recognized by the OpenSSL library):
+</p>
+    <ul>
+      <li>md_gost94 hash algorithm.</li>
+      <li>gost89 encryption/decryption algorithm.</li>
+      <li>gost94 digital signature algorithm.</li>
+      <li>gost94cp digital signature algorithm (alternative mode).</li>
+      <li>gost2001 digital signature algorithm based on elliptic curves.</li>
+      <li>gost2001cp digital signature algorithm based on elliptic curves (alternative mode).</li>
+    </ul>
+<p>
+To test GOST support at the library level try:
+</p>
+<pre>    ${OPENSSL_INSTALLDIR}/bin/openssl engine gost -t -c -vvvv
+</pre>
+</p><p>
+    You should see something similar to the following:
+</p>
+<pre>
+    (gost) GOST engine
+     [gost89, md_gost94, gost94, gost94cp, gost2001, gost2001cp]
+         [ available ]
+</pre>
+<h4>
+And do not forget to (re)install OpenXPKI based on the just installed OpenSSL-gost software 
+collection.
+</h4><p>
+For this before running <tt>perl Makefile.PL</tt> for the OpenXPKI's server, 
+you should define these environment variables:
+</p>
+    <ul>
+      <li><tt>OPENSSL_PREFIX=${OPENSSL_INSTALLDIR}</tt></li>
+      <li><tt>GOST_OPENSSL_ENGINE=${OPENSSL_INSTALLDIR}/lib/engines/libgost.so</tt></li>
+    </ul>
+<p>
+Only one of listed above algorithms, namely <b>GOST94</b> (in this spelling) 
+digital signature algorithm, 
+will be explicitly visible to the user/administrator of the today's OpenXPKI.
+</p><p>
+</p><p>
+</p><p>
+</p>
+
+
+
