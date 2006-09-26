@@ -44,6 +44,7 @@ $dir =~ s{ _ }{}xms;
 my $ca_token = $mgmt->get_token (TYPE => "CA", 
   		                 ID => $ca_id, 
 		                 PKI_REALM => "Test GOST Root CA",
+                                 CERTIFICATE => "dummy"
 	);
 ok (1, 'CA token');
 
@@ -177,11 +178,12 @@ print STDERR "cert: $cert\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/$dir/cert.pem", CONTENT => $cert);
 
 ## build the PKCS#12 file
- my $pkcs12 = $token->command ({COMMAND => "create_pkcs12",
-                                PASSWD  => $passwd,
-                                KEY     => $key,
-                                CERT    => $cert,
-                                CHAIN   => $token->get_certfile()});
+my @chain = [ $cert ];
+my $pkcs12 = $token->command ({COMMAND => "create_pkcs12",
+                               PASSWD  => $passwd,
+                               KEY     => $key,
+                               CERT    => $cert,
+                               CHAIN   => @chain});
 ok (1);
 print STDERR "PKCS#12 length: ".length ($pkcs12)."\n"
     if ($ENV{DEBUG});
