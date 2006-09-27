@@ -92,13 +92,20 @@ To test GOST support at the library level try:
 And do not forget to (re)install OpenXPKI based on the just installed OpenSSL-gost software 
 collection.
 </h4><p>
-For this before running <tt>perl Makefile.PL</tt> for the OpenXPKI's server, 
-you should define these environment variables:
+Environment variables:
 </p>
-    <ul>
-      <li><tt>OPENSSL_PREFIX=${OPENSSL_INSTALLDIR}</tt></li>
-      <li><tt>GOST_OPENSSL_ENGINE=${OPENSSL_INSTALLDIR}/lib/engines/libgost.so</tt></li>
-    </ul>
+<pre>
+    OPENSSL_PREFIX=${OPENSSL_INSTALLDIR}
+    GOST_OPENSSL_ENGINE=${OPENSSL_INSTALLDIR}/lib/engines/libgost.so
+</pre>
+<p>
+should be defined while running the following commands related to the OpenXPKI's server:
+</p>
+<pre>
+    perl Makefile.PL
+    make
+    make test
+</pre>
 <p>
 After that in addition to the regular western cryptography, users and administrators of 
 OpenXPKI will see the following GOST cryptographic algoritms (listed in the spelling of OpenXPKI):
