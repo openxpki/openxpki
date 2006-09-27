@@ -15,50 +15,27 @@ use Class::Std;
 
 use Data::Dumper;
 
-use Regexp::Common;
-use Params::Validate qw( validate :types );
-
 use OpenXPKI::Debug 'OpenXPKI::Server::API::Workflow';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 
-my %workflow_factory : ATTR;
-
 my $workflow_table = 'WORKFLOW';
 my $context_table  = 'WORKFLOW_CONTEXT';
 my $workflow_history_table = 'WORKFLOW_HISTORY';
 
-# regex definitions for parameter validation
-my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
-my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
-
-
-sub BUILD {
-    my ($self, $ident, $arg_ref) = @_;
-    
-    Params::Validate::validation_options(
-	# let parameter validation errors throw a proper exception
-	on_fail => sub {
-	    my $error = shift;
-	    
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_INVALID_PARAMETER",
-		params => {
-		    ERROR => $error,
-		});
-	},
-	);
+sub START {
+    # somebody tried to instantiate us, but we are just an
+    # utility class with static methods
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED',
+    );
 }
 
 ###########################################################################
 # lowlevel workflow functions
 
 sub list_workflow_instances {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
-
     ##! 1: "list_workflow_instances"
 
     my $dbi = CTX('dbi_workflow');
@@ -68,19 +45,15 @@ sub list_workflow_instances {
 	DYNAMIC => {
 	    PKI_REALM  => CTX('session')->get_pki_realm(),
 	},
-	);
+    );
 
     return $instances;
 }
 
 
 sub list_workflow_titles {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
-
     ##! 1: "list_workflow_titles"
-    my $factory = $self->__get_workflow_factory();
+    my $factory = __get_workflow_factory();
 
     # FIXME: we are poking into Workflow::Factory's internal data
     # structures here to get the required information.
@@ -102,19 +75,6 @@ sub list_workflow_titles {
 
 sub get_workflow_info {
     my $self  = shift;
-    my $ident = ident $self;
-    validate(
-	@_,
-	{
-	    WORKFLOW => {
-		type => SCALAR,
-		regex => $re_alpha_string,
-	    },
-	    ID => {
-		type => SCALAR,
-		regex => $re_integer_string,
-	    },
-	});	 
     my $args  = shift;
 
     ##! 1: "get_workflow_info"
@@ -122,36 +82,15 @@ sub get_workflow_info {
     my $wf_title = $args->{WORKFLOW};
     my $wf_id    = $args->{ID};
 
-    my $workflow = $self->__get_workflow_factory()->fetch_workflow(
+    my $workflow = __get_workflow_factory()->fetch_workflow(
 	$wf_title,
 	$wf_id);
 
-    return $self->__get_workflow_info($workflow);
+    return __get_workflow_info($workflow);
 }
 
 sub execute_workflow_activity {
     my $self  = shift;
-    my $ident = ident $self;
-    validate(
-	@_,
-	{
-	    WORKFLOW => {
-		type => SCALAR,
-		regex => $re_alpha_string,
-	    },
-	    ID => {
-		type => SCALAR,
-		regex => $re_integer_string,
-	    },
-	    ACTIVITY => {
-		type => SCALAR,
-		regex => $re_alpha_string,
-	    },
-	    PARAMS => {
-		type => HASHREF,
-		optional => 1,
-	    },
-	});	 
     my $args  = shift;
 
     ##! 1: "execute_workflow_activity"
@@ -162,7 +101,7 @@ sub execute_workflow_activity {
     my $wf_params   = $args->{PARAMS};
 
     ##! 2: "load workflow"
-    my $workflow = $self->__get_workflow_factory()->fetch_workflow(
+    my $workflow = __get_workflow_factory()->fetch_workflow(
 	$wf_title,
 	$wf_id);
     $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
@@ -236,29 +175,11 @@ sub execute_workflow_activity {
     };
     ##! 64: Dumper $workflow
 
-    return $self->__get_workflow_info($workflow);
+    return __get_workflow_info($workflow);
 }
 
 sub create_workflow_instance {
     my $self  = shift;
-    my $ident = ident $self;
-    validate(
-	@_,
-	{
-	    WORKFLOW => {
-		type => SCALAR,
-		regex => $re_alpha_string,
-	    },
-	    FILTER_PARAMS => {
-		type    => SCALAR,
-		regex   => $re_alpha_string,
-                default => 0
-	    },
-	    PARAMS => {
-		type => HASHREF,
-		optional => 1,
-	    },
-	});	 
     my $args  = shift;
 
     ##! 1: "create workflow instance"
@@ -267,7 +188,7 @@ sub create_workflow_instance {
     my $wf_title = $args->{WORKFLOW};
 
     # 'data only certificate request'
-    my $workflow = $self->__get_workflow_factory()->create_workflow($wf_title);
+    my $workflow = __get_workflow_factory()->create_workflow($wf_title);
 
     if (! defined $workflow) {
 	OpenXPKI::Exception->throw (
@@ -378,37 +299,17 @@ sub create_workflow_instance {
                 message => 'I18N_WF_ERROR_ILLEGAL_STATE');
     };
     
-    # commit changes (this is normally not required, as save_workflow()
-    # is usually called by execute_action() but in this case we are destroying
-    # the workflow instance right after creation.
-    #$self->__get_workflow_factory()->save_workflow($workflow);
-
-    return $self->__get_workflow_info($workflow);
+    return __get_workflow_info($workflow);
 }
 
-sub get_workflow_activities
-{
+sub get_workflow_activities {
     my $self  = shift;
-    my $ident = ident $self;
-    ##! 1: "start"
-    validate(
-	@_,
-	{
-	    WORKFLOW => {
-		type => SCALAR,
-		regex => $re_alpha_string,
-	    },
-	    ID => {
-		type => SCALAR,
-		regex => $re_integer_string,
-	    },
-	});	 
     my $args  = shift;
 
     my $wf_title = $args->{WORKFLOW};
     my $wf_id    = $args->{ID};
 
-    my $workflow = $self->__get_workflow_factory()->fetch_workflow(
+    my $workflow = __get_workflow_factory()->fetch_workflow(
 	$wf_title,
 	$wf_id);
     my @list = $workflow->get_current_actions();
@@ -418,45 +319,43 @@ sub get_workflow_activities
 }
 
 sub search_workflow_instances {
-    ##! 0: "FIXME TODO: query only within the current PKI realm!!!"
-    my $self  = shift;
-    my $ident = ident $self;
-    validate(
-	@_,
-	{
-	    CONTEXT => {
-		type => HASHREF,
-		optional => 1,
-	    },
-	});	 
+    my $self     = shift;
     my $arg_ref  = shift;
 
     my $dbi = CTX('dbi_workflow');
 
     if (exists $arg_ref->{CONTEXT}) {
 
-	# SELECT workflow_serial FROM workflow_context
-	#   WHERE ((workflow_context.workflow_context_key = $key)
-	#       AND (workflow_context.workflow_context_value like $value))
-
         my $key   = $arg_ref->{CONTEXT}->{KEY};
         my $value = $arg_ref->{CONTEXT}->{VALUE};
+        my $realm = CTX('session')->get_pki_realm();
 	
-	# SELECT workflow_serial FROM workflow, workflow_context
-	#   WHERE ((workflow_context.workflow_context_key = $key)
-	#       AND (workflow_context.workflow_context_value like $value)
-	#       AND (workflow.workflow_serial = workflow_context.workflow_serial)
-	#       AND (workflow.pki_realm = $pki_realm))
-        # !!! FIXME: implement above query !!!
-	my $result = $dbi->select(
-	    TABLE   => $context_table,
-	    DYNAMIC => {
-		WORKFLOW_CONTEXT_KEY    => $key,
-		WORKFLOW_CONTEXT_VALUE  => $value,
-	    },
-	);
+        my $dynamic = {
+	    $context_table . '.WORKFLOW_CONTEXT_KEY'    => $key,
+	    $context_table . '.WORKFLOW_CONTEXT_VALUE'  => $value,
+            $workflow_table .'.PKI_REALM'               => $realm,
+	};
 
-	return map { $_->{WORKFLOW_SERIAL} } @{$result};
+        if (defined $arg_ref->{TYPE}) {
+            $dynamic->{$workflow_table . '.WORKFLOW_TYPE'} = $arg_ref->{TYPE};
+        }
+
+        ##! 16: 'dynamic: ' . Dumper $dynamic
+	my $result = $dbi->select(
+	    TABLE   => [ $context_table, $workflow_table ],
+            COLUMNS => [
+                         $context_table. '.WORKFLOW_SERIAL',
+                       ],
+            JOIN    => [
+                         ['WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+                       ],
+	    DYNAMIC => $dynamic,
+	);
+        ##! 16: 'result: ' . Dumper $result
+        my @return = map { $_->{$context_table.'.WORKFLOW_SERIAL'} } @{$result};
+        ##! 16: 'return: ' . Dumper \@return
+
+	return \@return;
     }
     return;
 }
@@ -464,14 +363,10 @@ sub search_workflow_instances {
 ###########################################################################
 # private functions
 
-sub __get_workflow_factory : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
+sub __get_workflow_factory {
     my $args  = shift;
 
     ##! 1: "__get_workflow_factory"
-
-    return $workflow_factory{$ident} if defined $workflow_factory{$ident};
 
     # lazy initialization is necessary because the Workflow::Factory
     # class calls a Log::Log4perl function in its BEGIN block, causing
@@ -479,7 +374,7 @@ sub __get_workflow_factory : PRIVATE {
     # before
     require Workflow::Factory;
 
-    $workflow_factory{$ident} = Workflow::Factory->instance();
+    my $workflow_factory = Workflow::Factory->instance();
 
 
     my $pki_realm = CTX('session')->get_pki_realm();
@@ -561,7 +456,7 @@ sub __get_workflow_factory : PRIVATE {
 		COUNTER => [ $pki_realm_index, 0,            0,     $ii ],
 		);
 	    ##! 4: "config file: $entry"
-	    $workflow_factory{$ident}->add_config_from_file(
+	    $workflow_factory->add_config_from_file(
 		$workflow_config{$type}->{factory_param}  => $entry,
 		);
 	}
@@ -569,7 +464,7 @@ sub __get_workflow_factory : PRIVATE {
 
     # persister configuration should not be user-configurable and is
     # static and identical throughout OpenXPKI
-    $workflow_factory{$ident}->add_config(
+    $workflow_factory->add_config(
 	persister => {
 	    name           => 'OpenXPKI',
 	    class          => 'OpenXPKI::Server::Workflow::Persister::DBI',
@@ -578,15 +473,13 @@ sub __get_workflow_factory : PRIVATE {
 	},
 	);
 
-    ##! 64: Dumper $workflow_factory{$ident}
+    ##! 64: Dumper $workflow_factory
 
-    return $workflow_factory{$ident};
+    return $workflow_factory;
 }
 
 
-sub __get_workflow_info : PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
+sub __get_workflow_info {
     my $workflow  = shift;
 
     ##! 1: "__get_workflow_info"

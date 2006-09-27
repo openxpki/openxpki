@@ -28,28 +28,7 @@ my %api            : ATTR( :get<API> );
 # command registry
 my %allowed_command = (
     nop                       => 1,
-
-    get_role                  => {API => 'Info'},
-    get_roles                 => {API => 'Info'},
-    get_cert_profiles         => {API => 'Info'},
-    get_cert_subject_profiles => {API => 'Info'},
-
-    get_ca_certificate        => {API => 'Info'},
-    list_ca_ids               => {API => 'Info'},
-
-    list_workflow_instances   => {API => 'Workflow'},
-    list_workflow_titles      => {API => 'Workflow'},
-
-    get_workflow_info         => {API => 'Workflow'},
-    set_workflow_fields       => {API => 'Workflow'},
-    get_workflow_activities   => {API => 'Workflow'},
-
-    create_workflow_instance  => {API => 'Workflow'},
-    execute_workflow_activity => {API => 'Workflow'},
-
-    get_csr_info_hash_from_data => {API => 'Object'},
-
-    get_workflow_instance_info => {API => 'Visualization'},
+    # plus all API commands
 );
 
 sub BUILD {
@@ -57,7 +36,9 @@ sub BUILD {
 
     $command{$ident}        = $arg_ref->{COMMAND};
     $command_params{$ident} = $arg_ref->{PARAMS};
-    $api{$ident}            = OpenXPKI::Server::API->new();
+    $api{$ident}            = OpenXPKI::Server::API->new({
+                                EXTERNAL => 1,
+    });
 }
 
 sub START {
@@ -92,9 +73,11 @@ sub attach_impl : PRIVATE {
 	    });
     }
 
-    ## return true is senselesse because only exception will be used
-    ## but good style :)
-    return 1;
+    ## introduced in 438 by Michael, I'd guess this is a copy and
+    ## paste error:
+    ### return true is senselesse because only exception will be used
+    ### but good style :)
+    #return 1;
 
     my $base = 'OpenXPKI::Service::Default::Command';
 
@@ -119,11 +102,15 @@ sub attach_impl : PRIVATE {
 				MODULE     => $class});
 	      }
 	}
-    } else {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND",
-	);
-    }
+    } 
+    # this can still be a valid command because it is defined in the
+    # server API. If it is not defined there, the server API will
+    # thrown an exception anyway.
+    #else {
+    #	OpenXPKI::Exception->throw(
+    #   	        message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND",
+    #	);
+    #}
     
     return 1;
 }
@@ -140,10 +127,9 @@ sub execute {
 	my $method = $command{$ident};
 	##! 8: "automatic API mapping for $method"
 
-        ##! 8: "get correct API for the method"
         my $used_api = $self->get_API();
-           $used_api = $used_api->get_api ($allowed_command{$method}->{API});
         ##! 8: "call function at API"
+        ##! 16: 'command_params{ident}: ' . Dumper $command_params{$ident}
 	return $self->command_response(
 	    $used_api->$method($command_params{$ident}),
 	    $method, # explicitly provide command name to returned structure

@@ -68,7 +68,7 @@ sub execute
             next if ($item eq "parent_server_id");
             $hash{$item} = $ref->{params}->{$item};
         }
-        my $api = CTX('api')->get_api("Workflow");
+        my $api = CTX('api');
         my $workflow = $api->create_workflow_instance (
                              {
                               WORKFLOW      => $ref->{workflow_type},

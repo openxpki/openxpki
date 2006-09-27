@@ -24,7 +24,7 @@ sub execute {
     my $context = $workflow->context();
     ##! 32: 'context: ' . Dumper($context)
     my $dbi = CTX('dbi_backend');
-    my $pki_realm = CTX('api')->get_api('Session')->get_pki_realm(); 
+    my $pki_realm = CTX('api')->get_pki_realm(); 
 
     my $tm = OpenXPKI::Crypto::TokenManager->new();
     my $default_token = $tm->get_token(

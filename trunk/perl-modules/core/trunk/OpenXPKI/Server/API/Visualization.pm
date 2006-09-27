@@ -11,41 +11,17 @@ use warnings;
 use utf8;
 use English;
 
-use base qw( OpenXPKI::FileUtils );
-use Class::Std;
-
-use Regexp::Common;
-use Params::Validate qw( validate :types );
+use OpenXPKI::FileUtils;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::API::Visualization';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::i18n;
 
-my %workflow_factory : ATTR;
-
-# regex definitions for parameter validation
-my $re_integer_string = qr{ \A $RE{num}{int} \z }xms;
-my $re_image_format   = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
-
-sub BUILD {
-    my ($self, $ident, $arg_ref) = @_;
-    
-    Params::Validate::validation_options(
-	# let parameter validation errors throw a proper exception
-	on_fail => sub {
-	    my $error = shift;
-	    
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_API_VISUALIZATION_INVALID_PARAMETER",
-		params => {
-		    ERROR => $error,
-		});
-	},
-	);
-}
+use Class::Std;
 
 ### Configuration variables
+### TODO: this should be moved to an (XML) configuration file
 
 my $SUCCESS_STATE = 'SUCCESS';
 
@@ -77,25 +53,16 @@ my $NODE_FONTSIZE  = 16;
 my $EDGE_FONTNAME  = $GRAPH_FONTNAME;
 my $EDGE_FONTSIZE  = 8;
 
-sub get_workflow_instance_info
-{
+sub START {
+    # somebody tried to instantiate us, but we are just an
+    # utility class with static methods
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED',
+    );
+}
+
+sub get_workflow_instance_info {
     my $self  = shift;
-    my $ident = ident $self;
-    validate(
-	@_,
-	{
-	    ID => {
-		type => SCALAR,
-		regex => $re_integer_string,
-	    },
-            FORMAT => {
-		type => SCALAR,
-		regex => $re_image_format,
-            },
-            LANGUAGE => {
-		type => SCALAR
-            }
-	});	 
     my $args  = shift;
 
     ##! 1: "get_workflow_instance_info"
@@ -111,7 +78,7 @@ sub get_workflow_instance_info
                                              SERIAL  => $wf_id );
     my $wf_type = $list->[0]->{WORKFLOW_TYPE};
     ##! 4: "WF_TYPE: $wf_type"
-    $data .= $self->__get_preamble ({ID => $wf_id, TYPE => $wf_type});
+    $data .= __get_preamble ({ID => $wf_id, TYPE => $wf_type});
 
     ##! 2: "load the different workflow steps"
 
@@ -180,7 +147,8 @@ sub get_workflow_instance_info
     if ($format ne "NULL")
     {
         ##! 4: "create image"
-        my $filename = $self->get_safe_tmpfile({TMP => CTX('xml_config')->get_xpath(XPATH => 'common/server/tmpdir')});
+        my $fu = OpenXPKI::FileUtils->new();
+        my $filename = $fu->get_safe_tmpfile({TMP => CTX('xml_config')->get_xpath(XPATH => 'common/server/tmpdir')});
         if (not open FH, "|dot -T$format > $filename")
         {
             OpenXPKI::Exception->throw (
@@ -188,7 +156,7 @@ sub get_workflow_instance_info
         }
         print FH $data;
         close FH;
-        $data = $self->read_file ($filename);
+        $data = $fu->read_file($filename);
         ##! 64: $data
     }
 
@@ -198,7 +166,6 @@ sub get_workflow_instance_info
 }
 
 sub __get_preamble {
-    my $self    = shift;
     my $arg_ref = shift;
 
     my $type  = $arg_ref->{TYPE};
@@ -228,7 +195,9 @@ handling of the PKI workflow. Generally spoke, it implements
 
 =head2 get_workflow_instance_info
 
-It accepts only one parameter ID which is the ID of the workflow
-which should be monitored.
+It accepts the parameter ID which is the ID of the workflow
+whose history should be visualized. Additionally, FORMAT specifies
+the output format of the graph and LANGUAGE can be used to output
+the graph in one of the supported languages.
 
 Please see the GraphViz package for more details.

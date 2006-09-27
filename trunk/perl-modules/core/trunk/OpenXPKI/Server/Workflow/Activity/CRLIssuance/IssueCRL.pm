@@ -49,7 +49,7 @@ sub execute {
     }
     
     my $current_ca = $ca_ids[0];
-    my $pki_realm = CTX('api')->get_api('Session')->get_pki_realm();
+    my $pki_realm = CTX('api')->get_pki_realm();
     my $ca_identifier = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$current_ca}->{identifier};
     my $certificate = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$current_ca}->{certificate};
     ##! 16: 'ca_identifier: ' . $ca_identifier

@@ -1,6 +1,8 @@
 ## OpenXPKI::Server::API.pm 
 ##
-## Written 2005 by Michael Bell and Martin Bartosch for the OpenXPKI project
+## Written 2005, 2006 by Michael Bell, Martin Bartosch and
+## Alexander Klink for the OpenXPKI project
+## restructured 2006 by Alexander Klink for the OpenXPKI project
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
@@ -22,13 +24,13 @@ use OpenXPKI::Debug 'OpenXPKI::Server::API';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DN;
-use OpenXPKI::Server::API::Workflow;
+use OpenXPKI::Server::API::Default;
 use OpenXPKI::Server::API::Object;
 use OpenXPKI::Server::API::Visualization;
+use OpenXPKI::Server::API::Workflow;
 
-my %workflow :ATTR;
-my %object   :ATTR;
-my %visualization :ATTR;
+my %external_of    :ATTR;
+my %method_info_of :ATTR;
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
@@ -44,293 +46,258 @@ sub BUILD {
 		    ERROR => $error,
 		});
 	},
-	);
-
-    $workflow{$ident} = OpenXPKI::Server::API::Workflow->new ($arg_ref);
-    $object{$ident}   = OpenXPKI::Server::API::Object->new ($arg_ref);
-    $visualization{$ident} = OpenXPKI::Server::API::Visualization->new ($arg_ref);
-}
-
-sub get_api
-{
-    my $self  = shift;
-    my $ident = ident $self;
-    my $api   = shift;
-
-    return $workflow{$ident} if ($api eq "Workflow");
-    return $object{$ident}   if ($api eq "Object");
-    return $visualization{$ident}   if ($api eq "Visualization");
-    return $self; ## unknown APIs are handled by the core API
-}
-
-###########################################################################
-# API: simple retrieval functions
-
-# get current pki realm
-sub get_pki_realm {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
-
-    return CTX('session')->get_pki_realm();
-}
-
-# get current user
-sub get_user {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
-
-    return CTX('session')->get_user();
-}
-
-# get current user
-sub get_role {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
-
-    return CTX('session')->get_role();
-}
-
-
-sub get_chain {
-    my $self    = shift;
-    my $ident   = ident $self;
-    my $arg_ref = shift;
-    my $return_ref;
-    my @identifiers;
-    my @certificates;
-    my $finished = 0;
-    my $complete = 0;
-    my %already_seen; # hash of identifiers that have already been seen
-
-    if (! defined $arg_ref->{START_IDENTIFIER}) {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
-        );
+    );
+    if ($arg_ref->{EXTERNAL}) { # we are called externally, do ACL checks
+        $external_of{$ident} = 1;
     }
-    if (defined $arg_ref->{OUTFORMAT}) {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_OUTFORMAT_NOT_IMPLEMENTED_YET",
-        );
-    }
-    my $start = $arg_ref->{START_IDENTIFIER};
-    my $current_identifier = $start;
-    my $dbi = CTX('dbi_backend');
 
-    while (! $finished) {
-        push @identifiers, $current_identifier;
-        my $cert = $dbi->first(
-            TABLE   => 'CERTIFICATE',
-            DYNAMIC => {
-                IDENTIFIER => $current_identifier,
+    my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
+    my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
+    my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=]* \z }xms;
+    my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
+    $method_info_of{$ident} = {
+        ### Default API
+        'get_pki_realm' => {
+            class  => 'Default',
+            params => { },
+        },
+        'get_user' => {
+            class  => 'Default',
+            params => { },
+        },
+        'get_role' => {
+            class  => 'Default',
+            params => { },
+        },
+        'get_chain' => {
+            class  => 'Default',
+            params => {
+                START_IDENTIFIER => {
+                    type     => SCALAR,
+                    regex    => $re_base64_string,
+                }, 
             },
-        );
-        if (! defined $cert) { #certificate not found
-            $finished = 1;
-        }
-        else {
-            if ($cert->{ISSUER_IDENTIFIER} eq $current_identifier) {
-                # self-signed, this is the end of the chain
-                $finished = 1;
-                $complete = 1;
-            }
-            else { # go to parent
-                $current_identifier = $cert->{ISSUER_IDENTIFIER};
-                if (defined $already_seen{$current_identifier}) {
-                    # we've run into a loop!
-                    $finished = 1;
-                }
-                $already_seen{$current_identifier} = 1;
-            }
-        }
-        # TODO: fill @certificate array
-    }
-    $return_ref->{IDENTIFIERS} = \@identifiers;
-    $return_ref->{COMPLETE}    = $complete;
+        },
+        'get_ca_certificate' => {
+            class  => 'Default',
+            params => { },
+        },
+        'list_ca_ids' => {
+            class  => 'Default',
+            params => { },
+        },
+        'get_pki_realm_index' => { # TODO: find out if this is actually used
+                                   # externally or if it is only an internal
+                                   # helper function
+            class  => 'Default',
+            params => { },
+        },
+        'get_roles' => {
+            class  => 'Default',
+            params => { },
+        },
+        'get_cert_profiles' => {
+            class  => 'Default',
+            params => { },
+        },
+        'get_cert_subject_profiles' => {
+            class  => 'Default',
+            params => {
+                PROFILE => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+            },
+        },
 
-    return $return_ref;
+        ### Object API
+        'get_csr_info_hash_from_data' => {
+            class  => 'Object',
+            params => {
+                DATA => {
+                    type     => SCALAR, # TODO: regexp?
+                },
+            },
+        },
+
+        ### Visualization API
+        'get_workflow_instance_info' => {
+            class  => 'Visualization',
+            params => {
+                ID => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+                FORMAT => {
+                    type  => SCALAR,
+                    regex => $re_image_format,
+                },
+                LANGUAGE => {
+                    type => SCALAR, # TODO: regexp?
+                },
+            },
+        },
+
+        ### Workflow API
+        'list_workflow_instances' => {
+            class  => 'Workflow',
+            params => { },
+        },
+        'list_workflow_titles' => {
+            class  => 'Workflow',
+            params => { },
+        },
+        'get_workflow_info' => {
+            class  => 'Workflow',
+            params => {
+                WORKFLOW => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+	        ID => {
+		    type  => SCALAR,
+		    regex => $re_integer_string,
+                },
+	    },
+        },
+        'execute_workflow_activity' => {
+            class  => 'Workflow',
+            params => {
+                WORKFLOW => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+	        ID => {
+		    type  => SCALAR,
+		    regex => $re_integer_string,
+                },
+                ACTIVITY => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                PARAMS   => {
+                    type     => HASHREF,
+                    optional => 1,
+                },
+            },
+        },
+        'create_workflow_instance' => {
+            class  => 'Workflow',
+            params => {
+                WORKFLOW => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                FILTER_PARAMS => {
+                    type    => SCALAR,
+                    regex   => $re_alpha_string,
+                    default => 0,
+                },
+                PARAMS => {
+                    type     => HASHREF,
+                    optional => 1,
+                },
+            },
+        },
+        'get_workflow_activities' => {
+            class  => 'Workflow',
+            params => {
+                WORKFLOW => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+	        ID => {
+		    type  => SCALAR,
+		    regex => $re_integer_string,
+                },
+	    },
+        },
+        'search_workflow_instances' => {
+            class  => 'Workflow',
+            params => {
+                CONTEXT => {
+                    type => HASHREF,
+                },
+                TYPE => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
+                },
+            },
+        },
+    };
 }
 
-# get one or more CA certificates
-# FIXME: this still assumes we have files in the config
-sub get_ca_certificate {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
+sub AUTOMETHOD {
+    my ($self, $ident, @args) = @_;
 
-    my %response;
+    my $method_name = $_;
 
-    ##! 2: "get pki realm configuration"
-    my $realms = CTX('pki_realm');
-    if (!(defined $realms && (ref $realms eq 'HASH'))) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_GET_CA_CERTIFICATES_PKI_REALM_CONFIGURATION_UNAVAILABLE"
-        );
-    }
-
-    ##! 2: "get session's realm"
-    my $thisrealm = CTX('session')->get_pki_realm();
-    ##! 2: "$thisrealm"
-    if (! defined $thisrealm) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_GET_CA_CERTIFICATES_PKI_REALM_NOT_SET"
-	);
-    }
-
-    if (exists $realms->{$thisrealm}->{ca}) {
-	# if no ca certificates could be found this key will not exist
-        ##! 4: "ca cert exists"
-	foreach my $caid (keys %{$realms->{$thisrealm}->{ca}->{id}}) {
-            my $notbefore = $realms->{$thisrealm}->{ca}->{id}->{$caid}->{notbefore};
-            my $notafter  = $realms->{$thisrealm}->{ca}->{id}->{$caid}->{notafter};
-	    $response{$caid} = 
-	    {
-		notbefore => OpenXPKI::DateTime::convert_date(
-		    {
-			DATE => $notbefore,
-			OUTFORMAT => 'printable',
-		    }),
-		notafter => OpenXPKI::DateTime::convert_date(
-		    {
-			DATE => $notafter,
-			OUTFORMAT => 'printable',
-		    }),
-		cacert => $realms->{$thisrealm}->{ca}->{id}->{$caid}->{crypto}->get_certfile(),
-
-	    };
-	}
-    }
-    ##! 64: "response: " . Dumper(%response)
-    return \%response;
-}
-
-sub list_ca_ids {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $args  = shift;
-
-    my %response;
-
-    ##! 2: "get pki realm configuration"
-    my $realms = CTX('pki_realm');
-    if (!(defined $realms && (ref $realms eq 'HASH'))) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_CONFIGURATION_UNAVAILABLE"
-        );
-    }
-
-    ##! 2: "get session's realm"
-    my $thisrealm = CTX('session')->get_pki_realm();
-    ##! 2: "$thisrealm"
-    if (! defined $thisrealm) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
-	);
-    }
+    ##! 16: 'method name: ' . $method_name
+    return sub {
+        if (!exists $method_info_of{$ident}->{$method_name}) {
+            ##! 16: 'exception'
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_INVALID_METHOD_CALLED',
+                params  => {
+                    'METHOD_NAME' => $method_name,
+                },
+            );
+        }
+        my $class         = $method_info_of{$ident}->{$method_name}->{class};
+        my $valid_params  = $method_info_of{$ident}->{$method_name}->{params};
     
-    ##! 32: Dumper($realms->{$thisrealm}->{ca})
-    if (exists $realms->{$thisrealm}->{ca}) {
-        ##! 64: 'if!'
-        my @return = sort keys %{$realms->{$thisrealm}->{ca}->{id}};
-        ##! 64: Dumper(\@return)
-	return @return;
-    }
-    
-    return;
-}
-
-sub get_pki_realm_index
-{
-    my $self = shift;
-    my $pki_realm = CTX('session')->get_pki_realm();
-
-    ## scan for correct pki realm
-    my $index = CTX('xml_config')->get_xpath_count (XPATH => "pki_realm");
-    for (my $i=0; $i < $index; $i++)
-    {
-        if (CTX('xml_config')->get_xpath (XPATH   => ["pki_realm", "name"],
-                                          COUNTER => [$i, 0])
-            eq $pki_realm)
-        {
-            $index = $i;
-        } else {
-            if ($index == $i+1)
-            {
-                OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_SERVER_API_GET_PKI_REALM_INDEX_FAILED");
+        ##! 16: 'args: ' . Dumper(\@args)
+        # do parameter checking
+        if (scalar @args > 1 || defined $args[0]) {
+            validate(
+    	        @args,
+                $valid_params,
+            );
+        }
+        
+        # ACL checking
+        if ($external_of{$ident}) { # do ACL checking
+            my $affected_role
+                = $method_info_of{$ident}->{$method_name}->{affected_role};
+            my $acl_hashref = {
+                ACTIVITY      => "API::" . $class . "::" . $method_name,
+            };
+            if (defined $affected_role) {
+                # FIXME: optional for now, as we don't have a good way to
+                # figure out which role is affected by a certain API call
+                $acl_hashref->{AFFECTED_ROLE} = $affected_role;
+            }
+            eval {
+                CTX('acl')->authorize($acl_hashref);
+            };
+        
+            if (my $exc = OpenXPKI::Exception->caught()) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_API_ACL_CHECK_FAILED',
+                    params  => {
+                        'EXCEPTION' => $exc->message(),
+                        'PARAMS'    => $exc->params(),
+                    },
+                );
+            }
+            elsif ($EVAL_ERROR) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_API_ACL_CHECK_FAILED',
+                    params  => {
+                        'EVAL_ERROR' => $EVAL_ERROR,
+                    },
+                );
             }
         }
-    }
-
-    return $index;
+    
+        # call corresponding method
+        my $openxpki_class = "OpenXPKI::Server::API::" . $class;
+        return $openxpki_class->$method_name(@args);
+    };
 }
-
-sub get_roles
-{
-    my $self = shift;
-    return [ CTX('acl')->get_roles() ];
-}
-
-sub get_cert_profiles
-{
-    my $self = shift;
-    my $args = shift;
-
-    my $index = $self->get_pki_realm_index();
-
-    ## get all available profiles
-    my %profiles = ();
-    my $count = CTX('xml_config')->get_xpath_count (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile"],
-                    COUNTER => [$index, 0, 0, 0]);
-    for (my $i=0; $i <$count; $i++)
-    {
-        my $id = CTX('xml_config')->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "id"],
-                    COUNTER => [$index, 0, 0, 0, $i, 0]);
-        next if ($id eq "default");
-        $profiles{$id} = $i;
-    }
-
-    return \%profiles;
-}
-
-sub get_cert_subject_profiles
-{
-    my $self = shift;
-    my $args = shift;
-
-    my $index   = $self->get_pki_realm_index();
-    my $profile = $args->{PROFILE};
-
-    ## get index of profile
-    my $profiles = $self->get_cert_profiles();
-       $profile  = $profiles->{$profile};
-
-    ## get all available profiles
-    my %profiles = ();
-    my $count = CTX('xml_config')->get_xpath_count (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject"],
-                    COUNTER => [$index, 0, 0, 0, $profile]);
-    for (my $i=0; $i <$count; $i++)
-    {
-        my $id = CTX('xml_config')->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "id"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $i, 0]);
-        my $label = CTX('xml_config')->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "label"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $i, 0]);
-        my $desc = CTX('xml_config')->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "description"],
-                    COUNTER => [$index, 0, 0, 0, $profile, $i, 0]);
-        $profiles{$id}->{LABEL}       = $label;
-        $profiles{$id}->{DESCRIPTION} = $desc;
-    }
-
-    return \%profiles;
-}
+    
+###########################################################################
 
 1;
 __END__
@@ -352,76 +319,16 @@ object must be set before instantiating the API.
 
 =head2 new
 
-Default constructor created by Class::Std.
+Default constructor created by Class::Std. The named parameter
+EXTERNAL should be set to 1 if the API is used from an external
+source (e.g. within a service). If EXTERNAL is set, in addition to
+the parameter checks, ACL checks are enabled.
 
-=head2 get_api
+=head2 AUTOMETHOD
 
-return the requested API. Example:
-
-my $api = $api->get_api ("Workflow"); 
-
-=head2 get_user
-
-Get session user.
-
-=head2 get_role
-
-Get session user's role.
-
-=head2 get_pki_realm
-
-Get PKI realm for this session.
-
-=head2 get_ca_ids
-
-Returns a list of all issuing CA IDs that are available.
-Return structure:
-  CA_ID => array ref of CA IDs
-
-=head2 get_ca_certificate
-
-Returns CA certificate details.
-Expects named parameter 'CA_ID' which can be either a scalar or an 
-array ref indicating which CA certificates to fetch.
-If named paramter 'OUTFORM' is specified, it must be one of 'PEM' or
-'DER'. In this case the returned structure will return the CA certificate
-in the specified format.
-
-Returns an array ref containing the CA certificate information in the
-order that was requested.
-
-Return structure:
-  CACERT => [
-    {
-        CA_ID => CA ID (as requested)
-        NOTBEFORE => certifiate notbefore (ISO8601)
-        NOTAFTER => certifiate notafter  (ISO8601)
-        CERTIFICATE => certificate data (only if OUTFORM was specified)
-    }
-
-  ]
-
-=head2 get_chain
-
-Returns the certificate chain starting at a specified certificate.
-Expects a hash ref with the named parameter START_IDENTIFIER (the
-identifier from which to compute the chain) and optionally a parameter
-OUTFORMAT, which can be either 'PEM' or 'DER'.
-Returns a hash ref with the following entries:
-
-    IDENTIFIERS   the chain of certificate identifiers as an array
-    CERTIFICATES  the certificates as an array of data in outformat
-                  (if requested)
-    COMPLETE      1 if the complete chain was found in the database
-                  0 otherwise
-
-=head2 get_api
-
-expects the name of the requested API and returns an instance of this API.
-Example:
-
-my $workflow_api = $api->get_api('Workflow');
-my $object_api   = $api->get_api('Object');
-my $visual_api   = $api->get_api('Visualization');
-my $api          = $api->get_api('Unknown API');
-
+This method is used by Class::Std when a method is called that is undefined
+in the current class. In our case, this method does the parameter
+checking for the requested method. If the class has been instantiated
+with the EXTERNAL parameter, ACL checks are done in addition. Then the
+class name is constructed from the $method_info hash reference and
+the corresponding method is called with the given parameters.

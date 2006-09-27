@@ -24,7 +24,7 @@ sub execute
     my $id       = $context->param('cert_profile');
     ##! 16: 'context: ' . Dumper($context)
 
-    my $pki_realm = CTX('api')->get_api('Session')->get_pki_realm();
+    my $pki_realm = CTX('api')->get_pki_realm();
     ##! 16: 'pki_realm: ' . $pki_realm
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new(
             CONFIG    => CTX('xml_config'),

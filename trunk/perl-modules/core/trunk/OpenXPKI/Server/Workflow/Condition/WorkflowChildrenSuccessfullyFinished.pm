@@ -43,7 +43,7 @@ sub evaluate {
             condition_error($errors->[0]);
         }
     
-        my $api = CTX('api')->get_api('Workflow');
+        my $api = CTX('api');
 
         my $child_info = $api->get_workflow_info({
             ID       => $child_id,

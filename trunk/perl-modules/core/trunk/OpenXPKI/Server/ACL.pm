@@ -220,8 +220,11 @@ sub authorize
                         AUTH_ROLE     => $user});
     }
 
-    if (not exists $self->{PKI_REALM}->{$realm}->{ROLES}->{$owner})
-    {
+    if ((! exists $self->{PKI_REALM}->{$realm}->{ROLES}->{$owner})
+        && ($activity !~ m{ \A API:: }xms))
+    { # FIXME: we need to figure out a way to find out the affected
+      # role for API calls. For now, it is optional for authorization
+      # of API calls
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_ILLEGAL_AFFECTED_ROLE",
             params  => {PKI_REALM     => $realm,
@@ -240,6 +243,10 @@ sub authorize
                         AUTH_ROLE     => $user});
     }
 
+    # TODO: does this work for stuff like
+    # API::Workflow::something?
+    # apparently not
+    # FIXME: check API::Workflow::*, then API::*, then '*', ...
     my $class = substr($activity,0,index($activity, "::"))."::*";
     if (not exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{$activity}
         and

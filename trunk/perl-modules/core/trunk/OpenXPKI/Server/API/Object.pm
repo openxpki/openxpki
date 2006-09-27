@@ -11,47 +11,26 @@ use warnings;
 use utf8;
 use English;
 
-use Class::Std;
-
 use Data::Dumper;
 
-use Regexp::Common;
-use Params::Validate qw( validate :types );
+use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::API::Workflow';
+use OpenXPKI::Debug 'OpenXPKI::Server::API::Object';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Crypto::CSR;
 
-sub BUILD {
-    my ($self, $ident, $arg_ref) = @_;
-    
-    Params::Validate::validation_options(
-	# let parameter validation errors throw a proper exception
-	on_fail => sub {
-	    my $error = shift;
-	    
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_INVALID_PARAMETER",
-		params => {
-		    ERROR => $error,
-		});
-	},
-	);
+sub START {
+    # somebody tried to instantiate us, but we are just an
+    # utility class with static methods
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED',
+    );
 }
 
-sub get_csr_info_hash_from_data
-{
+sub get_csr_info_hash_from_data {
     ##! 1: "start"
     my $self  = shift;
-    my $ident = ident $self;
-    validate(
-	@_,
-	{
-	    DATA => {
-		type => SCALAR,
-		required => 1,
-	    }
-	});	 
     my $args  = shift;
 
     my $data  = $args->{DATA};
@@ -80,10 +59,6 @@ The API gets access to the server via the 'server' context object. This
 object must be set before instantiating the API.
 
 =head1 Functions
-
-=head2 new
-
-Default constructor created by Class::Std.
 
 =head2 get_csr_info_hash_from_data
 

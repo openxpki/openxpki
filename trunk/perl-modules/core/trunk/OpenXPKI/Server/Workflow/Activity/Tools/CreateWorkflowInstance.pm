@@ -24,7 +24,6 @@ sub execute
     my $api     = CTX('api');
 
     ## create new workflow
-    $api = $api->get_api('Workflow');
     my $wf_info = $api->create_workflow_instance({
             WORKFLOW      => $type,
             FILTER_PARAMS => 1,

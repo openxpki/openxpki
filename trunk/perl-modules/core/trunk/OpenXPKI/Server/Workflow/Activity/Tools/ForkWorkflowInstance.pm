@@ -20,7 +20,7 @@ sub execute {
     my $self = shift;
     my $workflow = shift;
 
-    ## get needed informations
+    ## get needed information
     my $context                = $workflow->context();
     my $wf_child_instance_type = $self->param('workflow_type');
     my $api                    = CTX('api');
@@ -28,7 +28,6 @@ sub execute {
 
     ##! 16: 'context: ' . Dumper($context->param())
     ## create new workflow
-    $api = $api->get_api('Workflow');
     my $wf_info = $api->create_workflow_instance({
             WORKFLOW      => $wf_child_instance_type,
             FILTER_PARAMS => 1,
