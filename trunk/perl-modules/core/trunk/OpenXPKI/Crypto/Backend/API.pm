@@ -58,7 +58,7 @@ sub __init_command_params : PRIVATE {
                           "CSR"     => 1,
                           "DAYS"    => 1},
     "create_key"      => {"PASSWD"     => 0,
-                          "TYPE"       => ["RSA","DSA","EC","GOST94"],
+                          "TYPE"       => ["RSA","DSA","EC","GOST94","GOST2001"],
                           "PARAMETERS" => {"TYPE:RSA" =>
                                               {"ENC_ALG" =>
                                                   ["__undef",
@@ -102,6 +102,19 @@ sub __init_command_params : PRIVATE {
                                                "CURVE_NAME" => 1,
                                               },
                                            "TYPE:GOST94" =>
+                                              {"ENC_ALG" =>
+                                                  ["__undef",
+                                                   "aes256",
+                                                   "aes192",
+                                                   "aes128",
+                                                   "idea",
+                                                   "des3",
+                                                   "des"
+                                                  ],
+                                               "PASSWD" => 0,
+                                               "PARAMSET" => 0
+                                              },
+                                           "TYPE:GOST2001" =>
                                               {"ENC_ALG" =>
                                                   ["__undef",
                                                    "aes256",

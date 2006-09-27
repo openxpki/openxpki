@@ -64,7 +64,7 @@ if ((exists $ENV{NCIPHER_LIBRARY}) and (exists $ENV{CHIL_LIBRARY}) and (exists $
 }
 else
 {
-    ## drop all the GOST configuration to avoid exceptions during initialization
+    ## drop all the nCipher configuration to avoid exceptions during initialization
     replace_param (FILENAME => "t/config.xml",
                    PARAM    => "default_nciph",
                    VALUE    => "default");

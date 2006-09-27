@@ -84,6 +84,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_chain.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/RSA.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/DSA.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/EC.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST2001.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST94.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/symmetric_cipher.pm

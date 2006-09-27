@@ -15,6 +15,7 @@ use English;
 
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::DSA;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::EC;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::GOST2001;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::GOST94;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::RSA;
 
