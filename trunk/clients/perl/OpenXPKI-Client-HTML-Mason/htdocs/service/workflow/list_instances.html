@@ -8,7 +8,8 @@
 %   my $msg = $context->{client}->send_receive_command_msg
 %             (
 %                 "list_workflow_instances",
-%                 {"type" => $type}
+%#                 {"type" => $type}
+%# type is not a valid parameter for list_workflow_instances
 %             );
 %   ## I expect the following:
 %   ## SERVICE_MSG => "COMMAND",
