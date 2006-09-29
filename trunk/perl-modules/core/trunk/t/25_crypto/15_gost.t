@@ -11,7 +11,7 @@ if( not exists $ENV{GOST_OPENSSL_ENGINE} or
 }
 else
 {
-    plan tests => 41;
+    plan tests => 49;
     print STDERR "OpenXPKI::Crypto::Command: Create CA and user certs and issue a CRL with GOST algorithms\n";
 }
 
@@ -164,7 +164,9 @@ my $csr_94 = $token->command ({COMMAND => "create_pkcs10",
                                SUBJECT => $subject_94});
 ok (1);
 print STDERR "GOST94 CSR: $csr_94\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/pkcs10.pem", CONTENT => $csr_94);
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/pkcs10.pem", 
+                      CONTENT => $csr_94,
+                      FORCE    => 1);
 
 $profile->set_serial  (1);
 $profile->set_subject ($subject_94);
@@ -176,7 +178,9 @@ my $cert_94 = $ca_token->command ({COMMAND => "issue_cert",
                                    PROFILE => $profile});
 ok (1);
 print STDERR "GOST94 cert: $cert_94\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/cert.pem", CONTENT => $cert_94);
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/cert.pem", 
+                      CONTENT => $cert_94,
+                      FORCE    => 1);
 
 ## build the PKCS#12 file
 my @chain = [ $cert_94 ];
@@ -211,7 +215,9 @@ my $csr_2001 = $token->command ({COMMAND => "create_pkcs10",
                                  SUBJECT => $subject_2001});
 ok (1);
 print STDERR "GOST2001 CSR: $csr_2001\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/pkcs10_2001.pem", CONTENT => $csr_2001);
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/pkcs10_2001.pem", 
+                      CONTENT => $csr_2001,
+                      FORCE    => 1);
 
 $profile->set_serial  (2);
 $profile->set_subject ($subject_2001);
@@ -223,7 +229,91 @@ my $cert_2001 = $ca_token->command ({COMMAND => "issue_cert",
                                      PROFILE => $profile});
 ok (1);
 print STDERR "GOST2001 cert: $cert_2001\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/cert_2001.pem", CONTENT => $cert_2001);
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/cert_2001.pem", 
+                      CONTENT => $cert_2001,
+                      FORCE    => 1);
+
+#------------------------- GOST 94cp ---------------------------------------
+
+## create GOST94CP key
+my $key_94cp = $token->command ({COMMAND    => "create_key",
+                                 TYPE       => "GOST94CP",
+                                 PASSWD     => $passwd,
+                                 PARAMETERS => {
+                                         ENC_ALG    => "aes256"}});
+ok (1);
+print STDERR "GOST94CP key: $key_94cp\n" if ($ENV{DEBUG});
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/key_94cp.pem",
+                      CONTENT  => $key_94cp,
+                      FORCE    => 1);
+
+## create CSR
+my $subject_94cp = "cn=John Doe,dc=gost94cp,dc=OpenXPKI,dc=org";
+my $csr_94cp = $token->command ({COMMAND => "create_pkcs10",
+                                 KEY     => $key_94cp,
+                                 PASSWD  => $passwd,
+                                 SUBJECT => $subject_94cp});
+ok (1);
+print STDERR "GOST94CP CSR: $csr_94cp\n" if ($ENV{DEBUG});
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/pkcs10_94cp.pem", 
+                      CONTENT => $csr_94cp,
+                      FORCE    => 1);
+
+$profile->set_serial  (3);
+$profile->set_subject ($subject_94cp);
+ok(1);
+
+## create cert
+my $cert_94cp = $ca_token->command ({COMMAND => "issue_cert",
+                                     CSR     => $csr_94cp,
+                                     PROFILE => $profile});
+ok (1);
+print STDERR "GOST94CP cert: $cert_94cp\n" if ($ENV{DEBUG});
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/cert_94cp.pem", 
+                      CONTENT => $cert_94cp,
+                      FORCE    => 1);
+
+#------------------------- GOST 2001cp -------------------------------------
+
+## create GOST2001CP key
+my $key_2001cp = $token->command ({COMMAND    => "create_key",
+                                   TYPE       => "GOST2001CP",
+                                   PASSWD     => $passwd,
+                                   PARAMETERS => {
+                                           ENC_ALG    => "aes256",
+                                           PARAMSET   => "A"
+                                   }});
+ok (1);
+print STDERR "GOST2001CP key: $key_2001cp\n" if ($ENV{DEBUG});
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/key_2001cp.pem",
+                      CONTENT  => $key_2001cp,
+                      FORCE    => 1);
+
+## create CSR
+my $subject_2001cp = "cn=John Doe,dc=gost2001cp,dc=OpenXPKI,dc=org";
+my $csr_2001cp = $token->command ({COMMAND => "create_pkcs10",
+                                   KEY     => $key_2001cp,
+                                   PASSWD  => $passwd,
+                                   SUBJECT => $subject_2001cp});
+ok (1);
+print STDERR "GOST2001CP CSR: $csr_2001cp\n" if ($ENV{DEBUG});
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/pkcs10_2001cp.pem",
+                      CONTENT => $csr_2001cp,
+                      FORCE    => 1);
+
+$profile->set_serial  (4);
+$profile->set_subject ($subject_2001cp);
+ok(1);
+
+## create cert
+my $cert_2001cp = $ca_token->command ({COMMAND => "issue_cert",
+                                       CSR     => $csr_2001cp,
+                                       PROFILE => $profile});
+ok (1);
+print STDERR "GOST2001CP cert: $cert_2001cp\n" if ($ENV{DEBUG});
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/cert_2001cp.pem",
+                      CONTENT => $cert_2001cp,
+                      FORCE    => 1);
 
 #------------------------- Issue a crl -------------------------------------
 
@@ -236,10 +326,12 @@ $profile = OpenXPKI::Crypto::Profile::CRL->new (
 ## $profile->set_serial (1);
 ### issue crl...
 my $crl = $ca_token->command ({COMMAND => "issue_crl",
-                               REVOKED => [$cert_94, $cert_2001],
+                               REVOKED => [$cert_94, $cert_2001, $cert_94cp, $cert_2001cp],
                                PROFILE => $profile});
 print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/crl.pem", CONTENT => $crl);
+OpenXPKI->write_file (FILENAME => "$basedir/$dir/crl.pem", 
+                      CONTENT => $crl,
+                      FORCE    => 1);
 ok (1);
 
 #-------------------------- XS tests ---------------------------------------

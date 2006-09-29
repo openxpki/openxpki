@@ -58,7 +58,7 @@ sub __init_command_params : PRIVATE {
                           "CSR"     => 1,
                           "DAYS"    => 1},
     "create_key"      => {"PASSWD"     => 0,
-                          "TYPE"       => ["RSA","DSA","EC","GOST94","GOST2001"],
+                          "TYPE"       => ["RSA","DSA","EC","GOST94","GOST2001","GOST94CP","GOST2001CP"],
                           "PARAMETERS" => {"TYPE:RSA" =>
                                               {"ENC_ALG" =>
                                                   ["__undef",
@@ -126,6 +126,40 @@ sub __init_command_params : PRIVATE {
                                                   ],
                                                "PASSWD" => 0,
                                                "PARAMSET" => 0
+                                              },
+                                           "TYPE:GOST94CP" =>
+                                              {"ENC_ALG" =>
+                                                  ["__undef",
+                                                   "aes256",
+                                                   "aes192",
+                                                   "aes128",
+                                                   "idea",
+                                                   "des3",
+                                                   "des"
+                                                  ],
+                                               "PASSWD" => 0,
+                                               "PARAMSET" => 0
+                                              },
+                                           "TYPE:GOST2001CP" =>
+                                              {"ENC_ALG" =>
+                                                  ["__undef",
+                                                   "aes256",
+                                                   "aes192",
+                                                   "aes128",
+                                                   "idea",
+                                                   "des3",
+                                                   "des"
+                                                  ],
+                                               "PASSWD" => 0,
+                                               #"PARAMSET" => 0
+                                               "PARAMSET" => 
+                                                 ["0", 
+                                                  "A", 
+                                                  "B", 
+                                                  "C", 
+                                                  "XA",
+                                                  "XB"
+                                                ]
                                               },
                                           }
                          },

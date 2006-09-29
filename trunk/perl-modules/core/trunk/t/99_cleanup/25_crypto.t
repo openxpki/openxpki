@@ -22,6 +22,14 @@ foreach my $cadir (qw( ca1 ca2 cagost canciph )) {
     "t/25_crypto/$cadir/pkcs10_2001.pem",
     "t/25_crypto/$cadir/cert_2001.pem",
 
+    "t/25_crypto/$cadir/key_94cp.pem",
+    "t/25_crypto/$cadir/pkcs10_94cp.pem",
+    "t/25_crypto/$cadir/cert_94cp.pem",
+
+    "t/25_crypto/$cadir/key_2001cp.pem",
+    "t/25_crypto/$cadir/pkcs10_2001cp.pem",
+    "t/25_crypto/$cadir/cert_2001cp.pem",
+
     "t/25_crypto/$cadir/utf8.0.pkcs10.pem",
     "t/25_crypto/$cadir/utf8.0.cert.pem",
     "t/25_crypto/$cadir/utf8.0.crl.pem",
@@ -44,7 +52,7 @@ foreach my $cadir (qw( ca1 ca2 cagost canciph )) {
 }
 
 ## 4 * number of files
-BEGIN { plan tests => 232 };
+BEGIN { plan tests => 280 };
 
 print STDERR "OpenXPKI::Crypto Cleanup\n";
 
