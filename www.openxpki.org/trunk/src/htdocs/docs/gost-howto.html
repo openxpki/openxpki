@@ -6,7 +6,7 @@
 <h3>An example of using OpenXPKI with alternative cryptography</h3>
 
 <p>
-Since September 18th, 2006 a production branch of OpenSSL version 0.9.9 has a built-in support 
+Since late summer of 2006 a production branch of OpenSSL version 0.9.9 has a built-in support 
 for arbitrary asymmetric cryptography, and provides an extended set 
 of russian national algorithms (GOST) as an example of <em>foreign</em>
 cryptography.
@@ -68,13 +68,13 @@ If successful, the above procedure adds support for the following cryptographic
 algorithms (named here as recognized by the OpenSSL library):
 </p>
     <ul>
-      <li>md_gost94 hash algorithm.</li>
-      <li>gost89 encryption/decryption algorithm with 256 bit key.</li>
-      <li>gost94 digital signature algorithm with 1024 bit public key.</li>
-      <li>gost94cp digital signature algorithm with 1024 bit public key (CP mode<sup>1</sup>).</li>
-      <li>gost2001 digital signature algorithm based on elliptic curves
+      <li>md_gost94 message digest algorithm.</li>
+      <li>gost89 encryption algorithm with 256 bit key.</li>
+      <li>gost94 public key algorithm with 1024 bit public key.</li>
+      <li>gost94cp public key algorithm with 1024 bit public key (CP mode<sup>1</sup>).</li>
+      <li>gost2001 public key algorithm based on elliptic curves
                     with 512 bit public key.</li>
-      <li>gost2001cp digital signature algorithm based on elliptic 
+      <li>gost2001cp public key algorithm based on elliptic 
                                         curves with 512 bit public key (CP mode<sup>1</sup>).</li>
     </ul>
 <p>
@@ -111,14 +111,14 @@ should be defined while running the following commands related to the OpenXPKI's
 </pre>
 <p>
 After that in addition to the usual western cryptography, users and administrators of 
-OpenXPKI will be able to enjoy the following GOST algoritms for digital signature 
+OpenXPKI will be able to enjoy the following GOST public key algoritms 
 (listed in the spelling of OpenXPKI):
 </p>
     <ul>
-      <li><b>GOST94</b> (digital signature)</li>
-      <li><b>GOST2001</b> (elliptic curves digital signature)</li>
-      <li><b>GOST94CP</b> (digital signature in CP mode<sup>1</sup>)</li>
-      <li><b>GOST2001CP</b> (elliptic curves digital signature in CP mode<sup>1</sup>)</li>
+      <li><b>GOST94</b> (public key algorithm)</li>
+      <li><b>GOST2001</b> (elliptic curves public key algorithm)</li>
+      <li><b>GOST94CP</b> (public key algorithm in CP mode<sup>1</sup>)</li>
+      <li><b>GOST2001CP</b> (elliptic curves public key algorithm in CP mode<sup>1</sup>)</li>
     </ul>
 <p>
 If environment variable:
