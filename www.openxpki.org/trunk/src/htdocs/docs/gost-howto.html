@@ -16,15 +16,15 @@ classical RSA - DSA cryptography, and GOST cryptography will be supported
 simultaneously and by default and out of the box.
 </p>
 <p>
-For those who can not wait, we provide here a patched version of 
+For those who can not wait, provided here is a patched version of 
 OpenSSL-0.9.8b equipped with the (same as in ver.0.9.9) set of GOST algorithms. 
-We call this collection OpenSSL-0.9.8b-gost. It has  
+This collection is called OpenSSL-0.9.8b-gost. It has  
 full and simultaneous support of both western 
 and russian cryptography. The recipes that follow have been tested to work with OpenXPKI
 at FreeBSD@Intel-32, FreeBSD@AMD-64, Debian@Intel-32 platforms. <em>Tested to work</em>
-here means that all built-in tests of OpenXPKI run ok, and that we have found no
-cryptographic-backend-related errors while 
-working with OpenXPKI via web interface. 
+here means that all built-in tests of the OpenXPKI pass ok, and that no
+cryptographic-backend-related errors were found while 
+working with the OpenXPKI via web interface. 
 </p>
 <p>
 Roughly today's procedure to prepare support for GOST in OpenXPKI is as follows:
@@ -69,11 +69,13 @@ algorithms (named here as recognized by the OpenSSL library):
 </p>
     <ul>
       <li>md_gost94 hash algorithm.</li>
-      <li>gost89 encryption/decryption algorithm.</li>
-      <li>gost94 digital signature algorithm.</li>
-      <li>gost94cp digital signature algorithm (alternative mode).</li>
-      <li>gost2001 digital signature algorithm based on elliptic curves.</li>
-      <li>gost2001cp digital signature algorithm based on elliptic curves (alternative mode).</li>
+      <li>gost89 encryption/decryption algorithm with 256 bit key.</li>
+      <li>gost94 digital signature algorithm with 1024 bit public key.</li>
+      <li>gost94cp digital signature algorithm with 1024 bit public key (CP mode<sup>1</sup>).</li>
+      <li>gost2001 digital signature algorithm based on elliptic curves
+                    with 512 bit public key.</li>
+      <li>gost2001cp digital signature algorithm based on elliptic 
+                                        curves with 512 bit public key (CP mode<sup>1</sup>).</li>
     </ul>
 <p>
 To test GOST support at the library level try:
@@ -91,7 +93,8 @@ To test GOST support at the library level try:
 <h4>
 And do not forget to (re)install OpenXPKI based on the just installed OpenSSL-gost software 
 collection.
-</h4><p>
+</h4>
+<p>
 Environment variables:
 </p>
 <pre>
@@ -107,16 +110,39 @@ should be defined while running the following commands related to the OpenXPKI's
     make test
 </pre>
 <p>
-After that in addition to the regular western cryptography, users and administrators of 
-OpenXPKI will see the following GOST cryptographic algoritms (listed in the spelling of OpenXPKI):
+After that in addition to the usual western cryptography, users and administrators of 
+OpenXPKI will be able to enjoy the following GOST algoritms for digital signature 
+(listed in the spelling of OpenXPKI):
 </p>
     <ul>
-      <li><b>GOST94</b> (routine digital signature)</li>
+      <li><b>GOST94</b> (digital signature)</li>
       <li><b>GOST2001</b> (elliptic curves digital signature)</li>
+      <li><b>GOST94CP</b> (digital signature in CP mode<sup>1</sup>)</li>
+      <li><b>GOST2001CP</b> (elliptic curves digital signature in CP mode<sup>1</sup>)</li>
     </ul>
-</p><p>
-</p><p>
-</p><p>
+<p>
+If environment variable:
+</p>
+<pre>
+    GOST_OPENSSL_ENGINE
+</pre>
+<p>
+is UNDEFINED during make procedure for OpenXPKI server,
+then GOST-related tests of OpenXPKI are skipped, and support of GOST algorithms in OpenXPKI 
+is suspended.
+This also applies to the case when cryptographic backend #1 is used
+(see <a href="crypto-plug.html">Cryptography abstraction concept</a>). 
+Thus the presence of GOST-related code inside of the OpenXPKI makes no harm to the
+customer who does not have GOST-enabled cryptographic backend, or knows nothing about GOST. 
+</p>
+
+<hr/>
+<p>
+(<sup>1</sup>)
+Digital signature in CP mode has different byte ordering with respect to the 
+regular mode. Strictly speaking this mode explicitly violates related Russian federal standards for
+digital signature. Nonetheless it is widely employed in some of the MSWindows-based applications. 
+Supported here for compatibility.  
 </p>
 
 
