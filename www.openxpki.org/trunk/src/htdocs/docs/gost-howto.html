@@ -121,6 +121,11 @@ OpenXPKI will be able to enjoy the following GOST public key algoritms
       <li><b>GOST2001CP</b> (elliptic curves public key algorithm in CP mode<sup>1</sup>)</li>
     </ul>
 <p>
+In full accord with X.509 standard, all these GOST* algorithms along with all DSA and RSA
+algorithms could be used to cross-sign certificates. Thus  chains of arbitrary algorithms
+could be found in certification chains of a given PKI.
+</p>
+<p>
 If environment variable:
 </p>
 <pre>

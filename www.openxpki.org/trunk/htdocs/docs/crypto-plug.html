@@ -103,7 +103,7 @@ deduce necessary cryptographic details from the data which they process.
 <dt>convert_crl</dt>
         <dd>transform CRL from PEM into DER or TXT</dd>
 <dt>convert_key</dt> 
-        <dd>transform a key from RSA, DSA or PKCS#8 into PEM, DER or PKCS8</dd> 
+        <dd>transform a key from RSA, DSA or PKCS#8 into PEM, DER or PKCS#8</dd> 
 <dt>convert_pkcs10</dt>
         <dd>transform a request from PEM into DER or TXT</dd>
 <dt>create_cert</dt>
@@ -113,7 +113,7 @@ deduce necessary cryptographic details from the data which they process.
 <dt>create_pkcs10</dt>
         <dd>create a certificate request</dd>
 <dt>create_pkcs12</dt>
-        <dd>store a secret key and related chain of certificates into a pkcs12 structure</dd>
+        <dd>store a secret key and related chain of certificates into a PKCS#12 structure</dd>
 <dt>create_random</dt>
         <dd>generate a random number</dd>
 <dt>is_prime</dt>
@@ -127,7 +127,7 @@ deduce necessary cryptographic details from the data which they process.
 <dt>pkcs7_encrypt</dt>
         <dd>encrypt data</dd>
 <dt>pkcs7_get_chain</dt>
-        <dd>check a chain of certificates, used for signature</dd>
+        <dd>check a chain of certificates, used for signature, and/or encryption/decryption</dd>
 <dt>pkcs7_sign</dt>
         <dd>sign data</dd>
 <dt>pkcs7_verify</dt>
@@ -203,7 +203,7 @@ supports both sets of cryptography:
 </p>
 
 <ol>
-<li>classical RSA and DSA set (the same as with cryptographic backend #1).
+<li>the same set of algorithms as with cryptographic backend #1, and plus to that:
 </li>
 <li>russian national cryptographic algorithms GOST.
 See <a href="gost-howto.html">Working with russian (GOST) cryptography</a>.
