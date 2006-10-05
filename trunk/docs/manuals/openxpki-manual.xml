@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-                      <!-- "http://www.docbook.org/xml/4.5/docbookx.dtd" -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-                      "/Users/klink/docbook/docbook-xml-4.5/docbookx.dtd" [
+                      "http://www.docbook.org/xml/4.5/docbookx.dtd" [
 <!ENTITY builddate    SYSTEM "builddate">
 <!ENTITY license      SYSTEM "license.xml">
 <!ENTITY introduction SYSTEM "introduction.xml">
