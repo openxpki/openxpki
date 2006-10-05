@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sect1 id="intro_overview">
+  <title>Overview</title>
+  <sect2 id="intro_overview_design">
+    <title>System Design</title>
+
+    <sect3 id="intro_overview_design_server">
+      <title>Server architecture</title>
+      <para></para>
+    </sect3>
+
+    <sect3 id="intro_overview_design_clients">
+      <title>Clients</title>
+      <para></para>
+    </sect3>
+  </sect2>
+
+  <sect2 id="intro_overview_pki">
+    <title>Public Key Infrastructure (PKI)</title>
+
+    <sect3 id="intro_overview_pki_realms">
+      <title>PKI Realms</title>
+      <para></para>
+    </sect3>
+
+    <sect3 id="intro_overview_pki_carollover">
+      <title>CA Rollover</title>
+      <para></para>
+    </sect3>
+  </sect2>
+</sect1>

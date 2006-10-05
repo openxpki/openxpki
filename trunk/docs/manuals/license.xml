@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<chapter id="license">
+  <title>License</title>
+<!-- document both the OpenXPKI and the documentation license,
+mention that both are open source, in case people stumble over
+the documentation and wonder what the license is. 
+OpenXPKI is Apache v2 (or later?)
+Documentation is GNU FDL
+-->
+  <para></para>
+</chapter>

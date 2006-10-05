@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sect1 id="wf_shipped">
+  <title>Shipped workflow implementations</title>
+
+  <sect2 id="wf_shipped_csr">
+    <title>Certificate Signing Request</title>
+    <sect3 id="wf_shipped_csr_browser">
+      <title>Browser request</title>
+      <para></para>
+    </sect3>
+  </sect2>
+
+  <sect2 id="wf_shipped_issuance">
+    <title>Certificate Issuance</title>
+    <para></para>
+  </sect2>
+
+  <sect2 id="wf_shipped_smartcard">
+    <title>Smartcard Personalization</title>
+    <para></para>
+  </sect2>
+
+  <sect2 id="wf_shipped_scep">
+    <title>Simple Certificate Enrollment Protocol (SCEP)</title>
+    <para></para>
+  </sect2>
+
+  <sect2 id="wf_shipped_dataexchange">
+    <title>Data Exchange</title>
+    <para></para>
+  </sect2>
+</sect1>

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sect2 id="ref_config_acl">
+  <title>Access Control</title>
+    
+  <sect3 id="ref_config_acl_authentication">
+    <title>Authentication</title>
+
+    <sect4>
+      <title>Mechanisms</title>
+      <para></para>
+    </sect4>
+  </sect3>
+
+  <sect3 id="ref_config_acl_authorization">
+    <title>Authorization</title>
+
+    <sect4>
+      <title>Built-in (configuration file)</title>
+      <para></para>
+    </sect4>
+
+<!-- TODO:
+    <sect4>
+      <title>LDAP</title>
+      <para></para>
+    </sect4>
+-->
+  </sect3>
+</sect2>

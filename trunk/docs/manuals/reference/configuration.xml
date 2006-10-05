@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sect1 id="ref_configuration">
+  <title>Configuration</title>
+  &ref_config_base;
+  &ref_config_database;
+  &ref_config_crypto;
+  &ref_config_workflow;
+  &ref_config_acl;
+</sect1>

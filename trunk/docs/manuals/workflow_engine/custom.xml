@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sect1 id="wf_custom">
+  <title>Custom workflows</title>
+
+  <sect2 id="wf_custom_definition">
+    <title>Definition (XML configuration)</title>
+    <para></para>
+  </sect2>
+
+  <sect2 id="wf_custom_implementation">
+    <title>Implementation (Perl modules)</title>
+    <para></para>
+  </sect2>
+</sect1>

@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+                      <!-- "http://www.docbook.org/xml/4.5/docbookx.dtd" -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+                      "/Users/klink/docbook/docbook-xml-4.5/docbookx.dtd" [
+<!ENTITY builddate    SYSTEM "builddate">
+<!ENTITY license      SYSTEM "license.xml">
+<!ENTITY introduction SYSTEM "introduction.xml">
+  <!ENTITY intro_abstract  SYSTEM "introduction/abstract.xml">
+  <!ENTITY intro_resources SYSTEM "introduction/resources.xml">
+  <!ENTITY intro_overview  SYSTEM "introduction/overview.xml">
+<!ENTITY quickstart   SYSTEM "quickstart.xml">
+  <!ENTITY qs_installation   SYSTEM "quickstart/installation.xml">
+  <!ENTITY qs_configuration  SYSTEM "quickstart/configuration.xml">
+  <!ENTITY qs_administration SYSTEM "quickstart/administration.xml">
+  <!ENTITY qs_running        SYSTEM "quickstart/running.xml">
+<!ENTITY workflow     SYSTEM "workflow_engine.xml">
+  <!ENTITY wf_overview SYSTEM "workflow_engine/overview.xml">
+  <!ENTITY wf_shipped  SYSTEM "workflow_engine/shipped.xml">
+  <!ENTITY wf_custom   SYSTEM "workflow_engine/custom.xml">
+<!ENTITY reference    SYSTEM "reference.xml">
+  <!ENTITY ref_configuration   SYSTEM "reference/configuration.xml">
+    <!ENTITY ref_config_base     SYSTEM "reference/config/base.xml"> 
+    <!ENTITY ref_config_database SYSTEM "reference/config/database.xml">
+    <!ENTITY ref_config_crypto   SYSTEM "reference/config/crypto.xml">
+    <!ENTITY ref_config_workflow SYSTEM "reference/config/workflow.xml">
+    <!ENTITY ref_config_acl      SYSTEM "reference/config/acl.xml">
+  <!ENTITY ref_administration  SYSTEM "reference/administration.xml">
+  <!ENTITY ref_deployment      SYSTEM "reference/deployment.xml">
+  <!ENTITY ref_troubleshooting SYSTEM "reference/troubleshooting.xml">
+<!ENTITY glossary     SYSTEM "glossary.xml">
+]>
+
+<book>
+  <bookinfo>
+    <title>OpenXPKI Manual</title>
+
+    <authorgroup>
+      <author>
+        <firstname>Martin</firstname>
+        <surname>Bartosch</surname>
+        <affiliation>
+          <orgname>Cynops GmbH</orgname>
+        </affiliation>
+      </author>
+      <author>
+        <firstname>Michael</firstname>
+        <surname>Bell</surname>
+        <affiliation>
+          <orgname>Humboldt-Universität zu Berlin</orgname>
+        </affiliation>
+      </author>
+      <author>
+        <firstname>Alexander</firstname>
+        <surname>Klink</surname>
+        <affiliation>
+          <orgname>Cynops GmbH</orgname>
+        </affiliation>
+      </author>
+    </authorgroup>
+    <copyright>
+       <year>2006</year>
+       <holder>The OpenXPKI Project</holder>
+    </copyright>
+    <releaseinfo>$Id$</releaseinfo>
+  </bookinfo>
+
+  &license;
+  &introduction;
+  &quickstart;
+  &workflow;
+  &reference;
+  &glossary;
+</book>

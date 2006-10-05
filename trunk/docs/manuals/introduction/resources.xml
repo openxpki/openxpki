@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sect1 id="intro_resources">
+  <title>Resources</title>
+  <sect2 id="intro_resources_website">
+    <title>Website</title>
+    <para></para>
+  </sect2>
+
+  <sect2 id="intro_resources_sf">
+    <title>Sourceforge</title>
+    <para></para>
+  </sect2>
+
+  <sect2 id="intro_resources_mailinglists">
+    <title>Mailing lists</title>
+    <para></para>
+  </sect2>
+
+  <sect2 id="intro_resources_commercial">
+    <title>Consulting Services and Commercial Support</title>
+    <para></para>
+  </sect2>
+</sect1>

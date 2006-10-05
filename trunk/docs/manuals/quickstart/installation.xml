@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sect1 id="qs_installation">
+  <title>Installation</title>
+  <sect2 id="qs_installation_initial">
+    <title>Initial (pre-deployment) configuration</title>
+    <para></para>
+  </sect2>
+
+  <sect2 id="qs_installation_deployment">
+    <title>Deployment</title>
+    <para></para>
+  </sect2>
+</sect1>

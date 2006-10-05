@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sect1 id="qs_running">
+  <title>Running OpenXPKI</title>
+  <sect2 id="qs_running_server">
+    <title>Server startup</title>
+    <para></para>
+  </sect2>
+
+  <sect2 id="qs_running_client">
+    <title>Client test</title>
+    <para></para>
+  </sect2>
+</sect1>

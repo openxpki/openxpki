@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sect1 id="qs_administration">
+  <title>Administration</title>
+  <sect2 id="qs_administration_pkirealm">
+    <title>PKI Realm Setup</title>
+
+    <sect3 id="qs_administration_pkirealm_ca">
+      <title>CA Setup</title>
+      <sect4 id="qs_administration_pkirealm_ca_key">
+        <title>Key generation</title>
+        <para></para>
+      </sect4>
+      <sect4 id="qs_administration_pkirealm_ca_csr">
+        <title>Certificate signing request generation</title>
+        <para></para>
+      </sect4>
+      <sect4 id="qs_administration_pkirealm_ca_cacert">
+        <title>CA Certificate installation</title>
+        <para></para>
+      </sect4>
+    </sect3>
+  </sect2>
+
+  <sect2 id="qs_administration_user">
+    <title>User Administration</title>
+
+    <sect3 id="qs_administration_user_ra">
+      <title>RA Operator</title>
+      <para></para>
+    </sect3>
+    
+    <sect3 id="qs_administration_user_ca">
+      <title>CA Operator</title>
+      <para></para>
+    </sect3>
+  </sect2>
+</sect1>
