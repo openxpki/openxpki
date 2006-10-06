@@ -1,4 +1,4 @@
-Last modified by <% $author %> on <% $change_date %> (Rev. <% $change_rev %>). &copy; 2005 - 2006  OpenXPKI Foundation
+Last modified by <% $author %> on <% $change_date %> (based on rev. <% $change_rev %>). &copy; 2005 - 2006  OpenXPKI Foundation
 
 <%init>
 use POSIX qw( strftime );
@@ -12,15 +12,11 @@ my $build_date;
 my $change_rev;
 my $head_rev;
 if (-f $file) {
+   $author = $ENV{'SVN_USER_NAME'};
+   $change_date = `date -u`;
    open my $fh, "svn info $file 2>&1 |";
    while (my $line = <$fh>) {
        chomp $line;
-       if ($line =~ m{ \A Last\ Changed\ Author: \s* (.*) }xms) {
-           $author = $1;
-       }
-       if ($line =~ m{ \A Text\ Last\ Updated: \s* (.*) \s* \( }xms) {
-           $change_date = $1;
-       }
        if ($line =~ m{ \A Last\ Changed\ Rev: \s* (.*) \z }xms) {
            $change_rev = $1;
        }

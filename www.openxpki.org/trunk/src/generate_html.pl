@@ -18,6 +18,53 @@ my ($source, $target) = map { File::Spec->canonpath($_) } @ARGV;
 die "Need a source and target\n"
     unless defined $source && defined $target;
 
+my $usr_file;
+my $usr_file_name = '.svn_user_name';
+my $usr_name = '';
+my %possible_names = ('alech' => 'devel','bellmich' => 'admin','djulia' => 'admin',
+                      'mbartosch' => 'admin','oliwel' => 'admin','svysh' => 'devel');
+
+if (-e($usr_file_name) && -s _) {                                                                                                                          
+    open($usr_file,$usr_file_name);
+    $usr_name = <$usr_file>;
+    close($usr_file);
+    chomp($usr_name);
+    $usr_name = '' if (!exists($possible_names{$usr_name}));
+}
+
+if ($usr_name eq '') {
+    do { 
+        print "Enter your username for SourceForge (to be used in footers of html docs): ";
+        $usr_name = <STDIN>;
+        chomp($usr_name);
+    } until ($usr_name =~ m{ \A [a-zA-Z0-9]+ [-\w]* \Z }xms);
+
+    if (exists($possible_names{$usr_name})) {
+        open($usr_file,">",$usr_file_name);
+        print $usr_file "$usr_name";
+        close($usr_file);
+        print "Your username for SourceForge is kept in file src/.svn_user_name as $usr_name\n";
+    }
+    else {
+        print "Supplied username for SourceForge does not match a list of OpenXPKI developers. \n";
+        print "     If you are a new developer then: \n";
+        print "          edit src/generate_html.pl, \n";
+        print "          rerun gmake from src directory, \n";
+        print "          commit src/generate_html.pl. \n";
+        exit 0;
+    }
+}
+
+$ENV{'SVN_USER_NAME'} = $usr_name;
+
+my %files_status;
+my @svn_output = `svn status`;
+foreach my $line (@svn_output) {
+    chomp($line);
+    $line =~ m/ \A \s* ([ACDIMRX?!~]) \s* ([^\s]+?) \s* \Z /xms;
+    $files_status{$2} = $1;
+}
+
 # Make target absolute because File::Find changes the current working
 # directory as it runs.
 $target = File::Spec->rel2abs($target);
@@ -38,6 +85,7 @@ sub convert {
 
     # Strip off leading part of path that matches source directory
     my $name = $File::Find::name;
+    my $name_with_source = $name;
     $name =~ s/^$source//;
 
     # We dont want to copy subversion dirs
@@ -55,8 +103,13 @@ sub convert {
     if (/(\.html)$/) {
 
 	# This will save the component's output in $buffer
-	$interp->out_method(\$buffer);
-	$interp->exec("/$comp_path");
+        if (exists($files_status{$name_with_source})) {
+	    $interp->out_method(\$buffer);
+	    $interp->exec("/$comp_path");
+        }
+        else {
+            return;
+        }
 
     # old: } elsif (/(\.png|\.txt)$/) {
     } elsif (/(\.png|\.txt|\.css)$/) {
