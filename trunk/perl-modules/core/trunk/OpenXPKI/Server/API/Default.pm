@@ -266,6 +266,55 @@ sub get_cert_subject_profiles {
 
     return \%profiles;
 }
+
+sub get_export_destinations
+{
+    ##! 1: "finished"
+    my $self = shift;
+    my $args = shift;
+
+    ##! 2: "load destination numbers"
+    my $export = CTX('xml_config')->get_xpath (
+                     XPATH   => [ 'common/data_exchange/export/dir' ],
+                     COUNTER => [ 0 ]);
+    my $import = CTX('xml_config')->get_xpath (
+                     XPATH   => [ 'common/data_exchange/import/dir' ],
+                     COUNTER => [ 0 ]);
+    my @list = ();
+    foreach my $dir ($import, $export)
+    {
+        opendir DIR, $dir;
+        my @filenames = grep /^[0-9]+/, readdir DIR;
+        close DIR;
+        foreach my $filename (@filenames)
+        {
+            next if (not length $filename);
+            $filename =~ s/^([0-9]+)(|[^0-9].*)$/$1/;
+            push @list, $filename if (length $filename);
+        }
+    }
+
+    ##! 2: "load all servers"
+    my %servers = $self->get_servers();
+
+    ##! 2: "build hash with numbers and names of affected servers"
+    my %result = ();
+    my $last   = -1;
+    foreach my $item (sort @list)
+    {
+        next if ($last == $item);
+        $result{$item} = $servers{$item};
+        $last = $item;
+    }
+
+    ##! 1: "finished"
+    return \%result;
+}
+
+sub get_servers {
+    return CTX('acl')->get_servers();
+}
+
 1;
 
 __END__

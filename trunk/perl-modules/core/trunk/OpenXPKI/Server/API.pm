@@ -109,6 +109,14 @@ sub BUILD {
                 },
             },
         },
+        'get_servers' => {
+            class  => 'Default',
+            params => { },
+        },
+        'get_export_destinations' => {
+            class  => 'Default',
+            params => { },
+        },
 
         ### Object API
         'get_csr_info_hash_from_data' => {

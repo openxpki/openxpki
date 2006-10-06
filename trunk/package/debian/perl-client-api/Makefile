@@ -1,9 +1,12 @@
 # trunk/package/debian/core
 
 OPENXPKI_SVN=../../../..
+PACKAGE=libopenxpki-client-perl
+PERLNAME=OpenXPKI-Client
 
 default:
 	make clean
+	make changelog
 	make openxpki-archive
 	make debian-archive
 	make source
@@ -14,7 +17,7 @@ openxpki-archive:
 	cd ${OPENXPKI_SVN}/trunk/clients/perl/OpenXPKI-Client; \
 	perl Makefile.PL; \
 	make dist; \
-	mv OpenXPKI-Client-*.tar.gz /tmp
+	mv $(PERLNAME)-*.tar.gz /tmp
 
 debian-archive:
 	## cd ${OPENXPKI_SVN}/trunk/package/
@@ -22,20 +25,30 @@ debian-archive:
 
 source:
 	cd /tmp; \
-	tar -xzf OpenXPKI-Client-*.tar.gz; \
-	cd OpenXPKI-Client-*/; \
+	tar -xzf $(PERLNAME)-*.tar.gz; \
+	cd $(PERLNAME)-*/; \
 	mkdir debian; \
 	cd debian; \
 	tar -xzf /tmp/openxpki-debian.tar.gz;
 
 package:
-	cd /tmp/OpenXPKI-Client-*/; \
+	cd /tmp/$(PERLNAME)-*/; \
 	fakeroot dpkg-buildpackage || echo ignoring error - usually signing ...
-	mv /tmp/libopenxpki-client-perl_* .
+	mv /tmp/$(PACKAGE)_* .
+
+changelog::
+	if [ ! -e changelog.org ]; then mv changelog changelog.org; fi
+	echo -n $(PACKAGE) > changelog
+	DATE=`date +'%Y%m%d'` && echo \ \($$DATE\) unstable\; urgency=low >> changelog
+	echo >> changelog
+	echo "  * Daily build." >> changelog
+	echo >> changelog
+	echo " -- Michael Bell <michael.bell@web.de> " `date --rfc-2822` >> changelog
 
 source-clean:
-	rm -rf /tmp/OpenXPKI-Client-*
+	rm -rf /tmp/$(PERLNAME)-*
 	rm -f /tmp/openxpki-debian.tar.gz
 
 clean:	source-clean
+	if [ -e changelog.org ]; then mv changelog.org changelog; fi
 	rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes

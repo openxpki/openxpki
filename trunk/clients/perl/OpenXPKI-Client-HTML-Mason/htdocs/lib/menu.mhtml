@@ -97,8 +97,7 @@
                      },
                     "dataexchange_export" =>
                     {
-                         CMD    => "service/workflow/create_instance.html",
-                         PARAMS => {"type" => "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"}
+                         CMD    => "service/workflow/start_data_exchange_export.html",
                     },
                     "dataexchange_import" =>
                     {

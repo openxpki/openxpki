@@ -23,6 +23,7 @@ sub execute
     my $context = $workflow->context();
     my $logs    = $context->param('local_import_dir');
     my $server  = $context->param('who_am_i');
+    my $dest    = $context->param('destination');
 
     ## document who is the sender
     my $cmd = "echo $server > ".$context->param ('tmpdir')."/who_am_i";
@@ -46,12 +47,21 @@ sub execute
     }
 
     # copy logs
-    $cmd = "cp $logs/* ".$context->param ('tmpdir')."/logs/";
+    $cmd = "cp $logs/$dest.log ".$context->param ('tmpdir')."/logs/";
     $ret = `$cmd`;
     if ($EVAL_ERROR)
     {
         my $errors = [[ 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_COPY_FAILED',
                         {COMMAND => $cmd} ]];
+        $context->param ("__error" => $errors);
+        workflow_error ($errors->[0]);
+    }
+
+    ## drop old logs
+    if (-e "$logs/$dest.log" and not unlink "$logs/$dest.log")
+    {
+        my $errors = [[ 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_UNLINK_FAILED',
+                        {FILENAME => "$logs/$dest.log"} ]];
         $context->param ("__error" => $errors);
         workflow_error ($errors->[0]);
     }

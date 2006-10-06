@@ -1,13 +1,13 @@
-# OpenXPKI::Server::Workflow::Observer::Log
+# OpenXPKI::Server::Workflow::Observer::Debug
 # Written by Alexander Klink for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
 # $Revision: 320 $
 
-package OpenXPKI::Server::Workflow::Observer::Log;
+package OpenXPKI::Server::Workflow::Observer::Debug;
 
 use strict;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Observer::Log';
+use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Observer::Debug';
 
 sub update {
     my ($class, $workflow, $action, $old_state, $action_name) = @_;
@@ -28,7 +28,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Observer::Log
+OpenXPKI::Server::Workflow::Observer::Debug
 
 =head1 Description
 

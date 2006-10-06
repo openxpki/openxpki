@@ -2,8 +2,7 @@
   <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
   <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST</description>
   <persister>OpenXPKI</persister>
-  <observer class="OpenXPKI::Server::Workflow::Observer::Log"/>
-  <observer class="OpenXPKI::Server::Workflow::Observer::AddExecuteHistory"/>
+  <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>
 
   <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>

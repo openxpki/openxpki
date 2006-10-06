@@ -94,6 +94,14 @@ sub __load_server
         my $name = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'server', 'name'],
                        COUNTER => [ $pkiid, 0, $i, 0]);
+        if (exists $self->{SERVER} and exists $self->{SERVER}->{$value})
+        {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_ACL_LOAD_SERVER_DUPLICATE_ID_FOUND",
+                params  => {ID   => $value,
+                            NAME => $name});
+        }
+        $self->{SERVER}->{$value} = $name;
         if ($value == $self->{SERVER_ID})
         {
             $self->{SERVER_NAME} = $name;
@@ -270,6 +278,12 @@ sub get_roles
     return keys %{$self->{PKI_REALM}->{CTX('session')->get_pki_realm()}->{ROLES}};
 }
 
+sub get_servers
+{
+    my $self  = shift;
+    return %{$self->{SERVER}};
+}
+
 1;
 __END__
 
@@ -309,4 +323,8 @@ is denied then an exception is thrown.
 =head2 get_roles
 
 returns all available roles for the actual PKI realm.
+
+=head2 get_servers
+
+returns a hash with all available servers.
 

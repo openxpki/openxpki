@@ -1,0 +1,49 @@
+<%args>
+  $destination => undef
+</%args>
+<& /service/open_form.mhtml &>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_START_EXPORT_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_START_EXPORT_DESCRIPTION') %>
+</p>
+<p>
+<& /lib/html/select.mhtml,
+   'name'    => "destination",
+   'values'  => $msg->{PARAMS} &>
+</p>
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<%init>
+  my $msg = undef;
+  if (not defined $destination)
+  {
+    ## ok we have to get the info from the server
+    $msg = $context->{client}->send_receive_command_msg
+               ("get_export_destinations");
+
+    ## if there is only one server then export to this server
+    if (scalar keys %{$msg->{PARAMS}} == 1)
+    {
+      $destination = join "", keys %{$msg->{PARAMS}};
+    }
+  }
+
+  if (defined $destination)
+  {
+    $msg = $context->{client}->send_receive_command_msg
+               (
+                  "create_workflow_instance",
+                  {"WORKFLOW" => "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT",
+                   "PARAMS"   => {"destination" => $destination}}
+               );
+    if (exists $msg->{SERVICE_MSG} and
+        $msg->{SERVICE_MSG} eq "ERROR")
+    {
+        my $errors = [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ];
+        return $m->comp ('/service/create_csr/print_errors.mhtml', 'errors' => $errors);
+    } else {
+        return $m->comp ('/service/workflow/show_instance.html', 'msg' => $msg);
+    }
+  }
+</%init>

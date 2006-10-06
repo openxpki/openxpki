@@ -1,9 +1,11 @@
 # trunk/package/debian/core
 
 OPENXPKI_SVN=../../../..
+PACKAGE=openxpki-i18n
 
 default:
 	make clean
+	make changelog
 	make openxpki-archive
 	make debian-archive
 	make source
@@ -13,7 +15,7 @@ default:
 openxpki-archive:
 	cd ${OPENXPKI_SVN}/trunk/i18n/; \
 	make dist; \
-	mv openxpki-i18n-*.tar.gz /tmp
+	mv $(PACKAGE)-*.tar.gz /tmp
 
 debian-archive:
 	## cd ${OPENXPKI_SVN}/trunk/package/
@@ -21,23 +23,33 @@ debian-archive:
 
 source:
 	cd /tmp; \
-	tar -xzf openxpki-i18n-*.tar.gz; \
-	cd openxpki-i18n-*/; \
+	tar -xzf $(PACKAGE)-*.tar.gz; \
+	cd $(PACKAGE)-*/; \
 	mkdir debian; \
 	cd debian; \
 	tar -xzf /tmp/openxpki-debian.tar.gz;
 
 package:
-	cd /tmp/openxpki-i18n-*/; \
+	cd /tmp/$(PACKAGE)-*/; \
 	fakeroot dpkg-buildpackage || echo ignoring error - usually signing ...
-	mv /tmp/openxpki-i18n_* .
+	mv /tmp/$(PACKAGE)_* .
+
+changelog::
+	if [ ! -e changelog.org ]; then mv changelog changelog.org; fi
+	echo -n $(PACKAGE) > changelog
+	DATE=`date +'%Y%m%d'` && echo \ \($$DATE\) unstable\; urgency=low >> changelog
+	echo >> changelog
+	echo "  * Daily build." >> changelog
+	echo >> changelog
+	echo " -- Michael Bell <michael.bell@web.de> " `date --rfc-2822` >> changelog
 
 source-clean:
-	#rm -rf /tmp/openxpki-i18n-*
-	#rm -f /tmp/openxpki-i18n-*.tar.gz
+	#rm -rf /tmp/$(PACKAGE)-*
+	#rm -f /tmp/$(PACKAGE)-*.tar.gz
 	#rm -f /tmp/openxpki-debian.tar.gz
 
 clean:	source-clean
+	if [ -e changelog.org ]; then mv changelog.org changelog; fi
 	rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes
 
 distclean: clean

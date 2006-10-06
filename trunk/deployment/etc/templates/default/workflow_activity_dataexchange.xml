@@ -6,6 +6,7 @@
   <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
 	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::PrepareEnv"
           device="/tmp/fd0">
+    <field name="destination"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_CLEANUP"
 	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::Cleanup">
@@ -14,6 +15,11 @@
   <!-- Export activities -->
   <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_LOGS"
 	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::ExportLogs">
+    <!-- do not use field with is_required                -->
+    <!-- because this ignores the order of the validators -->
+    <validator name="HasRequiredField">
+      <arg>destination</arg>
+    </validator>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES"
 	  class="OpenXPKI::Server::Workflow::Activity::DataExchange::ExportWorkflowInstances">
