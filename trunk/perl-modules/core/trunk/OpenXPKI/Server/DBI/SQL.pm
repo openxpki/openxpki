@@ -374,23 +374,7 @@ sub __get_symbolic_column_and_table {
     return ($symbolic_column, $symbolic_table);
 }
 
-# split 
-sub __get_schema_column_and_table {
-    my $self = shift;
-    my $arg = shift;
 
-    my ($symbolic_column, $symbolic_table) 
-	= $self->__get_symbolic_column_and_table($arg);
-    
-    my $tab;
-    if (defined $symbolic_table) {
-	$tab = $self->{schema}->get_table_name($symbolic_table);
-    };
-    
-    my $col = $self->{schema}->get_column($symbolic_column);
-
-    return ($col, $tab);
-}
 
 sub get_symbolic_query_columns {
     my $self = shift;
@@ -424,166 +408,302 @@ sub get_symbolic_query_columns {
     return @select_list;
 }
 
-sub get_schema_query_columns {
-    my $self = shift;
-    my $keys = shift;
-
-    my $table = $keys->{TABLE};
-    
-    my @select_list;
-    
-    if (ref $table eq '') {
-	@select_list = map {
-	    $self->{schema}->get_column($_);
-	} @{$self->{schema}->get_table_columns($table)};
-
-    } elsif (ref $table eq 'ARRAY') {
-	## ensure a schema compatible result
-	if (! exists $keys->{COLUMNS} ||
-	    ref $keys->{COLUMNS} ne 'ARRAY') {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS");
-	}
-
-	foreach my $column (@{$keys->{COLUMNS}}) {
-	    my ($col, $tab) = $self->__get_schema_column_and_table($column);
-	    
-	    if (! defined $tab) {
-		push @select_list, $col;
-	    } else {
-		push @select_list, $tab . '.' . $col;
-	    }
-	}
-    }
-    return @select_list;
-}
-
 
 
 sub select
 {
     my $self  = shift;
-    my $keys  = { @_ };
+    my $args  = { @_ };
 
-    ## check arguments
-    my $table = $keys->{TABLE};
-    if (! defined $table)
+    my %operator_of = (
+	'FROM'          => '>=',
+	'TO'            => '<=',
+
+	'LESS_THAN'     => '<',
+	'GREATER_THAN'  => '>',
+	);
+
+    my $pivot_column;
+
+    # we have three levels of table specification:
+    # alias => openxpki symbolic table name => sql table name
+
+    # this maps an alias to a symbolic table name and to a sql table name
+    my %alias_map_of;
+
+    my @symbolic_select_tables;
+    my @select_list;
+    my @conditions;
+    my @bind_values;
+
+    my $table_args = $args->{TABLE};
+
+    if (! defined $table_args)
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_TABLE");
-    }
-
-    my %compare = ("FROM"    => ">=",
-                   "TO"      => "<=",
-                   "GREATER" => ">",
-                   "LOWER"   => "<");
-    
-
-    ## extract columns from query
-    my @select_list = $self->get_schema_query_columns($keys);
-
-    my @select_tables;
-    my @condition;
-    my @bind_values;
-    my $pivot_column;
-
-
-    if (ref $table eq '') {
+    } elsif (ref $table_args eq '') {
 	### single table queries...
 
 	# use table index serial column as default selector
-	$pivot_column = $table . '_SERIAL';
+	$pivot_column = $table_args . '_SERIAL';
 	
-	push(@select_tables, $self->{schema}->get_table_name($table));
-    } elsif (ref $table eq 'ARRAY') {
+	@select_list = map {
+	    $self->{schema}->get_column($_);
+	} @{$self->{schema}->get_table_columns($table_args)};
+
+	push @symbolic_select_tables,
+	{
+	    SYMBOLIC_NAME => $table_args,
+	    SQL_NAME => $self->{schema}->get_table_name($table_args),
+	};
+    } elsif (ref $table_args eq 'ARRAY') {
 	### natural join...
-	@select_tables = map {
-	    $self->{schema}->get_table_name($_);
-	} @{$table};
 
-	# use the first column
-	$pivot_column = $select_tables[0];
-	### $pivot_column
+	if (! exists $args->{COLUMNS} ||
+	    ref $args->{COLUMNS} ne 'ARRAY') {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_COLUMNS");
+	}
+	
+	# collect tables to join
+	# - scalar value: join on this symbolic table name
+	# - arrayref: expect exactly two values (fat comma syntax suggested),
+	#     first is the symbolic table name, the second the alias name
+	#     to use in the query. you must use the second, alias name
+	#     to reference the table in the conditions if this syntax is used.
+	my $ii = -1;
+      TABLE:
+	foreach my $entry (@{$table_args}) {
+	    $ii++;
+	    if (ref $entry eq '') {
+		### literal table name...
+		# the argument is the symbolic table name
+		push @symbolic_select_tables, 
+		{
+		    SYMBOLIC_NAME => $entry,
+		    SQL_NAME => $self->{schema}->get_table_name($entry),
+		};
+		next TABLE;
+	    }
+	    if (ref $entry eq 'ARRAY') {
+		### aliased table name...
+		### $entry
+		# [ 'symbolic_table_name', 'alias_name' ] or
+		# [ 'symbolic_table_name' => 'alias_name' ]
+		if (scalar @{$entry} != 2) {
+		    OpenXPKI::Exception->throw (
+			message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_NUMBER_OF_SYMBOLIC_TABLE_ENTRIES",
+			params => {
+			    TABLE_REF => ref $entry,
+			    TABLE_INDEX => $ii,
+			});
+		}
+		my ($symbolic_table_name, $alias) = @{$entry};
+		### $symbolic_table_name
+		### $alias
+		# select on the alias name
 
-	if (! exists $keys->{JOIN} ||
-	    ref $keys->{JOIN} ne 'ARRAY') {
+		# make sure the alias is unique
+		if (exists $alias_map_of{$alias}) {
+		    OpenXPKI::Exception->throw (
+			message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_ALIAS_NOT_UNIQUE",
+			params => {
+			    SYMBOLIC_NAME => $symbolic_table_name,
+			    ALIAS => $alias,
+			});
+		}
+
+		# remember the mapping
+		$alias_map_of{$alias} = {
+		    SYMBOLIC_NAME => $symbolic_table_name,
+		    SQL_NAME => $self->{schema}->get_table_name($symbolic_table_name),
+		};
+
+		push @symbolic_select_tables, 
+		{
+		    ALIAS => $alias,
+		    %{$alias_map_of{$alias}},
+		};
+		next TABLE;
+	    }
+
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_TABLE_SPECIFICATION",
+		params => {
+		    TABLE_REF => ref $entry,
+		    TABLE_INDEX => $ii,
+		});
+	}
+
+	# build column specification
+	### $keys->{COLUMNS}
+	foreach my $column (@{$args->{COLUMNS}}) {
+	    my ($col, $tab) = $self->__get_symbolic_column_and_table($column);
+
+	    # convert this into schema compatible column
+	    $col = $self->{schema}->get_column($col);
+
+	    if (defined $tab) {
+		# if this is an alias leave it this way
+		if (! exists $alias_map_of{$tab}) {
+		    $tab = $self->{schema}->get_table_name($tab);
+		}
+		push @select_list, $tab . '.' . $col;
+
+	    } else {
+		push @select_list, $col;
+	    }
+
+	}
+
+
+	# use first column as pivot column
+	if (! defined $pivot_column) {
+	    $pivot_column = $symbolic_select_tables[0]->{SYMBOLIC_NAME} . '_SERIAL';
+	}
+
+
+	######################################################################
+	# handle joins
+	if (! exists $args->{JOIN} ||
+	    ref $args->{JOIN} ne 'ARRAY') {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_JOIN");
 	}
 	
-	foreach my $join (@{$keys->{JOIN}}) {
+	foreach my $join (@{$args->{JOIN}}) {
 	    ### $join
 	    if (ref $join ne 'ARRAY' ||
-		scalar(@{$join}) != scalar(@select_tables)) {
+		scalar(@{$join}) != scalar(@symbolic_select_tables)) {
 		OpenXPKI::Exception->throw (
 		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_JOIN_SPECIFICATION_MISMATCH",
 		    params => {
-			TABLES => [ @select_tables ],
+			TABLES => [ @symbolic_select_tables ],
 			JOIN => [ @{$join} ],
 		    });
 	    }
 
 	    ### add join condition...
+
 	    my $join_index;
 	  JOIN_COLUMN:
-	    for (my $ii = 0; $ii < scalar(@select_tables); $ii++) {
+	    for (my $ii = 0; $ii < scalar(@symbolic_select_tables); $ii++) {
 		next JOIN_COLUMN if (! defined $join->[$ii]);
 		### $ii
 
 		# skip column if undef'd
 		if (defined $join_index) {
 		    # combine the current join column with the previous one
-		    my $left = $select_tables[$join_index] . '.' . $self->{schema}->get_column($join->[$join_index]);
-		    my $right = $select_tables[$ii] . '.' . $self->{schema}->get_column($join->[$ii]);
+		    
+		    # use alias if available, otherwise symbolic name
+		    my $left_table;
+		    if (exists $symbolic_select_tables[$join_index]->{ALIAS}) {
+			# use alias literally
+			$left_table = $symbolic_select_tables[$join_index]->{ALIAS};
+		    } else {
+			# map symbolic name to real table name
+			$left_table = $self->{schema}->get_table_name(
+			    $symbolic_select_tables[$join_index]->{SYMBOLIC_NAME}
+			    );
+		    }
+
+		    my $right_table;
+		    if (exists $symbolic_select_tables[$ii]->{ALIAS}) {
+			# use alias literally
+			$right_table = $symbolic_select_tables[$ii]->{ALIAS};
+		    } else {
+			# map symbolic name to real table name
+			$right_table = $self->{schema}->get_table_name(
+			    $symbolic_select_tables[$ii]->{SYMBOLIC_NAME}
+			    );
+		    }
+		    
+		    my $left = 
+			$left_table 
+			. '.' 
+			. $self->{schema}->get_column($join->[$join_index]);
+
+		    my $right = 
+			$right_table 
+			. '.' 
+			. $self->{schema}->get_column($join->[$ii]);
+
 		    ### $left
 		    ### $right
-		    push @condition, $left . '=' . $right;
+		    push @conditions, $left . '=' . $right;
 		}
 		$join_index = $ii;
 	    }
 	}
     }
 
-    if (exists $keys->{PIVOT_COLUMN}) {
-	$pivot_column = $keys->{PIVOT_COLUMN};
-    }
 
-    foreach my $key (keys %compare)
-    {
-	next if (not exists $keys->{$key});
-	push @condition, $self->{schema}->get_column ($pivot_column) . " " . $compare{$key}." ?";
-	push @bind_values, $keys->{$key};
+    # sanity check: there must be a where clause
+    if (scalar(@select_list) == 0) {
+ 	OpenXPKI::Exception->throw (
+ 	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_COLUMNS_SELECTED",
+ 	    params  => {
+ 		TABLE  => $table_args,
+ 	    });
     }
     
-    foreach my $key ("KEY", "SERIAL")
+
+    # allow to override pivot columnn
+    if (exists $args->{PIVOT_COLUMN}) {
+	$pivot_column = $args->{PIVOT_COLUMN};
+    }
+
+    ###########################################################################
+    # build condition
+
+  OPERATOR:
+    foreach my $keyword (keys %operator_of)
     {
-	next if (not exists $keys->{$key});
-	push @condition, $self->{schema}->get_column ($pivot_column) . " = ?";
-	push @bind_values, $keys->{$key};
+	next OPERATOR if (! exists $args->{$keyword});
+	push @conditions, $self->{schema}->get_column ($pivot_column) . " " . $operator_of{$keyword} . " ?";
+	push @bind_values, $args->{$keyword};
     }
 
 
-    ## check dynamic parameters
-    
-    if ($keys->{DYNAMIC})
+  INDEX_MATCH:
+    foreach my $key (qw( KEY SERIAL ))
     {
-	foreach my $key (keys %{$keys->{DYNAMIC}})
+	next INDEX_MATCH if (! exists $args->{$key});
+	push @conditions, $self->{schema}->get_column($pivot_column) . " = ?";
+	push @bind_values, $args->{$key};
+    }
+
+
+    ###########################################################################
+    ## check dynamic conditions
+    if (exists $args->{DYNAMIC} && ref $args->{DYNAMIC} eq 'HASH')
+    {
+	foreach my $condition (keys %{$args->{DYNAMIC}})
 	{
-	    # for joins the key may be TABLE.COLUMN, otherwise we only
-	    # only get COLUMN
+	    # for joins the key may be SYMBOLIC_NAME.COLUMN or ALIAS.COLUMN, 
+	    # otherwise we only only get COLUMN
 	    # $dynamic_column always is set to COLUMN, $dynamic_table is
 	    # TABLE if available, otherwise undef
-	    my ($col, $tab) = $self->__get_schema_column_and_table($key);
+	    my ($col, $tab) = 
+		$self->__get_symbolic_column_and_table($condition);
 
-	    if (not $col)
+	    # leave alias as is, but map symbolic table name to real table name
+	    if (! exists $alias_map_of{$tab}) {
+		$tab = $self->{schema}->get_table_name($tab);
+	    }
+
+	    if (! $col)
 	    {
 		OpenXPKI::Exception->throw (
 		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_WRONG_COLUMN",
 		    params  => {
-			COLUMN => $key,
+			COLUMN => $condition,
 		    });
 	    }
 	    
+	    $col = $self->{schema}->get_column($col);
+
 	    my $expr;
 	    if (defined $tab) {
 		$expr = $tab . '.';
@@ -596,51 +716,60 @@ sub select
 	    } else {
 		$expr .= ' like ?';
 	    }
-	    push @condition, $expr;
-	    push @bind_values, $keys->{DYNAMIC}->{$key};
+	    push @conditions, $expr;
+	    push @bind_values, $args->{DYNAMIC}->{$condition};
 	} 
     }
     
-
-    # sanity check: there must be a where clause
-    if (scalar(@select_list) == 0) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_COLUMNS_SELECTED",
-	    params  => {
-		TABLE  => $table,
-	    });
-    }
-    
     # sanity check: there must be a condition
-    if (scalar(@condition) == 0) {
+    if (scalar(@conditions) == 0) {
 	OpenXPKI::Exception->throw (
 	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_WHERE_CLAUSE",
 	    params  => {
-		TABLE  => $table,
+		TABLE  => $table_args,
 	    });
     }
 
-    ## execute query
-    
-    my $query .= 'SELECT ' . join(', ', @select_list)
-	. ' FROM ' . join(', ', @select_tables)
-	. ' WHERE '
-	. join(' AND ', @condition);
 
-    if ($keys->{REVERSE})
+
+    ###########################################################################
+    # compose table specifications
+    my @table_specs;
+    foreach my $entry (@symbolic_select_tables) {
+	# real table name
+	my $table = $entry->{SQL_NAME};
+
+	if (exists $entry->{ALIAS}) {
+	    # aliased table
+	    $table = $entry->{SQL_NAME} . ' AS ' . $entry->{ALIAS};
+	}
+
+	push @table_specs, $table;
+    }
+
+    
+    ###########################################################################
+    ## execute query
+    my $query .= 'SELECT ' . join(', ', @select_list)
+	. ' FROM ' . join(', ', @table_specs)
+	. ' WHERE '
+	. join(' AND ', @conditions);
+
+    if ($args->{REVERSE})
     {
         $query .= ' ORDER BY ' . join(' DESC, ', @select_list) . ' DESC';
     } else {
         $query .= ' ORDER BY ' . join(', ', @select_list);
     }
 
+    ### $query
     $self->{DBH}->do_query (QUERY       => $query,
                             BIND_VALUES => \@bind_values,
-                            LIMIT       => $keys->{LIMIT});
+                            LIMIT       => $args->{LIMIT});
 
     ## build an array to return it
 
-    my @array = ();
+    my @result;
     my $sth = $self->{DBH}->get_sth();
     while ( (my $item =  $sth->fetchrow_arrayref) ) {
         my @tab = ();
@@ -655,12 +784,14 @@ sub select
                 push @tab, pack ("U0C*", unpack "C*", $item->[$i]);
             }
         }
-        push @array, [ @tab ];
+        push @result, [ @tab ];
     }
     $self->{DBH}->finish_sth();
 
-    return [ @array ];
+    return [ @result ];
 }
+
+
 1;
 __END__
 
@@ -779,22 +910,12 @@ contained in the string.
 Returns a two element array containing (first, second) if the string
 looks like 'first.second'.
 
-=head3 __get_schema_column_and_table
-
-Works similar to __get_symbolic_column_and_table but returns the
-schema column (and table if appropriate) for the specified argument.
-
 =head3 get_symbolic_query_columns
 
 Returns a list of symbolic column names for the specified query.
 If a single table is queried the method returns all table columns.
 If a join query is specified the method returns symbolic TABLE.COLUMN
 specifications for this particular query.
-
-=head3 get_schema_query_columns
-
-Works like get_symbolic_query_columns but returns the schema mapping
-for the specified query.
 
 
 =head3 select
@@ -822,21 +943,26 @@ will be mapped to ${TABLE}_SERIAL. Please note that a SERIAL is perhaps
 not a unique index in a table. Certificates with identical serials
 can be present in a table if they were issued by different CAs.
 
+=item * PIVOT_COLUMN
+
+optional, specifies the key column to apply the following filters on. Defaults
+to ${TABLE}_SERIAL.
+
 =item * FROM
 
-creates the SQL filter C<${FROM} <lt>= ${TABLE}_SERIAL>.
+creates the SQL filter C<${FROM} <lt>= PIVOT_COLUMN>.
 
 =item * TO
 
-creates the SQL filter C<${TABLE}_SERIAL <lt> ${FROM}>.
+creates the SQL filter C<PIVOT_COLUMN <lt>= ${FROM}>.
 
-=item * GREATER
+=item * GREATER_THAN
 
-creates the SQL filter C<${GREATER} <lt> ${TABLE}_SERIAL>.
+creates the SQL filter C<${GREATER} <lt> PIVOT_COLUMN>.
 
-=item * LOWER
+=item * LESS_THAN
 
-creates the SQL filter C<${TABLE}_SERIAL <lt> ${FROM}>.
+creates the SQL filter C<PIVOT_COLUMN <lt> ${FROM}>.
 
 =item * LIMIT
 
@@ -845,11 +971,6 @@ is the number of returned items.
 =item * REVERSE
 
 reverse the ordering of the results.
-
-=item * PIVOT_COLUMN
-
-optional, specifies the key column to apply above filters on. Defaults
-to table_SERIAL.
 
 =back
 
@@ -877,6 +998,23 @@ TABLE. If this is the case the following named parameters are also required:
 Array reference containing the exact specification of the columns to return.
 The scalars contained in the array ref should have the form TABLE.COLUMN,
 with table being one of the tables specified in the TABLES argument.
+
+In the common invocation mode, TABLE is an arrayref containing scalar
+table names. In this case the join uses these as table names. 
+
+Example:
+
+  TABLE => [ 'foo', 'bar' ]
+
+If you wish to reference one table more than once (e. g. for matching
+multiple tuples from one single table) you can assign a symbolic name
+to the table. In this case the TABLE arrayref should contain another 
+arrayref containing two entries, such as follows for the table 'bar'.
+
+Example:
+
+  TABLE => [ 'foo', [ bar => symbolic ] ]
+
 
 =item * JOIN
 
@@ -929,6 +1067,44 @@ This results in the following query:
  ORDER BY workflow.workflow_id, 
    workflow_context.workflow_context_key, 
    workflow_context.workflow_context_value
+
+=head4 Join example 2
+
+  $result = $dbi->select(
+    #          first table second table                          third table
+    TABLE => [ 'WORKFLOW', [ 'WORKFLOW_CONTEXT' => 'context1' ], [ 'WORKFLOW_CONTEXT' => 'context2' ] ],
+
+    # return these columns
+    COLUMNS => [ 'WORKFLOW.WORKFLOW_SERIAL', 'context1.WORKFLOW_CONTEXT_VALUE', 'context2.WORKFLOW_CONTEXT_VALUE' ],
+    
+    JOIN => [
+	#  on first table     second table       third
+	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    ],
+    DYNAMIC => {
+	'context1.WORKFLOW_CONTEXT_KEY' => 'somekey-5',
+	'context1.WORKFLOW_CONTEXT_VALUE' => 'somevalue: 100045',
+	'context2.WORKFLOW_CONTEXT_KEY' => 'somekey-7',
+	'context2.WORKFLOW_CONTEXT_VALUE' => 'somevalue: 100047',
+    },
+    );
+
+This results in the following query:
+
+ SELECT 
+    workflow.workflow_id, 
+    context1.workflow_context_value 
+    context2.workflow_context_value 
+ FROM workflow, workflow_context as context1, workflow_context as context2
+ WHERE workflow.workflow_id=context1.workflow_id 
+   AND context1.workflow_id=context2.workflow_id 
+   AND context1.workflow_context_key like ?
+   AND context1.workflow_context_value like ?
+   AND context2.workflow_context_key like ?
+   AND context2.workflow_context_value like ?
+ ORDER BY workflow.workflow_id, 
+   context1.workflow_context_value, 
+   context2.workflow_context_value
 
 
 =head1 See also

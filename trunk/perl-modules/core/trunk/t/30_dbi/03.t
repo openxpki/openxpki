@@ -3,7 +3,7 @@ use warnings;
 use Test;
 use DateTime;
 
-BEGIN { plan tests => 12 };
+BEGIN { plan tests => 16 };
 
 print STDERR "OpenXPKI::Server::DBI: Queries with constraints and joins\n";
 
@@ -120,5 +120,49 @@ $result = $dbi->select(
 ok(scalar @{$result}, 10);
 ok($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
 ok($result->[9]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100049');
+
+
+###########################################################################
+# test aliases table names
+
+# SELECT 
+#    workflow.workflow_id, 
+#    context1.workflow_context_value 
+#    context2.workflow_context_value 
+# FROM workflow, workflow_context as context1, workflow_context as context2
+# WHERE workflow.workflow_id=context1.workflow_id 
+#   AND context1.workflow_id=context2.workflow_id 
+#   AND context1.workflow_context_key like ?
+#   AND context1.workflow_context_value like ?
+#   AND context2.workflow_context_key like ?
+#   AND context2.workflow_context_value like ?
+# ORDER BY workflow.workflow_id, 
+#   context1.workflow_context_value, 
+#   context2.workflow_context_value
+$result = $dbi->select(
+    #          first table second table                          third table
+    TABLE => [ 'WORKFLOW', [ 'WORKFLOW_CONTEXT' => 'context1' ], [ 'WORKFLOW_CONTEXT' => 'context2' ] ],
+
+    # return these columns
+    COLUMNS => [ 'WORKFLOW.WORKFLOW_SERIAL', 'context1.WORKFLOW_CONTEXT_VALUE', 'context2.WORKFLOW_CONTEXT_VALUE' ],
+    
+    JOIN => [
+	#  on first table     second table       third
+	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    ],
+    DYNAMIC => {
+	'context1.WORKFLOW_CONTEXT_KEY' => 'somekey-5',
+	'context1.WORKFLOW_CONTEXT_VALUE' => 'somevalue: 100045',
+	'context2.WORKFLOW_CONTEXT_KEY' => 'somekey-7',
+	'context2.WORKFLOW_CONTEXT_VALUE' => 'somevalue: 100047',
+    },
+    );
+
+### $result
+
+ok(scalar @{$result}, 1);
+ok($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
+ok($result->[0]->{'context1.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100045');
+ok($result->[0]->{'context2.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100047');
 
 1;

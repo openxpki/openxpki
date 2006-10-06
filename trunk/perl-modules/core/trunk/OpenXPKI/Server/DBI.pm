@@ -343,7 +343,7 @@ sub next
 {
     my $self = shift;
     my $keys = { @_ };
-    my $result = $self->select (GREATER => $self->__extract_serial_from_params($keys),
+    my $result = $self->select (GREATER_THAN => $self->__extract_serial_from_params($keys),
                                 %{$keys}, LIMIT => 1);
     return if (not defined $result);
     return $result->[0];
@@ -353,7 +353,7 @@ sub prev
 {
     my $self = shift;
     my $keys = { @_ };
-    my $result = $self->select (LOWER => $self->__extract_serial_from_params($keys),
+    my $result = $self->select (LESS_THAN => $self->__extract_serial_from_params($keys),
                                 %{$keys}, LIMIT => 1, REVERSE => 1);
     return if (not defined $result);
     return $result->[0];
