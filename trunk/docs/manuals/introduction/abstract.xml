@@ -2,7 +2,7 @@
 <sect1 id="intro_abstract">
   <title>Abstract</title>
   <para>
-This manual aims to describe the installation und use of the &openxpki; software, an open source trustcenter solution written by The OpenXPKI Project. The indented audience are CA administrators and operators. Currently we do not have an end-user manual available, but help for the user should instead become part of the web interface.
+This manual aims to describe the installation und use of the &openxpki; software, an open source trustcenter solution written by The OpenXPKI Project. The intended audience are CA administrators and operators. We assume that readers are familiar working on a Unix shell and have enough background knowledge about Public Key Infrastructures to understand the relevant terms. Currently we do not have an end-user manual available, but help for the user should instead become part of the web interface.
   </para>
   <para>
 The OpenXPKI manual is split into four main parts:
