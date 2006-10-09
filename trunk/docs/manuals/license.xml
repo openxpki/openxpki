@@ -7,5 +7,15 @@ the documentation and wonder what the license is.
 OpenXPKI is Apache v2 (or later?)
 Documentation is GNU FDL
 -->
-  <para></para>
+  <para>Permission is granted to copy, distribute and/or modify this
+      document under the terms of the GNU Free Documentation License,
+      Version 1.2;
+<!-- or any later version published by the Free Software Foundation 
+TODO: do we really want this? -->
+      with no Invariant Sections, no Front-Cover Texts and
+      no Back-Cover Texts.  A copy of the license is included in the
+      section entitled "GNU Free Documentation License".
+<!-- TODO: do we want any Invariant sections, Front-Cover Texts, Back-Cover Texts? -->
+</para>
+<para>OpenXPKI itself is released unter the Apache License, Version 2.0, a BSD-style open source license which gives you a lot of freedom in modifying and distributing OpenXPKI. A copy of the license is included in the section entitled "Apache License"</para>
 </chapter>

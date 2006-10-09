@@ -26,7 +26,9 @@
   <!ENTITY ref_administration  SYSTEM "reference/administration.xml">
   <!ENTITY ref_deployment      SYSTEM "reference/deployment.xml">
   <!ENTITY ref_troubleshooting SYSTEM "reference/troubleshooting.xml">
-<!ENTITY glossary     SYSTEM "glossary.xml">
+<!ENTITY glossary       SYSTEM "glossary.xml">
+<!ENTITY gfdl           SYSTEM "gfdl.xml">
+<!ENTITY apache_license SYSTEM "apache_license.xml">
 ]>
 
 <book>
@@ -69,4 +71,6 @@
   &workflow;
   &reference;
   &glossary;
+  &gfdl;
+  &apache_license;
 </book>
