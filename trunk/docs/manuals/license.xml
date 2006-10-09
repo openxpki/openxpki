@@ -14,8 +14,10 @@ Documentation is GNU FDL
 TODO: do we really want this? -->
       with no Invariant Sections, no Front-Cover Texts and
       no Back-Cover Texts.  A copy of the license is included in the
-      section entitled "GNU Free Documentation License".
+      section entitled <quote>GNU Free Documentation License</quote>.
 <!-- TODO: do we want any Invariant sections, Front-Cover Texts, Back-Cover Texts? -->
 </para>
-<para>OpenXPKI itself is released unter the Apache License, Version 2.0, a BSD-style open source license which gives you a lot of freedom in modifying and distributing OpenXPKI. A copy of the license is included in the section entitled "Apache License"</para>
+<para>&openxpki; itself is released unter the Apache License, Version 2.0,
+<!-- TODO: here again, the "or later" discussion -->
+ a BSD-style open source license which gives you a lot of freedom in modifying and distributing &openxpki;. A copy of the license is included in the section entitled <quote>Apache License</quote></para>
 </chapter>

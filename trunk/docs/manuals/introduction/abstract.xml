@@ -1,7 +1,72 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <sect1 id="intro_abstract">
   <title>Abstract</title>
-  <para></para>
-<!-- what is this document all about, what is OpenXPKI, why would
-you want to use it, ... aka "the executive summary" :-) -->
+  <para>
+This manual aims to describe the installation und use of the &openxpki; software, an open source trustcenter solution written by The OpenXPKI Project. The indented audience are CA administrators and operators. Currently we do not have an end-user manual available, but help for the user should instead become part of the web interface.
+  </para>
+  <para>
+The OpenXPKI manual is split into four main parts:
+<orderedlist>
+  <listitem>The introduction, which you are reading right now. Following this abstract, you will learn more about where to get the software, where to get help. Furthermore, a high-level overview of the system design and some key concepts will be presented.</listitem>
+  <listitem>The <quote>Quick Start</quote> chapter lays the emphasis on getting a minimal Certificate Authority (CA) without any bells and whistles running. Reference to further configuration options is provided inline, so that you know where to look if you want to configure more advanced features. Please note that setting up a working CA is a complex task and thus the <quote>quick</quote> in <quote>quick start</quote> may be a bit euphemistic.</listitem>
+  <listitem>Following the quick start, more information on the workflow engine and the pre-defined workflows is given. This section also provides help if you are looking for information on implementing your own custom workflow.</listitem>
+  <listitem>The last chapter is called <quote>Reference</quote> and provides just that &ndash; information on all of the various configuration options concerning databases, cryptographic settings, workflows and access control, manuals for the various administrative and deployment tools as well as some information on where to look if something goes wrong.</listitem>
+</orderedlist>
+</para>
+  <sect2 id="intro_abstract_features">
+    <title>Key features</title>
+    <para>Assuming this is your first contact with &openxpki; here is a quick summary of what it is and what it is capable of.</para>
+    <para>&openxpki; aims to be an enterprise-scale Public Key Infrastructure (PKI) solution, supporting well established infrastructure components like RDBMS and Hardware Security Modules (HSMs). It is the successor of <application class="software">OpenCA</application>,
+and builds on the experience gained while developing it.
+<itemizedlist>
+<listitem>CA rollover: <quote>Normal</quote> trust center software usually does not account for the installment of a new CA certificate, thus if the CA certificate becomes invalid, a complete re-deployment has to be undertaken. OpenXPKI solves this problem by automatically deciding which CA certificate to use at a certain point in time.</listitem>
+<listitem>Support for multiple so-called <quote>PKI realms</quote>:
+                   Different CA instances can be run in a single
+                   installation without any interaction between them,
+                   so one machine can be used for different CAs.
+</listitem>
+<listitem>Private key support both in hardware and software:
+                   OpenXPKI has support for professional Hardware
+                   Security Modules such as the nCipher nShield or
+                   the Chrysalis-ITS Luna CA modules. If such modules
+                   are not available, access to a key can be protected
+                   by using a threshold secret sharing algorithm.
+</listitem>
+<listitem>Professional database support:
+                   The user can choose from a range of database
+                   backends, including commercial ones such as
+                   Oracle or DB2, which are typically used in
+                   enterprise scenarios.
+</listitem>
+<listitem>Many different interfaces to the server:
+                   Currently, one can access the CA server using
+                   a web-interface (which also allows for client-side
+                   request generation using SPKAC) or using a command
+                   line client. Embedded devices such as routers can
+                   use the Simple Certificate Enrollment Protocol (SCEP)
+                   to talk to the server and apply for certificates.
+</listitem>
+<listitem>Workflow Engine:
+                   OpenXPKI aims to be extremly customizable by allowing
+                   the definition of workflows for any process you can
+                   think of in the PKI area. Typical workflows such as
+                   editing and approving certificate signing requests,
+                   certificate and CRL issuance are already implemented.
+                   Implementing your own idea is normally pretty easy
+                   by defining a workflow in XML and (maybe) implementing
+                   a few lines in Perl.
+</listitem>
+<listitem>I18N: Localization of the application and interfaces is
+                   easily possible and OpenXPKI can of course deal
+                   with the whole range of Unicode characters in
+                   certificates.
+</listitem>
+<listitem>Self-Service application for token personalization:
+                   A web application which allows a
+                   user to easily create and install certificates to
+                   a smartcard is available.
+</listitem>
+</itemizedlist>
+    </para>
+   </sect2>
 </sect1>

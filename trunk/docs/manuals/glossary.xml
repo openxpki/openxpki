@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <chapter id="glossary">
-  <title>Glossary</title>
-  <para></para>
+  <glossary>
+    <title>Glossary</title>
+
+  </glossary>
 </chapter>

@@ -29,11 +29,14 @@
 <!ENTITY glossary       SYSTEM "glossary.xml">
 <!ENTITY gfdl           SYSTEM "gfdl.xml">
 <!ENTITY apache_license SYSTEM "apache_license.xml">
+
+<!ENTITY openxpki "<application class='software'>OpenXPKI</application>">
+<!ENTITY openxpki_project "The OpenXPKI Project">
 ]>
 
 <book>
   <bookinfo>
-    <title>OpenXPKI Manual</title>
+    <title>&openxpki; Manual</title>
 
     <authorgroup>
       <author>
@@ -60,7 +63,7 @@
     </authorgroup>
     <copyright>
        <year>2006</year>
-       <holder>The OpenXPKI Project</holder>
+       <holder>&openxpki_project;</holder>
     </copyright>
     <releaseinfo>$Id$</releaseinfo>
   </bookinfo>
