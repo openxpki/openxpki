@@ -100,6 +100,7 @@ sub set_language
     #delete $ENV{LC_MESSAGES};
     #delete $ENV{LC_TIME};
     delete $ENV{LANGUAGE};    ## known from Debian
+    nl_putenv("LANGUAGE=$language");
 
     if ($language eq "C" or $language eq "")
     {
