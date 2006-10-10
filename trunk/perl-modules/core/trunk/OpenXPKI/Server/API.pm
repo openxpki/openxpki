@@ -224,7 +224,7 @@ sub BUILD {
             class  => 'Workflow',
             params => {
                 CONTEXT => {
-                    type => HASHREF,
+                    type => ARRAYREF,
                 },
                 TYPE => {
                     type     => SCALAR,

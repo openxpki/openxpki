@@ -323,41 +323,68 @@ sub search_workflow_instances {
     my $arg_ref  = shift;
 
     my $dbi = CTX('dbi_workflow');
+    my $realm = CTX('session')->get_pki_realm();
 
-    if (exists $arg_ref->{CONTEXT}) {
-
-        my $key   = $arg_ref->{CONTEXT}->{KEY};
-        my $value = $arg_ref->{CONTEXT}->{VALUE};
-        my $realm = CTX('session')->get_pki_realm();
-	
-        my $dynamic = {
-	    $context_table . '.WORKFLOW_CONTEXT_KEY'    => $key,
-	    $context_table . '.WORKFLOW_CONTEXT_VALUE'  => $value,
-            $workflow_table .'.PKI_REALM'               => $realm,
-	};
-
-        if (defined $arg_ref->{TYPE}) {
-            $dynamic->{$workflow_table . '.WORKFLOW_TYPE'} = $arg_ref->{TYPE};
-        }
-
-        ##! 16: 'dynamic: ' . Dumper $dynamic
-	my $result = $dbi->select(
-	    TABLE   => [ $context_table, $workflow_table ],
-            COLUMNS => [
-                         $context_table. '.WORKFLOW_SERIAL',
-                       ],
-            JOIN    => [
-                         ['WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
-                       ],
-	    DYNAMIC => $dynamic,
-	);
-        ##! 16: 'result: ' . Dumper $result
-        my @return = map { $_->{$context_table.'.WORKFLOW_SERIAL'} } @{$result};
-        ##! 16: 'return: ' . Dumper \@return
-
-	return \@return;
+    if (scalar @{$arg_ref->{CONTEXT}} == 0) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY',
+        );
     }
-    return;
+    my $dynamic;
+    my @tables;
+    my @joins;
+    ## create complex select structures, similar to the following:
+    # $dbi->select(
+    #    TABLE    => [ { WORKFLOW_CONTEXT => WORKFLOW_CONTEXT_0},
+    #                  { WORKFLOW_CONTEXT => WORKFLOW_CONTEXT_1},
+    #                  WORKFLOW
+    #                ],
+    #    COLUMNS   => ...
+    #    JOIN      => [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    #    DYNAMIC   => {
+    #                   WORKFLOW_CONTEXT_0.WORKFLOW_CONTEXT_KEY = $key1,
+    #                   WORKFLOW_CONTEXT_0.WORKFLOW_CONTEXT_VALUE = $value1,
+    #                   WORKFLOW_CONTEXT_1.WORKFLOW_CONTEXT_KEY = $key2,
+    #                   WORKFLOW_CONTEXT_1.WORKFLOW_CONTEXT_VALUE = $value2,
+    #                   WORKFLOW.PKI_REALM = $realm,
+    #                 },
+    # );
+    my $i = 0;
+    foreach my $context_entry (@{$arg_ref->{CONTEXT}}) {
+        my $table_alias = $context_table . '_' . $i;
+        my $key   = $context_entry->{KEY};
+        my $value = $context_entry->{VALUE};
+        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_KEY'}   = $key;
+        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_VALUE'} = $value;
+        push @tables, [ $context_table => $table_alias ];
+        push @joins, 'WORKFLOW_SERIAL';
+        $i++;
+    }
+    push @tables, $workflow_table;
+    push @joins, 'WORKFLOW_SERIAL';
+    $dynamic->{$workflow_table . '.PKI_REALM'} = $realm;
+
+    if (defined $arg_ref->{TYPE}) {
+        $dynamic->{$workflow_table . '.WORKFLOW_TYPE'} = $arg_ref->{TYPE};
+    }
+
+    ##! 16: 'dynamic: ' . Dumper $dynamic
+    ##! 16: 'tables: ' . Dumper(\@tables)
+    my $result = $dbi->select(
+	TABLE   => \@tables,
+        COLUMNS => [
+                         $workflow_table . '.WORKFLOW_SERIAL',
+                         $workflow_table . '.WORKFLOW_TYPE',
+                         $workflow_table . '.WORKFLOW_STATE',
+                         $workflow_table . '.WORKFLOW_LAST_UPDATE',
+                   ],
+        JOIN    => [
+                         \@joins,
+                   ],
+	DYNAMIC => $dynamic,
+    );
+    ##! 16: 'result: ' . Dumper $result
+    return $result;
 }
  
 ###########################################################################
@@ -561,8 +588,7 @@ Return structure:
 This function accesses the database directly in order to find
 Workflow instances matching the specified search criteria.
 
-Returns an array of the workflow instance IDs matching the
-query.
+Returns an array reference of the database query result.
 
 Named parameters:
 

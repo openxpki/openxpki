@@ -30,6 +30,7 @@
                     "ra_op_menu" =>
                     [
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr"],
+#                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",     "workflow"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE", "dataexchange"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",     "language"],
@@ -51,6 +52,8 @@
                                     "workflow_create_instance"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES",
                                    "workflow_list_instances"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_SEARCH_INSTANCES",
+                                   "workflow_search_instances"],
                     ],
                     "dataexchange" =>
                     [
@@ -81,6 +84,10 @@
                     {
                         CMD => "service/create_csr/index.html"
                     },
+#                    "smartcard_personalization" =>
+#                    {
+#                        CMD => "service/smartcard_personalization/index.html"
+#                    },
                     "workflow_list_types" =>
                     {
                         CMD => "service/workflow/list_types.html"
@@ -94,6 +101,10 @@
                     "workflow_create_instance" =>
                      {
                          CMD => "service/workflow/create_instance.html"
+                     },
+                    'workflow_search_instances' =>
+                     {
+                         CMD => 'service/workflow/search_instances.html'
                      },
                     "dataexchange_export" =>
                     {

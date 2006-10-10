@@ -80,13 +80,16 @@ sub __pkcs_req : PRIVATE {
 
     ##! 16: "transaction ID: $transaction_id"
     # get workflow instance IDs corresponding to transaction ID
-    my @workflow_ids = $api->search_workflow_instances({
-            CONTEXT =>
-            {
-                KEY   => 'SCEP_TID',
-                VALUE => $transaction_id,
-            },
+    my $workflows = $api->search_workflow_instances({
+            CONTEXT => [
+                {
+                    KEY   => 'SCEP_TID',
+                    VALUE => $transaction_id,
+                },
+            ],
     });
+    my @workflow_ids = map { $_->{'WORKFLOW_CONTEXT.WORKFLOW_SERIAL'} } @{$workflows};
+    # TODO: check if this works as before
     
     if (defined @workflow_ids) { # query status of workflow(s)
         ##! 16: "at least one workflow was found"

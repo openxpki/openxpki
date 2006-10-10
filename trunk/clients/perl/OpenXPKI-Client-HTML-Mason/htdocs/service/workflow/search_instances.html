@@ -1,0 +1,119 @@
+<%args>
+    $type          => undef
+    $context_key   => undef
+    $context_value => undef
+</%args>
+<%init>
+    my @search_context;
+    if (defined $context_key && defined $context_value) {
+        for (my $i = 0; $i < scalar @{$context_key}; $i++) {
+            if ($context_key->[$i] ne '') {
+                push @search_context, {
+                    KEY   => $context_key->[$i],
+                    VALUE => $context_value->[$i],
+                };
+            }
+        }
+    }
+</%init>
+%   my $msg;
+%   if (scalar @search_context > 0 && defined $type && $type ne '') {
+%     $msg = $context->{client}->send_receive_command_msg
+%               (
+%                   "search_workflow_instances",
+%                    {
+%                         CONTEXT => \@search_context,
+%                         TYPE    => $type,
+%                    },
+%               );
+%   }
+%   elsif (scalar @search_context > 0 && (!defined $type || $type eq '')) {
+%     $msg = $context->{client}->send_receive_command_msg
+%               (
+%                   "search_workflow_instances",
+%                    {
+%                         CONTEXT => \@search_context,
+%                    },
+%               );
+%   }
+%   if (defined $msg) { # SEARCH RESULT
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_TITLE') %></h1>
+<p>
+<!--
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION') %>
+-->
+</p>
+<table>
+  <tr>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></th>
+  </tr>
+%   foreach my $instance (@{$msg->{PARAMS}})
+%   {
+  <tr>
+    <td><% i18nGettext($instance->{'WORKFLOW.WORKFLOW_TYPE'}) %></td>
+    <td><a href="show_instance.html?type=<% $instance->{'WORKFLOW.WORKFLOW_TYPE'} %>;id=<% $instance->{'WORKFLOW.WORKFLOW_SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $instance->{'WORKFLOW.WORKFLOW_SERIAL'} %></a></td>
+    <td><% i18nGettext($instance->{'WORKFLOW.WORKFLOW_STATE'}) %></td>
+    <td><% $instance->{'WORKFLOW.WORKFLOW_LAST_UPDATE'} %></td>
+  </tr>
+%   } # END FOREACH
+% } # END IF
+% else { # SEARCH FORM
+%        #### TODO: get all possible context keys (for type) from DB
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_DESCRIPTION') %>
+</p>
+<& /service/open_form.mhtml &>
+%   my $msg = $context->{client}->send_receive_command_msg ("list_workflow_titles");
+</select>
+<table>
+  <!-- TODO: input field for types -->
+  <tr>
+    <td>
+       <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE') %>
+    </td>
+    <td>
+      <select name="type">
+      <option value=""><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE_ANY') %></option>
+%   foreach my $type (keys %{$msg->{PARAMS}}) {
+      <option value="<% $type %>"><% i18nGettext($type) %></option>
+%   }
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_KEY') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_VALUE') %></th>
+  </tr>
+  <tr>
+    <td><& /lib/html/input.mhtml, 'name' => "context_key" &></td>
+    <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
+  </tr>
+  <tr>
+    <td><& /lib/html/input.mhtml, 'name' => "context_key" &></td>
+    <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
+  </tr>
+  <tr>
+    <td><& /lib/html/input.mhtml, 'name' => "context_key" &></td>
+    <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
+  </tr>
+  <tr>
+    <td><& /lib/html/input.mhtml, 'name' => "context_key" &></td>
+    <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
+  </tr>
+  <tr>
+    <td><& /lib/html/input.mhtml, 'name' => "context_key" &></td>
+    <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
+  </tr>
+<td>
+</table>
+<p>
+<& /service/send_form.mhtml &></td>
+<& /service/close_form.mhtml &>
+% }
+
+</table>

@@ -545,6 +545,7 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWD"
 msgstr "Password"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10"
 msgstr "PKCS#10"
 
@@ -673,8 +674,35 @@ msgstr "You can see now the available types of workflows."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_TITLE"
 msgstr "Workflow types"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_PKCS10"
 msgstr "PKCS#10"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_DESCRIPTION"
+msgstr ""
+"Please enter your search query for workflow context keys and values. SQL "
+"wildcards such as % can be used."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_KEY"
+msgstr "Key"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_TITLE"
+msgstr "Search workflow instances"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_VALUE"
+msgstr "Value"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION"
+msgstr "Search results:"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_TITLE"
+msgstr "Search results"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE"
+msgstr "Workflow type"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE_ANY"
+msgstr "any"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL"
 msgstr "Workflow serial"
@@ -690,6 +718,14 @@ msgstr "Workflow instance"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SPKAC"
 msgstr "SPKAC"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_START_EXPORT_DESCRIPTION"
+msgstr "Destination of export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_START_EXPORT_TITLE"
+msgstr "Destination of export"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE"
 msgstr "Workflow state"
@@ -759,8 +795,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
 msgstr ""
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED"
-msgstr ""
+msgstr "Additional informations"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT"
 msgstr ""
@@ -1032,14 +1069,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_OUTPUT_FORMAT"
 msgstr ""
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKCS10_MISSING_DATA"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKCS10_MISSING_OUTPUT_FORMAT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKCS10_WRONG_OUTPUT_FORMAT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_KEYFILE_DOES_NOT_EXIST"
 msgstr ""
@@ -1080,32 +1120,41 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_KEY_LENGTH"
 msgstr ""
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEY"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEYFILE"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_SUBJECT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_EMPTY_PASSWD"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_MISSING_CERT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_MISSING_KEY"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_MISSING_PASSWD"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_PASSWD_TOO_SHORT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RANDOM_EMPTY"
 msgstr ""
@@ -1152,63 +1201,81 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_XS"
 msgstr ""
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_CERT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_KEY"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_PASSWD"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_PASSWD_OR_KEY"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_PKCS7"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_MISSING_CERT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_MISSING_CONTENT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_WRONG_ENC_ALG"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_PKCS7"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_SIGNER"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_WRONG_SIGNER"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CERT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CONTENT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_PASSWD"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_PASSWD_OR_KEY"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_CHAIN"
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_CONTENT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_PKCS7"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_SYMMETRIC_CIPHER_ILLEGAL_IV"
 msgstr ""
@@ -1273,11 +1340,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_UNKNOWN_TYPE"
 msgstr ""
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_PKCS7_NEW_MISSING_DATA"
 msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_PKCS7_NEW_MISSING_TOKEN"
 msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 msgid "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_AUTOLOAD_ILLEGAL_FUNCTION"
 msgstr ""
@@ -1382,6 +1455,10 @@ msgstr ""
 "with the new DC-style looks like this: cn=John Doe, dc=OpenXPKI, dc=DE. The "
 "advantage is that we can use now the more correct name: cn=John Doe, "
 "dc=OpenXPKI, dc=org. We have no longer to use a country."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_NOT_YET_IMPLEMENTED"
+msgstr "New Request (CSR)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_QUORUM_MISSING"
@@ -1498,14 +1575,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_MISSING_TOKEN"
 msgstr ""
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_CONVERSION_FAILED"
-msgstr ""
+msgstr "The used suject style does not allow the use of an organization."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_MISSING_FORMAT"
-msgstr ""
+msgstr "SPKAC"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_WRONG_FORMAT"
-msgstr ""
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_X509_GET_IDENTIFIER_NOT_INITIALIZED"
@@ -1515,14 +1595,21 @@ msgstr "The used suject style does not allow the use of an organization."
 msgid "I18N_OPENXPKI_CRYPTO_X509_GET_STATUS_NOT_INITIALIZED"
 msgstr "The used suject style does not allow the use of an organization."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_X509_INIT_OBJECT_FAILED"
-msgstr ""
+msgstr "The used suject style does not allow the use of an organization."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_X509_NEW_MISSING_DATA"
 msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_X509_NEW_MISSING_TOKEN"
 msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 msgid "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_DATE"
 msgstr ""
@@ -1537,10 +1624,6 @@ msgid "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT"
 msgstr ""
 
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA"
-msgstr "Test Dummy CA"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA\n"
 msgstr "Test Dummy CA"
 
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA"
@@ -1599,6 +1682,10 @@ msgstr "Deutsch"
 #, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_WRITE_FILE_OPEN_FAILED"
 msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_FOO_BAR"
+msgstr "User profile"
 
 msgid "I18N_OPENXPKI_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST"
 msgstr ""
@@ -1672,8 +1759,13 @@ msgstr "Fax number"
 msgid "I18N_OPENXPKI_HTML_FAX_NUMBER_DESCRIPTION"
 msgstr "The field contains a normal fax number."
 
-msgid "I18N_OPENXPKI_HTML_GET_PROCESS_INFO"
-msgstr "Get a graphical workflow instance overview"
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
+msgstr "List instances"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
+msgstr "Print informations"
 
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "New Request (CSR)"
@@ -1699,6 +1791,9 @@ msgstr "Logout"
 msgid "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS"
 msgstr "Revoked"
 
+msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
+msgstr "Smartcard personalization"
+
 msgid "I18N_OPENXPKI_HTML_MENU_VALID_CERTS"
 msgstr "Valid"
 
@@ -1713,6 +1808,9 @@ msgstr "List instances"
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES"
 msgstr "List types"
+
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_SEARCH_INSTANCES"
+msgstr "Search instances"
 
 msgid "I18N_OPENXPKI_HTML_ORGANIZATION"
 msgstr "Organization"
@@ -1734,6 +1832,22 @@ msgstr ""
 msgid "I18N_OPENXPKI_HTML_PRINT_BUTTON"
 msgstr "Print informations"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_CREATE_IE_CSR"
+msgstr "New Request (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_FAILURE_ISSUANCE_IMPOSSIBLE"
+msgstr "Initializing ..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_INTRO_TEXT"
+msgstr "CSR with OU-style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_TITLE"
+msgstr "CSR with DC-style"
+
 msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER"
 msgstr "Telephone number"
 
@@ -1748,6 +1862,10 @@ msgstr ""
 "The Unique IDentifier (UID) is usually used to place accounts or other "
 "serial numbers into a distinguished name (DN) to associate it safely to a "
 "person or an object."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_MODULE_FUNCTION_SPECIFIC_STUFF"
+msgstr "Persist CSR"
 
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""
@@ -1787,6 +1905,16 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_LOAD_SERVER_DUPLICATE_ID_FOUND"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_ACL_CHECK_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_ILLEGAL_PARAM"
@@ -1846,6 +1974,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_MISSING_WORKFLOW_CONFIGURATION"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_INVALID_METHOD_CALLED"
+msgstr "The SPKAC string is empty."
+
 msgid "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER"
 msgstr ""
 
@@ -1856,23 +1988,24 @@ msgid "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_GET_PROCESS_INFO_DOT_FAILED"
+msgid "I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_INVALID_PARAMETER"
-msgstr "The SPKAC string is empty."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_INVALID_PARAMETER"
-msgstr "The SPKAC string is empty."
+msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_GET_WORKFLOW_INFO_DOT_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
+
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
+msgstr "At least one context entry is needed."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED"
 msgstr ""
@@ -1991,17 +2124,23 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_ROLLBACK_FAILED"
 msgstr ""
 
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_DB2_DROP_SEQUENCE_NOT_FORCED"
 msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_DB2_GET_DSN_NO_DATABASE_NAME"
-msgstr ""
+msgstr "The used suject style does not allow the use of an organization."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_DB2_GET_NEW_SERIAL_FAILED"
-msgstr ""
+msgstr "The used suject style does not allow the use of an organization."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_DB2_GET_NEW_SERIAL_NO_TABLE"
-msgstr ""
+msgstr "The used suject style does not allow the use of an organization."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_GET_ABSTRACT_COLUMN_TYPE_UNKNOWN_NAME"
 msgstr ""
@@ -2106,19 +2245,29 @@ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_TABLE_NOT_FORCED"
 msgstr "The used suject style does not allow the use of an organization."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SYMBOLIC_QUERY_COLUMNS_MISSING_COLUMNS"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_ALIAS_NOT_UNIQUE"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_NUMBER_OF_SYMBOLIC_TABLE_ENTRIES"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_TABLE_SPECIFICATION"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_JOIN_SPECIFICATION_MISMATCH"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_COLUMNS"
 msgstr "The used suject style does not allow the use of an organization."
 
 #, fuzzy
@@ -2163,8 +2312,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_TOKEN"
 msgstr ""
 
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_INIT_I18N_MISSING_CONFIG"
-msgstr ""
+msgstr "uid"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_INIT_NO_IDENTIFIER_FOUND_IN_ALIASES_DB"
@@ -2192,6 +2342,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_LOG_EMPTY_LOG_MESSAGE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_LOG_NEW_LOG4PERL_INIT_FAILED"
+msgstr "The used suject style does not allow the use of an organization."
 
 msgid "I18N_OPENXPKI_SERVER_LOG_NEW_MISSING_LOGGER"
 msgstr ""
@@ -2221,6 +2375,28 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTISSUANCE_IMPORTCERTDATA_INVALID_CSR_TYPE"
+msgstr "Certificates"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTREQUEST_PERSISTREQUEST_SOURCES_UNDEFINED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTREQUEST_PERSISTREQUEST_SUBJECT_ALT_NAME_SOURCE_UNDEFINED"
+msgstr ""
+"The GUID __GUID__ is not a valid Microsoft GUID and not a valid RFC 4122 "
+"UUID."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_CLEANUP_RMTREE_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -2234,6 +2410,12 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_MKDIR_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_UNLINK_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
@@ -2299,6 +2481,36 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_BIND_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_CONNECTION_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_SEARCH_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_MORE_THAN_ONE_LDAP_ENTRY_FOUND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MKDIR_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -2345,6 +2557,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ACL_NO_ACTIVITY"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
+msgstr "The value of a subject alternative name field is missing."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVED_MISSING_APPROVAL"
 msgstr "The value of a subject alternative name field is missing."
 
@@ -2366,6 +2582,22 @@ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_NOT_ALL_REQUIRED_PARAMS_PRESENT"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_MORE_CSRS_TO_CREATE"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_NO_MORE_CSRS_TO_CREATE"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
@@ -2456,6 +2688,7 @@ msgstr "The SPKAC string is empty."
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
 msgstr "The SPKAC string is empty."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_BASE64"
 msgstr "The submitted SPKAC data is not correctly base 64 encoded."
 
@@ -2476,9 +2709,6 @@ msgid "I18N_OPENXPKI_SERVICE_COLLECT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT "
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_IMPL_INSTANTIATE_FAILED"
@@ -2686,8 +2916,9 @@ msgstr "Common name"
 msgid "I18N_OPENXPKI_TOOLKIT_TEMPORARY_DIRECTORY_UNAVAILABLE"
 msgstr "Trustcenter Web Interface"
 
-msgid "I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_TRANSPORT"
+msgstr "Organizational Unit"
 
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_NEW_OPEN_INFILE_FAILED"
 msgstr ""
@@ -2761,9 +2992,6 @@ msgstr "Import workflow instances"
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
 msgstr "Prepare environment"
 
-msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
-msgstr "Determine issuing CA"
-
 msgid "I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
 msgstr "Execute the CSR"
 
@@ -2788,11 +3016,44 @@ msgstr "Wait for other workflow instance"
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr ""
 
-# only in documentation
-msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
-msgstr "Unlock CA key"
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTIVITY_CREATE_CSR"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTIVITY_DETERMINE_ISSUING_CA"
+msgstr "Determine issuing CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTIVITY_DO_NOTHING"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTIVITY_GET_CERT_PROFILE"
+msgstr "Change certificate profile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTIVITY_IMPORT"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTIVITY_ISSUE_CERTIFICATE"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTIVITY_PERSIST_CERTIFICATE"
+msgstr "Persist CSR"
 
 msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
+msgstr "Sleep"
+
+# only in documentation
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTIVITY_UNLOCK_CA_KEY"
+msgstr "Unlock CA key"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTVITY_DO_NOTHING"
 msgstr "Sleep"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE"
@@ -2820,17 +3081,37 @@ msgstr "This workflow exports workflow instances to other servers."
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
 msgstr "This workflow imports workflow instances from other servers."
 
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
-msgstr "CA certificate determined"
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION"
+msgstr "This is the workflow to issue fresh CRLs."
 
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
-msgstr "Certificate issued"
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DO_NOTHING"
+msgstr "Sleep"
 
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DO_NOTHING_2"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_APPROVAL"
+msgstr "Approve CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
+msgstr "Approve CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_NOT_USABLE"
 msgstr "Initializing ..."
 
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
-msgstr "Prepared for issuing ..."
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_USABLE"
+msgstr "Logout failed"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUED"
+msgstr "Certificate Issuance"
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVAL"
 msgstr "Approval is going on"
@@ -2843,6 +3124,22 @@ msgstr "Initializing ..."
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING"
 msgstr "Pending (in editing state)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_CERT_ISSUANCE_POSSIBLE"
+msgstr "Initializing ..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_GD_DATA_AVAILABLE"
+msgstr "Initializing ..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_INITIAL"
+msgstr "Initializing ..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_SERVER_CSR_CREATED"
+msgstr "Approved"
 
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSUED"
 msgstr "CRL issued"
@@ -2901,6 +3198,86 @@ msgstr "Imported Logs"
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
 msgstr "Import succeeded"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVAL"
+msgstr "Cancel CSR approval"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVED"
+msgstr "Approve CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_NOT_USABLE"
+msgstr "Initializing ..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_USABLE"
+msgstr "Logout failed"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
+msgstr "This is the workflow to create certificates."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_FINISHED_WAITING_FOR_CHILD"
+msgstr "Waiting to start"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
+msgstr "Exported logs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_ISSUING_CA_DETERMINED"
+msgstr "Next CA determined"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
+msgstr "Exported logs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_PREPARED"
+msgstr "Prepared for issuing ..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_REJECTED"
+msgstr "SCEP Certificate Signing Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_WAITING_FOR_START"
+msgstr "Waiting to start"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_FINISHED_WAITING_FOR_CHILD"
+msgstr "Waiting to start"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_FORKED"
+msgstr "Waiting to start"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_ISSUING_CA_DETERMINED"
+msgstr "Next CA determined"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_PENDING"
+msgstr "Waiting to start"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_PREPARED"
+msgstr "CRL Issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_REJECTED"
+msgstr "Reject CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SLEPT"
+msgstr "Sleep"
+
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Waiting to start"
 
@@ -2927,6 +3304,14 @@ msgstr "Import"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP Certificate Signing Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_"
+msgstr "CRL Issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION"
+msgstr "CRL Issuance"
 
 msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
 msgstr ""
@@ -2970,8 +3355,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_CONTEXT_PARAMETER"
 msgstr ""
 
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_PARAMETER> exception."
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_PARAMETER"
+msgstr "reset"
 
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_PKI_REALM_UNDEFINED"
 msgstr ""
@@ -3026,6 +3412,56 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST"
+#~ msgstr "reset"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MISSING_TMP"
+#~ msgstr "SPKAC"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_INVALID_PARAMETER"
+#~ msgstr "The SPKAC string is empty."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
+#~ msgstr "CA certificate determined"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
+#~ msgstr "Certificate issued"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS"
+#~ msgstr "Create private key"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRYPTO_PKCS"
+#~ msgstr "SPKAC"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRYPTO_X"
+#~ msgstr "Organizational Unit"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS"
+#~ msgstr "The SPKAC string is empty."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA\n"
+#~ msgstr "Test Dummy CA"
+
+#~ msgid "I18N_OPENXPKI_HTML_GET_PROCESS_INFO"
+#~ msgstr "Get a graphical workflow instance overview"
 
 #~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_FINISHED"
 #~ msgstr "Import completed"
