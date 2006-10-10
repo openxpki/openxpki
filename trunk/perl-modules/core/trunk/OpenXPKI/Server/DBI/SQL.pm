@@ -689,7 +689,7 @@ sub select
 		$self->__get_symbolic_column_and_table($condition);
 
 	    # leave alias as is, but map symbolic table name to real table name
-	    if (! exists $alias_map_of{$tab}) {
+	    if (defined $tab && ! exists $alias_map_of{$tab}) {
 		$tab = $self->{schema}->get_table_name($tab);
 	    }
 

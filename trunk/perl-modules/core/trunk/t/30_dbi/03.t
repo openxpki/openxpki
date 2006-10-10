@@ -3,7 +3,7 @@ use warnings;
 use Test;
 use DateTime;
 
-BEGIN { plan tests => 16 };
+BEGIN { plan tests => 18 };
 
 print STDERR "OpenXPKI::Server::DBI: Queries with constraints and joins\n";
 
@@ -76,7 +76,7 @@ foreach my $ii (10001 .. 10005) {
 
 ok($dbi->commit());
 
-# simple queries
+# simple ranged queries
 my $result;
 
 $result = $dbi->select(
@@ -86,6 +86,27 @@ $result = $dbi->select(
     );
 
 ok(scalar @{$result}, 20);
+
+
+# simple query for default index field
+$result = $dbi->select(
+    TABLE => 'WORKFLOW_HISTORY',
+    SERIAL => 100020,
+    );
+
+ok(scalar @{$result}, 1);
+
+
+# simple query for default index field
+$result = $dbi->select(
+    TABLE => 'WORKFLOW_HISTORY',
+    DYNAMIC => {
+	WORKFLOW_DESCRIPTION => 'Added context value somekey-3->somevalue: 100043',
+    },
+    );
+
+ok(scalar @{$result}, 1);
+
 
 
 # SELECT 
