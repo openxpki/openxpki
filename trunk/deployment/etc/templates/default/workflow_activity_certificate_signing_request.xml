@@ -13,6 +13,9 @@
       <field name="csr_type"/>
       <field name="spkac"/>
       <field name="pkcs10"/>
+      <field name="parent_workflow_serial"/>
+      <field name="parent_workflow_type"/>
+      <field name="parent_server_id"/>
       <!-- do not use field with is_required                -->
       <!-- because this ignores the order of the validators -->
       <validator name="HasRequiredField">

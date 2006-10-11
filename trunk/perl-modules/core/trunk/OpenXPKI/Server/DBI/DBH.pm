@@ -193,7 +193,6 @@ sub do_query
                         "QUERY"  => $query});
     }
 
-    ## execute
     ##! 2: "execute statement"
     my $result;
     if (@bind_values)
@@ -205,6 +204,7 @@ sub do_query
     if ($result)
     {
         ##! 4: "execute succeeded (leaving function - $result)"
+        ##! 4: "result count: ".$self->{STH}[$sth_nr]->rows()
         return $result;
     } else {
         ##! 4: "execute failed (leaving function)"

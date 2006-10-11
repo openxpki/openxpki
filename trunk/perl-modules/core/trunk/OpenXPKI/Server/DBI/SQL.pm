@@ -412,9 +412,11 @@ sub get_symbolic_query_columns {
 
 sub select
 {
+    ##! 1: "start"
     my $self  = shift;
     my $args  = { @_ };
 
+    ##! 2: "initialize variables"
     my %operator_of = (
 	'FROM'          => '>=',
 	'TO'            => '<=',
@@ -437,6 +439,8 @@ sub select
     my @bind_values;
 
     my $table_args = $args->{TABLE};
+
+    ##! 2: "setup table joins"
 
     if (! defined $table_args)
     {
@@ -638,7 +642,6 @@ sub select
 	}
     }
 
-
     # sanity check: there must be a where clause
     if (scalar(@select_list) == 0) {
  	OpenXPKI::Exception->throw (
@@ -648,7 +651,6 @@ sub select
  	    });
     }
     
-
     # allow to override pivot columnn
     if (exists $args->{PIVOT_COLUMN}) {
 	$pivot_column = $args->{PIVOT_COLUMN};
@@ -747,7 +749,6 @@ sub select
 	push @table_specs, $table;
     }
 
-    
     ###########################################################################
     ## execute query
     my $query .= 'SELECT ' . join(', ', @select_list)
@@ -762,14 +763,14 @@ sub select
         $query .= ' ORDER BY ' . join(', ', @select_list);
     }
 
-    ### $query
+    ##! 2: "execute do_query: $query"
     $self->{DBH}->do_query (QUERY       => $query,
                             BIND_VALUES => \@bind_values,
                             LIMIT       => $args->{LIMIT});
 
-    ## build an array to return it
+    ##! 2: "build an array to return it"
 
-    my @result;
+    my @result = ();
     my $sth = $self->{DBH}->get_sth();
     while ( (my $item =  $sth->fetchrow_arrayref) ) {
         my @tab = ();
@@ -788,6 +789,7 @@ sub select
     }
     $self->{DBH}->finish_sth();
 
+    ##! 1: "return ".scalar (@result)." results"
     return [ @result ];
 }
 

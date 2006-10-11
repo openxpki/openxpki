@@ -57,10 +57,41 @@ sub execute
         my $ser  = OpenXPKI::Serialization::Simple->new ();
         my $ref  = $ser->deserialize ($data);
 
-        ##! 4: "create a new workflow instance from the export"
+        ##! 4: "check for an already imported workflow (and deny it)"
         my %hash = ("parent_workflow_serial" => $ref->{parent}->{workflow_serial},
                     "parent_workflow_type"   => $ref->{parent}->{workflow_type},
                     "parent_server_id"       => $ref->{parent}->{server_id});
+        my $result = CTX('dbi_workflow')->select
+                     (
+                         TABLE => [ [ 'WORKFLOW'         => 'workflow' ],
+                                    [ 'WORKFLOW_CONTEXT' => 'context1' ],
+                                    [ 'WORKFLOW_CONTEXT' => 'context2' ],
+                                    [ 'WORKFLOW_CONTEXT' => 'context3' ],
+                                  ],
+                         COLUMNS => [ 'WORKFLOW.WORKFLOW_SERIAL' ],
+                         JOIN => [ [ 'WORKFLOW_SERIAL',
+                                    'WORKFLOW_SERIAL',
+                                    'WORKFLOW_SERIAL',
+                                    'WORKFLOW_SERIAL',
+                                   ], ],
+                         DYNAMIC => {
+                                     'workflow.WORKFLOW_TYPE'          => $ref->{workflow_type},
+                                     'context1.WORKFLOW_CONTEXT_KEY'   => 'parent_workflow_serial',
+                                     'context1.WORKFLOW_CONTEXT_VALUE' => $hash{parent_workflow_serial},
+                                     'context2.WORKFLOW_CONTEXT_KEY'   => 'parent_workflow_type',
+                                     'context2.WORKFLOW_CONTEXT_VALUE' => $hash{parent_workflow_type},
+                                     'context3.WORKFLOW_CONTEXT_KEY'   => 'parent_server_id',
+                                     'context3.WORKFLOW_CONTEXT_VALUE' => $hash{parent_server_id},
+                                    },
+                     );
+        ##! 4: "result from dulicate detection: ".scalar @{$result}
+        if (scalar @{$result})
+        {
+            ##! 8: "detected an already imported workflow"
+            next;
+        }
+
+        ##! 4: "create a new workflow instance from the export"
         foreach my $item (keys %{$ref->{params}})
         {
             next if ($item eq "parent_workflow_serial");
