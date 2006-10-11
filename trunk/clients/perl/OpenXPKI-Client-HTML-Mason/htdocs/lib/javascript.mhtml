@@ -1,7 +1,7 @@
 <%args>
 </%args>
 
-<% $js->get_function() %>
+<% $js->get_function() | n %>
 
 <%init>
     ##use OpenXPKI::Client::HTML::Mason::Javascript;

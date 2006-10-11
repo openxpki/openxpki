@@ -27,6 +27,11 @@
     }
   };
 
+  # guard against XSS attacks
+  $m->interp->set_escape(
+    h => \&HTML::Mason::Escapes::basic_html_escape,
+  );
+  
   if (exists $ENV{MOD_PERL} and $ENV{MOD_PERL})
   {
     ## script is operated by apache with mod_perl

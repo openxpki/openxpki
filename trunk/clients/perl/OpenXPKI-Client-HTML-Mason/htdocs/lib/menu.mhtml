@@ -178,7 +178,7 @@
   }
   $context->{menu} = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
 </%init>
-<% $context->{menu}->get() %>
+<% $context->{menu}->get() | n %>
 <%flags>
   inherit => '/syshandler'
 </%flags>
