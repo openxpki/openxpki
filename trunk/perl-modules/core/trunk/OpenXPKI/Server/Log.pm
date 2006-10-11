@@ -12,13 +12,16 @@ use strict;
 use warnings;
 use English;
 
-use Log::Log4perl;
+use Log::Log4perl qw(:easy);
 use Log::Log4perl::Level;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Log::Appender::DBI;
 
 # cache for package filenames (truncate log entries)
 my %filename_of_package;
+
+##! 1: "init Log::Log4perl to avoid warnings - this can be overwritten later"
+Log::Log4perl->easy_init($ERROR);
 
 sub new {
     my $that = shift;
@@ -41,7 +44,7 @@ sub new {
 
     ## scan the configuration all 10 seconds
     ## $self->{log4perl} = Log::Log4perl::init_and_watch($self->{configfile}, 10);
-    $self->{log4perl} = Log::Log4perl::init($self->{configfile});
+    $self->{log4perl} = Log::Log4perl->init($self->{configfile});
     if (not  $self->{log4perl})
     {
         ## FIXME: we should display here an error message from Log4perl

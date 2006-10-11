@@ -12,7 +12,7 @@ use utf8;
 use English;
 
 use Class::Std;
-
+use Workflow::Factory;
 use Data::Dumper;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::API::Workflow';
@@ -394,12 +394,6 @@ sub __get_workflow_factory {
     my $args  = shift;
 
     ##! 1: "__get_workflow_factory"
-
-    # lazy initialization is necessary because the Workflow::Factory
-    # class calls a Log::Log4perl function in its BEGIN block, causing
-    # a warning at runtime if the logging system has not been initialized
-    # before
-    require Workflow::Factory;
 
     my $workflow_factory = Workflow::Factory->instance();
 
