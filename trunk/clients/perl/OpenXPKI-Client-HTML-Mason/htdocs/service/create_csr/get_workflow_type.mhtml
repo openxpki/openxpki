@@ -19,7 +19,7 @@
 <%init>
     ## define the available workflow types
     my @types = ("I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST",
-                 "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE");
+                 "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA");
 
     ## return the role if it exists
     if (defined $workflow_type and

@@ -1763,10 +1763,6 @@ msgstr "The field contains a normal fax number."
 msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
 msgstr "List instances"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
-msgstr "Print informations"
-
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "New Request (CSR)"
 
@@ -1831,22 +1827,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_HTML_PRINT_BUTTON"
 msgstr "Print informations"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_SMARTCARD_CREATE_IE_CSR"
-msgstr "New Request (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_SMARTCARD_FAILURE_ISSUANCE_IMPOSSIBLE"
-msgstr "Initializing ..."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_INTRO_TEXT"
-msgstr "CSR with OU-style"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_TITLE"
-msgstr "CSR with DC-style"
 
 msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER"
 msgstr "Telephone number"
@@ -2391,12 +2371,6 @@ msgstr ""
 "UUID."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_CLEANUP_RMTREE_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -2439,12 +2413,6 @@ msgstr ""
 "action."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_LOG_FAILED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_MKDIR_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -2476,36 +2444,6 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_FAILED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_BIND_FAILED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_CONNECTION_FAILED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_SEARCH_FAILED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_MORE_THAN_ONE_LDAP_ENTRY_FOUND"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
@@ -2557,10 +2495,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ACL_NO_ACTIVITY"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
-msgstr "The value of a subject alternative name field is missing."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVED_MISSING_APPROVAL"
 msgstr "The value of a subject alternative name field is missing."
 
@@ -2582,22 +2516,6 @@ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
-msgstr "The SPKAC string is empty."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
-msgstr "The SPKAC string is empty."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_NOT_ALL_REQUIRED_PARAMS_PRESENT"
-msgstr "The SPKAC string is empty."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_MORE_CSRS_TO_CREATE"
-msgstr "The SPKAC string is empty."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_NO_MORE_CSRS_TO_CREATE"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
@@ -2992,6 +2910,10 @@ msgstr "Import workflow instances"
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
 msgstr "Prepare environment"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+msgstr "Determine issuing CA"
+
 msgid "I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
 msgstr "Execute the CSR"
 
@@ -3016,44 +2938,12 @@ msgstr "Wait for other workflow instance"
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr ""
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTIVITY_CREATE_CSR"
-msgstr "Sleep"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTIVITY_DETERMINE_ISSUING_CA"
-msgstr "Determine issuing CA"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTIVITY_DO_NOTHING"
-msgstr "Sleep"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTIVITY_GET_CERT_PROFILE"
-msgstr "Change certificate profile"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTIVITY_IMPORT"
-msgstr "Sleep"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTIVITY_ISSUE_CERTIFICATE"
-msgstr "Sleep"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTIVITY_PERSIST_CERTIFICATE"
-msgstr "Persist CSR"
-
-msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
-msgstr "Sleep"
-
 # only in documentation
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTIVITY_UNLOCK_CA_KEY"
+msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
 msgstr "Unlock CA key"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTVITY_DO_NOTHING"
+msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 msgstr "Sleep"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE"
@@ -3081,36 +2971,17 @@ msgstr "This workflow exports workflow instances to other servers."
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
 msgstr "This workflow imports workflow instances from other servers."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION"
-msgstr "This is the workflow to issue fresh CRLs."
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
+msgstr "CA certificate determined"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_DO_NOTHING"
-msgstr "Sleep"
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
+msgstr "Certificate issued"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_DO_NOTHING_2"
-msgstr "Sleep"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_APPROVAL"
-msgstr "Approve CSR"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
-msgstr "Approve CSR"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_NOT_USABLE"
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
 msgstr "Initializing ..."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_USABLE"
-msgstr "Logout failed"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUED"
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
 msgstr "Certificate Issuance"
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVAL"
@@ -3124,22 +2995,6 @@ msgstr "Initializing ..."
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING"
 msgstr "Pending (in editing state)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_CERT_ISSUANCE_POSSIBLE"
-msgstr "Initializing ..."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_GD_DATA_AVAILABLE"
-msgstr "Initializing ..."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_INITIAL"
-msgstr "Initializing ..."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_SERVER_CSR_CREATED"
-msgstr "Approved"
 
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSUED"
 msgstr "CRL issued"
@@ -3198,86 +3053,6 @@ msgstr "Imported Logs"
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
 msgstr "Import succeeded"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVAL"
-msgstr "Cancel CSR approval"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVED"
-msgstr "Approve CSR"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_NOT_USABLE"
-msgstr "Initializing ..."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_USABLE"
-msgstr "Logout failed"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
-msgstr "This is the workflow to create certificates."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_FINISHED_WAITING_FOR_CHILD"
-msgstr "Waiting to start"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
-msgstr "Exported logs"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_ISSUING_CA_DETERMINED"
-msgstr "Next CA determined"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
-msgstr "Exported logs"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_PREPARED"
-msgstr "Prepared for issuing ..."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_REJECTED"
-msgstr "SCEP Certificate Signing Request"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
-msgstr "Sleep"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_WAITING_FOR_START"
-msgstr "Waiting to start"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_FINISHED_WAITING_FOR_CHILD"
-msgstr "Waiting to start"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_FORKED"
-msgstr "Waiting to start"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_ISSUING_CA_DETERMINED"
-msgstr "Next CA determined"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_PENDING"
-msgstr "Waiting to start"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_PREPARED"
-msgstr "CRL Issuance"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_REJECTED"
-msgstr "Reject CSR"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_SLEPT"
-msgstr "Sleep"
-
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Waiting to start"
 
@@ -3304,14 +3079,6 @@ msgstr "Import"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP Certificate Signing Request"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_"
-msgstr "CRL Issuance"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION"
-msgstr "CRL Issuance"
 
 msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
 msgstr ""
@@ -3414,6 +3181,248 @@ msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
+#~ msgstr "Print informations"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_CREATE_IE_CSR"
+#~ msgstr "New Request (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_FAILURE_ISSUANCE_IMPOSSIBLE"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_INTRO_TEXT"
+#~ msgstr "CSR with OU-style"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_TITLE"
+#~ msgstr "CSR with DC-style"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_LOG_FAILED"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_BIND_FAILED"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_CONNECTION_FAILED"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_SEARCH_FAILED"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_MORE_THAN_ONE_LDAP_ENTRY_FOUND"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
+#~ msgstr "The value of a subject alternative name field is missing."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
+#~ msgstr "The SPKAC string is empty."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_NOT_ALL_REQUIRED_PARAMS_PRESENT"
+#~ msgstr "The SPKAC string is empty."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_MORE_CSRS_TO_CREATE"
+#~ msgstr "The SPKAC string is empty."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_NO_MORE_CSRS_TO_CREATE"
+#~ msgstr "The SPKAC string is empty."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_CREATE_CSR"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_DO_NOTHING"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_GET_CERT_PROFILE"
+#~ msgstr "Change certificate profile"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_IMPORT"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_ISSUE_CERTIFICATE"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_PERSIST_CERTIFICATE"
+#~ msgstr "Persist CSR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTVITY_DO_NOTHING"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION"
+#~ msgstr "This is the workflow to issue fresh CRLs."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_DO_NOTHING"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_DO_NOTHING_2"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVAL"
+#~ msgstr "Approve CSR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
+#~ msgstr "Approve CSR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_NOT_USABLE"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_USABLE"
+#~ msgstr "Logout failed"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_CERT_ISSUANCE_POSSIBLE"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_GD_DATA_AVAILABLE"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_INITIAL"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_SERVER_CSR_CREATED"
+#~ msgstr "Approved"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVAL"
+#~ msgstr "Cancel CSR approval"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVED"
+#~ msgstr "Approve CSR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_NOT_USABLE"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_USABLE"
+#~ msgstr "Logout failed"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
+#~ msgstr "This is the workflow to create certificates."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FINISHED_WAITING_FOR_CHILD"
+#~ msgstr "Waiting to start"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
+#~ msgstr "Exported logs"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_ISSUING_CA_DETERMINED"
+#~ msgstr "Next CA determined"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
+#~ msgstr "Exported logs"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PREPARED"
+#~ msgstr "Prepared for issuing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_REJECTED"
+#~ msgstr "SCEP Certificate Signing Request"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_WAITING_FOR_START"
+#~ msgstr "Waiting to start"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_FINISHED_WAITING_FOR_CHILD"
+#~ msgstr "Waiting to start"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_FORKED"
+#~ msgstr "Waiting to start"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_ISSUING_CA_DETERMINED"
+#~ msgstr "Next CA determined"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_PENDING"
+#~ msgstr "Waiting to start"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_PREPARED"
+#~ msgstr "CRL Issuance"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_REJECTED"
+#~ msgstr "Reject CSR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_SLEPT"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_"
+#~ msgstr "CRL Issuance"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION"
+#~ msgstr "CRL Issuance"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST"
 #~ msgstr "reset"
 
@@ -3430,15 +3439,6 @@ msgstr ""
 #~ msgstr ""
 #~ "The workflow is missing some required fields (__FIELDS__) for the next "
 #~ "action."
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
-#~ msgstr "CA certificate determined"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
-#~ msgstr "Certificate issued"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
-#~ msgstr "Initializing ..."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS"

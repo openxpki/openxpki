@@ -20,9 +20,8 @@ sub execute
 
     ## get needed informations
     my $context = $workflow->context();
-    my $type    = $context->param('export_workflow_type');
-    my $params  = $context->param('export_params');
-    my $dest    = $context->param('export_destination');
+    my $dest    = $self->param('export_destination');
+    my $state   = $self->param('export_state');
     my $server  = CTX('xml_config')->get_xpath (
                       XPATH   => [ 'common/database/server_id' ],
                       COUNTER => [ 0 ]);
@@ -33,22 +32,12 @@ sub execute
 
     ## build a hash reference with all informations
     my $msg = undef;
-    $msg->{'workflow_type'} = $context->param('export_workflow_type');
-    $msg->{'parent'}->{'workflow_serial'} = $workflow->id();
-    $msg->{'parent'}->{'workflow_type'}   = $workflow->type();
-    $msg->{'parent'}->{'server_id'}       = $server;
-    $params = [ split ",", $params ];
-    if ($params->[0] eq "*")
-    {
-        $msg->{'params'} = $context->param();
-    }
-    else
-    {
-        foreach my $item (sort @{$params})
-        {
-            $msg->{'params'}->{$item} = $context->param($item);
-        }
-    }
+    $msg->{'workflow'}->{'type'}        = $workflow->type();
+    $msg->{'workflow'}->{'serial'}      = $workflow->id();
+    $msg->{'workflow'}->{'state'}       = $state;
+    $msg->{'workflow'}->{'last_update'} = $workflow->last_update();
+    $msg->{'workflow'}->{'server_id'}   = $server;
+    $msg->{'params'} = $context->param();
 
     ## serialize the message
     my $serializer = OpenXPKI::Serialization::Simple->new ({SEPARATOR => '-'});
@@ -106,20 +95,13 @@ You must specifiy the following parameters in the action:
 
 =over
 
-=item * export_workflow_type
-
-This is the workflow type at the other server where the workflow will
-be created from the exported data-
-
-=item * export_params
-
-is a comma seperated list of the variables which should be exported
-from the workflow context. If you use "*" as value then all parameters
-will be exported.
-
 =item * export_destination
 
 is the server_id of the destination server.
+
+=item * export_state
+
+is the state on the destination server.
 
 =over
 

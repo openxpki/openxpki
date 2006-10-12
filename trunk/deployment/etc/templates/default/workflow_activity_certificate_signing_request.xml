@@ -13,9 +13,6 @@
       <field name="csr_type"/>
       <field name="spkac"/>
       <field name="pkcs10"/>
-      <field name="parent_workflow_serial"/>
-      <field name="parent_workflow_type"/>
-      <field name="parent_server_id"/>
       <!-- do not use field with is_required                -->
       <!-- because this ignores the order of the validators -->
       <validator name="HasRequiredField">
@@ -118,8 +115,9 @@
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve">
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_EXPORT_CSR"
-	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export">
-      <validator name="SetExportConfigForOnlineCSR"/>
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export"
+          export_destination="0"
+          export_state="INITIAL_IMPORT">
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
 	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::PersistRequest">
@@ -138,6 +136,16 @@
   <action name="I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
           class="OpenXPKI::Server::Workflow::Activity::Tools::ForkWorkflowInstance"
           workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_EXPORT_FINISHED_CSR"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export"
+          export_destination="0"
+          export_state="SUCCESS">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_EXPORT_FAILED_CSR"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export"
+          export_destination="0"
+          export_state="FAILURE">
   </action>
 </actions>
 

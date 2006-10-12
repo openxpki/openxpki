@@ -14,6 +14,8 @@ use base qw( OpenXPKI::Server::Workflow::Activity OpenXPKI::FileUtils );
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( workflow_error );
 use OpenXPKI::Serialization::Simple;
+use Workflow::Factory qw( FACTORY );
+use Workflow::Context;
 
 sub execute
 {
@@ -58,30 +60,19 @@ sub execute
         my $ref  = $ser->deserialize ($data);
 
         ##! 4: "check for an already imported workflow (and deny it)"
-        my %hash = ("parent_workflow_serial" => $ref->{parent}->{workflow_serial},
-                    "parent_workflow_type"   => $ref->{parent}->{workflow_type},
-                    "parent_server_id"       => $ref->{parent}->{server_id});
+        my %hash = ("parent_server_id" => $ref->{parent}->{server_id});
         my $result = CTX('dbi_workflow')->select
                      (
-                         TABLE => [ [ 'WORKFLOW'         => 'workflow' ],
-                                    [ 'WORKFLOW_CONTEXT' => 'context1' ],
-                                    [ 'WORKFLOW_CONTEXT' => 'context2' ],
-                                    [ 'WORKFLOW_CONTEXT' => 'context3' ],
-                                  ],
+                         TABLE   => [ [ 'WORKFLOW'         => 'workflow' ],
+                                      [ 'WORKFLOW_CONTEXT' => 'context1' ],
+                                    ],
                          COLUMNS => [ 'WORKFLOW.WORKFLOW_SERIAL' ],
-                         JOIN => [ [ 'WORKFLOW_SERIAL',
-                                    'WORKFLOW_SERIAL',
-                                    'WORKFLOW_SERIAL',
-                                    'WORKFLOW_SERIAL',
-                                   ], ],
+                         JOIN    => [ [ 'WORKFLOW_SERIAL', ], ],
                          DYNAMIC => {
-                                     'workflow.WORKFLOW_TYPE'          => $ref->{workflow_type},
-                                     'context1.WORKFLOW_CONTEXT_KEY'   => 'parent_workflow_serial',
-                                     'context1.WORKFLOW_CONTEXT_VALUE' => $hash{parent_workflow_serial},
-                                     'context2.WORKFLOW_CONTEXT_KEY'   => 'parent_workflow_type',
-                                     'context2.WORKFLOW_CONTEXT_VALUE' => $hash{parent_workflow_type},
-                                     'context3.WORKFLOW_CONTEXT_KEY'   => 'parent_server_id',
-                                     'context3.WORKFLOW_CONTEXT_VALUE' => $hash{parent_server_id},
+                                     'workflow.WORKFLOW_TYPE'          => $ref->{workflow}->{type},
+                                     'workflow.WORKFLOW_SERIAL'        => $ref->{workflow}->{serial},
+                                     'context1.WORKFLOW_CONTEXT_KEY'   => 'parent_server_id',
+                                     'context1.WORKFLOW_CONTEXT_VALUE' => $hash{parent_server_id},
                                     },
                      );
         ##! 4: "result from dulicate detection: ".scalar @{$result}
@@ -91,30 +82,47 @@ sub execute
             next;
         }
 
-        ##! 4: "create a new workflow instance from the export"
-        foreach my $item (keys %{$ref->{params}})
+        ##! 4: "if workflow does not exist in the database then create it"
+        $result = CTX('dbi_workflow')->select
+                  (
+                      TABLE => 'WORKFLOW',
+                      KEY   => $ref->{workflow}->{serial}
+                  );
+        if (not scalar @{$result})
         {
-            next if ($item eq "parent_workflow_serial");
-            next if ($item eq "parent_workflow_type");
-            next if ($item eq "parent_server_id");
-            $hash{$item} = $ref->{params}->{$item};
+            ##! 4: "insert workflow into the database"
+            CTX('dbi_workflow')->insert (
+                TABLE => 'WORKFLOW',
+                HASH  => (
+                          WORKFLOW_SERIAL      => $ref->{workflow}->{serial},
+                          WORKFLOW_TYPE        => $ref->{workflow}->{type},
+                          WORKFLOW_STATUS      => $ref->{workflow}->{state},
+                          WORKFLOW_LAST_UPDATE => $ref->{workflow}->{last_update}
+                         ));
         }
-        my $api = CTX('api');
-        my $workflow = $api->create_workflow_instance (
-                             {
-                              WORKFLOW      => $ref->{workflow_type},
-                              FILTER_PARAMS => 1,
-                              PARAMS        => \%hash
-                             });
-        my $cmd = "echo ".$ref->{parent}->{workflow_serial}." >> $logs/".$ref->{parent}->{server_id}.".log";
-        my $ret = `$cmd`;
-        if ($EVAL_ERROR)
+        else
         {
-            my $errors = [[ 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_LOG_FAILED',
-                            {COMMAND => $cmd} ]];
-            $context->param ("__error" => $errors);
-            workflow_error ($errors->[0]);
+            ##! 4: "update workflow in the database"
+            CTX('dbi_workflow')->update (
+                TABLE => 'WORKFLOW',
+                HASH  => (
+                          WORKFLOW_SERIAL      => $ref->{workflow}->{serial},
+                          WORKFLOW_STATUS      => $ref->{workflow}->{state},
+                          WORKFLOW_LAST_UPDATE => $ref->{workflow}->{last_update}
+                         ));
         }
+
+        ##! 4: "load the workflow"
+        my $wf = FACTORY->fetch_workflow ($ref->{workflow}->{type}, $ref->{workflow}->{serial});
+
+        ##! 4: "update the context"
+        my $context = Workflow::Context->new();
+        $context->param ($ref->params);
+        $context->param ("parent_server_id" => $ref->{workflow}->{server_id});
+        $wf->context ($context);
+
+        ##! 4: "persist workflow"
+        FACTORY->save_workflow ($wf);
     }
 }
 
