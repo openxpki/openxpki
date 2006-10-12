@@ -3,7 +3,7 @@ use warnings;
 use Test;
 use DateTime;
 
-BEGIN { plan tests => 18 };
+BEGIN { plan tests => 25 };
 
 print STDERR "OpenXPKI::Server::DBI: Queries with constraints and joins\n";
 
@@ -162,8 +162,10 @@ ok($result->[9]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100049
 #   context2.workflow_context_value
 $result = $dbi->select(
     #          first table second table                          third table
-    TABLE => [ 'WORKFLOW', [ 'WORKFLOW_CONTEXT' => 'context1' ], [ 'WORKFLOW_CONTEXT' => 'context2' ] ],
-
+    TABLE => [ 'WORKFLOW', 
+	       [ 'WORKFLOW_CONTEXT' => 'context1' ], 
+	       [ 'WORKFLOW_CONTEXT' => 'context2' ] ],
+    
     # return these columns
     COLUMNS => [ 'WORKFLOW.WORKFLOW_SERIAL', 'context1.WORKFLOW_CONTEXT_VALUE', 'context2.WORKFLOW_CONTEXT_VALUE' ],
     
@@ -185,5 +187,84 @@ ok(scalar @{$result}, 1);
 ok($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
 ok($result->[0]->{'context1.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100045');
 ok($result->[0]->{'context2.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100047');
+
+
+
+# get unique key values for workflow context
+# 
+# SELECT 
+#    DISTINCT workflow_context.workflow_context_key
+#    workflow.workflow_id
+# FROM workflow, workflow_context
+# WHERE workflow.workflow_id=workflow_context.workflow_id 
+#   AND workflow_context.workflow_id=?
+# ORDER BY workflow_context.workflow_context_key, 
+#   workflow.workflow_id
+$result = $dbi->select(
+    #          first table second table
+    TABLE => [ 'WORKFLOW', 'WORKFLOW_CONTEXT' ],
+
+    # return these columns
+    COLUMNS => [ 
+	{ 
+	    COLUMN   => 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
+	    DISTINCT => 1,
+	},
+	'WORKFLOW.WORKFLOW_SERIAL', 
+    ],
+    JOIN => [
+	#  on first table     second table   
+	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    ],
+    DYNAMIC => {
+	'WORKFLOW.WORKFLOW_SERIAL' => '10004',
+    },
+    );
+
+### $result
+
+ok(scalar @{$result}, 10);
+ok($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
+ok($result->[0]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-0');
+# ..
+ok($result->[9]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-9');
+
+
+
+# SELECT 
+#    MAX(workflow_context.workflow_context_key),
+#    workflow.workflow_id
+# FROM workflow, workflow_context
+# WHERE workflow.workflow_id=workflow_context.workflow_id 
+#   AND workflow_context.workflow_id=?
+# ORDER BY workflow_context.workflow_context_key, 
+#   workflow.workflow_id
+$result = $dbi->select(
+    #          first table second table
+    TABLE => [ 'WORKFLOW', 'WORKFLOW_CONTEXT' ],
+
+    # return these columns
+    COLUMNS => [ 
+	{ 
+	    COLUMN   => 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
+	    #DISTINCT => 1,
+	    AGGREGATE => 'MAX',
+	},
+	'WORKFLOW.WORKFLOW_SERIAL', 
+    ],
+    JOIN => [
+	#  on first table     second table   
+	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    ],
+    DYNAMIC => {
+	'WORKFLOW.WORKFLOW_SERIAL' => '10004',
+    },
+    );
+
+### $result
+
+ok(scalar @{$result}, 1);
+ok($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
+ok($result->[0]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-9');
 
 1;

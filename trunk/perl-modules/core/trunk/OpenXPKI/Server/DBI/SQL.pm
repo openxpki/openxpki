@@ -386,7 +386,6 @@ sub get_symbolic_query_columns {
     
     if (ref $table eq '') {
 	@select_list = @{$self->{schema}->get_table_columns($table)};
-
     } elsif (ref $table eq 'ARRAY') {
 	## ensure a schema compatible result
 	if (! exists $keys->{COLUMNS} ||
@@ -396,6 +395,10 @@ sub get_symbolic_query_columns {
 	}
 
 	foreach my $column (@{$keys->{COLUMNS}}) {
+	    if (ref $column eq 'HASH') {
+		$column = $column->{COLUMN};
+	    }
+
 	    my ($col, $tab) = $self->__get_symbolic_column_and_table($column);
 	    
 	    if (! defined $tab) {
@@ -434,7 +437,17 @@ sub select
     my %alias_map_of;
 
     my @symbolic_select_tables;
+
     my @select_list;
+    # select_list semantics:
+    # [
+    #    {
+    #      COLUMN => '...',
+    #      DISTINCT => 0,   # or 1
+    #      AGGREGATE => 'MAX',  # alternative aggregates possible (or undef'd)
+    #    }, ...
+    # ]
+
     my @conditions;
     my @bind_values;
 
@@ -453,7 +466,9 @@ sub select
 	$pivot_column = $table_args . '_SERIAL';
 	
 	@select_list = map {
-	    $self->{schema}->get_column($_);
+	    {
+		COLUMN => $self->{schema}->get_column($_),
+	    }
 	} @{$self->{schema}->get_table_columns($table_args)};
 
 	push @symbolic_select_tables,
@@ -542,7 +557,59 @@ sub select
 
 	# build column specification
 	### $keys->{COLUMNS}
-	foreach my $column (@{$args->{COLUMNS}}) {
+	$ii = -1;
+	foreach my $entry (@{$args->{COLUMNS}}) {
+	    $ii++;
+
+	    my $column;
+	    my %column_specification;
+
+	    if (ref $entry eq 'HASH') {
+		$column = $entry->{COLUMN};
+
+		if (exists $entry->{DISTINCT} && $entry->{DISTINCT}) {
+		    $column_specification{DISTINCT} = 1;
+		}
+
+		if (defined $entry->{AGGREGATE}) {
+		    $column_specification{AGGREGATE} = $entry->{AGGREGATE};
+
+		    if ($column_specification{AGGREGATE} !~ 
+			m{ \A (?: MIN | MAX | AVG | COUNT ) \z }xms) {
+			
+			OpenXPKI::Exception->throw (
+			    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_AGGREGATE_SPECIFICATION",
+			    params => {
+				COLUMN_REF => ref $entry,
+				COLUMN_INDEX => $ii,
+				COLUMN => $column,
+				AGGREGATE => $column_specification{AGGREGATE},
+			    });
+		    }
+		}
+	    } elsif (ref $entry eq '') {
+		# scalar value
+		$column = $entry;
+
+	    } elsif (ref $entry ne '') {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_COLUMN_DATA_TYPE",
+		    params => {
+			COLUMN_REF => ref $entry,
+			COLUMN_INDEX => $ii,
+		    });
+	    }
+	    
+	    if (! defined $column) {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_COLUMN_NOT_SPECIFIED",
+		    params => {
+			COLUMN_REF => ref $column,
+			COLUMN_INDEX => $ii,
+		    });
+	    }
+	    
+
 	    my ($col, $tab) = $self->__get_symbolic_column_and_table($column);
 
 	    # convert this into schema compatible column
@@ -553,12 +620,13 @@ sub select
 		if (! exists $alias_map_of{$tab}) {
 		    $tab = $self->{schema}->get_table_name($tab);
 		}
-		push @select_list, $tab . '.' . $col;
+		$column_specification{COLUMN} = $tab . '.' . $col;
 
 	    } else {
-		push @select_list, $col;
+		$column_specification{COLUMN} = $col;
 	    }
-
+	    
+	    push @select_list, \%column_specification;
 	}
 
 
@@ -733,6 +801,27 @@ sub select
     }
 
 
+    ###########################################################################
+    # compose column specifications
+    my @select_column_specs;
+    my @order_specs;
+    foreach my $entry (@select_list) {
+	my $select_column = $entry->{COLUMN};
+
+	if ($entry->{DISTINCT}) {
+	    $select_column = 'DISTINCT ' . $select_column;
+	}
+	if (defined $entry->{AGGREGATE}) {
+	    $select_column = $entry->{AGGREGATE} . '(' . $select_column . ')';
+	}
+
+	push @select_column_specs, $select_column;
+
+	# only order by column if no aggregate or distinct is applied to it
+	if ($select_column eq $entry->{COLUMN}) {
+	    push @order_specs, $select_column;
+	}
+    }
 
     ###########################################################################
     # compose table specifications
@@ -751,16 +840,16 @@ sub select
 
     ###########################################################################
     ## execute query
-    my $query .= 'SELECT ' . join(', ', @select_list)
+    my $query .= 'SELECT ' . join(', ', @select_column_specs)
 	. ' FROM ' . join(', ', @table_specs)
 	. ' WHERE '
 	. join(' AND ', @conditions);
 
     if ($args->{REVERSE})
     {
-        $query .= ' ORDER BY ' . join(' DESC, ', @select_list) . ' DESC';
+        $query .= ' ORDER BY ' . join(' DESC, ', @order_specs) . ' DESC';
     } else {
-        $query .= ' ORDER BY ' . join(', ', @select_list);
+        $query .= ' ORDER BY ' . join(', ', @order_specs);
     }
 
     ##! 2: "execute do_query: $query"
@@ -1107,6 +1196,89 @@ This results in the following query:
  ORDER BY workflow.workflow_id, 
    context1.workflow_context_value, 
    context2.workflow_context_value
+
+=head4 Aggregate statements
+
+It is possible to include aggregate (and DISTINCT) statements in the query
+by using a hash reference for the column specification instead of a scalar.
+In this case the hash key 'COLUMN' must be set to the desired column name.
+
+Optionally the key 'DISTINCT' may be set to a true value in order to get
+a DISTINCT COLUMN query.
+
+The key 'AGGREGATE' indicates that an aggregate function should be used on
+the column. In this case the value must be one of 'MIN', 'MAX', 'COUNT' or
+'AVG'.
+
+=head4 Aggregate example 1
+
+  $result = $dbi->select(
+    #          first table second table
+    TABLE => [ 'WORKFLOW', 'WORKFLOW_CONTEXT' ],
+
+    # return these columns
+    COLUMNS => [ 
+	{ 
+	    COLUMN   => 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
+	    AGGREGATE => 'MAX',
+	},
+	'WORKFLOW.WORKFLOW_SERIAL', 
+    ],
+    JOIN => [
+	#  on first table     second table   
+	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    ],
+    DYNAMIC => {
+	'WORKFLOW.WORKFLOW_SERIAL' => '10004',
+    },
+    );
+
+results in the following query:
+
+ SELECT 
+    MAX(workflow_context.workflow_context_key),
+    workflow.workflow_id
+ FROM workflow, workflow_context
+ WHERE workflow.workflow_id=workflow_context.workflow_id 
+   AND workflow_context.workflow_id=?
+ ORDER BY workflow_context.workflow_context_key, 
+   workflow.workflow_id
+
+
+=head4 Aggregate example 2
+
+  $result = $dbi->select(
+    #          first table second table
+    TABLE => [ 'WORKFLOW', 'WORKFLOW_CONTEXT' ],
+
+    # return these columns
+    COLUMNS => [ 
+	{ 
+	    COLUMN   => 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
+	    DISTINCT => 1,
+	},
+	'WORKFLOW.WORKFLOW_SERIAL', 
+    ],
+    JOIN => [
+	#  on first table     second table   
+	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    ],
+    DYNAMIC => {
+	'WORKFLOW.WORKFLOW_SERIAL' => '10004',
+    },
+    );
+
+results in the query
+
+ SELECT 
+    DISTINCT workflow_context.workflow_context_key
+    workflow.workflow_id
+ FROM workflow, workflow_context
+ WHERE workflow.workflow_id=workflow_context.workflow_id 
+   AND workflow_context.workflow_id=?
+ ORDER BY workflow_context.workflow_context_key, 
+   workflow.workflow_id
+
 
 
 =head1 See also
