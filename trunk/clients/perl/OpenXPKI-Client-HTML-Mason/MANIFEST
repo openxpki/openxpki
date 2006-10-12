@@ -10,6 +10,7 @@ bin/openxpki.cgi
 lib/OpenXPKI/Client/HTML/Mason.pm
 lib/OpenXPKI/Client/HTML/Mason/Javascript.pm
 lib/OpenXPKI/Client/HTML/Mason/Menu.pm
+lib/OpenXPKI/Client/HTML/Mason/ApacheHandler.pm
 
 htdocs/syshandler
 htdocs/autohandler
@@ -107,6 +108,5 @@ t/10_syntax.t
 t/11_login/01_anonymous.t
 t/99_cleanup.t
 
-eg/openxpki-mason-apachehandler.pl
 eg/openxpki-mason-cgi.conf
 eg/openxpki-mason-mod_perl.conf
