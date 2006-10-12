@@ -40,8 +40,8 @@ build-stamp: config
 	dh_testdir
 	$(PERL) Makefile.PL INSTALLDIRS=vendor
 	$(MAKE) OPTIMIZE="-O2 -g -Wall"
-	sed "s%comp_root\\s*=>.*%comp_root => '/var/www/openxpki',%" eg/openxpki-mason-apachehandler.pl > eg/openxpki-mason-apachehandler.pl.1
-	sed "s%data_dir\\s*=>.*%data_dir => '/var/cache/mason',%" eg/openxpki-mason-apachehandler.pl.1 > eg/openxpki-mason-apachehandler.pl
+	sed "s%MasonDataDir\\s.*%MasonDataDir '/var/cache/mason'%" eg/openxpki-mason-mod_perl.conf > eg/openxpki-mason-mod_perl.conf.1
+	sed "s%MasonCompRoot\\s.*%MasonCompRoot '/var/www/openxpki'%" eg/openxpki-mason-mod_perl.conf.1 > eg/openxpki-mason-mod_perl.conf
 	echo SetEnv OPENXPKI_SOCKET_FILE \"/var/openxpki/openxpki.socket\" >> eg/openxpki-mason-mod_perl.conf
 	# $(MAKE) test
 	touch build-stamp

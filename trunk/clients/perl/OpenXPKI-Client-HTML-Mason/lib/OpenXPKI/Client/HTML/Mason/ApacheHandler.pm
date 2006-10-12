@@ -28,6 +28,7 @@ sub make_apache_handler {
     my $host   = $r->hostname();
 
     my %p = HTML::Mason::ApacheHandler->_get_mason_params($r);
+    $p{comp_root} = $p{comp_root}[0];
 
     my $ah = HTML::Mason::ApacheHandler->new(
         %p,
