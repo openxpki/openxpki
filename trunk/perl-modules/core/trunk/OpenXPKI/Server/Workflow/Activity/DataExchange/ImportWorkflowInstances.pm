@@ -16,6 +16,7 @@ use Workflow::Exception qw( workflow_error );
 use OpenXPKI::Serialization::Simple;
 use Workflow::Factory qw( FACTORY );
 use Workflow::Context;
+use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 
 sub execute
 {
@@ -60,14 +61,15 @@ sub execute
         my $ref  = $ser->deserialize ($data);
 
         ##! 4: "check for an already imported workflow (and deny it)"
-        my %hash = ("parent_server_id" => $ref->{parent}->{server_id});
+        my %hash = ("parent_server_id" => $ref->{workflow}->{server_id});
         my $result = CTX('dbi_workflow')->select
                      (
                          TABLE   => [ [ 'WORKFLOW'         => 'workflow' ],
                                       [ 'WORKFLOW_CONTEXT' => 'context1' ],
                                     ],
                          COLUMNS => [ 'WORKFLOW.WORKFLOW_SERIAL' ],
-                         JOIN    => [ [ 'WORKFLOW_SERIAL', ], ],
+                         JOIN    => [ [ 'WORKFLOW_SERIAL',
+                                        'WORKFLOW_SERIAL'], ],
                          DYNAMIC => {
                                      'workflow.WORKFLOW_TYPE'          => $ref->{workflow}->{type},
                                      'workflow.WORKFLOW_SERIAL'        => $ref->{workflow}->{serial},
@@ -96,7 +98,7 @@ sub execute
                 HASH  => (
                           WORKFLOW_SERIAL      => $ref->{workflow}->{serial},
                           WORKFLOW_TYPE        => $ref->{workflow}->{type},
-                          WORKFLOW_STATUS      => $ref->{workflow}->{state},
+                          WORKFLOW_STATE       => $ref->{workflow}->{state},
                           WORKFLOW_LAST_UPDATE => $ref->{workflow}->{last_update}
                          ));
         }
@@ -105,24 +107,37 @@ sub execute
             ##! 4: "update workflow in the database"
             CTX('dbi_workflow')->update (
                 TABLE => 'WORKFLOW',
-                HASH  => (
-                          WORKFLOW_SERIAL      => $ref->{workflow}->{serial},
-                          WORKFLOW_STATUS      => $ref->{workflow}->{state},
+                WHERE => {WORKFLOW_SERIAL => $ref->{workflow}->{serial}},
+                DATA  => {
+                          WORKFLOW_STATE       => $ref->{workflow}->{state},
                           WORKFLOW_LAST_UPDATE => $ref->{workflow}->{last_update}
-                         ));
+                         });
         }
 
         ##! 4: "load the workflow"
         my $wf = FACTORY->fetch_workflow ($ref->{workflow}->{type}, $ref->{workflow}->{serial});
+        $wf->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
+        $wf->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
 
         ##! 4: "update the context"
         my $context = Workflow::Context->new();
-        $context->param ($ref->params);
+        $context->param ($ref->{params});
         $context->param ("parent_server_id" => $ref->{workflow}->{server_id});
         $wf->context ($context);
 
-        ##! 4: "persist workflow"
-        FACTORY->save_workflow ($wf);
+        ##! 4: "execute the first action"
+        my @list = $wf->get_current_actions();
+        if (not scalar @list)
+        {
+	    OpenXPKI::Exception->throw (
+	        message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_NO_NEXT_ACTION",
+	        params => {
+		    WORKFLOW => $ref->{workflow}->{serial},
+	        });
+        }
+        $wf->execute_action($list[0]);
+
+        ##! 4: "workflow is now persisted"
     }
 }
 

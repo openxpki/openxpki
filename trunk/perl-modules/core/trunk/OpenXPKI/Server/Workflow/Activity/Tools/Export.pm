@@ -10,7 +10,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 
 ## FIXME: why does the inheritance from Activity does not work?
 use OpenXPKI::Server::Context qw( CTX );
-use Workflow::Exception qw( workflow_error );
+use Workflow::Exception qw( configuration_error workflow_error );
 use OpenXPKI::Serialization::Simple;
 
 sub execute
@@ -29,6 +29,20 @@ sub execute
                       XPATH   => [ 'common/data_exchange/export/dir' ],
                       COUNTER => [ 0 ]);
        $dir =~ s{/\s*$}{}xs;
+
+    ## check the parameters
+    if (not defined $dest)
+    {
+        my $errors = [[ 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MISSING_DESTINATION' ]];
+        $context->param ("__error" => $errors);
+        configuration_error ($errors->[0]);
+    }
+    if (not defined $state)
+    {
+        my $errors = [[ 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MISSING_STATE' ]];
+        $context->param ("__error" => $errors);
+        configuration_error ($errors->[0]);
+    }
 
     ## build a hash reference with all informations
     my $msg = undef;
