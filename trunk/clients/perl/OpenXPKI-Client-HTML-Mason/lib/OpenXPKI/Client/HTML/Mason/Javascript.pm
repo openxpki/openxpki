@@ -203,8 +203,12 @@ End Function
 
 
 $FUNCTION{gen_csr_ie} = qq^
-    <script type="text/vbscript">
-    <!--
+<script type="text/javascript">
+<!-- This hack is needed for onClick to work in IE
+-->
+</script>
+<script type="text/vbscript">
+<!--
         dim PROV_RSA_FULL
         dim OLD_XENROLL
         dim NEW_XENROLL
@@ -401,8 +405,8 @@ $FUNCTION{gen_csr_ie} = qq^
             document.OPENXPKI.elements[0].focus()
 
         end sub
-    -->
-    </script>
+-->
+</script>
 ^;
 
 1;
