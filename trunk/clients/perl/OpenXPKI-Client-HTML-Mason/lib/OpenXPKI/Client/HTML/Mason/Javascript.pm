@@ -203,10 +203,6 @@ End Function
 
 
 $FUNCTION{gen_csr_ie} = qq^
-<script type="text/javascript">
-<!-- This hack is needed for onClick to work in IE
--->
-</script>
 <script type="text/vbscript">
 <!--
         dim PROV_RSA_FULL
