@@ -46,6 +46,7 @@ my %COLUMN_of = (
     AUTHORITY_KEY_IDENTIFIER => "authority_key_identifier",
 
     SUBMIT_DATE           => "submit_date",
+    APPROVAL_DATE         => "approval_date",
     TYPE                  => "format",
     DATA                  => "data",
 
@@ -190,6 +191,8 @@ my %TABLE_of = (
         COLUMNS => [ "PKI_REALM", "CRR_SERIAL",
                      "CERTIFICATE_IDENTIFIER", 
 		     "SUBMIT_DATE",
+                     "APPROVAL_DATE",
+                     "STATUS",
 		     "REVOCATION_REASON",
                      #"TYPE", "DATA", "GLOBAL_KEY_ID",
                      #"RA", "STATUS", "REASON",

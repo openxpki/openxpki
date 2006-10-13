@@ -63,6 +63,7 @@ sub execute {
         TABLE   => 'CRL',
         DYNAMIC => {
             'ISSUER_IDENTIFIER' => $ca_identifier,
+            'PUBLICATION_DATE'  => -1, # this CRL has not been published yet
         },
     );
     if (! defined $crl_db) {
@@ -114,7 +115,7 @@ sub execute {
             'PUBLICATION_DATE' => $date->epoch(),
         },
         WHERE => {
-            'ISSUER_IDENTIFIER' => $ca_identifier,
+            'CRL_SERIAL' => $crl_db->{'CRL_SERIAL'},
         },
     );
     $dbi->commit();

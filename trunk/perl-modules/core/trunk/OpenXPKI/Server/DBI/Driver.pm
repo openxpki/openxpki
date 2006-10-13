@@ -21,7 +21,8 @@ use OpenXPKI::Server::DBI::Driver::PostgreSQL;
 use OpenXPKI::Server::DBI::Driver::SQLite;
 
 our %COLUMN = (
-    "submit_date"      => "TEXT",
+    "submit_date"      => "BIGINT",
+    "approval_date"    => "BIGINT",
     "format"           => "TEXT",
     "data"             => "LONGTEXT",
 

@@ -25,6 +25,7 @@ sub execute {
     my $workflow   = shift;
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $context    = $workflow->context();
+    my $dbi        = CTX('dbi_backend');
 
     my $context_ca_ids = $context->param('ca_ids');
     my $profile        = $context->param('_crl_profile');
@@ -62,34 +63,102 @@ sub execute {
     );
 
     # FIXME: iterate over all <issue_for> identifiers, if present
-    my $dbi = CTX('dbi_backend');
-    my $revoked_certs = $dbi->select(
-        TABLE   => [ 'CRR', 'CERTIFICATE' ],
-        COLUMNS => [ 
-                     'CERTIFICATE.IDENTIFIER',
-                     'CRR.SUBMIT_DATE',
-                     'CERTIFICATE.DATA',
-                   ],
-        JOIN    => [
-                        [ 'IDENTIFIER', 'IDENTIFIER' ],
-                   ],
+
+    # we want all identifiers and data for certificates that are
+    # already in the certificate database with status 'REVOKED'
+
+    # We need to select three different classes of certificates
+    # for the CRL:
+    # - those that are in the certificate DB with status 'REVOKED'
+    #   and have a corresponding CRR entry, for those we also need
+    #   the smallest approval date (works optimal using SQL MIN(), tbd)
+    # - those that are in the certificate DB with status 'REVOKED'
+    #   and for some reason DON't have a CRR entry. For those, the
+    #   date is set to epoch 0
+    # - those that are in the certificate DB with status
+    #   'CRL_ISSUANCE_PENDING' and their smallest CRR approval date
+
+    my @cert_timestamps; # array with certificate data and timestamp
+    my $already_revoked_certs = $dbi->select(
+        TABLE   => 'CERTIFICATE',
+        COLUMNS => [
+            'IDENTIFIER',
+            'DATA'
+        ],
         DYNAMIC => {
-            'CRR.PKI_REALM' => $pki_realm,
-            'CERTIFICATE.ISSUER_IDENTIFIER' => $ca_identifier,
-        }
+            'PKI_REALM'         => $pki_realm,
+            'ISSUER_IDENTIFIER' => $ca_identifier,
+            'STATUS'            => 'REVOKED',
+        },
     );
-    ##! 128: 'revoked_certs: ' . Dumper($revoked_certs)
-    if (! defined $revoked_certs) {
-        ##! 2: 'no revoked certs in db'
+    if (defined $already_revoked_certs) {
+        ##! 16: 'already revoked certificates present'
+        foreach my $cert (@{$already_revoked_certs}) {
+            ##! 32: 'revoked cert: ' . Dumper $cert
+            my $data       = $cert->{'DATA'};
+            my $timestamp  = 0; # default if no approval date found
+            my $identifier = $cert->{'IDENTIFIER'};
+            my $earliest_approved_crr = $dbi->first(
+                TABLE   => 'CRR',
+                COLUMNS => [
+                    'APPROVAL_DATE',
+                ],
+                DYNAMIC => {
+                    'PKI_REALM'  => $pki_realm,
+                    'IDENTIFIER' => $identifier,
+                    'STATUS'     => 'APPROVED',
+                },
+            );
+            if (defined $earliest_approved_crr) {
+                $timestamp = $earliest_approved_crr->{'APPROVAL_DATE'};
+                ##! 32: 'earliest approved crr present: ' . $timestamp
+            }
+            my $dt = DateTime->from_epoch(
+                epoch => $timestamp,
+            );
+            push @cert_timestamps, [ $data, $dt->iso8601() ];
+        }
     }
-    else {
-        my @cert_timestamps;
-        for (my $i = 0; $i < scalar @{$revoked_certs}; $i++) {
-            # prepare array for token command
-            my $cert = $revoked_certs->[$i];
-            my $data      = $cert->{'CERTIFICATE.DATA'};
-            my $timestamp = $cert->{'CRR.SUBMIT_DATE'};
-            $cert_timestamps[$i] = [ $data, $timestamp ];
+    ##! 16: 'cert_timestamps after first step: ' . Dumper(\@cert_timestamps)
+
+    my $certs_to_be_revoked = $dbi->select(
+        TABLE   => 'CERTIFICATE',
+        COLUMNS => [
+            'IDENTIFIER',
+            'DATA'
+        ],
+        DYNAMIC => {
+            'PKI_REALM'         => $pki_realm,
+            'ISSUER_IDENTIFIER' => $ca_identifier,
+            'STATUS'            => 'CRL_ISSUANCE_PENDING',
+        },
+    );
+    if (defined $certs_to_be_revoked) {
+        ##! 16: 'certificates to be freshly included in CRL present'
+        foreach my $cert (@{$certs_to_be_revoked}) {
+            ##! 32: 'cert to be revoked: ' . Dumper $cert
+            my $data       = $cert->{'DATA'};
+            my $timestamp  = 0; # default if no approval date found
+            my $identifier = $cert->{'IDENTIFIER'};
+            my $earliest_approved_crr = $dbi->first(
+                TABLE   => 'CRR',
+                COLUMNS => [
+                    'APPROVAL_DATE',
+                ],
+                DYNAMIC => {
+                    'PKI_REALM'  => $pki_realm,
+                    'IDENTIFIER' => $identifier,
+                    'STATUS'     => 'APPROVED',
+                },
+            );
+            if (defined $earliest_approved_crr) {
+                $timestamp = $earliest_approved_crr->{'APPROVAL_DATE'};
+                ##! 32: 'earliest approved crr present: ' . $timestamp
+            }
+            my $dt = DateTime->from_epoch(
+                epoch => $timestamp,
+            );
+            push @cert_timestamps, [ $data, $dt->iso8601() ];
             # set status in certificate db to revoked
             $dbi->update(
                 TABLE => 'CERTIFICATE',
@@ -97,39 +166,42 @@ sub execute {
                     STATUS => 'REVOKED',
                 },
                 WHERE => {
-                    IDENTIFIER => $cert->{'CERTIFICATE.IDENTIFIER'},
+                    IDENTIFIER => $identifier,
                 },
             ); 
             $dbi->commit();
         }
-        my $crl = $ca_token->command({
-            COMMAND => 'issue_crl',
-            REVOKED => \@cert_timestamps,
-            PROFILE => $profile,
-        });
-        my $crl_obj = OpenXPKI::Crypto::CRL->new(
+    }
+    ##! 32: 'cert_timestamps after 2nd step: ' . Dumper \@cert_timestamps 
+        
+    my $crl = $ca_token->command({
+        COMMAND => 'issue_crl',
+        REVOKED => \@cert_timestamps,
+        PROFILE => $profile,
+    });
+    my $crl_obj = OpenXPKI::Crypto::CRL->new(
             TOKEN => $ca_token,
             DATA  => $crl,
-        );
-        ##! 128: 'crl: ' . Dumper($crl)
-        
-        my $serial = $dbi->get_new_serial(
+    );
+    ##! 128: 'crl: ' . Dumper($crl)
+
+    my $serial = $dbi->get_new_serial(
             TABLE => 'CRL',
-        );
-        my %insert_hash = $crl_obj->to_db_hash();
-        $insert_hash{'PKI_REALM'} = $pki_realm;
-        $insert_hash{'ISSUER_IDENTIFIER'} = $ca_identifier;
-        #$insert_hash{'TYPE'} = # FIXME: what is the meaning of this field?
-        $insert_hash{'CRL_SERIAL'} = $serial;
-        $dbi->insert(
+    );
+    my %insert_hash = $crl_obj->to_db_hash();
+    $insert_hash{'PKI_REALM'} = $pki_realm;
+    $insert_hash{'ISSUER_IDENTIFIER'} = $ca_identifier;
+    #$insert_hash{'TYPE'} = # FIXME: what is the meaning of this field?
+    $insert_hash{'CRL_SERIAL'} = $serial;
+    $insert_hash{'PUBLICATION_DATE'} = -1;
+    $dbi->insert(
             TABLE => 'CRL',
             HASH  => \%insert_hash,
-        ); 
-        $dbi->commit();
+    ); 
+    $dbi->commit();
 
-        # publish_crl can then publish all those without PUBLICATION_DATE
-        # and set it accordingly
-    }
+    # publish_crl can then publish all those with a PUBLICATION_DATE of -1
+    # and set it accordingly
     return 1;
 }
 
