@@ -845,11 +845,14 @@ sub select
 	. ' WHERE '
 	. join(' AND ', @conditions);
 
-    if ($args->{REVERSE})
-    {
-        $query .= ' ORDER BY ' . join(' DESC, ', @order_specs) . ' DESC';
-    } else {
-        $query .= ' ORDER BY ' . join(', ', @order_specs);
+    if (@order_specs) { # only order if we actually have columns by which
+                        # we can order
+        if ($args->{REVERSE})
+        {
+            $query .= ' ORDER BY ' . join(' DESC, ', @order_specs) . ' DESC';
+        } else {
+            $query .= ' ORDER BY ' . join(', ', @order_specs);
+        }
     }
 
     ##! 2: "execute do_query: $query"

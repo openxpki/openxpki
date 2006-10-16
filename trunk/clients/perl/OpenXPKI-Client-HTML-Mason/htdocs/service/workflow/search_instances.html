@@ -50,7 +50,7 @@
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></th>
   </tr>
-%   foreach my $instance (@{$msg->{PARAMS}})
+%   foreach my $instance (@{$msg->{PARAMS}}) # @{$msg->{PARAMS}})
 %   {
   <tr>
     <td><% i18nGettext($instance->{'WORKFLOW.WORKFLOW_TYPE'}) %></td>
@@ -76,10 +76,24 @@
        <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE') %>
     </td>
     <td>
-      <select name="type">
+    <script type="text/javascript">
+    <!--
+        function reloadType(type) {
+            search = window.location.search;
+            s_no_type = search.replace(/;type=.*$/, "");
+            window.location.search=s_no_type + ";type=" + type;
+        }
+    -->
+    </script>
+      <select name="type" onchange="reloadType(this.value)">
       <option value=""><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE_ANY') %></option>
-%   foreach my $type (keys %{$msg->{PARAMS}}) {
-      <option value="<% $type %>"><% i18nGettext($type) %></option>
+%   foreach my $a_type (keys %{$msg->{PARAMS}}) {
+%        if ($a_type eq $type) {
+            <option value="<% $a_type %>" selected><% i18nGettext($a_type) %></option>
+%        }
+%        else {
+            <option value="<% $a_type %>"><% i18nGettext($a_type) %></option>
+%        }
 %   }
     </td>
   </tr>
@@ -90,23 +104,71 @@
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_VALUE') %></th>
   </tr>
   <tr>
-    <td><& /lib/html/input.mhtml, 'name' => "context_key" &></td>
+%     if (!defined $type) {
+%         $type = '';
+%     }
+%     my $keys_msg = $context->{client}->send_receive_command_msg
+%               (
+%                   "list_context_keys",
+%                    {
+%                       'WORKFLOW_TYPE' => $type
+%                    },
+%               );
+    <td>
+      <select name="context_key">
+      <option value=""></option>
+%   my @i18n_keys;
+%   # create array of [ translated context key, I18N_KEY ]
+%   foreach my $key (@{$keys_msg->{PARAMS}}) {
+%       push @i18n_keys, [ $m->scomp('/lib/field_to_i18n.mhtml',
+%                                    'field' => $key),
+%                          $key ];
+%   }
+%   # output sorted by translated keys
+%   foreach my $key (sort {lc($a->[0]) cmp lc($b->[0])} @i18n_keys) {
+      <option value="<% $key->[1] %>"><% $key->[0] %></option>
+%   }
+    </select>
+    </td>
     <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
   </tr>
   <tr>
-    <td><& /lib/html/input.mhtml, 'name' => "context_key" &></td>
+    <td>
+      <select name="context_key">
+      <option value=""></option>
+%   foreach my $key (@{$keys_msg->{PARAMS}}) {
+%     # TODO: sort by i18n
+      <option value="<% $key %>"><% $m->comp('/lib/field_to_i18n.mhtml',
+                                             'field' => $key) %></option>
+%   }
+    </select>
+    </td>
     <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
   </tr>
   <tr>
-    <td><& /lib/html/input.mhtml, 'name' => "context_key" &></td>
+    <td>
+      <select name="context_key">
+      <option value=""></option>
+%   foreach my $key (@{$keys_msg->{PARAMS}}) {
+%     # TODO: sort by i18n
+      <option value="<% $key %>"><% $m->comp('/lib/field_to_i18n.mhtml',
+                                             'field' => $key) %></option>
+%   }
+    </select>
+    </td>
     <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
   </tr>
   <tr>
-    <td><& /lib/html/input.mhtml, 'name' => "context_key" &></td>
-    <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
-  </tr>
-  <tr>
-    <td><& /lib/html/input.mhtml, 'name' => "context_key" &></td>
+    <td>
+      <select name="context_key">
+      <option value=""></option>
+%   foreach my $key (@{$keys_msg->{PARAMS}}) {
+%     # TODO: sort by i18n
+      <option value="<% $key %>"><% $m->comp('/lib/field_to_i18n.mhtml',
+                                             'field' => $key) %></option>
+%   }
+    </select>
+    </td>
     <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
   </tr>
 <td>

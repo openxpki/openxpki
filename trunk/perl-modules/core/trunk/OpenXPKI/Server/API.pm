@@ -55,6 +55,7 @@ sub BUILD {
     my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
     my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=]* \z }xms;
     my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
+    my $re_cert_format       = qr{ \A (PEM|DER) \z }xms;
     $method_info_of{$ident} = {
         ### Default API
         'get_pki_realm' => {
@@ -76,6 +77,11 @@ sub BUILD {
                     type     => SCALAR,
                     regex    => $re_base64_string,
                 }, 
+                OUTFORMAT => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_cert_format,
+                },
             },
         },
         'get_ca_certificate' => {
@@ -154,6 +160,16 @@ sub BUILD {
         'list_workflow_titles' => {
             class  => 'Workflow',
             params => { },
+        },
+        'list_context_keys' => {
+            class  => 'Workflow',
+            params => {
+                WORKFLOW_TYPE => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
+                },
+            },
         },
         'get_workflow_info' => {
             class  => 'Workflow',

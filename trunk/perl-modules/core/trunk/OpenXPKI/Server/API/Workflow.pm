@@ -50,6 +50,36 @@ sub list_workflow_instances {
     return $instances;
 }
 
+sub list_context_keys {
+    ##! 1: "start"
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $dbi = CTX('dbi_workflow');
+
+    if (! defined $arg_ref->{'WORKFLOW_TYPE'}
+               || $arg_ref->{'WORKFLOW_TYPE'} eq '') {
+        $arg_ref->{'WORKFLOW_TYPE'} = '%';
+    }
+    my $context_keys = $dbi->select(
+	TABLE    => [ $workflow_table, $context_table ],
+        COLUMNS  => [
+            {
+                COLUMN   => $context_table . '.WORKFLOW_CONTEXT_KEY',
+                DISTINCT => 1,
+            },
+        ],
+	DYNAMIC => {
+            "$workflow_table.WORKFLOW_TYPE" => $arg_ref->{'WORKFLOW_TYPE'}, 
+	    "$workflow_table.PKI_REALM"  => CTX('session')->get_pki_realm(),
+	},
+        JOIN => [ [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ] ],
+    );
+    ##! 16: 'context_keys: ' . Dumper $context_keys
+
+    my @context_keys = map { $_->{$context_table.'.WORKFLOW_CONTEXT_KEY'}  } @{$context_keys};
+    return \@context_keys;
+}
 
 sub list_workflow_titles {
     ##! 1: "list_workflow_titles"
@@ -373,14 +403,15 @@ sub search_workflow_instances {
     my $result = $dbi->select(
 	TABLE   => \@tables,
         COLUMNS => [
+                         $workflow_table . '.WORKFLOW_LAST_UPDATE',
                          $workflow_table . '.WORKFLOW_SERIAL',
                          $workflow_table . '.WORKFLOW_TYPE',
                          $workflow_table . '.WORKFLOW_STATE',
-                         $workflow_table . '.WORKFLOW_LAST_UPDATE',
                    ],
         JOIN    => [
                          \@joins,
                    ],
+        REVERSE => 1,
 	DYNAMIC => $dynamic,
     );
     ##! 16: 'result: ' . Dumper $result
