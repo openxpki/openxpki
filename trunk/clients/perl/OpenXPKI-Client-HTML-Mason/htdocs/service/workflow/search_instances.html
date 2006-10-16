@@ -136,10 +136,8 @@
     <td>
       <select name="context_key">
       <option value=""></option>
-%   foreach my $key (@{$keys_msg->{PARAMS}}) {
-%     # TODO: sort by i18n
-      <option value="<% $key %>"><% $m->comp('/lib/field_to_i18n.mhtml',
-                                             'field' => $key) %></option>
+%   foreach my $key (sort {lc($a->[0]) cmp lc($b->[0])} @i18n_keys) {
+      <option value="<% $key->[1] %>"><% $key->[0] %></option>
 %   }
     </select>
     </td>
@@ -149,10 +147,8 @@
     <td>
       <select name="context_key">
       <option value=""></option>
-%   foreach my $key (@{$keys_msg->{PARAMS}}) {
-%     # TODO: sort by i18n
-      <option value="<% $key %>"><% $m->comp('/lib/field_to_i18n.mhtml',
-                                             'field' => $key) %></option>
+%   foreach my $key (sort {lc($a->[0]) cmp lc($b->[0])} @i18n_keys) {
+      <option value="<% $key->[1] %>"><% $key->[0] %></option>
 %   }
     </select>
     </td>
@@ -162,10 +158,8 @@
     <td>
       <select name="context_key">
       <option value=""></option>
-%   foreach my $key (@{$keys_msg->{PARAMS}}) {
-%     # TODO: sort by i18n
-      <option value="<% $key %>"><% $m->comp('/lib/field_to_i18n.mhtml',
-                                             'field' => $key) %></option>
+%   foreach my $key (sort {lc($a->[0]) cmp lc($b->[0])} @i18n_keys) {
+      <option value="<% $key->[1] %>"><% $key->[0] %></option>
 %   }
     </select>
     </td>
