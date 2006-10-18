@@ -749,46 +749,63 @@ sub select
     ## check dynamic conditions
     if (exists $args->{DYNAMIC} && ref $args->{DYNAMIC} eq 'HASH')
     {
-	foreach my $condition (keys %{$args->{DYNAMIC}})
+	foreach my $dynamic_key (keys %{$args->{DYNAMIC}})
 	{
 	    # for joins the key may be SYMBOLIC_NAME.COLUMN or ALIAS.COLUMN, 
 	    # otherwise we only only get COLUMN
 	    # $dynamic_column always is set to COLUMN, $dynamic_table is
 	    # TABLE if available, otherwise undef
 	    my ($col, $tab) = 
-		$self->__get_symbolic_column_and_table($condition);
-
+		$self->__get_symbolic_column_and_table($dynamic_key);
+	    
 	    # leave alias as is, but map symbolic table name to real table name
 	    if (defined $tab && ! exists $alias_map_of{$tab}) {
 		$tab = $self->{schema}->get_table_name($tab);
 	    }
-
+	    
 	    if (! $col)
 	    {
 		OpenXPKI::Exception->throw (
 		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_WRONG_COLUMN",
 		    params  => {
-			COLUMN => $condition,
+			COLUMN => $dynamic_key,
 		    });
 	    }
 	    
 	    $col = $self->{schema}->get_column($col);
-
+	    
 	    my $expr;
 	    if (defined $tab) {
 		$expr = $tab . '.';
 	    }
 	    $expr .= $col;
-
+	    
 	    if ($self->{DBH}->column_is_numeric ($col))
 	    {
 		$expr .= ' = ?';
 	    } else {
 		$expr .= ' like ?';
 	    }
-	    push @conditions, $expr;
-	    push @bind_values, $args->{DYNAMIC}->{$condition};
-	} 
+	    
+	    my @dynamic_values;
+
+	    if (ref $args->{DYNAMIC}->{$dynamic_key} eq '') {
+		push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key};
+	    } elsif (ref $args->{DYNAMIC}->{$dynamic_key} eq 'ARRAY') {
+		push @dynamic_values, @{$args->{DYNAMIC}->{$dynamic_key}};
+	    } else {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_DYNAMIC_QUERY",
+		    params  => {
+			CONDITION => $dynamic_key,
+		    });
+	    }
+	    
+	    foreach my $value (@dynamic_values) {
+		push @conditions, $expr;
+		push @bind_values, $value;
+	    }
+	}
     }
     
     # sanity check: there must be a condition
@@ -1072,7 +1089,9 @@ In addition the function supports all table columns except of the
 data columns because they are perhaps too large. Many database do not
 support searching on high volume columns or columns with a flexible
 length. Dynamic parameters may be specified via a hash reference passed
-in as the named parameter DYNAMIC.
+in as the named parameter DYNAMIC. The argument to DYNAMIC may be a scalar
+or an array reference. In the latter case multiple conditions are
+created that are logically ANDed.
 
 You can use wildcards inside of text fields like subjects or emailaddresses.
 You have to ensure that C<%> is used as wildcard. This module expects SQL

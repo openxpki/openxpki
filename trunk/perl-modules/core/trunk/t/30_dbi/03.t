@@ -3,7 +3,7 @@ use warnings;
 use Test;
 use DateTime;
 
-BEGIN { plan tests => 25 };
+BEGIN { plan tests => 26 };
 
 print STDERR "OpenXPKI::Server::DBI: Queries with constraints and joins\n";
 
@@ -102,6 +102,20 @@ $result = $dbi->select(
     TABLE => 'WORKFLOW_HISTORY',
     DYNAMIC => {
 	WORKFLOW_DESCRIPTION => 'Added context value somekey-3->somevalue: 100043',
+    },
+    );
+
+ok(scalar @{$result}, 1);
+
+
+# simple compound query for default index field
+$result = $dbi->select(
+    TABLE => 'WORKFLOW_HISTORY',
+    DYNAMIC => {
+	WORKFLOW_DESCRIPTION => [ 
+	    'Added context value somekey-3->somevalue:%',
+	    '%100043',
+	    ],
     },
     );
 
