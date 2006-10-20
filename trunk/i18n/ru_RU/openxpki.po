@@ -271,25 +271,25 @@ msgstr "Ошибки"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS"
 msgstr "Описания полей формы"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_CSP"
-msgstr "Создание закрытого ключа"
+msgstr "Криптопровайдер (CSP)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DEFAULT_CSP"
-msgstr "Теперь вы можете создать новый SPKAC-ключ при помощи своего броузера."
+msgstr "Криптопровайдер, используемый по умолчанию"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DESCRIPTION"
-msgstr "Теперь вы можете создать новый SPKAC-ключ при помощи своего броузера."
+msgstr "Теперь вы можете создать cвой новый закрытый ключ и изготовить заявку "
+"на сертификат. Выберите, пожалуйста, длину ключа "
+"и тип криптопровайдера (CSP). Криптопровайдер - это компонент системы, " 
+"при помощи которого производятся все процедуры с вашими закрытыми ключами. "
+"Данная страница предназначена для генерации ключа и заявки только при "
+"помощи броузера Microsoft Internet Explorer."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_KEY_LENGTH"
-msgstr "Создание закрытого ключа"
+msgstr "Длина криптографического ключа"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_TITLE"
-msgstr "Создание закрытого ключа"
+msgstr "Создание заявки при помощи броузера Microsoft Internet Explorer"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_INFO_DESCRIPTION"
 msgstr ""
@@ -315,14 +315,12 @@ msgstr "Теперь вы можете создать новый SPKAC-ключ 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_TITLE"
 msgstr "Создание закрытого ключа"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_DESCRIPTION"
 msgstr ""
-"Выберите, пожалуйста, роль, для которой вы хотите запросить сертификат."
+"Выберите, пожалуйста, профиль сертификата."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_TITLE"
-msgstr "Выбор роли"
+msgstr "Выбор профиля"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_DESCRIPTION"
 msgstr ""
@@ -367,14 +365,14 @@ msgstr "Выберите способ формирования имени"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_TITLE"
 msgstr "Создание уникального имени для сертификата"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_WORKFLOW_TYPE_DESCRIPTION"
 msgstr ""
-"Выберите, пожалуйста, роль, для которой вы хотите запросить сертификат."
+"Выберите, пожалуйста, из списка тип технологического процесса, "
+"который вы хотите запустить для создания заявки."
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_WORKFLOW_TYPE_TITLE"
-msgstr "Выбор роли"
+msgstr "Выбор типа технологического процесса для создания заявки"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_"
 msgstr ""
@@ -454,9 +452,9 @@ msgstr ""
 "Параметр URI (Uniform Ressource Identifier) представляет собой адрес или "
 "ссылку на источник информации. Например: www.openxpki.org/~testuser."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_IE_PKCS10"
-msgstr "PKCS#10"
+msgstr "Создать заявку в формате PKCS#10 "
+"при помощи броузера Microsoft Internet Explorer"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION"
 msgstr ""
@@ -601,13 +599,12 @@ msgstr "Имя"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE"
 msgstr "Значение"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
-msgstr "Теперь вы можете посмотреть доступные типы технологических процессов."
+msgstr "Данная функция системы  еще не реализована. "
+"Обратитесь, пожалуйста, к администратору."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_TITLE"
-msgstr "Типы технологических процессов."
+msgstr "Функция не реализована."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_APPROVALS"
 msgstr "Утверждение"
@@ -619,152 +616,93 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_TITLE"
 msgstr "Запуск нового технологического процесса."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATOR"
-msgstr "Состояние технологического процесса"
+msgstr "Владелец технологического процесса"
 
-#, fuzzy
+
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_INFO"
-msgstr "Серийный номер технологического процесса"
+msgstr "Дополнительная информация "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_PROFILE"
-msgstr "Серийный номер технологического процесса"
+msgstr "Профиль сертификата "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_ROLE"
-msgstr "Серийный номер технологического процесса"
+msgstr "Роль "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT"
-msgstr "Состояние технологического процесса"
+msgstr "Имя "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_ALT_NAME"
-msgstr "Альтернативное имя субъекта"
+msgstr "Альтернативное имя"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_STYLE"
-msgstr "Создание уникального имени для сертификата"
+msgstr "Способ формирования уникального имени "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_EXPORT_DESTINATION"
-msgstr "Теперь вы можете помотреть имеющиеся типы технологических процессов."
+msgstr "Объект, в который будут экспортированы параметры."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_EXPORT_PARAMS"
-msgstr "Серийный номер технологического процесса"
+msgstr "Экспортируемые параметры"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_EXPORT_WORKFLOW_TYPE"
-msgstr "Выбор роли"
+msgstr "Тип экспортируемого технологического процесса"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_KEYGEN"
-msgstr "Тип технологического процесса"
+msgstr "Генерация ключа "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_TYPE"
-msgstr "Тип технологического процесса"
+msgstr "Тип заявки на сертификат "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
-msgstr ""
-"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
-"внимательны - данная система поддерживает множественные реализации "
-"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
-"вы в настоящий момент работаете, обратитесь к информационному меню."
+msgstr "Описание"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_GET_INSTANCE_INFO_DESCRIPTION"
-msgstr ""
-"Вы можете запустить новый технологический процесс. Выберите тип процесса."
+msgstr "Введите, пожалуйста, формат, который будет использоваться при "
+"передаче вам графического представления хода выполнения "
+"технологических процессов"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_GET_INSTANCE_INFO_TITLE"
-msgstr "Запуск нового технологического процесса."
+msgstr "Получить информацию об текщем технологическом процессе"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Последнее обновление"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
 msgstr ""
-"Теперь вы можете помотреть список активированных технологических процессов."
+"Это страница с перечнем и ссылками на описания активных технологических " "процессов. Перейдя по ссылке с серийным номером процесса, "
+"можно посмотреть детальную информацию о нем."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_TITLE"
-msgstr "Активированные технологические процессы"
+msgstr "Активные технологические процессы"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_DESCRIPTION"
-msgstr "Теперь вы можете помотреть имеющиеся типы технологических процессов."
+msgstr "Это страница с перечнем и ссылками на типы технологических "
+"процессов. Перейдя по ссылке, можно посмотреть список процессов "
+"выбранного вами типа."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_TYPES_TITLE"
 msgstr "Типы технологических процессов"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_PKCS10"
-msgstr "Тип технологического процесса"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_DESCRIPTION"
-msgstr ""
-"Вы можете запустить новый технологический процесс. Выберите тип процесса."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_KEY"
-msgstr "Запуск нового технологического процесса."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_TITLE"
-msgstr "Запуск нового технологического процесса."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_VALUE"
-msgstr "Запуск нового технологического процесса."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION"
-msgstr ""
-"Теперь вы можете ознакомиться с деталями функционирования активированного "
-"технологического процесса."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_TITLE"
-msgstr "Активированный технологический процесс"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE"
-msgstr "Выбор роли"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE_ANY"
-msgstr "Выбор роли"
+msgstr " PKCS#10"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL"
 msgstr "Серийный номер технологического процесса"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES"
-msgstr "Активированный технологический процесс"
+msgstr "Показать активные технологические процессы"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DESCRIPTION"
 msgstr ""
-"Теперь вы можете ознакомиться с деталями функционирования активированного "
+"Теперь вы можете ознакомиться с деталями функционирования активного "
 "технологического процесса."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE"
-msgstr "Активированный технологический процесс"
+msgstr "Активный технологический процесс"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SPKAC"
-msgstr "Состояние технологического процесса"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_START_EXPORT_DESCRIPTION"
-msgstr "Теперь вы можете помотреть имеющиеся типы технологических процессов."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_START_EXPORT_TITLE"
-msgstr "Теперь вы можете помотреть имеющиеся типы технологических процессов."
+msgstr "SPKAC"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE"
 msgstr "Состояние технологического процесса"
@@ -982,7 +920,7 @@ msgstr "CSR с DC-структурой уникального имени"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_IS_ABSTRACT_CLASS"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Новая заявка на сертификат (CSR)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_MISSING_ENGINE"
@@ -1463,10 +1401,6 @@ msgstr ""
 "более корректно, так как значения dc-части больше не ограничены кодами стран."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_NOT_YET_IMPLEMENTED"
-msgstr "Создание новой заявки на сертификат (CSR)"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_QUORUM_MISSING"
 msgstr "CSR с OU-структурой уникального имени"
 
@@ -1624,10 +1558,14 @@ msgid "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT"
 msgstr ""
 
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA"
+msgstr "Тест Dummy CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA\n"
 msgstr "Проверка пустого Удостоверяющего Центра"
 
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA"
-msgstr "Проверка пользовательского Удостоверяющего Центра"
+msgstr "Тест User CA"
 
 msgid "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR"
 msgstr ""
@@ -1682,10 +1620,6 @@ msgstr "Русский"
 #, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_WRITE_FILE_OPEN_FAILED"
 msgstr "Русский"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_FOO_BAR"
-msgstr "Подразделение"
 
 msgid "I18N_OPENXPKI_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST"
 msgstr ""
@@ -1763,24 +1697,20 @@ msgstr "Номер факса"
 msgid "I18N_OPENXPKI_HTML_FAX_NUMBER_DESCRIPTION"
 msgstr "В данное поле вписывается обычный номер факса."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
-msgstr "Показать список технологических процессов."
+msgid "I18N_OPENXPKI_HTML_GET_PROCESS_INFO"
+msgstr "Показать диаграмму течения технологического процесса"
 
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "Создание новой заявки на сертификат (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
-msgstr "Язык (Language)"
+msgstr "Обмен данными"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT"
-msgstr "С истекшим сроком действия"
+msgstr "Экспорт "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_IMPORT"
-msgstr "Создание новой заявки на сертификат (CSR)"
+msgstr "Импорт"
 
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
 msgstr "С истекшим сроком действия"
@@ -1794,15 +1724,11 @@ msgstr "Выход"
 msgid "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS"
 msgstr "Блокированные сертификаты"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
-msgstr "Создание новой заявки на сертификат (CSR)"
-
 msgid "I18N_OPENXPKI_HTML_MENU_VALID_CERTS"
 msgstr "Действительные сертификаты"
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW"
-msgstr "Технологический Процесс"
+msgstr "Технологические процессы"
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
 msgstr "Активировать технологический процесс"
@@ -1812,10 +1738,6 @@ msgstr "Показать список технологических проце�
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES"
 msgstr "Показать список типов технологических процессов."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_SEARCH_INSTANCES"
-msgstr "Показать список технологических процессов."
 
 msgid "I18N_OPENXPKI_HTML_ORGANIZATION"
 msgstr "Организация"
@@ -1833,9 +1755,8 @@ msgstr ""
 "Поле Подразделение (ou) может быть использовано для описания внутренних "
 "структур организации."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_PRINT_BUTTON"
-msgstr "Организация"
+msgstr "Распечатать информацию"
 
 msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER"
 msgstr "Номер телефона"
@@ -1853,20 +1774,14 @@ msgstr ""
 "или иной цифровой информации, позволяющей безопасным образом привязать "
 "уникальное имя к конкретному пользователю или объекту."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_MODULE_FUNCTION_SPECIFIC_STUFF"
-msgstr "Новая завка на сертификат (CSR)"
-
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
-msgstr "Генерация ключа на стороне сервера"
+msgstr "Профиль TLS сервера "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_PROFILE_USER"
-msgstr "Подразделение"
+msgstr "Профиль пользователя"
 
 msgid "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST"
 msgstr ""
@@ -1897,17 +1812,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_ACL_LOAD_SERVER_DUPLICATE_ID_FOUND"
-msgstr ""
-"Используемая структура не предусматривает использование названия организации."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_ACL_CHECK_FAILED"
-msgstr ""
-"Для выполнения следующего этапа технологическому процессу не хватает "
-"некоторых данных (__FIELDS__)."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_ILLEGAL_PARAM"
@@ -1967,10 +1871,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_MISSING_WORKFLOW_CONFIGURATION"
 msgstr ""
 
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_INVALID_METHOD_CALLED"
-msgstr "SPKAC-строка пуста."
-
 msgid "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER"
 msgstr ""
 
@@ -1981,24 +1881,20 @@ msgid "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED"
+msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_GET_PROCESS_INFO_DOT_FAILED"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
 "некоторых данных (__FIELDS__)."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_GET_WORKFLOW_INFO_DOT_FAILED"
-msgstr ""
-"Для выполнения следующего этапа технологическому процессу не хватает "
-"некоторых данных (__FIELDS__)."
+msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_INVALID_PARAMETER"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_INVALID_PARAMETER"
+msgstr "SPKAC-строка пуста."
 
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS"
-msgstr ""
-"Для выполнения следующего этапа технологическому процессу не хватает "
-"некоторых данных (__FIELDS__)."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
 "некоторых данных (__FIELDS__)."
@@ -2243,33 +2139,19 @@ msgstr ""
 "Используемая структура не предусматривает использование названия организации."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SYMBOLIC_QUERY_COLUMNS_MISSING_COLUMNS"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
 "некоторых данных (__FIELDS__)."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_ALIAS_NOT_UNIQUE"
-msgstr ""
-"Используемая структура не предусматривает использование названия организации."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_NUMBER_OF_SYMBOLIC_TABLE_ENTRIES"
-msgstr ""
-"Используемая структура не предусматривает использование названия организации."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_TABLE_SPECIFICATION"
-msgstr ""
-"Используемая структура не предусматривает использование названия организации."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_JOIN_SPECIFICATION_MISMATCH"
-msgstr ""
-"Используемая структура не предусматривает использование названия организации."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_COLUMNS"
 msgstr ""
 "Используемая структура не предусматривает использование названия организации."
 
@@ -2347,12 +2229,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_LOG_EMPTY_LOG_MESSAGE"
 msgstr ""
 
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_LOG_NEW_LOG4PERL_INIT_FAILED"
-msgstr ""
-"Для выполнения следующего этапа технологическому процессу не хватает "
-"некоторых данных (__FIELDS__)."
-
 msgid "I18N_OPENXPKI_SERVER_LOG_NEW_MISSING_LOGGER"
 msgstr ""
 
@@ -2381,21 +2257,6 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTISSUANCE_IMPORTCERTDATA_INVALID_CSR_TYPE"
-msgstr "Сертификаты"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTREQUEST_PERSISTREQUEST_SOURCES_UNDEFINED"
-msgstr ""
-"Для выполнения следующего этапа технологическому процессу не хватает "
-"некоторых данных (__FIELDS__)."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTREQUEST_PERSISTREQUEST_SUBJECT_ALT_NAME_SOURCE_UNDEFINED"
-msgstr ""
-"GUID __GUID__ не соответствует ни требованиям Microsoft GUID, ни RFC 4122. "
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_CLEANUP_RMTREE_FAILED"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
@@ -2414,12 +2275,6 @@ msgstr ""
 "некоторых данных (__FIELDS__)."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_UNLINK_FAILED"
-msgstr ""
-"Для выполнения следующего этапа технологическому процессу не хватает "
-"некоторых данных (__FIELDS__)."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_WHO_AM_I_FAILED"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
@@ -2433,6 +2288,12 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES_MKDIR_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_LOG_FAILED"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
 "некоторых данных (__FIELDS__)."
@@ -2653,6 +2514,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT"
 msgstr ""
 
+msgid "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT "
+msgstr ""
+
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_IMPL_INSTANTIATE_FAILED"
 msgstr ""
 
@@ -2869,9 +2733,8 @@ msgstr "Имя субъекта (Common Name)"
 msgid "I18N_OPENXPKI_TOOLKIT_TEMPORARY_DIRECTORY_UNAVAILABLE"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_TRANSPORT"
-msgstr "Подразделение"
+msgid "I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION"
+msgstr ""
 
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_NEW_OPEN_INFILE_FAILED"
 msgstr ""
@@ -2891,300 +2754,224 @@ msgstr ""
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Утвердить заявку на сертификат (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Отменить утверждение заявки на сертификат (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Изменить дополнительную информацию"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Изменить профиль сертификата "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Изменить роль в заявке"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
-msgstr "Создание структуры уникального имени для сертификата"
+msgstr "Изменить имя в заявке"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
-msgstr "IP"
+msgstr "Изменить альтернативное имя в заявке"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Изменить способ формирования имени в заявке"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_CLEANUP"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Сброс данных"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_LOGS"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Экспорт журналов"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_PACK_ARCHIVE"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Сжатие архивированных данных"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES"
-msgstr "Сертификаты"
+msgstr "Экспорт активных технологических процессов"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_EXPORT_WRITE_ARCHIVE"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Запись архива "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_LOGS"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Импорт журналов "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_READ_ARCHIVE"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Чтение архива"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_UNPACK_ARCHIVE"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Распаковка архива"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES"
-msgstr "Сертификаты"
+msgstr "Импорт технологических процессов"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Подготовка окружения для обмена данными"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Определение Удостоверяющего Центра, выдавшего сертификат"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Выполнить заявку на сертификат (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CSR"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Эксопрт заявки на сертификат (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
-msgstr "Сертификаты"
+msgstr "Запустить новый технологический процесс для выдачи сертификата"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Оставить заявку для обработки(CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Отклонить заявку на сертификат (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Пауза"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Ожидание завершения технологического процесса"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Новая заявка на сертификат (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
-msgstr "CSR с OU-структурой уникального имени"
+msgstr "Разблокировать ключ удостоверяющего центра "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Пауза"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE"
-msgstr "Сертификаты"
+msgstr "Технологические процессы создания сертификатов"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
-msgstr ""
+msgstr "Технологические процессы быстрой обработки заявки"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE"
-msgstr "Сертификаты"
+msgstr "Технологические процессы быстрой фоновой обработки заявки"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-msgstr "Сертификаты"
+msgstr "Технологические процессы быстрой интерактивной обработки заявки"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
-msgstr "Сертификаты"
+msgstr "Технологические процессы выдачи новых списков отзыва"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Технологические процессы экспорта "
+"активных технологических процессов на другие серверы"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Технологические процессы импорта "
+"активных технологических процессов с других серверов"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
-msgstr "Сертификаты"
+msgstr "Сертификат Удостоверяющего центра идентифицирован"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
-msgstr "Сертификаты"
+msgstr "Сертификат выдан"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
-msgstr "Сертификаты"
+msgstr "Идет запуск... "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
-msgstr "Сертификаты"
+msgstr "Идет подготовка к выдаче сертификата...	"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVAL"
-msgstr ""
-"Используемая структура требует наличия, как минимум, названий одного "
-"подразделения  организации, одной организации и одной страны."
+msgstr "Идет процесс утверждения заявки"
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED"
-msgstr ""
+msgstr "Заявка утверждена"
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL"
-msgstr ""
+msgstr "Идет запуск... "
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING"
-msgstr ""
+msgstr "Заявка находится в стадии редактирования"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSUED"
-msgstr "Сертификаты"
+msgstr "Список отзыва выдан"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_PUBLISHED"
-msgstr "Сертификаты"
+msgstr "Список отзыва доступен"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_INITIAL"
-msgstr "Сертификаты"
+msgstr "Идет запуск... "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_NEXT_CA_DETERMINED"
-msgstr "Сертификаты"
+msgstr "Идентифицирован следующий удостоверяющий центр"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
-msgstr "Сертификаты"
+msgstr "Профиль подготовлен"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
-msgstr "Сертификаты"
+msgstr "Экспортированы журналы"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Экспортированы технологические процессы"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Архив данных готов для экспорта"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
-msgstr "Сертификаты"
+msgstr "Экспорт успешно завершен"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Окружение для экспорта данных готово"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
-msgstr "Сертификаты"
+msgstr "Идет запуск... "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
-msgstr "Сертификаты"
+msgstr "Экспорт выполнен"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_READY"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Архив данных готов для импорта"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_UNPACKED"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Импортированный архив данных распакован "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_COMPLETED"
-msgstr "Сертификаты"
+msgstr "Импорт успешно завершен"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ENV_READY"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "Окружение для импорта данных готово"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_INITIAL"
-msgstr "Сертификаты"
+msgstr "Идет запуск... "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_LOGS_DONE"
-msgstr "Сертификаты"
+msgstr "Журналы импортированы"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
-msgstr "Сертификаты"
+msgstr "Импорт выполнен"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
-msgstr "Новая завка на сертификат (CSR)"
+msgstr "В состоянии ожидания запуска"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
-msgstr "Сертификаты"
+msgstr "Выдача сертификата"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"
-msgstr ""
+msgstr "Создание заявки на сертификат (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE"
-msgstr ""
-"Используемая структура требует наличия, как минимум, названий одного "
-"подразделения  организации, одной организации и одной страны."
+msgstr "Фоновая часть процесса обработки заявки"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-msgstr ""
-"Используемая структура требует наличия, как минимум, названий одного "
-"подразделения  организации, одной организации и одной страны."
+msgstr "Интерактивная часть процесса создания заявки"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
-msgstr "Сертификаты"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
-msgstr ""
-"Используемая структура требует наличия, как минимум, названий одного "
-"подразделения  организации, одной организации и одной страны."
+msgstr "Экспорт"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT"
-msgstr ""
-"Используемая структура требует наличия, как минимум, названий одного "
-"подразделения  организации, одной организации и одной страны."
+msgstr "Импорт"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
-msgstr ""
-"Используемая структура требует наличия, как минимум, названий одного "
-"подразделения  организации, одной организации и одной страны."
+msgstr "Прием заявки по протоколу SCEP"
 
 msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
 msgstr ""
@@ -3228,9 +3015,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_CONTEXT_PARAMETER"
 msgstr ""
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_PARAMETER"
-msgstr "Сброс"
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_PARAMETER> exception."
+msgstr ""
 
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_PKI_REALM_UNDEFINED"
 msgstr ""
@@ -3286,29 +3072,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA\n"
-#~ msgstr "Проверка пустого Удостоверяющего Центра"
+msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
+msgstr "Показать информацию об активных технологических процессах"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_GET_PROCESS_INFO"
-#~ msgstr "Иван Петров"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_INVALID_PARAMETER"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
-#~ msgstr ""
-#~ "Для выполнения следующего этапа технологическому процессу не хватает "
-#~ "некоторых данных (__FIELDS__)."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_LOG_FAILED"
-#~ msgstr ""
-#~ "Для выполнения следующего этапа технологическому процессу не хватает "
-#~ "некоторых данных (__FIELDS__)."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_FINISHED"
@@ -3316,7 +3083,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
-#~ msgstr "Новая завка на сертификат (CSR)"
+#~ msgstr "Новая заявка на сертификат (CSR)"
 
 #~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
 #~ msgstr "Deutsch"
@@ -3391,3 +3158,5 @@ msgstr ""
 #~ msgstr ""
 #~ "The UPN __UPN__ is not a valid UPN. We support only UPN which are "
 #~ "compatible with RFC 822."
+
+
