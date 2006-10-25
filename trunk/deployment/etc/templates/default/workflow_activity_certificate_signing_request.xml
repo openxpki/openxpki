@@ -2,7 +2,7 @@
   <!-- this action name has not to be human readable      -->
   <!-- because it is only used to initialize the workflow -->
   <action name="create_csr"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::SetSource"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="USER">
       <field name="cert_role"/>
       <field name="cert_profile"/>
@@ -57,7 +57,7 @@
       </validator>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::SetSource"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="OPERATOR">
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
@@ -67,7 +67,7 @@
       </validator>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::SetSource"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="OPERATOR">
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
@@ -84,7 +84,7 @@
       <field name="cert_subject_style"/>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::SetSource"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="OPERATOR">
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
@@ -96,7 +96,7 @@
       </validator>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::SetSource"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="OPERATOR">
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->

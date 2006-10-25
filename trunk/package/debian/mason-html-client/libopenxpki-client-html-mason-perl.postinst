@@ -30,7 +30,7 @@ case "$1" in
         apache-modconf apache enable mod_perl
 
         # restart apache
-        /etc/init.d/apache reload
+        invoke-rc.d apache reload
 
         # add apache user to openxpki group (to allow connecting the socket)
         usermod --groups openxpki --append openxpki www-data

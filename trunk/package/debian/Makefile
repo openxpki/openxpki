@@ -1,11 +1,13 @@
 
+# do not change the order
+# some packages have build dependencies
 PACKAGES=	\
 	core			\
-	deployment		\
-	i18n			\
-	mason-html-client	\
+	perl-client-api		\
 	perl-cli-client		\
-	perl-client-api
+	deployment		\
+	mason-html-client	\
+	i18n
 
 .PHONY : $(PACKAGES)
 
@@ -31,3 +33,5 @@ check:
 clean:
 	rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes
 	make $(PACKAGES) SUBTARGET=clean
+
+distclean: clean

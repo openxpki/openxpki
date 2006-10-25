@@ -25,10 +25,7 @@ set -e
 
 case "$1" in
     configure)
-	# check for an installed deployment
-	if [ -e /etc/init.d/openxpkid ]; then
-		/etc/init.d/openxpkid restart || echo "OpenXPKI daemon restart failed."
-	fi;
+        invoke-rc.d --quiet openxpkid restart
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

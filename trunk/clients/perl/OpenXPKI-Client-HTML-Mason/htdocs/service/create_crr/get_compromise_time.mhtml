@@ -1,0 +1,66 @@
+<%args>
+    $workflow_type   => undef
+    $cert_serial     => undef
+    $cert_issuer     => undef
+    $compromise_time => undef
+</%args>
+
+<& /service/open_form.mhtml &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
+<& /lib/html/hidden.mhtml, 'name' => 'cert_serial',   'value' => $cert_serial &>
+<& /lib/html/hidden.mhtml, 'name' => 'cert_issuer',   'value' => $cert_issuer &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_COMPROMISE_TIME_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_COMPROMISE_TIME_DESCRIPTION') %>
+</p>
+
+<table>
+  <tr>
+    <td><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME') %></td>
+    <td>
+      <& '/lib/html/input.mhtml',
+         'name'  => 'compromise_time',
+         'value' => '',
+         'max'   => 32,
+         'min'   => 1 &>
+    </td>
+  </tr>
+</table>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+<& /service/create_csr/print_descriptions.mhtml, 'descriptions' => \%descriptions &>
+
+<%init>
+    my @errors = ();
+
+    my $new_form = 1;
+       $new_form = 0
+           if (defined $compromise_time);
+
+    eval
+    {
+        if (defined $compromise_time)
+        {
+            my $data = OpenXPKI::DateTime::convert_date({
+                           DATE      => $compromise_time,
+                           OUTFORMAT => 'iso8601',
+                       });
+        }
+    }
+    if ($EVAL_ERROR)
+    {
+        push @errors,
+             i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_COMPROMISE_TIME');
+    }
+
+    return $compromise_time if (not $new_form and not scalar @errors);
+
+</%init>
+<%once>
+    use OpenXPKI::DateTime;
+</%once>

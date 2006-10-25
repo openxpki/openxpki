@@ -38,6 +38,14 @@ htdocs/authentication/role.mhtml
 htdocs/authentication/open_form.mhtml
 htdocs/authentication/close_form.mhtml
 
+htdocs/service/info/autohandler
+htdocs/service/info/anonymous_menu.html
+htdocs/service/info/ca_op_menu.html
+htdocs/service/info/dataexchange.html
+htdocs/service/info/language.html
+htdocs/service/info/ra_op_menu.html
+htdocs/service/info/workflow.html
+
 htdocs/service/autohandler
 htdocs/service/dhandler
 htdocs/service/index.html
@@ -83,6 +91,12 @@ htdocs/service/create_csr/store_pkcs10.mhtml
 htdocs/service/create_csr/create_workflow.mhtml
 htdocs/service/create_csr/print_errors.mhtml
 htdocs/service/create_csr/print_descriptions.mhtml
+
+htdocs/service/create_crr/index.html
+htdocs/service/create_crr/get_workflow_type.mhtml
+htdocs/service/create_crr/get_certificate.mhtml
+htdocs/service/create_crr/get_compromise_time.mhtml
+htdocs/service/create_crr/get_reason.mhtml
 
 htdocs/binary/get_workflow_instance_info.html
 htdocs/service/workflow/get_workflow_instance_info.html

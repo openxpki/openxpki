@@ -61,7 +61,7 @@ install-stamp: build
 	dh_installdirs
 	mv bin/openxpki bin/openxpki-cli
 	dh_install
-	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
+	$(MAKE) install PREFIX=$(CURDIR)/debian/libopenxpki-client-cli-perl/usr
 	touch install-stamp
 
 .PHONY: arrange binary binary-arch binary-indep build clean config install

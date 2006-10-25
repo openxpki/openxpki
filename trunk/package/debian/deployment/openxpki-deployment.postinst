@@ -51,18 +51,6 @@ case "$1" in
 	## fix var directory
 	chown openxpki:openxpki /var/openxpki/*
 
-	# force permissions
-	#for i in /var/lib/openca/session/cookie/node
-	#do
-	#	dpkg-statoverride --list ${i} >/dev/null 2>&1 ||
-	#		dpkg-statoverride --add --update openca openca 0750 ${i}
-	#done
-
-        #for i in /etc/openca/access_control/node.xml.template
-        #do
-	#	dpkg-statoverride --list ${i} >/dev/null 2>&1 ||
-	#		dpkg-statoverride --add --update root openca 0640 ${i}
-        #done
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

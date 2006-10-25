@@ -149,8 +149,9 @@ OpenXPKI/Server/Workflow/Activity/CertIssuance/ImportCertData.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/Issue.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/GetCertProfile.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/PersistCertificate.pm
-OpenXPKI/Server/Workflow/Activity/CertRequest/SetSource.pm
-OpenXPKI/Server/Workflow/Activity/CertRequest/PersistRequest.pm
+OpenXPKI/Server/Workflow/Activity/CSR/PersistRequest.pm
+OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
+OpenXPKI/Server/Workflow/Activity/CRR/RevokeCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Profile/Create.pm
 OpenXPKI/Server/Workflow/Activity/Key/Generate.pm
 OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
@@ -162,6 +163,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/CreateWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ForkWorkflowInstance.pm
+OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Sleep.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
@@ -193,6 +195,7 @@ OpenXPKI/Server/Workflow/Condition/Server.pm
 OpenXPKI/Server/Workflow/Condition/CRLSigningCAsLeft.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowChildrenSuccessfullyFinished.pm
 
+OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
 OpenXPKI/Server/Workflow/Validator/CertProfile.pm
 OpenXPKI/Server/Workflow/Validator/CertSubject.pm

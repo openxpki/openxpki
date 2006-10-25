@@ -63,7 +63,7 @@ install-stamp: build
 	dh_testdir
 	dh_installdirs
 	dh_install
-	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
+	$(MAKE) install PREFIX=$(CURDIR)/debian/libopenxpki-client-html-mason-perl/usr
 	touch install-stamp
 
 .PHONY: arrange binary binary-arch binary-indep build clean config install

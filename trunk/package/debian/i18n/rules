@@ -50,7 +50,7 @@ config-stamp:
 install: install-stamp
 install-stamp: build
 	dh_testdir
-	DESTDIR=$(CURDIR)/debian/tmp make install
+	DESTDIR=$(CURDIR)/debian/openxpki-i18n make install
 	dh_installdocs
 	dh_fixperms -a
 	touch install-stamp

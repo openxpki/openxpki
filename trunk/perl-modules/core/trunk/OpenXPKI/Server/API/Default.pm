@@ -318,7 +318,8 @@ sub get_servers {
 1;
 
 __END__
-=head1 Name
+
+=head1 NAME
 
 OpenXPKI::Server::API::Default
 

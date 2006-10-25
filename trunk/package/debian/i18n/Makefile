@@ -44,9 +44,9 @@ changelog::
 	echo " -- Michael Bell <michael.bell@web.de> " `date --rfc-2822` >> changelog
 
 source-clean:
-	#rm -rf /tmp/$(PACKAGE)-*
-	#rm -f /tmp/$(PACKAGE)-*.tar.gz
-	#rm -f /tmp/openxpki-debian.tar.gz
+	rm -rf /tmp/$(PACKAGE)-*
+	rm -f /tmp/$(PACKAGE)-*.tar.gz
+	rm -f /tmp/openxpki-debian.tar.gz
 
 clean:	source-clean
 	if [ -e changelog.org ]; then mv changelog.org changelog; fi

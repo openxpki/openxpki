@@ -33,6 +33,10 @@ sub AUTOMETHOD {
 
 __END__
 
+=head1 NAME
+
+OpenXPKI::Client::API
+
 =head1 Description
 
 OpenXPKI Server API mirror. This class roughly implements somethin akin

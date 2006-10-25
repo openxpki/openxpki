@@ -27,7 +27,7 @@ binary-indep-stamp: arrange
 	dh_compress
 	dh_fixperms
 	dh_strip
-	dh_installdeb
+	#dh_installdeb
 	dh_perl
 	dh_shlibdeps
 	dh_gencontrol
@@ -50,16 +50,17 @@ clean:
 config: config-stamp
 config-stamp:
 	dh_testdir
-	./configure -- --setcfg dir.mandir=/usr/share/man --setcfg dir.sysconfdir=/etc --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 --setcfg dir.localedir=/usr/share/locale --setcfg dir.localstatedir=/var --setcfg server.admgroup=openxpki
+	./configure -- --setcfg dir.mandir=/usr/share/man --setcfg dir.sysconfdir=/etc --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 --setcfg dir.localedir=/usr/share/locale --setcfg dir.localstatedir=/var --setcfg server.admgroup=openxpki --setcfg server.pidfile=/var/run/openxpkid.pid
 	touch config-stamp
 
 install: install-stamp
 install-stamp: build
 	dh_testdir
 	dh_installdirs
-	DESTDIR=$(CURDIR)/debian/tmp make install
+	DESTDIR=$(CURDIR)/debian/openxpki-deployment make install
 	#dh_installinit --no-start --init-script=openxpkid
 	dh_installinit --name=openxpkid
+	dh_installdeb
 	dh_fixperms -a
 	touch install-stamp
 

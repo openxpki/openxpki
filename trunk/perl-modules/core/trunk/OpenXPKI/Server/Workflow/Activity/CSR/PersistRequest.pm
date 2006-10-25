@@ -1,16 +1,16 @@
-# OpenXPKI::Server::Workflow::Activity::CertRequest:PersistRequest:
+# OpenXPKI::Server::Workflow::Activity::CSR:PersistRequest:
 # Written by Alexander Klink for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
 # $Revision: 320 $
 
-package OpenXPKI::Server::Workflow::Activity::CertRequest::PersistRequest;
+package OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CertRequest::PersistRequest';
+use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest';
 use OpenXPKI::Serialization::Simple;
 
 use Data::Dumper;
@@ -46,7 +46,7 @@ sub execute
     }
     else {
         OpenXPKI::Exception->throw(
-            message   => 'I18N_OPENXPKI_ACTIVITY_CERTREQUEST_INSERTREQUEST_UNSUPPORTED_CSR_TYPE',
+            message   => 'I18N_OPENXPKI_ACTIVITY_CSR_INSERTREQUEST_UNSUPPORTED_CSR_TYPE',
             params => {
                 TYPE => $type,
             },
@@ -70,14 +70,14 @@ sub execute
     my $source_ref = $serializer->deserialize($context->param('sources'));
     if (! defined $source_ref) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTREQUEST_PERSISTREQUEST_SOURCES_UNDEFINED',
+            message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCES_UNDEFINED',
         );
     }
     my $san_source = $source_ref->{'cert_subject_alt_name'};
 
     if (! defined $san_source) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTREQUEST_PERSISTREQUEST_SUBJECT_ALT_NAME_SOURCE_UNDEFINED',
+            message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SUBJECT_ALT_NAME_SOURCE_UNDEFINED',
         );
     }
 
@@ -107,7 +107,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::CertRequest::PersistRequest
+OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
 
 =head1 Description
 

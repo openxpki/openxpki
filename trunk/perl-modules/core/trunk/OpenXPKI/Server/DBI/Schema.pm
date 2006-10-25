@@ -148,7 +148,7 @@ my %TABLE_of = (
     # "GLOBAL_KEY_ID",
     # "SCEP_TID"
     CSR_ATTRIBUTES => {
-        NAME    => "request_attributes",
+        NAME    => "csr_attributes",
         INDEX   => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CSR_SERIAL" ],
         COLUMNS => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CSR_SERIAL",
 		     "ATTRIBUTE_KEY", 
@@ -157,9 +157,19 @@ my %TABLE_of = (
 	    ],
     },
     
+    CRR_ATTRIBUTES => {
+        NAME    => "crr_attributes",
+        INDEX   => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CRR_SERIAL" ],
+        COLUMNS => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CRR_SERIAL",
+		     "ATTRIBUTE_KEY", 
+		     "ATTRIBUTE_VALUE",
+                     "ATTRIBUTE_SOURCE", # "USER" | "OPERATOR" | "EXTERNAL"
+	    ],
+    },
+    
     CERTIFICATE => {
         NAME    => "certificate",
-        INDEX   => [ "PKI_REALM", "ISSUER_DN", "CERTIFICATE_SERIAL" ],
+        INDEX   => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CERTIFICATE_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "ISSUER_DN", "CERTIFICATE_SERIAL",
 		     "ISSUER_IDENTIFIER", "IDENTIFIER", "DATA", 
                      # "GLOBAL_KEY_ID",
@@ -185,18 +195,6 @@ my %TABLE_of = (
 	COLUMNS => [ 'IDENTIFIER', 'PKI_REALM', 'ALIAS', ],
     },
 
-    CRR => {
-        NAME    => "crr",
-        INDEX   => [ "PKI_REALM", "CRR_SERIAL" ],
-        COLUMNS => [ "PKI_REALM", "CRR_SERIAL",
-                     "CERTIFICATE_IDENTIFIER", 
-		     "SUBMIT_DATE",
-                     "APPROVAL_DATE",
-                     "STATUS",
-		     "REVOCATION_REASON",
-                     #"TYPE", "DATA", "GLOBAL_KEY_ID",
-                     #"RA", "STATUS", "REASON",
-	    ]},
     CRL => {
         NAME    => "crl",
         INDEX   => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CRL_SERIAL" ],

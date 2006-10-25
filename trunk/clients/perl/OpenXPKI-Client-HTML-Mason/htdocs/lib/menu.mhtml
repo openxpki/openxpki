@@ -169,7 +169,7 @@
 
   my %params = ( MASON  => $m,
                  CONFIG => $CONFIG,
-                 ACTION => "service/index.html",
+                 ACTION => "/service/info",
                  COMP   => $m->request_comp()->title() );
 
   foreach my $key ("ROLE", "SESSION_ID", "LANGUAGE")

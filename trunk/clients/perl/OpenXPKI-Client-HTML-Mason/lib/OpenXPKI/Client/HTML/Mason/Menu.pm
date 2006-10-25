@@ -188,7 +188,7 @@ sub __get_menu_link
         my $config = $self->{CONFIG}->{ACTION}->{$result{"__menu_action"}};
         $link .= $config->{CMD};
     } else {
-        $link .= $self->{ACTION};
+        $link .= $self->{ACTION}."/".$params->{MENU}.".html";
     }
 
     ## include all common parameters

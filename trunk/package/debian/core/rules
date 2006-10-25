@@ -38,7 +38,7 @@ binary-indep-stamp: arrange
 build: build-stamp
 build-stamp: config
 	dh_testdir
-	$(PERL) Makefile.PL INSTALLDIRS=vendor
+	OPENSSL_PREFIX=/usr $(PERL) Makefile.PL INSTALLDIRS=vendor
 	$(MAKE) OPTIMIZE="-O2 -g -Wall"
 	# $(MAKE) test
 	touch build-stamp
@@ -52,14 +52,14 @@ clean:
 config: config-stamp
 config-stamp:
 	dh_testdir
-	#$(PERL) Makefile.PL INSTALLDIRS=vendor
 	touch config-stamp
 
 install: install-stamp
 install-stamp: build
 	dh_testdir
 	dh_installdirs
-	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
+	$(MAKE) install PREFIX=$(CURDIR)/debian/libopenxpki-perl/usr
+	dh_makeshlibs
 	touch install-stamp
 
 .PHONY: arrange binary binary-arch binary-indep build clean config install

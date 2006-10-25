@@ -1,0 +1,99 @@
+<%args>
+    $workflow_type      => undef
+    $cert_serial        => undef
+    $cert_issuer        => undef
+    $compromise_time    => undef
+    $reason_name        => undef
+    $reason_subject     => undef
+    $reason_description => undef
+</%args>
+
+<& /service/open_form.mhtml &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'workflow_type',   'value' => $workflow_type &>
+<& /lib/html/hidden.mhtml, 'name' => 'cert_serial',     'value' => $cert_serial &>
+<& /lib/html/hidden.mhtml, 'name' => 'cert_issuer',     'value' => $cert_issuer &>
+<& /lib/html/hidden.mhtml, 'name' => 'compromise_time', 'value' => $compromise_time &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_REASON_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_REASON_DESCRIPTION') %>
+</p>
+
+<table>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_NAME') %></td>
+    <td>
+      <& '/lib/html/select.mhtml',
+         'name'    => 'reason_name',
+         'default' => 'unspecified',
+         'values'  => [ @values ]
+      &>
+    </td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT') %></td>
+    <td>
+      <& '/lib/html/input.mhtml', 'name'  => 'reason_subject' &>
+    </td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_DESCRIPTION') %></td>
+    <td>
+      <& '/lib/html/input.mhtml', 'name'  => 'reason_description', 'type' => 'textarea' &>
+    </td>
+  </tr>
+</table>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+<& /service/create_csr/print_descriptions.mhtml, 'descriptions' => \%descriptions &>
+
+<%init>
+    my @errors = ();
+
+    my $new_form = 1;
+       $new_form = 0
+           if (defined $reason_name);
+
+    if (defined $reason_name and
+        not grep /^$reason_name$/, values %reasons)
+    {
+        push @errors,
+             i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_REASON_NAME');
+    }
+    if (not defined $reason_subject or not length $reason_subject)
+    {
+        push @errors,
+             i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_SUBJECT');
+    }
+    if (not defined $reason_description or not length $reason_description)
+    {
+        push @errors,
+             i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_DESCRIPTION');
+    }
+
+    return ($reason_name, $reason_subject, $reason_description)
+        if (not $new_form and not scalar @errors);
+
+</%init>
+<%once>
+  my %reasons = (i18nGettext('I18N_OPENXPKI_CRL_REASON_UNSPECIFIED')            => 'unspecified',
+                 i18nGettext('I18N_OPENXPKI_CRL_REASON_KEY_COMPROMISE')         => 'keyCompromise',
+                 i18nGettext('I18N_OPENXPKI_CRL_REASON_CA_COMPROMISE')          => 'CACompromise',
+                 i18nGettext('I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED')    => 'affiliationChanged',
+                 i18nGettext('I18N_OPENXPKI_CRL_REASON_SUPERSEDED')             => 'superseded',
+                 i18nGettext('I18N_OPENXPKI_CRL_REASON_CESSATION_OF_OPERATION') => 'cessationOfOperation',
+                 i18nGettext('I18N_OPENXPKI_CRL_REASON_CERTIFICATE_HOLD')       => 'certificateHold',
+                 i18nGettext('I18N_OPENXPKI_CRL_REASON_REMOVE_FROM_CRL')        => 'removeFromCRL',
+                 i18nGettext('I18N_OPENXPKI_CRL_REASON_HOLD_INSTRUCTION')       => 'holdInstruction',
+                 i18nGettext('I18N_OPENXPKI_CRL_REASON_KEY_TIME')               => 'keyTime',
+                 i18nGettext('I18N_OPENXPKI_CRL_REASON_CA_KEY_TIME')            => 'CAkeyTime');
+    my @values = ();
+    foreach my $key (sort keys %reasons)
+    {
+        push @values, {LABEL => $key, VALUE => $reasons{$key}};
+    }
+</%once>

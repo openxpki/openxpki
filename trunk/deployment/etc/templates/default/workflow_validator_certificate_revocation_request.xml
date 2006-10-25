@@ -1,0 +1,5 @@
+<validators>
+  <validator name="Creator"
+             class="OpenXPKI::Server::Workflow::Validator::Creator">
+  </validator>
+</validators>
