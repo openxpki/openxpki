@@ -1,3 +1,11 @@
+openxpki-deployment (0.9.20061030-1) unstable; urgency=low
+
+  * added debconf support
+  * package asks now for subject and passphrases
+  * CA key and certificate are still not installed
+
+ -- Michael Bell <michael.bell@web.de>  Mon, 30 Oct 2006 12:00:00 +0200
+
 openxpki-deployment (0.9.20060731-1) unstable; urgency=low
 
   * added debugging hints to /etc/init.d/openxpkid.

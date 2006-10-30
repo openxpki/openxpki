@@ -60,6 +60,7 @@ install-stamp: build
 	DESTDIR=$(CURDIR)/debian/openxpki-deployment make install
 	#dh_installinit --no-start --init-script=openxpkid
 	dh_installinit --name=openxpkid
+	dh_installdebconf
 	dh_installdeb
 	dh_fixperms -a
 	touch install-stamp

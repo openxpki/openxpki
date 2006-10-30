@@ -1,9 +1,7 @@
-#! /bin/sh
+#! /bin/sh -e
 # postinst script for openxpki-deployment
 #
 # see: dh_installdeb(1)
-
-set -e
 
 # summary of how this script can be called:
 #        * <postinst> `configure' <most-recently-configured-version>
@@ -27,30 +25,65 @@ case "$1" in
     configure)
 	# check for already configured trustcenter1
 	if [ -e /etc/openxpki/instances/trustcenter1/openxpki.conf ]; then
-		echo Detected and respect an old deployment.
+		echo Detected and respect an old deployment. >&2
 	else
 		for DIR in "/etc/openxpki" "/etc/openxpki/instances" "/etc/openxpki/instances/trustcenter1"; do
 			install -d -m 750 -o root -g openxpki $DIR
 		done
-		echo -n Deploy instance trustcenter1 ...
+		echo -n Deploy instance trustcenter1 ... >&2
 		openxpkiadm deploy -- --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 2>>/var/log/messages
-		echo DONE.
+		echo DONE. >&2
 		cd /etc/openxpki/instances/trustcenter1
-		echo -n Configure instance trustcenter1 ...
+		echo -n Configure instance trustcenter1 ... >&2
 		openxpki-configure --batch --createdirs >>/var/log/messages
-		echo DONE.
+		echo DONE. >&2
 	fi;
 	# check for already initialized database
 	if [ -e /var/openxpki/sqlite.db._backend_ ] || [ -e /var/openxpki/sqlite.db._workflow_ ]; then
-		echo Detected and respect an old database.
+		echo Detected and respect an old database. >&2
 	else
-		echo -n Initialize database ...
+		echo -n Initialize database ... >&2
                 openxpkiadm initdb --config=/etc/openxpki/instances/trustcenter1/config.xml 2>>/var/log/messages
-		echo DONE.
+		echo DONE. >&2
 	fi;
 	## fix var directory
 	chown openxpki:openxpki /var/openxpki/*
 
+	if [ ! -e /etc/openxpki/instances/trustcenter1/ca/testdummyca1/cakey.pem ]; then
+
+		# Source debconf library.
+		. /usr/share/debconf/confmodule
+
+		# read data from debconf database
+		db_get openxpki-deployment/subject
+        	SUBJECT="$RET"
+		db_get openxpki-deployment/email
+        	export email="$RET"
+		db_get openxpki-deployment/passwd
+        	export PASSWD="$RET"
+
+		# create key and certificate
+		# this key is Cisco safe (only 2048 bit key length)
+		mkdir demoCA || echo demoCA already exists from earlier installation
+		touch demoCA/index.txt
+		echo 01 > demoCA/serial
+		echo SUBJECT::="$SUBJECT"
+		openssl req -newkey rsa:2048 -subj "$SUBJECT" -passout env:PASSWD -out csr.pem -keyout key.pem
+		openssl ca  -selfsign -in csr.pem -keyfile key.pem -out cacert.pem -passin env:PASSWD -utf8 -outdir . -subj "$SUBJECT" -policy policy_anything -batch -extensions v3_ca -preserveDN
+		cd demoCA
+		rm index.txt  index.txt.attr  index.txt.old  serial  serial.old
+		cd ..
+		rmdir demoCA
+		rm 01.pem
+
+		# import key and certificate to OpenXPKI installation
+		# FIXME: why does openxpkiadm contain no documentation?
+
+		# delete passwd from debconf database
+		db_clear
+		db_stop
+		rm -f key.pem csr.pem cacert.pem
+	fi;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
