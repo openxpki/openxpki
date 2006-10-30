@@ -173,6 +173,8 @@ echo "OpenXPKI instance configured successfully."
 
 exit 0
 
+:<<__EOF
+
 ###########################################################################
 
 =head1 NAME
@@ -202,3 +204,4 @@ are many configuration parameters that cannot be set by this approach.
 
 (For a more advanced setup may be advisable to modify the settings in
 OpenXPKI's XML configuration files directly and NOT use openxpki-configure.)
+__EOF
