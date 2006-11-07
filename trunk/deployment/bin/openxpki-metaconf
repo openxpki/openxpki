@@ -681,8 +681,8 @@ ECHO: Database setup
   server_id: Server ID (unique for each distinct node)
   VALIDATE: m{ \A \d+ \z }xms
   server_shift: Server shift (must be the same for all nodes)
-  VALIDATE: m{ \A (?:SQLite|Oracle|DB2|mysql|PostgreSQL) }xms
-  type: Database type (SQLite, DB2, Oracle, mysql, PostgreSQL)
+  VALIDATE: m{ \A (?:SQLite|Oracle|DB2|MySQL|PostgreSQL) }xms
+  type: Database type (SQLite, DB2, Oracle, MySQL, PostgreSQL)
   name: Database name
   host
   port
