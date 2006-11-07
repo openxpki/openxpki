@@ -1291,8 +1291,7 @@ if ($cmd eq 'certificate') {
         # compile all relevant data for the database
         # TODO: use $cert->to_db_hash();
         my %insert_hash;
-        $insert_hash{STATUS}             = 'VALID'; # we assume everything that
-                                                    # is imported is valid
+        $insert_hash{STATUS}             = 'ISSUED'; 
         $insert_hash{PKI_REALM}          = $realm;
         $insert_hash{CERTIFICATE_SERIAL} = $cert->get_serial();
         $insert_hash{IDENTIFIER}         = $cert->get_identifier();
@@ -1839,15 +1838,42 @@ Example:
   openxpkiadm certificate remove --realm 'Root CA' \
         --name 'Root CA 1'
 
-=item B<chain>
+=item B<alias>
 
 Subcommand options:
 
 Mandatory:
+  --realm               PKI realm to create the alias in
+  --alias               The symbolic name for the certificate
+  --identifier          The identifier of the certificate
+
+Force options (use only if you now what you are doing!):
+  --force-certificate-not-found
+        Ignore that the certificate for which to create an
+        alias was not found in the DB
+
+Only use these options if you actually have to (the occasions where
+this happens should be really, really rare).
+
+Using openxpkiadm certificate alias, you can create a symbolic name
+for a certificate, which is associated with a specific PKI realm.
+This symbolic name can then be used in some of the openxpkiadm commands
+as well as in the configuration files.
+
+Example: 
+
+openxpkiadm certificate alias --realm 'Root CA' \ 
+    --identifier FpzZptRsa/444Acs/Nrdmo1Fo1s --alias 'root1'
+
+=item B<chain>
+ 
+Subcommand options:
+ 
+ Mandatory:
   --realm               The PKI realm to operate in
   --name                The alias or identifier of the child
   --issuer              The alias or identifier of the parent
-
+ 
 Optional:
   --issuer-realm        The realm in which the issuer alias
                         is defined
@@ -1859,23 +1885,22 @@ Force options (use only if you now what you are doing!):
   --force-issuer-certificate-not-found
         Ignore that the certificate of the parent was not found
         in the DB
-
+ 
 Once again, only use these options if you actually have to (the
 occasions where this happens should be really, really rare).
-
+ 
 Specifies subject/issuer relationship in order to set up certificate
 chains. The certificates to be connected must already be present in
 the database (see B<import>). As those connections are already set up
 during --import, this command exists for changing the issuer if you
 made an error. It also allows to specify an issuer that does not
 agree with the information contained in the certificate (but outputs
-an warning)
-
-Example: 
-
-openxpkiadm certificate chain --name 'Subordinate CA 1' \
-    --issuer 'Root CA'
-
+a warning)
+ 
+ Example: 
+ 
+openxpkiadm certificate chain --realm 'Root CA' \
+     --name 'Subordinate CA 1' --issuer 'root1'
 
 =head1 OPTIONS
 
