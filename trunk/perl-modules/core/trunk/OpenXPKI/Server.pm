@@ -39,7 +39,7 @@ sub new
 
     foreach my $key (keys %{$keys})
     {
-        if ($key ne "CONFIG")
+        if ($key ne "CONFIG" and $key ne "SILENT")
         {
             ##! 8: "IGNORED:  $key ::= $keys->{$key}"
         } else {
@@ -53,6 +53,7 @@ sub new
 	{
 	    CONFIG => $self->{CONFIG},
 	    TASKS  => [ 'xml_config', 'i18n', 'log' ],
+            SILENT => $keys->{SILENT}
 	});
 
     # from now on we can assume that we have CTX('log') available
@@ -65,6 +66,7 @@ sub new
 		CONFIG => $self->{CONFIG},
 		# FIXME: not needed?
 #		SERVER => $self,
+                SILENT => $keys->{SILENT}
 	    });
     };
     if ($EVAL_ERROR) {
@@ -575,6 +577,8 @@ are the following ones:
 =item * DAEMON_GROUP
 
 =item * CONFIG
+
+=item * SILENT (for silent startup with start-stop-daemons during System V init)
 
 =back
 

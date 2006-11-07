@@ -50,10 +50,10 @@ do_start()
 	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
 		|| return 1
 	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
-		start \
+		start --quiet \
 		|| return 2
 	# do not enable debugging
-	#	--exec $DAEMON start
+	#	--exec $DAEMON start --quiet
 	# enable full debugging
 	#	--exec $DAEMON start -- --debug :100
 	# enable rudimentary debugging

@@ -34,6 +34,8 @@ use OpenXPKI::Client;
 my $openxpkiconfdir = "[% dir.openxpkiconfdir %]";
 my $configfile      = "$openxpkiconfdir/config.xml";
 
+our $QUIET = 0;
+
 sub slurp {
     my $arg = shift;
 
@@ -131,7 +133,8 @@ sub do_start {
 
 	return 1;
     }
-    print STDERR "Starting OpenXPKI...\n";
+    ## this is only an informal message and not an error - so do not use STDERR
+    print STDOUT "Starting OpenXPKI...\n" if (not $QUIET);
     unlink $pidfile;
 
     # fork off server launcher
@@ -146,18 +149,23 @@ sub do_start {
 	    if ($!{EAGAIN}) {
 		# recoverable fork error
 		if ($redo_count > 5) {
-		    print STDERR "FAILED.\n";
+                    ## the first message is part of the informal daemon startup message
+                    ## the second message is a real error message
+		    print STDOUT "FAILED.\n" if (not $QUIET);
 		    print STDERR "Could not fork process\n";
 		    return;
 		}
-		print STDERR '.';
+                ## this is only an informal message and not an error - so do not use STDERR
+		print STDOUT '.' if (not $QUIET);
 		sleep 5;
 		$redo_count++;
 		redo FORK;
 	    }
 
 	    # other fork error
-	    print STDERR "FAILED.\n";
+            ## the first message is part of the informal daemon startup message
+            ## the second message is a real error message
+	    print STDOUT "FAILED.\n" if (not $QUIET);
 	    print STDERR "Could not fork process: $ERRNO\n";
 	    return;
 	}
@@ -177,7 +185,9 @@ sub do_start {
 
 	if (length $msg)
 	{
-	    print STDERR "FAILED.\n";
+            ## the first message is part of the informal daemon startup message
+            ## the second message is a real error message
+	    print STDOUT "FAILED.\n" if (not $QUIET);
 	    print STDERR "$msg\n";
 	    return;
 	}
@@ -190,7 +200,8 @@ sub do_start {
 	    return;
 	}
 	
-	print STDERR "DONE.\n";
+        ## this is only an informal message and not an error - so do not use STDERR
+	print STDOUT "DONE.\n" if (not $QUIET);
     } else {
 	# child here
 	# parent process pid is available with getppid
@@ -200,11 +211,15 @@ sub do_start {
 	
 	eval
 	{
-	    OpenXPKI::Server->new ("CONFIG" => $configfile);
+            ## SILENT is required to work correctly with start-stop-daemons
+            ## during a normal System V init
+            my $silent = 0;
+            $silent = 1 if ($QUIET);
+	    OpenXPKI::Server->new ("CONFIG" => $configfile, "SILENT" => $silent);
 	};
 	if ($EVAL_ERROR)
 	{
-	    print $EVAL_ERROR;
+	    print STDERR $EVAL_ERROR;
 	    return;
 	}
     }
@@ -225,29 +240,29 @@ sub do_stop {
 	print STDERR "OpenXPKI Server is not running.\n";
 	return 1;
     }
-    print STDERR "Stopping OpenXPKI\n";
+    print STDOUT "Stopping OpenXPKI\n" if (not $QUIET);
 
     my @signals = (2, 2, 3, 3, 9);
 
     # get all PIDs which belong to the current process group
     my @pids = __get_processgroup_pids($process_group);
     foreach my $p (@pids) {
-        print STDERR "[$p] ";
+        print STDOUT "[$p] " if (not $QUIET);
         TERMINATE:
         foreach my $sig (@signals) {
-	    print STDERR '.';
+	    print STDOUT '.' if (not $QUIET);
     	    kill($sig, $p);
 	    sleep 1;
 	    last TERMINATE if (kill(0, $p) == 0);
         }
-        print STDERR "\n";
+        print STDOUT "\n" if (not $QUIET);
         if (kill(0, $p)) {
-            print STDERR "FAILED.\n";
+            print STDOUT "FAILED.\n" if (not $QUIET);
             print STDERR "Could not terminate OpenXPKI process $p.\n";
             return;
         }
     }
-    print STDERR "DONE.\n";
+    print STDOUT "DONE.\n" if (not $QUIET);
     return 1;
 }
 
@@ -263,6 +278,7 @@ GetOptions(\%params,
 	      cfg|cfgfile|conf|config=s
               version
               debug=s@
+              quiet
 	      )) or pod2usage(-verbose => 0);
 
 if ($params{version}) {
@@ -293,6 +309,11 @@ if (defined $params{debug}) {
 	print STDERR "Debug level for module '$module': $level\n";
  	$OpenXPKI::Debug::LEVEL{$module} = $level;
     }
+}
+
+if ($params{quiet})
+{
+    $QUIET = 1;
 }
 
 use OpenXPKI::XML::Config;

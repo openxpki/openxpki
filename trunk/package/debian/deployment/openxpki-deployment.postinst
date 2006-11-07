@@ -70,6 +70,7 @@ case "$1" in
 		echo SUBJECT::="$SUBJECT"
 		openssl req -newkey rsa:2048 -subj "$SUBJECT" -passout env:PASSWD -out csr.pem -keyout key.pem
 		openssl ca  -selfsign -in csr.pem -keyfile key.pem -out cacert.pem -passin env:PASSWD -utf8 -outdir . -subj "$SUBJECT" -policy policy_anything -batch -extensions v3_ca -preserveDN
+		cat cacert.pem | perl -ne "\$cert = 1 if (\$_ =~ /^-----BEGIN/);next if (not \$cert); print \$_;" > cert.pem
 		cd demoCA
 		rm index.txt  index.txt.attr  index.txt.old  serial  serial.old
 		cd ..
@@ -77,12 +78,14 @@ case "$1" in
 		rm 01.pem
 
 		# import key and certificate to OpenXPKI installation
-		# FIXME: why does openxpkiadm contain no documentation?
+                openxpkiadm key import --purpose CA --realm "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA" --id testdummyca1 --file key.pem
+                IDENTIFIER=`openxpkiadm certificate import --file cert.pem | perl -ne "if (\\$_ =~ m{^\s*identifier:\s*.*\$}xmsi) {\\$_ =~ s{^\s*identifier:\s*(.*)\\$}{\\$1}xmsi; print \\$_;}"`
+                openxpkiadm certificate alias --realm "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA" --alias "testdummyca1" --identifier $IDENTIFIER
 
 		# delete passwd from debconf database
 		db_clear
 		db_stop
-		rm -f key.pem csr.pem cacert.pem
+		rm -f key.pem csr.pem cacert.pem cert.pem
 	fi;
     ;;
 
