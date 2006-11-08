@@ -120,7 +120,7 @@
           export_state="INITIAL_IMPORT">
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::PersistRequest">
+	  class="OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest">
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">

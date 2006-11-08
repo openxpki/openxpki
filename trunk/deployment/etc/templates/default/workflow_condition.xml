@@ -64,6 +64,47 @@
     <param name="role" value="CA Operator"/>
   </condition>
 
+  <!-- general CSR conditions -->
+
+  <condition name="ACL::create_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="create_crr"/>
+  </condition>
+  <condition name="ACL::change_crr_compromise_time" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_crr_compromise_time"/>
+  </condition>
+  <condition name="ACL::change_crr_reason" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_crr_reason"/>
+  </condition>
+  <condition name="ACL::approve_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="approve_crr"/>
+  </condition>
+  <condition name="ACL::cancel_crr_approval" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="cancel_crr_approval"/>
+  </condition>
+  <condition name="ACL::revoke_cert" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="revoke_cert"/>
+  </condition>
+  <condition name="ACL::insert_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="insert_crr"/>
+  </condition>
+  <condition name="ACL::reject_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="reject_crr"/>
+  </condition>
+
+  <condition name="Condition::check_crr_approvals" class="OpenXPKI::Server::Workflow::Condition::Approved">
+    <param name="role" value="RA Operator"/>
+  </condition>
+
+  <!-- if you use an online and an offline server then you need this for CSRs too -->
+
+  <condition name="ACL::export_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="export_crr"/>
+  </condition>
+  <condition name="ACL::import_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="import_crr"/>
+  </condition>
+
+
   <!-- check for system-instantiated workflow -->
   <condition name="ACL::start_certificate_issuance" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="certificate_issuance_start"/>
