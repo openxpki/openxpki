@@ -190,13 +190,9 @@ div.menu h2:hover {
 /* level 0 */
 
 div.menu_level_0_item_type_menu {
-    margin: 0.20em 0.5em 0.20em 0.1em;
-    padding: 0.38em 1em;
+    margin: 0.20em 0.1em 0.20em 0.1em;
+    padding: 0.2em 1em;
     text-align: left;
-    background: #ffaa33;
-    border: 1px solid white;
-    border-bottom: 1px solid black;
-    border-right: 1px solid black;
     color: white;
     list-style: none;
 }
@@ -209,13 +205,9 @@ div.menu_level_0_item_type_menu a {
     font-weight: normal;
 }
 div.menu_level_0_item_type_action {
-    margin: 0.20em 0.5em 0.20em 0.1em;
-    padding: 0.38em 1em;
+    margin: 0.20em 0.1em 0.20em 0.1em;
+    padding: 0.2em 1em;
     text-align: left;
-    background: #ffaa33;
-    border: 1px solid white;
-    border-bottom: 1px solid black;
-    border-right: 1px solid black;
     color: white;
     list-style: none;
 }
@@ -247,10 +239,11 @@ div.menu_level_1_item_type_menu a {
     font-weight: normal;
 }
 div.menu_level_1_item_type_action {
-    margin: 0.20em 0.5em 0.20em 0.1em;
     padding: 0.1em 0.2em;
     text-align: right;
-    background: #dddddd;
+    background: #bbbbbb;
+    border-left: 7px solid #ffaa33;
+    border-right: 7px solid #ffaa33;
     color: black;
     list-style: none;
 }

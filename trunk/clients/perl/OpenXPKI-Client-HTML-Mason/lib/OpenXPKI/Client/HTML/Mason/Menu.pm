@@ -68,6 +68,8 @@ sub new
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_ACTION");
     }
+    ## remove leading and trailing slashes /
+    $self->{ACTION} =~ s{^/*([^/].*[^/])/*}{$1}xms;
 
     return $self;
 }
@@ -118,6 +120,14 @@ sub __get_level
         ## menus are not security relevant
         ## so it is safe to not check the input from the browser
         $menu = $self->{PATH}->[$level-1];
+    }
+    if (not exists $self->{CONFIG}->{MENU}->{$menu})
+    {
+        ## usually this is a misconfiguration
+        ## it can happen if a not configured menu will be requested
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_GET_LEVEL_MISSING_MENU_CONFIG",
+            params  => {"MENU" => $menu});
     }
     ##! 2: "MENU ::= $menu"
 

@@ -20,8 +20,12 @@
                 {
                     "anonymous_menu" =>
                     [
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",
+                                   "ca_info"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",
                                    "create_csr"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
+                                   "cert_search"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",
                                    "language"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
@@ -41,6 +45,17 @@
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW", "workflow"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE", "language"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",   "logout"]
+                    ],
+                    "ca_info" =>
+                    [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_PKI_REALM_INFO",
+                                   "pki_realm_info"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_ISSUER",
+                                   "issuer_list"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_CRL",
+                                   "crl_list"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_POLICY",
+                                   "policy_list"]
                     ],
                     "workflow" =>
                     [
@@ -159,6 +174,26 @@
                             "REVOKE_BUTTON" => "NO",
                             "RENEW_BUTTON"  => "NO"
                         }
+                    },
+                    "pki_realm_info" =>
+                    {
+                        CMD => "service/api/pki_realm_info.html"
+                    },
+                    "cert_search" =>
+                    {
+                        CMD => "service/api/cert_search.html"
+                    },
+                    "issuer_list" =>
+                    {
+                        CMD => "service/ca/issuer_list.html"
+                    },
+                    "crl_list" =>
+                    {
+                        CMD => "service/ca/crl_list.html"
+                    },
+                    "policy_list" =>
+                    {
+                        CMD => "service/ca/policy_list.html"
                     },
                     "logout" =>
                     {

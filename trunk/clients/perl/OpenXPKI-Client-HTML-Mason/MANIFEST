@@ -38,14 +38,6 @@ htdocs/authentication/role.mhtml
 htdocs/authentication/open_form.mhtml
 htdocs/authentication/close_form.mhtml
 
-htdocs/service/info/autohandler
-htdocs/service/info/anonymous_menu.html
-htdocs/service/info/ca_op_menu.html
-htdocs/service/info/dataexchange.html
-htdocs/service/info/language.html
-htdocs/service/info/ra_op_menu.html
-htdocs/service/info/workflow.html
-
 htdocs/service/autohandler
 htdocs/service/dhandler
 htdocs/service/index.html
@@ -54,6 +46,21 @@ htdocs/service/logout.html
 htdocs/service/open_form.mhtml
 htdocs/service/send_form.mhtml
 htdocs/service/close_form.mhtml
+
+htdocs/service/info/dhandler
+htdocs/service/info/anonymous_menu.html
+htdocs/service/info/ca_info.html
+htdocs/service/info/ca_op_menu.html
+htdocs/service/info/dataexchange.html
+htdocs/service/info/language.html
+htdocs/service/info/ra_op_menu.html
+htdocs/service/info/workflow.html
+
+htdocs/service/api/dhandler
+htdocs/service/api/pki_realm_info.html
+
+htdocs/service/ca/dhandler
+htdocs/service/ca/policy_list.html
 
 htdocs/service/workflow/list_types.html
 htdocs/service/workflow/list_instances.html
