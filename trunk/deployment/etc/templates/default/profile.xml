@@ -46,7 +46,11 @@
 	</key_usage>
 	<subject_key_identifier   critical="false" hash="true"/>
 	<authority_key_identifier critical="false" keyid="false" issuer="true"/>
+        <!-- If the issuer has no subject alternative name, copying returns
+             an empty extension, which is problematic with both RSA SecurId
+             tokens and Cisco devices! 
 	<issuer_alt_name          critical="false" copy="true"/>
+        -->
 	<crl_distribution_points critical="false">
           <uri>http://localhost/cacrl.crt</uri>
           <uri>ldap://localhost/cn=My%20CA,dc=OpenXPKI,dc=org</uri>
@@ -137,7 +141,11 @@
 	</extended_key_usage>
 	<subject_key_identifier   critical="false" hash="true"/>
 	<authority_key_identifier critical="false" keyid="true" issuer="true"/>
+        <!-- If the issuer has no subject alternative name, copying returns
+             an empty extension, which is problematic with both RSA SecurId
+             tokens and Cisco devices! 
 	<issuer_alt_name          critical="false" copy="true"/>
+         -->
 	<crl_distribution_points critical="false">
           <uri>http://localhost/cacrl.crt</uri>
           <uri>ldap://localhost/cn=My%20CA,dc=OpenXPKI,dc=org</uri>

@@ -1,9 +1,18 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <sect1 id="qs_installation">
   <title>Installation</title>
+
+  <sect2 id="compilation">
+    <title>Compilation and Module installation</title>
+    <para>Assuming you've gotten a source tree from somewhere (i.e. either an official release tar-ball or a Subversion checkout), enter the <filename class="directory">trunk/perl-modules/core/trunk</filename> directory. Run <command>perl Makefile.PL</command> to create a Makefile. If this should fail, please make sure that you have all required Perl modules. If you don't, you can install them using either software packages from your distribution or by using the CPAN shell. If it works, you can compile &openxpki; using <command>make</command>. Once that is taken care of, make sure to run <command>make test</command> to see if the compiled &openxpki; runs correctly. <command>make install</command> completes the installation of the Perl modules. Note that if you want to install &openxpki; locally, i.e. into your home directory, you can run <command>perl Makefile.PL PREFIX=<replaceable>directory</replaceable></command> in the first step to prepare for an installation below <replaceable>directory</replaceable>.
+    </para>
+    <para>Now you have all the required modules for the server installed. As the administrative tools use code of the &openxpki; client as well, you need to install the corresponding modules, too. They come in handy later on when you want to set up a client (such as the Mason-based web interface) as well. Change to the <filename class="directory">trunk/clients/perl/OpenXPKI-Client</filename> directory and repeat the same steps as above, again using the <command>perl Makefile.PL PREFIX=<replaceable>directory</replaceable></command>, if necessary.
+   </para>
+  </sect2>
+
   <sect2 id="qs_installation_initial">
     <title>Initial (pre-deployment) configuration</title>
-    <para></para>
+    <para>Before being able to run the server, the administrative tools and the (base) configuration have to be deployed</para>
   </sect2>
 
   <sect2 id="qs_installation_deployment">

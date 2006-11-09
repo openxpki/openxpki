@@ -15,6 +15,10 @@ our %config;
 require 't/common.pl';
 
 my $debug = $config{debug};
+my $stderr = '2>/dev/null';
+if ($debug) {
+    $stderr = '';
+}
 
 diag("SCEP Client Test: GetCACert");
 
@@ -23,17 +27,20 @@ my $cgi_dir = $config{cgi_dir};
 
 
 SKIP: {
-    if (system("$sscep >/dev/null 2>&1") != 0) {
+    if (system("$sscep >/dev/null $stderr") != 0) {
 	skip "sscep binary not installed.", 4;
     }
 
-    ok(mkpath([ $cgi_dir ]));
+    ok(mkpath($cgi_dir));
     # create configuration
     open my $HANDLE, ">", "$cgi_dir/scep.cfg";
     print $HANDLE "[global]\n";
     print $HANDLE "socket=$config{socket_file}\n";
     print $HANDLE "realm=I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA\n";
     print $HANDLE "iprange=127.0.0.0/8\n";
+    print $HANDLE "profile=I18N_OPENXPKI_PROFILE_TLS_SERVER\n";
+    print $HANDLE "servername=testscepserver1\n";
+    print $HANDLE "encryption_algorithm=3DES\n";
     close $HANDLE;
 
     ok(copy("bin/scep", $cgi_dir));
@@ -76,9 +83,9 @@ SKIP: {
         sleep 3;
 
         # use the sscep client to get the CA certificates
-        ok(system("$sscep getca -u $scep_uri -c $cacert_base") == 0);
+        ok(system("$sscep getca -v -u $scep_uri -c $cacert_base $stderr") == 0);
 
-        my $index = 1;
+        my $index = 0;
         ok(-r "$cacert_base-$index");
 
         kill(9, $pid);
@@ -98,6 +105,4 @@ SKIP: {
         chdir $cgi_dir;
         exec("perl $http_server $config{http_server_port}");
     }
-
-   
- }
+}

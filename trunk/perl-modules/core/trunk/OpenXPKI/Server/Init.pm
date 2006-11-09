@@ -529,6 +529,7 @@ sub get_pki_realms
 	    COUNTER => [$i]);
 
 	my $issuing_ca_count = 0;
+        my $scep_count = 0;
 
       ISSUINGCA:
 	for (my $jj = 0; $jj < $nr_of_ca_entries; $jj++) {
@@ -555,7 +556,7 @@ sub get_pki_realms
 	    $realms{$name}->{ca}->{id}->{$ca_id}->{status} = 0;
 
             # cert identifier
-            if (! $arg_ref->{LIGHT}) { 
+            if (! $arg_ref->{LIGHT}) { # FIXME: "light" initialisation is obsolete!
                 eval {
                     my $cert_identifier;
                     eval {
@@ -695,6 +696,8 @@ sub get_pki_realms
                 $realms{$name}->{ca}->{id}->{$ca_id}->{notafter} 
                     = $cacert->get_parsed("BODY", "NOTAFTER");
 
+	        $issuing_ca_count++;
+
 	        log_wrapper({
 		    MESSAGE  => "Attached CA token for issuing CA '$ca_id' of PKI realm '$name'",
 		    PRIORITY => "info",
@@ -719,47 +722,154 @@ sub get_pki_realms
 		    FACILITY => "system",
 		});
             }
-            #############################################################
-            # crl_publication info
 
-            my @base_path = ('pki_realm', 'ca', 'crl_publication');
-            my @base_ctr  = ($i,          $jj,   0);
+         ###############################################
+         # crl_publication info
+
+         my @base_path = ('pki_realm', 'ca', 'crl_publication');
+         my @base_ctr  = ($i,          $jj,   0);
+         eval {
+	     my $crl_publication_id = $config->get_xpath(
+	        XPATH   => [ @base_path ],
+	        COUNTER => [ @base_ctr  ],
+	     );
+             $realms{$name}->{ca}->{id}->{$ca_id}->{crl_publication} = 1; # only executed if get_xpath does not crash
+         };
+         eval {
+             my $number_of_files = $config->get_xpath_count(
+                 XPATH   => [ @base_path, 'file'],
+                 COUNTER => [ @base_ctr ],
+             );
+             my @files;
+             ##! 16: 'nr_of_files: ' . $number_of_files
+             for (my $kkk = 0; $kkk < $number_of_files; $kkk++) {
+                 my $filename = $config->get_xpath(
+                     XPATH   => [ @base_path, 'file', 'filename' ],
+                     COUNTER => [ @base_ctr, $kkk   , 0          ],
+                 );
+                 ##! 16: 'filename: ' . $filename
+                 my $format = $config->get_xpath(
+                     XPATH   => [ @base_path, 'file', 'format'   ],
+                     COUNTER => [ @base_ctr, $kkk   , 0          ],
+                 );
+                 ##! 16: 'format: ' . $format
+                 push @files, {
+                     'FILENAME' => $filename,
+                     'FORMAT'   => $format,
+                 };
+             }
+             ##! 16: '@files: ' . Dumper(\@files)
+             $realms{$name}->{ca}->{id}->{$ca_id}->{crl_files} = \@files;
+          };
+        }
+          
+	# get all SCEP identifier for the PKI realm
+	# $realms{$name}->{scep}->{$scep_id}->{identifier}
+        my $nr_of_scep_entries = 0;
+        eval { # this might fail because no scep server is defined
+               # at all
+	    $nr_of_scep_entries = $config->get_xpath_count(
+	        XPATH   => ['pki_realm', 'scep'],
+	        COUNTER => [$i]
+            );
+        };
+        
+      SCEP_SERVER:
+	for (my $jj = 0; $jj < $nr_of_scep_entries; $jj++) {
+	    my $scep_id = $config->get_xpath(
+		XPATH =>   ['pki_realm', 'scep', 'id'],
+		COUNTER => [$i,          $jj,  0 ],
+	    );
+
+            # cert identifier
             eval {
-	        my $crl_publication_id = $config->get_xpath(
-		   XPATH   => [ @base_path ],
-		   COUNTER => [ @base_ctr  ],
-		);
-                $realms{$name}->{ca}->{id}->{$ca_id}->{crl_publication} = 1; # only executed if get_xpath does not crash
-            };
-            eval {
-                my $number_of_files = $config->get_xpath_count(
-                    XPATH   => [ @base_path, 'file'],
-                    COUNTER => [ @base_ctr ],
-                );
-                my @files;
-                ##! 16: 'nr_of_files: ' . $number_of_files
-                for (my $kkk = 0; $kkk < $number_of_files; $kkk++) {
-                    my $filename = $config->get_xpath(
-                        XPATH   => [ @base_path, 'file', 'filename' ],
-                        COUNTER => [ @base_ctr, $kkk   , 0          ],
-                    );
-                    ##! 16: 'filename: ' . $filename
-                    my $format = $config->get_xpath(
-                        XPATH   => [ @base_path, 'file', 'format'   ],
-                        COUNTER => [ @base_ctr, $kkk   , 0          ],
-                    );
-                    ##! 16: 'format: ' . $format
-                    push @files, {
-                        'FILENAME' => $filename,
-                        'FORMAT'   => $format,
-                    };
+                my $cert_identifier;
+                eval {
+                  ##! 128: 'eval'
+                  $cert_identifier = $config->get_xpath(
+                    XPATH   => [ 'pki_realm', 'scep', 'cert', 'identifier' ],
+                    COUNTER => [ $i,           $jj, 0     , 0            ],
+                  );
+                };
+                if (!defined $cert_identifier) {
+                  ##! 128: 'undefined'
+                  my $cert_alias = $config->get_xpath(
+                    XPATH   => [ 'pki_realm', 'scep', 'cert', 'alias' ],
+                    COUNTER => [ $i,          $jj,  0     , 0       ],
+                  );
+                  my $cert_realm = $config->get_xpath(
+                    XPATH   => [ 'pki_realm', 'scep', 'cert', 'realm' ],
+                    COUNTER => [ $i,          $jj,  0     , 0       ],
+                  );
+                  ##! 128: 'cert_alias: ' . $cert_alias
+                  ##! 128: 'cert_realm: ' . $cert_realm
+                  my $dbi = CTX('dbi_backend');
+                  $dbi->connect();
+                  my $cert = $dbi->first(
+                      TABLE   => 'ALIASES',
+                      DYNAMIC => {
+                          ALIAS     => $cert_alias,
+                          PKI_REALM => $cert_realm,
+                      },
+                   );
+                   $dbi->disconnect();
+                   ##! 128: 'cert: ' . Dumper($cert)
+                   if (defined $cert) {
+                       $cert_identifier = $cert->{IDENTIFIER};
+                   }
+                   else {
+                     OpenXPKI::Exception->throw(
+                         message => 'I18N_OPENXPKI_SERVER_INIT_NO_IDENTIFIER_FOUND_IN_ALIASES_DB',
+                         params  => {
+                             'ALIAS'     => $cert_alias,
+                             'PKI_REALM' => $cert_realm,
+                         },
+                     );
+                   }
                 }
-                ##! 16: '@files: ' . Dumper(\@files)
-                $realms{$name}->{ca}->{id}->{$ca_id}->{crl_files} = \@files;
+                ##! 16: 'identifier: ' . $cert_identifier
+                $realms{$name}->{scep}->{id}->{$scep_id}->{identifier} = $cert_identifier;
             };
+            if ($EVAL_ERROR) {
+    		log_wrapper({
+    		    MESSAGE  => "Could not determine identifier for SCEP server '$scep_id' (PKI realm $name)",
+    		    PRIORITY => "warn",
+    		    FACILITY => "system",
+		});
+		
+		log_wrapper({
+		    MESSAGE  => "SCEP server '$scep_id' (PKI realm $name) is unavailable",
+		    PRIORITY => "warn",
+		    FACILITY => "monitor",
+		});
+		
+		next SCEP_SERVER;
+            }
+            my $dbi = CTX('dbi_backend');
+            $dbi->connect();
+            my $certificate_db_entry = $dbi->first(
+                TABLE   => 'CERTIFICATE',
+                DYNAMIC => {
+                    IDENTIFIER => $realms{$name}->{scep}->{id}->{$scep_id}->{identifier},
+                },
+            );
+            $dbi->disconnect();
+            my $certificate = $certificate_db_entry->{DATA}; # in PEM
+            my $token = $crypto->get_token(
+                    TYPE        => "SCEP",
+                    ID          => $scep_id,
+                    PKI_REALM   => $name,
+                    CERTIFICATE => $certificate,
+            );
+            $realms{$name}->{scep}->{id}->{$scep_id}->{crypto} = $token;
+	    log_wrapper({
+		MESSAGE  => "Attached SCEP token for SCEP server '$scep_id' of PKI realm '$name'",
+		PRIORITY => "info",
+		FACILITY => "system",
+	    });
 
-	    $issuing_ca_count++;
-	}
+            $scep_count++;
+          }
 	    
 	log_wrapper(
 	    {
@@ -768,6 +878,12 @@ sub get_pki_realms
 		FACILITY => "system",
 	    });
 
+	log_wrapper(
+	    {
+		MESSAGE  => "Identified $scep_count SCEP servers for PKI realm '$name'",
+		PRIORITY => "info",
+		FACILITY => "system",
+	    });
     }
 
     ### realms: %realms
@@ -906,7 +1022,7 @@ sub redirect_stderr
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_MISSING_STDERR");
     }
-    ##! 2: "switching stderr to $stderr"
+    ##! 2: "redirecting STDERR to $stderr"
     if (not open STDERR, '>>', $stderr)
     {
         OpenXPKI::Exception->throw (

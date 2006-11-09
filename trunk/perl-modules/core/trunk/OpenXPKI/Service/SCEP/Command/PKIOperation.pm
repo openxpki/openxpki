@@ -5,18 +5,19 @@
 ## $Revision: 235 $
 ##
 package OpenXPKI::Service::SCEP::Command::PKIOperation;
+use base qw( OpenXPKI::Service::SCEP::Command );
+
+use strict;
 
 use English;
 
 use Class::Std;
 
-use base qw( OpenXPKI::Service::SCEP::Command );
-
 use OpenXPKI::Debug 'OpenXPKI::Service::SCEP::Command::PKIOperation';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Crypto::TokenManager;
+use OpenXPKI::Serialization::Simple;
 use Data::Dumper;
 use MIME::Base64;
 
@@ -31,15 +32,19 @@ sub execute {
     
     my $api = CTX('api');
     my $pki_realm = CTX('session')->get_pki_realm();
+    my $server = CTX('session')->get_server();
 
-    # get a new crypto token of type 'SCEP'
-    my $token_manager = OpenXPKI::Crypto::TokenManager->new();
-    my $token = $token_manager->get_token(
-        TYPE      => 'SCEP',
-        ID        => 'testscepserver1', # TODO: this is the name used in the config file, get from there!
-        PKI_REALM => $pki_realm,
-    ); 
+    ##! 16: 'pki_realm scep: ' . Dumper(CTX('pki_realm')->{$pki_realm}->{scep})
+
+    # get a crypto token of type 'SCEP'
+    my $token = CTX('pki_realm')->{$pki_realm}->{scep}->{id}->{$server}->{crypto};
     
+    if (!defined $token) {
+        ##! 64: Dumper CTX('pki_realm')->{$pki_realm}->{scep}
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING',
+        );
+    }
     my $message_type_ref = $token->command({
         COMMAND => 'get_message_type',
         PKCS7   => $pkcs7_decoded,
@@ -51,12 +56,30 @@ sub execute {
             PKCS7 => $pkcs7_base64,
         });
     }
-    # elsif ...
+    elsif ($message_type_ref->{MESSAGE_TYPE_NAME} eq 'GetCertInitial') {
+        # used by sscep after sending first request for polling
+        $result = $self->__pkcs_req({
+            TOKEN => $token,
+            PKCS7 => $pkcs7_base64,
+        });
+    }
     else {
-        OpenXPKI::Exception->throw({
-            message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_UNSUPPORTED_MESSAGE_TYPE',
-            # TODO: once all are implemented, change to INVALID_M_T?
-            params  => {'MESSAGE_TYPE' => $message_type},
+        # TODO -- decide whether to throw exception or send an error
+        # message to the client ...
+        # maybe log instead of throwing exception?
+        #
+        #OpenXPKI::Exception->throw({
+        #    message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_UNSUPPORTED_MESSAGE_TYPE',
+        #    # TODO: once all are implemented, change to INVALID_M_T?
+        #    params  => {
+        #      'MESSAGE_TYPE_NAME' => $message_type_ref->{MESSAGE_TYPE_NAME},
+        #      'MESSAGE_TYPE_CODE' => $message_type_ref->{MESSAGE_TYPE_CODE},
+        #    },
+        #});
+        $result = $token->command({
+            COMMAND      => 'create_error_reply',
+            PKCS7        => $pkcs7_decoded,
+            'ERROR_CODE' => 'badRequest',
         });
     }
     
@@ -80,6 +103,9 @@ sub __pkcs_req : PRIVATE {
 
     ##! 16: "transaction ID: $transaction_id"
     # get workflow instance IDs corresponding to transaction ID
+    # TODO -- maybe we want to only get non-FAILURE instances here
+    # to give the client the chance to retry if a failure happened
+    # (has the drawback of maybe filling the DB)
     my $workflows = $api->search_workflow_instances({
             CONTEXT => [
                 {
@@ -88,52 +114,131 @@ sub __pkcs_req : PRIVATE {
                 },
             ],
     });
-    my @workflow_ids = map { $_->{'WORKFLOW_CONTEXT.WORKFLOW_SERIAL'} } @{$workflows};
-    # TODO: check if this works as before
+    ##! 16: 'workflows: ' . Dumper $workflows
+    my @workflow_ids = map { $_->{'WORKFLOW.WORKFLOW_SERIAL'} } @{$workflows};
     
-    if (defined @workflow_ids) { # query status of workflow(s)
-        ##! 16: "at least one workflow was found"
-        my $num_of_workflows = scalar @workflow_ids;
-        if ($num_of_workflows > 1) { # this should _never_ happen ...
-            OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_WORKFLOW_FOUND",
-                params  => {
-                    WORKFLOWS => $num_of_workflows,
-                }
-            );
-        }
-        else { # everything is fine, we have only one matching workflow
-            my $wf_info = $api->get_workflow_info({
-                WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST',
-                ID       => $workflow_ids[0],
-            });
-            my $wf_state = $wf_info->{WORKFLOW}->{STATE};
-            if ($wf_state ne 'FINISHED') { # we are still pending
-                my $pending_msg = 'PENDING'; # TODO: create real pending message
-#                my $pending_msg = $token->command({
-#                    COMMAND => 'scep_create_pending_reply',
-#                    PKCS7   => $pkcs7_content,
-#                });
-#  $ENV{scep}
-#  openca-scep -new -signcert $scep_cert -msgtype CertRep -status PENDING -keyfile $scep_key -passin env:pwd -in $p7_file -reccert $reccert_file -outform DER 
-# why is -reccert needed?
-                return $pending_msg;
-            }
-            else { # the workflow is finished, TODO: extract the certificate
-                   # and return it to the requester
-            }
-        }
-    }
-    else { # create a new workflow instance
+    if (scalar @workflow_ids == 0) { 
         ##! 16: "no workflow was found, creating a new one"
-        $api->create_workflow_instance({
+        my $profile = CTX('session')->get_profile();
+        my $server  = CTX('session')->get_server();
+        # inject newlines if not already present
+        # this is necessary for openssl / openca-scep to parse
+        # the data correctly
+        $pkcs7_base64 =~ s{ \n }{}xmsg;
+        $pkcs7_base64 =~ s{ (.{64}) }{\1\n}xmsg;
+        $pkcs7_base64 .= "\n";
+        my $wf_info = $api->create_workflow_instance({
             WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST',
             PARAMS   => {
-                PKCS7_CONTENT => $pkcs7_base64,
-                SCEP_TID      => $transaction_id,
+                'pkcs7_content' => $pkcs7_base64,
+                'scep_tid'      => $transaction_id,
+                'cert_profile'  => $profile,
+                'server'        => $server,
             }
         });
-        return 'no workflows found';
+        ##! 16: 'wf_info: ' . Dumper $wf_info
+        $workflow_ids[0] = $wf_info->{WORKFLOW}->{ID};
+        ##! 16: '@workflow_ids: ' . Dumper \@workflow_ids
+    }
+
+    ##! 16: "at least one workflow was found"
+    my $num_of_workflows = scalar @workflow_ids;
+    if ($num_of_workflows > 1) { # this should _never_ happen ...
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_WORKFLOW_FOUND",
+            params  => {
+                WORKFLOWS      => $num_of_workflows,
+                TRANSACTION_ID => $transaction_id,
+            }
+        );
+    }
+    else { # everything is fine, we have only one matching workflow
+        my $wf_id = $workflow_ids[0];
+        my $wf_info = $api->get_workflow_info({
+            WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST',
+            ID       => $wf_id,
+        });
+        my $wf_state = $wf_info->{WORKFLOW}->{STATE};
+        if ($wf_state eq 'WAITED_FOR_CHILD') {
+            # in this state, we have to look for an available activity
+            # and execute it. This effectively checks whether the
+            # certificate issuance is finished or not
+            my $activities = $api->get_workflow_activities({
+                WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST',
+                ID       => $wf_id,
+            });
+            ##! 32: 'activities: ' . Dumper $activities
+            if (defined $activities && scalar @{$activities} > 1) {
+                # this should _never_ happen
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_ACTIVITY_FOUND',
+                );
+            }
+            elsif (defined $activities && scalar @{$activities} == 1) {
+                # execute possible activity
+                $api->execute_workflow_activity({
+                    WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST',
+                    ID       => $wf_id,
+                    ACTIVITY => $activities->[0],
+                });
+                # get new info and state
+                $wf_info = $api->get_workflow_info({
+                    WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST',
+                    ID       => $wf_id,
+                });
+                $wf_state = $wf_info->{WORKFLOW}->{STATE};
+                ##! 16: 'new state after triggering activity: ' . $wf_state
+            }        
+        }
+        if ($wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE') {
+            # we are still pending
+            my $pending_msg = $token->command({
+                COMMAND => 'create_pending_reply',
+                PKCS7   => $pkcs7_decoded,
+            });
+            return $pending_msg;
+        }
+        elsif ($wf_state eq 'SUCCESS') { # the workflow is finished,
+            # get the ID of the issuance child workflow
+            my $child_id_serialized = $wf_info->{WORKFLOW}->{CONTEXT}->{'wf_children_instances'};
+            ##! 16: 'child_id_serialized: ' . $child_id_serialized
+            my $ser = OpenXPKI::Serialization::Simple->new();
+            my $child_id_ref = $ser->deserialize($child_id_serialized);
+            ##! 16: 'child_id_ref: ' . Dumper($child_id_ref)
+            my $child_id = $child_id_ref->[0]->{ID};
+            ##! 16: 'child_id: ' . $child_id
+
+            my $cert_issuance_wf_info = $api->get_workflow_info({
+                WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
+                ID       => $child_id,
+            });
+            my $certificate = $cert_issuance_wf_info->{WORKFLOW}->{CONTEXT}->{certificate};
+
+            ##! 16: 'certificate: ' . $certificate
+
+            my $certificate_msg = $token->command({
+                COMMAND        => 'create_certificate_reply',
+                PKCS7          => $pkcs7_decoded,
+                CERTIFICATE    => $certificate,
+                ENCRYPTION_ALG => CTX('session')->get_enc_alg(),
+            });
+
+            return $certificate_msg;
+        }
+        else { ##! 32: 'FAILURE'
+            my $error_code = $wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'};
+            if (! defined $error_code) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_FAILURE_BUT_NO_ERROR_CODE',
+                );
+            }
+            my $error_msg = $token->command({
+                COMMAND      => 'create_error_reply',
+                PKCS7        => $pkcs7_decoded,
+                'ERROR_CODE' => $error_code,
+            });
+            return $error_msg;
+        }
     }
 }
 
@@ -174,8 +279,10 @@ the workflow.
 
 If there is a workflow, the status of this workflow is looked up and the response
 depends on the status:
-  - if the status is not 'FINISHED', the request is still pending, and a
-    corresponding message is returned to the SCEP client.
-  - if the status is 'FINISHED', the certificate is extracted from the workflow
-    and returned to the SCEP client.
+  - if the status is not 'SUCCESS' or 'FAILURE', the request is still
+    pending, and a corresponding message is returned to the SCEP client.
+  - if the status is 'SUCESS', the certificate is extracted from the
+    workflow and returned to the SCEP client.
+  - if the status is 'FAILURE', the failure code is extracted from the
+    workflow and returned to the client
 

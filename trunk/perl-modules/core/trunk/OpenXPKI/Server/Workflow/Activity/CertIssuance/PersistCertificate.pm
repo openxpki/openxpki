@@ -44,18 +44,37 @@ sub execute {
         TOKEN => $default_token,
         DATA  => $certificate,
     );
+    ##! 32: 'x509: ' . Dumper $x509
     my %insert_hash = $x509->to_db_hash();
+    my $identifier = $insert_hash{'IDENTIFIER'};
     my $ca = $context->param('ca');
     my $ca_identifier = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$ca}->{identifier};
     $insert_hash{'PKI_REALM'} = $pki_realm;
     $insert_hash{'ISSUER_IDENTIFIER'} = $ca_identifier;
     $insert_hash{'ROLE'}       = $context->param('cert_role'); 
     $insert_hash{'CSR_SERIAL'} = $context->param('csr_serial');
-    $insert_hash{'STATUS'} = 'VALID';
+    $insert_hash{'STATUS'} = 'ISSUED';
     $dbi->insert(
         TABLE => 'CERTIFICATE',
         HASH  => \%insert_hash,
     );
+
+    my @subject_alt_names = $x509->get_subject_alt_names();
+    ##! 32: 'sans: ' . Dumper \@subject_alt_names
+    foreach my $san (@subject_alt_names) {
+        my $serial = $dbi->get_new_serial(
+            TABLE => 'CERTIFICATE_ATTRIBUTES',
+        );
+        $dbi->insert(
+            TABLE => 'CERTIFICATE_ATTRIBUTES',
+            HASH  => {
+                'ATTRIBUTE_SERIAL' => $serial,
+                'IDENTIFIER'       => $identifier,
+                'ATTRIBUTE_KEY'    => 'subject_alt_name',
+                'ATTRIBUTE_VALUE'  => $san->[0] . ':' . $san->[1],
+            },
+        );
+    }
     $dbi->commit();
 }
 

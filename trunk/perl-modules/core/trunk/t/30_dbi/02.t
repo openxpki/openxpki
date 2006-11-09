@@ -33,13 +33,18 @@ $crl->set_header_attribute (PKI_REALM => "Test Root CA",
 ok($cert and $crl);
 
 # insert CA certificate
-$cert->set_status ("VALID");
+$cert->set_status ("ISSUED");
 ok($cert);
 
 # write self-signed root cert to DB
 
 my %hash = $cert->to_db_hash();
+$hash{'ISSUER_IDENTIFIER'} = 'dummy';
 $hash{PKI_REALM} = '';
+my $serial = $dbi->get_new_serial(
+    TABLE => 'CERTIFICATE',
+);
+$hash{'CERTIFICATE_SERIAL'} = $serial;
 
 $dbi->insert (TABLE => "CERTIFICATE", HASH => \%hash);
 $dbi->commit();
@@ -50,7 +55,12 @@ if ($ENV{DEBUG}) {
 }
 
 %hash = $cert2->to_db_hash();
+$hash{'ISSUER_IDENTIFIER'} = 'dummy';
 $hash{PKI_REALM} = '';
+$serial = $dbi->get_new_serial(
+    TABLE => 'CERTIFICATE',
+);
+$hash{'CERTIFICATE_SERIAL'} = $serial;
 
 $dbi->insert (TABLE => "CERTIFICATE", HASH => \%hash);
 $dbi->commit();
@@ -85,11 +95,10 @@ $dbi->commit();
 ok(1);
 # insert first CRL
 
-# TODO: write CRL->to_db_hash() and use here
 my %db_hash = $crl->to_db_hash();
 $db_hash{PKI_REALM} = 'Test Root CA';
 $db_hash{ISSUER_IDENTIFIER} = $cert->get_identifier();
-my $serial = $dbi->get_new_serial(
+$serial = $dbi->get_new_serial(
         TABLE => 'CRL',
 );
 $db_hash{'CRL_SERIAL'} = $serial;

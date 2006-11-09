@@ -14,6 +14,7 @@ use Data::Dumper;
 use English;
 use OpenXPKI::Crypto::Backend::API;
 use OpenXPKI::Crypto::Tool::SCEP::API;
+use OpenXPKI::Crypto::Tool::PKCS7::API;
 
 sub new {
     my $that = shift;
@@ -108,6 +109,10 @@ sub __add_token
     {
         $type_path = 'scep';
     }
+    elsif ($type eq 'PKCS7')
+    {
+        $type_path = 'pkcs7';
+    }
     elsif ($type eq "DEFAULT")
     {
         $type_path = "common";
@@ -178,6 +183,9 @@ sub __add_token
         my $backend_api_class;
         if ($type eq 'SCEP') { # SCEP uses its own API
             $backend_api_class = 'OpenXPKI::Crypto::Tool::SCEP::API';
+        }
+        elsif ($type eq 'PKCS7') { # so does PKCS#7
+            $backend_api_class = 'OpenXPKI::Crypto::Tool::PKCS7::API';
         }
         else { # use the 'default' backend
             $backend_api_class = 'OpenXPKI::Crypto::Backend::API';

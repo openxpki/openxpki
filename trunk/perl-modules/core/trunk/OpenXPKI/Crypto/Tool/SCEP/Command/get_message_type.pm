@@ -13,13 +13,14 @@ use OpenXPKI::Debug 'OpenXPKI::Crypto::Tool::SCEP::Command::get_message_type';
 use OpenXPKI::FileUtils;
 use Data::Dumper;
 
-my %fu_of :ATTR; # a FileUtils instance
+my %fu_of      :ATTR; # a FileUtils instance
 my %outfile_of :ATTR;
-my %tmp_of :ATTR;
-my %pkcs7_of :ATTR;
+my %tmp_of     :ATTR;
+my %pkcs7_of   :ATTR;
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
+    ##! 16: 'arg_ref: ' . Dumper($arg_ref)
     $fu_of{$ident} = OpenXPKI::FileUtils->new();
     $tmp_of{$ident} = $arg_ref->{TMP};
     $pkcs7_of{$ident} = $arg_ref->{PKCS7};
@@ -37,11 +38,13 @@ sub get_command {
     $outfile_of{$ident} = $fu_of{$ident}->get_safe_tmpfile({
         'TMP' => $tmp_of{$ident},
     });
+    ##! 16: 'content: ' . Dumper $pkcs7_of{$ident}
     $fu_of{$ident}->write_file({
         FILENAME => $in_filename,
         CONTENT  => $pkcs7_of{$ident},
         FORCE    => 1,
     });
+    ##! 16: 'stat: ' . Dumper(stat $in_filename)
    
     $command .= '-in ' . $in_filename;
     $command .= ' -out ' . $outfile_of{$ident};
@@ -73,6 +76,7 @@ sub get_result
         MESSAGE_TYPE_NAME => $message_type_name,
         MESSAGE_TYPE_CODE => $message_type_code,
     );
+    ##! 64: 'return_ref: ' . Dumper(\%return_ref)
 
     return \%return_ref;
 }

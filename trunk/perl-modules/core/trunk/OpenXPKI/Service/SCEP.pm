@@ -24,9 +24,9 @@ use OpenXPKI::Server;
 use OpenXPKI::Server::Session::Mock;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::SCEP::Command;
+use Data::Dumper;
 
-sub init
-{
+sub init {
     my $self  = shift;
     my $ident = ident $self;
     my $args  = shift;
@@ -39,13 +39,140 @@ sub init
     # get realm from client and save in session
     my $realm = $self->__init_pki_realm();
     CTX('session')->set_pki_realm($realm);
-
+    my $profile = $self->__init_profile();
+    CTX('session')->set_profile($profile);
+    my $server = $self->__init_server();
+    CTX('session')->set_server($server);
+    my $encryption_alg = $self->__init_encryption_alg();
+    CTX('session')->set_enc_alg($encryption_alg);
 
     return 1;
 }
 
-sub __init_session :PRIVATE
-{
+sub __init_profile :PRIVATE {
+    ##! 4: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $arg_ref = shift;
+
+    my $realm = CTX('session')->get_pki_realm();
+    
+    # check endentity profile list
+    my @list = sort keys %{CTX('pki_realm')->{$realm}->{endentity}->{id}};
+    ##! 16: Dumper(@list)
+    if (scalar @list < 1) {
+        ##! 4: "no endentity profiles configured"
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_SCEP_NO_ENDENTITY_PROFILES_CONFIGURED",
+        );
+    }
+
+    ##! 2: "build hash with names"
+    my %profiles =();
+    foreach my $profile (@list) {
+        $profiles{$profile}->{NAME}        = $profile;
+    }
+
+    my $message = $self->collect();
+    ##! 16: "message collected: " . Dumper($message)
+    my $requested_profile;
+    if ($message =~ /^SELECT_PROFILE (.*)/) {
+        $requested_profile = $1;
+        ##! 16: "requested profile: $requested_profile"
+    }
+    else {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_PROFILE_RECEIVED",
+        );
+        # FIXME: this is an uncaught exception
+    }
+
+    if (defined $profiles{$requested_profile}->{NAME}) { # the profile is valid
+        $self->talk('OK');
+        return $requested_profile;
+    }
+    else { # the requested profile was not found in the server configuration
+        $self->talk('NOTFOUND');
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_SCEP_INVALID_PROFILE_REQUESTED",
+            params  => {REQUESTED_PROFILE => $requested_profile},
+        );
+    }
+}
+
+sub __init_server : PRIVATE {
+    ##! 4: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $arg_ref = shift;
+
+    my $realm = CTX('session')->get_pki_realm();
+    
+    my $message = $self->collect();
+    ##! 16: "message collected: " . Dumper($message)
+    my $requested_server;
+    if ($message =~ /^SELECT_SERVER (.*)/) {
+        $requested_server = $1;
+        ##! 16: "requested server: $requested_server"
+    }
+    else {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_SERVER_RECEIVED",
+        );
+        # FIXME: this is an uncaught exception
+    }
+    if (exists CTX('pki_realm')->{$realm}->{scep}->{id}->{$requested_server}) {
+        # the server is valid
+        $self->talk('OK');
+        return $requested_server;
+    }
+    else { # the requested profile was not found in the server configuration
+        $self->talk('NOTFOUND');
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_SCEP_INVALID_SERVER_REQUESTED",
+            params  => {REQUESTED_SERVER => $requested_server},
+        );
+    }
+}
+
+sub __init_encryption_alg : PRIVATE {
+    ##! 4: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $arg_ref = shift;
+
+    my $realm = CTX('session')->get_pki_realm();
+    
+    my $message = $self->collect();
+    ##! 16: "message collected: " . Dumper($message)
+    my $requested_encryption_alg;
+    if ($message =~ /^SELECT_ENCRYPTION_ALGORITHM (.*)/) {
+        $requested_encryption_alg = $1;
+        ##! 16: "requested encryption_alg: $requested_encryption_alg"
+    }
+    else {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_ENCRYPTION_ALGORITHM_RECEIVED",
+        );
+        # FIXME: this is an uncaught exception
+    }
+    if ($requested_encryption_alg eq 'DES' ||
+        $requested_encryption_alg eq '3DES') {
+        # the encryption_alg is valid
+        $self->talk('OK');
+        return $requested_encryption_alg;
+    }
+    else { # the requested encryption algorithm is invalid
+        $self->talk('NOTFOUND');
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_SCEP_INVALID_ALGORITHM_REQUESTED",
+            params  => {REQUESTED_ALGORITHM => $requested_encryption_alg},
+        );
+    }
+}
+
+
+sub __init_session : PRIVATE {
     my $self    = shift;
     my $ident   = ident $self;
     my $arg     = shift;
@@ -90,9 +217,9 @@ sub __init_pki_realm :PRIVATE
         ##! 16: "requested realm: $requested_realm"
     }
     else {
-        OpenXPKI::Exception->throw({
+        OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_PKI_REALM_RECEIVED",
-        });
+        );
     }
 
     if (defined $realms{$requested_realm}->{NAME}) { # the realm is valid

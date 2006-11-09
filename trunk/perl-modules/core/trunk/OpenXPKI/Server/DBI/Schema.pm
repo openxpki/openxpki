@@ -17,6 +17,7 @@ my %SEQUENCE_of = (
     CSR            => "sequence_csr",
     CSR_ATTRIBUTES => "sequence_csr_attributes",
     CERTIFICATE    => "sequence_certificate",
+    CERTIFICATE_ATTRIBUTES => "sequence_certificate_attributes",
     CRR            => "sequence_crr",
     # log entries must use auto_increment
     # or whatever the name of this technology is on your database platform
@@ -181,8 +182,8 @@ my %TABLE_of = (
 
     CERTIFICATE_ATTRIBUTES => {
         NAME    => "certificate_attributes",
-        INDEX   => [ "IDENTIFIER", ],
-        COLUMNS => [ "IDENTIFIER", 
+        INDEX   => [ "ATTRIBUTE_SERIAL", "IDENTIFIER", ],
+        COLUMNS => [ "ATTRIBUTE_SERIAL", "IDENTIFIER", 
 		     "ATTRIBUTE_KEY", 
 		     "ATTRIBUTE_VALUE",
 	    ],

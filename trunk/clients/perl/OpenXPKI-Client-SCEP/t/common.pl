@@ -8,5 +8,6 @@ our %config = (
     config_file        => "$base/etc/openxpki/config.xml",
     socket_file        => "/var/tmp/openxpki-client-test.socket",
     http_server_port   => 8087,
-    debug              => 1,
+    debug              => 0,
+    openssl            => "/usr/bin/openssl",
 );

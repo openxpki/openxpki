@@ -12,13 +12,16 @@
     </validator>
   </action>
 
-  <action name="null"
+  <action name="do_nothing"
+          class="Workflow::Action::Null">
+  </action>
+  <action name="do_nothing2"
           class="Workflow::Action::Null">
   </action>
 
   <!-- implicit autorun and no user interaction - so no I18N name for this
        activity -->
-  <action name="I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+  <action name="determine_issuing_ca"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::DetermineIssuingCA">
   </action>
 
@@ -39,7 +42,7 @@
   </action>
 
   <!-- TODO: implement this action! -->
-  <action name="I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
+  <action name="unlock_ca_key"
           class="Workflow::Action::Null">
   </action>
   

@@ -148,7 +148,7 @@ sub execute {
                 ## capture STDOUT
                 if (not open FD, "$cmd|") {
                     OpenXPKI::Exception->throw (
-                        message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_PIPED_STDOUT_FAILED',
+                        message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDOUT_FAILED',
                         params  => { 'ERRVAL' => $EVAL_ERROR,
                                    },
                         );
@@ -167,7 +167,7 @@ sub execute {
         if ($EVAL_ERROR)
         {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_FAILED',
+                message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED',
                 params  => { 'ERRVAL' => $EVAL_ERROR,
                            },
             );
@@ -200,7 +200,7 @@ sub __find_error : PRIVATE {
             # read_file did not work ...
             unlink($stdout_file_of{$ident});
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_CANNOT_OPEN_ERRLOG',
+                message => 'I18N_OPENXPKI_CRYPTO_CLI_CANNOT_OPEN_ERRLOG',
                 params  => { 'FILENAME' => $stderr_file_of{$ident},
                            },
             );
@@ -215,7 +215,7 @@ sub __find_error : PRIVATE {
         ##! 8: "error detected - firing exception"
         unlink ($stdout_file_of{$ident});
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_ERROR',
+            message => 'I18N_OPENXPKI_CRYPTO_CLI_ERROR',
             params  => { 'ERRVAL' => $ret,
                        },
         );

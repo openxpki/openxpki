@@ -262,6 +262,7 @@ sub authorize
         and
         not exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{'*'})
     {
+        ##! 99: 'permission denied'
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED",
             params  => {PKI_REALM     => $realm,

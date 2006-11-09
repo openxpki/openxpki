@@ -5,9 +5,8 @@
   <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>
 
   <state name="INITIAL">
-    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL</description>
     <action name="import"
-            resulting_state="I18N_OPENXPKI_WF_STATE_WAITING_FOR_START">
+            resulting_state="WAITING_FOR_START">
 <!-- TODO: -->
 <!--      <condition name="CONTEXT::csr_serial_present"/> -->
     </action>
@@ -20,31 +19,29 @@
   </state>
 
   <!-- this state is implicitly autostarted by the parent workflow -->
-  <state name="I18N_OPENXPKI_WF_STATE_WAITING_FOR_START">
-    <action name="I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+  <state name="WAITING_FOR_START">
+    <action name="determine_issuing_ca"
 	    resulting_state="ISSUING_CA_DETERMINED">
       <condition name="ACL::start_certificate_issuance"/>
     </action>
   </state>
 
   <state name="ISSUING_CA_DETERMINED" autorun="yes">
-    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED</description>
     <action name="get_cert_profile"
             resulting_state="PREPARED">
     </action>
   </state>
 
   <state name="PREPARED" autorun="yes">
-    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED</description>
     <!-- at the moment, this action is never triggered as the condition
          always fails. This is useful for testing, but will change
          in the future -->
-    <action name="null"
+    <action name="do_nothing"
             resulting_state="CA_KEY_NOT_USABLE">
       <condition name="CA::key_is_not_usable"/>
     </action>
 
-    <action name="null"
+    <action name="do_nothing2"
             resulting_state="CA_KEY_USABLE">
       <condition name="CA::key_is_usable"/>
     </action>
@@ -61,33 +58,16 @@
   </state>
 
   <state name="CA_KEY_NOT_USABLE">
-    <action name="I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY" 
+    <action name="unlock_ca_key" 
 	    resulting_state="CA_KEY_USABLE">
     </action>
   </state>
 
   <state name="CERTIFICATE_ISSUED" autorun="yes">
-    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED</description>
     <action name="persist_certificate"
             resulting_state="SUCCESS">
     </action>
   </state>
-
-<!-- for testing forked workflows, sleeps 60 seconds after issuance -->
-<!--
-  <state name="CERTIFICATE_ISSUED" autorun="yes">
-    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED</description>
-    <action name="I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
-            resulting_state="SLEPT">
-    </action>
-  </state>
-
-  <state name="SLEPT" autorun="yes">
-    <action name="insert_certificate"
-            resulting_state="SUCCESS">
-    </action>
-  </state>
--->
 
   <state name="FAILURE"/>
   <state name="SUCCESS"/>

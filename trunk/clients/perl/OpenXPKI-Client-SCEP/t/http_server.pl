@@ -46,7 +46,7 @@ while (my $conn = $daemon->accept()) {
 
         # call the CGI script and pass it the options using STDIN
         # (CGI qw( -debug ) in scep)
-        open my $CGI_HANDLE, "| REMOTE_ADDR=127.0.0.1 ./scep > $tmp_filename";
+        open my $CGI_HANDLE, "| REMOTE_ADDR=127.0.0.1 ./scep > $tmp_filename 2>/dev/null";
         print $CGI_HANDLE $post_data;
         close $CGI_HANDLE;
 

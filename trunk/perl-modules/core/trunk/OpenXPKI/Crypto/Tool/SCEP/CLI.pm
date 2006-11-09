@@ -17,7 +17,10 @@ sub error_ispresent {
     my $ident = ident $self;
     my $stderr = shift;
 
-    if ($stderr =~ m{ USAGE }xms) { # TODO: check more possible error output
+    if ($stderr =~ m{ [eE]rror | 
+                       USAGE   |
+                       cannot[ ]decrypt[ ]request
+                    }xms) { # TODO: check more possible error output
         return 1;
     }
     else {

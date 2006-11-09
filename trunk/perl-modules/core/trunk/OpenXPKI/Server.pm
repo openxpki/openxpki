@@ -20,6 +20,8 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
 
+use Data::Dumper;
+
 sub new
 {
     my $that = shift;
@@ -199,7 +201,7 @@ sub process_request {
  	    FACILITY => "system",
  	    );
  	# die gracefully
-	##! 1: "Uncaught exception: $msg"
+	##! 1: "Uncaught exception: " . Dumper $msg
  	$ERRNO = 1;
         return;
     }

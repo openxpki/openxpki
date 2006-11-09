@@ -29,10 +29,30 @@ sub __init_command_params : PRIVATE {
     my $self = shift;
 
     $self->set_command_params({
-        'get_message_type'   => { 'PKCS7' => 1,
-                                     },
-        'get_transaction_id' => { 'PKCS7' => 1,
-                                     },
+        'get_message_type' => {
+            'PKCS7' => 1,
+        },
+        'get_transaction_id' => {
+            'PKCS7' => 1,
+        },
+        'create_pending_reply' => {
+            'PKCS7' => 1,
+        },
+        'create_certificate_reply' => {
+            'PKCS7'       => 1,
+            'CERTIFICATE' => 1,
+            'ENCRYPTION_ALG' => 1,
+        },
+        'create_error_reply' => {
+            'PKCS7'      => 1,
+            'ERROR_CODE' => 1,
+        },
+        'get_pkcs10' => {
+            'PKCS7' => 1,
+        },
+        'get_signer_cert' => {
+            'PKCS7' => 1,
+        },
     });
 }
 

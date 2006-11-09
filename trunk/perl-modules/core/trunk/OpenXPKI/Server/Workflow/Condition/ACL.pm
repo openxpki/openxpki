@@ -5,6 +5,7 @@ use warnings;
 use base qw( Workflow::Condition );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Condition::ACL';
 use English;
 
 __PACKAGE__->mk_accessors( 'activity' );
@@ -23,10 +24,12 @@ sub _init
 
 sub evaluate
 {
+    ##! 64: 'start'
     my ( $self, $wf ) = @_;
     my $context = $wf->context();
 
     my $activity = $self->activity();
+    ##! 64: 'activity: ' . $activity
     if (not $activity)
     {
         ## this is a critical event because we don't know what to verify
@@ -39,6 +42,7 @@ sub evaluate
     $role = $context->param ("role")      if ($context->param ("role"));
     $role = $context->param ("cert_role") if ($context->param ("cert_role"));
 
+    ##! 64: 'role: ' . $role
     eval
     {
         CTX('acl')->authorize ({
@@ -47,12 +51,14 @@ sub evaluate
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
+        ##! 64: 'exception caught'
         my $errors = [[ $exc->message(), $exc->params() ]];
         $context->param ("__error" => $errors);
         condition_error ($errors->[0]);
     }
     elsif ($EVAL_ERROR)
     {
+        ##! 64: 'eval_error'
         condition_error ($EVAL_ERROR);
     }
 

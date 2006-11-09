@@ -8,7 +8,8 @@ package OpenXPKI::Client::SCEP;
 use base qw( OpenXPKI::Client );
 use OpenXPKI::Server::Context qw( CTX );
 
-use version; 
+use Data::Dumper;
+
 use version; 
 ($OpenXPKI::Client::SCEP::VERSION = '$Revision: 342 $' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
 $VERSION = qv($VERSION);
@@ -28,6 +29,9 @@ $VERSION = qv($VERSION);
     my %operation_of :ATTR( :init_arg<OPERATION> ); # SCEP operation
     my %message_of   :ATTR( :init_arg<MESSAGE>   ); # SCEP message
     my %realm_of     :ATTR( :init_arg<REALM>     ); # PKI realm to use
+    my %profile_of   :ATTR( :init_arg<PROFILE>   ); # endentity profile to use
+    my %server_of    :ATTR( :init_arg<SERVER>    ); # server to use
+    my %enc_alg_of   :ATTR( :init_arg<ENCRYPTION_ALGORITHM> ); 
 
     my %allowed_op = map { $_ => 1 } qw(
         GetCACaps
@@ -40,14 +44,30 @@ $VERSION = qv($VERSION);
 
     sub START {
         my ($self, $ident, $arg_ref) = @_;
-        my $realm = $realm_of{$ident};
         
         # send configured realm, collect response
         ##! 4: "before talk"
-        $self->talk('SELECT_PKI_REALM ' . $realm);
+        $self->talk('SELECT_PKI_REALM ' . $realm_of{$ident});
         my $message = $self->collect();
         if ($message eq 'NOTFOUND') {
-            die('The configured realm was not found on the server');
+            die("The configured realm (" . $realm_of{$ident} . ") was not found"
+                . " on the server");
+        }
+        $self->talk('SELECT_PROFILE ' . $profile_of{$ident});
+        $message = $self->collect();
+        if ($message eq 'NOTFOUND') {
+            die("The configured profile (" . $profile_of{$ident} . ") was not found on the server");
+        }
+        $self->talk('SELECT_SERVER ' . $server_of{$ident});
+        $message = $self->collect();
+        if ($message eq 'NOTFOUND') {
+            die('The configured server (' . $server_of{$ident} . ') was not found on the server');
+        }
+        $self->talk('SELECT_ENCRYPTION_ALGORITHM ' . $enc_alg_of{$ident});
+        $message = $self->collect();
+        if ($message eq 'NOTFOUND') {
+            die('The configured encryption algorithm (' . $enc_alg_of{$ident} 
+                . ') was not found on the server');
         }
     }
 
@@ -55,21 +75,16 @@ $VERSION = qv($VERSION);
         my $self = shift;
         my $ident = ident $self;
         my $op = $operation_of{$ident};
-        my $message = $operation_of{$ident};
+        my $message = $message_of{$ident};
 
         if ($allowed_op{$op}) {
-            my $command;
-            my $args;
-            
-            if ($op eq 'PKIOperation') {
-                # TODO: parse message and set $command and $args accordingly
-            }
-            else { # the command is just the operation
-                $command = $op;
-                # TODO parse message and set $args accordingly
-            }
             # send command message to server
-            $self->send_command_msg($command, $args);
+            $self->send_command_msg(
+                $op,
+                {
+                  MESSAGE => $message,
+                }
+            );
         }
         else { # OP is invalid, throw corresponding exception
             OpenXPKI::Exception->throw(

@@ -99,6 +99,16 @@
     [% THROW config "No 'id' defined for subsystem $entry" IF ! $entry.id.defined %]
     [% THROW config "No 'type' defined for subsystem $entry" IF ! $entry.type.defined %]
     <[% $entry.type %] id="[% $entry.id %]">
+      [% IF $entry.cert_alias %]
+      <cert>
+        <alias>[% $entry.cert_alias %]</alias>
+        <realm>[% $realmsection.name %]</realm>
+      </cert>
+      [% ELSIF $entry.cert_identifier %]
+      <cert>
+        <identifier>[% $entry.cert_identifier %]</identifier>
+      <cert>
+      [% END %]
       <token super="common/token_config/token{[% $entry.id %]}"/>
     </[% $entry.type %]>
     [% END %]

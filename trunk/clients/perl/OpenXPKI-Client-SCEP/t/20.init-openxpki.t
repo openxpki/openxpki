@@ -11,6 +11,10 @@ our %config;
 require 't/common.pl';
 
 my $debug = $config{debug};
+my $stderr = '2>/dev/null';
+if ($debug) {
+    $stderr = '';
+}
 
 diag("Locally deploying OpenXPKI");
 
@@ -32,8 +36,8 @@ if (-d $instancedir) {
 ok(mkpath $instancedir);
 
 # deployment
-ok(system("openxpkiadm deploy --prefix $instancedir") == 0);
-
+diag("Deploying ...");
+ok(system("openxpkiadm deploy --prefix $instancedir $stderr") == 0);
 # meta config should now exist
 ok(-e "$config{config_dir}/openxpki.conf");
 
@@ -55,8 +59,9 @@ my $args = "--batch --createdirs --";
 foreach my $key (keys %configure_settings) {
     $args .= " --setcfgvalue $key=$configure_settings{$key}";
 }
-diag "Configuring with local options $args";
-ok(system("openxpki-configure $args") == 0);
+diag("Configuring ...");
+ok(system("openxpki-configure $args $stderr") == 0);
+
 
 # and back
 ok(chdir($dir));
@@ -65,16 +70,6 @@ if (! ok(-e $config{config_file})) {
     BAIL_OUT("No server configuration file present ($config{config_file})");
 }
 
-diag "Starting OpenXPKI Server.";
-
-$args = "--debug 100" if ($debug);
-if (system("openxpkictl --config $config{config_file} $args start") != 0) {
-    unlink $config{socket_file};
-    BAIL_OUT("Could not start OpenXPKI.");
-}
-
-if (! ok(-e $config{socket_file})) {
-    unlink $config{socket_file};
-    BAIL_OUT("Server did not start (no socket file)");
-}
+diag("Initializing database");
+ok(system("openxpkiadm initdb --config $config{config_file} $stderr") == 0);
 

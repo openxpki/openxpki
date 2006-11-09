@@ -218,8 +218,7 @@ sub __load_config {
             }
 	}
     }
-    if ($type_path eq 'ca') { # default tokens don't have a certificate
-        # FIXME: SCEP needs certificates as well
+    if ($type_path eq 'ca' || $type_path eq 'scep') { # default tokens don't have a certificate
         # certificate files are no longer defined in token.xml, thus
         # create a temporary file with the certificate in it
         # every time a token is instantiated.
@@ -412,6 +411,12 @@ sub command {
             });
         my $cmds = $cmd_ref->get_command();
 
+        my $cli_class = $base_class_of{$ident} . '::CLI';
+        # instantiate a new CLI class so that the different
+        # command calls during a token lifetime don't share
+        # a stderr log file, which leads to multiple exceptions
+        # for one error
+        $self->__instantiate_cli($cli_class);
 	if (ref $cmds ne 'HASH') {
 	    ##! 16: "standard invocation"
             $self->__prepare_cli($cmds);
@@ -437,7 +442,9 @@ sub command {
 	}
 
         my $result = $cli_of{$ident}->get_result();
+        ##! 128: 'before get_result()'
         $result = $cmd_ref->get_result($result);
+        ##! 128: 'after get_result()'
 
         if ($cmd_ref->hide_output())
         {
@@ -451,6 +458,8 @@ sub command {
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
+        ##! 16: 'exception: ' . Dumper $exc
+        ##! 16: 'eval_error: ' . $EVAL_ERROR
         $cli_of{$ident}->cleanup(); ## this is safe
         OpenXPKI::Exception->throw (
             message  => "I18N_OPENXPKI_TOOLKIT_COMMAND_FAILED",

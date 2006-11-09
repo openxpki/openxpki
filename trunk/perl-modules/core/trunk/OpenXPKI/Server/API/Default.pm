@@ -20,6 +20,7 @@ use Data::Dumper;
 use OpenXPKI::Debug 'OpenXPKI::Server::API';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Crypto::TokenManager;
 
 sub START {
     # somebody tried to instantiate us, but we are just an
@@ -62,16 +63,14 @@ sub get_chain {
 	    message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
         );
     }
-    if (defined $arg_ref->{OUTFORMAT}) {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_OUTFORMAT_NOT_IMPLEMENTED_YET",
-        );
-    }
     my $start = $arg_ref->{START_IDENTIFIER};
     my $current_identifier = $start;
     my $dbi = CTX('dbi_backend');
+    my @certs;
 
     while (! $finished) {
+        ##! 128: '@identifiers: ' . Dumper(\@identifiers)
+        ##! 128: '@certs: ' . Dumper(\@certs)
         push @identifiers, $current_identifier;
         my $cert = $dbi->first(
             TABLE   => 'CERTIFICATE',
@@ -83,6 +82,18 @@ sub get_chain {
             $finished = 1;
         }
         else {
+            if (defined $arg_ref->{OUTFORMAT}) {
+                if ($arg_ref->{OUTFORMAT} eq 'PEM') {
+                    push @certs, $cert->{DATA};
+                }
+                elsif ($arg_ref->{OUTFORMAT} eq 'DER') {
+                    # FIXME: convert to DER using default token
+                    # and convert_cert
+                    OpenXPKI::Exception->throw(
+                        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_FIXME_DER_OUTFORMAT_STILL_UNSUPPORTED',
+                    );
+                }
+            }
             if ($cert->{ISSUER_IDENTIFIER} eq $current_identifier) {
                 # self-signed, this is the end of the chain
                 $finished = 1;
@@ -97,11 +108,12 @@ sub get_chain {
                 $already_seen{$current_identifier} = 1;
             }
         }
-        # TODO: fill @certificate array
     }
     $return_ref->{IDENTIFIERS} = \@identifiers;
     $return_ref->{COMPLETE}    = $complete;
-
+    if (defined $arg_ref->{OUTFORMAT}) {
+        $return_ref->{CERTIFICATES} = \@certs;
+    }
     return $return_ref;
 }
 

@@ -110,7 +110,7 @@ templatedir:      $(dir.datadir)/templates
 # OpenSSL binary loation, REQUIRED
 openssl: /usr/bin/openssl
 openca_scep: /usr/bin/openca-scep
-
+openca_sv: /usr/bin/openca-sv
 
 ###########################################################################
 # OpenXPKI Server configuration
@@ -258,6 +258,7 @@ name: I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA
 issuingca: TEST_DUMMY_CA_1
 issuingca: TEST_DUMMY_CA_2
 subsystem: TEST_SCEP_SERVER_1
+subsystem: TEST_SCEP_PKCS7_TOOL_1
 profiles:  $(profiles)
 
 [Realm 2]
@@ -272,9 +273,17 @@ profiles:  $(profiles)
 
 [TEST_SCEP_SERVER_1]
 id: testscepserver1
+cert_alias: testscepserver1
 type: scep
 shell: $(file.openca_scep)
 backend: OpenXPKI::Crypto::Tool::SCEP
+dir: $(dir.cadir)/scepdummyserver1
+
+[TEST_SCEP_PKCS7_TOOL_1]
+id: testsceppkcs7tool1
+type: pkcs7
+shell: $(file.openca_sv)
+backend: OpenXPKI::Crypto::Tool::PKCS7
 dir: $(dir.cadir)/scepdummyserver1
 
 ###########################################################################

@@ -261,9 +261,15 @@ sub create_workflow_instance {
             (ref $args->{PARAMS} eq 'HASH'))
         {
             ##! 8: "load allowed parameters"
+            ##! 32: '@list: ' . Dumper(\@list)
+            ##! 64: 'workflow: ' . Dumper($workflow)
+            my @activities = $workflow->get_current_actions();
+            ##! 64: 'activity: ' . $list[0]
             my %fields = ();
+            ##! 64: 'fields: ' . $workflow->get_action_fields($list[0])
             foreach my $field ($workflow->get_action_fields($list[0]))
             {
+                ##! 32: 'field: ' . $field->name()
                 $fields{$field->name()} = $field->description();
             }
             ##! 8: "store the allowed parameters"
@@ -286,49 +292,63 @@ sub create_workflow_instance {
         }
         $state = $workflow->execute_action($list[0]);
     };
-
-    if ($EVAL_ERROR or $state eq 'INITIAL') {
-        my $eval = $EVAL_ERROR;
-        my $error = $workflow->context->param('__error');
-        if (defined $error) {
-            if (ref $error eq '')
-            {
-                OpenXPKI::Exception->throw (
-                    message => $error);
-            }
-            if (ref $error eq 'ARRAY')
-            {
-                my @list = ();
-                foreach my $item (@{$error})
-                {
-                    eval {
-                        OpenXPKI::Exception->throw (
-                            message => $item->[0],
-                            params  => $item->[1]);
-                    };
-                    push @list, $EVAL_ERROR;
-                }
-                OpenXPKI::Exception->throw (
-                    message  => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED",
-                    children => [ @list ]);
-            } 
-        }
-        if ($eval)
-        {
-            if (index ($eval, "The following fields require a value:") > -1)
-            {
-                ## missing field(s) in workflow
-                $eval =~ s/^.*://;
-                OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
-                    params  => {FIELDS => $eval});
-            }
-            $eval->rethrow();
-        }
-        OpenXPKI::Exception->throw (
-                message => 'I18N_WF_ERROR_ILLEGAL_STATE');
-    };
     
+    if ($EVAL_ERROR || $state eq 'INITIAL') {
+        my $eval = $EVAL_ERROR;
+        # ignore this special Workflow exception - we are stuck in a
+        # state which should be autorun. This might happen if something
+        # does not happen as fast as we want, but we can easily recover
+        # by autorunning manually. This is for example used in the
+        # SCEP code, which checks the state of the child every time
+        # an SCEP message is received.
+        # FIXME -- this should better be a patch to Workflow, to support
+        # such "semi-automatic" states which don't complain ...
+        if (ref $eval eq 'Workflow::Exception' &&
+            ($eval->error() =~ m{State[ ].*[ ]should[ ]be[ ]automatically[ ]executed[ ]but[ ]+there[ ]are[ ]no[ ]actions[ ]available[ ]for[ ]execution\.}xms)) {
+            ##! 2: 'ignoring error'
+        }
+        else {
+            ##! 16: 'eval error: ' . $eval->error()
+            my $error = $workflow->context->param('__error');
+            if (defined $error) {
+                if (ref $error eq '')
+                {
+                    OpenXPKI::Exception->throw (
+                        message => $error);
+                }
+                if (ref $error eq 'ARRAY')
+                {
+                    my @list = ();
+                    foreach my $item (@{$error})
+                    {
+                        eval {
+                            OpenXPKI::Exception->throw (
+                                message => $item->[0],
+                                params  => $item->[1]);
+                        };
+                        push @list, $EVAL_ERROR;
+                    }
+                    OpenXPKI::Exception->throw (
+                        message  => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED",
+                        children => [ @list ]);
+                } 
+            }
+            if ($eval)
+            {
+                if (index ($eval, "The following fields require a value:") > -1)
+                {
+                    ## missing field(s) in workflow
+                    $eval =~ s/^.*://;
+                    OpenXPKI::Exception->throw (
+                        message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
+                        params  => {FIELDS => $eval});
+                }
+                $eval->rethrow();
+            }
+            OpenXPKI::Exception->throw (
+                    message => 'I18N_WF_ERROR_ILLEGAL_STATE');
+        };
+    }        
     return __get_workflow_info($workflow);
 }
 

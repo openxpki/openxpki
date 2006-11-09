@@ -13,6 +13,8 @@ use OpenXPKI::Crypto::Header;
 use OpenXPKI::Exception;
 use English;
 
+use Data::Dumper;
+
 sub get_header
 {
     my $self = shift;
@@ -35,6 +37,7 @@ sub get_parsed
 {
     my $self  = shift;
     my $ref   = $self->{PARSED};
+    ##! 16: Dumper $self
 
     foreach my $name (@_)
     {
@@ -90,6 +93,38 @@ sub set_header_attribute
     return 1;
 }
 
+sub get_subject_alt_names {
+    my $self = shift;
+
+    my @subject_alt_names;
+    eval { 
+        @subject_alt_names = @{$self->get_parsed('BODY',
+                                                 'OPENSSL_EXTENSIONS',
+                                    'X509v3 Subject Alternative Name')};
+    };
+    if (my $exc = OpenXPKI::Exception->caught()) {
+        # there are no subject alternative names in the object
+        return;
+    }
+    else {
+        ##! 64: 'subject_alt_names: ' . Dumper(\@subject_alt_names)
+    
+        my $all_sans = '';
+        foreach my $san_line (@subject_alt_names) {
+            $all_sans .= $san_line;
+        }
+        my @sans = split q{, }, $all_sans;
+        foreach my $san (@sans) {
+            ##! 64: 'san: ' . $san
+            # convert from string to array ref of form [ 'DNS', 'example.com' ]
+            my @temp = split /:/, $san;
+            $san = [ $temp[0], $temp[1] ];
+        }
+        ##! 64: 'sans: ' . Dumper(\@sans)
+        return @sans;
+    }
+}
+
 1;
 __END__
 
@@ -142,3 +177,12 @@ Such types of objects must overwrite this function.
 =head2 set_header_attribute
 
 set an attribute in the header.
+
+=head2 get_subject_alt_names
+
+returns the subject alternative names in an array of arrays, i.e.
+ [
+    [ 'DNS', 'www.example.com' ],
+    [ 'DNS', 'www.example.org' ],
+]
+This works only for certificates or certificate signing requests.

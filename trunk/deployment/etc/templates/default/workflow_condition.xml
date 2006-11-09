@@ -4,6 +4,9 @@
 
   <!-- general CSR conditions -->
 
+ <!-- TODO: in many cases, param name is useless, one can just read the
+      condition name instead. This is only useful if activity is different
+      from the ACL name -->
   <condition name="ACL::create_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="create_csr"/>
   </condition>
@@ -33,6 +36,9 @@
   </condition>
   <condition name="ACL::insert_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="insert_csr"/>
+  </condition>
+  <condition name="ACL::persist_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="persist_csr"/>
   </condition>
   <condition name="ACL::execute_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="execute_csr"/>
@@ -145,6 +151,10 @@
   </condition>
   <condition name="wf_child_instance_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
   </condition>
+  <condition name="wf_child_instance_success" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
+  </condition>
+  <condition name="wf_child_instance_failure" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse"> <!-- TODO: implement real condition -->
+  </condition>
 
   <!-- conditions for the data exchange -->
   <condition name="ACL::dataexchange_export" class="OpenXPKI::Server::Workflow::Condition::ACL">
@@ -154,5 +164,41 @@
     <param name="activity" value="dataexchange_import"/>
   </condition>
 
+  <!-- SCEP conditions -->
+  <!-- policy settings, set them to your liking -->
+  <condition name="initial_enrollment_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
+  <condition name="initial_enrollment_not_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse"/>
+
+  <condition name="auto_renewal_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
+  <condition name="auto_renewal_not_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse"/>
+
+  <condition name="auto_approval_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
+  <condition name="no_auto_approval_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse"/>
+  
+  <!-- SCEP internal settings, only change parameters here -->
+  <condition name="is_initial_enrollment" class="OpenXPKI::Server::Workflow::Condition::InitialEnrollmentOrRenewal">
+    <param name="RDN_filter" value="CN,O"/>
+  </condition>
+  <condition name="is_renewal" class="OpenXPKI::Server::Workflow::Condition::InitialEnrollmentOrRenewal">
+    <param name="RDN_filter" value="CN,O"/>
+  </condition>
+  <condition name="valid_signature_with_requested_dn" class="OpenXPKI::Server::Workflow::Condition::IsValidSignatureWithRequestedDN"/>
+  <condition name="invalid_signature_or_requested_dn" class="OpenXPKI::Server::Workflow::Condition::IsValidSignatureWithRequestedDN"/>
+  <condition name="correct_number_of_valid_certs" class="OpenXPKI::Server::Workflow::Condition::CorrectNumberOfValidCerts"> 
+    <param name="min" value="1"/>
+    <param name="max" value="2"/>
+  </condition>
+  <condition name="incorrect_number_of_valid_certs" class="OpenXPKI::Server::Workflow::Condition::CorrectNumberOfValidCerts">
+    <param name="min" value="1"/>
+    <param name="max" value="2"/>
+  </condition>
+  <condition name="correct_timing" class="OpenXPKI::Server::Workflow::Condition::CorrectTiming">
+    <param name="difference" value="100d"/> <!-- renewal can only begin 100 days before the certificate becomes invalid -->
+  </condition>
+  <condition name="incorrect_timing" class="OpenXPKI::Server::Workflow::Condition::CorrectTiming">
+    <param name="difference" value="100d"/> <!-- renewal can only begin 100 days before the certificate becomes invalid -->
+  </condition>
+  <condition name="signed_using_original_cert" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/>
+  <condition name="self_signed" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/> 
 </conditions>
 

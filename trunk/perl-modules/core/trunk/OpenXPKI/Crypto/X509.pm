@@ -437,7 +437,7 @@ certificate, which is used as an identifier in the database
 
 =head2 set_status
 
-sets the certificate status, i.e. VALID, SUSPENDED, REVOKED
+sets the certificate status, i.e. ISSUED, SUSPENDED, REVOKED
 
 =head2 get_status
 
