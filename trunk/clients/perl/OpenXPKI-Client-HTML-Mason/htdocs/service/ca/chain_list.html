@@ -1,0 +1,50 @@
+<%args>
+  $identifier => undef
+</%args>
+<h1>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE') %>
+</h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION') %>
+</p>
+<table>
+  <tr>
+    <th><% i18nGettext('I18N_OPENXPKI_CA_SUBJECT') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CA_NOTBEFORE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CA_NOTAFTER') %></th>
+  </tr>
+<%perl>
+  foreach my $ca (sort keys %list)
+  {
+    print "  <tr>\n";
+    print "    <td>\n";
+</%perl>
+        <& /lib/html/a.mhtml,
+           'target' => "ca_cert.html",
+           'params' => [["identifier", $ca]],
+           'label'  => $list{$ca}->{BODY}->{SUBJECT} &>
+<%perl>
+    print "    </td>\n";
+    print "    <td>\n";
+    print "      ".$list{$ca}->{BODY}->{NOTBEFORE}."\n";
+    print "    </td>\n";
+    print "    <td>\n";
+    print "      ".$list{$ca}->{BODY}->{NOTAFTER}."\n";
+    print "    </td>\n";
+  }
+</%perl>
+</table>
+<%init>
+  my $msg  = $context->{client}->send_receive_command_msg (
+                  "get_chain",
+                  {'START_IDENTIFIER' => $identifier});
+  my $complete = $msg->{PARAMS}->{COMPLETE};
+  my %list     = ();
+  foreach my $ca (@{$msg->{PARAMS}->{IDENTIFIERS}})
+  {
+    $msg  = $context->{client}->send_receive_command_msg (
+                 'get_ca_cert',
+                 {'IDENTIFIER' => $ca});
+    $list{$ca} = $msg->{PARAMS};
+  }
+</%init>

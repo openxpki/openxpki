@@ -104,6 +104,38 @@ msgstr "Microsoft Internet Explorer"
 msgid "I18N_OPENXPKI_BACKEND_OPENSSL_INSTANTIATE_CLI_FAILED"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CA_CHAIN"
+msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CA_ID"
+msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CA_NOTAFTER"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CA_NOTBEFORE"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CA_STATUS"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CA_STATUS_UNUSABLE"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CA_STATUS_USABLE"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CA_SUBJECT"
+msgstr "Подразделение"
+
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID"
 msgstr ""
 
@@ -279,7 +311,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Автоматическое определение типа броузера"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_DESCRIPTION"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
 msgstr ""
 "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
 "внимательны - данная система поддерживает множественные реализации "
@@ -287,7 +319,19 @@ msgstr ""
 "вы в настоящий момент работаете, обратитесь к информационному меню."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_TITLE"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
+msgstr "Веб-интерфейс Удостоверяющего Центра"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_ISSUER_LIST_DESCRIPTION"
+msgstr ""
+"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+"внимательны - данная система поддерживает множественные реализации "
+"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
+"вы в настоящий момент работаете, обратитесь к информационному меню."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_ISSUER_LIST_TITLE"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 #, fuzzy
@@ -3623,6 +3667,19 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_DESCRIPTION"
+#~ msgstr ""
+#~ "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+#~ "внимательны - данная система поддерживает множественные реализации "
+#~ "удостоверяющих центров (CA). Если вы не вполне уверены, с какой "
+#~ "реализацией вы в настоящий момент работаете, обратитесь к информационному "
+#~ "меню."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_TITLE"
+#~ msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_HTML_MENU_CERTIFICATES"

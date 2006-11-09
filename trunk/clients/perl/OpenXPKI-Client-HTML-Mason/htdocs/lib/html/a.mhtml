@@ -1,0 +1,14 @@
+<%args>
+    $target => undef
+    $params => undef
+    $label  => undef
+</%args>
+<a href="<% $target %>?<% $param %>;<% $context->{menu}->get_link_params() %>"><% $label %></a>
+<%init>
+  my $param = "";
+  foreach my $key (@{$params})
+  {
+    $param .= ";" if ($param);
+    $param .= $key->[0]."=".$key->[1];
+  }
+</%init>

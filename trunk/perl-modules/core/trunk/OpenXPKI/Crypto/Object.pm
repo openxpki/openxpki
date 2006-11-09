@@ -55,6 +55,12 @@ sub get_parsed
     }
 }
 
+sub get_parsed_ref
+{
+    my $self  = shift;
+    return $self->{PARSED};
+}
+
 sub get_serial {
     my $self = shift;
     return $self->get_parsed ("BODY", "SERIAL");
@@ -118,6 +124,14 @@ returns the complete plain object.
 expects an array which is a path to parsed value. Example:
 
 $obj->get_parsed ("HEADER", "SERIAL")
+
+=head2 get_parsed_ref
+
+returns the parsed hash reference. Be warned - this function
+should only be used to serialize and transport the hash. You
+should never manipulate the data inside of the hash. Example:
+
+$obj->get_parsed_ref ()
 
 =head2 get_serial
 

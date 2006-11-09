@@ -53,7 +53,7 @@ sub BUILD {
 
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
     my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
-    my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=]* \z }xms;
+    my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=_\-]* \z }xms;
     my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
     my $re_cert_format       = qr{ \A (PEM|DER) \z }xms;
     $method_info_of{$ident} = {
@@ -84,10 +84,34 @@ sub BUILD {
                 },
             },
         },
-        'get_ca_certificate' => {
-            class  => 'Default',
+        'get_ca_list' => {
+            class  => 'Object',
             params => { },
         },
+        'get_ca_cert' => {
+            class  => 'Object',
+            params => {
+                IDENTIFIER => {
+                    type     => SCALAR,
+                    regex    => $re_base64_string,
+                }
+            },
+        },
+        'get_cert' => {
+            class  => 'Object',
+            params => {
+                IDENTIFIER => {
+                    type     => SCALAR,
+                    regex    => $re_base64_string,
+                }
+            },
+        },
+        ## loks like some outdated stuff
+        #'get_ca_certificate' => {
+        #    class  => 'Default',
+        #    params => { },
+        #},
+        ## do we really need this?
         'list_ca_ids' => {
             class  => 'Default',
             params => { },

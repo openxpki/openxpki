@@ -105,6 +105,30 @@ msgstr "Microsoft Internet Explorer"
 msgid "I18N_OPENXPKI_BACKEND_OPENSSL_INSTANTIATE_CLI_FAILED"
 msgstr "Trustcenter Web Interface"
 
+msgid "I18N_OPENXPKI_CA_CHAIN"
+msgstr "CA certificate chain"
+
+msgid "I18N_OPENXPKI_CA_ID"
+msgstr "CA Identifier"
+
+msgid "I18N_OPENXPKI_CA_NOTAFTER"
+msgstr "Not after"
+
+msgid "I18N_OPENXPKI_CA_NOTBEFORE"
+msgstr "Not before"
+
+msgid "I18N_OPENXPKI_CA_STATUS"
+msgstr "Status"
+
+msgid "I18N_OPENXPKI_CA_STATUS_UNUSABLE"
+msgstr "Not usable"
+
+msgid "I18N_OPENXPKI_CA_STATUS_USABLE"
+msgstr "Usable"
+
+msgid "I18N_OPENXPKI_CA_SUBJECT"
+msgstr "Subject"
+
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID"
 msgstr ""
 
@@ -275,22 +299,28 @@ msgstr "PKI realm __PKI_REALM__"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatic browser detection"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_DESCRIPTION"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
 msgstr ""
-"You are logged in to the web interface of the trustcenter. Please note that "
-"this software support several instances of certification authorities (CAs). "
-"If you are not sure which CA you actually use then please check the info "
-"menu."
+"This is the chain of the choosen CA certificate."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_TITLE"
-msgstr "Trustcenter Web Interface"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
+msgstr "CA certificate chain"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_ISSUER_LIST_DESCRIPTION"
+msgstr ""
+"Here you can see all available CA certificates inside the the PKI realm. You "
+"can take a detailed look at these certificates by following the links. If "
+"you are looking for certificates to complete a chain then please take a look "
+"at the chain links."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_ISSUER_LIST_TITLE"
+msgstr "CA certificates"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_POLICY_LIST_DESCRIPTION"
 msgstr ""
-"Here you can find references to official documents of the used certification authorities (CAs). "
-"These documents include policies and certificate practise statements (CPS)."
+"Here you can find references to official documents of the used certification "
+"authorities (CAs). These documents include policies and certificate practise "
+"statements (CPS)."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_POLICY_LIST_TITLE"
 msgstr "Policy overview"
@@ -730,11 +760,10 @@ msgstr "reset"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_DESCRIPTION"
 msgstr ""
-"The requested service is not available. "
-"This can happen because of a misconfiguration or simply because "
-"the service is actually not implemented. "
-"Nevertheless this is an administrative problem. "
-"Please contact the administrators."
+"The requested service is not available. This can happen because of a "
+"misconfiguration or simply because the service is actually not implemented. "
+"Nevertheless this is an administrative problem. Please contact the "
+"administrators."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr "Service unavailable"
@@ -3589,6 +3618,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_DESCRIPTION"
+#~ msgstr ""
+#~ "You are logged in to the web interface of the trustcenter. Please note "
+#~ "that this software support several instances of certification authorities "
+#~ "(CAs). If you are not sure which CA you actually use then please check "
+#~ "the info menu."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_TITLE"
+#~ msgstr "Trustcenter Web Interface"
+
 #~ msgid "I18N_OPENXPKI_HTML_MENU_CERTIFICATES"
 #~ msgstr "Certificates"
 
@@ -3797,10 +3838,6 @@ msgstr ""
 #~ msgstr "Waiting to start"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_FORKED"
-#~ msgstr "Waiting to start"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_ISSUING_CA_DETERMINED"
 #~ msgstr "Next CA determined"
 
@@ -3815,10 +3852,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_REJECTED"
 #~ msgstr "Reject CSR"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_SLEPT"
-#~ msgstr "Sleep"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_"
