@@ -300,11 +300,18 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatic browser detection"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
-msgstr ""
-"This is the chain of the choosen CA certificate."
+msgstr "This is the chain of the choosen CA certificate."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
 msgstr "CA certificate chain"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CRL_LIST_DESCRIPTION"
+msgstr ""
+"Here you can see all available CRLs inside the PKI realm. You "
+"can download these CRLs by following the links."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CRL_LIST_TITLE"
+msgstr "Certificate revocation lists (CRLs)"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_ISSUER_LIST_DESCRIPTION"
 msgstr ""
@@ -1086,6 +1093,9 @@ msgstr "This is the normal operator authentication."
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER"
 msgstr "This is the normal user authentication."
+
+msgid "I18N_OPENXPKI_CRL_FORMAT"
+msgstr "Format"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"

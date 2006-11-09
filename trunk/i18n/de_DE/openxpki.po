@@ -322,6 +322,18 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
 msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CRL_LIST_DESCRIPTION"
+msgstr ""
+"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
+"informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CRL_LIST_TITLE"
+msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_ISSUER_LIST_DESCRIPTION"
 msgstr ""
 "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
@@ -1141,6 +1153,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER"
 msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRL_FORMAT"
+msgstr "Organisationseinheit"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"

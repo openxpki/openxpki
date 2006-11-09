@@ -62,6 +62,7 @@ htdocs/service/api/pki_realm_info.html
 
 htdocs/service/ca/dhandler
 htdocs/service/ca/chain_list.html
+htdocs/service/ca/crl_list.html
 htdocs/service/ca/issuer_list.html
 htdocs/service/ca/policy_list.html
 

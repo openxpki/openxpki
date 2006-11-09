@@ -1,0 +1,68 @@
+<h1>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CRL_LIST_TITLE') %>
+</h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CRL_LIST_DESCRIPTION') %>
+</p>
+<table>
+  <tr>
+    <th><% i18nGettext('I18N_OPENXPKI_CA_ID') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CRL_FORMAT') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CA_STATUS') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CA_NOTBEFORE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CA_NOTAFTER') %></th>
+  </tr>
+<%perl>
+  foreach my $item (@list)
+  {
+    print "  <tr>\n";
+    print "    <td>\n";
+</%perl>
+        <!-- this is safe because filename and format are only hash keys -->
+        <& /lib/html/a.mhtml,
+           'target' => "crl.html",
+           'params' => [["identifier", $item->{IDENTIFIER}],
+                        ["filename",   $item->{FILENAME}],
+                        ["format",     $item->{FORMAT}]],
+           'label'  => $item->{LABEL} &>
+<%perl>
+    print "    </td>\n";
+    print "    <td>\n";
+    print "      ".$item->{FORMAT}."\n";
+    print "    </td>\n";
+    print "    <td>\n";
+    if ($item->{STATUS})
+    {
+        print "      ".i18nGettext('I18N_OPENXPKI_CA_STATUS_USABLE')."\n";
+    } else {
+        print "      ".i18nGettext('I18N_OPENXPKI_CA_STATUS_UNUSABLE')."\n";
+    }
+    print "    </td>\n";
+    print "    <td>\n";
+    print "      ".$item->{NOTBEFORE}."\n";
+    print "    </td>\n";
+    print "    <td>\n";
+    print "      ".$item->{NOTAFTER}."\n";
+    print "    </td>\n";
+  }
+</%perl>
+</table>
+<%init>
+  my $msg  = $context->{client}->send_receive_command_msg ("get_ca_list");
+  my @list = ();
+  foreach my $ca (sort keys %{$msg->{PARAMS}})
+  {
+    next if (not $msg->{PARAMS}->{$ca}->{crl_publication});
+    foreach my $crl (@{$msg->{PARAMS}->{$ca}->{crl_files}})
+    {
+      push @list, {"LABEL"      => $ca,
+                   "IDENTIFIER" => $msg->{PARAMS}->{$ca}->{identifier},
+                   "STATUS"     => $msg->{PARAMS}->{$ca}->{status},
+                   "NOTBEFORE"  => $msg->{PARAMS}->{$ca}->{notbefore},
+                   "NOTAFTER"   => $msg->{PARAMS}->{$ca}->{notafter},
+                   "FILENAME"   => $crl->{FILENAME},
+                   "FORMAT"     => $crl->{FORMAT}
+                  };
+    }
+  }
+</%init>
