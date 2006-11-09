@@ -80,7 +80,8 @@ sub __init
                         OUT     => 'DER',
     });
     $self->{SHA1} = sha1_base64($cert_der);
-
+    ## RFC 3548 URL and filename safe base64
+    $self->{SHA1} =~ tr/+\//-_/;
     
     ##########################
     ##     core parsing     ##
