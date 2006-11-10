@@ -44,7 +44,20 @@ OpenXPKI/Crypto/Tool/SCEP/API.pm
 OpenXPKI/Crypto/Tool/SCEP/CLI.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/get_message_type.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/get_transaction_id.pm
+OpenXPKI/Crypto/Tool/SCEP/Command/create_error_reply.pm
+OpenXPKI/Crypto/Tool/SCEP/Command/create_certificate_reply.pm
+OpenXPKI/Crypto/Tool/SCEP/Command/get_pkcs10.pm
+OpenXPKI/Crypto/Tool/SCEP/Command/create_pending_reply.pm
+OpenXPKI/Crypto/Tool/SCEP/Command/get_signer_cert.pm
 OpenXPKI/Crypto/Tool/SCEP/Engine/OpenSSL.pm
+OpenXPKI/Crypto/Tool/PKCS7.pm
+OpenXPKI/Crypto/Tool/PKCS7
+OpenXPKI/Crypto/Tool/PKCS7/CLI.pm
+OpenXPKI/Crypto/Tool/PKCS7/API.pm
+OpenXPKI/Crypto/Tool/PKCS7/Engine/OpenSSL.pm
+OpenXPKI/Crypto/Tool/PKCS7/Command/verify.pm
+OpenXPKI/Crypto/Tool/PKCS7/Command/is_not_self_signed.pm
+OpenXPKI/Crypto/Tool/PKCS7/Command/get_subject.pm
 OpenXPKI/Crypto/Toolkit.pm
 
 ## OpenSSL layer
@@ -145,26 +158,36 @@ OpenXPKI/Server/Workflow.pm
 
 OpenXPKI/Server/Workflow/Activity.pm 
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
+
 OpenXPKI/Server/Workflow/Activity/CertIssuance/ImportCertData.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/Issue.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/GetCertProfile.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/PersistCertificate.pm
+
 OpenXPKI/Server/Workflow/Activity/CSR/PersistRequest.pm
+
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/CRR/RevokeCertificate.pm
+
 OpenXPKI/Server/Workflow/Activity/Profile/Create.pm
+
 OpenXPKI/Server/Workflow/Activity/Key/Generate.pm
+
 OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
+
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly/Create.pm
 OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
+
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
+OpenXPKI/Server/Workflow/Activity/Tools/ChangeSessionRole.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CreateWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ForkWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Sleep.pm
+
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/IssueCRL.pm
@@ -181,6 +204,11 @@ OpenXPKI/Server/Workflow/Activity/DataExchange/ImportLogs.pm
 OpenXPKI/Server/Workflow/Activity/DataExchange/ImportWorkflowInstances.pm
 OpenXPKI/Server/Workflow/Activity/DataExchange/Cleanup.pm
 
+OpenXPKI/Server/Workflow/Activity/SCEP/SetContextFromOriginalCert.pm
+OpenXPKI/Server/Workflow/Activity/SCEP/SetContextFromCSR.pm
+OpenXPKI/Server/Workflow/Activity/SCEP/SetErrorCode.pm
+OpenXPKI/Server/Workflow/Activity/SCEP/ExtractCSR.pm
+
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
@@ -188,12 +216,18 @@ OpenXPKI/Server/Workflow/Observer/AddExecuteHistory.pm
 OpenXPKI/Server/Workflow/Observer/Debug.pm
 
 OpenXPKI/Server/Workflow/Condition/ACL.pm
+OpenXPKI/Server/Workflow/Condition/AlwaysFalse.pm
+OpenXPKI/Server/Workflow/Condition/AlwaysTrue.pm
 OpenXPKI/Server/Workflow/Condition/Approved.pm
 OpenXPKI/Server/Workflow/Condition/ContextParameterExistence.pm
 OpenXPKI/Server/Workflow/Condition/Key.pm
 OpenXPKI/Server/Workflow/Condition/Server.pm
 OpenXPKI/Server/Workflow/Condition/CRLSigningCAsLeft.pm
-OpenXPKI/Server/Workflow/Condition/WorkflowChildrenSuccessfullyFinished.pm
+OpenXPKI/Server/Workflow/Condition/WorkflowChildrenSuccessfullyFinished.pm      OpenXPKI/Server/Workflow/Condition/InitialEnrollmentOrRenewal.pm
+OpenXPKI/Server/Workflow/Condition/CorrectTiming.pm
+OpenXPKI/Server/Workflow/Condition/IsValidSignatureWithRequestedDN.pm
+OpenXPKI/Server/Workflow/Condition/CorrectNumberOfValidCerts.pm
+OpenXPKI/Server/Workflow/Condition/SignedUsingOriginalCertOrSelfSigned.pmA      OpenXPKI/Server/Workflow/Condition/ApprovalNeeded.pm
 
 OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
