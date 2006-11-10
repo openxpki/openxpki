@@ -223,11 +223,13 @@ OpenXPKI/Server/Workflow/Condition/ContextParameterExistence.pm
 OpenXPKI/Server/Workflow/Condition/Key.pm
 OpenXPKI/Server/Workflow/Condition/Server.pm
 OpenXPKI/Server/Workflow/Condition/CRLSigningCAsLeft.pm
-OpenXPKI/Server/Workflow/Condition/WorkflowChildrenSuccessfullyFinished.pm      OpenXPKI/Server/Workflow/Condition/InitialEnrollmentOrRenewal.pm
+OpenXPKI/Server/Workflow/Condition/WorkflowChildrenSuccessfullyFinished.pm
+OpenXPKI/Server/Workflow/Condition/InitialEnrollmentOrRenewal.pm
 OpenXPKI/Server/Workflow/Condition/CorrectTiming.pm
 OpenXPKI/Server/Workflow/Condition/IsValidSignatureWithRequestedDN.pm
 OpenXPKI/Server/Workflow/Condition/CorrectNumberOfValidCerts.pm
-OpenXPKI/Server/Workflow/Condition/SignedUsingOriginalCertOrSelfSigned.pmA      OpenXPKI/Server/Workflow/Condition/ApprovalNeeded.pm
+OpenXPKI/Server/Workflow/Condition/SignedUsingOriginalCertOrSelfSigned.pm
+OpenXPKI/Server/Workflow/Condition/ApprovalNeeded.pm
 
 OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
