@@ -129,6 +129,36 @@ msgstr "Usable"
 msgid "I18N_OPENXPKI_CA_SUBJECT"
 msgstr "Subject"
 
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
+msgstr "Download certificate"
+
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
+msgstr "Microsoft Internet Explorer"
+
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA"
+msgstr "Mozilla, Firefox, Opera"
+
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
+msgstr "PEM or CRT"
+
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
+msgstr "TXT"
+
+msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
+msgstr "Fingerprint"
+
+msgid "I18N_OPENXPKI_CERT_ISSUER"
+msgstr "Issuer"
+
+msgid "I18N_OPENXPKI_CERT_NOTAFTER"
+msgstr "Not after"
+
+msgid "I18N_OPENXPKI_CERT_NOTBEFORE"
+msgstr "Not before"
+
+msgid "I18N_OPENXPKI_CERT_SUBJECT"
+msgstr "Subject"
+
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID"
 msgstr ""
 
@@ -288,6 +318,40 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_TITLE"
 msgstr "Trustcenter Web Interface"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
+msgstr ""
+"Following you can find the most important informations about the selected CA "
+"certificate. Below you will find some links to install the certificates. If "
+"you want a more complete overview about the certificate then please follow "
+"the link to the normal certificate view."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
+msgstr "CA certificate"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_DESCRIPTION"
+msgstr "This is the chain of the choosen CA certificate."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_TITLE"
+msgstr "CA certificate chain"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CRL_LIST_DESCRIPTION"
+msgstr ""
+"Here you can see all available CRLs inside the PKI realm. You can download "
+"these CRLs by following the links."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CRL_LIST_TITLE"
+msgstr "Certificate revocation lists (CRLs)"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_DESCRIPTION"
+msgstr ""
+"Here you can see all available CA certificates inside the the PKI realm. You "
+"can take a detailed look at these certificates by following the links. If "
+"you are looking for certificates to complete a chain then please take a look "
+"at the chain links."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_TITLE"
+msgstr "CA certificates"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_DESCRIPTION"
 msgstr ""
 "The actually active PKI realm is __PKI_REALM__. A realm is some kind of a "
@@ -295,6 +359,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_TITLE"
 msgstr "PKI realm __PKI_REALM__"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_POLICY_LIST_DESCRIPTION"
+msgstr ""
+"Here you can find references to official documents of the used certification "
+"authorities (CAs). These documents include policies and certificate practise "
+"statements (CPS)."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_POLICY_LIST_TITLE"
+msgstr "Policy overview"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatic browser detection"
@@ -305,40 +378,14 @@ msgstr "This is the chain of the choosen CA certificate."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
 msgstr "CA certificate chain"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CRL_LIST_DESCRIPTION"
-msgstr ""
-"Here you can see all available CRLs inside the PKI realm. You "
-"can download these CRLs by following the links."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CRL_LIST_TITLE"
-msgstr "Certificate revocation lists (CRLs)"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_ISSUER_LIST_DESCRIPTION"
-msgstr ""
-"Here you can see all available CA certificates inside the the PKI realm. You "
-"can take a detailed look at these certificates by following the links. If "
-"you are looking for certificates to complete a chain then please take a look "
-"at the chain links."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_ISSUER_LIST_TITLE"
-msgstr "CA certificates"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_POLICY_LIST_DESCRIPTION"
-msgstr ""
-"Here you can find references to official documents of the used certification "
-"authorities (CAs). These documents include policies and certificate practise "
-"statements (CPS)."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_POLICY_LIST_TITLE"
-msgstr "Policy overview"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
-msgstr "reset"
+msgstr "Issuer"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_SERIAL"
-msgstr "Workflow serial"
+msgstr "Serial"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
+msgstr "Certificate Informations"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME"
@@ -583,6 +630,9 @@ msgstr "reset"
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
 msgstr "reset"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_FULL_CERT_INFO_LINK"
+msgstr "Detailed certificate informations"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION"
 msgstr ""

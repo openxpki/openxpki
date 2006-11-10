@@ -273,7 +273,7 @@ sub get_converted
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_MISSING_FORMAT");
     }
-    if ($format ne "PEM" and $format ne "DER" and $format ne "TXT")
+    if ($format ne "PEM" and $format ne "DER" and $format ne "TXT" and $format ne "PKCS7")
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_WRONG_FORMAT",
@@ -427,7 +427,7 @@ the base of the object.
 =head2 get_converted
 
 expects only one value - the requested format of the certificate.
-PEM, TXT and DER are supported. TXT is a plain text representation
+PEM, TXT, PKCS7 and DER are supported. TXT is a plain text representation
 which can be directly displayed to the user.
 
 =head2 get_identifier

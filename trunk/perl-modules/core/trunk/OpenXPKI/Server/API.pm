@@ -54,8 +54,9 @@ sub BUILD {
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
     my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
     my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=_\-]* \z }xms;
+    my $re_filename_string   = qr{ \A [A-Za-z0-9\+/=_\-\.]* \z }xms;
     my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
-    my $re_cert_format       = qr{ \A (PEM|DER) \z }xms;
+    my $re_cert_format       = qr{ \A (PEM|DER|TXT|PKCS7) \z }xms;
     $method_info_of{$ident} = {
         ### Default API
         'get_pki_realm' => {
@@ -103,7 +104,31 @@ sub BUILD {
                 IDENTIFIER => {
                     type     => SCALAR,
                     regex    => $re_base64_string,
-                }
+                },
+                FORMAT => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_cert_format,
+                },
+            },
+        },
+        'get_crl' => {
+            class  => 'Object',
+            params => {
+                CA_ID => {
+                    type     => SCALAR,
+                    regex    => $re_base64_string,
+                },
+                FILENAME => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_filename_string,
+                },
+                FORMAT => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_cert_format,
+                },
             },
         },
         ## loks like some outdated stuff

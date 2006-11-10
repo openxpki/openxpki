@@ -136,6 +136,46 @@ msgstr "Подразделение"
 msgid "I18N_OPENXPKI_CA_SUBJECT"
 msgstr "Подразделение"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
+msgstr "Microsoft Internet Explorer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_ISSUER"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_NOTAFTER"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_NOTBEFORE"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SUBJECT"
+msgstr "Подразделение"
+
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID"
 msgstr ""
 
@@ -296,6 +336,54 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_TITLE"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
+msgstr ""
+"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+"внимательны - данная система поддерживает множественные реализации "
+"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
+"вы в настоящий момент работаете, обратитесь к информационному меню."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
+msgstr "Область PKI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_DESCRIPTION"
+msgstr ""
+"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+"внимательны - данная система поддерживает множественные реализации "
+"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
+"вы в настоящий момент работаете, обратитесь к информационному меню."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_TITLE"
+msgstr "Веб-интерфейс Удостоверяющего Центра"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CRL_LIST_DESCRIPTION"
+msgstr ""
+"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+"внимательны - данная система поддерживает множественные реализации "
+"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
+"вы в настоящий момент работаете, обратитесь к информационному меню."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CRL_LIST_TITLE"
+msgstr "Веб-интерфейс Удостоверяющего Центра"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_DESCRIPTION"
+msgstr ""
+"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+"внимательны - данная система поддерживает множественные реализации "
+"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
+"вы в настоящий момент работаете, обратитесь к информационному меню."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_TITLE"
+msgstr "Веб-интерфейс Удостоверяющего Центра"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_DESCRIPTION"
 msgstr ""
 "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
@@ -306,6 +394,18 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_TITLE"
 msgstr "Область PKI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_POLICY_LIST_DESCRIPTION"
+msgstr ""
+"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+"внимательны - данная система поддерживает множественные реализации "
+"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
+"вы в настоящий момент работаете, обратитесь к информационному меню."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_POLICY_LIST_TITLE"
+msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Автоматическое определение типа броузера"
@@ -323,48 +423,16 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CRL_LIST_DESCRIPTION"
-msgstr ""
-"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
-"внимательны - данная система поддерживает множественные реализации "
-"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
-"вы в настоящий момент работаете, обратитесь к информационному меню."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CRL_LIST_TITLE"
-msgstr "Веб-интерфейс Удостоверяющего Центра"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_ISSUER_LIST_DESCRIPTION"
-msgstr ""
-"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
-"внимательны - данная система поддерживает множественные реализации "
-"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
-"вы в настоящий момент работаете, обратитесь к информационному меню."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_ISSUER_LIST_TITLE"
-msgstr "Веб-интерфейс Удостоверяющего Центра"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_POLICY_LIST_DESCRIPTION"
-msgstr ""
-"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
-"внимательны - данная система поддерживает множественные реализации "
-"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
-"вы в настоящий момент работаете, обратитесь к информационному меню."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_POLICY_LIST_TITLE"
-msgstr "Веб-интерфейс Удостоверяющего Центра"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
 msgstr "сброс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_SERIAL"
 msgstr "Серийный номер технологического процесса"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
+msgstr "Регистрация в системе"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME"
@@ -611,6 +679,10 @@ msgstr "сброс"
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
 msgstr "сброс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_FULL_CERT_INFO_LINK"
+msgstr "Регистрация в системе"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION"
 msgstr ""

@@ -1,0 +1,39 @@
+<%args>
+  $identifier   => undef
+  $content_type => "PLAIN"
+  $format       => "PEM"
+</%args>
+
+<%init>
+  ## first we have to determine the content-type
+  switch ($content_type)
+  {
+    case "X509_CA_CERT" {$content_type = "application/x-x509-ca-cert"}
+    case "IE_CA"        {$content_type = "application/pkcs7-MIME"}
+    else {$content_type = "text/plain"}
+  }
+
+  ## second we have to check the format
+  switch ($format)
+  {
+    case "PKCS7" {$format = "PKCS7"}
+    case "TXT"   {$format = "TXT"}
+    case "DER"   {$format = "DER"}
+    else {$format = "PEM"}
+  }
+
+  ## now request the certificate from the server
+  my $msg  = $context->{client}->send_receive_command_msg (
+                  "get_cert",
+                  {'IDENTIFIER' => $identifier,
+                   'FORMAT'     => $format});
+  my $item = $msg->{PARAMS};
+
+  ## now send the stuff
+  $r->content_type ($content_type);
+  print $item;
+  return 1;
+</%init>
+<%once>
+  use Switch;
+</%once>

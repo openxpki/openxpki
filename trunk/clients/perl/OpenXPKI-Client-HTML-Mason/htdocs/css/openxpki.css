@@ -289,6 +289,26 @@ div.w3c {
     font-weight: bold;
 }
 
+/* ***************** *
+ * table based lists *
+ * ***************** */
+
+table#table_list
+{
+    border-spacing: 0px;
+}
+
+table#table_list th
+{
+    border-right:  2px solid #dddddd;
+    border-bottom: 2px solid #bbbbbb;
+}
+
+table#table_list td
+{
+    border-right:  2px solid #dddddd;
+}
+
 /* **************************************************
  * special hacks to display some nice help messages *
  * ************************************************** */

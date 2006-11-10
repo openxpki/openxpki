@@ -1,0 +1,50 @@
+<%args>
+  $ca_id        => undef
+  $filename     => undef
+  $format       => "PEM"
+  $content_type => undef
+</%args>
+
+<%init>
+  ## first we have to check the format
+  switch ($format)
+  {
+    case "PKCS7" {$format = "PKCS7"}
+    case "TXT"   {$format = "TXT"}
+    case "DER"   {$format = "DER"}
+    else {$format = "PEM"}
+  }
+
+  ## second we compensate a missing content-type
+  $content_type = "PKCS7"
+    if (not $content_type and $format eq "PKCS7");
+  $content_type = "DER"
+    if (not $content_type and ($format eq "PEM" or $format eq "DER"));
+  $content_type = "TXT"
+    if (not $content_type and $format eq "TXT");
+
+  ## first we have to determine the content-type
+  switch ($content_type)
+  {
+    case "PKCS7" {$content_type = "application/pkcs7-crl"}
+    case "PEM"   {$content_type = "application/pkix-crl"}
+    case "DER"   {$content_type = "application/pkix-crl"}
+    else {$content_type = "text/plain"}
+  }
+
+  ## now request the certificate from the server
+  my $msg  = $context->{client}->send_receive_command_msg (
+                  "get_crl",
+                  {'CA_ID'    => $ca_id,
+                   'FILENAME' => $filename,
+                   'FORMAT'   => $format});
+  my $item = $msg->{PARAMS};
+
+  ## now send the stuff
+  $r->content_type ($content_type);
+  print $item;
+  return 1;
+</%init>
+<%once>
+  use Switch;
+</%once>
