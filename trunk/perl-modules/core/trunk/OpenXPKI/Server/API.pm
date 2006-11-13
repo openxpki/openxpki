@@ -57,6 +57,7 @@ sub BUILD {
     my $re_filename_string   = qr{ \A [A-Za-z0-9\+/=_\-\.]* \z }xms;
     my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
     my $re_cert_format       = qr{ \A (PEM|DER|TXT|PKCS7) \z }xms;
+    my $re_sql_string        = qr{ \A [a-zA-Z0-9\@\-_\.\s\%\*]* \z }xms;
     $method_info_of{$ident} = {
         ### Default API
         'get_pki_realm' => {
@@ -128,6 +129,51 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_cert_format,
+                },
+            },
+        },
+        'search_cert' => {
+            class  => 'Object',
+            params => {
+                EMAIL => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_sql_string,
+                },
+                SUBJECT => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_sql_string,
+                },
+                ISSUER => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_sql_string,
+                },
+                CSR_SERIAL => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+                CERT_SERIAL => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+                FIRST => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+                LAST => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+                LIMIT => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
                 },
             },
         },

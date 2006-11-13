@@ -59,7 +59,10 @@ htdocs/service/info/workflow.html
 
 htdocs/service/api/dhandler
 htdocs/service/api/pki_realm_info.html
+#htdocs/service/api/cert_full_info.html
 htdocs/service/api/cert_info.html
+htdocs/service/api/cert_list.html
+htdocs/service/api/cert_search.html
 htdocs/service/api/ca_cert_info.html
 htdocs/service/api/chain_list.html
 htdocs/service/api/crl_list.html

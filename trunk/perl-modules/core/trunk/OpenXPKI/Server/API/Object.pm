@@ -65,7 +65,6 @@ sub get_cert
     ##! 1: "start"
     my $self = shift;
     my $args = shift;
-    my @list = ();
 
     ##! 2: "initialize arguments"
     my $identifier = $args->{IDENTIFIER};
@@ -96,7 +95,6 @@ sub get_crl
     ##! 1: "start"
     my $self = shift;
     my $args = shift;
-    my @list = ();
 
     ##! 2: "initialize arguments"
     my $ca_id    = $args->{CA_ID};
@@ -145,6 +143,44 @@ sub get_crl
     ##! 2: "load the file and return it (finished)"
     my $fu = OpenXPKI::FileUtils->new();
     return $fu->read_file($filename);
+}
+
+sub search_cert
+{
+    ##! 1: "start"
+    my $self = shift;
+    my $args = shift;
+    my @list = ();
+
+    ##! 2: "fix arguments"
+    $args->{EMAIL}   =~ s/\*/%/g;
+    $args->{SUBJECT} =~ s/\*/%/g;
+    $args->{ISSUER}  =~ s/\*/%/g;
+
+    ##! 2: "initialize arguments"
+    my %params = (TABLE => 'CERTIFICATE');
+       $params{SERIAL}       = $args->{CERT_SERIAL} if ($args->{CERT_SERIAL});
+       $params{LIMIT}        = $args->{LIMIT}       if ($args->{LIMIT});
+       $params{TO}           = $args->{LAST}        if ($args->{LAST});
+       $params{REVERSE}      = 1                    if ($args->{LAST});
+       $params{FROM}         = $args->{FIRST}       if ($args->{FIRST});
+       $params{DYNAMIC}->{CSR_SERIAL} = $args->{CSR_SERIAL} if ($args->{CSR_SERIAL});
+       $params{DYNAMIC}->{EMAIL}      = $args->{EMAIL}      if ($args->{EMAIL});
+       $params{DYNAMIC}->{SUBJECT}    = $args->{SUBJECT}    if ($args->{SUBJECT});
+       $params{DYNAMIC}->{ISSUER}     = $args->{ISSUER}     if ($args->{ISSUER});
+
+    ##! 2: "load hashes and serialize them"
+    my $result = CTX('dbi_backend')->select (%params);
+    foreach my $item (@{$result})
+    {
+        ## delete data to minimize transport costs
+        delete $item->{DATA};
+        push @list, \%{$item};
+    }
+    @list = reverse @list if ($args->{LAST});
+
+    ##! 1: "finished"
+    return \@list;
 }
 
 1;
@@ -198,6 +234,34 @@ following values:
 =item * HASH - the default value
 
 =back
+
+=head2 search_cert
+
+supports a facility to search certificates. It supports the following parameters:
+
+=over
+
+=item * CERT_SERIAL
+
+=item * LIMIT
+
+=item * LAST
+
+=item * FIRST
+
+=item * CSR_SERIAL
+
+=item * EMAIL
+
+=item * SUBJECT
+
+=item * ISSUER
+
+=back
+
+The result is an array of hashes. The hashes do not contain the data field
+of the database to reduce the transport costs an avoid parser implementations
+on the client.
 
 =head2 get_crl
 

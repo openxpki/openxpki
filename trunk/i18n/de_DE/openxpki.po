@@ -158,6 +158,10 @@ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
 msgstr "Organisationseinheit"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CERT_EMAIL"
+msgstr "Warten"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
 msgstr "Organisationseinheit"
 
@@ -172,6 +176,72 @@ msgstr "Organisationseinheit"
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_NOTBEFORE"
 msgstr "Auf Start wartend"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL"
+msgstr "Abgelaufene"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL_DESCRIPTION"
+msgstr ""
+"DC-Stil bedeutet, dass am Ende des Zertifikats-Namens die Komponenten der "
+"DNS-Domain benutzt werden. Ein alter eindeutiger Name (DN) sieht wie folgt "
+"aus: cn=Max Mustermann, o=OpenXPKI, c=DE. Die letzte Namenskomponente c des "
+"DN akzeptiert aber nur zwei-buchstabige Länderkennungen und keine "
+"Domainnamen. Der gleiche Name im DC-Stil sieht wie folgt aus: cn=Max "
+"Musterman, dc=OpenXPKI, dc=DE. Der Vorteil ist, dass wir nun die mehr "
+"korrekte Variante nutzen können: cn=Max Mustermann, dc=OpenXPKI, dc=org. Es "
+"muss nicht länger auf eine Landeskennung ausgewichen werden."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL_DESCRIPTION"
+msgstr ""
+"DC-Stil bedeutet, dass am Ende des Zertifikats-Namens die Komponenten der "
+"DNS-Domain benutzt werden. Ein alter eindeutiger Name (DN) sieht wie folgt "
+"aus: cn=Max Mustermann, o=OpenXPKI, c=DE. Die letzte Namenskomponente c des "
+"DN akzeptiert aber nur zwei-buchstabige Länderkennungen und keine "
+"Domainnamen. Der gleiche Name im DC-Stil sieht wie folgt aus: cn=Max "
+"Musterman, dc=OpenXPKI, dc=DE. Der Vorteil ist, dass wir nun die mehr "
+"korrekte Variante nutzen können: cn=Max Mustermann, dc=OpenXPKI, dc=org. Es "
+"muss nicht länger auf eine Landeskennung ausgewichen werden."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_EMAIL"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_EMAIL_DESCRIPTION"
+msgstr ""
+"Die Organisationseinheit (ou) kann benutzt werden, um organisatorische "
+"Strukturen wie Abteilungen, Institute oder Fakultäten abzubilden."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_ISSUER"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_ISSUER_DESCRIPTION"
+msgstr "Dies ist eine Faxnummer."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT_DESCRIPTION"
+msgstr "Dies ist eine Faxnummer."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SERIAL"
+msgstr "Warten"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_SUBJECT"
@@ -345,6 +415,30 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
 msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
+msgstr ""
+"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
+"informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE"
+msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_DESCRIPTION"
+msgstr ""
+"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
+"informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_TITLE"
+msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_DESCRIPTION"
@@ -1383,7 +1477,29 @@ msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_CANNOT_OPEN_ERRLOG"
+msgstr "Zurücksetzen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_ERROR"
+msgstr ""
+"Wenn Sie sich nicht sicher sind, was Sie tun sollen und Sie auch nicht "
+"wissen, ob sich Ihre Clientumgebung bis zur Erstellung des Zertifikates "
+"durch das Trustcenter evtl. ändert, dann sollten Sie diese Art der "
+"Schlüsselerstellung auswählen.Der Schlüssel ist trotzdem nicht durch einen "
+"Administrator lesbar, weil sie die einzige Person sind, die das Passwort "
+"kennt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED"
+msgstr "Antrag im DC-Stil"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDIN_FAILED"
+msgstr "Antrag im DC-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDOUT_FAILED"
 msgstr "Antrag im DC-Stil"
 
 #, fuzzy
@@ -1450,18 +1566,6 @@ msgid "I18N_OPENXPKI_CRYPTO_OBJECT_GET_PARSED_NO_VALUE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OBJECT_SET_HEADER_ATTRIBUTE_REINIT_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_CANNOT_OPEN_ERRLOG"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_ERROR"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_PIPED_STDOUT_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_ENV_FAILED"
@@ -2049,6 +2153,46 @@ msgstr "Web-Schnittstelle des Trustcenters"
 msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_LOAD_CONFIG_EVAL_ERROR"
 msgstr "Aufgetretene Fehler"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_CERTFILE_MISSING"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_INVALID_ERROR_CODE"
+msgstr "Aufgetretene Fehler"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_KEYFILE_MISSING"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_NO_ENGINE"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_PENDING_REPLY_CERTFILE_MISSING"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_PENDING_REPLY_KEYFILE_MISSING"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_PENDING_REPLY_NO_ENGINE"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
 msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA"
 msgstr ""
 
@@ -2100,6 +2244,10 @@ msgstr "Seriennummer des Workflowprozesses"
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_X509_NEW_MISSING_TOKEN"
 msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CSR_SERIAL"
+msgstr "Warten"
 
 msgid "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_DATE"
 msgstr ""
@@ -2365,6 +2513,14 @@ msgstr ""
 "dient der sichern Identifikation von Personen oder Objekten."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_LIST_NEXT"
+msgstr "Organisationseinheit"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LIST_PREV"
+msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_MODULE_FUNCTION_SPECIFIC_STUFF"
 msgstr "Speichern des Zertifzierungsantrages"
 
@@ -2431,6 +2587,10 @@ msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_NO_FIRST_ACTIVITY"
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_FIXME_DER_OUTFORMAT_STILL_UNSUPPORTED"
+msgstr "Aktivität nicht implementiert"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
 msgstr "PKI Realm"
 
@@ -2443,10 +2603,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_GET_CA_CERTIFICATES_PKI_REALM_NOT_SET"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_GET_CHAIN_OUTFORMAT_NOT_IMPLEMENTED_YET"
-msgstr "Aktivität nicht implementiert"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING"
@@ -2474,6 +2630,22 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_CA_CONFIG"
+msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_PKI_REALM_CONFIG"
+msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_FOUND"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_PUBLIC"
+msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED"
@@ -2938,6 +3110,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_FAILED"
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EXTRACTCSR_PKCS10_UNDEFINED"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MISSING_DESTINATION"
 msgstr "PKI Realm"
 
@@ -2978,6 +3154,14 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ACL_NO_ACTIVITY"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ALWAYS_FALSE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
+msgstr "DirName"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVED_MISSING_APPROVAL"
 msgstr "DirName"
 
@@ -2987,6 +3171,22 @@ msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AREWORKFLOWCHILDRENSUCCESSFULLYFINISHED_NO_WF_CHILD_INSTANCE_ID_OR_TYPE_FOUND"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_INCORRECT_NUMBER_OF_VALID_CERTS"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_CORRECT_TIMING"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_INCORRECT_TIMING"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -3002,7 +3202,35 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_INITIAL_ENROLLMENT_VALID_CERTIFICATE_PRESENT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_RENEWAL_NO_VALID_CERTIFICATE_PRESENT"
+msgstr "DirName"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_INVALID_SIGNATURE_OR_NON_MATCHING_DNS"
+msgstr "DNS"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_VALID_SIGNATURE_AND_MATCHING_DNS"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SERVER_WRONG_SERVER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_COULD_NOT_ESTABLISH_SIGNER_CERT_ID"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SELF_SIGNED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SIGNED_USING_ORIGINAL_CERT"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -3155,6 +3383,10 @@ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_GETCACERT_NO_IDENTIFIER_FOUND"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_IMPL_INSTANTIATE_FAILED"
 msgstr "Seriennummer des Workflowprozesses"
 
@@ -3166,8 +3398,20 @@ msgstr "Antrag im OU-Stil"
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_NO_COMMAND_IMPL"
 msgstr "Antrag im OU-Stil"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_FAILURE_BUT_NO_ERROR_CODE"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_ACTIVITY_FOUND"
+msgstr "Seriennummer des Workflowprozesses"
+
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_WORKFLOW_FOUND"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING"
+msgstr "Antrag im OU-Stil"
 
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_UNSUPPORTED_MESSAGE_TYPE"
 msgstr ""
@@ -3183,11 +3427,39 @@ msgid "I18N_OPENXPKI_SERVICE_SCEP_GET_PKI_REALM_NO_REALM_CONFIGURED"
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_ALGORITHM_REQUESTED"
+msgstr "Zurücksetzen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_PROFILE_REQUESTED"
+msgstr "Zurücksetzen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_REALM_REQUESTED"
 msgstr "Zurücksetzen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_SERVER_REQUESTED"
+msgstr "Zurücksetzen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_ENDENTITY_PROFILES_CONFIGURED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_ENCRYPTION_ALGORITHM_RECEIVED"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_PKI_REALM_RECEIVED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_PROFILE_RECEIVED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_SERVER_RECEIVED"
 msgstr "PKI Realm"
 
 #, fuzzy
@@ -3410,10 +3682,6 @@ msgstr "Importieren der Workflow-Instanzen"
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
 msgstr "Vorbereiten der Umgebung"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
-msgstr "Bestimmung der ausstellenden CA"
-
 msgid "I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
 msgstr "Zertifikat erstellen"
 
@@ -3462,10 +3730,6 @@ msgstr "Auf anderen Workflow warten"
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr "Start der Zertifikatserstellung"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
-msgstr "Entsperren des Ca-Schlüssels"
-
 msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 msgstr "Warten"
 
@@ -3497,18 +3761,9 @@ msgstr ""
 "Dieser Workflow dient dem Import von Workflow-Instanzen und Import-Logs von "
 "anderen Servern."
 
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
-msgstr "Ausstellende CA für das Zertifikat bestimmt"
-
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
-msgstr "Zertifikat erstellt"
-
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
-msgstr "Start der Zertifikatserstellung"
-
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
-msgstr "Erstellen eines Zertifikates"
+msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
+msgstr "SCEP-Zertifizierungsantrag"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL"
@@ -3611,6 +3866,38 @@ msgstr "Logs importiert"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
 msgstr "Import erfolgreich"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVAL"
+msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVED"
+msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
+msgstr "Logs exportiert"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SCEP_INITIAL_ENROLLMENT"
+msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SCEP_RENEWAL"
+msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SCEP_RENEWAL_ALLOWED"
+msgstr "Zertifikatserstellung vorbereitet"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_CREATED"
+msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_INITIAL"
+msgstr "SCEP-Zertifizierungsantrag"
 
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Auf Start wartend"
@@ -3746,6 +4033,39 @@ msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_TITLE"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+#~ msgstr "Bestimmung der ausstellenden CA"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
+#~ msgstr "Entsperren des Ca-Schlüssels"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
+#~ msgstr "Ausstellende CA für das Zertifikat bestimmt"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
+#~ msgstr "Zertifikat erstellt"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
+#~ msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
+#~ msgstr "Erstellen eines Zertifikates"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_DESCRIPTION"
 #~ msgstr ""
 #~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
@@ -3813,19 +4133,7 @@ msgstr ""
 #~ msgstr "PKI Realm"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
-#~ msgstr "DirName"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_NOT_ALL_REQUIRED_PARAMS_PRESENT"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_MORE_CSRS_TO_CREATE"
 #~ msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -3869,10 +4177,6 @@ msgstr ""
 #~ msgstr "Warten"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVAL"
-#~ msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
 #~ msgstr "Genehmigen eines Zertifizierungsantrages"
 
@@ -3897,14 +4201,6 @@ msgstr ""
 #~ msgstr "Start des Zertifizierungsantrages"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVAL"
-#~ msgstr "Löschen der Genehmigung(en)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVED"
-#~ msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_NOT_USABLE"
 #~ msgstr "Start der CRL-Erstellung"
 
@@ -3921,24 +4217,12 @@ msgstr ""
 #~ msgstr "Auf Start wartend"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
-#~ msgstr "Logs exportiert"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_ISSUING_CA_DETERMINED"
 #~ msgstr "Ausstellende CA für die CRL bestimmt"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
 #~ msgstr "Logs exportiert"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PREPARED"
-#~ msgstr "Zertifikatserstellung vorbereitet"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_REJECTED"
-#~ msgstr "SCEP-Zertifizierungsantrag"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
@@ -4003,10 +4287,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CRYPTO_PKCS"
 #~ msgstr "SPKAC"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRYPTO_X"
-#~ msgstr "Organisationseinheit"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS"

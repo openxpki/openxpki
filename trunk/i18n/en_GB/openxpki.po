@@ -144,6 +144,9 @@ msgstr "PEM or CRT"
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
 msgstr "TXT"
 
+msgid "I18N_OPENXPKI_CERT_EMAIL"
+msgstr "Email address"
+
 msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
 msgstr "Fingerprint"
 
@@ -155,6 +158,47 @@ msgstr "Not after"
 
 msgid "I18N_OPENXPKI_CERT_NOTBEFORE"
 msgstr "Not before"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SEARCH_"
+msgstr "Issuer"
+
+msgid "I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL"
+msgstr "Certificate serial"
+
+msgid "I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL_DESCRIPTION"
+msgstr ""
+"The certificate serial is the serial which is directly contained in the "
+"certificate. It is not the internal identifier of the trustcenter system."
+
+msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL"
+msgstr "Request (CSR) serial"
+
+msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL_DESCRIPTION"
+msgstr ""
+"The serial of the certificate signing request (CSR) connects te certificate "
+"with the original request from which the certificate was created."
+
+msgid "I18N_OPENXPKI_CERT_SEARCH_EMAIL"
+msgstr "Email address"
+
+msgid "I18N_OPENXPKI_CERT_SEARCH_EMAIL_DESCRIPTION"
+msgstr "The email address(es) to which the certificate belongs."
+
+msgid "I18N_OPENXPKI_CERT_SEARCH_ISSUER"
+msgstr "Issuer"
+
+msgid "I18N_OPENXPKI_CERT_SEARCH_ISSUER_DESCRIPTION"
+msgstr "The subject name of the CA certificate which issues this certificate."
+
+msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT"
+msgstr "Subject"
+
+msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT_DESCRIPTION"
+msgstr "The subject of the certificate."
+
+msgid "I18N_OPENXPKI_CERT_SERIAL"
+msgstr "Serial"
 
 msgid "I18N_OPENXPKI_CERT_SUBJECT"
 msgstr "Subject"
@@ -327,6 +371,21 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
 msgstr "CA certificate"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
+msgstr ""
+"Here you can see the result of your search."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE"
+msgstr "Certificate search result"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_DESCRIPTION"
+msgstr ""
+"Here you can search for certificates. "
+"If you need more details then please see the descriptions of the different fields below the form."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_TITLE"
+msgstr "Certificate search"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_DESCRIPTION"
 msgstr "This is the chain of the choosen CA certificate."
@@ -1295,7 +1354,23 @@ msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_CANNOT_OPEN_ERRLOG"
+msgstr "reset"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_ERROR"
+msgstr "Valid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED"
+msgstr "CSR with DC-style"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDIN_FAILED"
+msgstr "CSR with DC-style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDOUT_FAILED"
 msgstr "CSR with DC-style"
 
 #, fuzzy
@@ -1362,18 +1437,6 @@ msgid "I18N_OPENXPKI_CRYPTO_OBJECT_GET_PARSED_NO_VALUE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OBJECT_SET_HEADER_ATTRIBUTE_REINIT_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_CANNOT_OPEN_ERRLOG"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_ERROR"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_CLI_EXECUTE_PIPED_STDOUT_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_ENV_FAILED"
@@ -1913,6 +1976,34 @@ msgstr "Trustcenter Web Interface"
 msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_LOAD_CONFIG_EVAL_ERROR"
 msgstr "Errors"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_CERTFILE_MISSING"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_INVALID_ERROR_CODE"
+msgstr "Errors"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_KEYFILE_MISSING"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_NO_ENGINE"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_PENDING_REPLY_CERTFILE_MISSING"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_PENDING_REPLY_KEYFILE_MISSING"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_PENDING_REPLY_NO_ENGINE"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
 msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA"
 msgstr ""
 
@@ -1966,6 +2057,9 @@ msgid "I18N_OPENXPKI_CRYPTO_X509_NEW_MISSING_TOKEN"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
+
+msgid "I18N_OPENXPKI_CSR_SERIAL"
+msgstr "CSR serial"
 
 msgid "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_DATE"
 msgstr ""
@@ -2216,6 +2310,12 @@ msgstr ""
 "serial numbers into a distinguished name (DN) to associate it safely to a "
 "person or an object."
 
+msgid "I18N_OPENXPKI_LIST_NEXT"
+msgstr "Next"
+
+msgid "I18N_OPENXPKI_LIST_PREV"
+msgstr "Prev"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_MODULE_FUNCTION_SPECIFIC_STUFF"
 msgstr "Persist CSR"
@@ -2291,6 +2391,10 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_FIXME_DER_OUTFORMAT_STILL_UNSUPPORTED"
+msgstr "Workflow types"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -2309,10 +2413,6 @@ msgid "I18N_OPENXPKI_SERVER_API_GET_CA_CERTIFICATES_PKI_REALM_NOT_SET"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_GET_CHAIN_OUTFORMAT_NOT_IMPLEMENTED_YET"
-msgstr "Workflow types"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -2327,9 +2427,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_MISSING_WORKFLOW_CONFIGURATION"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_INVALID_METHOD_CALLED"
-msgstr "The SPKAC string is empty."
+msgstr ""
+"You called an invalid method at the OpenXPKI server. "
+"The illegal method name is __METHOD_NAME__."
 
 msgid "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER"
 msgstr ""
@@ -2339,6 +2440,24 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_CA_CONFIG"
+msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_PKI_REALM_CONFIG"
+msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_FOUND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_PUBLIC"
+msgstr "The used suject style does not allow the use of an organization."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED"
@@ -2856,6 +2975,12 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EXTRACTCSR_PKCS10_UNDEFINED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MISSING_DESTINATION"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -2914,6 +3039,14 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ACL_NO_ACTIVITY"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ALWAYS_FALSE"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
+msgstr "The value of a subject alternative name field is missing."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVED_MISSING_APPROVAL"
 msgstr "The value of a subject alternative name field is missing."
 
@@ -2923,6 +3056,22 @@ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AREWORKFLOWCHILDRENSUCCESSFULLYFINISHED_NO_WF_CHILD_INSTANCE_ID_OR_TYPE_FOUND"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_INCORRECT_NUMBER_OF_VALID_CERTS"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_CORRECT_TIMING"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_INCORRECT_TIMING"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
@@ -2938,7 +3087,35 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_INITIAL_ENROLLMENT_VALID_CERTIFICATE_PRESENT"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_RENEWAL_NO_VALID_CERTIFICATE_PRESENT"
+msgstr "The value of a subject alternative name field is missing."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_INVALID_SIGNATURE_OR_NON_MATCHING_DNS"
+msgstr "The name __DNS__ is not a valid DNS entry."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_VALID_SIGNATURE_AND_MATCHING_DNS"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SERVER_WRONG_SERVER"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_COULD_NOT_ESTABLISH_SIGNER_CERT_ID"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SELF_SIGNED"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SIGNED_USING_ORIGINAL_CERT"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
@@ -3091,6 +3268,12 @@ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_GETCACERT_NO_IDENTIFIER_FOUND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_IMPL_INSTANTIATE_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -3104,8 +3287,24 @@ msgstr "The used suject style does not allow the use of a country."
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_NO_COMMAND_IMPL"
 msgstr "The used suject style does not allow the use of a country."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_FAILURE_BUT_NO_ERROR_CODE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_ACTIVITY_FOUND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_WORKFLOW_FOUND"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING"
+msgstr "The used suject style does not allow the use of a country."
 
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_UNSUPPORTED_MESSAGE_TYPE"
 msgstr ""
@@ -3120,13 +3319,55 @@ msgid "I18N_OPENXPKI_SERVICE_SCEP_GET_PKI_REALM_NO_REALM_CONFIGURED"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_ALGORITHM_REQUESTED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_PROFILE_REQUESTED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_REALM_REQUESTED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_SERVER_REQUESTED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_ENDENTITY_PROFILES_CONFIGURED"
+msgstr ""
+"The used subject style requires at minimum one organizational unit and two "
+"domain components."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_ENCRYPTION_ALGORITHM_RECEIVED"
+msgstr ""
+"The used subject style requires at minimum one organizational unit and two "
+"domain components."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_PKI_REALM_RECEIVED"
+msgstr ""
+"The used subject style requires at minimum one organizational unit and two "
+"domain components."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_PROFILE_RECEIVED"
+msgstr ""
+"The used subject style requires at minimum one organizational unit and two "
+"domain components."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_SERVER_RECEIVED"
 msgstr ""
 "The used subject style requires at minimum one organizational unit and two "
 "domain components."
@@ -3345,10 +3586,6 @@ msgstr "Import workflow instances"
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
 msgstr "Prepare environment"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
-msgstr "Determine issuing CA"
-
 msgid "I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
 msgstr "Execute the CSR"
 
@@ -3397,11 +3634,6 @@ msgstr "Wait for other workflow instance"
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr ""
 
-# only in documentation
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
-msgstr "Unlock CA key"
-
 msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 msgstr "Sleep"
 
@@ -3430,18 +3662,9 @@ msgstr "This workflow exports workflow instances to other servers."
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
 msgstr "This workflow imports workflow instances from other servers."
 
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
-msgstr "CA certificate determined"
-
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
-msgstr "Certificate issued"
-
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
-msgstr "Initializing ..."
-
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
-msgstr "Certificate Issuance"
+msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
+msgstr "SCEP Certificate Signing Request"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL"
@@ -3544,6 +3767,38 @@ msgstr "Imported Logs"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
 msgstr "Import succeeded"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVAL"
+msgstr "Cancel CSR approval"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVED"
+msgstr "Approve CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
+msgstr "Exported logs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SCEP_INITIAL_ENROLLMENT"
+msgstr "Initializing ..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SCEP_RENEWAL"
+msgstr "Approve CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SCEP_RENEWAL_ALLOWED"
+msgstr "Prepared for issuing ..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_CREATED"
+msgstr "SCEP Certificate Signing Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_INITIAL"
+msgstr "SCEP Certificate Signing Request"
 
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Waiting to start"
@@ -3679,6 +3934,40 @@ msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_DESCRIPTION"
+#~ msgstr ""
+#~ "Following you can find the most important informations about the selected "
+#~ "CA certificate. Below you will find some links to install the "
+#~ "certificates. If you want a more complete overview about the certificate "
+#~ "then please follow the link to the normal certificate view."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_TITLE"
+#~ msgstr "CA certificate"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+#~ msgstr "Determine issuing CA"
+
+# only in documentation
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
+#~ msgstr "Unlock CA key"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
+#~ msgstr "CA certificate determined"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
+#~ msgstr "Certificate issued"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
+#~ msgstr "Certificate Issuance"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_DESCRIPTION"
 #~ msgstr ""
 #~ "You are logged in to the web interface of the trustcenter. Please note "
@@ -3758,19 +4047,7 @@ msgstr ""
 #~ "action."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
-#~ msgstr "The value of a subject alternative name field is missing."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
-#~ msgstr "The SPKAC string is empty."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_NOT_ALL_REQUIRED_PARAMS_PRESENT"
-#~ msgstr "The SPKAC string is empty."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_MORE_CSRS_TO_CREATE"
 #~ msgstr "The SPKAC string is empty."
 
 #, fuzzy
@@ -3814,10 +4091,6 @@ msgstr ""
 #~ msgstr "Sleep"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVAL"
-#~ msgstr "Approve CSR"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
 #~ msgstr "Approve CSR"
 
@@ -3842,14 +4115,6 @@ msgstr ""
 #~ msgstr "Initializing ..."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVAL"
-#~ msgstr "Cancel CSR approval"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVED"
-#~ msgstr "Approve CSR"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_NOT_USABLE"
 #~ msgstr "Initializing ..."
 
@@ -3866,24 +4131,12 @@ msgstr ""
 #~ msgstr "Waiting to start"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
-#~ msgstr "Exported logs"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_ISSUING_CA_DETERMINED"
 #~ msgstr "Next CA determined"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
 #~ msgstr "Exported logs"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PREPARED"
-#~ msgstr "Prepared for issuing ..."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_REJECTED"
-#~ msgstr "SCEP Certificate Signing Request"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
@@ -3946,10 +4199,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CRYPTO_PKCS"
 #~ msgstr "SPKAC"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRYPTO_X"
-#~ msgstr "Organizational Unit"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS"

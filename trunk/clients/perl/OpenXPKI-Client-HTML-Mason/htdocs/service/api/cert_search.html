@@ -1,0 +1,71 @@
+<h1>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_TITLE') %>
+</h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_DESCRIPTION') %>
+</p>
+
+<& /service/open_form.mhtml, action => 'cert_list.html' &>
+
+<table>
+  <tr>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE') %></th>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_EMAIL') %></td>
+    <td><& /lib/html/input.mhtml, name => 'email' &>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></td>
+    <td><& /lib/html/input.mhtml, name => 'subject' &>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_SERIAL') %></td>
+    <td><& /lib/html/input.mhtml, name => 'cert_serial' &>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CSR_SERIAL') %></td>
+    <td><& /lib/html/input.mhtml, name => 'csr_serial' &>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></td>
+    <td><& /lib/html/input.mhtml, name => 'ISSUER' &>
+  </tr>
+</table>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_descriptions.mhtml, 'descriptions' => \%descriptions &>
+
+<%init>
+    my %descriptions = ();
+    my @raw = ("EMAIL", "SUBJECT", "ISSUER", "CERT_SERIAL", "CSR_SERIAL");
+
+    foreach my $key (@raw)
+    {
+        my $label = "I18N_OPENXPKI_CERT_SEARCH_".uc($key);
+        $descriptions{i18nGettext($label)} = i18nGettext($label."_DESCRIPTION");
+    }
+</%init>
+
+<%once>
+    ## fields for i18n scan
+
+    ## I18N_OPENXPKI_CERT_SEARCH_SUBJECT
+    ## I18N_OPENXPKI_CERT_SEARCH_SUBJECT_DESCRIPTION
+
+    ## I18N_OPENXPKI_CERT_SEARCH_EMAIL
+    ## I18N_OPENXPKI_CERT_SEARCH_EMAIL_DESCRIPTION
+
+    ## I18N_OPENXPKI_CERT_SEARCH_ISSUER
+    ## I18N_OPENXPKI_CERT_SEARCH_ISSUER_DESCRIPTION
+
+    ## I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL
+    ## I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL_DESCRIPTION
+
+    ## I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL
+    ## I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL_DESCRIPTION
+
+</%once>
