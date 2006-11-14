@@ -19,7 +19,8 @@
 <& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
 <& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
 <& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name',   'value' => $subject_alt_name &>
+<& /lib/html/hidden.mhtml, 'name' => 'ie_subject',    'value' => $ie_subject &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name', 'value' => $subject_alt_name &>
 <& /lib/html/hidden.mhtml, 'name' => 'info',          'value' => $info &>
 <& /lib/html/hidden.mhtml, 'name' => 'pkcs10',        'value' => '' &>
 
@@ -90,4 +91,6 @@
     }
 
     ## ok we have to display the whole stuff
+    my $dn = OpenXPKI::DN->new($subject);
+    my $ie_subject = $dn->get_x500_dn();
 </%init>

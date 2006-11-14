@@ -273,7 +273,7 @@ $FUNCTION{gen_csr_ie} = qq^
 
             alternate_subject = "cn=unsupported,dc=subject,dc=by,dc=MSIE"
     
-            szName = theForm.subject.value
+            szName = theForm.ie_subject.value
 
             re.Pattern = "__SUBJECT__"
             'MsgBox ("SUBJECT is " & szName)
