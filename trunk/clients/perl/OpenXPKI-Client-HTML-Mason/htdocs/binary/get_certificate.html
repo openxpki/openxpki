@@ -4,35 +4,80 @@
   $format       => "PEM"
 </%args>
 
+% ## this page will only be displayed for internet explorer
+%
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <& /lib/javascript.mhtml &>
+  </head>
+  <body onLoad="InstallCertIE();">
+    <h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE') %></h1>
+    <p>
+      <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC') %>
+    </p>
+    <pre>
+<% $item %>
+    </pre>
+    <form>
+      <input type="hidden" name"cert" value="<% $item %>"/>
+    </form>
+  </body>
+</html>
 <%init>
   ## first we have to determine the content-type
   switch ($content_type)
   {
-    case "X509_CA_CERT" {$content_type = "application/x-x509-ca-cert"}
-    case "IE_CA"        {$content_type = "application/pkcs7-MIME"}
-    else {$content_type = "text/plain"}
+    case "X509_CA_CERT"   {$content_type = "application/x-x509-ca-cert"}
+    case "X509_USER_CERT" {$content_type = "application/x-x509-user-cert"}
+    case "IE_CA"          {$content_type = "application/x-x509-ca-cert"}
+    case "IE_USER"        {$content_type = "application/x-x509-user-cert"}
+    case "IE_ENROLL"      {$content_type = "text/html"}
+    case "PLAIN"          {$content_type = "text/plain"}
+    else {
+          print "<h1>".i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_TITLE')."</h1>\n";
+          print "<p>\n";
+          print i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC',
+                            '__CONTENT_TYPE__' => $content_type)."\n";
+          print "</p>\n";
+          return 1;
+         }
   }
 
   ## second we have to check the format
+  my $native = "";
   switch ($format)
   {
-    case "PKCS7" {$format = "PKCS7"}
-    case "TXT"   {$format = "TXT"}
-    case "DER"   {$format = "DER"}
-    else {$format = "PEM"}
+    case "PKCS7"     {$native = "PKCS7"}
+    case "TXT"       {$native = "TXT"}
+    case "DER"       {$native = "DER"}
+    case "PEM"       {$native = "PEM"}
+    case "IE_ENROLL" {$native = "PEM"}
+    else {
+          print "<h1>".i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_TITLE')."</h1>\n";
+          print "<p>\n";
+          print i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_DESC',
+                            '__FORMAT__' => $format)."\n";
+          print "</p>\n";
+          return 1;
+         }
   }
 
   ## now request the certificate from the server
   my $msg  = $context->{client}->send_receive_command_msg (
                   "get_cert",
                   {'IDENTIFIER' => $identifier,
-                   'FORMAT'     => $format});
+                   'FORMAT'     => $native});
   my $item = $msg->{PARAMS};
 
   ## now send the stuff
-  $r->content_type ($content_type);
-  print $item;
-  return 1;
+  if ($format ne "IE_ENROLL")
+  {
+    $r->content_type ($content_type);
+    print $item;
+    return 1;
+  }
 </%init>
 <%once>
   use Switch;

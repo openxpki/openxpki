@@ -126,14 +126,17 @@ msgstr "Not usable"
 msgid "I18N_OPENXPKI_CA_STATUS_USABLE"
 msgstr "Usable"
 
-msgid "I18N_OPENXPKI_CA_SUBJECT"
-msgstr "Subject"
-
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Download certificate"
 
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
+msgstr "Install the certificate for a private key"
+
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
 msgstr "Microsoft Internet Explorer"
+
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
+msgstr "Microsoft Internet Explorer with matching private key"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA"
 msgstr "Mozilla, Firefox, Opera"
@@ -152,6 +155,18 @@ msgstr "Fingerprint"
 
 msgid "I18N_OPENXPKI_CERT_ISSUER"
 msgstr "Issuer"
+
+msgid "I18N_OPENXPKI_CERT_IS_CA"
+msgstr "Certificate is CA"
+
+msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
+msgstr "Key algorithm"
+
+msgid "I18N_OPENXPKI_CERT_KEY_EXPONENT"
+msgstr "Key exponent"
+
+msgid "I18N_OPENXPKI_CERT_KEY_SIZE"
+msgstr "Key size"
 
 msgid "I18N_OPENXPKI_CERT_NOTAFTER"
 msgstr "Not after"
@@ -372,17 +387,32 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
 msgstr "CA certificate"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_DESCRIPTION"
+msgstr "Following you can find all the details of the selected certificate."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
+msgstr "Detailed certificate informations"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
 msgstr ""
-"Here you can see the result of your search."
+"Following you can find the most important informations about the selected "
+"certificate. Below you will find some links to install the certificates. If "
+"you want a more complete overview about the certificate then please follow "
+"the link to the normal certificate view."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE"
+msgstr "Certificate"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
+msgstr "Here you can see the result of your search."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE"
 msgstr "Certificate search result"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_DESCRIPTION"
 msgstr ""
-"Here you can search for certificates. "
-"If you need more details then please see the descriptions of the different fields below the form."
+"Here you can search for certificates. If you need more details then please "
+"see the descriptions of the different fields below the form."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_TITLE"
 msgstr "Certificate search"
@@ -430,12 +460,6 @@ msgstr "Policy overview"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatic browser detection"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
-msgstr "This is the chain of the choosen CA certificate."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
-msgstr "CA certificate chain"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
 msgstr "Issuer"
@@ -700,6 +724,29 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE"
 msgstr "Choose authentication method"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
+msgstr ""
+"This page is only used to install a certificate to a corresponding private "
+"key with a Microsoft Internet Explorer. The necessary actions will be "
+"started automatically with the download of this page. If you do not have a "
+"private key for the selected certificate or you have no Internet Explorer "
+"then this page is fully useless for you."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
+msgstr "Microsoft Internet Explorer certificate enrollment"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC"
+msgstr "The requested content type __CONTENT_TYPE__ is not supported."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_TITLE"
+msgstr "Wrong HTML content-type"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_DESC"
+msgstr "The requested format __FORMAT__ is not supported."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_TITLE"
+msgstr "Wrong certificate format"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_DESCRIPTION"
 msgstr ""
@@ -2323,6 +2370,12 @@ msgstr "Persist CSR"
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""
 
+msgid "I18N_OPENXPKI_NO"
+msgstr "no"
+
+msgid "I18N_OPENXPKI_NOT_AVAILABLE"
+msgstr "n/a"
+
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
 msgstr "TLS Server profile"
 
@@ -2429,8 +2482,8 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_INVALID_METHOD_CALLED"
 msgstr ""
-"You called an invalid method at the OpenXPKI server. "
-"The illegal method name is __METHOD_NAME__."
+"You called an invalid method at the OpenXPKI server. The illegal method name "
+"is __METHOD_NAME__."
 
 msgid "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER"
 msgstr ""
@@ -3933,6 +3986,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
+msgid "I18N_OPENXPKI_YES"
+msgstr "yes"
+
+#~ msgid "I18N_OPENXPKI_CA_SUBJECT"
+#~ msgstr "Subject"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
+#~ msgstr "This is the chain of the choosen CA certificate."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
+#~ msgstr "CA certificate chain"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_DESCRIPTION"
 #~ msgstr ""
@@ -4268,9 +4333,6 @@ msgstr ""
 #~ msgstr ""
 #~ "The choosen subject alternative name type __TYPE__ is not known.Usually "
 #~ "this is a misconfiguration."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_DNS"
-#~ msgstr "The name __DNS__ is not a valid DNS name."
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_GUID"
 #~ msgstr ""

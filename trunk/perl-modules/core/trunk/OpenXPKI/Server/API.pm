@@ -135,6 +135,11 @@ sub BUILD {
         'search_cert' => {
             class  => 'Object',
             params => {
+                IDENTIFIER => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
                 EMAIL => {
                     type     => SCALAR,
                     optional => 1,

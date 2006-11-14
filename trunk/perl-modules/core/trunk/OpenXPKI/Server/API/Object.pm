@@ -164,6 +164,7 @@ sub search_cert
        $params{TO}           = $args->{LAST}        if ($args->{LAST});
        $params{REVERSE}      = 1                    if ($args->{LAST});
        $params{FROM}         = $args->{FIRST}       if ($args->{FIRST});
+       $params{DYNAMIC}->{IDENTIFIER} = $args->{IDENTIFIER} if ($args->{IDENTIFIER});
        $params{DYNAMIC}->{CSR_SERIAL} = $args->{CSR_SERIAL} if ($args->{CSR_SERIAL});
        $params{DYNAMIC}->{EMAIL}      = $args->{EMAIL}      if ($args->{EMAIL});
        $params{DYNAMIC}->{SUBJECT}    = $args->{SUBJECT}    if ($args->{SUBJECT});

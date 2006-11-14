@@ -59,7 +59,7 @@ htdocs/service/info/workflow.html
 
 htdocs/service/api/dhandler
 htdocs/service/api/pki_realm_info.html
-#htdocs/service/api/cert_full_info.html
+htdocs/service/api/cert_full_info.html
 htdocs/service/api/cert_info.html
 htdocs/service/api/cert_list.html
 htdocs/service/api/cert_search.html
@@ -114,6 +114,7 @@ htdocs/service/create_crr/get_compromise_time.mhtml
 htdocs/service/create_crr/get_reason.mhtml
 
 htdocs/binary/dhandler
+htdocs/binary/get_certificate.crt
 htdocs/binary/get_certificate.html
 htdocs/binary/get_crl.html
 htdocs/binary/get_workflow_instance_info.html

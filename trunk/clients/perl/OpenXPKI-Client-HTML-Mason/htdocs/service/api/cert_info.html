@@ -2,10 +2,10 @@
   $identifier => undef
 </%args>
 <h1>
-  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE') %>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE') %>
 </h1>
 <p>
-  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION') %>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION') %>
 </p>
 <table>
   <tr>
@@ -48,7 +48,7 @@
          target => '../../binary/get_certificate.html',
          label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD'),
          params => [["identifier",   $identifier],
-                    ["content_type", "X509_CA_CERT"],
+                    ["content_type", "X509_USER_CERT"],
                     ["format",       "PEM"]] &>
     </td>
   </tr>
@@ -59,8 +59,19 @@
          target => '../../binary/get_certificate.crt',
          label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD'),
          params => [["identifier",   $identifier],
-                    ["content_type", "IE_CA"],
+                    ["content_type", "IE_USER"],
                     ["format",       "PEM"]] &>
+    </td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL') %></td>
+    <td>
+      <& /lib/html/a.mhtml,
+         target => '../../binary/get_certificate.html',
+         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL'),
+         params => [["identifier",   $identifier],
+                    ["content_type", "IE_ENROLL"],
+                    ["format",       "IE_ENROLL"]] &>
     </td>
   </tr>
   <tr>
@@ -88,7 +99,7 @@
 </table>
 <%init>
   my $msg  = $context->{client}->send_receive_command_msg (
-                  "get_ca_cert",
+                  "get_cert",
                   {'IDENTIFIER' => $identifier});
   ## print Dumper($msg)."\n";
 

@@ -133,15 +133,19 @@ msgid "I18N_OPENXPKI_CA_STATUS_USABLE"
 msgstr "Подразделение"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CA_SUBJECT"
-msgstr "Подразделение"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Подразделение"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
+msgstr "Подразделение"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
+msgstr "Microsoft Internet Explorer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
 msgstr "Microsoft Internet Explorer"
 
 #, fuzzy
@@ -166,6 +170,22 @@ msgstr "Подразделение"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_ISSUER"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_IS_CA"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_KEY_EXPONENT"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_KEY_SIZE"
 msgstr "Подразделение"
 
 #, fuzzy
@@ -418,6 +438,30 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
 msgstr "Область PKI"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_DESCRIPTION"
+msgstr ""
+"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+"внимательны - данная система поддерживает множественные реализации "
+"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
+"вы в настоящий момент работаете, обратитесь к информационному меню."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
+msgstr "Область PKI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
+msgstr ""
+"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+"внимательны - данная система поддерживает множественные реализации "
+"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
+"вы в настоящий момент работаете, обратитесь к информационному меню."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE"
+msgstr "Область PKI"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
 msgstr ""
 "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
@@ -503,18 +547,6 @@ msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Автоматическое определение типа броузера"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
-msgstr ""
-"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
-"внимательны - данная система поддерживает множественные реализации "
-"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
-"вы в настоящий момент работаете, обратитесь к информационному меню."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
-msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
@@ -785,6 +817,30 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE"
 msgstr "Выберите способ аутентификации"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
+msgstr "The name __DNS__ is not a valid DNS name."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
+msgstr "Область PKI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC"
+msgstr "The name __DNS__ is not a valid DNS name."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_TITLE"
+msgstr "Выбор типа технологического процесса для создания заявки"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_DESC"
+msgstr "The name __DNS__ is not a valid DNS name."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_TITLE"
+msgstr "Область PKI"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_DESCRIPTION"
 msgstr ""
@@ -2424,6 +2480,14 @@ msgstr "Оставить заявку для обработки(CSR)"
 
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_NO"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_NOT_AVAILABLE"
+msgstr "Подразделение"
 
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
 msgstr "Профиль TLS сервера "
@@ -4070,6 +4134,27 @@ msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_YES"
+msgstr "uid"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CA_SUBJECT"
+#~ msgstr "Подразделение"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
+#~ msgstr ""
+#~ "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+#~ "внимательны - данная система поддерживает множественные реализации "
+#~ "удостоверяющих центров (CA). Если вы не вполне уверены, с какой "
+#~ "реализацией вы в настоящий момент работаете, обратитесь к информационному "
+#~ "меню."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
+#~ msgstr "Веб-интерфейс Удостоверяющего Центра"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_DESCRIPTION"
 #~ msgstr ""
 #~ "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
@@ -4208,9 +4293,6 @@ msgstr ""
 #~ msgstr ""
 #~ "The choosen subject alternative name type __TYPE__ is not known.Usually "
 #~ "this is a misconfiguration."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_DNS"
-#~ msgstr "The name __DNS__ is not a valid DNS name."
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_GUID"
 #~ msgstr ""

@@ -1,0 +1,96 @@
+<%args>
+  $identifier => undef
+</%args>
+<h1>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE') %>
+</h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_DESCRIPTION') %>
+</p>
+<table>
+  <tr>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE') %></th>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></td>
+    <td><% delete $params->{SUBJECT} %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_SERIAL') %></td>
+    <td><% delete $params->{SERIAL} %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_FINGERPRINT') %></td>
+    <td><% delete $params->{FINGERPRINT} %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></td>
+    <td><% join " ", split "T", delete $params->{NOTBEFORE} %> UTC</td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></td>
+    <td><% join " ", split "T", delete $params->{NOTAFTER} %> UTC</td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></td>
+    <td>
+      <& /lib/html/a.mhtml,
+         target => 'ca_cert_info.html',
+         label  => delete $params->{ISSUER},
+         params => [["identifier",   $issuer_identifier]] &>
+    </td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CSR_SERIAL') %></td>
+    <td><% $csr_serial %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_IS_CA') %></td>
+    <td>
+%     if (delete $params->{IS_CA}) {
+        <% i18nGettext('I18N_OPENXPKI_YES') %>
+%     } else {
+        <% i18nGettext('I18N_OPENXPKI_NO') %>
+%     }
+    </td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_KEY_ALGORITHM') %></td>
+    <td>
+%     $params->{PUBKEY_ALGORITHM} =~ s/encryption//i;
+      <% uc(delete $params->{PUBKEY_ALGORITHM}) %>
+    </td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_KEY_SIZE') %></td>
+    <td><% delete $params->{KEYSIZE} %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_KEY_EXPONENT') %></td>
+    <td><% delete $params->{EXPONENT} %></td>
+  </tr>
+<!--
+  <tr>
+    <td>... the forgotten things ...</td>
+    <td><pre><% Dumper($params) %></pre></td>
+  </tr>
+-->
+</table>
+<%init>
+  ## first we need the issuer identifier and the CSR serial
+  my $msg  = $context->{client}->send_receive_command_msg (
+                  "search_cert",
+                  {'IDENTIFIER' => $identifier});
+  my $issuer_identifier = $msg->{PARAMS}->[0]->{ISSUER_IDENTIFIER};
+  my $csr_serial        = $msg->{PARAMS}->[0]->{CSR_SERIAL};
+     $csr_serial        = i18nGettext('I18N_OPENXPKI_NOT_AVAILABLE')
+         if (not defined $csr_serial or not length $csr_serial);
+
+  ## second we download the certificate itself
+  $msg  = $context->{client}->send_receive_command_msg (
+                  "get_cert",
+                  {'IDENTIFIER' => $identifier});
+
+  my $params      = $msg->{PARAMS}->{BODY};
+</%init>

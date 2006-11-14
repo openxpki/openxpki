@@ -134,15 +134,19 @@ msgid "I18N_OPENXPKI_CA_STATUS_USABLE"
 msgstr "Warten"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CA_SUBJECT"
-msgstr "Warten"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Organisationseinheit"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
+msgstr "Organisationseinheit"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
+msgstr "Microsoft Internet Explorer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
 msgstr "Microsoft Internet Explorer"
 
 #, fuzzy
@@ -167,6 +171,22 @@ msgstr "Organisationseinheit"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_ISSUER"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_IS_CA"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_KEY_EXPONENT"
+msgstr "Organisationseinheit"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_KEY_SIZE"
 msgstr "Warten"
 
 #, fuzzy
@@ -417,6 +437,30 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_DESCRIPTION"
+msgstr ""
+"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
+"informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
+msgstr ""
+"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
+"informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
 msgstr ""
 "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
@@ -502,18 +546,6 @@ msgstr "Web-Schnittstelle des Trustcenters"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatische Browsererkennung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
-msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
@@ -807,6 +839,30 @@ msgstr "Bitte wählen Sie eine Methode zur Authentifizierung (Anmeldung) aus."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE"
 msgstr "Auswählen des Anmeldeverfahrens"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
+msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC"
+msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_TITLE"
+msgstr "Auswählen eines Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_DESC"
+msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_TITLE"
+msgstr "PKI Realm"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_DESCRIPTION"
 msgstr ""
@@ -2527,6 +2583,14 @@ msgstr "Speichern des Zertifzierungsantrages"
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_NO"
+msgstr "Organisationseinheit"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_NOT_AVAILABLE"
+msgstr "Warten"
+
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
 msgstr "TLS-Server"
 
@@ -4033,6 +4097,26 @@ msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_YES"
+msgstr "uid"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CA_SUBJECT"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_TITLE"
+#~ msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_DESCRIPTION"
 #~ msgstr ""
 #~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
@@ -4371,9 +4455,6 @@ msgstr ""
 #~ "Der alternative Namenstyp __TYPE__ ist unbekannt. Meistens handelt es "
 #~ "sich hierbei um eine Fehlkonfiguration. Bitte wenden Sie sich an die "
 #~ "Administratoren."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_DNS"
-#~ msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_GUID"
 #~ msgstr ""
