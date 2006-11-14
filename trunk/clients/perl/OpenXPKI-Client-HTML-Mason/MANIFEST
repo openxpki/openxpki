@@ -116,6 +116,7 @@ htdocs/service/create_crr/get_reason.mhtml
 htdocs/binary/dhandler
 htdocs/binary/get_certificate.crt
 htdocs/binary/get_certificate.html
+htdocs/binary/get_chain.html
 htdocs/binary/get_crl.html
 htdocs/binary/get_workflow_instance_info.html
 

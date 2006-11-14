@@ -2326,6 +2326,10 @@ msgstr "Test User CA"
 msgid "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_DOWNLOAD_CHAIN"
+msgstr "uid"
+
 msgid "I18N_OPENXPKI_FAILED"
 msgstr ""
 

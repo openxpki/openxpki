@@ -2129,8 +2129,11 @@ msgstr "Test User CA"
 msgid "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR"
 msgstr ""
 
+msgid "I18N_OPENXPKI_DOWNLOAD_CHAIN"
+msgstr "Download complete certificate chain"
+
 msgid "I18N_OPENXPKI_FAILED"
-msgstr ""
+msgstr "failed"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_DIR_DOES_NOT_EXIST"

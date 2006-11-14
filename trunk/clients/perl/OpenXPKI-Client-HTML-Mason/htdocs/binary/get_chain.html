@@ -1,0 +1,16 @@
+<%args>
+  $identifier   => undef
+</%args>
+<%init>
+  ## request the chain from the server
+  my $msg  = $context->{client}->send_receive_command_msg (
+                  "get_chain",
+                  {'START_IDENTIFIER' => $identifier,
+                   'OUTFORMAT'        => 'PEM'});
+  my $item = join "\n", @{$msg->{PARAMS}->{CERTIFICATES}};
+
+  ## now send the stuff
+  $r->content_type ("text/plain");
+  print $item;
+  return 1;
+</%init>

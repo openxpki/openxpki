@@ -1722,6 +1722,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR"
 msgstr ""
 
+msgid "I18N_OPENXPKI_DOWNLOAD_CHAIN"
+msgstr ""
+
 msgid "I18N_OPENXPKI_FAILED"
 msgstr ""
 
