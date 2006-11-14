@@ -1,5 +1,7 @@
 package OpenXPKI::Server::Workflow::Validator::SPKAC;
 
+# $Revision$
+
 use strict;
 use warnings;
 use base qw( Workflow::Validator );
