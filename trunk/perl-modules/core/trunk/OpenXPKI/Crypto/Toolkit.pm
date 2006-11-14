@@ -239,6 +239,7 @@ sub __load_config {
             CONTENT  => $certificate,
             FORCE    => 1,
         });
+        chmod 0644, $cert_filename;
         $params_of{$ident}->{CERT} = $cert_filename;
     }
     ##! 1: 'end'
