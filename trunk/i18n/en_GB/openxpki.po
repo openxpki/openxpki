@@ -609,14 +609,14 @@ msgstr "Choose a naming style"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_TITLE"
 msgstr "Creating the name of the certificate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_WORKFLOW_TYPE_DESCRIPTION"
 msgstr ""
-"Please choose the role for which you would like to request a certificate."
+"There is more than one workflow type available for the certificate "
+"signing request (CSR) generation. Please choose on of the "
+"available workflow types to proceed."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_WORKFLOW_TYPE_TITLE"
-msgstr "Choose a role"
+msgstr "Choose a workflow type"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_"
 msgstr ""
@@ -3703,11 +3703,10 @@ msgstr "This is the workflow to handle a certificate signing request at once."
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
 msgstr "This is the workflow to handle a certificate signing request at once."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr ""
-"This is the workflow to handle the offline issues a certificate signing "
-"request at once."
+"This is the workflow to handle a certificate signing request (CSR) "
+"if a offline CA is in use."
 
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "This is the workflow to issue fresh CRLs."
@@ -3873,7 +3872,6 @@ msgstr "Offline part of a Certificate Signing Request (CSR)"
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"
 msgstr "Certificate Signing Request (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr "Offline part of a Certificate Signing Request (CSR)"
 

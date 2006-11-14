@@ -105,167 +105,128 @@ msgstr "Microsoft Internet Explorer"
 msgid "I18N_OPENXPKI_BACKEND_OPENSSL_INSTANTIATE_CLI_FAILED"
 msgstr "Web-Schnittstelle des Trustcenters"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CA_CHAIN"
-msgstr "uid"
+msgstr "CA-Zertifikatskette"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CA_ID"
-msgstr "uid"
+msgstr "CA-ID"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CA_NOTAFTER"
-msgstr "Organisationseinheit"
+msgstr "Gültig bis"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CA_NOTBEFORE"
-msgstr "Auf Start wartend"
+msgstr "Gültig von"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CA_STATUS"
-msgstr "Warten"
+msgstr "Status"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CA_STATUS_UNUSABLE"
-msgstr "Warten"
+msgstr "Nicht aktiv"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CA_STATUS_USABLE"
-msgstr "Warten"
+msgstr "Aktiv"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
-msgstr "Organisationseinheit"
+msgstr "Zertifkat herunterladen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
-msgstr "Organisationseinheit"
+msgstr "Installieren eines Zertifikates zu passendem privatem Schlüssel"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
 msgstr "Microsoft Internet Explorer"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
-msgstr "Microsoft Internet Explorer"
+msgstr "Microsoft Internet Explorer mit passendem privaten Schlüssel"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA"
-msgstr "Organisationseinheit"
+msgstr "Firefox, Mozilla, Opera"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
-msgstr "Organisationseinheit"
+msgstr "PEM-, CRT-Format"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
-msgstr "Organisationseinheit"
+msgstr "Textformat"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_EMAIL"
-msgstr "Warten"
+msgstr "E-Mailadresse"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
-msgstr "Organisationseinheit"
+msgstr "Fingerprint"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_ISSUER"
-msgstr "Warten"
+msgstr "Aussteller"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_IS_CA"
-msgstr "Warten"
+msgstr "Zertifikat ist CA"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
-msgstr "Warten"
+msgstr "Algorithmus des Schlüssels"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_KEY_EXPONENT"
-msgstr "Organisationseinheit"
+msgstr "Exponent des Schlüssels (für RSA)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_KEY_SIZE"
-msgstr "Warten"
+msgstr "Schlüssellänge"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_NOTAFTER"
-msgstr "Organisationseinheit"
+msgstr "Gültig bis"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_NOTBEFORE"
-msgstr "Auf Start wartend"
+msgstr "Gültig von"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_"
 msgstr "Warten"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL"
-msgstr "Abgelaufene"
+msgstr "Seriennummer des Zertifikates"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL_DESCRIPTION"
 msgstr ""
-"DC-Stil bedeutet, dass am Ende des Zertifikats-Namens die Komponenten der "
-"DNS-Domain benutzt werden. Ein alter eindeutiger Name (DN) sieht wie folgt "
-"aus: cn=Max Mustermann, o=OpenXPKI, c=DE. Die letzte Namenskomponente c des "
-"DN akzeptiert aber nur zwei-buchstabige Länderkennungen und keine "
-"Domainnamen. Der gleiche Name im DC-Stil sieht wie folgt aus: cn=Max "
-"Musterman, dc=OpenXPKI, dc=DE. Der Vorteil ist, dass wir nun die mehr "
-"korrekte Variante nutzen können: cn=Max Mustermann, dc=OpenXPKI, dc=org. Es "
-"muss nicht länger auf eine Landeskennung ausgewichen werden."
+"Die Seriennummer des Zertifikates wird direkt von Aussteller vergeben und "
+"wird zur Identifikation eines Zertifikates genutzt, wenn der Aussteller bekannt "
+"oder eingrenzbar/bestimmbar ist."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL"
-msgstr "Warten"
+msgstr "Seriennumer des CSR"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL_DESCRIPTION"
 msgstr ""
-"DC-Stil bedeutet, dass am Ende des Zertifikats-Namens die Komponenten der "
-"DNS-Domain benutzt werden. Ein alter eindeutiger Name (DN) sieht wie folgt "
-"aus: cn=Max Mustermann, o=OpenXPKI, c=DE. Die letzte Namenskomponente c des "
-"DN akzeptiert aber nur zwei-buchstabige Länderkennungen und keine "
-"Domainnamen. Der gleiche Name im DC-Stil sieht wie folgt aus: cn=Max "
-"Musterman, dc=OpenXPKI, dc=DE. Der Vorteil ist, dass wir nun die mehr "
-"korrekte Variante nutzen können: cn=Max Mustermann, dc=OpenXPKI, dc=org. Es "
-"muss nicht länger auf eine Landeskennung ausgewichen werden."
+"Jedem Zertifizierungsantrag (CSR) wird eine eindeutige Seriennummer "
+"zugeordnet. Mit dieser Seriennummer ist jeder CSR innerhalb eines "
+"Trustcenters auffindbar. Jedem normalen Zertifikat wird die Seriennummer "
+"des CSR zugeordnet, aus welchem das Zertifikat erstellt worden ist."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_EMAIL"
-msgstr "Warten"
+msgstr "E-Mailadresse"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_EMAIL_DESCRIPTION"
-msgstr ""
-"Die Organisationseinheit (ou) kann benutzt werden, um organisatorische "
-"Strukturen wie Abteilungen, Institute oder Fakultäten abzubilden."
+msgstr "Die E-Mailadresse, welche im Zertifikat enthalten ist."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_ISSUER"
-msgstr "Warten"
+msgstr "Aussteller"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_ISSUER_DESCRIPTION"
-msgstr "Dies ist eine Faxnummer."
+msgstr "Der Name des Ausstellers des Zertifikates."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT"
-msgstr "Warten"
+msgstr "Name (Subject)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT_DESCRIPTION"
-msgstr "Dies ist eine Faxnummer."
+msgstr ""
+"Der Name des Zertifikates ist auch unter den Begriffen eindeutiger Name, "
+"distinguished name (DN) oder Subject bekannt. Er bezieht sich auf den "
+"im RFC 2253 definierten, eindeutigen Namen des Zertifikates. Bespiele "
+"hierfür sind 'cn=Max Mustermann,dc=example,dc=com' oder auch "
+"'cn=www.example.com,dc=example,dc=com'. Wenn man nach Max Mustermann "
+"suchen möchte, dann kann man auch einfach '*Max Mustermann*' eingeben und "
+"bekommt das passende Ergebnis."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SERIAL"
-msgstr "Warten"
+msgstr "Seriennummer"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SUBJECT"
-msgstr "Warten"
+msgstr "Name"
 
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID"
 msgstr ""
@@ -424,125 +385,98 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_TITLE"
 msgstr "Ablehnen des Zertifizierungsantrages"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Auf dieser Seiten finden Sie die wichtigsten Informationen über das "
+"ausgewählte CA-Zertifikat. Außerdem gibt es mehrere Links um das "
+"CA-Zertifikat zu installieren. Wenn Sie mehr Informationen benötigen, "
+"dann folgen Sie dem Link zu der ausführlicheren Zertifikatsseite. "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
-msgstr "PKI Realm"
+msgstr "CA-Zertifikat"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_DESCRIPTION"
-msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+msgstr "Hier finden Sie nun alle Details bzgl. des ausgewählten Zertifikats."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
-msgstr "PKI Realm"
+msgstr "Detailierte Zertifikatsinformationen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Auf dieser Seiten finden Sie die wichtigsten Informationen über das "
+"ausgewählte Zertifikat. Außerdem gibt es mehrere Links um das "
+"Zertifikat zu installieren. Wenn Sie mehr Informationen benötigen, "
+"dann folgen Sie dem Link zu der ausführlicheren Zertifikatsseite. "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE"
-msgstr "PKI Realm"
+msgstr "Zertifikatsinformationen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
-msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+msgstr "Untenstehend finden Sie das Ergebnis Ihrer Suche."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Gefundene Zertifikate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Hier können Sie Zertifikate suchen. Wenn Sie zu den einzelnen "
+"Feldern mehr Informationen benötigen, dann schauen Sie bitte am "
+"Ende der Seite nach, wo sich Beschreibungen zu den einzelnen Feldern befinden."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Zertifikatssuche"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Hier können Sie nun alle Zertifikate der Zertifizierungskette betrachten."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Zertifizierungskette der CA"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CRL_LIST_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Hier können Sie nun alle verfügbaren CRLs innerhalb dieses PKI Realms "
+"betrachten. Sie können diese CRLs herunterladen, wenn Sie einfach "
+"den Links folgen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CRL_LIST_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Zertifikatsrückrufliste (CRL)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Hier können sie nun alle verfügbaren CA-Zertifkate innerhalb dieses "
+"PKI Realms betrachten. Sie können sich die Zertifikate genauer ansehen, "
+"wenn Sie einfach den Links folgen. Dort können Sie die Zertifikate auch "
+"herunterladen oder direkt installieren. "
+"Wenn Sie auf der Suche nach einer kompletten Zertifizierungskette sind, "
+"dann folgen Sie bitte den Links in der Spalte 'Zertifizierungskette'."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "CA-Zertifikate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Sie befinden sich derzeit im PKI Realm __PKI_REALM__. Ein PKI Realm "
+"ist die komplette Umgebung des Trustcenters, welches Sie gerade "
+"benutzen. Der Unterschied zu einer CA besteht darin, dass eine CA "
+"typischer Weise nur aus einem CA-Zertifiakt besteht. "
+"Ein PKI Realm dient dazu CAs mit gleicher Bedeutung zu sammeln. "
+"Zum Beispiel kann der PKI Realm 'User CA' die CAs 'User CA 1' und "
+"'User CA 2' entahlten, wobei die 'User CA 2' wahrscheinlich die "
+"CA ist, welche aktuell Zertifikate ausstellt. Dies geschieht aber "
+"für den Nutzer fast vollständig transparent."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_TITLE"
-msgstr "PKI Realm"
+msgstr "PKI Realm __PKI_REALM__"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_POLICY_LIST_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Unten finden Sie die Referenzen zu den offiziellen Dokumenten der "
+"genutzten Zertifizierungsinstanzen (CAs). Dies beinhaltet mindestens "
+"die Policy und das Certificate Practise Statement (CPS)."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_POLICY_LIST_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Policy-/CPS-Übersicht"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatische Browsererkennung"
@@ -555,9 +489,8 @@ msgstr "Zurücksetzen"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_SERIAL"
 msgstr "Seriennummer des Workflowprozesses"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
-msgstr "Login"
+msgstr "Details des Zertifikats"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME"
@@ -830,9 +763,8 @@ msgstr "Zurücksetzen"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
 msgstr "Zurücksetzen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_FULL_CERT_INFO_LINK"
-msgstr "Login"
+msgstr "Detailierte Zertifikatsinformationen"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION"
 msgstr "Bitte wählen Sie eine Methode zur Authentifizierung (Anmeldung) aus."
@@ -870,29 +802,25 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_TITLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_ANONYMOUS_MENU_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. "
+"Bitte beachten Sie, dass diese Software verschiedene Zertifizierungsinstanzen (CAs) "
+"unterstützt. Wenn Sie sich nicht sicher sind, dann nutzen Sie den Info-Bereich "
+"im Menü, um sich zu informieren."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_ANONYMOUS_MENU_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Anonyme Web-Schnittstelle"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_INFO_MENU_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Dieses Menü erlaubt den Zugriff auf alle relevanten Informationen über "
+"die benutzte CA. Dies beinhaltet auch CA-Zertifikate und aktuelle CRLs. "
+"Zusätzlich können Sie hier Verweise auf die relevanten Policies und "
+"Certificate Practise Statements (CPS) finden."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_INFO_MENU_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "CA-Informationen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_OP_MENU_DESCRIPTION"
@@ -930,17 +858,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DHANDLER_TITLE"
 msgstr "Web-Schnittstelle des Trustcenters"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_LANGUAGE_MENU_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"OpenXPKI unterstützt verschiedene sprachen für die Benutzerschnittstelle. "
+"In dem entsprechenden Untermenü können Sie eine Sprache auswählen. "
+"OpenXPKI benutzt generell UTF-8 als Kodierung. Dies bedeutet, "
+"dass die ausgewählte Sprache nicht die individuelle Eingabe von Zeichen "
+"beeinflusst. Sie können also als Sprache auch Russisch wählen und "
+"trotzdem später eine Organisationseinheit mit deutschen Umlauten "
+"eingeben, wenn dies nötig ist."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_LANGUAGE_MENU_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Sprachauswahl"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_RA_OP_MENU_DESCRIPTION"
@@ -1376,9 +1305,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER"
 msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_FORMAT"
-msgstr "Organisationseinheit"
+msgstr "Format"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"
@@ -2301,9 +2229,8 @@ msgstr "Seriennummer des Workflowprozesses"
 msgid "I18N_OPENXPKI_CRYPTO_X509_NEW_MISSING_TOKEN"
 msgstr "Seriennummer des Workflowprozesses"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CSR_SERIAL"
-msgstr "Warten"
+msgstr "Seriennummer des Zertifizierungsantrages"
 
 msgid "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_DATE"
 msgstr ""
@@ -2326,9 +2253,8 @@ msgstr "Test User CA"
 msgid "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_DOWNLOAD_CHAIN"
-msgstr "uid"
+msgstr "Herunterladen der kompletten Zertifizierungskette"
 
 msgid "I18N_OPENXPKI_FAILED"
 msgstr ""
@@ -2469,9 +2395,8 @@ msgstr "Dies ist eine Faxnummer."
 msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
 msgstr "Prozesse anzeigen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
-msgstr "Neuer Antrag (CSR)"
+msgstr "CA-Infos"
 
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "Neuer Antrag (CSR)"
@@ -2491,31 +2416,26 @@ msgstr "Abgelaufene"
 msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
 msgstr "Sprache (Language)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_LIST_CRL"
-msgstr "Gültige"
+msgstr "Aktuelle CRLs"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_LIST_ISSUER"
-msgstr "Gültige"
+msgstr "Liste der CAs"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_LIST_POLICY"
-msgstr "Abmelden"
+msgstr "Policy/CPS"
 
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
 msgstr "Abmelden"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_PKI_REALM_INFO"
-msgstr "Neuer Antrag (CSR)"
+msgstr "PKI Realm"
 
 msgid "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS"
 msgstr "Zurückgerufene"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT"
-msgstr "Abgelaufene"
+msgstr "Zertifikats-Suche"
 
 msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
 msgstr "Smartcard personalisieren"
@@ -2572,13 +2492,11 @@ msgstr ""
 "auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
 "dient der sichern Identifikation von Personen oder Objekten."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_LIST_NEXT"
-msgstr "Organisationseinheit"
+msgstr "Rückwärts"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_LIST_PREV"
-msgstr "Genehmigen eines Zertifizierungsantrages"
+msgstr "Vorwärts"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_MODULE_FUNCTION_SPECIFIC_STUFF"
@@ -2587,13 +2505,11 @@ msgstr "Speichern des Zertifzierungsantrages"
 msgid "I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_NO"
-msgstr "Organisationseinheit"
+msgstr "nein"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_NOT_AVAILABLE"
-msgstr "Warten"
+msgstr "nicht verfügbar"
 
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
 msgstr "TLS-Server"
@@ -3811,10 +3727,10 @@ msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
 msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr ""
-"Dieser Workflow bearbeitet den Offline-Teil eines Zertifizierungsantrag."
+"Dieser Zertifizierungsantrag sollte benutzt werden, wenn die CA "
+"als Offline-CA eingesetzt wird."
 
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "Dieser Workflow erstellt neue CRLs."
@@ -3979,12 +3895,11 @@ msgstr "Zertifizierungsantrag"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA"
-msgstr "Zertifizierungsantrag (Offline-Teil)"
+msgstr "Zertifizierungsantrag (Offline-CA)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"
 msgstr "Zertifizierungsantrag"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr "Zertifizierungsantrag (Offline-Teil)"
 
@@ -4100,9 +4015,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_YES"
-msgstr "uid"
+msgstr "ja"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CA_SUBJECT"
