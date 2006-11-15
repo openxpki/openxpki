@@ -18,6 +18,7 @@ htdocs/index.html
 htdocs/css/openxpki.css
 htdocs/images/openxpki_logo.png
 htdocs/lib/debug.mhtml
+htdocs/lib/field_to_i18n.mhtml
 htdocs/lib/javascript.mhtml
 htdocs/lib/url.mhtml
 htdocs/lib/menu.mhtml

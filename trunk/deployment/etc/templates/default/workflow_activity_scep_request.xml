@@ -46,7 +46,7 @@
          class="OpenXPKI::Server::Workflow::Activity::SCEP::SetContextFromOriginalCert"/> 
   <!-- Changes -->
   <action name="change_csr_role"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::SetSource"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="OPERATOR">
       <field name="cert_role"/>
       <validator name="CertRole">
@@ -54,7 +54,7 @@
       </validator>
   </action>
   <action name="change_csr_profile"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::SetSource"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="OPERATOR">
       <field name="cert_profile"/>
       <validator name="CertProfile">
@@ -67,7 +67,7 @@
       <field name="cert_subject_style"/>
   </action>
   <action name="change_csr_subject"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::SetSource"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="OPERATOR">
       <field name="cert_subject"/>
       <validator name="CertSubject">
@@ -77,7 +77,7 @@
       </validator>
   </action>
   <action name="change_csr_subject_alt_name"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::SetSource"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="OPERATOR">
       <field name="cert_subject_alt_name"/>
       <validator name="CertSubjectAltName">
@@ -95,7 +95,7 @@
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve">
   </action>
   <action name="persist_csr"
-	  class="OpenXPKI::Server::Workflow::Activity::CertRequest::PersistRequest">
+	  class="OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest">
   </action>
   <action name="cancel_csr_approval"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
