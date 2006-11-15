@@ -11,6 +11,8 @@ use warnings;
 use utf8;
 use English;
 
+use Regexp::Common;
+
 use OpenXPKI::Debug 'OpenXPKI::Server::DBI::SQL';
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;
@@ -412,6 +414,89 @@ sub get_symbolic_query_columns {
 }
 
 
+# if a non-arrayref is passed, returns an arrayref containing the argument
+# if an arrayref is passed, returns the same arrayref
+sub __normalize_scalar_or_arrayref {
+    my $self = shift;
+    my $args = shift;
+
+    if (ref $args eq 'ARRAY') {
+	return $args;
+    } else {
+	return [ $args ];
+    }
+}
+
+# returns an arrayref containing epoch integers
+sub __normalize_validity {
+    my $self = shift;
+    my $args = shift;
+
+    $args = $self->__normalize_scalar_or_arrayref($args);
+
+    if (! defined $args) {
+	return;
+    }
+    
+    foreach my $element (@{$args}) {
+	if (ref $element eq 'DateTime') {
+	    $element = $element->epoch;
+	}
+
+	if ($element !~ m{ \A \d+ \z }xms) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_DBI_SQL_NORMALIZE_VALIDITY_INVALID_ARGUMENT",
+		params => {
+		    VALIDITY_SPEC => @{$args},
+		}) ;
+	}
+    }
+
+    return $args;
+}
+
+
+
+sub __get_validity_conditions {
+    my $self = shift;
+    my $args = shift;
+
+    my $table         = $args->{TABLE};
+    my $validity_args = $self->__normalize_validity($args->{VALID_AT});
+    
+    my @conditions;
+
+    if (! defined $validity_args) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_GET_VALIDITY_CONDITION_INCORRECT_VALIDITY_ARGUMENTS",
+	    params => {
+		VALID_AT => $args->{VALID_AT},
+	    }) ;
+    }
+	    
+    my $notbefore = $self->{schema}->get_column('NOTBEFORE');
+    my $notafter  = $self->{schema}->get_column('NOTAFTER');
+
+    if (defined $table) {
+	$notbefore = $table . '.' . $notbefore;
+	$notafter  = $table . '.' . $notafter;
+    }
+    
+    foreach my $validity (@{$validity_args}) {
+	push @conditions, 
+	$validity
+	    . '>=' 
+	    . $notbefore;
+	
+	push @conditions, 
+	$validity
+	    . '<=' 
+	    . $notafter;
+    }
+    
+    return \@conditions;
+}
+
 
 sub select
 {
@@ -476,6 +561,32 @@ sub select
 	    SYMBOLIC_NAME => $table_args,
 	    SQL_NAME => $self->{schema}->get_table_name($table_args),
 	};
+
+
+
+	# handle validity specification for single tables
+	if (exists $args->{VALID_AT}) {
+
+	    # check if table contains NOTBEFORE/NOTAFTER
+	    my $columns = $self->{schema}->get_table_columns($table_args);
+	    ### $columns
+	    if (! (grep(m{ \A NOTBEFORE \z }xms, @{$columns}) 
+		   && grep(m{ \A NOTAFTER \z }xms, @{$columns}))) {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_TABLE_FOR_VALIDITY_CONSTRAINT",
+		    params => {
+			TABLE => $table_args,
+		    });
+	    }
+
+	    push @conditions,
+	    @{$self->__get_validity_conditions(
+		{
+		    VALID_AT => $args->{VALID_AT},
+		})};
+	    
+ 	}
+
     } elsif (ref $table_args eq 'ARRAY') {
 	### natural join...
 
@@ -484,7 +595,7 @@ sub select
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_COLUMNS");
 	}
-	
+
 	# collect tables to join
 	# - scalar value: join on this symbolic table name
 	# - arrayref: expect exactly two values (fat comma syntax suggested),
@@ -591,7 +702,7 @@ sub select
 		# scalar value
 		$column = $entry;
 
-	    } elsif (ref $entry ne '') {
+	    } else {
 		OpenXPKI::Exception->throw (
 		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_COLUMN_DATA_TYPE",
 		    params => {
@@ -708,6 +819,65 @@ sub select
 		$join_index = $ii;
 	    }
 	}
+	
+	##
+	# handle validity for joins
+	if (defined $args->{VALID_AT}) {
+	    if (ref $args->{VALID_AT} ne 'ARRAY') {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_VALIDITY_SPECIFICATION_TYPE_FOR_JOIN");
+	    }
+	    
+	    if (scalar(@{$args->{VALID_AT}}) != scalar(@symbolic_select_tables)) {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_VALIDITY_SPECIFICATION_MISMATCH_FOR_JOIN",
+		    params => {
+			TABLES   => [ @symbolic_select_tables ],
+			VALID_AT => $args->{VALID_AT},
+		    });
+	    }
+
+	    ### add validity conditions...
+	    
+	    my $validity_index;
+	  VALIDITY:
+	    for (my $ii = 0; $ii < scalar(@symbolic_select_tables); $ii++) {
+		next VALIDITY if (! defined $args->{VALID_AT}->[$ii]);
+		
+		# use alias if available, otherwise symbolic name
+		my $table;
+		if (exists $symbolic_select_tables[$ii]->{ALIAS}) {
+		    ### use alias literally...
+		    $table = $symbolic_select_tables[$ii]->{ALIAS};
+		} else {
+		    ### map symbolic name to real table name...
+		    $table = $self->{schema}->get_table_name(
+			$symbolic_select_tables[$ii]->{SYMBOLIC_NAME}
+			);
+		}
+		
+		# check if table contains NOTBEFORE/NOTAFTER
+		my $columns = 
+		    $self->{schema}->get_table_columns($symbolic_select_tables[$ii]->{SYMBOLIC_NAME});
+
+		if (! (grep(m{ \A NOTBEFORE \z }xms, @{$columns}) 
+		       && grep(m{ \A NOTAFTER \z }xms, @{$columns}))) {
+		    OpenXPKI::Exception->throw (
+			message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_TABLE_FOR_VALIDITY_CONSTRAINT",
+			params => {
+			    TABLE => $symbolic_select_tables[$ii]->{SYMBOLIC_NAME},
+			});
+		}
+
+		### table: $table
+		push @conditions,
+		@{$self->__get_validity_conditions(
+		      {
+			  VALID_AT => $args->{VALID_AT}->[$ii],
+			  TABLE    => $table,
+		      })};
+	    }
+	}
     }
 
     # sanity check: there must be a where clause
@@ -807,7 +977,7 @@ sub select
 	    }
 	}
     }
-    
+
     # sanity check: there must be a condition
     if (scalar(@conditions) == 0) {
 	OpenXPKI::Exception->throw (
@@ -871,7 +1041,8 @@ sub select
             $query .= ' ORDER BY ' . join(', ', @order_specs);
         }
     }
-
+    
+    ### $query
     ##! 2: "execute do_query: $query"
     $self->{DBH}->do_query (QUERY       => $query,
                             BIND_VALUES => \@bind_values,
@@ -1083,6 +1254,10 @@ is the number of returned items.
 
 reverse the ordering of the results.
 
+=item * VALID_AT
+
+limit search to specified validity (see below).
+
 =back
 
 In addition the function supports all table columns except of the
@@ -1218,6 +1393,74 @@ This results in the following query:
  ORDER BY workflow.workflow_id, 
    context1.workflow_context_value, 
    context2.workflow_context_value
+
+
+=head4 Validity specification for single table queries
+
+Adding the named parameter VALID_AT limits the returned results to entries 
+with a NOTBEFORE and a NOTAFTER date. Depending on if the query is
+a single-table query or a join, the argument of VALID_AT is interpreted
+differently.
+
+For single-table queries the argument may either be a single scalar value
+or a arrayref. Each individual value of these may be either an
+integer number or a DateTime object.
+
+If an integer value is passed, the value is interpreted as seconds 
+since epoch. As an alternative, it is also possible to pass a 
+DateTime object instead of an epoch value.
+
+Only those entries are returned which match the validity specification.
+
+Examples:
+
+  VALID_AT => time
+or
+  VALID_AT => DateTime->now
+
+selects entries that are valid now
+
+
+  VALID_AT => time + 3600
+
+selects entries that will be valid in one hour
+
+  VALID_AT => [ time, time + 3600 ]
+
+selects entries that are valid now and also one hour from now.
+
+
+=head4 Validity specification for joined tables
+
+If multiple queries are linked using the join syntax, the VALID_AT
+named parameter must be an array reference very similar to the JOIN
+specification. The number of array elements must match the number of
+joined tables. Each individual entry of the arrayref specifies the
+validity for the corresponding table, just as in JOIN. For tables that
+do not have a NOTBEFORE/NOTAFTER date, the array element must be undef.
+Tables that have a validity may have a validity specification just as
+explained in the previous section for single table queries.
+
+Example:
+
+  $result = $dbi->select(
+    #          first table    second table
+    TABLE => [ 'CERTIFICATE', 'CERTIFICATE_ATTRIBUTES' ],
+
+    # return these columns
+    COLUMNS => [ 'CERTIFICATE.SUBJECT' ],
+    
+    JOIN => [
+	#  on first table second table
+	[ 'IDENTIFIER', 'IDENTIFIER' ],
+    ],
+    #             first table            second table (no notbefore -> undef)
+    VALID_AT => [ [ time, time + 3600 ], undef ],
+    DYNAMIC => {
+	'CERTIFICATE_ATTRIBUTES.ATTRIBUTE_KEY' => 'somekey-5',
+    },
+    );
+
 
 =head4 Aggregate statements
 

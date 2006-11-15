@@ -3,7 +3,7 @@ use warnings;
 use Test;
 use DateTime;
 
-BEGIN { plan tests => 26 };
+BEGIN { plan tests => 50 };
 
 print STDERR "OpenXPKI::Server::DBI: Queries with constraints and joins\n";
 
@@ -17,6 +17,7 @@ our $dbi;
 require 't/30_dbi/common.pl';
 
 ok (1);
+
 
 # insert some sample data
 my $history_id = 100000;
@@ -74,7 +75,91 @@ foreach my $ii (10001 .. 10005) {
     }
 }
 
+
+# insert dummy certificates
+# please note that previous tests insert two additional certificates:
+# valid -2 years to now and
+# valid now to +2 years
+
+my $cert_serial = 1;
+my $attribute_serial = 1;
+my $now = time;
+
+# 1 expired
+$dbi->insert(
+    TABLE => 'CERTIFICATE_ATTRIBUTES',
+    HASH => 
+    {
+	IDENTIFIER               => "dummy_identifier_$cert_serial",
+	ATTRIBUTE_KEY            => 'dummy key',
+	ATTRIBUTE_VALUE          => 'dummy value',
+	ATTRIBUTE_SERIAL         => $attribute_serial++,
+    });
+
+$dbi->insert(
+    TABLE => 'CERTIFICATE',
+    HASH => 
+    {
+	IDENTIFIER               => "dummy_identifier_$cert_serial",
+	PKI_REALM                => 'Test Root CA',
+	ISSUER_IDENTIFIER        => 'issuer_dummy_identifier',
+	ISSUER_DN                => 'n/a',
+	DATA                     => 'n/a',
+	SUBJECT                  => 'Dummy Certificate $cert_serial',
+	EMAIL                    => 'n/a',
+	STATUS                   => 'ISSUED',
+	ROLE                     => 'n/a',
+	PUBKEY                   => 'n/a',
+	SUBJECT_KEY_IDENTIFIER   => 'n/a',
+	AUTHORITY_KEY_IDENTIFIER => 'n/a',
+	NOTBEFORE                => $now - 86400,
+	NOTAFTER                 => $now - 1,
+	LOA                      => 'n/a',
+	CSR_SERIAL               => 'n/a',
+	CERTIFICATE_SERIAL       => $cert_serial++,
+    });
+
+# 1 valid
+$dbi->insert(
+    TABLE => 'CERTIFICATE_ATTRIBUTES',
+    HASH => 
+    {
+	IDENTIFIER               => "dummy_identifier_$cert_serial",
+	ATTRIBUTE_KEY            => 'dummy key',
+	ATTRIBUTE_VALUE          => 'dummy value',
+	ATTRIBUTE_SERIAL         => $attribute_serial++,
+    });
+
+$dbi->insert(
+    TABLE => 'CERTIFICATE',
+    HASH => 
+    {
+	IDENTIFIER               => "dummy_identifier_$cert_serial",
+	PKI_REALM                => 'Test Root CA',
+	ISSUER_IDENTIFIER        => 'issuer_dummy_identifier',
+	ISSUER_DN                => 'n/a',
+	DATA                     => 'n/a',
+	SUBJECT                  => 'Dummy Certificate $cert_serial',
+	EMAIL                    => 'n/a',
+	STATUS                   => 'ISSUED',
+	ROLE                     => 'n/a',
+	PUBKEY                   => 'n/a',
+	SUBJECT_KEY_IDENTIFIER   => 'n/a',
+	AUTHORITY_KEY_IDENTIFIER => 'n/a',
+	NOTBEFORE                => $now - 86400,
+	NOTAFTER                 => $now + 86400,
+	LOA                      => 'n/a',
+	CSR_SERIAL               => 'n/a',
+	CERTIFICATE_SERIAL       => $cert_serial++,
+    });
+
+
+
+
 ok($dbi->commit());
+
+
+###########################################################################
 
 # simple ranged queries
 my $result;
@@ -280,5 +365,88 @@ $result = $dbi->select(
 ok(scalar @{$result}, 1);
 ok($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
 ok($result->[0]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-9');
+
+
+
+
+###########################################################################
+# validity tests (uses certificates and CRLs from 02.t)
+
+
+my @validity_specs = (
+    # spec                                           expected hits
+    # single time                                    03.t + 02.t
+    [ time - (7 * 24 * 3600),                        0 + 1 ],
+    [ time - (     1 * 3600),                        2 + 1 ],
+    [ time,                                          1 + 2 ],
+    [ DateTime->now,                                 1 + 2 ],
+
+    # multiple points in time
+    # note that 02.t certs are not matched (because they have no 
+    # certificate_attribute entry)
+    [ [ DateTime->now, time - 3600 ],                1 + 1 ],
+    [ [ time - 3600, time + 3600 ],                  1 + 1 ],
+    [ [ time - 3600, time - 7200 ],                  2 + 1 ],
+    [ [ time - 3600, time - 7200, time - 14400 ],    2 + 1 ],
+    );
+
+### simple validity...
+foreach my $spec (@validity_specs) {
+    ### $spec
+    $result = $dbi->select(
+	TABLE => 'CERTIFICATE',
+	VALID_AT => $spec->[0],
+	);
+
+    ok(scalar @{$result}, $spec->[1]);
+}
+
+
+###########################################################################
+### validity in joins...
+foreach my $spec (@validity_specs) {
+    ### $spec
+    $result = $dbi->select(
+	#          first table second table
+	TABLE => [ 'CERTIFICATE', 'CERTIFICATE_ATTRIBUTES' ],
+	
+	# return these columns
+	COLUMNS => [ 
+	    'CERTIFICATE.SUBJECT',
+	],
+	JOIN => [
+	    #  on first table     second table   
+	    [ 'IDENTIFIER', 'IDENTIFIER' ],
+	],
+	#             first table  second table (n/a)
+	VALID_AT => [ $spec->[0],  undef ],
+	);
+    
+    ok(scalar @{$result}, $spec->[1]);
+}
+
+
+### validity in aliased joins...
+foreach my $spec (@validity_specs) {
+    ### $spec
+    $result = $dbi->select(
+	#          first table second table
+	TABLE => [ [ 'CERTIFICATE' => 'cert' ], 'CERTIFICATE_ATTRIBUTES' ],
+	
+	# return these columns	COLUMNS => [ 
+	COLUMNS => [ 
+	    'cert.SUBJECT',
+	],
+	JOIN => [
+	    #  on first table     second table   
+	    [ 'IDENTIFIER', 'IDENTIFIER' ],
+	],
+	#             first table  second table (n/a)
+	VALID_AT => [ $spec->[0],  undef ],
+	);
+    
+    ok(scalar @{$result}, $spec->[1]);
+}
+
 
 1;

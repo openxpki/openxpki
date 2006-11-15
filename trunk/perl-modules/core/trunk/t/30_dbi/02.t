@@ -47,6 +47,18 @@ my $serial = $dbi->get_new_serial(
 $hash{'CERTIFICATE_SERIAL'} = $serial;
 
 $dbi->insert (TABLE => "CERTIFICATE", HASH => \%hash);
+
+my $attribute_serial = 1;
+$dbi->insert(
+    TABLE => 'CERTIFICATE_ATTRIBUTES',
+    HASH => 
+    {
+	IDENTIFIER               => $cert->get_identifier(),
+	ATTRIBUTE_KEY            => 'dummy key',
+	ATTRIBUTE_VALUE          => 'dummy value',
+	ATTRIBUTE_SERIAL         => $attribute_serial++,
+    });
+
 $dbi->commit();
 ok(1);
 if ($ENV{DEBUG}) {
@@ -63,6 +75,15 @@ $serial = $dbi->get_new_serial(
 $hash{'CERTIFICATE_SERIAL'} = $serial;
 
 $dbi->insert (TABLE => "CERTIFICATE", HASH => \%hash);
+$dbi->insert(
+    TABLE => 'CERTIFICATE_ATTRIBUTES',
+    HASH => 
+    {
+	IDENTIFIER               => $cert2->get_identifier(),
+	ATTRIBUTE_KEY            => 'dummy key',
+	ATTRIBUTE_VALUE          => 'dummy value',
+	ATTRIBUTE_SERIAL         => $attribute_serial++,
+    });
 $dbi->commit();
 ok(1);
 if ($ENV{DEBUG}) {
