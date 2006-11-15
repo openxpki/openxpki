@@ -129,14 +129,14 @@ msgstr "Usable"
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Download certificate"
 
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL"
+msgstr "Install email certificate of another user"
+
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
-msgstr "Install the certificate for a private key"
+msgstr "Install the certificate for your private key"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
 msgstr "Microsoft Internet Explorer"
-
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
-msgstr "Microsoft Internet Explorer with matching private key"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA"
 msgstr "Mozilla, Firefox, Opera"
@@ -146,6 +146,9 @@ msgstr "PEM or CRT"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
 msgstr "TXT"
+
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_USER_ENROLL"
+msgstr "Install your certificate"
 
 msgid "I18N_OPENXPKI_CERT_EMAIL"
 msgstr "Email address"
@@ -611,9 +614,9 @@ msgstr "Creating the name of the certificate"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_WORKFLOW_TYPE_DESCRIPTION"
 msgstr ""
-"There is more than one workflow type available for the certificate "
-"signing request (CSR) generation. Please choose on of the "
-"available workflow types to proceed."
+"There is more than one workflow type available for the certificate signing "
+"request (CSR) generation. Please choose on of the available workflow types "
+"to proceed."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_WORKFLOW_TYPE_TITLE"
 msgstr "Choose a workflow type"
@@ -1195,9 +1198,6 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
 msgstr ""
 
 #, fuzzy
@@ -3705,8 +3705,8 @@ msgstr "This is the workflow to handle a certificate signing request at once."
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr ""
-"This is the workflow to handle a certificate signing request (CSR) "
-"if a offline CA is in use."
+"This is the workflow to handle a certificate signing request (CSR) if a "
+"offline CA is in use."
 
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "This is the workflow to issue fresh CRLs."
@@ -3989,6 +3989,13 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
+#~ msgstr "Microsoft Internet Explorer with matching private key"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA_ENROLL"
+#~ msgstr "Install the certificate for a private key"
 
 #~ msgid "I18N_OPENXPKI_CA_SUBJECT"
 #~ msgstr "Subject"

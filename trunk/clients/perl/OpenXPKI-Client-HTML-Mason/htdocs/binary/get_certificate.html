@@ -29,12 +29,13 @@
   ## first we have to determine the content-type
   switch ($content_type)
   {
-    case "X509_CA_CERT"   {$content_type = "application/x-x509-ca-cert"}
-    case "X509_USER_CERT" {$content_type = "application/x-x509-user-cert"}
-    case "IE_CA"          {$content_type = "application/x-x509-ca-cert"}
-    case "IE_USER"        {$content_type = "application/x-x509-user-cert"}
-    case "IE_ENROLL"      {$content_type = "text/html"}
-    case "PLAIN"          {$content_type = "text/plain"}
+    case "X509_CA_CERT"    {$content_type = "application/x-x509-ca-cert"}
+    case "X509_USER_CERT"  {$content_type = "application/x-x509-user-cert"}
+    case "X509_EMAIL_CERT" {$content_type = "application/x-x509-email-cert"}
+    case "IE_CA"           {$content_type = "application/x-x509-ca-cert"}
+    case "IE_USER"         {$content_type = "application/x-x509-user-cert"}
+    case "IE_ENROLL"       {$content_type = "text/html"}
+    case "PLAIN"           {$content_type = "text/plain"}
     else {
           print "<h1>".i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_TITLE')."</h1>\n";
           print "<p>\n";

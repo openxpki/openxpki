@@ -137,15 +137,15 @@ msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Подразделение"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL"
+msgstr "Подразделение"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
 msgstr "Подразделение"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
-msgstr "Microsoft Internet Explorer"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
 msgstr "Microsoft Internet Explorer"
 
 #, fuzzy
@@ -158,6 +158,10 @@ msgstr "Подразделение"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_USER_ENROLL"
 msgstr "Подразделение"
 
 #, fuzzy
@@ -1317,9 +1321,6 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED"
@@ -4140,6 +4141,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_YES"
 msgstr "uid"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
+#~ msgstr "Microsoft Internet Explorer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA_ENROLL"
+#~ msgstr "Подразделение"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CA_SUBJECT"
