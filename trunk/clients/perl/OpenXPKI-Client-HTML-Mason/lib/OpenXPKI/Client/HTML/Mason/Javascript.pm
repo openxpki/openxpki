@@ -60,19 +60,7 @@ sub get_function
 ## the definitions are at the end because they desorientate
 ## (with qq) the syntax parser of vim :)
 
-$FUNCTION{default} = qq^
-    <!-- Use the Microsoft ActiveX control to install the certificate -->
-    <object
-        classid="clsid:43f8f289-7a20-11d0-8f06-00c04fc295e1"
-        codebase="xenroll.dll"
-        id="certHelperOld">
-    </object>
-    <object
-        classid= "clsid:127698e4-e730-4e5c-a2b1-21490a70c8a1"
-        codebase="xenroll.dll"
-        id="certHelperNew">
-    </object>
-^;
+$FUNCTION{default} = "";
 
 $FUNCTION{install_cert_ie} = qq^
 <script type="text/javascript">
@@ -80,24 +68,21 @@ $FUNCTION{install_cert_ie} = qq^
     function InstallCertIE (form)
     {
         // Explorer Installation
+        dim xenroll
 
         if (form.cert.value == "") {
             // certificate not found
            document.all.result.innerText = "I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_NO_CERTIFICATE";
            return false;
         }
-   
+
+        xenroll = getXEnroll   
         try {
-            certHelperOld.acceptPKCS7(form.cert.value);
-        }
-        catch(e) {
-            try {
-                certHelperNew.acceptPKCS7(form.cert.value);
-            } catch (e) {
-                // perhaps already installed
-                document.all.result.innerText = "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR";
-                return false;
-            }
+            xenroll.acceptPKCS7(form.cert.value);
+        } catch (e) {
+            // perhaps already installed
+            document.all.result.innerText = "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR";
+            return false;
         }
         document.all.result.innerText = "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS";
     }
@@ -206,33 +191,31 @@ $FUNCTION{gen_csr_ie} = qq^
 <script type="text/vbscript">
 <!--
         dim PROV_RSA_FULL
-        dim OLD_XENROLL
-        dim NEW_XENROLL
 
         PROV_RSA_FULL = 1
-        OLD_XENROLL   = 0
-        NEW_XENROLL   = 1
 
         Function getXEnroll
-            dim tester
+            dim error
 
             On Error Resume Next
 
-            tester = certHelperOld.MyStoreName
-            if Len (tester) > 0 then
-                getXEnroll = OLD_XENROLL
-                ' it is important to harry the users with the info that they use a completely outdated IE
-                'MsgBox ("You are using an old Internet Explorer with a security bug in XEnroll.dll (MS02-48).")
-                MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED")
-            else
-                tester = certHelperNew.MyStoreName
-                if Len (tester) > 0 then
-                    getXEnroll = NEW_XENROLL
-                    ' it is not necessary to harry the users with the info that they use a patched IE
-                    'MsgBox ("You are using patched Internet Explorer.")
-                    'MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED")
+            getXEnroll = CreateObject("CEnroll.CEnroll.2")
+            if ( (Err.Number = 438) or (Err.Number = 429) ) then
+                set error = Err.Number
+                Err.Clear
+                getXEnroll = CreateObject("CEnroll.CEnroll.1")
+                if (Err.Number) then
+                    document.write("<h1>Can't instantiate the CEnroll control: " & Hex(error) )
+                else
+                    document.write("<h1>" & "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED" & "</h1>" )
                 end if
+                getXEnroll = ""
+                Err.Clear
             end if
+            if Err.Number <> 0 then
+                document.write("<h1>Can't instantiate the CEnroll control: " & Hex(err) & "</h1>")
+                getXEnroll = ""
+            end fi
         End Function
 
         Sub CreateCSR
@@ -252,21 +235,11 @@ $FUNCTION{gen_csr_ie} = qq^
             re.Pattern = "__CSP_NAME__"
             name = theForm.csp.options(document.OPENXPKI.csp.selectedIndex).value
             if Len(name) > 0 then
-                if xenroll = OLD_XENROLL then
-                    certHelperOld.ProviderName=name
-                    'MsgBox ("The used Cryptographic Service Provider is " & certHelperOld.ProviderName)
-                    MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME", certHelperOld.ProviderName))
-                else
-                    certHelperNew.ProviderName=name
-                    'MsgBox ("The used Cryptographic Service Provider is " & certHelperNew.ProviderName)
-                    MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME", certHelperNew.ProviderName))
-                end if
+                xenroll.ProviderName=name
+                'MsgBox ("The used Cryptographic Service Provider is " & xenroll.ProviderName)
+                MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME", xenroll.ProviderName))
             else
-                if xenroll = OLD_XENROLL then
-                    certHelperOld.ProviderName=""
-                else
-                    certHelperNew.ProviderName=""
-                end if
+                xenroll.ProviderName=""
                 'MsgBox ("The used Cryptographic Service Provider is the default one.")
                 MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP")
             end if
@@ -279,39 +252,22 @@ $FUNCTION{gen_csr_ie} = qq^
             'MsgBox ("SUBJECT is " & szName)
             Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT", szName))
 
-            if xenroll = OLD_XENROLL then
-                certHelperOld.providerType = PROV_RSA_FULL
-                certHelperOld.HashAlgorithm = "SHA1"
-                certHelperOld.KeySpec = 1
-                certHelperOld.GenKeyFlags = 134217731
-                if theForm.bits.value =  512 then
-                    certHelperOld.GenKeyFlags = 33554435
-                end if
-                if theForm.bits.value =  1024 then
-                    certHelperOld.GenKeyFlags = 67108867
-                end if
-                if theForm.bits.value =  2048 then
-                    certHelperOld.GenKeyFlags = 134217731
-                end if
-                sz10 = certHelperOld.CreatePKCS10(szName, "1.3.6.1.4.1.311.2.1.21")
-            else
-                certHelperNew.providerType = PROV_RSA_FULL
-                certHelperNew.HashAlgorithm = "SHA1"
-                certHelperNew.KeySpec = 1
-                certHelperNew.GenKeyFlags = 134217731
-                if theForm.bits.value =  512 then
-                    certHelperNew.GenKeyFlags = 33554435
-                end if
-                if theForm.bits.value =  1024 then
-                    certHelperNew.GenKeyFlags = 67108867
-                end if
-                if theForm.bits.value =  2048 then
-                    certHelperNew.GenKeyFlags = 134217731
-                end if
-                sz10 = certHelperNew.CreatePKCS10(szName, "1.3.6.1.4.1.311.2.1.21")
+            xenroll.providerType = PROV_RSA_FULL
+            xenroll.HashAlgorithm = "SHA1"
+            xenroll.KeySpec = 1
+            xenroll.GenKeyFlags = 134217731
+            if theForm.bits.value =  512 then
+                xenroll.GenKeyFlags = 33554435
             end if
+            if theForm.bits.value =  1024 then
+                xenroll.GenKeyFlags = 67108867
+            end if
+            if theForm.bits.value =  2048 then
+                xenroll.GenKeyFlags = 134217731
+            end if
+            sz10 = xenroll.CreatePKCS10(szName, "1.3.6.1.4.1.311.2.1.21")
 
-            ' certHelper.GenKeyFlags
+            ' xenroll.GenKeyFlags
             '                        0x0400     keylength (first 16 bit) => 1024
             '                        0x00000001 CRYPT_EXPORTABLE
             '                        0x00000002 CRYPT_USER_PROTECTED
@@ -323,31 +279,17 @@ $FUNCTION{gen_csr_ie} = qq^
             ' try pragmatical failover - we simply set another subject
             if Len(sz10) = 0 then 
                 Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER", alternate_subject))
-                if xenroll = OLD_XENROLL then
-                    certHelperOld.GenKeyFlags = 134217730
-                    if theForm.bits.value =  512 then
-                        certHelperOld.GenKeyFlags = 33554434
-                    end if
-                    if theForm.bits.value =  1024 then
-                        certHelperOld.GenKeyFlags = 67108866
-                    end if
-                    if theForm.bits.value =  2048 then
-                        certHelperOld.GenKeyFlags = 134217730
-                    end if
-                    sz10 = certHelperOld.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
-                else
-                    certHelperNew.GenKeyFlags = 134217730
-                    if theForm.bits.value =  512 then
-                        certHelperNew.GenKeyFlags = 33554434
-                    end if
-                    if theForm.bits.value =  1024 then
-                        certHelperNew.GenKeyFlags = 67108866
-                    end if
-                    if theForm.bits.value =  2048 then
-                        certHelperNew.GenKeyFlags = 134217730
-                    end if
-                    sz10 = certHelperNew.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
+                xenroll.GenKeyFlags = 134217730
+                if theForm.bits.value =  512 then
+                    xenroll.GenKeyFlags = 33554434
                 end if
+                if theForm.bits.value =  1024 then
+                    xenroll.GenKeyFlags = 67108866
+                end if
+                if theForm.bits.value =  2048 then
+                    xenroll.GenKeyFlags = 134217730
+                end if
+                sz10 = xenroll.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
 
                 if Len(sz10) = 0 then 
                     'MsgBox ("The generation of the request failed") 
@@ -381,12 +323,7 @@ $FUNCTION{gen_csr_ie} = qq^
             document.OPENXPKI.csp.selectedIndex = 0
 
             do
-                name = ""
-                if xenroll = OLD_XENROLL then
-                    name = certHelperOld.enumProviders(prov,0)
-                else
-                    name = certHelperNew.enumProviders(prov,0)
-                end if
+                name = xenroll.enumProviders(prov,0)
                 if Len (name) = 0 then
                     exit do
                 else
