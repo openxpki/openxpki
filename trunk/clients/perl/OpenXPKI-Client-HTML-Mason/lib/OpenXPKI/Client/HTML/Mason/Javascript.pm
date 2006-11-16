@@ -63,29 +63,34 @@ sub get_function
 $FUNCTION{default} = "";
 
 $FUNCTION{install_cert_ie} = qq^
-<script type="text/javascript">
+<script type="text/vbscript">
 <!--
-    function InstallCertIE (form)
-    {
-        // Explorer Installation
-        var xenroll;
+    Function InstallCertIE (form)
+        ' Explorer Installation
+        Err.Clear
+        On Error Resume Next
 
-        if (form.cert.value == "") {
-            // certificate not found
-           document.all.result.innerText = "I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_NO_CERTIFICATE";
-           return false;
-        }
+        if (form.cert.value = "") then
+            ' certificate not found
+            MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_NO_CERTIFICATE")
+           InstallCertIE = false
+        end if
 
-        xenroll = getXEnroll;
-        try {
-            xenroll.acceptPKCS7(form.cert.value);
-        } catch (e) {
-            // perhaps already installed
-            document.all.result.innerText = "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR";
-            return false;
-        }
-        document.all.result.innerText = "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS";
-    }
+        dim xenroll
+        Set xenroll = getXEnroll   
+
+        xenroll.ProviderName = form.csp.value
+        xenroll.acceptPKCS7(form.cert.value)
+        
+        if Err.Number <> 0 then
+            ' perhaps already installed
+            MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR")
+            InstallCertIE = false
+        else
+            MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS")
+            InstallCertIE = true
+        end if
+    End Function
 -->
 </script>
 ^;
@@ -196,10 +201,12 @@ $FUNCTION{gen_csr_ie} = qq^
 
         Function getXEnroll
             dim error
+            Err.Clear
 
             On Error Resume Next
 
-            set getXEnroll = CreateObject("CEnroll.CEnroll.2")
+            dim XEnrollObject
+            Set XEnrollObject = CreateObject("CEnroll.CEnroll.2")
             if Err.Number <> 0 then
                 if ( (Err.Number = 438) or (Err.Number = 429) ) then
                     ' the msgbox is used to signal the error code
@@ -209,9 +216,11 @@ $FUNCTION{gen_csr_ie} = qq^
                 else
                     document.write("<h1>Can't instantiate the CEnroll control: " & Hex(err) & "</h1>")
                 end if
+                
                 getXEnroll = ""
                 Err.Clear
             end if
+            Set getXEnroll = XEnrollObject
         End Function
 
         Sub CreateCSR
@@ -221,13 +230,12 @@ $FUNCTION{gen_csr_ie} = qq^
             dim szName
             dim sz10
             dim xenroll
-            dim name
-            dim alternate_subject
 
             On Error Resume Next
             set theForm = document.OPENXPKI
-            set re = new regexp 
-            set xenroll = getXEnroll
+            Set re = new regexp 
+
+            Set xenroll = getXEnroll
 
             re.Pattern = "__CSP_NAME__"
             name = theForm.csp.options(document.OPENXPKI.csp.selectedIndex).value
@@ -314,14 +322,14 @@ $FUNCTION{gen_csr_ie} = qq^
 
             On Error Resume Next
 
-            set xenroll = getXEnroll
+            Set xenroll = getXEnroll
 
             prov=0
             document.OPENXPKI.csp.selectedIndex = 0
 
             do
                 name = xenroll.enumProviders(prov,0)
-                if Err.Number <> 0 then
+                if Len (name) = 0 then
                     exit do
                 else
                     set element = document.createElement("OPTION") 
@@ -329,6 +337,7 @@ $FUNCTION{gen_csr_ie} = qq^
                     element.value = name
                     document.OPENXPKI.csp.add(element) 
                     prov = prov + 1
+                    name = ""
                 end if
             loop
 
