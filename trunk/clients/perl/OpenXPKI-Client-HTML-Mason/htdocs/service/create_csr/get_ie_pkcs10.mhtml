@@ -95,6 +95,19 @@
     ## Microsoft does not support RFC2253
     ## Microsoft does not know uid
     my $dn = OpenXPKI::DN->new($subject);
-    my $ie_subject = $dn->get_x500_dn();
-       $ie_subject =~ s/uid=/0.9.2342.19200300.100.1.1/g;
+    my @rdns = $dn->get_attributes();
+    my $ie_subject = "";
+    foreach my $rdn (reverse @rdns)
+    {
+        $ie_subject .= "," if (length $ie_subject);
+        my $part = "";
+        foreach my $attr (@{$rdn})
+        {
+            $part .= "+" if (length $part);
+            $attr  = "0.9.2342.19200300.100.1.1=".substr ($attr,4)
+                if (lc(substr($attr, 0, 4)) eq "uid=");
+            $part .= $attr;
+        }
+        $ie_subject .= $part;
+    }
 </%init>
