@@ -71,7 +71,6 @@ sub evaluate {
     my $now = DateTime->now()->epoch();
 
     # look up valid certificates matching the subject
-    # TODO -- notbefore < now, notafter > now
     my $certs = $dbi->select(
         TABLE   => 'CERTIFICATE',
         COLUMNS => [
@@ -85,6 +84,7 @@ sub evaluate {
             'PKI_REALM' => $pki_realm,
         },
         REVERSE => 1,
+        VALID_AT => time,
     );
 
     ##! 128: 'certs: ' . Dumper $certs
