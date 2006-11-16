@@ -200,22 +200,18 @@ $FUNCTION{gen_csr_ie} = qq^
             On Error Resume Next
 
             getXEnroll = CreateObject("CEnroll.CEnroll.2")
-            if ( (Err.Number = 438) or (Err.Number = 429) ) then
-                set error = Err.Number
-                Err.Clear
-                getXEnroll = CreateObject("CEnroll.CEnroll.1")
-                if (Err.Number) then
-                    document.write("<h1>Can't instantiate the CEnroll control: " & Hex(error) )
-                else
+            if Err.Number <> 0 then
+                if ( (Err.Number = 438) or (Err.Number = 429) ) then
+                    ' the msgbox is used to signal the error code
+                    ' because 429 and 438 do not always mean MS 02-48
+                    MsgBox("Error: " & Hex(err))
                     document.write("<h1>" & "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED" & "</h1>" )
+                else
+                    document.write("<h1>Can't instantiate the CEnroll control: " & Hex(err) & "</h1>")
                 end if
                 getXEnroll = ""
                 Err.Clear
             end if
-            if Err.Number <> 0 then
-                document.write("<h1>Can't instantiate the CEnroll control: " & Hex(err) & "</h1>")
-                getXEnroll = ""
-            end fi
         End Function
 
         Sub CreateCSR
