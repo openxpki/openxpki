@@ -68,7 +68,7 @@ $FUNCTION{install_cert_ie} = qq^
     function InstallCertIE (form)
     {
         // Explorer Installation
-        dim xenroll
+        var xenroll;
 
         if (form.cert.value == "") {
             // certificate not found
@@ -76,7 +76,7 @@ $FUNCTION{install_cert_ie} = qq^
            return false;
         }
 
-        xenroll = getXEnroll   
+        xenroll = getXEnroll;
         try {
             xenroll.acceptPKCS7(form.cert.value);
         } catch (e) {
@@ -199,7 +199,7 @@ $FUNCTION{gen_csr_ie} = qq^
 
             On Error Resume Next
 
-            getXEnroll = CreateObject("CEnroll.CEnroll.2")
+            set getXEnroll = CreateObject("CEnroll.CEnroll.2")
             if Err.Number <> 0 then
                 if ( (Err.Number = 438) or (Err.Number = 429) ) then
                     ' the msgbox is used to signal the error code
@@ -221,12 +221,13 @@ $FUNCTION{gen_csr_ie} = qq^
             dim szName
             dim sz10
             dim xenroll
+            dim name
+            dim alternate_subject
 
             On Error Resume Next
             set theForm = document.OPENXPKI
-            Set re = new regexp 
-
-            xenroll = getXEnroll
+            set re = new regexp 
+            set xenroll = getXEnroll
 
             re.Pattern = "__CSP_NAME__"
             name = theForm.csp.options(document.OPENXPKI.csp.selectedIndex).value
@@ -313,14 +314,14 @@ $FUNCTION{gen_csr_ie} = qq^
 
             On Error Resume Next
 
-            xenroll = getXEnroll
+            set xenroll = getXEnroll
 
             prov=0
             document.OPENXPKI.csp.selectedIndex = 0
 
             do
                 name = xenroll.enumProviders(prov,0)
-                if Len (name) = 0 then
+                if Err.Number <> 0 then
                     exit do
                 else
                     set element = document.createElement("OPTION") 
