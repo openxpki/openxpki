@@ -91,6 +91,10 @@
     }
 
     ## ok we have to display the whole stuff
+
+    ## Microsoft does not support RFC2253
+    ## Microsoft does not know uid
     my $dn = OpenXPKI::DN->new($subject);
     my $ie_subject = $dn->get_x500_dn();
+       $ie_subject =~ s/uid=/0.9.2342.19200300.100.1.1/g;
 </%init>
