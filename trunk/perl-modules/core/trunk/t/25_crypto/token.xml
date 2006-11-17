@@ -1,4 +1,5 @@
 <token_config>
+
     <token id="default">
         <backend>OpenXPKI::Crypto::Backend::OpenSSL</backend>
         <!--
@@ -34,7 +35,7 @@
         <key>t/25_crypto/ca1/cakey.pem</key>
 
 	<!-- CA passphrase -->
-        <secret method="Literal">1234567890</secret>
+        <secret>default</secret>
     </token>
 
     <token id="ca2" super="common/token_config/token{ca1}">
@@ -42,7 +43,7 @@
         <key>t/25_crypto/ca2/cakey.pem</key>
 
 	<!-- CA passphrase -->
-        <secret method="Literal">1234567890</secret>
+        <secret>default</secret>
     </token>
 
     <token id="default_gost" super="common/token_config/token{default}">
@@ -76,7 +77,7 @@
         <internal_chain>t/25_crypto/cagost/cacert.pem</internal_chain>
 
         <!-- CA passphrase -->
-        <secret method="Literal">1234567890</secret>
+        <secret>default</secret>
     </token>
 
     <token id="default_nciph" super="common/token_config/token{default}">
@@ -104,7 +105,7 @@ THREAD_LOCKING = 1
 
         <key>__NCIPHER_KEY__</key>
 
-        <secret method="Literal"></secret>
+        <secret>hsm</secret>
 
     </token>
 

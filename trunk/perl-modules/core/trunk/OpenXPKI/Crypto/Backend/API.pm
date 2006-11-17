@@ -269,7 +269,7 @@ sub START {
         next if (grep /^$key$/, ("TMP", "NAME",
                                  "PKI_REALM_INDEX",
                                  "TOKEN_TYPE", "TOKEN_INDEX",
-                                 "CERTIFICATE"));
+                                 "CERTIFICATE", "SECRET"));
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_ILLEGAL_PARAMETER",
             params  => {NAME => $key, VALUE => $arg_ref->{$key}});

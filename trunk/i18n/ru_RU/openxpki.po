@@ -526,6 +526,18 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_TITLE"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_KEY_LIST_DESCRIPTION"
+msgstr ""
+"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+"внимательны - данная система поддерживает множественные реализации "
+"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
+"вы в настоящий момент работаете, обратитесь к информационному меню."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_KEY_LIST_TITLE"
+msgstr "Веб-интерфейс Удостоверяющего Центра"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_DESCRIPTION"
 msgstr ""
 "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
@@ -547,6 +559,18 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_POLICY_LIST_TITLE"
+msgstr "Веб-интерфейс Удостоверяющего Центра"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SET_SECRET_DESCRIPTION"
+msgstr ""
+"Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+"внимательны - данная система поддерживает множественные реализации "
+"удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
+"вы в настоящий момент работаете, обратитесь к информационному меню."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SET_SECRET_TITLE"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
@@ -1373,6 +1397,10 @@ msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER"
 msgstr "Стандартный способ аутентификации пользователя системы."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP"
+msgstr "Стандартный способ аутентификации пользователя системы."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CRL_FORMAT"
 msgstr "Подразделение"
 
@@ -1877,8 +1905,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_MISSING_PASSWD"
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_INCOMPLETE_SECRET"
 msgstr ""
+"Имена доменов - это части полного DNS-имени. Если имя сервера - www.openxpki."
+"org, то  имена доменов - это www, openxpki и org. Если вы вводите только "
+"одно имя, то это обычно означает, что оно же является и последней частью "
+"полного DNS-имени."
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_PASSWD_TOO_SHORT"
 msgstr ""
@@ -2050,8 +2083,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INIT_FAILED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_PKI_REALM_NOT_FOUND"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_SECRET_UNDEFINED"
+msgstr "Русский"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_LIST_MEMBER_BY_ID_NOT_FOUND"
+msgstr "Русский"
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_NAME"
 msgstr ""
@@ -2067,6 +2105,26 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_GROUPS_MISSING_PKI_REALM"
+msgstr "Русский"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_MISSING_GROUP"
+msgstr "Русский"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_MISSING_PKI_REALM"
+msgstr "Русский"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_CACHE_TYPE"
+msgstr "Русский"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD"
+msgstr "Русский"
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_STOP_SESSION_FAILED"
 msgstr ""
@@ -2384,6 +2442,10 @@ msgstr "Импорт"
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
 msgstr "С истекшим сроком действия"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_KEY_LIST"
+msgstr "Действительные сертификаты"
+
 msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
 msgstr "Язык (Language)"
 
@@ -2511,6 +2573,32 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_READ_FILE_OPEN_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_COMPLETE"
+msgstr "Комментарий"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_INCOMPLETE"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_LABEL"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_LOGIN"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_LOGIN_LINK_LABEL"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_STATUS"
+msgstr "Подразделение"
 
 msgid "I18N_OPENXPKI_SERIALIZATION_SIMPLE_SEPARATOR_IS_NUMERIC"
 msgstr ""
@@ -3605,6 +3693,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_SET_LOCALE_PREFIX_DIR_DOES_NOT_EXIST"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SET_SECRET_PART_NUMBER"
+msgstr "Подразделение"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SET_SECRET_PASSWD"
+msgstr "Подразделение"
+
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_C_NOT_ALLOWED"
 msgstr ""
 "Выбранный способ построения имени не позволяет использовать название страны."
@@ -3637,6 +3733,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE"
 msgstr "При попытке выхода из системы произошла ошибка"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOKEN_CONFIG_HSM_AUTHENTICATION_GROUP"
+msgstr "Стандартный способ аутентификации пользователя системы."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_TOOLKIT_BINARY_NOT_EXECUTABLE"

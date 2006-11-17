@@ -53,6 +53,18 @@
            private key operations) -->
       <token super="common/token_config/token{default}"/>
 
+      <secret>
+        <group id="default" label="I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP">
+          <method id="plain">
+            <parts>1</parts>
+          </method>
+          <cache>
+            <type>session</type>
+            <usage_count>-1</usage_count>
+          </cache>
+        </group>
+      </secret>
+
       [% IF deployment.xmlstyle == 'multi-file' %]
       <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="profile.xml"/>
       [% ELSIF deployment.xmlstyle == 'all-in-one' %]

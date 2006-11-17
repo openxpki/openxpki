@@ -457,6 +457,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_TITLE"
 msgstr "CA-Zertifikate"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_KEY_LIST_DESCRIPTION"
+msgstr "Untenstehend finden Sie das Ergebnis Ihrer Suche."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_KEY_LIST_TITLE"
+msgstr "Gefundene Zertifikate"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_DESCRIPTION"
 msgstr ""
 "Sie befinden sich derzeit im PKI Realm __PKI_REALM__. Ein PKI Realm ist die "
@@ -479,6 +487,17 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_POLICY_LIST_TITLE"
 msgstr "Policy-/CPS-Übersicht"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SET_SECRET_DESCRIPTION"
+msgstr ""
+"Hier können Sie Zertifikate suchen. Wenn Sie zu den einzelnen Feldern mehr "
+"Informationen benötigen, dann schauen Sie bitte am Ende der Seite nach, wo "
+"sich Beschreibungen zu den einzelnen Feldern befinden."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SET_SECRET_TITLE"
+msgstr "Zertifikatssuche"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatische Browsererkennung"
@@ -1303,6 +1322,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER"
 msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP"
+msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
+
 msgid "I18N_OPENXPKI_CRL_FORMAT"
 msgstr "Format"
 
@@ -1879,8 +1902,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_MISSING_PASSWD"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_INCOMPLETE_SECRET"
+msgstr "Fehlende Funktionalität"
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_PASSWD_TOO_SHORT"
 msgstr ""
@@ -2068,8 +2092,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INIT_FAILED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_PKI_REALM_NOT_FOUND"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_SECRET_UNDEFINED"
+msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_LIST_MEMBER_BY_ID_NOT_FOUND"
+msgstr "Deutsch"
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_NAME"
 msgstr ""
@@ -2085,6 +2114,28 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_GROUPS_MISSING_PKI_REALM"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_MISSING_GROUP"
+msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_MISSING_PKI_REALM"
+msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_CACHE_TYPE"
+msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD"
+msgstr "Deutsch"
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_STOP_SESSION_FAILED"
 msgstr ""
@@ -2411,6 +2462,10 @@ msgstr "Import"
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
 msgstr "Abgelaufene"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_KEY_LIST"
+msgstr "Aktuelle CRLs"
+
 msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
 msgstr "Sprache (Language)"
 
@@ -2526,6 +2581,30 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_READ_FILE_OPEN_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_COMPLETE"
+msgstr "Kommentar"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_INCOMPLETE"
+msgstr "Gültig bis"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_LABEL"
+msgstr "E-Mailadresse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_LOGIN"
+msgstr "E-Mailadresse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_LOGIN_LINK_LABEL"
+msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SECRET_STATUS"
+msgstr "Status"
 
 msgid "I18N_OPENXPKI_SERIALIZATION_SIMPLE_SEPARATOR_IS_NUMERIC"
 msgstr ""
@@ -3484,6 +3563,14 @@ msgid "I18N_OPENXPKI_SET_LOCALE_PREFIX_DIR_DOES_NOT_EXIST"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SET_SECRET_PART_NUMBER"
+msgstr "E-Mailadresse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SET_SECRET_PASSWD"
+msgstr "Status"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_C_NOT_ALLOWED"
 msgstr "Antrag im OU-Stil"
 
@@ -3515,6 +3602,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE"
 msgstr "Fehler beim Abmelden"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TOKEN_CONFIG_HSM_AUTHENTICATION_GROUP"
+msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_TOOLKIT_BINARY_NOT_EXECUTABLE"

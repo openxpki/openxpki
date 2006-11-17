@@ -1,4 +1,5 @@
 <token_config>
+
     <token id="default">
         <backend>OpenXPKI::Crypto::Backend::OpenSSL</backend>
         <!--
@@ -41,7 +42,7 @@
         <key>[% $ca.dir %]/cakey.pem</key>
 
 	<!-- CA passphrase fragments -->
-        <secret method="Literal">1234567890</secret>
+        <secret>default</secret>
     </token>
     [% END %]
 
@@ -64,7 +65,7 @@
         <key>[% $entry.dir %]/key.pem</key>
 
 	<!-- CA passphrase -->
-        <secret method="Literal">1234567890</secret>
+        <secret>default</secret>
     </token>
     [% END %]
 

@@ -12,6 +12,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 use English;
+use Switch;
 use OpenXPKI::Crypto::Backend::API;
 use OpenXPKI::Crypto::Tool::SCEP::API;
 use OpenXPKI::Crypto::Tool::PKCS7::API;
@@ -29,6 +30,241 @@ sub new {
 
     ##! 1: "end - token manager is ready"
     return $self;
+}
+
+######################################################################
+##                authentication management                         ##
+######################################################################
+
+sub __load_secret_groups
+{
+    ##! 1: "start"
+    my $self = shift;
+    my $keys = shift;
+
+    ##! 2: "get the arguments"
+    my $realm = $keys->{PKI_REALM};
+    if (not $realm)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_GROUPS_MISSING_PKI_REALM");
+    }
+
+    ##! 2: "determine pki realm index"
+    my $realm_index = $self->__get_list_member_by_id ({
+                          XPATH    => ['pki_realm'],
+                          COUNTER  => [],
+                          ID_LABEL => 'name',
+                          ID_VALUE => $realm});
+
+    ##! 2: "load all groups"
+    my $count = CTX('xml_config')->get_xpath_count (
+                    XPATH   => [ 'pki_realm', 'common', 'secret', 'group' ],
+                    COUNTER => [ $realm_index, 0, 0 ]);
+    for (my $i=0; $i < $count; $i++)
+    {
+        my $group = CTX('xml_config')->get_xpath (
+                    XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'id' ],
+                    COUNTER => [ $realm_index, 0, 0, $i, 0 ]);
+        $self->__load_secret ({PKI_REALM => $realm, GROUP => $group});
+    }
+
+    ##! 1: "finished: $count"
+    $self->{SECRET_COUNT} = $count;
+    return $count;
+}
+
+sub __load_secret
+{
+    ##! 1: "start"
+    my $self = shift;
+    my $keys = shift;
+
+    ##! 2: "get the arguments"
+    my $group = $keys->{GROUP};
+    my $realm = $keys->{PKI_REALM};
+    if (not $realm)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_MISSING_PKI_REALM");
+    }
+    if (not $group)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_MISSING_GROUP");
+    }
+
+    ##! 2: "get the position of the group configuration"
+
+    my $realm_index = $self->__get_list_member_by_id ({
+                          XPATH    => ['pki_realm'],
+                          COUNTER  => [],
+                          ID_LABEL => 'name',
+                          ID_VALUE => $realm});
+    my $group_index = $self->__get_list_member_by_id ({
+                          XPATH    => ['pki_realm', 'common', 'secret', 'group'],
+                          COUNTER  => [$realm_index, 0, 0],
+                          ID_LABEL => 'id',
+                          ID_VALUE => $group});
+
+    ##! 2: "initialize secret object"
+    my $method = CTX('xml_config')->get_xpath (
+                          XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'id' ],
+                          COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+    $self->{SECRET}->{$realm}->{$group}->{TYPE}  = $method;
+    $self->{SECRET}->{$realm}->{$group}->{LABEL} = 
+        CTX('xml_config')->get_xpath (
+                          XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'label' ],
+                          COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+    switch ($method)
+    {
+        case ("literal") {
+            $self->{SECRET}->{$realm}->{$group}->{PART}->[0] =
+                CTX('xml_config')->get_xpath (
+                    XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'value' ],
+                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+            $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({TYPE => "Plain", PARTS => 1});
+            $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($self->{SECRET}->{$realm}->{$group}->{PART}->[0]);
+                         }
+        case ("plain")   {
+            my $parts =
+                CTX('xml_config')->get_xpath (
+                    XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'parts' ],
+                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+            $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
+                    TYPE => "Plain",
+                    PARTS => $parts});
+                         }
+        case ("split")   {
+            my $total =
+                CTX('xml_config')->get_xpath (
+                    XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'total_shares' ],
+                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+            my $required =
+                CTX('xml_config')->get_xpath (
+                    XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'required_shares' ],
+                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+            $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
+                    TYPE => "Split",
+                    QUORUM => { K => $required, N => $total}});
+                         }
+        else {
+              OpenXPKI::Exception->throw (
+                  message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD",
+                  params  => {METHOD => $method});
+             }
+    }
+
+    ##! 2: "load cache configuration"
+    $self->{SECRET}->{$realm}->{$group}->{CACHE} = 
+        CTX('xml_config')->get_xpath (
+            XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'cache', 'type' ],
+            COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} ne "session" and
+        $self->{SECRET}->{$realm}->{$group}->{CACHE} ne "daemon")
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_CACHE_TYPE",
+                  params  => {TYPE => $self->{SECRET}->{$realm}->{$group}->{CACHE}});
+    }
+
+    ##! 1: "finish"
+    return 1;
+}
+
+sub get_secret_groups
+{
+    ##! 1: "start"
+    my $self = shift;
+
+    ##! 2: "init"
+    my $realm = CTX('session')->get_pki_realm();
+    $self->__load_secret_groups({PKI_REALM => $realm})
+        if (not exists $self->{SECRET_COUNT});
+
+    ##! 2: "build list"
+    my %result = ();
+    foreach my $group (keys %{$self->{SECRET}->{$realm}})
+    {
+        $result{$group}->{LABEL} = $self->{SECRET}->{$realm}->{$group}->{LABEL};
+        $result{$group}->{TYPE}  = $self->{SECRET}->{$realm}->{$group}->{TYPE};
+    }
+
+    ##! 1: "finished"
+    return %result;
+}
+
+sub is_secret_group_complete
+{
+    ##! 1: "start"
+    my $self  = shift;
+    my $group = shift;
+
+    ##! 2: "init"
+    my $realm = CTX('session')->get_pki_realm();
+    $self->__load_secret({PKI_REALM => $realm, GROUP => $group})
+        if (not exists $self->{SECRET} or
+            not exists $self->{SECRET}->{$realm} or
+            not exists $self->{SECRET}->{$realm}->{$group});
+
+    ##! 2: "return true if it is complete"
+    my $boolean = $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete();
+    return $boolean if ($boolean);
+
+    ##! 2: "check for the cache"
+    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
+    {
+        ##! 4: "let's load the serialized secret in the session"
+        CTX('session')->get_secret ({
+            GROUP  => $group,
+            SECRET => $self->{SECRET}->{$realm}->{$group}->{REF}});
+    } else {
+        ##! 4: "let's store the serialized secret in the database"
+        #FIXME: ok this is still a missing issue
+    }
+
+    ##! 1: "finished"
+    return $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete();
+}
+
+sub set_secret_group_part
+{
+    ##! 1: "start"
+    my $self  = shift;
+    my $args  = shift;
+    my $group = $args->{GROUP};
+    my $part  = $args->{PART};
+    my $value = $args->{VALUE};
+
+    ##! 2: "init"
+    my $realm = CTX('session')->get_pki_realm();
+    $self->__load_secret({PKI_REALM => $realm, GROUP => $group})
+        if (not exists $self->{SECRET} or
+            not exists $self->{SECRET}->{$realm} or
+            not exists $self->{SECRET}->{$realm}->{$group});
+
+    ##! 2: "set secret"
+    if (defined $part)
+    {
+        $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret({SECRET => $value, PART => $part});
+    } else {
+        $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret($value);
+    }
+
+    ##! 2: "store the secrets"
+    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
+    {
+        ##! 4: "let's store the serialized secret in the session"
+        CTX('session')->set_secret ({
+            GROUP  => $group,
+            SECRET => $self->{SECRET}->{$realm}->{$group}->{REF}});
+    } else {
+        ##! 4: "let's store the serialized secret in the database"
+        #FIXME: ok this is still a missing issue
+    }
+
+    ##! 1: "finished"
+    return 1;
 }
 
 ######################################################################
@@ -124,25 +360,11 @@ sub __add_token
 
     ## get matching pki_realm
 
-    my $realm_count = CTX('xml_config')->get_xpath_count (
-                          XPATH => 'pki_realm');
-    my $realm_index;
-    for (my $i=0; $i<$realm_count; $i++)
-    {
-        ##! 4: "checking pki_realm"
-        next if ($realm ne CTX('xml_config')->get_xpath (
-                              XPATH    => [ 'pki_realm', 'name' ],
-                              COUNTER  => [ $i, 0 ]));
-        ##! 4: "pki_realm ok"
-        $realm_index = $i;
-        last;
-    }
-    if (! defined $realm_index)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_PKI_REALM_NOT_FOUND",
-            params  => {"PKI_REALM" => $realm});
-    }
+    my $realm_index = $self->__get_list_member_by_id ({
+                          XPATH    => ['pki_realm'],
+                          COUNTER  => [],
+                          ID_LABEL => 'name',
+                          ID_VALUE => $realm});
  
     ## get matching type
     my $type_count = CTX('xml_config')->get_xpath_count (
@@ -166,16 +388,46 @@ sub __add_token
             params  => {"NAME" => $name, "TYPE" => $type});
     }
 
+    ##! 2: "determine crypto backend"
     my $backend = CTX('xml_config')->get_xpath (
 		XPATH    => [ 'pki_realm', $type_path, 'token', 'backend' ],
 		COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
-
     if (! defined $backend) {
 	OpenXPKI::Exception->throw (
 	    message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_BACKEND_UNDEFINED",
 	    params  => {"NAME" => $name, 
 			"TYPE" => $type, 
 	    });
+    }
+
+    ##! 2: "determine secret group"
+    my $secret;
+    eval
+    {
+        ## try to get the secret
+        ## the secret is not mandatory (e.g. default tokens)
+        $secret = CTX('xml_config')->get_xpath (
+                      XPATH    => [ 'pki_realm', $type_path, 'token', 'secret' ],
+                      COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
+    };
+    if (not $EVAL_ERROR)
+    {
+        ##! 4: "secret is configured"
+        if (! defined $secret) {
+            OpenXPKI::Exception->throw (
+                 message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_SECRET_UNDEFINED",
+                 params  => {"NAME" => $name, 
+                             "TYPE" => $type, 
+                            });
+        }
+        $self->__load_secret({PKI_REALM => $realm, GROUP => $secret})
+            if (not exists $self->{SECRET} or
+                not exists $self->{SECRET}->{$realm} or
+                not exists $self->{SECRET}->{$realm}->{$secret});
+        $secret = $self->{SECRET}->{$realm}->{$secret}->{REF};
+    } else {
+        ##! 4: "the secret is not configured"
+        $secret = undef;
     }
 
     ##! 2: "try to setup $backend token"
@@ -200,6 +452,7 @@ sub __add_token
                     TOKEN_TYPE      => $type_path,
                     TOKEN_INDEX     => $type_index,
                     CERTIFICATE     => $cert,
+                    SECRET          => $secret
                 });
     };
     if (my $exc = OpenXPKI::Exception->caught())
@@ -231,6 +484,42 @@ sub __add_token
     return $self->{TOKEN}->{$realm}->{$type}->{$name};
 }
 
+sub __get_list_member_by_id
+{
+    ##! 1: "start";
+    my $self = shift;
+    my $args = shift;
+    my $xpath    = $args->{XPATH};
+    my $counter  = $args->{COUNTER};
+    my $id_label = $args->{ID_LABEL};
+    my $id_value = $args->{ID_VALUE};
+
+    ##! 2: "get matching list member"
+
+    my $count = CTX('xml_config')->get_xpath_count (
+                    XPATH => $xpath, COUNTER => $counter);
+    my $index = undef;
+    for (my $i=0; $i<$count; $i++)
+    {
+        ##! 4: "checking id"
+        next if ($id_value ne CTX('xml_config')->get_xpath (
+                                  XPATH    => [ @{$xpath}, $id_label ],
+                                  COUNTER  => [ @{$counter}, $i, 0 ]));
+        ##! 4: "pki_realm ok"
+        $index = $i;
+        last;
+    }
+    if (not defined $index)
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_LIST_MEMBER_BY_ID_NOT_FOUND",
+            params  => {"XPATH" => join (", ", @{$xpath})});
+    }
+
+    ##! 1: "finished: $index"
+    return $index;
+}
+ 
 sub __use_token
 {
     ##! 16: 'start'

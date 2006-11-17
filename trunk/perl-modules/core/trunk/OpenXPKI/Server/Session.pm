@@ -16,6 +16,7 @@ use OpenXPKI::i18n;
 
 ## switch of IP checks
 use CGI::Session qw/-ip-match/;
+use Digest::SHA1 qw( sha1_hex );;
 
 ## constructor and destructor stuff
 
@@ -226,6 +227,27 @@ sub get_id
     return $self->{session}->id();
 }
 
+sub set_secret
+{
+    my $self = shift;
+    my $args = shift;
+    my $group  = $args->{GROUP};
+    my $secret = $args->{SECRET};
+    my $name = "secret_".sha1_hex($group);
+    $self->{session}->param ($name => $secret->get_serialized());
+    $self->{session}->flush();
+}
+
+sub get_secret
+{
+    my $self = shift;
+    my $args = shift;
+    my $group  = $args->{GROUP};
+    my $secret = $args->{SECRET};
+    my $name = "secret_".sha1_hex($group);
+    return $secret->set_serialized ($self->{session}->param ($name));
+}
+
 1;
 __END__
 
@@ -307,5 +329,13 @@ returns a challenge string if such a string was set in the past.
 =item * get_pki_realm
 
 =item * get_id
+
+=item * get_language
+
+=item * set_language
+
+=item * get_secret
+
+=item * set_secret
 
 =back

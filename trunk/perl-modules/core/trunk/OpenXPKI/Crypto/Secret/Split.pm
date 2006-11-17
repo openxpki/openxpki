@@ -21,6 +21,8 @@ use base qw( OpenXPKI::Crypto::Secret );
 use OpenXPKI::Debug 'OpenXPKI::Crypto::Secret::Split';
 use OpenXPKI::Exception;
 use OpenXPKI::Crypto::TokenManager;
+use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Context qw( CTX );
 
 {
     my $DEFAULT_SECRET_BITLENGTH = 128;
@@ -142,7 +144,7 @@ use OpenXPKI::Crypto::TokenManager;
             return 1;
         }
         else {
-            return;
+            return 0;
         }
     }
 
@@ -403,7 +405,31 @@ use OpenXPKI::Crypto::TokenManager;
             }
         }
         return $product;
-    } 
+    }
+
+    sub get_serialized
+    {
+        my $self  = shift;
+        my $ident = ident $self;
+        my %result = ();
+        my $obj = OpenXPKI::Serialization::Simple->new();
+        return CTX('volatile_vault')->encrypt($obj->serialize($received_shares_of{$ident}));
+    }
+
+    sub set_serialized
+    {
+        my $self  = shift;
+        my $ident = ident $self;
+        return if (not CTX('volatile_vault')->can_decrypt());
+        my $dump  = shift;
+        my $obj = OpenXPKI::Serialization::Simple->new();
+        my $array = $obj->deserialize(CTX('volatile_vault')->decrypt($dump));
+        foreach my $item (@{$array})
+        {
+            $self->set_secret($item);
+        }
+        return 1;
+    }
 }
 
 1;

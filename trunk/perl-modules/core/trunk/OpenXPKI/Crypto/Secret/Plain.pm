@@ -19,6 +19,8 @@ use Regexp::Common;
 
 use OpenXPKI::Debug 'OpenXPKI::Crypto::Secret::Plain';
 use OpenXPKI::Exception;
+use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Context qw( CTX );
 
 {
     my %totalparts  : ATTR( :default(1) );
@@ -110,7 +112,7 @@ use OpenXPKI::Exception;
 	my $arg = shift;
 	
 	for (my $ii = 0; $ii < $totalparts{$ident}; $ii++) {
-	    return unless defined $parts{$ident}->[$ii];
+	    return 0 unless defined $parts{$ident}->[$ii];
 	}
 	return 1;
     }
@@ -123,6 +125,28 @@ use OpenXPKI::Exception;
 	return unless $self->is_complete();
 
 	return join('', @{$parts{$ident}});
+    }
+
+    sub get_serialized
+    {
+        my $self  = shift;
+        my $ident = ident $self;
+        return undef if (not $parts{$ident});
+        my %result = ();
+        my $obj = OpenXPKI::Serialization::Simple->new();
+        return CTX('volatile_vault')->encrypt($obj->serialize($parts{$ident}));
+    }
+
+    sub set_serialized
+    {
+        my $self  = shift;
+        my $ident = ident $self;
+        return if (not CTX('volatile_vault')->can_decrypt());
+        my $dump  = shift;
+	return if (not defined $dump or not length $dump);
+        my $obj = OpenXPKI::Serialization::Simple->new();
+        $parts{$ident} = $obj->deserialize(CTX('volatile_vault')->decrypt($dump));
+        return 1;
     }
 }
 

@@ -87,19 +87,19 @@ sub login {
     my $keys = shift;
 
     ## check the supplied parameter
-    if (not exists $keys->{PASSWD})
+    if (not $self->{SECRET}->is_complete())
     {
         ## enforce passphrases
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_MISSING_PASSWD");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_INCOMPLETE_SECRET");
     }
-    if (length $keys->{PASSWD} < 4)
+    $self->{PASSWD} = $self->{SECRET}->get_secret();
+    if (length $self->{PASSWD} < 4)
     {
         ## enforce OpenSSL default passphrase length
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_PASSWD_TOO_SHORT");
     }
-    $self->{PASSWD} = $keys->{PASSWD};
 
     ## test the passphrase
     eval
@@ -277,12 +277,12 @@ The constructor supports the following parameters:
 
 =head2 login
 
-set the passphrase for the used token and checks the passphrase for its
+tries to set the passphrase for the used token and checks the passphrase for its
 correctness. If the passhrase is missing, shorter than 4 characters or
-simply wrong then an exception is thrown. The only parameter is PASSWD
-with the passphrase.
+simply wrong then an exception is thrown. There is no parameters because
+we get the passphrase from the OpenXPKI::Crypto::Secret object.
 
-Examples: $engine->login ({PASSWD => "12345678"});
+Examples: $engine->login ();
 
 =head2 logout
 

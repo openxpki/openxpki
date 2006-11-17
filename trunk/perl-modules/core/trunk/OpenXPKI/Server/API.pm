@@ -26,6 +26,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DN;
 use OpenXPKI::Server::API::Default;
 use OpenXPKI::Server::API::Object;
+use OpenXPKI::Server::API::Secret;
 use OpenXPKI::Server::API::Visualization;
 use OpenXPKI::Server::API::Workflow;
 
@@ -51,6 +52,7 @@ sub BUILD {
         $external_of{$ident} = 1;
     }
 
+    my $re_all               = qr{ \A .* \z }xms;
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
     my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
     my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=_\-]* \z }xms;
@@ -348,6 +350,37 @@ sub BUILD {
                     optional => 1,
                 },
             },
+        },
+        'get_secrets' => {
+            class  => 'Secret',
+            params => { }
+        },
+        'is_secret_complete' => {
+            class  => 'Secret',
+            params => {
+                SECRET => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string
+                }
+            }
+        },
+        'set_secret_part' => {
+            class  => 'Secret',
+            params => {
+                GROUP => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string
+                },
+                PART => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string
+                },
+                VALUE => {
+                    type  => SCALAR,
+                    regex => $re_all
+                }
+            }
         },
     };
 }

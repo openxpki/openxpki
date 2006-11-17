@@ -47,6 +47,7 @@
                     ],
                     "ca_op_menu" =>
                     [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_KEY_LIST", "key_list"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",  "ca_info"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW", "workflow"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE", "language"],
@@ -200,6 +201,10 @@
                     "policy_list" =>
                     {
                         CMD => "service/api/policy_list.html"
+                    },
+                    "key_list" =>
+                    {
+                        CMD => "service/api/key_list.html"
                     },
                     "logout" =>
                     {

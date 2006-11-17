@@ -99,6 +99,7 @@ sub __load_config {
     my $type_path   = $arg_ref->{TOKEN_TYPE};
     my $type_index  = $arg_ref->{TOKEN_INDEX};
     my $certificate = $arg_ref->{CERTIFICATE};
+    $params_of{$ident}->{SECRET} = $arg_ref->{SECRET};
 
     my $realm;
     my $type_id;
@@ -154,7 +155,6 @@ sub __load_config {
                         engine     shell         wrapper 
                         randfile
                         key
-                        secret
                         engine_section
                         key_store  engine_usage
                        )) {
@@ -209,13 +209,7 @@ sub __load_config {
 	    my $value = CTX('xml_config')->get_xpath(
 		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
 		COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
-            if ($key ne 'secret') {
-    	        $params_of{$ident}->{uc($key)} = $value;
-            }
-            else {
-                # FIXME: support more than secret method literal
-                $params_of{$ident}->{PASSWD} = $value;
-            }
+    	    $params_of{$ident}->{uc($key)} = $value;
 	}
     }
     if ($type_path eq 'ca' || $type_path eq 'scep') { # default tokens don't have a certificate

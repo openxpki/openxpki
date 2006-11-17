@@ -25,6 +25,7 @@ my %SEQUENCE_of = (
     DATA           => "sequence_data",
     GLOBAL_KEY_ID  => "sequence_global_id",
     PRIVATE        => "sequence_private",
+    SECRET         => "sequence_secret",
     SIGNATURE      => "sequence_signature",
     VOTING         => "sequence_voting",
     DATAEXCHANGE   => "sequence_dataexchange",
@@ -68,6 +69,8 @@ my %COLUMN_of = (
     WORKFLOW_SERIAL       => "workflow_id",
     WORKFLOW_VERSION_SERIAL  => "workflow_version_id",
     WORKFLOW_HISTORY_SERIAL  => "workflow_hist_id",
+    GROUP_ID              => "group_id",
+    PART_ID               => "part_id",
 
     ATTRIBUTE_SERIAL      => 'attribute_key',
     ATTRIBUTE_KEY         => 'attribute_contentkey',
@@ -223,6 +226,10 @@ my %TABLE_of = (
         INDEX   => [ "PRIVATE_SERIAL" ],
         COLUMNS => [ "PRIVATE_SERIAL",
                      "DATA", "TYPE", "GLOBAL_KEY_ID"]},
+    SECRET => {
+        NAME    => "secret",
+        INDEX   => ["PKI_REALM", "GROUP_ID", "PART_ID"],
+        COLUMNS => ["PKI_REALM", "GROUP_ID", "PART_ID", "FORMAT", "DATA"]},
 
     SIGNATURE => {
         NAME    => "signature",

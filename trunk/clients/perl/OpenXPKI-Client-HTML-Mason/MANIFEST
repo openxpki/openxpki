@@ -68,7 +68,9 @@ htdocs/service/api/ca_cert_info.html
 htdocs/service/api/chain_list.html
 htdocs/service/api/crl_list.html
 htdocs/service/api/issuer_list.html
+htdocs/service/api/key_list.html
 htdocs/service/api/policy_list.html
+htdocs/service/api/set_secret.html
 
 htdocs/service/workflow/list_types.html
 htdocs/service/workflow/list_instances.html

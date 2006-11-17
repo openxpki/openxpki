@@ -48,8 +48,9 @@ our %COLUMN = (
     "data_key"         => "BIGINT",
     "private_key"      => "BIGINT",
     "signature_key"    => "BIGINT",
-    "global_id"        => "BIGINT",
     "dataexchange_key" => "BIGINT",
+    "group_id"         => "BIGINT",
+    "part_id"          => "BIGINT",
 
     "attribute_key"    => "BIGINT",
     "attribute_contentkey" => "TEXT_KEY",
