@@ -16,6 +16,7 @@ use Switch;
 use OpenXPKI::Crypto::Backend::API;
 use OpenXPKI::Crypto::Tool::SCEP::API;
 use OpenXPKI::Crypto::Tool::PKCS7::API;
+use OpenXPKI::Crypto::Secret;
 
 sub new {
     my $that = shift;
@@ -118,15 +119,15 @@ sub __load_secret
                           COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
     switch ($method)
     {
-        case ("literal") {
-            $self->{SECRET}->{$realm}->{$group}->{PART}->[0] =
+        case "literal" {
+            my $value =
                 CTX('xml_config')->get_xpath (
                     XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'value' ],
                     COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({TYPE => "Plain", PARTS => 1});
-            $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($self->{SECRET}->{$realm}->{$group}->{PART}->[0]);
+            $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($value);
                          }
-        case ("plain")   {
+        case "plain"   {
             my $parts =
                 CTX('xml_config')->get_xpath (
                     XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'parts' ],
@@ -135,7 +136,7 @@ sub __load_secret
                     TYPE => "Plain",
                     PARTS => $parts});
                          }
-        case ("split")   {
+        case "split"   {
             my $total =
                 CTX('xml_config')->get_xpath (
                     XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'total_shares' ],

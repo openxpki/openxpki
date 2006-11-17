@@ -28,6 +28,7 @@ sub new {
                         NAME
                         KEY
                         PASSWD
+                        SECRET
                         CERT
                         INTERNAL_CHAIN
                         ENGINE_SECTION
@@ -195,6 +196,8 @@ sub get_keyfile
 sub get_passwd
 {
     my $self = shift;
+    return $self->{SECRET}->get_secret()
+        if (exists $self->{SECRET} and $self->{SECRET}->is_complete());
     return $self->{PASSWD} if (exists $self->{PASSWD});
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_GET_PASSWD_UNDEF");

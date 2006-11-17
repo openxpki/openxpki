@@ -86,8 +86,6 @@
            private key operations) -->
       <token super="common/token_config/token{default_gost}"/>
 
-      <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="25_crypto/profile.xml"/>
-
     </common>
 
     <ca id="INTERNAL_CA_GOST">
@@ -102,8 +100,6 @@
       <!-- default token (used for general crypto operations not requiring
            private key operations) -->
       <token super="common/token_config/token{default_nciph}"/>
-
-      <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="25_crypto/profile.xml"/>
 
     </common>
 
