@@ -79,7 +79,9 @@ $FUNCTION{install_cert_ie} = qq^
         dim xenroll
         Set xenroll = getXEnroll   
 
-        xenroll.ProviderName = form.csp.value
+        dim name
+        name = form.csp.options(form.csp.selectedIndex).value
+        xenroll.ProviderName = name
         xenroll.acceptPKCS7(form.cert.value)
         
         if Err.Number <> 0 then
