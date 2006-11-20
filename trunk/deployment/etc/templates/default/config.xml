@@ -95,6 +95,16 @@
             <filename>[% $ca.crl_publication_file_name %]</filename>
             <format>[% $ca.crl_publication_file_format %]</format>
         </file>
+        <!--
+        <ldap>
+            <server></server>
+            <port></port>
+            <bind_dn></bind_dn>
+            <pass></pass>
+            <base_dn></base_dn>
+            <search_dn></search_dn>
+        </ldap>
+        -->
         [% IF $ca.crl_issue_for %]
           [% FOREACH identifier = $ca.crl_issue_for %]
                 <issue_for>[% $identifier %]</issue_for>
