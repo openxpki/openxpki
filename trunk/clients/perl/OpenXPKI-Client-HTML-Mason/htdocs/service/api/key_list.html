@@ -8,7 +8,7 @@
   <tr>
     <th><% i18nGettext('I18N_OPENXPKI_SECRET_LABEL') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_SECRET_STATUS') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_SECRET_LOGIN') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_SECRET_ACTION') %></th>
   </tr>
 <%perl>
   foreach my $secret (sort keys %secrets)
@@ -18,7 +18,12 @@
     if ($secrets{$secret}->{STATUS})
     {
         print "    <td>".i18nGettext('I18N_OPENXPKI_SECRET_COMPLETE')."</td>\n";
-        print "    <td>".i18nGettext('I18N_OPENXPKI_NOT_AVAILABLE')."</td>\n";
+        print "    <td>\n";
+        $m->comp ('/lib/html/a.mhtml',
+                  'target' => "clear_secret.html",
+                  'params' => [["secret", $secret]],
+                  'label'  => i18nGettext('I18N_OPENXPKI_SECRET_LOGOUT_LINK_LABEL'));
+        print "    </td>\n";
     } else {
         print "    <td>".i18nGettext('I18N_OPENXPKI_SECRET_INCOMPLETE')."</td>\n";
         print "    <td>\n";

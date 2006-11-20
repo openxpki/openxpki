@@ -228,8 +228,8 @@ my %TABLE_of = (
                      "DATA", "TYPE", "GLOBAL_KEY_ID"]},
     SECRET => {
         NAME    => "secret",
-        INDEX   => ["PKI_REALM", "GROUP_ID", "PART_ID"],
-        COLUMNS => ["PKI_REALM", "GROUP_ID", "PART_ID", "DATA"]},
+        INDEX   => ["PKI_REALM", "GROUP_ID"],
+        COLUMNS => ["PKI_REALM", "GROUP_ID", "DATA"]},
 
     SIGNATURE => {
         NAME    => "signature",

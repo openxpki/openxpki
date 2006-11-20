@@ -213,15 +213,24 @@ sub is_secret_group_complete
     return $boolean if ($boolean);
 
     ##! 2: "check for the cache"
+    my $secret = "";
     if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
     {
+        ## session mode
         ##! 4: "let's load the serialized secret in the session"
-        CTX('session')->get_secret ({
-            GROUP  => $group,
-            SECRET => $self->{SECRET}->{$realm}->{$group}->{REF}});
+        $secret = CTX('session')->get_secret ($group);
     } else {
+        ## daemon mode
         ##! 4: "let's store the serialized secret in the database"
-        #FIXME: ok this is still a missing issue
+        $secret = CTX('dbi_backend')->first (
+                      TABLE   => "SECRET",
+                      DYNAMIC => {
+                          PKI_REALM => $realm,
+                          GROUP_ID  => $group});
+    }
+    if (defined $secret and length $secret)
+    {
+        $self->{SECRET}->{$realm}->{$group}->{REF}->set_serialized ($secret);
     }
 
     ##! 1: "finished"
@@ -253,15 +262,80 @@ sub set_secret_group_part
     }
 
     ##! 2: "store the secrets"
+    my $secret = $self->{SECRET}->{$realm}->{$group}->{REF}->get_serialized();
     if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
     {
         ##! 4: "let's store the serialized secret in the session"
         CTX('session')->set_secret ({
             GROUP  => $group,
-            SECRET => $self->{SECRET}->{$realm}->{$group}->{REF}});
+            SECRET => $secret});
     } else {
         ##! 4: "let's store the serialized secret in the database"
-        #FIXME: ok this is still a missing issue
+        my $result = CTX('dbi_backend')->select (
+                         TABLE => "SECRET",
+                         DYNAMIC => {
+                             PKI_REALM => $realm,
+                             GROUP_ID  => $group});
+        if (scalar @{$result})
+        {
+            ##! 8: "this is an update in daemon mode"
+            CTX('dbi_backend')->update (
+                TABLE => "SECRET",
+                DATA  => {DATA => $secret},
+                WHERE => {
+                    PKI_REALM => $realm,
+                    GROUP_ID  => $group});
+        }
+        else
+        {
+            ##! 8: "this is an insert in daemon mode"
+            CTX('dbi_backend')->insert (
+                TABLE => "SECRET",
+                HASH  => {
+                    DATA      => $secret,
+                    PKI_REALM => $realm,
+                    GROUP_ID  => $group});
+        }
+    }
+
+    ##! 1: "finished"
+    return 1;
+}
+
+sub clear_secret_group
+{
+    ##! 1: "start"
+    my $self  = shift;
+    my $group = shift;
+
+    ##! 2: "init"
+    my $realm = CTX('session')->get_pki_realm();
+    $self->__load_secret({PKI_REALM => $realm, GROUP => $group})
+        if (not exists $self->{SECRET} or
+            not exists $self->{SECRET}->{$realm} or
+            not exists $self->{SECRET}->{$realm}->{$group});
+
+    ##! 2: "check for the cache"
+    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
+    {
+        ##! 4: "let's store the serialized secret in the session"
+        CTX('session')->clear_secret ($group);
+    } else {
+        ##! 4: "let's store the serialized secret in the database"
+        my $result = CTX('dbi_backend')->select (
+                         TABLE => "SECRET",
+                         DYNAMIC => {
+                             PKI_REALM => $realm,
+                             GROUP_ID  => $group});
+        if (scalar @{$result})
+        {
+            ##! 8: "we have to delete something"
+            CTX('dbi_backend')->delete (
+                TABLE => "SECRET",
+                DATA  => {
+                    PKI_REALM => $realm,
+                    GROUP_ID  => $group});
+        }
     }
 
     ##! 1: "finished"
@@ -547,57 +621,9 @@ sub __use_token
     ##! 16: 'end'
 }
 
-## functions to handle token which can operate as daemons
-
-sub stop_session
-{
-    my $self = shift;
-    my $error = 0;
-
-    foreach my $realm (keys %{$self->{TOKEN}})
-    {
-        foreach my $type (keys %{$self->{TOKEN}->{$realm}})
-        {
-            foreach my $name (keys %{$self->{TOKEN}->{$realm}->{$type}})
-            {
-                next if (not $self->{TOKEN}->{$realm}->{$type}->{$name}->get_mode() !~ /^session$/i);
-                $error = 1 if (not $self->{TOKEN}->{$realm}->{$type}->{$name}->logout());
-            }
-        }
-    }
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_STOP_SESSION_FAILED")
-        if ($error);
-    return 1;
-}
-
-## logout all tokens except sessions and daemons
 sub DESTROY {
     my $self = shift;
 
-    my $error = 0;
-    foreach my $realm (keys %{$self->{TOKEN}})
-    {
-        next if (not defined $realm or not length $realm);
-        foreach my $type (keys %{$self->{TOKEN}->{$realm}})
-        {
-            next if (not defined $type or not length $type);
-            foreach my $name (keys %{$self->{TOKEN}->{$realm}->{$type}})
-            {
-                next if (not $self->{TOKEN}->{$realm}->{$type}->{$name});
-                if ($self->{TOKEN}->{$realm}->{$type}->{$name}->get_mode() eq "standby")
-                {
-                    $error = 1 if (not $self->{TOKEN}->{$realm}->{$type}->{$name}->logout());
-                }
-                ## init destruction of token
-                delete $self->{TOKEN}->{$realm}->{$type}->{$name};
-            }
-        }
-    }
-
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENPKI_CRYPTO_TOKENMANAGER_DESTROY_TOKEN_FAILED")
-        if ($error);
     return 1;
 }
 
@@ -627,15 +653,3 @@ needs TYPE, NAME and PKI_REALM of a token and will return a token which is ready
 use. Please remember that all tokens inside of one PKI realm need
 distinguished names. The TYPE describes the use case of the token. This is required
 to find the token configuration. TYPE can be today only CA and DEFAULT.
-
-=head2 stop_session
-
-stops all tokens which operate in session mode.
-
-=head2 start_daemon
-
-start all tokens which operate in daemon mode. NOT IMPLEMENTED ACTUALLY.
-
-=head2 stop_daemon
-
-stop all tokens which operate in daemon mode. NOT IMPLEMENTED ACTUALLY.

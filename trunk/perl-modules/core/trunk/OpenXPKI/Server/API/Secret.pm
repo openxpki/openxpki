@@ -46,9 +46,17 @@ sub set_secret_part
     my $self = shift;
     my $args = shift;
     return CTX('crypto_layer')->set_secret_group_part({
-       GROUP => $args->{GROUP},
+       GROUP => $args->{SECRET},
        PART  => $args->{PART},
        VALUE => $args->{VALUE}});
+}
+
+sub clear_secret
+{
+    ##! 1: "start, forward and finish"
+    my $self = shift;
+    my $args = shift;
+    return CTX('crypto_layer')->clear_secret_group($args->{SECRET});
 }
 
 1;
@@ -72,6 +80,8 @@ an interface to set passphrase or parts of passphrases.
 =head2 is_group_secret_complete
 
 =head2 set_group_secret_part
+
+=head2 clear_secret
 
 =head1 See also
 

@@ -367,7 +367,7 @@ sub BUILD {
         'set_secret_part' => {
             class  => 'Secret',
             params => {
-                GROUP => {
+                SECRET => {
                     type  => SCALAR,
                     regex => $re_alpha_string
                 },
@@ -381,6 +381,15 @@ sub BUILD {
                     regex => $re_all
                 }
             }
+        },
+        'clear_secret' => {
+            class  => 'Secret',
+            params => {
+                SECRET => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string
+                },
+            },
         },
     };
 }

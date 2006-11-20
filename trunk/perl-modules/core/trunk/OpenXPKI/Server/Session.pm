@@ -229,23 +229,30 @@ sub get_id
 
 sub set_secret
 {
-    my $self = shift;
-    my $args = shift;
+    my $self   = shift;
+    my $args   = shift;
     my $group  = $args->{GROUP};
     my $secret = $args->{SECRET};
-    my $name = "secret_".sha1_hex($group);
-    $self->{session}->param ($name => $secret->get_serialized());
+    my $name   = "secret_".sha1_hex($group);
+    $self->{session}->param ($name => $secret);
     $self->{session}->flush();
 }
 
 sub get_secret
 {
-    my $self = shift;
-    my $args = shift;
-    my $group  = $args->{GROUP};
-    my $secret = $args->{SECRET};
-    my $name = "secret_".sha1_hex($group);
-    return $secret->set_serialized ($self->{session}->param ($name));
+    my $self  = shift;
+    my $group = shift;
+    my $name  = "secret_".sha1_hex($group);
+    return $self->{session}->param ($name);
+}
+
+sub clear_secret
+{
+    my $self  = shift;
+    my $group = shift;
+    my $name  = "secret_".sha1_hex($group);
+    $self->{session}->clear ($name);
+    $self->{session}->flush();
 }
 
 1;
@@ -337,5 +344,7 @@ returns a challenge string if such a string was set in the past.
 =item * get_secret
 
 =item * set_secret
+
+=item * delete_secret
 
 =back

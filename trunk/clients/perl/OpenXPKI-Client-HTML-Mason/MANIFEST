@@ -66,6 +66,7 @@ htdocs/service/api/cert_list.html
 htdocs/service/api/cert_search.html
 htdocs/service/api/ca_cert_info.html
 htdocs/service/api/chain_list.html
+htdocs/service/api/clear_secret.html
 htdocs/service/api/crl_list.html
 htdocs/service/api/issuer_list.html
 htdocs/service/api/key_list.html
