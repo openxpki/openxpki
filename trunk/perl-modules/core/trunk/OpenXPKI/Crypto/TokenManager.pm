@@ -6,13 +6,13 @@ package OpenXPKI::Crypto::TokenManager;
 
 use strict;
 use warnings;
+use Switch;
 
 use OpenXPKI::Debug 'OpenXPKI::Crypto::TokenManager';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 use English;
-use Switch;
 use OpenXPKI::Crypto::Backend::API;
 use OpenXPKI::Crypto::Tool::SCEP::API;
 use OpenXPKI::Crypto::Tool::PKCS7::API;
@@ -561,7 +561,7 @@ sub __add_token
 
 sub __get_list_member_by_id
 {
-    ##! 1: "start";
+    ##! 1: "start"
     my $self = shift;
     my $args = shift;
     my $xpath    = $args->{XPATH};
