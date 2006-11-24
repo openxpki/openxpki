@@ -7,15 +7,23 @@ use warnings;
 use base qw( Workflow::Validator );
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Validator::SPKAC';
 use English;
+
+use Data::Dumper;
 
 sub validate {
     my ( $self, $wf, $csr_type, $spkac ) = @_;
+    ##! 1: 'start'
 
+    ##! 16: 'csr_type: ' . $csr_type
+    ##! 16: 'spkac: ' . $spkac
     ## prepare the environment
     my $context = $wf->context();
+    ##! 128: 'context: ' . Dumper $context
     my $errors  = $context->param ("__error");
        $errors  = [] if (not defined $errors);
+    ##! 128: 'erros: ' . Dumper $errors
     my $old_errors = scalar @{$errors};
 
     return if (not defined $csr_type);
@@ -27,6 +35,7 @@ sub validate {
         ## SPKAC or PKCS10 must required and this is not possible with Workflow
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_DATA' ];
         $context->param ("__error" => $errors);
+        ##! 16: 'validation error: ' . $errors
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -38,6 +47,7 @@ sub validate {
         ## SPKAC is base64 and this is no base64
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_BASE64' ];
         $context->param ("__error" => $errors);
+        ##! 16: 'validation error: ' . $errors
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -47,6 +57,7 @@ sub validate {
         ## definitely too short for a SPKAC
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT' ];
         $context->param ("__error" => $errors);
+        ##! 16: 'validation error: ' . $errors
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -54,6 +65,7 @@ sub validate {
 
     ## return true is senselesse because only exception will be used
     ## but good style :)
+    ##! 1: 'end'
     return 1;
 }
 
