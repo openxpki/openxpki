@@ -181,11 +181,13 @@ OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ChangeSessionRole.pm
+OpenXPKI/Server/Workflow/Activity/Tools/ChangeBackSessionRole.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CreateWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ForkWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
+OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Sleep.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
@@ -206,8 +208,14 @@ OpenXPKI/Server/Workflow/Activity/DataExchange/Cleanup.pm
 
 OpenXPKI/Server/Workflow/Activity/SCEP/SetContextFromOriginalCert.pm
 OpenXPKI/Server/Workflow/Activity/SCEP/SetContextFromCSR.pm
-OpenXPKI/Server/Workflow/Activity/SCEP/SetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/SCEP/ExtractCSR.pm
+
+OpenXPKI/Server/Workflow/Activity/SmartCard/ForkWorkflowInstances.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/PersistCSRs.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/WriteCertificateToInstall.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/GetLDAPData.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/PublishCertificates.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/CreateServerCSR.pm
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
@@ -230,6 +238,11 @@ OpenXPKI/Server/Workflow/Condition/IsValidSignatureWithRequestedDN.pm
 OpenXPKI/Server/Workflow/Condition/CorrectNumberOfValidCerts.pm
 OpenXPKI/Server/Workflow/Condition/SignedUsingOriginalCertOrSelfSigned.pm
 OpenXPKI/Server/Workflow/Condition/ApprovalNeeded.pm
+OpenXPKI/Server/Workflow/Condition/MoreCertsToTest.pm
+OpenXPKI/Server/Workflow/Condition/MoreCSRsToCreate.pm
+OpenXPKI/Server/Workflow/Condition/IsCertificateIssuancePossible.pm
+OpenXPKI/Server/Workflow/Condition/CheckCertTestResult.pm
+
 
 OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm

@@ -93,6 +93,7 @@ htdocs/service/workflow/activity/execute_csr.html
 htdocs/service/workflow/activity/reject_csr.html
 htdocs/service/workflow/activity/export_csr.html
 htdocs/service/workflow/activity/persist_csr.html
+htdocs/service/workflow/activity/persist_csrs.html
 
 htdocs/service/create_csr/index.html
 htdocs/service/create_csr/get_workflow_type.mhtml
@@ -116,6 +117,15 @@ htdocs/service/create_crr/get_workflow_type.mhtml
 htdocs/service/create_crr/get_certificate.mhtml
 htdocs/service/create_crr/get_compromise_time.mhtml
 htdocs/service/create_crr/get_reason.mhtml
+
+htdocs/service/smartcard_personalization/index.html
+htdocs/service/smartcard_personalization/waiting_for_issuance.mhtml
+htdocs/service/smartcard_personalization/failure.mhtml
+htdocs/service/smartcard_personalization/print_errors.mhtml
+htdocs/service/smartcard_personalization/install_certificate.mhtml
+htdocs/service/smartcard_personalization/success.mhtml
+htdocs/service/smartcard_personalization/get_certificate_request.mhtml
+htdocs/service/smartcard_personalization/waiting_for_approval.mhtml
 
 htdocs/binary/dhandler
 htdocs/binary/get_certificate.crt
