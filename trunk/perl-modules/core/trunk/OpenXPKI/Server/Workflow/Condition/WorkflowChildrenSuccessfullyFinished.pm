@@ -21,8 +21,10 @@ sub evaluate {
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
     my $negate = 0;
-    if ($self->name() eq 'wf_child_instance_not_finished') {
+    if ($self->name() eq 'wf_child_instance_not_finished' ||
+        $self->name() eq 'wf_children_instances_not_finished') {
         $negate = 1;
+        ##! 16: 'negate=1'
     }
     my $context  = $workflow->context();
     ##! 16: 'context: ' . Dumper($context)
@@ -63,17 +65,21 @@ sub evaluate {
     }
     if ($all_children_successfully_finished == 1) {
         if ($negate == 1) {
+            ##! 32: 'negate and all children successfully finished -> EXCEPTION'
             condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_ALL_CHILDREN_SUCCESSFULLY_FINISHED');
         }
         else {
+            ##! 32: 'no negate and all children successfully finished -> ALL FINE'
             return 1;
         }
     }
     else {
         if ($negate == 1) {
+            ##! 32: 'negate and not all children successfully finished -> ALL FINE'
             return 1;
         }
         else {
+            ##! 32: 'no negate and not all children successfully finished -> EXCEPTION'
             condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_NOT_ALL_CHILDREN_SUCCESSFULLY_FINISHED');
         }
     }

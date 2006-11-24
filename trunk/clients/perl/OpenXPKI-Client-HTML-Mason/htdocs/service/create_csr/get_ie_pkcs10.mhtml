@@ -58,7 +58,7 @@
 <input type="button"
        name="continue"
        value="<% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_IE_PKCS10") %>"
-       OnClick="CreateCSR()"/>
+       OnClick="CreateCSR('')"/>
 
 <& /service/close_form.mhtml &>
 

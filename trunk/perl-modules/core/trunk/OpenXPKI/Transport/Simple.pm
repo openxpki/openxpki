@@ -13,6 +13,7 @@ our $VERSION = $OpenXPKI::VERSION::VERSION;
 
 use English;
 use OpenXPKI::Exception;
+
 use OpenXPKI::Debug 'OpenXPKI::Transport::Simple';
 
 $OUTPUT_AUTOFLUSH = 1;
@@ -195,6 +196,7 @@ sub __send
     elsif (exists $self->{SOCKET})
     {
         ##! 8: "using socket to write some data"
+        ##! 128: 'socket send: ' . $msg
         send ($self->{SOCKET},$msg,0);
         ## $self->{SOCKET}->flush();
     }
@@ -232,6 +234,7 @@ sub __receive
     {
         ##! 8: "using socket to read some data"
         $length = CORE::read $self->{SOCKET}, $msg, $length;
+        ##! 128: 'socket receive: ' . $msg
     }
     else
     {

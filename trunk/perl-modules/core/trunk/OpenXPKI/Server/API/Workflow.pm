@@ -39,6 +39,11 @@ sub list_workflow_instances {
     ##! 1: "list_workflow_instances"
 
     my $dbi = CTX('dbi_workflow');
+    # commit to get a current snapshot of the database in the
+    # highest isolation level.
+    # Without this, we will only see old data, especially if
+    # other processes are writing to the database at the same time
+    $dbi->commit();
 
     my $instances = $dbi->select(
 	TABLE => $workflow_table,
@@ -47,6 +52,7 @@ sub list_workflow_instances {
 	},
     );
 
+    ##! 16: 'instances: ' . Dumper $instances
     return $instances;
 }
 
@@ -56,6 +62,11 @@ sub list_context_keys {
     my $arg_ref = shift;
 
     my $dbi = CTX('dbi_workflow');
+    # commit to get a current snapshot of the database in the
+    # highest isolation level.
+    # Without this, we will only see old data, especially if
+    # other processes are writing to the database at the same time
+    $dbi->commit();
 
     if (! defined $arg_ref->{'WORKFLOW_TYPE'}
                || $arg_ref->{'WORKFLOW_TYPE'} eq '') {
@@ -109,6 +120,12 @@ sub get_workflow_info {
 
     ##! 1: "get_workflow_info"
 
+    # commit to get a current snapshot of the database in the
+    # highest isolation level.
+    # Without this, we will only see old data, especially if
+    # other processes are writing to the database at the same time
+    CTX('dbi_workflow')->commit();
+
     my $wf_title = $args->{WORKFLOW};
     my $wf_id    = $args->{ID};
 
@@ -130,6 +147,11 @@ sub execute_workflow_activity {
     my $wf_activity = $args->{ACTIVITY};
     my $wf_params   = $args->{PARAMS};
 
+    # commit to get a current snapshot of the database in the
+    # highest isolation level.
+    # Without this, we will only see old data, especially if
+    # other processes are writing to the database at the same time
+    CTX('dbi_workflow')->commit();
     ##! 2: "load workflow"
     my $workflow = __get_workflow_factory()->fetch_workflow(
 	$wf_title,
@@ -359,6 +381,12 @@ sub get_workflow_activities {
     my $wf_title = $args->{WORKFLOW};
     my $wf_id    = $args->{ID};
 
+    # commit to get a current snapshot of the database in the
+    # highest isolation level.
+    # Without this, we will only see old data, especially if
+    # other processes are writing to the database at the same time
+    CTX('dbi_workflow')->commit();
+
     my $workflow = __get_workflow_factory()->fetch_workflow(
 	$wf_title,
 	$wf_id);
@@ -373,6 +401,12 @@ sub search_workflow_instances {
     my $arg_ref  = shift;
 
     my $dbi = CTX('dbi_workflow');
+    # commit to get a current snapshot of the database in the
+    # highest isolation level.
+    # Without this, we will only see old data, especially if
+    # other processes are writing to the database at the same time
+    $dbi->commit();
+
     my $realm = CTX('session')->get_pki_realm();
 
     if (scalar @{$arg_ref->{CONTEXT}} == 0) {

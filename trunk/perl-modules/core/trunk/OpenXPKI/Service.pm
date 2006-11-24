@@ -49,6 +49,7 @@ sub talk {
     my $communication_state = $self->get_communication_state();
     # this may be undefined in the first invocation, accept it this way
     if (! defined $communication_state || ($communication_state eq 'can_send')) {
+        ##! 128: 'talk: ' . Dumper $arg
 	my $rc = $transport{$ident}->write(
 	    $serialization{$ident}->serialize($arg)
 	    );
@@ -105,6 +106,7 @@ sub collect {
 	}
     }
     $self->set_communication_state('can_send');
+    ##! 128: 'collect: ' . Dumper $result
     return $result;
 }
 

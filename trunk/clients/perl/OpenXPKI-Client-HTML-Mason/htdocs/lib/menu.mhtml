@@ -39,7 +39,7 @@
                     [
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr"],
-#                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",     "workflow"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE", "dataexchange"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",     "language"],
@@ -106,10 +106,10 @@
                     {
                         CMD => "service/create_csr/index.html"
                     },
-#                    "smartcard_personalization" =>
-#                    {
-#                        CMD => "service/smartcard_personalization/index.html"
-#                    },
+                    "smartcard_personalization" =>
+                    {
+                        CMD => "service/smartcard_personalization/index.html"
+                    },
                     "workflow_list_types" =>
                     {
                         CMD => "service/workflow/list_types.html"

@@ -1,0 +1,170 @@
+<workflow>
+  <type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION</type>
+  <description>I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION</description>
+  <persister>OpenXPKI</persister>
+  <observer class="OpenXPKI::Server::Workflow::Observer::Log"/>
+  <observer class="OpenXPKI::Server::Workflow::Observer::AddExecuteHistory"/>
+
+  <state name="INITIAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_INITIAL</description>
+    <action name="get_ldap_data" 
+	    resulting_state="LDAP_DATA_AVAILABLE">
+      <condition name="ACL::smartcard_personalization"/>
+    </action>
+  </state>
+
+  <state name="LDAP_DATA_AVAILABLE" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_GD_DATA_AVAILABLE</description>
+    <action name="set_error_ldap"
+	    resulting_state="FAILURE">
+      <condition name="certificate_issuance_impossible"/>
+      <!-- TODO: maybe split into several conditions each checking one
+                 specific thing -->
+    </action>
+    <action name="null2"
+	    resulting_state="CERTIFICATE_ISSUANCE_POSSIBLE">
+      <condition name="certificate_issuance_possible"/>
+    </action>
+  </state>
+
+  <state name="CERTIFICATE_ISSUANCE_POSSIBLE">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_CERT_ISSUANCE_POSSIBLE</description>
+    <action name="create_server_csr"
+	    resulting_state="SERVER_CSR_CREATED">
+    </action>
+  </state>
+
+  <state name="SERVER_CSR_CREATED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_SERVER_CSR_CREATED</description>
+    <action name="null"
+            resulting_state="CERTIFICATE_ISSUANCE_POSSIBLE">
+       <condition name="more_csrs_to_create"/>
+    </action>
+    <action name="change_session_role_to_ca_operator"
+            resulting_state="SESSION_ROLE_CHANGED">
+       <condition name="no_more_csrs_to_create"/>
+       <condition name="no_approval_needed"/>
+    </action>
+    <action name="null2"
+            resulting_state="APPROVAL">
+        <condition name="approval_needed"/>
+        <condition name="no_more_csrs_to_create"/>
+    </action>
+  </state>
+
+  <state name="SESSION_ROLE_CHANGED" autorun="yes">
+    <action name="persist_csrs"
+            resulting_state="CSRS_PERSISTED">
+    </action>
+  </state>
+
+  <state name="APPROVAL">
+    <action name="persist_csrs"
+	    resulting_state="APPROVED">
+      <condition name="ACL::persist_csr"/>
+      <condition name="Condition::check_csr_approvals"/>
+    </action>
+    <!-- perhaps we need more than one approval or                 -->
+    <!-- perhaps the first approval was from a not authorized role -->
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+	    resulting_state="APPROVAL">
+      <condition name="ACL::approve_csr"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+	    resulting_state="FAILURE">
+      <condition name="ACL::reject_csr"/>
+    </action>
+  </state>
+
+  <state name="APPROVED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_DESC_APPROVED</description>
+    <action name="fork_cert_issuance_instances"
+	    resulting_state="CERT_ISSUANCES_FORKED">
+    </action>
+  </state>
+
+  <state name="CSRS_PERSISTED" autorun="yes">
+    <action name="fork_cert_issuance_instances"
+	    resulting_state="CERT_ISSUANCES_FORKED">
+    </action>
+  </state>
+
+  <state name="CERT_ISSUANCES_FORKED" autorun="yes">
+    <action name="change_back_session_role"
+            resulting_state="SESSION_ROLE_CHANGED_BACK">
+    </action>
+  </state>
+
+  <state name="SESSION_ROLE_CHANGED_BACK" autorun="yes">
+    <action name="sleep_for_children"
+            resulting_state="WAITED_FOR_CHILDREN">
+    </action>
+  </state>
+
+  <!-- if child is not yet finished, this goes out of autorun -->
+  <state name="WAITED_FOR_CHILDREN" autorun="yes">
+    <action name="write_certificate_to_install"
+            resulting_state="INSTALL_CERTIFICATE">
+      <condition name="wf_children_instances_finished"/>
+    </action>
+    <action name="null2"
+            resulting_state="ISSUANCE_PENDING">
+      <condition name="wf_children_instances_not_finished"/>
+    </action>
+  </state>
+
+
+  <state name="ISSUANCE_PENDING">
+    <action name="write_certificate_to_install"
+            resulting_state="INSTALL_CERTIFICATE">
+      <condition name="wf_children_instances_finished"/>
+    </action>
+  </state>
+
+<!-- <state name="INSTALL_CERTIFICATE"/> -->
+
+  <state name="INSTALL_CERTIFICATE">
+    <action name="write_certificate_test_result"
+            resulting_state="CERTIFICATE_TESTED">
+    </action>
+  </state>
+
+  <state name="CERTIFICATE_TESTED" autorun="yes">
+    <action name="null"
+            resulting_state="ALL_CERTIFICATES_TESTED_OK">
+      <condition name="no_more_certs_to_test"/>
+      <condition name="test_result_ok"/>
+    </action>
+    <action name="write_certificate_to_install"
+            resulting_state="INSTALL_CERTIFICATE">
+      <condition name="more_certs_to_test"/>
+      <condition name="test_result_ok"/>
+    </action>
+    <action name="set_error_cert_test_failed"
+            resulting_state="FAILURE">
+      <condition name="test_result_failed"/>
+    </action>
+  </state>
+      
+<state name="ALL_CERTIFICATES_TESTED_OK" autorun="yes">
+    <action name="publish_certificates"
+            resulting_state="CERTIFICATES_PUBLISHED">
+    </action>
+</state>
+
+  <state name="CERTIFICATES_PUBLISHED" autorun="yes">
+    <action name="null"
+            resulting_state="SUCCESS"/>
+  </state>
+
+<!--
+  <state name="REJECTED" autorun="yes">
+    <action name="null"
+            resulting_state="FAILURE">
+    </action>
+  </state>
+-->
+
+  <state name="FAILURE" />
+  <state name="SUCCESS" />
+</workflow>

@@ -21,7 +21,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="Content-Script-Type" content="text/javascript"/>
   </head>
-  <body  OnLoad="enumCSP()">
+  <body <& SELF:onload, %ARGS &>>
     <div id="page">
 
       <div id="header">
@@ -79,3 +79,5 @@
 <%method title>
   OpenXPKI
 </%method>
+
+<%method onload>onload="enumCSP()"</%method>

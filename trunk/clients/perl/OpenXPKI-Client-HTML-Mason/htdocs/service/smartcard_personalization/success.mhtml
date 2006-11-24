@@ -1,0 +1,21 @@
+<%args>
+    $steps   => undef,
+</%args>
+<%init>
+</%init>
+<script type="text/javascript">
+<!--
+    function InstallCertIEAndTest(form) {
+    // this is sort of a hack, because on the success page, we still have
+    // a body onload call.
+        return 1;
+    }
+-->
+</script>
+<form name="OpenXPKI" action="">
+</form>
+<!-- and now to something completely different: -->
+<H1><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_TITLE',
+                       '__CURRENTSTEP__' => $steps,
+                       '__STEPS__' => $steps) %> </h1>
+<p><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_DESC') %></p>

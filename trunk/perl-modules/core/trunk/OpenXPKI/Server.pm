@@ -132,6 +132,8 @@ sub new
     # clean up process list
     $0 = "openxpkid -c $self->{CONFIG}";
     
+    CTX('dbi_workflow')->disconnect();
+    CTX('dbi_backend')->disconnect();
     $self->run (%params);
 }
 
@@ -319,7 +321,8 @@ sub do_process_request
     ##! 2: "update pre-initialized variables"
 
     eval { 
-	CTX('dbi_backend')->connect() 
+        CTX('dbi_backend')->new_dbh();
+	CTX('dbi_backend')->connect();
     };
     if ($EVAL_ERROR)
     {
@@ -330,9 +333,11 @@ sub do_process_request
         return;
         
     }
+    ##! 16: 'dbi_backend reconnected with new dbh'
 
     eval { 
-	CTX('dbi_workflow')->connect() 
+        CTX('dbi_workflow')->new_dbh();
+	CTX('dbi_workflow')->connect();
     };
     if ($EVAL_ERROR)
     {
@@ -344,6 +349,7 @@ sub do_process_request
         return;
         
     }
+    ##! 16: 'dbi_workflow reconnected with new dbh'
 
 
     # masquerade process

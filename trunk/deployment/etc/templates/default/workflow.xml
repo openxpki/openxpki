@@ -15,6 +15,7 @@
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_scep_request.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_dataexchange_export.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_dataexchange_import.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_def_smartcard_personalization.xml</configfile>
 <!--    <configfile>[% dir.openxpkiconfdir %]/workflow_def_request_pkcs10.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_request_dataonly.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_crl_issuance.xml</configfile>
@@ -31,6 +32,7 @@
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_crl_issuance.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_scep_request.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_dataexchange.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_smartcard_personalization.xml</configfile>
   </activities>
 
   <validators>

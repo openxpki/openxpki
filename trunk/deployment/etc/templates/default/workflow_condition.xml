@@ -46,6 +46,9 @@
   <condition name="ACL::reject_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="reject_csr"/>
   </condition>
+  <condition name="ACL::smartcard_personalization" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="smartcard_personalization"/>
+  </condition>
 
   <condition name="Condition::check_csr_approvals" class="OpenXPKI::Server::Workflow::Condition::Approved">
     <param name="role" value="RA Operator"/>
@@ -151,9 +154,40 @@
   </condition>
   <condition name="wf_child_instance_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
   </condition>
+  <condition name="wf_children_instances_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
+  </condition>
+  <condition name="wf_children_instances_not_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
+  </condition>
   <condition name="wf_child_instance_success" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
   </condition>
   <condition name="wf_child_instance_failure" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse"> <!-- TODO: implement real condition -->
+  </condition>
+
+  <!-- conditions for smartcard personalization -->
+  <!-- policy settings -->
+  <condition name="approval_needed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue">
+  </condition>
+  <condition name="no_approval_needed" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse">
+  </condition>
+  <!-- user settable parameters -->
+  <condition name="certificate_issuance_possible" class="OpenXPKI::Server::Workflow::Condition::IsCertificateIssuancePossible">
+    <param name="required" value="%REQUIRED_PARAMS%"/>
+  </condition>
+  <condition name="certificate_issuance_impossible" class="OpenXPKI::Server::Workflow::Condition::IsCertificateIssuancePossible">
+    <param name="required" value="%REQUIRED_PARAMS%"/>
+  </condition>
+  <!-- internal conditions -->
+  <condition name="more_csrs_to_create" class="OpenXPKI::Server::Workflow::Condition::MoreCSRsToCreate">
+  </condition>
+  <condition name="no_more_csrs_to_create" class="OpenXPKI::Server::Workflow::Condition::MoreCSRsToCreate">
+  </condition>
+  <condition name="more_certs_to_test" class="OpenXPKI::Server::Workflow::Condition::MoreCertsToTest">
+  </condition>
+  <condition name="no_more_certs_to_test" class="OpenXPKI::Server::Workflow::Condition::MoreCertsToTest">
+  </condition>
+  <condition name="test_result_ok" class="OpenXPKI::Server::Workflow::Condition::CheckCertTestResult"> 
+  </condition>
+  <condition name="test_result_failed" class="OpenXPKI::Server::Workflow::Condition::CheckCertTestResult">
   </condition>
 
   <!-- conditions for the data exchange -->
@@ -193,10 +227,10 @@
     <param name="max" value="2"/>
   </condition>
   <condition name="correct_timing" class="OpenXPKI::Server::Workflow::Condition::CorrectTiming">
-    <param name="difference" value="100d"/> <!-- renewal can only begin 100 days before the certificate becomes invalid -->
+    <param name="difference" value="100d"/> <!-- renewal can only begin 100d before the certificate becomes invalid -->
   </condition>
   <condition name="incorrect_timing" class="OpenXPKI::Server::Workflow::Condition::CorrectTiming">
-    <param name="difference" value="100d"/> <!-- renewal can only begin 100 days before the certificate becomes invalid -->
+    <param name="difference" value="100d"/> <!-- renewal can only begin 100d before the certificate becomes invalid -->
   </condition>
   <condition name="signed_using_original_cert" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/>
   <condition name="self_signed" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/> 

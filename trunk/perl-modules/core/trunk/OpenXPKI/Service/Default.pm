@@ -15,6 +15,8 @@ use English;
 
 use Class::Std;
 
+use Data::Dumper;
+
 ## used modules
 
 use OpenXPKI::i18n qw(set_language);
@@ -47,6 +49,8 @@ sub init
     
     $self->__init_session();
     $self->__init_pki_realm();
+    ##! 64: 'get_user: ' . $self->get_API('Session')->get_user()
+    ##! 64: 'get_role: ' . $self->get_API('Session')->get_role()
     if (! $self->get_API('Session')->get_user() ||
 	! $self->get_API('Session')->get_role()) {
 	my $authentication = CTX('authentication');
@@ -504,6 +508,7 @@ sub get_passwd_login
 	##! 2: "read answer"
 	my $msg = $self->collect();
 	
+        ##! 64: 'answer: ' . Dumper $msg
 	next GET_PASSWD_LOGIN unless exists $msg->{PARAMS}->{LOGIN};
 	next GET_PASSWD_LOGIN unless exists $msg->{PARAMS}->{PASSWD};
 	

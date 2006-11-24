@@ -1,0 +1,7 @@
+<%args>
+    @errors => undef
+</%args>
+% use Data::Dumper;
+% if (@errors) {
+    <% Dumper \@errors %>
+% }

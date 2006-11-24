@@ -75,6 +75,29 @@ sub new {
     return $self;
 }
 
+sub new_dbh {
+    my $self = shift;
+    #DBI->trace(2);
+    ##! 64: 'old dbh: '  . Dumper $self->{dbh}
+
+    $self->{dbh}   = undef;
+    ##! 64: 'dbh undef now: ' . Dumper $self->{dbh}
+
+    $self->{dbh}    = OpenXPKI::Server::DBI::DBH->new (%{$self->{params}});
+    ##! 64: 'new dbh: '  . Dumper $self->{dbh}
+
+    ##! 64: 'old sql: ' . Dumper $self->{sql}
+    $self->{sql}    = undef;
+    ##! 64: 'sql undef now: ' . Dumper $self->{sql}
+
+    $self->{sql}    = OpenXPKI::Server::DBI::SQL->new (DBH   => $self->{dbh});
+    ##! 64: 'new sql: ' . Dumper $self->{sql}
+
+    $self->{hash}   = OpenXPKI::Server::DBI::Hash->new (SQL   => $self->{sql},
+                                                        LOG   => $self->{log});
+    return 1;
+}
+
 sub set_crypto
 {
     my $self = shift;
@@ -468,6 +491,12 @@ initiates the database connection.
 =head3 disconnect
 
 cuts the database connection.
+
+=head3 new_dbh
+
+get a new database handle for the object. This is called on the
+CTX('dbi_workflow') and CTX('dbi_backend') objects when they are
+forked (either in workflow instance forking or Net::Server forking)
 
 =head3 commit
 

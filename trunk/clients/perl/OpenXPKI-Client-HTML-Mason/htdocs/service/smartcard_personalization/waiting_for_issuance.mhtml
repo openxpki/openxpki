@@ -1,0 +1,9 @@
+%    my $params = '';
+%    my %hash = $context->{menu}->get_menu_hash();
+%    foreach my $key (keys %hash)
+%    {
+%          $params .= $key . '=' . $hash{$key} . '&';
+%    }
+<meta http-equiv="refresh" content="15;url=index.html?<% $params %>">
+<H1><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE') %></H1>
+<p><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_DESC') %></p>

@@ -17,6 +17,10 @@ use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::Tools::ChangeSessionR
 sub execute {
     my $self = shift;
     my $workflow = shift;
+    my $context  = $workflow->context();
+
+    # save old role in context
+    $context->param('old_role' => CTX('session')->get_role());
 
     my $role = $self->param('role');
     ##! 64: 'configured role: ' . $role
@@ -37,8 +41,11 @@ OpenXPKI::Server::Workflow::Activity::Tools::ChangeSessionRole
 
 =head1 Description
 
-Changes the role of the current session to a configured role.
+Changes the role of the current session to a configured role and
+saves the old session role in the context.
 Despite the little code, this has of course some security implications.
 Only use this if you really have to (for example to automatically
 issue a certificate after thorough validation of the request).
 See the SCEP workflow for an example.
+Should be changed back using the ChangeBackSessionRole activity
+as soon as possible.

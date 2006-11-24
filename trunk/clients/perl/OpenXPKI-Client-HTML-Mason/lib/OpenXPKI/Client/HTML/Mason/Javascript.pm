@@ -65,7 +65,7 @@ $FUNCTION{default} = "";
 $FUNCTION{install_cert_ie} = qq^
 <script type="text/vbscript">
 <!--
-    Function InstallCertIE (form)
+    Function InstallCertIE (form, mode)
         ' Explorer Installation
         Err.Clear
         On Error Resume Next
@@ -80,16 +80,19 @@ $FUNCTION{install_cert_ie} = qq^
         Set xenroll = getXEnroll   
 
         dim name
-        name = form.csp.options(form.csp.selectedIndex).value
+        name = form.csp.value
         xenroll.ProviderName = name
         xenroll.acceptPKCS7(form.cert.value)
         
         if Err.Number <> 0 then
             ' perhaps already installed
             MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR")
+            MsgBox(Err.Number)
             InstallCertIE = false
         else
-            MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS")
+            if mode <> "silent" then
+                MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS")
+            end if
             InstallCertIE = true
         end if
     End Function
@@ -225,7 +228,7 @@ $FUNCTION{gen_csr_ie} = qq^
             Set getXEnroll = XEnrollObject
         End Function
 
-        Sub CreateCSR
+        Function CreateCSR (mode)
             dim theForm 
             dim options
             dim index
@@ -234,21 +237,25 @@ $FUNCTION{gen_csr_ie} = qq^
             dim xenroll
 
             On Error Resume Next
-            set theForm = document.OPENXPKI
+            set theForm = document.OpenXPKI
             Set re = new regexp 
 
             Set xenroll = getXEnroll
 
             re.Pattern = "__CSP_NAME__"
-            name = theForm.csp.options(document.OPENXPKI.csp.selectedIndex).value
+            name = theForm.csp.value
             if Len(name) > 0 then
                 xenroll.ProviderName=name
                 'MsgBox ("The used Cryptographic Service Provider is " & xenroll.ProviderName)
-                MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME", xenroll.ProviderName))
+                if mode <> "silent" then
+                    MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME", xenroll.ProviderName))
+                end if
             else
                 xenroll.ProviderName=""
                 'MsgBox ("The used Cryptographic Service Provider is the default one.")
-                MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP")
+                if mode <> "silent" then
+                    MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP")
+                end if
             end if
 
             alternate_subject = "cn=unsupported,dc=subject,dc=by,dc=MSIE"
@@ -257,7 +264,9 @@ $FUNCTION{gen_csr_ie} = qq^
 
             re.Pattern = "__SUBJECT__"
             'MsgBox ("SUBJECT is " & szName)
-            Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT", szName))
+            if mode <> "silent" then
+                Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT", szName))
+            end if
 
             xenroll.providerType = PROV_RSA_FULL
             xenroll.HashAlgorithm = "SHA1"
@@ -285,35 +294,38 @@ $FUNCTION{gen_csr_ie} = qq^
 
             ' try pragmatical failover - we simply set another subject
             if Len(sz10) = 0 then 
-                Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER", alternate_subject))
-                xenroll.GenKeyFlags = 134217730
-                if theForm.bits.value =  512 then
-                    xenroll.GenKeyFlags = 33554434
-                end if
-                if theForm.bits.value =  1024 then
-                    xenroll.GenKeyFlags = 67108866
-                end if
-                if theForm.bits.value =  2048 then
+                if mode <> "silent" then
+                    Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER", alternate_subject))
                     xenroll.GenKeyFlags = 134217730
-                end if
-                sz10 = xenroll.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
+                    if theForm.bits.value =  512 then
+                        xenroll.GenKeyFlags = 33554434
+                    end if
+                    if theForm.bits.value =  1024 then
+                        xenroll.GenKeyFlags = 67108866
+                    end if
+                    if theForm.bits.value =  2048 then
+                        xenroll.GenKeyFlags = 134217730
+                    end if
+                    sz10 = xenroll.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
 
-                if Len(sz10) = 0 then 
-                    'MsgBox ("The generation of the request failed") 
-                    MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED") 
-                    Exit Sub
+                    if Len(sz10) = 0 then 
+                        'MsgBox ("The generation of the request failed") 
+                        MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED") 
+                    end if
                 end if
-
+                Exit Function 
             end if 
 
             theForm.pkcs10.value = sz10
             'msgbox (theForm.pkcs10.value)
 
             'msgbox ("The certificate service request was successfully generated.")
-            MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED") 
+            if mode <> "silent" then
+                MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED") 
+            end if
 
             theForm.submit 
-        End Sub 
+        End Function
 
         sub enumCSP
 
