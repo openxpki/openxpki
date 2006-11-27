@@ -2,7 +2,7 @@
   <type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION</type>
   <description>I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION</description>
   <persister>OpenXPKI</persister>
-  <observer class="OpenXPKI::Server::Workflow::Observer::Log"/>
+  <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>
   <observer class="OpenXPKI::Server::Workflow::Observer::AddExecuteHistory"/>
 
   <state name="INITIAL">
