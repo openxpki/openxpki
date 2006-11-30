@@ -29,4 +29,19 @@ USE_PERL5=	yes
 USE_GMAKE=	yes
 PERL_CONFIGURE=	yes
 
+post-install:
+.if !defined(NOPORTDOCS)
+	${MKDIR} ${EXAMPLESDIR}
+	@${CP} -R ${WRKSRC}/eg ${EXAMPLESDIR}/
+	@${MKDIR} ${DATADIR}
+	@${CP} -R ${WRKSRC}/bin ${DATADIR}/
+	@${CP} -R ${WRKSRC}/htdocs ${DATADIR}/
+	@${ECHO_MSG} ""
+	@${ECHO_MSG} "================================ Information ==================================="
+	@${ECHO_MSG} "===> Examples of simple Mason configuration via httpd.conf directives installed in ${EXAMPLESDIR}."
+	@${ECHO_MSG} "===> CGI scripts and htdocs for ${DISTNAME} installed in ${DATADIR}."
+	@${ECHO_MSG} "================================================================================"
+	@${ECHO_MSG} ""
+.endif
+
 .include <bsd.port.mk>
