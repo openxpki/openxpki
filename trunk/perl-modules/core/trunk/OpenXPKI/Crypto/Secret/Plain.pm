@@ -141,9 +141,9 @@ use OpenXPKI::Server::Context qw( CTX );
     {
         my $self  = shift;
         my $ident = ident $self;
-        return if (not CTX('volatile_vault')->can_decrypt());
         my $dump  = shift;
 	return if (not defined $dump or not length $dump);
+        return if (not CTX('volatile_vault')->can_decrypt($dump));
         my $obj = OpenXPKI::Serialization::Simple->new();
         $parts{$ident} = $obj->deserialize(CTX('volatile_vault')->decrypt($dump));
         return 1;

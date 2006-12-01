@@ -12,6 +12,8 @@ use OpenXPKI::Exception;
 use English;
 use OpenXPKI::Server::Context qw( CTX );
 
+use Data::Dumper;
+
 sub new {
     my $that = shift;
     my $class = ref($that) || $that;
@@ -37,6 +39,7 @@ sub new {
                        }) {
 
 	if (exists $keys->{$key}) {
+            ##! 128: 'setting key ' . $key . ' to value ' . Dumper $keys->{$key}
 	    $self->{$key} = $keys->{$key};
 	}
     }
@@ -195,7 +198,9 @@ sub get_keyfile
 
 sub get_passwd
 {
+    ##! 16: 'start'
     my $self = shift;
+    ##! 16: 'secret is_complete: ' . $self->{SECRET}->is_complete()
     return $self->{SECRET}->get_secret()
         if (exists $self->{SECRET} and $self->{SECRET}->is_complete());
     return $self->{PASSWD} if (exists $self->{PASSWD});

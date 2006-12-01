@@ -43,9 +43,9 @@ my @init_tasks = qw(
   log
   redirect_stderr
   prepare_daemon
-  crypto_layer
   dbi_backend
   dbi_workflow
+  crypto_layer
   pki_realm
   volatile_vault
   acl

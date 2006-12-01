@@ -121,6 +121,12 @@ sub disconnect
     return 1;
 }
 
+sub is_connected
+{
+    my $self = shift;
+    return $self->{dbh}->is_connected();
+}
+
 ########################################################################
 
 sub schema_exists

@@ -58,6 +58,15 @@ sub new
 
 #######################################################################
 
+sub is_connected {
+    # TODO -- check if this works for all our database drivers
+    my $self = shift;
+    ##! 1: 'start'
+
+    return 0 if (! defined $self->{DBH});
+    return $self->{DBH}->ping();
+}
+
 sub connect
 {
     my $self = shift;

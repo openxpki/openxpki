@@ -132,6 +132,11 @@ use MIME::Base64;
 	my $ident = ident $self;
 	my $arg = shift;
 
+        if (! defined $arg || $arg eq '') {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_CAN_DECRYPT_MISSING_ARGUMENT',
+            );
+        }
 	my ($creator_ident, $encoding, $encrypted_data) = 
 	    ($arg =~ m{ (.*?) ; ([\w\-]+) ; (.*) }xms);
 

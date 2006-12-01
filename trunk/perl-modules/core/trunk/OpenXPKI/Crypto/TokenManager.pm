@@ -84,6 +84,7 @@ sub __load_secret
     ##! 2: "get the arguments"
     my $group = $keys->{GROUP};
     my $realm = $keys->{PKI_REALM};
+
     if (not $realm)
     {
         OpenXPKI::Exception->throw (
@@ -93,6 +94,12 @@ sub __load_secret
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_MISSING_GROUP");
+    }
+
+    # don't create a new object if we already have one
+    if (exists $self->{SECRET}->{$realm}->{$group}) {
+        ##! 4: '__load_secret called even though secret is already loaded'
+        return 1;
     }
 
     ##! 2: "get the position of the group configuration"
@@ -156,6 +163,34 @@ sub __load_secret
              }
     }
 
+    $self->__set_secret_from_cache({
+        PKI_REALM => $realm,
+        GROUP     => $group,
+    });
+
+    ##! 1: "finish"
+    return 1;
+}
+
+sub __set_secret_from_cache {
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $realm = $arg_ref->{'PKI_REALM'};
+    my $group = $arg_ref->{'GROUP'};
+
+    ##! 2: "get the position of the group configuration"
+
+    my $realm_index = $self->__get_list_member_by_id ({
+                          XPATH    => ['pki_realm'],
+                          COUNTER  => [],
+                          ID_LABEL => 'name',
+                          ID_VALUE => $realm});
+    my $group_index = $self->__get_list_member_by_id ({
+                          XPATH    => ['pki_realm', 'common', 'secret', 'group'],
+                          COUNTER  => [$realm_index, 0, 0],
+                          ID_LABEL => 'id',
+                          ID_VALUE => $group});
     ##! 2: "load cache configuration"
     $self->{SECRET}->{$realm}->{$group}->{CACHE} = 
         CTX('xml_config')->get_xpath (
@@ -168,8 +203,36 @@ sub __load_secret
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_CACHE_TYPE",
                   params  => {TYPE => $self->{SECRET}->{$realm}->{$group}->{CACHE}});
     }
-
-    ##! 1: "finish"
+    ##! 2: "check for the cache"
+    my $secret = "";
+    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
+    {
+        ## session mode
+        ##! 4: "let's load the serialized secret in the session"
+        $secret = CTX('session')->get_secret ($group);
+        ##! 16: 'secret: ' . $secret
+    } else {
+        ## daemon mode
+        ##! 4: "let's get the serialized secret from the database"
+        if (CTX('dbi_backend')->is_connected()) {
+            # do this only if the database is already connected
+            # i.e. not during server startup
+            # (this is senseless anyhow, as we will only find
+            # outdated secrets at that point)
+            my $secret_result = CTX('dbi_backend')->first (
+                                    TABLE   => "SECRET",
+                                    DYNAMIC => {
+                                        PKI_REALM => $realm,
+                                        GROUP_ID  => $group});
+            $secret = $secret_result->{DATA};
+        }
+        ##! 16: 'secret: ' . $secret
+    }
+    if (defined $secret and length $secret)
+    {
+        ##! 16: 'setting serialized secret'
+        $self->{SECRET}->{$realm}->{$group}->{REF}->set_serialized ($secret);
+    }
     return 1;
 }
 
@@ -195,6 +258,33 @@ sub get_secret_groups
     return %result;
 }
 
+sub reload_all_secret_groups_from_cache {
+    ##! 1: 'start'
+    my $self = shift;
+
+    my $nr_of_realms = CTX('xml_config')->get_xpath_count(
+        XPATH => 'pki_realm',
+    );
+    for (my $i = 0; $i < $nr_of_realms; $i++) {
+        my $realm = CTX('xml_config')->get_xpath(
+            XPATH   => [ 'pki_realm', 'name' ],
+            COUTNER => [ $i         , 0      ],
+        );
+        ##! 16: 'realm: ' . $realm
+
+        foreach my $group (keys %{$self->{SECRET}->{$realm}}) {
+            ##! 16: 'group: ' . $group
+            $self->__set_secret_from_cache({
+                PKI_REALM => $realm,
+                GROUP     => $group,
+            });
+        }
+    }
+    
+    ##! 1: 'end'
+    return 1;
+}
+
 sub is_secret_group_complete
 {
     ##! 1: "start"
@@ -208,30 +298,16 @@ sub is_secret_group_complete
             not exists $self->{SECRET}->{$realm} or
             not exists $self->{SECRET}->{$realm}->{$group});
 
+    $self->__set_secret_from_cache({
+        PKI_REALM => $realm,
+        GROUP     => $group,
+    });
+
     ##! 2: "return true if it is complete"
     my $boolean = $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete();
     return $boolean if ($boolean);
 
-    ##! 2: "check for the cache"
-    my $secret = "";
-    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
-    {
-        ## session mode
-        ##! 4: "let's load the serialized secret in the session"
-        $secret = CTX('session')->get_secret ($group);
-    } else {
-        ## daemon mode
-        ##! 4: "let's store the serialized secret in the database"
-        $secret = CTX('dbi_backend')->first (
-                      TABLE   => "SECRET",
-                      DYNAMIC => {
-                          PKI_REALM => $realm,
-                          GROUP_ID  => $group});
-    }
-    if (defined $secret and length $secret)
-    {
-        $self->{SECRET}->{$realm}->{$group}->{REF}->set_serialized ($secret);
-    }
+ 
 
     ##! 1: "finished"
     return $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete();
@@ -296,6 +372,7 @@ sub set_secret_group_part
                     PKI_REALM => $realm,
                     GROUP_ID  => $group});
         }
+        CTX('dbi_backend')->commit();
     }
 
     ##! 1: "finished"

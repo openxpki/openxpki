@@ -56,6 +56,8 @@ $identifier = `openxpkiadm certificate import --config t/instance/etc/openxpki/c
 `openxpkiadm certificate alias --config t/instance/etc/openxpki/config.xml --realm I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA --alias testdummyca1 --identifier $identifier $stderr`;
 ok(1);
 
+`cp t/config.xml t/instance/etc/openxpki/config.xml`;
+
 diag("Starting OpenXPKI Server.");
 my $args = '';
 $args = "--debug 150" if ($debug);

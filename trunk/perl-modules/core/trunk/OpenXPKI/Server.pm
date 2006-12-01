@@ -3,12 +3,12 @@
 ## Written 2005 by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
+package OpenXPKI::Server;
 
 use strict;
 use warnings;
 use utf8;
 
-package OpenXPKI::Server;
 use base qw(Net::Server::Fork);
 
 ## used modules
@@ -351,7 +351,10 @@ sub do_process_request
     }
     ##! 16: 'dbi_workflow reconnected with new dbh'
 
+    CTX('crypto_layer')->reload_all_secret_groups_from_cache();
 
+    ##! 16: 'secret groups reloaded from cache'
+    
     # masquerade process
     my $user = '';
     my $role = '';
