@@ -19,4 +19,5 @@ t/50.scep-renewal.t
 t/99.cleanup.t
 t/common.pl
 t/http_server.pl
+t/config.xml.diff
 bin/scep
