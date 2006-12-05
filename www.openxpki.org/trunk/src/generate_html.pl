@@ -3,13 +3,18 @@
 use strict;
 
 use Cwd;
-use Data::Dumper;
 use File::Basename;
 use File::Find;
 use File::Path;
 use File::Spec;
 use HTML::Mason;
 use URI;
+
+use Getopt::Long;
+#use Smart::Comments;
+
+my $force;
+GetOptions('force' => \$force);
 
 # These are directories.  The canonpath method removes any cruft
 # like doubled slashes.
@@ -21,8 +26,14 @@ die "Need a source and target\n"
 my $usr_file;
 my $usr_file_name = '.svn_user_name';
 my $usr_name = '';
-my %possible_names = ('alech' => 'devel','bellmich' => 'admin','djulia' => 'admin',
-                      'mbartosch' => 'admin','oliwel' => 'admin','svysh' => 'devel');
+my %possible_names = map { $_ => 1 } qw( 
+   alech
+   bellmich
+   djulia
+   mbartosch
+   oliwel
+   svysh
+);
 
 if (-e($usr_file_name) && -s _) {                                                                                                                          
     open($usr_file,$usr_file_name);
@@ -103,11 +114,12 @@ sub convert {
     if (/(\.html)$/) {
 
 	# This will save the component's output in $buffer
-        if (exists($files_status{$name_with_source})) {
+        if ((exists($files_status{$name_with_source}) || $force)) {
 	    $interp->out_method(\$buffer);
 	    $interp->exec("/$comp_path");
         }
         else {
+	    print STDERR "WARNING: $name_with_source ignored (not under version control\n";
             return;
         }
 
@@ -125,7 +137,8 @@ sub convert {
     
     # In case the directory doesn't exist, we make it
     mkpath(dirname($out_file));
-    
+
+    ### $out_file
     open my $RESULT, "> $out_file" or die "Cannot write to $out_file: $!";
     print $RESULT $buffer or die "Cannot write to $out_file: $!";
     close $RESULT or die "Cannot close $out_file: $!";

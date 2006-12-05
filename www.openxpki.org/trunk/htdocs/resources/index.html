@@ -24,12 +24,13 @@
                   <div class="menu_item"><a href="..">Home</a></div>
         <div class="menu_item"><a href="../secadvs/index.html">Security Advisories</a></div>
         <div class="menu_item"><a href="../news/index.html">News</a></div>
-        <div class="menu_item"><a href="../mirrors/index.html">Mirrors</a></div>
-        <div class="menu_item"><a href="../docs/index.html">Docs</a></div>
+        <div class="menu_item"><a href="../docs/index.html">Documentation</a></div>
+	<div class="menu_item"><a href="../support/index.html">Support</a></div>
         <div class="menu_item"><a href="../download/index.html">Download</a></div>
-        <div class="menu_item"><a href="../legacy/index.html">OpenCA Support</a></div>
         <div class="menu_item"><a href="index.html">Resources</a></div>
+        <div class="menu_sub_item"><a href="wwwmirrors.html">WWW Mirrors</a></div>
         <div class="menu_item"><a href="../foundation/index.html">Foundation</a></div>
+        <div class="menu_item"><a href="../legacy/index.html">OpenCA Support</a></div>
         <div class="w3c">
           <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=150124&amp;type=1" width="88" height="31" alt="SourceForge.net Logo" /></a>
         </div>
@@ -47,15 +48,12 @@
       <div id="content">
 
         <h2>Resources</h2>
-        <h3>
-          <a href="http://sourceforge.net/">
-            <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=150124"
-                 width="125" height="37" alt="SourceForge.net Logo"/>
-          </a>
-        </h3>
-        <p>OpenXPKI uses the SourceForge.net platform for various things. The major
-          aspects why we choose SourceForge.net is the stability and professional
-          level which the SourceForge.net staff provides to the projects.</p>
+        <a href="http://sourceforge.net/">
+          <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=150124"
+               width="125" height="37" alt="SourceForge.net Logo"/>
+        </a>
+        <p>OpenXPKI is hosted on SourceForge.net and uses its services
+	  for communication and project management.</p>
         <ul>
           <li><a href="http://sf.net/projects/openxpki/">
 	      OpenXPKI at SourceForge</a></li>
@@ -77,27 +75,27 @@
           <li><a href="http://www3.openxpki.org/svn/">
 	      WebSVN at www3</a> updates every 10 min</li>
         </ul>
-        <h3>Subversion structure</h3>
+        <h3>Source code repository structure</h3>
         <p>
-          We use the version control system from SourceForge. 
-          It contains the most up-to-date development code.
-          The actual structure under /
-          (svn root) is the following one:</p>
+	  OpenXPKI uses Subversion as its main revision control system.
+	  The primary repository is hosted at SourceForge, containing
+	  releases as well as bleeding edge development code.
+          The directory structure is layed out as follows:</p>
 <dl>
 <dt class="sourcecode">/trunk/</dt>
   <dd><dl>
   <dt class="sourcecode">perl-modules/core/trunk/</dt>
-    <dd>Core for server part</dd>
+    <dd>Server Core modules</dd>
   <dt class="sourcecode">clients/perl/</dt>
     <dd><dl>
     <dt class="sourcecode">OpenXPKI-Client/</dt>
-      <dd>Base class for actual clients</dd>
+      <dd>Base class for perl-based clients</dd>
     <dt class="sourcecode">OpenXPKI-Client-CLI/</dt>
       <dd>Command line interface to a locally running OpenXPKI daemon</dd>
     <dt class="sourcecode">OpenXPKI-Client-HTML-Mason/</dt>
       <dd>Web interface to a locally running OpenXPKI daemon</dd>
     <dt class="sourcecode">OpenXPKI-Client-SCEP/</dt>
-      <dd>SCEP tools</dd>
+      <dd>SCEP interface</dd>
     <dt class="sourcecode">OpenXPKI-Client-SOAP-Lite/</dt>
       <dd>SOAP-Lite tools</dd>
     </dl></dd>
@@ -111,23 +109,36 @@
       <dd>Tools to build fresh Debian Linux package</dd>
     <dt class="sourcecode">freebsd/</dt>
       <dd>FreeBSD port and tools to update it</dd>
+    <dt class="sourcecode">suse/</dt>
+      <dd>SuSE package creation tools</dd>
     </dl></dd>
   </dl></dd>
 <dt class="sourcecode">/www.openxpki.org/trunk/</dt>
   <dd><dl>
   <dt class="sourcecode">src/</dt>
-    <dd>Sources for the web pages</dd>
+    <dd>Web site source code</dd>
   <dt class="sourcecode">htdocs/</dt>
-    <dd>The web pages themselves</dd>
+    <dd>Static HTML generated from the source code (can directly be 
+      published by a web server)</dd>
   <dt class="sourcecode">update_www_openxpki_org</dt>
     <dd>A script to update the web servers</dd>
   </dl></dd>
 </dl>
 
+
+<h2>Web Site Mirrors</h2>
+<p>
+  This web site is mirrored on several web servers across the world.
+  You can find a 
+  <a href="wwwmirrors.html">
+    list of WWW Mirrors here
+  </a>.
+</p>
       </div> <!-- content -->
 
       <div id="footer">
-        Last modified by svysh on 2006-09-19 19:16:25 +0400  (Rev. 516). &copy; 2005 - 2006  OpenXPKI Foundation
+        Last modified by mbartosch on Tue Dec  5 10:45:37 GMT 2006
+ (based on rev. 516). &copy; 2005 - 2006  OpenXPKI Foundation
 
 
       </div> <!-- footer -->
