@@ -90,6 +90,12 @@ sub __check_command_param : PRIVATE {
     my $arg_ref = shift;
     my $ident = ident $self;
 
+    if (! defined $arg_ref->{COMMAND}) {
+	OpenXPKI::Exception->throw(
+	    message => 'I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_SPECIFIED',
+            );
+    }
+
     ## we need a hash ref with path to actual hash ref
     ## we need the command and the actual parameter path
 
@@ -109,7 +115,14 @@ sub __check_command_param : PRIVATE {
         }
     }
 
-    my $cmd = $self->get_command_params()->{$arg_ref->{COMMAND}};
+    my $command_params = $self->get_command_params();
+    if (! defined $command_params || ref $command_params ne 'HASH') {
+	OpenXPKI::Exception->throw(
+	    message => 'I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_PARAMS',
+            );
+    }
+
+    my $cmd = $command_params->{$arg_ref->{COMMAND}};
     ##! 16: 'cmd: ' . $cmd
     foreach my $key (@{$arg_ref->{COMMAND_PATH}})
     {

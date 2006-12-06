@@ -14,7 +14,7 @@ Sometimes it happens that the depend flag in Makefile.PL is incomplete.
 If this happen then you can get the complete list of used modules with
 the following REGEX:
 
-find . -name "*.pm" -exec grep "^use" '{}' \; | \
+find . -name "*.pm" -exec grep "^use " '{}' \; | \
 grep -v "warnings" | \
 grep -v "strict" | \
 grep -v "Test" | \

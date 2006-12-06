@@ -1,20 +1,40 @@
 use strict;
 use warnings;
+use English;
 use ExtUtils::MakeMaker;
 
 my $openxpki_major_version = "0.9";
 
-if (-e ".svn")
-{
-    my $result = `svn info`;
-       $result =~ s{ .*\n Last\ Changed\ Rev: \s* (\d+) .* }{$1}xs;
-       open FD, ">VERSION" and print FD "$openxpki_major_version.$result" and close FD or
-           die "Cannot write revision file.\n";
+my $openxpki_revision;
+
+# check if we are using a SVN checkout
+if (open my $fh, "svn info 2>/dev/null |") {
+  SVN_INFO:
+    while (my $line = <$fh>) {
+	chomp $line;
+	if ($line =~ m{ \A Revision: \s* (\d+) }xms) {
+	    $openxpki_revision = $1;
+	    last SVN_INFO;
+	}
+    }
+    close $fh;
 }
 
-my $version = undef;
-open FD, "VERSION" and $version = <FD> and close FD
-    or die "Cannot read revision from file.\n";
+if (defined $openxpki_revision) {
+    open my $fh, '>', 'VERSION' || die 'Could not write VERSION file. Stopped';
+    print $fh $openxpki_major_version . '.' . $openxpki_revision;
+    close $fh;
+}
+
+my $version = do {
+    local $INPUT_RECORD_SEPARATOR;
+    open my $fh, '<', 'VERSION' or return;
+    <$fh>;
+};
+
+if (! defined $version) {
+    die "Cannot read revision from file. Stopped";
+}
 
 WriteMakefile(
     NAME                => 'OpenXPKI::Client::SCEP',

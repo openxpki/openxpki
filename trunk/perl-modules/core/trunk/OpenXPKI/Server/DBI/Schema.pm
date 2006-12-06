@@ -27,7 +27,6 @@ my %SEQUENCE_of = (
     PRIVATE        => "sequence_private",
     SECRET         => "sequence_secret",
     SIGNATURE      => "sequence_signature",
-    VOTING         => "sequence_voting",
     DATAEXCHANGE   => "sequence_dataexchange",
     WORKFLOW       => "sequence_workflow",
     WORKFLOW_VERSION => "sequence_workflow_version",
@@ -63,7 +62,6 @@ my %COLUMN_of = (
     DATA_SERIAL           => "data_key",
     PRIVATE_SERIAL        => "private_key",
     SIGNATURE_SERIAL      => "signature_key",
-    VOTING_SERIAL         => "voting_key",
     LOCK_SERIAL           => "global_id",
     DATAEXCHANGE_SERIAL   => "dataexchange_key",
     WORKFLOW_SERIAL       => "workflow_id",
@@ -244,14 +242,6 @@ my %TABLE_of = (
                      "TABLE", "SERIAL",
                      "UNTIL" ]},
 
-#     DATAEXCHANGE => {
-#         NAME    => "dataexchange",
-#         INDEX   => [ "DATAEXCHANGE_SERIAL" ],
-#         COLUMNS => [ "DATAEXCHANGE_SERIAL",
-#                      "TABLE", "PKI_REALM", "CA", "SERIAL",
-# 		     "WORKFLOW_SERIAL", "WORKFLOW_CONTEXT_KEY",
-#                      "SERVERID", "EXPORTID" ]},
-    
     WORKFLOW => {
         NAME    => "workflow",
         INDEX   => [ "WORKFLOW_SERIAL" ],
