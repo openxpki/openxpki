@@ -115,11 +115,16 @@ sub convert {
 
 	# This will save the component's output in $buffer
         if ((exists($files_status{$name_with_source}) || $force)) {
-	    $interp->out_method(\$buffer);
-	    $interp->exec("/$comp_path");
+            if ($files_status{$name_with_source} !~ m/ \A \? \Z /xms) {
+	        $interp->out_method(\$buffer);
+	        $interp->exec("/$comp_path");
+            }
+            else { # file is not under version control
+	        print STDERR "WARNING: $name_with_source ignored (not under version control)\n";
+                return;
+            }
         }
-        else {
-	    print STDERR "WARNING: $name_with_source ignored (not under version control\n";
+        else { # file was not changed
             return;
         }
 
