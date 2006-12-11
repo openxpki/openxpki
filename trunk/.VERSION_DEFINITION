@@ -1,0 +1,59 @@
+#
+# Written by Martin Bartosch for the OpenXPKI project 2006
+# Copyright (c) 2006 by The OpenXPKI Project
+# $Revision: 589 $
+#
+###########################################################################
+# Format definitions. The formats defined here can be used as symbolic 
+# names for the --format option.
+#
+[FORMAT_DEFINITIONS]
+version: MAJOR.MINOR.RELEASESUFFIX\n
+daily_snapshot: %F-MAJOR.MINOR.RELEASESUFFIX\n
+
+###########################################################################
+# Version number components
+
+# built-in components (component names are 'magic'), but you can modify 
+# the keyword(s).
+# Currently the following magic built-ins are defined:
+#   revision: the global SVN revision number
+#   last-changed-revision: obtains the highest "Last Changed Rev" below
+#     the current directory (recursively)
+
+[revision]
+keyword:          SVN_REVISION
+
+[last-changed-revision]
+keyword:          SVN_LAST_CHANGED_REVISION
+
+# Custom components
+# To create a custom version number component define the following keys:
+# filename:         File name to use. vergen searches upwards from  the
+#                   current directory until it finds the specified file.
+#                   The file contents will be assigned as the component
+#                   value.
+# keyword:          Symbolic name(s) describing the version component that 
+#                   can be used to reference its value.
+#                   More than one keyword can be used for aliasing the 
+#                   component. Only the first keyword defined is used 
+#                   for --dump, though.
+# optional:         If set to 'yes' or 'true', this component is not mandatory
+
+[major]
+filename:         .VERSION_MAJOR
+keyword:          MAJOR
+
+[minor]
+filename:         .VERSION_MINOR
+keyword:          MINOR
+
+[release]
+filename:         .VERSION_RELEASE
+keyword:          RELEASE
+
+[suffix]
+filename:         .VERSION_SUFFIX
+keyword:          SUFFIX
+optional:         yes
+
