@@ -3,37 +3,24 @@ use warnings;
 use English;
 use ExtUtils::MakeMaker;
 
-my $openxpki_major_version = "0.9";
+my $vergen = '../../../../tools/vergen';
+my $version = `$vergen --format version`;
 
-my $openxpki_revision;
-
-# check if we are using a SVN checkout
-if (open my $fh, "svn info 2>/dev/null |") {
-  SVN_INFO:
-    while (my $line = <$fh>) {
-	chomp $line;
-	if ($line =~ m{ \A Revision: \s* (\d+) }xms) {
-	    $openxpki_revision = $1;
-	    last SVN_INFO;
-	}
-    }
-    close $fh;
-}
-
-if (defined $openxpki_revision) {
+if ($CHILD_ERROR == 0) {
+    print "Version $version\n";
     open my $fh, '>', 'VERSION' || die 'Could not write VERSION file. Stopped';
-    print $fh $openxpki_major_version . '.' . $openxpki_revision;
+    print $fh $version;
     close $fh;
 }
 
-my $version = do {
+$version = do {
     local $INPUT_RECORD_SEPARATOR;
-    open my $fh, '<', 'VERSION' or return;
+    open my $fh, '<', 'VERSION' or die "Could not read VERSION file. Stopped";
     <$fh>;
 };
 
 if (! defined $version) {
-    die "Cannot read revision from file. Stopped";
+    die "Cannot read version from file. Stopped";
 }
 
 WriteMakefile(
@@ -42,7 +29,7 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/OpenXPKI/Client.pm',
     PREREQ_PM => {
         'Test::More' => 0,
-        'Class::Std' => '0.0.7',
+        'Class::Std' => '0.0.8',
         'OpenXPKI::Debug' => 0,
         'OpenXPKI::Exception' => 0,
         'OpenXPKI::Transport::Simple' => 0,
