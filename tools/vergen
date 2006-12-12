@@ -324,6 +324,11 @@ Useful dump formats:
   --dumpformat 'KEYWORD="VALUE"\n'   
   --dumpformat 'export KEYWORD="VALUE"\n'   
 
+=item B<--verbose>
+
+Show which files are processed for determination of the version number
+components.
+
 =back
 
 =head1 The .VERSION_DEFINITION File

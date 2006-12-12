@@ -1,5 +1,5 @@
 
-OPENXPKI_MAJOR_VERSION = "0.9"
+VERGEN = ../../tools/vergen
 PREFIX?=	/usr
 LOCALE_DIR   = $(DESTDIR)$(PREFIX)/share/locale
 MO_FILE      = openxpki.mo
@@ -55,20 +55,20 @@ test install clean distclean::
 distclean clean::
 	rm -f */*.po~
 
-dist:	REVISION=${OPENXPKI_MAJOR_VERSION}.`svn info | grep -e "Last Changed Rev" | awk '{ print $$4 }'`
+dist:	VERSION=`$(VERGEN) --format version`
 dist:
-	if [ -d openxpki-i18n-$(REVISION) ] ; then \
-		rm -rf openxpki-i18n-$(REVISION)/ ; \
+	if [ -d openxpki-i18n-$(VERSION) ] ; then \
+		rm -rf openxpki-i18n-$(VERSION)/ ; \
 	fi
-	mkdir openxpki-i18n-$(REVISION)
+	mkdir openxpki-i18n-$(VERSION)
 	tar -c -p -f - \
 		--exclude "*.svn" \
 		--exclude "openxpki-i18n-*" \
 		--exclude "*.1" \
 		--exclude "*~" \
 		. | \
-		tar -C openxpki-i18n-$(REVISION)/ -x -f -
-	tar cf openxpki-i18n-$(REVISION).tar openxpki-i18n-$(REVISION)
-	gzip --best openxpki-i18n-$(REVISION).tar
-	rm -rf openxpki-i18n-$(REVISION)/
+		tar -C openxpki-i18n-$(VERSION)/ -x -f -
+	tar cf openxpki-i18n-$(VERSION).tar openxpki-i18n-$(VERSION)
+	gzip --best --force openxpki-i18n-$(VERSION).tar
+	rm -rf openxpki-i18n-$(VERSION)/
 

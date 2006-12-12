@@ -5,10 +5,10 @@ use ExtUtils::MakeMaker;
 
 use File::Spec;
 
-# Major version part (OpenXPKI uses x.y.z version numbers, this string
-# represents x.y of this version. z is the SVN revision.)
-my $openxpki_major_version = "0.9";
+my $vergen = '../../../../tools/vergen';
 
+###########################################################################
+# determine OpenSSL version
 ## first we have to find a working OpenSSL 0.9.8 at minimum
 
 # OPENSSL_LIB
@@ -20,9 +20,9 @@ my $openxpki_major_version = "0.9";
 # /
 # ...
 
-my $openssl_inc_dir = "";
-my $openssl_lib_dir = "";
-my $openssl_binary = "";
+my $openssl_inc_dir = '';
+my $openssl_lib_dir = '';
+my $openssl_binary  = '';
 
 my @paths = qw( /usr/local/ssl
                 /opt/local/ssl
@@ -32,13 +32,15 @@ my @paths = qw( /usr/local/ssl
                 /opt
               );
 
-if (exists $ENV{OPENSSL_PREFIX} && $ENV{OPENSSL_PREFIX} ne "") {
-    @paths = ($ENV{OPENSSL_PREFIX}, @paths);
+if (exists $ENV{OPENSSL_PREFIX} 
+    && $ENV{OPENSSL_PREFIX} ne '') {
+    unshift @paths, $ENV{OPENSSL_PREFIX};
 }
 
 
 my $tmp_ver;
 
+PATH:
 foreach my $path (@paths)
 {
     my $tmp_inc = File::Spec->catfile($path, 'include');
@@ -54,16 +56,16 @@ foreach my $path (@paths)
 	$openssl_inc_dir = $tmp_inc;
 	$openssl_lib_dir = $tmp_lib;
 	$openssl_binary  = $tmp_bin;
-	last;
+	last PATH;
     }
 }
 
 # accept settings from OPENSSL_INC and OPENSSL_LIB if BOTH exist
-if (exists $ENV{OPENSSL_INC} && $ENV{OPENSSL_INC} != "" &&
-    exists $ENV{OPENSSL_LIB} && $ENV{OPENSSL_LIB} != "") {
+if (exists $ENV{OPENSSL_INC}    && $ENV{OPENSSL_INC} != "" 
+    && exists $ENV{OPENSSL_LIB} && $ENV{OPENSSL_LIB} != "") {
 
     $openssl_inc_dir = $ENV{OPENSSL_INC};
-    $openssl_lib_dir     = $ENV{OPENSSL_LIB};
+    $openssl_lib_dir = $ENV{OPENSSL_LIB};
 }
 
 die "Could not find usable OpenSSL installation. Stopped" 
@@ -84,11 +86,13 @@ $openssl_version =~ s/^[^"]*"([^"]*)".*$/$1/;
 print STDERR "OpenSSL version: $openssl_version\n";
 $openssl_version =~ s/^\s*OpenSSL\s*0\.9\.//i;
 $openssl_version =~ s/^([0-9]+).*$/$1/;
+
 if ($openssl_version < 8)
 {
-    print STDERR "==============================================\n";
-    print STDERR "WARNING: You need at minimum an OpenSSL 0.9.8!\n";
-    print STDERR "==============================================\n";
+    print STDERR "\n";
+    print STDERR "ERROR: OpenSSL 0.9.8 or higher is required.\n";
+    print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
+    exit 1;
 }
 
 # make OpenSSL binary location available to tests
@@ -96,46 +100,14 @@ open my $fh, ">", File::Spec->catfile("t", "cfg.binary.openssl");
 print $fh $openssl_binary;
 close $fh;
 
-#determine version
 
-my $openxpki_version;
+###########################################################################
+# determine OpenXPKI version
 
-# check if we are using a SVN checkout
-if (open $fh, "svn info 2>/dev/null |") {
-  SVN_INFO:
-    while (my $line = <$fh>) {
-	chomp $line;
-	if ($line =~ m{ \A Revision: \s* (\d+) }xms) {
-	    $openxpki_version = $1;
-	    last SVN_INFO;
-	}
-    }
-    close $fh;
-}
+my $openxpki_version = `$vergen --format version`;
 
-if (defined $openxpki_version)
-{
-    print STDERR "This is a development tree\n";
-    print STDERR "Revision from SVN: $openxpki_version\n";
-    $openxpki_version = $openxpki_major_version.".".$openxpki_version;
-}
-
-# fallback methods to determine revision
-if (! defined $openxpki_version) {
-    # check for forced-revision file that should contain a single integer
-    # number
-    my $filename = 'revision';
-    if (-r $filename) {
-	my $revision = do {
-	    open my $fh, '<', $filename or die "Could not read $filename. Stopped";
-	    local $INPUT_RECORD_SEPARATOR;
-	    <$fh>;
-	};
-	($revision) = ($revision =~ m{ (\d+) }xms);
-	$openxpki_version = $openxpki_major_version . '.' . $revision;
-	print STDERR "This is a development tree\n";
-	print STDERR "Revision from '$filename' file: $revision\n";
-    }
+if ($CHILD_ERROR != 0) {
+    $openxpki_version = undef;
 }
 
 if (! defined $openxpki_version) {
@@ -143,12 +115,12 @@ if (! defined $openxpki_version) {
     # already installed but outdated version file)
     # this is mainly used in archives created from 'make dist' steps
     eval {
-	local @INC = ( '.' );
-	require OpenXPKI::VERSION;
-	$openxpki_version = $OpenXPKI::VERSION::VERSION;
-	print STDERR "OpenXPKI distribution\n";
-	print STDERR "Version from OpenXPKI::Version: $openxpki_version\n";
-    };
+ 	local @INC = ( '.' );
+ 	require OpenXPKI::VERSION;
+ 	$openxpki_version = $OpenXPKI::VERSION::VERSION;
+ 	print STDERR "OpenXPKI distribution\n";
+ 	print STDERR "Version from OpenXPKI::Version: $openxpki_version\n";
+     };
 }
 
 if (! defined $openxpki_version) {

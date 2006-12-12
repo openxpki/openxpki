@@ -8,8 +8,8 @@
 # names for the --format option.
 #
 [FORMAT_DEFINITIONS]
-version: MAJOR.MINOR.RELEASESUFFIX\n
-daily_snapshot: %F-MAJOR.MINOR.RELEASESUFFIX\n
+version: MAJOR.MINOR.RELEASESUFFIX
+daily_snapshot: %F-MAJOR.MINOR.RELEASESUFFIX
 
 ###########################################################################
 # Version number components
