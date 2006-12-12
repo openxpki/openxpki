@@ -5,8 +5,7 @@
 # $Revision$
 #
 
-our $VERSION = '0.9.$Revision$';
-$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
+our $VERSION = "[% deployment.version %]";
 
 use strict;
 use warnings;

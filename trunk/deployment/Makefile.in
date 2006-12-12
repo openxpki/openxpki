@@ -6,7 +6,7 @@
 # $Revision: 318 $
 #
 
-OPENXPKI_MAJOR_VERSION = "0.9"
+VERGEN = ../../tools/vergen
 
 BINDIR          = [% dir.bindir %]
 MANDIR          = [% dir.mandir %]
@@ -37,6 +37,9 @@ CONFIGFILE      = etc/templates/$(TEMPLATE)/openxpki.conf
 ###########################################################################
 # no user serviceable parts below this line
 
+VERSION=$(shell $(VERGEN) --format version)
+
+
 TOOLS_SRC = \
 	bin/openxpkiadm.in \
 	bin/openxpkictl.in \
@@ -56,7 +59,10 @@ tools: $(TOOLS)
 
 $(TOOLS_DST): $(TOOLS_SRC) $(CONFIGFILE)
 	for file in $(TOOLS_DST) ; do \
-		$(CFG) --config $(CONFIGFILE) --file $$file.in >$$file ;\
+		$(CFG) \
+			--config $(CONFIGFILE) \
+			--setcfg deployment.version="$(VERSION)" \
+			--file $$file.in >$$file ;\
 	done
 
 build-man:
@@ -93,27 +99,26 @@ clean:
 
 distclean: clean
 
-
-dist:	REVISION=${OPENXPKI_MAJOR_VERSION}.`svn info | grep -e "Last Changed Rev" | awk '{ print $$4 }'`
+# dist:	VERSION=`$(VERGEN) --format version`
 dist:
-	if [ -d openxpki-deployment-$(REVISION) ] ; then \
-		rm -rf openxpki-deployment-$(REVISION)/ ; \
+	if [ -d openxpki-deployment-$(VERSION) ] ; then \
+		rm -rf openxpki-deployment-$(VERSION)/ ; \
 	fi
-	mkdir openxpki-deployment-$(REVISION)
+	mkdir openxpki-deployment-$(VERSION)
 	tar -c -p -f - \
 		--exclude "*.svn" \
 		--exclude "openxpki-deployment-*" \
 		--exclude "*.1" \
 		--exclude "*~" \
 		. | \
-		tar -C openxpki-deployment-$(REVISION)/ -x -f -
-	find openxpki-deployment-$(REVISION) -name "*.in" | \
+		tar -C openxpki-deployment-$(VERSION)/ -x -f -
+	find openxpki-deployment-$(VERSION) -name "*.in" | \
 		sed -e 's/\.in//g' | while read file ; do \
 			rm -f $$file ; \
 		done
-	tar cf openxpki-deployment-$(REVISION).tar openxpki-deployment-$(REVISION)
-	gzip --best openxpki-deployment-$(REVISION).tar
-	rm -rf openxpki-deployment-$(REVISION)/
+	tar cf openxpki-deployment-$(VERSION).tar openxpki-deployment-$(VERSION)
+	gzip --best --force openxpki-deployment-$(VERSION).tar
+	rm -rf openxpki-deployment-$(VERSION)/
 
 
 help:
