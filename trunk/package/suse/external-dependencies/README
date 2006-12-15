@@ -1,0 +1,9 @@
+This directory contains spec files for modules that may not be part of
+your distribution.
+
+Please note that not all of these may have to be built by yourself, you
+may want to check your distribution if it ships the necessary module.
+
+The spec files reference versions known to work with OpenXPKI. You may
+use higher versions, but it is not recommended to deliberately downgrade.
+
