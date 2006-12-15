@@ -99,7 +99,6 @@ clean:
 
 distclean: clean
 
-# dist:	VERSION=`$(VERGEN) --format version`
 dist:
 	if [ -d openxpki-deployment-$(VERSION) ] ; then \
 		rm -rf openxpki-deployment-$(VERSION)/ ; \

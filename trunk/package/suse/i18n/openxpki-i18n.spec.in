@@ -1,0 +1,107 @@
+## Written 2006 by Martin Bartosch for the OpenXPKI project
+## Copyright (C) 2005-2006 by The OpenXPKI Project
+## $Revision: 350 $
+
+#
+#   - OpenXPKI i18n package -
+#
+
+%define pkgname openxpki-i18n
+%define filelist %{pkgname}-%{version}-filelist
+%define NVR %{pkgname}-%{version}-%{release}
+%define maketest 0
+
+name:      openxpki-i18n
+summary:   OpenXPKI Internationalization
+version:   _VERSION_
+release:   1
+vendor:    OpenXPKI Project
+packager:  Martin Bartosch <m.bartosch@cynops.de>
+license:   Apache
+group:     Applications/CPAN
+url:       http://www.openxpki.org
+buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
+prefix:    %(echo %{_prefix})
+source:    openxpki-i18n-%{version}.tar.gz
+
+%description
+OpenXPKI internationalization files.
+
+%prep
+%setup -q -n %{pkgname}-%{version} 
+chmod -R u+w %{_builddir}/%{pkgname}-%{version}
+
+%build
+%{__make} 
+%if %maketest
+%{__make} test
+%endif
+
+%install
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+
+%{makeinstall} DESTDIR=%{buildroot}
+
+
+cmd=/usr/share/spec-helper/compress_files
+[ -x $cmd ] || cmd=/usr/lib/rpm/brp-compress
+[ -x $cmd ] && $cmd
+
+# SuSE Linux
+if [ -e /etc/SuSE-release -o -e /etc/UnitedLinux-release ]
+then
+	:
+fi
+
+# remove special files
+
+# no empty directories
+find %{buildroot}%{_prefix}             \
+    -type d -depth                      \
+    -exec rmdir {} \; 2>/dev/null
+
+%{__perl} -MFile::Find -le '
+    find({ wanted => \&wanted, no_chdir => 1}, "%{buildroot}");
+    #print "%doc  CHANGES INSTALL LICENSE README";
+    for my $x (sort @dirs, @files) {
+        push @ret, $x unless indirs($x);
+        }
+    print join "\n", sort @ret;
+
+    sub wanted {
+        return if /auto$/;
+
+        local $_ = $File::Find::name;
+        my $f = $_; s|^\Q%{buildroot}\E||;
+        return unless length;
+        return $files[@files] = $_ if -f $f;
+
+        $d = $_;
+        /\Q$d\E/ && return for reverse sort @INC;
+        $d =~ /\Q$_\E/ && return
+            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share|;
+
+        $dirs[@dirs] = $_;
+        }
+
+    sub indirs {
+        my $x = shift;
+        $x =~ /^\Q$_\E\// && $x ne $_ && return 1 for @dirs;
+        }
+    ' > %filelist
+
+
+[ -z %filelist ] && {
+    echo "ERROR: empty %files listing"
+    exit -1
+    }
+
+%clean
+# [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+
+%files -f %filelist
+%defattr(-,root,root)
+
+%changelog
+* Mon Nov 27 2006 m.bartosch@cynops.de
+- Initial build.

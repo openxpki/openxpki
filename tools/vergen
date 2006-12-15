@@ -29,7 +29,7 @@ my $svn = 'svn';
 my $svn_info;
 my $mapping_of;
 my $format_of;
-
+my $saved_directory;
 
 ###########################################################################
 
@@ -51,8 +51,13 @@ sub slurp {
 }
 
 sub get_svn_info {
-    my $result;
-    open my $fh, "$svn info -R |" or die "Could not run 'svn' command. Stopped";
+    my $result = {};
+
+    my $fh;
+    if (! open $fh, "$svn info -R 2>/dev/null |") {
+	return $result;
+    }
+
   SVN_INFO:
     while (<$fh>) {
 	chomp;
@@ -109,8 +114,13 @@ sub expand_keyword {
     while ($last_arg ne $arg) {
         $last_arg = $arg;
 	foreach my $keyword (keys %{$mapping_of->{keyword}}) {
-	    my $value = $mapping_of->{keyword}->{$keyword}->{entry}->{value};
-	    $arg =~ s{ $keyword }{$value}xmsg;
+	    if ($arg =~ m{ $keyword }xms) {
+		my $value = $mapping_of->{keyword}->{$keyword}->{entry}->{value};
+		if (! defined $value) {
+		    die "Could not get value for keyword '$keyword'. Stopped";
+		}
+		$arg =~ s{ $keyword }{$value}xmsg;
+	    }
 	}
 	$arg = strftime($arg, gmtime(time));
     }
@@ -126,12 +136,20 @@ GetOptions(\%params,
 	      man
               verbose
               format=s
+              directory=s
               dump
               dumpformat=s
 	      )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
+
+if (defined $params{directory}) {
+    $saved_directory = getcwd;
+    if (! chdir $params{directory}) {
+        die "Could not change to directory $params{directory}. Stopped";
+    }
+}
 
 my $def_file = upwards_find_file('.VERSION_DEFINITION');
 
@@ -273,6 +291,7 @@ vergen [options] COMMAND
    --help                brief help message
    --man                 full documentation
    --format <arg>        print version using format 'arg'
+   --directory <dir>     pretend to be in directory 'dir'
    --dump                dump keyword assignments
    --dumpformat <string> use <string> as dump format 
                          (default: KEYWORD=VALUE\n)
@@ -310,6 +329,13 @@ referencing a format string in the FORMAT_DEFINITIONS section of
 the corresponding .VERSION_DEFINITION file or a custom string specifying
 the version number. You may use all keywords defined in .VERSION_DEFINITON
 and all conversion specifications as defined by strftime(3).
+
+=item B<--directory> dir
+
+Makes it possible to simulate calling vergen in another directory.
+This is identical to calling
+
+  ( cd <dir> && vergen ... )
 
 =item B<--dump>
 
