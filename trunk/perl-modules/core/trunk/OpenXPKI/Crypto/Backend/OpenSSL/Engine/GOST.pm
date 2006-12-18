@@ -31,7 +31,7 @@ sub new {
                         NAME
                         KEY
                         PASSWD
-                        PASSWD_PARTS
+                        SECRET
                         CERT
                         INTERNAL_CHAIN
                         ENGINE_SECTION
