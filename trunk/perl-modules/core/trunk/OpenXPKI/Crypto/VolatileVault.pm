@@ -15,8 +15,6 @@ use English;
 use OpenXPKI::Debug 'OpenXPKI::Crypto::VolatileVault';
 use OpenXPKI::Exception;
 
-use OpenXPKI::Crypto::TokenManager;
-
 use MIME::Base64;
 
 # use Smart::Comments;

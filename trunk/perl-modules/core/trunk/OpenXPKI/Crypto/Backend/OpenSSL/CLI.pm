@@ -34,7 +34,9 @@ sub error_ispresent {
 
     if ($stderr =~ m{ [eE]rror |
                       unable\ to\ load\ key |
-                      No\ certificate\ matches\ private\ key
+                      No\ certificate\ matches\ private\ key |
+                      unknown\ option |
+                      Usage:\ pkcs12
                     }xms) {
         return 1;
     }

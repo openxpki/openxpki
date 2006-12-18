@@ -7,59 +7,50 @@
   <state name="INITIAL">
     <action name="import"
             resulting_state="WAITING_FOR_START">
-<!-- TODO: -->
-<!--      <condition name="CONTEXT::csr_serial_present"/> -->
     </action>
-<!-- TODO: -->
-<!--    <action name="null" 
-	    resulting_state="FAILURE">
-      <condition name="CONTEXT::no_csr_serial_present"/>
-    </action>
--->
   </state>
 
   <!-- this state is implicitly autostarted by the parent workflow -->
   <state name="WAITING_FOR_START">
+    <action name="null" 
+	    resulting_state="FAILURE">
+      <condition name="!valid_csr_serial_present"/>
+    </action>
     <action name="determine_issuing_ca"
 	    resulting_state="ISSUING_CA_DETERMINED">
       <condition name="ACL::start_certificate_issuance"/>
+      <condition name="valid_csr_serial_present"/>
     </action>
   </state>
 
   <state name="ISSUING_CA_DETERMINED" autorun="yes">
-    <action name="get_cert_profile"
-            resulting_state="PREPARED">
-    </action>
-  </state>
-
-  <state name="PREPARED" autorun="yes">
-    <!-- at the moment, this action is never triggered as the condition
-         always fails. This is useful for testing, but will change
-         in the future -->
     <action name="do_nothing"
             resulting_state="CA_KEY_NOT_USABLE">
-      <condition name="CA::key_is_not_usable"/>
+      <condition name="!ca_key_usable"/>
     </action>
 
     <action name="do_nothing2"
             resulting_state="CA_KEY_USABLE">
-      <condition name="CA::key_is_usable"/>
+      <condition name="ca_key_usable"/>
     </action>
   </state>
 
-  <!-- TODO: maybe loop back to prepared if the key is not usable
-             _right now_ (might have become unusable for some reason).
-             Or am I just _too_ paranoid? ;-)
-   -->
-  <state name="CA_KEY_USABLE" autorun="yes">
+  <state name="PREPARED" autorun="yes">
     <action name="issue_certificate" 
 	    resulting_state="CERTIFICATE_ISSUED">
     </action>
   </state>
 
+  <state name="CA_KEY_USABLE" autorun="yes">
+    <action name="get_cert_profile"
+            resulting_state="PREPARED">
+    </action>
+  </state>
+
   <state name="CA_KEY_NOT_USABLE">
-    <action name="unlock_ca_key" 
+    <action name="continue" 
 	    resulting_state="CA_KEY_USABLE">
+        <condition name="ca_key_usable"/>
     </action>
   </state>
 

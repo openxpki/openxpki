@@ -20,7 +20,6 @@ use Data::Dumper;
 use OpenXPKI::Debug 'OpenXPKI::Server::API';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Crypto::TokenManager;
 
 sub START {
     # somebody tried to instantiate us, but we are just an
@@ -46,10 +45,32 @@ sub get_role {
     return CTX('session')->get_role();
 }
 
+sub get_random {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $length  = $arg_ref->{LENGTH};
+    ##! 4: 'length: ' . $length
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $random = $default_token->command({
+        COMMAND => 'create_random',
+        RETURN_LENGTH => $length,
+        RANDOM_LENGTH => $length,
+    });
+    ## DO NOT echo $random here, as it will possibly used as a password!
+    return $random;
+}
+    
+    
 
 sub get_chain {
     my $self    = shift;
     my $arg_ref = shift;
+
+    my $pki_realm     = CTX('session')->get_pki_realm();
+    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
 
     my $return_ref;
     my @identifiers;
@@ -87,11 +108,12 @@ sub get_chain {
                     push @certs, $cert->{DATA};
                 }
                 elsif ($arg_ref->{OUTFORMAT} eq 'DER') {
-                    # FIXME: convert to DER using default token
-                    # and convert_cert
-                    OpenXPKI::Exception->throw(
-                        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_FIXME_DER_OUTFORMAT_STILL_UNSUPPORTED',
-                    );
+                    push @certs, $default_token->command({
+                        COMMAND => 'convert_cert',
+                        DATA    => $cert->{DATA},
+                        IN      => 'PEM',
+                        OUT     => 'DER',
+                    });
                 }
             }
             if ($cert->{ISSUER_IDENTIFIER} eq $current_identifier) {
@@ -101,6 +123,7 @@ sub get_chain {
             }
             else { # go to parent
                 $current_identifier = $cert->{ISSUER_IDENTIFIER};
+                ##! 64: 'issuer: ' . $current_identifier
                 if (defined $already_seen{$current_identifier}) {
                     # we've run into a loop!
                     $finished = 1;

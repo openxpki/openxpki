@@ -237,6 +237,7 @@ sub dump
     $self->write_file (FILENAME => $self->{FILENAME}->{CONFIG},
                        CONTENT  => $config);
 
+    ##! 16: 'config: ' . $config
     ##! 2: "set the configuration to the XS library"
     ##! 2: "should we integrate this into the get_config function?"
     OpenXPKI::Crypto::Backend::OpenSSL::set_config ($self->{FILENAME}->{CONFIG});

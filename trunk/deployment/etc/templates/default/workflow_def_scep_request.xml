@@ -24,14 +24,14 @@
     </action>
     <action name="set_error_code_1"
             resulting_state="FAILURE">
-      <condition name="invalid_signature_or_requested_dn"/>
+      <condition name="!valid_signature_with_requested_dn"/>
     </action>
   </state>
 
   <state name="SIGNATURE_OK" autorun="yes">
     <action name="null"
             resulting_state="RENEWAL">
-      <condition name="is_renewal"/>
+      <condition name="!is_initial_enrollment"/>
     </action>
     <action name="null2"
             resulting_state="INITIAL_ENROLLMENT">
@@ -47,7 +47,7 @@
     </action>
     <action name="set_error_code_4"
 	    resulting_state="FAILURE">
-      <condition name="initial_enrollment_not_allowed"/>
+      <condition name="!initial_enrollment_allowed"/>
     </action>
   </state>
 
@@ -59,7 +59,7 @@
     </action>
     <action name="set_error_code_2"
 	    resulting_state="FAILURE">
-      <condition name="auto_renewal_not_allowed"/>
+      <condition name="!auto_renewal_allowed"/>
     </action>
   </state>
 
@@ -71,7 +71,7 @@
     </action>
     <action name="set_error_code_2"
             resulting_state="FAILURE">
-      <condition name="incorrect_number_of_valid_certs"/>
+      <condition name="!correct_number_of_valid_certs"/>
     </action>
   </state>
 
@@ -82,7 +82,7 @@
     </action>
     <action name="set_error_code_2"
             resulting_state="FAILURE">
-        <condition name="incorrect_timing"/>
+        <condition name="!correct_timing"/>
     </action>
   </state>
 
@@ -95,16 +95,16 @@
     <action name="null"
             resulting_state="PENDING">
       <condition name="auto_approval_allowed"/>
-      <condition name="self_signed"/>
+      <condition name="!signed_using_original_cert"/> <!-- this is equivalent to self-signed -->
     </action>
     <action name="null2"
             resulting_state="PENDING">
-      <condition name="no_auto_approval_allowed"/>
-      <condition name="self_signed"/>
+      <condition name="!auto_approval_allowed"/>
+      <condition name="!signed_using_original_cert"/>
     </action>
     <action name="null3"
             resulting_state="PENDING">
-      <condition name="no_auto_approval_allowed"/>
+      <condition name="!auto_approval_allowed"/>
       <condition name="signed_using_original_cert"/>
     </action>
   </state>

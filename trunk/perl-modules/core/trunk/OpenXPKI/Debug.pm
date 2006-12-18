@@ -1,5 +1,6 @@
 ## OpenXPKI::Debug
 ## Written 2006 by Michail Bachmann and Michael Bell for the OpenXPKI project
+## censoring added 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
 ## $Revision$
 
@@ -75,9 +76,11 @@ sub filter
 
 sub debug
 {
-    shift;
+    my $self  = shift;
     my $msg   = shift;
     my $level = shift || "0";
+
+    $msg = $self->__censor_msg($msg);
 
     my ($package, $filename, $line, $subroutine, $hasargs,
         $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
@@ -92,6 +95,19 @@ sub debug
 
     my $timestamp = strftime("%F %T", localtime(time));
     print STDERR "$timestamp DEBUG:$level PID:$PROCESS_ID $msg";
+}
+
+sub __censor_msg {
+    my $self = shift;
+    my $msg  = shift;
+    
+    $msg =~ s{PASS([A-Za-z_]*) .*}{PASS$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{PRIVATE([A-za-z_]*) .*}{PRIVATE$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{symmetric_cipher([A-za-z_]*) .*}{symmetric_cipher$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{SECRET([A-za-z_]*) .*}{SECRET$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{secret([A-za-z_]*) .*}{secret$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+
+    return $msg;
 }
 
 1 ;
@@ -166,6 +182,11 @@ import function. Please see Filter::Util::Call for more details.
 
 This function builds the debug message. It outputs such things like
 the debug level, the module name and the source code line.
+
+=head2 __censor_msg
+
+This method is used to censor debug messages that potentially contain
+confidential information such as passwords or private keys.
 
 =head1 See also
 

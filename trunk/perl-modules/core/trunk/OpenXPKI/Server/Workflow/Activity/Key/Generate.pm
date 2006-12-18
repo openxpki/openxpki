@@ -12,7 +12,6 @@ use Log::Log4perl       qw( get_logger );
 # use Smart::Comments;
 
 use OpenXPKI::Exception;
-use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Server::Context qw( CTX );
 
 

@@ -108,6 +108,7 @@ sub login {
     ## test the passphrase
     eval
     {
+        # this is probably broken
         $self->{OPENSSL}->command ({COMMAND => "convert_key", OUTFORM=>"PKCS8"});
     };
     if (my $exc = OpenXPKI::Exception->caught())

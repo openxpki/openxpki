@@ -20,10 +20,6 @@ sub evaluate {
     my ( $self, $workflow ) = @_;
 
     ##! 16: 'my condition name: ' . $self->name()
-    my $negate = 0;
-    if ($self->name() eq 'no_more_csrs_to_create') {
-        $negate = 1;
-    }
     my $context  = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
@@ -34,20 +30,11 @@ sub evaluate {
     my $nr_of_certs = $context->param('nr_of_certs');
     ##! 16: 'scalar @cert_issuance_data: ' . scalar @cert_issuance_data
     ##! 16: 'nr_of_certs: ' . $nr_of_certs
-    #
-    if ($negate == 0) {
-        ##! 16: 'negate = 0'
-        if (scalar @cert_issuance_data == $nr_of_certs) {
+
+    if (scalar @cert_issuance_data == $nr_of_certs) {
             condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_NO_MORE_CSRS_TO_CREATE');
-        }
     }
-    else {
-        ##! 16: 'negate = 1'
-        if (scalar @cert_issuance_data != $nr_of_certs) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_MORE_CSRS_TO_CREATE');
-        }
-    }
-   return 1; 
+    return 1; 
     ##! 16: 'end'
 }
 
@@ -72,6 +59,3 @@ OpenXPKI::Server::Workflow::Condition::MoreCSRsToCreate
 The condition checks if more CSRs are to be created by checking the
 size of the cert_issuance_data array against the nr_of_certificates
 scalar in the workflow context.
-If the magic condition name 'no_more_csrs_to_create' is used,
-it returns just the opposite.
-

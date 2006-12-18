@@ -57,6 +57,12 @@ OpenXPKI/Crypto/Tool/PKCS7/Engine/OpenSSL.pm
 OpenXPKI/Crypto/Tool/PKCS7/Command/verify.pm
 OpenXPKI/Crypto/Tool/PKCS7/Command/is_not_self_signed.pm
 OpenXPKI/Crypto/Tool/PKCS7/Command/get_subject.pm
+OpenXPKI/Crypto/Tool/CreateJavaKeystore.pm
+OpenXPKI/Crypto/Tool/CreateJavaKeystore/CLI.pm
+OpenXPKI/Crypto/Tool/CreateJavaKeystore/API.pm
+OpenXPKI/Crypto/Tool/CreateJavaKeystore/Engine.pm
+OpenXPKI/Crypto/Tool/CreateJavaKeystore/Engine/OpenSSL.pm
+OpenXPKI/Crypto/Tool/CreateJavaKeystore/Command/create_keystore.pm
 OpenXPKI/Crypto/Toolkit.pm
 
 ## OpenSSL layer
@@ -76,6 +82,8 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs10.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_cert.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs12.pm
+
+OpenXPKI/Crypto/Backend/OpenSSL/Command/get_pkcs8_keytype.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/is_prime.pm
 
@@ -165,6 +173,8 @@ OpenXPKI/Server/Workflow/Activity/CertIssuance/GetCertProfile.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/PersistCertificate.pm
 
 OpenXPKI/Server/Workflow/Activity/CSR/PersistRequest.pm
+OpenXPKI/Server/Workflow/Activity/CSR/GeneratePKCS10.pm
+OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
 
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/CRR/RevokeCertificate.pm
@@ -242,7 +252,11 @@ OpenXPKI/Server/Workflow/Condition/MoreCertsToTest.pm
 OpenXPKI/Server/Workflow/Condition/MoreCSRsToCreate.pm
 OpenXPKI/Server/Workflow/Condition/IsCertificateIssuancePossible.pm
 OpenXPKI/Server/Workflow/Condition/CheckCertTestResult.pm
-
+OpenXPKI/Server/Workflow/Condition/ValidCSRSerialPresent.pm
+OpenXPKI/Server/Workflow/Condition/WorkflowChildrenFailure.pm
+OpenXPKI/Server/Workflow/Condition/IsServerKeyGeneration.pm
+OpenXPKI/Server/Workflow/Condition/GeneratePKCS10.pm
+OpenXPKI/Server/Workflow/Condition/GenerateKey.pm
 
 OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
@@ -251,6 +265,7 @@ OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
 OpenXPKI/Server/Workflow/Validator/PKCS10.pm
 OpenXPKI/Server/Workflow/Validator/SPKAC.pm
+OpenXPKI/Server/Workflow/Validator/PasswordQuality.pm
 
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm

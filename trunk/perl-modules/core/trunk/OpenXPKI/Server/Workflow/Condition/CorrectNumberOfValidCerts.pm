@@ -40,21 +40,8 @@ sub evaluate {
     ##! 16: 'valid certs: ' . $valid_certs
     ##! 16: 'max: ' . $self->max()
 
-    ##! 16: 'my condition name: ' . $self->name()
-    my $negate = 0;
-    if ($self->name() eq 'incorrect_number_of_valid_certs') {
-        $negate = 1;
-    }
-
-    if ($negate == 0) { # we are asked if this is correct
-        if ($valid_certs < $self->min() || $valid_certs > $self->max()) {
+    if ($valid_certs < $self->min() || $valid_certs > $self->max()) {
             condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_INCORRECT_NUMBER_OF_VALID_CERTS');
-        }
-    }
-    else {
-        if ($valid_certs >= $self->min() && $valid_certs <= $self->max()) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS');
-        }
     }
     ##! 16: 'end'
     return 1;
@@ -83,5 +70,3 @@ OpenXPKI::Server::Workflow::Condition::CorrectNumberOfValidCerts
 The condition checks if a renewal SCEP request has the correct number
 of currently valid certificates. The definition of "correct" can be
 tweaked by setting the condition parameters min and max.
-If the condition name is 'incorrect_number_of_valid_certs', the condition
-checks the opposite.

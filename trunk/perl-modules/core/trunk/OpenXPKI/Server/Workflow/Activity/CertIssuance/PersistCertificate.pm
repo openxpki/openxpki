@@ -13,7 +13,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CertIssuance::PersistCertificate';
 use OpenXPKI::Crypto::X509;
-use OpenXPKI::Crypto::TokenManager;
 
 use Data::Dumper;
 
@@ -26,7 +25,7 @@ sub execute {
     my $dbi = CTX('dbi_backend');
     my $pki_realm = CTX('api')->get_pki_realm(); 
 
-    my $tm = OpenXPKI::Crypto::TokenManager->new();
+    my $tm = CTX('crypto_layer');
     my $default_token = $tm->get_token(
         TYPE      => 'DEFAULT',
         PKI_REALM => $pki_realm,

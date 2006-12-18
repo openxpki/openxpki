@@ -147,5 +147,20 @@
           export_destination="0"
           export_state="FAILURE">
   </action>
+  <action name="null"
+          class="Workflow::Action::Null">
+  </action>
+  <action name="generate_key"
+          class="OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey">
+      <field name="_key_type"/>
+      <field name="_password"/>
+      <validator name="PasswordQuality">
+        <arg>$_password</arg>
+      </validator>
+  </action>
+  <action name="generate_pkcs10"
+          class="OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10">
+  </action>
+
 </actions>
 

@@ -19,14 +19,17 @@ sub validate {
     return if (not defined $csr_type);
     return if ($csr_type ne "pkcs10");
 
+# allow non-defined PKCS10 for server-side key generation
     if (not defined $pkcs10)
     {
-        ## empty PKCS#10 must be intercepted here because require cannot be used here
-        ## SPKAC or PKCS10 must required and this is not possible with Workflow
-        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA' ];
-        $context->param ("__error" => $errors);
-        validation_error ($errors->[scalar @{$errors} -1]);
+        return 1;
     }
+#        ## empty PKCS#10 must be intercepted here because require cannot be used here
+#        ## SPKAC or PKCS10 must required and this is not possible with Workflow
+#        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA' ];
+#        $context->param ("__error" => $errors);
+#        validation_error ($errors->[scalar @{$errors} -1]);
+#    }
 
     ## check that it is clean
     if ($pkcs10 !~ m{^-----BEGIN \s CERTIFICATE \s REQUEST-----\s+

@@ -16,7 +16,6 @@ use OpenXPKI::Debug 'OpenXPKI::Service::SCEP::Command::GetCACert';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Crypto::TokenManager;
 
 use Data::Dumper;
 
@@ -33,7 +32,7 @@ sub execute {
 
     ##! 16: 'chain: ' . Dumper(\@ca_cert_Chain)
 
-    my $token_manager = OpenXPKI::Crypto::TokenManager->new();
+    my $token_manager = CTX('crypto_layer');
     my $token = $token_manager->get_token(
         TYPE      => 'DEFAULT',
         PKI_REALM => $pki_realm,

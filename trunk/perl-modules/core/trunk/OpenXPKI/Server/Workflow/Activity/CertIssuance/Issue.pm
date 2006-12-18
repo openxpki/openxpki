@@ -76,9 +76,6 @@ sub execute {
     }
 
     # determine serial number (atomically)
-    # FIXME: do this correctly
-    # TODO: check whether this is "correct" (at least it creates unique
-    # serials, but not necessarily consecutive ones)
     my $serial = $dbi->get_new_serial(
         TABLE => 'CERTIFICATE',
     );

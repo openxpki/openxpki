@@ -10,7 +10,6 @@ use base qw( Workflow::Condition );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug 'OpenXPKI::Server::API::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned';
-use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::X509;
 
 use English;
@@ -27,12 +26,6 @@ sub evaluate {
     my $current_identifier = $context->param('current_identifier');
     my $pki_realm = CTX('session')->get_pki_realm(); 
 
-    ##! 16: 'my condition name: ' . $self->name()
-    my $negate = 0;
-    if ($self->name() eq 'self_signed') {
-        $negate = 1;
-    }
-
      my $pkcs7 = $context->param('pkcs7_content');
      $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7 . "-----END PKCS7-----\n";
 
@@ -44,7 +37,7 @@ sub evaluate {
     });
     ##! 64: 'signer_cert: ' . $signer_cert
 
-    my $tm = OpenXPKI::Crypto::TokenManager->new();
+    my $tm = CTX('crypto_layer');
     my $default_token = $tm->get_token(
         TYPE      => 'DEFAULT',
         PKI_REALM => $pki_realm,
@@ -64,17 +57,8 @@ sub evaluate {
         );
     }
 
-    if ($negate == 1) { # we are asked if this is self signed
-        ##! 16: 'negate=1'
-        if ($signer_cert_identifier eq $current_identifier) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SIGNED_USING_ORIGINAL_CERT');
-        }
-    }
-    else {
-        ##! 16: 'negate=0'
-        if ($signer_cert_identifier ne $current_identifier) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SELF_SIGNED');
-        }
+    if ($signer_cert_identifier ne $current_identifier) {
+        condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SELF_SIGNED');
     }
     ##! 16: 'end'
     return 1;
@@ -100,10 +84,5 @@ OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned
 
 This condition checks whether a renewal SCEP request (PKCS#7) is signed
 with the selected original, currently valid certificate.
-If the condition name is "signed_using_original_cert", it returns
-true if the signature is valid and the signature key matches the
-original certificate key.
-TODO -- we can check against the serial reported by openca-sv verify,
-is that enough???
-If the condition name is "self_signed", the condition works in exactly
-the opposite way.
+It returns true if the signature is valid and the signature certificate
+matches the original certificate.

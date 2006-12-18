@@ -56,21 +56,8 @@ sub evaluate {
     my $diff = $notafter - $now; # TODO -- check for integer overflow?
     ##! 16: 'difference: ' . $diff
 
-    ##! 16: 'my condition name: ' . $self->name()
-    my $negate = 0;
-    if ($self->name() eq 'incorrect_timing') {
-        $negate = 1;
-    }
-
-    if ($negate == 0) { # we are asked if this is correct
-        if ($diff < 0 || $diff > $self->difference()) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_INCORRECT_TIMING');
-        }
-    }
-    else {
-        if ($diff > 0 && $diff <= $self->difference()) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_CORRECT_TIMING');
-        }
+    if ($diff < 0 || $diff > $self->difference()) {
+        condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_INCORRECT_TIMING');
     }
     ##! 16: 'end'
     return 1;
@@ -101,5 +88,3 @@ tweaked by setting the condition parameter 'difference' to a corresponding
 time value. Here, a number without any modifier is interpreted as seconds.
 Appending 'm' interprets the value as minutes, 'h' as hours, 'd' as days
 and 'w' as weeks.
-If the condition name is 'incorrect_timing', the condition
-checks the opposite.

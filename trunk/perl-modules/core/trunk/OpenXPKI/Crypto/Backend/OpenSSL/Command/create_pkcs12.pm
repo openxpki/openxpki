@@ -1,6 +1,8 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12
 ## Written 2005 by Michael Bell for the OpenXPKI project
 ## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
+## enhanced 2006 by Alexander Klink for the OpenXPKI project
+## to support Cryptographic Service Provider names
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
@@ -67,6 +69,19 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_WRONG_ENC_ALG");
     }
 
+    if (exists $self->{CSP}) {
+        # input validation, as this will be passed on to the
+        # command, i.e. a shell
+        if ($self->{CSP} !~ m{ \A [ \w \- \. : \s ]* \z }xms) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_PKCS12_CSP_IS_NOT_ALPHANUMERIC',
+                params => {
+                    CSP => $self->{CSP},
+                },
+            );
+        }
+    }
+
     ## prepare data
 
     $self->write_file (FILENAME => $self->{KEYFILE},
@@ -75,11 +90,14 @@ sub get_command
     $self->write_file (FILENAME => $self->{CERTFILE},
                        CONTENT  => $self->{CERT},
 	               FORCE    => 1);
-    my $chain = join('', @{$self->{CHAIN}});
-    $self->write_file (FILENAME => $self->{CHAINFILE},
-                       CONTENT  => $chain,
-	               FORCE    => 1)
-        if ($self->{CHAIN});
+    if (exists $self->{CHAIN}) {
+        my $chain = join('', @{$self->{CHAIN}});
+        $self->write_file(
+            FILENAME => $self->{CHAINFILE},
+            CONTENT  => $chain,
+	    FORCE    => 1
+        );
+    }
 
     ## build the command
 
@@ -89,7 +107,10 @@ sub get_command
     $command .= " -in ".$self->{CERTFILE};
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -".$self->{ENC_ALG};
-    if ($self->{CHAIN})
+    if (exists $self->{CSP}) {
+        $command .= " -CSP " . $self->{CSP};
+    }
+    if (exists $self->{CHAIN})
     {
         $command .= " -certfile ".$self->{CHAINFILE};
     }

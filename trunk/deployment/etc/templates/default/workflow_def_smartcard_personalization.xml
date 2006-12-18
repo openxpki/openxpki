@@ -15,15 +15,13 @@
 
   <state name="LDAP_DATA_AVAILABLE" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_GD_DATA_AVAILABLE</description>
-    <action name="set_error_ldap"
-	    resulting_state="FAILURE">
-      <condition name="certificate_issuance_impossible"/>
-      <!-- TODO: maybe split into several conditions each checking one
-                 specific thing -->
-    </action>
     <action name="null2"
 	    resulting_state="CERTIFICATE_ISSUANCE_POSSIBLE">
       <condition name="certificate_issuance_possible"/>
+    </action>
+    <action name="set_error_ldap"
+	    resulting_state="FAILURE">
+      <condition name="!certificate_issuance_possible"/>
     </action>
   </state>
 
@@ -42,13 +40,13 @@
     </action>
     <action name="change_session_role_to_ca_operator"
             resulting_state="SESSION_ROLE_CHANGED">
-       <condition name="no_more_csrs_to_create"/>
-       <condition name="no_approval_needed"/>
+       <condition name="!more_csrs_to_create"/>
+       <condition name="!approval_needed"/>
     </action>
     <action name="null2"
             resulting_state="APPROVAL">
+        <condition name="!more_csrs_to_create"/>
         <condition name="approval_needed"/>
-        <condition name="no_more_csrs_to_create"/>
     </action>
   </state>
 
@@ -109,7 +107,11 @@
     </action>
     <action name="null2"
             resulting_state="ISSUANCE_PENDING">
-      <condition name="wf_children_instances_not_finished"/>
+      <condition name="!wf_children_instances_finished"/>
+    </action>
+    <action name="set_error_issuance_failed"
+            resulting_state="FAILURE">
+      <condition name="wf_child_instance_failure"/>
     </action>
   </state>
 
@@ -121,8 +123,6 @@
     </action>
   </state>
 
-<!-- <state name="INSTALL_CERTIFICATE"/> -->
-
   <state name="INSTALL_CERTIFICATE">
     <action name="write_certificate_test_result"
             resulting_state="CERTIFICATE_TESTED">
@@ -132,7 +132,7 @@
   <state name="CERTIFICATE_TESTED" autorun="yes">
     <action name="null"
             resulting_state="ALL_CERTIFICATES_TESTED_OK">
-      <condition name="no_more_certs_to_test"/>
+      <condition name="!more_certs_to_test"/>
       <condition name="test_result_ok"/>
     </action>
     <action name="write_certificate_to_install"
@@ -142,7 +142,7 @@
     </action>
     <action name="set_error_cert_test_failed"
             resulting_state="FAILURE">
-      <condition name="test_result_failed"/>
+      <condition name="!test_result_ok"/>
     </action>
   </state>
       

@@ -87,5 +87,8 @@
           class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
           error_code="cert_test_failed"/>
 
+  <action name="set_error_issuance_failed"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
+          error_code="issuance_failed"/>
 </actions>
 

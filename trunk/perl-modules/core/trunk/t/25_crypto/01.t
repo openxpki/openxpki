@@ -13,7 +13,7 @@ eval `cat t/25_crypto/common.pl`;
 
 ok(1);
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new ();
+my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
 ok (1);
 
 ## parameter checks for get_token

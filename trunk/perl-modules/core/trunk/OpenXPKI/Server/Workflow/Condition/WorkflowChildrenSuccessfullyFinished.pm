@@ -20,12 +20,6 @@ sub evaluate {
     my ( $self, $workflow ) = @_;
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    my $negate = 0;
-    if ($self->name() eq 'wf_child_instance_not_finished' ||
-        $self->name() eq 'wf_children_instances_not_finished') {
-        $negate = 1;
-        ##! 16: 'negate=1'
-    }
     my $context  = $workflow->context();
     ##! 16: 'context: ' . Dumper($context)
     my @wf_children = @{$serializer->deserialize($context->param('wf_children_instances'))};
@@ -63,26 +57,10 @@ sub evaluate {
         }
         ##! 16: 'all_child...: ' . $all_children_successfully_finished
     }
-    if ($all_children_successfully_finished == 1) {
-        if ($negate == 1) {
-            ##! 32: 'negate and all children successfully finished -> EXCEPTION'
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_ALL_CHILDREN_SUCCESSFULLY_FINISHED');
-        }
-        else {
-            ##! 32: 'no negate and all children successfully finished -> ALL FINE'
-            return 1;
-        }
-    }
-    else {
-        if ($negate == 1) {
-            ##! 32: 'negate and not all children successfully finished -> ALL FINE'
-            return 1;
-        }
-        else {
-            ##! 32: 'no negate and not all children successfully finished -> EXCEPTION'
+    if (! $all_children_successfully_finished) {
             condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_NOT_ALL_CHILDREN_SUCCESSFULLY_FINISHED');
-        }
     }
+    return 1;
     ##! 16: 'end'
 }
 
@@ -108,6 +86,4 @@ The condition checks if the workflow children instances (instantiated using
 the CreateWorkflowInstance or ForkWorkflowInstance activity classes) are
 in state 'SUCCESS' already or whether it is still doing something /
 waiting for input / FAILED.
-If the magic condition name 'wf_child_instance_not_finished' is used,
-it returns just the opposite.
 

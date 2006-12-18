@@ -72,6 +72,7 @@ htdocs/service/api/issuer_list.html
 htdocs/service/api/key_list.html
 htdocs/service/api/policy_list.html
 htdocs/service/api/set_secret.html
+htdocs/service/api/get_privkey_password.html
 
 htdocs/service/workflow/list_types.html
 htdocs/service/workflow/list_instances.html
@@ -88,6 +89,7 @@ htdocs/service/workflow/activity/change_csr_subject.html
 htdocs/service/workflow/activity/change_csr_subject_alt_name.html
 htdocs/service/workflow/activity/change_csr_info.html
 htdocs/service/workflow/activity/approve_csr.html
+htdocs/service/workflow/activity/continue.html
 htdocs/service/workflow/activity/cancel_csr_approval.html
 htdocs/service/workflow/activity/execute_csr.html
 htdocs/service/workflow/activity/reject_csr.html
@@ -111,6 +113,9 @@ htdocs/service/create_csr/store_pkcs10.mhtml
 htdocs/service/create_csr/create_workflow.mhtml
 htdocs/service/create_csr/print_errors.mhtml
 htdocs/service/create_csr/print_descriptions.mhtml
+htdocs/service/create_csr/get_password.mhtml
+htdocs/service/create_csr/get_keysettings.mhtml
+htdocs/service/create_csr/store_serverside.mhtml
 
 htdocs/service/create_crr/index.html
 htdocs/service/create_crr/get_workflow_type.mhtml
@@ -127,12 +132,14 @@ htdocs/service/smartcard_personalization/success.mhtml
 htdocs/service/smartcard_personalization/get_certificate_request.mhtml
 htdocs/service/smartcard_personalization/waiting_for_approval.mhtml
 
+htdocs/binary/autohandler
 htdocs/binary/dhandler
 htdocs/binary/get_certificate.crt
 htdocs/binary/get_certificate.html
 htdocs/binary/get_chain.html
 htdocs/binary/get_crl.html
 htdocs/binary/get_workflow_instance_info.html
+htdocs/binary/get_privkey.html
 
 t/common.pl
 t/02_pod_syntax.t

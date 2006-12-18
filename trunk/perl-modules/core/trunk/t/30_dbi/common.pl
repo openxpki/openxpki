@@ -7,7 +7,7 @@ use warnings;
 use OpenXPKI::Crypto::TokenManager;
 our $cache;
 require 't/25_crypto/common.pl';
-my $mgmt = OpenXPKI::Crypto::TokenManager->new ();
+my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
 our $token = $mgmt->get_token (
     TYPE => "DEFAULT", 
     ID => "default", 

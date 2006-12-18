@@ -35,12 +35,6 @@ sub evaluate {
     ##! 64: 'context: ' . Dumper($context)
     my $pki_realm = CTX('session')->get_pki_realm(); 
 
-    ##! 16: 'my condition name: ' . $self->name()
-    my $negate = 0;
-    if ($self->name() eq 'is_renewal') {
-        $negate = 1;
-    }
-
     my $subject = $context->param('csr_subject');
     ##! 16: 'subject: ' . $subject
     my $dn = OpenXPKI::DN->new($subject);
@@ -89,16 +83,7 @@ sub evaluate {
 
     ##! 128: 'certs: ' . Dumper $certs
 
-    if ($negate == 0) { # we are asked if this is an initial enrollment
-        if (defined $certs && scalar @{$certs} > 0) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_INITIAL_ENROLLMENT_VALID_CERTIFICATE_PRESENT');
-        }
-    }
-    else {
-        if (! defined $certs || scalar @{$certs} == 0) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_RENEWAL_NO_VALID_CERTIFICATE_PRESENT');
-        }
-        else {
+    if (defined $certs && scalar @{$certs} > 0) {
             # this is a renewal, save number of matching certificates
             # and identifier and notafter date of first one in context
             # for later use.
@@ -115,7 +100,7 @@ sub evaluate {
             $context->param(
                 'current_notafter' => $certs->[0]->{NOTAFTER},
             );
-        }
+            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_INITIAL_ENROLLMENT_VALID_CERTIFICATE_PRESENT');
     }
     ##! 16: 'end'
     return 1;
@@ -144,13 +129,12 @@ or a renewal. The condition has a configuration parameter "RDNmatch",
 which allows one to specify which parts of the subject DN have to
 match.
 If it is undefined, the whole subject DN is taken as a search criteria.
-If the condition name is "is_initial_enrollment", it returns true if
-no valid certificate with the requested DN is found in the certificate
-database and false if at least one is found. If the condition name is
-"is_renewal", the condition works in exactly the opposite way.
-If asked for renewal and valid certificates are found, it saves
-the number of certificates in the context parameter
-'current_valid_certificates' and the identifier of the one with the
-longest notafter date in the context parameter 'current_identifier'.
+It returns true if no valid certificate with the requested DN is found
+in the certificate database and throws a condition_error if at least one
+is found. 
+In this case, it also saves the number of certificates in the context
+parameter 'current_valid_certificates' and the identifier of the one 
+with the longest notafter date in the context parameter
+'current_identifier'.
 The corresponding notafter date is saved in the 'current_notafter'
 context field to be checked later.

@@ -4,6 +4,9 @@
 
   <!-- general CSR conditions -->
 
+  <condition name="server_key_generation" class="OpenXPKI::Server::Workflow::Condition::IsServerKeyGeneration">
+  </condition>
+
  <!-- TODO: in many cases, param name is useless, one can just read the
       condition name instead. This is only useful if activity is different
       from the ACL name -->
@@ -120,18 +123,11 @@
   </condition>
 
   <!-- key online checks -->
-  <condition name="CA::key_is_usable" class="OpenXPKI::Server::Workflow::Condition::Key"> 
+  <condition name="ca_key_usable" class="OpenXPKI::Server::Workflow::Condition::Key"> 
     <!-- FIXME: insert proper arguments here -->
     <param name="key" value="ca"/>
     <!-- use condition name ($self->name) to determine what we want to do -->
     <param name="status" value="usable"/>
-  </condition>
-
-  <condition name="CA::key_is_not_usable" class="OpenXPKI::Server::Workflow::Condition::Key">
-    <!-- FIXME: insert proper arguments here -->
-    <param name="key" value="ca"/>
-    <!-- use condition name ($self->name) to determine what we want to do -->
-    <param name="status" value="unusable"/>
   </condition>
 
   <!-- conditions relevant for CRL issuance -->
@@ -141,53 +137,34 @@
   <condition name="crl_signing_cas_left" class="OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft">
     <!-- use condition name ($self->name) to determine what we want to do -->
   </condition>
-  <condition name="no_crl_signing_cas_left" class="OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft">
-    <!-- use condition name ($self->name) to determine what we want to do -->
-  </condition>
 
-  <condition name="CONTEXT::no_csr_serial_present" class="OpenXPKI::Server::Workflow::Condition::ContextParameterExistence">
-    <param name="parameter" value="csr_serial"/>
+  <condition name="valid_csr_serial_present" class="OpenXPKI::Server::Workflow::Condition::ValidCSRSerialPresent">
   </condition>
 
   <!-- conditions for child workflow control -->
-  <condition name="wf_child_instance_not_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
-  </condition>
   <condition name="wf_child_instance_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
   </condition>
   <condition name="wf_children_instances_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
   </condition>
-  <condition name="wf_children_instances_not_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
-  </condition>
   <condition name="wf_child_instance_success" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
   </condition>
-  <condition name="wf_child_instance_failure" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse"> <!-- TODO: implement real condition -->
+  <condition name="wf_child_instance_failure" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenFailure">
   </condition>
 
   <!-- conditions for smartcard personalization -->
   <!-- policy settings -->
   <condition name="approval_needed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue">
   </condition>
-  <condition name="no_approval_needed" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse">
-  </condition>
   <!-- user settable parameters -->
   <condition name="certificate_issuance_possible" class="OpenXPKI::Server::Workflow::Condition::IsCertificateIssuancePossible">
-    <param name="required" value="%REQUIRED_PARAMS%"/>
-  </condition>
-  <condition name="certificate_issuance_impossible" class="OpenXPKI::Server::Workflow::Condition::IsCertificateIssuancePossible">
     <param name="required" value="%REQUIRED_PARAMS%"/>
   </condition>
   <!-- internal conditions -->
   <condition name="more_csrs_to_create" class="OpenXPKI::Server::Workflow::Condition::MoreCSRsToCreate">
   </condition>
-  <condition name="no_more_csrs_to_create" class="OpenXPKI::Server::Workflow::Condition::MoreCSRsToCreate">
-  </condition>
   <condition name="more_certs_to_test" class="OpenXPKI::Server::Workflow::Condition::MoreCertsToTest">
   </condition>
-  <condition name="no_more_certs_to_test" class="OpenXPKI::Server::Workflow::Condition::MoreCertsToTest">
-  </condition>
   <condition name="test_result_ok" class="OpenXPKI::Server::Workflow::Condition::CheckCertTestResult"> 
-  </condition>
-  <condition name="test_result_failed" class="OpenXPKI::Server::Workflow::Condition::CheckCertTestResult">
   </condition>
 
   <!-- conditions for the data exchange -->
@@ -201,38 +178,23 @@
   <!-- SCEP conditions -->
   <!-- policy settings, set them to your liking -->
   <condition name="initial_enrollment_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
-  <condition name="initial_enrollment_not_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse"/>
 
   <condition name="auto_renewal_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
-  <condition name="auto_renewal_not_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse"/>
 
   <condition name="auto_approval_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
-  <condition name="no_auto_approval_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse"/>
   
   <!-- SCEP internal settings, only change parameters here -->
   <condition name="is_initial_enrollment" class="OpenXPKI::Server::Workflow::Condition::InitialEnrollmentOrRenewal">
     <param name="RDN_filter" value="CN,O"/>
   </condition>
-  <condition name="is_renewal" class="OpenXPKI::Server::Workflow::Condition::InitialEnrollmentOrRenewal">
-    <param name="RDN_filter" value="CN,O"/>
-  </condition>
   <condition name="valid_signature_with_requested_dn" class="OpenXPKI::Server::Workflow::Condition::IsValidSignatureWithRequestedDN"/>
-  <condition name="invalid_signature_or_requested_dn" class="OpenXPKI::Server::Workflow::Condition::IsValidSignatureWithRequestedDN"/>
   <condition name="correct_number_of_valid_certs" class="OpenXPKI::Server::Workflow::Condition::CorrectNumberOfValidCerts"> 
-    <param name="min" value="1"/>
-    <param name="max" value="2"/>
-  </condition>
-  <condition name="incorrect_number_of_valid_certs" class="OpenXPKI::Server::Workflow::Condition::CorrectNumberOfValidCerts">
     <param name="min" value="1"/>
     <param name="max" value="2"/>
   </condition>
   <condition name="correct_timing" class="OpenXPKI::Server::Workflow::Condition::CorrectTiming">
     <param name="difference" value="100d"/> <!-- renewal can only begin 100d before the certificate becomes invalid -->
   </condition>
-  <condition name="incorrect_timing" class="OpenXPKI::Server::Workflow::Condition::CorrectTiming">
-    <param name="difference" value="100d"/> <!-- renewal can only begin 100d before the certificate becomes invalid -->
-  </condition>
   <condition name="signed_using_original_cert" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/>
-  <condition name="self_signed" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/> 
 </conditions>
 

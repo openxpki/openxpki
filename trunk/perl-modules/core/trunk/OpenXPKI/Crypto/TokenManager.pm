@@ -16,12 +16,16 @@ use English;
 use OpenXPKI::Crypto::Backend::API;
 use OpenXPKI::Crypto::Tool::SCEP::API;
 use OpenXPKI::Crypto::Tool::PKCS7::API;
+use OpenXPKI::Crypto::Tool::CreateJavaKeystore::API;
 use OpenXPKI::Crypto::Secret;
 
 sub new {
+    ##! 1: 'start'
     my $that = shift;
     my $class = ref($that) || $that;
 
+    my $caller_package = caller;
+    
     my $self = {};
 
     bless $self, $class;
@@ -29,6 +33,21 @@ sub new {
     my $keys = { @_ };
     $self->{tmp} = $keys->{TMPDIR} if ($keys->{TMPDIR});
 
+    $self->{called_from_testscript} = 1 if ($keys->{'IGNORE_CHECK'});
+
+    if ($caller_package ne 'OpenXPKI::Server::Init' &&
+        ! $self->{called_from_testscript}) {
+        # TokenManager instances shall only be created during
+        # the server initialization, the rest of the code can
+        # use CTX('crypto_layer') as its token manager
+        # IGNORE_CHECK is only meant for unit tests!
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_TOKENMANAGER_INSTANTIATION_OUTSIDE_SERVER_INIT',
+            params => {
+                'CALLER' => $caller_package,
+            },
+        );
+    }
     ##! 1: "end - token manager is ready"
     return $self;
 }
@@ -214,11 +233,14 @@ sub __set_secret_from_cache {
     } else {
         ## daemon mode
         ##! 4: "let's get the serialized secret from the database"
-        if (CTX('dbi_backend')->is_connected()) {
+        if (! $self->{called_from_testscript}
+            && CTX('dbi_backend')->is_connected()) {
             # do this only if the database is already connected
             # i.e. not during server startup
             # (this is senseless anyhow, as we will only find
             # outdated secrets at that point)
+            # ... and not during test script execution, as we don't
+            # have a dbi_backend context there
             my $secret_result = CTX('dbi_backend')->first (
                                     TABLE   => "SECRET",
                                     DYNAMIC => {
@@ -440,6 +462,7 @@ sub get_token
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_TYPE");
     }
     $name = "default" if ($type  eq "DEFAULT");
+    $name = "testcreatejavakeystore" if ($type eq 'CreateJavaKeystore');
     if (not $name)
     {
         OpenXPKI::Exception->throw (
@@ -500,6 +523,10 @@ sub __add_token
     elsif ($type eq 'PKCS7')
     {
         $type_path = 'pkcs7';
+    }
+    elsif ($type eq 'CreateJavaKeystore')
+    {
+        $type_path = 'createjavakeystore';
     }
     elsif ($type eq "DEFAULT")
     {
@@ -590,6 +617,9 @@ sub __add_token
         }
         elsif ($type eq 'PKCS7') { # so does PKCS#7
             $backend_api_class = 'OpenXPKI::Crypto::Tool::PKCS7::API';
+        }
+        elsif ($type eq 'CreateJavaKeystore') { # so does nearly everyone
+            $backend_api_class = 'OpenXPKI::Crypto::Tool::CreateJavaKeystore::API';
         }
         else { # use the 'default' backend
             $backend_api_class = 'OpenXPKI::Crypto::Backend::API';

@@ -107,6 +107,67 @@
                     ["format",       "TXT"]] &>
     </td>
   </tr>
+% if (defined $private_key) {
+  <tr>
+    <td colspan=2><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS') %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM') %></td>
+    <td>
+      <& /lib/html/a.mhtml,
+         target => '/service/api/get_privkey_password.html',
+         label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_DOWNLOAD'),
+         params => [["identifier",   $identifier],
+                    ["format", "PKCS8_PEM"]] &>
+    </td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER') %></td>
+    <td>
+      <& /lib/html/a.mhtml,
+         target => '/service/api/get_privkey_password.html',
+         label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_DOWNLOAD'),
+         params => [["identifier",   $identifier],
+                    ["format", "PKCS8_DER"]] &>
+    </td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY') %></td>
+    <td>
+      <& /lib/html/a.mhtml,
+         target => '/service/api/get_privkey_password.html',
+         label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_DOWNLOAD'),
+         params => [["identifier",   $identifier],
+                    ["format", "OPENSSL_PRIVKEY"]] &>
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE') %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12') %></td>
+    <td>
+      <& /lib/html/a.mhtml,
+         target => '/service/api/get_privkey_password.html',
+         label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD'),
+         params => [["identifier",   $identifier],
+                    ["format", "PKCS12"]] &>
+    </td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE') %></td>
+    <td>
+      <& /lib/html/a.mhtml,
+         target => '/service/api/get_privkey_password.html',
+         label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD'),
+         params => [["identifier",   $identifier],
+                    ["format", "JAVA_KEYSTORE"]] &>
+    </td>
+  </tr>
+<!--
+<% $private_key %>
+-->
+% }
 </table>
 <%init>
   my $msg  = $context->{client}->send_receive_command_msg (
@@ -120,4 +181,14 @@
   my $notafter    = $params->{NOTAFTER};
   my $issuer      = $params->{ISSUER};
   my $fingerprint = $params->{FINGERPRINT};
+  
+  # retrieve CSR workflow and look for a private_key field
+  my $p_msg = $context->{client}->send_receive_command_msg(
+                    'private_key_exists_for_cert',
+                    {
+                        IDENTIFIER => $identifier,
+                    }
+  );
+  my $private_key = $p_msg->{PARAMS};
+
 </%init>

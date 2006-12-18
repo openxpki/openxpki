@@ -1,18 +1,23 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key
 ## Written 2005 by Michael Bell for the OpenXPKI project
 ## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
+## enhanced to support OpenSSL format keys and decryption 2006
+## by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 ## $Revision$
+package OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key;
 
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key;
+use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key';
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
+use Data::Dumper;
 
 sub get_command
 {
+    ##! 1: 'start' 
     my $self = shift;
 
     ## compensate missing parameters
@@ -31,7 +36,7 @@ sub get_command
         $engine = $self->{ENGINE}->get_engine();
     }
 
-    $self->get_tmpfile ('KEY', 'OUT');
+    $self->get_tmpfile ('KEY', 'OUT', 'FIRSTOUT');
     $self->write_file (FILENAME => $self->{KEYFILE},
                        CONTENT  => $self->{DATA},
 	               FORCE    => 1);
@@ -70,9 +75,11 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_MISSING_OUTPUT_FORMAT");
     }
-    if ($self->{OUT} ne "PEM" and
-        $self->{OUT} ne "DER" and
-        $self->{OUT} ne "PKCS8")
+    if ($self->{OUT} ne "PEM" &&
+        $self->{OUT} ne "DER" &&
+        $self->{OUT} ne "PKCS8" && 
+        $self->{OUT} ne "OPENSSL_RSA" &&
+        $self->{OUT} ne "OPENSSL_EC")
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_OUTPUT_FORMAT");
@@ -86,10 +93,16 @@ sub get_command
     ## build the command
 
     my $command  = "";
+    my $command2 = "";
     if ($self->{OUT} eq "PKCS8")
     {
         $command = "pkcs8 -topk8";
-        $command .= " -v2 ".$self->{ENC_ALG};
+        if ($self->{DECRYPT}) {
+            $command .= " -nocrypt";
+        }
+        else {
+            $command .= " -v2 ".$self->{ENC_ALG};
+        }
     }
     elsif ($self->{IN} eq "RSA")
     {
@@ -101,15 +114,56 @@ sub get_command
         $command = "dsa";
         $command .= " -".$self->{ENC_ALG};
     }
+    elsif ($self->{OUT} eq 'OPENSSL_RSA')
+    {
+        $command  = "pkcs8 ";
+        $command2 = "rsa ";
+        if (! $self->{DECRYPT}) {
+            $command2 .= '-' . $self->{ENC_ALG};
+        }
+        $command2 .= " -in " . $self->{FIRSTOUTFILE};
+        $command2 .= " -out " . $self->{OUTFILE}; 
+        $command2 .= " -engine $engine" if ($engine);
+        if ($self->{OUT_PASSWD}) {
+            $command2 .= " -passout env:outpwd";
+            $self->set_env('outpwd' => $self->{OUT_PASSWD});
+        }
+    }
+    elsif ($self->{OUT} eq 'OPENSSL_EC')
+    {
+        $command  = "pkcs8 ";
+        $command2 = "ec ";
+        if (! $self->{DECRYPT}) {
+            $command2 .= '-' . $self->{ENC_ALG};
+        }
+        $command2 .= " -in " . $self->{FIRSTOUTFILE};
+        $command2 .= " -out " . $self->{OUTFILE}; 
+        $command2 .= " -engine $engine" if ($engine);
+        if ($self->{OUT_PASSWD}) {
+            $command2 .= " -passout env:outpwd";
+            $self->set_env('outpwd' => $self->{OUT_PASSWD});
+        }
+    }
     else
     {
         $command = "pkcs8";
-        $command .= " -v2 ".$self->{ENC_ALG};
+        if (! $self->{DECRYPT}) {
+            $command .= " -v2 ".$self->{ENC_ALG};
+        }
     }
     $command .= " -outform DER -inform PEM" if ($self->{OUT} eq "DER");
     $command .= " -engine $engine" if ($engine);
     $command .= " -in ".$self->{KEYFILE};
-    $command .= " -out ".$self->{OUTFILE};
+
+    if ($self->{OUT} eq 'OPENSSL_RSA' || $self->{OUT} eq 'OPENSSL_EC') {
+        # we need to execute two commands when OPENSSL_RSA or OPENSSL_EC
+        # is requested and we want the outfile to be the same as before,
+        # so we output the first command to FIRSTOUTFILE
+        $command .= " -out ".$self->{FIRSTOUTFILE};
+    }
+    else {
+        $command .= " -out ".$self->{OUTFILE};
+    }
 
     if ($self->{PASSWD})
     {
@@ -123,12 +177,17 @@ sub get_command
         $self->set_env ('outpwd' => $self->{OUT_PASSWD});
     }
 
-    return [ $command ];
+    if ($self->{OUT} eq 'OPENSSL_RSA' || $self->{OUT} eq 'OPENSSL_EC') {
+        return [ $command, $command2 ];
+    }
+    else {
+        return [ $command ];
+    }
 }
 
 sub hide_output
 {
-    return 0;
+    return 1;
 }
 
 sub key_usage
@@ -162,6 +221,11 @@ the returned PEM encoded key again to DER.
 If you convert a RSA or DSA key from OpenSSL's proprietary format
 towards PKCS#8 then you must support us with a passphrase.
 
+To convert to OpenSSL's propietary format, you need to specify
+the key type, i.e. 'OPENSSL_RSA' as output format. If you need to
+deal with keys with different types, you can get the type with
+the 'get_pkcs8_keytype' command.
+
 =head1 Functions
 
 =head2 get_command
@@ -184,7 +248,7 @@ towards PKCS#8 then you must support us with a passphrase.
 
 =head2 hide_output
 
-returns 1 (key will only be displayed in encrypted form but the passphrase is present)
+returns 1
 
 =head2 key_usage
 

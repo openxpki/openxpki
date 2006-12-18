@@ -1,0 +1,7 @@
+This directory contains a Java program that can be used to create
+Java keystore including a private key (which is something that can
+not be done using keytool).
+To install, copy the jar file somewhere and configure the location of it
+in create_javakeystore.sh.
+Configure OpenXPKI to use the shell script as a shell for the corresponding
+token.

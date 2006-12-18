@@ -61,6 +61,10 @@ sub command { # this is typically used as $token->command()
     my $arg_ref = shift;
     my $ident = ident $self;
 
+    ## the following is done so that the order of the dump is
+    ## sorted, which allows us to censor the debug output more
+    ## effectively ...
+    $Data::Dumper::Sortkeys = 1;
     ##! 16: 'arg_ref: ' . Dumper($arg_ref)
     my $command = $arg_ref->{COMMAND};
 

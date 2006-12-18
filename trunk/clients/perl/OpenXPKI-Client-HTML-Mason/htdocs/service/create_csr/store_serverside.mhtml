@@ -1,0 +1,48 @@
+<%args>
+    $workflow_type => undef
+    $role          => undef
+    $profile       => undef
+    $subject_style => undef
+    $keygen        => undef
+    $subject       => undef
+    $subject_alt_name => undef
+    $info          => undef
+    $CONFIG        => undef
+</%args>
+
+<& /service/open_form.mhtml &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
+<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
+<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name',   'value' => $subject_alt_name &>
+<& /lib/html/hidden.mhtml, 'name' => 'info',          'value' => $info &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+
+<%init>
+    my @errors = ();
+
+    my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
+                            'workflow_type' => $workflow_type,
+                            'role'          => $role,
+                            'profile'       => $profile,
+                            'subject_style' => $subject_style,
+                            'subject'       => $subject,
+                            'subject_alt_name' => $subject_alt_name,
+                            'info'          => $info);
+    ## perhaps we should put this into a component like get_error.mhtml?
+    ## errors are returned in an array reference
+    ## fresh workflow instance is returned as a hash reference
+    if (ref $msg and ref $msg eq "ARRAY")
+    {
+        ## this must be an error
+        push @errors, @{$msg};
+    } else {
+        ## this is a hash
+        return $msg;
+    }
+</%init>

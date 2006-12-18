@@ -144,6 +144,14 @@ msgstr "Firefox, Mozilla, Opera"
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
 msgstr "PEM-, CRT-Format"
 
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE"
+msgstr "Zertifikat und privaten Schlüssel herunterladen"
+
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS"
+msgstr ""
+"Zu diesem Zertifikat können Sie (mit dem richtigen Passwort) den privaten "
+"Schlüssel herunterladen"
+
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
 msgstr "Textformat"
 
@@ -156,11 +164,11 @@ msgstr "E-Mailadresse"
 msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
 msgstr "Fingerprint"
 
-msgid "I18N_OPENXPKI_CERT_ISSUER"
-msgstr "Aussteller"
-
 msgid "I18N_OPENXPKI_CERT_IS_CA"
 msgstr "Zertifikat ist CA"
+
+msgid "I18N_OPENXPKI_CERT_ISSUER"
+msgstr "Aussteller"
 
 msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
 msgstr "Algorithmus des Schlüssels"
@@ -358,6 +366,15 @@ msgstr "Ändern des Stils des Zertifikatsnamens"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_TITLE"
 msgstr "Ändern des Zertifikatsnamens"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CONTINUE_DESCRIPTION"
+msgstr ""
+"Soll der Zertifizierungsantrag zu einem anderen Server exportiert werden?"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CONTINUE_TITLE"
+msgstr "Export der Zertifizierungsantrages"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXECUTE_CSR_DESCRIPTION"
 msgstr "Soll mit der Erstellung des Zertifikates begonnen werden?"
 
@@ -436,6 +453,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_TITLE"
 msgstr "Zertifizierungskette der CA"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CLEAR_SECRET_DESCRIPTION"
+msgstr ""
+"Hier können Sie Zertifikate suchen. Wenn Sie zu den einzelnen Feldern mehr "
+"Informationen benötigen, dann schauen Sie bitte am Ende der Seite nach, wo "
+"sich Beschreibungen zu den einzelnen Feldern befinden."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CLEAR_SECRET_TITLE"
+msgstr "Zertifikatssuche"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CRL_LIST_DESCRIPTION"
 msgstr ""
 "Hier können Sie nun alle verfügbaren CRLs innerhalb dieses PKI Realms "
@@ -498,6 +526,22 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SET_SECRET_TITLE"
 msgstr "Zertifikatssuche"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BINARY_GET_PRIVKEY_PASSWORD_ENTRY_DESC"
+msgstr ""
+"Zum Herunterladen des privaten Schlüssels müssen Sie das Passwort des "
+"Schlüssels eingeben, welches bei der Beantragung des Zertifikats von der CA "
+"erzeugt oder von Ihnen eingeben wurde."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BINARY_GET_PRIVKEY_PASSWORD_ENTRY_TITLE"
+msgstr "Herunterladen des privaten Schlüssels: Passworteingabe"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BINARY_GET_PRIVKEY_PASSWORD_PKCS12_CSP_DESC"
+msgstr ""
+"Für einige Anwendungen (insbesondere Smartcards) muss der Name des "
+"Cryptographic Service Providers (CSP) in die Datei eingebettet werden. Falls "
+"Sie dies benötigen, wählen Sie bitte den passenden CSP aus der Liste oder "
+"geben Sie den exakten Namen in das Textfeld ein."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatische Browsererkennung"
@@ -563,6 +607,12 @@ msgstr "Aufgetretene Fehler"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS"
 msgstr "Beschreibungen zu den Feldern"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GEN_PASSWORD_ENTER_PASSWORD"
+msgstr "Eingabe eines eigenen Passworts"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GEN_PASSWORD_SERVERSIDE"
+msgstr "Serverseitige Passwortgenerierung"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_CSP"
 msgstr "Cryptographic Service Provider (CSP)"
@@ -603,6 +653,63 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
 msgstr "Auswahl der Schlüsselerzeugung"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_CHOICE"
+msgstr "Schlüsseltyp"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_DESC"
+msgstr ""
+"Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
+"erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
+"sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
+"untenstehenden Erläuterungen."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
+msgstr "Auswahl des Typs des privaten Schlüssels"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_DECISION"
+msgstr "Wahl des Passworts"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_ENTER_PASSWORD_DESC"
+msgstr ""
+"Bitte geben Sie im untenstehenden Formular das Passwort für Ihren privaten "
+"Schlüssel ein."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_ENTER_PASSWORD_TITLE"
+msgstr "Eingabe des Passworts"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_GENERATED_DESC"
+msgstr ""
+"Im untenstehenden Formular sehen Sie das Passwort, dass die CA für Sie "
+"generiert hat. Bitte kopieren Sie das Passwort in das Formularfeld und "
+"notieren Sie es sich, da Sie es zur Installation ihres Zertifikates "
+"benötigen."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_GENERATED_TITLE"
+msgstr "Überprüfung ihres generierten Passworts"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_GENERATION_METHOD_DESC"
+msgstr ""
+"Sie können entweder die CA ein zufälliges Passwort generieren lassen oder "
+"selbst ein Passwort eingeben. Beachten Sie bitte, dass das Benutzen eines "
+"server-generierten Passworts normalerweise sicherer ist."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_GENERATION_METHOD_TITLE"
+msgstr "Auswahl der Passworterstellung"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_PASSWORD_BAD_RETRY"
+msgstr ""
+"Das Passwort hat die Qualitätsprüfung nicht bestanden. Bitte geben Sie ein "
+"neues ein und beachten Sie die untenstehenden Vorgaben."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_PASSWORD_POLICY"
+msgstr ""
+"Bitte beachten Sie, dass Ihr Passwort die folgenden Tests bestehen muss: Es "
+"enthält kein Wort länger als 5 Buchstaben aus dem Wörterbuch, nicht mehr als "
+"drei aufeinanderfolgende oder gleiche Buchstaben dürfen enthalten sein. Die "
+"Länge muss zwischen 8 und 32 Buchstaben liegen, außerdem müssen mindestens "
+"zwei Gruppen enthalten sein (wobei eine Gruppe aus Kleinbuchstaben, "
+"Großbuchstaben, Ziffern und Sondernzeichen besteht)."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_DESCRIPTION"
 msgstr ""
@@ -683,6 +790,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_WORKFLOW_TYPE_TITLE"
 msgstr "Auswählen eines Workflows"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_PASSWORD_COPY_HERE"
+msgstr "Bitte kopieren Sie das Passwort an diese Stelle"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_PASSWORD_GENERATED_PASSWORD"
+msgstr "Das für Sie generierte Passwort"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_"
 msgstr ""
@@ -784,6 +897,38 @@ msgstr "Zurücksetzen"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
 msgstr "Zurücksetzen"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CSP"
+msgstr "Cryptographic Service Provider"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CSP_FREEFORM"
+msgstr "Cryptographic Service Provider (freie Eingabe)"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1"
+msgstr "Elliptische Kurven DSA, benannte Kurve c2tnb191v1"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1_DESC"
+msgstr ""
+"Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
+"Kurve c2tnb191v1. Bitlänge 191 bits (ungefähr äquivalent zu 1022048 RSA-"
+"Schlüsseln)"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1"
+msgstr "Elliptische Kurven DSA, benannte Kurve prime192v1"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1_DESC"
+msgstr ""
+"Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
+"Kurve prime192v1. Bitlänge 192 bits (ungefähr äquivalent zu 1022048 RSA-"
+"Schlüsseln)"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1"
+msgstr "Elliptische Kurven DSA, benannte Kurve prime239v1"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1_DESC"
+msgstr ""
+"Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
+"Kurve prime239v1. Bitlänge 239 bits ."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_FULL_CERT_INFO_LINK"
 msgstr "Detailierte Zertifikatsinformationen"
 
@@ -822,6 +967,30 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_TITLE"
 msgstr ""
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED"
+msgstr "Download des privaten Schlüssels fehlgeschlagen"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED_DESC"
+msgstr "Der Download des privaten Schlüssels ist fehlgeschlagen. Sind Sie sicher, dass Sie das richtige Passwort eingegeben haben?"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED_TITLE"
+msgstr "Serverseitige Schlüsselgenerierung"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_PASSWORD_CSP_MANUALLY_ENTERED"
+msgstr "CSP selbst eingeben"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_PASSWORD_NO_SPECIAL_CSP"
+msgstr "Keinen CSP angeben"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_WRONG_FORMAT_DESC"
+msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_WRONG_FORMAT_TITLE"
+msgstr "PKI Realm"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_ANONYMOUS_MENU_DESCRIPTION"
 msgstr ""
@@ -1022,6 +1191,22 @@ msgstr "PKI Realm"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET"
 msgstr "Zurücksetzen"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024"
+msgstr "RSA, 1024 bits"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024_DESC"
+msgstr ""
+"Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge von "
+"1024 bit"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048"
+msgstr "RSA, 2048 bits"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048_DESC"
+msgstr ""
+"Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge von "
+"2048 bit"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"
 msgstr "Serverseitige Schlüsselgenerierung"
@@ -1272,6 +1457,10 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
+msgstr "Auswählen einer Rolle"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED"
 msgstr "Auswählen einer Rolle"
 
@@ -1392,6 +1581,14 @@ msgid "I18N_OPENXPKI_CRYPTO_API_COMMAND_ILLEGAL_PARAM"
 msgstr "Name"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_PARAMS"
+msgstr "Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_SPECIFIED"
+msgstr "Antrag im OU-Stil"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_API_EVAL_ERROR"
 msgstr ""
 "Wenn Sie sich nicht sicher sind, was Sie tun sollen und Sie auch nicht "
@@ -1415,10 +1612,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_WRONG_CONFIG"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NOT_IN_CACHE"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NO_REF"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NO_REF"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NOT_IN_CACHE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_CERTFILE_ILLEGAL_PARAM"
@@ -1433,10 +1630,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_ILLEGAL_PARAM"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NOT_IN_CACHE"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NO_REF"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NO_REF"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NOT_IN_CACHE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_ILLEGAL_FORMAT"
@@ -1480,6 +1677,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_PKCS12_CSP_IS_NOT_ALPHANUMERIC"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_CANNOT_OPEN_ERRLOG"
@@ -1747,6 +1950,20 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_DN_FAILURE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_GET_PKCS8_KEYTYPE_MISSING_DATA"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_GET_PKCS8_KEYTYPE_MISSING_PASSWD"
+msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_IS_PRIME_MISSING_PRIME"
+msgstr "Fehlende Funktionalität"
+
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_KEYFILE_DOES_NOT_EXIST"
 msgstr ""
 
@@ -1767,10 +1984,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_IS_PRIME_MISSING_PRIME"
-msgstr "Fehlende Funktionalität"
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_CONFIG"
 msgstr ""
@@ -2116,6 +2329,10 @@ msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_INSTANTIATION_OUTSIDE_SERVER_INIT"
+msgstr "Deutsch"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_GROUPS_MISSING_PKI_REALM"
 msgstr ""
 "Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
@@ -2136,9 +2353,6 @@ msgstr "Deutsch"
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD"
 msgstr "Deutsch"
-
-msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_STOP_SESSION_FAILED"
-msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT"
 msgstr ""
@@ -2187,6 +2401,12 @@ msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_LOAD_CONFIG_EVAL_ERROR"
 msgstr "Aufgetretene Fehler"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_TOOL_MAKEJAVAKEYSTORE_COMMAND_CREATE_KEYSTORE_COULD_NOT_GET_CERTIFICATE_ARRAY"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_CERTFILE_MISSING"
 msgstr ""
 "Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
@@ -2225,6 +2445,10 @@ msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_PENDING_REPLY_NO_ENGINE"
 msgstr ""
 "Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
 "gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_CAN_DECRYPT_MISSING_ARGUMENT"
+msgstr "Fehlende Funktionalität"
 
 msgid "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA"
 msgstr ""
@@ -2444,6 +2668,50 @@ msgstr "Dies ist eine Faxnummer."
 msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
 msgstr "Prozesse anzeigen"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
+msgstr "Ausdrucken der Seite"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_CERT_INSTALLATION_TEST_FAILED"
+msgstr "Antrag im OU-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_LDAP_MISSING_DATA"
+msgstr "Smartcard personalisieren"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_TITLE"
+msgstr "Erfolgreich abgemeldet"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_UNKNOWN_CAUSE"
+msgstr "Smartcard personalisieren"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_DESC"
+msgstr "Smartcard personalisieren"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_TITLE"
+msgstr "Erfolgreich abgemeldet"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_APPROVAL_DESC"
+msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_APPROVAL_TITLE"
+msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_DESC"
+msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE"
+msgstr "Start der CRL-Erstellung"
+
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
 msgstr "CA-Infos"
 
@@ -2530,6 +2798,66 @@ msgstr ""
 msgid "I18N_OPENXPKI_HTML_PRINT_BUTTON"
 msgstr "Ausdrucken der Seite"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION"
+msgstr "Neuer Antrag (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION_MORE_CERTIFICATES_TEXT"
+msgstr "Antrag im OU-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATIONMORE_CERTIFICATES_TITLE"
+msgstr "Antrag im OU-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION_TEXT"
+msgstr "Antrag im OU-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_CREATE_IE_CSR"
+msgstr "Neuer Antrag (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_ERORR_NO_WF_INFO_DESC"
+msgstr "Antrag im OU-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_ERROR_NO_WF_INFO_TITLE"
+msgstr "Antrag im DC-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_ERROR_UNKNOWN_STATE_DESC"
+msgstr "Neuer Antrag (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_ERROR_UNKNOWN_STATE_TITLE"
+msgstr "Antrag im DC-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_FAILURE_ISSUANCE_IMPOSSIBLE"
+msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_INSTALL_CERTIFICATE"
+msgstr "Neuer Antrag (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_MORE_CERTIFICATE_REQUESTS_TO_BE_GENERATED"
+msgstr "Neuer Antrag (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_MORE_CSRS_TITLE"
+msgstr "Antrag im DC-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_INTRO_TEXT"
+msgstr "Antrag im OU-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_TITLE"
+msgstr "Antrag im DC-Stil"
+
 msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER"
 msgstr "Telefonnummer"
 
@@ -2544,6 +2872,21 @@ msgstr ""
 "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account oder "
 "auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
 "dient der sichern Identifikation von Personen oder Objekten."
+
+msgid "I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE"
+msgstr "Java Keystore"
+
+msgid "I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY"
+msgstr "OpenSSL/SSLeay-Format"
+
+msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12"
+msgstr "PKCS#12"
+
+msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER"
+msgstr "PKCS#8 (DER)"
+
+msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM"
+msgstr "PKCS#8 (PEM)"
 
 msgid "I18N_OPENXPKI_LIST_NEXT"
 msgstr "Rückwärts"
@@ -2564,6 +2907,12 @@ msgstr "nein"
 msgid "I18N_OPENXPKI_NOT_AVAILABLE"
 msgstr "nicht verfügbar"
 
+msgid "I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD"
+msgstr "Privaten Schlüssel und Zertifkat herunterladen"
+
+msgid "I18N_OPENXPKI_PRIVKEY_DOWNLOAD"
+msgstr "Privaten Schlüssel herunterladen"
+
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
 msgstr "TLS-Server"
 
@@ -2583,6 +2932,10 @@ msgid "I18N_OPENXPKI_READ_FILE_OPEN_FAILED"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SECRET_ACTION"
+msgstr "E-Mailadresse"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SECRET_COMPLETE"
 msgstr "Kommentar"
 
@@ -2595,11 +2948,11 @@ msgid "I18N_OPENXPKI_SECRET_LABEL"
 msgstr "E-Mailadresse"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SECRET_LOGIN"
-msgstr "E-Mailadresse"
+msgid "I18N_OPENXPKI_SECRET_LOGIN_LINK_LABEL"
+msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SECRET_LOGIN_LINK_LABEL"
+msgid "I18N_OPENXPKI_SECRET_LOGOUT_LINK_LABEL"
 msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
@@ -2646,10 +2999,6 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_NO_FIRST_ACTIVITY"
 msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_FIXME_DER_OUTFORMAT_STILL_UNSUPPORTED"
-msgstr "Aktivität nicht implementiert"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
@@ -2707,6 +3056,14 @@ msgstr "PKI Realm"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_PUBLIC"
 msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_PRIVATE_KEY_FOR_CERT_COULD_NOT_DETERMINE_KEY_TYPE"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOT_FOUND_IN_DB"
+msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED"
@@ -2882,7 +3239,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_POSTGRESQL_DROP_SEQUENCE_NOT_FORCED"
 msgstr ""
 
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_DSN_NO_DATABASE_NAME"
+msgstr ""
+
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_FAILED"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_NO_TABLE"
 msgstr ""
 
 #, fuzzy
@@ -2957,6 +3320,14 @@ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SYMBOLIC_QUERY_COLUMNS_MISSING_COLUMNS"
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_VALIDITY_CONDITION_INCORRECT_VALIDITY_ARGUMENTS"
+msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_NORMALIZE_VALIDITY_INVALID_ARGUMENT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_ALIAS_NOT_UNIQUE"
 msgstr "Web-Schnittstelle des Trustcenters"
 
@@ -2977,11 +3348,19 @@ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_TABLE_SPECIFICATION"
 msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_VALIDITY_SPECIFICATION_TYPE_FOR_JOIN"
+msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_AGGREGATE_SPECIFICATION"
 msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_DYNAMIC_QUERY"
+msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_TABLE_FOR_VALIDITY_CONSTRAINT"
 msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
@@ -3005,6 +3384,10 @@ msgstr "Web-Schnittstelle des Trustcenters"
 
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_WHERE_CLAUSE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_VALIDITY_SPECIFICATION_MISMATCH_FOR_JOIN"
+msgstr "Web-Schnittstelle des Trustcenters"
 
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_WRONG_COLUMN"
 msgstr ""
@@ -3115,6 +3498,42 @@ msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SUBJECT_ALT_NAME_SOUR
 msgstr "Microsoft GUID"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_BIND_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_CONFIGURATION_BROKEN"
+msgstr "Die ausstellende CA für das Zertifikat ist bestimmt worden."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_CONNECTION_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_ENTRY_NOT_FOUND"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_MODIFY_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_SEARCH_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_MORE_THAN_ONE_LDAP_ENTRY_FOUND"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_OR_EMPTY_PASSWORD"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_WRONG_KEYTYPE"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_CLEANUP_RMTREE_FAILED"
 msgstr "PKI Realm"
 
@@ -3175,6 +3594,82 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EXTRACTCSR_PKCS10_UNDEFINED"
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_FORKWORKFLOWINSTANCES_CSR_SERIALS_UNDEFINED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_BIND_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_CONNECTION_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_SEARCH_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_MORE_THAN_ONE_LDAP_ENTRY_FOUND"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PERSISTCSRS_CERT_ISSUANCE_DATA_UNDEFINED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_BIND_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_CONNECTION_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_ENTRY_NOT_FOUND"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_MODIFY_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_SEARCH_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_MORE_THAN_ONE_LDAP_ENTRY_FOUND"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_NO_CERTIFICATE_IN_CHILD_WORKFLOW"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_NO_CERTS_AVAILABLE_FOR_PUBLICATION"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_NO_WF_CHILDREN"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_WRITECERTIFICATETOINSTALL_NO_CERTIFICATE_IN_CHILD_WORKFLOW"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_WRITECERTIFICATETOINSTALL_NO_WF_CHILDREN"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MISSING_DESTINATION"
 msgstr "PKI Realm"
 
@@ -3188,6 +3683,10 @@ msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_OPEN_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_CHILD_INSTANCE_ID_UNDEFINED"
 msgstr "PKI Realm"
 
 #, fuzzy
@@ -3235,15 +3734,11 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AREWORKFLOWCHILDRENSUCCESSFULLYFI
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKCERTTESTRESULT_TESTRESULT_NOT_TRUE"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_INCORRECT_NUMBER_OF_VALID_CERTS"
-msgstr "Prozesse anzeigen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_CORRECT_TIMING"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -3259,23 +3754,35 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_NO_CA_LEFT"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
-msgstr "Prozesse anzeigen"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_INITIAL_ENROLLMENT_VALID_CERTIFICATE_PRESENT"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_RENEWAL_NO_VALID_CERTIFICATE_PRESENT"
-msgstr "DirName"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_NOT_ALL_REQUIRED_PARAMS_PRESENT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISSERVERKEYGENERATION_NO_SERVER_KEYGEN_PKCS10_DEFINED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISSERVERKEYGENERATION_NO_SERVER_KEYGEN_SPKAC_DEFINED"
+msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_INVALID_SIGNATURE_OR_NON_MATCHING_DNS"
 msgstr "DNS"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_VALID_SIGNATURE_AND_MATCHING_DNS"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_KEY_UNUSABLE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECERTSTOTEST_NO_MORE_CERTS_TO_TEST"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_NO_MORE_CSRS_TO_CREATE"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -3291,11 +3798,19 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGN
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SIGNED_USING_ORIGINAL_CERT"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_VALIDCSRSERIALPRESENT_CSR_SERIAL_FROM_CONTEXT_NOT_IN_DATABASE"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_ALL_CHILDREN_SUCCESSFULLY_FINISHED"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_VALIDCSRSERIALPRESENT_NO_CSR_SERIAL_PRESENT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENFAILURE_NO_CHILD_FAILED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENFAILURE_NO_WF_CHILD_INSTANCE_ID_OR_TYPE_FOUND"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -3372,6 +3887,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_NEVER_REGEX"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_DAMAGED"
 msgstr "Prozesse anzeigen"
 
@@ -3390,12 +3909,6 @@ msgstr "Prozesse anzeigen"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT"
 msgstr "Prozesse anzeigen"
-
-msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_DSN_NO_DATABASE_NAME"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_NO_TABLE"
-msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
@@ -3579,6 +4092,10 @@ msgid "I18N_OPENXPKI_SUBJECT_STYLE_DC_NOT_ALLOWED"
 msgstr "Antrag im DC-Stil"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SUBJECT_STYLE_O_NOT_ALLOWED"
+msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_DC_DC_REQUIRED"
 msgstr ""
 "Die Organisationseinheit (ou) kann benutzt werden, um organisatorische "
@@ -3589,19 +4106,11 @@ msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_O_C_REQUIRED"
 msgstr "Zurücksetzen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SUBJECT_STYLE_O_NOT_ALLOWED"
-msgstr "Web-Schnittstelle des Trustcenters"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN"
 msgstr ""
 "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account oder "
 "auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
 "dient der sichern Identifikation von Personen oder Objekten."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE"
-msgstr "Fehler beim Abmelden"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_TOKEN_CONFIG_HSM_AUTHENTICATION_GROUP"
@@ -3839,6 +4348,10 @@ msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
 msgstr "SCEP-Zertifizierungsantrag"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION"
+msgstr "Dieser Workflow erstellt neue CRLs."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL"
 msgstr "Zertifizierungsantrag (teilweise) genehmigt"
 
@@ -3883,6 +4396,22 @@ msgstr "Zertifizierungsantrag in Bearbeitung"
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PERSISTED_CSR"
 msgstr "Zertifizierungsantrag genehmigt"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_CERT_ISSUANCE_POSSIBLE"
+msgstr "Start des Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_GD_DATA_AVAILABLE"
+msgstr "Start des Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_INITIAL"
+msgstr "Start des Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_SERVER_CSR_CREATED"
+msgstr "Zertifizierungsantrag genehmigt"
+
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSUED"
 msgstr "CRL erstellt"
 
@@ -3898,17 +4427,17 @@ msgstr "Ausstellende CA für die CRL bestimmt"
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "CRL-Profile vorbereitet"
 
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
-msgstr "Logs exportiert"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
-msgstr "Workflow-Instanzen exportiert"
-
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
 msgstr "Zu exportierendes Archiv fertig"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
 msgstr "Export komplett"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
+msgstr "Logs exportiert"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
+msgstr "Workflow-Instanzen exportiert"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
 msgstr "Exportumgebung bereit"
@@ -3972,9 +4501,6 @@ msgstr "SCEP-Zertifizierungsantrag"
 msgid "I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_INITIAL"
 msgstr "SCEP-Zertifizierungsantrag"
 
-msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
-msgstr "Auf Start wartend"
-
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
 msgstr "Erstellen eines Zertifikates"
 
@@ -3992,6 +4518,9 @@ msgstr "Zertifizierungsantrag"
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr "Zertifizierungsantrag (Offline-Teil)"
 
+msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
+msgstr "Zertifizierungsantrag (Online-Teil)"
+
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "Erstellen von CRLs"
 
@@ -4003,6 +4532,14 @@ msgstr "Import"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION"
+msgstr "Speichern eines privaten Schlüssels"
 
 msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
 msgstr "Speichern eines privaten Schlüssels"
@@ -4107,6 +4644,121 @@ msgstr ""
 msgid "I18N_OPENXPKI_YES"
 msgstr "ja"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_FIXME_DER_OUTFORMAT_STILL_UNSUPPORTED"
+#~ msgstr "Aktivität nicht implementiert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWORD"
+#~ msgstr "Passwort"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_EMPLOYEENUMBER"
+#~ msgstr "Telefonnummer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_CORRECT_TIMING"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_RENEWAL_NO_VALID_CERTIFICATE_PRESENT"
+#~ msgstr "DirName"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_VALID_SIGNATURE_AND_MATCHING_DNS"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SIGNED_USING_ORIGINAL_CERT"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_ALL_CHILDREN_SUCCESSFULLY_FINISHED"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE"
+#~ msgstr "Fehler beim Abmelden"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_CREATE_CSR"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_DO_NOTHING"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_PERSIST_CERTIFICATE"
+#~ msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVAL"
+#~ msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
+#~ msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUED"
+#~ msgstr "Dieser Workflow erstellt ein neues Zertifikat."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
+#~ msgstr "Dieser Workflow erstellt ein neues Zertifikat."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FINISHED_WAITING_FOR_CHILD"
+#~ msgstr "Auf Start wartend"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
+#~ msgstr "Logs exportiert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_REJECTED"
+#~ msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_FINISHED_WAITING_FOR_CHILD"
+#~ msgstr "Auf Start wartend"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_FORKED"
+#~ msgstr "Logs exportiert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_PENDING"
+#~ msgstr "Auf Start wartend"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_REJECTED"
+#~ msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_SLEPT"
+#~ msgstr "Warten"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
+#~ msgstr "Auf Start wartend"
+
 #~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
 #~ msgstr "Microsoft Internet Explorer mit passendem privaten Schlüssel"
 
@@ -4175,76 +4827,13 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_TITLE"
 #~ msgstr "Web-Schnittstelle des Trustcenters"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MENU_CERTIFICATES"
-#~ msgstr "Neuer Antrag (CSR)"
-
 #~ msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_ONLINE"
 #~ msgstr ""
 #~ "Dieser Workflow bearbeitet den Online-Teil eines Zertifizierungsantrag."
 
-#~ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-#~ msgstr "Zertifizierungsantrag (Online-Teil)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
-#~ msgstr "Ausdrucken der Seite"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_CREATE_IE_CSR"
-#~ msgstr "Neuer Antrag (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_FAILURE_ISSUANCE_IMPOSSIBLE"
-#~ msgstr "Start der CRL-Erstellung"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_INTRO_TEXT"
-#~ msgstr "Antrag im OU-Stil"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_TITLE"
-#~ msgstr "Antrag im DC-Stil"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
 #~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_BIND_FAILED"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_CONNECTION_FAILED"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_SEARCH_FAILED"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_MORE_THAN_ONE_LDAP_ENTRY_FOUND"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECSRSTOCREATE_NO_MORE_CSRS_TO_CREATE"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_CREATE_CSR"
-#~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_DO_NOTHING"
-#~ msgstr "Warten"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTIVITY_GET_CERT_PROFILE"
@@ -4255,16 +4844,8 @@ msgstr "ja"
 #~ msgstr "Warten"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_PERSIST_CERTIFICATE"
-#~ msgstr "Speichern des Zertifzierungsantrages"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTVITY_DO_NOTHING"
 #~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION"
-#~ msgstr "Dieser Workflow erstellt neue CRLs."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_DO_NOTHING"
@@ -4275,28 +4856,12 @@ msgstr "ja"
 #~ msgstr "Warten"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
-#~ msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_NOT_USABLE"
 #~ msgstr "Start der CRL-Erstellung"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_USABLE"
 #~ msgstr "Fehler beim Abmelden"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_CERT_ISSUANCE_POSSIBLE"
-#~ msgstr "Start des Zertifizierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_GD_DATA_AVAILABLE"
-#~ msgstr "Start des Zertifizierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_INITIAL"
-#~ msgstr "Start des Zertifizierungsantrages"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_NOT_USABLE"
@@ -4307,31 +4872,11 @@ msgstr "ja"
 #~ msgstr "Fehler beim Abmelden"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
-#~ msgstr "Dieser Workflow erstellt ein neues Zertifikat."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FINISHED_WAITING_FOR_CHILD"
-#~ msgstr "Auf Start wartend"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_ISSUING_CA_DETERMINED"
 #~ msgstr "Ausstellende CA für die CRL bestimmt"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
-#~ msgstr "Logs exportiert"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
-#~ msgstr "Warten"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_WAITING_FOR_START"
-#~ msgstr "Auf Start wartend"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_FINISHED_WAITING_FOR_CHILD"
 #~ msgstr "Auf Start wartend"
 
 #, fuzzy
@@ -4339,24 +4884,8 @@ msgstr "ja"
 #~ msgstr "Ausstellende CA für die CRL bestimmt"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_PENDING"
-#~ msgstr "Auf Start wartend"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_PREPARED"
 #~ msgstr "Erstellen von CRLs"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_REJECTED"
-#~ msgstr "Abweisen des Zertifizierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_"
-#~ msgstr "Erstellen von CRLs"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION"
-#~ msgstr "Speichern eines privaten Schlüssels"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST"
@@ -4367,16 +4896,8 @@ msgstr "ja"
 #~ msgstr "SPKAC"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_INVALID_PARAMETER"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
 #~ msgstr "Fehlende Funktionalität"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS"
-#~ msgstr "Hochladen des PKCS#10-Antrages"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS"
@@ -4474,8 +4995,3 @@ msgstr "ja"
 #~ msgstr ""
 #~ "Die GUID __GUID__ ist falsch. Es werden sowohl das RFC 4122 Format als "
 #~ "auch die übliche Microsoft-Schreibweise akzeptiert."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_UPN"
-#~ msgstr ""
-#~ "Der UPN __UPN__ ist falsch. OpenXPKI unterstützt nur RFC 822 konforme "
-#~ "UPNs."

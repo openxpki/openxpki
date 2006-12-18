@@ -18,6 +18,9 @@
   <action name="do_nothing2"
           class="Workflow::Action::Null">
   </action>
+  <action name="continue"
+          class="Workflow::Action::Null">
+  </action>
 
   <!-- implicit autorun and no user interaction - so no I18N name for this
        activity -->

@@ -134,9 +134,12 @@ sub execute {
            ) {
             if ($params->[$i]->{TYPE} eq 'STDIN') {
                 ## read data from STDIN
-                if (not open FD, "|$cmd" or
-                    not print FD $params->[$i]->{DATA} or
-                    not close FD) {
+                
+                if (open my $FD, "|$cmd") {
+                    print $FD $params->[$i]->{DATA};
+                    close $FD;
+                }
+                else {
                     OpenXPKI::Exception->throw(
                         message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDIN_FAILED',
                         params  => { 'ERRVAL' => $EVAL_ERROR,
@@ -146,19 +149,21 @@ sub execute {
             }
             else {
                 ## capture STDOUT
-                if (not open FD, "$cmd|") {
+                if (open my $FD, "$cmd|") {
+                    $params->[$i]->{STDOUT} = '';
+                    while (<$FD>) { # TODO: slurp
+                        $params->[$i]->{STDOUT} .= $_;
+                    }
+                    $return .= $params->[$i]->{STDOUT};
+                    close $FD;
+                }
+                else {
                     OpenXPKI::Exception->throw (
                         message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDOUT_FAILED',
                         params  => { 'ERRVAL' => $EVAL_ERROR,
                                    },
                         );
                 }
-                $params->[$i]->{STDOUT} = '';
-                while (<FD>) { # TODO: slurp
-                    $params->[$i]->{STDOUT} .= $_;
-                }
-                $return .= $params->[$i]->{STDOUT};
-                close FD;
             }
         } else {
             ## simply execute the command

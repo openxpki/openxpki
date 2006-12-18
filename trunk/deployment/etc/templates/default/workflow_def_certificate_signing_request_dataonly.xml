@@ -1,4 +1,5 @@
 <workflow>
+  <!-- FIXME - I guess this is all obsolete? -->
   <type>dataonly_cert_request</type>
   <description>Create a PKCS#10 request from user submitted request data</description>
   <persister>OpenXPKI</persister>

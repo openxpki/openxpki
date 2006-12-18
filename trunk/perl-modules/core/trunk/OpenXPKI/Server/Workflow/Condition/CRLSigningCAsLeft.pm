@@ -24,10 +24,6 @@ sub evaluate
     my ( $self, $workflow ) = @_;
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    my $negate = 0;
-    if ($self->name() eq 'no_crl_signing_cas_left') {
-        $negate = 1;
-    }
     my $context   = $workflow->context();
 
     my $context_ca_ids = $context->param('ca_ids');
@@ -41,21 +37,9 @@ sub evaluate
     my $ca_ids_ref = $serializer->deserialize($context_ca_ids);
     my @ca_ids = @{$ca_ids_ref};
     if (scalar @ca_ids == 1) { # we have arrived at the last CA
-        if ($negate == 0) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_NO_CA_LEFT');
-        }
-        else {
-            return 1; # 'no CAs left?' is true
-        }
+        condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_NO_CA_LEFT');
     }
-    else { # there is more then one entry left
-        if ($negate == 0) {
-            return 1; # 'CAs left?' is true
-        }
-        else {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT');
-        } 
-    }
+    return 1;
 }
 
 1;
@@ -77,6 +61,5 @@ OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft
 =head1 DESCRIPTION
 
 The condition checks if the there are CRL signing CAs left in
-the workflow context. If the magic condition name
-'no_crl_signing_cas_left' is used, it returns the opposite
+the workflow context. 
 

@@ -28,7 +28,7 @@ sub execute {
         'pkcs7tool' => $self->param('pkcs7tool'),
     );
 
-    my $tm = OpenXPKI::Crypto::TokenManager->new();
+    my $tm = CTX('crypto_layer');
 
     my $pkcs7 = $context->param('pkcs7_content');
     $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7 . "-----END PKCS7-----\n";

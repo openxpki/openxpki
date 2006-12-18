@@ -47,8 +47,10 @@ sub __init_command_params : PRIVATE {
                           "OUT_PASSWD" => 0,
                           "ENC_ALG"    => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
                           "IN"         => ["RSA","DSA","PKCS8"],
-                          "OUT"        => ["PEM","DER","PKCS8"],
-                          "DATA"       => 1},
+                          "OUT"        => ["PEM","DER","PKCS8",'OPENSSL_RSA','OPENSSL_EC'],
+                          "DATA"       => 1,
+                          'DECRYPT'    => 0,
+                         },
     "convert_pkcs10"  => {"DATA" => 1,
                           "OUT"  => ["DER","TXT"]},
     "create_cert"     => {"PROFILE" => 1,
@@ -171,10 +173,15 @@ sub __init_command_params : PRIVATE {
                           "ENC_ALG"        => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
                           "KEY"            => 1,
                           "CERT"           => 1,
-                          "CHAIN"          => 0},
+                          "CHAIN"          => 0,
+                          "CSP"            => 0,
+                         },
     "create_random"   => {"RETURN_LENGTH" => 0,
                           "RANDOM_LENGTH" => 0,
                           "INCLUDE_PADDING" => 0},
+    "get_pkcs8_keytype" => { 'DATA'   => 1,
+                            'PASSWD' => 1,
+                           },
     "is_prime"        => {"PRIME"   => 1,
                          },
     "issue_cert"      => {"PROFILE" => 1,
@@ -432,6 +439,23 @@ sub free_object {
     return $self->get_instance()->free_object ($object);
 }
 
+sub key_usable {
+    ##! 1: 'start'
+    my $self  = shift;
+    my $ident = ident $self;
+    ##! 16: 'engine: ' . $self->get_instance()->get_engine()
+    ##! 16: 'key_online: '  . $self->get_instance()->get_engine()->key_online()
+    return if (!defined $self->get_instance()->get_engine());
+    eval {
+        # try to get password, if this fails, key is unusable
+        $self->get_instance()->get_engine()->get_passwd();
+    };
+    if ($EVAL_ERROR) {
+        ##! 16: 'we have an eval error: ' . $EVAL_ERROR
+        return;
+    }
+    return 1;
+}
 
 1;
 __END__

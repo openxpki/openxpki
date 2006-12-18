@@ -1,0 +1,63 @@
+<%args>
+  $identifier   => undef
+  $format       => "PKCS8_PEM"
+  $password     => undef
+  $csp          => undef
+  $csp_freeform => undef
+</%args>
+<%init>
+  ## first we have to determine the content-type
+  my $content_type;
+  my $extension;
+  switch ($format) {
+    case "PKCS8_PEM"       {$content_type = "text/plain"; $extension = "pem"}
+    case "PKCS8_DER"       {$content_type = "application/octet-string"; $extension = "pk8"}
+    case "OPENSSL_PRIVKEY" {$content_type = "text/plain"; $extension = "pem"}
+    case "PKCS12"          {$content_type = "application/octet-string"; $extension = "p12"}
+    case "JAVA_KEYSTORE"   {$content_type = "application/octet-string"; $extension = "jks"}
+    else {
+          print "<h1>".i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_WRONG_FORMAT_TITLE')."</h1>\n";
+          print "<p>\n";
+          print i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_WRONG_FORMAT_DESC',
+                            '__FORMAT__' => $format)."\n";
+          print "</p>\n";
+          return 1;
+    }
+  }
+
+  if (defined $password) {
+      ## now request the key from the server
+      my $params = {
+        'IDENTIFIER' => $identifier,
+        'FORMAT'     => $format,
+        'PASSWORD'   => $password,
+      };
+      if (defined $csp_freeform && $csp_freeform ne '') {
+        $params->{'CSP'} = $csp_freeform;
+      }
+      elsif (defined $csp && $csp ne '') {
+        $params->{'CSP'} = $csp;
+      }
+      my $msg  = $context->{client}->send_receive_command_msg (
+                      "get_private_key_for_cert",
+                      $params,
+      );
+      my $item = $msg->{PARAMS}->{PRIVATE_KEY};
+
+      if (!defined $item || $item eq '') {
+          print "<h1>".i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED_TITLE')."</h1>\n";
+          print "<p>\n";
+          print i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED_DESC');
+          print "</p>\n";
+          return 1;
+      }
+      ## now send the stuff
+      $r->content_type ($content_type);
+      $r->header_out('Content-Disposition',  "attachement; filename=$identifier.$extension");
+      print $item;
+      return 1;
+  }
+</%init>
+<%once>
+  use Switch;
+</%once>

@@ -32,11 +32,6 @@ sub evaluate {
     ##! 16: 'start'
     my ( $self, $workflow ) = @_;
 
-    ##! 16: 'my condition name: ' . $self->name()
-    my $negate = 0;
-    if ($self->name() eq 'certificate_issuance_impossible') {
-        $negate = 1;
-    }
     my $context  = $workflow->context();
     ##! 16: 'context: ' . Dumper($context)
     my @required_context_params = split /,/, $self->required();
@@ -50,17 +45,8 @@ sub evaluate {
     }
     
     ##! 16: 'all_params_present: ' . $all_params_present
-    if ($negate == 0) {
-        ##! 16: 'negate = 0'
-        if ($all_params_present == 0) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_NOT_ALL_REQUIRED_PARAMS_PRESENT');
-        }
-    }
-    else {
-        ##! 16: 'negate = 1'
-        if ($all_params_present == 1) {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT');
-        }
+    if ($all_params_present == 0) {
+        condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_NOT_ALL_REQUIRED_PARAMS_PRESENT');
     }
    return 1; 
     ##! 16: 'end'
@@ -89,6 +75,3 @@ the certificate issuance.
 The required parameters are listed in the parameter required in the
 condition definition. If all these exist (prefixed with ldap_) in
 the workflow context, it returns true, otherwise it fails.
-If the magic condition name 'certificate_issuance_impossible' is used,
-it returns just the opposite.
-

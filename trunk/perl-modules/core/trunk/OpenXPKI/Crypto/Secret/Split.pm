@@ -20,7 +20,6 @@ use base qw( OpenXPKI::Crypto::Secret );
 
 use OpenXPKI::Debug 'OpenXPKI::Crypto::Secret::Split';
 use OpenXPKI::Exception;
-use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 

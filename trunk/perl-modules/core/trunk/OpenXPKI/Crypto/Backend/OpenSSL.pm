@@ -140,7 +140,7 @@ sub __prepare_cli {
 sub get_object
 {
     ##! 1: "start"
-    my $self = shift;
+    my $self  = shift;
     my $ident = ident $self;
     return $xs_of{$ident}->get_object(@_);
 }
@@ -148,7 +148,7 @@ sub get_object
 sub get_object_function
 {
     ##! 1: "start"
-    my $self   = shift;
+    my $self  = shift;
     my $ident = ident $self;
     return $xs_of{$ident}->get_object_function(@_);
 }
@@ -156,7 +156,7 @@ sub get_object_function
 sub free_object
 {
     ##! 1: "start"
-    my $self   = shift;
+    my $self  = shift;
     my $ident = ident $self;
     return $xs_of{$ident}->free_object(@_);
 }

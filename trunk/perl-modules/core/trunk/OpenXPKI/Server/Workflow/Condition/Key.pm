@@ -4,24 +4,35 @@ use strict;
 use warnings;
 use base qw( Workflow::Condition );
 use Workflow::Exception qw( condition_error configuration_error );
+use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Condition::Key';
 use OpenXPKI::Server::Context qw( CTX );
 use English;
 
-sub _init
-{
-    my ( $self, $params ) = @_;
-
-    return 1;
-}
-
 sub evaluate
 {
+    ##! 1: 'start'
     my ( $self, $wf ) = @_;
 
-    # FIXME: do some real work here to determine usability ...
-    if ($self->name() eq 'CA::key_is_not_usable') {
-        condition_error("I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE");
+    my $context = $wf->context();
+    my $ca      = $context->param('ca');
+    my $realm   = CTX('session')->get_pki_realm();
+
+    ##! 16: 'realm: ' . $realm
+    ##! 16: 'ca: ' . $ca
+    my $certificate = CTX('pki_realm')->{$realm}->{ca}->{id}->{$ca}->{certificate};
+    my $tm = CTX('crypto_layer');
+    my $ca_token = $tm->get_token(
+            TYPE        => 'CA',
+            ID          => $ca,
+            PKI_REALM   => $realm,
+            CERTIFICATE => $certificate,
+    );
+    ##! 16: 'CA token retrieved'
+    if (!defined $ca_token || ! $ca_token->key_usable()) {
+        ##! '16: key unusable condition error'
+        condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_KEY_UNUSABLE");
     }
+    ##! 1: 'end'
     return 1;
 }
 
@@ -44,8 +55,4 @@ OpenXPKI::Server::Workflow::Condition::Key
 
 =head1 DESCRIPTION
 
-The condition checks if the specified key (token id) is unusable
-(with the condition name CA::key_is_not_usable) or usable (with
-any other condition name).
-FIXME:
-Currently, it just assumes that the key is always available ...
+The condition checks if the specified key (token id) is usable.

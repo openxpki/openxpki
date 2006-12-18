@@ -51,6 +51,7 @@
 % {
 %   next if ($param eq "approvals" and length $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param} == 0);
 %   next if ($param eq "cert_profile_id");
+%   next if ($param =~ m{ \A _ }xms); # ignore "volatile" context parameters
   <tr>
       <td>
 % $m->comp('/lib/field_to_i18n.mhtml',

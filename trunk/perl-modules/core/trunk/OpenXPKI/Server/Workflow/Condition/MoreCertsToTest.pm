@@ -18,29 +18,14 @@ sub evaluate {
     ##! 16: 'start'
     my ( $self, $workflow ) = @_;
 
-    ##! 16: 'my condition name: ' . $self->name()
-    my $negate = 0;
-    if ($self->name() eq 'no_more_certs_to_test') {
-        $negate = 1;
-    }
     my $context  = $workflow->context();
     my $nr_of_certs = $context->param('nr_of_certs');
     my $certs_installed = $context->param('certs_installed');
     ##! 16: 'nr_of_certs: ' . $nr_of_certs
     ##! 16: 'certs_installed: ' . $certs_installed
-    if ($negate == 0) {
-        ##! 16: 'negate = 0'
-        if ($certs_installed == $nr_of_certs) {
-            ##! 32: 'no negate and enough certs -> ERROR'
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECERTSTOTEST_NO_MORE_CERTS_TO_TEST');
-        }
-    }
-    else {
-        ##! 16: 'negate = 1'
-        if ($certs_installed != $nr_of_certs) {
-            ##! 32: 'negate and not enough certs -> ERROR'
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECERTSTOTEST_MORE_CERTS_TO_TEST');
-        }
+    if ($certs_installed == $nr_of_certs) {
+        ##! 32: 'enough certs -> ERROR'
+        condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECERTSTOTEST_NO_MORE_CERTS_TO_TEST');
     }
    return 1; 
     ##! 16: 'end'

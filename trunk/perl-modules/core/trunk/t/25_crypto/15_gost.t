@@ -31,7 +31,7 @@ ok(1);
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new ();
+my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
 ok (1, 'TokenManager');
 
 my $ca_id = "INTERNAL_CA_GOST"; 

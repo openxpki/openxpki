@@ -13,7 +13,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CRLIssuance::IssueCRL';
 use OpenXPKI::Crypto::Profile::CRL;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::CRL;
 use Date::Parse;
 
@@ -54,7 +53,7 @@ sub execute {
     my $ca_identifier = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$current_ca}->{identifier};
     my $certificate = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$current_ca}->{certificate};
     ##! 16: 'ca_identifier: ' . $ca_identifier
-    my $tm = OpenXPKI::Crypto::TokenManager->new();
+    my $tm = CTX('crypto_layer');
     my $ca_token = $tm->get_token(
         TYPE      => 'CA',
         ID        => $current_ca,

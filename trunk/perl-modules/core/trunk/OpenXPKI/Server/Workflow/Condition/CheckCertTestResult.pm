@@ -20,21 +20,8 @@ sub evaluate {
     my $context    = $workflow->context();
     my $testresult = $context->param('testresult'); 
 
-    ##! 16: 'my condition name: ' . $self->name()
-    my $negate = 0;
-    if ($self->name() eq 'test_result_failed') {
-        $negate = 1;
-    }
-
-    if ($negate == 0) { # we are asked if the test is ok
-        if ($testresult ne 'true') {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKCERTTESTRESULT_TESTRESULT_NOT_TRUE');
-        }
-    }
-    else {
-        if ($testresult eq 'true') {
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKCERTTESTRESULT_TESTRESULT_TRUE');
-        }
+    if ($testresult ne 'true') {
+        condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKCERTTESTRESULT_TESTRESULT_NOT_TRUE');
     }
     ##! 16: 'end'
     return 1;

@@ -111,6 +111,7 @@ templatedir:      $(dir.datadir)/templates
 openssl: /usr/bin/openssl
 openca_scep: /usr/bin/openca-scep
 openca_sv: /usr/bin/openca-sv
+createjavakeystore: /usr/bin/create_javakeystore
 
 ###########################################################################
 # OpenXPKI Server configuration
@@ -259,6 +260,7 @@ issuingca: TEST_DUMMY_CA_1
 issuingca: TEST_DUMMY_CA_2
 subsystem: TEST_SCEP_SERVER_1
 subsystem: TEST_SCEP_PKCS7_TOOL_1
+subsystem: TEST_CREATE_JAVAKEYSTORE_1
 profiles:  $(profiles)
 
 [Realm 2]
@@ -285,6 +287,13 @@ type: pkcs7
 shell: $(file.openca_sv)
 backend: OpenXPKI::Crypto::Tool::PKCS7
 dir: $(dir.cadir)/scepdummyserver1
+
+[TEST_CREATE_JAVAKEYSTORE_1]
+id: testcreatejavakeystore
+type: createjavakeystore
+shell: $(file.createjavakeystore)
+backend: OpenXPKI::Crypto::Tool::CreateJavaKeystore
+dir: /tmp
 
 ###########################################################################
 # Issuing CAs

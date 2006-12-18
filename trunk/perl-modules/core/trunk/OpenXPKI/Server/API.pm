@@ -59,7 +59,9 @@ sub BUILD {
     my $re_filename_string   = qr{ \A [A-Za-z0-9\+/=_\-\.]* \z }xms;
     my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
     my $re_cert_format       = qr{ \A (PEM|DER|TXT|PKCS7) \z }xms;
+    my $re_privkey_format    = qr{ \A (PKCS8_PEM|PKCS8_DER|OPENSSL_PRIVKEY|PKCS12|JAVA_KEYSTORE) \z }xms;
     my $re_sql_string        = qr{ \A [a-zA-Z0-9\@\-_\.\s\%\*]* \z }xms;
+
     $method_info_of{$ident} = {
         ### Default API
         'get_pki_realm' => {
@@ -108,10 +110,41 @@ sub BUILD {
                     type     => SCALAR,
                     regex    => $re_base64_string,
                 },
-                FORMAT => {
+                FORMAT   => {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_cert_format,
+                },
+            },
+        },
+        'private_key_exists_for_cert' => {
+            class  => 'Object',
+            params => {
+                IDENTIFIER => {
+                    type  => SCALAR,
+                    regex => $re_base64_string,
+                },
+            },
+        },
+        'get_private_key_for_cert' => {
+            class  => 'Object',
+            params => {
+                IDENTIFIER => {
+                    type  => SCALAR,
+                    regex => $re_base64_string,
+                },
+                FORMAT => {
+                    type  => SCALAR,
+                    regex => $re_privkey_format,
+                },
+                PASSWORD => {
+                    type     => SCALAR,
+                    # regex => ???
+                },
+                CSP      => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
                 },
             },
         },
@@ -131,6 +164,15 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_cert_format,
+                },
+            },
+        },
+        'get_random' => {
+            class  => 'Default',
+            params => {
+                'LENGTH' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
                 },
             },
         },

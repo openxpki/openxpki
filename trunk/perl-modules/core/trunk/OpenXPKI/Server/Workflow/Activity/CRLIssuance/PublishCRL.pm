@@ -13,7 +13,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CRLIssuance::PublishCRL';
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::FileUtils;
-use OpenXPKI::Crypto::TokenManager;
 use DateTime;
 use Net::LDAP;
 
@@ -85,7 +84,7 @@ sub execute {
             $content = $crl;
         }
         elsif ($format eq 'DER') {
-            my $tm = OpenXPKI::Crypto::TokenManager->new();
+            my $tm = CTX('crypto_layer');
             my $default_token = $tm->get_token(
                 TYPE      => 'DEFAULT',
                 PKI_REALM => $pki_realm,
@@ -240,7 +239,7 @@ sub execute {
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_MORE_THAN_ONE_LDAP_ENTRY_FOUND',
             );
         }
-        my $tm = OpenXPKI::Crypto::TokenManager->new();
+        my $tm = CTX('crypto_layer');
         my $default_token = $tm->get_token(
             TYPE      => 'DEFAULT',
             PKI_REALM => $pki_realm,

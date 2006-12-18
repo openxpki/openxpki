@@ -20,4 +20,16 @@
   <validator name="PKCS10"
              class="OpenXPKI::Server::Workflow::Validator::PKCS10">
   </validator>
+  <validator name="PasswordQuality"
+             class="OpenXPKI::Server::Workflow::Validator::PasswordQuality">
+        <param name="DICTIONARY" value="5"/>
+        <param name="FOLLOWING" value="3"/>
+        <param name="FOLLOWING_KEYBOARD" value="1"/>
+        <param name="GROUPS" value="2"/>
+        <param name="MINLEN" value="8"/>
+        <param name="MAXLEN" value="32"/>
+        <!--
+        <param name="DICTIONARIES" value="/usr/share/dict/ngerman,/usr/share/dict/american-english"/>
+        -->
+  </validator>
 </validators>

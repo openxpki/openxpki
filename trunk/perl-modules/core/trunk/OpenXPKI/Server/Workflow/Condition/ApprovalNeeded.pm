@@ -19,13 +19,8 @@ sub evaluate {
     ##! 16: 'start'
     my ( $self, $workflow ) = @_;
 
-    my $negate = 0;
-    if ($self->name() eq 'no_approval_needed') {
-        $negate = 1;
-    }
-    if ($negate == 0) {
-        condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED');
-    }
+    condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED');
+
    return 1; 
     ##! 16: 'end'
 }
@@ -52,6 +47,3 @@ The condition checks if approval is needed for certificates.
 Currently, it just defines that no approval is needed whatsoever.
 If you need approval (maybe depending on some condition or other),
 you have to implement it yourself.
-If the magic condition name 'no_approval_needed' is used,
-it returns just the opposite.
-
