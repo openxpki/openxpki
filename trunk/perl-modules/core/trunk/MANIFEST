@@ -60,7 +60,6 @@ OpenXPKI/Crypto/Tool/PKCS7/Command/get_subject.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/CLI.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/API.pm
-OpenXPKI/Crypto/Tool/CreateJavaKeystore/Engine.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/Engine/OpenSSL.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/Command/create_keystore.pm
 OpenXPKI/Crypto/Toolkit.pm
@@ -255,8 +254,6 @@ OpenXPKI/Server/Workflow/Condition/CheckCertTestResult.pm
 OpenXPKI/Server/Workflow/Condition/ValidCSRSerialPresent.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowChildrenFailure.pm
 OpenXPKI/Server/Workflow/Condition/IsServerKeyGeneration.pm
-OpenXPKI/Server/Workflow/Condition/GeneratePKCS10.pm
-OpenXPKI/Server/Workflow/Condition/GenerateKey.pm
 
 OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
