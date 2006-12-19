@@ -757,7 +757,7 @@ my @options_spec = qw(
                      cfg|cfgfile|config|config=s
                      ); # config is the only global option
 
-my $cmd = shift @ARGV;
+my $cmd = shift @ARGV || '';
 my $subcmd;
 if ($cmd eq 'certificate' || $cmd eq 'key') { # those have subcommands
     $subcmd = shift @ARGV || '';
