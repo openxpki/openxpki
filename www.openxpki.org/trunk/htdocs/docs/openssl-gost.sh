@@ -2,15 +2,15 @@
 
 set -e
 
-OPENSSL_SOURCEDIR="/usr/local/src/openssl/work_098b"
-OPENSSL_INSTALLDIR="/usr/local/openssl-0.9.8b-patched"
-MAKE=make
+OPENSSL_SOURCEDIR="/usr/local/src/openssl/work_098d"
+OPENSSL_INSTALLDIR="/usr/local/openssl-0.9.8d-patched"
+MAKE=gmake
 
-OPENSSL_VERSION="0.9.8b"
+OPENSSL_VERSION="0.9.8d"
 OPENSSL_NAME="openssl-${OPENSSL_VERSION}"
 ENGINE_ID="gost"
-ENGINE_NAME="engine-${ENGINE_ID}-20060626"
-PATCH="openssl-asymm-${OPENSSL_VERSION}-20060626.diff"
+ENGINE_NAME="engine-${ENGINE_ID}-20061110"
+PATCH="openssl-asymm-${OPENSSL_VERSION}-20061110.diff"
 OPENSSL_DOWNLOAD="http://www.openssl.org/source/${OPENSSL_NAME}.tar.gz"
 ENGINE_DOWNLOAD="http://osdn.dl.sourceforge.net/openxpki/${ENGINE_NAME}.tar.gz"
 PATCH_DOWNLOAD="http://osdn.dl.sourceforge.net/openxpki/${PATCH}.gz"
@@ -80,7 +80,7 @@ echo "+------------------------ +"
 sleep ${SLEEP_TIME}
 
 cd ${OPENSSL_SOURCEDIR}/${OPENSSL_NAME}
-patch -p2 < ../${PATCH}
+patch -p0 < ../${PATCH}
 
 echo "+---------------------------------------------------- +"
 echo "| Configuring OpenSSL-${OPENSSL_VERSION} with ${ENGINE_ID} engine support |"

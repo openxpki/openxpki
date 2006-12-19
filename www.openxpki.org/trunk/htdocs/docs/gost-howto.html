@@ -61,8 +61,8 @@ simultaneously and by default and out of the box.
 </p>
 <p>
 For those who can not wait, provided here is a patched version of 
-OpenSSL-0.9.8b equipped with the (same as in ver.0.9.9) set of GOST algorithms. 
-This collection is called OpenSSL-0.9.8b-gost. It has  
+OpenSSL-0.9.8d equipped with the (same as in ver.0.9.9) set of GOST algorithms. 
+This collection is called OpenSSL-0.9.8d-gost. It has  
 full and simultaneous support of both western 
 and russian cryptography. The recipes that follow have been tested to work with OpenXPKI
 at FreeBSD@Intel-32, FreeBSD@AMD-64, Debian@Intel-32 platforms. <em>Tested to work</em>
@@ -75,16 +75,16 @@ Roughly today's procedure to prepare support for GOST in OpenXPKI is as follows:
 </p>
     <ul>
       <li>unzip a regular 
-<a href="http://www.openssl.org/source/openssl-0.9.8b.tar.gz">OpenSSL-0.9.8b version</a>
+<a href="http://www.openssl.org/source/openssl-0.9.8d.tar.gz">OpenSSL-0.9.8d version</a>
 </li>
       <li>apply
-<a href="http://prdownloads.sourceforge.net/openxpki/openssl-asymm-0.9.8b-20060626.diff.gz">
+<a href="http://prdownloads.sourceforge.net/openxpki/openssl-asymm-0.9.8d-20061110.diff.gz">
 a patch</a>
 which enables support of arbitrary asymmetric cryptography,</li>
       <li>install thus patched OpenSSL version to a specially dedicated directory 
            OPENSSL_INSTALLDIR, so that your system's OpenSSL installation is not violated,</li>
       <li>configure 
-<a href="http://prdownloads.sourceforge.net/openxpki/engine-gost-20060626.tar.gz">
+<a href="http://prdownloads.sourceforge.net/openxpki/engine-gost-20061110.tar.gz">
 engine-gost</a> (which is a set of GOST algoritms)
 to work with this OpenSSL and install it,</li>
     </ul>
@@ -199,8 +199,8 @@ Supported here for compatibility.
       </div> <!-- content -->
 
       <div id="footer">
-        Last modified by svysh on Wed Dec  6 12:44:29 UTC 2006
- (based on rev. 552). &copy; 2005 - 2006  OpenXPKI Foundation
+        Last modified by svysh on Tue Dec 19 14:00:19 UTC 2006
+ (based on rev. 637). &copy; 2005 - 2006  OpenXPKI Foundation
 
 
       </div> <!-- footer -->
