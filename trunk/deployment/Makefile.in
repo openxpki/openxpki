@@ -33,12 +33,10 @@ ADMUSER         = [% server.admuser %]
 ADMGROUP        = [% server.admgroup %]
 
 CONFIGFILE      = etc/templates/$(TEMPLATE)/openxpki.conf
+VERSION_FILE    = ./VERSION
 
 ###########################################################################
 # no user serviceable parts below this line
-
-VERSION=$(shell $(VERGEN) --format version)
-
 
 TOOLS_SRC = \
 	bin/openxpkiadm.in \
@@ -54,8 +52,19 @@ all: tools build-man
 
 install: makedirs installtemplates installbin postinstallhelp
 
+writeversion:
+	@( if [ -e $(VERGEN) ] ; then \
+		$(VERGEN) --format version > $(VERSION_FILE); \
+	fi )
+	@( if [ ! -e $(VERSION_FILE) ] ; then \
+		echo "Could not determine version" ; \
+		exit 1; \
+	fi )
 
-tools: $(TOOLS)
+readversion: writeversion
+VERSION=$(shell cat $(VERSION_FILE))
+
+tools: readversion $(TOOLS)
 
 $(TOOLS_DST): $(TOOLS_SRC) $(CONFIGFILE)
 	for file in $(TOOLS_DST) ; do \
@@ -99,7 +108,7 @@ clean:
 
 distclean: clean
 
-dist:
+dist: readversion
 	if [ -d openxpki-deployment-$(VERSION) ] ; then \
 		rm -rf openxpki-deployment-$(VERSION)/ ; \
 	fi

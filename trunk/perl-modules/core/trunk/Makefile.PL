@@ -104,10 +104,13 @@ close $fh;
 ###########################################################################
 # determine OpenXPKI version
 
-my $openxpki_version = `$vergen --format version`;
+my $openxpki_version;
+if ( -e($vergen) ) {
+    $openxpki_version = `$vergen --format version`;
 
-if ($CHILD_ERROR != 0) {
-    $openxpki_version = undef;
+    if ($CHILD_ERROR != 0) {
+        $openxpki_version = undef;
+    }
 }
 
 if (! defined $openxpki_version) {

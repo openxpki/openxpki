@@ -8,6 +8,7 @@ LANGS         = en_GB de_DE ru_RU
 PO_SOURCES   = $(LANGS:%=%/openxpki.po)
 MO_TRANSLATIONS = $(LANGS:%=%/$(MO_FILE))
 POT_SOURCES  = ../perl-modules ../clients ../deployment
+VERSION_FILE    = ./VERSION
 
 #---- variable settings above, rules below ----
 
@@ -55,8 +56,20 @@ test install clean distclean::
 distclean clean::
 	rm -f */*.po~
 
-dist:	VERSION=`$(VERGEN) --format version`
-dist:
+writeversion:
+	@( if [ -e $(VERGEN) ] ; then \
+		$(VERGEN) --format version > $(VERSION_FILE); \
+	fi )
+	@( if [ ! -e $(VERSION_FILE) ] ; then \
+		echo "Could not determine version" ; \
+		exit 1; \
+	fi )
+
+readversion: writeversion
+VERSION=$(shell cat $(VERSION_FILE))
+
+#dist:	VERSION=`$(VERGEN) --format version`
+dist: readversion
 	if [ -d openxpki-i18n-$(VERSION) ] ; then \
 		rm -rf openxpki-i18n-$(VERSION)/ ; \
 	fi

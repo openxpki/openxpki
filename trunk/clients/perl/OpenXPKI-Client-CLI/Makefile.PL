@@ -4,13 +4,17 @@ use English;
 use ExtUtils::MakeMaker;
 
 my $vergen = '../../../../tools/vergen';
-my $version = `$vergen --format version`;
+my $version;                                                                                                                                               
 
-if ($CHILD_ERROR == 0) {
-    print "Version $version\n";
-    open my $fh, '>', 'VERSION' || die 'Could not write VERSION file. Stopped';
-    print $fh $version;
-    close $fh;
+if ( -e($vergen) ) {
+    $version = `$vergen --format version`;
+
+    if ($CHILD_ERROR == 0) {
+        print "Version $version\n";
+        open my $fh, '>', 'VERSION' || die 'Could not write VERSION file. Stopped';
+        print $fh $version;
+        close $fh;
+    }
 }
 
 $version = do {
