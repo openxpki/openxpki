@@ -2,16 +2,13 @@
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
 ## $Revision: 350 $
 
-PACKAGES=	\
-	core			\
+PACKAGES=\
+	perl-openxpki-core \
+	perl-openxpki-client \
+	openxpki-deployment \
+	perl-openxpki-client-html-mason \
+	openxpki-i18n \
 
-
-
-	#perl-client-api		\
-	#perl-cli-client		\
-	#deployment		\
-	#mason-html-client	\
-	#i18n
 
 .PHONY : $(PACKAGES)
 
