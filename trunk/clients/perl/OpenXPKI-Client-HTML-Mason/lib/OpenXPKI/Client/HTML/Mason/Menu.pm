@@ -8,6 +8,8 @@ use OpenXPKI::Exception;
 use OpenXPKI::i18n qw( i18nGettext );
 use HTML::Mason::Request; # we only use this because we get $m as parameter
 
+use Data::Dumper;
+
 sub new
 {
     my $that = shift;
@@ -133,52 +135,117 @@ sub __get_level
 
     ##! 2: "calculate the different items"
     my $return = "";
-    $return .= "<div class=\"menu_level_$level\">\n";
-    for (my $i = 0; $i < scalar @{$self->{CONFIG}->{MENU}->{$menu}}; $i++)
-    {
-        ##! 4: "i ::= $i"
-        my $type  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[0];
-        my $label = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[1];
-        my $name  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[2];
-        ##! 4: "type=$type;$label=$label;name=$name"
-        ## ok das msste man komplett in die Parameterklasse einbauen
-        if ($type eq "MENU")
-        {
-            if ($menu eq $name)
-            {
-                $return .= "  <div class=\"menu_level_${level}_item_type_active_menu\">\n";
-            } else {
-                $return .= "  <div class=\"menu_level_${level}_item_type_menu\">\n";
+    my $title;
+
+    if ($level == 0) {
+        $return .= '<div class="subheader">' . "\n";
+        for (my $i = 0; $i < scalar @{$self->{CONFIG}->{MENU}->{$menu}}; $i++) {
+            ##! 4: "i ::= $i"
+            my $type  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[0];
+            my $label = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[1];
+            my $name  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[2];
+            ##! 4: "type=$type;$label=$label;name=$name"
+            ## ok das msste man komplett in die Parameterklasse einbauen
+            if ($i != 0) {
+                $return .= '&nbsp;| ' . "\n";
             }
-            $return .= "    <a href=\"".
-                       $self->__get_menu_link (
-                       {
+            if ($type eq "MENU") {
+                my $menu_link = $self->__get_menu_link({
                            "LEVEL" => $level,
                            "MENU"  => $name
-                       }).
-                       "\">\n";
-        } else {
-            $return .= "  <div class=\"menu_level_${level}_item_type_action\">\n";
-            $return .= "    <a href=\"".
+                });
+                if ($name eq $self->{PATH}->[0]) {
+                    $return .= '    <a class="highlight" ';
+                    $title = $label;
+                } else {
+                    $return .= '    <a ';
+                }
+                $return .= "href=\"". $menu_link . "\">";
+            } else {
+                $return .= "    <a href=\"".
                        $self->__get_menu_link (
                        {
                            "LEVEL"  => $level,
                            "ACTION" => $name
                        }).
-                       "\">\n";
+                       "\">";
+            }
+            $return .= i18nGettext($label);
+            $return .= "</a>";
         }
-        $return .= "      ".i18nGettext($label)."\n";
-        $return .= "    </a>\n";
-        $return .= "  </div>\n";
-        if ($params->{NESTED} and
-            $level < $self->{LEVEL} and
-            $name eq $self->{PATH}->[$level])
-        {
-            $return .= $self->__get_level ({LEVEL => $level+1, NESTED => 1});
+        $return .= "\n  </div>\n";
+        $return .= '</div>' . "\n" . '<div id="sidebar">' . "\n";
+    }
+    else {
+        if ($level == 1) {
+            $return .= '  <div>' . "\n";
+            $return .= '    <p class="title">' . i18nGettext($params->{'PARENT_TITLE'}) . '</p> ' . "\n";
+        }
+        $return .= '    <ul>' . "\n";
+        for (my $i = 0; $i < scalar @{$self->{CONFIG}->{MENU}->{$menu}}; $i++) {
+            ##! 4: "i ::= $i"
+            my $type  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[0];
+            my $label = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[1];
+            my $name  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[2];
+            ##! 4: "type=$type;$label=$label;name=$name"
+            ## ok das msste man komplett in die Parameterklasse einbauen
+            if ($type eq "MENU") {
+                my $menu_link = $self->__get_menu_link({
+                           "LEVEL" => $level,
+                           "MENU"  => $name
+                });
+                #if ($i != 0) {
+                #    $return .= ' | ';
+                #}
+                if ($menu_link =~ /\Q$self->{COMP}\E/) {
+                    # TODO this needs some editing, actually we want to
+                    # match the current URL against the link, this is
+                    # broken in the Language menu, for example
+                    $return .= '      <li class="highlight><a " ';
+                } else {
+                    $return .= '      <li><a  ';
+                }
+                $return .= "href=\"". $menu_link . "\">";
+            } else {
+                my $menu_link = $self->__get_menu_link ({
+                           "LEVEL"  => $level,
+                           "ACTION" => $name
+                });
+                if ($menu_link =~ /\Q$self->{COMP}\E/) {
+                    $return .= '       <li class="highlight">';
+                }
+                else {
+                    $return .= '       <li>';
+                }
+                $return .= "<a href=\"". $menu_link . "\">";
+            }
+            $return .= i18nGettext($label);
+            $return .= "</a></li>\n";
+            if ($params->{NESTED} and
+                $level < $self->{LEVEL} and
+                $name eq $self->{PATH}->[$level]) {
+                    $return .= $self->__get_level({
+                        LEVEL => $level+1,
+                        NESTED => 1,
+                    });
+            }
+        }
+        $return .= '    </ul>' . "\n";
+        if ($level == 1) {
+            $return .= "  </div>\n";
         }
     }
-    $return .= "</div>\n";
-
+    if ($level == 0) {
+        if ($params->{NESTED} &&
+            $level < $self->{LEVEL}) {
+                $return .= $self->__get_level({
+                    LEVEL        => $level+1,
+                    NESTED       => 1,
+                    PARENT_TITLE => $title,
+                });
+        }
+        $return .= "</div>\n";
+    }
     ##! 1: "end"
     return $return;
 }

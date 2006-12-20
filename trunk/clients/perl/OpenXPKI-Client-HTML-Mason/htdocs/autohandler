@@ -8,28 +8,63 @@
   <head>
     <title><& SELF:title, %ARGS &></title>
     <link rel="stylesheet" 
-          title="default" 
 % my $path = $m->request_comp()->dir_path();
 %    $path = substr ($path, 1);
 %    $path =~ s/[^\/]+/../g;
 %    $path .= "/" if (length $path);
           href="<& /lib/url.mhtml, 
-                   path => "${path}css/openxpki.css",
+                   path => "${path}css/sinorcaish-screen.css",
                    no_session => 1 &>" 
-          type="text/css" />
+          type="text/css" media="screen" />
+    <link rel="stylesheet" 
+          href="<& /lib/url.mhtml, 
+                   path => "${path}css/sinorcaish-print.css",
+                   no_session => 1 &>" 
+          type="text/css" media="print" />
     <& /lib/javascript.mhtml &>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="Content-Script-Type" content="text/javascript"/>
   </head>
   <body <& SELF:onload, %ARGS &>>
-    <div id="page">
+<!-- For non-visual or non-stylesheet-capable user agents -->
+<div id="mainlink"><a href="#main">Skip to main content.</a></div>
 
-      <div id="header">
-        <img src="<& /lib/url.mhtml, 
-             path => "${path}images/openxpki_logo.png",
-             no_session => 1 &>"
-             alt="OpenXPKI"/>
-      </div> <!-- header -->
+<div id="header">
+  <div class="left">
+    <a href="http://www.openxpki.org/"><img
+      src="<% ${path} %>images/openxpki_sinorcaish.png" alt="OpenXPKI"
+      width="325" height="60" /></a>
+  </div>
+
+  <div class="right">
+<!-- 
+    <span class="hidden">Useful links:</span>
+    <a href="index.html">Contacts</a> |
+    <a href="index.html">Feedback</a> |
+-->
+    Search <!-- |
+    <a href="index.html">About</a> -->
+
+    <div>
+      <form action="index.html" method="get">
+        <script type="text/javascript">
+            var EmptySearchFieldDone = 0;
+            function EmptySearchField(elem) {
+                if (EmptySearchFieldDone == 0) {
+                    elem.value = "";
+                    EmptySearchFieldDone = 1;
+                }
+                return true;
+            }
+        </script>
+        <div>
+          <input type="text" name="q" value="Search" onfocus="EmptySearchField(this);" size="15" maxlength="250" />
+          <input type="image" name="submit" src="<% ${path} %>images/search.png" alt="Search" />
+        </div>
+      </form>
+    </div>
+  </div>
+
 % }
 <%perl>
     ## if the session is present or faked and
@@ -51,9 +86,9 @@
     }
 </%perl>
 % if ($m->request_comp()->title() !~ /^\/binary\//) {
-      <div id="footer">
+    </div>  <!-- content -->
+      <div id="footer"><small>&copy; 2006 <a href="http://www.openxpki.org">The OpenXPKI Project</a></small>
       </div>
-    </div>  <!-- page -->
   </body>
 </html>
 % }

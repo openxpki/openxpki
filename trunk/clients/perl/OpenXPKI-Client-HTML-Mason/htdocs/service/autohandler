@@ -3,13 +3,8 @@
   $__comp       => undef
   @menu_path  => ()
 </%args>
-     <div id="navi">
-      <div class="menu">
         <& /lib/menu.mhtml, path => [ @menu_path ] &>
-      </div> <!-- menu -->
-     </div> <!-- navi -->
-
-     <div id="content">
+<div id="main">
 <%perl>
        # normal processing may only happen if the client is in the "normal"
        # state 'can_send'
@@ -38,8 +33,6 @@
 #       # corresponding output
 #       $m->comp('/lib/process_response.mhtml');
 </%perl>
-     </div> <!-- content -->
-
 <%init>
   ## fix content type
   $r->content_type('text/html; charset=utf-8');

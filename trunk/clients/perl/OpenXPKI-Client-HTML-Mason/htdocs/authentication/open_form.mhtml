@@ -1,8 +1,9 @@
 <%args>
     $session_id => undef
 </%args>
-
-      <div class="content">
+  <div class="subheader"></div>
+</div> <!-- header -->
+<div id="main">
 % my $title = $m->request_comp()->title();
 %    $title =~ s/[^\/]+\//..\//g;
 %    $title =~ s/\/[^\/]*$/\//;

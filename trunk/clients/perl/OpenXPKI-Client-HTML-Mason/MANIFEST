@@ -16,7 +16,11 @@ htdocs/syshandler
 htdocs/autohandler
 htdocs/index.html
 htdocs/css/openxpki.css
+htdocs/css/sinorcaish-print.css
+htdocs/css/sinorcaish-screen.css
 htdocs/images/openxpki_logo.png
+htdocs/images/openxpki_sinorcaish.png
+htdocs/images/search.png
 htdocs/lib/debug.mhtml
 htdocs/lib/field_to_i18n.mhtml
 htdocs/lib/javascript.mhtml
