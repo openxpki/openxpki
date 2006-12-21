@@ -2,11 +2,11 @@
 # Date created:				03 Oct 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki-client-html-mason/Makefile,v 1.1 2006/10/07 12:30:21 rafan Exp $
+# $FreeBSD: ports/security/p5-openxpki-client-html-mason/Makefile,v 1.2 2006/12/05 08:52:54 miwi Exp $
 #
 
 PORTNAME=	openxpki-client-html-mason
-PORTVERSION=	0.9.546
+PORTVERSION=	0.9.630
 CATEGORIES=	security perl5
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	openxpki
