@@ -28,14 +28,14 @@ p5-openxpki-deployment: set or deployment tools
 </li>
 </ul>
 <p>
-Dependencies of OpenXPKI ports ("A --> B" means that port B depends on port A):
+Dependencies of OpenXPKI ports ("A &#8594; B" means that port B depends on port A):
 </p>
 <pre>
- p5-openxpki-client  <--  p5-openxpki (server)  -->  p5-openxpki-i18n
-           \
-            \     |  p5-openxpki-client-cli, p5-openxpki-client-html-mason,
-             \--> |  p5-openxpki-client-scep, p5-openxpki-client-soap-lite, 
-                  |  p5-openxpki-deployment.
+p5-openxpki-client  &#8592;  p5-openxpki (server) &#8594;  p5-openxpki-i18n
+           \ &nbsp;
+             \      |  p5-openxpki-client-cli, p5-openxpki-client-html-mason,
+               \&#8594;  |  p5-openxpki-client-scep, p5-openxpki-client-soap-lite, 
+                    |  p5-openxpki-deployment.
 </pre>
 <p>
 Notes: 
@@ -57,7 +57,7 @@ I18n is needed for the English interface as well.
 OpenXPKI is included into the distribution of the basic
 FreeBSD system as a suite of regular portis under the FreeBSD names
               <a href="<& /lib/url.mas,
-                       host => 'http://www.freebsd.org',
+                       host => 'www.freebsd.org',
                        path => '/cgi/ports.cgi?query=openxpki' &>">
               security/p5-openxpki*</a>:
 </p><p>
@@ -81,7 +81,7 @@ Recommended procedure to make use of the port is:
 <li>
 Get/upgrade the entire ports collection as described in
               <a href="<& /lib/url.mas,
-                       host => 'http://www.freebsd.org',
+                       host => 'www.freebsd.org',
                        path => '/doc/en_US.ISO8859-1/books/handbook/ports-using.html' &>">
               a FreeBSD Handbook</a>.
 </li><li>
@@ -121,20 +121,6 @@ Please note, that thus modified ports may still need manual trimming.
 </p><p>
 If you find issues with these FreeBSD port, please contact
 ports maintainer svysh@cryptocom.ru
-</p>
-<p>
-</p>
-<p>
-</p>
-<ul>
-      <li>
-</li>
-      <li>
-</li>
-</ul>
-<p>
-</p>
-<p>
 </p>
 
 
