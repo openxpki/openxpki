@@ -24,7 +24,7 @@ p5-openxpki-client-scep: set of SCEP tools
 </li><li>
 p5-openxpki-client-soap-lite: set of SOAP-Lite tools
 </li><li>
-p5-openxpki-deployment: set or deployment tools
+p5-openxpki-deployment: set of deployment tools
 </li>
 </ul>
 <p>
@@ -33,9 +33,9 @@ Dependencies of OpenXPKI ports ("A &#8594; B" means that port B depends on port 
 <pre>
 p5-openxpki-client  &#8592;  p5-openxpki (server) &#8594;  p5-openxpki-i18n
            \ &nbsp;
-             \      |  p5-openxpki-client-cli, p5-openxpki-client-html-mason,
-               \&#8594;  |  p5-openxpki-client-scep, p5-openxpki-client-soap-lite, 
-                    |  p5-openxpki-deployment.
+             \       |  p5-openxpki-client-cli, p5-openxpki-client-html-mason,
+               \ &#8594;  |  p5-openxpki-client-scep, p5-openxpki-client-soap-lite, 
+                     |  p5-openxpki-deployment.
 </pre>
 <p>
 Notes: 
@@ -113,14 +113,14 @@ openxpki, you may try
 </li><li>
 update your ports collection (see above), 
 </li><li>
-<tt>cd .../trunk/package/freebsd/build-dist-and-update-checksum.sh</tt>
+<tt>cd .../trunk/package/freebsd</tt>
 </li><li>
 run the script
-<tt>build-dist-and-update-checksum.sh</tt>.
+<tt>build-dist-and-update-checksums.sh</tt>.
 This will build tarballs and place them into
 <tt>.../trunk/package/freebsd/usr/ports/distfiles/openxpki/</tt>.
 Then it will also modify files: 
-<tt>.../trunk/package/freebsd/usr/ports/security/openxpki*/Makefile</tt>.
+<tt>.../trunk/package/freebsd/usr/ports/security/p5-openxpki*/Makefile</tt>.
 Checksums for tarballs will be updated too.
 </li><li>
 Then for each port run the script
@@ -130,7 +130,7 @@ This will update file <tt>pkg-plist</tt> related to the port.
 <p>
 You should end up with updated collection of ports, which are located 
 inside your svn snapshot: 
-<tt>.../trunk/package/freebsd/usr/ports/security/openxpki*</tt>.
+<tt>.../trunk/package/freebsd/usr/ports/security/p5-openxpki*</tt>.
 </p><p>
 Please note, that thus modified ports may still need manual trimming.
 Especially if new 3-rd party's dependencies were added to the code.
