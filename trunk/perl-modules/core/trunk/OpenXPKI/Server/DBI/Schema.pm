@@ -13,24 +13,24 @@ package OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Exception;
 
 my %SEQUENCE_of = (
-    CRL            => "sequence_crl",
-    CSR            => "sequence_csr",
-    CSR_ATTRIBUTES => "sequence_csr_attributes",
-    CERTIFICATE    => "sequence_certificate",
-    CERTIFICATE_ATTRIBUTES => "sequence_certificate_attributes",
-    CRR            => "sequence_crr",
+    CRL            => "seq_crl",
+    CSR            => "seq_csr",
+    CSR_ATTRIBUTES => "seq_csr_attributes",
+    CERTIFICATE    => "seq_certificate",
+    CERTIFICATE_ATTRIBUTES => "seq_certificate_attributes",
+    CRR            => "seq_crr",
     # log entries must use auto_increment
     # or whatever the name of this technology is on your database platform
-    # AUDITTRAIL     => "sequence_audittrail",
-    DATA           => "sequence_data",
-    GLOBAL_KEY_ID  => "sequence_global_id",
-    PRIVATE        => "sequence_private",
-    SECRET         => "sequence_secret",
-    SIGNATURE      => "sequence_signature",
-    DATAEXCHANGE   => "sequence_dataexchange",
-    WORKFLOW       => "sequence_workflow",
-    WORKFLOW_VERSION => "sequence_workflow_version",
-    WORKFLOW_HISTORY => "sequence_workflow_history",
+    # AUDITTRAIL     => "seq_audittrail",
+    DATA           => "seq_data",
+    GLOBAL_KEY_ID  => "seq_global_id",
+    PRIVATE        => "seq_private",
+    SECRET         => "seq_secret",
+    SIGNATURE      => "seq_signature",
+    DATAEXCHANGE   => "seq_dataexchange",
+    WORKFLOW       => "seq_workflow",
+    WORKFLOW_VERSION => "seq_workflow_version",
+    WORKFLOW_HISTORY => "seq_workflow_history",
     );
 
 my %COLUMN_of = (
@@ -106,7 +106,7 @@ my %COLUMN_of = (
     TIMESTAMP             => "logtimestamp",
     MESSAGE               => "message",
     CATEGORY              => "category",
-    LEVEL                 => "level",
+    LOGLEVEL              => "loglevel",
 
     KEYID                 => "keyid",
     CA_ISSUER_NAME        => "ca_issuer_name",
@@ -211,7 +211,7 @@ my %TABLE_of = (
         INDEX   => [ "AUDITTRAIL_SERIAL" ],
         COLUMNS => [ "AUDITTRAIL_SERIAL",
                      "TIMESTAMP",
-                     "CATEGORY", "LEVEL", "MESSAGE" ]},
+                     "CATEGORY", "LOGLEVEL", "MESSAGE" ]},
     DATA => {
         NAME    => "data",
         INDEX   => [ "DATA_SERIAL" ],

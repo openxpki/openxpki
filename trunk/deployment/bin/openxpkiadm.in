@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #
 # Written by Martin Bartosch and Alexander Klink
 # for the OpenXPKI project 2006
@@ -95,7 +95,7 @@ sub initdb {
 	};
 	if ($EVAL_ERROR)
 	{
-	    print STDERR "ERROR: Could not connect to '$db' database\n";
+	    print STDERR "ERROR: Could not connect to '$db' database ($EVAL_ERROR)\n";
 	    return;
 	}
 	
@@ -860,6 +860,7 @@ pod2usage(-exitstatus => 0, -verbose => 2) if ($cmd eq 'man');
 pod2usage(-verbose => 1) if ($cmd eq 'help');
 if ($cmd eq '') {
     print STDERR "Usage: openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]\n";
+    print STDERR "Hint: 'openxpki help'\n";
     exit 0;
 }
 

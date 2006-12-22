@@ -123,7 +123,7 @@ fi
 
 if ! id openxpki >/dev/null 2>&1 ; then
     echo "Creating openxpki user ($id)" >&2
-    /usr/sbin/useradd -c "OpenXPKI User" -r -s /bin/false -u $id -d /tmp openxpki 2>/dev/null
+    /usr/sbin/useradd -c "OpenXPKI User" -r -s /bin/false -u $id -g $id -d /tmp openxpki 2>/dev/null
 fi
 
 

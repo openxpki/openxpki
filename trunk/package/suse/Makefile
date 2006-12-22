@@ -12,18 +12,13 @@ PACKAGES=\
 
 .PHONY : $(PACKAGES)
 
-all: clean $(PACKAGES)
+all: clean $(PACKAGES) collect
 
 $(PACKAGES):
 	cd $@ && PATH=$(PATH):/usr/sbin make $(SUBTARGET)
 
-resultlocal:
-	mv */*.tar.gz .  || echo No source file present.
-	mv */*.rpm .     || echo No debian package file present.
-	mv */*.changes . || echo No changes file present.
-
-check:
-
+collect:
+	@mv */*.rpm .     || echo No suse package file found.
 
 clean:
 	rm -f *.rpm

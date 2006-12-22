@@ -130,7 +130,7 @@ OpenXPKI/Server/DBI/Schema.pm
 OpenXPKI/Server/DBI/Driver.pm
 OpenXPKI/Server/DBI/Driver/DB2.pm
 OpenXPKI/Server/DBI/Driver/MySQL.pm
-#OpenXPKI/Server/DBI/Driver/Oracle.pm
+OpenXPKI/Server/DBI/Driver/Oracle.pm
 OpenXPKI/Server/DBI/Driver/PostgreSQL.pm
 OpenXPKI/Server/DBI/Driver/SQLite.pm
 

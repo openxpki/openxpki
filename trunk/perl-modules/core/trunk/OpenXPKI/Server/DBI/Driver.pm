@@ -4,11 +4,12 @@
 ## Copyright (C) 2005 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::Server::DBI::Driver;
+
 use strict;
 use warnings;
 use utf8;
-
-package OpenXPKI::Server::DBI::Driver;
+use English;
 
 use vars qw(@ISA);
 use OpenXPKI::Exception;
@@ -16,7 +17,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::Driver::DB2;
 use OpenXPKI::Server::DBI::Driver::MySQL;
-## use OpenXPKI::Server::DBI::Driver::Oracle;
+use OpenXPKI::Server::DBI::Driver::Oracle;
 use OpenXPKI::Server::DBI::Driver::PostgreSQL;
 use OpenXPKI::Server::DBI::Driver::SQLite;
 
@@ -90,7 +91,7 @@ our %COLUMN = (
     "logtimestamp"     => "TIMESTAMP",
     "message"          => "TEXT",
     "category"         => "TEXT_KEY",
-    "level"            => "TEXT_KEY",
+    "loglevel"         => "TEXT_KEY",
 
     "keyid"            => "TEXT_KEY",
     "ca_issuer_name"   => "TEXT_KEY",
@@ -126,6 +127,16 @@ sub new
 
     ## init SQL types for the columns
     my %type = eval ("\%${driver}::TYPE");
+
+    if ($EVAL_ERROR) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_DRIVER_LOAD_ERROR",
+	    params  => {
+		DRIVER => $driver,
+	    },
+	    );
+    }
+
     foreach my $key (keys %COLUMN)
     {
         if (not exists $type{$COLUMN{$key}})
