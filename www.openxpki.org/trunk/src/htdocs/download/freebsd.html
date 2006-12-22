@@ -56,10 +56,11 @@ I18n is needed for the English interface as well.
 <p>
 OpenXPKI is included into the distribution of the basic
 FreeBSD system as a suite of regular portis under the FreeBSD names
-              <a href="<& /lib/url.mas,
+</p><p align=center>
+             <tt> <a href="<& /lib/url.mas,
                        host => 'www.freebsd.org',
                        path => '/cgi/ports.cgi?query=openxpki' &>">
-              security/p5-openxpki*</a>:
+              security/p5-openxpki*</a> </tt>
 </p><p>
 These ports embrace all tools of openxpki
 (server-side, client-side, deployment, i18n).
@@ -68,16 +69,16 @@ You have to undergo subsequent deployment stage by hand.
 This will specify the role, which your computer plays in the
 PKI infrastructure.
 </p><p>
-It is very much NOT recommended to copy only one port
-security/p5-openxpki onto your computer, if you wish to install it.
-This port depends on dozens of other ports.
+It is very much NOT recommended to copy only ports
+<tt>security/p5-openxpki*</tt> onto your computer, if you wish to install them.
+These ports depend on dozens of other ports.
 Thus it is essential to have the entire port collection
 (present on your computer) in a self-consistent state and
 in accord with your base system.
 </p><p>
 Recommended procedure to make use of the port is:
 </p>
-<ol>
+<ul>
 <li>
 Get/upgrade the entire ports collection as described in
               <a href="<& /lib/url.mas,
@@ -95,7 +96,7 @@ Install your favorite database and web server.
 </li><li>
 Perform deployment procedure for openxpki in a regular way.
 </li><li>
-</ol>
+</ul>
 <p>
 Just in case: FreeBSD employs one and the same port collection
 in ALL (stable, current, legacy) versions of FreeBSD.
@@ -104,20 +105,35 @@ in ALL (stable, current, legacy) versions of FreeBSD.
 <h3>Ports for current svn snapshot</h3>
 <p>
 If you are impatient and want to play with more recent snapshots of
-openxpki, you may try "<tt>svn update</tt>", update your ports collection 
-(see above), and run the script
-"<tt>.../trunk/package/freebsd/build-dist-and-update-checksum.sh</tt>".
+openxpki, you may try 
+</p>
+<ul>
+<li>
+<tt>svn update</tt>, 
+</li><li>
+update your ports collection (see above), 
+</li><li>
+<tt>cd .../trunk/package/freebsd/build-dist-and-update-checksum.sh</tt>
+</li><li>
+run the script
+<tt>build-dist-and-update-checksum.sh</tt>.
 This will build tarballs and place them into
-".../trunk/package/freebsd/usr/ports/distfiles/openxpki/".
-Then it will attempt to modify Makefiles of all ports located in the
-".../trunk/package/freebsd/usr/ports/security/openxpki*/Makefile".
+<tt>.../trunk/package/freebsd/usr/ports/distfiles/openxpki/</tt>.
+Then it will also modify files: 
+<tt>.../trunk/package/freebsd/usr/ports/security/openxpki*/Makefile</tt>.
 Checksums for tarballs will be updated too.
-</p><p>
+</li><li>
 Then for each port run the script
-"<tt>.../trunk/package/freebsd/update-port.sh _name_of_port_</tt>".
+<tt>update-port.sh _name_of_port_</tt>.
 This will update file <tt>pkg-plist</tt> related to the port.
+</ul>
+<p>
+You should end up with updated collection of ports, which are located 
+inside your svn snapshot: 
+<tt>.../trunk/package/freebsd/usr/ports/security/openxpki*</tt>.
 </p><p>
 Please note, that thus modified ports may still need manual trimming.
+Especially if new 3-rd party's dependencies were added to the code.
 </p><p>
 If you find issues with these FreeBSD port, please contact
 ports maintainer svysh@cryptocom.ru
