@@ -100,7 +100,7 @@ I18n is needed for the English interface as well.
 <p>
 OpenXPKI is included into the distribution of the basic
 FreeBSD system as a suite of regular ports under the FreeBSD names
-</p><p align=center>
+</p><p>
              <tt> <a href="http://www.freebsd.org/cgi/ports.cgi?query=openxpki">
               security/p5-openxpki*</a> </tt>
 </p><p>
@@ -126,7 +126,7 @@ Get/upgrade the entire ports collection as described in
               <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/ports-using.html">
               a FreeBSD Handbook</a>.
 </li><li>
-<tt>cd /usr/ports/sysutils/portupgrade && make reinstall clean</tt><br/>
+<tt>cd /usr/ports/sysutils/portupgrade &amp;&amp; make reinstall clean</tt><br/>
 <tt>/usr/local/sbin/portupgrade -NrR security/p5-openxpki</tt><br/>
 (Appropriate tarballs of openxpki will be fetched automatically.
 Alternatively, you can fetch tarballs of openxpki by hand
@@ -159,17 +159,18 @@ run the script
 <tt>build-dist-and-update-checksums.sh</tt>.
 This will build tarballs and place them into
 <tt>.../trunk/package/freebsd/usr/ports/distfiles/openxpki/</tt>.
-Then it will also modify files: 
+Then it will also modify files:<br/> 
 <tt>.../trunk/package/freebsd/usr/ports/security/p5-openxpki*/Makefile</tt>.
 Checksums for tarballs will be updated too.
 </li><li>
 Then for each port run the script
 <tt>update-port.sh _name_of_port_</tt>.
 This will update file <tt>pkg-plist</tt> related to the port.
+</li>
 </ul>
 <p>
 You should end up with updated collection of ports, which are located 
-inside your svn snapshot: 
+inside your svn snapshot:<br/> 
 <tt>.../trunk/package/freebsd/usr/ports/security/p5-openxpki*</tt>.
 </p><p>
 Please note, that thus modified ports may still need manual trimming.
@@ -187,8 +188,8 @@ ports maintainer svysh@cryptocom.ru
       </div> <!-- content -->
 
       <div id="footer">
-        Last modified by svysh on Fri Dec 22 13:40:27 UTC 2006
- (based on rev. 661). &copy; 2005 - 2006  OpenXPKI Foundation
+        Last modified by svysh on Fri Dec 22 14:13:58 UTC 2006
+ (based on rev. 662). &copy; 2005 - 2006  OpenXPKI Foundation
 
 
       </div> <!-- footer -->
