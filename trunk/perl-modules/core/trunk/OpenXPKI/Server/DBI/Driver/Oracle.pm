@@ -84,7 +84,7 @@ sub sequence_exists
     my $dbh  = $keys->{DBH};
     my $seq = $self->{schema}->get_sequence_name ($keys->{NAME});
 
-    my $query = "SELECT NEXTVAL('$seq')";
+    my $query = "SELECT NEXTVAL('$seq') FROM DUAL";
     eval { $dbh->do_query (QUERY => $query); };
     my $err = $EVAL_ERROR;
     $dbh->finish_sth();

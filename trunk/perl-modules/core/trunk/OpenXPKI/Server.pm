@@ -105,10 +105,9 @@ sub new
     }
 
     ## start the server
-    my %params;
     eval
     {
-	%params = $self->__get_server_config();
+	$self->{PARAMS} = $self->__get_server_config();
     };
     if ($EVAL_ERROR) {
  	my $msg = exception_as_string($EVAL_ERROR);
@@ -122,7 +121,7 @@ sub new
         die $msg;
     }
 
-    unlink ($params{port});
+    unlink ($self->{PARAMS}->{port});
     CTX('log')->log(
 	MESSAGE  => "Server initialization completed",
 	PRIORITY => "info",
@@ -134,7 +133,51 @@ sub new
     
     CTX('dbi_workflow')->disconnect();
     CTX('dbi_backend')->disconnect();
-    $self->run (%params);
+    
+    $self->run (%{$self->{PARAMS}});
+}
+
+
+# from Net::Server:
+#           This hook occurs just after the bind process and just before any
+#           chrooting, change of user, or change of group occurs.  At this
+#           point the process will still be running as the user who started the
+#           server.
+sub post_bind_hook {
+    my $self = shift;
+
+    # Net::Server creates the socket file with process owner/group ownership
+    # it runs as. The admin may want to make this configurable differently,
+    # though.
+
+    my $socketfile = $self->{PARAMS}->{port};
+
+    my $socket_owner = -1; # default: unchanged
+    my $socket_group = -1; # default: unchanged
+
+    if (defined $self->{PARAMS}->{socket_owner}) {
+	$socket_owner = $self->{PARAMS}->{socket_owner};
+    }
+    
+    if (defined $self->{PARAMS}->{socket_group}) {
+	$socket_group = $self->{PARAMS}->{socket_group};
+    }
+
+    if (($socket_owner != -1) || ($socket_group != -1)) {
+	# try to change socket ownership
+	if (! chown $socket_owner, $socket_group, $socketfile) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_COULD_NOT_CHANGE_SOCKET_OWNERSHIP",
+		params  => {
+		    SOCKETFILE => $socketfile,
+		    SOCKET_OWNER => $socket_owner,
+		    SOCKET_GROUP => $socket_group,
+		},
+		);
+	}
+    }
+ 
+    return 1;
 }
 
 
@@ -443,6 +486,44 @@ sub __get_user_interfaces
     return 1;
 }
 
+# returns numerical user id for specified user (name or id)
+# undef if not found
+sub __get_numerical_user_id {
+    my $self = shift;
+    my $arg = shift;
+
+    return unless defined $arg;
+
+    my ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
+        $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
+	    getpwnam ($arg);
+
+    ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
+     $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
+	 getpwuid ($arg) if (! defined $pw_uid);
+
+    return $pw_uid;
+}
+
+# returns numerical group id for specified group (name or id)
+# undef if not found
+sub __get_numerical_group_id {
+    my $self = shift;
+    my $arg = shift;
+
+    return unless defined $arg;
+
+    my ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
+        getgrnam ($arg);
+
+    ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
+        getgrgid ($arg) if (! defined $gr_gid);
+
+    return $gr_gid;
+}
+
+
+
 sub __get_server_config
 {
     my $self = shift;
@@ -467,7 +548,7 @@ sub __get_server_config
     $params{group}      = $config->get_xpath (XPATH => "common/server/group");
     $params{port}       = $socketfile . '|unix';
     $params{pid_file}   = $config->get_xpath (XPATH => "common/server/pid_file");
-
+    
     ## check daemon user
 
     foreach my $param (qw( user group port pid_file )) {
@@ -478,35 +559,61 @@ sub __get_server_config
 	}
     }
 
-    my ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
-        $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
-        getpwnam ($params{"user"});
-
-    ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
-     $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
-	 getpwuid ($params{"user"}) if (not $pw_uid);
-
-    if (! defined $pw_name || ($pw_name eq ""))
+    my $user  = __get_numerical_user_id($params{user});
+    if (! defined $user || ($user eq ''))
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_USER",
             params  => {"USER" => $params{"user"}});
     }
+    # convert user id to numerical
+    $params{user} = __get_numerical_user_id($user);
 
-    ## check daemon group
 
-    my ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
-        getgrnam ($params{"group"});
-
-    ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
-        getgrgid ($params{"group"}) if (! $gr_name);
-
-    if (! defined $gr_name || ($gr_name eq ""))
+    my $group = __get_numerical_group_id($params{group});
+    if (! defined $group || ($group eq ""))
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_DAEMON_GROUP",
             params  => {"GROUP" => $params{"group"}});
     }
+    # convert group id to numerical
+    $params{group} = __get_numerical_group_id($group);
+
+    # check if we have different ownership settings for the socket
+
+    my $socket_owner;
+    my $socket_group;
+
+    eval {
+	$socket_owner = $config->get_xpath (XPATH => "common/server/socket_owner");
+    };
+
+    if (defined $socket_owner) {
+	# convert user id to numerical
+	$params{socket_owner} = __get_numerical_user_id($socket_owner);
+
+	if (! defined $params{socket_owner} || ($params{socket_owner} eq ''))
+	{
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER",
+		params  => {"SOCKET_OWNER" => $socket_owner});
+	}
+	$params{socket_owner} = $socket_owner;	
+    }
+
+    eval {
+	# convert group id to numerical
+	$params{socket_group} = __get_numerical_user_id($socket_group);
+
+	if (! defined $params{socket_group} || ($params{socket_group} eq ''))
+	{
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER_GROUP",
+		params  => {"SOCKET_GROUP" => $socket_group});
+	}
+	$params{socket_group} = $socket_group;	
+    };
 
     return %params;
 }

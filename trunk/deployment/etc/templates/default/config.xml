@@ -4,6 +4,12 @@
     <server>
         <user>[%          server.runuser %]</user>
         <group>[%         server.rungroup %]</group>
+	[% IF server.socketowner %]
+        <socket_owner>[%  server.socketowner %]</socket_owner>
+	[% END %]
+	[% IF server.socketgroup %]
+        <socket_group>[%  server.socketgroup %]</socket_group>
+	[% END %]
         <socket_file>[%   server.socketfile %]</socket_file>
         <pid_file>[%      server.pidfile %]</pid_file>
         <session_dir>[%   dir.openxpkisessiondir %]</session_dir>

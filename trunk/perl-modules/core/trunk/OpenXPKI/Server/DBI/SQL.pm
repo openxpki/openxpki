@@ -1006,7 +1006,11 @@ sub select
 
 	# only order by column if no aggregate or distinct is applied to it
 	if ($select_column eq $entry->{COLUMN}) {
-	    push @order_specs, $select_column;
+	    # don't order by TEXT and LONGTEXT columns
+	    my $type = $self->{DBH}->get_abstract_column_type($select_column);
+	    if (($type ne 'TEXT') && ($type ne 'LONGTEXT')) {
+		push @order_specs, $select_column;
+	    }
 	}
     }
 

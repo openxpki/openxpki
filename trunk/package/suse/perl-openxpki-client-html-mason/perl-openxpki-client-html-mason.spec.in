@@ -53,6 +53,12 @@ CFLAGS="$RPM_OPT_FLAGS"
 
 %{makeinstall} `%{__perl} -MExtUtils::MakeMaker -e ' print \$ExtUtils::MakeMaker::VERSION <= 6.05 ? qq|PREFIX=%{buildroot}%{_prefix}| : qq|DESTDIR=%{buildroot}| '`
 
+install -d -D -m 755 -o root -g openxpki %{buildroot}/srv/www/openxpki/cgi-bin
+install -d -D -m 755 -o root -g openxpki %{buildroot}/srv/www/openxpki/htdocs
+install -d -D -m 755 -o root -g openxpki %{buildroot}/srv/www/openxpki/mason-data
+install -D -m 755 -o root -g openxpki bin/openxpki.cgi %{buildroot}/srv/www/openxpki/cgi-bin/openxpki.cgi
+tar cf - htdocs | tar -C %{buildroot}/srv/www/openxpki/ -x -f -
+
 cmd=/usr/share/spec-helper/compress_files
 [ -x $cmd ] || cmd=/usr/lib/rpm/brp-compress
 [ -x $cmd ] && $cmd

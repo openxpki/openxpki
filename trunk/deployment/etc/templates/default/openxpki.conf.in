@@ -126,6 +126,10 @@ rungroup:        openxpki
 admuser:         root
 admgroup:        root
 
+# ownership of the server socket, defaults to runuser:rungroup
+# socketowner:     openxpki
+# socketgroup:     openxpki
+
 # configuration files
 config:          $(dir.openxpkiconfdir)/openxpki.xml
 logconfig:       $(dir.openxpkiconfdir)/log.conf

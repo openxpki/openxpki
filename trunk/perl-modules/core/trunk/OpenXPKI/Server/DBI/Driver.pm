@@ -55,7 +55,7 @@ our %COLUMN = (
 
     "attribute_key"    => "BIGINT",
     "attribute_contentkey" => "TEXT_KEY",
-    "attribute_value"  => "TEXT",
+    "attribute_value"  => "LONGTEXT",
     "attribute_source" => "TEXT",
     "subject"          => "TEXT_KEY",
     "email"            => "TEXT",
@@ -300,11 +300,17 @@ abstract types:
 
 =over 4
 
-=item * TEXT
-
 =item * TIMESTAMP
 
-=item * LONGTEXT (the only type which may not be searchable via a where clause)
+=item * TEXT
+
+A text data type that does not need to be indexed by the database.
+Cannot be ordered by.
+
+=item * LONGTEXT 
+A text data type that is capable of storing large amounts of text data and
+that does not need to be indexed by the database. 
+Cannot be ordered by. May not be searchable via a where clause.
 
 =item * TEXT_KEY
 
