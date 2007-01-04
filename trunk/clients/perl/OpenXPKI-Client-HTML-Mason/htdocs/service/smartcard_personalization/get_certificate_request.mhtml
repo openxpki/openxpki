@@ -44,7 +44,10 @@
     }
 -->
 </script>
-<& /service/open_form.mhtml &>
+% # 'action' is necessary as this might be called from a different
+% # URL, i.e. right after authentication
+<& /service/open_form.mhtml,
+    'action' => '/service/smartcard_personalization/index.html', &>
 %    my $csp = $wf_info->{CONTEXT}->{client_csp};
 %    my $bitlength = $wf_info->{CONTEXT}->{client_bitlength};
 <& /lib/html/hidden.mhtml, 'name' => 'csp', 'value' => $csp &>
