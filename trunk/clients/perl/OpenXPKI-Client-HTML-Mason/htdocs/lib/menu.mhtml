@@ -1,4 +1,34 @@
+<%args>
+    $no_menu => 0,
+</%args>
 <%init>
+  my $EMPTY_CONFIG = {
+                NESTED => 1,
+                ROLE =>
+                {
+                    '' =>
+                    {
+                        MENU => "empty_menu"
+                    },
+                    'User' =>
+                    {
+                        MENU => "empty_menu"
+                    },
+                    'RA Operator' =>
+                    {
+                        MENU => "empty_menu"
+                    },
+                    'CA Operator' =>
+                    {
+                        MENU => "empty_menu"
+                    }
+                },
+                MENU =>
+                {
+                    "empty_menu" => [ ],
+                },
+  };
+
   my $CONFIG = {
                 NESTED => 1,
                 ROLE =>
@@ -223,6 +253,9 @@
   foreach my $key ("ROLE", "SESSION_ID", "LANGUAGE")
   {
       $params{$key} = $context->{lc $key} if (exists $context->{lc $key});
+  }
+  if ($no_menu) {
+        $params{'CONFIG'} = $EMPTY_CONFIG;
   }
   $context->{menu} = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
 </%init>

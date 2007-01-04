@@ -1,8 +1,14 @@
 <%args>
   $msg             => undef
+  $next_comp        => undef
+  $no_menu         => undef
 </%args>
 
-    <& '/authentication/open_form.mhtml', 'session_id' => $session_id &>
+    <& '/authentication/open_form.mhtml',
+            'session_id' => $session_id,
+            'next_comp'   => $next_comp,
+            'no_menu'    => $no_menu,
+    &>
     <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE') %></h1>
     <p>
       <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_DESCRIPTION') %>

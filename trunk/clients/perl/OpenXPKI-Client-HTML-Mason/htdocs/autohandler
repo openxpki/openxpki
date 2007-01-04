@@ -58,7 +58,7 @@
             }
         </script>
         <div>
-          <input type="text" name="q" value="Search" onfocus="EmptySearchField(this);" size="15" maxlength="250" />
+          <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />
           <input type="image" name="submit" src="<% ${path} %>images/search.png" alt="Search" />
         </div>
       </form>

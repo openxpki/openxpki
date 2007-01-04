@@ -1,9 +1,12 @@
 <%args>
   $__session_id => undef
   $__comp       => undef
+  $__no_menu    => undef
   @menu_path  => ()
 </%args>
-        <& /lib/menu.mhtml, path => [ @menu_path ] &>
+        <& /lib/menu.mhtml,
+            path    => [ @menu_path ],
+            no_menu => $__no_menu, &>
 <div id="main">
 <%perl>
        # normal processing may only happen if the client is in the "normal"
@@ -17,12 +20,13 @@
                  'level' => 2,
                  'msg'   => "next component name: ".$m->fetch_next()->name());
        if ($m->fetch_next()->name() eq "dhandler" and
-           defined $__comp and
-           $__comp eq '/service/index.html')
-       {
+           defined $__comp) { # and
+                              # $__comp eq '/service/index.html')
+                              # {
            ## autohandler called directly - usually from authentication
            ## this is no error and so we only call index.html and not the dhandler
-           $m->comp ('/service/index.html');
+           #$m->comp ('/service/index.html');
+            $m->comp($__comp);
        } else {
            ## print STDERR "NEXT: ".$m->fetch_next()->name()."\n";
            $m->call_next;

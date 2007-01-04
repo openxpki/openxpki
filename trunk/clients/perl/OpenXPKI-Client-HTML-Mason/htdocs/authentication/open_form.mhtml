@@ -1,5 +1,7 @@
 <%args>
     $session_id => undef
+    $next_comp   => undef
+    $no_menu    => undef
 </%args>
   <div class="subheader"></div>
 </div> <!-- header -->
@@ -8,6 +10,8 @@
 %    $title =~ s/[^\/]+\//..\//g;
 %    $title =~ s/\/[^\/]*$/\//;
 %    $title =~ s/^\///;
-        <form action="<% $title %>authentication/index.html" method="post">
+        <form action="<% $title %>authentication/index.html" method="get">
           <input type="hidden" name="__session_id" value="<% $session_id %>"/>
+          <input type="hidden" name="next_comp" value="<% $next_comp %>"/>
+          <input type="hidden" name="no_menu" value="<% $no_menu %>"/>
 

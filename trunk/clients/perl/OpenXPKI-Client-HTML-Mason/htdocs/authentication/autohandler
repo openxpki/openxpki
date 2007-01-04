@@ -2,6 +2,13 @@
   $__session_id => undef
 </%args>
 <%perl>
+    my $next_comp = $m->request_args()->{'next_comp'};
+    my $no_menu  = $m->request_args()->{'no_menu'};
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => 'next_comp: ' . $next_comp
+    );
+
     ## let's init the environment
     $m->comp('/authentication/session.mhtml',
              'init'         => 1,
@@ -40,11 +47,19 @@
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
               'msg'   => Dumper($context->{msg}));
-    $msg = $m->comp('/authentication/auth_stack.mhtml', 'msg' => $msg);
+    $msg = $m->comp('/authentication/auth_stack.mhtml',
+            'msg' => $msg,
+            'next_comp' => $next_comp,
+            'no_menu'  => $no_menu,
+    );
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
               'msg'   => Dumper($context->{msg}));
-    $msg = $m->comp('/authentication/passwd.mhtml', 'msg' => $msg);
+    $msg = $m->comp('/authentication/passwd.mhtml',
+                        'msg'      => $msg,
+                        'next_comp' => $next_comp,
+                        'no_menu'  => $no_menu,
+    );
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
               'msg'   => Dumper($context->{msg}));
@@ -59,16 +74,26 @@
         not defined $msg)
     {
         ## ok let's panic - session is ready and we are inside of the auth autohandler !?
-        $m->comp ('/lib/debug.mhtml',
-                  'level' => 4,
-                  'msg'   => "calling index.html of service area");
-        $m->comp('/service/autohandler',
-                 '__session_id' => $session_id,
-                 '__comp'       => '/service/index.html');
+        if (defined $next_comp && $next_comp ne '') {
+            $m->comp('/service/autohandler',
+                '__session_id' => $session_id,
+                '__comp'       => $next_comp,
+                '__no_menu'    => $no_menu,
+            );
+        }
+        else {
+            $m->comp ('/lib/debug.mhtml',
+                      'level' => 4,
+                      'msg'   => "calling index.html of service area");
+            $m->comp('/service/autohandler',
+                     '__session_id' => $session_id,
+                     '__comp'       => '/service/index.html');
+        }
     }
     $m->comp ('/lib/debug.mhtml',
               'level' => 1,
               'msg'   => "authentication autohandler finished");
+
 
 </%perl>
 <%init>
