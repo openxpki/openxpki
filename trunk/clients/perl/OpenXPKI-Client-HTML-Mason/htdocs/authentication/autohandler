@@ -87,7 +87,9 @@
                       'msg'   => "calling index.html of service area");
             $m->comp('/service/autohandler',
                      '__session_id' => $session_id,
-                     '__comp'       => '/service/index.html');
+                     '__comp'       => '/service/index.html',
+                     '__no_menu'    => $no_menu,
+            );
         }
     }
     $m->comp ('/lib/debug.mhtml',

@@ -37,6 +37,10 @@
   </div>
 
   <div class="right">
+% if (! $m->request_args()->{'no_menu'}  &&
+%     $m->request_comp()->title() !~ m{\A /index.html \z}xms) {
+% # show search button only if menu is activated
+% # and we are not at the login page
 <!-- 
     <span class="hidden">Useful links:</span>
     <a href="index.html">Contacts</a> |
@@ -63,6 +67,7 @@
         </div>
       </form>
     </div>
+% }
   </div>
 
 % }
