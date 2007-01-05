@@ -1,8 +1,15 @@
 <%args>
     $steps   => undef,
+    $wf_info => undef,
 </%args>
 <%init>
+    my $serializer = OpenXPKI::Serialization::Simple->new();
+    my @csr_serials = @{$serializer->deserialize($wf_info->{'CONTEXT'}->{'csr_serial'})};
+    my @cert_issuance_data = @{$serializer->deserialize($wf_info->{'CONTEXT'}->{'cert_issuance_data'})};
 </%init>
+<%once>
+    use OpenXPKI::Serialization::Simple;
+</%once>
 <script type="text/javascript">
 <!--
     function InstallCertIEAndTest(form) {
@@ -19,3 +26,18 @@
                        '__CURRENTSTEP__' => $steps,
                        '__STEPS__' => $steps) %> </h1>
 <p><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_DESC') %></p>
+<table>
+% for (my $i = 0; $i < scalar @csr_serials; $i++) {
+    <tr> 
+        <td>
+      <& /lib/html/a.mhtml,
+         'target' => "/service/api/cert_list.html",
+         'params' => [
+                      ["csr_serial"  => $csr_serials[$i]],
+                      ['submit'      => 'OK'],
+                     ],
+         'label'  => $cert_issuance_data[$i]->{'cert_subject'} &>
+        </td>
+    </tr>
+% }
+</table>

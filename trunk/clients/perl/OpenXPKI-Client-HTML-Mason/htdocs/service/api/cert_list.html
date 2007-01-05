@@ -125,6 +125,13 @@
       $obj = DateTime->from_epoch(epoch => $cert->{NOTAFTER});
       $list{$cert->{CERTIFICATE_SERIAL}}->{NOTAFTER}   = OpenXPKI::DateTime::convert_date({DATE => $obj});
     }
+    if (scalar @{$msg->{PARAMS}} == 1) { # we have only one result, show
+                                         # it directly
+        $m->comp('cert_info.html',
+                   'identifier'  => $msg->{PARAMS}->[0]->{IDENTIFIER},
+        );
+        exit;
+    }
   }
 </%init>
 <%once>

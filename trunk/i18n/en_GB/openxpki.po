@@ -2541,7 +2541,7 @@ msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_DESC"
 msgstr ""
 "The personalization process has been completed successfully. All your "
 "certificates are now installed on your smartcard and ready for use. You may "
-"now log off this system."
+"now log off this system. If you want to download your certificates, please use one of the links below."
 
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_TITLE"
 msgstr "[__CURRENTSTEP__/__STEPS__] Successfully finished personalization"

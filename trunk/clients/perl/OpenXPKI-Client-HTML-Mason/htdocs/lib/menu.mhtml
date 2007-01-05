@@ -39,7 +39,7 @@
                     },
                     'User' =>
                     {
-                        MENU => "anonymous_menu"
+                        MENU => "user_menu"
                     },
                     'RA Operator' =>
                     {
@@ -72,6 +72,16 @@
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",     "workflow"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE", "dataexchange"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
+                                   "cert_search"],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",     "language"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",       "logout"]
+                    ],
+                    "user_menu" =>
+                    [
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
                                    "cert_search"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",     "language"],

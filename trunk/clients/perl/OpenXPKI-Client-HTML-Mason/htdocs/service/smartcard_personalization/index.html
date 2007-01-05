@@ -56,14 +56,23 @@ onload="InstallCertIEAndTest(document.OpenXPKI)"
             'msg'   => 'workflow_ids: ' . Dumper(\@workflow_ids),
         );
     }
+
+    # filter out those that are in state FAILURE
+    # TODO: ultimately, this is something the database should do
+    my @filtered_workflows;
+    foreach my $workflow (@workflow_ids) {
+        if ($workflow->{'WORKFLOW.WORKFLOW_STATE'} ne 'FAILURE') {
+            push @filtered_workflows, $workflow;
+        }
+    }
+
     # decide by number of entries what to to
     # 0 - create new workflow
     # 1 - re-entry at given state
     # > 1 present dialog? (date, state)
-    # TODO -- filter those that are in state FAILURE (or SUCCESS?)
     
     my $wf_info;
-    if (scalar @workflow_ids == 0) { # no workflow available
+    if (scalar @filtered_workflows == 0) { # no workflow available
         my $c_msg = $context->{client}->send_receive_command_msg(
             'create_workflow_instance',
             {
@@ -76,12 +85,12 @@ onload="InstallCertIEAndTest(document.OpenXPKI)"
         $wf_info = $c_msg->{PARAMS}->{WORKFLOW};
         $debug_msg = $c_msg;
     }
-    elsif (scalar @workflow_ids == 1) { # re-entry into workflow
+    elsif (scalar @filtered_workflows == 1) { # re-entry into workflow
         my $i_msg = $context->{client}->send_receive_command_msg(
             'get_workflow_info',
             {
                 WORKFLOW => $wf_type,
-                ID       => $workflow_ids[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
+                ID       => $filtered_workflows[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
             },
         );
         if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
@@ -125,7 +134,7 @@ onload="InstallCertIEAndTest(document.OpenXPKI)"
             'get_workflow_info',
             {
                 WORKFLOW => $wf_type,
-                ID       => $workflow_ids[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
+                ID       => $filtered_workflows[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
             },
         );
         if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
@@ -168,7 +177,7 @@ onload="InstallCertIEAndTest(document.OpenXPKI)"
             'get_workflow_info',
             {
                 WORKFLOW => $wf_type,
-                ID       => $workflow_ids[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
+                ID       => $filtered_workflows[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
             },
         );
         if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
@@ -198,7 +207,7 @@ onload="InstallCertIEAndTest(document.OpenXPKI)"
             'get_workflow_info',
             {
                 WORKFLOW => $wf_type,
-                ID       => $workflow_ids[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
+                ID       => $filtered_workflows[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
             },
         );
         if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
@@ -234,12 +243,8 @@ onload="InstallCertIEAndTest(document.OpenXPKI)"
 %   }
 %   elsif ($wf_info->{STATE} eq 'SUCCESS') {
       <& './success.mhtml', 
-            'steps'   => $steps  &>
-%   }
-%   elsif ($wf_info->{STATE} eq 'FAILURE') {
-      <& './failure.mhtml',
-            'wf_info' => $wf_info,
-            'steps'   => $steps, &>
+            'steps'   => $steps,
+            'wf_info' => $wf_info,  &>
 %   }
 %   else {
 <H1>I18N_OPENXPKI_HTML_SMARTCARD_ERROR_UNKNOWN_STATE_TITLE</H1>

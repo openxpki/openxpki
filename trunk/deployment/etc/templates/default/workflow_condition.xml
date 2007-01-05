@@ -52,6 +52,9 @@
   <condition name="ACL::smartcard_personalization" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="smartcard_personalization"/>
   </condition>
+  <condition name="ACL::fail_workflow" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="fail_workflow"/>
+  </condition>
 
   <condition name="Condition::check_csr_approvals" class="OpenXPKI::Server::Workflow::Condition::Approved">
     <param name="role" value="RA Operator"/>

@@ -107,7 +107,8 @@
                     ["format",       "TXT"]] &>
     </td>
   </tr>
-% if ($private_key ne 'private_key_exists_for_cert') {
+% if ($private_key ne 'private_key_exists_for_cert' &&
+%     $private_key ne '') {
   <tr>
     <td colspan=2><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS') %></td>
   </tr>
@@ -166,6 +167,9 @@
   </tr>
 % }
 </table>
+<!--
+<% $private_key %>
+-->
 <%init>
   my $msg  = $context->{client}->send_receive_command_msg (
                   "get_cert",

@@ -71,6 +71,12 @@
   </permission>
   <permission>
     <server>*</server>
+    <activity>Workflow::smartcard_personalization</activity>
+    <affected_role>*</affected_role>
+    <auth_role>User</auth_role>
+  </permission>
+  <permission>
+    <server>*</server>
     <activity>API::*</activity>
     <affected_role>*</affected_role>
     <auth_role>*</auth_role>
