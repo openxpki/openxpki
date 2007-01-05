@@ -151,7 +151,7 @@ not be displayed. If you use 3 then the above message will be displayed.
 Add to the startup script the following lines:
 
 use OpenXPKI::Debug;
-$OpenXPKI::Debug::LEVEL{'MyM.*'};
+$OpenXPKI::Debug::LEVEL{'MyM.*'} = 100;
 
 require MyModule; ## or require a module which use my Module
 
