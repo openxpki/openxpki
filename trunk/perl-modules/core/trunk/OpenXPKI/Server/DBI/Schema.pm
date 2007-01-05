@@ -171,7 +171,7 @@ my %TABLE_of = (
     
     CERTIFICATE => {
         NAME    => "certificate",
-        INDEX   => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CERTIFICATE_SERIAL" ],
+        INDEX   => [ "ISSUER_IDENTIFIER", "CERTIFICATE_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "ISSUER_DN", "CERTIFICATE_SERIAL",
 		     "ISSUER_IDENTIFIER", "IDENTIFIER", "DATA", 
                      # "GLOBAL_KEY_ID",

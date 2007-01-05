@@ -107,7 +107,7 @@
                     ["format",       "TXT"]] &>
     </td>
   </tr>
-% if (defined $private_key) {
+% if ($private_key ne 'private_key_exists_for_cert') {
   <tr>
     <td colspan=2><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS') %></td>
   </tr>
@@ -164,9 +164,6 @@
                     ["format", "JAVA_KEYSTORE"]] &>
     </td>
   </tr>
-<!--
-<% $private_key %>
--->
 % }
 </table>
 <%init>

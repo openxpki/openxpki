@@ -1224,7 +1224,7 @@ if ($cmd eq 'certificate') {
 					  DATA  => $certdata);
         #### cert : Dumper($cert)
 
-        my $realm = '';
+        my $realm;
         my $issuer_identifier;
         if (! defined $params{realm} || $params{realm} eq '') {
             # user wants to import a self-signed
