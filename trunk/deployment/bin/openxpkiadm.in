@@ -997,15 +997,15 @@ if ($cmd eq 'certificate') {
     if ($subcmd eq 'list') {
         my @realms;
         if (defined $params{realm}) {
-            $realms[0] = $params{realm};
+            push @realms, $params{realm};
         }
         else {
             @realms = keys %{CTX('pki_realm')};
-            $realms[scalar @realms] = ''; # add the magic empty realm
+            push @realms, undef; # add the magic empty realm
         }
 
         foreach my $realm (@realms) {
-            if ($realm ne '') {
+            if (defined $realm) {
                 print "\nCertificates in $realm:\n";
             }
             else {
@@ -1307,6 +1307,11 @@ if ($cmd eq 'certificate') {
                 exit 1;
             }
         }
+
+	# make sure the self-signed realm is specified as 'undef'
+	if (defined $realm && ($realm eq '')) {
+	    $realm = undef;
+	}
 
         # compile all relevant data for the database
         # TODO: use $cert->to_db_hash();

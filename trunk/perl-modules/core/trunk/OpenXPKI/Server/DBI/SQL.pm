@@ -943,18 +943,20 @@ sub select
 	    }
 	    
 	    $col = $self->{schema}->get_column($col);
-	    
-	    my $expr;
+
+	    # left-hand side
+	    my $lhs = '';
 	    if (defined $tab) {
-		$expr = $tab . '.';
+		$lhs = $tab . '.';
 	    }
-	    $expr .= $col;
-	    
+	    $lhs .= $col;
+
+	    my $comparison_operator;
 	    if ($self->{DBH}->column_is_numeric ($col))
 	    {
-		$expr .= ' = ?';
+		$comparison_operator = ' = ?';
 	    } else {
-		$expr .= ' like ?';
+		$comparison_operator = ' like ?';
 	    }
 	    
 	    my @dynamic_values;
@@ -972,8 +974,13 @@ sub select
 	    }
 	    
 	    foreach my $value (@dynamic_values) {
-		push @conditions, $expr;
-		push @bind_values, $value;
+		if (defined $value) {
+		    push @conditions, $lhs . $comparison_operator;
+		    push @bind_values, $value;
+		} else {
+		    # handle queries for NULL
+		    push @conditions, $lhs . ' IS NULL';
+		}
 	    }
 	}
     }
