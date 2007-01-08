@@ -1007,7 +1007,10 @@ sub select
 	# only order by column if no aggregate or distinct is applied to it
 	if ($select_column eq $entry->{COLUMN}) {
 	    # don't order by TEXT and LONGTEXT columns
-	    my $type = $self->{DBH}->get_abstract_column_type($select_column);
+	    my ($col, $tab) = 
+		$self->__get_symbolic_column_and_table($select_column);
+
+	    my $type = $self->{DBH}->get_abstract_column_type($col);
 	    if (($type ne 'TEXT') && ($type ne 'LONGTEXT')) {
 		push @order_specs, $select_column;
 	    }

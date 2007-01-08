@@ -22,12 +22,8 @@ use IO::Prompt;
 #use Smart::Comments;
 
 use OpenXPKI::VERSION;
-use OpenXPKI::FileUtils;
-use OpenXPKI::Server::Init;
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::XML::Config;
-use OpenXPKI::Crypto::Secret;
-use OpenXPKI::DateTime;
 
 # settings determined by openxpki-metaconf
 my %config = (
@@ -755,6 +751,7 @@ sub __resolve_alias {
 
 my @options_spec = qw(
                      cfg|cfgfile|config|config=s
+                     debug=s@
                      ); # config is the only global option
 
 my $cmd = shift @ARGV || '';
@@ -863,6 +860,29 @@ if ($cmd eq '') {
     print STDERR "Hint: 'openxpki help'\n";
     exit 0;
 }
+
+if (defined $params{debug}) {
+    @{$params{debug}} = split(m{,}, join(',', @{$params{debug}}));
+    
+    foreach my $param (@{$params{debug}}) {
+	my ($module, $level) = ($param =~ m{ \A (.*?):?(\d*) \z }xms);
+	if ($level eq '') {
+	    $level = 1;
+	}
+	if ($module eq '') {
+	    $module = '.*';
+	}
+	print STDERR "Debug level for module '$module': $level\n";
+ 	$OpenXPKI::Debug::LEVEL{$module} = $level;
+    }
+}
+
+require OpenXPKI::FileUtils;
+require OpenXPKI::Server::Init;
+require OpenXPKI::XML::Config;
+require OpenXPKI::Crypto::Secret;
+require OpenXPKI::DateTime;
+
 
 if ((($cmd eq 'certificate' || $cmd eq 'key') && $subcmd eq '') ||
     (($cmd eq 'certificate' || $cmd eq 'key') && substr($subcmd, 0, 1) eq '-')

@@ -121,7 +121,7 @@ sub new
         die $msg;
     }
 
-    unlink ($self->{PARAMS}->{port});
+    unlink ($self->{PARAMS}->{socketfile});
     CTX('log')->log(
 	MESSAGE  => "Server initialization completed",
 	PRIORITY => "info",
@@ -150,17 +150,33 @@ sub post_bind_hook {
     # it runs as. The admin may want to make this configurable differently,
     # though.
 
-    my $socketfile = $self->{PARAMS}->{port};
+    my $socketfile = $self->{PARAMS}->{socketfile};
 
     my $socket_owner = -1; # default: unchanged
     my $socket_group = -1; # default: unchanged
 
     if (defined $self->{PARAMS}->{socket_owner}) {
-	$socket_owner = $self->{PARAMS}->{socket_owner};
+	$socket_owner = __get_numerical_user_id($self->{PARAMS}->{socket_owner});
+	if (! defined $socket_owner) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_OWNER",
+		params  => {
+		    SOCKET_OWNER => $self->{PARAMS}->{socket_owner},
+		},
+		);
+	}
     }
     
     if (defined $self->{PARAMS}->{socket_group}) {
-	$socket_group = $self->{PARAMS}->{socket_group};
+	$socket_group = __get_numerical_group_id($self->{PARAMS}->{socket_group});
+	if (! defined $socket_group) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_GROUP",
+		params  => {
+		    SOCKET_GROUP => $self->{PARAMS}->{socket_group},
+		},
+		);
+	}
     }
 
     if (($socket_owner != -1) || ($socket_group != -1)) {
@@ -489,7 +505,6 @@ sub __get_user_interfaces
 # returns numerical user id for specified user (name or id)
 # undef if not found
 sub __get_numerical_user_id {
-    my $self = shift;
     my $arg = shift;
 
     return unless defined $arg;
@@ -497,10 +512,12 @@ sub __get_numerical_user_id {
     my ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
         $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
 	    getpwnam ($arg);
-
-    ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
-     $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
-	 getpwuid ($arg) if (! defined $pw_uid);
+    
+    if (! defined $pw_uid && ($arg =~ m{ \A \d+ \z }xms)) {
+	($pw_name,$pw_passwd,$pw_uid,$pw_gid,
+	 $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
+	     getpwuid ($arg);
+    }
 
     return $pw_uid;
 }
@@ -508,7 +525,6 @@ sub __get_numerical_user_id {
 # returns numerical group id for specified group (name or id)
 # undef if not found
 sub __get_numerical_group_id {
-    my $self = shift;
     my $arg = shift;
 
     return unless defined $arg;
@@ -516,12 +532,13 @@ sub __get_numerical_group_id {
     my ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
         getgrnam ($arg);
 
-    ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
-        getgrgid ($arg) if (! defined $gr_gid);
+    if (! defined $gr_gid && ($arg =~ m{ \A \d+ \z }xms)) {
+	($gr_name,$gr_passwd,$gr_gid,$gr_members) =
+	    getgrgid ($arg);
+    }
 
     return $gr_gid;
 }
-
 
 
 sub __get_server_config
@@ -542,6 +559,7 @@ sub __get_server_config
     }
 
     my %params = ();
+    $params{socketfile} = $socketfile;
     $params{proto}      = "unix";
     $params{background} = 1;
     $params{user}       = $config->get_xpath (XPATH => "common/server/user");
@@ -615,7 +633,7 @@ sub __get_server_config
 	$params{socket_group} = $socket_group;	
     };
 
-    return %params;
+    return \%params;
 }
 
 
@@ -732,5 +750,4 @@ of each hash element is an instance of the user interface class.
 =head3 __get_server_config
 
 Prepares the complete server configuration to startup a socket
-based server with Net::Server::Fork. It returns a hash which can be
-directly passed to the module. 
+based server with Net::Server::Fork. It returns a hashref.

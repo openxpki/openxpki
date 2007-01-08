@@ -27,7 +27,7 @@ our $DBI_OPTION = {
     AutoCommit => 0
 };
 
-our $LIMIT = 'SELECT * FROM (__QUERY__) WHERE ROWNUM < __MAXITEMS__';
+our $LIMIT = 'SELECT * FROM (__QUERY__) WHERE ROWNUM <= __MAXITEMS__';
 
 sub get_dsn
 {

@@ -123,6 +123,9 @@ my %COLUMN_of = (
     WORKFLOW_CONTEXT_VALUE => "workflow_context_value",
     );
 
+
+my $NAMESPACE;
+
 my %TABLE_of = (
     CA => {
         NAME    => "ca",
@@ -341,7 +344,7 @@ sub get_table_name
 
     __check_param($table);
 
-    if (not exists $TABLE_of{$table})
+    if (! exists $TABLE_of{$table})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_NAME_UNKNOWN_TABLE",
@@ -349,7 +352,11 @@ sub get_table_name
 		TABLE => $table,
 	    });
     }
-    return $TABLE_of{$table}->{NAME};
+    if (defined $NAMESPACE) {
+	return $NAMESPACE . '.' . $TABLE_of{$table}->{NAME};
+    } else {
+	return $TABLE_of{$table}->{NAME};
+    }
 }
 
 sub get_table_index
@@ -359,7 +366,7 @@ sub get_table_index
 
     __check_param($table);
 
-    if (not exists $TABLE_of{$table})
+    if (! exists $TABLE_of{$table})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_INDEX_UNKNOWN_TABLE",
@@ -488,12 +495,7 @@ sub set_namespace
 
     __check_param($namespace);
 
-    foreach my $table (keys %TABLE_of)
-    {
-        $TABLE_of{$table}->{NAME} = $namespace 
-	    . '.' 
-	    . $TABLE_of{$table}->{NAME};
-    }
+    $NAMESPACE = $namespace;
     return 1;
 }
 
