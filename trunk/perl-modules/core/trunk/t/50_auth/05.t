@@ -2,13 +2,12 @@ use strict;
 use warnings;
 use English;
 use Test;
-BEGIN { plan tests => 7 };
+BEGIN { plan tests => 6 };
 
 print STDERR "OpenXPKI::Server::Authentication::External (dynamic role)\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Service::Test;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
 ok(1);
@@ -35,18 +34,19 @@ OpenXPKI::Server::Context::setcontext ({'session' => $session});
 ## set pki realm to identify configuration
 $session->set_pki_realm ("Test Root CA");
 
-## create new test user interface
-my $gui = OpenXPKI::Service::Test->new({
-              "AUTHENTICATION_STACK" => "External Dynamic",
-              "LOGIN"                => "John Doe",
-              "PASSWD"               => "User"});
-ok(OpenXPKI::Server::Context::setcontext ({"service" => $gui}));
+my ($user, $role, $reply) = $auth->login_step({
+    STACK   => 'External Dynamic',
+    MESSAGE => {
+        'SERVICE_MSG' => 'GET_PASSWD_LOGIN',
+        'PARAMS'      => {
+            'LOGIN'  => 'John Doe',
+            'PASSWD' => 'User',
+        },
+    },
+});
 
-## perform authentication
-ok($auth->login ());
-
-## check session
-ok($session->is_valid());
-ok($session->get_role() eq "User");
+ok($user eq 'John Doe');
+ok($role eq 'User');
+ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');    
 
 1;

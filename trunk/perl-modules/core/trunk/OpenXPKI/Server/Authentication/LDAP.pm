@@ -155,6 +155,11 @@ sub login
     ##! 1: "start"
     my $gui = CTX('service');
 
+    # FIXME - convert to the new way of using it using login_step
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MODULE_BROKEN',
+    );
+
     my ($account, $passwd) = $gui->get_passwd_login ("");
 
     ##! 2: "account ... $account"

@@ -1,7 +1,8 @@
 ## OpenXPKI::Server::Authentication::Password.pm 
 ##
 ## Written 2006 by Michael Bell
-## (C) Copyright 2006 by The OpenXPKI Project
+## Updated to use new Service::Default semantics 2007 by Alexander Klink
+## (C) Copyright 2006, 2007 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -69,90 +70,92 @@ sub new {
     return $self;
 }
 
-sub login
-{
-    my $self = shift;
-    ##! 1: "start"
-    my $name = shift;
-    my $gui  = CTX('service');
+sub login_step {
+    ##! 1: 'start' 
+    my $self    = shift;
+    my $arg_ref = shift;
+ 
+    my $name    = $arg_ref->{HANDLER};
+    my $msg     = $arg_ref->{MESSAGE};
 
-    my $answer = $gui->get_passwd_login ({
-                     NAME        => $self->{NAME},
-                     DESCRIPTION => $self->{DESC}});
-    my ($account, $passwd) = ($answer->{LOGIN}, $answer->{PASSWD});
-
-    ##! 2: "credentials ... present"
-    ##! 2: "account ... $account"
-
-    ## check account
-
-    if (not exists $self->{DATABASE}->{$account})
-    {
-        CTX('log')->log (FACILITY => "auth",
-                         PRIORITY => "warn",
-                         MESSAGE  => "Login to internal database failed (unknown user).\n".
-                                     "user::=$account\n".
-                                     "logintype::=Password");
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
-            params  => {USER => $account});
+    if (! exists $msg->{PARAMS}->{LOGIN} ||
+        ! exists $msg->{PARAMS}->{PASSWD}) {
+        ##! 4: 'no login data received (yet)' 
+        return (undef, undef, 
+            {
+		SERVICE_MSG => "GET_PASSWD_LOGIN",
+		PARAMS      => {
+                    NAME        => $self->{NAME},
+                    DESCRIPTION => $self->{DESC},
+	        },
+            },
+        );
     }
-    my $digest    = $self->{DATABASE}->{$account}->{DIGEST};
-    my $algorithm = $self->{DATABASE}->{$account}->{ALGORITHM};
-    my $role      = $self->{DATABASE}->{$account}->{ROLE};
+    else {
+        ##! 2: 'login data received'
+        my $account = $msg->{PARAMS}->{LOGIN};
+        my $passwd  = $msg->{PARAMS}->{PASSWD};
 
-    ## create comparable value
-    my $hash = "";
-    if ($algorithm eq "sha1")
-    {
-         my $ref = Digest::SHA1->new();
-         $ref->add($passwd);
-         $hash = $ref->b64digest();
-         ## normalize digests
-         $hash   =~ s/=*$//;
-         $digest =~ s/=*$//;
-    } elsif ($algorithm eq"md5") {
-         my $ref = Digest::MD5->new();
-         $ref->add($passwd);
-         $hash = $ref->b64digest();
-    } elsif ($algorithm eq "crypt") {
-         $hash = crypt ($passwd, $digest);
+        ##! 2: "account ... $account"
+
+        ## check account
+
+        if (not exists $self->{DATABASE}->{$account}) {
+            CTX('log')->log (FACILITY => "auth",
+                             PRIORITY => "warn",
+                             MESSAGE  => "Login to internal database failed (unknown user).\n".
+                                         "user::=$account\n".
+                                         "logintype::=Password");
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
+                params  => {USER => $account});
+        }
+        my $digest    = $self->{DATABASE}->{$account}->{DIGEST};
+        my $algorithm = $self->{DATABASE}->{$account}->{ALGORITHM};
+        my $role      = $self->{DATABASE}->{$account}->{ROLE};
+    
+        ## create comparable value
+        my $hash = "";
+        if ($algorithm eq "sha1") {
+             my $sha1 = Digest::SHA1->new();
+             $sha1->add($passwd);
+             $hash = $sha1->b64digest();
+             ## normalize digests
+             $hash   =~ s/=*$//;
+             $digest =~ s/=*$//;
+        } elsif ($algorithm eq"md5") {
+             my $md5 = Digest::MD5->new();
+             $md5->add($passwd);
+             $hash = $md5->b64digest();
+        } elsif ($algorithm eq "crypt") {
+             $hash = crypt ($passwd, $digest);
+        }
+    
+        ##! 2: "ident user ::= $account and digest ::= $hash"
+    
+        ## compare passphrases
+        if ($hash ne $digest) {
+            ##! 4: "mismatch with digest in database ($digest)"
+            CTX('log')->log (FACILITY => "auth",
+                             PRIORITY => "warn",
+                             MESSAGE  => "Login to internal database failed (wrong passphrase).\n".
+                                         "user::=$account\n".
+                                         "logintype::=Password");
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
+                params  => {USER => $account});
+        }
+        else { # hash is fine, return user, role, service ready message
+            return ($account, $role,
+                {
+                    SERVICE_MSG => 'SERVICE_READY',
+                },
+            ); 
+        } 
     }
-
-    ##! 2: "ident user ::= $account and digest ::= $hash"
-
-    ## compare passphrases
-    if ($hash ne $digest) {
-        ##! 4: "mismatch with digest in database ($digest)"
-        CTX('log')->log (FACILITY => "auth",
-                         PRIORITY => "warn",
-                         MESSAGE  => "Login to internal database failed (wrong passphrase).\n".
-                                     "user::=$account\n".
-                                     "logintype::=Password");
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
-            params  => {USER => $account});
-    }
-
-    ## accept login
-    $self->{USER} = $account;
-
-    return 1;
+    return (undef, undef, {});
 }
 
-sub get_user
-{
-    my $self = shift;
-    ##! 1: "start"
-    return $self->{USER};
-}
-
-sub get_role
-{
-    my $self = shift;
-    ##! 1: "start"
-    return $self->{DATABASE}->{$self->{USER}}->{ROLE};
-}
 
 1;
 __END__
@@ -174,14 +177,8 @@ is the constructor. The supported parameters are XPATH and COUNTER.
 This is the minimum parameter set for any authentication class.
 Every user block in the configuration must include a name, algorithm, digest and role.
 
-=head2 login
+=head2 login_step
 
-returns true if the login was successful.
+returns a pair of (user, role, response_message) for a given login
+step. If user and role are undefined, the login is not yet finished.
 
-=head2 get_user
-
-returns the user which logged in successful.
-
-=head2 get_role
-
-returns the role from the user database.

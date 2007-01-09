@@ -1,6 +1,7 @@
 ## OpenXPKI::Server::Authentication::Anonymous.pm 
 ##
 ## Written 2006 by Michael Bell
+## Updated to use new Service::Default semantics 2007 by Alexander Klink
 ## (C) Copyright 2006 by The OpenXPKI Project
 ## $Revision$
 
@@ -35,25 +36,21 @@ sub new {
     return $self;
 }
 
-sub login
-{
-    my $self = shift;
-    ##! 1: "start"
-    return 1;
-}
+sub login_step {
+    ##! 1: 'start' 
+    my $self    = shift;
+    my $arg_ref = shift;
+ 
+    my $name    = $arg_ref->{HANDLER};
+    my $msg     = $arg_ref->{MESSAGE};
 
-sub get_user
-{
-    my $self = shift;
-    ##! 1: "start"
-    return "";
-}
-
-sub get_role
-{
-    my $self = shift;
-    ##! 1: "start"
-    return $self->{ROLE};
+    return (
+        '',
+        $self->{ROLE},
+        {
+            SERVICE_MSG => 'SERVICE_READY',
+        },
+    );
 }
 
 1;
@@ -76,15 +73,6 @@ authentication method. The parameters are passed as a hash reference.
 is the constructor. The supported parameters are XPATH and COUNTER.
 This is the minimum parameter set for any authentication class.
 
-=head2 login
+=head2 login_step
 
-returns always a true value.
-
-=head2 get_user
-
-returns always an empty string.
-
-=head2 get_role
-
-returns the role which is specified in the configuration. The configuration must
-support a parameter role.
+returns the tripe ('', $self->{ROLE}, and the service ready message)

@@ -2,7 +2,9 @@
 ##
 ## Written 2003 by Michael Bell
 ## Rewritten 2005 and 2006 by Michael Bell for the OpenXPKI project
-## (C) Copyright 2003-2006 by The OpenXPKI Project
+## adapted to new Service::Default semantics 2007 by Alexander Klink
+## for the OpenXPKI project
+## (C) Copyright 2003-2007 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -167,89 +169,87 @@ sub __load_handler
 ##                          identify the user                         ##
 ########################################################################
 
-sub login
-{
+sub list_authentication_stacks {
     my $self = shift;
 
     ##! 1: "start"
-
-    CTX('session')->start_authentication();
 
     ##! 2: "get PKI realm"
     my $realm = CTX('session')->get_pki_realm();
 
     ##! 2: "get authentication stack"
     my %stacks = ();
-    foreach my $stack (sort keys %{$self->{PKI_REALM}->{$realm}->{STACK}})
-    {
+    foreach my $stack (sort keys %{$self->{PKI_REALM}->{$realm}->{STACK}}) {
         $stacks{$stack}->{NAME}        = $stack;
         $stacks{$stack}->{DESCRIPTION} = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION};
     }
-    my $stack = CTX('service')->get_authentication_stack (
-                {
-                    STACKS => \%stacks
-                });
-    if (not $stack)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_NO_STACK_PRESENT");
-    }
-    if (not exists $self->{PKI_REALM}->{$realm}->{STACK}->{$stack} or
-        not scalar @{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}})
-    {
-        OpenXPKI::Exception->throw (
+    ##! 1: 'end'
+    return \%stacks;
+}
+
+sub login_step {
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $msg     = $arg_ref->{MESSAGE};
+    my $stack   = $arg_ref->{STACK};
+    my $realm   = CTX('session')->get_pki_realm();
+
+    ##! 16: 'realm: ' . $realm
+    ##! 16: 'stack: ' . $stack
+    if (! exists $self->{PKI_REALM}->{$realm}->{STACK}->{$stack} ||
+        ! scalar @{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}}) {
+        OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK",
-            params  => {STACK => $stack});
+            params  => {STACK => $stack},
+        );
     }
 
     ##! 2: "try the different available handlers for the stack $stack"
     my $ok = 0;
-    foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}})
-    {
+    my $user;
+    my $role;
+    my $return_msg = {};
+    foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}}) {
         ##! 4: "handler $handler from stack $stack"
         my $ref = $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler};
-        if (not ref $ref)
-        {
+        if (! ref $ref) { # note the great choice of variable name ...
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_WRONG_HANDLER",
                 params  => {PKI_REALM => $realm, HANDLER => $handler});
         }
-        eval
-        {
-            $ref->login($handler);
+        eval {
+            ($user, $role, $return_msg) = $ref->login_step({
+                HANDLER => $handler,
+                MESSAGE => $msg,
+            });
         };
-        if (not $EVAL_ERROR)
-        {
-            ##! 8: "login ok"
+        if (! $EVAL_ERROR) {
+            ##! 8: "login step ok"
             $ok = 1;
-            CTX('session')->set_user ($ref->get_user());
-            CTX('session')->set_role ($ref->get_role());
-            CTX('session')->make_valid();
             ##! 8: "session configured"
             last;
         } else {
             ##! 8: "EVAL_ERROR detected"
+            ##! 64: '$EVAL_ERROR = ' . $EVAL_ERROR
         }
     }
-    if (not $ok)
-    {
+    if (! $ok) {
         ##! 4: "show at minimum the last error message"
-        if (my $exc = OpenXPKI::Exception->caught())
-        {
+        if (my $exc = OpenXPKI::Exception->caught()) {
             OpenXPKI::Exception->throw (
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
                 children => [ $exc ]);
         }
-        else
-        {
+        else {
             OpenXPKI::Exception->throw (
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
                 children => [ $EVAL_ERROR->message() ]);
         }
     }
 
-    return 1;
-}
+    return ($user, $role, $return_msg); 
+};
 
 1;
 __END__
@@ -277,13 +277,17 @@ configuration is loaded. This makes it possible to cash
 this object and to use login when it is required in a very
 fast way.
 
-=head2 login
+=head2 login_step
 
-is the function which performs the authentication. You cannot
-specify any parameters. The function executes in the server's
-context and only uses the configuration as source for
-necessary informations. It returns true on success and throws
-an exception on failure.
+is the function which performs the authentication. 
+Named parameters are STACK (the authentication stack to use)
+and MESSAGE (the message received by the service).
+It returns a triple (user, role, reply). The authentication
+is not finished until user and role are defined. Multiple
+calls can then be made until this state is achieved.
+Reply is the reply message that is to be sent to the user
+(i.e. a challenge, or the 'SERVICE_READY' message in case
+the authentication has been successful).
 
 =head1 See Also
 

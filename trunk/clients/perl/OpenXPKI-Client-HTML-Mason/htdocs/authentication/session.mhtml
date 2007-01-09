@@ -25,20 +25,15 @@
       
   # check if we are using an already existing session
   # check if the session has working connection
-#  FIXME FIXME FIXME
-#  this does not work, because is_connected() sends 'PING'
-#  which the server does not answer in the state where it expects
-#  a login and password -> we really do need a state machine at
-#  the serverside that can answer a PING anytime
-#  if (defined $context and
-#      exists $context->{session_id} and
-#      exists $context->{client}  and
-#      $context->{client}->is_connected())
-#  {
-#      # this session has already been established and is in the context
-#      # we ignore the context if the client connection is down
-#      return 1;
-#  }
+  if (defined $context and
+      exists $context->{session_id} and
+      exists $context->{client} and
+      $context->{client}->is_connected())
+  {
+      # this session has already been established and is in the context
+      # we ignore the context if the client connection is down
+      return 1;
+  }
 
   # FIXME: don't use environment but rather a proper configuration
   my $socketfile = $ENV{OPENXPKI_SOCKET_FILE};

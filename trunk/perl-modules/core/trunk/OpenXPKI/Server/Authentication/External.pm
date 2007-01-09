@@ -2,7 +2,8 @@
 ##
 ## Written 2005 by Martin Bartosch and Michael Bell
 ## Rewritten 2006 by Michael Bell
-## (C) Copyright 2005-2006 by The OpenXPKI Project
+## Updated to use new Service::Default semantics 2007 by Alexander Klink
+## (C) Copyright 2005-2007 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -81,16 +82,29 @@ sub new {
     return $self;
 }
 
-sub login
-{
-    my $self = shift;
-    ##! 1: "start"
-    my $name = shift;
-    my $gui  = CTX('service');
+sub login_step {
+    ##! 1: 'start' 
+    my $self    = shift;
+    my $arg_ref = shift;
+ 
+    my $name    = $arg_ref->{HANDLER};
+    my $msg     = $arg_ref->{MESSAGE};
+    my $answer  = $msg->{PARAMS};
 
-    my $answer = $gui->get_passwd_login ({
-                     NAME        => $self->{NAME},
-                     DESCRIPTION => $self->{DESC}});
+    if (! exists $msg->{PARAMS}->{LOGIN} ||
+        ! exists $msg->{PARAMS}->{PASSWD}) {
+        ##! 4: 'no login data received (yet)' 
+        return (undef, undef, 
+            {
+		SERVICE_MSG => "GET_PASSWD_LOGIN",
+		PARAMS      => {
+                    NAME        => $self->{NAME},
+                    DESCRIPTION => $self->{DESC},
+	        },
+            },
+        );
+    }
+
     my ($account, $passwd) = ($answer->{LOGIN}, $answer->{PASSWD});
 
     ##! 2: "credentials ... present"
@@ -137,29 +151,24 @@ sub login
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED",
             params  => {USER => $account});
+        return (undef, undef, {});
     }
 
     $self->{USER} = $account;
 
-    if (not exists $self->{ROLE})
+    if (! exists $self->{ROLE})
     {
         $out =~ s/$self->{PATTERN}/$self->{REPLACE}/;
         $self->{ROLE} = $out;
     }
-}
 
-sub get_user
-{
-    my $self = shift;
-    ##! 1: "start"
-    return $self->{USER};
-}
-
-sub get_role
-{
-    my $self = shift;
-    ##! 1: "start"
-    return $self->{ROLE};
+    return (
+        $self->{USER},
+        $self->{ROLE},
+        {
+            SERVICE_MSG => 'SERVICE_READY',
+        },
+    );
 }
 
 1;
@@ -188,13 +197,6 @@ parameter will be replaced by the entered user and passphrase.
 
 =head2 login
 
-returns true if the login was ok.
+returns (user, role, service ready message) triple if login was
+successful, (undef, undef, {}) otherwise.
 
-=head2 get_user
-
-returns the user from the successful login.
-
-=head2 get_role
-
-returns the role which is specified in the configuration or extracted from
-the returned output of the external command.

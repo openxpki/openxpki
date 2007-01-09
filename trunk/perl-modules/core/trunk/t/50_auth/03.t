@@ -2,13 +2,12 @@ use strict;
 use warnings;
 use English;
 use Test;
-BEGIN { plan tests => 6 };
+BEGIN { plan tests => 5 };
 
 print STDERR "OpenXPKI::Server::Authentication::Anonymous\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Service::Test;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
 ok(1);
@@ -35,15 +34,13 @@ OpenXPKI::Server::Context::setcontext ({'session' => $session});
 ## set pki realm to identify configuration
 $session->set_pki_realm ("Test Root CA");
 
-## create new test user interface
-my $gui = OpenXPKI::Service::Test->new({
-              "AUTHENTICATION_STACK" => "Anonymous"});
-ok(OpenXPKI::Server::Context::setcontext ({"service" => $gui}));
-
 ## perform authentication
-ok($auth->login ());
+my ($user, $role, $reply) =  $auth->login_step({
+    STACK   => 'Anonymous',
+    MESSAGE => {},
+});
+ok(defined $user);
+ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');
 
-## check session
-ok($session->is_valid());
 
 1;

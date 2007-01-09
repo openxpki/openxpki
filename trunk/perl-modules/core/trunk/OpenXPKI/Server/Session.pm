@@ -255,6 +255,19 @@ sub clear_secret
     $self->{session}->flush();
 }
 
+sub set_state
+{
+    my $self = shift;
+    $self->{session}->param ("state" => shift);
+    $self->{session}->flush();
+}
+
+sub get_state
+{
+    my $self = shift;
+    return $self->{session}->param ("state");
+}
+
 1;
 __END__
 
@@ -344,6 +357,10 @@ returns a challenge string if such a string was set in the past.
 =item * get_secret
 
 =item * set_secret
+
+=item * get_state
+
+=item * set_state
 
 =item * delete_secret
 

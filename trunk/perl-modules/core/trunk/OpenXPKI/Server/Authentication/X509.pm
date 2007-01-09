@@ -41,6 +41,11 @@ sub login
 
     ##! 2: "type ... x509"
 
+    # FIXME - convert to the new way of using it using login_step
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MODULE_BROKEN',
+    );
+
     my $challenge = CTX('session')->get_id();
     my $signature = $gui->get_x509_login ($challenge);
 
