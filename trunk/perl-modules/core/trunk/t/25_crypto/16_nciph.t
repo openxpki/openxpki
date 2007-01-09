@@ -15,7 +15,7 @@ if( not exists $ENV{NCIPHER_LIBRARY} or
 }
 else
 {
-    plan tests => 24;
+    plan tests => 20;
     print STDERR "OpenXPKI::Crypto::Command: Create CA and user certs and issue a CRL with nCipher\n";
 }
 
@@ -24,6 +24,7 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
 use OpenXPKI::Crypto::Profile::CRL;
 use OpenXPKI::Crypto::PKCS7;
+use OpenXPKI::FileUtils;
 use Time::HiRes;
 
 our $cache;
@@ -44,83 +45,20 @@ $cn =~ s{ INTERNAL_ }{}xms;
 my $dir = lc($cn);
 $dir =~ s{ _ }{}xms;
 
+`cp $basedir/canciph_scripts/* $basedir/$dir`;
+`cd $basedir/$dir; ./create_cacert.sh`;
+ok(-e "$basedir/$dir/certs/cacert.pem");
+
+my $fu = OpenXPKI::FileUtils->new();
+my $ca_cert = $fu->read_file("$basedir/$dir/certs/cacert.pem"); 
+
 my $ca_token = $mgmt->get_token (TYPE => "CA", 
   		                 ID => $ca_id, 
-		                 PKI_REALM => "Test nCipher Root CA"
+		                 PKI_REALM => "Test nCipher Root CA",
+				 CERTIFICATE => $ca_cert,
 	);
 ok (1);
 
-## try to create token key
-eval
-{
-    my $hsm_key = $ca_token->command ({COMMAND    => "create_key",
-                                       TYPE       => "RSA",
-		    	               PASSWD     => "1234567890",
-				       PARAMETERS => {
-				               KEY_LENGTH => "1024",
-				               ENC_ALG    => "aes256"}});
-}; 
-
-if ($EVAL_ERROR) {
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        print STDERR "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1);                        
-    }
-    else                              
-    {
-        print STDERR "Unknown eval error: ${EVAL_ERROR}\n" if ($ENV{DEBUG});
-        ok(0);
-    }
-}                                      
-else
-{
-    print STDERR "Eval error does not occur when trying to create CA key in HSM\n" if ($ENV{DEBUG});
-    ok(0);            
-} 
-
-## create CA CSR
-my $ca_csr = $ca_token->command ({COMMAND => "create_pkcs10",
-	                          SUBJECT => "cn=$cn,dc=OpenXPKI,dc=info"});
-ok (1);
-print STDERR "CA CSR: $ca_csr\n" if ($ENV{DEBUG});
-    
-## create profile
-my $ca_profile = OpenXPKI::Crypto::Profile::Certificate->new (
-	CONFIG    => $cache,
-	PKI_REALM => "Test nCipher Root CA",
-	CA        => $ca_id,
-	TYPE      => "SELFSIGNEDCA");
-$ca_profile->set_serial(1);
-ok(1);
-print STDERR "Profile is created\n" if ($ENV{DEBUG});
-
-### profile: $profile
-    
-## create CA cert
-my $ca_cert = $ca_token->command ({COMMAND => "create_cert",
-	                           PROFILE => $ca_profile,
-				   CSR     => $ca_csr});
-ok (1);
-print STDERR "CA cert: $ca_cert\n" if ($ENV{DEBUG});
-
-# FIXME: create_cert should not write the text representation of the
-# cert to the file specified in the configuration
-OpenXPKI->write_file (
-	FILENAME => "$basedir/$dir/cacert.pem", 
-	CONTENT  => $ca_cert,
-	FORCE    => 1,
-);
-
-## check that the CA is ready for further tests
-
-if (not -e "$basedir/$dir/cacert.pem")
-{
-    ok(0);
-    print STDERR "Missing CA cert\n";
-} else {
-    ok(1);
-}
 
 #----------------------USER-----------------------------------------------
 
@@ -183,7 +121,7 @@ OpenXPKI->write_file (FILENAME => "$basedir/$dir/cert.pem", CONTENT => $cert);
                                 PASSWD  => $passwd,
                                 KEY     => $key,
                                 CERT    => $cert,
-                                CHAIN   => $token->get_certfile()});
+                                CHAIN   => [ $ca_cert ]});
 ok (1);
 print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
 
@@ -229,7 +167,7 @@ ok ($content eq "This is for example a passprase.");
 ## verify signature
 
 $pkcs7 = OpenXPKI::Crypto::PKCS7->new (TOKEN => $ca_token, CONTENT => $content, PKCS7 => $sig);
-my $result = $pkcs7->verify ();
+my $result = $pkcs7->verify (CHAIN => [ $ca_cert ]);
 ok(1);
 print STDERR "PKCS#7 verify: $result\n" if ($ENV{DEBUG});
 
@@ -246,7 +184,7 @@ my $begin = [ Time::HiRes::gettimeofday() ];
 for (my $i=0; $i<$items; $i++)
 {
     $pkcs7 = OpenXPKI::Crypto::PKCS7->new (TOKEN => $ca_token, CONTENT => $content, PKCS7 => $sig);
-    $pkcs7->verify();
+    $pkcs7->verify(CHAIN => [$ca_cert]);
     $pkcs7->get_chain();
 }
 ok (1);
