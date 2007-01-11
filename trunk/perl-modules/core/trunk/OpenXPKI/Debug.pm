@@ -27,6 +27,9 @@ sub import
     ## import only be called to specify the different levels
     return if (not defined $module);
 
+    ## only for debugging of this module
+    ## print STDERR "OpenXPKI::Debug: Checking module $module ...\n";
+
     ## perhaps a regex was used in the LEVEL spec
     if (not exists $LEVEL{$module})
     {

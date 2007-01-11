@@ -448,6 +448,12 @@ sub __get_user_interfaces
         my $class = $config->get_xpath (
 	    XPATH   => "common/server/transport",
 	    COUNTER => $i);
+        ## we have to force the reload of the modules to enable debugging
+        ## openxpkictl already loads some transport stuff via OpenXPKI::Client
+        ## whilst openxpkictl is not in debug mode
+        ## do not use the module Symbol with the function delete_package here
+        ## delete_package works too radical for reloading and results in a crash
+        delete $INC{"OpenXPKI/Transport/$class.pm"} if (exists $INC{"OpenXPKI/Transport/$class.pm"});
 	$class = "OpenXPKI::Transport::".$class;
         eval "use $class;";
         if ($EVAL_ERROR)
