@@ -30,7 +30,7 @@ our %COLUMN = (
     "pki_realm"        => "TEXT_KEY",
     "ca_name"          => "TEXT_KEY",
     "issuing_ca"       => "TEXT_KEY",
-    "issuing_pki_realm"=> "TEXT_KEY", # FIXME: remove this
+#    "issuing_pki_realm"=> "TEXT_KEY", # FIXME: remove this
     "referenced_realm" => "TEXT_KEY",
     "issuer_identifier"=> "TEXT_KEY",
     "issuer_dn"        => "TEXT_KEY",
@@ -50,7 +50,7 @@ our %COLUMN = (
     "private_key"      => "BIGINT",
     "signature_key"    => "BIGINT",
     "dataexchange_key" => "BIGINT",
-    "group_id"         => "BIGINT",
+    "group_id"         => "TEXT_KEY",
     "part_id"          => "BIGINT",
 
     "attribute_key"    => "BIGINT",

@@ -127,12 +127,12 @@ my %COLUMN_of = (
 my $NAMESPACE;
 
 my %TABLE_of = (
-    CA => {
-        NAME    => "ca",
-        INDEX   => [ "PKI_REALM", "CA" ],
-        COLUMNS => [ "PKI_REALM", "CA",
-                     "CERTIFICATE_SERIAL", "ISSUING_CA", "ISSUING_PKI_REALM"
-                   ]},
+#     CA => {
+#         NAME    => "ca",
+#         INDEX   => [ "PKI_REALM", "CA" ],
+#         COLUMNS => [ "PKI_REALM", "CA",
+#                      "CERTIFICATE_SERIAL", "ISSUING_CA", "ISSUING_PKI_REALM"
+#                   ]},
     CSR => { # this table contains what is requested, which might not
              # necessarily match what is in the DATA column
         NAME    => "request",

@@ -11,6 +11,7 @@
 %define NVR %{pkgname}-%{version}-%{release}
 %define instancedir /etc/openxpki/instances
 %define instance trustcenter1
+%define install_prefix _PREFIX_
 
 name:      openxpki-deployment
 summary:   OpenXPKI Deployment Tools
@@ -33,14 +34,22 @@ OpenXPKI deployment and administration tools.
 chmod -R u+w %{_builddir}/%{pkgname}-%{version}
 
 %build
-./configure -- \
-    --setcfg dir.mandir=/usr/share/man \
+./configure _CONFIGURE_ARGS_ -- \
     --setcfg dir.sysconfdir=/etc \
     --setcfg dir.openxpkiconfdir=%{instancedir}/%{instance} \
-    --setcfg dir.localedir=/usr/share/locale \
     --setcfg dir.localstatedir=/var \
     --setcfg server.pidfile=/var/run/openxpkid.pid \
     --setcfg server.admgroup=openxpki \
+
+
+# Debian used this (does not take into account %prefix properly)
+#    --setcfg dir.mandir=/usr/share/man \
+#    --setcfg dir.sysconfdir=/etc \
+#    --setcfg dir.openxpkiconfdir=%{instancedir}/%{instance} \
+#    --setcfg dir.localedir=/usr/share/locale \
+#    --setcfg dir.localstatedir=/var \
+#    --setcfg server.pidfile=/var/run/openxpkid.pid \
+#    --setcfg server.admgroup=openxpki \
 
 
 %{__make}
@@ -128,12 +137,13 @@ fi
 
 
 %post
+export PATH=%{install_prefix}/bin:$PATH
 # check for already configured trustcenter1
 if [ -e %{instancedir}/%{instance}/openxpki.conf ]; then
     echo "Detected an existing deployment (leaving it untouched)." >&2
 else
     install -d -m 750 -o root -g openxpki %{instancedir}/%{instance}
-    install -m 750 -o root -g openxpki /usr/share/openxpki/templates/default/openxpki.conf %{instancedir}/%{instance}
+    install -m 750 -o root -g openxpki %{install_prefix}/share/openxpki/templates/default/openxpki.conf %{instancedir}/%{instance}
     echo -n "Deploying instance '%{instance}'... " >&2
     openxpkiadm deploy -- --setcfg dir.openxpkiconfdir=%{instancedir}/%{instance} 2>>/var/log/messages
     echo "DONE." >&2

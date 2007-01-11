@@ -203,13 +203,7 @@ sub do_query
     }
 
     ##! 2: "execute statement"
-    my $result;
-    if (@bind_values)
-    {
-        $result = $self->{STH}[$sth_nr]->execute (@bind_values);
-    } else {
-        $result = $self->{STH}[$sth_nr]->execute ();
-    }
+    my $result = $self->{STH}[$sth_nr]->execute(@bind_values);
     if ($result)
     {
         ##! 4: "execute succeeded (leaving function - $result)"

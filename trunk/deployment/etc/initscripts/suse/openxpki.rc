@@ -38,7 +38,7 @@
 
 # Check for missing binaries (stale symlinks should not happen)
 # Note: Special treatment of stop for LSB conformance
-OPENXPKI_BIN=/usr/bin/openxpkictl
+OPENXPKI_BIN=`which openxpkictl`
 test -x $OPENXPKI_BIN || { echo "$OPENXPKI_BIN not installed"; 
 	if [ "$1" = "stop" ]; then exit 0;
 	else exit 5; fi; }

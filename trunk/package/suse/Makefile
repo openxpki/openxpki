@@ -9,13 +9,17 @@ PACKAGES=\
 	perl-openxpki-client-html-mason \
 	openxpki-i18n \
 
+ifdef PREFIX
+PERL_MAKEPL_ARGS="PREFIX=$(PREFIX)"
+endif
+
 
 .PHONY : $(PACKAGES)
 
 all: clean $(PACKAGES) collect
 
 $(PACKAGES):
-	cd $@ && PATH=$(PATH):/usr/sbin make $(SUBTARGET)
+	cd $@ && PATH=$(PATH):/usr/sbin make $(SUBTARGET) $(PERL_MAKEPL_ARGS)
 
 collect:
 	@mv */*.rpm .     || echo No suse package file found.

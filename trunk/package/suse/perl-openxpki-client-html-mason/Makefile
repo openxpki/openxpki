@@ -11,6 +11,11 @@ SRCNAME=OpenXPKI-Client-HTML-Mason
 
 VERGEN=$(OPENXPKI_SVN)/tools/vergen
 VERSION=$(shell $(VERGEN) --format version --directory $(SRCBASE))
+PERL=$(shell which perl)
+
+ifdef PREFIX
+PERL_MAKEPL_ARGS="PREFIX=$(PREFIX)"
+endif
 
 
 #include ../Makefile.package
@@ -31,7 +36,7 @@ perl-dist: dist-clean
 	)
 
 $(PACKAGE).spec: $(PACKAGE).spec.in
-	sed -e 's/_VERSION_/$(VERSION)/g' <$< >$@
+	sed -e 's/_VERSION_/$(VERSION)/g' <$< | sed -e 's+_PERL_+$(PERL)+g' | sed -e 's+_MAKEPL_ARGS_+$(PERL_MAKEPL_ARGS)+g' >$@
 
 package: $(PACKAGE).spec
 	rpm -ba $(PACKAGE).spec

@@ -11,6 +11,11 @@ SRCNAME=deployment
 
 VERGEN=$(OPENXPKI_SVN)/tools/vergen
 VERSION=$(shell $(VERGEN) --format version --directory $(SRCBASE))
+PERL=$(shell which perl)
+
+ifdef PREFIX
+CONFIGURE_ARGS=--prefix $(PREFIX)
+endif
 
 default: clean dist package collect
 
@@ -27,7 +32,10 @@ dist: dist-clean
 	)
 
 $(PACKAGE).spec: $(PACKAGE).spec.in
-	sed -e 's/_VERSION_/$(VERSION)/g' <$< >$@
+	sed -e 's/_VERSION_/$(VERSION)/g' <$< | \
+	sed -e 's+_PERL_+$(PERL)+g' | \
+	sed -e 's+_CONFIGURE_ARGS_+$(CONFIGURE_ARGS)+g' | \
+	sed -e 's+_PREFIX_+$(PREFIX)+g'  >$@
 
 package: $(PACKAGE).spec
 	rpm -ba $(PACKAGE).spec
