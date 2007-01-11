@@ -49,20 +49,23 @@ do_start()
 	#   2 if daemon could not be started
 	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
 		|| return 1
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
-		start --quiet \
+	start-stop-daemon --start --quiet --pidfile $PIDFILE \
+		--exec $DAEMON -- start --quiet \
 		|| return 2
 	# do not enable debugging
-	#	--exec $DAEMON start --quiet
+	#	--exec $DAEMON -- start --quiet
 	# enable full debugging
-	#	--exec $DAEMON start -- --debug :100
+	#	--exec $DAEMON -- start --debug :100
 	# enable rudimentary debugging
-	#	--exec $DAEMON start -- --debug :
+	#	--exec $DAEMON -- start --debug :
 	# enable debugging of the visualization API
-	#	--exec $DAEMON start -- --debug "OpenXPKI::Server::API::Visualization:100"
+	#	--exec $DAEMON -- start --debug "OpenXPKI::Server::API::Visualization:100"
 	# Add code here, if necessary, that waits for the process to be ready
 	# to handle requests from services started subsequently which depend
 	# on this one.  As a last resort, sleep for some time.
+	#
+	# OpenXPKI notice: we check in openxpictl if the server is available
+	#                  before we signal a correct startup
 }
 
 #

@@ -21,7 +21,6 @@ use Proc::ProcessTable;
 
 use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
-use OpenXPKI::Client;
 
 # settings determined by openxpki-metaconf
 # not really needed...
@@ -76,6 +75,9 @@ sub connect_openxpki_daemon {
 
     my $client;
     eval {
+        ## do not make a use statement from this
+        ## a use would disturb the server initialization
+        require OpenXPKI::Client;
 	$client = OpenXPKI::Client->new(
 	    {
 		SOCKETFILE => $socketfile,
@@ -315,7 +317,9 @@ if ($params{quiet})
     $QUIET = 1;
 }
 
-use OpenXPKI::XML::Config;
+## do not migrate this to use statements
+## this disturbs the debugging
+require OpenXPKI::XML::Config;
 require OpenXPKI::Server;
 
 if (defined $params{cfg}) {
