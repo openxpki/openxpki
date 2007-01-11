@@ -442,16 +442,12 @@ msgstr "This is the chain of the choosen CA certificate."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_TITLE"
 msgstr "CA certificate chain"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CLEAR_SECRET_DESCRIPTION"
 msgstr ""
-"Please enter now your passphrase. If you use plain authentication "
-"passphrases and the original passphrase was splitted then you must enter the "
-"number of the passphrase."
+"Do you really want to clear all private key passphrases?"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CLEAR_SECRET_TITLE"
-msgstr "Enter passphrase for key group"
+msgstr "Clear passphrases"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CRL_LIST_DESCRIPTION"
 msgstr ""
@@ -2794,7 +2790,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_READ_FILE_OPEN_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SECRET_ACTION"
 msgstr "Action"
 
@@ -2810,9 +2805,8 @@ msgstr "Name of secret"
 msgid "I18N_OPENXPKI_SECRET_LOGIN_LINK_LABEL"
 msgstr "Login"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SECRET_LOGOUT_LINK_LABEL"
-msgstr "Login"
+msgstr "Logout"
 
 msgid "I18N_OPENXPKI_SECRET_STATUS"
 msgstr "Status"

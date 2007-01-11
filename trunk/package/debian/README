@@ -29,5 +29,7 @@ Example:
 
 dh-make-perl --build --cpan XML::Filter::XInclude
 dh-make-perl --build --cpan XML::Validator::Schema
+dh-make-perl --build --cpan Data::Password
 dpkg -i libxml-filter-xinclude-perl_1.0-1_all.deb
 dpkg -i libxml-validator-schema-perl_1.08-1_all.deb
+dpkg -i libdata-password-perl_1.07-1_all.deb
