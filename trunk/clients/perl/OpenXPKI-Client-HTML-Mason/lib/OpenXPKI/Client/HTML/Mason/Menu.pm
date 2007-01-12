@@ -2,13 +2,13 @@
 use strict;
 use warnings;
 
+## $Revision$
+
 package OpenXPKI::Client::HTML::Mason::Menu;
 
 use OpenXPKI::Exception;
 use OpenXPKI::i18n qw( i18nGettext );
 use HTML::Mason::Request; # we only use this because we get $m as parameter
-
-use Data::Dumper;
 
 sub new
 {
@@ -58,6 +58,8 @@ sub new
             message => "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_WRONG_ROLE",
             params  => {ROLE => $self->{ROLE}});
     }
+    ## build an empty hashref if necessary
+    $self->{CONFIG}->{CSS_MAP} = {} if (not exists $self->{CONFIG}->{CSS_MAP});
 
     ## check info about paths
     if (not exists $self->{COMP})
@@ -102,14 +104,22 @@ sub __build_env
         $self->{$key} = $args{"__".lc($key)}
             if (not exists $self->{$key});
     }
+
     return $self->{LEVEL};
 }
 
 sub __get_level
 {
-    my $self   = shift;
-    my $params = shift;
-    my $level  = $params->{LEVEL};
+    ##! 1: "start"
+    my $self    = shift;
+    my $params  = shift;
+    my $level   = $params->{LEVEL};
+    my $nested  = $params->{NESTED};
+    my $to      = $params->{LAST_LEVEL};
+    my $mode    = $params->{MODE};
+
+    ##! 2: "test that FROM is lower than or equal TO
+    return "" if ($level > $to);
 
     ##! 2: "determine menu for level $level"
     my $menu = "";
@@ -135,117 +145,86 @@ sub __get_level
 
     ##! 2: "calculate the different items"
     my $return = "";
-    my $title;
-
-    if ($level == 0) {
-        $return .= '<div class="subheader">' . "\n";
-        for (my $i = 0; $i < scalar @{$self->{CONFIG}->{MENU}->{$menu}}; $i++) {
-            ##! 4: "i ::= $i"
-            my $type  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[0];
-            my $label = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[1];
-            my $name  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[2];
-            ##! 4: "type=$type;$label=$label;name=$name"
-            ## ok das msste man komplett in die Parameterklasse einbauen
-            if ($i != 0) {
-                $return .= '&nbsp;| ' . "\n";
+    my $class  = "menu_level_$level";
+       $class  = $self->{CONFIG}->{CSS_MAP}->{$class}
+         if (exists $self->{CONFIG}->{CSS_MAP}->{$class});
+    if ($mode eq "LIST")
+    {
+        $return .= "<ul>";
+    } else {
+        $return .= "<div class=\"$class\">\n";
+    }
+    for (my $i = 0; $i < scalar @{$self->{CONFIG}->{MENU}->{$menu}}; $i++)
+    {
+        if ($mode eq "ONELINE")
+        {
+            $return .= "&nbsp;|" if ($i > 0);
+        }
+        elsif ($mode eq "LIST")
+        {
+            $return .= "<li>";
+        }
+        ##! 4: "i ::= $i"
+        my $type  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[0];
+        my $label = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[1];
+        my $name  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[2];
+        ##! 4: "type=$type;$label=$label;name=$name"
+        ## ok das msste man komplett in die Parameterklasse einbauen
+        if ($type eq "MENU")
+        {
+            if ($mode ne "ONELINE" and $mode ne "LIST")
+            {
+                if ($menu eq $name)
+                {
+                    $return .= "  <div class=\"menu_level_${level}_item_type_active_menu\">\n";
+                } else {
+                    $return .= "  <div class=\"menu_level_${level}_item_type_menu\">\n";
+                }
             }
-            if ($type eq "MENU") {
-                my $menu_link = $self->__get_menu_link({
+            $return .= "    <a href=\"".
+                       $self->__get_menu_link (
+                       {
                            "LEVEL" => $level,
                            "MENU"  => $name
-                });
-                if ($name eq $self->{PATH}->[0]) {
-                    $return .= '    <a class="highlight" ';
-                    $title = $label;
-                } else {
-                    $return .= '    <a ';
-                }
-                $return .= "href=\"". $menu_link . "\">";
-            } else {
-                $return .= "    <a href=\"".
+                       }).
+                       "\">\n";
+        } else {
+            if ($mode ne "ONELINE" and $mode ne "LIST")
+            {
+                $return .= "  <div class=\"menu_level_${level}_item_type_action\">\n";
+            }
+            $return .= "    <a href=\"".
                        $self->__get_menu_link (
                        {
                            "LEVEL"  => $level,
                            "ACTION" => $name
                        }).
-                       "\">";
-            }
-            $return .= i18nGettext($label);
-            $return .= "</a>";
+                       "\">\n";
         }
-        $return .= "\n  </div>\n";
-        $return .= '</div>' . "\n" . '<div id="sidebar">' . "\n";
-    }
-    else {
-        if ($level == 1) {
-            $return .= '  <div>' . "\n";
-            $return .= '    <p class="title">' . i18nGettext($params->{'PARENT_TITLE'}) . '</p> ' . "\n";
+        $return .= "      ".i18nGettext($label)."\n";
+        $return .= "    </a>\n";
+        if ($mode eq "LIST")
+        {
+            $return .= "</li>\n";
         }
-        $return .= '    <ul>' . "\n";
-        for (my $i = 0; $i < scalar @{$self->{CONFIG}->{MENU}->{$menu}}; $i++) {
-            ##! 4: "i ::= $i"
-            my $type  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[0];
-            my $label = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[1];
-            my $name  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[2];
-            ##! 4: "type=$type;$label=$label;name=$name"
-            ## ok das msste man komplett in die Parameterklasse einbauen
-            if ($type eq "MENU") {
-                my $menu_link = $self->__get_menu_link({
-                           "LEVEL" => $level,
-                           "MENU"  => $name
-                });
-                #if ($i != 0) {
-                #    $return .= ' | ';
-                #}
-                if ($menu_link =~ /\Q$self->{COMP}\E/) {
-                    # TODO this needs some editing, actually we want to
-                    # match the current URL against the link, this is
-                    # broken in the Language menu, for example
-                    $return .= '      <li class="highlight><a " ';
-                } else {
-                    $return .= '      <li><a  ';
-                }
-                $return .= "href=\"". $menu_link . "\">";
-            } else {
-                my $menu_link = $self->__get_menu_link ({
-                           "LEVEL"  => $level,
-                           "ACTION" => $name
-                });
-                if ($menu_link =~ /\Q$self->{COMP}\E/) {
-                    $return .= '       <li class="highlight">';
-                }
-                else {
-                    $return .= '       <li>';
-                }
-                $return .= "<a href=\"". $menu_link . "\">";
-            }
-            $return .= i18nGettext($label);
-            $return .= "</a></li>\n";
-            if ($params->{NESTED} and
-                $level < $self->{LEVEL} and
-                $name eq $self->{PATH}->[$level]) {
-                    $return .= $self->__get_level({
-                        LEVEL => $level+1,
-                        NESTED => 1,
-                    });
-            }
-        }
-        $return .= '    </ul>' . "\n";
-        if ($level == 1) {
+        elsif ($mode ne "ONELINE")
+        {
             $return .= "  </div>\n";
         }
-    }
-    if ($level == 0) {
-        if ($params->{NESTED} &&
-            $level < $self->{LEVEL}) {
-                $return .= $self->__get_level({
-                    LEVEL        => $level+1,
-                    NESTED       => 1,
-                    PARENT_TITLE => $title,
-                });
+        if ($nested and
+            $level < $to and
+            $name eq $self->{PATH}->[$level])
+        {
+            $return .= $self->__get_level ({LEVEL => $level+1, NESTED => 1});
         }
+    }
+    if ($mode eq "LIST")
+    {
+        $return .= "</ul>\n";
+    } else {
         $return .= "</div>\n";
     }
+
     ##! 1: "end"
     return $return;
 }
@@ -329,18 +308,32 @@ sub get_root
 
 sub get
 {
-    my $self = shift;
+    my $self   = shift;
+    my $params = shift;
+    my $nested = undef;
+       $nested = $params->{NESTED} if (defined $params and exists $params->{NESTED});
+       $nested = $self->{CONFIG}->{NESTED} if (not defined $nested);
+    my $from   = 0;
+       $from   = $params->{FIRST_LEVEL}
+         if (defined $params and exists $params->{FIRST_LEVEL});
+    my $to     = $self->{LEVEL};
+       $to     = $params->{LAST_LEVEL} if (defined $params and exists $params->{LAST_LEVEL});
+    my $mode   = $params->{MODE};
 
-    if ($self->{CONFIG}->{NESTED})
+    if ($nested)
     {
-        return $self->__get_level({LEVEL => 0, NESTED => 1});
+        return $self->__get_level({LEVEL      => $from,
+                                   NESTED     => 1,
+                                   MODE       => $mode,
+                                   LAST_LEVEL => $to});
     } else {
         my $return = "";
+        $to = $self->{LEVEL} if ($self->{LEVEL} < $to);
 
         ## get the different menus and submenus
-        for (my $i=0; $i <= $self->{LEVEL}; $i++)
+        for (my $i=$from; $i <= $to; $i++)
         {
-            $return .= $self->__get_level ({LEVEL => $i, NESTED => 0});
+            $return .= $self->__get_level ({LEVEL => $i, NESTED => 0, MODE => $mode});
         }
 
         return $return;

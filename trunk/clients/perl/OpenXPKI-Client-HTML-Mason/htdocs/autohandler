@@ -1,6 +1,58 @@
 <%args>
   $__session_id => undef
+  $no_menu      => undef
 </%args>
+
+<%perl>
+  ## do we have a usable session?
+  sub session_id_present {
+      if (defined $context and
+          exists $context->{session_id} and
+          length $context->{session_id})
+      {
+          return 1;
+      } else {
+          return 0;
+      }
+  }
+
+  ## let's calculate the path of our mason autohandler root
+  my $path = $m->request_comp()->dir_path();
+     $path = substr ($path, 1);
+     $path =~ s/[^\/]+/../g;
+     $path .= "/" if (length $path);
+
+  ## if the session is present or faked and
+  ## the user tries to penetrate the server then
+  ## nothing will happen because the server simply
+  ## asks for login and terminates the session
+  ## if the authentication is not ok
+  ## IMPORTANT: the server and not the client enforces the security
+  ## EXCEPTION: if shibboleth is in use then the client forwards
+  ##            the session id from its environment (a session injection
+  ##            from the browser is not possible)
+  my $auth_stuff = "";
+  if (not session_id_present())
+  {
+      $auth_stuff = $m->scomp('/authentication/autohandler', '__session_id' => $__session_id);
+      if ($auth_stuff =~ /REDIRECT_TO_SERVICE_AUTOHANDLER/)
+      {
+        ## the authentication was successfully finished and
+        ## now we redirect to the service area
+</%perl>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="refresh" content="0; URL=../service/index.html?__session_id=<% $context->{session_id} %>;__role=<% $context->{role} %>"/>
+  </head>
+</html>
+<%perl>
+        return;
+      }
+  }
+</%perl>
+
 % if ($m->request_comp()->title() !~ /^\/binary\//) {
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -8,10 +60,6 @@
   <head>
     <title><& SELF:title, %ARGS &></title>
     <link rel="stylesheet" 
-% my $path = $m->request_comp()->dir_path();
-%    $path = substr ($path, 1);
-%    $path =~ s/[^\/]+/../g;
-%    $path .= "/" if (length $path);
           href="<& /lib/url.mhtml, 
                    path => "${path}css/sinorcaish-screen.css",
                    no_session => 1 &>" 
@@ -26,74 +74,97 @@
     <meta http-equiv="Content-Script-Type" content="text/javascript"/>
   </head>
   <body <& SELF:onload, %ARGS &>>
-<!-- For non-visual or non-stylesheet-capable user agents -->
-<div id="mainlink"><a href="#main">Skip to main content.</a></div>
+    <!-- For non-visual or non-stylesheet-capable user agents -->
+    <div id="mainlink"><a href="#main">Skip to main content.</a></div>
 
-<div id="header">
-  <div class="left">
-    <a href="http://www.openxpki.org/"><img
-      src="<% ${path} %>images/openxpki_sinorcaish.png" alt="OpenXPKI"
-      width="325" height="60" /></a>
-  </div>
+    <div id="header">
+      <div class="left">
+        <a href="http://www.openxpki.org/"><img
+          src="<% ${path} %>images/openxpki_sinorcaish.png" alt="OpenXPKI"
+          width="325" height="60" /></a>
+      </div>
 
-  <div class="right">
-% if (! $m->request_args()->{'no_menu'}  &&
-%     $m->request_comp()->title() !~ m{\A /index.html \z}xms) {
+      <div class="right">
+% # if (! $m->request_args()->{'no_menu'}  &&
+% if (! $no_menu  &&
+%     $m->request_comp()->title() !~ m{\A /authentication/index.html \z}xms) {
 % # show search button only if menu is activated
 % # and we are not at the login page
+        <span class="hidden">Useful links:</span>
 <!-- 
-    <span class="hidden">Useful links:</span>
-    <a href="index.html">Contacts</a> |
-    <a href="index.html">Feedback</a> |
+        <a href="index.html">Contacts</a> |
 -->
-    Search <!-- |
-    <a href="index.html">About</a> -->
+        <a href="http://www.openxpki.org/resources/index.html">Feedback</a> |
+<!-- 
+        Search |
+-->
+        <a href="http://www.openxpki.org">About</a>
 
-    <div>
-      <form action="index.html" method="get">
-        <script type="text/javascript">
-            var EmptySearchFieldDone = 0;
-            function EmptySearchField(elem) {
-                if (EmptySearchFieldDone == 0) {
-                    elem.value = "";
-                    EmptySearchFieldDone = 1;
-                }
-                return true;
-            }
-        </script>
+<!-- 
+        Today there is no meaningful stuff behind this search button.
+        Later we could use it for certificate search on the subject or something else.
+        BTW the form of the search function uses a static action attribute.
+
         <div>
-          <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />
-          <input type="image" name="submit" src="<% ${path} %>images/search.png" alt="Search" />
+          <form action="index.html" method="post">
+            <script type="text/javascript">
+              var EmptySearchFieldDone = 0;
+              function EmptySearchField(elem) {
+                  if (EmptySearchFieldDone == 0) {
+                      elem.value = "";
+                      EmptySearchFieldDone = 1;
+                  }
+                  return true;
+                }
+            </script>
+            <div>
+              <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />
+              <input type="image" name="submit" src="<% ${path} %>images/search.png" alt="Search" />
+            </div>
+          </form>
         </div>
-      </form>
-    </div>
+-->
 % }
-  </div>
+      </div> <!-- end of right -->
 
+% if (not $auth_stuff) {
+      <& /lib/menu.mhtml,
+          last_level => 0,
+          mode       => "ONELINE" &>
+% } else {
+      <div class="subheader">&nbsp;</div>
 % }
+
+    </div> <!-- end of header -->
+
+    <div id="sidebar">
+      <div> <!-- this div controls the distance between the list and the window -->
+% if (not $auth_stuff) {
+        <& /lib/menu.mhtml,
+          first_level => 1,
+          nested      => 1,
+          mode        => "LIST" &>
+%}
+      </div>
+    </div> <!-- end of sidebar -->
+
+    <div id="main">
+% } ## end of if not binary
+
 <%perl>
-    ## if the session is present or faked and
-    ## the user tries to penetrate the server then
-    ## nothing will happen because the server simply
-    ## asks for login and terminates the session
-    ## if the authentication is not ok
-    ## IMPORTANT: the server and not the client enforces the security
-    ## EXCEPTION: if shibboleth is in use then the client forwards
-    ##            the session id from its environment (a session injection
-    ##            from the browser is not possible)
-    if (defined $context and
-        exists $context->{session_id} and
-        length $context->{session_id})
+    if (not length $auth_stuff)
     {
        $m->call_next;
     } else {
-       $m->comp('/authentication/autohandler', '__session_id' => $__session_id);
+       print $auth_stuff;
     }
 </%perl>
+
 % if ($m->request_comp()->title() !~ /^\/binary\//) {
-    </div>  <!-- content -->
-      <div id="footer"><small>&copy; 2006 <a href="http://www.openxpki.org">The OpenXPKI Project</a></small>
-      </div>
+    </div>  <!-- main -->
+
+    <div id="footer"><small>&copy; 2006 <a href="http://www.openxpki.org">The OpenXPKI Project</a></small>
+    </div>
   </body>
 </html>
 % }

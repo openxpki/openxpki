@@ -90,6 +90,7 @@
                      '__comp'       => '/service/index.html',
                      '__no_menu'    => $no_menu,
             );
+            print "REDIRECT_TO_SERVICE_AUTOHANDLER";
         }
     }
     $m->comp ('/lib/debug.mhtml',

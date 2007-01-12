@@ -1,9 +1,19 @@
 <%args>
-    $no_menu => 0,
+    $no_menu     => 0,
+    $nested      => 0,
+    $first_level => undef,
+    $last_level  => undef,
+    $mode        => "DEFAULT",
 </%args>
+
+% my %keys = (NESTED => $nested, MODE => $mode);
+%    $keys{FIRST_LEVEL} = $first_level if (defined $first_level);
+%    $keys{LAST_LEVEL}  = $last_level  if (defined $last_level);
+
+<% $context->{menu}->get(\%keys) | n %>
+
 <%init>
   my $EMPTY_CONFIG = {
-                NESTED => 1,
                 ROLE =>
                 {
                     '' =>
@@ -30,7 +40,6 @@
   };
 
   my $CONFIG = {
-                NESTED => 1,
                 ROLE =>
                 {
                     '' =>
@@ -252,6 +261,10 @@
                     {
                         CMD => "service/logout.html"
                     }
+                },
+                CSS_MAP =>
+                {
+                    "menu_level_0" => "subheader"
                 }
                };
 
@@ -269,7 +282,7 @@
   }
   $context->{menu} = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
 </%init>
-<% $context->{menu}->get() | n %>
+
 <%flags>
   inherit => '/syshandler'
 </%flags>

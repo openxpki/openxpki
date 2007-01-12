@@ -1,13 +1,7 @@
 <%args>
   $__session_id => undef
   $__comp       => undef
-  $__no_menu    => undef
-  @menu_path  => ()
 </%args>
-        <& /lib/menu.mhtml,
-            path    => [ @menu_path ],
-            no_menu => $__no_menu, &>
-<div id="main">
 <%perl>
        # normal processing may only happen if the client is in the "normal"
        # state 'can_send'
