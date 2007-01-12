@@ -23,6 +23,8 @@ sub execute {
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
+    my $role       = $self->param('role');
+    ##! 64: 'role from config file: ' . $role
     my $csr_serials = $context->param('csr_serial');
     if (!defined $csr_serials) {
         OpenXPKI::Exception->throw(
@@ -44,7 +46,7 @@ sub execute {
             'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
             {
                 'csr_serial' => $serial,
-                'role'       => $context->param('role')
+                'role'       => $role,
             },
         );
         ##! 64: 'executed'

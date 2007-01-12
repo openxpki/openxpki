@@ -44,6 +44,14 @@ sub new {
 
     ## scan the configuration all 10 seconds
     ## $self->{log4perl} = Log::Log4perl::init_and_watch($self->{configfile}, 10);
+    $self->init();
+
+    return $self;
+}
+
+sub init {
+    my $self = shift;
+
     $self->{log4perl} = Log::Log4perl->init($self->{configfile});
     if (not  $self->{log4perl})
     {
@@ -67,7 +75,13 @@ sub new {
         ## FIXME: we should check for a wrong DBI config here too
     }
 
-    return $self;
+    return 1;
+}
+
+sub re_init {
+    my $self = shift;
+
+    return $self->init();
 }
 
 sub log
@@ -156,6 +170,15 @@ things to meet our requirements.
 
 This function only accepts one parameter - C<CONFIG>.
 C<CONFIG> includes the filename of the Log::Log4perl configuration.
+
+=head2 init
+
+is used by both new and re_init to initialize the Log4perl objects
+
+=head2 re_init
+
+is just a fancier name for init, is called in the forked child
+at ForkWorkflowInstance.pm
 
 =head2 log
 

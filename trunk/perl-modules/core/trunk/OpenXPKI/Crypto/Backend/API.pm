@@ -446,15 +446,16 @@ sub key_usable {
     ##! 16: 'engine: ' . $self->get_instance()->get_engine()
     ##! 16: 'key_online: '  . $self->get_instance()->get_engine()->key_online()
     return if (!defined $self->get_instance()->get_engine());
+    my $result;
     eval {
-        # try to get password, if this fails, key is unusable
-        $self->get_instance()->get_engine()->get_passwd();
+        # try to call key_usable, if this fails, key is unusable
+        $result = $self->get_instance()->get_engine()->key_usable();
     };
     if ($EVAL_ERROR) {
         ##! 16: 'we have an eval error: ' . $EVAL_ERROR
         return;
     }
-    return 1;
+    return $result;
 }
 
 1;

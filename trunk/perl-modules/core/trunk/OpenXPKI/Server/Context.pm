@@ -10,6 +10,9 @@ use base qw( Exporter );
 
 use Storable qw(dclone);
 
+use OpenXPKI::Debug 'OpenXPKI::Server::Context';
+use Data::Dumper;
+
 our @EXPORT_OK = qw( CTX );
 
 #use Smart::Comments;
@@ -110,8 +113,12 @@ sub CTX {
 
 # add new entries to the context
 sub setcontext {
+    ##! 1: 'start'
     my $params = shift;
     
+    my $force = delete($params->{'force'});
+    ##! 16: 'force: ' . $force
+
     if (not $context->{initialized}) {
 	$context->{initialized} = 1;
     }
@@ -127,7 +134,7 @@ sub setcontext {
 	}
 
 	### already defined?
-	if (defined ($context->{exported}->{$key})) {
+	if (defined ($context->{exported}->{$key}) && (! $force)) {
 	    ### yes, bail out
 	    OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ALREADY_DEFINED",
@@ -135,8 +142,8 @@ sub setcontext {
             );
 	}
 
-	##! 4: trying to set value for $key
-	##! 4: value: $value
+	##! 128: 'trying to set value for key: ' . $key
+	##! 128: 'value: ' . Dumper $params->{$key}
 	if (! defined $params->{$key}) {
 	    OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_UNDEFINED_VALUE",

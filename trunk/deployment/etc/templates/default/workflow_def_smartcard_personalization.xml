@@ -42,8 +42,8 @@
             resulting_state="CERTIFICATE_ISSUANCE_POSSIBLE">
        <condition name="more_csrs_to_create"/>
     </action>
-    <action name="change_session_role_to_ca_operator"
-            resulting_state="SESSION_ROLE_CHANGED">
+    <action name="persist_csrs"
+            resulting_state="CSRS_PERSISTED">
        <condition name="!more_csrs_to_create"/>
        <condition name="!approval_needed"/>
     </action>
@@ -56,24 +56,6 @@
             resulting_state="FAILURE">
         <condition name="ACL::fail_workflow"/>
     </action>
-  </state>
-
-  <state name="SESSION_ROLE_CHANGED" autorun="yes">
-    <action name="persist_csrs"
-            resulting_state="CSRS_PERSISTED">
-    </action>
-    <!-- TODO - the following needs to be revisited. Once the
-         session role has changed, fail_workflow is available for
-         the user, which causes the autorun to fail. Maybe we should
-         have a dedicated role just for certificate issuance.
-         This also hangs on the resolution of bug #1628729
-    -->
-    <!--
-    <action name="fail_workflow"
-            resulting_state="FAILURE">
-        <condition name="ACL::fail_workflow"/>
-    </action>
-    -->
   </state>
 
   <state name="APPROVAL">
@@ -105,29 +87,14 @@
     <action name="fork_cert_issuance_instances"
 	    resulting_state="CERT_ISSUANCES_FORKED">
     </action>
-<!-- see above -->
-<!--
+
     <action name="fail_workflow"
             resulting_state="FAILURE">
         <condition name="ACL::fail_workflow"/>
     </action>
--->
   </state>
 
   <state name="CERT_ISSUANCES_FORKED" autorun="yes">
-    <action name="change_back_session_role"
-            resulting_state="SESSION_ROLE_CHANGED_BACK">
-    </action>
-<!-- see above -->
-<!--
-    <action name="fail_workflow"
-            resulting_state="FAILURE">
-        <condition name="ACL::fail_workflow"/>
-    </action>
--->
-  </state>
-
-  <state name="SESSION_ROLE_CHANGED_BACK" autorun="yes">
     <action name="sleep_for_children"
             resulting_state="WAITED_FOR_CHILDREN">
     </action>

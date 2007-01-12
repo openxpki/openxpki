@@ -157,6 +157,19 @@ sub __handle_message : PRIVATE {
         my $method = '__handle_' . $message_name;
         $result = $self->$method($message);
     };
+    if (my $exc = OpenXPKI::Exception->caught()) {
+        $exc->rethrow();
+    }
+    elsif ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_MESSAGE_FAILED',
+            params  => {
+                'MESSAGE_NAME' => $message_name,
+                'EVAL_ERROR'   => $EVAL_ERROR,
+            },
+        );
+    }
+
     return $result;
 }
 

@@ -250,6 +250,19 @@ sub filter_stdout
     return $_[0];
 }
 
+sub key_usable {
+    my $self = shift;
+
+    eval {
+        $self->get_passwd();
+    };
+    if ($EVAL_ERROR) {
+        # we could not get the password, so the key is not usable
+        return 0;
+    }
+    return 1;
+}
+
 1;
 __END__
 

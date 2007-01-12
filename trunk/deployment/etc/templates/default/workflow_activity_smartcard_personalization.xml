@@ -38,7 +38,8 @@
   </action>
 
   <action name="fork_cert_issuance_instances"
-          class="OpenXPKI::Server::Workflow::Activity::SmartCard::ForkWorkflowInstances">
+          class="OpenXPKI::Server::Workflow::Activity::SmartCard::ForkWorkflowInstances"
+          role="CA Operator">
   </action>
   
   <action name="sleep_for_children"

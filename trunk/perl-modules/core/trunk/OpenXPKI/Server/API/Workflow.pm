@@ -330,7 +330,7 @@ sub create_workflow_instance {
             ##! 2: 'ignoring error'
         }
         else {
-            ##! 16: 'eval error: ' . $eval->error()
+            ##! 16: 'eval error: ' . $EVAL_ERROR
             my $error = $workflow->context->param('__error');
             if (defined $error) {
                 if (ref $error eq '')

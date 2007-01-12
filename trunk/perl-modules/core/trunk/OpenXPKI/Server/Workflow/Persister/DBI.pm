@@ -19,6 +19,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use DateTime::Format::Strptime;
 
+use Data::Dumper;
+
 my $workflow_table = 'WORKFLOW';
 my $context_table  = 'WORKFLOW_CONTEXT';
 my $history_table  = 'WORKFLOW_HISTORY';
@@ -134,6 +136,7 @@ sub update_workflow {
     else
     {
         ##! 4: "really update the workflow"
+        ##! 128: 'data: ' . Dumper(\%data)
 
         # save workflow instance...
         $dbi->update(
@@ -143,18 +146,21 @@ sub update_workflow {
                 WORKFLOW_SERIAL => $id,
             },
         );
+        ##! 128: 'update done'
     
         # ... purge any existing context data...
         $dbi->delete(TABLE => $context_table,
                      DATA  => {
                          WORKFLOW_SERIAL => $id,
                      },
-                    );
+        );
+        ##! 128: 'context data deleted'
     }
     
     # ... and write new context
     my $params = $workflow->context()->param();
 
+    ##! 128: 'params from context: ' . Dumper $params
   PARAMETER:
     while (my ($key, $value) = each %{ $params }) {
 	# parameters with undefined values are not stored
@@ -197,7 +203,8 @@ sub update_workflow {
  		WORKFLOW_CONTEXT_KEY   => $key,
  		WORKFLOW_CONTEXT_VALUE => $value
  	    }
- 	    );
+ 	);
+        ##! 128: 'insert done, key: ' . $key . ', value: ' . $value
     }
     
     $dbi->commit();

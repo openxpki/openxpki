@@ -73,6 +73,12 @@ sub get_wrapper
     return $self->{WRAPPER};
 }
 
+sub key_usable {
+    # for now, return 1
+    # FIXME - actually check whether the key is usable
+
+    return 1;
+}
 1;
 __END__
 
