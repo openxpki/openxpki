@@ -444,7 +444,6 @@ sub key_usable {
     my $self  = shift;
     my $ident = ident $self;
     ##! 16: 'engine: ' . $self->get_instance()->get_engine()
-    ##! 16: 'key_online: '  . $self->get_instance()->get_engine()->key_online()
     return if (!defined $self->get_instance()->get_engine());
     my $result;
     eval {
@@ -455,6 +454,7 @@ sub key_usable {
         ##! 16: 'we have an eval error: ' . $EVAL_ERROR
         return;
     }
+    ##! 16: 'result: ' . $result
     return $result;
 }
 
