@@ -204,6 +204,13 @@ sub do_query
 
     ##! 2: "execute statement"
     my $result = $self->{STH}[$sth_nr]->execute(@bind_values);
+
+    # FIXME: we have to perform error checking here; if the DBD driver
+    # experiences an error, the code below sometimes does not catch it
+    # properly.
+    # remedy: either have the DBD throw an exception on error
+    # or use $sth->err
+
     if ($result)
     {
         ##! 4: "execute succeeded (leaving function - $result)"

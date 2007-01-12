@@ -10,6 +10,7 @@ use warnings;
 use utf8;
 
 use base qw(Net::Server::Fork);
+use Net::Server::Daemonize qw( set_uid set_gid );
 
 ## used modules
 
@@ -121,6 +122,22 @@ sub new
         die $msg;
     }
 
+    # Net::Server does not provide a hook that lets us change the
+    # ownership of the created socket properly: it chowns the socket
+    # file itself just before set_uid/set_gid. hence we make Net::Server
+    # believe that it does not have to set_uid/set_gid itself and do this
+    # a little later in the pre_loop_hook
+    # to make this work, delete the corresponding settings from the
+    # Net::Server init params
+    if (exists $self->{PARAMS}->{user}) {
+	$self->{PARAMS}->{process_owner} = $self->{PARAMS}->{user};
+	delete $self->{PARAMS}->{user};
+    }
+    if (exists $self->{PARAMS}->{group}) {
+	$self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
+	delete $self->{PARAMS}->{group};
+    }
+
     unlink ($self->{PARAMS}->{socketfile});
     CTX('log')->log(
 	MESSAGE  => "Server initialization completed",
@@ -181,6 +198,15 @@ sub post_bind_hook {
 
     if (($socket_owner != -1) || ($socket_group != -1)) {
 	# try to change socket ownership
+ 	CTX('log')->log(
+ 	    MESSAGE  => "Setting socket file '$socketfile' ownership to "
+	    . (( $socket_owner != -1) ? $socket_owner : 'unchanged' )
+	    . '/'
+	    . (( $socket_group != -1) ? $socket_group : 'unchanged' ),
+ 	    PRIORITY => "info",
+ 	    FACILITY => "system",
+ 	    );
+
 	if (! chown $socket_owner, $socket_group, $socketfile) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_COULD_NOT_CHANGE_SOCKET_OWNERSHIP",
@@ -194,6 +220,62 @@ sub post_bind_hook {
     }
  
     return 1;
+}
+
+# from Net::Server:
+#           This hook occurs after chroot, change of user, and change of group
+#           has occured.  It allows for preparation before looping begins.
+sub pre_loop_hook {
+    my $self = shift;
+
+    # we are duplicating code from Net::Server::post_bind() here because
+    # Net::Server does not provide a hook that is executed BEFORE.
+    # we are tricking Net::Server to believe that it should not change
+    # owner and group of the process and do it ourselves shortly afterwards
+
+    ### drop privileges
+    eval{
+	if( $self->{PARAMS}->{process_group} ne $) ){
+	    $self->log(2,"Setting gid to \"$self->{PARAMS}->{process_group}\"");
+	    CTX('log')->log(
+		MESSAGE  => "Setting gid to to " .$self->{PARAMS}->{process_group},
+		PRIORITY => "info",
+		FACILITY => "system",
+		);
+	    set_gid( $self->{PARAMS}->{process_group} );
+	}
+	if( $self->{PARAMS}->{process_owner} ne $> ){
+	    $self->log(2,"Setting uid to \"$self->{PARAMS}->{process_owner}\"");
+	    CTX('log')->log(
+		MESSAGE  => "Setting uid to to " .$self->{PARAMS}->{process_owner},
+		PRIORITY => "info",
+		FACILITY => "system",
+		);
+	    set_uid( $self->{PARAMS}->{process_owner} );
+	}
+    };
+    if( $EVAL_ERROR ){
+	if( $> == 0 ){
+	    CTX('log')->log(
+		MESSAGE  => $EVAL_ERROR,
+		PRIORITY => "fatal",
+		FACILITY => "system",
+		);
+	    die $EVAL_ERROR;
+	} elsif( $< == 0){
+	    CTX('log')->log(
+		MESSAGE  => "Effective UID changed, but Real UID is 0: $EVAL_ERROR",
+		PRIORITY => "warn",
+		FACILITY => "system",
+		);
+	}else{
+	    CTX('log')->log(
+		MESSAGE  => $EVAL_ERROR,
+		PRIORITY => "error",
+		FACILITY => "system",
+		);
+	}
+    }
 }
 
 
@@ -621,8 +703,12 @@ sub __get_server_config
     }
 
     eval {
+	$socket_group = $config->get_xpath (XPATH => "common/server/socket_group");
+    };
+
+    if (defined $socket_group) {
 	# convert group id to numerical
-	$params{socket_group} = __get_numerical_user_id($socket_group);
+	$params{socket_group} = __get_numerical_group_id($socket_group);
 
 	if (! defined $params{socket_group} || ($params{socket_group} eq ''))
 	{
