@@ -1,7 +1,7 @@
 Source: libopenxpki-client-perl
 Maintainer: Michael Bell <michael.bell@web.de>
 Priority: optional
-Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0)
+Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0), libversion-perl
 
 Package: libopenxpki-client-perl
 Architecture: any

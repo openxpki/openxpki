@@ -1,7 +1,7 @@
 Source: libopenxpki-perl
 Maintainer: Michael Bell <michael.bell@web.de>
 Priority: optional
-Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0-16), liblog-log4perl-perl
+Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0-16), liblog-log4perl-perl, libversion-perl
 
 Package: libopenxpki-perl
 Architecture: any

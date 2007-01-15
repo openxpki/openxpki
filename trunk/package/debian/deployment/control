@@ -1,7 +1,7 @@
 Source: openxpki-deployment
 Maintainer: Michael Bell <michael.bell@web.de>
 Priority: optional
-Build-Depends: debhelper (>= 5), perl (>= 5.6.0), libopenxpki-perl, libopenxpki-client-perl, debconf
+Build-Depends: debhelper (>= 5), perl (>= 5.6.0), libopenxpki-perl, libopenxpki-client-perl, debconf, libversion-perl
 
 Package: openxpki-deployment
 Architecture: any
