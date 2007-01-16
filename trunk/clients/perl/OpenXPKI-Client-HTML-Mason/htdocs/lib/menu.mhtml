@@ -1,45 +1,22 @@
 <%args>
-    $no_menu     => 0,
+    $init_only   => 0,
     $nested      => 0,
     $first_level => undef,
     $last_level  => undef,
     $mode        => "DEFAULT",
 </%args>
 
-% my %keys = (NESTED => $nested, MODE => $mode);
-%    $keys{FIRST_LEVEL} = $first_level if (defined $first_level);
-%    $keys{LAST_LEVEL}  = $last_level  if (defined $last_level);
+% my %params = (NESTED => $nested, MODE => $mode);
+%    $params{FIRST_LEVEL} = $first_level if (defined $first_level);
+%    $params{LAST_LEVEL}  = $last_level  if (defined $last_level);
 
-<% $context->{menu}->get(\%keys) | n %>
+<% $context->{menu}->get(\%params) | n %>
 
 <%init>
-  my $EMPTY_CONFIG = {
-                ROLE =>
-                {
-                    '' =>
-                    {
-                        MENU => "empty_menu"
-                    },
-                    'User' =>
-                    {
-                        MENU => "empty_menu"
-                    },
-                    'RA Operator' =>
-                    {
-                        MENU => "empty_menu"
-                    },
-                    'CA Operator' =>
-                    {
-                        MENU => "empty_menu"
-                    }
-                },
-                MENU =>
-                {
-                    "empty_menu" => [ ],
-                },
-  };
 
-  my $CONFIG = {
+  if ($init_only)
+  {
+    my $CONFIG = {
                 ROLE =>
                 {
                     '' =>
@@ -268,19 +245,18 @@
                 }
                };
 
-  my %params = ( MASON  => $m,
-                 CONFIG => $CONFIG,
-                 ACTION => "/service/info",
-                 COMP   => $m->request_comp()->title() );
+    my %params = ( MASON  => $m,
+                   CONFIG => $CONFIG,
+                   ACTION => "/service/info",
+                   COMP   => $m->request_comp()->title() );
 
-  foreach my $key ("ROLE", "SESSION_ID", "LANGUAGE")
-  {
-      $params{$key} = $context->{lc $key} if (exists $context->{lc $key});
+    foreach my $key ("ROLE", "SESSION_ID", "LANGUAGE")
+    {
+        $params{$key} = $context->{lc $key} if (exists $context->{lc $key});
+    }
+    $context->{menu} = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
+    return;
   }
-  if ($no_menu) {
-        $params{'CONFIG'} = $EMPTY_CONFIG;
-  }
-  $context->{menu} = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
 </%init>
 
 <%flags>
