@@ -1033,7 +1033,7 @@ sub select
 
 	if (exists $entry->{ALIAS}) {
 	    # aliased table
-	    $table = $entry->{SQL_NAME} . ' AS ' . $entry->{ALIAS};
+	    $table = $entry->{SQL_NAME} . ' ' . $entry->{ALIAS};
 	}
 
 	push @table_specs, $table;
