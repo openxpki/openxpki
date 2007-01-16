@@ -1,6 +1,7 @@
 <%args>
   $__session_id => undef
   $no_menu      => undef
+  $next_comp    => undef
 </%args>
 
 <%perl>
@@ -44,7 +45,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   <head>
-    <meta http-equiv="refresh" content="0; URL=../service/index.html?__session_id=<% $context->{session_id} %>;__role=<% $context->{role} %>"/>
+%   ## if there is an explicit target specified by next_comp
+%   ## then we try to call it (security especially permission
+%   ## enforcement is managed by the daemon not by the web client)
+%   if ($next_comp) {
+%     ## an example URL can be (/openxpki is the mason root directory):
+%     ##     http://localhost/openxpki/index.html?next_comp=service/api/issuer_list.html
+%     ## after the authentication is gone then the redirect shows the issuer list
+      <meta http-equiv="refresh" content="0; URL=<% $path %><% $next_comp %>?__session_id=<% $context->{session_id} %>;__role=<% $context->{role} %>"/>
+%   } else {
+      <meta http-equiv="refresh" content="0; URL=<% $path %>service/index.html?__session_id=<% $context->{session_id} %>;__role=<% $context->{role} %>"/>
+%   }
   </head>
 </html>
 <%perl>

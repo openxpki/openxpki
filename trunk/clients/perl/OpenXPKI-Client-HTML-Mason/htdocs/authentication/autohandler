@@ -2,6 +2,8 @@
   $__session_id => undef
 </%args>
 <%perl>
+    ## next_comp is used to start a component via a normal web link
+    ## somewhere on your portal after the authentication was successful
     my $next_comp = $m->request_args()->{'next_comp'};
     my $no_menu  = $m->request_args()->{'no_menu'};
     $m->comp ('/lib/debug.mhtml',
@@ -73,25 +75,7 @@
     if ($msg->{SERVICE_MSG} eq "SERVICE_READY" or
         not defined $msg)
     {
-        ## ok let's panic - session is ready and we are inside of the auth autohandler !?
-        if (defined $next_comp && $next_comp ne '') {
-            $m->comp('/service/autohandler',
-                '__session_id' => $session_id,
-                '__comp'       => $next_comp,
-                '__no_menu'    => $no_menu,
-            );
-        }
-        else {
-            $m->comp ('/lib/debug.mhtml',
-                      'level' => 4,
-                      'msg'   => "calling index.html of service area");
-            $m->comp('/service/autohandler',
-                     '__session_id' => $session_id,
-                     '__comp'       => '/service/index.html',
-                     '__no_menu'    => $no_menu,
-            );
-            print "REDIRECT_TO_SERVICE_AUTOHANDLER";
-        }
+        print "REDIRECT_TO_SERVICE_AUTOHANDLER";
     }
     $m->comp ('/lib/debug.mhtml',
               'level' => 1,
