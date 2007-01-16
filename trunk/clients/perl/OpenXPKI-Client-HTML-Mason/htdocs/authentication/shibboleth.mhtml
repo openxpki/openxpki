@@ -1,0 +1,49 @@
+<%args>
+  $msg             => undef
+</%args>
+<%init>
+    my $client     = $context->{client};
+
+    ## check that we must handle this message
+    return $msg if ($msg->{SERVICE_MSG} ne "GET_CLIENT_SSO_LOGIN");
+
+    ## Shibboleth sets the credentials in the environment vairables
+    ## the security must be enforced by Shibboleth which protects
+    ## the access to this area of the web server
+    my $account     = $ENV{"REMOTE_USER"};
+    my $cn          = $ENV{"Shib-Person-commonName"};
+    my $pseudo_role = $ENV{"Shib-EP-Entitlement"};
+
+    if (not defined $account     or not length $account or
+        not defined $cn          or not length $cn or
+        not defined $pseudo_role or not length $pseudo_role)
+    {
+        ## Shibboleth grants access to the web server's area
+        ## but Shibboleth does not provide us with the credentials
+        ## ==> ALERT: This is a security issue!
+        print STDERR "Shibboleth SSO misconfigured for OpenXPKI!\n";
+        ## hard abort
+        exit 100;
+    }
+
+    $msg = $client->send_receive_service_msg (
+                            'GET_CLIENT_SSO_LOGIN',
+                            {
+                             'LOGIN'       => $account,
+                             'PSEUDO_ROLE' => $pseudo_role,
+                            });
+    if ($msg->{'SERVICE_MSG'} ne 'GET_CLIENT_SSO_LOGIN')
+    {
+        ## successful login
+        return $msg;
+    }
+
+    ## Something on server does not accept the client SSO credentials
+    ## ==> ALERT: This is a security issue!
+    print STDERR "The OpenXPKI daemon does not accept the Shibboleth SSO credentials!\n";
+    print STDERR "Login: $account\n";
+    print STDERR "CN: $cn\n";
+    print STDERR "Pseudo-Role: ${pseudo_role}\n";
+    ## hard abort
+    exit 200;
+</%init>

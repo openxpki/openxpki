@@ -40,6 +40,8 @@ htdocs/authentication/session.mhtml
 htdocs/authentication/pki_realm.mhtml
 htdocs/authentication/auth_stack.mhtml
 htdocs/authentication/passwd.mhtml
+htdocs/authentication/sso.mhtml
+htdocs/authentication/shibboleth.mhtml
 htdocs/authentication/role.mhtml
 htdocs/authentication/open_form.mhtml
 htdocs/authentication/close_form.mhtml

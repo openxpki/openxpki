@@ -1,0 +1,19 @@
+<%args>
+  $msg             => undef
+  $next_comp        => undef
+  $no_menu         => undef
+</%args>
+<%init>
+  ## Please note that SSO is always heavily dependend on the
+  ## implementation. Therefore we use this file only to activate
+  ## a special SSO implementation.
+  ##
+  ## Default:   Shibboleth
+  ##
+  ## Available: Shibboleth from internet2.edu
+
+  return $m->comp ('/authentication/shibboleth.mhtml',
+                   'session_id' => $session_id,
+                   'next_comp'   => $next_comp,
+                   'no_menu'    => $no_menu);
+</%init>
