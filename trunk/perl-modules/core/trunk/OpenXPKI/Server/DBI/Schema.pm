@@ -22,11 +22,11 @@ my %SEQUENCE_of = (
     # log entries must use auto_increment
     # or whatever the name of this technology is on your database platform
     # AUDITTRAIL     => "seq_audittrail",
-    DATA           => "seq_data",
-    GLOBAL_KEY_ID  => "seq_global_id",
-    PRIVATE        => "seq_private",
+#    DATA           => "seq_data",
+    GLOBAL_KEY_ID  => "seq_global_id",     # ??? FIXME - remove it?
+#    PRIVATE        => "seq_private",
     SECRET         => "seq_secret",
-    SIGNATURE      => "seq_signature",
+#    SIGNATURE      => "seq_signature",
     DATAEXCHANGE   => "seq_dataexchange",
     WORKFLOW       => "seq_workflow",
     WORKFLOW_VERSION => "seq_workflow_version",
@@ -135,7 +135,7 @@ my %TABLE_of = (
 #                   ]},
     CSR => { # this table contains what is requested, which might not
              # necessarily match what is in the DATA column
-        NAME    => "request",
+        NAME    => "csr",
         INDEX   => [ "PKI_REALM", "CSR_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "CSR_SERIAL",
                      "TYPE",  # SPKAC, PKCS#10, IE...
@@ -209,41 +209,43 @@ my %TABLE_of = (
 		     "NEXT_UPDATE",
 		     "PUBLICATION_DATE",
 	    ]},
+
     AUDITTRAIL => {
         NAME    => "audittrail",
         INDEX   => [ "AUDITTRAIL_SERIAL" ],
         COLUMNS => [ "AUDITTRAIL_SERIAL",
                      "TIMESTAMP",
                      "CATEGORY", "LOGLEVEL", "MESSAGE" ]},
-    DATA => {
-        NAME    => "data",
-        INDEX   => [ "DATA_SERIAL" ],
-        COLUMNS => [ "DATA_SERIAL",
-                     "GLOBAL_KEY_ID", "OBJECT_ID",
-                     "COLUMN_NAME", "ARRAY_COUNTER", "CONTENT_TYPE",
-                     "NUMBER", "STRING" ]},
-    PRIVATE => {
-        NAME    => "private",
-        INDEX   => [ "PRIVATE_SERIAL" ],
-        COLUMNS => [ "PRIVATE_SERIAL",
-                     "DATA", "TYPE", "GLOBAL_KEY_ID"]},
+#     DATA => {
+#         NAME    => "data",
+#         INDEX   => [ "DATA_SERIAL" ],
+#         COLUMNS => [ "DATA_SERIAL",
+#                      "GLOBAL_KEY_ID", "OBJECT_ID",
+#                      "COLUMN_NAME", "ARRAY_COUNTER", "CONTENT_TYPE",
+#                      "NUMBER", "STRING" ]},
+#     PRIVATE => {
+#         NAME    => "private",
+#         INDEX   => [ "PRIVATE_SERIAL" ],
+#         COLUMNS => [ "PRIVATE_SERIAL",
+#                     "DATA", "TYPE", "GLOBAL_KEY_ID"]},
+
     SECRET => {
         NAME    => "secret",
         INDEX   => ["PKI_REALM", "GROUP_ID"],
         COLUMNS => ["PKI_REALM", "GROUP_ID", "DATA"]},
 
-    SIGNATURE => {
-        NAME    => "signature",
-        INDEX   => [ "SIGNATURE_SERIAL" ],
-        COLUMNS => [ "SIGNATURE_SERIAL",
-                     "TABLE", "SERIAL",
-                     "DATA", "TYPE" ]},
-    LOCK => {
-        NAME    => "lock_table",  ## because of a mysql bug we cannot create a table lock
-        INDEX   => [ "LOCK_SERIAL" ],
-        COLUMNS => [ "LOCK_SERIAL",
-                     "TABLE", "SERIAL",
-                     "UNTIL" ]},
+#     SIGNATURE => {
+#         NAME    => "signature",
+#         INDEX   => [ "SIGNATURE_SERIAL" ],
+#         COLUMNS => [ "SIGNATURE_SERIAL",
+#                     "TABLE", "SERIAL",
+#                     "DATA", "TYPE" ]},
+#     LOCK => {
+#         NAME    => "lock_table",  ## because of a mysql bug we cannot create a table lock
+#         INDEX   => [ "LOCK_SERIAL" ],
+#         COLUMNS => [ "LOCK_SERIAL",
+#                      "TABLE", "SERIAL",
+#                      "UNTIL" ]},
 
     WORKFLOW => {
         NAME    => "workflow",
@@ -256,14 +258,14 @@ my %TABLE_of = (
 		     "WORKFLOW_LAST_UPDATE",
 	    ]},
 
-    WORKFLOW_VERSION => {
-        NAME    => "workflow_version",
-        INDEX   => [ "WORKFLOW_VERSION_SERIAL" ],
-        COLUMNS => [ "WORKFLOW_VERSION_SERIAL",
-                     # TODO:
-                     # - identify workflow configuration used for this instance
-                     # - link it to workflow_config table (TODO: define table)
-            ]},
+#     WORKFLOW_VERSION => {
+#         NAME    => "workflow_version",
+#         INDEX   => [ "WORKFLOW_VERSION_SERIAL" ],
+#         COLUMNS => [ "WORKFLOW_VERSION_SERIAL",
+#                      # TODO:
+#                      # - identify workflow configuration used for this instance
+#                      # - link it to workflow_config table (TODO: define table)
+#             ]},
 
     WORKFLOW_HISTORY => {
         NAME    => "workflow_history",
@@ -286,18 +288,18 @@ my %TABLE_of = (
     );
 
 my %INDEX_of = (
-   DATA_COLUMN_NAME => {
-       NAME    => "data_column_name_index",
-       TABLE   => "DATA",
-       COLUMNS => [ "COLUMN_NAME" ]},
-   DATA_GLOBAL_KEY_ID   => {
-       NAME    => "data_global_id_index",
-       TABLE   => "DATA",
-       COLUMNS => [ "GLOBAL_KEY_ID" ]},
-   DATA_GLOBAL_COLUMN => {
-       NAME    => "data_global_column_index",
-       TABLE   => "DATA",
-       COLUMNS => [ "GLOBAL_KEY_ID", "COLUMN_NAME" ]},
+#    DATA_COLUMN_NAME => {
+#        NAME    => "data_column_name_index",
+#        TABLE   => "DATA",
+#        COLUMNS => [ "COLUMN_NAME" ]},
+#    DATA_GLOBAL_KEY_ID   => {
+#        NAME    => "data_global_id_index",
+#        TABLE   => "DATA",
+#        COLUMNS => [ "GLOBAL_KEY_ID" ]},
+#    DATA_GLOBAL_COLUMN => {
+#        NAME    => "data_global_column_index",
+#        TABLE   => "DATA",
+#        COLUMNS => [ "GLOBAL_KEY_ID", "COLUMN_NAME" ]},
 #    DATA_COLUMN_STRING => {
 #        NAME    => "data_column_string_index",
 #        TABLE   => "DATA",
@@ -419,7 +421,12 @@ sub get_sequence_name
 		SEQUENCE => $sequence,
 	    });
     }
-    return $SEQUENCE_of{$sequence};
+
+    if (defined $NAMESPACE) {
+	return $NAMESPACE . '.' . $SEQUENCE_of{$sequence};
+    } else {
+	return $SEQUENCE_of{$sequence};
+    }
 }
 
 ########################################################################

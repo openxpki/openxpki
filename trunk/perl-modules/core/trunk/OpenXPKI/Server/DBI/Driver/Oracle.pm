@@ -15,7 +15,7 @@ use English;
 our %TYPE = (
     SERIAL     => 'NUMBER(38) NOT NULL PRIMARY KEY',
     TEXT       => 'CLOB',
-    TIMESTAMP  => 'TIMESTAMP',
+    TIMESTAMP  => 'VARCHAR(20)',
     LONGTEXT   => 'CLOB',
     TEXT_KEY   => 'VARCHAR(255)',
     BIGINT     => 'NUMERIC(38)',
@@ -61,7 +61,7 @@ sub get_new_serial
     my $dbh = $keys->{DBH};
     my $seq = $self->{schema}->get_sequence_name ($keys->{TABLE});
 
-    my $query = "SELECT NEXTVAL('$seq') FROM DUAL";
+    my $query = "SELECT $seq.NEXTVAL FROM DUAL";
     my $sth   = $dbh->get_next_sth ();
     $dbh->do_query (QUERY => $query);
     $sth = $dbh->get_sth ($sth);
@@ -85,7 +85,7 @@ sub sequence_exists
     my $dbh  = $keys->{DBH};
     my $seq = $self->{schema}->get_sequence_name ($keys->{NAME});
 
-    my $query = "SELECT NEXTVAL('$seq') FROM DUAL";
+    my $query = "SELECT $seq.NEXTVAL FROM DUAL";
     eval { $dbh->do_query (QUERY => $query); };
     my $err = $EVAL_ERROR;
     $dbh->finish_sth();
