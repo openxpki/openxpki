@@ -190,8 +190,6 @@ OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
-OpenXPKI/Server/Workflow/Activity/Tools/ChangeSessionRole.pm
-OpenXPKI/Server/Workflow/Activity/Tools/ChangeBackSessionRole.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CreateWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm

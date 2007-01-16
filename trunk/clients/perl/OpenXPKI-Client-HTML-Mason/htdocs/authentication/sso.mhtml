@@ -13,7 +13,7 @@
   ## Available: Shibboleth from internet2.edu
 
   return $m->comp ('/authentication/shibboleth.mhtml',
-                   'session_id' => $session_id,
-                   'next_comp'   => $next_comp,
-                   'no_menu'    => $no_menu);
+                   'msg'       => $msg,
+                   'next_comp' => $next_comp,
+                   'no_menu'   => $no_menu);
 </%init>
