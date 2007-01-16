@@ -79,6 +79,23 @@ sub key_usable {
 
     return 1;
 }
+
+sub login {
+    my $self = shift;
+
+    $self->{ONLINE} = 1;
+    return 1;
+}
+
+sub get_passwd
+{
+    ##! 16: 'start'
+    my $self = shift;
+
+    return;
+}
+
+
 1;
 __END__
 

@@ -4,17 +4,20 @@
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::Server::DBI::DBH;
+
 use strict;
 use warnings;
 use utf8;
-
-package OpenXPKI::Server::DBI::DBH;
+use English;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::DBI::DBH';
 use OpenXPKI::Server::Context qw( CTX );
 use DBI;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::Driver;
+
+use Data::Dumper;
 
 our ($errno, $errval);
 
@@ -86,12 +89,24 @@ sub connect
     ##! 2: "dsn: $dsn"
     ##! 2: "USER: ".($self->{params}->{USER} or "")
     ##! 2: "PASSWD: ".($self->{params}->{PASSWD} or "")
-    ##! 2: "DBI_OPTION: ".$self->{driver}->{dbi_option}
-    $self->{DBH} = DBI->connect ($dsn,
-                                 ($self->{params}->{USER}   or ""),
-                                 ($self->{params}->{PASSWD} or ""),
-                                 \%dbi_options);
-    if (not $self->{DBH}) {
+    ##! 2: "DBI_OPTION: " . Dumper $self->{driver}->{dbi_option}
+
+    # FIXME: we should really use RaiseError => 1, because Oracle
+    # silently raises an error if authentication was not successful
+    eval {
+	$self->{DBH} = DBI->connect ($dsn,
+				     ($self->{params}->{USER}   or ""),
+				     ($self->{params}->{PASSWD} or ""),
+				     \%dbi_options);
+    };
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_DBH_CONNECT_EXCEPTION",
+            params  => {"ERRNO"  => $DBI::err,
+                        "ERRVAL" => $DBI::errstr});
+    }
+
+    if (! defined $self->{DBH}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_CONNECT_FAILED",
             params  => {"ERRNO"  => $DBI::err,

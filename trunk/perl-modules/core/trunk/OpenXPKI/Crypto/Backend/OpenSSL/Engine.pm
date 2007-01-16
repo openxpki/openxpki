@@ -201,9 +201,12 @@ sub get_passwd
 {
     ##! 16: 'start'
     my $self = shift;
-    ##! 16: 'secret is_complete: ' . $self->{SECRET}->is_complete()
-    return $self->{SECRET}->get_secret()
-        if (exists $self->{SECRET} and $self->{SECRET}->is_complete());
+
+    if (defined $self->{SECRET} && $self->{SECRET}->is_complete()) {
+	##! 16: 'secret is_complete: ' . $self->{SECRET}->is_complete()
+	return $self->{SECRET}->get_secret();
+    }
+
     return $self->{PASSWD} if (exists $self->{PASSWD});
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_GET_PASSWD_UNDEF");
