@@ -84,11 +84,11 @@ sub login_step {
 		
         if ($? != 0)
         {
-            CTX->log->log (FACILITY => "auth",
-                           PRIORITY => "warn",
-                           MESSAGE  => "Login via client SSO failed.\n".
-                                       "user::=$account\n".
-                                       "logintype::=ClientSSO");
+            CTX('log')->log (FACILITY => "auth",
+			     PRIORITY => "warn",
+			     MESSAGE  => "Login via client SSO failed.\n"
+			     . "user::=$account\n"
+			     . "logintype::=ClientSSO");
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED",
                 params  => {USER => $account});

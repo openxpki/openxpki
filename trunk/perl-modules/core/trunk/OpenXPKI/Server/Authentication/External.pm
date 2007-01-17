@@ -143,11 +143,11 @@ sub login_step {
 		
     if ($? != 0)
     {
-        CTX->log->log (FACILITY => "auth",
-                       PRIORITY => "warn",
-                       MESSAGE  => "Login to external database failed.\n".
-                                   "user::=$account\n".
-                                   "logintype::=External");
+        CTX('log')->log (FACILITY => "auth",
+			 PRIORITY => "warn",
+			 MESSAGE  => "Login to external database failed.\n"
+			 . "user::=$account\n"
+			 . "logintype::=External");
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED",
             params  => {USER => $account});
