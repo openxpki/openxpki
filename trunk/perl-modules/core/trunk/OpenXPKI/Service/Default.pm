@@ -73,7 +73,7 @@ sub init {
             if ($EVAL_ERROR) {
 	        $self->__send_error({
 	            ERROR     => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ERROR_HANDLING_MESSAGE",
-                    EXCEPTION => "$EVAL_ERROR",   
+                    EXCEPTION => $EVAL_ERROR,   
 	        });
             }
             else { # if everything was fine, send the result to the client
@@ -705,7 +705,7 @@ sub run
             if ($EVAL_ERROR) {
 	        $self->__send_error({
 	            ERROR     => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ERROR_HANDLING_MESSAGE",
-                    EXCEPTION => "$EVAL_ERROR",   
+                    EXCEPTION => $EVAL_ERROR,   
 	        });
             }
             else { # if everything was fine, send the result to the client
