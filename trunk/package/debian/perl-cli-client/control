@@ -8,7 +8,7 @@ Architecture: any
 Recommends:
 Section: perl
 Priority: optional
-Depends: ${perl:Depends}, ${shlibs:Depends}, libopenxpki-client-perl
+Depends: ${perl:Depends}, libopenxpki-client-perl
 Description: OpenXPKI Perl command line interface
  OpenXPKI is an Open Source PKI project.
  .

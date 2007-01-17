@@ -5,7 +5,22 @@ How to create these debian packages?
 
 2. cd trunk/package/debian/
 
-3. make
+3. make core
+
+4. dpkg -i core/libopenxpki-perl*.deb
+
+5. make perl-client-api
+
+6. dpkg -i perl-client-api/libopenxpki-client-perl*.deb
+
+7. make
+
+8. dpkg -i *.deb
+
+If you have finished this or libopenxpki-perl and libopenxpki-client-perl
+are already installed then you must only perform steps 1, 2, 7 and 8. The
+steps 3 to 6 are necessary because the packages libopenxpki-perl and
+libopenxpki-client-perl are required for package builds.
 
 How to create a special debian package like libopenxpki-perl?
 =============================================================
