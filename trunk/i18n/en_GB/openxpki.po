@@ -164,11 +164,11 @@ msgstr "Email address"
 msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
 msgstr "Fingerprint"
 
-msgid "I18N_OPENXPKI_CERT_IS_CA"
-msgstr "Certificate is CA"
-
 msgid "I18N_OPENXPKI_CERT_ISSUER"
 msgstr "Issuer"
+
+msgid "I18N_OPENXPKI_CERT_IS_CA"
+msgstr "Certificate is CA"
 
 msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
 msgstr "Key algorithm"
@@ -443,8 +443,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_TITLE"
 msgstr "CA certificate chain"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CLEAR_SECRET_DESCRIPTION"
-msgstr ""
-"Do you really want to clear all private key passphrases?"
+msgstr "Do you really want to clear all private key passphrases?"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CLEAR_SECRET_TITLE"
 msgstr "Clear passphrases"
@@ -906,12 +905,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_TITLE"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED"
-msgstr ""
-"Downloading the private key failed. Are you sure you have entered the "
-"correct password?"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED_DESC"
 msgstr ""
@@ -1391,10 +1384,6 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
-msgstr "Additional informations"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED"
 msgstr "Additional informations"
 
@@ -1539,10 +1528,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_WRONG_CONFIG"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NO_REF"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NOT_IN_CACHE"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NOT_IN_CACHE"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NO_REF"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_CERTFILE_ILLEGAL_PARAM"
@@ -1557,10 +1546,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_ILLEGAL_PARAM"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NO_REF"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NOT_IN_CACHE"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NOT_IN_CACHE"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NO_REF"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_ILLEGAL_FORMAT"
@@ -1851,9 +1840,6 @@ msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_GET_PKCS8_KEYTYPE_MISSING_PASSWD"
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_IS_PRIME_MISSING_PRIME"
-msgstr ""
-
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_KEYFILE_DOES_NOT_EXIST"
 msgstr ""
 
@@ -1873,6 +1859,9 @@ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_PROFILE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_IS_PRIME_MISSING_PRIME"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_CONFIG"
@@ -2514,10 +2503,6 @@ msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
 msgstr "Get a graphical workflow overview"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
-msgstr "Print informations"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_CERT_INSTALLATION_TEST_FAILED"
 msgstr "Initializing ..."
 
@@ -2537,7 +2522,8 @@ msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_DESC"
 msgstr ""
 "The personalization process has been completed successfully. All your "
 "certificates are now installed on your smartcard and ready for use. You may "
-"now log off this system. If you want to download your certificates, please use one of the links below."
+"now log off this system. If you want to download your certificates, please "
+"use one of the links below."
 
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_TITLE"
 msgstr "[__CURRENTSTEP__/__STEPS__] Successfully finished personalization"
@@ -2650,15 +2636,15 @@ msgstr "Print information"
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION"
 msgstr "[__CURRENTSTEP__/__STEPS__] Certificate Installation"
 
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATIONMORE_CERTIFICATES_TITLE"
+msgstr "[__CURRENTSTEP__/__STEPS__] Installing another certificate"
+
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION_MORE_CERTIFICATES_TEXT"
 msgstr ""
 "Another certificate has to be installed (certificate installation step "
 "__CURRENTCERT__/__TOTALCERTS__). Please click on 'install certificate' again "
 "and answer with yes to the dialog if one pops up. Again, your browser may "
 "appear to be frozen for a significant amount of time afterwards."
-
-msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATIONMORE_CERTIFICATES_TITLE"
-msgstr "[__CURRENTSTEP__/__STEPS__] Installing another certificate"
 
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION_TEXT"
 msgstr ""
@@ -2957,6 +2943,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
 msgstr "At least one context entry is needed."
 
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED"
+msgstr ""
+
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED"
 msgstr ""
 
@@ -2974,6 +2963,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MISSING_PW_ATTR_IN_ENTRY"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MODULE_BROKEN"
+msgstr ""
+"You called an invalid method at the OpenXPKI server. The illegal method name "
+"is __METHOD_NAME__."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MORE_THAN_ONE_USER_FOUND"
 msgstr ""
@@ -3002,11 +2997,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_NO_STACK_PRESENT"
-msgstr ""
-
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED"
 msgstr ""
+"The login of the user __USER__ failed. "
+"Please try again."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_ALGORITHM"
 msgstr ""
@@ -3014,11 +3008,25 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_WRONG_HANDLER"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MODULE_BROKEN"
+msgstr "Default key group"
+
 msgid "I18N_OPENXPKI_SERVER_COMMAND_MISSING_SESSION"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_DAEMON_GROUP"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER_GROUP"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_USER"
 msgstr ""
@@ -3052,6 +3060,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_COMMIT_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_CONNECT_EXCEPTION"
+msgstr "The Country (c) is the nothing else then country."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_CONNECT_FAILED"
 msgstr ""
@@ -3113,19 +3125,27 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_MYSQL_LAST_INSERT_ID_FAILED"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_DRIVER_LOAD_ERROR"
+msgstr "The used suject style does not allow the use of an organization."
+
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_WRONG_TYPE_IN_SCHEMA"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_ORACLE_DROP_SEQUENCE_NOT_FORCED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_ORACLE_GET_NEW_SERIAL_FAILED"
+msgstr "The used suject style does not allow the use of an organization."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_POSTGRESQL_DROP_SEQUENCE_NOT_FORCED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_DSN_NO_DATABASE_NAME"
-msgstr ""
-
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_NO_TABLE"
 msgstr ""
 
 #, fuzzy
@@ -3344,6 +3364,20 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_COULD_NOT_CHANGE_SOCKET_OWNERSHIP"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_GROUP"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_OWNER"
+msgstr "The used suject style does not allow the use of an organization."
 
 msgid "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_FAILED"
 msgstr ""
@@ -3687,6 +3721,12 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_ERROR_FORKING"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_FORK_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -3909,11 +3949,47 @@ msgstr "The SPKAC string is empty."
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT"
 msgstr "The SPKAC string is empty."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_ORACLE_GET_DSN_NO_DATABASE_NAME"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_ORACLE_GET_NEW_SERIAL_NO_TABLE"
+msgstr "The used suject style does not allow the use of an organization."
+
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_DSN_NO_DATABASE_NAME"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_NO_TABLE"
+msgstr ""
+
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COMMAND_MISSING"
+msgstr "The used suject style does not allow the use of a country."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COULD_NOT_INSTANTIATE_COMMAND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTION_ERROR"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_ILLEGAL_COMMAND_RETURN_VALUE"
+msgstr ""
+"The used subject style requires at minimum one organizational unit, one "
+"organization and one country."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_IMPL_INSTANTIATE_FAILED"
 msgstr ""
@@ -3921,37 +3997,51 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PRIVATE_METHOD_REQUESTED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_NO_REALM_CONFIGURED"
-msgstr ""
-
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PERMISSION_DENIED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PRIVATE_METHOD_REQUESTED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_AUTHENTICATION_STACK_INVALID_AUTH_STACK_REQUESTED"
 msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_INVALID_PKI_REALM_REQUESTED"
 msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED"
 msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_MESSAGE_FAILED"
 msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_NO_PKI_REALM_CONFIGURED"
+msgstr ""
+"The used subject style requires at minimum one organizational unit and two "
+"domain components."
+
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ERROR_HANDLING_MESSAGE"
+msgstr ""
+"The default service on the OpenXPKI daemon detected one or more errors. "
+"The error(s) will be forwarded as a list to the connected client."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
@@ -4112,9 +4202,6 @@ msgstr "The used suject style does not allow the use of a country."
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_DC_NOT_ALLOWED"
 msgstr "The used subject style does not allow the use of a domain component."
 
-msgid "I18N_OPENXPKI_SUBJECT_STYLE_O_NOT_ALLOWED"
-msgstr "The used suject style does not allow the use of an organization."
-
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_DC_DC_REQUIRED"
 msgstr ""
 "The used subject style requires at minimum one organizational unit and two "
@@ -4124,6 +4211,9 @@ msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_O_C_REQUIRED"
 msgstr ""
 "The used subject style requires at minimum one organizational unit, one "
 "organization and one country."
+
+msgid "I18N_OPENXPKI_SUBJECT_STYLE_O_NOT_ALLOWED"
+msgstr "The used suject style does not allow the use of an organization."
 
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN"
 msgstr "The used suject style requires a UID plus a common name."
@@ -4441,17 +4531,17 @@ msgstr "Next CA determined"
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "Profile was prepared"
 
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
-msgstr "Archive ready"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
-msgstr "Export completed"
-
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
 msgstr "Exported logs"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
 msgstr "Exported workflow instances"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
+msgstr "Archive ready"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
+msgstr "Export completed"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
 msgstr "Environment for export ready"
@@ -4531,9 +4621,6 @@ msgstr "Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr "Offline part of a Certificate Signing Request (CSR)"
-
-msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-msgstr "Online part of a Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "CRL Issuance"
@@ -4658,6 +4745,23 @@ msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED"
+#~ msgstr ""
+#~ "Downloading the private key failed. Are you sure you have entered the "
+#~ "correct password?"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
+#~ msgstr "Additional informations"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
+#~ msgstr "Print informations"
+
+#~ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
+#~ msgstr "Online part of a Certificate Signing Request (CSR)"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_FIXME_DER_OUTFORMAT_STILL_UNSUPPORTED"
 #~ msgstr "Workflow types"
 
@@ -4671,10 +4775,6 @@ msgstr "yes"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS"
-#~ msgstr "The SPKAC string is empty."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_CORRECT_TIMING"
 #~ msgstr "The SPKAC string is empty."
 
 #, fuzzy

@@ -181,11 +181,11 @@ msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
 msgstr "Подразделение"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CERT_IS_CA"
+msgid "I18N_OPENXPKI_CERT_ISSUER"
 msgstr "Подразделение"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CERT_ISSUER"
+msgid "I18N_OPENXPKI_CERT_IS_CA"
 msgstr "Подразделение"
 
 #, fuzzy
@@ -1019,10 +1019,6 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_TITLE"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED"
-msgstr "Генерация ключа на стороне сервера"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED_DESC"
 msgstr "Генерация ключа на стороне сервера"
 
@@ -1535,10 +1531,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
 msgstr ""
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
-msgstr "Дополнительная информация"
-
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED"
 msgstr ""
 
@@ -1686,10 +1678,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_COMMAND_WRONG_CONFIG"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NO_REF"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NOT_IN_CACHE"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NOT_IN_CACHE"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NO_REF"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_CERTFILE_ILLEGAL_PARAM"
@@ -1704,10 +1696,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_ILLEGAL_PARAM"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NO_REF"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NOT_IN_CACHE"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NOT_IN_CACHE"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NO_REF"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_ILLEGAL_FORMAT"
@@ -1990,9 +1982,6 @@ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_GET_PKCS8_KEYTYPE_MISSING_PASSWD"
 msgstr ""
 "IP-адрес __IP__  некорректен. Поддерживаются адреса стандартов IPv4 и IPv6."
 
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_IS_PRIME_MISSING_PRIME"
-msgstr ""
-
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_KEYFILE_DOES_NOT_EXIST"
 msgstr ""
 
@@ -2012,6 +2001,9 @@ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_PROFILE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED"
+msgstr ""
+
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_IS_PRIME_MISSING_PRIME"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_CONFIG"
@@ -2649,10 +2641,6 @@ msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
 msgstr "Показать информацию об активных технологических процессах"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
-msgstr "Распечатать информацию"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_CERT_INSTALLATION_TEST_FAILED"
 msgstr "Создание новой заявки на сертификат (CSR)"
 
@@ -2791,11 +2779,11 @@ msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION"
 msgstr "Создание новой заявки на сертификат (CSR)"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION_MORE_CERTIFICATES_TEXT"
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATIONMORE_CERTIFICATES_TITLE"
 msgstr "Создание новой заявки на сертификат (CSR)"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATIONMORE_CERTIFICATES_TITLE"
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION_MORE_CERTIFICATES_TEXT"
 msgstr "Создание новой заявки на сертификат (CSR)"
 
 #, fuzzy
@@ -3116,6 +3104,12 @@ msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
 "некоторых данных (__FIELDS__)."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED"
 msgstr ""
 
@@ -3133,6 +3127,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MISSING_PW_ATTR_IN_ENTRY"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MODULE_BROKEN"
+msgstr "SPKAC-строка пуста."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MORE_THAN_ONE_USER_FOUND"
 msgstr ""
@@ -3161,9 +3159,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_NO_STACK_PRESENT"
-msgstr ""
-
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED"
 msgstr ""
 
@@ -3173,11 +3168,25 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_WRONG_HANDLER"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MODULE_BROKEN"
+msgstr "Стандартный способ аутентификации пользователя системы."
+
 msgid "I18N_OPENXPKI_SERVER_COMMAND_MISSING_SESSION"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_DAEMON_GROUP"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER_GROUP"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
 
 msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_USER"
 msgstr ""
@@ -3211,6 +3220,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_COMMIT_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_CONNECT_EXCEPTION"
+msgstr "Значение поля Country (c) - это просто название страны."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_CONNECT_FAILED"
 msgstr ""
@@ -3266,19 +3279,31 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_MYSQL_LAST_INSERT_ID_FAILED"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_DRIVER_LOAD_ERROR"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_WRONG_TYPE_IN_SCHEMA"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_ORACLE_DROP_SEQUENCE_NOT_FORCED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_ORACLE_GET_NEW_SERIAL_FAILED"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_POSTGRESQL_DROP_SEQUENCE_NOT_FORCED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_DSN_NO_DATABASE_NAME"
-msgstr ""
-
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_NO_TABLE"
 msgstr ""
 
 #, fuzzy
@@ -3521,6 +3546,21 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_COULD_NOT_CHANGE_SOCKET_OWNERSHIP"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_GROUP"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_OWNER"
+msgstr ""
+"Используемая структура не предусматривает использование названия организации."
 
 msgid "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_FAILED"
 msgstr ""
@@ -3859,6 +3899,12 @@ msgstr ""
 "некоторых данных (__FIELDS__)."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_ERROR_FORKING"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_FORK_FAILED"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
@@ -4080,11 +4126,52 @@ msgstr "SPKAC-строка пуста."
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT"
 msgstr "SPKAC-строка пуста."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_ORACLE_GET_DSN_NO_DATABASE_NAME"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_ORACLE_GET_NEW_SERIAL_NO_TABLE"
+msgstr ""
+"Тип __TYPE__  не может быть использован в качестве данных поля "
+"альтернативного имени субъекта."
+
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_DSN_NO_DATABASE_NAME"
+msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_NO_TABLE"
+msgstr ""
+
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COMMAND_MISSING"
+msgstr ""
+"Выбранный способ построения имени не позволяет использовать название страны."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COULD_NOT_INSTANTIATE_COMMAND"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTION_ERROR"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_ILLEGAL_COMMAND_RETURN_VALUE"
+msgstr ""
+"Используемая структура требует наличия, как минимум, названий одного "
+"подразделения  организации, одной организации и одной страны."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_IMPL_INSTANTIATE_FAILED"
 msgstr ""
@@ -4092,37 +4179,52 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PRIVATE_METHOD_REQUESTED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_NO_REALM_CONFIGURED"
-msgstr ""
-
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PERMISSION_DENIED"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
 "некоторых данных (__FIELDS__)."
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PRIVATE_METHOD_REQUESTED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_AUTHENTICATION_STACK_INVALID_AUTH_STACK_REQUESTED"
 msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_INVALID_PKI_REALM_REQUESTED"
 msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED"
 msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_MESSAGE_FAILED"
 msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_NO_PKI_REALM_CONFIGURED"
+msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ERROR_HANDLING_MESSAGE"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
@@ -4293,11 +4395,6 @@ msgstr ""
 "Выбранный способ построения имени не позволяет использовать части доменного "
 "имени."
 
-msgid "I18N_OPENXPKI_SUBJECT_STYLE_O_NOT_ALLOWED"
-msgstr ""
-"Выбранный способ построения имени не позволяет использовать название "
-"организации."
-
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_DC_DC_REQUIRED"
 msgstr ""
 "Выбранный способ построения имени требует наличия, как минимум, одного "
@@ -4307,6 +4404,11 @@ msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_O_C_REQUIRED"
 msgstr ""
 "Используемая структура требует наличия, как минимум, названий одного "
 "подразделения  организации, одной организации и одной страны."
+
+msgid "I18N_OPENXPKI_SUBJECT_STYLE_O_NOT_ALLOWED"
+msgstr ""
+"Выбранный способ построения имени не позволяет использовать название "
+"организации."
 
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN"
 msgstr ""
@@ -4630,17 +4732,17 @@ msgstr "Идентифицирован следующий удостоверяю
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "Профиль подготовлен"
 
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
-msgstr "Архив данных готов для экспорта"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
-msgstr "Экспорт успешно завершен"
-
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
 msgstr "Экспортированы журналы"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
 msgstr "Экспортированы технологические процессы"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
+msgstr "Архив данных готов для экспорта"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
+msgstr "Экспорт успешно завершен"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
 msgstr "Окружение для экспорта данных готово"
@@ -4721,9 +4823,6 @@ msgstr "Создание заявки на сертификат (CSR)"
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr "Фоновая часть процесса обработки заявки"
-
-msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-msgstr "Интерактивная часть процесса создания заявки"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
@@ -4850,6 +4949,21 @@ msgid "I18N_OPENXPKI_YES"
 msgstr "uid"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED"
+#~ msgstr "Генерация ключа на стороне сервера"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
+#~ msgstr "Дополнительная информация"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
+#~ msgstr "Распечатать информацию"
+
+#~ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
+#~ msgstr "Интерактивная часть процесса создания заявки"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_FIXME_DER_OUTFORMAT_STILL_UNSUPPORTED"
 #~ msgstr "Типы технологических процессов."
 
@@ -4864,10 +4978,6 @@ msgstr "uid"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS"
 #~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_CORRECT_TIMING"
-#~ msgstr "SPKAC строка пуста."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"

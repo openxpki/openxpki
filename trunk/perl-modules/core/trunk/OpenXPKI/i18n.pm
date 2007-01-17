@@ -68,8 +68,15 @@ sub i18nGettext {
 	## in the resulting string
 
 	for my $parameter (keys %{$arg_ref}) {
-	    warn if ($parameter !~ m{\A __\w+__ \z}xm);
-            $i18n_string =~ s/$parameter/$arg_ref->{$parameter}/g;
+            my $key = $parameter;
+            if ($parameter !~ m{\A __\w+__ \z}xm)
+            {
+                warn "The i18 token $text is used together with the parameter ".
+                     "$parameter without __ as prefix and suffix. ".
+                     "The prefix and suffix will be fixed automatically. ";
+                $parameter =~ s{\A _* (\w+) _* \z}{__$1__}xms;
+            }
+            $i18n_string =~ s/$parameter/$arg_ref->{$key}/g;
         }
     } else {
         ## no translation found, output original string followed
