@@ -43,7 +43,6 @@ sub login_step {
 
     ##! 2: "credentials ... present"
     ##! 2: "account ... $account"
-    ##! 2: "role ... $role"
     ##! 2: "pseudo_role ... $pseudo_role"
 
     if ($self->{COMMAND})

@@ -121,6 +121,7 @@ sub __is_valid_message : PRIVATE {
         'WAITING_FOR_LOGIN' => [
             'PING',
             'GET_PASSWD_LOGIN',
+            'GET_CLIENT_SSO_LOGIN',
         ],
         'MAIN_LOOP' => [
             'PING',
@@ -433,6 +434,15 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
         ##! 4: 'login unsuccessful'
     }
     return $reply;
+}
+
+sub __handle_GET_CLIENT_SSO_LOGIN : PRIVATE {
+    ##! 1: 'start'
+    my $self = shift;
+    my $msg  = shift;
+    
+    # SSO login is basically handled in the same way as password login
+    return $self->__handle_GET_PASSWD_LOGIN($msg);
 }
 
 sub __handle_LOGOUT : PRIVATE {
