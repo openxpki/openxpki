@@ -25,7 +25,10 @@ set -e
 
 case "$1" in
     configure)
-        invoke-rc.d --quiet openxpkid restart
+	set +e
+        invoke-rc.d openxpkid restart
+        if [ $? -gt 0 -a $? -eq 100 ]; then exit $?; fi
+	set -e
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
