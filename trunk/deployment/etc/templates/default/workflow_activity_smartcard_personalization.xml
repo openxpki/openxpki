@@ -71,15 +71,6 @@
       </validator>
   </action>
 
-  <action name="change_session_role_to_ca_operator"
-          class="OpenXPKI::Server::Workflow::Activity::Tools::ChangeSessionRole"
-          role="CA Operator">
-  </action>
-
-  <action name="change_back_session_role"
-          class="OpenXPKI::Server::Workflow::Activity::Tools::ChangeBackSessionRole">
-  </action>
-
   <action name="set_error_ldap"
           class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
           error_code="ldap_missing_data"/>
