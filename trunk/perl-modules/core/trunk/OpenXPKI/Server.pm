@@ -169,9 +169,11 @@ sub post_bind_hook {
 
     my $socketfile = $self->{PARAMS}->{socketfile};
 
-    my $socket_owner = -1; # default: unchanged
-    my $socket_group = -1; # default: unchanged
+    # socket ownership defaults to daemon user/group...
+    my $socket_owner = $self->{PARAMS}->{process_owner};
+    my $socket_group = $self->{PARAMS}->{process_group};
 
+    # ... but can be overwritten in the config file
     if (defined $self->{PARAMS}->{socket_owner}) {
 	$socket_owner = __get_numerical_user_id($self->{PARAMS}->{socket_owner});
 	if (! defined $socket_owner) {
