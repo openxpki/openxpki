@@ -379,6 +379,11 @@ sub __get_extensions
                 $type = "OCSP"       if ($pair->[0] eq "OCSP");
                 foreach my $http (@{$pair->[1]})
                 {
+                    # substitute commas and semicolons in the URI,
+                    # as they will otherwise be misinterpreted by
+                    # openssl as seperators
+                    $http =~ s{,}{%2C}xmsg;
+                    $http =~ s{;}{%3B}xmsg;
                     $config .= "$type;URI:$http,";
                 }
             }
