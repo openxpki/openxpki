@@ -70,10 +70,14 @@ sub init {
                     MESSAGE => $msg
                 });
             };
-            if ($EVAL_ERROR) {
+            if (my $exc = OpenXPKI::Exception->caught()) {
+                $self->__send_error({
+                    EXCEPTION => $exc,
+                });
+            }
+            elsif ($EVAL_ERROR) {
 	        $self->__send_error({
-	            ERROR     => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ERROR_HANDLING_MESSAGE",
-                    EXCEPTION => $EVAL_ERROR,   
+	            ERROR     => $EVAL_ERROR,
 	        });
             }
             else { # if everything was fine, send the result to the client
@@ -547,7 +551,10 @@ sub __handle_COMMAND : PRIVATE {
 	    eval {
 		$result = $command->execute();
 	    };
-	    if ($EVAL_ERROR) {
+            if (my $exc = OpenXPKI::Exception->caught()) {
+                $exc->rethrow();
+            }
+	    elsif ($EVAL_ERROR) {
 		##! 14: "Exception caught during command execution"
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTION_ERROR',
@@ -702,10 +709,14 @@ sub run
                     MESSAGE => $msg
                 });
             };
-            if ($EVAL_ERROR) {
+            if (my $exc = OpenXPKI::Exception->caught()) {
+                $self->__send_error({
+                    EXCEPTION => $exc,
+                });
+            }
+            elsif ($EVAL_ERROR) {
 	        $self->__send_error({
-	            ERROR     => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ERROR_HANDLING_MESSAGE",
-                    EXCEPTION => $EVAL_ERROR,   
+	            ERROR     => $EVAL_ERROR,
 	        });
             }
             else { # if everything was fine, send the result to the client
