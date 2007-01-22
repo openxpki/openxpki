@@ -5,6 +5,7 @@ We can always identify every change via the complete changeset.
 We only notice differences to former version here. Please note
 that the starting point was the OpenCA 0.9.2 series.
 
+
 OpenXPKI 1.0
 
 - make test
