@@ -118,7 +118,7 @@ sub __get_level
     my $to      = $params->{LAST_LEVEL};
     my $mode    = $params->{MODE};
 
-    ##! 2: "test that FROM is lower than or equal TO
+    ##! 2: "test that FROM is lower than or equal TO"
     return "" if ($level > $to);
 
     ##! 2: "determine menu for level $level"

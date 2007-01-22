@@ -102,8 +102,11 @@ sub connect
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_CONNECT_EXCEPTION",
-            params  => {"ERRNO"  => $DBI::err,
-                        "ERRVAL" => $DBI::errstr});
+            params  => {
+		ERRNO  => $DBI::err,
+		ERRVAL => $DBI::errstr,
+		EXCEPTION => $EVAL_ERROR,
+	    });
     }
 
     if (! defined $self->{DBH}) {
@@ -349,7 +352,7 @@ sub get_new_serial
     ## fix missing module spec
 
     $server_shift = 8 if (not exists $self->{SERVER_SHIFT});
-    $server_id = exp($server_shift * log(2)) -1 if (not exists $self->{SERVER_ID});
+    $server_id = 2 ** $server_shift - 1 if (not exists $self->{SERVER_ID});
 
     ## shift serial and add server id
     $serial = ($serial << $server_shift) | $server_id;

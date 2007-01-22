@@ -71,14 +71,14 @@ sub load_extension
     my @counter = @{$keys->{COUNTER}};
     my @values  = ();
 
-    ## does the extension be used ?
+    ## is the extension used at all?
 
     my $scan = eval {$self->{config}->get_xpath_count (
                          XPATH   => [@path],
                          COUNTER => [@counter])};
     return 0 if ($EVAL_ERROR or not $scan);
 
-    ## does it be critical?
+    ## is this a critical extension?
 
     my $critical = eval {$self->{config}->get_xpath (
                              XPATH   => [@path, "critical"],
@@ -130,13 +130,18 @@ sub load_extension
             $bit = "0" if ($bit eq "false");
             push @values, $bits[$i] if ($bit);
         }
-        if ($self->{config}->get_xpath_count (XPATH   => [@path, "oid"],
-                                              COUNTER => [@counter, 0]))
+	my $oid_count = 0;
+	eval {
+	    $oid_count 
+		= $self->{config}->get_xpath_count (XPATH   => [@path, "oid"],
+						    COUNTER => [@counter, 0]);
+	};
+        if ($oid_count > 0)
         {
             push @values, @{$self->{config}->get_xpath_list (XPATH   => [@path, "oid"],
                                                              COUNTER => [@counter, 0])};
         }
-        if (scalar @values)
+	if (scalar @values)
         {
             $self->set_extension (NAME     => "extended_key_usage",
                                   CRITICAL => $critical,
@@ -207,24 +212,34 @@ sub load_extension
     }
     elsif ($path[$#path] eq "authority_info_access")
     {
-        if ($self->{config}->get_xpath_count (XPATH   => [@path, "ca_issuers"],
-                                              COUNTER => [@counter, 0]))
-        {
+	my $ca_issuer_count = 0;
+	eval {
+	    $ca_issuer_count
+		= $self->{config}->get_xpath_count (XPATH   => [@path, "ca_issuers"],
+						    COUNTER => [@counter, 0]);
+	};
+        if ($ca_issuer_count > 0) {
             push @values, ["CA_ISSUERS",
                            $self->{config}->get_xpath_list (
                                XPATH   => [@path, "ca_issuers"],
                                COUNTER => [@counter, 0])];
         }
-        if ($self->{config}->get_xpath_count (XPATH   => [@path, "ocsp"],
-                                              COUNTER => [@counter, 0]))
-        {
-            push @values, ["OCSP",
-                           $self->{config}->get_xpath_list (
-                               XPATH   => [@path, "ocsp"],
-                               COUNTER => [@counter, 0])];
-        }
-        if (scalar @values)
-        {
+
+	my $ocsp_count = 0;
+	eval {
+	    $ocsp_count 
+		= $self->{config}->get_xpath_count (XPATH   => [@path, "ocsp"],
+						    COUNTER => [@counter, 0]);
+	};
+	if ($ocsp_count > 0) {
+	    push @values, ["OCSP",
+			   $self->{config}->get_xpath_list (
+			       XPATH   => [@path, "ocsp"],
+			       COUNTER => [@counter, 0])];
+	}
+
+	if (scalar @values)
+	{
             $self->set_extension (NAME     => "authority_info_access",
                                   CRITICAL => $critical,
                                   VALUES   => [@values]);
