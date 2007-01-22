@@ -13,6 +13,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::Tools::ForkWorkflowInstance';
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Session::Mock;
 
 use Data::Dumper;
 
