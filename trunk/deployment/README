@@ -18,6 +18,7 @@ Make sure that the necessary Perl modules are installed:
 
 - required: OpenXPKI core modules
 - required: OpenXPKI::Client module
+- required: Template, the frontend module to Template::Toolkit
 - recommended: OpenXPKI::Client::CLI module
 - optional: other client modules as required
 
@@ -39,7 +40,7 @@ instance later during the instance deployment and configuration step.
 
 1.2.2 Installation
 
-$ make install
+$ make && make install
 
 This installs the required shell scripts (daemon start script
 and config helper) and the XML configuration templates to the 
