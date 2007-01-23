@@ -364,8 +364,10 @@ sub __get_extensions
     my $profile  = $self->{PROFILE};
     my $sections = "";
     
+   EXTENSIONS:
     foreach my $name (sort $profile->get_named_extensions())
     {
+        ##! 64: 'name: ' . $name
         my $critical = "";
         $critical = "critical," if ($profile->is_critical_extension ($name));
 	
@@ -431,6 +433,34 @@ sub __get_extensions
             foreach my $cdp (@{$profile->get_extension("cdp")})
             {
                 $sections .= "URI.$i=$cdp\n";
+                $i++;
+            }
+            $sections .= "\n";
+        }
+        elsif ($name eq 'user_notice') {
+            # FIXME - currently, you can only have a user_notice
+            # together with a policy_identifier
+            next EXTENSIONS;
+        }
+        elsif ($name eq 'policy_identifier') {
+            $config .= "certificatePolicies = $critical\@cert_policies\n";
+            $sections .= "\n[ cert_policies ]\n";
+            my $i = 0;
+            my @oids = @{ $profile->get_extension('policy_identifier')->[0] };
+            ##! 16: '@oids: ' . Dumper \@oids
+            if (scalar @oids) {
+                $sections .= "policyIdentifier = " . $oids[0];
+                $sections .= "\n";
+            }
+            foreach my $notice (@{$profile->get_extension('user_notice')}) {
+                $sections .= qq{userNotice.$i = \@notice$i\n};
+                $i++;
+            }
+            $sections .= "\n";
+            $i = 0;
+            foreach my $notice (@{$profile->get_extension('user_notice')}) {
+                $sections .= "\n[ notice$i ]\n";
+                $sections .= qq{explicitText = "$notice"\n\n};
                 $i++;
             }
             $sections .= "\n";

@@ -63,8 +63,8 @@ sub execute {
     my $wf_info;
     eval {
     ##! 16: 'fake session role set, role: ' . CTX('session')->get_role()
-        if (defined $params) { # we are called from within another activity
-                               # class, use the params passed
+        if (scalar %{$params}) { # we are called from within another
+                                 # activity class, use the params passed
             $wf_info = $api->create_workflow_instance({
                 WORKFLOW      => $wf_child_instance_type,
                 FILTER_PARAMS => 1,

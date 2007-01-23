@@ -196,7 +196,7 @@ sub load_profile
     foreach my $ext ("basic_constraints", "key_usage", "extended_key_usage",
                      "subject_key_identifier", "authority_key_identifier",
                      "issuer_alt_name", "crl_distribution_points", "authority_info_access",
-                     "user_notice", "policy", "oid",
+                     "user_notice", "policy_identifier", "oid",
                      "netscape/comment", "netscape/certificate_type", "netscape/cdp")
     {
         $self->load_extension (PATH    => [@profile_path, $ext],
