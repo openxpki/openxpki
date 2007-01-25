@@ -1,21 +1,12 @@
 <%args>
-    $init_only   => 0,
     $nested      => 0,
     $first_level => undef,
     $last_level  => undef,
     $mode        => "DEFAULT",
 </%args>
 
-% my %params = (NESTED => $nested, MODE => $mode);
-%    $params{FIRST_LEVEL} = $first_level if (defined $first_level);
-%    $params{LAST_LEVEL}  = $last_level  if (defined $last_level);
-
-<% $context->{menu}->get(\%params) | n %>
-
 <%init>
 
-  if ($init_only)
-  {
     my $CONFIG = {
                 ROLE =>
                 {
@@ -239,10 +230,6 @@
                         CMD => "service/logout.html"
                     }
                 },
-                CSS_MAP =>
-                {
-                    "menu_level_0" => "subheader"
-                }
                };
 
     my %params = ( MASON  => $m,
@@ -256,7 +243,6 @@
     }
     $context->{menu} = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
     return;
-  }
 </%init>
 
 <%flags>

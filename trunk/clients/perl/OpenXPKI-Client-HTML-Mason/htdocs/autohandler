@@ -66,7 +66,7 @@
   ## sometimes no_menu is active but we need some informations
   ## from the menu class to calculate links
   ## therefore we initialize the menu separately from the output
-  $m->comp ('/lib/menu.mhtml', 'init_only' => 1) if (not $auth_stuff);
+  $m->comp ('/lib/init_menu.mhtml') if (not $auth_stuff);
 </%perl>
 
 % if ($m->request_comp()->title() !~ /^\/binary\//) {
@@ -144,7 +144,7 @@
       </div> <!-- end of right -->
 
 % if (not $auth_stuff and not $no_menu) {
-      <& /lib/menu.mhtml,
+      <& /lib/get_menu.mhtml,
           last_level => 0,
           mode       => "ONELINE" &>
 % } else {
@@ -156,7 +156,7 @@
     <div id="sidebar">
       <div> <!-- this div controls the distance between the list and the window -->
 % if (not $auth_stuff and not $no_menu) {
-        <& /lib/menu.mhtml,
+        <& /lib/get_menu.mhtml,
           first_level => 1,
           nested      => 1,
           mode        => "LIST" &>

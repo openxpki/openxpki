@@ -114,12 +114,10 @@ sub __get_level
     my $self    = shift;
     my $params  = shift;
     my $level   = $params->{LEVEL};
-    my $nested  = $params->{NESTED};
     my $to      = $params->{LAST_LEVEL};
-    my $mode    = $params->{MODE};
 
     ##! 2: "test that FROM is lower than or equal TO"
-    return "" if ($level > $to);
+    return () if ($level > $to);
 
     ##! 2: "determine menu for level $level"
     my $menu = "";
@@ -144,89 +142,40 @@ sub __get_level
     ##! 2: "MENU ::= $menu"
 
     ##! 2: "calculate the different items"
-    my $return = "";
-    my $class  = "menu_level_$level";
-       $class  = $self->{CONFIG}->{CSS_MAP}->{$class}
-         if (exists $self->{CONFIG}->{CSS_MAP}->{$class});
-    if ($mode eq "LIST")
-    {
-        $return .= "<ul>";
-    } else {
-        $return .= "<div class=\"$class\">\n";
-    }
+    my @return = ();
     for (my $i = 0; $i < scalar @{$self->{CONFIG}->{MENU}->{$menu}}; $i++)
     {
-        if ($mode eq "ONELINE")
-        {
-            $return .= "&nbsp;|" if ($i > 0);
-        }
-        elsif ($mode eq "LIST")
-        {
-            $return .= "<li>";
-        }
         ##! 4: "i ::= $i"
         my $type  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[0];
         my $label = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[1];
         my $name  = $self->{CONFIG}->{MENU}->{$menu}->[$i]->[2];
         ##! 4: "type=$type;$label=$label;name=$name"
-        ## ok das msste man komplett in die Parameterklasse einbauen
         if ($type eq "MENU")
         {
-            if ($mode ne "ONELINE" and $mode ne "LIST")
-            {
-                if ($menu eq $name)
-                {
-                    $return .= "  <div class=\"menu_level_${level}_item_type_active_menu\">\n";
-                } else {
-                    $return .= "  <div class=\"menu_level_${level}_item_type_menu\">\n";
-                }
-            }
-            $return .= "    <a href=\"".
-                       $self->__get_menu_link (
-                       {
-                           "LEVEL" => $level,
-                           "MENU"  => $name
-                       }).
-                       "\">\n";
+            $return[$i]->{TYPE} = "MENU";
+            $return[$i]->{LINK} .= $self->__get_menu_link (
+                                   {
+                                       "LEVEL" => $level,
+                                       "MENU"  => $name
+                                   });
         } else {
-            if ($mode ne "ONELINE" and $mode ne "LIST")
-            {
-                $return .= "  <div class=\"menu_level_${level}_item_type_action\">\n";
-            }
-            $return .= "    <a href=\"".
-                       $self->__get_menu_link (
-                       {
-                           "LEVEL"  => $level,
-                           "ACTION" => $name
-                       }).
-                       "\">\n";
+            $return[$i]->{TYPE} = "ACTION";
+            $return[$i]->{LINK} .= $self->__get_menu_link (
+                                   {
+                                       "LEVEL"  => $level,
+                                       "ACTION" => $name
+                                   });
         }
-        $return .= "      ".i18nGettext($label)."\n";
-        $return .= "    </a>\n";
-        if ($mode eq "LIST")
-        {
-            $return .= "</li>\n";
-        }
-        elsif ($mode ne "ONELINE")
-        {
-            $return .= "  </div>\n";
-        }
-        if ($nested and
-            $level < $to and
+        $return[$i]->{LABEL} = i18nGettext($label);
+        if ($level < $to and
             $name eq $self->{PATH}->[$level])
         {
-            $return .= $self->__get_level ({LEVEL => $level+1, NESTED => 1});
+            $return[$i]->{CHILDREN} = [ $self->__get_level ({LEVEL => $level+1}) ];
         }
-    }
-    if ($mode eq "LIST")
-    {
-        $return .= "</ul>\n";
-    } else {
-        $return .= "</div>\n";
     }
 
     ##! 1: "end"
-    return $return;
+    return @return;
 }
 
 sub __get_menu_link
@@ -310,34 +259,15 @@ sub get
 {
     my $self   = shift;
     my $params = shift;
-    my $nested = undef;
-       $nested = $params->{NESTED} if (defined $params and exists $params->{NESTED});
-       $nested = $self->{CONFIG}->{NESTED} if (not defined $nested);
     my $from   = 0;
        $from   = $params->{FIRST_LEVEL}
          if (defined $params and exists $params->{FIRST_LEVEL});
     my $to     = $self->{LEVEL};
        $to     = $params->{LAST_LEVEL} if (defined $params and exists $params->{LAST_LEVEL});
-    my $mode   = $params->{MODE};
 
-    if ($nested)
-    {
-        return $self->__get_level({LEVEL      => $from,
-                                   NESTED     => 1,
-                                   MODE       => $mode,
-                                   LAST_LEVEL => $to});
-    } else {
-        my $return = "";
-        $to = $self->{LEVEL} if ($self->{LEVEL} < $to);
+    return $self->__get_level({LEVEL      => $from,
+                               LAST_LEVEL => $to});
 
-        ## get the different menus and submenus
-        for (my $i=$from; $i <= $to; $i++)
-        {
-            $return .= $self->__get_level ({LEVEL => $i, NESTED => 0, MODE => $mode});
-        }
-
-        return $return;
-    }
 }
 
 sub get_link_params

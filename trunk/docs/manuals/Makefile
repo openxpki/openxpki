@@ -1,4 +1,14 @@
-FOP_SH=~/docbook/fop-0.20.5/fop.sh
+
+FOP=fop
+DOCBOOK=/usr/share/xml/docbook/stylesheet/nwalsh/
+
+## DO NOT HARDCODE PATHS !!!
+## Please set DOCBOOK and FOP in the file Makefile.vars.
+## The file Makefile.vars is ignored by subversion.
+##
+## Please add FOP and DOCBOOK to the file Makefile.vars.
+
+include Makefile.vars
 
 default: openxpki-manual
 
@@ -8,9 +18,19 @@ check:
 openxpki-manual: html pdf
 
 html:
-	xsltproc docbook-html.xsl openxpki-manual.xml > ../openxpki-manual.html
+	xsltproc $(DOCBOOK)/html/docbook.xsl openxpki-manual.xml > ../openxpki-manual.html
 
 pdf:
-	xsltproc docbook-fo.xsl openxpki-manual.xml > ../openxpki-manual.fo
-	$(FOP_SH) -fo ../openxpki-manual.fo -pdf ../openxpki-manual.pdf
+	xsltproc \
+		--stringparam fop1.extensions "1" \
+		--stringparam paper.type "A4" \
+		$(DOCBOOK)/fo/docbook.xsl openxpki-manual.xml > ../openxpki-manual.fo
+	$(FOP) -fo ../openxpki-manual.fo -pdf ../openxpki-manual.pdf
 	rm ../openxpki-manual.fo 
+
+clean:
+	rm -f ../openxpki-manual.html
+	rm -f ../openxpki-manual.fo
+	rm -f ../openxpki-manual.pdf
+
+dist-clean: clean
