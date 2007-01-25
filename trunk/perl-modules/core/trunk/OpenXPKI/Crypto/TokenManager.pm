@@ -156,7 +156,7 @@ sub __load_secret
         case "plain"   {
             my $parts =
                 CTX('xml_config')->get_xpath (
-                    XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'parts' ],
+                    XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'total_shares' ],
                     COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
                     TYPE => "Plain",

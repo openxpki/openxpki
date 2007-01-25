@@ -62,8 +62,26 @@
       <secret>
         <group id="default" label="I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP">
           <method id="plain">
-            <parts>1</parts>
+            <total_shares>1</total_shares>
           </method>
+        <!-- alternatively use one of the following methods:
+          <method id="literal">password</method>
+          Literal password in the configuration file, not recommended
+          except for testing.
+
+          <method id="split">
+            <total_shares>3</total_shares>
+          </method>
+          Shamir's secret splitting, three passphrase shares, three
+          required to unlock the secret.
+
+          <method id="split">
+            <total_shares>5</total_shares>
+            <required_shares>3</required_shares>
+          </method>
+          Shamir's secret splitting, five passphrase shares, any three
+          required to unlock the secret.
+        --> 
           <cache>
             <type>daemon</type>
             <usage_count>-1</usage_count>
