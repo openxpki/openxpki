@@ -1,0 +1,127 @@
+<%args>
+    $nested      => 0,
+    $first_level => undef,
+    $last_level  => undef,
+    $mode        => "DEFAULT",
+</%args>
+
+<%init>
+  my %params = ();
+     $params{FIRST_LEVEL} = $first_level if (defined $first_level);
+     $params{LAST_LEVEL}  = $last_level  if (defined $last_level);
+
+  my $next_menu = [ $context->{menu}->get(\%params) ];
+  my $level     = $first_level -1;
+
+  ## we expect nodes with the following structure in the menu tree:
+  ##     - LINK
+  ##     - CHILDREN
+  ##     - LABEL
+  ##     - TYPE (MENU or ACTION)
+
+  ## FIXME: I have no idea why I must use "local" instead of "my"
+  ## local function to build the different menus
+  local *build_menu = sub {
+      my $menu     = shift;
+      my $children = undef;
+      $level++;
+
+      ## determine basic class and map it if necessary
+      my $class       = "menu_level_$level";
+      my $action      = $class."_item_type_action";
+      my $active_menu = $class."_item_type_active_menu";
+      my $normal_menu = $class."_item_type_menu";
+      $class       = $css_map{$class}       if (exists $css_map{$class});
+      $action      = $css_map{$action}      if (exists $css_map{$action});
+      $active_menu = $css_map{$active_menu} if (exists $css_map{$active_menu});
+      $normal_menu = $css_map{$normal_menu} if (exists $css_map{$normal_menu});
+
+      ## build header of list
+      if ($mode eq "LIST")
+      {
+          print "<ul>";
+      } else {
+          print "<div class=\"$class\">\n";
+      }
+
+      ## build list
+      for (my $i = 0; $i < scalar @{$menu}; $i++)
+      {
+          ## prefix for menu item
+          if ($mode eq "ONELINE")
+          {
+              print "&nbsp;|" if ($i > 0);
+          }
+          elsif ($mode eq "LIST")
+          {
+              print "<li>";
+          }
+          if ($menu->[$i]->{TYPE} eq "MENU")
+          {
+              if ($mode ne "ONELINE" and $mode ne "LIST")
+              {
+                  if (exists $menu->[$i]->{CHILDREN})
+                  {
+                      print "  <div class=\"${active_menu}\">\n";
+                  } else {
+                      print "  <div class=\"${normal_menu}\">\n";
+                  }
+              }
+          } else {
+              if ($mode ne "ONELINE" and $mode ne "LIST")
+              {
+                  print "  <div class=\"$action\">\n";
+              }
+          }
+
+          ## build link of menu item
+          print "    <a href=\"".$menu->[$i]->{LINK}."\">\n";
+          print "      ".i18nGettext($menu->[$i]->{LABEL})."\n";
+          print "    </a>\n";
+
+          ## build suffix for menu item
+          if ($mode eq "LIST")
+          {
+              print "</li>\n";
+          }
+          elsif ($mode ne "ONELINE")
+          {
+              print "  </div>\n";
+          }
+          if ($menu->[$i]->{CHILDREN})
+          {
+              if ($nested)
+              {
+                  build_menu($menu->[$i]->{CHILDREN});
+              } else {
+                  $children .= build_menu($menu->[$i]->{CHILDREN});
+              }
+          }
+      }
+
+      ## build footer of list
+      if ($mode eq "LIST")
+      {
+          print "</ul>\n";
+      } else {
+          print "</div>\n";
+      }
+
+      return $children;
+  };
+  ## end of inner function build_menu
+
+  ## ok, now we can build the menu
+  while ($next_menu)
+  {
+      $next_menu = build_menu($next_menu);
+  }
+
+  return 1;
+</%init>
+
+<%once>
+  my %css_map = (
+                 "menu_level_0" => "subheader"
+                );
+</%once>
