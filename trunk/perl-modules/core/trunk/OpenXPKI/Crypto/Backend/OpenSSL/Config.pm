@@ -452,13 +452,27 @@ sub __get_extensions
                 $sections .= "policyIdentifier = " . $oids[0];
                 $sections .= "\n";
             }
-            foreach my $notice (@{$profile->get_extension('user_notice')}) {
+            my @user_notices;
+            my $old_eval_error = $EVAL_ERROR;
+            eval {
+                # a user_notice might not be present, just leave the
+                # array empty then
+                #OpenXPKI::Exception->throw(
+                #    message => 'I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_GET_EXTENSION_NOT_FOUND',
+                #);
+                @user_notices = @{$profile->get_extension('user_notice')};
+            };
+            my $exc = OpenXPKI::Exception->caught();
+            if ($exc->message() eq 'I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_GET_EXTENSION_NOT_FOUND') {
+                $EVAL_ERROR = $old_eval_error;
+            }
+            foreach my $notice (@user_notices) {
                 $sections .= qq{userNotice.$i = \@notice$i\n};
                 $i++;
             }
             $sections .= "\n";
             $i = 0;
-            foreach my $notice (@{$profile->get_extension('user_notice')}) {
+            foreach my $notice (@user_notices) {
                 $sections .= "\n[ notice$i ]\n";
                 $sections .= qq{explicitText = "$notice"\n\n};
                 $i++;
