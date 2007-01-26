@@ -404,7 +404,10 @@ sub get_extension
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_GET_EXTENSION_NOT_FOUND",
-            params  => {"EXTENSION" => $ext});
+            params  => {
+                "EXTENSION" => $ext,
+            },
+        );
     }
 
     if (exists $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE})

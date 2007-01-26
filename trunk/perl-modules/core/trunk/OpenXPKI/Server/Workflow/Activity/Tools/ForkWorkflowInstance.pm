@@ -30,6 +30,10 @@ sub execute {
     else {
         $role = $self->param('role');
         ##! 16: 'called directly, role = ' . $role
+        if (!defined $role) {
+            $role = CTX('session')->get_role();
+            ##! 16: 'no (elevated) role configured, using session role: ' . $role
+        }
     }
     my $old_session = CTX('session');
     

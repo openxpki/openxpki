@@ -463,7 +463,7 @@ sub __get_extensions
                 @user_notices = @{$profile->get_extension('user_notice')};
             };
             my $exc = OpenXPKI::Exception->caught();
-            if ($exc->message() eq 'I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_GET_EXTENSION_NOT_FOUND') {
+            if (defined $exc && $exc->message() eq 'I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_GET_EXTENSION_NOT_FOUND') {
                 $EVAL_ERROR = $old_eval_error;
             }
             foreach my $notice (@user_notices) {
