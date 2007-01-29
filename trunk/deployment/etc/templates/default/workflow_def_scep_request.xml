@@ -87,8 +87,9 @@
   </state>
 
   <state name="TIMING_CORRECT" autorun="yes">
-    <action name="change_session_role_to_ca_operator"
-            resulting_state="SESSION_ROLE_CHANGED">
+    <action name="persist_csr"
+            resulting_state="APPROVED">
+      <condition name="ACL::persist_csr"/>
       <condition name="auto_approval_allowed"/>
       <condition name="signed_using_original_cert"/>
     </action>
@@ -109,12 +110,6 @@
     </action>
   </state>
 
-
-  <state name="SESSION_ROLE_CHANGED" autorun="yes">
-    <action name="persist_csr"
-            resulting_state="APPROVED">
-    </action>
-  </state>
 
   <state name="PENDING">
     <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"

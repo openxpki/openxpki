@@ -5,7 +5,7 @@
        <secret>
          <group id="default" label="I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP">
 -          <method id="plain">
--            <parts>1</parts>
+-            <total_shares>1</total_shares>
 +          <method id="literal">
 +            <value>1234567890</value>
            </method>

@@ -110,7 +110,8 @@
 
   <action name="fork_cert_issuance_instance"
           class="OpenXPKI::Server::Workflow::Activity::Tools::ForkWorkflowInstance"
-          workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE">
+          workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
+          role="CA Operator">
   </action>
 
 </actions>
