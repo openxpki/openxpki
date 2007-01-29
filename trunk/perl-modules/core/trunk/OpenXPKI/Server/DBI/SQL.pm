@@ -312,8 +312,14 @@ sub delete
     my $keys  = { @_ };
     my $table = $keys->{TABLE};
     my $hash  = $keys->{DATA};
+    my $all   = $keys->{ALL};
 
     my $sql = "delete from ".$self->{schema}->get_table_name ($table)." where ";
+
+    if (!defined $hash && $all) {
+        $sql .= '1'; # delete everything
+        $hash = {};  # so that foreach below works 
+    }
 
     my @list   = ();
 

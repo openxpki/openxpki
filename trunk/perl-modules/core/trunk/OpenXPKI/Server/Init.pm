@@ -295,6 +295,14 @@ sub __do_init_dbi_backend {
 	{
 	    dbi_backend => $dbi,
 	});
+    # delete leftover secrets
+    CTX('dbi_backend')->connect();
+    CTX('dbi_backend')->delete(
+        TABLE => 'SECRET',
+        ALL   => 1, 
+    );
+    CTX('dbi_backend')->commit();
+    CTX('dbi_backend')->disconnect();
 }
 
 sub __do_init_dbi_workflow {
