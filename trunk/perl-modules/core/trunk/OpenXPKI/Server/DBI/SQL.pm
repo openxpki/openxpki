@@ -317,7 +317,7 @@ sub delete
     my $sql = "delete from ".$self->{schema}->get_table_name ($table)." where ";
 
     if (!defined $hash && $all) {
-        $sql .= '1'; # delete everything
+        $sql .= '1 = 1'; # delete everything
         $hash = {};  # so that foreach below works 
     }
 
