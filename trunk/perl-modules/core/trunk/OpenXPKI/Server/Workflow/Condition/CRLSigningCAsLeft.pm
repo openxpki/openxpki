@@ -10,6 +10,7 @@ use base qw( Workflow::Condition );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft';
 use English;
 
 sub _init
@@ -21,6 +22,7 @@ sub _init
 
 sub evaluate
 {
+    ##! 1: 'start'
     my ( $self, $workflow ) = @_;
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
@@ -36,7 +38,9 @@ sub evaluate
     
     my $ca_ids_ref = $serializer->deserialize($context_ca_ids);
     my @ca_ids = @{$ca_ids_ref};
+    ##! 16: 'number of entries in ca_ids: ' . scalar @ca_ids
     if (scalar @ca_ids == 1) { # we have arrived at the last CA
+        ##! 32: 'last ca_id reached'
         condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_NO_CA_LEFT');
     }
     return 1;

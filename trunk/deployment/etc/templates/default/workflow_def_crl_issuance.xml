@@ -23,14 +23,20 @@
     <action name="issue_crl"
             resulting_state="CRL_ISSUED">
       <condition name="ca_key_usable"/> 
-      <!-- <condition name="profile_available"/> --> 
     </action>
 
-<!--    <action name="sleep"
-            resulting_state="PROFILE_PREPARED">
+    <action name="null"
+            resulting_state="CA_KEY_NOT_USABLE">
        <condition name="!ca_key_is_usable"/>
     </action>
--->
+  </state>
+
+  <state name="CA_KEY_NOT_USABLE">
+    <!-- continue = get_crl_profile -->
+    <action name="continue" 
+	    resulting_state="PROFILE_PREPARED">
+        <condition name="ca_key_usable"/>
+    </action>
   </state>
 
   <state name="CRL_ISSUED" autorun="yes">
@@ -47,10 +53,10 @@
         <condition name="crl_signing_cas_left"/>
      </action>
      <action name="null"
-             resulting_state="FINISHED">
+             resulting_state="SUCCESS">
         <condition name="!crl_signing_cas_left"/>
      </action>
   </state>
-  <state name="FINISHED"/>
+  <state name="SUCCESS"/>
 
 </workflow>

@@ -29,7 +29,10 @@ sub evaluate
     );
     ##! 16: 'CA token retrieved'
     if (!defined $ca_token || ! $ca_token->key_usable()) {
-        ##! '16: key unusable condition error'
+        if (!defined $ca_token) {
+            ##! 32: 'ca token undefined!'
+        }
+        ##! 16: 'key unusable condition error'
         condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_KEY_UNUSABLE");
     }
     ##! 1: 'end'

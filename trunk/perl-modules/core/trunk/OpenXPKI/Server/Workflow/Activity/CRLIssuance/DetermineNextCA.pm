@@ -51,7 +51,10 @@ sub execute {
         }
         ##! 32: 'crl_issung_cas: ' . Dumper(\@crl_issuing_cas)
         my $ca_ids_serialized = $serializer->serialize(\@crl_issuing_cas);
-        $context->param('ca_ids' => $ca_ids_serialized)
+        $context->param('ca_ids' => $ca_ids_serialized);
+        # set the ca to the next issuing CA, this is needed for
+        # the key usable check
+        $context->param('ca' => $crl_issuing_cas[0]);
     }
     else {
         ##! 4: 'context ca_ids defined'
@@ -77,6 +80,11 @@ sub execute {
         shift @ca_ids; # delete first element
         my $ca_ids_serialized = $serializer->serialize(\@ca_ids);
         $context->param('ca_ids' => $ca_ids_serialized);
+        if (scalar @ca_ids) {
+            # set the ca to the next issuing CA, this is needed for
+            # the key usable check
+            $context->param('ca' => $ca_ids[0]); 
+        }
     }    
     
     ##! 16: Dumper($context)

@@ -1,39 +1,24 @@
 <actions>
-  <!-- implicit autorun and no user interaction - so no I18N name for this
-       activity -->
   <action name="determine_next_ca"
 	  class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::DetermineNextCA">
   </action>
 
-  <!-- autorun and no user interaction - so no I18N name for this
-       activity -->
   <action name="get_crl_profile"
 	  class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::GetCRLProfile"> 
   </action>
 
+  <action name="continue"
+	  class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::GetCRLProfile"> 
+  </action>
 
-  <!-- autorun and no user interaction - so no I18N name for this
-       activity -->
   <action name="issue_crl"
 	class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::IssueCRL">
   </action>
 
-  <!-- autorun and no user interaction - so no I18N name for this
-       activity -->
-  <action name="sleep"
-        class="Workflow::Action::Null">
-  </action>
-
-    <!-- class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"> -->
-  <!-- autorun and no user interaction - so no I18N name for this
-       activity -->
   <action name="publish_crl"
         class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::PublishCRL">
   </action>
 
-	  <!-- class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::IssueCRL"> -->
-  <!-- autorun and no user interaction - so no I18N name for this
-       activity -->
   <action name="null"
 	  class="Workflow::Action::Null">
   </action>
