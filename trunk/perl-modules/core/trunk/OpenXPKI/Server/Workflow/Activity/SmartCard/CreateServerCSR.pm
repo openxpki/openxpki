@@ -15,6 +15,7 @@ use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::SmartCard::CreateServ
 use OpenXPKI::Serialization::Simple;
 
 use Data::Dumper;
+use Template;
 
 sub execute {
     ##! 1: 'start'
@@ -38,21 +39,27 @@ sub execute {
     }
     my $current_pos = scalar @cert_issuance_data;
     
-    my $cert_subject = $self->param('cert_subject');
-    # replace every %var% occurence with the corresponding
-    # value from the ldap_... variables in the workflow context
-    while (my ($var) = ($cert_subject =~ m{ %(.*?)% }xms)) {
-        my $value = $context->param("ldap_$var") || '';
-        $cert_subject =~ s{ %$var% }{ $value }xmse;
+    # prepare LDAP variable hashref for Template Toolkit
+    my $ldap_vars;
+    foreach my $param (keys %{ $context->param() }) {
+        if ($param =~ s{ \A ldap_ }{}xms) {
+            ##! 64: 'adding param ' . $param . ' to ldap_vars, value: ' . $context->param('ldap_' . $param)
+            $ldap_vars->{$param} = $context->param('ldap_' . $param);
+        }
     }
+    # process subject using TT
+    my $template = $self->param('cert_subject');
+    my $tt = Template->new();
+    my $cert_subject = '';
+    $tt->process(\$template, $ldap_vars, \$cert_subject);
     ##! 16: 'cert_subject: ' . $cert_subject
 
-    my $cert_subj_alt_names = $self->param('cert_subject_alt_names');
-    while (my ($var) = ($cert_subj_alt_names =~ m{ %(.*?)% }xms)) {
-        my $value = $context->param("ldap_$var") || '';
-        $cert_subj_alt_names =~ s{ %$var% }{ $value }xmse;
-    }
+    # process subject alternative names using TT
+    $template = $self->param('cert_subject_alt_names');
+    my $cert_subj_alt_names = '';
+    $tt->process(\$template, $ldap_vars, \$cert_subj_alt_names);
     ##! 16: 'cert_subj_alt_names: ' . $cert_subj_alt_names
+
     my @sans = split /,/, $cert_subj_alt_names;
     foreach my $entry (@sans) {
         my @tmp_array = split /=/, $entry;
