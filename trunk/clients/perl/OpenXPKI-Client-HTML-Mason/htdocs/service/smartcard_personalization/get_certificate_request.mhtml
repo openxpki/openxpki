@@ -37,6 +37,10 @@
 <script type="text/javascript">
 <!--
     function DisableButtonAndCreateCSR() {
+        if (navigator.appName != 'Microsoft Internet Explorer') {
+            alert('<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED') %>');
+            return;
+        }
         CreateCSR('silent');
         document.OpenXPKI.Submit.disabled = true;
         //document.OpenXPKI.Submit.style.display = 'none';

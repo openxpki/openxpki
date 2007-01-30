@@ -2,7 +2,7 @@
 # Copyright (C) 2005-2006 The OpenXPKI Project
 # This file is distributed under the same license as the OpenXPKI package.
 # Petr Grigoriev <pgrig@cryptocom.ru>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
@@ -193,17 +193,18 @@ msgstr "Серийный номер"
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL_DESCRIPTION"
 msgstr ""
-"Серийный номер сертификата - это уникальное число, "
-"содержащееся в самом сертификате. Это не есть какой-либо внутренний "
-"идентификатор удостоверяющего центра, выдавшего сертификат."
+"Серийный номер сертификата - это уникальное число, содержащееся в самом "
+"сертификате. Это не есть какой-либо внутренний идентификатор удостоверяющего "
+"центра, выдавшего сертификат."
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL"
 msgstr "Серийный номер заявки"
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL_DESCRIPTION"
 msgstr ""
-"Серийный номер заявки устанавливает соответствие сертификата "
-"исходному документу, инициировавшему выпуск сертификата - так называемой, " "заявке на сертификат (CSR)."
+"Серийный номер заявки устанавливает соответствие сертификата исходному "
+"документу, инициировавшему выпуск сертификата - так называемой, заявке на "
+"сертификат (CSR)."
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_EMAIL"
 msgstr "Адрес электронной почты"
@@ -215,8 +216,9 @@ msgid "I18N_OPENXPKI_CERT_SEARCH_ISSUER"
 msgstr "Поставщик"
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_ISSUER_DESCRIPTION"
-msgstr "Имя субъекта в корневом сертификате удостоверяющего центра, "
-"выдавшего сертификат."
+msgstr ""
+"Имя субъекта в корневом сертификате удостоверяющего центра, выдавшего "
+"сертификат."
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT"
 msgstr "Субъект"
@@ -274,8 +276,8 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_DESCRIPTION"
 msgstr ""
-"Если Вы действительно хотите утвердить заявку на сертификат "
-"нажмите кнопку \"Выполнить операцию\"."
+"Если Вы действительно хотите утвердить заявку на сертификат нажмите кнопку "
+"\"Выполнить операцию\"."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_TITLE"
 msgstr "Утверждение заявки на сертификат"
@@ -308,27 +310,27 @@ msgstr "Изменение профиля в заявке"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_ROLE_DESCRIPTION"
 msgstr ""
-"Если вы действительно хотите изменить роль в заявке на сертификат, "
-"выберите, пожалуйста, из списка роль, которую Вы хотите записать в заявку "
-"и нажмите кнопку \"Выполнить операцию\"."
+"Если вы действительно хотите изменить роль в заявке на сертификат, выберите, "
+"пожалуйста, из списка роль, которую Вы хотите записать в заявку и нажмите "
+"кнопку \"Выполнить операцию\"."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_ROLE_TITLE"
 msgstr "Измение роли в заявке на сертификат"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_ALT_NAME_DESCRIPTION"
 msgstr ""
-"Если вы действительно хотите изменить альтернативное имя субъекта "
-"в заявке на сертификат, заполните, пожалуйста, поля нового "
-"альтернативного имени и нажмите кнопку \"Выполнить операцию\"."
+"Если вы действительно хотите изменить альтернативное имя субъекта в заявке "
+"на сертификат, заполните, пожалуйста, поля нового альтернативного имени и "
+"нажмите кнопку \"Выполнить операцию\"."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_ALT_NAME_TITLE"
 msgstr "Изменение альтернативного имени субъекта в заявке на сертификат"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_DESCRIPTION"
 msgstr ""
-"Если вы действительно хотите изменить имя субъекта "
-"в заявке на сертификат, заполните, пожалуйста, поля, формирующие новое "
-"имя субъекта и нажмите кнопку \"Выполнить операцию\"."
+"Если вы действительно хотите изменить имя субъекта в заявке на сертификат, "
+"заполните, пожалуйста, поля, формирующие новое имя субъекта и нажмите кнопку "
+"\"Выполнить операцию\"."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_STYLE_DESCRIPTION"
@@ -366,6 +368,14 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXPORT_CSR_TITLE"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_FAIL_WORKFLOW_DESCRIPTION"
+msgstr "Описание"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_FAIL_WORKFLOW_TITLE"
+msgstr "Веб-интерфейс Удостоверяющего Центра"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_INSERT_CSR_DESCRIPTION"
 msgstr "Описания полей формы"
 
@@ -375,65 +385,61 @@ msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_DESCRIPTION"
 msgstr ""
-"Если Вы действительно хотите отклонить заявку на сертификат "
-"нажмите кнопку \"Выполнить операцию\"."
+"Если Вы действительно хотите отклонить заявку на сертификат нажмите кнопку "
+"\"Выполнить операцию\"."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_TITLE"
 msgstr "Отклонение заявки на сертификат"
 
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
 msgstr ""
-"Ниже приведены основные сведения о выбранном сертификате УЦ, а также "
-"ссылки, позволяющие загрузить и установить сертификат. "
-"По ссылке также доступна более подробная информация о сертификате."
+"Ниже приведены основные сведения о выбранном сертификате УЦ, а также ссылки, "
+"позволяющие загрузить и установить сертификат. По ссылке также доступна "
+"более подробная информация о сертификате."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
 msgstr "Сертификат УЦ"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_DESCRIPTION"
-msgstr ""
-"Ниже приведена детальная информация о выбранном сертификате."
+msgstr "Ниже приведена детальная информация о выбранном сертификате."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
 msgstr "Подробное описание содержимого сертификата"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
 msgstr ""
-"Ниже приведены основные сведения о найденных сертификатах, а также "
-"ссылки, позволяющие загрузить и установить сертификаты. "
-"По ссылке также доступна более подробная информация о каждом сертификате."
+"Ниже приведены основные сведения о найденных сертификатах, а также ссылки, "
+"позволяющие загрузить и установить сертификаты. По ссылке также доступна "
+"более подробная информация о каждом сертификате."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE"
 msgstr "Сертификаты "
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
 msgstr ""
-"Здесь Вы можете просмотреть список найденных сертификатов, "
-"соответствующих заданным Вами условиям."
+"Здесь Вы можете просмотреть список найденных сертификатов, соответствующих "
+"заданным Вами условиям."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE"
 msgstr "Результаты поиска сертификатов "
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_DESCRIPTION"
 msgstr ""
-"Поиск сертификатов в базе данных можно выполнять с использованием "
-"шаблонов для полей, детальное описание которых приведено ниже."
+"Поиск сертификатов в базе данных можно выполнять с использованием шаблонов "
+"для полей, детальное описание которых приведено ниже."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_TITLE"
 msgstr "Поиск сертификатов"
 
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_DESCRIPTION"
 msgstr ""
 "Ниже перечислены параметры сертификатов, образующих цепочку доверия "
-"выбранного сертификата УЦ. "
-"Гиперссылка позволит Вам загрузить всю цепочку сертификатов."
+"выбранного сертификата УЦ. Гиперссылка позволит Вам загрузить всю цепочку "
+"сертификатов."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_TITLE"
 msgstr "Цепочка доверия сертификата УЦ "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CLEAR_SECRET_DESCRIPTION"
 msgstr ""
 
@@ -444,8 +450,8 @@ msgstr "Веб-интерфейс Удостоверяющего Центра"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CRL_LIST_DESCRIPTION"
 msgstr ""
 "Ниже перечислены все списки отзыва сертификатов в данной инфраструктуре "
-"открытых ключей. "
-"Гиперссылки позволят Вам загрузить необходимый список отзыва."
+"открытых ключей. Гиперссылки позволят Вам загрузить необходимый список "
+"отзыва."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CRL_LIST_TITLE"
 msgstr "Списки отзыва сертификатов (стоп-листы или CRL)"
@@ -453,19 +459,16 @@ msgstr "Списки отзыва сертификатов (стоп-листы 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_DESCRIPTION"
 msgstr ""
 "В данном списке перечислены все сертификаты УЦ в данной инфраструктуре "
-"открытых ключей. "
-"Информационные страницы, доступные через гиперссылки, "
-"содержат детальную информацию о сертификатах. "
-"Если Вам необходимо найти сертификат для завершения цепочки проверок "
-"ЭЦП, используйте гиперссылки на цепочки сертификатов."
+"открытых ключей. Информационные страницы, доступные через гиперссылки, "
+"содержат детальную информацию о сертификатах. Если Вам необходимо найти "
+"сертификат для завершения цепочки проверок ЭЦП, используйте гиперссылки на "
+"цепочки сертификатов."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_TITLE"
 msgstr "Сертификаты Удостоверяющих Центров"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_KEY_LIST_DESCRIPTION"
 msgstr ""
-
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_KEY_LIST_TITLE"
@@ -473,24 +476,22 @@ msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_DESCRIPTION"
 msgstr ""
-"Вы работаете с удостоверяющим центром \"__PKI_REALM__\". "
-"Удостоверяющий центр представляет собой рабочее пространство "
-"системы, в котором будут выполняться все "
-"операции, доступные через данный интерфейс."
+"Вы работаете с удостоверяющим центром \"__PKI_REALM__\". Удостоверяющий "
+"центр представляет собой рабочее пространство системы, в котором будут "
+"выполняться все операции, доступные через данный интерфейс."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_TITLE"
 msgstr "Удостоверяющий центр \"__PKI_REALM__\""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_POLICY_LIST_DESCRIPTION"
 msgstr ""
-"Ниже приведены ссылки на официальные документы удостоверяющих центров "
-"данной инфраструктуры открытых ключей. В этих документах Вы найдете описание "
+"Ниже приведены ссылки на официальные документы удостоверяющих центров данной "
+"инфраструктуры открытых ключей. В этих документах Вы найдете описание "
 "политик безопасности удостоверяющих центров и правила выдачи сертификатов."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_POLICY_LIST_TITLE"
 msgstr "Политики безопасности Удостоверяющих Центров"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SET_SECRET_DESCRIPTION"
 msgstr ""
 
@@ -608,8 +609,9 @@ msgstr "Дополнительные сведения"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_DESCRIPTION"
 msgstr ""
-"Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор существенно "
-"повлияет на последующие действия системы. Внимательно прочитайте комментарии."
+"Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
+"существенно повлияет на последующие действия системы. Внимательно прочитайте "
+"комментарии."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
 msgstr "Выбор способа генерации ключа"
@@ -665,8 +667,9 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_PASSWORD_POLICY"
 msgstr "Создание закрытого ключа"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_DESCRIPTION"
-msgstr "Введите, пожалуйста, имя файла, в котором хранится заявка "
-"в формате PKCS#10. Для поиска файла используйте кнопку \"Обзор...\""
+msgstr ""
+"Введите, пожалуйста, имя файла, в котором хранится заявка в формате PKCS#10. "
+"Для поиска файла используйте кнопку \"Обзор...\""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_TITLE"
 msgstr "Подача заявки в формате PKCS#10"
@@ -823,7 +826,6 @@ msgstr ""
 "Создать заявку в формате PKCS#10 при помощи броузера Microsoft Internet "
 "Explorer"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_DESCRIPTION"
 msgstr ""
 
@@ -938,7 +940,6 @@ msgstr "The name __DNS__ is not a valid DNS name."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_WRONG_FORMAT_TITLE"
 msgstr "Область PKI"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_ANONYMOUS_MENU_DESCRIPTION"
 msgstr ""
 
@@ -948,30 +949,27 @@ msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_INFO_MENU_DESCRIPTION"
 msgstr ""
-"Здесь Вы можете получить информацию о данном УЦ и его окружении "
-"в инфраструктуре открытых ключей, в частности, доступны перечни сертификатов " "УЦ, списки отозванных сертификатов (CRL), а также "
-"описания политик безопасности УЦ и правил выдачи сертификатов (CPS)."
+"Здесь Вы можете получить информацию о данном УЦ и его окружении в "
+"инфраструктуре открытых ключей, в частности, доступны перечни сертификатов "
+"УЦ, списки отозванных сертификатов (CRL), а также описания политик "
+"безопасности УЦ и правил выдачи сертификатов (CPS)."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_INFO_MENU_TITLE"
 msgstr "Информация об инфраструктуре открытых ключей"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_OP_MENU_DESCRIPTION"
 msgstr ""
-
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_OP_MENU_TITLE"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DATAEXCHANGE_MENU_DESCRIPTION"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DATAEXCHANGE_MENU_TITLE"
 msgstr "Обмен данными между УЦ"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DHANDLER_DESCRIPTION"
 msgstr ""
 
@@ -981,18 +979,18 @@ msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_LANGUAGE_MENU_DESCRIPTION"
 msgstr ""
-"Здесь можете выбрать язык интерфейса по "
-"своему усмотрению. Обратите внимание на то, что в настоящий момент полный "
-"перевод всех сообщений интерфейса сделан не для всех языков. В OpenXPKI не "
-"поддерживается автоматический вывод английской версии "
-"непереведенных сообщений. Вместо английского перевода Вы увидите в этом " "случае системный мнемонический код сообщения. "
-"Если Вы хотите принять участие в переводе сообщений интерфейса OpenXPKI, свяжитесь с группой разработчиков проекта по электронной почте: "
-"openxpki-devel@lists.sourceforge.net"
+"Здесь можете выбрать язык интерфейса по своему усмотрению. Обратите внимание "
+"на то, что в настоящий момент полный перевод всех сообщений интерфейса "
+"сделан не для всех языков. В OpenXPKI не поддерживается автоматический вывод "
+"английской версии непереведенных сообщений. Вместо английского перевода Вы "
+"увидите в этом случае системный мнемонический код сообщения. Если Вы хотите "
+"принять участие в переводе сообщений интерфейса OpenXPKI, свяжитесь с "
+"группой разработчиков проекта по электронной почте: openxpki-devel@lists."
+"sourceforge.net"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_LANGUAGE_MENU_TITLE"
 msgstr "Выбор языка интерфейса"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_RA_OP_MENU_DESCRIPTION"
 msgstr ""
 
@@ -1001,9 +999,9 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_RA_OP_MENU_TITLE"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_WORKFLOW_MENU_DESCRIPTION"
-msgstr "Здесь Вы можете просмотреть информацию о технологических "
-"процессах в УЦ, а также активировать (запустить) новый "
-"технологический процесс."
+msgstr ""
+"Здесь Вы можете просмотреть информацию о технологических процессах в УЦ, а "
+"также активировать (запустить) новый технологический процесс."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_WORKFLOW_MENU_TITLE"
 msgstr "Технологические процессы"
@@ -1021,8 +1019,8 @@ msgstr ""
 "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
 "внимательны - данная система поддерживает множественные реализации "
 "удостоверяющих центров (CA). Если вы не вполне уверены, с какой реализацией "
-"вы в настоящий момент работаете, обратитесь к информационному меню "
-"(пункт \"Информация УЦ\")."
+"вы в настоящий момент работаете, обратитесь к информационному меню (пункт "
+"\"Информация УЦ\")."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE"
 msgstr "Веб-интерфейс Серверного Узла инфраструктуры открытых ключей (PKI)"
@@ -1089,7 +1087,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_WRONG_ROLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_DESCRIPTION"
 msgstr ""
 
@@ -1123,19 +1120,15 @@ msgstr "Область PKI"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET"
 msgstr "Сброс"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024_DESC"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048_DESC"
 msgstr ""
 
@@ -1150,6 +1143,10 @@ msgstr ""
 "пожалуйста, данный способ генерации ключа. Ключ не будет доступен никому (в "
 "том числе и администраторам системы), кроме вас, так как он будет защищен "
 "паролем, известным только вам."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED"
+msgstr "Персонализация смарт-карт"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC"
 msgstr "SPKAC"
@@ -1229,9 +1226,9 @@ msgstr "Описание"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_GET_INSTANCE_INFO_DESCRIPTION"
 msgstr ""
-"Выберите, пожалуйста, формат рисунка, который будет использоваться "
-"при передаче вам графического представления хода выполнения "
-"технологических процессов"
+"Выберите, пожалуйста, формат рисунка, который будет использоваться при "
+"передаче вам графического представления хода выполнения технологических "
+"процессов"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_GET_INSTANCE_INFO_TITLE"
 msgstr "Получить информацию о текущем технологическом процессе"
@@ -1261,8 +1258,8 @@ msgstr " PKCS#10"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_DESCRIPTION"
 msgstr ""
-"Здесь вы можете задать критерии поиска технологических процессов "
-"и просмотреть результаты поиска в базе данных информации по заданным шаблонам."
+"Здесь вы можете задать критерии поиска технологических процессов и "
+"просмотреть результаты поиска в базе данных информации по заданным шаблонам."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_KEY"
 msgstr "Параметр поиска "
@@ -1276,9 +1273,9 @@ msgstr "Значение параметра поиска"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION"
 msgstr ""
 "Здесь приведен перчень найденных в базе данных технологических процессов."
-"Перейдя по ссылке с номером процесса, Вы можете просмотреть "
-"подробное описание процесса и список возможных операций с процессом, "
-"а также выполнить эти операции."
+"Перейдя по ссылке с номером процесса, Вы можете просмотреть подробное "
+"описание процесса и список возможных операций с процессом, а также выполнить "
+"эти операции."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_TITLE"
 msgstr "Результаты поиска технологических процессов в базе данных"
@@ -1320,7 +1317,6 @@ msgstr "Состояние технологического процесса"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE"
 msgstr "Тип технологического процесса"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_ISSUER"
 msgstr ""
 
@@ -1328,11 +1324,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_SERIAL"
 msgstr "Серийный номер "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_COMPROMISE_TIME"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_REASON_NAME"
 msgstr ""
 
@@ -1385,7 +1379,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER"
 msgstr ""
 
@@ -1395,7 +1388,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
 msgstr ""
 
@@ -1455,74 +1447,57 @@ msgstr "Стандартный способ аутентификации пол�
 msgid "I18N_OPENXPKI_CRL_FORMAT"
 msgstr "Формат списка отзыва сертификатов"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_CA_COMPROMISE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_CA_KEY_TIME"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_CERTIFICATE_HOLD"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_CESSATION_OF_OPERATION"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_HOLD_INSTRUCTION"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_KEY_COMPROMISE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_KEY_TIME"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_REMOVE_FROM_CRL"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_SUPERSEDED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_REASON_UNSPECIFIED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_API_CHECK_COMMAND_PARAM_PARAM_PATH_MISMATCH"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_API_COMMAND_ILLEGAL_PARAM"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_PARAMS"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_SPECIFIED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_API_EVAL_ERROR"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_API_IS_ABSTRACT_CLASS"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_API_NEW_MISSING_CLASS"
 msgstr ""
 
@@ -1598,47 +1573,36 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_PKCS12_CSP_IS_NOT_ALPHANUMERIC"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_CANNOT_OPEN_ERRLOG"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_ERROR"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDIN_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDOUT_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_IS_ABSTRACT_CLASS"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_MISSING_ENGINE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_MISSING_SHELL"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_MISSING_TMP"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_TMP_DOES_NOT_EXIST"
 msgstr ""
 
@@ -1703,7 +1667,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_OUTPUT_FORMAT"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_WRONG_DATATYPE"
 msgstr ""
 
@@ -1824,11 +1787,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_DN_FAILURE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_GET_PKCS8_KEYTYPE_MISSING_DATA"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_GET_PKCS8_KEYTYPE_MISSING_PASSWD"
 msgstr ""
 
@@ -1963,7 +1924,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_INCOMPLETE_SECRET"
 msgstr ""
 
@@ -2066,43 +2026,33 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_IMPLEMENTATION_UNAVAILABLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_INSTANTIATION_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_MISSING_PARAMETER"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPIT_N_OR_K_MISSING"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_INVALID_SHARE_VERSION"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_NOT_YET_IMPLEMENTED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_QUORUM_MISSING"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_TOKEN_MISSING"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_WRONG_CHECKSUM"
 msgstr ""
 
@@ -2125,11 +2075,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INIT_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_SECRET_UNDEFINED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_LIST_MEMBER_BY_ID_NOT_FOUND"
 msgstr ""
 
@@ -2148,74 +2096,57 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_INSTANTIATION_OUTSIDE_SERVER_INIT"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_GROUPS_MISSING_PKI_REALM"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_MISSING_GROUP"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_MISSING_PKI_REALM"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_CACHE_TYPE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_CERTIFICATE_NOT_DEFINED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_COULD_NOT_READ_REALM_FROM_CONFIG"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_COULD_NOT_READ_TYPE_ID_FROM_CONFIG"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_INCOMPLETE_CONFIGURATION"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_IS_ABSTRACT_CLASS"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_LOAD_CONFIG_DUPLICATE_ATTRIBUTE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOLKIT_LOAD_CONFIG_EVAL_ERROR"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOL_MAKEJAVAKEYSTORE_COMMAND_CREATE_KEYSTORE_COULD_NOT_GET_CERTIFICATE_ARRAY"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_CERTFILE_MISSING"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_INVALID_ERROR_CODE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_KEYFILE_MISSING"
 msgstr ""
 
@@ -2223,15 +2154,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_ERROR_REPLY_NO_ENGINE"
 msgstr "uid"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_PENDING_REPLY_CERTFILE_MISSING"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_PENDING_REPLY_KEYFILE_MISSING"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_PENDING_REPLY_NO_ENGINE"
 msgstr ""
 
@@ -2266,11 +2194,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_X509_GET_CONVERTED_WRONG_FORMAT"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_X509_GET_IDENTIFIER_NOT_INITIALIZED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_X509_GET_STATUS_NOT_INITIALIZED"
 msgstr ""
 
@@ -2313,55 +2239,42 @@ msgstr "Загрузить цепочку сертифкатов"
 msgid "I18N_OPENXPKI_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_DIR_DOES_NOT_EXIST"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_MISSING_TMP"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPDIR_MAKE_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MAKE_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_READ_FILE_DOES_NOT_EXIST"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_READ_FILE_MISSING_PARAMETER"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_READ_FILE_NOT_READABLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_READ_FILE_OPEN_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_WRITE_FILE_ALREADY_EXISTS"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_WRITE_FILE_NO_CONTENT_SPECIFIED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_WRITE_FILE_NO_FILENAME_SPECIFIED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FILEUTILS_WRITE_FILE_OPEN_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_FOO_BAR"
 msgstr ""
 
@@ -2444,47 +2357,36 @@ msgstr "В данное поле вписывается обычный номе�
 msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
 msgstr "Показать информацию об активных технологических процессах"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_CERT_INSTALLATION_TEST_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_LDAP_MISSING_DATA"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_TITLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_UNKNOWN_CAUSE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_DESC"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_TITLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_APPROVAL_DESC"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_APPROVAL_TITLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_DESC"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE"
 msgstr ""
 
@@ -2506,7 +2408,6 @@ msgstr "Импорт"
 msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
 msgstr "С истекшим сроком действия"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_KEY_LIST"
 msgstr ""
 
@@ -2574,63 +2475,48 @@ msgstr ""
 msgid "I18N_OPENXPKI_HTML_PRINT_BUTTON"
 msgstr "Распечатать информацию"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION_MORE_CERTIFICATES_TEXT"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATIONMORE_CERTIFICATES_TITLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION_TEXT"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_CREATE_IE_CSR"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_ERORR_NO_WF_INFO_DESC"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_ERROR_NO_WF_INFO_TITLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_ERROR_UNKNOWN_STATE_DESC"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_ERROR_UNKNOWN_STATE_TITLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_FAILURE_ISSUANCE_IMPOSSIBLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_INSTALL_CERTIFICATE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_MORE_CERTIFICATE_REQUESTS_TO_BE_GENERATED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_MORE_CSRS_TITLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_INTRO_TEXT"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_TITLE"
 msgstr ""
 
@@ -2650,23 +2536,18 @@ msgstr ""
 "или иной цифровой информации, позволяющей безопасным образом привязать "
 "уникальное имя к конкретному пользователю или объекту."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM"
 msgstr ""
 
@@ -2676,7 +2557,6 @@ msgstr "Следующая страница"
 msgid "I18N_OPENXPKI_LIST_PREV"
 msgstr "Предыдущая страница"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_MODULE_FUNCTION_SPECIFIC_STUFF"
 msgstr ""
 
@@ -2689,11 +2569,9 @@ msgstr "Нет"
 msgid "I18N_OPENXPKI_NOT_AVAILABLE"
 msgstr "Информация недоступна"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_PRIVKEY_DOWNLOAD"
 msgstr ""
 
@@ -2715,31 +2593,24 @@ msgstr ""
 msgid "I18N_OPENXPKI_READ_FILE_OPEN_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SECRET_ACTION"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SECRET_COMPLETE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SECRET_INCOMPLETE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SECRET_LABEL"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SECRET_LOGIN_LINK_LABEL"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SECRET_LOGOUT_LINK_LABEL"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SECRET_STATUS"
 msgstr ""
 
@@ -2761,34 +2632,27 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_ACL_LOAD_SERVER_DUPLICATE_ID_FOUND"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_ACL_CHECK_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_ILLEGAL_PARAM"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_ILLEGAL_WORKFLOW_TITLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_NO_FIRST_ACTIVITY"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_ILLEGAL_PARAM"
 msgstr ""
 
@@ -2798,7 +2662,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_API_GET_CA_CERTIFICATES_PKI_REALM_NOT_SET"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING"
 msgstr ""
 
@@ -2824,44 +2687,39 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_CA_CONFIG"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_PKI_REALM_CONFIG"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_FOUND"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_PUBLIC"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_PRIVATE_KEY_FOR_CERT_COULD_NOT_DETERMINE_KEY_TYPE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOT_FOUND_IN_DB"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_GET_WORKFLOW_INFO_DOT_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED"
+msgstr "SPKAC-строка пуста."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED"
 msgstr ""
@@ -2880,6 +2738,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MISSING_PW_ATTR_IN_ENTRY"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MODULE_BROKEN"
+msgstr "SPKAC-строка пуста."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MORE_THAN_ONE_USER_FOUND"
 msgstr ""
@@ -2908,9 +2770,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_NO_STACK_PRESENT"
-msgstr ""
-
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED"
 msgstr ""
 
@@ -2920,11 +2779,23 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_WRONG_HANDLER"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MODULE_BROKEN"
+msgstr "Стандартный способ аутентификации пользователя системы."
+
 msgid "I18N_OPENXPKI_SERVER_COMMAND_MISSING_SESSION"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_DAEMON_GROUP"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER_GROUP"
+msgstr "SPKAC строка пуста."
 
 msgid "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_USER"
 msgstr ""
@@ -2958,6 +2829,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_COMMIT_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_CONNECT_EXCEPTION"
+msgstr "Значение поля Country (c) - это просто название страны."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_CONNECT_FAILED"
 msgstr ""
@@ -2998,7 +2873,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_GET_COLUMN_TYPE_UNKNOWN_NAME"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_MYSQL_DROP_SEQUENCE_NOT_FORCED"
 msgstr ""
 
@@ -3011,8 +2885,29 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_MYSQL_LAST_INSERT_ID_FAILED"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_DRIVER_LOAD_ERROR"
+msgstr "SPKAC-строка пуста."
+
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_WRONG_TYPE_IN_SCHEMA"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_ORACLE_DROP_SEQUENCE_NOT_FORCED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_ORACLE_GET_DSN_NO_DATABASE_NAME"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_ORACLE_GET_NEW_SERIAL_FAILED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_ORACLE_GET_NEW_SERIAL_NO_TABLE"
+msgstr ""
+"Используемая структура не предусматривает использование названия организации."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_POSTGRESQL_DROP_SEQUENCE_NOT_FORCED"
 msgstr ""
@@ -3026,7 +2921,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_NO_TABLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_DRIVER_SQLITE_DROP_SEQUENCE_NOT_FORCED"
 msgstr ""
 
@@ -3056,27 +2950,21 @@ msgid "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_INDEX_COLUMNS_UNKNOWN_INDEX"
 msgstr ""
 "Используемая структура не предусматривает использование названия организации."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_INDEX_NAME_UNKNOWN_INDEX"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_INDEX_TABLE_UNKNOWN_INDEX"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_SEQUENCE_NAME_UNKNOWN_SEQUENCE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_COLUMNS_UNKNOWN_TABLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_INDEX_UNKNOWN_TABLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_NAME_UNKNOWN_TABLE"
 msgstr ""
 
@@ -3086,92 +2974,68 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_DELETE_WRONG_OPERATOR"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_INDEX_NOT_FORCED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_TABLE_NOT_FORCED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SYMBOLIC_QUERY_COLUMNS_MISSING_COLUMNS"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_VALIDITY_CONDITION_INCORRECT_VALIDITY_ARGUMENTS"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_NORMALIZE_VALIDITY_INVALID_ARGUMENT"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_ALIAS_NOT_UNIQUE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_COLUMN_NOT_SPECIFIED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_COLUMN_DATA_TYPE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_NUMBER_OF_SYMBOLIC_TABLE_ENTRIES"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_TABLE_SPECIFICATION"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_VALIDITY_SPECIFICATION_TYPE_FOR_JOIN"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_AGGREGATE_SPECIFICATION"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_DYNAMIC_QUERY"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_TABLE_FOR_VALIDITY_CONSTRAINT"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_JOIN_SPECIFICATION_MISMATCH"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_COLUMNS"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_JOIN"
 msgstr ""
-
 
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_TABLE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_COLUMNS_SELECTED"
 msgstr ""
-
 
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_WHERE_CLAUSE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_VALIDITY_SPECIFICATION_MISMATCH_FOR_JOIN"
 msgstr ""
-
 
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_WRONG_COLUMN"
 msgstr ""
@@ -3204,7 +3068,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_INIT_I18N_MISSING_CONFIG"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_INIT_NO_IDENTIFIER_FOUND_IN_ALIASES_DB"
 msgstr ""
 
@@ -3229,7 +3092,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_LOG_EMPTY_LOG_MESSAGE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_LOG_NEW_LOG4PERL_INIT_FAILED"
 msgstr ""
 
@@ -3238,6 +3100,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_COULD_NOT_CHANGE_SOCKET_OWNERSHIP"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_GROUP"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_OWNER"
+msgstr "SPKAC строка пуста."
 
 msgid "I18N_OPENXPKI_SERVER_REDIRECT_STDERR_FAILED"
 msgstr ""
@@ -3260,31 +3134,24 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTISSUANCE_IMPORTCERTDATA_INVALID_CSR_TYPE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CRR_PERSISTREQUEST_SOURCES_UNDEFINED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCES_UNDEFINED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCE_UNDEFINED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SUBJECT_ALT_NAME_SOURCE_UNDEFINED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_BIND_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_CONFIGURATION_BROKEN"
 msgstr ""
 
@@ -3294,47 +3161,36 @@ msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
 "некоторых данных (__FIELDS__)."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_ENTRY_NOT_FOUND"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_MODIFY_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_SEARCH_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_MORE_THAN_ONE_LDAP_ENTRY_FOUND"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_OR_EMPTY_PASSWORD"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_WRONG_KEYTYPE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_CLEANUP_RMTREE_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_COPY_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_MKDIR_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_UNLINK_FAILED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_LOGS_WHO_AM_I_FAILED"
 msgstr ""
 
@@ -3344,193 +3200,127 @@ msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
 "некоторых данных (__FIELDS__)."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_EXPORT_WORKFLOW_INSTANCES_MKDIR_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_MKDIR_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_IMPORT_WORKFLOW_INSTANCES_NO_NEXT_ACTION"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_PACK_ARCHIVE_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_READ_ARCHIVE_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_UNPACK_ARCHIVE_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_DIR_MISSING"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EXTRACTCSR_PKCS10_UNDEFINED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_FORKWORKFLOWINSTANCES_CSR_SERIALS_UNDEFINED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_BIND_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_CONNECTION_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_SEARCH_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_MORE_THAN_ONE_LDAP_ENTRY_FOUND"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PERSISTCSRS_CERT_ISSUANCE_DATA_UNDEFINED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_BIND_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_CONNECTION_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_ENTRY_NOT_FOUND"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_MODIFY_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_SEARCH_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_MORE_THAN_ONE_LDAP_ENTRY_FOUND"
 msgstr ""
-
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_NO_CERTIFICATE_IN_CHILD_WORKFLOW"
 msgstr "Сертификаты"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_NO_CERTS_AVAILABLE_FOR_PUBLICATION"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_NO_WF_CHILDREN"
 msgstr ""
-
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_WRITECERTIFICATETOINSTALL_NO_CERTIFICATE_IN_CHILD_WORKFLOW"
 msgstr "Сертификаты"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_WRITECERTIFICATETOINSTALL_NO_WF_CHILDREN"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MISSING_DESTINATION"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MISSING_STATE"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MKDIR_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_OPEN_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_CHILD_INSTANCE_ID_UNDEFINED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_ERROR_EXECUTING_ACTIVITY"
 msgstr ""
 
-
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_ERROR_FORKING"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_FORK_FAILED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_INSTANCE_NOT_IN_STATE_WAITING_FOR_START"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_MORE_THAN_ONE_ACTIVITY_AVAILABLE"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_NO_ACTIVITIES_AVAILABLE"
 msgstr ""
-
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ACL_NO_ACTIVITY"
@@ -3655,10 +3445,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_FETCH_WORKFLOW_FAILURE"
 msgstr ""
-
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_ID_MISMATCH"
@@ -3735,56 +3523,81 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COMMAND_MISSING"
+msgstr ""
+"Выбранный способ построения имени не позволяет использовать название страны."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COULD_NOT_INSTANTIATE_COMMAND"
+msgstr ""
+"Выбранный способ построения имени не позволяет использовать название страны."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTION_ERROR"
+msgstr "Значение поля Country (c) - это просто название страны."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_ILLEGAL_COMMAND_RETURN_VALUE"
+msgstr ""
+"Используемая структура требует наличия, как минимум, названий одного "
+"подразделения  организации, одной организации и одной страны."
+
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_IMPL_INSTANTIATE_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PERMISSION_DENIED"
+msgstr ""
+"Выбранный способ построения имени не позволяет использовать название страны."
+
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PRIVATE_METHOD_REQUESTED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_NO_REALM_CONFIGURED"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_AUTHENTICATION_STACK_INVALID_AUTH_STACK_REQUESTED"
 msgstr ""
+"Выберите, пожалуйста, способ аутентификации, с помощью которого вы  "
+"удостоверите свою личность."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_INVALID_PKI_REALM_REQUESTED"
 msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
 
-
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED"
 msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_MESSAGE_FAILED"
 msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
 
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_NO_PKI_REALM_CONFIGURED"
 msgstr ""
-
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
-msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_GETCACERT_NO_IDENTIFIER_FOUND"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_IMPL_INSTANTIATE_FAILED"
 msgstr ""
-
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_INVALID_COMMAND"
@@ -3796,15 +3609,11 @@ msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_NO_COMMAND_IMPL"
 msgstr ""
 "Выбранный способ построения имени не позволяет использовать название страны."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_FAILURE_BUT_NO_ERROR_CODE"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_ACTIVITY_FOUND"
 msgstr ""
-
 
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_WORKFLOW_FOUND"
 msgstr ""
@@ -3826,25 +3635,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_SCEP_GET_PKI_REALM_NO_REALM_CONFIGURED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_ALGORITHM_REQUESTED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_PROFILE_REQUESTED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_REALM_REQUESTED"
 msgstr ""
 
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_INVALID_SERVER_REQUESTED"
 msgstr ""
-
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_NO_ENDENTITY_PROFILES_CONFIGURED"
@@ -3876,10 +3677,8 @@ msgstr ""
 "Выбранный способ построения имени требует наличия, как минимум, одного "
 "названия подразделения и двух компонентов доменного имени."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_COMMAND_EXECUTION_FAILED"
 msgstr ""
-
 
 msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_COULD_NOT_INSTANTIATE_COMMAND"
 msgstr ""
@@ -3890,10 +3689,8 @@ msgstr ""
 "Используемая структура требует наличия, как минимум, названий одного "
 "подразделения  организации, одной организации и одной страны."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_MISSING_SERVICE_MESSAGE"
 msgstr ""
-
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_RUN_READ_EXCEPTION"
@@ -4183,7 +3980,8 @@ msgstr ""
 "серверов"
 
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
-msgstr "Технологические процессы приема заявок на сертификаты по протоколу SCEP"
+msgstr ""
+"Технологические процессы приема заявок на сертификаты по протоколу SCEP"
 
 msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION"
 msgstr "Технологические процессы персонализации смарт-карт"
@@ -4496,10 +4294,6 @@ msgstr "Да"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_CORRECT_TIMING"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
 #~ msgstr "SPKAC строка пуста."
 
@@ -4749,6 +4543,3 @@ msgstr "Да"
 #~ msgstr ""
 #~ "The GUID __GUID__ has a wrong format. We support the formats of RFC 4122 "
 #~ "and Microsoft."
-
-
-
