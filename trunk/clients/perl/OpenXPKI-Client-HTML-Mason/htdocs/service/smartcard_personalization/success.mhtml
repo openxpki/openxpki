@@ -31,7 +31,7 @@
     <tr> 
         <td>
       <& /lib/html/a.mhtml,
-         'target' => "/service/api/cert_list.html",
+         'target' => "../api/cert_list.html",
          'params' => [
                       ["csr_serial"  => $csr_serials[$i]],
                       ['submit'      => 'OK'],
