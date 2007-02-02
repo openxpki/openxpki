@@ -4,6 +4,8 @@
 ## for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
 
+set -e
+
 myPWD=`pwd`
 PKGNAME_PREFIX="p5-"
 MAJOR_VERSION="0.9"
@@ -16,7 +18,7 @@ TMP=${HOME}/tmp/${PORT_NAME_SHORT}
 
 if [ ! -d ${myPWD}/${PORT_PATH}/${PORT_NAME} ]; then
   echo -e "Usage: update-port.sh PORT_NAME. \nPossible values of PORT_NAME:\n$(cd ${myPWD}/${PORT_PATH}/ && ls | grep ${PKGNAME_PREFIX})"
-  exit
+  exit 1
 fi
 
 if [ -d ${TMP} ]; then
@@ -32,7 +34,7 @@ else
   echo "No new tarball for the port ${PORT_NAME} was found in"
   echo "${myPWD}/${DISTS_PATH}/"
   echo "Port was not updated."
-  exit
+  exit 1
 fi
 
 echo "========================================================="
@@ -53,3 +55,7 @@ export NOCLEANDEPENDS="yes"
 make clean
 rm Makefile.bak
 rm pkg-plist.0
+
+if [ -d ${TMP} ]; then
+  rm -rf ${TMP} 
+fi
