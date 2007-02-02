@@ -253,6 +253,7 @@ OpenXPKI/Server/Workflow/Condition/CheckCertTestResult.pm
 OpenXPKI/Server/Workflow/Condition/ValidCSRSerialPresent.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowChildrenFailure.pm
 OpenXPKI/Server/Workflow/Condition/IsServerKeyGeneration.pm
+OpenXPKI/Server/Workflow/Condition/CertificateNotYetRevoked.pm
 
 OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
@@ -262,6 +263,8 @@ OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
 OpenXPKI/Server/Workflow/Validator/PKCS10.pm
 OpenXPKI/Server/Workflow/Validator/SPKAC.pm
 OpenXPKI/Server/Workflow/Validator/PasswordQuality.pm
+OpenXPKI/Server/Workflow/Validator/InvalidityTime.pm
+OpenXPKI/Server/Workflow/Validator/ReasonCode.pm
 
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm

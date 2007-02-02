@@ -35,6 +35,8 @@
                                    "ca_info"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",
                                    "create_csr"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CRR",
+                                   "create_crr"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
                                    "cert_search"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",
@@ -46,6 +48,8 @@
                     [
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CRR",
+                                   "create_crr"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",     "workflow"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE", "dataexchange"],
@@ -124,6 +128,10 @@
                     "create_csr" =>
                     {
                         CMD => "service/create_csr/index.html"
+                    },
+                    "create_crr" =>
+                    {
+                        CMD => "service/create_crr/index.html"
                     },
                     "smartcard_personalization" =>
                     {

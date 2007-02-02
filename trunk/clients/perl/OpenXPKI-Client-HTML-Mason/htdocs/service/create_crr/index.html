@@ -1,66 +1,56 @@
-<%args>
-    $workflow_type    => undef
-    $cert_serial        => undef
-    $cert_issuer        => undef
-    $reason_name        => undef
-    $reason_subject     => undef
-    $reason_description => undef
-    $compromise_time    => undef
-</%args>
 <%init>
-    my %params = ();
+    use OpenXPKI::Client::HTML::Mason::CRR;
+    use OpenXPKI::Exception;
+    use English;
+    use Data::Dumper;
 
-    ## which workflow type
-    $params{workflow_type} = $m->comp ('/service/create_crr/get_workflow_type.mhtml',
-                                          %params, 'workflow_type' => $workflow_type);
-    return if (not defined $params{workflow_type});
-
-    ## which certificate
-    ($params{cert_serial}, $params{cert_issuer}) =
-        $m->comp ('/service/create_crr/get_certfificate.mhtml',
-                  %params,
-                  'cert_serial' => $cert_serial,
-                  'cert_issuer' => $cert_issuer);
-    return if (not defined $params{cert_serial} or not length ($params{cert_serial}));
-    return if (not defined $params{cert_issuer} or not length ($params{cert_issuer}));
-
-    ## which compromise time
-    my $params{compromise_time} = $m->comp ('/service/create_crr/get_compromise_time.mhtml',
-                                            %params, 'compromise_time' => $compromise_time);
-    return if (not defined $params{workflow_type});
-
-    ## which reason
-    ($params{reason_name}, $params{reason_subject}, $params{reason_description}) =
-        $m->comp ('/service/create_crr/get_reason.mhtml',
-                  %params,
-                  'reason_name'        => $reason_name,
-                  'reason_subject'     => $reason_subject,
-                  'reason_description' => $reason_description);
-    return if (not defined $params{reason_name} or not length ($params{reason_name}));
-    return if (not defined $params{reason_subject} or not length ($params{reason_subject}));
-    return if (not defined $params{reason_description} or not length ($params{reason_description}));
-
-    ## create the workflow for the new CRR
-    delete $params{workflow_type};
-    my $msg = $context->{client}->send_receive_command_msg (
-                  "create_workflow_instance",
-                  {WORKFLOW => $workflow_type,
-                   PARAMS   => \%params});
-    my $errors = [];
-    if (not ref $msg)
-    {
-        ## ups, this is completely unexpected
-        $errors = [ {LABEL => $msg} ];
+    if (!defined $ARGS{'workflow_type'}) {
+        # no form data is present, let user search for cert
+        $m->comp('/service/create_crr/search.mhtml');
     }
-    elsif (exists $msg->{SERVICE_MSG} and
-           $msg->{SERVICE_MSG} eq "ERROR")
-    {
-        ## detected error
-        $errors = [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ];
-    }
-    else
-    {
-        ## if we reach this point then the workflow is already created
-        return $m->comp ('/service/workflow/show_instance.html', 'msg' => $msg);
+    else {
+        # form has been submitted, try to create CRR object
+        my $crr;
+        eval {
+            $crr = OpenXPKI::Client::HTML::Mason::CRR->new({
+                %ARGS,
+                client => $context->{client},
+            });
+            $crr->validate();
+        };
+        if (my $exc = OpenXPKI::Exception->caught()) {
+            # failed for some reason, redisplay form with errors
+            $m->comp('/service/create_crr/form.html',
+                crr             => $crr,
+                cert_identifier => $ARGS{'cert_identifier'},
+            );
+            return;
+        }
+        elsif ($EVAL_ERROR) {
+            # crashed, display error page
+            my $error = $EVAL_ERROR;
+            $m->comp('/service/create_crr/error.mhtml',
+                error => $error,
+            );
+            return;
+        }
+        # try to create workflow from CRR object 
+        eval {
+            $crr->create_workflow();
+        };
+        if ($EVAL_ERROR) {
+            my $error = $EVAL_ERROR;
+            # crashed, display error page
+            $m->comp('/service/create_crr/error.mhtml',
+                error => $error,
+            );
+        }
+        else {
+            # everything is fine, display freshly created workflow
+            return $m->comp ('/service/workflow/show_instance.html',
+                type => $crr->get_workflow_type(),
+                id   => $crr->get_workflow_id(),
+            );
+        }
     }
 </%init>

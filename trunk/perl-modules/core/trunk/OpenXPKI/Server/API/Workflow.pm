@@ -426,10 +426,10 @@ sub search_workflow_instances {
     #    COLUMNS   => ...
     #    JOIN      => [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
     #    DYNAMIC   => {
-    #                   WORKFLOW_CONTEXT_0.WORKFLOW_CONTEXT_KEY = $key1,
-    #                   WORKFLOW_CONTEXT_0.WORKFLOW_CONTEXT_VALUE = $value1,
-    #                   WORKFLOW_CONTEXT_1.WORKFLOW_CONTEXT_KEY = $key2,
-    #                   WORKFLOW_CONTEXT_1.WORKFLOW_CONTEXT_VALUE = $value2,
+    #                   WORKFLOW_CONTEXT_0.WORKFLOW_CONTEXT_KEY => $key1,
+    #                   WORKFLOW_CONTEXT_0.WORKFLOW_CONTEXT_VALUE => $value1,
+    #                   WORKFLOW_CONTEXT_1.WORKFLOW_CONTEXT_KEY => $key2,
+    #                   WORKFLOW_CONTEXT_1.WORKFLOW_CONTEXT_VALUE => $value2,
     #                   WORKFLOW.PKI_REALM = $realm,
     #                 },
     # );

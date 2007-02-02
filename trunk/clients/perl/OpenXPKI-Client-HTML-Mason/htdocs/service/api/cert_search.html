@@ -1,3 +1,6 @@
+<%args>
+    $revocation => 0
+</%args>
 <h1>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_TITLE') %>
 </h1>
@@ -5,8 +8,9 @@
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_SEARCH_DESCRIPTION') %>
 </p>
 
-<& /service/open_form.mhtml, action => 'cert_list.html' &>
+<& /service/open_form.mhtml, action => $context->{menu}->get_root().'/service/api/cert_list.html' &>
 
+<& /lib/html/hidden.mhtml, name => 'revocation', value => $revocation &>
 <table>
   <tr>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME') %></th>

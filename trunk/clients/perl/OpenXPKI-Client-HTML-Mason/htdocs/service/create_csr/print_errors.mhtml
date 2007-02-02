@@ -7,7 +7,15 @@
     <ul>
 %   foreach my $error (@errors)
 %   {
-      <li><% i18nGettext($error->{LABEL}, %{$error->{PARAMS}}) %></li>
+%     if (ref $error eq 'HASH') {
+        <li><% i18nGettext($error->{LABEL}, %{$error->{PARAMS}}) %></li>
+%     }
+%     elsif (ref $error eq '') {
+        <li><% i18nGettext($error) %></li>
+%     }
+%     else {
+        <li><% Dumper $error %></li>
+%     }
 %   }
     </ul>
 % }

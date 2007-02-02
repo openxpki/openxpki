@@ -71,6 +71,12 @@
   </permission>
   <permission>
     <server>*</server>
+    <activity>Workflow::create_crr</activity>
+    <affected_role>*</affected_role>
+    <auth_role>*</auth_role>
+  </permission>
+  <permission>
+    <server>*</server>
     <activity>Workflow::persist_csr</activity>
     <affected_role>*</affected_role>
     <auth_role>*</auth_role>

@@ -40,6 +40,14 @@ our %COLUMN = (
     "identifier"       => "TEXT_KEY",
     "alias"            => "TEXT_KEY",
 
+    'creator'          => 'TEXT_KEY',
+    'creator_role'     => 'TEXT_KEY',
+    'reason_code'      => 'TEXT_KEY',
+    'invalidity_time'  => 'NUMERIC',
+    'revocation_time'  => 'NUMERIC',
+    'comment'          => 'TEXT',
+    'hold_code'        => 'TEXT_KEY',
+
     "cert_key"         => "NUMERIC",
     "req_key"          => "BIGINT",
     "crr_key"          => "BIGINT",

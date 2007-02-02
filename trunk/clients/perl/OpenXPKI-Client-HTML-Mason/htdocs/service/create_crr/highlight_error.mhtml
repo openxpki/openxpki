@@ -1,0 +1,9 @@
+<%args>
+    $crr  => undef
+    $name => undef 
+</%args>
+% if (defined $crr) {
+%     if (defined $crr->get_errors()->{$name}) {
+ class="highlight_error"\
+%     }
+% }

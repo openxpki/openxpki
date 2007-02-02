@@ -13,6 +13,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest';
 use OpenXPKI::Serialization::Simple;
+use DateTime;
 
 sub execute
 {
@@ -22,6 +23,8 @@ sub execute
     my $pki_realm  = CTX('api')->get_pki_realm();
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $dbi        = CTX('dbi_backend');
+    my $identifier = $context->param('cert_identifier');
+
     my $crr_serial = $dbi->get_new_serial(
         TABLE => 'CRR',
     );
@@ -33,40 +36,32 @@ sub execute
         );
     }
 
-    my @list = (
-                "creator", "creator_role",
-                "cert_serial", "cert_identifier",
-                "reason_name", "reason_subject", "reason_description",
-                "compromise_time"
-               );
-    foreach my $field (@list)
-    {
-        my $source = $source_ref->{$field};
-        if (! defined $source) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCE_UNDEFINED',
-                params  => {"NAME" => $field, "VALUE" => $context->param($field)}
-            );
-        }
-
-        ##! 64: 'source: ' . $source
-        ##! 64: 'name:   ' . $field
-        ##! 64: 'value:  ' . $$context->param($field)
-        my $attrib_serial = $dbi->get_new_serial(
-            TABLE => 'CRR_ATTRIBUTES',
-        );
-        $dbi->insert(
-            TABLE => 'CRR_ATTRIBUTES',
+    my $dt = DateTime->now();
+    $dbi->insert(
+            TABLE => 'CRR',
             HASH  => {
-                'ATTRIBUTE_SERIAL' => $attrib_serial,
-                'PKI_REALM'        => $pki_realm,
                 'CRR_SERIAL'       => $crr_serial,
-                'ATTRIBUTE_KEY'    => $field,
-                'ATTRIBUTE_VALUE'  => $context->param($field),
-                'ATTRIBUTE_SOURCE' => $source,
+                'PKI_REALM'        => $pki_realm,
+                'CREATOR'          => $context->param('creator'),
+                'CREATOR_ROLE'     => $context->param('creator_role'),
+                'IDENTIFIER'       => $context->param('cert_identifier'),
+                'REASON_CODE'      => $context->param('reason_code'),
+                'REVOCATION_TIME'  => $dt->epoch(),
+                'INVALIDITY_TIME'  => $context->param('invalidity_time'),
+                'COMMENT'          => $context->param('comment'),
+                'HOLD_CODE'        => $context->param('hold_code'),
             },
-        );
-    }
+    );
+    $dbi->update(
+        TABLE => 'CERTIFICATE',
+        DATA  => {
+            'STATUS' => 'CRL_ISSUANCE_PENDING',
+        },
+        WHERE => {
+            'PKI_REALM'  => $pki_realm,
+            'IDENTIFIER' => $identifier,
+        },
+    );
     $dbi->commit();
     $context->param('crr_serial' => $crr_serial);
 }

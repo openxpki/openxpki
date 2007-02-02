@@ -91,32 +91,8 @@ sub execute {
         },
     );
     if (defined $already_revoked_certs) {
-        ##! 16: 'already revoked certificates present'
-        foreach my $cert (@{$already_revoked_certs}) {
-            ##! 32: 'revoked cert: ' . Dumper $cert
-            my $data       = $cert->{'DATA'};
-            my $timestamp  = 0; # default if no approval date found
-            my $identifier = $cert->{'IDENTIFIER'};
-            my $earliest_approved_crr = $dbi->first(
-                TABLE   => 'CRR',
-                COLUMNS => [
-                    'APPROVAL_DATE',
-                ],
-                DYNAMIC => {
-                    'PKI_REALM'  => $pki_realm,
-                    'IDENTIFIER' => $identifier,
-                    'STATUS'     => 'APPROVED',
-                },
-            );
-            if (defined $earliest_approved_crr) {
-                $timestamp = $earliest_approved_crr->{'APPROVAL_DATE'};
-                ##! 32: 'earliest approved crr present: ' . $timestamp
-            }
-            my $dt = DateTime->from_epoch(
-                epoch => $timestamp,
-            );
-            push @cert_timestamps, [ $data, $dt->iso8601() ];
-        }
+        push @cert_timestamps,
+                $self->__prepare_crl_data($already_revoked_certs);
     }
     ##! 16: 'cert_timestamps after first step: ' . Dumper(\@cert_timestamps)
 
@@ -133,43 +109,8 @@ sub execute {
         },
     );
     if (defined $certs_to_be_revoked) {
-        ##! 16: 'certificates to be freshly included in CRL present'
-        foreach my $cert (@{$certs_to_be_revoked}) {
-            ##! 32: 'cert to be revoked: ' . Dumper $cert
-            my $data       = $cert->{'DATA'};
-            my $timestamp  = 0; # default if no approval date found
-            my $identifier = $cert->{'IDENTIFIER'};
-            my $earliest_approved_crr = $dbi->first(
-                TABLE   => 'CRR',
-                COLUMNS => [
-                    'APPROVAL_DATE',
-                ],
-                DYNAMIC => {
-                    'PKI_REALM'  => $pki_realm,
-                    'IDENTIFIER' => $identifier,
-                    'STATUS'     => 'APPROVED',
-                },
-            );
-            if (defined $earliest_approved_crr) {
-                $timestamp = $earliest_approved_crr->{'APPROVAL_DATE'};
-                ##! 32: 'earliest approved crr present: ' . $timestamp
-            }
-            my $dt = DateTime->from_epoch(
-                epoch => $timestamp,
-            );
-            push @cert_timestamps, [ $data, $dt->iso8601() ];
-            # set status in certificate db to revoked
-            $dbi->update(
-                TABLE => 'CERTIFICATE',
-                DATA  => {
-                    STATUS => 'REVOKED',
-                },
-                WHERE => {
-                    IDENTIFIER => $identifier,
-                },
-            ); 
-            $dbi->commit();
-        }
+        push @cert_timestamps,
+                $self->__prepare_crl_data($certs_to_be_revoked);
     }
     ##! 32: 'cert_timestamps after 2nd step: ' . Dumper \@cert_timestamps 
         
@@ -202,6 +143,62 @@ sub execute {
     # publish_crl can then publish all those with a PUBLICATION_DATE of -1
     # and set it accordingly
     return 1;
+}
+
+sub __prepare_crl_data {
+    my $self = shift;
+    my $certs_to_be_revoked = shift;
+
+    my @cert_timestamps;
+    my $dbi       = CTX('dbi_backend');
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    foreach my $cert (@{$certs_to_be_revoked}) {
+        ##! 32: 'cert to be revoked: ' . Dumper $cert
+        my $data       = $cert->{'DATA'};
+        my $revocation_timestamp  = 0; # default if no approval date found
+        my $reason_code = '';
+        my $invalidity_timestamp = '';
+        my $identifier = $cert->{'IDENTIFIER'};
+        my $crr = $dbi->last(
+           TABLE => 'CRR',
+            COLUMNS => [
+                'REVOCATION_TIME',
+                'REASON_CODE',
+                'INVALIDITY_TIME',
+            ],
+            DYNAMIC => {
+                'IDENTIFIER' => $identifier,
+                'PKI_REALM'  => $pki_realm,
+            },
+        );
+        if (defined $crr) {
+            $revocation_timestamp = $crr->{'REVOCATION_TIME'};
+            $reason_code          = $crr->{'REASON_CODE'};
+            $invalidity_timestamp = $crr->{'INVALIDITY_TIME'};
+            ##! 32: 'last approved crr present: ' . $revocation_timestamp
+        }
+        push @cert_timestamps, [ $data, $revocation_timestamp, $reason_code, $invalidity_timestamp ];
+        # update certificate database:
+        my $status = 'REVOKED';
+        if ($reason_code eq 'certificateHold') {
+            $status = 'HOLD';
+        }
+        if ($reason_code eq 'removeFromCRL') {
+            $status = 'ISSUED';
+        }
+        $dbi->update(
+            TABLE => 'CERTIFICATE',
+            DATA  => {
+                STATUS => $status,
+            },
+            WHERE => {
+                IDENTIFIER => $identifier,
+            },
+        ); 
+        $dbi->commit();
+    }
+    return @cert_timestamps;
 }
 
 1;

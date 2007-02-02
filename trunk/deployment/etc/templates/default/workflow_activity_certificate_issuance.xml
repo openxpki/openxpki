@@ -18,7 +18,7 @@
   <action name="do_nothing2"
           class="Workflow::Action::Null">
   </action>
-  <action name="continue"
+  <action name="continue_issuance"
           class="Workflow::Action::Null">
   </action>
 

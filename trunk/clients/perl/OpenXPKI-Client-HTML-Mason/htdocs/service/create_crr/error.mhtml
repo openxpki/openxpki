@@ -1,0 +1,20 @@
+<%args>
+    $error => undef
+</%args>
+<h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_ERROR_TITLE') %></h1>
+% if (ref $error eq 'OpenXPKI::Exception') {
+%    my $msg = $error->{'params'}->{'MESSAGE'};
+%    my @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
+<ul> 
+%    foreach my $err (@errors) {
+        <li><% i18nGettext($err->{'LABEL'}) %></li>    
+%    }
+</ul>
+% }
+% else {
+    <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_UNKNOWN_ERROR') %>
+     <pre>
+<% Dumper $error %>
+     </pre>
+% }
+

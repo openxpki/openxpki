@@ -1,4 +1,4 @@
-## OpenXPKI::Server::DBI::SQL
+# OpenXPKI::Server::DBI::SQL
 ##
 ## Written 2005 by Michael Bell for the OpenXPKI::Server project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
@@ -283,6 +283,11 @@ sub update
         next if (not exists $hash->{$col});
         push @data, $self->{schema}->get_column ($col)." = ?";
         push @list, $hash->{$col};
+    }
+    if (! scalar @data) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_DBI_SQL_UPDATE_NO_DATA_PRESENT',
+        );
     }
     $sql .= " set ".join ", ", @data;
 

@@ -48,7 +48,7 @@
   </state>
 
   <state name="CA_KEY_NOT_USABLE">
-    <action name="continue" 
+    <action name="continue_issuance" 
 	    resulting_state="CA_KEY_USABLE">
         <condition name="ca_key_usable"/>
     </action>

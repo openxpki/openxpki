@@ -1,5 +1,6 @@
 <%args>
   $identifier => undef
+  $revocation => undef
 </%args>
 <h1>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE') %>
@@ -163,6 +164,20 @@
          label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD'),
          params => [["identifier",   $identifier],
                     ["format", "JAVA_KEYSTORE"]] &>
+    </td>
+  </tr>
+% }
+% if ($revocation) {
+  <tr>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <& /lib/html/a.mhtml,
+         target => '/service/create_crr/form.html',
+         label  => i18nGettext('I18N_OPENXPKI_HTML_MASON_CERT_INFO_NEW_CRR'),
+         params => [["cert_identifier",   $identifier]],
+      &>
     </td>
   </tr>
 % }

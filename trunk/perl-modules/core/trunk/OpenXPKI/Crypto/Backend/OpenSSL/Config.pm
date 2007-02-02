@@ -78,14 +78,41 @@ sub set_cert_list
         ##! 4: "handle next certficate"
 
         # end of time_t datatype in C library
-        my ($cert, $timestamp) = (undef, "2038:01:16T23:59:59.9999999");
+        # TODO - does this default make sense?
+        my ($cert, $timestamp) = (undef, "2147483647");
         if (not ref $arrayref)
         {
             $cert      = $arrayref;
         } else {
             $cert      = $arrayref->[0];
-            $timestamp = $arrayref->[1]
-                if (scalar @{$arrayref} > 1);
+            if (scalar @{$arrayref} > 1) {
+                $timestamp = $arrayref->[1];
+                ##! 4: "create timestamp"
+                $timestamp = DateTime->from_epoch(epoch => $timestamp);
+                $timestamp = OpenXPKI::DateTime::convert_date({
+                    DATE      => $timestamp,
+                    OUTFORMAT => 'openssltime',
+                });
+                ##! 16: 'revocation date is present: ' . $timestamp
+            }
+            if (scalar @{$arrayref} > 2) {
+                # append reasonCode
+                $timestamp .= ',' . $arrayref->[2];
+                ##! 16: 'reason code is present: ' . $timestamp
+            }
+            if (scalar @{$arrayref} > 3) {
+                # append invalidity date / Hold instruction OID
+                # FIXME - implement code that treats hold instruction
+                # correctly
+                my $invalidity_date = $arrayref->[3];
+                $invalidity_date = DateTime->from_epoch(epoch => $timestamp);
+                $invalidity_date = OpenXPKI::DateTime::convert_date({
+                    DATE      => $invalidity_date,
+                    OUTFORMAT => 'openssltime',
+                });
+                $timestamp .= ',' . $invalidity_date;
+                ##! 16: 'invalidity date is present: ' . $timestamp
+            }
         }
 
         ##! 4: "get X509 object"
@@ -106,10 +133,8 @@ sub set_cert_list
             }
         }
 
-        ##! 4: "create timestamp"
-        $timestamp = str2time ($timestamp);
-        $timestamp = [ gmtime ($timestamp) ];
-        $timestamp = POSIX::strftime ("%y%m%d%H%M%S",@{$timestamp})."Z";
+#        $timestamp = [ gmtime ($timestamp) ];
+#        $timestamp = POSIX::strftime ("%y%m%d%H%M%S",@{$timestamp})."Z";
         ##! 4: "timestamp = $timestamp"
 
         ##! 4: "create start time - notbefore"

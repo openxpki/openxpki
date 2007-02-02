@@ -10,20 +10,17 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
+use OpenXPKI::Serialization::Simple;
 
 sub execute
 {
-    my $self = shift;
+    my $self     = shift;
     my $workflow = shift;
-
-    ## get needed informations
     my $context = $workflow->context();
+    my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    ## delete approvals
-    ## do not replace the hasref by a hash
-    ## Workflow::Base->param conatins a typical Perl bug
-    ## BUG: unless ( $value )
-    $context->param ({'approvals' => ""});
+    ## delete approvals (set to a serialized empty hashref)
+    $context->param('approvals' => $serializer->serialize({})) ;
 }
 
 

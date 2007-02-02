@@ -27,7 +27,7 @@
 
     <action name="null"
             resulting_state="CA_KEY_NOT_USABLE">
-       <condition name="!ca_key_is_usable"/>
+       <condition name="!ca_key_usable"/>
     </action>
   </state>
 

@@ -18,7 +18,7 @@ sub execute
     my $workflow   = shift;
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    ## get needed informations
+    ## get needed information
     my $context = $workflow->context();
     my $user    = CTX('session')->get_user();
     my $role    = CTX('session')->get_role();

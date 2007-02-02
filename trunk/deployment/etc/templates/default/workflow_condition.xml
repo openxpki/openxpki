@@ -79,13 +79,19 @@
     <param name="role" value="CA Operator"/>
   </condition>
 
-  <!-- general CSR conditions -->
+  <!-- general CRR conditions -->
 
+  <condition name="certificate_not_yet_revoked" class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">
+    <!-- here you can set whether you want accept more CRRs while the
+         certificate is still in state CRL_ISSUANCE_PENDING (as compared
+         to REVOKED) or not -->
+    <param name="crl_issuance_pending_accept" value="1"/>
+  </condition>
   <condition name="ACL::create_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="create_crr"/>
   </condition>
-  <condition name="ACL::change_crr_compromise_time" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_crr_compromise_time"/>
+  <condition name="ACL::change_crr_invalidity_time" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_crr_invalidity_time"/>
   </condition>
   <condition name="ACL::change_crr_reason" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="change_crr_reason"/>
@@ -96,8 +102,8 @@
   <condition name="ACL::cancel_crr_approval" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="cancel_crr_approval"/>
   </condition>
-  <condition name="ACL::revoke_cert" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="revoke_cert"/>
+  <condition name="ACL::revoke_certificate" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="revoke_certificate"/>
   </condition>
   <condition name="ACL::insert_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="insert_crr"/>

@@ -96,7 +96,8 @@ sub __is_valid_message : PRIVATE {
     my $message = $arg_ref->{'MESSAGE'};
     my $message_name = $message->{'SERVICE_MSG'};
 
-    ##! 32: 'message_name: ' . Dumper $message_name
+    ##! 32: 'message_name: ' . $message_name
+    ##! 32: 'state: ' . $state_of{$ident}
     
     # this is a table of valid messages that may be received from the
     # client in the different states

@@ -6,6 +6,7 @@
   $csr_serial  => undef
   $last        => undef
   $first       => undef
+  $revocation  => 0
 </%args>
 <h1>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE') %>
@@ -36,7 +37,10 @@
 </%perl>
         <& /lib/html/a.mhtml,
            'target' => "cert_info.html",
-           'params' => [["identifier", $list{$serial}->{IDENTIFIER}]],
+           'params' => [
+                ["identifier", $list{$serial}->{IDENTIFIER}],
+                ['revocation', $revocation],
+            ],
            'label'  => $serial &>
 <%perl>
     print "    </td>\n";
@@ -129,6 +133,7 @@
                                          # it directly
         $m->comp('cert_info.html',
                    'identifier'  => $msg->{PARAMS}->[0]->{IDENTIFIER},
+                   'revocation'  => $revocation,
         );
         exit;
     }

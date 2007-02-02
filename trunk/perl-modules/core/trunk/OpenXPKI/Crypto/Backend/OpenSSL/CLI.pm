@@ -36,7 +36,8 @@ sub error_ispresent {
                       unable\ to\ load\ key |
                       No\ certificate\ matches\ private\ key |
                       unknown\ option |
-                      Usage:\ pkcs12
+                      Usage:\ pkcs12 |
+                      invalid\ reason\ code 
                     }xms) {
         return 1;
     }

@@ -19,6 +19,7 @@ my %SEQUENCE_of = (
     CERTIFICATE    => "seq_certificate",
     CERTIFICATE_ATTRIBUTES => "seq_certificate_attributes",
     CRR            => "seq_crr",
+#    CRR_ATTRIBUTES => 'seq_crr_attributes',
     # log entries must use auto_increment
     # or whatever the name of this technology is on your database platform
     # AUDITTRAIL     => "seq_audittrail",
@@ -50,6 +51,14 @@ my %COLUMN_of = (
     APPROVAL_DATE         => "approval_date",
     TYPE                  => "format",
     DATA                  => "data",
+
+    CREATOR               => 'creator',
+    CREATOR_ROLE          => 'creator_role',
+    REASON_CODE           => "reason_code",
+    INVALIDITY_TIME       => 'invalidity_time',
+    COMMENT               => 'comment',
+    HOLD_CODE             => 'hold_code',
+    REVOCATION_TIME       => 'revocation_time',
 
     GLOBAL_KEY_ID         => "global_id",
     OBJECT_ID             => "object_id",
@@ -90,7 +99,6 @@ my %COLUMN_of = (
     PUBLIC                => "public_cert",
     
     STATUS                => "status",
-    REVOCATION_REASON     => "reason",
     SERIAL                => "object_serial",
     TABLE                 => "object_type",
     UNTIL                 => "valid_until",
@@ -161,16 +169,24 @@ my %TABLE_of = (
                      "ATTRIBUTE_SOURCE", # "USER" | "OPERATOR" | "EXTERNAL"
 	    ],
     },
-    
-    CRR_ATTRIBUTES => {
-        NAME    => "crr_attributes",
-        INDEX   => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CRR_SERIAL" ],
-        COLUMNS => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CRR_SERIAL",
-		     "ATTRIBUTE_KEY", 
-		     "ATTRIBUTE_VALUE",
-                     "ATTRIBUTE_SOURCE", # "USER" | "OPERATOR" | "EXTERNAL"
-	    ],
+    CRR => {
+        NAME    => 'crr',
+        INDEX   => [ 'CRR_SERIAL', 'PKI_REALM', 'IDENTIFIER' ],
+        COLUMNS => [ 'CRR_SERIAL', 'PKI_REALM', 'IDENTIFIER',
+                     'CREATOR', 'CREATOR_ROLE', 'REASON_CODE',
+                     'INVALIDITY_TIME', 'COMMENT', 'HOLD_CODE',
+                     'REVOCATION_TIME',
+                   ],
     },
+#    CRR_ATTRIBUTES => {
+#        NAME    => "crr_attributes",
+#        INDEX   => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CRR_SERIAL" ],
+#        COLUMNS => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CRR_SERIAL",
+#		     "ATTRIBUTE_KEY", 
+#		     "ATTRIBUTE_VALUE",
+#                     "ATTRIBUTE_SOURCE", # "USER" | "OPERATOR" | "EXTERNAL"
+#	    ],
+#    },
     
     CERTIFICATE => {
         NAME    => "certificate",

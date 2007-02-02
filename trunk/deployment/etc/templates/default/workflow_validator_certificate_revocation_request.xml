@@ -2,4 +2,10 @@
   <validator name="Creator"
              class="OpenXPKI::Server::Workflow::Validator::Creator">
   </validator>
+  <validator name="InvalidityTime"
+             class="OpenXPKI::Server::Workflow::Validator::InvalidityTime">
+  </validator>
+  <validator name="ReasonCode"
+             class="OpenXPKI::Server::Workflow::Validator::ReasonCode">
+  </validator>
 </validators>

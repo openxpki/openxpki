@@ -1,5 +1,5 @@
 <workflow>
-  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
+  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA</type>
   <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_REVOCATION_REQUEST</description>
   <persister>OpenXPKI</persister>
   <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>
@@ -18,19 +18,19 @@
 
   <state name="PENDING">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_PENDING</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_COMPROMISE_TIME"
+    <action name="change_crr_invalidity_time"
 	    resulting_state="PENDING">
-      <condition name="ACL::change_crr_compromise_time"/>
+      <condition name="ACL::change_crr_invalidity_time"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
+    <action name="change_crr_reason"
 	    resulting_state="PENDING">
       <condition name="ACL::change_crr_reason"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
+    <action name="approve_crr"
 	    resulting_state="APPROVAL">
       <condition name="ACL::approve_crr"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
+    <action name="reject_crr"
 	    resulting_state="REJECTED">
       <condition name="ACL::reject_crr"/>
     </action>
@@ -38,22 +38,22 @@
 
   <state name="APPROVAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+    <action name="revoke_certificate"
 	    resulting_state="REVOKED_CERTIFICATE">
-      <condition name="ACL::revoke_cert"/>
+      <condition name="ACL::revoke_certificate"/>
       <condition name="Condition::check_crr_approvals"/>
     </action>
     <!-- perhaps we need more than one approval or                 -->
     <!-- perhaps the first approval was from a not authorized role -->
-    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
+    <action name="approve_crr"
 	    resulting_state="APPROVAL">
       <condition name="ACL::approve_crr"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
+    <action name="cancel_crr_approval"
 	    resulting_state="PENDING">
       <condition name="ACL::cancel_crr_approval"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
+    <action name="reject_crr"
 	    resulting_state="REJECTED">
       <condition name="ACL::reject_crr"/>
     </action>
@@ -61,14 +61,14 @@
 
   <state name="REVOKED_CERTIFICATE" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_REVOKED_CERTIFICATE</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
+    <action name="persist_crr"
 	    resulting_state="PERSISTED_CRR">
       <condition name="ACL::insert_crr"/>
     </action>
   </state>
 
   <state name="PERSISTED_CRR" autorun="yes">
-    <action name="I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
+    <action name="export_crr"
 	    resulting_state="SUCCESS">
       <condition name="ACL::export_crr"/>
     </action>
@@ -96,15 +96,15 @@
   </state>
 
   <state name="IMPORTED_CRR" autorun="yes">
-    <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+    <action name="revoke_certificate"
 	    resulting_state="REVOKED_CERTIFICATE">
-      <condition name="ACL::revoke_cert"/>
+      <condition name="ACL::revoke_certificate"/>
     </action>
   </state>
 
   <state name="REVOKED_CERTIFICATE" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_REVOKED_CERTIFICATE</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
+    <action name="persist_crr"
 	    resulting_state="SUCCESS">
       <condition name="ACL::insert_crr"/>
     </action>
