@@ -2,11 +2,11 @@
 # Date created:				03 Oct 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki-client-soap-lite/Makefile,v 1.1 2006/10/07 12:31:24 rafan Exp $
+# $FreeBSD: ports/security/p5-openxpki-client-soap-lite/Makefile,v 1.2 2007/02/03 09:49:27 miwi Exp $
 #
 
 PORTNAME=	openxpki-client-soap-lite
-PORTVERSION=	0.9.421
+PORTVERSION=	0.9.651
 CATEGORIES=	security perl5
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	openxpki
