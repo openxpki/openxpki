@@ -29,7 +29,6 @@ cd ${myPWD}/${DISTS_PATH}/
 TARBALL_NAME=`find . -iname ${PORT_NAME_SHORT}-${MAJOR_VERSION}.*\.gz | sed -e "s/\.\///"`
 if [ ${TARBALL_NAME} ]; then
   echo "New tarball is " ${TARBALL_NAME}
-  cp -Rf ${myPWD}/${DISTS_PATH}/${TARBALL_NAME} ${DISTS_PATH}/
 else
   echo "No new tarball for the port ${PORT_NAME} was found in"
   echo "${myPWD}/${DISTS_PATH}/"
