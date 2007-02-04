@@ -1,0 +1,34 @@
+#!/bin/sh
+# $FreeBSD: ports/security/p5-openxpki-deployment/files/openxpki.sh.in,v 1.2 2007/02/03 09:49:52 miwi Exp $
+
+# PROVIDE: openxpki
+# REQUIRE: DAEMON
+# BEFORE: LOGIN
+# KEYWORD: shutdown
+
+# Define these openxpki_* variables in one of these files:
+#       /etc/rc.conf
+#       /etc/rc.conf.local
+#
+# DO NOT CHANGE THESE DEFAULT VALUES HERE
+#
+openxpki_enable="${openxpki_enable-NO}"
+openxpki_flags=""
+openxpki_pidfile="%%PREFIX%%/var/openxpki/openxpki.pid"
+
+case "$1" in 
+    *start) command_args="start";;
+esac
+
+. %%RC_SUBR%%
+
+name="openxpki"
+rcvar=`set_rcvar`
+command="%%PREFIX%%/bin/openxpkictl"
+procname="openxpkid"
+
+load_rc_config $name
+
+pidfile="${openxpki_pidfile}"
+
+run_rc_command "$1"
