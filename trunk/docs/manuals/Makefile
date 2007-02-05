@@ -8,7 +8,7 @@ DOCBOOK=/usr/share/xml/docbook/stylesheet/nwalsh/
 ##
 ## Please add FOP and DOCBOOK to the file Makefile.vars.
 
-include Makefile.vars
+-include Makefile.vars
 
 default: openxpki-manual
 
