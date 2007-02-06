@@ -177,7 +177,6 @@ OpenXPKI/Server/Workflow/Activity/CSR/GeneratePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
 
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
-OpenXPKI/Server/Workflow/Activity/CRR/RevokeCertificate.pm
 
 OpenXPKI/Server/Workflow/Activity/Profile/Create.pm
 

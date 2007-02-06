@@ -138,7 +138,7 @@ htdocs/service/create_csr/store_serverside.mhtml
 htdocs/service/create_crr/index.html
 htdocs/service/create_crr/highlight_error.mhtml
 htdocs/service/create_crr/search.mhtml
-htdocs/service/create_crr/form.mhtml
+htdocs/service/create_crr/form.html
 htdocs/service/create_crr/error.mhtml
 
 htdocs/service/smartcard_personalization/index.html
