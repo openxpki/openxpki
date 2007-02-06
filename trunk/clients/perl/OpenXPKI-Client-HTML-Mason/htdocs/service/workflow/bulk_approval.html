@@ -1,0 +1,82 @@
+<%args>
+    $wf_type   => undef
+    @approvals => undef
+    @serials   => undef    
+</%args>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_DESC') %>
+</p>
+<p>
+<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_SUCCESSFULLY_APPROVED', '__NR__' => $nr_approved) %>
+</p>
+<p>
+<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_SUCCESSFULLY_ISSUED', '__NR__' => $nr_issued) %>
+</p>
+<p>
+
+% if ($nr_failed) {
+<p>
+<b><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_FAILED_APPROVAL', '__NR__' => $nr_failed) %></b>
+</p>
+% # TODO - show errros
+% }
+% if ($nr_failed_issuance) {
+<p>
+<b><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_FAILED_ISSUANCE', '__NR__' => $nr_failed_issuance) %></b>
+</p>
+% # TODO - show errros
+% }
+<%init>
+my $nr_approved = 0;
+my $nr_issued   = 0;
+my $nr_failed   = 0;
+my $nr_failed_issuance = 0;
+my @errors;
+
+APPROVAL:
+for (my $i = 0; $i < scalar @approvals; $i++) {
+    if ($approvals[$i]) {
+        my $msg = $context->{client}->send_receive_command_msg(
+                      "execute_workflow_activity",
+                      {
+                        WORKFLOW => $wf_type,
+                        ID       => $serials[$i],
+                        ACTIVITY => "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR",
+                      },
+        );
+        if (exists $msg->{SERVICE_MSG} &&
+            $msg->{SERVICE_MSG} eq "ERROR") {
+            push @errors, [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ];
+            $nr_failed++;
+            next APPROVAL;
+        }
+        $nr_approved++;                
+        my $info_msg = $context->{client}->send_receive_command_msg(
+            'get_workflow_info',
+            {
+                WORKFLOW => $wf_type,
+                ID       => $serials[$i],
+            },
+        );
+        if ($info_msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'APPROVAL') {
+            # the certificate is ready to be issued
+            my $e_msg = $context->{client}->send_receive_command_msg(
+                'execute_workflow_activity',
+                {
+                    WORKFLOW => $wf_type,
+                    ID       => $serials[$i],
+                    ACTIVITY => 'I18N_OPENXPKI_WF_ACTION_PERSIST_CSR',
+                },
+            );
+            if (exists $msg->{SERVICE_MSG} &&
+                $msg->{SERVICE_MSG} eq 'ERROR') {
+                push @errors, [ $m->comp('/lib/get_deep_error.mhtml', 'msg' => $msg) ];
+                $nr_failed_issuance++;
+                next APPROVAL;
+            }
+            $nr_issued++;
+        }
+    }
+}
+</%init>

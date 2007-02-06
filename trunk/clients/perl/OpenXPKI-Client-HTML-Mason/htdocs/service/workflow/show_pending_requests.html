@@ -1,0 +1,159 @@
+<%args>
+    $show_approval_buttons => undef
+    $creator               => '%'
+    $wf_type               => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST'
+</%args>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_DESC') %>
+</p>
+% if ($creator ne '%') {
+  <p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_LIMITED_TO_CREATOR', '__CREATOR__' => $creator) %>
+  </p>
+% }
+<table>
+  <tr>
+% if ($show_approval_buttons) {
+    <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/bulk_approval.html" &>
+    <input type="hidden" name="wf_type" value="<% $wf_type %>">
+    <script language="JavaScript" type="text/javascript">
+<!--
+function ToggleAll() {
+  for (var i = 0; i < document.OpenXPKI.elements.length; i++) {
+    if (document.OpenXPKI.elements[i].type == 'checkbox') {
+        document.OpenXPKI.elements[i].checked = !(document.OpenXPKI.elements[i].checked);
+    }
+  }
+}
+-->
+    </script>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_APPROVE') %><br>
+<input type="checkbox" name="toggleAll" title="Toggle" onclick="ToggleAll()">
+    </th>
+% }
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_PROFILE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_ROLE') %></th>
+% if ($creator eq '%') {
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATOR') %></th>
+% }
+<!-- TODO - possibly add ticket references once implemented -->
+  </tr>
+% foreach my $res (@results) {
+  <tr>
+%   if ($show_approval_buttons) {
+    <td><input type="checkbox" name="approvals"></td>
+%   }
+    <td><input type="hidden" name="serials" value="<% $res->{'SERIAL'} %>"><a href="show_instance.html?type=<% $wf_type %>;id=<% $res->{'SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $res->{'SERIAL'} %></a></td>
+    <td><% $res->{'LAST_UPDATE'} %></td>
+    <td>
+    <% $res->{'SUBJECT'} %>
+%   foreach my $san (@{ $res->{'SUBJECT_ALT_NAMES'} }) {
+%      if ($san =~ m{ \A DNS:(.*) \z }xms) {
+%         if (! gethostbyname($1)) {
+            <br><small><font color="#ff0000"><% $san %></font></small>
+%         }
+%         else {
+            <br><small><font color="#009900"><% $san %></font></small>
+%         }
+%      }
+%      else {
+        <br><small><% $san %></small>
+%      }
+%   }
+    </td>
+    <td><% $res->{'PROFILE'} %></td>
+    <td><% $res->{'ROLE'} %></td>
+%   if ($creator eq '%') {
+    <td><a href="show_pending_requests.html?creator=<% $res->{'CREATOR'} %>;show_approval_buttons=1;<% $context->{menu}->get_link_params() %>"><% $res->{'CREATOR'} %></a></td>
+%   }
+  </tr>
+% }
+</table>
+% if ($show_approval_buttons) {
+    <& /service/send_form.mhtml &>
+    <& /service/close_form.mhtml &>
+% }
+
+<%init>
+use OpenXPKI::Serialization::Simple;
+use Data::Dumper;
+
+my $ser = OpenXPKI::Serialization::Simple->new();
+my $search_context = [
+    {
+        KEY   => 'creator',
+        VALUE => $creator,
+    }
+];
+my @results;
+
+my $msg = $context->{client}->send_receive_command_msg(
+              "search_workflow_instances",
+              {
+                     "TYPE"    => $wf_type,
+                     'CONTEXT' => $search_context,
+                     'STATE'   => 'PENDING',
+              },
+);
+my $msg2 = $context->{client}->send_receive_command_msg(
+              "search_workflow_instances",
+              {
+                     "TYPE"    => $wf_type,
+                     'CONTEXT' => $search_context,
+                     'STATE'   => 'APPROVAL',
+              },
+);
+my @instances;
+if (defined $msg->{PARAMS} && ref $msg->{PARAMS} eq 'ARRAY') {
+    @instances = @{ $msg->{PARAMS} };
+}
+if (defined $msg2->{PARAMS} && ref $msg2->{PARAMS} eq 'ARRAY') {
+    push @instances, @{ $msg2->{PARAMS} };
+}
+# TODO - error handling
+
+foreach my $instance (@instances) {
+    my $wf_info = $context->{client}->send_receive_command_msg(
+            'get_workflow_info',
+            {
+                WORKFLOW => $wf_type,
+                ID       => $instance->{'WORKFLOW.WORKFLOW_SERIAL'}, 
+            },
+    );
+    # TODO - error handling
+    $m->comp('/lib/debug.mhtml',
+        'level' => 10,
+        'msg' => Dumper $wf_info,
+    );
+    my $wf_context = $wf_info->{PARAMS}->{WORKFLOW}->{CONTEXT};
+    my $san_ref = $ser->deserialize($wf_context->{'cert_subject_alt_name'});
+    $m->comp('/lib/debug.mhtml',
+        'level' => 10,
+        'msg' => Dumper $san_ref,
+    );
+    my @subject_alt_names;
+    if (defined $san_ref && ref $san_ref eq 'ARRAY') {
+        foreach my $san_pair (@{ $san_ref }) {
+            push @subject_alt_names, $san_pair->[0] . ':' . $san_pair->[1];
+        }
+    }
+    $m->comp('/lib/debug.mhtml',
+        'level' => 10,
+        'msg' => Dumper \@subject_alt_names,
+    );
+    # TODO - error handling
+    push @results, {
+        'SERIAL'            => $instance->{'WORKFLOW.WORKFLOW_SERIAL'},
+        'LAST_UPDATE'       => $instance->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
+        'SUBJECT',          => $wf_context->{'cert_subject'},
+        'SUBJECT_ALT_NAMES' => \@subject_alt_names,
+        'PROFILE',          => $wf_context->{'cert_profile'},
+        'ROLE',             => $wf_context->{'cert_role'},
+        'CREATOR',          => $wf_context->{'creator'},
+    };
+}
+</%init>

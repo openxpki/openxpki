@@ -565,6 +565,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SET_SECRET_TITLE"
 msgstr "Enter passphrase for key group"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_APPROVE"
+msgstr "Approve"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BINARY_GET_PRIVKEY_PASSWORD_ENTRY_DESC"
 msgstr ""
 "To download the private key, you have to enter the password for it. This is "
@@ -594,27 +597,11 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
 msgstr "Certificate Information"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_DAY"
-msgstr "reset"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_HOUR"
-msgstr "reset"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MINUTE"
-msgstr "reset"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MONTH"
-msgstr "reset"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_ROLE"
+msgstr "Certificate Information"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME"
-msgstr "reset"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_YEAR"
 msgstr "reset"
 
 #, fuzzy
@@ -904,6 +891,9 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_IE_PKCS10"
 msgstr "PKCS#10"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATOR"
+msgstr "Creator"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_COULD_NOT_CREATE_DATETIME_OBJECT"
@@ -1322,8 +1312,15 @@ msgstr "Certificate revokation - search for certificate"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_TITLE"
 msgstr "Create a new Certificate Revocation Request (CRR)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_UNKNOWN_ERROR"
+msgstr "Errors"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_WORKFLOW_TYPE"
 msgstr "Workflow type"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED"
+msgstr "Personalization needs Microsoft Internet Explorer to work"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC"
 msgstr "SPKAC"
@@ -1355,6 +1352,24 @@ msgstr "Activity not implemented"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_APPROVALS"
 msgstr "Approvals"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_DESC"
+msgstr "The system has tried to approve all checked certificate requests."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_FAILED_APPROVAL"
+msgstr "Approval failed for __NR__ certificate requests."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_FAILED_ISSUANCE"
+msgstr "Certificate issuance failed for __NR__ certificate requests."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_SUCCESSFULLY_APPROVED"
+msgstr "__NR__ certificate requests have been approved successfully."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_SUCCESSFULLY_ISSUED"
+msgstr "__NR__ certificates have been issued successfully."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_TITLE"
+msgstr "Bulk approval results"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_DESCRIPTION"
 msgstr ""
 "You can create a new instance of workflow type here. Please choose one."
@@ -1372,7 +1387,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_PROFILE"
 msgstr "Certificate profile"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_ROLE"
-msgstr "Certificate profile"
+msgstr "Certificate role"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT"
 msgstr "Certificate subject"
@@ -1465,6 +1480,16 @@ msgstr "These are the possible activities for the shown workflow instance."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE"
 msgstr "Workflow instance"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_DESC"
+msgstr ""
+"Below you can find the pending certificate requests that still need approval."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_LIMITED_TO_CREATOR"
+msgstr "Only requests by __CREATOR__ are shown."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE"
+msgstr "Pending Certificate Requests"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SPKAC"
 msgstr "SPKAC"
@@ -2785,6 +2810,9 @@ msgstr "Revoked"
 msgid "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT"
 msgstr "Search certificate(s)"
 
+msgid "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS"
+msgstr "Pending CSRs"
+
 msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
 msgstr "Smartcard personalization"
 
@@ -3612,12 +3640,6 @@ msgstr ""
 "action."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCE_UNDEFINED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SUBJECT_ALT_NAME_SOURCE_UNDEFINED"
 msgstr ""
 "The GUID __GUID__ is not a valid Microsoft GUID and not a valid RFC 4122 "
@@ -3970,6 +3992,26 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AREWORKFLOWCHILDRENSUCCESSFULLYFI
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_IN_STATE_CRL_ISSUANCE_PENDING"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_IN_STATE_REVOKED"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_NOT_ON_HOLD_AND_REASON_CODE_REMOVE_FROM_CRL"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_ON_HOLD_AND_REASON_CODE_NOT_REMOVE_FROM_CRL"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_IDENTIFIER_MISSING"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKCERTTESTRESULT_TESTRESULT_NOT_TRUE"
 msgstr "The SPKAC string is empty."
 
@@ -4122,6 +4164,26 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_NEVER_REGEX"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD"
 msgstr "The SPKAC string is empty."
 
@@ -4131,6 +4193,10 @@ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REASON_CODE_INVALID"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
@@ -4940,8 +5006,31 @@ msgstr ""
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED"
-msgstr "Personalization needs Microsoft Internet Explorer to work"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_DAY"
+#~ msgstr "reset"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_HOUR"
+#~ msgstr "reset"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MINUTE"
+#~ msgstr "reset"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MONTH"
+#~ msgstr "reset"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_YEAR"
+#~ msgstr "reset"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCE_UNDEFINED"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED"

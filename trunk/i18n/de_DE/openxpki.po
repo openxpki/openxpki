@@ -597,6 +597,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SET_SECRET_TITLE"
 msgstr "Zertifikatssuche"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_APPROVE"
+msgstr "Zurücksetzen"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BINARY_GET_PRIVKEY_PASSWORD_ENTRY_DESC"
 msgstr ""
 "Zum Herunterladen des privaten Schlüssels müssen Sie das Passwort des "
@@ -628,27 +632,11 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
 msgstr "Details des Zertifikats"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_DAY"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_HOUR"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MINUTE"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MONTH"
-msgstr "Zurücksetzen"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_ROLE"
+msgstr "Details des Zertifikats"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_YEAR"
 msgstr "Zurücksetzen"
 
 #, fuzzy
@@ -970,6 +958,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_IE_PKCS10"
 msgstr "Erstellen des Zertifizierugnsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATOR"
+msgstr "Zurücksetzen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_COULD_NOT_CREATE_DATETIME_OBJECT"
@@ -1401,8 +1393,15 @@ msgstr "Zertifikatsrückruf - Suche des Zertifikats"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_TITLE"
 msgstr "Erstellen eines neuen Rückrufantrags (CRRs)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_UNKNOWN_ERROR"
+msgstr "Aufgetretene Fehler"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_WORKFLOW_TYPE"
 msgstr "Workflowart"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED"
+msgstr "Die Personalisierung funktioniert nur mit Microsoft Internet Explorer"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC"
 msgstr "SPKAC"
@@ -1433,6 +1432,30 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_TITLE"
 msgstr "Aktivität nicht implementiert"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_APPROVALS"
+msgstr "Genehmigungen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_DESC"
+msgstr "Genehmigungen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_FAILED_APPROVAL"
+msgstr "Genehmigungen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_FAILED_ISSUANCE"
+msgstr "Genehmigungen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_SUCCESSFULLY_APPROVED"
+msgstr "Genehmigungen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_SUCCESSFULLY_ISSUED"
+msgstr "Genehmigungen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_BULK_APPROVAL_TITLE"
 msgstr "Genehmigungen"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_DESCRIPTION"
@@ -1546,6 +1569,20 @@ msgstr ""
 "Workflows sehen."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE"
+msgstr "Details der Workflowinstanz"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_DESC"
+msgstr ""
+"Hier können Sie nun alle verfügbaren Details zu der ausgewählten Instanz des "
+"Workflows sehen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_LIMITED_TO_CREATOR"
+msgstr "Details der Workflowinstanz"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE"
 msgstr "Details der Workflowinstanz"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SPKAC"
@@ -2952,6 +2989,10 @@ msgstr "Zurückgerufene"
 msgid "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT"
 msgstr "Zertifikats-Suche"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS"
+msgstr "Abgelaufene"
+
 msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
 msgstr "Smartcard personalisieren"
 
@@ -3727,10 +3768,6 @@ msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCES_UNDEFINED"
 msgstr "PKI Realm"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCE_UNDEFINED"
-msgstr "PKI Realm"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SUBJECT_ALT_NAME_SOURCE_UNDEFINED"
 msgstr "Microsoft GUID"
 
@@ -3975,6 +4012,26 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AREWORKFLOWCHILDRENSUCCESSFULLYFI
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_IN_STATE_CRL_ISSUANCE_PENDING"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_IN_STATE_REVOKED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_NOT_ON_HOLD_AND_REASON_CODE_REMOVE_FROM_CRL"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_ON_HOLD_AND_REASON_CODE_NOT_REMOVE_FROM_CRL"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_IDENTIFIER_MISSING"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKCERTTESTRESULT_TESTRESULT_NOT_TRUE"
 msgstr "Prozesse anzeigen"
 
@@ -4128,6 +4185,26 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_NEVER_REGEX"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD"
 msgstr "Prozesse anzeigen"
 
@@ -4137,6 +4214,10 @@ msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REASON_CODE_INVALID"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -4910,8 +4991,29 @@ msgstr ""
 msgid "I18N_OPENXPKI_YES"
 msgstr "ja"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED"
-msgstr "Die Personalisierung funktioniert nur mit Microsoft Internet Explorer"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_DAY"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_HOUR"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MINUTE"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MONTH"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_YEAR"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCE_UNDEFINED"
+#~ msgstr "PKI Realm"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ERROR_HANDLING_MESSAGE"

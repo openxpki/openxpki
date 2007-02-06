@@ -51,6 +51,7 @@
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CRR",
                                    "create_crr"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS", "show_pending_requests"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",     "workflow"],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE", "dataexchange"],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
@@ -144,6 +145,9 @@
                     "workflow_list_instances" =>
                     {
                         CMD => "service/workflow/list_instances.html"
+                    },
+                    'show_pending_requests' => {
+                        CMD => 'service/workflow/show_pending_requests.html'
                     },
                     ## please be really sure what you do if you uncomment this
                     ## cf. above (Alex)

@@ -451,6 +451,9 @@ sub search_workflow_instances {
     if (defined $arg_ref->{TYPE}) {
         $dynamic->{$workflow_table . '.WORKFLOW_TYPE'} = $arg_ref->{TYPE};
     }
+    if (defined $arg_ref->{STATE}) {
+        $dynamic->{$workflow_table . '.WORKFLOW_STATE'} = $arg_ref->{STATE};
+    }
 
     ##! 16: 'dynamic: ' . Dumper $dynamic
     ##! 16: 'tables: ' . Dumper(\@tables)

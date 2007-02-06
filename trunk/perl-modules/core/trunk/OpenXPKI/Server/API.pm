@@ -391,6 +391,11 @@ sub BUILD {
                     regex    => $re_alpha_string,
                     optional => 1,
                 },
+                STATE => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
+                },
             },
         },
         'get_secrets' => {
