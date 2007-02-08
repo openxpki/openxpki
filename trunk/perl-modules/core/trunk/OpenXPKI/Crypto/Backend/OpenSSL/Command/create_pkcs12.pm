@@ -133,7 +133,7 @@ sub hide_output
 sub key_usage
 {
     my $self = shift;
-    return 1;
+    return 0;
 }
 
 sub get_result
@@ -182,7 +182,7 @@ returns false
 
 =head2 key_usage
 
-returns true (FIXME: does this be correct?)
+returns false
 
 =head2 get_result
 

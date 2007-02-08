@@ -33,7 +33,14 @@ sub execute
     $approvals = $serializer->serialize($approvals);
     $context->param ('approvals' => $approvals);
 
+    CTX('log')->log(
+	MESSAGE => 'Approval for workflow ' . $workflow->id() . " by user $user, role $role",
+	PRIORITY => 'info',
+	FACILITY => 'audit',
+	);
+
     ## enforce context persistence
+    return 1;
 }
 
 

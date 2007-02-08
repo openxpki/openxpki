@@ -36,7 +36,6 @@ sub evaluate
     my ( $self, $wf ) = @_;
     my $context = $wf->context();
 
-print STDERR "Check approvals called.\n";
     ## load config
     my $roles = $self->role();
     if (not $roles or not scalar @{$roles})
@@ -92,10 +91,6 @@ print STDERR "Check approvals called.\n";
         condition_error ($errors->[0]);
     }
 
-print STDERR "All approvals are present.\n";
-
-    ## return true is senselesse because only exception will be used
-    ## but good style :)
     return 1;
 }
 

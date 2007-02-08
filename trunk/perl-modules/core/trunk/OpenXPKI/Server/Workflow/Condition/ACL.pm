@@ -62,8 +62,6 @@ sub evaluate
         condition_error ($EVAL_ERROR);
     }
 
-    ## return true is senselesse because only exception will be used
-    ## but good style :)
     return 1;
 }
 

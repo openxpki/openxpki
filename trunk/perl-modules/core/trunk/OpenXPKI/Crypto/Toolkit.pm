@@ -493,12 +493,12 @@ sub online
     return $self->get_engine()->online(@_);
 }
 
-sub key_online
+sub key_usable
 {
     ##! 1: "start"
     my $self   = shift;
     my $ident = ident $self;
-    return $self->get_engine()->key_online(@_);
+    return $self->get_engine()->key_usable(@_);
 }
 
 sub login

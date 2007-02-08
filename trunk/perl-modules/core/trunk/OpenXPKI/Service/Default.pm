@@ -196,6 +196,7 @@ sub __handle_NEW_SESSION : PRIVATE {
                                         XPATH => "common/server/session_lifetime"
                                     ),
     });
+
     if (exists $msg->{LANGUAGE}) {
         ##! 8: "set language"
         set_language($msg->{LANGUAGE});
@@ -204,6 +205,12 @@ sub __handle_NEW_SESSION : PRIVATE {
         ##! 8: "no language specified"
     }
     OpenXPKI::Server::Context::setcontext({'session' => $session});
+
+    CTX('log')->log(
+	MESSAGE  => 'New session created',
+	PRIORITY => 'info',
+	FACILITY => 'system',
+	);
 
     $self->__change_state({
         STATE => 'SESSION_ID_SENT',
@@ -255,6 +262,13 @@ sub __handle_CONTINUE_SESSION {
         # do not use __change_state here, as we want to have access
         # to the old session in __handle_SESSION_ID_ACCEPTED
         $state_of{$ident} = 'SESSION_ID_SENT_FROM_CONTINUE';
+	
+	CTX('log')->log(
+	    MESSAGE  => 'Continuing existing session',
+	    PRIORITY => 'info',
+	    FACILITY => 'auth',
+	    );
+	
         return {
             SESSION_ID => $session->get_id(),
         };
@@ -530,21 +544,15 @@ sub __handle_COMMAND : PRIVATE {
 		##! 16: "Invalid command $data->{PARAMS}->{COMMAND}"
 		# fall-through intended
 	    } else {
-                ##! 16: "FIXME: this means that we simply crash without sending something to the client!"
 		$exc->rethrow();
 	    }
 	} elsif ($EVAL_ERROR) {
-            ##! 8: "FIXME: this means that we simply crash without sending something to the client!"
-	    if (ref $EVAL_ERROR) {
-		$EVAL_ERROR->rethrow();
-	    } else {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COULD_NOT_INSTANTIATE_COMMAND",
-		    params  => {
-			EVAL_ERROR => $EVAL_ERROR,
-		    },
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COULD_NOT_INSTANTIATE_COMMAND",
+		params  => {
+		    EVAL_ERROR => $EVAL_ERROR,
+		},
                 );
-	    }
 	}
 
 	if (defined $command) {
@@ -656,6 +664,11 @@ sub __change_state : PRIVATE {
     my $new_state = $arg_ref->{STATE};
 
     ##! 4: 'changing state from ' . $state_of{$ident} . ' to ' . $new_state
+    CTX('log')->log(
+	MESSAGE  => 'Changing session state from ' . $state_of{$ident} . ' to ' . $new_state,
+	PRIORITY => 'debug',
+	FACILITY => 'system',
+	);
     $state_of{$ident} = $new_state;
     # save the new state in the session
     CTX('session')->set_state($new_state);
@@ -680,17 +693,14 @@ sub run
 		# client closed socket
 		last MESSAGE;
 	    } else {
-		# FIXME: return error instead of rethrowing
 		$exc->rethrow();
 	    }
 	} elsif ($EVAL_ERROR) {
-	    if (ref $EVAL_ERROR) {
-		$EVAL_ERROR->rethrow();
-	    } else {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION",
-		    params  => {EVAL_ERROR => $EVAL_ERROR});
-	    }
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION",
+		params  => {
+		    EVAL_ERROR => $EVAL_ERROR,
+		});
 	}
 
 	last MESSAGE unless defined $msg;

@@ -84,7 +84,7 @@ sub __init_profile :PRIVATE {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_PROFILE_RECEIVED",
         );
-        # FIXME: this is an uncaught exception
+        # this is an uncaught exception
     }
 
     if (defined $profiles{$requested_profile}->{NAME}) { # the profile is valid
@@ -119,7 +119,7 @@ sub __init_server : PRIVATE {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_SERVER_RECEIVED",
         );
-        # FIXME: this is an uncaught exception
+        # this is an uncaught exception
     }
     if (exists CTX('pki_realm')->{$realm}->{scep}->{id}->{$requested_server}) {
         # the server is valid
@@ -154,7 +154,7 @@ sub __init_encryption_alg : PRIVATE {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_ENCRYPTION_ALGORITHM_RECEIVED",
         );
-        # FIXME: this is an uncaught exception
+        # this is an uncaught exception
     }
     if ($requested_encryption_alg eq 'DES' ||
         $requested_encryption_alg eq '3DES') {
@@ -254,17 +254,14 @@ sub run
 		# client closed socket
 		last MESSAGE;
 	    } else {
-		# FIXME: return error instead of rethrowing
 		$exc->rethrow();
 	    }
 	} elsif ($EVAL_ERROR) {
-	    if (ref $EVAL_ERROR) {
-		$EVAL_ERROR->rethrow();
-	    } else {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVICE_SCEP_RUN_READ_EXCEPTION",
-		    params  => {EVAL_ERROR => $EVAL_ERROR});
-	    }
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVICE_SCEP_RUN_READ_EXCEPTION",
+		params  => {
+		    EVAL_ERROR => $EVAL_ERROR,
+		});
 	}
 
 	last MESSAGE unless defined $data;
@@ -318,15 +315,11 @@ sub run
 			$exc->rethrow();
 		    }
 		} elsif ($EVAL_ERROR) {
-		    if (ref $EVAL_ERROR) {
-			$EVAL_ERROR->rethrow();
-		    } else {
-			OpenXPKI::Exception->throw (
-			    message => "I18N_OPENXPKI_SERVICE_SCEP_RUN_COULD_NOT_INSTANTIATE_COMMAND",
-			    params  => {
-				EVAL_ERROR => $EVAL_ERROR,
-			    });
-		    }
+		    OpenXPKI::Exception->throw (
+			message => "I18N_OPENXPKI_SERVICE_SCEP_RUN_COULD_NOT_INSTANTIATE_COMMAND",
+			params  => {
+			    EVAL_ERROR => $EVAL_ERROR,
+			});
 		}
 
 		if (defined $command) {
@@ -346,6 +339,12 @@ sub run
 			
 			next MESSAGE;
 		    }
+		    CTX('log')->log(
+			MESSAGE  => "Executed SCEP command '$received_command'",
+			PRIORITY => 'debug',
+			FACILITY => 'system',
+			);
+
 
 		    # sanity checks on command reply
 		    if (! defined $result || ref $result ne 'HASH') {
@@ -358,7 +357,6 @@ sub run
 			next MESSAGE;
 		    }
 
-		    # FIXME: translate messages
 		    $self->talk($result);
 
 		    next MESSAGE;

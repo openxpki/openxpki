@@ -30,7 +30,7 @@ sub get_command {
     my $self = shift;
     my $ident = ident $self;
     
-    my $command = ' -print_msgtype -noout -inform DER '; # TODO: support more than DER?
+    my $command = ' -print_msgtype -noout -inform DER ';
     
     my $in_filename = $fu_of{$ident}->get_safe_tmpfile({
         'TMP' => $tmp_of{$ident},

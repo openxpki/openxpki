@@ -5,10 +5,10 @@
 ## (C) Copyright 2006, 2007 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::Server::Authentication::Password;
+
 use strict;
 use warnings;
-
-package OpenXPKI::Server::Authentication::Password;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::Password';
 use OpenXPKI::Exception;
@@ -63,7 +63,16 @@ sub new {
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_ALGORITHM",
-                params  => {USER => $name, ALGORITHM => $algorithm});
+                params  => {
+		    USER => $name, 
+		    ALGORITHM => $algorithm,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'system',
+		},
+		);
         }
     }
 
@@ -101,14 +110,12 @@ sub login_step {
         ## check account
 
         if (not exists $self->{DATABASE}->{$account}) {
-            CTX('log')->log (FACILITY => "auth",
-                             PRIORITY => "warn",
-                             MESSAGE  => "Login to internal database failed (unknown user).\n".
-                                         "user::=$account\n".
-                                         "logintype::=Password");
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
-                params  => {USER => $account});
+                params  => {
+		    USER => $account,
+		},
+		);
         }
         my $digest    = $self->{DATABASE}->{$account}->{DIGEST};
         my $algorithm = $self->{DATABASE}->{$account}->{ALGORITHM};
@@ -136,14 +143,12 @@ sub login_step {
         ## compare passphrases
         if ($hash ne $digest) {
             ##! 4: "mismatch with digest in database ($digest)"
-            CTX('log')->log (FACILITY => "auth",
-                             PRIORITY => "warn",
-                             MESSAGE  => "Login to internal database failed (wrong passphrase).\n".
-                                         "user::=$account\n".
-                                         "logintype::=Password");
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
-                params  => {USER => $account});
+                params  => {
+		    USER => $account,
+		},
+		);
         }
         else { # hash is fine, return user, role, service ready message
             return ($account, $role,

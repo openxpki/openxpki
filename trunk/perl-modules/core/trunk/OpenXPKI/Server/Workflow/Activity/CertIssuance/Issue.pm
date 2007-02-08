@@ -102,6 +102,12 @@ sub execute {
 			        PROFILE => $profile,
 			        CSR     => $csr,
     });
+    CTX('log')->log(
+	MESSAGE => "CA '" . $self->param('ca') . "' issued certificate with serial $serial and DN=" . $profile->get_subject() . " in PKI realm '" . $self->{PKI_REALM} . "'",
+	PRIORITY => 'info',
+	FACILITY => [ 'audit', 'system', ],
+	);
+
     my $cert_pem;
     if ($csr_type eq 'spkac') {
         $cert_pem = $token->command({

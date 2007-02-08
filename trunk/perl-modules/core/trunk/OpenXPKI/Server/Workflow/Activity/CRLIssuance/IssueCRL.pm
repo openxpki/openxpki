@@ -119,6 +119,7 @@ sub execute {
         REVOKED => \@cert_timestamps,
         PROFILE => $profile,
     });
+
     my $crl_obj = OpenXPKI::Crypto::CRL->new(
             TOKEN => $ca_token,
             DATA  => $crl,
@@ -128,10 +129,17 @@ sub execute {
     my $serial = $dbi->get_new_serial(
             TABLE => 'CRL',
     );
+
+    CTX('log')->log(
+	MESSAGE => 'CRL issued for CA ' . $current_ca . ' in realm ' . $pki_realm,
+	PRIORITY => 'info',
+	FACILITY => [ 'audit', 'system' ],
+	);
+
+
     my %insert_hash = $crl_obj->to_db_hash();
     $insert_hash{'PKI_REALM'} = $pki_realm;
     $insert_hash{'ISSUER_IDENTIFIER'} = $ca_identifier;
-    #$insert_hash{'TYPE'} = # FIXME: what is the meaning of this field?
     $insert_hash{'CRL_SERIAL'} = $serial;
     $insert_hash{'PUBLICATION_DATE'} = -1;
     $dbi->insert(

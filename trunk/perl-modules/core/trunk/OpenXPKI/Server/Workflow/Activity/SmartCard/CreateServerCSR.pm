@@ -24,8 +24,8 @@ sub execute {
     my $context  = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    my @cert_profiles = split /,/, $self->param('cert_profiles');
-    my @cert_roles    = split /,/, $self->param('cert_roles');
+    my @cert_profiles = split(/,/, $self->param('cert_profiles'));
+    my @cert_roles    = split(/,/, $self->param('cert_roles'));
 
     my $cert_issuance_data_ser = $context->param('cert_issuance_data');
     my @cert_issuance_data;
@@ -60,9 +60,9 @@ sub execute {
     $tt->process(\$template, $ldap_vars, \$cert_subj_alt_names);
     ##! 16: 'cert_subj_alt_names: ' . $cert_subj_alt_names
 
-    my @sans = split /,/, $cert_subj_alt_names;
+    my @sans = split(/,/, $cert_subj_alt_names);
     foreach my $entry (@sans) {
-        my @tmp_array = split /=/, $entry;
+        my @tmp_array = split(/=/, $entry);
         $entry = \@tmp_array;
     }
     ##! 16: '@sans: ' . Dumper(\@sans)

@@ -32,6 +32,12 @@ sub validate {
     {
         push @{$errors}, [$EVAL_ERROR];
         $context->param ("__error" => $errors);
+	CTX('log')->log(
+	    MESSAGE  => "Could not create DN object from subject '$subject'",
+	    PRIORITY => 'error',
+	    FACILITY => 'system',
+	    );
+
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -94,15 +100,19 @@ sub validate {
         }
     }
 
-    ## did we find some errors?
+    ## did we find any errors?
     if (scalar @{$errors} and scalar @{$errors} > $old_errors)
     {
         $context->param ("__error" => $errors);
+	CTX('log')->log(
+	    MESSAGE  => "Certificate subject validation error for subject '$subject'",
+	    PRIORITY => 'error',
+	    FACILITY => 'system',
+	    );
+
         validation_error ($errors->[scalar @{$errors} -1]->[0]);
     }
 
-    ## return true is senselesse because only exception will be used
-    ## but good style :)
     return 1;
 }
 

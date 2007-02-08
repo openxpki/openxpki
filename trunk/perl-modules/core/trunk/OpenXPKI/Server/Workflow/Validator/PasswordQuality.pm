@@ -32,7 +32,7 @@ sub _init {
         $MAXLEN = $params->{MAXLEN};
     }
     if (exists $params->{DICTIONARIES}) {
-        @DICTIONARIES = split /,/, $params->{DICTIONARIES};
+        @DICTIONARIES = split(/,/, $params->{DICTIONARIES});
     }
 }
 

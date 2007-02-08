@@ -6,10 +6,11 @@
 ## (C) Copyright 2005-2007 by The OpenXPKI Project
 ## $Revision: 675 $
 
+package OpenXPKI::Server::Authentication::ClientSSO;
+
 use strict;
 use warnings;
-
-package OpenXPKI::Server::Authentication::ClientSSO;
+use English;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::ClientSSO';
 use OpenXPKI::Exception;
@@ -80,18 +81,15 @@ sub login_step {
         my $out = `$command`;
         map { delete $ENV{$_} } @{$self->{CLEARENV}}; # clear environment
 
-        ##! 2: "command returned $?, STDOUT was: $out"
+        ##! 2: "command returned $CHILD_ERROR, STDOUT was: $out"
 		
-        if ($? != 0)
+        if ($CHILD_ERROR != 0)
         {
-            CTX('log')->log (FACILITY => "auth",
-			     PRIORITY => "warn",
-			     MESSAGE  => "Login via client SSO failed.\n"
-			     . "user::=$account\n"
-			     . "logintype::=ClientSSO");
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED",
-                params  => {USER => $account});
+                params  => {
+		    USER => $account,
+		});
             return (undef, undef, {});
         }
 

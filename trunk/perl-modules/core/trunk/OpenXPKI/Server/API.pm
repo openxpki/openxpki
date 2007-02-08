@@ -455,6 +455,11 @@ sub AUTOMETHOD {
                 params  => {
                     'METHOD_NAME' => $method_name,
                 },
+		log => {
+		    logger => CTX('log'),
+		    priority => 'info',
+		    facility => 'system',
+		},
             );
         }
         my $class         = $method_info_of{$ident}->{$method_name}->{class};
@@ -483,6 +488,7 @@ sub AUTOMETHOD {
             }
             eval {
                 CTX('acl')->authorize($acl_hashref);
+		# logging is done in ACL class
             };
         
             if (my $exc = OpenXPKI::Exception->caught()) {
@@ -500,9 +506,20 @@ sub AUTOMETHOD {
                     params  => {
                         'EVAL_ERROR' => $EVAL_ERROR,
                     },
+		    log => {
+			logger => CTX('log'),
+			priority => 'error',
+			facility => 'system',
+		    },
                 );
             }
         }
+
+	CTX('log')->log(
+	    MESSAGE  => "Method '$method_name' called via API",
+	    PRIORITY => 'debug',
+	    FACILITY => 'system',
+	    );
     
         # call corresponding method
         my $openxpki_class = "OpenXPKI::Server::API::" . $class;

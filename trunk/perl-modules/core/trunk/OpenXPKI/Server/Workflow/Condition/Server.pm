@@ -53,8 +53,6 @@ sub evaluate
         condition_error ($errors->[0]);
     }
 
-    ## return true is senselesse because only exception will be used
-    ## but good style :)
     return 1;
 }
 

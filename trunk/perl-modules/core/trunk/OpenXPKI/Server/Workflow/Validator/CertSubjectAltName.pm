@@ -33,6 +33,10 @@ sub validate {
     {
         push @{$errors}, [$EVAL_ERROR];
         $context->param ("__error" => $errors);
+	CTX('log')->log(
+	    MESSAGE  => "Could not deserialize subject alternative names ($subject_alt_name)",
+	    PRIORITY => 'error',
+	    FACILITY => 'system',
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -157,10 +161,14 @@ sub validate {
         push @fixed, [$type, $value];
     }
 
-    ## did we find some errors?
+    ## did we find any errors?
     if (scalar @{$errors} and scalar @{$errors} > $old_errors)
     {
         $context->param ("__error" => $errors);
+	CTX('log')->log(
+	    MESSAGE  => 'Invalid subject alternative name (' . join(', ', @{$errors}) . ')',
+	    PRIORITY => 'error',
+	    FACILITY => 'system',
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -170,8 +178,6 @@ sub validate {
     $subject_alt_name = $serializer->serialize(\@fixed);
     $context->param ("cert_subject_alt_name" => $subject_alt_name);
 
-    ## return true is senselesse because only exception will be used
-    ## but good style :)
     return 1;
 }
 

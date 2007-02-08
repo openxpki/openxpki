@@ -103,7 +103,7 @@ sub __instantiate_cli {
     ##! 16: 'end'
 }
 
-sub __init_command { # FIXME: use :CUMULATIVE, does not work?
+sub __init_command {
     ##! 16: 'start'
     my $self = shift;
     my $ident = ident $self;
@@ -236,7 +236,7 @@ our engine module for more informations.
 
 =item * online
 
-=item * key_online
+=item * key_usable
 
 =item * login
 

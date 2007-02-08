@@ -116,9 +116,12 @@ sub login {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED");
     } elsif ($EVAL_ERROR) {
-        ## FIXME: doe snormal EVAL_ERRORs support rethrow?
-        ## FIXME: usually this ends with die :)
-        $EVAL_ERROR->rethrow();
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED_EVAL_ERROR",
+	    params => {
+		EVAL_ERROR => $EVAL_ERROR,
+	    },
+	);
     }
 
     $self->{ONLINE} = 1;
@@ -137,7 +140,7 @@ sub online {
     return 1;
 }
 
-sub key_online {
+sub key_usable {
     my $self = shift;
     return 0 if (not $self->{ONLINE});
     return 1;
@@ -318,7 +321,7 @@ enforces the logout form the token.
 returns true if the token is usable for non-pivate-key
 operations.
 
-=head2 key_online
+=head2 key_usable
 
 returns true if the private key is usable.
 

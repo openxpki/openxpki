@@ -87,6 +87,12 @@ sub execute
     my $key = $default_token->command($command);
     ##! 16: 'key: ' . $key
 
+    CTX('log')->log(
+	MESSAGE => 'Created ' . $key_type . ' private key for ' . $context->param('creator'),
+	PRIORITY => 'info',
+	FACILITY => 'audit',
+	);
+
     $context->param('private_key' => $key);
 
     # pass on the password to the PKCS#10 generation activity

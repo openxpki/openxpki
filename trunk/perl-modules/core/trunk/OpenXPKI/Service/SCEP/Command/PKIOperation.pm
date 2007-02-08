@@ -64,18 +64,6 @@ sub execute {
         });
     }
     else {
-        # TODO -- decide whether to throw exception or send an error
-        # message to the client ...
-        # maybe log instead of throwing exception?
-        #
-        #OpenXPKI::Exception->throw({
-        #    message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_UNSUPPORTED_MESSAGE_TYPE',
-        #    # TODO: once all are implemented, change to INVALID_M_T?
-        #    params  => {
-        #      'MESSAGE_TYPE_NAME' => $message_type_ref->{MESSAGE_TYPE_NAME},
-        #      'MESSAGE_TYPE_CODE' => $message_type_ref->{MESSAGE_TYPE_CODE},
-        #    },
-        #});
         $result = $token->command({
             COMMAND      => 'create_error_reply',
             PKCS7        => $pkcs7_decoded,
@@ -222,6 +210,12 @@ sub __pkcs_req : PRIVATE {
                 CERTIFICATE    => $certificate,
                 ENCRYPTION_ALG => CTX('session')->get_enc_alg(),
             });
+
+	    CTX('log')->log(
+		MESSAGE  => "Delivered certificate via SCEP (issuance workflow id: $child_id)",
+		PRIORITY => 'info',
+		FACILITY => 'system',
+		);
 
             return $certificate_msg;
         }

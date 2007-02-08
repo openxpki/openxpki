@@ -36,18 +36,30 @@ sub validate {
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_DATA' ];
         $context->param ("__error" => $errors);
         ##! 16: 'validation error: ' . $errors
+
+	CTX('log')->log(
+	    MESSAGE  => "Empty SPKAC request",
+	    PRIORITY => 'info',
+	    FACILITY => 'system',
+	    );
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
     ## check that it is clean
-    if ($spkac !~ /^[0-9A-Za-z\-_=]*$/ and ## RFC 3548 URL and filename safe
-        $spkac !~ /^[0-9A-Za-z+\/=]*$/     ## RFC 1421,2045 and 3548
-       )
+    if ($spkac !~ m{ \A [0-9A-Za-z\-_=]* \z }xms    ## RFC 3548 URL and filename safe
+        && $spkac !~ m{ \A [0-9A-Za-z+\/=]* \z }xms ## RFC 1421,2045 and 3548
+	)
     {
         ## SPKAC is base64 and this is no base64
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_NO_BASE64' ];
         $context->param ("__error" => $errors);
         ##! 16: 'validation error: ' . $errors
+
+	CTX('log')->log(
+	    MESSAGE  => "Invalid characters in SPKAC request",
+	    PRIORITY => 'warn',
+	    FACILITY => 'system',
+	    );
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -58,13 +70,16 @@ sub validate {
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT' ];
         $context->param ("__error" => $errors);
         ##! 16: 'validation error: ' . $errors
+	CTX('log')->log(
+	    MESSAGE  => "SPKAC request incomplete",
+	    PRIORITY => 'warn',
+	    FACILITY => 'system',
+	    );
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
     ## FIXME: theoretically we could parse it to validate it...
 
-    ## return true is senselesse because only exception will be used
-    ## but good style :)
     ##! 1: 'end'
     return 1;
 }

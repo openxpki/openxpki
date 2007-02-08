@@ -146,10 +146,13 @@ sub execute {
 	}
     }
 
-    ##! 4: "FIXME: throw exception?"
-    return {
-	ERROR => "COMMAND EXECUTION METHOD NOT IMPLEMENTED",
-    };
+    OpenXPKI::Exception->throw(
+	message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTE_COMMAND_NOT_FOUND",
+	params  => {
+	    COMMAND => $command{$ident},
+	});
+
+    return;
 }
 
 

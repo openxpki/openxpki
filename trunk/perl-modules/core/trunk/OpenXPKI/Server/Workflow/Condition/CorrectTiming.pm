@@ -53,7 +53,7 @@ sub evaluate {
     ##! 16: 'notafter: ' . $notafter
     my $now = DateTime->now()->epoch();
     ##! 16: 'now: ' . $now
-    my $diff = $notafter - $now; # TODO -- check for integer overflow?
+    my $diff = $notafter - $now;
     ##! 16: 'difference: ' . $diff
 
     if ($diff < 0 || $diff > $self->difference()) {

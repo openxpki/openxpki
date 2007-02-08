@@ -220,7 +220,7 @@ my %TABLE_of = (
         NAME    => "crl",
         INDEX   => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CRL_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CRL_SERIAL",
-                     "TYPE", "DATA",
+                     "DATA",
                      "LAST_UPDATE", 
 		     "NEXT_UPDATE",
 		     "PUBLICATION_DATE",

@@ -2,6 +2,9 @@
 FOP=fop
 DOCBOOK=/usr/share/xml/docbook/stylesheet/nwalsh/
 
+XSLTPROC_OPTS=
+XMLLINT_OPTS=
+
 ## DO NOT HARDCODE PATHS !!!
 ## Please set DOCBOOK and FOP in the file Makefile.vars.
 ## The file Makefile.vars is ignored by subversion.
@@ -13,15 +16,15 @@ DOCBOOK=/usr/share/xml/docbook/stylesheet/nwalsh/
 default: openxpki-manual
 
 check:
-	xmllint --noout --postvalid openxpki-manual.xml
+	xmllint $(XMLLINT_OPTS) --noout --postvalid openxpki-manual.xml
 
 openxpki-manual: html pdf
 
 html:
-	xsltproc $(DOCBOOK)/html/docbook.xsl openxpki-manual.xml > ../openxpki-manual.html
+	xsltproc $(XSLTPROC_OPTS) $(DOCBOOK)/html/docbook.xsl openxpki-manual.xml > ../openxpki-manual.html
 
 pdf:
-	xsltproc \
+	xsltproc $(XSLTPROC_OPTS) \
 		--stringparam fop1.extensions "1" \
 		--stringparam paper.type "A4" \
 		$(DOCBOOK)/fo/docbook.xsl openxpki-manual.xml > ../openxpki-manual.fo

@@ -6,10 +6,10 @@
 ## (C) Copyright 2005-2007 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::Server::Authentication::External;
+
 use strict;
 use warnings;
-
-package OpenXPKI::Server::Authentication::External;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::External';
 use OpenXPKI::Exception;
@@ -143,14 +143,11 @@ sub login_step {
 		
     if ($? != 0)
     {
-        CTX('log')->log (FACILITY => "auth",
-			 PRIORITY => "warn",
-			 MESSAGE  => "Login to external database failed.\n"
-			 . "user::=$account\n"
-			 . "logintype::=External");
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED",
-            params  => {USER => $account});
+            params  => {
+		USER => $account,
+	    });
         return (undef, undef, {});
     }
 

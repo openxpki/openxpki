@@ -26,7 +26,6 @@ my %api            : ATTR( :get<API> );
 
 
 # command registry
-# TODO: add commands as they are implemented
 my %allowed_command = map { $_ => 1 } qw(
     GetCACert
     PKIOperation
@@ -139,10 +138,13 @@ sub execute {
 	}
     }
 
-    ##! 4: "FIXME: throw exception?"
-    return {
-	ERROR => "COMMAND EXECUTION METHOD NOT IMPLEMENTED",
-    };
+    OpenXPKI::Exception->throw(
+	message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_INVALID_COMMAND",
+	params  => {
+	    COMMAND => $command{$ident},
+	});
+
+    return;
 }
 
 

@@ -55,31 +55,11 @@ sub execute {
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_WRITECERTIFICATETOINSTALL_NO_CERTIFICATE_IN_CHILD_WORKFLOW',
         );
     }
-
-#    my $ca_cert = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$ca_id}->{certificate};
-#    my $ca_token = $tm->get_token(
-#        TYPE        => 'CA',
-#        ID          => $ca_id,
-#        PKI_REALM   => $pki_realm,
-#        CERTIFICATE => $ca_cert,
-#    );
-#    my $pkcs7 = $ca_token->command({
-#        COMMAND          => 'convert_cert',
-#        CONTAINER_FORMAT => 'PKCS7',
-#        DATA             => [ $certificate, $ca_cert ],
-#        OUT              => 'PEM',
-#    });
-#    my $pkcs7_der = $ca_token->command({
-#        COMMAND          => 'convert_cert',
-#        CONTAINER_FORMAT => 'PKCS7',
-#        DATA             => [ $certificate, $ca_cert ],
-#        OUT              => 'DER',
-#    });
     
     ##! 64: 'certificate: ' . $certificate
     $context->param('certificate' => $certificate);
-#    $context->param('pkcs7' => $pkcs7);
     $certs_installed++;
+
     $context->param('certs_installed' => $certs_installed);
     ##! 4: 'end'
     return;

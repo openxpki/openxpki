@@ -19,7 +19,6 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use Data::Dumper;
 
-# TODO: use param ($self->get_PARAMS()->{MESSAGE}) to select CA? How?
 sub execute {
     my $self    = shift;
     my $arg_ref = shift;

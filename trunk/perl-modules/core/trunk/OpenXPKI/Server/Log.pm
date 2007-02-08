@@ -55,8 +55,7 @@ sub init {
     $self->{log4perl} = Log::Log4perl->init($self->{configfile});
     if (not  $self->{log4perl})
     {
-        ## FIXME: we should display here an error message from Log4perl
-        ## FIXME: how we can get the error from Log4perl
+	# Log4Perl does not export any initialization errors
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_LOG_NEW_LOG4PERL_INIT_FAILED");
     }
@@ -72,7 +71,6 @@ sub init {
                 message => "I18N_OPENXPKI_SERVER_LOG_NEW_MISSING_LOGGER",
                 params  => {"FACILITY" => $facility});
         }
-        ## FIXME: we should check for a wrong DBI config here too
     }
 
     return 1;
@@ -89,17 +87,29 @@ sub log
     my $self = shift;
     my $keys = { @_ };
 
-    ## FIXME: "undefined message" is inacceptable as log message
-    ## FIXME: errors must cause an exception after logging
-    ## FIXME: errors are fatal for the logging system
-
     my ($facility, $prio, $msg) =
        ("monitor", "FATAL", "EMPTY LOG MESSAGE WAS USED!");
 
+    my $callerlevel = 0;
+    if (defined $keys->{CALLERLEVEL}) {
+	$callerlevel = $keys->{CALLERLEVEL};
+    }
     my ($package, $filename, $line, $subroutine, $hasargs,
-        $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
+        $wantarray, $evaltext, $is_require, $hints, $bitmask) 
+	= caller($callerlevel);
 
     ## get parameters
+    if (ref $keys->{FACILITY} eq 'ARRAY') {
+	foreach my $entry (@{$keys->{FACILITY}}) {
+	    $self->log(
+		MESSAGE     => $keys->{MESSAGE},
+		FACILITY    => $entry,
+		PRIORITY    => $keys->{PRIORITY},
+		CALLERLEVEL => 1,
+		);
+	}
+	return 1;
+    }
 
     $facility = lc($keys->{FACILITY})
         if (exists $keys->{FACILITY} and
@@ -140,7 +150,7 @@ sub log
 
     my $return = $self->{$facility}->log (eval ("\$${prio}"), $msg);
 
-    return $return if (exists $keys->{MESSAGE} and length ($keys->{MESSAGE}));
+    return $return if (defined $keys->{MESSAGE} and length ($keys->{MESSAGE}));
 
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_SERVER_LOG_EMPTY_LOG_MESSAGE",
@@ -190,6 +200,9 @@ parameters:
 =item * PRIORITY (debug, info, warn, error, fatal)
 
 =item * FACILITY (auth, audit, monitor, system)
+
+It is possible to specify more than one facility by passing an array
+reference here.
 
 =item * MESSAGE (normal text string)
 

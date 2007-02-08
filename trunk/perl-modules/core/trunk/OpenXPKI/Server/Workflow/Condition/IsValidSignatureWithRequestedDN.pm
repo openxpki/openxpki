@@ -54,6 +54,11 @@ sub evaluate {
     };
     if ($EVAL_ERROR) {
         ##! 4: 'signature invalid: ' . $EVAL_ERROR
+	CTX('log')->log(
+	    MESSAGE => "Invalid SCEP signature; CSR subject: $csr_subject, signature subject: $sig_subject",
+	    PRIORITY => 'info',
+	    FACILITY => 'audit',
+	    );
     }
     else {
         ##! 16: 'signature valid'

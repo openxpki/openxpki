@@ -6,18 +6,19 @@
 ## Copyright (C) 2004-2005 by The OpenXPKI Project
 ## $Revision$
 
-use strict;
-use warnings;
-
-## delay connection setup
 
 package OpenXPKI::Server::Log::Appender::DBI;
+
+use strict;
+use warnings;
 
 use base qw(Log::Log4perl::Appender::DBI);
 
 sub _init
 {
     my $self = shift;
+
+    ## delay connection setup
     $self->{init_params} = { @_ };
     return 1;
 }

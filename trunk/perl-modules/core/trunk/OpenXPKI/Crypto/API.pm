@@ -255,7 +255,7 @@ sub online
     $self->get_instance()->online();
 }
 
-sub key_online
+sub key_usable
 {
     my $self = shift;
     my $ident = ident $self;
@@ -263,9 +263,9 @@ sub key_online
     if (@_)
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_KEY_ONLINE_ILLEGAL_PARAM");
+            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_KEY_USABLE_ILLEGAL_PARAM");
     }
-    $self->get_instance()->key_online();
+    $self->get_instance()->key_usable();
 }
 
 sub get_mode

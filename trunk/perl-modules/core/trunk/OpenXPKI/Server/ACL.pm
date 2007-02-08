@@ -4,13 +4,13 @@
 ## Copyright (C) 2006 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::Server::ACL;
+
 use strict;
 use warnings;
 use utf8;
-
-package OpenXPKI::Server::ACL;
-
 use English;
+
 use OpenXPKI::Debug 'OpenXPKI::Server::ACL';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -241,7 +241,7 @@ sub authorize
                         AUTH_ROLE     => $user});
     }
 
-    if (not exists $self->{PKI_REALM}->{$realm}->{ROLES}->{$user})
+    if (! exists $self->{PKI_REALM}->{$realm}->{ROLES}->{$user})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_ILLEGAL_AUTH_ROLE",
@@ -251,25 +251,78 @@ sub authorize
                         AUTH_ROLE     => $user});
     }
 
-    # TODO: does this work for stuff like
-    # API::Workflow::something?
-    # apparently not
-    # FIXME: check API::Workflow::*, then API::*, then '*', ...
-    my $class = substr($activity,0,index($activity, "::"))."::*";
-    if (not exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{$activity}
-        and
-        not exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{$class}
-        and
-        not exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{'*'})
-    {
-        ##! 99: 'permission denied'
+    my $granted;
+    my $requested_activity = $activity;
+    
+  PERMISSION_CHECK:
+    while ($requested_activity ne '') {
+	if (exists $self->{PKI_REALM}->{$realm}->{ACL}->{$owner}->{$user}->{$requested_activity}) {
+	    $granted = 1;
+	    last PERMISSION_CHECK;
+	}
+	if ($requested_activity eq $activity) {
+	    # replace Level1::Level2::activity by Level1::Level2::*
+	    if (! ($requested_activity =~ s{ :: [^:]+ \z }{::*}xms)) {
+		OpenXPKI::Exception->throw (
+		    message => "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_MALFORMED_ACTIVITY",
+		    params  => {
+			PKI_REALM     => $realm,
+			ACTIVITY      => $activity,
+			AFFECTED_ROLE => $owner,
+			AUTH_ROLE     => $user,
+		    },
+		    log => {
+			logger => CTX('log'),
+			priority => 'error',
+			facility => 'auth',
+		    },
+		    );
+	    }
+	}
+	elsif ($requested_activity =~ m{ ::\* \z }xms) {
+	    # replace Level1::Level2::* by Level1::*
+	    $requested_activity =~ s{ [^:]+ ::\* \z }{*}xms;
+	}
+	elsif ($requested_activity eq '*') {
+	    # last step, replace '*' by ''
+	    $requested_activity = '';
+	}
+	else {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_MALFORMED_ACTIVITY",
+		params  => {
+		    PKI_REALM     => $realm,
+		    ACTIVITY      => $activity,
+		    AFFECTED_ROLE => $owner,
+		    AUTH_ROLE     => $user,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'auth',
+		},
+		);
+	}
+    }
+
+    if (! $granted) {
+        ##! 4: 'permission denied'
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED",
-            params  => {PKI_REALM     => $realm,
-                        ACTIVITY      => $activity,
-                        AFFECTED_ROLE => $owner,
-                        AUTH_ROLE     => $user});
+            params  => {
+		PKI_REALM     => $realm,
+		ACTIVITY      => $activity,
+		AFFECTED_ROLE => $owner,
+		AUTH_ROLE     => $user,
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'info',
+		facility => 'auth',
+	    },
+	    );
     }
+
     return 1;
 }
 

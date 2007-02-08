@@ -177,8 +177,14 @@ sub execute_workflow_activity {
                     ACTIVITY => $wf_activity,
                     PARAM    => $key,
                     VALUE    => $wf_params->{$key}
-	        });
-        }
+	        },
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'system',
+		},
+		);
+	}
     }
 
     ##! 2: "set parameters"
@@ -191,6 +197,11 @@ sub execute_workflow_activity {
     };
     if ($EVAL_ERROR) {
         my $eval = $EVAL_ERROR;
+	my $log = {
+	    logger => CTX('log'),
+	    priority => 'error',
+	    facility => 'system',
+	};
 
         ## normal OpenXPKI exception
         $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
@@ -202,7 +213,9 @@ sub execute_workflow_activity {
             if (ref $error eq '')
             {
                 OpenXPKI::Exception->throw (
-                    message => $error);
+                    message => $error,
+		    log     => $log,
+		    );
             }
             if (ref $error eq 'ARRAY')
             {
@@ -218,14 +231,25 @@ sub execute_workflow_activity {
                 }
                 OpenXPKI::Exception->throw (
                     message  => "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED",
-                    children => [ @list ]);
-            } 
+                    children => [ @list ],
+		    log      => $log,
+		    );
+            }
         }
 
         ## unknown exception
-        OpenXPKI::Exception->throw (message => scalar $eval);
+        OpenXPKI::Exception->throw(
+	    message => scalar $eval,
+	    log     => $log,
+	    );
     };
     ##! 64: Dumper $workflow
+
+    CTX('log')->log(
+	MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
+	PRIORITY => 'info',
+	FACILITY => 'system',
+	);
 
     return __get_workflow_info($workflow);
 }
@@ -371,6 +395,15 @@ sub create_workflow_instance {
                     message => 'I18N_WF_ERROR_ILLEGAL_STATE');
         };
     }        
+
+    my $wf_id = $workflow->id();
+    
+    CTX('log')->log(
+	MESSAGE  => "Workflow instance $wf_id created (type: '$wf_title')",
+	PRIORITY => 'info',
+	FACILITY => 'system',
+	);
+
     return __get_workflow_info($workflow);
 }
 

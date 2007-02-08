@@ -45,7 +45,7 @@ sub evaluate {
         my @filters = split(/,/, $self->RDN_filter());
         foreach my $filter (@filters) {
             ##! 128: 'filter: ' . $filter
-            push @filtered_rdns, (grep /^$filter=/, @rdns);
+            push @filtered_rdns, grep(/^$filter=/, @rdns);
         }
     }
     my $dynamic_subject;

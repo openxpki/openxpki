@@ -14,8 +14,6 @@ sub validate {
     $context->param ('creator'      => CTX('session')->get_user());
     $context->param ('creator_role' => CTX('session')->get_role());
     
-    ## return true is senselesse because only exception will be used
-    ## but good style :)
     return 1;
 }
 

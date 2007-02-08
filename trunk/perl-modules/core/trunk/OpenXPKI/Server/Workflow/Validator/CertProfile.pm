@@ -41,6 +41,13 @@ sub validate {
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_UNSUPPORTED_PROFILE',
                          {PROFILE      => $profile} ];
         $context->param ("__error" => $errors);
+	
+	CTX('log')->log(
+	    MESSAGE => "Unsupported certificate profile '$profile'",
+	    PRIORITY => 'error',
+	    FACILITY => 'system',
+	    );
+	
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -57,6 +64,13 @@ sub validate {
             push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_ID_MISMATCH',
                              {PROFILE      => $profile} ];
             $context->param ("__error" => $errors);
+
+	    CTX('log')->log(
+		MESSAGE => "Certificate profile id mismatch for profile '$profile'",
+		PRIORITY => 'error',
+		FACILITY => 'system',
+		);
+
             validation_error ($errors->[scalar @{$errors} -1]);
         }
     } else {
@@ -64,8 +78,6 @@ sub validate {
         $context->param ("cert_profile_id" => $index);
     }
 
-    ## return true is senselesse because only exception will be used
-    ## but good style :)
     return 1;
 }
 

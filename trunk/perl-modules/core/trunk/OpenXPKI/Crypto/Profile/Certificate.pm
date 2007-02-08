@@ -226,16 +226,6 @@ sub get_digest
     return $self->{PROFILE}->{DIGEST};
 }
 
-# FIXME: this is not really needed, in fact it can damage the initial
-# validity computation
-# sub set_days
-# {
-#     my $self = shift;
-#     $self->{PROFILE}->{NOTAFTER} = $self->{PROFILE}->{NOTBEFORE}->clone();
-#     $self->{PROFILE}->{NOTAFTER}->add (days => shift);
-#     return 1;
-# }
-
 sub set_subject
 {
     my $self = shift;

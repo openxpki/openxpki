@@ -45,10 +45,30 @@ sub set_secret_part
     ##! 1: "start, forward and finish"
     my $self = shift;
     my $args = shift;
-    return CTX('crypto_layer')->set_secret_group_part({
-       GROUP => $args->{SECRET},
-       PART  => $args->{PART},
-       VALUE => $args->{VALUE}});
+
+    my $result = 
+	CTX('crypto_layer')->set_secret_group_part(
+	    {
+		GROUP => $args->{SECRET},
+		PART  => $args->{PART},
+		VALUE => $args->{VALUE}
+	    });
+
+    if ($result) {
+	CTX('log')->log(
+	    MESSAGE  => "Secret part $args->{PART} set for group $args->{SECRET}",
+	    PRIORITY => 'info',
+	    FACILITY => 'audit',
+	    );
+    } else {
+	CTX('log')->log(
+	    MESSAGE  => "Incorrect secret part $args->{PART} entered for group $args->{SECRET}",
+	    PRIORITY => 'warn',
+	    FACILITY => 'audit',
+	    );
+    }
+    
+    return $result;
 }
 
 sub clear_secret
@@ -56,6 +76,13 @@ sub clear_secret
     ##! 1: "start, forward and finish"
     my $self = shift;
     my $args = shift;
+
+    CTX('log')->log(
+	MESSAGE  => "Clearing secret for group $args->{SECRET}",
+	PRIORITY => 'info',
+	FACILITY => 'audit',
+	);
+
     return CTX('crypto_layer')->clear_secret_group($args->{SECRET});
 }
 

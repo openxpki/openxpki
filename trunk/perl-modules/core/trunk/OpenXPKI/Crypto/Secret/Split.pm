@@ -52,8 +52,6 @@ use OpenXPKI::Server::Context qw( CTX );
             );
         }
         if (defined $arg_ref && defined $arg_ref->{TOKEN}) {
-            # FIXME: this is not really clean, the token
-            # should be created here, not passed here
             $token_of{$ident} = $arg_ref->{TOKEN};
         }
         else {
@@ -237,11 +235,7 @@ use OpenXPKI::Server::Context qw( CTX );
                 COMMAND => 'is_prime',
                 PRIME   => $hex_test_prime,
             });
-            #my $openssl = `openssl prime -hex $hex_test_prime`;
-            # TODO: use CLI or module for primes
-            #if ($openssl =~ /is prime/) {
-            #    $prime_found = 1;
-            #}
+
             if (! defined $prime_found) {
                 $test_prime->badd($TWO); # next, please
             }

@@ -27,14 +27,17 @@ sub validate {
     ## the specified role must be in the ACL specification
     if (not grep /^$role$/, @roles)
     {
-        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_ROLE_NOT_EXISTS',
+        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_ROLE_INVALID',
                          {ROLE => $role} ];
         $context->param ("__error" => $errors);
+	CTX('log')->log(
+	    MESSAGE => "Invalid certificate role '$role'",
+	    PRIORITY => 'error',
+	    FACILITY => 'system',
+	    );
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
-    ## return true is senselesse because only exception will be used
-    ## but good style :)
     return 1;
 }
 

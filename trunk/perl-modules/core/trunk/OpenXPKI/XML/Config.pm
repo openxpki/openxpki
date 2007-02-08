@@ -5,11 +5,11 @@
 ## Copyright (C) 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::XML::Config;
+
 use strict;
 use warnings;
 use utf8;
-
-package OpenXPKI::XML::Config;
 
 use OpenXPKI::XML::Cache;
 use OpenXPKI::Debug 'OpenXPKI::XML::Config';

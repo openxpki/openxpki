@@ -54,6 +54,11 @@ sub evaluate {
     if (!defined $signer_cert_identifier || $signer_cert_identifier eq '') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_COULD_NOT_ESTABLISH_SIGNER_CERT_ID',
+	    log => {
+		logger => CTX('log'),
+		priority => 'info',
+		facility => 'system',
+	    },
         );
     }
 

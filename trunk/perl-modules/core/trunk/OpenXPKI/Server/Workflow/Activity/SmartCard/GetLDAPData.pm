@@ -31,11 +31,11 @@ sub execute {
     my $ldap_basedn     = $self->param('ldap_basedn');
     my $ldap_attributes = $self->param('ldap_attributes');
     my $ldap_timelimit  = $self->param('ldap_timelimit');
-    my @ldap_attribs    = split /,/, $ldap_attributes;
+    my @ldap_attribs    = split(/,/, $ldap_attributes);
 
     ##! 2: 'connecting to ldap server ' . $ldap_server . ':' . $ldap_port
     my $ldap = Net::LDAP->new(
-        "$ldap_server",
+        $ldap_server,
         port    => $ldap_port,
         onerror => undef,
     );
@@ -50,6 +50,11 @@ sub execute {
                 'LDAP_SERVER' => $ldap_server,
                 'LDAP_PORT'   => $ldap_port,
             },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'monitor',
+	    },
         );
     }
 
@@ -63,7 +68,12 @@ sub execute {
             params  => {
                 ERROR      => $mesg->error(),
                 ERROR_DESC => $mesg->error_desc(),
-            }
+            },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'monitor',
+	    },
         );
     }
     ##! 2: 'ldap->bind() done'
@@ -83,7 +93,12 @@ sub execute {
             params  => {
                 ERROR      => $mesg->error(),
                 ERROR_DESC => $mesg->error_desc(),
-            }
+            },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'monitor',
+	    },
         );
     }
     ##! 2: 'ldap->search() done'
@@ -92,11 +107,27 @@ sub execute {
     if ($mesg->count == 0) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND',
+	    params => {
+		FILTER => "$key=$value",
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
         );
     }
     elsif ($mesg->count > 1) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_MORE_THAN_ONE_LDAP_ENTRY_FOUND',
+	    params => {
+		FILTER => "$key=$value",
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
         );
     }
 

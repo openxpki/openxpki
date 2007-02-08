@@ -113,7 +113,7 @@ sub execute {
     my $ident = ident $self;
     my $arg_ref   = shift;
 
-    my $return = "";
+    my $return = '';
     my $params;
 
     if (defined $arg_ref) {
@@ -149,22 +149,23 @@ sub execute {
             }
             else {
                 ## capture STDOUT
-                if (open my $FD, "$cmd|") {
-                    $params->[$i]->{STDOUT} = '';
-                    while (<$FD>) { # TODO: slurp
-                        $params->[$i]->{STDOUT} .= $_;
-                    }
-                    $return .= $params->[$i]->{STDOUT};
-                    close $FD;
-                }
-                else {
+		$return = do {
+		    open my $FD, "$cmd|";   # slurp stdout
+		    local $INPUT_RECORD_SEPARATOR;
+		    <$FD>;
+		};
+
+		if ($CHILD_ERROR != 0) {
                     OpenXPKI::Exception->throw (
                         message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDOUT_FAILED',
-                        params  => { 'ERRVAL' => $EVAL_ERROR,
-                                   },
-                        );
+                        params  => { 
+			    CHILD_ERROR => $CHILD_ERROR,
+			},
+		    );
                 }
-            }
+		
+		$params->[$i]->{STDOUT} = $return;
+	    }
         } else {
             ## simply execute the command
             `$cmd`;

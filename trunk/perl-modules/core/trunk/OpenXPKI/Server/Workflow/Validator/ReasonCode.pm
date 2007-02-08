@@ -35,6 +35,11 @@ sub validate {
     if (! grep { $_ eq $reason_code} @valid_reason_codes) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REASON_CODE_INVALID',
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
         );
     }
     return 1;

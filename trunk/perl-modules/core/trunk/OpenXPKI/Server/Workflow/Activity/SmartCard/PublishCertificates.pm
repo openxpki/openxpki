@@ -36,7 +36,7 @@ sub execute {
 
     ##! 2: 'connecting to ldap server ' . $ldap_server . ':' . $ldap_port
     my $ldap = Net::LDAP->new(
-        "$ldap_server",
+        $ldap_server,
         port    => $ldap_port,
         onerror => undef,
     );
@@ -51,6 +51,11 @@ sub execute {
                 'LDAP_SERVER' => $ldap_server,
                 'LDAP_PORT'   => $ldap_port,
             },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'system',
+	    },
         );
     }
 
@@ -64,7 +69,12 @@ sub execute {
             params  => {
                 ERROR      => $mesg->error(),
                 ERROR_DESC => $mesg->error_desc(),
-            }
+            },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'system',
+	    },
         );
     }
     ##! 2: 'ldap->bind() done'
@@ -83,7 +93,12 @@ sub execute {
             params  => {
                 ERROR      => $mesg->error(),
                 ERROR_DESC => $mesg->error_desc(),
-            }
+            },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'system',
+	    },
         );
     }
     ##! 2: 'ldap->search() done'
@@ -92,11 +107,27 @@ sub execute {
     if ($mesg->count == 0) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_ENTRY_NOT_FOUND',
+	    params => {
+		FILTER => "$key=$value",
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
         );
     }
     elsif ($mesg->count > 1) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_MORE_THAN_ONE_LDAP_ENTRY_FOUND',
+	    params => {
+		FILTER => "$key=$value",
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
         );
     }
 
@@ -105,6 +136,11 @@ sub execute {
     if (!defined $wf_children) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_NO_WF_CHILDREN',
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'system',
+	    },
         );
     }
     my @certs_der;
@@ -122,6 +158,11 @@ sub execute {
         if (!defined $certificate) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_NO_CERTIFICATE_IN_CHILD_WORKFLOW',
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'system',
+		},
             );
         }
         my $cert_der = $default_token->command({
@@ -132,6 +173,11 @@ sub execute {
         if (!defined $cert_der || $cert_der eq '') {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER',
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'system',
+		},
             );
         }
         else {
@@ -142,6 +188,11 @@ sub execute {
     if (! @certs_der) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_NO_CERTS_AVAILABLE_FOR_PUBLICATION',
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'system',
+	    },
         );
     }
 
@@ -160,8 +211,18 @@ sub execute {
                     ERROR      => $mesg->error(),
                     ERROR_DESC => $mesg->error_desc(),
                 },
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'monitor',
+		},
             );
         }
+	CTX('log')->log(
+	    MESSAGE => 'Successfully published certificate to ' . $entry->dn() . ' on server ' . $ldap_server . ' port ' . $ldap_port,
+	    PRIORITY => 'info',
+	    FACILITY => 'system',
+	    );
     }
 
     ##! 4: 'end'

@@ -7,11 +7,11 @@
 ## (C) Copyright 2003-2007 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::Server::Authentication;
+
 use strict;
 use warnings;
 use utf8;
-
-package OpenXPKI::Server::Authentication;
 
 use English;
 use OpenXPKI::Debug 'OpenXPKI::Server::Authentication';
@@ -202,7 +202,14 @@ sub login_step {
         ! scalar @{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}}) {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK",
-            params  => {STACK => $stack},
+            params  => {
+		STACK => $stack
+	    },
+	    log     => {
+		logger => CTX('log'),
+		priority => 'info',
+		facility => 'auth',
+	    },
         );
     }
 
@@ -211,13 +218,23 @@ sub login_step {
     my $user;
     my $role;
     my $return_msg = {};
+  HANDLER:
     foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}}) {
         ##! 4: "handler $handler from stack $stack"
         my $ref = $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler};
         if (! ref $ref) { # note the great choice of variable name ...
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_WRONG_HANDLER",
-                params  => {PKI_REALM => $realm, HANDLER => $handler});
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_INCORRECT_HANDLER",
+                params  => {
+		    PKI_REALM => $realm, 
+		    HANDLER => $handler,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'system',
+		},
+		);
         }
         eval {
             ($user, $role, $return_msg) = $ref->login_step({
@@ -228,8 +245,9 @@ sub login_step {
         if (! $EVAL_ERROR) {
             ##! 8: "login step ok"
             $ok = 1;
+
             ##! 8: "session configured"
-            last;
+            last HANDLER;
         } else {
             ##! 8: "EVAL_ERROR detected"
             ##! 64: '$EVAL_ERROR = ' . $EVAL_ERROR
@@ -240,13 +258,33 @@ sub login_step {
         if (my $exc = OpenXPKI::Exception->caught()) {
             OpenXPKI::Exception->throw (
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
-                children => [ $exc ]);
+                children => [ $exc ],
+		log => {
+		    logger => CTX('log'),
+		    priority => 'warn',
+		    facility => 'auth',
+		},
+		);
         }
         else {
             OpenXPKI::Exception->throw (
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
-                children => [ $EVAL_ERROR->message() ]);
+                children => [ $EVAL_ERROR->message() ],
+		log => {
+		    logger => CTX('log'),
+		    priority => 'warn',
+		    facility => 'auth',
+		},
+		);
         }
+    }
+
+    if (defined $user) {
+	CTX('log')->log(
+	    MESSAGE  => "Login successful using authentication stack '$stack' (user: '$user', role: '$role')",
+	    PRIORITY => 'info',
+	    FACILITY => 'auth',
+	    );
     }
 
     return ($user, $role, $return_msg); 

@@ -29,14 +29,9 @@ our ($errno, $errval);
 ($OpenXPKI::Server::DBI::VERSION = '$Revision$' )=~ s/(?:^.*: (\d+))|(?:\s+\$$)/defined $1?"0\.9":""/eg; 
 
 sub new {
-  
-    # no idea what this should do
-  
     my $that = shift;
     my $class = ref($that) || $that;
     my $self = bless {}, $class;
-
-    # ok here I start ;-)
 
     my $keys = { @_ };
 
@@ -98,12 +93,6 @@ sub new_dbh {
     return 1;
 }
 
-sub set_crypto
-{
-    my $self = shift;
-    $self->{crypto} = shift;
-    return $self->{crypto};
-}
 
 ########################################################################
 
@@ -465,11 +454,6 @@ parameters are supported:
 =back
 
 Please remember that not all drivers can handle all parameters.
-
-=head3 set_crypto
-
-configures the instance of the crypto token to support the
-instantiation of cryptographic objects like certificates.
 
 =head3 get_driver_name
 

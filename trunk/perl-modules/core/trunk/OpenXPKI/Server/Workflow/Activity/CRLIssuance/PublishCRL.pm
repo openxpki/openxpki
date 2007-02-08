@@ -106,6 +106,13 @@ sub execute {
             CONTENT  => $content,
             FORCE    => 1,
         });
+	
+	CTX('log')->log(
+	    MESSAGE => 'CRL published to file ' . $filename . '  for CA ' . $current_ca . ' in realm ' . $pki_realm,
+	    PRIORITY => 'info',
+	    FACILITY => [ 'system' ],
+	    );
+	
     }
     # do LDAP publication if configured
     my $config = CTX('xml_config');
@@ -263,8 +270,20 @@ sub execute {
                         ERROR      => $mesg->error(),
                         ERROR_DESC => $mesg->error_desc(),
                     },
+		    log => {
+			logger => CTX('log'),
+			priority => 'warn',
+			facility => 'monitor',
+		    },
                 );
             }
+
+	    CTX('log')->log(
+		MESSAGE => 'CRL published to LDAP location ' . $entry->dn()  . 'on server ' .  $ldap_server . ' port ' . $ldap_port . ' for CA ' . $current_ca . ' in realm ' . $pki_realm,
+		PRIORITY => 'info',
+		FACILITY => [ 'system' ],
+		);
+	    
         }
     }
 

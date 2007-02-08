@@ -4,11 +4,11 @@
 ## Copyright (C) 2005 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::Server::Init;
+
 use strict;
 use warnings;
 use utf8;
-
-package OpenXPKI::Server::Init;
 
 ## used modules
 
@@ -96,27 +96,19 @@ sub init {
 	}
 	elsif ($EVAL_ERROR)
 	{
-	    my $msg = $EVAL_ERROR;
-	    if (ref $EVAL_ERROR) {
-		$msg = $EVAL_ERROR->message();
-	    }
-
 	    log_wrapper(
 		{
-		    MESSAGE  => "Exception during initialization task '$task': " . $msg,
+		    MESSAGE  => "Exception during initialization task '$task': " . $EVAL_ERROR,
 		    PRIORITY => "fatal",
 		    FACILITY => "system",
 		});
 	    
-	    if (ref $EVAL_ERROR) {
-		$EVAL_ERROR->rethrow();
-	    } else {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
-		    params  => {
-			task => $task,
-		    });
-	    }
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
+		params  => {
+		    task => $task,
+		    EVAL_ERROR => $EVAL_ERROR,
+		});
 	}
 
 	$is_initialized{$task}++;
@@ -339,7 +331,7 @@ sub __do_init_authentication {
     my $obj = OpenXPKI::Server::Authentication->new();
     if (! defined $obj) {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_FAILURE");
+            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_INSTANTIATION_FAILURE");
     }
     OpenXPKI::Server::Context::setcontext(
 	{
@@ -380,7 +372,7 @@ sub get_xml_config
     if (not -r $keys->{"CONFIG"})
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_XML_CONFIG_FILE_IS_NOT_READABLE",
+            message => "I18N_OPENXPKI_SERVER_INIT_XML_CONFIG_FILE_NOT_READABLE",
             params  => {"FILENAME" => $keys->{CONFIG}});
     }
 
@@ -500,8 +492,12 @@ sub get_pki_realms
 			{
 			    $exc->rethrow();
 			}
-		    } elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
-			$EVAL_ERROR->rethrow();
+		    } elsif ($EVAL_ERROR) {
+			OpenXPKI::Exception->throw (
+			    message => "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_VALIDITY_ERROR",
+			    params  => {
+				EVAL_ERROR => $EVAL_ERROR,
+			    });
 		    }
 		    
 		    ### got format: $format
@@ -627,13 +623,6 @@ sub get_pki_realms
 		    });
 		
 		    next ISSUINGCA;
-                    # we don't want this to be fatal!
-                    #OpenXPKI::Exception->throw(
-                    #    message => 'I18N_OPENXPKI_SERVER_INIT_COULD_NOT_DETERMINE_CA_IDENTIFIER',
-                    #    params  => {
-                    #        CA => $ca_id,
-                    #    },
-                    #);
                 }
     
                 ###########################################################

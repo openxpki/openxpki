@@ -229,12 +229,12 @@ OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
 OpenXPKI/Server/Workflow/Observer/AddExecuteHistory.pm
 OpenXPKI/Server/Workflow/Observer/Debug.pm
+OpenXPKI/Server/Workflow/Observer/Log.pm
 
 OpenXPKI/Server/Workflow/Condition/ACL.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysFalse.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysTrue.pm
 OpenXPKI/Server/Workflow/Condition/Approved.pm
-OpenXPKI/Server/Workflow/Condition/ContextParameterExistence.pm
 OpenXPKI/Server/Workflow/Condition/Key.pm
 OpenXPKI/Server/Workflow/Condition/Server.pm
 OpenXPKI/Server/Workflow/Condition/CRLSigningCAsLeft.pm
@@ -244,7 +244,6 @@ OpenXPKI/Server/Workflow/Condition/CorrectTiming.pm
 OpenXPKI/Server/Workflow/Condition/IsValidSignatureWithRequestedDN.pm
 OpenXPKI/Server/Workflow/Condition/CorrectNumberOfValidCerts.pm
 OpenXPKI/Server/Workflow/Condition/SignedUsingOriginalCertOrSelfSigned.pm
-OpenXPKI/Server/Workflow/Condition/ApprovalNeeded.pm
 OpenXPKI/Server/Workflow/Condition/MoreCertsToTest.pm
 OpenXPKI/Server/Workflow/Condition/MoreCSRsToCreate.pm
 OpenXPKI/Server/Workflow/Condition/IsCertificateIssuancePossible.pm

@@ -34,7 +34,7 @@ sub evaluate {
 
     my $context  = $workflow->context();
     ##! 16: 'context: ' . Dumper($context)
-    my @required_context_params = split /,/, $self->required();
+    my @required_context_params = split(/,/, $self->required());
 
     my $all_params_present = 1;
     foreach my $param (@required_context_params) {

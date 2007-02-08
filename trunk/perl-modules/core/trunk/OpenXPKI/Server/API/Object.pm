@@ -249,8 +249,6 @@ sub get_private_key_for_cert {
     my $arg_ref = shift;
     ##! 1: 'start'
 
-    # TODO -- how do we prevent the password from appearing in the
-    # debug log all over the place (Service, ...)
     my $identifier = $arg_ref->{IDENTIFIER};
     my $format     = $arg_ref->{FORMAT};
     my $password   = $arg_ref->{PASSWORD};
@@ -360,6 +358,13 @@ sub get_private_key_for_cert {
     if (!defined $result) {
         $result = $default_token->command($command_hashref);
     }
+
+    CTX('log')->log(
+        MESSAGE  => "Private key requested for certificate $identifier",
+        PRIORITY => 'info',
+        FACILITY => 'audit',
+    );
+
     return {
             PRIVATE_KEY => $result,
     };

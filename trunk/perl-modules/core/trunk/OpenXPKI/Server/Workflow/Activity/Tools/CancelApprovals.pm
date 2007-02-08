@@ -21,6 +21,14 @@ sub execute
 
     ## delete approvals (set to a serialized empty hashref)
     $context->param('approvals' => $serializer->serialize({})) ;
+
+    CTX('log')->log(
+	MESSAGE => 'All existing approvals canceled for workflow ' . $workflow->id() . " by user $user, role $role",
+	PRIORITY => 'info',
+	FACILITY => 'audit',
+	);
+
+    return 1;
 }
 
 

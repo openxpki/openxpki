@@ -65,16 +65,6 @@ sub get_command
 
     my $algclass = __PACKAGE__."::".$self->{TYPE};
 
-    # added some use statements at top of the class
-    # ##! 1: "FIXME: require should never be called in normal code"
-    # ##! 1: "FIXME: always use 'use ...;' at top of a module!"
-    # eval "require $algclass";
-    # if ($EVAL_ERROR) 
-    # {
-    #     OpenXPKI::Exception->throw (
-    #         message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE",
-    #         params  => {"TYPE" => $self->{TYPE}});
-    # }
     my $algobj = $algclass->new ($self);
 
     ## we do not need to check the result because 

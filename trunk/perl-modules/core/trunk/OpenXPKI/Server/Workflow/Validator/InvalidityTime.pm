@@ -24,6 +24,11 @@ sub validate {
     if (! $identifier =~ m{ [a-zA-Z\-_]+ }xms) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER',
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
         );
     }
     ##! 16: 'invalidity time: ' . $invalidity_time
@@ -49,6 +54,11 @@ sub validate {
     if (! defined $cert) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB',
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
         );
     }
     my $notbefore = $cert->{'NOTBEFORE'};
@@ -59,17 +69,32 @@ sub validate {
     if ($invalidity_time < $notbefore) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE',
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
         );
         
     }
     if ($invalidity_time > $notafter) {
         OpenXPKI::Exception->thow(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER',
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
         );
     }
     if ($invalidity_time > $now) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE',
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
         );
     }
     return 1;

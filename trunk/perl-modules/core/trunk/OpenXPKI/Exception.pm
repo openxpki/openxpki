@@ -4,12 +4,12 @@
 ## Copyright (C) 2005 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::Exception;
+
 use strict;
 use warnings;
 #use diagnostics;
 use utf8;
-
-package OpenXPKI::Exception;
 
 use OpenXPKI::Debug 'OpenXPKI::Exception';
 
@@ -65,6 +65,51 @@ sub full_message
     ##! 1: "exception thrown: $msg"
 
     return $msg;
+}
+
+sub throw {
+    my $proto = shift;
+
+    $proto->rethrow if ref $proto;
+
+    my %args = ( @_ );
+    my %exception_args = %args;
+    delete $exception_args{log};
+    
+    my $self = $proto->new(%exception_args);
+
+    if (exists $args{log}
+	&& exists $args{log}->{logger}
+	&& (ref $args{log}->{logger} eq 'OpenXPKI::Server::Log')) {
+
+	my $message;
+	if (exists $args{log}->{message}) {
+	    $message = $args{log}->{message};
+	} else {
+	    $message = 'Exception: ' . $self->full_message(%args);
+	}
+	
+	my $facility = 'system';
+	if (exists $args{log}->{facility}) {
+	    $facility = $args{log}->{facility};
+	}
+	
+	my $priority = 'debug';
+	if (exists $args{log}->{priority}) {
+	    $priority = $args{log}->{priority};
+	}
+
+	$args{log}->{logger}->log(
+	    MESSAGE     => $message,
+	    FACILITY    => $facility,
+	    PRIORITY    => $priority,
+	    CALLERLEVEL => 1,
+	    );
+
+	delete $args{log};
+    }
+
+    die $self;
 }
 
 #sub get_errno

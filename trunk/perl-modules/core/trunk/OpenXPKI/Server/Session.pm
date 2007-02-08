@@ -4,17 +4,17 @@
 ## (C) Copyright 2006 by The OpenXPKI Project
 ## $Revision$
 
+package OpenXPKI::Server::Session;
+
 use strict;
 use warnings;
 use utf8;
-
-package OpenXPKI::Server::Session;
 
 use English;
 use OpenXPKI::Exception;
 use OpenXPKI::i18n;
 
-## switch of IP checks
+## switch off IP checks
 use CGI::Session qw/-ip-match/;
 use Digest::SHA1 qw( sha1_hex );;
 

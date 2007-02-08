@@ -5,10 +5,15 @@
 ## (C) Copyright 2003-2006 by The OpenXPKI Project
 ## $Revision$
 
-use strict;
-use warnings;
+# FIXME 2007-02-06 Alexander Klink/Martin Bartosch
+# This code does not support the new login_step semantics and will hence
+# not work at all (was untested before the change as well). Will need
+# some refactoring.
 
 package OpenXPKI::Server::Authentication::LDAP;
+
+use strict;
+use warnings;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::LDAP';
 use OpenXPKI::Exception;
@@ -222,11 +227,14 @@ sub login
         if ( $is_rootdse and 
              not $root_dse->supported_extension ($starttls_OID))
         {
-            CTX('log')->log (FACILITY => "system",
-                           PRIORITY => "error",
-                           MESSAGE  => "LDAP Server does not support START_TLS.");
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_START_TLS_NOT_POSSIBLE");
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_START_TLS_NOT_POSSIBLE",
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'system',
+		},
+		);
         }
         ##! 4: "executing start_tls ..."
 
@@ -235,18 +243,26 @@ sub login
                          capath => $self->{CA_PATH});
         if ( $tlsmsg->is_error() )
         {
-            my $msg = "Possible reason: The directory in \"capath\" must contain certificates ".
-                      "named using the hash value of the certificates\' subject names. ".
-                      "To generate these names, use OpenSSL like this in Unix: ".
-                      "ln -s cacert.pem \`openssl x509 -hash -noout \< cacert.pem\`.0";
-            CTX('log')->log (FACILITY => "system",
-                           PRIORITY => "error",
-                           MESSAGE  => "LDAP Server failed during start_tls.\n$msg\n".
-                                       join ", ", $self->__get_ldap_error ($tlsmsg));
+            # LDAP Server failed during start_tls. 
+	    # Possible reason: The directory in "capath" must 
+	    # contain certificates.
+	    # named using the hash value of the certificates' subject names.
+	    # To generate these names, use OpenSSL like this in Unix:
+	    # ln -s cacert.pem `openssl x509 -hash -noout < cacert.pem`.0
+
             ##! 8: join ",", $self->__get_ldap_error ($tlsmsg)
+
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_START_TLS_NOT_POSSIBLE",
-                params  => {$self->__get_ldap_error ($tlsmsg)});
+                params  => {
+		    $self->__get_ldap_error ($tlsmsg),
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'auth',
+		},
+		);
         } else {
             ##! 8: "starttls successful"
         }
@@ -264,18 +280,23 @@ sub login
         } else {  
             ##! 8: "LDAP bind: ", join ", ", $self->__get_ldap_error ($bindmsg)
         }
-        CTX('log')->log (FACILITY => "system",
-                       PRIORITY => "error",
-                       MESSAGE  => "LDAP bind to server failed.\n".
-                                   join ", ", $self->__get_ldap_error ($bindmsg));
+
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_BIND_NOT_POSSIBLE",
-            params  => {$self->__get_ldap_error ($bindmsg)});
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_BIND_FAILED",
+            params  => {
+		$self->__get_ldap_error($bindmsg),
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'auth',
+	    },
+	    );
     }
     ##! 2: "bind successful"
 		
     ## now search for an entry with an ID-attribute containing 
-    ## the value inputted by the user
+    ## the value input by the user
 
     my $searchfilter = "($self->{SEARCH_ATTRIBUTE}=".
                        "$self->{SEARCH_VALUE_PREFIX}$account)";
@@ -286,34 +307,44 @@ sub login
                          filter => $searchfilter);
     if ($searchmesg->is_error())
     {
-        CTX('log')->log (FACILITY => "system",
-                       PRIORITY => "error",
-                       MESSAGE  => "LDAP search on server failed.\n".
-                                   join ", ", $self->__get_ldap_error ($searchmesg));
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_SEARCH_FAILED",
-            params  => {$self->__get_ldap_error ($searchmesg)});
+            params  => {
+		$self->__get_ldap_error ($searchmesg)
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'auth',
+	    },
+	    );
     }
     my $entrycount = $searchmesg->count();
 		
     ## no user found?
     if ( not $entrycount )
     {
-        CTX('log')->log (FACILITY => "system",
-                       PRIORITY => "error",
-                       MESSAGE  => "LDAP login found no matching user.");
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_NO_USER_FOUND");
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_NO_USER_FOUND",
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'auth',
+	    },
+	    );
     }
 
     ## more than one user found?
-    if ( not $entrycount )
+    if ( $entrycount > 1 )
     {
-        CTX('log')->log (FACILITY => "system",
-                       PRIORITY => "error",
-                       MESSAGE  => "LDAP login found more then one matching entry.");
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MORE_THAN_ONE_USER_FOUND");
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MORE_THAN_ONE_USER_FOUND",
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => 'auth',
+	    },
+	    );
     }
 
     ## ok lets analyse the entry found:
@@ -382,11 +413,14 @@ sub login
         if ($ldapauthmeth eq "pwattr" and not $ldappwattrvaluecount )
         {
             # Error no value of ldap pw attribute 
-            CTX('log')->log (FACILITY => "system",
-                           PRIORITY => "error",
-                           MESSAGE  => "LDAP login found no password attribute in the entry.");
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MISSING_PW_ATTR_IN_ENTRY");
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MISSING_PW_ATTR_IN_ENTRY",
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'auth',
+		},
+		);
         }
     } else {
         $ldapauthmeth = $self->{DEFAULT_AUTH_METHOD};
@@ -431,11 +465,14 @@ sub login
         {
             $self->{DIGEST} = $passwd;
         } else {
-            CTX('log')->log (FACILITY => "system",
-                           PRIORITY => "error",
-                           MESSAGE  => "LDAP login found no hash algorithm for the entry.");
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MISSING_PW_ATTR_HASH_IN_ENTRY");
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MISSING_PW_ATTR_HASH_IN_ENTRY",
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'auth',
+		},
+		);
         }               
         ##! 4: "ident name ... ".$account
         ##! 4: "ident algorithm ... ".$self->{ALGORITHM}
@@ -455,11 +492,10 @@ sub login
 
         if ($self->{DIGEST} ne $ldapdigest)
         {
-             CTX('log')->log (FACILITY => "auth",
-                            PRIORITY => "warn",
-                            MESSAGE  => "LDAP login failed. Password is wrong.");
-             OpenXPKI::Exception->throw (
-                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_LOGIN_FAILED");
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_LOGIN_FAILED",
+		
+		);
         }
     }
     elsif ( $ldapauthmeth eq "bind" )

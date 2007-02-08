@@ -100,13 +100,9 @@ sub update_workflow {
 	    $exc->rethrow();
 	}
     } elsif ($EVAL_ERROR) {
-	if (ref $EVAL_ERROR) {
-	    $EVAL_ERROR->rethrow();
-	} else {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_FETCH_WORKFLOW_FAILURE",
-		params  => {EVAL_ERROR => $EVAL_ERROR});
-	}
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_FETCH_WORKFLOW_FAILURE",
+	    params  => {EVAL_ERROR => $EVAL_ERROR});
     }
     
     if ($mode eq 'INSERT')
@@ -180,6 +176,11 @@ sub update_workflow {
 		    CONTEXT_KEY => $key,
 		    CONTEXT_VALUE_LENGTH => length($value),
 		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'system',
+		},
 		);
 	}
 
@@ -191,6 +192,11 @@ sub update_workflow {
 		params  => {
 		    WORKFLOW_ID => $id,
 		    CONTEXT_KEY => $key,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => [ 'audit', 'system', ],
 		},
 		);
 	}
@@ -261,6 +267,11 @@ sub fetch_workflow {
 		REQUESTED_ID => $id,
 		RETURNED_ID  => $result->{WORKFLOW_SERIAL},
 	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
 	    );
     }
 
@@ -286,33 +297,15 @@ sub fetch_extra_workflow_data {
 	},
 	);
 
-    # NOTE: work around a bug in Workflow::Context up to and including v0.17:
-    # clear context in order to prevent merging operation when attaching
-    # the new context to the workflow instance below.
-    if ($Workflow::Context::VERSION <= 1.03) {
-	# Workflow::Context workaround
-	##! 2: "explicitly clear all context entries"
-	$workflow->context()->clear_params();
-
-	# set workflow ID (for compatibility with the non-workaround 
-	# version below)
-	$workflow->context()->param(workflow_id => $id);
-
-	foreach my $entry (@{$result}) {
-	    $workflow->context()->param($entry->{WORKFLOW_CONTEXT_KEY} =>
-					$entry->{WORKFLOW_CONTEXT_VALUE});
-	}
-    } else {
-	# new empty context
-	my $context = Workflow::Context->new();
-	foreach my $entry (@{$result}) {
-	    $context->param($entry->{WORKFLOW_CONTEXT_KEY} =>
-			    $entry->{WORKFLOW_CONTEXT_VALUE});
-	}
-
-	# merge context to workflow instance
-	$workflow->context($context);
+    # new empty context
+    my $context = Workflow::Context->new();
+    foreach my $entry (@{$result}) {
+	$context->param($entry->{WORKFLOW_CONTEXT_KEY} =>
+			$entry->{WORKFLOW_CONTEXT_VALUE});
     }
+    
+    # merge context to workflow instance
+    $workflow->context($context);
 
     return; # no useful result
 }
