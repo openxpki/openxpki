@@ -27,6 +27,7 @@ use OpenXPKI::Server::Log;
 use OpenXPKI::Server::ACL;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;
+use OpenXPKI::Server::Notification::Dispatcher;
 
 use OpenXPKI::Server::Context qw( CTX );
                 
@@ -51,6 +52,7 @@ my @init_tasks = qw(
   acl
   api
   authentication
+  notification
   server
 );
 
@@ -348,6 +350,13 @@ sub __do_init_server {
 		server => $keys->{SERVER},
 	    });
     }
+}
+
+sub __do_init_notification {
+    OpenXPKI::Server::Context::setcontext({
+        notification => OpenXPKI::Server::Notification::Dispatcher->new(),
+    });
+    return 1;
 }
 
 ###########################################################################

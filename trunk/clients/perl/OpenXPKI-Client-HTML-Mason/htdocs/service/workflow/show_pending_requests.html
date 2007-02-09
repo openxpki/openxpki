@@ -33,6 +33,7 @@ function ToggleAll() {
     </th>
 % }
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_PROFILE') %></th>
@@ -40,7 +41,6 @@ function ToggleAll() {
 % if ($creator eq '%') {
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATOR') %></th>
 % }
-<!-- TODO - possibly add ticket references once implemented -->
   </tr>
 % foreach my $res (@results) {
   <tr>
@@ -48,6 +48,11 @@ function ToggleAll() {
     <td><input type="checkbox" name="approvals"></td>
 %   }
     <td><input type="hidden" name="serials" value="<% $res->{'SERIAL'} %>"><a href="show_instance.html?type=<% $wf_type %>;id=<% $res->{'SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $res->{'SERIAL'} %></a></td>
+    <td>
+% foreach my $ticket (@{ $res->{'TICKETS'} }) {
+<small><a href="<% $ticket->{URL} %>"><% $ticket->{ID} %></a></small><br>
+% }
+    </td>
     <td><% $res->{'LAST_UPDATE'} %></td>
     <td>
     <% $res->{'SUBJECT'} %>
@@ -65,8 +70,8 @@ function ToggleAll() {
 %      }
 %   }
     </td>
-    <td><% $res->{'PROFILE'} %></td>
-    <td><% $res->{'ROLE'} %></td>
+    <td><% i18nGettext($res->{'PROFILE'}) %></td>
+    <td><% i18nGettext($res->{'ROLE'}) %></td>
 %   if ($creator eq '%') {
     <td><a href="show_pending_requests.html?creator=<% $res->{'CREATOR'} %>;show_approval_buttons=1;<% $context->{menu}->get_link_params() %>"><% $res->{'CREATOR'} %></a></td>
 %   }
@@ -146,14 +151,32 @@ foreach my $instance (@instances) {
         'msg' => Dumper \@subject_alt_names,
     );
     # TODO - error handling
+    my @tickets;
+    if (exists $wf_context->{'ticket'}) {
+        my $tickets = $ser->deserialize($wf_context->{'ticket'});
+        foreach my $key (keys %{ $tickets }) {
+            my $ticket_entry;
+            $ticket_entry->{ID} = $tickets->{$key};
+            my $url_msg = $context->{client}->send_receive_command_msg(
+                'get_url_for_ticket',
+                {
+                    NOTIFIER => $key,
+                    TICKET   => $tickets->{$key},
+                },
+            );
+            $ticket_entry->{URL} = $url_msg->{PARAMS};
+            push @tickets, $ticket_entry;
+        }
+    }
     push @results, {
         'SERIAL'            => $instance->{'WORKFLOW.WORKFLOW_SERIAL'},
         'LAST_UPDATE'       => $instance->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-        'SUBJECT',          => $wf_context->{'cert_subject'},
+        'SUBJECT'           => $wf_context->{'cert_subject'},
         'SUBJECT_ALT_NAMES' => \@subject_alt_names,
-        'PROFILE',          => $wf_context->{'cert_profile'},
-        'ROLE',             => $wf_context->{'cert_role'},
-        'CREATOR',          => $wf_context->{'creator'},
+        'PROFILE'           => $wf_context->{'cert_profile'},
+        'ROLE'              => $wf_context->{'cert_role'},
+        'CREATOR'           => $wf_context->{'creator'},
+        'TICKETS'           => \@tickets,
     };
 }
 </%init>

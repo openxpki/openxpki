@@ -161,6 +161,10 @@ OpenXPKI/Server/Authentication/Password.pm
 OpenXPKI/Server/Authentication/X509.pm
 OpenXPKI/Server/ACL.pm
 
+OpenXPKI/Server/Notification/RT.pm
+OpenXPKI/Server/Notification/Dispatcher.pm
+OpenXPKI/Server/Notification.pm
+
 ## Workflow
 OpenXPKI/Server/Workflow.pm
 
@@ -196,6 +200,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/ForkWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Sleep.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Notification.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm

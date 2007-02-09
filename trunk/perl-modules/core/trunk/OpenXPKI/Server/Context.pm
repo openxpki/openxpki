@@ -39,6 +39,7 @@ my $context = {
         acl            => undef,
         session        => undef,
         authentication => undef,
+        notification   => undef,
     },
 };
 

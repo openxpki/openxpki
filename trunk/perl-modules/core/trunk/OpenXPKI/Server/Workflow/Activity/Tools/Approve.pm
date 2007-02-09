@@ -37,9 +37,12 @@ sub execute
 	MESSAGE => 'Approval for workflow ' . $workflow->id() . " by user $user, role $role",
 	PRIORITY => 'info',
 	FACILITY => 'audit',
-	);
+    );
 
-    ## enforce context persistence
+    CTX('notification')->notify({
+        MESSAGE  => 'csr_approved',
+        WORKFLOW => $workflow,
+    });
     return 1;
 }
 

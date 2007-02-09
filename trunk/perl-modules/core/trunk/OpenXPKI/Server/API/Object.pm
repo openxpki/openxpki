@@ -54,6 +54,15 @@ sub get_ca_list
     return CTX('pki_realm')->{$realm}->{ca}->{id};
 }
 
+sub get_url_for_ticket {
+    ##! 1: 'start'
+    my $self     = shift;
+    my $arg_ref  = shift;
+    
+    ##! 1: 'end'
+    return CTX('notification')->get_url_for_ticket($arg_ref);
+}
+
 sub get_ca_cert
 {
     ##! 1: "start, forward and finish"

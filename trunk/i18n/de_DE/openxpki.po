@@ -1423,6 +1423,10 @@ msgstr "Name"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE"
 msgstr "Wert"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS"
+msgstr "Cryptographic Service Provider"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
 msgstr ""
 "Diese Aktivität ist noch nicht implementiert worden. Eventuell wurde der "
@@ -1873,8 +1877,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_MISSING_DATA"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_KEY_USABLE_ILLEGAL_PARAM"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_KEY_ONLINE_ILLEGAL_PARAM"
+msgstr "Name"
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_LOGIN_ILLEGAL_PARAM"
 msgstr ""
@@ -3723,6 +3728,82 @@ msgid "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_COULD_NOT_FIND_CONFIG_ENTRY_FOR_NOTIFICATION"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_COULD_NOT_FIND_CONFIG_ENTRY_FOR_NOTIFIER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_DISPATCHER_COULD_NOT_FIND_CONFIG_ENTRY_FOR_NOTIFIER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_DISPATCHER_DISPATCH_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_EMPTY_OR_UNDEFINED_CONTENT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_FAILED_TO_INSTANTIATE_NOTIFIER"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_IS_ABSTRACT_CLASS"
+msgstr "Test User CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_NOTIFY_WRONG_ARGUMENT_TYPE"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_NO_CONFIG_VALUE_FOR_ACTION"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_NO_TEMPLATE_DEFINED"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_CLOSE_TICKET"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_CREATE_TICKET"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_INSTANTIATE_CLIENT"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_LINK_TICKETS"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_LOGIN"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_SET_VALUE_IN_TICKET"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_REQUESTOR_IS_NOT_AN_EMAIL_ADDRESS"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_TEMPLATE_FILE_DOES_NOT_EXIST"
+msgstr "Zurücksetzen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_TEMPLATE_FILE_IS_NOT_READABLE"
+msgstr "TLS-Server"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_COULD_NOT_CHANGE_SOCKET_OWNERSHIP"
 msgstr "Prozesse anzeigen"
 
@@ -3985,6 +4066,10 @@ msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_NO_ACTIVITIES_AVAILABLE"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_NOTIFICATION_MESSAGE_UNDEFINED"
 msgstr "PKI Realm"
 
 #, fuzzy

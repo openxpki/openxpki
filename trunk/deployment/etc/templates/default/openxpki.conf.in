@@ -265,6 +265,7 @@ subsystem: TEST_SCEP_SERVER_1
 subsystem: TEST_SCEP_PKCS7_TOOL_1
 subsystem: TEST_CREATE_JAVAKEYSTORE_1
 profiles:  $(profiles)
+#notifier:  TEST_DUMMY_NOTIFIER_RT_1
 
 [Realm 2]
 name: I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA
@@ -275,6 +276,13 @@ profiles:  $(profiles)
 ###########################################################################
 # Auxiliary subsystems:
 # SCEP
+
+[TEST_DUMMY_NOTIFIER_RT_1]
+type: RT
+username: rt_user
+password: rt_password 
+url: http://rt_host/path/to/rt/
+timeout: 10
 
 [TEST_SCEP_SERVER_1]
 id: testscepserver1

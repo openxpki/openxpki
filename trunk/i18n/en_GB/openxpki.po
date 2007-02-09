@@ -1341,6 +1341,9 @@ msgstr "Name"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE"
 msgstr "Value"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS"
+msgstr "Tickets"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
 msgstr ""
 "The requested activity is not implemented yet. Please contact the "
@@ -1772,8 +1775,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_MISSING_DATA"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_KEY_USABLE_ILLEGAL_PARAM"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_KEY_ONLINE_ILLEGAL_PARAM"
+msgstr "Common name"
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_LOGIN_ILLEGAL_PARAM"
 msgstr ""
@@ -3589,6 +3593,98 @@ msgid "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_COULD_NOT_FIND_CONFIG_ENTRY_FOR_NOTIFICATION"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_COULD_NOT_FIND_CONFIG_ENTRY_FOR_NOTIFIER"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_DISPATCHER_COULD_NOT_FIND_CONFIG_ENTRY_FOR_NOTIFIER"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_DISPATCHER_DISPATCH_FAILED"
+msgstr "The login of the user __USER__ failed. Please try again."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_EMPTY_OR_UNDEFINED_CONTENT"
+msgstr ""
+"You called an invalid method at the OpenXPKI server. The illegal method name "
+"is __METHOD_NAME__."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_FAILED_TO_INSTANTIATE_NOTIFIER"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_IS_ABSTRACT_CLASS"
+msgstr "Test User CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_NOTIFY_WRONG_ARGUMENT_TYPE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_NO_CONFIG_VALUE_FOR_ACTION"
+msgstr ""
+"You called an invalid method at the OpenXPKI server. The illegal method name "
+"is __METHOD_NAME__."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_NO_TEMPLATE_DEFINED"
+msgstr ""
+"You called an invalid method at the OpenXPKI server. The illegal method name "
+"is __METHOD_NAME__."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_CLOSE_TICKET"
+msgstr ""
+"You called an invalid method at the OpenXPKI server. The illegal method name "
+"is __METHOD_NAME__."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_CREATE_TICKET"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_INSTANTIATE_CLIENT"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_LINK_TICKETS"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_LOGIN"
+msgstr ""
+"You called an invalid method at the OpenXPKI server. The illegal method name "
+"is __METHOD_NAME__."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_SET_VALUE_IN_TICKET"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_RT_REQUESTOR_IS_NOT_AN_EMAIL_ADDRESS"
+msgstr "The login of the user __USER__ failed. Please try again."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_TEMPLATE_FILE_DOES_NOT_EXIST"
+msgstr "reset"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_TEMPLATE_FILE_IS_NOT_READABLE"
+msgstr "Serverside key generation"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_COULD_NOT_CHANGE_SOCKET_OWNERSHIP"
 msgstr "The SPKAC string is empty."
 
@@ -3963,6 +4059,12 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_NO_ACTIVITIES_AVAILABLE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_NOTIFICATION_MESSAGE_UNDEFINED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."

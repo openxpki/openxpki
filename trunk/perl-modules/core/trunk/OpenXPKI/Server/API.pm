@@ -167,6 +167,19 @@ sub BUILD {
                 },
             },
         },
+        'get_url_for_ticket' => {
+            class  => 'Object',
+            params => {
+                'NOTIFIER' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                'TICKET' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+            },
+        },
         'get_random' => {
             class  => 'Default',
             params => {

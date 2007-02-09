@@ -43,9 +43,12 @@
     [% IF deployment.xmlstyle == 'multi-file' %]
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="token.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="notification.xml"/>
+
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
-      [% INCLUDE database.xml FILTER indent(4) %]
-      [% INCLUDE token.xml    FILTER indent(4) %]
+      [% INCLUDE database.xml     FILTER indent(4) %]
+      [% INCLUDE token.xml        FILTER indent(4) %]
+      [% INCLUDE notification.xml FILTER indent(4) %]
     [% ELSE %]
       [% THROW configerror 'Invalid XML output style specification (deployment.xmlstyle)' %]
     [% END %]
@@ -88,6 +91,11 @@
           </cache>
         </group>
       </secret>
+      <notification>
+      [% FOREACH notifier = $realmsection.notifier %]
+        <notifier>[% notifier %]</notifier>
+      [% END %]
+      </notification>
 
       [% IF deployment.xmlstyle == 'multi-file' %]
       <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="profile.xml"/>

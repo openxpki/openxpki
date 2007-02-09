@@ -52,7 +52,13 @@
 %     ## an example URL can be (/openxpki is the mason root directory):
 %     ##     http://localhost/openxpki/index.html?next_comp=service/api/issuer_list.html
 %     ## after the authentication is gone then the redirect shows the issuer list
-      <meta http-equiv="refresh" content="0; URL=<% $path %><% $next_comp %>?__session_id=<% $context->{session_id} %>&__role=<% $context->{role} %>&no_menu=<% $no_menu %>"/>
+%      if ($next_comp =~ m{ \? }xms) {
+%        $next_comp .= ';';
+%      }
+%      else {
+%        $next_comp .= '?';
+%      }
+      <meta http-equiv="refresh" content="0; URL=<% $path %><% $next_comp %>__session_id=<% $context->{session_id} %>&__role=<% $context->{role} %>&no_menu=<% $no_menu %>"/>
 %   } else {
       <meta http-equiv="refresh" content="0; URL=<% $path %>service/index.html?__session_id=<% $context->{session_id} %>&__role=<% $context->{role} %>"/>
 %   }

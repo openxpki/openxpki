@@ -56,6 +56,14 @@
         <arg>$pkcs10</arg>
       </validator>
   </action>
+  <action name="notify_user_of_creation"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::Notification"
+          message="csr_created">
+  </action>
+  <action name="notify_user_of_issuance"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::Notification"
+          message="certificate_issued">
+  </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="OPERATOR">
@@ -126,7 +134,8 @@
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
-	  class="Workflow::Action::Null">
+          class="OpenXPKI::Server::Workflow::Activity::Tools::Notification"
+          message="csr_rejected">
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"

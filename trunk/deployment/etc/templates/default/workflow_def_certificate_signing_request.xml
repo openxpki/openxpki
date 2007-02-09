@@ -13,7 +13,7 @@
   </state>
 
   <state name="CREATED" autorun="yes">
-    <action name="null"
+    <action name="notify_user_of_creation"
             resulting_state="PENDING">
         <condition name="!server_key_generation"/>
     </action>
@@ -32,6 +32,12 @@
 
   <state name="KEY_GENERATED" autorun="yes">
     <action name="generate_pkcs10"
+            resulting_state="PKCS10_GENERATED">
+    </action>
+  </state>
+
+  <state name="PKCS10_GENERATED" autorun="yes">
+    <action name="notify_user"
             resulting_state="PENDING">
     </action>
   </state>
@@ -110,7 +116,7 @@
 
   <!-- if child is not yet finished, this goes out of autorun -->
   <state name="CHECK_CHILD_FINISHED" autorun="yes" may_stop="yes">
-    <action name="null"
+    <action name="notify_user_of_issuance"
             resulting_state="SUCCESS">
       <condition name="wf_child_instance_finished"/>
     </action>

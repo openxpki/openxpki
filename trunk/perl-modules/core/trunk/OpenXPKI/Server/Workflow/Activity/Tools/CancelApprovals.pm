@@ -26,7 +26,12 @@ sub execute
 	MESSAGE => 'All existing approvals canceled for workflow ' . $workflow->id() . " by user $user, role $role",
 	PRIORITY => 'info',
 	FACILITY => 'audit',
-	);
+    );
+
+    CTX('notification')->notify({
+        MESSAGE  => 'csr_approvals_canceled',
+        WORKFLOW => $workflow,
+    });
 
     return 1;
 }
