@@ -36,6 +36,9 @@ sub __init_command_params : PRIVATE {
     my $self = shift;
 
     $self->set_command_params({
+    "list_algorithms" => {"FORMAT"        => 1,
+                          "ALG"           => 0,
+                          "PARAM"         => 0},
     "convert_cert"    => {"DATA"             => 1,
                           "IN"               => ["DER", "PEM"],
                           "OUT"              => ["DER","TXT","PEM"],

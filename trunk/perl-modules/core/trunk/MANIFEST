@@ -110,6 +110,8 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST94CP.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/symmetric_cipher.pm
 
+OpenXPKI/Crypto/Backend/OpenSSL/Command/list_algorithms.pm
+
 ## XS sources
 
 typemap
