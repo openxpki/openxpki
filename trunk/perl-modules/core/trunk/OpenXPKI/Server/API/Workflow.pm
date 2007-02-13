@@ -113,6 +113,38 @@ sub list_workflow_titles {
     return $result;
 }
 
+sub get_workflow_type_for_id {
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $id      = $arg_ref->{ID};
+    ##! 1: 'start'
+    ##! 16: 'id: ' . $id
+
+    my $dbi = CTX('dbi_workflow');
+    # commit to get a current snapshot of the database in the
+    # highest isolation level.
+    # Without this, we will only see old data, especially if
+    # other processes are writing to the database at the same time
+    $dbi->commit();
+
+    my $db_result = $dbi->first(
+	TABLE    => $workflow_table,
+	DYNAMIC  => {
+            'WORKFLOW_SERIAL' => $id,
+        },
+    );
+    if (! defined $db_result) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_TYPE_FOR_ID_NO_RESULT_FOR_ID',
+            params  => {
+                'ID' => $id,
+            },
+        );
+    }
+    my $type = $db_result->{'WORKFLOW_TYPE'};
+    ##! 16: 'type: ' . $type
+    return $type;
+}
 
 sub get_workflow_info {
     my $self  = shift;

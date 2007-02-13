@@ -328,6 +328,15 @@ sub BUILD {
                 },
             },
         },
+        'get_workflow_type_for_id' => {
+            class  => 'Workflow',
+            params => {
+                ID => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+            },
+        },
         'get_workflow_info' => {
             class  => 'Workflow',
             params => {

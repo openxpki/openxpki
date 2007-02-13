@@ -37,6 +37,7 @@ sub validate {
 	    MESSAGE  => "Could not deserialize subject alternative names ($subject_alt_name)",
 	    PRIORITY => 'error',
 	    FACILITY => 'system',
+        );
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -169,6 +170,7 @@ sub validate {
 	    MESSAGE  => 'Invalid subject alternative name (' . join(', ', @{$errors}) . ')',
 	    PRIORITY => 'error',
 	    FACILITY => 'system',
+        );
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 

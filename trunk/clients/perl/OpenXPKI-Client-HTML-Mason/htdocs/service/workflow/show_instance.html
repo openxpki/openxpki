@@ -156,6 +156,16 @@
         not ref $msg or
         not ref $msg eq "HASH")
     {
+        if (! defined $type) {
+            # type was not specified, get it from the server
+            my $type_msg = $context->{client}->send_receive_command_msg(
+                'get_workflow_type_for_id',
+                {
+                    'ID' => $id,
+                },
+            );
+            $type = $type_msg->{PARAMS};
+        }
         ## ok we have to get the info from the server
         $msg = $context->{client}->send_receive_command_msg
                (

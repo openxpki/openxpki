@@ -283,6 +283,11 @@ sub __handle_PING : PRIVATE {
     my $ident   = ident $self;
     my $message = shift;
 
+    if ($state_of{$ident} eq 'MAIN_LOOP') {
+        return {
+            SERVICE_MSG => 'SERVICE_READY',
+        };
+    }
     return {};
 }
 
@@ -335,6 +340,10 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
         $self->__change_state({
             STATE => 'WAITING_FOR_AUTHENTICATION_STACK',
         });
+        return $self->__list_authentication_stacks();
+    }
+
+    if ($state_of{$ident} eq 'WAITING_FOR_AUTHENTICATION_STACK') {
         return $self->__list_authentication_stacks();
     }
 
@@ -554,6 +563,7 @@ sub __handle_COMMAND : PRIVATE {
 		},
                 );
 	}
+        ##! 16: 'command class instantiated successfully'
 
 	if (defined $command) {
 	    my $result;
@@ -561,6 +571,7 @@ sub __handle_COMMAND : PRIVATE {
 		$result = $command->execute();
 	    };
             if (my $exc = OpenXPKI::Exception->caught()) {
+                ##! 16: 'exception caught during execute'
                 $exc->rethrow();
             }
 	    elsif ($EVAL_ERROR) {
@@ -574,6 +585,7 @@ sub __handle_COMMAND : PRIVATE {
                 return;
 	    }
 
+            ##! 16: 'command executed successfully'
 	    # sanity checks on command reply
 	    if (! defined $result || ref $result ne 'HASH') {
                 OpenXPKI::Exception->throw(
@@ -581,6 +593,7 @@ sub __handle_COMMAND : PRIVATE {
                 );
                 return;
             }
+            ##! 16: 'returning result'
             return $result;
         }
     }

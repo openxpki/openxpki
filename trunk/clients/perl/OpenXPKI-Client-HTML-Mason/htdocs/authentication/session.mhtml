@@ -3,6 +3,8 @@
     $init         => 0
 </%args>
 <%init>
+  use CGI::Cookie;
+
   $m->comp ('/lib/debug.mhtml',
             level => 1,
             msg   => "try to get session\n");
@@ -12,6 +14,32 @@
             msg   => "__session_id::=".$__session_id."\n".
                      "context->session_id::=".$context->{session_id});
 
+  if (!defined $__session_id) {
+      # session_id is not defined, let's have a look if the user
+      # presents it to us in a cookie
+      $m->comp ('/lib/debug.mhtml',
+            level => 2,
+            msg   => "session id not defined, trying cookies",
+      );
+      my $cookies = CGI::Cookie->fetch();
+      my $cookie;
+      if (defined $cookies) {
+          $m->comp ('/lib/debug.mhtml',
+              level => 2,
+              msg   => 'cookies received',
+          );
+          $cookie = $cookies->{'openxpki_sessionid'};
+      }
+      if (defined $cookie) {
+          # use the session id from the cookie from now on
+          $m->comp ('/lib/debug.mhtml',
+              level => 2,
+              msg   => 'session_id cookie defined, using it',
+          );
+          $__session_id = $cookie->value();
+          undef $context->{msg};
+      }
+  }
   ## prepare the context if necessary
   if (defined $__session_id and
       exists $session_cache{$__session_id})
@@ -30,6 +58,10 @@
       exists $context->{client} and
       $context->{client}->is_connected())
   {
+      $m->comp ('/lib/debug.mhtml',
+         level => 2,
+         msg   => 'reusing existing connection',
+      );
       # this session has already been established and is in the context
       # we ignore the context if the client connection is down
       return 1;
@@ -71,6 +103,17 @@
   $session_cache{$__session_id}->{client} = $client;
   $session_cache{$__session_id}->{session_id} = $__session_id;
   $context = $session_cache{$__session_id};
+
+  # set the session ID in a cookie, too
+  # TODO - specify a better path than /?
+  # TODO - currently, this is a session cookie, we might consider making
+  # it more persistent
+  my $c = CGI::Cookie->new(
+    -name  => 'openxpki_sessionid',
+    -value => $__session_id,
+    -path  => '/', 
+  );
+  $r->headers_out->set('Set-Cookie' => $c);
 
   $m->comp ('/lib/debug.mhtml',
             'level' => 1,

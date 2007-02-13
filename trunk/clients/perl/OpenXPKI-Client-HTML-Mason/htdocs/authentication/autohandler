@@ -26,11 +26,22 @@
               'level' => 99,
               'msg'   => Dumper($context->{msg}));
 
+    ## try to ping. if SERVICE_READY is returned, the connection
+    ## is working and the user is logged in already
+    my $ping_msg = $client->send_receive_service_msg('PING');
+    if ($ping_msg->{SERVICE_MSG} eq 'SERVICE_READY') {
+        print "REDIRECT_TO_SERVICE_AUTOHANDLER";
+        return;
+    }
     ## check the message
-    if (not defined $msg and
-        $client->get_communication_state ne "can_receive")
-    {
+    if (! defined $msg &&
+        $client->get_communication_state ne "can_receive" &&
+        ! $client->is_connected()
+    ) {
         ## let's kill the connection and start again
+        $m->comp ('/lib/debug.mhtml',
+                 'level' => 2,
+                 'msg'   => 'starting over ...');
         delete $context->{client};
         $m->comp('/authentication/session.mhtml');
         $session_id = $context->{session_id};
