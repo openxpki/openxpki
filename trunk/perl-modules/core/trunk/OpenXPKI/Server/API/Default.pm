@@ -62,8 +62,43 @@ sub get_random {
     ## DO NOT echo $random here, as it will possibly used as a password!
     return $random;
 }
-    
-    
+
+sub get_alg_names {
+    my $self    = shift;
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $alg_names = $default_token->command ({COMMAND => "list_algorithms", FORMAT => "alg_names"});
+    return $alg_names;
+}
+
+sub get_param_names {
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $keytype = $arg_ref->{KEYTYPE};
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $param_names = $default_token->command ({COMMAND => "list_algorithms",
+                                                FORMAT  => "param_names",
+                                                ALG     => $keytype});
+    return $param_names;
+}
+
+sub get_param_values {
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $keytype = $arg_ref->{KEYTYPE};
+    my $param_name = $arg_ref->{PARAMNAME};
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $param_values = $default_token->command ({COMMAND => "list_algorithms",
+                                                FORMAT  => "param_values",
+                                                ALG     => $keytype,
+                                                PARAM   => $param_name});
+    return $param_values;
+}
 
 sub get_chain {
     my $self    = shift;

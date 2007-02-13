@@ -76,6 +76,32 @@ sub BUILD {
             class  => 'Default',
             params => { },
         },
+        'get_alg_names' => {
+            class  => 'Default',
+            params => { },
+        },
+        'get_param_names' => {
+            class  => 'Default',
+            params => {
+                'KEYTYPE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+            },
+        },
+        'get_param_values' => {
+            class  => 'Default',
+            params => {
+                'KEYTYPE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                'PARAMNAME' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+            },
+        },
         'get_chain' => {
             class  => 'Default',
             params => {
