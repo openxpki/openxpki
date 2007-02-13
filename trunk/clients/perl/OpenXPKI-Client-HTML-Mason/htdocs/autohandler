@@ -23,6 +23,14 @@
      $path =~ s/[^\/]+/../g;
      $path .= "/" if (length $path);
 
+  if ($m->base_comp()->title() ne '/index.html') {
+      if (! defined $next_comp) {
+          $next_comp = $m->base_comp()->title() . '?';
+          foreach my $key (keys %{ $m->request_args() }) {
+              $next_comp .= $key . '=' . $m->request_args()->{$key} . ';';
+          }
+      }
+  }
   ## if the session is present or faked and
   ## the user tries to penetrate the server then
   ## nothing will happen because the server simply
@@ -35,7 +43,7 @@
   my $auth_stuff = "";
   if (not session_id_present())
   {
-      $auth_stuff = $m->scomp('/authentication/autohandler', '__session_id' => $__session_id);
+      $auth_stuff = $m->scomp('/authentication/autohandler', '__session_id' => $__session_id, next_comp => $next_comp);
       if ($auth_stuff =~ /REDIRECT_TO_SERVICE_AUTOHANDLER/)
       {
         ## the authentication was successfully finished and
@@ -52,12 +60,10 @@
 %     ## an example URL can be (/openxpki is the mason root directory):
 %     ##     http://localhost/openxpki/index.html?next_comp=service/api/issuer_list.html
 %     ## after the authentication is gone then the redirect shows the issuer list
-%      if ($next_comp =~ m{ \? }xms) {
+%      if ($next_comp !~ m{ ; \z }xms) {
 %        $next_comp .= ';';
 %      }
-%      else {
-%        $next_comp .= '?';
-%      }
+%      $path =~ s{ / \z}{}xms;
       <meta http-equiv="refresh" content="0; URL=<% $path %><% $next_comp %>__session_id=<% $context->{session_id} %>&__role=<% $context->{role} %>&no_menu=<% $no_menu %>"/>
 %   } else {
       <meta http-equiv="refresh" content="0; URL=<% $path %>service/index.html?__session_id=<% $context->{session_id} %>&__role=<% $context->{role} %>"/>
