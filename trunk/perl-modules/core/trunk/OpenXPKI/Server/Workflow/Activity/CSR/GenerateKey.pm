@@ -1,6 +1,7 @@
 # OpenXPKI::Server::Workflow::Activity::CSR:GenerateKey:
 # Written by Alexander Klink for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
+# Rewritten by Julia Dubenskaya for the OpenXPKI project 2007
+# Copyright (c) 2006-2007 by The OpenXPKI Project
 # $Revision: 320 $
 
 package OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey;
@@ -23,49 +24,22 @@ sub execute
     my $pki_realm  = CTX('session')->get_pki_realm();
     my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
 
-    my $params_map = {
-        'RSA1024' => {
-            TYPE       => 'RSA',
-            PARAMETERS => {
-                ENC_ALG    => 'aes256',
-                KEY_LENGTH => 1024,
-            },
-        },
-        'RSA2048' => {
-            TYPE       => 'RSA',
-            PARAMETERS => {
-                ENC_ALG    => 'aes256',
-                KEY_LENGTH => 2048,
-            },
-        },
-        'ECDSA_PRIME192V1' => {
-            TYPE       => 'EC',
-            PARAMETERS => {
-                ENC_ALG    => 'aes256',
-                CURVE_NAME => 'prime192v1',
-            },
-        },
-        'ECDSA_C2TNB191V1' => {
-            TYPE       => 'EC',
-            PARAMETERS => {
-                ENC_ALG    => 'aes256',
-                CURVE_NAME => 'c2tnb191v1',
-            },
-        },
-        'ECDSA_PRIME239V1' => {
-            TYPE       => 'EC',
-            PARAMETERS => {
-                ENC_ALG    => 'aes256',
-                CURVE_NAME => 'prime239v1',
-            },
-        },
-    },
-
     my $key_type = $context->param('_key_type');
     ##! 16: 'key_type: ' . $key_type
+
     my $password = $context->param('_password');
+    # password check
+    if (! defined $password || $password eq '') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_OR_EMPTY_PASSWORD',
+        );
+    }
+
+    my $supported_algs = $default_token->command({COMMAND       => "list_algorithms",
+                                                  FORMAT        => "all_data"});
     
-    if (! exists $params_map->{$key_type}) {
+    # keytype check
+    if (! exists $supported_algs->{$key_type}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_WRONG_KEYTYPE',
             params => {
@@ -73,15 +47,53 @@ sub execute
             },
         );
     }
-    my $command = $params_map->{$key_type};
 
-    if (! defined $password || $password eq '') {
+    my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
+    my $context_parameters = $context->param('_key_gen_params');
+    if (! defined $context_parameters) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_OR_EMPTY_PASSWORD',
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_PARAMETERS',
         );
     }
-    $command->{PASSWD}  = $password;
-    $command->{COMMAND} = 'create_key';
+    my $parameters = $serializer->deserialize($context_parameters);
+
+    # parameters check
+    my ($param, $value, $param_values) = ("","","undef");
+    while (($param, $value) = each(%{$parameters})) {
+        if (! exists $supported_algs->{$key_type}->{$param}) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_UNSUPPORTED_PARAMNAME',
+                params => {
+                    'KEYTYPE'   => $key_type, 
+                    'PARAMNAME' => $param,
+                }
+            );
+        } # if param name is not supported
+
+        $param_values = $default_token->command({COMMAND       => "list_algorithms",
+                                                 FORMAT        => "param_values",
+                                                 ALG           => $key_type,
+                                                 PARAM         => $param});
+                                      
+        if (! exists $param_values->{$value}) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_UNSUPPORTED_PARAMVALUE',
+                params => {
+                    'KEYTYPE'    => $key_type, 
+                    'PARAMNAME'  => $param,
+                    'PARAMVALUE' => $value,
+                }
+            );
+        } #  if param value is not supported
+    } # while each(%{$parameters})
+
+    # command definition
+    my $command = {
+         COMMAND    => 'create_key',
+         TYPE       => $key_type,
+         PASSWD     => $password,
+         PARAMETERS => $parameters,
+    };
     ##! 16: 'command: ' . Dumper $command
 
     my $key = $default_token->command($command);

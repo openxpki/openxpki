@@ -132,7 +132,8 @@ htdocs/service/create_csr/create_workflow.mhtml
 htdocs/service/create_csr/print_errors.mhtml
 htdocs/service/create_csr/print_descriptions.mhtml
 htdocs/service/create_csr/get_password.mhtml
-htdocs/service/create_csr/get_keysettings.mhtml
+htdocs/service/create_csr/get_keytype.mhtml
+htdocs/service/create_csr/get_keyparameters.mhtml
 htdocs/service/create_csr/store_serverside.mhtml
 
 htdocs/service/create_crr/index.html

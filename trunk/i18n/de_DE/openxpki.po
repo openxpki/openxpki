@@ -732,18 +732,193 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
 msgstr "Auswahl der Schlüsselerzeugung"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_CHOICE"
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_CHOICE"
 msgstr "Schlüsseltyp"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_DESC"
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DESC"
 msgstr ""
 "Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
 "erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
 "sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
 "untenstehenden Erläuterungen."
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
-msgstr "Auswahl des Typs des privaten Schlüssels"
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA"
+msgstr ""
+"Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
+"erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
+"sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
+"untenstehenden Erläuterungen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC"
+msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001"
+msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP"
+msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94"
+msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP"
+msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA"
+msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_TITLE"
+msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_DESC"
+msgstr ""
+"Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
+"erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
+"sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
+"untenstehenden Erläuterungen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG"
+msgstr ""
+"Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
+"erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
+"sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
+"untenstehenden Erläuterungen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH"
+msgstr "Schlüssellänge"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET"
+msgstr ""
+"Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
+"erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
+"sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
+"untenstehenden Erläuterungen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET_DESCRIPTION"
+msgstr ""
+"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
+"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
+"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
+"dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_TITLE"
+msgstr "Auswahl der Schlüsselerzeugung"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_DECISION"
 msgstr "Wahl des Passworts"
@@ -1039,32 +1214,6 @@ msgstr "Cryptographic Service Provider"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CSP_FREEFORM"
 msgstr "Cryptographic Service Provider (freie Eingabe)"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1"
-msgstr "Elliptische Kurven DSA, benannte Kurve c2tnb191v1"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1_DESC"
-msgstr ""
-"Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
-"Kurve c2tnb191v1. Bitlänge 191 bits (ungefähr äquivalent zu 1022048 RSA-"
-"Schlüsseln)"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1"
-msgstr "Elliptische Kurven DSA, benannte Kurve prime192v1"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1_DESC"
-msgstr ""
-"Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
-"Kurve prime192v1. Bitlänge 192 bits (ungefähr äquivalent zu 1022048 RSA-"
-"Schlüsseln)"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1"
-msgstr "Elliptische Kurven DSA, benannte Kurve prime239v1"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1_DESC"
-msgstr ""
-"Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
-"Kurve prime239v1. Bitlänge 239 bits ."
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_FULL_CERT_INFO_LINK"
 msgstr "Detailierte Zertifikatsinformationen"
 
@@ -1326,22 +1475,6 @@ msgstr "PKI Realm"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET"
 msgstr "Zurücksetzen"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024"
-msgstr "RSA, 1024 bits"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024_DESC"
-msgstr ""
-"Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge von "
-"1024 bit"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048"
-msgstr "RSA, 2048 bits"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048_DESC"
-msgstr ""
-"Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge von "
-"2048 bit"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"
 msgstr "Serverseitige Schlüsselgenerierung"
@@ -3885,6 +4018,18 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_OR_EMPTY_P
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_PARAMETERS"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_UNSUPPORTED_PARAMNAME"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_UNSUPPORTED_PARAMVALUE"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_WRONG_KEYTYPE"
 msgstr "PKI Realm"
 
@@ -5075,6 +5220,51 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "ja"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
+#~ msgstr "Auswahl des Typs des privaten Schlüssels"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1"
+#~ msgstr "Elliptische Kurven DSA, benannte Kurve c2tnb191v1"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1_DESC"
+#~ msgstr ""
+#~ "Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
+#~ "Kurve c2tnb191v1. Bitlänge 191 bits (ungefähr äquivalent zu 1022048 RSA-"
+#~ "Schlüsseln)"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1"
+#~ msgstr "Elliptische Kurven DSA, benannte Kurve prime192v1"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1_DESC"
+#~ msgstr ""
+#~ "Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
+#~ "Kurve prime192v1. Bitlänge 192 bits (ungefähr äquivalent zu 1022048 RSA-"
+#~ "Schlüsseln)"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1"
+#~ msgstr "Elliptische Kurven DSA, benannte Kurve prime239v1"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1_DESC"
+#~ msgstr ""
+#~ "Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
+#~ "Kurve prime239v1. Bitlänge 239 bits ."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024"
+#~ msgstr "RSA, 1024 bits"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024_DESC"
+#~ msgstr ""
+#~ "Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge "
+#~ "von 1024 bit"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048"
+#~ msgstr "RSA, 2048 bits"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048_DESC"
+#~ msgstr ""
+#~ "Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge "
+#~ "von 2048 bit"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_DAY"

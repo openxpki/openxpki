@@ -1,0 +1,102 @@
+<%args>
+    $workflow_id   => undef
+    $workflow_type => undef
+    $role          => undef
+    $profile       => undef
+    $subject_style => undef
+    $keygen        => undef
+    $pkcs10        => undef
+    $subject       => undef
+    $subject_alt_name => undef
+    $info          => undef
+    $CONFIG        => undef
+    $keytype       => undef,
+    $keyparameters => undef,
+</%args>
+<& /service/open_form.mhtml &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'workflow_id',   'value' => $workflow_id &>
+<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
+<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
+<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
+<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
+<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name', 'value' => $subject_alt_name &>
+<& /lib/html/hidden.mhtml, 'name' => 'info',          'value' => $info &>
+<& /lib/html/hidden.mhtml, 'name' => 'keytype',       'value' => $keytype &>
+<& /lib/html/hidden.mhtml, 'name' => 'FILLED_KEY_PARAMETERS_FORM', 'value' => 1 &>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_DESC') %>
+</p>
+
+<table>
+
+% foreach my $param_name (@param_names) {
+%     ## build a table to select values for each parameter name
+%     $msg = $context->{client}->send_receive_command_msg ('get_param_values',
+%         {
+%             KEYTYPE   => $keytype,
+%             PARAMNAME => $param_name,
+%         },
+%     );
+%     @param_values = sort keys(%{$msg->{PARAMS}});
+%     $param_label = "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_".uc($param_name);
+%     $descriptions{i18nGettext(${param_label})} = i18nGettext(${param_label}."_DESCRIPTION");
+     <tr>
+       <td>
+           <% i18nGettext (${param_label}) %>
+       </td>
+       <td>
+           <& /lib/html/select.mhtml,
+             'name'    => "PARAMETER_".uc(${param_name}),
+             'values'  => \@param_values &>
+       </td>
+     </tr>
+% }
+</table>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+<& /service/create_csr/print_descriptions.mhtml, 'descriptions' => \%descriptions &>
+
+<%init>
+    my @errors = ();
+
+    ## get names of parameters for the previously selected key type
+    my $msg = $context->{client}->send_receive_command_msg ('get_param_names',
+        {
+            KEYTYPE => $keytype,
+        },
+    );
+    my @param_names = keys(%{$msg->{PARAMS}});
+    my @param_values;
+
+    my $ARGS = {$m->request_args()};
+
+    if (not defined $keyparameters)
+    {
+        my $selected_value;
+        my $selected_parameters;
+
+        ## get values of the selected parameters
+        foreach my $param_name (@param_names) {
+            $selected_value  = $ARGS->{"PARAMETER_".uc(${param_name})};
+            $selected_parameters->{$param_name} = $selected_value;
+        }
+        if ($ARGS->{"FILLED_KEY_PARAMETERS_FORM"})
+        {
+            my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
+            $keyparameters = $serializer->serialize($selected_parameters);
+        }
+
+    }
+    return $keyparameters if (defined $keyparameters);
+
+    my %descriptions = ();
+    my $param_label;
+
+</%init>

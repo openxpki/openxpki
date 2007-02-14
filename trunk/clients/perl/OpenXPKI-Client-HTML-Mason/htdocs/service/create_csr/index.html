@@ -11,7 +11,8 @@
     $spkac            => undef
     $pkcs10           => undef
     $key              => undef
-    $keysettings      => undef
+    $keytype          => undef
+    $keyparameters    => undef
     $password_gen     => undef
     $password         => undef
     $verify_password  => undef
@@ -112,31 +113,44 @@
     else {
         # continue here with selection of key parameters and
         # password entry/verification 
-        if (!defined $keysettings) {
-            $m->comp ('/service/create_csr/get_keysettings.mhtml',
+        if (!defined $keytype) {
+            $m->comp ('/service/create_csr/get_keytype.mhtml',
                         %params,
                         'workflow_id' => $workflow_id,
+                        'keytype'     => $keytype,
             );
         }
-        if (defined $keysettings && !defined $password) {
+        return if (not $keytype);
+        if (not $params{keyparameters}) {
+            $params{'keyparameters'} = $m->comp ('/service/create_csr/get_keyparameters.mhtml',
+                        %params,
+                        'workflow_id' => $workflow_id,
+                        'keytype'     => $keytype,
+                        'keyparameters' => $keyparameters,
+            );
+        }
+        return if (not $params{'keyparameters'});
+        if (defined $keytype && !defined $password) {
             $m->comp ('/service/create_csr/get_password.mhtml',
-                        'password_gen' => $password_gen,
-                        'workflow_id'  => $workflow_id,
-                        'keysettings'  => $keysettings,
+                        'password_gen'  => $password_gen,
+                        'workflow_id'   => $workflow_id,
+                        'keytype'       => $keytype,
+                        'keyparameters' => $keyparameters,
                         %params,
             );
         }
-        elsif (defined $keysettings && defined $password) {
+        elsif (defined $keytype && defined $password) {
             $m->comp('/lib/debug.mhtml',
                 'level' => 1,
-                'msg' => 'keysettings: ' . $keysettings,
+                'msg' => 'keytype: ' . $keytype,
             );
             if (defined $verify_password
               && $password ne $verify_password) {
                 $m->comp ('/service/create_csr/get_password.mhtml',
-                            'password_gen' => $password_gen,
-                            'workflow_id'  => $workflow_id,
-                            'keysettings'  => $keysettings,
+                            'password_gen'  => $password_gen,
+                            'workflow_id'   => $workflow_id,
+                            'keytype'       => $keytype,
+                            'keyparameters' => $keyparameters,
                              %params,
                 );
             }
@@ -149,8 +163,9 @@
                         ID       => $workflow_id,
                         ACTIVITY => 'generate_key',
                         PARAMS   => {
-                            '_key_type' => $keysettings,
-                            '_password' => $password,
+                            '_key_type'       => $keytype,
+                            '_password'       => $password,
+                            '_key_gen_params' => $keyparameters,
                         },
                     },
                 );
@@ -162,10 +177,11 @@
                     $exec_msg->{SERVICE_MSG} eq 'ERROR' &&
                     $exec_msg->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD') {
                     $m->comp ('/service/create_csr/get_password.mhtml',
-                                'password_gen' => $password_gen,
-                                'workflow_id'  => $workflow_id,
-                                'keysettings'  => $keysettings,
-                                'password_bad' => 1,
+                                'password_gen'  => $password_gen,
+                                'workflow_id'   => $workflow_id,
+                                'keytype'       => $keytype,
+                                'keyparameters' => $keyparameters,
+                                'password_bad'  => 1,
                                  %params,
                     );
                 }
