@@ -9,6 +9,7 @@ package OpenXPKI::Client::HTML::Mason::Menu;
 use OpenXPKI::Exception;
 use OpenXPKI::i18n qw( i18nGettext );
 use HTML::Mason::Request; # we only use this because we get $m as parameter
+use List::Util qw( first );
 
 sub new
 {
@@ -39,6 +40,30 @@ sub new
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_MISSING_ROLE");
     }
+    # delete those elements from the menu config that have no
+    # corresponding available workflow
+    my $menus = $self->{CONFIG}->{MENU};
+    my @available_workflows = @{$self->{'AVAILABLE_WORKFLOWS'}};
+
+    foreach my $menu (keys %{ $menus }) {
+        my @temp_menu = ();
+        foreach my $menu_entry (@{ $menus->{$menu} }) {
+            my $required_wf = $menu_entry->[3];
+            if (! defined $required_wf) {
+                # nothing required
+                push @temp_menu, $menu_entry;
+            }
+            else {
+                if (defined first { $required_wf eq $_ } @available_workflows) {
+                    # the workflow is available, push menu entry
+                    push @temp_menu, $menu_entry;
+                }
+            }
+        }
+        # overwrite existing menu by 'filtered' one
+        $menus->{$menu} = \@temp_menu;
+    }
+
     $self->__build_env();
 
     ## check config

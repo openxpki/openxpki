@@ -32,96 +32,94 @@
                     "anonymous_menu" =>
                     [
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",
-                                   "ca_info"],
+                                   "ca_info", undef],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",
-                                   "create_csr"],
+                                   "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CRR",
-                                   "create_crr"],
+                                   "create_crr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
-                                   "cert_search"],
+                                   "cert_search", undef ],
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",
-                                   "language"],
+                                   "language", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
-                                   "logout"]
+                                   "logout", undef ]
                     ],
                     "ra_op_menu" =>
                     [
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr"],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info", undef],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CRR",
-                                   "create_crr"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS", "show_pending_requests"],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",     "workflow"],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE", "dataexchange"],
+                                   "create_crr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS", "show_pending_requests", undef],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",     "workflow", undef],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE", "dataexchange", 'I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
-                                   "cert_search"],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",     "language"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",       "logout"]
+                                   "cert_search", undef ],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",     "language", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",       "logout", undef ]
                     ],
                     "user_menu" =>
                     [
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization"],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
-                                   "cert_search"],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",     "language"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",       "logout"]
+                                   "cert_search", undef ],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE",     "language", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",       "logout", undef ]
                     ],
                     "ca_op_menu" =>
                     [
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_KEY_LIST", "key_list"],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",  "ca_info"],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW", "workflow"],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE", "language"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",   "logout"]
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_KEY_LIST", "key_list", undef ],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",  "ca_info", undef ],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW", "workflow", undef ],
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_LANGUAGE", "language", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",   "logout", undef ]
                     ],
                     "ca_info" =>
                     [
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_PKI_REALM_INFO",
-                                   "pki_realm_info"],
+                                   "pki_realm_info", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_ISSUER",
-                                   "issuer_list"],
+                                   "issuer_list", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_CRL",
-                                   "crl_list"],
+                                   "crl_list", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_POLICY",
-                                   "policy_list"]
+                                   "policy_list", undef ]
                     ],
                     "workflow" =>
                     [
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES",
-                                   "workflow_list_types"],
-                        ## please be really sure what you do if you uncomment this
-                        ## why? not having a menu entry does not protect against entering the URL manually! (Alex, 2006-09-05)
+                                   "workflow_list_types", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE",
-                                    "workflow_create_instance"],
+                                    "workflow_create_instance", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES",
-                                   "workflow_list_instances"],
+                                   "workflow_list_instances", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_SEARCH_INSTANCES",
-                                   "workflow_search_instances"],
+                                   "workflow_search_instances", undef ],
                     ],
                     "dataexchange" =>
                     [
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT",
-                                   "dataexchange_export"],
+                                   "dataexchange_export", 'I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_IMPORT",
-                                   "dataexchange_import"],
+                                   "dataexchange_import", 'I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT' ],
                     ],
                     "language" =>
                     [
                         ["ACTION", "English",
-                                   "set_language_en_gb"],
+                                   "set_language_en_gb", undef ],
                         ["ACTION", "Deutsch",
-                                   "set_language_de_de"],
+                                   "set_language_de_de", undef ],
                         ["ACTION", "Русский",
-                                   "set_language_ru_ru"],
+                                   "set_language_ru_ru", undef ],
                     ],
                     "edit_certs" =>
                     [
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_VALID_CERTS",   "edit_valid_certs"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS", "edit_expired_certs"],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS", "edit_revoked_certs"],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_VALID_CERTS",   "edit_valid_certs", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS", "edit_expired_certs", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS", "edit_revoked_certs", undef ],
                     ]
                 },
                 ACTION =>
@@ -149,8 +147,6 @@
                     'show_pending_requests' => {
                         CMD => 'service/workflow/show_pending_requests.html'
                     },
-                    ## please be really sure what you do if you uncomment this
-                    ## cf. above (Alex)
                     "workflow_create_instance" =>
                      {
                          CMD => "service/workflow/create_instance.html"
@@ -253,6 +249,15 @@
     {
         $params{$key} = $context->{lc $key} if (exists $context->{lc $key});
     }
+    
+    # get all workflow types
+    my $msg = $context->{client}->send_receive_command_msg('list_workflow_titles');
+    my @types;
+    if (ref $msg->{PARAMS} eq 'HASH') {
+        @types = keys %{$msg->{PARAMS}};
+    }
+    $params{'AVAILABLE_WORKFLOWS'} = \@types;
+
     $context->{menu} = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
     return;
 </%init>
