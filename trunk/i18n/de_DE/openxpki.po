@@ -732,11 +732,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
 msgstr "Auswahl der Schlüsselerzeugung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_CHOICE"
 msgstr "Schlüsseltyp"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DESC"
 msgstr ""
 "Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
@@ -839,9 +837,8 @@ msgstr ""
 "Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
 "dann wird der Schlüssellokal bei Ihnen generiert."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_TITLE"
-msgstr "Auswahl der Schlüsselerzeugung"
+msgstr "Auswahl des Typs des privaten Schlüssels"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME"
@@ -886,7 +883,6 @@ msgstr ""
 "Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
 "dann wird der Schlüssellokal bei Ihnen generiert."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH"
 msgstr "Schlüssellänge"
 

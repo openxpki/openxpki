@@ -687,164 +687,97 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
 msgstr "Select the way of the key generation"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_CHOICE"
 msgstr "Type of private key"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DESC"
 msgstr ""
 "Please choose one of the following types of private keys. This will set the "
 "kind of private key which the server will generate for you. If you are "
 "unsure which one to use, please have a look at the descriptions below. "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA"
-msgstr ""
-"Please choose one of the following types of private keys. This will set the "
-"kind of private key which the server will generate for you. If you are "
-"unsure which one to use, please have a look at the descriptions below. "
+msgstr "DSA"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA_DESCRIPTION"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "DSA public key algorithm."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC"
-msgstr "Select the way of the key generation"
+msgstr "EC - Elliptic Curve DSA"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC_DESCRIPTION"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "EC public key algorithm based on elliptic curves."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001"
-msgstr "Select the way of the key generation"
+msgstr "GOST2001"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001_DESCRIPTION"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "GOST2001 public key algorithm based on elliptic curves with 512 bit key length."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP"
-msgstr "Select the way of the key generation"
+msgstr "GOST2001CP"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP_DESCRIPTION"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "GOST2001CP public key algorithm based on elliptic curves with 512 bit key length "
+"(CP mode). Digital signature in CP mode has different byte ordering with respect to "
+"the regular mode."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94"
-msgstr "Select the way of the key generation"
+msgstr "GOST94"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94_DESCRIPTION"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "GOST94 public key algorithm with 1024 bit key length."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP"
-msgstr "Select the way of the key generation"
+msgstr "GOST94CP"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP_DESCRIPTION"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "GOST94CP public key algorithm with 1024 bit public key (CP mode). "
+"Digital signature in CP mode has different byte ordering with respect to "
+"the regular mode."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA"
-msgstr "Select the way of the key generation"
+msgstr "RSA"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA_DESCRIPTION"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "RSA public key algorithm."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_TITLE"
-msgstr "Select the way of the key generation"
+msgstr "Server-side key generation: choose type"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "Elliptic Curve name"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME_DESCRIPTION"
 msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+"The elliptic curve DSA algorithm can use one of the named curves specified above. "
+"Each curve name contains a bit length. Bit length of 191 or 192 bits is "
+"approximately equivalent to 2048 bits RSA, bit length of 239 bits ensures higher "
+"security."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_DESC"
-msgstr ""
-"Please choose one of the following types of private keys. This will set the "
-"kind of private key which the server will generate for you. If you are "
-"unsure which one to use, please have a look at the descriptions below. "
+msgstr "Please select a value of each parameter for the previously chosen type of private key."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG"
-msgstr ""
-"Please choose one of the following types of private keys. This will set the "
-"kind of private key which the server will generate for you. If you are "
-"unsure which one to use, please have a look at the descriptions below. "
+msgstr "Encryption algorithm"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG_DESCRIPTION"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "A password based encryption algorithm to use."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH"
-msgstr "Create private key"
+msgstr "Key length"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH_DESCRIPTION"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "The size of the private key to generate in bits."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET"
-msgstr ""
-"Please choose one of the following types of private keys. This will set the "
-"kind of private key which the server will generate for you. If you are "
-"unsure which one to use, please have a look at the descriptions below. "
+msgstr "Parameters set"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET_DESCRIPTION"
-msgstr ""
-"Please choose one of the following available options for the key generation. "
-"This is important because this influence the next steps. The options can "
-"mean really different things. So please read the descriptions carefully."
+msgstr "Set of parameters for GOST2001 algorithm."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_TITLE"
-msgstr "Select the way of the key generation"
+msgstr "Server-side key generation: choose parameters"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_DECISION"
 msgstr "Choice of password"
