@@ -85,11 +85,6 @@
       </validator>
   </action>
 
-  <action name="change_session_role_to_ca_operator"
-          class="OpenXPKI::Server::Workflow::Activity::Tools::ChangeSessionRole"
-          role="CA Operator">
-  </action>
-
   <!-- approval, persist, ... -->
   <action name="approve_csr"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve">
