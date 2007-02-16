@@ -94,14 +94,13 @@ installbin: tools
 
 installtemplates:
 	@echo "Installing template files to $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR)"
-	@( cd etc/templates && for template in * ; do \
-		if [ -d $$template ]; then \
-			$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR)/$$template || exit 1 ;\
-			for file in $$template/*.xml $$template/*.conf ; do \
-				$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR)/$$template/`basename $$file` || exit 1 ; \
-			done ; \
-		fi; \
-	done )
+	INSTALL=$(INSTALL) \
+	ADMUSER=$(ADMUSER) \
+	ADMGROUP=$(ADMGROUP) \
+	TARGETDIR=$(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR) \
+	DIREXCLUDE="svn" \
+	FILEINCLUDE="(\.xml|\.conf|\.txt)$$" \
+		./bin/installtemplates.sh
 
 clean:
 	rm -f Makefile $(TOOLS_DST)
