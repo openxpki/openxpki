@@ -285,6 +285,7 @@ WriteMakefile(
 	'Math::BigInt'           => 1,
         'Net::IP'                => 1,
 	'Net::LDAP'              => "0.32",
+        'Net::Server'            => '0.94',
 	'Params::Validate'       => '0.77',
 	'Proc::ProcessTable'     => '0.41',
 	'Regexp::Common'         => 2,
