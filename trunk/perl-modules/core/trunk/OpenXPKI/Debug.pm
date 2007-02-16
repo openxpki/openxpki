@@ -104,6 +104,7 @@ sub __censor_msg {
     my $self = shift;
     my $msg  = shift;
     
+    $msg =~ s{openssl\ enc.*}{openssl enc \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
     $msg =~ s{PASS([A-Za-z_]*) .*}{PASS$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
     $msg =~ s{ldap_pass([A-Za-z_]*) .*}{ldap_pass$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
     $msg =~ s{PRIVATE([A-za-z_]*) .*}{PRIVATE$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
