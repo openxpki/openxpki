@@ -9,7 +9,7 @@
 
   <sect2 id="intro_resources_sf">
     <title>Sourceforge</title>
-    <para>All of the development efforts take place on <ulink url="http://www.sourceforge.net">Sourceforge.net</ulink>, a collaborative software development platform. There, you can browse our Subversion source repository, download the latest release from one of many mirrors or report bugs. <!-- TODO: do we really want users to report bugs using SF? -->
+    <para>All of the development efforts take place on <ulink url="http://www.sourceforge.net">Sourceforge.net</ulink>, a collaborative software development platform. There, you can browse our Subversion source repository, download the latest release from one of many mirrors, report bugs or file requests for new features. 
 It also hosts the various mailing list the project uses. The project page is at <ulink url="http://www.sourceforge.net/projects/openxpki/">http://www.sourceforge.net/projects/openxpki/</ulink>.
 </para>
     <sect3 id="intro_resources_sf_svn">
@@ -34,6 +34,12 @@ If you want to subscribe to one of the lists, email to <replaceable>listname</re
 
   <sect2 id="intro_resources_commercial">
     <title>Consulting Services and Commercial Support</title>
-    <para></para>
+    <para>OpenXPKI users are invited to use the mailing lists to get free support. However, our software is admittedly complex and it is not always possible to solve complicated requirements via email. Hence if you plan to deploy OpenXPKI in your organization, you may be in need of professional support in order to attain your project goals.</para>
+    <para>Currently, commercial support and OpenXPKI consultancy is offered by the following companies:
+<itemizedlist>
+  <listitem>Cynops GmbH &ndash; network security engineering. Cynops is an IT security consulting and development company which has been heavily involved in OpenXPKI development from the very beginning and is committed to supporting the project. A considerable part of OpenXPKI's system architecture and project source code has been contributed by Cynops employees. The company has experience in customization, deployment and integration of open source PKIs (OpenCA, OpenXPKI) in enterprise environments.
+  </listitem>
+</itemizedlist>
+</para>
   </sect2>
 </sect1>
