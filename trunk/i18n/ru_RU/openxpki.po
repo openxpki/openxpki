@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) 2005-2006 The OpenXPKI Project
 # This file is distributed under the same license as the OpenXPKI package.
-# Petr Grigoriev <pgrig@cryptocom.ru>, YEAR.
+# Petr Grigoriev <pgrig@cryptocom.ru>, 2007.
 # 
 msgid ""
 msgstr ""
@@ -111,7 +111,7 @@ msgid "I18N_OPENXPKI_CA_ID"
 msgstr "Идентификатор"
 
 msgid "I18N_OPENXPKI_CA_NOTAFTER"
-msgstr " Действителен по"
+msgstr "Действителен по"
 
 msgid "I18N_OPENXPKI_CA_NOTBEFORE"
 msgstr "Действителен с"
@@ -145,11 +145,11 @@ msgstr "Загрузка сертификата в форматах PEM или C
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE"
-msgstr "Отклонить заявку на сертификат (CSR)"
+msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS"
-msgstr "Подразделение"
+msgstr ""
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
 msgstr "Загрузка сертификата в текстовом формате"
@@ -329,13 +329,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CRR_REASON_TITLE"
 msgstr "Измение роли в заявке на сертификат"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_INFO_DESCRIPTION"
-msgstr "Введите, пожалуйста, дополнительную информацию."
+msgstr "Если вы действительно хотите изменить дополнительные сведения "
+"в заявке на сертификат, заполните, пожалуйста, поля новыми значениями " 
+"и нажмите кнопку \"Выполнить операцию\"."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_INFO_TITLE"
-msgstr "Дополнительные сведения"
+msgstr "Изменение дополнительных сведений"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_PROFILE_DESCRIPTION"
 msgstr ""
@@ -634,13 +634,11 @@ msgstr "Ошибки"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS"
 msgstr "Описания полей формы"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GEN_PASSWORD_ENTER_PASSWORD"
-msgstr "Создание закрытого ключа"
+msgstr "Ввод пароля пользователем"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GEN_PASSWORD_SERVERSIDE"
-msgstr "Создание закрытого ключа"
+msgstr "Генерация пароля сервером "
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_CSP"
 msgstr "Криптопровайдер (CSP)"
@@ -834,41 +832,36 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_TITLE"
 msgstr "Выбор способа генерации ключа"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_DECISION"
-msgstr "Теперь вы можете создать новый SPKAC-ключ при помощи своего броузера."
+msgstr "Выберите способ задания пароля из списка"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_ENTER_PASSWORD_DESC"
-msgstr "Создание закрытого ключа"
+msgstr "Введите пароль для защиты вашего закрытого ключа"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_ENTER_PASSWORD_TITLE"
-msgstr "Создание закрытого ключа"
+msgstr "Ввод пароля пользователем"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_GENERATED_DESC"
-msgstr "Теперь вы можете создать новый SPKAC-ключ при помощи своего броузера."
+msgstr "Сгенерированный сервером пароль приведен ниже. Скопируйте его "
+"в указанное поле, и запишите (пароль понадобится Вам при установке Вашего "
+"сертификата). Затем выполните операцию проверки пароля."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_GENERATED_TITLE"
-msgstr "Создание закрытого ключа"
+msgstr "Проверка созданного пароля"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_GENERATION_METHOD_DESC"
-msgstr "Теперь вы можете создать новый SPKAC-ключ при помощи своего броузера."
+msgstr "Здесь Вы можете задать способ создания пароля для шифрования закрытого ключа"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_GENERATION_METHOD_TITLE"
-msgstr "Создание закрытого ключа"
+msgstr "Выбор способ создания пароля"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_PASSWORD_BAD_RETRY"
-msgstr "Создание закрытого ключа"
+msgstr "Введенный Вами пароль не может "
+"быть использован для защиты закрытого ключа. Введите другой пароль."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_PASSWORD_POLICY"
-msgstr "Создание закрытого ключа"
+msgstr "Ограничения на вид пароля пока отсутствуют"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_DESCRIPTION"
 msgstr ""
@@ -935,17 +928,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_WORKFLOW_TYPE_TITLE"
 msgstr "Выбор типа технологического процесса для создания заявки"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_PASSWORD_COPY_HERE"
-msgstr ""
-"The UPN __UPN__ is not a valid UPN. We support only UPN which are compatible "
-"with RFC 822."
+msgstr "Скопируйте пароль в это поле ->"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_PASSWORD_GENERATED_PASSWORD"
-msgstr ""
-"The UPN __UPN__ is not a valid UPN. We support only UPN which are compatible "
-"with RFC 822."
+msgstr "Пароль, сгенерированный серврером: "
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_"
 msgstr ""
@@ -2716,12 +2703,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
 msgstr "Информация УЦ"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CRR"
-msgstr "Создание новой заявки на сертификат (CSR)"
+msgstr "Создание заявки на отзыв сертификата (CRR)"
 
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
-msgstr "Создание новой заявки на сертификат (CSR)"
+msgstr "Создание заявки на сертификат (CSR)"
 
 msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
 msgstr "Обмен данными"
@@ -3102,7 +3088,7 @@ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED"
-msgstr ""
+msgstr "Вы не прошли аутенитификацию. Возможно, пароль был набран неверно."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_ALGORITHM"
 msgstr ""
@@ -4412,10 +4398,10 @@ msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
 msgstr "Запустить новый технологический процесс для выдачи сертификата"
 
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
-msgstr "Оставить заявку для обработки(CSR)"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
 
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
-msgstr "Отклонить заявку на сертификат (CSR)"
+msgstr "Отклонить заявку на сертификат"
 
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP"
 msgstr "Пауза"
@@ -4750,33 +4736,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_YES"
 msgstr "Да"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
-#~ msgstr "Выберите способ генерации ключа."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1"
-#~ msgstr "SPKAC"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1_DESC"
-#~ msgstr "The name __DNS__ is not a valid DNS name."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1"
-#~ msgstr "сброс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1_DESC"
-#~ msgstr "сброс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1"
-#~ msgstr "сброс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1_DESC"
-#~ msgstr "сброс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_DAY"
@@ -5099,3 +5058,58 @@ msgstr "Да"
 #~ msgstr ""
 #~ "The GUID __GUID__ has a wrong format. We support the formats of RFC 4122 "
 #~ "and Microsoft."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
+msgstr "Выбор типа закрытого ключа"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_DESC"
+msgstr "Выберите криптографический алгоритм закрытого ключа"
+
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1"
+msgstr "Алгоритм ЭЦП на эллиптических кривых c2tnb191v1"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1_DESC"
+msgstr ""
+"Ключ такого типа используется для выработки ЭЦП с использованием "
+"эллиптических кривых определенного вида - c2tnb191v1. "
+"Длина ключа - 191 бит (в отношении криптографической стойкости "
+"такая длина эквивалентна 2048 битам ключа для использования алгоритма RSA)"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1"
+msgstr "Алгоритм ЭЦП на эллиптических кривых prime192v1"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1_DESC"
+msgstr ""
+"Ключ такого типа используется для выработки ЭЦП с использованием "
+"эллиптических кривых определенного вида - prime192v1. "
+"Длина ключа - 192 бита (в отношении криптографической стойкости "
+"такая длина эквивалентна 2048 битам ключа для использования алгоритма RSA)"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1"
+msgstr "Алгоритм ЭЦП на эллиптических кривых prime239v1"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1_DESC"
+msgstr ""
+"Ключ такого типа используется для выработки ЭЦП с использованием "
+"эллиптических кривых определенного вида - prime239v1. "
+"Длина ключа - 239 бит."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024"
+msgstr "Алгоритм RSA, 1024 bits"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024_DESC"
+msgstr ""
+"Ключ такого типа используется для реализации криптографического "
+"алгоритма RSA. Длина ключа - 1024 бита."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048"
+msgstr "Алгоритм RSA, 2048 bits"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048_DESC"
+msgstr ""
+"Ключ такого типа используется для реализации криптографического "
+"алгоритма RSA. Длина ключа - 2048 бит."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_CHOICE"
+msgstr "Выберите криптгорафический алгоритм из списка"
