@@ -94,7 +94,8 @@ while [ -n "$1" ] ; do
 	    shift
 	    ;;
 	--template)
-	    TEMPLATE="$1"
+	    TEMPLATE="$2"
+	    shift
 	    shift
 	    ;;
 	--createdirs)
