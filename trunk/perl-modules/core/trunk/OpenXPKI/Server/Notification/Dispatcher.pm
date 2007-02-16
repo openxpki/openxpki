@@ -19,9 +19,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
 
-# Notifier classes
-use OpenXPKI::Server::Notification::RT;
-
 my %notifier_of :ATTR; # hashref of arrays of notifier objects by realm
         
 sub START {
@@ -64,9 +61,26 @@ sub START {
             my $notifier_type = $self->__get_notifier_type($notifier);
             ##! 16: 'notifier_type: ' . $notifier_type
             my $notifier_obj;
+            my $notifier_class = 'OpenXPKI::Server::Notification::'
+                . $notifier_type;
+            eval "require $notifier_class";
+            if ($EVAL_ERROR) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_FAILED_TO_USE_NOTIFIER_CLASS',
+                    params  => {
+                        PKI_REALM => $pki_realm,
+                        TYPE      => $notifier_type,
+                        ERROR     => $EVAL_ERROR,
+                    },
+                    log     => {
+                        logger   => CTX('log'),
+                        priority => 'error',
+                        facility => 'system',
+                    },
+                );
+
+            }
             eval {
-                my $notifier_class = 'OpenXPKI::Server::Notification::'
-                    . $notifier_type;
                 $notifier_obj = $notifier_class->new({
                     CONFIG    => $config,
                     NAME      => $notifier,
