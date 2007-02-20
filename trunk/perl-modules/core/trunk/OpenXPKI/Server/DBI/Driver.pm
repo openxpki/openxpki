@@ -96,7 +96,7 @@ our %COLUMN = (
     "int_content"      => "NUMERIC",
     "char_content"     => "TEXT",
 
-    "logtimestamp"     => "TIMESTAMP",
+    "logtimestamp"     => "BIGINT",
     "message"          => "TEXT",
     "category"         => "TEXT_KEY",
     "loglevel"         => "TEXT_KEY",

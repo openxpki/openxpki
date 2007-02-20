@@ -31,6 +31,7 @@ my $context = {
 	log            => undef,
 	dbi_backend    => undef,
 	dbi_workflow   => undef,
+	dbi_log        => undef,
 
 	# user-settable
 	api            => undef,

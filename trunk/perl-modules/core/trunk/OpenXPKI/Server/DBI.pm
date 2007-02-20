@@ -37,6 +37,7 @@ sub new {
 
     ##! 1: "start"
 
+    ##! 16: 'log: ' . ref $keys->{LOG}
     $self->{log} = $keys->{LOG};
     if (not $self->{log})
     {

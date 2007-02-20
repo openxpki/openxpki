@@ -15,6 +15,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::DBI::SQL;
 use OpenXPKI::Server::DBI::Schema;
 
+use Digest::SHA1 qw( sha1_hex );
+
 sub new
 {
     shift;
@@ -22,6 +24,7 @@ sub new
     bless $self, "OpenXPKI::Server::DBI::Hash";
     $self->{schema} = OpenXPKI::Server::DBI::Schema->new();
     ##! 1: "init complete"
+    ##! 16: 'log: ' . ref $self->{LOG}
     return $self;
 }
 
@@ -139,18 +142,18 @@ sub __log_write_action
 ### FIXME: move to DBI instantiation, makes more sense there
 ###        (loop through all tables and check if indices are correct)
 #    ## set the index
-#    my %index = ();
-#    foreach my $col (@{$self->{schema}->get_table_index($table)})
-#    {
-#        if ($col eq "${table}_SERIAL")
-#        {
-#            $index{SERIAL}  = $hash->{$col};
-#        } else {
-#            ## planned for index with more than one column
-#            ## example: pki_realm and ca for certificates, CSRs etc.
-#            $index{$col} = $hash->{$col};
-#        }
-#    }
+    my %index = ();
+    foreach my $col (@{$self->{schema}->get_table_index($table)})
+    {
+        if ($col eq "${table}_SERIAL")
+        {
+            $index{SERIAL}  = $hash->{$col};
+        } else {
+            ## planned for index with more than one column
+            ## example: pki_realm and ca for certificates, CSRs etc.
+            $index{$col} = $hash->{$col};
+        }
+    }
 #
 #    ## check that the schema is intact
 #    foreach my $col (keys %index)
@@ -176,21 +179,23 @@ sub __log_write_action
     $message .= "\nstatus=".$status if (defined $status);
     if (eval{ CTX('session') })
     {
-        $message .= "\nsession=".CTX('session')->get_id();
+        $message .= "\nsha1(session)=".sha1_hex(CTX('session')->get_id());
     } else {
         $message .= "\nsession=undef";
     }
 # TODO: do we really need to log this?
-#    foreach my $key (keys %index)
-#    {
-#        $message .= "\n".lc($key)."=".$index{$key};
-#    }
+    foreach my $key (keys %index)
+    {
+        $message .= "\n".lc($key)."=".$index{$key};
+    }
+    ##! 16: 'log: ' . ref $self->{LOG}
+
     $self->{LOG}->log (FACILITY => "audit",
-                       PRIORITY => "info",
-                       MESSAGE  => $message,
-                       MODULE   => $package,
-                       FILENAME => $filename,
-                       LINE     => $line);
+                           PRIORITY => "info",
+                           MESSAGE  => $message,
+                           MODULE   => $package,
+                           FILENAME => $filename,
+                           LINE     => $line);
 
 #     ## write dataexchange log
 #     $self->{SQL}->delete (TABLE => "DATAEXCHANGE",

@@ -48,6 +48,7 @@ sub get_config {
 	    TASKS  => [ 
 		'xml_config', 
 		'i18n', 
+                'dbi_log',
 		'log', 
                 'api',
 		@additional_tasks,

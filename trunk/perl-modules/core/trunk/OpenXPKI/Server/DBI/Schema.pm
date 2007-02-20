@@ -22,7 +22,7 @@ my %SEQUENCE_of = (
 #    CRR_ATTRIBUTES => 'seq_crr_attributes',
     # log entries must use auto_increment
     # or whatever the name of this technology is on your database platform
-    # AUDITTRAIL     => "seq_audittrail",
+    AUDITTRAIL     => "seq_audittrail",
 #    DATA           => "seq_data",
     GLOBAL_KEY_ID  => "seq_global_id",     # ??? FIXME - remove it?
 #    PRIVATE        => "seq_private",

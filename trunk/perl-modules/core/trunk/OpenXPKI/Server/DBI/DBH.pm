@@ -32,6 +32,7 @@ sub new
     ##! 1: "start"
     $self->{log} = $self->{params}->{LOG};
 
+    ##! 64: 'log: ' . ref $self->{log}
     ## init driver
     if (not $self->{params}->{TYPE})
     {
@@ -324,13 +325,15 @@ sub commit
     if ($self->{DBH}->commit()) {
         return 1;
     } else {
-        $self->{log}->log (FACILITY => "warn",
-                           PRIORITY => "error",
-                           MESSAGE  => "Commit failed.".
-                                       "\nsession=".CTX('session')->get_id(),
-                           MODULE   => $package,
-                           FILENAME => $filename,
-                           LINE     => $line);
+        if (defined $self->{log}) {
+            $self->{log}->log (FACILITY => "warn",
+                               PRIORITY => "error",
+                               MESSAGE  => "Commit failed.".
+                                          "\nsession=".CTX('session')->get_id(),
+                               MODULE   => $package,
+                               FILENAME => $filename,
+                               LINE     => $line);
+        }
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_COMMIT_FAILED",
             params  => {"ERRNO"  => $self->{DBH}->err(),

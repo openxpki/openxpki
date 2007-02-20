@@ -24,6 +24,7 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Server::DBI;
 use OpenXPKI::Server::Log;
+use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Server::ACL;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;
@@ -41,6 +42,7 @@ use Data::Dumper;
 my @init_tasks = qw(
   xml_config
   i18n
+  dbi_log
   log
   redirect_stderr
   prepare_daemon
@@ -182,6 +184,7 @@ sub __do_init_log {
 	{
 	    log => $log,
 	});
+    ##! 64: 'log during init: ' . ref $log
 }
 
 
@@ -310,6 +313,20 @@ sub __do_init_dbi_workflow {
 	{
 	    dbi_workflow => $dbi,
 	});
+}
+
+sub __do_init_dbi_log {
+    ### init backend dbi...
+    my $dbi = get_dbi(
+	{
+	    PURPOSE => 'log',
+	});
+    
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    dbi_log => $dbi,
+	});
+    CTX('dbi_log')->connect();
 }
 
 sub __do_init_acl {
@@ -922,37 +939,47 @@ sub get_dbi
 
     my $config = CTX('xml_config');
 
-    my %params = (LOG => CTX('log'));
+    my %params;
+
+    my $dbpath = 'database';
+    if (exists $args->{PURPOSE} && $args->{PURPOSE} eq 'log') {
+        ##! 16: 'purpose: log'
+        $dbpath = 'log_database';
+        %params = (LOG => OpenXPKI::Server::Log::NOOP->new());
+    }
+    else {
+        %params = (LOG => CTX('log'));
+    }
 
     ## setup of the environment
 
     ## determine database vendor
     $params{TYPE} = $config->get_xpath (
-                   XPATH    => [ 'common/database/type' ],
+                   XPATH    => [ "common/$dbpath/type" ],
                    COUNTER  => [ 0 ]);
 
     ## determine configuration for infrastructure
     $params{SERVER_ID} = $config->get_xpath (
-                   XPATH    => [ 'common/database/server_id' ],
+                   XPATH    => [ "common/$dbpath/server_id" ],
                    COUNTER  => [ 0 ]);
     $params{SERVER_SHIFT} = $config->get_xpath (
-                   XPATH    => [ 'common/database/server_shift' ],
+                   XPATH    => [ "common/$dbpath/server_shift" ],
                    COUNTER  => [ 0 ]);
 
     ## find configuration and detect number of options
     my ($vendor_name, $vendor_number, $vendor_envs) = ("", -1, 0);
     my $vendor_count = $config->get_xpath_count (
-                            XPATH    => [ 'common/database/environment/vendor' ],
+                            XPATH    => [ "common/$dbpath/environment/vendor" ],
                             COUNTER  => []);
     for (my $k = 0; $k<$vendor_count; $k++)
     {
         $vendor_name = $config->get_xpath (
-                            XPATH    => [ 'common/database/environment/vendor', 'type' ],
+                            XPATH    => [ "common/$dbpath/environment/vendor", "type" ],
                             COUNTER  => [ $k, 0 ]);
         next if ($vendor_name ne $params{TYPE});
         $vendor_number = $k;
         eval { $vendor_envs = $config->get_xpath_count (
-		   XPATH    => [ 'common/database/environment/vendor', 'option' ],
+		   XPATH    => [ "common/$dbpath/environment/vendor", "option" ],
 		   COUNTER  => [ $k ]);
 	};
     }
@@ -961,10 +988,10 @@ sub get_dbi
     for (my $i = 0; $i<$vendor_envs; $i++)
     {
         my $env_name = $config->get_xpath (
-                           XPATH    => [ 'common/database/environment/vendor', 'option', 'name' ],
+                           XPATH    => [ "common/$dbpath/environment/vendor", "option", "name" ],
                            COUNTER  => [ $vendor_number, $i, 0 ]);
         my $env_value = $config->get_xpath (
-                           XPATH    => [ 'common/database/environment/vendor', 'option', 'value' ],
+                           XPATH    => [ "common/$dbpath/environment/vendor", "option", "value" ],
                            COUNTER  => [ $vendor_number, $i, 0 ]);
         $ENV{$env_name} = $env_value;
         ##! 4: "NUMBER: $i"
@@ -974,28 +1001,28 @@ sub get_dbi
 
     ## load database config
     $params{NAME} = $config->get_xpath (
-                   XPATH    => [ 'common/database/name' ],
+                   XPATH    => [ "common/$dbpath/name" ],
                    COUNTER  => [ 0 ]);
     eval{ $params{HOST} = $config->get_xpath (
-                   XPATH    => [ 'common/database/host' ],
+                   XPATH    => [ "common/$dbpath/host" ],
                    COUNTER  => [ 0 ]) };
     eval{ $params{PORT} = $config->get_xpath (
-                   XPATH    => [ 'common/database/port' ],
+                   XPATH    => [ "common/$dbpath/port" ],
                    COUNTER  => [ 0 ]) };
     eval{ $params{USER} = $config->get_xpath (
-                   XPATH    => [ 'common/database/user' ],
+                   XPATH    => [ "common/$dbpath/user" ],
                    COUNTER  => [ 0 ]) };
     eval{ $params{PASSWD} = $config->get_xpath (
-                   XPATH    => [ 'common/database/passwd' ],
+                   XPATH    => [ "common/$dbpath/passwd" ],
                    COUNTER  => [ 0 ]) };
     eval{ $params{NAMESPACE} = $config->get_xpath (
-                   XPATH    => [ 'common/database/namespace' ],
+                   XPATH    => [ "common/$dbpath/namespace" ],
                    COUNTER  => [ 0 ]) };
 
     # special handling for SQLite databases
-    if ($params{TYPE} eq 'SQLite') {
-	if (defined $args->{PURPOSE} && ($args->{PURPOSE} ne '')) {
-	    $params{NAME} .= '._' . $args->{PURPOSE} . '_';
+    if ($params{TYPE} eq "SQLite") {
+	if (defined $args->{PURPOSE} && ($args->{PURPOSE} ne "")) {
+	    $params{NAME} .= "._" . $args->{PURPOSE} . "_";
 	}
     }
 
@@ -1012,7 +1039,11 @@ sub get_log
                   COUNTER  => [ 0 ]);
 
     ## init logging
+    ##! 64: 'before Log->new'
+
     my $log = OpenXPKI::Server::Log->new (CONFIG => $config);
+
+    ##! 64: 'log during get_log: ' . $log
 
     return $log;
 }

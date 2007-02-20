@@ -150,6 +150,7 @@ sub new
     
     CTX('dbi_workflow')->disconnect();
     CTX('dbi_backend')->disconnect();
+    CTX('dbi_log')->disconnect();
     
     $self->run (%{$self->{PARAMS}});
 }
@@ -359,6 +360,22 @@ sub do_process_request
 {
     ##! 2: "start"
     my $self = shift;
+
+    eval { 
+        CTX('dbi_log')->new_dbh();
+	CTX('dbi_log')->connect();
+    };
+    if ($EVAL_ERROR)
+    {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_COULD_NOT_RECONNECT_DBI_LOG',
+            params  => {
+                ERROR => $EVAL_ERROR,
+            },
+        );
+        return;
+    }
+    ##! 16: 'dbi_log reconnected with new dbh'
 
     my $log = CTX('log');
 

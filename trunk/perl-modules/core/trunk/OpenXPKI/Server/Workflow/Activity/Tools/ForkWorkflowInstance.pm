@@ -115,6 +115,7 @@ sub execute {
         # a new database handle is created in the child workflow
         CTX('dbi_workflow')->disconnect();
         CTX('dbi_backend')->disconnect();
+        CTX('dbi_log')->disconnect();
         my $redo_count = 0;
         my $pid;
         $SIG{CHLD} = 'IGNORE'; # avoids zombies, TODO: research on
@@ -149,10 +150,13 @@ sub execute {
             ##! 16: 'parent: process group: ' . getpgrp(0)
             # we have forked successfully and have nothing to do any more
             # except for getting a new database handle
+            CTX('dbi_log')->new_dbh();
+            ##! 16: 'new parent dbi_log dbh'
             CTX('dbi_workflow')->new_dbh();
             ##! 16: 'new parent dbi_workflow dbh'
             CTX('dbi_backend')->new_dbh();
             ##! 16: 'new parent dbi_backend dbh'
+            CTX('dbi_log')->connect();
             CTX('dbi_workflow')->connect();
             CTX('dbi_backend')->connect();
             # get new database handles
@@ -162,15 +166,20 @@ sub execute {
                 'force' => 1,
             }); 
             ##! 16: 'old session restored, role: ' . CTX('session')->get_role()
+            ### FIXME - this should no longer be necessary once we have
+            ### written a custom Log4perl appender using our dbi_log handle
             CTX('log')->re_init();
             ##! 16: 'child: log re-init done'
         }
         else {
     	    ##! 16: 'child here'
+            CTX('dbi_log')->new_dbh();
+            ##! 16: 'new child dbi_log dbh'
             CTX('dbi_workflow')->new_dbh();
             ##! 16: 'new child dbi_workflow dbh'
             CTX('dbi_backend')->new_dbh();
             ##! 16: 'new child dbi_backend dbh'
+            CTX('dbi_log')->connect();
             CTX('dbi_workflow')->connect();
             CTX('dbi_backend')->connect();
             ##! 16: 'child: DB handles reconnected'

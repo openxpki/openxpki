@@ -42,11 +42,13 @@
 
     [% IF deployment.xmlstyle == 'multi-file' %]
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="log_database.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="token.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="notification.xml"/>
 
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
       [% INCLUDE database.xml     FILTER indent(4) %]
+      [% INCLUDE log_database.xml FILTER indent(4) %]
       [% INCLUDE token.xml        FILTER indent(4) %]
       [% INCLUDE notification.xml FILTER indent(4) %]
     [% ELSE %]

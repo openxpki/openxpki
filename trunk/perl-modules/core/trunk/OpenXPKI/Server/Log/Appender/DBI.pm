@@ -1,35 +1,83 @@
 ## OpenXPKI::Server::Log::Appender::DBI.pm 
 ##
-## Written by Michael Bell for the OpenCA project 2004
-## Migrated to the OpenXPKI Project 2005
-## Copyright transfered from Michael Bell to The OpenXPKI Project in 2005
-## Copyright (C) 2004-2005 by The OpenXPKI Project
+## Written in 2007 by Alexander Klink for the OpenXPKI Project
+## Copyright (C) 2007 by The OpenXPKI Project
 ## $Revision$
-
-
 package OpenXPKI::Server::Log::Appender::DBI;
 
 use strict;
 use warnings;
 
-use base qw(Log::Log4perl::Appender::DBI);
+use OpenXPKI::Debug 'OpenXPKI::Server::Log::Appender::DBI';
+use OpenXPKI::Server::Context qw( CTX );
+use Data::Dumper;
 
-sub _init
-{
-    my $self = shift;
+sub new {
+    ##! 1: 'start'
+    my($proto, %p) = @_;
+    my $class = ref $proto || $proto;
 
-    ## delay connection setup
-    $self->{init_params} = { @_ };
+    my $self = bless {}, $class; 
+    ##! 1: 'end'
+    return $self;
+}
+
+sub log {
+    ##! 1:  'start'
+    my $self    = shift;
+    my $arg_ref = { @_ };
+
+    ##! 128: 'arg_ref: ' . Dumper $arg_ref
+
+    my $dbi = CTX('dbi_log');
+
+    my $timestamp = $self->__get_current_utc_time();
+    ##! 64: 'timestamp: ' . $timestamp
+    my $category  = $arg_ref->{'log4p_category'};
+    ##! 64: 'category: ' . $category
+    my $loglevel  = $arg_ref->{'log4p_level'};
+    ##! 64: 'loglevel: ' . $loglevel
+    my $message   = $arg_ref->{'message'}->[0];
+    ##! 64: 'message: ' . $message
+
+    my $serial = $dbi->get_new_serial(
+        TABLE => 'AUDITTRAIL',
+    );
+    ##! 64: 'serial: ' . $serial
+
+    $dbi->insert(
+        TABLE => 'AUDITTRAIL',
+        HASH  => {
+            AUDITTRAIL_SERIAL => $serial,
+            TIMESTAMP         => $timestamp,
+            CATEGORY          => $category,
+            LOGLEVEL           => $loglevel,
+            MESSAGE           => $message,
+        },    
+    );
+    $dbi->commit();
+
+    ##! 1: 'end'
     return 1;
 }
 
-sub create_statement
-{
-    my ($self, $stmt) = @_;
+sub __get_current_utc_time {
+    my $self = shift;
 
-    $self->SUPER::_init(%{$self->{init_params}})
-        if (not $self->{dbh});
-    return $self->SUPER::create_statement ($stmt);
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) =
+        gmtime(time);
+    $year += 1900;
+    $mon++;
+    my $time;
+    my $microseconds = 0;
+    eval { # if Time::HiRes is available, use it to get microseconds
+        use Time::HiRes qw( gettimeofday );
+        my ($seconds, $micro) = gettimeofday();
+        $microseconds = $micro;
+    };
+    $time = sprintf("%04d%02d%02d%02d%02d%02d%06d", $year, $mon, $mday, $hour, $min, $sec, $microseconds);
+
+    return $time;
 }
 
 1;
