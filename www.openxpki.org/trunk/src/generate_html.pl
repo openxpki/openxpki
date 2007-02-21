@@ -33,6 +33,7 @@ my %possible_names = map { $_ => 1 } qw(
    mbartosch
    oliwel
    svysh
+   pgrig
 );
 
 if (-e($usr_file_name) && -s _) {                                                                                                                          
