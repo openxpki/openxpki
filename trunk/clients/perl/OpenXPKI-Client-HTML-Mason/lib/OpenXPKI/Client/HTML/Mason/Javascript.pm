@@ -1,4 +1,5 @@
 ## Written by Michael Bell
+## Rewritten by Julia Dubenskaya
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 
 package OpenXPKI::Client::HTML::Mason::Javascript;
@@ -104,6 +105,80 @@ $FUNCTION{install_cert_ie} = qq^
 $FUNCTION{sign_form} = qq^
 <script type="text/javascript">
 <!--
+
+var PROV_DSS=3;
+var PROV_RSA_SCHANNEL=12;
+var PROV_DSS_DH=13;
+var PROV_DH_SCHANNEL=18;
+var ALG_CLASS_SIGNATURE=1<<13;
+var ALG_CLASS_HASH=4<<13;
+var AT_KEYEXCHANGE=1;
+var AT_SIGNATURE=2;
+
+function GetSelectedProvName () {
+    return document.OpenXPKI.csp.options[document.OpenXPKI.csp.options.selectedIndex].text;
+}
+
+function GetSelectedProvType () {
+    return document.OpenXPKI.csp.options[document.OpenXPKI.csp.options.selectedIndex].value;
+}
+
+function GetKeyGenFlags (nKeyLength, nCryptUserProtected, nCryptExportable) {
+    var nKeyGenFlags;
+
+    // xenroll.GenKeyFlags
+    //                        0x0400     keylength (first 16 bit) => 1024
+    //                        0x00000001 CRYPT_EXPORTABLE
+    //                        0x00000002 CRYPT_USER_PROTECTED
+    //                        0x04000003
+    //                        0x0200     => this works for some export-restricted browsers (512 bit)
+    //                        0x02000003
+    //                        33554435
+
+    nKeyGenFlags=nKeyLength<<16;
+    nKeyGenFlags|=nCryptUserProtected;
+    nKeyGenFlags|=nCryptExportable;
+    return nKeyGenFlags;
+}
+
+function handleError(nResult) {
+    var sErrorName="L_ErrNameUnknown_ErrorMessage";
+    // analyze the error
+    if (0==(0x80090008\^nResult)) {
+        sErrorName="NTE_BAD_ALGID";
+    } else if (0==(0x80090016\^nResult)) {
+        sErrorName="NTE_BAD_KEYSET";
+    } else if (0==(0x80090019\^nResult)) {
+        sErrorName="NTE_KEYSET_NOT_DEF";
+    } else if (0==(0x80090020\^nResult)) {
+        sErrorName="NTE_FAIL";
+    } else if (0==(0x80090009\^nResult)) {
+        sErrorName="NTE_BAD_FLAGS";
+    } else if (0==(0x8009000F\^nResult)) {
+        sErrorName="NTE_EXISTS";
+    } else if (0==(0x80092002\^nResult)) {
+        sErrorName="CRYPT_E_BAD_ENCODE";
+    } else if (0==(0x80092022\^nResult)) {
+        sErrorName="CRYPT_E_INVALID_IA5_STRING";
+    } else if (0==(0x80092023\^nResult)) {
+        sErrorName="CRYPT_E_INVALID_X500_STRING";
+    } else if (0==(0x80070003\^nResult)) {
+        sErrorName="ERROR_PATH_NOT_FOUND";
+    } else if (0==(0x80070103\^nResult)) {
+        sErrorName="ERROR_NO_MORE_ITEMS";
+    } else if (0==(0xFFFFFFFF\^nResult)) {
+        sErrorName=L_ErrNameNoFileName_ErrorMessage;
+    } else if (0==(0x8000FFFF\^nResult)) {
+        sErrorName="E_UNEXPECTED";
+    } else if (0==(0x00000046\^nResult)) {
+        sErrorName=L_ErrNamePermissionDenied_ErrorMessage;
+    } else if (0==(0x800704c7\^nResult)) {
+        // not an error at all, user cancel
+        return;
+    }
+    return "Error: "+sErrorName;
+}
+
 function signForm(theForm, theWindow){
   if (navigator.appName == "Netscape"){
     if (signFormN(theForm, theWindow))
@@ -200,9 +275,9 @@ End Function
 $FUNCTION{gen_csr_ie} = qq^
 <script type="text/vbscript">
 <!--
-        dim PROV_RSA_FULL
-
-        PROV_RSA_FULL = 1
+        const PROV_RSA_FULL=1
+        const KEY_LEN_MIN=1
+        const KEY_LEN_MAX=0
 
         Function getXEnroll
             dim error
@@ -230,36 +305,49 @@ $FUNCTION{gen_csr_ie} = qq^
 
         Function CreateCSR (mode)
             dim theForm 
+            dim sProvName, nProvType
             dim options
             dim index
             dim szName
             dim sz10
             dim xenroll
+            dim nSupportedKeyUsages
 
             On Error Resume Next
             set theForm = document.OpenXPKI
-            Set re = new regexp 
-
-            Set xenroll = getXEnroll
+            set re = new regexp 
+            set xenroll = getXEnroll
 
             re.Pattern = "__CSP_NAME__"
-            name = theForm.csp.value
-            if Len(name) > 0 then
-                xenroll.ProviderName=name
-                'MsgBox ("The used Cryptographic Service Provider is " & xenroll.ProviderName)
-                if mode <> "silent" then
+            if mode <> "silent" then
+                sProvName=GetSelectedProvName()
+                nProvType=GetSelectedProvType()
+                if Len(nProvType) > 0 then
+                    'MsgBox ("The used Cryptographic Service Provider is " & xenroll.ProviderName)
                     MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME", xenroll.ProviderName))
-                end if
-            else
-                xenroll.ProviderName=""
-                'MsgBox ("The used Cryptographic Service Provider is the default one.")
-                if mode <> "silent" then
+                else
+                    sProvName=""
+                    nProvType=PROV_RSA_FULL
+                    'MsgBox ("The used Cryptographic Service Provider is the default one.")
                     MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP")
                 end if
+            else
+                sProvName=theForm.csp.value
+                nProvType=PROV_RSA_FULL
+            end if
+
+            xenroll.ProviderName=sProvName
+            xenroll.ProviderType=nProvType
+            xenroll.HashAlgorithm = "SHA1"
+            nSupportedKeyUsages=xenroll.GetSupportedKeySpec()
+            if 0=nSupportedKeyUsages then
+                nSupportedKeyUsages=AT_SIGNATURE or AT_KEYEXCHANGE
+            end if
+            if (PROV_DSS=nProvType) or (PROV_DSS_DH=nProvType) or (PROV_DH_SCHANNEL=nProvType) then
+                nSupportedKeyUsages=AT_SIGNATURE
             end if
 
             alternate_subject = "cn=unsupported,dc=subject,dc=by,dc=MSIE"
-    
             szName = theForm.ie_subject.value
 
             re.Pattern = "__SUBJECT__"
@@ -268,44 +356,25 @@ $FUNCTION{gen_csr_ie} = qq^
                 Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT", szName))
             end if
 
-            xenroll.providerType = PROV_RSA_FULL
-            xenroll.HashAlgorithm = "SHA1"
-            xenroll.KeySpec = 1
-            xenroll.GenKeyFlags = 134217731
-            if theForm.bits.value =  512 then
-                xenroll.GenKeyFlags = 33554435
-            end if
-            if theForm.bits.value =  1024 then
-                xenroll.GenKeyFlags = 67108867
-            end if
-            if theForm.bits.value =  2048 then
-                xenroll.GenKeyFlags = 134217731
-            end if
+            xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 1)
             sz10 = xenroll.CreatePKCS10(szName, "1.3.6.1.4.1.311.2.1.21")
-
-            ' xenroll.GenKeyFlags
-            '                        0x0400     keylength (first 16 bit) => 1024
-            '                        0x00000001 CRYPT_EXPORTABLE
-            '                        0x00000002 CRYPT_USER_PROTECTED
-            '                        0x04000003
-            '                        0x0200     => this works for some export-restricted browsers (512 bit)
-            '                        0x02000003
-            '                        33554435
+            if (0<>Err.Number) and (mode<>"silent") then
+                ' XEnroll failed
+                dim nResult
+                nResult=handleError(Err.Number)
+                if Len(nResult)>0 then
+                    MsgBox(nResult)
+                else
+                    'user canselled request generation
+                    exit function
+                end if
+            end if
 
             ' try pragmatical failover - we simply set another subject
             if Len(sz10) = 0 then 
                 if mode <> "silent" then
-                    Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER", alternate_subject))
-                    xenroll.GenKeyFlags = 134217730
-                    if theForm.bits.value =  512 then
-                        xenroll.GenKeyFlags = 33554434
-                    end if
-                    if theForm.bits.value =  1024 then
-                        xenroll.GenKeyFlags = 67108866
-                    end if
-                    if theForm.bits.value =  2048 then
-                        xenroll.GenKeyFlags = 134217730
-                    end if
+                    MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER", alternate_subject))
+                    xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 0)
                     sz10 = xenroll.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
 
                     if Len(sz10) = 0 then 
@@ -313,13 +382,13 @@ $FUNCTION{gen_csr_ie} = qq^
                         MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED") 
                     end if
                 end if
-                Exit Function 
+                exit function 
             end if 
 
             theForm.pkcs10.value = sz10
-            'msgbox (theForm.pkcs10.value)
+            'MsgBox (theForm.pkcs10.value)
 
-            'msgbox ("The certificate service request was successfully generated.")
+            'MsgBox ("The certificate service request was successfully generated.")
             if mode <> "silent" then
                 MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED") 
             end if
@@ -328,34 +397,116 @@ $FUNCTION{gen_csr_ie} = qq^
         End Function
 
         sub enumCSP
+            on Error Resume Next
 
-            dim prov
-            dim name
-            dim element
+            const nMinProvType=1
+            const nMaxProvType=600
+            dim nProvType, nOrigProvType, nProvIndex, sProvName
+            dim XEnroll
+
+            set xenroll = getXEnroll
+            ' save the original provider type
+            nOrigProvType=XEnroll.ProviderType
+            if 0<>Err.Number then
+                ' XEnroll failed
+                exit sub
+            end if
+
+            ' take each of the provider types
+            for nProvType=nMinProvType To nMaxProvType
+                if PROV_RSA_SCHANNEL<>nProvType then
+                    XEnroll.ProviderType=nProvType
+                    ' take each of the providers of the type nProvType
+                    nProvIndex=0
+                    sProvName=""
+                    do
+                        'get provider name
+                        sProvName=XEnroll.enumProviders(nProvIndex, 0)
+                        if &H80070103=Err.Number Then 
+                            ' no more providers of the type nProvType
+                            Err.Clear
+                            exit do
+                        elseIf 0<>Err.Number Then
+                            ' XEnroll failed
+                            exit sub
+                        end if
+                        ' add provider name to the list box
+                        dim oElement
+                        set oElement=document.createElement("Option")
+                        oElement.text=sProvName
+                        oElement.value=nProvType
+
+                        document.OpenXPKI.csp.add(oElement)
+
+                        ' get the next provider number
+                        nProvIndex=nProvIndex+1
+                    loop
+                end if
+            next
+            ' restore the original provider type
+            XEnroll.ProviderType=nOrigProvType
+            document.OpenXPKI.elements[0].focus()
+            GetKeyLength()
+        end sub
+
+        function GetMinMaxKeyLength (bMinMax, bExchange)
+            on Error Resume Next
+              
+            const KEY_LEN_MIN_DEFAULT=512
+            const KEY_LEN_MAX_DEFAULT=4096
+            dim sProvName, nProvType, nProvIndex
             dim xenroll
 
-            On Error Resume Next
+            set xenroll = getXEnroll
+            
+            sProvName=GetSelectedProvName()
+            nProvType=GetSelectedProvType()
+            xenroll.ProviderName=sProvName
+            xenroll.providerType=nProvType
 
-            Set xenroll = getXEnroll
-
-            prov=0
-            document.OPENXPKI.csp.selectedIndex = 0
-
-            do
-                name = xenroll.enumProviders(prov,0)
-                if Len (name) = 0 then
-                    exit do
+            GetMinMaxKeyLength=xenroll.GetKeyLen(bMinMax, bExchange)
+            
+            if (0<>Err.Number) or (KEY_LEN_MIN_DEFAULT>GetMinMaxKeyLength) or (KEY_LEN_MAX_DEFAULT<GetMinMaxKeyLength) then
+                if KEY_LEN_MIN=bMinMax then
+                    GetMinMaxKeyLength=KEY_LEN_MIN_DEFAULT
                 else
-                    set element = document.createElement("OPTION") 
-                    element.text = name
-                    element.value = name
-                    document.OPENXPKI.csp.add(element) 
-                    prov = prov + 1
-                    name = ""
+                    GetMinMaxKeyLength=KEY_LEN_MAX_DEFAULT
+                end if
+            end if
+            
+        end function
+
+       sub GetKeyLength
+            on Error Resume Next
+
+            dim nKeyMin, nKeyMax
+            dim nPowerSize
+            dim oOption
+           
+            nKeyMin=GetMinMaxKeyLength(KEY_LEN_MIN, 1)
+            nKeyMax=GetMinMaxKeyLength(KEY_LEN_MAX, 0)
+
+            ' remove previous values of key length
+            do
+                if document.OpenXPKI.bits.length=0 then
+                   exit do
+                else
+                    document.OpenXPKI.bits.remove(0)
                 end if
             loop
-
-            document.OPENXPKI.elements[0].focus()
+            ' add key length to the list
+            nPowerSize=nKeyMin
+            do
+                if nPowerSize>nKeyMax then
+                    exit do
+                else
+                    set oOption = document.createElement("OPTION") 
+                    oOption.text = nPowerSize
+                    oOption.value = nPowerSize
+                    document.OpenXPKI.bits.add(oOption)
+                    nPowerSize=nPowerSize*2                   
+                end if
+            loop
 
         end sub
 -->
