@@ -9,12 +9,21 @@ PACKAGES=	\
 	mason-html-client	\
 	i18n
 
-.PHONY : $(PACKAGES)
+EXTERNAL=	\
+	Data__Password \
+	XML__Filter__XInclude \
+	XML__Validator__Schema
+
+.PHONY : $(PACKAGES) $(EXTERNAL)
 
 default:	clean
+	make $(EXTERNAL)
 	make $(PACKAGES)
 	make resultlocal
 	make check
+
+$(EXTERNAL):
+	dh-make-perl --build --cpan $(subst __,::,$@)
 
 $(PACKAGES):
 	cd $@ && PATH=$(PATH):/usr/sbin make $(SUBTARGET)
@@ -33,5 +42,8 @@ check:
 clean:
 	rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes
 	make $(PACKAGES) SUBTARGET=clean
+	for DIR in $(subst __,-,$(EXTERNAL)); do \
+		rm -rf $$DIR-*; \
+	done
 
 distclean: clean
