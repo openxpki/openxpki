@@ -149,22 +149,22 @@ sub execute {
             }
             else {
                 ## capture STDOUT
-		$return = do {
-		    open my $FD, "$cmd|";   # slurp stdout
-		    local $INPUT_RECORD_SEPARATOR;
-		    <$FD>;
-		};
-
-		if ($CHILD_ERROR != 0) {
-                    OpenXPKI::Exception->throw (
-                        message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDOUT_FAILED',
-                        params  => { 
-			    CHILD_ERROR => $CHILD_ERROR,
-			},
-		    );
+                if (open my $FD, "$cmd|") {
+                    $params->[$i]->{STDOUT} = '';
+                    while (<$FD>) { # TODO: slurp, see #
+                        $params->[$i]->{STDOUT} .= $_;
+                    }
+                    $return .= $params->[$i]->{STDOUT};
+                    close $FD;
                 }
-		
-		$params->[$i]->{STDOUT} = $return;
+                else {
+                    OpenXPKI::Exception->throw(
+                        message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDOUT_FAILED',
+                        params  => {
+                            'ERRVAL' => $EVAL_ERROR,
+                        },
+                    );
+                }
 	    }
         } else {
             ## simply execute the command
