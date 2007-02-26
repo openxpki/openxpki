@@ -139,6 +139,7 @@ OpenXPKI/Server/DBI/Driver/SQLite.pm
 ## logging interface
 
 OpenXPKI/Server/Log.pm
+OpenXPKI/Server/Log/NOOP.pm
 OpenXPKI/Server/Log/Appender/DBI.pm
 
 ## common server stuff
