@@ -139,7 +139,7 @@
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"
-          time="5">
+          time="10">
   </action>
 
   <action name="I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"

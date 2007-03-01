@@ -4302,6 +4302,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_KEY_UNUSABLE"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_LDAP_DISABLED"
+msgstr "Ldap is disabled in config.xml for given realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECERTSTOTEST_NO_MORE_CERTS_TO_TEST"
 msgstr "Prozesse anzeigen"
 
@@ -4873,6 +4877,10 @@ msgstr "Exportieren des Zertifzierungsantrages"
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
 msgstr "Start der Zertifikatserstellung"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
+msgstr "Create a new workflow instance for publishing a certificate using LDAP"
+
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
 msgstr "Speichern des Zertifzierungsantrages"
 
@@ -4885,6 +4893,10 @@ msgstr "Warten"
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
 msgstr "Auf anderen Workflow warten"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
+msgstr " Wait 2 seconds for other workflow instance"
+
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr "Start der Zertifikatserstellung"
 
@@ -4893,6 +4905,10 @@ msgstr "Warten"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE"
 msgstr "Dieser Workflow erstellt ein neues Zertifikat."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_LDAP_PUBLISHING"
+msgstr "Publish a certificate using LDAP"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_REVOCATION_REQUEST"
@@ -5058,6 +5074,50 @@ msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
 msgstr "Logs exportiert"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_CERT_TO_STACK"
+msgstr "Adding a certificate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_NODE"
+msgstr "Adding missing node"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_ALL_NODES_PRESENT"
+msgstr "All LDAP nodes are present"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_ATTRIBUTES_DETERMINED"
+msgstr "LDAP attributes determined"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_CERT_STACK_LOADED"
+msgstr "Node certificates are loaded"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_CHECK_DN_AVAILABLE"
+msgstr "Checking if DN exists in LDAP tree"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_LEAF_TYPE_AVAILABLE"
+msgstr "Looking for the leaf in LDAP tree"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_MISSING_NODE_DETERMINED"
+msgstr "LDAP node for the given DN is missing"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_NODE_UPDATED"
+msgstr "LDAP node updated"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_OBJECTCLASSES_DETERMINED"
+msgstr "Determine LDAP objectclasses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_PUBLIC_INITIAL"
+msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_SCEP_INITIAL_ENROLLMENT"
 msgstr "Start der CRL-Erstellung"
 
@@ -5079,6 +5139,10 @@ msgstr "SCEP-Zertifizierungsantrag"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
 msgstr "Erstellen eines Zertifikates"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING"
+msgstr "Publish a certificate using LDAP"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST"
@@ -5675,3 +5739,4 @@ msgstr "ja"
 #~ msgstr ""
 #~ "Die GUID __GUID__ ist falsch. Es werden sowohl das RFC 4122 Format als "
 #~ "auch die übliche Microsoft-Schreibweise akzeptiert."
+

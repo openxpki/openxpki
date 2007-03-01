@@ -547,6 +547,78 @@ sub get_pki_realms
 		}
 	    }
 	}
+        #############################################################
+        # get ldap options  
+	#
+        my $ldap_enable = $config->get_xpath(
+		        XPATH   => [ 'pki_realm', 'common','ldap','ldap_enable' ],
+  		        COUNTER => [          $i,        0,     0,           0  ],
+		      );
+         $realms{$name}->{ldap_enable} = $ldap_enable;
+
+	 my $ldap_excluded_roles = $config->get_xpath(
+              XPATH   => [ 'pki_realm', 'common','ldap','ldap_excluded_roles' ],
+              COUNTER => [          $i,        0,     0,                    0 ],
+		      );
+         $realms{$name}->{ldap_excluded_roles} = $ldap_excluded_roles;
+
+	 my $ldap_suffix = $config->get_xpath(
+                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_suffix' ],
+	                 COUNTER => [          $i,        0,     0,           0  ],
+		      );
+         $realms{$name}->{ldap_suffix} = $ldap_suffix;
+
+	 my $ldap_server = $config->get_xpath(
+                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_server' ],
+	                 COUNTER => [          $i,        0,     0,           0  ],
+		      );
+         $realms{$name}->{ldap_server} = $ldap_server;
+
+	 my $ldap_port = $config->get_xpath(
+                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_port' ],
+	                 COUNTER => [          $i,        0,     0,           0  ],
+		      );
+         $realms{$name}->{ldap_port} = $ldap_port;
+
+	 my $ldap_version = $config->get_xpath(
+                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_version' ],
+	                 COUNTER => [          $i,        0,     0,           0  ],
+		      );
+         $realms{$name}->{ldap_version} = $ldap_version;
+	 
+         my $ldap_tls = $config->get_xpath(
+                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_tls' ],
+	                 COUNTER => [          $i,        0,     0,           0  ],
+		      );
+         $realms{$name}->{ldap_tls} = $ldap_tls;
+
+	 my $ldap_sasl = $config->get_xpath(
+                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_sasl' ],
+	                 COUNTER => [          $i,        0,     0,           0  ],
+		      );
+         $realms{$name}->{ldap_sasl} = $ldap_sasl;
+	 
+         my $ldap_chain = $config->get_xpath(
+                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_chain' ],
+	                 COUNTER => [          $i,        0,     0,           0  ],
+		      );
+         $realms{$name}->{ldap_chain} = $ldap_chain;
+
+	 my $ldap_login = $config->get_xpath(
+                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_login' ],
+	                 COUNTER => [          $i,        0,     0,           0  ],
+		      );
+         $realms{$name}->{ldap_login} = $ldap_login;
+	 
+         my $ldap_password = $config->get_xpath(
+                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_password' ],
+	                 COUNTER => [          $i,        0,     0,           0  ],
+		      );
+         $realms{$name}->{ldap_password} = $ldap_password;
+
+        # The End of ldap section
+        ################################################################
+
 
 	### %realms
 	

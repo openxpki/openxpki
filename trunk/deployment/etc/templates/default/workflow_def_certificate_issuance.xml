@@ -37,7 +37,7 @@
 
   <state name="PREPARED" autorun="yes">
     <action name="issue_certificate" 
-	    resulting_state="CERTIFICATE_ISSUED">
+	    resulting_state="SPAWNING_CERTIFICATE_LDAP_PUBLISHING">
     </action>
   </state>
 
@@ -52,6 +52,30 @@
 	    resulting_state="CA_KEY_USABLE">
         <condition name="ca_key_usable"/>
     </action>
+  </state>
+
+  <state name="SPAWNING_CERTIFICATE_LDAP_PUBLISHING" autorun="yes">
+   <action name="I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
+           resulting_state="SLEEPING_FOR_CHILD">
+        <condition name="use_ldap"/>
+      </action>
+      <action name="null"
+          resulting_state="CERTIFICATE_ISSUED">
+        <condition name="!use_ldap"/>
+      </action>
+  </state>
+							
+  <state name="SLEEPING_FOR_CHILD" autorun="yes">
+   <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
+                  resulting_state="CHECK_CHILD_FINISHED">
+   </action>
+  </state>
+
+  <state name="CHECK_CHILD_FINISHED" autorun="yes" may_stop="yes">
+   <action name="null"
+      resulting_state="CERTIFICATE_ISSUED">
+     <condition name="wf_child_instance_finished"/>
+   </action>
   </state>
 
   <state name="CERTIFICATE_ISSUED" autorun="yes">

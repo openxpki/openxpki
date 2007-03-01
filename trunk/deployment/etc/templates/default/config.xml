@@ -104,6 +104,22 @@
       [% ELSIF deployment.xmlstyle == 'all-in-one' %]
         [% INCLUDE profile.xml FILTER indent(6) %]
       [% END %]
+      <!-- LDAP addition  -->
+      <!-- WARNING: keep "ldap_enable" set to "no" to avoid surprises  -->      
+       <ldap>
+         <ldap_enable>no</ldap_enable>
+         <ldap_excluded_roles>publish_all_roles</ldap_excluded_roles>
+         <ldap_suffix>o=ca_organization, c=ca_country</ldap_suffix>
+         <ldap_server>myserver</ldap_server>
+         <ldap_port>389</ldap_port>
+         <ldap_version>3</ldap_version>
+         <ldap_tls>no</ldap_tls>
+         <ldap_sasl>no</ldap_sasl>
+         <ldap_chain>chain</ldap_chain>
+         <ldap_login>ldaproot</ldap_login>
+         <ldap_password>ldaprootpwd</ldap_password>
+       </ldap>
+      <!-- end of LDAP addition  -->
     </common>
 
     <!-- Issuing CAs defined for this realm -->

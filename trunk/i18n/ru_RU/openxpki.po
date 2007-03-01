@@ -3808,6 +3808,9 @@ msgstr "DNS-имя __DNS__  некорректно."
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_KEY_UNUSABLE"
 msgstr "SPKAC строка пуста."
 
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_LDAP_DISABLED"
+msgstr "LDAP отключен в config.xml для данного УЦ"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MORECERTSTOTEST_NO_MORE_CERTS_TO_TEST"
 msgstr "SPKAC строка пуста."
@@ -4397,6 +4400,9 @@ msgstr "Экспорт заявки на сертификат (CSR)"
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
 msgstr "Запустить новый технологический процесс для выдачи сертификата"
 
+msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
+msgstr "Запустить технологический процесс LDAP-публикации сертификата"
+
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
 msgstr "Сохранить заявку в базе данных и выдать сертификат"
 
@@ -4409,6 +4415,9 @@ msgstr "Пауза"
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
 msgstr "Ожидание завершения технологического процесса"
 
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
+msgstr "Ожидание завершения технологического процесса - 2 с"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr "Новая заявка на сертификат (CSR)"
@@ -4418,6 +4427,9 @@ msgstr "Пауза"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE"
 msgstr "Технологические процессы создания сертификатов"
+
+msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_LDAP_PUBLISHING"
+msgstr " Технологические процессы публикации сертификатов через LDAP"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_REVOCATION_REQUEST"
 msgstr "Технологические процессы отзыва сертификатов"
@@ -4578,6 +4590,40 @@ msgstr "Утвердить заявку на сертификат (CSR)"
 msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
 msgstr "Экспортированы журналы"
 
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_CERT_TO_STACK"
+msgstr "Добавление сертификата к LDAP записи"
+
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_NODE"
+msgstr "Добавление LDAP-узла"
+
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_ALL_NODES_PRESENT"
+msgstr "Все узлы LDAP найдены"
+
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_ATTRIBUTES_DETERMINED"
+msgstr "Определены атрибуты LDAP записи"
+
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_CERT_STACK_LOADED"
+msgstr "Сертификаты LDAP-узла загружены"
+
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_CHECK_DN_AVAILABLE"
+msgstr "Проверка существования DN в LDAP-дереве"
+
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_LEAF_TYPE_AVAILABLE"
+msgstr "Поиск ветви LDAP-дерева"
+
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_MISSING_NODE_DETERMINED"
+msgstr "Узел LDAP с данным DN отсутствует"
+
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_NODE_UPDATED"
+msgstr "Данные узла LDAP обновлены"
+
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_OBJECTCLASSES_DETERMINED"
+msgstr "Определение классов узла LDAP"
+
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_PUBLIC_INITIAL"
+msgstr "Начальное состояние технологического процесса публикации "
+"сертификатов через LDAP"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_SCEP_INITIAL_ENROLLMENT"
 msgstr "Идет запуск... "
@@ -4600,6 +4646,9 @@ msgstr "Прием заявки по протоколу SCEP"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
 msgstr "Выдача сертификата"
+
+msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING"
+msgstr "Публикация сертификата через LDAP"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST"
 msgstr "Отзыв сертификата"

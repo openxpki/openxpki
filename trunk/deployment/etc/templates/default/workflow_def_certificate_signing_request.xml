@@ -106,36 +106,19 @@
 	    resulting_state="SLEEPING_FOR_CHILD">
     </action>
   </state>
-
-  <!-- sleep a moment to give child the chance to finish -->
+  
   <state name="SLEEPING_FOR_CHILD" autorun="yes">
     <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
-            resulting_state="CHECK_CHILD_FINISHED">
+	    resulting_state="CHECK_CHILD_FINISHED">
     </action>
   </state>
 
-  <!-- if child is not yet finished, this goes out of autorun -->
   <state name="CHECK_CHILD_FINISHED" autorun="yes" may_stop="yes">
     <action name="notify_user_of_issuance"
             resulting_state="SUCCESS">
       <condition name="wf_child_instance_finished"/>
     </action>
   </state>
-
-<!-- alternatively, this loops till child is finished
-     (has the drawback of synchronously waiting for the child) -->
-<!-- 
-  <state name="WAITING_FOR_CHILD" autorun="yes">
-    <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
-            resulting_state="WAITING_FOR_CHILD">
-        <condition name="!wf_child_instance_finished"/>
-    </action>
-    <action name="null"
-            resulting_state="FINISHED">
-        <condition name="wf_child_instance_finished"/>
-    </action>
-  </state>
--->
 
   <state name="REJECTED" autorun="yes">
     <action name="null"

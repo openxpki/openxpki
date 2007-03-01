@@ -1,0 +1,97 @@
+<workflow>
+ <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
+  <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_LDAP_PUBLISHING</description>
+  <persister>OpenXPKI</persister>
+
+  <state name="INITIAL">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_PUBLIC_INITIAL</description>
+    <action name="null" 
+            resulting_state="WAITING_FOR_START">
+    </action>
+  </state>
+  
+  <state name="WAITING_FOR_START">
+    <description>I18N_OPENXPKI_WF_STATE_WAITING_FOR_START</description>
+    <action name="null"
+             resulting_state="CHECK_DN_AVAILABLE">
+     <condition name="ACL::certificate_ldap_publishing"/>
+    </action>
+  </state>
+
+  <state name="CHECK_DN_AVAILABLE" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_CHECK_DN_AVAILABLE</description>
+    <action name="null"
+	    resulting_state="ALL_NODES_PRESENT">
+     <condition name="ldap_dn_available"/> 
+    </action>
+    <action name="null2"
+	    resulting_state="MISSING_NODE_DETERMINED">
+     <condition name="!ldap_dn_available"/> 
+    </action>
+  </state>
+
+  <state name="MISSING_NODE_DETERMINED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_MISSING_NODE_DETERMINED</description>
+    <action name="null"
+	    resulting_state="LEAF_TYPE_AVAILABLE">
+    </action>
+  </state>
+
+  <state name="LEAF_TYPE_AVAILABLE" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_LEAF_TYPE_AVAILABLE</description>
+    <action name="null"
+	    resulting_state="OBJECTCLASSES_DETERMINED">
+    </action>
+  </state>
+
+  <state name="OBJECTCLASSES_DETERMINED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_OBJECTCLASSES_DETERMINED</description>
+    <action name="null"
+	    resulting_state="ATTRIBUTES_DETERMINED">
+    </action>
+  </state>
+
+
+  <state name="ATTRIBUTES_DETERMINED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_ATTRIBUTES_DETERMINED</description>
+    <action name="null"
+	    resulting_state="ADD_NODE">
+    </action>
+  </state>
+
+  <state name="ADD_NODE" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_ADD_NODE</description>
+    <action name="add_missing_node"
+	    resulting_state="CHECK_DN_AVAILABLE">
+    </action>
+  </state>
+
+  <state name="ALL_NODES_PRESENT" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_ALL_NODES_PRESENT</description>
+    <action name="null"
+	    resulting_state="CERT_STACK_LOADED">
+    </action>
+  </state>
+
+  <state name="CERT_STACK_LOADED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_CERT_STACK_LOADED</description>
+    <action name="null"
+	    resulting_state="ADD_CERT_TO_STACK">
+    </action>
+  </state>
+
+  <state name="ADD_CERT_TO_STACK" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_ADD_CERT_TO_STACK</description>
+    <action name="public_cert_ldap"
+	    resulting_state="NODE_UPDATED">
+    </action>
+  </state>
+
+  <state name="NODE_UPDATED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_NODE_UPDATED</description>
+    <action name="null"
+             resulting_state="SUCCESS">
+    </action>
+  </state>
+  <state name="SUCCESS"/>
+</workflow>

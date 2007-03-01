@@ -9,6 +9,7 @@
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_signing_request.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_signing_request_offline_ca.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_issuance.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_ldap_publishing.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_revocation_request.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_revocation_request_offline_ca.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_def_crl_issuance.xml</configfile>
@@ -28,6 +29,7 @@
       -->
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_certificate_signing_request.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_certificate_issuance.xml</configfile>
+    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_certificate_ldap_publishing.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_certificate_revocation_request.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_crl_issuance.xml</configfile>
     <configfile>[% dir.openxpkiconfdir %]/workflow_activity_scep_request.xml</configfile>

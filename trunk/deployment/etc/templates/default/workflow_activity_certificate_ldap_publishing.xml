@@ -1,0 +1,8 @@
+<actions>
+  <action name="public_cert_ldap"
+	  class="OpenXPKI::Server::Workflow::Activity::CertLdapPublish::PublicCertLdap">
+  </action>
+  <action name="add_missing_node"
+	  class="OpenXPKI::Server::Workflow::Activity::CertLdapPublish::AddMissingNode">
+  </action>
+</actions>

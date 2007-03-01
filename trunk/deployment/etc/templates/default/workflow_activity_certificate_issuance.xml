@@ -49,6 +49,18 @@
           class="Workflow::Action::Null">
   </action>
   
+  <!--  LDAP FORK - happens only if "use_ladp" set to "yes" in config.xml -->
+  <action name="I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
+      class="OpenXPKI::Server::Workflow::Activity::Tools::ForkWorkflowInstance"
+      workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING">
+  </action>
+
+  <!-- Waiting for LDAP publishing if forked --> 
+  <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"
+          time="2">
+  </action>
+
 <!-- for testing only
   <action name="I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"

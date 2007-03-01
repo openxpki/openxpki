@@ -205,5 +205,15 @@
     <param name="difference" value="100d"/> <!-- renewal can only begin 100d before the certificate becomes invalid -->
   </condition>
   <condition name="signed_using_original_cert" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/>
+
+ <!-- conditions for publishing certificates using ldap -->
+  <condition name="ACL::certificate_ldap_publishing" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="certificate_ldap_publishing"/>
+  </condition>
+  <condition name="use_ldap" class="OpenXPKI::Server::Workflow::Condition::UseLdap">
+  </condition>
+  <condition name="ldap_dn_available" class="OpenXPKI::Server::Workflow::Condition::LdapDnAvailable">
+  </condition>
+
 </conditions>
 
