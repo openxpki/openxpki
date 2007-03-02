@@ -550,6 +550,7 @@ sub get_pki_realms
         #############################################################
         # get ldap options  
 	#
+        eval {
         my $ldap_enable = $config->get_xpath(
 		        XPATH   => [ 'pki_realm', 'common','ldap','ldap_enable' ],
   		        COUNTER => [          $i,        0,     0,           0  ],
@@ -615,7 +616,15 @@ sub get_pki_realms
 	                 COUNTER => [          $i,        0,     0,           0  ],
 		      );
          $realms{$name}->{ldap_password} = $ldap_password;
-
+         }; 
+	    if ($EVAL_ERROR) {
+    		log_wrapper({
+    		    MESSAGE  => "No LDAP options found, LDAP turned off",
+    		    PRIORITY => "warn",
+    		    FACILITY => "system",
+		});
+		$realms{$name}->{ldap_enable} = "no";
+		} 
         # The End of ldap section
         ################################################################
 

@@ -120,5 +120,9 @@
   </condition>
   <condition name="wf_child_instance_failure" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenFailure">
   </condition>
+
+ <!-- condition for bypassing publishing certificates using ldap -->
+  <condition name="use_ldap" class="OpenXPKI::Server::Workflow::Condition::UseLdap">
+  </condition>
 </conditions>
 
