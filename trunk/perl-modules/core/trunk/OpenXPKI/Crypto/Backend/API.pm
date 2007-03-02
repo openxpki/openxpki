@@ -35,7 +35,11 @@ sub __init_command_params : PRIVATE {
     ##! 16: 'start'
     my $self = shift;
 
-    $self->set_command_params({
+    ## application of the crypto layer policy: names of crypto algorithms should be defined in the crypto backend
+    ## now implemented for the public key algoriths only 
+ 
+    ## define params for all the crypto commands except 'create_key'
+    my $command_params = {
     "list_algorithms" => {"FORMAT"        => 1,
                           "ALG"           => 0,
                           "PARAM"         => 0},
@@ -62,112 +66,6 @@ sub __init_command_params : PRIVATE {
                           "SUBJECT" => 1,
                           "CSR"     => 1,
                           "DAYS"    => 1},
-    "create_key"      => {"PASSWD"     => 0,
-                          "TYPE"       => ["RSA","DSA","EC","GOST94","GOST2001","GOST94CP","GOST2001CP"],
-                          "PARAMETERS" => {"TYPE:RSA" =>
-                                              {"ENC_ALG" =>
-                                                  ["__undef",
-                                                   "aes256",
-                                                   "aes192",
-                                                   "aes128",
-                                                   "idea",
-                                                   "des3",
-                                                   "des"
-                                                  ],
-                                               "KEY_LENGTH" =>
-                                                  [512, 768, 1024,
-                                                   2048, 4096
-                                                  ]
-                                              },
-                                           "TYPE:DSA" =>
-                                              {"ENC_ALG" =>
-                                                  ["__undef",
-                                                   "aes256",
-                                                   "aes192",
-                                                   "aes128",
-                                                   "idea",
-                                                   "des3",
-                                                   "des"
-                                                  ],
-                                               "KEY_LENGTH" =>
-                                                  [512, 768, 1024,
-                                                   2048, 4096
-                                                  ]
-                                              },
-                                           "TYPE:EC" =>
-                                              {"ENC_ALG" =>
-                                                  ["__undef",
-                                                   "aes256",
-                                                   "aes192",
-                                                   "aes128",
-                                                   "idea",
-                                                   "des3",
-                                                   "des"
-                                                  ],
-                                               "CURVE_NAME" => 1,
-                                              },
-                                           "TYPE:GOST94" =>
-                                              {"ENC_ALG" =>
-                                                  ["__undef",
-                                                   "aes256",
-                                                   "aes192",
-                                                   "aes128",
-                                                   "idea",
-                                                   "des3",
-                                                   "des"
-                                                  ],
-                                               "PASSWD" => 0,
-                                               "PARAMSET" => 0
-                                              },
-                                           "TYPE:GOST2001" =>
-                                              {"ENC_ALG" =>
-                                                  ["__undef",
-                                                   "aes256",
-                                                   "aes192",
-                                                   "aes128",
-                                                   "idea",
-                                                   "des3",
-                                                   "des"
-                                                  ],
-                                               "PASSWD" => 0,
-                                               "PARAMSET" => 0
-                                              },
-                                           "TYPE:GOST94CP" =>
-                                              {"ENC_ALG" =>
-                                                  ["__undef",
-                                                   "aes256",
-                                                   "aes192",
-                                                   "aes128",
-                                                   "idea",
-                                                   "des3",
-                                                   "des"
-                                                  ],
-                                               "PASSWD" => 0,
-                                               "PARAMSET" => 0
-                                              },
-                                           "TYPE:GOST2001CP" =>
-                                              {"ENC_ALG" =>
-                                                  ["__undef",
-                                                   "aes256",
-                                                   "aes192",
-                                                   "aes128",
-                                                   "idea",
-                                                   "des3",
-                                                   "des"
-                                                  ],
-                                               "PASSWD" => 0,
-                                               #"PARAMSET" => 0
-                                               "PARAMSET" => 
-                                                 ["0", 
-                                                  "A", 
-                                                  "B", 
-                                                  "C", 
-                                                  "XA",
-                                                  "XB"
-                                                ]
-                                              },
-                                          }
-                         },
     "create_pkcs10"   => {"PASSWD"  => 0,
                           "KEY"     => 0,
                           "SUBJECT" => 1},
@@ -241,7 +139,37 @@ sub __init_command_params : PRIVATE {
 						"des3",
 			       ],
                             },
-    });
+    };
+    
+    ## assign the specified value to the command_params attribute  
+    $self->set_command_params($command_params);
+
+    ## ask crypto backend for supported public key algorithms and their params
+    ## for this execute a command 'list_algorithms'
+    my $supported_algs;
+    $supported_algs = $self->command({COMMAND       => "list_algorithms",                                                                                   
+                                      FORMAT        => "all_data"});
+
+    ## extract public key algorithms names and appropriate params from the answer of the backend
+    my @types = ();  
+    my $parameters;
+    while (my ($alg, $params) = each(%{$supported_algs})) {
+        push @types, $alg;
+        $parameters->{"TYPE:$alg"} = $params;
+    }
+
+    ## specify now params for the crypto command 'create_key'
+    my $create_key_params;
+    $create_key_params = {"PASSWD"     => 0,
+                          "TYPE"       => \@types,
+                          "PARAMETERS" => $parameters,
+                         };
+
+    ## insert 'create_key' params to the main definition of the crypto commands params
+    $command_params->{"create_key"} = $create_key_params;
+
+    ## reassign the updated value to the command_params attribute
+    $self->set_command_params($command_params);
    ##! 16: 'end'
 }
 

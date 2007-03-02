@@ -61,7 +61,7 @@ sub get_result
                          {"ENC_ALG" =>
                             [ "__undef", "aes256", "aes192", "aes128", "idea", "des3", "des" ],
                           "CURVE_NAME" =>
-                            ["prime192v1", "c2tnb191v1", "prime239v1" ]
+                            ["prime192v1", "c2tnb191v1", "prime239v1", "sect571r1" ]
                          },
                      "GOST94" =>
                          {"ENC_ALG" =>
