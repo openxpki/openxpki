@@ -1,7 +1,9 @@
 <%args>
-    $type   => undef
-    $id     => undef
-    $filled => undef
+    $type      => undef
+    $id        => undef
+    $filled    => undef
+    $signature => undef
+    $text      => undef
 </%args>
 
 <& /service/open_form.mhtml, action => 'approve_csr.html' &>
@@ -9,27 +11,42 @@
 <& /lib/html/hidden.mhtml, 'name' => 'type',   'value' => $type &>
 <& /lib/html/hidden.mhtml, 'name' => 'id',     'value' => $id &>
 <& /lib/html/hidden.mhtml, 'name' => 'filled', 'value' => '1' &>
+<& /lib/html/hidden.mhtml, 'name' => 'signature', 'value' => '' &>
+<& /lib/html/hidden.mhtml, 'name' => 'text', value => $to_be_signed &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_TITLE') %></h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_DESCRIPTION') %>
 </p>
-<& /service/send_form.mhtml &>
+<input type="submit" name="sign" value="I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_SIGNING" onClick="signForm(document.OpenXPKI)">
+<input type="submit" name="nosign" value="I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_WITHOUT_SIGNING">
+
 <& /service/close_form.mhtml &>
 
 <& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
 
 <%init>
     my @errors = ();
+    my $to_be_signed;
 
+            
     if ($filled)
     {
-        ## reject the CSR
+        ## approve the CSR
+        my $params = {};
+        if (defined $signature && $signature ne '') {
+            $params->{'_signature'}      = $signature;
+            $params->{'_signature_text'} = $text;
+        }
         my $msg = $context->{client}->send_receive_command_msg (
                       "execute_workflow_activity",
-                      {WORKFLOW => $type,
-                       ID       => $id,
-                       ACTIVITY => "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"});
+                      {
+                        WORKFLOW => $type,
+                        ID       => $id,
+                        ACTIVITY => "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR",
+                        PARAMS   => $params,
+                      }
+        );
         if (exists $msg->{SERVICE_MSG} and
             $msg->{SERVICE_MSG} eq "ERROR")
         {
@@ -43,6 +60,25 @@
                              'id'   => $id);
         }
     }
+    # get translated approval message from server
+    my $lang = 'en_GB';
+    if (defined $session_cache{$context->{'session_id'}}->{language}) {
+        $lang = $session_cache{$context->{'session_id'}}->{language};
+    }
+    my $sig_msg = $context->{client}->send_receive_command_msg(
+        'get_approval_message',
+        {
+           TYPE     => 'CSR',
+           WORKFLOW => $type,
+           ID       => $id,
+           LANG     => $lang,
+        }
+    );
+    if (exists $sig_msg->{SERVICE_MSG} &&
+       $sig_msg->{SERVICE_MSG} eq "ERROR") {
+        @errors = $m->comp ('/lib/get_deep_error.mhtml', 'sig_msg' => $sig_msg);
+    }
+    $to_be_signed = $sig_msg->{PARAMS};
 
     ## ok, we have to ask the user
 </%init>

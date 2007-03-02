@@ -56,29 +56,26 @@ sub evaluate
     my %required = ();
     foreach my $role (sort @{$roles})
     {
-        if (exists $required{$role})
-        {
-            $required{$role}++;
-        } else {
-            $required{$role} = 1;
-        }
+        $required{$role}++;
     }
 
-    ## remove available approvals from teh required list
-    foreach my $user (keys %{$approvals})
-    {
-        if (not exists $required{$approvals->{$user}})
-        {
-            ## this means that role user $user is not in the required list
-            ## this means that we do not need this approval
-            ## this is no error - simply "over" approved
-            next;
+    ## remove available approvals from the required list
+    foreach my $approval (@{$approvals}) {
+        my $role;
+        if (exists $approval->{signer_role}) {
+            # the signature takes precedence over the session, if
+            # a signature is present
+            $role = $approval->{signer_role};
         }
-        if ($required{$approvals->{$user}} > 1)
-        {
-            $required{$approvals->{$user}}--;
-        } else {
-            delete $required{$approvals->{$user}};
+        else {
+            # no signer role available, just use session role
+            $role = $approval->{session_role};
+        }
+        if ($required{$role} > 1) {
+            $required{$role}--;
+        }
+        else {
+            delete $required{$role};
         }
     }
 

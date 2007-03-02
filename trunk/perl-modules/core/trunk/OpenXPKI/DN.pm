@@ -91,7 +91,8 @@ sub convert_openssl_dn
     shift @rdn;
 
     # return comma separated list, escape commas include in rdns
-    return join(", ", reverse map { s{,}{\\,}xsg; $_; } @rdn);
+    # RFC 4514 says RDNS are joined by q{,} not q{, }
+    return join(",", reverse map { s{,}{\\,}xsg; $_; } @rdn);
 }
 
 ###################################

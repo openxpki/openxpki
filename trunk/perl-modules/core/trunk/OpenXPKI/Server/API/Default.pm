@@ -20,6 +20,8 @@ use Data::Dumper;
 use OpenXPKI::Debug 'OpenXPKI::Server::API';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::i18n qw( set_language );
+use Digest::SHA1 qw( sha1_base64 );
 
 sub START {
     # somebody tried to instantiate us, but we are just an
@@ -29,6 +31,60 @@ sub START {
     );
 }
 # API: simple retrieval functions
+
+sub get_approval_message {
+    my $self      = shift;
+    my $arg_ref   = shift;
+    my $sess_lang = CTX('session')->get_language();
+    ##! 16: 'session language: ' . $sess_lang
+    my $hash_sessionid = sha1_base64(CTX('session')->get_id());
+    ##! 16: 'hash of the session ID: ' . $hash_sessionid
+
+    my $result;
+
+    # temporarily change the I18N language
+    ##! 16: 'changing language to: ' . $arg_ref->{LANG}
+    set_language($arg_ref->{LANG});            
+
+    if ($arg_ref->{TYPE} eq 'CSR') {
+        ##! 16: 'CSR'
+        my $wf_info = CTX('api')->get_workflow_info({
+            WORKFLOW => $arg_ref->{WORKFLOW},
+            ID       => $arg_ref->{ID},
+        });
+        # compute hash of CSR data (either PKCS10 or SPKAC)
+        my $hash;
+        my $spkac  = $wf_info->{WORKFLOW}->{CONTEXT}->{spkac};
+        my $pkcs10 = $wf_info->{WORKFLOW}->{CONTEXT}->{pkcs10};
+        if (! defined $spkac && ! defined $pkcs10) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_APPROVAL_MESSAGE_NEITHER_SPKAC_NOR_PKCS10_PRESENT_IN_CONTEXT',
+                log     => {
+                    logger => CTX('log'),
+                },
+            );
+        }
+        elsif (defined $spkac) {
+            $hash = sha1_base64($spkac);
+        }
+        elsif (defiend $pkcs10) {
+            $hash = sha1_base64($pkcs10);
+        }
+        # translate message
+        $result = OpenXPKI::i18n::i18nGettext(
+            'I18N_OPENXPKI_APPROVAL_MESSAGE_CSR',
+            '__WFID__' => $arg_ref->{ID},
+            '__HASH__' => $hash,
+            '__HASHSESSIONID__' => $hash_sessionid,
+        );
+    }
+    # change back the language to the original session language
+    ##! 16: 'changing back language to: ' . $sess_lang
+    set_language($sess_lang);
+
+    ##! 16: 'result: ' . $result
+    return $result;
+}
 
 # get current pki realm
 sub get_pki_realm {
@@ -401,6 +457,15 @@ They were once the toplevel OpenXPKI::Server::API methods, but the
 structure is now different.
 
 =head1 Functions
+
+=head2 get_approval_message
+
+Gets the approval message that is to be signed for a signature-based
+approval. Takes the parameters TYPE (can either be CSR or CRR),
+WORKFLOW, ID (specifies the workflow from which the data is taken)
+and optionally LANG (which specifies the language that is used to
+translate the message).
+
 =head2 get_user
 
 Get session user.

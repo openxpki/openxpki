@@ -19,6 +19,7 @@ my %outfile_of :ATTR;
 my %tmp_of     :ATTR;
 my %pkcs7_of   :ATTR;
 my %engine_of  :ATTR;
+my %data_of    :ATTR;
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
@@ -26,6 +27,7 @@ sub START {
     $fu_of    {$ident} = OpenXPKI::FileUtils->new();
     $pkcs7_of {$ident} = $arg_ref->{PKCS7};
     $tmp_of   {$ident} = $arg_ref->{TMP};
+    $data_of  {$ident} = $arg_ref->{DATA};
 }
 
 sub get_command {
@@ -41,8 +43,24 @@ sub get_command {
         CONTENT  => $pkcs7_of{$ident},
         FORCE    => 1,
     });
+    my $data_filename;
+    if (defined $data_of{$ident}) {
+        ##! 16: 'data defined'
+        $data_filename = $fu_of{$ident}->get_safe_tmpfile({
+            'TMP' => $tmp_of{$ident},
+        });
+        $fu_of{$ident}->write_file({
+            FILENAME => $data_filename,
+            CONTENT  => $data_of{$ident},
+            FORCE    => 1,
+        });
+    }
    
     my $command = " verify -in $in_filename"; 
+    if (defined $data_filename) {
+        ##! 16: 'data_filename defined'
+        $command .= " -data $data_filename";
+    }
     ##! 1: 'end'
     return $command;
 }

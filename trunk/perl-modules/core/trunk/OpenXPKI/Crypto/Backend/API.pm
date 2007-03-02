@@ -97,6 +97,7 @@ sub __init_command_params : PRIVATE {
                           "ENC_ALG" => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
                           "CONTENT" => 1},
     "pkcs7_get_chain" => {"SIGNER" => 1,
+                          'SIGNER_SUBJECT' => 0,
                           "PKCS7"  => 1},
     "pkcs7_sign"      => {"PASSWD"  => 0,
                           "KEY"     => 0,

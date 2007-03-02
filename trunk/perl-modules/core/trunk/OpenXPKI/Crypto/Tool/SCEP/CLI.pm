@@ -19,7 +19,7 @@ sub error_ispresent {
 
     if ($stderr =~ m{ [eE]rror | 
                        USAGE   |
-                       cannot[ ]decrypt[ ]request
+                       cannot\ decrypt\ request
                     }xms) { # TODO: check more possible error output
         return 1;
     }

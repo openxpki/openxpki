@@ -32,4 +32,22 @@
         <param name="DICTIONARIES" value="/usr/share/dict/ngerman,/usr/share/dict/american-english"/>
         -->
   </validator>
+  <validator name="ValidApprovalSignature"
+             class="OpenXPKI::Server::Workflow::Validator::ApprovalSignature">
+      <param name="type" value="CSR"/>
+      <!-- if you set the following parameter to 1, you can enforce
+           signatures on all CSR approvals -->
+      <param name="signature_required" value="0"/>
+      <param name="pkcs7tool" value="testsceppkcs7tool1"/>
+      <!-- if you set signature_required to 1, you have to defined
+           identifiers for your trust anchors:
+           
+      <param name="trust_anchors" value="identifier1,identifier2,..."/>
+
+      Feature request: allow Realms instead of identifiers, too
+      Code should replace the realm by all configured identifiers in
+      that realm. 
+      -->
+
+  </validator>
 </validators>

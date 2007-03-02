@@ -19,8 +19,8 @@ sub execute
     my $context = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    ## delete approvals (set to a serialized empty hashref)
-    $context->param('approvals' => $serializer->serialize({})) ;
+    ## delete approvals (set to a serialized empty arrayref)
+    $context->param('approvals' => $serializer->serialize([])) ;
 
     my $user = CTX('session')->get_user();
     my $role = CTX('session')->get_role();

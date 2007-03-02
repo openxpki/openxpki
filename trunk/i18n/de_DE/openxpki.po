@@ -2,7 +2,7 @@
 # Copyright (C) 2005-2006 The OpenXPKI Project
 # This file is distributed under the same license as the OpenXPKI package.
 # Michael Bell <michael.bell@web.de>, 2006.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
@@ -92,6 +92,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_ACTIVITY_TOOLS_DETERMINEISSUINGCA_NO_MATCHING_PROFILE"
 msgstr ""
+
+msgid "I18N_OPENXPKI_APPROVAL_MESSAGE_CSR"
+msgstr ""
+"Ich genehmige den CSR für Workflow __WFID__.\r\n"
+"SHA1-Hash der CSR-Daten:\r\n"
+"__HASH__\r\n"
+"SHA1-Hash der Session-ID:\r\n"
+"__HASHSESSIONID__"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_BACKEND_OPENSSL_EVAL_ERROR"
@@ -302,7 +310,19 @@ msgstr ""
 "informieren Sie sich bitte im Info-Menü."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_SIGNING"
+msgstr ""
+"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
+"informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_TITLE"
+msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_WITHOUT_SIGNING"
 msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
@@ -620,64 +640,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatische Browsererkennung"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_SERIAL"
-msgstr "Seriennummer des Workflowprozesses"
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
 msgstr "Details des Zertifikats"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_ROLE"
-msgstr "Details des Zertifikats"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_CERTIFICATE_DESCRIPTION"
-msgstr ""
-"Bitte wählen Sie ein Profil aus, welches zur Zertifikatserstellung genutzt "
-"werden soll."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_CERTIFICATE_TITLE"
-msgstr "Auswählen eines Profils"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_COMPROMISE_TIME_DESCRIPTION"
-msgstr ""
-"Bitte wählen Sie ein Profil aus, welches zur Zertifikatserstellung genutzt "
-"werden soll."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_COMPROMISE_TIME_TITLE"
-msgstr "Auswählen eines Profils"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_REASON_DESCRIPTION"
-msgstr ""
-"Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
-"(CSR) stellen wollen."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_REASON_TITLE"
-msgstr "Auswählen einer Rolle"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_DESCRIPTION"
-msgstr ""
-"Es stehen mehrere Workflows zur Abarbeitung eines Zertifizierungsantrages "
-"zur Verfügung. Bitte wählen Sie einen aus."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_TITLE"
-msgstr "Auswählen eines Workflows"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST"
 msgstr "Aufgetretene Fehler"
@@ -732,131 +696,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE"
 msgstr "Auswahl der Schlüsselerzeugung"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_CHOICE"
-msgstr "Schlüsseltyp"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DESC"
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_"
 msgstr ""
 "Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
 "erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
 "sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
 "untenstehenden Erläuterungen."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA"
-msgstr ""
-"Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
-"erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
-"sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
-"untenstehenden Erläuterungen."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC"
-msgstr "Auswahl der Schlüsselerzeugung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001"
-msgstr "Auswahl der Schlüsselerzeugung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP"
-msgstr "Auswahl der Schlüsselerzeugung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94"
-msgstr "Auswahl der Schlüsselerzeugung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP"
-msgstr "Auswahl der Schlüsselerzeugung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA"
-msgstr "Auswahl der Schlüsselerzeugung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_TITLE"
-msgstr "Auswahl des Typs des privaten Schlüssels"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_DESC"
@@ -867,54 +713,25 @@ msgstr ""
 "untenstehenden Erläuterungen."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG"
-msgstr ""
-"Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
-"erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
-"sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
-"untenstehenden Erläuterungen."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH"
-msgstr "Schlüssellänge"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET"
-msgstr ""
-"Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
-"erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
-"sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
-"untenstehenden Erläuterungen."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET_DESCRIPTION"
-msgstr ""
-"Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
-"wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern ob "
-"die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen soll."
-"Wenn die Auswahloption sich auf den Browser - also auf den Client - bezieht, "
-"dann wird der Schlüssellokal bei Ihnen generiert."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_TITLE"
 msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_"
+msgstr "Auswahl der Schlüsselerzeugung"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_CHOICE"
+msgstr "Schlüsseltyp"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DESC"
+msgstr ""
+"Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die CA "
+"erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich unsicher "
+"sind, welcher Schlüsseltyp der richtige für sie ist, beachten Sie bitte die "
+"untenstehenden Erläuterungen."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_TITLE"
+msgstr "Auswahl des Typs des privaten Schlüssels"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PASSWORD_DECISION"
 msgstr "Wahl des Passworts"
@@ -1152,22 +969,6 @@ msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_INVALID_REASON_CODE"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_DESCRIPTION"
-msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_NAME"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
 msgstr "Zurücksetzen"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REVOCATION_REASON_AFFILIATION_CHANGED"
@@ -1434,14 +1235,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MENU_NEW_WRONG_ROLE"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_DESCRIPTION"
-msgstr "Die von Ihnen gewünschte Funktion ist derzeit nicht vorhanden."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_SUBJECT"
-msgstr "Fehlende Funktionalität"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_DESCRIPTION"
 msgstr "Die von Ihnen gewünschte Funktion ist derzeit nicht vorhanden."
@@ -1735,22 +1528,6 @@ msgstr "Status des Workflows"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE"
 msgstr "Name des Workflows"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_ISSUER"
-msgstr "Fehlende Funktionalität"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_SERIAL"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_COMPROMISE_TIME"
-msgstr "Web-Schnittstelle des Trustcenters"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_REASON_NAME"
-msgstr "Zurücksetzen"
-
 msgid "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
 
@@ -1830,10 +1607,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_SIGN_ERROR"
 msgstr ""
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CLIENT_SSO"
-msgstr "Bitte geben Sie zur Anmeldung Ihren Account und Ihr Passwort ein."
-
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL"
 msgstr ""
 "Ihre Identität wird über eine externes Programm geprüft. Bitte geben Sie "
@@ -1875,61 +1648,6 @@ msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
 msgid "I18N_OPENXPKI_CRL_FORMAT"
 msgstr "Format"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"
-msgstr "Datenaustausch"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_CA_COMPROMISE"
-msgstr "Ändern des Zertifikats-Profils"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_CA_KEY_TIME"
-msgstr ""
-"SPKAC ist ursprünglich von Netscape entwickelt. Heute wird dieses Format von "
-"vielen verschiedenen Browsern benutzt. Solche Browser sind zum Beispiel "
-"Netscape, Mozilla, Firefox und Opera. Wenn Sie einen solchen Browser "
-"benutzen und den Schlüssel mit Ihrem Client generieren wollen, dann ist dies "
-"die richtige Option für Sie."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_CERTIFICATE_HOLD"
-msgstr "Dieser Workflow erstellt ein neues Zertifikat."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_CESSATION_OF_OPERATION"
-msgstr ""
-"Die Organisation (o) bestimmt die Einrichtung, auf die sich das Zertifikat "
-"bezieht."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_HOLD_INSTRUCTION"
-msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_KEY_COMPROMISE"
-msgstr "dc"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_KEY_TIME"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_REMOVE_FROM_CRL"
-msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_SUPERSEDED"
-msgstr "Serverseitige Schlüsselgenerierung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CRL_REASON_UNSPECIFIED"
-msgstr "uid"
 
 msgid "I18N_OPENXPKI_CRYPTO_API_CHECK_COMMAND_PARAM_PARAM_PATH_MISMATCH"
 msgstr ""
@@ -2007,7 +1725,7 @@ msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_MISSING_DATA"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_KEY_ONLINE_ILLEGAL_PARAM"
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_KEY_USABLE_ILLEGAL_PARAM"
 msgstr "Name"
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_LOGIN_ILLEGAL_PARAM"
@@ -2231,9 +1949,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_NO_ENGINE_FOR_GOST"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_UNSUPPORTED_TYPE"
-msgstr ""
-
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_EC_CURVE_NAME"
 msgstr ""
 
@@ -2344,6 +2059,32 @@ msgstr ""
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_IS_PRIME_MISSING_PRIME"
 msgstr "Fehlende Funktionalität"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_ILLEGAL_FORMAT"
+msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_NO_ALGORITMN"
+msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_NO_FORMAT"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_NO_PARAM_NAME"
+msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_UNSUPPORTED_ALGORITHM"
+msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_UNSUPPORTED_PARAM_NAME"
+msgstr "Fehlende Funktionalität"
+
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_CONFIG"
 msgstr ""
 
@@ -2394,7 +2135,7 @@ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_PKCS7"
 msgstr "Fehlende Funktionalität"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_SIGNER"
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_SIGNER_OR_SIGNER_SUBJECT"
 msgstr "Fehlende Funktionalität"
 
 #, fuzzy
@@ -2473,6 +2214,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED_EVAL_ERROR"
+msgstr "Fehlende Funktionalität"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_INCOMPLETE_SECRET"
@@ -3083,9 +2828,6 @@ msgstr "Rückrufantrag (CRR)"
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "Neuer Antrag (CSR)"
 
-msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
-msgstr "Datenaustausch"
-
 msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT"
 msgstr "Export"
 
@@ -3126,9 +2868,6 @@ msgstr "Zertifikats-Suche"
 #, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS"
 msgstr "Abgelaufene"
-
-msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
-msgstr "Smartcard personalisieren"
 
 msgid "I18N_OPENXPKI_HTML_MENU_VALID_CERTS"
 msgstr "Gültige"
@@ -3343,6 +3082,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_ILLEGAL_AUTH_ROLE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_MALFORMED_ACTIVITY"
+msgstr "Prozesse anzeigen"
+
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED"
 msgstr ""
 
@@ -3368,6 +3111,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_NO_FIRST_ACTIVITY"
 msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_APPROVAL_MESSAGE_NEITHER_SPKAC_NOR_PKCS10_PRESENT_IN_CONTEXT"
+msgstr "Aktivität nicht implementiert"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
@@ -3443,6 +3190,10 @@ msgid "I18N_OPENXPKI_SERVER_API_VISUALIZATION_GET_WORKFLOW_INFO_DOT_FAILED"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_TYPE_FOR_ID_NO_RESULT_FOR_ID"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS"
 msgstr "Seriennummer des Workflowprozesses"
 
@@ -3456,8 +3207,13 @@ msgstr "Seriennummer des Workflowprozesses"
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_BIND_NOT_POSSIBLE"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_INCORRECT_HANDLER"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_BIND_FAILED"
+msgstr "Seriennummer des Workflowprozesses"
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_LOGIN_CONNECTION_FAILED"
 msgstr ""
@@ -3508,9 +3264,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_ALGORITHM"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_WRONG_HANDLER"
-msgstr ""
-
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MODULE_BROKEN"
 msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
@@ -3555,6 +3308,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_UNDEFINED_VALUE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_COULD_NOT_RECONNECT_DBI_LOG"
+msgstr "PKI Realm"
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_AUTOCOMMIT"
 msgstr ""
@@ -3801,21 +3558,22 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_TRANSPORT_FAILED"
 msgstr ""
 
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_INIT_COULD_NOT_DETERMINE_CA_IDENTIFIER"
-msgstr "Prozesse anzeigen"
-
 msgid "I18N_OPENXPKI_SERVER_INIT_DEFAULT_CRYPTO_TOKEN_MISSING_PKI_REALM"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_FAILURE"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_INSTANTIATION_FAILURE"
+msgstr "Seriennummer des Workflowprozesses"
 
 msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_PKI_REALM"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_TOKEN"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_VALIDITY_ERROR"
+msgstr "Zurücksetzen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_INIT_I18N_MISSING_CONFIG"
@@ -3837,8 +3595,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_INIT_XML_CONFIG_FILE_DOES_NOT_EXIST"
 msgstr ""
 
-msgid "I18N_OPENXPKI_SERVER_INIT_XML_CONFIG_FILE_IS_NOT_READABLE"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_INIT_XML_CONFIG_FILE_NOT_READABLE"
+msgstr "TLS-Server"
 
 msgid "I18N_OPENXPKI_SERVER_INIT_XML_CONFIG_MISSING_CONFIG"
 msgstr ""
@@ -3878,6 +3637,10 @@ msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_FAILED_TO_INSTANTIATE_NOTIFIER"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_FAILED_TO_USE_NOTIFIER_CLASS"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
@@ -4166,6 +3929,22 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_WRITECERTIFICATETOINSTAL
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_COULD_NOT_DETERMINE_SIGNER_CERTIFICATE_IDENTIFIER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_COULD_NOT_DETERMINE_SIGNER_SUBJECT"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_NOT_ALLOWED_TO_APPROVE_YOURSELF"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_SIGNATURE_CERT_NOT_FOUND_IN_DB"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_EXPORT_MISSING_DESTINATION"
 msgstr "PKI Realm"
 
@@ -4365,6 +4144,54 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_FETCH_WORKFLO
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPOVALSIGNATURE_PKCS7TOOL_NOT_CONFIGURED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_COULD_NOT_DETERMINE_SIGNER_CERTIFICATE_IDENTIFIER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_COULD_NOT_DETERMINE_SIGNER_CHAIN_FROM_SERVER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_COULD_NOT_DETERMINE_SIGNER_SUBJECT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_NO_TRUST_ANCHORS_DEFINED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_PLAIN_TEXT_DOES_NOT_MATCH_REQUIRED_STRUCTURE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_SIGNATURE_INVALID"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_SIGNER_CERT_NOT_FOUND_IN_DB_OR_INVALID"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_TYPE_NOT_CONFIGURED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_UNTRUSTED_CERTIFICATE"
+msgstr "IP-Adresse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVAL_SIGNATURE_SIGNATURE_CONTAINS_INVALID_CHARACTERS"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVAL_SIGNATURE_SIGNATURE_NOT_DEFINED_BUT_REQUIRED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_ID_MISMATCH"
 msgstr "Prozesse anzeigen"
 
@@ -4373,7 +4200,7 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_UNSUPPORTED_PROFILE"
 msgstr "IP-Adresse"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_ROLE_NOT_EXISTS"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_ROLE_INVALID"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -4443,10 +4270,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_DAMAGED"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
-msgstr "Prozesse anzeigen"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REASON_CODE_INVALID"
 msgstr "Prozesse anzeigen"
 
@@ -4488,6 +4311,10 @@ msgstr "Antrag im OU-Stil"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COULD_NOT_INSTANTIATE_COMMAND"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTE_COMMAND_NOT_FOUND"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
@@ -4599,9 +4426,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING"
 msgstr "Antrag im OU-Stil"
 
-msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_UNSUPPORTED_MESSAGE_TYPE"
-msgstr ""
-
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PRIVATE_METHOD_REQUESTED"
 msgstr ""
@@ -4694,6 +4518,22 @@ msgstr "E-Mailadresse"
 #, fuzzy
 msgid "I18N_OPENXPKI_SET_SECRET_PASSWD"
 msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SIGNATURE"
+msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SIGNED_APPROVAL"
+msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SIGNED_TEXT"
+msgstr "Rückwärts"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SIGNER_CERTIFICATE_IDENTIFIER"
+msgstr "Dieser Workflow erstellt ein neues Zertifikat."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_C_NOT_ALLOWED"
@@ -4874,12 +4714,12 @@ msgstr "Exportieren des Zertifzierungsantrages"
 msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_FINISHED_CSR"
 msgstr "Exportieren des Zertifzierungsantrages"
 
-msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
-msgstr "Start der Zertifikatserstellung"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
 msgstr "Create a new workflow instance for publishing a certificate using LDAP"
+
+msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
+msgstr "Start der Zertifikatserstellung"
 
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
 msgstr "Speichern des Zertifzierungsantrages"
@@ -5137,6 +4977,9 @@ msgstr "SCEP-Zertifizierungsantrag"
 msgid "I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_INITIAL"
 msgstr "SCEP-Zertifizierungsantrag"
 
+msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
+msgstr "Auf Start wartend"
+
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
 msgstr "Erstellen eines Zertifikates"
 
@@ -5281,6 +5124,326 @@ msgstr ""
 msgid "I18N_OPENXPKI_YES"
 msgstr "ja"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_SERIAL"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_ROLE"
+#~ msgstr "Details des Zertifikats"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_CERTIFICATE_DESCRIPTION"
+#~ msgstr ""
+#~ "Bitte wählen Sie ein Profil aus, welches zur Zertifikatserstellung "
+#~ "genutzt werden soll."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_CERTIFICATE_TITLE"
+#~ msgstr "Auswählen eines Profils"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_COMPROMISE_TIME_DESCRIPTION"
+#~ msgstr ""
+#~ "Bitte wählen Sie ein Profil aus, welches zur Zertifikatserstellung "
+#~ "genutzt werden soll."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_COMPROMISE_TIME_TITLE"
+#~ msgstr "Auswählen eines Profils"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_REASON_DESCRIPTION"
+#~ msgstr ""
+#~ "Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
+#~ "(CSR) stellen wollen."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_REASON_TITLE"
+#~ msgstr "Auswählen einer Rolle"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_DESCRIPTION"
+#~ msgstr ""
+#~ "Es stehen mehrere Workflows zur Abarbeitung eines Zertifizierungsantrages "
+#~ "zur Verfügung. Bitte wählen Sie einen aus."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_TITLE"
+#~ msgstr "Auswählen eines Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA"
+#~ msgstr ""
+#~ "Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die "
+#~ "CA erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich "
+#~ "unsicher sind, welcher Schlüsseltyp der richtige für sie ist, beachten "
+#~ "Sie bitte die untenstehenden Erläuterungen."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001"
+#~ msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP"
+#~ msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94"
+#~ msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP"
+#~ msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA"
+#~ msgstr "Auswahl der Schlüsselerzeugung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG"
+#~ msgstr ""
+#~ "Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die "
+#~ "CA erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich "
+#~ "unsicher sind, welcher Schlüsseltyp der richtige für sie ist, beachten "
+#~ "Sie bitte die untenstehenden Erläuterungen."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH"
+#~ msgstr "Schlüssellänge"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET"
+#~ msgstr ""
+#~ "Bitte wählen Sie einen der folgenden Typen von privaten Schlüsseln. Die "
+#~ "CA erzeugt dann einen entsprechenden Schlüssel für Sie. Falls Sie sich "
+#~ "unsicher sind, welcher Schlüsseltyp der richtige für sie ist, beachten "
+#~ "Sie bitte die untenstehenden Erläuterungen."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET_DESCRIPTION"
+#~ msgstr ""
+#~ "Diese Software unterstützt verschiedene Formen der Schlüsselerzeugung. Es "
+#~ "wird dabei nicht nur unterschieden, welchen Browser Sie benutzen, sondern "
+#~ "ob die Schlüsselerzeugung auf dem Client oder auf dem Browser erfolgen "
+#~ "soll.Wenn die Auswahloption sich auf den Browser - also auf den Client - "
+#~ "bezieht, dann wird der Schlüssellokal bei Ihnen generiert."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_NAME"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_DESCRIPTION"
+#~ msgstr "Die von Ihnen gewünschte Funktion ist derzeit nicht vorhanden."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_SUBJECT"
+#~ msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_ISSUER"
+#~ msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_SERIAL"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_COMPROMISE_TIME"
+#~ msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_REASON_NAME"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CLIENT_SSO"
+#~ msgstr "Bitte geben Sie zur Anmeldung Ihren Account und Ihr Passwort ein."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"
+#~ msgstr "Datenaustausch"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_CA_COMPROMISE"
+#~ msgstr "Ändern des Zertifikats-Profils"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_CA_KEY_TIME"
+#~ msgstr ""
+#~ "SPKAC ist ursprünglich von Netscape entwickelt. Heute wird dieses Format "
+#~ "von vielen verschiedenen Browsern benutzt. Solche Browser sind zum "
+#~ "Beispiel Netscape, Mozilla, Firefox und Opera. Wenn Sie einen solchen "
+#~ "Browser benutzen und den Schlüssel mit Ihrem Client generieren wollen, "
+#~ "dann ist dies die richtige Option für Sie."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_CERTIFICATE_HOLD"
+#~ msgstr "Dieser Workflow erstellt ein neues Zertifikat."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_CESSATION_OF_OPERATION"
+#~ msgstr ""
+#~ "Die Organisation (o) bestimmt die Einrichtung, auf die sich das "
+#~ "Zertifikat bezieht."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_HOLD_INSTRUCTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_KEY_COMPROMISE"
+#~ msgstr "dc"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_KEY_TIME"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_REMOVE_FROM_CRL"
+#~ msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_SUPERSEDED"
+#~ msgstr "Serverseitige Schlüsselgenerierung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_UNSPECIFIED"
+#~ msgstr "uid"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
+#~ msgstr "Datenaustausch"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
+#~ msgstr "Smartcard personalisieren"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
+#~ msgstr "Prozesse anzeigen"
+
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
 #~ msgstr "Auswahl des Typs des privaten Schlüssels"
 
@@ -5397,10 +5560,6 @@ msgstr "ja"
 #~ msgstr "Zertifizierungsantrag (Online-Teil)"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_FIXME_DER_OUTFORMAT_STILL_UNSUPPORTED"
-#~ msgstr "Aktivität nicht implementiert"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWORD"
 #~ msgstr "Passwort"
 
@@ -5453,16 +5612,8 @@ msgstr "ja"
 #~ msgstr "Speichern des Zertifzierungsantrages"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVAL"
-#~ msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
 #~ msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUED"
-#~ msgstr "Dieser Workflow erstellt ein neues Zertifikat."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
@@ -5503,9 +5654,6 @@ msgstr "ja"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_SLEPT"
 #~ msgstr "Warten"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
-#~ msgstr "Auf Start wartend"
 
 #~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
 #~ msgstr "Microsoft Internet Explorer mit passendem privaten Schlüssel"
@@ -5739,4 +5887,3 @@ msgstr "ja"
 #~ msgstr ""
 #~ "Die GUID __GUID__ ist falsch. Es werden sowohl das RFC 4122 Format als "
 #~ "auch die übliche Microsoft-Schreibweise akzeptiert."
-

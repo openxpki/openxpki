@@ -29,10 +29,10 @@ sub get_command
 
     ## check parameters
 
-    if (not $self->{SIGNER})
+    if (! defined $self->{SIGNER} && ! defined $self->{SIGNER_SUBJECT})
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_SIGNER");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_SIGNER_OR_SIGNER_SUBJECT");
     }
     if (not $self->{PKCS7})
     {
@@ -80,6 +80,9 @@ sub get_result
     {
         my ($subject, $issuer) = ($cert, $cert);
         $subject =~ s/^subject=([^\n]*)\n.*/$1/s;
+        ##! 16: 'subject: ' . $subject
+        $subject = OpenXPKI::DN::convert_openssl_dn($subject);
+        ##! 16: 'converted subject: ' . $subject
         $issuer  =~ s/^.*\nissuer=([^\n]*)\n.*/$1/s;
         $cert    =~ s/^.*\n-----BEGIN/-----BEGIN/s;
         $certs{$subject}->{ISSUER} = $issuer;
@@ -116,6 +119,7 @@ sub get_result
     $pkcs7 = "";
     while (exists $certs{$subject})
     {
+        # FIXME - I (Alex) believe an endless loop is possible here ...
         $pkcs7  .= $certs{$subject}->{CERT}."\n\n";
         last if ($subject eq $certs{$subject}->{ISSUER});
         $subject = $certs{$subject}->{ISSUER};

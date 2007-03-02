@@ -59,6 +59,10 @@
       </td>
     <td>
 %   my $value = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param};
+%   # someone is interpreting UTF8 data here, re-encode ...
+%   # FIXME - find out why this is actually happening so that we
+%   # can eliminate the source
+%   $value = encode('UTF-8', $value);
 %   if ($value =~ /^(ARRAY|HASH|-----BEGIN)/)
 %   {
 %      ## serialized stuff
@@ -99,11 +103,28 @@
 %      }
 %      elsif ($param eq "approvals")
 %      {
-%          ## hash: user to role
-%          foreach my $user (sort keys %{$ref})
-%          {
-%              next if (not defined $user); ## empty hash
+%          if (ref $ref eq 'HASH') { # old style
+%              ## hash: user to role
+%              foreach my $user (sort keys %{$ref})
+%              {
+%                  next if (not defined $user); ## empty hash - !???
 <% $user %>&rarr;<% $ref->{$user} %>
+%              }
+%          }
+%          elsif (ref $ref eq 'ARRAY') { # new style for signatures
+%             foreach my $approval (@{$ref}) {
+%                 if (defined $approval->{signature}) {
+<% i18nGettext('I18N_OPENXPKI_SIGNED_APPROVAL') %>:
+<% $approval->{signer_subject} %>&rarr;<% $approval->{signer_role} %>
+<% i18nGettext('I18N_OPENXPKI_SIGNER_CERTIFICATE_IDENTIFIER') %>: <% $approval->{signer_identifier} %>
+<% i18nGettext('I18N_OPENXPKI_SIGNED_TEXT') %>: <% $approval->{plaintext} %>
+<% i18nGettext('I18N_OPENXPKI_SIGNATURE') %>: <% $approval->{signature} %>
+%                 }
+<% $approval->{session_user} %>&rarr;<% $approval->{session_role} %>
+
+================================================================
+
+%             }
 %          }
 %      }
 %      else
@@ -151,6 +172,9 @@
   </div>
 </div>
 
+<%once>
+    use Encode qw(encode decode);
+</%once>
 <%init>
     if (not defined $msg or
         not ref $msg or

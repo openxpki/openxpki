@@ -58,6 +58,8 @@
       {
           #print "LANG: ".$translations{$choose}."\n";
           set_language($translations{$choose});
+          $session_cache{$session_id}->{language} = $translations{$choose}
+              if (defined $session_id);
           return;
       }
     }

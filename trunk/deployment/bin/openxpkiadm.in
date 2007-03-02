@@ -1301,6 +1301,7 @@ if ($cmd eq 'certificate') {
                                     && (defined $params{realm})) {
             print STDERR "ERROR: You have to specify an issuer (or leave "
               . "out --realm for self-signed certificates).\n";
+            exit 1;
         }
 
 	my $cert

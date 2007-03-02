@@ -63,7 +63,7 @@ sub get_function
 
 $FUNCTION{default} = "";
 
-$FUNCTION{install_cert_ie} = qq^
+$FUNCTION{install_cert_ie} = << 'XEOF';
 <script type="text/vbscript">
 <!--
     Function InstallCertIE (form, mode)
@@ -99,10 +99,10 @@ $FUNCTION{install_cert_ie} = qq^
     End Function
 -->
 </script>
-^;
+XEOF
 
 
-$FUNCTION{sign_form} = qq^
+$FUNCTION{sign_form} = << "XEOF";
 <script type="text/javascript">
 <!--
 
@@ -179,17 +179,17 @@ function handleError(nResult) {
     return "Error: "+sErrorName;
 }
 
-function signForm(theForm, theWindow){
+function signForm(theForm){
   if (navigator.appName == "Netscape"){
-    if (signFormN(theForm, theWindow))
+    if (signFormN(theForm))
     	theForm.submit();
   } else {
-    signFormIE(theForm,theWindow);
+    signFormIE(theForm);
     theForm.submit();
   }
 }
 
-function signFormN(theForm, theWindow) {
+function signFormN(theForm) {
   var signedText;
 
   var sObject;
@@ -199,7 +199,7 @@ function signFormN(theForm, theWindow) {
   //alert("the following Data will be signed: \\n\\n"+theForm.text.value);
   
   //alert ('Using integrated Javascript object crypto.');
-  signedText = theWindow.crypto.signText(theForm.text.value, "ask");
+  signedText = crypto.signText(theForm.text.value, "ask");
 
   if ( signedText.length < 100 ) {
     if ( signedText == "error:internalError" ) {
@@ -229,15 +229,80 @@ Function UnicodeToAscii(ByRef pstrUnicode)
      result = ""
      For i = 1 To Len(pstrUnicode)
           result = result & ChrB(Asc(Mid(pstrUnicode, i, 1)))
+          MsgBox result
      Next
          
+     For i = 1 To Len(result)
+          MsgBox(AscW(Mid(result,i,1)))
+     Next
      UnicodeToAscii = result
 End Function
 
-Function signFormIE(theForm, theWindow)
+Function LeftShift(value, width)
+	LeftShift = Int(value * 2^width)
+End Function
+
+Function RightShift(value, width)
+	RightShift = Int(value / 2^width)
+End Function
+
+Function UnicodeToUTF8(ByRef pstrUnicode)
+    ' converts a unicode string to UTF8
+    ' reference: http://en.wikipedia.org/wiki/UTF8
+    Dim i, result
+
+    result = ""
+    For i = 1 To Len(pStrUnicode)
+        CurrentChar = Mid(PstrUnicode, i, 1)
+        CodePoint = AscW(CurrentChar)
+        If (CodePoint < 0) Then
+            ' AscW is broken. Badly. It can only return an integer,
+            ' which is 32767 at most. So everything up to 65535 is
+            ' AscW() + 65536. That Unicode chars exist beyond 65535
+            ' is apparently unknown to Microsoft ...
+            CodePoint = CodePoint + 65536
+        End If
+
+        MaskSixBits   = 2^6 - 1 ' the lower 6 bits are 1
+        MaskFourBits  = 2^4 - 1 ' the lower 4 bits are 1
+        MaskThreeBits = 2^3 - 1 ' the lower 3 bits are 1
+        MaskTwoBits   = 2^2 - 1 ' the lower 3 bits are 1
+        
+        'MsgBox(CurrentChar & " : " & CodePoint)
+        If (CodePoint >= 0) And (CodePoint < 128) Then
+            ' for codepoints < 128, just add one byte with the
+            ' value of the codepoint (this is the ASCII subset)
+            Zs = CodePoint
+            result = result & ChrB(Zs)
+        End If
+        ' this is common for all of the following
+        Zs = CodePoint And MaskSixBits
+        If (CodePoint >= 128) And (CodePoint < 2048) Then
+            ' for naming, see the Wikipedia article referenced above
+            Ys = RightShift(CodePoint, 6)
+            FirstByte  = LeftShift(6, 5) Xor Ys ' 110yyyy 
+            SecondByte = LeftShift(2, 6) Xor Zs ' 10zzzzz
+            'MsgBox "Case 1: " & FirstByte & ", " & SecondByte
+            result = result & ChrB(FirstByte) & ChrB(SecondByte)
+        End If
+        If (CodePoint >= 2048) And (CodePoint < 65536) Then
+            Ys = RightShift(CodePoint, 6) And MaskSixBits
+            Xs = RightShift(CodePoint, 12) And MaskFourBits
+            FirstByte  = LeftShift(14, 4) Xor Xs ' 1110xxxx
+            SecondByte = LeftShift(2, 6) Xor Ys  ' 10yyyyyy
+            ThirdByte  = LeftShift(2, 6) Xor Zs  ' 10zzzzzz
+            'MsgBox "Case 2: " & FirstByte & ", " & SecondByte & ", " & ThirdByte
+            result = result & ChrB(FirstByte) & ChrB(SecondByte) & ChrB(ThirdByte)
+        End If 
+    Next
+    UnicodeToUTF8 = result
+End Function
+
+Function signFormIE(theForm)
 Dim SignedData
 
 On Error Resume Next
+Err.Clear
 
 Set Settings = CreateObject("CAPICOM.Settings")
 Settings.EnablePromptForCertificateUI = True
@@ -248,18 +313,9 @@ If Err.Number <> 0 then
 	MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_MISSING_CAPICOM")
 End If
 
-SignedData.Content = UnicodeToAscii(theForm.text.value)
-
-' we cannot use it by default because MsgBox can only handle up to 1024 characters
-' MsgBox(theForm.text.Value)
-
+SignedData.Content = UnicodeToUTF8(theForm.text.value)
 
 theForm.signature.Value = SignedData.Sign (Nothing)
-' theForm.signature.Value = SignedData.Sign (Nothing, False, CAPICOM_ENCODE_BASE64)
-
-' SignedData.Verify (theForm.signature.Value)
-' SignedData.Verify (theForm.signature.Value, False)
-' SignedData.Verify (theForm.signature.Value, False, CAPICOM_VERIFY_SIGNATURE_AND_CERTIFICATE)
 
 If Err.Number <> 0 then
 	'MsgBox("Sign error: " & Err.Description)
@@ -269,10 +325,10 @@ End If
 End Function
 -->
 </script>
-^;
+XEOF
 
 
-$FUNCTION{gen_csr_ie} = qq^
+$FUNCTION{gen_csr_ie} = << "XEOF";
 <script type="text/vbscript">
 <!--
         const PROV_RSA_FULL=1
@@ -511,7 +567,7 @@ $FUNCTION{gen_csr_ie} = qq^
         end sub
 -->
 </script>
-^;
+XEOF
 
 1;
 __END__

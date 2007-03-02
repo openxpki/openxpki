@@ -140,11 +140,11 @@ sub online {
     return 1;
 }
 
-sub key_usable {
-    my $self = shift;
-    return 0 if (not $self->{ONLINE});
-    return 1;
-}
+#sub key_usable {
+#    my $self = shift;
+#    return 0 if (not $self->{ONLINE});
+#    return 1;
+#}
 
 sub get_mode {
     return "standby";
