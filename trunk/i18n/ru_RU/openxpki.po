@@ -162,6 +162,10 @@ msgstr "Установить сертификат"
 msgid "I18N_OPENXPKI_CERT_EMAIL"
 msgstr "Адрес электронной почты"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_EXPIRED"
+msgstr "Адрес электронной почты"
+
 msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
 msgstr "Идентификатор ключа"
 
@@ -185,6 +189,10 @@ msgstr "Действителен по"
 
 msgid "I18N_OPENXPKI_CERT_NOTBEFORE"
 msgstr "Действителен с"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_NOT_YET_VALID"
+msgstr "Адрес электронной почты"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_"
@@ -475,7 +483,28 @@ msgstr "Ниже приведена детальная информация о �
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
 msgstr "Подробное описание содержимого сертификата"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_CRL_ISSUANCE_PENDING_DESC"
+msgstr ""
+"Ниже приведены основные сведения о найденных сертификатах, а также ссылки, "
+"позволяющие загрузить и установить сертификаты. По ссылке также доступна "
+"более подробная информация о каждом сертификате."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
+msgstr ""
+"Ниже приведены основные сведения о найденных сертификатах, а также ссылки, "
+"позволяющие загрузить и установить сертификаты. По ссылке также доступна "
+"более подробная информация о каждом сертификате."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_REVOKED_DESC"
+msgstr ""
+"Ниже приведены основные сведения о найденных сертификатах, а также ссылки, "
+"позволяющие загрузить и установить сертификаты. По ссылке также доступна "
+"более подробная информация о каждом сертификате."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_SUSPENDED_DESC"
 msgstr ""
 "Ниже приведены основные сведения о найденных сертификатах, а также ссылки, "
 "позволяющие загрузить и установить сертификаты. По ссылке также доступна "
@@ -1149,6 +1178,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PAGE"
+msgstr "SPKAC"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWD"
 msgstr "Пароль"
@@ -2976,6 +3009,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DISCONNECT_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_AMOUNT_IS_NOT_A_NUMBER"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_IS_NOT_A_NUMBER"
+msgstr "Значение поля Country (c) - это просто название страны."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_START_IS_NOT_A_NUMBER"
+msgstr "Значение поля Country (c) - это просто название страны."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED"
 msgstr ""

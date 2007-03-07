@@ -8,6 +8,21 @@
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION') %>
 </p>
+% if ($status eq 'REVOKED') {
+<p>
+<b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_REVOKED_DESC') %></font><b>
+</p>
+% }
+% elsif ($status eq 'SUSPENDED') {
+<p>
+<b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_SUSPENDED_DESC') %></font><b>
+</p>
+% }
+% elsif ($status eq 'CRL_ISSUANCE_PENDING') {
+<p>
+<b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_CRL_ISSUANCE_PENDING_DESC') %></font><b>
+</p>
+% }
 <table>
   <tr>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME') %></th>
@@ -32,11 +47,19 @@
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></td>
-    <td><% join " ", split "T", $notbefore %> UTC</td>
+    <td><% join " ", split "T", $notbefore %> UTC
+% if ($not_yet_valid) {
+<b>(<% i18nGettext('I18N_OPENXPKI_CERT_NOT_YET_VALID') %>)</b>
+% }
+    </td>
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></td>
-    <td><% join " ", split "T", $notafter %> UTC</td>
+    <td><% join " ", split "T", $notafter %> UTC
+% if ($expired) {
+<b>(<% i18nGettext('I18N_OPENXPKI_CERT_EXPIRED') %>)</b>
+    </td>
+% }
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></td>
@@ -197,7 +220,20 @@
   my $notafter    = $params->{NOTAFTER};
   my $issuer      = $params->{ISSUER};
   my $fingerprint = $params->{FINGERPRINT};
+  my $status      = $msg->{PARAMS}->{STATUS};
   
+  my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = gmtime(time);
+  $year += 1900;
+  $mon++;
+  my $now = sprintf("%04d-%02d-%02dT%02d:%02d%02d", $year, $mon, $mday, $hour, $min, $sec);
+  my $not_yet_valid;
+  my $expired;
+  if ($now lt $notbefore) {
+    $not_yet_valid = 1;
+  }
+  if ($now gt $notafter) {
+    $expired = 1;
+  }
   # retrieve CSR workflow and look for a private_key field
   my $p_msg = $context->{client}->send_receive_command_msg(
                     'private_key_exists_for_cert',

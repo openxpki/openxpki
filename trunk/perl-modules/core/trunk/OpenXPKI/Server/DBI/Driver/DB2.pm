@@ -26,6 +26,13 @@ our $DBI_OPTION = {
                    AutoCommit => 0};
 
 our $LIMIT = "__QUERY__ LIMIT __MAXITEMS__";
+# FIXME FIXME FIXME - we need to figure out how to define LIMITSTART
+# as a starter, SQL::Abstract::Limit defines a way, but this requires
+# knowing the ORDER BY column. Extracting it from the query might work
+# but seems quite ugly.
+# (Alex, 2007/03/06)
+# FIXME FIXME FIXME
+#our $LIMITSTART = "";
 
 sub get_dsn
 {

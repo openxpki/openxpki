@@ -27,7 +27,8 @@ our $DBI_OPTION = {
 
 our $TABLE_OPTION = "TYPE=InnoDB";
 
-our $LIMIT = "__QUERY__ LIMIT __MAXITEMS__";
+our $LIMIT      = "__QUERY__ LIMIT __MAXITEMS__";
+our $LIMITSTART = "__QUERY__ LIMIT __START__,__MAXITEMS__";
 
 sub get_dsn
 {

@@ -1,13 +1,27 @@
 <%args>
-    $type => undef
+    $limit => 20
+    $start => 1
+    $page  => undef
 </%args>
-<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_TITLE') %></h1>
-<p>
-  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION') %>
-</p>
+%   my $nr_msg = $context->{client}->send_receive_command_msg(
+%       'get_number_of_workflow_instances',
+%   );
+%   my $count = $nr_msg->{PARAMS};
+<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_PAGE') %> 
+% my $pageInfo = $m->comp('/lib/paging.mhtml',
+%    totalEntries   => $count,
+%    entriesPerPage => $limit,
+%    page           => $page,
+%    start          => $start,
+%    url            => 'list_instances.html',
+%);
 %   my $msg = $context->{client}->send_receive_command_msg
 %             (
 %                 "list_workflow_instances",
+%                  {
+%                     LIMIT => $limit,
+%                     START => $pageInfo->first - 1,
+%                  }
 %#                 {"type" => $type}
 %# type is not a valid parameter for list_workflow_instances
 %             );
@@ -21,6 +35,11 @@
 %   ##                   'WORKFLOW_LAST_UPDATE' => $date,
 %   ##                   'PKI_REALM'            => $pki_realm
 %   ##                  } ]*
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION', '__COUNT__' => $count, '__START__' => $pageInfo->first, '__END__' => $pageInfo->last ) %>
+</p>
 <table>
   <tr>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE') %></th>
@@ -43,3 +62,6 @@
   </tr>
 % }
 </table>
+<%once>
+    use Data::SpreadPagination;
+</%once>

@@ -29,6 +29,7 @@ our $DBI_OPTION = {
 };
 
 our $LIMIT = 'SELECT * FROM (__QUERY__) WHERE ROWNUM <= __MAXITEMS__';
+our $LIMITSTART = 'SELECT * FROM ( SELECT a.*, ROWNUM rnum FROM ( __QUERY__ ) a WHERE ROWNUM <= __START__+__MAXITEMS__-1 ) WHERE rnum >= __START__';
 
 sub get_dsn
 {

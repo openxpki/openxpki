@@ -95,7 +95,12 @@ sub get_cert
     		    			    DATA  => $hash->{DATA});
 
     ##! 2: "return if a HASH reference was requested"
-    return $obj->get_parsed_ref() if ($format eq "HASH");
+    if ($format eq 'HASH') {
+        ##! 16: 'status: ' . $hash->{STATUS}
+        my $return_ref = $obj->get_parsed_ref();
+        $return_ref->{STATUS} = $hash->{STATUS};
+        return $return_ref;
+    }
 
     ##! 1: "finished"
     return $obj->get_converted($format);

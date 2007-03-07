@@ -156,9 +156,10 @@ sub new
         $self->{column}->{$key} = $type{$COLUMN{$key}};
     }
 
-    ## DBI_OPTION and LIMIT must be set by the driver
+    ## DBI_OPTION, LIMIT and LIMITSTART must be set by the driver
     $self->{dbi_option}   = eval ("\$${driver}::DBI_OPTION");
     $self->{limit}        = eval ("\$${driver}::LIMIT");
+    $self->{limitstart}   = eval ("\$${driver}::LIMITSTART");
     my $option = eval ("\$${driver}::TABLE_OPTION");
     $self->{table_option} = $option if ($option);
 

@@ -26,6 +26,7 @@ our $DBI_OPTION = {
                    AutoCommit => 0};
 
 our $LIMIT = "__QUERY__ LIMIT __MAXITEMS__";
+our $LIMITSTART = "__QUERY__ LIMIT __MAXITEMS__, __START__";
 
 sub get_dsn
 {

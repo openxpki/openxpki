@@ -96,8 +96,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_APPROVAL_MESSAGE_CSR"
 msgstr ""
 "I approve the CSR for workflow __WFID__.\r\n"
-"SHA1-Hash of the CSR data:\r\n__HASH__\r\n"
-"SHA1-Hash of the session ID:\r\n__HASHSESSIONID__"
+"SHA1-Hash of the CSR data:\r\n"
+"__HASH__\r\n"
+"SHA1-Hash of the session ID:\r\n"
+"__HASHSESSIONID__"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_BACKEND_OPENSSL_EVAL_ERROR"
@@ -167,6 +169,9 @@ msgstr "Install your certificate"
 msgid "I18N_OPENXPKI_CERT_EMAIL"
 msgstr "Email address"
 
+msgid "I18N_OPENXPKI_CERT_EXPIRED"
+msgstr "expired"
+
 msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
 msgstr "Fingerprint"
 
@@ -190,6 +195,9 @@ msgstr "Not after"
 
 msgid "I18N_OPENXPKI_CERT_NOTBEFORE"
 msgstr "Not before"
+
+msgid "I18N_OPENXPKI_CERT_NOT_YET_VALID"
+msgstr "not yet valid"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_"
@@ -484,9 +492,9 @@ msgstr "Trustcenter Web Interface"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
 msgstr ""
 "Following you can find the most important information about the selected CA "
-"certificate. Below you will find some links to install the certificates. If "
+"certificate. Below you will find some links to install the certificate. If "
 "you want a more complete overview about the certificate then please follow "
-"the link to the normal certificate view."
+"the link to the detailed certificate information."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
 msgstr "CA certificate"
@@ -497,12 +505,21 @@ msgstr "Following you can find all the details of the selected certificate."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
 msgstr "Detailed certificate information"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_CRL_ISSUANCE_PENDING_DESC"
+msgstr "Revocation has been started for this certificate and it will be included in the next CRL (Certificate Revocation List). This means it should probably no longer be used."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
 msgstr ""
 "Following you can find the most important information about the selected "
 "certificate. Below you will find some links to install the certificates. If "
 "you want a more complete overview about the certificate then please follow "
-"the link to the normal certificate view."
+"the link to the detailed certificate information."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_REVOKED_DESC"
+msgstr "This certificate has been revoked, it should not be used any longer."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_SUSPENDED_DESC"
+msgstr "This certificate has been suspended and should not be used currently."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE"
 msgstr "Certificate"
@@ -1162,6 +1179,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr "Service unavailable"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PAGE"
+msgstr "Page"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWD"
 msgstr "Password"
 
@@ -1351,7 +1371,8 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Last update"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
-msgstr "You can see now the active workflow instances."
+msgstr ""
+"Below, you can see workflow instances __START__ to __END__ of __COUNT__."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_TITLE"
 msgstr "Workflow instances"
@@ -3180,6 +3201,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DISCONNECT_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_AMOUNT_IS_NOT_A_NUMBER"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_IS_NOT_A_NUMBER"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_START_IS_NOT_A_NUMBER"
+msgstr "The used suject style does not allow the use of an organization."
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED"
 msgstr ""

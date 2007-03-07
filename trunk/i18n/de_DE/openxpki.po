@@ -169,6 +169,9 @@ msgstr "Installation Ihres Zertifikates"
 msgid "I18N_OPENXPKI_CERT_EMAIL"
 msgstr "E-Mailadresse"
 
+msgid "I18N_OPENXPKI_CERT_EXPIRED"
+msgstr "abgelaufen"
+
 msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
 msgstr "Fingerprint"
 
@@ -192,6 +195,9 @@ msgstr "Gültig bis"
 
 msgid "I18N_OPENXPKI_CERT_NOTBEFORE"
 msgstr "Gültig von"
+
+msgid "I18N_OPENXPKI_CERT_NOT_YET_VALID"
+msgstr "noch nicht gültig"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_"
@@ -511,12 +517,21 @@ msgstr "Hier finden Sie nun alle Details bzgl. des ausgewählten Zertifikats."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
 msgstr "Detailierte Zertifikatsinformationen"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_CRL_ISSUANCE_PENDING_DESC"
+msgstr "Für dieses Zertifikat wurde der Rückrufprozess begonnen, es wird Teil der nächsten CRL (Certificate Revocation List) sein. Daher sollte es vermutlich nicht mehr benutzt werden."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
 msgstr ""
 "Auf dieser Seiten finden Sie die wichtigsten Informationen über das "
 "ausgewählte Zertifikat. Außerdem gibt es mehrere Links um das Zertifikat zu "
 "installieren. Wenn Sie mehr Informationen benötigen, dann folgen Sie dem "
 "Link zu der ausführlicheren Zertifikatsseite. "
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_REVOKED_DESC"
+msgstr "Dieses Zertifikat wurde zurückgerufen und sollte nicht mehr benutzt werden."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_SUSPENDED_DESC"
+msgstr "Dieses Zertifikat wurde suspendiert und sollte zur Zeit nicht benutzt werden."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE"
 msgstr "Zertifikatsinformationen"
@@ -1242,6 +1257,9 @@ msgstr "Die von Ihnen gewünschte Funktion ist derzeit nicht vorhanden."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr "Fehlende Funktionalität"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PAGE"
+msgstr "Seite"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWD"
 msgstr "Passwort"
 
@@ -1442,7 +1460,9 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Letzte Aktualisierung"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
-msgstr "Die derzeit aktiven Instanzen können Sie der Tabelle entnehmen."
+msgstr ""
+"In der untenstehenden Tabelle sehen Sie die Workflow-Instanzen __START__ bis "
+"__END__ von __COUNT__."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_TITLE"
 msgstr "Aktive Workflow-Instanzen"
@@ -3328,6 +3348,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DISCONNECT_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_AMOUNT_IS_NOT_A_NUMBER"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_IS_NOT_A_NUMBER"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_START_IS_NOT_A_NUMBER"
+msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED"

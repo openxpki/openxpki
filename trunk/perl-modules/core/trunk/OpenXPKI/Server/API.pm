@@ -359,9 +359,23 @@ sub BUILD {
         },
 
         ### Workflow API
+        'get_number_of_workflow_instances' => {
+            class  => 'Workflow',
+            params => {
+            },
+        },
         'list_workflow_instances' => {
             class  => 'Workflow',
-            params => { },
+            params => {
+                LIMIT => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+                START => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+            },
         },
         'list_workflow_titles' => {
             class  => 'Workflow',

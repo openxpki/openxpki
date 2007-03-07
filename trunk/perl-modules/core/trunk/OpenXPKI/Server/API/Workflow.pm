@@ -36,7 +36,9 @@ sub START {
 # lowlevel workflow functions
 
 sub list_workflow_instances {
-    ##! 1: "list_workflow_instances"
+    ##! 1: "start"
+    my $self    = shift;
+    my $arg_ref = shift;
 
     my $dbi = CTX('dbi_workflow');
     # commit to get a current snapshot of the database in the
@@ -45,15 +47,57 @@ sub list_workflow_instances {
     # other processes are writing to the database at the same time
     $dbi->commit();
 
+    my $limit = $arg_ref->{LIMIT};
+    ##! 16: 'limit: ' . $limit
+    my $start = $arg_ref->{START};
+    ##! 16: 'start: ' . $start
+
     my $instances = $dbi->select(
-	TABLE => $workflow_table,
+	TABLE   => $workflow_table,
 	DYNAMIC => {
 	    PKI_REALM  => CTX('session')->get_pki_realm(),
 	},
+        LIMIT   => {
+            AMOUNT => $limit,
+            START  => $start,
+        },
+        REVERSE => 1,
     );
 
     ##! 16: 'instances: ' . Dumper $instances
     return $instances;
+}
+
+sub get_number_of_workflow_instances {
+    ##! 1: "start"
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $dbi = CTX('dbi_workflow');
+    # commit to get a current snapshot of the database in the
+    # highest isolation level.
+    # Without this, we will only see old data, especially if
+    # other processes are writing to the database at the same time
+    $dbi->commit();
+
+    # TODO - wait for someone to implement aggregates without joins
+    # and then use a simpler query (cf. feature request #1675572)
+    my $instances = $dbi->select(
+	TABLE     => [ $workflow_table ],
+        JOIN      => [ [ 'WORKFLOW_SERIAL'] ],
+	DYNAMIC   => {
+	    PKI_REALM  => CTX('session')->get_pki_realm(),
+	},
+        COLUMNS   => [
+            {
+                COLUMN    => 'WORKFLOW_SERIAL',
+                AGGREGATE => 'COUNT',
+            }
+        ],
+    );
+
+    ##! 16: 'instances: ' . Dumper $instances
+    return $instances->[0]->{WORKFLOW_SERIAL};
 }
 
 sub list_context_keys {

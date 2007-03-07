@@ -1,0 +1,37 @@
+<%args>
+    $totalEntries   => undef
+    $entriesPerPage => 20
+    $page           => undef
+    $start          => 1
+    $url            => undef
+    $maxPages       => 8
+</%args>
+% foreach my $page ($pageInfo->pages_in_spread()) {
+%    if (! defined $page) {
+...
+%    }
+%    elsif ($page == $pageInfo->current_page) {
+<b><% $page %></b>
+%    }
+%    else {
+<a href="<% $url %>?page=<% $page %>;limit=<% $entriesPerPage %>;<% $context->{menu}->get_link_params() %>"><% $page %> </a>
+%    }
+% }
+% return $pageInfo;
+<%once>
+    use Data::SpreadPagination;
+</%once>
+<%init>
+    my $params = {
+        totalEntries   => $totalEntries,
+        entriesPerPage => $entriesPerPage,
+        maxPages       => $maxPages,
+    };
+    if (! defined $page) {
+        $params->{startEntry} = $start,
+    }
+    else {
+        $params->{currentPage} = $page,
+    }
+    my $pageInfo = Data::SpreadPagination->new($params);
+</%init>

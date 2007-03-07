@@ -158,11 +158,37 @@ sub do_query
 
     # these variables are in-vars
     my $query     = $keys->{QUERY};
-    if ($keys->{LIMIT})
+    if ($keys->{LIMIT} && (! ref $keys->{LIMIT})) # 'old' style, limit is just a number
     {
+        if (! $keys->{LIMIT} =~ m{ \A \d+ \z }xms) {
+            # LIMIT is not a number!
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_IS_NOT_A_NUMBER',
+            );
+        }
         my $tmp = $self->{driver}->{limit};
         $tmp =~ s/__QUERY__/$query/;
         $tmp =~ s/__MAXITEMS__/$keys->{LIMIT}/;
+        $query = $tmp;
+    }
+    elsif ($keys->{LIMIT} && (ref $keys->{LIMIT} eq 'HASH')) {
+        # LIMIT is a hash reference consiting of AMOUNT and START
+        ##! 16: 'amount: ' . $keys->{LIMIT}->{AMOUNT}
+        ##! 16: 'start:  ' . $keys->{LIMIT}->{START}
+        if (! ($keys->{LIMIT}->{AMOUNT} =~ m{ \A \d+ \z }xms)) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_AMOUNT_IS_NOT_A_NUMBER',
+            );
+        }
+        if (! ($keys->{LIMIT}->{START} =~ m{ \A \d+ \z }xms)) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_LIMIT_START_IS_NOT_A_NUMBER',
+            );
+        }
+        my $tmp = $self->{driver}->{limitstart};
+        $tmp =~ s/__QUERY__/$query/;
+        $tmp =~ s/__MAXITEMS__/$keys->{LIMIT}->{AMOUNT}/;
+        $tmp =~ s/__START__/$keys->{LIMIT}->{START}/;
         $query = $tmp;
     }
     my @bind_values = ();
