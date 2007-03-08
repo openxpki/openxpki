@@ -472,13 +472,17 @@ sub BUILD {
                     type => ARRAYREF,
                 },
                 TYPE => {
-                    type     => SCALAR,
-                    regex    => $re_alpha_string,
+                    type     => SCALAR | ARRAYREF,
+                #    regex    => $re_alpha_string,
+                #    parameter content is checked in the method itself
+                #    because we can't check the array ref entries here
                     optional => 1,
                 },
                 STATE => {
-                    type     => SCALAR,
-                    regex    => $re_alpha_string,
+                    type     => SCALAR | ARRAYREF,
+                #    regex    => $re_alpha_string,
+                #    parameter content is checked in the method itself
+                #    because we can't check the array ref entries here
                     optional => 1,
                 },
             },

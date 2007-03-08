@@ -508,6 +508,7 @@ sub get_workflow_activities {
 sub search_workflow_instances {
     my $self     = shift;
     my $arg_ref  = shift;
+    my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
 
     my $dbi = CTX('dbi_workflow');
     # commit to get a current snapshot of the database in the
@@ -558,9 +559,55 @@ sub search_workflow_instances {
     $dynamic->{$workflow_table . '.PKI_REALM'} = $realm;
 
     if (defined $arg_ref->{TYPE}) {
+        # do parameter validation (here instead of the API because
+        # the API can't do regex checks on arrayrefs)
+        if (! ref $arg_ref->{TYPE}) {
+            if ($arg_ref->{TYPE} !~ $re_alpha_string) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC',
+                    params  => {
+                        TYPE => $arg_ref->{TYPE},
+                    },
+                );
+            }
+        }
+        elsif (ref $arg_ref->{TYPE} eq 'ARRAYREF') {
+            foreach my $subtype (@{$arg_ref->{TYPE}}) {
+                if ($subtype !~ $re_alpha_string) {
+                    OpenXPKI::Exception->throw(
+                        message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC',
+                        params  => {
+                            TYPE => $subtype,
+                        },
+                    );
+                }
+            }
+        }
         $dynamic->{$workflow_table . '.WORKFLOW_TYPE'} = $arg_ref->{TYPE};
     }
     if (defined $arg_ref->{STATE}) {
+        if (! ref $arg_ref->{STATE}) {
+            if ($arg_ref->{STATE} !~ $re_alpha_string) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_STATE_NOT_ALPHANUMERIC',
+                    params  => {
+                        STATE => $arg_ref->{STATE},
+                    },
+                );
+            }
+        }
+        elsif (ref $arg_ref->{STATE} eq 'ARRAYREF') {
+            foreach my $substate (@{$arg_ref->{STATE}}) {
+                if ($substate !~ $re_alpha_string) {
+                    OpenXPKI::Exception->throw(
+                        message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_STATE_NOT_ALPHANUMERIC',
+                        params  => {
+                            STATE => $substate,
+                        },
+                    );
+                }
+            }
+        }
         $dynamic->{$workflow_table . '.WORKFLOW_STATE'} = $arg_ref->{STATE};
     }
 

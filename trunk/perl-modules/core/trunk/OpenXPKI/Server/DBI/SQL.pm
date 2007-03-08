@@ -19,6 +19,8 @@ use OpenXPKI::Server::DBI::DBH;
 
 # use Smart::Comments;
 
+use Data::Dumper;
+
 sub new
 {
     shift;
@@ -518,6 +520,8 @@ sub select
     my $self  = shift;
     my $args  = { @_ };
 
+    ##! 128: 'args: ' . Dumper $args
+    
     ##! 2: "initialize variables"
     my %operator_of = (
 	'FROM'          => '>=',
@@ -911,6 +915,7 @@ sub select
     ###########################################################################
     # build condition
 
+    ##! 128: '@conditions: ' . Dumper \@conditions
   OPERATOR:
     foreach my $keyword (keys %operator_of)
     {
@@ -918,6 +923,7 @@ sub select
 	push @conditions, $self->{schema}->get_column ($pivot_column) . " " . $operator_of{$keyword} . " ?";
 	push @bind_values, $args->{$keyword};
     }
+    ##! 128: '@conditions: ' . Dumper \@conditions
 
 
   INDEX_MATCH:
@@ -927,6 +933,7 @@ sub select
 	push @conditions, $self->{schema}->get_column($pivot_column) . " = ?";
 	push @bind_values, $args->{$key};
     }
+    ##! 128: '@conditions: ' . Dumper \@conditions
 
 
     ###########################################################################
@@ -976,9 +983,11 @@ sub select
 	    my @dynamic_values;
 
 	    if (ref $args->{DYNAMIC}->{$dynamic_key} eq '') {
+                ##! 64: 'pushing scalar dynamic value for ' . $dynamic_key
 		push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key};
 	    } elsif (ref $args->{DYNAMIC}->{$dynamic_key} eq 'ARRAY') {
-		push @dynamic_values, @{$args->{DYNAMIC}->{$dynamic_key}};
+                ##! 64: 'pushing arrayref dynamic value for ' . $dynamic_key
+		push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key};
 	    } else {
 		OpenXPKI::Exception->throw (
 		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_DYNAMIC_QUERY",
@@ -988,10 +997,22 @@ sub select
 	    }
 	    
 	    foreach my $value (@dynamic_values) {
-		if (defined $value) {
+                ##! 64: 'dynamic value: ' . Dumper $value
+		if (defined $value && ! ref $value) {
+                    # scalar case
 		    push @conditions, $lhs . $comparison_operator;
 		    push @bind_values, $value;
-		} else {
+		}
+                elsif (defined $value && ref $value eq 'ARRAY') {
+                    # the value is an array reference, combine with OR
+                    my @tmp = ();
+                    foreach my $subvalue (@{$value}) {
+                        push @tmp, $lhs . $comparison_operator;
+                        push @bind_values, $subvalue; 
+                    }
+                    push @conditions, \@tmp;
+                }
+                else {
 		    # handle queries for NULL
 		    push @conditions, $lhs . ' IS NULL';
 		}
@@ -1055,6 +1076,11 @@ sub select
 
     ###########################################################################
     ## execute query
+    foreach my $condition (@conditions) {
+        if (ref $condition eq 'ARRAY') {
+            $condition = '(' . join(' OR ', @{$condition}) . ')';
+        }
+    }
     my $query .= 'SELECT ' . join(', ', @select_column_specs)
 	. ' FROM ' . join(', ', @table_specs)
 	. ' WHERE '
@@ -1276,7 +1302,9 @@ creates the SQL filter C<PIVOT_COLUMN <lt> ${FROM}>.
 
 =item * LIMIT
 
-is the number of returned items.
+Can either be a number n, which means that only the first n rows are returned,
+or a hash reference with the keys AMOUNT and START, in which case AMOUNT
+rows are returned starting at START.
 
 =item * REVERSE
 
@@ -1293,8 +1321,10 @@ data columns because they are perhaps too large. Many database do not
 support searching on high volume columns or columns with a flexible
 length. Dynamic parameters may be specified via a hash reference passed
 in as the named parameter DYNAMIC. The argument to DYNAMIC may be a scalar
-or an array reference. In the latter case multiple conditions are
-created that are logically ANDed.
+or an hash reference. In the latter case multiple conditions are
+created that are logically ANDed. The hash value for each key can
+either be a scalar or an array reference. In the latter case, they
+are combined by a logical OR.
 
 You can use wildcards inside of text fields like subjects or emailaddresses.
 You have to ensure that C<%> is used as wildcard. This module expects SQL

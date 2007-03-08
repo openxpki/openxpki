@@ -101,23 +101,12 @@ my $msg = $context->{client}->send_receive_command_msg(
               {
                      "TYPE"    => $wf_type,
                      'CONTEXT' => $search_context,
-                     'STATE'   => 'PENDING',
-              },
-);
-my $msg2 = $context->{client}->send_receive_command_msg(
-              "search_workflow_instances",
-              {
-                     "TYPE"    => $wf_type,
-                     'CONTEXT' => $search_context,
-                     'STATE'   => 'APPROVAL',
+                     'STATE'   => [ 'PENDING', 'APPROVAL' ],
               },
 );
 my @instances;
 if (defined $msg->{PARAMS} && ref $msg->{PARAMS} eq 'ARRAY') {
     @instances = @{ $msg->{PARAMS} };
-}
-if (defined $msg2->{PARAMS} && ref $msg2->{PARAMS} eq 'ARRAY') {
-    push @instances, @{ $msg2->{PARAMS} };
 }
 # TODO - error handling
 
