@@ -160,8 +160,17 @@ sub get_chain {
     my $self    = shift;
     my $arg_ref = shift;
 
-    my $pki_realm     = CTX('session')->get_pki_realm();
-    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $default_token;
+
+    eval {
+        my $pki_realm     = CTX('session')->get_pki_realm();
+        $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    };
+    # ignore if this fails, as this is only needed within the
+    # server if a user is connected. openxpkiadm -v -v uses this
+    # method to show the chain (but not to convert the certificates)
+    # we check later where the default token is needed whether it is
+    # available
 
     my $return_ref;
     my @identifiers;
@@ -199,6 +208,14 @@ sub get_chain {
                     push @certs, $cert->{DATA};
                 }
                 elsif ($arg_ref->{OUTFORMAT} eq 'DER') {
+                    if (! defined $default_token) {
+                        OpenXPKI::Exception->throw(
+                            message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN',
+                            log     => {
+                                logger => CTX('log'),
+                            },
+                        );
+                    }
                     push @certs, $default_token->command({
                         COMMAND => 'convert_cert',
                         DATA    => $cert->{DATA},
