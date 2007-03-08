@@ -295,7 +295,7 @@ WriteMakefile(
 	'Test::Pod::Coverage'    => "1.00",
 	'Text::CSV_XS'           => "0.23",
 	'Time::HiRes'            => 1,
-	'Workflow'               => '0.25',
+	'Workflow'               => '0.26',
 	'XML::Filter::XInclude'  => 1,
 	'XML::Parser'            => 1,
 	'XML::SAX'               => '0.12',
