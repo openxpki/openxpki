@@ -26,7 +26,7 @@ find . | while read file ; do
 		MATCH=0
 	    fi
 	fi
-	if [ $MATCH == 1 ] ; then
+	if [ $MATCH = 1 ] ; then
 	    echo "Creating directory $TARGETDIR/$file"
 	    $INSTALL -o $ADMUSER -g $ADMGROUP -m 0755 -d $TARGETDIR/$file
 	    if [ $? != 0 ] ; then
@@ -46,7 +46,7 @@ find . | while read file ; do
 	    # target directory was excluded
 	    MATCH=0
 	fi
-	if [ $MATCH == 1 ] ; then
+	if [ $MATCH = 1 ] ; then
 	    echo "Creating $TARGETDIR/$file"
  	    $INSTALL -o $ADMUSER -g $ADMGROUP -m 0644 $file $TARGETDIR/$file
 	    if [ $? != 0 ] ; then
