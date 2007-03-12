@@ -1,5 +1,5 @@
 <%args>
-    $totalEntries   => undef
+    $totalEntries   => 0
     $entriesPerPage => 20
     $page           => undef
     $start          => 1

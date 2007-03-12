@@ -485,6 +485,38 @@ sub BUILD {
                 #    because we can't check the array ref entries here
                     optional => 1,
                 },
+                LIMIT => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                    optional => 1,
+                },
+                START => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                    optional => 1,
+                },
+            },
+        },
+        'search_workflow_instances_count' => {
+            class  => 'Workflow',
+            params => {
+                CONTEXT => {
+                    type => ARRAYREF,
+                },
+                TYPE => {
+                    type     => SCALAR | ARRAYREF,
+                #    regex    => $re_alpha_string,
+                #    parameter content is checked in the method itself
+                #    because we can't check the array ref entries here
+                    optional => 1,
+                },
+                STATE => {
+                    type     => SCALAR | ARRAYREF,
+                #    regex    => $re_alpha_string,
+                #    parameter content is checked in the method itself
+                #    because we can't check the array ref entries here
+                    optional => 1,
+                },
             },
         },
         'get_secrets' => {

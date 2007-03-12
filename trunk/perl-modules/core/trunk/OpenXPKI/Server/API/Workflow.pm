@@ -505,6 +505,18 @@ sub get_workflow_activities {
     return \@list;
 }
 
+sub search_workflow_instances_count {
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $result = $self->search_workflow_instances($arg_ref);
+
+    if (defined $result && ref $result eq 'ARRAY') {
+        return scalar @{$result};
+    }
+    return 0;
+}
+
 sub search_workflow_instances {
     my $self     = shift;
     my $arg_ref  = shift;
@@ -610,6 +622,16 @@ sub search_workflow_instances {
         }
         $dynamic->{$workflow_table . '.WORKFLOW_STATE'} = $arg_ref->{STATE};
     }
+    my %limit;
+    if (defined $arg_ref->{LIMIT} && !defined $arg_ref->{START}) {
+        $limit{'LIMIT'} = $arg_ref->{LIMIT};
+    }
+    elsif (defined $arg_ref->{LIMIT} && defined $arg_ref->{START}) {
+        $limit{'LIMIT'} = {
+            AMOUNT => $arg_ref->{LIMIT},
+            START  => $arg_ref->{START},
+        };
+    }
 
     ##! 16: 'dynamic: ' . Dumper $dynamic
     ##! 16: 'tables: ' . Dumper(\@tables)
@@ -626,6 +648,7 @@ sub search_workflow_instances {
                    ],
         REVERSE => 1,
 	DYNAMIC => $dynamic,
+        %limit,
     );
     ##! 16: 'result: ' . Dumper $result
     return $result;
@@ -853,4 +876,26 @@ Examples:
 	      },
       }
 
+=item * TYPE (optional)
+
+The named parameter TYPE can either be scalar or an array reference.
+Searches for workflows only of this type / these types.
+
+=item * STATE (optional)
+
+The named parameter TYPE can either be scalar or an array reference.
+Searches for workflows only in this state / these states.
+
+=item * LIMIT (optional)
+
+If given, limits the amount of workflows returned.
+
+=item * START (optional)
+
+If given, defines the offset of the returned workflow (use with LIMIT).
+
+=head2 search_workflow_instances_count
+
+Works exactly the same as search_workflow_instances, but returns the
+number of results instead of the results themselves.
 

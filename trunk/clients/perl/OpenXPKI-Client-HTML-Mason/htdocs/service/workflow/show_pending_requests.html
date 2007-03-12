@@ -1,4 +1,7 @@
 <%args>
+    $limit  => 10
+    $start  => 1
+    $page   => undef
     $show_approval_buttons => undef
     $creator               => '%'
     $wf_type               => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST'
@@ -96,12 +99,39 @@ my $search_context = [
 ];
 my @results;
 
+my $nr_msg = $context->{client}->send_receive_command_msg(
+              "search_workflow_instances_count",
+              {
+                     "TYPE"    => $wf_type,
+                     'CONTEXT' => $search_context,
+                     'STATE'   => [ 'PENDING', 'APPROVAL' ],
+              },
+);
+my $count = $nr_msg->{PARAMS};
+
+my $pageInfo;
+if (! defined $show_approval_buttons) {
+    $pageInfo = $m->comp('/lib/paging.mhtml',
+        totalEntries   => $count,
+        entriesPerPage => $limit,
+        page           => $page,
+        start          => $start,
+        url            => 'show_pending_requests.html',
+    );
+}
+my %optional_params;
+if (defined $pageInfo) {
+    $optional_params{LIMIT} = $limit;
+    $optional_params{START} = $pageInfo->first - 1;
+}
+
 my $msg = $context->{client}->send_receive_command_msg(
               "search_workflow_instances",
               {
                      "TYPE"    => $wf_type,
                      'CONTEXT' => $search_context,
                      'STATE'   => [ 'PENDING', 'APPROVAL' ],
+                     %optional_params,
               },
 );
 my @instances;
