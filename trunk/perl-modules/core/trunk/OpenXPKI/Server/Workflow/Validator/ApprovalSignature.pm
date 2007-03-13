@@ -47,18 +47,10 @@ sub _init {
 
 sub validate {
     my ( $self, $wf, $role ) = @_;
-
     ## prepare the environment
     my $pki_realm = CTX('session')->get_pki_realm(); 
     my $context = $wf->context();
     my $sig      = $context->param('_signature');
-    ##! 64: 'signature: ' . $sig
-    if ($sig !~ m{\A .* \n\z}xms) {
-        ##! 64: 'sig does not end with \n, add it'
-        $sig .= "\n";
-    }
-    my $sig_text = $context->param('_signature_text');
-    ##! 64: 'signature text: ' . $sig_text
 
     if (! defined $sig) {
         if  (! $self->signature_required()) {
@@ -77,6 +69,13 @@ sub validate {
         }
     }
     ##! 64: 'signature defined'
+    ##! 64: 'signature: ' . $sig
+    if ($sig !~ m{\A .* \n\z}xms) {
+        ##! 64: 'sig does not end with \n, add it'
+        $sig .= "\n";
+    }
+    my $sig_text = $context->param('_signature_text');
+    ##! 64: 'signature text: ' . $sig_text
 
     # Check that signature is Base64 only
     if (! $sig =~ m{ \A [a-zA-Z\+/=]+ \z }xms) {
