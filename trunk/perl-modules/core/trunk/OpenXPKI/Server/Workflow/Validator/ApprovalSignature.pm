@@ -231,7 +231,7 @@ sub validate {
     eval {
         @signer_chain_server = @{ CTX('api')->get_chain({
             START_IDENTIFIER => $sig_identifier,
-        })->{IDENTIFIERS} }
+        })->{IDENTIFIERS} };
     };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(

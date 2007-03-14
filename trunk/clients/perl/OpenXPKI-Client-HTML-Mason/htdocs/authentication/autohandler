@@ -79,6 +79,14 @@
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
               'msg'   => Dumper($context->{msg}));
+    $msg = $m->comp('/authentication/x509.mhtml',
+                        'msg'      => $msg,
+                        'next_comp' => $next_comp,
+                        'no_menu'  => $no_menu,
+    );
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => Dumper($context->{msg}));
     $msg = $m->comp('/authentication/sso.mhtml',
                         'msg'      => $msg,
                         'next_comp' => $next_comp,

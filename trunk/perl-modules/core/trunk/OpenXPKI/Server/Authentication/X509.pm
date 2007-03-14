@@ -1,17 +1,21 @@
 ## OpenXPKI::Server::Authentication::X509.pm 
 ##
 ## Written 2006 by Michael Bell
-## (C) Copyright 2006 by The OpenXPKI Project
+## Rewritten 2007 by Alexander Klink for the OpenXPKI Project
+## (C) Copyright 2006, 2007 by The OpenXPKI Project
 ## $Revision$
+package OpenXPKI::Server::Authentication::X509;
 
 use strict;
 use warnings;
-
-package OpenXPKI::Server::Authentication::X509;
+use English;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::X509';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use MIME::Base64;
+
+use Data::Dumper;
 
 ## constructor and destructor stuff
 
@@ -27,54 +31,245 @@ sub new {
     ##! 1: "start"
 
     my $config = CTX('xml_config');
-    $self->{CHAIN} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "chain" ],
-                                         COUNTER => [ %{$keys->{COUNTER}}, 0 ]);
+
+    $self->{DESC} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "description" ],
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+    $self->{NAME} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "name" ],
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+
+    # create an empty arrayref of pending challenges
+    $self->{PENDING_CHALLENGES} = [];
+
+    my $trust_anchors;
+    my @trust_anchors;
+    eval {
+        $trust_anchors = $config->get_xpath(
+            XPATH   => [ @{$keys->{XPATH}},   "trust_anchors" ],
+            COUNTER => [ @{$keys->{COUNTER}}, 0 ]
+        );
+        @trust_anchors = split(q{,}, $trust_anchors);
+    };
+    if (! scalar @trust_anchors || $EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_TRUST_ANCHOR_CONFIGURATION',
+            params  => {
+                TRUST_ANCHORS => $trust_anchors,
+                EVAL_ERROR    => $EVAL_ERROR,
+            },
+        );
+    }
+    $self->{TRUST_ANCHORS} = \@trust_anchors;
+    eval {
+        $self->{PKCS7TOOL} = $config->get_xpath(
+            XPATH   => [ @{$keys->{XPATH}},   "pkcs7tool" ],
+            COUNTER => [ @{$keys->{COUNTER}}, 0 ]
+        );
+    };
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_PKCS7TOOL_CONFIGURATION',
+            params  => {
+                EVAL_ERROR    => $EVAL_ERROR,
+            },
+        );
+    }
+    eval {
+        $self->{CHALLENGE_LENGTH} = $config->get_xpath(
+            XPATH   => [ @{$keys->{XPATH}},   "challenge_length" ],
+            COUNTER => [ @{$keys->{COUNTER}}, 0 ]
+        );
+    };
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_CHALLENGE_LENGTH_CONFIGURATION',
+            params  => {
+                EVAL_ERROR    => $EVAL_ERROR,
+            },
+        );
+    }
 
     return $self;
 }
 
-sub login
-{
-    my $self = shift;
-    ##! 1: "start"
-    my $gui = CTX('service');
+sub login_step {
+    ##! 1: 'start' 
+    my $self    = shift;
+    my $arg_ref = shift;
+ 
+    my $name    = $arg_ref->{HANDLER};
+    my $msg     = $arg_ref->{MESSAGE};
 
-    ##! 2: "type ... x509"
+    if (! exists $msg->{PARAMS}->{CHALLENGE} ||
+        ! exists $msg->{PARAMS}->{SIGNATURE}) {
+        ##! 4: 'no login data received (yet)' 
+        # get a random challenge
+        my $random_data = CTX('api')->get_random({
+            LENGTH => $self->{CHALLENGE_LENGTH},
+        });
+        my $challenge = encode_base64($random_data);
+        $challenge =~ s/\n//g;
+        ##! 64: 'challenge: ' . $challenge
+        # save the pending challenge to check later that we
+        # received a valid challenge
+        push @{ $self->{PENDING_CHALLENGES} }, $challenge;
+        ##! 64: 'pending challenges: ' . Dumper $self->{PENDING_CHALLENGES}
 
-    # FIXME - convert to the new way of using it using login_step
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MODULE_BROKEN',
-    );
+        return (undef, undef, 
+            {
+		SERVICE_MSG => "GET_X509_LOGIN",
+		PARAMS      => {
+                    NAME        => $self->{NAME},
+                    DESCRIPTION => $self->{DESC},
+                    CHALLENGE   => $challenge,
+	        },
+            },
+        );
+    }
+    else {
+        ##! 2: 'login data / signature received'
+        my $challenge = $msg->{PARAMS}->{CHALLENGE};
+        my $signature = $msg->{PARAMS}->{SIGNATURE};
+        my $pki_realm = CTX('session')->get_pki_realm();
 
-    my $challenge = CTX('session')->get_id();
-    my $signature = $gui->get_x509_login ($challenge);
+        if ($signature !~ m{ \A .* \n \z }xms) {
+            # signature does not end with \n, add it
+            $signature .= "\n";
+        }
+        ##! 64: 'challenge: ' . $challenge
+        ##! 64: 'signature: ' . $signature
+        ##! 64: 'pending challenges: ' . Dumper $self->{PENDING_CHALLENGES}
 
-    my $token = CTX('crypto_layer')->get_token
-                (
-                    TYPE      => "DEFAULT",
-                    PKI_REALM => CTX('session')->get_pki_realm()
-                );
+        if (! grep { $_ eq $challenge } @{$self->{PENDING_CHALLENGES}}) {
+            # the sent challenge is not a pending one
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING',
+                params  => {
+                    CHALLENGE => $challenge,
+                },
+            );
+        }
+        if (! $signature =~ m{ \A [a-zA-Z\+/=]+ \z }xms) {
+            # the sent signature is not in Base64 format
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_SIGNATURE_IS_NOT_BASE64',
+            );
+        }
+        my $tm = CTX('crypto_layer');
+        my $pkcs7 =
+              '-----BEGIN PKCS7-----' . "\n"
+            . $signature
+            . '-----END PKCS7-----';
+        my $pkcs7_token = $tm->get_token(
+            TYPE      => 'PKCS7',
+            ID        => $self->{PKCS7TOOL},
+            PKI_REALM => $pki_realm,
+        );
+        eval {
+            $pkcs7_token->command({
+                COMMAND => 'verify',
+                PKCS7   => $pkcs7,
+                DATA    => $challenge,
+            });
+        };
+        if ($EVAL_ERROR) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_INVALID_SIGNATURE',
+            );
+        }
+        ##! 16: 'signature valid'
+        my $signer_subject;
+        eval {
+            $signer_subject = $pkcs7_token->command({
+                COMMAND => 'get_subject',
+                PKCS7   => $pkcs7,
+                DATA    => $challenge,
+            });
+        };
+        if ($EVAL_ERROR) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNER_SUBJECT',
+            );
+        }
+        ##! 16: 'signer subject: ' . $signer_subject
+        my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+        my @signer_chain = $default_token->command({
+            COMMAND        => 'pkcs7_get_chain',
+            PKCS7          => $pkcs7,
+            SIGNER_SUBJECT => $signer_subject,
+        });
+        ##! 64: 'signer_chain: ' . Dumper \@signer_chain
 
-    my $sig = OpenXPKI::Crypto::PKCS7->new (TOKEN => $token,
-                                            PKCS7 => $signature);
-    $self->{USER} = $sig->verify (CONTENT => $challenge,
-                                  CHAIN   => $self->{CHAIN});
-    return 1;
-}
+        my $sig_identifier = OpenXPKI::Crypto::X509->new(
+            TOKEN => $default_token,
+            DATA  => $signer_chain[0],
+        )->get_identifier();
+        if (! defined $sig_identifier || $sig_identifier eq '') {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CERTIFICATE_IDENTIFIER',
+            );
+        }
+        ##! 64: 'sig identifier: ' . $sig_identifier
 
-sub get_user
-{
-    my $self = shift;
-    ##! 1: "start"
-    return $self->{USER};
-}
+        my @signer_chain_server;
+        eval {
+            @signer_chain_server = @{ CTX('api')->get_chain({
+                START_IDENTIFIER => $sig_identifier,
+            })->{IDENTIFIERS} };
+        };
+        if ($EVAL_ERROR) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CHAIN_FROM_SERVER',
+                params  => {
+                    EVAL_ERROR => $EVAL_ERROR,
+                },
+            );
+        }
+        ##! 64: 'signer_chain_server: ' . Dumper \@signer_chain_server
+        my $anchor_found;
+        my @trust_anchors = @{ $self->{TRUST_ANCHORS} };
+      CHECK_CHAIN:
+        foreach my $identifier (@signer_chain_server) {
+            ##! 16: 'identifier: ' . $identifier
+            if (grep {$identifier eq $_} @trust_anchors) {
+                $anchor_found = 1;
+                last CHECK_CHAIN;
+            }
+        }
+        if (! defined $anchor_found) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_UNTRUSTED_CERTIFICATE',
+                params  => {
+                    'IDENTIFIER' => $sig_identifier,
+                },
+            );
+        }
 
-sub get_role
-{
-    my $self = shift;
-    ##! 1: "start"
-    ## how should we determine the role ???
-    return $self->{USER};
+        # Get the signer cert from the DB (and check that it is valid now)
+        my $cert_db = CTX('dbi_backend')->first(
+            TABLE    => 'CERTIFICATE',
+            DYNAMIC  => {
+                'IDENTIFIER' => $sig_identifier,
+                'STATUS'     => 'ISSUED',
+            },
+            VALID_AT => time(),
+        );
+        if (! defined $cert_db) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_NOT_FOUND_IN_DB_OR_INVALID',
+                params  => {
+                    'IDENTIFIER' => $sig_identifier,
+                },
+            );
+        } 
+        my $user = $signer_subject;
+        my $role = $cert_db->{ROLE};
+        return ($user, $role,
+            {
+                SERVICE_MSG => 'SERVICE_READY',
+            },
+        ); 
+    }
+    return (undef, undef, {});
 }
 
 1;
@@ -88,16 +283,6 @@ OpenXPKI::Server::Authentication::X509 - certificate based authentication.
 
 This is the class which supports OpenXPKI with a signature based
 authentication method. The parameters are passed as a hash reference.
-Actually the role mapping does not work.
-FIXME:
-Does it be possible to search an LDAP directory for certificates?
-How can we find a certificate in our database if we do not know the PKI
-Realm and the CA certificate? If we know the database entry then we know
-the role of the certificate.
-IDEA: search all certs with this serial
-NEXT: scan for a matching cert
-NEXT: PKI Realm allowed for authentication
-NEXT: use role from database
 
 =head1 Functions
 
@@ -105,17 +290,12 @@ NEXT: use role from database
 
 is the constructor. The supported parameters are XPATH and COUNTER.
 This is the minimum parameter set for any authentication class.
-The only parsed argument form the configuration is the used chain.
-This is used to support certificates from other CAs.
+The parameters which are taken from the configuration are trust_anchors
+and pkcs7tool, which works in the same way as in the approval signature
+case. Furthermore, the challenge_length is taken to define the length
+(in bytes) of the random challenge that is being created.
 
-=head2 login
+=head2 login_step
 
-returns true if the login was successful.
-
-=head2 get_user
-
-returns the user which logged in successful.
-
-=head2 get_role
-
-returns the user (no typo today) which logged in successful.
+returns a pair of (user, role, response_message) for a given login
+step. If user and role are undefined, the login is not yet finished.

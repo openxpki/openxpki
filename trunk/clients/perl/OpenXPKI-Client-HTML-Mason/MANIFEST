@@ -49,6 +49,7 @@ htdocs/authentication/shibboleth.mhtml
 htdocs/authentication/role.mhtml
 htdocs/authentication/open_form.mhtml
 htdocs/authentication/close_form.mhtml
+htdocs/authentication/x509.mhtml
 
 htdocs/service/autohandler
 htdocs/service/dhandler

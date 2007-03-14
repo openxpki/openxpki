@@ -476,7 +476,6 @@ sub do_process_request
                    FACILITY => "system");
         return;
     }
-    CTX('service')->init();
 
     ##! 2: "update pre-initialized variables"
 
@@ -510,6 +509,9 @@ sub do_process_request
         
     }
     ##! 16: 'dbi_workflow reconnected with new dbh'
+
+    # this is run until the user has logged in successfully
+    CTX('service')->init();
 
     CTX('crypto_layer')->reload_all_secret_groups_from_cache();
 
@@ -769,6 +771,7 @@ sub __get_server_config
 ##                                            ##
 ################################################
 
+### obsolete??? (ak, 2007/03/12)
 sub command
 {
     my $self = shift;

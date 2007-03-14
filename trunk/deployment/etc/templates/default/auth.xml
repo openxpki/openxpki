@@ -21,6 +21,16 @@
     <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_STATIC</description>
     <handler>External Static Role</handler>
   </stack>
+  <stack name="Certificate Challenge/Response"></stack>
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE</description>
+    <handler>Signature</handler>
+  </stack>
+  <handler name="Signature" type="X509">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE</description>
+    <trust_anchors></trust_anchors>
+    <pkcs7tool>testsceppkcs7tool1</pkcs7tool>
+    <challenge_length>256</challenge_length>
+  </handler>
   <handler name="Anonymous" type="Anonymous">
     <role></role>
   </handler>

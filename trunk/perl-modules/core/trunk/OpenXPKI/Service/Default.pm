@@ -127,6 +127,7 @@ sub __is_valid_message : PRIVATE {
             'PING',
             'GET_PASSWD_LOGIN',
             'GET_CLIENT_SSO_LOGIN',
+            'GET_X509_LOGIN',
         ],
         'MAIN_LOOP' => [
             'PING',
@@ -470,6 +471,15 @@ sub __handle_GET_CLIENT_SSO_LOGIN : PRIVATE {
     my $msg  = shift;
     
     # SSO login is basically handled in the same way as password login
+    return $self->__handle_GET_PASSWD_LOGIN($msg);
+}
+
+sub __handle_GET_X509_LOGIN : PRIVATE {
+    ##! 1: 'start'
+    my $self = shift;
+    my $msg  = shift;
+
+    # X509 login is handled the same as password login, too
     return $self->__handle_GET_PASSWD_LOGIN($msg);
 }
 
