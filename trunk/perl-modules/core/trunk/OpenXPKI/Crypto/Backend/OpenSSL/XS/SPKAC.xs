@@ -4,35 +4,11 @@ OpenXPKI_Crypto_Backend_OpenSSL_SPKAC
 _new(sv)
 	SV * sv
     PREINIT:
-	unsigned char * spkac;
+	char * spkac;
 	STRLEN len;
-	BIO *bio;
-	CONF *conf = NULL;
-	int i;
-	char *spkstr = NULL;
     CODE:
-	spkac = (unsigned char*) SvPV(sv, len);
-
-	bio  = BIO_new(BIO_s_mem());
-
-	/* load encoded data into bio */
-	BIO_write(bio, spkac, len);
-
-        conf = NCONF_new(NULL);
-        i = NCONF_load_bio(conf, bio, NULL);
-
-        if(!i) {
-		exit (100);
-        }
-
-        spkstr = NCONF_get_string(conf, "default", "SPKAC");
-
-	/* RETVAL = NETSCAPE_SPKI_b64_decode(spkac, len); */
-	RETVAL = NETSCAPE_SPKI_b64_decode(spkstr, -1);
-	NCONF_free(conf);
-	BIO_free(bio);
-        /* never free a NCONF part directly !!! */
-	/* free(spkstr); */
+	spkac = (char*) SvPV(sv, len);
+	RETVAL = NETSCAPE_SPKI_b64_decode(spkac, len);
     OUTPUT:
 	RETVAL
 
@@ -208,6 +184,25 @@ exponent (spkac)
 	SAFEFREE(char_ptr);
 	Newz(0, char_ptr, n+1, char);
         memcpy (char_ptr, exponent, n);
+	RETVAL = char_ptr;
+	BIO_free(out);
+    OUTPUT:
+	RETVAL
+
+char *
+signature_algorithm(spkac)
+	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
+    PREINIT:
+	BIO *out;
+	char *sig;
+	int n;
+    CODE:
+	out = BIO_new(BIO_s_mem());
+	i2a_ASN1_OBJECT(out, spkac->sig_algor->algorithm);
+	n = BIO_get_mem_data(out, &sig);
+	SAFEFREE(char_ptr);
+	Newz(0, char_ptr, n+1, char);
+        memcpy (char_ptr, sig, n);
 	RETVAL = char_ptr;
 	BIO_free(out);
     OUTPUT:

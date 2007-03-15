@@ -489,6 +489,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_TITLE"
 msgstr "Trustcenter Web Interface"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_MORE_SUBJECT_ALTERNATIVE_FIELDS"
+msgstr "Click here if you need more input fields"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
 msgstr ""
 "Following you can find the most important information about the selected CA "
@@ -506,7 +509,10 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
 msgstr "Detailed certificate information"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_CRL_ISSUANCE_PENDING_DESC"
-msgstr "Revocation has been started for this certificate and it will be included in the next CRL (Certificate Revocation List). This means it should probably no longer be used."
+msgstr ""
+"Revocation has been started for this certificate and it will be included in "
+"the next CRL (Certificate Revocation List). This means it should probably no "
+"longer be used."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
 msgstr ""
@@ -1113,6 +1119,10 @@ msgstr "Trustcenter Web Interface"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN"
 msgstr "Login"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN_USING_SIGNATURE"
+msgstr "Login"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr ""
 "The logout failed. Please contact immediately the reponsible administrators. "
@@ -1356,6 +1366,10 @@ msgstr "Key generation"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_TYPE"
 msgstr "CSR type"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
+msgstr "Key generation"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
 msgstr "Description"
 
@@ -1369,6 +1383,10 @@ msgstr "Get workflow instance information"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Last update"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
+msgstr "Workflow instances"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
 msgstr ""
@@ -1531,6 +1549,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_SIGN_ERROR"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE"
+msgstr ""
+"You authenticate yourself by signing a random challenge using a trusted "
+"certificate."
+
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL"
 msgstr ""
 "Here we use an external program to authenticate you. Simply enter your "
@@ -1538,6 +1561,10 @@ msgstr ""
 "the background."
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD"
+msgstr "Please enter your account and passphrase."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE"
 msgstr "Please enter your account and passphrase."
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_ANONYMOUS"
@@ -2658,6 +2685,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE"
 msgstr "Waiting for certificate issuance"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
+msgstr "Additional information"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
+msgstr "Description"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
+msgstr "Last update"
+
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
 msgstr "CA Info"
 
@@ -2714,6 +2753,10 @@ msgstr "Workflow"
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
 msgstr "Create instance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
+msgstr "List instances"
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
 msgstr "List instances"
@@ -2966,6 +3009,10 @@ msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_APPROVAL_MESSAGE_NEITHER_SPKAC_NOR_P
 msgstr "Workflow types"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN"
+msgstr "uid"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -3068,6 +3115,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
 msgstr "At least one context entry is needed."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_STATE_NOT_ALPHANUMERIC"
+msgstr "At least one context entry is needed."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC"
+msgstr "At least one context entry is needed."
+
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED"
 msgstr ""
 
@@ -3136,7 +3191,49 @@ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_ALGORITHM"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MODULE_BROKEN"
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_NOT_FOUND_IN_DB_OR_INVALID"
+msgstr "Default key group"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
+msgstr "Default key group"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CERTIFICATE_IDENTIFIER"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CHAIN_FROM_SERVER"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNER_SUBJECT"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_INVALID_SIGNATURE"
+msgstr "Default key group"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_CHALLENGE_LENGTH_CONFIGURATION"
+msgstr "Default key group"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_PKCS7TOOL_CONFIGURATION"
+msgstr "Default key group"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_TRUST_ANCHOR_CONFIGURATION"
+msgstr "Default key group"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_SIGNATURE_IS_NOT_BASE64"
+msgstr "Default key group"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_UNTRUSTED_CERTIFICATE"
 msgstr "Default key group"
 
 msgid "I18N_OPENXPKI_SERVER_COMMAND_MISSING_SESSION"
@@ -4048,10 +4145,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ALWAYS_FALSE"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
-msgstr "The value of a subject alternative name field is missing."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVED_MISSING_APPROVAL"
 msgstr "The value of a subject alternative name field is missing."
 
@@ -4304,6 +4397,10 @@ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYREUSE_CERTIFICATE_WITH_KEY_ALREADY_EXISTS"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
@@ -5192,6 +5289,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
+#~ msgstr "The value of a subject alternative name field is missing."
+
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
 #~ msgstr "Issuer"
 
@@ -5360,10 +5461,6 @@ msgstr "yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_REASON_NAME"
 #~ msgstr "reset"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CLIENT_SSO"
-#~ msgstr "Please enter your account and passphrase."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"

@@ -107,22 +107,26 @@ sub __init
     ##     parse subject     ##
     ###########################
  
+
     ## handle some missing data for SPKAC request
     if ( $self->{TYPE} eq "SPKAC" ) {
-        my @reqLines = split /\n/, $self->getBody();
-        $ret->{SUBJECT} = "";
-	for my $tmp (@reqLines)
-        {
-            $tmp =~ s/\r$//;
-            my ($key,$val)=($tmp =~ /([\w]+)\s*=\s*(.*)\s*/ );
-            if ($key =~ /SPKAC/i)
-            {
-                $ret->{SPKAC} = $val;
-            } else {
-                $ret->{SUBJECT} .= ", " if ($ret->{SUBJECT});
-                $ret->{SUBJECT} .= "$key=$val";
-            }
-        }
+        ## this has probably never been tested!!! FIXME FIXME
+        ## There is no subject in SPKAC, AFAIK ...
+        my @reqLines = split /\n/, $self->get_body();
+        #$ret->{SUBJECT} = "";
+        $ret->{SUBJECT} = "CN=SPKAC";
+	#for my $tmp (@reqLines)
+        #{
+        #    $tmp =~ s/\r$//;
+        #    my ($key,$val)=($tmp =~ /([\w]+)\s*=\s*(.*)\s*/ );
+        #    if ($key =~ /SPKAC/i)
+        #    {
+        #        $ret->{SPKAC} = $val;
+        #    } else {
+        #        $ret->{SUBJECT} .= ", " if ($ret->{SUBJECT});
+        #        $ret->{SUBJECT} .= "$key=$val";
+        #    }
+        #}
         $ret->{VERSION}	= 1;
     }
 

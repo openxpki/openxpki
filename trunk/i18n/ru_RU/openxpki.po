@@ -468,6 +468,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_TITLE"
 msgstr "Отклонение заявки на сертификат"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_MORE_SUBJECT_ALTERNATIVE_FIELDS"
+msgstr "DNS"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
 msgstr ""
 "Ниже приведены основные сведения о выбранном сертификате УЦ, а также ссылки, "
@@ -1114,6 +1118,10 @@ msgstr "Веб-интерфейс Серверного Узла инфрастр
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN"
 msgstr "Имя учетной записи"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN_USING_SIGNATURE"
+msgstr "Имя учетной записи"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr ""
 "Произошла ошибка при попытке выхода из системы. Свяжитесь, пожалуйста, как "
@@ -1366,6 +1374,10 @@ msgstr "Генерация ключа "
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_TYPE"
 msgstr "Тип заявки на сертификат "
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
+msgstr "Генерация ключа "
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
 msgstr "Описание"
 
@@ -1380,6 +1392,10 @@ msgstr "Получить информацию о текущем технолог
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Последнее обновление"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
+msgstr "Активные технологические процессы"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
 msgstr ""
@@ -1552,6 +1568,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_SIGN_ERROR"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE"
+msgstr ""
+"Для вашей аутентификации используется внешняя программа. Введите ваше "
+"обычное имя учетной записи и пароль. Дальнейшая процедура будет выполнена "
+"автоматически в фоновом режиме."
+
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL"
 msgstr ""
 "Для вашей аутентификации используется внешняя программа. Введите ваше "
@@ -1559,6 +1582,10 @@ msgstr ""
 "автоматически в фоновом режиме."
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD"
+msgstr "Введите пожалуйста, имя своей учетной записи и пароль"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE"
 msgstr "Введите пожалуйста, имя своей учетной записи и пароль"
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_ANONYMOUS"
@@ -2541,6 +2568,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
+msgstr "Дополнительная информация "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
+msgstr "Описание"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
+msgstr "Последнее обновление"
+
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
 msgstr "Информация УЦ"
 
@@ -2598,6 +2637,10 @@ msgstr "Технологические процессы"
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
 msgstr "Активировать технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
+msgstr "Показать список технологических процессов."
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
 msgstr "Показать список технологических процессов."
@@ -2810,6 +2853,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_APPROVAL_MESSAGE_NEITHER_SPKAC_NOR_PKCS10_PRESENT_IN_CONTEXT"
 msgstr "Типы технологических процессов."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN"
+msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
+
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
 msgstr ""
 
@@ -2882,6 +2931,14 @@ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_STATE_NOT_ALPHANUMERIC"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED"
 msgstr "SPKAC-строка пуста."
 
@@ -2946,7 +3003,47 @@ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_ALGORITHM"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MODULE_BROKEN"
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_NOT_FOUND_IN_DB_OR_INVALID"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
+msgstr "Стандартный способ аутентификации пользователя системы."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CERTIFICATE_IDENTIFIER"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CHAIN_FROM_SERVER"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNER_SUBJECT"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_INVALID_SIGNATURE"
+msgstr "Стандартный способ аутентификации пользователя системы."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_CHALLENGE_LENGTH_CONFIGURATION"
+msgstr "Стандартный способ аутентификации пользователя системы."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_PKCS7TOOL_CONFIGURATION"
+msgstr "Стандартный способ аутентификации пользователя системы."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_TRUST_ANCHOR_CONFIGURATION"
+msgstr "Стандартный способ аутентификации пользователя системы."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_SIGNATURE_IS_NOT_BASE64"
+msgstr "Стандартный способ аутентификации пользователя системы."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_UNTRUSTED_CERTIFICATE"
 msgstr "Стандартный способ аутентификации пользователя системы."
 
 msgid "I18N_OPENXPKI_SERVER_COMMAND_MISSING_SESSION"
@@ -3620,10 +3717,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ALWAYS_FALSE"
 msgstr "SPKAC строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
-msgstr "Отсутствует информация об альтернативном имени субъекта."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVED_MISSING_APPROVAL"
 msgstr "Отсутствует информация об альтернативном имени субъекта."
 
@@ -3874,6 +3967,10 @@ msgstr "SPKAC-строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYREUSE_CERTIFICATE_WITH_KEY_ALREADY_EXISTS"
+msgstr "SPKAC строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD"
@@ -4743,6 +4840,10 @@ msgid "I18N_OPENXPKI_YES"
 msgstr "Да"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
+#~ msgstr "Отсутствует информация об альтернативном имени субъекта."
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
 #~ msgstr "сброс"
 
@@ -4937,10 +5038,6 @@ msgstr "Да"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_SERIAL"
 #~ msgstr "Серийный номер "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CLIENT_SSO"
-#~ msgstr "Введите пожалуйста, имя своей учетной записи и пароль"
 
 #~ msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
 #~ msgstr "Обмен данными"

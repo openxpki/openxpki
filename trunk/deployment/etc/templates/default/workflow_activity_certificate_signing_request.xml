@@ -13,6 +13,12 @@
       <field name="csr_type"/>
       <field name="spkac"/>
       <field name="pkcs10"/>
+      <validator name="KeyReuse">
+        <arg>$csr_type</arg>
+        <arg>$pkcs10</arg>
+        <arg>$spkac</arg>
+      </validator>
+
       <!-- do not use field with is_required                -->
       <!-- because this ignores the order of the validators -->
       <validator name="HasRequiredField">

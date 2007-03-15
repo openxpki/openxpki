@@ -90,7 +90,8 @@ sub execute {
         $csr = $self->param('pkcs10');
     }
     elsif ($csr_type eq 'spkac') {
-        $csr = "\nSPKAC=" . $self->param('spkac');
+        # $csr = "\nSPKAC=" . $self->param('spkac');
+        $csr = $self->param('spkac');
     }
     else { 
         OpenXPKI::Exception->throw(

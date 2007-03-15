@@ -181,7 +181,10 @@ foreach my $component (keys %config) {
     
     # built-in components
     if ($component =~ m{ \A (?:revision|last-changed-revision) \z }xms) {
-        $svn_info ||= get_svn_info();
+        $svn_info = get_svn_info();
+        if (! scalar keys %{$svn_info}) {
+            die "Could not determine subversion info, is svn installed and in path?";
+        }
 
         $mapping_of->{component}->{$component} = {
             keyword => $config{$component}->{keyword},

@@ -67,18 +67,18 @@ sub get_command
 
     ## prepare data
 
+    my $spkac = 0;
+    if ($self->{CSR} !~ m{\A -----BEGIN }xms)
+    {
+        $spkac = 1;
+        $self->{CSR} = 'SPKAC=' . $self->{CSR};
+    }
     #done by CLI
     #$self->{CONFIG}->dump();
     #my $config = $self->{CONFIG}->get_config_filename();
     $self->write_file (FILENAME => $self->{CSRFILE},
                        CONTENT  => $self->{CSR},
 	               FORCE    => 1);
-    my $spkac = 0;
-    if ($self->{CSR} !~ /^-----BEGIN/s and
-        $self->{CSR} =~ /\nSPKAC\s*=/s)
-    {
-        $spkac = 1;
-    }
 
     ## build the command
 
