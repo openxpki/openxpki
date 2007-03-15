@@ -16,6 +16,7 @@
     $password_gen     => undef
     $password         => undef
     $verify_password  => undef
+    $additional_entries => undef
 </%args>
 <%init>
     use OpenXPKI::Debug 'service/create_csr/index.html';
@@ -69,7 +70,7 @@
 
     ## get subject alt name
     $params{subject_alt_name} = $m->comp ('/service/create_csr/get_subject_alt_name.mhtml',
-                                          %params, 'subject_alt_name' => $subject_alt_name);
+                                          %params, 'subject_alt_name' => $subject_alt_name, 'additional_entries' => $additional_entries);
     return if (not $params{subject_alt_name});
 
     ## get additional_infos
@@ -207,7 +208,7 @@
                   "ou_style" =>
                   {
                    ROLE        => [ "User", "RA Operator" ],
-                   KEY_GENERATION => ["SPKAC", "IE", "SERVERSIDE", "AUTO"],
+                   KEY_GENERATION => ["SPKAC", "IE", "SERVERSIDE", 'PKCS10', "AUTO"],
                    SUBJECT     =>
                    [
                        [    ## 1.RDN
