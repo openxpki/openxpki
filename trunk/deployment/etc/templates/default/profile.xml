@@ -194,6 +194,10 @@
       <subject super="../../subject{ou_style}"/>
       <subject super="../../subject{dc_style}"/>
 
+      <role>User</role>
+      <role>RA Operator</role>
+      <role>CA Operator</role>
+
       <validity>
 	<notafter format="relativedate">+0006</notafter>
       </validity>
@@ -241,6 +245,7 @@
     <profile id="I18N_OPENXPKI_PROFILE_TLS_SERVER"
 	     super="../profile{default}">
 
+      <role>Web Server</role>
       <subject super="../../subject{ou_style}"/>
       <subject super="../../subject{dc_style}"/>
 

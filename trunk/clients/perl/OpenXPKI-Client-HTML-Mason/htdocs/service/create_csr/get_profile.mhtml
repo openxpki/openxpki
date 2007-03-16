@@ -10,15 +10,19 @@
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_DESCRIPTION') %>
 </p>
-<select name="profile">
-%   foreach my $hprofile (sort keys %profiles)
-%   {
-  <option value="<% $hprofile %>"><% i18nGettext($hprofile) %></option>
-%   }
-</select>
+% if (scalar @select_values) {
+<p>
+<& '/lib/html/select.mhtml',
+    'name'   => 'profile',
+    'values' => \@select_values,
+&>
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
-<dl>
+</p>
+% }
+% else {
+<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_NO_PROFILES_DEFINED_FOR_ROLE') %>
+% }
 
 <%init>
     ## read all profiles from the server
@@ -32,13 +36,26 @@
         return $profile;
     }
 
-    ## if we have only one configuration
-    ## then we have not to ask the user
-    if (scalar keys %profiles == 1)
-    {
-        my @array = keys %profiles;
-        $profile = pop @array;
-        return $profile;
+    my $p_msg = $context->{client}->send_receive_command_msg(
+        'get_possible_profiles_for_role',
+        {
+            ROLE => $role,
+        },
+    );
+    my @possible_profiles = @{ $p_msg->{PARAMS} };
+
+    # if we have only one configuration
+    # then we don't have to ask the user
+    if (scalar @possible_profiles == 1) {
+        return $possible_profiles[0];
+    }
+    my @select_values = ();
+
+    foreach my $profile (@possible_profiles) {
+        push @select_values, {
+            VALUE => $profile,
+            LABEL => i18nGettext($profile),
+        };
     }
 
     ## ok, we have to ask the user

@@ -32,6 +32,52 @@ sub START {
 }
 # API: simple retrieval functions
 
+sub get_possible_profiles_for_role {
+    my $self      = shift;
+    my $arg_ref   = shift;
+    my $req_role  = $arg_ref->{ROLE};
+    ##! 1: 'start'
+    ##! 16: 'requested role: ' . $req_role
+
+    my $pki_realm = CTX('session')->get_pki_realm();
+    my @profiles  = ();
+    my $index     = $self->get_pki_realm_index();
+
+    my $count = CTX('xml_config')->get_xpath_count(
+     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile"],
+     COUNTER => [$index     , 0       , 0         , 0]
+    );
+    ##! 16: 'count: ' . $count
+    for (my $i=0; $i < $count; $i++) {
+        my $id = CTX('xml_config')->get_xpath(
+            XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "id"],
+            COUNTER => [$index     , 0       , 0         , 0          , $i       , 0   ],
+        );
+        next if ($id eq "default");
+        my $role_count = 0;
+        eval {
+            $role_count = CTX('xml_config')->get_xpath_count(
+                XPATH   => ['pki_realm', 'common', 'profiles', 'endentity', 'profile', 'role'],
+                COUNTER => [$index     , 0       , 0         , 0          , $i ],
+            );
+        };
+        ##! 16: 'role_count: ' . $role_count
+        foreach (my $ii = 0; $ii < $role_count; $ii++) {
+            my $role = CTX('xml_config')->get_xpath(
+                XPATH   => ['pki_realm', 'common', 'profiles', 'endentity', 'profile', 'role'],
+                COUNTER => [$index     , 0       , 0         , 0          , $i       , $ii   ],
+            );
+            ##! 16: 'role: ' . $role
+            if ($role eq $req_role) {
+                ##! 16: 'requested role found, adding profile: ' . $id
+                push @profiles, $id;
+            }
+        }
+    }
+    ##! 1: 'end'
+    return \@profiles;
+}
+
 sub get_approval_message {
     my $self      = shift;
     my $arg_ref   = shift;
@@ -538,3 +584,8 @@ Returns a hash ref with the following entries:
     COMPLETE      1 if the complete chain was found in the database
                   0 otherwise
 
+=head2 get_possible_profiles_for_role
+
+Returns an array reference of possible certificate profiles for a given
+certificate role (passed in the named parameter ROLE) taken from the
+configuration.

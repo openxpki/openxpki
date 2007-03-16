@@ -66,6 +66,15 @@ sub BUILD {
 
     $method_info_of{$ident} = {
         ### Default API
+        'get_possible_profiles_for_role' => {
+            class  => 'Default',
+            params => {
+                'ROLE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+            },
+        },
         'get_approval_message' => {
             class  => 'Default',
             params => {

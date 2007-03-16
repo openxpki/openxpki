@@ -33,6 +33,7 @@
       <validator name="CertProfile">
         <arg>$cert_profile</arg>
         <arg>$cert_profile_id</arg>
+        <arg>$cert_role</arg>
       </validator>
       <validator name="HasRequiredField">
         <arg>cert_subject_style</arg>

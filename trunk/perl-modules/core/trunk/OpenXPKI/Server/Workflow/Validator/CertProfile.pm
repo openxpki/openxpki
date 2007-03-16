@@ -1,14 +1,19 @@
 package OpenXPKI::Server::Workflow::Validator::CertProfile;
+use base qw( Workflow::Validator );
 
 use strict;
 use warnings;
-use base qw( Workflow::Validator );
-use Workflow::Exception qw( validation_error );
-use OpenXPKI::Server::Context qw( CTX );
 use English;
 
+use Workflow::Exception qw( validation_error );
+use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Exception;
+use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Validator::CertProfile';
+
+use Data::Dumper;
+
 sub validate {
-    my ( $self, $wf, $profile, $profile_id ) = @_;
+    my ( $self, $wf, $profile, $profile_id, $role ) = @_;
 
     ## prepare the environment
     my $context = $wf->context();
@@ -76,6 +81,22 @@ sub validate {
     } else {
         ## set the cert profile
         $context->param ("cert_profile_id" => $index);
+    }
+    ## check that it is an allowed profile for a given role
+    ##! 64: 'role: ' . $role
+    ##! 64: 'profile: ' . $role
+    my @possible_profiles = @{ CTX('api')->get_possible_profiles_for_role({
+        ROLE => $role,
+    }) };
+    ##! 64: 'possible profiles: ' . Dumper \@possible_profiles
+    if (! grep { $profile eq $_ } @possible_profiles) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTPROFILE_PROFILE_NOT_VALID_FOR_ROLE',
+            params  => {
+                'PROFILE' => $profile,
+                'ROLE'    => $role,
+            },
+        );
     }
 
     return 1;
