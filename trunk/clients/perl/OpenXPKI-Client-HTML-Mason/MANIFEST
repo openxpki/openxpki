@@ -94,6 +94,7 @@ htdocs/service/workflow/show_instance.html
 htdocs/service/workflow/get_workflow_instance_info.html
 htdocs/service/workflow/show_pending_requests.html
 htdocs/service/workflow/bulk_approval.html
+htdocs/service/workflow/show_csr_brief.html
 htdocs/service/workflow/activity/dhandler
 htdocs/service/workflow/activity/change_csr_role.html
 htdocs/service/workflow/activity/change_csr_profile.html

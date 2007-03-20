@@ -50,7 +50,7 @@ function ToggleAll() {
 %   if ($show_approval_buttons) {
     <td><input type="checkbox" name="approvals"></td>
 %   }
-    <td><input type="hidden" name="serials" value="<% $res->{'SERIAL'} %>"><a href="show_instance.html?type=<% $wf_type %>;id=<% $res->{'SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $res->{'SERIAL'} %></a></td>
+    <td><input type="hidden" name="serials" value="<% $res->{'SERIAL'} %>"><a href="show_csr_brief.html?type=<% $wf_type %>;id=<% $res->{'SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $res->{'SERIAL'} %></a></td>
     <td>
 % foreach my $ticket (@{ $res->{'TICKETS'} }) {
 <small><a href="<% $ticket->{URL} %>"><% $ticket->{ID} %></a></small><br>
