@@ -71,10 +71,12 @@ $ENV{'SVN_USER_NAME'} = $usr_name;
 
 my %files_status;
 my @svn_output = `svn status`;
+my $mason_files_changed = 0;
 foreach my $line (@svn_output) {
     chomp($line);
     $line =~ m/ \A \s* ([ACDIMRX?!~]) \s* ([^\s]+?) \s* \Z /xms;
     $files_status{$2} = $1;
+    $mason_files_changed = 1 if ($2 =~ m/ \A lib\/.*\.mas \Z /xms);
 }
 
 # Make target absolute because File::Find changes the current working
@@ -115,14 +117,15 @@ sub convert {
     if (/(\.html)$/) {
 
 	# This will save the component's output in $buffer
-        if ((exists($files_status{$name_with_source}) || $force)) {
-            if ($files_status{$name_with_source} !~ m/ \A \? \Z /xms) {
-	        $interp->out_method(\$buffer);
-	        $interp->exec("/$comp_path");
-            }
-            else { # file is not under version control
+        if ((exists($files_status{$name_with_source}) || $force || $mason_files_changed )) {
+            if ((exists($files_status{$name_with_source})) && ($files_status{$name_with_source} =~ m/ \A \? \Z /xms)) { 
+                # file is not under version control 
 	        print STDERR "WARNING: $name_with_source ignored (not under version control)\n";
                 return;
+            }
+            else {
+	        $interp->out_method(\$buffer);
+	        $interp->exec("/$comp_path");
             }
         }
         else { # file was not changed
