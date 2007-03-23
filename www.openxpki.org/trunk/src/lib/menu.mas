@@ -44,10 +44,8 @@
 	  path => '/pub/openca' &>">ftp.openca.org</a></div>
         <div class="menu_sub_item"><a href="<& /lib/url.mas, 
 	  path => '/legacy/ftp.html' &>">FTP Mirrors</a></div>
-<!--
         <div class="menu_sub_item"><a href="<& /lib/url.mas, 
 	  path => '/legacy/demo.html' &>">Demo Installations</a></div>
--->
 % }
         <div class="w3c">
           <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=150124&amp;type=1" width="88" height="31" alt="SourceForge.net Logo" /></a>
