@@ -1,6 +1,15 @@
 #!/bin/sh
+OXI18="I18N_OPENXPKI_"
+OXSEDCMD="\
+/$OXI18/h;\
+s/$OXI18\([A-Z0-9_]*\).*/$OXI18\1/;\
+s/.*$OXI18\([A-Z0-9_]*\)/msgid \"$OXI18\1\"/;\
+/$OXI18/p;\
+/$OXI18/x;\
+s/$OXI18\([A-Z0-9_]*\)//;\
+tcycle"
 
-if [ "$SED" == "" ]; then
+if [ "x$SED" = "x" ]; then
     SED=sed
 fi
 
@@ -30,5 +39,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 '
 
-grep -Ir 'I18N_OPENXPKI' $@ | grep -v ".svn" |  $SED "s/.*I18N_OPENXPKI_\([A-Z0-9_]*\).*/I18N_OPENXPKI_\1/" | sort | uniq | $SED "s/^I/msgid \"I/g" | $SED "s/\$/\"msgstr \"\"\n/g" | $SED "s/.*XX_ERASE_XX.*//g" | $SED "s/msgstr/\nmsgstr/g"
-
+grep -Ir 'I18N_OPENXPKI' $@ \
+| grep -v ".svn" \
+| $SED -n -e :cycle  -e "$OXSEDCMD" \
+| sort | uniq \
+| $SED "s/.*XX_ERASE_XX.*//g;G" \
+| $SED "s/^\$/msgstr \"\"/g"
