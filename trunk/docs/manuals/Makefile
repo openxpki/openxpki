@@ -1,6 +1,11 @@
 
 FOP=fop
-DOCBOOK=/usr/share/xml/docbook/stylesheet/nwalsh/
+DOCBOOK=/usr/share/xml/docbook/stylesheet/nwalsh
+
+OSTYPE=$(shell uname)
+ifeq "$(OSTYPE)" "FreeBSD"
+DOCBOOK=/usr/local/share/xsl/docbook
+endif
 
 ifndef OUTPUT_DIR
 OUTPUT_DIR=..
