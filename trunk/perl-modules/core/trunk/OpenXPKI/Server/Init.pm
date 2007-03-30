@@ -548,84 +548,185 @@ sub get_pki_realms
 	    }
 	}
         #############################################################
-        # get ldap options  
+        ##! 129: '--------------------------------- get ldap options'  
 	#
+        my @ldap_path   = ('pki_realm', 'common/ldap_options');
+        my @ldap_counter= (         $i,             0);
         eval {
-        my $ldap_enable = $config->get_xpath(
-		        XPATH   => [ 'pki_realm', 'common','ldap','ldap_enable' ],
-  		        COUNTER => [          $i,        0,     0,           0  ],
-		      );
-         $realms{$name}->{ldap_enable} = $ldap_enable;
+         $realms{$name}->{ldap_enable} = $config->get_xpath(
+	      XPATH   => [  @ldap_path   ,'ldap_enable' ],
+  	      COUNTER => [  @ldap_counter,           0  ]);
+	     };
+        if ($EVAL_ERROR) {
+         log_wrapper({
+    	  MESSAGE  => "No LDAP options found, LDAP turned off",
+    	  PRIORITY => "warn",
+    	  FACILITY => "system",
+	 });
+	 $realms{$name}->{ldap_enable} = "no";
+	}
+	if($realms{$name}->{ldap_enable} eq "yes"){
+        ##! 129: 'LDAP LOADED, STATUS '.$realms{$name}->{ldap_enable}
+	  $realms{$name}->{ldap_excluded_roles} = $config->get_xpath(
+              XPATH   => [  @ldap_path   ,'ldap_excluded_roles' ],
+              COUNTER => [  @ldap_counter,                    0 ]);
+	  $realms{$name}->{ldap_suffix} = $config->get_xpath(
+              XPATH   => [  @ldap_path   ,'ldap_suffix' ],
+              COUNTER => [  @ldap_counter,           0  ]);
+	  $realms{$name}->{ldap_server} = $config->get_xpath(
+              XPATH   => [  @ldap_path   ,'ldap_server' ],
+              COUNTER => [  @ldap_counter,           0  ]);
+	  $realms{$name}->{ldap_port} = $config->get_xpath(
+              XPATH   => [  @ldap_path   ,'ldap_port' ],
+              COUNTER => [  @ldap_counter,         0  ]);
+	  $realms{$name}->{ldap_version} = $config->get_xpath(
+              XPATH   => [  @ldap_path   ,'ldap_version' ],
+              COUNTER => [  @ldap_counter,            0  ]);
+          $realms{$name}->{ldap_tls} = $config->get_xpath(
+              XPATH   => [  @ldap_path   ,'ldap_tls' ],
+              COUNTER => [  @ldap_counter,          0]);
+	  $realms{$name}->{ldap_sasl} = $config->get_xpath(
+              XPATH   => [  @ldap_path   ,'ldap_sasl' ],
+              COUNTER => [  @ldap_counter,          0 ]);
+          $realms{$name}->{ldap_chain} = $config->get_xpath(
+              XPATH   => [  @ldap_path   ,'ldap_chain'],
+              COUNTER => [  @ldap_counter,           0]);
+	  $realms{$name}->{ldap_login} = $config->get_xpath(
+              XPATH   => [  @ldap_path   ,'ldap_login'],
+              COUNTER => [  @ldap_counter,           0]);
+          $realms{$name}->{ldap_password} = $config->get_xpath(
+              XPATH   => [  @ldap_path   ,'ldap_password'],
+              COUNTER => [  @ldap_counter,           0   ]);
+          ##! 129: 'ldap: loading schema'
+          my @schema_prefix    = ('pki_realm','common/ldap_options/schema');
+          my @schema_counter   = ( $i        , 0                          );
+          my @cert_types = ("default", "certificate", "ca");
+	  my $rdn;
+          my $rdn_count;
+	  my $attribute_count;
+          my $attr_type;
+	  my $must_count;
+	  my $may_count;
+	  my $structural_count;
+	  my $auxiliary_count;
 
-	 my $ldap_excluded_roles = $config->get_xpath(
-              XPATH   => [ 'pki_realm', 'common','ldap','ldap_excluded_roles' ],
-              COUNTER => [          $i,        0,     0,                    0 ],
-		      );
-         $realms{$name}->{ldap_excluded_roles} = $ldap_excluded_roles;
+          ##! 129: 'block: default, certificate, ca'
+          foreach my $cert_type (@cert_types) { 
+           ##! 129: 'load_schema: LOADING '.$cert_type.' BLOCK'
+           $rdn_count = $config->get_xpath_count(
+            XPATH   => [ @schema_prefix,$cert_type,'rdn' ],
+            COUNTER => [ @schema_counter, 0 ]);
+           ##! 129: 'load_schema: '.$cert_type.' rdns:'. $rdn_count
+           next if (not $rdn_count);
+	   ##! 129: 'block: rdns'
+           for ($rdn=0; $rdn < $rdn_count; $rdn++){
+            ##! 129: 'attributetype'
+            $attr_type = $config->get_xpath (
+             XPATH    => [ @schema_prefix, $cert_type,'rdn',
+	                  'attributetype'],
+             COUNTER  => [ @schema_counter,0,          $rdn, 0 ]);
+            $realms{$name}->{schema}->{$cert_type}->{lc ($attr_type)}->{attributetype} =
+             $attr_type;
+            $attr_type = lc ($attr_type);
+            ##! 129: 'load_schema: loading attributetype '.$attr_type 
+            $must_count = $config->get_xpath_count (
+             XPATH    => [ @schema_prefix, $cert_type,'rdn',
+	                 "must/attributetype" ],
+             COUNTER  => [ @schema_counter,0,          $rdn ]);
+            ##! 129: 'load_schema: must: count: '.$must_count
+            $must_count = 0 if (not $must_count);
 
-	 my $ldap_suffix = $config->get_xpath(
-                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_suffix' ],
-	                 COUNTER => [          $i,        0,     0,           0  ],
-		      );
-         $realms{$name}->{ldap_suffix} = $ldap_suffix;
-
-	 my $ldap_server = $config->get_xpath(
-                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_server' ],
-	                 COUNTER => [          $i,        0,     0,           0  ],
-		      );
-         $realms{$name}->{ldap_server} = $ldap_server;
-
-	 my $ldap_port = $config->get_xpath(
-                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_port' ],
-	                 COUNTER => [          $i,        0,     0,           0  ],
-		      );
-         $realms{$name}->{ldap_port} = $ldap_port;
-
-	 my $ldap_version = $config->get_xpath(
-                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_version' ],
-	                 COUNTER => [          $i,        0,     0,           0  ],
-		      );
-         $realms{$name}->{ldap_version} = $ldap_version;
-	 
-         my $ldap_tls = $config->get_xpath(
-                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_tls' ],
-	                 COUNTER => [          $i,        0,     0,           0  ],
-		      );
-         $realms{$name}->{ldap_tls} = $ldap_tls;
-
-	 my $ldap_sasl = $config->get_xpath(
-                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_sasl' ],
-	                 COUNTER => [          $i,        0,     0,           0  ],
-		      );
-         $realms{$name}->{ldap_sasl} = $ldap_sasl;
-	 
-         my $ldap_chain = $config->get_xpath(
-                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_chain' ],
-	                 COUNTER => [          $i,        0,     0,           0  ],
-		      );
-         $realms{$name}->{ldap_chain} = $ldap_chain;
-
-	 my $ldap_login = $config->get_xpath(
-                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_login' ],
-	                 COUNTER => [          $i,        0,     0,           0  ],
-		      );
-         $realms{$name}->{ldap_login} = $ldap_login;
-	 
-         my $ldap_password = $config->get_xpath(
-                         XPATH   => [ 'pki_realm', 'common','ldap','ldap_password' ],
-	                 COUNTER => [          $i,        0,     0,           0  ],
-		      );
-         $realms{$name}->{ldap_password} = $ldap_password;
-         }; 
+            ##! 129: 'block: must'
+            for (my $attribute_count=0; 
+	            $attribute_count < $must_count;
+	            $attribute_count++){ 
+             $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{must}->[$attribute_count] =
+              $config->get_xpath (
+               XPATH    => [ @schema_prefix, $cert_type,'rdn',
+	                    "must/attributetype" ],
+               COUNTER  => [ @schema_counter,0,          $rdn,
+	                        $attribute_count ]);
+             ##! 129: 'load_schema: must'
+            }
+	    ##! 129: 'end of block: must'
+            eval {
+             $may_count = $config->get_xpath_count (
+              XPATH    => [ @schema_prefix, $cert_type,'rdn',
+	                    "may/attributetype" ],
+              COUNTER  => [ @schema_counter,0        ,$rdn ]);
+            };
 	    if ($EVAL_ERROR) {
-    		log_wrapper({
-    		    MESSAGE  => "No LDAP options found, LDAP turned off",
-    		    PRIORITY => "warn",
-    		    FACILITY => "system",
-		});
-		$realms{$name}->{ldap_enable} = "no";
-		} 
-        # The End of ldap section
+             ##! 129: 'load_schema: may: count: ZERO'
+             $may_count = 0;
+            }
+            else {
+             ##! 129: 'block: may'
+             ##! 129: 'load_schema: may: count: '.$may_count 
+	     for ($attribute_count=0; 
+	          $attribute_count < $may_count; 
+	          $attribute_count++){ 
+              $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{may}->[$attribute_count] =
+               $config->get_xpath (
+                 XPATH    => [ @schema_prefix, $cert_type,'rdn',
+	                       "may/attributetype" ],
+                 COUNTER  => [ @schema_counter,0,          $rdn,
+	                          $attribute_count ]);
+            ##! 129: 'load_schema: may'
+             }
+            };
+	    ##  129: 'end of block: may'
+            $structural_count = $config->get_xpath_count (
+             XPATH    => [ @schema_prefix, $cert_type,'rdn',
+                          "structural/objectclass" ],
+             COUNTER  => [ @schema_counter,0        ,$rdn ]);
+            ##! 129: 'load_schema: count: '.$count
+            $structural_count = 0 if (not $structural_count);
+            ## 129: 'block: structural'
+            for ($attribute_count=0; 
+ 	         $attribute_count < $structural_count; 
+ 		 $attribute_count++){
+             $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{structural}->[$attribute_count] =
+              $config->get_xpath (
+               XPATH    => [ @schema_prefix, $cert_type,'rdn',
+	                    "structural/objectclass" ],
+               COUNTER  => [ @schema_counter,0,          $rdn,
+	                            $attribute_count ]);
+            ##! 129: 'load_schema: structural'
+            } 
+            ##! 129: 'end of block: structural'
+            eval {
+             $auxiliary_count = $config->get_xpath_count (
+             XPATH    => [ @schema_prefix, $cert_type,'rdn',
+ 	                  "auxiliary/objectclass" ],
+            COUNTER  => [ @schema_counter,0          ,$rdn ]);
+            };
+	    if ($EVAL_ERROR) {
+             ##! 129 : 'load_schema: auxiliary: count: ZERO'
+             $auxiliary_count = 0;
+            }
+            else {
+             ##! 129 : 'load_schema: auxiliary: count: '.$count
+             ##! 129 : 'block: auxiliary'
+             for ($attribute_count=0; 
+	          $attribute_count < $auxiliary_count; 
+ 	          $attribute_count++){
+              $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{auxiliary}->[$attribute_count] =
+               $config->get_xpath (
+                XPATH    => [ @schema_prefix, $cert_type,'rdn',
+	                    "auxiliary/objectclass" ],
+                COUNTER  => [ @schema_counter,0,          $rdn,
+	                           $attribute_count ]);
+              ##! 129: 'load_schema: auxiliary'
+             };
+            }; 
+	    ##! 129: 'end of block: auxiliary'
+           }; 
+	   ##! 129: 'end of block: rdns'
+          }; 
+	  ##! 129: 'end of block: default, certificate, ca'
+        }; 
+	##! 129: 'end of block: ldap_enable=yes'
+        ##! 129: '-------------------------------------The End of ldap section'
         ################################################################
 
 
