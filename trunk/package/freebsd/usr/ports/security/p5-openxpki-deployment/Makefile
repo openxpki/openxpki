@@ -2,18 +2,18 @@
 # Date created:				03 Oct 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki-deployment/Makefile,v 1.3 2007/02/03 09:49:51 miwi Exp $
+# $FreeBSD: ports/security/p5-openxpki-deployment/Makefile,v 1.4 2007/03/28 17:24:13 miwi Exp $
 #
 
 PORTNAME=	openxpki-deployment
-PORTVERSION=	0.9.720
+PORTVERSION=	0.9.781
 CATEGORIES=	security perl5
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	openxpki
 PKGNAMEPREFIX=	p5-
 DIST_SUBDIR=	openxpki
 
-MAINTAINER=	svysh@cryptocom.ru
+MAINTAINER=	svysh@pn.sinp.msu.ru
 COMMENT=	Perl based enterprise class trustcenter software for PKI
 
 BUILD_DEPENDS=	\

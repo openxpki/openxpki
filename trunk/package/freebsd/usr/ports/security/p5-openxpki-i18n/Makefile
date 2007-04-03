@@ -2,18 +2,18 @@
 # Date created:				03 Oct 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki-i18n/Makefile,v 1.2 2007/02/03 09:49:48 miwi Exp $
+# $FreeBSD: ports/security/p5-openxpki-i18n/Makefile,v 1.3 2007/04/02 07:14:10 clsung Exp $
 #
 
 PORTNAME=	openxpki-i18n
-PORTVERSION=	0.9.725
+PORTVERSION=	0.9.789
 CATEGORIES=	security perl5
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	openxpki
 PKGNAMEPREFIX=	p5-
 DIST_SUBDIR=	openxpki
 
-MAINTAINER=	svysh@cryptocom.ru
+MAINTAINER=	svysh@pn.sinp.msu.ru
 COMMENT=	Perl based trustcenter software for PKI: i18n tools
 
 BUILD_DEPENDS=	\
