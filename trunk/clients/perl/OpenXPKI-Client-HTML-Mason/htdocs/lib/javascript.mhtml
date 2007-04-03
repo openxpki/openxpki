@@ -3,6 +3,12 @@
 
 <% $js->get_function() | n %>
 
+<script type="text/javascript">
+    window.onload = function() {
+        enumCSP();
+    }
+</script>
+
 <%init>
     ##use OpenXPKI::Client::HTML::Mason::Javascript;
     ## translate all javascript messages

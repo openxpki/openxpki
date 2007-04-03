@@ -11,6 +11,8 @@
 <& /lib/html/hidden.mhtml, 'name' => 'signature', 'value' => '' &>
 <& /lib/html/hidden.mhtml, 'name' => 'text', value => $challenge &>
 
+<& /lib/javascript.mhtml &>
+
     <h1><% i18nGettext ($name) %></h1>
     <p>
       <% i18nGettext ($desc) %>

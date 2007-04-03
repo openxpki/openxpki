@@ -35,6 +35,9 @@
 %    {
 %          $params .= $key . '=' . $hash{$key} . ';';
 %    }
+
+<& /lib/javascript.mhtml &>
+
 <script type="text/javascript">
 <!--
     function InstallCertIEAndTest (form) {

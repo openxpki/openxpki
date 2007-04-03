@@ -14,6 +14,8 @@
 <& /lib/html/hidden.mhtml, 'name' => 'signature', 'value' => '' &>
 <& /lib/html/hidden.mhtml, 'name' => 'text', value => $to_be_signed &>
 
+<& /lib/javascript.mhtml &>
+
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_TITLE') %></h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_DESCRIPTION') %>

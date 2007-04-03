@@ -24,6 +24,8 @@
 <& /lib/html/hidden.mhtml, 'name' => 'info',          'value' => $info &>
 <& /lib/html/hidden.mhtml, 'name' => 'pkcs10',        'value' => '' &>
 
+<& /lib/javascript.mhtml &>
+
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_TITLE') %></h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DESCRIPTION') %>
@@ -46,7 +48,7 @@
       <% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_CSP") %>
     </td>
     <td>
-      <select name="csp" size=1 id="csp">
+      <select name="csp" size=1 id="csp" OnChange="GetKeyLength()">
         <option value="" selected>
           <% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DEFAULT_CSP") %>
         </option>

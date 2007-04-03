@@ -97,11 +97,10 @@
                    path => "${path}css/sinorcaish-print.css",
                    no_session => 1 &>" 
           type="text/css" media="print" />
-    <& /lib/javascript.mhtml &>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="Content-Script-Type" content="text/javascript"/>
   </head>
-  <body <& SELF:onload, %ARGS &>>
+  <body>
     <!-- For non-visual or non-stylesheet-capable user agents -->
     <div id="mainlink"><a href="#main">Skip to main content.</a></div>
 
@@ -218,5 +217,3 @@
 <%method title>
   OpenXPKI
 </%method>
-
-<%method onload>onload="enumCSP()"</%method>

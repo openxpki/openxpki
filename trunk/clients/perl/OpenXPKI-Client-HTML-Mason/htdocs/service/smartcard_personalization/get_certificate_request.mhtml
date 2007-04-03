@@ -34,6 +34,9 @@
 % }
 </table>
 <p>
+
+<& /lib/javascript.mhtml &>
+
 <script type="text/javascript">
 <!--
     function DisableButtonAndCreateCSR() {
