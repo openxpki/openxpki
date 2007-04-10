@@ -8,7 +8,7 @@ package OpenXPKI::Client::HTML::Mason::ApacheHandler;
 use strict;
 
 use HTML::Mason::ApacheHandler;
-use Apache::Request;
+eval { require Apache::Request } or { require Apache2::Request };
 
 my %ah;
 

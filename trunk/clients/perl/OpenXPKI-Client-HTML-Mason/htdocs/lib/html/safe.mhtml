@@ -4,17 +4,7 @@
 <%init>
     return "" if (not defined $data);
 
-    if (exists $ENV{MOD_PERL} and $ENV{MOD_PERL})
-    {
-        ## script is operated by apache with mod_perl
-        ## FIXME: escape_html includes a bug which removes the iutf8 flag from the string
-        $data = Apache::Util::escape_html ($data);
-        Encode::_utf8_on ($data);
-        print $data;
-    } else {
-        ## script runs without mod_perl
-        print HTML::Entities::encode ($data);
-    }
+    print HTML::Entities::encode ($data);
     ## always return here !!!
     ## if the normal perl area will be executed
     ## then the output can include newlines

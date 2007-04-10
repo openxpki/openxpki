@@ -9,6 +9,7 @@
   use OpenXPKI::DN;
   use English;
   use Data::Dumper;
+  use HTML::Entities;
 
   if (defined $ENV{OPENXPKI_LOCALE_PREFIX}) {
     set_locale_prefix($ENV{OPENXPKI_LOCALE_PREFIX});
@@ -32,15 +33,6 @@
     h => \&HTML::Mason::Escapes::basic_html_escape,
   );
   
-  if (exists $ENV{MOD_PERL} and $ENV{MOD_PERL})
-  {
-    ## script is operated by apache with mod_perl
-    eval "use Apache::Util;";
-  } else {
-    ## script runs without mod_perl
-    eval "use HTML::Entities;";
-  }
-  die $EVAL_ERROR if ($EVAL_ERROR);
 </%once>
 
 <%init>
