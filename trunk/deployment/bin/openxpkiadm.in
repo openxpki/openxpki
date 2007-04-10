@@ -78,9 +78,7 @@ sub initdb {
   DB:
     foreach my $db (@databases) {
 	my $params = {};
-	if ($db ne 'log') {
-	    $params->{PURPOSE} = $db;
-	}
+        $params->{PURPOSE} = $db;
 
 	if (defined $params->{PURPOSE}) {
 	    print STDERR "Setting up database '$db'\n";
