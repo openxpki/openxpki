@@ -1,4 +1,4 @@
 % $m->call_next();
 <%flags>
-    inherit => undef
+    inherit => '/syshandler'
 </%flags>

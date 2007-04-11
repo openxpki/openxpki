@@ -74,7 +74,17 @@ sub write
     my $msg = "type::=last\n".
               "length::=".length($data)."\n".
               $data;
-    $self->__send ($msg);
+    eval {
+        $self->__send ($msg);
+    };
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_ERROR_DURING___SEND',
+            params  => {
+                'EVAL_ERROR' => $EVAL_ERROR,
+            },
+        );
+    }
 
     if ($self->{STDOUT})
     {
@@ -239,7 +249,18 @@ sub __receive
     else
     {
         ##! 8: "read via STDIN"
-        $length = CORE::read STDIN, $msg, $length;
+        eval {
+            $length = CORE::read STDIN, $msg, $length;
+        };
+        if ($EVAL_ERROR) {
+            ##! 16: 'EVAL_ERROR!'
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_FAILED',
+                params  => {
+                    'EVAL_ERROR' => $EVAL_ERROR,
+                },
+            );
+        }
         ##! 8: "read $length bytes - $msg"
     }
     if (not $length)

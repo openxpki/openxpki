@@ -54,7 +54,7 @@
     if (not defined $msg or
         $client->get_communication_state eq "can_receive")
     {
-        $msg = $client->collect();
+        $msg = $client->send_receive_service_msg('PING');
     }
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,

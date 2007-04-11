@@ -96,6 +96,7 @@ sub collect {
  	alarm 0;
     };
     if ($EVAL_ERROR) {
+        $self->set_communication_state('can_send');
  	if ($EVAL_ERROR eq "alarm\n") {
 	    OpenXPKI::Exception->throw(
 	        message => "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT",

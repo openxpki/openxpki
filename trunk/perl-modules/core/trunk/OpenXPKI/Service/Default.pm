@@ -289,6 +289,34 @@ sub __handle_PING : PRIVATE {
             SERVICE_MSG => 'SERVICE_READY',
         };
     }
+    elsif ($state_of{$ident} eq 'WAITING_FOR_PKI_REALM') {
+        my %realms =();
+        my @list = sort keys %{CTX('pki_realm')};
+        foreach my $realm (@list) {
+            $realms{$realm}->{NAME}        = $realm;
+            ## FIXME: we should add a description to every PKI realm
+            $realms{$realm}->{DESCRIPTION} = $realm;
+        }
+        return {
+	    SERVICE_MSG => 'GET_PKI_REALM',
+	    PARAMS => {
+		    'PKI_REALMS' => \%realms,
+	    },
+        };
+    }
+    elsif ($state_of{$ident} eq 'WAITING_FOR_AUTHENTICATION_STACK') {
+        return $self->__list_authentication_stacks();
+    }
+    elsif ($state_of{$ident} eq 'WAITING_FOR_LOGIN') {
+        ##! 16: 'we are in state WAITING_FOR_LOGIN'
+        ##! 16: 'auth stack: ' . CTX('session')->get_authentication_stack()
+        ##! 16: 'pki realm: ' . CTX('session')->get_pki_realm()
+        my ($user, $role, $reply) = CTX('authentication')->login_step({
+            STACK   => CTX('session')->get_authentication_stack(),
+            MESSAGE => $message,
+        });
+        return $reply;
+    }
     return {};
 }
 

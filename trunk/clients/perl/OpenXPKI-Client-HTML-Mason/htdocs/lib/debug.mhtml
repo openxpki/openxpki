@@ -9,6 +9,8 @@
 <%init>
     return if (not defined $DEBUG);
     return if ($DEBUG < $level);
+    # no debugging in /binary as it will screw up our binary output ...
+    return if ($m->request_comp()->title =~ m{\A /binary}xms);
 
     my $caller = $m->caller();
     my $label  = $caller->title();

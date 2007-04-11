@@ -45,6 +45,19 @@ my %socket                 : ATTR;
 my %transport              : ATTR;
 my %serialization          : ATTR;
 
+sub catch_signal {
+    my $signame = shift;
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_CLIENT_SIGNAL_CAUGHT',
+        params  => {
+            'SIGNAL' => $signame,
+        },
+    );
+    return 1;
+}
+
+$SIG{CHLD} = \&catch_signal;
+$SIG{PIPE} = \&catch_signal;
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
@@ -75,10 +88,21 @@ sub talk {
 
     ##! 1: "talk"
     if ($self->get_communication_state() eq 'can_send') {
-	my $rc = $transport{$ident}->write(
-	    $serialization{$ident}->serialize($arg)
-	    );
-	$self->set_communication_state('can_receive');
+        my $rc;
+        eval {
+	    $rc = $transport{$ident}->write(
+	        $serialization{$ident}->serialize($arg)
+	        );
+	    $self->set_communication_state('can_receive');
+        };
+        if ($EVAL_ERROR) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_CLIENT_TALK_ERROR_DURING_WRITE',
+                params  => {
+                    'EVAL_ERROR' => $EVAL_ERROR,
+                },
+            );
+        }
 	return $rc;
     } else {
 	OpenXPKI::Exception->throw(
@@ -88,6 +112,7 @@ sub talk {
 	    },
 	    );
     }
+    return 1;
 }
 
 # get server response
@@ -113,9 +138,11 @@ sub collect {
  	$result = $serialization{$ident}->deserialize(
  	    $transport{$ident}->read()
  	    );
+        $self->set_communication_state('can_send');
  	alarm 0;
     };
     if ($EVAL_ERROR) {
+        $self->set_communication_state('can_send');
  	if ($EVAL_ERROR eq "alarm\n") {
  	    return;
  	} else {
@@ -123,7 +150,6 @@ sub collect {
 	    die $EVAL_ERROR;
 	}
     }
-    $self->set_communication_state('can_send');
     return $result;
 }
 
@@ -147,7 +173,20 @@ sub send_service_msg {
 	);
 
     ##! 4: Dumper \%arguments
-    return $self->talk(\%arguments);
+    eval {
+        $self->talk(\%arguments);
+    };
+    if ($EVAL_ERROR) {
+        ##! 16: 'eval error during send_service_msg!'
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CLIENT_SEND_SERVICE_MSG_TALK_FAILED',
+            params  => {
+                EVAL_ERROR => $EVAL_ERROR,
+            },
+        );
+    }
+        
+    return 1;
 }
 
 # send service command message
@@ -183,8 +222,30 @@ sub send_receive_service_msg {
     ##! 2: $cmd
     ##! 4: Dumper $arg
 
-    $self->send_service_msg($cmd, $arg);
-    my $rc = $self->collect();
+    eval {
+        $self->send_service_msg($cmd, $arg);
+    };
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_SEND_SERVICE_MSG',
+            params  => {
+                EVAL_ERROR => $EVAL_ERROR,
+            },
+        );
+    }
+    my $rc;
+    eval {
+        $rc = $self->collect();
+    };
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_COLLECT',
+            params  => {
+                EVAL_ERROR => $EVAL_ERROR,
+                STATE      => $self->get_communication_state(),
+            },
+        );
+    }
     ##! 4: Dumper $rc
     return $rc;
 }
@@ -259,10 +320,14 @@ sub init_session {
     
     $sessionid{$ident} = $msg->{SESSION_ID};
     
-    return $self->talk(
+    $self->talk(
 	{
 	    SERVICE_MSG => 'SESSION_ID_ACCEPTED',
 	});
+    
+    # we want to be able to send after initialization, so collect a message!
+    $msg = $self->collect();
+    return 1;
 }
 
 sub is_connected
@@ -276,18 +341,18 @@ sub is_connected
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION')
-        {
-            # could be a timed-out client session
+        if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_ERROR_DURING___SEND') {
+            # this is probably an OpenXPKI server that died at the
+            # other end
             # normal missing connection => 0
             return 0;
         } else {
             # OpenXPKI::Exception but from where ? => undef
-            return;
+            return undef;
         }
     } elsif ($EVAL_ERROR) {
-        # completely unkown die => undef
-        return;
+        # completely unkown die => -1
+        return -1;
     }
     return 1;
 }

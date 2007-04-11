@@ -1,3 +1,6 @@
+<%args>
+    $__session_id => undef
+</%args>
 % $m->call_next;
 <%once>
   # FIXME: move this to Apache handler?
@@ -36,6 +39,17 @@
 </%once>
 
 <%init>
+    ## if there is a session and we are not in the authentication process
+    ## then re-use the session
+    if (defined $__session_id and
+        0 > index ($m->request_comp()->title(), "authentication/"))
+    {
+        $m->comp('/authentication/session.mhtml', '__session_id' => $__session_id);
+        $m->comp('/authentication/role.mhtml') if ($context and not exists $context->{role});
+    } else {
+        undef $context;
+    }
+    $m->comp ('/lib/language.mhtml', "session_id" => $__session_id);
 </%init>
 
 <%flags>
