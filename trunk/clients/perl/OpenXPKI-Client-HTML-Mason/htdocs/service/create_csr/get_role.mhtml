@@ -21,13 +21,20 @@
 <& /service/close_form.mhtml &>
 <dl>
 
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+
 <%init>
     ## read all roles from the server
+    my @errors = ();
     my $msg = $context->{client}->send_receive_command_msg("get_roles");
-    # FIXME: the following fails in both Konqueror and Opera with
-    # "not an array reference". Weird.
-    my @roles = @{$msg->{PARAMS}};
-
+    my @roles = ();
+    if (ref $msg->{PARAMS} eq 'ARRAY') {
+        @roles = @{$msg->{PARAMS}};
+    }
+    if (ref $msg eq 'ARRAY' && $msg->[0]->{LABEL} ne 'I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS') {
+        # an error occured
+        push @errors, @{ $msg };
+    }
     ## return the role if it exists
     if (defined $role and
         grep /^$role$/, @roles)
