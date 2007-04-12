@@ -12,11 +12,13 @@ require 't/common.pl';
 my $debug = $config{debug};
 
 diag("SCEP Client Test: approving the SCEP request");
-
 my $sscep = 'sscep';
 SKIP: {
     if (system("$sscep >/dev/null 2>&1") != 0) {
-	skip "sscep binary not installed.", 4;
+	skip "sscep binary not installed.", 1;
+    }
+    if (! (`$config{openssl} version` =~ m{\A OpenSSL\ 0\.9\.8 }xms)) {
+        skip "OpenSSL 0.9.8 not available.", 1;
     }
     
     # we need to backup the sqlite db, as the approval might fail
@@ -48,9 +50,9 @@ SKIP: {
         });
         $client->init_session();
     
-        my $msg = $client->collect();
+        #my $msg = $client->collect();
     
-        $msg = $client->send_receive_service_msg(
+        my $msg = $client->send_receive_service_msg(
             'GET_AUTHENTICATION_STACK',
             {
                 'AUTHENTICATION_STACK' => 'Operator',

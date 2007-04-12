@@ -45,19 +45,19 @@ my %socket                 : ATTR;
 my %transport              : ATTR;
 my %serialization          : ATTR;
 
-sub catch_signal {
-    my $signame = shift;
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_CLIENT_SIGNAL_CAUGHT',
-        params  => {
-            'SIGNAL' => $signame,
-        },
-    );
-    return 1;
-}
+#sub catch_signal {
+#    my $signame = shift;
+#    OpenXPKI::Exception->throw(
+#        message => 'I18N_OPENXPKI_CLIENT_SIGNAL_CAUGHT',
+#        params  => {
+#            'SIGNAL' => $signame,
+#        },
+#    );
+#    return 1;
+#}
 
-$SIG{CHLD} = \&catch_signal;
-$SIG{PIPE} = \&catch_signal;
+#$SIG{CHLD} = \&catch_signal;
+#$SIG{PIPE} = \&catch_signal;
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;

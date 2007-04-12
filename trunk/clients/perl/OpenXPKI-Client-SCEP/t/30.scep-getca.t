@@ -30,6 +30,9 @@ SKIP: {
     if (system("$sscep >/dev/null $stderr") != 0) {
 	skip "sscep binary not installed.", 4;
     }
+    if (! (`$config{openssl} version` =~ m{\A OpenSSL\ 0\.9\.8 }xms)) {
+        skip "OpenSSL 0.9.8 not available.", 4;
+    }
 
     ok(mkpath($cgi_dir));
     # create configuration
