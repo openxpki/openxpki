@@ -181,6 +181,7 @@ OpenXPKI/Server/Workflow/Activity/CertIssuance/GetCertProfile.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/PersistCertificate.pm
 
 OpenXPKI/Server/Workflow/Activity/CertLdapPublish/AddMissingNode.pm
+OpenXPKI/Server/Workflow/Activity/CertLdapPublish/ImportPublicData.pm
 OpenXPKI/Server/Workflow/Activity/CertLdapPublish/PublicCertLdap.pm
 
 OpenXPKI/Server/Workflow/Activity/CSR/PersistRequest.pm

@@ -5,7 +5,7 @@
 
   <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_LDAP_PUBLIC_INITIAL</description>
-    <action name="null" 
+    <action name="import_public_data" 
             resulting_state="WAITING_FOR_START">
     </action>
   </state>

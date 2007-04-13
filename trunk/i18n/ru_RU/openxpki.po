@@ -619,6 +619,10 @@ msgstr "Дополнительная информация о сертифика�
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST"
 msgstr "Ошибки"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_NO_PROFILES_DEFINED_FOR_ROLE"
+msgstr "Выбор профиля"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS"
 msgstr "Описания полей формы"
 
@@ -1262,8 +1266,16 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_WORKFLOW_TYPE"
 msgstr "Выбор типа технологического процесса для создания заявки"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SHOW_CSR_BRIEF_DETAILED_LINK"
+msgstr "Автоматическое определение типа броузера"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED"
 msgstr "Персонализация смарт-карт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SOURCE"
+msgstr "Сброс"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC"
 msgstr "SPKAC"
@@ -1366,10 +1378,6 @@ msgstr "Генерация ключа "
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_TYPE"
 msgstr "Тип заявки на сертификат "
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
-msgstr "Генерация ключа "
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
 msgstr "Описание"
 
@@ -1384,10 +1392,6 @@ msgstr "Получить информацию о текущем технолог
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Последнее обновление"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
-msgstr "Активные технологические процессы"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
 msgstr ""
@@ -1441,6 +1445,10 @@ msgstr "Все типы"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL"
 msgstr "Серийный номер технологического процесса"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_CSR_BRIEF_TITLE"
+msgstr "Активный технологический процесс"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES"
 msgstr "Возможные действия оператора"
@@ -1512,6 +1520,26 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_SCEP_INVALID_OP"
 msgstr "SPKAC"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_COLLECT"
+msgstr "Ошибки"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_SEND_SERVICE_MSG"
+msgstr "Генерация пароля сервером "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_SEND_SERVICE_MSG_TALK_FAILED"
+msgstr "Генерация ключа на стороне сервера"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_SIGNAL_CAUGHT"
+msgstr "SPKAC"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_TALK_ERROR_DURING_WRITE"
+msgstr "Веб-интерфейс Серверного Узла инфраструктуры открытых ключей (PKI)"
+
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR"
 msgstr ""
 
@@ -1540,9 +1568,6 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED"
@@ -2527,6 +2552,10 @@ msgid "I18N_OPENXPKI_HTML_MASON_CERT_INFO_NEW_CRR"
 msgstr "Дополнительная информация о сертификате"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_CHANGE"
+msgstr "Страница "
+
+#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_CRR_INVALID_WORKFLOW_TYPE"
 msgstr "Тип технологического процесса"
 
@@ -2559,18 +2588,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
-msgstr "Дополнительная информация "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
-msgstr "Описание"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
-msgstr "Последнее обновление"
 
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
 msgstr "Информация УЦ"
@@ -2634,10 +2651,6 @@ msgstr "Технологические процессы"
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
 msgstr "Активировать технологический процесс"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
-msgstr "Показать список технологических процессов."
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
 msgstr "Показать список технологических процессов."
@@ -3899,6 +3912,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVAL_SIGNATURE_SIGNATURE_NOT_
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTPROFILE_PROFILE_NOT_VALID_FOR_ROLE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_ID_MISMATCH"
 msgstr "SPKAC строка пуста."
 
@@ -4075,50 +4092,13 @@ msgstr ""
 "названия подразделения и двух компонентов доменного имени."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
-msgstr ""
-"Выбранный способ построения имени требует наличия, как минимум, одного "
-"названия подразделения и двух компонентов доменного имени."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
-msgstr ""
-"Выбранный способ построения имени не позволяет использовать название страны."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_NO_PKI_REALM_CONFIGURED"
 msgstr ""
 "Выбранный способ построения имени требует наличия, как минимум, одного "
 "названия подразделения и двух компонентов доменного имени."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
-msgstr "Значение поля Country (c) - это просто название страны."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
-msgstr ""
-"Выбранный способ построения имени не позволяет использовать название страны."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
-msgstr ""
-"Используемая структура требует наличия, как минимум, названий одного "
-"подразделения  организации, одной организации и одной страны."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
-msgstr ""
-"Выбранный способ построения имени не позволяет использовать название страны."
-
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
-msgstr ""
-"Выбранный способ построения имени требует заполнения поля UID и поля имени - "
-"common name."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
@@ -4369,8 +4349,16 @@ msgstr "ОШИБКА! Соединение закрыто."
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_DAMAGED_MESSAGE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_FAILED"
+msgstr "ОШИБКА! Соединение закрыто."
+
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_WRONG_MESSAGE_TYPE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_ERROR_DURING___SEND"
+msgstr "ОШИБКА! Соединение закрыто."
 
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 msgstr ""
@@ -4750,6 +4738,32 @@ msgstr "Сертификаты"
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_UNSUPPORTED_CSR_TYPE"
 msgstr "Сертификаты"
 
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_IMPORT_CERTIFICATE_TOKEN_UNAVAILABLE"
+msgstr "Отсутствует токен для преобразования сертификата в DER-формат"
+
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_CONVERSION_FAILED"
+msgstr "При преобразовании сертификата произошла ошибка"
+
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_BIND_FAILED"
+msgstr "Не удалось создать экземпляр класса LDAP-интерфейса"
+
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_CONNECTION_FAILED"
+msgstr "Ошибка подключения к LDAP серверу"
+
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MISSING_NODE"
+msgstr "Не удается добавить сертификат к LDAP узлу, так как узел отсутствует"
+
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MODIFY_FAILED"
+msgstr "При попытке модификации LDAP-узла произошла ошибка"
+
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_SEARCH_FAILED"
+msgstr "При поиске LDAP-узла произошла ошибка"
+
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_TOKEN_UNAVAILABLE"
+msgstr ""
+"Отсутствует токен для преобразования сертификата в DER-формат перед "
+"добавлением к LDAP-узлу"
+
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_DEFAULT_TOKEN_UNAVAILABLE"
 msgstr ""
 
@@ -4836,8 +4850,51 @@ msgid "I18N_OPENXPKI_YES"
 msgstr "Да"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
-#~ msgstr "Отсутствует информация об альтернативном имени субъекта."
+#~ msgid "I18N_OPENXPKI_CA_SUBJECT"
+#~ msgstr "Подразделение"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
+#~ msgstr "Microsoft Internet Explorer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA_ENROLL"
+#~ msgstr "Подразделение"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_DESCRIPTION"
+#~ msgstr ""
+#~ "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+#~ "внимательны - данная система поддерживает множественные реализации "
+#~ "удостоверяющих центров (CA). Если вы не вполне уверены, с какой "
+#~ "реализацией вы в настоящий момент работаете, обратитесь к информационному "
+#~ "меню."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_TITLE"
+#~ msgstr "Область PKI"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_DESCRIPTION"
+#~ msgstr ""
+#~ "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+#~ "внимательны - данная система поддерживает множественные реализации "
+#~ "удостоверяющих центров (CA). Если вы не вполне уверены, с какой "
+#~ "реализацией вы в настоящий момент работаете, обратитесь к информационному "
+#~ "меню."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_TITLE"
+#~ msgstr "Веб-интерфейс Удостоверяющего Центра"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
+#~ msgstr ""
+#~ "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
+#~ "внимательны - данная система поддерживает множественные реализации "
+#~ "удостоверяющих центров (CA). Если вы не вполне уверены, с какой "
+#~ "реализацией вы в настоящий момент работаете, обратитесь к информационному "
+#~ "меню."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
@@ -4852,7 +4909,27 @@ msgstr "Да"
 #~ msgstr "Дополнительная информация о сертификате"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_DAY"
+#~ msgstr "сброс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_HOUR"
+#~ msgstr "сброс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MINUTE"
+#~ msgstr "сброс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MONTH"
+#~ msgstr "сброс"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME"
+#~ msgstr "сброс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_YEAR"
 #~ msgstr "сброс"
 
 #, fuzzy
@@ -4889,82 +4966,6 @@ msgstr "Да"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_TITLE"
 #~ msgstr "Выбор типа технологического процесса для создания заявки"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA"
-#~ msgstr ""
-#~ "Выберите, пожалуйста, способ генерации ключа.Внимание! Ваш выбор "
-#~ "существенно повлияет на последующие действия системы. Внимательно "
-#~ "прочитайте комментарии."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA_DESCRIPTION"
-#~ msgstr ""
-#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
-#~ "существенно повлияет на последующие действия системы. Внимательно "
-#~ "прочитайте комментарии."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC_DESCRIPTION"
-#~ msgstr ""
-#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
-#~ "существенно повлияет на последующие действия системы. Внимательно "
-#~ "прочитайте комментарии."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001"
-#~ msgstr "Выбор способа генерации ключа"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001_DESCRIPTION"
-#~ msgstr ""
-#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
-#~ "существенно повлияет на последующие действия системы. Внимательно "
-#~ "прочитайте комментарии."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP"
-#~ msgstr "Выбор способа генерации ключа"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP_DESCRIPTION"
-#~ msgstr ""
-#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
-#~ "существенно повлияет на последующие действия системы. Внимательно "
-#~ "прочитайте комментарии."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94"
-#~ msgstr "Выбор способа генерации ключа"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94_DESCRIPTION"
-#~ msgstr ""
-#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
-#~ "существенно повлияет на последующие действия системы. Внимательно "
-#~ "прочитайте комментарии."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP"
-#~ msgstr "Выбор способа генерации ключа"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP_DESCRIPTION"
-#~ msgstr ""
-#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
-#~ "существенно повлияет на последующие действия системы. Внимательно "
-#~ "прочитайте комментарии."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA"
-#~ msgstr "Выбор способа генерации ключа"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA_DESCRIPTION"
-#~ msgstr ""
-#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
-#~ "существенно повлияет на последующие действия системы. Внимательно "
-#~ "прочитайте комментарии."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME"
@@ -5019,274 +5020,90 @@ msgstr "Да"
 #~ "существенно повлияет на последующие действия системы. Внимательно "
 #~ "прочитайте комментарии."
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_NAME"
-#~ msgstr "сброс"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_CHOICE"
+#~ msgstr "Выберите криптгорафический алгоритм из списка"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_DESC"
+#~ msgstr "Выберите криптографический алгоритм закрытого ключа"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
+#~ msgstr "Выбор типа закрытого ключа"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
-#~ msgstr "сброс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_SUBJECT"
-#~ msgstr "сброс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_SERIAL"
-#~ msgstr "Серийный номер "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_DAY"
-#~ msgstr "сброс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_HOUR"
-#~ msgstr "сброс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MINUTE"
-#~ msgstr "сброс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MONTH"
-#~ msgstr "сброс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_YEAR"
-#~ msgstr "сброс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED"
-#~ msgstr "Генерация ключа на стороне сервера"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
-#~ msgstr "Утвердить заявку на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
-#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_COMPROMISE_TIME"
-#~ msgstr "Изменить профиль сертификата "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
-#~ msgstr "Изменить роль в заявке"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
-#~ msgstr "Экспорт заявки на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
-#~ msgstr "Оставить заявку для обработки(CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
-#~ msgstr "Отклонить заявку на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
-#~ msgstr "Отклонить заявку на сертификат (CSR)"
-
-#~ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-#~ msgstr "Интерактивная часть процесса создания заявки"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWORD"
-#~ msgstr "Пароль"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_EMPLOYEENUMBER"
-#~ msgstr "Номер телефона"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_RENEWAL_NO_VALID_CERTIFICATE_PRESENT"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_VALID_SIGNATURE_AND_MATCHING_DNS"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SIGNED_USING_ORIGINAL_CERT"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_ALL_CHILDREN_SUCCESSFULLY_FINISHED"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE"
-#~ msgstr "При попытке выхода из системы произошла ошибка"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_CREATE_CSR"
-#~ msgstr "Пауза"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_DO_NOTHING"
-#~ msgstr "Пауза"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_PERSIST_CERTIFICATE"
-#~ msgstr "Отклонить заявку на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
-#~ msgstr "Утвердить заявку на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
-#~ msgstr "Технологические процессы создания сертификатов"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FINISHED_WAITING_FOR_CHILD"
-#~ msgstr "В состоянии ожидания запуска"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
-#~ msgstr "Утвердить заявку на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_REJECTED"
-#~ msgstr "Экспортированы журналы"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
-#~ msgstr "Экспортированы журналы"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_FORKED"
-#~ msgstr "Экспортированы журналы"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_PENDING"
-#~ msgstr "Прием заявки по протоколу SCEP"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_REJECTED"
-#~ msgstr "Экспортированы журналы"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_SLEPT"
-#~ msgstr "Пауза"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
-#~ msgstr "Microsoft Internet Explorer"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA_ENROLL"
-#~ msgstr "Подразделение"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CA_SUBJECT"
-#~ msgstr "Подразделение"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA"
 #~ msgstr ""
-#~ "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
-#~ "внимательны - данная система поддерживает множественные реализации "
-#~ "удостоверяющих центров (CA). Если вы не вполне уверены, с какой "
-#~ "реализацией вы в настоящий момент работаете, обратитесь к информационному "
-#~ "меню."
+#~ "Выберите, пожалуйста, способ генерации ключа.Внимание! Ваш выбор "
+#~ "существенно повлияет на последующие действия системы. Внимательно "
+#~ "прочитайте комментарии."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_DESCRIPTION"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA_DESCRIPTION"
 #~ msgstr ""
-#~ "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
-#~ "внимательны - данная система поддерживает множественные реализации "
-#~ "удостоверяющих центров (CA). Если вы не вполне уверены, с какой "
-#~ "реализацией вы в настоящий момент работаете, обратитесь к информационному "
-#~ "меню."
+#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
+#~ "существенно повлияет на последующие действия системы. Внимательно "
+#~ "прочитайте комментарии."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_TITLE"
-#~ msgstr "Область PKI"
-
-#~ msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
-#~ msgstr "Определение Удостоверяющего Центра, выдавшего сертификат"
-
-#~ msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
-#~ msgstr "Разблокировать ключ удостоверяющего центра "
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
-#~ msgstr "Сертификат Удостоверяющего центра идентифицирован"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
-#~ msgstr "Сертификат выдан"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
-#~ msgstr "Идет запуск... "
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
-#~ msgstr "Идет подготовка к выдаче сертификата...\t"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_DESCRIPTION"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC_DESCRIPTION"
 #~ msgstr ""
-#~ "Вы прошли авторизацию в Удостоверяющем Центре через Веб-интерфейс. Будьте "
-#~ "внимательны - данная система поддерживает множественные реализации "
-#~ "удостоверяющих центров (CA). Если вы не вполне уверены, с какой "
-#~ "реализацией вы в настоящий момент работаете, обратитесь к информационному "
-#~ "меню."
+#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
+#~ "существенно повлияет на последующие действия системы. Внимательно "
+#~ "прочитайте комментарии."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_TITLE"
-#~ msgstr "Веб-интерфейс Удостоверяющего Центра"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001"
+#~ msgstr "Выбор способа генерации ключа"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA\n"
-#~ msgstr "Проверка пустого Удостоверяющего Центра"
-
-#~ msgid "I18N_OPENXPKI_HTML_GET_PROCESS_INFO"
-#~ msgstr "Показать диаграмму течения технологического процесса"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP"
+#~ msgstr "Выбор способа генерации ключа"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP_DESCRIPTION"
 #~ msgstr ""
-#~ "Для выполнения следующего этапа технологическому процессу не хватает "
-#~ "некоторых данных (__FIELDS__)."
-
-#~ msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-#~ msgstr "Технологические процессы быстрой интерактивной обработки заявки"
+#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
+#~ "существенно повлияет на последующие действия системы. Внимательно "
+#~ "прочитайте комментарии."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_FINISHED"
-#~ msgstr "Сертификаты"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001_DESCRIPTION"
+#~ msgstr ""
+#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
+#~ "существенно повлияет на последующие действия системы. Внимательно "
+#~ "прочитайте комментарии."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
-#~ msgstr "Новая заявка на сертификат (CSR)"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94"
+#~ msgstr "Выбор способа генерации ключа"
 
-#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
-#~ msgstr "Deutsch"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP"
+#~ msgstr "Выбор способа генерации ключа"
 
-#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
-#~ msgstr "English"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP_DESCRIPTION"
+#~ msgstr ""
+#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
+#~ "существенно повлияет на последующие действия системы. Внимательно "
+#~ "прочитайте комментарии."
 
-#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
-#~ msgstr "Русский"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94_DESCRIPTION"
+#~ msgstr ""
+#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
+#~ "существенно повлияет на последующие действия системы. Внимательно "
+#~ "прочитайте комментарии."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA"
+#~ msgstr "Выбор способа генерации ключа"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA_DESCRIPTION"
+#~ msgstr ""
+#~ "Выберите, пожалуйста, способ генерации ключа. Внимание! Ваш выбор "
+#~ "существенно повлияет на последующие действия системы. Внимательно "
+#~ "прочитайте комментарии."
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII"
 #~ msgstr "Атрибут __LABEL__ может содержать только ASCII-символы."
@@ -5345,11 +5162,13 @@ msgstr "Да"
 #~ "The GUID __GUID__ has a wrong format. We support the formats of RFC 4122 "
 #~ "and Microsoft."
 
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
-#~ msgstr "Выбор типа закрытого ключа"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_NAME"
+#~ msgstr "сброс"
 
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_DESC"
-#~ msgstr "Выберите криптографический алгоритм закрытого ключа"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
+#~ msgstr "сброс"
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1"
 #~ msgstr "Алгоритм ЭЦП на эллиптических кривых c2tnb191v1"
@@ -5380,6 +5199,14 @@ msgstr "Да"
 #~ "эллиптических кривых определенного вида - prime239v1. Длина ключа - 239 "
 #~ "бит."
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_SUBJECT"
+#~ msgstr "сброс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWORD"
+#~ msgstr "Пароль"
+
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024"
 #~ msgstr "Алгоритм RSA, 1024 bits"
 
@@ -5396,6 +5223,252 @@ msgstr "Да"
 #~ "Ключ такого типа используется для реализации криптографического алгоритма "
 #~ "RSA. Длина ключа - 2048 бит."
 
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_CHOICE"
-#~ msgstr "Выберите криптгорафический алгоритм из списка"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
+#~ msgstr "Генерация ключа "
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
+#~ msgstr "Активные технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_SERIAL"
+#~ msgstr "Серийный номер "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA\n"
+#~ msgstr "Проверка пустого Удостоверяющего Центра"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_EMPLOYEENUMBER"
+#~ msgstr "Номер телефона"
+
+#~ msgid "I18N_OPENXPKI_HTML_GET_PROCESS_INFO"
+#~ msgstr "Показать диаграмму течения технологического процесса"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
+#~ msgstr "Дополнительная информация "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
+#~ msgstr "Описание"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
+#~ msgstr "Последнее обновление"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
+#~ msgstr "Deutsch"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
+#~ msgstr "English"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
+#~ msgstr "Русский"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
+#~ msgstr "Показать список технологических процессов."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
+#~ msgstr ""
+#~ "Для выполнения следующего этапа технологическому процессу не хватает "
+#~ "некоторых данных (__FIELDS__)."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
+#~ msgstr "Отсутствует информация об альтернативном имени субъекта."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS"
+#~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
+#~ msgstr "SPKAC строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_RENEWAL_NO_VALID_CERTIFICATE_PRESENT"
+#~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
+#~ msgstr "SPKAC строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_VALID_SIGNATURE_AND_MATCHING_DNS"
+#~ msgstr "SPKAC строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SIGNED_USING_ORIGINAL_CERT"
+#~ msgstr "SPKAC строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_ALL_CHILDREN_SUCCESSFULLY_FINISHED"
+#~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
+#~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
+#~ msgstr ""
+#~ "Выбранный способ построения имени требует наличия, как минимум, одного "
+#~ "названия подразделения и двух компонентов доменного имени."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
+#~ msgstr ""
+#~ "Выбранный способ построения имени не позволяет использовать название "
+#~ "страны."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
+#~ msgstr "Значение поля Country (c) - это просто название страны."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
+#~ msgstr ""
+#~ "Выбранный способ построения имени не позволяет использовать название "
+#~ "страны."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
+#~ msgstr ""
+#~ "Используемая структура требует наличия, как минимум, названий одного "
+#~ "подразделения  организации, одной организации и одной страны."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
+#~ msgstr ""
+#~ "Выбранный способ построения имени не позволяет использовать название "
+#~ "страны."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
+#~ msgstr ""
+#~ "Выбранный способ построения имени требует заполнения поля UID и поля "
+#~ "имени - common name."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE"
+#~ msgstr "При попытке выхода из системы произошла ошибка"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
+#~ msgstr "Утвердить заявку на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
+#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_COMPROMISE_TIME"
+#~ msgstr "Изменить профиль сертификата "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
+#~ msgstr "Изменить роль в заявке"
+
+#~ msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+#~ msgstr "Определение Удостоверяющего Центра, выдавшего сертификат"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
+#~ msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
+#~ msgstr "Оставить заявку для обработки(CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
+#~ msgstr "Отклонить заявку на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+#~ msgstr "Отклонить заявку на сертификат (CSR)"
+
+#~ msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
+#~ msgstr "Разблокировать ключ удостоверяющего центра "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_CREATE_CSR"
+#~ msgstr "Пауза"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_DO_NOTHING"
+#~ msgstr "Пауза"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_PERSIST_CERTIFICATE"
+#~ msgstr "Отклонить заявку на сертификат (CSR)"
+
+#~ msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_ONLINE"
+#~ msgstr "Технологические процессы быстрой интерактивной обработки заявки"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
+#~ msgstr "Утвердить заявку на сертификат (CSR)"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
+#~ msgstr "Сертификат Удостоверяющего центра идентифицирован"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
+#~ msgstr "Сертификат выдан"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
+#~ msgstr "Идет запуск... "
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
+#~ msgstr "Идет подготовка к выдаче сертификата...\t"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
+#~ msgstr "Новая заявка на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_FINISHED"
+#~ msgstr "Сертификаты"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
+#~ msgstr "Технологические процессы создания сертификатов"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FINISHED_WAITING_FOR_CHILD"
+#~ msgstr "В состоянии ожидания запуска"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
+#~ msgstr "Утвердить заявку на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_REJECTED"
+#~ msgstr "Экспортированы журналы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
+#~ msgstr "Экспортированы журналы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_FORKED"
+#~ msgstr "Экспортированы журналы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_PENDING"
+#~ msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_REJECTED"
+#~ msgstr "Экспортированы журналы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_SLEPT"
+#~ msgstr "Пауза"
+
+#~ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
+#~ msgstr "Интерактивная часть процесса создания заявки"
