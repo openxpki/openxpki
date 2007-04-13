@@ -8,7 +8,7 @@ package OpenXPKI::Client::SOAP::Lite;
 use base qw( OpenXPKI::Client );
 
 use version; 
-($OpenXPKI::Client::SOAP::LITE::VERSION = '$Revision: 342 $' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
+($OpenXPKI::Client::SOAP::Lite::VERSION = '$Revision: 342 $' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
 $VERSION = qv($VERSION);
 
 use warnings;
@@ -21,7 +21,7 @@ use Class::Std;
 # use Smart::Comments;
 # use Data::Dumper;
 
-use OpenXPKI qw( i18nGettext );
+use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Debug 'OpenXPKI::Client::SOAP::Lite';
 use OpenXPKI::Exception;
 
