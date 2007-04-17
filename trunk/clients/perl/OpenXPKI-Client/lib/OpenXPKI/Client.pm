@@ -132,24 +132,29 @@ sub collect {
 
     my $result;
     eval {
- 	local $SIG{ALRM} = sub { die "alarm\n" };
+ 	    local $SIG{ALRM} = sub { die "alarm\n" };
 	
- 	alarm $read_timeout{$ident};
- 	$result = $serialization{$ident}->deserialize(
- 	    $transport{$ident}->read()
+ 	    alarm $read_timeout{$ident};
+ 	    $result = $serialization{$ident}->deserialize(
+ 	        $transport{$ident}->read()
  	    );
         $self->set_communication_state('can_send');
- 	alarm 0;
+ 	    alarm 0;
     };
-    if ($EVAL_ERROR) {
+    if (my $exc = OpenXPKI::Exception->caught()) {
         $self->set_communication_state('can_send');
- 	if ($EVAL_ERROR eq "alarm\n") {
- 	    return;
- 	} else {
+        if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_FAILED'
+         && $exc->params()->{'__EVAL_ERROR__'} eq 'alarm') {
+            # timeout, return
+            return;
+        }
+        die $exc->message();
+    }
+    elsif ($EVAL_ERROR) {
+        $self->set_communication_state('can_send');
 	    # FIXME
 	    die $EVAL_ERROR;
 	}
-    }
     return $result;
 }
 
