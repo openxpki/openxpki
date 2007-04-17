@@ -501,10 +501,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_TITLE"
 msgstr "Ablehnen des Zertifizierungsantrages"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_MORE_SUBJECT_ALTERNATIVE_FIELDS"
-msgstr "DNS"
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
 msgstr ""
 "Auf dieser Seiten finden Sie die wichtigsten Informationen über das "
@@ -543,7 +539,7 @@ msgstr ""
 "Dieses Zertifikat wurde suspendiert und sollte zur Zeit nicht benutzt werden."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE"
-msgstr "Zertifikatsinformationen"
+msgstr "Zertifikat #__SERIAL__"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
 msgstr "Untenstehend finden Sie das Ergebnis Ihrer Suche."
@@ -669,6 +665,10 @@ msgstr "Details des Zertifikats"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST"
 msgstr "Aufgetretene Fehler"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_NO_PROFILES_DEFINED_FOR_ROLE"
+msgstr "Auswählen eines Profils"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS"
 msgstr "Beschreibungen zu den Feldern"
@@ -858,6 +858,18 @@ msgstr ""
 "bezüglich eines Feldes nicht sicher sind, so finden Sie am Ende dieser Seite "
 "Beschreibungen für jedes genutzte Feld."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_MORE_FIELDS"
+msgstr "Erstellung des Zertifikatsnamens"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_NO_VALUE_OPTIONAL"
+msgstr ""
+"Der eindeutige Name des Zertifikates wird aus den Feldern dieses Formulars "
+"erstellt. Bitte geben Sie die benötigten Informationen ein. Wenn Sie sich "
+"bezüglich eines Feldes nicht sicher sind, so finden Sie am Ende dieser Seite "
+"Beschreibungen für jedes genutzte Feld."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_DESCRIPTION"
 msgstr ""
 "Der eindeutige Name eines Zertifikates besteht aus mehreren Komponenten, die "
@@ -887,85 +899,14 @@ msgstr "Bitte kopieren Sie das Passwort an diese Stelle"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_PASSWORD_GENERATED_PASSWORD"
 msgstr "Das für Sie generierte Passwort"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SAN_ADD_5"
+msgstr ""
+"Die GUID __GUID__ ist falsch. Es werden sowohl das RFC 4122 Format als auch "
+"die übliche Microsoft-Schreibweise akzeptiert."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_"
 msgstr ""
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME"
-msgstr "DirName"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME_DESCRIPTION"
-msgstr ""
-"Dieses Feld enthält eine Referenz auf einen Eintrag in einem Directory-"
-"Server (auch als Verzeichnisdienst bekannt). Der Eintrag in diesem Directry-"
-"Server enthält evtl. weitere Informationen über den Eigentümer des "
-"Zertifikates."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS"
-msgstr "DNS"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS_DESCRIPTION"
-msgstr ""
-"Ein DNS-Name ist ein Menschen-lesbarer Name für einen Computer. Beispiel: "
-"www.openxpki.org."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL"
-msgstr "E-Mailadresse"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL_DESCRIPTION"
-msgstr ""
-"Eine E-Mailadresse sollte nicht direkt in den Namen des Zertifikates (engl. "
-"subject or distinguished name) eingegeben werden. Deshalb sollten Sie E-"
-"Mailadressen in den alternativen Namen eingeben. Sie können auch mehrere E-"
-"Mailadressen eingeben, aber bitte immer nur eine pro Formularfeld."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID"
-msgstr "Microsoft GUID"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID_DESCRIPTION"
-msgstr ""
-"Eine Microsoft GUID, welche kompatibel mit der UUID aus RFC 4122 ist, wird "
-"benutzt, um Computer wie Domain Controller eindeutig identifizieren zu "
-"können. Wenn Sie also ein Zertifikat für einen Domain Controller benötigen, "
-"dann müssen Sie die GUID angeben."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP"
-msgstr "IP-Adresse"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP_DESCRIPTION"
-msgstr ""
-"Die IP-Adresse ist die tatsächliche Adresse eines Computers. Eine IPv4-"
-"Adresse sieht wie folgt aus: 123.123.123.123. Eine IPv6-Adresse sieht etwas "
-"anders aus: 11ad::de01:adf. Diese Art von Namen sollte ausgefüllt werden, "
-"wenn Sie ein Serverzertifikat benatragen, weil manchmal Server direkt über "
-"Ihre IP-Adresse und nicht über ihren DNS-Namen adressiert werden. Wenn dies "
-"geschieht, dann nutzt der Eintrag des DNS-Namens im Zertifikat nichts mehr, "
-"da dieser DNS-Name auf dem Client nicht zur Verfügung steht."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID"
-msgstr "Registered ID"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID_DESCRIPTION"
-msgstr "Für diesen alternativen Namen liegt derzeit keine Beschreibung vor."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN"
-msgstr "Microsoft UPN"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN_DESCRIPTION"
-msgstr ""
-"Der Microsoft Universal Prinicipal Name (UPN) sieht aus wie eine E-"
-"Mailadresse, aber er ist keine E-Mailadresse. Es ist der Account plus die "
-"Domäne. Beispiel: testuser@openxpki.org. Im Beispiel ist testuser der "
-"Account und openxpki.org die Domäne. Bitte lesen Sie Microsofts Whitepaper, "
-"wenn Sie nähere Informationen benötigen oder fragen Sie Ihre Administratoren."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI"
-msgstr "URI"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI_DESCRIPTION"
-msgstr ""
-"Ein Uniform Ressource Identifier (URI) kann eine beliebige Adresse oder "
-"Referenz auf weitere Informationsquellen bzgl. Zertifikatsnutzers sein. "
-"Beispiel: www.openxpki.org/~testuser."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_IE_PKCS10"
@@ -1353,8 +1294,16 @@ msgstr "Aufgetretene Fehler"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_WORKFLOW_TYPE"
 msgstr "Workflowart"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SHOW_CSR_BRIEF_DETAILED_LINK"
+msgstr "Details der Workflowinstanz"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED"
 msgstr "Die Personalisierung funktioniert nur mit Microsoft Internet Explorer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SOURCE"
+msgstr "Zurücksetzen"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC"
 msgstr "SPKAC"
@@ -1527,6 +1476,10 @@ msgstr "beliebig"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL"
 msgstr "Seriennummer des Workflowprozesses"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_CSR_BRIEF_TITLE"
+msgstr "Details der Workflowinstanz"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES"
 msgstr "Verfügbare Aktivitäten"
 
@@ -1597,6 +1550,26 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_SCEP_INVALID_OP"
 msgstr "SPKAC"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_COLLECT"
+msgstr "Aufgetretene Fehler"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_SEND_SERVICE_MSG"
+msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_SEND_SERVICE_MSG_TALK_FAILED"
+msgstr "Download des privaten Schlüssels fehlgeschlagen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_SIGNAL_CAUGHT"
+msgstr "SPKAC"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_TALK_ERROR_DURING_WRITE"
+msgstr "Web-Schnittstelle des Trustcenters"
+
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR"
 msgstr ""
 
@@ -1647,6 +1620,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_SIGN_ERROR"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CN_DESC"
+msgstr "ja"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_COMMENT"
+msgstr "Kommentar"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_COMMENT_DESC"
+msgstr "ja"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE"
@@ -2660,6 +2645,10 @@ msgstr "Seriennummer des Workflowprozesses"
 msgid "I18N_OPENXPKI_CSR_SERIAL"
 msgstr "Seriennummer des Zertifizierungsantrages"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_C_DESC"
+msgstr "ja"
+
 msgid "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_DATE"
 msgstr ""
 
@@ -2672,6 +2661,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_DC_DESC"
+msgstr "ja"
+
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA"
 msgstr "Test Dummy CA"
 
@@ -2683,6 +2676,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_DOWNLOAD_CHAIN"
 msgstr "Herunterladen der kompletten Zertifizierungskette"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_EMAILADDRESS"
+msgstr "E-Mailadresse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_EMAILADDRESS_DESC"
+msgstr "ja"
 
 msgid "I18N_OPENXPKI_FAILED"
 msgstr ""
@@ -2747,6 +2748,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_GET_SAFE_TMPFILE_MISSING_TMP"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HOSTNAME"
+msgstr "Rückwärts"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HOSTNAME_DESC"
+msgstr "uid"
 
 msgid "I18N_OPENXPKI_HTML_COMMENT"
 msgstr "Kommentar"
@@ -2827,6 +2836,10 @@ msgid "I18N_OPENXPKI_HTML_MASON_CERT_INFO_NEW_CRR"
 msgstr "Rückrufantrag für dieses Zertifikat stellen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_CHANGE"
+msgstr "Seite"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_CRR_INVALID_WORKFLOW_TYPE"
 msgstr "Name des Workflows"
 
@@ -2891,6 +2904,9 @@ msgstr "Rückrufantrag (CRR)"
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "Neuer Antrag (CSR)"
 
+msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
+msgstr "Datenaustausch"
+
 msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT"
 msgstr "Export"
 
@@ -2931,6 +2947,9 @@ msgstr "Zertifikats-Suche"
 #, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS"
 msgstr "Abgelaufene"
+
+msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
+msgstr "Smartcard personalisieren"
 
 msgid "I18N_OPENXPKI_HTML_MENU_VALID_CERTS"
 msgstr "Gültige"
@@ -3082,17 +3101,77 @@ msgstr "nein"
 msgid "I18N_OPENXPKI_NOT_AVAILABLE"
 msgstr "nicht verfügbar"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_O"
+msgstr "nein"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_OPTIONAL"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_OU"
+msgstr "nein"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_OU_DESC"
+msgstr "ja"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_O_DESC"
+msgstr "ja"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PHONE"
+msgstr "nein"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PHONE_DESC"
+msgstr "ja"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PORT"
+msgstr "nein"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PORT_DESC"
+msgstr "Zertifikat ist CA"
+
 msgid "I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD"
 msgstr "Privaten Schlüssel und Zertifkat herunterladen"
 
 msgid "I18N_OPENXPKI_PRIVKEY_DOWNLOAD"
 msgstr "Privaten Schlüssel herunterladen"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_ADVANCED_DESC"
+msgstr "TLS-Server"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_ADVANCED_STYLE"
+msgstr "TLS-Server"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC"
+msgstr "TLS-Server"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE"
+msgstr "TLS-Server"
+
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
 msgstr "TLS-Server"
 
 msgid "I18N_OPENXPKI_PROFILE_USER"
 msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_DESC"
+msgstr "TLS-Server"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_STYLE"
+msgstr "TLS-Server"
 
 msgid "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST"
 msgstr ""
@@ -3105,6 +3184,98 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_READ_FILE_OPEN_FAILED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_REALNAME"
+msgstr "Rückwärts"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_REALNAME_DESC"
+msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_DNS"
+msgstr "CA-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_DNS_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account oder "
+"auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
+"dient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_EMAIL"
+msgstr "E-Mailadresse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_EMAIL_DESCRIPTION"
+msgstr "Die E-Mailadresse, welche im Zertifikat enthalten ist."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_GUID"
+msgstr "CA-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_GUID_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account oder "
+"auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
+"dient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_IP"
+msgstr "CA-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_IP_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account oder "
+"auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
+"dient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_OID"
+msgstr "CA-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_OID_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account oder "
+"auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
+"dient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_RID"
+msgstr "CA-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_RID_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account oder "
+"auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
+"dient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_UPN"
+msgstr "nein"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_UPN_DESCRIPTION"
+msgstr ""
+"Die Organisationseinheit (ou) kann benutzt werden, um organisatorische "
+"Strukturen wie Abteilungen, Institute oder Fakultäten abzubilden."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_URI"
+msgstr "CA-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_URI_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account oder "
+"auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
+"dient der sichern Identifikation von Personen oder Objekten."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SECRET_ACTION"
@@ -3186,6 +3357,10 @@ msgstr "Aktivität nicht implementiert"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN"
 msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_PROFILE_INDEX_PROFILE_NOT_FOUND"
+msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
@@ -4319,6 +4494,30 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVAL_SIGNATURE_SIGNATURE_NOT_
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTPROFILE_PROFILE_NOT_VALID_FOR_ROLE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_DID_NOT_MATCH_REGEX"
+msgstr "IP-Adresse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_PART_NOT_AVAILABLE_BUT_REQUIRED"
+msgstr "Microsoft GUID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_SELECT_DID_NOT_MATCH_OPTIONS"
+msgstr "DNS"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_TOO_LITTLE_ELEMENTS"
+msgstr "DNS"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_TOO_MANY_ENTRIES_FOR_PART"
+msgstr "IP-Adresse"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_ID_MISMATCH"
 msgstr "Prozesse anzeigen"
 
@@ -4771,11 +4970,27 @@ msgstr ""
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_DAMAGED_MESSAGE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_FAILED"
+msgstr "Antrag im DC-Stil"
+
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_WRONG_MESSAGE_TYPE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_ERROR_DURING___SEND"
+msgstr "Antrag im OU-Stil"
+
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_USERNAME"
+msgstr "Rückwärts"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_USERNAME_DESC"
+msgstr "uid"
 
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 msgstr "Genehmigen eines Zertifizierungsantrages"
@@ -5152,9 +5367,6 @@ msgstr "Erstellen von CRLs"
 msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION"
 msgstr "Speichern eines privaten Schlüssels"
 
-msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
-msgstr "Speichern eines privaten Schlüssels"
-
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_AUTHORIZATION_FAILED"
 msgstr ""
 
@@ -5169,6 +5381,38 @@ msgstr "Start der Zertifikatserstellung"
 #, fuzzy
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_UNSUPPORTED_CSR_TYPE"
 msgstr "Zertifikatserstellung vorbereitet"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_IMPORT_CERTIFICATE_TOKEN_UNAVAILABLE"
+msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_CONVERSION_FAILED"
+msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_BIND_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_CONNECTION_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MISSING_NODE"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MODIFY_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_SEARCH_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_TOKEN_UNAVAILABLE"
+msgstr "Start der Zertifikatserstellung"
 
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_DEFAULT_TOKEN_UNAVAILABLE"
 msgstr ""
@@ -5254,6 +5498,93 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "ja"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_MORE_SUBJECT_ALTERNATIVE_FIELDS"
+#~ msgstr "DNS"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME"
+#~ msgstr "DirName"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME_DESCRIPTION"
+#~ msgstr ""
+#~ "Dieses Feld enthält eine Referenz auf einen Eintrag in einem Directory-"
+#~ "Server (auch als Verzeichnisdienst bekannt). Der Eintrag in diesem "
+#~ "Directry-Server enthält evtl. weitere Informationen über den Eigentümer "
+#~ "des Zertifikates."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS"
+#~ msgstr "DNS"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS_DESCRIPTION"
+#~ msgstr ""
+#~ "Ein DNS-Name ist ein Menschen-lesbarer Name für einen Computer. Beispiel: "
+#~ "www.openxpki.org."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL"
+#~ msgstr "E-Mailadresse"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL_DESCRIPTION"
+#~ msgstr ""
+#~ "Eine E-Mailadresse sollte nicht direkt in den Namen des Zertifikates "
+#~ "(engl. subject or distinguished name) eingegeben werden. Deshalb sollten "
+#~ "Sie E-Mailadressen in den alternativen Namen eingeben. Sie können auch "
+#~ "mehrere E-Mailadressen eingeben, aber bitte immer nur eine pro "
+#~ "Formularfeld."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID"
+#~ msgstr "Microsoft GUID"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID_DESCRIPTION"
+#~ msgstr ""
+#~ "Eine Microsoft GUID, welche kompatibel mit der UUID aus RFC 4122 ist, "
+#~ "wird benutzt, um Computer wie Domain Controller eindeutig identifizieren "
+#~ "zu können. Wenn Sie also ein Zertifikat für einen Domain Controller "
+#~ "benötigen, dann müssen Sie die GUID angeben."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP"
+#~ msgstr "IP-Adresse"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP_DESCRIPTION"
+#~ msgstr ""
+#~ "Die IP-Adresse ist die tatsächliche Adresse eines Computers. Eine IPv4-"
+#~ "Adresse sieht wie folgt aus: 123.123.123.123. Eine IPv6-Adresse sieht "
+#~ "etwas anders aus: 11ad::de01:adf. Diese Art von Namen sollte ausgefüllt "
+#~ "werden, wenn Sie ein Serverzertifikat benatragen, weil manchmal Server "
+#~ "direkt über Ihre IP-Adresse und nicht über ihren DNS-Namen adressiert "
+#~ "werden. Wenn dies geschieht, dann nutzt der Eintrag des DNS-Namens im "
+#~ "Zertifikat nichts mehr, da dieser DNS-Name auf dem Client nicht zur "
+#~ "Verfügung steht."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID"
+#~ msgstr "Registered ID"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID_DESCRIPTION"
+#~ msgstr "Für diesen alternativen Namen liegt derzeit keine Beschreibung vor."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN"
+#~ msgstr "Microsoft UPN"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN_DESCRIPTION"
+#~ msgstr ""
+#~ "Der Microsoft Universal Prinicipal Name (UPN) sieht aus wie eine E-"
+#~ "Mailadresse, aber er ist keine E-Mailadresse. Es ist der Account plus die "
+#~ "Domäne. Beispiel: testuser@openxpki.org. Im Beispiel ist testuser der "
+#~ "Account und openxpki.org die Domäne. Bitte lesen Sie Microsofts "
+#~ "Whitepaper, wenn Sie nähere Informationen benötigen oder fragen Sie Ihre "
+#~ "Administratoren."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI"
+#~ msgstr "URI"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI_DESCRIPTION"
+#~ msgstr ""
+#~ "Ein Uniform Ressource Identifier (URI) kann eine beliebige Adresse oder "
+#~ "Referenz auf weitere Informationsquellen bzgl. Zertifikatsnutzers sein. "
+#~ "Beispiel: www.openxpki.org/~testuser."
+
+#~ msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
+#~ msgstr "Speichern eines privaten Schlüssels"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
@@ -5565,12 +5896,6 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_CRL_REASON_UNSPECIFIED"
 #~ msgstr "uid"
 
-#~ msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
-#~ msgstr "Datenaustausch"
-
-#~ msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
-#~ msgstr "Smartcard personalisieren"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
 #~ msgstr "Prozesse anzeigen"
@@ -5679,9 +6004,6 @@ msgstr "ja"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
 #~ msgstr "Warten"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED"
-#~ msgstr "Download des privaten Schlüssels fehlgeschlagen"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
@@ -6013,8 +6335,3 @@ msgstr "ja"
 #~ "Der alternative Namenstyp __TYPE__ ist unbekannt. Meistens handelt es "
 #~ "sich hierbei um eine Fehlkonfiguration. Bitte wenden Sie sich an die "
 #~ "Administratoren."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_GUID"
-#~ msgstr ""
-#~ "Die GUID __GUID__ ist falsch. Es werden sowohl das RFC 4122 Format als "
-#~ "auch die übliche Microsoft-Schreibweise akzeptiert."

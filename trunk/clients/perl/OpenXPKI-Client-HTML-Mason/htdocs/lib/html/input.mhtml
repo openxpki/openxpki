@@ -4,10 +4,12 @@
     $value => undef
     $min   => undef
     $max   => undef
+    $width => 20
+    $height => 10
 </%args>
 % if ($type eq "textarea")
 % {
-<textarea name="<& '/lib/html/safe.mhtml', 'data' => $name &>" maxlength="<& '/lib/html/safe.mhtml', 'data' => $max &>" rows="5"><& '/lib/html/safe.mhtml', 'data' => $value &></textarea>
+<textarea name="<& '/lib/html/safe.mhtml', 'data' => $name &>" maxlength="<& '/lib/html/safe.mhtml', 'data' => $max &>" rows="<% $height %>"><& '/lib/html/safe.mhtml', 'data' => $value &></textarea>
 % } else {
-<input type="<& '/lib/html/safe.mhtml', 'data' => $type &>" name="<& '/lib/html/safe.mhtml', 'data' => $name &>" value="<& '/lib/html/safe.mhtml', 'data' => $value &>" maxlength="<& '/lib/html/safe.mhtml', 'data' => $max &>"/>
+<input type="<& '/lib/html/safe.mhtml', 'data' => $type &>" name="<& '/lib/html/safe.mhtml', 'data' => $name &>" value="<& '/lib/html/safe.mhtml', 'data' => $value &>" size="<& '/lib/html/safe.mhtml', 'data' => $width &>" maxlength="<& '/lib/html/safe.mhtml', 'data' => $max &>"/>
 % }

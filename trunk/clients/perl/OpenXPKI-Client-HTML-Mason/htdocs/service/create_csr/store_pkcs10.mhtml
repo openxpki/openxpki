@@ -6,8 +6,9 @@
     $keygen        => undef
     $pkcs10        => undef
     $subject       => undef
-    $subject_alt_name => undef
-    $info          => undef
+    $subject_alt_name_parts => undef
+    $subject_parts => undef
+    $info          => "test_store_pkcs10"
 </%args>
 <%init>
     ## if (not $pkcs10)
@@ -18,8 +19,8 @@
                         'role'          => $role,
                         'profile'       => $profile,
                         'subject_style' => $subject_style,
-                        'subject'       => $subject,
-                        'subject_alt_name' => $subject_alt_name,
+                        'subject_parts' => $subject_parts,
+                        'subject_alt_name_parts' => $subject_alt_name_parts,
                         'info'          => $info,
                         'pkcs10'        => $pkcs10);
     ## perhaps we should put this into a component like get_error.mhtml?
@@ -37,3 +38,4 @@
 
     ## ok we have to display the whole stuff
 </%init>
+<% Dumper $msg %>

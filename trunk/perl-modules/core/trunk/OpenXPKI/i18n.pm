@@ -12,6 +12,7 @@ package OpenXPKI::i18n;
 use English;
 
 use OpenXPKI::Exception;
+use OpenXPKI::Debug 'OpenXPKI::i18n';
 use Locale::Messages qw (:locale_h :libintl_h nl_putenv bind_textdomain_filter);
 use POSIX qw (setlocale);
 use Encode;

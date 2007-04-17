@@ -3,23 +3,19 @@
     $role          => undef
     $profile       => undef
     $subject_style => undef
-    $CONFIG        => undef
 </%args>
 <& /service/open_form.mhtml &>
-<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
-<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
-<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
+<& /lib/html/hidden_reqargs.mhtml &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_TITLE') %></h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_DESCRIPTION') %>
 </p>
 <select name="subject_style">
-%   foreach my $style (sort keys %{$CONFIG})
+%   foreach my $key (sort keys %styles)
 %   {
-%       next if (not exists $types{$style});
-  <option value="<% $style %>">
-    <% i18nGettext($types{$style}->{LABEL}) %>
+  <option value="<% $key %>">
+    <% i18nGettext($styles{$key}->{LABEL}) %>
   </option>
 %   }
 </select>
@@ -29,30 +25,36 @@
 <& /service/create_csr/print_descriptions.mhtml, descriptions => \%descriptions &>
 
 <%init>
-    ## load available subject profiles from server
+    ## load available subject styles for this profile from server
     my $msg = $context->{client}->send_receive_command_msg (
-                   "get_cert_subject_profiles",
-                   {PROFILE => $profile});
-    my %types = %{$msg->{PARAMS}};
+                   "get_cert_subject_styles",
+                   {
+                        PROFILE => $profile
+                   }
+    );
+    my %styles = ();
+    if (defined $msg->{PARAMS} && ref $msg->{PARAMS} eq 'HASH') {
+        %styles = %{$msg->{PARAMS}};
+    }
+    # TODO - error handling
 
     ## if we have only one configuration
-    ## then we have not to ask the user
-    if (scalar keys %{$CONFIG} == 1)
-    {
-        $subject_style = join "", keys %{$CONFIG};
+    ## then we do not need to ask the user
+    if (scalar keys %styles == 1) {
+        foreach my $key (keys %styles) {
+            $subject_style = $key;
+        }
     }
 
     ## return the configuration number if it exists
     return $subject_style
-        if (defined $subject_style and
-            exists $CONFIG->{$subject_style} and
-            exists $types{$subject_style});
+        if (defined $subject_style);
 
     ## ok, we have to ask the user
     my %descriptions = ();
-    foreach my $type (sort keys %types)
+    foreach my $key (sort keys %styles)
     {
-        $descriptions{i18nGettext($types{$type}->{LABEL})} = 
-            i18nGettext($types{$type}->{DESCRIPTION});
+        $descriptions{i18nGettext($styles{$key}->{LABEL})} = 
+            i18nGettext($styles{$key}->{DESCRIPTION});
     }
 </%init>

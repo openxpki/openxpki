@@ -3,7 +3,7 @@
   $revocation => undef
 </%args>
 <h1>
-  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE') %>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE', __SERIAL__ => $serial) %>
 </h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION') %>
@@ -220,6 +220,8 @@
   my $notafter    = $params->{NOTAFTER};
   my $issuer      = $params->{ISSUER};
   my $fingerprint = $params->{FINGERPRINT};
+  my $serial      = $params->{SERIAL};
+  $serial .= ' (0x' . sprintf("%0x", $serial) . ')';
   my $status      = $msg->{PARAMS}->{STATUS};
   
   my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = gmtime(time);

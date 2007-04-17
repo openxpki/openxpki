@@ -222,7 +222,13 @@ sub __get_menu_link
     }
 
     ## include all common parameters
-    $link .= "?";
+    if ($link =~ m{ \? }xms) {
+        # link already contains a ?, so someone probably put a
+        # parameter in activity, no need to append it
+    }
+    else {
+        $link .= "?";
+    }
     foreach my $item (keys %result)
     {
         next if (not defined $item);

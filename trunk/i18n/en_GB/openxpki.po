@@ -489,9 +489,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_TITLE"
 msgstr "Trustcenter Web Interface"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_MORE_SUBJECT_ALTERNATIVE_FIELDS"
-msgstr "Click here if you need more input fields"
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
 msgstr ""
 "Following you can find the most important information about the selected CA "
@@ -528,7 +525,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_SUSPENDED_DESC"
 msgstr "This certificate has been suspended and should not be used currently."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE"
-msgstr "Certificate"
+msgstr "Certificate #__SERIAL__"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
 msgstr "Here you can see the result of your search."
@@ -653,7 +650,7 @@ msgstr "Create private key"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DEFAULT_CSP"
-msgstr "Now you can generate a new SPKAC key with your browser."
+msgstr "In the last step, please choose the key length of your private key. Your browser will generate a new SPKAC key for you and submit the certificate request to the CA."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DESCRIPTION"
@@ -778,7 +775,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_TITLE"
 msgstr "Choose a role"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_DESCRIPTION"
-msgstr "Now you can generate a new SPKAC key with your browser."
+msgstr "In the last step, please choose the key length of your private key. Your browser will generate a new SPKAC key for you and submit the certificate request to the CA."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_TITLE"
 msgstr "Create private key"
@@ -801,8 +798,21 @@ msgstr ""
 "what to enter then please read the descriptions of the fields at the end of "
 "this page."
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_MORE_FIELDS"
+msgstr "+1"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_NO_VALUE_OPTIONAL"
+msgstr "(no value, this field is optional)"
+"The name of the certificate is build from the values of the following form "
+"fields. Please enter the required information. If you are not sure about "
+"what to enter then please read the descriptions of the fields at the end of "
+"this page."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_DESCRIPTION"
-msgstr "Please choose now a style for the certificates name."
+msgstr ""
+"Please choose a style for the certificate's name. Depending on the style, "
+"you'll be asked for more or less information which will be included in the "
+"certificate."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_TITLE"
 msgstr "Choose a naming style"
@@ -825,81 +835,12 @@ msgstr "Copy and paste the password here"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_PASSWORD_GENERATED_PASSWORD"
 msgstr "Password generated for you"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SAN_ADD_5"
+msgstr "+5"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME"
-msgstr "DirName"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME_DESCRIPTION"
-msgstr ""
-"The DirName is a reference to an entry in a directory server which includes "
-"information about the certificate owner."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS"
-msgstr "DNS"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS_DESCRIPTION"
-msgstr ""
-"A DNS name is the human readable name of a machine. Example: www.openxpki."
-"org."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL"
-msgstr "emailAddress"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL_DESCRIPTION"
-msgstr ""
-"This field can contain an email address. Email addresses should not be "
-"included in the name of the certificate (subject). Therefore you should add "
-"it to the subject alternative name. You can add several different email "
-"addresses to the subject alternative name but please add only one address "
-"per form field."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID"
-msgstr "Microsoft GUID"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID_DESCRIPTION"
-msgstr ""
-"Microsoft GUID which is compatible with the UUID of RFC 4122 is used to "
-"identify machines like domain controllers. If you need a certificate for a "
-"domain controller then you must specify the GUID or it will not work."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP"
-msgstr "IP"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP_DESCRIPTION"
-msgstr ""
-"The IP address is the real address of any computer. An IPv4 address looks "
-"like 123.123.123.123 and IPv6 address looks like 11ad::de01:adf. This field "
-"should be filled if you request a certificate for a server because sometimes "
-"the server will be addressed directly by its IP address and not by its DNS "
-"name. If this happens then the DNS entries in the subject alternative name "
-"does not help."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID"
-msgstr "Registered ID"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID_DESCRIPTION"
-msgstr "No description available today."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN"
-msgstr "Microsoft UPN"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN_DESCRIPTION"
-msgstr ""
-"The Microsoft Universal Prinicipal Name (UPN) looks like an email address "
-"but it is no email address. It is the account plus the domain. Example: "
-"testuser@openxpki.org. Here it is the account testuser of the domain "
-"openxpki.org. Please see Microsoft's documentation if you need more "
-"information. Their whitepapers are really good in this case."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI"
-msgstr "URI"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI_DESCRIPTION"
-msgstr ""
-"Uniform Ressource Identifier (URI) can be any address or reference to an "
-"information source. Example: www.openxpki.org/~testuser."
+msgstr "Subject alternative name"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_IE_PKCS10"
@@ -1199,7 +1140,6 @@ msgstr "Page"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWD"
 msgstr "Password"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10"
 msgstr "PKCS#10"
 
@@ -1273,16 +1213,14 @@ msgstr "Errors"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_WORKFLOW_TYPE"
 msgstr "Workflow type"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SHOW_CSR_BRIEF_DETAILED_LINK"
-msgstr "Automatic browser detection"
+msgstr "Show detailed workflow instance information"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED"
 msgstr "Personalization needs Microsoft Internet Explorer to work"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SOURCE"
-msgstr "reset"
+msgstr "Source"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC"
 msgstr "SPKAC"
@@ -1378,6 +1316,10 @@ msgstr "Key generation"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_TYPE"
 msgstr "CSR type"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
+msgstr "Key generation"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
 msgstr "Description"
 
@@ -1391,6 +1333,10 @@ msgstr "Get workflow instance information"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Last update"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
+msgstr "Workflow instances"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
 msgstr ""
@@ -1438,9 +1384,8 @@ msgstr "any"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL"
 msgstr "Workflow serial"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_CSR_BRIEF_TITLE"
-msgstr "Workflow instance"
+msgstr "Certificate Signing Request #__WORKFLOWID__ (__STATE__)"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES"
 msgstr "Available activities"
@@ -1562,6 +1507,10 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
+msgstr "Additional informations"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED"
 msgstr "Additional informations"
 
@@ -1576,6 +1525,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_SIGN_ERROR"
 msgstr ""
+
+msgid "I18N_OPENXPKI_CN_DESC"
+msgstr "Common Name"
+
+msgid "I18N_OPENXPKI_COMMENT"
+msgstr "Comment"
+
+msgid "I18N_OPENXPKI_COMMENT_DESC"
+msgstr "For information for the registration officers"
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE"
 msgstr ""
@@ -2507,6 +2465,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_CSR_SERIAL"
 msgstr "CSR serial"
 
+msgid "I18N_OPENXPKI_C_DESC"
+msgstr "Country"
+
 msgid "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_DATE"
 msgstr ""
 
@@ -2519,6 +2480,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT"
 msgstr ""
 
+msgid "I18N_OPENXPKI_DC_DESC"
+msgstr "Domain Component"
+
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA"
 msgstr "Test Dummy CA"
 
@@ -2530,6 +2494,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_DOWNLOAD_CHAIN"
 msgstr "Download complete certificate chain"
+
+msgid "I18N_OPENXPKI_EMAILADDRESS"
+msgstr "E-mail:"
+
+msgid "I18N_OPENXPKI_EMAILADDRESS_DESC"
+msgstr "Your e-mail address, for example john.doe@example.com"
 
 msgid "I18N_OPENXPKI_FAILED"
 msgstr "failed"
@@ -2595,11 +2565,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_GET_SAFE_TMPFILE_MISSING_TMP"
 msgstr ""
 
+msgid "I18N_OPENXPKI_HOSTNAME"
+msgstr "Hostname"
+
+msgid "I18N_OPENXPKI_HOSTNAME_DESC"
+msgstr "This is the (fully qualified) hostname"
+
 msgid "I18N_OPENXPKI_HTML_COMMENT"
 msgstr "Comment"
 
 msgid "I18N_OPENXPKI_HTML_COMMENT_DESCRIPTION"
-msgstr "This fiedl can be used for a normal comment."
+msgstr "This field can be used for a normal comment."
 
 msgid "I18N_OPENXPKI_HTML_COMMON_NAME"
 msgstr "Common name"
@@ -2664,9 +2640,8 @@ msgstr "Get a graphical workflow overview"
 msgid "I18N_OPENXPKI_HTML_MASON_CERT_INFO_NEW_CRR"
 msgstr "Create a certificate revocation request (CRR) for this certificate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_CHANGE"
-msgstr "Page"
+msgstr "Edit"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_CRR_INVALID_WORKFLOW_TYPE"
@@ -2716,6 +2691,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE"
 msgstr "Waiting for certificate issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
+msgstr "Additional information"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
+msgstr "Description"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
+msgstr "Last update"
 
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
 msgstr "CA Info"
@@ -2779,6 +2766,10 @@ msgstr "Workflow"
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
 msgstr "Create instance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
+msgstr "List instances"
 
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
 msgstr "List instances"
@@ -2928,17 +2919,72 @@ msgstr "no"
 msgid "I18N_OPENXPKI_NOT_AVAILABLE"
 msgstr "n/a"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_O"
+msgstr "no"
+
+msgid "I18N_OPENXPKI_OPTIONAL"
+msgstr "optional"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_OU"
+msgstr "no"
+
+msgid "I18N_OPENXPKI_OU_DESC"
+msgstr "Organizational Unit"
+
+msgid "I18N_OPENXPKI_O_DESC"
+msgstr "Organization"
+
+msgid "I18N_OPENXPKI_PHONE"
+msgstr "Phone"
+
+msgid "I18N_OPENXPKI_PHONE_DESC"
+msgstr "A telephone number under which you can be reached for questions regarding your certificate request"
+
+msgid "I18N_OPENXPKI_PORT"
+msgstr "Port"
+
+msgid "I18N_OPENXPKI_PORT_DESC"
+msgstr "The (TCP) port that is used with the certificate"
+
 msgid "I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD"
 msgstr "Download private key and certificate"
 
 msgid "I18N_OPENXPKI_PRIVKEY_DOWNLOAD"
 msgstr "Download private key"
 
+msgid "I18N_OPENXPKI_PROFILE_ADVANCED_DESC"
+msgstr ""
+"Choose this style if you know exactly how your certificate subject is "
+"supposed to look like and have a good understanding of the certificate "
+"subject components and your local naming conventions. It also allows you to "
+"set arbitrary subject alternative names."
+
+msgid "I18N_OPENXPKI_PROFILE_ADVANCED_STYLE"
+msgstr "Advanced naming style"
+
+msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC"
+msgstr ""
+"If you use this style, you will just have to enter the hostname and port of "
+"the server for which you want a certificate. This is the easiest way to "
+"obtain your certificate, use it if you have no specific requirement for "
+"which you would need the advanced style."
+
+msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE"
+msgstr "Basic TLS style"
+
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
 msgstr "TLS Server profile"
 
 msgid "I18N_OPENXPKI_PROFILE_USER"
 msgstr "User profile"
+
+msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_DESC"
+msgstr "If you use this style, you'll only be required to enter your name, username and e-mail address. This is the easiest way to obtain a certificate, use it if you have no specific requirement for which you would need the advanced style."
+
+msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_STYLE"
+msgstr "Basic user naming style"
 
 msgid "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST"
 msgstr ""
@@ -2951,6 +2997,83 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_READ_FILE_OPEN_FAILED"
 msgstr ""
+
+msgid "I18N_OPENXPKI_REALNAME"
+msgstr "Realname"
+
+msgid "I18N_OPENXPKI_REALNAME_DESC"
+msgstr "Your real name, for example 'John Doe'"
+
+msgid "I18N_OPENXPKI_SAN_DNS"
+msgstr "DNS"
+
+msgid "I18N_OPENXPKI_SAN_DNS_DESCRIPTION"
+msgstr ""
+"A DNS name is the human readable name of a machine. Example: www.openxpki."
+"org."
+
+msgid "I18N_OPENXPKI_SAN_EMAIL"
+msgstr "emailAddress"
+
+msgid "I18N_OPENXPKI_SAN_EMAIL_DESCRIPTION"
+msgstr ""
+"This field can contain an email address. Email addresses should not be "
+"included in the name of the certificate (subject). Therefore you should add "
+"it to the subject alternative name. You can add several different email "
+"addresses to the subject alternative name but please add only one address "
+"per form field."
+
+msgid "I18N_OPENXPKI_SAN_GUID"
+msgstr "Microsoft GUID"
+
+msgid "I18N_OPENXPKI_SAN_GUID_DESCRIPTION"
+msgstr ""
+"Microsoft GUID which is compatible with the UUID of RFC 4122 is used to "
+"identify machines like domain controllers. If you need a certificate for a "
+"domain controller then you must specify the GUID or it will not work."
+
+msgid "I18N_OPENXPKI_SAN_IP"
+msgstr "IP"
+
+msgid "I18N_OPENXPKI_SAN_IP_DESCRIPTION"
+msgstr ""
+"The IP address is the real address of any computer. An IPv4 address looks "
+"like 123.123.123.123 and IPv6 address looks like 11ad::de01:adf. This field "
+"should be filled if you request a certificate for a server because sometimes "
+"the server will be addressed directly by its IP address and not by its DNS "
+"name. If this happens then the DNS entries in the subject alternative name "
+"does not help."
+
+msgid "I18N_OPENXPKI_SAN_OID"
+msgstr "OID"
+
+msgid "I18N_OPENXPKI_SAN_OID_DESCRIPTION"
+msgstr "Using this field you can add arbitrary object identifiers (OIDs) and values for them. You will probably need this very rarely."
+
+msgid "I18N_OPENXPKI_SAN_RID"
+msgstr "Registered ID"
+
+msgid "I18N_OPENXPKI_SAN_RID_DESCRIPTION"
+msgstr "No description available today."
+
+msgid "I18N_OPENXPKI_SAN_UPN"
+msgstr "Microsoft UPN"
+
+msgid "I18N_OPENXPKI_SAN_UPN_DESCRIPTION"
+msgstr ""
+"The Microsoft Universal Prinicipal Name (UPN) looks like an email address "
+"but it is no email address. It is the account plus the domain. Example: "
+"testuser@openxpki.org. Here it is the account testuser of the domain "
+"openxpki.org. Please see Microsoft's documentation if you need more "
+"information. Their whitepapers are really good in this case."
+
+msgid "I18N_OPENXPKI_SAN_URI"
+msgstr "URI"
+
+msgid "I18N_OPENXPKI_SAN_URI_DESCRIPTION"
+msgstr ""
+"Uniform Ressource Identifier (URI) can be any address or reference to an "
+"information source. Example: http://www.openxpki.org/~testuser/."
 
 msgid "I18N_OPENXPKI_SECRET_ACTION"
 msgstr "Action"
@@ -3033,6 +3156,12 @@ msgstr "Workflow types"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN"
 msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_PROFILE_INDEX_PROFILE_NOT_FOUND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
@@ -4358,6 +4487,23 @@ msgstr "The SPKAC string is empty."
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTPROFILE_PROFILE_NOT_VALID_FOR_ROLE"
 msgstr "The SPKAC string is empty."
 
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_DID_NOT_MATCH_REGEX"
+msgstr "The entry for __PART__ did not match the required regular expression (__REGEX__). Please check if your entry conforms to the naming convention."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_PART_NOT_AVAILABLE_BUT_REQUIRED"
+msgstr ""
+"The __PART__ field is empty but the configuration requires a value for this field. Please enter a value for __PART__."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_SELECT_DID_NOT_MATCH_OPTIONS"
+msgstr "The name __DNS__ is not a valid DNS entry."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_TOO_LITTLE_ELEMENTS"
+msgstr "__MIN__ elements are required for field __PART__, but you have only provided __AMOUNT__."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_TOO_MANY_ENTRIES_FOR_PART"
+msgstr "At most __MAX__ elements can be specified for field __PART__, but you specified __ENTRIES__."
+
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_ID_MISMATCH"
 msgstr "The SPKAC string is empty."
@@ -4540,13 +4686,53 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_NO_PKI_REALM_CONFIGURED"
 msgstr ""
 "The used subject style requires at minimum one organizational unit and two "
 "domain components."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
+msgstr ""
+"The used subject style requires at minimum one organizational unit, one "
+"organization and one country."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
+msgstr "The used suject style requires a UID plus a common name."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
@@ -4826,6 +5012,12 @@ msgstr "CSR with OU-style"
 
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 msgstr ""
+
+msgid "I18N_OPENXPKI_USERNAME"
+msgstr "Username"
+
+msgid "I18N_OPENXPKI_USERNAME_DESC"
+msgstr "Your username or account, for example 'jdoe'"
 
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 msgstr "Approve CSR"
@@ -5180,9 +5372,6 @@ msgstr "CRL Issuance"
 msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION"
 msgstr "Smartcard personalization"
 
-msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
-msgstr ""
-
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_AUTHORIZATION_FAILED"
 msgstr ""
 
@@ -5307,11 +5496,121 @@ msgstr ""
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
 
-#~ msgid "I18N_OPENXPKI_CA_SUBJECT"
-#~ msgstr "Subject"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_MORE_SUBJECT_ALTERNATIVE_FIELDS"
+#~ msgstr "Subject alternative name"
 
-#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
-#~ msgstr "Microsoft Internet Explorer with matching private key"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME"
+#~ msgstr "Subject alternative name"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME_DESCRIPTION"
+#~ msgstr ""
+#~ "A certificate can have several so called alternative names. These names "
+#~ "gives more information about the certificate users. Certificates for "
+#~ "servers usually include the DNS names and IP addresses of the server. "
+#~ "Normal user certificates include the email address. If you use Microsoft "
+#~ "Smartcardlogin then you must set the UPN. So please set now your required "
+#~ "alternative names."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS"
+#~ msgstr "Subject alternative name"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS_DESCRIPTION"
+#~ msgstr ""
+#~ "A certificate can have several so called alternative names. These names "
+#~ "gives more information about the certificate users. Certificates for "
+#~ "servers usually include the DNS names and IP addresses of the server. "
+#~ "Normal user certificates include the email address. If you use Microsoft "
+#~ "Smartcardlogin then you must set the UPN. So please set now your required "
+#~ "alternative names."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL"
+#~ msgstr "Subject alternative name"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_EMAIL_DESCRIPTION"
+#~ msgstr ""
+#~ "A certificate can have several so called alternative names. These names "
+#~ "gives more information about the certificate users. Certificates for "
+#~ "servers usually include the DNS names and IP addresses of the server. "
+#~ "Normal user certificates include the email address. If you use Microsoft "
+#~ "Smartcardlogin then you must set the UPN. So please set now your required "
+#~ "alternative names."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID"
+#~ msgstr "Subject alternative name"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_GUID_DESCRIPTION"
+#~ msgstr ""
+#~ "A certificate can have several so called alternative names. These names "
+#~ "gives more information about the certificate users. Certificates for "
+#~ "servers usually include the DNS names and IP addresses of the server. "
+#~ "Normal user certificates include the email address. If you use Microsoft "
+#~ "Smartcardlogin then you must set the UPN. So please set now your required "
+#~ "alternative names."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP"
+#~ msgstr "Subject alternative name"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP_DESCRIPTION"
+#~ msgstr ""
+#~ "A certificate can have several so called alternative names. These names "
+#~ "gives more information about the certificate users. Certificates for "
+#~ "servers usually include the DNS names and IP addresses of the server. "
+#~ "Normal user certificates include the email address. If you use Microsoft "
+#~ "Smartcardlogin then you must set the UPN. So please set now your required "
+#~ "alternative names."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID"
+#~ msgstr "Subject alternative name"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_RID_DESCRIPTION"
+#~ msgstr ""
+#~ "A certificate can have several so called alternative names. These names "
+#~ "gives more information about the certificate users. Certificates for "
+#~ "servers usually include the DNS names and IP addresses of the server. "
+#~ "Normal user certificates include the email address. If you use Microsoft "
+#~ "Smartcardlogin then you must set the UPN. So please set now your required "
+#~ "alternative names."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN"
+#~ msgstr "Subject alternative name"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_UPN_DESCRIPTION"
+#~ msgstr ""
+#~ "A certificate can have several so called alternative names. These names "
+#~ "gives more information about the certificate users. Certificates for "
+#~ "servers usually include the DNS names and IP addresses of the server. "
+#~ "Normal user certificates include the email address. If you use Microsoft "
+#~ "Smartcardlogin then you must set the UPN. So please set now your required "
+#~ "alternative names."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI"
+#~ msgstr "Subject alternative name"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_URI_DESCRIPTION"
+#~ msgstr ""
+#~ "A certificate can have several so called alternative names. These names "
+#~ "gives more information about the certificate users. Certificates for "
+#~ "servers usually include the DNS names and IP addresses of the server. "
+#~ "Normal user certificates include the email address. If you use Microsoft "
+#~ "Smartcardlogin then you must set the UPN. So please set now your required "
+#~ "alternative names."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA_ENROLL"
@@ -5543,11 +5842,6 @@ msgstr "yes"
 #~ "The choosen subject alternative name type __TYPE__ is not known.Usually "
 #~ "this is a misconfiguration."
 
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_WRONG_GUID"
-#~ msgstr ""
-#~ "The GUID __GUID__ has a wrong format. We support the formats of RFC 4122 "
-#~ "and Microsoft."
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_DESCRIPTION"
 #~ msgstr ""
@@ -5621,14 +5915,6 @@ msgstr "yes"
 #~ "A private key using the RSA algorithm with a keylength of 2048 bits."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
-#~ msgstr "Key generation"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
-#~ msgstr "Workflow instances"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_ISSUER"
 #~ msgstr "Creator of workflow instance"
 
@@ -5643,10 +5929,6 @@ msgstr "yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_REASON_NAME"
 #~ msgstr "reset"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
-#~ msgstr "Additional informations"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"
@@ -5730,22 +6012,6 @@ msgstr "yes"
 #~ msgstr "Print informations"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
-#~ msgstr "Additional information"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
-#~ msgstr "Description"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
-#~ msgstr "Last update"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
-#~ msgstr "List instances"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
 #~ msgstr ""
 #~ "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -5799,50 +6065,10 @@ msgstr "yes"
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
 #~ msgstr "The SPKAC string is empty."
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
-#~ msgstr ""
-#~ "The workflow is missing some required fields (__FIELDS__) for the next "
-#~ "action."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
-#~ msgstr ""
-#~ "The workflow is missing some required fields (__FIELDS__) for the next "
-#~ "action."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
-#~ msgstr ""
-#~ "The workflow is missing some required fields (__FIELDS__) for the next "
-#~ "action."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
-#~ msgstr ""
-#~ "The workflow is missing some required fields (__FIELDS__) for the next "
-#~ "action."
-
 #~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ERROR_HANDLING_MESSAGE"
 #~ msgstr ""
 #~ "The default service on the OpenXPKI daemon detected one or more errors. "
 #~ "The error(s) will be forwarded as a list to the connected client."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
-#~ msgstr ""
-#~ "The used subject style requires at minimum one organizational unit, one "
-#~ "organization and one country."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
-#~ msgstr ""
-#~ "The workflow is missing some required fields (__FIELDS__) for the next "
-#~ "action."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
-#~ msgstr "The used suject style requires a UID plus a common name."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE"

@@ -1,9 +1,9 @@
 ## OpenXPKI::Server::API.pm 
 ##
-## Written 2005, 2006 by Michael Bell, Martin Bartosch and
+## Written 2005, 2006, 2007 by Michael Bell, Martin Bartosch and
 ## Alexander Klink for the OpenXPKI project
 ## restructured 2006 by Alexander Klink for the OpenXPKI project
-## Copyright (C) 2005-2006 by The OpenXPKI Project
+## Copyright (C) 2005-2007 by The OpenXPKI Project
 ## $Revision$
 
 package OpenXPKI::Server::API;
@@ -12,6 +12,7 @@ use strict;
 use warnings;
 use utf8;
 use English;
+use Benchmark ':hireswallclock';
 
 use Class::Std;
 
@@ -60,7 +61,7 @@ sub BUILD {
     my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
     my $re_cert_format       = qr{ \A (PEM|DER|TXT|PKCS7) \z }xms;
     my $re_privkey_format    = qr{ \A (PKCS8_PEM|PKCS8_DER|OPENSSL_PRIVKEY|PKCS12|JAVA_KEYSTORE) \z }xms;
-    my $re_sql_string        = qr{ \A [a-zA-Z0-9\@\-_\.\s\%\*]* \z }xms;
+    my $re_sql_string        = qr{ \A [a-zA-Z0-9\@\-_\.\s\%\*\+\=\,]* \z }xms;
     my $re_approval_msg_type = qr{ \A (CSR|CRR) \z }xms;
     my $re_approval_lang     = qr{ \A (de_DE|en_GB|ru_RU) \z }xms;
 
@@ -330,6 +331,15 @@ sub BUILD {
                 },
             },
         },
+        'get_cert_subject_styles' => {
+            class  => 'Default',
+            params => {
+                PROFILE => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+            },
+        },
         'get_servers' => {
             class  => 'Default',
             params => { },
@@ -371,6 +381,11 @@ sub BUILD {
         'get_number_of_workflow_instances' => {
             class  => 'Workflow',
             params => {
+                ACTIVE => {
+                    type     => SCALAR,
+                    regex    => $re_integer_string,
+                    optional => 1,
+                },
             },
         },
         'list_workflow_instances' => {
@@ -383,6 +398,11 @@ sub BUILD {
                 START => {
                     type  => SCALAR,
                     regex => $re_integer_string,
+                },
+                ACTIVE => {
+                    type     => SCALAR,
+                    regex    => $re_integer_string,
+                    optional => 1,
                 },
             },
         },
@@ -653,7 +673,12 @@ sub AUTOMETHOD {
     
         # call corresponding method
         my $openxpki_class = "OpenXPKI::Server::API::" . $class;
-        return $openxpki_class->$method_name(@args);
+        ##! 64: 'Calling ' . $openxpki_class . '->' . $method_name
+        my $t0 = Benchmark->new();
+        my $result = $openxpki_class->$method_name(@args);
+        my $t1 = Benchmark->new();
+        ##! 64: 'The call of ' . $openxpki_class . '->' . $method_name . ' took ' . timestr(timediff($t1, $t0))
+        return $result;
     };
 }
     

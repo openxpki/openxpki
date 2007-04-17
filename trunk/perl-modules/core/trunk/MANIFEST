@@ -280,6 +280,8 @@ OpenXPKI/Server/Workflow/Validator/SPKAC.pm
 OpenXPKI/Server/Workflow/Validator/PasswordQuality.pm
 OpenXPKI/Server/Workflow/Validator/InvalidityTime.pm
 OpenXPKI/Server/Workflow/Validator/ReasonCode.pm
+OpenXPKI/Server/Workflow/Validator/CertSubjectParts.pm
+OpenXPKI/Server/Workflow/Validator/CertSubjectAltNameParts.pm
 
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm

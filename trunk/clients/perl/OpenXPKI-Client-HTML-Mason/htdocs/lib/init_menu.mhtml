@@ -5,8 +5,7 @@
     $mode        => "DEFAULT",
 </%args>
 
-<%init>
-
+<%once>
     my $CONFIG = {
                 ROLE =>
                 {
@@ -96,6 +95,8 @@
                                     "workflow_create_instance", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES",
                                    "workflow_list_instances", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES",
+                                   "workflow_list_active_instances", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_SEARCH_INSTANCES",
                                    "workflow_search_instances", undef ],
                     ],
@@ -143,6 +144,10 @@
                     "workflow_list_instances" =>
                     {
                         CMD => "service/workflow/list_instances.html"
+                    },
+                    "workflow_list_active_instances" =>
+                    {
+                        CMD => "service/workflow/list_instances.html?active=1"
                     },
                     'show_pending_requests' => {
                         CMD => 'service/workflow/show_pending_requests.html'
@@ -240,6 +245,14 @@
                 },
                };
 
+    # get all workflow types
+    my $msg = $context->{client}->send_receive_command_msg('list_workflow_titles');
+    my @types;
+    if (ref $msg->{PARAMS} eq 'HASH') {
+        @types = keys %{$msg->{PARAMS}};
+    }
+</%once>
+<%init>
     my %params = ( MASON  => $m,
                    CONFIG => $CONFIG,
                    ACTION => "/service/info",
@@ -249,15 +262,7 @@
     {
         $params{$key} = $context->{lc $key} if (exists $context->{lc $key});
     }
-    
-    # get all workflow types
-    my $msg = $context->{client}->send_receive_command_msg('list_workflow_titles');
-    my @types;
-    if (ref $msg->{PARAMS} eq 'HASH') {
-        @types = keys %{$msg->{PARAMS}};
-    }
     $params{'AVAILABLE_WORKFLOWS'} = \@types;
-
     $context->{menu} = OpenXPKI::Client::HTML::Mason::Menu->new(\%params);
     return;
 </%init>

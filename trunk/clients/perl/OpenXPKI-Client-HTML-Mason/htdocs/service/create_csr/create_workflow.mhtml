@@ -3,8 +3,8 @@
     $role             => undef
     $profile          => undef
     $subject_style    => undef
-    $subject          => undef
-    $subject_alt_name => undef
+    $subject_alt_name_parts => undef
+    $subject_parts    => undef
     $info             => undef
     $keygen           => undef
     $spkac            => undef
@@ -21,9 +21,9 @@
     $params{"cert_role"}             = $role             if (defined $role);
     $params{"cert_profile"}          = $profile          if (defined $profile);
     $params{"cert_subject_style"}    = $subject_style    if (defined $subject_style);
-    $params{"cert_subject"}          = $subject          if (defined $subject);
-    $params{"cert_subject_alt_name"} = $subject_alt_name if (defined $subject_alt_name);
-    $params{"cert_info"}             = $info             if (defined $info);
+    $params{"cert_subject_parts"}    = $ser->serialize($subject_parts)    if (defined $subject_parts);
+    $params{"cert_subject_alt_name_parts"} = $ser->serialize($subject_alt_name_parts) if (defined $subject_alt_name_parts);
+    $params{"cert_info"}             = $ser->serialize($info)             if (defined $info);
     $params{"spkac"}                 = $spkac            if (defined $spkac);
     $params{"pkcs10"}                = $pkcs10           if (defined $pkcs10);
     $params{"private_key"}           = $key              if (defined $key);
@@ -53,29 +53,13 @@
         ## detected error
         $errors = [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ];
     }
-    $key = "" if (scalar @{$errors});
-
-    ## now store the private key
-    if ($key)
-    {
-        my $key_msg = $context->{client}->send_receive_command_msg (
-                          "create_workflow_instance",
-                          {WORKFLOW => "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY",
-                           PARAMS   => {"private_key" => $key,
-                                        "workflow_id" => $msg->{WORKFLOW}->{ID}}});
-        if (exists $key_msg->{SERVICE_MSG} and
-            $key_msg->{SERVICE_MSG} eq "ERROR")
-        {
-            ## FIXME: uups, we got a real problem the CSR is in the database
-            ## FIXME: but not the private key !!!
-            ## FIXME: can we log this event to system.fatal ?
-            $errors = [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ];
-        }
-    }
-
     ## handle errors
     return $errors if (scalar @{$errors});
 
     ## this should be a serial number of the workflow
     return $msg;
 </%init>
+<%once>
+    use OpenXPKI::Serialization::Simple;
+    my $ser = OpenXPKI::Serialization::Simple->new();
+</%once>

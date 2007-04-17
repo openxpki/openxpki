@@ -1,6 +1,6 @@
           <div class="form_button_bar">
             <span class="form_button_bar_button">
-              <input type="submit" name="submit" value="<% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT") %>"/>
+              <input type="submit" name="__submit" value="<% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT") %>"/>
             </span>
             <span class="form_button_bar_button">
               <input type="reset" name="reset" value="<% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_RESET") %>"/>

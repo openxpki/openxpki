@@ -11,11 +11,11 @@
   <validator name="CertProfile"
              class="OpenXPKI::Server::Workflow::Validator::CertProfile">
   </validator>
-  <validator name="CertSubject"
-             class="OpenXPKI::Server::Workflow::Validator::CertSubject">
+  <validator name="CertSubjectParts"
+             class="OpenXPKI::Server::Workflow::Validator::CertSubjectParts">
   </validator>
-  <validator name="CertSubjectAltName"
-             class="OpenXPKI::Server::Workflow::Validator::CertSubjectAltName">
+  <validator name="CertSubjectAltNameParts"
+             class="OpenXPKI::Server::Workflow::Validator::CertSubjectAltNameParts">
   </validator>
   <validator name="SPKAC"
              class="OpenXPKI::Server::Workflow::Validator::SPKAC">

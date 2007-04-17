@@ -219,6 +219,9 @@ sub get_url_for_ticket {
     my $ticket    = $arg_ref->{TICKET};
     my $pki_realm = CTX('session')->get_pki_realm();
 
+    if (! defined $notifier_of{$ident}->{$pki_realm} ) {
+        return '';
+    }
     my $count = scalar (@{ $notifier_of{$ident}->{$pki_realm} });
 
     # find the right notifier

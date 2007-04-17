@@ -34,6 +34,8 @@ sub execute {
     my $subject = $csr_obj->get_parsed('BODY', 'SUBJECT');
     $context->param('cert_subject' => $subject);
     $context->param('cert_role' => ''); # FIXME, is this correct?
+                                        # maybe we should make this
+                                        # a config option?
 
     my @subject_alt_names = $csr_obj->get_subject_alt_names();
 
@@ -45,7 +47,8 @@ sub execute {
     my $sources = {
         'cert_subject'           => 'USER',
         'cert_role'              => 'EXTERNAL', # ?
-        'cert_subject_alt_name' => 'USER',
+        #'cert_subject_alt_name'  => 'USER',
+        'cert_subject_alt_name_parts'  => 'USER',
     };
     $context->param('sources' =>
                     $serializer->serialize($sources));

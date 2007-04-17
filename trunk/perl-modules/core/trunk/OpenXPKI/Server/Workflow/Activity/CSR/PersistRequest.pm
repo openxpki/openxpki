@@ -73,7 +73,7 @@ sub execute
             message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCES_UNDEFINED',
         );
     }
-    my $san_source = $source_ref->{'cert_subject_alt_name'};
+    my $san_source = $source_ref->{'cert_subject_alt_name_parts'};
 
     if (! defined $san_source) {
         OpenXPKI::Exception->throw(

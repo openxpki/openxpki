@@ -73,7 +73,7 @@ sub execute {
     my $sources = {
         'cert_subject'           => 'EXTERNAL',
         'cert_role'              => 'EXTERNAL',
-        'cert_subject_alt_name'  => 'EXTERNAL',
+        'cert_subject_alt_name_parts'  => 'EXTERNAL',
     };
     $context->param('sources' =>
                     $serializer->serialize($sources));

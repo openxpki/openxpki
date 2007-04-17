@@ -4,35 +4,27 @@
     $profile       => undef
     $subject_style => undef
     $keygen        => undef
-    $subject       => undef
-    $subject_alt_name => undef
+    $subject_parts => undef
+    $subject_alt_name_parts => undef
     $info          => undef
     $CONFIG        => undef
 </%args>
 
 <& /service/open_form.mhtml &>
 
-<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
-<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
-<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
-<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name',   'value' => $subject_alt_name &>
-<& /lib/html/hidden.mhtml, 'name' => 'info',          'value' => $info &>
-
+<& /lib/html/hidden_reqargs.mhtml &>
 <& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
 
 <%init>
     my @errors = ();
 
-    my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
+        my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
                             'workflow_type' => $workflow_type,
                             'role'          => $role,
                             'profile'       => $profile,
                             'subject_style' => $subject_style,
-                            'subject'       => $subject,
-                            'subject_alt_name' => $subject_alt_name,
+                            'subject_parts' => $subject_parts,
+                            'subject_alt_name_parts' => $subject_alt_name_parts,
                             'info'          => $info);
     ## perhaps we should put this into a component like get_error.mhtml?
     ## errors are returned in an array reference

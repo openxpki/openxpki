@@ -37,7 +37,7 @@
   </state>
 
   <state name="PKCS10_GENERATED" autorun="yes">
-    <action name="notify_user"
+    <action name="notify_user_of_creation"
             resulting_state="PENDING">
     </action>
   </state>

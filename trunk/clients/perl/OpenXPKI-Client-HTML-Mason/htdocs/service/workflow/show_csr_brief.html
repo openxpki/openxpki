@@ -107,8 +107,8 @@
                 [ 'subject', $subject ],
             ],
             label => $breakable_subject &>
-% if ($sources->{'cert_subject'} ne 'USER') {
-(<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SOURCE') %>: <% $sources->{'cert_subject'} %>)
+% if ($sources->{'cert_subject_parts'} ne 'USER') {
+(<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SOURCE') %>: <% $sources->{'cert_subject_parts'} %>)
 % }
                   </td>
                   <td>
@@ -125,8 +125,8 @@
 % if (scalar @sans) {
   <tr>
     <td><& '/lib/field_to_i18n.mhtml', field => 'cert_subject_alt_name' &>
-%   if ($sources->{'cert_subject_alt_name'} ne 'USER') {
-(<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SOURCE') %>: <% $sources->{'cert_subject_alt_name'} %>)
+%   if ($sources->{'cert_subject_alt_name_parts'} ne 'USER') {
+(<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SOURCE') %>: <% $sources->{'cert_subject_alt_name_parts'} %>)
 %   }
 %   if (exists $actions{i18nGettext('I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME')}) {
 <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/activity/change_csr_subject_alt_name.html" &>

@@ -34,6 +34,7 @@ htdocs/lib/paging.mhtml
 htdocs/lib/html/a.mhtml
 htdocs/lib/html/safe.mhtml
 htdocs/lib/html/hidden.mhtml
+htdocs/lib/html/hidden_reqargs.mhtml
 htdocs/lib/html/input.mhtml
 htdocs/lib/html/select.mhtml
 htdocs/lib/html/select_date.mhtml

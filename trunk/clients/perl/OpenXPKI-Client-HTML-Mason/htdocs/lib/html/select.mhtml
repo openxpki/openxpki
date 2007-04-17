@@ -9,12 +9,10 @@
 %   $value = {VALUE => $value, LABEL => $value} if (not ref $value);
 %   if (defined $default and grep /^$value->{VALUE}$/, @{$default})
 %   {
-      <option selected value="<& '/lib/html/safe.mhtml', 'data' => $value->{VALUE} &>">
+      <option selected value="<& '/lib/html/safe.mhtml', 'data' => $value->{VALUE} &>"><& '/lib/html/safe.mhtml', 'data' => i18nGettext($value->{LABEL}) &></option>
 %   } else {
-      <option value="<& '/lib/html/safe.mhtml', 'data' => $value->{VALUE} &>">
+      <option value="<& '/lib/html/safe.mhtml', 'data' => $value->{VALUE} &>"><& '/lib/html/safe.mhtml', 'data' => i18nGettext($value->{LABEL}) &></option>
 %   }
-        <& '/lib/html/safe.mhtml', 'data' => i18nGettext($value->{LABEL}) &>
-      </option>
 % }
 </select>
 <%init>

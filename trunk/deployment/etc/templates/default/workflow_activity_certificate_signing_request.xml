@@ -7,8 +7,8 @@
       <field name="cert_role"/>
       <field name="cert_profile"/>
       <field name="cert_subject_style"/>
-      <field name="cert_subject"/>
-      <field name="cert_subject_alt_name"/>
+      <field name="cert_subject_parts"/>
+      <field name="cert_subject_alt_name_parts"/>
       <field name="cert_info"/>
       <field name="csr_type"/>
       <field name="spkac"/>
@@ -37,18 +37,22 @@
       </validator>
       <validator name="HasRequiredField">
         <arg>cert_subject_style</arg>
-        <arg>cert_subject</arg>
+        <arg>cert_subject_parts</arg>
       </validator>
-      <validator name="CertSubject">
+      <validator name="CertSubjectParts">
+        <arg>$cert_profile</arg>
         <arg>$cert_profile_id</arg>
         <arg>$cert_subject_style</arg>
-        <arg>$cert_subject</arg>
+        <arg>$cert_subject_parts</arg>
       </validator>
       <validator name="HasRequiredField">
-        <arg>cert_subject_alt_name</arg>
+        <arg>cert_subject_alt_name_parts</arg>
       </validator>
-      <validator name="CertSubjectAltName">
-        <arg>$cert_subject_alt_name</arg>
+      <validator name="CertSubjectAltNameParts">
+        <arg>$cert_profile</arg>
+        <arg>$cert_subject_style</arg>
+        <arg>$cert_subject_parts</arg>
+        <arg>$cert_subject_alt_name_parts</arg>
       </validator>
       <validator name="HasRequiredField">
         <arg>cert_info</arg>
@@ -181,6 +185,7 @@
   <action name="generate_key"
           class="OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey">
       <field name="_key_type"/>
+      <field name="_key_gen_params"/>
       <field name="_password"/>
       <validator name="PasswordQuality">
         <arg>$_password</arg>

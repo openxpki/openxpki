@@ -191,8 +191,46 @@
     <profile id="I18N_OPENXPKI_PROFILE_USER"
 	     super="../profile{default}">
 
-      <subject super="../../subject{ou_style}"/>
-      <subject super="../../subject{dc_style}"/>
+      <subject id="user_basic_style">
+        <label>I18N_OPENXPKI_PROFILE_USER_BASIC_STYLE</label>
+        <description>I18N_OPENXPKI_PROFILE_USER_BASIC_DESC</description>
+        <template>
+             <!-- default: min=1, max=1 -->
+             <!-- note that the regex is pretty restrictive, one might
+                  want to change that to something more liberal -->
+             <input id="username"
+                    label="I18N_OPENXPKI_USERNAME"
+                    description="I18N_OPENXPKI_USERNAME_DESC"
+                    type="freetext"
+                    match="\A [A-Za-z]+ \z"
+                    width="20"
+                    default="testuser"/>
+             <input id="realname"
+                    label="I18N_OPENXPKI_REALNAME"
+                    description="I18N_OPENXPKI_REALNAME_DESC"
+                    type="freetext"
+                    match=".+"
+                    width="40"
+                    default=""/>
+             <input id="email"
+                    label="I18N_OPENXPKI_EMAILADDRESS"
+                    description="I18N_OPENXPKI_EMAILADDRESS_DESC"
+                    type="freetext"
+                    match=".+@.+"
+                    width="30"
+                    default=""/>
+        </template>
+        <dn>CN=[- realname -]+UID=[- username -],DC=Test Deployment,DC=OpenXPKI,DC=org</dn> 
+        <additional_information>
+        </additional_information>
+        <subject_alternative_names>
+            <san id="dns">
+                <key type="fixed">email</key>
+                <value type="fixed">[- email -]</value>
+            </san>
+        </subject_alternative_names>
+      </subject>
+      <subject super="../../subject{advanced_style}"/>
 
       <role>User</role>
       <role>RA Operator</role>
@@ -246,9 +284,47 @@
 	     super="../profile{default}">
 
       <role>Web Server</role>
+<!--
       <subject super="../../subject{ou_style}"/>
       <subject super="../../subject{dc_style}"/>
+-->
 
+      <subject id="tls_basic_style">
+        <label>I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE</label>
+        <description>I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC</description>
+        <template>
+             <!-- not that the regex is not exact, this might still not
+                  be a valid hostname -->
+             <!-- default: min=1, max=1 -->
+             <input id="hostname"
+                    label="I18N_OPENXPKI_HOSTNAME"
+                    description="I18N_OPENXPKI_HOSTNAME_DESC"
+                    type="freetext"
+                    source="CN:([^:]+)"
+                    match="\A [A-Za-z\d-\.]+ \z"
+                    width="60"
+                    default="fully.qualified.example.com"/>
+             <input id="port"
+                    label="I18N_OPENXPKI_PORT"
+                    description="I18N_OPENXPKI_PORT_DESC"
+                    type="freetext"
+                    source="CN:.+:(.+)"
+                    match="\A \d+ \z"
+                    width="5"
+                    min="0"
+                    default=""/>
+        </template>
+        <dn>CN=[- hostname -][- IF port AND port != 443 -]:[- port -][- END -],DC=Test Deployment,DC=OpenXPKI,DC=org</dn> 
+        <additional_information>
+        </additional_information>
+        <subject_alternative_names>
+            <san id="dns">
+                <key type="fixed">DNS</key>
+                <value type="fixed">[- hostname -]</value>
+            </san>
+        </subject_alternative_names>
+      </subject>
+      <subject super="../../subject{advanced_style}"/>
       <validity>
 	<notafter format="relativedate">+0003</notafter>
       </validity>
@@ -289,33 +365,91 @@
       </extensions>
     </profile>
       
-    <subject id="ou_style">
-      <label>I18N_OPENXPKI_HTML_CREATE_CSR_OU_STYLE</label>
-      <description>I18N_OPENXPKI_HTML_CREATE_CSR_OU_STYLE_DESCRIPTION</description>
-      <!-- regex are executed with m{$regex}xs !!! -->
-      <always>
-        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN">^(uid|UID)=[^+]+\+(cn|CN)=</regex>
-        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_OU_O_C_REQUIRED">,(ou|OU)=[^,]+,[oO]=OpenXPKI,[cC]=DE$</regex>
-      </always>
-      <never>
-        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_DC_NOT_ALLOWED">(dc|DC)=</regex>
-      </never>
+    <subject id="advanced_style">
+      <label>I18N_OPENXPKI_PROFILE_ADVANCED_STYLE</label>
+      <description>I18N_OPENXPKI_PROFILE_ADVANCED_DESC</description>
+      <template>
+           <!-- not that the regex is not exact, this might still not
+                be a valid hostname -->
+           <!-- default: min=1, max=1 -->
+           <input id="CN"
+                  label="CN"
+                  description="I18N_OPENXPKI_CN_DESC"
+                  type="freetext"
+                  source="CN:([^:]+)"
+                  width="60"
+                  default=""/>
+           <input id="O"
+                  label="O"
+                  description="I18N_OPENXPKI_O_DESC"
+                  type="freetext"
+                  min="0"
+                  max="1"
+                  width="40"/>
+           <input id="OU"
+                  label="OU"
+                  description="I18N_OPENXPKI_OU_DESC"
+                  type="freetext"
+                  source="OU"
+                  width="40"
+                  min="0"
+                  max="1000"/> <!-- if min or max is present, result is an arrayref -->
+           <input id="DC"
+                  label="DC"
+                  description="I18N_OPENXPKI_DC_DESC"
+                  type="freetext"
+                  width="40"
+                  min="0"
+                  max="1000"/>
+          <input id="C"
+                 label="C"
+                  description="I18N_OPENXPKI_C_DESC"
+                  type="freetext"
+                  width="2"
+                  min="0"
+                  max="1"/>
+      </template>
+      <dn>CN=[- CN -][- IF OU -][- FOREACH entry = OU -],OU=[- entry -][- END -][- END -][- IF O -],O=[- O -][- END -][- FOREACH entry = DC -],DC=[- entry -][- END -][- IF C -],C=[- C -][- END -]</dn> 
+      <additional_information>
+        <input id="phone"
+               label="I18N_OPENXPKI_PHONE"
+               description="I18N_OPENXPKI_PHONE_DESC"
+               type="freetext"
+               width="20"
+               default=""/>
+        <input id="comment"
+               label="I18N_OPENXPKI_COMMENT"
+               description="I18N_OPENXPKI_COMMENT_DESC"
+               type="textarea"
+               width="40"
+               height="10"/>
+      </additional_information>
+      <subject_alternative_names>
+          <san id="choice">
+              <key type="select" max="1000">
+                  <option label="I18N_OPENXPKI_SAN_EMAIL"
+                          description="I18N_OPENXPKI_SAN_EMAIL_DESCRIPTION">email</option>
+                  <option label="I18N_OPENXPKI_SAN_DNS"
+                          description="I18N_OPENXPKI_SAN_DNS_DESCRIPTION">DNS</option>
+                  <option label="I18N_OPENXPKI_SAN_IP"
+                          description="I18N_OPENXPKI_SAN_IP_DESCRIPTION">IP</option>
+                  <option label="I18N_OPENXPKI_SAN_URI"
+                          description="I18N_OPENXPKI_SAN_URI_DESCRIPTION">URI</option>
+                  <option label="I18N_OPENXPKI_SAN_GUID"
+                          description="I18N_OPENXPKI_SAN_GUID_DESCRIPTION">GUID</option>
+                  <option label="I18N_OPENXPKI_SAN_UPN"
+                          description="I18N_OPENXPKI_SAN_UPN_DESCRIPTION">UPN</option>
+                  <option label="I18N_OPENXPKI_SAN_RID"
+                          description="I18N_OPENXPKI_SAN_RID_DESCRIPTION">RID</option>
+              </key>
+              <value type="freetext" width="40"/>
+          </san>
+          <san id="oid">
+              <key type="oid" max="1000" width="20"/>
+              <value type="freetext" width="40"/>
+          </san>
+      </subject_alternative_names>
     </subject>
-
-    <subject id="dc_style">
-      <label>I18N_OPENXPKI_HTML_CREATE_CSR_DC_STYLE</label>
-      <description>I18N_OPENXPKI_HTML_CREATE_CSR_DC_STYLE_DESCRIPTION</description>
-      <!-- regex are executed with m{$regex}xs !!! -->
-      <always>
-        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN">^(uid|UID)=[^+]+\+(cn|CN)=</regex>
-        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_OU_DC_DC_REQUIRED">,(ou|OU)=[^,]+,(dc|DC)=OpenXPKI,(dc|DC)=org$</regex>
-      </always>
-      <never>
-        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_O_NOT_ALLOWED">,[oO]=</regex>
-        <regex label="I18N_OPENXPKI_SUBJECT_STYLE_C_NOT_ALLOWED">,[cC]=</regex>
-      </never>
-    </subject>
-
   </endentity>
 
 </profiles>

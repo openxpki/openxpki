@@ -9,10 +9,7 @@
 
 <& /service/open_form.mhtml &>
 
-<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
-<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
-<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
+<& /lib/html/hidden_reqargs.mhtml, internals => 0 &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYGEN_TITLE') %></h1>
 <p>
@@ -62,16 +59,16 @@
     ## return the configuration number if it exists
     return $keygen
         if (defined $keygen and 
-            grep $keygen, @{$CONFIG->{$subject_style}->{KEY_GENERATION}});
+            grep $keygen, @{$CONFIG->{KEY_GENERATION}});
 
     ## if we have only one key generation type
     ## then we have not to ask the user
-    return $CONFIG->{$subject_style}->{KEY_GENERATION}->[0]
-        if (scalar @{$CONFIG->{$subject_style}->{KEY_GENERATION}} == 1);
+    return $CONFIG->{KEY_GENERATION}->[0]
+        if (scalar @{$CONFIG->{KEY_GENERATION}} == 1);
 
     ## ok, we have to ask the user
     my @values = ();
-    foreach my $entry (@{$CONFIG->{$subject_style}->{KEY_GENERATION}})
+    foreach my $entry (@{$CONFIG->{KEY_GENERATION}})
     {
         if ($entry eq "IE")
         {

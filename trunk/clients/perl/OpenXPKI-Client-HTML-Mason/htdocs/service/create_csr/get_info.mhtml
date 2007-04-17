@@ -7,21 +7,11 @@
     $pkcs10        => undef
     $subject       => undef
     $subject_alt_name => undef
-    $info          => undef
     $CONFIG        => undef
 </%args>
 
 <& /service/open_form.mhtml &>
-
-<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
-<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
-<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
-<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
-<& /lib/html/hidden.mhtml, 'name' => 'pkcs10',        'value' => $pkcs10 &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name',   'value' => $subject_alt_name &>
-<& /lib/html/hidden.mhtml, 'name' => 'FILLED_INFO_FORM', 'value' => 1 &>
+<& /lib/html/hidden_reqargs.mhtml &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_INFO_TITLE') %></h1>
 <p>
@@ -29,12 +19,18 @@
 </p>
 
 <table>
-% foreach my $item (@{$CONFIG->{$subject_style}->{INFOS}})
+% foreach my $item (@input)
 % {
     <tr>
-      <td><% i18nGettext ($item->{LABEL}) %></td>
+      <td><% i18nGettext($item->{LABEL}) %></td>
       <td>
-        <& /lib/html/input.mhtml, 'type' => $item->{TYPE}, 'name' => $item->{NAME} &>
+        <& /lib/html/input.mhtml,
+            'type'   => $item->{TYPE},
+            'name'   => 'additional_info_' . $item->{ID},
+            'width'  => $item->{WIDTH},
+            'height' => $item->{HEIGHT},
+            'value'  => $item->{DEFAULT},
+         &>
       </td>
     </tr>
 % }
@@ -46,28 +42,48 @@
 <& /service/create_csr/print_descriptions.mhtml, descriptions => \%descriptions &>
 
 <%init>
-    return $info if (defined $info);
-    my @errors = ();
-    my $ARGS   = {$m->request_args()};
-
-    if ($ARGS->{'FILLED_INFO_FORM'})
-    {
-        # try to build info
-        foreach my $item (@{$CONFIG->{$subject_style}->{INFOS}})
-        {
-            $info->{$item->{NAME}} = $ARGS->{$item->{NAME}};
+    my $req_args = {};
+    my $info = {};
+    my %styles = ();
+    # copy $m->request_args to $req_args
+    # and combine them to $info
+    foreach my $key (keys %{ $m->request_args() }) {
+        if ($key =~ s{ \A additional_info_ }{}xms) {
+            $info->{$key} = $m->request_args()->{'additional_info_' . $key};
         }
-
-        ## serialize info
-        ## warnings we must be safe against \n truncation
-        my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
-        $info = $serializer->serialize($info);
-        return $info;
+        $req_args->{$key} = $m->request_args()->{$key};
     }
+    return $info if (scalar keys %{ $info });
 
+    my $chosen_style = $req_args->{'subject_style'};
+    my $msg = $context->{client}->send_receive_command_msg(
+                   "get_cert_subject_styles",
+                   {
+                        PROFILE => $profile,
+                   }
+    );
+    if (defined $msg->{PARAMS} && ref $msg->{PARAMS} eq 'HASH') {
+        %styles = %{$msg->{PARAMS}};
+    }
+    if (! defined $chosen_style && (scalar keys %styles == 1)) {
+        # fallback if subject_style not defined and only one possible
+        # style present
+        foreach my $key (keys %styles) {
+            $chosen_style = $key;
+        }
+    }
+    # TODO - error handling
+    my @input;
+    if (exists $styles{$chosen_style}->{ADDITIONAL_INFORMATION}->{INPUT}
+        && ref $styles{$chosen_style}->{ADDITIONAL_INFORMATION}->{INPUT} eq 'ARRAY') {
+        @input = @{ $styles{$chosen_style}->{ADDITIONAL_INFORMATION}->{INPUT} };
+    }
+    if (! scalar @input) {
+        return 1;
+    }
     ## ok we have to display the whole stuff
     my %descriptions = ();
-    foreach my $item (@{$CONFIG->{$subject_style}->{INFOS}})
+    foreach my $item (@input)
     {
         $descriptions{i18nGettext ($item->{LABEL})} =
             i18nGettext ($item->{DESCRIPTION});

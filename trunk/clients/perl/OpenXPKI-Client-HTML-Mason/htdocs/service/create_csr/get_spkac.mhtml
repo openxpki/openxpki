@@ -6,21 +6,13 @@
     $keygen        => undef
     $subject       => undef
     $subject_alt_name => undef
-    $info          => undef
     $spkac         => undef
     $CONFIG        => undef
 </%args>
 
 <& /service/open_form.mhtml &>
 
-<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
-<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
-<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
-<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject',       'value' => $subject &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_alt_name',   'value' => $subject_alt_name &>
-<& /lib/html/hidden.mhtml, 'name' => 'info',          'value' => $info &>
+<& /lib/html/hidden_reqargs.mhtml, ignore => qr(\A spkac \z)xms &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_TITLE') %></h1>
 <p>
@@ -37,6 +29,22 @@
 <%init>
     my @errors = ();
 
+    my $info = {};
+    my $subject_parts = {};
+    my $subject_alt_name_parts = {};
+
+    # create info, subject_parts, subject_alt_name parts from req args
+    foreach my $key (keys %{ $m->request_args() }) {
+        if ($key =~ m{ \A cert_subject_alt_name_ }xms) {
+            $subject_alt_name_parts->{$key} = $m->request_args()->{$key};
+        }
+        elsif ($key =~ m{ \A cert_subject_ }xms) {
+            $subject_parts->{$key} = $m->request_args()->{$key};
+        }    
+        elsif ($key =~ s{ \A additional_info_ }{}xms) {
+            $info->{$key} = $m->request_args()->{'additional_info_' . $key};
+        }
+    }
     if ($spkac)
     {
         $spkac =~ s/[\n\r]//g;
@@ -46,8 +54,8 @@
                             'role'          => $role,
                             'profile'       => $profile,
                             'subject_style' => $subject_style,
-                            'subject'       => $subject,
-                            'subject_alt_name' => $subject_alt_name,
+                            'subject_parts' => $subject_parts,
+                            'subject_alt_name_parts' => $subject_alt_name_parts,
                             'info'          => $info,
                             'spkac'         => $spkac);
         ## perhaps we should put this into a component like get_error.mhtml?

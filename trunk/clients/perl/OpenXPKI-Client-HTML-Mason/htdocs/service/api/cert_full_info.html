@@ -33,7 +33,7 @@
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_SERIAL') %></td>
-    <td><% delete $params->{SERIAL} %></td>
+    <td><% $serial %></td>
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_FINGERPRINT') %></td>
@@ -130,4 +130,6 @@
   if ($now gt $params->{NOTAFTER}) {
     $expired = 1;
   }
+  my $serial = $params->{SERIAL};
+  $serial .= ' (0x' . sprintf("%X", $serial) . ')';
 </%init>
