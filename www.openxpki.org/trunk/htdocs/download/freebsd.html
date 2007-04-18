@@ -117,7 +117,7 @@ Thus it is essential to have the entire port collection
 (present on your computer) in a self-consistent state and
 in accord with your base system.
 </p><p>
-Recommended procedure to make use of the port is:
+Recommended procedure to make use of the ports is:
 </p>
 <ul>
 <li>
@@ -126,14 +126,20 @@ Get/upgrade the entire ports collection as described in
               a FreeBSD Handbook</a>.
 </li><li>
 <tt>cd /usr/ports/ports-mgmt/portupgrade &amp;&amp; make reinstall clean</tt><br/>
-<tt>/usr/local/sbin/portupgrade -NrR security/p5-openxpki</tt><br/>
+<tt>/usr/local/sbin/portupgrade -NrR security/p5-openxpki-client-html-mason</tt><br/>
+<tt>/usr/local/sbin/portupgrade -NrR security/p5-openxpki-deployment</tt><br/>
+<tt>/usr/local/sbin/portupgrade -NrR security/p5-openxpki-i18n</tt><br/>
 (Appropriate tarballs of openxpki will be fetched automatically.
 Alternatively, you can fetch tarballs of openxpki by hand
 and place them into <tt>/usr/ports/distfiles/openxpki/</tt>)
 </li><li>
-Install your favorite database and web server.
+Install your favorite database (enable utf-8 support if needed) and web server.
 </li><li>
 Perform deployment procedure for openxpki in a regular way.
+When asked for the name of the &lquot;openxpki user&rquot; answer &lquot;openxpki&rquot;,
+and do not forget to add a line:
+&lquot;User openxpki&rquot;
+to the zone of your OpenXPI-related (virtual) web server in your Apache configuration file.
 </li>
 </ul>
 <p>
@@ -181,8 +187,8 @@ inside your svn snapshot:<br/>
 Please note, that thus modified ports may still need manual trimming.
 Especially if new 3-rd party's dependencies were added to the code.
 </p><p>
-If you find issues with these FreeBSD ports, please contact
-ports maintainer svysh@cryptocom.ru
+If you find issues with these FreeBSD ports, please report to the 
+openxpki-users mailing list.
 </p>
 
 
@@ -193,8 +199,8 @@ ports maintainer svysh@cryptocom.ru
       </div> <!-- content -->
 
       <div id="footer">
-        Last modified by djulia on Wed Feb 14 16:59:11 UTC 2007
- (based on rev. 729). &copy; 2005 - 2006  OpenXPKI Foundation
+        Last modified by svysh on Wed Apr 18 13:12:55 UTC 2007
+ (based on rev. 745). &copy; 2005 - 2006  OpenXPKI Foundation
 
 
       </div> <!-- footer -->

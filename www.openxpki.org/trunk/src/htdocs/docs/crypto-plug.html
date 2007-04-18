@@ -42,11 +42,7 @@ to speak to cryptographic tools in a specially designed
 <h2>High level language for cryptographic needs of PKI at server side</h2>
 <p>
 Our analysis shows that all cryptographic needs of PKI at the server side can be 
-expressed by just the following 18 commands. Please note that only one of these commands, 
-namely <em>create_key</em>, obligatoryly requires apriori knowledge of the fact that 
-a certain cryptographic 
-set of tools exists with a specific name (like RSA, DSA, GOST, etc). All other commands could 
-deduce necessary cryptographic details from the data which they process.
+expressed by just the following 19 commands. 
 </p>
 
 <dl>
@@ -78,6 +74,8 @@ deduce necessary cryptographic details from the data which they process.
         <dd>issue a certificate which is signed by a Certificate Authority (CA)</dd>
 <dt>issue_crl</dt>
         <dd>issue a Certificate Revocation List (CRL)</dd>
+<dt>list_algorithms</dt>
+        <dd>return list of supported public key algorithms and their parameters</dd>
 <dt>pkcs7_decrypt</dt>
         <dd>decrypt data</dd>
 <dt>pkcs7_encrypt</dt>
@@ -92,6 +90,22 @@ deduce necessary cryptographic details from the data which they process.
         <dd>encrypt/decrypt data with one of the algorithms for symmetric encryption</dd> 
 </dl>
 
+<p>
+Please note that only one of these commands, 
+namely <em>create_key</em>, obligatoryly requires apriori knowledge of the fact that 
+a certain cryptographic 
+set of tools exists with a specific name (like RSA, DSA, GOST, etc).
+This apriori knowledge can be acquired with another command: <em>list_algorithms</em>.
+In interactive scripts you can ask your system to list algorithms and show the list to the
+user. So that the user can pick up the preferred algorithm with a pointing device.
+To facilitate automatic processing of this list, severall formats of list presentation is provided.
+As a result, the high-level programmer needs no knowledge about which cryptographic backend and 
+which cryptographic algorithms will be available in a really installed system.
+</p>
+<p>
+All other commands could 
+deduce necessary cryptographic details from the data which they process.
+</p>
 <hr/>
 
 <h3>N.B.:</h3>
@@ -130,8 +144,8 @@ Today this list consists of the following entries:
 
 <ol>
 <li><a href="http://www.openssl.org/">OpenSSL</a> cryptographic library 
-ver. 0.9.8x with x = a, b, c, d.</li>
-<li><a href="gost-howto.html">OpenSSL-0.9.8b-gost</a> a clone of OpenSSL cryptographic library
+ver. 0.9.8x with x = a, b, c, d, e.</li>
+<li><a href="gost-howto.html">OpenSSL-0.9.8d-gost</a> a clone of OpenSSL cryptographic library
 with additional support for russian national (GOST) cryptographic algorithms.</li>
 </ol>
 
