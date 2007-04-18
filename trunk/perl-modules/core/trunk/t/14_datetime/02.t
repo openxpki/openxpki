@@ -24,7 +24,15 @@ $dt = OpenXPKI::DateTime::get_validity(
     });
 
 $offset = $dt - $now;
-ok($offset->in_units('months'), 12);
+if ($dt->is_leap_year() && $now->month >= 3) {
+    # if the date in the future is a leap year, and the current month
+    # is at least march, the difference will only be 11 months
+    # (for example: 01.03.2007 + 365d = 29.02.2008)
+    ok($offset->in_units('months'), 11);
+}
+else {
+    ok($offset->in_units('months'), 12);
+}
 
 ###########################################################################
 $then = DateTime->now( time_zone => 'UTC' );
@@ -37,8 +45,13 @@ $dt = OpenXPKI::DateTime::get_validity(
     });
 
 $offset = $dt - $now;
-ok($offset->in_units('months'), 14);
-
+if ($dt->is_leap_year() && $then->month >= 5) {
+    # cf above
+    ok($offset->in_units('months'), 13);
+}
+else {
+    ok($offset->in_units('months'), 14);
+}
 
 ###########################################################################
 $now = DateTime->now( time_zone => 'UTC' ); 
