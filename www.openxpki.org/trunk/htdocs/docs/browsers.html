@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>OpenXPKI Project - Browser interaction with the OpenXPKI server</title>
+<link rel="stylesheet" title="default" href="../css/openxpki.css" type="text/css" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  
+
+  </head>
+  <body>
+    <div id="page">
+
+      <div id="header">
+        <a href="..">
+  <img src="../images/openxpki_logo.png"
+     alt="OpenXPKI Project"/>
+</a>
+
+      </div> <!-- header -->
+
+      <div id="navi">
+        <div class="menu">
+                  <div class="menu_item"><a href="..">Home</a></div>
+        <div class="menu_item"><a href="../secadvs/index.html">Security Advisories</a></div>
+        <div class="menu_item"><a href="../news/index.html">News</a></div>
+        <div class="menu_item"><a href="index.html">Documentation</a></div>
+	<div class="menu_item"><a href="../support/index.html">Support</a></div>
+        <div class="menu_item"><a href="../download/index.html">Download</a></div>
+        <div class="menu_item"><a href="../resources/index.html">Resources</a></div>
+        <div class="menu_item"><a href="../foundation/index.html">Foundation</a></div>
+        <div class="menu_item"><a href="../legacy/index.html">OpenCA Support</a></div>
+        <div class="w3c">
+          <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=150124&amp;type=1" width="88" height="31" alt="SourceForge.net Logo" /></a>
+        </div>
+        <div class="w3c">
+          <a href="http://validator.w3.org/check?uri=http://www.openxpki.org/docs/browsers.html"><img class="noborder" src="../images/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88" /></a>
+        </div>
+        <div class="w3c">
+          <a href="http://www.masonhq.com/"><img class="noborder" src="../images/built-with-white1.png" alt="Built with Mason" height="31" width="88" /></a>
+        </div>
+
+
+        </div> <!-- menu -->
+      </div> <!-- navi -->
+
+      <div id="content">
+
+
+<h1>Browser interaction with the OpenXPKI server</h1> 
+
+<p>
+A single OpenXPKI server running on a UNIX host can serve several CAs, RAs and public interfaces:
+depending on the topology of PKI as resulted after deployment procedure. 
+The most regular way to access OpenXPKI server is via the web server running on the same UNIX host.
+This access is done with a web browser from the local UNIX host or (if allowed) from any host in the internet.
+CA operator, RA operator, regular users: everybody can access OpenXPKI server this way.
+</p><p>
+Different browsers have different understanding and support of cryptography. 
+That is why different browsers provide different cryptography related functionality when accessing the OpenXPKI server.
+</p>
+
+<h2>All browsers can do</h2>
+<p>
+</p>
+
+<dl>
+<dt>Generation of a private key on the server side </dt>
+  <dd>This is a part of procedure to generatate a Certificate Signing Request (CSR).
+Could be performed by a regular user or by RA operator.
+Is implemented by built-in tools of the crypto-backend which is installed on the server side.
+The user can choose from a list of crypto-algorithms and their parameters available at the server side.
+  </dd>
+<dt>Upload to the OpenXPKI server of a preliminary prepared CSR</dt>
+  <dd>Could be performed by a regular user or by RA operator.
+  </dd>
+</dl>
+
+
+<h2>MS Internet Explorer ver.6+ specific features</h2>
+<p>
+</p>
+
+<dl>
+<dt>Generation of a private key on the client side </dt>
+  <dd>This is a part of procedure to generatate a Certificate Signing Request (CSR). 
+Could be performed by a regular user or by RA operator. 
+Private key generation is implemented with a Visual Basic Script. 
+If several crypto service providers (CSPs) are installed at the client's host, 
+a list of CSP's names is shown on the screen along with
+a list of parameters for supported crypto-algorithm. 
+It is assumed that one CSP provides only one type of crypto-algorithm. 
+E.g. only RSA, only DSA, only GOST, or only GOST-on-eliptic-curves.
+  </dd>
+<dt>Smart card personalisation procedure</dt>
+  <dd>Is meant for initial massive issuing of smartcards based on data from LDAP directory of personnel department.
+  </dd>
+<dt>Signing of approved CSR</dt>
+  <dd>Could be performed by RA operator on the client side. Is implemented with a Visual Basic Script. 
+  </dd>
+<dt>Download and install certifite to the browser</dt>
+  <dd>Is implemented with a Visual Basic Script.
+  </dd>
+</dl>
+
+<h2>Mozilla/Firefox/Netscape specific features</h2>
+<p>
+</p>
+
+<dl>
+<dt>Generation of a private key on the client side </dt>
+  <dd>This is a part of procedure to generatate a Certificate Signing Request (CSR).
+Could be performed by a regular user or by RA operator.
+Private key generation is implemented with a JavaScript. 
+Public key is uploaded to the server in SPKAC format.
+Personal data of cert holder goes to the server separately.
+Server collects data and public key thus effectively forming
+an equivalent of unsigned CSR in the server database.
+  </dd>
+<dt>Signing of approved CSR</dt>
+  <dd>Could be performed by RA operator on the client side. Is implemented with a JavaScript.
+  </dd>
+<dt>Download and install certifite to the browser</dt>
+  <dd>Is implemented with a JavaScript.
+  </dd>
+
+</dl>
+
+<h2>Opera</h2>                                                                                           
+<p>Poorly predictable behaviour. Not fully tested yet.
+</p>
+   
+<dl>
+</dl>
+
+<h2>Konqueror</h2>                                                                                           
+<p>Not fully tested yet.
+</p>
+   
+<dl>
+</dl>
+
+<h2>Lynx</h2>
+<p>Not fully tested yet.
+</p>
+  
+<h2>Linx</h2>
+<p>Not fully tested yet.
+</p>
+  
+<dl>
+</dl>
+
+<p>
+</p>
+<hr/>
+
+
+      </div> <!-- content -->
+
+      <div id="footer">
+        Last modified by svysh on Thu Apr 19 11:01:22 UTC 2007
+ (based on rev. ). &copy; 2005 - 2006  OpenXPKI Foundation
+
+
+      </div> <!-- footer -->
+
+    </div> <!-- page -->
+  </body>
+</html>
+
+
