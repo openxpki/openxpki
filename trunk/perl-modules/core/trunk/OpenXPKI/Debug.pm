@@ -14,6 +14,7 @@ use English;
 use Filter::Util::Call;
 
 our %LEVEL;
+our $USE_COLOR = 0;
 
 sub import
 {
@@ -27,6 +28,9 @@ sub import
     ## import only be called to specify the different levels
     return if (not defined $module);
 
+    if ($USE_COLOR) {
+        use Term::ANSIColor;
+    }
     ## only for debugging of this module
     ## print STDERR "OpenXPKI::Debug: Checking module $module ...\n";
 
@@ -62,14 +66,18 @@ sub filter
         if ($_ =~ /^\s*##!/)
         {
             my $msg = $_;
-            if ($msg =~ s/^\s*##!\s*(\d+)\s*:\s*//)
+            if ($msg =~ s/^\s*##!\s*(\d+)\s*([\w\s]*):\s*//)
             {
                 ## higher levels mean more noise
                 my $level = $1;
+                my $color = $2;
                 if ($1 <= $LEVEL{$self->{MODULE}})
                 {
                     $msg =~ s/\n//s;
-                    $_ = "OpenXPKI::Debug->debug(".$msg.",$level);\n";
+                    $_ = "OpenXPKI::Debug->debug("
+                            .$msg
+                            . ",$level,"
+                            . "'$color');\n";
                 }
             }
         }
@@ -82,6 +90,7 @@ sub debug
     my $self  = shift;
     my $msg   = shift;
     my $level = shift || "0";
+    my $color = shift;
 
     $msg = $self->__censor_msg($msg);
 
@@ -103,7 +112,14 @@ sub debug
         my ($seconds, $microseconds) = Time::HiRes::gettimeofday();
         $timestamp .= '.' . sprintf("%06d", $microseconds); 
     };
-    print STDERR "$timestamp DEBUG:$level PID:$PROCESS_ID $msg";
+    my $output = "$timestamp DEBUG:$level PID:$PROCESS_ID $msg";
+    if ($USE_COLOR && $color) {
+        eval {
+            # try to color the output
+            $output = colored($output, $color);
+        };
+    }
+    print STDERR $output;
 }
 
 sub __censor_msg {
