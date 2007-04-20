@@ -97,6 +97,12 @@ sub debug
     $msg = "$subroutine $msg\n";
 
     my $timestamp = strftime("%F %T", localtime(time));
+    eval {
+        # if HiRes is available, we want HiRes timestamps ...
+        require Time::HiRes;
+        my ($seconds, $microseconds) = Time::HiRes::gettimeofday();
+        $timestamp .= '.' . sprintf("%06d", $microseconds); 
+    };
     print STDERR "$timestamp DEBUG:$level PID:$PROCESS_ID $msg";
 }
 
