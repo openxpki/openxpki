@@ -12,13 +12,13 @@ our $token = $mgmt->get_token (
     TYPE => "DEFAULT", 
     ID => "default", 
     PKI_REALM => "Test Root CA");
-ok($token);
+ok($token, 'Default token initialized');
 
 ## prepare log system
 
 use OpenXPKI::Server::Log;
 my $log = OpenXPKI::Server::Log->new (CONFIG => "t/28_log/log.conf");
-ok($log);
+ok($log, 'Log object initialized');
 
 ## prepare database configuration
 
@@ -30,9 +30,6 @@ our %config = (
              );
 our $dbi = OpenXPKI::Server::DBI->new (%config);
 
-ok($dbi and ref $dbi);
+ok($dbi && ref $dbi, 'DBI instantiation');
 
-ok($dbi->connect());
-
-ok ($dbi->set_crypto ($token));
-
+ok($dbi->connect(), 'DBI connect');

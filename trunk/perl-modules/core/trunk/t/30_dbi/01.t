@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 use English;
-use Test;
-BEGIN { plan tests => 9 };
+use Test::More;
+plan tests => 8;
 
-print STDERR "OpenXPKI::Server::DBI: Database Initialization\n";
+diag "OpenXPKI::Server::DBI: Database Initialization\n";
 
-use OpenXPKI::Server::DBI;
-
-ok (1);
+BEGIN {
+    use_ok('OpenXPKI::Server::DBI', 'Using OpenXPKI::Server::DBI');
+}
 
 our %config;
 our $dbi;
@@ -18,31 +18,11 @@ ok(1);
 
 ## dryrun of database schema init
 my $sqlscript = eval { $dbi->init_schema (MODE => "DRYRUN") };
-if ($EVAL_ERROR)
-{
-    ok(0);
-    print STDERR "Error: DRYRUN of init_schema failed (${EVAL_ERROR})\n";
-}
-elsif (length ($sqlscript) < 1000)
-{
-    ok(0);
-    print STDERR "Error: SQL script looks like too short ($sqlscript)\n";
-}
-else
-{
-    ok(1);
-}
+ok(! $EVAL_ERROR, 'DRYRUN mode') or diag $EVAL_ERROR;
+ok(length($sqlscript) > 1000, 'Length of SQL script');
 
 ## database schema init
 $sqlscript = eval { $dbi->init_schema () };
-if ($EVAL_ERROR)
-{
-    ok(0);
-    print STDERR "Error: init_schema failed (${EVAL_ERROR})\n";
-}
-else
-{
-    ok(1);
-}
+ok(! $EVAL_ERROR, 'init_schema') or diag $EVAL_ERROR;
 
 1;

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use Test;
-BEGIN { plan tests => 7 };
+use Test::More;
+plan tests => 6;
 
-print STDERR "OpenXPKI::Server::DBI: Performance (planned)\n";
+diag "OpenXPKI::Server::DBI: Performance (planned)\n";
 
 use OpenXPKI::Server::DBI;
 

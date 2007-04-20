@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-use Test;
+use Test::More;
 use DateTime;
 
-BEGIN { plan tests => 50 };
+plan tests => 49;
 
-print STDERR "OpenXPKI::Server::DBI: Queries with constraints and joins\n";
+diag "OpenXPKI::Server::DBI: Queries with constraints and joins\n";
 
 use OpenXPKI::Server::DBI;
 # use Smart::Comments;
@@ -170,7 +170,7 @@ $result = $dbi->select(
     TO => 100039,
     );
 
-ok(scalar @{$result}, 20);
+is(scalar @{$result}, 20);
 
 
 # simple query for default index field
@@ -179,7 +179,7 @@ $result = $dbi->select(
     SERIAL => 100020,
     );
 
-ok(scalar @{$result}, 1);
+is(scalar @{$result}, 1);
 
 
 # simple query for default index field
@@ -190,10 +190,10 @@ $result = $dbi->select(
     },
     );
 
-ok(scalar @{$result}, 1);
+is(scalar @{$result}, 1);
 
 
-# simple compound query for default index field
+# Try an 'OR' query
 $result = $dbi->select(
     TABLE => 'WORKFLOW_HISTORY',
     DYNAMIC => {
@@ -204,7 +204,7 @@ $result = $dbi->select(
     },
     );
 
-ok(scalar @{$result}, 1);
+is(scalar @{$result}, 5);
 
 
 
@@ -237,9 +237,9 @@ $result = $dbi->select(
 
 ### $result
 
-ok(scalar @{$result}, 10);
-ok($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
-ok($result->[9]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100049');
+is(scalar @{$result}, 10);
+is($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
+is($result->[9]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100049');
 
 
 ###########################################################################
@@ -282,10 +282,10 @@ $result = $dbi->select(
 
 ### $result
 
-ok(scalar @{$result}, 1);
-ok($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
-ok($result->[0]->{'context1.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100045');
-ok($result->[0]->{'context2.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100047');
+is(scalar @{$result}, 1);
+is($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
+is($result->[0]->{'context1.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100045');
+is($result->[0]->{'context2.WORKFLOW_CONTEXT_VALUE'}, 'somevalue: 100047');
 
 
 
@@ -322,11 +322,11 @@ $result = $dbi->select(
 
 ### $result
 
-ok(scalar @{$result}, 10);
-ok($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
-ok($result->[0]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-0');
+is(scalar @{$result}, 10);
+is($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
+is($result->[0]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-0');
 # ..
-ok($result->[9]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-9');
+is($result->[9]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-9');
 
 
 
@@ -362,9 +362,9 @@ $result = $dbi->select(
 
 ### $result
 
-ok(scalar @{$result}, 1);
-ok($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
-ok($result->[0]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-9');
+is(scalar @{$result}, 1);
+is($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
+is($result->[0]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-9');
 
 
 
@@ -398,7 +398,7 @@ foreach my $spec (@validity_specs) {
 	VALID_AT => $spec->[0],
 	);
 
-    ok(scalar @{$result}, $spec->[1]);
+    is(scalar @{$result}, $spec->[1]);
 }
 
 
@@ -422,7 +422,7 @@ foreach my $spec (@validity_specs) {
 	VALID_AT => [ $spec->[0],  undef ],
 	);
     
-    ok(scalar @{$result}, $spec->[1]);
+    is(scalar @{$result}, $spec->[1]);
 }
 
 
@@ -445,7 +445,7 @@ foreach my $spec (@validity_specs) {
 	VALID_AT => [ $spec->[0],  undef ],
 	);
     
-    ok(scalar @{$result}, $spec->[1]);
+    is(scalar @{$result}, $spec->[1]);
 }
 
 

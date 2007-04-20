@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use Test;
-BEGIN { plan tests => 14 };
+use Test::More;
+plan tests => 13;
 
-print STDERR "OpenXPKI::Server::DBI: CA setup and empty CRL\n";
+diag "OpenXPKI::Server::DBI: CA setup and empty CRL\n";
 
 use OpenXPKI::Server::DBI;
 use OpenXPKI::Crypto::X509;
@@ -62,7 +62,7 @@ $dbi->insert(
 $dbi->commit();
 ok(1);
 if ($ENV{DEBUG}) {
-    print STDERR "Certificate with identifier " . $cert->get_identifier()
+    diag "Certificate with identifier " . $cert->get_identifier()
         . " inserted.\n";
 }
 
@@ -87,7 +87,7 @@ $dbi->insert(
 $dbi->commit();
 ok(1);
 if ($ENV{DEBUG}) {
-    print STDERR "Certificate with identifier " . $cert2->get_identifier()
+    diag "Certificate with identifier " . $cert2->get_identifier()
         . " inserted.\n";
 }
 
