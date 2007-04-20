@@ -329,8 +329,6 @@ in ldappublic.xml as excluded from publishing list.
 
 Does not create or change context parameters
 
-=back
-
 =head1 Functions
 
 =head2 execute

@@ -104,11 +104,7 @@ Please note that the key file which must be specified in the configuration
 must be the idenitifier of the key on the smartcard an not a real filename.
 A typical OpenSC example for a name is id_45.
 
-=end text
-
 =head1 Functions
-
-=back
 
 =head2 login
 

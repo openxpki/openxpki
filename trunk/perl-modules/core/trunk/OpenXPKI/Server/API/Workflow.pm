@@ -876,6 +876,8 @@ Examples:
 	      },
       }
 
+=over
+
 =item * TYPE (optional)
 
 The named parameter TYPE can either be scalar or an array reference.
@@ -893,6 +895,8 @@ If given, limits the amount of workflows returned.
 =item * START (optional)
 
 If given, defines the offset of the returned workflow (use with LIMIT).
+
+=back
 
 =head2 search_workflow_instances_count
 

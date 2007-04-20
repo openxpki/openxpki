@@ -126,6 +126,8 @@ A serialized array of subject alternative names
 The role associated with the certificate
 =back
 
+=back
+
 =head1 Functions
 
 =head2 execute
