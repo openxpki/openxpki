@@ -66,13 +66,14 @@ That is why different browsers provide different cryptography related functional
 
 <dl>
 <dt>Generation of a private key on the server side </dt>
-  <dd>This is a part of procedure to generatate a Certificate Signing Request (CSR).
+  <dd>This is a part of procedure to generate a Certificate Signing Request (CSR).
 Could be performed by a regular user or by RA operator.
 Is implemented by built-in tools of the crypto-backend which is installed on the server side.
 The user can choose from a list of crypto-algorithms and their parameters available at the server side.
   </dd>
 <dt>Upload to the OpenXPKI server of a preliminary prepared CSR</dt>
   <dd>Could be performed by a regular user or by RA operator.
+CSRs to be uploaded should be rendered to PKCS#10 format by external means.
   </dd>
 </dl>
 
@@ -83,25 +84,43 @@ The user can choose from a list of crypto-algorithms and their parameters availa
 
 <dl>
 <dt>Generation of a private key on the client side </dt>
-  <dd>This is a part of procedure to generatate a Certificate Signing Request (CSR). 
+  <dd>This is a part of procedure to generate a Certificate Signing Request (CSR). 
 Could be performed by a regular user or by RA operator. 
-Private key generation is implemented with a Visual Basic Script. 
+Private key generation is implemented with a Visual Basic Script 
+and uses the standard MS XEnroll ActiveX control. 
+MS Windows Vista has not been tested yet.
 If several crypto service providers (CSPs) are installed at the client's host, 
 a list of CSP's names is shown on the screen along with
 a list of parameters for supported crypto-algorithm. 
 It is assumed that one CSP provides only one type of crypto-algorithm. 
 E.g. only RSA, only DSA, only GOST, or only GOST-on-eliptic-curves.
+A CSP can provide an interface to hardware cryptographic device such as a smart card or USB token. 
+In this case hardware is fully masqueraded by this CSP from the OpenXPKI related scripts.
   </dd>
-<dt>Smart card personalisation procedure</dt>
+<dt>Smart card personalization procedure</dt>
   <dd>Is meant for initial massive issuing of smartcards based on data from LDAP directory of personnel department.
+It offers the possibility to automatically create a key and a corresponding certificate
+request for the CA. The CA then signs the request and within a few seconds, the certificate is
+returned to the user and is automatically installed on the user's smartcard. 
   </dd>
 <dt>Signing of approved CSR</dt>
   <dd>Could be performed by RA operator on the client side. Is implemented with a Visual Basic Script. 
   </dd>
-<dt>Download and install certifite to the browser</dt>
+<dt>Download and install certificate to the Windows certificate store</dt>
   <dd>Is implemented with a Visual Basic Script.
+Windows certificate store is meant for use by arbitrary software (IE including) installed at the client side.
+  </dd>
+<dt>Automatic browser detection</dt>
+  <dd>on server side: works reliably.
+  </dd>
+<dt>https</dt>
+  <dd>Is supported if web server is configured so.
   </dd>
 </dl>
+<dt>Certificate base logon</dt>
+  <dd>Certificate base logon to the OpenXPKI server is supported. 
+CAPICOM ActiveX component is used for this.
+  </dd>
 
 <h2>Mozilla/Firefox/Netscape specific features</h2>
 <p>
@@ -109,7 +128,7 @@ E.g. only RSA, only DSA, only GOST, or only GOST-on-eliptic-curves.
 
 <dl>
 <dt>Generation of a private key on the client side </dt>
-  <dd>This is a part of procedure to generatate a Certificate Signing Request (CSR).
+  <dd>This is a part of procedure to generate a Certificate Signing Request (CSR).
 Could be performed by a regular user or by RA operator.
 Private key generation is implemented with a JavaScript. 
 Public key is uploaded to the server in SPKAC format.
@@ -120,21 +139,44 @@ an equivalent of unsigned CSR in the server database.
 <dt>Signing of approved CSR</dt>
   <dd>Could be performed by RA operator on the client side. Is implemented with a JavaScript.
   </dd>
-<dt>Download and install certifite to the browser</dt>
-  <dd>Is implemented with a JavaScript.
+<dt>Download and install certificate to the browser</dt>
+  <dd>If appropriate mime-type is configured in the browser, then 
+downloading of the certificate triggers subsequent installation of this certificate
+to the browser store.
+  </dd>
+<dt>Automatic browser detection</dt>
+  <dd>on server side: works reliably.
+  </dd>
+<dt>https</dt>
+  <dd>Is supported if web server is configured so.
+  </dd>
+<dt>Certificate base logon</dt>
+  <dd>Certificate base logon to the OpenXPKI server is supported, 
+using built-in functionality of the browser.
   </dd>
 
 </dl>
 
 <h2>Opera</h2>                                                                                           
-<p>Poorly predictable behaviour. Not fully tested yet.
+<p>Tries to be a browser which is better that IE and Mozilla.
+In reality imitates partly IE, partly Mozilla.
+Starting with version 9, Opera is changing inter-platform portability concept,
+actually sacrificing it.
+SPKAC is claimed to work, but seems like it does not.
+Not recommended for use with the OpenXPKI. Not fully tested yet.
 </p>
    
 <dl>
+<dt>Automatic browser detection</dt>
+  <dd>on server side: works sporadically and heavily depends on user preferences chosen in the browser.
+  </dd>
+<dt>https</dt>
+  <dd>Is supported if web server is configured so.
+  </dd>
 </dl>
 
 <h2>Konqueror</h2>                                                                                           
-<p>Not fully tested yet.
+<p>SPKAC should work? Not fully tested yet.
 </p>
    
 <dl>
@@ -159,8 +201,8 @@ an equivalent of unsigned CSR in the server database.
       </div> <!-- content -->
 
       <div id="footer">
-        Last modified by svysh on Thu Apr 19 11:01:22 UTC 2007
- (based on rev. ). &copy; 2005 - 2006  OpenXPKI Foundation
+        Last modified by svysh on Fri Apr 20 10:51:15 UTC 2007
+ (based on rev. 805). &copy; 2005 - 2006  OpenXPKI Foundation
 
 
       </div> <!-- footer -->
