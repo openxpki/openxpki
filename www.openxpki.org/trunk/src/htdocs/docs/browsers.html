@@ -6,10 +6,9 @@
 <h1>Browser interaction with the OpenXPKI server</h1> 
 
 <p>
-A single OpenXPKI server running on a UNIX host can serve several CAs, RAs and public interfaces:
-depending on the topology of PKI as resulted after deployment procedure. 
-The most regular way to access OpenXPKI server is via the web server running on the same UNIX host.
-This access is done with a web browser from the local UNIX host or (if allowed) from any host in the internet.
+A single OpenXPKI server running on a Unix host can serve several CAs, RAs and public interfaces depending on the topology of the PKI as resulted after the deployment procedure. 
+The normal way to access OpenXPKI server is via the web server running on the same Unix host.
+This access is done with a web browser from the local Unix host or (if allowed) from any host on the intranet or internet.
 CA operator, RA operator, regular users: everybody can access OpenXPKI server this way.
 </p><p>
 Different browsers have different understanding and support of cryptography. 
@@ -23,8 +22,8 @@ That is why different browsers provide different cryptography related functional
 <dl>
 <dt>Generation of a private key on the server side </dt>
   <dd>This is a part of procedure to generate a Certificate Signing Request (CSR).
-Could be performed by a regular user or by RA operator.
-Is implemented by built-in tools of the crypto-backend which is installed on the server side.
+This could be performed by a regular user or by RA operator.
+It is implemented by built-in tools of the crypto-backend which is installed on the server side.
 The user can choose from a list of crypto-algorithms and their parameters available at the server side.
   </dd>
 <dt>Upload to the OpenXPKI server of a preliminary prepared CSR</dt>
@@ -34,23 +33,23 @@ CSRs to be uploaded should be rendered to PKCS#10 format by external means.
 </dl>
 
 
-<h2>MS Internet Explorer ver.6+ specific features</h2>
+<h2>MS Internet Explorer version 6+ specific features</h2>
 <p>
 </p>
 
 <dl>
 <dt>Generation of a private key on the client side </dt>
-  <dd>This is a part of procedure to generate a Certificate Signing Request (CSR). 
-Could be performed by a regular user or by RA operator. 
+  <dd>This is a part of the procedure to generate a Certificate Signing Request (CSR). 
+It could be performed by a regular user or by a RA operator. 
 Private key generation is implemented with a Visual Basic Script 
 and uses the standard MS XEnroll ActiveX control. 
-MS Windows Vista has not been tested yet.
+This has not yet been tested under MS Windows Vista.
 If several crypto service providers (CSPs) are installed at the client's host, 
 a list of CSP's names is shown on the screen along with
 a list of parameters for supported crypto-algorithm. 
 It is assumed that one CSP provides only one type of crypto-algorithm. 
 E.g. only RSA, only DSA, only GOST, or only GOST-on-eliptic-curves.
-A CSP can provide an interface to hardware cryptographic device such as a smart card or USB token. 
+A CSP can provide an interface to a hardware cryptographic device such as a smart card or USB token. 
 In this case hardware is fully masqueraded by this CSP from the OpenXPKI related scripts.
   </dd>
 <dt>Smart card personalization procedure</dt>
@@ -59,12 +58,12 @@ It offers the possibility to automatically create a key and a corresponding cert
 request for the CA. The CA then signs the request and within a few seconds, the certificate is
 returned to the user and is automatically installed on the user's smartcard. 
   </dd>
-<dt>Signing of approved CSR</dt>
-  <dd>Could be performed by RA operator on the client side. Is implemented with a Visual Basic Script. 
+<dt>Signing to approve a CSR</dt>
+  <dd>Could be performed by RA operator on the client side. Is implemented with a Visual Basic Script, which uses the CAPICOM ActiveX component.
   </dd>
 <dt>Download and install certificate to the Windows certificate store</dt>
   <dd>Is implemented with a Visual Basic Script.
-Windows certificate store is meant for use by arbitrary software (IE including) installed at the client side.
+The windows certificate store can be used by arbitrary software (including IE) installed at the client side.
   </dd>
 <dt>Automatic browser detection</dt>
   <dd>on server side: works reliably.
@@ -72,11 +71,11 @@ Windows certificate store is meant for use by arbitrary software (IE including) 
 <dt>https</dt>
   <dd>Is supported if web server is configured so.
   </dd>
-<dt>utf-8 support</dt>
-<dt>Certificate based logon</dt>
-  <dd>Certificate based logon to the OpenXPKI server is supported. 
-CAPICOM ActiveX component is used for this.
-  </dd>
+</dl>
+<dt>UTF-8 support</dt>
+<dt>Certificate-based logon</dt>
+  <dd>Certificate-based logon to the OpenXPKI server is supported. 
+    CAPICOM ActiveX component is used for this.</dd>
 </dl>
 
 <h2>Mozilla/Firefox/Netscape specific features</h2>
@@ -87,19 +86,18 @@ CAPICOM ActiveX component is used for this.
 <dt>Generation of a private key on the client side </dt>
   <dd>This is a part of procedure to generate a Certificate Signing Request (CSR).
 Could be performed by a regular user or by RA operator.
-Private key generation is implemented with a JavaScript. 
-Public key is uploaded to the server in SPKAC format.
-Personal data of cert holder goes to the server separately.
+Private key generation is implemented using the proprietary &lt;keygen&gt; tag, the public key is uploaded to the server in SPKAC format.
+Personal data of the certificate requestor goes to the server separately.
 Server collects data and public key thus effectively forming
-an equivalent of unsigned CSR in the server database.
+an equivalent of a CSR in the server database.
   </dd>
-<dt>Signing of approved CSR</dt>
+<dt>Signing to approve a CSR</dt>
   <dd>Could be performed by RA operator on the client side. Is implemented with a JavaScript.
   </dd>
 <dt>Download and install certificate to the browser</dt>
-  <dd>If appropriate mime-type is configured in the browser, then 
-downloading of the certificate triggers subsequent installation of this certificate
-to the browser store.
+  <dd>The 
+download of the certificate triggers subsequent installation of this certificate
+to the browser store. This is implemented by sending the certificate with Mozilla-specific MIME-types.
   </dd>
 <dt>Automatic browser detection</dt>
   <dd>on server side: works reliably.
@@ -107,9 +105,9 @@ to the browser store.
 <dt>https</dt>
   <dd>Is supported if web server is configured so.
   </dd>
-<dt>utf-8 support</dt>
-<dt>Certificate base logon</dt>
-  <dd>Certificate base logon to the OpenXPKI server is supported, 
+<dt>UTF-8 support</dt>
+<dt>Certificate-based logon</dt>
+  <dd>Certificate-based logon to the OpenXPKI server is supported, 
 using built-in functionality of the browser.
   </dd>
 
