@@ -1,20 +1,22 @@
 use strict;
 use warnings;
-use Test;
+use Test::More;
 
 my @files = (
              "t/28_log/sqlite.db",
              "t/28_log/sqlite_log.db",
-             "t/28_log/stderrr.log",
+             "t/28_log/openxpki.log",
             );
-BEGIN { plan tests => 6 };
 
-print STDERR "OpenXPKI::Server::Log Cleanup\n";
+## 2 * number of files
+plan tests => (scalar @files) * 2;
+
+diag "OpenXPKI::Crypto Cleanup\n";
 
 foreach my $filename (@files)
 {
-    ok(not -e $filename or unlink ($filename));
-    ok(not -e $filename);
+    ok(! -e $filename || unlink ($filename), 'file does not exist or can be removed');
+    ok(! -e $filename, 'file does not exist');
 }
 
 1;
