@@ -1,10 +1,16 @@
 use strict;
 use warnings;
-use Test;
 use English;
-BEGIN { plan tests => 19 };
 
-print STDERR "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n";
+use Test::More;
+plan tests => 20;
+
+diag "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n";
+
+use OpenXPKI::Debug;
+if ($ENV{DEBUG_LEVEL}) {
+    $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
+}
 
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
@@ -17,12 +23,12 @@ our $basedir;
 our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
 
 ## parameter checks for TokenManager init
 
 my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
-ok (1);
+ok(defined $mgmt, 'new TokenManager defined');
 
 ## parameter checks for get_token
 
@@ -31,15 +37,16 @@ my $ca_token      = $mgmt->get_token (TYPE      => "CA",
                                       PKI_REALM => "Test Root CA",
                                       CERTIFICATE => $cacert,
 );
+ok(defined $ca_token, 'CA Token defined');
 my $default_token = $mgmt->get_token (TYPE      => "DEFAULT",
                                       PKI_REALM => "Test Root CA");
-ok (1);
+ok(defined $default_token, 'Default Token defined');
 
 ## create PIN (128 bit == 16 byte)
 my $passwd = $default_token->command ({COMMAND       => "create_random",
                                        RANDOM_LENGTH => 16});
-ok (1);
-print STDERR "passwd: $passwd\n" if ($ENV{DEBUG});
+ok($passwd, 'Random password created');
+diag "passwd: $passwd\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/passwd.txt",
                       CONTENT  => $passwd,
                       FORCE    => 1);
@@ -51,8 +58,8 @@ my $key = $default_token->command ({COMMAND    => "create_key",
                                     PARAMETERS => {
                                         KEY_LENGTH => "1024",
                                         ENC_ALG    => "aes256"}});
-ok (1);
-print STDERR "DSA: $key\n" if ($ENV{DEBUG});
+ok ($key, 'DSA key created');
+diag "DSA: $key\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/dsa.pem",
                       CONTENT  => $key,
                       FORCE    => 1);
@@ -64,8 +71,8 @@ $key = $default_token->command ({COMMAND    => "create_key",
                                  PARAMETERS => {
                                      CURVE_NAME => "sect571r1",
                                      ENC_ALG    => "aes256"}});
-ok (1);
-print STDERR "EC: $key\n" if ($ENV{DEBUG});
+ok ($key, 'EC key created');
+diag "EC: $key\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/ec.pem",
                       CONTENT  => $key,
                       FORCE    => 1);
@@ -77,8 +84,8 @@ $key = $default_token->command ({COMMAND    => "create_key",
                                  PARAMETERS => {
                                      KEY_LENGTH => "1024",
                                      ENC_ALG    => "aes256"}});
-ok (1);
-print STDERR "RSA: $key\n" if ($ENV{DEBUG});
+ok ($key, 'RSA key created');
+diag "RSA: $key\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/rsa.pem",
                       CONTENT  => $key,
                       FORCE    => 1);
@@ -97,19 +104,19 @@ eval
 if ($EVAL_ERROR) {
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        print STDERR "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1);
+        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
+        ok(1, 'Unsupported algorithm caught');
     }
     else
     {
-        print STDERR "Unknown eval error: ${EVAL_ERROR}\n" if ($ENV{DEBUG});
-        ok(0);
+        diag "Unknown eval error: ${EVAL_ERROR}\n";
+        ok(0, 'Unsupported algorithm caught');
     }
 }
 else
 {
-    print STDERR "Eval error does not occur when algorithm is not supported\n" if ($ENV{DEBUG});
-    ok(0);
+    diag "Eval error does not occur when algorithm is not supported\n";
+    ok(0, 'Unsupported algorithm caught');
 }
 
 ## test DSA parameters
@@ -127,20 +134,19 @@ eval
 if ($EVAL_ERROR) {
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        print STDERR "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1);
+        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
+        ok(1, 'Catching wrong keylength');
     }
     else
     {
-        print STDERR "Unknown eval error: ${EVAL_ERROR}\n" if ($ENV{DEBUG});
-        ok(0);
+        diag "Unknown eval error: ${EVAL_ERROR}\n";
+        ok(0, 'Catching wrong keylength');
     }
 }
 else
 {
-    print STDERR "Eval error does not occur when DSA KEY_LENGTH value is wrong\n" 
-      if ($ENV{DEBUG});
-    ok(0);
+    diag "Eval error does not occur when DSA KEY_LENGTH value is wrong\n";
+    ok(0, 'Catching wrong keylength');
 }
 
 ## create DSA key with wrong ENC_ALG value
@@ -157,20 +163,19 @@ eval
 if ($EVAL_ERROR) {
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        print STDERR "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1);
+        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
+        ok(1, 'Catching unknown algorithm');
     }
     else
     {
-        print STDERR "Unknown eval error: ${EVAL_ERROR}\n" if ($ENV{DEBUG});
-        ok(0);
+        diag "Unknown eval error: ${EVAL_ERROR}\n";
+        ok(0, 'Catching unknown algorithm');
     }
 }
 else
 {
-    print STDERR "Eval error does not occur when DSA ENC_ALG value is wrong\n" 
-      if ($ENV{DEBUG});
-    ok(0);
+    diag "Eval error does not occur when DSA ENC_ALG value is wrong\n" ;
+    ok(0, 'Catching unknown algorithm');
 }
 
 ## test RSA parameters
@@ -188,20 +193,19 @@ eval
 if ($EVAL_ERROR) {
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        print STDERR "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1);
+        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
+        ok(1, 'Catching RSA wrong keylength');
     }
     else
     {
-        print STDERR "Unknown eval error: ${EVAL_ERROR}\n" if ($ENV{DEBUG});
-        ok(0);
+        diag "Unknown eval error: ${EVAL_ERROR}\n";
+        ok(0, 'Catching RSA wrong keylength');
     }
 }
 else
 {
-    print STDERR "Eval error does not occur when RSA KEY_LENGTH value is wrong\n" 
-      if ($ENV{DEBUG});
-    ok(0);
+    diag "Eval error does not occur when RSA KEY_LENGTH value is wrong\n" ;
+    ok(0, 'Catching RSA wrong keylength');
 }
 
 ## create RSA key with wrong ENC_ALG value
@@ -218,20 +222,19 @@ eval
 if ($EVAL_ERROR) {
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        print STDERR "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1);
+        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
+        ok(1, 'Catching RSA unknown encryption algorithm');
     }
     else
     {
-        print STDERR "Unknown eval error: ${EVAL_ERROR}\n" if ($ENV{DEBUG});
-        ok(0);
+        diag "Unknown eval error: ${EVAL_ERROR}\n";
+        ok(0, 'Catching RSA unknown encryption algorithm');
     }
 }
 else
 {
-    print STDERR "Eval error does not occur when RSA ENC_ALG value is wrong\n" 
-      if ($ENV{DEBUG});
-    ok(0);
+    diag "Eval error does not occur when RSA ENC_ALG value is wrong\n";
+    ok(0, 'Catching RSA unknown encryption algorithm');
 }
 
 ## test EC parameters
@@ -250,24 +253,19 @@ eval
 if ($EVAL_ERROR) {
     if (my $exc = OpenXPKI::Exception->caught())
     {
-
-## FIXME Unfortunately we don't understand why this exception 
-## is printed to STDERR... May be it's an error in newly added code.
-
-        print STDERR "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1);
+        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
+        ok(1, 'Catching EC unknown encryption algorithm');
     }
     else
     {
-        print STDERR "Unknown eval error: ${EVAL_ERROR}\n" if ($ENV{DEBUG});
-        ok(0);
+        diag "Unknown eval error: ${EVAL_ERROR}\n";
+        ok(0, 'Catching EC unknown encryption algorithm');
     }
 }
 else
 {
-    print STDERR "Eval error does not occur when EC CURVE_NAME value is wrong\n" 
-      if ($ENV{DEBUG});
-    ok(0);
+    diag "Eval error does not occur when EC CURVE_NAME value is wrong\n";
+    ok(0, 'Catching EC unknown encryption algorithm');
 }
 
 ## create EC key with wrong CURVE_NAME value
@@ -284,20 +282,19 @@ eval
 if ($EVAL_ERROR) {
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        print STDERR "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1);
+        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
+        ok(1, 'Catching EC wrong curve name');
     }
     else
     {
-        print STDERR "Unknown eval error: ${EVAL_ERROR}\n" if ($ENV{DEBUG});
-        ok(0);
+        diag "Unknown eval error: ${EVAL_ERROR}\n";
+        ok(0, 'Catching EC wrong curve name');
     }
 }
 else
 {
-    print STDERR "Eval error does not occur when EC CURVE_NAME value is wrong\n" 
-      if ($ENV{DEBUG});
-    ok(0);
+    diag "Eval error does not occur when EC CURVE_NAME value is wrong\n";
+    ok(0, 'Catching EC wrong curve name');
 }
 
 ## create CSR
@@ -306,8 +303,8 @@ my $csr = $default_token->command ({COMMAND => "create_pkcs10",
                                     KEY     => $key,
                                     PASSWD  => $passwd,
                                     SUBJECT => $subject});
-ok (1);
-print STDERR "CSR: $csr\n" if ($ENV{DEBUG});
+ok($csr, 'PKCS#10 creation');
+diag "CSR: $csr\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/pkcs10.pem",
                       CONTENT  => $csr,
                       FORCE    => 1);
@@ -322,14 +319,14 @@ my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
 		  );
 $profile->set_serial  (1);
 $profile->set_subject ($subject);
-ok(1);
+ok($profile, 'Certificate profile');
 
 ## create cert
 my $cert = $ca_token->command ({COMMAND => "issue_cert",
                                 CSR     => $csr,
                                 PROFILE => $profile});
-ok (1);
-print STDERR "cert: $cert\n" if ($ENV{DEBUG});
+ok ($cert, 'Certificate issuance');
+diag "cert: $cert\n" if ($ENV{DEBUG});
 OpenXPKI->write_file (FILENAME => "$basedir/ca1/cert.pem",
                       CONTENT  => $cert,
                       FORCE    => 1);
@@ -341,8 +338,8 @@ my $pkcs12 = $default_token->command ({COMMAND => "create_pkcs12",
                                        KEY     => $key,
                                        CERT    => $cert,
                                        CHAIN   => @chain});
-ok ($pkcs12);
-print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
+ok ($pkcs12, 'PKCS#12 creation');
+diag "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
 
 ### create CRL profile...
 $profile = OpenXPKI::Crypto::Profile::CRL->new (
@@ -352,23 +349,17 @@ $profile = OpenXPKI::Crypto::Profile::CRL->new (
 ## otherwise test 34 fails
 ## $profile->set_serial (1);
 ### issue crl...
+my $crl;
 eval
 {
-    my $crl = $ca_token->command ({COMMAND => "issue_crl",
+    $crl = $ca_token->command ({COMMAND => "issue_crl",
                                    REVOKED => [$cert],
                                    PROFILE => $profile});
-    print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
+    diag "CRL: $crl\n" if ($ENV{DEBUG});
     OpenXPKI->write_file (FILENAME => "$basedir/ca1/crl.pem",
                           CONTENT  => $crl,
                           FORCE    => 1);
 };
-if ($EVAL_ERROR)
-{
-    print STDERR "Exception: ${EVAL_ERROR}\n";
-    ok(0);
-    exit 1;
-} else {
-    ok (1);
-}
+ok($crl, 'CRL creation') or diag "Exception: $EVAL_ERROR";
 
 1;

@@ -77,9 +77,9 @@ sub set_cert_list
     {
         ##! 4: "handle next certficate"
 
-        # end of time_t datatype in C library
-        # TODO - does this default make sense?
-        my ($cert, $timestamp) = (undef, "2147483647");
+        # default revocation date if none is specified is epoch 0,
+        # i.e. 01/01/1970 00:00:00
+        my ($cert, $timestamp) = (undef, '700101000000Z');
         if (not ref $arrayref)
         {
             $cert      = $arrayref;

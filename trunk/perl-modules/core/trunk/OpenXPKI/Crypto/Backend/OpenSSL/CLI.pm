@@ -37,7 +37,8 @@ sub error_ispresent {
                       No\ certificate\ matches\ private\ key |
                       unknown\ option |
                       Usage:\ pkcs12 |
-                      invalid\ reason\ code 
+                      invalid\ reason\ code |
+                      invalid\ revocation\ date
                     }xms) {
         return 1;
     }
