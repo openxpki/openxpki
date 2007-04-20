@@ -16,7 +16,7 @@ That is why different browsers provide different cryptography related functional
 </p>
 
 <h2>All browsers can do</h2>
-<p>
+<p>Provided cookies are supported and enabled:
 </p>
 
 <dl>
@@ -34,7 +34,9 @@ CSRs to be uploaded should be rendered to PKCS#10 format by external means.
 
 
 <h2>MS Internet Explorer version 6+ specific features</h2>
-<p>
+<p>These features are implemented with scripts provided by the OpenXPKI project
+and with regular tools built into Windows. 
+No permissions and no digital signatures from MS are needed to make use of these features.
 </p>
 
 <dl>
@@ -59,7 +61,9 @@ request for the CA. The CA then signs the request and within a few seconds, the 
 returned to the user and is automatically installed on the user's smartcard. 
   </dd>
 <dt>Signing to approve a CSR</dt>
-  <dd>Could be performed by RA operator on the client side. Is implemented with a Visual Basic Script, which uses the CAPICOM ActiveX component.
+  <dd>Could be performed by RA operator on the client side. 
+Is implemented with a Visual Basic Script, which uses the CAPICOM ActiveX component.
+Optionally cryptographic cards and tokens could be used.
   </dd>
 <dt>Download and install certificate to the Windows certificate store</dt>
   <dd>Is implemented with a Visual Basic Script.
@@ -69,13 +73,17 @@ The windows certificate store can be used by arbitrary software (including IE) i
   <dd>on server side: works reliably.
   </dd>
 <dt>https</dt>
-  <dd>Is supported if web server is configured so.
+  <dd>is supported.
   </dd>
 </dl>
-<dt>UTF-8 support</dt>
+<dt>UTF-8</dt>
+  <dd>is supported in web interface and inside PKI data.
+  </dd>
 <dt>Certificate-based logon</dt>
   <dd>Certificate-based logon to the OpenXPKI server is supported. 
-    CAPICOM ActiveX component is used for this.</dd>
+    CAPICOM ActiveX component is used for this.
+Optionally cryptographic cards and tokens could be used.
+  </dd>
 </dl>
 
 <h2>Mozilla/Firefox/Netscape specific features</h2>
@@ -86,13 +94,16 @@ The windows certificate store can be used by arbitrary software (including IE) i
 <dt>Generation of a private key on the client side </dt>
   <dd>This is a part of procedure to generate a Certificate Signing Request (CSR).
 Could be performed by a regular user or by RA operator.
-Private key generation is implemented using the proprietary &lt;keygen&gt; tag, the public key is uploaded to the server in SPKAC format.
+Private key generation is implemented using the proprietary &lt;keygen&gt; tag, 
+the public key is uploaded to the server in SPKAC format.
+Optionally cryptographic cards and tokens could be used.
 Personal data of the certificate requestor goes to the server separately.
 Server collects data and public key thus effectively forming
 an equivalent of a CSR in the server database.
   </dd>
 <dt>Signing to approve a CSR</dt>
   <dd>Could be performed by RA operator on the client side. Is implemented with a JavaScript.
+Optionally cryptographic cards and tokens could be used.
   </dd>
 <dt>Download and install certificate to the browser</dt>
   <dd>The 
@@ -103,12 +114,15 @@ to the browser store. This is implemented by sending the certificate with Mozill
   <dd>on server side: works reliably.
   </dd>
 <dt>https</dt>
-  <dd>Is supported if web server is configured so.
+  <dd>is supported.
   </dd>
-<dt>UTF-8 support</dt>
+<dt>UTF-8</dt>
+  <dd>is supported in web interface and inside PKI data.
+  </dd>
 <dt>Certificate-based logon</dt>
   <dd>Certificate-based logon to the OpenXPKI server is supported, 
 using built-in functionality of the browser.
+Optionally cryptographic cards and tokens could be used.
   </dd>
 
 </dl>
@@ -127,13 +141,15 @@ Not recommended for use with the OpenXPKI. Not fully tested yet.
   <dd>on server side: works sporadically and heavily depends on user preferences chosen in the browser.
   </dd>
 <dt>https</dt>
-  <dd>Is supported if web server is configured so.
+  <dd>is supported.
   </dd>
-<dt>utf-8 support</dt>
+<dt>UTF-8</dt>
+  <dd>is supported in web interface and inside PKI data.
+  </dd>
 </dl>
 
 <h2>Konqueror</h2>                                                                                           
-<p>SPKAC should work? Not fully tested yet.
+<p>SPKAC should work. Not fully tested yet.
 </p>
    
 <dl>
@@ -143,7 +159,7 @@ Not recommended for use with the OpenXPKI. Not fully tested yet.
 <p>Not fully tested yet.
 </p>
   
-<h2>Linx</h2>
+<h2>Links</h2>
 <p>Not fully tested yet.
 </p>
   
