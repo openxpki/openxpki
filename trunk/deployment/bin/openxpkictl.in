@@ -122,6 +122,7 @@ sub do_start {
     my $pid        = $arg->{PID};
     my $pidfile    = $arg->{PIDFILE};
     my $socketfile = $arg->{SOCKETFILE};
+    my $foreground = $arg->{FOREGROUND};
 
     if (defined $pid && kill(0, $pid)) {
 	if (! do_status(
@@ -141,90 +142,108 @@ sub do_start {
     # fork off server launcher
     my $redo_count = 0;
     my $READ_FROM_KID;
-  FORK:
-    do {
-	# this open call efectively does a fork and attaches the child's
-	# STDOUT to $READ_FROM_KID, allowing the child to send us data.
-	$pid = open($READ_FROM_KID, "-|");
-	if (! defined $pid) {
-	    if ($!{EAGAIN}) {
-		# recoverable fork error
-		if ($redo_count > 5) {
+    if (! $foreground) {
+        # fork server away to background
+      FORK:
+        do {
+            # this open call efectively does a fork and attaches the child's
+            # STDOUT to $READ_FROM_KID, allowing the child to send us data.
+            $pid = open($READ_FROM_KID, "-|");
+            if (! defined $pid) {
+                if ($!{EAGAIN}) {
+                # recoverable fork error
+                    if ($redo_count > 5) {
+                                ## the first message is part of the informal daemon startup message
+                                ## the second message is a real error message
+                        print STDOUT "FAILED.\n" if (not $QUIET);
+                        print STDERR "Could not fork process\n";
+                        return;
+                    }
+                            ## this is only an informal message and not an error - so do not use STDERR
+                    print STDOUT '.' if (not $QUIET);
+                    sleep 5;
+                    $redo_count++;
+                    redo FORK;
+                }
+
+                # other fork error
                     ## the first message is part of the informal daemon startup message
                     ## the second message is a real error message
-		    print STDOUT "FAILED.\n" if (not $QUIET);
-		    print STDERR "Could not fork process\n";
-		    return;
-		}
+                print STDOUT "FAILED.\n" if (not $QUIET);
+                print STDERR "Could not fork process: $ERRNO\n";
+                return;
+            }
+        } until defined $pid;
+
+        if ($pid) {
+            # parent here
+            # child process pid is available in $pid
+
+            my $kid;
+            do {
+                $kid = waitpid(-1, WNOHANG);
+            } until $kid > 0;
+
+            # check if child noticed a startup error
+            my $msg = slurp $READ_FROM_KID;
+
+            if (length $msg)
+            {
+                    ## the first message is part of the informal daemon startup message
+                    ## the second message is a real error message
+                print STDOUT "FAILED.\n" if (not $QUIET);
+                print STDERR "$msg\n";
+                return;
+            }
+
+            # find out if the server is REALLY running properly
+            if (! do_status(
+                  {
+                      SOCKETFILE => $socketfile,
+                  })) {
+                return;
+            }
+            
                 ## this is only an informal message and not an error - so do not use STDERR
-		print STDOUT '.' if (not $QUIET);
-		sleep 5;
-		$redo_count++;
-		redo FORK;
-	    }
-
-	    # other fork error
-            ## the first message is part of the informal daemon startup message
-            ## the second message is a real error message
-	    print STDOUT "FAILED.\n" if (not $QUIET);
-	    print STDERR "Could not fork process: $ERRNO\n";
-	    return;
-	}
-    } until defined $pid;
-
-    if ($pid) {
-	# parent here
-	# child process pid is available in $pid
-
-	my $kid;
-	do {
-	    $kid = waitpid(-1, WNOHANG);
-	} until $kid > 0;
-
-	# check if child noticed a startup error
-	my $msg = slurp $READ_FROM_KID;
-
-	if (length $msg)
-	{
-            ## the first message is part of the informal daemon startup message
-            ## the second message is a real error message
-	    print STDOUT "FAILED.\n" if (not $QUIET);
-	    print STDERR "$msg\n";
-	    return;
-	}
-
-	# find out if the server is REALLY running properly
-	if (! do_status(
-		  {
-		      SOCKETFILE => $socketfile,
-		  })) {
-	    return;
-	}
-	
-        ## this is only an informal message and not an error - so do not use STDERR
-	print STDOUT "DONE.\n" if (not $QUIET);
-    } else {
-	# child here
-	# parent process pid is available with getppid
-	
-	# everything printed to STDOUT here will be available to the
-	# parent on its $READ_FROM_KID file descriptor
-	
-	eval
-	{
-            ## SILENT is required to work correctly with start-stop-daemons
-            ## during a normal System V init
+            print STDOUT "DONE.\n" if (not $QUIET);
+        } else {
+            # child here
+            # parent process pid is available with getppid
+            
+            # everything printed to STDOUT here will be available to the
+            # parent on its $READ_FROM_KID file descriptor
+            
+            eval
+            {
+                    ## SILENT is required to work correctly with start-stop-daemons
+                    ## during a normal System V init
+                    my $silent = 0;
+                    $silent = 1 if ($QUIET);
+                OpenXPKI::Server->new ("CONFIG" => $configfile, "SILENT" => $silent);
+            };
+            if ($EVAL_ERROR)
+            {
+                print STDERR $EVAL_ERROR;
+                return;
+            }
+        }
+    }
+    else {
+        # foreground requested, do not fork
+        eval {
             my $silent = 0;
             $silent = 1 if ($QUIET);
-	    OpenXPKI::Server->new ("CONFIG" => $configfile, "SILENT" => $silent);
-	};
-	if ($EVAL_ERROR)
-	{
-	    print STDERR $EVAL_ERROR;
-	    return;
-	}
+            OpenXPKI::Server->new(
+                'CONFIG' => $configfile,
+                'SILENT' => $silent,
+                'TYPE'   => 'Simple',
+            );
+        };
+        if ($EVAL_ERROR) {
+            print STDERR $EVAL_ERROR;
+            return;
+        }
     }
-
     return 1;
 }
 
@@ -280,6 +299,7 @@ GetOptions(\%params,
               version
               debug=s@
               quiet
+              fg|foreground
 	      )) or pod2usage(-verbose => 0);
 
 if ($params{version}) {
@@ -324,6 +344,11 @@ require OpenXPKI::Server;
 
 if (defined $params{cfg}) {
     $configfile = $params{cfg};
+}
+
+my $foreground;
+if (defined $params{fg}) {
+    $foreground = 1;
 }
 
 $configfile = File::Spec->rel2abs($configfile);
@@ -379,6 +404,7 @@ if ($cmd eq 'start') {
 	    PID        => $pid,
 	    PIDFILE    => $pidfile,
 	    SOCKETFILE => $socketfile,
+        FOREGROUND => $foreground,
 	})) {
 	exit 1;
     }
@@ -431,6 +457,8 @@ openxpkictl [options] COMMAND
                          (positive integer value).
                          MODULE defaults to '.*'
                          LEVEL defaults to 1
+   --foreground          Uses a non-forking server. This is only
+                         useful for debugging or profiling.
 
  Commands:
    start            Start OpenXPKI daemon
@@ -503,6 +531,11 @@ Examples:
   --debug OpenPKI::Server:10 --debug OpenXPKI::Crypto::.*:20
   --debug OpenXPKI::Server:10,OpenXPKI::Crypto::.*:20
   (these two are equivalent)
+
+=item B<--foreground>
+
+Does not fork program away and uses a non-forking server. Pretty much
+useful only for debugging and profiling.
 
 =back
 

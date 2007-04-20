@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-use base qw(Net::Server::Fork);
+use base qw( Net::Server::MultiType );
 use Net::Server::Daemonize qw( set_uid set_gid );
 
 ## used modules
@@ -36,6 +36,11 @@ sub new
 
     ## get parameters
 
+    $self->{TYPE} = $keys->{TYPE};
+    if (! defined $self->{TYPE}) {
+        # a forking server is the standard one
+        $self->{TYPE} = 'Fork';
+    }
     $self->{"CONFIG"} = $keys->{CONFIG};
 
     ## dump out startup configuration
@@ -64,24 +69,14 @@ sub new
     # perform the rest of the initialization
     eval
     {
-	OpenXPKI::Server::Init::init(
+	    OpenXPKI::Server::Init::init(
 	    {
-		CONFIG => $self->{CONFIG},
-		# FIXME: not needed?
-#		SERVER => $self,
-                SILENT => $keys->{SILENT}
+		    CONFIG => $self->{CONFIG},
+            SILENT => $keys->{SILENT}
 	    });
     };
     if ($EVAL_ERROR) {
- 	my $msg = exception_as_string($EVAL_ERROR);
- 	CTX('log')->log(
- 	    MESSAGE  => "Exception during server initialization: " . $msg,
- 	    PRIORITY => "fatal",
- 	    FACILITY => "system",
- 	    );
- 	# die gracefully
- 	$ERRNO = 1;
-        die $msg;
+        $self->__log_and_die($EVAL_ERROR, 'server initialization');
     }
 
     ## group access is allowed
@@ -90,36 +85,19 @@ sub new
     ## load the user interfaces
     eval
     {
-	$self->__get_user_interfaces();
+	    $self->__get_user_interfaces();
     };
     if ($EVAL_ERROR) {
- 	my $msg = exception_as_string($EVAL_ERROR);
-        ## FIXME: this error message does not reach the startup script and the log!
- 	CTX('log')->log(
- 	    MESSAGE  => "Exception during interface initialization: " . $msg,
- 	    PRIORITY => "fatal",
- 	    FACILITY => "system",
- 	    );
- 	# die gracefully
- 	$ERRNO = 1;
-        die $msg;
+        $self->__log_and_die($EVAL_ERROR, 'interface initialization');
     }
 
     ## start the server
     eval
     {
-	$self->{PARAMS} = $self->__get_server_config();
+	    $self->{PARAMS} = $self->__get_server_config();
     };
     if ($EVAL_ERROR) {
- 	my $msg = exception_as_string($EVAL_ERROR);
- 	CTX('log')->log(
- 	    MESSAGE  => "Exception during server daemon setup: " . $msg,
- 	    PRIORITY => "fatal",
- 	    FACILITY => "system",
- 	    );
- 	# die gracefully
- 	$ERRNO = 1;
-        die $msg;
+        $self->__log_and_die($EVAL_ERROR, 'server daemon setup');
     }
 
     # Net::Server does not provide a hook that lets us change the
@@ -130,19 +108,19 @@ sub new
     # to make this work, delete the corresponding settings from the
     # Net::Server init params
     if (exists $self->{PARAMS}->{user}) {
-	$self->{PARAMS}->{process_owner} = $self->{PARAMS}->{user};
-	delete $self->{PARAMS}->{user};
+	    $self->{PARAMS}->{process_owner} = $self->{PARAMS}->{user};
+	    delete $self->{PARAMS}->{user};
     }
     if (exists $self->{PARAMS}->{group}) {
-	$self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
-	delete $self->{PARAMS}->{group};
+	    $self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
+	    delete $self->{PARAMS}->{group};
     }
 
     unlink ($self->{PARAMS}->{socketfile});
     CTX('log')->log(
-	MESSAGE  => "Server initialization completed",
-	PRIORITY => "info",
-	FACILITY => "system",
+	    MESSAGE  => "Server initialization completed",
+	    PRIORITY => "info",
+	    FACILITY => "system",
 	);
     
     # clean up process list
@@ -152,7 +130,7 @@ sub new
     CTX('dbi_backend')->disconnect();
     CTX('dbi_log')->disconnect();
     
-    $self->run (%{$self->{PARAMS}});
+    $self->run(%{$self->{PARAMS}});
 }
 
 
@@ -176,50 +154,50 @@ sub post_bind_hook {
 
     # ... but can be overwritten in the config file
     if (defined $self->{PARAMS}->{socket_owner}) {
-	$socket_owner = __get_numerical_user_id($self->{PARAMS}->{socket_owner});
-	if (! defined $socket_owner) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_OWNER",
-		params  => {
-		    SOCKET_OWNER => $self->{PARAMS}->{socket_owner},
-		},
-		);
-	}
+        $socket_owner = __get_numerical_user_id($self->{PARAMS}->{socket_owner});
+        if (! defined $socket_owner) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_OWNER",
+                params  => {
+                    SOCKET_OWNER => $self->{PARAMS}->{socket_owner},
+                },
+            );
+        }
     }
     
     if (defined $self->{PARAMS}->{socket_group}) {
-	$socket_group = __get_numerical_group_id($self->{PARAMS}->{socket_group});
-	if (! defined $socket_group) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_GROUP",
-		params  => {
-		    SOCKET_GROUP => $self->{PARAMS}->{socket_group},
-		},
-		);
-	}
+        $socket_group = __get_numerical_group_id($self->{PARAMS}->{socket_group});
+        if (! defined $socket_group) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_INCORRECT_SOCKET_GROUP",
+                params  => {
+                    SOCKET_GROUP => $self->{PARAMS}->{socket_group},
+                },
+            );
+        }
     }
 
     if (($socket_owner != -1) || ($socket_group != -1)) {
-	# try to change socket ownership
- 	CTX('log')->log(
- 	    MESSAGE  => "Setting socket file '$socketfile' ownership to "
-	    . (( $socket_owner != -1) ? $socket_owner : 'unchanged' )
-	    . '/'
-	    . (( $socket_group != -1) ? $socket_group : 'unchanged' ),
- 	    PRIORITY => "info",
- 	    FACILITY => "system",
- 	    );
+        # try to change socket ownership
+        CTX('log')->log(
+            MESSAGE  => "Setting socket file '$socketfile' ownership to "
+            . (( $socket_owner != -1) ? $socket_owner : 'unchanged' )
+            . '/'
+            . (( $socket_group != -1) ? $socket_group : 'unchanged' ),
+            PRIORITY => "info",
+            FACILITY => "system",
+        );
 
-	if (! chown $socket_owner, $socket_group, $socketfile) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_COULD_NOT_CHANGE_SOCKET_OWNERSHIP",
-		params  => {
-		    SOCKETFILE => $socketfile,
-		    SOCKET_OWNER => $socket_owner,
-		    SOCKET_GROUP => $socket_group,
-		},
-		);
-	}
+        if (! chown $socket_owner, $socket_group, $socketfile) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_POST_BIND_HOOK_COULD_NOT_CHANGE_SOCKET_OWNERSHIP",
+                params  => {
+                    SOCKETFILE => $socketfile,
+                    SOCKET_OWNER => $socket_owner,
+                    SOCKET_GROUP => $socket_group,
+                },
+            );
+        }
     }
  
     return 1;
@@ -238,83 +216,56 @@ sub pre_loop_hook {
 
     ### drop privileges
     eval{
-	if( $self->{PARAMS}->{process_group} ne $) ){
-	    $self->log(2,"Setting gid to \"$self->{PARAMS}->{process_group}\"");
-	    CTX('log')->log(
-		MESSAGE  => "Setting gid to to " .$self->{PARAMS}->{process_group},
-		PRIORITY => "info",
-		FACILITY => "system",
-		);
-	    set_gid( $self->{PARAMS}->{process_group} );
-	}
-	if( $self->{PARAMS}->{process_owner} ne $> ){
-	    $self->log(2,"Setting uid to \"$self->{PARAMS}->{process_owner}\"");
-	    CTX('log')->log(
-		MESSAGE  => "Setting uid to to " .$self->{PARAMS}->{process_owner},
-		PRIORITY => "info",
-		FACILITY => "system",
-		);
-	    set_uid( $self->{PARAMS}->{process_owner} );
-	}
+        if( $self->{PARAMS}->{process_group} ne $) ){
+            $self->log(
+                2,
+                "Setting gid to \"$self->{PARAMS}->{process_group}\""
+            );
+            CTX('log')->log(
+                MESSAGE  => "Setting gid to to " 
+                            . $self->{PARAMS}->{process_group},
+                PRIORITY => "info",
+                FACILITY => "system",
+            );
+            set_gid( $self->{PARAMS}->{process_group} );
+        }
+        if( $self->{PARAMS}->{process_owner} ne $> ){
+            $self->log(
+                2,
+                "Setting uid to \"$self->{PARAMS}->{process_owner}\""
+            );
+            CTX('log')->log(
+                MESSAGE  => "Setting uid to to " 
+                    . $self->{PARAMS}->{process_owner},
+                PRIORITY => "info",
+                FACILITY => "system",
+            );
+            set_uid( $self->{PARAMS}->{process_owner} );
+        }
     };
     if( $EVAL_ERROR ){
-	if( $> == 0 ){
-	    CTX('log')->log(
-		MESSAGE  => $EVAL_ERROR,
-		PRIORITY => "fatal",
-		FACILITY => "system",
-		);
-	    die $EVAL_ERROR;
-	} elsif( $< == 0){
-	    CTX('log')->log(
-		MESSAGE  => "Effective UID changed, but Real UID is 0: $EVAL_ERROR",
-		PRIORITY => "warn",
-		FACILITY => "system",
-		);
-	}else{
-	    CTX('log')->log(
-		MESSAGE  => $EVAL_ERROR,
-		PRIORITY => "error",
-		FACILITY => "system",
-		);
-	}
+        if ( $> == 0 ) {
+            CTX('log')->log(
+                MESSAGE  => $EVAL_ERROR,
+                PRIORITY => "fatal",
+                FACILITY => "system",
+            );
+        die $EVAL_ERROR;
+        } elsif( $< == 0) {
+            CTX('log')->log(
+                MESSAGE  => "Effective UID changed, but Real UID is 0: $EVAL_ERROR",
+                PRIORITY => "warn",
+                FACILITY => "system",
+            );
+        } else {
+            CTX('log')->log(
+                MESSAGE  => $EVAL_ERROR,
+                PRIORITY => "error",
+                FACILITY => "system",
+            );
+        }
     }
 }
-
-
-# called statically
-sub exception_as_string {
-    my $exc = shift;
-
-    my $msg = "";
-    ##! 8: ref $exc
-    if (ref $exc eq '') {
-        ##! 16: "no ref"
-	$msg = $exc;
-    } elsif (ref $exc eq 'OpenXPKI::Exception') {
-        ##! 16: "OpenXPKI::Exception detected"
-	$msg = $exc->full_message() || '<no message>';
-        ##! 16: "do there be any children?"
-	if ($exc->children()) {
-            ##! 32: "has children"
-            foreach my $child (@{$exc->children()})
-            {
-                ##! 64: "call exception_as_string"
-	        $msg .= '; CHILD: [' . exception_as_string($child) . ']';
-            }
-	}
-        ##! 16: "children finished"
-    } elsif (ref $exc) {
-        ##! 16: "other exception detected"
-	$msg = $EVAL_ERROR->message();
-    } else {
-        ##! 16: "no exception detected"
-	$msg = "<not an exception>";
-    }
-    ##! 4: "final message: $msg"
-    return $msg;
-}
-
 
 sub process_request {
     my $rc;
@@ -325,30 +276,31 @@ sub process_request {
         $rc = do_process_request(@_);
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
-	if ($exc->message() =~ m{ (?:
+	    if ($exc->message() =~ m{ (?:
                 I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION
                 | I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT 
             ) }xms) {
-	    # exit quietly
-	    return 1;
-	}
+	        # exit quietly
+	        return 1;
+	    }
 
-	# other OpenXPKI exceptions
-	$msg = exception_as_string($EVAL_ERROR);
+        # other OpenXPKI exceptions
+        $msg = $exc->full_message();
     } elsif ($EVAL_ERROR) {
-	# non-OpenXPKI exception
- 	$msg = exception_as_string($EVAL_ERROR);
+        # non-OpenXPKI "exception"
+        $msg = $EVAL_ERROR;
     }
 
     if (defined $msg) {
- 	CTX('log')->log(
- 	    MESSAGE  => "Uncaught exception: " . $msg,
- 	    PRIORITY => "fatal",
- 	    FACILITY => "system",
- 	    );
- 	# die gracefully
-	##! 1: "Uncaught exception: " . Dumper $msg
- 	$ERRNO = 1;
+        CTX('log')->log(
+            MESSAGE  => "Uncaught exception: " . $msg,
+            PRIORITY => "fatal",
+            FACILITY => "system",
+        );
+        # die gracefully
+        ##! 1: "Uncaught exception: " . Dumper $msg
+        $ERRNO = 1;
+
         return;
     }
 
@@ -363,7 +315,7 @@ sub do_process_request
 
     eval { 
         CTX('dbi_log')->new_dbh();
-	CTX('dbi_log')->connect();
+	    CTX('dbi_log')->connect();
     };
     if ($EVAL_ERROR)
     {
@@ -481,7 +433,7 @@ sub do_process_request
 
     eval { 
         CTX('dbi_backend')->new_dbh();
-	CTX('dbi_backend')->connect();
+	    CTX('dbi_backend')->connect();
     };
     if ($EVAL_ERROR)
     {
@@ -496,7 +448,7 @@ sub do_process_request
 
     eval { 
         CTX('dbi_workflow')->new_dbh();
-	CTX('dbi_workflow')->connect();
+	    CTX('dbi_workflow')->connect();
     };
     if ($EVAL_ERROR)
     {
@@ -521,10 +473,10 @@ sub do_process_request
     my $user = '';
     my $role = '';
     eval {
-	$user = CTX('session')->get_user();
+	    $user = CTX('session')->get_user();
     };
     eval {
-	$role = '(' . CTX('session')->get_role() . ')';
+	    $role = '(' . CTX('session')->get_role() . ')';
     };
     $0 = 'openxpkid: ' . $user . $role;
 
@@ -664,7 +616,21 @@ sub __get_server_config
     my %params = ();
     $params{socketfile} = $socketfile;
     $params{proto}      = "unix";
-    $params{background} = 1;
+    if ($self->{TYPE} eq 'Simple') {
+        $params{server_type} = 'Simple';
+    }
+    elsif ($self->{TYPE} eq 'Fork') {
+        $params{server_type} = 'Fork';
+        $params{background}  = 1;
+    }
+    else {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER__GET_SERVER_CONFIG_UNKNOWN_SERVER_TYPE',
+            params  => {
+                TYPE => $self->{TYPE},
+            },
+        );
+    }
     $params{user}       = $config->get_xpath (XPATH => "common/server/user");
     $params{group}      = $config->get_xpath (XPATH => "common/server/group");
     $params{port}       = $socketfile . '|unix';
@@ -771,6 +737,38 @@ sub __get_server_config
 ##                                            ##
 ################################################
 
+sub __log_and_die {
+    ##! 1: 'start'
+    my $self  = shift;
+    my $error = shift;
+    my $when  = shift;
+
+    my $log_message;
+    if (ref $error eq 'OpenXPKI::Exception') {
+        ##! 16: 'error is exception'
+        my $msg = $error->full_message();
+        $log_message = "Exception during $when: $msg";
+    }
+    else {
+        ##! 16: 'error is something else'
+        $log_message = "Eval error during $when: $error";
+    }
+    ##! 16: 'log_message: ' . $log_message
+
+    CTX('log')->log(
+        MESSAGE  => $log_message,
+        PRIORITY => "fatal",
+        FACILITY => "system",
+    );
+
+ 	# die gracefully
+ 	$ERRNO = 1;
+    ##! 1: 'end, dying'
+    die $log_message;
+    
+    return 1;
+}
+
 ### obsolete??? (ak, 2007/03/12)
 sub command
 {
@@ -837,6 +835,25 @@ communication is handled via STDIN and STDOUT.
 The class selects the user interfaces and checks the
 pre-initialized variables. If all of this is fine then
 the user interface will be initialized and started.
+
+=head2 do_process_request
+
+does the actual work of process_request: it reconnects dbi_log,
+determines transport, serialization and service from the user
+input and calls the init() and run() methods on the corresponding
+service. It also does some housekeeping such as setting permissions,
+setting the process name, etc.
+
+=head2 post_bind_hook
+
+Is executed (by Net::Server) just after the bind process and just before
+any chrooting, change of user, or change of group occurs. Changes
+the socket ownership based on the configuration.
+
+=head2 pre_loop_hook
+
+Drops privileges to the user configured in the configuration file just
+before starting the main server loop.
 
 =head2 command
 
