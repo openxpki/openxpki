@@ -1,84 +1,52 @@
-
 use strict;
 use warnings;
 use English;
-use Test;
+use Test::More;
 use OpenXPKI::XML::Config;
 use Time::HiRes;
+use Net::Ping;
 
 BEGIN { plan tests => 6 };
 
-print STDERR "CONFIGURATION INHERITANCE\n";
-ok(1);
+diag "CONFIGURATION INHERITANCE\n";
 
 ## create new object
-my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/config.xml");
-if ($obj)
-{
-    ok (1);
-} else {
-    ok (0);
-    print STDERR "Error: ${EVAL_ERROR}\n";
-}
+my $obj;
+eval {
+    $obj = OpenXPKI::XML::Config->new(CONFIG => "t/config.xml");
+};
+ok(defined $obj, 'Config object defined') or diag "Error: $EVAL_ERROR";
 
 ## try to discover the ca token of the first realm
 my $name = eval {$obj->get_xpath (
                      XPATH   => ["pki_realm", "ca", "token", "backend"],
                      COUNTER => [0, 0, 0, 0])
                 };
-if ($EVAL_ERROR)
-{
-    ok(0);
-    print STDERR "Error: ".$EVAL_ERROR->as_string()."\n";
-} else {
-    ok(1);
-}
-ok ($name eq "OpenXPKI::Crypto::Backend::OpenSSL");
+is($EVAL_ERROR, '', 'Getting the CA token backend of the first realm') or diag "Error: ".$EVAL_ERROR;
+is($name, "OpenXPKI::Crypto::Backend::OpenSSL", 'Correct result from XML file');
 
 ## try a non-existing path
 $name = eval {$obj->get_xpath (
                   XPATH   => ["pki_realm", "ca", "token", "nom"],
                   COUNTER => [0, 0, 0, 0])
              };
-if ($EVAL_ERROR)
-{
-    ok(1);
-} else {
-    ok(0);
-    print STDERR "Error: no exception thrown on wrong path\n";
-}
+isnt($EVAL_ERROR, '', 'Testing non-existent path') or diag "Error: no exception thrown on wrong path";
 
-if ($ENV{OFFLINE})
-{
-    ok(1);
-    print STDERR "WARNING: Cannot validate the configuration with the schema because you are offline.\n";
-}
-else
-{ 
-    ## validate with xmllint
-    my $result = `xmllint -format -schema openxpki.xsd -xinclude t/config.xml 2>&1 1>/dev/null`;
-    if ($CHILD_ERROR)
-    {
-        my $msg = "Error: there is something wrong with xmllint (${CHILD_ERROR}: ${EVAL_ERROR})\n";
-        ## the w3c servers need really huge TTLs
-        $result = `ping -c 1 -t 30 www.w3.org`;
-        if ($CHILD_ERROR)
-        {
-            ok(1);
-            print STDERR "WARNING: Cannot validate the configuration with the schema because you are offline.\n";
-        } else {
-            ok(0);
-            print STDERR $msg;
-        }
-    } else {
+$EVAL_ERROR = '';
+
+TODO: {
+    local $TODO = 'The XML schema is broken, see #1702814';
+    SKIP: {
+        my $p = Net::Ping->new('tcp', 5); 
+        $p->{portnum} = 80;
+        skip "Cannot validate configuration with the schema because you are offline", 2 if ($ENV{OFFLINE} || ! $p->ping('www.w3.org'));
+
+        ## validate with xmllint
+        my $result = `xmllint -format -schema openxpki.xsd -xinclude t/config.xml 2>&1 1>/dev/null`;
+        is ($CHILD_ERROR, '', 'xmllint succeeded with the validation') or diag "Error: there is something wrong with xmllint (${CHILD_ERROR}: ${EVAL_ERROR})";
+
         $result =~ s/^(.*\n)?([^\n]+)\n?$/$2/s;
-        if ($result eq "t/config.xml validates")
-        {
-            ok(1);
-        } else {
-            ok(0);
-            print STDERR "xmllint reports some trouble with t/config.xml and openxpki.xsd\n";
-        }
+        is($result, "t/config.xml validates", 'xmllint says validation successfull') or diag "xmllint reports some trouble with t/config.xml and openxpki.xsd\n";
     }
 }
 
