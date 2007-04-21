@@ -2,7 +2,9 @@
 ##
 ## Written by Michael Bell for the OpenXPKI project
 ## Rewritten 2005 by Michael Bell for the OpenXPKI project
-## (C) Copyright 2003-2006 by The OpenXPKI Project
+## Enhanced to do super tag substition at initialization 2007 by
+## Alexander Klink for the OpenXPKI project
+## (C) Copyright 2003-2007 by The OpenXPKI Project
 ## $Revision$
 
 package OpenXPKI::XML::Cache;
@@ -11,6 +13,7 @@ use strict;
 use warnings;
 use utf8;
 
+use English;
 use File::Spec;
 
 ## this is for the caching itself
@@ -27,7 +30,9 @@ $XML::SAX::ParserPackage = "XML::SAX::PurePerl";
 
 use OpenXPKI::Debug 'OpenXPKI::XML::Cache';
 use OpenXPKI::Exception;
-use English;
+use Memoize;
+
+use Data::Dumper;
 
 #######################################
 ##          General functions        ##
@@ -46,6 +51,9 @@ sub new
 
     $self->{config} = $keys->{CONFIG};
     $self->{schema} = $keys->{SCHEMA} if (exists $keys->{SCHEMA});
+
+#    memoize('get_xpath',       NORMALIZER => 'normalize_get_xpath');
+#    memoize('get_xpath_count', NORMALIZER => 'normalize_get_xpath');
 
     return undef if (not $self->init ());
 
@@ -110,13 +118,286 @@ sub init
                         "ERRVAL" => $msg});
     }
     $self->{cache} = $xml->{openxpki}->[0];
+    ##! 64: 'cache: ' . Dumper $self->{cache}
+
     $self->{xtree}->{$filename}->{LEVEL} = 1;
     $self->{xtree}->{$filename}->{REF}   = $self->{cache};
 
+    ##! 64: 'xtree: ' . Dumper $self->{xtree}
     $self->__perform_xinclude();
+    ##! 64: 'cache after xinclude: ' . Dumper $self->{cache}
+    $self->__perform_super_resolution();
+    ##! 64: 'cache after super resolution: ' . Dumper $self->{cache}
 
     return 1;
 }
+
+sub __get_super_entry {
+    my $self = shift;
+    my $path = shift;
+
+    my @path = split q{/}, $path;
+    ##! 32: 'path: ' . Dumper \@path
+    my $result = $self->{cache};
+
+   PATH_TRAVERSAL:
+    foreach my $element (@path) {
+        my ($attribute, $id_attr, $id_content)
+            = $self->__parse_super_element_entry($element);
+        ##! 32: 'result: ' . Dumper $result
+        ##! 16: 'attribute: '  . $attribute
+        ##! 16: defined $id_attr ? 'id_attr: ' . $id_attr : '! id_attr'
+        ##! 16: defined $id_content ? 'id_content: ' . $id_content : '! id_content'
+
+        if (! defined $id_attr) {
+            ##! 16: 'id_attr is undefined, just using the first one'
+            $result = $result->{$attribute}->[0];
+            next PATH_TRAVERSAL;
+        }
+
+        $entry_found = 0;
+       FIND_ENTRY:
+        foreach my $possible_path (@{$result->{$attribute}}) {
+            ##! 32: 'possible path: ' . Dumper $possible_path
+            if (exists $possible_path->{$id_attr} 
+                && $possible_path->{$id_attr} eq $id_content) {
+                ##! 32: 'matching entry found'
+                $result = $possible_path;
+                $entry_found = 1;
+                last FIND_ENTRY;
+            }
+        }
+        if (! $entry_found) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_XML_CACHE_GET_SUPER_ENTRY_PATH_NOT_FOUND',
+                params  => {
+                    'PATH'    => $path,
+                    'ELEMENT' => $element,
+                },
+            );
+        }
+    }
+    # copy result so that changing things in the new structure does
+    # not break the one from which we inherited ...
+    my $result_copy;
+    foreach $key (keys %{$result}) {
+        $result_copy->{$key} = $result->{$key};
+    }
+    return $result_copy;;
+}
+
+sub __parse_super_element_entry {
+    my $self    = shift;
+    my $element = shift;
+    ##! 32: 'element: ' . $element
+
+    # entry is of the form
+    #           attribute                         (0)
+    #           attribute{id_content} or          (1)
+    #           attribute{id_attr:id_content}     (2)
+
+    if (! ($element =~ /{/)) {
+        ##! 16: 'element is of form 0'
+        return ($element, undef, undef);
+    }
+
+    my $attribute;
+    my $id_attr = 'id';
+    my $id_content;
+
+    if ($element =~ /:/) {
+        ##! 16: 'element is of form 2'
+        ($attribute, $id_attr, $id_content) = 
+            ($element =~ m/ ([^{]+) { (\w+) : (\w+) }/xms);
+    }
+    else {
+        ##! 16: 'element is of form 1'
+        ($attribute, $id_content) =
+            ($element =~ m/ ([^{]+) { (\w+) }/xms);
+    }
+    if (! defined $attribute 
+     || ! defined $id_attr
+     || ! defined $id_content) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_XML_CACHE_PARSE_SUPER_ELEMENT_ENTRY_ERROR_PARSING_PATH_ELEMENT',
+            params  => {
+                ELEMENT => $element,
+            },
+        );
+    }
+    return ($attribute, $id_attr, $id_content);
+}
+
+sub __replace_super {
+    my $self      = shift;
+    my $arg_ref   = shift;
+    my $start_ref = $arg_ref->{START_REF};
+    my $path      = "$arg_ref->{PATH}";
+    my $level     = $arg_ref->{LEVEL};
+    ##! 1: 'path: ' . $path
+    ##! 1: 'level: ' . $level
+    ##! 1: 'start_ref: ' . Dumper $start_ref
+
+    foreach my $entry (@{$start_ref}) {
+        ##! 16: 'entry: ' . Dumper $entry
+        if (exists $entry->{'super'}) {
+            ##! 16: 'super attribute exists, replacing content'
+            ##! 16 red on_yellow: 'super entry is: ' . $entry->{'super'}
+            ##! 16 bold blue on_white: 'current path is: ' . $path
+            
+            my $absolute_path_to_super;
+            if ($entry->{'super'} =~ m{\A \.\.}xms) {
+                ##! 16: 'super entry is relative, compute absolute path'
+                $absolute_path_to_super = $path;
+                $relative_path = $entry->{'super'};
+                while ($relative_path =~ s{\A \.\./}{}xms) {
+                    ##! 16: 'cut off ../ from relative_path: ' . $relative_path
+                    if (! $absolute_path_to_super) {
+                        # if absolute path is empty already, we can not
+                        # delete anything from it -> Exception
+                        # this means that some has specified ../ below
+                        # root
+                        OpenXPKI::Exception->throw(
+                            message => 'I18N_OPENXPKI_XML_CACHE_RELATIVE_TOO_MANY_LEVELS_UP',
+                            params => {
+                                'SUPER' => $entry->{super},
+                                'RELATIVE_PATH' => $relative_path,
+                            },
+                        );
+                    }
+                    $absolute_path_to_super =~ s{/? [^/]+ \z}{}xms;
+                    ##! 16: 'cut off last part from absolute_path_to_super: ' . $absolute_path_to_super
+                }
+                if ($absolute_path_to_super) {
+                    # we still have absolute path left, append relative path with /
+                    $absolute_path_to_super .= '/' . $relative_path;
+                }
+                else {
+                    # the absolute path is the rest of the relative path
+                    $absolute_path_to_super = $relative_path;
+                }
+                ##! 16: 'absolute_path_to_super: ' . $absolute_path_to_super
+            }
+            else {
+                ##! 16: 'super entry is absolute, just use that'
+                $absolute_path_to_super = $entry->{'super'};
+            }
+            # copy the entry to original entry (because we want to
+            # copy everything except the super part back later)
+            my $original_entry;
+            foreach my $key (keys %{$entry}) {
+                $original_entry->{$key} = $entry->{$key};
+            }
+            delete $original_entry->{'super'};
+            ##! 32: 'original_entry: ' . Dumper $original_entry
+
+            # overwrite entry with the inherited one from super
+            $entry = $self->__get_super_entry($absolute_path_to_super);
+            ##! 32: 'entry after copying from super: ' . Dumper $entry
+            # overwrite entries from the original entry
+            foreach my $key (keys %{$original_entry}) {
+                $entry->{$key} = $original_entry->{$key};
+            }
+            ##! 32: 'final entry after inheritance: ' . Dumper $entry
+        }
+        else {
+            ##! 16: 'super attribute does NOT exist, scanning each key'
+            my @keys = keys %{ $entry };
+            ##! 16: 'keys: ' . Dumper \@keys
+            
+            foreach my $key (@keys) {
+                ##! 16: 'key: ' . $key
+                if (ref $entry->{$key} eq 'ARRAY') {
+                    if (exists $entry->{id}) {
+                        ##! 32: 'entry->id exists: ' . $entry->{id}
+                        $new_path = $path . '{' . $entry->{id} . '}';
+                    }
+                    else {
+                        $new_path = $path;
+                    }
+                    # dig deeper if it is an array
+                    ##! 16: 'level: ' . $level
+                    ##! 16: 'array found, digging deeper'
+                    ##! 16: 'new_path: ' . $new_path
+                    ##! 16: 'path: '     . $new_path
+                    ##! 16: 'calling replace_super with path: ' . $new_path . '/' . $key
+                    $self->__replace_super({
+                        START_REF => $entry->{$key},
+                        PATH      => $new_path . '/' . $key,
+                        LEVEL     => $level + 1,
+                    });
+                }
+            }
+        }
+    }
+
+    return 1;
+}
+
+sub __perform_super_resolution {
+    my $self = shift;
+    ##! 1: 'start'
+
+    # scan configuration for unresolved super references
+
+    foreach my $key (keys %{$self->{cache}}) {
+        my $i = 0;
+       REPLACE_SUPER_TAGS:
+        while ($self->__super_tags_found($self->{cache}->{$key})) {
+            $self->__replace_super({
+                START_REF => $self->{cache}->{$key},
+                PATH      => $key,
+                LEVEL     => 0, # this is mainly for better debug output
+            });
+            if ($i > 1000) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_XML_CACHE_PERFORM_SUPER_RESOLUTION_TOO_MANY_INTERATIONS_POSSIBLE_SUPER_LOOP',
+                );
+                last REPLACE_SUPER_TAGS;
+            }
+            $i++;
+        }
+    }
+
+    ##! 1: 'end'
+    return 1;
+}
+
+sub __super_tags_found {
+    my $self      = shift;
+    my $start_ref = shift;
+    ##! 1: 'start'
+
+    my $found = 0;
+   SEARCH_FOR_SUPER:
+    foreach my $entry (@{$start_ref}) {
+        ##! 16: 'entry: ' . Dumper $entry
+        if (exists $entry->{'super'}) {
+            ##! 16: 'super tag found, exiting loop'
+            $found = 1;
+            last SEARCH_FOR_SUPER;
+        }
+        ##! 16: 'super attribute does NOT exist, scanning each key'
+        my @keys = keys %{ $entry };
+        ##! 16: 'keys: ' . Dumper \@keys
+        
+        foreach my $key (@keys) {
+            ##! 16: 'key: ' . $key
+            if (ref $entry->{$key} eq 'ARRAY') {
+                # dig deeper if it is an array
+                my $result = $self->__super_tags_found($entry->{$key});
+                if ($result) {
+                    ##! 16: 'super tag found'
+                    $found = 1;
+                    last SEARCH_FOR_SUPER;
+                }
+            }
+        }
+    }
+
+    ##! 1: 'end: ' . $found
+    return $found;
+};
 
 sub __perform_xinclude
 {
@@ -317,22 +598,11 @@ sub get_xpath
     {
         ##! 4: "XPATH: ".$keys->{XPATH}->[$i]
         ##! 4: "COUNTER: ".$keys->{COUNTER}->[$i]
-        if ($i+1 == scalar @{$keys->{XPATH}})
-        {
-            ##! 8: "length ok"
-        }
-        if (exists $item->{$keys->{XPATH}->[$i]})
-        {
-            ##! 8: "exists ok"
-        }
-        if (not ref $item->{$keys->{XPATH}->[$i]})
-        {
-            ##! 8: "no ref ok"
-        }
-        if ($keys->{COUNTER}->[$i] == 0)
-        {
-            ##! 8: "counter ok"
-        }
+
+        ##! 8: $i+1 == scalar @{$keys->{XPATH}} ? 'length ok' : 'length NOT ok'
+        ##! 8: exists $item->{$keys->{XPATH}->[$i]} ? 'exists ok' : 'exists NOT ok'
+        ##! 8: ! ref $item->{$keys->{XPATH}->[$i]} ? '! ref ok' : '! ref NOT ok'
+        ##! 8: $keys->{COUNTER}->[$i] == 0 ? 'counter ok' : 'counter NOT ok'
         if (not exists $item->{$keys->{XPATH}->[$i]} or
             not ref $item->{$keys->{XPATH}->[$i]} or
             not exists $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]])
@@ -499,7 +769,8 @@ be valid in the meaning of the schema. The parameter is optional.
 
 This function loads all XML files (or literal XML strings) and initializes 
 the internal data structures. After init you have a constant access 
-performance.
+performance. The init function resolves both xincludes as well as
+inheritance via super tags.
 
 =head2 dump
 

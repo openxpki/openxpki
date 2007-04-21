@@ -509,7 +509,7 @@ sub get_pki_realms
 		    if (my $exc = OpenXPKI::Exception->caught()) {
 			# ignore exception for missing 'notbefore' entry
 			if (($exc->message() 
-			    eq "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND")
+			    eq "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT")
 			    && ($validitytype eq "notbefore")) {
 			    # default: "now"
 			    $validity = undef;
