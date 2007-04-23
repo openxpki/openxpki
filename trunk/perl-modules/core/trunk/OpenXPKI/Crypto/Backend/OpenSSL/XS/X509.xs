@@ -218,8 +218,8 @@ fingerprint (cert, digest_name="sha1")
 	}
 	n = BIO_get_mem_data(out, &fingerprint);
 	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, fingerprint, n);
+	Newz(0, char_ptr, (int)n+1, char);
+        memcpy (char_ptr, fingerprint, (int)n);
 	RETVAL = char_ptr;
 	BIO_free(out);
     OUTPUT:
@@ -360,8 +360,8 @@ pubkey_hash (cert, digest_name="sha1")
 	}
 	n = BIO_get_mem_data(out, &fingerprint);
 	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, fingerprint, n);
+	Newz(0, char_ptr, (int)n+1, char);
+        memcpy (char_ptr, fingerprint, (int)n);
 	RETVAL = char_ptr;
 	BIO_free(out);
     OUTPUT:

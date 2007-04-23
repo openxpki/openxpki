@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 11;
+plan tests => 13;
 
 diag "OpenXPKI::Crypto::Backend::OpenSSL::SPKAC\n";
 
@@ -51,7 +51,7 @@ $spkac = $token->get_object ({DATA => $spkac, TYPE => "CSR", FORMAT => "SPKAC"})
 ok($spkac, 'get_object()');
 
 ## check that all required functions are available and work
-foreach my $func ("pubkey_algorithm", "pubkey", "keysize", "modulus", "exponent")
+foreach my $func ("pubkey_algorithm", "pubkey", "keysize", "modulus", "exponent", "pubkey_hash", "signature_algorithm")
 {
     ## FIXME: this is a bypass of the API !!!
     my $result = $spkac->$func();

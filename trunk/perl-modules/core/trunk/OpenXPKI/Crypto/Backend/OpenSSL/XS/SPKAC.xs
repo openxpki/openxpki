@@ -79,7 +79,8 @@ pubkey_hash (spkac, digest_name="sha1")
 	if (pkey != NULL)
 	{
 		length = i2d_PublicKey (pkey, NULL);
-		data = OPENSSL_malloc(length+1);
+		/* data = OPENSSL_malloc(length+1); */
+                /* Do not free this pointer! It is from the EVP_PKEY structure. */
 		length = i2d_PublicKey (pkey, &data);
 		if (!strcmp ("sha1", digest_name))
 			digest = EVP_sha1();
@@ -95,13 +96,13 @@ pubkey_hash (spkac, digest_name="sha1")
 				if (j+1 != (int)n) BIO_printf(out,":");
 			}
 		}
-		OPENSSL_free (data);
+		/* OPENSSL_free (data); */
 		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &fingerprint);
 	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, fingerprint, n);
+	Newz(0, char_ptr, (int)n+1, char);
+        memcpy (char_ptr, fingerprint, (int)n);
 	RETVAL = char_ptr;
 	BIO_free(out);
     OUTPUT:
