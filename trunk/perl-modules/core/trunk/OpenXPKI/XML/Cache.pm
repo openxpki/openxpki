@@ -155,7 +155,7 @@ sub __get_super_entry {
             next PATH_TRAVERSAL;
         }
 
-        $entry_found = 0;
+        my $entry_found = 0;
        FIND_ENTRY:
         foreach my $possible_path (@{$result->{$attribute}}) {
             ##! 32: 'possible path: ' . Dumper $possible_path
@@ -180,7 +180,7 @@ sub __get_super_entry {
     # copy result so that changing things in the new structure does
     # not break the one from which we inherited ...
     my $result_copy;
-    foreach $key (keys %{$result}) {
+    foreach my $key (keys %{$result}) {
         $result_copy->{$key} = $result->{$key};
     }
     return $result_copy;;
@@ -249,7 +249,7 @@ sub __replace_super {
             if ($entry->{'super'} =~ m{\A \.\.}xms) {
                 ##! 16: 'super entry is relative, compute absolute path'
                 $absolute_path_to_super = $path;
-                $relative_path = $entry->{'super'};
+                my $relative_path = $entry->{'super'};
                 while ($relative_path =~ s{\A \.\./}{}xms) {
                     ##! 16: 'cut off ../ from relative_path: ' . $relative_path
                     if (! $absolute_path_to_super) {
@@ -308,12 +308,10 @@ sub __replace_super {
             foreach my $key (@keys) {
                 ##! 16: 'key: ' . $key
                 if (ref $entry->{$key} eq 'ARRAY') {
+                    my $new_path = $path;
                     if (exists $entry->{id}) {
                         ##! 32: 'entry->id exists: ' . $entry->{id}
                         $new_path = $path . '{' . $entry->{id} . '}';
-                    }
-                    else {
-                        $new_path = $path;
                     }
                     # dig deeper if it is an array
                     ##! 16: 'level: ' . $level
