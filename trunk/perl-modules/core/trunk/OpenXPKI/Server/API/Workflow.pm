@@ -717,7 +717,7 @@ sub __get_workflow_factory {
 	if (my $exc = OpenXPKI::Exception->caught()) {
 	    # ignore missing configuration
 	    if (($exc->message() 
-		 eq "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND")
+		 eq "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT")
 		&& (($type eq 'validators') || ($type eq 'conditions'))) {
 		$count = 0;
 	    }
