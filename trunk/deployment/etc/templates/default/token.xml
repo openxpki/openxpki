@@ -37,7 +37,7 @@
     [% THROW config "No 'id' defined for issuing CA $ca" IF ! $ca.id.defined %]
     [% THROW config "No 'dir' defined for issuing CA $ca" IF ! $ca.dir.defined %]
 
-    <token id="[% $ca.id %]" super="common/token_config/token{default}">
+    <token id="[% $ca.id %]" super="../token{default}">
         <!-- CA key (PEM encoded) -->
         <key>[% $ca.dir %]/cakey.pem</key>
 
@@ -52,7 +52,7 @@
     [% THROW config "No 'id' defined for subsystem $entry" IF ! $entry.id.defined %]
     [% THROW config "No 'dir' defined for subsystem $entry" IF ! $entry.dir.defined %]
 
-    <token id="[% $entry.id %]" super="common/token_config/token{default}">
+    <token id="[% $entry.id %]" super="../token{default}">
         <!-- Backend class -->
         <backend>[% $entry.backend %]</backend>
 	

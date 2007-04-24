@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 8;
+plan tests => 14;
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
@@ -11,7 +11,8 @@ if ($ENV{DEBUG_LEVEL}) {
 require OpenXPKI::XML::Config;
 
 use Time::HiRes;
-
+use Data::Dumper;
+#use GraphViz::Data::Structure;
 
 diag "RELATIVE CONFIGURATION INHERITANCE\n";
 
@@ -72,5 +73,40 @@ $item = $obj->get_xpath (
 # test 9
 is($item, 'somevalue');
 
+$item = $obj->get_xpath(
+    XPATH   => ['subordinate', 'item', 'value'],
+    COUNTER => [0, 7, 0]);
 
+is($item, 'test');
+
+## create new object
+$obj = OpenXPKI::XML::Config->new(CONFIG => "t/25_crypto/test_profile.xml");
+ok($obj) or diag "Error: ${EVAL_ERROR}\n";
+
+unlike($obj->dump(), qr/name --> super\n/, 'No mention of super in the dump');
+
+my $result;
+eval {
+    $result = $obj->get_xpath(
+        XPATH   => ['selfsignedca', 'profile', 'validity', 'notafter', 'format' ],
+        COUNTER => [0             , 1        , 0         , 0         , 0        ],
+    );
+};
+ok (! $EVAL_ERROR, 'get_xpath works') or diag $EVAL_ERROR;
+is ($result, 'relativedate', 'get_xpath returns the correct result');
+
+
+eval {
+    $result = $obj->get_xpath(
+        XPATH   => ['selfsignedca', 'profile', 'validity', 'notbefore', 'format' ],
+        COUNTER => [0             , 0        , 0         , 0         , 0        ],
+    );
+};
+# if this test fails, it usually means that the one who inherits inadvertently
+# copied some of his data to the one he inherited from ...
+ok ($EVAL_ERROR, 'Super entry did not inherit from caller');
+
+# tip of the day, nice for debugging:
+# my $gvds = GraphViz::Data::Structure->new($obj->dumper);
+# print $gvds->graph()->as_png('test.png');
 1;

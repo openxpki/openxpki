@@ -1,4 +1,4 @@
-## OpenXPKI::XML::Cache
+# OpenXPKI::XML::Cache
 ##
 ## Written by Michael Bell for the OpenXPKI project
 ## Rewritten 2005 by Michael Bell for the OpenXPKI project
@@ -132,9 +132,46 @@ sub init
     return 1;
 }
 
+sub __super_tags_found {
+    my $self      = shift;
+    my $start_ref = shift;
+    ##! 1: 'start'
+
+    my $found = 0;
+   SEARCH_FOR_SUPER:
+    foreach my $entry (@{$start_ref}) {
+        ##! 16: 'entry: ' . Dumper $entry
+        if (exists $entry->{'super'}) {
+            ##! 16: 'super tag found, exiting loop'
+            $found = 1;
+            last SEARCH_FOR_SUPER;
+        }
+        ##! 16: 'super attribute does NOT exist, scanning each key'
+        my @keys = keys %{ $entry };
+        ##! 16: 'keys: ' . Dumper \@keys
+        
+        foreach my $key (@keys) {
+            ##! 16: 'key: ' . $key
+            if (ref $entry->{$key} eq 'ARRAY') {
+                # dig deeper if it is an array
+                my $result = $self->__super_tags_found($entry->{$key});
+                if ($result) {
+                    ##! 16: 'super tag found'
+                    $found = 1;
+                    last SEARCH_FOR_SUPER;
+                }
+            }
+        }
+    }
+
+    ##! 1: 'end: ' . $found
+    return $found;
+};
+
 sub __get_super_entry {
-    my $self = shift;
-    my $path = shift;
+    my $self  = shift;
+    my $path  = shift;
+    my $level = shift;
 
     my @path = split q{/}, $path;
     ##! 32: 'path: ' . Dumper \@path
@@ -179,11 +216,39 @@ sub __get_super_entry {
     }
     # copy result so that changing things in the new structure does
     # not break the one from which we inherited ...
+    # Also replace any super tags in the structure we found (so that
+    # local references get resolved there and not at the new place
+    # later, which will not work)
     my $result_copy;
-    foreach my $key (keys %{$result}) {
-        $result_copy->{$key} = $result->{$key};
+    if (exists $result->{'super'}) {
+        ##! 16: 'super tag found at "toplevel"'
+        ##! 16: 'result: ' . Dumper $result
+        ##! 16: 'level: ' . ($level + 1)
+        ##! 16: 'path: '  . $path
+        $result_copy = $self->__replace_super({
+            START_REF => [ $result ],
+            PATH      => $path,
+            LEVEL     => $level + 1,
+        })->[0];
+        return $result_copy;
     }
-    return $result_copy;;
+
+    foreach my $key (keys %{$result}) {
+        if (ref $result->{$key} eq 'ARRAY' && $self->__super_tags_found($result->{$key})) {
+            ##! 16: 'calling replace super ...'
+            ##! 16: 'result->{$key}: ' . Dumper $result->{$key}
+            $result_copy->{$key} = $self->__replace_super({
+                START_REF => $result->{$key},
+                LEVEL     => $level + 1,
+                PATH      => $path . '/' . $key,
+            });
+            ##! 16: 'result_copy->{$key}: ' . Dumper $result_copy->{$key}
+        }
+        else {
+            $result_copy->{$key} = $result->{$key};
+        }
+    }
+    return $result_copy;
 }
 
 sub __parse_super_element_entry {
@@ -234,9 +299,16 @@ sub __replace_super {
     my $start_ref = $arg_ref->{START_REF};
     my $path      = "$arg_ref->{PATH}";
     my $level     = $arg_ref->{LEVEL};
+    my $MAX_LEVEL = 500;
     ##! 1: 'path: ' . $path
     ##! 1: 'level: ' . $level
     ##! 1: 'start_ref: ' . Dumper $start_ref
+
+    if ($level > $MAX_LEVEL) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_XML_CACHE_REPLACE_SUPER_LEVEL_TOO_DEEP_POSSIBLE_SUPER_LOOP',
+        );
+    }
 
     foreach my $entry (@{$start_ref}) {
         ##! 16: 'entry: ' . Dumper $entry
@@ -282,54 +354,121 @@ sub __replace_super {
                 ##! 16: 'super entry is absolute, just use that'
                 $absolute_path_to_super = $entry->{'super'};
             }
-            # copy the entry to original entry (because we want to
+            # copy the entry to $original_entry (because we want to
             # copy everything except the super part back later)
-            my $original_entry;
-            foreach my $key (keys %{$entry}) {
-                $original_entry->{$key} = $entry->{$key};
-            }
+            
+            my $original_entry = {};
+            $self->__deepcopy($entry, $original_entry);
+            
             delete $original_entry->{'super'};
             ##! 32: 'original_entry: ' . Dumper $original_entry
 
             # overwrite entry with the inherited one from super
-            $entry = $self->__get_super_entry($absolute_path_to_super);
+            $self->__deepcopy(
+                $self->__get_super_entry(
+                    $absolute_path_to_super,
+                    $level,
+                ),
+                $entry,
+            );
+            delete $entry->{'super'};
             ##! 32: 'entry after copying from super: ' . Dumper $entry
+            ##! 32: 'copying back from original entry: ' . Dumper $original_entry
+            ##! 32: 'keys of original entry: ' . Dumper keys %{$original_entry}
             # overwrite entries from the original entry
-            foreach my $key (keys %{$original_entry}) {
-                $entry->{$key} = $original_entry->{$key};
-            }
+            $self->__deepcopy($original_entry, $entry);
             ##! 32: 'final entry after inheritance: ' . Dumper $entry
         }
         else {
             ##! 16: 'super attribute does NOT exist, scanning each key'
-            my @keys = keys %{ $entry };
-            ##! 16: 'keys: ' . Dumper \@keys
-            
-            foreach my $key (@keys) {
-                ##! 16: 'key: ' . $key
-                if (ref $entry->{$key} eq 'ARRAY') {
-                    my $new_path = $path;
-                    if (exists $entry->{id}) {
-                        ##! 32: 'entry->id exists: ' . $entry->{id}
-                        $new_path = $path . '{' . $entry->{id} . '}';
-                    }
-                    # dig deeper if it is an array
-                    ##! 16: 'level: ' . $level
-                    ##! 16: 'array found, digging deeper'
-                    ##! 16: 'new_path: ' . $new_path
-                    ##! 16: 'path: '     . $new_path
-                    ##! 16: 'calling replace_super with path: ' . $new_path . '/' . $key
-                    $self->__replace_super({
-                        START_REF => $entry->{$key},
-                        PATH      => $new_path . '/' . $key,
-                        LEVEL     => $level + 1,
-                    });
-                }
+            $entry = $self->__replace_super_foreach_arrayrefkey({
+                ENTRY => $entry,
+                PATH  => $path,
+                LEVEL => $level,
+            });
+        }
+    }
+    ##! 16: 'end, start_ref: ' . Dumper $start_ref
+
+    return $start_ref;
+}
+
+sub __deepcopy {
+    ##! 1: 'start'
+    my $self   = shift;
+    my $source = shift;
+    my $dest   = shift;
+    ##! 32: 'source: ' . Dumper $source
+    ##! 32: 'dest:   ' . Dumper $dest
+
+    if (ref $source eq '') {
+        ##! 32: 'source is scalar'
+        $dest = $source;
+        return 1;
+    }
+    my @entries = ();
+    if (ref $source eq 'HASH') {
+        ##! 16: 'source is hashref'
+        foreach my $key (keys %{$source}) {
+            ##! 32: 'key: ' . $key
+            if (ref $dest->{$key} eq 'HASH'
+             || ref $dest->{$key} eq 'ARRAY') {
+                ##! 64: 'dest is hash or array, deepcopying'
+                $self->__deepcopy($source->{$key}, $dest->{$key});
+            }
+            elsif (! ref $dest->{$key}) {
+                ##! 64: 'dest is scalar, copying source: ' . $source->{$key} . ' to dest: ' . $dest->{$key}
+                $dest->{$key} = $source->{$key};
             }
         }
     }
-
+    elsif (ref $source eq 'ARRAY') {
+        # Note that his not a 'general' deepcopy, but assumes that
+        # dest and source have the same number of entries if source
+        # is an arrayref. Luckily, this holds true for the structures
+        # generated from XMLin ...
+        ##! 16: 'source is arrayref'
+        for (my $i = 0; $i < scalar @{ $source }; $i++) {
+            ##! 32: 'copying entry ' . $i
+            $self->__deepcopy($source->[$i], $dest->[$i]);
+        }
+    }
     return 1;
+}
+
+
+sub __replace_super_foreach_arrayrefkey {
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $entry   = $arg_ref->{'ENTRY'};
+    my $path    = $arg_ref->{'PATH'};
+    my $level   = $arg_ref->{'LEVEL'};
+    
+    my @keys = keys %{ $entry };
+    ##! 16: 'keys: ' . Dumper \@keys
+    
+    foreach my $key (@keys) {
+        ##! 16: 'key: ' . $key
+        if (ref $entry->{$key} eq 'ARRAY') {
+            my $new_path = $path;
+            if (exists $entry->{id}) {
+                ##! 32: 'entry->id exists: ' . $entry->{id}
+                $new_path = $path . '{' . $entry->{id} . '}';
+            }
+            # dig deeper if it is an array
+            ##! 16: 'level: ' . $level
+            ##! 16: 'array found, digging deeper'
+            ##! 16: 'new_path: ' . $new_path
+            ##! 16: 'path: '     . $new_path
+            ##! 16: 'calling replace_super with path: ' . $new_path . '/' . $key
+            $entry->{$key} = $self->__replace_super({
+                START_REF => $entry->{$key},
+                PATH      => $new_path . '/' . $key,
+                LEVEL     => $level + 1,
+            });
+        }
+    }
+    return $entry;
 }
 
 sub __perform_super_resolution {
@@ -360,42 +499,6 @@ sub __perform_super_resolution {
     ##! 1: 'end'
     return 1;
 }
-
-sub __super_tags_found {
-    my $self      = shift;
-    my $start_ref = shift;
-    ##! 1: 'start'
-
-    my $found = 0;
-   SEARCH_FOR_SUPER:
-    foreach my $entry (@{$start_ref}) {
-        ##! 16: 'entry: ' . Dumper $entry
-        if (exists $entry->{'super'}) {
-            ##! 16: 'super tag found, exiting loop'
-            $found = 1;
-            last SEARCH_FOR_SUPER;
-        }
-        ##! 16: 'super attribute does NOT exist, scanning each key'
-        my @keys = keys %{ $entry };
-        ##! 16: 'keys: ' . Dumper \@keys
-        
-        foreach my $key (@keys) {
-            ##! 16: 'key: ' . $key
-            if (ref $entry->{$key} eq 'ARRAY') {
-                # dig deeper if it is an array
-                my $result = $self->__super_tags_found($entry->{$key});
-                if ($result) {
-                    ##! 16: 'super tag found'
-                    $found = 1;
-                    last SEARCH_FOR_SUPER;
-                }
-            }
-        }
-    }
-
-    ##! 1: 'end: ' . $found
-    return $found;
-};
 
 sub __perform_xinclude
 {
