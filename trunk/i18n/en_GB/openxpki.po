@@ -650,7 +650,10 @@ msgstr "Create private key"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DEFAULT_CSP"
-msgstr "In the last step, please choose the key length of your private key. Your browser will generate a new SPKAC key for you and submit the certificate request to the CA."
+msgstr ""
+"In the last step, please choose the key length of your private key. Your "
+"browser will generate a new SPKAC key for you and submit the certificate "
+"request to the CA."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DESCRIPTION"
@@ -775,7 +778,10 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_TITLE"
 msgstr "Choose a role"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_DESCRIPTION"
-msgstr "In the last step, please choose the key length of your private key. Your browser will generate a new SPKAC key for you and submit the certificate request to the CA."
+msgstr ""
+"In the last step, please choose the key length of your private key. Your "
+"browser will generate a new SPKAC key for you and submit the certificate "
+"request to the CA."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SPKAC_TITLE"
 msgstr "Create private key"
@@ -802,11 +808,11 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_MORE_FIELDS"
 msgstr "+1"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_NO_VALUE_OPTIONAL"
-msgstr "(no value, this field is optional)"
-"The name of the certificate is build from the values of the following form "
-"fields. Please enter the required information. If you are not sure about "
-"what to enter then please read the descriptions of the fields at the end of "
-"this page."
+msgstr ""
+"(no value, this field is optional)The name of the certificate is build from "
+"the values of the following form fields. Please enter the required "
+"information. If you are not sure about what to enter then please read the "
+"descriptions of the fields at the end of this page."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_STYLE_DESCRIPTION"
 msgstr ""
@@ -1316,10 +1322,6 @@ msgstr "Key generation"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_TYPE"
 msgstr "CSR type"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
-msgstr "Key generation"
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
 msgstr "Description"
 
@@ -1333,10 +1335,6 @@ msgstr "Get workflow instance information"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Last update"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
-msgstr "Workflow instances"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
 msgstr ""
@@ -1505,10 +1503,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
-msgstr "Additional informations"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED"
@@ -2692,18 +2686,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE"
 msgstr "Waiting for certificate issuance"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
-msgstr "Additional information"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
-msgstr "Description"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
-msgstr "Last update"
-
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
 msgstr "CA Info"
 
@@ -2919,16 +2901,8 @@ msgstr "no"
 msgid "I18N_OPENXPKI_NOT_AVAILABLE"
 msgstr "n/a"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_O"
-msgstr "no"
-
 msgid "I18N_OPENXPKI_OPTIONAL"
 msgstr "optional"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_OU"
-msgstr "no"
 
 msgid "I18N_OPENXPKI_OU_DESC"
 msgstr "Organizational Unit"
@@ -2940,7 +2914,9 @@ msgid "I18N_OPENXPKI_PHONE"
 msgstr "Phone"
 
 msgid "I18N_OPENXPKI_PHONE_DESC"
-msgstr "A telephone number under which you can be reached for questions regarding your certificate request"
+msgstr ""
+"A telephone number under which you can be reached for questions regarding "
+"your certificate request"
 
 msgid "I18N_OPENXPKI_PORT"
 msgstr "Port"
@@ -2981,7 +2957,11 @@ msgid "I18N_OPENXPKI_PROFILE_USER"
 msgstr "User profile"
 
 msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_DESC"
-msgstr "If you use this style, you'll only be required to enter your name, username and e-mail address. This is the easiest way to obtain a certificate, use it if you have no specific requirement for which you would need the advanced style."
+msgstr ""
+"If you use this style, you'll only be required to enter your name, username "
+"and e-mail address. This is the easiest way to obtain a certificate, use it "
+"if you have no specific requirement for which you would need the advanced "
+"style."
 
 msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_STYLE"
 msgstr "Basic user naming style"
@@ -3048,7 +3028,9 @@ msgid "I18N_OPENXPKI_SAN_OID"
 msgstr "OID"
 
 msgid "I18N_OPENXPKI_SAN_OID_DESCRIPTION"
-msgstr "Using this field you can add arbitrary object identifiers (OIDs) and values for them. You will probably need this very rarely."
+msgstr ""
+"Using this field you can add arbitrary object identifiers (OIDs) and values "
+"for them. You will probably need this very rarely."
 
 msgid "I18N_OPENXPKI_SAN_RID"
 msgstr "Registered ID"
@@ -3919,6 +3901,45 @@ msgstr ""
 "The GUID __GUID__ is not a valid Microsoft GUID and not a valid RFC 4122 "
 "UUID."
 
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_ADD_DN_ATTRIBUTE_MISSING"
+msgstr "Attribute specified in realm schema does not present in certificate"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_ADD_DN_ATTRIBUTE_NOT_IN_SCHEMA"
+msgstr "Attribute is not described in realm schema"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_ADD_DN_LDAP_BIND_FAILED"
+msgstr "Ldap bind failed"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_ADD_DN_LDAP_CONNECTION_FAILED"
+msgstr "Connection to LDAP server failed"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_IMPORT_CERTIFICATE_TOKEN_UNAVAILABLE"
+msgstr "Cannot get a token to import DER-certificate"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_IMPORT_LDAP_BIND_FAILED"
+msgstr "Ldap bind failed"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_IMPORT_LDAP_CONNECTION_FAILED"
+msgstr "Connection to LDAP server failed"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_CONVERSION_FAILED"
+msgstr "Certificate conversion failed"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_BIND_FAILED"
+msgstr "Ldap bind failed"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_CONNECTION_FAILED"
+msgstr "Connection to LDAP server failed"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MODIFY_FAILED"
+msgstr "Error occured while trying to modify LDAP node"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_SEARCH_FAILED"
+msgstr "Error occured while trying to search LDAP node"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_TOKEN_UNAVAILABLE"
+msgstr "Cannot get a token to publish DER-certificate"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_BIND_FAILED"
 msgstr ""
@@ -4331,6 +4352,9 @@ msgstr "The SPKAC string is empty."
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKCERTTESTRESULT_TESTRESULT_NOT_TRUE"
 msgstr "The SPKAC string is empty."
 
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECK_DN_LDAP_NODE_DOES_NOT_EXIST"
+msgstr "LDAP node does not exist"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_INCORRECT_NUMBER_OF_VALID_CERTS"
 msgstr "The SPKAC string is empty."
@@ -4488,21 +4512,28 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTPROFILE_PROFILE_NOT_VALID_FOR
 msgstr "The SPKAC string is empty."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_DID_NOT_MATCH_REGEX"
-msgstr "The entry for __PART__ did not match the required regular expression (__REGEX__). Please check if your entry conforms to the naming convention."
+msgstr ""
+"The entry for __PART__ did not match the required regular expression "
+"(__REGEX__). Please check if your entry conforms to the naming convention."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_PART_NOT_AVAILABLE_BUT_REQUIRED"
 msgstr ""
-"The __PART__ field is empty but the configuration requires a value for this field. Please enter a value for __PART__."
+"The __PART__ field is empty but the configuration requires a value for this "
+"field. Please enter a value for __PART__."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_SELECT_DID_NOT_MATCH_OPTIONS"
 msgstr "The name __DNS__ is not a valid DNS entry."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_TOO_LITTLE_ELEMENTS"
-msgstr "__MIN__ elements are required for field __PART__, but you have only provided __AMOUNT__."
+msgstr ""
+"__MIN__ elements are required for field __PART__, but you have only provided "
+"__AMOUNT__."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTSUBJECTPARTS_TOO_MANY_ENTRIES_FOR_PART"
-msgstr "At most __MAX__ elements can be specified for field __PART__, but you specified __ENTRIES__."
+msgstr ""
+"At most __MAX__ elements can be specified for field __PART__, but you "
+"specified __ENTRIES__."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_ID_MISMATCH"
@@ -4612,6 +4643,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_NO_TABLE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER__GET_SERVER_CONFIG_UNKNOWN_SERVER_TYPE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
 
@@ -4686,53 +4723,13 @@ msgstr ""
 "action."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_NO_PKI_REALM_CONFIGURED"
 msgstr ""
 "The used subject style requires at minimum one organizational unit and two "
 "domain components."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
-msgstr ""
-"The used subject style requires at minimum one organizational unit, one "
-"organization and one country."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
-msgstr "The used suject style requires a UID plus a common name."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
@@ -5279,35 +5276,14 @@ msgstr "Approve CSR"
 msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
 msgstr "Exported logs"
 
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_CERT_TO_STACK"
-msgstr "Adding a certificate"
-
 msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_NODE"
 msgstr "Adding missing node"
 
 msgid "I18N_OPENXPKI_WF_STATE_LDAP_ALL_NODES_PRESENT"
 msgstr "All LDAP nodes are present"
 
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_ATTRIBUTES_DETERMINED"
-msgstr "LDAP attributes determined"
-
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_CERT_STACK_LOADED"
-msgstr "Node certificates are loaded"
-
 msgid "I18N_OPENXPKI_WF_STATE_LDAP_CHECK_DN_AVAILABLE"
 msgstr "Checking if DN exists in LDAP tree"
-
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_LEAF_TYPE_AVAILABLE"
-msgstr "Looking for the leaf in LDAP tree"
-
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_MISSING_NODE_DETERMINED"
-msgstr "LDAP node for the given DN is missing"
-
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_NODE_UPDATED"
-msgstr "LDAP node updated"
-
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_OBJECTCLASSES_DETERMINED"
-msgstr "Determine LDAP objectclasses"
 
 msgid "I18N_OPENXPKI_WF_STATE_LDAP_PUBLIC_INITIAL"
 msgstr "Initial state of the LDAP publishing workflow"
@@ -5387,30 +5363,6 @@ msgstr "Certificates"
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_UNSUPPORTED_CSR_TYPE"
 msgstr "Certificates"
 
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_IMPORT_CERTIFICATE_TOKEN_UNAVAILABLE"
-msgstr "Cannot get a token to import DER-certificate"
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_CONVERSION_FAILED"
-msgstr "Certificate conversion failed"
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_BIND_FAILED"
-msgstr "Ldap bind failed"
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_CONNECTION_FAILED"
-msgstr "Connection to LDAP server failed"
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MISSING_NODE"
-msgstr "Cannot publish the certificate, LDAP node is missing"
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MODIFY_FAILED"
-msgstr "Error occured while trying to modify LDAP node"
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_SEARCH_FAILED"
-msgstr "Error occured while trying to search LDAP node"
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_TOKEN_UNAVAILABLE"
-msgstr "Cannot get a token to publish DER-certificate"
-
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_DEFAULT_TOKEN_UNAVAILABLE"
 msgstr ""
 
@@ -5454,6 +5406,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_WRITE_FILE_OPEN_FAILED"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_XML_CACHE_GET_SUPER_ENTRY_PATH_NOT_FOUND"
+msgstr "testuser"
+
 msgid "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_MISSING_ELEMENT"
 msgstr ""
 
@@ -5472,11 +5428,21 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CACHE_INIT_XML_SCHEMA_ERROR"
 msgstr ""
 
+msgid "I18N_OPENXPKI_XML_CACHE_PARSE_SUPER_ELEMENT_ENTRY_ERROR_PARSING_PATH_ELEMENT"
+msgstr ""
+
+msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_SUPER_RESOLUTION_TOO_MANY_INTERATIONS_POSSIBLE_SUPER_LOOP"
+msgstr ""
+
 msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_LOOP_DETECTED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_XML_ERROR"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_XML_CACHE_RELATIVE_TOO_MANY_LEVELS_UP"
+msgstr "Sleep"
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_FIXED_PARAMS_MISSING_COUNTER"
 msgstr ""
@@ -5484,17 +5450,101 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_FIXED_PARAMS_MISSING_XPATH"
 msgstr ""
 
-msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_LOOP_BY_SUPER_FOUND"
-msgstr ""
-
-msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND"
-msgstr ""
-
-msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
-msgstr ""
-
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
+#~ msgstr "Key generation"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
+#~ msgstr "Workflow instances"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
+#~ msgstr "Additional informations"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
+#~ msgstr "Additional information"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
+#~ msgstr "Description"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
+#~ msgstr "Last update"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_O"
+#~ msgstr "no"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_OU"
+#~ msgstr "no"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
+#~ msgstr ""
+#~ "The used subject style requires at minimum one organizational unit, one "
+#~ "organization and one country."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
+#~ msgstr "The used suject style requires a UID plus a common name."
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_CERT_TO_STACK"
+#~ msgstr "Adding a certificate"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_ATTRIBUTES_DETERMINED"
+#~ msgstr "LDAP attributes determined"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_CERT_STACK_LOADED"
+#~ msgstr "Node certificates are loaded"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_LEAF_TYPE_AVAILABLE"
+#~ msgstr "Looking for the leaf in LDAP tree"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_MISSING_NODE_DETERMINED"
+#~ msgstr "LDAP node for the given DN is missing"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_NODE_UPDATED"
+#~ msgstr "LDAP node updated"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_OBJECTCLASSES_DETERMINED"
+#~ msgstr "Determine LDAP objectclasses"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_MORE_SUBJECT_ALTERNATIVE_FIELDS"

@@ -1408,10 +1408,6 @@ msgstr "Typ der Schlüsselerzeugung"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_TYPE"
 msgstr "Format"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
-msgstr "Typ der Schlüsselerzeugung"
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
 msgstr "Beschreibung"
 
@@ -1424,10 +1420,6 @@ msgstr "Anzeige der Historie der Workflow-Instanz"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE"
 msgstr "Letzte Aktualisierung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
-msgstr "Aktive Workflow-Instanzen"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_INSTANCES_DESCRIPTION"
 msgstr ""
@@ -1600,10 +1592,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
-msgstr "Auswählen einer Rolle"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED"
@@ -2883,18 +2871,6 @@ msgstr "Start der CRL-Erstellung"
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE"
 msgstr "Start der CRL-Erstellung"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
-msgstr "Zusätzliche Informationen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
-msgstr "Beschreibung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
-msgstr "Letzte Aktualisierung"
-
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
 msgstr "CA-Infos"
 
@@ -3102,16 +3078,8 @@ msgid "I18N_OPENXPKI_NOT_AVAILABLE"
 msgstr "nicht verfügbar"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_O"
-msgstr "nein"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_OPTIONAL"
 msgstr "Nutzer"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_OU"
-msgstr "nein"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_OU_DESC"
@@ -4051,6 +4019,58 @@ msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SUBJECT_ALT_NAME_SOUR
 msgstr "Microsoft GUID"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_ADD_DN_ATTRIBUTE_MISSING"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_ADD_DN_ATTRIBUTE_NOT_IN_SCHEMA"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_ADD_DN_LDAP_BIND_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_ADD_DN_LDAP_CONNECTION_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_IMPORT_CERTIFICATE_TOKEN_UNAVAILABLE"
+msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_IMPORT_LDAP_BIND_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_IMPORT_LDAP_CONNECTION_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_CONVERSION_FAILED"
+msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_BIND_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_CONNECTION_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MODIFY_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_SEARCH_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_TOKEN_UNAVAILABLE"
+msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_BIND_FAILED"
 msgstr "PKI Realm"
 
@@ -4343,6 +4363,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKCERTTESTRESULT_TESTRESULT_NO
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECK_DN_LDAP_NODE_DOES_NOT_EXIST"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_INCORRECT_NUMBER_OF_VALID_CERTS"
 msgstr "Prozesse anzeigen"
 
@@ -4629,6 +4653,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_POSTGRESQL_GET_NEW_SERIAL_NO_TABLE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER__GET_SERVER_CONFIG_UNKNOWN_SERVER_TYPE"
+msgstr "Seriennummer des Workflowprozesses"
+
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_INCORRECT_COMMUNICATION_STATE"
 msgstr ""
 
@@ -4685,42 +4713,11 @@ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_MESSAGE_FAILED"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_NO_PKI_REALM_CONFIGURED"
 msgstr "PKI Realm"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
-msgstr "Fehlende Funktionalität"
-
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
-msgstr ""
-"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account oder "
-"auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
-"dient der sichern Identifikation von Personen oder Objekten."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
@@ -5260,10 +5257,6 @@ msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
 msgstr "Logs exportiert"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_CERT_TO_STACK"
-msgstr "Adding a certificate"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_NODE"
 msgstr "Adding missing node"
 
@@ -5272,32 +5265,8 @@ msgid "I18N_OPENXPKI_WF_STATE_LDAP_ALL_NODES_PRESENT"
 msgstr "All LDAP nodes are present"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_ATTRIBUTES_DETERMINED"
-msgstr "LDAP attributes determined"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_CERT_STACK_LOADED"
-msgstr "Node certificates are loaded"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_LDAP_CHECK_DN_AVAILABLE"
 msgstr "Checking if DN exists in LDAP tree"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_LEAF_TYPE_AVAILABLE"
-msgstr "Looking for the leaf in LDAP tree"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_MISSING_NODE_DETERMINED"
-msgstr "LDAP node for the given DN is missing"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_NODE_UPDATED"
-msgstr "LDAP node updated"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_LDAP_OBJECTCLASSES_DETERMINED"
-msgstr "Determine LDAP objectclasses"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_LDAP_PUBLIC_INITIAL"
@@ -5382,38 +5351,6 @@ msgstr "Start der Zertifikatserstellung"
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_UNSUPPORTED_CSR_TYPE"
 msgstr "Zertifikatserstellung vorbereitet"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_IMPORT_CERTIFICATE_TOKEN_UNAVAILABLE"
-msgstr "Start der Zertifikatserstellung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_CONVERSION_FAILED"
-msgstr "Start der Zertifikatserstellung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_BIND_FAILED"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_CONNECTION_FAILED"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MISSING_NODE"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MODIFY_FAILED"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_SEARCH_FAILED"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_TOKEN_UNAVAILABLE"
-msgstr "Start der Zertifikatserstellung"
-
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_DEFAULT_TOKEN_UNAVAILABLE"
 msgstr ""
 
@@ -5457,6 +5394,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_WRITE_FILE_OPEN_FAILED"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_XML_CACHE_GET_SUPER_ENTRY_PATH_NOT_FOUND"
+msgstr "testuser"
+
 msgid "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_MISSING_ELEMENT"
 msgstr ""
 
@@ -5475,11 +5416,21 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CACHE_INIT_XML_SCHEMA_ERROR"
 msgstr ""
 
+msgid "I18N_OPENXPKI_XML_CACHE_PARSE_SUPER_ELEMENT_ENTRY_ERROR_PARSING_PATH_ELEMENT"
+msgstr ""
+
+msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_SUPER_RESOLUTION_TOO_MANY_INTERATIONS_POSSIBLE_SUPER_LOOP"
+msgstr ""
+
 msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_LOOP_DETECTED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_XML_ERROR"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_XML_CACHE_RELATIVE_TOO_MANY_LEVELS_UP"
+msgstr "Warten"
 
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_FIXED_PARAMS_MISSING_COUNTER"
 msgstr ""
@@ -5487,17 +5438,99 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_FIXED_PARAMS_MISSING_XPATH"
 msgstr ""
 
-msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_LOOP_BY_SUPER_FOUND"
-msgstr ""
-
-msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_NO_INHERITANCE_FOUND"
-msgstr ""
-
-msgid "I18N_OPENXPKI_XML_CONFIG_GET_SUPER_XPATH_WRONG_SUPER_REFERENCE"
-msgstr ""
-
 msgid "I18N_OPENXPKI_YES"
 msgstr "ja"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
+#~ msgstr "Typ der Schlüsselerzeugung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
+#~ msgstr "Aktive Workflow-Instanzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
+#~ msgstr "Auswählen einer Rolle"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
+#~ msgstr "Zusätzliche Informationen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
+#~ msgstr "Beschreibung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
+#~ msgstr "Letzte Aktualisierung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_O"
+#~ msgstr "nein"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_OU"
+#~ msgstr "nein"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
+#~ msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
+#~ msgstr ""
+#~ "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
+#~ "oder auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+#~ "Dies dient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_CERT_TO_STACK"
+#~ msgstr "Adding a certificate"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_ATTRIBUTES_DETERMINED"
+#~ msgstr "LDAP attributes determined"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_CERT_STACK_LOADED"
+#~ msgstr "Node certificates are loaded"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_LEAF_TYPE_AVAILABLE"
+#~ msgstr "Looking for the leaf in LDAP tree"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_MISSING_NODE_DETERMINED"
+#~ msgstr "LDAP node for the given DN is missing"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_NODE_UPDATED"
+#~ msgstr "LDAP node updated"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_OBJECTCLASSES_DETERMINED"
+#~ msgstr "Determine LDAP objectclasses"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_MORE_SUBJECT_ALTERNATIVE_FIELDS"

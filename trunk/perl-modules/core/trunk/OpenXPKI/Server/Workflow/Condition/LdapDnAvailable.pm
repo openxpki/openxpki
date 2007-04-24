@@ -11,6 +11,9 @@ use base qw( Workflow::Condition );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Condition::LdapDnAvailable';
+use OpenXPKI::DN;
+use utf8;
+use Net::LDAP;
 use English;
 
 sub _init
@@ -22,28 +25,27 @@ sub _init
 
 sub evaluate
 {
- my ( $self, $wf ) = @_;
+ my ( $self, $workflow ) = @_;
 
  my $pki_realm = CTX('api')->get_pki_realm(); 
  my $realm_config = CTX('pki_realm')->{$pki_realm};
+ my $context  = $workflow->context();
 
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_enable}
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_excluded_roles}
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_suffix}
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_server}
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_port}
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_version}
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_tls}
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_sasl}
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_chain}
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_login}
-        ##! 128 'LDAP CONDITION '. $realm_config->{ldap_password}
 
+ my $node_exist  = $context->param('node_exist');
+
+ if ( $node_exist eq 'no' ){
+       ##! 129: 'LDAP PUBLIC CONDITION node NOT FOUND'
+       condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECK_DN_LDAP_NODE_DOES_NOT_EXIST");
+ };	  
  return 1;
 }
 
 1;
 
+
+#-----------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 __END__
 
 =head1 NAME
@@ -60,6 +62,5 @@ OpenXPKI::Server::Workflow::Condition::LdapDnAvailable
 
 =head1 DESCRIPTION
 
-This condition must check if the certificate 
-distinguished name is found in ldap tree. 
-At the moment always returns TRUE.
+This condition checks if the LDAP node exists where the certificate is assumed to be published. 
+

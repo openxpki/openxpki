@@ -18,7 +18,6 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DN;
 use utf8;
 use Net::LDAP;
-use Data::Dumper;
 
 sub execute {
  my $self = shift;
@@ -54,7 +53,7 @@ sub execute {
 				      );
     if (! defined $default_token) {
 	OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_TOKEN_UNAVAILABLE",
+            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_TOKEN_UNAVAILABLE",
             );
     };
     my $cert_der = $default_token->command({
@@ -66,12 +65,11 @@ sub execute {
 				   );
     if (! defined $cert_der) {
 	OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_CONVERSION_FAILED",
-            );
+            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_CONVERSION_FAILED",
+        );
     };
 
     ##! 129: 'LDAP ACTION PUBLIC connecting to LDAP server'
-    
     my $ldap_passwd  = $realm_config->{ldap_password};
     my $ldap_user    = $realm_config->{ldap_login};
     my $ldap_server  = $realm_config->{ldap_server};
@@ -86,7 +84,7 @@ sub execute {
                              );
     if (! defined $ldap) {
        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_CONNECTION_FAILED",
+            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_CONNECTION_FAILED",
             params  => {
                         'LDAP_SERVER'  => $ldap_server,
 			  'LDAP_PORT'  => $ldap_port,
@@ -106,7 +104,7 @@ sub execute {
 	       );
     if ($mesg->is_error()) {
        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_BIND_FAILED",
+            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_BIND_FAILED",
             params  => {
                         ERROR      => $mesg->error(),
 			ERROR_DESC => $mesg->error_desc(),
@@ -118,120 +116,19 @@ sub execute {
 		        },
       );
    };																    
+   ##! 129: 'LDAP ACTION PUBLIC connected to LDAP server OK'
 
-
-   ##! 129: 'LDAP ACTION PUBLIC check node'
-   my  $search = $ldap->search (
-                                 base    => $cert_dn,
-                                 scope   => 'base',
-			          filter => 'cn=*',	
-			           attrs => ['1.1']
-                        );
-   if ( $search->is_error()){
-      ##! 129: 'LDAP ACTION PUBLIC check node SEARCH FAILED'
-       OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_SEARCH_FAILED",
-            params  => {
-                        ERROR      => $search->error(),
-			ERROR_DESC => $search->error_desc(),
-	         	},
-                log => {
-	                  logger => CTX('log'),
-		        priority => 'error',
-			facility => 'monitor',
-		        },
-      );
-   }
-   else { 
-      ##! 129: 'LDAP ACTION PUBLIC check node SEARCH SUCCESS'
-      if ( $search->count() == 0){
-          ##! 129: 'LDAP ACTION PUBLIC node NOT FOUND'
-          OpenXPKI::Exception->throw(
-              message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MISSING_NODE",
-              params  => {
-                          ERROR      => $search->error(),
-	    		  ERROR_DESC => $search->error_desc(),
-	         	 },
-                  log => {
-	                    logger => CTX('log'),
-	 	          priority => 'error',
-			  facility => 'monitor',
-		         },
-          );
-      }	  
-      ##! 129: 'LDAP ACTION PUBLIC found node'
-   }; 
-
-   ##! 129: 'LDAP ACTION PUBLIC check pkiUser'
-   $search = $ldap->search ( 
-                            base  => $cert_dn,
-                            scope => 'base',
-			   filter => 'objectClass=pkiUser',	
-			    attrs => ['1.1'],
-                    );
-   if ( $search->is_error() ){
-       OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_SEARCH_FAILED",
-            params  => {
-                        ERROR      => $search->error(),
-			ERROR_DESC => $search->error_desc(),
-	         	},
-                log => {
-	                  logger => CTX('log'),
-		        priority => 'error',
-			facility => 'monitor',
-		        },
-      );
-      ##! 129: 'LDAP ACTION PUBLIC check node SEARCH FAILED'
-   };
-
-   if ( $search->count() == 0 ){
-      ##! 129: 'LDAP ACTION PUBLIC found no pkiUser, trying to add one'
-      my  $addPki = $ldap->modify (
-                              $cert_dn, 
-                              changes => [
-                                  add => [
-  				     'objectClass' => [
-				         'pkiUser',
-			             ],
-       				 ],
-			     ],
-		          );
-      if ($addPki->is_error()){
-          ##! 129: 'LDAP ACTION PUBLIC failed to add pkiUser'
-          OpenXPKI::Exception->throw(
-               message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MODIFY_FAILED",
-               params  => {
-                           ERROR      => $addPki->error(),
-   			   ERROR_DESC => $addPki->error_desc(),
-	           	  },
-                   log => {
-	                     logger => CTX('log'),
-		           priority => 'error',
-		   	   facility => 'monitor',
-		          },
-          );
-      }
-      else { 
-          ##! 129: 'LDAP ACTION PUBLIC pkiUser added'
-      };
-    
-   } 
-   else { 
-       ##! 129: 'LDAP ACTION PUBLIC found pkiUser'
-   };
- 
    ##! 129: 'LDAP ACTION PUBLIC check certs'
    my $attr='userCertificate;binary';
-   $search = $ldap->search ( base    => $cert_dn,
+   my $search = $ldap->search ( base    => $cert_dn,
                              scope   => 'base',
-			     filter => 'objectClass=pkiUser',	
+			     filter => 'objectClass=*',	
 			     attrs => $attr,
                             );
    if ( $search->is_error()){
       ##! 129: 'LDAP ACTION PUBLIC certificates SEARCH FAILED'
        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_SEARCH_FAILED",
+            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_SEARCH_FAILED",
             params  => {
                         ERROR      => $search->error(),
 			ERROR_DESC => $search->error_desc(),
@@ -243,19 +140,27 @@ sub execute {
 		        },
       );
    };
+   
+   # check how many certificates there is in the node
    my @cert_values = ($search->entries)[0]->get_value ($attr);
    my $number = scalar @cert_values;
+
    ##! 129: 'LDAP ACTION PUBLIC certificates found '.$number
+
+   # now we add our new certificate to the stack and check for duplication
    push @cert_values, $cert_der;
    @cert_values = sort @cert_values;
    for (my $i=1; $i < scalar @cert_values; $i++) {
-    if ($cert_values[$i] eq $cert_values[$i-1]) {
-     splice @cert_values, $i, 1;
-     $i--;
-    }
+      if ($cert_values[$i] eq $cert_values[$i-1]) {
+         splice @cert_values, $i, 1;
+         $i--;
+      };
    }; 
+   
    $number = scalar @cert_values;
    ##! 129: 'LDAP ACTION PUBLIC certificates prepaired '.$number
+   
+   # no we add all prepaired certificates to the node
    $mesg = $ldap->modify (
                               $cert_dn, 
                               changes => [
@@ -269,7 +174,7 @@ sub execute {
   if ($mesg->is_error()){
       ##! 129: 'LDAP ACTION PUBLIC add certificates FAILED'
       OpenXPKI::Exception->throw(
-          message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MODIFY_FAILED",
+          message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_LDAP_MODIFY_FAILED",
           params  => {
                       ERROR      => $mesg->error(),
           	      ERROR_DESC => $mesg->error_desc(),
@@ -280,8 +185,7 @@ sub execute {
 	     	      facility => 'monitor',
 		     },
       );
-  }
-  else { 
+  } else { 
      ##! 129: 'LDAP ACTION PUBLIC add certificates SUCCESS'
   };
 
@@ -292,6 +196,7 @@ return 1;
 1;
 
 __END__
+
 =head1 Name
 
 OpenXPKI::Server::Workflow::Activity::CertLdapPublish::PublicCertLdap
@@ -299,7 +204,6 @@ OpenXPKI::Server::Workflow::Activity::CertLdapPublish::PublicCertLdap
 =head1 Description
 
 This activity adds issued certificate to the existing LDAP node.
-If the node has no object class pkiUser the activity adds it.
 
 =head2 Context parameters
 
@@ -310,10 +214,6 @@ Expects the following context parameters:
 =item certificate
 
 PEM-coded certificate to be published
-
-=item cert_mail
-
-The certificate subject e-mail which will be used as LDAP attribute 
 
 =item cert_subject
 
@@ -328,6 +228,8 @@ in ldappublic.xml as excluded from publishing list.
 =back
 
 Does not create or change context parameters
+
+=back
 
 =head1 Functions
 
