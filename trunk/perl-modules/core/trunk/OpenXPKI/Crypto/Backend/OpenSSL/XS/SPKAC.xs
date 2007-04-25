@@ -12,7 +12,7 @@ _new(sv)
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 pubkey_algorithm(spkac)
 	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
@@ -23,15 +23,12 @@ pubkey_algorithm(spkac)
 	out = BIO_new(BIO_s_mem());
 	i2a_ASN1_OBJECT(out, spkac->spkac->pubkey->algor->algorithm);
 	n = BIO_get_mem_data(out, &pubkey);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-	memcpy (char_ptr, pubkey, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(pubkey, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 pubkey(spkac)
 	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
@@ -51,15 +48,12 @@ pubkey(spkac)
 	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-	memcpy (char_ptr, pubkey, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(pubkey, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 pubkey_hash (spkac, digest_name="sha1")
 	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
 	char *digest_name
@@ -100,15 +94,12 @@ pubkey_hash (spkac, digest_name="sha1")
 		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &fingerprint);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, (int)n+1, char);
-        memcpy (char_ptr, fingerprint, (int)n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(fingerprint, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 keysize (spkac)
 	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
@@ -126,15 +117,12 @@ keysize (spkac)
 		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, pubkey, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(pubkey, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 modulus (spkac)
 	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
@@ -154,15 +142,12 @@ modulus (spkac)
 	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &modulus);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, modulus, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(modulus, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 exponent (spkac)
 	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
@@ -182,15 +167,12 @@ exponent (spkac)
 	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &exponent);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, exponent, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(exponent, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 signature_algorithm(spkac)
 	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
@@ -201,10 +183,7 @@ signature_algorithm(spkac)
 	out = BIO_new(BIO_s_mem());
 	i2a_ASN1_OBJECT(out, spkac->sig_algor->algorithm);
 	n = BIO_get_mem_data(out, &sig);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, sig, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(sig, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
@@ -213,8 +192,9 @@ void
 free(spkac)
 	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     CODE:
-	/* 
-        if (spkac != NULL) NETSCAPE_SPKI_free(spkac);
-	SAFEFREE(char_ptr);
-        */
+        if (spkac != NULL)
+        {
+            NETSCAPE_SPKI_free(spkac);
+            spkac = NULL;
+        }
 
