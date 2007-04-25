@@ -113,7 +113,7 @@ sub __pkcs_req : PRIVATE {
         # this is necessary for openssl / openca-scep to parse
         # the data correctly
         $pkcs7_base64 =~ s{ \n }{}xmsg;
-        $pkcs7_base64 =~ s{ (.{64}) }{\1\n}xmsg;
+        $pkcs7_base64 =~ s{ (.{64}) }{$1\n}xmsg;
         $pkcs7_base64 .= "\n";
         my $wf_info = $api->create_workflow_instance({
             WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST',

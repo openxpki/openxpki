@@ -33,7 +33,7 @@ sub execute {
             );
         }
         my @ca_ids = $api->list_ca_ids();
-        if (!defined @ca_ids) {
+        if (! @ca_ids) {
 	    OpenXPKI::Exception->throw (
 	        message => "I18N_OPENXPKI_ACTIVITY_CRLISSUANCE_DETERMINENEXTCA_CA_IDS_NOT_DEFINED",
             );
