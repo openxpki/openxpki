@@ -369,12 +369,21 @@ Object classes and attributes for nodes are selected from realm schema
 specified in ldappublic.xml. Last RDN attributes are used to find schema
 entry. Restrictions of the current version (in comparison with OpenCA):
 
+=over
+
 =item Multiple LDAP suffixes are not supported at the moment 
+
 =item No suffix check implemented yet
+
 =item No CN evaluation from e-mail implemeted yet
+
 =item Artificial SN 'NOT SUBSTITUTED YET' is used if required
+
 =item Alternative Name Attribute DirName is not used as DN even if present
+
 =item No TLS
+
+=back
 
 That means DC-style and OU-style certificates cannot be published
 simultaneously in one realm - their DNs have different suffixes.
@@ -382,6 +391,8 @@ simultaneously in one realm - their DNs have different suffixes.
 =head2 Context parameters
 
 Expects the following context parameters:
+
+=over
 
 =item cert_mail
 
