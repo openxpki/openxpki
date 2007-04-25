@@ -363,20 +363,22 @@ sub __replace_super {
             delete $original_entry->{'super'};
             ##! 32: 'original_entry: ' . Dumper $original_entry
 
+            my $new_entry = {};
             # overwrite entry with the inherited one from super
             $self->__deepcopy(
                 $self->__get_super_entry(
                     $absolute_path_to_super,
                     $level,
                 ),
-                $entry,
+                $new_entry,
             );
-            delete $entry->{'super'};
-            ##! 32: 'entry after copying from super: ' . Dumper $entry
+            ##! 32: 'new entry after copying from super: ' . Dumper $new_entry
             ##! 32: 'copying back from original entry: ' . Dumper $original_entry
             ##! 32: 'keys of original entry: ' . Dumper keys %{$original_entry}
             # overwrite entries from the original entry
-            $self->__deepcopy($original_entry, $entry);
+            $self->__deepcopy($original_entry, $new_entry);
+            $self->__deepcopy($new_entry, $entry);
+            delete $entry->{'super'};
             ##! 32: 'final entry after inheritance: ' . Dumper $entry
         }
         else {
@@ -401,23 +403,33 @@ sub __deepcopy {
     ##! 32: 'source: ' . Dumper $source
     ##! 32: 'dest:   ' . Dumper $dest
 
-    if (ref $source eq '') {
-        ##! 32: 'source is scalar'
-        $dest = $source;
-        return 1;
-    }
     my @entries = ();
     if (ref $source eq 'HASH') {
         ##! 16: 'source is hashref'
         foreach my $key (keys %{$source}) {
             ##! 32: 'key: ' . $key
-            if (ref $dest->{$key} eq 'HASH'
-             || ref $dest->{$key} eq 'ARRAY') {
-                ##! 64: 'dest is hash or array, deepcopying'
+            if (ref $source->{$key} eq 'HASH'
+             || ref $source->{$key} eq 'ARRAY') {
+                ##! 64: 'source is arrayref or hashref, deepcopying'
+                if (! defined $dest->{$key}) {
+                    if (ref $source->{$key} eq 'HASH') {
+                        ##! 64: 'dest->{$key} is not defined, replacing with empty hashref'
+                        $dest->{$key} = { };
+                    }
+                    elsif (ref $source->{$key} eq 'ARRAY') {
+                        ##! 64: 'dest->{$key} is not defined, replacing with empty arrayref'
+                        $dest->{$key} = [ ];
+                    }
+                    else {
+                        OpenXPKI::Exception->throw(
+                            message => 'I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE',
+                        );
+                    }
+                }
                 $self->__deepcopy($source->{$key}, $dest->{$key});
             }
-            elsif (! ref $dest->{$key}) {
-                ##! 64: 'dest is scalar, copying source: ' . $source->{$key} . ' to dest: ' . $dest->{$key}
+            elsif (! ref $source->{$key}) {
+                ##! 64: 'source is scalar, copying source: ' . $source->{$key} . ' to dest: ' . $dest->{$key}
                 $dest->{$key} = $source->{$key};
             }
         }
@@ -430,7 +442,29 @@ sub __deepcopy {
         ##! 16: 'source is arrayref'
         for (my $i = 0; $i < scalar @{ $source }; $i++) {
             ##! 32: 'copying entry ' . $i
-            $self->__deepcopy($source->[$i], $dest->[$i]);
+            if (ref $source->[$i]) {
+                ##! 32: 'source is non-scalar'
+                if (! defined $dest->[$i]) {
+                    if (ref $source->[$i] eq 'HASH') {
+                        ##! 64: 'dest->[$i] is not defined, replacing with empty hashref'
+                        $dest->[$i] = { };
+                    }
+                    elsif (ref $source->[$i] eq 'ARRAY') {
+                        ##! 64: 'dest->[$i] is not defined, replacing with empty arrayref'
+                        $dest->[$i] = [ ];
+                    }
+                    else {
+                        OpenXPKI::Exception->throw(
+                            message => 'I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE',
+                        );
+                    }
+                }
+                $self->__deepcopy($source->[$i], $dest->[$i]);
+            }
+            else {
+                ##! 32: 'dest is scalar'
+                $dest->[$i] = $source->[$i];
+            }
         }
     }
     return 1;

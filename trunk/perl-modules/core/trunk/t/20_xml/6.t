@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 14;
+plan tests => 18;
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
@@ -105,6 +105,22 @@ eval {
 # if this test fails, it usually means that the one who inherits inadvertently
 # copied some of his data to the one he inherited from ...
 ok ($EVAL_ERROR, 'Super entry did not inherit from caller');
+
+## create new object
+$obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/test_profile2.xml");
+ok($obj) or diag "Error: ${EVAL_ERROR}\n";
+
+unlike($obj->dump(), qr/name --> super\n/, 'No mention of super in the dump');
+
+my $result;
+eval {
+    $result = $obj->get_xpath(
+        XPATH   => ['selfsignedca', 'profile', 'validity', 'notafter' ],
+        COUNTER => [0             , 1        , 0         , 0          ],
+    );
+};
+ok (! $EVAL_ERROR, 'get_xpath works') or diag $EVAL_ERROR;
+is ($result, '+01', 'get_xpath returns the correct result (inheritance overwriting)');
 
 # tip of the day, nice for debugging:
 # my $gvds = GraphViz::Data::Structure->new($obj->dumper);
