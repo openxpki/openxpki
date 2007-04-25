@@ -309,6 +309,7 @@ WriteMakefile(
                   },
     macro      => { OPENSSL_BINARY => $openssl_binary,
                   },
+    clean      => {FILES => 't/50_auth/cgisess_*'},
     'XSPROTOARG' => '-noprototypes',
     %flags,
 );
