@@ -9,6 +9,13 @@ BEGIN { plan tests => 24 };
 
 print STDERR "OpenXPKI::Crypto::Command: Create a CA\n";
 
+use OpenXPKI::Debug;
+if ($ENV{DEBUG_LEVEL}) {
+    $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
+    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;
+    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Config'} = 0;
+}
+
 use OpenXPKI qw( read_file );
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
@@ -106,7 +113,7 @@ foreach my $ca_id (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
     if (not -e "$basedir/$dir/cakey.pem")
     {
 	ok(0);
-	print STDERR "Missing CA key\n";
+	print STDERR "Missing CA key ($basedir/$dir/cakey.pem).\n";
     } else {
 	ok(1);
     }
