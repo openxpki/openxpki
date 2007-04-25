@@ -46,10 +46,15 @@ foreach my $func ("version", "subject", "subject_hash", "fingerprint",
 {
     ## FIXME: this is a bypass of the API !!!
     my $result = $csr->$func();
-    if (defined $result or $func eq "extensions")
+    if (defined $result)
     {
         ok(1);
         print STDERR "$func: $result\n" if ($ENV{DEBUG});
+    }
+    elsif (grep /$func/, ("extensions", "emailaddress"))
+    {
+        ok(1);
+        print STDERR "$func: not available\n" if ($ENV{DEBUG});
     } else {
         ok(0);
         print STDERR "Error: function $func failed\n";

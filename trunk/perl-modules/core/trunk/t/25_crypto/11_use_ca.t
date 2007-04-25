@@ -10,6 +10,8 @@ diag "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n";
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
+    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;
+    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Config'} = 0;
 }
 
 use OpenXPKI::Crypto::TokenManager;

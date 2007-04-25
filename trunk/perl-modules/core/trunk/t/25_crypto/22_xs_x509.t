@@ -50,6 +50,11 @@ foreach my $func ("version", "serial", "subject", "openssl_subject", "issuer",
     {
         ok(1);
         print STDERR "$func: $result\n" if ($ENV{DEBUG});
+    }
+    elsif (grep /$func/, ("emailaddress"))
+    {
+        ok(1);
+        print STDERR "$func: not available\n" if ($ENV{DEBUG});
     } else {
         ok(0);
         print STDERR "Error: function $func failed\n";

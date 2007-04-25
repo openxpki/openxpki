@@ -54,25 +54,20 @@ free(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     CODE:
 	if (cert != NULL) X509_free(cert);
-        SAFEFREE(char_ptr);
-        SAFEFREE(uchar_ptr);
 
-char *
+SV *
 serial(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
 	char *serial;
     CODE:
 	serial = i2s_ASN1_INTEGER(NULL,X509_get_serialNumber(cert));
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, strlen(serial)+1, char);
-	memcpy (char_ptr, serial, strlen(serial));
-        RETVAL = char_ptr;
+        RETVAL = newSVpvn(serial, strlen(serial));
 	OPENSSL_free(serial);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 subject(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -83,37 +78,25 @@ subject(cert)
 	out = BIO_new(BIO_s_mem());
 	X509_NAME_print_ex(out, X509_get_subject_name(cert), 0, OPENXPKI_FLAG_RFC2253);
 	n = BIO_get_mem_data(out, &subject);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, subject, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(subject, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 openssl_subject(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
-	BIO *out;
 	char *subject;
-	int n;
     CODE:
-	// calculate aprox. string length
-	out = BIO_new(BIO_s_mem());
-	X509_NAME_print_ex(out, X509_get_subject_name(cert), 0, OPENXPKI_FLAG_RFC2253);
-	n = BIO_get_mem_data(out, &subject);
-	BIO_free(out);
-
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+10, char);
 	// X509_NAME_print_ex(out, X509_get_subject_name(cert), 0, XN_FLAG_COMPAT);
-	char_ptr = X509_NAME_oneline (X509_get_subject_name(cert), char_ptr, n+10);
-	RETVAL = char_ptr;
+	subject = X509_NAME_oneline (X509_get_subject_name(cert), NULL, 0);
+	RETVAL = newSVpvn(subject, strlen(subject+1));
+	OPENSSL_free(subject);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 issuer(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -124,15 +107,12 @@ issuer(cert)
 	out = BIO_new(BIO_s_mem());
 	X509_NAME_print_ex(out, X509_get_issuer_name(cert), 0, OPENXPKI_FLAG_RFC2253);
 	n = BIO_get_mem_data(out, &issuer);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, issuer, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(issuer, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 notbefore(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -143,15 +123,12 @@ notbefore(cert)
 	out = BIO_new(BIO_s_mem());
 	ASN1_TIME_print(out, X509_get_notBefore(cert));
 	n = BIO_get_mem_data(out, &not);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, not, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(not, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 notafter(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -162,15 +139,12 @@ notafter(cert)
 	out = BIO_new(BIO_s_mem());
 	ASN1_TIME_print(out, X509_get_notAfter(cert));
 	n = BIO_get_mem_data(out, &not);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, not, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(not, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 alias(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -180,17 +154,14 @@ alias(cert)
 	alias = X509_alias_get0(cert, &n);
         if (alias != NULL)
         {
-	    SAFEFREE(char_ptr);
-	    Newz(0, char_ptr, n+1, char);
-	    memcpy (char_ptr, alias, n);
-	    RETVAL = char_ptr;
+	    RETVAL = newSVpvn((char *) alias, n);
         } else {
             RETVAL = NULL;
         }
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 fingerprint (cert, digest_name="sha1")
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
 	char *digest_name
@@ -217,10 +188,7 @@ fingerprint (cert, digest_name="sha1")
 		}
 	}
 	n = BIO_get_mem_data(out, &fingerprint);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, (int)n+1, char);
-        memcpy (char_ptr, fingerprint, (int)n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(fingerprint, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
@@ -236,14 +204,14 @@ subject_hash(cert)
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 emailaddress (cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
 	int j, n;
         STACK *emlst;
 	BIO *out;
-	unsigned char *emails;
+	char *emails;
     CODE:
 	out = BIO_new(BIO_s_mem());
 	emlst = X509_get1_email(cert);
@@ -255,15 +223,12 @@ emailaddress (cert)
 	}
 	X509_email_free(emlst);
 	n = BIO_get_mem_data(out, &emails);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, emails, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(emails, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 version(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -275,15 +240,12 @@ version(cert)
 	l = X509_get_version(cert);
 	BIO_printf (out,"%lu (0x%lx)",l+1,l);
 	l = BIO_get_mem_data(out, &version);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, l+1, char);
-	memcpy (char_ptr, version, l);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(version, l);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 pubkey_algorithm(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -296,15 +258,12 @@ pubkey_algorithm(cert)
 	ci = cert->cert_info;
 	i2a_ASN1_OBJECT(out, ci->key->algor->algorithm);
 	n = BIO_get_mem_data(out, &pubkey);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-	memcpy (char_ptr, pubkey, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(pubkey, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 pubkey(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -324,15 +283,12 @@ pubkey(cert)
 		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-	memcpy (char_ptr, pubkey, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(pubkey, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 pubkey_hash (cert, digest_name="sha1")
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
 	char *digest_name
@@ -341,7 +297,7 @@ pubkey_hash (cert, digest_name="sha1")
 	int j;
 	unsigned int n;
 	const EVP_MD *digest;
-	char * fingerprint;
+	char * hash;
 	unsigned char md[EVP_MAX_MD_SIZE];
     CODE:
 	out = BIO_new(BIO_s_mem());
@@ -358,22 +314,19 @@ pubkey_hash (cert, digest_name="sha1")
 			if (j+1 != (int)n) BIO_printf(out,":");
 		}
 	}
-	n = BIO_get_mem_data(out, &fingerprint);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, (int)n+1, char);
-        memcpy (char_ptr, fingerprint, (int)n);
-	RETVAL = char_ptr;
+	n = BIO_get_mem_data(out, &hash);
+	RETVAL = newSVpvn(hash, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 keysize (cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
 	BIO *out;
 	EVP_PKEY *pkey;
-	char * pubkey;
+	char * length;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
@@ -384,16 +337,13 @@ keysize (cert)
 			BIO_printf(out,"%d", BN_num_bits(pkey->pkey.rsa->n));
 		EVP_PKEY_free(pkey);
 	}
-	n = BIO_get_mem_data(out, &pubkey);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, pubkey, n);
-	RETVAL = char_ptr;
+	n = BIO_get_mem_data(out, &length);
+	RETVAL = newSVpvn(length, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 modulus (cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -413,15 +363,12 @@ modulus (cert)
 	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &modulus);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, modulus, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(modulus, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 exponent (cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -441,15 +388,12 @@ exponent (cert)
 	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &exponent);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, exponent, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(exponent, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 extensions(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -464,18 +408,12 @@ extensions(cert)
 	// the causes the function to fail if title == NULL and indent == 0
 	X509V3_extensions_print(out, NULL, ci->extensions, 0, 4);
 	n = BIO_get_mem_data(out, &ext);
-	SAFEFREE(char_ptr);
-	if (n)
-	{
-	        Newz(0, char_ptr, n+1, char);
-		memcpy (char_ptr, ext, n);
-	}
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(ext, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 signature_algorithm(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -488,15 +426,12 @@ signature_algorithm(cert)
 	ci = cert->cert_info;
 	i2a_ASN1_OBJECT(out, ci->signature->algorithm);
 	n = BIO_get_mem_data(out, &sig);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, sig, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(sig, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 signature(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
@@ -514,10 +449,7 @@ signature(cert)
 		BIO_printf(out,"%02x%s",s[i], (((i+1)%18) == 0)?"":":");
 	}
 	n = BIO_get_mem_data(out, &sig);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, sig, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(sig, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL

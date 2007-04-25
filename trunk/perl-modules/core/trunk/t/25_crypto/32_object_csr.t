@@ -8,6 +8,13 @@ BEGIN { plan tests => 25 };
 
 print STDERR "OpenXPKI::Crypto::CSR\n";
 
+use OpenXPKI::Debug;
+if ($ENV{DEBUG_LEVEL}) {
+    $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
+    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;
+    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Config'} = 0;
+}
+
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::CSR;
 use Time::HiRes;

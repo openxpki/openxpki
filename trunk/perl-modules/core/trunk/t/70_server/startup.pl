@@ -9,7 +9,9 @@ use OpenXPKI::Debug;
 if (grep /^--debug$/, @ARGV)
 {
     $OpenXPKI::Debug::LEVEL{'.*'} = 100;
-    print STDERR "Starting server in full debug mode for all modules ...\n";
+    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Config'} = 0;
+    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;
+    print STDERR "Starting server in full debug mode for all modules except XML ...\n";
 }
 
 require OpenXPKI::Server;

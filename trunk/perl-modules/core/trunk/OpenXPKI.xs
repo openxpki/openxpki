@@ -18,14 +18,6 @@ typedef X509_CRL      * OpenXPKI_Crypto_Backend_OpenSSL_CRL;
 typedef NETSCAPE_SPKI * OpenXPKI_Crypto_Backend_OpenSSL_SPKAC;
 typedef X509_REQ      * OpenXPKI_Crypto_Backend_OpenSSL_PKCS10;
 
-/* general pointer to avoid memory leaks because fo char * returns */
-char * char_ptr = NULL;
-unsigned char * uchar_ptr = NULL;
-
-/* free is only safe if we test the pointer before free and
-   reset the pointer to NULL after this macro */
-#define SAFEFREE(pointer) if (pointer!=NULL) Safefree(pointer); pointer=NULL;
-
 /* hack to avoid MSB escaping by OpenSSL */
 #define OPENXPKI_FLAG_RFC2253 (XN_FLAG_RFC2253&(~ASN1_STRFLGS_ESC_MSB))
 

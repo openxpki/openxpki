@@ -192,9 +192,5 @@ void
 free(spkac)
 	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     CODE:
-        if (spkac != NULL)
-        {
-            NETSCAPE_SPKI_free(spkac);
-            spkac = NULL;
-        }
+        if (spkac != NULL) NETSCAPE_SPKI_free(spkac);
 

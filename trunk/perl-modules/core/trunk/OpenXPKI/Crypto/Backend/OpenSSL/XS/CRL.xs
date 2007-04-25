@@ -56,9 +56,8 @@ free(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     CODE:
 	if (crl != NULL) X509_CRL_free(crl);
-        SAFEFREE(char_ptr);
 
-char *
+SV *
 version(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
@@ -70,16 +69,12 @@ version(crl)
 	l = X509_CRL_get_version(crl);
 	BIO_printf (out,"%lu (0x%lx)",l+1,l);
 	l = BIO_get_mem_data(out, &version);
-	SAFEFREE(char_ptr);
-	New(0, char_ptr, l+1, char);
-	char_ptr[l] = '\0';
-	memcpy (char_ptr, version, l);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(version, l);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 issuer(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
@@ -90,11 +85,7 @@ issuer(crl)
 	out = BIO_new(BIO_s_mem());
 	X509_NAME_print_ex(out, X509_CRL_get_issuer(crl), 0, OPENXPKI_FLAG_RFC2253);
 	n = BIO_get_mem_data(out, &issuer);
-	SAFEFREE(char_ptr);
-	New(0, char_ptr, n+1, char);
-	char_ptr [n] = '\0';
-        memcpy (char_ptr, issuer, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(issuer,n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
@@ -108,7 +99,7 @@ issuer_hash(crl)
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 last_update(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
@@ -119,15 +110,12 @@ last_update(crl)
 	out = BIO_new(BIO_s_mem());
 	ASN1_TIME_print(out, X509_CRL_get_lastUpdate(crl));
 	n = BIO_get_mem_data(out, &not);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, not, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(not, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 next_update(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
@@ -138,15 +126,12 @@ next_update(crl)
 	out = BIO_new(BIO_s_mem());
 	ASN1_TIME_print(out, X509_CRL_get_nextUpdate(crl));
 	n = BIO_get_mem_data(out, &not);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, not, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(not, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 fingerprint (crl, digest_name="sha1")
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
 	char *digest_name
@@ -173,15 +158,12 @@ fingerprint (crl, digest_name="sha1")
 		}
 	}
 	n = BIO_get_mem_data(out, &fingerprint);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, (int)n+1, char);
-        memcpy (char_ptr, fingerprint, (int)n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(fingerprint, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 signature_algorithm(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
@@ -192,15 +174,12 @@ signature_algorithm(crl)
 	out = BIO_new(BIO_s_mem());
 	i2a_ASN1_OBJECT(out, crl->sig_alg->algorithm);
 	n = BIO_get_mem_data(out, &sig);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, sig, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(sig, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 signature(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
@@ -218,15 +197,12 @@ signature(crl)
 		BIO_printf(out,"%02x%s",s[i], (((i+1)%18) == 0)?"":":");
 	}
 	n = BIO_get_mem_data(out, &sig);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, sig, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(sig, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 extensions(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
@@ -239,13 +215,7 @@ extensions(crl)
 	// the causes the function to fail if title == NULL and indent == 0
 	X509V3_extensions_print(out, NULL, crl->crl->extensions, 0, 4);
 	n = BIO_get_mem_data(out, &ext);
-	SAFEFREE(char_ptr);
-	if (n)
-	{
-		Newz(0, char_ptr, n+1, char);
-		memcpy (char_ptr, ext, n);
-	}
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(ext, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL
@@ -266,7 +236,7 @@ serial(crl)
     OUTPUT:
 	RETVAL
 
-char *
+SV *
 revoked(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
@@ -292,10 +262,7 @@ revoked(crl)
 			r->extensions, 0, 8);
 	}
 	n = BIO_get_mem_data(out, &ext);
-	SAFEFREE(char_ptr);
-	Newz(0, char_ptr, n+1, char);
-        memcpy (char_ptr, ext, n);
-	RETVAL = char_ptr;
+	RETVAL = newSVpvn(ext, n);
 	BIO_free(out);
     OUTPUT:
 	RETVAL

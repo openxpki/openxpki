@@ -127,7 +127,12 @@ sub get_object_function
     my $result = $object->$func();
     ##without pack/unpack the conversion does not work
     ##utf8::upgrade($result) if (defined $result);
-    $result = pack "U0C*", unpack "C*", $object->$func();
+    if (defined $result)
+    {
+        ## if the XS code returns NULL
+        ## then it makes not sense to convert it to UTF8
+        $result = pack "U0C*", unpack "C*", $result;
+    }
 
     ## fix proprietary "DirName:" of OpenSSL
     if (defined $result and $func eq "extensions")
