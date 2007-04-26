@@ -1,6 +1,8 @@
 ## OpenXPKI::Server::ACL.pm 
 ##
 ## Written by Michael Bell 2006
+## cleaned up a bit to support multiple PKI realms
+## by Alexander Klink 2007
 ## Copyright (C) 2006 by The OpenXPKI Project
 ## $Revision$
 
@@ -14,6 +16,8 @@ use English;
 use OpenXPKI::Debug 'OpenXPKI::Server::ACL';
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+
+use Data::Dumper;
 
 ## constructor and destructor stuff
 
@@ -77,37 +81,41 @@ sub __load_server
 {
     my $self  = shift;
     my $keys  = shift;
+    ##! 1: 'start'
     my $realm = $keys->{PKI_REALM};
     my $pkiid = $self->{PKI_REALM}->{$realm}->{POS};
 
-    $self->{SERVER_ID} = CTX('xml_config')->get_xpath (
-                             XPATH   => ['common', 'database', 'server_id'],
-                             COUNTER => [0, 0, 0]);
+    # get the ID of the server that we are on
+    # (for some reason, this ID lives in the database part of the
+    #  configuration)
+    my $our_server_id = CTX('xml_config')->get_xpath (
+         XPATH   => ['common', 'database', 'server_id'],
+         COUNTER => [0, 0, 0]
+    );
     my $servers = CTX('xml_config')->get_xpath_count (
                       XPATH   => ['pki_realm', 'acl', 'server'],
                       COUNTER => [$pkiid, 0]);
-    for (my $i=0; $i < $servers; $i++)
-    {
-        my $value = CTX('xml_config')->get_xpath (
+
+    for (my $i=0; $i < $servers; $i++) {
+        my $id   = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'server', 'id'],
                        COUNTER => [ $pkiid, 0, $i, 0]);
         my $name = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'server', 'name'],
                        COUNTER => [ $pkiid, 0, $i, 0]);
-        if (exists $self->{SERVER} and exists $self->{SERVER}->{$value})
-        {
+        if (exists $self->{SERVER}->{$realm}->{$id}) {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_ACL_LOAD_SERVER_DUPLICATE_ID_FOUND",
-                params  => {ID   => $value,
+                params  => {ID   => $id,
                             NAME => $name});
         }
-        $self->{SERVER}->{$value} = $name;
-        if ($value == $self->{SERVER_ID})
-        {
+        $self->{SERVER}->{$realm}->{$id} = $name;
+        if ($id == $our_server_id) {
             $self->{SERVER_NAME} = $name;
-            last;
         }
     }
+    ##! 16: 'self->{SERVER}: ' . Dumper $self->{SERVER}
+    ##! 1: 'end'
     return 1;
 }
 
@@ -335,7 +343,7 @@ sub get_roles
 sub get_servers
 {
     my $self  = shift;
-    return %{$self->{SERVER}};
+    return $self->{SERVER};
 }
 
 1;
@@ -380,5 +388,4 @@ returns all available roles for the actual PKI realm.
 
 =head2 get_servers
 
-returns a hash with all available servers.
-
+returns a hashref that lists all servers by PKI realm

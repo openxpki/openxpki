@@ -850,6 +850,7 @@ sub get_export_destinations
     ##! 1: "finished"
     my $self = shift;
     my $args = shift;
+    my $pki_realm = CTX('session')->get_pki_realm();
 
     ##! 2: "load destination numbers"
     my $export = CTX('xml_config')->get_xpath (
@@ -873,7 +874,7 @@ sub get_export_destinations
     }
 
     ##! 2: "load all servers"
-    my %servers = $self->get_servers();
+    my %servers = %{ $self->get_servers()->{$pki_realm} };
 
     ##! 2: "build hash with numbers and names of affected servers"
     my %result = ();
