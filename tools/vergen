@@ -200,18 +200,18 @@ foreach my $component (keys %config) {
     
     # built-in components
     if ($component =~ m{ \A (?:revision|last-changed-revision) \z }xms) {
-        if (`$git branch`) {
-            # if the current tree is under git control, use git-svn
-            # instead of svn to get the revision numbers
-            $svn_info = get_git_svn_info(); 
-            if (! scalar keys %{$svn_info}) {
-                die "Could not determine subversion info from git, is git-svn installed and in path?";
+        $svn_info = get_svn_info();
+        if (! scalar keys %{$svn_info}) {
+            # getting revision info from SVN did not work, try git
+            if (`$git branch`) {
+                # if the current tree is under git control, use git-svn
+                # instead of svn to get the revision numbers
+                $svn_info = get_git_svn_info(); 
+                if (! scalar keys %{$svn_info}) {
+                    die "Could not determine subversion info from git, is git-svn installed and in path?";
+                }
             }
-        }
-        else {
-            # use subversion to get version information
-            $svn_info = get_svn_info();
-            if (! scalar keys %{$svn_info}) {
+            else {
                 die "Could not determine subversion info, is svn installed and in path?";
             }
         }
