@@ -25,6 +25,8 @@ my %config;
 
 
 my $svn = 'svn';
+my $git = 'git';
+my $git_svn = 'git-svn';
 
 my $svn_info;
 my $mapping_of;
@@ -50,6 +52,23 @@ sub slurp {
     return $result;
 }
 
+sub get_git_svn_info {
+    my $result = {};
+
+    my $last_log = `$git_svn log --oneline --limit 1`;
+    my ($revision) = ($last_log =~ m{\A r(\d+)\ \|\ .*}xms);
+    if (! defined $revision) {
+        # did not get correct structure
+        return $result;
+    }
+	$result->{revision} = $revision;
+    # in git (as in SVN, too?), the last-changed-revision is always equal
+    # to the revision
+	$result->{'last-changed-revision'} = $revision;
+    
+    return $result;
+}
+    
 sub get_svn_info {
     my $result = {};
 
@@ -181,9 +200,20 @@ foreach my $component (keys %config) {
     
     # built-in components
     if ($component =~ m{ \A (?:revision|last-changed-revision) \z }xms) {
-        $svn_info = get_svn_info();
-        if (! scalar keys %{$svn_info}) {
-            die "Could not determine subversion info, is svn installed and in path?";
+        if (`$git branch`) {
+            # if the current tree is under git control, use git-svn
+            # instead of svn to get the revision numbers
+            $svn_info = get_git_svn_info(); 
+            if (! scalar keys %{$svn_info}) {
+                die "Could not determine subversion info from git, is git-svn installed and in path?";
+            }
+        }
+        else {
+            # use subversion to get version information
+            $svn_info = get_svn_info();
+            if (! scalar keys %{$svn_info}) {
+                die "Could not determine subversion info, is svn installed and in path?";
+            }
         }
 
         $mapping_of->{component}->{$component} = {
