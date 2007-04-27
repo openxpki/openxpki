@@ -3,51 +3,51 @@
 
 use strict;
 use warnings;
-use Test;
+use Test::More;
 
 use OpenXPKI::DateTime;
 use DateTime;
 
-BEGIN { plan tests => 5 };
+plan tests => 5;
 
-print STDERR "DATETIME FUNCTIONS: DATE CONVERSION\n";
+diag "DATETIME FUNCTIONS: DATE CONVERSION\n";
 
 my $epoch = 1142434089;
 my $dt = DateTime->from_epoch( epoch => $epoch ); 
 
-ok(OpenXPKI::DateTime::convert_date(
+is(OpenXPKI::DateTime::convert_date(
        { 
 	   OUTFORMAT => 'epoch', 
 	   DATE      => $dt,
        }),
-   $epoch);
+   $epoch, 'convert date to epoch works');
 
-ok(OpenXPKI::DateTime::convert_date(
+is(OpenXPKI::DateTime::convert_date(
        { 
 	   OUTFORMAT => 'iso8601', 
 	   DATE      => $dt,
        }),
-   '2006-03-15T14:48:09');
+   '2006-03-15T14:48:09', 'convert date to iso8601 works');
 
-ok(OpenXPKI::DateTime::convert_date(
+is(OpenXPKI::DateTime::convert_date(
        { 
 	   OUTFORMAT => 'openssltime', 
 	   DATE      => $dt,
        }),
-   '060315144809Z');
+   '060315144809Z', 'convert date to openssltime works');
 
-ok(OpenXPKI::DateTime::convert_date(
+is(OpenXPKI::DateTime::convert_date(
        { 
 	   OUTFORMAT => 'terse', 
 	   DATE      => $dt,
        }),
-   '20060315144809');
+   '20060315144809', 'convert date to terse works');
 
-ok(OpenXPKI::DateTime::convert_date(
+is(OpenXPKI::DateTime::convert_date(
        { 
 	   OUTFORMAT => 'printable', 
 	   DATE      => $dt,
        }),
-   '2006-03-15 14:48:09');
+   '2006-03-15 14:48:09', 'convert date to printable works');
 
 1;

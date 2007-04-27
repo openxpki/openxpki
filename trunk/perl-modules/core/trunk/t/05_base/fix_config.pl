@@ -18,7 +18,7 @@ replace_param (FILENAME => "t/config.xml",
 if ($pwentry[0] ne "root")
 {
     ## warn the user
-    print STDERR "Please note that you are not root.\n".
+    diag "Please note that you are not root.\n".
                  "The tests cannot verify that the change UID and GID operations work.\n";
 }
 

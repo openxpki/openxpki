@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test;
+use Test::More;
 use Data::Dumper;
 use Scalar::Util qw( blessed );
 
@@ -10,10 +10,9 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
-BEGIN { plan tests => 12 };
+plan tests => 11;
 
-print STDERR "OpenXPKI::Server::Context - global context entries\n";
-ok(1);
+diag "OpenXPKI::Server::Context - global context entries\n";
 
 ## init Context
 ok(OpenXPKI::Server::Init::init(
@@ -32,45 +31,45 @@ ok(OpenXPKI::Server::Init::init(
 		       'api',
 		       'authentication',
 		       ],
-       }));
+       }), 'Server init');
 
 
-ok(blessed CTX('xml_config'),
-   'OpenXPKI::XML::Config');
+is(ref CTX('xml_config'), 
+    'OpenXPKI::XML::Config', "CTX('xml_config')");
 
-ok(blessed CTX('crypto_layer'),
-   'OpenXPKI::Crypto::TokenManager');
+is(ref CTX('crypto_layer'),
+    'OpenXPKI::Crypto::TokenManager', "CTX('crypto_layer')");
 
-ok(blessed CTX('volatile_vault'),
-   'OpenXPKI::Crypto::VolatileVault');
+is(ref CTX('volatile_vault'),
+   'OpenXPKI::Crypto::VolatileVault', "CTX('volatile_vault')");
 
-ok(blessed CTX('log'),
-   'OpenXPKI::Server::Log');
+is(ref CTX('log'),
+    'OpenXPKI::Server::Log', "CTX('log')");
 
-ok(blessed CTX('dbi_backend'),
-   'OpenXPKI::Server::DBI');
+is(ref CTX('dbi_backend'),
+   'OpenXPKI::Server::DBI', "CTX('dbi_backend')"
+);
 
-ok(blessed CTX('dbi_workflow'),
-   'OpenXPKI::Server::DBI');
+is(ref CTX('dbi_workflow'),
+   'OpenXPKI::Server::DBI', "CTX('dbi_workflow')"
+);
 
-ok(blessed CTX('acl'),
-   'OpenXPKI::Server::ACL');
+is(ref CTX('acl'),
+   'OpenXPKI::Server::ACL', "CTX('acl')"
+);
 
-ok(blessed CTX('api'),
-   'OpenXPKI::Server::API');
+is(ref CTX('api'),
+   'OpenXPKI::Server::API', "CTX('api')"
+);
 
-ok(blessed CTX('authentication'),
-   'OpenXPKI::Server::Authentication');
+is(ref CTX('authentication'),
+   'OpenXPKI::Server::Authentication', "CTX('authentication')"
+);
 
 eval {
     CTX('server');
 };
-if (my $exc = OpenXPKI::Exception->caught()) {
-    ok($exc->message(), 
-       "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED"); # expected error
-} else {
-    ok(0);
-}
-
+my $exc = OpenXPKI::Exception->caught();
+is($exc->message(), "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED", 'Undefined object -> exception'); # expected error
 
 1;

@@ -1,24 +1,19 @@
 use strict;
 use warnings;
-use Test;
-BEGIN { plan tests => 6 };
+use Test::More;
+## 2 * number of files
 
-print STDERR "OpenXPKI::Server::DBI Cleanup\n";
+my @files = qw( t/30_dbi/sqlite.db 
+                t/30_dbi/sqlite.db._workflow_
+                t/30_dbi/sqlite.db._backend_ );
 
-foreach my $db (qw( t/30_dbi/sqlite.db 
-                    t/30_dbi/sqlite.db._workflow_
-                    t/30_dbi/sqlite.db._backend_ )) {
+plan tests => (scalar @files) * 2;
 
-    unlink $db;
+diag "OpenXPKI::Server::DBI Cleanup\n";
 
-    ok(1);
-
-    if (-e $db)
-    {
-	ok(0);
-    } else {
-	ok(1);
-    }
+foreach my $filename (@files)
+{
+    ok(! -e $filename || unlink ($filename), 'file does not exist or can be removed');
+    ok(! -e $filename, 'file does not exist');
 }
-
 1;

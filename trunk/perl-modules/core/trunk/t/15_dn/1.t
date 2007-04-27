@@ -9,7 +9,7 @@
 
 use strict;
 use warnings;
-use Test;
+use Test::More;
 use OpenXPKI::DN;
 
 my %example = (
@@ -73,20 +73,15 @@ my %example = (
 
 BEGIN { plan tests => 66 };
 
-print STDERR "SYNTAX VALIDATION\n";
+diag "SYNTAX VALIDATION\n";
 
 foreach my $dn (keys %example)
 {
     ## init object
 
     my $object = OpenXPKI::DN->new ($dn);
-    if ($object)
-    {
-        ok (1);
-    } else {
-        ok (0);
-    }
-    ok ($object->get_rfc_2253_dn(), $dn, "Could not parse RFC2253 DN");
+    ok(defined $object, 'OpenXPKI::DN object defined');
+    is ($object->get_rfc_2253_dn(), $dn, "Could not parse RFC2253 DN");
 
     my @attr = $object->get_parsed();
 
@@ -98,10 +93,10 @@ foreach my $dn (keys %example)
         for (my $k=0; $k < scalar @{$example{$dn}[$i]}; $k++)
         {
             ## we are at attribute level now
-            ok ($attr[$i][$k]->[0], 
+            is ($attr[$i][$k]->[0], 
 		$example{$dn}[$i][$k][0], 
 		"Got: $attr[$i][$k]->[0], expected $example{$dn}[$i][$k][0]");
-            ok ($attr[$i][$k]->[1], 
+            is ($attr[$i][$k]->[1], 
 		$example{$dn}[$i][$k][1], 
 		"Got: $attr[$i][$k]->[1], expected $example{$dn}[$i][$k][1]");
         }

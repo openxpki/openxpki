@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test;
+use Test::More;
 
 my @files = ();
 
@@ -51,15 +51,15 @@ foreach my $cadir (qw( ca1 ca2 cagost canciph )) {
     "t/25_crypto/$cadir/crlnumber",
 }
 
-## 4 * number of files
-BEGIN { plan tests => 280 };
+## 2 * number of files
+plan tests => (scalar @files) * 2;
 
-print STDERR "OpenXPKI::Crypto Cleanup\n";
+diag "OpenXPKI::Crypto Cleanup\n";
 
 foreach my $filename (@files)
 {
-    ok(not -e $filename or unlink ($filename));
-    ok(not -e $filename);
+    ok(! -e $filename || unlink ($filename), 'file does not exist or can be removed');
+    ok(! -e $filename, 'file does not exist');
 }
 
 1;

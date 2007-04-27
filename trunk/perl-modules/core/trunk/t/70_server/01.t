@@ -1,56 +1,50 @@
 use strict;
 use warnings;
 use English;
-use Test;
-BEGIN { plan tests => 12 };
+use Test::More;
+plan tests => 12;
 
-print STDERR "OpenXPKI::Server\n";
+diag "OpenXPKI::Server\n";
 
 use OpenXPKI::Server;
-ok(1);
 
 `cp t/30_dbi/sqlite.db t/30_dbi/sqlite.db._backend_`;
-ok(not $CHILD_ERROR);
+is($CHILD_ERROR, 0, 'Copying database');
+
+`cp t/30_dbi/sqlite.db t/30_dbi/sqlite.db._log_`;
+is($CHILD_ERROR, 0, 'Copying database');
 
 foreach my $mode ('debug', '')
 {
-    print STDERR "Starting server in debug mode ...\n"
+    diag "Starting server in debug mode ...\n"
         if ($mode eq "debug");
 
     my @cmd = qw( perl
                   t/70_server/startup.pl );
     my $sleep = 5;
     if ($mode eq 'debug') {
-	push @cmd, '--debug';
-	$sleep += 10;
+        push @cmd, '--debug';
+        $sleep += 10;
     }
 
-    ok(system(@cmd) == 0);
-    print STDERR "Waiting $sleep seconds for starting server ...\n";
+    ok(system(@cmd) == 0, 'Server started without an error code');
+    diag "Waiting $sleep seconds for starting server ...\n";
     sleep($sleep);
 
-    if (not -e 't/pid')
-    {
-        print STDERR "Waiting 5 additional seconds to support very slow machines ...\n";
+    if (not -e 't/pid') {
+        diag "Waiting 5 additional seconds to support very slow machines ...\n";
         sleep 5;
     }
-    ok(-e "t/pid");
-    ok(-e "t/socket");
+    ok(-e "t/pid", 'PID file exists');
+    ok(-e "t/socket", 'Socket file exists');
 
     ## should we check here that the server is really running?
 
     my $pid = `cat t/pid`;
-    ok($pid =~ m{ \d+ }xs);
+    ok($pid =~ m{ \d+ }xs, 'PID file contains a number');
 
     my $ret = `kill $pid`;
-    if ($?)
-    {
-        ok(0);
-        print STDERR "Error: ".$?."(".$@.")\n";
-    } else {
-        ok(1);
-        print STDERR "Server terminated correctly.\n";
-    }
+    ok(! $?, 'Server termination') or diag "Error: ".$?."(".$@.")\n";
 }
 
 1;
