@@ -1139,6 +1139,7 @@ sub get_dbi
     $params{TYPE} = $config->get_xpath (
                    XPATH    => [ "common/$dbpath/type" ],
                    COUNTER  => [ 0 ]);
+    ##! 16: 'type: ' . $params{TYPE}
 
     ## determine configuration for infrastructure
     $params{SERVER_ID} = $config->get_xpath (
@@ -1148,6 +1149,8 @@ sub get_dbi
                    XPATH    => [ "common/$dbpath/server_shift" ],
                    COUNTER  => [ 0 ]);
 
+    ##! 16: 'server id: ' . $params{SERVER_ID}
+    ##! 16: 'server shift: ' . $params{SERVER_ID}
     ## find configuration and detect number of options
     my ($vendor_name, $vendor_number, $vendor_envs) = ("", -1, 0);
     my $vendor_count = $config->get_xpath_count (
@@ -1165,6 +1168,7 @@ sub get_dbi
 		   COUNTER  => [ $k ]);
 	};
     }
+    ##! 16: 'vendor_envs: ' . $vendor_envs
 
     ## load environment
     for (my $i = 0; $i<$vendor_envs; $i++)
@@ -1185,6 +1189,7 @@ sub get_dbi
     $params{NAME} = $config->get_xpath (
                    XPATH    => [ "common/$dbpath/name" ],
                    COUNTER  => [ 0 ]);
+    ##! 16: 'name: ' . $params{NAME}
     eval{ $params{HOST} = $config->get_xpath (
                    XPATH    => [ "common/$dbpath/host" ],
                    COUNTER  => [ 0 ]) };
@@ -1203,9 +1208,10 @@ sub get_dbi
 
     # special handling for SQLite databases
     if ($params{TYPE} eq "SQLite") {
-	if (defined $args->{PURPOSE} && ($args->{PURPOSE} ne "")) {
-	    $params{NAME} .= "._" . $args->{PURPOSE} . "_";
-	}
+        if (defined $args->{PURPOSE} && ($args->{PURPOSE} ne "")) {
+            $params{NAME} .= "._" . $args->{PURPOSE} . "_";
+            ##! 16: 'SQLite, name: ' . $params{NAME}
+        }
     }
 
     return OpenXPKI::Server::DBI->new (%params);
