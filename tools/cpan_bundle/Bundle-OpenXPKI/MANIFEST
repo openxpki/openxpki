@@ -1,0 +1,5 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+lib/Bundle/OpenXPKI.pm
