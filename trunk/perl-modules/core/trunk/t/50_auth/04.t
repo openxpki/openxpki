@@ -1,16 +1,15 @@
 use strict;
 use warnings;
 use English;
-use Test;
-BEGIN { plan tests => 5 };
+use Test::More;
+plan tests => 3;
 
-print STDERR "OpenXPKI::Server::Authentication::Password\n";
+diag "OpenXPKI::Server::Authentication::Password\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
-ok(1);
 
 ## init XML cache
 OpenXPKI::Server::Init::init(
@@ -21,18 +20,11 @@ OpenXPKI::Server::Init::init(
     });
 
 ## load authentication configuration
-my $auth = OpenXPKI::Server::Authentication->new ();
+my $auth = OpenXPKI::Server::Authentication::Password->new ({
+        XPATH   => ['pki_realm', 'auth', 'handler' ], 
+        COUNTER => [ 0         , 0     , 1         ],
+});
 ok($auth);
-
-## create new session
-my $session = OpenXPKI::Server::Session->new ({
-                  DIRECTORY => "t/50_auth/",
-                  LIFETIME  => 5});
-ok($session);
-OpenXPKI::Server::Context::setcontext ({'session' => $session});
-
-## set pki realm to identify configuration
-$session->set_pki_realm ("Test Root CA");
 
 ## perform authentication
 my ($user, $role, $reply) = $auth->login_step({

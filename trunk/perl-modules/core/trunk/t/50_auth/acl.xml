@@ -43,7 +43,7 @@
 
   <permission>
     <server>*</server>
-    <activity>*</activity>
+    <activity>Test::*</activity>
     <affected_role>*</affected_role>
     <auth_role>CA Operator</auth_role>
   </permission>

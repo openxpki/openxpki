@@ -20,6 +20,9 @@ ok(1);
 my $sqlscript = eval { $dbi->init_schema (MODE => "DRYRUN") };
 ok(! $EVAL_ERROR, 'DRYRUN mode') or diag $EVAL_ERROR;
 ok(length($sqlscript) > 1000, 'Length of SQL script');
+if ($ENV{DEBUG}) {
+    diag $sqlscript;
+}
 
 ## database schema init
 $sqlscript = eval { $dbi->init_schema () };

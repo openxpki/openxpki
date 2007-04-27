@@ -112,7 +112,6 @@ ok($obj) or diag "Error: ${EVAL_ERROR}\n";
 
 unlike($obj->dump(), qr/name --> super\n/, 'No mention of super in the dump');
 
-my $result;
 eval {
     $result = $obj->get_xpath(
         XPATH   => ['selfsignedca', 'profile', 'validity', 'notafter' ],

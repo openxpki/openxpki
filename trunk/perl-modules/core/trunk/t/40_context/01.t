@@ -14,6 +14,7 @@ BEGIN { plan tests => 11 };
 print STDERR "OpenXPKI::Server::Context\n";
 ok(1);
 
+`cp t/30_dbi/sqlite.db t/30_dbi/sqlite.db._backend_`;
 
 ## init XML cache
 ok(OpenXPKI::Server::Init::init(

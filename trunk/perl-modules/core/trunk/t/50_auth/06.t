@@ -1,16 +1,15 @@
 use strict;
 use warnings;
 use English;
-use Test;
-BEGIN { plan tests => 6 };
+use Test::More;
+plan tests => 4;
 
-print STDERR "OpenXPKI::Server::Authentication::External (static role)\n";
+diag "OpenXPKI::Server::Authentication::External (static role)\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
-ok(1);
 
 ## init XML cache
 OpenXPKI::Server::Init::init(
@@ -21,21 +20,14 @@ OpenXPKI::Server::Init::init(
     });
 
 ## load authentication configuration
-my $auth = OpenXPKI::Server::Authentication->new ();
-ok($auth);
-
-## create new session
-my $session = OpenXPKI::Server::Session->new ({
-                  DIRECTORY => "t/50_auth/",
-                  LIFETIME  => 5});
-ok($session);
-OpenXPKI::Server::Context::setcontext ({'session' => $session});
-
-## set pki realm to identify configuration
-$session->set_pki_realm ("Test Root CA");
+my $auth = OpenXPKI::Server::Authentication::External->new({
+        XPATH   => ['pki_realm', 'auth', 'handler' ], 
+        COUNTER => [ 0         , 0     , 4         ],
+});
+ok($auth, 'Auth object creation');
 
 my ($user, $role, $reply) = $auth->login_step({
-    STACK   => 'External Static',
+    STACK   => 'External Dynamic',
     MESSAGE => {
         'SERVICE_MSG' => 'GET_PASSWD_LOGIN',
         'PARAMS'      => {
@@ -45,8 +37,7 @@ my ($user, $role, $reply) = $auth->login_step({
     },
 });
 
-ok($user eq 'John Doe');
-ok($role eq 'RA Operator');
-ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');    
-
+is($user, 'John Doe', 'Correct user');
+is($role, 'RA Operator', 'Correct role');
+is($reply->{'SERVICE_MSG'}, 'SERVICE_READY', 'Service ready.');    
 1;

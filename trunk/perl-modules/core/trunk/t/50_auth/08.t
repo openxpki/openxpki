@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use English;
-use Test;
-BEGIN { plan tests => 7 };
+use Test::More;
+plan tests => 8;
 
-print STDERR "OpenXPKI::Server::ACL Performance\n";
+diag "OpenXPKI::Server::ACL Performance\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
@@ -26,6 +26,9 @@ my $session = OpenXPKI::Server::Session->new ({
                   LIFETIME  => 5});
 ok($session);
 ok(OpenXPKI::Server::Context::setcontext({'session' => $session}));
+ok(OpenXPKI::Server::Context::setcontext({
+    log => OpenXPKI::Server::Log::NOOP->new()}),
+    'Dummy log object in CTX');
 
 ## configure the session
 $session->set_pki_realm ("Test Root CA");
@@ -44,14 +47,14 @@ my $begin = [ Time::HiRes::gettimeofday() ];
 for (my $i=0; $i<$items; $i++)
 {
    $acl->authorize ({ACTIVITYCLASS => "Test::Test",
-                     ACTIVITY      => "Test",
+                     ACTIVITY      => "Test::activity",
                      AFFECTED_ROLE => "User"});
 }
 ok (1);
 my $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $items / $result;
 $result =~ s/\..*$//;
-print STDERR " - $result checks/second (minimum: 10.000 per second)\n";
+diag " - $result checks/second (minimum: 10.000 per second)\n";
 ok($result);
 
 1;

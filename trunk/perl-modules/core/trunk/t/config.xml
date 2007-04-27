@@ -20,6 +20,7 @@
         <default_language>C</default_language>
     </i18n>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="30_dbi/database.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="28_log/log_database.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="25_crypto/token.xml"/>
   </common>
 
