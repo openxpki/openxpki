@@ -37,6 +37,8 @@ sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
 
     $api{$ident} = OpenXPKI::Server::API->new();
+
+    return 1;
 }
 
 
@@ -182,6 +184,11 @@ Base class for service implementations. The protocol definition itself
 is left to the derived classes.
 
 =head2 Methods
+
+=head3 BUILD
+
+is the constructor (called via new()). Fills the api attribute with
+a newly created API object.
 
 =head3 talk
 

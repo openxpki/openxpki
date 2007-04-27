@@ -224,4 +224,10 @@ Example: $self->write_file (FILENAME => $filename, CONTENT => $data, FORCE => 1)
 
 Example: my $file = $self->get_tmpfile ({TMP => "/tmp"});
 
-This method creates a safe temporary file and return the filename.
+This method creates a safe temporary file and returns the filename.
+
+=head2 get_safe_tmpdir
+
+Example: my $dir = $self->get_tmpdir ({TMP => "/tmp"});
+
+This method creates a safe temporary directory and returns the path to it.
