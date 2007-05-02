@@ -302,7 +302,7 @@ sub __replace_super {
     my $MAX_LEVEL = 500;
     ##! 1: 'path: ' . $path
     ##! 1: 'level: ' . $level
-    ##! 1: 'start_ref: ' . Dumper $start_ref
+    ##! 16: 'start_ref: ' . Dumper $start_ref
 
     if ($level > $MAX_LEVEL) {
         OpenXPKI::Exception->throw(
