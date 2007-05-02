@@ -1,4 +1,4 @@
-use Test::More tests => 8;
+use Test::More tests => 9;
 use File::Path;
 use File::Spec;
 use Cwd;
@@ -44,7 +44,9 @@ my %configure_settings = (
     'server.socketfile' => File::Spec->rel2abs($config{socket_file}),
     'server.runuser' => $pw_name,
     'server.rungroup' => $gr_name,
-    );
+    'database.type' => 'SQLite',
+    'database.name' => "$instancedir/sqlite.db",
+);
 
 # configure in this directory
 my $dir = getcwd;
@@ -64,9 +66,11 @@ if (! ok(-e $config{config_file})) {
     BAIL_OUT("No server configuration file present ($config{config_file})");
 }
 
+ok(system("openxpkiadm initdb --config $config{config_file}") == 0);
+
 diag "Starting OpenXPKI Server.";
 
-$args = "--debug 100" if ($debug);
+$args = "--debug 100 --debug OpenXPKI::XML::Config:0 --debug OpenXPKI::XML::Cache:0" if ($debug);
 if (system("openxpkictl --config $config{config_file} $args start") != 0) {
     unlink $config{socket_file};
     BAIL_OUT("Could not start OpenXPKI.");
