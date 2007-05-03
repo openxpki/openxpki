@@ -82,8 +82,7 @@ CLIENTS_COMMON_DIR="openxpki/trunk/clients/perl"
 CLIENTS="OpenXPKI-Client \
 	OpenXPKI-Client-CLI \
 	OpenXPKI-Client-HTML-Mason \
-	OpenXPKI-Client-SCEP \
-	OpenXPKI-Client-SOAP-Lite"
+	OpenXPKI-Client-SCEP"
 
 for CLIENT_NAME in ${CLIENTS}
 do
@@ -132,7 +131,7 @@ done
 #---------------- Makefile for port ----------------------
 
 PORTS_PREFIX="p5-"
-PORTS="openxpki openxpki-client openxpki-client-cli openxpki-client-html-mason openxpki-client-scep openxpki-client-soap-lite openxpki-i18n openxpki-deployment"
+PORTS="openxpki openxpki-client openxpki-client-cli openxpki-client-html-mason openxpki-client-scep openxpki-i18n openxpki-deployment"
 
 cd ${PORTS_DIR} 
 MODIFIED_PORTS=0
