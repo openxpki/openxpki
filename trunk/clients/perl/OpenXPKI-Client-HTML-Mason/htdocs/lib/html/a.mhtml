@@ -9,7 +9,7 @@
   foreach my $key (@{$params})
   {
     $param .= ";" if ($param);
-    $param .= $key->[0]."=".uri_escape($key->[1]);
+    $param .= $key->[0]."=".URI::Escape::uri_escape_utf8($key->[1]);
   }
 </%init>
 <%once>

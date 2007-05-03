@@ -4,7 +4,10 @@
 <%init>
     return "" if (not defined $data);
 
-    print HTML::Entities::encode ($data);
+    Encode::_utf8_on ($data);
+    $data = HTML::Entities::encode ($data);
+    print $data;
+
     ## always return here !!!
     ## if the normal perl area will be executed
     ## then the output can include newlines

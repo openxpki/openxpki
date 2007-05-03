@@ -8,6 +8,7 @@ use base qw( Workflow::Validator );
 
 use strict;
 use warnings;
+use utf8;
 
 use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Validator::CertSubjectAltNameParts';
 use Workflow::Exception qw( validation_error );
@@ -18,6 +19,7 @@ use Mail::RFC822::Address;
 use Net::IP;
 
 use Data::Dumper;
+use Encode;
 
 sub validate {
     my ( $self, $wf, $profile, $subj_style, $subject_parts, $subject_alt_name_parts ) = @_;
@@ -31,6 +33,8 @@ sub validate {
 
     return if (not defined $subject_alt_name_parts);
 
+    Encode::_utf8_off ($subject_alt_name_parts);
+    Encode::_utf8_off ($subject_parts);
     my $ser = OpenXPKI::Serialization::Simple->new();
     $subject_alt_name_parts = $ser->deserialize($subject_alt_name_parts);
     $subject_parts          = $ser->deserialize($subject_parts);

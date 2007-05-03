@@ -7,6 +7,8 @@ package OpenXPKI::Server::Workflow::Validator::CertSubjectParts;
 
 use strict;
 use warnings;
+use utf8;
+
 use base qw( Workflow::Validator );
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
@@ -16,6 +18,7 @@ use English;
 use Template;
 
 use Data::Dumper;
+use Encode;
 
 sub validate {
     my ( $self, $wf, $profile, $profile_id, $style, $subject_parts ) = @_;
@@ -38,6 +41,7 @@ sub validate {
     });
     ##! 64: 'styles: ' . Dumper $styles
 
+    Encode::_utf8_off ($subject_parts);
     my $ser = OpenXPKI::Serialization::Simple->new();
     $subject_parts = $ser->deserialize($subject_parts);
     
