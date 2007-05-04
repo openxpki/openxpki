@@ -13,7 +13,7 @@ print STDERR "SCHEMA VALIDATION\n";
 TODO: {
     local $TODO = 'Schema is outdated, see #1702814';
     ## create new object
-    my $obj = eval {OpenXPKI::XML::Config->new(CONFIG => "t/config.xml",
+    my $obj = eval {OpenXPKI::XML::Config->new(CONFIG => "t/config_test.xml",
                                                SCHEMA => "openxpki.xsd")};
     is($EVAL_ERROR, '', 'Config object created successfully');
     ok(defined $obj, 'Config object is defined');

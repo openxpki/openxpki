@@ -13,7 +13,7 @@ diag "CONFIGURATION INHERITANCE\n";
 ## create new object
 my $obj;
 eval {
-    $obj = OpenXPKI::XML::Config->new(CONFIG => "t/config.xml");
+    $obj = OpenXPKI::XML::Config->new(CONFIG => "t/config_test.xml");
 };
 ok(defined $obj, 'Config object defined') or diag "Error: $EVAL_ERROR";
 
@@ -42,11 +42,11 @@ TODO: {
         skip "Cannot validate configuration with the schema because you are offline", 2 if ($ENV{OFFLINE} || ! $p->ping('www.w3.org'));
 
         ## validate with xmllint
-        my $result = `xmllint -format -schema openxpki.xsd -xinclude t/config.xml 2>&1 1>/dev/null`;
+        my $result = `xmllint -format -schema openxpki.xsd -xinclude t/config_test.xml 2>&1 1>/dev/null`;
         is ($CHILD_ERROR, '', 'xmllint succeeded with the validation') or diag "Error: there is something wrong with xmllint (${CHILD_ERROR}: ${EVAL_ERROR})";
 
         $result =~ s/^(.*\n)?([^\n]+)\n?$/$2/s;
-        is($result, "t/config.xml validates", 'xmllint says validation successfull') or diag "xmllint reports some trouble with t/config.xml and openxpki.xsd\n";
+        is($result, "t/config_test.xml validates", 'xmllint says validation successfull') or diag "xmllint reports some trouble with t/config_test.xml and openxpki.xsd\n";
     }
 }
 

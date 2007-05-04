@@ -6,6 +6,8 @@ my @files = ();
 
 foreach my $cadir (qw( ca1 ca2 cagost canciph )) {
     push @files, 
+    "t/config_test.xml",
+    "t/25_crypto/$cadir/token_test.xml",
     "t/25_crypto/$cadir/cakey.pem",
     "t/25_crypto/$cadir/cacert.pem",
     

@@ -16,8 +16,8 @@ if (grep /^--debug$/, @ARGV)
 
 require OpenXPKI::Server;
 
-#OpenXPKI::Server->new ("CONFIG" => "t/config.xml");
-my $configfile = "t/config.xml";
+#OpenXPKI::Server->new ("CONFIG" => "t/config_test.xml");
+my $configfile = "t/config_test.xml";
 
 FORK: 
 {

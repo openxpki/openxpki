@@ -5,7 +5,9 @@ use Test::More;
 
 my @files = qw( t/30_dbi/sqlite.db 
                 t/30_dbi/sqlite.db._workflow_
-                t/30_dbi/sqlite.db._backend_ );
+                t/30_dbi/sqlite.db._backend_
+                t/30_dbi/sqlite.db._log_
+);
 
 plan tests => (scalar @files) * 2;
 

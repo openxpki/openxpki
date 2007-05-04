@@ -23,7 +23,7 @@ foreach my $mode ('debug', '')
                   t/70_server/startup.pl );
     my $sleep = 5;
     if ($mode eq 'debug') {
-        push @cmd, '--debug';
+        push @cmd, '--debug 128';
         $sleep += 10;
     }
 

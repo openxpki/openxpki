@@ -15,7 +15,7 @@ ok(1);
 ## init XML cache
 OpenXPKI::Server::Init::init(
     {
-	CONFIG => 't/config.xml',
+	CONFIG => 't/config_test.xml',
 	TASKS => [ 'xml_config' ],
 	SILENT => 1,
     });

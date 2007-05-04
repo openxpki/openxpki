@@ -3,13 +3,13 @@ use warnings;
 use English;
 
 my @pwentry = getpwuid ($UID);
-replace_param (FILENAME => "t/config.xml",
+replace_param (FILENAME => "t/config_test.xml",
                TAG      => "user",
                VALUE    => $pwentry[0])
     if ($pwentry[0] ne "root");
 
 my @grentry = getgrgid ($GID);
-replace_param (FILENAME => "t/config.xml",
+replace_param (FILENAME => "t/config_test.xml",
                TAG      => "group",
                VALUE    => $grentry[0])
     if ($grentry[0] ne "root"); # On BSDs user root belongs to group 'wheel'
@@ -41,10 +41,10 @@ if (exists $ENV{GOST_OPENSSL_ENGINE})
 else
 {
     ## drop all the GOST configuration to avoid exceptions during initialization
-    replace_param (FILENAME => "t/config.xml",
+    replace_param (FILENAME => "t/config_test.xml",
                    PARAM    => "default_gost",
                    VALUE    => "default");
-    replace_param (FILENAME => "t/config.xml",
+    replace_param (FILENAME => "t/config_test.xml",
                    PARAM    => "cagost",
                    VALUE    => "ca1");
 }
@@ -65,10 +65,10 @@ if ((exists $ENV{NCIPHER_LIBRARY}) and (exists $ENV{CHIL_LIBRARY}) and (exists $
 else
 {
     ## drop all the nCipher configuration to avoid exceptions during initialization
-    replace_param (FILENAME => "t/config.xml",
+    replace_param (FILENAME => "t/config_test.xml",
                    PARAM    => "default_nciph",
                    VALUE    => "default");
-    replace_param (FILENAME => "t/config.xml",
+    replace_param (FILENAME => "t/config_test.xml",
                    PARAM    => "canciph",
                    VALUE    => "ca1");
 }
@@ -98,11 +98,7 @@ sub replace_param
                   {$value}sgx;
     }
 
-    my $i = 0;
-    while (-e sprintf ("%s.%03d", $filename, $i)) {$i++;}
-
-    rename ($filename, sprintf ("%s.%03d", $filename, $i));
-    open FD, ">$filename" or die "Cannot open configuration file $filename for writing.\n";
+    open FD, '>', $filename or die "Cannot open configuration file $filename for writing.\n";
     print FD $file;
     close FD;
 }

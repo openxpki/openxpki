@@ -118,7 +118,7 @@ Log::Log4perl->easy_init($ERROR);
 ### initialize context
 ok(OpenXPKI::Server::Init::init(
        {
-	   CONFIG => 't/config.xml',
+	   CONFIG => 't/config_test.xml',
 	   TASKS  => [ 'xml_config', 
 		       'i18n', 
 		       'log', 
