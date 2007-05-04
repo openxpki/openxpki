@@ -76,6 +76,18 @@ sub throw {
     my %exception_args = %args;
     delete $exception_args{log};
     
+    # This is a bit of an evil hack until Exception::Class supports
+    # turning off stack traces, see
+    # http://rt.cpan.org/Ticket/Display.html?id=26489
+    # for a bug report and patch
+    # It fakes the Devel::StackTrace calls that are used in
+    # Exception::Class to be nearly empty, which massively speeds up
+    # Exception throwing
+    local *Devel::StackTrace::new
+        = *OpenXPKI::Exception::__fake_stacktrace_new;
+    local *Devel::StackTrace::frame
+        = *OpenXPKI::Exception::__fake_stacktrace_frame;
+
     my $self = $proto->new(%exception_args);
 
     if (exists $args{log}
@@ -110,6 +122,22 @@ sub throw {
     }
 
     die $self;
+}
+
+sub __fake_stacktrace_new {
+    ##! 16: 'fake_stacktrace_new called'
+    my $that  = shift;
+    my $class = ref($that) || $that;
+
+    my $self = {};
+    bless $self, $class;
+
+    return $self;
+}
+
+sub __fake_stacktrace_frame {
+    ##! 16: 'fake_stacktrace_frame called'
+    return 0;
 }
 
 #sub get_errno
