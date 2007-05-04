@@ -4,6 +4,16 @@ use warnings;
 
 ## configure test environment
 
+my $base = 't/instance';
+our %config = (
+    server_dir         => $base,
+    config_dir         => "$base/etc/openxpki",
+    var_dir            => "$base/var/openxpki",
+    config_file        => "$base/etc/openxpki/config.xml",
+    socket_file        => "/var/tmp/openxpki-client-test.socket",
+    debug              => 1,
+);
+
 our $PWD      = `pwd`;
     $PWD      =~ s/\n//g;
 our $INSTANCE = "$PWD/t/tc1";

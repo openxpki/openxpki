@@ -1,81 +1,83 @@
+use Test::More tests => 9;
+use File::Path;
+use File::Spec;
+use Cwd;
+use English;
 
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+our %config;
+require 't/common.pl';
 
-use English;
+my $debug = $config{debug};
 
-BEGIN {
+diag("Locally deploying OpenXPKI");
 
-    our ($INSTANCE, $CONFIG);
-    require "t/common.pl";
-
-    ## remove instance; from old test
-    if (length $INSTANCE > 10)
-    {
-        `rm -rf $INSTANCE`;
-    }
-    ok (! -d $INSTANCE);
-
-    ## check for OpenXPKI::Server
-    use_ok ("OpenXPKI::Server");
-
-    ## check for deployment tools
-    ok (`openxpkiadm --help`);
-    ok (`openxpkictl --help`);
-
-    ## create test directory
-    mkdir $INSTANCE if (! -d $INSTANCE);
-    ok (-d $INSTANCE);
-    mkdir "$INSTANCE/etc" if (! -d "$INSTANCE/etc");
-    ok (-d "$INSTANCE/etc");
-    mkdir "$INSTANCE/etc/openxpki" if (! -d "$INSTANCE/etc/openxpki");
-    ok (-d "$INSTANCE/etc/openxpki");
-
-    ## create openxpki.conf
-    ## openxpki-metaconf does not use sysconfdir therefor we must set openxpkiconfdir
-    `openxpkiadm deploy --prefix $INSTANCE -- --setcfg dir.openxpkiconfdir=$INSTANCE/etc/openxpki`;
-    ok (-e "$INSTANCE/etc/openxpki/$CONFIG");
-
-    ## set correct prefix
-    ## set correct user and group
-    `cd $INSTANCE/etc/openxpki && openxpki-metaconf --config openxpki.conf --force --setcfgvalue dir.prefix=$INSTANCE --setcfgvalue server.runuser=$UID --setcfgvalue server.rungroup=$GID --setcfg dir.localstatedir=$INSTANCE/var --setcfg dir.sysconfdir=$INSTANCE/etc --setcfg dir.openxpkiconfdir=$INSTANCE/etc/openxpki --writecfg openxpki.conf`;
-    ok(! $EVAL_ERROR);
-
-    ## configure new instance
-    `cd $INSTANCE/etc/openxpki && openxpki-configure --batch --force`;
-    ok (! $EVAL_ERROR);
-
-    # create some necessary directories
-    foreach my $name (qw( dir.datarootdir dir.localedir dir.localstatedir dir.openxpkistatedir dir.openxpkisessiondir ))
-    {
-        my $dir = `openxpki-metaconf --config $INSTANCE/etc/openxpki/$CONFIG --getcfgvalue $name`;
-           $dir =~ s{ (.*) \n+ }{$1}xms;
-        ok (-d $dir or mkdir $dir);
-    }
-
-    ## start server
-    `openxpkictl --config $INSTANCE/etc/openxpki/config.xml start`;
-    ok (! $EVAL_ERROR);
-    #unnecessary - openxpkictl performs waitpid
-    #print STDERR "Waiting 10 seconds for server startup ...";
-    #sleep 5;
-
-    ## get socketfile
-    my $socketfile = `openxpki-metaconf --config $INSTANCE/etc/openxpki/$CONFIG --getcfgvalue server.socketfile`;
-       $socketfile =~ s{ (.*) \n+ }{$1}xms;
-    #print STDERR "Verifying server via socketfile $socketfile ...\n";
-    ok (-e $socketfile);
-
-    ## create a directory for the generated HTML pages
-    our $OUTPUT;
-    if (not -d $OUTPUT)
-    {
-        ok(mkdir $OUTPUT);
-    } else {
-        ok(1);
-    }
+# check if infrastructure commands are installed
+if (system("openxpkiadm >/dev/null 2>&1") != 0) {
+    BAIL_OUT("OpenXPKI deployment environment is not installed");
 }
 
-diag( "Deploy an OpenXPKI trustcenter installation" );
+my $instancedir = $config{server_dir};
+
+if (length($instancedir) < 10) {
+    BAIL_OUT("Instance directory $instancedir not acceptable.");
+}
+
+if (-d $instancedir) {
+    rmtree($instancedir);
+}
+
+ok(mkpath $instancedir);
+
+# deployment
+ok(system("openxpkiadm deploy --prefix $instancedir") == 0);
+
+# meta config should now exist
+ok(-e "$config{config_dir}/openxpki.conf");
+
+my ($pw_name) = getpwuid($EUID);
+my ($gr_name) = getgrgid($EUID);
+my %configure_settings = (
+    'dir.prefix' => File::Spec->rel2abs($instancedir),
+    'server.socketfile' => File::Spec->rel2abs($config{socket_file}),
+    'server.runuser' => $pw_name,
+    'server.rungroup' => $gr_name,
+    'database.type' => 'SQLite',
+    'database.name' => "$instancedir/sqlite.db",
+);
+
+# configure in this directory
+my $dir = getcwd;
+ok(chdir $instancedir);
+
+my $args = "--batch --createdirs --";
+foreach my $key (keys %configure_settings) {
+    $args .= " --setcfgvalue $key=$configure_settings{$key}";
+}
+diag "Configuring with local options $args";
+ok(system("openxpki-configure $args") == 0);
+
+# and back
+ok(chdir($dir));
+
+if (! ok(-e $config{config_file})) {
+    BAIL_OUT("No server configuration file present ($config{config_file})");
+}
+
+ok(system("openxpkiadm initdb --config $config{config_file}") == 0);
+
+diag "Starting OpenXPKI Server.";
+
+$args = "--debug 100 --debug OpenXPKI::XML::Config:0 --debug OpenXPKI::XML::Cache:0" if ($debug);
+if (system("openxpkictl --config $config{config_file} $args start") != 0) {
+    unlink $config{socket_file};
+    BAIL_OUT("Could not start OpenXPKI.");
+}
+
+if (! ok(-e $config{socket_file})) {
+    unlink $config{socket_file};
+    BAIL_OUT("Server did not start (no socket file)");
+}
+
