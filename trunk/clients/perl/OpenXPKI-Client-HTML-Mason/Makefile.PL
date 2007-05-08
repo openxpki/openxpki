@@ -38,6 +38,7 @@ WriteMakefile(
         'version'          => 0,
         'OpenXPKI::Client' => 0,
         'OpenXPKI::i18n'   => 0,
+	'HTML::Mason'      => 1,
     },
     test => {TESTS => 't/*/*.t t/*.t'},
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

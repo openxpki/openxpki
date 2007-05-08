@@ -278,6 +278,7 @@ WriteMakefile(
 	'English'                => 1, ## for broken Perl installations like on Ubuntu Drapper
 	'Exception::Class'       => "1.22",
 	'Filter::Util::Call'     => 1,
+        'IO::Prompt'             => 1, # required for deployment tools
 	## includes the version of libintl-perl which includes Locale::Messages
 	'Locale::TextDomain'     => 1,
 	'Log::Log4perl'          => '0.51',
@@ -290,6 +291,7 @@ WriteMakefile(
 	'Proc::ProcessTable'     => '0.41',
 	'Regexp::Common'         => 2,
         'Sys::SigAction'         => '0.06',
+        'Template'               => '2.15',
 	'Test'                   => 1,
 	'Test::Pod'              => "1.00",
 	'Test::Pod::Coverage'    => "1.00",
