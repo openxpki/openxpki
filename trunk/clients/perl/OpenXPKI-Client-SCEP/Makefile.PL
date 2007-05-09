@@ -32,8 +32,9 @@ WriteMakefile(
     VERSION             => $version,
     ABSTRACT_FROM       => 'lib/OpenXPKI/Client/SCEP.pm',
     PREREQ_PM => {
-        'Test::More' => 0,
-        'version'    => 0,
+        'Test::More'   => 0,
+        'NetAddr::IP'  => 0,
+        'version'      => 0,
 	'OpenXPKI::Client' => 0,
     },
 );

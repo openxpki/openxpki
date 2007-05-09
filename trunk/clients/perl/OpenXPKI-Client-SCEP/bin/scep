@@ -56,6 +56,9 @@ else {
         SERVER     => $server,
         ENCRYPTION_ALGORITHM => $enc_alg,
         });
+    if (! defined $scep_client) {
+        die "SCEP client not defined";
+    }
     my $result = $scep_client->send_request();
     print $result;
 }

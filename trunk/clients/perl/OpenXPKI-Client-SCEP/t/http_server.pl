@@ -7,12 +7,14 @@
 # Copyright (c) 2006 by The OpenXPKI project
 # $Revision$
 
+use strict;
+use warnings;
+use English;
+
 use HTTP::Daemon;
 use CGI;
 use File::Temp;
 use OpenXPKI;
-use strict;
-use warnings;
 
 # If there is an argument, use it as the portnumber.
 # If there is none, the default port is 8087
@@ -49,9 +51,15 @@ while (my $conn = $daemon->accept()) {
         open my $CGI_HANDLE, "| REMOTE_ADDR=127.0.0.1 ./scep > $tmp_filename 2>/dev/null";
         print $CGI_HANDLE $post_data;
         close $CGI_HANDLE;
+        if ($CHILD_ERROR) {
+            $conn->send_error( 501, 'scep CGI problem' );
+        }
 
         # pass on the response of the CGI script to the HTTP client
         my $response = OpenXPKI->read_file($tmp_filename);
+        if (! $response) {
+            $conn->send_error( 502, 'scep response file empty' );
+        }
         $conn->send_response($response);
     }
     $conn->close();
