@@ -11,7 +11,7 @@ use base qw(OpenXPKI::Crypto::API);
 
 use Class::Std;
 use English;
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Tool::SCEP::API';
+use OpenXPKI::Debug;
 
 ## scalar value:
 ##     - 0 means the parameter is optional

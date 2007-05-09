@@ -12,7 +12,7 @@ use English;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::FileUtils';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
 use File::Spec;

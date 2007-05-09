@@ -7,7 +7,7 @@ use warnings;
 use base qw( Workflow::Validator );
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Validator::SPKAC';
+use OpenXPKI::Debug;
 use English;
 
 use Data::Dumper;

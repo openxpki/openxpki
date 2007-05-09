@@ -8,7 +8,7 @@ use warnings;
 
 package OpenXPKI::Crypto::Object;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Object';
+use OpenXPKI::Debug;
 use OpenXPKI::Crypto::Header;
 use OpenXPKI::Exception;
 use English;

@@ -18,7 +18,7 @@ use MIME::Base64;
 
 use base qw( OpenXPKI::Crypto::Secret );
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Secret::Split';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );

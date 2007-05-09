@@ -10,7 +10,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode';
+use OpenXPKI::Debug;
 use Data::Dumper;
 
 sub execute {

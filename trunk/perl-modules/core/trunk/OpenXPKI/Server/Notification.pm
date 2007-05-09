@@ -15,7 +15,7 @@ use Class::Std;
 
 use Data::Dumper;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Notification';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
 use OpenXPKI::Serialization::Simple;

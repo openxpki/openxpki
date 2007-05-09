@@ -7,7 +7,7 @@ package OpenXPKI::Server::Workflow::Observer::Debug;
 
 use strict;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Observer::Debug';
+use OpenXPKI::Debug;
 
 sub update {
     my ($class, $workflow, $action, $old_state, $action_name) = @_;

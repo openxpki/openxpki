@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use utf8;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Validator::CertSubjectAltNameParts';
+use OpenXPKI::Debug;
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
 use English;

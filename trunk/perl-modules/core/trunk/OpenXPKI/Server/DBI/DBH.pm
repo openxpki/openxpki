@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 use English;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::DBI::DBH';
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use DBI;
 use OpenXPKI::Server::DBI::Schema;

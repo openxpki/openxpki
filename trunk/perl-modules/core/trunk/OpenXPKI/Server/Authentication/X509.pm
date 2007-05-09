@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use English;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::X509';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64;

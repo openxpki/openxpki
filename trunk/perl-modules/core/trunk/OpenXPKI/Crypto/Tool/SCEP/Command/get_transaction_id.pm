@@ -9,7 +9,7 @@ use warnings;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Tool::SCEP::Command::get_transaction_id';
+use OpenXPKI::Debug;
 use Data::Dumper;
 
 # OpenSSL::Command is used as there is no SCEP::Command ...

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Workflow::Validator );
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Validator::ReasonCode';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
 use DateTime;

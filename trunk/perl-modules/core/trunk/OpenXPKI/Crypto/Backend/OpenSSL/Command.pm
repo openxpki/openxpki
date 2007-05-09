@@ -29,7 +29,7 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Command::symmetric_cipher;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Command';
+use OpenXPKI::Debug;
 use OpenXPKI qw(read_file write_file get_safe_tmpfile);
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;

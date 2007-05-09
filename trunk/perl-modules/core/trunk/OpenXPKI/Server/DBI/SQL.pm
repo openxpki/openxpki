@@ -13,7 +13,7 @@ use English;
 
 use Regexp::Common;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::DBI::SQL';
+use OpenXPKI::Debug;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;
 

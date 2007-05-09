@@ -13,7 +13,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::X509;
 use OpenXPKI::Exception;
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CertLdapPublish::ImportPublicData';
+use OpenXPKI::Debug;
 use Data::Dumper;
 use utf8;
 

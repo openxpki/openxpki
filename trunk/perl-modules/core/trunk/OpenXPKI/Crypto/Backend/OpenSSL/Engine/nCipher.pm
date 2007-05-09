@@ -10,7 +10,7 @@ use warnings;
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine::nCipher;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Engine::nCipher';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use English;
 use OpenXPKI::Server::Context qw( CTX );

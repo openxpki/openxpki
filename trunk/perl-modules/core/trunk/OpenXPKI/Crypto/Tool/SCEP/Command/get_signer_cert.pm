@@ -9,7 +9,7 @@ use warnings;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Tool::SCEP::Command::get_signer_cert';
+use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use Data::Dumper;
 

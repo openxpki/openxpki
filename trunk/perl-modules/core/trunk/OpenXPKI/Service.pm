@@ -19,7 +19,7 @@ use Sys::SigAction qw( set_sig_handler );
 use Data::Dumper;
 ## used modules
 
-use OpenXPKI::Debug 'OpenXPKI::Service';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API;
 use OpenXPKI::i18n qw( i18nGettext );

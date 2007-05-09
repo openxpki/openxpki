@@ -12,7 +12,7 @@ use English;
 
 # use Smart::Comments;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Persister::DBI';
+use OpenXPKI::Debug;
 
 use OpenXPKI::Server::Workflow::Persister::DBI::SequenceId;
 use OpenXPKI::Server::Context qw( CTX );

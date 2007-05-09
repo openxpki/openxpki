@@ -218,7 +218,7 @@ This is the central debugging module of OpenXPKI. If you write a new
 module then you can include it by simply making an appropriate use
 statement:
 
-use OpenXPKI::Debug 'MyModule';
+use OpenXPKI::Debug;
 
 It is not necessary to remove this line if you don't debug your
 code. The activation of the debugging statements is handled by

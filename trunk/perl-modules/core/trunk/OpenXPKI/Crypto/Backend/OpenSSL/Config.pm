@@ -10,7 +10,7 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Config;
 
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Config';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 ##! 0: "FIXME: why do we have no delete_tmpfile operation?"
 ##! 0: "FIXME: a missing delete_tmpfile is a security risk"

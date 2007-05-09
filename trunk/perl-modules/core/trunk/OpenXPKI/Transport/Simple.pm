@@ -14,7 +14,7 @@ our $VERSION = $OpenXPKI::VERSION::VERSION;
 use English;
 use OpenXPKI::Exception;
 
-use OpenXPKI::Debug 'OpenXPKI::Transport::Simple';
+use OpenXPKI::Debug;
 
 $OUTPUT_AUTOFLUSH = 1;
 our $MAX_MSG_LENGTH = 1048576; # 1024^2

@@ -8,7 +8,7 @@ use English;
 
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Validator::KeyReuse';
+use OpenXPKI::Debug;
 
 use OpenXPKI::Crypto::CSR;
 

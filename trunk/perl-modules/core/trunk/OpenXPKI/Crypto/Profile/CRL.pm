@@ -10,7 +10,7 @@ package OpenXPKI::Crypto::Profile::CRL;
 
 use base qw(OpenXPKI::Crypto::Profile::Base);
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Profile::CRL';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use English;
 

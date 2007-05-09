@@ -9,7 +9,7 @@ use warnings;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Tool::PKCS7::Command::verify';
+use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use Data::Dumper;
 

@@ -17,7 +17,7 @@ use base qw( OpenXPKI::Crypto::Secret );
 
 use Regexp::Common;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Secret::Plain';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );

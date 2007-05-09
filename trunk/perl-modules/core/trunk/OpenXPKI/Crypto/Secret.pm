@@ -15,7 +15,7 @@ use Class::Std;
 
 # use Data::Dumper;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Secret';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
 {

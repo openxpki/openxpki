@@ -13,7 +13,7 @@ use English;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Service::SCEP::Command::PKIOperation';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Context qw( CTX );

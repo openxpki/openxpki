@@ -16,7 +16,7 @@ use Net::Server::Daemonize qw( set_uid set_gid );
 
 use English;
 use Socket;
-use OpenXPKI::Debug 'OpenXPKI::Server';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;

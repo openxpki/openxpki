@@ -8,7 +8,7 @@ use warnings;
 
 package OpenXPKI::Crypto::X509;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::X509';
+use OpenXPKI::Debug;
 use OpenXPKI::DN;
 use Math::BigInt;
 use Digest::SHA1 qw(sha1_base64);

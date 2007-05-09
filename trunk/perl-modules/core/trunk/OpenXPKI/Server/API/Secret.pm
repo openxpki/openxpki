@@ -13,7 +13,7 @@ use English;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::API::Object';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::Secret;

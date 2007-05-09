@@ -12,7 +12,7 @@ use strict;
 use warnings;
 use English;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::ClientSSO';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 

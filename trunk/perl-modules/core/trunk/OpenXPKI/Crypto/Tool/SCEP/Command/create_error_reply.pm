@@ -9,7 +9,7 @@ use warnings;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Tool::SCEP::Command::create_error_reply';
+use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use Data::Dumper;
 

@@ -12,7 +12,7 @@ package OpenXPKI::Crypto::Backend::OpenSSL::XS;
 
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::XS';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use English;
 

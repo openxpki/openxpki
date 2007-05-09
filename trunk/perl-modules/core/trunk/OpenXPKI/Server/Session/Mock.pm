@@ -13,7 +13,7 @@ use English;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Session::Mock';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use Data::Dumper;
 

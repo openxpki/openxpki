@@ -15,7 +15,7 @@ use Class::Std;
 use OpenXPKI::Crypto::CLI;
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Toolkit';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::FileUtils;
 use English;

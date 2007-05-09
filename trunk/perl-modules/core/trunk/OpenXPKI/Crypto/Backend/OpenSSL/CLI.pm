@@ -13,7 +13,7 @@ use warnings;
 use English;
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::CLI';
+use OpenXPKI::Debug;
 
 my %config_of :ATTR( :init_arg<CONFIG> ); # the config object
 

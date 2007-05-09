@@ -8,7 +8,7 @@ package OpenXPKI::Server::Workflow::Observer::Log;
 use strict;
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Observer::Log';
+use OpenXPKI::Debug;
 
 sub update {
     my ($class, $workflow, $action, $old_state, $action_name) = @_;

@@ -8,7 +8,7 @@ use English;
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Validator::CertProfile';
+use OpenXPKI::Debug;
 
 use Data::Dumper;
 

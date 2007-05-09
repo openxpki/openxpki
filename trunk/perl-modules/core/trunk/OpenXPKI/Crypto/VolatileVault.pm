@@ -12,7 +12,7 @@ use strict;
 use warnings;
 use English;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::VolatileVault';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
 use MIME::Base64;

@@ -8,7 +8,7 @@ use warnings;
 
 package OpenXPKI::Crypto::CRR;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::CRR';
+use OpenXPKI::Debug;
 use Math::BigInt;
 
 use base qw(OpenXPKI::Crypto::Object);

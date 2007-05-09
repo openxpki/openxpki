@@ -17,7 +17,7 @@ use RT::Client::REST;
 
 use Data::Dumper;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Notification::RT';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
 my %url_of       :ATTR; # URL of the RT instance

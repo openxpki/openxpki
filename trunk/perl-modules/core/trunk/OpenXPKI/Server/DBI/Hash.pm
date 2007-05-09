@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use utf8;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::DBI::Hash';
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::DBI::SQL;
 use OpenXPKI::Server::DBI::Schema;

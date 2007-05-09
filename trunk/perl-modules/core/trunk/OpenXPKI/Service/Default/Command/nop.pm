@@ -7,7 +7,7 @@ use Class::Std;
 
 use base qw( OpenXPKI::Service::Default::Command );
 
-use OpenXPKI::Debug 'OpenXPKI::Service::Default::Command::nop';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API;
 

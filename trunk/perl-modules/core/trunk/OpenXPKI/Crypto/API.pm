@@ -11,7 +11,7 @@ use English;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::API';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use Data::Dumper;
 

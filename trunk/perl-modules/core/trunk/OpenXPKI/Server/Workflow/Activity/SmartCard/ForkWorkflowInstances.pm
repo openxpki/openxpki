@@ -10,7 +10,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::SmartCard::ForkWorkflowInstances';
+use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 # the following is a bit of a hack, we use the activity class to
 # fork each workflow instance

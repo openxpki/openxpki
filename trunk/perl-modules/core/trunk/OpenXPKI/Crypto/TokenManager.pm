@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Switch;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::TokenManager';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;

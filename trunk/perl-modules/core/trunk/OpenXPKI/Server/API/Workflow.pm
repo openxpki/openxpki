@@ -15,7 +15,7 @@ use Class::Std;
 use Workflow::Factory;
 use Data::Dumper;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::API::Workflow';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;

@@ -12,7 +12,7 @@ use utf8;
 use base qw( Workflow::Validator );
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Validator::CertSubjectParts';
+use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use English;
 use Template;

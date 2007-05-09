@@ -14,7 +14,7 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Config;
 use OpenXPKI::Crypto::Backend::OpenSSL::XS;
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
 my %xs_of     :ATTR; # the XS object

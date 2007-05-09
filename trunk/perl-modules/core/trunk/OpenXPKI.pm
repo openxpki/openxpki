@@ -19,7 +19,7 @@ use English qw (-no_match_vars);
 use XSLoader;
 XSLoader::load ("OpenXPKI", $VERSION);
 
-use OpenXPKI::Debug 'OpenXPKI';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use Date::Parse;
 use DateTime;

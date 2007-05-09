@@ -12,7 +12,7 @@ use Class::Std;
 
 use base qw( OpenXPKI::Service::SCEP::Command );
 
-use OpenXPKI::Debug 'OpenXPKI::Service::SCEP::Command::GetCACert';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Context qw( CTX );

@@ -12,7 +12,7 @@ use warnings;
 use utf8;
 
 use OpenXPKI::XML::Cache;
-use OpenXPKI::Debug 'OpenXPKI::XML::Config';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use English;
 

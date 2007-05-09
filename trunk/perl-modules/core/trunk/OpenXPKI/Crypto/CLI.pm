@@ -11,7 +11,7 @@ use warnings;
 use English;
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::CLI';
+use OpenXPKI::Debug;
 #use OpenXPKI qw (read_file get_safe_tmpfile);
 use OpenXPKI::FileUtils;
 use OpenXPKI::Exception;

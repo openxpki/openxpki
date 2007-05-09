@@ -10,7 +10,7 @@ use warnings;
 use English;
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Tool::SCEP::CLI';
+use OpenXPKI::Debug;
 
 sub error_ispresent {
     my $self = shift;

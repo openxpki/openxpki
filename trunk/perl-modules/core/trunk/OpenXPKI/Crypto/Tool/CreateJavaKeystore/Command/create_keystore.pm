@@ -9,7 +9,7 @@ use warnings;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Tool::CreateJavaKeystore::Command::create_keystore';
+use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use Data::Dumper;
 use English;

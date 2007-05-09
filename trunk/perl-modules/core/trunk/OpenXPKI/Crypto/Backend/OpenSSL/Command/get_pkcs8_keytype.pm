@@ -9,7 +9,7 @@ use warnings;
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::get_pkcs8_keytype;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Command::get_pkcs8_keytpe';
+use OpenXPKI::Debug;
 
 sub get_command
 {

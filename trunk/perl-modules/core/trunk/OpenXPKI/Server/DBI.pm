@@ -14,7 +14,7 @@ use English;
 
 # use Smart::Comments;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::DBI';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;

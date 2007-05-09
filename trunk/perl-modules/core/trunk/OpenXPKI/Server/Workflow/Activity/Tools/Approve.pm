@@ -11,7 +11,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::Tools::Approve';
+use OpenXPKI::Debug;
 
 use English;
 use Data::Dumper;

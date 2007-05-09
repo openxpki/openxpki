@@ -17,7 +17,7 @@ use Data::Dumper;
 
 #use Regexp::Common;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::API';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::i18n qw( set_language );

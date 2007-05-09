@@ -11,7 +11,7 @@ use warnings;
 use English;
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Validator::ApprovalSignature';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Crypto::X509;
 

@@ -28,7 +28,7 @@ use XML::Filter::XInclude;
 use XML::SAX::ParserFactory;
 $XML::SAX::ParserPackage = "XML::SAX::PurePerl";
 
-use OpenXPKI::Debug 'OpenXPKI::XML::Cache';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use Memoize;
 

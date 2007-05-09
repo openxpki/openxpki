@@ -10,7 +10,7 @@ use base qw( Workflow::Condition );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft';
+use OpenXPKI::Debug;
 use English;
 
 sub _init

@@ -10,7 +10,7 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key;
 use strict;
 use warnings;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key';
+use OpenXPKI::Debug;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 use Data::Dumper;

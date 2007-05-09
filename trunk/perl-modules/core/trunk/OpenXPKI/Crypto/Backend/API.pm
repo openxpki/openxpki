@@ -11,7 +11,7 @@ use strict;
 use warnings;
 
 use Class::Std;
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::API';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;

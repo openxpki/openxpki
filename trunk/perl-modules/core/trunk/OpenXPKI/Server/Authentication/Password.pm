@@ -10,7 +10,7 @@ package OpenXPKI::Server::Authentication::Password;
 use strict;
 use warnings;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::Password';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 

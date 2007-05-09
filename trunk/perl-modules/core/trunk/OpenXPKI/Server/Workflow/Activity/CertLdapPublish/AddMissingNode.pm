@@ -11,7 +11,7 @@ use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Activity::CertLdapPublish::AddMissingNode';
+use OpenXPKI::Debug;
 use OpenXPKI::DN;
 use utf8;
 use Net::LDAP;

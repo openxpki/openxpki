@@ -10,7 +10,7 @@ use strict;
 use warnings;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_cert;
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_cert';
+use OpenXPKI::Debug;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 

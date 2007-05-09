@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( Workflow::Condition );
 use Workflow::Exception qw( condition_error configuration_error );
-use OpenXPKI::Debug 'OpenXPKI::Server::Workflow::Condition::Key';
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use English;
 

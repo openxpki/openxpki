@@ -11,7 +11,7 @@ package OpenXPKI::Server::Authentication::External;
 use strict;
 use warnings;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Authentication::External';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 

@@ -8,7 +8,7 @@ package OpenXPKI::Server::Log::Appender::DBI;
 use strict;
 use warnings;
 
-use OpenXPKI::Debug 'OpenXPKI::Server::Log::Appender::DBI';
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 

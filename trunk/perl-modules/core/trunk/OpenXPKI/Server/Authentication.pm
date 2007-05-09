@@ -14,7 +14,7 @@ use warnings;
 use utf8;
 
 use English;
-use OpenXPKI::Debug 'OpenXPKI::Server::Authentication';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 

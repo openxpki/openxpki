@@ -11,7 +11,7 @@ use warnings;
 #use diagnostics;
 use utf8;
 
-use OpenXPKI::Debug 'OpenXPKI::Exception';
+use OpenXPKI::Debug;
 
 use OpenXPKI::i18n qw( i18nGettext );
 use Exception::Class (

@@ -10,7 +10,7 @@ package OpenXPKI::Crypto::Profile::Certificate;
 
 use base qw(OpenXPKI::Crypto::Profile::Base);
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Profile::Certificate';
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
 use English;

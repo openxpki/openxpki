@@ -9,7 +9,7 @@ use warnings;
 
 use Class::Std;
 
-use OpenXPKI::Debug 'OpenXPKI::Crypto::Tool::PKCS7::Command::is_not_self_signed';
+use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use Data::Dumper;
 
