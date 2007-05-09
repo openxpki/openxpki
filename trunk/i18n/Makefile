@@ -49,12 +49,20 @@ install_dir:
 .SUFFIXES: .mo .po
 
 .po.mo:
-	msgfmt -o $@ $<
+	if [ -e $<.local ] ; then \
+		echo "Using local file" ; \
+		msgcat --use-first $<.local $< | msgfmt -o $@ - ; \
+	else \
+		msgfmt -o $@ $< ; \
+	fi
 
 test install clean distclean::
 
-distclean clean::
+clean::
 	rm -f */*.po~
+
+distclean:: clean
+	rm -f *.pot */*.mo
 
 writeversion:
 	@( if [ -e $(VERGEN) ] ; then \

@@ -1,0 +1,34 @@
+This directory contains the internationalization package for OpenXPKI.
+
+Usage notes:
+
+Invocation
+
+make scan
+  will skim through the source code, collect all I18N identifiers and
+  write them out to the message catalog openxpki.pot
+
+make
+  rebuilds the machine translations (.mo files)
+
+
+Customizing messages
+
+OpenXPKI ships with a default set of translations (LANG/openxpki.po). This
+catalog will naturally change as the project evolves.
+
+If you need to modify or add translations (e. g. you do not like the
+default translation or you have extended the system in a way that it
+uses additional I18N tags) it is recommended not to modify openxpki.po,
+because keeping up with changes in the project will become difficult for
+you.
+
+Instead you should generate a file <LANG>/openxpki.po.local (same format
+as the normal .po file) in which you specifically include all additional
+translations and all translations you would like to override.
+
+If such a file is detected by the 'make' operation, it will include
+your local changes in the machine translation file. (We do not ship
+a sample file under version control in order to allow you to have
+a local file that will not be overwritten by subsequent checkouts.)
+
