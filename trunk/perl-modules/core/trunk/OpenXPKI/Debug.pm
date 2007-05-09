@@ -1,7 +1,9 @@
 ## OpenXPKI::Debug
 ## Written 2006 by Michail Bachmann and Michael Bell for the OpenXPKI project
-## censoring added 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
+## - censoring added 2006 by Alexander Klink for the OpenXPKI project
+## - eval'ing of debug code 2007 by Alexander Klink and Martin Bartosch
+##   for the OpenXPKI project
+## (C) Copyright 2007 by The OpenXPKI Project
 ## $Revision$
 
 use strict;
@@ -74,10 +76,62 @@ sub filter
                 if ($1 <= $LEVEL{$self->{MODULE}})
                 {
                     $msg =~ s/\n//s;
-                    $_ = "OpenXPKI::Debug->debug("
-                            .$msg
-                            . ",$level,"
-                            . "'$color');\n";
+                    ##--------------------------------------------------##
+                    # HERE BE DRAGONS ... HERE BE DRAGONS ...
+                    # $_ is the statement that will be written by
+                    # Filter::Util::Call in place of the current line
+                    # As the debug code might fail for some reason,
+                    # we eval() it and print an error message if
+                    # it fails ...
+                    # Note that we need the string variant of eval
+                    # instead of the block one (see perldoc -f eval).
+                    # $@ needs to be quoted to \$\@ because otherwise
+                    # it will be the current (empty) eval error, not
+                    # the one at the lower level.
+                    # Because the eval "" destroys the caller information,
+                    # we can not get it in debug(), but have to pass it
+                    # on to debug() ourselves. As we are no longer
+                    # one level deeper in debug(), we have to get the
+                    # subroutine as caller(0) and the line number
+                    # via the special __LINE__ construct.
+                    # Furthermore, the message itself has to be passed
+                    # as a code reference to debug(), because otherwise
+                    # it might screw up the arguments of debug otherwise
+                    # (as it may contain ANYTHING). This appears
+                    # particularly with Data::Dumper which we use
+                    # extensively in debug comments ...
+                    # HERE BE DRAGONS ... HERE BE DRAGONS ...
+                    ##--------------------------------------------------##
+                    $_ = << "XEOF"; 
+{
+    my \$subroutine = (caller(0))[3];
+    my \$line       = __LINE__;
+    eval q{
+        OpenXPKI::Debug::debug({
+            MESSAGE    => sub { $msg },
+            LINE       => \$line,
+            SUBROUTINE => \$subroutine,
+            LEVEL      => q{$level},
+            COLOR      => q{$color}
+        });
+    };
+    if (\$\@) {
+        print STDERR 'Invalid DEBUG statement: ' . q{$msg} . ': ' . \$\@ . "\n";
+    }
+}
+XEOF
+                    # substitute (n-1) newlines so that the linenumber in
+                    # the output are correct again ...
+                    s/\n/ /g;
+                    $_ .= "\n";
+
+                    # if you ever need to debug the source filtering
+                    # (you've got my sympathy), the following may
+                    # prove useful to see what is replaced ...
+                    #
+                    # open my $TMP, '>>', '/tmp/code';
+                    # print $TMP $_;
+                    # close $TMP;
                 }
             }
         }
@@ -87,22 +141,31 @@ sub filter
 
 sub debug
 {
-    my $self  = shift;
-    my $msg   = shift;
-    my $level = shift || "0";
-    my $color = shift;
+    my $arg_ref    = shift;
+    my $msg        = $arg_ref->{MESSAGE};
+    if (ref $msg ne 'CODE') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_DEBUG_DEBUG_MESSAGE_IS_NOT_A_CODEREF',
+            params  => {
+                'REF_MSG' => ref $msg,
+                'MSG'     => $msg,
+            },
+        );
+    }
+    # execute the message sub to get back the message ...
+    $msg = &$msg();
+    my $line       = $arg_ref->{LINE};
+    my $subroutine = $arg_ref->{SUBROUTINE};
+    my $level      = $arg_ref->{LEVEL} || "0";
+    my $color      = $arg_ref->{COLOR};
 
-    $msg = $self->__censor_msg($msg);
+    $msg = OpenXPKI::Debug::__censor_msg($msg);
 
-    my ($package, $filename, $line, $subroutine, $hasargs,
-        $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
     if (! defined $msg) {
-	$msg = 'undef';
+	    $msg = 'undef';
     }
     $msg = "(line $line): $msg";
 
-    ($package, $filename, $line, $subroutine, $hasargs,
-     $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(1);
     $msg = "$subroutine $msg\n";
 
     my $timestamp = strftime("%F %T", localtime(time));
@@ -123,7 +186,6 @@ sub debug
 }
 
 sub __censor_msg {
-    my $self = shift;
     my $msg  = shift;
     
     $msg =~ s{openssl\ enc.*}{openssl enc \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
