@@ -78,7 +78,7 @@ sub execute {
     ##! 129: 'LDAP IMPORT setting serialNumber attribute'    
     $context->param('cert_serial' => $cert_hash{'CERTIFICATE_SERIAL'});
 
-    ##! 129: 'LDAP IMPORT check DirName for LDAP node DN
+    ##! 129: 'LDAP IMPORT check DirName for LDAP node DN'
     my $cert_dn = $cert_hash{'SUBJECT'} ;
 
 #    FIXME
