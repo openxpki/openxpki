@@ -320,15 +320,22 @@ if (defined $params{debug}) {
     @{$params{debug}} = split(m{,}, join(',', @{$params{debug}}));
     
     foreach my $param (@{$params{debug}}) {
-	my ($module, $level) = ($param =~ m{ \A (.*?):?(\d*) \z }xms);
-	if ($level eq '') {
-	    $level = 1;
-	}
-	if ($module eq '') {
-	    $module = '.*';
-	}
-	print STDERR "Debug level for module '$module': $level\n";
- 	$OpenXPKI::Debug::LEVEL{$module} = $level;
+        my ($module, $level) = ($param =~ m{ \A (.*?):?(\d*) \z }xms);
+        if ($level eq '') {
+            $level = 1;
+        }
+        if ($module eq '') {
+            # if modules are not specified, debug everything except for
+            # XML::Cache and XML::Config (if you really want to debug these,
+            # just use --debug .*:<debug level>)
+            $OpenXPKI::Debug::LEVEL{'.*'} = $level;
+            $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'}  = 0;
+            $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Config'} = 0;
+        }
+        else {
+            print STDERR "Debug level for module '$module': $level\n";
+            $OpenXPKI::Debug::LEVEL{$module} = $level;
+        }
     }
 }
 
