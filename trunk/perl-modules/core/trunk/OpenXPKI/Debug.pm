@@ -21,7 +21,13 @@ our $USE_COLOR = 0;
 sub import
 {
     my($self,$module) = @_ ;
-
+    if (! defined $module) {
+        # if the module name was not passed explicitly using
+        # use OpenXPKI::Debug 'ModuleName',
+        # we just assume that the module is the caller of the
+        # import function (which is the normal use anyways)
+        $module = (caller(0))[0];
+    }
 #     foreach my $key (keys %LEVEL)
 #     {
 #         print STDERR "Debugging module(s) '$key' with level $LEVEL{$key}.\n";
