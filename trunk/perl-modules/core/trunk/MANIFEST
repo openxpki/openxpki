@@ -309,6 +309,16 @@ t/05_base/02.t
 t/05_base/03.t
 t/05_base/fix_config.pl
 
+t/08_debug/01_using.t
+t/08_debug/02_color.t
+t/08_debug/03_invalid.t
+t/08_debug/04_use_without_package.t
+t/08_debug/TestModule.pm
+t/08_debug/TestModuleColor.pm
+t/08_debug/TestModuleInvalid.pm
+t/08_debug/TestModuleUseWithout.pm
+t/08_debug/main.pl
+
 t/10_exception/1.t
 
 t/14_datetime/01.t
