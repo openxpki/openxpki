@@ -265,6 +265,31 @@ sub do_query
         ##! 4: "execute failed (leaving function)"
         my $err    = $self->{STH}[$sth_nr]->err;
         my $errstr = $self->{STH}[$sth_nr]->errstr;
+
+        if ($err == 5 && $errstr =~ m{\A database\ is\ locked }xms) {
+            # this is the typical SQLite concurrency problem,
+            # we try to reconnect and do the query again 10 times
+            # Note that this still might not help in which case it
+            # will fail - a good reason to use SQLite for testing only ...
+            ##! 16: 'database is locked ... SQLite concurrency problem?'
+            ##! 16: 'trying again'
+            foreach my $i (1..10) {
+                ##! 16: 'try #' . $i
+                $self->disconnect();
+                $self->connect();
+                ##! 16: 'reconnected ...'
+                my $sth = $self->{DBH}->prepare($query);
+                ##! 16: 'statement handle created successfully'
+                $result = $sth->execute(@bind_values);
+                ##! 16: 'executed'
+                if ($result) {
+                    ##! 16: 'failover worked'
+                    return $result;
+                }
+                ##! 16: 'failover try failed'
+            }
+            ##! 16: 'failover failed completely'
+        }
         $self->finish_sth();
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_DBH_EXECUTE_FAILED", 
