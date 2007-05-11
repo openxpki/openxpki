@@ -135,6 +135,7 @@ sub deserialize
 {
     my $self = shift;
     my $msg  = shift;
+    Encode::_utf8_off($msg);
 
     my $ret = $self->__read_data($msg);
 
