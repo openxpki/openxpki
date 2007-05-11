@@ -49,6 +49,8 @@ my %configure_settings = (
     'server.socketfile' => File::Spec->rel2abs($config{socket_file}),
     'server.runuser' => $pw_name,
     'server.rungroup' => $gr_name,
+    'database.type'   => 'SQLite',
+    'database.name'   => "$instancedir/var/openxpki/sqlite.db",
     );
 
 # configure in this directory
