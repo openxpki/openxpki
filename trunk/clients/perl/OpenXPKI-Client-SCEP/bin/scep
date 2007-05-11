@@ -50,6 +50,7 @@ else {
         SERVICE    => 'SCEP',
         REALM      => $realm,
         SOCKETFILE => $socket,
+        TIMEOUT    => 120, # TODO - make configurable?
         PROFILE    => $profile, 
         OPERATION  => $operation,
         MESSAGE    => $message,
