@@ -78,7 +78,7 @@ if (system("./configure $DEPLOYMENT_PREFIX && make && make install") != 0) {
 }
 
 INSTALL:
-foreach my $test (keys %{ $tests }) {
+foreach my $test (sort keys %{ $tests }) {
     print STDERR "Compiling and installing for $test\n";
     chdir $tests->{$test}->{DIRECTORY};
     if (system("perl Makefile.PL $PREFIX && make && make install") != 0) {
@@ -87,7 +87,7 @@ foreach my $test (keys %{ $tests }) {
 }
 
 TEST:
-foreach my $test (keys %{ $tests }) {
+foreach my $test (sort keys %{ $tests }) {
     print STDERR "Running test for $test (revision $revision)\n";
 
     # compile and run each test
@@ -141,7 +141,7 @@ foreach my $rev (@tested_revisions) {
     $svn_info =~ s{ (.*) \|\ \d+\ lines}{$1}xms;
 
     print INDEX "<tr><td colspan=12>Report for $svn_info</td></tr>";
-    foreach my $test (keys %{ $tests }) {
+    foreach my $test (sort keys %{ $tests }) {
         chdir $tests->{$test}->{DIRECTORY};
         my $files = $rev . '_coverage ' . $rev . '_output.txt ';
         system("mkdir $output_dir/$test");
