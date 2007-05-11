@@ -51,8 +51,8 @@ like($stderr, qr{ code:\ 2 }xms, 'Debug contains executed log message');
 
 # here are the color specific tests ...
 
-my $red_start = chr(0x1b), '[31m';
-my $color_stop  = chr(0x1b), '[0m';
+my $red_start = chr(0x1b) . '\[31m';
+my $color_stop  = chr(0x1b) . '\[0m';
 
 like($stderr, qr{ $red_start }xms, 'Output contains ANSI red start code');
 like($stderr, qr{ $color_stop }xms, 'Output contains ANSI stop coloring code');
