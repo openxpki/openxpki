@@ -23,7 +23,7 @@ if ($pwentry[0] ne "root")
 }
 
 my $openssl_binary = `cat t/cfg.binary.openssl`;
-replace_param (FILENAME => "t/25_crypto/token.xml",
+replace_param (FILENAME => "t/25_crypto/token_test.xml",
                TAG      => "shell",
                VALUE    => $openssl_binary);
 
@@ -31,10 +31,10 @@ replace_param (FILENAME => "t/25_crypto/token.xml",
 if (exists $ENV{GOST_OPENSSL_ENGINE})
 {
     $ENV{GOST_OPENSSL} = $openssl_binary if (not exists $ENV{GOST_OPENSSL});
-    replace_param (FILENAME => "t/25_crypto/token.xml",
+    replace_param (FILENAME => "t/25_crypto/token_test.xml",
                    PARAM    => "__GOST_ENGINE_LIBRARY__",
                    VALUE    => $ENV{GOST_OPENSSL_ENGINE});
-    replace_param (FILENAME => "t/25_crypto/token.xml",
+    replace_param (FILENAME => "t/25_crypto/token_test.xml",
                    PARAM    => "__GOST_OPENSSL__",
                    VALUE    => $ENV{GOST_OPENSSL});
 }
@@ -52,13 +52,13 @@ else
 ## prepare nCipher configuration
 if ((exists $ENV{NCIPHER_LIBRARY}) and (exists $ENV{CHIL_LIBRARY}) and (exists $ENV{NCIPHER_KEY})) 
 {
-    replace_param (FILENAME => "t/25_crypto/token.xml",
+    replace_param (FILENAME => "t/25_crypto/token_test.xml",
                    PARAM    => "__CHIL_LIBRARY__",
                    VALUE    => $ENV{CHIL_LIBRARY});
-    replace_param (FILENAME => "t/25_crypto/token.xml",
+    replace_param (FILENAME => "t/25_crypto/token_test.xml",
                    PARAM    => "__NCIPHER_LIBRARY__",
                    VALUE    => $ENV{NCIPHER_LIBRARY});
-    replace_param (FILENAME => "t/25_crypto/token.xml",
+    replace_param (FILENAME => "t/25_crypto/token_test.xml",
                    PARAM    => "__NCIPHER_KEY__",
                    VALUE    => $ENV{NCIPHER_KEY});
 }
