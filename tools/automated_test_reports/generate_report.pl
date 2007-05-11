@@ -63,7 +63,7 @@ my $tests = {
     },
 };
 
-my $revision = sprintf("%04d", `vergen --format SVN_LAST_CHANGED_REVISION`);
+my $revision = sprintf("%04d", `vergen --format SVN_REVISION`);
 if (! $revision) {
     die "Could not determine SVN revision";
 }

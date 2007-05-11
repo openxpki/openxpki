@@ -12,7 +12,7 @@ if (! -e 'perl-modules/core/trunk/t') {
     die "Please start from main OpenXPKI trunk directory\n";
 }
 
-open my $SVN, 'svn log -qr HEAD|';
+open my $SVN, 'svn log -qr HEAD ..|';
 <$SVN>;
 my $svn_info = <$SVN>;
 my ($newest_revision) = ($svn_info =~ m{ \A r(\d+) .* }xms);
