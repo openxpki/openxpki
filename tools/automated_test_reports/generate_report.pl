@@ -6,8 +6,20 @@ use English;
 
 # define your path here if run_test.pl is not in path
 # e.g.
-#my $run_test = '/Users/klink/dev/openxpki/tools/automated_test_reports/run_test.pl';
+# my $run_test = '/Users/klink/dev/openxpki/tools/automated_test_reports/run_test.pl';
 my $run_test;
+
+# define an installation prefix (passed to perl Makefile.PL) if necessary
+# e.g.
+# my $PREFIX = 'PREFIX=~/usr/local';
+my $PREFIX = '';
+
+# define a deployment prefix (passed to ./configure in trunk/deployment)
+# if necessary
+# e.g.
+# my $DEPLOYMENT_PREFIX = '--prefix ~/usr/local';
+my $DEPLOYMENT_PREFIX = '';
+
 if (! defined $run_test) {
     $run_test = `which run_test.pl`;
     chomp($run_test);
@@ -59,6 +71,21 @@ if (! -x $run_test) {
     die "run_test.pl not found or not executable";
 }
 
+# install new deployment tools before testing
+chdir $basedir . '/deployment';
+if (system("./configure $DEPLOYMENT_PREFIX && make && make install") != 0) {
+    die "Could not install new deployment tools";
+}
+
+INSTALL:
+foreach my $test (keys %{ $tests }) {
+    print STDERR "Compiling and installing for $test\n";
+    chdir $tests->{$test}->{DIRECTORY};
+    if (system("perl Makefile.PL $PREFIX && make && make install") != 0) {
+        die "Could not compile for $test test";
+    }
+}
+
 TEST:
 foreach my $test (keys %{ $tests }) {
     print STDERR "Running test for $test (revision $revision)\n";
@@ -69,9 +96,6 @@ foreach my $test (keys %{ $tests }) {
     if (-e $output_filename) {
         # test has already been run, skip
         next TEST;
-    }
-    if (system("perl Makefile.PL && make") != 0) {
-        die "Could not compile for $test test";
     }
     system("$run_test $revision $test");
 }
