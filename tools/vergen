@@ -149,6 +149,9 @@ sub expand_keyword {
 
 ###########################################################################
 
+# make sure that system output is not localized
+$ENV{LANG} = 'C';
+
 GetOptions(\%params,
 	   qw(
 	      help|?
