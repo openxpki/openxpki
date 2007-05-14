@@ -130,10 +130,10 @@ print INDEX << "XEOF";
       </tr>
 XEOF
 
-chdir $basedir;
 print STDERR "Generating report ... ";
 foreach my $rev (@tested_revisions) {
     print STDERR "r$rev ";
+    chdir $basedir;
     open my $SVN, "svn log -qr $rev ..|";
     my $line = <$SVN>;
     my $svn_info = <$SVN>;
