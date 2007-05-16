@@ -1,5 +1,9 @@
 Revision history for Bundle-OpenXPKI
 
+0.02    2007-05-02
+        - deleted mod_perl from dependency list as it is not strictly
+        necessary and users will probably want to install it via a
+        package system instead of CPAN
+        - deleted B::Lint from dependency list (not needed)
 0.01    2007-04-27
-        First version, released on an unsuspecting world.
-
+        - First version, released on an unsuspecting world.

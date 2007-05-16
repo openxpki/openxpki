@@ -1,6 +1,6 @@
 package Bundle::OpenXPKI;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 __END__
@@ -11,93 +11,19 @@ Bundle::OpenXPKI - A bundle to install modules required for OpenXPKI
 
 =head1 SYNOPSIS
 
-C<perm -MCPAN -e 'install Bundle::OpenXPKI'>
+C<perl -MCPAN -e 'install Bundle::OpenXPKI'>
 
 =head1 CONTENTS
 
 AnyDBM_File 1.00
 
-Apache 1.27
-
-Apache::Connection 1.00
-
-Apache::Constants 1.09
-
-Apache::Constants::Exports undef
-
 Apache::Cookie 1.3
-
-Apache::Debug 1.61
-
-Apache::ExtUtils 1.04
-
-Apache::FakeRequest 1.00
-
-Apache::File 1.01
-
-Apache::Include 1.00
-
-Apache::Leak 1.00
-
-Apache::Log 1.01
 
 Apache::Mason 0.4
 
-Apache::ModuleConfig 0.01
-
-Apache::Opcode undef
-
-Apache::Options 1.61
-
-Apache::PerlRun undef
-
-Apache::PerlRunXS 0.03
-
-Apache::PerlSections 1.61
-
-Apache::RedirectLogFix undef
-
-Apache::Registry 2.01
-
-Apache::RegistryBB undef
-
-Apache::RegistryLoader 1.91
-
-Apache::RegistryNG 1.00
-
 Apache::Request 1.33
 
-Apache::Resource 1.71
-
-Apache::SIG 1.91
-
-Apache::Server 1.01
-
-Apache::SizeLimit 0.91-dev
-
-Apache::StatINC 1.07
-
-Apache::Status 2.03
-
-Apache::Symbol 1.31
-
-Apache::Symdump undef
-
-Apache::Table 0.01
-
-Apache::URI 1.00
-
-Apache::Util 1.02
-
-Apache::fork 1.00
-
-Apache::httpd_conf 0.01
-
 Apache::libapreq 1.3
-
-Apache::src 0.01
-
-Apache::testold 0.01
 
 Attribute::Handlers 0.78_02
 
@@ -118,8 +44,6 @@ B::Concise 0.66
 B::Deparse 0.71
 
 B::Disassembler 1.05
-
-B::Lint 1.03
 
 B::Showlex 1.02
 
@@ -149,59 +73,7 @@ CGI::Push 1.04
 
 CGI::Session 4.20
 
-CGI::Session::Driver 4.20
-
-CGI::Session::Driver::DBI 4.20
-
-CGI::Session::Driver::db_file 4.20
-
-CGI::Session::Driver::file 4.20
-
-CGI::Session::Driver::mysql 4.20
-
-CGI::Session::Driver::postgresql 4.20
-
-CGI::Session::Driver::sqlite 4.20
-
-CGI::Session::ErrorHandler 4.20
-
-CGI::Session::ID::Incr 4.20
-
-CGI::Session::ID::MD5 4.20
-
-CGI::Session::ID::incr 4.20
-
-CGI::Session::ID::md5 4.20
-
-CGI::Session::ID::static 4.20
-
-CGI::Session::Serialize::Default 4.20
-
-CGI::Session::Serialize::FreezeThaw 4.2
-
-CGI::Session::Serialize::Storable 4.20
-
-CGI::Session::Serialize::default 4.20
-
-CGI::Session::Serialize::freezethaw 4.2
-
-CGI::Session::Serialize::json 4.20
-
-CGI::Session::Serialize::storable 4.20
-
-CGI::Session::Serialize::yaml 4.20
-
-CGI::Session::Test::Default 4.20
-
-CGI::Session::Tutorial 4.20
-
 CGI::Util 1.5
-
-CPAN 1.76_02
-
-CPAN::FirstTime 1.60
-
-CPAN::Nox 1.03
 
 Cache::BaseCache undef
 
@@ -281,7 +153,7 @@ Convert::ASN1::parser undef
 
 Cwd 3.12
 
-DBD::DBM 0.03
+CPAN 1.76_02
 
 DBD::ExampleP 12.009153
 
@@ -3412,8 +3284,6 @@ less 0.01
 lib 0.5565
 
 locale 1.00
-
-mod_perl 1.30
 
 open 1.05
 
