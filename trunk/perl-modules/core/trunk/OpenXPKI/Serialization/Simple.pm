@@ -86,7 +86,7 @@ sub __write_hash
     my $data = shift;
     my $msg  = "";
 
-    foreach my $key (keys %{$data})
+    foreach my $key (sort keys %{$data})
     {
         $msg .= length($key).$self->{SEPARATOR}.
                 $key.$self->{SEPARATOR}.
