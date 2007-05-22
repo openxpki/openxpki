@@ -112,6 +112,7 @@ sub filter
 {
     my \$subroutine = (caller(0))[3];
     my \$line       = __LINE__;
+    local \$\@;
     eval q{
         OpenXPKI::Debug::debug({
             MESSAGE    => sub { $msg },
