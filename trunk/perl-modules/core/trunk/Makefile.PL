@@ -203,13 +203,17 @@ else
 ## some information about the used OpenXPKI version
 
 print STDERR "This is OpenXPKI version $openxpki_version\n";
-print STDERR "Statistics:\n";
-my $cmd = 'cat OpenXPKI.pm OpenXPKI.xs `find OpenXPKI -type f | grep -r -v "/\."`| wc -l';
-print STDERR "    LOC: ".`$cmd`;
-$cmd = 'cat `find t -type f | grep -r -v "/\."`| wc -l';
-print STDERR "    LOT: ".`$cmd`;
-$cmd = 'cat `find . -type f | grep -r -v "/\."`| wc -l';
-print STDERR "    LOA: ".`$cmd`;
+
+# removed code statistics code, it introduces an annoying delay during
+# Makefile creation. it was not working accurateley anyway.
+# if you wish to generate meaningful statistics use e. g. sloccount instead
+#print STDERR "Statistics:\n";
+#my $cmd = 'cat OpenXPKI.pm OpenXPKI.xs `find OpenXPKI -type f | grep -r -v "/\."`| wc -l';
+#print STDERR "    LOC: ".`$cmd`;
+#$cmd = 'cat `find t -type f | grep -r -v "/\."`| wc -l';
+#print STDERR "    LOT: ".`$cmd`;
+#$cmd = 'cat `find . -type f | grep -r -v "/\."`| wc -l';
+#print STDERR "    LOA: ".`$cmd`;
 
 ## hack to avoid warnings from Log4perl
 
@@ -278,7 +282,7 @@ WriteMakefile(
 	'English'                => 1, ## for broken Perl installations like on Ubuntu Drapper
 	'Exception::Class'       => "1.22",
 	'Filter::Util::Call'     => 1,
-        'IO::Prompt'             => 1, # required for deployment tools
+        'IO::Prompt'             => '0.99.4', # required for deployment tools
 	## includes the version of libintl-perl which includes Locale::Messages
 	'Locale::TextDomain'     => 1,
 	'Log::Log4perl'          => '0.51',
