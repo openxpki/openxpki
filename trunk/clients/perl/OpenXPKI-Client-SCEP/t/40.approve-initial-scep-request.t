@@ -55,14 +55,14 @@ SKIP: {
         my $msg = $client->send_receive_service_msg(
             'GET_AUTHENTICATION_STACK',
             {
-                'AUTHENTICATION_STACK' => 'Operator',
+                'AUTHENTICATION_STACK' => 'External Dynamic',
             },
         );
         $msg = $client->send_receive_service_msg(
             'GET_PASSWD_LOGIN',
             {
                 'LOGIN'  => 'raop',
-                'PASSWD' => 'raop',
+                'PASSWD' => 'RA Operator',
             },
         );
         if (exists $msg->{'SERVICE_MSG'} &&
