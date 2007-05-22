@@ -40,9 +40,14 @@
     </description>
     <user>
       <name>John Doe</name>
-      <algorithm>sha1</algorithm>
       <!-- this is Doe in sha1 -->
-      <digest>yUetMg5m/GSZjoalXA2iEMjB2Bo=</digest>
+      <digest>{SHA}yUetMg5m/GSZjoalXA2iEMjB2Bo=</digest>
+      <role>User</role>
+    </user>
+    <user>
+      <name>Foo</name>
+      <!-- password: Koxkz3rW -->
+      <digest>{SSHA}XGIRdvf3+6uz9+gnujwYM+r2Ae1vRHFI</digest>
       <role>User</role>
     </user>
   </handler>
@@ -52,9 +57,8 @@
     </description>
     <user>
       <name>root</name>
-      <algorithm>sha1</algorithm>
-      <!-- this is root in sha1 -->
-      <digest>3Hbp8MAAbo+RngxRXGbbujmC94U</digest>
+      <!-- this is root in seeded sha1 -->
+      <digest>{SSHA}2w/Kpysz3Wi2xQQFoOVC2l09Q9I/qXY0</digest>
       <role>CA Operator</role>
     </user>
   </handler>

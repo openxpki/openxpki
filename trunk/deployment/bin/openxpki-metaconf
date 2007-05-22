@@ -130,6 +130,7 @@ sub process_template {
 	PRE_CHOMP => 1, # remove whitespace before directives
 	RELATIVE => 1,
 	ABSOLUTE => 1,
+	PLUGIN_BASE => 'OpenXPKI::Template::Plugin',
 	);
 
     if (exists $params->{INCLUDE} && (ref $params->{INCLUDE} eq 'ARRAY')) {

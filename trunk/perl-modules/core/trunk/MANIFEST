@@ -14,6 +14,7 @@ OpenXPKI/Debug.pm
 OpenXPKI/DN.pm
 OpenXPKI/Exception.pm
 OpenXPKI/FileUtils.pm
+OpenXPKI/Template/Plugin/RandomPassword.pm
 OpenXPKI/XML/Cache.pm
 OpenXPKI/XML/Config.pm
 OpenXPKI/i18n.pm

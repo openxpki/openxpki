@@ -2,6 +2,8 @@
 ##
 ## Written 2006 by Michael Bell
 ## Updated to use new Service::Default semantics 2007 by Alexander Klink
+## Updated to support seeded SHA1 and RFC 2307 password notatation 
+##   2007 by Martin Bartosch
 ## (C) Copyright 2006, 2007 by The OpenXPKI Project
 ## $Revision$
 
@@ -16,6 +18,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use Digest::SHA1;
 use Digest::MD5;
+use MIME::Base64;
 
 ## constructor and destructor stuff
 
@@ -47,25 +50,48 @@ sub new {
     {
         my $name      = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "name" ],
                                             COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ]);
-        my $digest    = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "digest" ],
-                                            COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ]);
-        my $algorithm = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "algorithm" ],
+        my $encrypted = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "digest" ],
                                             COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ]);
         my $role      = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "role" ],
                                             COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ]);
-        $self->{DATABASE}->{$name}->{DIGEST}    = $digest;
-        $self->{DATABASE}->{$name}->{ALGORITHM} = lc $algorithm;
+
+	my $scheme;
+	# digest specified in RFC 2307 userPassword notation?
+	if ($encrypted =~ m{ \{ (\w+) \} (.*) }xms) {
+	    ##! 8: "database uses RFC2307 password syntax"
+	    $scheme = lc($1);
+	    $encrypted = $2;
+	}
+
+	if (! defined $scheme) {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_MISSING_SCHEME_SPECIFICATION",
+		params  => {
+		    USER => $name, 
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => 'system',
+		},
+		)
+	}
+	
+
+        $self->{DATABASE}->{$name}->{ENCRYPTED} = $encrypted;
+        $self->{DATABASE}->{$name}->{SCHEME}    = $scheme;
         $self->{DATABASE}->{$name}->{ROLE}      = $role;
         ##! 4: "scanned user ... "
-        ##! 4: "    (name, digest, algorithm, role) => "
-        ##! 4: "    ($name, $digest, $algorithm, $role)"
-        if ($algorithm !~ /^(sha1|md5|crypt)$/)
+        ##! 4: "    (name, encrypted, scheme, role) => "
+        ##! 4: "    ($name, $encrypted, $scheme, $role)"
+
+        if ($scheme !~ /^(sha1|sha|ssha|md5|smd5|crypt)$/)
         {
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_ALGORITHM",
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_SCHEME",
                 params  => {
 		    USER => $name, 
-		    ALGORITHM => $algorithm,
+		    SCHEME => $scheme,
 		},
 		log => {
 		    logger => CTX('log'),
@@ -109,7 +135,7 @@ sub login_step {
 
         ## check account
 
-        if (not exists $self->{DATABASE}->{$account}) {
+        if (! exists $self->{DATABASE}->{$account}) {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
                 params  => {
@@ -117,32 +143,46 @@ sub login_step {
 		},
 		);
         }
-        my $digest    = $self->{DATABASE}->{$account}->{DIGEST};
-        my $algorithm = $self->{DATABASE}->{$account}->{ALGORITHM};
+        my $encrypted = $self->{DATABASE}->{$account}->{ENCRYPTED};
+        my $scheme    = $self->{DATABASE}->{$account}->{SCHEME};
         my $role      = $self->{DATABASE}->{$account}->{ROLE};
     
-        ## create comparable value
-        my $hash = "";
-        if ($algorithm eq "sha1") {
-             my $sha1 = Digest::SHA1->new();
-             $sha1->add($passwd);
-             $hash = $sha1->b64digest();
-             ## normalize digests
-             $hash   =~ s/=*$//;
-             $digest =~ s/=*$//;
-        } elsif ($algorithm eq"md5") {
-             my $md5 = Digest::MD5->new();
-             $md5->add($passwd);
-             $hash = $md5->b64digest();
-        } elsif ($algorithm eq "crypt") {
-             $hash = crypt ($passwd, $digest);
-        }
-    
-        ##! 2: "ident user ::= $account and digest ::= $hash"
+	my $computed_secret = '';
+	if ($scheme eq 'sha') {
+ 	    my $ctx = Digest::SHA1->new();
+ 	    $ctx->add($passwd);
+	    $computed_secret = $ctx->b64digest();
+	}
+	if ($scheme eq 'ssha') {
+	    my $salt = substr(decode_base64($encrypted), 20);
+ 	    my $ctx = Digest::SHA1->new();
+ 	    $ctx->add($passwd);
+	    $ctx->add($salt);
+	    $computed_secret = encode_base64($ctx->digest() . $salt, '');
+	}
+	if ($scheme eq 'md5') {
+ 	    my $ctx = Digest::MD5->new();
+ 	    $ctx->add($passwd);
+	    $computed_secret = $ctx->b64digest();
+	}
+	if ($scheme eq 'smd5') {
+	    my $salt = substr(decode_base64($encrypted), 16);
+ 	    my $ctx = Digest::MD5->new();
+ 	    $ctx->add($passwd);
+	    $ctx->add($salt);
+	    $computed_secret = encode_base64($ctx->digest() . $salt, '');
+	}
+	if ($scheme eq 'crypt') {
+	    $computed_secret = crypt($passwd, $encrypted);
+	}
+
+        ##! 2: "ident user ::= $account and digest ::= $computed_secret"
+	$computed_secret =~ s{ =+ \z }{}xms;
+	$encrypted       =~ s{ =+ \z }{}xms;
     
         ## compare passphrases
-        if ($hash ne $digest) {
-            ##! 4: "mismatch with digest in database ($digest)"
+        if ($computed_secret ne $encrypted) {
+            ##! 4: "mismatch with digest in database ($encrypted)"
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
                 params  => {
@@ -180,7 +220,13 @@ authentication method. The parameters are passed as a hash reference.
 
 is the constructor. The supported parameters are XPATH and COUNTER.
 This is the minimum parameter set for any authentication class.
-Every user block in the configuration must include a name, algorithm, digest and role.
+Every user block in the configuration must include a name, digest and role.
+The digest must have the format
+
+{SCHEME}encrypted_string
+
+SCHEME is one of sha (SHA1), md5 (MD5), crypt (Unix crypt(3)) or 
+ssha (seeded SHA1).
 
 =head2 login_step
 

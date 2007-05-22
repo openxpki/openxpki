@@ -1,3 +1,4 @@
+[% USE password = RandomPassword -%]
 <auth>
   <stack name="Anonymous">
     <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_ANONYMOUS</description>
@@ -17,23 +18,17 @@
     <!-- echo -n root | openssl sha1 -binary | openssl base64 -->
     <user>
       <name>John Doe</name>
-      <algorithm>sha1</algorithm>
-      <!-- this is Doe in sha1 -->
-      <digest>yUetMg5m/GSZjoalXA2iEMjB2Bo=</digest>
+      <digest>[% password.generate(scheme => 'ssha', callback => 'sub { print STDERR "*** NOTE: Password for user <John Doe> is: $_\n" }') %]</digest>
       <role>User</role>
     </user>
     <user>
       <name>root</name>
-      <algorithm>sha1</algorithm>
-      <!-- this is root in sha1 -->
-      <digest>3Hbp8MAAbo+RngxRXGbbujmC94U</digest>
+      <digest>[% password.generate(scheme => 'ssha', callback => 'sub { print STDERR "*** NOTE: Password for user <root> is: $_\n" }') %]</digest>
       <role>CA Operator</role>
     </user>
     <user>
       <name>raop</name>
-      <algorithm>sha1</algorithm>
-      <!-- this is raop in sha1 -->
-      <digest>fXR0BfkSrEHvv1yCBBBIVBDw1qM</digest>
+      <digest>[% password.generate(scheme => 'ssha', callback => 'sub { print STDERR "*** NOTE: Password for user <raop> is: $_\n" }') %]</digest>
       <role>RA Operator</role>
     </user>
   </handler>
