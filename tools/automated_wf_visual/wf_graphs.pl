@@ -16,6 +16,9 @@ use Pod::Usage;
 use Getopt::Long;
 use Locale::Messages qw (:locale_h :libintl_h nl_putenv bind_textdomain_filter);
 use POSIX qw (setlocale);
+use Image::Size 'html_imgsize';
+				  
+
 
 # command line options
 my $man      = 0;
@@ -138,17 +141,25 @@ foreach my $wf_file (@{$wf_config}){
       print WEBLINKFILE "title => 'OpenXPKI workflows graphical representation'\n";
       print WEBLINKFILE "</%attr>\n\n";
       print WEBLINKFILE "<h1>OpenXPKI workflows' graphical representation</h1>\n";
+      print WEBLINKFILE "<h2> Workflow ". $wf_title ."</h2>\n\n";
+      print WEBLINKFILE "<p>\nAutorun states are yellow\n</p>\n\n";
+      print WEBLINKFILE "<p>\n".
+            "You may need to pan or scroll to view a picture\n</p>\n\n";
       print WEBLINKFILE "<p>\n";
-      print WEBLINKFILE '<font size=6> Workflow </font>'.
-                        '<font size=6 color=blue> '.
-                        $wf_title ."</font><br/>\n";
-      print WEBLINKFILE "</p>\n\n";
-      print WEBLINKFILE "<p>\n(autorun states are yellow)\n</p>\n\n";
-      print WEBLINKFILE '<img src="'. 
-                        $wf_dot . '.' . $pic_format .'" />'."\n"; 
+      my $image_name = $dot_file . "." . $pic_format;
+      my $image_size = html_imgsize($image_name);
+      # $size == 'width="60" height="40"'
+
+      print WEBLINKFILE '<img hspace=5 align="left" ' . $image_size .
+                        ' src="'. $wf_dot . '.' . $pic_format . '"' .
+			' border=0 '.
+			'alt="' . $wf_title . '" ' .
+			'title="' . $wf_title . '" ' .
+			'/>'."\n"; 
+      print WEBLINKFILE '<br clear="all"/></p>' . "\n";
       close(WEBLINKFILE);
-      print WEBFILE '<a href="' . $ref_dir . '/' . $wf_dot . '.html"/>' .
-                    $wf_title . '<a><br/>'."\n";    			
+      print WEBFILE '<a href="' . $ref_dir . '/' . $wf_dot . '.html">' .
+                    $wf_title . '</a><br/>'."\n";    			
    };
 };
 
