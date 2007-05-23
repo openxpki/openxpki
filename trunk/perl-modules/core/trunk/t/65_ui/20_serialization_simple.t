@@ -56,8 +56,7 @@ ok($ref);
 
 my $text = $ref->serialize ($hash);
 
-my $expected_serialization = "HASH-328-6-FOOTER-ARRAY-31-0-SCALAR-2-OK-1-SCALAR-5-Abort-4-LIST-ARRAY-203-0-HASH-100-9-Undefined-UNDEF-6-Serial-ARRAY-28-0-SCALAR-2-10-1-SCALAR-2-12-4-Name-ARRAY-20-0-SCALAR-8-John Doe-1-HASH-82-6-Serial-ARRAY-28-0-SCALAR-2-11-1-SCALAR-2-13-4-Name-ARRAY-20-0-SCALAR-8-Jane Doe-6-HEADER-ARRAY-23-0-SCALAR-10-Testheader-9-UNDEFINED-UNDEF-";
-
+my $expected_serialization = "HASH-328-6-FOOTER-ARRAY-31-0-SCALAR-2-OK-1-SCALAR-5-Abort-6-HEADER-ARRAY-23-0-SCALAR-10-Testheader-4-LIST-ARRAY-203-0-HASH-100-4-Name-ARRAY-20-0-SCALAR-8-John Doe-6-Serial-ARRAY-28-0-SCALAR-2-10-1-SCALAR-2-12-9-Undefined-UNDEF-1-HASH-82-4-Name-ARRAY-20-0-SCALAR-8-Jane Doe-6-Serial-ARRAY-28-0-SCALAR-2-11-1-SCALAR-2-13-9-UNDEFINED-UNDEF-";
 ok($text eq $expected_serialization);
 
 my $res = $ref->deserialize($text);
@@ -79,7 +78,7 @@ $hash = {
         };
 $text = $ref->serialize ($hash);
 
-$expected_serialization = "HASH-92-3-uid-ARRAY-29-0-SCALAR-16-Тестиров-2-cn-ARRAY-34-0-SCALAR-21-Иван Петров-";
+$expected_serialization = "HASH-92-2-cn-ARRAY-34-0-SCALAR-21-Иван Петров-3-uid-ARRAY-29-0-SCALAR-16-Тестиров-";
 ## downgrade from utf8 to byte level
 $expected_serialization = pack ("C*", unpack ("U0C*", $expected_serialization));
 ok($text eq $expected_serialization);
