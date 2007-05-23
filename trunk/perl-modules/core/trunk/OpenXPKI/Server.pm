@@ -265,6 +265,15 @@ sub pre_loop_hook {
             );
         }
     }
+    if ($self->{TYPE} eq 'Simple') {
+        # the Net::Server::Fork forked children have the DEFAULT
+        # signal handler for SIGCHLD (instead of the Net::Server
+        # sigchld handler).
+        # We need it, too, because otherwise
+        # $? is -1 after a `$command` backtick call
+        # (for example when doing external dynamic authentication) ...
+        $SIG{CHLD} = 'DEFAULT';
+    }
 }
 
 sub process_request {
