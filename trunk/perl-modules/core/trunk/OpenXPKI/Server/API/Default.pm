@@ -720,7 +720,7 @@ sub list_ca_ids {
         ##! 64: 'if!'
         my @return = sort keys %{$realms->{$thisrealm}->{ca}->{id}};
         ##! 64: Dumper(\@return)
-	return @return;
+	return \@return;
     }
     
     return;

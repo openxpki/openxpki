@@ -32,7 +32,13 @@ sub execute {
 	        message => "I18N_OPENXPKI_ACTIVITY_CRLISSUANCE_DETERMINENEXTCA_API_NOT_DEFINED",
             );
         }
-        my @ca_ids = $api->list_ca_ids();
+        my $ca_ids = $api->list_ca_ids();
+        if (! defined $ca_ids || ref $ca_ids ne 'ARRAY') {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_DETERMINENEXTCA_NO_CA_IDS_DEFINED',
+            );
+        }
+        my @ca_ids = @{ $ca_ids };
         if (! @ca_ids) {
 	    OpenXPKI::Exception->throw (
 	        message => "I18N_OPENXPKI_ACTIVITY_CRLISSUANCE_DETERMINENEXTCA_CA_IDS_NOT_DEFINED",
