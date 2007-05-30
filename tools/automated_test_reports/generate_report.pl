@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 use English;
+use XML::Feed;
+use XML::Simple;
 
 # define your path here if run_test.pl is not in path
 # e.g.
@@ -19,6 +21,13 @@ my $PREFIX = '';
 # e.g.
 # my $DEPLOYMENT_PREFIX = '--prefix ~/usr/local';
 my $DEPLOYMENT_PREFIX = '';
+
+# define the format of the feed (see XML::Feed)
+my $FEED_FORMAT = 'Atom';
+
+# define the title and location of the feed
+my $FEED_TITLE = "OpenXPKI tests at " . `hostname`;
+my $FEED_LINK  = "http://build0.cynops.de/openxpki_tests/";
 
 if (! defined $run_test) {
     $run_test = `which run_test.pl`;
@@ -144,7 +153,7 @@ foreach my $rev (@tested_revisions) {
     foreach my $test (sort keys %{ $tests }) {
         chdir $tests->{$test}->{DIRECTORY};
         my $files = $rev . '_coverage ' . $rev . '_output.txt ';
-        system("mkdir $output_dir/$test");
+        system("mkdir $output_dir/$test 2>/dev/null");
         system("cp -r $files $output_dir/$test");
 
         my $summary_filename = $rev . '_summary.html';
@@ -157,3 +166,81 @@ foreach my $rev (@tested_revisions) {
 }
 print STDERR "\n";
 close INDEX;
+
+print STDERR "Generating feed ... ";
+my $feed = XML::Feed->new($FEED_FORMAT);
+$feed->title($FEED_TITLE);
+$feed->link($FEED_LINK);
+
+foreach my $rev (@tested_revisions) {
+    my $entry = XML::Feed::Entry->new($FEED_FORMAT);
+
+    print STDERR "r$rev ";
+    chdir $basedir;
+    open my $SVN, "svn log -qr $rev ..|";
+    my $line = <$SVN>;
+    my $svn_info = <$SVN>;
+    close $SVN;
+
+    my @svn_info = split(/ \| /, $svn_info);
+    my $author = $svn_info[1];
+    my $date   = $svn_info[2];
+    my ($year, $month, $day, $hour, $minute, $second, $tz) = 
+        ($date =~ m{\A (\d{4}) \- (\d{2}) \- (\d{2}) [ ]
+                       (\d{2}) : (\d{2}) : (\d{2}) [ ] ([\+\-]\d{4})}xms);
+    my $dt = DateTime->new(
+        year   => $year,
+        month  => $month,
+        day    => $day,
+        hour   => $hour,
+        minute => $minute,
+        second => $second,
+        time_zone => $tz,
+    );
+    
+    my $svn_changes = do {
+        local $INPUT_RECORD_SEPARATOR;
+        open my $SVN, "svn log -vr $rev ..|";
+        <$SVN>;
+    };
+
+    my $all_green = 1;
+    my $all_summaries = '<table border=0 cellspacing=0 cellpadding=5>';
+    my @failed;
+    foreach my $test (sort keys %{ $tests }) {
+        chdir $tests->{$test}->{DIRECTORY};
+        my $summary_filename = $rev . '_summary.html';
+        open my $SUMMARY, '<', $summary_filename;
+        my $summary = <$SUMMARY>;
+        $summary =~ s{Coverage\ report}{$tests->{$test}->{NAME} coverage report}xms;
+        my $xs = XML::Simple->new();
+        my $summary_ref = $xs->XMLin($summary);
+        if ($summary_ref->{'td'}->[6] ne '0 (0.00%)') {
+            $all_green = 0;
+            # push failed total tests
+            push @failed, "$test: " . $summary_ref->{'td'}->[6];
+        }
+        $all_summaries .= $summary;
+        close $SUMMARY;
+    }
+    $all_summaries .= '</table>';
+    if ($all_green) {
+        $entry->title("$rev: All green");
+    }
+    else {
+        $entry->title("$rev: Failed: " . join q{, }, @failed);
+    }
+    $entry->author($author);
+    my $body = "<H1>Report for $rev</H1>" . $all_summaries;
+    $body   .= "<H1>Changes</H1><pre>" . $svn_changes . "</pre>";
+    $entry->content(XML::Feed::Content->new({body => $body }));
+    $entry->modified($dt);
+    $entry->link($FEED_LINK);
+
+    $feed->add_entry($entry);
+}
+$feed->modified(DateTime->now);
+open FEED, '>', "$output_dir/" . lc($FEED_FORMAT);
+print FEED $feed->as_xml();
+close(FEED);
+print STDERR "\n";
