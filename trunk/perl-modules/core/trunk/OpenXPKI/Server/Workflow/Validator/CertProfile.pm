@@ -82,21 +82,25 @@ sub validate {
         ## set the cert profile
         $context->param ("cert_profile_id" => $index);
     }
-    ## check that it is an allowed profile for a given role
-    ##! 64: 'role: ' . $role
-    ##! 64: 'profile: ' . $role
-    my @possible_profiles = @{ CTX('api')->get_possible_profiles_for_role({
-        ROLE => $role,
-    }) };
-    ##! 64: 'possible profiles: ' . Dumper \@possible_profiles
-    if (! grep { $profile eq $_ } @possible_profiles) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTPROFILE_PROFILE_NOT_VALID_FOR_ROLE',
-            params  => {
-                'PROFILE' => $profile,
-                'ROLE'    => $role,
-            },
-        );
+    if (defined $role) {
+        ## check that it is an allowed profile for a given role
+        ##! 64: 'role: ' . $role
+        ##! 64: 'profile: ' . $role
+        my @possible_profiles = @{
+            CTX('api')->get_possible_profiles_for_role({
+                ROLE => $role,
+            })
+        };
+        ##! 64: 'possible profiles: ' . Dumper \@possible_profiles
+        if (! grep { $profile eq $_ } @possible_profiles) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTPROFILE_PROFILE_NOT_VALID_FOR_ROLE',
+                params  => {
+                    'PROFILE' => $profile,
+                    'ROLE'    => $role,
+                },
+            );
+        }
     }
 
     return 1;

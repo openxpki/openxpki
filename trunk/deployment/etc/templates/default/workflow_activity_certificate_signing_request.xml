@@ -93,7 +93,6 @@
       <field name="cert_profile"/>
       <validator name="CertProfile">
         <arg>$cert_profile</arg>
-        <arg>$cert_profile_id</arg>
       </validator>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
