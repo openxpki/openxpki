@@ -19,7 +19,7 @@ Test::More->builder()->use_numbers(0);
 diag("Certificate revocation list workflow\n");
 print "1..$NUMBER_OF_TESTS\n";
 
-my $instancedir = 't/60_workflow/test_instance';
+my $instancedir = 't/60_workflow/test_instance_crl';
 my $socketfile = $instancedir . '/var/openxpki/openxpki.socket';
 my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
 
@@ -54,8 +54,8 @@ do {
 } until defined $pid;
 
 if ($pid) {
-    Test::More->builder()->use_numbers(0);
     # this is the parent
+    Test::More->builder()->use_numbers(0);
     start_test_server({
         FOREGROUND => 1,
         DIRECTORY  => $instancedir,
