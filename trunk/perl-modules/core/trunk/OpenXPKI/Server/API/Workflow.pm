@@ -531,11 +531,10 @@ sub search_workflow_instances {
 
     my $realm = CTX('session')->get_pki_realm();
 
-    if (scalar @{$arg_ref->{CONTEXT}} == 0) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY',
-        );
-    }
+    my @context = ();
+    eval {
+        @context = @{ $arg_ref->{CONTEXT} };
+    };
     my $dynamic;
     my @tables;
     my @joins;
@@ -556,7 +555,7 @@ sub search_workflow_instances {
     #                 },
     # );
     my $i = 0;
-    foreach my $context_entry (@{$arg_ref->{CONTEXT}}) {
+    foreach my $context_entry (@context) {
         my $table_alias = $context_table . '_' . $i;
         my $key   = $context_entry->{KEY};
         my $value = $context_entry->{VALUE};
@@ -637,17 +636,18 @@ sub search_workflow_instances {
     ##! 16: 'tables: ' . Dumper(\@tables)
     my $result = $dbi->select(
 	TABLE   => \@tables,
-        COLUMNS => [
+        COLUMNS  => [
                          $workflow_table . '.WORKFLOW_LAST_UPDATE',
                          $workflow_table . '.WORKFLOW_SERIAL',
                          $workflow_table . '.WORKFLOW_TYPE',
                          $workflow_table . '.WORKFLOW_STATE',
-                   ],
-        JOIN    => [
+                    ],
+        JOIN     => [
                          \@joins,
-                   ],
-        REVERSE => 1,
-	DYNAMIC => $dynamic,
+                    ],
+        REVERSE  => 1,
+	    DYNAMIC  => $dynamic,
+        DISTINCT => 1,
         %limit,
     );
     ##! 16: 'result: ' . Dumper $result

@@ -498,7 +498,8 @@ sub BUILD {
             class  => 'Workflow',
             params => {
                 CONTEXT => {
-                    type => ARRAYREF,
+                    type     => ARRAYREF,
+                    optional => 1,
                 },
                 TYPE => {
                     type     => SCALAR | ARRAYREF,
