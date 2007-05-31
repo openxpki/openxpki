@@ -1,4 +1,4 @@
-## OpenXPKI::Tests;
+## OpenXPKI::Tests
 ##
 ## Written 2007 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2007 by The OpenXPKI Project
@@ -24,6 +24,7 @@ use Exporter 'import';
                 login
                 is_error_response
                 isnt_deeply
+                create_ca_cert
             ); 
 
 sub deploy_test_server {
@@ -104,6 +105,87 @@ sub deploy_test_server {
         diag("openxpkiadm initdb failed");
         return 0;
     }
+    return 1;
+}
+
+sub create_ca_cert {
+    my $arg_ref     = shift;
+    my $instancedir = $arg_ref->{DIRECTORY};
+
+    if (! (`openssl version` =~ m{\A OpenSSL\ 0\.9\.8 }xms)) {
+        diag "OpenSSL 0.9.8 not available";
+        return 0;
+    }
+    `mkdir -p $instancedir/etc/openxpki/ca/testdummyca1/`;
+    if ($CHILD_ERROR) {
+        diag "Could not create directory";
+        return 0;
+    }
+    `pwd=1234567890 openssl genrsa -des -passout env:pwd -out $instancedir/etc/openxpki/ca/testdummyca1/cakey.pem`;
+    if ($CHILD_ERROR) {
+        diag "Could not generate CA key";
+        return 0;
+    }
+    `(echo '.'; echo '.'; echo '.'; echo 'OpenXPKI'; echo 'Testing CA'; echo 'Testing CA'; echo '.'; echo '.'; echo '.')|pwd=1234567890 openssl req -new -key $instancedir/etc/openxpki/ca/testdummyca1/cakey.pem -passin env:pwd -out $instancedir/csr.pem`;  
+    if ($CHILD_ERROR) {
+        diag "Could not generate CA CSR";
+        return 0;
+    }
+    
+    `mkdir $instancedir/demoCA`;
+    `touch $instancedir/demoCA/index.txt`;
+    `echo 01 > $instancedir/demoCA/serial`;
+
+    `cd $instancedir; pwd=1234567890 openssl ca -selfsign -in csr.pem -keyfile etc/openxpki/ca/testdummyca1/cakey.pem -passin env:pwd -utf8 -outdir . -policy policy_anything -batch -extensions v3_ca -preserveDN -out cacert.pem`;
+    if ($CHILD_ERROR) {
+        diag "Could not issue CA certificate";
+        return 0;
+    }
+    open CACERT_IN,  '<', "$instancedir/cacert.pem";
+    open CACERT_OUT, '>', "$instancedir/etc/openxpki/ca/testdummyca1/cert.pem";
+    my $cert;
+    while (<CACERT_IN>) {
+        if ($_ =~ m{ \A -----BEGIN }xms) {
+            $cert = 1;
+        }
+        next if (! $cert);
+        print CACERT_OUT $_;
+    }
+    close CACERT_IN;
+    close CACERT_OUT;
+
+    my $identifier = `openxpkiadm certificate import --config $instancedir/etc/openxpki/config.xml --file $instancedir/etc/openxpki/ca/testdummyca1/cert.pem|tail -1|sed -e 's/  Identifier: //'`;
+    if ($CHILD_ERROR || ! $identifier) {
+        diag "Could not import CA cert into DB";
+        return 0;
+    }
+    `openxpkiadm certificate alias --config $instancedir/etc/openxpki/config.xml -realm I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA --alias testdummyca1 --identifier $identifier`;
+    if ($CHILD_ERROR) {
+        diag "Could not create alias for certificate";
+        return 0;
+    }
+    open PATCH, "|patch -p0";
+    print PATCH << "XEOF";
+--- $instancedir/etc/openxpki/config.xml  2006-12-04 10:41:16.000000000 +0100
++++ $instancedir/etc/openxpki/config.xml  2006-12-04 10:49:32.000000000 +0100
+@@ -46,8 +46,8 @@
+ 
+       <secret>
+         <group id="default" label="I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP">
+-          <method id="plain">
+-            <total_shares>1</total_shares>
++          <method id="literal">
++            <value>1234567890</value>
+           </method>
+           <cache>
+             <type>daemon</type>
+XEOF
+    close PATCH;
+    if ($CHILD_ERROR) {
+        diag "Could not patch file";
+        return 0;
+    }
+
     return 1;
 }
 
@@ -207,6 +289,16 @@ much of the namespace for themselves anyways).
 Deploys test server configuration. Takes a named argument of 'DIRECTORY',
 which is the directory into which the server will be deployed.
 Returns 1 if deployment was successfull, 0 otherwise.
+
+=head2 create_ca_cert
+
+Creates a CA certificate using OpenSSL for installation in a freshly
+deployed test server. Takes a named argument of 'DIRECTORY', which is
+the directory of the deployed server.
+Also imports the certificate into the OpenXPKI database and creates an
+appropriate alias for it. Then patches the config file to use the
+literal password for the key. This enables you to start a test server
+with a working CA certificate using start_test_server().
 
 =head2 start_test_server
 
