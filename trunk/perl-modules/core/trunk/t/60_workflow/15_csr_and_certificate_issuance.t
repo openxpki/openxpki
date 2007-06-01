@@ -11,7 +11,7 @@ use OpenXPKI::Serialization::Simple;
 # this is needed because we need to manually output the number of tests run
 Test::More->builder()->no_header(1);
 my $OUTPUT_AUTOFLUSH = 1;
-my $NUMBER_OF_TESTS  = 19;
+my $NUMBER_OF_TESTS  = 23;
 
 # do not use test numbers because forking destroys all order
 Test::More->builder()->use_numbers(0);
@@ -156,7 +156,47 @@ else {
     ); 
     ok(! is_error_response($msg), 'search_workflow_instances') or diag Dumper $msg;
     is(scalar @{ $msg->{PARAMS} }, 1, 'One workflow instance present');
-    is($msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'}, 'SUCCESS', 'Certificate issuance workflow is in state SUCCESS');
+    my $try = 1;
+    while ($try <= 60 && $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'} ne 'SUCCESS') {
+        # wait up to 60 seconds for cert issuance state to become SUCCESS
+        $msg = $client->send_receive_command_msg(
+            'search_workflow_instances',
+            {
+                  'TYPE' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
+            },
+        ); 
+        if ($ENV{DEBUG}) {
+            diag "Try number $try, state: " . $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'};
+        }
+        sleep 1;
+        $try++;
+    }
+    is($msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'}, 'SUCCESS', 'Certificate issuance workflow is in state SUCCESS') or diag Dumper $msg;
+
+    $msg = $client->send_receive_command_msg(
+        'get_workflow_info',
+        {
+              'ID'       => $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
+              'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
+        },
+    ); 
+    ok(! is_error_response($msg), 'get_workflow_info') or diag Dumper $msg;
+    my $cert = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{'certificate'};
+    ok($cert, 'Certificate is present in workflow context');
+
+    open my $TESTCERT, '>', "$instancedir/testcert.pem";
+    print $TESTCERT $cert;
+    close $TESTCERT;
+
+    my $openssl = `cat t/cfg.binary.openssl`;
+    my $openssl_output = `$openssl x509 -noout -text -in $instancedir/testcert.pem`;
+    ok($openssl_output =~ m{
+            Subject:\ DC=org,\ DC=OpenXPKI,\ DC=Test\ Deployment,\ CN=fully.qualified.example.com
+        }xms, 
+        'Parsing certificate using OpenSSL works (subject)') or diag "Certificate: $cert\nOpenSSL output: $openssl_output";
+
+    ok($openssl_output =~ m{ DNS:fully\.qualified\.example\.com }xms,
+        'Parsing certificate using OpenSSL works (subject alternative name)') or diag "Certificate: $cert\nOpenSSL output: $openssl_output";
 
     # LOGOUT
     eval {
