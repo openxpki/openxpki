@@ -55,6 +55,7 @@ do {
 
 if ($pid) {
     # this is the parent
+    local $SIG{'CHLD'} = 'IGNORE';
     Test::More->builder()->use_numbers(0);
     start_test_server({
         FOREGROUND => 1,
@@ -65,10 +66,10 @@ else {
     Test::More->builder()->use_numbers(0);
     # child here
 
-  CHECK_PIDFILE:
+  CHECK_SOCKET:
     foreach my $i (1..60) {
-        if (-e $pidfile) {
-            last CHECK_PIDFILE;
+        if (-e $socketfile) {
+            last CHECK_SOCKET;
         }
         else {
             sleep 1;
