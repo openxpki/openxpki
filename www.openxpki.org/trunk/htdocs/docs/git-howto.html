@@ -139,7 +139,12 @@ $ mkdir openxpki.git
 $ cd openxpki.git
 $ git-svn clone https://johndoe@openxpki.svn.sourceforge.net/svnroot/openxpki 
 </pre>
-This will take quite a while as it will import the complete revision history from the subversion repository. If you know someone who has already done this and published the corresponding git repository, it is much faster to just "git clone" this repository.
+This will take quite a while as it will import the complete revision history from the subversion repository. Alternatively, you can clone a publicly available git repository, for example the one at <a href="http://repo.or.cz/w/openxpki.git">repo.or.cz</a>:
+<pre>
+$ mkdir openxpki.git
+$ cd openxpki.git
+$ git clone git://repo.or.cz/openxpki.git
+</pre>
 <p>
 <h3>Daily usage</h3>
 <p><tt>git-svn rebase</tt> fetches changes from the subversion repository
@@ -150,25 +155,25 @@ and rebases your changes onto the latest subversion HEAD. If you want to push yo
 Add remote Git repositories for all people you want to collaborate with, for example:
 </p>
 <pre>
-$ git-remote add martin http://www.cynops.de/oss/OpenXPKI/openxpki.git
+$ git-remote add alech git://repo.or.cz/openxpki/alech.git
 </pre>
 <p>
 You are now ready to fetch or pull changes from the remote repositories,
-e.g. from the "martin" remote we created above:
+e.g. from the "alech" remote we created above:
 </p>
 <pre>
-$ git fetch martin
+$ git fetch alech
 </pre>
 <p>
-The changes "martin" published will now show up as tracking branches
-as "martin/master", "martin/sometopicbranch", etc. You can branch away from them, merge them into your local branches, etc.
+The changes "alech" published will now show up as tracking branches
+as "alech/master", "alech/sometopicbranch", etc. You can branch away from them, merge them into your local branches, etc.
 </p>
 <p>
 In order to allow others to get your own changes you have to publish
 your Git repository. You will have to set up a publicly available Git 
 repository to make this possible. Only you will need write access anybody
 else needs read-only access. We will assume that you will publish via
-ssh and that others get access via HTTP.
+ssh and that others get access via HTTP. 
 </p>
 <p>
 On the publicly available system create the remote repository 
@@ -200,6 +205,12 @@ $ git push mypublic
 </pre>
 <p>
 You can also push all your branches by saying git push --all mypublic
+</p>
+<p>
+If you don't have a place where you can push your changes, have a look
+at <a href="http://repo.or.cz/">repo.or.cz</a>. There, you can set up
+your repository easily and for free, and you can even mark it as an
+OpenXPKI "fork", so it will be easier for people to find.
 </p>
 
 <h2>Git only</h2>
