@@ -133,7 +133,7 @@ sub new
     $self->run(%{$self->{PARAMS}});
 }
 
-sub DESTROY {
+sub pre_server_close_hook {
     ##! 1: 'start'
     my $self = shift;
 
