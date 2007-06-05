@@ -110,7 +110,6 @@ sub do_status {
             ## wait for a starting server ...
             return do_status ({SOCKETFILE => $arg->{SOCKETFILE}, SLEEP => 5});
         }
-	print STDERR "OpenXPKI server is not running or does not accept requests.\n";
 	return;
     }
     return 1;
@@ -254,12 +253,12 @@ sub do_stop {
     my $pidfile    = $arg->{PIDFILE};
     my $socketfile = $arg->{SOCKETFILE};
 
-    my $process_group = getpgrp($pid);
-
     if (! defined $pid || (kill(0, $pid) == 0)) {
 	print STDERR "OpenXPKI Server is not running.\n";
 	return 1;
     }
+    my $process_group = getpgrp($pid);
+
     print STDOUT "Stopping OpenXPKI\n" if (not $QUIET);
 
     my @signals = (2, 2, 3, 3, 9);
@@ -403,43 +402,34 @@ if (-r $pidfile) {
     chomp $pid if defined $pid;
 }
 
+my $command_table = {
+    start   => \&do_start,
+    stop    => \&do_stop,
+    restart => sub {
+	do_stop(@_); 
+	do_start(@_);
+    },
+    status  => sub { 
+	if (do_status(@_)) {
+	    print "OpenXPKI Server is running and accepting requests.\n";
+	} else {
+	    print "OpenXPKI server is not running or does not accept requests.\n";
+	}
+    },
+};
+
 my $cmd = shift;
 
-if ($cmd eq 'start') {
-    if (! do_start(
-	{
-	    PID        => $pid,
-	    PIDFILE    => $pidfile,
-	    SOCKETFILE => $socketfile,
-        FOREGROUND => $foreground,
-	})) {
+if (exists $command_table->{$cmd}) {
+    if (! $command_table->{$cmd}->(
+	      {
+		  PID        => $pid,
+		  PIDFILE    => $pidfile,
+		  SOCKETFILE => $socketfile,
+		  FOREGROUND => $foreground,
+	      })) {
 	exit 1;
     }
-    exit 0;
-}
-
-if ($cmd eq 'stop') {
-    if (! do_stop(
-	{
-	    PID        => $pid,
-	    PIDFILE    => $pidfile,
-	    SOCKETFILE => $socketfile,
-	})) {
-	exit 1;
-    }
-    exit 0;
-}
-
-if ($cmd eq 'status') {
-    if (! do_status(
-	{
-	    PID        => $pid,
-	    PIDFILE    => $pidfile,
-	    SOCKETFILE => $socketfile,
-	})) {
-	exit 1;
-    }
-    print "OpenXPKI Server is running and accepting requests.\n";
     exit 0;
 }
 
@@ -470,6 +460,7 @@ openxpkictl [options] COMMAND
  Commands:
    start            Start OpenXPKI daemon
    stop             Stop OpenXPKI daemon
+   restart          Restart OpenXPKI daemon
    status           Get OpenXPKI daemon status
 
 
@@ -486,6 +477,10 @@ Starts the OpenXPKI daemon.
 =item B<stop>
 
 Stops the OpenXPKI daemon.
+
+=item B<restart>
+
+Restarts the OpenXPKI daemon.
 
 =item B<status>
 
