@@ -147,6 +147,19 @@ sub pre_server_close_hook {
     return 1;
 }
 
+sub DESTROY {
+    ##! 1: 'start'
+    my $self = shift;
+
+    if ($self->{TYPE} ne 'Fork') {
+        # for servers in the foreground, call the pre_server_close_hook
+        # on destruction ...
+        $self->pre_server_close_hook();
+    }
+
+    return 1;
+}
+
 # from Net::Server:
 #           This hook occurs just after the bind process and just before any
 #           chrooting, change of user, or change of group occurs.  At this
