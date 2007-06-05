@@ -78,7 +78,7 @@ sub validate {
         
     }
     if ($invalidity_time > $notafter) {
-        OpenXPKI::Exception->thow(
+        OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER',
 	    log => {
 		logger => CTX('log'),
