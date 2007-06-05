@@ -34,6 +34,7 @@ my %possible_names = map { $_ => 1 } qw(
    oliwel
    svysh
    pgrig
+   flowmar
 );
 
 if (-e($usr_file_name) && -s _) {                                                                                                                          
