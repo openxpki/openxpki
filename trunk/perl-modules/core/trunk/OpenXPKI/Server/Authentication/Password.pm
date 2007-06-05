@@ -147,7 +147,7 @@ sub login_step {
         my $scheme    = $self->{DATABASE}->{$account}->{SCHEME};
         my $role      = $self->{DATABASE}->{$account}->{ROLE};
     
-	my $computed_secret = '';
+	my $computed_secret;
 	if ($scheme eq 'sha') {
  	    my $ctx = Digest::SHA1->new();
  	    $ctx->add($passwd);
@@ -175,6 +175,15 @@ sub login_step {
 	if ($scheme eq 'crypt') {
 	    $computed_secret = crypt($passwd, $encrypted);
 	}
+
+        if (! defined $computed_secret) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_UNSUPPORTED_SCHEME",
+                params  => {
+		    USER => $account,
+		},
+		);
+        }
 
         ##! 2: "ident user ::= $account and digest ::= $computed_secret"
 	$computed_secret =~ s{ =+ \z }{}xms;
