@@ -133,6 +133,19 @@ sub new
     $self->run(%{$self->{PARAMS}});
 }
 
+sub DESTROY {
+    ##! 1: 'start'
+    my $self = shift;
+
+    # remove pid and socketfile on destruction - they are no longer useful
+    # if the server is not running ...
+    unlink ($self->{PARAMS}->{socketfile});
+    ##! 4: 'socketfile removed'
+    unlink ($self->{PARAMS}->{pid_file});
+    ##! 4: 'pid_file removed'
+
+    return 1;
+}
 
 # from Net::Server:
 #           This hook occurs just after the bind process and just before any
