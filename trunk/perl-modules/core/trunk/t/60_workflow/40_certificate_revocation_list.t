@@ -11,7 +11,7 @@ use OpenXPKI::Serialization::Simple;
 # this is needed because we need to manually output the number of tests run
 Test::More->builder()->no_header(1);
 my $OUTPUT_AUTOFLUSH = 1;
-my $NUMBER_OF_TESTS  = 8;
+my $NUMBER_OF_TESTS  = 10;
 
 # do not use test numbers because forking destroys all order
 Test::More->builder()->use_numbers(0);
@@ -19,16 +19,10 @@ Test::More->builder()->use_numbers(0);
 diag("Certificate revocation list workflow\n");
 print "1..$NUMBER_OF_TESTS\n";
 
-my $instancedir = 't/60_workflow/test_instance_crl';
+# reuse the already deployed server
+my $instancedir = 't/60_workflow/test_instance';
 my $socketfile = $instancedir . '/var/openxpki/openxpki.socket';
 my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
-
-ok(deploy_test_server({
-        DIRECTORY  => $instancedir,
-    }), 'Test server deployed successfully');
-ok(create_ca_cert({
-        DIRECTORY => $instancedir,
-    }), 'CA certificate created and installed successfully');
 
 # Fork server, connect to it, test config IDs, create workflow instance
 my $redo_count = 0;
@@ -99,6 +93,23 @@ else {
     is($msg->{PARAMS}->{WORKFLOW}->{STATE}, 'SUCCESS', 'WF is in state SUCCESS');
     ok(-s "$instancedir/etc/openxpki/ca/testdummyca1/crl.pem", "CRL file exists");
 
+    # Parsing using OpenSSL
+    
+    my $openssl = `cat t/cfg.binary.openssl`;
+    my $openssl_output = `$openssl crl -noout -text -in $instancedir/etc/openxpki/ca/testdummyca1/crl.pem`;
+    if ($ENV{DEBUG}) {
+        diag "OpenSSL output: $openssl_output";
+    }
+    ok($openssl_output =~ m{
+            Certificate\ Revocation\ List
+        }xms, 
+        'Parsing CRL using OpenSSL works') or diag "OpenSSL output: $openssl_output";
+    ok($openssl_output =~ m{ 01FF }xms, 'Parsing using OpenSSL works (serial)')
+        or diag "OpenSSL output: $openssl_output";
+    ok($openssl_output =~ m{ Cessation\ Of\ Operation }xms,
+        'Parsing using OpenSSL works (reason code)')
+        or diag "OpenSSL output: $openssl_output";
+
     # LOGOUT
     eval {
         $msg = $client->send_receive_service_msg('LOGOUT');
@@ -106,3 +117,5 @@ else {
     diag "Terminated connection";
     exit 0;
 }
+ok(1, 'Done'); # this is to make Test::Builder happy, which otherwise
+               # believes we did not do any testing at all ... :-/

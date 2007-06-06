@@ -11,7 +11,7 @@ use OpenXPKI::Serialization::Simple;
 # this is needed because we need to manually output the number of tests run
 Test::More->builder()->no_header(1);
 my $OUTPUT_AUTOFLUSH = 1;
-my $NUMBER_OF_TESTS  = 33;
+my $NUMBER_OF_TESTS  = 35;
 
 # do not use test numbers because forking destroys all order
 Test::More->builder()->use_numbers(0);
@@ -26,6 +26,10 @@ my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
 ok(deploy_test_server({
         DIRECTORY  => $instancedir,
     }), 'Test server deployed successfully');
+ok(create_ca_cert({
+        DIRECTORY => $instancedir,
+    }), 'CA certificate created and installed successfully');
+
 
 # Fork server, connect to it, test config IDs, create workflow instance
 my $redo_count = 0;
@@ -285,3 +289,5 @@ else {
     diag "Terminated connection";
     exit 0;
 }
+ok(1, 'Done'); # this is to make Test::Builder happy, which otherwise
+               # believes we did not do any testing at all ... :-/
