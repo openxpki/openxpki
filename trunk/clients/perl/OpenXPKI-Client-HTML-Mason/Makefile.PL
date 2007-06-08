@@ -41,6 +41,7 @@ WriteMakefile(
         'HTML::Mason'      => 1,
         'HTTP::Server::Simple::Mason' => 0,
         'Test::HTTP::Server::Simple'  => 0,
+        'WWW::Mechanize' => 0,
     },
     test => {TESTS => 't/*/*.t t/*.t'},
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
