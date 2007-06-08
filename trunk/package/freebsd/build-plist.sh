@@ -46,7 +46,7 @@ fi
 make
 
 make install PREFIX=${TMP} 
-(cd ${TMP} && find -d * \! -type d) | sort > pkg-plist
+(cd ${TMP} && find -d * \! -type d \! -path "etc/rc.d/*") | sort > pkg-plist
 
 (cd ${TMP} && find -d * -type d) | sort | \
   comm -13 OLD-DIRS - | sort -r | sed -e 's#^#@dirrm #' >> pkg-plist
