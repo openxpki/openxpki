@@ -70,6 +70,7 @@ ok(system("openxpkiadm initdb --config $config{config_file}") == 0);
 
 diag "Starting OpenXPKI Server.";
 
+$args = "";
 $args = "--debug 100 --debug OpenXPKI::XML::Config:0 --debug OpenXPKI::XML::Cache:0" if ($debug);
 if (system("openxpkictl --config $config{config_file} $args start") != 0) {
     unlink $config{socket_file};
