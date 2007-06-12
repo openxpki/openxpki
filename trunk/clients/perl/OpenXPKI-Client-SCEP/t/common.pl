@@ -11,3 +11,9 @@ our %config = (
     debug              => 0,
     openssl            => "/usr/bin/openssl",
 );
+
+if ($ENV{DEBUG}) {
+    $config{debug} = 1;
+}
+
+1;

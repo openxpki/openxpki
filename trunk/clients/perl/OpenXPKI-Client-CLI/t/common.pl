@@ -6,6 +6,11 @@ our %config = (
     var_dir            => "$base/var/openxpki",
     config_file        => "$base/etc/openxpki/config.xml",
     socket_file        => "/var/tmp/openxpki-client-test.socket",
-    debug              => 1,
-    );
+    debug              => 0,
+);
 
+if ($ENV{DEBUG}) {
+    $config{debug} = 1;
+}
+
+1;
