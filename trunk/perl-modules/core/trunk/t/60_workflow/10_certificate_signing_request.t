@@ -103,7 +103,8 @@ else {
             },
         },
     );
-    ok(is_error_response($msg), 'Successfully complains about missing field');
+    ok(is_error_response($msg), 'Successfully complains about missing field')
+        or diag Dumper $msg;
     is($msg->{LIST}->[0]->{LABEL}, 'I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS', 'Correct error message');
     $msg = $client->send_receive_command_msg(
         'create_workflow_instance',
@@ -121,7 +122,8 @@ else {
             },
         },
     );
-    ok(! is_error_response($msg), 'Successfully created CSR workflow instance');
+    ok(! is_error_response($msg), 'Successfully created CSR workflow instance')
+        or diag Dumper $msg;
     ok(exists $msg->{PARAMS}->{ACTIVITY}->{'I18N_OPENXPKI_WF_ACTION_APPROVE_CSR'}, 'Approve activity exists');
     my $wf_id = $msg->{PARAMS}->{WORKFLOW}->{ID} ;
     ok(defined $wf_id, 'Workflow ID exists');
@@ -234,7 +236,6 @@ else {
               'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
         },
     ); 
-    diag Dumper $msg;
     ok(! is_error_response($msg), 'Successfully approved') or diag Dumper $msg;
     ok($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{'approvals'}, 'Context has approvals');
     my @approvals = ();

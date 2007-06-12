@@ -1,0 +1,12 @@
+--- t/80_config_versioning/test_instance/etc/openxpki/workflow_def_certificate_signing_request.xml	2007-05-22 13:58:03.000000000 +0200
++++ t/80_config_versioning/test_instance/etc/openxpki/workflow_def_certificate_signing_request.xml	2007-05-22 14:02:45.000000000 +0200
+@@ -76,6 +76,9 @@
+ 	    resulting_state="REJECTED">
+       <condition name="ACL::reject_csr"/>
+     </action>
++    <action name="null"
++            resulting_state="FAILURE">
++    </action>
+   </state>
+ 
+   <state name="APPROVAL">

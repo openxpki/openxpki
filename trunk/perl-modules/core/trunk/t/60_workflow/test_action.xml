@@ -1,0 +1,29 @@
+<actions>
+  <action name="create_csr"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+         source="USER">
+      <field name="cert_role"/>
+      <validator name="KeyReuse">
+        <arg>$csr_type</arg>
+        <arg>$pkcs10</arg>
+        <arg>$spkac</arg>
+      </validator>
+
+      <validator name="HasRequiredField">
+        <arg>cert_role</arg>
+      </validator>
+  </action>
+  <action name="notify_user_of_creation"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::Notification"
+          message="csr_created">
+  </action>
+  <action name="generate_key"
+          class="OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey">
+      <field name="_key_type"/>
+      <field name="_key_gen_params"/>
+      <field name="_password"/>
+      <validator name="PasswordQuality">
+        <arg>$_password</arg>
+      </validator>
+  </action>
+</actions>

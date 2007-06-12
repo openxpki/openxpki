@@ -9,6 +9,7 @@ diag "Check the POD coverage in ".scalar @files." files\n";
 TODO: {
     local $TODO = 'We need a lot more code documentation ...';
     foreach my $module (@files) {
+            diag "Testing POD coverage for $module";
             pod_coverage_ok($module, "$module is covered" );
     }
 }
