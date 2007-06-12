@@ -5,7 +5,12 @@ use Data::Dumper;
 
 # use Smart::Comments;
 
-use OpenXPKI::Server::Init;
+use OpenXPKI::Debug;
+if ($ENV{DEBUG}) {
+    $OpenXPKI::Debug::LEVEL{'.*'} = 128;
+}
+
+require OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
@@ -20,15 +25,18 @@ ok(1);
 ok(OpenXPKI::Server::Init::init(
        {
 	   CONFIG => 't/config_test.xml',
-	   TASKS  => [ 'xml_config', 
+	   TASKS  => [ 'current_xml_config', 
 		       'i18n', 
+               'dbi_log',
 		       'log', 
 #		       'redirect_stderr', 
-		       'crypto_layer',
-		       'pki_realm_light', 
-		       'volatile_vault',
 		       'dbi_backend', 
-		       'dbi_workflow', ],
+		       'dbi_workflow',
+               'xml_config',
+		       'crypto_layer',
+		       'pki_realm', 
+		       'volatile_vault',
+               ],
        }));
    
 my $var;

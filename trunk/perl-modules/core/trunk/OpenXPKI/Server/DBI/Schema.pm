@@ -47,6 +47,8 @@ my %COLUMN_of = (
     SUBJECT_KEY_IDENTIFIER   => "subject_key_identifier",
     AUTHORITY_KEY_IDENTIFIER => "authority_key_identifier",
 
+    CONFIG_IDENTIFIER     => 'config_identifier',
+
     SUBMIT_DATE           => "submit_date",
     APPROVAL_DATE         => "approval_date",
     TYPE                  => "format",
@@ -269,10 +271,21 @@ my %TABLE_of = (
         COLUMNS => [ "WORKFLOW_SERIAL",
 		     "PKI_REALM",
 		     "WORKFLOW_TYPE",
-		     "WORKFLOW_VERSION_SERIAL",
+		     "WORKFLOW_VERSION_SERIAL", # TODO - remove, it is obsolete
+                                        # as we have a config_id in
+                                        # the workflow context
 		     "WORKFLOW_STATE",
 		     "WORKFLOW_LAST_UPDATE",
 	    ]},
+
+    CONFIG => {
+        NAME    => 'config',
+        INDEX   => [ 'CONFIG_IDENTIFIER' ],
+        COLUMNS => [
+            'CONFIG_IDENTIFIER',
+            'DATA',
+        ],
+    },
 
 #     WORKFLOW_VERSION => {
 #         NAME    => "workflow_version",

@@ -57,11 +57,10 @@ sub new
 
     # we need to get a usable logger as soon as possible, hence:
     # initialize configuration, i18n and log
-    OpenXPKI::Server::Init::init(
-	{
+    OpenXPKI::Server::Init::init({
 	    CONFIG => $self->{CONFIG},
-	    TASKS  => [ 'xml_config', 'i18n', 'log' ],
-            SILENT => $keys->{SILENT}
+	    TASKS  => [ 'current_xml_config', 'i18n', 'log' ],
+        SILENT => $keys->{SILENT},
 	});
 
     # from now on we can assume that we have CTX('log') available

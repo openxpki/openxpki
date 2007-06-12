@@ -16,7 +16,12 @@ ok(1);
 OpenXPKI::Server::Init::init(
     {
 	CONFIG => 't/config_test.xml',
-	TASKS => [ 'xml_config' ],
+	TASKS => [
+        'current_xml_config',
+        'log',
+        'dbi_backend',
+        'xml_config',
+    ],
 	SILENT => 1,
     });
 

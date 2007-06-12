@@ -18,20 +18,22 @@ diag "OpenXPKI::Server::Context - global context entries\n";
 ok(OpenXPKI::Server::Init::init(
        {
 	   CONFIG => 't/config_test.xml',
-	   TASKS  => [ 'xml_config', 
+	   TASKS  => [ 'current_xml_config', 
 		       'i18n', 
+               'dbi_log',
 		       'log', 
 #		       'redirect_stderr', 
-		       'crypto_layer', 
-		       'pki_realm_light', 
-		       'volatile_vault',
 		       'dbi_backend', 
-		       'dbi_workflow', 
-		       'acl',
-		       'api',
-		       'authentication',
-		       ],
-       }), 'Server init');
+		       'dbi_workflow',
+               'xml_config',
+		       'crypto_layer',
+		       'pki_realm', 
+		       'volatile_vault',
+               'acl',
+               'api',
+               'authentication',
+               ],
+       }));
 
 
 is(ref CTX('xml_config'), 

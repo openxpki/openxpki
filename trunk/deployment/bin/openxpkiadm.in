@@ -46,24 +46,25 @@ sub get_config {
 	{
 	    CONFIG => $cfgfile,
 	    TASKS  => [ 
-		'xml_config', 
-		'i18n', 
-                'dbi_log',
-		'log', 
-                'api',
-		@additional_tasks,
+            'current_xml_config', 
+            'i18n', 
+            'dbi_log',
+            'log', 
+            'api',
+            @additional_tasks,
 		],
-            SILENT => 1,
+        SILENT => 1,
 	});
 }
 
 sub initdb {
     my $args = shift;
 
-
-    my $type = CTX('xml_config')->get_xpath (
+    no warnings;
+    my $type = $OpenXPKI::Server::Init::current_xml_config->get_xpath (
 	XPATH    => [ 'common/database/type' ],
 	COUNTER  => [ 0 ]);
+    use warnings;
     
     print STDERR "Database type: $type\n";
 
@@ -226,6 +227,26 @@ sub deploy {
     print STDERR "wrote $dstfile\n";
 
     return 1;
+}
+
+sub list_realms {
+    my @realms;
+    my $config = OpenXPKI::XML::Config->new(
+        CONFIG => $configfile,
+    );
+    my $nr_of_realms = $config->get_xpath_count(
+        XPATH   => [ 'pki_realm' ],
+        COUNTER => [ ],
+    );
+
+    my $realm_index;
+    for (my $i=0; $i < $nr_of_realms; $i++) {
+        push @realms, $config->get_xpath(
+              XPATH    => [ 'pki_realm', 'name' ],
+              COUNTER  => [ $i         , 0 ],
+        );
+    }
+    return @realms;
 }
 
 sub list_keys {
@@ -1029,7 +1050,7 @@ if ($cmd eq 'deploy') {
 } 
 
 if ($cmd eq 'certificate') {
-    if (! get_config($configfile, qw( crypto_layer pki_realm_light dbi_backend ))) {
+    if (! get_config($configfile, qw( dbi_backend xml_config crypto_layer ))) {
 	print STDERR "Could not obtain OpenXPKI instance configuration\n";
 	exit 1;
     }
@@ -1038,8 +1059,8 @@ if ($cmd eq 'certificate') {
 
     # FIXME: compare OpenXPKI::Server::Init, we use the first realm if none
     # is available, this is a completely arbitrary choice!
-    my $realms = CTX('pki_realm');
-    my $firstrealm = (sort keys %{$realms})[0];
+    my @realms = list_realms();
+    my $firstrealm = $realms[0];
     
     my $realm = $params{realm};
     if (! defined $realm || $realm eq '') {
@@ -1069,7 +1090,7 @@ if ($cmd eq 'certificate') {
             push @realms, $params{realm};
         }
         else {
-            @realms = keys %{CTX('pki_realm')};
+            @realms = list_realms();
             push @realms, undef; # add the magic empty realm
         }
 
@@ -1625,15 +1646,16 @@ if ($cmd eq 'certificate') {
 }
 
 if ($cmd eq 'key') {
-    if (! get_config($configfile, qw( crypto_layer pki_realm_light ))) {
+    if (! get_config($configfile, qw( dbi_backend xml_config crypto_layer))) {
 	print STDERR "Could not obtain OpenXPKI instance configuration\n";
 	exit 1;
     }
 
+    my @pki_realms = list_pki_realms();
     if (! defined $params{realm} ||
-	! exists CTX('pki_realm')->{$params{realm}}) {
+        ! grep {$params{realm} eq $_} @pki_realms) {
 	print STDERR "Please specify one of the following PKI realms via --realm:\n";
-	foreach my $realm (keys %{CTX('pki_realm')}) {
+	foreach my $realm (list_realms()) {
 	    print "  $realm\n";
 	}
 

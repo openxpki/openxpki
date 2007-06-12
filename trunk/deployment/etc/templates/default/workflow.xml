@@ -1,50 +1,72 @@
 <workflow_config id="default">
-  <!-- FIXME: for now we are using file specifications here and let
-       Workflow read and parse the corresponding XML files itself.
-       In the future the workflow configuration should be part of this
-       XML structure. 
-    -->
   <workflows>
-<!--    <configfile>[% dir.openxpkiconfdir %]/workflow_def_init_ca.xml</configfile> -->
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_signing_request.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_signing_request_offline_ca.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_issuance.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_ldap_publishing.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_revocation_request.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_certificate_revocation_request_offline_ca.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_crl_issuance.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_scep_request.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_dataexchange_export.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_dataexchange_import.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_smartcard_personalization.xml</configfile>
-<!--    <configfile>[% dir.openxpkiconfdir %]/workflow_def_request_pkcs10.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_request_dataonly.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_def_crl_issuance.xml</configfile>
--->
+    [% IF deployment.xmlstyle == 'multi-file' %]
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_signing_request.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_signing_request_offline_ca.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_issuance.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_ldap_publishing.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_revocation_request.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_revocation_request_offline_ca.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_crl_issuance.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_scep_request.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_dataexchange_export.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_dataexchange_import.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_personalization.xml"/>
+    [% ELSIF deployment.xmlstyle == 'all-in-one' %]
+      [% INCLUDE workflow_def_certificate_signing_request.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_certificate_signing_request_offline_ca.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_certificate_issuance.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_certificate_ldap_publishing.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_certificate_revocation_request.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_certificate_revocation_request_offline_ca.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_crl_issuance.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_scep_request.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_dataexchange_export.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_dataexchange_import.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_smartcard_personalization.xml FILTER indent(4) %]
+    [% END %]
   </workflows>
     
   <activities>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_null.xml</configfile>
-    <!--    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_init_ca.xml</configfile>
-      -->
-    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_certificate_signing_request.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_certificate_issuance.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_certificate_ldap_publishing.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_certificate_revocation_request.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_crl_issuance.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_scep_request.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_dataexchange.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_activity_smartcard_personalization.xml</configfile>
+    [% IF deployment.xmlstyle == 'multi-file' %]
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_null.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_signing_request.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_issuance.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_ldap_publishing.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_revocation_request.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_crl_issuance.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_scep_request.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_dataexchange.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_personalization.xml"/>
+    [% ELSIF deployment.xmlstyle == 'all-in-one' %]
+      [% INCLUDE workflow_activity_null.xml FILTER indent(4) %]
+      [% INCLUDE workflow_activity_certificate_signing_request.xml FILTER indent(4) %]
+      [% INCLUDE workflow_activity_certificate_issuance.xml FILTER indent(4) %]
+      [% INCLUDE workflow_activity_certificate_ldap_publishing.xml FILTER indent(4) %]
+      [% INCLUDE workflow_activity_certificate_revocation_request.xml FILTER indent(4) %]
+      [% INCLUDE workflow_activity_crl_issuance.xml FILTER indent(4) %]
+      [% INCLUDE workflow_activity_scep_request.xml FILTER indent(4) %]
+      [% INCLUDE workflow_activity_dataexchange.xml FILTER indent(4) %]
+      [% INCLUDE workflow_activity_smartcard_personalization.xml FILTER indent(4) %]
+    [% END %]
   </activities>
 
   <validators>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_validator_certificate_signing_request.xml</configfile>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_validator_certificate_revocation_request.xml</configfile>
-<!--    <configfile>[% dir.openxpkiconfdir %]/workflow_validator_crl_issuance.xml</configfile> -->
+    [% IF deployment.xmlstyle == 'multi-file' %]
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_signing_request.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_revocation_request.xml"/>
+    [% ELSIF deployment.xmlstyle == 'all-in-one' %]
+      [% INCLUDE workflow_validator_certificate_signing_request.xml FILTER indent(4) %]
+      [% INCLUDE workflow_validator_certificate_revocation_request.xml FILTER indent(4) %]
+    [% END %]
   </validators>
 
   <conditions>
-    <configfile>[% dir.openxpkiconfdir %]/workflow_condition.xml</configfile>
+    [% IF deployment.xmlstyle == 'multi-file' %]
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition.xml"/>
+    [% ELSIF deployment.xmlstyle == 'all-in-one' %]
+      [% INCLUDE workflow_condition.xml FILTER indent(4) %]
+    [% END %]
   </conditions>
 
 </workflow_config>

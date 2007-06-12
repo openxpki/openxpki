@@ -27,6 +27,7 @@ our %COLUMN = (
     "format"           => "TEXT",
     "data"             => "LONGTEXT",
 
+    'config_identifier' => 'TEXT_KEY',
     "pki_realm"        => "TEXT_KEY",
     "ca_name"          => "TEXT_KEY",
     "issuing_ca"       => "TEXT_KEY",

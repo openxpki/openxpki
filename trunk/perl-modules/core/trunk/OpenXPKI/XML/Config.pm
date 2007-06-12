@@ -16,6 +16,8 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use English;
 
+use Digest::SHA1 qw( sha1_base64 );
+
 use Data::Dumper;
 sub new
 { 
@@ -30,9 +32,60 @@ sub new
 
     ##! 16: 'keys: ' . Dumper $keys
 
-    $self->{CACHE} = OpenXPKI::XML::Cache->new (@_);
+    if (! exists $keys->{SERIALIZED_CACHES}) {
+        # old behaviour (for current_xml_config), only create a
+        # cache object for the default config identifier
+        $self->{CACHE}->{default} = OpenXPKI::XML::Cache->new (@_);
+    }
+    else {
+        # serialized XML::Simple objects were passed, create a
+        # cache object for each of them. They are identified by their
+        # SHA1 hash.
+        foreach my $serialization (@{ $keys->{SERIALIZED_CACHES} }) {
+            ##! 64: 'serialization: ' . $serialization
+            my $config_id = sha1_base64($serialization);
+            ##! 16: 'config id: ' . $config_id
+            $self->{CACHE}->{$config_id} = OpenXPKI::XML::Cache->new(
+                SERIALIZED_CACHE => $serialization,
+            );
+        }
+        if (! exists $keys->{DEFAULT}) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_XML_CONFIG_NEW_SERIALIZED_CACHES_BUT_NO_DEFAULT_PASSED',
+            );
+        }
+        ##! 16: 'default cache: ' . $keys->{DEFAULT}
+        $self->{CACHE}->{default} = $self->{CACHE}->{$keys->{DEFAULT}};   
+        $self->{CURRENT_CONFIG_ID} = $keys->{DEFAULT};
+        if (! defined $self->{CACHE}->{default}) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_XML_CONFIG_NEW_INCORRECT_DEFAULT_CACHE',
+            );
+        }
+    }
 
     return $self;
+}
+
+sub get_current_config_id {
+    my $self = shift;
+    ##! 1: 'start'
+    return $self->{CURRENT_CONFIG_ID};
+}
+
+sub get_serialized {
+    my $self    = shift;
+    my $arg_ref = shift;
+    ##! 1: 'start'
+
+    if (exists $arg_ref->{CONFIG_ID}) {
+        ##! 4: 'config_id passed: ' . $arg_ref->{CONFIG_ID}
+        return $self->{CACHE}->{$arg_ref->{CONFIG_ID}}->get_serialized();
+    }
+    else {
+        ##! 4: 'no config id passed, getting serialized default cache'
+        return $self->{CACHE}->{default}->get_serialized();
+    }
 }
 
 sub get_xpath
@@ -43,7 +96,16 @@ sub get_xpath
     my %keys = $self->__get_fixed_params(@_);
     ##! 16: 'keys: ' . Dumper \%keys
 
-    return $self->{CACHE}->get_xpath( %keys );
+    return $self->{CACHE}->{$keys{CONFIG_ID}}->get_xpath( %keys );
+}
+
+sub get_xpath_hashref {
+    my $self = shift;
+    ##! 1: 'start'
+    
+    my %keys = $self->__get_fixed_params(@_);
+
+    return $self->{CACHE}->{$keys{CONFIG_ID}}->get_xpath_hashref( %keys );
 }
 
 sub get_xpath_list
@@ -54,7 +116,7 @@ sub get_xpath_list
     my %keys = $self->__get_fixed_params(@_);
     delete $keys{COUNTER}->[scalar @{$keys{COUNTER}}-1];
 
-    return $self->{CACHE}->get_xpath_list (%keys);
+    return $self->{CACHE}->{$keys{CONFIG_ID}}->get_xpath_list (%keys);
 }
 
 sub get_xpath_count
@@ -65,7 +127,7 @@ sub get_xpath_count
     my %keys = $self->__get_fixed_params(@_);
     delete $keys{COUNTER}->[scalar @{$keys{COUNTER}}-1];
 
-    return $self->{CACHE}->get_xpath_count (%keys);
+    return $self->{CACHE}->{$keys{CONFIG_ID}}->get_xpath_count (%keys);
 }
 
 sub __get_fixed_params
@@ -74,8 +136,44 @@ sub __get_fixed_params
     my $keys = { @_ };
     ##! 1: "start"
 
-    ## first make all parameters well-formed arrays
+    my %params = (XPATH => [], COUNTER => []);
 
+    if (! exists $keys->{CONFIG_ID} || ! defined $keys->{CONFIG_ID}) {
+        my $i = 0;
+        # check if someone in the caller chain comes from the workflow
+        # namespace
+        my @callers = ();
+        while (my $caller = caller($i)) {
+            # get detailed caller information for debugging purposes
+            my ($package, $filename, $line, $subroutine, $hasargs,
+                $wantarray, $evaltext, $is_require, $hints, $bitmask)
+                = caller($i);
+            push @callers, "$package:$subroutine:$line";
+
+            ##! 64: 'caller: ' . $caller
+            if (   $caller =~ m{ \A OpenXPKI::Server::Workflow }xms
+                || $caller eq 'OpenXPKI::Server::Init'
+               ) {
+                # caller is from the Workflow namespace or from
+                # Server::Init, so he has to provide a config identifier
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_OPENXPKI_XML_CONFIG___GET_FIXED_PARAMS_NO_CONFIG_IDENFIER',
+                    params  => {
+                        'CALLER_CHAIN' => join(q{, }, @callers),
+                    }
+                );
+            }
+            $i++;
+        }
+        # the loop before terminated successfully,
+        # we can use the default config id
+        $params{'CONFIG_ID'} = 'default';
+    }
+    else {
+        $params{'CONFIG_ID'} = $keys->{'CONFIG_ID'};
+    }
+        
+    ## first make all parameters well-formed arrays
     my @xpath   = ();
     my @counter = ();
     if (not exists $keys->{XPATH})
@@ -113,8 +211,6 @@ sub __get_fixed_params
 
     ## normalize parameters for XML cache
 
-    my %params = (XPATH => [], COUNTER => []);
-
     for (my $i=0; $i<scalar @xpath; $i++)
     {
         ##! 4: "scan: ".$xpath[$i]
@@ -137,8 +233,18 @@ sub __get_fixed_params
 
 sub dump
 {
-    my $self = shift;
-    return $self->{CACHE}->dump (@_);
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $cfg_id;
+    if (ref $arg_ref eq 'HASH' && exists $arg_ref->{CONFIG_ID}) {
+        $cfg_id  = $arg_ref->{CONFIG_ID};
+    }
+    if (! defined $cfg_id) {
+        return $self->{CACHE}->{default}->dump (@_);
+    }
+    else {
+        return $self->{CACHE}->{$cfg_id}->dump (@_);
+    }
 }
 
 1;
@@ -236,6 +342,13 @@ result is the number of available values with the specified path.
 The interface is the same like for get_xpath_count. Only the return
 value is different. It returns an array reference to the found
 values.
+
+=head2 get_xpath_hashref
+
+Returns the hashref structure as used by XML::Simple starting at
+the node specified by XPATH and COUNTER (cf. get_xpath). This is
+mainly used to pass it on to other modules that use the same
+structure internally, such as Workflow.pm
 
 =head2 dump
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 8;
+plan tests => 7;
 
 diag "OpenXPKI::Server::ACL Performance\n";
 
@@ -16,7 +16,12 @@ ok(1);
 OpenXPKI::Server::Init::init(
     {
 	CONFIG => 't/config.xml',
-	TASKS => [ 'xml_config' ],
+	TASKS => [
+        'current_xml_config',
+        'log',
+        'dbi_backend',
+        'xml_config',
+    ],
 	SILENT => 1,
     });
 
@@ -26,9 +31,6 @@ my $session = OpenXPKI::Server::Session->new ({
                   LIFETIME  => 5});
 ok($session);
 ok(OpenXPKI::Server::Context::setcontext({'session' => $session}));
-ok(OpenXPKI::Server::Context::setcontext({
-    log => OpenXPKI::Server::Log::NOOP->new()}),
-    'Dummy log object in CTX');
 
 ## configure the session
 $session->set_pki_realm ("Test Root CA");
