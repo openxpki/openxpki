@@ -30,6 +30,8 @@ $XML::SAX::ParserPackage = "XML::SAX::PurePerl";
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Serialization::Simple;
+
 use Memoize;
 
 use Data::Dumper;
@@ -49,8 +51,9 @@ sub new
 
     my $keys = { @_ };
 
-    $self->{config} = $keys->{CONFIG};
-    $self->{schema} = $keys->{SCHEMA} if (exists $keys->{SCHEMA});
+    $self->{config}           = $keys->{CONFIG};
+    $self->{schema}           = $keys->{SCHEMA} if (exists $keys->{SCHEMA});
+    $self->{serialized_cache} = $keys->{SERIALIZED_CACHE};
 
 #    memoize('get_xpath',       NORMALIZER => 'normalize_get_xpath');
 #    memoize('get_xpath_count', NORMALIZER => 'normalize_get_xpath');
@@ -89,6 +92,14 @@ sub init
     }
 
     ## load the data
+
+    if ($self->{serialized_cache}) {
+        ##! 16: 'serialized cache exists, using it'
+        my $ser = OpenXPKI::Serialization::Simple->new();
+        $self->{cache} = $ser->deserialize($self->{serialized_cache});
+        ##! 16: 'deserialized cache: ' . Dumper $self->{cache}
+        return 1;
+    }
 
     ##! 2: "load the XML data"
     $self->{xs} = XML::Simple->new (ForceArray    => 1,
@@ -130,6 +141,13 @@ sub init
     ##! 64: 'cache after super resolution: ' . Dumper $self->{cache}
 
     return 1;
+}
+
+sub get_serialized {
+    my $self = shift;
+
+    my $ser = OpenXPKI::Serialization::Simple->new();
+    return $ser->serialize($self->{cache});
 }
 
 sub __super_tags_found {
@@ -720,6 +738,37 @@ sub dump
         }
     }
     return $msg;
+}
+
+sub get_xpath_hashref {
+    my $self = shift;
+    my $keys = { @_ };
+    ##! 1: 'start'
+
+    my $item = $self->{cache};
+    for (my $i = 0; $i < scalar @{$keys->{XPATH}}; $i++) {
+        if (! defined $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]]) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_HASHREF_MISSING_ELEMENT",
+                params  => {"XPATH" =>    $self->__get_serialized_xpath($keys),
+                            "TAG"   =>    $keys->{XPATH}->[$i],
+                            "POSITION" => $keys->{COUNTER}->[$i]});
+        }
+        $item = $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]];
+    }
+    if (ref $item ne 'HASH') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_XML_CACHE_GET_XPATH_HASHREF_RESULT_NOT_A_HASHREF',
+            params  => {
+                'XPATH' => $self->__get_serialized_xpath($keys),
+            },
+        );
+    }
+    ##! 64: 'item: ' . Dumper $item
+    my $copy = {};
+    $self->__deepcopy($item, $copy);
+    ##! 64: 'copy: ' . Dumper $item
+    return $copy;
 }
 
 sub get_xpath
