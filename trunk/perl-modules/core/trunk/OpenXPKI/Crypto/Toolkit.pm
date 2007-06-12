@@ -100,6 +100,7 @@ sub __load_config {
     my $type_index  = $arg_ref->{TOKEN_INDEX};
     my $certificate = $arg_ref->{CERTIFICATE};
     $params_of{$ident}->{SECRET} = $arg_ref->{SECRET};
+    my $config_id   = $arg_ref->{CONFIG_ID};
 
     my $realm;
     my $type_id;
@@ -109,8 +110,9 @@ sub __load_config {
 
     eval {
         $realm = CTX('xml_config')->get_xpath(
-            XPATH   => [ 'pki_realm' , 'name' ],
-            COUNTER => [ $realm_index, 0      ],
+            XPATH     => [ 'pki_realm' , 'name' ],
+            COUNTER   => [ $realm_index, 0      ],
+            CONFIG_ID => $config_id,
         );
     };
     if (! defined $realm) {
@@ -125,8 +127,9 @@ sub __load_config {
 
     eval {
         $type_id = CTX('xml_config')->get_xpath(
-            XPATH   => [ 'pki_realm' , $type_path , 'id' ],
-            COUNTER => [ $realm_index, $type_index, 0    ],
+            XPATH     => [ 'pki_realm' , $type_path , 'id' ],
+            COUNTER   => [ $realm_index, $type_index, 0    ],
+            CONFIG_ID => $config_id,
         );
     };
     if (! defined $type_id) {
@@ -163,8 +166,10 @@ sub __load_config {
 	eval {
 	    ##! 8: "try to get attribute_count"
 	    $attribute_count = CTX('xml_config')->get_xpath_count (
-		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
-		COUNTER  => [ $realm_index, $type_index, 0 ]);
+            XPATH     => [ 'pki_realm', $type_path, 'token', $key ],
+            COUNTER   => [ $realm_index, $type_index, 0 ],
+            CONFIG_ID => $config_id,
+        );
 	    ##! 8: "attribute_count ::= ".$attribute_count
 	};
 
@@ -207,10 +212,12 @@ sub __load_config {
 
 	if ($attribute_count == 1) {
 	    my $value = CTX('xml_config')->get_xpath(
-		XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
-		COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
+            XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
+            COUNTER  => [ $realm_index, $type_index, 0, 0 ],
+            CONFIG_ID => $config_id,
+        );
     	    $params_of{$ident}->{uc($key)} = $value;
-	}
+    }
     }
     if ($type_path eq 'ca' || $type_path eq 'scep') { # default tokens don't have a certificate
         # certificate files are no longer defined in token.xml, thus

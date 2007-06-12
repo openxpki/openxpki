@@ -33,6 +33,7 @@ sub new {
     $self->{TYPE}      = $keys->{TYPE}      if ($keys->{TYPE});
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
     $self->{ID}        = $keys->{ID}        if ($keys->{ID});
+    $self->{CONFIG_ID} = $keys->{CONFIG_ID} if ($keys->{CONFIG_ID});
 
     if (not $self->{config})
     {
@@ -88,7 +89,7 @@ sub new {
 
     ##! 2: "parameters ok"
 
-    $self->load_profile ();
+    $self->load_profile($self->{CONFIG_ID});
     ##! 2: "config loaded"
 
     return $self;
@@ -96,11 +97,12 @@ sub new {
 
 sub load_profile
 {
-    my $self = shift;
+    my $self   = shift;
+    my $cfg_id = shift;
 
     ## scan for correct pki realm and ca
 
-    my %result    = $self->get_path();
+    my %result    = $self->get_path($cfg_id);
     my $pki_realm = $result{PKI_REALM};
 
     ## scan for correct profile
@@ -123,27 +125,30 @@ sub load_profile
 
     push @profile_path, "profile";
 
-    my $nr_of_profiles 
-	= $self->{config}->get_xpath_count (XPATH   => [@profile_path],
-					    COUNTER => [@profile_counter]);
+    my $nr_of_profiles = $self->{config}->get_xpath_count(
+            XPATH     => [@profile_path],
+			COUNTER   => [@profile_counter],
+            CONFIG_ID => $cfg_id,
+    );
     my $found = 0;
   FINDPROFILE:
     for (my $ii = 0; $ii < $nr_of_profiles; $ii++)
     {
-	if ($self->{config}->get_xpath(
-		XPATH   => [@profile_path, "id"],
-		COUNTER => [@profile_counter, $ii, 0])
-	    eq $requested_id)
-	{
-	    push @profile_counter, $ii;
-	    $found = 1;
-	    last FINDPROFILE;
-	}
+        if ($self->{config}->get_xpath(
+            XPATH   => [@profile_path, "id"],
+            COUNTER => [@profile_counter, $ii, 0],
+            CONFIG_ID => $cfg_id)
+            eq $requested_id)
+        {
+            push @profile_counter, $ii;
+            $found = 1;
+            last FINDPROFILE;
+        }
     }
     
     if (! $found) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_UNDEFINED_PROFILE");
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_UNDEFINED_PROFILE");
     }
 
     ## now we have a correct starting point to load the profile
@@ -152,8 +157,10 @@ sub load_profile
 
 
     $self->{PROFILE}->{DIGEST} = $self->{config}->get_xpath (
-                                     XPATH   => [@profile_path, "digest"],
-                                     COUNTER => [@profile_counter, 0]);
+         XPATH     => [@profile_path, "digest"],
+         COUNTER   => [@profile_counter, 0],
+         CONFIG_ID => $cfg_id,
+    );
 
 
 
@@ -164,6 +171,7 @@ sub load_profile
 	{
 	    XPATH     => \@profile_path,
 	    COUNTER   => \@profile_counter,
+        CONFIG_ID => $cfg_id,
 	});
 
     if (! exists $entry_validity{notafter}) {
@@ -184,7 +192,7 @@ sub load_profile
     # relative notafter is always relative to notbefore
     $entry_validity{notafter}->{REFERENCEDATE} = $self->{PROFILE}->{NOTBEFORE};
     $self->{PROFILE}->{NOTAFTER} = OpenXPKI::DateTime::get_validity(
-	$entry_validity{notafter},
+        $entry_validity{notafter},
 	);
 
     
@@ -199,8 +207,11 @@ sub load_profile
                      "user_notice", "policy_identifier", "oid",
                      "netscape/comment", "netscape/certificate_type", "netscape/cdp")
     {
-        $self->load_extension (PATH    => [@profile_path, $ext],
-                               COUNTER => [@profile_counter]);
+        $self->load_extension(
+            PATH    => [@profile_path, $ext],
+            COUNTER => [@profile_counter],
+            CONFIG_ID => $cfg_id,
+        );
     }
 
     ##! 2: Dumper($self->{PROFILE})

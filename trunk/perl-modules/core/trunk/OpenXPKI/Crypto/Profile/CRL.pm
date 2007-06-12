@@ -30,6 +30,7 @@ sub new {
     $self->{config}    = $keys->{CONFIG}    if ($keys->{CONFIG});
     $self->{PKI_REALM} = $keys->{PKI_REALM} if ($keys->{PKI_REALM});
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
+    $self->{CONFIG_ID} = $keys->{CONFIG_ID} if ($keys->{CONFIG_ID});
 
     if (not $self->{config})
     {
@@ -62,7 +63,7 @@ sub load_profile
 
     ## scan for correct pki realm and ca
 
-    my %result = $self->get_path();
+    my %result = $self->get_path($self->{CONFIG_ID});
     my $pki_realm = $result{PKI_REALM};
     my $ca        = $result{CA};
 
@@ -76,22 +77,25 @@ sub load_profile
     push @profile_path, "profile";
 
 
-    my $nr_of_profiles 
-	= $self->{config}->get_xpath_count (XPATH   => [@profile_path],
-					    COUNTER => [@profile_counter]);
+    my $nr_of_profiles = $self->{config}->get_xpath_count(
+        XPATH     => [ @profile_path    ],
+		COUNTER   => [ @profile_counter ],
+        CONFIG_ID => $self->{CONFIG_ID},
+    );
     my $found = 0;
   FINDPROFILE:
     for (my $ii = 0; $ii < $nr_of_profiles; $ii++)
     {
-	if ($self->{config}->get_xpath(
-		XPATH   => [@profile_path, "id"],
-		COUNTER => [@profile_counter, $ii, 0])
-	    eq $requested_id)
-	{
-	    push @profile_counter, $ii;
-	    $found = 1;
-	    last FINDPROFILE;
-	}
+        if ($self->{config}->get_xpath(
+            XPATH     => [@profile_path, "id"],
+            COUNTER   => [@profile_counter, $ii, 0],
+            CONFIG_ID => $self->{CONFIG_ID})
+            eq $requested_id)
+        {
+            push @profile_counter, $ii;
+            $found = 1;
+            last FINDPROFILE;
+        }
     }
     
     if (! $found) {
@@ -103,22 +107,23 @@ sub load_profile
 
     ## load general parameters
 
-    $self->{PROFILE}->{DIGEST} = $self->{config}->get_xpath (
-                                     XPATH   => [@profile_path, "digest"],
-                                     COUNTER => [@profile_counter, 0]);
-
+    $self->{PROFILE}->{DIGEST} = $self->{config}->get_xpath(
+        XPATH     => [@profile_path, "digest"],
+        COUNTER   => [@profile_counter, 0],
+        CONFIG_ID => $self->{CONFIG_ID},
+    );
 
     my %entry_validity = $self->get_entry_validity(
 	{
 	    XPATH     => \@profile_path,
 	    COUNTER   => \@profile_counter,
+        CONFIG_ID => $self->{CONFIG_ID},
 	});
 
     if (! exists $entry_validity{notafter}) {
 	OpenXPKI::Exception->throw (
 	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
 	    );
-	
     }
 
     # notbefore is not applicable for CRLs (and may lead to incorrect

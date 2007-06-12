@@ -101,8 +101,9 @@ sub __load_secret
     my $keys = shift;
 
     ##! 2: "get the arguments"
-    my $group = $keys->{GROUP};
-    my $realm = $keys->{PKI_REALM};
+    my $group  = $keys->{GROUP};
+    my $realm  = $keys->{PKI_REALM};
+    my $cfg_id = $keys->{CONFIG_ID};
 
     if (not $realm)
     {
@@ -124,32 +125,42 @@ sub __load_secret
     ##! 2: "get the position of the group configuration"
 
     my $realm_index = $self->__get_list_member_by_id ({
-                          XPATH    => ['pki_realm'],
-                          COUNTER  => [],
-                          ID_LABEL => 'name',
-                          ID_VALUE => $realm});
+                          XPATH     => ['pki_realm'],
+                          COUNTER   => [],
+                          ID_LABEL  => 'name',
+                          ID_VALUE  => $realm,
+                          CONFIG_ID => $cfg_id,
+    });
     my $group_index = $self->__get_list_member_by_id ({
-                          XPATH    => ['pki_realm', 'common', 'secret', 'group'],
-                          COUNTER  => [$realm_index, 0, 0],
-                          ID_LABEL => 'id',
-                          ID_VALUE => $group});
+                          XPATH     => ['pki_realm', 'common', 'secret', 'group'],
+                          COUNTER   => [$realm_index, 0, 0],
+                          ID_LABEL  => 'id',
+                          ID_VALUE  => $group,
+                          CONFIG_ID => $cfg_id,
+    });
 
     ##! 2: "initialize secret object"
     my $method = CTX('xml_config')->get_xpath (
                           XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'id' ],
-                          COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+                          COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ],
+                          CONFIG_ID => $cfg_id,
+    );
     $self->{SECRET}->{$realm}->{$group}->{TYPE}  = $method;
     $self->{SECRET}->{$realm}->{$group}->{LABEL} = 
         CTX('xml_config')->get_xpath (
                           XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'label' ],
-                          COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+                          COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ],
+                          CONFIG_ID => $cfg_id,
+    );
     switch ($method)
     {
         case "literal" {
             my $value =
                 CTX('xml_config')->get_xpath (
                     XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'value' ],
-                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ],
+                    CONFIG_ID => $cfg_id,
+                );
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({TYPE => "Plain", PARTS => 1});
             $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($value);
                          }
@@ -157,7 +168,9 @@ sub __load_secret
             my $parts =
                 CTX('xml_config')->get_xpath (
                     XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'total_shares' ],
-                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ],
+                    CONFIG_ID => $cfg_id,
+                );
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
                     TYPE => "Plain",
                     PARTS => $parts});
@@ -166,11 +179,15 @@ sub __load_secret
             my $total =
                 CTX('xml_config')->get_xpath (
                     XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'total_shares' ],
-                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ],
+                    CONFIG_ID => $cfg_id,
+                );
             my $required =
                 CTX('xml_config')->get_xpath (
                     XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'method', 'required_shares' ],
-                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+                    COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ],
+                    CONFIG_ID => $cfg_id,
+                );
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
                     TYPE => "Split",
                     QUORUM => { K => $required, N => $total}});
@@ -185,6 +202,7 @@ sub __load_secret
     $self->__set_secret_from_cache({
         PKI_REALM => $realm,
         GROUP     => $group,
+        CONFIG_ID => $cfg_id,
     });
 
     ##! 1: "finish"
@@ -195,8 +213,9 @@ sub __set_secret_from_cache {
     my $self    = shift;
     my $arg_ref = shift;
 
-    my $realm = $arg_ref->{'PKI_REALM'};
-    my $group = $arg_ref->{'GROUP'};
+    my $realm  = $arg_ref->{'PKI_REALM'};
+    my $group  = $arg_ref->{'GROUP'};
+    my $cfg_id = $arg_ref->{'CONFIG_ID'};
 
     ##! 2: "get the position of the group configuration"
 
@@ -204,17 +223,21 @@ sub __set_secret_from_cache {
                           XPATH    => ['pki_realm'],
                           COUNTER  => [],
                           ID_LABEL => 'name',
-                          ID_VALUE => $realm});
+                          ID_VALUE => $realm,
+                          CONFIG_ID => $cfg_id });
     my $group_index = $self->__get_list_member_by_id ({
                           XPATH    => ['pki_realm', 'common', 'secret', 'group'],
                           COUNTER  => [$realm_index, 0, 0],
                           ID_LABEL => 'id',
-                          ID_VALUE => $group});
+                          ID_VALUE => $group,
+                          CONFIG_ID => $cfg_id });
     ##! 2: "load cache configuration"
     $self->{SECRET}->{$realm}->{$group}->{CACHE} = 
         CTX('xml_config')->get_xpath (
             XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'cache', 'type' ],
-            COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ]);
+            COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ],
+            CONFIG_ID => $cfg_id,
+        );
     if ($self->{SECRET}->{$realm}->{$group}->{CACHE} ne "session" and
         $self->{SECRET}->{$realm}->{$group}->{CACHE} ne "daemon")
     {
@@ -451,10 +474,12 @@ sub get_token
     my $keys = { @_ };
     ##! 1: "start"
 
-    my $type  = $keys->{TYPE};
-    my $name  = $keys->{ID};
-    my $realm = $keys->{PKI_REALM};
-    my $cert  = $keys->{CERTIFICATE};
+    my $type   = $keys->{TYPE};
+    my $name   = $keys->{ID};
+    my $realm  = $keys->{PKI_REALM};
+    my $cert   = $keys->{CERTIFICATE};
+    my $cfg_id = $keys->{CONFIG_ID};
+    ##! 64: 'cfg_id: ' . $cfg_id
 
     if (not $type)
     {
@@ -481,6 +506,7 @@ sub get_token
             NAME        => $name,
             PKI_REALM   => $realm,
             CERTIFICATE => $cert,
+            CONFIG_ID   => $cfg_id,
         );
     }
     ##! 2: "token added"
@@ -504,10 +530,12 @@ sub __add_token
     my $keys = { @_ };
     ##! 1: "start"
 
-    my $type  = $keys->{TYPE};
-    my $name  = $keys->{NAME};
-    my $realm = $keys->{PKI_REALM};
-    my $cert  = $keys->{CERTIFICATE};
+    my $type   = $keys->{TYPE};
+    my $name   = $keys->{NAME};
+    my $realm  = $keys->{PKI_REALM};
+    my $cert   = $keys->{CERTIFICATE};
+    my $cfg_id = $keys->{CONFIG_ID};
+    ##! 64: 'cfg_id: ' . $cfg_id
 
     ## build path from token type
 
@@ -540,22 +568,27 @@ sub __add_token
     ## get matching pki_realm
 
     my $realm_index = $self->__get_list_member_by_id ({
-                          XPATH    => ['pki_realm'],
-                          COUNTER  => [],
-                          ID_LABEL => 'name',
-                          ID_VALUE => $realm});
+                          XPATH     => ['pki_realm'],
+                          COUNTER   => [],
+                          ID_LABEL  => 'name',
+                          ID_VALUE  => $realm,
+                          CONFIG_ID => $cfg_id,
+    });
  
     ## get matching type
     my $type_count = CTX('xml_config')->get_xpath_count (
-                          XPATH   => [ 'pki_realm', $type_path ],
-                          COUNTER => [ $realm_index ]);
+                          XPATH     => [ 'pki_realm', $type_path ],
+                          COUNTER   => [ $realm_index ],
+                          CONFIG_ID => $cfg_id,
+    );
     my $type_index;
     for (my $i=0; $i<$type_count; $i++)
     {
         ##! 4: "checking name of type"
         next if ($name ne CTX('xml_config')->get_xpath (
                               XPATH    => [ 'pki_realm', $type_path, 'id' ],
-                              COUNTER  => [ $realm_index, $i, 0 ]));
+                              COUNTER  => [ $realm_index, $i, 0 ],
+                              CONFIG_ID => $cfg_id));
         ##! 4: "pki_realm and name ok"
         $type_index = $i;
         last;
@@ -569,8 +602,10 @@ sub __add_token
 
     ##! 2: "determine crypto backend"
     my $backend = CTX('xml_config')->get_xpath (
-		XPATH    => [ 'pki_realm', $type_path, 'token', 'backend' ],
-		COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
+		XPATH     => [ 'pki_realm', $type_path, 'token', 'backend' ],
+		COUNTER   => [ $realm_index, $type_index, 0, 0 ],
+        CONFIG_ID => $cfg_id,
+    );
     if (! defined $backend) {
 	OpenXPKI::Exception->throw (
 	    message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_BACKEND_UNDEFINED",
@@ -586,8 +621,10 @@ sub __add_token
         ## try to get the secret
         ## the secret is not mandatory (e.g. default tokens)
         $secret = CTX('xml_config')->get_xpath (
-                      XPATH    => [ 'pki_realm', $type_path, 'token', 'secret' ],
-                      COUNTER  => [ $realm_index, $type_index, 0, 0 ]);
+                      XPATH     => [ 'pki_realm', $type_path, 'token', 'secret' ],
+                      COUNTER   => [ $realm_index, $type_index, 0, 0 ],
+                      CONFIG_ID => $cfg_id,
+        );
     };
     if (not $EVAL_ERROR)
     {
@@ -599,7 +636,7 @@ sub __add_token
                              "TYPE" => $type, 
                             });
         }
-        $self->__load_secret({PKI_REALM => $realm, GROUP => $secret})
+        $self->__load_secret({PKI_REALM => $realm, GROUP => $secret, CONFIG_ID => $cfg_id})
             if (not exists $self->{SECRET} or
                 not exists $self->{SECRET}->{$realm} or
                 not exists $self->{SECRET}->{$realm}->{$secret});
@@ -634,7 +671,8 @@ sub __add_token
                     TOKEN_TYPE      => $type_path,
                     TOKEN_INDEX     => $type_index,
                     CERTIFICATE     => $cert,
-                    SECRET          => $secret
+                    SECRET          => $secret,
+                    CONFIG_ID       => $cfg_id,
                 });
     };
     if (my $exc = OpenXPKI::Exception->caught())
@@ -675,18 +713,24 @@ sub __get_list_member_by_id
     my $counter  = $args->{COUNTER};
     my $id_label = $args->{ID_LABEL};
     my $id_value = $args->{ID_VALUE};
+    my $cfg_id   = $args->{CONFIG_ID};
+    ##! 64: 'cfg_id: ' . $cfg_id
 
     ##! 2: "get matching list member"
 
     my $count = CTX('xml_config')->get_xpath_count (
-                    XPATH => $xpath, COUNTER => $counter);
+        XPATH     => $xpath,
+        COUNTER   => $counter,
+        CONFIG_ID => $cfg_id,
+    );
     my $index = undef;
     for (my $i=0; $i<$count; $i++)
     {
         ##! 4: "checking id"
         next if ($id_value ne CTX('xml_config')->get_xpath (
-                                  XPATH    => [ @{$xpath}, $id_label ],
-                                  COUNTER  => [ @{$counter}, $i, 0 ]));
+                                  XPATH     => [ @{$xpath}, $id_label ],
+                                  COUNTER   => [ @{$counter}, $i, 0 ],
+                                  CONFIG_ID => $cfg_id));
         ##! 4: "pki_realm ok"
         $index = $i;
         last;

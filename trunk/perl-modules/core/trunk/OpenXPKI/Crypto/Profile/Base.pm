@@ -18,15 +18,21 @@ use Data::Dumper;
 
 sub get_path
 {
-    my $self = shift;
+    my $self      = shift;
+    my $config_id = shift;
 
     ## scan for correct pki realm
 
-    my $pki_realm = $self->{config}->get_xpath_count (XPATH => "pki_realm");
+    my $pki_realm = $self->{config}->get_xpath_count(
+        XPATH => "pki_realm",
+        CONFIG_ID => $config_id,
+    );
     for (my $i=0; $i < $pki_realm; $i++)
     {
         if ($self->{config}->get_xpath (XPATH   => ["pki_realm", "name"],
-                                        COUNTER => [$i, 0])
+                                        COUNTER => [$i, 0],
+                                        CONFIG_ID => $config_id,
+                                       )
               eq $self->{PKI_REALM})
         {
             $pki_realm = $i;
@@ -41,12 +47,17 @@ sub get_path
 
     ## scan for correct ca
  
-    my $ca = $self->{config}->get_xpath_count (XPATH   => ["pki_realm", "ca"],
-                                               COUNTER => [$pki_realm]);
+    my $ca = $self->{config}->get_xpath_count (
+        XPATH   => ["pki_realm", "ca"],
+        COUNTER => [$pki_realm],
+        CONFIG_ID => $config_id,
+    );
     for (my $i=0; $i < $ca; $i++)
     {
         if ($self->{config}->get_xpath (XPATH   => ["pki_realm", "ca", "id"],
-                                        COUNTER => [$pki_realm, $i, 0])
+                                        COUNTER => [$pki_realm, $i, 0],
+                                        CONFIG_ID => $config_id,
+                                       )
               eq $self->{CA})
         {
             $ca = $i;
@@ -70,32 +81,41 @@ sub load_extension
     my @path    = @{$keys->{PATH}};
     my @counter = @{$keys->{COUNTER}};
     my @values  = ();
+    my $cfg_id  = $keys->{CONFIG_ID};
 
     ## is the extension used at all?
 
-    my $scan = eval {$self->{config}->get_xpath_count (
-                         XPATH   => [@path],
-                         COUNTER => [@counter])};
+    my $scan = eval {
+        $self->{config}->get_xpath_count(
+            XPATH     => [@path],
+            COUNTER   => [@counter],
+            CONFIG_ID => $cfg_id,
+        );
+    };
     return 0 if ($EVAL_ERROR or not $scan);
 
     ## is this a critical extension?
 
     my $critical = eval {$self->{config}->get_xpath (
-                             XPATH   => [@path, "critical"],
-                             COUNTER => [@counter, 0, 0])};
+                             XPATH     => [@path, "critical"],
+                             COUNTER   => [@counter, 0, 0],
+                             CONFIG_ID => $cfg_id)};
 
     if ($path[$#path] eq "basic_constraints")
     {
         $values[0] = ["CA",
                       $self->{config}->get_xpath (XPATH   => [@path, "ca"],
-                                                  COUNTER => [@counter, 0, 0])];
+                                                  COUNTER => [@counter, 0, 0],
+                                                  CONFIG_ID => $cfg_id)];
         if (eval {$self->{config}->get_xpath (XPATH   => [@path, "path_length"],
-                                              COUNTER => [@counter, 0, 0])} and
+                                              COUNTER => [@counter, 0, 0],
+                                              CONFIG_ID => $cfg_id)} and
             not $EVAL_ERROR)
         {
             $values[1] = ["PATH_LENGTH",
                           $self->{config}->get_xpath (XPATH   => [@path, "path_length"],
-                                                      COUNTER => [@counter, 0, 0])];
+                                                      COUNTER => [@counter, 0, 0],
+                                                      CONFIG_ID => $cfg_id)];
         }
         $self->set_extension (NAME     => "basic_constraints",
                               CRITICAL => $critical,
@@ -109,7 +129,8 @@ sub load_extension
         for (my $i=0; $i < scalar @bits; $i++)
         {
             my $bit = $self->{config}->get_xpath (XPATH   => [@path, $bits[$i]],
-                                                  COUNTER => [@counter, 0, 0]);
+                                                  COUNTER => [@counter, 0, 0],
+                                                  CONFIG_ID => $cfg_id);
             $bit =~ s/\s+//g;
             $bit = "1" if ($bit eq "true");
             $bit = "0" if ($bit eq "false");
@@ -125,7 +146,8 @@ sub load_extension
         for (my $i=0; $i < scalar @bits; $i++)
         {
             my $bit = $self->{config}->get_xpath (XPATH   => [@path, $bits[$i]],
-                                                  COUNTER => [@counter, 0, 0]);
+                                                  COUNTER => [@counter, 0, 0],
+                                                  CONFIG_ID => $cfg_id);
             $bit = "1" if ($bit eq "true");
             $bit = "0" if ($bit eq "false");
             push @values, $bits[$i] if ($bit);
@@ -134,12 +156,14 @@ sub load_extension
 	eval {
 	    $oid_count 
 		= $self->{config}->get_xpath_count (XPATH   => [@path, "oid"],
-						    COUNTER => [@counter, 0]);
+						    COUNTER => [@counter, 0],
+                            CONFIG_ID => $cfg_id);
 	};
         if ($oid_count > 0)
         {
             push @values, @{$self->{config}->get_xpath_list (XPATH   => [@path, "oid"],
-                                                             COUNTER => [@counter, 0])};
+                                                             COUNTER => [@counter, 0],
+                                                             CONFIG_ID => $cfg_id)};
         }
 	if (scalar @values)
         {
@@ -151,7 +175,8 @@ sub load_extension
     elsif ($path[$#path] eq "subject_key_identifier")
     {
         my $hash = $self->{config}->get_xpath (XPATH   => [@path, "hash"],
-                                               COUNTER => [@counter, 0, 0]);
+                                               COUNTER => [@counter, 0, 0],
+                                               CONFIG_ID => $cfg_id);
         $hash = "1" if ($hash eq "true");
         $hash = "0" if ($hash eq "false");
         if ($hash)
@@ -164,13 +189,15 @@ sub load_extension
     elsif ($path[$#path] eq "authority_key_identifier")
     {
         my $keyid = $self->{config}->get_xpath (XPATH   => [@path, "keyid"],
-                                                COUNTER => [@counter, 0, 0]);
+                                                COUNTER => [@counter, 0, 0],
+                                                CONFIG_ID => $cfg_id);
         $keyid = "1" if ($keyid eq "true");
         $keyid = "0" if ($keyid eq "false");
         push @values, "keyid" if ($keyid);
 
         my $issuer = $self->{config}->get_xpath (XPATH   => [@path, "issuer"],
-                                              COUNTER => [@counter, 0, 0]);
+                                              COUNTER => [@counter, 0, 0],
+                                              CONFIG_ID => $cfg_id);
         $issuer = "1" if ($issuer eq "true");
         $issuer = "0" if ($issuer eq "false");
         push @values, "issuer" if ($issuer);
@@ -185,7 +212,8 @@ sub load_extension
     elsif ($path[$#path] eq "issuer_alt_name")
     {
         my $copy = $self->{config}->get_xpath (XPATH   => [@path, "copy"],
-                                               COUNTER => [@counter, 0, 0]);
+                                               COUNTER => [@counter, 0, 0],
+                                               CONFIG_ID => $cfg_id);
         $copy = "1" if ($copy eq "true");
         $copy = "0" if ($copy eq "false");
         if ($copy)
@@ -198,10 +226,12 @@ sub load_extension
     elsif ($path[$#path] eq "crl_distribution_points")
     {
         if ($self->{config}->get_xpath_count (XPATH   => [@path, "uri"],
-                                              COUNTER => [@counter, 0]))
+                                              COUNTER => [@counter, 0],
+                                              CONFIG_ID => $cfg_id))
         {
             push @values, @{$self->{config}->get_xpath_list (XPATH   => [@path, "uri"],
-                                                             COUNTER => [@counter, 0])};
+                                                             COUNTER => [@counter, 0],
+                                                             CONFIG_ID => $cfg_id)};
         }
         if (scalar @values)
         {
@@ -216,26 +246,30 @@ sub load_extension
 	eval {
 	    $ca_issuer_count
 		= $self->{config}->get_xpath_count (XPATH   => [@path, "ca_issuers"],
-						    COUNTER => [@counter, 0]);
+						    COUNTER => [@counter, 0],
+                            CONFIG_ID => $cfg_id);
 	};
         if ($ca_issuer_count > 0) {
             push @values, ["CA_ISSUERS",
                            $self->{config}->get_xpath_list (
                                XPATH   => [@path, "ca_issuers"],
-                               COUNTER => [@counter, 0])];
+                               COUNTER => [@counter, 0],
+                               CONFIG_ID => $cfg_id)];
         }
 
 	my $ocsp_count = 0;
 	eval {
 	    $ocsp_count 
 		= $self->{config}->get_xpath_count (XPATH   => [@path, "ocsp"],
-						    COUNTER => [@counter, 0]);
+						    COUNTER => [@counter, 0],
+                            CONFIG_ID => $cfg_id);
 	};
 	if ($ocsp_count > 0) {
 	    push @values, ["OCSP",
 			   $self->{config}->get_xpath_list (
 			       XPATH   => [@path, "ocsp"],
-			       COUNTER => [@counter, 0])];
+			       COUNTER => [@counter, 0],
+                   CONFIG_ID => $cfg_id)];
 	}
 
 	if (scalar @values)
@@ -248,7 +282,8 @@ sub load_extension
     elsif ($path[$#path] eq "user_notice")
     {
         push @values,  $self->{config}->get_xpath (XPATH   => [@path],
-                                                   COUNTER => [@counter, 0]);
+                                                   COUNTER => [@counter, 0],
+                                                   CONFIG_ID => $cfg_id);
         $self->set_extension (NAME     => "user_notice",
                               CRITICAL => $critical,
                               VALUES   => [@values]);
@@ -256,10 +291,12 @@ sub load_extension
     elsif ($path[$#path] eq "policy_identifier")
     {
         if ($self->{config}->get_xpath_count (XPATH   => [@path, "oid"],
-                                              COUNTER => [@counter, 0]))
+                                              COUNTER => [@counter, 0],
+                                              CONFIG_ID => $cfg_id))
         {
             push @values, $self->{config}->get_xpath_list (XPATH   => [@path, "oid"],
-                                                           COUNTER => [@counter, 0]);
+                                                           COUNTER => [@counter, 0],
+                                                           CONFIG_ID => $cfg_id);
         }
         if (scalar @values)
         {
@@ -271,10 +308,12 @@ sub load_extension
     elsif ($path[$#path] eq "cps")
     {
         if ($self->{config}->get_xpath_count (XPATH   => [@path, "uri"],
-                                              COUNTER => [@counter, 0]))
+                                              COUNTER => [@counter, 0],
+                                              CONFIG_ID => $cfg_id))
         {
             push @values, $self->{config}->get_xpath_list (XPATH   => [@path, "uri"],
-                                                 COUNTER => [@counter, 0]);
+                                                 COUNTER => [@counter, 0],
+                                                 CONFIG_ID => $cfg_id);
         }
         if (scalar @values)
         {
@@ -286,20 +325,25 @@ sub load_extension
     elsif ($path[$#path] eq "oid")
     {
         my $count = $self->{config}->get_xpath_count (XPATH   => [@path],
-                                                      COUNTER => [@counter]);
+                                                      COUNTER => [@counter],
+                                                      CONFIG_ID => $cfg_id);
         for (my $i=0; $i<$count; $i++)
         {
             my $oid = $self->{config}->get_xpath (XPATH   => [@path, "numeric"],
-                                                  COUNTER => [@counter, $i, 0]);
+                                                  COUNTER => [@counter, $i, 0],
+                                                  CONFIG_ID => $cfg_id);
             $values[0] = ["FORMAT",
                           $self->{config}->get_xpath (XPATH   => [@path, "format"],
-                                                      COUNTER => [@counter, $i, 0])];
+                                                      COUNTER => [@counter, $i, 0],
+                                                      CONFIG_ID => $cfg_id)];
             $values[1] = ["ENCODING",
                           $self->{config}->get_xpath (XPATH   => [@path, "encoding"],
-                                                      COUNTER => [@counter, $i, 0])];
+                                                      COUNTER => [@counter, $i, 0],
+                                                      CONFIG_ID => $cfg_id)];
             $values[2] = ["CONTENT",
                           $self->{config}->get_xpath (XPATH   => [@path],
-                                                      COUNTER => [@counter, $i])];
+                                                      COUNTER => [@counter, $i],
+                                                      CONFIG_ID => $cfg_id)];
             $self->set_extension (NAME     => $oid,
                                   CRITICAL => $critical,
                                   VALUES   => [@values]);
@@ -308,7 +352,8 @@ sub load_extension
     elsif ($path[$#path] eq "netscape/comment")
     {
         push @values, $self->{config}->get_xpath (XPATH   => [@path],
-                                                   COUNTER => [@counter, 0]);
+                                                   COUNTER => [@counter, 0],
+                                                  CONFIG_ID => $cfg_id);
         $self->set_extension (NAME     => "netscape/comment",
                               CRITICAL => $critical,
                               VALUES   => [@values]);
@@ -320,7 +365,8 @@ sub load_extension
         for (my $i=0; $i < scalar @bits; $i++)
         {
             my $bit = $self->{config}->get_xpath (XPATH   => [@path, $bits[$i]],
-                                                  COUNTER => [@counter, 0, 0]);
+                                                  COUNTER => [@counter, 0, 0],
+                                                  CONFIG_ID => $cfg_id);
             $bit = "1" if ($bit eq "true");
             $bit = "0" if ($bit eq "false");
             push @values, $bits[$i] if ($bit);
@@ -332,13 +378,15 @@ sub load_extension
     elsif ($path[$#path] eq "netscape/cdp")
     {
         my $cdp = $self->{config}->get_xpath (XPATH   => [@path, "url"],
-                                              COUNTER => [@counter, 0, 0]);
+                                              COUNTER => [@counter, 0, 0],
+                                              CONFIG_ID => $cfg_id);
         $self->set_extension (NAME     => "netscape/cdp",
                               CRITICAL => $critical,
                               VALUES   => [$cdp]);
 
         $cdp = $self->{config}->get_xpath (XPATH   => [@path, "ca_url"],
-                                           COUNTER => [@counter, 0, 0]);
+                                           COUNTER => [@counter, 0, 0],
+                                           CONFIG_ID => $cfg_id);
         $self->set_extension (NAME     => "netscape/ca_cdp",
                               CRITICAL => $critical,
                               VALUES   => [$cdp]);
@@ -464,6 +512,13 @@ sub get_entry_validity {
 	    });
     }
 
+    if (! exists $params->{CONFIG_ID}) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_GET_ENTRY_VALIDITY_MISSING_PARAMETER",
+	    params  => {
+		PARAMETER => 'CONFIG_ID',
+	    });
+    }
     
     my %entry_validity = ();
 
@@ -475,14 +530,16 @@ sub get_entry_validity {
 	my $format;
 	eval {
 	    $format = $self->{config}->get_xpath(
-		XPATH   => [ @{$params->{XPATH}},   'validity', $validitytype, 'format' ],
-		COUNTER => [ @{$params->{COUNTER}}, 0,          0,             0 ],
+            XPATH     => [ @{$params->{XPATH}},   'validity', $validitytype, 'format' ],
+            COUNTER   => [ @{$params->{COUNTER}}, 0,          0,             0 ],
+            CONFIG_ID => $params->{CONFIG_ID},
 		);
 	    
 	    ### $format
 	    $validity = $self->{config}->get_xpath(
-		XPATH   => [ @{$params->{XPATH}},   'validity', $validitytype ],
-		COUNTER => [ @{$params->{COUNTER}}, 0,          0 ],
+            XPATH     => [ @{$params->{XPATH}},   'validity', $validitytype ],
+            COUNTER   => [ @{$params->{COUNTER}}, 0,          0 ],
+            CONFIG_ID => $params->{CONFIG_ID},
 		);
 	    ### $validity
 	    
