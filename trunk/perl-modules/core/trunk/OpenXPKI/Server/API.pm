@@ -67,12 +67,36 @@ sub BUILD {
 
     $method_info_of{$ident} = {
         ### Default API
+        'get_current_config_id' => {
+            class  => 'Default',
+            params => {
+            },
+        },
+        'list_config_ids' => {
+            class  => 'Default',
+            params => {
+            },
+        },
+        'get_config_id' => {
+            class  => 'Workflow',
+            params => {
+                'ID' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+            },
+        },
         'get_possible_profiles_for_role' => {
             class  => 'Default',
             params => {
                 'ROLE' => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
+                },
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
                 },
             },
         },
@@ -306,13 +330,25 @@ sub BUILD {
         ## do we really need this?
         'list_ca_ids' => {
             class  => 'Default',
-            params => { },
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+            },
         },
         'get_pki_realm_index' => { # TODO: find out if this is actually used
                                    # externally or if it is only an internal
                                    # helper function
             class  => 'Default',
-            params => { },
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+            },
         },
         'get_roles' => {
             class  => 'Default',
@@ -337,6 +373,11 @@ sub BUILD {
                 PROFILE => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
+                },
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
                 },
             },
         },

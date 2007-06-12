@@ -32,15 +32,48 @@ sub START {
 }
 # API: simple retrieval functions
 
+sub get_current_config_id {
+    my $self = shift;
+    return CTX('xml_config')->get_current_config_id();
+}
+
+sub list_config_ids {
+    my $self = shift;
+    ##! 1: 'start'
+    my $config_entries = CTX('dbi_backend')->select(
+        TABLE   => 'CONFIG',
+        DYNAMIC => {
+            CONFIG_IDENTIFIER => '%',
+        },
+    );
+    if (! defined $config_entries
+        || ref $config_entries ne 'ARRAY'
+        || scalar @{ $config_entries } == 0) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_LIST_CONFIG_IDS_NO_CONFIG_IDS_IN_DB',
+        );
+    }
+    ##! 64: 'config_entries: ' . Dumper $config_entries
+
+    my @config_ids = map { $_->{CONFIG_IDENTIFIER} } @{ $config_entries };
+    return \@config_ids;
+}
+
 sub get_cert_subject_styles {
     my $self      = shift;
     my $arg_ref   = shift;
     my $profile   = $arg_ref->{PROFILE};
+    my $cfg_id    = $arg_ref->{CONFIG_ID};
     ##! 1: 'start'
 
     my $pki_realm = CTX('session')->get_pki_realm();
-    my $index         = $self->get_pki_realm_index();
-    my $profile_index = $self->__get_profile_index($profile);
+    my $index         = $self->get_pki_realm_index({
+        CONFIG_ID => $cfg_id,
+    });
+    my $profile_index = $self->__get_profile_index({
+        PROFILE   => $profile,
+        CONFIG_ID => $cfg_id,
+    });
     my $styles = {};
     my @base_path = ( 'pki_realm', 'common', 'profiles', 'endentity', 'profile' );
     my @base_ctr  = ( $index     , 0       , 0         , 0          , $profile_index );
@@ -48,38 +81,44 @@ sub get_cert_subject_styles {
     my $count = 0;
     eval {
         $count = CTX('xml_config')->get_xpath_count(
-            XPATH   => [ @base_path, 'subject' ],
-            COUNTER => [ @base_ctr ],
+            XPATH     => [ @base_path, 'subject' ],
+            COUNTER   => [ @base_ctr ],
+            CONFIG_ID => $cfg_id,
         );
     };
     ##! 16: 'count: ' . $count
     # iterate over all subject styles
     for (my $i = 0; $i < $count; $i++) {
         my $id = CTX('xml_config')->get_xpath(
-            XPATH   => [ @base_path, 'subject', 'id' ],
-            COUNTER => [ @base_ctr , $i       , 0    ],
+            XPATH     => [ @base_path, 'subject', 'id' ],
+            COUNTER   => [ @base_ctr , $i       , 0    ],
+            CONFIG_ID => $cfg_id,
         );
         ##! 64: 'id: ' . $id
         $styles->{$id}->{LABEL} = CTX('xml_config')->get_xpath(
-            XPATH   => [ @base_path, 'subject', 'label' ],
-            COUNTER => [ @base_ctr , $i       , 0       ],
+            XPATH     => [ @base_path, 'subject', 'label' ],
+            COUNTER   => [ @base_ctr , $i       , 0       ],
+            CONFIG_ID => $cfg_id,
         );
         ##! 64: 'label: ' . $styles->{$id}->{LABEL}
         $styles->{$id}->{DESCRIPTION} = CTX('xml_config')->get_xpath(
-            XPATH   => [ @base_path, 'subject', 'description' ],
-            COUNTER => [ @base_ctr , $i       , 0             ],
+            XPATH     => [ @base_path, 'subject', 'description' ],
+            COUNTER   => [ @base_ctr , $i       , 0             ],
+            CONFIG_ID => $cfg_id,
         );
         ##! 64: 'description: ' . $styles->{$id}->{DESCRIPTION}
         $styles->{$id}->{DN} = CTX('xml_config')->get_xpath(
-            XPATH   => [ @base_path, 'subject', 'dn' ],
-            COUNTER => [ @base_ctr , $i       , 0    ],
+            XPATH     => [ @base_path, 'subject', 'dn' ],
+            COUNTER   => [ @base_ctr , $i       , 0    ],
+            CONFIG_ID => $cfg_id,
         );
         ##! 64: 'dn: ' . $styles->{$id}->{DN}
         my $input_count = 0;
         eval {
             $input_count = CTX('xml_config')->get_xpath_count(
-                XPATH   => [ @base_path, 'subject', 'template', 'input' ],
-                COUNTER => [ @base_ctr , $i       , 0        ],
+               XPATH     => [ @base_path, 'subject', 'template', 'input' ],
+               COUNTER   => [ @base_ctr , $i       , 0        ],
+               CONFIG_ID => $cfg_id,
             );
         };
         ##! 64: 'input count: ' . $input_count
@@ -92,71 +131,83 @@ sub get_cert_subject_styles {
             push @input_ctr,  ( $i       , 0         , $ii     );
 
             $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{ID} = CTX('xml_config')->get_xpath(
-                XPATH   => [ @input_path, 'id' ],
-                COUNTER => [ @input_ctr , 0    ],
+                XPATH     => [ @input_path, 'id' ],
+                COUNTER   => [ @input_ctr , 0    ],
+                CONFIG_ID => $cfg_id,
             );
             $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{LABEL} = CTX('xml_config')->get_xpath(
-                XPATH   => [ @input_path, 'label' ],
-                COUNTER => [ @input_ctr , 0    ],
+                XPATH     => [ @input_path, 'label' ],
+                COUNTER   => [ @input_ctr , 0    ],
+                CONFIG_ID => $cfg_id,
             );
             $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{DESCRIPTION} = CTX('xml_config')->get_xpath(
-                XPATH   => [ @input_path, 'description' ],
-                COUNTER => [ @input_ctr , 0    ],
+                XPATH     => [ @input_path, 'description' ],
+                COUNTER   => [ @input_ctr , 0    ],
+                CONFIG_ID => $cfg_id,
             );
             $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{TYPE} = CTX('xml_config')->get_xpath(
-                XPATH   => [ @input_path, 'type' ],
-                COUNTER => [ @input_ctr , 0    ],
+                XPATH     => [ @input_path, 'type' ],
+                COUNTER   => [ @input_ctr , 0    ],
+                CONFIG_ID => $cfg_id,
             );
             # source, min, max, match, width and default are optional,
             # thus in eval
             eval {
                 $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{SOURCE} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @input_path, 'source' ],
-                    COUNTER => [ @input_ctr , 0    ],
+                    XPATH     => [ @input_path, 'source' ],
+                    COUNTER   => [ @input_ctr , 0    ],
+                    CONFIG_ID => $cfg_id,
                 );
             };
             eval {
                 $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{MIN} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @input_path, 'min' ],
-                    COUNTER => [ @input_ctr , 0    ],
+                    XPATH     => [ @input_path, 'min' ],
+                    COUNTER   => [ @input_ctr , 0    ],
+                    CONFIG_ID => $cfg_id,
                 );
             };
             eval {
                 $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{MAX} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @input_path, 'max' ],
-                    COUNTER => [ @input_ctr , 0    ],
+                    XPATH     => [ @input_path, 'max' ],
+                    COUNTER   => [ @input_ctr , 0    ],
+                    CONFIG_ID => $cfg_id,
                 );
             };
             eval {
                 $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{MATCH} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @input_path, 'match' ],
-                    COUNTER => [ @input_ctr , 0    ],
+                    XPATH     => [ @input_path, 'match' ],
+                    COUNTER   => [ @input_ctr , 0    ],
+                    CONFIG_ID => $cfg_id,
                 );
             };
             eval {
                 $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{WIDTH} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @input_path, 'width' ],
-                    COUNTER => [ @input_ctr , 0    ],
+                    XPATH     => [ @input_path, 'width' ],
+                    COUNTER   => [ @input_ctr , 0    ],
+                    CONFIG_ID => $cfg_id,
                 );
             };
             eval {
                 $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{DEFAULT} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @input_path, 'default' ],
-                    COUNTER => [ @input_ctr , 0    ],
+                    XPATH     => [ @input_path, 'default' ],
+                    COUNTER   => [ @input_ctr , 0    ],
+                    CONFIG_ID => $cfg_id,
                 );
             };
             # if type is select, add options array ref
             if ($styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{TYPE} eq 'select') {
                 ##! 64: 'type is select'
                 my $options_count = CTX('xml_config')->get_xpath_count(
-                    XPATH   => [ @input_path, 'option' ],
-                    COUNTER => [ @input_ctr ],
+                    XPATH     => [ @input_path, 'option' ],
+                    COUNTER   => [ @input_ctr ],
+                    CONFIG_ID => $cfg_id,
                 );
                 ##! 64: 'options_count: ' . $options_count
                 for (my $iii = 0; $iii < $options_count; $iii++) {
                     $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{OPTIONS}->[$iii] = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @input_path, 'option' ],
-                        COUNTER => [ @input_ctr , $iii     ],
+                        XPATH     => [ @input_path, 'option' ],
+                        COUNTER   => [ @input_ctr , $iii     ],
+                        CONFIG_ID => $cfg_id,
                     ); 
                 }
             }
@@ -165,8 +216,9 @@ sub get_cert_subject_styles {
         my $add_input_count = 0;
         eval {
             $add_input_count = CTX('xml_config')->get_xpath_count(
-                XPATH   => [ @base_path, 'subject', 'additional_information', 'input' ],
-                COUNTER => [ @base_ctr , $i       , 0        ],
+                XPATH     => [ @base_path, 'subject', 'additional_information', 'input' ],
+                COUNTER   => [ @base_ctr , $i       , 0        ],
+                CONFIG_ID => $cfg_id,
             );
         };
         ##! 64: 'additional input count: ' . $add_input_count
@@ -179,53 +231,62 @@ sub get_cert_subject_styles {
             push @input_ctr,  ( $i       , 0         , $ii     );
 
             $styles->{$id}->{ADDITIONAL_INFORMATION}->{INPUT}->[$ii]->{ID} = CTX('xml_config')->get_xpath(
-                XPATH   => [ @input_path, 'id' ],
-                COUNTER => [ @input_ctr , 0    ],
+                XPATH     => [ @input_path, 'id' ],
+                COUNTER   => [ @input_ctr , 0    ],
+                CONFIG_ID => $cfg_id,
             );
             $styles->{$id}->{ADDITIONAL_INFORMATION}->{INPUT}->[$ii]->{LABEL} = CTX('xml_config')->get_xpath(
-                XPATH   => [ @input_path, 'label' ],
-                COUNTER => [ @input_ctr , 0    ],
+                XPATH     => [ @input_path, 'label' ],
+                COUNTER   => [ @input_ctr , 0    ],
+                CONFIG_ID => $cfg_id,
             );
             $styles->{$id}->{ADDITIONAL_INFORMATION}->{INPUT}->[$ii]->{DESCRIPTION} = CTX('xml_config')->get_xpath(
-                XPATH   => [ @input_path, 'description' ],
-                COUNTER => [ @input_ctr , 0    ],
+                XPATH     => [ @input_path, 'description' ],
+                COUNTER   => [ @input_ctr , 0    ],
+                CONFIG_ID => $cfg_id,
             );
             $styles->{$id}->{ADDITIONAL_INFORMATION}->{INPUT}->[$ii]->{TYPE} = CTX('xml_config')->get_xpath(
-                XPATH   => [ @input_path, 'type' ],
-                COUNTER => [ @input_ctr , 0    ],
+                XPATH     => [ @input_path, 'type' ],
+                COUNTER   => [ @input_ctr , 0    ],
+                CONFIG_ID => $cfg_id,
             );
             # width, height, default is optional,
             # thus in eval
             eval {
                 $styles->{$id}->{ADDITIONAL_INFORMATION}->{INPUT}->[$ii]->{WIDTH} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @input_path, 'width' ],
-                    COUNTER => [ @input_ctr , 0    ],
+                    XPATH     => [ @input_path, 'width' ],
+                    COUNTER   => [ @input_ctr , 0    ],
+                    CONFIG_ID => $cfg_id,
                 );
             };
             eval {
                 $styles->{$id}->{ADDITIONAL_INFORMATION}->{INPUT}->[$ii]->{HEIGHT} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @input_path, 'height' ],
-                    COUNTER => [ @input_ctr , 0    ],
+                    XPATH     => [ @input_path, 'height' ],
+                    COUNTER   => [ @input_ctr , 0    ],
+                    CONFIG_ID => $cfg_id,
                 );
             };
             eval {
                 $styles->{$id}->{ADDITIONAL_INFORMATION}->{INPUT}->[$ii]->{DEFAULT} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @input_path, 'default' ],
-                    COUNTER => [ @input_ctr , 0    ],
+                    XPATH     => [ @input_path, 'default' ],
+                    COUNTER   => [ @input_ctr , 0    ],
+                    CONFIG_ID => $cfg_id,
                 );
             };
             # if type is select, add options array ref
             if ($styles->{$id}->{ADDITIONAL_INFORMATION}->{INPUT}->[$ii]->{TYPE} eq 'select') {
                 ##! 64: 'type is select'
                 my $options_count = CTX('xml_config')->get_xpath_count(
-                    XPATH   => [ @input_path, 'option' ],
-                    COUNTER => [ @input_ctr ],
+                    XPATH     => [ @input_path, 'option' ],
+                    COUNTER   => [ @input_ctr ],
+                    CONFIG_ID => $cfg_id,
                 );
                 ##! 64: 'options_count: ' . $options_count
                 for (my $iii = 0; $iii < $options_count; $iii++) {
                     $styles->{$id}->{ADDITIONAL_INFORMATION}->{INPUT}->[$ii]->{OPTIONS}->[$iii] = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @input_path, 'option' ],
-                        COUNTER => [ @input_ctr , $iii     ],
+                        XPATH     => [ @input_path, 'option' ],
+                        COUNTER   => [ @input_ctr , $iii     ],
+                        CONFIG_ID => $cfg_id,
                     ); 
                 }
             }
@@ -234,8 +295,9 @@ sub get_cert_subject_styles {
         my $san_count = 0;
         eval {
             $san_count = CTX('xml_config')->get_xpath_count(
-                XPATH   => [ @base_path, 'subject', 'subject_alternative_names', 'san' ],
-                COUNTER => [ @base_ctr , $i       , 0        ],
+                XPATH     => [ @base_path, 'subject', 'subject_alternative_names', 'san' ],
+                COUNTER   => [ @base_ctr , $i       , 0        ],
+                CONFIG_ID => $cfg_id,
             );
         };
         
@@ -247,19 +309,22 @@ sub get_cert_subject_styles {
             push @san_ctr,  ( $i       , 0         , $ii     );
 
             $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{ID} = CTX('xml_config')->get_xpath(
-                XPATH   => [ @san_path, 'id' ],
-                COUNTER => [ @san_ctr , 0     ],
+                XPATH     => [ @san_path, 'id' ],
+                COUNTER   => [ @san_ctr , 0     ],
+                CONFIG_ID => $cfg_id,
             );
             my $key_type = CTX('xml_config')->get_xpath(
-                XPATH   => [ @san_path, 'key', 'type' ],
-                COUNTER => [ @san_ctr , 0    , 0      ],
+                XPATH     => [ @san_path, 'key', 'type' ],
+                COUNTER   => [ @san_ctr , 0    , 0      ],
+                CONFIG_ID => $cfg_id,
             );
             $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{TYPE} = $key_type;
             # depending on the key type, different configs need to be read
             if ($key_type eq 'fixed') {
                 $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{VALUE} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @san_path, 'key' ],
-                    COUNTER => [ @san_ctr , 0     ],
+                    XPATH     => [ @san_path, 'key' ],
+                    COUNTER   => [ @san_ctr , 0     ],
+                    CONFIG_ID => $cfg_id,
                 );
             }
             elsif ($key_type eq 'select') {
@@ -267,8 +332,9 @@ sub get_cert_subject_styles {
                 my $san_opt_count = 0;
                 eval {
                     $san_opt_count = CTX('xml_config')->get_xpath_count(
-                        XPATH   => [ @san_path, 'key', 'option' ],
-                        COUNTER => [ @san_ctr , 0    , 0     ],
+                        XPATH     => [ @san_path, 'key', 'option' ],
+                        COUNTER   => [ @san_ctr , 0    , 0     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 };
                 ##! 64: 'san_opt_count: ' . $san_opt_count
@@ -276,29 +342,34 @@ sub get_cert_subject_styles {
                 # iterate over all SAN key options
                 for (my $iii = 0; $iii < $san_opt_count; $iii++) {
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{OPTIONS}->[$iii]->{LABEL} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'key', 'option', 'label' ],
-                        COUNTER => [ @san_ctr , 0    , $iii    , 0       ],
+                        XPATH     => [ @san_path, 'key', 'option', 'label' ],
+                        COUNTER   => [ @san_ctr , 0    , $iii    , 0       ],
+                        CONFIG_ID => $cfg_id,
                     );
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{OPTIONS}->[$iii]->{DESCRIPTION} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'key', 'option', 'description' ],
-                        COUNTER => [ @san_ctr , 0    , $iii    , 0       ],
+                        XPATH     => [ @san_path, 'key', 'option', 'description' ],
+                        COUNTER   => [ @san_ctr , 0    , $iii    , 0       ],
+                        CONFIG_ID => $cfg_id,
                     );
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{OPTIONS}->[$iii]->{VALUE} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'key', 'option' ],
-                        COUNTER => [ @san_ctr , 0    , $iii     ],
+                        XPATH     => [ @san_path, 'key', 'option' ],
+                        COUNTER   => [ @san_ctr , 0    , $iii     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 }
                 # min and max are optional
                 eval {
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{MIN} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'key', 'min' ],
-                        COUNTER => [ @san_ctr , 0    , 0     ],
+                        XPATH     => [ @san_path, 'key', 'min' ],
+                        COUNTER   => [ @san_ctr , 0    , 0     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 };
                 eval {
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{MAX} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'key', 'max' ],
-                        COUNTER => [ @san_ctr , 0    , 0     ],
+                        XPATH     => [ @san_path, 'key', 'max' ],
+                        COUNTER   => [ @san_ctr , 0    , 0     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 };
             }
@@ -306,40 +377,46 @@ sub get_cert_subject_styles {
                 # min, max and width are optional
                 eval {
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{MIN} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'key', 'min' ],
-                        COUNTER => [ @san_ctr , 0    , 0     ],
+                        XPATH     => [ @san_path, 'key', 'min' ],
+                        COUNTER   => [ @san_ctr , 0    , 0     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 };
                 eval {
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{MAX} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'key', 'max' ],
-                        COUNTER => [ @san_ctr , 0    , 0     ],
+                        XPATH     => [ @san_path, 'key', 'max' ],
+                        COUNTER   => [ @san_ctr , 0    , 0     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 };
                 eval {
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{WIDTH} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'key', 'width' ],
-                        COUNTER => [ @san_ctr , 0    , 0     ],
+                        XPATH     => [ @san_path, 'key', 'width' ],
+                        COUNTER   => [ @san_ctr , 0    , 0     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 };
             }
             my $value_type = CTX('xml_config')->get_xpath(
-                XPATH   => [ @san_path, 'value', 'type' ],
-                COUNTER => [ @san_ctr , 0    , 0        ],
+                XPATH     => [ @san_path, 'value', 'type' ],
+                COUNTER   => [ @san_ctr , 0    , 0        ],
+                CONFIG_ID => $cfg_id,
             );
             $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{VALUE}->{TYPE} = $value_type;
             if ($value_type eq 'fixed') {
                 $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{VALUE}->{TEMPLATE} = CTX('xml_config')->get_xpath(
-                    XPATH   => [ @san_path, 'value' ],
-                    COUNTER => [ @san_ctr , 0       ],
+                    XPATH     => [ @san_path, 'value' ],
+                    COUNTER   => [ @san_ctr , 0       ],
+                    CONFIG_ID => $cfg_id,
                 );
             }
             elsif ($value_type eq 'freetext') {
                 # width is optional
                 eval {
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{VALUE}->{WIDTH} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'value', 'width' ],
-                        COUNTER => [ @san_ctr , 0    , 0     ],
+                        XPATH     => [ @san_path, 'value', 'width' ],
+                        COUNTER   => [ @san_ctr , 0    , 0     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 };
             }
@@ -347,8 +424,9 @@ sub get_cert_subject_styles {
                 my $san_opt_count = 0;
                 eval {
                     $san_opt_count = CTX('xml_config')->get_xpath_count(
-                        XPATH   => [ @san_path, 'value', 'option' ],
-                        COUNTER => [ @san_ctr , 0    , 0     ],
+                        XPATH     => [ @san_path, 'value', 'option' ],
+                        COUNTER   => [ @san_ctr , 0    , 0     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 };
                 ##! 64: 'san_opt_count: ' . $san_opt_count
@@ -356,25 +434,29 @@ sub get_cert_subject_styles {
                 # iterate over all SAN key options
                 for (my $iii = 0; $iii < $san_opt_count; $iii++) {
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{VALUE}->{OPTIONS}->[$iii]->{LABEL} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'value', 'option', 'label' ],
-                        COUNTER => [ @san_ctr , 0    , $iii    , 0       ],
+                        XPATH     => [ @san_path, 'value', 'option', 'label' ],
+                        COUNTER   => [ @san_ctr , 0    , $iii    , 0       ],
+                        CONFIG_ID => $cfg_id,
                     );
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{VALUE}->{OPTIONS}->[$iii]->{VALUE} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'value', 'option' ],
-                        COUNTER => [ @san_ctr , 0    , $iii     ],
+                        XPATH     => [ @san_path, 'value', 'option' ],
+                        COUNTER   => [ @san_ctr , 0    , $iii     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 }
                 # min and max are optional
                 eval {
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{VALUE}->{MIN} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'value', 'min' ],
-                        COUNTER => [ @san_ctr , 0    , 0     ],
+                        XPATH     => [ @san_path, 'value', 'min' ],
+                        COUNTER   => [ @san_ctr , 0    , 0     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 };
                 eval {
                     $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{VALUE}->{MAX} = CTX('xml_config')->get_xpath(
-                        XPATH   => [ @san_path, 'value', 'max' ],
-                        COUNTER => [ @san_ctr , 0    , 0     ],
+                        XPATH     => [ @san_path, 'value', 'max' ],
+                        COUNTER   => [ @san_ctr , 0    , 0     ],
+                        CONFIG_ID => $cfg_id,
                     );
                 };
             }
@@ -388,22 +470,27 @@ sub get_possible_profiles_for_role {
     my $self      = shift;
     my $arg_ref   = shift;
     my $req_role  = $arg_ref->{ROLE};
+    my $cfg_id    = $arg_ref->{CONFIG_ID};
     ##! 1: 'start'
     ##! 16: 'requested role: ' . $req_role
 
     my $pki_realm = CTX('session')->get_pki_realm();
     my @profiles  = ();
-    my $index     = $self->get_pki_realm_index();
+    my $index     = $self->get_pki_realm_index({
+        CONFIG_ID => $cfg_id,
+    });
 
     my $count = CTX('xml_config')->get_xpath_count(
      XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile"],
-     COUNTER => [$index     , 0       , 0         , 0]
+     COUNTER => [$index     , 0       , 0         , 0],
+     CONFIG_ID => $cfg_id,
     );
     ##! 16: 'count: ' . $count
     for (my $i=0; $i < $count; $i++) {
         my $id = CTX('xml_config')->get_xpath(
             XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "id"],
             COUNTER => [$index     , 0       , 0         , 0          , $i       , 0   ],
+            CONFIG_ID => $cfg_id,
         );
         next if ($id eq "default");
         my $role_count = 0;
@@ -411,6 +498,7 @@ sub get_possible_profiles_for_role {
             $role_count = CTX('xml_config')->get_xpath_count(
                 XPATH   => ['pki_realm', 'common', 'profiles', 'endentity', 'profile', 'role'],
                 COUNTER => [$index     , 0       , 0         , 0          , $i ],
+                CONFIG_ID => $cfg_id,
             );
         };
         ##! 16: 'role_count: ' . $role_count
@@ -418,6 +506,7 @@ sub get_possible_profiles_for_role {
             my $role = CTX('xml_config')->get_xpath(
                 XPATH   => ['pki_realm', 'common', 'profiles', 'endentity', 'profile', 'role'],
                 COUNTER => [$index     , 0       , 0         , 0          , $i       , $ii   ],
+                CONFIG_ID => $cfg_id,
             );
             ##! 16: 'role: ' . $role
             if ($role eq $req_role) {
@@ -696,10 +785,18 @@ sub get_ca_certificate {
 }
 
 sub list_ca_ids {
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $cfg_id  = $arg_ref->{CONFIG_ID};
+    ##! 16: 'cfg_id: ' . $cfg_id
+
     my %response;
 
     ##! 2: "get pki realm configuration"
-    my $realms = CTX('pki_realm');
+    my $realms = CTX('pki_realm_by_cfg')->{$cfg_id}; 
+    if (! defined $cfg_id) {
+        $realms = CTX('pki_realm');
+    }
     if (!(defined $realms && (ref $realms eq 'HASH'))) {
 	OpenXPKI::Exception->throw (
 	    message => "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_CONFIGURATION_UNAVAILABLE"
@@ -727,22 +824,29 @@ sub list_ca_ids {
 }
 
 sub __get_profile_index {
-    my $self      = shift;
-    my $profile   = shift;
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $profile = $arg_ref->{PROFILE};
+    my $cfg_id  = $arg_ref->{CONFIG_ID};
+
     ##! 1: 'start'
-    my $pki_index = $self->get_pki_realm_index();
+    my $pki_index = $self->get_pki_realm_index({
+        CONFIG_ID => $cfg_id,
+    });
     
     my $count = CTX('xml_config')->get_xpath_count(
-        XPATH   => [ 'pki_realm', 'common', 'profiles', 'endentity', 'profile' ],
-        COUNTER => [ $pki_index , 0       , 0         , 0 ],
+        XPATH     => [ 'pki_realm', 'common', 'profiles', 'endentity', 'profile' ],
+        COUNTER   => [ $pki_index , 0       , 0         , 0 ],
+        CONFIG_ID => $cfg_id,
     );
     ##! 16: 'count: ' . $count
     my $profile_index;
   PROFILE_INDEX:
     for (my $i = 0; $i < $count; $i++) {
         my $profile_id = CTX('xml_config')->get_xpath(
-            XPATH   => [ 'pki_realm', 'common', 'profiles', 'endentity', 'profile', 'id' ],
-            COUNTER => [ $pki_index , 0       , 0         , 0          , $i       , 0    ],
+            XPATH     => [ 'pki_realm', 'common', 'profiles', 'endentity', 'profile', 'id' ],
+            COUNTER   => [ $pki_index , 0       , 0         , 0          , $i       , 0    ],
+            CONFIG_ID => $cfg_id,
         ); 
         ##! 64: 'profile_id: ' . $profile_id
         if ($profile_id eq $profile) {
@@ -764,14 +868,20 @@ sub __get_profile_index {
 }
 
 sub get_pki_realm_index {
+    my $self    = shift;
+    my $arg_ref = shift;
     my $pki_realm = CTX('session')->get_pki_realm();
 
     ## scan for correct pki realm
-    my $index = CTX('xml_config')->get_xpath_count (XPATH => "pki_realm");
+    my $index = CTX('xml_config')->get_xpath_count(
+        XPATH     => "pki_realm",
+        CONFIG_ID => $arg_ref->{CONFIG_ID},
+    );
     for (my $i=0; $i < $index; $i++)
     {
         if (CTX('xml_config')->get_xpath (XPATH   => ["pki_realm", "name"],
-                                          COUNTER => [$i, 0])
+                                          COUNTER => [$i, 0],
+                                          CONFIG_ID => $arg_ref->{CONFIG_ID},)
             eq $pki_realm)
         {
             $index = $i;

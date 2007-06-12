@@ -35,6 +35,23 @@ sub START {
 ###########################################################################
 # lowlevel workflow functions
 
+sub get_config_id {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    # determine workflow's config ID
+    CTX('dbi_workflow')->commit();
+    my $wf = CTX('dbi_workflow')->first(
+        TABLE   => 'WORKFLOW_CONTEXT',
+        DYNAMIC => {
+            'WORKFLOW_SERIAL'      => $arg_ref->{ID},
+            'WORKFLOW_CONTEXT_KEY' => 'config_id',
+        },
+    );
+    return $wf->{WORKFLOW_CONTEXT_VALUE};
+}
+
 sub list_workflow_instances {
     ##! 1: "start"
     my $self    = shift;
@@ -205,9 +222,14 @@ sub get_workflow_info {
     my $wf_title = $args->{WORKFLOW};
     my $wf_id    = $args->{ID};
 
-    my $workflow = __get_workflow_factory()->fetch_workflow(
-	$wf_title,
-	$wf_id);
+    # get the factory corresponding to the workflow
+    my $factory = __get_workflow_factory({
+        WORKFLOW_ID => $wf_id,
+    });
+    my $workflow = $factory->fetch_workflow(
+	    $wf_title,
+	    $wf_id
+    );
 
     return __get_workflow_info($workflow);
 }
@@ -229,9 +251,13 @@ sub execute_workflow_activity {
     # other processes are writing to the database at the same time
     CTX('dbi_workflow')->commit();
     ##! 2: "load workflow"
-    my $workflow = __get_workflow_factory()->fetch_workflow(
-	$wf_title,
-	$wf_id);
+    my $factory = __get_workflow_factory({
+        WORKFLOW_ID => $wf_id,
+    });
+    my $workflow = $factory->fetch_workflow(
+	    $wf_title,
+	    $wf_id
+    );
     $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
     $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
 
@@ -359,6 +385,15 @@ sub create_workflow_instance {
     }
 
     $workflow->context->param(creator => $creator);
+
+    my $config_id = CTX('api')->get_current_config_id();
+    if (! defined $config_id) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_CREATE_WORKFLOW_CONFIG_ID_UNDEFINED',
+        );
+    }
+
+    $workflow->context->param(config_id => $config_id);
 
     # our convention is that every workflow MUST have the following properties:
     # - it must have an activity called 'create'
@@ -496,9 +531,13 @@ sub get_workflow_activities {
     # other processes are writing to the database at the same time
     CTX('dbi_workflow')->commit();
 
-    my $workflow = __get_workflow_factory()->fetch_workflow(
-	$wf_title,
-	$wf_id);
+    my $factory = __get_workflow_factory({
+        WORKFLOW_ID => $wf_id,
+    });
+    my $workflow = $factory->fetch_workflow(
+	    $wf_title,
+	    $wf_id,
+    );
     my @list = $workflow->get_current_actions();
 
     ##! 1: "finished"
@@ -658,114 +697,44 @@ sub search_workflow_instances {
 # private functions
 
 sub __get_workflow_factory {
-    my $args  = shift;
-
-    ##! 1: "__get_workflow_factory"
-
-    my $workflow_factory = Workflow::Factory->instance();
-
-
+    ##! 1: 'start'
+    my $arg_ref = shift;
+    my $config_id = CTX('api')->get_current_config_id();
+    if ($arg_ref->{CONFIG_ID}) {
+        $config_id = $arg_ref->{CONFIG_ID};
+    }
+    if ($arg_ref->{WORKFLOW_ID}) {
+        ##! 16: 'determine factory for workflow ' . $arg_ref->{WORKFLOW_ID}
+        # determine workflow's config ID and set config_id accordingly
+        my $wf = CTX('dbi_workflow')->first(
+            TABLE   => 'WORKFLOW_CONTEXT',
+            DYNAMIC => {
+                'WORKFLOW_SERIAL'      => $arg_ref->{WORKFLOW_ID},
+                'WORKFLOW_CONTEXT_KEY' => 'config_id',
+            },
+        );
+        $config_id = $wf->{WORKFLOW_CONTEXT_VALUE};
+    }
+    ##! 32: 'config_id: ' . $config_id
     my $pki_realm = CTX('session')->get_pki_realm();
-    my $pki_realm_index;
-    
-    my $pki_realm_count = CTX('xml_config')->get_xpath_count (XPATH => "pki_realm");
-
-  FINDREALM:
-    for (my $ii = 0; $ii < $pki_realm_count; $ii++)
-    {
-        if (CTX('xml_config')->get_xpath (XPATH   => ["pki_realm", "name"],
-					  COUNTER => [$ii,         0])
-	    eq $pki_realm) {
-
-            $pki_realm_index = $ii;
-	    last FINDREALM;
-        }
+    if ($arg_ref->{PKI_REALM}) {
+        $pki_realm = $arg_ref->{PKI_REALM};
     }
+    ##! 32: 'realm: ' . $pki_realm
+    my $factory = CTX('workflow_factory')->{$config_id}->{$pki_realm};
+    ##! 64: 'factory: ' . Dumper $factory
+    # this is a hack, because Workflow::Factory does not really
+    # support subclassing (although it claims so). For details see
+    # Server::Init::__wf_factory_add_config()
+    *Workflow::State::FACTORY   = sub { return $factory };
+    *Workflow::Action::FACTORY  = sub { return $factory };
+    *Workflow::Factory::FACTORY = sub { return $factory };
+    *Workflow::FACTORY          = sub { return $factory };
+    *OpenXPKI::Server::Workflow::Observer::AddExecuteHistory::FACTORY
+        = sub { return $factory };
 
-    if (! defined $pki_realm_index) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_INCORRECT_PKI_REALM");
-    }
-
-    my %workflow_config = (
-	# how we name it in our XML configuration file
-	workflows => {
-	    # how the parameter is called for Workflow::Factory 
-	    factory_param => 'workflow',
-	},
-	activities => {
-	    factory_param => 'action',
-	},
-	validators => {
-	    factory_param => 'validator',
-	},
-	conditions => {
-	    factory_param => 'condition',
-	},
-	);
-    
-    foreach my $type (keys %workflow_config) {
-	##! 2: "getting workflow '$type' configuration files"
-
-	my $count;
-	eval {
-	    $count = CTX('xml_config')->get_xpath_count(
-		XPATH =>   [ 'pki_realm',      'workflow_config', $type, 'configfile' ],
-		COUNTER => [ $pki_realm_index, 0,                 0,      ],
-		);
-	};
-	if (my $exc = OpenXPKI::Exception->caught()) {
-	    # ignore missing configuration
-	    if (($exc->message() 
-		 eq "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT")
-		&& (($type eq 'validators') || ($type eq 'conditions'))) {
-		$count = 0;
-	    }
-	    else
-	    {
-		$exc->rethrow();
-	    }
-	} elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
-	    $EVAL_ERROR->rethrow();
-	}
-
-	if (! defined $count) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_MISSING_WORKFLOW_CONFIGURATION",
-		params => {
-		    configtype => $type,
-		});
-	}
-
-
-	for (my $ii = 0; $ii < $count; $ii++) {
-	    my $entry = CTX('xml_config')->get_xpath (
-		XPATH   => [ 'pki_realm', 'workflow_config', $type, 'configfile' ],
-		COUNTER => [ $pki_realm_index, 0,            0,     $ii ],
-		);
-	    ##! 4: "config file: $entry"
-	    $workflow_factory->add_config_from_file(
-		$workflow_config{$type}->{factory_param}  => $entry,
-		);
-	}
-    }
-
-    # persister configuration should not be user-configurable and is
-    # static and identical throughout OpenXPKI
-    $workflow_factory->add_config(
-	persister => {
-	    name           => 'OpenXPKI',
-	    class          => 'OpenXPKI::Server::Workflow::Persister::DBI',
-	    workflow_table => $workflow_table,
-	    history_table  => $workflow_history_table,
-	},
-	);
-
-    ##! 64: Dumper $workflow_factory
-
-    return $workflow_factory;
+    return $factory;
 }
-
 
 sub __get_workflow_info {
     my $workflow  = shift;
@@ -832,6 +801,11 @@ object must be set before instantiating the API.
 =head2 new
 
 Default constructor created by Class::Std.
+
+=head2 get_config_id
+
+Looks up the configuration ID for a given workflow ID (passed with the
+named parameter 'ID') from the database.
 
 =head2 list_workflow_titles
 
