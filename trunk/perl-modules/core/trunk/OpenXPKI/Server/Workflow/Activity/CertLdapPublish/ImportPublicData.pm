@@ -28,7 +28,15 @@ sub execute {
 
     ##! 129: 'LDAP IMPORT checking role'
     my $pki_realm = CTX('api')->get_pki_realm();
-    my $realm_config = CTX('pki_realm')->{$pki_realm};
+    my $cfg_id = $self->{CONFIG_ID};
+    if (! defined $cfg_id) {
+        # as this is the first activity, $self->{CONFIG_ID} is not
+        # defined yet and we'll just use the current config ID
+        $cfg_id = CTX('api')->get_current_config_id();
+    }
+    ##! 128: 'config_id: ' . $cfg_id
+    my $realm_config = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm};
+    ##! 128: 'realm_config: ' . Dumper $realm_config
     my $ldap_excluded_roles = $realm_config->{ldap_excluded_roles};
 
     if ( $ldap_excluded_roles =~  /^\s*${cert_role}\s*\,/m  |

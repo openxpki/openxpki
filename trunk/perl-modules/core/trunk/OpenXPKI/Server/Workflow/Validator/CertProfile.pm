@@ -25,17 +25,33 @@ sub validate {
 
     return if (not defined $profile);
 
+    ##! 16: 'wf->id(): ' . $wf->id()
+    my $cfg_id = $api->get_config_id({ ID => $wf->id() });
+    ##! 16: 'cfg_id: ' . $cfg_id
+    if (! defined $cfg_id) {
+        # as this is called during creation, the cfg id is not defined
+        # yet, so we use the current one
+        $cfg_id = $api->get_current_config_id();
+    }
+    ##! 16: 'cfg_id: ' . $cfg_id
+
     ## first calculate the expected index
-    my $realm = $api->get_pki_realm_index();
+    my $realm = $api->get_pki_realm_index({
+        CONFIG_ID => $cfg_id,
+    });
     my $index = undef;
     my $count = $config->get_xpath_count (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile"],
-                    COUNTER => [$realm, 0, 0, 0]);
+        XPATH     => ["pki_realm", "common", "profiles", "endentity", "profile"],
+        COUNTER   => [$realm, 0, 0, 0],
+        CONFIG_ID => $cfg_id,
+    );
     for (my $i=0; $i <$count; $i++)
     {
         my $id = $config->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "id"],
-                    COUNTER => [$realm, 0, 0, 0, $i, 0]);
+            XPATH     => ["pki_realm", "common", "profiles", "endentity", "profile", "id"],
+            COUNTER   => [$realm, 0, 0, 0, $i, 0],
+            CONFIG_ID => $cfg_id,
+        );
         next if ($id ne $profile);
         $index = $i;
     }
@@ -89,6 +105,7 @@ sub validate {
         my @possible_profiles = @{
             CTX('api')->get_possible_profiles_for_role({
                 ROLE => $role,
+                CONFIG_ID => $cfg_id,
             })
         };
         ##! 64: 'possible profiles: ' . Dumper \@possible_profiles

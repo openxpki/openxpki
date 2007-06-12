@@ -28,9 +28,29 @@ sub execute
     );
 
     my $type    = $context->param('csr_type');
+    if (! defined $type) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDDEFINED',
+        );
+    }
     my $profile = $context->param('cert_profile');
+    if (! defined $profile) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_PROFILE_UNDDEFINED',
+        );
+    }
     my $subject = $context->param('cert_subject');
+    if (! defined $subject) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_SUBJECT_UNDDEFINED',
+        );
+    }
     my $role    = $context->param('cert_role');
+    if (! defined $role) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_ROLE_UNDDEFINED',
+        );
+    }
 
     my $subj_alt_names = $serializer->deserialize($context->param('cert_subject_alt_name'));
 

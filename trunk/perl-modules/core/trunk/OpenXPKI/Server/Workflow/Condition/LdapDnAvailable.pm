@@ -28,7 +28,8 @@ sub evaluate
  my ( $self, $workflow ) = @_;
 
  my $pki_realm = CTX('api')->get_pki_realm(); 
- my $realm_config = CTX('pki_realm')->{$pki_realm};
+ my $cfg_id = CTX('api')->get_config_id({ ID => $workflow->id() });
+ my $realm_config = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm};
  my $context  = $workflow->context();
 
 

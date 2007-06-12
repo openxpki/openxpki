@@ -12,75 +12,58 @@ use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
+use OpenXPKI::Debug;
 
-# use Smart::Comments;
+use Data::Dumper;
 
 sub execute {
     my $self = shift;
     my $workflow = shift;
 
-    $self->SUPER::execute($workflow,
-			  {
-			      # CHOOSE one of the following:
-			      # CA: CA operation (default)
-			      # RA: RA operation
-			      # PUBLIC: publicly available operation
-			      ACTIVITYCLASS => 'CA',
-			      PARAMS => {
-				  'cert_profile' => { # was 'profile'
-				      accept_from => [ 'context' ],
-				      required => 1,
-				  },
-			      },
-			  });    
-
-
     # you may wish to use these shortcuts
     my $context      = $workflow->context();
-#     my $activity     = $self->{ACTIVITY};
     my $pki_realm    = $self->{PKI_REALM};
-#     my $session      = $self->{SESSION};
-#     my $defaulttoken = $self->{TOKEN_DEFAULT};
+    ##! 16: 'pki_realm: ' . $pki_realm
+    my $realm_config = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}
+                                              ->{$pki_realm};
+    ##! 128: 'realm_config: ' . Dumper $realm_config
 
-
-    my $realm_config = CTX('pki_realm')->{$pki_realm};
-
-    my $profilename = $self->param('cert_profile'); # was 'profile'
+    my $profilename = $context->param('cert_profile'); # was 'profile'
+    ##! 16: 'profilename: ' . $profilename
 
     if (! exists $realm_config->{endentity}->{id}->{$profilename}->{validity}) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_ACTIVITY_TOOLS_DETERMINEISSUINGCA_NO_MATCHING_PROFILE",
-	    params  => {
-		REQUESTED_PROFILE => $profilename,
-	    },
-	    );
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_ACTIVITY_TOOLS_DETERMINEISSUINGCA_NO_MATCHING_PROFILE",
+            params  => {
+                REQUESTED_PROFILE => $profilename,
+            },
+        );
     }
 
     # get validity as specified in the configuration
     my $entry_validity 
-	= $realm_config->{endentity}->{id}->{$profilename}->{validity};
-
+	    = $realm_config->{endentity}->{id}->{$profilename}->{validity};
 
     my $requested_notbefore;
     my $requested_notafter;
 
     if (! exists $entry_validity->{notbefore}) {
-	# assign default (current timestamp) if notbefore is not specified
-	$requested_notbefore = DateTime->now( time_zone => 'UTC' );
+        # assign default (current timestamp) if notbefore is not specified
+        $requested_notbefore = DateTime->now( time_zone => 'UTC' );
     } else {
-	$requested_notbefore = OpenXPKI::DateTime::get_validity(
-	    {
-		VALIDITY => $entry_validity->{notbefore}->{validity},
-		VALIDITYFORMAT => $entry_validity->{notbefore}->{format},
-	    },
-	    );
+        $requested_notbefore = OpenXPKI::DateTime::get_validity(
+            {
+                VALIDITY => $entry_validity->{notbefore}->{validity},
+                VALIDITYFORMAT => $entry_validity->{notbefore}->{format},
+            },
+        );
     }
 
     $requested_notafter = OpenXPKI::DateTime::get_validity(
 	    {
-		REFERENCEDATE => $requested_notbefore,
-		VALIDITY => $entry_validity->{notafter}->{validity},
-		VALIDITYFORMAT => $entry_validity->{notafter}->{format},
+            REFERENCEDATE => $requested_notbefore,
+            VALIDITY => $entry_validity->{notafter}->{validity},
+            VALIDITYFORMAT => $entry_validity->{notafter}->{format},
 	    },
 	);
 
@@ -105,57 +88,57 @@ sub execute {
     foreach my $ca_id (sort keys %{ $realm_config->{ca}->{id} }) {
 	### Internal CA: $ca_id
 
-	my $ca_notbefore = $realm_config->{ca}->{id}->{$ca_id}->{notbefore};
-	###   NotAfter: $ca_notbefore->datetime()
+        my $ca_notbefore = $realm_config->{ca}->{id}->{$ca_id}->{notbefore};
+        ###   NotAfter: $ca_notbefore->datetime()
 
-	my $ca_notafter = $realm_config->{ca}->{id}->{$ca_id}->{notafter};
-	###   NotBefore: $ca_notafter->datetime()
+        my $ca_notafter = $realm_config->{ca}->{id}->{$ca_id}->{notafter};
+        ###   NotBefore: $ca_notafter->datetime()
 
-	# check if issuing CA is valid now
-	if (DateTime->compare($now, $ca_notbefore) <= 0) {
-	    ###   Internal CA is not valid yet, skipping...
-	    next CANDIDATE;
-	}
-	if (DateTime->compare($now, $ca_notafter) >= 0) {
-	    ###   Internal CA is not valid any more, skipping...
-	    next CANDIDATE;
-	}
+        # check if issuing CA is valid now
+        if (DateTime->compare($now, $ca_notbefore) <= 0) {
+            ###   Internal CA is not valid yet, skipping...
+            next CANDIDATE;
+        }
+        if (DateTime->compare($now, $ca_notafter) >= 0) {
+            ###   Internal CA is not valid any more, skipping...
+            next CANDIDATE;
+        }
 
-	# check if requested validity fits into the ca validity
-	if (DateTime->compare($requested_notbefore, $ca_notbefore) <= 0) {
-	    ###   requested NotBefore does not fit in CA validity...
-	    next CANDIDATE;
-	}
-	if (DateTime->compare($requested_notafter, $ca_notafter) >= 0) {
-	    ###   requested NotAfter does not fit in CA validity...
-	    next CANDIDATE;
-	}
+        # check if requested validity fits into the ca validity
+        if (DateTime->compare($requested_notbefore, $ca_notbefore) <= 0) {
+            ###   requested NotBefore does not fit in CA validity...
+            next CANDIDATE;
+        }
+        if (DateTime->compare($requested_notafter, $ca_notafter) >= 0) {
+            ###   requested NotAfter does not fit in CA validity...
+            next CANDIDATE;
+        }
 
-	# check if this CA has a more recent NotBefore date
-	if (defined $mostrecent_notbefore)
-	{
-	    if (DateTime->compare($ca_notbefore, $mostrecent_notbefore) > 0)
-	    {
-		###    Issuing CA has a more recent NotBefore date than the previous one
-		$mostrecent_notbefore = $ca_notbefore;
-		$intca = $ca_id;
-	    }
-	}
-	else
-	{
-	    ###    First candidate...
-	    $mostrecent_notbefore = $ca_notbefore;
-	    $intca = $ca_id;
-	}
+        # check if this CA has a more recent NotBefore date
+        if (defined $mostrecent_notbefore)
+        {
+            if (DateTime->compare($ca_notbefore, $mostrecent_notbefore) > 0)
+            {
+                ###    Issuing CA has a more recent NotBefore date than the previous one
+                $mostrecent_notbefore = $ca_notbefore;
+                $intca = $ca_id;
+            }
+        }
+        else
+        {
+            ###    First candidate...
+            $mostrecent_notbefore = $ca_notbefore;
+            $intca = $ca_id;
+        }
     }
 
     if (! defined $intca) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_ACTIVITY_TOOLS_DETERMINEISSUINGCA_NO_MATCHING_CA",
-	    params  => {
-		REQUESTED_NOTAFTER => $requested_notafter->iso8601(),
-	    },
-	);
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_ACTIVITY_TOOLS_DETERMINEISSUINGCA_NO_MATCHING_CA",
+            params  => {
+                REQUESTED_NOTAFTER => $requested_notafter->iso8601(),
+            },
+        );
     }
 
     $context->param(ca => $intca);

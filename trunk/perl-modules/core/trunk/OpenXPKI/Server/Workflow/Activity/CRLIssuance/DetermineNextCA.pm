@@ -20,8 +20,14 @@ sub execute {
     my $workflow   = shift;
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $pki_realm  = CTX('api')->get_pki_realm();
-
     my $context   = $workflow->context();
+
+    my $cfg_id = $self->{CONFIG};
+    if (! defined $cfg_id) {
+        # as this is called during creation, the cfg id is not defined
+        # yet, so we use the current one
+        $cfg_id = CTX('api')->get_current_config_id();
+    }
 
     my $context_ca_ids = $context->param('ca_ids');
     if (! defined $context_ca_ids) { # undefined, fill context with CA ids
@@ -32,7 +38,9 @@ sub execute {
 	        message => "I18N_OPENXPKI_ACTIVITY_CRLISSUANCE_DETERMINENEXTCA_API_NOT_DEFINED",
             );
         }
-        my $ca_ids = $api->list_ca_ids();
+        my $ca_ids = $api->list_ca_ids({
+            CONFIG_ID => $cfg_id,
+        });
         if (! defined $ca_ids || ref $ca_ids ne 'ARRAY') {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_DETERMINENEXTCA_NO_CA_IDS_DEFINED',
@@ -45,8 +53,10 @@ sub execute {
             );
         }
         ##! 16: 'ca_ids: ' . Dumper(\@ca_ids)
-        my @crl_issuing_cas; # only CAs that actually issue CRLs
-        my $realms = CTX('pki_realm');
+        my @crl_issuing_cas = (); # only CAs that actually issue CRLs
+        my $realms = CTX('pki_realm_by_cfg')->{$cfg_id};
+        ##! 64: 'config_id: ' . $cfg_id
+        ##! 64: 'realms: ' . Dumper $realms
         foreach my $ca_id (@ca_ids) {
             ##! 16: 'ca_id: ' . $ca_id
             ##! 16: Dumper(\$realms->{$pki_realm}->{ca}->{id}->{$ca_id})

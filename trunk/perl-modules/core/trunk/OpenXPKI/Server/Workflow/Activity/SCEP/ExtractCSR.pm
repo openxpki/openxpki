@@ -34,7 +34,7 @@ sub execute {
     $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7 . "-----END PKCS7-----\n";
     ##! 32: 'pkcs7: ' . $pkcs7
 
-    my $scep_token = CTX('pki_realm')->{$pki_realm}->{scep}->{id}->{$server}->{crypto}; 
+    my $scep_token = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{scep}->{id}->{$server}->{crypto}; 
 
     my $pkcs10 = $scep_token->command({
         COMMAND => 'get_pkcs10',
@@ -51,7 +51,7 @@ sub execute {
     # extract subject from CSR and add a context entry for it
     my $csr_obj = OpenXPKI::Crypto::CSR->new(
         DATA  => $pkcs10,
-        TOKEN => CTX('pki_realm')->{$pki_realm}->{crypto}->{default},
+        TOKEN => CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{crypto}->{default},
     );
     ##! 32: 'csr_obj: ' . Dumper $csr_obj
     my $subject = $csr_obj->get_parsed('BODY', 'SUBJECT');

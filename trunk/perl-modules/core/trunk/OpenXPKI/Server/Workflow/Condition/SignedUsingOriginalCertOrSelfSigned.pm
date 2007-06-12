@@ -25,16 +25,17 @@ sub evaluate {
     my $scep_server = $context->param('server');
     my $current_identifier = $context->param('current_identifier');
     my $pki_realm = CTX('session')->get_pki_realm(); 
+    my $cfg_id = CTX('api')->get_config_id({ ID => $workflow->id() });
 
-     my $pkcs7 = $context->param('pkcs7_content');
-     $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7 . "-----END PKCS7-----\n";
+    my $pkcs7 = $context->param('pkcs7_content');
+    $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7 . "-----END PKCS7-----\n";
 
-     ##! 32: 'pkcs7: ' . $pkcs7
-     my $scep_token = CTX('pki_realm')->{$pki_realm}->{scep}->{id}->{$scep_server}->{crypto}; 
-     my $signer_cert = $scep_token->command({
-         COMMAND => 'get_signer_cert',
-         PKCS7   => $pkcs7,
-    });
+    ##! 32: 'pkcs7: ' . $pkcs7
+    my $scep_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm}->{scep}->{id}->{$scep_server}->{crypto}; 
+    my $signer_cert = $scep_token->command({
+            COMMAND => 'get_signer_cert',
+            PKCS7   => $pkcs7,
+        });
     ##! 64: 'signer_cert: ' . $signer_cert
 
     my $tm = CTX('crypto_layer');

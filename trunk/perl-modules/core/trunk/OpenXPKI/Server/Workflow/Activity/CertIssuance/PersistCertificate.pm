@@ -47,7 +47,7 @@ sub execute {
     my %insert_hash = $x509->to_db_hash();
     my $identifier = $insert_hash{'IDENTIFIER'};
     my $ca = $context->param('ca');
-    my $ca_identifier = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$ca}->{identifier};
+    my $ca_identifier = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{ca}->{id}->{$ca}->{identifier};
     $insert_hash{'PKI_REALM'} = $pki_realm;
     $insert_hash{'ISSUER_IDENTIFIER'} = $ca_identifier;
     $insert_hash{'ROLE'}       = $context->param('cert_role'); 

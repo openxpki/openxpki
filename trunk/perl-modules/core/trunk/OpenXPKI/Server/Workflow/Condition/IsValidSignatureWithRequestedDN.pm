@@ -24,6 +24,7 @@ sub evaluate {
     ##! 64: 'context: ' . Dumper($context)
     my $pkcs7tool = $context->param('pkcs7tool');
     my $pki_realm = CTX('session')->get_pki_realm(); 
+    my $config_id = CTX('api')->get_config_id({ ID => $workflow->id() });
 
     my $csr_subject = $context->param('csr_subject');
     ##! 16: 'csr_subject: ' . $csr_subject
@@ -35,9 +36,10 @@ sub evaluate {
 
      ##! 32: 'pkcs7: ' . $pkcs7
      my $pkcs7_token = $tm->get_token(
-         TYPE => 'PKCS7',
-         ID   => $pkcs7tool,
+         TYPE      => 'PKCS7',
+         ID        => $pkcs7tool,
          PKI_REALM => $pki_realm,
+         CONFIG_ID => $config_id,
      );
      my $sig_subject = $pkcs7_token->command({
          COMMAND => 'get_subject',

@@ -20,51 +20,19 @@ sub execute {
     my $self = shift;
     my $workflow = shift;
 
-    $self->SUPER::execute($workflow,
-			  {
-			      ACTIVITYCLASS => 'CA',
-			      PARAMS => {
-				  _cert_profile => {
-				      accept_from => [ 'context' ],
-				      required => 1,
-				  },
-				  ca => {
-				      accept_from => [ 'context' ], 
-				      required => 1,
-				  },
-				  pkcs10 => {
-				      accept_from => [ 'context' ],
-				      required => 0,
-				  },
-				  spkac => {
-				      accept_from => [ 'context' ],
-				      required => 0,
-				  },
-				  cert_subject => {
-				      accept_from => [ 'context' ], 
-				      required => 1,
-				  },
-				  csr_type => {
-				      accept_from => [ 'context' ], 
-				      required => 1,
-				  },
-			      },
-			  });    
-    
-
     my $context = $workflow->context();
     ##! 32: 'context: ' . Dumper($context)
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $dbi = CTX('dbi_backend');
 
-    my $token = CTX('pki_realm')->{$self->{PKI_REALM}}->{ca}->{id}->{$self->param('ca')}->{crypto};
+    my $token = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$self->{PKI_REALM}}->{ca}->{id}->{$context->param('ca')}->{crypto};
     if (! defined $token) {
 	OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_TOKEN_UNAVAILABLE",
             );
     }
 
-    my $profile = $self->param('_cert_profile');
+    my $profile = $context->param('_cert_profile');
     ##! 16: 'profile: ' . $profile
 
     my $cert_subj_alt_name = $context->param('cert_subject_alt_name');
@@ -81,17 +49,17 @@ sub execute {
     );
     $profile->set_serial($serial);
 
-    $profile->set_subject($self->param('cert_subject'));
+    $profile->set_subject($context->param('cert_subject'));
 
     my $csr;
-    my $csr_type = $self->param('csr_type');
+    my $csr_type = $context->param('csr_type');
     ##! 16: 'csr_type: ' . $csr_type
     if ($csr_type eq 'pkcs10') {
-        $csr = $self->param('pkcs10');
+        $csr = $context->param('pkcs10');
     }
     elsif ($csr_type eq 'spkac') {
-        # $csr = "\nSPKAC=" . $self->param('spkac');
-        $csr = $self->param('spkac');
+        # $csr = "\nSPKAC=" . $context->param('spkac');
+        $csr = $context->param('spkac');
     }
     else { 
         OpenXPKI::Exception->throw(
@@ -104,7 +72,7 @@ sub execute {
 			        CSR     => $csr,
     });
     CTX('log')->log(
-	MESSAGE => "CA '" . $self->param('ca') . "' issued certificate with serial $serial and DN=" . $profile->get_subject() . " in PKI realm '" . $self->{PKI_REALM} . "'",
+	MESSAGE => "CA '" . $context->param('ca') . "' issued certificate with serial $serial and DN=" . $profile->get_subject() . " in PKI realm '" . $self->{PKI_REALM} . "'",
 	PRIORITY => 'info',
 	FACILITY => [ 'audit', 'system', ],
 	);

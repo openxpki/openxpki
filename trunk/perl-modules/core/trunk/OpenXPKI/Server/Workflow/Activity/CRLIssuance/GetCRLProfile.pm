@@ -47,7 +47,8 @@ sub execute {
     my $profile = OpenXPKI::Crypto::Profile::CRL->new(
             CONFIG    => CTX('xml_config'),
             PKI_REALM => $pki_realm,
-            CA        => $ca_ids[0]
+            CA        => $ca_ids[0],
+            CONFIG_ID => $self->{CONFIG_ID},
     );
     ##! 16: 'profile: ' . Dumper($profile)
     $context->param('_crl_profile' => $profile);

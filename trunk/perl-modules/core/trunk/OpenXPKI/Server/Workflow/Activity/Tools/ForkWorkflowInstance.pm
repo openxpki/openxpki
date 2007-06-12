@@ -193,8 +193,9 @@ sub execute {
             ### note that if we don't, the child waits for a communication
             ### timeout in the Default service.
             my $socket_file = CTX('xml_config')->get_xpath(
-                XPATH   => [ 'common', 'server', 'socket_file' ],
-                COUNTER => [ 0       , 0       , 0            ],
+                XPATH     => [ 'common', 'server', 'socket_file' ],
+                COUNTER   => [ 0       , 0       , 0            ],
+                CONFIG_ID => $self->{CONFIG_ID},
             );
             ##! 16: 'socket file: ' . $socket_file
             close($socket_file);

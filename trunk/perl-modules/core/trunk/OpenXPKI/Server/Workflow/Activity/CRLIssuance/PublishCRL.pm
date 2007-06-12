@@ -48,9 +48,9 @@ sub execute {
     
     my $current_ca = $ca_ids[0];
     my $pki_realm = CTX('api')->get_pki_realm();
-    my $ca_identifier = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$current_ca}->{identifier};
+    my $ca_identifier = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{ca}->{id}->{$current_ca}->{identifier};
     ##! 16: 'ca_identifier: ' . $ca_identifier
-    my $crl_files = CTX('pki_realm')->{$pki_realm}->{ca}->{id}->{$current_ca}->{'crl_files'};
+    my $crl_files = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{ca}->{id}->{$current_ca}->{'crl_files'};
     ##! 16: 'ref crl_files: ' . ref $crl_files
     if (ref $crl_files ne 'ARRAY') {
 	OpenXPKI::Exception->throw (
@@ -119,22 +119,28 @@ sub execute {
 
     my $ldap_servers = 0;
     my $realm_index; 
-    my $nr_of_realms = $config->get_xpath_count(XPATH => [ 'pki_realm' ]);
+    my $nr_of_realms = $config->get_xpath_count(
+        XPATH     => [ 'pki_realm' ],
+        CONFIG_ID => $self->{CONFIG_ID},
+    );
     ##! 64: 'nr of realms: ' . $nr_of_realms
 
     SEARCH_REALM_INDEX:
     for (my $i = 0; $i < $nr_of_realms; $i++) {
         next SEARCH_REALM_INDEX if ($pki_realm ne $config->get_xpath(
                                     XPATH   => [ 'pki_realm', 'name' ],
-                                    COUNTER => [ $i,          0]));
+                                    COUNTER => [ $i,          0],
+                                    CONFIG_ID => $self->{CONFIG_ID},
+                                   ));
         $realm_index = $i;
         last SEARCH_REALM_INDEX;
     }
     ##! 64: 'realm_index: '  . $realm_index
 
     my $nr_of_cas = $config->get_xpath_count(
-                        XPATH   => [ 'pki_realm', 'ca' ],
-                        COUNTER => [ $realm_index ],
+                        XPATH     => [ 'pki_realm', 'ca' ],
+                        COUNTER   => [ $realm_index ],
+                        CONFIG_ID => $self->{CONFIG_ID},
     );
 
     my $ca_index;
@@ -142,7 +148,9 @@ sub execute {
     for (my $i = 0; $i < $nr_of_cas; $i++) {
         next SEARCH_CA_INDEX if ($current_ca ne $config->get_xpath(
                                     XPATH   => [ 'pki_realm' , 'ca', 'id' ],
-                                    COUNTER => [ $realm_index, $i, 0 ]));
+                                    COUNTER => [ $realm_index, $i, 0 ],
+                                    CONFIG_ID => $self->{CONFIG_ID},
+                                ));
         $ca_index = $i;
         last SEARCH_CA_INDEX;
     }
@@ -150,36 +158,43 @@ sub execute {
 
     eval {
         $ldap_servers = $config->get_xpath_count(
-            XPATH   => [ 'pki_realm' , 'ca'     , 'crl_publication', 'ldap' ],
-            COUNTER => [ $realm_index, $ca_index, 0 ],
+            XPATH     => [ 'pki_realm' , 'ca'     , 'crl_publication', 'ldap' ],
+            COUNTER   => [ $realm_index, $ca_index, 0 ],
+            CONFIG_ID => $self->{CONFIG_ID},
         );
     };
     for (my $i = 0; $i < $ldap_servers; $i++) {
         my @basepath = ('pki_realm', 'ca', 'crl_publication', 'ldap');
         my @basectr = ($realm_index, $ca_index, 0, $i);
         my $ldap_server = $config->get_xpath(
-            XPATH   => [ @basepath, 'server' ],
-            COUNTER => [ @basectr , '0'],
+            XPATH     => [ @basepath, 'server' ],
+            COUNTER   => [ @basectr , '0'],
+            CONFIG_ID => $self->{CONFIG_ID},
         );
         my $ldap_port = $config->get_xpath(
-            XPATH   => [ @basepath, 'port' ],
-            COUNTER => [ @basectr , '0'],
+            XPATH     => [ @basepath, 'port' ],
+            COUNTER   => [ @basectr , '0'],
+            CONFIG_ID => $self->{CONFIG_ID},
         );
         my $ldap_bind_dn = $config->get_xpath(
-            XPATH   => [ @basepath, 'bind_dn' ],
-            COUNTER => [ @basectr , '0'],
+            XPATH     => [ @basepath, 'bind_dn' ],
+            COUNTER   => [ @basectr , '0'],
+            CONFIG_ID => $self->{CONFIG_ID},
         );
         my $ldap_pass = $config->get_xpath(
-            XPATH   => [ @basepath, 'pass' ],
-            COUNTER => [ @basectr , '0'],
+            XPATH     => [ @basepath, 'pass' ],
+            COUNTER   => [ @basectr , '0'],
+            CONFIG_ID => $self->{CONFIG_ID},
         );
         my $ldap_base_dn = $config->get_xpath(
-            XPATH   => [ @basepath, 'base_dn' ],
-            COUNTER => [ @basectr , '0'],
+            XPATH     => [ @basepath, 'base_dn' ],
+            COUNTER   => [ @basectr , '0'],
+            CONFIG_ID => $self->{CONFIG_ID},
         );
         my $ldap_search_dn = $config->get_xpath(
-            XPATH   => [ @basepath, 'search_dn' ],
-            COUNTER => [ @basectr , '0'],
+            XPATH     => [ @basepath, 'search_dn' ],
+            COUNTER   => [ @basectr , '0'],
+            CONFIG_ID => $self->{CONFIG_ID},
         );
         if (! $ldap_server || ! $ldap_port    || ! $ldap_bind_dn ||
             ! $ldap_pass   || ! $ldap_base_dn || ! $ldap_search_dn) {

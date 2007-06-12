@@ -204,7 +204,13 @@ sub validate {
         );
     }
     ##! 16: 'signer subject: ' . $signer_subject
-    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $cfg_id = CTX('api')->get_config_id({ ID => $wf->id() });
+    if (! defined $cfg_id) {
+        # as this is called during creation, the cfg id is not defined
+        # yet, so we use the current one
+        $cfg_id = CTX('api')->get_current_config_id();
+    }
+    my $default_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm}->{crypto}->{default};
     my @signer_chain = $default_token->command({
         COMMAND        => 'pkcs7_get_chain',
         PKCS7          => $pkcs7,

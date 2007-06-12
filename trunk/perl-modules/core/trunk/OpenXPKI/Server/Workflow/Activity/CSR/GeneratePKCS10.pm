@@ -20,8 +20,8 @@ sub execute
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $pki_realm  = CTX('session')->get_pki_realm();
-    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->
+                            {$self->{PKI_REALM}}->{crypto}->{default};
     my $private_key = $context->param('private_key');
     my $password    = $context->param('_password');
     my $subject     = $context->param('cert_subject');

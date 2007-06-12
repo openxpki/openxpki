@@ -36,8 +36,19 @@ sub validate {
     return if (not defined $style);
     return if (not defined $subject_parts);
 
+    ##! 16: 'wf->id(): ' . $wf->id()
+    my $cfg_id = $api->get_config_id({ ID => $wf->id() });
+    ##! 16: 'cfg_id: ' . $cfg_id
+    if (! defined $cfg_id) {
+        # as this is called during creation, the cfg id is not defined
+        # yet, so we use the current one
+        $cfg_id = $api->get_current_config_id();
+    }
+    ##! 16: 'cfg_id: ' . $cfg_id
+
     my $styles = $api->get_cert_subject_styles({
-        PROFILE => $profile,
+        PROFILE   => $profile,
+        CONFIG_ID => $cfg_id,
     });
     ##! 64: 'styles: ' . Dumper $styles
 

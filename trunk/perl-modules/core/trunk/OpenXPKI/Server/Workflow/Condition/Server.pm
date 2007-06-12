@@ -7,46 +7,45 @@ use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use English;
 
-__PACKAGE__->mk_accessors( 'grant' );
-
-sub _init
+sub evaluate
 {
-    my ( $self, $params ) = @_;
+    my ( $self, $wf ) = @_;
+    my $config_id = CTX('api')->get_config_id({ ID => $wf->id() });
+    ##! 16: 'config id: ' . $config_id
 
-    ## check for the required config param
-    unless ( exists $params->{server_id} )
+    unless ( defined $self->param('server_id') )
     {
         configuration_error
              "You must define one value for 'server_id' in ",
              "declaration of condition ", $self->name;
     }
 
+    my $server_ids;
     ## server_id can be a scalar
-    if (not ref $params->{server_id})
+    if (not ref $self->param('server_id'))
     {
         ## only one role -> simplest case
-        $params->{server_id} = [ $params->{server_id} ];
+        $server_ids = [ $self->param('server_id') ];
+    }
+    else {
+        $server_ids = $self->param('server_id');
     }
 
     ## get local server_id
     my $server_id = CTX('xml_config')->get_xpath (
-                        XPATH    => [ 'common/database/server_id' ],
-                        COUNTER  => [ 0 ]);
+                        XPATH     => [ 'common/database/server_id' ],
+                        COUNTER   => [ 0 ],
+                        CONFIG_ID => $config_id,
+    );
 
     ## search for a matching server_id
-    $self->grant(0);
-    foreach my $id (@{$params->{server_id}})
+    my $grant = 0;
+    foreach my $id (@{$server_ids})
     {
         ## use string compare to avoid problems with wrong configs
-        $self->grant(1) if ($id eq $server_id);
+        $grant = 1 if ($id eq $server_id);
     }
-}
-
-sub evaluate
-{
-    my ( $self, $wf ) = @_;
-
-    if (not $self->grant())
+    if (not $grant)
     {
         my $errors = [[ 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SERVER_WRONG_SERVER' ]];
         $wf->context()->param ("__error" => $errors);

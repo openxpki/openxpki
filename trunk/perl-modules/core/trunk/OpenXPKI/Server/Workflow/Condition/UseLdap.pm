@@ -25,7 +25,8 @@ sub evaluate
  my ( $self, $wf ) = @_;
 
  my $pki_realm = CTX('api')->get_pki_realm();
- my $realm_config = CTX('pki_realm')->{$pki_realm};
+ my $cfg_id = CTX('api')->get_config_id({ ID => $wf->id() });
+ my $realm_config = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm};
 
  if ($realm_config->{ldap_enable} ne 'yes') {
      condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_LDAP_DISABLED");

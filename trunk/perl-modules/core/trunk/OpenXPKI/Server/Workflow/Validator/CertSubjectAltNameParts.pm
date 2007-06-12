@@ -33,6 +33,16 @@ sub validate {
 
     return if (not defined $subject_alt_name_parts);
 
+    ##! 16: 'wf->id(): ' . $wf->id()
+    my $cfg_id = $api->get_config_id({ ID => $wf->id() });
+    ##! 16: 'cfg_id: ' . $cfg_id
+    if (! defined $cfg_id) {
+        # as this is called during creation, the cfg id is not defined
+        # yet, so we use the current one
+        $cfg_id = $api->get_current_config_id();
+    }
+
+    ##! 16: 'cfg_id: ' . $cfg_id
     Encode::_utf8_off ($subject_alt_name_parts);
     Encode::_utf8_off ($subject_parts);
     my $ser = OpenXPKI::Serialization::Simple->new();
@@ -231,7 +241,10 @@ sub validate {
         validation_error ($errors->[scalar @{$errors} -1]);
     }
     # save subject alt names in context
-    my $styles = CTX('api')->get_cert_subject_styles({PROFILE => $profile =>});
+    my $styles = CTX('api')->get_cert_subject_styles({
+        PROFILE   => $profile,
+        CONFIG_ID => $cfg_id,
+    });
     ##! 64: 'styles: ' . Dumper $styles
  
     # template evaluation for 'fixed' SANs
