@@ -38,7 +38,7 @@ sub new {
 
     my $keys       = shift;
 
-    $self->__load_config();
+    $self->__load_config($keys);
 
     ##! 1: "end"
     return $self;
@@ -53,13 +53,20 @@ sub __load_config
 {
     ##! 4: "start"
     my $self = shift;
+    my $keys = shift;
 
     ##! 8: "load all PKI realms"
 
-    my $realms = CTX('xml_config')->get_xpath_count (XPATH => 'pki_realm');
+    my $realms = CTX('xml_config')->get_xpath_count(
+        XPATH     => 'pki_realm',
+        CONFIG_ID => $keys->{CONFIG_ID},
+    );
     for (my $i=0; $i < $realms; $i++)
     {
-        $self->__load_pki_realm ({PKI_REALM => $i});
+        $self->__load_pki_realm ({
+                PKI_REALM => $i,
+                CONFIG_ID => $keys->{CONFIG_ID},
+        });
     }
 
     ##! 4: "leaving function successfully"
@@ -69,30 +76,42 @@ sub __load_config
 sub __load_pki_realm
 {
     ##! 4: "start"
-    my $self  = shift;
-    my $keys  = shift;
-    my $realm = $keys->{PKI_REALM};
+    my $self   = shift;
+    my $keys   = shift;
+    my $realm  = $keys->{PKI_REALM};
+    my $cfg_id = $keys->{CONFIG_ID};
 
     my $name = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'name'],
-                                         COUNTER => [$realm, 0]);
+                                         COUNTER => [$realm, 0],
+                                         CONFIG_ID => $cfg_id );
     $self->{PKI_REALM}->{$name}->{POS} = $realm;
 
     ##! 8: "load all handlers"
 
     my $handlers = CTX('xml_config')->get_xpath_count (XPATH   => ['pki_realm', 'auth', 'handler'],
-                                                   COUNTER => [$realm, 0]);
+                                                   COUNTER => [$realm, 0],
+                                                   CONFIG_ID => $cfg_id);
     for (my $i=0; $i < $handlers; $i++)
     {
-        $self->__load_handler ({PKI_REALM => $name, HANDLER => $i});
+        $self->__load_handler ({
+                PKI_REALM => $name,
+                HANDLER   => $i,
+                CONFIG_ID => $cfg_id,
+        });
     }
 
     ##! 8: "determine all authentication stacks"
 
     my $stacks = CTX('xml_config')->get_xpath_count (XPATH   => ['pki_realm', 'auth', 'stack'],
-                                                 COUNTER => [$realm, 0]);
+                                                 COUNTER => [$realm, 0],
+                                                 CONFIG_ID => $cfg_id);
     for (my $i=0; $i < $stacks; $i++)
     {
-        $self->__load_stack ({PKI_REALM => $name, STACK => $i});
+        $self->__load_stack ({
+                PKI_REALM => $name,
+                STACK     => $i,
+                CONFIG_ID => $cfg_id,
+        });
     }
     ##! 4: "end"
     return 1;
@@ -106,20 +125,27 @@ sub __load_stack
     my $realm     = $keys->{PKI_REALM};
     my $realm_pos = $self->{PKI_REALM}->{$realm}->{POS};
     my $stack_pos = $keys->{STACK};
+    my $cfg_id    = $keys->{CONFIG_ID};
 
     ##! 8: "load stack name (this is what the user will see)"
 
     my $stack = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'stack', 'name'],
-                                              COUNTER => [$realm_pos, 0, $stack_pos, 0]);
+                                              COUNTER => [$realm_pos, 0, $stack_pos, 0],
+                                              CONFIG_ID => $cfg_id,
+    );
     my $desc  = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'stack', 'description'],
-                                              COUNTER => [$realm_pos, 0, $stack_pos, 0]);
+                                              COUNTER => [$realm_pos, 0, $stack_pos, 0],
+                                              CONFIG_ID => $cfg_id,
+    );
 
     ##! 8: "determine all used handlers"
 
     $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION} = $desc;
     $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER} =
         CTX('xml_config')->get_xpath_list (XPATH   => ['pki_realm', 'auth', 'stack', 'handler'],
-                                       COUNTER => [$realm_pos, 0, $stack_pos]);
+                                       COUNTER => [$realm_pos, 0, $stack_pos],
+                                        CONFIG_ID => $cfg_id,
+    );
     ##! 4: "end"
     return 1;
 }
@@ -132,20 +158,25 @@ sub __load_handler
     my $realm       = $keys->{PKI_REALM};
     my $realm_pos   = $self->{PKI_REALM}->{$realm}->{POS};
     my $handler_pos = $keys->{HANDLER};
+    my $cfg_id      = $keys->{CONFIG_ID};
 
     ##! 8: "load handler name and type"
 
     my $name = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'handler', 'name'],
-                                         COUNTER => [$realm_pos, 0, $handler_pos, 0]);
+                                         COUNTER => [$realm_pos, 0, $handler_pos, 0],
+                                        CONFIG_ID => $cfg_id);
     my $type = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'auth', 'handler', 'type'],
-                                         COUNTER => [$realm_pos, 0, $handler_pos, 0]);
+                                         COUNTER => [$realm_pos, 0, $handler_pos, 0],
+                                        CONFIG_ID => $cfg_id);
     ##! 8: "name ::= $name"
     ##! 8: "type ::= $type"
     $type = "OpenXPKI::Server::Authentication::$type";
     $self->{PKI_REALM}->{$realm}->{HANDLER}->{$name} = eval {
 
         $type->new ({XPATH   => ['pki_realm', 'auth', 'handler'],
-                     COUNTER => [$realm_pos, 0, $handler_pos]});
+                     COUNTER => [$realm_pos, 0, $handler_pos],
+                     CONFIG_ID => $cfg_id,
+                   });
 
                                                            };
     if (my $exc = OpenXPKI::Exception->caught())

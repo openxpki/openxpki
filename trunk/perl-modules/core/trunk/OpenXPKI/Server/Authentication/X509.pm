@@ -33,9 +33,13 @@ sub new {
     my $config = CTX('xml_config');
 
     $self->{DESC} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "description" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                        CONFIG_ID => $keys->{CONFIG_ID},
+    );
     $self->{NAME} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "name" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                        CONFIG_ID => $keys->{CONFIG_ID},
+    );
 
     # create an empty arrayref of pending challenges
     $self->{PENDING_CHALLENGES} = [];
@@ -44,8 +48,9 @@ sub new {
     my @trust_anchors;
     eval {
         $trust_anchors = $config->get_xpath(
-            XPATH   => [ @{$keys->{XPATH}},   "trust_anchors" ],
-            COUNTER => [ @{$keys->{COUNTER}}, 0 ]
+            XPATH    => [ @{$keys->{XPATH}},   "trust_anchors" ],
+            COUNTER  => [ @{$keys->{COUNTER}}, 0 ],
+            CONFIG_ID => $keys->{CONFIG_ID},
         );
         @trust_anchors = split(q{,}, $trust_anchors);
     };
@@ -61,8 +66,9 @@ sub new {
     $self->{TRUST_ANCHORS} = \@trust_anchors;
     eval {
         $self->{PKCS7TOOL} = $config->get_xpath(
-            XPATH   => [ @{$keys->{XPATH}},   "pkcs7tool" ],
-            COUNTER => [ @{$keys->{COUNTER}}, 0 ]
+            XPATH    => [ @{$keys->{XPATH}},   "pkcs7tool" ],
+            COUNTER  => [ @{$keys->{COUNTER}}, 0 ],
+            CONFIG_ID => $keys->{CONFIG_ID},
         );
     };
     if ($EVAL_ERROR) {
@@ -75,8 +81,9 @@ sub new {
     }
     eval {
         $self->{CHALLENGE_LENGTH} = $config->get_xpath(
-            XPATH   => [ @{$keys->{XPATH}},   "challenge_length" ],
-            COUNTER => [ @{$keys->{COUNTER}}, 0 ]
+            XPATH     => [ @{$keys->{XPATH}},   "challenge_length" ],
+            COUNTER   => [ @{$keys->{COUNTER}}, 0 ],
+            CONFIG_ID => $keys->{CONFIG_ID},
         );
     };
     if ($EVAL_ERROR) {

@@ -24,6 +24,7 @@ use Template;
 my %pki_realm_of     :ATTR( :init_arg<PKI_REALM> ); 
 my %name_of          :ATTR( :init_arg<NAME>      ); # name of the notifier
 my %config_of        :ATTR( :init_arg<CONFIG>    ); # the XML config
+my %config_id_of     :ATTR( :init_arg<CONFIG_ID> ); # the config identifier
         
 sub START {
     ##! 2: 'start'
@@ -67,8 +68,9 @@ sub notify {
 
 
     my $action_count = $config_of{$ident}->get_xpath_count(
-        XPATH   => [ @xpath  , 'action' ],
-        COUNTER => [ @counter ],       
+        XPATH     => [ @xpath  , 'action' ],
+        COUNTER   => [ @counter ],       
+        CONFIG_ID => $config_id_of{$ident},
     );
     ##! 16: 'number of actions to do: ' . $action_count
 
@@ -76,8 +78,9 @@ sub notify {
     my $new_ticket_id;
     for (my $i = 0; $i < $action_count; $i++) {
         my $action_type = $config_of{$ident}->get_xpath(
-            XPATH   => [ @xpath  , 'action', 'type' ],
-            COUNTER => [ @counter, $i      , 0      ],
+            XPATH    => [ @xpath  , 'action', 'type' ],
+            COUNTER  => [ @counter, $i      , 0      ],
+            CONFIG_ID => $config_id_of{$ident},
         );
         ##! 16: 'action_type: ' . $action_type
         my $method_name = '__do_' . $action_type;
@@ -266,10 +269,11 @@ sub __get_backend_config_value {
 
     my $index = $self->__get_notifier_index();
     my $config_value = $config_of{$ident}->get_xpath(
-        XPATH   => [ 'common', 'notification_config', 'notifier',
-                     'notification_backend', "$config_key" ],
-        COUNTER => [ 0       , 0                    , $index    ,
-                     0                     , 0             ],
+        XPATH     => [ 'common', 'notification_config', 'notifier',
+                       'notification_backend', "$config_key" ],
+        COUNTER   => [ 0       , 0                    , $index    ,
+                       0                     , 0             ],
+        CONFIG_ID => $config_id_of{$ident},
     );
     ##! 16: 'config_value for ' . $config_key . ': ' . $config_value 
 
@@ -286,8 +290,9 @@ sub __get_notifier_index :PRIVATE {
     my $config   = $config_of{$ident};
 
     my $nr_of_all_notifiers = $config->get_xpath_count(
-        XPATH   => [ 'common', 'notification_config', 'notifier' ],
-        COUNTER => [ 0       , 0                   ],
+        XPATH     => [ 'common', 'notification_config', 'notifier' ],
+        COUNTER   => [ 0       , 0                   ],
+        CONFIG_ID => $config_id_of{$ident},
     );
     ##! 16: 'nr_of_all_notifiers: ' . $nr_of_all_notifiers
 
@@ -297,6 +302,7 @@ sub __get_notifier_index :PRIVATE {
         my $notifier_name = $config->get_xpath(
           XPATH   => [ 'common', 'notification_config', 'notifier', 'id' ],
           COUNTER => [ 0       , 0                    , $i        , 0    ],
+          CONFIG_ID => $config_id_of{$ident},
         );
         if ($notifier_name eq $notifier) {
             $index = $i;
@@ -331,8 +337,9 @@ sub __get_notification_index :PRIVATE {
                     0               );
 
     my $nr_of_notifications = $config->get_xpath_count(
-        XPATH   => [ @xpath   ],
-        COUNTER => [ @counter ],
+        XPATH     => [ @xpath   ],
+        COUNTER   => [ @counter ],
+        CONFIG_ID => $config_id_of{$ident},
     );
     ##! 16: 'nr_of_notifications: ' . $nr_of_notifications
 
@@ -340,8 +347,9 @@ sub __get_notification_index :PRIVATE {
   NOTIFICATION_INDEX:
     for (my $i = 0; $i < $nr_of_notifications; $i++) {
         my $notification_name = $config->get_xpath(
-          XPATH   => [ @xpath,      'id' ],
-          COUNTER => [ @counter, $i, 0   ],
+          XPATH     => [ @xpath,      'id' ],
+          COUNTER   => [ @counter, $i, 0   ],
+          CONFIG_ID => $config_id_of{$ident},
         );
         if ($notification_name eq $notification) {
             $index = $i;
@@ -379,8 +387,9 @@ sub __get_action_config_template :PRIVATE {
     eval {
         # get the number of entries for this key
         $count = $config_of{$ident}->get_xpath_count(
-            XPATH   => [ @xpath  , 'template' ],
-            COUNTER => [ @counter ],
+            XPATH     => [ @xpath  , 'template' ],
+            COUNTER   => [ @counter ],
+            CONFIG_ID => $config_id_of{$ident},
         );
     };
     if (! $count) {
@@ -392,8 +401,9 @@ sub __get_action_config_template :PRIVATE {
   FIND_LANGUAGE_TEMPLATE:
     for (my $i = 0; $i < $count; $i++) {
         my $lang = $config_of{$ident}->get_xpath(
-            XPATH   => [ @xpath  , 'template', 'lang' ],
-            COUNTER => [ @counter, $i        , 0      ],
+            XPATH     => [ @xpath  , 'template', 'lang' ],
+            COUNTER   => [ @counter, $i        , 0      ],
+            CONFIG_ID => $config_id_of{$ident},
         );
         if ($lang eq $language) {
             $template_index = $i;
@@ -407,8 +417,9 @@ sub __get_action_config_template :PRIVATE {
         $template_index = 0;
     }
     my $filename = $config_of{$ident}->get_xpath(
-        XPATH   => [ @xpath  , 'template'     , 'file' ],
-        COUNTER => [ @counter, $template_index, 0      ],
+        XPATH     => [ @xpath  , 'template'     , 'file' ],
+        COUNTER   => [ @counter, $template_index, 0      ],
+        CONFIG_ID => $config_id_of{$ident},
     );
     if (! -e $filename) {
         OpenXPKI::Exception->throw(
@@ -460,8 +471,9 @@ sub __get_action_config_value :PRIVATE {
     eval {
         # get the number of entries for this key
         $count = $config_of{$ident}->get_xpath_count(
-            XPATH   => [ @xpath  , $arg_ref->{KEY} ],
-            COUNTER => [ @counter ],
+            XPATH     => [ @xpath  , $arg_ref->{KEY} ],
+            COUNTER   => [ @counter ],
+            CONFIG_ID => $config_id_of{$ident},
         );
     };
     if (! $count) {
@@ -474,8 +486,9 @@ sub __get_action_config_value :PRIVATE {
     }
     elsif ($count == 1) { # scalar value
         $value = $config_of{$ident}->get_xpath(
-            XPATH   => [ @xpath  , $arg_ref->{KEY} ],
-            COUNTER => [ @counter, 0               ],
+            XPATH     => [ @xpath  , $arg_ref->{KEY} ],
+            COUNTER   => [ @counter, 0               ],
+            CONFIG_ID => $config_id_of{$ident},
         );
         $value = $self->__apply_template({
             TEMPLATE  => $value,
@@ -485,8 +498,9 @@ sub __get_action_config_value :PRIVATE {
     else { # more than one, prepare an array reference
         for (my $i = 0; $i < $count; $i++) {
             $value->[$i] = $config_of{$ident}->get_xpath(
-                XPATH   => [ @xpath  , $arg_ref->{KEY} ],
-                COUNTER => [ @counter, $i              ],
+                XPATH     => [ @xpath  , $arg_ref->{KEY} ],
+                COUNTER   => [ @counter, $i              ],
+                CONFIG_ID => $config_id_of{$ident},
             );
             $value->[$i] = $self->__apply_template({
                 TEMPLATE  => $value->[$i],

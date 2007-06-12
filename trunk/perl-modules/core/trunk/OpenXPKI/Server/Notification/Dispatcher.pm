@@ -25,17 +25,23 @@ sub START {
     ##! 2: 'start'
     my $self    = shift;
     my $ident   = shift;
+    my $arg_ref = shift;
+    my $cfg_id  = $arg_ref->{CONFIG_ID};
 
     my $config = CTX('xml_config');
 
-    my $nr_of_realms = $config->get_xpath_count(XPATH => 'pki_realm');
+    my $nr_of_realms = $config->get_xpath_count(
+        XPATH     => 'pki_realm',
+        CONFIG_ID => $cfg_id,
+    );
     ##! 16: 'nr_of_realms: ' . $nr_of_realms
 
     # iterate over PKI realms
     for (my $i = 0; $i < $nr_of_realms; $i++) {
         my $pki_realm = $config->get_xpath(
-            XPATH    => [ 'pki_realm', 'name' ],
-            COUNTER  => [ $i         , 0      ]
+            XPATH     => [ 'pki_realm', 'name' ],
+            COUNTER   => [ $i         , 0      ],
+            CONFIG_ID => $cfg_id,
         );
         ##! 16: 'pki_realm: ' . $pki_realm
 
@@ -45,8 +51,9 @@ sub START {
         my $nr_of_notifiers = 0;
         eval {
             $nr_of_notifiers = $config->get_xpath_count(
-                XPATH   => [ @xpath  , 'notifier' ],
-                COUNTER => [ @counter ],
+                XPATH    => [ @xpath  , 'notifier' ],
+                COUNTER  => [ @counter ],
+                CONFIG_ID => $cfg_id,
             );
         };
         ##! 16: 'notifiers: ' . $nr_of_notifiers
@@ -54,8 +61,9 @@ sub START {
         # iterate over notifiers	
         for (my $ii = 0; $ii < $nr_of_notifiers; $ii++) {
             my $notifier = $config->get_xpath(
-                XPATH   => [ @xpath  , 'notifier' ],
-                COUNTER => [ @counter, $ii        ],
+                XPATH     => [ @xpath  , 'notifier' ],
+                COUNTER   => [ @counter, $ii        ],
+                CONFIG_ID => $cfg_id,
             );
             ##! 16: 'notifier: ' . $notifier
             my $notifier_type = $self->__get_notifier_type($notifier);
@@ -85,6 +93,7 @@ sub START {
                     CONFIG    => $config,
                     NAME      => $notifier,
                     PKI_REALM => $pki_realm,
+                    CONFIG_ID => $cfg_id,
                 });
             };
             if (my $exc = OpenXPKI::Exception->caught()) {

@@ -32,7 +32,7 @@ sub new {
     my $keys = shift;
     ##! 1: "start"
 
-    return undef if (not $self->__load_config ());
+    return undef if (not $self->__load_config ($keys));
 
     ##! 1: "end"
     return $self;
@@ -48,12 +48,18 @@ sub __load_config
     my $self = shift;
     ##! 1: "start"
 
+    my $keys   = shift;
+    my $cfg_id = $keys->{CONFIG_ID};
+
     ## load all PKI realms
 
-    my $realms = CTX('xml_config')->get_xpath_count (XPATH => 'pki_realm');
+    my $realms = CTX('xml_config')->get_xpath_count(
+        XPATH     => 'pki_realm',
+        CONFIG_ID => $cfg_id,
+    );
     for (my $i=0; $i < $realms; $i++)
     {
-        $self->__load_pki_realm ({PKI_REALM => $i});
+        $self->__load_pki_realm ({PKI_REALM => $i, CONFIG_ID => $cfg_id});
     }
 
     ##! 1: "leaving function successfully"
@@ -62,17 +68,20 @@ sub __load_config
 
 sub __load_pki_realm
 {
-    my $self  = shift;
-    my $keys  = shift;
-    my $realm = $keys->{PKI_REALM};
+    my $self   = shift;
+    my $keys   = shift;
+    my $realm  = $keys->{PKI_REALM};
+    my $cfg_id = $keys->{CONFIG_ID};
 
-    my $name = CTX('xml_config')->get_xpath (XPATH   => ['pki_realm', 'name'],
-                                             COUNTER => [$realm, 0]);
+    my $name = CTX('xml_config')->get_xpath (XPATH     => ['pki_realm', 'name'],
+                                             COUNTER   => [$realm, 0],
+                                             CONFIG_ID => $cfg_id,
+    );
     $self->{PKI_REALM}->{$name}->{POS} = $realm;
 
-    $self->__load_server      ({PKI_REALM => $name});
-    $self->__load_roles       ({PKI_REALM => $name});
-    $self->__load_permissions ({PKI_REALM => $name});
+    $self->__load_server      ({PKI_REALM => $name, CONFIG_ID => $cfg_id});
+    $self->__load_roles       ({PKI_REALM => $name, CONFIG_ID => $cfg_id});
+    $self->__load_permissions ({PKI_REALM => $name, CONFIG_ID => $cfg_id});
 
     return 1;
 }
@@ -82,27 +91,35 @@ sub __load_server
     my $self  = shift;
     my $keys  = shift;
     ##! 1: 'start'
-    my $realm = $keys->{PKI_REALM};
-    my $pkiid = $self->{PKI_REALM}->{$realm}->{POS};
+    my $realm  = $keys->{PKI_REALM};
+    my $cfg_id = $keys->{CONFIG_ID};
+    my $pkiid  = $self->{PKI_REALM}->{$realm}->{POS};
 
     # get the ID of the server that we are on
     # (for some reason, this ID lives in the database part of the
     #  configuration)
     my $our_server_id = CTX('xml_config')->get_xpath (
          XPATH   => ['common', 'database', 'server_id'],
-         COUNTER => [0, 0, 0]
+         COUNTER => [0, 0, 0],
+         CONFIG_ID => $cfg_id,
     );
     my $servers = CTX('xml_config')->get_xpath_count (
                       XPATH   => ['pki_realm', 'acl', 'server'],
-                      COUNTER => [$pkiid, 0]);
+                      COUNTER => [$pkiid, 0],
+                      CONFIG_ID => $cfg_id,
+                  );
 
     for (my $i=0; $i < $servers; $i++) {
         my $id   = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'server', 'id'],
-                       COUNTER => [ $pkiid, 0, $i, 0]);
+                       COUNTER => [ $pkiid, 0, $i, 0],
+                       CONFIG_ID => $cfg_id,
+                   );
         my $name = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'server', 'name'],
-                       COUNTER => [ $pkiid, 0, $i, 0]);
+                       COUNTER => [ $pkiid, 0, $i, 0],
+                       CONFIG_ID => $cfg_id,
+                   );
         if (exists $self->{SERVER}->{$realm}->{$id}) {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_ACL_LOAD_SERVER_DUPLICATE_ID_FOUND",
@@ -121,19 +138,24 @@ sub __load_server
 
 sub __load_roles
 {
-    my $self  = shift;
-    my $keys  = shift;
-    my $realm = $keys->{PKI_REALM};
-    my $pkiid = $self->{PKI_REALM}->{$realm}->{POS};
+    my $self   = shift;
+    my $keys   = shift;
+    my $realm  = $keys->{PKI_REALM};
+    my $cfg_id = $keys->{CONFIG_ID};
+    my $pkiid  = $self->{PKI_REALM}->{$realm}->{POS};
 
     my $roles = CTX('xml_config')->get_xpath_count (
                       XPATH   => ['pki_realm', 'acl', 'role'],
-                      COUNTER => [$pkiid, 0]);
+                      COUNTER => [$pkiid, 0],
+                      CONFIG_ID => $cfg_id,
+                  );
     for (my $i=0; $i < $roles; $i++)
     {
         my $role = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'role'],
-                       COUNTER => [ $pkiid, 0, $i]);
+                       COUNTER => [ $pkiid, 0, $i],
+                       CONFIG_ID => $cfg_id,
+                   );
         $self->{PKI_REALM}->{$realm}->{ROLES}->{$role} = 1;
     }
     ## add empty role for things which have no owner or are owned by the CA
@@ -143,28 +165,39 @@ sub __load_roles
 
 sub __load_permissions
 {
-    my $self  = shift;
-    my $keys  = shift;
-    my $realm = $keys->{PKI_REALM};
-    my $pkiid = $self->{PKI_REALM}->{$realm}->{POS};
+    my $self   = shift;
+    my $keys   = shift;
+    my $realm  = $keys->{PKI_REALM};
+    my $cfg_id = $keys->{CONFIG_ID};
+    my $pkiid  = $self->{PKI_REALM}->{$realm}->{POS};
 
     my $perms = CTX('xml_config')->get_xpath_count (
                       XPATH   => ['pki_realm', 'acl', 'permission'],
-                      COUNTER => [$pkiid, 0]);
+                      COUNTER => [$pkiid, 0],
+                      CONFIG_ID => $cfg_id,
+                  );
     for (my $i=0; $i < $perms; $i++)
     {
         my $server = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'permission', 'server'],
-                       COUNTER => [ $pkiid, 0, $i]);
+                       COUNTER => [ $pkiid, 0, $i],
+                       CONFIG_ID => $cfg_id,
+                   );
         my $activity = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'permission', 'activity'],
-                       COUNTER => [ $pkiid, 0, $i]);
+                       COUNTER => [ $pkiid, 0, $i],
+                       CONFIG_ID => $cfg_id,
+                   );
         my $owner = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'permission', 'affected_role'],
-                       COUNTER => [ $pkiid, 0, $i]);
+                       COUNTER => [ $pkiid, 0, $i],
+                       CONFIG_ID => $cfg_id,
+                   );
         my $user = CTX('xml_config')->get_xpath (
                        XPATH   => ['pki_realm', 'acl', 'permission', 'auth_role'],
-                       COUNTER => [ $pkiid, 0, $i]);
+                       COUNTER => [ $pkiid, 0, $i],
+                       CONFIG_ID => $cfg_id,
+                   );
 
         my @perms = ();
 

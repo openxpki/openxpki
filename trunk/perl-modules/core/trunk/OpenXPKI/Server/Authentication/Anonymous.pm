@@ -29,7 +29,9 @@ sub new {
 
     $self->{ROLE} = CTX('xml_config')->get_xpath (
                         XPATH   => [@{$keys->{XPATH}},   "role"],
-                        COUNTER => [@{$keys->{COUNTER}}, 0]);
+                        COUNTER => [@{$keys->{COUNTER}}, 0],
+                        CONFIG_ID => $keys->{CONFIG_ID},
+    );
 
     ##! 2: "role: ".$self->{ROLE}
 

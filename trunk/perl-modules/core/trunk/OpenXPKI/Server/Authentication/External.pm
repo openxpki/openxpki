@@ -33,25 +33,37 @@ sub new {
     ##! 2: "load name and description for handler"
 
     $self->{DESC} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "description" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                        CONFIG_ID => $keys->{CONFIG_ID},
+    );
     $self->{NAME} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "name" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                        CONFIG_ID => $keys->{CONFIG_ID},
+    );
 
     ##! 2: "load command"
     $self->{COMMAND} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "command" ],
-                                           COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+                                           COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                        CONFIG_ID => $keys->{CONFIG_ID},
+    );
     ##! 2: "command: ".$self->{COMMAND}
 
     $self->{ROLE} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "role" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                        CONFIG_ID => $keys->{CONFIG_ID},
+    );
     ##! 2: "role: ".$self->{ROLE}
     if (not length ($self->{ROLE}))
     {
         delete $self->{ROLE};
         $self->{PATTERN} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "pattern" ],
-                                               COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+                                               COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                               CONFIG_ID => $keys->{CONFIG_ID},
+        );
         $self->{REPLACE} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "replacement" ],
-                                               COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+                                               COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                               CONFIG_ID => $keys->{CONFIG_ID},
+        );
     }
 
     # get environment settings
@@ -59,14 +71,20 @@ sub new {
 
     my @clearenv;
     my $count = $config->get_xpath_count (XPATH    => [ @{$keys->{XPATH}}, 'env' ],
-                                          COUNTER  => $keys->{COUNTER});
+                                          COUNTER  => $keys->{COUNTER},
+                                          CONFIG_ID => $keys->{CONFIG_ID},
+    );
 		
     for (my $i = 0; $i < $count; $i++)
     {
         my $name = $config->get_xpath (XPATH    => [ @{$keys->{XPATH}},   'env', 'name' ],
-                                       COUNTER  => [ @{$keys->{COUNTER}}, $i,    0 ]);
+                                       COUNTER  => [ @{$keys->{COUNTER}}, $i,    0 ],
+                                       CONFIG_ID => $keys->{CONFIG_ID},
+        );
         my $value = $config->get_xpath (XPATH    => [ @{$keys->{XPATH}},   'env', 'value' ],
-                                        COUNTER  => [ @{$keys->{COUNTER}}, $i,    0 ]);
+                                        COUNTER  => [ @{$keys->{COUNTER}}, $i,    0 ],
+                                        CONFIG_ID => $keys->{CONFIG_ID},
+        );
         $self->{ENV}->{$name} = $value;
         if (exists $self->{CLEARENV})
         {

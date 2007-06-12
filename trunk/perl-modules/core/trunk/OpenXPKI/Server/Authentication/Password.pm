@@ -38,22 +38,34 @@ sub new {
     ##! 2: "load name and description for handler"
 
     $self->{DESC} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "description" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                        CONFIG_ID => $keys->{CONFIG_ID},
+    );
     $self->{NAME} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "name" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ]);
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                        CONFIG_ID => $keys->{CONFIG_ID},
+    );
 
     ## load user database
 
     my $count = $config->get_xpath_count (XPATH   => [@{$keys->{XPATH}}, "user"],
-                                          COUNTER => $keys->{COUNTER});
+                                          COUNTER => $keys->{COUNTER},
+                                          CONFIG_ID => $keys->{CONFIG_ID},
+    );
     for (my $i=0; $i<$count; $i++)
     {
         my $name      = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "name" ],
-                                            COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ]);
+                                            COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ],
+                                            CONFIG_ID => $keys->{CONFIG_ID},
+        );
         my $encrypted = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "digest" ],
-                                            COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ]);
+                                            COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ],
+                                            CONFIG_ID => $keys->{CONFIG_ID},
+        );
         my $role      = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "role" ],
-                                            COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ]);
+                                            COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ],
+                                            CONFIG_ID => $keys->{CONFIG_ID},
+        );
 
 	my $scheme;
 	# digest specified in RFC 2307 userPassword notation?
