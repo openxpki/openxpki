@@ -39,14 +39,6 @@ B::Asmdata 1.01
 
 B::Assembler 0.07
 
-B::Concise 0.66
-
-B::Deparse 0.71
-
-B::Disassembler 1.05
-
-B::Showlex 1.02
-
 B::Stackobj 1.00
 
 B::Stash 1.00
@@ -54,10 +46,6 @@ B::Stash 1.00
 B::Xref 1.01
 
 Base 2.07
-
-Benchmark 1.07
-
-ByteLoader 0.06
 
 CGI 3.15
 
@@ -114,8 +102,6 @@ Cache::SizeAwareFileCache undef
 Cache::SizeAwareMemoryCache undef
 
 Cache::SizeAwareSharedMemoryCache undef
-
-Carp 1.04
 
 Class::Accessor 0.30
 
@@ -1595,8 +1581,6 @@ Digest::file 1.00
 
 DirHandle 1.00
 
-Dumpvalue 1.12
-
 DynaLoader 1.05
 
 Encode 2.12
@@ -1642,8 +1626,6 @@ Encode::TW 2.00
 Encode::Unicode 2.02
 
 Encode::Unicode::UTF7 2.01
-
-English 1.02
 
 Env 1.00
 
@@ -1735,21 +1717,11 @@ Fatal 1.03
 
 Fcntl 1.05
 
-File::Basename 2.74
-
 File::CheckTree 4.3
 
 File::Compare 1.1003
 
-File::Copy 2.09
-
 File::DosGlob 1.00
-
-File::Find 1.10
-
-File::Glob 1.05
-
-File::Path 1.08
 
 File::Spec 3.12
 
@@ -1775,15 +1747,11 @@ File::Temp 0.16
 
 File::stat 1.00
 
-FileCache 1.06
-
 FileHandle 2.01
 
 Filter::Simple 0.82
 
 Filter::Util::Call 1.0601
-
-FindBin 1.47
 
 Getopt::Long 2.35
 
@@ -1896,10 +1864,6 @@ IO::Socket::INET 1.29
 IO::Socket::UNIX 1.22
 
 IPC::Msg 1.02
-
-IPC::Open2 1.02
-
-IPC::Open3 1.02
 
 IPC::Semaphore 1.02
 
@@ -2425,8 +2389,6 @@ Module::Build::Version undef
 
 Module::Build::YAML 0.50
 
-NDBM_File 1.06
-
 NEXT 0.60
 
 Net::Cmd 2.26
@@ -2561,19 +2523,7 @@ Net::servent 1.01
 
 O 1.00
 
-Opcode 1.06
-
-POSIX 1.09
-
 Params::Validate 0.88
-
-PerlIO 1.04
-
-PerlIO::encoding 0.09
-
-PerlIO::scalar 0.04
-
-PerlIO::via 0.03
 
 PerlIO::via::QuotedPrint 0.06
 
@@ -2591,11 +2541,7 @@ Pod::Escapes 1.04
 
 Pod::Find 1.34
 
-Pod::Functions 1.03
-
 Pod::HTML 1.0504
-
-Pod::Html 1.0504
 
 Pod::InputObjects 1.3
 
@@ -2777,29 +2723,19 @@ Regexp::Common::whitespace 2.103
 
 Regexp::Common::zip 2.112
 
-SDBM_File 1.05
-
 Safe 2.12
 
 Scalar::Util 1.18
 
 Search::Dict 1.02
 
-SelectSaver 1.01
-
 SelfLoader 1.0904
-
-Shell 0.6
-
-Socket 1.78
 
 Storable 2.15
 
 Sub::Uplevel 0.14
 
 Switch 2.10_01
-
-Symbol 1.06
 
 Sys::Hostname 1.11
 
@@ -2897,11 +2833,7 @@ Term::ANSIColor 1.10
 
 Term::Cap 1.09
 
-Term::Complete 1.402
-
 Term::ReadKey 2.30
-
-Term::ReadLine 1.02
 
 Test 1.25
 
@@ -2941,8 +2873,6 @@ Text::CSV_XS 0.23
 
 Text::Iconv 1.4
 
-Text::ParseWords 3.24
-
 Text::Soundex 1.01
 
 Text::Tabs 2005.0824
@@ -2960,8 +2890,6 @@ Tie::Array 1.03
 Tie::File 0.97
 
 Tie::Handle 4.1
-
-Tie::Hash 1.02
 
 Tie::Memoize 1.0
 
@@ -3086,10 +3014,6 @@ URI::urn::oid undef
 Unicode::Collate 0.52
 
 Unicode::Normalize 0.32
-
-Unicode::UCD 0.24
-
-User::grent 1.01
 
 User::pwent 1.00
 
@@ -3237,17 +3161,9 @@ XML::Validator::Schema::TypeLibrary undef
 
 XML::Validator::Schema::Util undef
 
-XS::APItest 0.08
-
-XS::Typemap 0.02
-
 XSLoader 0.06
 
 attributes 0.06
-
-attrs 1.02
-
-autouse 1.05
 
 base 2.07
 
@@ -3257,17 +3173,7 @@ bignum 0.17
 
 bigrat 0.08
 
-blib 1.03
-
-bytes 1.02
-
-charnames 1.05
-
 config undef
-
-constant 1.05
-
-diagnostics 1.15
 
 encoding 2.02
 
@@ -3285,14 +3191,6 @@ lib 0.5565
 
 locale 1.00
 
-open 1.05
-
-ops 1.01
-
-overload 1.04
-
-re 0.05
-
 sigtrap 1.02
 
 sort 1.02
@@ -3307,19 +3205,11 @@ threads::shared 0.94
 
 uri 1.35
 
-utf8 1.06
-
 vars 1.01
 
 version 0.71
 
 version::vxs 0.71
-
-vmsish 1.02
-
-warnings 1.05
-
-warnings::register 1.01
 
 =head1 DESCRIPTION
 
