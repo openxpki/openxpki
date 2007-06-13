@@ -191,7 +191,7 @@
     <profile id="I18N_OPENXPKI_PROFILE_USER"
 	     super="../profile{default}">
 
-      <subject id="user_basic_style">
+      <subject id="00_user_basic_style">
         <label>I18N_OPENXPKI_PROFILE_USER_BASIC_STYLE</label>
         <description>I18N_OPENXPKI_PROFILE_USER_BASIC_DESC</description>
         <template>
@@ -230,7 +230,7 @@
             </san>
         </subject_alternative_names>
       </subject>
-      <subject super="../../subject{advanced_style}"/>
+      <subject super="../../subject{05_advanced_style}"/>
 
       <role>User</role>
       <role>RA Operator</role>
@@ -289,7 +289,7 @@
       <subject super="../../subject{dc_style}"/>
 -->
 
-      <subject id="tls_basic_style">
+      <subject id="00_tls_basic_style">
         <label>I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE</label>
         <description>I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC</description>
         <template>
@@ -324,7 +324,7 @@
             </san>
         </subject_alternative_names>
       </subject>
-      <subject super="../../subject{advanced_style}"/>
+      <subject super="../../subject{05_advanced_style}"/>
       <validity>
 	<notafter format="relativedate">+0003</notafter>
       </validity>
@@ -365,7 +365,7 @@
       </extensions>
     </profile>
       
-    <subject id="advanced_style">
+    <subject id="05_advanced_style">
       <label>I18N_OPENXPKI_PROFILE_ADVANCED_STYLE</label>
       <description>I18N_OPENXPKI_PROFILE_ADVANCED_DESC</description>
       <template>
