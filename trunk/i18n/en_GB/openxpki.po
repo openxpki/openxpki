@@ -298,9 +298,10 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_TITLE"
 msgstr "Trustcenter Web Interface"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_DESCRIPTION"
-msgstr "To approve this certificate signing request, you can either "
-"approve with or without signature. Please choose the appropriate button "
-"to approve the certificate request."
+msgstr ""
+"To approve this certificate signing request, you can either approve with or "
+"without signature. Please choose the appropriate button to approve the "
+"certificate request."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_SIGNING"
 msgstr "Approve CSR using digital signature"
@@ -1035,9 +1036,11 @@ msgstr "RA operator interface"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_WORKFLOW_MENU_DESCRIPTION"
 msgstr ""
+"Use the menu to list the available workflow types, list or search workflows "
+"or create a new workflow instance."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_WORKFLOW_MENU_TITLE"
-msgstr "The Workflow Menu"
+msgstr "Workflows"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTERNET_EXPLORER"
 msgstr "Microsoft Internet Explorer"
@@ -2933,6 +2936,18 @@ msgstr "Download private key and certificate"
 
 msgid "I18N_OPENXPKI_PRIVKEY_DOWNLOAD"
 msgstr "Download private key"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_00_TLS_BASIC_STYLE"
+msgstr "Basic TLS style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_00_USER_BASIC_STYLE"
+msgstr "Basic user naming style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_05_ADVANCED_STYLE"
+msgstr "Advanced naming style"
 
 msgid "I18N_OPENXPKI_PROFILE_ADVANCED_DESC"
 msgstr ""

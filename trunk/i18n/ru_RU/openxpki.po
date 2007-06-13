@@ -2780,6 +2780,18 @@ msgstr "Загрузка закрытого ключа и сертификата
 msgid "I18N_OPENXPKI_PRIVKEY_DOWNLOAD"
 msgstr "Загрузка закрытого ключа"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_00_TLS_BASIC_STYLE"
+msgstr "Профиль TLS сервера общего назначения"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_00_USER_BASIC_STYLE"
+msgstr "Профиль пользователя общего назначения"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_05_ADVANCED_STYLE"
+msgstr "Расширенный профиль"
+
 msgid "I18N_OPENXPKI_PROFILE_ADVANCED_DESC"
 msgstr ""
 "Используйте данный профиль сертификата только если Вы отчетливо "
