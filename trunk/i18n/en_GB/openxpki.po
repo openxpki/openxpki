@@ -297,29 +297,19 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_TITLE"
 msgstr "Trustcenter Web Interface"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_DESCRIPTION"
-msgstr ""
-"You are logged in to the web interface of the trustcenter. Please note that "
-"this software support several instances of certification authorities (CAs). "
-"If you are not sure which CA you actually use then please check the info "
-"menu."
+msgstr "To approve this certificate signing request, you can either "
+"approve with or without signature. Please choose the appropriate button "
+"to approve the certificate request."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_SIGNING"
-msgstr ""
-"You are logged in to the web interface of the trustcenter. Please note that "
-"this software support several instances of certification authorities (CAs). "
-"If you are not sure which CA you actually use then please check the info "
-"menu."
+msgstr "Approve CSR using digital signature"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_TITLE"
-msgstr "Trustcenter Web Interface"
+msgstr "Certificate Signing Request: Approval"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_WITHOUT_SIGNING"
-msgstr "Trustcenter Web Interface"
+msgstr "Approve CSR without digital signature"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CRR_APPROVAL_DESCRIPTION"
@@ -2477,6 +2467,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_DC_DESC"
 msgstr "Domain Component"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_DEBUG_DEBUG_MESSAGE_IS_NOT_A_CODEREF"
+msgstr "The used suject style does not allow the use of an organization."
+
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA"
 msgstr "Test Dummy CA"
 
@@ -2901,6 +2895,16 @@ msgstr "no"
 msgid "I18N_OPENXPKI_NOT_AVAILABLE"
 msgstr "n/a"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_OPENXPKI_SERVER_CONTEXT_WORKFLOW_CLASS_USED_PKI_REALM"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_OPENXPKI_XML_CONFIG___GET_FIXED_PARAMS_NO_CONFIG_IDENFIER"
+msgstr "Serverside key generation"
+
 msgid "I18N_OPENXPKI_OPTIONAL"
 msgstr "optional"
 
@@ -3146,6 +3150,12 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_LIST_CONFIG_IDS_NO_CONFIG_IDS_IN_DB"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -3170,9 +3180,6 @@ msgstr ""
 "action."
 
 msgid "I18N_OPENXPKI_SERVER_API_GET_PKI_REALM_INDEX_FAILED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_INCORRECT_PKI_REALM"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_MISSING_WORKFLOW_CONFIGURATION"
@@ -3235,6 +3242,12 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_CREATE_WORKFLOW_CONFIG_ID_UNDEFINED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_TYPE_FOR_ID_NO_RESULT_FOR_ID"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -3244,9 +3257,6 @@ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
-
-msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
-msgstr "At least one context entry is needed."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_STATE_NOT_ALPHANUMERIC"
@@ -3320,8 +3330,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED"
 msgstr "The login of the user __USER__ failed. Please try again."
 
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_ALGORITHM"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_MISSING_SCHEME_SPECIFICATION"
+msgstr "The login of the user __USER__ failed. Please try again."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_SCHEME"
+msgstr "The login of the user __USER__ failed. Please try again."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_UNSUPPORTED_SCHEME"
+msgstr "The login of the user __USER__ failed. Please try again."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_NOT_FOUND_IN_DB_OR_INVALID"
@@ -3692,6 +3711,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_INSTANTIATION_FAILURE"
 msgstr "The login of the user __USER__ failed. Please try again."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_PKI_REALM_BY_CFG_CONFIG_IDS_NOT_FOUND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
 msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_PKI_REALM"
 msgstr ""
 
@@ -3705,8 +3730,18 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_INIT_GET_WORKFLOW_FACTORY_NO_CONFIG_IDENTIFIERS_IN_DB"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_INIT_I18N_MISSING_CONFIG"
 msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_INIT_NO_CONFIG_ENTRIES_IN_DB"
+msgstr "Serverside key generation"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_INIT_NO_IDENTIFIER_FOUND_IN_ALIASES_DB"
@@ -3722,6 +3757,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_INIT_WF_FACTORY_ADD_CONFIG_EVAL_ERROR_DURING_CONFIGFILE_PARSING"
+msgstr ""
+"You called an invalid method at the OpenXPKI server. The illegal method name "
+"is __METHOD_NAME__."
 
 msgid "I18N_OPENXPKI_SERVER_INIT_XML_CONFIG_FILE_DOES_NOT_EXIST"
 msgstr ""
@@ -3941,6 +3982,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFI
 msgstr "Cannot get a token to publish DER-certificate"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_DETERMINENEXTCA_NO_CA_IDS_DEFINED"
+msgstr "Certificates"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_BIND_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -4006,6 +4051,30 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_WRONG_KEYTYPE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_PROFILE_UNDDEFINED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_ROLE_UNDDEFINED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_SUBJECT_UNDDEFINED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDDEFINED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
@@ -4919,6 +4988,18 @@ msgid "I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN"
 msgstr "The used suject style requires a UID plus a common name."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_MISSING_SCHEME_SPECIFICATION"
+msgstr ""
+"The requested service is not available. This can happen because of a "
+"misconfiguration or simply because the service is actually not implemented. "
+"Nevertheless this is an administrative problem. Please contact the "
+"administrators."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_TOKEN_CONFIG_HSM_AUTHENTICATION_GROUP"
 msgstr "This is the normal user authentication."
 
@@ -5348,9 +5429,6 @@ msgstr "CRL Issuance"
 msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION"
 msgstr "Smartcard personalization"
 
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_AUTHORIZATION_FAILED"
-msgstr ""
-
 #, fuzzy
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_INSERT_CERTIFICATE_TOKEN_UNAVAILABLE"
 msgstr "Certificates"
@@ -5363,15 +5441,6 @@ msgstr "Certificates"
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_UNSUPPORTED_CSR_TYPE"
 msgstr "Certificates"
 
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_DEFAULT_TOKEN_UNAVAILABLE"
-msgstr ""
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_INVALID_ARGUMENT"
-msgstr ""
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_INVALID_SESSION"
-msgstr ""
-
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INCORRECT_ALGORITHM"
 msgstr ""
 
@@ -5382,16 +5451,6 @@ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_PKI_REALM_UNDEFINED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_TOKEN_UNAVAILABLE"
-msgstr ""
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_CONTEXT_PARAMETER"
-msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_PARAMETER"
-msgstr "reset"
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_PKI_REALM_UNDEFINED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS"
@@ -5415,6 +5474,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_NOTHING_FOUND"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_XML_CACHE_GET_XPATH_HASHREF_MISSING_ELEMENT"
+msgstr "testuser"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_XML_CACHE_GET_XPATH_HASHREF_RESULT_NOT_A_HASHREF"
+msgstr "testuser"
 
 msgid "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_CONTENT"
 msgstr ""
@@ -5458,8 +5525,22 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CONFIG_GET_FIXED_PARAMS_MISSING_XPATH"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_XML_CONFIG_NEW_INCORRECT_DEFAULT_CACHE"
+msgstr "The SPKAC string is empty."
+
+msgid "I18N_OPENXPKI_XML_CONFIG_NEW_SERIALIZED_CACHES_BUT_NO_DEFAULT_PASSED"
+msgstr ""
+
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
+#~ msgstr "At least one context entry is needed."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_PARAMETER"
+#~ msgstr "reset"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
@@ -6071,12 +6152,6 @@ msgstr "yes"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
-#~ msgstr ""
-#~ "The workflow is missing some required fields (__FIELDS__) for the next "
-#~ "action."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCE_UNDEFINED"
 #~ msgstr ""
 #~ "The workflow is missing some required fields (__FIELDS__) for the next "
 #~ "action."
