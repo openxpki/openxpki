@@ -95,8 +95,6 @@
                                     "workflow_create_instance", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES",
                                    "workflow_list_instances", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES",
-                                   "workflow_list_active_instances", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_SEARCH_INSTANCES",
                                    "workflow_search_instances", undef ],
                     ],
@@ -144,10 +142,6 @@
                     "workflow_list_instances" =>
                     {
                         CMD => "service/workflow/list_instances.html"
-                    },
-                    "workflow_list_active_instances" =>
-                    {
-                        CMD => "service/workflow/list_instances.html?active=1"
                     },
                     'show_pending_requests' => {
                         CMD => 'service/workflow/show_pending_requests.html'
