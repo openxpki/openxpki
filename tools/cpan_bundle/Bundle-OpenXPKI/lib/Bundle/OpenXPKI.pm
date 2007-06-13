@@ -1,6 +1,6 @@
 package Bundle::OpenXPKI;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 __END__
@@ -3210,6 +3210,12 @@ vars 1.01
 version 0.71
 
 version::vxs 0.71
+
+HTTP::Server::Simple::Mason 0.09
+
+Test::HTTP::Server::Simple 0.05
+
+WWW::Mechanize 1.30
 
 =head1 DESCRIPTION
 

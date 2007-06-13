@@ -1,5 +1,8 @@
 Revision history for Bundle-OpenXPKI
 
+0.03    2007-06-13
+        - Cleaned up dependencies that are in Perl 5.8.8 already
+        - Added modules required for Mason testing
 0.02    2007-05-02
         - deleted mod_perl from dependency list as it is not strictly
         necessary and users will probably want to install it via a
