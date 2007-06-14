@@ -10,9 +10,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   <head>
-    <& /lib/javascript.mhtml &>
+    <& /lib/javascript.mhtml, 'method' => 'InstallCertIE();' &>
   </head>
-  <body onLoad="InstallCertIE();">
+  <body>
     <h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE') %></h1>
     <p>
       <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC') %>

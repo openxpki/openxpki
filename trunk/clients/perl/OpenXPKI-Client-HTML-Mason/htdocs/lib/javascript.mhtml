@@ -1,4 +1,5 @@
 <%args>
+    $method => undef
 </%args>
 
 <% $js->get_function() | n %>
@@ -6,6 +7,9 @@
 <script type="text/javascript">
     window.onload = function() {
         enumCSP();
+%if (defined $method) {
+%    print $method; 
+% }
     }
 </script>
 
