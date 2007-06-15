@@ -157,10 +157,16 @@ foreach my $rev (@tested_revisions) {
         system("cp -r $files $output_dir/$test");
 
         my $summary_filename = $rev . '_summary.html';
-        open my $SUMMARY, '<', $summary_filename;
-        my $summary = <$SUMMARY>;
-        $summary =~ s{Coverage\ report}{$tests->{$test}->{NAME} coverage report}xms;
-        close $SUMMARY;
+        my $opened = open my $SUMMARY, '<', $summary_filename;
+        my $summary;
+        if (! $opened) {
+            $summary = '<tr color="303030"><td colspan=12>' . $tests->{$test}->{NAME} . ' summary unavailable</td></tr>' . "\n";
+        }
+        else {
+            $summary = <$SUMMARY>;
+            $summary =~ s{Coverage\ report}{$tests->{$test}->{NAME} coverage report}xms;
+            close $SUMMARY;
+        }
         print INDEX $summary;
     }
 }
@@ -210,18 +216,24 @@ foreach my $rev (@tested_revisions) {
     foreach my $test (sort keys %{ $tests }) {
         chdir $tests->{$test}->{DIRECTORY};
         my $summary_filename = $rev . '_summary.html';
-        open my $SUMMARY, '<', $summary_filename;
-        my $summary = <$SUMMARY>;
-        $summary =~ s{Coverage\ report}{$tests->{$test}->{NAME} coverage report}xms;
-        my $xs = XML::Simple->new();
-        my $summary_ref = $xs->XMLin($summary);
-        if ($summary_ref->{'td'}->[6] ne '0 (0.00%)') {
+        my $opened = open my $SUMMARY, '<', $summary_filename;
+        if (! $opened) {
             $all_green = 0;
-            # push failed total tests
-            push @failed, "$test: " . $summary_ref->{'td'}->[6];
+            push @failed, "$test n/a";
         }
-        $all_summaries .= $summary;
-        close $SUMMARY;
+        else {
+            my $summary = <$SUMMARY>;
+            $summary =~ s{Coverage\ report}{$tests->{$test}->{NAME} coverage report}xms;
+            my $xs = XML::Simple->new();
+            my $summary_ref = $xs->XMLin($summary);
+            if ($summary_ref->{'td'}->[6] ne '0 (0.00%)') {
+                $all_green = 0;
+                # push failed total tests
+                push @failed, "$test: " . $summary_ref->{'td'}->[6];
+            }
+            $all_summaries .= $summary;
+            close $SUMMARY;
+        }
     }
     $all_summaries .= '</table>';
     if ($all_green) {
