@@ -84,7 +84,7 @@ SKIP: {
 
         # use sscep to download certificate
         my $scep_uri = "http://127.0.0.1:$config{http_server_port}/cgi-bin/scep";
-        my $scep_result = `$sscep enroll -u $scep_uri -c $config{server_dir}/cacert-0 -k t/instance/request_key.pem -r t/instance/request.csr -l t/instance/certificate -t 5 -n 0 -v $stderr`;
+        my $scep_result = `$sscep enroll -u $scep_uri -c $config{server_dir}/cacert-0 -k t/instance/request_key.pem -r t/instance/request.csr -l t/instance/certificate -t 10 -n 5 -v $stderr`;
         if ($debug) {
             print STDERR $scep_result;
         }

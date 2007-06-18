@@ -183,7 +183,7 @@
   <!-- if no autorun is available here, we are stuck in this state.
        Every time a corresponding SCEP request comes in, the service
        checks if we have an available action to execute and executes it -->
-  <state name="WAITED_FOR_CHILD" autorun="yes">
+  <state name="WAITED_FOR_CHILD" autorun="yes" may_stop="yes">
     <action name="null"
             resulting_state="SUCCESS">
         <condition name="wf_child_instance_success"/>
