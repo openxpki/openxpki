@@ -610,7 +610,7 @@ sub __wf_factory_add_config {
                                     $workflow_config{$type}->{'force_array'}
                                 ),
                         );
-                        ##! 128: 'workflow_factory: ' . Dumper $workflow_factory
+                        ##! 256: 'workflow_factory: ' . Dumper $workflow_factory
                     }
                 }
                 else {
@@ -619,7 +619,7 @@ sub __wf_factory_add_config {
                         COUNTER   => [ @base_ctr  ],
                         CONFIG_ID => $config_id,
                     );
-                    ##! 16: "entry: " . Dumper $entry
+                    ##! 256: "entry: " . Dumper $entry
                     # Flatten some attributes because
                     # Workflow.pm expects these to be scalars and not
                     # a one-element arrayref with a content hashref ...
@@ -627,14 +627,14 @@ sub __wf_factory_add_config {
                         $entry,
                         $workflow_config{$type}->{force_array}
                     );
-                    ##! 16: 'entry after flattening: ' . Dumper $entry
-                    ##! 128: 'workflow_factory: ' . Dumper $workflow_factory
+                    ##! 256: 'entry after flattening: ' . Dumper $entry
+                    ##! 512: 'workflow_factory: ' . Dumper $workflow_factory
                     # cf. above ...
                     local *Workflow::State::FACTORY = sub { return $workflow_factory };
                     $workflow_factory->add_config(
                         $workflow_config{$type}->{factory_param} => $entry,
                     );
-                    ##! 128: 'workflow_factory: ' . Dumper $workflow_factory
+                    ##! 256: 'workflow_factory: ' . Dumper $workflow_factory
                 }
                 ##! 16: 'config ' . $ii . ' added to workflow_factory'
             }
@@ -717,8 +717,10 @@ sub __wf_factory_add_config {
 sub __flatten_content {
     my $entry       = shift;
     my $force_array = shift;
-    ##! 16: 'entry: ' . Dumper $entry
-    ##! 16: 'force_array: ' . Dumper $force_array;
+    # as this method calls itself a large number of times recursively,
+    # the debug levels are /a bit/ higher than usual ...
+    ##! 256: 'entry: ' . Dumper $entry
+    ##! 256: 'force_array: ' . Dumper $force_array;
 
     foreach my $key (keys %{$entry}) {
         if (ref $entry->{$key} eq 'ARRAY' &&
@@ -726,32 +728,32 @@ sub __flatten_content {
             ref $entry->{$key}->[0] eq 'HASH' &&
             exists $entry->{$key}->[0]->{'content'} &&
             scalar keys %{ $entry->{$key}->[0] } == 1) {
-            ##! 16: 'key: ' . $key . ', flattening (deleting array)'
+            ##! 256: 'key: ' . $key . ', flattening (deleting array)'
             if (grep {$_ eq $key} @{ $force_array}) {
-                ##! 16: 'force array'
+                ##! 256: 'force array'
                 $entry->{$key} = [ $entry->{$key}->[0]->{'content'} ];
             }
             else {
-                ##! 16: 'no force array - replacing array by scalar'
+                ##! 256: 'no force array - replacing array by scalar'
                 $entry->{$key} = $entry->{$key}->[0]->{'content'};
             }
         }
         elsif (ref $entry->{$key} eq 'ARRAY') {
-            ##! 16: 'entry is array but more than one element'
+            ##! 256: 'entry is array but more than one element'
             for (my $i = 0; $i < scalar @{ $entry->{$key} }; $i++) {
-                ##! 16: 'i: ' . $i
+                ##! 256: 'i: ' . $i
                 if (ref $entry->{$key}->[$i] eq 'HASH') {
                     if (exists $entry->{$key}->[$i]->{'content'}) {
-                        ##! 16: 'entry #' . $i . ' has content key, flattening'
+                        ##! 256: 'entry #' . $i . ' has content key, flattening'
                         $entry->{$key}->[$i] 
                             = $entry->{$key}->[$i]->{'content'};
                     }
                     else {
-                        ##! 16: 'entry #' . $i . ' does not have content key'
-                        ##! 32: ref $entry->{$key}->[$i]
+                        ##! 256: 'entry #' . $i . ' does not have content key'
+                        ##! 512: ref $entry->{$key}->[$i]
                         if (ref $entry->{$key}->[$i] eq 'HASH') {
                             # no need to flatten scalars any more
-                            ##! 16: 'recursively flattening more ...'
+                            ##! 256: 'recursively flattening more ...'
                             $entry->{$key}->[$i] = __flatten_content(
                                 $entry->{$key}->[$i],
                                 $force_array
