@@ -221,8 +221,7 @@
                     default=""/>
         </template>
         <dn>CN=[- realname -]+UID=[- username -],DC=Test Deployment,DC=OpenXPKI,DC=org</dn> 
-        <additional_information>
-        </additional_information>
+        <additional_information super="../../../subject{05_advanced_style}/additional_information"/>
         <subject_alternative_names>
             <san id="dns">
                 <key type="fixed">email</key>
@@ -284,10 +283,6 @@
 	     super="../profile{default}">
 
       <role>Web Server</role>
-<!--
-      <subject super="../../subject{ou_style}"/>
-      <subject super="../../subject{dc_style}"/>
--->
 
       <subject id="00_tls_basic_style">
         <label>I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE</label>
@@ -315,8 +310,7 @@
                     default=""/>
         </template>
         <dn>CN=[- hostname -][- IF port AND port != 443 -]:[- port -][- END -],DC=Test Deployment,DC=OpenXPKI,DC=org</dn> 
-        <additional_information>
-        </additional_information>
+        <additional_information super="../../../subject{05_advanced_style}/additional_information"/>
         <subject_alternative_names>
             <san id="dns">
                 <key type="fixed">DNS</key>

@@ -14,14 +14,19 @@
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_INFO_DESCRIPTION') %>
 </p>
-
 <table>
-% foreach my $key (keys %info)
+% foreach my $item (@input)
 % {
     <tr>
-      <td><% i18nGettext ($key) %></td>
+        <td><% i18nGettext ($item->{LABEL}) %></td>
       <td>
-        <& /lib/html/input.mhtml, 'type' => 'text', 'name' => "info_$key", value => $info{$key} &>
+          <& /lib/html/input.mhtml,
+            'type'   => $item->{TYPE},
+            'name'   => "info_" . $item->{ID},
+            'value'  => $info{$item->{ID}},
+            'width'  => $item->{WIDTH},
+            'height' => $item->{HEIGHT},
+          &>
       </td>
     </tr>
 % }
@@ -50,6 +55,22 @@
     $text = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_info};
     ## serialized stuff
     %info   = %{$serializer->deserialize($text)};
+
+    my $chosen_style = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_subject_style};
+    my $profile = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_profile};
+
+    $msg = $context->{client}->send_receive_command_msg(
+        'get_cert_subject_styles',
+        {
+            PROFILE => $profile,
+        },
+    );
+    # TODO - error handling
+    my @input;
+    if (exists $msg->{PARAMS}->{$chosen_style}->{ADDITIONAL_INFORMATION}->{INPUT} &&
+        ref $msg->{PARAMS}->{$chosen_style}->{ADDITIONAL_INFORMATION}->{INPUT} eq 'ARRAY') {
+        @input = @ { $msg->{PARAMS}->{$chosen_style}->{ADDITIONAL_INFORMATION}->{INPUT} };
+    }
 
     if ($filled)
     {
