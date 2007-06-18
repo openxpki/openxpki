@@ -555,6 +555,7 @@ sub __perform_super_resolution {
 sub __perform_xinclude
 {
     my $self = shift;
+    my $MAX_LEVEL = 70;
     ##! 1: "start"
 
     ## scan configuration for unresolved xincludes
@@ -596,18 +597,6 @@ sub __perform_xinclude
             $filename = File::Spec->catfile($dir, $filename);
         }
 
-        ## loop detection
-        ## protection against endless loops
-        ##! 4: "check for loop"
-        if (exists $self->{xtree} and
-            exists $self->{xtree}->{$filename})
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_LOOP_DETECTED",
-                params  => {"FILENAME"   => $filename});
-        }
-
-
         ## load the xinclude file
         ##! 4: "load the included file $filename"
         my $xml = eval { $self->{xs}->XMLin ($filename) };
@@ -646,6 +635,18 @@ sub __perform_xinclude
     foreach my $file (keys %{$self->{xtree}})
     {
         $self->{xtree}->{$file}->{LEVEL}++;
+        ##! 16: "LEVEL for $file: " . $self->{xtree}->{$file}->{LEVEL}
+        ## loop detection
+        ## protection against endless loops
+        ##! 4: "check for loop"
+        if ($self->{xtree}->{$file}->{LEVEL} > $MAX_LEVEL) {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_POSSIBLE_LOOP_DETECTED",
+                params  => {
+                    "FILENAME" => $file
+                },
+            );
+        }
     }
 
     ## resolve the new xincludes

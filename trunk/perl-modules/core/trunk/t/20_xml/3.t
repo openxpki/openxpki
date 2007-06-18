@@ -1,10 +1,15 @@
 use strict;
 use warnings;
 use Test::More;
+use English;
 
-use OpenXPKI::XML::Config;
+use OpenXPKI::Debug;
+if ($ENV{DEBUG_LEVEL}) {
+    $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
+}
+require OpenXPKI::XML::Config;
 
-plan tests => 7;
+plan tests => 8;
 
 print STDERR "XINCLUDE SUPPORT\n";
 
@@ -32,16 +37,22 @@ is ($obj->get_xpath (COUNTER => 1, XPATH => $xpath),
 is ($obj->get_xpath (COUNTER => 2, XPATH => $xpath),
     "testdata", 'get_xpath works correctly _in_ xinclude');
 
-TODO: {
-    local $TODO = 'Multiple includes not implemented yet, see #1653466';
-    # test multiple includes
-    ## create new object
-    $obj = undef;
-    eval {
-        $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/top2.xml");
-    };
+# test multiple includes
+## create new object
+$obj = undef;
+eval {
+    $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/top2.xml");
+};
 
-    ok(defined $obj, 'Config object with multiple includes is defined');
-}
+ok(defined $obj, 'Config object with multiple includes is defined');
+
+$obj = undef;
+eval {
+    $obj = OpenXPKI::XML::Config->new(CONFIG => 't/20_xml/loop1.xml');
+};
+is($EVAL_ERROR->message,
+   'I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_POSSIBLE_LOOP_DETECTED',
+   'Loop detection works'
+);
 
 1;
