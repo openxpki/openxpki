@@ -144,11 +144,9 @@ else {
         },
     ); 
 
-    TODO: {
-        local $TODO = 'Changing CSR subject is currently broken. Bug report #1728258';
-        ok(! is_error_response($msg), 'Successfully changed subject');
-        is($msg->{PARAM}->{WORKFLOW}->{CONTEXT}->{cert_subject}, 'CN=fully.qualified.example.com,DC=Test,DC=OpenXPKI,DC=org', 'Changed subject in context');
-    }
+    ok(! is_error_response($msg), 'Successfully changed subject');
+    is($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_subject}, 'CN=fully.qualified.example.com,DC=Test,DC=OpenXPKI,DC=org', 'Changed subject in context')
+        or diag Dumper $msg;
 
     # changing CSR profile
     

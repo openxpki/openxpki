@@ -107,11 +107,6 @@
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
       <field name="cert_subject"/>
-      <validator name="CertSubject">
-        <arg>$cert_profile_id</arg>
-        <arg>$cert_subject_style</arg>
-        <arg>$cert_subject</arg>
-      </validator>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
@@ -119,9 +114,6 @@
       <!-- do not use field with is_required="yes"          -->
       <!-- because this ignores the order of the validators -->
       <field name="cert_subject_alt_name"/>
-      <validator name="CertSubjectAltName">
-        <arg>$cert_subject_alt_name</arg>
-      </validator>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
 	  class="Workflow::Action::Null">

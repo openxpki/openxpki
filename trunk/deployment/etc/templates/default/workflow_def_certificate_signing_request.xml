@@ -52,10 +52,6 @@
 	    resulting_state="PENDING">
       <condition name="ACL::change_csr_profile"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
-	    resulting_state="PENDING">
-      <condition name="ACL::change_csr_subject_style"/>
-    </action>
     <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
 	    resulting_state="PENDING">
       <condition name="ACL::change_csr_subject"/>
