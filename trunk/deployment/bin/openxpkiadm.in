@@ -929,18 +929,18 @@ if ($cmd eq 'certificate' && $subcmd eq 'chain') {
 my %params;
 GetOptions(\%params, @options_spec) or pod2usage(-verbose => 0);
 
+my ($vol, $dir, $file) = File::Spec->splitpath($0);
 if ($cmd eq 'version') {
-    my ($vol, $dir, $file) = File::Spec->splitpath($0);
     print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
     print "$file Version: $VERSION\n";
     exit 0;
 }
 
 pod2usage(-exitstatus => 0, -verbose => 2) if ($cmd eq 'man');
-pod2usage(-verbose => 1) if ($cmd eq 'help');
+pod2usage(-verbose => 99, -sections => 'NAME|USAGE') if ($cmd eq 'help');
 if ($cmd eq '') {
-    print STDERR "Usage: openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]\n";
-    print STDERR "Hint: 'openxpki help'\n";
+    print STDERR "Usage: $file COMMAND [SUBCOMMAND] [OPTIONS]\n";
+    print STDERR "Hint: '$file help'\n";
     exit 0;
 }
 
