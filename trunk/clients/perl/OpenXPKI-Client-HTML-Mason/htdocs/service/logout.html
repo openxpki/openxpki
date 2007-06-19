@@ -30,15 +30,31 @@
 <%init>
     ## this is so unclean that Mason cannot handle it via syshandler
     use English;
+    use CGI::Cookie;
 
+    my $cookies = CGI::Cookie->fetch();
+    if (defined $cookies && exists $cookies->{'openxpki_sessionid'}) {
+        # session ID cookie exists, we have to delete it
+        # a cookie with a negative expiration date is equivalent to
+        # deleting it ...
+        my $c = CGI::Cookie->new(
+            -name    => 'openxpki_sessionid',
+            -expires => '-1M',
+            -path    => '/',
+        );
+        $r->headers_out->set('Set-Cookie' => $c);
+    }
     ## kill the session on the server
     $context->{client}->send_service_msg ("LOGOUT");
 
-    ## erase the session from the session cache
-    delete $session_cache{$context->{"session_id"}};
+#   this is only specific to one Apache worker anyways, so it does
+#   not make much sense to do it at all ...
+#
+#    ## erase the session from the session cache
+#    delete $session_cache{$context->{"session_id"}};
 
-    ## make the session unavailable in the context
-    delete $context->{"session_id"};
+#    ## make the session unavailable in the context
+#    delete $context->{"session_id"};
 
     ## the connection should now be closed by the server
 </%init>

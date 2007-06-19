@@ -104,7 +104,25 @@
     }
     elsif ($msg->{SERVICE_MSG} eq "ERROR")
     {
-        ## something goes wrong during the authentication
+        # something went wrong during the authentication ...
+        # we have to delete the cookie, because otherwise one might be
+        # stuck in a state of authentication from which one can not return
+        # - say a user accidentally chose the 'Operator' stack. If we
+        # do not delete the cookie, he will present a valid session ID
+        # for a session that asks for an operator password, which the user
+        # does not have ...
+        my $cookies = CGI::Cookie->fetch();
+        if (defined $cookies && exists $cookies->{'openxpki_sessionid'}) {
+            # session ID cookie exists, we have to delete it
+            # a cookie with a negative expiration date is equivalent to
+            # deleting it ...
+            my $c = CGI::Cookie->new(
+                -name    => 'openxpki_sessionid',
+                -expires => '-1M',
+                -path    => '/',
+            );
+            $r->headers_out->set('Set-Cookie' => $c);
+        }
         $m->comp ('/service/create_csr/print_errors.mhtml',
                   'errors' => [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ]);
     }
