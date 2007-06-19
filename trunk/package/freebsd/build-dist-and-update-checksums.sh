@@ -130,7 +130,7 @@ done
 #---------------- Makefile for port ----------------------
 
 PORTS_PREFIX="p5-"
-PORTS="openxpki openxpki-client openxpki-client-cli openxpki-client-html-mason openxpki-client-scep openxpki-i18n openxpki-deployment"
+PORTS="openxpki openxpki-client openxpki-client-html-mason openxpki-client-scep openxpki-i18n openxpki-deployment"
 
 cd ${PORTS_DIR} 
 MODIFIED_PORTS=0

@@ -15,8 +15,6 @@ p5-openxpki-client: base class for actual clients
 </li><li>
 p5-openxpki-i18n: internationalization of the user interface
 </li><li>
-p5-openxpki-client-cli: command line interface to local OpenXPKI daemon
-</li><li>
 p5-openxpki-client-html-mason: web interface to local OpenXPKI daemon
 </li><li>
 p5-openxpki-client-scep: set of SCEP tools
@@ -30,7 +28,7 @@ Dependencies of OpenXPKI ports ("A &#8594; B" means that port B depends on port 
 <pre>
 p5-openxpki-client  &#8592;  p5-openxpki (server) &#8594;  p5-openxpki-i18n
            \ &nbsp;
-             \       |  p5-openxpki-client-cli, p5-openxpki-client-html-mason,
+             \       |  p5-openxpki-client-html-mason,
                \ &#8594;  |  p5-openxpki-client-scep, p5-openxpki-deployment.
 </pre>
 <p>
@@ -42,7 +40,7 @@ To get a working server it is recommended to install deployment port too.
 Do not forget to undergo deployment procedure itself (by hand).
 </li><li>
 For effective use of deployment,
-it is recommended to install at least one of the clients: ...-cli or ...-mason.
+it is recommended to install html-mason client. 
 </li><li>
 I18n is needed for the English interface as well.
 </li>
