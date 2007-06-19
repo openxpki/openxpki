@@ -335,6 +335,21 @@ sub init_session {
     return 1;
 }
 
+sub is_logged_in {
+    my $self = shift;
+
+    my $msg;
+    eval {
+        $msg = $self->send_receive_service_msg('PING')
+    };
+    if (defined $msg &&
+        ref $msg eq 'HASH' &&
+        $msg->{SERVICE_MSG} eq 'SERVICE_READY') {
+        return 1;
+    }
+    return undef;
+}
+
 sub is_connected
 {
     my $self = shift;
@@ -797,6 +812,11 @@ Set socket read timeout (seconds, default: 30).
 
 returns true on a normal established connection. Returns false if the
 connection is missing or something goes wrong during the check.
+
+=head2 is_logged_in
+
+returns true if a connection is available and the user has finished
+authentication (i.e. PING returns 'SERVICE_READY').
 
 =head1 CONFIGURATION AND ENVIRONMENT
 

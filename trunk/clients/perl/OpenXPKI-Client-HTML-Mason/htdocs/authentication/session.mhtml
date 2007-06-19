@@ -68,7 +68,7 @@
   if (defined $context &&
       exists $context->{session_id} &&
       exists $context->{client} &&
-      ($context->{client}->is_connected() == 1))
+      ($context->{client}->is_logged_in() == 1))
   {
       $m->comp ('/lib/debug.mhtml',
          level => 2,
