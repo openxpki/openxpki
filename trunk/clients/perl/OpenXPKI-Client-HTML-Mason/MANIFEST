@@ -172,5 +172,10 @@ t/10_syntax.t
 t/11_login/01_anonymous.t
 t/99_cleanup.t
 
+t/20_webserver/01_deploy_openxpki_instance.t
+t/20_webserver/05_login.t
+t/20_webserver/99_cleanup.t
+t/20_webserver/lib/OpenXPKI/Client/HTML/Mason/Test/Server.pm
+
 eg/openxpki-mason-cgi.conf
 eg/openxpki-mason-mod_perl.conf

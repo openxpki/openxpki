@@ -171,6 +171,8 @@ OpenXPKI/Server/Notification/Dispatcher.pm
 OpenXPKI/Server/Notification.pm
 
 ## Workflow
+OpenXPKI/Workflow/Factory.pm
+
 OpenXPKI/Server/Workflow.pm
 
 OpenXPKI/Server/Workflow/Activity.pm 
@@ -190,15 +192,6 @@ OpenXPKI/Server/Workflow/Activity/CSR/GeneratePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
 
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
-
-OpenXPKI/Server/Workflow/Activity/Profile/Create.pm
-
-OpenXPKI/Server/Workflow/Activity/Key/Generate.pm
-
-OpenXPKI/Server/Workflow/Activity/Passphrase/Generate.pm
-
-OpenXPKI/Server/Workflow/Activity/Request/Certificate/DataOnly/Create.pm
-OpenXPKI/Server/Workflow/Activity/Request/Certificate/PKCS10/Create.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
@@ -299,6 +292,8 @@ OpenXPKI/Service/SCEP/Command/PKIOperation.pm
 
 ## test stuff
 
+OpenXPKI/Tests.pm
+
 t/config.xml
 
 t/01_pod/1.t
@@ -336,11 +331,14 @@ t/20_xml/3.t
 t/20_xml/4.t
 t/20_xml/5.t
 t/20_xml/6.t
+t/20_xml/7_hashref.t
 t/20_xml/test.xml
 t/20_xml/top.xml
 t/20_xml/top2.xml
 t/20_xml/sub.xml
 t/20_xml/relative.xml
+t/20_xml/loop1.xml
+t/20_xml/loop2.xml
 
 t/25_crypto/01_init_token.t
 t/25_crypto/10_init_ca.t
@@ -403,18 +401,23 @@ t/60_workflow/01.t
 t/60_workflow/01_workflow.xml
 t/60_workflow/01_workflow_activity.xml
 t/60_workflow/01_workflow_persister.xml
-t/60_workflow/02.t
-t/60_workflow/02_workflow_activity.xml
-t/60_workflow/02_workflow_persister.xml
-t/60_workflow/02_workflow_request_dataonly.xml
+t/60_workflow/03_convert.t
+t/60_workflow/04_factory.t
+t/60_workflow/10_certificate_signing_request.t
+t/60_workflow/15_csr_and_certificate_issuance.t
+t/60_workflow/20_certificate_revocation.t
+t/60_workflow/40_certificate_revocation_list.t
+t/60_workflow/99_cleanup.t
 t/60_workflow/common.pl
+t/60_workflow/test_action.xml
 
 t/65_ui/10_transport_simple.t
 t/65_ui/20_serialization_simple.t
 t/65_ui/21_serialization_json.t
 
-t/70_server/startup.pl
-t/70_server/01.t
+t/80_config_versioning/01.t
+t/80_config_versioning/99_cleanup.t
+t/80_config_versioning/config.patch
 
 t/00_cleanup/25_crypto.t
 t/00_cleanup/28_log.t
