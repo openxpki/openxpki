@@ -80,7 +80,6 @@ make-clean
 
 CLIENTS_COMMON_DIR="openxpki/trunk/clients/perl"
 CLIENTS="OpenXPKI-Client \
-	OpenXPKI-Client-CLI \
 	OpenXPKI-Client-HTML-Mason \
 	OpenXPKI-Client-SCEP"
 

@@ -58,10 +58,6 @@ my $tests = {
         DIRECTORY => $basedir . "/clients/perl/OpenXPKI-Client",
         NAME      => 'Client',
     },
-    'client_cli'   => {
-        DIRECTORY => $basedir . "/clients/perl/OpenXPKI-Client-CLI",
-        NAME      => 'CLI client',
-    },
     'client_mason' => {
         DIRECTORY => $basedir . "/clients/perl/OpenXPKI-Client-HTML-Mason",
         NAME      => 'Mason client',
