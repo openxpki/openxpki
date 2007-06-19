@@ -20,8 +20,8 @@
              '__session_id' => $__session_id);
     my $session_id = $context->{session_id};
     my $client     = $context->{client};
-    my $msg        = undef;
-       $msg        = $context->{msg} if (exists $context->{msg});
+    my $msg      = $client->send_receive_service_msg('PING');
+
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
               'msg'   => Dumper($context->{msg}));
@@ -51,11 +51,6 @@
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
               'msg'   => Dumper($context->{msg}));
-    if (not defined $msg or
-        $client->get_communication_state eq "can_receive")
-    {
-        $msg = $client->send_receive_service_msg('PING');
-    }
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
               'msg'   => Dumper($context->{msg}));

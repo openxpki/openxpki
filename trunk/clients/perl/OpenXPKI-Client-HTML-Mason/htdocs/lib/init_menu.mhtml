@@ -238,15 +238,14 @@
                     }
                 },
                };
-
+</%once>
+<%init>
     # get all workflow types
     my $msg = $context->{client}->send_receive_command_msg('list_workflow_titles');
     my @types;
     if (ref $msg->{PARAMS} eq 'HASH') {
         @types = keys %{$msg->{PARAMS}};
     }
-</%once>
-<%init>
     my %params = ( MASON  => $m,
                    CONFIG => $CONFIG,
                    ACTION => "/service/info",
