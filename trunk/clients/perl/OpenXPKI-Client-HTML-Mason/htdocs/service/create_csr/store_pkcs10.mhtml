@@ -6,14 +6,27 @@
     $keygen        => undef
     $pkcs10        => undef
     $subject       => undef
-    $subject_alt_name_parts => undef
-    $subject_parts => undef
-    $info          => "test_store_pkcs10"
 </%args>
 <%init>
     ## if (not $pkcs10)
     ## this can never happen because get_pkcs10 handle this failure
 
+    my $info = {};
+    my $subject_parts = {};
+    my $subject_alt_name_parts = {};
+
+    # create info, subject_parts, subject_alt_name parts from req args
+    foreach my $key (keys %{ $m->request_args() }) {
+        if ($key =~ m{ \A cert_subject_alt_name_ }xms) {
+            $subject_alt_name_parts->{$key} = $m->request_args()->{$key};
+        }
+        elsif ($key =~ m{ \A cert_subject_ }xms) {
+            $subject_parts->{$key} = $m->request_args()->{$key};
+        }    
+        elsif ($key =~ s{ \A additional_info_ }{}xms) {
+            $info->{$key} = $m->request_args()->{'additional_info_' . $key};
+        }
+    }
     my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
                         'workflow_type' => $workflow_type,
                         'role'          => $role,
