@@ -1,6 +1,7 @@
 Build.PL
 Changes
 MANIFEST
+LICENSE
 #META.yml # Will be created by "make dist" # NO! "make dist" dies if this string is active
 Makefile.PL
 README
