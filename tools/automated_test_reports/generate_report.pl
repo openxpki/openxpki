@@ -102,7 +102,13 @@ foreach my $test (sort keys %{ $tests }) {
         # test has already been run, skip
         next TEST;
     }
-    system("$run_test $revision $test");
+    my $ENV = '';
+    if ($test eq 'client_mason') {
+        # we need to set this here, because any attempt to set it within
+        # the test file itself fails for some reason ...
+        $ENV = 'OPENXPKI_SOCKET_FILE=t/20_webserver/test_instance/var/openxpki/openxpki.socket';
+    }
+    system("$ENV $run_test $revision $test");
 }
 
 chdir $tests->{'server'}->{DIRECTORY};
