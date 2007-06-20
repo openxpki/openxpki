@@ -126,6 +126,15 @@
         Search |
 -->
         <a href="http://www.openxpki.org">About</a>
+% if (defined $context->{user}) {
+%    my $role = $context->{role} ? $context->{role} : 'Anonymous';
+<div>
+<% $context->{user} . ' | ' . $role %>
+</div>
+<div>
+<% i18nGettext($context->{'pki_realm'}) %>
+</div>
+% }
 
 <!-- 
         Today there is no meaningful stuff behind this search button.

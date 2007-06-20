@@ -100,6 +100,9 @@
     if ($msg->{SERVICE_MSG} eq "SERVICE_READY" or
         not defined $msg)
     {
+        $context->{user} = $context->{client}->send_receive_command_msg('get_user')->{PARAMS};
+        $context->{role} = $context->{client}->send_receive_command_msg('get_role')->{PARAMS};
+        $context->{pki_realm} = $context->{client}->send_receive_command_msg('get_pki_realm')->{PARAMS};
         print "REDIRECT_TO_SERVICE_AUTOHANDLER";
     }
     elsif ($msg->{SERVICE_MSG} eq "ERROR")
