@@ -61,8 +61,6 @@
 
 <& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
 
-<% Dumper $m->request_args() %>
-pkcs10: <% Dumper $pkcs10 %>
 <%init>
     my @errors = ();
 
