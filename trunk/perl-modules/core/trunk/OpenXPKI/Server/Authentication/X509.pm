@@ -41,9 +41,6 @@ sub new {
                                         CONFIG_ID => $keys->{CONFIG_ID},
     );
 
-    # create an empty arrayref of pending challenges
-    $self->{PENDING_CHALLENGES} = [];
-
     my $trust_anchors;
     my @trust_anchors;
     eval {
@@ -109,17 +106,14 @@ sub login_step {
     if (! exists $msg->{PARAMS}->{CHALLENGE} ||
         ! exists $msg->{PARAMS}->{SIGNATURE}) {
         ##! 4: 'no login data received (yet)' 
-        # get a random challenge
-        my $random_data = CTX('api')->get_random({
-            LENGTH => $self->{CHALLENGE_LENGTH},
-        });
-        my $challenge = encode_base64($random_data);
-        $challenge =~ s/\n//g;
+        # The challenge is just the session ID, so we do not have to
+        # remember the challenge (which could only be done in the
+        # session anyways as people might talk to different servers
+        # in different login steps) ...
+        my $challenge = CTX('session')->get_id();
         ##! 64: 'challenge: ' . $challenge
         # save the pending challenge to check later that we
         # received a valid challenge
-        push @{ $self->{PENDING_CHALLENGES} }, $challenge;
-        ##! 64: 'pending challenges: ' . Dumper $self->{PENDING_CHALLENGES}
 
         return (undef, undef, 
             {
@@ -144,14 +138,14 @@ sub login_step {
         }
         ##! 64: 'challenge: ' . $challenge
         ##! 64: 'signature: ' . $signature
-        ##! 64: 'pending challenges: ' . Dumper $self->{PENDING_CHALLENGES}
 
-        if (! grep { $_ eq $challenge } @{$self->{PENDING_CHALLENGES}}) {
-            # the sent challenge is not a pending one
+        if ($challenge ne CTX('session')->get_id()) {
+            # the sent challenge is not for this session ID
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING',
+                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_DOES_NOT_MATCH_SESSION_ID',
                 params  => {
-                    CHALLENGE => $challenge,
+                    CHALLENGE  => $challenge,
+                    SESSION_ID => CTX('session')->get_id(),
                 },
             );
         }
