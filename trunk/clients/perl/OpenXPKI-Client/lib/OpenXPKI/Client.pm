@@ -281,20 +281,6 @@ sub init_session {
     my $ident = ident $self;
     my $args  = shift;
 
-    if (exists $sessionid{$ident}) {
-	# a specific session was requested, check if it's the current one
-	if (defined $args->{SESSION_ID} 
-	    && ($sessionid{$ident} ne $args->{SESSION_ID})) {
-	    
-	    OpenXPKI::Exception->throw(
-		message => "I18N_OPENXPKI_CLIENT_INIT_SESSION_ALREADY_ESTABLISHED",
-		);
-	}
-
-	# session already established, return success
-	return 1;
-    }
-    
     ##! 4: "initialize session"
     if (defined $args->{SESSION_ID}) {
 	##! 8: "using existing session"

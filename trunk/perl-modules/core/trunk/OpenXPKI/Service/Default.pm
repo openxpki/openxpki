@@ -110,30 +110,36 @@ sub __is_valid_message : PRIVATE {
         'SESSION_ID_SENT' => [
             'PING',
             'SESSION_ID_ACCEPTED',
+            'CONTINUE_SESSION',
         ],
         'SESSION_ID_SENT_FROM_CONTINUE' => [
             'PING',
             'SESSION_ID_ACCEPTED',
+            'CONTINUE_SESSION',
         ],
         'WAITING_FOR_PKI_REALM' => [
             'PING',
             'GET_PKI_REALM',
+            'CONTINUE_SESSION',
         ],
         'WAITING_FOR_AUTHENTICATION_STACK' => [
             'PING',
             'GET_AUTHENTICATION_STACK',
+            'CONTINUE_SESSION',
         ],
         'WAITING_FOR_LOGIN' => [
             'PING',
             'GET_PASSWD_LOGIN',
             'GET_CLIENT_SSO_LOGIN',
             'GET_X509_LOGIN',
+            'CONTINUE_SESSION',
         ],
         'MAIN_LOOP' => [
             'PING',
             'LOGOUT',
             'STATUS',
             'COMMAND',
+            'CONTINUE_SESSION',
         ],
     };
     
@@ -259,7 +265,13 @@ sub __handle_CONTINUE_SESSION {
 	}
     }
     if (defined $session) {
-        OpenXPKI::Server::Context::setcontext({'session' => $session});
+        eval {
+            my $s = CTX('session');
+        };
+        if ($EVAL_ERROR) {
+            # session is not yet defined, set it
+            OpenXPKI::Server::Context::setcontext({'session' => $session});
+        }
         # do not use __change_state here, as we want to have access
         # to the old session in __handle_SESSION_ID_ACCEPTED
         $state_of{$ident} = 'SESSION_ID_SENT_FROM_CONTINUE';
@@ -476,6 +488,9 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
         STACK   => CTX('session')->get_authentication_stack(),
         MESSAGE => $message,
     });
+    ##! 16: 'user: ' . $user
+    ##! 16: 'role: ' . $role
+    ##! 16: 'reply: ' . Dumper $reply
     if (defined $user && defined $role) {
         ##! 4: 'login successful'
         # successful login, save it in the session
@@ -766,23 +781,33 @@ sub run
         }
         else { # valid message received
             my $result;
-            eval { # try to handle it
-                $result = $self->__handle_message({
-                    MESSAGE => $msg
-                });
-            };
-            if (my $exc = OpenXPKI::Exception->caught()) {
+            if (! CTX('session')->is_valid()) {
+                # check whether we still have a valid session (someone
+                # might have logged out on a different forked server)
                 $self->__send_error({
-                    EXCEPTION => $exc,
+                    ERROR => 'I18N_OPENXPKI_SERVICE_DEFAULT_RUN_SESSION_INVALID',
                 });
             }
-            elsif ($EVAL_ERROR) {
-	        $self->__send_error({
-	            ERROR     => $EVAL_ERROR,
-	        });
-            }
-            else { # if everything was fine, send the result to the client
-                $self->talk($result);
+            else {
+                # our session is just fine
+                eval { # try to handle it
+                    $result = $self->__handle_message({
+                        MESSAGE => $msg
+                    });
+                };
+                if (my $exc = OpenXPKI::Exception->caught()) {
+                    $self->__send_error({
+                        EXCEPTION => $exc,
+                    });
+                }
+                elsif ($EVAL_ERROR) {
+                $self->__send_error({
+                    ERROR     => $EVAL_ERROR,
+                });
+                }
+                else { # if everything was fine, send the result to the client
+                    $self->talk($result);
+                }
             }
         }
     }
