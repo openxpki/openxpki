@@ -264,6 +264,11 @@ sub login_step {
         } 
         my $user = $signer_subject;
         my $role = $cert_db->{ROLE};
+        if (! defined $role) {
+            # if the role is not defined in the certificate database,
+            # we just set it to '' (Anonymous)
+            $role = '';
+        }
         return ($user, $role,
             {
                 SERVICE_MSG => 'SERVICE_READY',
