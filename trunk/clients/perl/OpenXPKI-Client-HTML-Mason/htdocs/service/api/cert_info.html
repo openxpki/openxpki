@@ -102,11 +102,9 @@
     <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER') %></td>
     <td>
       <& /lib/html/a.mhtml,
-         target => '../../binary/get_certificate.html',
+         target => 'cert_enroll_ie.html',
          label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL'),
-         params => [["identifier",   $identifier],
-                    ["content_type", "IE_ENROLL"],
-                    ["format",       "IE_ENROLL"]] &>
+         params => [["identifier",   $identifier]] &>
     </td>
   </tr>
   <tr>

@@ -4,27 +4,6 @@
   $format       => "PEM"
 </%args>
 
-% ## this page will only be displayed for internet explorer
-%
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-  <head>
-    <& /lib/javascript.mhtml, 'method' => 'InstallCertIE();' &>
-  </head>
-  <body>
-    <h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE') %></h1>
-    <p>
-      <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC') %>
-    </p>
-    <pre>
-<% $item %>
-    </pre>
-    <form>
-      <input type="hidden" name"cert" value="<% $item %>"/>
-    </form>
-  </body>
-</html>
 <%init>
   ## first we have to determine the content-type
   switch ($content_type)
@@ -34,7 +13,6 @@
     case "X509_EMAIL_CERT" {$content_type = "application/x-x509-email-cert"}
     case "IE_CA"           {$content_type = "application/x-x509-ca-cert"}
     case "IE_USER"         {$content_type = "application/x-x509-user-cert"}
-    case "IE_ENROLL"       {$content_type = "text/html"}
     case "PLAIN"           {$content_type = "text/plain"}
     else {
           print "<h1>".i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_TITLE')."</h1>\n";
@@ -73,12 +51,9 @@
   my $item = $msg->{PARAMS};
 
   ## now send the stuff
-  if ($format ne "IE_ENROLL")
-  {
-    $r->content_type ($content_type);
-    print $item;
-    return 1;
-  }
+  $r->content_type ($content_type);
+  print $item;
+  return 1;
 </%init>
 <%once>
   use Switch;

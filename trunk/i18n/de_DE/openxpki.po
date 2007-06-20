@@ -990,8 +990,16 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
 msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
 msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_INSTALL"
+msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC"
@@ -2940,10 +2948,6 @@ msgstr "Workflow"
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
 msgstr "Neue Instanz"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
-msgstr "Instanzen anzeigen"
-
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
 msgstr "Instanzen anzeigen"
 
@@ -3122,18 +3126,6 @@ msgstr "Privaten Schlüssel und Zertifkat herunterladen"
 
 msgid "I18N_OPENXPKI_PRIVKEY_DOWNLOAD"
 msgstr "Privaten Schlüssel herunterladen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_00_TLS_BASIC_STYLE"
-msgstr "TLS-Server"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_00_USER_BASIC_STYLE"
-msgstr "TLS-Server"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_05_ADVANCED_STYLE"
-msgstr "TLS-Server"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_PROFILE_ADVANCED_DESC"
@@ -3523,6 +3515,10 @@ msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_NOT_FOUND_IN_DB_OR_INVALID"
 msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_DOES_NOT_MATCH_SESSION_ID"
+msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
@@ -4789,6 +4785,10 @@ msgstr "PKI Realm"
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_SESSION_INVALID"
+msgstr "Seriennummer des Workflowprozesses"
+
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
 
@@ -5486,8 +5486,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_SUPER_RESOLUTION_TOO_MANY_INTERATIONS_POSSIBLE_SUPER_LOOP"
 msgstr ""
 
-msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_LOOP_DETECTED"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_POSSIBLE_LOOP_DETECTED"
+msgstr "Warten"
 
 msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_XML_ERROR"
 msgstr ""
@@ -5519,6 +5520,26 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "ja"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKC"
+#~ msgstr "Cryptographic Service Provider (CSP)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
+#~ msgstr "Instanzen anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_00_TLS_BASIC_STYLE"
+#~ msgstr "TLS-Server"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_00_USER_BASIC_STYLE"
+#~ msgstr "TLS-Server"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_05_ADVANCED_STYLE"
+#~ msgstr "TLS-Server"
 
 #~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
 #~ msgstr "Mindestens ein Kontext-Eintrag wird benötigt"
@@ -5558,10 +5579,6 @@ msgstr "ja"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_OU"
 #~ msgstr "nein"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
-#~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"

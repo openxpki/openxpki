@@ -639,12 +639,8 @@ msgstr "Server-side password generation"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_CSP"
 msgstr "Create private key"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DEFAULT_CSP"
-msgstr ""
-"In the last step, please choose the key length of your private key. Your "
-"browser will generate a new SPKAC key for you and submit the certificate "
-"request to the CA."
+msgstr "Default Cryptographic Service Provider"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DESCRIPTION"
@@ -919,8 +915,14 @@ msgstr ""
 "private key for the selected certificate or you have no Internet Explorer "
 "then this page is fully useless for you."
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
+msgstr "Certificate installed successfully"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
 msgstr "Microsoft Internet Explorer certificate enrollment"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_INSTALL"
+msgstr "Install certificate"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC"
 msgstr "The requested content type __CONTENT_TYPE__ is not supported."
@@ -1467,7 +1469,7 @@ msgid "I18N_OPENXPKI_CLIENT_TALK_ERROR_DURING_WRITE"
 msgstr "Trustcenter Web Interface"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR"
-msgstr ""
+msgstr "Error during certificate installation"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS"
 msgstr ""
@@ -1495,7 +1497,7 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED"
-msgstr ""
+msgstr "Generation of CSR successful"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_MS02_48_BUG_DETECTED"
@@ -1505,7 +1507,7 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP"
-msgstr ""
+msgstr "Generating certificate request using default CSP"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_MISSING_CAPICOM"
 msgstr ""
@@ -2746,10 +2748,6 @@ msgstr "Workflow"
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
 msgstr "Create instance"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
-msgstr "List instances"
-
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
 msgstr "List instances"
 
@@ -2936,18 +2934,6 @@ msgstr "Download private key and certificate"
 
 msgid "I18N_OPENXPKI_PRIVKEY_DOWNLOAD"
 msgstr "Download private key"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_00_TLS_BASIC_STYLE"
-msgstr "Basic TLS style"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_00_USER_BASIC_STYLE"
-msgstr "Basic user naming style"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_05_ADVANCED_STYLE"
-msgstr "Advanced naming style"
 
 msgid "I18N_OPENXPKI_PROFILE_ADVANCED_DESC"
 msgstr ""
@@ -3359,6 +3345,10 @@ msgstr "The login of the user __USER__ failed. Please try again."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_NOT_FOUND_IN_DB_OR_INVALID"
+msgstr "Default key group"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_DOES_NOT_MATCH_SESSION_ID"
 msgstr "Default key group"
 
 #, fuzzy
@@ -4815,6 +4805,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_SESSION_INVALID"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
 
@@ -5516,8 +5512,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_SUPER_RESOLUTION_TOO_MANY_INTERATIONS_POSSIBLE_SUPER_LOOP"
 msgstr ""
 
-msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_LOOP_DETECTED"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_POSSIBLE_LOOP_DETECTED"
+msgstr "Sleep"
 
 msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_XML_ERROR"
 msgstr ""
@@ -5549,6 +5546,26 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKC"
+#~ msgstr "Create private key"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
+#~ msgstr "List instances"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_00_TLS_BASIC_STYLE"
+#~ msgstr "Basic TLS style"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_00_USER_BASIC_STYLE"
+#~ msgstr "Basic user naming style"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_05_ADVANCED_STYLE"
+#~ msgstr "Advanced naming style"
 
 #~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
 #~ msgstr "At least one context entry is needed."
@@ -5588,12 +5605,6 @@ msgstr "yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_OU"
 #~ msgstr "no"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
-#~ msgstr ""
-#~ "The workflow is missing some required fields (__FIELDS__) for the next "
-#~ "action."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"

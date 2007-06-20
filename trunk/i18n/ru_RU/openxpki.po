@@ -890,8 +890,21 @@ msgstr ""
 "нет закрытого ключа для данного сертификата, или Вы не используете Microsoft "
 "Internet Explorer, данная ссылка абсолютно бесполезна для Вас."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
+msgstr "Регистрация сертификата через Microsoft Internet Explorer"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
 msgstr "Регистрация сертификата через Microsoft Internet Explorer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_INSTALL"
+msgstr ""
+"Данная ссылка используется только для установки соответствия сертификата "
+"закрытому ключу при помощи броузера Microsoft Internet Explorer. Процедура "
+"установки запустится автоматически при переходе по этой ссылке. Если у Вас "
+"нет закрытого ключа для данного сертификата, или Вы не используете Microsoft "
+"Internet Explorer, данная ссылка абсолютно бесполезна для Вас."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC"
 msgstr ""
@@ -2596,9 +2609,6 @@ msgstr "Технологические процессы"
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
 msgstr "Запустить процесс"
 
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
-msgstr "Активные процессы."
-
 msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
 msgstr "Все процессы."
 
@@ -2779,18 +2789,6 @@ msgstr "Загрузка закрытого ключа и сертификата
 
 msgid "I18N_OPENXPKI_PRIVKEY_DOWNLOAD"
 msgstr "Загрузка закрытого ключа"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_00_TLS_BASIC_STYLE"
-msgstr "Профиль TLS сервера общего назначения"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_00_USER_BASIC_STYLE"
-msgstr "Профиль пользователя общего назначения"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_05_ADVANCED_STYLE"
-msgstr "Расширенный профиль"
 
 msgid "I18N_OPENXPKI_PROFILE_ADVANCED_DESC"
 msgstr ""
@@ -3162,6 +3160,10 @@ msgstr "Вы не прошли аутенитификацию. Возможно,
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_NOT_FOUND_IN_DB_OR_INVALID"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_DOES_NOT_MATCH_SESSION_ID"
+msgstr "Стандартный способ аутентификации пользователя системы."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
@@ -4356,6 +4358,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_SESSION_INVALID"
+msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
+
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
 msgstr ""
 
@@ -5043,8 +5051,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_SUPER_RESOLUTION_TOO_MANY_INTERATIONS_POSSIBLE_SUPER_LOOP"
 msgstr ""
 
-msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_LOOP_DETECTED"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_POSSIBLE_LOOP_DETECTED"
+msgstr "Пауза"
 
 msgid "I18N_OPENXPKI_XML_CACHE_PERFORM_XINCLUDE_XML_ERROR"
 msgstr ""
@@ -5076,6 +5085,25 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "Да"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKC"
+#~ msgstr "Криптопровайдер (CSP)"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
+#~ msgstr "Активные процессы."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_00_TLS_BASIC_STYLE"
+#~ msgstr "Профиль TLS сервера общего назначения"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_00_USER_BASIC_STYLE"
+#~ msgstr "Профиль пользователя общего назначения"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_05_ADVANCED_STYLE"
+#~ msgstr "Расширенный профиль"
 
 #~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
 #~ msgstr "Необходим хотя бы один параметр контекста"
@@ -5115,12 +5143,6 @@ msgstr "Да"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_OU"
 #~ msgstr "Нет"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_NEW_SESSION_CONTINUE_FAILED"
-#~ msgstr ""
-#~ "Выбранный способ построения имени требует наличия, как минимум, одного "
-#~ "названия подразделения и двух компонентов доменного имени."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"

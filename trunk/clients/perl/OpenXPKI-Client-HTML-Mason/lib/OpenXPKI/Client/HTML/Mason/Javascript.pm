@@ -408,9 +408,9 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
 
             re.Pattern = "__SUBJECT__"
             'MsgBox ("SUBJECT is " & szName)
-            if mode <> "silent" then
-                Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT", szName))
-            end if
+            ' if mode <> "silent" then
+            '    Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT", szName))
+            ' end if
 
             xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 1)
             sz10 = xenroll.CreatePKCS10(szName, "1.3.6.1.4.1.311.2.1.21")
