@@ -126,14 +126,30 @@
         Search |
 -->
         <a href="http://www.openxpki.org">About</a>
-% if (defined $context->{user}) {
-%    my $role = $context->{role} ? $context->{role} : 'Anonymous';
+
+% if ($__session_id) {
+%     my $session = CGI::Session->new(
+%       'id:static',
+%       $__session_id,
+%       {
+%           Directory => $ENV{OPENXPKI_MASON_SESSION_DIR},
+%       },
+%     );
+%     $m->comp ('/lib/debug.mhtml',
+%               'level' => 1,
+%               'msg'   => "CGI::Session with session ID $__session_id retrieved");
+%     if (defined $session && defined $session->param('user')) {
+%       $m->comp ('/lib/debug.mhtml',
+%                 'level' => 1,
+%                 'msg'   => "CGI::Session object id: " . $session->id());
+%        my $role = $session->param('role') ? $session->param('role') : 'Anonymous';
 <div>
-<% $context->{user} . ' | ' . $role %>
+<% $session->param('user') . ' | ' . $role %>
 </div>
 <div>
-<% i18nGettext($context->{'pki_realm'}) %>
+<% i18nGettext($session->param('pki_realm')) %>
 </div>
+%     }
 % }
 
 <!-- 

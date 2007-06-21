@@ -100,9 +100,30 @@
     if ($msg->{SERVICE_MSG} eq "SERVICE_READY" or
         not defined $msg)
     {
-        $context->{user} = $context->{client}->send_receive_command_msg('get_user')->{PARAMS};
-        $context->{role} = $context->{client}->send_receive_command_msg('get_role')->{PARAMS};
-        $context->{pki_realm} = $context->{client}->send_receive_command_msg('get_pki_realm')->{PARAMS};
+        my $session = CGI::Session->new(
+          'id:static',
+          $__session_id,
+          {
+              Directory => $ENV{OPENXPKI_MASON_SESSION_DIR},
+          },
+        );
+        $session->param(
+            'user' =>
+            $context->{client}->send_receive_command_msg('get_user')->{PARAMS}
+        );
+        $session->param(
+            'role' =>
+            $context->{client}->send_receive_command_msg('get_role')->{PARAMS}
+        );
+        $session->param(
+            'pki_realm' =>
+            $context->{client}->send_receive_command_msg('get_pki_realm')->{PARAMS}
+        );
+        $session->expire('+1d');
+        $session->flush();
+        $m->comp ('/lib/debug.mhtml',
+                  'level' => 5,
+                  'msg'   => "CGI::Session created for $__session_id, object id: " . $session->id());
         print "REDIRECT_TO_SERVICE_AUTOHANDLER";
     }
     elsif ($msg->{SERVICE_MSG} eq "ERROR")
@@ -140,4 +161,5 @@
 </%init>
 <%once>
   use Data::Dumper;
+  use OpenXPKI::Client::HTML::Mason::SessionGenerator;
 </%once>

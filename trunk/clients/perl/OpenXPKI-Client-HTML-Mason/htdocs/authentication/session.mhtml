@@ -4,6 +4,7 @@
 </%args>
 <%init>
   use CGI::Cookie;
+  use CGI::Session qw/-ip-match/;
 
   $m->comp ('/lib/debug.mhtml',
             level => 1,
@@ -14,7 +15,7 @@
             msg   => "__session_id::=".$__session_id."\n".
                      "context->session_id::=".$context->{session_id});
 
-  if (!defined $__session_id) {
+  if (! defined $__session_id) {
       # session_id is not defined, let's have a look if the user
       # presents it to us in a cookie
       $m->comp ('/lib/debug.mhtml',
