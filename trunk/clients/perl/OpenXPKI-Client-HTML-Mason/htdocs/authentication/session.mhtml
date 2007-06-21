@@ -4,7 +4,6 @@
 </%args>
 <%init>
   use CGI::Cookie;
-  use CGI::Session qw/-ip-match/;
 
   $m->comp ('/lib/debug.mhtml',
             level => 1,

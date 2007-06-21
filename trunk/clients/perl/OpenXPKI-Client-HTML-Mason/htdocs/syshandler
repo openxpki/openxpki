@@ -13,6 +13,7 @@
   use English;
   use Data::Dumper;
   use HTML::Entities;
+  use CGI::Session qw/-ip-match/;
 
   if (defined $ENV{OPENXPKI_LOCALE_PREFIX}) {
     set_locale_prefix($ENV{OPENXPKI_LOCALE_PREFIX});

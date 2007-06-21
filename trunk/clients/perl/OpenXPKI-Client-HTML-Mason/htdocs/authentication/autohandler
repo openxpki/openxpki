@@ -161,5 +161,4 @@
 </%init>
 <%once>
   use Data::Dumper;
-  use OpenXPKI::Client::HTML::Mason::SessionGenerator;
 </%once>
