@@ -89,7 +89,7 @@ my $def_dir = $wf_all;
 # get a list of workflow definitions
 my $config = XMLin($wf_all);
 
-my $wf_config = $config->{'workflows'}->{'configfile'};
+my $wf_config = $config->{'workflows'}->{'xi:include'};
 if($html){
    open(WEBFILE, ">", $dot_dir ."/../". $html_name ) or 
         die "Opening file $html_name in $dot_dir:  $!";
@@ -101,10 +101,9 @@ if($html){
    print WEBFILE "Here are links to graphs describing main OpenXPKI workflows\n";
    print WEBFILE "</p>\n\n"
 };
-foreach my $wf_file (@{$wf_config}){
-   my $wf_def = $wf_file;
-#  cut path - we assume it must be the same as in wf_all 
-   $wf_def =~ s/^.*\///;
+
+foreach my $wf_file_hash (@{$wf_config}){
+   my $wf_def = $wf_file_hash->{'href'};
 
 #  dot file has the same name but suffix 'dot' instead of 'xml'
    my $wf_dot = $wf_def;
@@ -142,21 +141,15 @@ foreach my $wf_file (@{$wf_config}){
       print WEBLINKFILE "</%attr>\n\n";
       print WEBLINKFILE "<h1>OpenXPKI workflows' graphical representation</h1>\n";
       print WEBLINKFILE "<h2> Workflow ". $wf_title ."</h2>\n\n";
-      print WEBLINKFILE "<p>\nAutorun states are yellow\n</p>\n\n";
-      print WEBLINKFILE "<p>\n".
-            "You may need to pan or scroll to view a picture\n</p>\n\n";
-      print WEBLINKFILE "<p>\n";
+      print WEBLINKFILE "<p>\nAutorun states are yellow.\n";
+      print WEBLINKFILE "You may need to pan or scroll to view a picture.\n</p>\n\n";
       my $image_name = $dot_file . "." . $pic_format;
       my $image_size = html_imgsize($image_name);
-      # $size == 'width="60" height="40"'
-
-      print WEBLINKFILE '<img hspace=5 align="left" ' . $image_size .
+      print WEBLINKFILE '<img ' . $image_size .
                         ' src="'. $wf_dot . '.' . $pic_format . '"' .
-			' border=0 '.
 			'alt="' . $wf_title . '" ' .
 			'title="' . $wf_title . '" ' .
 			'/>'."\n"; 
-      print WEBLINKFILE '<br clear="all"/></p>' . "\n";
       close(WEBLINKFILE);
       print WEBFILE '<a href="' . $ref_dir . '/' . $wf_dot . '.html">' .
                     $wf_title . '</a><br/>'."\n";    			
