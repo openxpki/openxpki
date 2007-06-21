@@ -8,6 +8,12 @@
 %    $title =~ s/[^\/]+\//..\//g;
 %    $title =~ s/\/[^\/]*$/\//;
 %    $title =~ s/^\///;
+%    if (($next_comp) and ("$next_comp" ne "")) {
+%        my $old_session_id = $next_comp;
+%        $old_session_id =~ s{\A .* __session_id=(.+?) ; .* \z }{$1}xms;
+%        $next_comp = "" if (($old_session_id ne "") and ($session_id ne $old_session_id));
+%    }
+
         <form action="<% $title %>authentication/index.html" name="<% $name %>" method="post">
           <input type="hidden" name="__session_id" value="<% $session_id %>"/>
           <input type="hidden" name="next_comp" value="<% $next_comp %>"/>
