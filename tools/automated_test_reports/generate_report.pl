@@ -29,6 +29,11 @@ my $FEED_FORMAT = 'Atom';
 my $FEED_TITLE = "OpenXPKI tests at " . `hostname`;
 my $FEED_LINK  = "http://build0.cynops.de/openxpki_tests/";
 
+# define how many revisions you want to show at the HTML page and how
+# many you want in the Atom feed
+my $MAX_HTML_REVISIONS = 20;
+my $MAX_ATOM_REVISIONS = 20;
+
 if (! defined $run_test) {
     $run_test = `which run_test.pl`;
     chomp($run_test);
@@ -142,7 +147,7 @@ print INDEX << "XEOF";
 XEOF
 
 print STDERR "Generating report ... ";
-foreach my $rev (@tested_revisions) {
+foreach my $rev (@tested_revisions[0..$MAX_HTML_REVISIONS-1]) {
     print STDERR "r$rev ";
     chdir $basedir;
     open my $SVN, "svn log -qr $rev ..|";
@@ -180,7 +185,7 @@ my $feed = XML::Feed->new($FEED_FORMAT);
 $feed->title($FEED_TITLE);
 $feed->link($FEED_LINK);
 
-foreach my $rev (@tested_revisions) {
+foreach my $rev (@tested_revisions[0..$MAX_ATOM_REVISIONS-1]) {
     my $entry = XML::Feed::Entry->new($FEED_FORMAT);
 
     print STDERR "r$rev ";
