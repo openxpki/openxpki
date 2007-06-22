@@ -291,7 +291,7 @@ sub __parse_super_element_entry {
     if ($element =~ /:/) {
         ##! 16: 'element is of form 2'
         ($attribute, $id_attr, $id_content) = 
-            ($element =~ m/ ([^{]+) { (\w+) : (\w+) }/xms);
+            ($element =~ m/ ([^{]+) { (\w+) : ([\w\*\ ]+) }/xms);
     }
     else {
         ##! 16: 'element is of form 1'
