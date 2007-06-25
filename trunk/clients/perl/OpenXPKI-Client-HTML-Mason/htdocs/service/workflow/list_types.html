@@ -13,7 +13,7 @@
 %   foreach my $type (sort keys %{$msg->{PARAMS}})
 %   {
   <dt>
-    <a href="list_instances.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>">
+    <a href="search_instances.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>;context_key=creator;context_value=%25;context_key=;context_value=">
       <% i18nGettext($type) %>
     </a>
   </dt>
