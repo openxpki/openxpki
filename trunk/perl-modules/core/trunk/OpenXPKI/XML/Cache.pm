@@ -881,7 +881,11 @@ sub get_xpath_count
     if (not exists $item->{$keys->{XPATH}->[scalar @{$keys->{COUNTER}}]})
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_NOTHING_FOUND");
+            message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_NOTHING_FOUND",
+            params  => {
+                XPATH => $self->__get_serialized_xpath($keys),
+            },
+        );
     }
     ##! 2: "at minimum one exists"
     $item = $item->{$keys->{XPATH}->[scalar @{$keys->{COUNTER}}]};
