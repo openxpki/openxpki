@@ -18,10 +18,18 @@
 
 <%init>
     ## define the available workflow types
-    my @types = ("I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST",
-                 "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA");
-
-    ## return the role if it exists
+    my @types = ();
+    my @possible_types = ("I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST", "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA");
+    my $msg = $context->{client}->send_receive_command_msg ("list_workflow_titles");
+    # TODO - error handling ...
+    if (defined $msg && ref $msg eq 'HASH' && ref $msg->{PARAMS} eq 'HASH') {
+        foreach my $type (@possible_types) {
+            if (exists $msg->{PARAMS}->{$type}) {
+                push @types, $type;
+            }
+        }
+    }
+    ## return the type if it exists
     if (defined $workflow_type and
         grep /^$workflow_type$/, @types)
     {
