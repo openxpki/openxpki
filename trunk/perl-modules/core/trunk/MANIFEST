@@ -407,9 +407,14 @@ t/60_workflow/10_certificate_signing_request.t
 t/60_workflow/15_csr_and_certificate_issuance.t
 t/60_workflow/20_certificate_revocation.t
 t/60_workflow/40_certificate_revocation_list.t
+t/60_workflow/80_looping.t
 t/60_workflow/99_cleanup.t
 t/60_workflow/common.pl
 t/60_workflow/test_action.xml
+t/60_workflow/test_workflow_configs/workflow_activity_cycle_test.xml
+t/60_workflow/test_workflow_configs/workflow_def_cycle_sub.xml
+t/60_workflow/test_workflow_configs/workflow_def_cycle_sub2.xml
+t/60_workflow/test_workflow_configs/workflow_def_cycle_top.xml
 
 t/65_ui/10_transport_simple.t
 t/65_ui/20_serialization_simple.t

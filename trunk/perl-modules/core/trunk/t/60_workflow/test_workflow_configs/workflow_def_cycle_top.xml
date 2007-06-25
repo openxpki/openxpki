@@ -1,0 +1,38 @@
+<workflow>
+ <type>I18N_OPENXPKI_WF_TYPE_CYCLE_TOP</type>
+  <description>I18N_OPENXPKI_WF_DESC_CYCLE_TOP</description>
+  <persister>OpenXPKI</persister>
+
+  <state name="INITIAL">
+    <description>I18N_OPENXPKI_WF_STATE_CYCLE_TOP_INITIAL</description>
+    <action name="null" 
+             resulting_state="LAUNCH_SUBCYCLE">
+    </action>
+  </state>
+
+  <state name="LAUNCH_SUBCYCLE" autorun="yes">
+   <action name="I18N_OPENXPKI_WF_ACTION_CYCLE_TOP_FORK"
+           resulting_state="SLEEPING_FOR_CHILD">
+      </action>
+  </state>
+							
+  <state name="SLEEPING_FOR_CHILD" autorun="yes">
+   <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_TOP"
+                  resulting_state="CHECK_CHILD_FINISHED">
+   </action>
+  </state>
+
+  <state name="CHECK_CHILD_FINISHED" autorun="yes">
+   <action name="null"
+      resulting_state="SUCCESS">
+     <condition name="wf_child_instance_finished"/>
+   </action>
+   <action name="null2"
+      resulting_state="SLEEPING_FOR_CHILD">
+     <condition name="!wf_child_instance_finished"/>
+   </action>
+  </state>
+
+  <state name="SUCCESS"/>
+
+</workflow>
