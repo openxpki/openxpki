@@ -4,9 +4,6 @@
     $profile       => undef
     $subject_style => undef
     $keygen        => undef
-    $subject_parts => undef
-    $subject_alt_name_parts => undef
-    $info          => undef
     $CONFIG        => undef
 </%args>
 
@@ -17,6 +14,23 @@
 
 <%init>
     my @errors = ();
+
+    my $info = {};
+    my $subject_parts = {};
+    my $subject_alt_name_parts = {};
+
+    # create info, subject_parts, subject_alt_name parts from req args
+    foreach my $key (keys %{ $m->request_args() }) {
+        if ($key =~ m{ \A cert_subject_alt_name_ }xms) {
+            $subject_alt_name_parts->{$key} = $m->request_args()->{$key};
+        }
+        elsif ($key =~ m{ \A cert_subject_ }xms) {
+            $subject_parts->{$key} = $m->request_args()->{$key};
+        }
+        elsif ($key =~ s{ \A additional_info_ }{}xms) {
+            $info->{$key} = $m->request_args()->{'additional_info_' . $key};
+        }
+    }
 
         my $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
                             'workflow_type' => $workflow_type,
