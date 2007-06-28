@@ -145,7 +145,7 @@ sub execute {
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_FORK_FAILED',
             );
         } 
-        elsif ($pid == 0) {
+        elsif ($pid != 0) {
     	    ##! 16: 'parent here'
             ##! 16: 'parent: process group: ' . getpgrp(0)
             # we have forked successfully and have nothing to do any more
