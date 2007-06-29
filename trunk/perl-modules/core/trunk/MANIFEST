@@ -397,6 +397,7 @@ t/50_auth/08.t
 t/50_auth/acl.xml
 t/50_auth/auth.xml
 
+t/60_workflow/00.t
 t/60_workflow/01.t
 t/60_workflow/01_workflow.xml
 t/60_workflow/01_workflow_activity.xml
@@ -407,6 +408,7 @@ t/60_workflow/10_certificate_signing_request.t
 t/60_workflow/15_csr_and_certificate_issuance.t
 t/60_workflow/20_certificate_revocation.t
 t/60_workflow/40_certificate_revocation_list.t
+t/60_workflow/60_ldap_publishing.t
 t/60_workflow/80_looping.t
 t/60_workflow/99_cleanup.t
 t/60_workflow/common.pl
@@ -415,6 +417,15 @@ t/60_workflow/test_workflow_configs/workflow_activity_cycle_test.xml
 t/60_workflow/test_workflow_configs/workflow_def_cycle_sub.xml
 t/60_workflow/test_workflow_configs/workflow_def_cycle_sub2.xml
 t/60_workflow/test_workflow_configs/workflow_def_cycle_top.xml
+t/60_workflow/ldap_conf/test_slapd_conf.template
+t/60_workflow/ldap_schema/cosine.schema
+t/60_workflow/ldap_schema/openldap.ldif
+t/60_workflow/ldap_schema/openldap.schema
+t/60_workflow/ldap_schema/openca.schema
+t/60_workflow/ldap_schema/core.ldif
+t/60_workflow/ldap_schema/core.schema
+t/60_workflow/ldap_schema/inetorgperson.schema
+t/60_workflow/ldap_schema/ppolicy.schema
 
 t/65_ui/10_transport_simple.t
 t/65_ui/20_serialization_simple.t
