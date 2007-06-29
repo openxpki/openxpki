@@ -22,9 +22,11 @@ print "1..$NUMBER_OF_TESTS\n";
 my $instancedir = 't/80_config_versioning/test_instance';
 my $socketfile = $instancedir . '/var/openxpki/openxpki.socket';
 my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
+my $opensslfile = `cat t/cfg.binary.openssl`;
 
 ok(deploy_test_server({
         DIRECTORY  => $instancedir,
+        OPENSSL_FILE => $opensslfile,
     }), 'Test server deployed successfully');
 
 # Fork server, connect to it, test config IDs, create workflow instance

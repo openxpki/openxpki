@@ -7,6 +7,8 @@ use OpenXPKI::Tests;
 use OpenXPKI::Client;
 use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
+use File::Copy;
+use Cwd;
 
 # this is needed because we need to manually output the number of tests run
 Test::More->builder()->no_header(1);
@@ -22,12 +24,20 @@ print "1..$NUMBER_OF_TESTS\n";
 my $instancedir = 't/60_workflow/test_instance';
 my $socketfile = $instancedir . '/var/openxpki/openxpki.socket';
 my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
+my $opensslfile = `cat t/cfg.binary.openssl`;
+my $configfile = cwd()."/$instancedir/openssl.cnf";
 
 ok(deploy_test_server({
         DIRECTORY  => $instancedir,
+        OPENSSL_FILE => $opensslfile,
     }), 'Test server deployed successfully');
+
+copy("t/60_workflow/openssl.cnf", "$instancedir/openssl.cnf");
+
 ok(create_ca_cert({
-        DIRECTORY => $instancedir,
+        DIRECTORY    => $instancedir,
+        OPENSSL_FILE => $opensslfile,
+        CONFIGFILE   => $configfile,
     }), 'CA certificate created and installed successfully');
 
 

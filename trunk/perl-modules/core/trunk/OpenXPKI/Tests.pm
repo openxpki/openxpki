@@ -30,10 +30,30 @@ use Exporter 'import';
 sub deploy_test_server {
     my $arg_ref     = shift;
     my $instancedir = $arg_ref->{DIRECTORY};
+    my $opensslfile = ''; 
+    if ($arg_ref->{OPENSSL_FILE}) {
+        $opensslfile = $arg_ref->{OPENSSL_FILE};
+        $opensslfile = '' if ((! (-e $opensslfile)) || (!(-x _ )) || (`$opensslfile version` !~ m{\A OpenSSL\ 0\.9\.8 }xms));
+    }
+
     diag("Locally deploying OpenXPKI");
 
     # check if infrastructure commands are installed
-    if (system("openxpkiadm >/dev/null 2>&1") != 0) {
+
+    my $openxpkiadm = "openxpkiadm";
+    my $openxpki_configure = "openxpki-configure";
+    if ($ENV{DEPLOYMENT_PREFIX}) {
+        diag "Deployment prefix is: $ENV{DEPLOYMENT_PREFIX}\n ";
+        $openxpkiadm = $ENV{DEPLOYMENT_PREFIX}."/$openxpkiadm" 
+            if (-e $ENV{DEPLOYMENT_PREFIX}."/$openxpkiadm" && -x _);
+        diag "Using openxpkiadm: $openxpkiadm\n ";
+        $openxpki_configure = $ENV{DEPLOYMENT_PREFIX}."/$openxpki_configure" 
+            if (-e $ENV{DEPLOYMENT_PREFIX}."/$openxpki_configure" && -x _);
+        diag "Using openxpki-configure: $openxpki_configure\n ";
+        $ENV{PATH} = $ENV{DEPLOYMENT_PREFIX}.":".$ENV{PATH};
+    }
+
+    if (system("$openxpkiadm >/dev/null 2>&1") != 0) {
         diag("openxpkiadm is not installed!");
         return 0;
     }
@@ -50,7 +70,7 @@ sub deploy_test_server {
     }
 
     # deployment
-    if(system("openxpkiadm deploy --prefix $instancedir $stderr")) {
+    if(system("$openxpkiadm deploy --prefix $instancedir $stderr")) {
         diag("openxpkiadm deploy failed");
         return 0;
     }
@@ -72,6 +92,7 @@ sub deploy_test_server {
         'database.type'     => 'SQLite',
         'database.name'     => "$instancedir/var/openxpki/sqlite.db",
     );
+    $configure_settings{'file.openssl'} = $opensslfile if ($opensslfile);
 
     # configure in this directory
     my $dir = getcwd();
@@ -84,7 +105,7 @@ sub deploy_test_server {
     foreach my $key (keys %configure_settings) {
         $args .= " --setcfgvalue $key=$configure_settings{$key}";
     }
-    if(system("openxpki-configure $args $stderr")) {
+    if(system("$openxpki_configure $args $stderr")) {
         diag("openxpki-configure failed");
         return 0;
     }
@@ -101,7 +122,7 @@ sub deploy_test_server {
     if ($ENV{DEBUG}) {
         $args .= ' --debug 128 ';
     }
-    if(system("openxpkiadm initdb $args --config $instancedir/etc/openxpki/config.xml $stderr")) {
+    if(system("$openxpkiadm initdb $args --config $instancedir/etc/openxpki/config.xml $stderr")) {
         diag("openxpkiadm initdb failed");
         return 0;
     }
@@ -111,22 +132,49 @@ sub deploy_test_server {
 sub create_ca_cert {
     my $arg_ref     = shift;
     my $instancedir = $arg_ref->{DIRECTORY};
+    my $configfile;
+    $configfile = $arg_ref->{CONFIGFILE} if ($arg_ref->{CONFIGFILE});
 
-    if (! (`openssl version` =~ m{\A OpenSSL\ 0\.9\.8 }xms)) {
+    my $openssl = 'openssl';
+    if ($arg_ref->{OPENSSL_FILE}) {
+        $openssl = $arg_ref->{OPENSSL_FILE};
+        $openssl = 'openssl' if ( (! (-e $openssl)) || (!(-x _ )) );
+    }
+
+    if (! (`$openssl version` =~ m{\A OpenSSL\ 0\.9\.8 }xms)) {
         diag "OpenSSL 0.9.8 not available";
         return 0;
     }
+
+    if (! $configfile || ! -e $configfile) {
+        diag "Trying to use default OpenSSL config file.";
+        $configfile = '';
+    }
+    else {
+        $configfile = cwd()."/$configfile" if ($configfile !~ m{ \A \/ }xms );
+        diag "Using local OpenSSL config file ($configfile).";
+        $configfile = "-config $configfile";
+    }
+
+    my $openxpkiadm = "openxpkiadm";
+    if ($ENV{DEPLOYMENT_PREFIX}) {
+        diag "Using deployment prefix: $ENV{DEPLOYMENT_PREFIX}\n ";
+        $openxpkiadm = $ENV{DEPLOYMENT_PREFIX}."/$openxpkiadm" 
+            if (-e $ENV{DEPLOYMENT_PREFIX}."/$openxpkiadm" && -x _);
+    }
+
     `mkdir -p $instancedir/etc/openxpki/ca/testdummyca1/`;
     if ($CHILD_ERROR) {
         diag "Could not create directory";
         return 0;
     }
-    `pwd=1234567890 openssl genrsa -des -passout env:pwd -out $instancedir/etc/openxpki/ca/testdummyca1/cakey.pem`;
+
+    `pwd=1234567890 $openssl genrsa -des -passout env:pwd -out $instancedir/etc/openxpki/ca/testdummyca1/cakey.pem`;
     if ($CHILD_ERROR) {
         diag "Could not generate CA key";
         return 0;
     }
-    `(echo '.'; echo '.'; echo '.'; echo 'OpenXPKI'; echo 'Testing CA'; echo 'Testing CA'; echo '.'; echo '.'; echo '.')|pwd=1234567890 openssl req -new -key $instancedir/etc/openxpki/ca/testdummyca1/cakey.pem -passin env:pwd -out $instancedir/csr.pem`;  
+    `(echo '.'; echo '.'; echo '.'; echo 'OpenXPKI'; echo 'Testing CA'; echo 'Testing CA'; echo '.'; echo '.'; echo '.')|pwd=1234567890 $openssl req -new $configfile -key $instancedir/etc/openxpki/ca/testdummyca1/cakey.pem -passin env:pwd -out $instancedir/csr.pem`;  
     if ($CHILD_ERROR) {
         diag "Could not generate CA CSR";
         return 0;
@@ -136,11 +184,12 @@ sub create_ca_cert {
     `touch $instancedir/demoCA/index.txt`;
     `echo 01 > $instancedir/demoCA/serial`;
 
-    `cd $instancedir; pwd=1234567890 openssl ca -selfsign -in csr.pem -keyfile etc/openxpki/ca/testdummyca1/cakey.pem -passin env:pwd -utf8 -outdir . -policy policy_anything -batch -extensions v3_ca -preserveDN -out cacert.pem`;
+    `cd $instancedir; pwd=1234567890 $openssl ca -selfsign $configfile -in csr.pem -keyfile etc/openxpki/ca/testdummyca1/cakey.pem -passin env:pwd -utf8 -outdir . -policy policy_anything -batch -extensions v3_ca -preserveDN -out cacert.pem`;
     if ($CHILD_ERROR) {
         diag "Could not issue CA certificate";
         return 0;
     }
+
     open CACERT_IN,  '<', "$instancedir/cacert.pem";
     open CACERT_OUT, '>', "$instancedir/etc/openxpki/ca/testdummyca1/cert.pem";
     my $cert;
@@ -154,12 +203,12 @@ sub create_ca_cert {
     close CACERT_IN;
     close CACERT_OUT;
 
-    my $identifier = `openxpkiadm certificate import --config $instancedir/etc/openxpki/config.xml --file $instancedir/etc/openxpki/ca/testdummyca1/cert.pem|tail -1|sed -e 's/  Identifier: //'`;
+    my $identifier = `$openxpkiadm certificate import --config $instancedir/etc/openxpki/config.xml --file $instancedir/etc/openxpki/ca/testdummyca1/cert.pem|tail -1|sed -e 's/  Identifier: //'`;
     if ($CHILD_ERROR || ! $identifier) {
         diag "Could not import CA cert into DB";
         return 0;
     }
-    `openxpkiadm certificate alias --config $instancedir/etc/openxpki/config.xml -realm I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA --alias testdummyca1 --identifier $identifier`;
+    `$openxpkiadm certificate alias --config $instancedir/etc/openxpki/config.xml -realm I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA --alias testdummyca1 --identifier $identifier`;
     if ($CHILD_ERROR) {
         diag "Could not create alias for certificate";
         return 0;
@@ -209,7 +258,14 @@ sub start_test_server {
     if ($ENV{DEBUG}) {
         $args .= ' --debug 128 ';
     }
-    return ! system("openxpkictl --config $configfile $args start $stderr");
+
+    my $openxpkictl = "openxpkictl";
+    if ($ENV{DEPLOYMENT_PREFIX} && -e $ENV{DEPLOYMENT_PREFIX}."/$openxpkictl" && -x _) {
+        $openxpkictl = $ENV{DEPLOYMENT_PREFIX}."/$openxpkictl"; 
+        diag "Using openxpkictl: $openxpkictl\n ";
+    }
+
+    return ! system("$openxpkictl --config $configfile $args start $stderr");
 }
 
 sub login {
