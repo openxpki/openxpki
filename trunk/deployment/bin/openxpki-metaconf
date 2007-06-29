@@ -691,6 +691,27 @@ ECHO: Database setup
   passwd
   namespace
 
+SECTION: ldappublic
+ECHO: LDAP options setup
+
+  VALIDATE: m{ \A (?:yes|no) }xms
+  use_ldap: Use LDAP flag (yes or no)
+  excluded_roles: Excluded roles (comma separated)
+  server: LDAP server name
+  port: Port 
+  version: Version 
+  login: DN of the OpenXPKI LDAP account
+  password: Password (plain text or {SHA})
+  VALIDATE: m{ \A (?:yes|no) }xms
+  use_tls: Use TLS flag (yes or no)
+  VALIDATE: m{ \A (?:yes|no) }xms
+  use_sasl: Use SASL authentication flag (yes or no) 
+  suffix@: LDAP suffixes
+  client_cert: Path to OpenXPKI certificate for TLS
+  client_key: Path to OpenXPKI key for TLS
+  ca_cert: Path to CA certificate for TLS 
+  VALIDATE: m{ \A (?:EXTERNAL|DIGEST-MD5) }xms
+  sasl_mechanism: SASL mechanism for authentication (EXTERNAL or DIGEST-MD5)
 
 SECTION: deployment
 ECHO: Deployment options

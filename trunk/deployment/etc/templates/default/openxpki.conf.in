@@ -359,4 +359,31 @@ baz: 1234
 endentity:    $(endentityprofile)
 #selfsignedca: $(selfsignedcaprofile)
 
+###########################################################################
+# LDAP public configuration
+[ldappublic]
 
+# Common use ldap options
+use_ldap: no
+excluded_roles: publish_all_roles
+server: localhost
+port: 60389
+version: 3
+login: cn=Manager,dc=openxpki,dc=org
+password: secret
+use_tls: no
+use_sasl: no 
+
+# Multiple suffix lines are supported 
+suffix: dc=openxpki,dc=org
+suffix: dc=openxpki,c=DE
+suffix: dc=openxpki,c=RU
+
+
+# These keys work if ldappublic.use_tls is set to 'yes'
+client_cert: no
+client_key: no
+ca_cert: no
+
+# This key works if ldappublic.use_sasl is set to 'yes'
+sasl_mechanism: EXTERNAL

@@ -1,27 +1,26 @@
 <ldap_options>
-<!-- WARNING: keep "ldap_enable" set to "no" to avoid surprises  -->
- <ldap_enable>no</ldap_enable>
- <ldap_excluded_roles>publish_all_roles</ldap_excluded_roles>
+ <ldap_enable>[% ldappublic.use_ldap %]</ldap_enable>
+ <ldap_excluded_roles>[% ldappublic.excluded_roles %]</ldap_excluded_roles>
  <ldap_suffixes>
-  <ldap_suffix>dc=OpenXPKI,dc=org</ldap_suffix>
-  <ldap_suffix>dc=OpenXPKI,c=RU</ldap_suffix>
-  <ldap_suffix>dc=OpenXPKI,c=DE</ldap_suffix>
+    [% FOREACH item = ldappublic.suffix %]
+      <ldap_suffix>[% item %]</ldap_suffix>
+    [% END %]
  </ldap_suffixes>
- <ldap_server>localhost</ldap_server>
- <ldap_port>60389</ldap_port>
- <ldap_version>3</ldap_version>
+ <ldap_server>[% ldappublic.server %]</ldap_server>
+ <ldap_port>[% ldappublic.port %]</ldap_port>
+ <ldap_version>[% ldappublic.version %]</ldap_version>
  <ldap_tls>
-  <use_tls>no</use_tls>
-  <client_cert>no</client_cert>
-  <client_key>no</client_key>
-  <ca_cert>no</ca_cert>
+  <use_tls>[% ldappublic.use_tls %]</use_tls>
+  <client_cert>[% ldappublic.client_cert %]</client_cert>
+  <client_key>[% ldappublic.client_key %]</client_key>
+  <ca_cert>[% ldappublic.ca_cert %]</ca_cert>
  </ldap_tls>
  <ldap_sasl>
-  <use_sasl>no</use_sasl>
-  <sasl_mech>EXTERNAL</sasl_mech>
+  <use_sasl>[% ldappublic.use_sasl %]</use_sasl>
+  <sasl_mech>[% ldappublic.sasl_mechanism %]</sasl_mech>
  </ldap_sasl>
- <ldap_login>cn=Manager,dc=OpenXPKI,dc=org</ldap_login>
- <ldap_password>secret</ldap_password>
+ <ldap_login>[% ldappublic.login %]</ldap_login>
+ <ldap_password>[% ldappublic.password %]</ldap_password>
  <schema>
    <default>
      <rdn>
