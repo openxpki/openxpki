@@ -1282,7 +1282,7 @@ msgstr "Bulk approval results"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_DESCRIPTION"
 msgstr ""
-"You can create a new instance of workflow type here. Please choose one."
+"Please choose the type of workflow for which you want to create a new instance. Note that you can only create workflows which do not require any data. To create workflows which require you to pass data to the CA please use the appropriate menu item."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_TITLE"
 msgstr "Create workflow instance"

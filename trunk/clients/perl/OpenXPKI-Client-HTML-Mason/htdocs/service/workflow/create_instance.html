@@ -1,7 +1,7 @@
 <%args>
     $type => undef
 </%args>
-<& /service/open_form.mhtml &>
+%#<& /service/open_form.mhtml &>
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_TITLE') %></h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_DESCRIPTION') %>
@@ -12,22 +12,23 @@
 %   ## COMMAND     => $cmd,
 %   ## PARAMS      => {$name => {description => $desc}, ... }
 %
-<select name="type">
-%   foreach my $type (keys %{$msg->{PARAMS}})
-%   {
-  <option value="<% $type %>">
-    <% i18nGettext($type) %>
-  </option>
-%   }
-</select>
-<& /service/send_form.mhtml &>
-<& /service/close_form.mhtml &>
+%#<select name="type">
+%#   foreach my $type (keys %{$msg->{PARAMS}})
+%#   {
+%#  <option value="<% $type %>">
+%#    <% i18nGettext($type) %>
+%#  </option>
+%#   }
+%#</select>
+%#<& /service/send_form.mhtml &>
+%#<& /service/close_form.mhtml &>
 <dl>
 %
 %   foreach my $type (keys %{$msg->{PARAMS}})
 %   {
+%       next if (! grep {$_ eq $type} @optionless_workflows);
   <dt>
-    <a href="list_instances.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>">
+    <a href="create_instance.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>">
       <% i18nGettext($type) %>
     </a>
   </dt>
@@ -36,6 +37,12 @@
 </dl>
 
 <%init>
+    # this is the list to filter the available workflows against.
+    # As it makes only sense to display workflows that have no options,
+    # show only the ones which you can create without input of data
+    my @optionless_workflows = qw(
+        I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
+    );
     if (defined $type)
     {
         my $msg = $context->{client}->send_receive_command_msg
@@ -49,7 +56,7 @@
             my $errors = [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ];
             return $m->comp ('/service/create_csr/print_errors.mhtml', 'errors' => $errors);
         } else {
-            return $m->comp ('/service/workflow/list_instances.html', 'type' => $type)
+        return $m->comp ('/service/workflow/show_instance.html', 'id' => $msg->{PARAMS}->{WORKFLOW}->{ID})
         }
     }
 </%init>
