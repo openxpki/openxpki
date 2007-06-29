@@ -123,7 +123,11 @@ sub execute {
     my $ldap_user    = $realm_config->{ldap_login};
     my $ldap_server  = $realm_config->{ldap_server};
     my $ldap_port    = $realm_config->{ldap_port};
-    my $ldap_suffix  = $realm_config->{ldap_suffix};
+#
+#   FIXME 
+#   we do not need suffix at the moment, and later the realm 
+#   configuration will be changed to multi-suffix version
+#   my $ldap_suffix  = $realm_config->{ldap_suffix};
     my $ldap_version = $realm_config->{ldap_version};
 
     my $ldap = Net::LDAP->new(

@@ -67,7 +67,12 @@ sub execute {
     my $ldap_user    = $realm_config->{ldap_login};
     my $ldap_server  = $realm_config->{ldap_server};
     my $ldap_port    = $realm_config->{ldap_port};
-    my $ldap_suffix  = $realm_config->{ldap_suffix};
+#
+#   FIXME
+#   At the moment we are using only the first suffix of multi-suffix 
+#   configuration.  Suffix selection will be added later.
+#
+    my $ldap_suffix  = $realm_config->{ldap_suffix}->[0];
     my $ldap_version = $realm_config->{ldap_version};
 
 

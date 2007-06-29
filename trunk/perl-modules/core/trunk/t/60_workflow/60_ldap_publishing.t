@@ -90,9 +90,7 @@ my $new_ldap_config = File::Spec->catfile(
 		     );
 system(
     "sed -e 's/<ldap_enable>no/<ldap_enable>yes/' " . 
-    "< $old_ldap_config | " . 
-    "sed -e 's/<ldap_server>myserver/<ldap_server>localhost/' | " . 
-    "sed -e 's/<ldap_port>389/<ldap_port>60389/' " . 
+    "< $old_ldap_config " . 
     "> $new_ldap_config "
 );
 unlink("$old_ldap_config");
