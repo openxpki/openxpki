@@ -285,6 +285,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG"
 msgstr ""
 
+msgid "I18N_OPENXPKI_CLIENT_COLLECT_EVAL_ERROR"
+msgstr "An internal error occured while reading data from the CA server. Error: __ERROR__"
+
+msgid "I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT"
+msgstr "A timeout occured while reading data from the CA server."
+
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_DESCRIPTION"
 msgstr ""
@@ -3352,10 +3358,6 @@ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_DOES_NOT_MATCH_SESSION
 msgstr "Default key group"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
-msgstr "Default key group"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CERTIFICATE_IDENTIFIER"
 msgstr "The SPKAC string is empty."
 
@@ -5132,6 +5134,14 @@ msgstr "Change subject alternative name"
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Change subject style"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CYCLE_SUB_FORK"
+msgstr "Change additional information"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CYCLE_TOP_FORK"
+msgstr "Sleep"
+
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_CLEANUP"
 msgstr "Cleanup"
 
@@ -5197,6 +5207,18 @@ msgstr "Wait for other workflow instance"
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
 msgstr " Wait 2 seconds for other workflow instance"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_SUB"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_TOP"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_SUBSUB"
+msgstr "Sleep"
+
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr ""
 
@@ -5223,6 +5245,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "This is the workflow to issue fresh CRLs."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CYCLE_SUB"
+msgstr "This is the workflow to issue fresh CRLs."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CYCLE_SUB2"
+msgstr "This is the workflow to issue fresh CRLs."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CYCLE_TOP"
+msgstr "SCEP Certificate Signing Request"
 
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
 msgstr "This workflow exports workflow instances to other servers."
@@ -5313,6 +5347,18 @@ msgstr "Next CA determined"
 
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "Profile was prepared"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CYCLE_SUB2_INITIAL"
+msgstr "Initializing ..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CYCLE_SUB_INITIAL"
+msgstr "Initializing ..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CYCLE_TOP_INITIAL"
+msgstr "SCEP Certificate Signing Request"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
 msgstr "Exported logs"
@@ -5423,6 +5469,18 @@ msgstr "Offline part of a Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "CRL Issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CYCLE_SUB"
+msgstr "CRL Issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CYCLE_SUB2"
+msgstr "CRL Issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CYCLE_TOP"
+msgstr "SCEP Certificate Signing Request"
 
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
 msgstr "Export"
@@ -5546,6 +5604,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
+#~ msgstr "Default key group"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKC"

@@ -152,8 +152,30 @@ sub collect {
     }
     elsif ($EVAL_ERROR) {
         $self->set_communication_state('can_send');
-	    # FIXME
-	    die $EVAL_ERROR;
+        if ($EVAL_ERROR =~ m{\A alarm }xms) {
+            # Timeout from the above alarm signal handler
+            return {
+                'SERVICE_MSG' => 'ERROR',
+                'LIST' => [
+                    {
+                        'LABEL' => 'I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT',
+                    },
+                ],
+            };
+        }
+        else {
+            return {
+                'SERVICE_MSG' => 'ERROR',
+                'LIST' => [
+                    {
+                        'LABEL'  => 'I18N_OPENXPKI_CLIENT_COLLECT_EVAL_ERROR',
+                        'PARAMS' => {
+                            ERROR => $EVAL_ERROR,
+                        },
+                    },
+                ],
+            };
+        }
 	}
     return $result;
 }

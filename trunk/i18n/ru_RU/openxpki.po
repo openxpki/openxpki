@@ -288,6 +288,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_COLLECT_EVAL_ERROR"
+msgstr "Действителен"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT"
+msgstr "Завершено"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_DESCRIPTION"
 msgstr ""
 "Если Вы действительно хотите утвердить заявку на отзыв сертификата, нажмите "
@@ -3166,10 +3174,6 @@ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_DOES_NOT_MATCH_SESSION
 msgstr "Стандартный способ аутентификации пользователя системы."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
-msgstr "Стандартный способ аутентификации пользователя системы."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CERTIFICATE_IDENTIFIER"
 msgstr "SPKAC-строка пуста."
 
@@ -4668,6 +4672,14 @@ msgstr "Изменить альтернативное имя в заявке"
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Изменить способ формирования имени в заявке"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CYCLE_SUB_FORK"
+msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CYCLE_TOP_FORK"
+msgstr "Пауза"
+
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_CLEANUP"
 msgstr "Сброс данных"
 
@@ -4734,6 +4746,18 @@ msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
 msgstr "Ожидание завершения технологического процесса - 2 с"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_SUB"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_TOP"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_SUBSUB"
+msgstr "Пауза"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr "Новая заявка на сертификат (CSR)"
 
@@ -4757,6 +4781,19 @@ msgstr "Технологические процессы фоновой обра�
 
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "Технологические процессы выдачи новых списков отзыва"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CYCLE_SUB"
+msgstr "Технологические процессы выдачи новых списков отзыва"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CYCLE_SUB2"
+msgstr "Технологические процессы выдачи новых списков отзыва"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CYCLE_TOP"
+msgstr ""
+"Технологические процессы приема заявок на сертификаты по протоколу SCEP"
 
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
 msgstr ""
@@ -4850,6 +4887,18 @@ msgstr "Идентифицирован следующий удостоверяю
 
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "Профиль подготовлен"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CYCLE_SUB2_INITIAL"
+msgstr "Идет запуск... "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CYCLE_SUB_INITIAL"
+msgstr "Идет запуск... "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CYCLE_TOP_INITIAL"
+msgstr "Прием заявки по протоколу SCEP"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
 msgstr "Экспортированы журналы"
@@ -4962,6 +5011,18 @@ msgstr "Фоновая часть процесса обработки заявк
 
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CYCLE_SUB"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CYCLE_SUB2"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CYCLE_TOP"
+msgstr "Прием заявок на сертификаты по протоколу SCEP"
 
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
 msgstr "Экспорт"
@@ -5085,6 +5146,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "Да"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
+#~ msgstr "Стандартный способ аутентификации пользователя системы."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKC"

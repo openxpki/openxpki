@@ -296,6 +296,14 @@ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_COLLECT_EVAL_ERROR"
+msgstr "Gültige"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT"
+msgstr "Kommentar"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_DESCRIPTION"
 msgstr ""
 "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
@@ -3521,10 +3529,6 @@ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_DOES_NOT_MATCH_SESSION
 msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
-msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CERTIFICATE_IDENTIFIER"
 msgstr "Prozesse anzeigen"
 
@@ -5091,6 +5095,14 @@ msgstr "Ändern des alternativen Namens"
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Ändern des Stils des Namens"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CYCLE_SUB_FORK"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CYCLE_TOP_FORK"
+msgstr "Warten"
+
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_CLEANUP"
 msgstr "Aufräumen"
 
@@ -5158,6 +5170,18 @@ msgstr "Auf anderen Workflow warten"
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
 msgstr " Wait 2 seconds for other workflow instance"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_SUB"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_TOP"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_SUBSUB"
+msgstr "Warten"
+
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr "Start der Zertifikatserstellung"
 
@@ -5185,6 +5209,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "Dieser Workflow erstellt neue CRLs."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CYCLE_SUB"
+msgstr "Dieser Workflow erstellt neue CRLs."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CYCLE_SUB2"
+msgstr "Dieser Workflow erstellt neue CRLs."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CYCLE_TOP"
+msgstr "SCEP-Zertifizierungsantrag"
 
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
 msgstr ""
@@ -5279,6 +5315,18 @@ msgstr "Ausstellende CA für die CRL bestimmt"
 
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED"
 msgstr "CRL-Profile vorbereitet"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CYCLE_SUB2_INITIAL"
+msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CYCLE_SUB_INITIAL"
+msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CYCLE_TOP_INITIAL"
+msgstr "SCEP-Zertifizierungsantrag"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
 msgstr "Logs exportiert"
@@ -5396,6 +5444,18 @@ msgstr "Zertifizierungsantrag (Offline-Teil)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CYCLE_SUB"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CYCLE_SUB2"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CYCLE_TOP"
+msgstr "SCEP-Zertifizierungsantrag"
 
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
 msgstr "Export"
@@ -5520,6 +5580,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "ja"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
+#~ msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKC"
