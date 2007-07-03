@@ -61,7 +61,10 @@ sub BUILD {
     my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
     my $re_cert_format       = qr{ \A (PEM|DER|TXT|PKCS7) \z }xms;
     my $re_privkey_format    = qr{ \A (PKCS8_PEM|PKCS8_DER|OPENSSL_PRIVKEY|PKCS12|JAVA_KEYSTORE) \z }xms;
-    my $re_sql_string        = qr{ \A [a-zA-Z0-9\@\-_\.\s\%\*\+\=\,]* \z }xms;
+    # TODO - consider opening up re_sql_string even more, currently this means
+    # that we can not search for unicode characters in certificate subjects,
+    # for example ...
+    my $re_sql_string        = qr{ \A [a-zA-Z0-9\@\-_\.\s\%\*\+\=\,\:\ ]* \z }xms;
     my $re_approval_msg_type = qr{ \A (CSR|CRR) \z }xms;
     my $re_approval_lang     = qr{ \A (de_DE|en_GB|ru_RU) \z }xms;
 
