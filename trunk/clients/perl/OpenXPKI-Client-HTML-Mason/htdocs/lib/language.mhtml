@@ -65,5 +65,9 @@
     }
 
     ## use the system default language
+    my $default_lang = 'en_GB';
+    set_language($default_lang);
+    $session_cache{$session_id}->{language} = $default_lang
+        if (defined $session_id);
     return;
 </%init>
