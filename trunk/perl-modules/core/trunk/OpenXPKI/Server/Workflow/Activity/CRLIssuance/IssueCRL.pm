@@ -114,6 +114,11 @@ sub execute {
     }
     ##! 32: 'cert_timestamps after 2nd step: ' . Dumper \@cert_timestamps 
         
+    my $serial = $dbi->get_new_serial(
+            TABLE => 'CRL',
+    );
+    $profile->set_serial($serial);
+
     my $crl = $ca_token->command({
         COMMAND => 'issue_crl',
         REVOKED => \@cert_timestamps,
@@ -125,10 +130,6 @@ sub execute {
             DATA  => $crl,
     );
     ##! 128: 'crl: ' . Dumper($crl)
-
-    my $serial = $dbi->get_new_serial(
-            TABLE => 'CRL',
-    );
 
     CTX('log')->log(
 	MESSAGE => 'CRL issued for CA ' . $current_ca . ' in realm ' . $pki_realm,
