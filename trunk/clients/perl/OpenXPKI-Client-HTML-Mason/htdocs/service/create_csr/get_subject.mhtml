@@ -17,7 +17,9 @@
 </style>
 <& /service/open_form.mhtml &>
 <& /lib/html/hidden.mhtml, 'name' => '__filled_in', value => '1' &>
+% if ($keygen eq 'PKCS10') {
 <& /lib/html/hidden.mhtml, 'name' => 'pkcs10', value => $pkcs10 &>
+% }
 <& /lib/html/hidden_reqargs.mhtml, ignore => qr(\A cert_subject_)xms &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_TITLE') %></h1>
