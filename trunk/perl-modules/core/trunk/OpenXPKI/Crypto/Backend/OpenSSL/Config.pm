@@ -369,6 +369,7 @@ sub __get_ca
                "database          = ".$self->{FILENAME}->{DATABASE}."\n".
                "default_crl_days  = ".$self->{PROFILE}->get_nextupdate_in_days()."\n".
                "x509_extensions   = v3ca\n".
+               "crl_extensions    = v3ca\n".
                "preserve          = YES\n".
                "policy            = dn_policy\n".
                "name_opt          = RFC2253,-esc_msb\n".

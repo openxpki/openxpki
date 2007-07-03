@@ -166,14 +166,21 @@ sub load_profile
 
     ## load extensions
     #
-    #push @profile_path, "extensions";
-    #push @profile_counter, 0;
-    #
-    #foreach my $ext ()
-    #{
-    #    $self->load_extension (PATH    => [@profile_path, $ext],
-    #                           COUNTER => [@profile_counter]);
-    #}
+    push @profile_path,    'extensions';
+    push @profile_counter, 0;
+    
+    # TODO - implement crl_number (but not here ...)
+    # possibly:
+    # RFC 3280, 5.2.5 - issuing_distributing_point (if someone really
+    # needs it ...)
+    foreach my $ext qw( authority_info_access authority_key_identifier issuer_alt_name ) {
+        ##! 16: 'load extension ' . $ext
+        $self->load_extension(
+            PATH      => [@profile_path, $ext],
+            COUNTER   => [@profile_counter],
+            CONFIG_ID => $self->{CONFIG_ID},
+        );
+    }
 
     ##! 2: Dumper($self->{PROFILE})
     ##! 1: "end"

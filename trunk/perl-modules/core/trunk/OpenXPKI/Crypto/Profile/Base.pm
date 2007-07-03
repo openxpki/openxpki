@@ -9,6 +9,7 @@ use warnings;
 package OpenXPKI::Crypto::Profile::Base;
 
 use OpenXPKI::Exception;
+use OpenXPKI::Debug;
 use English;
 
 use DateTime;
@@ -76,15 +77,20 @@ sub get_path
 
 sub load_extension
 {
+    ##! 1: 'start'
     my $self    = shift;
     my $keys    = { @_ };
     my @path    = @{$keys->{PATH}};
     my @counter = @{$keys->{COUNTER}};
     my @values  = ();
     my $cfg_id  = $keys->{CONFIG_ID};
+    ##! 4: 'path: ' . Dumper \@path
+    ##! 4: 'counter: ' . Dumper \@counter
+    ##! 4: 'cfg_id: ' . $cfg_id
 
     ## is the extension used at all?
 
+    ##! 16: 'check whether extension is present in config'
     my $scan = eval {
         $self->{config}->get_xpath_count(
             XPATH     => [@path],
@@ -92,7 +98,10 @@ sub load_extension
             CONFIG_ID => $cfg_id,
         );
     };
+    ##! 16: 'EVAL_ERROR: ' . $EVAL_ERROR
+    ##! 16: 'scan' . $scan
     return 0 if ($EVAL_ERROR or not $scan);
+    ##! 16: 'extension is present in config'
 
     ## is this a critical extension?
 
@@ -403,11 +412,15 @@ sub load_extension
 
 sub set_extension
 {
+    ##! 1: 'start'
     my $self = shift;
     my $keys = { @_ };
     my $name     = $keys->{NAME};
     my $critical = $keys->{CRITICAL};
     my $value    = $keys->{VALUES};
+    ##! 16: 'name: ' . $name
+    ##! 16: 'critical: ' . $critical
+    ##! 16: 'value: ' . $value
 
     $critical = 0 if ($critical eq "false");
     $critical = 1 if ($critical eq "true");
