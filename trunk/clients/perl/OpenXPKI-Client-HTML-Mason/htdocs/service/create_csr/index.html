@@ -108,6 +108,17 @@
         $msg = $m->comp ('/service/create_csr/store_pkcs10.mhtml',
                          %params);
     }
+    else
+    {
+        $m->comp('/lib/debug.mhtml',
+            'level' => 1,
+            'msg' => 'PKCS#10 upload',
+        );
+        ## serverside
+        $msg = $m->comp ('/service/create_csr/store_pkcs10.mhtml',
+                             %params, 'pkcs10' => $pkcs10);
+        $workflow_id = $msg->{PARAMS}->{WORKFLOW}->{ID};
+    }
     return if (! defined $msg && ! defined $workflow_id);
     ## if we reach this point then the workflow is already created
 

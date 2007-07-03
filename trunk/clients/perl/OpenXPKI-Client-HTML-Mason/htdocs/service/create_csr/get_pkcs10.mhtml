@@ -10,11 +10,7 @@
 
 <& /service/open_form.mhtml &>
 
-<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
-<& /lib/html/hidden.mhtml, 'name' => 'role',          'value' => $role &>
-<& /lib/html/hidden.mhtml, 'name' => 'profile',       'value' => $profile &>
-<& /lib/html/hidden.mhtml, 'name' => 'subject_style', 'value' => $subject_style &>
-<& /lib/html/hidden.mhtml, 'name' => 'keygen',        'value' => $keygen &>
+<& /lib/html/hidden_reqargs.mhtml &>
 
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_TITLE') %></h1>
 <p>
@@ -29,14 +25,23 @@
 <& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
 
 <%init>
+    use CGI;
     my @errors = ();
 
     return ($pkcs10, $subject) if ($pkcs10);
     my %args = $m->request_args();
 
-    # FIXME: the following fails when not using mod_perl
-    my $file = $r->upload('upload'); 
-    $file = $file->fh() if (index (ref $file, "::Upload") > -1);
+    my $file;
+    eval {
+        $file = $r->upload('upload');
+        $file = $file->fh() if (index (ref $file, "::Upload") > -1);
+    };
+    if (! defined $file) {
+        # eval failed, so we are apparently not using mod_perl, do it
+        # 'the CGI way'
+        my $query = CGI->new(\%args);
+        $file = $query->upload('upload'); 
+    }
     if ($file)
     {
         $pkcs10 = "";
