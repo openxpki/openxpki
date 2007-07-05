@@ -252,9 +252,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_AUTH_STACK_MESSAGE"
 msgstr ""
 
-msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PASSWD_LOGIN_MESSAGE"
-msgstr ""
-
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_ENTER_ID"
 msgstr ""
 
@@ -286,7 +283,9 @@ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_COLLECT_EVAL_ERROR"
-msgstr "An internal error occured while reading data from the CA server. Error: __ERROR__"
+msgstr ""
+"An internal error occured while reading data from the CA server. Error: "
+"__ERROR__"
 
 msgid "I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT"
 msgstr "A timeout occured while reading data from the CA server."
@@ -681,10 +680,38 @@ msgstr ""
 "Please select a value of each parameter for the previously chosen type of "
 "private key."
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME"
+msgstr "Elliptic Curve name"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME_DESCRIPTION"
+msgstr ""
+"The elliptic curve DSA algorithm can use one of the named curves specified "
+"above. Each curve name contains a bit length. Bit length of 191 or 192 bits "
+"is approximately equivalent to 2048 bits RSA, bit length of 239 bits ensures "
+"higher security."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_DESC"
 msgstr ""
 "Please select a value of each parameter for the previously chosen type of "
 "private key."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG"
+msgstr "Encryption algorithm"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG_DESCRIPTION"
+msgstr "A password based encryption algorithm to use."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH"
+msgstr "Key length"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH_DESCRIPTION"
+msgstr "The size of the private key to generate in bits."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET"
+msgstr "Parameters set"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET_DESCRIPTION"
+msgstr "Set of parameters for GOST2001 algorithm."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_TITLE"
 msgstr "Server-side key generation: choose parameters"
@@ -701,6 +728,60 @@ msgstr ""
 "Please choose one of the following types of private keys. This will set the "
 "kind of private key which the server will generate for you. If you are "
 "unsure which one to use, please have a look at the descriptions below. "
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA"
+msgstr "DSA"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA_DESCRIPTION"
+msgstr "DSA public key algorithm."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC"
+msgstr ""
+"Please choose one of the following types of private keys. This will set the "
+"kind of private key which the server will generate for you. If you are "
+"unsure which one to use, please have a look at the descriptions below. "
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC_DESCRIPTION"
+msgstr "EC public key algorithm based on elliptic curves."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001"
+msgstr "GOST2001"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP"
+msgstr "GOST2001CP"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP_DESCRIPTION"
+msgstr ""
+"GOST2001CP public key algorithm based on elliptic curves with 512 bit key "
+"length (CP mode). Digital signature in CP mode has different byte ordering "
+"with respect to the regular mode."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001_DESCRIPTION"
+msgstr ""
+"GOST2001 public key algorithm based on elliptic curves with 512 bit key "
+"length."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94"
+msgstr "GOST94"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP"
+msgstr "GOST94CP"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP_DESCRIPTION"
+msgstr ""
+"GOST94CP public key algorithm with 1024 bit public key (CP mode). Digital "
+"signature in CP mode has different byte ordering with respect to the regular "
+"mode."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94_DESCRIPTION"
+msgstr "GOST94 public key algorithm with 1024 bit key length."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA"
+msgstr "RSA"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA_DESCRIPTION"
+msgstr "RSA public key algorithm."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_TITLE"
 msgstr "Server-side key generation: choose type"
@@ -912,23 +993,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE"
 msgstr "Choose authentication method"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
-msgstr ""
-"This page is only used to install a certificate to a corresponding private "
-"key with a Microsoft Internet Explorer. The necessary actions will be "
-"started automatically with the download of this page. If you do not have a "
-"private key for the selected certificate or you have no Internet Explorer "
-"then this page is fully useless for you."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
-msgstr "Certificate installed successfully"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
-msgstr "Microsoft Internet Explorer certificate enrollment"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_INSTALL"
-msgstr "Install certificate"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC"
 msgstr "The requested content type __CONTENT_TYPE__ is not supported."
@@ -1282,7 +1346,10 @@ msgstr "Bulk approval results"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_DESCRIPTION"
 msgstr ""
-"Please choose the type of workflow for which you want to create a new instance. Note that you can only create workflows which do not require any data. To create workflows which require you to pass data to the CA please use the appropriate menu item."
+"Please choose the type of workflow for which you want to create a new "
+"instance. Note that you can only create workflows which do not require any "
+"data. To create workflows which require you to pass data to the CA please "
+"use the appropriate menu item."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_TITLE"
 msgstr "Create workflow instance"
@@ -1435,9 +1502,6 @@ msgid "I18N_OPENXPKI_CLIENT_INIT_SERIALIZATION_PROTOCOL_REJECTED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_INIT_SERVICE_PROTOCOL_REJECTED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_ALREADY_ESTABLISHED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED"
@@ -5238,11 +5302,6 @@ msgstr "This is the workflow to handle a certificate signing request at once."
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
 msgstr "This is the workflow to handle a certificate signing request at once."
 
-msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
-msgstr ""
-"This is the workflow to handle a certificate signing request (CSR) if a "
-"offline CA is in use."
-
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "This is the workflow to issue fresh CRLs."
 
@@ -5258,12 +5317,6 @@ msgstr "This is the workflow to issue fresh CRLs."
 msgid "I18N_OPENXPKI_WF_DESC_CYCLE_TOP"
 msgstr "SCEP Certificate Signing Request"
 
-msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
-msgstr "This workflow exports workflow instances to other servers."
-
-msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
-msgstr "This workflow imports workflow instances from other servers."
-
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
 msgstr "SCEP Certificate Signing Request"
@@ -5277,10 +5330,6 @@ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL"
 msgstr "Approval is going on"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_IMPORT"
-msgstr "Initializing ..."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_INITIAL"
 msgstr "Initializing ..."
 
@@ -5288,34 +5337,14 @@ msgstr "Initializing ..."
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_PENDING"
 msgstr "Pending (in editing state)"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_REVOKED_CERTIFICATE"
-msgstr "Approved"
-
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVAL"
 msgstr "Approval is going on"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED_IMPORT"
-msgstr "Approved"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_IMPORT"
-msgstr "Initializing ..."
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL"
 msgstr "Initializing ..."
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING"
 msgstr "Pending (in editing state)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING_IMPORT"
-msgstr "Pending (in editing state)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PERSISTED_CSR"
-msgstr "Approved"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_CERT_ISSUANCE_POSSIBLE"
@@ -5359,48 +5388,6 @@ msgstr "Initializing ..."
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CYCLE_TOP_INITIAL"
 msgstr "SCEP Certificate Signing Request"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
-msgstr "Exported logs"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
-msgstr "Exported workflow instances"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
-msgstr "Archive ready"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
-msgstr "Export completed"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
-msgstr "Environment for export ready"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
-msgstr "Initializing ..."
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
-msgstr "Export succeeded"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_READY"
-msgstr "Archive ready"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_UNPACKED"
-msgstr "Unpacked archive"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_COMPLETED"
-msgstr "Import completed"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ENV_READY"
-msgstr "Environment for import ready"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_INITIAL"
-msgstr "Initializing ..."
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_LOGS_DONE"
-msgstr "Imported Logs"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
-msgstr "Import succeeded"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVAL"
@@ -5510,18 +5497,6 @@ msgstr "Certificates"
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_UNSUPPORTED_CSR_TYPE"
 msgstr "Certificates"
 
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INCORRECT_ALGORITHM"
-msgstr ""
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INVALID_SESSION"
-msgstr ""
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_PKI_REALM_UNDEFINED"
-msgstr ""
-
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_TOKEN_UNAVAILABLE"
-msgstr ""
-
 msgid "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS"
 msgstr ""
 
@@ -5604,6 +5579,100 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
+#~ msgstr ""
+#~ "This page is only used to install a certificate to a corresponding "
+#~ "private key with a Microsoft Internet Explorer. The necessary actions "
+#~ "will be started automatically with the download of this page. If you do "
+#~ "not have a private key for the selected certificate or you have no "
+#~ "Internet Explorer then this page is fully useless for you."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
+#~ msgstr "Certificate installed successfully"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
+#~ msgstr "Microsoft Internet Explorer certificate enrollment"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_INSTALL"
+#~ msgstr "Install certificate"
+
+#~ msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
+#~ msgstr ""
+#~ "This is the workflow to handle a certificate signing request (CSR) if a "
+#~ "offline CA is in use."
+
+#~ msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
+#~ msgstr "This workflow exports workflow instances to other servers."
+
+#~ msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
+#~ msgstr "This workflow imports workflow instances from other servers."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_IMPORT"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_REVOKED_CERTIFICATE"
+#~ msgstr "Approved"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED_IMPORT"
+#~ msgstr "Approved"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_IMPORT"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING_IMPORT"
+#~ msgstr "Pending (in editing state)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PERSISTED_CSR"
+#~ msgstr "Approved"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
+#~ msgstr "Exported logs"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
+#~ msgstr "Exported workflow instances"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
+#~ msgstr "Archive ready"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
+#~ msgstr "Export completed"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
+#~ msgstr "Environment for export ready"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
+#~ msgstr "Initializing ..."
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
+#~ msgstr "Export succeeded"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_READY"
+#~ msgstr "Archive ready"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_UNPACKED"
+#~ msgstr "Unpacked archive"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_COMPLETED"
+#~ msgstr "Import completed"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ENV_READY"
+#~ msgstr "Environment for import ready"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_INITIAL"
+#~ msgstr "Initializing ..."
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_LOGS_DONE"
+#~ msgstr "Imported Logs"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
+#~ msgstr "Import succeeded"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
@@ -5940,83 +6009,8 @@ msgstr "yes"
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_TITLE"
 #~ msgstr "Choose a role"
 
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME"
-#~ msgstr "Elliptic Curve name"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_CURVE_NAME_DESCRIPTION"
-#~ msgstr ""
-#~ "The elliptic curve DSA algorithm can use one of the named curves "
-#~ "specified above. Each curve name contains a bit length. Bit length of 191 "
-#~ "or 192 bits is approximately equivalent to 2048 bits RSA, bit length of "
-#~ "239 bits ensures higher security."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG"
-#~ msgstr "Encryption algorithm"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_ENC_ALG_DESCRIPTION"
-#~ msgstr "A password based encryption algorithm to use."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH"
-#~ msgstr "Key length"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_KEY_LENGTH_DESCRIPTION"
-#~ msgstr "The size of the private key to generate in bits."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET"
-#~ msgstr "Parameters set"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_PARAMSET_DESCRIPTION"
-#~ msgstr "Set of parameters for GOST2001 algorithm."
-
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
 #~ msgstr "Server-side key generation: choose type"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA"
-#~ msgstr "DSA"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA_DESCRIPTION"
-#~ msgstr "DSA public key algorithm."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC_DESCRIPTION"
-#~ msgstr "EC public key algorithm based on elliptic curves."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001"
-#~ msgstr "GOST2001"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP"
-#~ msgstr "GOST2001CP"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001CP_DESCRIPTION"
-#~ msgstr ""
-#~ "GOST2001CP public key algorithm based on elliptic curves with 512 bit key "
-#~ "length (CP mode). Digital signature in CP mode has different byte "
-#~ "ordering with respect to the regular mode."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST2001_DESCRIPTION"
-#~ msgstr ""
-#~ "GOST2001 public key algorithm based on elliptic curves with 512 bit key "
-#~ "length."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94"
-#~ msgstr "GOST94"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP"
-#~ msgstr "GOST94CP"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94CP_DESCRIPTION"
-#~ msgstr ""
-#~ "GOST94CP public key algorithm with 1024 bit public key (CP mode). Digital "
-#~ "signature in CP mode has different byte ordering with respect to the "
-#~ "regular mode."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_GOST94_DESCRIPTION"
-#~ msgstr "GOST94 public key algorithm with 1024 bit key length."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA"
-#~ msgstr "RSA"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_RSA_DESCRIPTION"
-#~ msgstr "RSA public key algorithm."
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII"
 #~ msgstr "The attribute __LABEL__ can only be filled with ASCII data."
