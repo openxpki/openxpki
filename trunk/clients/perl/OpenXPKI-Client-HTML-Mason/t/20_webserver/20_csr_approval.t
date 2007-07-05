@@ -9,7 +9,7 @@ use URI::Escape;
 use Data::Dumper;
 
 use Test::More;
-plan tests => 33;
+plan tests => 39;
 
 my $TEST_PORT = 8099;
 if ($ENV{MASON_TEST_PORT}) {
@@ -49,20 +49,21 @@ if ($ENV{DEBUG}) {
 $mech->get("http://127.0.0.1:$TEST_PORT/service/index.html?__session_id=$session_id&__role=RA%20Operator");
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE/, 'Correct title');
 
-$mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS', n => '1');
+ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS', n => '1'), 'Followed link');
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE/, 'Show pending requests page');
 like($mech->response->content, qr/example1.example.com/, 'example1 present');
 like($mech->response->content, qr/example2.example.com/, 'example2 present');
 like($mech->response->content, qr/example3.example.com/, 'example3 present');
 like($mech->response->content, qr/example4.example.com/, 'example4 present');
 
-$mech->follow_link(text => '1279', n => '1');
+ok($mech->follow_link(text => '1279', n => '1'), 'Followed link');
 like($mech->response->content, qr/I18N_OPENXPKI_WF_ACTION_APPROVE_CSR/, 'Approve button present');
+
 like($mech->response->content, qr/I18N_OPENXPKI_WF_ACTION_REJECT_CSR/, 'Reject button present');
 like($mech->response->content, qr/I18N_OPENXPKI_HTML_MASON_CHANGE/, 'Change button(s) present');
 like($mech->response->content, qr/comment/, 'Comment present');
 
-$mech->follow_link(text => 'CN=example1.example.com:1234, DC=Test Deployment, DC=OpenXPKI, DC=org', n => '1');
+ok($mech->follow_link(text => 'CN=example1.example.com:1234, DC=Test Deployment, DC=OpenXPKI, DC=org', n => '1'), 'Followed link');
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE/, 'Certificate search result page');
 unlike($mech->response->content, qr/example1.example.com:1234/, 'No prior certificate with same DN present');
 $mech->back();
@@ -89,27 +90,27 @@ $mech->click('__submit');
 like($mech->response->content, qr/FAILURE/, 'FAILURE after rejection');
 
 $mech->get("http://127.0.0.1:$TEST_PORT/service/index.html?__session_id=$session_id&__role=RA%20Operator");
-$mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS', n => '1');
+ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS', n => '1'), 'Followed link');
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE/, 'Show pending requests page');
 unlike($mech->response->content, qr/example1.example.com/, 'example1 no longer present');
 like($mech->response->content, qr/example2.example.com/, 'example2 present');
 like($mech->response->content, qr/example3.example.com/, 'example3 present');
 like($mech->response->content, qr/example4.example.com/, 'example4 present');
 
-$mech->follow_link(text => '4095', n => '1');
+ok($mech->follow_link(text => '2047', n => '1'), 'Followed link');
 
 like($mech->response->content, qr/I18N_OPENXPKI_WF_ACTION_APPROVE_CSR/, 'Approve button present');
 like($mech->response->content, qr/I18N_OPENXPKI_WF_ACTION_REJECT_CSR/, 'Reject button present');
 like($mech->response->content, qr/I18N_OPENXPKI_HTML_MASON_CHANGE/, 'Change button(s) present');
 like($mech->response->content, qr/comment/, 'Comment present');
 
-$mech->follow_link(text => 'CN=example2.example.com:1234, DC=Test Deployment, DC=OpenXPKI, DC=org', n => '1');
+ok($mech->follow_link(text => 'CN=example2.example.com:1234, DC=Test Deployment, DC=OpenXPKI, DC=org', n => '1'), 'Followed link');
 unlike($mech->response->content, qr/example2.example.com:1234/, 'No prior certificate with same DN present');
 $mech->back();
 
-$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/approve_csr.html?id=4095;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
+$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/approve_csr.html?id=2047;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
 $mech->form_name('OpenXPKI');
-$mech->field('id', '4095');
+$mech->field('id', '2047');
 $mech->field('filled', '1');
 $mech->field('signature', '');
 $mech->field('text', '');
@@ -118,12 +119,12 @@ $mech->click('nosign');
 
 like($mech->response->content, qr/raop\&rarr;RA Operator/, 'Approval present');
 
-$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/persist_csr.html?id=4095;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
+$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/persist_csr.html?id=2047;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
 
 ok($mech->response->content =~ qr/CHECK_CHILD_FINISHED/ || $mech->response->content =~ qr/SUCCESS/, 'WF in state CHECK_CHILD_FINISHED or SUCCESS after persist');
 
 # cert issuance workflow
-$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/show_instance.html?id=6143;__session_id=$session_id&__role=RA%20Operator");
+$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/show_instance.html?id=5119;__session_id=$session_id&__role=RA%20Operator");
 my $i = 0;
 while ($i < 60 && $mech->response->content !~ qr/SUCCESS/) {
     $i++;
@@ -131,7 +132,7 @@ while ($i < 60 && $mech->response->content !~ qr/SUCCESS/) {
         diag "Sleeping ...";
     }
     sleep 1;
-    $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/show_instance.html?id=6143;__session_id=$session_id&__role=RA%20Operator");
+    $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/show_instance.html?id=5119;__session_id=$session_id&__role=RA%20Operator");
 }
 like($mech->response->content, qr/SUCCESS/, 'Cert issuance workflow in state success');
 like($mech->response->content, qr/-----BEGIN\ CERTIFICATE-----/, 'Certificate present');

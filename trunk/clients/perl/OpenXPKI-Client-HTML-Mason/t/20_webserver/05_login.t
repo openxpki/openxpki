@@ -8,7 +8,7 @@ use WWW::Mechanize;
 use URI::Escape;
 
 use Test::More;
-plan tests => 60;
+plan tests => 64;
 
 my $TEST_PORT = 8099;
 if ($ENV{MASON_TEST_PORT}) {
@@ -56,7 +56,7 @@ foreach my $menu_item (qw(
 }
 # TODO - check for menu items that should not appear on anonymous page
 
-$mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_LOGOUT', n => '1');
+ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_LOGOUT', n => '1'), 'Followed link');
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_TITLE/, 'Logout successfull');
 
 
@@ -101,7 +101,7 @@ foreach my $role (keys %expected_menus) {
     }
     # TODO - check for menu items that should not appear
 
-    $mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_LOGOUT', n => '1');
+    ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_LOGOUT', n => '1'), 'Followed link');
     like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_TITLE/, 'Logout successfull');
 }
 
