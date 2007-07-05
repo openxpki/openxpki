@@ -149,6 +149,7 @@
         }
         $m->comp ('/service/create_csr/print_errors.mhtml',
                   'errors' => [ $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg) ]);
+        $m->comp ('/service/loginagain.html');
     }
     $m->comp ('/lib/debug.mhtml',
               'level' => 1,
