@@ -121,6 +121,24 @@ eval {
 ok (! $EVAL_ERROR, 'get_xpath works') or diag $EVAL_ERROR;
 is ($result, '+01', 'get_xpath returns the correct result (inheritance overwriting)');
 
+
+## create new object
+undef $obj;
+$obj = OpenXPKI::XML::Config->new(CONFIG => 't/20_xml/test_acl.xml');
+ok($obj, 'XML file parsed correctly') or diag "Error: $EVAL_ERROR\n";
+
+eval {
+    $result = $obj->get_xpath_count(
+        XPATH   => [ 'workflow_permissions', 'server', 'create'],
+        COUNTER => [ 0                     , 0        ],
+    );
+};
+ok(! $EVAL_ERROR, 'get_xpath works') or diag $EVAL_ERROR;
+TODO: {
+    local $TODO = 'XML multi-level inheritance is broken, SF bug #1748593';
+    is($result, '4', '4 entries present (3 inherited + 1 new)');
+}
+
 # tip of the day, nice for debugging:
 # my $gvds = GraphViz::Data::Structure->new($obj->dumper);
 # print $gvds->graph()->as_png('test.png');
