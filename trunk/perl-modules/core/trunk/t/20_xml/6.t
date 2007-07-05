@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 18;
+plan tests => 21;
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
