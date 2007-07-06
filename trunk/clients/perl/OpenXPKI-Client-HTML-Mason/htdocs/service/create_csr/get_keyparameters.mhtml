@@ -54,8 +54,8 @@
 <& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
 <& /service/create_csr/print_descriptions.mhtml, 'descriptions' => \%descriptions &>
 
-<% Dumper $keyparameters %>
-<% Dumper $selected_parameters %>
+% #<% Dumper $keyparameters %>
+% #<% Dumper $selected_parameters %>
 <%init>
     my @errors = ();
 

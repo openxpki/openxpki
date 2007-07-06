@@ -735,12 +735,8 @@ msgstr "DSA"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_DSA_DESCRIPTION"
 msgstr "DSA public key algorithm."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC"
-msgstr ""
-"Please choose one of the following types of private keys. This will set the "
-"kind of private key which the server will generate for you. If you are "
-"unsure which one to use, please have a look at the descriptions below. "
+msgstr "EC - Elliptic Curve DSA"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYTYPE_EC_DESCRIPTION"
 msgstr "EC public key algorithm based on elliptic curves."
