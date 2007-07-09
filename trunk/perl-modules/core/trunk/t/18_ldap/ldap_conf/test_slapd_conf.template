@@ -1,0 +1,26 @@
+include		[% test_directory_schema %]core.schema
+include		[% test_directory_schema %]cosine.schema
+include		[% test_directory_schema %]inetorgperson.schema
+include		[% test_directory_schema %]openca.schema
+pidfile		[% test_directory_var %]slapd.pid
+argsfile	[% test_directory_var %]slapd.args
+modulepath	[% module_path %]
+moduleload	back_bdb
+loglevel 1
+authz-regexp    
+              UID=sasl2.*   
+              dn:CN=UserB+UID=sasl2,DC=openxpki,DC=org
+authz-regexp    
+              UID=sasl1.*   
+	      dn:CN=Manager,DC=openxpki,DC=org
+database	bdb
+suffix		"dc=openxpki,dc=org"
+rootdn		"cn=Manager,dc=openxpki,dc=org"
+rootpw          secret
+directory	[% test_directory_db %]
+index	objectClass	eq
+TLSCACertificateFile   [% test_directory_certs %]cacert.pem
+TLSCertificateFile     [% test_directory_certs %]servercert.pem
+TLSCertificateKeyFile  [% test_directory_keys %]serverkey.pem
+TLSCipherSuite         HIGH:MEDIUM:+SSLv2
+TLSVerifyClient        demand
