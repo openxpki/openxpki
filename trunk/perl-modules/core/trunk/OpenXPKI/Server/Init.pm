@@ -1336,53 +1336,12 @@ sub get_pki_realms
 
             # cert identifier
             eval {
-                my $cert_identifier;
-                eval {
-                    ##! 128: 'eval'
-                    $cert_identifier = $config->get_xpath(
-                        XPATH   => [ 'pki_realm', 'ca', 'cert', 'identifier' ],
-                        COUNTER => [ $i,           $jj, 0     , 0            ],
-                        CONFIG_ID => $cfg_id,
-                    );
-                };
-                if (!defined $cert_identifier) {
-                    ##! 128: 'undefined'
-                    my $cert_alias = $config->get_xpath(
-                        XPATH   => [ 'pki_realm', 'ca', 'cert', 'alias' ],
-                        COUNTER => [ $i,          $jj,  0     , 0       ],
-                        CONFIG_ID => $cfg_id,
-                    );
-                    my $cert_realm = $config->get_xpath(
-                        XPATH   => [ 'pki_realm', 'ca', 'cert', 'realm' ],
-                        COUNTER => [ $i,          $jj,  0     , 0       ],
-                        CONFIG_ID => $cfg_id,
-                    );
-                    ##! 128: 'cert_alias: ' . $cert_alias
-                    ##! 128: 'cert_realm: ' . $cert_realm
-                    my $dbi = CTX('dbi_backend');
-                    $dbi->connect();
-                    my $cert = $dbi->first(
-                        TABLE   => 'ALIASES',
-                        DYNAMIC => {
-                            ALIAS     => $cert_alias,
-                            PKI_REALM => $cert_realm,
-                        },
-                    );
-                    $dbi->disconnect();
-                    ##! 128: 'cert: ' . Dumper($cert)
-                    if (defined $cert) {
-                        $cert_identifier = $cert->{IDENTIFIER};
-                    }
-                    else {
-                        OpenXPKI::Exception->throw(
-                            message => 'I18N_OPENXPKI_SERVER_INIT_NO_IDENTIFIER_FOUND_IN_ALIASES_DB',
-                            params  => {
-                                'ALIAS'     => $cert_alias,
-                                'PKI_REALM' => $cert_realm,
-                            },
-                        );
-                    }
-                }
+                my $cert_identifier = __get_cert_identifier({
+                    TYPE          => 'ca',
+                    REALM_COUNTER => $i,
+                    TYPE_COUNTER  => $jj,
+                    CONFIG_ID     => $cfg_id,
+                });
                 ##! 16: 'identifier: ' . $cert_identifier
                 $realms{$name}->{ca}->{id}->{$ca_id}->{identifier} = $cert_identifier;
             };
@@ -1405,19 +1364,12 @@ sub get_pki_realms
             ###########################################################
             # get certificate from DB and save it in the pki_realms CTX
 
-            my $dbi = CTX('dbi_backend');
-            $dbi->connect();
-            my $certificate_db_entry = $dbi->first(
-                TABLE   => 'CERTIFICATE',
-                DYNAMIC => {
-                    IDENTIFIER => $realms{$name}->{ca}->{id}->{$ca_id}->{identifier},
-                },
-            );
-            $dbi->disconnect();
-            my $certificate = $certificate_db_entry->{DATA}; # in PEM
+            my $certificate = __get_certificate({
+                IDENTIFIER => $realms{$name}->{ca}->{id}->{$ca_id}->{identifier},
+            });
+
             ##! 16: 'certificate: ' . $certificate
-            if (! defined $certificate_db_entry
-                || ! defined $certificate) {
+            if (! defined $certificate) {
                 log_wrapper({
                         MESSAGE  => "Could not read issuing CA certificate from database for CA '$ca_id' (PKI realm $name)",
                         PRIORITY => "warn",
@@ -1563,53 +1515,12 @@ sub get_pki_realms
 
             # cert identifier
             eval {
-                my $cert_identifier;
-                eval {
-                    ##! 128: 'eval'
-                    $cert_identifier = $config->get_xpath(
-                        XPATH   => [ 'pki_realm', 'scep', 'cert', 'identifier' ],
-                        COUNTER => [ $i,           $jj, 0     , 0            ],
-                        CONFIG_ID => $cfg_id,
-                    );
-                };
-                if (!defined $cert_identifier) {
-                    ##! 128: 'undefined'
-                    my $cert_alias = $config->get_xpath(
-                        XPATH   => [ 'pki_realm', 'scep', 'cert', 'alias' ],
-                        COUNTER => [ $i,          $jj,  0     , 0       ],
-                        CONFIG_ID => $cfg_id,
-                    );
-                    my $cert_realm = $config->get_xpath(
-                        XPATH   => [ 'pki_realm', 'scep', 'cert', 'realm' ],
-                        COUNTER => [ $i,          $jj,  0     , 0       ],
-                        CONFIG_ID => $cfg_id,
-                    );
-                    ##! 128: 'cert_alias: ' . $cert_alias
-                    ##! 128: 'cert_realm: ' . $cert_realm
-                    my $dbi = CTX('dbi_backend');
-                    $dbi->connect();
-                    my $cert = $dbi->first(
-                        TABLE   => 'ALIASES',
-                        DYNAMIC => {
-                            ALIAS     => $cert_alias,
-                            PKI_REALM => $cert_realm,
-                        },
-                    );
-                    $dbi->disconnect();
-                    ##! 128: 'cert: ' . Dumper($cert)
-                    if (defined $cert) {
-                        $cert_identifier = $cert->{IDENTIFIER};
-                    }
-                    else {
-                        OpenXPKI::Exception->throw(
-                            message => 'I18N_OPENXPKI_SERVER_INIT_NO_IDENTIFIER_FOUND_IN_ALIASES_DB',
-                            params  => {
-                                'ALIAS'     => $cert_alias,
-                                'PKI_REALM' => $cert_realm,
-                            },
-                        );
-                    }
-                }
+                my $cert_identifier = __get_cert_identifier({
+                    TYPE          => 'scep',
+                    REALM_COUNTER => $i,
+                    TYPE_COUNTER  => $jj,
+                    CONFIG_ID     => $cfg_id,
+                });
                 ##! 16: 'identifier: ' . $cert_identifier
                 $realms{$name}->{scep}->{id}->{$scep_id}->{identifier} = $cert_identifier;
             };
@@ -1628,16 +1539,9 @@ sub get_pki_realms
 
                 next SCEP_SERVER;
             }
-            my $dbi = CTX('dbi_backend');
-            $dbi->connect();
-            my $certificate_db_entry = $dbi->first(
-                TABLE   => 'CERTIFICATE',
-                DYNAMIC => {
-                    IDENTIFIER => $realms{$name}->{scep}->{id}->{$scep_id}->{identifier},
-                },
-            );
-            $dbi->disconnect();
-            my $certificate = $certificate_db_entry->{DATA}; # in PEM
+            my $certificate = __get_certificate({
+                IDENTIFIER => $realms{$name}->{scep}->{id}->{$scep_id}->{identifier},
+            });
             my $token = $crypto->get_token(
                 TYPE        => "SCEP",
                 ID          => $scep_id,
@@ -1672,6 +1576,91 @@ sub get_pki_realms
 
     ### realms: %realms
     return \%realms;
+}
+
+sub __get_certificate {
+    ##! 1: 'start'
+    my $arg_ref    = shift;
+    my $identifier = $arg_ref->{IDENTIFIER};
+    ##! 16: 'identifier: ' . $identifier
+
+    my $dbi = CTX('dbi_backend');
+    $dbi->connect();
+    my $certificate_db_entry = $dbi->first(
+        TABLE   => 'CERTIFICATE',
+        DYNAMIC => {
+            IDENTIFIER => $identifier,
+        },
+    );
+    $dbi->disconnect();
+    my $certificate = $certificate_db_entry->{DATA}; # in PEM
+
+    return $certificate;
+}
+
+sub __get_cert_identifier {
+    ##! 1: 'start'
+    my $arg_ref = shift;
+    my $type    = $arg_ref->{TYPE};
+    ##! 16: 'type: ' . $type
+    my $i       = $arg_ref->{REALM_COUNTER};
+    ##! 16: 'i: ' . $i
+    my $jj      = $arg_ref->{TYPE_COUNTER};
+    ##! 16: 'jj: ' . $jj
+    my $cfg_id  = $arg_ref->{CONFIG_ID};
+    ##! 16: 'cfg_id: ' . $cfg_id
+    my $config  = CTX('xml_config');
+
+    my $cert_identifier;
+    eval {
+        ##! 128: 'eval'
+        $cert_identifier = $config->get_xpath(
+            XPATH   => [ 'pki_realm', $type, 'cert', 'identifier' ],
+            COUNTER => [ $i,           $jj, 0     , 0            ],
+            CONFIG_ID => $cfg_id,
+        );
+    };
+    if (! defined $cert_identifier) {
+        # fallback, check if alias and realm are defined and retrieve
+        # corresponding identifier from alias DB
+        ##! 128: 'undefined'
+        my $cert_alias = $config->get_xpath(
+            XPATH   => [ 'pki_realm', $type, 'cert', 'alias' ],
+            COUNTER => [ $i,          $jj,  0     , 0       ],
+            CONFIG_ID => $cfg_id,
+        );
+        my $cert_realm = $config->get_xpath(
+            XPATH   => [ 'pki_realm', $type, 'cert', 'realm' ],
+            COUNTER => [ $i,          $jj,  0     , 0       ],
+            CONFIG_ID => $cfg_id,
+        );
+        ##! 128: 'cert_alias: ' . $cert_alias
+        ##! 128: 'cert_realm: ' . $cert_realm
+        my $dbi = CTX('dbi_backend');
+        $dbi->connect();
+        my $cert = $dbi->first(
+            TABLE   => 'ALIASES',
+            DYNAMIC => {
+                ALIAS     => $cert_alias,
+                PKI_REALM => $cert_realm,
+            },
+        );
+        $dbi->disconnect();
+        ##! 128: 'cert: ' . Dumper($cert)
+        if (defined $cert) {
+            $cert_identifier = $cert->{IDENTIFIER};
+        }
+        else {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_INIT_NO_IDENTIFIER_FOUND_IN_ALIASES_DB',
+                params  => {
+                    'ALIAS'     => $cert_alias,
+                    'PKI_REALM' => $cert_realm,
+                },
+            );
+        }
+    }
+    return $cert_identifier;
 }
 
 sub __get_default_crypto_token
