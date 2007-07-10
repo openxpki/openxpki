@@ -5170,11 +5170,23 @@ msgstr "Username"
 msgid "I18N_OPENXPKI_USERNAME_DESC"
 msgstr "Your username or account, for example 'jdoe'"
 
+msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
+msgstr "Approve CRR"
+
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 msgstr "Approve CSR"
 
+msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
+msgstr "Cancel CRR approval"
+
 msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 msgstr "Cancel CSR approval"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_COMPROMISE_TIME"
+msgstr "Change CRR invalidity time"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
+msgstr "Change CRR reason"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
 msgstr "Change additional information"
@@ -5255,8 +5267,14 @@ msgstr "Create a new workflow instance for certificate issuance"
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
 msgstr "Persist CSR"
 
+msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
+msgstr "Reject CRR"
+
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
 msgstr "Reject CSR"
+
+msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+msgstr "Revoke the certificate"
 
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP"
 msgstr "Sleep"
@@ -6286,22 +6304,6 @@ msgstr "yes"
 #~ msgstr "Logout failed"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
-#~ msgstr "Approve CSR"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
-#~ msgstr "Cancel CSR approval"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_COMPROMISE_TIME"
-#~ msgstr "Change certificate profile"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
-#~ msgstr "Change role"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
 #~ msgstr "Determine issuing CA"
 
@@ -6312,14 +6314,6 @@ msgstr "yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
 #~ msgstr "Persist CSR"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
-#~ msgstr "Reject CSR"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
-#~ msgstr "Sleep"
 
 # only in documentation
 #, fuzzy

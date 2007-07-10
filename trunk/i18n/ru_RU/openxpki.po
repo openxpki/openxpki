@@ -406,13 +406,12 @@ msgstr "Описания полей формы"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CONTINUE_TITLE"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CRR_REVOKE_CERTIFICATE_DESCRIPTION"
-msgstr "Выберите, пожалуйста, профиль сертификата."
+msgstr "Здесь Вы можете произвести отзыв сертификата "
+"(отозванный сертификат будет включен в\"стоп-лист\")"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CRR_REVOKE_CERTIFICATE_TITLE"
-msgstr "Выбор профиля"
+msgstr "Отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXECUTE_CSR_DESCRIPTION"
@@ -4751,11 +4750,23 @@ msgstr "Имя учетной записи"
 msgid "I18N_OPENXPKI_USERNAME_DESC"
 msgstr "Имя Вашей учетной записи в информационной системе, например aivanov"
 
+msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
+msgstr "Утвердить заявку на отзыв сертификата (CRR)"
+
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 msgstr "Утвердить заявку на сертификат (CSR)"
 
+msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
+msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
+
 msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
+msgstr "Изменить срок отзыва сертификата"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
+msgstr "Изменить причину отзыва сертификата"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
 msgstr "Изменить дополнительную информацию"
@@ -4836,8 +4847,14 @@ msgstr "Запустить новый технологический проце�
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
 msgstr "Сохранить заявку в базе данных и выдать сертификат"
 
+msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
+msgstr "Отклонить заявку на отзыв сертификата"
+
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
 msgstr "Отклонить заявку на сертификат"
+
+msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+msgstr "Отозвать сертификат"
 
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP"
 msgstr "Пауза"
@@ -5770,21 +5787,12 @@ msgstr "Да"
 #~ msgid "I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE"
 #~ msgstr "При попытке выхода из системы произошла ошибка"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
-#~ msgstr "Утвердить заявку на сертификат (CSR)"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
-#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_COMPROMISE_TIME"
 #~ msgstr "Изменить профиль сертификата "
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
-#~ msgstr "Изменить роль в заявке"
 
 #~ msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
 #~ msgstr "Определение Удостоверяющего Центра, выдавшего сертификат"
@@ -5792,18 +5800,6 @@ msgstr "Да"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
 #~ msgstr "Экспорт заявки на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
-#~ msgstr "Оставить заявку для обработки(CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
-#~ msgstr "Отклонить заявку на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
-#~ msgstr "Отклонить заявку на сертификат (CSR)"
 
 #~ msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
 #~ msgstr "Разблокировать ключ удостоверяющего центра "
@@ -5885,3 +5881,5 @@ msgstr "Да"
 
 #~ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
 #~ msgstr "Интерактивная часть процесса создания заявки"
+
+
