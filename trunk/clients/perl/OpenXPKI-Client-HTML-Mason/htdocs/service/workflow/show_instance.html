@@ -152,11 +152,12 @@
 % {
 %   my $filename = lc($actions{$action});
 %      $filename =~ s/i18n_openxpki_wf_[^_]*_//;
+%   my $buttonname = 'I18N_OPENXPKI_WF_ACTION_' . uc($filename);
   <div class="openxpki_command_list_item">
     <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/activity/$filename.html" &>
     <& /lib/html/hidden.mhtml, 'name' => 'type', 'value' => $type &>
     <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
-    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => $action &>
+    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext($buttonname) &>
     <& /service/close_form.mhtml &>
   </div>
 % }
@@ -227,6 +228,13 @@
     foreach my $key (@{$activities})
     {
         ## I hope that nobody will translate two actions with the same string
+	## Here are some translation tags for CRR activities (for pot-file)
+	## "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
+	## "I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
+	## "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_COMPROMISE_TIME"
+	## "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
+	## "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
+	## "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
         $actions{i18nGettext($key)} = $key;
     }
 </%init>

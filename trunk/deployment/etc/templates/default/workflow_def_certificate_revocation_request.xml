@@ -14,19 +14,19 @@
 
   <state name="PENDING">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_PENDING</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
+    <action name="change_crr_invalidity_time"
 	    resulting_state="PENDING">
       <condition name="ACL::change_crr_invalidity_time"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
+    <action name="change_crr_reason"
 	    resulting_state="PENDING">
       <condition name="ACL::change_crr_reason"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
+    <action name="approve_crr"
 	    resulting_state="APPROVAL">
       <condition name="ACL::approve_crr"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
+    <action name="reject_crr"
 	    resulting_state="REJECTED">
       <condition name="ACL::reject_crr"/>
     </action>
@@ -34,22 +34,22 @@
 
   <state name="APPROVAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+    <action name="revoke_certificate"
 	    resulting_state="CRR_APPROVED">
       <condition name="ACL::revoke_certificate"/>
       <condition name="Condition::check_crr_approvals"/>
     </action>
     <!-- perhaps we need more than one approval or                 -->
     <!-- perhaps the first approval was from a not authorized role -->
-    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
+    <action name="approve_crr"
 	    resulting_state="APPROVAL">
       <condition name="ACL::approve_crr"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
+    <action name="cancel_crr_approval"
 	    resulting_state="PENDING">
       <condition name="ACL::cancel_crr_approval"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
+    <action name="reject_crr"
 	    resulting_state="REJECTED">
       <condition name="ACL::reject_crr"/>
     </action>

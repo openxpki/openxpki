@@ -24,21 +24,21 @@
         <arg>$reason_code</arg>
       </validator>
   </action>
-  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
+  <action name="change_crr_invalidity_time"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource">
       <field name="invalidity_time"/>
       <validator name="InvalidityTime">
         <arg>$invalidity_time</arg>
       </validator>
   </action>
-  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
+  <action name="change_crr_reason"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource">
       <field name="reason_code"/>
       <validator name="ReasonCode">
         <arg>$reason_code</arg>
       </validator>
   </action>
-  <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
+  <action name="approve_crr"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve">
   </action>
   <action name="export_crr"
@@ -49,13 +49,13 @@
   <action name="persist_crr"
 	  class="OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest">
   </action>
-  <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
+  <action name="cancel_crr_approval"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
   </action>
-  <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
+  <action name="reject_crr"
 	  class="Workflow::Action::Null">
   </action>
-  <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+  <action name="revoke_certificate"
 	  class="Workflow::Action::Null">
   </action>
 </actions>

@@ -192,7 +192,7 @@ else {
     $msg = $client->send_receive_command_msg(
         'execute_workflow_activity',
         {
-              'ACTIVITY' => 'I18N_OPENXPKI_WF_ACTION_APPROVE_CRR',
+              'ACTIVITY' => 'approve_crr',
               'ID' => $wf_id,
               'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST',
         },
@@ -203,7 +203,7 @@ else {
     $msg = $client->send_receive_command_msg(
         'execute_workflow_activity',
         {
-              'ACTIVITY' => 'I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE',
+              'ACTIVITY' => 'revoke_certificate',
               'ID' => $wf_id,
               'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST',
         },
