@@ -414,6 +414,16 @@ t/40_context/01.t
 t/40_context/02.t
 t/40_context/03.t
 
+t/50_auth/ldap_conf/test_slapd_conf.template
+t/50_auth/ldap_schema/core.ldif
+t/50_auth/ldap_schema/core.schema
+t/50_auth/ldap_schema/cosine.schema
+t/50_auth/ldap_schema/inetorgperson.schema
+t/50_auth/ldap_schema/openca.schema
+t/50_auth/ldap_schema/openldap.ldif
+t/50_auth/ldap_schema/openldap.schema
+t/50_auth/ldap_schema/ppolicy.schema
+t/50_auth/00.t
 t/50_auth/01.t
 t/50_auth/02.t
 t/50_auth/03.t
@@ -422,6 +432,8 @@ t/50_auth/05.t
 t/50_auth/06.t
 t/50_auth/07.t
 t/50_auth/08.t
+t/50_auth/09.t
+t/50_auth/99_clean.t
 t/50_auth/acl.xml
 t/50_auth/auth.xml
 

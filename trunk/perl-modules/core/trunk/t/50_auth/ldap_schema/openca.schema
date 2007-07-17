@@ -1,0 +1,130 @@
+##
+## Additional attributes and objectclasses for strict schema
+##
+## Please notice that we don't create an own OID space until
+## now because the PKI vendors created already new classes
+## to fit the requirements
+##
+##
+## Attributes
+## ==========
+##
+## RFC 2985
+## we don't use the attributes for naturalPerson because CISCO
+## use them for SCEP and a router or switch is not a person
+##
+## RFC 2985 B.3.6 unstructuredName
+## -------------------------------
+##
+##   (
+##           1.2.840.113549.1.9.2
+##           NAME 'unstructuredName'
+##           DESC 'PKCS #9 unstructured name'
+##           EQUALITY pkcs9CaseIgnoreMatch
+##           SYNTAX 1.2.840.113549.1.9.26.1
+##   )
+##
+## unstructuredName ATTRIBUTE ::= {
+##           WITH SYNTAX PKCS9String {pkcs-9-ub-unstructuredName}
+##           EQUALITY MATCHING RULE pkcs9CaseIgnoreMatch
+##           ID pkcs-9-at-unstructuredName
+##   }
+##
+## RFC 2985 B.3.7 unstructuredAddress
+## ----------------------------------
+##
+##   (
+##           1.2.840.113549.1.9.8
+##           NAME 'unstructuredAddress'
+##           DESC 'PKCS #9 unstructured address'
+##           EQUALITY caseIgnoreMatch
+##           SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+##   )
+##
+## unstructuredAddress ATTRIBUTE ::= {
+##           WITH SYNTAX DirectoryString {pkcs-9-ub-unstructuredAddress}
+##           EQUALITY MATCHING RULE caseIgnoreMatch
+##           ID pkcs-9-at-unstructuredAddress
+##   }
+
+attributetype ( 1.2.840.113549.1.9.2 NAME 'unstructuredName'
+	EQUALITY caseIgnoreMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+# OpenLDAP fails with correct definitions
+#	EQUALITY pkcs9CaseIgnoreMatch
+#	SYNTAX 1.2.840.113549.1.9.26.1 )
+
+attributetype ( 1.2.840.113549.1.9.8 NAME 'unstructuredAddress'
+	EQUALITY caseIgnoreMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+	
+
+## Objectclasses
+## =============
+##
+## RFC 2587
+## --------
+##
+## pkiUser   OBJECT-CLASS   ::= {
+##    SUBCLASS OF   { top}
+##    KIND          auxiliary
+##    MAY CONTAIN   {userCertificate}
+##    ID    joint-iso-ccitt(2) ds(5) objectClass(6) pkiUser(21)}
+##
+## pkiCA   OBJECT-CLASS   ::= {
+##    SUBCLASS OF   { top}
+##    KIND          auxiliary
+##    MAY CONTAIN   {cACertificate |
+##                   certificateRevocationList |
+##                   authorityRevocationList |
+##                   crossCertificatePair }
+##    ID    joint-iso-ccitt(2) ds(5) objectClass(6) pkiCA(22)}
+##
+## OpenCA
+## ------
+##
+## we only introduce OIDs where no other OIDs already exist for this purpose
+##
+## OpenCA OID space
+##
+## 1.3.6.1.4.1.18227       OpenCA area assigned by IANA
+## 1.3.6.1.4.1.18227.0     reserved and never used
+## 1.3.6.1.4.1.18227.1     policy OIDs
+## 1.3.6.1.4.1.18227.2     LDAP OIDs
+## 1.3.6.1.4.1.18227.2.1   LDAP objectclasses
+## 1.3.6.1.4.1.18227.2.1.1 opencaUniquelyIdentifiedUser
+## 1.3.6.1.4.1.18227.2.1.2 opencaEmailAddress
+## 1.3.6.1.4.1.18227.2.1.3 opencaSCEPDevice
+## 1.3.6.1.4.1.18227.2.2   LDAP attributes
+##
+## opencaUniquelyIdentifiedUser   OBJECT-CLASS   ::= {
+##    SUBCLASS OF   { top}
+##    KIND          auxiliary
+##    MUST CONTAIN  {serialNumber }
+##    ID     see OpenCA OID description 
+##
+## opencaEmailAddress   OBJECT-CLASS   ::= {
+##    SUBCLASS OF   { top}
+##    KIND          auxiliary
+##    MAY CONTAIN   {rfc822Mailbox }
+##    ID    see OpenCA OID description
+##
+## opencaSCEPDevice OBJECT-CLASS ::= {
+##    SUBCLASS OF   { top }
+##    KIND          auxiliary
+##    MAY CONTAIN   { unstructuredName |
+##                    unstructuredAddress }
+##    ID    see OpenCA OID description
+##
+
+objectclass ( 1.3.6.1.4.1.18227.2.1.1 NAME 'opencaUniquelyIdentifiedUser' SUP top AUXILIARY
+	MAY ( serialNumber )
+	)
+
+objectclass ( 1.3.6.1.4.1.18227.2.1.2 NAME 'opencaEmailAddress' SUP top AUXILIARY
+	MAY ( mail $ emailAddress )
+	)
+
+objectclass ( 1.3.6.1.4.1.18227.2.1.3 NAME 'opencaSCEPDevice' SUP top AUXILIARY
+	MAY ( unstructuredName $ unstructuredAddress )
+	)

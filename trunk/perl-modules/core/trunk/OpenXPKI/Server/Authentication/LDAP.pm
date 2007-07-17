@@ -9,6 +9,8 @@
 # This code does not support the new login_step semantics and will hence
 # not work at all (was untested before the change as well). Will need
 # some refactoring.
+# Starting refactoring 2007-07-13 Petr Grigoriev
+
 
 package OpenXPKI::Server::Authentication::LDAP;
 
@@ -52,22 +54,46 @@ sub new {
     my $keys = shift;
     ##! 1: "start"
 
-    my $config = CTX('config');
+    my $config = CTX('xml_config');
+    
+    ##! 2: "load name and description for handler"
+    $self->{DESC} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "description" ],
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                      CONFIG_ID => $keys->{CONFIG_ID},
+    );
+    $self->{NAME} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "name" ],
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
+                                      CONFIG_ID => $keys->{CONFIG_ID},
+    );
+
+
 
     ## load network configuration
 
-    $self->{HOST} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "host" ],
-                                        COUNTER => [ %{$keys->{COUNTER}}, 0]);
-    $self->{PORT} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "port" ],
-                                        COUNTER => [ %{$keys->{COUNTER}}, 0]);
-    $self->{BASE} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "base" ],
-                                        COUNTER => [ %{$keys->{COUNTER}}, 0]);
-    $self->{VERSION} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "version" ],
-                                        COUNTER => [ %{$keys->{COUNTER}}, 0]);
-    $self->{BIND_DN} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "bind_dn" ],
-                                        COUNTER => [ %{$keys->{COUNTER}}, 0]);
-    $self->{BIND_PW} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "bind_pw" ],
-                                        COUNTER => [ %{$keys->{COUNTER}}, 0]);
+    $self->{HOST} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "host" ],
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0],
+                                      CONFIG_ID => $keys->{CONFIG_ID},
+    );
+    $self->{PORT} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "port" ],
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0],
+                                      CONFIG_ID => $keys->{CONFIG_ID},
+    );
+    $self->{BASE} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "base" ],
+                                        COUNTER => [ @{$keys->{COUNTER}}, 0],
+                                      CONFIG_ID => $keys->{CONFIG_ID},
+    );
+    $self->{VERSION} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "version" ],
+                                           COUNTER => [ @{$keys->{COUNTER}}, 0],
+                                         CONFIG_ID => $keys->{CONFIG_ID},
+    );
+    $self->{BIND_DN} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "bind_dn" ],
+                                           COUNTER => [ @{$keys->{COUNTER}}, 0],
+                                         CONFIG_ID => $keys->{CONFIG_ID},
+    );
+    $self->{BIND_PW} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "bind_pw" ],
+                                           COUNTER => [ @{$keys->{COUNTER}}, 0],
+                                         CONFIG_ID => $keys->{CONFIG_ID},
+    );
     ##! 2: "version ::= ".$self->{VERSION}
     ##! 2: "server  ::= ldap://".$self->{HOST}.":".$self->{PORT}."/".$self->{BASE}
     ##! 2: "user    ::= ".$self->{BIND_DN}
@@ -75,56 +101,79 @@ sub new {
     ## check for a TLS protected connection
     ## FIXME: who checks when that TLS is supported?
 
-    $self->{USE_TLS} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "use_tls" ],
-                                           COUNTER => [ %{$keys->{COUNTER}}, 0]);
+    $self->{USE_TLS} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "use_tls" ],
+                                           COUNTER => [ @{$keys->{COUNTER}}, 0],
+                                         CONFIG_ID => $keys->{CONFIG_ID},
+    );
     $self->{USE_TLS} = 1 if (lc($self->{USE_TLS}) eq "true");
     $self->{USE_TLS} = 0 if (lc($self->{USE_TLS}) eq "false");
     if ($self->{USE_TLS})
     {
-        $self->{CA_PATH} = $config->get_xpath (XPATH   => [ %{$keys->{XPATH}},   "capath" ],
-                                               COUNTER => [ %{$keys->{COUNTER}}, 0]);
-        ##! 4: "cacert ::= ".$self->{CA_CERT}
+        $self->{CA_PATH} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "capath" ],
+                                               COUNTER => [ @{$keys->{COUNTER}}, 0],
+                                             CONFIG_ID => $keys->{CONFIG_ID},
+        );
+        ##! 4: "capath ::= ".$self->{CA_PATH}
     }
     ##! 2: "use_tls ::= ".$self->{USE_TLS}
 
     ## load search config
 
     $self->{SEARCH_ATTRIBUTE} = $config->get_xpath (
-                XPATH   => [ %{$keys->{XPATH}},   "searchattr" ],
-                COUNTER => [ %{$keys->{COUNTER}}, 0]);
+                XPATH   => [ @{$keys->{XPATH}},   "searchattr" ],
+                COUNTER => [ @{$keys->{COUNTER}}, 0],
+              CONFIG_ID => $keys->{CONFIG_ID},
+    );
     $self->{SEARCH_VALUE_PREFIX} = $config->get_xpath (
-                XPATH   => [ %{$keys->{XPATH}},   "searchvalueprefix" ],
-                COUNTER => [ %{$keys->{COUNTER}}, 0]);
+                XPATH   => [ @{$keys->{XPATH}},   "searchvalueprefix" ],
+                COUNTER => [ @{$keys->{COUNTER}}, 0],
+              CONFIG_ID => $keys->{CONFIG_ID},
+    );
     ##! 2: "search->attribute    ::= ".$self->{SEARCH_ATTRIBUTE}
     ##! 2: "search->value_prefix ::= ".$self->{SEARCH_VALUE_PREFIX}
 
     ## load authentication config
 
     $self->{AUTH_METH_ATTR} = $config->get_xpath (
-                XPATH   => [ %{$keys->{XPATH}},   "auth_meth_attr" ],
-                COUNTER => [ %{$keys->{COUNTER}}, 0]);
+                XPATH   => [ @{$keys->{XPATH}},   "auth_meth_attr" ],
+                COUNTER => [ @{$keys->{COUNTER}}, 0],
+              CONFIG_ID => $keys->{CONFIG_ID},
+    );
     $self->{DEFAULT_AUTH_METHOD} = $config->get_xpath (
-                XPATH   => [ %{$keys->{XPATH}},   "default_auth_meth" ],
-                COUNTER => [ %{$keys->{COUNTER}}, 0]);
+                XPATH   => [ @{$keys->{XPATH}},   "default_auth_meth" ],
+                COUNTER => [ @{$keys->{COUNTER}}, 0],
+              CONFIG_ID => $keys->{CONFIG_ID},
+    );
     my $count = $config->get_xpath_count (
-                XPATH   => [ %{$keys->{XPATH}},   "auth_meth_map" ],
-                COUNTER => $keys->{COUNTER});
+                XPATH   => [ @{$keys->{XPATH}},   "auth_meth_map" ],
+               COUNTER  => $keys->{COUNTER},
+              CONFIG_ID => $keys->{CONFIG_ID},
+    );
     for (my $i=0; $i < $count; $i++)
     {
         my $condition = $config->get_xpath (
-                XPATH   => [ %{$keys->{XPATH}},   "auth_meth_map", "attr_value" ],
-                COUNTER => [ %{$keys->{COUNTER}}, $i, 0]);
+                XPATH   => [ @{$keys->{XPATH}},   "auth_meth_map", "attr_value" ],
+                COUNTER => [ @{$keys->{COUNTER}}, $i, 0],
+              CONFIG_ID => $keys->{CONFIG_ID},
+        );
         my $method = $config->get_xpath (
-                XPATH   => [ %{$keys->{XPATH}},   "auth_meth_map", "auth_meth" ],
-                COUNTER => [ %{$keys->{COUNTER}}, $i, 0]);
+                XPATH   => [ @{$keys->{XPATH}},   "auth_meth_map", "auth_meth" ],
+                COUNTER => [ @{$keys->{COUNTER}}, $i, 0],
+              CONFIG_ID => $keys->{CONFIG_ID},
+        );
         $self->{AUTH_METHOD}->{$condition} = $method;
+        ##! 4: "auth map $condition to $method"
     }
     $self->{PW_ATTR} = $config->get_xpath (
-                XPATH   => [ %{$keys->{XPATH}},   "pw_attr" ],
-                COUNTER => [ %{$keys->{COUNTER}}, 0]);
+                XPATH   => [ @{$keys->{XPATH}},   "pw_attr" ],
+                COUNTER => [ @{$keys->{COUNTER}}, 0],
+              CONFIG_ID => $keys->{CONFIG_ID},
+    );
     $self->{PW_ATTR_HASH} = $config->get_xpath (
-                XPATH   => [ %{$keys->{XPATH}},   "pw_attr_hash" ],
-                COUNTER => [ %{$keys->{COUNTER}}, 0]);
+                XPATH   => [ @{$keys->{XPATH}},   "pw_attr_hash" ],
+                COUNTER => [ @{$keys->{COUNTER}}, 0],
+              CONFIG_ID => $keys->{CONFIG_ID},
+    );
     ##! 2: "auth->method_attr    ::= ".$self->{AUTH_METH_ATTR}
     ##! 2: "auth->default_method ::= ".$self->{DEFAULT_AUTH_METHOD}
     ##! 2: "auth->pw_attr        ::= ".$self->{PW_ATTR}
@@ -133,20 +182,28 @@ sub new {
     ## role mapping
 
     $self->{ROLE_ATTR} = $config->get_xpath (
-                XPATH   => [ %{$keys->{XPATH}},   "role_attr" ],
-                COUNTER => [ %{$keys->{COUNTER}}, 0]);
+                XPATH   => [ @{$keys->{XPATH}},   "role_attr" ],
+                COUNTER => [ @{$keys->{COUNTER}}, 0],
+                CONFIG_ID => $keys->{CONFIG_ID},
+    );
     ##! 2: "role attribute ::= ".$self->{ROLE_ATTR}
     $count = $config->get_xpath_count (
-                 XPATH   => [ %{$keys->{XPATH}},   "role_map" ],
-                 COUNTER => $keys->{COUNTER});
+                 XPATH   => [ @{$keys->{XPATH}},   "role_map" ],
+                 COUNTER => $keys->{COUNTER},
+               CONFIG_ID => $keys->{CONFIG_ID},
+    );
     for (my $i=0; $i < $count; $i++)
     {
         my $value = $config->get_xpath (
-                        XPATH   => [ %{$keys->{XPATH}},   "role_map", "value" ],
-                        COUNTER => [ %{$keys->{COUNTER}}, $i, 0 ]);
+                        XPATH   => [ @{$keys->{XPATH}},   "role_map", "value" ],
+                        COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ],
+                      CONFIG_ID => $keys->{CONFIG_ID},
+        );
         my $role  = $config->get_xpath (
-                        XPATH   => [ %{$keys->{XPATH}},   "role_map", "role" ],
-                        COUNTER => [ %{$keys->{COUNTER}}, $i, 0 ]);
+                        XPATH   => [ @{$keys->{XPATH}},   "role_map", "role" ],
+                        COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ],
+                      CONFIG_ID => $keys->{CONFIG_ID},
+        );
         $self->{ROLE_MAP}->{$value} = $role;
         ##! 4: "role map $value to $role"
     }
@@ -154,21 +211,34 @@ sub new {
     return $self;
 }
 
-sub login
-{
-    my $self = shift;
-    ##! 1: "start"
-    my $gui = CTX('service');
+sub login_step {
+    ##! 1: 'start' 
+    my $self    = shift;
+    my $arg_ref = shift;
 
-    # FIXME - convert to the new way of using it using login_step
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MODULE_BROKEN',
-    );
+    my $name    = $arg_ref->{HANDLER};
+    my $msg     = $arg_ref->{MESSAGE};
+    my $answer  = $msg->{PARAMS};
 
-    my ($account, $passwd) = $gui->get_passwd_login ("");
+    ##! 4: 'checking login data' 
+    if (! exists $msg->{PARAMS}->{LOGIN} ||
+        ! exists $msg->{PARAMS}->{PASSWD}) {
+        ##! 4: 'no login data received (yet)' 
+        return (undef, undef,
+            {
+                SERVICE_MSG => "GET_PASSWD_LOGIN",
+                PARAMS      => {
+                    NAME        => $self->{NAME},
+                    DESCRIPTION => $self->{DESC},
+                },
+            },
+        );
+    } else {      # start of auth block
+    
+    my ($account, $passwd) = ($answer->{LOGIN}, $answer->{PASSWD});
 
+    ##! 2: "credentials ... present"
     ##! 2: "account ... $account"
-
 
     ## now start an LDAP connection
 
@@ -487,7 +557,12 @@ sub login
         {
             $ldapdigest = $1;
             ##! 8: "value contains {X}Y="
-        }
+        } else {
+	    if ( $ldapdigest =~ /^\{\w+\}(.+)$/ ) {
+        	 $ldapdigest = $1;
+        	 ##! 8: "value contains {X}Y"
+            };
+	};    
         ##! 4: "comparing |".$self->{DIGEST}."| with |".$ldapdigest."|"
 
         if ($self->{DIGEST} ne $ldapdigest)
@@ -550,7 +625,9 @@ sub login
     {
         if (exists $self->{ROLE_MAP}->{$role})
         {
-            $self->{ROLE} = $role;
+            ##! 2: 'found role ' . $role
+	    ##! 2" 'role mapped to ' . $self->{ROLE_MAP}->{$role}
+	    $self->{ROLE} = $self->{ROLE_MAP}->{$role};
             $found     = 1;
             last;
         }
@@ -563,8 +640,18 @@ sub login
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_LOGIN_FAILED");
     }
+    };   # the end of auth block
+    
+    ##! 4: 'got user >' . $self->{USER} . '<'
+    ##! 4: 'got role >' . $self->{ROLE} . '<'
 
-    return 1;
+    return (
+        $self->{USER},
+        $self->{ROLE},
+        {
+            SERVICE_MSG => 'SERVICE_READY',
+        },
+    );
 }
 
 sub __get_ldap_error
@@ -577,20 +664,6 @@ sub __get_ldap_error
             "NAME"  => ldap_error_name($msg),
             "TEXT"  => ldap_error_text($msg),
             "DESCRIPTION" => ldap_error_desc($msg));
-}
-
-sub get_user
-{
-    my $self = shift;
-    ##! 2: "start"
-    return $self->{USER};
-}
-
-sub get_role
-{
-    my $self = shift;
-    ##! 2: "start"
-    return $self->{ROLE};
 }
 
 1;
@@ -606,7 +679,6 @@ This is the class which supports OpenXPKI with an internal passphrase based
 authentication method. The parameters are passed as a hash reference.
 LDAP database source (user/password stored in LDAP or AD server)        
 This is the most complex authentication method.
-FIXME:
 
 =head1 Functions
 
@@ -614,17 +686,136 @@ FIXME:
 
 is the constructor. The supported parameters are XPATH and COUNTER.
 This is the minimum parameter set for any authentication class.
-We need here a complete description of the LDAP config stuff.
+Parameters block in the configuration must also include:
 
-=head2 login
+=over
 
-returns true if the login was successful. Here we need at minimum a description
-of the algorithm. Otherwise this module is too critical.
+=item *
 
-=head2 get_user
+B<host> - LDAP server hostname (e.g. localhost);
 
-returns the user which logged in successfully.
+=item *
 
-=head2 get_role
+B<port> - LDAP server port (e.g. 389);
 
-returns the role.
+=item *
+
+B<base> - top DN for search in LDAP database;
+
+=item *
+
+B<version> - LDAP version (we support only 3); 
+
+=item *
+
+B<bind_dn> - DN for binding to LDAP server;
+
+=item *
+
+B<bind_pw> - password for binding to LDAP server;
+
+=item *
+
+B<use_tls> - use 'true' here if you want to use TLS and 'false' otherwise;
+
+=item *
+
+B<capath> - path to the certificates for TLS connection 
+(makes sense only if B<use_tls> parameter is set to 'B<true>');
+
+=item *
+
+B<searchattr> - LDAP entry attribute which value will be compared to account;
+
+=item *
+
+B<searchvalueprefix> - prefix which will be added 
+in front of the account name before comparing it to the value of B<searchattr>;
+
+=item *
+
+B<auth_meth_attr> - LDAP entry attribute which value is used 
+to specify authentication method;
+
+=item *
+
+B<default_auth_meth> - name of the authentication method which 
+is used if no method found in user entry;
+
+=item *
+
+B<auth_meth_map> - a block containing a pair attr_value->auth_meth 
+mapping auth_meth_attr value to real authentication method name;
+
+=item *
+
+B<pw_attr> -  LDAP entry attribute which value is used to compare to password;
+
+=item *
+
+B<pw_attr_hash> - name of the hash type stored in pw_attr (e.g. sha1 );
+
+=item *
+
+B<role_attr> - LDAP entry attribute which value is used to assign a role;
+
+=item *
+
+B<role_map> - block containg pair value->role
+mapping role_attr value to real OpenXPKI role;
+
+=back
+
+=head2 login_step
+
+The procedure goes in the following way:
+
+=over
+
+=item 1.
+
+connect to LDAP server using parameters: 
+B<host>, B<port>, B<version> and B<capath> 
+(the last one - in the case of using TLS);	 
+
+=item 2.
+
+search LDAP entry starting from the B<base_dn> using filtering condition
+built with B<search_attr>, B<searchvalueprefix> and account string
+(exactly one entry is expected to exist);
+
+=item 3.
+
+read all values of the entry attributes whose names are specified in
+B<auth_meth_attr>, B<pw_attr> and  B<role_attr>;
+
+=item 4.
+
+select an authetication method - 
+find the value of B<auth_meth_attr> that is present in the set of 
+mapping pairs B<attr_value>/B<auth_meth> 
+(if no match detected the method specified in B<default_auth_meth> 
+will be used);
+
+=item 5.
+
+authenticate user using the method selected: 
+there are two variants at the moment - 
+to compare a password hash in B<pw_attr> with
+the hash of the password passed to the module 
+(method name is 'B<pwattr>') 
+or to try password-based bind to the same LDAP 
+server account (method name is 'B<bind>');
+
+=item 6. 
+
+find the value of B<role_attr> that is present in the set of mapping pairs
+B<value>/B<role> and assign the corresponding role to the user authenticated.
+
+=back
+
+The procedure returns (B<user>, B<role>, B<SERVICE_READY> message) triple 
+if login was successful, (B<undef>, B<undef>, B<{}>) otherwise.
+
+
+
