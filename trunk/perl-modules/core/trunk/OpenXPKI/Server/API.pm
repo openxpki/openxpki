@@ -57,6 +57,7 @@ sub BUILD {
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
     my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
     my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=_\-]* \z }xms;
+    my $re_cert_string       = qr{ \A [A-Za-z0-9\+/=_\-\ \n]+ \z }xms;
     my $re_filename_string   = qr{ \A [A-Za-z0-9\+/=_\-\.]* \z }xms;
     my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
     my $re_cert_format       = qr{ \A (PEM|DER|TXT|PKCS7) \z }xms;
@@ -70,6 +71,15 @@ sub BUILD {
 
     $method_info_of{$ident} = {
         ### Default API
+        'get_cert_identifier' => {
+            class  => 'Default',
+            params => {
+                'CERT' => {
+                    type  => SCALAR,
+                    regex => $re_cert_string,
+                },
+            },
+        },
         'get_current_config_id' => {
             class  => 'Default',
             params => {

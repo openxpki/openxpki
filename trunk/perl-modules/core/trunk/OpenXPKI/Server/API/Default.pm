@@ -32,6 +32,27 @@ sub START {
 }
 # API: simple retrieval functions
 
+sub get_cert_identifier {
+    ##! 1: 'start'
+    my $self      = shift;
+    my $arg_ref   = shift;
+    my $cert      = $arg_ref->{CERT};
+    my $pki_realm = CTX('session')->get_pki_realm();
+    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    ##! 64: 'cert: ' . $cert
+
+    my $x509 = OpenXPKI::Crypto::X509->new(
+        DATA  => $cert,
+        TOKEN => $default_token,
+    );
+
+    my $identifier = $x509->get_identifier();
+    ##! 4: 'identifier: ' . $identifier
+
+    ##! 1: 'end'
+    return $identifier;
+}
+
 sub get_current_config_id {
     my $self = shift;
     return CTX('xml_config')->get_current_config_id();
