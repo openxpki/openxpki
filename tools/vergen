@@ -55,16 +55,32 @@ sub slurp {
 sub get_git_svn_info {
     my $result = {};
 
-    my $last_log = `$git_svn log --oneline --limit 1`;
+    my $last_log = `$git_svn log --oneline --limit 1 2>/dev/null`;
     my ($revision) = ($last_log =~ m{\A r(\d+)\ \|\ .*}xms);
     if (! defined $revision) {
-        # did not get correct structure
+        # did not get correct structure.
+	# reason may be that this repository does not rebase via git-svn,
+	# but rather pulls from another repository. assume that the
+	# svn revision information is available in git full text logs.
+
+	open my $HANDLE, qq{ $git log --pretty=format:"%b" | };
+      GITLOGLINE:
+	while (my $line = <$HANDLE>) {
+	    chomp $line;
+	    if ($line =~ m{ \A git-svn-id: .*? @(\d+) \s+ }xms) {
+		$result->{revision} = $1;
+		$result->{'last-changed-revision'} = $result->{revision};
+		last GITLOGLINE;
+	    }
+	}
+	close $HANDLE;
+
         return $result;
     }
-	$result->{revision} = $revision;
+    $result->{revision} = $revision;
     # in git (as in SVN, too?), the last-changed-revision is always equal
     # to the revision
-	$result->{'last-changed-revision'} = $revision;
+    $result->{'last-changed-revision'} = $revision;
     
     return $result;
 }
