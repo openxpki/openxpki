@@ -127,7 +127,7 @@ my $crypto_gen  = File::Spec->catfile(
 		    $test_directory,
  		    'create_certs.pl',
  		  );
-#require $crypto_gen;
+require $crypto_gen;
 ok(1,"Creating certificates for TLS connections");
 $index++;
 
@@ -186,7 +186,7 @@ my $ldap_starter =
     $daemon_path . " -f " . $slapd_config . 
 		   " -u $pwname "         . 
 		   " -g $grname "         .
-		   ' -h "ldap://127.0.0.1:60389/"'  ;
+		   ' -h "ldap://127.0.0.1:60389/ ldaps://127.0.0.1:60636/"'  ;
 my $fail_to_start = system("$ldap_starter");
 if( $fail_to_start  ) {
     diag("Could not start LDAP server" .
@@ -289,6 +289,7 @@ ok(1,"Add additional node for authentication");
 $index++;
 
 $testldap->unbind;
+
 #### 11) CREATING SEMAPHORE FILE 
 my $semaphore_file = File::Spec->catfile($test_directory,
                                          'enable_talk_to_server',

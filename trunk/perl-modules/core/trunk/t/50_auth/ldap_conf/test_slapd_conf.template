@@ -13,3 +13,8 @@ rootdn		"cn=Manager,dc=openxpki,dc=org"
 rootpw          secret
 directory	[% test_directory_db %]
 index	objectClass	eq
+TLSCACertificatePath   [% test_directory_certs %]
+TLSCertificateFile     [% test_directory_certs %]servercert.pem
+TLSCertificateKeyFile  [% test_directory_keys %]serverkey.pem
+TLSCipherSuite         HIGH:MEDIUM:+SSLv2
+TLSVerifyClient        try

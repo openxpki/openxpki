@@ -433,9 +433,12 @@ t/50_auth/06.t
 t/50_auth/07.t
 t/50_auth/08.t
 t/50_auth/09.t
+t/50_auth/10.t
 t/50_auth/99_clean.t
 t/50_auth/acl.xml
 t/50_auth/auth.xml
+t/50_auth/create_certs.pl
+
 
 t/60_workflow/00.t
 t/60_workflow/01.t
@@ -478,8 +481,10 @@ t/80_config_versioning/config.patch
 t/00_cleanup/25_crypto.t
 t/00_cleanup/28_log.t
 t/00_cleanup/30_dbi.t
+t/00_cleanup/50_auth.t
 t/00_cleanup/65_ui.t
 t/99_cleanup/25_crypto.t
 t/99_cleanup/28_log.t
 t/99_cleanup/30_dbi.t
+t/99_cleanup/50_auth.t
 t/99_cleanup/65_ui.t

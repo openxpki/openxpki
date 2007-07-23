@@ -1,7 +1,7 @@
 ##
-## AUTHENTICATION USING LDAP VALIDATION
+## AUTHENTICATION USING LDAP AND SSL VALIDATION
 ##
-## Here we can check LDAP-based authentication methods.
+## Here we can check LDAP-based over SSL authentication methods.
 ##
 ## We need running LDAP server for that
 ##
@@ -30,7 +30,6 @@ my $semaphore_file = File::Spec->catfile(
 if( !( -f $semaphore_file) ) {
     plan skip_all => "No ldap server for testing";
 };
-
 
 diag "OpenXPKI::Server::Authentication::LDAP\n";
 
@@ -136,22 +135,16 @@ foreach my $login_set (@credentials){
  	                ];
 };
 
-#------------------ ENUMERATE EXTRA TASKS TO CALC TEST NUMBER
-my @extra_tasks = (
-		    '1  connect to LDAP server',
-		    '2  bind to LDAP server',
-		    '3  auth configuration',
-		);    
-my $test_number = scalar @extra_tasks;
-
+# test N 1 ->  auth configuration
+my $test_number = 1;
  
     my $number_of_credentials = (scalar (keys %{$auth_nodes}));
     my $number_of_bad_credentials = scalar @bad_credentials;
-    $test_number += $number_of_credentials * 4 + $number_of_bad_credentials;
+    $test_number += $number_of_credentials * 3 + $number_of_bad_credentials;
 #                   NUMBER OF TESTS
 #               extras + credentials + bad credentials
 #                            | x 4
-#                  add_node user role result
+#                     user role result
 #
     plan tests => $test_number;
 
@@ -162,87 +155,7 @@ my $index=0;
 ##
 SKIP: {
 
-# 1) CONNECT TO STARTED SERVER
-my $testldap = Net::LDAP->new("localhost:60389");
-if( !defined $testldap) {
-   diag("Cannot connect to running server (strange), check logs..." .
-         "\n skipping ldap server related tests \n"
-   );
-   skip '', $test_number - $index;
-};	
-ok(1,"Connect to LDAP server");
-$index++;
-
-#### 2) BIND TO LDAP SERVER 
-my $msg = $testldap->bind ("cn=Manager,dc=OpenXPKI,dc=org",
-                        	password => "secret",
-                        	version => 3 );
-if ( $msg->is_error()) {
-    my $strange_error = "\nCODE => " . $msg->code() . 
-    		       "\nERROR => " . $msg->error() .
-	                "\nNAME => " . ldap_error_name($msg) .
-                        "\nTEXT => " . ldap_error_text($msg) .
-                 "\nDESCRIPTION => " . ldap_error_desc($msg) . "\n";
-    diag("Cannot bind to running server (strange), check logs..." .
-         "\n skipping ldap server related tests \n"
-    );
-    if( $ENV{DEBUG} ) {
-        diag($strange_error);
-    };
-    skip '', $test_number - $index;
-};
-ok(1,"Bind to LDAP server");
-$index++;
-
-#### 3) ADDING NODES FOR AUTHENTICATION
-foreach my $node ( keys %{$auth_nodes} ){
-#    print STDERR  "ADDING A GOOD NODE ->  $node \n";
-    my @attrs = @{$auth_nodes->{$node}};
-    my $attr_flag_index = 0;
-    my $attr_index      = 0;
-#   here we replace plain passwords with hashes
-    foreach my $attr ( @attrs){
-	if( $attr eq $auth_meth_attr){
-	$attr_flag_index = $attr_index;
-	}
-	if( $attr eq 'userPassword'){
-	last;
-	}
-	$attr_index++;
-    };
-    if( ${$auth_nodes->{$node}}[$attr_flag_index+1] eq $auth_meth_pw_value ){
-
-	my $insecure_pass = ${$auth_nodes->{$node}}[$attr_index+1];
-
-# FIXME: we are going to check the other hash algorithms too
-#	print STDERR "Orig   pass $insecure_pass \n";
-	my $secure_pass = secure_password($insecure_pass,'sha1');
-
-#	print STDERR "Secure pass $secure_pass \n";
-	${$auth_nodes->{$node}}[$attr_index+1] = $secure_pass;
-#    print STDERR "userPassword Index $attr_index \n";
-    };
-    $msg = $testldap->add( $node, attr => $auth_nodes->{$node});
-    if ( $msg->is_error() ) {
-	my $strange_error =    "\n CODE => " . $msg->code() . 
-    	        	       "\nERROR => " . $msg->error() .
-    		                "\nNAME => " . ldap_error_name($msg) .
-                    		"\nTEXT => " . ldap_error_text($msg) .
-                         "\nDESCRIPTION => " . ldap_error_desc($msg);
-	diag("Cannot work with running server (strange), check logs..." . 
-    	     "\n skipping ldap server related tests \n"
-	);
-	if( $ENV{DEBUG} ) {
-    	    diag($strange_error);
-	};
-	skip '', $test_number - $index;
-    };
-    ok(1,"Add node $node to LDAP server");
-    $index++;
-};    
-$testldap->unbind;
-
-## nodes are ready, now real authentication tests are coming ...
+## nodes must be ready, only real authentication tests are coming ...
 
 ## init XML cache
 OpenXPKI::Server::Init::init(
@@ -260,7 +173,7 @@ OpenXPKI::Server::Init::init(
 ## load authentication configuration
 my $auth = OpenXPKI::Server::Authentication::LDAP->new({
         XPATH   => ['pki_realm', 'auth', 'handler' ], 
-        COUNTER => [ 0         , 0     , 5         ],
+        COUNTER => [ 0         , 0     , 6         ],
 });
 
 ok($auth, 'Auth object creation');
@@ -272,7 +185,7 @@ ok($auth, 'Auth object creation');
 	my $expected_result = $login_set->{'result'};       
 	
 	my ($user, $role, $reply) = $auth->login_step({
-	    STACK   => 'LDAP user',
+	    STACK   => 'LDAP SSL user',
 	    MESSAGE => {
     		'SERVICE_MSG' => 'GET_PASSWD_LOGIN',
 	        'PARAMS'      => {
@@ -296,7 +209,7 @@ ok($auth, 'Auth object creation');
 
         eval {	
 	    my ($user, $role, $reply) = $auth->login_step({
-		STACK   => 'LDAP user',
+		STACK   => 'LDAP SSL user',
 		MESSAGE => {
     		    'SERVICE_MSG' => 'GET_PASSWD_LOGIN',
 		    'PARAMS'      => {
@@ -309,31 +222,4 @@ ok($auth, 'Auth object creation');
 	ok(OpenXPKI::Exception->caught(),'Bad credentials rejected');
     };	
 }; # the end of SKIP BLOCK
-1;
-
-# The sub to generate hashes for authentication tests
-sub secure_password {
-    my $passwd = shift;
-    my $algorithm = shift;
-    my $digest;
-    my $pass_salt='12345';
-    my $secure_pass;
-    if ($algorithm eq "sha1") {
-        $digest = Digest::SHA1->new;
-        $digest->add($passwd);
-        my $b64digest = $digest->b64digest;
-        $secure_pass = $b64digest;
-    } elsif ($algorithm eq "md5") {
-        my $digest = Digest::MD5->new;
-        $digest->add($passwd);
-        $secure_pass = $digest->b64digest;
-    } elsif ($algorithm eq "crypt") {
-        $secure_pass = crypt ($passwd, $pass_salt);
-    } elsif ($algorithm =~ /^none$/i) {
-        return $passwd;
-    } else {
-        return undef;
-    };               
- return '{' . $algorithm . '}' . $secure_pass;
-}
 1;
