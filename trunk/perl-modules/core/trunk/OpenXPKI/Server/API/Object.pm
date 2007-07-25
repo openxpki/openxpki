@@ -83,6 +83,8 @@ sub get_cert
        $format     = $args->{FORMAT} if (exists $args->{FORMAT});
 
     ##! 2: "load hash and serialize it"
+    # get current DB state
+    CTX('dbi_backend')->commit();
     my $hash = CTX('dbi_backend')->first (
                    TABLE => 'CERTIFICATE',
                    DYNAMIC => {
