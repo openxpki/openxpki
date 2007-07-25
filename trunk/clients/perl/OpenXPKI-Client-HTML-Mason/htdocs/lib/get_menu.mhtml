@@ -3,6 +3,10 @@
     $first_level => undef,
     $last_level  => undef,
     $mode        => "DEFAULT",
+    $seperator   => "&nbsp;|" ,
+    $a_class_first => undef,
+    $a_class       => undef,
+    $no_div        => 0,
 </%args>
 
 <%init>
@@ -41,7 +45,9 @@
       {
           print "<ul>";
       } else {
-          print "<div class=\"$class\">\n";
+          if (! $no_div) {
+                print "<div class=\"$class\">\n";
+          }
       }
 
       ## build list
@@ -50,7 +56,7 @@
           ## prefix for menu item
           if ($mode eq "ONELINE")
           {
-              print "&nbsp;|" if ($i > 0);
+              print $seperator if ($i > 0);
           }
           elsif ($mode eq "LIST")
           {
@@ -74,8 +80,15 @@
               }
           }
 
+          my $class = "";
+          if ($a_class_first && $i == 0) {
+                $class = qq{class="$a_class_first"};
+          }
+          elsif ($a_class && $i > 0) {
+                $class = qq{class="$a_class"};
+          }
           ## build link of menu item
-          print "    <a href=\"".$menu->[$i]->{LINK}."\">\n";
+          print "    <a href=\"".$menu->[$i]->{LINK}."\" $class>\n";
           print "      ".i18nGettext($menu->[$i]->{LABEL})."\n";
           print "    </a>\n";
 
