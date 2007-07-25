@@ -256,7 +256,7 @@ sub do_query
     # remedy: either have the DBD throw an exception on error
     # or use $sth->err
 
-    if ($result)
+    if ($result && ! $self->{STH}[$sth_nr]->err)
     {
         ##! 4: "execute succeeded (leaving function - $result)"
         ##! 4: "result count: ".$self->{STH}[$sth_nr]->rows()
