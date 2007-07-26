@@ -17,6 +17,7 @@ lib/OpenXPKI/Client/HTML/Mason/ApacheHandler.pm
 htdocs/syshandler
 htdocs/autohandler
 htdocs/index.html
+htdocs/favicon.ico
 htdocs/css/openxpki.css
 htdocs/css/sinorcaish-print.css
 htdocs/css/sinorcaish-screen.css
@@ -57,6 +58,7 @@ htdocs/service/autohandler
 htdocs/service/dhandler
 htdocs/service/index.html
 htdocs/service/logout.html
+htdocs/service/loginagain.html
 
 htdocs/service/open_form.mhtml
 htdocs/service/send_form.mhtml
@@ -147,6 +149,7 @@ htdocs/service/create_crr/highlight_error.mhtml
 htdocs/service/create_crr/search.mhtml
 htdocs/service/create_crr/form.html
 htdocs/service/create_crr/error.mhtml
+htdocs/service/create_crr/success.mhtml
 
 htdocs/service/smartcard_personalization/index.html
 htdocs/service/smartcard_personalization/waiting_for_issuance.mhtml
