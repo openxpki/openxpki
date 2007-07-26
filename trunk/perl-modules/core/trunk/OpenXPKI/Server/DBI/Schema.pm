@@ -58,7 +58,7 @@ my %COLUMN_of = (
     CREATOR_ROLE          => 'creator_role',
     REASON_CODE           => "reason_code",
     INVALIDITY_TIME       => 'invalidity_time',
-    COMMENT               => 'comment',
+    COMMENT               => 'crr_comment',
     HOLD_CODE             => 'hold_code',
     REVOCATION_TIME       => 'revocation_time',
 
