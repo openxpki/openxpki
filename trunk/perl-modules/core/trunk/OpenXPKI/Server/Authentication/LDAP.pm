@@ -105,17 +105,36 @@ sub new {
                                            COUNTER => [ @{$keys->{COUNTER}}, 0],
                                          CONFIG_ID => $keys->{CONFIG_ID},
     );
-    $self->{USE_TLS} = 1 if (lc($self->{USE_TLS}) eq "true");
-    $self->{USE_TLS} = 0 if (lc($self->{USE_TLS}) eq "false");
-    if ($self->{USE_TLS})
-    {
-        $self->{CA_PATH} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "capath" ],
-                                               COUNTER => [ @{$keys->{COUNTER}}, 0],
-                                             CONFIG_ID => $keys->{CONFIG_ID},
-        );
-        ##! 4: "capath ::= ".$self->{CA_PATH}
-    }
-    ##! 2: "use_tls ::= ".$self->{USE_TLS}
+    if( lc($self->{USE_TLS}) eq "false" ) {
+	$self->{START_TLS} = 0;
+	$self->{USE_LDAPS} = 0; 
+    } else {
+	##! 2: "use_tls ::= ".$self->{USE_TLS}
+        $self->{CA_PATH} = 
+	    $config->get_xpath (
+		  XPATH   => [ @{$keys->{XPATH}},   "capath" ],
+                  COUNTER => [ @{$keys->{COUNTER}}, 0],
+                CONFIG_ID => $keys->{CONFIG_ID},
+            );
+	##! 4: "capath ::= ".$self->{CA_PATH}
+	if( lc($self->{USE_TLS}) eq "true_ssl" ){
+	    $self->{USE_LDAPS} = $is_ldaps; 
+	    $self->{START_TLS} = $is_ldaps ^ 1;
+	} else {
+	    if( lc($self->{USE_TLS}) eq "true_tls" ){
+		$self->{START_TLS} = 1;
+		$self->{USE_LDAPS} = 0; 
+	    } else {
+    		OpenXPKI::Exception->throw(
+        	    message => 
+			'I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_WRONG_TLS_CONFIGURATION',
+        	    params  => {
+            		TLS_CONFIG => $self->{USE_TLS},
+        	    },
+    		);
+    	    };
+	};
+    };	
 
     ## load search config
 
@@ -245,14 +264,7 @@ sub login_step {
     my $bindmsg = undef;
     my $ldap = undef;
 
-    if ( $self->{USE_TLS} and not $is_ldaps )
-    {
-        ## we use start_tls because ldaps is not installed
-        $self->{START_TLS} = 1;
-        $self->{USE_TLS}   = 0;
-    }
-
-    if ( $self->{USE_TLS} )
+    if ( $self->{USE_LDAPS} )
     {  
         ##! 4: "starting a SSL (ldaps) session on"
 
@@ -716,12 +728,17 @@ B<bind_pw> - password for binding to LDAP server;
 
 =item *
 
-B<use_tls> - use 'true' here if you want to use TLS and 'false' otherwise;
+B<use_tls> - use 'false' here if you do not want to use TLS
+connection to LDAP server, 'true_tls' value will switch on
+TLS mode via STARTTLS command to server, use 'true_ssl'
+instead if you want to try Net::LDAPS SSL connection first
+(if Net::LDAPS is not installed the STARTTLS will be used);
 
 =item *
 
 B<capath> - path to the certificates for TLS connection 
-(makes sense only if B<use_tls> parameter is set to 'B<true>');
+(makes sense only if B<use_tls> parameter is set to 'B<true_tls>' or
+'B<true_ssl>');
 
 =item *
 

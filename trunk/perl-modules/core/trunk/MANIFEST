@@ -434,6 +434,7 @@ t/50_auth/07.t
 t/50_auth/08.t
 t/50_auth/09.t
 t/50_auth/10.t
+t/50_auth/11.t
 t/50_auth/99_clean.t
 t/50_auth/acl.xml
 t/50_auth/auth.xml

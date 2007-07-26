@@ -115,7 +115,6 @@ if( not exists $ENV{OPENXPKI_LDAP_MODULE_PATH} or
 				$test_directory,
 				$auth_directory,
    				'ldap_certs',
-				'',
 		     ); 
     replace_param (FILENAME => "$auth_config_xml",
                    PARAM    => "__LDAP_CA_PATH__",

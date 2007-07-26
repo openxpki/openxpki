@@ -43,6 +43,12 @@
     </description>
     <handler>LDAP SSL user</handler>
   </stack>
+  <stack name="LDAP TLS user">
+    <description>
+      This is the external LDAP based login using TLS and static role assignment.
+    </description>
+    <handler>LDAP TLS user</handler>
+  </stack>
   <handler name="Anonymous" type="Anonymous">
     <role></role>
   </handler>
@@ -166,7 +172,47 @@
     <version>3</version>
     <bind_dn>cn=Manager,dc=openxpki,dc=org</bind_dn>
     <bind_pw>secret</bind_pw>
-    <use_tls>true</use_tls>
+    <use_tls>true_ssl</use_tls>
+    <capath>__LDAP_CA_PATH__</capath>
+    <searchattr>cn</searchattr>
+    <searchvalueprefix>OpenXPKI User </searchvalueprefix>
+    <auth_meth_attr>uid</auth_meth_attr>
+    <default_auth_meth>bind</default_auth_meth>
+    <auth_meth_map>
+        <attr_value>X1</attr_value>
+	<auth_meth>pwattr</auth_meth>
+    </auth_meth_map>
+    <auth_meth_map>
+        <attr_value>X2</attr_value>
+	<auth_meth>bind</auth_meth>
+    </auth_meth_map>
+    <pw_attr>userPassword</pw_attr>
+    <pw_attr_hash>sha1</pw_attr_hash>
+    <role_attr>title</role_attr>
+    <role_map>
+      <value>manager</value>
+      <role>User</role>
+    </role_map>
+    <role_map>
+      <value>programmer</value>
+      <role>RA Operator</role>
+    </role_map>
+    <role_map>
+      <value>CEO</value>
+      <role>CA Operator</role>
+    </role_map>
+  </handler>
+  <handler name="LDAP TLS user" type="LDAP">
+    <description>
+     This is the external LDAP based login over SSL with a static role.
+    </description>
+    <host>localhost</host>
+    <port>60389</port>
+    <base>o=Security,dc=openxpki,dc=org</base> 
+    <version>3</version>
+    <bind_dn>cn=Manager,dc=openxpki,dc=org</bind_dn>
+    <bind_pw>secret</bind_pw>
+    <use_tls>true_tls</use_tls>
     <capath>__LDAP_CA_PATH__</capath>
     <searchattr>cn</searchattr>
     <searchvalueprefix>OpenXPKI User </searchvalueprefix>
