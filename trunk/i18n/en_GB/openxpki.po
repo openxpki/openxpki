@@ -252,6 +252,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_AUTH_STACK_MESSAGE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PASSWD_LOGIN_MESSAGE"
+msgstr "Page"
+
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_ENTER_ID"
 msgstr ""
 
@@ -624,6 +628,16 @@ msgstr "Automatic browser detection"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
 msgstr "Certificate Information"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_SUCCESS_CREATE_CRL"
+msgstr "Create a new certificate revocation list (CRL)"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_SUCCESS_DESC"
+msgstr ""
+"The certificate has been successfully flagged as revoked in the database. Now might be a good moment to issue a new certificate revocation list (CRL). If you want to do this now, please use the link below."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_SUCCESS_TITLE"
+msgstr "Certificate successfully revoked"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST"
 msgstr "Errors"
 
@@ -962,9 +976,8 @@ msgstr "Key compromise"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REVOCATION_REASON_REMOVE_FROM_CRL"
 msgstr "Remove certificate from CRL"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REVOCATION_REASON_SUPERSEDED"
-msgstr "Unspecified"
+msgstr "Superseded"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REVOCATION_REASON_UNSPECIFIED"
 msgstr "Unspecified"
@@ -989,6 +1002,23 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE"
 msgstr "Choose authentication method"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
+msgstr ""
+"This page is only used to install a certificate to a corresponding private "
+"key with a Microsoft Internet Explorer. The necessary actions will be "
+"started automatically with the download of this page. If you do not have a "
+"private key for the selected certificate or you have no Internet Explorer "
+"then this page is fully useless for you."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
+msgstr "Certificate installed successfully"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
+msgstr "Microsoft Internet Explorer certificate enrollment"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_INSTALL"
+msgstr "Install certificate"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC"
 msgstr "The requested content type __CONTENT_TYPE__ is not supported."
@@ -1499,6 +1529,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_INIT_SERVICE_PROTOCOL_REJECTED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_ALREADY_ESTABLISHED"
+msgstr "Value"
 
 msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED"
 msgstr ""
@@ -2943,6 +2977,54 @@ msgstr "PKCS#8 (DER)"
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM"
 msgstr "PKCS#8 (PEM)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_"
+msgstr "optional"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_ADD_NODE_SIMPLE"
+msgstr "Adding missing node"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_CHECK_NODE_SIMPLE"
+msgstr "Checking if DN exists in LDAP tree"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_DELETE_NODE_SIMPLE"
+msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_GET_EXISTING_PATH_MAKING_LIST"
+msgstr "SPKAC"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_GET_LDAP_NODE_ATTRIBUTES_MATCH_SCHEMA"
+msgstr "LDAP attributes determined"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_GET_LDAP_NODE_ATTRIBUTES_SEARCH_MUST"
+msgstr "LDAP attributes determined"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_GET_SUFFIX_MATCH"
+msgstr "Logout failed"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_LDAP_CONNECT_LDAP_NEW_FAILED"
+msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_LDAP_CONNECT_READING_PARAMETERS"
+msgstr "reset"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAPUTILS_LDAP_CONNECT_SASL_NEW_FAILED"
+msgstr "Logout failed"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_LDAP_UTILS_GET_LDAP_NODE_ATTRIBUTES_SEARCH_MUST"
+msgstr "LDAP attributes determined"
+
 msgid "I18N_OPENXPKI_LIST_NEXT"
 msgstr "Next"
 
@@ -3381,6 +3463,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_UNKNWON_AUTH_METHOD"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_WRONG_TLS_CONFIGURATION"
+msgstr "Default key group"
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOAD_HANDLER_CRASHED"
 msgstr ""
@@ -5170,6 +5256,10 @@ msgstr "Username"
 msgid "I18N_OPENXPKI_USERNAME_DESC"
 msgstr "Your username or account, for example 'jdoe'"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_"
+msgstr "Sleep"
+
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
 msgstr "Approve CRR"
 
@@ -5316,6 +5406,11 @@ msgstr "This is the workflow to handle a certificate signing request at once."
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
 msgstr "This is the workflow to handle a certificate signing request at once."
 
+msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
+msgstr ""
+"This is the workflow to handle a certificate signing request (CSR) if a "
+"offline CA is in use."
+
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "This is the workflow to issue fresh CRLs."
 
@@ -5331,6 +5426,12 @@ msgstr "This is the workflow to issue fresh CRLs."
 msgid "I18N_OPENXPKI_WF_DESC_CYCLE_TOP"
 msgstr "SCEP Certificate Signing Request"
 
+msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
+msgstr "This workflow exports workflow instances to other servers."
+
+msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
+msgstr "This workflow imports workflow instances from other servers."
+
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
 msgstr "SCEP Certificate Signing Request"
@@ -5344,6 +5445,10 @@ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL"
 msgstr "Approval is going on"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_IMPORT"
+msgstr "Initializing ..."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_INITIAL"
 msgstr "Initializing ..."
 
@@ -5351,14 +5456,34 @@ msgstr "Initializing ..."
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_PENDING"
 msgstr "Pending (in editing state)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_REVOKED_CERTIFICATE"
+msgstr "Approved"
+
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVAL"
 msgstr "Approval is going on"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED_IMPORT"
+msgstr "Approved"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_IMPORT"
+msgstr "Initializing ..."
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL"
 msgstr "Initializing ..."
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING"
 msgstr "Pending (in editing state)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING_IMPORT"
+msgstr "Pending (in editing state)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PERSISTED_CSR"
+msgstr "Approved"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_CERT_ISSUANCE_POSSIBLE"
@@ -5402,6 +5527,48 @@ msgstr "Initializing ..."
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CYCLE_TOP_INITIAL"
 msgstr "SCEP Certificate Signing Request"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
+msgstr "Exported logs"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
+msgstr "Exported workflow instances"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
+msgstr "Archive ready"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
+msgstr "Export completed"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
+msgstr "Environment for export ready"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
+msgstr "Initializing ..."
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
+msgstr "Export succeeded"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_READY"
+msgstr "Archive ready"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_UNPACKED"
+msgstr "Unpacked archive"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_COMPLETED"
+msgstr "Import completed"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ENV_READY"
+msgstr "Environment for import ready"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_INITIAL"
+msgstr "Initializing ..."
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_LOGS_DONE"
+msgstr "Imported Logs"
+
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
+msgstr "Import succeeded"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVAL"
@@ -5489,6 +5656,10 @@ msgstr "Export"
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT"
 msgstr "Import"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
+msgstr "CRL Issuance"
+
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP Certificate Signing Request"
 
@@ -5509,6 +5680,28 @@ msgstr "Certificates"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_UNSUPPORTED_CSR_TYPE"
+msgstr "Certificates"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INCORRECT_ALGORITHM"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INVALID_SESSION"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_PKI_REALM_UNDEFINED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_TOKEN_UNAVAILABLE"
 msgstr "Certificates"
 
 msgid "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS"
@@ -5593,100 +5786,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
-#~ msgstr ""
-#~ "This page is only used to install a certificate to a corresponding "
-#~ "private key with a Microsoft Internet Explorer. The necessary actions "
-#~ "will be started automatically with the download of this page. If you do "
-#~ "not have a private key for the selected certificate or you have no "
-#~ "Internet Explorer then this page is fully useless for you."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
-#~ msgstr "Certificate installed successfully"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
-#~ msgstr "Microsoft Internet Explorer certificate enrollment"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_INSTALL"
-#~ msgstr "Install certificate"
-
-#~ msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
-#~ msgstr ""
-#~ "This is the workflow to handle a certificate signing request (CSR) if a "
-#~ "offline CA is in use."
-
-#~ msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
-#~ msgstr "This workflow exports workflow instances to other servers."
-
-#~ msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
-#~ msgstr "This workflow imports workflow instances from other servers."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_IMPORT"
-#~ msgstr "Initializing ..."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_REVOKED_CERTIFICATE"
-#~ msgstr "Approved"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED_IMPORT"
-#~ msgstr "Approved"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_IMPORT"
-#~ msgstr "Initializing ..."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING_IMPORT"
-#~ msgstr "Pending (in editing state)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PERSISTED_CSR"
-#~ msgstr "Approved"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
-#~ msgstr "Exported logs"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
-#~ msgstr "Exported workflow instances"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
-#~ msgstr "Archive ready"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
-#~ msgstr "Export completed"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
-#~ msgstr "Environment for export ready"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
-#~ msgstr "Initializing ..."
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
-#~ msgstr "Export succeeded"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_READY"
-#~ msgstr "Archive ready"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_UNPACKED"
-#~ msgstr "Unpacked archive"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_COMPLETED"
-#~ msgstr "Import completed"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ENV_READY"
-#~ msgstr "Environment for import ready"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_INITIAL"
-#~ msgstr "Initializing ..."
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_LOGS_DONE"
-#~ msgstr "Imported Logs"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
-#~ msgstr "Import succeeded"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
@@ -5787,9 +5886,6 @@ msgstr "yes"
 
 #~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_CERT_TO_STACK"
 #~ msgstr "Adding a certificate"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_ATTRIBUTES_DETERMINED"
-#~ msgstr "LDAP attributes determined"
 
 #~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_CERT_STACK_LOADED"
 #~ msgstr "Node certificates are loaded"
@@ -6009,10 +6105,6 @@ msgstr "yes"
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_REASON_DESCRIPTION"
 #~ msgstr ""
 #~ "Please choose the role for which you would like to request a certificate."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_REASON_TITLE"
-#~ msgstr "Choose a role"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_DESCRIPTION"
