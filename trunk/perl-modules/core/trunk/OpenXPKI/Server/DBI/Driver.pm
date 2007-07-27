@@ -46,7 +46,7 @@ our %COLUMN = (
     'reason_code'      => 'TEXT_KEY',
     'invalidity_time'  => 'NUMERIC',
     'revocation_time'  => 'NUMERIC',
-    'comment'          => 'TEXT',
+    'crr_comment'      => 'TEXT',
     'hold_code'        => 'TEXT_KEY',
 
     "cert_key"         => "NUMERIC",
