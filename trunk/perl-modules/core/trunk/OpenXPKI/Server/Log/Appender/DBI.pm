@@ -11,6 +11,7 @@ use warnings;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
+use English;
 
 sub new {
     ##! 1: 'start'
@@ -29,7 +30,6 @@ sub log {
 
     ##! 128: 'arg_ref: ' . Dumper $arg_ref
 
-    my $dbi = CTX('dbi_log');
 
     my $timestamp = $self->__get_current_utc_time();
     ##! 64: 'timestamp: ' . $timestamp
@@ -40,10 +40,35 @@ sub log {
     my $message   = $arg_ref->{'message'}->[0];
     ##! 64: 'message: ' . $message
 
-    my $serial = $dbi->get_new_serial(
-        TABLE => 'AUDITTRAIL',
-    );
-    ##! 64: 'serial: ' . $serial
+    my $dbi;
+
+    eval {
+        $dbi = CTX('dbi_log');
+    };
+    if ($EVAL_ERROR || ! defined $dbi) {
+        ##! 16: 'dbi_log unavailable!'
+        print STDERR "dbi_log unavailable! (tried to log: $timestamp, $category, $loglevel, $message)\n";
+        return;
+    }
+
+    my $serial;
+    eval {
+        $serial = $dbi->get_new_serial(
+            TABLE => 'AUDITTRAIL',
+        );
+        ##! 64: 'serial: ' . $serial
+    };
+    if (my $exc = OpenXPKI::Exception->caught()) {
+        ##! 16: 'exception caught'
+        if ($exc->message() eq 'I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED') {
+            ##! 16: 'dbi_log not connected'
+            print STDERR "dbi_log not connected! (tried to log: $timestamp, $category, $loglevel, $message)\n";
+            return; 
+        }
+        else {
+            $exc->rethrow();
+        }
+    }
 
     $dbi->insert(
         TABLE => 'AUDITTRAIL',
