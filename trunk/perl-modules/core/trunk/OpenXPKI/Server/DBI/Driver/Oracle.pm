@@ -25,7 +25,7 @@ our %TYPE = (
 our $DBI_OPTION = {
     RaiseError => 0, 
     AutoCommit => 0,
-    LongReadLen => 32768,
+    LongReadLen => 1_000_000,
 };
 
 our $LIMIT = 'SELECT * FROM (__QUERY__) WHERE ROWNUM <= __MAXITEMS__';
