@@ -166,10 +166,6 @@ sub execute {
                 'force' => 1,
             }); 
             ##! 16: 'old session restored, role: ' . CTX('session')->get_role()
-            ### FIXME - this should no longer be necessary once we have
-            ### written a custom Log4perl appender using our dbi_log handle
-            CTX('log')->re_init();
-            ##! 16: 'child: log re-init done'
         }
         else {
     	    ##! 16: 'child here'
@@ -185,9 +181,6 @@ sub execute {
             ##! 16: 'child: DB handles reconnected'
             ##! 16: 'child dbi_workflow: ' . Dumper CTX('dbi_workflow')
     
-            CTX('log')->re_init();
-            ##! 16: 'child: log re-init done'
-            
             ### we work in the background, so we don't need/want to
             ### communicate with anyone -> close the socket file
             ### note that if we don't, the child waits for a communication
