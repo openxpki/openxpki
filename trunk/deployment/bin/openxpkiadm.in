@@ -1651,11 +1651,11 @@ if ($cmd eq 'key') {
 	exit 1;
     }
 
-    my @pki_realms = list_pki_realms();
+    my @pki_realms = list_realms();
     if (! defined $params{realm} ||
         ! grep {$params{realm} eq $_} @pki_realms) {
 	print STDERR "Please specify one of the following PKI realms via --realm:\n";
-	foreach my $realm (list_realms()) {
+	foreach my $realm (@pki_realms) {
 	    print "  $realm\n";
 	}
 
