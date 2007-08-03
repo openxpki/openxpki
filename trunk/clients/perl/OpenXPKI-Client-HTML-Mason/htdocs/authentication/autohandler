@@ -30,7 +30,14 @@
     ## is working and the user is logged in already
     my $ping_msg = $client->send_receive_service_msg('PING');
     if ($ping_msg->{SERVICE_MSG} eq 'SERVICE_READY') {
-        print "REDIRECT_TO_SERVICE_AUTOHANDLER";
+        # the connection was actually working when the authentication
+        # autohandler was called, it just did not have the session ID
+        # in the context. Thus, skip all of the rest and just return
+        # 'CONNECTION_WORKING', which will be handled by the toplevel
+        # autohandler appropriately (just show the component the user
+        # came for)
+    	$m->comp('/authentication/role.mhtml', 'msg' => $msg);
+        print "CONNECTION_WORKING";
         return;
     }
     ## check the message
@@ -107,23 +114,25 @@
               Directory => $ENV{OPENXPKI_MASON_SESSION_DIR},
           },
         );
-        $session->param(
-            'user' =>
-            $context->{client}->send_receive_command_msg('get_user')->{PARAMS}
-        );
-        $session->param(
-            'role' =>
-            $context->{client}->send_receive_command_msg('get_role')->{PARAMS}
-        );
-        $session->param(
-            'pki_realm' =>
-            $context->{client}->send_receive_command_msg('get_pki_realm')->{PARAMS}
-        );
-        $session->expire('+1d');
-        $session->flush();
-        $m->comp ('/lib/debug.mhtml',
-                  'level' => 5,
-                  'msg'   => "CGI::Session created for $__session_id, object id: " . $session->id());
+        if (defined $session) {
+            $session->param(
+                'user' =>
+                $context->{client}->send_receive_command_msg('get_user')->{PARAMS}
+            );
+            $session->param(
+                'role' =>
+                $context->{client}->send_receive_command_msg('get_role')->{PARAMS}
+            );
+            $session->param(
+                'pki_realm' =>
+                $context->{client}->send_receive_command_msg('get_pki_realm')->{PARAMS}
+            );
+            $session->expire('+1d');
+            $session->flush();
+            $m->comp ('/lib/debug.mhtml',
+                      'level' => 5,
+                      'msg'   => "CGI::Session created for $__session_id, object id: " . $session->id());
+        }
         print "REDIRECT_TO_SERVICE_AUTOHANDLER";
     }
     elsif ($msg->{SERVICE_MSG} eq "ERROR")
