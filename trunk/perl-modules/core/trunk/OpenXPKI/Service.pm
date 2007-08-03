@@ -98,6 +98,7 @@ sub collect {
  	alarm 0;
     };
     if ($EVAL_ERROR) {
+	alarm 0;
         $self->set_communication_state('can_send');
  	if ($EVAL_ERROR eq "alarm\n") {
 	    OpenXPKI::Exception->throw(
