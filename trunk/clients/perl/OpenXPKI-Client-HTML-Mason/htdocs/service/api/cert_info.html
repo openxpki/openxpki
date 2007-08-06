@@ -138,7 +138,7 @@
     <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM') %></td>
     <td>
       <& /lib/html/a.mhtml,
-         target => '/service/api/get_privkey_password.html',
+         target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
          label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_DOWNLOAD'),
          params => [["identifier",   $identifier],
                     ["format", "PKCS8_PEM"]] &>
@@ -148,7 +148,7 @@
     <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER') %></td>
     <td>
       <& /lib/html/a.mhtml,
-         target => '/service/api/get_privkey_password.html',
+         target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
          label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_DOWNLOAD'),
          params => [["identifier",   $identifier],
                     ["format", "PKCS8_DER"]] &>
@@ -158,7 +158,7 @@
     <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY') %></td>
     <td>
       <& /lib/html/a.mhtml,
-         target => '/service/api/get_privkey_password.html',
+         target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
          label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_DOWNLOAD'),
          params => [["identifier",   $identifier],
                     ["format", "OPENSSL_PRIVKEY"]] &>
@@ -171,7 +171,7 @@
     <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12') %></td>
     <td>
       <& /lib/html/a.mhtml,
-         target => '/service/api/get_privkey_password.html',
+         target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
          label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD'),
          params => [["identifier",   $identifier],
                     ["format", "PKCS12"]] &>
@@ -181,7 +181,7 @@
     <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE') %></td>
     <td>
       <& /lib/html/a.mhtml,
-         target => '/service/api/get_privkey_password.html',
+         target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
          label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD'),
          params => [["identifier",   $identifier],
                     ["format", "JAVA_KEYSTORE"]] &>
@@ -195,7 +195,7 @@
     <td></td>
     <td>
       <& /lib/html/a.mhtml,
-         target => '/service/create_crr/form.html',
+         target => $context->{menu}->get_root() . '/service/create_crr/form.html',
          label  => i18nGettext('I18N_OPENXPKI_HTML_MASON_CERT_INFO_NEW_CRR'),
          params => [["cert_identifier",   $identifier]],
       &>
