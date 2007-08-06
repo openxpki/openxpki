@@ -1,30 +1,13 @@
 <%args>
-    $wf_info   => undef,
-    $steps     => undef,
+    $wf_info => undef,
 </%args>
 <%init>
-    my $error_code = $wf_info->{CONTEXT}->{error_code};
+use Data::Dumper;
+my $error = $wf_info->{CONTEXT}->{error_code};
+my $i18n_error = defined $error ? uc($error) : 'UNKNOWN';
 </%init>
-<script type="text/javascript">
-<!--
-    function InstallCertIEAndTest (form) {
-    // this is sort of a hack, because on the failure page, we still have
-    // a body onload call.
-    }
--->
-</script>
-<H1><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_TITLE',
-                       '__CURRENTSTEP__' => $steps,
-                       '__STEPS__' => $steps) %> </h1>
-% if ($error_code eq 'ldap_missing_data') {
-    <p><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_LDAP_MISSING_DATA') %></p>
-% }
-% elsif ($error_code eq 'cert_test_failed') {
-    <p><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_CERT_INSTALLATION_TEST_FAILED') %></p>
-% }
-% else {
-    <p><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_UNKNOWN_CAUSE') %></p>
-    <pre>
-    <% Dumper $wf_info %>
-    </pre>
-% }
+<H1><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_TITLE') %></H1>
+<p><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_DESC') %></p>
+<p>
+<% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_REASON_' . $i18n_error) %>
+</p>

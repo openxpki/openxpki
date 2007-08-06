@@ -246,6 +246,11 @@ onload="InstallCertIEAndTest(document.OpenXPKI)"
             'steps'   => $steps,
             'wf_info' => $wf_info,  &>
 %   }
+%   elsif ($wf_info->{STATE} eq 'FAILURE') {
+     <& './failure.mhtml',
+           'wf_info' => $wf_info,   &>
+%      return;
+%   }
 %   else {
 <H1>I18N_OPENXPKI_HTML_SMARTCARD_ERROR_UNKNOWN_STATE_TITLE</H1>
 <p>I18N_OPENXPKI_HTML_SMARTCARD_ERROR_UNKNOWN_STATE_DESC</p>
