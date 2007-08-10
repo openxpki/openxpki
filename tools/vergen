@@ -28,7 +28,7 @@ my $svn = 'svn';
 my $git = 'git';
 my $git_svn = 'git-svn';
 
-my $svn_info;
+my $revision_info;
 my $mapping_of;
 my $format_of;
 my $saved_directory;
@@ -52,42 +52,44 @@ sub slurp {
     return $result;
 }
 
-sub get_git_svn_info {
+# sub get_git_svn_info {
+#     my $result = {};
+
+#     my $last_log = `$git_svn log --oneline --limit 1 2>/dev/null`;
+#     my ($revision) = ($last_log =~ m{\A r(\d+)\ \|\ .*}xms);
+#     if (! defined $revision) {
+#         # did not get correct structure.
+# 	# reason may be that this repository does not rebase via git-svn,
+# 	# but rather pulls from another repository. assume that the
+# 	# svn revision information is available in git full text logs.
+
+# 	open my $HANDLE, qq{ $git log --pretty=format:"%b" | };
+#       GITLOGLINE:
+# 	while (my $line = <$HANDLE>) {
+# 	    chomp $line;
+# 	    # first git-svn-id line encountered wins
+# 	    if ($line =~ m{ \A git-svn-id: .*? @(\d+) \s+ }xms) {
+# 		$result->{revision} = $1;
+# 		$result->{'last-changed-revision'} = $result->{revision};
+# 		last GITLOGLINE;
+# 	    }
+# 	}
+# 	close $HANDLE;
+
+#         return $result;
+#     }
+#     $result->{revision} = $revision;
+#     # in git (as in SVN, too?), the last-changed-revision is always equal
+#     # to the revision
+#     $result->{'last-changed-revision'} = $revision;
+    
+#     return $result;
+# }
+    
+sub get_revision_info {
     my $result = {};
 
-    my $last_log = `$git_svn log --oneline --limit 1 2>/dev/null`;
-    my ($revision) = ($last_log =~ m{\A r(\d+)\ \|\ .*}xms);
-    if (! defined $revision) {
-        # did not get correct structure.
-	# reason may be that this repository does not rebase via git-svn,
-	# but rather pulls from another repository. assume that the
-	# svn revision information is available in git full text logs.
-
-	open my $HANDLE, qq{ $git log --pretty=format:"%b" | };
-      GITLOGLINE:
-	while (my $line = <$HANDLE>) {
-	    chomp $line;
-	    if ($line =~ m{ \A git-svn-id: .*? @(\d+) \s+ }xms) {
-		$result->{revision} = $1;
-		$result->{'last-changed-revision'} = $result->{revision};
-		last GITLOGLINE;
-	    }
-	}
-	close $HANDLE;
-
-        return $result;
-    }
-    $result->{revision} = $revision;
-    # in git (as in SVN, too?), the last-changed-revision is always equal
-    # to the revision
-    $result->{'last-changed-revision'} = $revision;
-    
-    return $result;
-}
-    
-sub get_svn_info {
-    my $result = {};
-
+    # first get SVN revision information
     my $fh;
     if (! open $fh, "$svn info -R 2>/dev/null |") {
 	return $result;
@@ -108,6 +110,59 @@ sub get_svn_info {
 	}
     }
     close $fh;
+
+    # check if we are running in a git checkout
+    # getting revision info from SVN did not work, try git
+    if (`$git branch`) {
+	# try via git-svn...
+	if (! exists $result->{revision}) {
+	    # try to get revision from git-svn
+	    my $last_log = `$git_svn log --oneline --limit 1 2>/dev/null`;
+	    my ($revision) = ($last_log =~ m{\A r(\d+)\ \|\ .*}xms);
+	    $result->{revision} = $revision;
+	}
+
+	# ... and via plain git
+	if (! exists $result->{revision}) {
+	    # revision could not be obtained by git-svn
+	    # reason may be that this repository does not rebase via git-svn,
+	    # but rather pulls from another repository. assume that the
+	    # svn revision information is available in git full text logs.
+	    
+	    open $fh, qq{ $git log --pretty=format:"%b" | };
+	  GITLOGLINE:
+	    while (my $line = <$fh>) {
+		chomp $line;
+		# first git-svn-id line encountered wins
+		if ($line =~ m{ \A git-svn-id: .*? @(\d+) \s+ }xms) {
+		    $result->{revision} = $1;
+		    last GITLOGLINE;
+		}
+	    }
+	    close $fh;
+	}
+	# fake last-changed-revision
+	$result->{'last-changed-revision'} ||= $result->{revision};
+	
+	# get git commit hashes
+	$result->{'git-abbreviated-commit-hash'} = `$git show-ref -h -s --abbrev HEAD`;
+	chomp $result->{'git-abbreviated-commit-hash'};
+
+	$result->{'git-commit-hash'} = `$git show-ref -h -s HEAD`;
+	chomp $result->{'git-commit-hash'};
+
+	# get git tag information
+	open $fh, qq{ $git name-rev --tags HEAD | };
+      GITLOGLINE:
+	while (my $line = <$fh>) {
+	    chomp $line;
+	    if ($line =~ m{ \A HEAD \s+ (?: .*?/)?(.*) }xms) {
+		if ($1 ne 'undefined') {
+		    $result->{'git-tag'} ||= $1;
+		}
+	    }
+	}
+    }
     
     return $result;
 }
@@ -159,7 +214,7 @@ sub expand_keyword {
 	}
 	$arg = strftime($arg, gmtime(time));
     }
-
+    
     return $arg;
 }
 
@@ -218,26 +273,21 @@ foreach my $component (keys %config) {
     }
     
     # built-in components
-    if ($component =~ m{ \A (?:revision|last-changed-revision) \z }xms) {
-        $svn_info = get_svn_info();
-        if (! scalar keys %{$svn_info}) {
-            # getting revision info from SVN did not work, try git
-            if (`$git branch`) {
-                # if the current tree is under git control, use git-svn
-                # instead of svn to get the revision numbers
-                $svn_info = get_git_svn_info(); 
-                if (! scalar keys %{$svn_info}) {
-                    die "Could not determine subversion info from git, is git-svn installed and in path?";
-                }
-            }
-            else {
-                die "Could not determine subversion info, is svn installed and in path?";
-            }
+    if ($component =~ m{ \A (?: revision | 
+                                last-changed-revision |
+                                git-commit-hash | 
+                                git-abbreviated-commit-hash |
+                                git-tag
+                            ) \z }xms) {
+        $revision_info ||= get_revision_info();
+
+        if (! scalar keys %{$revision_info}) {
+            die "Could not determine revision info. (Hint: is svn installed and in path?)";
         }
 
         $mapping_of->{component}->{$component} = {
             keyword => $config{$component}->{keyword},
-            value   => $svn_info->{$component},
+            value   => $revision_info->{$component},
             type    => 'built-in',
         };
         next COMPONENT;
@@ -352,8 +402,9 @@ vergen [options] COMMAND
 =head1 DESCRIPTION
 
 B<vergen> is a tool that can help to maintain consistent version numbers
-in a project. If desired it uses Subversion to determine revision number
-information.
+in a project. If desired it uses Subversion and/or Git to determine 
+revision control information.
+
 Starting from the current directory, vergen searches upwards for its
 configuration file '.VERSION_DEFINITION' and reads the first file found
 (see B<The .VERSION_DEFINITION File> for a detailed description.)
@@ -361,12 +412,16 @@ After the configuration file has been read, vergen again traverses the
 directory tree upwards from the current directory and searches for all
 file names defined in the version definition file. Once a file is found,
 its content is read and stored as the value for the corresponding component.
-Finally, if Subversion references are contained in the configuration file,
-vergen calls 'svn info -R' in the current directory and determines certain
-information about the checked-out subversion project.
-All this information is available as a symbolic name for the composition
-of version numbers. It is possible to print the composed version number
-using the --format option
+
+Components can arbitrarily be combined to 'formats'. A format consists
+of a string that may contain any number of custom and built-in component
+names.
+It is then possible to print the resulting version string using 
+the --format option.
+
+When used within a directory hierarchy under revision control via
+Subversion and/or Git, B<vergen> is able to obtain and use information about
+the current checkout.
 
 
 =head1 OPTIONS
@@ -379,7 +434,7 @@ Print format string, using the version numbers obtained by vergen. The
 output format is determined by 'arg' and may either be a symbolic name
 referencing a format string in the FORMAT_DEFINITIONS section of
 the corresponding .VERSION_DEFINITION file or a custom string specifying
-the version number. You may use all keywords defined in .VERSION_DEFINITON
+the version number. You may use all keywords defined in .VERSION_DEFINITION
 and all conversion specifications as defined by strftime(3).
 
 =item B<--directory> dir
@@ -456,20 +511,50 @@ Only the first keyword defined is used for --dump.
 
 If set to 'yes' or 'true', this component is not mandatory.
 
-=head2 Subversion built-ins
+=head2 Revision control built-ins
+
+When called within a directory tree that is under version control by
+Subversion and/or Git it is possible to obtain certain information from the
+revision control system.
+
+B<vergen> support Subversion-only operation, Subversion with Git (using
+git-svn to rebase the Subversion repository) and Git-only. Git-only mode
+also tries to guess Subversion version numbers from the Git log (e. g.
+when pulling from a Git repository that uses git-svn to rebase from 
+Subversion).
+
+=head3 Subversion built-ins
 
 The following named sections are hardcoded
 and can be used to access Subversion information.
 
-=head3 revision 
+=head4 revision 
 
 'revision' expands to the global SVN revision number
 
-=head3 last-changed-revision
+=head4 last-changed-revision
 
 'last-changed-revision' determines the highest "Last Changed Rev" 
 below the current directory (recursively).
 
+
+=head3 Git built-ins
+
+The following named sections are hardcoded and can be used to access Git
+version information (if current directory is inside a Git repository).
+
+=head4 git-commit-hash
+
+'git-commit-hash' expands to the Git commit hash for the current HEAD.
+
+=head4 git-abbreviated-commit-hash
+
+'git-abbreviated-commit-hash' expands to the abbreviated commit hash.
+
+=head4 git-tag
+
+'git-tag' expands to the first Git tag name found for the current HEAD,
+undefined if the current HEAD is untagged.
 
 =head1 Examples
 
@@ -479,6 +564,7 @@ below the current directory (recursively).
   [FORMAT_DEFINITIONS]
   version: MAJOR.MINOR.RELEASESUFFIX\n
   daily_snapshot: %F-MAJOR.MINOR.RELEASESUFFIX\n
+  git-commit: MAJOR.MINOR.GIT_TAG
 
   # Built-in components
   [revision]
@@ -486,6 +572,16 @@ below the current directory (recursively).
 
   [last-changed-revision]
   keyword:          SVN_LAST_CHANGED_REVISION
+
+  [git-commit-hash]
+  keyword:          GIT_COMMIT_HASH
+
+  [git-abbreviated-commit-hash]
+  keyword:          GIT_ABBREVIATED_COMMIT_HASH
+
+  [git-tag]
+  keyword:          GIT_TAG
+  optional:          yes
 
   # Custom components
   [major]

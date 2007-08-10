@@ -10,6 +10,8 @@
 [FORMAT_DEFINITIONS]
 version: MAJOR.MINOR.RELEASESUFFIX
 daily_snapshot: %F-MAJOR.MINOR.RELEASESUFFIX
+git_commit: MAJOR.MINOR.RELEASE-GIT_ABBREVIATED_COMMIT_HASH
+git_tag: MAJOR.MINOR.GIT_TAG
 
 ###########################################################################
 # Version number components
@@ -17,15 +19,38 @@ daily_snapshot: %F-MAJOR.MINOR.RELEASESUFFIX
 # built-in components (component names are 'magic'), but you can modify 
 # the keyword(s).
 # Currently the following magic built-ins are defined:
-#   revision: the global SVN revision number
-#   last-changed-revision: obtains the highest "Last Changed Rev" below
-#     the current directory (recursively)
+# 'revision'
+#     the global SVN revision number
+# 'last-changed-revision'
+#     obtains the highest "Last Changed Rev" below the current 
+#     directory (recursively)
+# The following keywords are only expanded if Git is used:
+# 'git-commit-hash'
+#     commit hash
+# 'git-abbreviated-commit-hash'
+#     abbreviated commit hash (hint: git-show-ref -h -s --abbrev HEAD)
+# 'git-tag'
+#     tag name of the current checkout (empty string if no tag is defined,
+#     if more than one tags are set for the current head then only the first
+#     tag is reported)
+
 
 [revision]
 keyword:          SVN_REVISION
 
 [last-changed-revision]
 keyword:          SVN_LAST_CHANGED_REVISION
+
+[git-commit-hash]
+keyword:          GIT_COMMIT_HASH
+
+[git-abbreviated-commit-hash]
+keyword:          GIT_ABBREVIATED_COMMIT_HASH
+
+[git-tag]
+keyword:          GIT_TAG
+optional:         yes
+
 
 # Custom components
 # To create a custom version number component define the following keys:
