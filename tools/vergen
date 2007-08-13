@@ -86,7 +86,9 @@ sub get_revision_info {
 	    # try to get revision from git-svn
 	    my $last_log = `$git_svn log --oneline --limit 1 2>/dev/null`;
 	    my ($revision) = ($last_log =~ m{\A r(\d+)\ \|\ .*}xms);
-	    $result->{revision} = $revision;
+	    if (defined $revision) {
+		$result->{revision} = $revision;
+	    }
 	}
 
 	# ... and via plain git
