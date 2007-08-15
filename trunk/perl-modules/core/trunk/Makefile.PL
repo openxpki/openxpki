@@ -269,7 +269,7 @@ WriteMakefile(
     'VERSION'   => $openxpki_version,
     'LIBS'      => ["-L$openssl_lib_dir -lcrypto"],
     'INC'       => "-I. -I$openssl_inc_dir",
-    'CCFLAGS'   => '-O2 -g -Wall',
+    'CCFLAGS'   => '-O2 -g',
     'PREREQ_PM' => {
 	'Class::Std'             => '0.0.8',
 	'CGI::Session'           => '3.95',
