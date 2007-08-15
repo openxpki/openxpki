@@ -158,7 +158,8 @@ sub update_workflow {
 
     ##! 128: 'params from context: ' . Dumper $params
   PARAMETER:
-    while (my ($key, $value) = each %{ $params }) {
+    foreach my $key (keys %{ $params }) {
+        my $value = $params->{$key};
 	# parameters with undefined values are not stored
 	next PARAMETER if (! defined $value);
 
