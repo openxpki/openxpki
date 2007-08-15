@@ -107,13 +107,18 @@
     if ($msg->{SERVICE_MSG} eq "SERVICE_READY" or
         not defined $msg)
     {
-        my $session = CGI::Session->new(
-          'id:static',
-          $__session_id,
-          {
-              Directory => $ENV{OPENXPKI_MASON_SESSION_DIR},
-          },
-        );
+        my $session;
+        if (defined $__session_id && exists $ENV{OPENXPKI_MASON_SESSION_DIR}) {
+            # try to create a CGI::Session object only if we have a
+            # session ID and configuration for a client side session directory
+            $session = CGI::Session->new(
+              'id:static',
+              $__session_id,
+              {
+                  Directory => $ENV{OPENXPKI_MASON_SESSION_DIR},
+              },
+            );
+        }
         if (defined $session) {
             $session->param(
                 'user' =>
