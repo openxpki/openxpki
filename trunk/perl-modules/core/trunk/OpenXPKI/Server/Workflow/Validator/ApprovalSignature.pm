@@ -156,11 +156,14 @@ sub validate {
             },
         );
     }
+
+    my $cfg_id = CTX('api')->get_config_id({ ID => $wf_id });
     ##! 32: 'pkcs7: ' . $pkcs7
     my $pkcs7_token = $tm->get_token(
         TYPE      => 'PKCS7',
         ID        => $self->pkcs7tool(),
         PKI_REALM => $pki_realm,
+        CONFIG_ID => $cfg_id,
     );
     $sig_text = encode('utf8', $sig_text);
     eval {
