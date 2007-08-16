@@ -186,9 +186,9 @@ sub do_query
             );
         }
         my $tmp = $self->{driver}->{limitstart};
-        $tmp =~ s/__QUERY__/$query/;
-        $tmp =~ s/__MAXITEMS__/$keys->{LIMIT}->{AMOUNT}/;
-        $tmp =~ s/__START__/$keys->{LIMIT}->{START}/;
+        $tmp =~ s/__QUERY__/$query/g;
+        $tmp =~ s/__MAXITEMS__/$keys->{LIMIT}->{AMOUNT}/g;
+        $tmp =~ s/__START__/$keys->{LIMIT}->{START}/g;
         $query = $tmp;
     }
     my @bind_values = ();
