@@ -114,7 +114,7 @@ sub write_file
     }
 
 
-    my $mode = O_WRONLY;
+    my $mode = O_WRONLY | O_TRUNC;
     if (! -e $filename) {
 	$mode |= O_EXCL | O_CREAT;
     }
