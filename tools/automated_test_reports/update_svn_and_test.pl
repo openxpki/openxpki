@@ -17,11 +17,11 @@ open my $SVN, 'svn log -qr HEAD ..|';
 my $svn_info = <$SVN>;
 my ($newest_revision) = ($svn_info =~ m{ \A r(\d+) .* }xms);
 
-my $local_revision = `vergen --format SVN_LAST_CHANGED_REVISION`;
+my $local_revision = `../tools/vergen --format SVN_LAST_CHANGED_REVISION`;
 
 for (my $rev = $local_revision + 1; $rev <= $newest_revision; $rev++) {
     print STDERR "Updating to revision $rev ...\n";
-    `svn update -r $rev`;
+    `svn update -r $rev ..`;
     print STDERR "Running tests for revision $rev ...\n";
     `generate_report.pl $output_dir`;
 }
