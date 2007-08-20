@@ -30,11 +30,10 @@ use Exporter 'import';
 sub deploy_test_server {
     my $arg_ref     = shift;
     my $instancedir = $arg_ref->{DIRECTORY};
-    my $opensslfile = ''; 
-    if ($arg_ref->{OPENSSL_FILE}) {
-        $opensslfile = $arg_ref->{OPENSSL_FILE};
-        $opensslfile = '' if ((! (-e $opensslfile)) || (!(-x _ )) || (`$opensslfile version` !~ m{\A OpenSSL\ 0\.9\.8 }xms));
-    }
+    open my $OPENSSLCFG, '<', 't/cfg.binary.openssl';
+    my $opensslfile = <$OPENSSLCFG>;
+    close $OPENSSLCFG;
+    $opensslfile = '' if ((! (-e $opensslfile)) || (!(-x _ )) || (`$opensslfile version` !~ m{\A OpenSSL\ 0\.9\.8 }xms));
 
     diag("Locally deploying OpenXPKI");
 

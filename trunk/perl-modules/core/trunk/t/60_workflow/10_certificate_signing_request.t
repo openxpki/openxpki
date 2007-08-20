@@ -24,19 +24,16 @@ print "1..$NUMBER_OF_TESTS\n";
 my $instancedir = 't/60_workflow/test_instance';
 my $socketfile = $instancedir . '/var/openxpki/openxpki.socket';
 my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
-my $opensslfile = `cat t/cfg.binary.openssl`;
 my $configfile = cwd()."/$instancedir/openssl.cnf";
 
 ok(deploy_test_server({
         DIRECTORY  => $instancedir,
-        OPENSSL_FILE => $opensslfile,
     }), 'Test server deployed successfully');
 
 copy("t/60_workflow/openssl.cnf", "$instancedir/openssl.cnf");
 
 ok(create_ca_cert({
         DIRECTORY    => $instancedir,
-        OPENSSL_FILE => $opensslfile,
         CONFIGFILE   => $configfile,
     }), 'CA certificate created and installed successfully');
 
