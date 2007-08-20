@@ -126,10 +126,13 @@ if ($pid) {
     local $SIG{'CHLD'} = 'IGNORE';
     Test::More->builder()->use_numbers(0);
     # this is the parent
+    local $SIG{'ALRM'} = sub { die "Timeout ..." };
+    alarm 300;
     start_test_server({
         FOREGROUND => 1,
         DIRECTORY  => $instancedir,
     });
+    alarm 0;
 }
 else {
     Test::More->builder()->use_numbers(0);
