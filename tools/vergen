@@ -80,7 +80,7 @@ sub get_revision_info {
 
     # check if we are running in a git checkout
     # getting revision info from SVN did not work, try git
-    if (`$git branch 2>/dev/null`) {
+    if ( (`which $git 2>/dev/null`) && (`$git branch 2>/dev/null`) ) {
 	# try via git-svn...
 	if (! exists $result->{revision}) {
 	    # try to get revision from git-svn
