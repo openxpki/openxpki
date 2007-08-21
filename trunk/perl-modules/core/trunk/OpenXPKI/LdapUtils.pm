@@ -15,9 +15,6 @@ use OpenXPKI::DN;
 use Data::Dumper;
 use utf8;
 
-use Authen::SASL qw(Perl);
-use Authen::SASL;
-
 use Net::LDAP;
 use Net::LDAP::Util qw( ldap_error_text
 		        ldap_error_name
@@ -83,6 +80,15 @@ sub ldap_connect {
         ##! 129: 'LDAP UTILS creating sasl object'
         $ldap_sasl_mech   = $realm_config->{ldap_sasl_mech};
 
+        eval "use Authen::SASL qw( Perl );";
+        if ($EVAL_ERROR) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_LDAPUTILS_AUTHEN_SASL_USE_FAILED',
+                params  => {
+                    'ERROR' => $EVAL_ERROR,
+                },
+            );
+        }
         if( $ldap_sasl_mech  eq 'EXTERNAL' ){
                 $sasl = Authen::SASL->new(
                                           mechanism => 'EXTERNAL',
