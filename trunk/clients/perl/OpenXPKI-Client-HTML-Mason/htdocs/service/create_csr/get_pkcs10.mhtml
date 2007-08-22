@@ -45,10 +45,32 @@
     if ($file)
     {
         $pkcs10 = "";
-        while (<$file>) {
-            $pkcs10 .= $_;
-        }
+        $pkcs10 = do {
+            local $INPUT_RECORD_SEPARATOR;
+            <$file>;
+        };
     
+        if ($pkcs10 !~ /-----BEGIN/) {
+            # assume it is
+            my $msg = $context->{client}->send_receive_command_msg(
+                'convert_csr',
+                {
+                    DATA => $pkcs10,
+                    IN   => 'DER',
+                    OUT  => 'PEM',
+                },
+            );
+            if (   exists $msg->{SERVICE_MSG}
+                && $msg->{SERVICE_MSG} eq 'ERROR') {
+                @errors = $m->comp(
+                    '/lib/get_deep_error.mhtml',
+                    'msg' => $msg,
+                );
+            }
+            else {
+                $pkcs10 = $msg->{PARAMS};
+            }
+        }
         ## parse the CSR
         my $msg = $context->{client}->send_receive_command_msg (
                       "get_csr_info_hash_from_data",

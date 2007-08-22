@@ -27,12 +27,24 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKCS10_MISSING_DATA");
     }
+    if (! exists $self->{IN}) {
+        # default input format is PEM
+        $self->{IN} = 'PEM';
+    }
+    if ($self->{IN} ne 'PEM' && $self->{IN} ne 'DER') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKCS10_INCORRECT_INPUT_FORMAT',
+            params  => {
+                FORMAT => $self->{IN},
+            },
+        );
+    }
     if (not exists $self->{OUT})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKCS10_MISSING_OUTPUT_FORMAT");
     }
-    if ($self->{OUT} ne "DER" and $self->{OUT} ne "TXT")
+    if ($self->{OUT} ne "DER" && $self->{OUT} ne "TXT" && $self->{OUT} ne 'PEM')
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKCS10_WRONG_OUTPUT_FORMAT");
@@ -52,10 +64,14 @@ sub get_command
 
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -in ".$self->{INFILE};
-    if ($self->{OUT} eq "DER")
-    {
+    $command .= " -inform " . $self->{IN};
+    if ($self->{OUT} eq "DER") {
         $command .= " -outform DER";
-    } else {
+    }
+    elsif ($self->{OUT} eq 'PEM') {
+        $command .= " -outform PEM";
+    }
+    else {
         $command .= " -noout -text -nameopt RFC2253,-esc_msb";
     }
 

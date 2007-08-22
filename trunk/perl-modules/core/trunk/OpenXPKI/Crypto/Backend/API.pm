@@ -59,7 +59,9 @@ sub __init_command_params : PRIVATE {
                           'DECRYPT'    => 0,
                          },
     "convert_pkcs10"  => {"DATA" => 1,
-                          "OUT"  => ["DER","TXT"]},
+                          "IN"   => [ 'DER', 'PEM' ],
+                          "OUT"  => [ 'DER', 'PEM', 'TXT']
+                         },
     "create_cert"     => {"PROFILE" => 1,
                           "PASSWD"  => 0,
                           "KEY"     => 0,

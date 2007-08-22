@@ -1025,6 +1025,21 @@ sub get_servers {
     return CTX('acl')->get_servers();
 }
 
+sub convert_csr {
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $realm   = CTX('session')->get_pki_realm();
+    my $default_token = CTX('pki_realm')->{$realm}->{crypto}->{default};
+    my $data = $default_token->command({
+        COMMAND => 'convert_pkcs10',
+        IN      => $arg_ref->{IN},
+        OUT     => $arg_ref->{OUT},
+        DATA    => $arg_ref->{DATA},
+    });
+    return $data;
+}
+
 1;
 
 __END__

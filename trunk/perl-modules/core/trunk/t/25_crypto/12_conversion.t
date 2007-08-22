@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use Test;
-BEGIN { plan tests => 15 };
+use Test::More;
+plan tests => 16;
 
-print STDERR "OpenXPKI::Crypto::Command: Conversion tests\n";
+diag "OpenXPKI::Crypto::Command: Conversion tests\n";
 
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (read_file);
@@ -80,7 +80,7 @@ $token->command ({COMMAND => "convert_key",
 ok(1);
 
 ## PKCS10: PEM --> DER
-$token->command ({COMMAND => "convert_pkcs10",
+my $der_csr = $token->command ({COMMAND => "convert_pkcs10",
                   DATA    => $csr,
                   OUT => "DER"});
 ok(1);
@@ -91,6 +91,14 @@ $token->command ({COMMAND => "convert_pkcs10",
                   OUT     => "TXT"});
 ok(1);
 
+## PKCS10: DER -> PEM
+my $pem_csr = $token->command({
+    COMMAND => 'convert_pkcs10',
+    DATA    => $der_csr,
+    IN      => 'DER',
+    OUT     => 'PEM',
+});
+is($pem_csr, $csr, 'Converting from DER to PEM recovers original PEM format CSR');
 ## Cert: PEM --> DER
 $token->command ({COMMAND => "convert_cert",
                   DATA    => $cert,

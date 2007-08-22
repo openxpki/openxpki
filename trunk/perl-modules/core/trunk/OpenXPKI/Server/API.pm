@@ -68,6 +68,7 @@ sub BUILD {
     my $re_sql_string        = qr{ \A [a-zA-Z0-9\@\-_\.\s\%\*\+\=\,\:\ ]* \z }xms;
     my $re_approval_msg_type = qr{ \A (CSR|CRR) \z }xms;
     my $re_approval_lang     = qr{ \A (de_DE|en_GB|ru_RU) \z }xms;
+    my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
 
     $method_info_of{$ident} = {
         ### Default API
@@ -401,6 +402,22 @@ sub BUILD {
         'get_export_destinations' => {
             class  => 'Default',
             params => { },
+        },
+        'convert_csr' => {
+            class  => 'Default',
+            params => {
+                DATA => {
+                    type => SCALAR,
+                },
+                IN => {
+                    type  => SCALAR,
+                    regex => $re_csr_format,
+                },
+                OUT => {
+                    type  => SCALAR,
+                    regex => $re_csr_format,
+                },
+            },
         },
 
         ### Object API
