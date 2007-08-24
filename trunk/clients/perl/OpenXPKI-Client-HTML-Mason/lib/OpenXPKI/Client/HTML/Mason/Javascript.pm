@@ -80,9 +80,17 @@ $FUNCTION{install_cert_ie} = << 'XEOF';
         dim xenroll
         Set xenroll = getXEnroll   
 
-        dim name
-        name = form.csp.value
-        xenroll.ProviderName = name
+        dim sProvName, nProvType
+
+        if mode <> "silent" then
+            sProvName=GetSelectedProvName()
+            nProvType=GetSelectedProvType()
+            xenroll.providerType=nProvType
+        else
+            sProvName = form.csp.value
+        end if
+
+        xenroll.ProviderName=sProvName
         xenroll.acceptPKCS7(form.cert.value)
         
         if Err.Number <> 0 then
