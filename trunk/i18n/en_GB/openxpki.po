@@ -138,22 +138,22 @@ msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Download certificate"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL"
-msgstr "Install email certificate of another user"
+msgstr "Install (use button Open) or download the certificate of another user"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
 msgstr "Install the certificate for your private key"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
-msgstr "Microsoft Internet Explorer"
+msgstr "Links for Microsoft Internet Explorer"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA"
-msgstr "Mozilla, Firefox, Opera"
+msgstr "Links for Mozilla, Firefox, Opera"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
-msgstr "PEM or CRT"
+msgstr "PEM (CRT) format"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE"
-msgstr "Download certificate and private key"
+msgstr "Download certificate and private key in a single container"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS"
 msgstr ""
@@ -161,10 +161,10 @@ msgstr ""
 "password)"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
-msgstr "TXT"
+msgstr "TXT format"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_USER_ENROLL"
-msgstr "Install your certificate"
+msgstr "Install the certificate for your private key"
 
 msgid "I18N_OPENXPKI_CERT_EMAIL"
 msgstr "Email address"
@@ -2966,16 +2966,16 @@ msgid "I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE"
 msgstr "Java Keystore"
 
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY"
-msgstr "OpenSSL/SSLeay-Format"
+msgstr "OpenSSL/SSLeay format"
 
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12"
 msgstr "PKCS#12"
 
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER"
-msgstr "PKCS#8 (DER)"
+msgstr "PKCS#8 (DER) format"
 
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM"
-msgstr "PKCS#8 (PEM)"
+msgstr "PKCS#8 (PEM) format"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_LDAPUTILS_"

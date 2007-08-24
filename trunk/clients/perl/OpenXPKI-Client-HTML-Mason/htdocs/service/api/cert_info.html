@@ -25,28 +25,19 @@
 % }
 <table>
   <tr>
-    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME') %>&nbsp;</th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE') %></th>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO') %></td>
-    <td>
-      <& /lib/html/a.mhtml,
-         target => 'cert_full_info.html',
-         label  => i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_FULL_CERT_INFO_LINK'),
-         params => [["identifier", $identifier]] &>
-    </td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %>&nbsp;</td>
     <td><% $subject %></td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_FINGERPRINT') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_FINGERPRINT') %>&nbsp;</td>
     <td><% $fingerprint %></td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %>&nbsp;</td>
     <td><% join " ", split "T", $notbefore %> UTC
 % if ($not_yet_valid) {
 <b>(<% i18nGettext('I18N_OPENXPKI_CERT_NOT_YET_VALID') %>)</b>
@@ -54,7 +45,7 @@
     </td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %>&nbsp;</td>
     <td><% join " ", split "T", $notafter %> UTC
 % if ($expired) {
 <b>(<% i18nGettext('I18N_OPENXPKI_CERT_EXPIRED') %>)</b>
@@ -62,11 +53,21 @@
 % }
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %>&nbsp;</td>
     <td><% $issuer %></td>
   </tr>
+</table>
+
+<p>
+      <& /lib/html/a.mhtml,
+         target => 'cert_full_info.html',
+         label  => i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_FULL_CERT_INFO_LINK'),
+         params => [["identifier", $identifier]] &>
+</p>
+<hr/>
+<table>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA') %>&nbsp;</td>
     <td>
       <& /lib/html/a.mhtml,
          target => '../../binary/get_certificate.html',
@@ -77,7 +78,7 @@
     </td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA') %></td>
+    <td></td>
     <td>
       <& /lib/html/a.mhtml,
          target => '../../binary/get_certificate.html',
@@ -88,18 +89,7 @@
     </td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER') %></td>
-    <td>
-      <& /lib/html/a.mhtml,
-         target => '../../binary/get_certificate.crt',
-         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD'),
-         params => [["identifier",   $identifier],
-                    ["content_type", "IE_USER"],
-                    ["format",       "PEM"]] &>
-    </td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER') %>&nbsp;</td>
     <td>
       <& /lib/html/a.mhtml,
          target => 'cert_enroll_ie.html',
@@ -108,7 +98,21 @@
     </td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PEM') %></td>
+    <td></td>
+    <td>
+      <& /lib/html/a.mhtml,
+         target => '../../binary/get_certificate.crt',
+         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL'),
+         params => [["identifier",   $identifier],
+                    ["content_type", "IE_USER"],
+                    ["format",       "PEM"]] &>
+    </td>
+  </tr>
+</table>
+<hr/>
+<table>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PEM') %>&nbsp;</td>
     <td>
       <& /lib/html/a.mhtml,
          target => '../../binary/get_certificate.html',
@@ -119,7 +123,7 @@
     </td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_TXT') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_TXT') %>&nbsp;</td>
     <td>
       <& /lib/html/a.mhtml,
          target => '../../binary/get_certificate.html',
@@ -129,13 +133,15 @@
                     ["format",       "TXT"]] &>
     </td>
   </tr>
+</table>
 % if ($private_key ne 'private_key_exists_for_cert' &&
 %     $private_key ne '') {
+<p>
+    <% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS') %>
+</p>
+<table>
   <tr>
-    <td colspan=2><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS') %></td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM') %>&nbsp;</td>
     <td>
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
@@ -145,7 +151,7 @@
     </td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER') %>&nbsp;</td>
     <td>
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
@@ -155,7 +161,7 @@
     </td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY') %>&nbsp;</td>
     <td>
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
@@ -165,10 +171,14 @@
     </td>
   </tr>
   <tr>
-    <td colspan=2><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE') %></td>
+</table>
+<p>
+    <% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE') %>
+</p>
+<table>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12') %>&nbsp;</td>
     <td>
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
@@ -178,7 +188,7 @@
     </td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE') %>&nbsp;</td>
     <td>
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
@@ -203,6 +213,11 @@
   </tr>
 % }
 </table>
+
+
+
+
+
 <!--
 <% $private_key %>
 -->
