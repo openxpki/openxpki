@@ -308,6 +308,9 @@ dd {
 				/* Tables should never be used for visual */
 				/* formatting: that is the role of CSS!   */
 
+th,td         { padding-right: 1em;
+                text-align: left; }
+
 table.simple {
    color:           inherit;
    background:      inherit;	/* Don't make tables transparent */
