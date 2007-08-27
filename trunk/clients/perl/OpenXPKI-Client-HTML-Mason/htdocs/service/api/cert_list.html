@@ -25,7 +25,7 @@
   </tr>
 <%perl>
   ($first, $last) = (undef, undef);
-  foreach my $serial (sort keys %list)
+  foreach my $serial (sort({$a <=> $b} keys %list))
   {
     ## fill first and last marker
     $first = $serial if (not defined $first);
