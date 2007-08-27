@@ -93,6 +93,15 @@
 <& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
 
 <%init>
+  ## if $subject is not defined then define it as $subject = '*'
+  ## This will influence nothing if any other field is defined.
+  ## But there will not be an error if noone field is defined,
+  ## instead all certificates will be shown
+
+  if (!(defined $subject and length $subject)) {
+      $subject = '*';
+  }
+
   ## collect params
   my %fields = ();
   $fields{'EMAIL'}       = $email       if (defined $email and length $email);
