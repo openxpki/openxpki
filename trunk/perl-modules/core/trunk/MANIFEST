@@ -449,7 +449,7 @@ t/60_workflow/01_workflow_activity.xml
 t/60_workflow/01_workflow_persister.xml
 t/60_workflow/03_convert.t
 t/60_workflow/04_factory.t
-/t/60_workflow/09_deploy_and_start_testserver.t
+t/60_workflow/09_deploy_and_start_testserver.t
 t/60_workflow/10_certificate_signing_request.t
 t/60_workflow/15_csr_and_certificate_issuance.t
 t/60_workflow/20_certificate_revocation.t
