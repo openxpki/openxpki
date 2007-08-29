@@ -38,7 +38,8 @@ my @test_tasks = (
 		    '2 check pidfile and stop ldap server',
 		    '3 clean directories',
 		    '4 delete slapd.conf',
-		    '5 delete server instance',
+            '5 stop server',
+		    '6 delete server instance',
 		);    
 my $test_number = scalar @test_tasks;
 plan tests =>  $test_number;
@@ -159,7 +160,9 @@ ok(1,"Deleting directories");
 if (-f $ldap_conf_file){ unlink $ldap_conf_file; };
 ok ( !(-f $ldap_conf_file),"Deleting ldap-server config file");
 
-#### 5) DELETE SERVER INSTANCE
+#### 5) STOP SERVER
+ok(system("openxpkictl --config t/60_workflow/test_instance/etc/openxpki/config.xml stop") == 0,
+        'Successfully stopped OpenXPKI instance');
+
+#### 6) DELETE SERVER INSTANCE
 ok(system("rm -r $instancedir") == 0, 'Deleting test_instance');
-
-

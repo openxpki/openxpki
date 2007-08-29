@@ -7,6 +7,8 @@
   <condition name="server_key_generation" class="OpenXPKI::Server::Workflow::Condition::IsServerKeyGeneration">
   </condition>
 
+  <condition name="workflow_creator" class="OpenXPKI::Server::Workflow::Condition::WorkflowCreator"/>
+
  <!-- TODO: in many cases, param name is useless, one can just read the
       condition name instead. This is only useful if activity is different
       from the ACL name -->

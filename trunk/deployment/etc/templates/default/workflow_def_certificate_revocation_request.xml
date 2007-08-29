@@ -25,6 +25,7 @@
     <action name="approve_crr"
 	    resulting_state="APPROVAL">
       <condition name="ACL::approve_crr"/>
+      <condition name="!workflow_creator"/>
     </action>
     <action name="reject_crr"
 	    resulting_state="REJECTED">
@@ -44,6 +45,7 @@
     <action name="approve_crr"
 	    resulting_state="APPROVAL">
       <condition name="ACL::approve_crr"/>
+      <condition name="!workflow_creator"/>
     </action>
     <action name="cancel_crr_approval"
 	    resulting_state="PENDING">

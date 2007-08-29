@@ -69,6 +69,7 @@
     <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 	    resulting_state="APPROVAL">
       <condition name="ACL::approve_csr"/>
+      <condition name="!workflow_creator"/>
     </action>
     <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
 	    resulting_state="FAILURE">
