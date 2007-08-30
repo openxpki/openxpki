@@ -18,7 +18,7 @@ eval
         SEPARATOR => "ab"
     });
 };
-ok($EVAL_ERROR);
+ok($EVAL_ERROR, 'Multiple character separator -> exception');
 eval
 {
     OpenXPKI::Serialization::Simple->new
@@ -26,18 +26,18 @@ eval
         SEPARATOR => "1"
     });
 };
-ok($EVAL_ERROR);
+ok($EVAL_ERROR, 'Numeric separator -> exception');
 
 # test default separator
 my $ref = OpenXPKI::Serialization::Simple->new ();
-ok($ref);
+ok($ref, 'Default seperator');
 
 # using "-" to make testing easier
 $ref = OpenXPKI::Serialization::Simple->new
              ({
                  SEPARATOR => "-"
              });
-ok($ref);
+ok($ref, '- as seperator');
 
     my $hash = {
 	"HEADER" => ["Testheader"],
@@ -57,18 +57,18 @@ ok($ref);
 my $text = $ref->serialize ($hash);
 
 my $expected_serialization = "HASH-328-6-FOOTER-ARRAY-31-0-SCALAR-2-OK-1-SCALAR-5-Abort-6-HEADER-ARRAY-23-0-SCALAR-10-Testheader-4-LIST-ARRAY-203-0-HASH-100-4-Name-ARRAY-20-0-SCALAR-8-John Doe-6-Serial-ARRAY-28-0-SCALAR-2-10-1-SCALAR-2-12-9-Undefined-UNDEF-1-HASH-82-4-Name-ARRAY-20-0-SCALAR-8-Jane Doe-6-Serial-ARRAY-28-0-SCALAR-2-11-1-SCALAR-2-13-9-UNDEFINED-UNDEF-";
-ok($text eq $expected_serialization);
+is($text, $expected_serialization, 'Serialization outputs expected serialization');
 
 my $res = $ref->deserialize($text);
-ok($res);
+ok($res, 'Deserialization produced a result');
 
 is_deeply($res, $hash, "Data structure survived (de)serialization");
 
 ## check that undef really works
-ok (not defined $hash->{'UNDEFINED'});
-ok (not defined $res->{'UNDEFINED'});
-ok (not defined $hash->{'LIST'}->[0]->{'UNDEFINED'});
-ok (not defined $res->{'LIST'}->[0]->{'UNDEFINED'});
+ok (not defined $hash->{'UNDEFINED'}, 'undefined hash');
+ok (not defined $res->{'UNDEFINED'}, 'undefined ref');
+ok (not defined $hash->{'LIST'}->[0]->{'UNDEFINED'}, 'undefined hash/array');
+ok (not defined $res->{'LIST'}->[0]->{'UNDEFINED'}, 'undefined res/array');
 
 ## testing utf-8 encoding
 
@@ -76,20 +76,15 @@ $hash = {
 	 "uid"   => ["Тестиров"],
          "cn"    => ["Иван Петров"]
         };
-$text = $ref->serialize ($hash);
+$text = $ref->serialize ($hash, 'utf8 serialization');
 
 $expected_serialization = "HASH-92-2-cn-ARRAY-34-0-SCALAR-21-Иван Петров-3-uid-ARRAY-29-0-SCALAR-16-Тестиров-";
 ## downgrade from utf8 to byte level
 $expected_serialization = pack ("C*", unpack ("U0C*", $expected_serialization));
-ok($text eq $expected_serialization);
-if ($text ne $expected_serialization)
-{
-    print STDERR "EXPECT: =>$expected_serialization<=\n";
-    print STDERR "GOT:    =>$text<=\n";
-}
+is($text, $expected_serialization, 'UTF8 serialization produces expected result');
 
 $res = $ref->deserialize($text);
-ok($res);
+ok($res, 'UTF8 serialized text deserialized');
 is_deeply($res, $hash, "Data structure survived (de)serialization");
 
 1;
