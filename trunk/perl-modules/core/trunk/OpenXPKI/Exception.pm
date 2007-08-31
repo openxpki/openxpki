@@ -5,7 +5,6 @@
 ## $Revision$
 
 package OpenXPKI::Exception;
-use base qw( Exception::Class );
 
 use strict;
 use warnings;
