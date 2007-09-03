@@ -69,6 +69,7 @@ sub BUILD {
     my $re_approval_msg_type = qr{ \A (CSR|CRR) \z }xms;
     my $re_approval_lang     = qr{ \A (de_DE|en_GB|ru_RU) \z }xms;
     my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
+    my $re_pkcs10            = qr{ \A [A-za-z0-9\+/=_\-\r\n\ ]+ \z}xms;
 
     $method_info_of{$ident} = {
         ### Default API
@@ -392,6 +393,11 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_base64_string,
+                },
+                PKCS10 => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_pkcs10,
                 },
             },
         },

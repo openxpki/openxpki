@@ -241,10 +241,21 @@ sub validate {
         validation_error ($errors->[scalar @{$errors} -1]);
     }
     # save subject alt names in context
-    my $styles = CTX('api')->get_cert_subject_styles({
-        PROFILE   => $profile,
-        CONFIG_ID => $cfg_id,
-    });
+    my $pkcs10 = $context->param('pkcs10');
+    my $styles;
+    if (defined $pkcs10) {
+        $styles = CTX('api')->get_cert_subject_styles({
+            PROFILE   => $profile,
+            CONFIG_ID => $cfg_id,
+            PKCS10    => $pkcs10,
+        });
+    }
+    else {
+        $styles = CTX('api')->get_cert_subject_styles({
+            PROFILE   => $profile,
+            CONFIG_ID => $cfg_id,
+        });
+    }
     ##! 64: 'styles: ' . Dumper $styles
  
     # template evaluation for 'fixed' SANs

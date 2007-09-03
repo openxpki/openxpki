@@ -370,13 +370,14 @@
                   label="CN"
                   description="I18N_OPENXPKI_CN_DESC"
                   type="freetext"
-                  source="CN:([^:]+)"
+                  source="CN:(.+)"
                   width="60"
                   default=""/>
            <input id="O"
                   label="O"
                   description="I18N_OPENXPKI_O_DESC"
                   type="freetext"
+                  source="O:(.+)"
                   min="0"
                   max="1"
                   width="40"/>
@@ -384,7 +385,7 @@
                   label="OU"
                   description="I18N_OPENXPKI_OU_DESC"
                   type="freetext"
-                  source="OU"
+                  source="OU:(.+)"
                   width="40"
                   min="0"
                   max="1000"/> <!-- if min or max is present, result is an arrayref -->
@@ -400,6 +401,7 @@
                   description="I18N_OPENXPKI_C_DESC"
                   type="freetext"
                   width="2"
+                  source="C:(.+)"
                   min="0"
                   max="1"/>
       </template>

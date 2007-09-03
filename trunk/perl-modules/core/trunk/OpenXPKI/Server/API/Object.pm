@@ -36,10 +36,11 @@ sub get_csr_info_hash_from_data {
     my $self  = shift;
     my $args  = shift;
 
-    my $data  = $args->{DATA};
-    my $realm = CTX('session')->get_pki_realm();
-    my $token = CTX('pki_realm')->{$realm}->{crypto}->{default};
-    my $obj   = OpenXPKI::Crypto::CSR->new (DATA => $data, TOKEN => $token);
+    my $data   = $args->{DATA};
+    my $realm  = CTX('session')->get_pki_realm();
+    my $cfg_id = CTX('api')->get_current_config_id();
+    my $token  = CTX('pki_realm_by_cfg')->{$cfg_id}->{$realm}->{crypto}->{default};
+    my $obj    = OpenXPKI::Crypto::CSR->new (DATA => $data, TOKEN => $token);
 
     ##! 1: "finished"
     return $obj->get_info_hash();

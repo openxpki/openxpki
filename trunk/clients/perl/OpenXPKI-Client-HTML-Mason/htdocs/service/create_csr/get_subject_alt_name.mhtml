@@ -156,12 +156,15 @@
 
     # load available subject styles for this profile from server
 
-
+    my $params = {
+        PROFILE => $profile,
+    };
+    if (defined $pkcs10) {
+        $params->{PKCS10} = $pkcs10;
+    }
     my $msg = $context->{client}->send_receive_command_msg(
                    "get_cert_subject_styles",
-                   {
-                        PROFILE => $profile,
-                   }
+                   $params,
     );
     if (defined $msg->{PARAMS} && ref $msg->{PARAMS} eq 'HASH') {
         %styles = %{$msg->{PARAMS}};
@@ -243,6 +246,7 @@
                             'profile'                => $profile,
                             'subject_style'          => $subject_style,
                             'keygen'                 => $keygen,
+                            'pkcs10'                 => $pkcs10,
                             'subject_parts'          => $subject_parts,
                             'subject_alt_name_parts' => $san_parts,
         );

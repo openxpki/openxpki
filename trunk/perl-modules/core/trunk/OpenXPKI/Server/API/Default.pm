@@ -85,7 +85,19 @@ sub get_cert_subject_styles {
     my $arg_ref   = shift;
     my $profile   = $arg_ref->{PROFILE};
     my $cfg_id    = $arg_ref->{CONFIG_ID};
+    my $pkcs10    = $arg_ref->{PKCS10};
     ##! 1: 'start'
+
+    my $csr_info;
+    if (defined $pkcs10) {
+        # if PKCS#10 data is passed, we need to get the info from
+        # the data ...
+        ##! 16: 'pkcs10 defined'
+        $csr_info = CTX('api')->get_csr_info_hash_from_data({
+            DATA => $pkcs10,
+        });
+        ##! 64: 'csr info: ' . Dumper $csr_info
+    }
 
     my $pki_realm = CTX('session')->get_pki_realm();
     my $index         = $self->get_pki_realm_index({
@@ -215,6 +227,43 @@ sub get_cert_subject_styles {
                     CONFIG_ID => $cfg_id,
                 );
             };
+
+            if (defined $pkcs10) {
+                # if a PKCS#10 is passed, we want to try and set the
+                # default value from the data available within the
+                # PKCS#10 file ...
+                my $source;
+                eval {
+                    $source = CTX('xml_config')->get_xpath(
+                        XPATH     => [ @input_path, 'source' ],
+                        COUNTER   => [ @input_ctr , 0        ],
+                        CONFIG_ID => $cfg_id,
+                    );
+                };
+                ##! 16: 'source: ' . $source
+                # if source is defined, use it with $csr_info ...
+                if (defined $source) {
+                    my ($part, $regex) = ($source =~ m{([^:]+) : (.+)}xms);
+                    ##! 16: 'part: ' . $part
+                    ##! 16: 'regex: ' . $regex
+                    my $part_from_csr;
+                    eval {
+                        # try to get data from csr info hash
+                        # currently, we only get the first entry
+                        # for the given part (so we can not deal
+                        # with multiple OUs, for example)
+                        $part_from_csr = $csr_info->{BODY}->{SUBJECT_HASH}->{$part}->[0];
+                    };
+                    ##! 16: 'part from csr: ' . $part_from_csr
+                    if (defined $part_from_csr) {
+                        my ($match) = ($part_from_csr =~ m{$regex}xms);
+                        ##! 16: 'match: ' . $match
+                        # override default value with the result of the
+                        # regex matching
+                        $styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{DEFAULT} = $match;
+                    }
+                }
+            }
             # if type is select, add options array ref
             if ($styles->{$id}->{TEMPLATE}->{INPUT}->[$ii]->{TYPE} eq 'select') {
                 ##! 64: 'type is select'
@@ -481,6 +530,27 @@ sub get_cert_subject_styles {
                     );
                 };
             }
+        }
+        if ($pkcs10) {
+            # add subject alternative names from CSR if present
+            my @pkcs10_sans = ();
+            eval {
+                @pkcs10_sans = split q{, }, $csr_info->{BODY}->{OPENSSL_EXTENSIONS}->{'X509v3 Subject Alternative Name'}->[0];
+            };
+            for (my $ii = $san_count; $ii < ($san_count + scalar @pkcs10_sans); $ii++) {
+                # add fixed SAN entries for all SANs in the PKCS#10
+                my $san = $pkcs10_sans[$ii - $san_count];
+                ##! 16: 'san: ' . $san
+                my ($key, $value) = ($san =~ m{([^:]+) : (.+)}xms);
+                ##! 16: 'key: ' . $key
+                ##! 16: 'value: ' . $value
+                $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{ID} = 'pkcs10' . ($ii - $san_count);
+                $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{TYPE} = 'fixed';
+                $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{KEY}->{VALUE} = $key;
+                $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{VALUE}->{TYPE} = 'fixed';
+                $styles->{$id}->{SUBJECT_ALTERNATIVE_NAMES}->[$ii]->{VALUE}->{TEMPLATE} = $value;
+            }
+            ##! 16: '@pkcs10_sans: ' . Dumper \@pkcs10_sans
         }
     }
     ##! 128: 'styles: ' . Dumper $styles
