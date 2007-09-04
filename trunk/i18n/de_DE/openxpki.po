@@ -1770,13 +1770,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_CN_DESC"
 msgstr "ja"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_COMMENT"
 msgstr "Kommentar"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_COMMENT_DESC"
-msgstr "ja"
+msgstr ""
+"Weitere Informationen für die Bearbeiter des Zertifikatsantrags."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE"
@@ -2826,13 +2827,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_DOWNLOAD_CHAIN"
 msgstr "Herunterladen der kompletten Zertifizierungskette"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_EMAILADDRESS"
-msgstr "E-Mailadresse"
 
-#, fuzzy
+msgid "I18N_OPENXPKI_EMAILADDRESS"
+msgstr "eMail-Adresse"
+
+
 msgid "I18N_OPENXPKI_EMAILADDRESS_DESC"
-msgstr "ja"
+msgstr "Ihre eMail-Adresse, z. B. 'pmueller@bsp.de'."
 
 msgid "I18N_OPENXPKI_FAILED"
 msgstr ""
@@ -2977,9 +2978,9 @@ msgstr "Faxnummer"
 msgid "I18N_OPENXPKI_HTML_FAX_NUMBER_DESCRIPTION"
 msgstr "Dies ist eine Faxnummer."
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
-msgstr "Prozesse anzeigen"
+msgstr "Grafische Workflow-Übersicht generieren"
 
 msgid "I18N_OPENXPKI_HTML_MASON_CERT_INFO_NEW_CRR"
 msgstr "RÃ¼ckrufantrag fÃ¼r dieses Zertifikat stellen"
@@ -3254,13 +3255,15 @@ msgstr "ja"
 msgid "I18N_OPENXPKI_O_DESC"
 msgstr "ja"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_PHONE"
-msgstr "nein"
 
-#, fuzzy
+msgid "I18N_OPENXPKI_PHONE"
+msgstr "Telefon"
+
+
 msgid "I18N_OPENXPKI_PHONE_DESC"
-msgstr "ja"
+msgstr ""
+"Eine Telefonummer, unter der Sie für eventuelle Rückfragen bzgl. des Zertifikats "
+"zu erreichen sind." 
 
 #, fuzzy
 msgid "I18N_OPENXPKI_PORT"
@@ -3276,35 +3279,49 @@ msgstr "Privaten SchlÃ¼ssel und Zertifkat herunterladen"
 msgid "I18N_OPENXPKI_PRIVKEY_DOWNLOAD"
 msgstr "Privaten SchlÃ¼ssel herunterladen"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_PROFILE_ADVANCED_DESC"
-msgstr "TLS-Server"
+msgstr ""
+"Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen muss und Sie eine genaue "
+"Kenntnis der einzelnen Komponenten des eindeutigen Zertifikatsnamens und der lokalen Namenskonventionen "
+"haben, können Sie diese Benennungsart verwenden. Sie erlaubt Ihnen auch die Angabe beliebiger alternativer "
+"Zertifikatsnamen."
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_PROFILE_ADVANCED_STYLE"
-msgstr "TLS-Server"
+msgstr "Erweiterte Benennungsart"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC"
-msgstr "TLS-Server"
+msgstr ""
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, müssen Sie nur den "
+"Hostnamen und den Port des Servers angeben, für den Sie das Zertifikat ausgestellt bekommen möchten. "
+"Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen haben, die die Verwendung der "
+"erweiterten Benennungsart erfordern."
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE"
-msgstr "TLS-Server"
+msgstr "Einfache TLS Benennungsart"
+
 
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
 msgstr "TLS-Server"
 
+
 msgid "I18N_OPENXPKI_PROFILE_USER"
 msgstr "Nutzer"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_DESC"
-msgstr "TLS-Server"
 
-#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_DESC"
+msgstr ""
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, müssen Sie nur "
+"ihren Namen, ihren Benutzernamen und ihre eMail-Adresse angeben. "
+"Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen haben, die die Verwendung der "
+"erweiterten Benennungsart erfordern."
+
+
 msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_STYLE"
-msgstr "TLS-Server"
+msgstr "Einfache Benennungsart"
 
 msgid "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST"
 msgstr ""
@@ -3318,13 +3335,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_READ_FILE_OPEN_FAILED"
 msgstr ""
 
-#, fuzzy
-msgid "I18N_OPENXPKI_REALNAME"
-msgstr "RÃ¼ckwÃ¤rts"
 
-#, fuzzy
+msgid "I18N_OPENXPKI_REALNAME"
+msgstr "Name"
+
+
 msgid "I18N_OPENXPKI_REALNAME_DESC"
-msgstr "uid"
+msgstr ""
+"Ihr Name, z. B. 'Peter Müller'"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SAN_DNS"
@@ -5204,13 +5222,13 @@ msgstr "Antrag im OU-Stil"
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 msgstr ""
 
-#, fuzzy
-msgid "I18N_OPENXPKI_USERNAME"
-msgstr "RÃ¼ckwÃ¤rts"
 
-#, fuzzy
+msgid "I18N_OPENXPKI_USERNAME"
+msgstr "Benutzername"
+
+
 msgid "I18N_OPENXPKI_USERNAME_DESC"
-msgstr "uid"
+msgstr "Ihr Benutzername, z. B. 'pmueller'."
 
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 msgstr "Genehmigen eines Zertifizierungsantrages"
