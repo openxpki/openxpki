@@ -455,6 +455,15 @@ sub BUILD {
         },
 
         ### Workflow API
+        'get_cert_identifier_by_csr_wf' => {
+            class  => 'Workflow',
+            params => {
+                'WORKFLOW_ID' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+            },
+        },
         'get_number_of_workflow_instances' => {
             class  => 'Workflow',
             params => {

@@ -19,6 +19,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
+use OpenXPKI::Serialization::Simple;
 
 my $workflow_table = 'WORKFLOW';
 my $context_table  = 'WORKFLOW_CONTEXT';
@@ -34,6 +35,105 @@ sub START {
 
 ###########################################################################
 # lowlevel workflow functions
+
+sub get_cert_identifier_by_csr_wf {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $wf_id   = $arg_ref->{WORKFLOW_ID};
+
+    my $factory = __get_workflow_factory({
+        WORKFLOW_ID => $wf_id,
+    });
+    if (! defined $factory) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_FACTORY_NOT_DEFINED',
+            params  => {
+                'WORKFLOW_ID' => $wf_id,
+            },
+        );
+    }
+    my $workflow = $factory->fetch_workflow(
+	    'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
+	    $wf_id,
+    );
+    if (! defined $workflow) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_WORKFLOW_COULD_NOT_BE_FETCHED',
+            params  => {
+                'WORKFLOW_ID' => $wf_id,
+            },
+        );
+    }
+    my $wf_children_ser = $workflow->context->param('wf_children_instances');
+    if (! defined $wf_children_ser) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_NO_CHILDREN_INSTANCES_FOUND',
+            params  => {
+                'WORKFLOW_ID' => $wf_id,
+            },
+        );
+    }
+    my $wf_children;
+    eval {
+        $wf_children = OpenXPKI::Serialization::Simple->new()->deserialize($wf_children_ser);
+    };
+    if (! defined $wf_children) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_DESERIALIZING_WF_CHILDREN_CONTEXT_PARAMETER_FAILED',
+            params  => {
+                'WORKFLOW_ID' => $wf_id,
+                'SERIALIZED'  => $wf_children_ser,
+            },
+        );
+    }
+    my $child_type;
+    eval {
+        $child_type = $wf_children->[0]->{TYPE};
+    };
+    my $child_id;
+    eval {
+        $child_id = $wf_children->[0]->{ID};
+    };
+    if (! defined $child_id || ! defined $child_type) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_COULD_NOT_DETERMINE_CHILD_TYPE_AND_ID',
+            params  => {
+                'WORKFLOW_ID' => $wf_id,
+                'CHILDREN'    => $wf_children,
+            },
+        );
+    }
+    $factory = __get_workflow_factory({
+        WORKFLOW_ID => $child_id,
+    });
+    if (! defined $factory) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_CHILD_FACTORY_NOT_DEFINED',
+            params  => {
+                'WORKFLOW_CHILD_ID' => $child_id,
+            },
+        );
+    }
+    my $workflow = $factory->fetch_workflow(
+	    $child_type,
+	    $child_id,
+    );
+    if (! defined $workflow) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_CHILD_WORKFLOW_COULD_NOT_BE_FETCHED',
+            params  => {
+                'WORKFLOW_CHILD_ID'   => $child_id,
+                'WORKFLOW_CHILD_TYPE' => $child_type,
+            },
+        );
+    }
+    my $cert_identifier;
+    eval {
+        $cert_identifier = $workflow->context->param('cert_identifier');
+    };
+    return $cert_identifier;
+}
 
 sub get_config_id {
     ##! 1: 'start'

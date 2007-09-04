@@ -13,6 +13,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Crypto::X509;
 
 use Data::Dumper;
 
@@ -89,8 +90,14 @@ sub execute {
     elsif ($csr_type eq 'pkcs10') {
         $cert_pem = $cert;
     }
+    my $x509 = OpenXPKI::Crypto::X509->new(
+        DATA  => $cert_pem,
+        TOKEN => $token,
+    );
+    my $cert_identifier = $x509->get_identifier();
     ##! 16: 'cert_pem: ' . $cert_pem
-    $context->param(certificate => $cert_pem),
+    $context->param(certificate => $cert_pem);
+    $context->param('cert_identifier' => $cert_identifier);
 }
 
 

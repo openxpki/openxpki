@@ -1,7 +1,10 @@
 <%args>
-    $type          => undef
-    $context_key   => undef
-    $context_value => undef
+    $type             => undef
+    $context_key      => undef
+    $context_value    => undef
+    $notitle          => undef
+    $certificate_link => undef
+    $limit            => undef
 </%args>
 <%init>
     my @search_context;
@@ -17,32 +20,30 @@
     }
 </%init>
 %   my $msg;
-%   if (scalar @search_context > 0 && defined $type && $type ne '') {
-%     $msg = $context->{client}->send_receive_command_msg
+%   if (scalar @search_context > 0) {
+%       my $params = {
+%           'CONTEXT' => \@search_context,
+%       };
+%       if ($type) {
+%           $params->{TYPE} = $type,
+%       }
+%       if ($limit) {
+%           $params->{LIMIT} = $limit,
+%       }
+%       $msg = $context->{client}->send_receive_command_msg
 %               (
 %                   "search_workflow_instances",
-%                    {
-%                         CONTEXT => \@search_context,
-%                         TYPE    => $type,
-%                    },
+%                   $params,
 %               );
 %   }
-%   elsif (scalar @search_context > 0 && (!defined $type || $type eq '')) {
-%     $msg = $context->{client}->send_receive_command_msg
-%               (
-%                   "search_workflow_instances",
-%                    {
-%                         CONTEXT => \@search_context,
-%                    },
-%               );
+%   my $nr_of_results;
+%   if (defined $msg && exists $msg->{PARAMS} && ref $msg->{PARAMS} eq 'ARRAY') {
+%       $nr_of_results = scalar @{ $msg->{PARAMS} };
 %   }
-%   if (defined $msg) { # SEARCH RESULT
+%   if ($nr_of_results > 0) { # SEARCH RESULT
+%     if (! $notitle) {
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_TITLE') %></h1>
-<p>
-<!--
-  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION') %>
--->
-</p>
+%     }
 <table>
   <tr>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE') %></th>
@@ -54,13 +55,21 @@
 %   {
   <tr>
     <td><% i18nGettext($instance->{'WORKFLOW.WORKFLOW_TYPE'}) %></td>
-    <td><a href="show_instance.html?type=<% $instance->{'WORKFLOW.WORKFLOW_TYPE'} %>;id=<% $instance->{'WORKFLOW.WORKFLOW_SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $instance->{'WORKFLOW.WORKFLOW_SERIAL'} %></a></td>
-    <td><% i18nGettext($instance->{'WORKFLOW.WORKFLOW_STATE'}) %></td>
+    <td><a href="<% $context->{menu}->get_root() %>/service/workflow/show_instance.html?type=<% $instance->{'WORKFLOW.WORKFLOW_TYPE'} %>;id=<% $instance->{'WORKFLOW.WORKFLOW_SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $instance->{'WORKFLOW.WORKFLOW_SERIAL'} %></a></td>
+    <td><% i18nGettext($instance->{'WORKFLOW.WORKFLOW_STATE'}) %>
+%     if ($certificate_link && $instance->{'WORKFLOW.WORKFLOW_TYPE'} eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' && ($instance->{'WORKFLOW.WORKFLOW_STATE'} eq 'SUCCESS' || $instance->{'WORKFLOW.WORKFLOW_STATE'} eq 'CHECK_CHILD_FINISHED')) {
+%       # we have a CSR workflow with a potential certificate
+<& '/service/workflow/link_to_cert_by_csr_id.mhtml',
+  id    => $instance->{'WORKFLOW.WORKFLOW_SERIAL'},
+  label => '(' . i18nGettext('I18N_OPENXPKI_HTML_MASON_DOWNLOAD_CERTIFICATE') . ')',
+&>
+%     }
+    </td>
     <td><% $instance->{'WORKFLOW.WORKFLOW_LAST_UPDATE'} %></td>
   </tr>
 %   } # END FOREACH
 % } # END IF
-% else { # SEARCH FORM
+% elsif (! defined $nr_of_results) { # SEARCH FORM
 %        #### TODO: get all possible context keys (for type) from DB
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_TITLE') %></h1>
 <p>
