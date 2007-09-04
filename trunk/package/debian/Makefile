@@ -4,7 +4,6 @@
 PACKAGES=	\
 	core			\
 	perl-client-api		\
-	perl-cli-client		\
 	deployment		\
 	mason-html-client	\
 	i18n
