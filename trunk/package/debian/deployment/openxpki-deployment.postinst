@@ -61,6 +61,9 @@ case "$1" in
         	export email="$RET"
 		db_get openxpki-deployment/passwd
         	export PASSWD="$RET"
+                if [ "x$PASSWD" == "x" ]; then
+                    export PASSWD="1234567890" # yay, a default password
+                fi
 
 		# create key and certificate
 		# this key is Cisco safe (only 2048 bit key length)
