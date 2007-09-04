@@ -1777,7 +1777,7 @@ msgstr "Kommentar"
 
 msgid "I18N_OPENXPKI_COMMENT_DESC"
 msgstr ""
-"Weitere Informationen für die Bearbeiter des Zertifikatsantrags."
+"Weitere Informationen fÃ¼r die Registrierungssachbearbeiter."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE"
@@ -2980,7 +2980,7 @@ msgstr "Dies ist eine Faxnummer."
 
 
 msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
-msgstr "Grafische Workflow-Übersicht generieren"
+msgstr "Grafische Workflow-Ãœbersicht generieren"
 
 msgid "I18N_OPENXPKI_HTML_MASON_CERT_INFO_NEW_CRR"
 msgstr "RÃ¼ckrufantrag fÃ¼r dieses Zertifikat stellen"
@@ -3262,7 +3262,7 @@ msgstr "Telefon"
 
 msgid "I18N_OPENXPKI_PHONE_DESC"
 msgstr ""
-"Eine Telefonummer, unter der Sie für eventuelle Rückfragen bzgl. des Zertifikats "
+"Eine Telefonummer, unter der Sie fÃ¼r eventuelle RÃ¼ckfragen bzgl. des Zertifikats "
 "zu erreichen sind." 
 
 #, fuzzy
@@ -3284,7 +3284,7 @@ msgid "I18N_OPENXPKI_PROFILE_ADVANCED_DESC"
 msgstr ""
 "Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen muss und Sie eine genaue "
 "Kenntnis der einzelnen Komponenten des eindeutigen Zertifikatsnamens und der lokalen Namenskonventionen "
-"haben, können Sie diese Benennungsart verwenden. Sie erlaubt Ihnen auch die Angabe beliebiger alternativer "
+"haben, kÃ¶nnen Sie diese Benennungsart verwenden. Sie erlaubt Ihnen auch die Angabe beliebiger alternativer "
 "Zertifikatsnamen."
 
 
@@ -3294,8 +3294,8 @@ msgstr "Erweiterte Benennungsart"
 
 msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC"
 msgstr ""
-"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, müssen Sie nur den "
-"Hostnamen und den Port des Servers angeben, für den Sie das Zertifikat ausgestellt bekommen möchten. "
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, mÃ¼ssen Sie nur den "
+"Hostnamen und den Port des Servers angeben, fÃ¼r den Sie das Zertifikat ausgestellt bekommen mÃ¶chten. "
 "Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen haben, die die Verwendung der "
 "erweiterten Benennungsart erfordern."
 
@@ -3314,7 +3314,7 @@ msgstr "Nutzer"
 
 msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_DESC"
 msgstr ""
-"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, müssen Sie nur "
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, mÃ¼ssen Sie nur "
 "ihren Namen, ihren Benutzernamen und ihre eMail-Adresse angeben. "
 "Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen haben, die die Verwendung der "
 "erweiterten Benennungsart erfordern."
@@ -3335,14 +3335,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_READ_FILE_OPEN_FAILED"
 msgstr ""
 
-
 msgid "I18N_OPENXPKI_REALNAME"
 msgstr "Name"
 
-
 msgid "I18N_OPENXPKI_REALNAME_DESC"
-msgstr ""
-"Ihr Name, z. B. 'Peter Müller'"
+msgstr "Ihr Name, z.B. 'Peter MÃ¼ller'"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SAN_DNS"
@@ -5222,13 +5219,11 @@ msgstr "Antrag im OU-Stil"
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 msgstr ""
 
-
 msgid "I18N_OPENXPKI_USERNAME"
 msgstr "Benutzername"
 
-
 msgid "I18N_OPENXPKI_USERNAME_DESC"
-msgstr "Ihr Benutzername, z. B. 'pmueller'."
+msgstr "Ihr Benutzername, z. B. 'pmueller'"
 
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 msgstr "Genehmigen eines Zertifizierungsantrages"
