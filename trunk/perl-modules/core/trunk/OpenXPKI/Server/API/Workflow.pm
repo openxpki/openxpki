@@ -115,7 +115,7 @@ sub get_cert_identifier_by_csr_wf {
             },
         );
     }
-    my $workflow = $factory->fetch_workflow(
+    $workflow = $factory->fetch_workflow(
 	    $child_type,
 	    $child_id,
     );
