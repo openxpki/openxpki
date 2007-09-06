@@ -1,0 +1,20 @@
+Morphix is a live CD builder based on Knoppix and Debian.
+
+Here, you can find the input files to build the OpenXPKI Live CD.
+To build, you'll first need to install the morphing-tools:
+ * Add "deb http://www.morphix.org/debian ./" to your /etc/apt/source.list
+ * apt-get update
+ * apt-get install morphing-tools 
+
+Then, run ./build.sh which will create a file named openxpki_live.iso
+after quite a while.
+
+The OpenXPKI Live CD is currently in beta. It contains a fully deployed
+OpenXPKI using MySQL as the database backend and a fully configured
+mod_perl-based web interface.
+For now, it serves as a quick demonstration of OpenXPKI's features.
+In the future, it may also serve as a quick way to install OpenXPKI
+and use it (for example as an offline CA together with a USB storage
+device)
+
+More information about Morphix can be found at http://www.morphix.org
