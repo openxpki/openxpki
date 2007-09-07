@@ -33,10 +33,10 @@ my $msg = $client->send_receive_command_msg(
     {
         WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
         PARAMS   => {
-            'cert_info' => "HASH\n0",
+            'cert_info' => "HASH\n0\n",
             'cert_profile' => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
             'cert_role' => 'Web Server',
-            'cert_subject_alt_name_parts' => "HASH\n0",
+            'cert_subject_alt_name_parts' => "HASH\n0\n",
             'cert_subject_parts' => "HASH\n94\n21\ncert_subject_hostname\nSCALAR\n27\nfully.qualified.example.com\n17\ncert_subject_port\nSCALAR\n0\n\n",
             'cert_subject_style' => '00_tls_basic_style',
             'csr_type' => 'spkac',
