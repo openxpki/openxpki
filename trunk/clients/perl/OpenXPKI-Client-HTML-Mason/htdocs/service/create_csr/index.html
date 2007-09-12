@@ -21,7 +21,7 @@
 <%init>
     $m->comp('/lib/debug.mhtml',
         'level' => 1,
-        'msg' => 'pkcs10: ' . $pkcs10,
+        'msg' => 'pkcs10: ' . defined $pkcs10 ? $pkcs10 : 'undef',
     );
     #use OpenXPKI::Debug 'service/create_csr/index.html';
     # why doesn't this work?

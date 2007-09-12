@@ -1,6 +1,6 @@
 <%args>
     $nested      => 0,
-    $first_level => undef,
+    $first_level => 0,
     $last_level  => undef,
     $mode        => "DEFAULT",
     $seperator   => "&nbsp;|" ,
