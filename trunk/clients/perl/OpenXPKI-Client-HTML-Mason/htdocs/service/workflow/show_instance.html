@@ -63,7 +63,7 @@
 %   # FIXME - find out why this is actually happening so that we
 %   # can eliminate the source
 %   $value = encode('UTF-8', $value);
-%   if ($value =~ /^(ARRAY|HASH|-----BEGIN)/)
+%   if ($value =~ /^(ARRAY|HASH)/)
 %   {
 %      ## serialized stuff
 %      my $ser = OpenXPKI::Serialization::Simple->new();
@@ -139,7 +139,10 @@
 %          $value = substr ($value, 0, $i*64)."\n".substr($value,$i*64);
 %      }
        <pre><% $value %></pre>
-%   } else {
+%   } elsif ($value =~ m{ \A -----BEGIN }xms) { # PKCS 10 or key
+       <pre><% $value %></pre>
+%   }
+%   else {
        <% i18nGettext($value) %>
 %   }
     </td>
