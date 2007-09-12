@@ -71,11 +71,8 @@ $mech->field('subject_style', '00_tls_basic_style');
 $mech->field('role', 'Web Server');
 $mech->click('__submit');
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_TITLE/, 'Subject');
-TODO: {
-    local $TODO = 'Subject from PKCS#10 still needs to be taken into account - #1746990';
-    like($mech->response->content, qr/pkcs10\.example\.com/, 'Subject created from PKCS#10');
-    like($mech->response->content, qr/4711/, 'Port created from PKCS#10');
-}
+like($mech->response->content, qr/pkcs10\.example\.com/, 'Subject created from PKCS#10');
+like($mech->response->content, qr/4711/, 'Port created from PKCS#10');
 
 open my $PKCS10, '<', 't/20_webserver/csr.pem';
 my $pkcs10 = do { # slurp
