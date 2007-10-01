@@ -6,7 +6,8 @@
     $url            => undef
     $maxPages       => 8
 </%args>
-% foreach my $page ($pageInfo->pages_in_spread()) {
+% if (scalar @{ $pageInfo->pages_in_spread_raw() } > 1) {
+%   foreach my $page ($pageInfo->pages_in_spread()) {
 %    if (! defined $page) {
 ...
 %    }
@@ -29,6 +30,7 @@
 %       }
 <a href="<% $link_url %>"><% $page %> </a>
 %    }
+%   }
 % }
 % return $pageInfo;
 <%once>
