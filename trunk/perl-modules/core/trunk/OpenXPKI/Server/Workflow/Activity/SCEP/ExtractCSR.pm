@@ -31,7 +31,7 @@ sub execute {
     my $tm = CTX('crypto_layer');
 
     my $pkcs7 = $context->param('pkcs7_content');
-    $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7 . "-----END PKCS7-----\n";
+    $pkcs7 = "-----BEGIN PKCS7-----\n" . chomp($pkcs7) . "-----END PKCS7-----\n";
     ##! 32: 'pkcs7: ' . $pkcs7
 
     my $scep_token = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{scep}->{id}->{$server}->{crypto}; 
