@@ -4,7 +4,9 @@
     $context_value    => undef
     $notitle          => undef
     $certificate_link => undef
-    $limit            => undef
+    $limit            => 20
+    $start            => 1
+    $page             => undef
 </%args>
 <%init>
     my @search_context;
@@ -20,6 +22,7 @@
     }
 </%init>
 %   my $msg;
+%   my $nr_of_results;
 %   if (scalar @search_context > 0) {
 %       my $params = {
 %           'CONTEXT' => \@search_context,
@@ -27,18 +30,29 @@
 %       if ($type) {
 %           $params->{TYPE} = $type,
 %       }
-%       if ($limit) {
-%           $params->{LIMIT} = $limit,
+%       $nr_of_results = $context->{client}->send_receive_command_msg(
+%           'search_workflow_instances_count',
+%           $params,
+%       )->{PARAMS};
+%       $params->{LIMIT} = $limit,
+%       my $page_info = $m->comp('/lib/paging.mhtml',
+%           totalEntries   => $nr_of_results,
+%           entriesPerPage => $limit,
+%           page           => $page,
+%           start          => $start,
+%           url            => 'search_instances.html',
+%       );
+%       if (defined $page_info) {
+%           $params->{START} = $page_info->first - 1;
+%       }
+%       if ($params->{START} == -1) {
+%           $params->{START} = 1;
 %       }
 %       $msg = $context->{client}->send_receive_command_msg
 %               (
 %                   "search_workflow_instances",
 %                   $params,
 %               );
-%   }
-%   my $nr_of_results;
-%   if (defined $msg && exists $msg->{PARAMS} && ref $msg->{PARAMS} eq 'ARRAY') {
-%       $nr_of_results = scalar @{ $msg->{PARAMS} };
 %   }
 %   if ($nr_of_results > 0) { # SEARCH RESULT
 %     if (! $notitle) {

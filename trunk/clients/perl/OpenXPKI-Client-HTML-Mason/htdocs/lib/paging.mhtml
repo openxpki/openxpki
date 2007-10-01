@@ -14,7 +14,20 @@
 <b><% $page %></b>
 %    }
 %    else {
-<a href="<% $url %>?page=<% $page %>;limit=<% $entriesPerPage %>;<% $context->{menu}->get_link_params() %>"><% $page %> </a>
+%       my $link_url = $url . '?page=' . $page . ';limit=' . $entriesPerPage;
+%     ARGS:
+%       foreach my $key (keys %{ $m->request_args() }) {
+%           next ARGS if ($key eq 'page' || $key eq 'limit');
+%           if (ref $m->request_args()->{$key} eq 'ARRAY') {
+%               foreach my $entry (@{ $m->request_args()->{$key} }) {
+%                   $link_url .= ';' . $key . '=' . $entry;
+%               }
+%           }
+%           else {
+%               $link_url .= ';' . $key . '=' . $m->request_args()->{$key};
+%           }
+%       }
+<a href="<% $link_url %>"><% $page %> </a>
 %    }
 % }
 % return $pageInfo;
@@ -23,8 +36,8 @@
 </%once>
 <%init>
     my $params = {
-        totalEntries   => $totalEntries,
-        entriesPerPage => $entriesPerPage,
+        totalEntries   => defined $totalEntries ? $totalEntries : 0,
+        entriesPerPage => defined $entriesPerPage ? $entriesPerPage : 20,
         maxPages       => $maxPages,
     };
     if (! defined $page) {
