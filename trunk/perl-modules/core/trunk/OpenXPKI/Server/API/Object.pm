@@ -164,12 +164,25 @@ sub get_crl
     return $fu->read_file($filename);
 }
 
+sub search_cert_count {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $result = $self->search_cert($arg_ref);
+
+    if (defined $result && ref $result eq 'ARRAY') {
+        ##! 1: 'array result with ' . scalar @{$result} . ' elements'
+        return scalar @{$result};
+    }
+    return 0;
+}
+
 sub search_cert
 {
     ##! 1: "start"
     my $self = shift;
     my $args = shift;
-    my @list = ();
 
     ##! 2: "fix arguments"
     $args->{EMAIL}   =~ s/\*/%/g;
@@ -179,28 +192,41 @@ sub search_cert
     ##! 2: "initialize arguments"
     my %params = (TABLE => 'CERTIFICATE');
        $params{SERIAL}       = $args->{CERT_SERIAL} if ($args->{CERT_SERIAL});
-       $params{LIMIT}        = $args->{LIMIT}       if ($args->{LIMIT});
-       $params{TO}           = $args->{LAST}        if ($args->{LAST});
-       $params{REVERSE}      = 1                    if ($args->{LAST});
-       $params{FROM}         = $args->{FIRST}       if ($args->{FIRST});
-       $params{DYNAMIC}->{IDENTIFIER} = $args->{IDENTIFIER} if ($args->{IDENTIFIER});
-       $params{DYNAMIC}->{CSR_SERIAL} = $args->{CSR_SERIAL} if ($args->{CSR_SERIAL});
-       $params{DYNAMIC}->{EMAIL}      = $args->{EMAIL}      if ($args->{EMAIL});
-       $params{DYNAMIC}->{SUBJECT}    = $args->{SUBJECT}    if ($args->{SUBJECT});
-       $params{DYNAMIC}->{ISSUER}     = $args->{ISSUER}     if ($args->{ISSUER});
+        if (defined $args->{LIMIT} && ! defined $args->{START}) {
+            $params{'LIMIT'} = $args->{LIMIT};
+        }
+        elsif (defined $args->{LIMIT} && defined $args->{START}) {
+            $params{'LIMIT'} = {
+                AMOUNT => $args->{LIMIT},
+                START  => $args->{START},
+            };
+        }
+        $params{DYNAMIC}->{IDENTIFIER} = $args->{IDENTIFIER} if ($args->{IDENTIFIER});
+        $params{DYNAMIC}->{CSR_SERIAL} = $args->{CSR_SERIAL} if ($args->{CSR_SERIAL});
+        $params{DYNAMIC}->{EMAIL}      = $args->{EMAIL}      if ($args->{EMAIL});
+        $params{DYNAMIC}->{SUBJECT}    = $args->{SUBJECT}    if ($args->{SUBJECT});
+        $params{DYNAMIC}->{ISSUER}     = $args->{ISSUER}     if ($args->{ISSUER});
+        # only search in current realm
+        $params{DYNAMIC}->{PKI_REALM}  = CTX('session')->get_pki_realm();
+        $params{REVERSE} = 1;
 
-    ##! 2: "load hashes and serialize them"
-    my $result = CTX('dbi_backend')->select (%params);
-    foreach my $item (@{$result})
+    my $result = CTX('dbi_backend')->select(%params);
+    if (ref $result ne 'ARRAY') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY',
+            params  => {
+                'TYPE' => ref $result,
+            },
+        );
+    }
+    foreach my $item (@{ $result })
     {
         ## delete data to minimize transport costs
         delete $item->{DATA};
-        push @list, \%{$item};
     }
-    @list = reverse @list if ($args->{LAST});
 
     ##! 1: "finished"
-    return \@list;
+    return $result;
 }
 
 sub private_key_exists_for_cert {

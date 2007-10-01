@@ -287,6 +287,41 @@ sub BUILD {
                 },
             },
         },
+        'search_cert_count' => {
+            class  => 'Object',
+            params => {
+                IDENTIFIER => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+                EMAIL => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_sql_string,
+                },
+                SUBJECT => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_sql_string,
+                },
+                ISSUER => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_sql_string,
+                },
+                CSR_SERIAL => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+                CERT_SERIAL => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+            },
+        },
         'search_cert' => {
             class  => 'Object',
             params => {
@@ -320,17 +355,12 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_integer_string,
                 },
-                FIRST => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                LAST => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
                 LIMIT => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+                START => {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_integer_string,

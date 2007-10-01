@@ -4,9 +4,10 @@
   $issuer      => undef
   $cert_serial => undef
   $csr_serial  => undef
-  $last        => undef
-  $first       => undef
-  $revocation  => 0
+  $limit       => 10
+  $start       => 1
+  $page        => undef
+  $revocation  => undef
 </%args>
 <h1>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE') %>
@@ -23,71 +24,45 @@
     <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></th>
   </tr>
-<%perl>
-  ($first, $last) = (undef, undef);
-  foreach my $serial (sort({$a <=> $b} keys %list))
-  {
-    ## fill first and last marker
-    $first = $serial if (not defined $first);
-    $last  = $serial;
+% foreach my $cert (@results) {
+%   my $notbefore = OpenXPKI::DateTime::convert_date({
+%       DATE => DateTime->from_epoch(epoch => $cert->{NOTBEFORE}),
+%   });
+%   $notbefore =~ s/T/ /;
+%   $notbefore .= ' UTC';
 
-    ## create table columns
-    print "  <tr>\n";
-    print "    <td>\n";
-</%perl>
-        <& /lib/html/a.mhtml,
+%   my $notafter = OpenXPKI::DateTime::convert_date({
+%       DATE => DateTime->from_epoch(epoch => $cert->{NOTAFTER}),
+%   });
+%   $notafter =~ s/T/ /;
+%   $notafter .= ' UTC';
+<tr>
+  <td>
+     <& /lib/html/a.mhtml,
            'target' => "cert_info.html",
            'params' => [
-                ["identifier", $list{$serial}->{IDENTIFIER}],
+                ["identifier", $cert->{IDENTIFIER}],
                 ['revocation', $revocation],
             ],
-           'label'  => $serial &>
-<%perl>
-    print "    </td>\n";
-    print "    <td>\n";
-    print "      ".$list{$serial}->{SUBJECT}."\n";
-    print "    </td>\n";
-    print "    <td>\n";
-    print "      ".$list{$serial}->{EMAIL}."\n";
-    print "    </td>\n";
-    print "    <td>\n";
-    print "      ".join (" ", split "T", $list{$serial}->{NOTBEFORE})." UTC\n";
-    print "    </td>\n";
-    print "    <td>\n";
-    print "      ".join (" ", split "T", $list{$serial}->{NOTAFTER})." UTC\n";
-    print "    </td>\n";
-    print "    <td>\n";
-    print "      ".$list{$serial}->{ISSUER}."\n";
-    print "    </td>\n";
-  }
-</%perl>
-</table>
-
-<table>
-  <tr>
-    <td>
-      <& /lib/html/a.mhtml,
-         'target' => "cert_list.html",
-         'params' => [["email"       => $email],
-                      ["subject"     => $subject],
-                      ["issuer"      => $issuer],
-                      ["cert_serial" => $cert_serial],
-                      ["csr_serial"  => $csr_serial],
-                      ["last"        => $first]],
-         'label'  => '<== '.i18nGettext('I18N_OPENXPKI_LIST_PREV') &>
-    </td>
-    <td>
-      <& /lib/html/a.mhtml,
-         'target' => "cert_list.html",
-         'params' => [["email"       => $email],
-                      ["subject"     => $subject],
-                      ["issuer"      => $issuer],
-                      ["cert_serial" => $cert_serial],
-                      ["csr_serial"  => $csr_serial],
-                      ["first"        => $last]],
-         'label'  => i18nGettext('I18N_OPENXPKI_LIST_NEXT').' ==>' &>
-    </td>
-  </tr>
+            'label'  => $cert->{CERTIFICATE_SERIAL} &>
+  </td>
+  <td>
+      <% $cert->{SUBJECT} %>
+  </td>
+  <td>
+      <% $cert->{EMAIL} %>
+  </td>
+  <td>
+      <% $notbefore %>
+  </td>
+  <td>
+      <% $notafter %>
+  </td>
+  <td>
+      <% $cert->{'ISSUER_DN'} %>
+  </td>
+</tr>
+% }
 </table>
 
 <& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
@@ -109,9 +84,24 @@
   $fields{'ISSUER'}      = $issuer      if (defined $issuer and length $issuer);
   $fields{'CERT_SERIAL'} = $cert_serial if (defined $cert_serial and length $cert_serial);
   $fields{'CSR_SERIAL'}  = $csr_serial  if (defined $csr_serial and length $csr_serial);
-  $fields{'LAST'}        = $last        if (defined $last and length $last);
-  $fields{'FIRST'}       = $first       if (defined $first and length $first);
-  $fields{'LIMIT'}       = 50;
+
+  my $result_count = $context->{client}->send_receive_command_msg(
+      'search_cert_count', \%fields
+  )->{PARAMS};
+  my $page_info = $m->comp('/lib/paging.mhtml',
+    totalEntries   => $result_count,
+    entriesPerPage => $limit,
+    page           => $page,
+    start          => $start,
+    url            => 'cert_list.html',
+  );
+  if (defined $page_info) {
+    $fields{'START'}       = $page_info->first - 1;
+  }
+  if ($fields{'START'} == -1) {
+    $fields{'START'} = 1;
+  }
+  $fields{'LIMIT'}       = $limit;
 
   ## execute query
   my $msg  = $context->{client}->send_receive_command_msg (
@@ -120,24 +110,14 @@
   ## error or result ?
   my %list = ();
   my @errors = ();
+  my @results = ();
   if (not exists $msg->{PARAMS} or ref $msg->{PARAMS} ne 'ARRAY')
   {
     push @errors, @{$msg->{LIST}};
   }
   else
   {
-    foreach my $cert (@{$msg->{PARAMS}})
-    {
-      $list{$cert->{CERTIFICATE_SERIAL}}->{IDENTIFIER} = $cert->{IDENTIFIER};
-      $list{$cert->{CERTIFICATE_SERIAL}}->{SUBJECT}    = $cert->{SUBJECT};
-      $list{$cert->{CERTIFICATE_SERIAL}}->{EMAIL}      = $cert->{EMAIL};
-      $list{$cert->{CERTIFICATE_SERIAL}}->{ISSUER}     = $cert->{ISSUER_DN};
-
-      my $obj = DateTime->from_epoch(epoch => $cert->{NOTBEFORE});
-      $list{$cert->{CERTIFICATE_SERIAL}}->{NOTBEFORE}  = OpenXPKI::DateTime::convert_date({DATE => $obj});
-      $obj = DateTime->from_epoch(epoch => $cert->{NOTAFTER});
-      $list{$cert->{CERTIFICATE_SERIAL}}->{NOTAFTER}   = OpenXPKI::DateTime::convert_date({DATE => $obj});
-    }
+    @results = @{ $msg->{PARAMS} };
     if (scalar @{$msg->{PARAMS}} == 1) { # we have only one result, show
                                          # it directly
         $m->comp('cert_info.html',
@@ -149,8 +129,6 @@
   }
 </%init>
 <%once>
-  ## FIXME: This is a damaged wrapper.
-  ## FIXME: The wrapper should encapsulate the complete module.
   use OpenXPKI::DateTime;
   use DateTime;
 </%once>
