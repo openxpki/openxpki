@@ -2,7 +2,7 @@
 # Date created:				29 Sep 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki/Makefile,v 1.11 2007/03/28 17:13:07 miwi Exp $
+# $FreeBSD: ports/security/p5-openxpki/Makefile,v 1.13 2007/09/08 01:03:59 linimon Exp $
 #
 
 PORTNAME=	openxpki
@@ -266,11 +266,10 @@ MAN3=	OpenXPKI.3 \
 	OpenXPKI::XML::Cache.3 \
 	OpenXPKI::XML::Config.3 \
 	OpenXPKI::i18n.3
-USE_PERL5=	yes
 USE_GMAKE=	yes
 USE_OPENSSL=	yes
 WITH_OPENSSL_BETA=	yes
-PERL_CONFIGURE=	yes
+PERL_CONFIGURE=	5.8.6+
 
 OPTIONS=	DEVELOPER	"Install development tools for OpenXPKI?" off
 # These tools include docbook, Java and Xorg libraries.
@@ -291,9 +290,5 @@ RUN_DEPENDS+=	fop:${PORTSDIR}/textproc/fop \
 
 post-install:
 	${SH} ${PKGINSTALL} ${PORTNAME} POST-INSTALL
-
-.if ${PERL_LEVEL} < 500806
-IGNORE=	requires newer Perl, but you can install required old additional perl modules from CPAN instead
-.endif
 
 .include <bsd.port.post.mk>

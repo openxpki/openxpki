@@ -2,7 +2,7 @@
 # Date created:				03 Oct 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki-client-scep/Makefile,v 1.2 2007/02/03 09:49:02 miwi Exp $
+# $FreeBSD: ports/security/p5-openxpki-client-scep/Makefile,v 1.4 2007/09/08 01:04:00 linimon Exp $
 #
 
 PORTNAME=	openxpki-client-scep
@@ -23,7 +23,6 @@ BUILD_DEPENDS=	\
 RUN_DEPENDS=	${BUILD_DEPENDS}
 
 MAN3=	OpenXPKI::Client::SCEP.3
-USE_PERL5=	yes
 USE_GMAKE=	yes
 PERL_CONFIGURE=	yes
 

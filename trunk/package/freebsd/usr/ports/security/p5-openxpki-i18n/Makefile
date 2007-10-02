@@ -2,7 +2,7 @@
 # Date created:				03 Oct 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki-i18n/Makefile,v 1.3 2007/04/02 07:14:10 clsung Exp $
+# $FreeBSD: ports/security/p5-openxpki-i18n/Makefile,v 1.4 2007/06/07 05:37:24 miwi Exp $
 #
 
 PORTNAME=	openxpki-i18n

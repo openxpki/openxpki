@@ -2,7 +2,7 @@
 # Date created:				03 Oct 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki-client-html-mason/Makefile,v 1.4 2007/03/28 17:16:20 miwi Exp $
+# $FreeBSD: ports/security/p5-openxpki-client-html-mason/Makefile,v 1.6 2007/09/08 01:03:59 linimon Exp $
 #
 
 PORTNAME=	openxpki-client-html-mason
@@ -28,7 +28,6 @@ MAN3=	OpenXPKI::Client::HTML::Mason.3 \
 	OpenXPKI::Client::HTML::Mason::Config.3 \
 	OpenXPKI::Client::HTML::Mason::Javascript.3 \
 	OpenXPKI::Client::HTML::Mason::Menu.3
-USE_PERL5=	yes
 USE_GMAKE=	yes
 PERL_CONFIGURE=	yes
 
