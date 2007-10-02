@@ -137,8 +137,14 @@ msgstr "Usable"
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Download certificate"
 
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_DER"
+msgstr "DER format"
+
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL"
 msgstr "Install (use button Open) or download the certificate of another user"
+
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL_MOZILLA"
+msgstr "Install the certificate of another user"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
 msgstr "Install the certificate for your private key"
@@ -147,7 +153,7 @@ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
 msgstr "Links for Microsoft Internet Explorer"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA"
-msgstr "Links for Mozilla, Firefox, Opera"
+msgstr "Links for Mozilla, Firefox"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
 msgstr "PEM (CRT) format"
@@ -1152,8 +1158,8 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_DESCRIPTION"
 msgstr ""
-"You are logged in to the web interface of the trustcenter. "
-"Below you will find an overview over the last workflows you created (if any)."
+"You are logged in to the web interface of the trustcenter. Below you will "
+"find an overview over the last workflows you created (if any)."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE"
 msgstr "Trustcenter Web Interface"
@@ -3029,12 +3035,6 @@ msgstr "Logout failed"
 msgid "I18N_OPENXPKI_LDAP_UTILS_GET_LDAP_NODE_ATTRIBUTES_SEARCH_MUST"
 msgstr "LDAP attributes determined"
 
-msgid "I18N_OPENXPKI_LIST_NEXT"
-msgstr "Next"
-
-msgid "I18N_OPENXPKI_LIST_PREV"
-msgstr "Prev"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_MODULE_FUNCTION_SPECIFIC_STUFF"
 msgstr "Persist CSR"
@@ -3286,6 +3286,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERIALIZATION_SIMPLE_SEPARATOR_TOO_LONG"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERIALIZATION_SIMPLE_WRITE_DATA_TYPE_NOT_SUPPORTED"
+msgstr "reset"
+
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_ACTIVITY_UNDEFINED"
 msgstr ""
 
@@ -3423,6 +3427,12 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOT_FOUND_IN_DB"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
@@ -5935,6 +5945,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#~ msgid "I18N_OPENXPKI_LIST_NEXT"
+#~ msgstr "Next"
+
+#~ msgid "I18N_OPENXPKI_LIST_PREV"
+#~ msgstr "Prev"
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION"
 #~ msgstr "Search results:"

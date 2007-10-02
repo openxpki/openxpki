@@ -81,7 +81,7 @@
     <td>
       <& /lib/html/a.mhtml,
          target => '../../binary/get_certificate.html',
-         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL'),
+         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL_MOZILLA'),
          params => [["identifier",   $identifier],
                     ["content_type", "X509_EMAIL_CERT"],
                     ["format",       "PEM"]] &>
@@ -118,6 +118,17 @@
          params => [["identifier",   $identifier],
                     ["content_type", "PLAIN"],
                     ["format",       "PEM"]] &>
+    </td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_DER') %></td>
+    <td>
+      <& /lib/html/a.mhtml,
+         target => '../../binary/get_certificate.crt',
+         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD'),
+         params => [["identifier",   $identifier],
+                    ["content_type", "DOWNLOAD"],
+                    ["format",       "DER"]] &>
     </td>
   </tr>
   <tr>

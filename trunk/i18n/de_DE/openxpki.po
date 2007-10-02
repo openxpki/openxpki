@@ -137,7 +137,13 @@ msgstr "Aktiv"
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Zertifkat herunterladen"
 
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_DER"
+msgstr "DER-Format"
+
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL"
+msgstr "Installation eines E-Mail-Zertifikates eines anderen Nutzers"
+
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL_MOZILLA"
 msgstr "Installation eines E-Mail-Zertifikates eines anderen Nutzers"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
@@ -147,7 +153,7 @@ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
 msgstr "Microsoft Internet Explorer"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA"
-msgstr "Firefox, Mozilla, Opera"
+msgstr "Firefox, Mozilla"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
 msgstr "PEM-, CRT-Format"
@@ -1333,9 +1339,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_DESCRIPTION"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. "
-"Untenstehend finden Sie eine Übersicht über die zuletzt von Ihnen "
-"erstellten Workflows (falls vorhanden)."
+"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Untenstehend "
+"finden Sie eine Übersicht über die zuletzt von Ihnen erstellten Workflows "
+"(falls vorhanden)."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE"
 msgstr "Web-Schnittstelle des Trustcenters"
@@ -3303,12 +3309,6 @@ msgstr "Fehler beim Abmelden"
 msgid "I18N_OPENXPKI_LDAP_UTILS_GET_LDAP_NODE_ATTRIBUTES_SEARCH_MUST"
 msgstr "LDAP attributes determined"
 
-msgid "I18N_OPENXPKI_LIST_NEXT"
-msgstr "Rückwärts"
-
-msgid "I18N_OPENXPKI_LIST_PREV"
-msgstr "Vorwärts"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_MODULE_FUNCTION_SPECIFIC_STUFF"
 msgstr "Speichern des Zertifzierungsantrages"
@@ -3581,6 +3581,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERIALIZATION_SIMPLE_SEPARATOR_TOO_LONG"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERIALIZATION_SIMPLE_WRITE_DATA_TYPE_NOT_SUPPORTED"
+msgstr "Zurücksetzen"
+
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_ACTIVITY_UNDEFINED"
 msgstr ""
 
@@ -3695,6 +3699,10 @@ msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOT_FOUND_IN_DB"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY"
 msgstr "PKI Realm"
 
 #, fuzzy
@@ -5968,6 +5976,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "ja"
+
+#~ msgid "I18N_OPENXPKI_LIST_NEXT"
+#~ msgstr "Rückwärts"
+
+#~ msgid "I18N_OPENXPKI_LIST_PREV"
+#~ msgstr "Vorwärts"
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION"
 #~ msgstr "Suchergebnisse:"
