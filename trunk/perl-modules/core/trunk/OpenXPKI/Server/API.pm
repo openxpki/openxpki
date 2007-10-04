@@ -549,25 +549,28 @@ sub BUILD {
             class  => 'Workflow',
             params => {
                 WORKFLOW => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
                 },
-	        ID => {
-		    type  => SCALAR,
-		    regex => $re_integer_string,
+                ID => {
+                        type  => SCALAR,
+                        regex => $re_integer_string,
                 },
-	    },
+	        },
         },
         'execute_workflow_activity' => {
             class  => 'Workflow',
             params => {
                 WORKFLOW => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
                 },
-	        ID => {
-		    type  => SCALAR,
-		    regex => $re_integer_string,
+                ID => {
+                    type     => SCALAR,
+                    regex    => $re_integer_string,
+                    optional => 1,
                 },
                 ACTIVITY => {
                     type  => SCALAR,

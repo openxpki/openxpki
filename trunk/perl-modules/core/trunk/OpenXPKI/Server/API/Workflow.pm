@@ -322,6 +322,10 @@ sub get_workflow_info {
     my $wf_title = $args->{WORKFLOW};
     my $wf_id    = $args->{ID};
 
+    if (! defined $wf_title) {
+        $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
+    }
+
     # get the factory corresponding to the workflow
     my $factory = __get_workflow_factory({
         WORKFLOW_ID => $wf_id,
@@ -345,6 +349,9 @@ sub execute_workflow_activity {
     my $wf_activity = $args->{ACTIVITY};
     my $wf_params   = $args->{PARAMS};
 
+    if (! defined $wf_title) {
+        $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
+    }
     # commit to get a current snapshot of the database in the
     # highest isolation level.
     # Without this, we will only see old data, especially if
