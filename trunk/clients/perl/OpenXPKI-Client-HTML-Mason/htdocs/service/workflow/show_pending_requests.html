@@ -4,7 +4,6 @@
     $page   => undef
     $show_approval_buttons => undef
     $creator               => '%'
-    $wf_type               => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST'
 </%args>
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE') %></h1>
 <p>
@@ -19,7 +18,6 @@
   <tr>
 % if ($show_approval_buttons) {
     <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/bulk_approval.html" &>
-    <input type="hidden" name="wf_type" value="<% $wf_type %>">
     <script language="JavaScript" type="text/javascript">
 <!--
 function ToggleAll() {
@@ -50,7 +48,7 @@ function ToggleAll() {
 %   if ($show_approval_buttons) {
     <td><input type="checkbox" name="approvals"></td>
 %   }
-    <td><input type="hidden" name="serials" value="<% $res->{'SERIAL'} %>"><a href="show_csr_brief.html?type=<% $wf_type %>;id=<% $res->{'SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $res->{'SERIAL'} %></a></td>
+    <td><input type="hidden" name="serials" value="<% $res->{'SERIAL'} %>"><a href="show_csr_brief.html?id=<% $res->{'SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $res->{'SERIAL'} %></a></td>
     <td>
 % foreach my $ticket (@{ $res->{'TICKETS'} }) {
 <small><a href="<% $ticket->{URL} %>"><% $ticket->{ID} %></a></small><br>
@@ -102,7 +100,7 @@ my @results;
 my $nr_msg = $context->{client}->send_receive_command_msg(
               "search_workflow_instances_count",
               {
-                     "TYPE"    => $wf_type,
+                     "TYPE"    => [ 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST' ],
                      'CONTEXT' => $search_context,
                      'STATE'   => [ 'PENDING', 'APPROVAL' ],
               },
@@ -128,7 +126,7 @@ if (defined $pageInfo) {
 my $msg = $context->{client}->send_receive_command_msg(
               "search_workflow_instances",
               {
-                     "TYPE"    => $wf_type,
+                     "TYPE"    => [ 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST' ],
                      'CONTEXT' => $search_context,
                      'STATE'   => [ 'PENDING', 'APPROVAL' ],
                      %optional_params,
@@ -144,7 +142,6 @@ foreach my $instance (@instances) {
     my $wf_info = $context->{client}->send_receive_command_msg(
             'get_workflow_info',
             {
-                WORKFLOW => $wf_type,
                 ID       => $instance->{'WORKFLOW.WORKFLOW_SERIAL'}, 
             },
     );
@@ -154,11 +151,14 @@ foreach my $instance (@instances) {
         'msg' => Dumper $wf_info,
     );
     my $wf_context = $wf_info->{PARAMS}->{WORKFLOW}->{CONTEXT};
-    my $san_ref = $ser->deserialize($wf_context->{'cert_subject_alt_name'});
-    $m->comp('/lib/debug.mhtml',
-        'level' => 10,
-        'msg' => Dumper $san_ref,
-    );
+    my $san_ref;
+    if (exists $wf_context->{'cert_subject_alt_name'}) {
+        $san_ref = $ser->deserialize($wf_context->{'cert_subject_alt_name'});
+        $m->comp('/lib/debug.mhtml',
+            'level' => 10,
+            'msg' => Dumper $san_ref,
+        );
+    }
     my @subject_alt_names;
     if (defined $san_ref && ref $san_ref eq 'ARRAY') {
         foreach my $san_pair (@{ $san_ref }) {

@@ -1,5 +1,4 @@
 <%args>
-    $wf_type   => undef
     @approvals => undef
     @serials   => undef    
 </%args>
@@ -40,7 +39,6 @@ for (my $i = 0; $i < scalar @approvals; $i++) {
         my $msg = $context->{client}->send_receive_command_msg(
                       "execute_workflow_activity",
                       {
-                        WORKFLOW => $wf_type,
                         ID       => $serials[$i],
                         ACTIVITY => "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR",
                       },
@@ -55,7 +53,6 @@ for (my $i = 0; $i < scalar @approvals; $i++) {
         my $info_msg = $context->{client}->send_receive_command_msg(
             'get_workflow_info',
             {
-                WORKFLOW => $wf_type,
                 ID       => $serials[$i],
             },
         );
@@ -64,7 +61,6 @@ for (my $i = 0; $i < scalar @approvals; $i++) {
             my $e_msg = $context->{client}->send_receive_command_msg(
                 'execute_workflow_activity',
                 {
-                    WORKFLOW => $wf_type,
                     ID       => $serials[$i],
                     ACTIVITY => 'I18N_OPENXPKI_WF_ACTION_PERSIST_CSR',
                 },

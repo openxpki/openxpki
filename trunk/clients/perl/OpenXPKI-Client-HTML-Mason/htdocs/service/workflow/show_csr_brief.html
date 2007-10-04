@@ -9,6 +9,14 @@
 
 <table>
 <tr>
+% if (! defined $type) {
+%     $type = $context->{client}->send_receive_command_msg(
+%       'get_workflow_type_for_id',
+%       {
+%           ID => $id,
+%       },
+%     )->{PARAMS};
+% }
 % foreach my $action (qw(
 %                         I18N_OPENXPKI_WF_ACTION_PERSIST_CSR
 %                         I18N_OPENXPKI_WF_ACTION_APPROVE_CSR
