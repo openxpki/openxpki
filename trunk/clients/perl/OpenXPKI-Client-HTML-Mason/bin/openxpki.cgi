@@ -9,6 +9,9 @@ use warnings;
 
 use HTML::Mason::CGIHandler;
 
+# switch STDOUT to utf8 to avoid perl guessing incorrectly ... 
+binmode STDOUT, ':utf8';
+
 # if you use a deployment where your top level is not '/',
 # you have to mangle the PATH_INFO environment variable, e.g.
 # do something like
