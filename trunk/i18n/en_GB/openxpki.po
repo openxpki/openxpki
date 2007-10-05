@@ -178,6 +178,9 @@ msgstr "Email address"
 msgid "I18N_OPENXPKI_CERT_EXPIRED"
 msgstr "expired"
 
+msgid "I18N_OPENXPKI_CERT_EXTENDED_KEYUSAGE"
+msgstr "Extended key usage"
+
 msgid "I18N_OPENXPKI_CERT_FINGERPRINT"
 msgstr "Fingerprint"
 
@@ -186,6 +189,9 @@ msgstr "Issuer"
 
 msgid "I18N_OPENXPKI_CERT_IS_CA"
 msgstr "Certificate is CA"
+
+msgid "I18N_OPENXPKI_CERT_KEYUSAGE"
+msgstr "Key usage"
 
 msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
 msgstr "Key algorithm"
@@ -1466,6 +1472,9 @@ msgstr "Search workflow instances"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_VALUE"
 msgstr "Value"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION"
+msgstr "Search results:"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_TITLE"
 msgstr "Search results"
@@ -5951,9 +5960,6 @@ msgstr "yes"
 
 #~ msgid "I18N_OPENXPKI_LIST_PREV"
 #~ msgstr "Prev"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION"
-#~ msgstr "Search results:"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_CERT_INSTALLATION_TEST_FAILED"

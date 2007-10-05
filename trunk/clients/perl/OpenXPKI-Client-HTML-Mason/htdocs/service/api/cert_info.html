@@ -56,6 +56,14 @@
     <td><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></td>
     <td><% $issuer %></td>
   </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_KEYUSAGE') %></td>
+    <td><% $keyusage %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_EXTENDED_KEYUSAGE') %></td>
+    <td><% $extended_keyusage %></td>
+  </tr>
 </table>
 
 <p>
@@ -226,7 +234,6 @@
 
 
 
-
 <!--
 <% $private_key %>
 -->
@@ -245,6 +252,14 @@
   my $serial      = $params->{SERIAL};
   $serial .= ' (0x' . sprintf("%0x", $serial) . ')';
   my $status      = $msg->{PARAMS}->{STATUS};
+  my $keyusage;
+  my $extended_keyusage;
+  if (ref $params->{OPENSSL_EXTENSIONS}->{'X509v3 Key Usage'} eq 'ARRAY') {
+      $keyusage = join q{,}, @{ $params->{OPENSSL_EXTENSIONS}->{'X509v3 Key Usage'} };
+  }
+  if (ref $params->{OPENSSL_EXTENSIONS}->{'X509v3 Extended Key Usage'} eq 'ARRAY') {
+      $extended_keyusage = join q{,}, @{ $params->{OPENSSL_EXTENSIONS}->{'X509v3 Extended Key Usage'} };
+  }
   
   my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = gmtime(time);
   $year += 1900;
