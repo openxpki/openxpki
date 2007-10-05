@@ -22,7 +22,7 @@
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 
-<& /service/create_csr/print_descriptions.mhtml, descriptions => \%descriptions &>
+<& /service/create_csr/print_descriptions.mhtml, descriptions => \@descriptions &>
 
 <%init>
     ## load available subject styles for this profile from server
@@ -51,10 +51,9 @@
         if (defined $subject_style);
 
     ## ok, we have to ask the user
-    my %descriptions = ();
+    my @descriptions = ();
     foreach my $key (sort keys %styles)
     {
-        $descriptions{i18nGettext($styles{$key}->{LABEL})} = 
-            i18nGettext($styles{$key}->{DESCRIPTION});
+        push @descriptions, [ i18nGettext($styles{$key}->{LABEL}), i18nGettext($styles{$key}->{DESCRIPTION}) ];
     }
 </%init>
