@@ -859,14 +859,12 @@ msgstr "Now you can generate a new SPKAC key with your browser."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_TITLE"
 msgstr "Create private key"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_DESCRIPTION"
 msgstr ""
-"Please choose the role for which you would like to request a certificate."
+"Please choose a certificate profile. The certificate profile acts as a template for your certificate and influences a large number of different settings. Which profile you need largely depends on your application."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_TITLE"
-msgstr "Choose a role"
+msgstr "Choose a certificate profile"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_DESCRIPTION"
 msgstr ""
