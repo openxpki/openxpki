@@ -123,7 +123,7 @@
 
     ## store and display CSR
     if ($params{'keygen'} ne 'SERVERSIDE') {
-        $m->comp ('/service/workflow/show_instance.html', 'msg' => $msg);
+        $m->comp ('/service/create_csr/show_receipt_confirmation.mhtml', 'msg' => $msg);
     }
     else {
         # continue here with selection of key parameters and
@@ -211,7 +211,7 @@
                     );
                     # TODO - check for more errors
                     # we are done, show instance
-                    $m->comp ('/service/workflow/show_instance.html', 'msg' => $i_msg);
+                    $m->comp ('/service/create_csr/show_receipt_confirmation.mhtml', 'msg' => $i_msg);
                 }
             }
         }

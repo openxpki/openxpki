@@ -1,0 +1,56 @@
+<%args>
+    $msg => undef
+</%args>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_TITLE') %></h1>
+% if (exists $msg->{SERVICE_MSG}
+%         && $msg->{SERVICE_MSG} eq 'ERROR') {
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_OCCURED_DESC') %>
+<& /service/create_csr/print_errors.mhtml, 'errors' => $msg &>
+</p>
+% }
+% else {
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_DESC') %>
+</p>
+<p>
+  <table border=0>
+    <tr>
+      <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></td>
+      <td><% $msg->{PARAMS}->{WORKFLOW}->{ID} %></td>
+    </tr>
+    <tr>
+      <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></td>
+      <td><% $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{'cert_subject'} %></td>
+    </tr>
+% my $sans = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{'cert_subject_alt_name'};
+% my @sans = ();
+% eval {
+%     @sans = @{ OpenXPKI::Serialization::Simple->new()->deserialize($sans) };
+% };
+% if (scalar @sans > 0) {
+    <tr>
+      <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_ALT_NAMES') %></td>
+      <td><% $sans[0]->[0] %>: <% $sans[0]->[1] %></td>
+    </tr>
+%    for (my $i = 1; $i < scalar @sans; $i++) {
+    <tr>
+      <td></td>
+      <td><% $sans[$i]->[0] %>: <% $sans[$i]->[1] %></td>
+    </tr>
+%    }
+% }
+    <tr>
+      <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_ROLE') %></td>
+      <td><% $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{'cert_role'} %></td>
+    </tr>
+    <tr>
+      <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_PROFILE') %></td>
+      <td><% i18nGettext($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{'cert_profile'}) %></td>
+    </tr>
+  </table>
+</p>
+% }
+<%init>
+  use OpenXPKI::Serialization::Simple;
+</%init>

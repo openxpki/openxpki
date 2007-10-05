@@ -659,6 +659,13 @@ msgstr "Errors"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_NO_PROFILES_DEFINED_FOR_ROLE"
 msgstr "Choose a role"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_OCCURED_DESC"
+msgstr ""
+"The certificate has been successfully flagged as revoked in the database. "
+"Now might be a good moment to issue a new certificate revocation list (CRL). "
+"If you want to do this now, please use the link below."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_FIELD_DESCRIPTIONS"
 msgstr "Descriptions of the form fields"
 
@@ -861,7 +868,9 @@ msgstr "Create private key"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_DESCRIPTION"
 msgstr ""
-"Please choose a certificate profile. The certificate profile acts as a template for your certificate and influences a large number of different settings. Which profile you need largely depends on your application."
+"Please choose a certificate profile. The certificate profile acts as a "
+"template for your certificate and influences a large number of different "
+"settings. Which profile you need largely depends on your application."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_TITLE"
 msgstr "Choose a certificate profile"
@@ -936,6 +945,12 @@ msgstr "Copy and paste the password here"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_PASSWORD_GENERATED_PASSWORD"
 msgstr "Password generated for you"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_DESC"
+msgstr "Your certificate request has successfully been received by the CA. Depending on your organization's process, the registration officers will deal with the request accordingly. Please see below for a final overview on your certificate details."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_TITLE"
+msgstr "Certificate signing request successfully received"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SAN_ADD_5"
 msgstr "+5"
@@ -1407,6 +1422,9 @@ msgstr "Certificate subject"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_ALT_NAME"
 msgstr "Subject alternative name"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_ALT_NAMES"
+msgstr "Subject alternative names"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_STYLE"
 msgstr "Certificate subject style"
