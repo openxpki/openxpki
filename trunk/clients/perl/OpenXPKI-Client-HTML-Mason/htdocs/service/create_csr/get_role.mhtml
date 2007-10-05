@@ -26,11 +26,12 @@
 <%init>
     ## read all roles from the server
     my @errors = ();
-    my $msg = $context->{client}->send_receive_command_msg("get_roles");
+    my $msg = $context->{client}->send_receive_command_msg(
+        "get_available_cert_roles",
+    );
     my @roles = ();
     if (ref $msg->{PARAMS} eq 'ARRAY') {
         @roles = @{$msg->{PARAMS}};
-        # TODO - display '' role with 'Anonymous' label
     }
     if (ref $msg eq 'ARRAY' && $msg->[0]->{LABEL} ne 'I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS') {
         # an error occured

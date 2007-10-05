@@ -992,6 +992,60 @@ sub get_roles {
     return [ CTX('acl')->get_roles() ];
 }
 
+sub get_available_cert_roles {
+    my $self      = shift;
+    my $arg_ref   = shift;
+    my $cfg_id    = $arg_ref->{CONFIG_ID};
+    if (! defined $cfg_id) {
+        $cfg_id = $self->get_current_config_id();
+    }
+    my %available_roles = ();
+
+    ##! 1: 'start'
+
+    my $pki_realm = CTX('session')->get_pki_realm();
+    my @profiles  = ();
+    my $index     = $self->get_pki_realm_index({
+        CONFIG_ID => $cfg_id,
+    });
+
+    my $count = CTX('xml_config')->get_xpath_count(
+     XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile"],
+     COUNTER => [$index     , 0       , 0         , 0],
+     CONFIG_ID => $cfg_id,
+    );
+    ##! 16: 'count: ' . $count
+    for (my $i=0; $i < $count; $i++) {
+        my $id = CTX('xml_config')->get_xpath(
+            XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "id"],
+            COUNTER => [$index     , 0       , 0         , 0          , $i       , 0   ],
+            CONFIG_ID => $cfg_id,
+        );
+        next if ($id eq "default");
+        my $role_count = 0;
+        eval {
+            $role_count = CTX('xml_config')->get_xpath_count(
+                XPATH   => ['pki_realm', 'common', 'profiles', 'endentity', 'profile', 'role'],
+                COUNTER => [$index     , 0       , 0         , 0          , $i ],
+                CONFIG_ID => $cfg_id,
+            );
+        };
+        ##! 16: 'role_count: ' . $role_count
+        foreach (my $ii = 0; $ii < $role_count; $ii++) {
+            my $role = CTX('xml_config')->get_xpath(
+                XPATH   => ['pki_realm', 'common', 'profiles', 'endentity', 'profile', 'role'],
+                COUNTER => [$index     , 0       , 0         , 0          , $i       , $ii   ],
+                CONFIG_ID => $cfg_id,
+            );
+            ##! 16: 'role: ' . $role
+            $available_roles{$role} = 1;
+        }
+    }
+    ##! 1: 'end'
+    my @roles = keys %available_roles;
+    return \@roles;
+}
+
 sub get_cert_profiles {
     my $index = get_pki_realm_index();
 

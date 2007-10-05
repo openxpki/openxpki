@@ -399,6 +399,16 @@ sub BUILD {
             class  => 'Default',
             params => { },
         },
+        'get_available_cert_roles' => {
+            class  => 'Default',
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+            },
+        },
         'get_cert_profiles' => {
             class  => 'Default',
             params => { },
