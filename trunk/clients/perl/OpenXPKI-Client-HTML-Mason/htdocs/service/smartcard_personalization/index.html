@@ -102,7 +102,8 @@ onload="InstallCertIEAndTest(document.OpenXPKI)"
     my $wf_id = $wf_info->{ID};
 
     if ($wf_info->{STATE} eq 'ISSUANCE_PENDING' ||
-        $wf_info->{STATE} eq 'WAITED_FOR_CHILDREN') { # check whether we can advance to the next state
+        $wf_info->{STATE} eq 'WAITED_FOR_CHILDREN' ||
+        $wf_info->{STATE} eq 'APPROVAL') { # check whether we can advance to the next state
         # TODO
         # the || is a workaround for bug #1602288 (so we are at least not
         # stuck in WAITED_FOR_CHILDREN if it happens)
