@@ -8,7 +8,7 @@ use WWW::Mechanize;
 use URI::Escape;
 
 use Test::More;
-plan tests => 22;
+plan tests => 18;
 
 my $TEST_PORT = 8099;
 if ($ENV{MASON_TEST_PORT}) {
@@ -101,10 +101,6 @@ $mech->field('subject_style', '00_tls_basic_style');
 $mech->field('role', 'Web Server');
 $mech->click('__submit');
 
-like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE/, 'Show instance information');
-like($mech->response->content, qr/PENDING/, 'Workflow in state pending');
-like($mech->response->content, qr/comment/, 'Comment present');
-like($mech->response->content, qr/1234/, 'Phone number present');
+like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_TITLE/, 'CSR received');
 like($mech->response->content, qr/I18N_OPENXPKI_PROFILE_TLS_SERVER/, 'TLS server profile');
 like($mech->response->content, qr/CN=example3.example.com:1234,DC=Test\ Deployment,DC=OpenXPKI,DC=org/, 'Certificate subject');
-like($mech->response->content, qr/-----BEGIN\ CERTIFICATE\ REQUEST-----/, 'PKCS#10 present');
