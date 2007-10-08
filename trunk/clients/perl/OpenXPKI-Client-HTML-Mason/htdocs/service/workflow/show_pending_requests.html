@@ -100,7 +100,7 @@ my @results;
 my $nr_msg = $context->{client}->send_receive_command_msg(
               "search_workflow_instances_count",
               {
-                     "TYPE"    => [ 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST' ],
+                     "TYPE"    => [ 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
                      'CONTEXT' => $search_context,
                      'STATE'   => [ 'PENDING', 'APPROVAL' ],
               },
@@ -126,7 +126,7 @@ if (defined $pageInfo) {
 my $msg = $context->{client}->send_receive_command_msg(
               "search_workflow_instances",
               {
-                     "TYPE"    => [ 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST' ],
+                     "TYPE"    => [ 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
                      'CONTEXT' => $search_context,
                      'STATE'   => [ 'PENDING', 'APPROVAL' ],
                      %optional_params,

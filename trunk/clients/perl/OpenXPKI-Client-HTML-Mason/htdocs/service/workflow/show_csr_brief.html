@@ -4,11 +4,6 @@
     $msg  => undef
     $activities => undef
 </%args>
-<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_CSR_BRIEF_TITLE', '__WORKFLOWID__' => $msg->{PARAMS}->{WORKFLOW}->{ID}, '__STATE__' => $msg->{PARAMS}->{WORKFLOW}->{STATE} ) %></h1>
-<p>
-
-<table>
-<tr>
 % if (! defined $type) {
 %     $type = $context->{client}->send_receive_command_msg(
 %       'get_workflow_type_for_id',
@@ -17,6 +12,19 @@
 %       },
 %     )->{PARAMS};
 % }
+% if ($type eq 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST') {
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_CSR_BRIEF_TITLE_SCEP', '__WORKFLOWID__' => $msg->{PARAMS}->{WORKFLOW}->{ID}, '__STATE__' => $msg->{PARAMS}->{WORKFLOW}->{STATE} ) %></h1>
+% }
+% elsif ($type eq 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION') {
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_CSR_BRIEF_TITLE_SMARTCARD', '__WORKFLOWID__' => $msg->{PARAMS}->{WORKFLOW}->{ID}, '__STATE__' => $msg->{PARAMS}->{WORKFLOW}->{STATE} ) %></h1>
+% }
+% else {
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_CSR_BRIEF_TITLE', '__WORKFLOWID__' => $msg->{PARAMS}->{WORKFLOW}->{ID}, '__STATE__' => $msg->{PARAMS}->{WORKFLOW}->{STATE} ) %></h1>
+% }
+<p>
+
+<table>
+<tr>
 % foreach my $action (qw(
 %                         I18N_OPENXPKI_WF_ACTION_PERSIST_CSR
 %                         I18N_OPENXPKI_WF_ACTION_APPROVE_CSR
@@ -70,13 +78,14 @@
     <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></td>
     <td><% $last_update %></td>
   </tr>
+% if ($type ne 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION') {
   <tr>
     <td><& '/lib/field_to_i18n.mhtml', 'field' => 'cert_role' &>
-% if ($sources->{'cert_role'} ne 'USER') {
+% if (exists $sources->{'cert_role'} && $sources->{'cert_role'} ne 'USER') {
 (<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SOURCE') %>: <% $sources->{'cert_role'} %>)
 % }
 / <& '/lib/field_to_i18n.mhtml', field => 'cert_profile' &>
-% if ($sources->{'cert_profile'} ne 'USER') {
+% if (exists $sources->{'cert_role'} && $sources->{'cert_profile'} ne 'USER') {
 (<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SOURCE') %>: <% $sources->{'cert_profile'} %>)
 % }
     </td>
@@ -94,16 +103,17 @@
        </td><td>
        / <% i18nGettext($profile) %>
        </td><td>
-% if (exists $actions{i18nGettext('I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE')}) {
+%     if (exists $actions{i18nGettext('I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE')}) {
 <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/activity/change_csr_profile.html" &>
 <& /lib/html/hidden.mhtml, 'name' => 'type', 'value' => $type &>
 <& /lib/html/hidden.mhtml, 'name' => 'id', 'value'   => $id &>
 <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext('I18N_OPENXPKI_HTML_MASON_CHANGE') &>
 <& /service/close_form.mhtml &>
-% }
+%     }
          </td></tr></table>
     </td>
   </tr>
+% }
   <tr>
     <td><& '/lib/field_to_i18n.mhtml', 'field' => 'cert_subject' &></td>
     <td>
@@ -115,7 +125,7 @@
                 [ 'subject', $subject ],
             ],
             label => $breakable_subject &>
-% if ($sources->{'cert_subject_parts'} ne 'USER') {
+% if (exists $sources->{'cert_subject_parts'} && $sources->{'cert_subject_parts'} ne 'USER') {
 (<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SOURCE') %>: <% $sources->{'cert_subject_parts'} %>)
 % }
                   </td>
@@ -255,6 +265,12 @@
     }
     
     my $subject = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_subject};
+    if ($type eq 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION') {
+        # Smartcard personalization workflow context has different structure
+        my $cert_iss_data = OpenXPKI::Serialization::Simple->new()->deserialize($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_issuance_data});
+        my @subjects = map { $_->{'cert_subject'} } @{ $cert_iss_data };
+        $subject = join q{<br>}, @subjects;
+    }
     my $breakable_subject = $subject;
     $breakable_subject =~ s{,}{, }xmsg;
     

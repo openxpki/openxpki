@@ -947,7 +947,11 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_PASSWORD_GENERATED_PASSWORD"
 msgstr "Password generated for you"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_DESC"
-msgstr "Your certificate request has successfully been received by the CA. Depending on your organization's process, the registration officers will deal with the request accordingly. Please see below for a final overview on your certificate details."
+msgstr ""
+"Your certificate request has successfully been received by the CA. Depending "
+"on your organization's process, the registration officers will deal with the "
+"request accordingly. Please see below for a final overview on your "
+"certificate details."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_TITLE"
 msgstr "Certificate signing request successfully received"
@@ -1506,6 +1510,12 @@ msgstr "Workflow serial"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_CSR_BRIEF_TITLE"
 msgstr "Certificate Signing Request #__WORKFLOWID__ (__STATE__)"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_CSR_BRIEF_TITLE_SCEP"
+msgstr "SCEP Request #__WORKFLOWID__ (__STATE__)"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_CSR_BRIEF_TITLE_SMARTCARD"
+msgstr "Smartcard Personalization Request #__WORKFLOWID__ (__STATE__)"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES"
 msgstr "Available activities"
