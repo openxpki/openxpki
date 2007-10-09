@@ -806,6 +806,14 @@ sub __get_workflow_factory {
                 'WORKFLOW_CONTEXT_KEY' => 'config_id',
             },
         );
+        if (! defined $wf) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_CONFIG_ID_CONTEXT_ENTRY_COULD_NOT_BE_FOUND',
+                params  => {
+                    WORKFLOW_ID => $arg_ref->{WORKFLOW_ID},
+                },
+            );
+        }
         $config_id = $wf->{WORKFLOW_CONTEXT_VALUE};
     }
     ##! 32: 'config_id: ' . $config_id
