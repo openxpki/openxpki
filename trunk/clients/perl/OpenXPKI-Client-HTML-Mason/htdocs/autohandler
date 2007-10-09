@@ -149,11 +149,9 @@
 %                 'level' => 1,
 %                 'msg'   => "CGI::Session object id: " . $session->id());
 %        my $role = $session->param('role') ? $session->param('role') : 'Anonymous';
+<div><% $session->param('user') . ' | ' . $role %></div>
 <div>
-<% $session->param('user') . ' | ' . $role %>
-</div>
-<div>
-<% i18nGettext($session->param('pki_realm')) %>
+<a href="<% $context->{menu}->get_root() . '/' %>"><% i18nGettext($session->param('pki_realm')) %></a>
 </div>
 %     }
 % }
