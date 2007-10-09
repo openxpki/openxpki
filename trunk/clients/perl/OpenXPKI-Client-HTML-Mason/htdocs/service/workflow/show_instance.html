@@ -129,8 +129,9 @@
 %      }
 %      else
 %      {
-%   Encode::_utf8_on($value);
-<% $value %>
+%         my $dump = Dumper($ref);
+%   Encode::_utf8_on($dump);
+<% $dump %>
 %      }
        </pre>
 %   } elsif ($param eq "spkac") {
@@ -179,6 +180,9 @@
 
 <%once>
     use Encode qw(encode decode);
+    use Data::Dumper;
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Sortkeys = 1;
 </%once>
 <%init>
     if (not defined $msg or
