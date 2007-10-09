@@ -7,6 +7,7 @@
     $maxPages       => 8
 </%args>
 % if (scalar @{ $pageInfo->pages_in_spread_raw() } > 1) {
+<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_PAGE') %> 
 %   foreach my $page ($pageInfo->pages_in_spread()) {
 %    if (! defined $page) {
 ...
