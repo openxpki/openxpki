@@ -151,7 +151,16 @@
 %        my $role = $session->param('role') ? $session->param('role') : 'Anonymous';
 <div><% $session->param('user') . ' | ' . $role %></div>
 <div>
-<a href="<% $context->{menu}->get_root() . '/' %>"><% i18nGettext($session->param('pki_realm')) %></a>
+%        my $root;
+%        eval {
+%            $root = $context->{menu}->get_root();
+%        };
+%        if (defined $root) {
+<a href="<% $root . '/' %>"><% i18nGettext($session->param('pki_realm')) %></a>
+%        }
+%        else {
+<% i18nGettext($session->param('pki_realm')) %>
+%        }
 </div>
 %     }
 % }
