@@ -149,8 +149,7 @@
 %                 'level' => 1,
 %                 'msg'   => "CGI::Session object id: " . $session->id());
 %        my $role = $session->param('role') ? $session->param('role') : 'Anonymous';
-<div><% $session->param('user') . ' | ' . $role %></div>
-<div>
+<div><% $session->param('user') . ' | ' . $role %> |
 %        my $root;
 %        eval {
 %            $root = $context->{menu}->get_root();
@@ -164,14 +163,9 @@
 </div>
 %     }
 % }
-
-<!-- 
-        Today there is no meaningful stuff behind this search button.
-        Later we could use it for certificate search on the subject or something else.
-        BTW the form of the search function uses a static action attribute.
-
         <div>
-          <form action="index.html" method="post">
+          <form action="<% $context->{menu}->get_root() %>/service/api/super_search.html" method="post">
+            <& /lib/html/hidden_reqargs.mhtml, ignore => qr{ \A q \z }xms &>
             <script type="text/javascript">
               var EmptySearchFieldDone = 0;
               function EmptySearchField(elem) {
@@ -188,7 +182,7 @@
             </div>
           </form>
         </div>
--->
+
 % }
       </div> <!-- end of right -->
 
