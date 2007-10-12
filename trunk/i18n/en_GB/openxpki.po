@@ -134,6 +134,12 @@ msgstr "Not usable"
 msgid "I18N_OPENXPKI_CA_STATUS_USABLE"
 msgstr "Usable"
 
+msgid "I18N_OPENXPKI_CERTIFICATE"
+msgstr "Certificate"
+
+msgid "I18N_OPENXPKI_CERTIFICATE_IDENTIFIER"
+msgstr "Certificate ID"
+
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Download certificate"
 
@@ -590,9 +596,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_KEY_LIST_TITLE"
 msgstr "Key management groups"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_DESCRIPTION"
-msgstr ""
-"The actually active PKI realm is __PKI_REALM__. A realm is some kind of a "
-"domain where all of your operations on this interface will now take place."
+msgstr "The PKI realm you are logged in to is __PKI_REALM__."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_TITLE"
 msgstr "PKI realm __PKI_REALM__"
@@ -1091,6 +1095,9 @@ msgstr "The requested format __FORMAT__ is not supported."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_WRONG_FORMAT_TITLE"
 msgstr "Wrong certificate format"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_HIDE"
+msgstr "hide"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_ANONYMOUS_MENU_DESCRIPTION"
 msgstr ""
 "You are logged in to the web interface of the trustcenter. Please note that "
@@ -1259,6 +1266,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_SERVICE_TITLE"
 msgstr "Service unavailable"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_OTHER_WORKFLOW_CONTEXT_KEYS"
+msgstr "Workflow context details"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_OVERVIEW"
+msgstr "Overview"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PAGE"
 msgstr "Page"
@@ -1448,9 +1461,6 @@ msgstr "Key generation"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_TYPE"
 msgstr "CSR type"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
-msgstr "Description"
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_GET_INSTANCE_INFO_DESCRIPTION"
 msgstr ""
 "Please enter the format which you want to use if you get the graphical "
@@ -1523,8 +1533,11 @@ msgstr "Available activities"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DESCRIPTION"
 msgstr "These are the possible activities for the shown workflow instance."
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DETAILS"
+msgstr "Show (technical) workflow details"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE"
-msgstr "Workflow instance"
+msgstr "Workflow instance #__ID__ (__STATE__)"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_DESC"
 msgstr ""
@@ -3249,6 +3262,12 @@ msgstr ""
 "Uniform Ressource Identifier (URI) can be any address or reference to an "
 "information source. Example: http://www.openxpki.org/~testuser/."
 
+msgid "I18N_OPENXPKI_SCEP_CURRENT_ID"
+msgstr "ID of current certificate"
+
+msgid "I18N_OPENXPKI_SCEP_CURRENT_VALID_CERTIFICATES"
+msgstr "Number of currently valid certificates"
+
 msgid "I18N_OPENXPKI_SECRET_ACTION"
 msgstr "Action"
 
@@ -4717,6 +4736,12 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_CONFIG_ID_CONTEXT_ENTRY_COULD_NOT_BE_FOUND"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ACL_NO_ACTIVITY"
 msgstr "The SPKAC string is empty."
 
@@ -5466,7 +5491,7 @@ msgstr "Cancel CRR approval"
 msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 msgstr "Cancel CSR approval"
 
-msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_COMPROMISE_TIME"
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
 msgstr "Change CRR invalidity time"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
@@ -5588,25 +5613,22 @@ msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 msgstr "Sleep"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE"
-msgstr "This is the workflow to create certificates."
+msgstr "Issue a certificate"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_LDAP_PUBLISHING"
 msgstr "Publish a certificate using LDAP"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_REVOCATION_REQUEST"
-msgstr "This is the workflow to handle a certificate signing request at once."
+msgstr "Handle a certificate revocation request"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
-msgstr "This is the workflow to handle a certificate signing request at once."
+msgstr "Handle a certificate signing request"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
-msgstr ""
-"This is the workflow to handle a certificate signing request (CSR) if a "
-"offline CA is in use."
+msgstr "Handle a certificate singing request for an offlince CA"
 
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
-msgstr "This is the workflow to issue fresh CRLs."
+msgstr "Issue a certificate revocation list (CRL)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_CYCLE_SUB"
@@ -5626,13 +5648,11 @@ msgstr "This workflow exports workflow instances to other servers."
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
 msgstr "This workflow imports workflow instances from other servers."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
-msgstr "SCEP Certificate Signing Request"
+msgstr "Handle a SCEP Certificate Signing Request"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION"
-msgstr "This is the workflow to issue fresh CRLs."
+msgstr "Personalize a smartcard"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL"
@@ -5864,6 +5884,9 @@ msgstr "CRL Issuance"
 msgid "I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION"
 msgstr "Smartcard personalization"
 
+msgid "I18N_OPENXPKI_WORKFLOWS"
+msgstr "Workflows"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_INSERT_CERTIFICATE_TOKEN_UNAVAILABLE"
 msgstr "Certificates"
@@ -5897,6 +5920,9 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_TOKEN_UNAVAILABLE"
 msgstr "Certificates"
+
+msgid "I18N_OPENXPKI_WORKFLOW_CHILDREN"
+msgstr "Workflow children"
 
 msgid "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS"
 msgstr ""
@@ -5980,6 +6006,34 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SCEP_CURRENT_NOTAFTER"
+#~ msgstr "Not after"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_DESC_CODE_SIGNING_REQUEST"
+#~ msgstr ""
+#~ "This is the workflow to handle a certificate signing request at once."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CODE_SIGNING_REQUEST_APPROVAL"
+#~ msgstr "Approval is going on"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CODE_SIGNING_REQUEST_INITIAL"
+#~ msgstr "Initializing ..."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CODE_SIGNING_REQUEST_PENDING"
+#~ msgstr "Pending (in editing state)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_CODE_SIGNING_REQUEST"
+#~ msgstr "Certificate Signing Request (CSR)"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
+#~ msgstr "Description"
 
 #~ msgid "I18N_OPENXPKI_LIST_NEXT"
 #~ msgstr "Next"

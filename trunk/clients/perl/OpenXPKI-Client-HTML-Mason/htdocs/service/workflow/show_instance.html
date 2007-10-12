@@ -3,154 +3,17 @@
     $id   => undef
     $msg  => undef
     $activities => undef
+    $details    => undef
 </%args>
-<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE') %></h1>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE', '__ID__' => $msg->{PARAMS}->{WORKFLOW}->{ID}, '__STATE__' => $msg->{PARAMS}->{WORKFLOW}->{STATE}) %></h1>
+<div>
+    <!-- 
+<% Dumper $msg->{PARAMS} %>
+    -->
+<div class="floatbox" style="width: 30%">
+    <hr/>
+<p class="title"><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES') %></p>
 <p>
-  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DESCRIPTION') %>
-</p>
-
-%    ## I expect the following:
-%    ## SERVICE_MSG => "COMMAND",
-%    ## COMMAND     => $cmd,
-%    ## PARAMS      => 
-%    ## {
-%    ##     WORKFLOW =>
-%    ##     {
-%    ##         ID      => $id,
-%    ##         STATE   => $state,
-%    ##         CONTEXT => { ... a simple hash ... }
-%    ##     }
-%    ## }
-
-<table>
-  <tr>
-    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE') %></th>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></td>
-    <td><% $msg->{PARAMS}->{WORKFLOW}->{ID} %></td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE') %></td>
-    <td><% i18nGettext($msg->{PARAMS}->{WORKFLOW}->{STATE}) %></td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE') %></td>
-    <td><% i18nGettext($msg->{PARAMS}->{WORKFLOW}->{TYPE}) %></td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION') %></td>
-    <td><% i18nGettext($msg->{PARAMS}->{WORKFLOW}->{DESCRIPTION}) %></td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></td>
-    <td><% $msg->{PARAMS}->{WORKFLOW}->{LAST_UPDATE} %></td>
-  </tr>
-% foreach my $param (sort keys %{$msg->{PARAMS}->{WORKFLOW}->{CONTEXT}})
-% {
-%   next if ($param eq "approvals" and length $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param} == 0);
-%   next if ($param eq "cert_profile_id");
-%   next if ($param =~ m{ \A _ }xms); # ignore "volatile" context parameters
-  <tr>
-      <td>
-% $m->comp('/lib/field_to_i18n.mhtml',
-%          'field' => $param);
-      </td>
-    <td>
-%   my $value = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param};
-%   # someone is interpreting UTF8 data here, re-encode ...
-%   # FIXME - find out why this is actually happening so that we
-%   # can eliminate the source
-%   $value = encode('UTF-8', $value);
-%   if ($value =~ /^(ARRAY|HASH)/)
-%   {
-%      ## serialized stuff
-%      my $ser = OpenXPKI::Serialization::Simple->new();
-%      my $ref = $ser->deserialize($value);
-       <pre>
-%      if ($param eq "cert_info")
-%      {
-%          ## simple hash
-%          foreach my $key (sort keys %{$ref})
-%          {
-<% $key %>::=<% $ref->{$key} %>
-%          }
-%      }
-%      elsif ($param eq 'ticket') {
-<ul>
-%          foreach my $key (sort keys %{$ref}) {
-%               my $url_msg = $context->{client}->send_receive_command_msg(
-%                   "get_url_for_ticket",
-%                   {
-%                       "NOTIFIER" => $key,
-%                       "TICKET"   => $ref->{$key}
-%                   },
-%               );
-%               my $url = $url_msg->{PARAMS};
-               <li><a href="<% $url %>"><% i18nGettext($key) %>: <% i18nGettext($ref->{$key}) %></a>
-%            }
-</ul>
-%      }
-%      elsif ($param eq "cert_subject_alt_name")
-%      {
-%          ## array of arrays
-%          foreach my $pair (@{$ref})
-%          {
-%              next if (not $pair); ## empty array
-<% $pair->[0] %>::=<% $pair->[1] %>
-%          }
-%      }
-%      elsif ($param eq "approvals")
-%      {
-%          if (ref $ref eq 'HASH') { # old style
-%              ## hash: user to role
-%              foreach my $user (sort keys %{$ref})
-%              {
-%                  next if (not defined $user); ## empty hash - !???
-<% $user %>&rarr;<% $ref->{$user} %>
-%              }
-%          }
-%          elsif (ref $ref eq 'ARRAY') { # new style for signatures
-%             foreach my $approval (@{$ref}) {
-%                 if (defined $approval->{signature}) {
-<% i18nGettext('I18N_OPENXPKI_SIGNED_APPROVAL') %>:
-<% $approval->{signer_subject} %>&rarr;<% $approval->{signer_role} %>
-<% i18nGettext('I18N_OPENXPKI_SIGNER_CERTIFICATE_IDENTIFIER') %>: <% $approval->{signer_identifier} %>
-<% i18nGettext('I18N_OPENXPKI_SIGNED_TEXT') %>: <% $approval->{plaintext} %>
-<% i18nGettext('I18N_OPENXPKI_SIGNATURE') %>: <% $approval->{signature} %>
-%                 }
-<% $approval->{session_user} %>&rarr;<% $approval->{session_role} %>
-
-================================================================
-
-%             }
-%          }
-%      }
-%      else
-%      {
-%         my $dump = Dumper($ref);
-%   Encode::_utf8_on($dump);
-<% $dump %>
-%      }
-       </pre>
-%   } elsif ($param eq "spkac") {
-%      for (my $i = int(length ($value) / 64); $i > 0; $i--)
-%      {
-%          $value = substr ($value, 0, $i*64)."\n".substr($value,$i*64);
-%      }
-       <pre><% $value %></pre>
-%   } elsif ($value =~ m{ \A -----BEGIN }xms) { # PKCS 10 or key
-       <pre><% $value %></pre>
-%   }
-%   else {
-       <% i18nGettext($value) %>
-%   }
-    </td>
-  </tr>
-% }
-</table>
-<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES') %></h1>
 <div class="openxpki_command_list">
 % foreach my $action (sort keys %actions)
 % {
@@ -177,9 +40,123 @@
     <input type="button" name="print" value="<% i18nGettext ('I18N_OPENXPKI_HTML_PRINT_BUTTON') %>" onClick="window.print()"/>
   </div>
 </div>
+</p>
+</hr>
+</div>
+<div>
+    <!-- id="overflow"> -->
+    <!--
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DESCRIPTION') %>
+</p>
+-->
+<p>
+%    ## I expect the following:
+%    ## SERVICE_MSG => "COMMAND",
+%    ## COMMAND     => $cmd,
+%    ## PARAMS      => 
+%    ## {
+%    ##     WORKFLOW =>
+%    ##     {
+%    ##         ID      => $id,
+%    ##         STATE   => $state,
+%    ##         CONTEXT => { ... a simple hash ... }
+%    ##     }
+%    ## }
+<div style="width: 65%">
+<h2 style="color: #888888"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_OVERVIEW') %></h2>
+<table>
+<!--
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></td>
+    <td><% $msg->{PARAMS}->{WORKFLOW}->{ID} %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE') %></td>
+    <td><% i18nGettext($msg->{PARAMS}->{WORKFLOW}->{STATE}) %></td>
+  </tr>
+-->
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE') %></td>
+    <td><% i18nGettext($msg->{PARAMS}->{WORKFLOW}->{TYPE}) %></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATOR') %></td>
+    <td><!-- creator --><a href="<% $context->{menu}->get_root() %>/service/workflow/search_instances.html?<% $context->{menu}->get_link_params() %>;context_key=creator;context_value=<% $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{creator} %>;context_key=;context_value="><% delete($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{creator}) %></a></td>
+  </tr>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></td>
+% my $last_update = $msg->{PARAMS}->{WORKFLOW}->{LAST_UPDATE};
+% $last_update =~ s/T/ /;
+% $last_update .= ' UTC';
+    <td><% $last_update %></td>
+  </tr>
 
+% BASIC_DETAILS:
+% foreach my $context_key (@{ $basic_details{$msg->{PARAMS}->{WORKFLOW}->{TYPE}} }) {
+%     # skip if context entry does not exist - this may for example be the
+%     # case with entries that are added later in the process, such as
+%     # csr_serial in CSR workflows
+%     next BASIC_DETAILS if (! exists $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$context_key});
+  <tr>
+    <td style="vertical-align:top;">
+<!-- <% $context_key %> -->
+% $m->comp('/lib/field_to_i18n.mhtml',
+%          'field' => $context_key);
+    </td>
+    <td>
+%   my $value = delete($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$context_key});
+%   $value = encode('UTF-8', $value);
+%   if ($untainted{$context_key}) {
+       <% i18nGettext($value) | n  %>
+%   }
+%   else {
+      <% i18nGettext($value) %>
+%   }
+    </td>
+  </tr>
+%   }
+
+</table>
+</div>
+% if (! $details) {
+<a href="<% $context->{menu}->get_root() %>/service/workflow/show_instance.html?<% $context->{menu}->get_link_params() %>;type=<% $msg->{PARAMS}->{WORKFLOW}->{TYPE} %>&id=<% $msg->{PARAMS}->{WORKFLOW}->{ID} %>&details=1"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DETAILS') %> ...</a>
+% }
+% else {
+<h2 style="color: #888888"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_OTHER_WORKFLOW_CONTEXT_KEYS') %> (<a href="<% $context->{menu}->get_root() %>/service/workflow/show_instance.html?<% $context->{menu}->get_link_params() %>;type=<% $msg->{PARAMS}->{WORKFLOW}->{TYPE} %>&id=<% $msg->{PARAMS}->{WORKFLOW}->{ID} %>&details=0" style="color: #888888"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_HIDE') %></a>)</h2>
+<table style="clear: right">
+% foreach my $param (sort keys %{$msg->{PARAMS}->{WORKFLOW}->{CONTEXT}}) {
+%#   next if ($param eq "approvals" and length $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param} == 0);
+%#   next if ($param eq "cert_profile_id");
+%   next if ($param =~ m{ \A _ }xms); # ignore "volatile" context parameters
+  <tr>
+      <td style="vertical-align: top">
+<!-- <% $param %> -->
+% $m->comp('/lib/field_to_i18n.mhtml',
+%          'field' => $param);
+      </td>
+    <td>
+%   my $value = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param};
+%   # someone is interpreting UTF8 data here, re-encode ...
+%   # FIXME - find out why this is actually happening so that we
+%   # can eliminate the source
+%   $value = encode('UTF-8', $value);
+%   if ($untainted{$param}) {
+       <% i18nGettext($value) | n  %>
+%   }
+%   else {
+      <% i18nGettext($value) %>
+%   }
+    </td>
+  </tr>
+%  }
+</table>
+% }
+</p>
 <%once>
     use Encode qw(encode decode);
+    use HTML::Entities;
+    use DateTime;
     use Data::Dumper;
     $Data::Dumper::Terse = 1;
     $Data::Dumper::Sortkeys = 1;
@@ -215,6 +192,140 @@
         $id   = $msg->{PARAMS}->{WORKFLOW}->{ID}   if (not defined $id);
         $type = $msg->{PARAMS}->{WORKFLOW}->{TYPE} if (not defined $type);
     }
+    # TODO - error handling!!!
+    my %untainted = ();
+    foreach my $param (keys %{ $msg->{PARAMS}->{WORKFLOW}->{CONTEXT} }) {    
+        my $value = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param};
+        if ($param eq 'csr_serial' && $value =~ m{\A \d+ \z}xms) {
+            # transform a scalar csr_serial into a one-element array
+            $value = OpenXPKI::Serialization::Simple->new()->serialize([ $value ]);
+        }
+           if ($value =~ /^(ARRAY|HASH)/)
+           {
+              ## serialized stuff
+              my $ser = OpenXPKI::Serialization::Simple->new();
+              my $ref = $ser->deserialize($value);
+              if ($param eq "cert_info")
+              {
+                  ## simple hash
+                  $value = '<table style="border:0px; border-spacing:0px">';
+                  foreach my $key (sort keys %{$ref})
+                  {
+                      my $key_i18n = $m->scomp('/lib/field_to_i18n.mhtml', 
+                          'field' => $key,
+                      );
+                      $ref->{$key} =~ encode_entities($ref->{$key});
+                      $ref->{$key} =~ s{\n}{<br/>}xmsg;
+                      $value .= '<tr><td style="vertical-align: top">' . $key_i18n . '</td><td>' . $ref->{$key} . '<td/></tr>';
+                  }
+                  $value .= '</table>';
+                  $untainted{'cert_info'} = 1;
+             }
+             elsif ($param eq 'ticket') {
+                $value = '<ul>';
+                foreach my $key (sort keys %{$ref}) {
+                     my $url_msg = $context->{client}->send_receive_command_msg(
+                         "get_url_for_ticket",
+                         {
+                             "NOTIFIER" => $key,
+                             "TICKET"   => $ref->{$key}
+                         },
+                     );
+                     my $url = $url_msg->{PARAMS};
+                     $value .= '<li><a href="' . $url . '">' . i18nGettext($key) . ': ' .  i18nGettext($ref->{$key}) . '</a>';
+                  }
+                $value .= '</ul>';
+                $untainted{'ticket'} = 1;
+            }
+            elsif ($param eq "cert_subject_alt_name")
+            {
+                ## array of arrays
+                $value = '';
+                foreach my $pair (@{$ref})
+                {
+                    next if (not $pair); ## empty array
+                    $value .= encode_entities($pair->[0]) . ': ' .  encode_entities($pair->[1]) . '<br/>';
+                }
+                $untainted{'cert_subject_alt_name'} = 1;
+            }
+            elsif ($param eq "approvals")
+            {
+                $value = '';
+                if (ref $ref eq 'HASH') { # old style
+                    ## hash: user to role
+                    foreach my $user (sort keys %{$ref})
+                    {
+                        next if (not defined $user); ## empty hash - !???
+                        $value .= encode_entities($user) . '&rarr;' . encode_entities($ref->{$user}) . '<br/>';
+                    }
+                }
+                elsif (ref $ref eq 'ARRAY') { # new style for signatures
+                   foreach my $approval (@{$ref}) {
+                       if (defined $approval->{signature}) {
+                           $value .= i18nGettext('I18N_OPENXPKI_SIGNED_APPROVAL') . ':<br/>';
+                           $value .= encode_entities($approval->{signer_subject}) . '&rarr;' . encode_entities($approval->{signer_role}) . '<br/>';
+                           $value .= i18nGettext('I18N_OPENXPKI_SIGNER_CERTIFICATE_IDENTIFIER') . ': ' . encode_entities($approval->{signer_identifier}) . '<br/>';
+                           $value .= i18nGettext('I18N_OPENXPKI_SIGNED_TEXT') . ': ' . encode_entities($approval->{plaintext}) . '<br/>';
+                           $value .= i18nGettext('I18N_OPENXPKI_SIGNATURE') . ': ' . encode_entities($approval->{signature}) . '<br/>';
+                       }
+                       $value .= encode_entities($approval->{session_user}) . '&rarr;' . encode_entities($approval->{session_role}) . '<br/><br/>================================================================<br/>';
+                   }
+                }
+                $untainted{'approvals'} = 1; 
+            }
+            elsif ($param eq 'wf_children_instances') {
+                $value = '';
+                foreach my $instance (@{ $ref }) {
+                    $value .= '<a href="' . $context->{menu}->get_root() . '/service/workflow/show_instance.html?' . $context->{menu}->get_link_params() . ';id=' . $instance->{ID} . '">' . encode_entities(i18nGettext($instance->{TYPE})) . ' #' . encode_entities($instance->{ID}) . '</a><br/>';
+                }
+                $untainted{'wf_children_instances'} = 1;
+            }
+            elsif ($param eq 'csr_serial') {
+                $value = '';
+                foreach my $serial (@{ $ref }) {
+                    $value .= $serial . ' (<a href="' . $context->{menu}->get_root() . '/service/workflow/search_instances.html?' . $context->{menu}->get_link_params() . ';context_key=csr_serial;context_value=%25' . $serial . '%25;context_key=;context_value=">' .  i18nGettext('I18N_OPENXPKI_WORKFLOWS') . '</a>';
+                    if ($msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'SUCCESS') {
+                        # there should be a certificate for this ID, too
+                        $value .= ', <a href="' . $context->{menu}->get_root() . '/service/api/cert_list.html?' . $context->{menu}->get_link_params() . ';csr_serial=' . $serial . '">' . i18nGettext('I18N_OPENXPKI_CERTIFICATE') . '</a>';
+                    }
+                    $value .= ')<br/>';
+                }
+                $untainted{'csr_serial'} = 1;
+            }
+            else
+            {
+              my $dump = Dumper($ref);
+              Encode::_utf8_on($dump);
+              $value = $dump;
+            }
+        }
+        elsif ($param eq 'spkac') {
+            for (my $i = int(length ($value) / 64); $i > 0; $i--)
+            {
+                $value = substr ($value, 0, $i*64)."<br/>".substr($value,$i*64);
+            }
+            $value = '<div style="font-family: monospace">' . $value . '</div>';
+            $untainted{'spkac'} = 1;
+        }
+        elsif ($param eq 'cert_subject') {
+            # make certificate subject more breakable
+            $value =~ s{,}{, }xmsg;
+        }
+        elsif ($param eq 'cert_identifier' || $param eq 'current_identifier') {
+            $value = '<a href="' . $context->{menu}->get_root() . '/service/api/cert_info.html?' . $context->{menu}->get_link_params() . ';identifier=' . $value . '">' . encode_entities($value) . '</a>';
+            $untainted{$param} = 1;
+        }
+        elsif ($param eq 'invalidity_time') {
+            $value = DateTime->from_epoch( epoch => $value )->strftime('%Y-%m-%d %H:%M UTC');
+        }
+        elsif ($value =~ m{ \A -----BEGIN }xms || $param eq 'pkcs7_content') { # PKCS 10/7 or key
+            $value = encode_entities($value);
+            $value =~ s{\n}{<br/>}xmsg;
+            $value = '<div style="font-family: monospace">' . $value . '</div>';
+            $untainted{$param} = 1;
+        }
+        $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param} = $value;
+    }
     if (not defined $activities)
     {
         ## ok we have to get the info from the server
@@ -238,10 +349,25 @@
 	## Here are some translation tags for CRR activities (for pot-file)
 	## "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
 	## "I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
-	## "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_COMPROMISE_TIME"
+	## "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
 	## "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
 	## "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
 	## "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
         $actions{i18nGettext($key)} = $key;
     }
+    my %basic_details = (
+        'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' =>
+            [ qw( cert_subject cert_profile cert_role cert_subject_alt_name
+                 cert_info csr_serial wf_children_instances) ],
+        'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE' =>
+            [ qw( cert_subject cert_profile cert_role cert_subject_alt_name
+                 csr_serial ) ],
+        'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' =>
+            [ qw( csr_serial wf_children_instances ) ],
+        'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' =>
+            [ qw( cert_identifier reason_code invalidity_time comment ) ],
+        'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST' =>
+            [ qw( cert_subject cert_profile cert_role cert_subject_alt_name
+                 current_identifier current_valid_certificates csr_serial wf_children_instances) ],
+    );
 </%init>
