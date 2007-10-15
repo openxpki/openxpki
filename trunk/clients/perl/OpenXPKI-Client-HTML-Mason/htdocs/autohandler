@@ -133,7 +133,7 @@
 -->
         <a href="http://www.openxpki.org">About</a>
 
-% if ($__session_id) {
+%   if ($__session_id) {
 %     my $session = CGI::Session->new(
 %       'id:static',
 %       $__session_id,
@@ -162,7 +162,8 @@
 %        }
 </div>
 %     }
-% }
+%   }
+%   if (exists $context->{menu}) {
         <div>
           <form action="<% $context->{menu}->get_root() %>/service/api/super_search.html" method="post">
             <& /lib/html/hidden_reqargs.mhtml, ignore => qr{ \A q \z }xms &>
@@ -182,7 +183,7 @@
             </div>
           </form>
         </div>
-
+%   }
 % }
       </div> <!-- end of right -->
 
