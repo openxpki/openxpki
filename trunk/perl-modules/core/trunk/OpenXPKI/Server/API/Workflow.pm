@@ -594,7 +594,17 @@ sub create_workflow_instance {
                     message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
                     params  => {FIELDS => $eval});
             }
-            $eval->rethrow();
+            if (ref $eval eq 'OpenXPKI::Exception') {
+                $eval->rethrow();
+            }
+            else {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED_EVAL_ERROR',
+                    params  => {
+                        ERROR => "$eval",
+                    },
+                );
+            }
         }
         OpenXPKI::Exception->throw (
                 message => 'I18N_WF_ERROR_ILLEGAL_STATE');
