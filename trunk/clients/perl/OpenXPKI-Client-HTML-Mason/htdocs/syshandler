@@ -38,7 +38,6 @@
   );
   
 </%once>
-
 <%init>
     ## if there is a session and we are not in the authentication process
     ## then re-use the session
@@ -52,9 +51,7 @@
     }
     $m->comp ('/lib/language.mhtml', "session_id" => $__session_id);
 </%init>
-
 <%flags>
   # this is the toplevel handler
   inherit => undef
 </%flags>
-
