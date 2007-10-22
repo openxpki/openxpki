@@ -11,8 +11,9 @@ THIS_DIR=`pwd`
 # Fetch newer files from the master server
 # (do NOT shorten the name "sourceforge" below, 
 # this would ruin the operation of wget):
+#${WGET} -nH -m -I lastmidnight http://openxpki.sourceforge.net/lastmidnight/index.html
 
-${WGET} -nH -m -I lastmidnight http://openxpki.sourceforge.net/lastmidnight/index.html
+${WGET} -nH -m -I lastmidnight http://www7.openxpki.org/lastmidnight/index.html
 
 # Remove those files at the mirror, which are 
 # not referenced by new index.html any more:
