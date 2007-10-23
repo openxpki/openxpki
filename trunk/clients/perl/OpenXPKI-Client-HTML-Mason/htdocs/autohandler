@@ -166,7 +166,6 @@
 %   if (exists $context->{menu}) {
         <div>
           <form action="<% $context->{menu}->get_root() %>/service/api/super_search.html" method="post">
-            <& /lib/html/hidden_reqargs.mhtml, ignore => qr{ \A q \z }xms &>
             <script type="text/javascript">
               var EmptySearchFieldDone = 0;
               function EmptySearchField(elem) {
@@ -179,6 +178,10 @@
             </script>
             <div>
               <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />
+%   my %menu_hash = $context->{menu}->get_menu_hash();
+%    foreach my $key (keys %menu_hash) {
+              <input type="hidden" name="<% $key %>" value="<% $menu_hash{$key} %>"/>
+%    }
               <input type="image" name="submit" src="<% ${path} %>images/search.png" alt="Search" />
             </div>
           </form>
