@@ -93,6 +93,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_ACTIVITY_TOOLS_DETERMINEISSUINGCA_NO_MATCHING_PROFILE"
 msgstr ""
 
+msgid "I18N_OPENXPKI_APPROVAL_MESSAGE_CRR"
+msgstr ""
+"I approve the CRR for workflow __WFID__.\r\n"
+"ID of the certificate to be revoked:\r\n"
+"__CERT_IDENTIFIER__\r\n"
+"SHA1-Hash of the session ID:\r\n"
+"__HASHSESSIONID__"
+
 msgid "I18N_OPENXPKI_APPROVAL_MESSAGE_CSR"
 msgstr ""
 "I approve the CSR for workflow __WFID__.\r\n"
@@ -313,6 +321,25 @@ msgid "I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT"
 msgstr "A timeout occured while reading data from the CA server."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_DESCRIPTION"
+msgstr ""
+"To approve this certificate signing request, you can either approve with or "
+"without signature. Please choose the appropriate button to approve the "
+"certificate request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_SIGNING"
+msgstr "Approve CSR using digital signature"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_TITLE"
+msgstr "Approve CSR using digital signature"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_WITHOUT_SIGNING"
+msgstr "Approve CSR without digital signature"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_DESCRIPTION"
 msgstr ""
 "You are logged in to the web interface of the trustcenter. Please note that "
@@ -321,8 +348,16 @@ msgstr ""
 "menu."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_SIGNING"
+msgstr "Approve CSR using digital signature"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_TITLE"
 msgstr "Trustcenter Web Interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_WITHOUT_SIGNING"
+msgstr "Approve CSR without digital signature"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_DESCRIPTION"
 msgstr ""
@@ -338,6 +373,15 @@ msgstr "Certificate Signing Request: Approval"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_WITHOUT_SIGNING"
 msgstr "Approve CSR without digital signature"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CODE_SIGNING_APPROVAL_DESCRIPTION"
+msgstr ""
+"Please choose the role for which you would like to request a certificate."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CODE_SIGNING_APPROVAL_TITLE"
+msgstr "Choose a role"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CRR_APPROVAL_DESCRIPTION"
@@ -481,6 +525,18 @@ msgstr "Descriptions of the form fields"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_INSERT_CSR_TITLE"
+msgstr "Trustcenter Web Interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CODE_SIGNING_DESCRIPTION"
+msgstr ""
+"You are logged in to the web interface of the trustcenter. Please note that "
+"this software support several instances of certification authorities (CAs). "
+"If you are not sure which CA you actually use then please check the info "
+"menu."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CODE_SIGNING_TITLE"
 msgstr "Trustcenter Web Interface"
 
 #, fuzzy
@@ -643,6 +699,94 @@ msgstr "Automatic browser detection"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
 msgstr "Certificate Information"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_ALREADY_DOWNLOADED"
+msgstr "reset"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_ARCHIVED_WFS"
+msgstr "Overview"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_NEW_WF_TITLE"
+msgstr "Certificate #__SERIAL__"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_ERROR_DESC"
+msgstr ""
+"Using the form below, you can create a new request for certificate "
+"revocation (CRR). Please choose a workflow type, a reason why you want to "
+"revoke the certificate and the time of invalidity of the certificate (this "
+"may not be in the future). If relevant, include background information in "
+"the comment field."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_ERROR_TITLE"
+msgstr "Errors"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_SUCCESS_DESC"
+msgstr ""
+"The certificate has been successfully flagged as revoked in the database. "
+"Now might be a good moment to issue a new certificate revocation list (CRL). "
+"If you want to do this now, please use the link below."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_SUCCESS_TITLE"
+msgstr "Certificate successfully revoked"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_DESC"
+msgstr "Login"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_DOWNLOAD_SIGNED_FILE"
+msgstr "Trustcenter Web Interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_DOWNLOAD_SIGNED_FILE_AGAIN"
+msgstr "Login again"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_FILENAME"
+msgstr "reset"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_FILETYPE_FORM"
+msgstr "Cryptographic Service Provider (free-form)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_INTRO_DESC"
+msgstr "Login"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_NOTIFIED_BUT_NOT_YET_DOWNLOADED"
+msgstr "Logout failed"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_NOTIFIED_WFS"
+msgstr "Login"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_PENDING_WFS"
+msgstr "Certificate Information"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_TITLE"
+msgstr "Trustcenter Web Interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_UPLOAD_FILE_FORM"
+msgstr "Cryptographic Service Provider (free-form)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_WAITING_FOR_APPROVAL"
+msgstr "The requested format __FORMAT__ is not supported."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_WAITING_FOR_CODESIGNING_SOAP_SERVER"
+msgstr "Login"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_SUCCESS_CREATE_CRL"
 msgstr "Create a new certificate revocation list (CRL)"
@@ -1382,6 +1526,22 @@ msgstr "Value"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS"
 msgstr "Tickets"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_DESC"
+msgstr "Activity not implemented"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_ERROR_DESC"
+msgstr "Activity not implemented"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_ERROR_TITLE"
+msgstr "Activity not implemented"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_TITLE"
+msgstr "Activity not implemented"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
 msgstr ""
@@ -2842,6 +3002,10 @@ msgstr "Waiting for certificate issuance"
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
 msgstr "CA Info"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_CODESIGNING"
+msgstr "CA Info"
+
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CRR"
 msgstr "Revocation Request (CRR)"
 
@@ -3378,6 +3542,12 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED_EVAL_ERROR"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
@@ -4223,6 +4393,34 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_SOAPCALL_CALL_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_SOAPCALL_NEW_MISSING_METHOD_PARAM"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_SOAPCALL_NEW_MISSING_NAMESPACE_PARAM"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_SOAPCALL_NEW_MISSING_WSDL_PARAM"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_SOAPCALL_UNEXPECTED_RESULT_STRUCTURE"
+msgstr "testuser"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTISSUANCE_IMPORTCERTDATA_INVALID_CSR_TYPE"
 msgstr "Certificates"
 
@@ -4736,6 +4934,16 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_SOAPCALL_CONFIGURATION_ERROR_MANDATORY_PARAMETERS_MISSING"
+msgstr "Certificates"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_SOAPCALL_CONFIGURATION_ERROR_PARAM_MAPPING_INVALID_FORMAT"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_CONFIG_ID_CONTEXT_ENTRY_COULD_NOT_BE_FOUND"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -4849,6 +5057,14 @@ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SELF_SIGNED"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_CONFIGURATION_ERROR_MANDATORY_PARAMETERS_MISSING"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_METHOD_RETURNED_FALSE"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
@@ -5849,6 +6065,10 @@ msgstr "Certificate Signing Request (CSR)"
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr "Offline part of a Certificate Signing Request (CSR)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CODE_SIGNING_REQUEST"
+msgstr "Certificate Signing Request (CSR)"
+
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "CRL Issuance"
 
@@ -6027,10 +6247,6 @@ msgstr "yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_CODE_SIGNING_REQUEST_PENDING"
 #~ msgstr "Pending (in editing state)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_TYPE_CODE_SIGNING_REQUEST"
-#~ msgstr "Certificate Signing Request (CSR)"
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
 #~ msgstr "Description"
@@ -6450,10 +6666,6 @@ msgstr "yes"
 #~ "the info menu."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_NAME"
-#~ msgstr "reset"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
 #~ msgstr "reset"
 
@@ -6524,10 +6736,6 @@ msgstr "yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_COMPROMISE_TIME"
 #~ msgstr "Trustcenter Web Interface"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_REASON_NAME"
-#~ msgstr "reset"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"

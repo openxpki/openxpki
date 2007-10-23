@@ -39,7 +39,19 @@
       </validator>
   </action>
   <action name="approve_crr"
-	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve">
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve"
+          pkcs7tool="testsceppkcs7tool1"
+          multi_role_approval="0"
+          check_creator="0">
+          <!-- if multi_role_approval is set to 1, a user is allowed
+               to approve the certificate request with different
+               session roles -->
+      <field name="_signature"/>
+      <field name="_signature_text"/>
+      <validator name="ValidApprovalSignature">
+        <arg>$_signature</arg>
+        <arg>$_signature_text</arg>
+     </validator>
   </action>
   <action name="export_crr"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export"

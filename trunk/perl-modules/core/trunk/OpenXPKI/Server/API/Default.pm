@@ -656,6 +656,21 @@ sub get_approval_message {
             '__HASHSESSIONID__' => $hash_sessionid,
         );
     }
+    elsif ($arg_ref->{TYPE} eq 'CRR') {
+        ##! 16: 'CRR'
+        my $wf_info = CTX('api')->get_workflow_info({
+            WORKFLOW => $arg_ref->{WORKFLOW},
+            ID       => $arg_ref->{ID},
+        });
+        my $cert_id = $wf_info->{WORKFLOW}->{CONTEXT}->{cert_identifier};
+        # translate message
+        $result = OpenXPKI::i18n::i18nGettext(
+            'I18N_OPENXPKI_APPROVAL_MESSAGE_CRR',
+            '__WFID__' => $arg_ref->{ID},
+            '__CERT_IDENTIFIER__' => $cert_id,
+            '__HASHSESSIONID__' => $hash_sessionid,
+        );
+    }
     # change back the language to the original session language
     ##! 16: 'changing back language to: ' . $sess_lang
     set_language($sess_lang);
