@@ -284,6 +284,7 @@ WriteMakefile(
 	'Filter::Util::Call'     => 1,
         'IO::Prompt'             => '0.99.4', # required for deployment tools
 	## includes the version of libintl-perl which includes Locale::Messages
+    'IPC::ShareLite'         => '0.09',
 	'Locale::TextDomain'     => 1,
 	'Log::Log4perl'          => '0.51',
         'Mail::RFC822::Address'  => '0.3',
