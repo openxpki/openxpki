@@ -114,7 +114,7 @@
       <div class="left">
         <a href="http://www.openxpki.org/"><img
           src="<% ${path} %>images/openxpki_sinorcaish.png" alt="OpenXPKI"
-          width="325" height="60" /></a>
+          width="325" height="68" /></a>
       </div>
 
       <div class="right">
