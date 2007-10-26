@@ -196,7 +196,6 @@ OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
-OpenXPKI/Server/Workflow/Activity/Tools/CreateWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ForkWorkflowInstance.pm
@@ -204,6 +203,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Sleep.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Notification.pm
+OpenXPKI/Server/Workflow/Activity/Tools/NotifyParentWorkflow.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
@@ -263,6 +263,7 @@ OpenXPKI/Server/Workflow/Condition/CertificateNotYetRevoked.pm
 OpenXPKI/Server/Workflow/Condition/LdapDnAvailable.pm
 OpenXPKI/Server/Workflow/Condition/UseLdap.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
+OpenXPKI/Server/Workflow/Condition/CheckForkedWorkflowChildren.pm
 
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm

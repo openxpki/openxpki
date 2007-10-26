@@ -55,11 +55,21 @@
       workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING">
   </action>
 
-  <!-- Waiting for LDAP publishing if forked --> 
-  <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
-          class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"
-          time="2">
-  </action>
+  <action name="notify_parent_success"
+      class="OpenXPKI::Server::Workflow::Activity::Tools::NotifyParentWorkflow"
+      result="SUCCESS"/>
+
+  <action name="notify_parent_failure"
+      class="OpenXPKI::Server::Workflow::Activity::Tools::NotifyParentWorkflow"
+      result="FAILURE"/>
+
+  <action name="child_finished_successfully"
+      class="OpenXPKI::Server::Workflow::Activity::Tools::NotifyParentWorkflow"
+      result="SUCCESS"/>
+
+  <action name="child_finished_failure"
+      class="OpenXPKI::Server::Workflow::Activity::Tools::NotifyParentWorkflow"
+      result="FAILURE"/>
 
 <!-- for testing only
   <action name="I18N_OPENXPKI_WF_ACTIVITY_SLEEP"

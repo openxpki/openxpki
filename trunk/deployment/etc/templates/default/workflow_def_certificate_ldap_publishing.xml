@@ -41,6 +41,13 @@
   <state name="ALL_NODES_PRESENT" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_LDAP_ALL_NODES_PRESENT</description>
     <action name="public_cert_ldap"
+             resulting_state="PUBLISHED">
+    </action>
+  </state>
+
+  <state name="PUBLISHED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_LDAP_PUBLISHED</description>
+    <action name="notify_parent_success"
              resulting_state="SUCCESS">
     </action>
   </state>

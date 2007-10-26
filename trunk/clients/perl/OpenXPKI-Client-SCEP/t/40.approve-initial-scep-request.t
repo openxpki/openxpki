@@ -137,7 +137,7 @@ SKIP: {
         );
         if (exists $msg->{'PARAMS'}->{'WORKFLOW'}->{'STATE'} &&
             ($msg->{'PARAMS'}->{'WORKFLOW'}->{'STATE'} eq 'SUCCESS'
-          || $msg->{'PARAMS'}->{'WORKFLOW'}->{'STATE'} eq 'WAITED_FOR_CHILD')) {
+          || $msg->{'PARAMS'}->{'WORKFLOW'}->{'STATE'} eq 'WAITING_FOR_CHILD')) {
             $success = 1;
             if ($debug) {
                 print STDERR "success ...\n";

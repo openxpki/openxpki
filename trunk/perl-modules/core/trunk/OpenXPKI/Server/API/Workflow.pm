@@ -537,6 +537,10 @@ sub create_workflow_instance {
                 $fields{$field->name()} = $field->description();
             }
             ##! 8: "store the allowed parameters"
+
+            # store workflow parent ID and delete it from the arguments
+            $workflow->context->param('workflow_parent_id' => delete($args->{PARAMS}->{'workflow_parent_id'}));
+
 	    foreach my $key (keys %{$args->{PARAMS}})
             {
                 next if (not exists $fields{$key} and $args->{FILTER_PARAMS});

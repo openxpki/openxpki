@@ -101,49 +101,6 @@ onload="InstallCertIEAndTest(document.OpenXPKI)"
     }
     my $wf_id = $wf_info->{ID};
 
-    if ($wf_info->{STATE} eq 'ISSUANCE_PENDING' ||
-        $wf_info->{STATE} eq 'WAITED_FOR_CHILDREN' ||
-        $wf_info->{STATE} eq 'APPROVAL') { # check whether we can advance to the next state
-        # TODO
-        # the || is a workaround for bug #1602288 (so we are at least not
-        # stuck in WAITED_FOR_CHILDREN if it happens)
-        my $g_msg = $context->{client}->send_receive_command_msg(
-            'get_workflow_activities',
-            {
-              WORKFLOW => $wf_type,
-              ID       => $wf_id,
-            },   
-        );
-        my @list;
-        if ($g_msg->{SERVICE_MSG} eq 'ERROR') {
-            @errors = [ $m->comp('/lib/get_deep_error.mhtml', 'msg' => $g_msg) ];
-        }
-        else {
-            @list = @{$g_msg->{PARAMS}};
-            if (scalar @list == 1) { # execute activity
-                my $e_msg = $context->{client}->send_receive_command_msg(
-                    'execute_workflow_activity',
-                    {
-                    WORKFLOW => $wf_type,
-                    ID       => $wf_id,
-                    ACTIVITY => $list[0],
-                    },   
-                );
-            }
-        }
-        my $i_msg = $context->{client}->send_receive_command_msg(
-            'get_workflow_info',
-            {
-                WORKFLOW => $wf_type,
-                ID       => $filtered_workflows[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
-            },
-        );
-        if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
-            @errors = [ $m->comp('/lib/get_deep_error.mhtml', 'msg' => $i_msg) ] ;
-        }
-        $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
-
-    }
     if ($wf_info->{STATE} eq 'FAILURE') { # failed because of LDAP
          @errors = [ 'I18N_OPENXPKI_HTML_SMARTCARD_FAILURE_ISSUANCE_IMPOSSIBLE' ]; # TODO: does this work?
     }
@@ -233,7 +190,8 @@ onload="InstallCertIEAndTest(document.OpenXPKI)"
 %       || $wf_info->{STATE} eq 'APPROVAL') {
       <& './waiting_for_approval.mhtml' &>
 %   }
-%   elsif ($wf_info->{STATE} eq 'ISSUANCE_PENDING') {
+%   elsif ($wf_info->{STATE} eq 'ISSUANCE_PENDING'
+%       || $wf_info->{STATE} eq 'CHILDREN_FINISHED') {
       <& './waiting_for_issuance.mhtml' &>
 %   }
 %   elsif ($wf_info->{STATE} eq 'INSTALL_CERTIFICATE') {

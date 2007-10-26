@@ -80,13 +80,13 @@
   <state name="APPROVED" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_DESC_APPROVED</description>
     <action name="fork_cert_issuance_instances"
-	    resulting_state="CERT_ISSUANCES_FORKED">
+	    resulting_state="ISSUANCE_PENDING">
     </action>
   </state>
 
   <state name="CSRS_PERSISTED" autorun="yes">
     <action name="fork_cert_issuance_instances"
-	    resulting_state="CERT_ISSUANCES_FORKED">
+	    resulting_state="ISSUANCE_PENDING">
     </action>
 
     <action name="fail_workflow"
@@ -94,46 +94,24 @@
         <condition name="ACL::fail_workflow"/>
     </action>
   </state>
-
-  <state name="CERT_ISSUANCES_FORKED" autorun="yes">
-    <action name="sleep_for_children"
-            resulting_state="WAITED_FOR_CHILDREN">
-    </action>
-    <action name="fail_workflow"
-            resulting_state="FAILURE">
-        <condition name="ACL::fail_workflow"/>
-    </action>
-  </state>
-
-  <!-- if child is not yet finished, this goes out of autorun -->
-  <state name="WAITED_FOR_CHILDREN" autorun="yes" may_stop="yes">
-    <action name="write_certificate_to_install"
-            resulting_state="INSTALL_CERTIFICATE">
-      <condition name="wf_children_instances_finished"/>
-    </action>
-    <action name="null2"
-            resulting_state="ISSUANCE_PENDING">
-      <condition name="!wf_children_instances_finished"/>
-    </action>
-    <action name="set_error_issuance_failed"
-            resulting_state="FAILURE">
-      <condition name="wf_child_instance_failure"/>
-    </action>
-    <action name="fail_workflow"
-            resulting_state="FAILURE">
-        <condition name="ACL::fail_workflow"/>
-    </action>
-  </state>
-
 
   <state name="ISSUANCE_PENDING">
-    <action name="write_certificate_to_install"
-            resulting_state="INSTALL_CERTIFICATE">
-      <condition name="wf_children_instances_finished"/>
+    <action name="child_finished_successfully"
+            resulting_state="CHILDREN_FINISHED">
+      <condition name="all_wf_children_instances_finished"/>
+    </action>
+    <action name="child_finished_failure"
+            resulting_state="FAILURE">
     </action>
     <action name="fail_workflow"
             resulting_state="FAILURE">
         <condition name="ACL::fail_workflow"/>
+    </action>
+  </state>
+
+  <state name="CHILDREN_FINISHED" autorun="yes">
+    <action name="write_certificate_to_install"
+            resulting_state="INSTALL_CERTIFICATE">
     </action>
   </state>
 

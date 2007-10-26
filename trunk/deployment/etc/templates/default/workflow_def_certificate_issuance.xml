@@ -12,7 +12,7 @@
 
   <!-- this state is implicitly autostarted by the parent workflow -->
   <state name="WAITING_FOR_START">
-    <action name="null" 
+    <action name="notify_parent_failure" 
 	    resulting_state="FAILURE">
       <condition name="!valid_csr_serial_present"/>
     </action>
@@ -62,29 +62,26 @@
 
   <state name="SPAWNING_CERTIFICATE_LDAP_PUBLISHING" autorun="yes">
    <action name="I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
-           resulting_state="SLEEPING_FOR_CHILD">
+           resulting_state="WAITING_FOR_CHILD">
         <condition name="use_ldap"/>
       </action>
-      <action name="null"
+      <action name="notify_parent_success"
           resulting_state="SUCCESS">
         <condition name="!use_ldap"/>
       </action>
   </state>
 							
-  <state name="SLEEPING_FOR_CHILD" autorun="yes">
-   <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
-                  resulting_state="CHECK_CHILD_FINISHED">
+  <state name="WAITING_FOR_CHILD">
+      <!-- = notify_parent_success -->
+   <action name="child_finished_successfully"
+                  resulting_state="SUCCESS">
+      <condition name="all_wf_children_instances_finished"/>
+   </action>
+      <!-- = notify_parent_failure -->
+   <action name="child_finished_failure"
+                  resulting_state="FAILURE">
    </action>
   </state>
-
-  <state name="CHECK_CHILD_FINISHED" autorun="yes" may_stop="yes">
-   <action name="null"
-      resulting_state="SUCCESS">
-     <condition name="wf_child_instance_finished"/>
-   </action>
-  </state>
-
-
 
   <state name="FAILURE"/>
   <state name="SUCCESS"/>

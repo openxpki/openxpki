@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 23;
+plan tests => 25;
 
 use OpenXPKI::Tests;
 use OpenXPKI::Client;
@@ -112,9 +112,9 @@ $msg = $client->send_receive_command_msg(
 ); 
 ok(! is_error_response($msg), 'Successfully persisted CSR') or diag Dumper $msg;
 ok(
-       ($msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'CHECK_CHILD_FINISHED')
+       ($msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'WAITING_FOR_CHILD')
     || ($msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'SUCCESS'),
-    'State is CHECK_CHILD_FINISHED or SUCCESS'
+    'State is WAITING_FOR_CHILD or SUCCESS'
 ) or diag Dumper $msg;
 
 $msg = $client->send_receive_command_msg(
@@ -141,11 +141,22 @@ while ($try <= 60 && $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'} ne 'SUCCES
     $try++;
 }
 is($msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'}, 'SUCCESS', 'Certificate issuance workflow is in state SUCCESS') or diag Dumper $msg;
+my $cert_iss_wfid = $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
+# once the cert issuance workflow is in state 'SUCCESS', the CSR workflow should be, too
+$msg = $client->send_receive_command_msg(
+    'get_workflow_info',
+    {
+        WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
+        ID       => $wf_id,
+    },
+);
+ok(! is_error_response($msg), 'get_workflow_info (CSR)') or diag Dumper $msg;
+is( $msg->{PARAMS}->{WORKFLOW}->{STATE}, 'SUCCESS', 'CSR workflow in state SUCCESS' );
 
 $msg = $client->send_receive_command_msg(
     'get_workflow_info',
     {
-          'ID'       => $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
+          'ID'       => $cert_iss_wfid,
           'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
     },
 ); 

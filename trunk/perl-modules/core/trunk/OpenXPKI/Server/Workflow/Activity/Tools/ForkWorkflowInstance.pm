@@ -9,12 +9,15 @@ use strict;
 use English;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
+use POSIX qw(:signal_h :errno_h :sys_wait_h);
+
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Session::Mock;
 
+use IPC::ShareLite;
 use Data::Dumper;
 
 sub execute {
@@ -67,21 +70,17 @@ sub execute {
     my $wf_info;
     eval {
     ##! 16: 'fake session role set, role: ' . CTX('session')->get_role()
-        if (scalar %{$params}) { # we are called from within another
-                                 # activity class, use the params passed
-            $wf_info = $api->create_workflow_instance({
-                WORKFLOW      => $wf_child_instance_type,
-                FILTER_PARAMS => 1,
-                PARAMS        => $params,
-            });
+        if (! scalar %{$params}) { 
+            $params = $context->param();
         }
-        else { # normal behaviour, copy params from parent context
-            $wf_info = $api->create_workflow_instance({
-                WORKFLOW      => $wf_child_instance_type,
-                FILTER_PARAMS => 1,
-                PARAMS        => $context->param(),
-            });
-        }
+        $params->{'workflow_parent_id'} = $workflow->id();
+        ##! 16: 'parent_id: ' . $params->{'workflow_parent_id'}
+                                   
+        $wf_info = $api->create_workflow_instance({
+            WORKFLOW      => $wf_child_instance_type,
+            FILTER_PARAMS => 1,
+            PARAMS        => $params,
+        });
         my $wf_child_instance_id = $wf_info->{WORKFLOW}->{ID};
         if (!defined $wf_child_instance_id) {
             OpenXPKI::Exception->throw(
@@ -118,10 +117,8 @@ sub execute {
         CTX('dbi_log')->disconnect();
         my $redo_count = 0;
         my $pid;
-        $SIG{CHLD} = 'IGNORE'; # avoids zombies, TODO: research on
-                               # which systems this actually works
-                               # Martin suggests to set up a handler for
-                               # SIGCHLD that does waitpid ...
+        $SIG{CHLD} = \&child_handler;
+
         while (!defined $pid && $redo_count < 5) {
             ##! 32: 'trying to fork'
     	    $pid = fork();
@@ -166,6 +163,33 @@ sub execute {
                 'force' => 1,
             }); 
             ##! 16: 'old session restored, role: ' . CTX('session')->get_role()
+
+            # TODO - figure out if the key is OK
+            ##! 16: 'create (if necessary) new shared memory with key ' . $PID
+            my $share = new IPC::ShareLite( -key     => $PID,
+                                            -create  => 'yes',
+                                            -destroy => 'no' );
+            if (! defined $share) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_SHARED_MEMORY_NOT_CREATED',
+                    params  => {
+                        ERROR => $!,
+                    },
+                );
+            }
+            $share->lock();
+            my $shared_content = $share->fetch();
+            ##! 16: 'shared content: ' . $shared_content
+            my $pids = {};
+            if ($shared_content) {
+                $pids = $serializer->deserialize($shared_content);
+            }
+            ##! 16: 'pids: ' . Dumper $pids
+            $pids->{$pid} = 1;
+            ##! 16: 'new pids: ' . Dumper $pids
+
+            $share->store($serializer->serialize($pids));
+            $share->unlock();
         }
         else {
     	    ##! 16: 'child here'
@@ -180,7 +204,7 @@ sub execute {
             CTX('dbi_backend')->connect();
             ##! 16: 'child: DB handles reconnected'
             ##! 16: 'child dbi_workflow: ' . Dumper CTX('dbi_workflow')
-    
+
             ### we work in the background, so we don't need/want to
             ### communicate with anyone -> close the socket file
             ### note that if we don't, the child waits for a communication
@@ -271,6 +295,50 @@ sub execute {
     return;
 }
 
+sub child_handler {
+    my $pid = waitpid(-1, &WNOHANG);
+    ##! 16: 'pid: ' . $pid
+    
+    my $serializer = OpenXPKI::Serialization::Simple->new();
+    ##! 16: 'accessing shared mem with key ' . $PID
+    my $share = new IPC::ShareLite( -key     => $PID,
+                                    -create  => 'no',
+                                    -destroy => 'no' );
+    if (defined $share) {
+        # share might not be defined because it the child_handler
+        # might be called from open or system after the share
+        # has already been destroyed
+        my $shared_content = $share->fetch();
+        ##! 16: 'shared content: ' . $shared_content
+        my $pids = {};
+        if ($shared_content) {
+            $pids = $serializer->deserialize($shared_content);
+        }
+        ##! 16: 'pids: ' . Dumper $pids
+        # this should not be necessary, because the deletion is
+        # supposed to take place in the CheckForkedWorkflowChildren
+        # condition - this is only here to free shared memory in
+        # case something goes wrong ...
+        if (WIFEXITED($?)) {
+            ##! 16: 'exited'
+            delete $pids->{$pid};
+        }
+        ##! 16: 'new pids: ' . Dumper $pids
+        if (scalar keys %{ $pids } == 0) {
+            # we are done, destroy shared memory
+            $share = new IPC::ShareLite( -key     => $PID,
+                                         -create  => 'no',
+                                         -destroy => 'yes',
+            );
+            undef $share;
+        }
+        else {
+            $share->store(OpenXPKI::Serialization::Simple->new()->serialize($pids));
+        }
+    }
+    $SIG{'CHLD'} = \&child_handler;
+}
+
 1;
 __END__
 
@@ -307,3 +375,7 @@ $fork_wf_instance->execute(
     'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
     $params
 );
+
+When creating a new forked workflow, the activity adds an entry in
+a shared memory segment indexed using the parent PID. This allows
+to figure out which children are still running.

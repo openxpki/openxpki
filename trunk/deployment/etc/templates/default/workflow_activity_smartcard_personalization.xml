@@ -86,5 +86,11 @@
   <action name="fail_workflow"
           class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
           error_code="failed_by_administrator"/>
+
+  <action name="child_finished_successfully"
+      class="Workflow::Action::Null"/>
+
+  <action name="child_finished_failure"
+      class="Workflow::Action::Null"/>
 </actions>
 

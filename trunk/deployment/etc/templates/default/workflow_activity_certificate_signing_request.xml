@@ -186,5 +186,10 @@
           class="OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10">
   </action>
 
+  <action name="child_finished_successfully"
+      class="Workflow::Action::Null"/>
+
+  <action name="child_finished_failure"
+      class="Workflow::Action::Null"/>
 </actions>
 

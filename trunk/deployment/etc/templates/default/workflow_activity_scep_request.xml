@@ -109,5 +109,11 @@
           role="CA Operator">
   </action>
 
+  <action name="child_finished_successfully"
+      class="Workflow::Action::Null"/>
+
+  <action name="child_finished_failure"
+         class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
+    error_code="badRequest"/> 
 </actions>
 

@@ -153,6 +153,7 @@
   </condition>
 
   <!-- conditions for child workflow control -->
+  <!-- obsolete ... -->
   <condition name="wf_child_instance_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
   </condition>
   <condition name="wf_children_instances_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
@@ -160,6 +161,10 @@
   <condition name="wf_child_instance_success" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
   </condition>
   <condition name="wf_child_instance_failure" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenFailure">
+  </condition>
+
+  <!-- new -->
+  <condition name="all_wf_children_instances_finished" class="OpenXPKI::Server::Workflow::Condition::CheckForkedWorkflowChildren">
   </condition>
 
   <!-- conditions for smartcard personalization -->

@@ -14,4 +14,7 @@
   <action name="add_missing_node"
 	  class="OpenXPKI::Server::Workflow::Activity::CertLdapPublish::AddMissingNode">
   </action>
+  <action name="notify_parent_success"
+      class="OpenXPKI::Server::Workflow::Activity::Tools::NotifyParentWorkflow"
+      result="SUCCESS"/>
 </actions>
