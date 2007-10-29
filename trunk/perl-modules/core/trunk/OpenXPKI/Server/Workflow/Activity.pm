@@ -13,11 +13,23 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
 use Workflow::Exception qw( workflow_error );
+use Data::Dumper;
+
+__PACKAGE__->mk_accessors( 'resulting_state' );
 
 sub init {
     my ( $self, $wf, $params ) = @_;
     ##! 1: 'start'
+    ##! 64: 'self: ' . Dumper $self
+    ##! 64: 'params: ' . Dumper $params
+    ##! 64: 'wf: ' . Dumper $wf
 
+    # FIXME - this is a bit of a hack - we're peeking into Workflow's
+    # internal structures here. Workflow should provide a way to get
+    # the resulting state for an activity itself.
+    $self->resulting_state($wf->{_states}->{$wf->state()}->{_actions}->{$params->{name}}->{resulting_state});
+
+    ##! 16: 'resulting_state: ' . $self->resulting_state()
     $self->{PKI_REALM} = CTX('session')->get_pki_realm();
     ##! 16: 'self->{PKI_REALM} = ' . $self->{PKI_REALM}
 
