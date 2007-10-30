@@ -77,12 +77,12 @@ $mech->field('text', '');
 $mech->field('type', 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST');
 $mech->click('nosign');
 
-like($mech->response->content, qr/raop\&rarr;RA Operator/, 'Approval present');
+like($mech->response->content, qr/raop\&amp;rarr;RA Operator/, 'Approval present');
 
 $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/cancel_csr_approval.html?id=1279;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
 $mech->form_name('OpenXPKI');
 $mech->click('__submit');
-unlike($mech->response->content, qr/raop\&rarr;RA Operator/, 'No approval present after cancelling');
+unlike($mech->response->content, qr/raop\&amp;rarr;RA Operator/, 'No approval present after cancelling');
 
 $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/reject_csr.html?id=1279;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
 $mech->form_name('OpenXPKI');
@@ -117,7 +117,7 @@ $mech->field('text', '');
 $mech->field('type', 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST');
 $mech->click('nosign');
 
-like($mech->response->content, qr/raop\&rarr;RA Operator/, 'Approval present');
+like($mech->response->content, qr/raop\&amp;rarr;RA Operator/, 'Approval present');
 
 $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/persist_csr.html?id=2047;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
 
