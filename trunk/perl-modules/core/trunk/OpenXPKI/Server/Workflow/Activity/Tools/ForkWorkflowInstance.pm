@@ -205,6 +205,12 @@ sub execute {
             ##! 16: 'child: DB handles reconnected'
             ##! 16: 'child dbi_workflow: ' . Dumper CTX('dbi_workflow')
 
+            # save parent PID, because we will need it to reference
+            # the correct IPC share later on. This will not work
+            # with getppid if the parent dies in the meantime and
+            # the child becomes a child of 1 (init).
+            $OpenXPKI::Server::Context::who_forked_me = getppid();
+
             ### we work in the background, so we don't need/want to
             ### communicate with anyone -> close the socket file
             ### note that if we don't, the child waits for a communication

@@ -22,8 +22,8 @@ sub evaluate {
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    ##! 16: 'accessing shared mem with key: ' . getppid()
-    my $share = new IPC::ShareLite( -key     => getppid(),
+    ##! 16: 'accessing shared mem with key: ' . $OpenXPKI::Server::Context::who_forked_me
+    my $share = new IPC::ShareLite( -key     => $OpenXPKI::Server::Context::who_forked_me,
                                     -create  => 'no',
                                     -destroy => 'no' );
     if (! defined $share) {
