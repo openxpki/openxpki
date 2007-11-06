@@ -121,7 +121,7 @@ like($mech->response->content, qr/raop\&amp;rarr;RA Operator/, 'Approval present
 
 $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/persist_csr.html?id=2047;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
 
-ok($mech->response->content =~ qr/CHECK_CHILD_FINISHED/ || $mech->response->content =~ qr/SUCCESS/, 'WF in state CHECK_CHILD_FINISHED or SUCCESS after persist');
+ok($mech->response->content =~ qr/WAITING_FOR_CHILD/ || $mech->response->content =~ qr/SUCCESS/, 'WF in state WAITING_FOR_CHILD or SUCCESS after persist') || diag $mech->response->content;
 
 # cert issuance workflow
 $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/show_instance.html?id=5119;__session_id=$session_id&__role=RA%20Operator");
