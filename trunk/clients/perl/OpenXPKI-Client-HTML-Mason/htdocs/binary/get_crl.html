@@ -6,13 +6,14 @@
 </%args>
 
 <%init>
+  my $extension = '';
   ## first we have to check the format
   switch ($format)
   {
-    case "PKCS7" {$format = "PKCS7"}
-    case "TXT"   {$format = "TXT"}
-    case "DER"   {$format = "DER"}
-    else {$format = "PEM"}
+    case "PKCS7" {$format = "PKCS7"; $extension = 'pk7'; }
+    case "TXT"   {$format = "TXT";   $extension = 'txt'; }
+    case "DER"   {$format = "DER";   $extension = 'crl'; }
+    else {$format = "PEM";           $extension = 'pem'; }
   }
 
   ## second we compensate a missing content-type
@@ -40,7 +41,15 @@
                    'FORMAT'   => $format});
   my $item = $msg->{PARAMS};
 
+  my $download_filename = $ca_id . '.' . $extension;
   ## now send the stuff
+  eval {
+    $r->header_out('Content-Disposition' => ("attachment; filename=$download_filename")); 
+  };
+  if ($EVAL_ERROR) {
+    # mod_perl 2
+    $r->headers_out->add('Content-Disposition' => ("attachment; filename=$download_filename"));
+  }
   $r->content_type ($content_type);
   print $item;
   return 1;

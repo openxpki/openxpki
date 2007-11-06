@@ -52,8 +52,19 @@
           return 1;
       }
       ## now send the stuff
+      my $filename = $m->comp('/lib/filename_for_cert.mhtml',
+        'identifier' => $identifier,
+        'extension'  => $extension,
+      );
+
+      eval {
+        $r->header_out('Content-Disposition' => ("attachment; filename=$filename")); 
+      };
+      if ($EVAL_ERROR) {
+        # mod_perl 2
+        $r->headers_out->add('Content-Disposition' => ("attachment; filename=$filename"));
+      }
       $r->content_type ($content_type);
-      $r->header_out('Content-Disposition',  "attachement; filename=$identifier.$extension");
       print $item;
       return 1;
   }

@@ -2,6 +2,11 @@
   $identifier   => undef
 </%args>
 <%init>
+  my $filename = $m->comp('/lib/filename_for_cert.mhtml',
+    'identifier' => $identifier,
+    'extension'  => 'pem',
+    'chain'      => 1,
+  );
   ## request the chain from the server
   my $msg  = $context->{client}->send_receive_command_msg (
                   "get_chain",
@@ -10,6 +15,13 @@
   my $item = join "\n", @{$msg->{PARAMS}->{CERTIFICATES}};
 
   ## now send the stuff
+  eval {
+    $r->header_out('Content-Disposition' => ("attachment; filename=$filename")); 
+  };
+  if ($EVAL_ERROR) {
+    # mod_perl 2
+    $r->headers_out->add('Content-Disposition' => ("attachment; filename=$filename"));
+  }
   $r->content_type ("text/plain");
   print $item;
   return 1;

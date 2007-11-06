@@ -27,13 +27,14 @@
 
   ## second we have to check the format
   my $native = "";
+  my $extension = "";
   switch ($format)
   {
-    case "PKCS7"     {$native = "PKCS7"}
-    case "TXT"       {$native = "TXT"}
-    case "DER"       {$native = "DER"}
-    case "PEM"       {$native = "PEM"}
-    case "IE_ENROLL" {$native = "PEM"}
+    case "PKCS7"     {$native = "PKCS7"; $extension = 'p7'; }
+    case "TXT"       {$native = "TXT"; $extension = 'txt'; }
+    case "DER"       {$native = "DER"; $extension = 'der'; }
+    case "PEM"       {$native = "PEM"; $extension = 'pem'; }
+    case "IE_ENROLL" {$native = "PEM"; $extension = 'pem'; } # ???
     else {
           print "<h1>".i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_TITLE')."</h1>\n";
           print "<p>\n";
@@ -44,6 +45,11 @@
          }
   }
 
+  my $filename = $m->comp('/lib/filename_for_cert.mhtml',
+    'identifier' => $identifier,
+    'extension'  => $extension,
+  );
+
   ## now request the certificate from the server
   my $msg  = $context->{client}->send_receive_command_msg (
                   "get_cert",
@@ -52,10 +58,18 @@
   my $item = $msg->{PARAMS};
 
   ## now send the stuff
+  eval {
+    $r->header_out('Content-Disposition' => ("attachment; filename=$filename")); 
+  };
+  if ($EVAL_ERROR) {
+    # mod_perl 2
+    $r->headers_out->add('Content-Disposition' => ("attachment; filename=$filename"));
+  }
   $r->content_type ($content_type);
   print $item;
   return 1;
 </%init>
 <%once>
   use Switch;
+  use English;
 </%once>

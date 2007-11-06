@@ -29,6 +29,7 @@ htdocs/lib/field_to_i18n.mhtml
 htdocs/lib/javascript.mhtml
 htdocs/lib/url.mhtml
 htdocs/lib/init_menu.mhtml
+htdocs/lib/filename_for_cert.mhtml
 htdocs/lib/get_menu.mhtml
 htdocs/lib/language.mhtml
 htdocs/lib/get_deep_error.mhtml
