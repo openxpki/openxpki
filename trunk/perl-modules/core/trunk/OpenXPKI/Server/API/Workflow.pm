@@ -370,9 +370,16 @@ sub execute_workflow_activity {
 
     ##! 2: "check parameters"
     my %fields = ();
-    foreach my $field ($workflow->get_action_fields($wf_activity))
-    {
-        $fields{$field->name()} = $field->description();
+    if (scalar keys %{ $wf_params } > 0) {
+        # only call get_action_fields if parameters are actually passed
+        # this especially helps with the call to the
+        # CheckForkedWorkflowChildren condition - get_action_fields
+        # evaluates the condition even though the activity class is
+        # called without any parameters.
+        foreach my $field ($workflow->get_action_fields($wf_activity))
+        {
+            $fields{$field->name()} = $field->description();
+        }
     }
     foreach my $key (keys %{$wf_params})
     {
