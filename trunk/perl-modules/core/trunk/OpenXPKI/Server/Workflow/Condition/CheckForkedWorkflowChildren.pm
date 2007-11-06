@@ -23,6 +23,12 @@ sub evaluate {
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
     ##! 16: 'accessing shared mem with key: ' . $OpenXPKI::Server::Context::who_forked_me
+    if (! defined $OpenXPKI::Server::Context::who_forked_me) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_PARENT_UNKNOWN',
+        );
+    }
+
     my $share = new IPC::ShareLite( -key     => $OpenXPKI::Server::Context::who_forked_me,
                                     -create  => 'no',
                                     -destroy => 'no' );
