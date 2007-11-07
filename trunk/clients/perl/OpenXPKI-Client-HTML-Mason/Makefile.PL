@@ -58,6 +58,7 @@ WriteMakefile(
         'Smart::Comments'  => 0,
         'XML::Simple'      => 0,
         'XML::Parser'      => 0,
+        'Digest::SHA1'     => 0,
     },
     test => {TESTS => 't/*/*.t t/*.t'},
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

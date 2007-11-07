@@ -1,0 +1,22 @@
+<%args>
+    $context => undef
+</%args>
+<%init>
+    return if (! defined $context || ref $context ne 'HASH');
+
+    my $current_context;
+    CONTEXT:
+    foreach my $key (sort keys %{ $context }) {
+        next CONTEXT if ($key =~ m{ \A _ }xms);
+        $current_context->{$key} = $context->{$key};
+    }
+
+    my $serialized_context = OpenXPKI::Serialization::Simple->new()->serialize($current_context);
+
+    my $context_hash = sha1_hex($serialized_context);
+
+    return $context_hash;
+</%init>
+<%once>
+    use Digest::SHA1 qw( sha1_hex );
+</%once>
