@@ -129,6 +129,7 @@
           <!-- if multi_role_approval is set to 1, a user is allowed
                to approve the certificate request with different
                session roles -->
+      <field name="_check_hash"/>
       <field name="_signature"/>
       <field name="_signature_text"/>
       <validator name="ValidApprovalSignature">

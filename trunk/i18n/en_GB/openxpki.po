@@ -3002,10 +3002,6 @@ msgstr "Waiting for certificate issuance"
 msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
 msgstr "CA Info"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_HTML_MENU_CODESIGNING"
-msgstr "CA Info"
-
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CRR"
 msgstr "Revocation Request (CRR)"
 
@@ -4839,6 +4835,9 @@ msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
 
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_CONTEXT_HASH_CHECK_FAILED"
+msgstr "The workflow context has changed since the last time you have seen it, which is why no approval was recorded. Please revisit the workflow information page."
+
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_COULD_NOT_DETERMINE_SIGNER_CERTIFICATE_IDENTIFIER"
 msgstr "The SPKAC string is empty."
@@ -4928,6 +4927,12 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_SHARED_MEMORY_NOT_CREATED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_NOTIFICATION_MESSAGE_UNDEFINED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -4991,6 +4996,18 @@ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKCERTTESTRESULT_TESTRESULT_NOT_TRUE"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_INCORRECT_NUMBER_OF_FORKED_CHILDREN"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_IPC_SHARE_DOES_NOT_EXIST"
+msgstr "LDAP node does not exist"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_PARENT_UNKNOWN"
 msgstr "The SPKAC string is empty."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECK_DN_LDAP_NODE_DOES_NOT_EXIST"
@@ -5057,14 +5074,6 @@ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SELF_SIGNED"
-msgstr "The SPKAC string is empty."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_CONFIGURATION_ERROR_MANDATORY_PARAMETERS_MISSING"
-msgstr "The SPKAC string is empty."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_METHOD_RETURNED_FALSE"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
@@ -6025,6 +6034,10 @@ msgid "I18N_OPENXPKI_WF_STATE_LDAP_PUBLIC_INITIAL"
 msgstr "Initial state of the LDAP publishing workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_PUBLISHED"
+msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_SCEP_INITIAL_ENROLLMENT"
 msgstr "Initializing ..."
 
@@ -6226,6 +6239,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MENU_CODESIGNING"
+#~ msgstr "CA Info"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_CONFIGURATION_ERROR_MANDATORY_PARAMETERS_MISSING"
+#~ msgstr "The SPKAC string is empty."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_METHOD_RETURNED_FALSE"
+#~ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SCEP_CURRENT_NOTAFTER"

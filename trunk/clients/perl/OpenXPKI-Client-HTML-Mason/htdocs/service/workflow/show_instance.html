@@ -22,6 +22,9 @@
 %   my $buttonname = 'I18N_OPENXPKI_WF_ACTION_' . uc($filename);
   <div class="openxpki_command_list_item">
     <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/activity/$filename.html" &>
+% if ($filename eq 'approve_csr') {
+    <& /lib/html/hidden.mhtml, 'name' => 'context_hash', 'value' => $context_hash &>
+% }
     <& /lib/html/hidden.mhtml, 'name' => 'type', 'value' => $type &>
     <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
     <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext($buttonname) &>
@@ -196,6 +199,12 @@
     }
     # TODO - error handling!!!
     my %untainted = ();
+    my $context_hash = '';
+    if ($msg->{PARAMS}->{WORKFLOW}->{TYPE} eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST') {
+        $context_hash = $m->comp('/service/workflow/context_hash.mhtml',
+            'context' => $msg->{PARAMS}->{WORKFLOW}->{CONTEXT},
+        );
+    }
     foreach my $param (keys %{ $msg->{PARAMS}->{WORKFLOW}->{CONTEXT} }) {    
         my $value = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param};
         if ($param eq 'csr_serial' && $value =~ m{\A \d+ \z}xms) {

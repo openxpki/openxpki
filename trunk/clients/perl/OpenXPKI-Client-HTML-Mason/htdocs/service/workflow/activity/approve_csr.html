@@ -4,6 +4,7 @@
     $filled    => undef
     $signature => undef
     $text      => undef
+    $context_hash => undef
 </%args>
 
 <& /service/open_form.mhtml, action => 'approve_csr.html' &>
@@ -13,6 +14,7 @@
 <& /lib/html/hidden.mhtml, 'name' => 'filled', 'value' => '1' &>
 <& /lib/html/hidden.mhtml, 'name' => 'signature', 'value' => '' &>
 <& /lib/html/hidden.mhtml, 'name' => 'text', value => $to_be_signed &>
+<& /lib/html/hidden.mhtml, 'name' => 'context_hash', value => $context_hash &>
 
 <& /lib/javascript.mhtml &>
 
@@ -40,6 +42,9 @@
             $params->{'_signature'}      = $signature;
             $params->{'_signature_text'} = $text;
         }
+        if ($context_hash) {
+            $params->{'_check_hash'} = $context_hash;
+        }
         my $msg = $context->{client}->send_receive_command_msg (
                       "execute_workflow_activity",
                       {
@@ -56,6 +61,29 @@
         }
         else
         {
+            # if available, try to persist the CSR now
+            $msg = $context->{client}->send_receive_command_msg(
+                'get_workflow_activities',
+                {
+                    WORKFLOW => $type,
+                    ID       => $id,
+                },
+            );
+            if (grep { $_ eq 'I18N_OPENXPKI_WF_ACTION_PERSIST_CSR' } @{ $msg->{PARAMS} }) {
+                $msg = $context->{client}->send_receive_command_msg(
+                      'execute_workflow_activity',
+                      {
+                        WORKFLOW => $type,
+                        ID       => $id,
+                        ACTIVITY => "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR",
+                      }
+                );
+            }
+            if (exists $msg->{SERVICE_MSG} and
+                $msg->{SERVICE_MSG} eq "ERROR")
+            {
+                @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
+            }
             return $m->comp ('/service/workflow/show_instance.html',
                              'msg'  => $msg,
                              'type' => $type,

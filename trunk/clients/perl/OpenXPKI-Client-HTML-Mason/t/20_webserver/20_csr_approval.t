@@ -9,7 +9,7 @@ use URI::Escape;
 use Data::Dumper;
 
 use Test::More;
-plan tests => 39;
+plan tests => 38;
 
 my $TEST_PORT = 8099;
 if ($ENV{MASON_TEST_PORT}) {
@@ -68,16 +68,16 @@ like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_
 unlike($mech->response->content, qr/example1.example.com:1234/, 'No prior certificate with same DN present');
 $mech->back();
 
-$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/approve_csr.html?id=1279;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
-$mech->form_name('OpenXPKI');
-$mech->field('id', '1279');
-$mech->field('filled', '1');
-$mech->field('signature', '');
-$mech->field('text', '');
-$mech->field('type', 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST');
-$mech->click('nosign');
+#$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/approve_csr.html?id=1279;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
+#$mech->form_name('OpenXPKI');
+#$mech->field('id', '1279');
+#$mech->field('filled', '1');
+#$mech->field('signature', '');
+#$mech->field('text', '');
+#$mech->field('type', 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST');
+#$mech->click('nosign');
 
-like($mech->response->content, qr/raop\&amp;rarr;RA Operator/, 'Approval present');
+#like($mech->response->content, qr/raop\&amp;rarr;RA Operator/, 'Approval present');
 
 $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/cancel_csr_approval.html?id=1279;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
 $mech->form_name('OpenXPKI');
@@ -119,7 +119,7 @@ $mech->click('nosign');
 
 like($mech->response->content, qr/raop\&amp;rarr;RA Operator/, 'Approval present');
 
-$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/persist_csr.html?id=2047;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
+#$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/persist_csr.html?id=2047;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
 
 ok($mech->response->content =~ qr/WAITING_FOR_CHILD/ || $mech->response->content =~ qr/SUCCESS/, 'WF in state WAITING_FOR_CHILD or SUCCESS after persist') || diag $mech->response->content;
 

@@ -15,6 +15,7 @@ use OpenXPKI::Debug;
 
 use English;
 use Data::Dumper;
+use Digest::SHA1 qw( sha1_hex );
 
 use Encode qw(encode decode);
 
@@ -29,6 +30,39 @@ sub execute
     my $user      = CTX('session')->get_user();
     my $role      = CTX('session')->get_role();
     my $pki_realm = CTX('session')->get_pki_realm(); 
+
+    if (defined $context->param('_check_hash')) {
+        # compute SHA1 hash over the serialization of the context,
+        # skipping volatile entries
+        my $current_context;
+
+       CONTEXT:
+        foreach my $key (sort keys %{ $context->param() }) {
+            next CONTEXT if ($key =~ m{ \A _ }xms);
+            $current_context->{$key} = $context->param($key);
+        }
+        ##! 16: 'current_context: ' . Dumper $current_context;
+
+        my $serialized_context = OpenXPKI::Serialization::Simple->new()->serialize($current_context);
+        ##! 16: 'serialized current context: ' . Dumper $serialized_context
+
+        my $context_hash = sha1_hex($serialized_context);
+
+        ##! 16: 'context_hash: ' . $context_hash
+        
+        if ($context_hash ne $context->param('_check_hash')) {
+            # this means that the context changed, do not approve
+            # and throw an exception
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_CONTEXT_HASH_CHECK_FAILED',
+                params  => {
+                    REQUESTED_HASH => $context->param('_check_hash'),
+                    CURRENT_HASH   => $context_hash,
+                },
+            );
+        }
+    }
+
 
     ## get already present approvals
     my @approvals = ();

@@ -38,6 +38,7 @@
 <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/activity/$filename.html" &>
 <& /lib/html/hidden.mhtml, 'name' => 'type', 'value' => $type &>
 <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
+<& /lib/html/hidden.mhtml, 'name' => 'context_hash', 'value' => $context_hash &>
 <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext($action) &>
 <& /service/close_form.mhtml &>
 </td>
@@ -313,4 +314,8 @@
             %cert_info = %{ $cert_info_deser };
         }
     }
+
+    my $context_hash = $m->comp('/service/workflow/context_hash.mhtml',
+        'context' => $msg->{PARAMS}->{WORKFLOW}->{CONTEXT},
+    );
 </%init>
