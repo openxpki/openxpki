@@ -205,7 +205,7 @@ sub search_cert
         $params{DYNAMIC}->{CSR_SERIAL} = $args->{CSR_SERIAL} if ($args->{CSR_SERIAL});
         $params{DYNAMIC}->{EMAIL}      = $args->{EMAIL}      if ($args->{EMAIL});
         $params{DYNAMIC}->{SUBJECT}    = $args->{SUBJECT}    if ($args->{SUBJECT});
-        $params{DYNAMIC}->{ISSUER}     = $args->{ISSUER}     if ($args->{ISSUER});
+        $params{DYNAMIC}->{ISSUER_DN}  = $args->{ISSUER}     if ($args->{ISSUER});
         # only search in current realm
         $params{DYNAMIC}->{PKI_REALM}  = CTX('session')->get_pki_realm();
         $params{REVERSE} = 1;
