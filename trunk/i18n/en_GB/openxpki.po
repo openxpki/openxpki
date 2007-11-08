@@ -4836,7 +4836,10 @@ msgstr ""
 "action."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_CONTEXT_HASH_CHECK_FAILED"
-msgstr "The workflow context has changed since the last time you have seen it, which is why no approval was recorded. Please revisit the workflow information page."
+msgstr ""
+"The workflow context has changed since the last time you have seen it, which "
+"is why no approval was recorded. Please revisit the workflow information "
+"page."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_COULD_NOT_DETERMINE_SIGNER_CERTIFICATE_IDENTIFIER"
@@ -6156,6 +6159,9 @@ msgstr "Certificates"
 
 msgid "I18N_OPENXPKI_WORKFLOW_CHILDREN"
 msgstr "Workflow children"
+
+msgid "I18N_OPENXPKI_WORKFLOW_PARENT"
+msgstr "Workflow parent"
 
 msgid "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS"
 msgstr ""

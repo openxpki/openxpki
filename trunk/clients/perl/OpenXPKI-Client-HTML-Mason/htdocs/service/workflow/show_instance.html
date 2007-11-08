@@ -326,6 +326,10 @@
             $value = '<a href="' . $context->{menu}->get_root() . '/service/api/cert_info.html?' . $context->{menu}->get_link_params() . ';identifier=' . $value . '">' . encode_entities($value) . '</a>';
             $untainted{$param} = 1;
         }
+        elsif ($param eq 'workflow_parent_id') {
+            $value = '<a href="' . $context->{menu}->get_root() . '/service/workflow/show_instance.html?' . $context->{menu}->get_link_params() . ';id=' . $value . '">#' . encode_entities($value) . '</a>';
+            $untainted{$param} = 1;
+        }
         elsif ($param eq 'invalidity_time') {
             $value = DateTime->from_epoch( epoch => $value )->strftime('%Y-%m-%d %H:%M UTC');
         }
@@ -372,7 +376,7 @@
                  cert_info csr_serial wf_children_instances) ],
         'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE' =>
             [ qw( cert_subject cert_profile cert_role cert_subject_alt_name
-                 csr_serial ) ],
+                 csr_serial workflow_parent_id ) ],
         'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' =>
             [ qw( csr_serial wf_children_instances ) ],
         'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' =>
@@ -380,5 +384,7 @@
         'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST' =>
             [ qw( cert_subject cert_profile cert_role cert_subject_alt_name
                  current_identifier current_valid_certificates csr_serial wf_children_instances) ],
+        'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING' =>
+            [ qw( workflow_parent_id ) ],
     );
 </%init>
