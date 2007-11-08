@@ -14,23 +14,28 @@ sub get_command
     my $self = shift;
 
     $self->get_tmpfile ('IN', 'OUT');
+    if (! exists $self->{DATA})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_MISSING_DATA");
+    }
+    if (! $self->{DATA}) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_DATA_EMPTY'
+        );
+    }
     $self->write_file (FILENAME => $self->{INFILE},
                        CONTENT  => $self->{DATA},
 	               FORCE    => 1);
 
     ## check parameters
 
-    if (not exists $self->{DATA})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_MISSING_DATA");
-    }
     if (not exists $self->{OUT})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_MISSING_OUTPUT_FORMAT");
     }
-    if ($self->{OUT} ne "DER" and $self->{OUT} ne "TXT")
+    if ($self->{OUT} ne 'DER' && $self->{OUT} ne 'TXT' && $self->{OUT} ne 'PEM')
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_WRONG_OUTPUT_FORMAT");
@@ -41,10 +46,17 @@ sub get_command
     my $command  = "crl";
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -in ".$self->{INFILE};
+    if ($self->{IN} eq 'DER') {
+        $command .= " -inform DER";
+    }
     if ($self->{OUT} eq "DER")
     {
         $command .= " -outform DER";
-    } else {
+    }
+    elsif ($self->{OUT} eq 'PEM') {
+        $command .= ' -outform PEM';
+    }
+    else {
         $command .= " -noout -text -nameopt RFC2253,-esc_msb";
     }
 

@@ -65,6 +65,11 @@ sub __init
                                                    OBJECT   => $self->{crl},
                                                    FUNCTION => $attr});
     }
+
+    $self->{PARSED}->{BODY}->{NEXT_UPDATE}
+        = str2time($self->{PARSED}->{BODY}->{NEXT_UPDATE});
+    $self->{PARSED}->{BODY}->{LAST_UPDATE}
+        = str2time($self->{PARSED}->{BODY}->{LAST_UPDATE});
     $self->{TOKEN}->free_object ($self->{crl});
     delete $self->{crl};
     ##! 2: "loaded crl attributes"
@@ -92,7 +97,7 @@ sub __init
                          EXTENSIONS => $ext}; 
             @list = ( @list, $entry );
         }
-        $self->{PARSED}->{LIST} = @list;
+        $self->{PARSED}->{LIST} = \@list;
     }
 
     return 1;
@@ -143,8 +148,8 @@ sub to_db_hash {
 
     my %insert_hash;
     $insert_hash{'DATA'} = $self->get_body();
-    $insert_hash{'LAST_UPDATE'} = str2time($self->get_parsed("BODY", "LAST_UPDATE"));
-    $insert_hash{'NEXT_UPDATE'} = str2time($self->get_parsed("BODY", "NEXT_UPDATE"));
+    $insert_hash{'LAST_UPDATE'} = $self->get_parsed("BODY", "LAST_UPDATE");
+    $insert_hash{'NEXT_UPDATE'} = $self->get_parsed("BODY", "NEXT_UPDATE");
     return %insert_hash;
 }
 

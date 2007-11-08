@@ -6,62 +6,73 @@
 </p>
 <table id="table_list">
   <tr>
-    <th><% i18nGettext('I18N_OPENXPKI_CA_ID') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CRL_FORMAT') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CA_STATUS') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CA_NOTBEFORE') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CA_NOTAFTER') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CRL_ISSUER') %></th>
+    <th colspan=3><% i18nGettext('I18N_OPENXPKI_CRL_FORMAT') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CRL_NUMBER') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CRL_LAST_UPDATE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CRL_NEXT_UPDATE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CRL_ENTRIES') %></th>
   </tr>
-<%perl>
-  foreach my $item (@list)
-  {
-    print "  <tr>\n";
-    print "    <td>\n";
-</%perl>
+%  foreach my $item (@list)
+%  {
+  <tr>
+      <td><% $item->{ISSUER} %></td>
+%     foreach my $format (qw( DER PEM TXT )) {
+        <td>
         <!-- this is safe because filename and format are only hash keys -->
         <& /lib/html/a.mhtml,
            'target' => "../../binary/get_crl.html",
            'params' => [["ca_id",    $item->{LABEL}],
                         ["filename", $item->{FILENAME}],
-                        ["format",   $item->{FORMAT}]],
-           'label'  => $item->{LABEL} &>
-<%perl>
-    print "    </td>\n";
-    print "    <td>\n";
-    print "      ".$item->{FORMAT}."\n";
-    print "    </td>\n";
-    print "    <td>\n";
-    if ($item->{STATUS})
-    {
-        print "      ".i18nGettext('I18N_OPENXPKI_CA_STATUS_USABLE')."\n";
-    } else {
-        print "      ".i18nGettext('I18N_OPENXPKI_CA_STATUS_UNUSABLE')."\n";
-    }
-    print "    </td>\n";
-    print "    <td>\n";
-    print "      ".join (" ", split "T", $item->{NOTBEFORE})." UTC\n";
-    print "    </td>\n";
-    print "    <td>\n";
-    print "      ".join (" ", split "T", $item->{NOTAFTER})." UTC\n";
-    print "    </td>\n";
-  }
-</%perl>
+                        ["format",   $format]],
+           'label'  => $format &>
+        </td>
+%     }
+      <td><% $item->{NUMBER} %></td>
+      <td><% $item->{LAST_UPDATE} %></td>
+      <td><% $item->{NEXT_UPDATE} %></td>
+      <td><% $item->{ENTRIES} %></td>
+    </tr>
+% }
 </table>
 <%init>
   my $msg  = $context->{client}->send_receive_command_msg ("get_ca_list");
   my @list = ();
-  foreach my $ca (sort keys %{$msg->{PARAMS}})
-  {
+  foreach my $ca (sort keys %{$msg->{PARAMS}}) {
     next if (not $msg->{PARAMS}->{$ca}->{crl_publication});
-    foreach my $crl (@{$msg->{PARAMS}->{$ca}->{crl_files}})
-    {
-      push @list, {"LABEL"      => $ca,
-                   "STATUS"     => $msg->{PARAMS}->{$ca}->{status},
-                   "NOTBEFORE"  => $msg->{PARAMS}->{$ca}->{notbefore},
-                   "NOTAFTER"   => $msg->{PARAMS}->{$ca}->{notafter},
-                   "FILENAME"   => $crl->{FILENAME},
-                   "FORMAT"     => $crl->{FORMAT}
-                  };
+    foreach my $crl (@{$msg->{PARAMS}->{$ca}->{crl_files}}) {
+        my $crl_msg = $context->{client}->send_receive_command_msg(
+            'get_crl',
+            {
+                'CA_ID'    => $ca,
+                'FILENAME' => $crl->{FILENAME},
+                'FORMAT'   => 'HASH',
+            },
+        );
+        my $issuer = $crl_msg->{PARAMS}->{BODY}->{ISSUER};
+        # make issuer better breakable
+        $issuer =~ s/,/, /g;
+
+        my $last_update = $crl_msg->{PARAMS}->{BODY}->{LAST_UPDATE};
+        my $dt = DateTime->from_epoch(epoch => $last_update);
+        $last_update = $dt->strftime("%Y-%m-%d %H:%M:%S UTC");
+
+        my $next_update = $crl_msg->{PARAMS}->{BODY}->{NEXT_UPDATE};
+        $dt = DateTime->from_epoch(epoch => $next_update);
+        $next_update = $dt->strftime("%Y-%m-%d %H:%M:%S UTC");
+
+        push @list, {
+           'LABEL'    => $ca,
+           'FILENAME' => $crl->{FILENAME},
+           'ISSUER'   => $issuer,
+           'NUMBER'   => $crl_msg->{PARAMS}->{BODY}->{SERIAL},
+           'LAST_UPDATE' => $last_update,
+           'NEXT_UPDATE' => $next_update,
+           'ENTRIES'     => ref $crl_msg->{PARAMS}->{LIST} eq 'ARRAY' ? scalar @{ $crl_msg->{PARAMS}->{LIST} } : '-',
+        };
     }
   }
 </%init>
+<%once>
+    use DateTime;
+</%once>

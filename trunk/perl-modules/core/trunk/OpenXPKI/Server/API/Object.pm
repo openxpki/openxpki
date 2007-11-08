@@ -145,11 +145,12 @@ sub get_crl
     ##! 2: "check the specified file"
     my $files   = CTX('pki_realm')->{$realm}->{ca}->{id}->{$ca_id}->{crl_files};
     my $correct = 0;
+    my $published_format;
     foreach my $fileset (@{$files})
     {
         next if ($fileset->{FILENAME} ne $filename);
-        next if ($fileset->{FORMAT}   ne $format);
         $correct = 1;
+        $published_format = $fileset->{FORMAT};
         last;
     }
     if (not $correct)
@@ -158,10 +159,45 @@ sub get_crl
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_FOUND',
         );
     }
-
-    ##! 2: "load the file and return it (finished)"
     my $fu = OpenXPKI::FileUtils->new();
-    return $fu->read_file($filename);
+    my $file_content = $fu->read_file($filename);
+    my $output;
+
+    if ($published_format ne $format) {
+        # we still have to convert the CRL
+        my $pki_realm = CTX('session')->get_pki_realm();
+        my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+        ##! 16: 'convert from ' . $fileset->{FORMAT} . ' to ' . $format
+        if ($format eq 'DER' || $format eq 'TXT') {
+            $output = $default_token->command({
+                COMMAND => 'convert_crl',
+                OUT     => $format,
+                IN      => $published_format,
+                DATA    => $file_content,
+            });
+        }
+        elsif ($format eq 'HASH') {
+            # parse CRL using OpenXPKI::Crypto::CRL
+            my $pem_crl = $default_token->command({
+                COMMAND => 'convert_crl',
+                OUT     => 'PEM',
+                IN      => $published_format,
+                DATA    => $file_content,
+            });
+            my $crl_obj = OpenXPKI::Crypto::CRL->new(
+                TOKEN => $default_token,
+                DATA  => $pem_crl,
+            );
+            $output = $crl_obj->get_parsed_ref();
+            ##! 16: 'output: ' . Dumper $output
+        }
+    }
+    else {
+        # we can use the data from the file directly
+        $output = $file_content;
+    }
+    ##! 2: "load the file and return it (finished)"
+    return $output;
 }
 
 sub search_cert_count {

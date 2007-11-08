@@ -127,12 +127,6 @@ msgstr "CA certificate chain"
 msgid "I18N_OPENXPKI_CA_ID"
 msgstr "CA Identifier"
 
-msgid "I18N_OPENXPKI_CA_NOTAFTER"
-msgstr "Not after"
-
-msgid "I18N_OPENXPKI_CA_NOTBEFORE"
-msgstr "Not before"
-
 msgid "I18N_OPENXPKI_CA_STATUS"
 msgstr "Status"
 
@@ -1651,8 +1645,8 @@ msgstr "PKCS#10"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_DESCRIPTION"
 msgstr ""
-"Please enter your search query for workflow context keys and values. You can
-use '*' as a wildcard character. "
+"Please enter your search query for workflow context keys and values. You can "
+"use '*' as a wildcard character. "
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_KEY"
 msgstr "Key"
@@ -1881,8 +1875,23 @@ msgstr "This is the normal user authentication."
 msgid "I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP"
 msgstr "Default key group"
 
+msgid "I18N_OPENXPKI_CRL_ENTRIES"
+msgstr "Entries"
+
 msgid "I18N_OPENXPKI_CRL_FORMAT"
 msgstr "Format"
+
+msgid "I18N_OPENXPKI_CRL_ISSUER"
+msgstr "Issuer"
+
+msgid "I18N_OPENXPKI_CRL_LAST_UPDATE"
+msgstr "Last update"
+
+msgid "I18N_OPENXPKI_CRL_NEXT_UPDATE"
+msgstr "Next update"
+
+msgid "I18N_OPENXPKI_CRL_NUMBER"
+msgstr "CRL number"
 
 msgid "I18N_OPENXPKI_CRYPTO_API_CHECK_COMMAND_PARAM_PARAM_PATH_MISMATCH"
 msgstr ""
@@ -2093,6 +2102,10 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_WRONG_DATATYPE"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_DATA_EMPTY"
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_MISSING_DATA"
@@ -6246,6 +6259,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
 
+#~ msgid "I18N_OPENXPKI_CA_NOTAFTER"
+#~ msgstr "Not after"
+
+#~ msgid "I18N_OPENXPKI_CA_NOTBEFORE"
+#~ msgstr "Not before"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_HTML_MENU_CODESIGNING"
 #~ msgstr "CA Info"
@@ -6813,10 +6832,6 @@ msgstr "yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CRL_REASON_REMOVE_FROM_CRL"
 #~ msgstr "Approve CSR"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_SUPERSEDED"
-#~ msgstr "Serverside key generation"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CRL_REASON_UNSPECIFIED"
