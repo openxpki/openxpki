@@ -748,6 +748,7 @@ sub run
     my $ident = ident $self;
     my $args  = shift;
 
+    $SIG{'TERM'} = \&OpenXPKI::Server::sig_term;
   MESSAGE:
     while (1) {
         my $msg;

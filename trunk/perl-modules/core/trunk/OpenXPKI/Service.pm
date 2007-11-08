@@ -52,17 +52,22 @@ sub talk {
     # this may be undefined in the first invocation, accept it this way
     if (! defined $communication_state || ($communication_state eq 'can_send')) {
         ##! 128: 'talk: ' . Dumper $arg
-	my $rc = $transport{$ident}->write(
-	    $serialization{$ident}->serialize($arg)
+	    my $rc = $transport{$ident}->write(
+	        $serialization{$ident}->serialize($arg)
 	    );
-	$self->set_communication_state('can_receive');
-	return $rc;
-    } else {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_SERVICE_TALK_INCORRECT_COMMUNICATION_STATE",
-	    params => {
-		status => $self->get_communication_state(),
-	    },
+	    $self->set_communication_state('can_receive');
+        if ($OpenXPKI::Server::stop_soon) {
+            ##! 1: 'stop_soon hit'
+            die "We have been asked to stop (SIGTERM)";
+        }
+	    return $rc;
+    }
+    else {
+	    OpenXPKI::Exception->throw(
+	        message => "I18N_OPENXPKI_SERVICE_TALK_INCORRECT_COMMUNICATION_STATE",
+	        params => {
+		        status => $self->get_communication_state(),
+	        },
 	    );
     }
 }
@@ -73,6 +78,11 @@ sub talk {
 sub collect {
     my $self  = shift;
     my $ident = ident $self;
+
+    if ($OpenXPKI::Server::stop_soon) {
+        ##! 1: 'stop_soon hit'
+        die "We have been asked to stop (SIGTERM)";
+    }
 
     my $communication_state = $self->get_communication_state();
     # this may be undefined in the first invocation, accept it this way

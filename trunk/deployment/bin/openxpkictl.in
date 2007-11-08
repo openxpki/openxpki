@@ -34,6 +34,10 @@ my $configfile      = "$openxpkiconfdir/config.xml";
 
 our $QUIET = 0;
 
+my $MAX_ATTEMPTS = 300;
+
+$| = 1;
+
 sub slurp {
     my $arg = shift;
 
@@ -261,20 +265,37 @@ sub do_stop {
 
     print STDOUT "Stopping OpenXPKI\n" if (not $QUIET);
 
-    my @signals = (2, 2, 3, 3, 9);
-
     # get all PIDs which belong to the current process group
     my @pids = __get_processgroup_pids($process_group);
     foreach my $p (@pids) {
         print STDOUT "[$p] " if (not $QUIET);
+        my $attempts = 0;
+
+        # wait for the process to terminate for a good amount of time
+        # by sending it SIGTERM
         TERMINATE:
-        foreach my $sig (@signals) {
-	    print STDOUT '.' if (not $QUIET);
-    	    kill($sig, $p);
-	    sleep 1;
-	    last TERMINATE if (kill(0, $p) == 0);
+        while ($attempts < $MAX_ATTEMPTS) {
+	        print STDOUT '.' if (not $QUIET);
+    	    kill(15, $p);
+	        sleep 2;
+	        last TERMINATE if (kill(0, $p) == 0);
+            $attempts++;
+        }
+
+        if (kill(0, $p) != 0) {
+            # if that did not help, kill it hard
+            $attempts = 0;
+            KILL:
+            while ($attempts < 5) {
+                print STDOUT '+' if (not $QUIET);
+                kill(9, $p);
+                sleep 1;
+                last KILL if (kill(0, $p) == 0);
+                $attempts++;
+            }
         }
         print STDOUT "\n" if (not $QUIET);
+
         if (kill(0, $p)) {
             print STDOUT "FAILED.\n" if (not $QUIET);
             print STDERR "Could not terminate OpenXPKI process $p.\n";

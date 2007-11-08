@@ -23,6 +23,8 @@ use OpenXPKI::Server::Init;
 
 use Data::Dumper;
 
+our $stop_soon = 0;
+
 sub new
 {
     my $that = shift;
@@ -224,7 +226,7 @@ sub post_bind_hook {
             );
         }
     }
- 
+
     return 1;
 }
 
@@ -299,6 +301,22 @@ sub pre_loop_hook {
         # (for example when doing external dynamic authentication) ...
         $SIG{CHLD} = 'DEFAULT';
     }
+}
+
+sub sig_term {
+    # in the TERM signal handler, just set the global 'stop_soon' variable,
+    # which will be checked in the services
+    ##! 1: 'start'
+    # if an alarm is active, decrease the time to alarm to 1, so that
+    # the stopping can take place "pretty soon now"
+    my $current_alarm = alarm(0);
+    ##! 16: 'current alarm timeout: ' . $current_alarm
+    if ($current_alarm > 0) {
+        ##! 16: 'current alarm > 0, resetting to 1'
+        alarm(1);
+    }
+    $stop_soon = 1;
+    ##! 1: 'end'
 }
 
 sub process_request {
