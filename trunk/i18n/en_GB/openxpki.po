@@ -1651,8 +1651,8 @@ msgstr "PKCS#10"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_DESCRIPTION"
 msgstr ""
-"Please enter your search query for workflow context keys and values. SQL "
-"wildcards such as % can be used."
+"Please enter your search query for workflow context keys and values. You can
+use '*' as a wildcard character. "
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_KEY"
 msgstr "Key"

@@ -11,7 +11,15 @@
 <%init>
     my @search_context;
     if (defined $context_key && defined $context_value) {
+        if (! ref $context_key) {
+            $context_key = [ $context_key ];
+        }
+        if (! ref $context_value) {
+            $context_value = [ $context_value ];
+        }
         for (my $i = 0; $i < scalar @{$context_key}; $i++) {
+            $context_value->[$i] =~ s/\*/%/g;
+
             if ($context_key->[$i] ne '') {
                 push @search_context, {
                     KEY   => $context_key->[$i],

@@ -1863,7 +1863,7 @@ msgstr "PKCS#10-Antrag"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_DESCRIPTION"
 msgstr ""
 "Bitte geben Sie Ihre Suchanfrage für die Kontext-Schlüssel und -Werte an. "
-"SQL-Platzhalter wie etwa % können dazu benutzt werden."
+"Als Platzhalter kann '*' benutzt werden."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_KEY"
 msgstr "Schlüssel"
