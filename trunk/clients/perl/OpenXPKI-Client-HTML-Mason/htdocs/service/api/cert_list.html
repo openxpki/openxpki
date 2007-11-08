@@ -79,9 +79,9 @@
 
   ## collect params
   my %fields = ();
-  $fields{'EMAIL'}       = $email       if (defined $email and length $email);
-  $fields{'SUBJECT'}     = $subject     if (defined $subject and length $subject);
-  $fields{'ISSUER'}      = $issuer      if (defined $issuer and length $issuer);
+  $fields{'EMAIL'}       = "*$email*"   if (defined $email and length $email);
+  $fields{'SUBJECT'}     = "*$subject*" if (defined $subject and length $subject);
+  $fields{'ISSUER'}      = "*$issuer*"  if (defined $issuer and length $issuer);
   $fields{'CERT_SERIAL'} = $cert_serial if (defined $cert_serial and length $cert_serial);
   $fields{'CSR_SERIAL'}  = $csr_serial  if (defined $csr_serial and length $csr_serial);
 
