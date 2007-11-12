@@ -53,23 +53,31 @@
         # make issuer better breakable
         $issuer =~ s/,/, /g;
 
-        my $last_update = $crl_msg->{PARAMS}->{BODY}->{LAST_UPDATE};
-        my $dt = DateTime->from_epoch(epoch => $last_update);
-        $last_update = $dt->strftime("%Y-%m-%d %H:%M:%S UTC");
+        my $last_update;
+        if (exists $crl_msg->{PARAMS}->{BODY}->{LAST_UPDATE}) {
+            $last_update = $crl_msg->{PARAMS}->{BODY}->{LAST_UPDATE};
+            my $dt = DateTime->from_epoch(epoch => $last_update);
+            $last_update = $dt->strftime("%Y-%m-%d %H:%M:%S UTC");
+        }
 
-        my $next_update = $crl_msg->{PARAMS}->{BODY}->{NEXT_UPDATE};
-        $dt = DateTime->from_epoch(epoch => $next_update);
-        $next_update = $dt->strftime("%Y-%m-%d %H:%M:%S UTC");
+        my $next_update;
+        if (exists $crl_msg->{PARAMS}->{BODY}->{NEXT_UPDATE}) {
+            $next_update = $crl_msg->{PARAMS}->{BODY}->{NEXT_UPDATE};
+            my $dt = DateTime->from_epoch(epoch => $next_update);
+            $next_update = $dt->strftime("%Y-%m-%d %H:%M:%S UTC");
+        }
 
-        push @list, {
-           'LABEL'    => $ca,
-           'FILENAME' => $crl->{FILENAME},
-           'ISSUER'   => $issuer,
-           'NUMBER'   => $crl_msg->{PARAMS}->{BODY}->{SERIAL},
-           'LAST_UPDATE' => $last_update,
-           'NEXT_UPDATE' => $next_update,
-           'ENTRIES'     => ref $crl_msg->{PARAMS}->{LIST} eq 'ARRAY' ? scalar @{ $crl_msg->{PARAMS}->{LIST} } : '-',
-        };
+        if (defined $last_update) {
+            push @list, {
+               'LABEL'    => $ca,
+               'FILENAME' => $crl->{FILENAME},
+               'ISSUER'   => $issuer,
+               'NUMBER'   => $crl_msg->{PARAMS}->{BODY}->{SERIAL},
+               'LAST_UPDATE' => $last_update,
+               'NEXT_UPDATE' => $next_update,
+               'ENTRIES'     => ref $crl_msg->{PARAMS}->{LIST} eq 'ARRAY' ? scalar @{ $crl_msg->{PARAMS}->{LIST} } : '-',
+            };
+        }
     }
   }
 </%init>
