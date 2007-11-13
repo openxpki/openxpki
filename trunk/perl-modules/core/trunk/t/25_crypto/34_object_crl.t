@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-use Test;
-BEGIN { plan tests => 16 };
+use Test::More;
+plan tests => 16;
 
 print STDERR "OpenXPKI::Crypto::CRL\n";
 
@@ -45,8 +45,8 @@ ok(1);
 
 ## test parser
 ok ($crl->get_parsed("BODY", "ISSUER") eq "CN=CA_1,DC=OpenXPKI,DC=info");
-ok ($crl->get_parsed("BODY", "SERIAL") == -1);
-ok ($crl->get_serial() > 1128083416);
+is ($crl->get_parsed("BODY", "SERIAL"), 23, 'get_parsed() -> serial');
+is ($crl->get_serial(), 23, 'get_serial()');
 ok ($crl->get_parsed("HEADER", "GLOBAL_ID") == 1234);
 
 ## test attribute setting

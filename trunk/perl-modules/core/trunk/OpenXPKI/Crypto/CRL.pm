@@ -106,13 +106,8 @@ sub __init
 sub get_serial {
     my $self = shift;
 
-    # return the serial if one is present
-    return $self->get_parsed("BODY", "SERIAL")
-        if ($self->get_parsed("BODY", "SERIAL") != -1);
-
-    # new numbering by timestamp
-    return str2time($self->get_parsed("BODY", "LAST_UPDATE"));
-
+    # return the serial (undef if not present)
+    return $self->get_parsed("BODY", "SERIAL");
 }
 
 sub get_converted
@@ -177,9 +172,8 @@ DATA is a PEM encoded CRL. TOKEN is a token from the token manager
 
 =head2 get_serial
 
-returns the serial of the CRL. If there is no serial in the CRL
-because the CRL does not support this extension then the timestamp
-in seconds from the last update will be returned.
+returns the serial of the CRL. If there is no serial in the CRL,
+undef will be returned.
 
 =head2 get_converted
 

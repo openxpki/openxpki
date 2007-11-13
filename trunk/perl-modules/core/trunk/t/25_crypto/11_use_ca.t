@@ -349,7 +349,7 @@ $profile = OpenXPKI::Crypto::Profile::CRL->new (
                   PKI_REALM => "Test Root CA",
                   CA        => "INTERNAL_CA_1");
 ## otherwise test 34 fails
-## $profile->set_serial (1);
+$profile->set_serial (23);
 ### issue crl...
 my $crl;
 eval
