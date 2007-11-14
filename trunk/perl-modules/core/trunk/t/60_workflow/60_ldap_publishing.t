@@ -51,6 +51,23 @@ my $pidfile        = File::Spec->catfile(
 			'openxpki',
 			'openxpki.pid',
 		     );
+#------------------ ENUMERATE TASKS TO CALC TEST NUMBER
+my @test_tasks = (
+                    '1  shut down the server launched previously',
+                    '2  start the server',
+                    '3  check server PID',
+                    '4  check server socket',
+                    '5  login as raop',
+                    '6  create ldap-publishing workflow',
+                    '7  check the wf ID',
+                    '8  check the wf STATE',
+                    '9  start executing workflow actions',
+                    '10 check that the workflow is in SUCCESS state',
+                    '11 check that the certificate is really published in ldap',
+                    '12 stop the server',
+                );    
+my $test_number = scalar @test_tasks;
+
 
 #--- check permissions to run test
 my $semaphore_file = File::Spec->catfile(
@@ -60,19 +77,16 @@ my $semaphore_file = File::Spec->catfile(
 if( !( -f $semaphore_file) ) {
     plan skip_all => "LDAP server was not created for testing";
 } else {
-    plan 'no_plan' => '';
+    plan tests =>  $test_number;
 };
 
-#  we need to manually output the number of tests run
-Test::More->builder()->no_header(1);
-my $OUTPUT_AUTOFLUSH = 1;
-my $NUMBER_OF_TESTS  = 12;
-
-# do not use test numbers because forking destroys all order
-Test::More->builder()->use_numbers(0);
-
 diag("LDAP Publishing\n");
-print "1..$NUMBER_OF_TESTS\n";
+
+
+# here we stop the SERVER launched before
+# 1 
+ok(system("openxpkictl --config t/60_workflow/test_instance/etc/openxpki/config.xml stop") == 0,
+        'Successfully stopped OpenXPKI instance');
 
 #   Here we enable ldap in ldappublic.xml
 my $old_ldap_config = File::Spec->catfile(
@@ -99,69 +113,48 @@ copy(
 );
 unlink("$new_ldap_config");	   
 
-# Fork server, connect to it, test config IDs, create workflow instance
-my $redo_count = 0;
-my $pid;
-FORK:
-do {
-    $pid = fork();
-    if (! defined $pid) {
-        if ($!{EAGAIN}) {
-            # recoverable fork error
-            if ($redo_count > 5) {
-                die "Forking failed";
-            }
-            sleep 5;
-            $redo_count++;
-            redo FORK;
-        }
 
-        # other fork error
-        die "Forking failed: $ERRNO";
-        last FORK;
-    }
-} until defined $pid;
-
-if ($pid) {
-    local $SIG{'CHLD'} = 'IGNORE';
-    Test::More->builder()->use_numbers(0);
-    # this is the parent
-    local $SIG{'ALRM'} = sub { die "Timeout ..." };
-    alarm 300;
-    start_test_server({
-        FOREGROUND => 1,
-        DIRECTORY  => $instancedir,
-    });
-    alarm 0;
-}
-else {
-    Test::More->builder()->use_numbers(0);
-    # child here
-
-  CHECK_SOCKET:
-    foreach my $i (1..60) {
-        if (-e $socketfile) {
-            last CHECK_SOCKET;
-        }
-        else {
-            sleep 1;
-        }
-    }
-# 1
-    ok(-e $pidfile, "PID file exists");
+# here we start the new instance of the OpenXPKI server again
 # 2
-    ok(-e $socketfile, "Socketfile exists");
-    my $client = OpenXPKI::Client->new({
+ok(start_test_server({
+        DIRECTORY  => $instancedir,
+    }), 'Test server started successfully');
+
+
+# wait for server startup
+CHECK_SOCKET:
+foreach my $i (1..60) {
+    if (-e $socketfile) {
+        last CHECK_SOCKET;
+    }
+    else {
+        sleep 1;
+    }
+}
+
+# 3
+ok(-e $pidfile, "PID file exists");
+# 4
+ok(-e $socketfile, "Socketfile exists");
+
+
+
+# login OpenXPKI
+my $client = OpenXPKI::Client->new({
         SOCKETFILE => $socketfile,
     });
-# 3
-    ok(login({
+# 5
+ok( login({
         CLIENT   => $client,
         USER     => 'raop',
         PASSWORD => 'RA Operator',
-      }), 'Logged in successfully');
+    }), 
+    'Logged in successfully'
+);
 
-    my $msg = $client->send_receive_command_msg(
+
+# create ldap-publishing workflow
+my $msg = $client->send_receive_command_msg(
         'create_workflow_instance',
         {
             WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING',
@@ -198,50 +191,45 @@ else {
             },
         },
     );
-#4
-    ok(! is_error_response($msg), 'Successfully created LDAP publishing workflow instance');
-    my $wf_id = $msg->{PARAMS}->{WORKFLOW}->{ID} ;
-# 5
-    ok(defined $wf_id, 'Workflow ID exists');
 # 6
-    is($msg->{PARAMS}->{WORKFLOW}->{STATE}, 
-       'WAITING_FOR_START', 'WF is in state WAITING_FOR_START');
+ok(! is_error_response($msg), 'Successfully created LDAP publishing workflow instance');
 
+my $wf_id = $msg->{PARAMS}->{WORKFLOW}->{ID} ;
 # 7
-    ok(1,"SKIPPED null activity check");
-#   ok(exists $msg->{PARAMS}->{ACTIVITY}->{'null'}, '<null> activity exists');
-#    $wf_id = $msg->{PARAMS}->{WORKFLOW}->{ID} ;
+ok(defined $wf_id, 'Workflow ID exists');
 # 8
-    ok(defined $wf_id, 'Workflow ID exists again');
+is( $msg->{PARAMS}->{WORKFLOW}->{STATE}, 
+    'WAITING_FOR_START', 'WF is in state WAITING_FOR_START');
 
-    # Go to LDAP
-
-    $msg = $client->send_receive_command_msg(
-        'execute_workflow_activity',
-        {
+# do workflow actions
+$msg = $client->send_receive_command_msg(
+            'execute_workflow_activity',
+            {
               'ACTIVITY' => 'null',
               'ID' => $wf_id,
               'PARAMS' => {
                           },
               'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING',
-        },
-    ); 
+            },
+       ); 
 # 9
-    ok(! is_error_response($msg), 'Successfully started') or diag Dumper $msg;
+ok(! is_error_response($msg), 'Successfully started') or diag Dumper $msg;
+
 # 10
-    is($msg->{PARAMS}->{WORKFLOW}->{STATE}, 
+is( $msg->{PARAMS}->{WORKFLOW}->{STATE}, 
        'SUCCESS', 'WF is in state SUCCESS');
+
 # 11 
-# CONNECT TO SERVER
+# CONNECT TO LDAP SERVER
 my $testldap = Net::LDAP->new("localhost:60389");
 if( defined $testldap) {
     my $msg = $testldap->bind ("cn=Manager,dc=OpenXPKI,dc=org",
                         	password => "secret",
                         	version => 3 );
     if ( $msg->is_error()) {
-	my $strange_error = "\nCODE => " . $msg->code() . 
+	my $strange_error =     "\nCODE => " . $msg->code() . 
     	    	    	   "\nERROR => " . $msg->error() .
-	            	    "\nNAME => " . ldap_error_name($msg) .
+	            	        "\nNAME => " . ldap_error_name($msg) .
                     	    "\nTEXT => " . ldap_error_text($msg) .
                      "\nDESCRIPTION => " . ldap_error_desc($msg) . "\n";
 	diag("Fail to bind to LDAP server");
@@ -252,14 +240,14 @@ if( defined $testldap) {
     } else {
 	 $msg = $testldap->search(  base => 'cn=Xaa,dc=OpenXPKI,dc=org',
 	                          scope  => 'base',
-		                  filter => 'cn=*',
+		                      filter => 'cn=*',
 	       );
    	 if ( $msg->is_error()) {
-	    my $strange_error =     "\nCODE => " . $msg->code() . 
-    			    	   "\nERROR => " . $msg->error() .
-	            		    "\nNAME => " . ldap_error_name($msg) .
-                    		    "\nTEXT => " . ldap_error_text($msg) .
-	                     "\nDESCRIPTION => " . ldap_error_desc($msg) . "\n";
+	    my $strange_error =   "\nCODE => " . $msg->code() . 
+    			    	     "\nERROR => " . $msg->error() .
+	            		      "\nNAME => " . ldap_error_name($msg) .
+                    		  "\nTEXT => " . ldap_error_text($msg) .
+	                   "\nDESCRIPTION => " . ldap_error_desc($msg) . "\n";
 	    diag("Found nothing in LDAP database");
 	    ok(0,'Check if the certificate is really published');
 	    if( $ENV{DEBUG} ) {
@@ -313,29 +301,28 @@ $testldap->unbind;
 };
 
 # LOGOUT
-    eval {
-        $msg = $client->send_receive_service_msg('LOGOUT');
-    };
-    diag "Terminated connection";
+eval {
+    $msg = $client->send_receive_service_msg('LOGOUT');
+};
+diag "Terminated connection";
+
+
+#   Here we stop the server
+# 12
+ok(system("openxpkictl --config t/60_workflow/test_instance/etc/openxpki/config.xml stop") == 0,
+        'Successfully stopped OpenXPKI instance');
 
 #   Here we disable ldap in ldappublic.xml 
 #   to prevent automatic launcihing ldap-publishing in other tests
-    system(
-        "sed -e 's/<ldap_enable>yes/<ldap_enable>no/' " . 
-        "< $old_ldap_config  " . 
-        "> $new_ldap_config "
-    );
-    unlink("$old_ldap_config");
-    copy(
-           "$new_ldap_config",
-           "$old_ldap_config"
-    );
-    unlink("$new_ldap_config");	   
+system(
+    "sed -e 's/<ldap_enable>yes/<ldap_enable>no/' " . 
+    "< $old_ldap_config  " . 
+    "> $new_ldap_config "
+);
+unlink("$old_ldap_config");
+copy(
+       "$new_ldap_config",
+       "$old_ldap_config"
+);
+unlink("$new_ldap_config");	   
 
-#   That's all for child
-    exit 0;
-}
-
-# 12
-ok(1, 'Done'); # this is to make Test::Builder happy, which otherwise
-               # believes we did not do any testing at all ... :-/
