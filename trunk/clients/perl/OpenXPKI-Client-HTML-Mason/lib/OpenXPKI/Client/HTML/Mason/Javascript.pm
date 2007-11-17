@@ -23,7 +23,7 @@ sub new
     }
     foreach my $line (@lines)
     {
-        $line =~ s/^.*(I18N_[A-Z0-9]+).*$/$1/;
+        $line =~ s/^.*(I18N_[A-Z0-9_]+).*$/$1/;
         push @i18n, $line;
     }
     foreach my $string (@i18n)
