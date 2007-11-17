@@ -643,6 +643,10 @@ msgstr "Zertifikat #__SERIAL__"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
 msgstr "Untenstehend finden Sie das Ergebnis Ihrer Suche."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_NO_CERTIFICATES_FOUND"
+msgstr "Gefundene Zertifikate"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE"
 msgstr "Gefundene Zertifikate"
 

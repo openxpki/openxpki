@@ -15,6 +15,12 @@
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION') %>
 </p>
+% if (scalar @results == 0) {
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_NO_CERTIFICATES_FOUND') %>
+</p>
+%     return;
+% }
 <table id="table_list">
   <tr>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_SERIAL') %></th>

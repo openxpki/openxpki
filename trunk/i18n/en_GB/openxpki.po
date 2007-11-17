@@ -598,6 +598,9 @@ msgstr "Certificate #__SERIAL__"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION"
 msgstr "Here you can see the result of your search."
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_NO_CERTIFICATES_FOUND"
+msgstr "No certificates found."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE"
 msgstr "Certificate search result"
 
