@@ -63,6 +63,12 @@
 %   ## then we try to call it (security especially permission
 %   ## enforcement is managed by the daemon not by the web client)
 %   if ($next_comp) {
+%     # if next_comp already contains session_id and role then remove these items 
+%     # to prevent mixture with newly received session_id and role
+%     my ($old_session_id) = ($next_comp =~ m{\A .* __session_id=(.+?) & .* \z }xms);
+%     my ($old_role) = ($next_comp =~ m{\A .* __role=(.*?) & .* \z }xms);
+%     $next_comp =~ s{__session_id=$old_session_id&}{}ms;
+%     $next_comp =~ s{__role=$old_role&}{}ms;
 %     ## an example URL can be (/openxpki is the mason root directory):
 %     ##     http://localhost/openxpki/index.html?next_comp=service/api/issuer_list.html
 %     ## after the authentication is gone then the redirect shows the issuer list
