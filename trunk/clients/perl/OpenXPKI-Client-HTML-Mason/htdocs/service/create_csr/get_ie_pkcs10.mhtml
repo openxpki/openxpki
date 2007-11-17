@@ -29,17 +29,6 @@
 <table>
   <tr>
     <td>
-      <% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_KEY_LENGTH") %>
-    </td>
-    <td>
-      <& '/lib/html/select.mhtml',
-         'name'    => "bits",
-         'default' => ["1024"],
-         'values'  => [1024, 2048, 4096] &>
-    </td>
-  </tr>
-  <tr>
-    <td>
       <% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_CSP") %>
     </td>
     <td>
@@ -48,6 +37,17 @@
           <% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DEFAULT_CSP") %>
         </option>
       </select>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_KEY_LENGTH") %>
+    </td>
+    <td>
+      <& '/lib/html/select.mhtml',
+         'name'    => "bits",
+         'default' => ["512"],
+         'values'  => [512, 1024, 2048, 4096] &>
     </td>
   </tr>
 </table>
