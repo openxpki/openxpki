@@ -66,7 +66,7 @@ sub START {
                 CONFIG_ID => $cfg_id,
             );
             ##! 16: 'notifier: ' . $notifier
-            my $notifier_type = $self->__get_notifier_type($notifier);
+            my $notifier_type = $self->__get_notifier_type($notifier, $cfg_id);
             ##! 16: 'notifier_type: ' . $notifier_type
             my $notifier_obj;
             my $notifier_class = 'OpenXPKI::Server::Notification::'
@@ -253,12 +253,14 @@ sub __get_notifier_type :PRIVATE {
     ##! 1: 'start'
     my $self     = shift;
     my $notifier = shift;
+    my $cfg_id   = shift;
 
     my $config   = CTX('xml_config');
 
     my $nr_of_all_notifiers = $config->get_xpath_count(
-        XPATH   => [ 'common', 'notification_config', 'notifier' ],
-        COUNTER => [ 0       , 0                   ],
+        XPATH     => [ 'common', 'notification_config', 'notifier' ],
+        COUNTER   => [ 0       , 0                   ],
+        CONFIG_ID => $cfg_id,
     );
     ##! 16: 'nr_of_all_notifiers: ' . $nr_of_all_notifiers
 
@@ -268,6 +270,7 @@ sub __get_notifier_type :PRIVATE {
         my $notifier_name = $config->get_xpath(
           XPATH   => [ 'common', 'notification_config', 'notifier', 'id' ],
           COUNTER => [ 0       , 0                    , $i        , 0    ],
+          CONFIG_ID => $cfg_id,
         );
         if ($notifier_name eq $notifier) {
             $index = $i;
@@ -288,6 +291,7 @@ sub __get_notifier_type :PRIVATE {
                      'notification_backend', 'type' ],
         COUNTER => [ '0'     , 0                    , $index    ,
                      0                     , 0      ],
+        CONFIG_ID => $cfg_id,
     );
     ##! 16: 'notifier_type: ' . $notifier_type
 
