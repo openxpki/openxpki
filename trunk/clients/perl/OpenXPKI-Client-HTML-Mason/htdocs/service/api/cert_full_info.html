@@ -58,20 +58,37 @@
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></td>
     <td>
+
+% if (! $issuer_identifier) {
+% # issuer identifier is not defined due to:
+%   if (exists $params->{IS_CA} and $params->{IS_CA}) {
+%   # 1. self-signed CA certificate, show subject in the 'issuer' field
+<% $subject %>
+%   } else {
+%   # 2. any other reason, show 'information is not available' message
+<% i18nGettext('I18N_OPENXPKI_NOT_AVAILABLE') %>
+%   }
+% } else {
+% # issuer identifier is defined
       <& /lib/html/a.mhtml,
          target => 'ca_cert_info.html',
          label  => delete $params->{ISSUER},
          params => [["identifier",   $issuer_identifier]] &>
+% }
     </td>
   </tr>
+% if (defined $keyusage and length $keyusage) {
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_KEYUSAGE') %></td>
     <td><% $keyusage %></td>
   </tr>
+% }
+% if (defined $extended_keyusage and length $extended_keyusage) {
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_EXTENDED_KEYUSAGE') %></td>
     <td><% $extended_keyusage %></td>
   </tr>
+% }
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CSR_SERIAL') %></td>
     <td><% $csr_serial %></td>
@@ -149,4 +166,5 @@
   }
   my $serial = $params->{SERIAL};
   $serial .= ' (0x' . sprintf("%X", $serial) . ')';
+  my $subject = $params->{SUBJECT};
 </%init>
