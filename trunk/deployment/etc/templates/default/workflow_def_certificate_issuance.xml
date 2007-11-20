@@ -74,11 +74,23 @@
   <state name="WAITING_FOR_CHILD">
       <!-- = notify_parent_success -->
    <action name="child_finished_successfully"
-                  resulting_state="SUCCESS">
+                  resulting_state="NOTIFY_PARENT_SUCCESS">
       <condition name="all_wf_children_instances_finished"/>
    </action>
       <!-- = notify_parent_failure -->
    <action name="child_finished_failure"
+                  resulting_state="NOTIFY_PARENT_FAILURE">
+   </action>
+  </state>
+
+  <state name="NOTIFY_PARENT_SUCCESS" autorun="yes">
+   <action name="notify_parent_success"
+                  resulting_state="SUCCESS">
+   </action>
+  </state>
+
+  <state name="NOTIFY_PARENT_FAILURE" autorun="yes">
+   <action name="notify_parent_failure"
                   resulting_state="FAILURE">
    </action>
   </state>
