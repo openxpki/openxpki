@@ -107,12 +107,17 @@
   
   <state name="WAITING_FOR_CHILD">
     <action name="child_finished_successfully"
-	    resulting_state="SUCCESS">
+	    resulting_state="CHILD_FINISHED_SUCCESS">
       <condition name="all_wf_children_instances_finished"/>
     </action>
     <action name="child_finished_failure"
 	    resulting_state="FAILURE">
     </action>
+  </state>
+
+  <state name="CHILD_FINISHED_SUCCESS" autorun="yes">
+      <action name="notify_user_of_issuance"
+              resulting_state="SUCCESS"/>
   </state>
 
   <state name="REJECTED" autorun="yes">
