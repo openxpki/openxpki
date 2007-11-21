@@ -23,6 +23,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::i18n qw( set_language );
 use Digest::SHA1 qw( sha1_base64 );
 
+use Workflow;
+
 sub START {
     # somebody tried to instantiate us, but we are just an
     # utility class with static methods
@@ -146,6 +148,20 @@ sub get_cert_subject_styles {
             CONFIG_ID => $cfg_id,
         );
         ##! 64: 'dn: ' . $styles->{$id}->{DN}
+
+        my $bulk;
+        eval {
+            $bulk = CTX('xml_config')->get_xpath(
+                XPATH      => [ @base_path, 'subject', 'bulk' ],
+                COUNTER    => [ @base_ctr,  $i       , 0      ],
+                CONFIG_ID  => $cfg_id,
+            );
+        };
+        if ($bulk) {
+            ##! 16: 'bulk defined for this style'
+            $styles->{$id}->{BULK} = 1;
+        }
+
         my $input_count = 0;
         eval {
             $input_count = CTX('xml_config')->get_xpath_count(
@@ -1177,6 +1193,33 @@ sub convert_csr {
         DATA    => $arg_ref->{DATA},
     });
     return $data;
+}
+
+sub create_bulk_request_ticket {
+    ##! 1: 'start'
+    my $self      = shift;
+    my $arg_ref   = shift;
+    my $workflows = $arg_ref->{WORKFLOWS};
+    my $ser       = OpenXPKI::Serialization::Simple->new();
+
+    my $dummy_workflow = Workflow->new();
+    ##! 16: 'dummy_workflow: ' . Dumper $dummy_workflow
+    $dummy_workflow->context->param('creator' => CTX('session')->get_user());
+
+    ##! 16: 'dummy_workflow: ' . Dumper $dummy_workflow
+    my $ticket = CTX('notification')->notify({
+        MESSAGE  => 'create_bulk_request',
+        WORKFLOW => $dummy_workflow,
+    });
+    $dummy_workflow->context->param('ticket' => $ser->serialize($ticket));
+    $dummy_workflow->context->param('workflows' => $ser->serialize($workflows));
+
+    CTX('notification')->notify({
+        MESSAGE  => 'create_bulk_request_workflows',
+        WORKFLOW => $dummy_workflow,
+    });
+
+    return $ticket;
 }
 
 1;

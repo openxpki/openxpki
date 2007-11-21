@@ -3,7 +3,7 @@ Cc: certificate-list@example.com
 Dear [% creator %],
 
 You certificate has been issued and is available for download from
-http://127.0.0.1:8080/?auth_stack=Anonymous;pki_realm=[% META_PKI_REALM %];next_comp=service/api/cert_list.html?csr_serial=[% csr_serial %]
+http://127.0.0.1:8080/service/api/cert_list.html?csr_serial=[% csr_serial];auth_stack=Anonymous;pki_realm=[% META_PKI_REALM %]
 
 Regards,
   PKI Team

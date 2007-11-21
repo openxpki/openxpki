@@ -47,6 +47,7 @@
                     [
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info", undef],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR_BULK",   "create_csr_bulk", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CRR",
                                    "create_crr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
@@ -62,6 +63,9 @@
                     [
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR_BULK",   "create_csr_bulk", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CRR",
+                                   "create_crr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
                                    "cert_search", undef ],
@@ -126,6 +130,10 @@
                     "create_csr" =>
                     {
                         CMD => "service/create_csr/index.html"
+                    },
+                    "create_csr_bulk" =>
+                    {
+                        CMD => "service/create_csr/bulk/index.html"
                     },
                     "create_crr" =>
                     {

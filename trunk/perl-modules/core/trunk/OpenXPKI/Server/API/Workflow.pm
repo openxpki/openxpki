@@ -845,6 +845,12 @@ sub __get_workflow_factory {
     ##! 32: 'realm: ' . $pki_realm
     my $factory = CTX('workflow_factory')->{$config_id}->{$pki_realm};
     ##! 64: 'factory: ' . Dumper $factory
+    ##! 64: 'workflow_factory keys: ' . Dumper keys %{ CTX('workflow_factory') }
+    if (! defined $factory) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_FACTORY_FACTORY_NOT_DEFINED',
+        );
+    }
     # this is a hack, because Workflow::Factory does not really
     # support subclassing (although it claims so). For details see
     # Server::Init::__wf_factory_add_config()

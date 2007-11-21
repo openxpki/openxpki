@@ -30,11 +30,15 @@ sub execute
 	FACILITY => 'audit',
     );
 
-    CTX('notification')->notify({
-        MESSAGE  => 'csr_approvals_canceled',
-        WORKFLOW => $workflow,
-    });
-
+    my $bulk = $context->param('bulk');
+    if (! $bulk) {
+        # only notify if this is not part of a bulk request - otherwise
+        # the user would get a huge number of tickets
+        CTX('notification')->notify({
+            MESSAGE  => 'csr_approvals_canceled',
+            WORKFLOW => $workflow,
+        });
+    }
     return 1;
 }
 

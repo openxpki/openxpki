@@ -1,9 +1,12 @@
 <%args>
-    @errors => undef
+    @errors   => undef
+    $no_title => 0
 </%args>
 % if (scalar @errors)
 % {
+% if (! $no_title) {
     <h2><% i18nGettext ("I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST") %></h2>
+% }
     <ul>
 %   foreach my $error (@errors)
 %   {

@@ -13,6 +13,12 @@
       <field name="csr_type"/>
       <field name="spkac"/>
       <field name="pkcs10"/>
+      <field name="bulk"/>
+
+      <validator name="Bulk">
+          <arg>$bulk</arg>
+      </validator>
+
       <validator name="KeyReuse">
         <arg>$csr_type</arg>
         <arg>$pkcs10</arg>

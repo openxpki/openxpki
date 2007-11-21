@@ -46,6 +46,19 @@
       </action>
       <action type="close"/>
     </notification>
+    <notification id="create_bulk_request">
+      <action type="open">
+        <requestor>[% creator %]</requestor>
+        <queue>Certificate Signing Requests</queue>
+        <subject>Bulk request</subject>
+      </action>
+    </notification>
+
+    <notification id="create_bulk_request_workflows">
+      <action type="comment">
+        <template file="/Users/klink/usr/local/etc/openxpki/notification/en/create_bulk_request_comment.txt" lang="en_EN"/>
+      </action>
+    </notification>
   </notifications>
 
 [- FOREACH realmsection = global.pkirealm -]

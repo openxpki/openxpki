@@ -14,12 +14,14 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
 sub execute {
+    ##! 1: 'start'
     my $self     = shift;
     my $workflow = shift;
     my $context  = $workflow->context();
     my $ser      = OpenXPKI::Serialization::Simple->new();
 
     my $message    = $self->param('message');
+    ##! 16: 'message: ' . $message
 
     if (! defined $message) {
         OpenXPKI::Exception->throw(
@@ -27,28 +29,35 @@ sub execute {
         );
     }
 
+    my $bulk = $context->param('bulk');
     # send notifaction
-    my $ticket = CTX('notification')->notify({
-        MESSAGE  => $message,
-        WORKFLOW => $workflow,
-    });
-    if (defined $ticket) {
-        my $do_update;
-      CHECK_TICKET_IDS_DEFINED:
-        foreach my $key (keys %{ $ticket }) {
-            if (defined $ticket->{$key}) {
-                $do_update = 1;
-                last CHECK_TICKET_IDS_DEFINED;
+    if (! $bulk) {
+        ##! 16: 'bulk not set, notifying'
+        # only notify if this is not part of a bulk request - otherwise
+        # the user would get a huge number of tickets
+        my $ticket = CTX('notification')->notify({
+            MESSAGE  => $message,
+            WORKFLOW => $workflow,
+        });
+        if (defined $ticket) {
+            my $do_update;
+          CHECK_TICKET_IDS_DEFINED:
+            foreach my $key (keys %{ $ticket }) {
+                if (defined $ticket->{$key}) {
+                    $do_update = 1;
+                    last CHECK_TICKET_IDS_DEFINED;
+                }
             }
-        }
-        # if notify returns anything in the hashref,
-        # it is the ticket ID of a newly created ticket,
-        # thus save it to the context
-        if ($do_update) {
-            $context->param('ticket' => $ser->serialize($ticket));
+            # if notify returns anything in the hashref,
+            # it is the ticket ID of a newly created ticket,
+            # thus save it to the context
+            if ($do_update) {
+                $context->param('ticket' => $ser->serialize($ticket));
+            }
         }
     }
 
+    ##! 1: 'end'
     return 1;
 }
 

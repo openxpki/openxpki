@@ -797,6 +797,29 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_SUCCESS_TITLE"
 msgstr "Certificate successfully revoked"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_DESC"
+msgstr ""
+"The certificate has been successfully flagged as revoked in the database. "
+"Now might be a good moment to issue a new certificate revocation list (CRL). "
+"If you want to do this now, please use the link below."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_GET_PKCS10_DESC"
+msgstr "Please paste your certificate requests in concatenated PEM form into the textbox below."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_GET_PKCS10_TITLE"
+msgstr "PKCS#10 upload"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_RESULTS_DESC"
+msgstr "Below you can find a summary of which workflows have been created in response to your bulk request."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_RESULTS_TITLE"
+msgstr "Bulk request results"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_TITLE"
+msgstr "Choose a role"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST"
 msgstr "Errors"
 
@@ -1019,6 +1042,13 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_TITLE"
 msgstr "Choose a certificate profile"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_BULK_DESCRIPTION"
+msgstr ""
+"Please choose the role for which you would like to request certificates. Please note that all requested certificates will have the same role and profile."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_BULK_TITLE"
+msgstr "Choose a role for your certificates"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_DESCRIPTION"
 msgstr ""
@@ -2825,6 +2855,9 @@ msgstr "E-mail:"
 msgid "I18N_OPENXPKI_EMAILADDRESS_DESC"
 msgstr "Your e-mail address, for example john.doe@example.com"
 
+msgid "I18N_OPENXPKI_ERROR"
+msgstr "Error"
+
 msgid "I18N_OPENXPKI_FAILED"
 msgstr "failed"
 
@@ -3023,6 +3056,9 @@ msgstr "Revocation Request (CRR)"
 
 msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
 msgstr "New Request (CSR)"
+
+msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR_BULK"
+msgstr "New Bulk Request"
 
 msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
 msgstr "Data Exchange"
@@ -3729,6 +3765,12 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_WORKFLOW_COULD_NOT_BE_FETCHED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_FACTORY_FACTORY_NOT_DEFINED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
@@ -5096,6 +5138,14 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGN
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_CONFIGURATION_ERROR_MANDATORY_PARAMETERS_MISSING"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_METHOD_RETURNED_FALSE"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_VALIDCSRSERIALPRESENT_CSR_SERIAL_FROM_CONTEXT_NOT_IN_DATABASE"
 msgstr "The SPKAC string is empty."
 
@@ -5186,6 +5236,10 @@ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVAL_SIGNATURE_SIGNATURE_NOT_DEFINED_BUT_REQUIRED"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_BULK_NOT_UNDEF_OR_ONE"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
@@ -5608,6 +5662,9 @@ msgstr "The used suject style does not allow the use of an organization."
 
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN"
 msgstr "The used suject style requires a UID plus a common name."
+
+msgid "I18N_OPENXPKI_SUCCESS"
+msgstr "Success"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION"
@@ -6273,14 +6330,6 @@ msgstr "yes"
 #~ msgstr "CA Info"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_CONFIGURATION_ERROR_MANDATORY_PARAMETERS_MISSING"
-#~ msgstr "The SPKAC string is empty."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_METHOD_RETURNED_FALSE"
-#~ msgstr "The SPKAC string is empty."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SCEP_CURRENT_NOTAFTER"
 #~ msgstr "Not after"
 
@@ -6382,10 +6431,6 @@ msgstr "yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
 #~ msgstr "Last update"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_O"
-#~ msgstr "no"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_OU"

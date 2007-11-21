@@ -149,6 +149,11 @@ htdocs/service/create_csr/get_keyparameters.mhtml
 htdocs/service/create_csr/show_receipt_confirmation.mhtml
 htdocs/service/create_csr/store_serverside.mhtml
 
+htdocs/service/create_csr/bulk/create_workflows.html
+htdocs/service/create_csr/bulk/get_pkcs10s.mhtml
+htdocs/service/create_csr/bulk/index.html
+htdocs/service/create_csr/bulk/profile.html
+
 htdocs/service/create_crr/index.html
 htdocs/service/create_crr/highlight_error.mhtml
 htdocs/service/create_crr/search.mhtml

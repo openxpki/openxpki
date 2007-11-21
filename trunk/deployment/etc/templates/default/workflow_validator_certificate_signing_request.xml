@@ -1,4 +1,7 @@
 <validators>
+  <validator name="Bulk"
+             class="OpenXPKI::Server::Workflow::Validator::Bulk">
+  </validator>
   <validator name="KeyReuse"
              class="OpenXPKI::Server::Workflow::Validator::KeyReuse">
   </validator>

@@ -362,6 +362,7 @@
     <subject id="05_advanced_style">
       <label>I18N_OPENXPKI_PROFILE_ADVANCED_STYLE</label>
       <description>I18N_OPENXPKI_PROFILE_ADVANCED_DESC</description>
+      <bulk>1</bulk> <!-- this is the subject style for bulk requests -->
       <template>
            <!-- not that the regex is not exact, this might still not
                 be a valid hostname -->

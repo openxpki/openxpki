@@ -68,8 +68,8 @@ sub evaluate {
         undef $share;
     }
 
-    return 1;
     ##! 16: 'end'
+    return 1;
 }
 
 1;

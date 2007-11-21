@@ -38,7 +38,7 @@ sub execute {
                 ACTIVITY => 'child_finished_successfully',
             });
         };
-        ##! 64: 'eval_error from execute_workflow_activity: ' . defined $EVAL_ERROR ? $EVAL_ERROR : 'none'
+        ##! 64: 'eval_error from execute_workflow_activity: ' . $EVAL_ERROR
     }
     elsif ($result eq 'FAILURE') {
         # no eval because this activity should be present all the time

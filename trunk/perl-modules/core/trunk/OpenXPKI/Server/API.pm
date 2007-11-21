@@ -466,6 +466,14 @@ sub BUILD {
                 },
             },
         },
+        'create_bulk_request_ticket' => {
+            class  => 'Default',
+            params => {
+                WORKFLOWS => {
+                    type   => ARRAYREF,
+                },
+            },
+        },
 
         ### Object API
         'get_csr_info_hash_from_data' => {
