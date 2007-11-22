@@ -17,6 +17,8 @@
       }
   }
 
+  my $current_url = $ENV{REQUEST_URI};
+
   ## let's calculate the path of our mason autohandler root
   my $path = $m->request_comp()->dir_path();
      $path = substr ($path, 1);
@@ -183,6 +185,15 @@
                 }
             </script>
             <div>
+%           my $gb_url = $current_url;
+%              $gb_url =~ s/__language=[^;]+/__language=en_GB/;
+%           my $ru_url = $current_url;
+%              $ru_url =~ s/__language=[^;]+/__language=ru_RU/;
+%           my $de_url = $current_url;
+%              $de_url =~ s/__language=[^;]+/__language=de_DE/;
+          <a href="<% $gb_url %>"><img src="<% $context->{menu}->get_root() %>/images/gb.png" style="margin-right:-1em"></a>
+          <a href="<% $ru_url %>"><img src="<% $context->{menu}->get_root() %>/images/ru.png" style="margin-right:-1em"></a>
+          <a href="<% $de_url %>"><img src="<% $context->{menu}->get_root() %>/images/de.png" style="margin-right:1em"></a>
               <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />
 %   my %menu_hash = $context->{menu}->get_menu_hash();
 %    foreach my $key (keys %menu_hash) {
