@@ -12,6 +12,11 @@
     $key              => undef
 </%args>
 <%init>
+    # protect against XSRF by checking for $__session_id (see
+    # /service/workflow/activity/autohandler for details)
+    if (! $m->request_args()->{'__session_id'}) {
+        die "This looks like XSRF to me ...";
+    }
     ## we must know which workflow we should use for the validation
     return if (not defined $subject_style);
 

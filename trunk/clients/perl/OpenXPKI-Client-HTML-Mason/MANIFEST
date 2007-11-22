@@ -105,6 +105,7 @@ htdocs/service/workflow/bulk_approval.html
 htdocs/service/workflow/show_csr_brief.html
 htdocs/service/workflow/context_hash.mhtml
 htdocs/service/workflow/activity/dhandler
+htdocs/service/workflow/activity/autohandler
 htdocs/service/workflow/activity/change_csr_role.html
 htdocs/service/workflow/activity/change_csr_profile.html
 htdocs/service/workflow/activity/change_csr_subject_style.html

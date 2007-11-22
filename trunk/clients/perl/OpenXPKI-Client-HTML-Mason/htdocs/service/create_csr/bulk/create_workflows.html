@@ -4,6 +4,12 @@
     $profile => undef
 </%args>
 <%init>
+    # protect against XSRF by checking for $__session_id (see
+    # /service/workflow/activity/autohandler for details)
+    if (! $m->request_args()->{'__session_id'}) {
+        die "This looks like XSRF to me ...";
+    }
+
     use Data::Dumper;
     my @requests;
     my @lines = split /\n/, $pkcs10;
