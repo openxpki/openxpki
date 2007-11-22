@@ -45,9 +45,6 @@
   <condition name="ACL::persist_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="persist_csr"/>
   </condition>
-  <condition name="ACL::execute_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="execute_csr"/>
-  </condition>
   <condition name="ACL::reject_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="reject_csr"/>
   </condition>
@@ -60,25 +57,6 @@
 
   <condition name="Condition::check_csr_approvals" class="OpenXPKI::Server::Workflow::Condition::Approved">
     <param name="role" value="RA Operator"/>
-  </condition>
-
-  <!-- if you use an online and an offline server then you need this for CSRs too -->
-
-  <condition name="ACL::export_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="export_csr"/>
-  </condition>
-  <condition name="ACL::import_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="export_csr"/>
-  </condition>
-
-  <condition name="Condition::server_0" class="OpenXPKI::Server::Workflow::Condition::Server">
-    <param name="server_id" value="0"/>
-  </condition>
-  <condition name="Condition::check_csr_approvals_online" class="OpenXPKI::Server::Workflow::Condition::Approved">
-    <param name="role" value="RA Operator"/>
-  </condition>
-  <condition name="Condition::check_csr_approvals_offline" class="OpenXPKI::Server::Workflow::Condition::Approved">
-    <param name="role" value="CA Operator"/>
   </condition>
 
   <!-- general CRR conditions -->
