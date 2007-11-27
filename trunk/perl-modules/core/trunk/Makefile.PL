@@ -250,9 +250,15 @@ if (open $fh, "$cc -shared -o test test.c 2>&1 |") {
     if (! $cc_supports_shared)
     {
         print STDERR "C compiler does not support -shared.\n";
-    } else {
-        print STDERR "C compiler supports -share. Adding it to LDDLFLAGS.\n";
-        $flags{'LDDLFLAGS'} = '-shared';
+    }
+    else {
+        if ($^O ne 'darwin') {
+            print STDERR "C compiler supports -share. Adding it to LDDLFLAGS.\n";
+            $flags{'LDDLFLAGS'} = '-shared';
+        }
+        else {
+            print STDERR "C compiler claims to support -share. But we are on Mac OS X, experience shows that it still does not work with -share, so we won't add it to LDDLFLAGS ...\n";
+        }
     }
 }
 else {
