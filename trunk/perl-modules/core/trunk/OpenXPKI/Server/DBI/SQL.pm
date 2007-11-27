@@ -696,10 +696,6 @@ sub select
 	    if (ref $entry eq 'HASH') {
 		$column = $entry->{COLUMN};
 
-		if (exists $entry->{DISTINCT} && $entry->{DISTINCT}) {
-		    $column_specification{DISTINCT} = 1;
-		}
-
 		if (defined $entry->{AGGREGATE}) {
 		    $column_specification{AGGREGATE} = $entry->{AGGREGATE};
 
@@ -776,13 +772,14 @@ sub select
 	foreach my $join (@{$args->{JOIN}}) {
 	    ### $join
 	    if (ref $join ne 'ARRAY' ||
-		scalar(@{$join}) != scalar(@symbolic_select_tables)) {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_JOIN_SPECIFICATION_MISMATCH",
-		    params => {
-			TABLES => [ @symbolic_select_tables ],
-			JOIN => [ @{$join} ],
-		    });
+		    scalar(@{$join}) != scalar(@symbolic_select_tables)) {
+		    OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_JOIN_SPECIFICATION_MISMATCH",
+                params => {
+                    TABLES => [ @symbolic_select_tables ],
+                    JOIN => Dumper $join,
+                },
+            );
 	    }
 
 	    ### add join condition...
@@ -1037,9 +1034,6 @@ sub select
     foreach my $entry (@select_list) {
 	my $select_column = $entry->{COLUMN};
 
-	if ($entry->{DISTINCT}) {
-	    $select_column = 'DISTINCT ' . $select_column;
-	}
 	if (defined $entry->{AGGREGATE}) {
 	    $select_column = $entry->{AGGREGATE} . '(' . $select_column . ')';
 	}
@@ -1081,10 +1075,15 @@ sub select
             $condition = '(' . join(' OR ', @{$condition}) . ')';
         }
     }
-    my $query .= 'SELECT ' . join(', ', @select_column_specs)
-	. ' FROM ' . join(', ', @table_specs)
-	. ' WHERE '
-	. join(' AND ', @conditions);
+    my $distinct = '';
+    if ($args->{DISTINCT}) {
+        $distinct = 'DISTINCT';
+    }
+    my $query = 'SELECT ' . $distinct . ' '
+      . join(', ', @select_column_specs)
+	  . ' FROM ' . join(', ', @table_specs)
+	  . ' WHERE '
+	  . join(' AND ', @conditions);
 
     if (@order_specs) { # only order if we actually have columns by which
                         # we can order
@@ -1522,12 +1521,9 @@ Example:
 
 =head4 Aggregate statements
 
-It is possible to include aggregate (and DISTINCT) statements in the query
+It is possible to include aggregate statements in the query
 by using a hash reference for the column specification instead of a scalar.
 In this case the hash key 'COLUMN' must be set to the desired column name.
-
-Optionally the key 'DISTINCT' may be set to a true value in order to get
-a DISTINCT COLUMN query.
 
 The key 'AGGREGATE' indicates that an aggregate function should be used on
 the column. In this case the value must be one of 'MIN', 'MAX', 'COUNT' or
@@ -1602,7 +1598,11 @@ results in the query
  ORDER BY workflow_context.workflow_context_key, 
    workflow.workflow_id
 
+=head4 Distinct results
 
+If you want the results to be distinct, you can specify a
+global DISTINCT key with a true value. This is particularly
+interesting when used with joins.
 
 =head1 See also
 

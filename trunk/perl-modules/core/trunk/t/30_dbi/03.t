@@ -305,11 +305,8 @@ $result = $dbi->select(
 
     # return these columns
     COLUMNS => [ 
-	{ 
-	    COLUMN   => 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
-	    DISTINCT => 1,
-	},
-	'WORKFLOW.WORKFLOW_SERIAL', 
+	    'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
+	    'WORKFLOW.WORKFLOW_SERIAL', 
     ],
     JOIN => [
 	#  on first table     second table   
@@ -318,6 +315,7 @@ $result = $dbi->select(
     DYNAMIC => {
 	'WORKFLOW.WORKFLOW_SERIAL' => '10004',
     },
+    DISTINCT => 1,
     );
 
 ### $result
