@@ -5,6 +5,7 @@
     $start          => 1
     $url            => undef
     $maxPages       => 8
+    $additional_params => { }
 </%args>
 % if (scalar @{ $pageInfo->pages_in_spread_raw() } > 1) {
 <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_PAGE') %> 
@@ -29,6 +30,17 @@
 %               $link_url .= ';' . $key . '=' . $m->request_args()->{$key};
 %           }
 %       }
+%       foreach my $key (keys %{ $additional_params }) {
+%           if (ref $additional_params->{$key} eq 'ARRAY') {
+%               foreach my $entry (@{ $additional_params->{$key} }) {
+%                   $link_url .= ';' . $key . '=' . $entry;
+%               }
+%           }
+%           else {
+%               $link_url .= ';' . $key . '=' . $additional_params->{$key};
+%           }
+%       }
+%       
 <a href="<% $link_url %>"><% $page %> </a>
 %    }
 %   }

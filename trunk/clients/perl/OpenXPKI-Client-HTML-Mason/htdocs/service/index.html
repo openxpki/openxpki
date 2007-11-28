@@ -1,6 +1,7 @@
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE') %></h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_DESCRIPTION') %>
+</p>
 % my $user = $context->{client}->send_receive_command_msg('get_user')->{PARAMS}; 
 % if ($user) {
 <& /service/workflow/search_instances.html,

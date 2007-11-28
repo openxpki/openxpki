@@ -48,7 +48,11 @@
 %           entriesPerPage => $limit,
 %           page           => $page,
 %           start          => $start,
-%           url            => 'search_instances.html',
+%           url            => $context->{menu}->get_root() . '/service/workflow/search_instances.html',
+%           additional_params => {
+%               'context_key'   => $context_key,
+%               'context_value' => $context_value,
+%           }
 %       );
 %       if (defined $page_info) {
 %           $params->{START} = $page_info->first - 1;
