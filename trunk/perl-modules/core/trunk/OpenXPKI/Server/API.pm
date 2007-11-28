@@ -83,6 +83,25 @@ sub BUILD {
                 },
             },
         },
+        'count_my_certificates' => {
+            class  => 'Default',
+            params => { },
+        },
+        'list_my_certificates' => {
+            class  => 'Default',
+            params => {
+                LIMIT => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+                START => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+            },
+        },
         'get_current_config_id' => {
             class  => 'Default',
             params => {

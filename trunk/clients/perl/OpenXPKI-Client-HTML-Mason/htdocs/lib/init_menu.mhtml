@@ -11,7 +11,7 @@
                 {
                     '' =>
                     {
-                        MENU => "anonymous_menu"
+                        MENU => "user_menu"
                     },
                     'User' =>
                     {
@@ -19,97 +19,107 @@
                     },
                     'RA Operator' =>
                     {
-                        MENU => "ra_op_menu"
+                        MENU => "raop_menu"
                     },
                     'CA Operator' =>
                     {
-                        MENU => "ca_op_menu"
+                        MENU => "caop_menu"
                     }
                 },
                 MENU =>
                 {
-                    "anonymous_menu" =>
+                    "user_menu" =>
                     [
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",
-                                   "ca_info", undef],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",
-                                   "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CRR",
-                                   "create_crr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
-                                   "cert_search", undef ],
+                        ['ACTION', 'I18N_OPENXPKI_HTML_MENU_HOME',
+                                   'home', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_REQUEST',
+                                   'user_request', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_DOWNLOAD',
+                                   'download', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_SEARCH',
+                                   'search', undef],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
                                    "logout", undef ]
                     ],
-                    "ra_op_menu" =>
+                    "raop_menu" =>
                     [
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info", undef],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR_BULK",   "create_csr_bulk", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CRR",
+                        ['ACTION', 'I18N_OPENXPKI_HTML_MENU_TASKS',
+                                   'home', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_REQUEST',
+                                   'op_request', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_DOWNLOAD',
+                                   'download', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_APPROVAL',
+                                   'approval', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_SEARCH',
+                                   'search', undef],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
+                                   "logout", undef ]
+                    ],
+                    "caop_menu" =>
+                    [
+                        ['ACTION', 'I18N_OPENXPKI_HTML_MENU_TASKS',
+                                   'home', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_REQUEST',
+                                   'op_request', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_DOWNLOAD',
+                                   'download', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_APPROVAL',
+                                   'approval', undef],
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_SEARCH',
+                                   'search', undef],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
+                                   "logout", undef ]
+                    ],
+                    "user_request" =>
+                    [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_SIGNING_REQUEST",
+                                   "create_csr", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_PERSONALIZATION",
+                                   "smartcard_personalization", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_REVOCATION_REQUEST",
+                                   "create_crr", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_BULK_CERTIFICATE_SIGNING_REQUEST",
+                                   "create_csr_bulk", undef ],
+                    ],
+                    "op_request" =>
+                    [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_SIGNING_REQUEST",
+                                   "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_PERSONALIZATION",
+                                   "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_REVOCATION_REQUEST",
                                    "create_crr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS", "show_pending_requests", undef],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW",     "workflow", undef],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE", "dataexchange", 'I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
-                                   "cert_search", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",       "logout", undef ]
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_BULK_CERTIFICATE_SIGNING_REQUEST",
+                                   "create_csr_bulk", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST', ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_ISSUE_CRL",
+                                   "issue_crl", 'I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE' ],
                     ],
-                    "user_menu" =>
+                    "download" =>
                     [
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",      "ca_info", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR",   "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CSR_BULK",   "create_csr_bulk", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CREATE_CRR",
-                                   "create_crr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD", "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT",
-                                   "cert_search", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",       "logout", undef ]
-                    ],
-                    "ca_op_menu" =>
-                    [
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_KEY_LIST", "key_list", undef ],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",  "ca_info", undef ],
-                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_WORKFLOW", "workflow", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",   "logout", undef ]
-                    ],
-                    "ca_info" =>
-                    [
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_PKI_REALM_INFO",
-                                   "pki_realm_info", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_ISSUER",
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_MY_CERTIFICATES",
+                                   "my_certificates", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CA_CERTIFICATES",
                                    "issuer_list", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_CRL",
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_CRLS",
                                    "crl_list", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_POLICY",
-                                   "policy_list", undef ]
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_POLICY_DOCUMENTS",
+                                   "policy_list", undef ],
                     ],
-                    "workflow" =>
+                    "approval" =>
                     [
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES",
-                                   "workflow_list_types", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE",
-                                    "workflow_create_instance", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES",
-                                   "workflow_list_instances", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_WORKFLOW_SEARCH_INSTANCES",
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_PENDING_CSRS",
+                                   "show_pending_requests", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_PENDING_CRRS",
+                                   "show_pending_crrs", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' ],
+                    ],
+                    "search" =>
+                    [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERTIFICATES",
+                                   "cert_search", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_WORKFLOWS",
                                    "workflow_search_instances", undef ],
                     ],
-                    "dataexchange" =>
-                    [
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT",
-                                   "dataexchange_export", 'I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_IMPORT",
-                                   "dataexchange_import", 'I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT' ],
-                    ],
-                    "edit_certs" =>
-                    [
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_VALID_CERTS",   "edit_valid_certs", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS", "edit_expired_certs", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS", "edit_revoked_certs", undef ],
-                    ]
                 },
                 ACTION =>
                 {
@@ -129,72 +139,16 @@
                     {
                         CMD => "service/smartcard_personalization/index.html"
                     },
-                    "workflow_list_types" =>
-                    {
-                        CMD => "service/workflow/list_types.html"
-                    },
-                    "workflow_list_instances" =>
-                    {
-                        CMD => "service/workflow/list_instances.html"
-                    },
                     'show_pending_requests' => {
                         CMD => 'service/workflow/show_pending_requests.html'
                     },
-                    "workflow_create_instance" =>
-                     {
-                         CMD => "service/workflow/create_instance.html"
-                     },
+                    'show_pending_crrs' => {
+                        CMD => 'service/workflow/show_pending_crrs.html'
+                    },
                     'workflow_search_instances' =>
                      {
                          CMD => 'service/workflow/search_instances.html'
                      },
-                    "dataexchange_export" =>
-                    {
-                         CMD    => "service/workflow/start_data_exchange_export.html",
-                    },
-                    "dataexchange_import" =>
-                    {
-                         CMD    => "service/workflow/create_instance.html",
-                         PARAMS => {"type" => "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT"}
-                    },
-                    "edit_valid_certs" =>
-                    {
-                        CMD => "service/cert_list.html",
-                        PARAMS =>
-                        {
-                            "STATUS"        => "VALID",
-                            "REVOKE_BUTTON" => "YES",
-                            "RENEW_BUTTON"  => "YES"
-                        }
-                    },
-                    "edit_expired_certs" =>
-                    {
-                        CMD => "service/cert_list.html",
-                        PARAMS =>
-                        {
-                            "STATUS"        => "VALID",
-                            "REVOKE_BUTTON" => "YES",
-                            "RENEW_BUTTON"  => "YES"
-                        }
-                    },
-                    "edit_revoked_certs" =>
-                    {
-                        CMD => "service/cert_list.html",
-                        PARAMS =>
-                        {
-                            "STATUS"        => "REVOKED",
-                            "REVOKE_BUTTON" => "NO",
-                            "RENEW_BUTTON"  => "NO"
-                        }
-                    },
-                    "pki_realm_info" =>
-                    {
-                        CMD => "service/api/pki_realm_info.html"
-                    },
-                    "cert_search" =>
-                    {
-                        CMD => "service/api/cert_search.html"
-                    },
                     "issuer_list" =>
                     {
                         CMD => "service/api/issuer_list.html"
@@ -214,7 +168,22 @@
                     "logout" =>
                     {
                         CMD => "service/logout.html"
-                    }
+                    },
+                    "cert_search" =>
+                    {
+                        CMD => "service/api/cert_search.html"
+                    },
+                    "issue_crl" =>
+                    {
+                        CMD => "service/workflow/create_instance.html",
+                        PARAMS => {
+                            'type' => 'I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE',
+                        },
+                    },
+                    "my_certificates" =>
+                    {
+                        CMD => "service/api/certs_requested_by_user.html",
+                    },
                 },
                };
 </%once>

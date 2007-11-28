@@ -4,11 +4,9 @@
     $page   => undef
     $show_approval_buttons => undef
     $creator               => '%'
+    $heading => 1
 </%args>
-<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE') %></h1>
-<p>
-  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_DESC') %>
-</p>
+<h<% $heading %>><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE') %></h<% $heading %>>
 % if ($creator ne '%') {
   <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_LIMITED_TO_CREATOR', '__CREATOR__' => $creator) %>
@@ -114,7 +112,7 @@ if (! defined $show_approval_buttons) {
         entriesPerPage => $limit,
         page           => $page,
         start          => $start,
-        url            => 'show_pending_requests.html',
+        url            => $context->{menu}->get_root() . '/service/workflow/show_pending_requests.html',
     );
 }
 my %optional_params;

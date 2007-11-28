@@ -65,14 +65,12 @@ htdocs/service/open_form.mhtml
 htdocs/service/send_form.mhtml
 htdocs/service/close_form.mhtml
 
+htdocs/service/info/approval.html
 htdocs/service/info/dhandler
-htdocs/service/info/anonymous_menu.html
-htdocs/service/info/ca_info.html
-htdocs/service/info/ca_op_menu.html
-htdocs/service/info/dataexchange.html
-htdocs/service/info/language.html
-htdocs/service/info/ra_op_menu.html
-htdocs/service/info/workflow.html
+htdocs/service/info/download.html
+htdocs/service/info/op_request.html
+htdocs/service/info/search.html
+htdocs/service/info/user_request.html
 
 htdocs/service/api/dhandler
 htdocs/service/api/pki_realm_info.html
@@ -91,6 +89,7 @@ htdocs/service/api/policy_list.html
 htdocs/service/api/set_secret.html
 htdocs/service/api/get_privkey_password.html
 htdocs/service/api/super_search.html
+htdocs/service/api/certs_requested_by_user.html
 
 htdocs/service/workflow/link_to_cert_by_csr_id.mhtml
 htdocs/service/workflow/list_types.html
@@ -101,6 +100,7 @@ htdocs/service/workflow/start_data_exchange_export.html
 htdocs/service/workflow/show_instance.html
 htdocs/service/workflow/get_workflow_instance_info.html
 htdocs/service/workflow/show_pending_requests.html
+htdocs/service/workflow/show_pending_crrs.html
 htdocs/service/workflow/bulk_approval.html
 htdocs/service/workflow/show_csr_brief.html
 htdocs/service/workflow/context_hash.mhtml

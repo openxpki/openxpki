@@ -1,0 +1,109 @@
+<%args>
+    $limit  => 10
+    $start  => 1
+    $page   => undef
+    $heading => 1
+</%args>
+<h<% $heading %>><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_CRRS_TITLE') %></h<% $heading %>>
+<table>
+  <tr>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CRR_CERT_SUBJECT') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CRR_REASON') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATOR') %></th>
+  </tr>
+% foreach my $res (@results) {
+  <tr>
+      <td>
+          <& /lib/html/a.mhtml,
+            target => $context->{menu}->get_root() . '/service/workflow/show_instance.html',
+            label  => $res->{'SERIAL'},
+            params => [
+                [ 'id' => $res->{'SERIAL'} ],
+            ],
+          &>
+    </td>
+    <td><% $res->{'LAST_UPDATE'} %></td>
+    <td><% $res->{'SUBJECT'} %></td>
+    <td><% $res->{'REASON'} %></td>
+    <td><% $res->{'CREATOR'} %></td>
+  </tr>
+% }
+</table>
+
+<%init>
+use OpenXPKI::Serialization::Simple;
+use Data::Dumper;
+
+my $ser = OpenXPKI::Serialization::Simple->new();
+my @results;
+
+my $nr_msg = $context->{client}->send_receive_command_msg(
+              "search_workflow_instances_count",
+              {
+                     "TYPE"    => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST',
+                     'STATE'   => [ 'PENDING', 'APPROVAL' ],
+              },
+);
+my $count = $nr_msg->{PARAMS};
+my $pageInfo = $m->comp('/lib/paging.mhtml',
+    totalEntries   => $count,
+    entriesPerPage => $limit,
+    page           => $page,
+    start          => $start,
+    url            => $context->{menu}->get_root() . '/service/workflow/show_pending_crrs.html',
+);
+my %optional_params;
+if (defined $pageInfo) {
+    $optional_params{LIMIT} = $limit;
+    $optional_params{START}
+        = ($pageInfo->first > 0)
+            ? $pageInfo->first - 1
+            : 0;
+}
+
+my $msg = $context->{client}->send_receive_command_msg(
+              "search_workflow_instances",
+              {
+                     "TYPE"    => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST',
+                     'STATE'   => [ 'PENDING', 'APPROVAL' ],
+                     %optional_params,
+              },
+);
+my @instances;
+if (defined $msg->{PARAMS} && ref $msg->{PARAMS} eq 'ARRAY') {
+    @instances = @{ $msg->{PARAMS} };
+}
+# TODO - error handling
+
+foreach my $instance (@instances) {
+    my $wf_info = $context->{client}->send_receive_command_msg(
+            'get_workflow_info',
+            {
+                ID       => $instance->{'WORKFLOW.WORKFLOW_SERIAL'}, 
+            },
+    );
+    # TODO - error handling
+    $m->comp('/lib/debug.mhtml',
+        'level' => 10,
+        'msg' => Dumper $wf_info,
+    );
+    my $wf_context = $wf_info->{PARAMS}->{WORKFLOW}->{CONTEXT};
+    my $cert_info = $context->{client}->send_receive_command_msg(
+        'get_cert',
+        {
+            IDENTIFIER => $wf_context->{'cert_identifier'},
+        },
+    );
+    my $subject = $cert_info->{PARAMS}->{BODY}->{SUBJECT};
+    $subject =~ s/,/, /g;
+    push @results, {
+        'SERIAL'            => $instance->{'WORKFLOW.WORKFLOW_SERIAL'},
+        'LAST_UPDATE'       => $instance->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
+        'REASON'            => $wf_context->{'reason_code'},
+        'SUBJECT'           => $subject,
+        'CREATOR'           => $wf_context->{'creator'},
+    };
+}
+</%init>

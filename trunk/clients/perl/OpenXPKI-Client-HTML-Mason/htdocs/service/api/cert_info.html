@@ -5,9 +5,6 @@
 <h1>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE', __SERIAL__ => $serial) %>
 </h1>
-<p>
-  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION') %>
-</p>
 % if ($status eq 'REVOKED') {
 <p>
 <b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_REVOKED_DESC') %></font><b>
