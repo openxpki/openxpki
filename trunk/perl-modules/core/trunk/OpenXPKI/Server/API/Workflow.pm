@@ -234,18 +234,16 @@ sub list_context_keys {
         $arg_ref->{'WORKFLOW_TYPE'} = '%';
     }
     my $context_keys = $dbi->select(
-	TABLE    => [ $workflow_table, $context_table ],
+	    TABLE    => [ $workflow_table, $context_table ],
         COLUMNS  => [
-            {
-                COLUMN   => $context_table . '.WORKFLOW_CONTEXT_KEY',
-                DISTINCT => 1,
-            },
+             $context_table . '.WORKFLOW_CONTEXT_KEY',
         ],
-	DYNAMIC => {
+	    DYNAMIC => {
             "$workflow_table.WORKFLOW_TYPE" => $arg_ref->{'WORKFLOW_TYPE'}, 
-	    "$workflow_table.PKI_REALM"  => CTX('session')->get_pki_realm(),
-	},
+	        "$workflow_table.PKI_REALM"     => CTX('session')->get_pki_realm(),
+	    },
         JOIN => [ [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ] ],
+        DISTINCT => 1,
     );
     ##! 16: 'context_keys: ' . Dumper $context_keys
 
