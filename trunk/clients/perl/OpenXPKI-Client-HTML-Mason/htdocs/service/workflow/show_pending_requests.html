@@ -46,7 +46,15 @@ function ToggleAll() {
 %   if ($show_approval_buttons) {
     <td><input type="checkbox" name="approvals"></td>
 %   }
-    <td><input type="hidden" name="serials" value="<% $res->{'SERIAL'} %>"><a href="show_csr_brief.html?id=<% $res->{'SERIAL'} %>;<% $context->{menu}->get_link_params() %>"><% $res->{'SERIAL'} %></a></td>
+    <td><input type="hidden" name="serials" value="<% $res->{'SERIAL'} %>">
+        <& /lib/html/a.mhtml,
+            target   => $context->{menu}->get_root() . '/service/workflow/show_csr_brief.html',
+            label    => $res->{'SERIAL'},
+            params   => [
+                [ 'id' , $res->{'SERIAL'} ],
+            ],
+        &>
+    </td>
     <td>
 % foreach my $ticket (@{ $res->{'TICKETS'} }) {
 <small><a href="<% $ticket->{URL} %>"><% $ticket->{ID} %></a></small><br>
