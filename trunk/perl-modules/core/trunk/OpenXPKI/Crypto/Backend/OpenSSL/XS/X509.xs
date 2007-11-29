@@ -280,6 +280,8 @@ pubkey(cert)
 			RSA_print(out,pkey->pkey.rsa,0);
 		else if (pkey->type == EVP_PKEY_DSA)
 			DSA_print(out,pkey->pkey.dsa,0);
+                else if (pkey->type == EVP_PKEY_EC)
+                        EC_KEY_print(out,pkey->pkey.ec,0);
 		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
