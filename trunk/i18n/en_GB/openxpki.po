@@ -142,20 +142,20 @@ msgstr "Certificate"
 msgid "I18N_OPENXPKI_CERTIFICATE_IDENTIFIER"
 msgstr "Certificate ID"
 
+msgid "I18N_OPENXPKI_CERT_AIA"
+msgstr "Authority Information Access"
+
+msgid "I18N_OPENXPKI_CERT_CDPS"
+msgstr "CRL Distribution Points"
+
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Download certificate"
 
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_DER"
-msgstr "DER format"
-
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL"
-msgstr "Install (use button Open) or download the certificate of another user"
-
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL_MOZILLA"
-msgstr "Install the certificate of another user"
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_FIREFOX_INSTALL"
+msgstr "Firefox / Mozilla"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
-msgstr "Install the certificate for your private key"
+msgstr "Internet Explorer"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
 msgstr "Links for Microsoft Internet Explorer"
@@ -166,9 +166,6 @@ msgstr "Links for Mozilla, Firefox"
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
 msgstr "PEM (CRT) format"
 
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE"
-msgstr "Download certificate and private key in a single container"
-
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS"
 msgstr ""
 "For this certificate, you can download the private key (using the correct "
@@ -176,9 +173,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
 msgstr "TXT format"
-
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_USER_ENROLL"
-msgstr "Install the certificate for your private key"
 
 msgid "I18N_OPENXPKI_CERT_EMAIL"
 msgstr "Email address"
@@ -218,6 +212,12 @@ msgstr "Not before"
 
 msgid "I18N_OPENXPKI_CERT_NOT_YET_VALID"
 msgstr "not yet valid"
+
+msgid "I18N_OPENXPKI_CERT_POLICY"
+msgstr "Policy"
+
+msgid "I18N_OPENXPKI_CERT_PUBLIC_KEY"
+msgstr "Public key"
 
 msgid "I18N_OPENXPKI_CERT_REVOKED"
 msgstr "revoked"
@@ -269,11 +269,20 @@ msgstr "State"
 msgid "I18N_OPENXPKI_CERT_SUBJECT"
 msgstr "Subject"
 
+msgid "I18N_OPENXPKI_CERT_SUBJECT_KEY_IDENTIFIER"
+msgstr "Subject key identifier"
+
 msgid "I18N_OPENXPKI_CERT_SUSPENDED"
 msgstr "suspended"
 
+msgid "I18N_OPENXPKI_CERT_USER_NOTICE"
+msgstr "User notice"
+
 msgid "I18N_OPENXPKI_CERT_VALID"
 msgstr "valid"
+
+msgid "I18N_OPENXPKI_CERT_VALIDITY"
+msgstr "Validity"
 
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID"
 msgstr ""
@@ -645,6 +654,9 @@ msgstr "Automatic browser detection"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
 msgstr "Certificate Information"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO_INSTALL_IN_BROWSER"
+msgstr "Install in browser for your private key"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_SUCCESS_CREATE_CRL"
 msgstr "Create a new certificate revocation list (CRL)"
@@ -1126,7 +1138,9 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_HIDE"
 msgstr "hide"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_APPROVAL_DESC"
-msgstr "Use the menu entries to view certificate signing or revocation requests awaiting your approval."
+msgstr ""
+"Use the menu entries to view certificate signing or revocation requests "
+"awaiting your approval."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_APPROVAL_TITLE"
 msgstr "Approval"
@@ -3071,18 +3085,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE"
 msgstr "Java Keystore"
-
-msgid "I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY"
-msgstr "OpenSSL/SSLeay format"
-
-msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12"
-msgstr "PKCS#12"
-
-msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER"
-msgstr "PKCS#8 (DER) format"
-
-msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM"
-msgstr "PKCS#8 (PEM) format"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_LDAPUTILS_"
@@ -6020,6 +6022,34 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_DER"
+#~ msgstr "DER format"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE"
+#~ msgstr "Download certificate and private key in a single container"
+
+#~ msgid "I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY"
+#~ msgstr "OpenSSL/SSLeay format"
+
+#~ msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12"
+#~ msgstr "PKCS#12"
+
+#~ msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER"
+#~ msgstr "PKCS#8 (DER) format"
+
+#~ msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM"
+#~ msgstr "PKCS#8 (PEM) format"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL"
+#~ msgstr ""
+#~ "Install (use button Open) or download the certificate of another user"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL_MOZILLA"
+#~ msgstr "Install the certificate of another user"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_USER_ENROLL"
+#~ msgstr "Install the certificate for your private key"
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_ANONYMOUS_MENU_DESCRIPTION"
 #~ msgstr ""

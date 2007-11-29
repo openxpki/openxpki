@@ -29,38 +29,60 @@
     <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></td>
     <td><% $subject %></td>
   </tr>
+% if (scalar @subject_alt_names) {
+     <tr>
+         <td>
+%        if (scalar @subject_alt_names > 1) {
+            <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_ALT_NAMES') %>
+%        }
+%        else  {
+            <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_ALT_NAME') %>
+%        }
+        </td>
+       <td><% $subject_alt_names[0] %></td>
+     </tr>
+%    for (my $i = 1; $i < scalar @subject_alt_names; $i++) {
+     <tr>
+       <td></td>
+       <td><% $subject_alt_names[$i] %></td>
+     </tr>
+%    }
+% }
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_FINGERPRINT') %></td>
     <td><% $fingerprint %></td>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></td>
-    <td><% join " ", split "T", $notbefore %> UTC
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_VALIDITY') %></td>
+    <td><% join " ", split "T", $notbefore %> UTC - <% join " ", split "T", $notafter %> UTC
 % if ($not_yet_valid) {
 <b>(<% i18nGettext('I18N_OPENXPKI_CERT_NOT_YET_VALID') %>)</b>
 % }
-    </td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></td>
-    <td><% join " ", split "T", $notafter %> UTC
 % if ($expired) {
 <b>(<% i18nGettext('I18N_OPENXPKI_CERT_EXPIRED') %>)</b>
-    </td>
 % }
+    </td>
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></td>
-    <td><% $issuer %></td>
+    <td><& /lib/html/a.mhtml,
+        target => $context->{menu}->get_root() . '/service/api/cert_info.html',
+        label  => $issuer,
+        params => [
+            [ 'identifier', $issuer_identifier ],
+        ],
+    &></td>
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_KEYUSAGE') %></td>
     <td><% $keyusage %></td>
   </tr>
+% if ($extended_keyusage) {
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_EXTENDED_KEYUSAGE') %></td>
     <td><% $extended_keyusage %></td>
   </tr>
+% }
 </table>
 
 <p>
@@ -71,77 +93,44 @@
 </p>
 <hr/>
 <table>
+% if ($private_key eq 'private_key_exists_for_cert' ||
+%     $private_key eq '') {
+    <tr>
+        <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO_INSTALL_IN_BROWSER') %></td>
+        <td>
+            <& /lib/html/a.mhtml,
+             target => '../../binary/get_certificate.html',
+             label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_FIREFOX_INSTALL'),
+             params => [["identifier",   $identifier],
+                        ["content_type", "X509_USER_CERT"],
+                        ["format",       "PEM"]] &> |
+          <& /lib/html/a.mhtml,
+             target => 'cert_enroll_ie.html',
+             label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL'),
+             params => [["identifier",   $identifier]] &>
+        </td>
+    </tr>
+% }
   <tr>
-    <td rowspan="2"><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD') %></td>
     <td>
       <& /lib/html/a.mhtml,
          target => '../../binary/get_certificate.html',
-         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_USER_ENROLL'),
-         params => [["identifier",   $identifier],
-                    ["content_type", "X509_USER_CERT"],
-                    ["format",       "PEM"]] &>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <& /lib/html/a.mhtml,
-         target => '../../binary/get_certificate.html',
-         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL_MOZILLA'),
-         params => [["identifier",   $identifier],
-                    ["content_type", "X509_EMAIL_CERT"],
-                    ["format",       "PEM"]] &>
-    </td>
-  </tr>
-  <tr>
-    <td rowspan="2"><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER') %></td>
-    <td>
-      <& /lib/html/a.mhtml,
-         target => 'cert_enroll_ie.html',
-         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL'),
-         params => [["identifier",   $identifier]] &>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <& /lib/html/a.mhtml,
-         target => '../../binary/get_certificate.crt',
-         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL'),
-         params => [["identifier",   $identifier],
-                    ["content_type", "IE_USER"],
-                    ["format",       "PEM"]] &>
-    </td>
-  </tr>
-</table>
-<hr/>
-<table>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PEM') %></td>
-    <td>
-      <& /lib/html/a.mhtml,
-         target => '../../binary/get_certificate.html',
-         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD'),
+         label  => 'PEM',
          params => [["identifier",   $identifier],
                     ["content_type", "PLAIN"],
                     ["format",       "PEM"]] &>
-    </td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_DER') %></td>
-    <td>
+        |
       <& /lib/html/a.mhtml,
          target => '../../binary/get_certificate.crt',
-         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD'),
+         label  => 'DER',
          params => [["identifier",   $identifier],
                     ["content_type", "DOWNLOAD"],
                     ["format",       "DER"]] &>
-    </td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_TXT') %></td>
-    <td>
+        |
       <& /lib/html/a.mhtml,
          target => '../../binary/get_certificate.html',
-         label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD'),
+         label  => 'TXT',
          params => [["identifier",   $identifier],
                     ["content_type", "PLAIN"],
                     ["format",       "TXT"]] &>
@@ -155,62 +144,44 @@
 </p>
 <table>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_PRIVKEY_DOWNLOAD') %></td>
     <td>
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
-         label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_DOWNLOAD'),
+         label  => 'PKCS#8 (PEM)',
          params => [["identifier",   $identifier],
                     ["format", "PKCS8_PEM"]] &>
-    </td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER') %></td>
-    <td>
+      |
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
-         label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_DOWNLOAD'),
+         label  => 'PKCS#8 (DER)',
          params => [["identifier",   $identifier],
                     ["format", "PKCS8_DER"]] &>
-    </td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY') %></td>
-    <td>
+      |
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
-         label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_DOWNLOAD'),
+         label  => 'OpenSSL (PEM)',
          params => [["identifier",   $identifier],
                     ["format", "OPENSSL_PRIVKEY"]] &>
     </td>
   </tr>
   <tr>
-</table>
-<p>
-    <% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE') %>
-</p>
-<table>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12') %>&nbsp;</td>
+    <td><% i18nGettext('I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD') %></td>
     <td>
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
-         label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD'),
+         label  => 'PKCS#12',
          params => [["identifier",   $identifier],
                     ["format", "PKCS12"]] &>
-    </td>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE') %></td>
-    <td>
+        | 
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/api/get_privkey_password.html',
-         label  => i18nGettext('I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD'),
+         label  => i18nGettext('I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE'),
          params => [["identifier",   $identifier],
                     ["format", "JAVA_KEYSTORE"]] &>
     </td>
   </tr>
+</table>
 % }
 % if ($revocation) {
   <tr>
@@ -228,12 +199,6 @@
 % }
 </table>
 
-
-
-
-<!--
-<% $private_key %>
--->
 <%init>
   my $msg  = $context->{client}->send_receive_command_msg (
                   "get_cert",
@@ -242,9 +207,12 @@
 
   my $params      = $msg->{PARAMS}->{BODY};
   my $subject     = $params->{SUBJECT};
+  $subject =~ s/,/, /g;
   my $notbefore   = $params->{NOTBEFORE};
   my $notafter    = $params->{NOTAFTER};
   my $issuer      = $params->{ISSUER};
+  $issuer =~ s/,/, /g;
+  my $issuer_identifier = $msg->{PARAMS}->{ISSUER_IDENTIFIER};
   my $fingerprint = $params->{FINGERPRINT};
   my $serial      = $params->{SERIAL};
   $serial .= ' (0x' . sprintf("%0x", $serial) . ')';
@@ -258,6 +226,13 @@
       $extended_keyusage = join q{,}, @{ $params->{OPENSSL_EXTENSIONS}->{'X509v3 Extended Key Usage'} };
   }
   
+  my @subject_alt_names = ();
+  if (ref $params->{OPENSSL_EXTENSIONS}->{'X509v3 Subject Alternative Name'} eq 'ARRAY') {
+    @subject_alt_names = split q{, }, $params->{OPENSSL_EXTENSIONS}->{'X509v3 Subject Alternative Name'}->[0];
+  } 
+  foreach my $san (@subject_alt_names) {
+    $san =~ s/:/: /;
+  }
   my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = gmtime(time);
   $year += 1900;
   $mon++;
@@ -280,3 +255,6 @@
   my $private_key = $p_msg->{PARAMS};
 
 </%init>
+<%once>
+    use Data::Dumper;
+</%once>

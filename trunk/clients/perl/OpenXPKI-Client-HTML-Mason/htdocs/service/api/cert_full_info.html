@@ -31,6 +31,12 @@
     <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></td>
     <td><% delete $params->{SUBJECT} %></td>
   </tr>
+%    foreach my $san (@subject_alt_names) {
+     <tr>
+       <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT_ALT_NAME') %></td>
+       <td><% $san %></td>
+     </tr>
+%    }
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_SERIAL') %></td>
     <td><% $serial %></td>
@@ -39,6 +45,12 @@
     <td><% i18nGettext('I18N_OPENXPKI_CERT_FINGERPRINT') %></td>
     <td><% delete $params->{FINGERPRINT} %></td>
   </tr>
+% if ($subject_key_identifier) {
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT_KEY_IDENTIFIER') %></td>
+    <td><% $subject_key_identifier %></td>
+  </tr>
+% }
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></td>
     <td><% join " ", split "T", delete $params->{NOTBEFORE} %> UTC
@@ -71,8 +83,8 @@
 % } else {
 % # issuer identifier is defined
       <& /lib/html/a.mhtml,
-         target => 'ca_cert_info.html',
-         label  => delete $params->{ISSUER},
+         target => 'cert_info.html',
+         label  => $issuer,
          params => [["identifier",   $issuer_identifier]] &>
 % }
     </td>
@@ -88,6 +100,42 @@
     <td><% i18nGettext('I18N_OPENXPKI_CERT_EXTENDED_KEYUSAGE') %></td>
     <td><% $extended_keyusage %></td>
   </tr>
+% }
+% if (scalar @cdps) {
+  <tr>
+      <td><% i18nGettext('I18N_OPENXPKI_CERT_CDPS') %></td>
+      <td><% $cdps[0] %></td>
+  </tr>
+%   for (my $i = 1; $i < scalar @cdps; $i++) {
+  <tr>
+      <td></td>
+      <td><% $cdps[$i] %></td>
+  </tr>
+%   }
+% }
+% if (scalar @aia) {
+  <tr>
+      <td><% i18nGettext('I18N_OPENXPKI_CERT_AIA') %></td>
+      <td><% $aia[0] %></td>
+  </tr>
+%   for (my $i = 1; $i < scalar @aia; $i++) {
+  <tr>
+      <td></td>
+      <td><% $aia[$i] %></td>
+  </tr>
+%   }
+% }
+% foreach my $notice (@user_notice) {
+    <tr>
+        <td><% i18nGettext('I18N_OPENXPKI_CERT_USER_NOTICE') %></td>
+        <td><% $notice %></td>
+    </tr>
+% }
+% foreach my $policy (@policies) {
+    <tr>
+        <td><% i18nGettext('I18N_OPENXPKI_CERT_POLICY') %></td>
+        <td><a href="http://www.alvestrand.no/cgi-bin/hta/oidwordsearch?text=<% $policy %>"><% $policy %></a></td>
+    </tr>
 % }
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CSR_SERIAL') %></td>
@@ -106,10 +154,10 @@
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_KEY_ALGORITHM') %></td>
     <td>
-%     $params->{PUBKEY_ALGORITHM} =~ s/encryption//i;
-      <% uc(delete $params->{PUBKEY_ALGORITHM}) %>
+      <% $algo %>
     </td>
   </tr>
+% if ($algo eq 'RSA') {
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_KEY_SIZE') %></td>
     <td><% delete $params->{KEYSIZE} %></td>
@@ -118,6 +166,13 @@
     <td><% i18nGettext('I18N_OPENXPKI_CERT_KEY_EXPONENT') %></td>
     <td><% delete $params->{EXPONENT} %></td>
   </tr>
+% }
+% if ($pubkey) {
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_PUBLIC_KEY') %></td>
+    <td><div style="font-family: monospace"><% $pubkey | n %></div></td>
+  </tr>
+% }
 <!--
   <tr>
     <td>... the forgotten things ...</td>
@@ -152,6 +207,51 @@
       $extended_keyusage = join q{,}, @{ $params->{OPENSSL_EXTENSIONS}->{'X509v3 Extended Key Usage'} };
   }
 
+  my @subject_alt_names = ();
+  if (ref $params->{OPENSSL_EXTENSIONS}->{'X509v3 Subject Alternative Name'} eq 'ARRAY') {
+      @subject_alt_names = split q{, }, $params->{OPENSSL_EXTENSIONS}->{'X509v3 Subject Alternative Name'}->[0];
+      foreach my $san (@subject_alt_names) {
+        $san =~ s/:/: /;
+      }
+  } 
+
+  my $subject_key_identifier;
+  if (ref $params->{OPENSSL_EXTENSIONS}->{'X509v3 Subject Key Identifier'} eq 'ARRAY') {
+      $subject_key_identifier = $params->{OPENSSL_EXTENSIONS}->{'X509v3 Subject Key Identifier'}->[0];
+  }
+
+
+  my @cdps = ();
+  if (ref $params->{OPENSSL_EXTENSIONS}->{'X509v3 CRL Distribution Points'} eq 'ARRAY') {
+      @cdps = @{ $params->{OPENSSL_EXTENSIONS}->{'X509v3 CRL Distribution Points'} };
+      foreach my $cdp (@cdps) {
+        $cdp =~ s{\A URI:}{}xms;
+      }
+  }
+
+  my @aia = ();
+  if (ref $params->{OPENSSL_EXTENSIONS}->{'Authority Information Access'} eq 'ARRAY') {
+      @aia = @{ $params->{OPENSSL_EXTENSIONS}->{'Authority Information Access'} };
+      foreach my $aia (@aia) {
+        $aia =~ s{URI:}{}xms;
+      }
+  }
+
+  my @policies = ();
+  if (ref $params->{OPENSSL_EXTENSIONS}->{'X509v3 Certificate Policies'} eq 'ARRAY') {
+      @policies = @{ $params->{OPENSSL_EXTENSIONS}->{'X509v3 Certificate Policies'} };
+      foreach my $policy (@policies) {
+          $policy =~ s/Policy: //;
+      }
+  }
+
+  my @user_notice = ();
+  if (ref $params->{OPENSSL_EXTENSIONS}->{'User Notice'} eq 'ARRAY') {
+      @user_notice = @{ $params->{OPENSSL_EXTENSIONS}->{'User Notice'} };
+      foreach my $notice (@user_notice) {
+        $notice =~ s{\A Explicit\ Text:\ }{}xms;
+      }
+  }
   my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = gmtime(time);
   $year += 1900;
   $mon++;
@@ -167,4 +267,20 @@
   my $serial = $params->{SERIAL};
   $serial .= ' (0x' . sprintf("%X", $serial) . ')';
   my $subject = $params->{SUBJECT};
+  $subject =~ s/,/, /g;
+  my $issuer = $params->{ISSUER};
+  $issuer =~ s/,/, /g;
+  my $algo = $params->{PUBKEY_ALGORITHM};
+  if ($algo eq 'rsaEncryption') {
+    $algo = 'RSA';
+  } 
+  if ($algo eq 'dsaEncryption') {
+    $algo = 'DSA';
+  } 
+  my $pubkey = $params->{PUBKEY};
+  $pubkey =~ s/\n\s+/\n/g;
+  $pubkey =~ s/\n/<br\/>/g;
 </%init>
+<%once>
+    use Data::Dumper;
+</%once>

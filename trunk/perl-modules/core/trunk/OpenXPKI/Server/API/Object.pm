@@ -102,6 +102,7 @@ sub get_cert
         ##! 16: 'status: ' . $hash->{STATUS}
         my $return_ref = $obj->get_parsed_ref();
         $return_ref->{STATUS} = $hash->{STATUS};
+        $return_ref->{ISSUER_IDENTIFIER} = $hash->{ISSUER_IDENTIFIER};
         return $return_ref;
     }
 
