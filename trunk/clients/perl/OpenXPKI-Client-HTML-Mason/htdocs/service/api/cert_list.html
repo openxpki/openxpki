@@ -24,7 +24,7 @@
 <table id="table_list">
   <tr>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_SERIAL') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_HTML_COMMON_NAME') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_EMAIL') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></th>
@@ -53,7 +53,7 @@
             'label'  => $cert->{CERTIFICATE_SERIAL} &>
   </td>
   <td>
-      <% $cert->{SUBJECT} %>
+      <% $cert->{CN} %>
   </td>
   <td>
       <% $cert->{EMAIL} %>
@@ -132,6 +132,12 @@
         );
         return;
     }
+  }
+  foreach my $cert (@results) {
+        my $cn = '';
+        my %dn_hash = OpenXPKI::DN->new($cert->{SUBJECT})->get_hashed_content();
+        $cn = $dn_hash{'CN'}->[0];
+        $cert->{CN} = $cn;
   }
 </%init>
 <%once>

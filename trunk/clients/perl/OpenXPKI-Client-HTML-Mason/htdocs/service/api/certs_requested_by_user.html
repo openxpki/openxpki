@@ -9,7 +9,7 @@
     <table>
     <tr>
         <th><% i18nGettext('I18N_OPENXPKI_CERT_SERIAL') %></th>
-        <th><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></th>
+        <th><% i18nGettext('I18N_OPENXPKI_HTML_COMMON_NAME') %></th>
         <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></th>
         <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></th>
         <th><% i18nGettext('I18N_OPENXPKI_CERT_STATE') %></th>
@@ -27,7 +27,7 @@
            <td><% $cert->{CERTIFICATE_SERIAL} %></td>
            <td><& /lib/html/a.mhtml,
                    target => 'cert_info.html',
-                   label   => $cert->{SUBJECT},
+                   label   => $cert->{CN},
                    params  => [
                        ['identifier', $cert->{IDENTIFIER} ],
                    ],
@@ -90,7 +90,10 @@
             DATE      => $dt,
             OUTFORMAT => 'printable',
         }) . ' UTC';
-        $cert->{SUBJECT} =~ s/,/, /g;
+        my $cn = '';
+        my %dn_hash = OpenXPKI::DN->new($cert->{SUBJECT})->get_hashed_content();
+        $cn = $dn_hash{'CN'}->[0];
+        $cert->{CN} = $cn;
     }
     my $state_map = {
         'ISSUED'          => 'I18N_OPENXPKI_CERT_VALID',
