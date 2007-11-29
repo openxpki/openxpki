@@ -34,7 +34,7 @@
     case "PKCS7"     {$native = "PKCS7"; $extension = 'p7'; }
     case "TXT"       {$native = "TXT"; $extension = 'txt'; }
     case "DER"       {$native = "DER"; $extension = 'der'; }
-    case "PEM"       {$native = "PEM"; $extension = 'pem'; }
+    case "PEM"       {$native = "PEM"; $extension = 'pem'; $attachment = 1; }
     case "IE_ENROLL" {$native = "PEM"; $extension = 'pem'; } # ???
     else {
           print "<h1>".i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_TITLE')."</h1>\n";
