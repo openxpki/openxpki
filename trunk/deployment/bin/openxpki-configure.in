@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # OpenXPKI (Re)configuration script
 #
@@ -56,7 +56,12 @@ check_dirs() {
 	    echo "$dir: OK"
 	else
 	    if [ "$1" != "" ] ; then
-		if install -o $RUNUSER -g $RUNGROUP -m 0750 -d $dir ; then
+		if [ "`uname`" == "SunOS" ]; then 
+			INSTALL="/usr/sbin/install -u"; 
+		else 
+			INSTALL="install -o"; 
+		fi ; 
+		if $INSTALL $RUNUSER -g $RUNGROUP -m 0750 -d $dir ; then
 		    echo "$dir: CREATED"
 		else
 		    echo "$dir: FAILED TO CREATE"

@@ -8,6 +8,7 @@
 
 VERGEN = ../../tools/vergen
 
+SHELL           = /bin/bash
 BINDIR          = [% dir.bindir %]
 MANDIR          = [% dir.mandir %]
 SYSCONFDIR      = [% dir.sysconfdir %]
@@ -43,7 +44,7 @@ TOOLS_SRC = \
 	bin/openxpkictl.in \
 	bin/openxpki-configure.in \
 
-TOOLS_DST = $(patsubst %.in,%,$(TOOLS_SRC))
+TOOLS_DST = $(TOOLS_SRC:.in=)
 
 TOOLS =	$(TOOLS_DST) \
 	bin/openxpki-metaconf \

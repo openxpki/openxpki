@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # OpenXPKI template installation script
 #
@@ -28,7 +28,11 @@ find . | while read file ; do
 	fi
 	if [ $MATCH = 1 ] ; then
 	    echo "Creating directory $TARGETDIR/$file"
-	    $INSTALL -o $ADMUSER -g $ADMGROUP -m 0755 -d $TARGETDIR/$file
+	    if [ "$(uname)" == "SunOS" ]; then
+	    	$INSTALL -u $ADMUSER -g $ADMGROUP -m 0755 -d $TARGETDIR/$file
+	    else
+	    	$INSTALL -o $ADMUSER -g $ADMGROUP -m 0755 -d $TARGETDIR/$file
+	    fi
 	    if [ $? != 0 ] ; then
 		echo "*** ERROR: could not create directory $TARGETDIR/$file"
 	    fi
@@ -48,7 +52,11 @@ find . | while read file ; do
 	fi
 	if [ $MATCH = 1 ] ; then
 	    echo "Creating $TARGETDIR/$file"
- 	    $INSTALL -o $ADMUSER -g $ADMGROUP -m 0644 $file $TARGETDIR/$file
+	    if [ "$(uname)" == "SunOS" ]; then
+	    	$INSTALL -u $ADMUSER -g $ADMGROUP -m 0644 -f `dirname $TARGETDIR/$file` $file
+	    else
+	    	$INSTALL -o $ADMUSER -g $ADMGROUP -m 0644 $file $TARGETDIR/$file
+	    fi
 	    if [ $? != 0 ] ; then
 		echo "*** ERROR: could not install file $TARGETDIR/$file"
 	    fi

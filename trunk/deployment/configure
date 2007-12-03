@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # OpenXPKI Configuration Script
 #
@@ -63,9 +63,17 @@ if [ "$ERRORS" != "0" ] ; then
     exit 1
 fi
 
+UNAME=`uname`
 
-USER=`id -nu`
-GROUP=`id -ng`
+if [ "$UNAME" == "SunOS" ]; then
+    # Solaris does not support id -nu/-ng, extract usernames manually
+    USER=`id|perl -n -e 's/.*uid=[0-9]+\(([a-z0-9]+)\).*/$1/; print $_'`;
+    GROUP=`id|perl -n -e 's/.*gid=[0-9]+\(([a-z0-9]+)\).*/$1/; print $_'`;
+else
+    # we are on a "sane" system :-)
+    USER=`id -nu`
+    GROUP=`id -ng`
+fi
 
 ADMUSER="$USER"
 ADMGROUP="$GROUP"
