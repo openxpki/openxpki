@@ -238,7 +238,7 @@ sub execute
     $context->param ('approvals' => $approvals);
 
     my $bulk = $context->param('bulk');
-    if (! $bulk) {
+    if (! $bulk && $workflow->type eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST') {
         # only notify if this is not part of a bulk request - otherwise
         # the user would get a huge number of tickets
         CTX('notification')->notify({
