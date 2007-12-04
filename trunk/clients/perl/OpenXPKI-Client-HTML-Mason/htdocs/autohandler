@@ -78,9 +78,9 @@
 %      if ($next_comp !~ /\&/) {
 %          $next_comp .= '?';
 %      }
-      <meta http-equiv="refresh" content="0; URL=<% $path %><% $next_comp | n %>__session_id=<% $context->{session_id} %>&__role=<% $context->{role} %>&no_menu=<% $no_menu %>"/>
+      <meta http-equiv="refresh" content="0; URL=<% $path %><% $next_comp | n %>__session_id=<% $context->{session_id} %>&__role=<% $context->{role} %>&no_menu=<% $no_menu %>&__language=<% $context->{language} %>"/>
 %   } else {
-      <meta http-equiv="refresh" content="0; URL=<% $path %>service/index.html?__session_id=<% $context->{session_id} %>&__role=<% $context->{role} %>"/>
+      <meta http-equiv="refresh" content="0; URL=<% $path %>service/index.html?__session_id=<% $context->{session_id} %>&__role=<% $context->{role} %>&__language=<% $context->{language} %>"/>
 %   }
   </head>
 </html>
