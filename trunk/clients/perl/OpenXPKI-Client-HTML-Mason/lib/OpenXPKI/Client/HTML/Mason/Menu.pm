@@ -282,6 +282,13 @@ sub get_root
         $link .= "/" if (length $link);
         $link .= "..";
     }
+    if (! $link) {
+        # if $link is empty now, we are at the root, so we want to
+        # return the current directory (otherwise, in a deployment
+        # not below the root, the links start at the root, not at the
+        # openxpki directory)
+        $link = '.';
+    }
 
     return $link;
 }
