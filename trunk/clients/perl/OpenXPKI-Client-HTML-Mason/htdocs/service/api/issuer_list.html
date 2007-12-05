@@ -6,7 +6,7 @@
 </p>
 <table id="table_list">
   <tr>
-    <th><% i18nGettext('I18N_OPENXPKI_CA_ID') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_HTML_COMMON_NAME') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CA_STATUS') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></th>
@@ -21,7 +21,7 @@
         <& /lib/html/a.mhtml,
            'target' => "ca_cert_info.html",
            'params' => [["identifier", $list->{$ca}->{'identifier'}]],
-           'label'  => $ca &>
+           'label'  => $list->{$ca}->{CN} &>
 <%perl>
     print "    </td>\n";
     print "    <td>\n";
@@ -43,7 +43,7 @@
         <& /lib/html/a.mhtml,
            'target' => "chain_list.html",
            'params' => [["identifier", $list->{$ca}->{'identifier'}]],
-           'label'  => $ca &>
+           'label'  => $list->{$ca}->{CN} &>
 <%perl>
     print "    </td>\n";
   }
@@ -52,4 +52,20 @@
 <%init>
   my $msg  = $context->{client}->send_receive_command_msg ("get_ca_list");
   my $list = $msg->{PARAMS};
+  foreach my $ca (keys %{ $list }) {
+    my $id = $list->{$ca}->{identifier};
+    my $msg = $context->{client}->send_receive_command_msg('get_cert',
+        {
+            IDENTIFIER => $id,
+        },
+    );
+    my $subject = $msg->{PARAMS}->{BODY}->{SUBJECT};
+    my $cn = '';
+    my %dn_hash = OpenXPKI::DN->new($subject)->get_hashed_content();
+    $cn = $dn_hash{'CN'}->[0];
+    $list->{$ca}->{CN} = $cn;
+  }
 </%init>
+<%once>
+    use OpenXPKI::DN;
+</%once>
