@@ -9,7 +9,7 @@ use URI::Escape;
 use Data::Dumper;
 
 use Test::More;
-plan tests => 38;
+plan tests => 36;
 
 my $TEST_PORT = 8099;
 if ($ENV{MASON_TEST_PORT}) {
@@ -47,9 +47,8 @@ if ($ENV{DEBUG}) {
 
 # go to redirect page
 $mech->get("http://127.0.0.1:$TEST_PORT/service/index.html?__session_id=$session_id&__role=RA%20Operator");
-like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE/, 'Correct title');
+like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_RAOP_TITLE/, 'Correct title');
 
-ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS', n => '1'), 'Followed link');
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE/, 'Show pending requests page');
 like($mech->response->content, qr/example1.example.com/, 'example1 present');
 like($mech->response->content, qr/example2.example.com/, 'example2 present');
@@ -90,7 +89,6 @@ $mech->click('__submit');
 like($mech->response->content, qr/FAILURE/, 'FAILURE after rejection');
 
 $mech->get("http://127.0.0.1:$TEST_PORT/service/index.html?__session_id=$session_id&__role=RA%20Operator");
-ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS', n => '1'), 'Followed link');
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE/, 'Show pending requests page');
 unlike($mech->response->content, qr/example1.example.com/, 'example1 no longer present');
 like($mech->response->content, qr/example2.example.com/, 'example2 present');

@@ -8,7 +8,7 @@ use WWW::Mechanize;
 use URI::Escape;
 
 use Test::More;
-plan tests => 15;
+plan tests => 12;
 
 my $TEST_PORT = 8099;
 if ($ENV{MASON_TEST_PORT}) {
@@ -43,18 +43,13 @@ if ($ENV{DEBUG}) {
 $mech->get("http://127.0.0.1:$TEST_PORT/service/index.html?__session_id=$session_id&__role=");
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE/, 'Correct title');
 
-ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_CA_INFO', n => '1'), 'Followed link');
-ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_PKI_REALM_INFO'), 'Followed link');
+ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_DOWNLOAD', n => '1'), 'Followed link');
+ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_CA_CERTIFICATES'), 'Followed link');
 
-like($mech->response->content, qr/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/, 'Dummy deployment realm is listed'), 
-
-ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_LIST_ISSUER', n => '1'), 'Followed link');
-
-like($mech->response->content, qr/testdummyca1/, 'Test Dummy CA 1 is listed'), 
-like($mech->response->content, qr/testdummyca2/, 'Test Dummy CA 2 is listed'), 
+like($mech->response->content, qr/Testing CA/, 'Testing CA is listed'), 
 like($mech->response->content, qr/I18N_OPENXPKI_CA_STATUS_USABLE/, 'At least one CA is usable'), 
 
-ok($mech->follow_link(text => 'testdummyca1', n=> '1'), 'Followed link');
+ok($mech->follow_link(text => 'Testing CA', n=> '1'), 'Followed link');
 like($mech->response->content, qr/CN=Testing CA,OU=Testing CA,O=OpenXPKI/, 'CA certificate info shows subject'), 
 
 # TODO - issue a CRL later on and show the list then ...

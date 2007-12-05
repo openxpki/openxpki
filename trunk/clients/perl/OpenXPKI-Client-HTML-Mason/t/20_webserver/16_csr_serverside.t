@@ -8,7 +8,7 @@ use WWW::Mechanize;
 use URI::Escape;
 
 use Test::More;
-plan tests => 21;
+plan tests => 22;
 
 my $TEST_PORT = 8099;
 if ($ENV{MASON_TEST_PORT}) {
@@ -44,7 +44,8 @@ $mech->get("http://127.0.0.1:$TEST_PORT/service/index.html?__session_id=$session
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE/, 'Correct title');
 
 # Server side key generation
-ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_CREATE_CSR', n => '1'), 'Followed link');
+ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_REQUEST', n => '1'), 'Followed link');
+ok($mech->follow_link(text => 'I18N_OPENXPKI_HTML_MENU_CERTIFICATE_SIGNING_REQUEST', n => '1'), 'Followed link');
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_TITLE/, 'Role selection on first page');
 $mech->form_name('OpenXPKI');
 $mech->field('role', 'Web Server');

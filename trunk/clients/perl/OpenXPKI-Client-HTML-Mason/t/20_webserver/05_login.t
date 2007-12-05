@@ -44,10 +44,10 @@ $mech->get("http://127.0.0.1:$TEST_PORT/service/index.html?__session_id=$session
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE/, 'Correct title');
 
 foreach my $menu_item (qw(
-    I18N_OPENXPKI_HTML_MENU_CA_INFO
-    I18N_OPENXPKI_HTML_MENU_CREATE_CSR
-    I18N_OPENXPKI_HTML_MENU_CREATE_CRR
-    I18N_OPENXPKI_HTML_MENU_SEARCH_CERT
+    I18N_OPENXPKI_HTML_MENU_HOME
+    I18N_OPENXPKI_HTML_MENU_REQUEST
+    I18N_OPENXPKI_HTML_MENU_DOWNLOAD
+    I18N_OPENXPKI_HTML_MENU_SEARCH
     I18N_OPENXPKI_HTML_MENU_LOGOUT
     )) {
     like($mech->response->content, qr/$menu_item/, 
@@ -61,10 +61,42 @@ like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS
 
 # login using external dynamic stack
 my %expected_menus = (
-    'RA Operator' => [ qw(I18N_OPENXPKI_HTML_MENU_CA_INFO I18N_OPENXPKI_HTML_MENU_CREATE_CSR I18N_OPENXPKI_HTML_MENU_CREATE_CRR I18N_OPENXPKI_HTML_MENU_SMARTCARD I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS I18N_OPENXPKI_HTML_MENU_WORKFLOW I18N_OPENXPKI_HTML_MENU_SEARCH_CERT I18N_OPENXPKI_HTML_MENU_LOGOUT) ],
-    'User' => [ qw(I18N_OPENXPKI_HTML_MENU_CA_INFO I18N_OPENXPKI_HTML_MENU_CREATE_CSR I18N_OPENXPKI_HTML_MENU_SMARTCARD I18N_OPENXPKI_HTML_MENU_SEARCH_CERT I18N_OPENXPKI_HTML_MENU_LOGOUT) ],
-    'CA Operator' => [ qw(I18N_OPENXPKI_HTML_MENU_KEY_LIST I18N_OPENXPKI_HTML_MENU_CA_INFO I18N_OPENXPKI_HTML_MENU_WORKFLOW I18N_OPENXPKI_HTML_MENU_LOGOUT) ],
+    'RA Operator' => [
+    qw(
+        I18N_OPENXPKI_HTML_MENU_TASKS
+        I18N_OPENXPKI_HTML_MENU_REQUEST
+        I18N_OPENXPKI_HTML_MENU_DOWNLOAD
+        I18N_OPENXPKI_HTML_MENU_APPROVAL
+        I18N_OPENXPKI_HTML_MENU_SEARCH
+        I18N_OPENXPKI_HTML_MENU_LOGOUT
+    )
+    ],
+    'User' => [ 
+    qw(
+        I18N_OPENXPKI_HTML_MENU_HOME
+        I18N_OPENXPKI_HTML_MENU_REQUEST
+        I18N_OPENXPKI_HTML_MENU_DOWNLOAD
+        I18N_OPENXPKI_HTML_MENU_SEARCH
+        I18N_OPENXPKI_HTML_MENU_LOGOUT
+    )
+    ],
+    'CA Operator' => [
+    qw(
+        I18N_OPENXPKI_HTML_MENU_TASKS
+        I18N_OPENXPKI_HTML_MENU_REQUEST
+        I18N_OPENXPKI_HTML_MENU_DOWNLOAD
+        I18N_OPENXPKI_HTML_MENU_APPROVAL
+        I18N_OPENXPKI_HTML_MENU_SEARCH
+        I18N_OPENXPKI_HTML_MENU_LOGOUT
+    )
+    ],
 );
+
+my $expected_intro_title = {
+    'User' => qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE/,
+    'CA Operator' => qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_CAOP_TITLE/,
+    'RA Operator' => qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_RAOP_TITLE/,
+};
 
 foreach my $role (keys %expected_menus) {
     diag "Login as external dynamic ($role) ...";
@@ -92,7 +124,7 @@ foreach my $role (keys %expected_menus) {
 
     # go to redirect page
     $mech->get("http://127.0.0.1:$TEST_PORT/service/index.html?__session_id=$session_id&__role=" . uri_escape($role));
-    like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE/, 'Correct title');
+    like($mech->response->content, $expected_intro_title->{$role}, 'Correct title');
 
     foreach my $menu_item (@{ $expected_menus{$role} }) {
         like($mech->response->content, qr/$menu_item/, 
@@ -130,5 +162,5 @@ if ($ENV{DEBUG}) {
 
 # go to redirect page
 $mech->get("http://127.0.0.1:$TEST_PORT/service/index.html?__session_id=$session_id&__role=RA%20Operator");
-like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE/, 'Correct title');
+like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_RAOP_TITLE/, 'Correct title');
 
