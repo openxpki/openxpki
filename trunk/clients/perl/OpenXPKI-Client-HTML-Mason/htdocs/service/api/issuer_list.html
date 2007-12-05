@@ -52,8 +52,14 @@
 <%init>
   my $msg  = $context->{client}->send_receive_command_msg ("get_ca_list");
   my $list = $msg->{PARAMS};
+
+  CA:
   foreach my $ca (keys %{ $list }) {
     my $id = $list->{$ca}->{identifier};
+    if (! defined $id) {
+        delete $list->{$ca};
+        next CA;
+    }
     my $msg = $context->{client}->send_receive_command_msg('get_cert',
         {
             IDENTIFIER => $id,
