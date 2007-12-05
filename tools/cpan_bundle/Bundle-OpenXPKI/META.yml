@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Bundle-OpenXPKI
-version:             0.03
+version:             0.04
 abstract:            A bundle to install modules required for OpenXPKI
 generated_by:        ExtUtils::MakeMaker version 6.31
 distribution_type:   module

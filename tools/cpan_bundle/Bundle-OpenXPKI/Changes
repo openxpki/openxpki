@@ -1,5 +1,7 @@
 Revision history for Bundle-OpenXPKI
 
+0.04    2007-12-05
+        - Require IPC::ShareLite, too
 0.03    2007-06-13
         - Cleaned up dependencies that are in Perl 5.8.8 already
         - Added modules required for Mason testing

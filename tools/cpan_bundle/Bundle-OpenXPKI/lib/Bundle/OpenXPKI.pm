@@ -1,6 +1,6 @@
 package Bundle::OpenXPKI;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 1;
 __END__
@@ -1868,6 +1868,8 @@ IPC::Msg 1.02
 IPC::Semaphore 1.02
 
 IPC::SysV 1.04
+
+IPC::ShareLite 0.09
 
 LWP::Protocol::ldap 1.10
 
