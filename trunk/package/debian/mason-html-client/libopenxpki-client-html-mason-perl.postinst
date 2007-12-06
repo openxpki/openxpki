@@ -34,6 +34,10 @@ case "$1" in
 
         # add apache user to openxpki group (to allow connecting the socket)
         usermod --groups openxpki --append openxpki www-data
+
+        # chown/chmod the mason session directory
+        chown www-data.openxpki /var/openxpki/mason_sessions
+        chmod 0770 /var/openxpki/mason_sessions
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

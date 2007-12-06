@@ -3,3 +3,4 @@ var/www/openxpki/authentication
 var/www/openxpki/service
 var/www/openxpki/lib
 var/www/openxpki/css
+var/openxpki/mason_sessions

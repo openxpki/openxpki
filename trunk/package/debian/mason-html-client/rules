@@ -43,6 +43,7 @@ build-stamp: config
 	sed "s%MasonDataDir\\s.*%MasonDataDir '/var/cache/mason'%" eg/openxpki-mason-mod_perl.conf > eg/openxpki-mason-mod_perl.conf.1
 	sed "s%MasonCompRoot\\s.*%MasonCompRoot '/var/www/openxpki'%" eg/openxpki-mason-mod_perl.conf.1 > eg/openxpki-mason-mod_perl.conf
 	echo SetEnv OPENXPKI_SOCKET_FILE \"/var/openxpki/openxpki.socket\" >> eg/openxpki-mason-mod_perl.conf
+	echo SetEnv OPENXPKI_MASON_SESSION_DIR \"/var/openxpki/mason_sessions\" >> eg/openxpki-mason-mod_perl.conf
 	# $(MAKE) test
 	touch build-stamp
 

@@ -15,7 +15,7 @@ Description: Top Level Domain:
 
 Template: openxpki-deployment/sld
 Type: string
-Default: debian
+Default: example
 Description: Second Level Domain:
  Please enter the name of your your second level domain name (e.g. "debian").
 
@@ -27,7 +27,7 @@ Description: Country:
 
 Template: openxpki-deployment/organization
 Type: string
-Default: Debian
+Default: Acme Inc.
 Description: Organization:
  Please enter the name of your organization (e.g. "Debian" or "Snake Oil").
 
