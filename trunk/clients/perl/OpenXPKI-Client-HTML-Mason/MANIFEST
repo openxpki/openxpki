@@ -24,6 +24,9 @@ htdocs/css/sinorcaish-screen.css
 htdocs/images/openxpki_logo.png
 htdocs/images/openxpki_sinorcaish.png
 htdocs/images/search.png
+htdocs/images/de.png
+htdocs/images/gb.png
+htdocs/images/ru.png
 htdocs/lib/debug.mhtml
 htdocs/lib/field_to_i18n.mhtml
 htdocs/lib/javascript.mhtml
