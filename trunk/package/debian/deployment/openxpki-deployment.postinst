@@ -72,7 +72,7 @@ case "$1" in
 		echo 01 > demoCA/serial
 		echo SUBJECT::="$SUBJECT"
 		openssl req -newkey rsa:2048 -subj "$SUBJECT" -passout env:PASSWD -out csr.pem -keyout key.pem
-		openssl ca  -selfsign -in csr.pem -keyfile key.pem -out cacert.pem -passin env:PASSWD -utf8 -outdir . -subj "$SUBJECT" -policy policy_anything -batch -extensions v3_ca -preserveDN
+		openssl ca  -selfsign -in csr.pem -keyfile key.pem -out cacert.pem -passin env:PASSWD -utf8 -outdir . -subj "$SUBJECT" -policy policy_anything -batch -extensions v3_ca -preserveDN -days 730
 		cat cacert.pem | perl -ne "\$cert = 1 if (\$_ =~ /^-----BEGIN/);next if (not \$cert); print \$_;" > cert.pem
 		cd demoCA
 		rm index.txt  index.txt.attr  index.txt.old  serial  serial.old
