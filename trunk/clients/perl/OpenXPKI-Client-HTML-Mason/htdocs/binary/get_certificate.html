@@ -46,6 +46,10 @@
          }
   }
 
+  if ($format eq 'PEM' && $content_type ne 'DOWNLOAD') {
+      # Mozilla certificate installation has to be sent inline
+      $attachment = 0;
+  }
   my $filename = $m->comp('/lib/filename_for_cert.mhtml',
     'identifier' => $identifier,
     'extension'  => $extension,
