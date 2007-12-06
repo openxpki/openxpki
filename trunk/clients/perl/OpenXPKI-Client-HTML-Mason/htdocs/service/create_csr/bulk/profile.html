@@ -1,0 +1,12 @@
+<%args>
+    $role    => undef
+    $profile => undef
+</%args>
+<%init>
+    if (! defined $profile) {
+        $profile = $m->comp('/service/create_csr/get_profile.mhtml', bulk => 1, role => $role);
+    }
+    if (defined $profile) {
+        $m->comp('/service/create_csr/bulk/get_pkcs10s.mhtml', role => $role, profile => $profile);
+    }
+</%init>
