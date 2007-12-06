@@ -116,9 +116,7 @@ htdocs/service/workflow/activity/approve_csr.html
 htdocs/service/workflow/activity/continue.html
 htdocs/service/workflow/activity/continue_issuance.html
 htdocs/service/workflow/activity/cancel_csr_approval.html
-htdocs/service/workflow/activity/execute_csr.html
 htdocs/service/workflow/activity/reject_csr.html
-htdocs/service/workflow/activity/export_csr.html
 htdocs/service/workflow/activity/persist_csr.html
 htdocs/service/workflow/activity/persist_csrs.html
 htdocs/service/workflow/activity/reject_crr.html
