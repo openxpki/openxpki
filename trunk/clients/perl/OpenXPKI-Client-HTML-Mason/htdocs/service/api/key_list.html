@@ -23,7 +23,7 @@
         print "    <td>".i18nGettext('I18N_OPENXPKI_SECRET_COMPLETE')."</td>\n";
         print "    <td>\n";
         $m->comp ('/lib/html/a.mhtml',
-                  'target' => "clear_secret.html",
+                  'target' => $context->{menu}->get_root() . "/service/api/clear_secret.html",
                   'params' => [["secret", $secret]],
                   'label'  => i18nGettext('I18N_OPENXPKI_SECRET_LOGOUT_LINK_LABEL'));
         print "    </td>\n";
@@ -31,7 +31,7 @@
         print "    <td>".i18nGettext('I18N_OPENXPKI_SECRET_INCOMPLETE')."</td>\n";
         print "    <td>\n";
         $m->comp ('/lib/html/a.mhtml',
-                  'target' => "set_secret.html",
+                  'target' => $context->{menu}->get_root() . "/service/api/set_secret.html",
                   'params' => [["secret", $secret], ["type", $secrets{$secret}->{TYPE}]],
                   'label'  => i18nGettext('I18N_OPENXPKI_SECRET_LOGIN_LINK_LABEL'));
         print "    </td>\n";
