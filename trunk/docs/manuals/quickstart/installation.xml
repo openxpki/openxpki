@@ -5,7 +5,7 @@
 <!-- TODO - openssl installation? -->
   <sect2 id="compilation">
     <title>Compilation and Module installation</title>
-    <para>Assuming you've gotten a source tree from somewhere (i.e. either an official release tar-ball or a Subversion checkout), enter the <filename class="directory">trunk/perl-modules/core/trunk</filename> directory. Run <command>perl Makefile.PL</command> to create a Makefile. If this should fail, please make sure that you have installed all required Perl modules. If you don't, you can install them using either software packages from your distribution or by using the CPAN shell. If it works, you can compile &openxpki; using <command>make</command>. Once that is taken care of, make sure to run <command>make test</command> to see if the compiled &openxpki; runs correctly. <command>make install</command> completes the installation of the Perl modules. Note that if you want to install &openxpki; locally, i.e. into your home directory, you can run <command>perl Makefile.PL PREFIX=<replaceable>directory</replaceable></command> in the first step to prepare for an installation below <replaceable>directory</replaceable>.
+    <para>Assuming you've gotten a source tree from somewhere (i.e. either an official release tar-ball or a Subversion checkout), enter the <filename class="directory">trunk/perl-modules/core/trunk</filename> directory. Run <command>perl Makefile.PL</command> to create a Makefile. If this should fail, please make sure that you have installed all required Perl modules. If you don't, you can install them using either software packages from your distribution or by using the CPAN shell. The CPAN package Bundle::OpenXPKI can be used to download the minimal set of required packages (run <command>perl -MCPAN -e 'install Bundle::OpenXPKI'</command>). If it works, you can compile &openxpki; using <command>make</command>. Once that is taken care of, make sure to run <command>make test</command> to see if the compiled &openxpki; runs correctly. <command>make install</command> completes the installation of the Perl modules. Note that if you want to install &openxpki; locally, i.e. into your home directory, you can run <command>perl Makefile.PL PREFIX=<replaceable>directory</replaceable></command> in the first step to prepare for an installation below <replaceable>directory</replaceable>.
     </para>
     <para>Now you have all the required modules for the server installed. As the administrative tools use code of the &openxpki; client as well, you need to install the corresponding modules, too. They come in handy later on when you want to set up a client (such as the Mason-based web interface) as well. Change to the <filename class="directory">trunk/clients/perl/OpenXPKI-Client</filename> directory and repeat the same steps as above, again using <command>perl Makefile.PL PREFIX=<replaceable>directory</replaceable></command> if necessary.
    </para>
@@ -21,19 +21,55 @@
     <title>Deployment</title>
     <para>To install the meta configuration file (<filename>openxpki.conf</filename>), run <command>openxpkiadm deploy --template quickstart</command>. Follow the instructions and run <command>openxpki-configure</command>. This is an interactive tool that allows you to specify some of the basic configuration options. The most important options that you need to set right now are the location of your openssl binary (defaults to <filename>/usr/bin/openssl</filename>) and your database configuration. Exit the tool and allow it to write the modified configuration. Depending on the deployment style, you now have one huge <filename>config.xml</filename> or a number of smaller XML files in your <filename class="directory">etc/openxpki</filename> directory. These are the files that are actually used by the OpenXPKI server and which you can modify later to set up your desired behaviour. After having set up a database using your favourite tool for your favourite DBMS, you should run <command>openxpkiadm initdb</command> to set up the database schema. If everything goes right, try to start the &openxpki; server using <command>openxpkictl start</command>. If you see <quote>DONE.</quote> in the last line of output, this works and the &openxpki; server is up and running. Stop it for now using <command>openxpkictl stop</command>. If it goes wrong, please check your <envar>PERL5LIB</envar> environment variable. This variable needs to include the location where your Perl modules where installed (which depends on your <envar>PREFIX</envar> setting).</para>
   </sect2>
-<!-- TODO - i18n installation -->
+
   <sect2 id="qs_installation_webinterface">
     <title>Setting up the web interface</title>
     <para>So now you've got a working server, but of course you can not see very much of it, which is why the installation of the web interface will be the next step. Change into the <filename class="directory">trunk/clients/perl/OpenXPKI-Client-HTML-Mason</filename> directory and run <command>perl Makefile.PL</command> (again adding the PREFIX option if necessary), <command>make</command> and <command>make install</command>. This installs the needed client modules. In the next step, copy the <filename class="directory">htdocs</filename> directory to a path of your liking that is readable by your webserver. We will refer to this directory as the (Mason) component root later on.</para>
     <para>For the rest of this section, we assume you are using Apache as your webserver. Installation under different webservers is possible, but you are largely on your own here. There are two different options how to install the &openxpki; Mason client &ndash; either using mod_perl or using CGI. If you have mod_perl available, go for it, as it is much faster than using CGI. CGI is not recommend for production use, but to quickly try out &openxpki;, it works.</para>
     <sect3 id="qs_installation_webinterface_mod_perl">
       <title>Installing using mod_perl</title>
-      <para>Use the <filename>eg/openxpki-mason-mod_perl.conf</filename> file as a boilerplate for your Apache configuration. You need to change four variables defined in this file. The first one is the <envar>MasonDataDir</envar> variable, which should point to a directory that is writable by your webserver user. This is a directory where Mason temporarily caches its components. The second one is the <envar>MasonCompRoot</envar> variable, which should point to the component root that you chose earlier. Furthermore, you need to set up <envar>OPENXPKI_SOCKET_FILE</envar> to point to your &openxpki; socket file. Note that this file needs to be readable and writable by both your &openxpki; user as well as the webserver user &ndash; the easiest way to achieve this is putting them in a common group. You can look up the location of the socket file in your <filename>config.xml</filename>. The last variable is <envar>OPENXPKI_LOCALE_PREFIX</envar>, which needs to point to your <filename class="directory">locale</filename> directory if you have installed it in a non-standard path.</para>
+      <para>Use the <filename>eg/openxpki-mason-mod_perl.conf</filename> file as a boilerplate for your Apache configuration. You need to change five variables defined in this file. The first one is the <envar>MasonDataDir</envar> variable, which should point to a directory that is writable by your webserver user. This is a directory where Mason temporarily caches its components. The second one is the <envar>MasonCompRoot</envar> variable, which should point to the component root that you chose earlier. Furthermore, you need to set up <envar>OPENXPKI_SOCKET_FILE</envar> to point to your &openxpki; socket file. Note that this file needs to be readable and writable by both your &openxpki; user as well as the webserver user &ndash; the easiest way to achieve this is putting them in a common group. You can look up the location of the socket file in your <filename>config.xml</filename>. The fourth variable is <envar>OPENXPKI_MASON_SESSION_DIR</envar> which is a directory for the client sessions &ndash; this is supposed to be read-/writable by your Apache user only. The last variable is <envar>OPENXPKI_LOCALE_PREFIX</envar>, which needs to point to your <filename class="directory">locale</filename> directory if you have installed it in a non-standard path (see the next step). (Re)start your Apache and you should be up and running, but you won't be able to do much yet because you do not have a CA certificate yet.</para>
     </sect3>
+  </sect2>
+
+  <sect2 id="qs_installation_i18n">
+    <title>Installing the internationalization files</title>
+    <para>
+        If you have looked at the webserver after the last step, you may have noticed that it does not speak any language yet, but only shows so-called I18N-identifiers. You will need to go to the <filename class="directory">trunk/i18n</filename> directory and run <command>make</command> and <command>make install</command> to install the gettext files. If you use a local installation, you can run <command>PREFIX=<replaceable>directory</replaceable> make install</command> instead of <command>make install</command>.
+    </para>
   </sect2>
 
   <sect2 id="qs_installation_ca_certificate">
     <title>Setting up the CA certificate and key</title>
-    <para></para>
+    <para>
+        To be able to issue certificates, you will of course need a CA certificate. For the quickstart, we will assume that you want a single CA certificate with no intermediaries (which are strongly suggested for production use, though). For now, we will assume that you want to create a software key using a single password. Other methods such as threshold secret sharing or using HSMs are available too but beyond the scope of this quickstart guide.
+    </para>
+    <sect3 id="qs_installation_ca_certificate_key_generation">
+        <title>Creating a new CA key</title>
+        <para>
+            &openxpki; is able to use the same password for different keys and thus has the concept of so-called secret groups. If you have a look at your newly created <filename>config.xml</filename>, you will see a definition for the secret group with ID default. This secret group is also referenced as the group used for unlocking your CA key token in <filename>token.xml</filename>. You need to specify the ID of the secret group when generating a new key using openxpkiadm key generate. Typically, the required command line will look like this: <command>openxpkiadm key generate --realm <replaceable>realm</replaceable> --group default</command>. Follow the directions to select the type and parameters for your keys. As a start, using an RSA key with 2048 bit key length and AES256 as the key encryption algorithm would be a reasonable choice. You can check if everything went fine by using the <command>openxpkiadm key list --realm <replaceable>realm</replaceable></command> command &ndash; all listed keys should now be prefixed with a plus sign.
+        </para>
+    </sect3>
+    <sect3 id="qs_installation_ca_certificate_cacert_generation">
+        <title>Creating and installing a new CA certificate</title>
+        <para>
+            Using the new key, you will need to create a new CA certificate. The quickest way is doing so using OpenSSL. Create a minimal config file (<filename>openssl.cnf</filename>) with the following content:
+            <programlisting>
+[ ext ]
+keyUsage = critical, cRLSign, keyCertSign
+basicConstraints = critical,CA:true
+
+[ req ]
+distinguished_name = ca_dn
+
+[ ca_dn ]
+countryName = "Country code"
+organizationName = "Organization"
+organizationalUnitName = "Organizational Unit"
+commonName = "Common name"
+            </programlisting>
+            Then, run the following command: <command>openssl req -config openssl.cnf -extensions ext -days <replaceable>validity_length</replaceable> -new -x509 -key <replaceable>/path/to/your/cakey.pem</replaceable> -out cacert.pem</command>. After answering the questions, a new CA certificate should be available in <filename>cacert.pem</filename>. You will need to import this certificate into the &openxpki; database. To do so, run <command>openxpkiadm certificate import --file <replaceable>/path/to/your/cacert.pem</replaceable></command>. If that is successful, you will see an identifier for the certificate. To reference the certificate within the &openxpki; configuration, you can either use the identifier directly or use a so-called alias, which is just a symbolic name for the identifier. In your freshly deployed <filename>config.xml</filename>, you should find a certificate section that references an alias and a realm. To set the alias, use <command>openxpkiadm certificate alias --realm <replaceable>configured_realm</replaceable> --alias <replaceable>configured_alias</replaceable> --identifier <replaceable>identifier</replaceable></command>. Once you have restarted the &openxpki; server using <command>openxpkictl stop; openxpkictl start</command>, your CA should be up and running. You can check that using the web interface &ndash; use the Download &rarr; CA certificates menu to see if your CA is listed as usable.
+        </para>
+    </sect3>
   </sect2>
 </sect1>
