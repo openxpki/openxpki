@@ -10,19 +10,4 @@
       workflow_type="I18N_OPENXPKI_WF_TYPE_CYCLE_SUB2">
   </action>
 
-  <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_TOP"
-          class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"
-          time="1">
-  </action>
-
-  <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_SUB"
-          class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"
-          time="3">
-  </action>
-
-  <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_IN_SUBSUB"
-          class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"
-          time="9">
-  </action>
-
 </actions>

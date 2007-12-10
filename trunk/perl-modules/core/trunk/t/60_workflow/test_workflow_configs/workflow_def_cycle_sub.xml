@@ -23,23 +23,31 @@
       </action>
   </state>
 							
-  <state name="SLEEPING_FOR_CHILD" autorun="yes">
-   <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_SUB"
-                  resulting_state="CHECK_CHILD_FINISHED">
+  <state name="SLEEPING_FOR_CHILD">
+      <!-- = notify_parent_success -->
+   <action name="child_finished_successfully"
+                  resulting_state="NOTIFY_PARENT_SUCCESS">
+      <condition name="all_wf_children_instances_finished"/>
+   </action>
+      <!-- = notify_parent_failure -->
+   <action name="child_finished_failure"
+                  resulting_state="NOTIFY_PARENT_FAILURE">
    </action>
   </state>
 
-  <state name="CHECK_CHILD_FINISHED" autorun="yes">
-   <action name="null"
-      resulting_state="SUCCESS">
-     <condition name="wf_child_instance_finished"/>
-   </action>
-   <action name="null2"
-      resulting_state="SLEEPING_FOR_CHILD">
-     <condition name="!wf_child_instance_finished"/>
+  <state name="NOTIFY_PARENT_SUCCESS" autorun="yes">
+   <action name="notify_parent_success"
+                  resulting_state="SUCCESS">
    </action>
   </state>
 
+  <state name="NOTIFY_PARENT_FAILURE" autorun="yes">
+   <action name="notify_parent_failure"
+                  resulting_state="FAILURE">
+   </action>
+  </state>
+
+  <state name="FAILURE"/>
   <state name="SUCCESS"/>
 
 </workflow>

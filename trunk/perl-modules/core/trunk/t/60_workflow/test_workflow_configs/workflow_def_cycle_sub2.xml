@@ -18,9 +18,9 @@
   </state>
 
   <state name="SLEEPING_SUBSUB" autorun="yes">
-   <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_IN_SUBSUB"
-      resulting_state="SUCCESS">
-   </action>
+    <action name="notify_parent_success"
+             resulting_state="SUCCESS">
+    </action>
   </state>
 
   <state name="SUCCESS"/>
