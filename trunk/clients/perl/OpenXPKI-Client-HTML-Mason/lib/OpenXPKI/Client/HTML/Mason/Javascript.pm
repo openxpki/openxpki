@@ -421,6 +421,7 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
             ' end if
 
             xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 1)
+            xenroll.KeySpec = 1 ' AT_KEYEXCHANGE
             sz10 = xenroll.CreatePKCS10(szName, "1.3.6.1.4.1.311.2.1.21")
             if (0<>Err.Number) and (mode<>"silent") then
                 ' XEnroll failed
