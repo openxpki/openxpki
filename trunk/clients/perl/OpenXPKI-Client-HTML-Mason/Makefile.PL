@@ -55,7 +55,6 @@ WriteMakefile(
         'Encode'           => 0,
         'Class::Std'       => 0,
         'List::Util'       => 0,
-        'Smart::Comments'  => 0,
         'XML::Simple'      => 0,
         'XML::Parser'      => 0,
         'Digest::SHA1'     => 0,
