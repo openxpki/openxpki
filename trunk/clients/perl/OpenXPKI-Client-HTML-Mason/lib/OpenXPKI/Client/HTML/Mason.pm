@@ -16,10 +16,6 @@ use base qw( OpenXPKI::Client );
 use Carp;
 use English;
 
-# FIXME: remove debugging modules
-use Smart::Comments;
-use Data::Dumper;
-
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Debug 'OpenXPKI::Client::HTML::Mason';
 use OpenXPKI::Exception;
