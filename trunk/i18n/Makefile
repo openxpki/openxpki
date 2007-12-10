@@ -17,7 +17,7 @@ VERSION_FILE    = ./VERSION
 default::	$(MO_TRANSLATIONS)
 	@echo Languages: $(LANGS)
 
-$(PO_SOURCES):	openxpki.pot
+$(PO_SOURCES)::
 	@if (test ! -d $(@:openxpki.po=)); then echo creating directory for $(@:openxpki.po=); mkdir $(@:openxpki.po=); fi
 	@if (test ! -e $@); then echo creating po file $@; cp openxpki.pot $@; fi
 	msgmerge --update $@ openxpki.pot
