@@ -59,7 +59,7 @@
     my @subject_alt_name = ();
     my $text             = "";
     my $range            = 5;
-    my $serializer       = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
+    my $serializer       = OpenXPKI::Serialization::Simple->new();
 
     ## load the workflow and extract the subject alternative name
     my $msg = $context->{client}->send_receive_command_msg

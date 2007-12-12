@@ -41,7 +41,7 @@
     my @errors = ();
     my %info   = ();
     my $text   = "";
-    my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
+    my $serializer = OpenXPKI::Serialization::Simple->new();
 
     ## load the workflow and extract the additional infos
     my $msg = $context->{client}->send_receive_command_msg
