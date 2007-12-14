@@ -57,6 +57,7 @@ htdocs/authentication/role.mhtml
 htdocs/authentication/open_form.mhtml
 htdocs/authentication/close_form.mhtml
 htdocs/authentication/x509.mhtml
+htdocs/authentication/x509_webserver.mhtml
 
 htdocs/service/autohandler
 htdocs/service/dhandler

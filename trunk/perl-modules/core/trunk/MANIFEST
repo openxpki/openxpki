@@ -165,6 +165,7 @@ OpenXPKI/Server/Authentication/External.pm
 OpenXPKI/Server/Authentication/LDAP.pm
 OpenXPKI/Server/Authentication/Password.pm
 OpenXPKI/Server/Authentication/X509.pm
+OpenXPKI/Server/Authentication/ClientX509.pm
 OpenXPKI/Server/ACL.pm
 
 OpenXPKI/Server/Notification/RT.pm

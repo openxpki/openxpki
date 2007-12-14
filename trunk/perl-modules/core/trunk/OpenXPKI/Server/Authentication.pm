@@ -24,6 +24,7 @@ use OpenXPKI::Server::Authentication::LDAP;
 use OpenXPKI::Server::Authentication::Password;
 use OpenXPKI::Server::Authentication::X509;
 use OpenXPKI::Server::Authentication::ClientSSO;
+use OpenXPKI::Server::Authentication::ClientX509;
 
 ## constructor and destructor stuff
 

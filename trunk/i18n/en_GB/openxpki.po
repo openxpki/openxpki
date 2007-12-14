@@ -124,9 +124,6 @@ msgstr "Trustcenter Web Interface"
 msgid "I18N_OPENXPKI_CA_CHAIN"
 msgstr "CA certificate chain"
 
-msgid "I18N_OPENXPKI_CA_ID"
-msgstr "CA Identifier"
-
 msgid "I18N_OPENXPKI_CA_STATUS"
 msgstr "Status"
 
@@ -1687,6 +1684,11 @@ msgstr ""
 "You authenticate yourself by signing a random challenge using a trusted "
 "certificate."
 
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER"
+msgstr ""
+"If your webserver is correctly configured, you can authenticate using "
+"your client certificate using TLS."
+
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL"
 msgstr ""
 "Here we use an external program to authenticate you. Simply enter your "
@@ -2918,17 +2920,11 @@ msgstr "Home"
 msgid "I18N_OPENXPKI_HTML_MENU_ISSUE_CRL"
 msgstr "Issue CRL"
 
-msgid "I18N_OPENXPKI_HTML_MENU_KEY_LIST"
-msgstr "Key status"
-
 msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
 msgstr "Language"
 
 msgid "I18N_OPENXPKI_HTML_MENU_LIST_CRL"
 msgstr "List CRLs"
-
-msgid "I18N_OPENXPKI_HTML_MENU_LIST_ISSUER"
-msgstr "List issuing CAs"
 
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
 msgstr "Logout"
@@ -2941,9 +2937,6 @@ msgstr "Pending revocation requests (CRRs)"
 
 msgid "I18N_OPENXPKI_HTML_MENU_PENDING_CSRS"
 msgstr "Pending signing requests (CSRs)"
-
-msgid "I18N_OPENXPKI_HTML_MENU_PKI_REALM_INFO"
-msgstr "PKI Realm"
 
 msgid "I18N_OPENXPKI_HTML_MENU_POLICY_DOCUMENTS"
 msgstr "Policy documents"
@@ -2963,20 +2956,11 @@ msgstr "Search certificates"
 msgid "I18N_OPENXPKI_HTML_MENU_SEARCH_WORKFLOWS"
 msgstr "Search workflows"
 
-msgid "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS"
-msgstr "Pending CSRs"
-
-msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
-msgstr "Smartcard personalization"
-
 msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD_PERSONALIZATION"
 msgstr "Smartcard personalization"
 
 msgid "I18N_OPENXPKI_HTML_MENU_TASKS"
 msgstr "Tasks"
-
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW"
-msgstr "Workflow"
 
 msgid "I18N_OPENXPKI_HTML_ORGANIZATION"
 msgstr "Organization"
@@ -3639,6 +3623,10 @@ msgstr "At least one context entry is needed."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED"
 msgstr ""
+
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED"
+msgstr ""
+"You could not be authenticated using your certificate with CN __USER__."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED"
 msgstr ""
@@ -5629,18 +5617,6 @@ msgstr "Wait for other workflow instance"
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
 msgstr " Wait 2 seconds for other workflow instance"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_SUB"
-msgstr "Sleep"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_TOP"
-msgstr "Sleep"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_SUBSUB"
-msgstr "Sleep"
-
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr ""
 
@@ -6022,6 +5998,39 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#~ msgid "I18N_OPENXPKI_CA_ID"
+#~ msgstr "CA Identifier"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_KEY_LIST"
+#~ msgstr "Key status"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LIST_ISSUER"
+#~ msgstr "List issuing CAs"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_PKI_REALM_INFO"
+#~ msgstr "PKI Realm"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS"
+#~ msgstr "Pending CSRs"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
+#~ msgstr "Smartcard personalization"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW"
+#~ msgstr "Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_SUB"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_TOP"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_SUBSUB"
+#~ msgstr "Sleep"
 
 #~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_DER"
 #~ msgstr "DER format"

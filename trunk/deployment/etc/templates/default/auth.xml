@@ -26,6 +26,17 @@
     <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE</description>
     <handler>Signature</handler>
   </stack>
+  <stack name="Certificate via Webserver">
+      <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER</description>
+      <handler>Certificate</handler>
+  </stack>
+  <handler name="Certificate" type="ClientX509">
+      <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER</description>
+      <!-- list the roles that you want to allow to login via this handler here -->
+      <allowed_role>User</allowed_role>
+      <allowed_role>RA Operator</allowed_role>
+      <allowed_role>CA Operator</allowed_role>
+  </handler>
   <handler name="Signature" type="X509">
     <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE</description>
     <trust_anchors>your,identifiers,here</trust_anchors>
