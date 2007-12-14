@@ -457,7 +457,7 @@ t/60_workflow/15_csr_and_certificate_issuance.t
 t/60_workflow/20_certificate_revocation.t
 t/60_workflow/40_certificate_revocation_list.t
 t/60_workflow/60_ldap_publishing.t
-t/60_workflow/80_looping.t
+t/60_workflow/80_forking.t
 t/60_workflow/99_cleanup.t
 t/60_workflow/common.pl
 t/60_workflow/test_action.xml
