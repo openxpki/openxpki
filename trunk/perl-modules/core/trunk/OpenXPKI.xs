@@ -11,6 +11,7 @@
 #include <openssl/bn.h>
 #include <openssl/rsa.h>
 #include <openssl/dsa.h>
+#include <openssl/ec.h>
 
 /* Standard trick to have a C pointer as a Perl object, see the typemap */
 typedef X509          * OpenXPKI_Crypto_Backend_OpenSSL_X509;
