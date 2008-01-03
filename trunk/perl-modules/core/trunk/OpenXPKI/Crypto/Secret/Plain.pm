@@ -27,104 +27,104 @@ use OpenXPKI::Server::Context qw( CTX );
     my %parts       : ATTR();
 
     sub BUILD {
-	my ($self, $ident, $arg_ref) = @_;
+        my ($self, $ident, $arg_ref) = @_;
 
-	if (defined $arg_ref && defined $arg_ref->{PARTS}) {
-	    if ($arg_ref->{PARTS} !~ m{ \A $RE{num}{int} \z }xms
-		|| $arg_ref->{PARTS} < 1) {
-		OpenXPKI::Exception->throw(
-		    message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-		    params  => 
-		    {
-			PARTS => $arg_ref->{PARTS},
-		    });
-	    }
-
-	    $totalparts{$ident} = $arg_ref->{PARTS};
-	}
+        if (defined $arg_ref && defined $arg_ref->{PARTS}) {
+            if ($arg_ref->{PARTS} !~ m{ \A $RE{num}{int} \z }xms
+            || $arg_ref->{PARTS} < 1) {
+                OpenXPKI::Exception->throw(
+                    message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
+                    params  => 
+                    {
+                        PARTS => $arg_ref->{PARTS},
+                    }
+                );
+            }
+            $totalparts{$ident} = $arg_ref->{PARTS};
+        }
     }
 
     sub set_secret {
-	my $self = shift;
-	my $ident = ident $self;
-	my $arg = shift;
-	
-	if (! defined $arg) {
-	    OpenXPKI::Exception->throw(
-		message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_MISSING_PARAMETER",
-		);
-	}
+        my $self = shift;
+        my $ident = ident $self;
+        my $arg = shift;
+        
+        if (! defined $arg) {
+            OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_MISSING_PARAMETER",
+            );
+        }
 
-	if (ref $arg eq '') {
-	    if ($totalparts{$ident} != 1) {
-		OpenXPKI::Exception->throw(
-		    message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-		    );
-	    }
-	    $parts{$ident}->[0] = $arg;
-	    return 1;
-	}
+        if (ref $arg eq '') {
+            if ($totalparts{$ident} != 1) {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
+                );
+            }
+            $parts{$ident}->[0] = $arg;
+            return 1;
+        }
 
-	if (ref $arg eq 'HASH') {
-	    my $part = $arg->{PART};
+        if (ref $arg eq 'HASH') {
+            my $part = $arg->{PART};
 
-	    if ($part !~ m{ \A $RE{num}{int} \z }xms) {
-		OpenXPKI::Exception->throw(
-		    message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-		    params  => 
-		    {
-			PART => $part,
-		    });
-	    }
+            if ($part !~ m{ \A $RE{num}{int} \z }xms) {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
+                params  => 
+                {
+                PART => $part,
+                });
+            }
 
-	    if ($part < 1 || $part > $totalparts{$ident}) {
-		OpenXPKI::Exception->throw(
-		    message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-		    params  => 
-		    {
-			PART => $part,
-		    });
-	    }
-	    
-	    if (! exists $arg->{SECRET}
-		|| ref $arg->{SECRET} ne '') {
-		OpenXPKI::Exception->throw(
-		    message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-		    params  => 
-		    {
-			SECRET => $arg->{SECRET},
-		    });
-	    }
+            if ($part < 1 || $part > $totalparts{$ident}) {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
+                params  => 
+                {
+                PART => $part,
+                });
+            }
+            
+            if (! exists $arg->{SECRET}
+            || ref $arg->{SECRET} ne '') {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
+                params  => 
+                {
+                SECRET => $arg->{SECRET},
+                });
+            }
 
-	    $parts{$ident}->[$part - 1] = $arg->{SECRET};
+            $parts{$ident}->[$part - 1] = $arg->{SECRET};
 
-	    return 1;
-	}
+            return 1;
+        }
 
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
+        OpenXPKI::Exception->throw(
+	        message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
 	    );
     }
 
     sub is_complete {
-	my $self = shift;
-	my $ident = ident $self;
-	my $arg = shift;
-	
-	for (my $ii = 0; $ii < $totalparts{$ident}; $ii++) {
-	    return 0 unless defined $parts{$ident}->[$ii];
-	}
-	return 1;
+        ##! 1: 'start'
+        my $self = shift;
+        my $ident = ident $self;
+        
+        for (my $ii = 0; $ii < $totalparts{$ident}; $ii++) {
+            ##! 16: $ii . ' defined? ' . ( defined $parts{$ident}->[$ii] ? '1' : '0' )
+            return 0 unless defined $parts{$ident}->[$ii];
+        }
+        return 1;
     }
 
     sub get_secret {
-	my $self = shift;
-	my $ident = ident $self;
-	my $arg = shift;
+        my $self = shift;
+        my $ident = ident $self;
 
-	return unless $self->is_complete();
+        return unless $self->is_complete();
 
-	return join('', @{$parts{$ident}});
+        return join('', @{$parts{$ident}});
     }
 
     sub get_serialized
@@ -142,7 +142,7 @@ use OpenXPKI::Server::Context qw( CTX );
         my $self  = shift;
         my $ident = ident $self;
         my $dump  = shift;
-	return if (not defined $dump or not length $dump);
+	    return if (not defined $dump or not length $dump);
         return if (not CTX('volatile_vault')->can_decrypt($dump));
         my $obj = OpenXPKI::Serialization::Simple->new();
         $parts{$ident} = $obj->deserialize(CTX('volatile_vault')->decrypt($dump));

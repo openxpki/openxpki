@@ -22,13 +22,7 @@ sub evaluate
     ##! 16: 'realm: ' . $realm
     ##! 16: 'ca: ' . $ca
     my $certificate = CTX('pki_realm_by_cfg')->{$cfg_id}->{$realm}->{ca}->{id}->{$ca}->{certificate};
-    my $tm = CTX('crypto_layer');
-    my $ca_token = $tm->get_token(
-            TYPE        => 'CA',
-            ID          => $ca,
-            PKI_REALM   => $realm,
-            CERTIFICATE => $certificate,
-    );
+    my $ca_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$realm}->{ca}->{id}->{$ca}->{crypto};
     ##! 16: 'CA token retrieved'
     if (!defined $ca_token || ! $ca_token->key_usable()) {
         if (!defined $ca_token) {

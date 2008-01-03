@@ -64,6 +64,7 @@ sub __load_secret_groups
 
     ##! 2: "get the arguments"
     my $realm = $keys->{PKI_REALM};
+    ##! 16: 'realm: ' . $realm
     if (not $realm)
     {
         OpenXPKI::Exception->throw (
@@ -81,11 +82,13 @@ sub __load_secret_groups
     my $count = CTX('xml_config')->get_xpath_count (
                     XPATH   => [ 'pki_realm', 'common', 'secret', 'group' ],
                     COUNTER => [ $realm_index, 0, 0 ]);
+    ##! 16: 'count: ' . $count
     for (my $i=0; $i < $count; $i++)
     {
         my $group = CTX('xml_config')->get_xpath (
                     XPATH   => [ 'pki_realm', 'common', 'secret', 'group', 'id' ],
                     COUNTER => [ $realm_index, 0, 0, $i, 0 ]);
+        ##! 16: 'group: ' . $group
         $self->__load_secret ({PKI_REALM => $realm, GROUP => $group});
     }
 
@@ -104,6 +107,9 @@ sub __load_secret
     my $group  = $keys->{GROUP};
     my $realm  = $keys->{PKI_REALM};
     my $cfg_id = $keys->{CONFIG_ID};
+    ##! 16: 'group: ' . $group
+    ##! 16: 'realm: ' . $realm
+    ##! 16: 'cfg_id: ' . $cfg_id
 
     if (not $realm)
     {
@@ -313,7 +319,7 @@ sub reload_all_secret_groups_from_cache {
     for (my $i = 0; $i < $nr_of_realms; $i++) {
         my $realm = CTX('xml_config')->get_xpath(
             XPATH   => [ 'pki_realm', 'name' ],
-            COUTNER => [ $i         , 0      ],
+            COUNTER => [ $i         , 0      ],
         );
         ##! 16: 'realm: ' . $realm
 
@@ -739,7 +745,14 @@ sub __get_list_member_by_id
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_LIST_MEMBER_BY_ID_NOT_FOUND",
-            params  => {"XPATH" => join (", ", @{$xpath})});
+            params  => {
+                "XPATH" => join (", ", @{$xpath}),
+                COUNTER  => $args->{COUNTER},
+                ID_LABEL => $args->{ID_LABEL},
+                ID_VALUE => $args->{ID_VALUE},
+                CFG_ID   => $args->{CONFIG_ID},
+            }
+        );
     }
 
     ##! 1: "finished: $index"
