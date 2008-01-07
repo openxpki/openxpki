@@ -58,7 +58,7 @@
 
 
 [% FOREACH realmsection = global.pkirealm %]
-  <pki_realm name="[% $realmsection.name %]">
+  <pki_realm name="[% $realmsection.name %]" id="[% $realmsection.name %]">
     <common id="default">
       <!-- default token (used for general crypto operations not requiring
            private key operations) -->
