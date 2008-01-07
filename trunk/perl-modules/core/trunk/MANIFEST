@@ -364,6 +364,9 @@ t/20_xml/4.t
 t/20_xml/5.t
 t/20_xml/6.t
 t/20_xml/7_hashref.t
+t/20_xml/8_xinclude_relative_dir.t
+t/20_xml/9_inheritance_bug.t
+t/20_xml/inheritance_bug.xml
 t/20_xml/test.xml
 t/20_xml/top.xml
 t/20_xml/top2.xml
