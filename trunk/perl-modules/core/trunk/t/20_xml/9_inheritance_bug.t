@@ -2,27 +2,18 @@ use strict;
 use warnings;
 
 use Test::More;
+use English;
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
 }
 require OpenXPKI::XML::Config;
 
-plan tests => 3;
+plan tests => 1;
 
-my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/inheritance_bug.xml");
+eval {
+    my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/inheritance_bug.xml");
+};
 
-ok(defined $obj, 'Config object is defined');
-is(ref $obj, 'OpenXPKI::XML::Config', 'Config object has correct type');
+like($EVAL_ERROR, qr(I18N_OPENXPKI_SERVER_XML_CACHE___GET_SUPER_ENTRY_MORE_THAN_ONE_PATH_AND_NO_ID_SPECIFIED));
 
-my $result = $obj->get_xpath(
-    XPATH   => [ 'pki_realm', 'profiles', 'profile', 'oid' ],
-    COUNTER => [ 1          ,  0         , 1        , 0    ],
-);
-
-diag "Result: $result";
-
-TODO: {
-    local $TODO = 'Weird inheritance bug #1865861';
-    is($result, 'test2', 'correct output');
-}

@@ -205,7 +205,15 @@ sub __get_super_entry {
         ##! 16: defined $id_content ? 'id_content: ' . $id_content : '! id_content'
 
         if (! defined $id_attr) {
-            ##! 16: 'id_attr is undefined, just using the first one'
+            ##! 16: 'id_attr is undefined, just using the first one - if there is only one!'
+            if (scalar @{ $result->{$attribute} } > 1) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_XML_CACHE___GET_SUPER_ENTRY_MORE_THAN_ONE_PATH_AND_NO_ID_SPECIFIED',
+                    params  => {
+                        ATTRIBUTE => $attribute,
+                    },
+                );
+            }
             $result = $result->{$attribute}->[0];
             next PATH_TRAVERSAL;
         }
