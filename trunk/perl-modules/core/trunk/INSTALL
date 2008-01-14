@@ -18,6 +18,6 @@ find . -name "*.pm" -exec grep "^use " '{}' \; | \
 grep -v "warnings" | \
 grep -v "strict" | \
 grep -v "Test" | \
-grep -v "English | \
+grep -v "English" | \
 grep -v "OpenXPKI" | \
 sort | uniq
