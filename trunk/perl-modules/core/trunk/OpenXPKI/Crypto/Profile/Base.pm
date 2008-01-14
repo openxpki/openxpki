@@ -154,12 +154,17 @@ sub load_extension
         my @bits = ( "client_auth", "email_protection" );
         for (my $i=0; $i < scalar @bits; $i++)
         {
-            my $bit = $self->{config}->get_xpath (XPATH   => [@path, $bits[$i]],
+            my $config_value;
+            eval {
+               $config_value
+                    = $self->{config}->get_xpath (XPATH   => [@path, $bits[$i]],
                                                   COUNTER => [@counter, 0, 0],
                                                   CONFIG_ID => $cfg_id);
-            $bit = "1" if ($bit eq "true");
-            $bit = "0" if ($bit eq "false");
-            push @values, $bits[$i] if ($bit);
+            };
+            if (defined $config_value &&
+                   ($config_value eq 'true' || $config_value eq '1')) {
+                push @values, $bits[$i];
+            }
         }
 	my $oid_count = 0;
 	eval {
