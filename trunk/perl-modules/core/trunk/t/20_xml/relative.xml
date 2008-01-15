@@ -13,7 +13,7 @@
         </item>
       </b>
     </z>
-    <item id="test4" super="subordinate/item{test3}"/>
+    <item id="test4" super="subordinate{area1}/item{test3}"/>
     <item id="test5" super="../item{test3}"/>
     <item id="test6" super="../../subordinate{area2}/item{othertest1}"/>
     <item mytag="test7">
