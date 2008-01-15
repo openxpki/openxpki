@@ -4,6 +4,7 @@
     $msg  => undef
     $activities => undef
     $details    => undef
+    $history    => undef
 </%args>
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE', '__ID__' => $msg->{PARAMS}->{WORKFLOW}->{ID}, '__STATE__' => $msg->{PARAMS}->{WORKFLOW}->{STATE}) %></h1>
 <div>
@@ -31,14 +32,6 @@
     <& /service/close_form.mhtml &>
   </div>
 % }
-  <div class="openxpki_command_list_item">
-    <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/get_workflow_instance_info.html" &>
-    <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
-    <!-- the format is optional -->
-    <& /lib/html/hidden.mhtml, 'name' => 'format', 'value' => 'png' &>
-    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext ('I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO') &>
-    <& /service/close_form.mhtml &>
-  </div>
   <div class="openxpki_command_list_item">
     <input type="button" name="print" value="<% i18nGettext ('I18N_OPENXPKI_HTML_PRINT_BUTTON') %>" onClick="window.print()"/>
   </div>
@@ -123,7 +116,7 @@
 </table>
 </div>
 % if (! $details) {
-<a href="<% $context->{menu}->get_root() %>/service/workflow/show_instance.html?<% $context->{menu}->get_link_params() %>;type=<% $msg->{PARAMS}->{WORKFLOW}->{TYPE} %>&id=<% $msg->{PARAMS}->{WORKFLOW}->{ID} %>&details=1"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DETAILS') %> ...</a>
+<a href="<% $context->{menu}->get_root() %>/service/workflow/show_instance.html?<% $context->{menu}->get_link_params() %>;type=<% $msg->{PARAMS}->{WORKFLOW}->{TYPE} %>&id=<% $msg->{PARAMS}->{WORKFLOW}->{ID} %>&details=1&history=<% $history %>"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DETAILS') %> ...</a><br/>
 % }
 % else {
 <h2 style="color: #888888"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_OTHER_WORKFLOW_CONTEXT_KEYS') %> (<a href="<% $context->{menu}->get_root() %>/service/workflow/show_instance.html?<% $context->{menu}->get_link_params() %>;type=<% $msg->{PARAMS}->{WORKFLOW}->{TYPE} %>&id=<% $msg->{PARAMS}->{WORKFLOW}->{ID} %>&details=0" style="color: #888888"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_HIDE') %></a>)</h2>
@@ -154,6 +147,48 @@
   </tr>
 %  }
 </table>
+% }
+% if (! $history) {
+<a href="<% $context->{menu}->get_root() %>/service/workflow/show_instance.html?<% $context->{menu}->get_link_params() %>;type=<% $msg->{PARAMS}->{WORKFLOW}->{TYPE} %>&id=<% $msg->{PARAMS}->{WORKFLOW}->{ID} %>&details=<% $details %>&history=1"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY') %> ...</a><br/>
+% }
+% else {
+<h2 style="color: #888888"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_TITLE') %> (<a href="<% $context->{menu}->get_root() %>/service/workflow/show_instance.html?<% $context->{menu}->get_link_params() %>;type=<% $msg->{PARAMS}->{WORKFLOW}->{TYPE} %>&id=<% $msg->{PARAMS}->{WORKFLOW}->{ID} %>&details=<% $details %>&history=0" style="color: #888888"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_HIDE') %></a>)</h2>
+<table>
+    <tr>
+        <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_DATE') %></th>
+        <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_STATE') %></th>
+        <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_ACTION') %></th>
+        <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_NEW_STATE') %></th>
+        <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_USER') %></th>
+    </tr>
+%     foreach my $entry (@history) {
+%     my ($next_state) = ($entry->{'WORKFLOW_DESCRIPTION'} =~ m{ NEW_STATE[^\s+]*:\ (.+) }xms);
+%     next if ($entry->{'WORKFLOW_ACTION'} eq 'Create workflow');
+    <tr>
+        <td><% $entry->{'WORKFLOW_HISTORY_DATE'} %></td>
+        <td><% $entry->{'WORKFLOW_STATE'} %></td>
+        <td><& /lib/field_to_i18n.mhtml, 
+                field => $entry->{'WORKFLOW_ACTION'} &></td>
+        <td>
+%           if ($entry->{'WORKFLOW_DESCRIPTION'} =~ /NEW_STATE_AUTORUN/) {
+                <i><% $next_state %></i>
+%           }
+%           else {
+                <% $next_state %>
+%           }
+        </td>
+        <td><% $entry->{'WORKFLOW_USER'} %></td>
+    </tr>
+%     }
+</table>
+  <div class="openxpki_command_list_item">
+    <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/get_workflow_instance_info.html" &>
+    <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
+    <!-- the format is optional -->
+    <& /lib/html/hidden.mhtml, 'name' => 'format', 'value' => 'png' &>
+    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext ('I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO') &>
+    <& /service/close_form.mhtml &>
+  </div>
 % }
 </p>
 </div>
@@ -355,6 +390,18 @@
                    }
                );
         $activities = $hmsg->{PARAMS};
+    }
+    my @history = ();
+    if ($history) {
+        my $msg = $context->{client}->send_receive_command_msg( 
+            'get_workflow_history',
+            {
+                'ID' => $id,
+            },
+        );
+        eval {
+            @history = @{ $msg->{PARAMS} };
+        };
     }
 
     my %actions = ();

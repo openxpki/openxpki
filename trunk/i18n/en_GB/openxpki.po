@@ -1541,6 +1541,27 @@ msgstr "These are the possible activities for the shown workflow instance."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DETAILS"
 msgstr "Show (technical) workflow details"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY"
+msgstr "Show (technical) workflow history"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_ACTION"
+msgstr "Activity executed"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_DATE"
+msgstr "Date"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_NEW_STATE"
+msgstr "New state"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_STATE"
+msgstr "State"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_TITLE"
+msgstr "Workflow history"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_USER"
+msgstr "User"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE"
 msgstr "Workflow instance #__ID__ (__STATE__)"
 
@@ -1686,8 +1707,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER"
 msgstr ""
-"If your webserver is correctly configured, you can authenticate using "
-"your client certificate using TLS."
+"If your webserver is correctly configured, you can authenticate using your "
+"client certificate using TLS."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CLIENT_SSO"
+msgstr "Please enter your account and passphrase."
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL"
 msgstr ""
@@ -1708,6 +1733,22 @@ msgstr ""
 "the anonymous authentication which means that you can use some basic "
 "function which are not critical and so it is no problem to use them "
 "anonymously."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_DEUBA_AUTH_CA_OFFICER"
+msgstr "This is the normal operator authentication."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_DEUBA_AUTH_PUK_MANAGER"
+msgstr "This is the normal user authentication."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_DEUBA_AUTH_RA_OFFICER"
+msgstr "This is the normal operator authentication."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_DEUBA_AUTH_USER"
+msgstr "This is the normal user authentication."
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_DYNAMIC"
 msgstr ""
@@ -3028,6 +3069,38 @@ msgstr "Initializing ..."
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_INSTALL_CERTIFICATE"
 msgstr "Install certificate"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_CN"
+msgstr "Create certificate request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBCOSTCENTER"
+msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBORGLEVEL1"
+msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBORGLEVEL2"
+msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBORGLEVEL3"
+msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBORGLEVEL4"
+msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBORGLEVEL5"
+msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_TELEPHONENUMBER"
+msgstr "Telephone number"
+
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_MORE_CERTIFICATE_REQUESTS_TO_BE_GENERATED"
 msgstr ""
 "Another certificate request has to be generated (certificate generation step "
@@ -3200,6 +3273,10 @@ msgstr "TLS Server profile"
 msgid "I18N_OPENXPKI_PROFILE_USER"
 msgstr "User profile"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION"
+msgstr "Basic user naming style"
+
 msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_DESC"
 msgstr ""
 "If you use this style, you'll only be required to enter your name, username "
@@ -3209,6 +3286,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_PROFILE_USER_BASIC_STYLE"
 msgstr "Basic user naming style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_USER_FSE"
+msgstr "User profile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_USER_FSE_MSO"
+msgstr "User profile"
 
 msgid "I18N_OPENXPKI_READ_FILE_DOES_NOT_EXIST"
 msgstr ""
@@ -5094,6 +5179,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_XML_CACHE___GET_SUPER_ENTRY_MORE_THAN_ONE_PATH_AND_NO_ID_SPECIFIED"
+msgstr "testuser"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_ORACLE_GET_DSN_NO_DATABASE_NAME"
 msgstr "The used suject style does not allow the use of an organization."
 
@@ -5377,6 +5466,10 @@ msgstr ""
 "The used subject style requires at minimum one organizational unit and two "
 "domain components."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_NOT_ALLOWED"
+msgstr "The used suject style does not allow the use of an organization."
+
 msgid "I18N_OPENXPKI_SUBJECT_STYLE_OU_O_C_REQUIRED"
 msgstr ""
 "The used subject style requires at minimum one organizational unit, one "
@@ -5620,6 +5713,10 @@ msgstr " Wait 2 seconds for other workflow instance"
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTIVITY_INIT_CA_LABEL_ISSUING_CA"
+msgstr "Determine issuing CA"
+
 msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 msgstr "Sleep"
 
@@ -5659,11 +5756,23 @@ msgstr "This workflow exports workflow instances to other servers."
 msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
 msgstr "This workflow imports workflow instances from other servers."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_INIT_CA"
+msgstr "Issue a certificate revocation list (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_PASSWORD_SAFE"
+msgstr "CRL Issuance"
+
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
 msgstr "Handle a SCEP Certificate Signing Request"
 
 msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION"
 msgstr "Personalize a smartcard"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_INIT_CA_DESC_ISSUING_CA"
+msgstr "Next CA determined"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL"
@@ -5885,6 +5994,26 @@ msgstr "Export"
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT"
 msgstr "Import"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_INIT_CA"
+msgstr "CRL Issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_INIT_CA_CREATED"
+msgstr "CRL Issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_INIT_CA_DETERMINE_KEY"
+msgstr "Next CA determined"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_INIT_CA_INITIAL"
+msgstr "SCEP Certificate Signing Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
+msgstr "CRL Issuance"
+
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP Certificate Signing Request"
 
@@ -5912,6 +6041,14 @@ msgstr "Certificates"
 
 msgid "I18N_OPENXPKI_WORKFLOW_CHILDREN"
 msgstr "Workflow children"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_INIT_CA_DESC_ISSUING_CA"
+msgstr "reset"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_INIT_CA_LABEL_ISSUING_CA"
+msgstr "reset"
 
 msgid "I18N_OPENXPKI_WORKFLOW_PARENT"
 msgstr "Workflow parent"
@@ -6244,10 +6381,6 @@ msgstr "yes"
 #~ msgstr "The SPKAC string is empty."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
-#~ msgstr "CRL Issuance"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INCORRECT_ALGORITHM"
 #~ msgstr ""
 #~ "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -6561,10 +6694,6 @@ msgstr "yes"
 
 #~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
 #~ msgstr "At least one context entry is needed."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_PARAMETER"
-#~ msgstr "reset"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
@@ -7124,10 +7253,6 @@ msgstr "yes"
 #~ msgstr "Logout failed"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
-#~ msgstr "Determine issuing CA"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
 #~ msgstr "Export CSR"
 
@@ -7223,10 +7348,6 @@ msgstr "yes"
 #~ msgstr "Waiting to start"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_ISSUING_CA_DETERMINED"
-#~ msgstr "Next CA determined"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
 #~ msgstr "Exported logs"
 
@@ -7241,10 +7362,6 @@ msgstr "yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_FINISHED_WAITING_FOR_CHILD"
 #~ msgstr "Waiting to start"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_ISSUING_CA_DETERMINED"
-#~ msgstr "Next CA determined"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_PREPARED"

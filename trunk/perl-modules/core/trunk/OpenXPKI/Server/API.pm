@@ -597,6 +597,15 @@ sub BUILD {
                 },
 	        },
         },
+        'get_workflow_history' => {
+            class  => 'Workflow',
+            params => {
+                ID => {
+                        type  => SCALAR,
+                        regex => $re_integer_string,
+                },
+	        },
+        },
         'execute_workflow_activity' => {
             class  => 'Workflow',
             params => {

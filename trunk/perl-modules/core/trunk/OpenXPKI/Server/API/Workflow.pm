@@ -336,6 +336,24 @@ sub get_workflow_info {
     return __get_workflow_info($workflow);
 }
 
+sub get_workflow_history {
+    my $self    = shift;
+    my $arg_ref = shift;
+    ##! 1: 'start'
+
+    my $wf_id   = $arg_ref->{ID};
+
+    my $history = CTX('dbi_workflow')->select(
+        TABLE => $workflow_history_table,
+        DYNAMIC => {
+            WORKFLOW_SERIAL => $wf_id,
+        },
+    );
+    ##! 64: 'history: ' . Dumper $history
+
+    return $history;
+}
+
 sub execute_workflow_activity {
     my $self  = shift;
     my $args  = shift;
