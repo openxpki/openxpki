@@ -2,13 +2,6 @@
 
     <token id="default">
         <backend>OpenXPKI::Crypto::Backend::OpenSSL</backend>
-        <!--
-            if the token support sessions then you can use session and daemon too
-
-            session - token will be logged out at end of session
-            daemon  - token will be only logged out explicitly
-        -->
-        <mode>standby</mode>
 
         <!-- possible values are OpenSSL, nCipher, LunaCA -->
 	<engine>OpenSSL</engine>

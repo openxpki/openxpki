@@ -268,19 +268,6 @@ sub key_usable
     $self->get_instance()->key_usable();
 }
 
-sub get_mode
-{
-    my $self = shift;
-    my $ident = ident $self;
-
-    if (@_)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_MODE_ILLEGAL_PARAM");
-    }
-    $self->get_instance()->get_mode();
-}
-
 sub get_certfile
 {
     my $self = shift;

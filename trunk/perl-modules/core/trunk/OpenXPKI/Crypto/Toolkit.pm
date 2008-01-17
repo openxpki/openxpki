@@ -484,14 +484,6 @@ sub command {
 ##     BEGIN engine code     ##
 ###############################
 
-sub get_mode
-{
-    ##! 1: "start"
-    my $self   = shift;
-    my $ident = ident $self;
-    return $self->get_engine()->get_mode(@_);
-}
-
 sub online
 {
     ##! 1: "start"

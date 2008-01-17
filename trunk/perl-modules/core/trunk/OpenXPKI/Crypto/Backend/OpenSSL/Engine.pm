@@ -146,10 +146,6 @@ sub online {
 #    return 1;
 #}
 
-sub get_mode {
-    return "standby";
-}
-
 sub is_dynamic
 {
     return 1;
