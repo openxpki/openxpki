@@ -232,8 +232,6 @@ our engine module for more informations.
 
 =over
 
-=item * get_mode
-
 =item * online
 
 =item * key_usable

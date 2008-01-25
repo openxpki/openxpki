@@ -154,7 +154,7 @@ sub __load_config {
     # FIXME: currently unused attributes:
     # openca-sv
     # FIXME: engine_section is OpenSSL-specific
-    foreach my $key (qw(backend       mode 
+    foreach my $key (qw(backend
                         engine     shell         wrapper 
                         randfile
                         key
