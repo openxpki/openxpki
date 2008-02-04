@@ -364,14 +364,14 @@ sub list_keys {
                 );
                 if ($secret_method ne 'literal') { # all others have total_shares
                     my $quorum_n = $config->get_xpath(
-                        XPATH   => [ @secret_path   , 'group', 'method', 'total_shares' ],
-                        COUNTER => [ @secret_counter, 0      , 0       , 0                 ],
+                        XPATH   => [ @secret_path   , 'group'     , 'method', 'total_shares' ],
+                        COUNTER => [ @secret_counter, $group_index, 0       , 0                 ],
                     );
 
                     my $quorum_k = __get_required_shares({
                         CONFIG        => $config,
-                        TOKEN_PATH    => \@secret_path,
-                        TOKEN_COUNTER => \@secret_counter,
+                        TOKEN_PATH    => [ @secret_path,    'group'      ],
+                        TOKEN_COUNTER => [ @secret_counter, $group_index ],
                     });
                     if (! defined $quorum_k) { # if it is not defined, n is
                                                # the default value
@@ -449,14 +449,14 @@ sub generate_keys {
     my $display_secret_method = $secret_method;
     if ($secret_method ne 'literal') { # all others have total_shares
         $quorum_n = $config->get_xpath(
-                XPATH   => [ @secret_path   , 'group', 'method', 'total_shares' ],
-                COUNTER => [ @secret_counter, 0      , 0       , 0                 ]
+                XPATH   => [ @secret_path   , 'group'     , 'method', 'total_shares' ],
+                COUNTER => [ @secret_counter, $group_index, 0       , 0                 ]
        );
 
         $quorum_k = __get_required_shares({
                 CONFIG        => $config,
-                TOKEN_PATH    => \@secret_path,
-                TOKEN_COUNTER => \@secret_counter,
+                TOKEN_PATH    => [ @secret_path,    'group'      ],
+                TOKEN_COUNTER => [ @secret_counter, $group_index ],
         });
         if (! defined $quorum_k) { # if it is not defined, n is
                                    # the default value
@@ -511,7 +511,7 @@ sub generate_keys {
                 prompt("Please make sure that share holder number $nr is ready"
                     . " to copy the share,\n"
                     . "then press enter to view the share.");
-                for (my $j = 0; $j < 100; $j++) {
+                for (my $j = 0; $j < 500; $j++) {
                     print "\n"; # pseudo clearscreen
                 }
                 print "Please copy the following share:\n";
@@ -519,7 +519,7 @@ sub generate_keys {
                 print "Press enter to continue (next share will not "
                     . "yet be shown).\n";
                 prompt();
-                for (my $j = 0; $j < 100; $j++) {
+                for (my $j = 0; $j < 500; $j++) {
                     print "\n"; # pseudo clearscreen
                 }
             }
@@ -755,8 +755,8 @@ sub __get_required_shares {
     my $quorum_k_count;
     my $quorum_k;
     eval { # This crashes when k is not present!
-        push @token_path   , ('group', 'method', 'quorum', 'k');
-        push @token_counter, (0       , 0      , 0);
+        push @token_path   , ( 'method', 'required_shares' );
+        push @token_counter, ( 0       , 0                 );
         $quorum_k_count = $config->get_xpath_count(
                 XPATH   => [ @token_path ],
                 COUNTER => [ @token_counter ],
@@ -765,6 +765,7 @@ sub __get_required_shares {
     if ($EVAL_ERROR) { # k is not present, noticed the hard way
         $quorum_k_count = 0;
         $quorum_k = undef;
+        print "EVAL_ERROR: " . $EVAL_ERROR;
     }
     if ($quorum_k_count != 0) { # 'k' configured,
         push @token_counter, (0);
@@ -881,6 +882,13 @@ if ($cmd eq 'key' && $subcmd eq 'import') {
                         );
 }
 
+if ($cmd eq 'key' && $subcmd eq 'use') {
+    push @options_spec, qw(
+                         purpose=s
+                         id=s
+                         command=s
+                        );
+}
 if ($cmd eq 'certificate' && $subcmd eq 'import') {
     push @options_spec, qw(
                           file=s
@@ -1682,6 +1690,193 @@ if ($cmd eq 'key') {
 	exit 0;
     }
 
+    if ($subcmd eq 'use') {
+        my $key_id  = $params{id};
+        my $purpose = lc $params{purpose};
+        my $realm   = $params{realm};
+        my $command = $params{command};
+        if (! defined $command) {
+            $command = '/bin/sh';
+        }
+        my $default_token = CTX('crypto_layer')->get_token(
+                TYPE      => 'DEFAULT',
+                PKI_REALM => $realm,
+        );
+
+        if ($key_id eq '') {
+            print STDERR "Please specify a token ID with --id (see output of key list for a list of possible values).\n";
+            exit 1;
+        }
+        if ($purpose eq '') {
+            print STDERR "Please specify a purpose (CA, SCEP, ...) with --purpose (see output of key list for a list of possible values).\n";
+        }
+        my $config = OpenXPKI::XML::Config->new(
+            CONFIG => $configfile,
+        );
+
+        my $nr_of_realms = $config->get_xpath_count(
+            XPATH   => [ 'pki_realm' ],
+            COUNTER => [ ],
+        );
+
+        my $realm_index;
+        for (my $i=0; $i < $nr_of_realms; $i++) {
+            next if ($realm ne $config->get_xpath(
+                              XPATH    => [ 'pki_realm', 'name' ],
+                              COUNTER  => [ $i         , 0 ]));
+            $realm_index = $i;
+            last;
+        }
+        my $nr_of_purpose_items = $config->get_xpath_count(
+            XPATH   => [ 'pki_realm', $purpose ],
+            COUNTER => [ $realm_index ],
+        );
+        my $purpose_index;
+        for (my $i=0; $i < $nr_of_purpose_items; $i++) { # look for matching id
+            next if ($key_id ne $config->get_xpath(
+                            XPATH   => [ 'pki_realm' , $purpose, 'token', 'id' ],
+                            COUNTER => [ $realm_index, $i      , 0      , 0    ],
+            ));
+            $purpose_index = $i;
+            last;
+        }
+        if (! defined($purpose_index)) {
+            print STDERR "Could not find configuration for this ID and purpose.\n";
+            exit 1;
+        }
+        my @token_path    = ( 'pki_realm' , $purpose      , 'token' );
+        my @token_counter = ( $realm_index, $purpose_index, 0       );
+        my $key_filename;
+        eval {
+            $key_filename = $config->get_xpath(
+                XPATH   => [ @token_path   , 'key' ],
+                COUNTER => [ @token_counter, 0     ],
+            );
+        };
+        if ($EVAL_ERROR) {
+            print STDERR "Could not read key filename from config file, "
+                . "configuration error?\n";
+            print STDERR "$EVAL_ERROR\n";
+            exit 1;
+        }
+        if (! -s $key_filename) {
+            print STDERR "Key file does not exist or is empty\n";
+            exit 1;
+        }
+        my $secret_group_name;
+        eval {
+            $secret_group_name = $config->get_xpath(
+                XPATH   => [ @token_path   , 'secret' ],
+                COUNTER => [ @token_counter, 0     ],
+            );
+        };
+        if ($EVAL_ERROR) {
+            print STDERR "Could not read secret group from config file, "
+                . "configuration error?\n";
+            print STDERR "$EVAL_ERROR\n";
+            exit 1;
+        }
+
+        my @secret_path    = ( 'pki_realm' , 'common', 'secret' );
+        my @secret_counter = ( $realm_index, 0       , 0        );
+        my $secret_group_count;
+        eval {
+            $secret_group_count = $config->get_xpath_count(
+                XPATH   => [ @secret_path   , 'group' ],
+                COUNTER => [ @secret_counter  ],
+            );
+        };
+        my $group_index;
+      SEARCH_GROUP_ID:
+        for (my $i = 0; $i < $secret_group_count; $i++) {
+            my $group_id = $config->get_xpath(
+                XPATH   => [ @secret_path   , 'group', 'id' ],
+                COUNTER => [ @secret_counter, $i     , 0    ], 
+            );
+            if ($group_id eq $secret_group_name) {
+                $group_index = $i;
+                last SEARCH_GROUP_ID;
+            }
+        }
+        if (! defined $group_index) {
+            print STDERR "Could not find configuration for secret group '$secret_group_name'.\n";
+            exit 1;
+        }
+        my $secret_method = $config->get_xpath(
+          XPATH   => [ @secret_path   , 'group'     , 'method', 'id' ],
+          COUNTER => [ @secret_counter, $group_index, 0       , 0  ],
+        );
+        my $passphrase;
+        if ($secret_method ne 'literal') { # all others have total_shares
+            my $quorum_n = $config->get_xpath(
+             XPATH   => [ @secret_path   , 'group'     , 'method', 'total_shares' ],
+             COUNTER => [ @secret_counter, $group_index, 0       , 0              ],
+            );
+
+            my $quorum_k = __get_required_shares({
+                CONFIG        => $config,
+                TOKEN_PATH    => [ @secret_path,    'group'      ],
+                TOKEN_COUNTER => [ @secret_counter, $group_index ],
+            });
+            if (! defined $quorum_k) { # if it is not defined, n is
+                                       # the default value
+                $quorum_k = $quorum_n;
+            }
+            my $display_secret_method = $secret_method;
+            $display_secret_method .= ' (n = ' . $quorum_n . ', k = ' 
+                . $quorum_k . ')';
+            print 'Secret method: ' . $display_secret_method . "\n";
+            my $secret_method = ucfirst($secret_method);
+            my $secret = OpenXPKI::Crypto::Secret->new({
+                TYPE   => $secret_method,
+                QUORUM => {
+                    K => $quorum_k,
+                    N => $quorum_n,
+                },
+                TOKEN  => $default_token,
+            });
+          SECRET_INPUT:
+            while (! $secret->is_complete()) {
+                print "Secret not yet complete, please enter a share.\n";
+                my $part;
+                if ($secret_method eq 'Plain') {
+                    $part   = prompt "Share number: ";
+                }
+                my $share  = prompt('Share:         ');
+                my $share2 = prompt('Share (again): ');
+                if ($share ne $share2) {
+                    print "Shares input do not match, please try again!\n";
+                    next SECRET_INPUT;
+                }
+                else {
+                    if ($secret_method eq 'Plain') {
+                        $secret->set_secret({
+                            PART   => $part,
+                            SECRET => "$share",
+                        });
+                    }
+                    elsif ($secret_method eq 'Split') {
+                        $secret->set_secret("$share");
+                    }
+                }
+                for (my $j = 0; $j < 500; $j++) {
+                    print "\n"; # pseudo clearscreen
+                }
+            }
+            $passphrase = $secret->get_secret();
+        }
+        else {
+            $passphrase = $config->get_xpath(
+                XPATH   => [ @secret_path   , 'group'     , 'method' ],
+                COUNTER => [ @secret_counter, $group_index, 0        ],
+            );
+        }
+        $ENV{'passphrase'}   = $passphrase;
+        $ENV{'keyfile'}      = $key_filename;
+        delete $ENV{'OPENSSL_CONF'};
+        exec $command;
+        exit 0;
+    }
     if ($subcmd eq 'import') {
         my $key_id  = $params{id};
         my $purpose = lc $params{purpose};
@@ -1932,8 +2127,24 @@ copies the key file to the location given in the config file. The options
 are the same as in key generate, except for --file, which gives the
 location of the externally generated key.
 
-=back
+=item B<use>
 
+Command options:
+
+   --realm               PKI Realm to operate on
+   --purpose             The purpose of the key (e.g. CA, SCEP)
+   --id                  The name of the configured key
+   --command             The command to start (defaults to '/bin/sh')
+
+This command asks for the needed key passphrase shares and exports the
+recovered passphrase into the passphrase environment variable as well
+as the key file location into the keyfile environment variable. Typical
+usage is to create a certificate request for a secret-splitted key:
+
+openxpkiadm key use --realm 'Root CA' --purpose ca --id testdummyca1 \
+     --command 'openssl req -new -passin env:passphrase -key $keyfile'
+
+=back
 
 =head2 certificate
 
