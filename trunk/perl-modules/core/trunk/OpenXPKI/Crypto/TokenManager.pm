@@ -194,9 +194,15 @@ sub __load_secret
                     COUNTER => [ $realm_index, 0, 0, $group_index, 0, 0 ],
                     CONFIG_ID => $cfg_id,
                 );
+            my $default_token = $self->get_token(
+                TYPE      => 'DEFAULT',
+                PKI_REALM => $realm,
+            );
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
                     TYPE => "Split",
-                    QUORUM => { K => $required, N => $total}});
+                    QUORUM => { K => $required, N => $total },
+                    TOKEN  => $default_token,
+            });
                          }
         else {
               OpenXPKI::Exception->throw (
@@ -328,6 +334,7 @@ sub reload_all_secret_groups_from_cache {
             $self->__set_secret_from_cache({
                 PKI_REALM => $realm,
                 GROUP     => $group,
+                CONFIG_ID => CTX('api')->get_current_config_id(),
             });
         }
     }
@@ -348,10 +355,10 @@ sub is_secret_group_complete
         if (not exists $self->{SECRET} or
             not exists $self->{SECRET}->{$realm} or
             not exists $self->{SECRET}->{$realm}->{$group});
-
     $self->__set_secret_from_cache({
         PKI_REALM => $realm,
         GROUP     => $group,
+        CONFIG_ID => CTX('api')->get_current_config_id(),
     });
 
     ##! 2: "return true if it is complete"

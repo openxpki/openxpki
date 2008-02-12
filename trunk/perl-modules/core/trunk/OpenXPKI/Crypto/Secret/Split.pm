@@ -137,7 +137,7 @@ use OpenXPKI::Server::Context qw( CTX );
 	my $ident = ident $self;
 	my $arg = shift;
 
-	if (defined $received_shares_of{$ident} && ($k_of{$ident} == scalar @{$received_shares_of{$ident}})) {
+	if (defined $received_shares_of{$ident} && ($k_of{$ident} <= scalar @{$received_shares_of{$ident}})) {
             return 1;
         }
         else {
@@ -413,13 +413,16 @@ use OpenXPKI::Server::Context qw( CTX );
     {
         my $self  = shift;
         my $ident = ident $self;
-        return if (not CTX('volatile_vault')->can_decrypt());
         my $dump  = shift;
+        return if (not CTX('volatile_vault')->can_decrypt($dump));
         my $obj = OpenXPKI::Serialization::Simple->new();
         my $array = $obj->deserialize(CTX('volatile_vault')->decrypt($dump));
         foreach my $item (@{$array})
         {
-            $self->set_secret($item);
+            # only add the secret part if it was not yet present
+            if (! grep { $_ eq $item } @{ $received_shares_of{$ident} }) {
+                $self->set_secret($item);
+            }
         }
         return 1;
     }
