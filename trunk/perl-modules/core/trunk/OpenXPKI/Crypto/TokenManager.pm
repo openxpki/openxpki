@@ -472,6 +472,11 @@ sub clear_secret_group
                     GROUP_ID  => $group});
         }
     }
+    delete $self->{SECRET}->{$realm}->{$group};
+    $self->__load_secret({
+        PKI_REALM => $realm,
+        GROUP     => $group,
+    });
 
     ##! 1: "finished"
     return 1;
