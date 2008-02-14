@@ -889,13 +889,11 @@ msgstr ""
 "consist of at least 2 different groups (where groups are lowercase letters, "
 "uppercase letters, digits and the rest of the allowed characters)."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_DESCRIPTION"
-msgstr "Now you can generate a new SPKAC key with your browser."
+msgstr "Please upload a PEM- or DER-encoded PKCS#10 certificate signing request file using the form below."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_TITLE"
-msgstr "Create private key"
+msgstr "Upload PKCS#10 file"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_DESCRIPTION"
 msgstr ""
