@@ -116,10 +116,15 @@ sub load_extension
                       $self->{config}->get_xpath (XPATH   => [@path, "ca"],
                                                   COUNTER => [@counter, 0, 0],
                                                   CONFIG_ID => $cfg_id)];
-        if (eval {$self->{config}->get_xpath (XPATH   => [@path, "path_length"],
-                                              COUNTER => [@counter, 0, 0],
-                                              CONFIG_ID => $cfg_id)} and
-            not $EVAL_ERROR)
+        my $path_length;
+        eval {
+            $path_length = $self->{config}->get_xpath(
+                XPATH   => [@path, "path_length"],
+                COUNTER => [@counter, 0, 0],
+                CONFIG_ID => $cfg_id
+            );
+        }; 
+        if (defined $path_length) 
         {
             $values[1] = ["PATH_LENGTH",
                           $self->{config}->get_xpath (XPATH   => [@path, "path_length"],
