@@ -73,7 +73,9 @@ sub execute {
     # not able to issue the certificate anymore when the actual signing
     # action begins
     # FIXME: is this acceptable?
-    $requested_notafter->add( minutes => 5 );
+    if ($entry_validity->{notafter}->{format} eq 'relativedate') {
+        $requested_notafter->add( minutes => 5 );
+    }        
 
     ### requested notbefore: $requested_notbefore->datetime()
     ### requested notafter: $requested_notafter->datetime()
@@ -95,21 +97,21 @@ sub execute {
         ###   NotBefore: $ca_notafter->datetime()
 
         # check if issuing CA is valid now
-        if (DateTime->compare($now, $ca_notbefore) <= 0) {
+        if (DateTime->compare($now, $ca_notbefore) < 0) {
             ###   Internal CA is not valid yet, skipping...
             next CANDIDATE;
         }
-        if (DateTime->compare($now, $ca_notafter) >= 0) {
+        if (DateTime->compare($now, $ca_notafter) > 0) {
             ###   Internal CA is not valid any more, skipping...
             next CANDIDATE;
         }
 
         # check if requested validity fits into the ca validity
-        if (DateTime->compare($requested_notbefore, $ca_notbefore) <= 0) {
+        if (DateTime->compare($requested_notbefore, $ca_notbefore) < 0) {
             ###   requested NotBefore does not fit in CA validity...
             next CANDIDATE;
         }
-        if (DateTime->compare($requested_notafter, $ca_notafter) >= 0) {
+        if (DateTime->compare($requested_notafter, $ca_notafter) > 0) {
             ###   requested NotAfter does not fit in CA validity...
             next CANDIDATE;
         }

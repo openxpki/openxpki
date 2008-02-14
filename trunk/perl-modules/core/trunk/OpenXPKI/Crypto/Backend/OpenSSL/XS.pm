@@ -158,7 +158,9 @@ sub get_object_function
     if (defined $result && (($func eq "notbefore") || ($func eq "notafter"))) {
 
 	# seconds since the epoch
-	my $epoch = str2time($result);
+    ##! 16: 'result: ' . $result
+	my $epoch = str2time($result, 'UTC');
+    ##! 16: 'epoch: ' . $epoch
 	if (! defined $epoch) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_FUNCTION_DATE_PARSING_ERROR",
@@ -168,10 +170,10 @@ sub get_object_function
 		);
 	}
 	
-	my $dt_object = DateTime->from_epoch(epoch => $epoch);
+	my $dt_object = DateTime->from_epoch(epoch => $epoch, time_zone => 'UTC');
 
 	# make sure we use UTC
-	$dt_object->set_time_zone('UTC');
+    #$dt_object->set_time_zone('UTC');
 
 	$result = $dt_object;
     }
