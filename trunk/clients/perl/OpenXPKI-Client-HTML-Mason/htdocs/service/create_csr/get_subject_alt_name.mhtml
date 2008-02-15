@@ -178,7 +178,7 @@
     }
     # TODO - error handling
     my @sans = ();
-    if (exists $styles{$chosten_style}->{SUBJECT_ALTERNATIVE_NAMES}) {
+    if (exists $styles{$chosen_style}->{SUBJECT_ALTERNATIVE_NAMES}) {
         @sans = @{ $styles{$chosen_style}->{SUBJECT_ALTERNATIVE_NAMES} };
     }
 
