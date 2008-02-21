@@ -28,7 +28,7 @@ $(PO_SOURCES)::
 
 ## do not depend on openxpki.pot or some directories - this does not work
 scan:
-	sh build-pot.sh $(POT_SOURCES) > openxpki.pot
+	perl build-pot.pl $(POT_SOURCES) > openxpki.pot
 	make $(PO_SOURCES)
 
 install::	$(LANGS)
