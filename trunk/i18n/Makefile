@@ -1,4 +1,3 @@
-
 VERGEN = ../../tools/vergen
 PREFIX?=	/usr
 LOCALE_DIR   = $(DESTDIR)$(PREFIX)/share/locale
@@ -19,23 +18,27 @@ default::	$(MO_TRANSLATIONS)
 
 $(PO_SOURCES)::
 	@if (test ! -d $(@:openxpki.po=)); then echo creating directory for $(@:openxpki.po=); mkdir $(@:openxpki.po=); fi
-	@if (test ! -e $@); then echo creating po file $@; cp openxpki.pot $@; fi
-	msgmerge --update $@ openxpki.pot
+	@if (test ! -f $@); then echo creating po file $@; cp openxpki.pot $@; fi
+	@if (test `uname` = "SunOS"); then \
+                gmsgmerge --update $@ openxpki.pot; \
+	else \
+		msgmerge --update $@ openxpki.pot; \
+	fi
 	@rm -f $@~
 	@perl convert.pl $@ > $@_utf8 2>/dev/null
-	@if (test ! -z `diff $@ $@_utf8`); then echo no utf8; exit 1; fi
+	@if (test ! -z "`diff $@ $@_utf8`"); then echo no utf8; exit 1; fi
 	@rm -f $@_utf8
 
 ## do not depend on openxpki.pot or some directories - this does not work
 scan:
 	perl build-pot.pl $(POT_SOURCES) > openxpki.pot
-	make $(PO_SOURCES)
+	$(MAKE) $(PO_SOURCES)
 
 install::	$(LANGS)
-	make install_dir DIR=$(LOCALE_DIR)
+	$(MAKE) install_dir DIR=$(LOCALE_DIR)
 	set -e; for lang in $(LANGS); do \
-		make install_dir DIR=$(LOCALE_DIR)/$$lang; \
-		make install_dir DIR=$(LOCALE_DIR)/$$lang/LC_MESSAGES; \
+		$(MAKE) install_dir DIR=$(LOCALE_DIR)/$$lang; \
+		$(MAKE) install_dir DIR=$(LOCALE_DIR)/$$lang/LC_MESSAGES; \
 		$(INSTALL) -m 644 $$lang/$(MO_FILE) $(LOCALE_DIR)/$$lang/LC_MESSAGES/$(MO_FILE); \
 	done
 
@@ -49,7 +52,7 @@ install_dir:
 .SUFFIXES: .mo .po
 
 .po.mo:
-	if [ -e $<.local ] ; then \
+	@if (test -f $<.local)  ; then \
 		echo "Using local file" ; \
 		msgcat --use-first $<.local $< | msgfmt -o $@ - ; \
 	else \
@@ -65,10 +68,10 @@ distclean:: clean
 	rm -f *.pot */*.mo
 
 writeversion:
-	@( if [ -e $(VERGEN) ] ; then \
+	@( if (test -f $(VERGEN)) ; then \
 		$(VERGEN) --format version > $(VERSION_FILE); \
 	fi )
-	@( if [ ! -e $(VERSION_FILE) ] ; then \
+	@( if (test ! -f $(VERSION_FILE) ) ; then \
 		echo "Could not determine version" ; \
 		exit 1; \
 	fi )
@@ -78,7 +81,7 @@ VERSION=$(shell cat $(VERSION_FILE))
 
 #dist:	VERSION=`$(VERGEN) --format version`
 dist: readversion
-	if [ -d openxpki-i18n-$(VERSION) ] ; then \
+	if (test -d openxpki-i18n-$(VERSION)) ; then \
 		rm -rf openxpki-i18n-$(VERSION)/ ; \
 	fi
 	mkdir openxpki-i18n-$(VERSION)
