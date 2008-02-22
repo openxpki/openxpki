@@ -36,10 +36,14 @@ scan:
 
 install::	$(LANGS)
 	$(MAKE) install_dir DIR=$(LOCALE_DIR)
-	set -e; for lang in $(LANGS); do \
+	@set -e; for lang in $(LANGS); do \
 		$(MAKE) install_dir DIR=$(LOCALE_DIR)/$$lang; \
 		$(MAKE) install_dir DIR=$(LOCALE_DIR)/$$lang/LC_MESSAGES; \
-		$(INSTALL) -m 644 $$lang/$(MO_FILE) $(LOCALE_DIR)/$$lang/LC_MESSAGES/$(MO_FILE); \
+		if (test `uname` = "SunOS"); then \
+			$(INSTALL) -m 644 -f $(LOCALE_DIR)/$$lang/LC_MESSAGES $$lang/$(MO_FILE); \
+		else \
+		        $(INSTALL) -m 644 $$lang/$(MO_FILE) $(LOCALE_DIR)/$$lang/LC_MESSAGES/$(MO_FILE); \
+		fi \
 	done
 
 install_dir:
