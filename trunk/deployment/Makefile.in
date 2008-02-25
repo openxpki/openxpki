@@ -80,17 +80,28 @@ build-man:
 
 makedirs:
 	@echo Creating directories
-	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(BINDIR)
-	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)/man1
-	$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR)
-	$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(LOCALEDIR)
-
+	@if (test `uname` = "SunOS"); then \
+		/usr/sbin/install -u $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(BINDIR); \
+		/usr/sbin/install -u $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)/man1; \
+		/usr/sbin/install -u $(RUNUSER) -g $(RUNGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR); \
+		/usr/sbin/install -u $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(LOCALEDIR); \
+	else \
+		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(BINDIR); \
+		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)/man1; \
+		$(INSTALL) -o $(RUNUSER) -g $(RUNGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(TEMPLATEDIR); \
+		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 -d $(DESTDIR)$(INSTALLPREFIX)$(LOCALEDIR); \
+	fi 
 
 installbin: tools
 	@echo "Installing binary files to $(DESTDIR)$(INSTALLPREFIX)$(BINDIR)"
-	for file in $(TOOLS) ; do \
-		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 $$file $(DESTDIR)$(INSTALLPREFIX)$(BINDIR)/ ;\
-		$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file.1 $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)/man1/ ;\
+	@for file in $(TOOLS) ; do \
+		if (test `uname` = "SunOS"); then \
+			/usr/sbin/install -u $(ADMUSER) -g $(ADMGROUP) -m 0755 -f $(DESTDIR)$(INSTALLPREFIX)$(BINDIR)/ $$file ;\
+			/usr/sbin/install -u $(ADMUSER) -g $(ADMGROUP) -m 0644 -f $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)/man1/ $$file.1 ;\
+		else \
+			$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0755 $$file $(DESTDIR)$(INSTALLPREFIX)$(BINDIR)/ ;\
+			$(INSTALL) -o $(ADMUSER) -g $(ADMGROUP) -m 0644 $$file.1 $(DESTDIR)$(INSTALLPREFIX)$(MANDIR)/man1/ ;\
+		fi; \
 	done
 
 installtemplates:

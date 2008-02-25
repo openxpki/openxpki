@@ -15,6 +15,10 @@ for var in INSTALL ADMUSER ADMGROUP TARGETDIR ; do
     fi
 done
 
+if (test `uname` = "SunOS"); then
+	INSTALL=/usr/sbin/install
+fi;
+
 cd etc/templates || exit 1
 
 find . | while read file ; do
