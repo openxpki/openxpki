@@ -406,7 +406,8 @@ sub __init_connection : PRIVATE {
 	OpenXPKI::Exception->throw(
 	    message => "I18N_OPENXPKI_CLIENT_INIT_CONNECTION_FAILED",
 	    params  => {
-		SOCKETFILE => $socketfile{$ident},
+		    SOCKETFILE => $socketfile{$ident},
+            ERROR      => $!,
 	    });
     }
     ##! 4: "finished"
