@@ -4,11 +4,12 @@ use strict;
 use warnings;
 use File::Find;
 
-my $dir    = $ARGV[0];
 my $prefix = 'I18N_OPENXPKI_';
 
 my %tags = ();
-find(\&extract_tags, $dir);
+foreach my $dir (@ARGV) {
+    find(\&extract_tags, $dir);
+}
 
 sub extract_tags {
     my $filename = $_;
@@ -45,6 +46,6 @@ msgstr ""
 
 XEOF
 
-foreach my $tag (keys %tags) {
+foreach my $tag (sort keys %tags) {
     print qq{msgid "$tag"\n} . qq{msgstr ""\n};
 }
