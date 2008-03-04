@@ -66,6 +66,8 @@ sub execute {
             VALIDITYFORMAT => $entry_validity->{notafter}->{format},
 	    },
 	);
+    ##! 64: 'requested_notbefore: ' . Dumper $requested_notbefore
+    ##! 64: 'request_notafter: ' . Dumper $requested_notafter
 
 
     # anticipate runtime differences, if the requested notafter is close
@@ -76,10 +78,7 @@ sub execute {
     if ($entry_validity->{notafter}->{format} eq 'relativedate') {
         $requested_notafter->add( minutes => 5 );
     }        
-
-    ### requested notbefore: $requested_notbefore->datetime()
-    ### requested notafter: $requested_notafter->datetime()
-
+    ##! 64: 'request_notafter (+5m?): ' . Dumper $requested_notafter
 
     # iterate through all issuing CAs and determine possible candidates
     # for issuing the requested certificate
@@ -88,47 +87,52 @@ sub execute {
     my $mostrecent_notbefore;
   CANDIDATE:
     foreach my $ca_id (sort keys %{ $realm_config->{ca}->{id} }) {
-	### Internal CA: $ca_id
+        ##! 16: 'ca_id: ' . $ca_id
 
         my $ca_notbefore = $realm_config->{ca}->{id}->{$ca_id}->{notbefore};
-        ###   NotAfter: $ca_notbefore->datetime()
+        ##! 16: 'ca_notbefore: ' . Dumper $ca_notbefore
 
         my $ca_notafter = $realm_config->{ca}->{id}->{$ca_id}->{notafter};
-        ###   NotBefore: $ca_notafter->datetime()
+        ##! 16: 'ca_notafter: ' . Dumper $ca_notafter
 
+        if (! defined $ca_notbefore || ! defined $ca_notafter) {
+            ##! 16: 'ca_notbefore or ca_notafter undef, skipping'
+            next CANDIDATE;
+        }
         # check if issuing CA is valid now
         if (DateTime->compare($now, $ca_notbefore) < 0) {
-            ###   Internal CA is not valid yet, skipping...
+            ##! 16: $ca_id . ' is not yet valid, skipping'
             next CANDIDATE;
         }
         if (DateTime->compare($now, $ca_notafter) > 0) {
-            ###   Internal CA is not valid any more, skipping...
+            ##! 16: $ca_id . ' is expired, skipping'
             next CANDIDATE;
         }
 
         # check if requested validity fits into the ca validity
         if (DateTime->compare($requested_notbefore, $ca_notbefore) < 0) {
-            ###   requested NotBefore does not fit in CA validity...
+            ##! 16: 'requested notbefore does not fit in ca validity'
             next CANDIDATE;
         }
         if (DateTime->compare($requested_notafter, $ca_notafter) > 0) {
-            ###   requested NotAfter does not fit in CA validity...
+            ##! 16: 'requested notafter does not fit in ca validity'
             next CANDIDATE;
         }
 
         # check if this CA has a more recent NotBefore date
         if (defined $mostrecent_notbefore)
         {
+            ##! 16: 'mostrecent_notbefore: ' . Dumper $mostrecent_notbefore
             if (DateTime->compare($ca_notbefore, $mostrecent_notbefore) > 0)
             {
-                ###    Issuing CA has a more recent NotBefore date than the previous one
+                ##! 16: $ca_id . ' has an earlier notbefore data'
                 $mostrecent_notbefore = $ca_notbefore;
                 $intca = $ca_id;
             }
         }
         else
         {
-            ###    First candidate...
+            ##! 16: 'new mostrecent_notbefore'
             $mostrecent_notbefore = $ca_notbefore;
             $intca = $ca_id;
         }
