@@ -64,7 +64,12 @@ $dt = OpenXPKI::DateTime::get_validity(
     });
 
 $offset = $dt - $now;
-is($offset->in_units('months'), -12, 'get_validity() -365d');
+if (($now->is_leap_year() && $now->month >= 3) || ($dt->is_leap_year() && $dt->month < 3)) {
+    is($offset->in_units('months'), -11, 'get_validity() -365d with leap years');
+}
+else {
+    is($offset->in_units('months'), -12, 'get_validity() -365d w/o leap years');
+}
 
 
 ###########################################################################
