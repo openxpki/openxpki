@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use utf8;
 binmode STDERR, ":utf8";
-use Test;
-BEGIN { plan tests => 25 };
+use Test::More;
+BEGIN { plan tests => 26 };
 
 print STDERR "OpenXPKI::Crypto::X509\n";
 
@@ -11,6 +11,7 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::X509;
 use Time::HiRes;
 use DateTime;
+use Data::Dumper;
 
 # use Smart::Comments;
 
@@ -54,6 +55,8 @@ ok(1);
 ## test parser
 ok ($cert->get_parsed("BODY", "SUBJECT") eq "CN=John Doe,DC=OpenXPKI,DC=org");
 ok ($cert->get_parsed("BODY", "KEYSIZE") == 1024);
+my @key_usage = @{ $cert->get_parsed('BODY', 'EXTENSIONS', 'KEYUSAGE') };
+ok (grep {$_ eq 'Non Repudiation'} @key_usage, 'Key Usage array contains Non Repudation');
 
 my $notafter;
 my $now = DateTime->now( time_zone => 'UTC' );

@@ -226,6 +226,11 @@ sub __init
         $ret->{EXTENSIONS}->{BASIC_CONSTRAINTS}->{CA} = 0;
     }
 
+    # add keyusage extensions as arrayref
+    my $keyusage = $ret->{OPENSSL_EXTENSIONS}->{'X509v3 Key Usage'}->[0];
+    my @keyusages = split /, /, $keyusage;
+    $ret->{'EXTENSIONS'}->{'KEYUSAGE'} = \@keyusages;
+
     ## add extensions for chain tracking
     foreach my $item (@{$ret->{OPENSSL_EXTENSIONS}->{"X509v3 Authority Key Identifier"}})
     {
