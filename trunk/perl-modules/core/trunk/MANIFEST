@@ -370,6 +370,7 @@ t/20_xml/inheritance_bug.xml
 t/20_xml/test.xml
 t/20_xml/top.xml
 t/20_xml/top2.xml
+t/20_xml/top3.xml
 t/20_xml/sub.xml
 t/20_xml/relative.xml
 t/20_xml/loop1.xml
