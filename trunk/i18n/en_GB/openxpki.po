@@ -890,7 +890,9 @@ msgstr ""
 "uppercase letters, digits and the rest of the allowed characters)."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_DESCRIPTION"
-msgstr "Please upload a PEM- or DER-encoded PKCS#10 certificate signing request file using the form below."
+msgstr ""
+"Please upload a PEM- or DER-encoded PKCS#10 certificate signing request file "
+"using the form below."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PKCS10_TITLE"
 msgstr "Upload PKCS#10 file"
@@ -1194,9 +1196,8 @@ msgstr "Trustcenter Web Interface"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN"
 msgstr "Login"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN_USING_SIGNATURE"
-msgstr "Login"
+msgstr "Sign random challenge and login"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr ""
@@ -1649,13 +1650,15 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_SIGN_FORM_MOZILLA_CANCELLED"
-msgstr ""
+msgstr "Error: signing request canceled"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_SIGN_FORM_MOZILLA_INTERNAL_ERROR"
 msgstr ""
+"Internal Browser Error. Please check that your CA certificate is trusted to "
+"identify email users."
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_SIGN_FORM_MOZILLA_UNKNOWN_ERROR"
-msgstr ""
+msgstr "Unknown error response from browser: __SIGNED_TEXT__"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_NO_CERTIFICATE"
 msgstr ""
@@ -1698,6 +1701,24 @@ msgstr "Comment"
 msgid "I18N_OPENXPKI_COMMENT_DESC"
 msgstr "For information for the registration officers"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUT"
+msgstr "Comment"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESC"
+msgstr ""
+"Here we use an external program to authenticate you. Simply enter your "
+"normal account and passphrase. All other stuff will be done automatically in "
+"the background."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPT"
+msgstr ""
+"Here we use an external program to authenticate you. Simply enter your "
+"normal account and passphrase. All other stuff will be done automatically in "
+"the background."
+
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE"
 msgstr ""
 "You authenticate yourself by signing a random challenge using a trusted "
@@ -1721,9 +1742,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD"
 msgstr "Please enter your account and passphrase."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE"
-msgstr "Please enter your account and passphrase."
+msgstr ""
+"Login using IE or Mozilla-based browser by signing a challenge with your "
+"certificate and private key."
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_ANONYMOUS"
 msgstr ""
@@ -1832,9 +1854,6 @@ msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NO_REF"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_CERTFILE_ILLEGAL_PARAM"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_MODE_ILLEGAL_PARAM"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_ILLEGAL_FUNCTION"
@@ -2701,7 +2720,59 @@ msgstr "Domain Component"
 msgid "I18N_OPENXPKI_DEBUG_DEBUG_MESSAGE_IS_NOT_A_CODEREF"
 msgstr "The used suject style does not allow the use of an organization."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPL"
+msgstr "yes"
+
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA"
+msgstr "Test Dummy CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CACN"
+msgstr "Test Dummy CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCESUCCESS2007"
+msgstr "Certificate Issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCESUCCESS2008"
+msgstr "Certificate Issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUESTPENDING2008"
+msgstr "Pending (in editing state)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUESTSUCCESS2008"
+msgstr "Certificate Revocation Request (CRR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUESTFAILURE2008"
+msgstr "Certificate Signing Request (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUESTSUCCESS2008"
+msgstr "Certificate Signing Request (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CRL_ISSUANCESUCCESS2008"
+msgstr "Test Dummy CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTPENDING2007"
+msgstr "Test Dummy CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTSUCCESS2007"
+msgstr "Test Dummy CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTWAITING_FOR_CHILD"
+msgstr "Waiting to start"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAK8LWN4D7_3"
 msgstr "Test Dummy CA"
 
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA"
@@ -3239,6 +3310,10 @@ msgstr "Port"
 msgid "I18N_OPENXPKI_PORT_DESC"
 msgstr "The (TCP) port that is used with the certificate"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_PR"
+msgstr "Port"
+
 msgid "I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD"
 msgstr "Download private key and certificate"
 
@@ -3255,6 +3330,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_PROFILE_ADVANCED_STYLE"
 msgstr "Advanced naming style"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_TLS"
+msgstr "User profile"
+
 msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC"
 msgstr ""
 "If you use this style, you will just have to enter the hostname and port of "
@@ -3266,6 +3345,14 @@ msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE"
 msgstr "Basic TLS style"
 
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
+msgstr "TLS Server profile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_TLS_SERVERCN"
+msgstr "TLS Server profile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_PROFILE_TLS_SERVERNI"
 msgstr "TLS Server profile"
 
 msgid "I18N_OPENXPKI_PROFILE_USER"
@@ -3310,6 +3397,10 @@ msgstr "Realname"
 
 msgid "I18N_OPENXPKI_REALNAME_DESC"
 msgstr "Your real name, for example 'John Doe'"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_S"
+msgstr "yes"
 
 msgid "I18N_OPENXPKI_SAN_DNS"
 msgstr "DNS"
@@ -3364,6 +3455,10 @@ msgstr "Registered ID"
 
 msgid "I18N_OPENXPKI_SAN_RID_DESCRIPTION"
 msgstr "No description available today."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SAN_U"
+msgstr "Microsoft UPN"
 
 msgid "I18N_OPENXPKI_SAN_UPN"
 msgstr "Microsoft UPN"
@@ -3782,51 +3877,38 @@ msgstr "The login of the user __USER__ failed. Please try again."
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_UNSUPPORTED_SCHEME"
 msgstr "The login of the user __USER__ failed. Please try again."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_NOT_FOUND_IN_DB_OR_INVALID"
-msgstr "Default key group"
+msgstr "The certificate was not found in the database or is invalid."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_DOES_NOT_MATCH_SESSION_ID"
-msgstr "Default key group"
+msgstr "Challenge does not match session ID."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CERTIFICATE_IDENTIFIER"
-msgstr "The SPKAC string is empty."
+msgstr "Could not determine certificate identifier."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CHAIN_FROM_SERVER"
-msgstr "The SPKAC string is empty."
+msgstr "Could not determine signature chain from server."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNER_SUBJECT"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
+msgstr "Could not determine signer subject."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_INVALID_SIGNATURE"
-msgstr "Default key group"
+msgstr "Invalid signature."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_CHALLENGE_LENGTH_CONFIGURATION"
-msgstr "Default key group"
+msgstr "Configuration error: challenge length has to be configured"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_PKCS7TOOL_CONFIGURATION"
-msgstr "Default key group"
+msgstr "Configuration error: pkcs7tool has to be configured"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_TRUST_ANCHOR_CONFIGURATION"
-msgstr "Default key group"
+msgstr "Configuration error: missing trust anchor"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_SIGNATURE_IS_NOT_BASE64"
-msgstr "Default key group"
+msgstr "Signature is not in Base64 format."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_UNTRUSTED_CERTIFICATE"
-msgstr "Default key group"
+msgstr "Signature made by an untrusted certificate."
 
 msgid "I18N_OPENXPKI_SERVER_COMMAND_MISSING_SESSION"
 msgstr ""
@@ -5593,6 +5675,10 @@ msgid "I18N_OPENXPKI_USERNAME_DESC"
 msgstr "Your username or account, for example 'jdoe'"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_A"
+msgstr "User profile"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_"
 msgstr "Sleep"
 
@@ -5602,11 +5688,23 @@ msgstr "Approve CRR"
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 msgstr "Approve CSR"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSRNEW_STATE"
+msgstr "Approve CSR"
+
 msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
 msgstr "Cancel CRR approval"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 msgstr "Cancel CSR approval"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVALNEW_STATE"
+msgstr "Cancel CSR approval"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANG"
+msgstr "Sleep"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
 msgstr "Change CRR invalidity time"
@@ -5620,11 +5718,23 @@ msgstr "Change additional information"
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
 msgstr "Change certificate profile"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILENEW_STATE"
+msgstr "Change certificate profile"
+
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
+msgstr "Change role"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLENEW_STATE"
 msgstr "Change role"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
 msgstr "Change subject"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECTNEW_STATE"
+msgstr "Change subject style"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
 msgstr "Change subject alternative name"
@@ -5684,16 +5794,36 @@ msgstr "Export CSR"
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
 msgstr "Create a new workflow instance for publishing a certificate using LDAP"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSU"
+msgstr "Create a new workflow instance for certificate issuance"
+
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
+msgstr "Create a new workflow instance for certificate issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCENEW_STATE_AUTORUN"
 msgstr "Create a new workflow instance for certificate issuance"
 
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
 msgstr "Persist CSR"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSRNEW_STATE"
+msgstr "Persist CSR"
+
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
 msgstr "Reject CRR"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CS"
+msgstr "Reject CSR"
+
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+msgstr "Reject CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSRNEW_STATE"
 msgstr "Reject CSR"
 
 msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
@@ -5717,6 +5847,10 @@ msgstr "Determine issuing CA"
 
 msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE"
+msgstr "Issue a certificate"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE"
 msgstr "Issue a certificate"
@@ -5765,6 +5899,10 @@ msgstr "CRL Issuance"
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
 msgstr "Handle a SCEP Certificate Signing Request"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATI"
+msgstr "Personalize a smartcard"
+
 msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION"
 msgstr "Personalize a smartcard"
 
@@ -5806,6 +5944,10 @@ msgstr "Initializing ..."
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL"
 msgstr "Initializing ..."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PEN"
+msgstr "Pending (in editing state)"
+
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING"
 msgstr "Pending (in editing state)"
 
@@ -5833,6 +5975,10 @@ msgstr "Initializing ..."
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_SERVER_CSR_CREATED"
 msgstr "Approved"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSU"
+msgstr "CRL issued"
+
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSUED"
 msgstr "CRL issued"
 
@@ -5859,6 +6005,10 @@ msgstr "Initializing ..."
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CYCLE_TOP_INITIAL"
 msgstr "SCEP Certificate Signing Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANG"
+msgstr "Export"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
 msgstr "Exported logs"
@@ -5953,6 +6103,14 @@ msgstr "SCEP Certificate Signing Request"
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Waiting to start"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYP"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICAT"
+msgstr "Certificate Issuance"
+
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
 msgstr "Certificate Issuance"
 
@@ -5964,6 +6122,10 @@ msgstr "Certificate Revocation Request (CRR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA"
 msgstr "Offline part of a Certificate Revocation Request (CRR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQ"
+msgstr "Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"
 msgstr "Certificate Signing Request (CSR)"
@@ -7340,10 +7502,6 @@ msgstr "yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
 #~ msgstr "This is the workflow to create certificates."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FINISHED_WAITING_FOR_CHILD"
-#~ msgstr "Waiting to start"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
