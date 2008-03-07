@@ -139,8 +139,9 @@ sub BUILD {
             class  => 'Default',
             params => {
                 'TYPE' => {
-                    type  => SCALAR,
-                    regex => $re_approval_msg_type,
+                    type     => SCALAR,
+                    regex    => $re_approval_msg_type,
+                    optional => 1,
                 },
                 'WORKFLOW' => {
                     type  => SCALAR,

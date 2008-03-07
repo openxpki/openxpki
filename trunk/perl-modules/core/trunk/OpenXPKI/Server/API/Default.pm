@@ -728,6 +728,14 @@ sub get_approval_message {
     ##! 16: 'changing language to: ' . $arg_ref->{LANG}
     set_language($arg_ref->{LANG});            
 
+    if (! defined $arg_ref->{TYPE}) {
+        if ($arg_ref->{'WORKFLOW'} eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST') {
+            $arg_ref->{TYPE} = 'CSR';
+        }
+        elsif ($arg_ref->{'WORKFLOW'} eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST') {
+            $arg_ref->{TYPE} = 'CRR';
+        }
+    }
     if ($arg_ref->{TYPE} eq 'CSR') {
         ##! 16: 'CSR'
         my $wf_info = CTX('api')->get_workflow_info({

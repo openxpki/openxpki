@@ -21,7 +21,6 @@ use Encode qw(encode decode);
 
 __PACKAGE__->mk_accessors( qw(
                               signature_required
-                              type
                               pkcs7tool
                               trust_anchors
                              )
@@ -32,9 +31,6 @@ sub _init {
     # set config options
     if (exists $params->{'signature_required'}) {
         $self->signature_required($params->{'signature_required'});
-    }
-    if (exists $params->{'type'}) {
-        $self->type($params->{'type'});
     }
     if (exists $params->{'pkcs7tool'}) {
         $self->pkcs7tool($params->{'pkcs7tool'});
@@ -96,17 +92,6 @@ sub validate {
     ##! 64: 'wf_id: ' . $wf_id
     ##! 64: 'wf_type: ' . $wf_type
 
-    if (! defined $self->type()) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_TYPE_NOT_CONFIGURED',
-            log     => {
-                logger   => CTX('log'),
-                priority => 'info',
-                facility => 'system',
-            },
-        );
-    }
-
     my $matched;
   CHECK_MATCH:
     foreach my $lang (qw(en_GB de_DE ru_RU)) {
@@ -115,7 +100,6 @@ sub validate {
             WORKFLOW => $wf_type,
             ID       => $wf_id,
             LANG     => $lang,
-            TYPE     => $self->type(),
         });
         ##! 64: 'match: ' . $match
         ##! 64: 'sig_text: ' . $sig_text
@@ -355,6 +339,5 @@ valid. It does this by running through the following checks:
 Configuration:
 The following parameters can be defined in the validator definition:
 - signature_required: if true, enforce a signature on the approval
-- type: the type of the approval, used for the text template
 - pkcs7tool: the id of the pkcs7tool to use (see config.xml)
 - trust_anchors: a comma-seperated list of trust anchor identifiers
