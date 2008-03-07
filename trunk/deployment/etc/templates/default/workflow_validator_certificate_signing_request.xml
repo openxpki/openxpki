@@ -38,9 +38,8 @@
         <param name="DICTIONARIES" value="/usr/share/dict/ngerman,/usr/share/dict/american-english"/>
         -->
   </validator>
-  <validator name="ValidApprovalSignature"
+  <validator name="ValidApprovalSignatureCSR"
              class="OpenXPKI::Server::Workflow::Validator::ApprovalSignature">
-      <param name="type" value="CSR"/>
       <!-- if you set the following parameter to 1, you can enforce
            signatures on all CSR approvals -->
       <param name="signature_required" value="0"/>

@@ -138,7 +138,7 @@
       <field name="_check_hash"/>
       <field name="_signature"/>
       <field name="_signature_text"/>
-      <validator name="ValidApprovalSignature">
+      <validator name="ValidApprovalSignatureCSR">
         <arg>$_signature</arg>
         <arg>$_signature_text</arg>
      </validator>

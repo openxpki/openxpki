@@ -48,7 +48,7 @@
                session roles -->
       <field name="_signature"/>
       <field name="_signature_text"/>
-      <validator name="ValidApprovalSignature">
+      <validator name="ValidApprovalSignatureCRR">
         <arg>$_signature</arg>
         <arg>$_signature_text</arg>
      </validator>

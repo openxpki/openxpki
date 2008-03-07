@@ -8,9 +8,8 @@
   <validator name="ReasonCode"
              class="OpenXPKI::Server::Workflow::Validator::ReasonCode">
   </validator>
-  <validator name="ValidApprovalSignature"
+  <validator name="ValidApprovalSignatureCRR"
              class="OpenXPKI::Server::Workflow::Validator::ApprovalSignature">
-      <param name="type" value="CRR"/>
       <!-- if you set the following parameter to 1, you can enforce
            signatures on all CSR approvals -->
       <param name="signature_required" value="0"/>
