@@ -17,7 +17,7 @@
     <p>
       <% i18nGettext ($desc) %>
     </p>
-<input type="submit" name="sign" value="I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN_USING_SIGNATURE" onClick="signForm(document.OpenXPKI)">
+<input type="submit" name="sign" value="<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN_USING_SIGNATURE') %>" onClick="signForm(document.OpenXPKI)">
 </form>
 
 <%init>
