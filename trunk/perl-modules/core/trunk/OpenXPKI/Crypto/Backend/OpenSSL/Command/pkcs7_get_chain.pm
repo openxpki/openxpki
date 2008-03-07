@@ -12,6 +12,9 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 use OpenXPKI::Debug;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 use English;
+use Data::Dumper;
+use OpenXPKI::FileUtils;
+use OpenXPKI::DN;
 
 sub get_command
 {
@@ -49,6 +52,7 @@ sub get_command
     ## build the command
 
     my $command  = "pkcs7 -print_certs";
+    $command .= " -text";
     $command .= " -inform PEM";
     $command .= " -in ".$self->{PKCS7FILE};
     $command .= " -out ".$self->{OUTFILE};
@@ -72,25 +76,36 @@ sub get_result
 {
     my $self = shift;
 
-    my $pkcs7 = $self->read_file ($self->{OUTFILE});
+    my $fu = OpenXPKI::FileUtils->new();
+    my $pkcs7 = $fu->read_file ($self->{OUTFILE});
+    ##! 16: 'pkcs7: ' . $pkcs7
     ##! 2: "split certs"
     my %certs = ();
-    my @parts = split /\n\n/, $pkcs7;
+    my @parts = split /-----END CERTIFICATE-----\n\n/, $pkcs7;
     foreach my $cert (@parts)
     {
+        $cert .= "-----END CERTIFICATE-----\n";
+        ##! 16: 'cert: ' . $cert
         my ($subject, $issuer) = ($cert, $cert);
-        $subject =~ s/^subject=([^\n]*)\n.*/$1/s;
-        ##! 16: 'subject: ' . $subject
-        $subject = OpenXPKI::DN::convert_openssl_dn($subject);
-        ##! 16: 'converted subject: ' . $subject
-        $issuer  =~ s/^.*\nissuer=([^\n]*)\n.*/$1/s;
+        $subject =~ s{ .* ^ \s+ Subject:\ ([^\n]*)\n.*}{$1}xms;
+        $subject = __convert_subject($subject);
+
+        ##! 16: 'subject: ' . Dumper $subject
+        $issuer  =~ s{ .* ^ \s+ Issuer:\ ([^\n]*)\n.*}{$1}xms;
+        $issuer  = __convert_subject($issuer);
+
+        ##! 16: 'issuer: ' . Dumper $issuer
+
         $cert    =~ s/^.*\n-----BEGIN/-----BEGIN/s;
         $certs{$subject}->{ISSUER} = $issuer;
         $certs{$subject}->{CERT}   = $cert;
     }
     
+    ##! 64: 'certs: ' . Dumper \%certs
+    
     ##! 2: "order certs"
     my $subject = $self->{SIGNER_SUBJECT};
+    ##! 16: 'SIGNER_SUBJECT: ' . $subject
     if (not $subject)
     {
         ##! 4: "determine the subject of the end entity cert"
@@ -115,19 +130,48 @@ sub get_result
             $EVAL_ERROR->rethrow();
         }
     }
+    ##! 16: 'subject: ' . $subject
     ##! 2: "create ordered cert list"
     $pkcs7 = "";
-    while (exists $certs{$subject})
+    my $iterations = 0;
+    my $MAX_CHAIN_LENGTH = 1000;
+    while (exists $certs{$subject} && $iterations < $MAX_CHAIN_LENGTH)
     {
-        # FIXME - I (Alex) believe an endless loop is possible here ...
+        ##! 16: 'while for subject: ' . $subject
         $pkcs7  .= $certs{$subject}->{CERT}."\n\n";
         last if ($subject eq $certs{$subject}->{ISSUER});
         $subject = $certs{$subject}->{ISSUER};
+        $iterations++;
     }
     ##! 2: "end"
+    ##! 16: 'pkcs7: ' . $pkcs7
+    if ($pkcs7 eq '') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_PKCS7_GET_CHAIN_COULD_NOT_CREATE_CHAIN',
+        );
+    }
     return $pkcs7;
 }
 
+sub __convert_subject {
+    ##! 1: 'start'
+    my $subject = shift;
+    $subject =~ s/, /,/g;
+
+    while ($subject =~ /\\x[0-9A-F]{2}/) {
+        ##! 64: 'subject still contains \x-escaped character, replacing'
+        use bytes;
+        $subject =~ s/\\x([0-9A-F]{2})/chr(hex($1))/e;
+        no bytes;
+        ##! 64: 'subject after replacement: ' . $subject
+    }
+
+    my $dn = OpenXPKI::DN->new($subject);
+    $subject = $dn->get_x500_dn();
+
+    ##! 1: 'end'
+    return $subject;
+}
 1;
 __END__
 
