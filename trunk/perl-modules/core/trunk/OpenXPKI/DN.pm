@@ -68,6 +68,7 @@ sub new
 # convert OpenSSL DN to RFC2253 DN
 sub convert_openssl_dn
 {
+    ##! 1: 'warning: OpenSSL DN used. Can not be parsed unambigously! This may even lead to security issues. Avoid whenever possible!'
     my $dn = shift;
 
     my $openssl_format
@@ -344,6 +345,12 @@ distinguished names. It was designed to output RFC 2253 compliant
 and OpenSSL formatted DNs. Additionally you can get the parsed
 RDNs and the attributes in a hash (e.g. if you are looking for
 the organizational hierarchy via OUs).
+
+Please note that OpenSSL formatted DNs can not be parsed unambigously.
+This is because '/' is a perfectly valid character within an RDN but
+is used to separate them as well. Avoid getting OpenSSL DNs from
+OpenSSL or other applications whenever possible, as this parsing
+problem might lead to security issues.
 
 =head1 Initialization
 
