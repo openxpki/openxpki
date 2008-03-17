@@ -249,6 +249,41 @@ sub get_url_for_ticket {
     return '';
 }
 
+sub ticket_exists {
+    ##! 1: 'start'
+    my $self      = shift;
+    my $ident     = ident $self;
+    my $arg_ref   = shift;
+    my $notifier  = $arg_ref->{NOTIFIER};
+    my $ticket    = $arg_ref->{TICKET};
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    if (! defined $notifier_of{$ident}->{$pki_realm} ) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_DISPATCHER_NO_NOTIFIERS_DEFINED_FOR_PKI_REALM',
+        );
+    }
+    my $count = scalar (@{ $notifier_of{$ident}->{$pki_realm} });
+
+    # find the right notifier
+    for (my $i = 0; $i < $count; $i++) {
+        my $not = $notifier_of{$ident}->{$pki_realm}->[$i];
+        if ($not->{NAME} eq $notifier) {
+            my $rc;
+            eval {
+                # try to get a ticket URL from the notifier
+                $rc = $not->{OBJECT}->ticket_exists($ticket);
+            };
+            if ($rc) {
+                # ticket exists
+                return 1;
+            }
+        }
+    }
+    ##! 1: 'end'
+    return 0;
+}
+
 sub __get_notifier_type :PRIVATE {
     ##! 1: 'start'
     my $self     = shift;

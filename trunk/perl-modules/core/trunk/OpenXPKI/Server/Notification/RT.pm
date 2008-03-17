@@ -37,6 +37,11 @@ sub START {
     $password_of{$ident} = $self->__get_backend_config_value('password');
     $timeout_of{$ident}  = $self->__get_backend_config_value('timeout');
 
+    # instantiate the RT client and login
+    $self->__instantiate_rt_client();
+    $self->__login();
+    ##! 4: 'successfully logged in to the RT system'
+
     ##! 1: 'end'
     return 1; 
 }
@@ -84,6 +89,19 @@ sub open {
 
     ##! 1: 'end'
     return $rt_id;
+}
+
+sub ticket_exists {
+    ##! 1: 'start'
+    my $self   = shift;
+    my $ident  = ident $self;
+    my $ticket_id = shift;
+    my $ticket;
+    eval {
+        $ticket = $rt_of{$ident}->show(type => 'ticket', id => $ticket_id);
+    };
+    ##! 16: 'ticket: ' . Dumper $ticket
+    return (defined $ticket);
 }
 
 sub correspond {
@@ -253,11 +271,6 @@ sub __pre_notification {
     ##! 1: 'start'
     my $self      = shift;
     my $ident     = ident $self;
-
-    # instantiate the RT client and login
-    $self->__instantiate_rt_client();
-    $self->__login();
-    ##! 4: 'successfully logged in to the RT system'
 
     ##! 1: 'end'
     return 1;
