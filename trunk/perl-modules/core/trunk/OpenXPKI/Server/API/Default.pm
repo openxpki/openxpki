@@ -1291,6 +1291,21 @@ sub convert_csr {
     return $data;
 }
 
+sub convert_certificate {
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $realm   = CTX('session')->get_pki_realm();
+    my $default_token = CTX('pki_realm')->{$realm}->{crypto}->{default};
+    my $data = $default_token->command({
+        COMMAND => 'convert_cert',
+        IN      => $arg_ref->{IN},
+        OUT     => $arg_ref->{OUT},
+        DATA    => $arg_ref->{DATA},
+    });
+    return $data;
+}
+
 sub create_bulk_request_ticket {
     ##! 1: 'start'
     my $self      = shift;

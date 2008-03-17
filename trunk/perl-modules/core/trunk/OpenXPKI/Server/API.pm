@@ -486,6 +486,22 @@ sub BUILD {
                 },
             },
         },
+        'convert_certificate' => {
+            class  => 'Default',
+            params => {
+                DATA => {
+                    type => SCALAR,
+                },
+                IN => {
+                    type  => SCALAR,
+                    regex => $re_csr_format,
+                },
+                OUT => {
+                    type  => SCALAR,
+                    regex => $re_csr_format,
+                },
+            },
+        },
         'create_bulk_request_ticket' => {
             class  => 'Default',
             params => {
