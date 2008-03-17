@@ -55,6 +55,13 @@
     ## cache the last message in the context
     my $auth_stacks = $msg->{PARAMS}->{AUTHENTICATION_STACKS};
     $context->{msg} = $msg;
+
+    # filter out stacks starting with '_' - those are internal and
+    # not supposed to be shown on the webinterface
+    foreach my $stack (keys %{ $auth_stacks }) {
+        delete $auth_stacks->{$stack} if ($stack =~ m{ \A _ }xms);
+    }
+
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
               'msg'   => "CONTEXT->MSG: ".Dumper($context->{msg}));
