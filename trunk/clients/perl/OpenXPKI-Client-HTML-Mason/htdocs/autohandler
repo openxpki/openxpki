@@ -119,7 +119,7 @@
     <div id="mainlink"><a href="#main">Skip to main content.</a></div>
 
     <div id="header">
-      <div class="left">
+      <div class="left" style="height: 68px">
         <a href="http://www.openxpki.org/"><img
           src="<% ${path} %>images/openxpki_sinorcaish.png" alt="OpenXPKI"
           width="325" height="68" /></a>
