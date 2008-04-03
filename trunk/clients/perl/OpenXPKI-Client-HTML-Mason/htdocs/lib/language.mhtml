@@ -4,7 +4,7 @@
 <%init>
     ## try to detect the language from a parameter
     my %args = $m->request_args();
-    if (exists $args{"__language"})
+    if (exists $args{'__language'} && $args{'__language'})
     {
         $session_cache{$session_id}->{language} = $args{"__language"}
             if (defined $session_id);

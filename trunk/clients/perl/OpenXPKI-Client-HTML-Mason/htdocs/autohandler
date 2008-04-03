@@ -186,11 +186,11 @@
             </script>
             <div>
 %           my $gb_url = $current_url;
-%              $gb_url =~ s/__language=[^;]+/__language=en_GB/;
+%              $gb_url =~ s/__language=[^;]*/__language=en_GB/;
 %           my $ru_url = $current_url;
-%              $ru_url =~ s/__language=[^;]+/__language=ru_RU/;
+%              $ru_url =~ s/__language=[^;]*/__language=ru_RU/;
 %           my $de_url = $current_url;
-%              $de_url =~ s/__language=[^;]+/__language=de_DE/;
+%              $de_url =~ s/__language=[^;]*/__language=de_DE/;
           <a href="<% $gb_url %>"><img src="<% $context->{menu}->get_root() %>/images/gb.png" style="margin-right:-1em"></a>
           <a href="<% $ru_url %>"><img src="<% $context->{menu}->get_root() %>/images/ru.png" style="margin-right:-1em"></a>
           <a href="<% $de_url %>"><img src="<% $context->{menu}->get_root() %>/images/de.png" style="margin-right:1em"></a>
