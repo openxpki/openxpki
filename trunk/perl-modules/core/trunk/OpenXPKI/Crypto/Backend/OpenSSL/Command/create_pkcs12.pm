@@ -108,7 +108,7 @@ sub get_command
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -".$self->{ENC_ALG};
     if (exists $self->{CSP}) {
-        $command .= " -CSP " . $self->{CSP};
+        $command .= " -CSP " . q{"} . $self->{CSP} . q{"};
     }
     if (exists $self->{CHAIN})
     {
