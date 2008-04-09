@@ -2,9 +2,10 @@ use strict;
 use warnings;
 use utf8;
 binmode STDERR, ":utf8";
-use Test;
+use Test::More;
 use English;
-BEGIN { plan tests => 25 };
+
+plan tests => 25;
 
 print STDERR "OpenXPKI::Crypto::CSR\n";
 
@@ -55,20 +56,20 @@ my $csr = OpenXPKI::Crypto::CSR->new (TOKEN => $token, DATA => $data);
 ok(1);
 
 ## test parser
-ok ($csr->get_parsed("BODY", "SUBJECT") eq "CN=John Doe,DC=OpenXPKI,DC=org");
-ok ($csr->get_parsed("SUBJECT") eq "CN=John Doe,DC=OpenXPKI,DC=org");
-ok ($csr->get_parsed("BODY", "KEYSIZE") == 1024);
-ok ($csr->get_parsed("HEADER", "ROLE") eq "User");
-ok ($csr->get_serial() == 4321);
+is ($csr->get_parsed("BODY", "SUBJECT"), "CN=John Dö,DC=OpenXPKI,DC=org");
+is ($csr->get_parsed("SUBJECT"), "CN=John Dö,DC=OpenXPKI,DC=org");
+is ($csr->get_parsed("BODY", "KEYSIZE"), 1024);
+is ($csr->get_parsed("HEADER", "ROLE"), "User");
+is ($csr->get_serial(), 4321);
 
 ## test attribute setting
 ok ($csr->set_header_attribute(GLOBAL_ID => 1234));
-ok ($csr->get_parsed("HEADER", "GLOBAL_ID") == 1234);
+is ($csr->get_parsed("HEADER", "GLOBAL_ID"), 1234);
 
 ## test deep copy for client interfaces
 my $ref = $csr->get_info_hash();
-ok (ref $ref eq "HASH");
-ok ($ref->{BODY}->{SUBJECT} eq "CN=John Doe,DC=OpenXPKI,DC=org");
+is (ref $ref, "HASH");
+is ($ref->{BODY}->{SUBJECT}, "CN=John Dö,DC=OpenXPKI,DC=org");
 
 ## test conversion
 ok ($csr->get_converted ("PEM"));

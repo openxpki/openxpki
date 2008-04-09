@@ -53,7 +53,7 @@ my $cert = OpenXPKI::Crypto::X509->new (TOKEN => $token, DATA => $data);
 ok(1);
 
 ## test parser
-ok ($cert->get_parsed("BODY", "SUBJECT") eq "CN=John Doe,DC=OpenXPKI,DC=org");
+ok ($cert->get_parsed("BODY", "SUBJECT") eq "CN=John Dö,DC=OpenXPKI,DC=org");
 ok ($cert->get_parsed("BODY", "KEYSIZE") == 1024);
 my @key_usage = @{ $cert->get_parsed('BODY', 'EXTENSIONS', 'KEYUSAGE') };
 ok (grep {$_ eq 'Non Repudiation'} @key_usage, 'Key Usage array contains Non Repudation');

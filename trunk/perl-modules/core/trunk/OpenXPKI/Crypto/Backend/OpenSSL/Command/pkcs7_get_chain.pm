@@ -15,6 +15,7 @@ use English;
 use Data::Dumper;
 use OpenXPKI::FileUtils;
 use OpenXPKI::DN;
+use Encode;
 
 sub get_command
 {
@@ -115,7 +116,7 @@ sub get_result
                                                      TYPE => "X509"});
             $subject = $self->{XS}->get_object_function ({
                            OBJECT   => $x509,
-                           FUNCTION => "openssl_subject"});
+                           FUNCTION => "subject"});
             $self->{XS}->free_object ($x509);
         };
         ##! 4: "eval finished"
@@ -129,6 +130,7 @@ sub get_result
             ##! 8: "general exception detected"
             $EVAL_ERROR->rethrow();
         }
+        $subject = encode_utf8($subject);
     }
     ##! 16: 'subject: ' . $subject
     ##! 2: "create ordered cert list"
