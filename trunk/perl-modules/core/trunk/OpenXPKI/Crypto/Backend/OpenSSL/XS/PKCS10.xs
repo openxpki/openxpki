@@ -197,6 +197,8 @@ pubkey(csr)
 			RSA_print(out,pkey->pkey.rsa,0);
 		else if (pkey->type == EVP_PKEY_DSA)
 			DSA_print(out,pkey->pkey.dsa,0);
+                else if (pkey->type == EVP_PKEY_EC)
+                        EC_KEY_print(out,pkey->pkey.ec,0);
 		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
@@ -264,9 +266,7 @@ keysize (csr)
 	pkey=X509_REQ_get_pubkey(csr);
 	if (pkey != NULL)
 	{
-		if (pkey->type == EVP_PKEY_RSA)
-			BIO_printf(out,"%d", BN_num_bits(pkey->pkey.rsa->n));
-		EVP_PKEY_free(pkey);
+            BIO_printf(out,"%d", EVP_PKEY_bits(pkey));
 	}
 	n = BIO_get_mem_data(out, &length);
 	RETVAL = newSVpvn(length, n);

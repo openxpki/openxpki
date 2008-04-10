@@ -335,9 +335,7 @@ keysize (cert)
 	pkey=X509_get_pubkey(cert);
 	if (pkey != NULL)
 	{
-		if (pkey->type == EVP_PKEY_RSA)
-			BIO_printf(out,"%d", BN_num_bits(pkey->pkey.rsa->n));
-		EVP_PKEY_free(pkey);
+            BIO_printf(out,"%d", EVP_PKEY_bits(pkey));
 	}
 	n = BIO_get_mem_data(out, &length);
 	RETVAL = newSVpvn(length, n);

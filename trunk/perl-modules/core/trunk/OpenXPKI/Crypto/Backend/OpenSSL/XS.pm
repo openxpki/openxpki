@@ -125,6 +125,7 @@ sub get_object_function
     }
 
     my $result = $object->$func();
+    ##! 128: 'result: ' . $result
     ##without pack/unpack the conversion does not work
     ##utf8::upgrade($result) if (defined $result);
     if (defined $result)
