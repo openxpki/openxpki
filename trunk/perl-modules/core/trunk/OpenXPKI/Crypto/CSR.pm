@@ -9,6 +9,7 @@ use warnings;
 package OpenXPKI::Crypto::CSR;
 
 use OpenXPKI::DN;
+use OpenXPKI::Debug;
 use Math::BigInt;
 use Data::Dumper;
 use English;
@@ -94,9 +95,12 @@ sub __init
     }
     foreach my $attr (@attrlist)
     {
+        ##! 16: 'OBJECT: ' . Dumper $self->{csr}
+        ##! 16: 'attr: ' . $attr
         $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function ({
                                                    OBJECT   => $self->{csr},
                                                    FUNCTION => $attr});
+        ##! 16: 'result: ' . $self->{PARSED}->{BODY}->{uc($attr)}
     }
     $self->{TOKEN}->free_object ($self->{csr});
     delete $self->{csr};

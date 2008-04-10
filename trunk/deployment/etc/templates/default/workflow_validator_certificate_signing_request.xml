@@ -1,4 +1,15 @@
 <validators>
+  <validator name="KeyLength"
+             class="OpenXPKI::Server::Workflow::Validator::KeyLength">
+      <param name="min" value="rsaEncryption: 1024, dsaEncryption: 1024, id-ecPublicKey: 191"/>
+      <!-- the following is optional, if you want your users to be able
+           to use arbitrarily long keys, you can comment it -->
+      <param name="max" value="rsaEncryption: 8192, dsaEncryption: 8192, id-ecPublicKey: 800"/>
+      <!-- this defines whether you want to fail if an algorithm is used
+           for which you have not defined a minimal length -->
+      <param name="fail_on_unknown_algorithm" value="1"/>
+  </validator>
+
   <validator name="Bulk"
              class="OpenXPKI::Server::Workflow::Validator::Bulk">
   </validator>

@@ -184,20 +184,23 @@
                         },
                     },
                 );
-                #$m->comp('/lib/debug.mhtml',
-                #    'level' => 1,
-                #    'msg' => 'exec_msg: ' . Dumper $exec_msg,
-                #);
+                $m->comp('/lib/debug.mhtml',
+                    'level' => 1,
+                    'msg' => 'exec_msg: ' . Dumper $exec_msg,
+                );
                 if (exists $exec_msg->{SERVICE_MSG} &&
-                    $exec_msg->{SERVICE_MSG} eq 'ERROR' &&
-                    $exec_msg->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD') {
+                           $exec_msg->{SERVICE_MSG} eq 'ERROR') {
+                  #  $exec_msg->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD') {
+                    $m->comp('/lib/debug.mhtml',
+                        'level' => 1,
+                        'msg' => 'error during generate_key'
+                    );
                     $m->comp ('/service/create_csr/get_password.mhtml',
                                 'password_gen'  => $password_gen,
                                 'workflow_id'   => $workflow_id,
                                 'keytype'       => $keytype,
                                 'keyparameters' => $keyparameters,
-                                'password_bad'  => 1,
-                                 %params,
+                                'msg'           => $exec_msg,
                     );
                 }
                 else {

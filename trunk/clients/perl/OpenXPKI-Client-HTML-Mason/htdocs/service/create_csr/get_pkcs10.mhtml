@@ -26,7 +26,9 @@
 
 <%init>
     use CGI;
+    use Data::Dumper;
     my @errors = ();
+    my $msg;
 
     return ($pkcs10, $subject) if ($pkcs10);
     my %args = $m->request_args();
@@ -52,7 +54,7 @@
     
         if ($pkcs10 !~ /-----BEGIN/) {
             # assume it is
-            my $msg = $context->{client}->send_receive_command_msg(
+            $msg = $context->{client}->send_receive_command_msg(
                 'convert_csr',
                 {
                     DATA => $pkcs10,
@@ -72,7 +74,7 @@
             }
         }
         ## parse the CSR
-        my $msg = $context->{client}->send_receive_command_msg (
+        $msg = $context->{client}->send_receive_command_msg (
                       "get_csr_info_hash_from_data",
                       {DATA => $pkcs10});
         if (exists $msg->{SERVICE_MSG} and
@@ -82,7 +84,21 @@
         } else {
             ## set the parameters
             $subject = $msg->{PARAMS}->{BODY}->{SUBJECT} if (not defined $subject);
-            return ($pkcs10, $subject);
+            ## used for the KeyLength validator, so that the user can
+            ## already be informed at that point that his key is too
+            ## short/long
+            $msg = $m->comp ('/service/create_csr/create_workflow.mhtml',
+                            'workflow_type' => $workflow_type,
+                            'role'          => $role,
+                            'profile'       => $profile,
+                            'subject_style' => $subject_style,
+                            'pkcs10'        => $pkcs10);
+            if (ref $msg eq 'ARRAY' && $msg->[0]->{'LABEL'} =~ m{ \A I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH }xms) {
+                @errors = @{ $msg };
+            }
+            else {
+                return ($pkcs10, $subject);
+            }
         }
     }
 

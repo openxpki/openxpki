@@ -1705,20 +1705,6 @@ msgstr "For information for the registration officers"
 msgid "I18N_OPENXPKI_CONFIG_AUT"
 msgstr "Comment"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESC"
-msgstr ""
-"Here we use an external program to authenticate you. Simply enter your "
-"normal account and passphrase. All other stuff will be done automatically in "
-"the background."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPT"
-msgstr ""
-"Here we use an external program to authenticate you. Simply enter your "
-"normal account and passphrase. All other stuff will be done automatically in "
-"the background."
-
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE"
 msgstr ""
 "You authenticate yourself by signing a random challenge using a trusted "
@@ -1913,6 +1899,10 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_PKCS12_CSP_IS_NOT_ALPHANUMERIC"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_PKCS7_GET_CHAIN_COULD_NOT_CREATE_CHAIN"
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 #, fuzzy
@@ -2736,30 +2726,6 @@ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_I
 msgstr "Certificate Issuance"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCESUCCESS2008"
-msgstr "Certificate Issuance"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUESTPENDING2008"
-msgstr "Pending (in editing state)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUESTSUCCESS2008"
-msgstr "Certificate Revocation Request (CRR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUESTFAILURE2008"
-msgstr "Certificate Signing Request (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUESTSUCCESS2008"
-msgstr "Certificate Signing Request (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CRL_ISSUANCESUCCESS2008"
-msgstr "Test Dummy CA"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTPENDING2007"
 msgstr "Test Dummy CA"
 
@@ -2770,10 +2736,6 @@ msgstr "Test Dummy CA"
 #, fuzzy
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTWAITING_FOR_CHILD"
 msgstr "Waiting to start"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAK8LWN4D7_3"
-msgstr "Test Dummy CA"
 
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA"
 msgstr "Test User CA"
@@ -4326,6 +4288,10 @@ msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_DISPATCHER_DISPATCH_FAILED"
 msgstr "The login of the user __USER__ failed. Please try again."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_DISPATCHER_NO_NOTIFIERS_DEFINED_FOR_PKI_REALM"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_EMPTY_OR_UNDEFINED_CONTENT"
 msgstr ""
 "You called an invalid method at the OpenXPKI server. The illegal method name "
@@ -5117,10 +5083,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_SIGNER_CERT_NOT
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_TYPE_NOT_CONFIGURED"
-msgstr "The SPKAC string is empty."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_UNTRUSTED_CERTIFICATE"
 msgstr "The IP address __IP__ is not compliant to IPv4 and IPv6."
 
@@ -5230,6 +5192,28 @@ msgstr "The SPKAC string is empty."
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
 msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH"
+msgstr "The SPKAC string is empty."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
+msgstr "Keylength validator configuration error: invalid algorithm or length"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING"
+msgstr "Keylength validator configuration error: min entry missing"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM"
+msgstr "Your request contains an invalid algorithm"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE"
+msgstr "Invalid CSR type"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_LONG"
+msgstr "Your key is too long (__GIVEN_LENGTH__ bits, at most __MAX_LENGTH__ bits are allowed)"
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
+msgstr "Your key is too short (__GIVEN_LENGTH__ bits, it needs to have at least __MIN_LENGTH__ bits)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYREUSE_CERTIFICATE_WITH_KEY_ALREADY_EXISTS"
@@ -5675,10 +5659,6 @@ msgid "I18N_OPENXPKI_USERNAME_DESC"
 msgstr "Your username or account, for example 'jdoe'"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_A"
-msgstr "User profile"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_"
 msgstr "Sleep"
 
@@ -5699,10 +5679,6 @@ msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 msgstr "Cancel CSR approval"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVALNEW_STATE"
-msgstr "Cancel CSR approval"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CHANG"
 msgstr "Sleep"
 
@@ -5718,23 +5694,11 @@ msgstr "Change additional information"
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
 msgstr "Change certificate profile"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILENEW_STATE"
-msgstr "Change certificate profile"
-
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
-msgstr "Change role"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLENEW_STATE"
 msgstr "Change role"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
 msgstr "Change subject"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECTNEW_STATE"
-msgstr "Change subject style"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
 msgstr "Change subject alternative name"
@@ -5801,10 +5765,6 @@ msgstr "Create a new workflow instance for certificate issuance"
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
 msgstr "Create a new workflow instance for certificate issuance"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCENEW_STATE_AUTORUN"
-msgstr "Create a new workflow instance for certificate issuance"
-
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
 msgstr "Persist CSR"
 
@@ -5820,10 +5780,6 @@ msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CS"
 msgstr "Reject CSR"
 
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
-msgstr "Reject CSR"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSRNEW_STATE"
 msgstr "Reject CSR"
 
 msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
@@ -5943,10 +5899,6 @@ msgstr "Initializing ..."
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL"
 msgstr "Initializing ..."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PEN"
-msgstr "Pending (in editing state)"
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING"
 msgstr "Pending (in editing state)"
@@ -6123,10 +6075,6 @@ msgstr "Certificate Revocation Request (CRR)"
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA"
 msgstr "Offline part of a Certificate Revocation Request (CRR)"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQ"
-msgstr "Certificate Signing Request (CSR)"
-
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"
 msgstr "Certificate Signing Request (CSR)"
 
@@ -6295,6 +6243,91 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESC"
+#~ msgstr ""
+#~ "Here we use an external program to authenticate you. Simply enter your "
+#~ "normal account and passphrase. All other stuff will be done automatically "
+#~ "in the background."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPT"
+#~ msgstr ""
+#~ "Here we use an external program to authenticate you. Simply enter your "
+#~ "normal account and passphrase. All other stuff will be done automatically "
+#~ "in the background."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCESUCCESS2008"
+#~ msgstr "Certificate Issuance"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUESTPENDING2008"
+#~ msgstr "Pending (in editing state)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUESTSUCCESS2008"
+#~ msgstr "Certificate Revocation Request (CRR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUESTFAILURE2008"
+#~ msgstr "Certificate Signing Request (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUESTSUCCESS2008"
+#~ msgstr "Certificate Signing Request (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CRL_ISSUANCESUCCESS2008"
+#~ msgstr "Test Dummy CA"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAK8LWN4D7_3"
+#~ msgstr "Test Dummy CA"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_TYPE_NOT_CONFIGURED"
+#~ msgstr "The SPKAC string is empty."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_A"
+#~ msgstr "User profile"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVALNEW_STATE"
+#~ msgstr "Cancel CSR approval"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILENEW_STATE"
+#~ msgstr "Change certificate profile"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLENEW_STATE"
+#~ msgstr "Change role"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECTNEW_STATE"
+#~ msgstr "Change subject style"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCENEW_STATE_AUTORUN"
+#~ msgstr "Create a new workflow instance for certificate issuance"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSRNEW_STATE"
+#~ msgstr "Reject CSR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PEN"
+#~ msgstr "Pending (in editing state)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQ"
+#~ msgstr "Certificate Signing Request (CSR)"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_EXTERNAL_CERTIFICATE_TRUST_REQUEST"
+#~ msgstr "External CA Trust"
 
 #~ msgid "I18N_OPENXPKI_CA_ID"
 #~ msgstr "CA Identifier"
@@ -6527,10 +6560,6 @@ msgstr "yes"
 #~ msgstr ""
 #~ "The workflow is missing some required fields (__FIELDS__) for the next "
 #~ "action."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_CONFIGURATION_ERROR_MANDATORY_PARAMETERS_MISSING"
-#~ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_METHOD_RETURNED_FALSE"
@@ -7393,10 +7422,6 @@ msgstr "yes"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_ALL_CHILDREN_SUCCESSFULLY_FINISHED"
-#~ msgstr "The SPKAC string is empty."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS"
 #~ msgstr "The SPKAC string is empty."
 
 #, fuzzy

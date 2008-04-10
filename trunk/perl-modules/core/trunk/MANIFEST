@@ -272,6 +272,7 @@ OpenXPKI/Server/Workflow/Validator/CertRole.pm
 OpenXPKI/Server/Workflow/Validator/CertProfile.pm
 OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
+OpenXPKI/Server/Workflow/Validator/KeyLength.pm
 OpenXPKI/Server/Workflow/Validator/KeyReuse.pm
 OpenXPKI/Server/Workflow/Validator/PKCS10.pm
 OpenXPKI/Server/Workflow/Validator/SPKAC.pm
