@@ -39,7 +39,7 @@
   </handler>
   <handler name="Signature" type="X509">
     <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE</description>
-    <trust_anchors>your,identifiers,here</trust_anchors>
+    <trust_anchors>your,identifiers,or,realms,here</trust_anchors>
     <pkcs7tool>testsceppkcs7tool1</pkcs7tool>
     <challenge_length>256</challenge_length>
   </handler>

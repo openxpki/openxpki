@@ -60,9 +60,8 @@
            
       <param name="trust_anchors" value="identifier1,identifier2,..."/>
 
-      Feature request: allow Realms instead of identifiers, too
-      Code should replace the realm by all configured identifiers in
-      that realm. 
+      Alternatively, you can also specify realms, which will then be
+      replaced by all CA identifiers defined in that realm
       -->
 
   </validator>

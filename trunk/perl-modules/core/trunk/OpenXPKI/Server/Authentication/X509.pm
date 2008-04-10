@@ -43,15 +43,16 @@ sub new {
 
     my $trust_anchors;
     my @trust_anchors;
+    my @temp_trust_anchors;
     eval {
         $trust_anchors = $config->get_xpath(
             XPATH    => [ @{$keys->{XPATH}},   "trust_anchors" ],
             COUNTER  => [ @{$keys->{COUNTER}}, 0 ],
             CONFIG_ID => $keys->{CONFIG_ID},
         );
-        @trust_anchors = split(q{,}, $trust_anchors);
+        @temp_trust_anchors = split(q{,}, $trust_anchors);
     };
-    if (! scalar @trust_anchors || $EVAL_ERROR) {
+    if (! scalar @temp_trust_anchors || $EVAL_ERROR) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_TRUST_ANCHOR_CONFIGURATION',
             params  => {
@@ -60,6 +61,29 @@ sub new {
             },
         );
     }
+    my $realms = CTX('pki_realm');
+    my @pki_realms = keys %{ $realms };
+    ##! 16: 'pki_realms: ' . Dumper \@pki_realms
+    foreach my $trust_anchor (@temp_trust_anchors) {
+        if (grep { $_ eq $trust_anchor } @pki_realms) {
+            ##! 16: $trust_anchor . ' is a PKI realm'
+            # this trust anchor is not an identifier, but a PKI realm,
+            # we'll have to replace it by all defined CAs for that realm
+            my @ca_ids = keys %{ $realms->{$trust_anchor}->{ca}->{id} };
+            foreach my $ca_id (@ca_ids) {
+              ##! 16: 'ca_id: ' . $ca_id
+              push @trust_anchors, 
+                $realms->{$trust_anchor}->{ca}->{id}->{$ca_id}->{identifier};
+            }
+        }
+        else {
+            ##! 16: $trust_anchor . ' seems to be an identifier'
+            # just your regular identifier
+            push @trust_anchors, $trust_anchor;
+        }
+    }
+    ##! 16: 'trust_anchors: ' . Dumper \@trust_anchors
+
     $self->{TRUST_ANCHORS} = \@trust_anchors;
     eval {
         $self->{PKCS7TOOL} = $config->get_xpath(

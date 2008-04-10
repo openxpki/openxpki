@@ -238,9 +238,8 @@ sub validate {
     }
     ##! 64: 'signer_chain_server: ' . Dumper \@signer_chain_server
 
-
-    my @trust_anchors = split q{,}, $self->trust_anchors();
-    if (! scalar @trust_anchors) {
+    my @temp_trust_anchors = split q{,}, $self->trust_anchors();
+    if (! scalar @temp_trust_anchors) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_NO_TRUST_ANCHORS_DEFINED',
             log     => {
@@ -249,6 +248,30 @@ sub validate {
                 facility => 'system',
             },
         );  
+    }
+    # FIXME - the code replacing the PKI realms is a duplication form
+    # Authentication/X509.pm, this should only be in one place ...
+    my $realms = CTX('pki_realm');
+    my @pki_realms = keys %{ $realms };
+    my @trust_anchors;
+    ##! 16: 'pki_realms: ' . Dumper \@pki_realms
+    foreach my $trust_anchor (@temp_trust_anchors) {
+        if (grep { $_ eq $trust_anchor } @pki_realms) {
+            ##! 16: $trust_anchor . ' is a PKI realm'
+            # this trust anchor is not an identifier, but a PKI realm,
+            # we'll have to replace it by all defined CAs for that realm
+            my @ca_ids = keys %{ $realms->{$trust_anchor}->{ca}->{id} };
+            foreach my $ca_id (@ca_ids) {
+              ##! 16: 'ca_id: ' . $ca_id
+              push @trust_anchors,
+                $realms->{$trust_anchor}->{ca}->{id}->{$ca_id}->{identifier};
+            }
+        }
+        else {
+            ##! 16: $trust_anchor . ' seems to be an identifier'
+            # just your regular identifier
+            push @trust_anchors, $trust_anchor;
+        }
     }
     ##! 64: 'trust anchors: ' . Dumper \@trust_anchors
 
