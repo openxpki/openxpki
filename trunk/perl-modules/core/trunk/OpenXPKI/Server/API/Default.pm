@@ -757,7 +757,7 @@ sub get_approval_message {
         elsif (defined $spkac) {
             $hash = sha1_base64($spkac);
         }
-        elsif (defiend $pkcs10) {
+        elsif (defined $pkcs10) {
             $hash = sha1_base64($pkcs10);
         }
         # translate message
