@@ -1491,6 +1491,17 @@ sub get_pki_realms
                 ##! 16: '@files: ' . Dumper(\@files)
                 $realms{$name}->{ca}->{id}->{$ca_id}->{crl_files} = \@files;
             };
+            # the default crl_issuer is the CA itself, unless configured
+            # otherwise:
+            $realms{$name}->{ca}->{id}->{$ca_id}->{crl_issuer} = $ca_id;
+            eval {
+                my $issuer = $config->get_xpath(
+                    XPATH   => [ @base_path, 'issuer' ],
+                    COUNTER => [ @base_ctr , 0        ],
+                    CONFIG_ID => $cfg_id,
+                );
+                $realms{$name}->{ca}->{id}->{$ca_id}->{crl_issuer} = $issuer;
+            };
         }
 
         # get all SCEP identifier for the PKI realm
