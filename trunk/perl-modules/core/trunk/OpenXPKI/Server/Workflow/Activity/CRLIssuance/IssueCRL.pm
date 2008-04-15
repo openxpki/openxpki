@@ -51,19 +51,15 @@ sub execute {
     my $current_ca = $ca_ids[0];
     my $pki_realm = CTX('api')->get_pki_realm();
     my $ca_identifier = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{ca}->{id}->{$current_ca}->{identifier};
-    my $certificate   = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{ca}->{id}->{$current_ca}->{certificate};
-    my $crl_issuer    = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{ca}->{id}->{$current_ca}->{crl_issuer};
+    my $certificate = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{ca}->{id}->{$current_ca}->{certificate};
     ##! 16: 'ca_identifier: ' . $ca_identifier
-    ##! 16: 'crl_issuer: ' . $crl_issuer
     my $tm = CTX('crypto_layer');
     my $ca_token = $tm->get_token(
-        TYPE        => 'CA',
-        ID          => $crl_issuer,
-        PKI_REALM   => $pki_realm,
+        TYPE      => 'CA',
+        ID        => $current_ca,
+        PKI_REALM => $pki_realm,
         CERTIFICATE => $certificate,
     );
-
-    # FIXME: iterate over all <issue_for> identifiers, if present
 
     # we want all identifiers and data for certificates that are
     # already in the certificate database with status 'REVOKED'

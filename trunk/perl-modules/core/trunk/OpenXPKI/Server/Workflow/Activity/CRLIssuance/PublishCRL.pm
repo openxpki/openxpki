@@ -57,7 +57,6 @@ sub execute {
 	    message => "I18N_OPENXPKI_ACTIVITY_CRLISSUANCE_PUBLISHCRL_CRL_FILES_IS_NOT_ARRAYREF",
         );
     }
-    # FIXME: iterate over all <issue_for> identifiers, if present
     my $dbi = CTX('dbi_backend');
     my $crl_db = $dbi->first(
         TABLE   => 'CRL',

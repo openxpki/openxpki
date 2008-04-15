@@ -133,10 +133,6 @@
       </cert>
       [% IF $ca.crl_publication_file_format && $ca.crl_publication_file_name %]
       <crl_publication>
-        <!-- if the CRL is not to be issued by this CA, but by another one,
-             you can optionally configure this using
-               <issuer>ca_identifier</issuer>
-        -->
         <file>
             <filename>[% $ca.crl_publication_file_name %]</filename>
             <format>[% $ca.crl_publication_file_format %]</format>
