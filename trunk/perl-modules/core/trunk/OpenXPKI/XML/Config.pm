@@ -231,6 +231,20 @@ sub __get_fixed_params
     return %params;
 }
 
+sub xml_simple {
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $cfg_id;
+    if (ref $arg_ref eq 'HASH' && exists $arg_ref->{CONFIG_ID}) {
+        $cfg_id  = $arg_ref->{CONFIG_ID};
+    }
+    if (! defined $cfg_id) {
+        return $self->{CACHE}->{default}->xml_simple (@_);
+    }
+    else {
+        return $self->{CACHE}->{$cfg_id}->xml_simple (@_);
+    }
+}
 sub dump
 {
     my $self    = shift;
@@ -352,4 +366,12 @@ structure internally, such as Workflow.pm
 
 =head2 dump
 
-This call is directly passed to the XML cache.
+This call is directly passed to the XML cache specified by a config
+identifier (parameter CONFIG_ID). If no config identifier is 
+specified, it is passed to the default cache.
+
+=head2 xml_simple
+
+This call is directly passed to the XML cache specified by a config
+identifier (parameter CONFIG_ID). If no config identifier is 
+specified, it is passed to the default cache.

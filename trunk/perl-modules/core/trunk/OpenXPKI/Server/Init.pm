@@ -35,8 +35,12 @@ use OpenXPKI::Server::Context qw( CTX );
                 
 use OpenXPKI::Crypto::X509;
 
+use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Serialization::Fast;
+
 use Data::Dumper;
 
+use Test::More;
 
 use Digest::SHA1 qw( sha1_base64 );
 
@@ -799,16 +803,112 @@ sub get_xml_config {
 
     ##! 1: "start"
     my @serializations = ();
-    my $ser = OpenXPKI::Serialization::Simple->new();
+
     my $curr_config_ser = $current_xml_config->get_serialized();
     ##! 16: 'serialized current config: ' . $curr_config_ser
-    # TODO
-    # - check whether current config is in DB, if not, add
-    # - iterate over all DB entries and add them to @serializations
-    push @serializations, $curr_config_ser;
-
     my $curr_config_id = sha1_base64($curr_config_ser);
     ##! 16: 'curr config ID: ' . $curr_config_id
+
+    # get all current configuration entries from the database
+    CTX('dbi_backend')->connect();
+    my $config_entries = CTX('dbi_backend')->select(
+        TABLE   => 'CONFIG',
+        DYNAMIC => {
+            CONFIG_IDENTIFIER => '%',
+        },
+    );
+    CTX('dbi_backend')->disconnect();
+
+    if (! defined $config_entries
+        || ref $config_entries ne 'ARRAY') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_INIT_GET_XML_CONFIG_CONFIG_DB_ERROR',
+        );
+    }
+
+    ### migration from old serialization format to new one ...
+
+   CONFIG:
+    foreach my $config (@{ $config_entries }) {
+        # the database entry _might_ still use the old Serialization::Simple
+        # format, so we check for this and convert if necessary ...
+        if ($config->{DATA} =~ m{ \A HASH }xms) {
+            my $old_identifier = $config->{CONFIG_IDENTIFIER};
+            my $ser_simple = OpenXPKI::Serialization::Simple->new();
+            my $ser_fast   = OpenXPKI::Serialization::Fast->new();
+
+            my $deserialized_config = $ser_simple->deserialize($config->{DATA});
+            ##! 128: 'deserialized config: ' . Dumper $deserialized_config
+
+            my $xs = $current_xml_config->xml_simple();
+            ##! 128: 'xs: ' . Dumper $xs
+
+            if (Test::More::_deep_check($deserialized_config, $xs)) {
+                ##! 16: 'current config found in db, deleting it'
+                # this is the current config, just delete it, it will
+                # be added again anyways ...
+                CTX('dbi_backend')->connect();
+                CTX('dbi_backend')->delete(
+                    TABLE => 'CONFIG',
+                    DATA  => {
+                        'CONFIG_IDENTIFIER' => $old_identifier,
+                    },
+                );
+                CTX('dbi_backend')->commit();
+                CTX('dbi_backend')->disconnect();
+                # update references in workflow_context
+                CTX('dbi_workflow')->connect();
+                CTX('dbi_workflow')->update(
+                    TABLE => 'WORKFLOW_CONTEXT',
+                    DATA  => {
+                        'WORKFLOW_CONTEXT_VALUE' => $curr_config_id,
+                    },
+                    WHERE => {
+                        'WORKFLOW_CONTEXT_KEY'   => 'config_id',
+                        'WORKFLOW_CONTEXT_VALUE' => $old_identifier,
+                    },
+                );
+                CTX('dbi_workflow')->commit();
+                CTX('dbi_workflow')->disconnect();
+                next CONFIG;
+            }
+            my $new_identifier = sha1_base64($config->{DATA});
+            ##! 16: 'old_identifier: ' . $old_identifier
+            ##! 16: 'new_identifier: ' . $new_identifier
+
+            # update config database
+            CTX('dbi_backend')->connect();
+            CTX('dbi_backend')->update(
+                TABLE => 'CONFIG',
+                DATA  => {
+                    CONFIG_IDENTIFIER => $new_identifier,
+                    DATA              => $config->{DATA},
+                },
+                WHERE => {
+                    CONFIG_IDENTIFIER => $old_identifier,
+                },
+            );
+            CTX('dbi_backend')->commit();
+            CTX('dbi_backend')->disconnect();
+
+            # update references in workflow_context
+            CTX('dbi_workflow')->connect();
+            CTX('dbi_workflow')->update(
+                TABLE => 'WORKFLOW_CONTEXT',
+                DATA  => {
+                    'WORKFLOW_CONTEXT_VALUE' => $new_identifier,
+                },
+                WHERE => {
+                    'WORKFLOW_CONTEXT_KEY'   => 'config_id',
+                    'WORKFLOW_CONTEXT_VALUE' => $old_identifier,
+                },
+            );
+            CTX('dbi_workflow')->commit();
+            CTX('dbi_workflow')->disconnect();
+        }
+    }
+
+    # check whether current config is already in database, if not, add it
     CTX('dbi_backend')->connect();
     my $curr_config_db = CTX('dbi_backend')->first(
         TABLE   => 'CONFIG',
@@ -828,14 +928,18 @@ sub get_xml_config {
         );
         CTX('dbi_backend')->commit();
     }
-    # get all configuration entries from the database
-    my $config_entries = CTX('dbi_backend')->select(
+    CTX('dbi_backend')->disconnect();
+
+    # get the new list of config entries
+    CTX('dbi_backend')->connect();
+    $config_entries = CTX('dbi_backend')->select(
         TABLE   => 'CONFIG',
         DYNAMIC => {
             CONFIG_IDENTIFIER => '%',
         },
     );
     CTX('dbi_backend')->disconnect();
+
     if (! defined $config_entries
         || ref $config_entries ne 'ARRAY'
         || scalar @{ $config_entries } == 0) {
@@ -844,6 +948,7 @@ sub get_xml_config {
         );
     }
     foreach my $config (@{ $config_entries }) {
+        ##! 128: 'config->{DATA}: ' . $config->{DATA}
         push @serializations, $config->{DATA};
     }
     ##! 16: '# of serializations: ' . scalar @serializations

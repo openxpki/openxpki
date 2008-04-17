@@ -286,6 +286,7 @@ OpenXPKI/Server/Workflow/Validator/Bulk.pm
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm
 OpenXPKI/Serialization/Simple.pm
+OpenXPKI/Serialization/Fast.pm
 OpenXPKI/Serialization/JSON.pm
 OpenXPKI/Service.pm
 OpenXPKI/Service/Default.pm

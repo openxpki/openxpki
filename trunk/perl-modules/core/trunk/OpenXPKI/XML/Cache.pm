@@ -30,7 +30,7 @@ $XML::SAX::ParserPackage = "XML::SAX::PurePerl";
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Serialization::Fast;
 
 use Memoize;
 
@@ -95,7 +95,7 @@ sub init
 
     if ($self->{serialized_cache}) {
         ##! 16: 'serialized cache exists, using it'
-        my $ser = OpenXPKI::Serialization::Simple->new();
+        my $ser = OpenXPKI::Serialization::Fast->new();
         $self->{cache} = $ser->deserialize($self->{serialized_cache});
         ##! 16: 'deserialized cache: ' . Dumper $self->{cache}
         return 1;
@@ -146,7 +146,7 @@ sub init
 sub get_serialized {
     my $self = shift;
 
-    my $ser = OpenXPKI::Serialization::Simple->new();
+    my $ser = OpenXPKI::Serialization::Fast->new();
     return $ser->serialize($self->{cache});
 }
 
@@ -920,6 +920,11 @@ sub __get_serialized_xpath
     return $result;
 }
 
+sub xml_simple {
+    my $self = shift;
+    return $self->{cache};
+}
+
 1;
 __END__
 
@@ -996,3 +1001,7 @@ result is the number of available values with the specified path.
 The interface is the same like for get_xpath_count. Only the return
 value is different. It returns an array reference to the found
 values.
+
+=head2 xml_simple
+
+Returns the XML::Simple data structure.
