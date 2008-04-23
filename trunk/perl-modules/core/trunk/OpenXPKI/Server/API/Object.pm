@@ -101,6 +101,13 @@ sub get_cert
     if ($format eq 'HASH') {
         ##! 16: 'status: ' . $hash->{STATUS}
         my $return_ref = $obj->get_parsed_ref();
+        # NOTBEFORE and NOTAFTER are DateTime objects, which we do
+        # not want to be serialized, so we just send out the stringified
+        # version ...
+        $return_ref->{BODY}->{NOTBEFORE}
+            = "$return_ref->{BODY}->{NOTBEFORE}";
+        $return_ref->{BODY}->{NOTAFTER} 
+            = "$return_ref->{BODY}->{NOTAFTER}";
         $return_ref->{STATUS} = $hash->{STATUS};
         $return_ref->{ROLE}   = $hash->{ROLE};
         $return_ref->{ISSUER_IDENTIFIER} = $hash->{ISSUER_IDENTIFIER};
