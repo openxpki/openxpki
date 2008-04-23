@@ -706,24 +706,20 @@ msgstr "Enter your own password"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GEN_PASSWORD_SERVERSIDE"
 msgstr "Server-side password generation"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_CSP"
-msgstr "Create private key"
+msgstr "Cryptographic Service Provider"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DEFAULT_CSP"
 msgstr "Default Cryptographic Service Provider"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DESCRIPTION"
-msgstr "Now you can generate a new SPKAC key with your browser."
+msgstr "Using the form below, you can create a private key on your machine using Internet Explorer. You can choose a Cryptographic Service Provider (CSP) to use from the ones installed on your machine. This also allows you to create the key on a smartcard, for example."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_KEY_LENGTH"
-msgstr "Create private key"
+msgstr "Key length"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_TITLE"
-msgstr "Create private key"
+msgstr "Create private key using Internet Explorer"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_INFO_DESCRIPTION"
 msgstr "Please enter now some additional information."
@@ -1003,9 +999,8 @@ msgstr "+5"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_"
 msgstr "Subject alternative name"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_IE_PKCS10"
-msgstr "PKCS#10"
+msgstr "Create private key"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATOR"
 msgstr "Creator"
@@ -1076,11 +1071,11 @@ msgstr "Choose authentication method"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
 msgstr ""
-"This page is only used to install a certificate to a corresponding private "
-"key with a Microsoft Internet Explorer. The necessary actions will be "
-"started automatically with the download of this page. If you do not have a "
-"private key for the selected certificate or you have no Internet Explorer "
-"then this page is fully useless for you."
+"Please click on 'Install certificate' to install a certificate for a corresponding private "
+"key with Microsoft Internet Explorer. You can also choose a Cryptographic "
+"Service Provider (CSP) to use for installation. If you do not have a "
+"private key for the selected certificate or you are not using Internet Explorer "
+"then this page is useless for you."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
 msgstr "Certificate installed successfully"
