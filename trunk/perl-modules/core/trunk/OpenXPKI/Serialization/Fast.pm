@@ -34,7 +34,7 @@ sub serialize {
     my $self = shift;
     my $data = shift;
 
-    return $self->{DS}->serialize($data);
+    return $self->{DS}->serialize([ $data ]);
 }
 
 sub deserialize {
@@ -42,7 +42,13 @@ sub deserialize {
     my $msg  = shift;
 #    Encode::_utf8_off($msg);
 
-    return $self->{DS}->deserialize($msg);
+    my $content = $self->{DS}->deserialize($msg);
+    if (ref $content ne 'ARRAY') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERIALIZATION_FAST_DESERIALIZE_INCORRECT_SERIALIZATION_FORMAT',
+        );
+    }
+    return $content->[0];
 }
 
 1;
