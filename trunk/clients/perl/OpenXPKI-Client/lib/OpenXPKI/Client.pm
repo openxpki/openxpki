@@ -25,6 +25,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Transport::Simple;
 use OpenXPKI::Serialization::Simple;
 eval { use OpenXPKI::Serialization::JSON; };
+eval { use OpenXPKI::Serialization::Fast; };
 
 $OUTPUT_AUTOFLUSH = 1;
 
@@ -33,7 +34,7 @@ use Data::Dumper;
 
 my %socketfile             : ATTR( :init_arg<SOCKETFILE> );
 my %transport_protocol     : ATTR( :init_arg<TRANSPORT>     :default('Simple') );
-my %serialization_protocol : ATTR( :init_arg<SERIALIZATION> :default('Simple') );
+my %serialization_protocol : ATTR( :init_arg<SERIALIZATION> :default('Fast')   );
 my %service_protocol       : ATTR( :init_arg<SERVICE>       :default('Default') );
 my %read_timeout           : ATTR( :init_arg<TIMEOUT>       :default(30) :set<timeout> );
 
@@ -100,6 +101,7 @@ sub talk {
                 message => 'I18N_OPENXPKI_CLIENT_TALK_ERROR_DURING_WRITE',
                 params  => {
                     'EVAL_ERROR' => $EVAL_ERROR,
+                    'ARGUMENT'   => $arg,
                 },
             );
         }
@@ -468,8 +470,8 @@ sub __init_serialization_protocol : PRIVATE {
     }
 
     ##! 8: "intializing serialization protocol"
-    # FIXME: dynamically attach serializer
-    $serialization{$ident} = OpenXPKI::Serialization::Simple->new();
+    my $class = "OpenXPKI::Serialization::" . $serialization_protocol{$ident};
+    $serialization{$ident} = $class->new();
 
     # initialize communication state; the first message must be a write
     # operation to the socket

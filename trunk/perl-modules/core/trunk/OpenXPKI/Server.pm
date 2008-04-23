@@ -444,7 +444,7 @@ sub do_process_request
     my $serializer = undef;
     my $msg = $transport->read();
 
-    if ($msg =~ m{ \A (?:Simple|JSON) \z }xms) {
+    if ($msg =~ m{ \A (?:Simple|JSON|Fast) \z }xms) {
 	eval "\$serializer = OpenXPKI::Serialization::$msg->new();";
 
 	if (! defined $serializer) {
@@ -581,25 +581,6 @@ sub __get_user_interfaces
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_TRANSPORT_FAILED",
-                params  => {EVAL_ERROR => $EVAL_ERROR,
-                            MODULE     => $class});
-        }
-    }
-
-    ##! 2: "init serializers"
-
-    $count = $config->get_xpath_count (XPATH => "common/server/serialization");
-    for (my $i=0; $i < $count; $i++)
-    {
-        my $class = $config->get_xpath (
-	    XPATH   => "common/server/serialization",
-	    COUNTER => $i);
-	$class = "OpenXPKI::Serialization::".$class;
-        eval "use $class;";
-        if ($EVAL_ERROR)
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_SERIALIZATION_FAILED",
                 params  => {EVAL_ERROR => $EVAL_ERROR,
                             MODULE     => $class});
         }

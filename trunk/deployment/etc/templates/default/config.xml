@@ -20,9 +20,6 @@
 [% FOREACH item = server.transport %]
         <transport>[%     item %]</transport>
 [% END %]
-[% FOREACH item = server.serialization %]
-        <serialization>[% item %]</serialization>
-[% END %]
 [% FOREACH item = server.service %]
         <service>[%       item %]</service>
 [% END %]
