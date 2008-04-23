@@ -26,6 +26,12 @@
 [% FOREACH item = server.service %]
         <service>[%       item %]</service>
 [% END %]
+[% FOREACH var IN environment.keys %]
+        <environment>
+            <variable>[% var %]</variable>
+            <value>[% environment.$var %]</value>
+        </environment>
+[% END %]
     </server>
     <i18n>
         <locale_directory>[% dir.localedir %]</locale_directory>

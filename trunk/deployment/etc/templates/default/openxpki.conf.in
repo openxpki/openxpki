@@ -387,3 +387,8 @@ ca_cert: no
 
 # This key works if ldappublic.use_sasl is set to 'yes'
 sasl_mechanism: EXTERNAL
+
+# if you need additional (shell) environment variables ...
+#[environment]
+#LD_LIBRARY_PATH: /usr/local/lib
+#PATH: /usr/local/bin

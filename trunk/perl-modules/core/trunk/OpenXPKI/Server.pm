@@ -227,6 +227,26 @@ sub post_bind_hook {
         }
     }
 
+    my $environment_count = 0;
+    eval {
+        $environment_count = CTX('xml_config')->get_xpath_count(
+            XPATH => 'common/server/environment',
+        );
+    };
+    ##! 16: 'environment count: ' . $environment_count
+    for (my $i = 0; $i < $environment_count; $i++) {
+        my $var = CTX('xml_config')->get_xpath(
+            XPATH   => [ 'common', 'server', 'environment', 'variable' ],
+            COUNTER => [ 0       , 0       , $i           , 0          ],
+        );
+        my $value = CTX('xml_config')->get_xpath(
+            XPATH   => [ 'common', 'server', 'environment', 'value' ],
+            COUNTER => [ 0       , 0       , $i           , 0       ],
+        );
+        ##! 16: "ENV{$var} = $value"
+        $ENV{$var} = $value;
+    }
+
     return 1;
 }
 
