@@ -34,7 +34,7 @@ use Data::Dumper;
 
 my %socketfile             : ATTR( :init_arg<SOCKETFILE> );
 my %transport_protocol     : ATTR( :init_arg<TRANSPORT>     :default('Simple') );
-my %serialization_protocol : ATTR( :init_arg<SERIALIZATION> :default('Fast')   );
+my %serialization_protocol : ATTR( :init_arg<SERIALIZATION> :default('Simple') );
 my %service_protocol       : ATTR( :init_arg<SERVICE>       :default('Default') );
 my %read_timeout           : ATTR( :init_arg<TIMEOUT>       :default(30) :set<timeout> );
 
