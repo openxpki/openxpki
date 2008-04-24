@@ -400,6 +400,7 @@ t/25_crypto/35_object_pkcs7.t
 t/25_crypto/50_symmetric_cipher.t
 t/25_crypto/51_volatile_vault.t
 t/25_crypto/52_object_secret.t
+t/25_crypto/53_is_issuer.t
 t/25_crypto/token.xml
 t/25_crypto/profile.xml
 #t/25_crypto/certs/01.pem
