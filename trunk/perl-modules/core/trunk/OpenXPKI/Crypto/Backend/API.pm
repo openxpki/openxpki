@@ -86,6 +86,10 @@ sub __init_command_params : PRIVATE {
     "get_pkcs8_keytype" => { 'DATA'   => 1,
                             'PASSWD' => 1,
                            },
+    'is_issuer'       => {
+                            'CERT'             => 1,
+                            'POTENTIAL_ISSUER' => 1,
+                         },
     "is_prime"        => {"PRIME"   => 1,
                          },
     "issue_cert"      => {"PROFILE" => 1,

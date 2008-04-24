@@ -87,6 +87,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs12.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/get_pkcs8_keytype.pm
 
+OpenXPKI/Crypto/Backend/OpenSSL/Command/is_issuer.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/is_prime.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/issue_cert.pm
