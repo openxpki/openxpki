@@ -418,6 +418,7 @@ t/30_dbi/README
 t/30_dbi/01.t
 t/30_dbi/02.t
 t/30_dbi/03.t
+t/30_dbi/04_quoting_bug.t
 t/30_dbi/70.t
 t/30_dbi/common.pl
 t/30_dbi/database.xml
