@@ -28,6 +28,28 @@ our %config = (
               NAME   => "t/30_dbi/sqlite.db",
               LOG    => $log
              );
+if ($ENV{'OPENXPKI_TEST_DB'} eq 'MySQL') {
+    my $username = 'openxpki_test';
+    my $password = 'openxpki_test'; # yay, a default password :-)
+    my $name     = 'openxpki_test';
+    # make it possible to override test settings using environment variables
+    if (exists $ENV{'OPENXPKI_TEST_DB_MYSQL_USERNAME'}) {
+        $username = $ENV{'OPENXPKI_TEST_DB_MYSQL_USERNAME'};
+    }
+    if (exists $ENV{'OPENXPKI_TEST_DB_MYSQL_PASSWORD'}) {
+        $password = $ENV{'OPENXPKI_TEST_DB_MYSQL_PASSWORD'};
+    }
+    if (exists $ENV{'OPENXPKI_TEST_DB_MYSQL_DATABASE'}) {
+        $name = $ENV{'OPENXPKI_TEST_DB_MYSQL_DATABASE'};
+    }
+    %config = (
+        TYPE   => 'MySQL',
+        NAME   => $name,
+        USER   => $username,
+        PASSWD => $password,
+        LOG    => $log,
+    );
+}
 our $dbi = OpenXPKI::Server::DBI->new (%config);
 
 ok($dbi && ref $dbi, 'DBI instantiation');

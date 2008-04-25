@@ -25,7 +25,7 @@ if ($ENV{DEBUG}) {
 }
 
 ## database schema init
-$sqlscript = eval { $dbi->init_schema () };
+$sqlscript = eval { $dbi->init_schema (MODE => 'FORCE') };
 ok(! $EVAL_ERROR, 'init_schema') or diag $EVAL_ERROR;
 
 1;
