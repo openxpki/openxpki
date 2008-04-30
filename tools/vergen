@@ -98,7 +98,7 @@ sub get_revision_info {
 	    # but rather pulls from another repository. assume that the
 	    # svn revision information is available in git full text logs.
 	    
-	    open $fh, qq{ $git log --pretty=format:"%b" | };
+	    open $fh, qq{ $git log --pretty=email | };
 	  GITLOGLINE:
 	    while (my $line = <$fh>) {
 		chomp $line;
