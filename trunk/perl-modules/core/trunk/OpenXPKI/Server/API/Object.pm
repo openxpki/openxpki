@@ -92,6 +92,14 @@ sub get_cert
                        IDENTIFIER => $identifier,
                    },
                   );
+    if (! defined $hash) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB',
+            params  => {
+                'IDENTIFIER' => $identifier,
+            },
+        );
+    }
     my $realm = CTX('session')->get_pki_realm();
     my $token = CTX('pki_realm')->{$realm}->{crypto}->{default};
     my $obj   = OpenXPKI::Crypto::X509->new(TOKEN => $token,
