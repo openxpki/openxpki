@@ -9,6 +9,7 @@ use warnings;
 package OpenXPKI::Crypto::CRL;
 
 use OpenXPKI::Debug;
+use DateTime::Format::DateParse;
 
 use base qw(OpenXPKI::Crypto::Object);
 

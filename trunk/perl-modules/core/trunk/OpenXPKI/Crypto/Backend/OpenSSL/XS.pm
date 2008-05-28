@@ -18,6 +18,7 @@ use English;
 
 use File::Spec;
 use DateTime;
+use DateTime::Format::DateParse;
 
 sub new
 {
@@ -156,18 +157,18 @@ sub get_object_function
 
     ## parse dates
     if (defined $result && (($func eq "notbefore") || ($func eq "notafter"))) {
-
-	# seconds since the epoch
-    ##! 16: 'result: ' . $result
-    my $dt_object = DateTime::Format::DateParse->parse_datetime($result, 'UTC');
-	if (! defined $dt_object) {
-	    OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_FUNCTION_DATE_PARSING_ERROR",
-            params  => {
-                DATE => $result,
-            },
-		);
-	}
+        ##! 16: 'result: ' . $result
+        my $dt_object = DateTime::Format::DateParse->parse_datetime($result, 'UTC');
+        if (! defined $dt_object || ref $dt_object ne 'DateTime') {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_FUNCTION_DATE_PARSING_ERROR",
+                params  => {
+                    DATE => $result,
+                },
+            );
+        }
+        $result = $dt_object;
+    }
     
     return $result;
 }
