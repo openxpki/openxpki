@@ -99,6 +99,13 @@ sub __init
 		OBJECT   => $self->{x509},
 		FUNCTION => $attr,
 	    });
+        if ($attr eq 'serial') {
+            # add serial in hex as well so clients do not have to convert
+            # it themselves
+            my $serial = Math::BigInt->new($self->{PARSED}->{BODY}->{SERIAL});
+            $self->{PARSED}->{BODY}->{SERIAL_HEX} = $serial->as_hex();
+            $self->{PARSED}->{BODY}->{SERIAL_HEX} =~ s{\A 0x}{}xms;
+        }
     }
     $self->{TOKEN}->free_object ($self->{x509});
     delete $self->{x509};

@@ -215,7 +215,7 @@
   my $issuer_identifier = $msg->{PARAMS}->{ISSUER_IDENTIFIER};
   my $fingerprint = $params->{FINGERPRINT};
   my $serial      = $params->{SERIAL};
-  $serial .= ' (0x' . sprintf("%0x", $serial) . ')';
+  $serial .= ' (0x' . $params->{SERIAL_HEX} . ')';
   my $status      = $msg->{PARAMS}->{STATUS};
   my $keyusage;
   my $extended_keyusage;

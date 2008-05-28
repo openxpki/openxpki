@@ -265,7 +265,7 @@
     $expired = 1;
   }
   my $serial = $params->{SERIAL};
-  $serial .= ' (0x' . sprintf("%X", $serial) . ')';
+  $serial .= ' (0x' . $params->{SERIAL_HEX} . ')';
   my $subject = $params->{SUBJECT};
   $subject =~ s/,/, /g;
   my $issuer = $params->{ISSUER};
