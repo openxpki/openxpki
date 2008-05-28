@@ -136,7 +136,7 @@ are an ARRAY too which contains the certificate and the timestamp. The
 certificate can be a PEM encoded X.509v3 certificate or it must
 be a reference to an OpenXPKI::Crypto::Backend::OpenSSL::X509 object. The
 timestamp must be a timestamp which is automatically parseable
-by Date::Parse.
+by DateTime::Format::DateParse.
 
 =back
 

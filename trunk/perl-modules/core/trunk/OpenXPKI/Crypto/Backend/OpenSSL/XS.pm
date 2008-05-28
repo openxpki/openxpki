@@ -17,7 +17,6 @@ use OpenXPKI::Exception;
 use English;
 
 use File::Spec;
-use Date::Parse;
 use DateTime;
 
 sub new
@@ -160,24 +159,15 @@ sub get_object_function
 
 	# seconds since the epoch
     ##! 16: 'result: ' . $result
-	my $epoch = str2time($result, 'UTC');
-    ##! 16: 'epoch: ' . $epoch
-	if (! defined $epoch) {
+    my $dt_object = DateTime::Format::DateParse->parse_datetime($result, 'UTC');
+	if (! defined $dt_object) {
 	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_FUNCTION_DATE_PARSING_ERROR",
-		params  => {
-		    DATE => $result,
-		},
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_FUNCTION_DATE_PARSING_ERROR",
+            params  => {
+                DATE => $result,
+            },
 		);
 	}
-	
-	my $dt_object = DateTime->from_epoch(epoch => $epoch, time_zone => 'UTC');
-
-	# make sure we use UTC
-    #$dt_object->set_time_zone('UTC');
-
-	$result = $dt_object;
-    }
     
     return $result;
 }

@@ -21,7 +21,6 @@ XSLoader::load ("OpenXPKI", $VERSION);
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use Date::Parse;
 use DateTime;
 use Scalar::Util qw( blessed );
 use Fcntl qw (:DEFAULT);

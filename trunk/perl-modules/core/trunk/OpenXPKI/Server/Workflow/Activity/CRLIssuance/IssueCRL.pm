@@ -14,7 +14,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Crypto::Profile::CRL;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Crypto::CRL;
-use Date::Parse;
 
 use Data::Dumper;
 

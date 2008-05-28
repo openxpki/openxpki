@@ -33,7 +33,6 @@ use OpenXPKI::Debug;
 use OpenXPKI qw(read_file write_file get_safe_tmpfile);
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
-use Date::Parse;
 use File::Temp;
 use File::Spec;
 use POSIX qw(strftime);

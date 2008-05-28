@@ -8,7 +8,6 @@ use warnings;
 
 package OpenXPKI::Crypto::PKCS7;
 
-use Date::Parse;
 use OpenXPKI::Exception;
 
 sub new

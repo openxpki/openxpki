@@ -9,7 +9,6 @@ use warnings;
 package OpenXPKI::Crypto::CRL;
 
 use OpenXPKI::Debug;
-use Date::Parse;
 
 use base qw(OpenXPKI::Crypto::Object);
 
@@ -67,9 +66,9 @@ sub __init
     }
 
     $self->{PARSED}->{BODY}->{NEXT_UPDATE}
-        = str2time($self->{PARSED}->{BODY}->{NEXT_UPDATE});
+        = DateTime::Format::DateParse->parse_datetime($self->{PARSED}->{BODY}->{NEXT_UPDATE})->epoch();
     $self->{PARSED}->{BODY}->{LAST_UPDATE}
-        = str2time($self->{PARSED}->{BODY}->{LAST_UPDATE});
+        = DateTime::Format::DateParse->parse_datetime($self->{PARSED}->{BODY}->{LAST_UPDATE})->epoch();
     $self->{TOKEN}->free_object ($self->{crl});
     delete $self->{crl};
     ##! 2: "loaded crl attributes"

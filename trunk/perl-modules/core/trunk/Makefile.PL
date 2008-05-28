@@ -282,8 +282,8 @@ WriteMakefile(
 	'DBI'                    => 1,
     'Data::Password'         => '1.07',
     'Data::Serializer'       => '0.44',
-	'Date::Parse'            => 1,
 	'DateTime'               => "0.22",
+    'DateTime::Format::DateParse' => '0.04',
 	'Digest::MD5'            => 1,
 	'Digest::SHA1'           => 1,
 	'English'                => 1, ## for broken Perl installations like on Ubuntu Drapper

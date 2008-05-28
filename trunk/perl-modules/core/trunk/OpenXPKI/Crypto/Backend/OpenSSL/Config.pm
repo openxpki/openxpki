@@ -17,7 +17,6 @@ use OpenXPKI::Exception;
 use OpenXPKI qw(write_file get_safe_tmpfile);
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
-use Date::Parse;
 use English;
 
 use Data::Dumper;
