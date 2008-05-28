@@ -1,5 +1,9 @@
 Revision history for Bundle-OpenXPKI
 
+0.05    2008-05-28
+        - Replaced Date::Parse with DateTime::Format::DateParse (Date::Parse
+          is not Y2038 safe!)
+        - Added Data::Serializer (required for OpenXPKI::Serialization::Fast)
 0.04    2007-12-05
         - Require IPC::ShareLite, too
 0.03    2007-06-13

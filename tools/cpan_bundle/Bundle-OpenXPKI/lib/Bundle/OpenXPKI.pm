@@ -1,6 +1,6 @@
 package Bundle::OpenXPKI;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 __END__
@@ -140,6 +140,8 @@ Convert::ASN1::parser undef
 Cwd 3.12
 
 CPAN 1.76_02
+
+Data::Serializer 0.44
 
 DBD::ExampleP 12.009153
 
@@ -293,11 +295,11 @@ Date::Language::TigrinyaEritrean 1.00
 
 Date::Language::TigrinyaEthiopian 1.00
 
-Date::Parse 2.27
-
 DateTime 0.36
 
 DateTime::Duration undef
+
+DateTime::Format::DateParse 0.04
 
 DateTime::Format::Strptime 1.0700
 
