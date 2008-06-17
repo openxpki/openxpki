@@ -19,6 +19,13 @@ sub execute {
     my $self       = shift;
     my $workflow   = shift;
     my $pki_realm  = CTX('session')->get_pki_realm();
+    my $cfg_id     = $self->{CONFIG_ID};
+    if (! defined $cfg_id) {
+        # in new configurations, we run as the first activity so we have
+        # to get the default config id as $self->{CONFIG_ID} is not yet
+        # defined ...
+        $cfg_id = CTX('api')->get_current_config_id();
+    }
 
     my $context   = $workflow->context();
     my $server    = $context->param('server');
@@ -35,7 +42,7 @@ sub execute {
     $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7 . "\n-----END PKCS7-----\n";
     ##! 32: 'pkcs7: ' . $pkcs7
 
-    my $scep_token = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{scep}->{id}->{$server}->{crypto}; 
+    my $scep_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm}->{scep}->{id}->{$server}->{crypto}; 
 
     my $pkcs10 = $scep_token->command({
         COMMAND => 'get_pkcs10',
@@ -52,7 +59,7 @@ sub execute {
     # extract subject from CSR and add a context entry for it
     my $csr_obj = OpenXPKI::Crypto::CSR->new(
         DATA  => $pkcs10,
-        TOKEN => CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{crypto}->{default},
+        TOKEN => CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm}->{crypto}->{default},
     );
     ##! 32: 'csr_obj: ' . Dumper $csr_obj
     my $subject = $csr_obj->get_parsed('BODY', 'SUBJECT');

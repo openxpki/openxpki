@@ -5,15 +5,8 @@
 
   <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_INITIAL</description>
-    <action name="create" 
-	    resulting_state="CREATED">
-    </action>
-  </state>
-
-  <state name="CREATED" autorun="yes">
-    <description>I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_CREATED</description>
-    <action name="extract_csr"
-	    resulting_state="CSR_EXTRACTED">
+    <action name="extract_csr" 
+            resulting_state="CSR_EXTRACTED">
     </action>
   </state>
 

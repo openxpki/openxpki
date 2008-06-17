@@ -1,7 +1,8 @@
 <actions>
   <!-- No-operation action -->
-  <action name="create"
-         class="Workflow::Action::Null">
+  <action name="extract_csr"
+         class="OpenXPKI::Server::Workflow::Activity::SCEP::ExtractCSR"
+     pkcs7tool="testsceppkcs7tool1">
       <field name="scep_tid"/>
       <field name="pkcs7_content"/>
       <field name="cert_profile"/>
@@ -19,9 +20,6 @@
         <arg>server</arg>
       </validator>
   </action>
-  <action name="extract_csr"
-         class="OpenXPKI::Server::Workflow::Activity::SCEP::ExtractCSR"
-     pkcs7tool="testsceppkcs7tool1"/>
   <action name="null"
           class="Workflow::Action::Null"/>
   <action name="null2"
