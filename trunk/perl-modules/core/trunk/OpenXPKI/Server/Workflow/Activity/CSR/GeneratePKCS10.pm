@@ -20,7 +20,7 @@ sub execute
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $default_token = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->
+    my $default_token = CTX('pki_realm_by_cfg')->{$self->config_id()}->
                             {$self->{PKI_REALM}}->{crypto}->{default};
     my $private_key = $context->param('private_key');
     my $password    = $context->param('_password');

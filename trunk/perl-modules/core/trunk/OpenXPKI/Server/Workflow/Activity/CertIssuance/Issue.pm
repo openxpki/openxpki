@@ -26,7 +26,7 @@ sub execute {
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $dbi = CTX('dbi_backend');
 
-    my $token = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$self->{PKI_REALM}}->{ca}->{id}->{$context->param('ca')}->{crypto};
+    my $token = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$self->{PKI_REALM}}->{ca}->{id}->{$context->param('ca')}->{crypto};
     if (! defined $token) {
 	OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_TOKEN_UNAVAILABLE",

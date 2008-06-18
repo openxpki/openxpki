@@ -22,7 +22,7 @@ sub execute {
     my $workflow = shift;
  
     my $pki_realm = CTX('api')->get_pki_realm();
-    my $realm_config = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm};
+    my $realm_config = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm};
 
     ##! 129: 'LDAP PUBLIC ADD NODE connecting to LDAP server'
     my $ldap_passwd  = $realm_config->{ldap_password};

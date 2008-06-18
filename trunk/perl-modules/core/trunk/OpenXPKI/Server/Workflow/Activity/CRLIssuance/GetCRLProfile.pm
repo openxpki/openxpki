@@ -48,7 +48,7 @@ sub execute {
             CONFIG    => CTX('xml_config'),
             PKI_REALM => $pki_realm,
             CA        => $ca_ids[0],
-            CONFIG_ID => $self->{CONFIG_ID},
+            CONFIG_ID => $self->config_id(),
     );
     ##! 16: 'profile: ' . Dumper($profile)
     $context->param('_crl_profile' => $profile);

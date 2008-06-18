@@ -37,7 +37,7 @@ sub execute {
     my $cert_data = $context->param('certificate');
 
     my $pki_realm = CTX('api')->get_pki_realm();
-    my $realm_config = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm};
+    my $realm_config = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm};
 
     my $tm = CTX('crypto_layer');
     my $default_token = $tm->get_token(

@@ -28,7 +28,7 @@ sub execute {
 
     my $csr_obj = OpenXPKI::Crypto::CSR->new(
         DATA  => $csr,
-        TOKEN => CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{crypto}->{default},
+        TOKEN => CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{crypto}->{default},
     );
     ##! 32: 'csr_obj: ' . Dumper $csr_obj
     my $subject = $csr_obj->get_parsed('BODY', 'SUBJECT');

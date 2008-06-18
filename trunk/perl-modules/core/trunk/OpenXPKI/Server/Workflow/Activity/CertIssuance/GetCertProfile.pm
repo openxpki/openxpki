@@ -32,7 +32,7 @@ sub execute
             CA        => $ca,
             ID        => $id,
             TYPE      => 'ENDENTITY', # no self-signed CA certs here(?)
-            CONFIG_ID => $self->{CONFIG_ID},
+            CONFIG_ID => $self->config_id(),
     );
     ##! 16: 'profile: ' . Dumper($profile)
     $context->param('_cert_profile' => $profile);

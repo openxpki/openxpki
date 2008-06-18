@@ -49,8 +49,34 @@ sub get_xpath {
     ##! 1: 'start, proxying to xml_config with config ID: ' . $self->{CONFIG_ID}
     return CTX('xml_config')->get_xpath(
         @_,
-        CONFIG_ID => $self->{CONFIG_ID},
+        CONFIG_ID => $self->config_id(),
     );
+}
+
+sub get_xpath_count {
+    my $self = shift;
+    ##! 1: 'start, proxying to xml_config with config ID: ' . $self->{CONFIG_ID}
+    return CTX('xml_config')->get_xpath_count(
+        @_,
+        CONFIG_ID => $self->config_id(),
+    );
+}
+
+sub config_id {
+    my $self = shift;
+
+    if (defined $self->{CONFIG_ID}) {
+        return $self->{CONFIG_ID};
+    }
+    else {
+        # this (only) happens when the activity is called as the first
+        # activity in the workflow ...
+        # as the config_id is only written to the context once the workflow
+        # has been created (which is technically not the case while the
+        # first activity is still running), we need to get the current
+        # config ID, which will be the workflow's config ID anyways ...
+        return CTX('api')->get_current_config_id();
+    }
 }
 
 1;
@@ -77,3 +103,9 @@ Also sets $self->{PKI_REALM} to CTX('session')->get_pki_realm()
 =head2 get_xpath
 
 Calls CTX('xml_config')->get_xpath() with the workflow's config ID.
+
+=head2 config_id
+
+Returns the config identifier for the workflow or the current config
+identifier if the config ID is not yet set (this happens in the very
+first workflow activity)

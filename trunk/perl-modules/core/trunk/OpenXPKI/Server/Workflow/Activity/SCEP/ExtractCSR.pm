@@ -19,13 +19,7 @@ sub execute {
     my $self       = shift;
     my $workflow   = shift;
     my $pki_realm  = CTX('session')->get_pki_realm();
-    my $cfg_id     = $self->{CONFIG_ID};
-    if (! defined $cfg_id) {
-        # in new configurations, we run as the first activity so we have
-        # to get the default config id as $self->{CONFIG_ID} is not yet
-        # defined ...
-        $cfg_id = CTX('api')->get_current_config_id();
-    }
+    my $cfg_id     = $self->config_id();
 
     my $context   = $workflow->context();
     my $server    = $context->param('server');

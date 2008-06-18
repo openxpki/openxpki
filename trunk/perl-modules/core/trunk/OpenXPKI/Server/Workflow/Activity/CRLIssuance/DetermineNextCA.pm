@@ -22,13 +22,6 @@ sub execute {
     my $pki_realm  = CTX('api')->get_pki_realm();
     my $context   = $workflow->context();
 
-    my $cfg_id = $self->{CONFIG};
-    if (! defined $cfg_id) {
-        # as this is called during creation, the cfg id is not defined
-        # yet, so we use the current one
-        $cfg_id = CTX('api')->get_current_config_id();
-    }
-
     my $context_ca_ids = $context->param('ca_ids');
     if (! defined $context_ca_ids) { # undefined, fill context with CA ids
         ##! 4: 'context ca_ids not defined'
@@ -39,7 +32,7 @@ sub execute {
             );
         }
         my $ca_ids = $api->list_ca_ids({
-            CONFIG_ID => $cfg_id,
+            CONFIG_ID => $self->config_id(),
         });
         if (! defined $ca_ids || ref $ca_ids ne 'ARRAY') {
             OpenXPKI::Exception->throw(

@@ -22,7 +22,7 @@ sub execute
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $default_token = CTX('pki_realm_by_cfg')->
-                           {$self->{CONFIG_ID}}->
+                           {$self->config_id()}->
                            {$self->{PKI_REALM}}->{crypto}->{default};
 
     my $key_type = $context->param('_key_type');

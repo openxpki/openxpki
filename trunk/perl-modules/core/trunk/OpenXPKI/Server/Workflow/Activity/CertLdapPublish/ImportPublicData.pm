@@ -28,12 +28,7 @@ sub execute {
 
     ##! 129: 'LDAP IMPORT checking role'
     my $pki_realm = CTX('api')->get_pki_realm();
-    my $cfg_id = $self->{CONFIG_ID};
-    if (! defined $cfg_id) {
-        # as this is the first activity, $self->{CONFIG_ID} is not
-        # defined yet and we'll just use the current config ID
-        $cfg_id = CTX('api')->get_current_config_id();
-    }
+    my $cfg_id = $self->config_id();
     ##! 128: 'config_id: ' . $cfg_id
     my $realm_config = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm};
     ##! 128: 'realm_config: ' . Dumper $realm_config

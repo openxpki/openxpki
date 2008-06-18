@@ -49,8 +49,8 @@ sub execute {
     
     my $current_ca = $ca_ids[0];
     my $pki_realm = CTX('api')->get_pki_realm();
-    my $ca_identifier = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{ca}->{id}->{$current_ca}->{identifier};
-    my $certificate = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$pki_realm}->{ca}->{id}->{$current_ca}->{certificate};
+    my $ca_identifier = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{ca}->{id}->{$current_ca}->{identifier};
+    my $certificate = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{ca}->{id}->{$current_ca}->{certificate};
     ##! 16: 'ca_identifier: ' . $ca_identifier
     my $tm = CTX('crypto_layer');
     my $ca_token = $tm->get_token(

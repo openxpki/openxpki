@@ -24,7 +24,7 @@ sub execute {
     my $context      = $workflow->context();
     my $pki_realm    = $self->{PKI_REALM};
     ##! 16: 'pki_realm: ' . $pki_realm
-    my $realm_config = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}
+    my $realm_config = CTX('pki_realm_by_cfg')->{$self->config_id()}
                                               ->{$pki_realm};
     ##! 128: 'realm_config: ' . Dumper $realm_config
 
