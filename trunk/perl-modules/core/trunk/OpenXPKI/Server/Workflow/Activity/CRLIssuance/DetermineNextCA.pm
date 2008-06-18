@@ -47,8 +47,8 @@ sub execute {
         }
         ##! 16: 'ca_ids: ' . Dumper(\@ca_ids)
         my @crl_issuing_cas = (); # only CAs that actually issue CRLs
-        my $realms = CTX('pki_realm_by_cfg')->{$cfg_id};
-        ##! 64: 'config_id: ' . $cfg_id
+        my $realms = CTX('pki_realm_by_cfg')->{$self->config_id()};
+        ##! 64: 'config_id: ' . $self->config_id()
         ##! 64: 'realms: ' . Dumper $realms
         foreach my $ca_id (@ca_ids) {
             ##! 16: 'ca_id: ' . $ca_id
