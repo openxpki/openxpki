@@ -8,7 +8,7 @@
 
 VERGEN = ../../tools/vergen
 
-SHELL           = /bin/bash
+SHELL           = [% shell.bash %]
 BINDIR          = [% dir.bindir %]
 MANDIR          = [% dir.mandir %]
 SYSCONFDIR      = [% dir.sysconfdir %]

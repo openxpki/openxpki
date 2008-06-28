@@ -126,8 +126,10 @@ for TEMPLATE in $TEMPLATEDIR/* ; do
     fi
 done
 
+BASH_SHELL=`which bash`
 echo "Creating Makefile..."
 $CFG --config $TEMPLATEDIR/default/openxpki.conf \
+    --setcfg shell.bash="$BASH_SHELL" \
     --file Makefile.in >Makefile
 
 echo
