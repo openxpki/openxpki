@@ -27,7 +27,8 @@ dist-clean:
 
 dist: dist-clean
 	( cd $(SRCBASE)/ && \
-		make -f Makefile.in dist && \
+		./configure --distonly && \
+		make dist && \
 		mv *.tar.gz $(RPMBASE)/SOURCES \
 	)
 

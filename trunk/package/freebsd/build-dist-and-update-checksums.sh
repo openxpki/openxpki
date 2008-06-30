@@ -108,7 +108,8 @@ for DIR in ${OTHER_DIRS}
 do
 	cd ${MAIN_DIR}/${COMMON_DIR}/${DIR}
 	make-clean
-	${MAKE} -f Makefile.in dist
+	./configure --distonly
+	${MAKE} dist
         ${MV} *.gz ${TARBALLS_DIR}/
 	make clean	
 done

@@ -49,6 +49,9 @@ TOOLS_DST = $(TOOLS_SRC:.in=)
 TOOLS =	$(TOOLS_DST) \
 	bin/openxpki-metaconf \
 
+TOOLS_MAN1 = $(TOOLS_SRC:.in=.1) \
+             bin/openxpki-metaconf.1 \
+
 all: tools build-man
 
 install: makedirs installtemplates installbin postinstallhelp
@@ -114,8 +117,9 @@ installtemplates:
 	FILEINCLUDE="(\.xml|\.conf|\.txt)$$" \
 		./bin/installtemplates.sh
 
+#FIXME: quickstart/openxpki.conf file, created by the "configure", is not removed by the next target
 clean:
-	rm -f Makefile $(TOOLS_DST)
+	rm -f Makefile $(TOOLS_DST) $(TOOLS_MAN1) $(CONFIGFILE)
 
 distclean: clean
 
@@ -126,6 +130,7 @@ dist: readversion
 	mkdir openxpki-deployment-$(VERSION)
 	tar -c -p -f - \
 		--exclude "*.svn" \
+		--exclude "Makefile" \
 		--exclude "openxpki-deployment-*" \
 		--exclude "*.1" \
 		--exclude "*~" \

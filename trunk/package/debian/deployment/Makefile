@@ -14,7 +14,8 @@ default:
 
 openxpki-archive:
 	cd ${OPENXPKI_SVN}/trunk/deployment; \
-	make -f Makefile.in dist; \
+	./configure --distonly; \
+	make dist; \
 	mv $(PACKAGE)-*.tar.gz /tmp
 
 debian-archive:
