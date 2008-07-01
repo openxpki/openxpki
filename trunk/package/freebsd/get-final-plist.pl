@@ -27,17 +27,26 @@ while ($line = <SOURCE_FILE>) {
     $line =~ s/share\/${PORT_NAME}/\%\%DATADIR\%\%/;
     $line =~ s/(dirrm)([^t])/$1try$2/;
     $line =~ s/share\/examples\/${PORT_NAME}/\%\%EXAMPLESDIR\%\%/;
-  
+    $line =~ s/share\/doc\/${PORT_NAME}/\%\%DOCSDIR\%\%/;                                                            
+
+    $line =~ s/\A(.*\%\%DOCSDIR\%\%)/\%\%PORTDOCS\%\%$1/;
+    $line =~ s/\A(.*\%\%DATADIR\%\%)/\%\%PORTDATA\%\%$1/;
+    $line =~ s/\A(.*\%\%EXAMPLESDIR\%\%)/\%\%PORTEXAMPLES\%\%$1/;
+
     if ($line =~ m/\.1$/) {
         $man1 .= $line." \\\n";
-    } 
+    }
     elsif ($line =~ m/\.3$/) {
         $man3 .= $line." \\\n" if ($line =~ m/\.3$/);
     }
     else {
-       print TARGET_FILE "$line\n" if (($line !~ m/share\/nls/) and (($line !~ m/dirrm/) or
-                                       ($line =~ m/openxpki/i) or ($line =~ m/DATADIR/i) or
-                                       ($line =~ m/EXAMPLESDIR/) or ($line =~ m/share/)));
+       print TARGET_FILE "$line\n" if (($line !~ m/share\/nls/) and 
+                                       (($line !~ m/dirrm/) or
+                                        ($line =~ m/openxpki/i) or ($line =~ m/DATADIR/i) or
+                                        ($line =~ m/DOCSDIR/i) or
+                                        ($line =~ m/EXAMPLESDIR/) or ($line =~ m/share/)
+                                       )
+                                      );
     }
 }
 close(SOURCE_FILE);
