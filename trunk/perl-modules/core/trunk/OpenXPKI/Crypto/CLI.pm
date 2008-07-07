@@ -179,6 +179,15 @@ sub execute {
             );
         }
     }
+    if ($CHILD_ERROR != 0) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_CHILD_ERROR',
+            params  => {
+                'EXIT_CODE' => ($? >> 8),
+                'SIGNAL'    => ($? & 127),
+            },
+        );
+    }
 
     ##! 2: "try to detect other errors"
     $self->__find_error();
