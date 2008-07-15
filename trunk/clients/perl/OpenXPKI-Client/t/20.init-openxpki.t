@@ -70,8 +70,10 @@ ok(system("openxpkiadm initdb --config $config{config_file}") == 0);
 
 diag "Starting OpenXPKI Server.";
 
-$args = "";
-$args = "--debug 100 --debug OpenXPKI::XML::Config:0 --debug OpenXPKI::XML::Cache:0" if ($debug);
+#$args = "";
+# redirect to /dev/null, see OpenXPKI::Tests for the reason (prove hangs)
+$args = ">/dev/null 2>/dev/null";
+$args = "--debug 100 --debug OpenXPKI::XML::Config:0 --debug OpenXPKI::XML::Cache:0 >/dev/null 2>/dev/null" if ($debug);
 if (system("openxpkictl --config $config{config_file} $args start") != 0) {
     unlink $config{socket_file};
     BAIL_OUT("Could not start OpenXPKI.");
