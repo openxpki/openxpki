@@ -247,9 +247,18 @@ sub start_test_server {
     my $configfile  = $instancedir . '/etc/openxpki/config.xml';
 
     my $stderr = '>/dev/null 2>/dev/null';
-    if ($ENV{DEBUG}) {
-        $stderr = '';
-    }
+
+    # TODO
+    # if this is uncommented, prove hangs on t/60_workflow/09_deploy_and_start_testserver - !???
+    # uncommented for now, the information is not that important anyways
+    # (it is the STDERR output before the stderr is redirect, this is
+    # only interesting if the server does not start, but this can and should
+    # be investigated manually anyways ...)
+    # 
+    #if ($ENV{DEBUG}) {
+    #    $stderr = '';
+    #}
+
     my $args = '';
     if ($arg_ref->{FOREGROUND}) {
         $args = '--foreground';
