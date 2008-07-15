@@ -301,15 +301,15 @@ sub execute {
 }
 
 sub child_handler {
-    my $pid = waitpid(-1, &WNOHANG);
-    ##! 16: 'pid: ' . $pid
-    
-    my $serializer = OpenXPKI::Serialization::Simple->new();
     ##! 16: 'accessing shared mem with key ' . $PID
     my $share = new IPC::ShareLite( -key     => $PID,
                                     -create  => 'no',
                                     -destroy => 'no' );
     if (defined $share) {
+        my $pid = waitpid(-1, &WNOHANG);
+        ##! 16: 'pid: ' . $pid
+        
+        my $serializer = OpenXPKI::Serialization::Simple->new();
         # share might not be defined because it the child_handler
         # might be called from open or system after the share
         # has already been destroyed

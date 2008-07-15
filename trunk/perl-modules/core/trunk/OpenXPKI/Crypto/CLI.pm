@@ -179,6 +179,7 @@ sub execute {
             );
         }
     }
+    ##! 64: 'CHILD_ERROR: ' . $CHILD_ERROR
     if ($CHILD_ERROR != 0) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_CHILD_ERROR',
