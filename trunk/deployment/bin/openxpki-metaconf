@@ -414,7 +414,6 @@ GetOptions(\%params,
 if ($params{version}) {
     my ($vol, $dir, $file) = File::Spec->splitpath($0);
     print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
-    print "$file Version: $VERSION\n";
     exit 0;
 }
 
