@@ -34,9 +34,10 @@ SKIP: {
         my $message = "Approval try #" . ($i+1);
         diag($message);
         my $stderr = "2>/dev/null";
-        if ($debug) {
-            $stderr = "";
-        }
+        # hangs prove, see OpenXPKI::Tests
+        #if ($debug) {
+        #    $stderr = "";
+        #}
         if ($i > 0) {
             # restore sqlite backup & restart server
             `openxpkictl --config $config{config_file} stop $stderr`;

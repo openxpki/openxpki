@@ -15,5 +15,8 @@ our %config = (
 if ($ENV{DEBUG}) {
     $config{debug} = 1;
 }
+if ($ENV{TEST_OPENSSL}) {
+    $config{openssl} = $ENV{TEST_OPENSSL};
+}
 
 1;

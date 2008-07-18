@@ -16,9 +16,9 @@ require 't/common.pl';
 
 my $debug = $config{debug};
 my $stderr = '2>/dev/null';
-if ($debug) {
-    $stderr = '';
-}
+#if ($debug) {
+#    $stderr = '';
+#}
 
 diag("SCEP Client Test: automatic renewal");
 

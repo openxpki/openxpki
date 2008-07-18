@@ -15,10 +15,10 @@ our %config;
 require 't/common.pl';
 
 my $debug = $config{debug};
-my $stderr = '2>/dev/null';
-if ($debug) {
-    $stderr = '';
-}
+my $stderr = '2>/tmp/stderr';
+#if ($debug) {
+#    $stderr = '';
+#}
 
 diag("SCEP Client Test: GetCACert");
 
@@ -86,7 +86,7 @@ SKIP: {
         sleep 3;
 
         # use the sscep client to get the CA certificates
-        ok(system("$sscep getca -v -u $scep_uri -c $cacert_base $stderr") == 0);
+        ok(system("$sscep getca -v -d -u $scep_uri -c $cacert_base $stderr") == 0);
 
         my $index = 0;
         ok(-r "$cacert_base-$index");

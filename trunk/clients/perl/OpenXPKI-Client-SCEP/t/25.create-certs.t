@@ -8,9 +8,9 @@ our %config;
 require 't/common.pl';
 my $debug = $config{debug};
 my $stderr = '2>/dev/null';
-if ($debug) {
-    $stderr = '';
-}
+#if ($debug) {
+#    $stderr = '';
+#}
 
 print STDERR "OpenXPKI::Client::SCEP: Create certificates for the SCEP server / CA\n";
 
@@ -65,7 +65,7 @@ SKIP : {
     diag("Starting OpenXPKI Server.");
     my $args = '';
     $args = "--debug 150" if ($debug);
-    if (system("openxpkictl --config $config{config_file} $args start") != 0) {
+    if (system("openxpkictl --config $config{config_file} $args start $stderr >/dev/null") != 0) {
         unlink $config{socket_file};
         BAIL_OUT("Could not start OpenXPKI.");
     }
