@@ -25,7 +25,6 @@
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DESCRIPTION') %>
 </p>
 
-<% $pkcs10 %>
 <table>
   <tr>
     <td>

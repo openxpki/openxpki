@@ -34,7 +34,7 @@
     $params{"private_key"}           = $key              if (defined $key);
 
     ## this type must always be set to intercept empty CSRs
-    if ($spkac or $keygen eq "SPKAC")
+    if ($spkac || (defined $keygen && $keygen eq "SPKAC"))
     {
         $params{"csr_type"} = "spkac";
     } else {

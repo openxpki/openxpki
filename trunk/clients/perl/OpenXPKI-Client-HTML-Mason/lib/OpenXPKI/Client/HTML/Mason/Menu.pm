@@ -216,7 +216,9 @@ sub __get_menu_link
     if ($result{"__menu_action"})
     {
         my $config = $self->{CONFIG}->{ACTION}->{$result{"__menu_action"}};
-        $link .= $config->{CMD};
+        if ($config->{CMD}) {
+            $link .= $config->{CMD};
+        }
     } else {
         $link .= $self->{ACTION}."/".$params->{MENU}.".html";
     }
@@ -318,7 +320,7 @@ sub get_link_params
     {
         next if (not defined $key); ## empty array
         $link .= ";" if (length $link);
-        $link .= $key."=".$params{$key};
+        $link .= $key . "=" . (defined $params{$key} ? $params{$key} : '');
     }
     return $link;
 }

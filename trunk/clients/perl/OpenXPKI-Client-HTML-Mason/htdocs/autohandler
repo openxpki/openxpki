@@ -197,7 +197,8 @@
               <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />
 %   my %menu_hash = $context->{menu}->get_menu_hash();
 %    foreach my $key (keys %menu_hash) {
-              <input type="hidden" name="<% $key %>" value="<% $menu_hash{$key} %>"/>
+%             my $menu_content = $menu_hash{$key} || '';
+              <input type="hidden" name="<% $key %>" value="<% $menu_content %>"/>
 %    }
               <input type="image" name="submit" src="<% ${path} %>images/search.png" alt="Search" />
             </div>

@@ -45,7 +45,10 @@
     ## if none matches - choose default C
 
     ## BTW we enforce utf8 as charset
-    my @list = split (/,/ , $browser);
+    my @list = ();
+    if ($browser) {
+        @list = split (/,/ , $browser);
+    }
 
     ## check every browser supported lang until one matches our supported ones
     my $found = 0;

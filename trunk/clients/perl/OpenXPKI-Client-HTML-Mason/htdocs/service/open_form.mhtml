@@ -7,5 +7,7 @@
 %    my %hash = $context->{menu}->get_menu_hash();
 %    foreach my $key (keys %hash)
 %    {
-          <input type="hidden" name="<% $key %>" value="<% $hash{$key} %>"/>
+%         my $value = $hash{$key};
+%         $value = '' if (! defined $value);
+          <input type="hidden" name="<% $key %>" value="<% $value %>"/>
 %    }

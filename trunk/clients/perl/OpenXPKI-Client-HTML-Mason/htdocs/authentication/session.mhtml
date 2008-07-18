@@ -10,9 +10,12 @@
             msg   => "try to get session\n");
 
   $m->comp ('/lib/debug.mhtml',
-            level => 2,
-            msg   => "__session_id::=".$__session_id."\n".
-                     "context->session_id::=".$context->{session_id});
+      level => 2,
+      msg   => "__session_id::=" 
+        .  (defined $__session_id ? $__session_id : 'none' ) . "\n"
+        . 'context->session_id::=' 
+        . (defined $context->{session_id} ? $context->{session_id} : 'none'),
+  );
 
   if (! defined $__session_id) {
       # session_id is not defined, let's have a look if the user
@@ -65,10 +68,14 @@
       
   # check if we are using an already existing session
   # check if the session has working connection
+  my $is_logged_in;
+  if (defined $context && exists $context->{client}) {
+      $is_logged_in = $context->{client}->is_logged_in();
+  }
   if (defined $context &&
       exists $context->{session_id} &&
-      exists $context->{client} &&
-      ($context->{client}->is_logged_in() == 1))
+      defined $is_logged_in &&
+      $is_logged_in == 1)
   {
       $m->comp ('/lib/debug.mhtml',
          level => 2,

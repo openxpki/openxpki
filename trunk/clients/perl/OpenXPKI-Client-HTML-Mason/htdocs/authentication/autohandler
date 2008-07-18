@@ -11,7 +11,7 @@
     my $no_menu  = $m->request_args()->{'no_menu'};
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
-              'msg'   => 'next_comp: ' . $next_comp
+              'msg'   => 'next_comp: ' . defined $next_comp ? $next_comp : 'none'
     );
 
     ## let's init the environment
@@ -112,8 +112,10 @@
     #print STDERR "session_id ::= ".$context->{session_id}."\n";
 
     ## msg can be undef on relaod
-    if ($msg->{SERVICE_MSG} eq "SERVICE_READY" or
-        not defined $msg)
+    if ((exists $msg->{SERVICE_MSG} && 
+         defined $msg->{SERVICE_MSG} &&
+         $msg->{SERVICE_MSG} eq "SERVICE_READY") ||
+        ! defined $msg)
     {
         my $session;
         if (defined $__session_id && exists $ENV{OPENXPKI_MASON_SESSION_DIR}) {

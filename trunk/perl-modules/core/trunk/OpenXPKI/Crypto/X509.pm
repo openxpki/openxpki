@@ -235,7 +235,10 @@ sub __init
 
     # add keyusage extensions as arrayref
     my $keyusage = $ret->{OPENSSL_EXTENSIONS}->{'X509v3 Key Usage'}->[0];
-    my @keyusages = split /, /, $keyusage;
+    my @keyusages = ();
+    if ($keyusage) {
+        @keyusages = split /, /, $keyusage;
+    }
     $ret->{'EXTENSIONS'}->{'KEYUSAGE'} = \@keyusages;
 
     ## add extensions for chain tracking

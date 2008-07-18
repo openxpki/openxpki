@@ -5,7 +5,9 @@
     my $client     = $context->{client};
 
     ## check that we must handle this message
-    return $msg if ($msg->{SERVICE_MSG} ne "GET_CLIENT_X509_LOGIN");
+    return $msg if (! exists $msg->{SERVICE_MSG});
+    return $msg if (exists $msg->{SERVICE_MSG} &&
+                           $msg->{SERVICE_MSG} ne "GET_CLIENT_X509_LOGIN");
 
     my $username    = $ENV{'SSL_CLIENT_S_DN_CN'};
     my $certificate = $ENV{'SSL_CLIENT_CERT'};

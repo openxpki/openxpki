@@ -5,7 +5,9 @@
     my $client     = $context->{client};
 
     ## check that we must handle this message
-    return $msg if ($msg->{SERVICE_MSG} ne "GET_CLIENT_SSO_LOGIN");
+    return $msg if (! exists $msg->{SERVICE_MSG});
+    return $msg if (exists $msg->{SERVICE_MSG} &&
+                           $msg->{SERVICE_MSG} ne "GET_CLIENT_SSO_LOGIN");
 
     ## Shibboleth sets the credentials in the environment vairables
     ## the security must be enforced by Shibboleth which protects

@@ -29,7 +29,8 @@
     my $client     = $context->{client};
 
     ## check that we must handle this message
-    return $msg if ($msg->{SERVICE_MSG} ne "GET_PASSWD_LOGIN");
+    return $msg if (exists $msg->{SERVICE_MSG} && 
+                           $msg->{SERVICE_MSG} ne "GET_PASSWD_LOGIN");
 
     ## was the login specified by the user?
     my %data = $m->request_args();
@@ -54,8 +55,8 @@
 
     ## ok let's ask the user for the login and password
     ## cache the last message in the context
-    my $name = $msg->{PARAMS}->{NAME};
-    my $desc = $msg->{PARAMS}->{DESCRIPTION};
+    my $name = $msg->{PARAMS}->{NAME} || '';
+    my $desc = $msg->{PARAMS}->{DESCRIPTION} || '';
     $context->{msg} = $msg;
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,

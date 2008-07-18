@@ -54,7 +54,10 @@
         }
 
     }
-    $m->comp ('/lib/debug.mhtml', 'level' => 2, 'msg' => "KEYGEN: $keygen");
+    $m->comp('/lib/debug.mhtml',
+        'level' => 2,
+        'msg' => "KEYGEN: " . (defined $keygen ? $keygen : 'undef'),
+    );
 
     ## return the configuration number if it exists
     return $keygen
