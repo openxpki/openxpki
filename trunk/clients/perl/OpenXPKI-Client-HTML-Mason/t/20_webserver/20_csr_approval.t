@@ -127,10 +127,11 @@ my $i = 0;
 while ($i < 60 && $mech->response->content !~ qr/SUCCESS/) {
     $i++;
     if ($ENV{DEBUG}) {
+        diag $mech->response->content();
         diag "Sleeping ...";
     }
     sleep 1;
-    $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/show_instance.html?id=5119;__session_id=$session_id&__role=RA%20Operator");
+    $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/show_instance.html?id=5375;__session_id=$session_id&__role=RA%20Operator");
 }
 like($mech->response->content, qr/SUCCESS/, 'Cert issuance workflow in state success');
 like($mech->response->content, qr/-----BEGIN\ CERTIFICATE-----/, 'Certificate present');
