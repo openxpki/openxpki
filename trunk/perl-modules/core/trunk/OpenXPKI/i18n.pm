@@ -117,8 +117,22 @@ sub set_language
         nl_putenv("LC_TIME=C");
     } else {
         my $loc = "${language}.UTF-8";
-        setlocale(LC_MESSAGES, $loc);
-        setlocale(LC_TIME,     $loc);
+        if (setlocale(LC_MESSAGES, $loc) ne $loc) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_I18N_SETLOCALE_LC_MESSAGES_FAILED',
+                params  => {
+                    LOCALE => $loc,
+                },
+            );
+        };
+        if (setlocale(LC_TIME,     $loc) ne $loc) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_I18N_SETLOCALE_LC_TIME_FAILED',
+                params  => {
+                    LOCALE => $loc,
+                },
+            );
+        }
         nl_putenv("LC_MESSAGES=$loc");
         nl_putenv("LC_TIME=$loc");
     }
