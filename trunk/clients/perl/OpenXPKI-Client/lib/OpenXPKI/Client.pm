@@ -5,9 +5,9 @@
 
 package OpenXPKI::Client;
 
-use version; 
-($OpenXPKI::Client::VERSION = '$Revision$' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
-$VERSION = qv($VERSION);
+#use version; 
+#($OpenXPKI::Client::VERSION = '$Revision$' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
+#$VERSION = qv($VERSION);
 
 use warnings;
 use strict;
