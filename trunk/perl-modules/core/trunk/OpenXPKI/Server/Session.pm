@@ -2,7 +2,6 @@
 ##
 ## Written 2006 by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Server::Session;
 

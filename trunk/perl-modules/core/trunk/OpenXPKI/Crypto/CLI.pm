@@ -3,7 +3,6 @@
 ## largely based on the (former) code of OpenXPKI::Crypto::Backend::
 ## OpenSSL::CLI by Michael Bell for the OpenXPKI project, 2005-2006
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision$
 package OpenXPKI::Crypto::CLI;
 	
 use strict;

@@ -1,13 +1,8 @@
 # OpenXPKI::Client
 # Written 2006 by Michael Bell and Martin Bartosch for the OpenXPKI project
 # (C) Copyright 2006 by The OpenXPKI Project
-# $Revision$
 
 package OpenXPKI::Client;
-
-#use version; 
-#($OpenXPKI::Client::VERSION = '$Revision$' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
-#$VERSION = qv($VERSION);
 
 use warnings;
 use strict;

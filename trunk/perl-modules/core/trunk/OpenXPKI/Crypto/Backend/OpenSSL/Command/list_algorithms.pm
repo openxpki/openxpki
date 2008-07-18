@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::list_algorithms
 ## Written 2007 by Julia Dubenskaya for the OpenXPKI project
 ## (C) Copyright 2007 by The OpenXPKI Project
-## $Revision: 740 $
 
 use strict;
 use warnings;

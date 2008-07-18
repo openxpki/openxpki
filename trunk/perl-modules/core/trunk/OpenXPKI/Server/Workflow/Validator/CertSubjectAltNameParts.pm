@@ -3,7 +3,6 @@ package OpenXPKI::Server::Workflow::Validator::CertSubjectAltNameParts;
 ## Written 2007 by Alexander Klink for the OpenXPKI project
 ## (based on Validator::CertSubjectAltName)
 ## Copyright (C) 2007 by The OpenXPKI Project
-## $Revision: 781 $
 use base qw( Workflow::Validator );
 
 use strict;

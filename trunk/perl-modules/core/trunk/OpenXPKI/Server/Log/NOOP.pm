@@ -5,7 +5,6 @@
 ## yet available)
 ## Written in 2007 by Alexander Klink for the OpenXPKI Project
 ## (C) Copyright 2007 by The OpenXPKI Project
-## $Revision: 737 $
 
 package OpenXPKI::Server::Log::NOOP;
 

@@ -2,11 +2,6 @@ package OpenXPKI::Client::HTML::Mason::Config;
 
 use Class::Std;
 
-use version; 
-our $VERSION = '0.9.$Revision: 244 $';
-$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
-$VERSION = qv($VERSION);
-
 use warnings;
 use strict;
 use Carp;

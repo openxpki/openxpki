@@ -1,7 +1,6 @@
 ## OpenXPKI::i18n.pm
 ## Written 2005 by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2005-2006 The OpenXPKI Project
-## $Revision: 240 $
 
 use strict;
 use warnings;

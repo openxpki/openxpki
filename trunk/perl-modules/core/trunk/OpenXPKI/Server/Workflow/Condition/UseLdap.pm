@@ -1,7 +1,6 @@
 ## OpenXPKI::Server::Workflow::Condition::UseLdap
 ## Written 2007 by Peter Grigoriev for the OpenXPKI project
 ## (C) Copyright 2007 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Server::Workflow::Condition::UseLdap;
 

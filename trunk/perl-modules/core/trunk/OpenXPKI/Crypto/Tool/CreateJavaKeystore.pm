@@ -2,7 +2,6 @@
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## based on OpenXPKI::Crypto::Toolkit
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision: 416 $
 package OpenXPKI::Crypto::Tool::CreateJavaKeystore;
 use base qw( OpenXPKI::Crypto::Toolkit );	
 

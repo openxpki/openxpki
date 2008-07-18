@@ -1,7 +1,6 @@
 # OpenXPKI::Server::Workflow::Condition::CheckForkedWorkflowChildren
 # Written by Alexander Klink for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision$
 package OpenXPKI::Server::Workflow::Condition::CheckForkedWorkflowChildren;
 
 use strict;

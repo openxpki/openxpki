@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Config
 ## Written 2005 and 2006 by Julia Dubenskaya and Michael Bell for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision$
 	
 use strict;
 use warnings;

@@ -2,7 +2,6 @@
 ##
 ## Written by Michael Bell for the OpenXPKI project
 ## Copyright (C) 2005 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Exception;
 

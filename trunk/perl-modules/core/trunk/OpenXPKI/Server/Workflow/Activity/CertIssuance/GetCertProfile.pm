@@ -1,7 +1,6 @@
 # OpenXPKI::Server::Workflow::Activity::CertIssuance::GetCertProfile.pm
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision: 320 $
 
 package OpenXPKI::Server::Workflow::Activity::CertIssuance::GetCertProfile;
 

@@ -2,7 +2,6 @@
 ##
 ## Written by Martin Bartosch for the OpenXPKI project 2007
 ## Copyright (C) 2007 The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Template::Plugin::RandomPassword;
 

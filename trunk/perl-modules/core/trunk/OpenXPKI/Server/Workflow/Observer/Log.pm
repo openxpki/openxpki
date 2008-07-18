@@ -1,7 +1,6 @@
 # OpenXPKI::Server::Workflow::Observer::Log
 # Written by Alexander Klink and Martin Bartosch for the OpenXPKI project 2007
 # Copyright (c) 2007 by The OpenXPKI Project
-# $Revision: 320 $
 
 package OpenXPKI::Server::Workflow::Observer::Log;
 

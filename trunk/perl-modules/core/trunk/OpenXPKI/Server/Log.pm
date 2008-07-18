@@ -4,7 +4,6 @@
 ## Migrated to the OpenXPKI Project 2005
 ## Copyright transfered from Michael Bell to The OpenXPKI Project in 2005
 ## (C) Copyright 2004-2006 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Server::Log;
 

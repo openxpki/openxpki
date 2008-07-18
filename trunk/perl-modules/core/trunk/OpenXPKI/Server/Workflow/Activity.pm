@@ -2,7 +2,6 @@
 # Written by Martin Bartosch for the OpenXPKI project 2005
 # Rewritten by Alexander Klink for the OpenXPKI project 2007
 # Copyright (c) 2005-2007 by The OpenXPKI Project
-# $Revision$
 package OpenXPKI::Server::Workflow::Activity;
 
 use strict;

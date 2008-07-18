@@ -2,7 +2,6 @@
 ##
 ## Written 2006 by Michael Bell for the OpenXPKI project
 ## Copyright (C) 2006 by The OpenXPKI Project
-## $Revision: 431 $
 
 package OpenXPKI::Server::API::Secret;
 

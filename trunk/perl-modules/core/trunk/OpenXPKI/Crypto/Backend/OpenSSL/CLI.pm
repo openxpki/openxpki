@@ -4,7 +4,6 @@
 ## Rewritten to use the OpenXPKI::Crypto::CLI base class
 ## 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision$
 package OpenXPKI::Crypto::Backend::OpenSSL::CLI;
 use base qw( OpenXPKI::Crypto::CLI );
 

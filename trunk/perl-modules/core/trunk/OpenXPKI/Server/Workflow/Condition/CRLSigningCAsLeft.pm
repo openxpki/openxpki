@@ -1,7 +1,6 @@
 # OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft
 # Written by Alexander Klink for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision$
 package OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft;
 
 use strict;

@@ -2,7 +2,6 @@
 ##
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision: 389 $
 
 package OpenXPKI::Service::SCEP;
 

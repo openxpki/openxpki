@@ -2,7 +2,6 @@
 ##
 ## Written 2007 by Alexander Klink for the OpenXPKI project
 ## Copyright (C) 2007 by The OpenXPKI Project
-## $Revision: 781 $
 package OpenXPKI::Server::Workflow::Validator::CertSubjectParts;
 
 use strict;

@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::GOST2001
 ## Written 2006 by Julia Dubenskaya for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision: 320 $
 
 use strict;
 use warnings;

@@ -4,7 +4,6 @@
 ## Rewritten 2006 by Michael Bell
 ## Updated to use new Service::Default semantics 2007 by Alexander Klink
 ## (C) Copyright 2005-2007 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Server::Authentication::External;
 

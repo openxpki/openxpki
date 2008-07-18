@@ -4,7 +4,6 @@
 ## Enhanced to convert an array of certificates to PKCS#7
 ## 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision$
 
 use strict;
 use warnings;

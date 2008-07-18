@@ -2,7 +2,6 @@
 # Written by Martin Bartosch & Alexander Klink for 
 # the OpenXPKI project 2005, 2006
 # Copyright (c) 2005, 2006 by The OpenXPKI Project
-# $Revision$
 
 package OpenXPKI::Server::Workflow::Activity::CertIssuance::Issue;
 

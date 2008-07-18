@@ -4,7 +4,6 @@
 ## Polished to use a state-machine like interface 2007 by Alexander Klink
 ## for the OpenXPKI project
 ## (C) Copyright 2005-2007 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Service::Default;
 

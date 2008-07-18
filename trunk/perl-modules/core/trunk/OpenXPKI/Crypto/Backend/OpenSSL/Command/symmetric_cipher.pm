@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::symmetric_encrypt
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision: 320 $
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::symmetric_cipher;
 

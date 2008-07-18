@@ -5,7 +5,6 @@
 ## Updated to support seeded SHA1 and RFC 2307 password notatation 
 ##   2007 by Martin Bartosch
 ## (C) Copyright 2006, 2007 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Server::Authentication::Password;
 

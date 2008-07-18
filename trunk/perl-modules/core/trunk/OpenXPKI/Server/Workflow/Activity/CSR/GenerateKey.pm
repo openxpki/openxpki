@@ -2,7 +2,6 @@
 # Written by Alexander Klink for the OpenXPKI project 2006
 # Rewritten by Julia Dubenskaya for the OpenXPKI project 2007
 # Copyright (c) 2006-2007 by The OpenXPKI Project
-# $Revision: 320 $
 
 package OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey;
 

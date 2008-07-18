@@ -4,7 +4,6 @@
 #
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision: 582 $
 #
 
 for var in INSTALL ADMUSER ADMGROUP TARGETDIR ; do

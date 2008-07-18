@@ -3,7 +3,6 @@
 #
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision: 318 $
 #
 
 VERGEN = ../../tools/vergen

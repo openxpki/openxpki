@@ -5,7 +5,6 @@
 #
 # Written by Alexander Klink for the OpenXPKI project
 # Copyright (c) 2006 by The OpenXPKI project
-# $Revision$
 
 use strict;
 use warnings;

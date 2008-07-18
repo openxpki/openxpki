@@ -4,7 +4,6 @@
 ## enhanced to support OpenSSL format keys and decryption 2006
 ## by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision$
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key;
 
 use strict;

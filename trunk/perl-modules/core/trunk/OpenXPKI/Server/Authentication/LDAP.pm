@@ -3,7 +3,6 @@
 ## Written 2005 by Peter Gietz
 ## Rewritten 2006 by Michael Bell
 ## (C) Copyright 2003-2006 by The OpenXPKI Project
-## $Revision$
 
 # FIXME 2007-02-06 Alexander Klink/Martin Bartosch
 # This code does not support the new login_step semantics and will hence

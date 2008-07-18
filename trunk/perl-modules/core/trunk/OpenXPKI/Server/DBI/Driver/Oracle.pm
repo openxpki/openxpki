@@ -2,7 +2,6 @@
 ##
 ## Written by Martin Bartosch 2006 for the OpenXPKI project
 ## (c) Copyright 2006 by the OpenXPKI project
-## $Revision: 470 $
 
 package OpenXPKI::Server::DBI::Driver::Oracle;
 

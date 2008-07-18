@@ -1,7 +1,6 @@
 ## OpenXPKI::Server::Workflow::Condition::LdapDnAvailable
 ## Written 2007 by Peter Grigoriev for the OpenXPKI project
 ## (C) Copyright 2007 by The OpenXPKI Project
-## $Revision 008$
 
 package OpenXPKI::Server::Workflow::Condition::LdapDnAvailable;
 

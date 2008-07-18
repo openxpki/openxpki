@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::API.pm
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Crypto::API;
 	

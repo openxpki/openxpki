@@ -1,7 +1,6 @@
 # OpenXPKI::Client::HTML::Mason::ApacheHandler
 # Written 2006 by Martin Bartosch and Alexander Klink for the OpenXPKI project
 # (C) Copyright 2006 by The OpenXPKI Project
-# $Revision: 244 $
 
 package OpenXPKI::Client::HTML::Mason::ApacheHandler;
 

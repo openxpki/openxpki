@@ -3,7 +3,6 @@
 ## Written 2006 by Michael Bell
 ## Updated to use new Service::Default semantics 2007 by Alexander Klink
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision$
 
 use strict;
 use warnings;

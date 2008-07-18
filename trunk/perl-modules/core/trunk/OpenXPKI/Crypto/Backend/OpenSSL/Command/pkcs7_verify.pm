@@ -4,7 +4,6 @@
 ## changes for CHAIN passing by Alexander Klink for the OpenXPKI
 ## project 2006.
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision$
 
 use strict;
 use warnings;

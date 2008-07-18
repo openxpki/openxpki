@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::Tool::PKCS7::Command::get_subject.pm
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision: 418 $
 package OpenXPKI::Crypto::Tool::PKCS7::Command::get_subject;
 
 use strict;

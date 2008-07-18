@@ -1,7 +1,6 @@
 # OpenXPKI::Server::Workflow::Validator::ReasonCode
 # Written by Alexander Klink for the OpenXPKI project 2007
 # Copyright (c) 2007 by The OpenXPKI Project
-# $Revision$
 
 package OpenXPKI::Server::Workflow::Validator::ReasonCode;
 

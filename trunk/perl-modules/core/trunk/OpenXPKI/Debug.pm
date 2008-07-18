@@ -4,7 +4,6 @@
 ## - eval'ing of debug code 2007 by Alexander Klink and Martin Bartosch
 ##   for the OpenXPKI project
 ## (C) Copyright 2007 by The OpenXPKI Project
-## $Revision$
 
 use strict;
 use warnings;

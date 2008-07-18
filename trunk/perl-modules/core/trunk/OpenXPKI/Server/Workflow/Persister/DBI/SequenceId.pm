@@ -1,7 +1,6 @@
 # OpenXPKI::Server::Workflow::Persister::DBI::SequenceId
 # Written by Martin Bartosch for the OpenXPKI project 2005
 # Copyright (c) 2005 by The OpenXPKI Project
-# $Revision$
 
 package OpenXPKI::Server::Workflow::Persister::DBI::SequenceId;
 

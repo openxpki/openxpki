@@ -4,11 +4,7 @@
 #
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision$
 #
-
-our $VERSION = '0.9.$Revision$';
-$VERSION =~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{$1}xms;
 
 use warnings;
 use strict;
@@ -19,7 +15,6 @@ use English;
 # OpenXPKI Deployment tools
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision$
 
 package OpenXPKI::Deployment;
 

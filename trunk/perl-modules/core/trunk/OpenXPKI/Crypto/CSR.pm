@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::CSR
 ## Rewritten 2005 by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2003-2006 by The OpenXPKI Project
-## $Revision$
 
 use strict;
 use warnings;

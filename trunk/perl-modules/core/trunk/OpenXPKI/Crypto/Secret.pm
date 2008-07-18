@@ -2,7 +2,6 @@
 ##
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision: 269 $
 
 package OpenXPKI::Crypto::Secret;
 

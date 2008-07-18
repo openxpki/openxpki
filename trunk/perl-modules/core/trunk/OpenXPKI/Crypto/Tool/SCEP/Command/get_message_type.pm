@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::Tool::SCEP::Command::get_message_type
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision: 418 $
 package OpenXPKI::Crypto::Tool::SCEP::Command::get_message_type;
 
 use strict;

@@ -3,7 +3,6 @@
 ## Rewritten 2006 by Dmitry Belyavsky for the OpenXPKI project 
 ## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision$
 
 use strict;
 use warnings;

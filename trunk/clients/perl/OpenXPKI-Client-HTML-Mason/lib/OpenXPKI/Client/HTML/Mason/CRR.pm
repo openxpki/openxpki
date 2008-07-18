@@ -2,7 +2,6 @@
 ##
 ## Written 2007 by Alexander Klink for the OpeNXPKI project
 ## (C) Copyright 2007 by The OpenXPKI Project
-## $Revision: 705 $
 
 package OpenXPKI::Client::HTML::Mason::CRR;
 

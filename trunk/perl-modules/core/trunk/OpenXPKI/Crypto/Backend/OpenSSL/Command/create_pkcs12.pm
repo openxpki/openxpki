@@ -4,7 +4,6 @@
 ## enhanced 2006 by Alexander Klink for the OpenXPKI project
 ## to support Cryptographic Service Provider names
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-## $Revision$
 
 use strict;
 use warnings;

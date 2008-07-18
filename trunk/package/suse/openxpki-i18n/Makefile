@@ -1,6 +1,5 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
-## $Revision: 350 $
 
 RPMBASE=/usr/src/packages
 OPENXPKI_SVN=../../../..

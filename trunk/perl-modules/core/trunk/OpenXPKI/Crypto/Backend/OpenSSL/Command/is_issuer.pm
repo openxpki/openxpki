@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::is_issuer
 ## Written 2008 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2008 by The OpenXPKI Project
-## $Revision$
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::is_issuer;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 

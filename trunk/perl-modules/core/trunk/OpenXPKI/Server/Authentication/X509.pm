@@ -3,7 +3,6 @@
 ## Written 2006 by Michael Bell
 ## Rewritten 2007 by Alexander Klink for the OpenXPKI Project
 ## (C) Copyright 2006, 2007 by The OpenXPKI Project
-## $Revision$
 package OpenXPKI::Server::Authentication::X509;
 
 use strict;

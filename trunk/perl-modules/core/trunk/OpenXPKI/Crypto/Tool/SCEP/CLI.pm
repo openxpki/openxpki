@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::Tool::SCEP::CLI
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision$
 package OpenXPKI::Crypto::Tool::SCEP::CLI;
 use base qw( OpenXPKI::Crypto::CLI );
 

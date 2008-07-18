@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::GOST94CP
 ## Written 2006 by Julia Dubenskaya for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision: $
 
 use strict;
 use warnings;

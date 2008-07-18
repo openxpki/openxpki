@@ -1,7 +1,6 @@
 # OpenXPKI::Server::Workflow::Activity::CertLdapPublish::ImportPublicData
 # Written by Petr Grigoriev for the OpenXPKI project 2007
 # Copyright (c) 2007 by The OpenXPKI Project
-# $Revision$
 
 
 package OpenXPKI::Server::Workflow::Activity::CertLdapPublish::ImportPublicData;

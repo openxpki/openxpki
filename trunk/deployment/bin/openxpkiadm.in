@@ -3,7 +3,6 @@
 # Written by Martin Bartosch and Alexander Klink
 # for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-# $Revision: 80 $
 #
 
 our $VERSION = "[% deployment.version %]";

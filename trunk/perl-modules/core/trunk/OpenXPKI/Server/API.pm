@@ -4,7 +4,6 @@
 ## Alexander Klink for the OpenXPKI project
 ## restructured 2006 by Alexander Klink for the OpenXPKI project
 ## Copyright (C) 2005-2007 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Server::API;
 

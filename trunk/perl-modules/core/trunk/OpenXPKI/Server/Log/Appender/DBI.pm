@@ -2,7 +2,6 @@
 ##
 ## Written in 2007 by Alexander Klink for the OpenXPKI Project
 ## Copyright (C) 2007 by The OpenXPKI Project
-## $Revision$
 package OpenXPKI::Server::Log::Appender::DBI;
 
 use strict;

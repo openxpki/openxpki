@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 
-## $Revision$
 
 package OpenXPKI::Client::HTML::Mason::Menu;
 

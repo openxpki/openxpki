@@ -5,7 +5,6 @@
 ## adapted to new Service::Default semantics 2007 by Alexander Klink
 ## for the OpenXPKI project
 ## (C) Copyright 2003-2007 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Server::Authentication;
 

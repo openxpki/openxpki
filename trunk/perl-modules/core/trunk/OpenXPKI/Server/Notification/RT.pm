@@ -3,7 +3,6 @@
 ##
 ## Written 2007 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2007 by The OpenXPKI Project
-## $Revision: 727 $
 
 package OpenXPKI::Server::Notification::RT;
 use base qw( OpenXPKI::Server::Notification );

@@ -3,7 +3,6 @@
 ## Written by Michael Bell for the OpenXPKI project
 ## Rewritten 2005 by Michael Bell for the OpenXPKI project
 ## Copyright (C) 2003-2006 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::XML::Config;
 

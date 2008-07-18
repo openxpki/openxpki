@@ -2,7 +2,6 @@
 ## Largerly based on code of the OpenCA project 2004
 ## Rewritten 2007 by Petr Grigoriev for the OpenXPKI project
 ## (C) Copyright 2007 by The OpenXPKI Project
-## $Revision$#
 package OpenXPKI::LdapUtils;
 
 

@@ -2,7 +2,6 @@
 ##
 ## Written 2005 by Michael Bell and Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
-## $Revision: 431 $
 
 package OpenXPKI::Server::API::Workflow;
 

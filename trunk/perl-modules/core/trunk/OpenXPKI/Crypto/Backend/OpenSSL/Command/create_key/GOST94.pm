@@ -1,7 +1,6 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::GOST94
 ## Written 2006 by Dmitry Belyavsky for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision$
 
 use strict;
 use warnings;

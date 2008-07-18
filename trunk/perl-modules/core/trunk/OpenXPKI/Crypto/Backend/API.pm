@@ -3,7 +3,6 @@
 ## Converted to use Class::Std and OpenXPKI::Crypto::API
 ## 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision$
 package OpenXPKI::Crypto::Backend::API;
 use base qw( OpenXPKI::Crypto::API );
 	

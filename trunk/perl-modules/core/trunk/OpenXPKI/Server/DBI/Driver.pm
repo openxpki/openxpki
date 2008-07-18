@@ -2,7 +2,6 @@
 ##
 ## Written by Michael Bell for the OpenXPKI::Server project 2005
 ## Copyright (C) 2005 by The OpenXPKI Project
-## $Revision$
 
 package OpenXPKI::Server::DBI::Driver;
 

@@ -1,7 +1,6 @@
 # OpenXPKI::Client::SCEP
 # Written 2006 by Alexander Klink for the OpenXPKI project
 # (C) Copyright 2006 by The OpenXPKI Project
-# $Revision: 244 $
 
 package OpenXPKI::Client::SCEP;
 
@@ -9,10 +8,6 @@ use base qw( OpenXPKI::Client );
 use OpenXPKI::Server::Context qw( CTX );
 
 use Data::Dumper;
-
-use version; 
-($OpenXPKI::Client::SCEP::VERSION = '$Revision: 342 $' )=~ s{ \$ Revision: \s* (\d+) \s* \$ \z }{0.9.$1}xms;
-$VERSION = qv($VERSION);
 
 {
     use warnings;

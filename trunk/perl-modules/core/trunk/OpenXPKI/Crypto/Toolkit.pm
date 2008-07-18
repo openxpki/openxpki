@@ -3,7 +3,6 @@
 ## based on OpenXPKI::Crypto::Backend::OpenSSL,
 ## written by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-## $Revision: 416 $
 package OpenXPKI::Crypto::Toolkit;
 	
 use strict;
