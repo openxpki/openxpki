@@ -101,6 +101,15 @@ sub BUILD {
                 },
             },
         },
+        'get_workflow_ids_for_cert' => {   
+            class => 'Default',
+            params => {
+                'CSR_SERIAL' => {
+                    type => SCALAR,
+                    regex => $re_integer_string,
+                 },
+            },
+        },
         'get_current_config_id' => {
             class  => 'Default',
             params => {

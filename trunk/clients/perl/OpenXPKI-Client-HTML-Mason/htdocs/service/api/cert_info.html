@@ -83,6 +83,55 @@
     <td><% $extended_keyusage %></td>
   </tr>
 % }
+
+%
+% # get the workflow identifiers related to this certificate
+% my $message = $context->{client}->send_receive_command_msg ( "get_workflow_ids_for_cert", { 'CSR_SERIAL' => $csr_serial } );
+% my $workflow_identifiers = $message->{'PARAMS'};
+%  
+  <tr>
+    <td>
+      <% i18nGettext('I18N_OPENXPKI_CERT_WORKFLOWS') %>
+    </td>
+    <td>
+%
+% if (ref $workflow_identifiers ne 'ARRAY') {
+%     $workflow_identifiers = [];
+% }
+% my $workflow_count = scalar @{$workflow_identifiers};
+%
+% foreach my $workflow_serial_info ( @{$workflow_identifiers} ) {
+%     my $workflow_serial = $workflow_serial_info->{'WORKFLOW.WORKFLOW_SERIAL'};
+%     my $workflow_type = $workflow_serial_info->{'WORKFLOW.WORKFLOW_TYPE'};
+%
+%     # certificate issuance workflow
+%     if ( $workflow_type eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE' ) {
+%
+      <& /lib/html/a.mhtml,
+         target => '../workflow/show_instance.html',
+         label => i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_ISSUANCE_WORKFLOW_LINK', '__SERIAL__' => $workflow_serial),
+         params => [["id", $workflow_serial]] &>
+%
+%     }
+%
+%     # certificate signing request workflow
+%     if ( $workflow_type eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ) {
+%
+        <& /lib/html/a.mhtml,
+           target => '../workflow/show_instance.html',
+           label => i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_SIGNING_REQUEST_WORKFLOW_LINK', '__SERIAL__' => $workflow_serial),
+           params => [["id", $workflow_serial]] &>
+%
+%     }
+%
+%     $workflow_count--;
+%     if ( $workflow_count > 0 ) {
+%         print ", ";
+%     }
+% }
+%
+    </td>
+  </tr>
 </table>
 
 <p>
@@ -203,7 +252,7 @@
   my $msg  = $context->{client}->send_receive_command_msg (
                   "get_cert",
                   {'IDENTIFIER' => $identifier});
-  ## print Dumper($msg)."\n";
+  #print Dumper($msg)."\n";
 
   my $params      = $msg->{PARAMS}->{BODY};
   my $subject     = $params->{SUBJECT};
@@ -213,9 +262,11 @@
   my $issuer      = $params->{ISSUER};
   $issuer =~ s/,/, /g;
   my $issuer_identifier = $msg->{PARAMS}->{ISSUER_IDENTIFIER};
+  my $csr_serial        = $msg->{PARAMS}->{CSR_SERIAL};
   my $fingerprint = $params->{FINGERPRINT};
   my $serial      = $params->{SERIAL};
   $serial .= ' (0x' . $params->{SERIAL_HEX} . ')';
+  my $serial_dec  = $params->{SERIAL};
   my $status      = $msg->{PARAMS}->{STATUS};
   my $keyusage;
   my $extended_keyusage;

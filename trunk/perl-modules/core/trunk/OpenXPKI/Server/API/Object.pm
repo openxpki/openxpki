@@ -118,6 +118,7 @@ sub get_cert
         $return_ref->{STATUS} = $hash->{STATUS};
         $return_ref->{ROLE}   = $hash->{ROLE};
         $return_ref->{ISSUER_IDENTIFIER} = $hash->{ISSUER_IDENTIFIER};
+        $return_ref->{CSR_SERIAL} = $hash->{CSR_SERIAL};
         return $return_ref;
     }
 

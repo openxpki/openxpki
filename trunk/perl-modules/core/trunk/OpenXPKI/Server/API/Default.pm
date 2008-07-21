@@ -142,6 +142,29 @@ sub get_cert_identifier {
     return $identifier;
 }
 
+sub get_workflow_ids_for_cert {
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $csr_serial = $arg_ref->{'CSR_SERIAL'};
+
+    my $workflow_ids = CTX('api')->search_workflow_instances(
+        {
+            CONTEXT => [
+                {
+                    KEY   => 'csr_serial',
+                    VALUE => $csr_serial,
+                },
+            ],
+            TYPE => [
+                'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
+                'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE'
+            ]
+        }
+    );
+
+    return $workflow_ids;
+}
+
 sub get_current_config_id {
     my $self = shift;
     return CTX('xml_config')->get_current_config_id();

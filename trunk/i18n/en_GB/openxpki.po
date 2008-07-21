@@ -281,6 +281,9 @@ msgstr "valid"
 msgid "I18N_OPENXPKI_CERT_VALIDITY"
 msgstr "Validity"
 
+msgid "I18N_OPENXPKI_CERT_WORKFLOWS"
+msgstr "Related Workflows"
+
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID"
 msgstr ""
 
@@ -289,10 +292,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_AUTH_STACK_MESSAGE"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PASSWD_LOGIN_MESSAGE"
-msgstr "Page"
 
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_ENTER_ID"
 msgstr ""
@@ -655,6 +654,12 @@ msgstr "Certificate Information"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO_INSTALL_IN_BROWSER"
 msgstr "Install in browser for your private key"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_ISSUANCE_WORKFLOW_LINK"
+msgstr "Certificate issuance workflow #__SERIAL__"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_SIGNING_REQUEST_WORKFLOW_LINK"
+msgstr "Certificate signing request workflow #__SERIAL__"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_SUCCESS_CREATE_CRL"
 msgstr "Create a new certificate revocation list (CRL)"
 
@@ -713,7 +718,11 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DEFAULT_CSP"
 msgstr "Default Cryptographic Service Provider"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_DESCRIPTION"
-msgstr "Using the form below, you can create a private key on your machine using Internet Explorer. You can choose a Cryptographic Service Provider (CSP) to use from the ones installed on your machine. This also allows you to create the key on a smartcard, for example."
+msgstr ""
+"Using the form below, you can create a private key on your machine using "
+"Internet Explorer. You can choose a Cryptographic Service Provider (CSP) to "
+"use from the ones installed on your machine. This also allows you to create "
+"the key on a smartcard, for example."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKCS10_KEY_LENGTH"
 msgstr "Key length"
@@ -1071,11 +1080,11 @@ msgstr "Choose authentication method"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
 msgstr ""
-"Please click on 'Install certificate' to install a certificate for a corresponding private "
-"key with Microsoft Internet Explorer. You can also choose a Cryptographic "
-"Service Provider (CSP) to use for installation. If you do not have a "
-"private key for the selected certificate or you are not using Internet Explorer "
-"then this page is useless for you."
+"Please click on 'Install certificate' to install a certificate for a "
+"corresponding private key with Microsoft Internet Explorer. You can also "
+"choose a Cryptographic Service Provider (CSP) to use for installation. If "
+"you do not have a private key for the selected certificate or you are not "
+"using Internet Explorer then this page is useless for you."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
 msgstr "Certificate installed successfully"
@@ -1488,6 +1497,10 @@ msgstr "Workflow types"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_PKCS10"
 msgstr "PKCS#10"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_CUSTOM_RESULT_COLUMNS"
+msgstr "Search results"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_DESCRIPTION"
 msgstr ""
 "Please enter your search query for workflow context keys and values. You can "
@@ -1506,6 +1519,10 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPT
 msgstr "Search results:"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_TITLE"
+msgstr "Search results"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_SHOW_CUSTOM_RESULT_COLUMNS"
 msgstr "Search results"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE"
@@ -1600,10 +1617,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_INIT_SERVICE_PROTOCOL_REJECTED"
 msgstr ""
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_ALREADY_ESTABLISHED"
-msgstr "Value"
-
 msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED"
 msgstr ""
 
@@ -1695,10 +1708,6 @@ msgstr "Comment"
 
 msgid "I18N_OPENXPKI_COMMENT_DESC"
 msgstr "For information for the registration officers"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CONFIG_AUT"
-msgstr "Comment"
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE"
 msgstr ""
@@ -1907,6 +1916,10 @@ msgstr "reset"
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_ERROR"
 msgstr "Valid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_CHILD_ERROR"
+msgstr "CSR with DC-style"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED"
@@ -2705,32 +2718,8 @@ msgstr "Domain Component"
 msgid "I18N_OPENXPKI_DEBUG_DEBUG_MESSAGE_IS_NOT_A_CODEREF"
 msgstr "The used suject style does not allow the use of an organization."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPL"
-msgstr "yes"
-
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA"
 msgstr "Test Dummy CA"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CACN"
-msgstr "Test Dummy CA"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCESUCCESS2007"
-msgstr "Certificate Issuance"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTPENDING2007"
-msgstr "Test Dummy CA"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTSUCCESS2007"
-msgstr "Test Dummy CA"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTWAITING_FOR_CHILD"
-msgstr "Waiting to start"
 
 msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_USER_CA"
 msgstr "Test User CA"
@@ -3166,6 +3155,16 @@ msgstr ""
 "serial numbers into a distinguished name (DN) to associate it safely to a "
 "person or an object."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_I18N_SETLOCALE_LC_MESSAGES_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_I18N_SETLOCALE_LC_TIME_FAILED"
+msgstr "CSR with DC-style"
+
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE"
 msgstr "Java Keystore"
 
@@ -3267,10 +3266,6 @@ msgstr "Port"
 msgid "I18N_OPENXPKI_PORT_DESC"
 msgstr "The (TCP) port that is used with the certificate"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_PR"
-msgstr "Port"
-
 msgid "I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD"
 msgstr "Download private key and certificate"
 
@@ -3287,10 +3282,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_PROFILE_ADVANCED_STYLE"
 msgstr "Advanced naming style"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_TLS"
-msgstr "User profile"
-
 msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC"
 msgstr ""
 "If you use this style, you will just have to enter the hostname and port of "
@@ -3302,14 +3293,6 @@ msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE"
 msgstr "Basic TLS style"
 
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
-msgstr "TLS Server profile"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_TLS_SERVERCN"
-msgstr "TLS Server profile"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_TLS_SERVERNI"
 msgstr "TLS Server profile"
 
 msgid "I18N_OPENXPKI_PROFILE_USER"
@@ -3354,10 +3337,6 @@ msgstr "Realname"
 
 msgid "I18N_OPENXPKI_REALNAME_DESC"
 msgstr "Your real name, for example 'John Doe'"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_S"
-msgstr "yes"
 
 msgid "I18N_OPENXPKI_SAN_DNS"
 msgstr "DNS"
@@ -3413,10 +3392,6 @@ msgstr "Registered ID"
 msgid "I18N_OPENXPKI_SAN_RID_DESCRIPTION"
 msgstr "No description available today."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_SAN_U"
-msgstr "Microsoft UPN"
-
 msgid "I18N_OPENXPKI_SAN_UPN"
 msgstr "Microsoft UPN"
 
@@ -3462,6 +3437,10 @@ msgstr "Logout"
 
 msgid "I18N_OPENXPKI_SECRET_STATUS"
 msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERIALIZATION_FAST_DESERIALIZE_INCORRECT_SERIALIZATION_FORMAT"
+msgstr "Serverside key generation"
 
 msgid "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_ARRAY_ELEMENT_POSITION_FORMAT_CORRUPTED"
 msgstr ""
@@ -3634,6 +3613,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_CA_CONFIG"
@@ -4174,9 +4159,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_UPDATE_NO_DATA_PRESENT"
 msgstr "The used suject style does not allow the use of an organization."
 
-msgid "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_SERIALIZATION_FAILED"
-msgstr ""
-
 msgid "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_SERVICE_FAILED"
 msgstr ""
 
@@ -4213,6 +4195,10 @@ msgid "I18N_OPENXPKI_SERVER_INIT_GET_WORKFLOW_FACTORY_NO_CONFIG_IDENTIFIERS_IN_D
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_INIT_GET_XML_CONFIG_CONFIG_DB_ERROR"
+msgstr "Serverside key generation"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_INIT_I18N_MISSING_CONFIG"
@@ -5205,10 +5191,14 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE"
 msgstr "Invalid CSR type"
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_LONG"
-msgstr "Your key is too long (__GIVEN_LENGTH__ bits, at most __MAX_LENGTH__ bits are allowed)"
+msgstr ""
+"Your key is too long (__GIVEN_LENGTH__ bits, at most __MAX_LENGTH__ bits are "
+"allowed)"
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
-msgstr "Your key is too short (__GIVEN_LENGTH__ bits, it needs to have at least __MIN_LENGTH__ bits)"
+msgstr ""
+"Your key is too short (__GIVEN_LENGTH__ bits, it needs to have at least "
+"__MIN_LENGTH__ bits)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYREUSE_CERTIFICATE_WITH_KEY_ALREADY_EXISTS"
@@ -5663,19 +5653,11 @@ msgstr "Approve CRR"
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 msgstr "Approve CSR"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSRNEW_STATE"
-msgstr "Approve CSR"
-
 msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
 msgstr "Cancel CRR approval"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 msgstr "Cancel CSR approval"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_CHANG"
-msgstr "Sleep"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
 msgstr "Change CRR invalidity time"
@@ -5753,26 +5735,14 @@ msgstr "Export CSR"
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
 msgstr "Create a new workflow instance for publishing a certificate using LDAP"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSU"
-msgstr "Create a new workflow instance for certificate issuance"
-
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
 msgstr "Create a new workflow instance for certificate issuance"
 
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
 msgstr "Persist CSR"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSRNEW_STATE"
-msgstr "Persist CSR"
-
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
 msgstr "Reject CRR"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CS"
-msgstr "Reject CSR"
 
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
 msgstr "Reject CSR"
@@ -5798,10 +5768,6 @@ msgstr "Determine issuing CA"
 
 msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 msgstr "Sleep"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE"
-msgstr "Issue a certificate"
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_ISSUANCE"
 msgstr "Issue a certificate"
@@ -5849,10 +5815,6 @@ msgstr "CRL Issuance"
 
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
 msgstr "Handle a SCEP Certificate Signing Request"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATI"
-msgstr "Personalize a smartcard"
 
 msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATION"
 msgstr "Personalize a smartcard"
@@ -5922,10 +5884,6 @@ msgstr "Initializing ..."
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_SERVER_CSR_CREATED"
 msgstr "Approved"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSU"
-msgstr "CRL issued"
-
 msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSUED"
 msgstr "CRL issued"
 
@@ -5952,10 +5910,6 @@ msgstr "Initializing ..."
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CYCLE_TOP_INITIAL"
 msgstr "SCEP Certificate Signing Request"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANG"
-msgstr "Export"
 
 msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
 msgstr "Exported logs"
@@ -6049,14 +6003,6 @@ msgstr "SCEP Certificate Signing Request"
 
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Waiting to start"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYP"
-msgstr "Sleep"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICAT"
-msgstr "Certificate Issuance"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
 msgstr "Certificate Issuance"
@@ -6238,6 +6184,110 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PASSWD_LOGIN_MESSAGE"
+#~ msgstr "Page"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_ALREADY_ESTABLISHED"
+#~ msgstr "Value"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CONFIG_AUT"
+#~ msgstr "Comment"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPL"
+#~ msgstr "yes"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CACN"
+#~ msgstr "Test Dummy CA"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCESUCCESS2007"
+#~ msgstr "Certificate Issuance"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTPENDING2007"
+#~ msgstr "Test Dummy CA"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTSUCCESS2007"
+#~ msgstr "Test Dummy CA"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CAI18N_OPENXPKI_WF_TYPE_SCEP_REQUESTWAITING_FOR_CHILD"
+#~ msgstr "Waiting to start"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PR"
+#~ msgstr "Port"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_TLS"
+#~ msgstr "User profile"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_TLS_SERVERCN"
+#~ msgstr "TLS Server profile"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_TLS_SERVERNI"
+#~ msgstr "TLS Server profile"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_S"
+#~ msgstr "yes"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SAN_U"
+#~ msgstr "Microsoft UPN"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CSRNEW_STATE"
+#~ msgstr "Approve CSR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_CHANG"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSU"
+#~ msgstr "Create a new workflow instance for certificate issuance"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSRNEW_STATE"
+#~ msgstr "Persist CSR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CS"
+#~ msgstr "Reject CSR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE"
+#~ msgstr "Issue a certificate"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_DESC_SMARTCARD_PERSONALIZATI"
+#~ msgstr "Personalize a smartcard"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSU"
+#~ msgstr "CRL issued"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANG"
+#~ msgstr "Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYP"
+#~ msgstr "Sleep"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICAT"
+#~ msgstr "Certificate Issuance"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESC"
