@@ -7,6 +7,8 @@
     $limit            => 20
     $start            => 1
     $page             => undef
+    $show_custom_columns   => undef
+    @custom_columns        => undef
 </%args>
 <%init>
     my @search_context;
@@ -76,6 +78,15 @@
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_STATE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></th>
+%
+% # add custom columns 
+% foreach my $custom_column ( @custom_columns ) {
+%
+%   # map field to i18n identifier
+    <th><% $m->comp('/lib/field_to_i18n.mhtml', 'field' => $custom_column) %></th>
+%
+% }
+%
   </tr>
 %   foreach my $instance (@{$msg->{PARAMS}}) # @{$msg->{PARAMS}})
 %   {
@@ -92,6 +103,18 @@
 %     }
     </td>
     <td><% $instance->{'WORKFLOW.WORKFLOW_LAST_UPDATE'} %></td>
+%
+%  # fill custom columns
+%  foreach my $custom_column ( @custom_columns ) {
+%      my $workflow_info = $context->{client}->send_receive_command_msg('get_workflow_info', { ID => $instance->{'WORKFLOW.WORKFLOW_SERIAL'} } );
+%
+%      # fetch the data to be displayed in the custom column
+%      my $custom_column_data = $workflow_info->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$custom_column};
+%
+    <td><% $m->comp('/lib/display_field.mhtml', 'field' => $custom_column_data ) %></td>
+%
+%  }
+%
   </tr>
 %   } # END FOREACH
 % } # END IF
@@ -202,6 +225,40 @@
   </tr>
 <td>
 </table>
+
+%
+% if (not $show_custom_columns) {
+      <a href="<% $context->{menu}->get_root() %>/service/workflow/search_instances.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>&id=<% $msg->{PARAMS}->{WORKFLOW}->{ID} %>&show_custom_columns=1"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_SHOW_CUSTOM_RESULT_COLUMNS') %></a>
+% }
+% else {
+%
+<table>
+  <tr>
+    <th>
+      <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_CUSTOM_RESULT_COLUMNS') %>
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <select name="custom_columns" multiple="multiple">
+%
+% my @result_column_choices;
+% foreach my $key (@{$keys_msg->{PARAMS}}) {
+%     push @result_column_choices, [ $m->scomp('/lib/field_to_i18n.mhtml', 'field' => $key), $key ];
+% }
+% 
+% foreach my $key (sort {lc($a->[0]) cmp lc($b->[0])} @result_column_choices) {
+      <option value="<% $key->[1] %>"><% $key->[0] %></option>
+% }
+%
+      </select>
+    </td>
+  </tr>
+</table>
+%
+% }
+%
+
 <p>
 <& /service/send_form.mhtml &></td>
 <& /service/close_form.mhtml &>
