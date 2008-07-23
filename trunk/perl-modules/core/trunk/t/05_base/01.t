@@ -16,7 +16,7 @@ my $language;
 $language = "C";
 ok(OpenXPKI::i18n::set_language($language), 'Setting language to C succeeds');
 
-$language = "de-de";
-ok(OpenXPKI::i18n::set_language($language), 'Setting langauge to de-de succeeds');
+$language = "de_DE";
+ok(OpenXPKI::i18n::set_language($language), 'Setting language to de_DE succeeds');
 
 1;
