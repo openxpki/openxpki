@@ -244,7 +244,7 @@
 % if ($m->request_comp()->title() !~ /^\/binary\//) {
     </div>  <!-- main -->
 
-    <div id="footer"><small>&copy; 2006, 2007 <a href="http://www.openxpki.org">The OpenXPKI Project</a></small>
+    <div id="footer"><small>&copy; 2006-2008 <a href="http://www.openxpki.org">The OpenXPKI Project</a></small>
     </div>
   </body>
 </html>
