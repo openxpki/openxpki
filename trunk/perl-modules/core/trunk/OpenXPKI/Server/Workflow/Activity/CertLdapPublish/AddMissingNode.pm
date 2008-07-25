@@ -4,16 +4,17 @@
 
 
 package OpenXPKI::Server::Workflow::Activity::CertLdapPublish::AddMissingNode;
+use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use strict;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::DN;
-use utf8;
+
 use Net::LDAP;
+use Data::Dumper;
 
 
 sub execute {
@@ -313,20 +314,27 @@ return 1;
 }
 
 sub __add_node {
- my $self = shift;
- my $cert_dn=shift;
- my $attr_array=shift;
- my $ldap_connection=shift;
- 
-my $result = $ldap_connection->add( $cert_dn, attr => $attr_array );
-if ( ! $result->code ) {
-##! 129: 'LDAP ADD NODE entry $cert_dn added SUCCESSFULLY' 
-}
-else {
-##! 129: 'LDAP ADD NODE adding entry $cert_dn FAILED $result->error'
-}
+    my $self            = shift;
+    my $cert_dn         = shift;
+    my $attr_array      = shift;
+    my $ldap_connection = shift;
 
-return 1;
+    my $result = $ldap_connection->add( $cert_dn, attr => $attr_array );
+    if ( ! $result->code ) {
+        ##! 129: 'LDAP ADD NODE entry $cert_dn added SUCCESSFULLY' 
+    }
+    else {
+        ##! 129: 'LDAP ADD NODE adding entry $cert_dn FAILED $result->error'
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTLDAPPUBLISH_ADDMISSING_NODE_ADD_FAILED',
+            params  => {
+                ATTRIBUTES => Dumper $attr_array,
+                DN         => $cert_dn,
+                ERROR      => $result->error,
+            }
+        );
+    }
+    return 1;
 }
 
 sub __push_to_hash {
