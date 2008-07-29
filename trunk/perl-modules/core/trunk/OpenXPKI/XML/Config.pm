@@ -142,16 +142,16 @@ sub __get_fixed_params
         # check if someone in the caller chain comes from the workflow
         # namespace
         my @callers = ();
-        while (my $caller = caller($i)) {
+        while (my @caller = caller($i)) {
             # get detailed caller information for debugging purposes
             my ($package, $filename, $line, $subroutine, $hasargs,
                 $wantarray, $evaltext, $is_require, $hints, $bitmask)
-                = caller($i);
+                = @caller;
             push @callers, "$package:$subroutine:$line";
 
-            ##! 64: 'caller: ' . $caller
-            if (   $caller =~ m{ \A OpenXPKI::Server::Workflow }xms
-                || $caller eq 'OpenXPKI::Server::Init'
+            ##! 64: 'caller: ' . $subroutine
+            if ($subroutine =~ m{ \A OpenXPKI::Server::Workflow }xms
+                || $subroutine eq 'OpenXPKI::Server::Init'
                ) {
                 # caller is from the Workflow namespace or from
                 # Server::Init, so he has to provide a config identifier
