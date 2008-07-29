@@ -124,11 +124,11 @@ done
 BASH_SHELL=`which bash`
 
 if [ "${DIST_ONLY}" != "0" ] ; then
-  mv Makefile.in Makefile
+  cp Makefile.in Makefile
 	# Use "," as delimeter symbol when calling sed
 	# change "[% shell.bash %]" line into actual path to bash
 	# Keep initial file under the name Makefile.in
-  sed -e "s,\[\% shell.bash \%\],$BASH_SHELL,g" -i ".in" Makefile 
+  sed -e "s,\[\% shell.bash \%\],$BASH_SHELL,g" Makefile 
   echo
   echo "Specially reduced Makefile created. You may now prepare distribution tarball by running command:"
   echo
