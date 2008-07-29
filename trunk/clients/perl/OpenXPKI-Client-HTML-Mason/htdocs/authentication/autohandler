@@ -8,6 +8,18 @@
     if (!defined $next_comp) {
         $next_comp = $m->request_args()->{'next_comp'};
     }
+    # if you click on a menu link after logging out, next_comp will
+    # contain the __ parameters (__session_id, __language, __role)
+    # which will then be in the final link twice - thus we need to
+    # clean these up.
+    # Note that we do not clean up the __menu_... parameters, as these
+    # actually provide useful information on where the user left off ...
+    $next_comp =~ s{__language=[^&]*&?}{};
+    $next_comp =~ s{__session_id=[0-9a-f]*&?}{};
+    $next_comp =~ s{__role=[^&]*&?}{};
+    # if only a trailing ? is left, remove that too
+    $next_comp =~ s{\?\z}{}xms;
+
     my $no_menu  = $m->request_args()->{'no_menu'};
     $m->comp ('/lib/debug.mhtml',
               'level' => 99,
