@@ -300,7 +300,7 @@ WriteMakefile(
 	'Net::LDAP'              => "0.32",
         'Net::Server'            => '0.94',
 	'Params::Validate'       => '0.77',
-	'Proc::ProcessTable'     => '0.41',
+	'Proc::ProcessTable'     => '0.43',
 	'Regexp::Common'         => 2,
         'Sys::SigAction'         => '0.06',
         'Template'               => '2.15',
