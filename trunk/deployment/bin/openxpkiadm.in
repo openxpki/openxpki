@@ -764,7 +764,6 @@ sub __get_required_shares {
     if ($EVAL_ERROR) { # k is not present, noticed the hard way
         $quorum_k_count = 0;
         $quorum_k = undef;
-        print "EVAL_ERROR: " . $EVAL_ERROR;
     }
     if ($quorum_k_count != 0) { # 'k' configured,
         push @token_counter, (0);
