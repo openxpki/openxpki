@@ -540,13 +540,14 @@ sub __wf_factory_add_config {
     my $config_id        = $arg_ref->{CONFIG_ID};
     ##! 4: 'config_id: ' . $config_id
     my %workflow_config  = %{ $arg_ref->{WF_CONFIG_MAP} };
+    my $xml_config       = CTX('xml_config');
 
   ADD_CONFIG:
     foreach my $type (qw( conditions validators activities workflows )) {
         ##! 2: "getting workflow '$type' configuration files"
         my $toplevel_count;
         eval {
-            $toplevel_count = CTX('xml_config')->get_xpath_count(
+            $toplevel_count = $xml_config->get_xpath_count(
                 XPATH     => [ 'pki_realm'     , 'workflow_config',
                              $type           , $workflow_config{$type}->{config_key} ],
                 COUNTER   => [ $idx            , 0,
@@ -578,7 +579,7 @@ sub __wf_factory_add_config {
 
                     my $secondlevel_count;
                     eval {
-                        $secondlevel_count = CTX('xml_config')->get_xpath_count(
+                        $secondlevel_count = $xml_config->get_xpath_count(
                             XPATH     => [ @base_path, $iterator ],
                             COUNTER   => [ @base_ctr ],
                             CONFIG_ID => $config_id,
@@ -586,7 +587,7 @@ sub __wf_factory_add_config {
                     };
                     ##! 16: 'secondlevel_count: ' . $secondlevel_count
                     for (my $iii = 0; $iii < $secondlevel_count; $iii++) {
-                        my $entry = CTX('xml_config')->get_xpath_hashref(
+                        my $entry = $xml_config->get_xpath_hashref(
                             XPATH     => [ @base_path, $iterator ],
                             COUNTER   => [ @base_ctr , $iii      ],
                             CONFIG_ID => $config_id,
@@ -617,7 +618,7 @@ sub __wf_factory_add_config {
                     }
                 }
                 else {
-                    my $entry = CTX('xml_config')->get_xpath_hashref(
+                    my $entry = $xml_config->get_xpath_hashref(
                         XPATH     => [ @base_path ],
                         COUNTER   => [ @base_ctr  ],
                         CONFIG_ID => $config_id,
@@ -650,7 +651,7 @@ sub __wf_factory_add_config {
         # <configfile> references ...
         my $count;
         eval {
-            $count = CTX('xml_config')->get_xpath_count(
+            $count = $xml_config->get_xpath_count(
                 XPATH     => [ 'pki_realm', 'workflow_config', $type, 'configfile' ],
                 COUNTER   => [ $idx       , 0                , 0 ],
                 CONFIG_ID => $config_id,
@@ -685,7 +686,7 @@ sub __wf_factory_add_config {
         }
 
         for (my $ii = 0; $ii < $count; $ii++) {
-            my $entry = CTX('xml_config')->get_xpath (
+            my $entry = $xml_config->get_xpath (
                 XPATH     => [ 'pki_realm', 'workflow_config', $type, 'configfile' ],
                 COUNTER   => [ $idx       , 0,            0,     $ii ],
                 CONFIG_ID => $config_id,
