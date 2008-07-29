@@ -229,10 +229,14 @@
     else
     {
         ## sometimes we have only the message
-        $id   = $msg->{PARAMS}->{WORKFLOW}->{ID}   if (not defined $id);
-        $type = $msg->{PARAMS}->{WORKFLOW}->{TYPE} if (not defined $type);
+        $id   = $msg->{PARAMS}->{WORKFLOW}->{ID}   if (! defined $id && exists $msg->{PARAMS} && exists $msg->{PARAMS}->{WORKFLOW} && exists $msg->{PARAMS}->{WORKFLOW}->{ID});
+        $type = $msg->{PARAMS}->{WORKFLOW}->{TYPE} if (! defined $type && exists $msg->{PARAMS} && exists $msg->{PARAMS}->{WORKFLOW} && exists $msg->{PARAMS}->{WORKFLOW}->{TYPE});
     }
-    # TODO - error handling!!!
+    if (ref $msg eq 'HASH' && exists $msg->{SERVICE_MSG} && $msg->{SERVICE_MSG} eq 'ERROR') {
+        my @errors = $m->comp('/lib/get_deep_error.mhtml', 'msg' => $msg);
+        $m->comp('/service/create_csr/print_errors.mhtml', 'errors' => \@errors);
+        return;
+    }
     my %untainted = ();
     my $context_hash = '';
     if ($msg->{PARAMS}->{WORKFLOW}->{TYPE} eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST') {
