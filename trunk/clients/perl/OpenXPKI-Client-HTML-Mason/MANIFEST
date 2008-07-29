@@ -185,14 +185,19 @@ htdocs/binary/get_privkey.html
 t/common.pl
 t/02_pod_syntax.t
 t/03_pod_coverage.t
-t/05_deployment.t
 t/10_syntax.t
-t/11_login/01_anonymous.t
-t/99_cleanup.t
 
 t/20_webserver/01_deploy_openxpki_instance.t
 t/20_webserver/05_login.t
+t/20_webserver/10_ca_info.t
+t/20_webserver/15_csr_spkac.t
+t/20_webserver/16_csr_serverside.t
+t/20_webserver/17_csr_pkcs10.t
+t/20_webserver/18_csr_ie.t
+t/20_webserver/20_csr_approval.t
 t/20_webserver/99_cleanup.t
+t/20_webserver/csr.pem
+t/20_webserver/csr.pem.ie
 t/20_webserver/lib/OpenXPKI/Client/HTML/Mason/Test/Server.pm
 
 eg/openxpki-mason-cgi.conf
