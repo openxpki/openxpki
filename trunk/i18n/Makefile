@@ -6,7 +6,7 @@ INSTALL      = install
 LANGS         = en_GB de_DE ru_RU
 PO_SOURCES   = $(LANGS:%=%/openxpki.po)
 MO_TRANSLATIONS = $(LANGS:%=%/$(MO_FILE))
-POT_SOURCES  = ../perl-modules ../clients ../deployment
+POT_SOURCES  = ../perl-modules/core/trunk ../clients/perl/OpenXPKI-Client ../clients/perl/OpenXPKI-Client-SCEP ../clients/perl/OpenXPKI-Client-HTML-Mason ../deployment
 VERSION_FILE    = ./VERSION
 
 #---- variable settings above, rules below ----
@@ -20,9 +20,9 @@ $(PO_SOURCES)::
 	@if (test ! -d $(@:openxpki.po=)); then echo creating directory for $(@:openxpki.po=); mkdir $(@:openxpki.po=); fi
 	@if (test ! -f $@); then echo creating po file $@; cp openxpki.pot $@; fi
 	@if (test `uname` = "SunOS"); then \
-                gmsgmerge --update $@ openxpki.pot; \
+                gmsgmerge -s --update $@ openxpki.pot; \
 	else \
-		msgmerge --update $@ openxpki.pot; \
+		msgmerge -s --update $@ openxpki.pot; \
 	fi
 	@rm -f $@~
 	@perl convert.pl $@ > $@_utf8 2>/dev/null

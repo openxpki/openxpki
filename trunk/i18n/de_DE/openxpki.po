@@ -124,15 +124,6 @@ msgstr "Web-Schnittstelle des Trustcenters"
 msgid "I18N_OPENXPKI_CA_CHAIN"
 msgstr "CA-Zertifikatskette"
 
-msgid "I18N_OPENXPKI_CA_ID"
-msgstr "CA-ID"
-
-msgid "I18N_OPENXPKI_CA_NOTAFTER"
-msgstr "Gültig bis"
-
-msgid "I18N_OPENXPKI_CA_NOTBEFORE"
-msgstr "Gültig von"
-
 msgid "I18N_OPENXPKI_CA_STATUS"
 msgstr "Status"
 
@@ -150,17 +141,20 @@ msgstr "Zertifikat ist CA"
 msgid "I18N_OPENXPKI_CERTIFICATE_IDENTIFIER"
 msgstr "Dieser Workflow erstellt ein neues Zertifikat."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_AIA"
+msgstr "E-Mailadresse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_CDPS"
+msgstr "Zertifikat ist CA"
+
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Zertifkat herunterladen"
 
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_DER"
-msgstr "DER-Format"
-
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL"
-msgstr "Installation eines E-Mail-Zertifikates eines anderen Nutzers"
-
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL_MOZILLA"
-msgstr "Installation eines E-Mail-Zertifikates eines anderen Nutzers"
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_DOWNLOAD_FIREFOX_INSTALL"
+msgstr "Installation eines Zertifikates für Ihren privaten Schlüssel"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
 msgstr "Installation eines Zertifikates für Ihren privaten Schlüssel"
@@ -174,9 +168,6 @@ msgstr "Firefox, Mozilla"
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
 msgstr "PEM-, CRT-Format"
 
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE"
-msgstr "Zertifikat und privaten Schlüssel herunterladen"
-
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS"
 msgstr ""
 "Zu diesem Zertifikat können Sie (mit dem richtigen Passwort) den privaten "
@@ -184,9 +175,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
 msgstr "Textformat"
-
-msgid "I18N_OPENXPKI_CERT_DOWNLOAD_USER_ENROLL"
-msgstr "Installation Ihres Zertifikates"
 
 msgid "I18N_OPENXPKI_CERT_EMAIL"
 msgstr "E-Mailadresse"
@@ -228,6 +216,18 @@ msgstr "Gültig von"
 
 msgid "I18N_OPENXPKI_CERT_NOT_YET_VALID"
 msgstr "noch nicht gültig"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_POLICY"
+msgstr "Zertifikat ist CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_PUBLIC_KEY"
+msgstr "abgelaufen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_REVOKED"
+msgstr "abgelaufen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_"
@@ -280,8 +280,36 @@ msgstr ""
 msgid "I18N_OPENXPKI_CERT_SERIAL"
 msgstr "Seriennummer"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_STATE"
+msgstr "Gültig bis"
+
 msgid "I18N_OPENXPKI_CERT_SUBJECT"
 msgstr "Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SUBJECT_KEY_IDENTIFIER"
+msgstr "Dieser Workflow erstellt ein neues Zertifikat."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_SUSPENDED"
+msgstr "Aussteller"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_USER_NOTICE"
+msgstr "Seriennummer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_VALID"
+msgstr "E-Mailadresse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_VALIDITY"
+msgstr "E-Mailadresse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_WORKFLOWS"
+msgstr "Workflow"
 
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID"
 msgstr ""
@@ -291,10 +319,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_AUTH_STACK_MESSAGE"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PASSWD_LOGIN_MESSAGE"
-msgstr "Seite"
 
 msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_ENTER_ID"
 msgstr ""
@@ -333,34 +357,6 @@ msgstr "Gültige"
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT"
 msgstr "Kommentar"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_DESCRIPTION"
-msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_SIGNING"
-msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_TITLE"
-msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_WITHOUT_SIGNING"
-msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_DESCRIPTION"
@@ -409,16 +405,6 @@ msgstr "Web-Schnittstelle des Trustcenters"
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_WITHOUT_SIGNING"
 msgstr "Web-Schnittstelle des Trustcenters"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CODE_SIGNING_APPROVAL_DESCRIPTION"
-msgstr ""
-"Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
-"(CSR) stellen wollen."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CODE_SIGNING_APPROVAL_TITLE"
-msgstr "Auswählen einer Rolle"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CRR_APPROVAL_DESCRIPTION"
@@ -542,27 +528,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CRR_REVOKE_CERTIFICATE_TITLE"
 msgstr "Auswählen eines Profils"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXECUTE_CSR_DESCRIPTION"
-msgstr "Soll mit der Erstellung des Zertifikates begonnen werden?"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXECUTE_CSR_TITLE"
-msgstr "Start der Zertifikatserstellung"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXPORT_CSR_DESCRIPTION"
-msgstr ""
-"Soll der Zertifizierungsantrag zu einem anderen Server exportiert werden?"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXPORT_CSR_TITLE"
-msgstr "Export der Zertifizierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_FAIL_WORKFLOW_DESCRIPTION"
-msgstr "Beschreibung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_FAIL_WORKFLOW_TITLE"
-msgstr "Export der Zertifizierungsantrages"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_INSERT_CSR_DESCRIPTION"
 msgstr ""
@@ -571,16 +536,6 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_INSERT_CSR_TITLE"
 msgstr "Export der Zertifizierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CODE_SIGNING_DESCRIPTION"
-msgstr ""
-"Wenn Sie diesen Zertifzierungsantrag tatsächlich ablehnen wollen, dann "
-"fahren Sie fort."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CODE_SIGNING_TITLE"
-msgstr "Ablehnen des Zertifizierungsantrages"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CRR_DESCRIPTION"
@@ -621,13 +576,6 @@ msgstr ""
 "Für dieses Zertifikat wurde der Rückrufprozess begonnen, es wird Teil der "
 "nächsten CRL (Certificate Revocation List) sein. Daher sollte es vermutlich "
 "nicht mehr benutzt werden."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
-msgstr ""
-"Auf dieser Seiten finden Sie die wichtigsten Informationen über das "
-"ausgewählte Zertifikat. Außerdem gibt es mehrere Links um das Zertifikat zu "
-"installieren. Wenn Sie mehr Informationen benötigen, dann folgen Sie dem "
-"Link zu der ausführlicheren Zertifikatsseite. "
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_REVOKED_DESC"
 msgstr ""
@@ -767,93 +715,16 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
 msgstr "Details des Zertifikats"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_ALREADY_DOWNLOADED"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_ARCHIVED_WFS"
-msgstr "Login"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_NEW_WF_TITLE"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO_INSTALL_IN_BROWSER"
 msgstr "Zertifikat #__SERIAL__"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_ERROR_DESC"
-msgstr ""
-"Mit dem untenstehenden Formular können Sie einen Zertifikatsrückruf "
-"beantragen. Bitte suchen Sie die passende Workflowart aus und geben sie "
-"einen Rückrufgrund sowie die Zeit der Ungültigkeit des Zertifikates an "
-"(diese darf nicht in der Zukunft). Falls Sie relevante "
-"Hintergrundinformation haben, vermerken Sie diese bitte im Kommentarfeld."
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_ISSUANCE_WORKFLOW_LINK"
+msgstr "Detailierte Zertifikatsinformationen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_ERROR_TITLE"
-msgstr "Aufgetretene Fehler"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_SUCCESS_DESC"
-msgstr ""
-"Um einen Zertifikatsrückruf zu beantragen, müssen Sie das Zertifikat "
-"angeben, das Sie zurückrufen möchten. Benutzen Sie bitte das Suchformular, "
-"um das passende Zertifikat zu finden. Auf der Zertifikatsinformationsseite "
-"finden Sie dann einen Link, mit dem Sie den Rückruf starten können."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_SUCCESS_TITLE"
-msgstr "Auswählen einer Rolle"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_DESC"
-msgstr "Login"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_DOWNLOAD_SIGNED_FILE"
-msgstr "Export der Zertifizierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_DOWNLOAD_SIGNED_FILE_AGAIN"
-msgstr "Erneut anmelden"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_FILENAME"
-msgstr "Zurücksetzen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_FILETYPE_FORM"
-msgstr "Cryptographic Service Provider (freie Eingabe)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_INTRO_DESC"
-msgstr "Login"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_NOTIFIED_BUT_NOT_YET_DOWNLOADED"
-msgstr "Fehler beim Abmelden"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_NOTIFIED_WFS"
-msgstr "Login"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_PENDING_WFS"
-msgstr "Details des Zertifikats"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_UPLOAD_FILE_FORM"
-msgstr "Cryptographic Service Provider (freie Eingabe)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_WAITING_FOR_APPROVAL"
-msgstr "Start der CRL-Erstellung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_WAITING_FOR_CODESIGNING_SOAP_SERVER"
-msgstr "Login"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_SIGNING_REQUEST_WORKFLOW_LINK"
+msgstr "Detailierte Zertifikatsinformationen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_SUCCESS_CREATE_CRL"
@@ -869,6 +740,29 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_SUCCESS_TITLE"
+msgstr "Auswählen einer Rolle"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_GET_PKCS10_DESC"
+msgstr ""
+"Bitte wählen Sie die Datei aus, die den Zertifzierungsantrag im PKCS#10 "
+"Format enthält. Beim Abschicken dieses Formulars wird der Antrag automatisch "
+"zum Server hochgeladen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_GET_PKCS10_TITLE"
+msgstr "Erstellung eines Antrages mit einem Microsoft Internet Explorer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_RESULTS_DESC"
+msgstr ""
+"Um einen Zertifikatsrückruf zu beantragen, müssen Sie das Zertifikat "
+"angeben, das Sie zurückrufen möchten. Benutzen Sie bitte das Suchformular, "
+"um das passende Zertifikat zu finden. Auf der Zertifikatsinformationsseite "
+"finden Sie dann einen Link, mit dem Sie den Rückruf starten können."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_RESULTS_TITLE"
 msgstr "Auswählen einer Rolle"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_ERROR_LIST"
@@ -1198,6 +1092,16 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_TITLE"
 msgstr "Auswählen eines Profils"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_BULK_DESCRIPTION"
+msgstr ""
+"Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
+"(CSR) stellen wollen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_BULK_TITLE"
+msgstr "Auswählen einer Rolle"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_DESCRIPTION"
 msgstr ""
 "Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
@@ -1439,28 +1343,16 @@ msgstr "PKI Realm"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_HIDE"
 msgstr "Seite"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_ANONYMOUS_MENU_DESCRIPTION"
-msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software verschiedene Zertifizierungsinstanzen "
-"(CAs) unterstützt. Wenn Sie sich nicht sicher sind, dann nutzen Sie den Info-"
-"Bereich im Menü, um sich zu informieren."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_ANONYMOUS_MENU_TITLE"
-msgstr "Anonyme Web-Schnittstelle"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_INFO_MENU_DESCRIPTION"
-msgstr ""
-"Dieses Menü erlaubt den Zugriff auf alle relevanten Informationen über die "
-"benutzte CA. Dies beinhaltet auch CA-Zertifikate und aktuelle CRLs. "
-"Zusätzlich können Sie hier Verweise auf die relevanten Policies und "
-"Certificate Practise Statements (CPS) finden."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_INFO_MENU_TITLE"
-msgstr "CA-Informationen"
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_APPROVAL_DESC"
+msgstr "Genehmigungen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_OP_MENU_DESCRIPTION"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_APPROVAL_TITLE"
+msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DOWNLOAD_DESC"
 msgstr ""
 "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
 "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
@@ -1468,11 +1360,11 @@ msgstr ""
 "informieren Sie sich bitte im Info-Menü."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_OP_MENU_TITLE"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DOWNLOAD_TITLE"
 msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DATAEXCHANGE_MENU_DESCRIPTION"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_OP_REQUEST_DESC"
 msgstr ""
 "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
 "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
@@ -1480,52 +1372,28 @@ msgstr ""
 "informieren Sie sich bitte im Info-Menü."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DATAEXCHANGE_MENU_TITLE"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_OP_REQUEST_TITLE"
 msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DHANDLER_DESCRIPTION"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_SEARCH_DESC"
 msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
+"Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge von "
+"1024 bit"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DHANDLER_TITLE"
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_SEARCH_TITLE"
+msgstr "Zertifikatssuche"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_USER_REQUEST_DESC"
+msgstr ""
+"Hier können Sie nun alle verfügbaren Details zu der ausgewählten Instanz des "
+"Workflows sehen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_USER_REQUEST_TITLE"
 msgstr "Web-Schnittstelle des Trustcenters"
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_LANGUAGE_MENU_DESCRIPTION"
-msgstr ""
-"OpenXPKI unterstützt verschiedene sprachen für die Benutzerschnittstelle. In "
-"dem entsprechenden Untermenü können Sie eine Sprache auswählen. OpenXPKI "
-"benutzt generell UTF-8 als Kodierung. Dies bedeutet, dass die ausgewählte "
-"Sprache nicht die individuelle Eingabe von Zeichen beeinflusst. Sie können "
-"also als Sprache auch Russisch wählen und trotzdem später eine "
-"Organisationseinheit mit deutschen Umlauten eingeben, wenn dies nötig ist."
-
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_LANGUAGE_MENU_TITLE"
-msgstr "Sprachauswahl"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_RA_OP_MENU_DESCRIPTION"
-msgstr ""
-"Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann "
-"informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_RA_OP_MENU_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_WORKFLOW_MENU_DESCRIPTION"
-msgstr "Beschreibung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_WORKFLOW_MENU_TITLE"
-msgstr "Status des Workflows"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTERNET_EXPLORER"
 msgstr "Microsoft Internet Explorer"
@@ -1536,11 +1404,19 @@ msgstr ""
 "benutzt.Wenn Sie diesen benutzen und dien Schlüssel auf Ihrem lokalen "
 "Computer erstellen und speichern wollen, dann ist dies die richtige Auswahl."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_CAOP_TITLE"
+msgstr "Web-Schnittstelle des Trustcenters"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_DESCRIPTION"
 msgstr ""
 "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Untenstehend "
 "finden Sie eine Übersicht über die zuletzt von Ihnen erstellten Workflows "
 "(falls vorhanden)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_RAOP_TITLE"
+msgstr "Web-Schnittstelle des Trustcenters"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE"
 msgstr "Web-Schnittstelle des Trustcenters"
@@ -1737,22 +1613,6 @@ msgstr "Wert"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS"
 msgstr "Cryptographic Service Provider"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_DESC"
-msgstr "Aktivität nicht implementiert"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_ERROR_DESC"
-msgstr "Aktivität nicht implementiert"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_ERROR_TITLE"
-msgstr "Aktivität nicht implementiert"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_TITLE"
-msgstr "Aktivität nicht implementiert"
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
 msgstr ""
 "Diese Aktivität ist noch nicht implementiert worden. Eventuell wurde der "
@@ -1797,6 +1657,14 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATE_INSTANCE_TITLE"
 msgstr "Neuer Workflow-Instanz"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATOR"
+msgstr "Erzeuger des Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CRR_CERT_SUBJECT"
+msgstr "Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CRR_REASON"
 msgstr "Erzeuger des Workflows"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_INFO"
@@ -1864,6 +1732,10 @@ msgstr "Workflows"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_PKCS10"
 msgstr "PKCS#10-Antrag"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_CUSTOM_RESULT_COLUMNS"
+msgstr "Suchergebnisse"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_DESCRIPTION"
 msgstr ""
 "Bitte geben Sie Ihre Suchanfrage für die Kontext-Schlüssel und -Werte an. "
@@ -1878,10 +1750,11 @@ msgstr "Suche nach Workflow-Instanzen"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_VALUE"
 msgstr "Wert"
 
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION"
-msgstr "Suchergebnisse:"
-
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_TITLE"
+msgstr "Suchergebnisse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_SHOW_CUSTOM_RESULT_COLUMNS"
 msgstr "Suchergebnisse"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE"
@@ -1917,14 +1790,42 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DETAILS"
 msgstr "Details der Workflowinstanz"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY"
+msgstr "Details der Workflowinstanz"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_ACTION"
+msgstr ""
+"Hier können Sie nun alle verfügbaren Details zu der ausgewählten Instanz des "
+"Workflows sehen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_DATE"
+msgstr "Details der Workflowinstanz"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_NEW_STATE"
+msgstr "Details der Workflowinstanz"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_STATE"
+msgstr "Details der Workflowinstanz"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_TITLE"
+msgstr "Details der Workflowinstanz"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_USER"
+msgstr "Details der Workflowinstanz"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE"
 msgstr "Details der Workflowinstanz"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_DESC"
-msgstr ""
-"Hier können Sie nun alle verfügbaren Details zu der ausgewählten Instanz des "
-"Workflows sehen."
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_CRRS_TITLE"
+msgstr "Details der Workflowinstanz"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_LIMITED_TO_CREATOR"
@@ -1965,10 +1866,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLIENT_INIT_SERVICE_PROTOCOL_REJECTED"
 msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_ALREADY_ESTABLISHED"
-msgstr "Wert"
 
 msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED"
 msgstr ""
@@ -2063,6 +1960,12 @@ msgstr ""
 "Ihre Identität wird über eine externes Programm geprüft. Bitte geben Sie "
 "hierfür Ihren Account und Ihr Passwort ein."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER"
+msgstr ""
+"Ihre Identität wird über eine externes Programm geprüft. Bitte geben Sie "
+"hierfür Ihren Account und Ihr Passwort ein."
+
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL"
 msgstr ""
 "Ihre Identität wird über eine externes Programm geprüft. Bitte geben Sie "
@@ -2106,8 +2009,32 @@ msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 msgid "I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP"
 msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CRL_ENTRIES"
+msgstr "Seriennummer des Zertifizierungsantrages"
+
 msgid "I18N_OPENXPKI_CRL_FORMAT"
 msgstr "Format"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRL_ISSUANCE_PENDING"
+msgstr "Auf Start wartend"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRL_ISSUER"
+msgstr "Aussteller"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRL_LAST_UPDATE"
+msgstr "Serverseitige Schlüsselgenerierung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRL_NEXT_UPDATE"
+msgstr "Gültig bis"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRL_NUMBER"
+msgstr "Faxnummer"
 
 msgid "I18N_OPENXPKI_CRYPTO_API_CHECK_COMMAND_PARAM_PARAM_PATH_MISMATCH"
 msgstr ""
@@ -2155,9 +2082,6 @@ msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NO_REF"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_CERTFILE_ILLEGAL_PARAM"
-msgstr ""
-
-msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_MODE_ILLEGAL_PARAM"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_ILLEGAL_FUNCTION"
@@ -2222,6 +2146,12 @@ msgstr ""
 "gültige IPv4- oder IPv6-Adresse handelt."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_PKCS7_GET_CHAIN_COULD_NOT_CREATE_CHAIN"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_CANNOT_OPEN_ERRLOG"
 msgstr "Zurücksetzen"
 
@@ -2234,6 +2164,10 @@ msgstr ""
 "Schlüsselerstellung auswählen.Der Schlüssel ist trotzdem nicht durch einen "
 "Administrator lesbar, weil sie die einzige Person sind, die das Passwort "
 "kennt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_CHILD_ERROR"
+msgstr "Antrag im DC-Stil"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED"
@@ -2330,6 +2264,12 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_WRONG_DATATYPE"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
+"gültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_DATA_EMPTY"
 msgstr ""
 "Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um eine "
 "gültige IPv4- oder IPv6-Adresse handelt."
@@ -3117,6 +3057,10 @@ msgstr "eMail-Adresse"
 msgid "I18N_OPENXPKI_EMAILADDRESS_DESC"
 msgstr "Ihre eMail-Adresse, z. B. 'pmueller@bsp.de'."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_ERROR"
+msgstr "nein"
+
 msgid "I18N_OPENXPKI_FAILED"
 msgstr ""
 
@@ -3278,6 +3222,18 @@ msgid "I18N_OPENXPKI_HTML_MASON_DOWNLOAD_CERTIFICATE"
 msgstr "Zertifikat herunterladen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_MY_CERTIFICATES_DESC"
+msgstr "Zertifikat herunterladen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_MY_CERTIFICATES_NO_CERTIFICATES"
+msgstr "Gefundene Zertifikate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_MY_CERTIFICATES_TITLE"
+msgstr "Zertifikat herunterladen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_DESC"
 msgstr "Erfolgreich abgemeldet"
 
@@ -3313,83 +3269,87 @@ msgstr "Start der CRL-Erstellung"
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE"
 msgstr "Start der CRL-Erstellung"
 
-msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
-msgstr "CA-Infos"
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_APPROVAL"
+msgstr "Smartcard personalisieren"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_HTML_MENU_CODESIGNING"
-msgstr "CA-Infos"
-
-msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CRR"
-msgstr "Rückrufantrag (CRR)"
-
-msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CSR"
-msgstr "Neuer Antrag (CSR)"
-
-msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
-msgstr "Datenaustausch"
-
-msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT"
-msgstr "Export"
-
-msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_IMPORT"
-msgstr "Import"
-
-msgid "I18N_OPENXPKI_HTML_MENU_EXPIRED_CERTS"
-msgstr "Abgelaufene"
+msgid "I18N_OPENXPKI_HTML_MENU_BULK_CERTIFICATE_SIGNING_REQUEST"
+msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_HTML_MENU_KEY_LIST"
+msgid "I18N_OPENXPKI_HTML_MENU_CA_CERTIFICATES"
+msgstr "Gültige"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_REVOCATION_REQUEST"
+msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_SIGNING_REQUEST"
+msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_CRLS"
 msgstr "Aktuelle CRLs"
 
-msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
-msgstr "Sprache (Language)"
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_DOWNLOAD"
+msgstr "Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_HOME"
+msgstr "Abmelden"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_ISSUE_CRL"
+msgstr "Aktuelle CRLs"
 
 msgid "I18N_OPENXPKI_HTML_MENU_LIST_CRL"
 msgstr "Aktuelle CRLs"
 
-msgid "I18N_OPENXPKI_HTML_MENU_LIST_ISSUER"
-msgstr "Liste der CAs"
-
-msgid "I18N_OPENXPKI_HTML_MENU_LIST_POLICY"
-msgstr "Policy/CPS"
-
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
 msgstr "Abmelden"
 
-msgid "I18N_OPENXPKI_HTML_MENU_PKI_REALM_INFO"
-msgstr "PKI Realm"
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_MY_CERTIFICATES"
+msgstr "Neuer Antrag (CSR)"
 
-msgid "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS"
-msgstr "Zurückgerufene"
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_PENDING_CRRS"
+msgstr "Abgelaufene"
 
-msgid "I18N_OPENXPKI_HTML_MENU_SEARCH_CERT"
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_PENDING_CSRS"
+msgstr "Abgelaufene"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_POLICY_DOCUMENTS"
+msgstr "Gültige"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_REQUEST"
+msgstr "Neuer Antrag (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_SEARCH"
 msgstr "Zertifikats-Suche"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS"
-msgstr "Abgelaufene"
+msgid "I18N_OPENXPKI_HTML_MENU_SEARCH_CERTIFICATES"
+msgstr "Zertifikats-Suche"
 
-msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD"
-msgstr "Smartcard personalisieren"
-
-msgid "I18N_OPENXPKI_HTML_MENU_VALID_CERTS"
-msgstr "Gültige"
-
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW"
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_SEARCH_WORKFLOWS"
 msgstr "Workflow"
 
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
-msgstr "Neue Instanz"
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD_PERSONALIZATION"
+msgstr "Dieser Workflow erstellt neue CRLs."
 
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
-msgstr "Instanzen anzeigen"
-
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES"
-msgstr "Arten anzeigen"
-
-msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_SEARCH_INSTANCES"
-msgstr "Instanzen suchen"
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MENU_TASKS"
+msgstr "Aktuelle CRLs"
 
 msgid "I18N_OPENXPKI_HTML_ORGANIZATION"
 msgstr "Organisation"
@@ -3485,20 +3445,16 @@ msgstr ""
 "auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. Dies "
 "dient der sichern Identifikation von Personen oder Objekten."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_I18N_SETLOCALE_LC_MESSAGES_FAILED"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_I18N_SETLOCALE_LC_TIME_FAILED"
+msgstr "Antrag im DC-Stil"
+
 msgid "I18N_OPENXPKI_KEY_DOWNLOAD_JAVA_KEYSTORE"
 msgstr "Java Keystore"
-
-msgid "I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY"
-msgstr "OpenSSL/SSLeay-Format"
-
-msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12"
-msgstr "PKCS#12"
-
-msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER"
-msgstr "PKCS#8 (DER)"
-
-msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM"
-msgstr "PKCS#8 (PEM)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_LDAPUTILS_"
@@ -3783,6 +3739,10 @@ msgstr "Web-Schnittstelle des Trustcenters"
 msgid "I18N_OPENXPKI_SECRET_STATUS"
 msgstr "Status"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERIALIZATION_FAST_DESERIALIZE_INCORRECT_SERIALIZATION_FORMAT"
+msgstr "TLS-Server"
+
 msgid "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_ARRAY_ELEMENT_POSITION_FORMAT_CORRUPTED"
 msgstr ""
 
@@ -3933,6 +3893,10 @@ msgid "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_CA_CONFIG"
 msgstr "uid"
 
@@ -4001,6 +3965,10 @@ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_WORKFLOW_
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_FACTORY_FACTORY_NOT_DEFINED"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_TYPE_FOR_ID_NO_RESULT_FOR_ID"
 msgstr "Seriennummer des Workflowprozesses"
 
@@ -4018,6 +3986,10 @@ msgstr "Mindestens ein Kontext-Eintrag wird benötigt"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED"
 msgstr "Seriennummer des Workflowprozesses"
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_LOGIN_FAILED"
@@ -4426,9 +4398,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_UPDATE_NO_DATA_PRESENT"
 msgstr "Web-Schnittstelle des Trustcenters"
 
-msgid "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_SERIALIZATION_FAILED"
-msgstr ""
-
 msgid "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_SERVICE_FAILED"
 msgstr ""
 
@@ -4459,6 +4428,10 @@ msgstr "Zurücksetzen"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_INIT_GET_WORKFLOW_FACTORY_NO_CONFIG_IDENTIFIERS_IN_DB"
 msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_INIT_GET_XML_CONFIG_CONFIG_DB_ERROR"
+msgstr "TLS-Server"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_INIT_I18N_MISSING_CONFIG"
@@ -4523,6 +4496,10 @@ msgstr "Prozesse anzeigen"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_DISPATCHER_DISPATCH_FAILED"
 msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_DISPATCHER_NO_NOTIFIERS_DEFINED_FOR_PKI_REALM"
+msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_EMPTY_OR_UNDEFINED_CONTENT"
@@ -4622,26 +4599,6 @@ msgid "I18N_OPENXPKI_SERVER_SESSION_NEW_MISSING_LIFETIME"
 msgstr ""
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_SOAPCALL_CALL_FAILED"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_SOAPCALL_NEW_MISSING_METHOD_PARAM"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_SOAPCALL_NEW_MISSING_NAMESPACE_PARAM"
-msgstr "Fehlende Funktionalität"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_SOAPCALL_NEW_MISSING_WSDL_PARAM"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_SOAPCALL_UNEXPECTED_RESULT_STRUCTURE"
-msgstr "testuser"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_CERTISSUANCE_IMPORTCERTDATA_INVALID_CSR_TYPE"
 msgstr "Zertifikatserstellung vorbereitet"
 
@@ -4708,6 +4665,10 @@ msgstr "PKI Realm"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTIFICATEPUBLISH_PUBLISH_CERTIFICATE_TOKEN_UNAVAILABLE"
 msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTLDAPPUBLISH_ADDMISSING_NODE_ADD_FAILED"
+msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_DETERMINENEXTCA_NO_CA_IDS_DEFINED"
@@ -4834,46 +4795,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_WRITE_ARCHIVE_FAILED"
 msgstr "PKI Realm"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_RETRIEVE_PASSWORD_ID_IS_NEITHER_ARRAY_NOR_SCALAR"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_RETRIEVE_PASSWORD_NO_ENCRYPTED_PASSWORD_PRESENT_FOR_ID"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_RETRIEVE_PASSWORD_TOKEN_NOT_AVAILABLE"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_CERT_NOT_AVAILABLE"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_ID_OR_PASSWORD_UNAVAILABLE"
-msgstr "Prozesse anzeigen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_INVALID_SAFE_ID"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_MISSING_PKI_REALM_CONFIG"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_NO_SAFE_AVAILABLE"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_TOKEN_NOT_AVAILABLE"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STOR_EPASSWORD_INPUT_DATA_IS_NOT_A_HASHREF"
-msgstr "Prozesse anzeigen"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EXTRACTCSR_PKCS10_UNDEFINED"
 msgstr "PKI Realm"
 
@@ -4954,6 +4875,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_WRITECERTIFICATETOINSTAL
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_CONTEXT_HASH_CHECK_FAILED"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_COULD_NOT_DETERMINE_SIGNER_CERTIFICATE_IDENTIFIER"
 msgstr "Prozesse anzeigen"
 
@@ -5014,15 +4939,11 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_NO_ACTI
 msgstr "PKI Realm"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_NOTIFICATION_MESSAGE_UNDEFINED"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_FORKWORKFLOWINSTANCE_SHARED_MEMORY_NOT_CREATED"
 msgstr "PKI Realm"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_SOAPCALL_CONFIGURATION_ERROR_MANDATORY_PARAMETERS_MISSING"
-msgstr "Die ausstellende CA für das Zertifikat ist bestimmt worden."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_SOAPCALL_CONFIGURATION_ERROR_PARAM_MAPPING_INVALID_FORMAT"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_NOTIFICATION_MESSAGE_UNDEFINED"
 msgstr "PKI Realm"
 
 #, fuzzy
@@ -5071,6 +4992,18 @@ msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKCERTTESTRESULT_TESTRESULT_NOT_TRUE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_INCORRECT_NUMBER_OF_FORKED_CHILDREN"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_IPC_SHARE_DOES_NOT_EXIST"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_PARENT_UNKNOWN"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -5139,14 +5072,6 @@ msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SELF_SIGNED"
-msgstr "Prozesse anzeigen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_CONFIGURATION_ERROR_MANDATORY_PARAMETERS_MISSING"
-msgstr "Prozesse anzeigen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_METHOD_RETURNED_FALSE"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -5225,10 +5150,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_SIGNER_CERT_NOT
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_TYPE_NOT_CONFIGURED"
-msgstr "Prozesse anzeigen"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_UNTRUSTED_CERTIFICATE"
 msgstr "IP-Adresse"
 
@@ -5238,6 +5159,10 @@ msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVAL_SIGNATURE_SIGNATURE_NOT_DEFINED_BUT_REQUIRED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_BULK_NOT_UNDEF_OR_ONE"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -5335,6 +5260,34 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_LONG"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYREUSE_CERTIFICATE_WITH_KEY_ALREADY_EXISTS"
 msgstr "Prozesse anzeigen"
 
@@ -5363,8 +5316,8 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_UNUSED_ID_IS_HAS_BEEN_USED_ALREADY"
-msgstr "Prozesse anzeigen"
+msgid "I18N_OPENXPKI_SERVER_XML_CACHE___GET_SUPER_ENTRY_MORE_THAN_ONE_PATH_AND_NO_ID_SPECIFIED"
+msgstr "testuser"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER__DBI_DRIVER_ORACLE_GET_DSN_NO_DATABASE_NAME"
@@ -5623,6 +5576,10 @@ msgstr ""
 "dient der sichern Identifikation von Personen oder Objekten."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SUCCESS"
+msgstr "ja"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION"
 msgstr "Web-Schnittstelle des Trustcenters"
 
@@ -5808,9 +5765,6 @@ msgstr "Importieren der Workflow-Instanzen"
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
 msgstr "Vorbereiten der Umgebung"
 
-msgid "I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
-msgstr "Zertifikat erstellen"
-
 msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CSR"
 msgstr "Exportieren des Zertifzierungsantrages"
 
@@ -5849,22 +5803,6 @@ msgstr "Warten"
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
 msgstr "Auf anderen Workflow warten"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
-msgstr " Wait 2 seconds for other workflow instance"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_SUB"
-msgstr "Warten"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_TOP"
-msgstr "Warten"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_SUBSUB"
-msgstr "Warten"
-
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr "Start der Zertifikatserstellung"
 
@@ -5885,11 +5823,6 @@ msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
 msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
 
-msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
-msgstr ""
-"Dieser Zertifizierungsantrag sollte benutzt werden, wenn die CA als Offline-"
-"CA eingesetzt wird."
-
 msgid "I18N_OPENXPKI_WF_DESC_CRL_ISSUANCE"
 msgstr "Dieser Workflow erstellt neue CRLs."
 
@@ -5905,16 +5838,6 @@ msgstr "Dieser Workflow erstellt neue CRLs."
 msgid "I18N_OPENXPKI_WF_DESC_CYCLE_TOP"
 msgstr "SCEP-Zertifizierungsantrag"
 
-msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
-msgstr ""
-"Dieser Workflow dient dem Export von Workflow-Instanzen und Import-Logs zu "
-"anderen Servern."
-
-msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
-msgstr ""
-"Dieser Workflow dient dem Import von Workflow-Instanzen und Import-Logs von "
-"anderen Servern."
-
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
 msgstr "SCEP-Zertifizierungsantrag"
@@ -5928,10 +5851,6 @@ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL"
 msgstr "Zertifizierungsantrag (teilweise) genehmigt"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_IMPORT"
-msgstr "Start des Zertifizierungsantrages"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_INITIAL"
 msgstr "Start des Zertifizierungsantrages"
 
@@ -5939,34 +5858,14 @@ msgstr "Start des Zertifizierungsantrages"
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_PENDING"
 msgstr "Zertifizierungsantrag in Bearbeitung"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_REVOKED_CERTIFICATE"
-msgstr "Zertifizierungsantrag genehmigt"
-
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVAL"
 msgstr "Zertifizierungsantrag (teilweise) genehmigt"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED_IMPORT"
-msgstr "Zertifizierungsantrag genehmigt"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_IMPORT"
-msgstr "Start des Zertifizierungsantrages"
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL"
 msgstr "Start des Zertifizierungsantrages"
 
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING"
 msgstr "Zertifizierungsantrag in Bearbeitung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING_IMPORT"
-msgstr "Zertifizierungsantrag in Bearbeitung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PERSISTED_CSR"
-msgstr "Zertifizierungsantrag genehmigt"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_USB_CERT_ISSUANCE_POSSIBLE"
@@ -6011,48 +5910,6 @@ msgstr "Start der CRL-Erstellung"
 msgid "I18N_OPENXPKI_WF_STATE_CYCLE_TOP_INITIAL"
 msgstr "SCEP-Zertifizierungsantrag"
 
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
-msgstr "Logs exportiert"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
-msgstr "Workflow-Instanzen exportiert"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
-msgstr "Zu exportierendes Archiv fertig"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
-msgstr "Export komplett"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
-msgstr "Exportumgebung bereit"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
-msgstr "Initialisiere ..."
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
-msgstr "Export erfolgreich"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_READY"
-msgstr "Zu importierendes Archiv fertig"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_UNPACKED"
-msgstr "Archiv ausgepackt"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_COMPLETED"
-msgstr "Import komplett"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ENV_READY"
-msgstr "Importumgebung bereit"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_INITIAL"
-msgstr "Initialisiere ..."
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_LOGS_DONE"
-msgstr "Logs importiert"
-
-msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
-msgstr "Import erfolgreich"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVAL"
 msgstr "Löschen der Genehmigung(en)"
@@ -6060,10 +5917,6 @@ msgstr "Löschen der Genehmigung(en)"
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_DESC_APPROVED"
 msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
-msgstr "Logs exportiert"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_NODE"
@@ -6082,6 +5935,10 @@ msgid "I18N_OPENXPKI_WF_STATE_LDAP_PUBLIC_INITIAL"
 msgstr "Initial state of the LDAP publishing workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_LDAP_PUBLISHED"
+msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_SCEP_INITIAL_ENROLLMENT"
 msgstr "Start der CRL-Erstellung"
 
@@ -6092,10 +5949,6 @@ msgstr "Genehmigen eines Zertifizierungsantrages"
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_SCEP_RENEWAL_ALLOWED"
 msgstr "Zertifikatserstellung vorbereitet"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_CREATED"
-msgstr "SCEP-Zertifizierungsantrag"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_INITIAL"
@@ -6125,10 +5978,6 @@ msgstr "Zertifizierungsantrag"
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr "Zertifizierungsantrag (Offline-Teil)"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_CODE_SIGNING_REQUEST"
-msgstr "Zertifizierungsantrag"
-
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
 msgstr "Erstellen von CRLs"
 
@@ -6146,13 +5995,6 @@ msgstr "SCEP-Zertifizierungsantrag"
 
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
 msgstr "Export"
-
-msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT"
-msgstr "Import"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
-msgstr "Erstellen von CRLs"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP-Zertifizierungsantrag"
@@ -6182,23 +6024,11 @@ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_UNSUPPORTED_CSR
 msgstr "Zertifikatserstellung vorbereitet"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INCORRECT_ALGORITHM"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INVALID_SESSION"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_PKI_REALM_UNDEFINED"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_TOKEN_UNAVAILABLE"
-msgstr "Start der Zertifikatserstellung"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_WORKFLOW_CHILDREN"
+msgstr "Herunterladen der kompletten Zertifizierungskette"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WORKFLOW_PARENT"
 msgstr "Herunterladen der kompletten Zertifizierungskette"
 
 msgid "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS"
@@ -6284,148 +6114,325 @@ msgstr ""
 msgid "I18N_OPENXPKI_YES"
 msgstr "ja"
 
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
+#~ msgid "I18N_OPENXPKI_CA_ID"
+#~ msgstr "CA-ID"
+
+#~ msgid "I18N_OPENXPKI_CA_NOTAFTER"
+#~ msgstr "Gültig bis"
+
+#~ msgid "I18N_OPENXPKI_CA_NOTBEFORE"
+#~ msgstr "Gültig von"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CA_SUBJECT"
+#~ msgstr "Warten"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_DER"
+#~ msgstr "DER-Format"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL"
+#~ msgstr "Installation eines E-Mail-Zertifikates eines anderen Nutzers"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_EMAIL_ENROLL_MOZILLA"
+#~ msgstr "Installation eines E-Mail-Zertifikates eines anderen Nutzers"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
+#~ msgstr "Microsoft Internet Explorer mit passendem privaten Schlüssel"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA_ENROLL"
+#~ msgstr "Installieren eines Zertifikates zu passendem privatem Schlüssel"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_AND_CERTIFICATE"
+#~ msgstr "Zertifikat und privaten Schlüssel herunterladen"
+
+#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_USER_ENROLL"
+#~ msgstr "Installation Ihres Zertifikates"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PASSWD_LOGIN_MESSAGE"
+#~ msgstr "Seite"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_SIGNING"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_TITLE"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CODE_SIGNING_WITHOUT_SIGNING"
+#~ msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CODE_SIGNING_APPROVAL_DESCRIPTION"
+#~ msgstr ""
+#~ "Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
+#~ "(CSR) stellen wollen."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CODE_SIGNING_APPROVAL_TITLE"
+#~ msgstr "Auswählen einer Rolle"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXECUTE_CSR_DESCRIPTION"
+#~ msgstr "Soll mit der Erstellung des Zertifikates begonnen werden?"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXECUTE_CSR_TITLE"
+#~ msgstr "Start der Zertifikatserstellung"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXPORT_CSR_DESCRIPTION"
+#~ msgstr ""
+#~ "Soll der Zertifizierungsantrag zu einem anderen Server exportiert werden?"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_EXPORT_CSR_TITLE"
+#~ msgstr "Export der Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_FAIL_WORKFLOW_DESCRIPTION"
 #~ msgstr "Beschreibung"
 
-#~ msgid "I18N_OPENXPKI_LIST_NEXT"
-#~ msgstr "Rückwärts"
-
-#~ msgid "I18N_OPENXPKI_LIST_PREV"
-#~ msgstr "Vorwärts"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_FAIL_WORKFLOW_TITLE"
+#~ msgstr "Export der Zertifizierungsantrages"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_CERT_INSTALLATION_TEST_FAILED"
-#~ msgstr "Antrag im OU-Stil"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CODE_SIGNING_DESCRIPTION"
+#~ msgstr ""
+#~ "Wenn Sie diesen Zertifzierungsantrag tatsächlich ablehnen wollen, dann "
+#~ "fahren Sie fort."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_LDAP_MISSING_DATA"
-#~ msgstr "Smartcard personalisieren"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CODE_SIGNING_TITLE"
+#~ msgstr "Ablehnen des Zertifizierungsantrages"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_UNKNOWN_CAUSE"
-#~ msgstr "Smartcard personalisieren"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_MORE_SUBJECT_ALTERNATIVE_FIELDS"
+#~ msgstr "DNS"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_DESCRIPTION"
+#~ msgstr ""
+#~ "Auf dieser Seiten finden Sie die wichtigsten Informationen über das "
+#~ "ausgewählte Zertifikat. Außerdem gibt es mehrere Links um das Zertifikat "
+#~ "zu installieren. Wenn Sie mehr Informationen benötigen, dann folgen Sie "
+#~ "dem Link zu der ausführlicheren Zertifikatsseite. "
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MODULE_BROKEN"
-#~ msgstr "Prozesse anzeigen"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
-#~ msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_TITLE"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_TITLE"
+#~ msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_SERIAL"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_ROLE"
+#~ msgstr "Details des Zertifikats"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_ALREADY_DOWNLOADED"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_ARCHIVED_WFS"
+#~ msgstr "Login"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_NEW_WF_TITLE"
+#~ msgstr "Zertifikat #__SERIAL__"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_ERROR_DESC"
+#~ msgstr ""
+#~ "Mit dem untenstehenden Formular können Sie einen Zertifikatsrückruf "
+#~ "beantragen. Bitte suchen Sie die passende Workflowart aus und geben sie "
+#~ "einen Rückrufgrund sowie die Zeit der Ungültigkeit des Zertifikates an "
+#~ "(diese darf nicht in der Zukunft). Falls Sie relevante "
+#~ "Hintergrundinformation haben, vermerken Sie diese bitte im Kommentarfeld."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_ERROR_TITLE"
+#~ msgstr "Aufgetretene Fehler"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_SUCCESS_DESC"
+#~ msgstr ""
+#~ "Um einen Zertifikatsrückruf zu beantragen, müssen Sie das Zertifikat "
+#~ "angeben, das Sie zurückrufen möchten. Benutzen Sie bitte das "
+#~ "Suchformular, um das passende Zertifikat zu finden. Auf der "
+#~ "Zertifikatsinformationsseite finden Sie dann einen Link, mit dem Sie den "
+#~ "Rückruf starten können."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_CREATE_WF_SUCCESS_TITLE"
+#~ msgstr "Auswählen einer Rolle"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_DESC"
+#~ msgstr "Login"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_DOWNLOAD_SIGNED_FILE"
+#~ msgstr "Export der Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_DOWNLOAD_SIGNED_FILE_AGAIN"
+#~ msgstr "Erneut anmelden"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_FILENAME"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_FILETYPE_FORM"
+#~ msgstr "Cryptographic Service Provider (freie Eingabe)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_INTRO_DESC"
+#~ msgstr "Login"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_NOTIFIED_BUT_NOT_YET_DOWNLOADED"
+#~ msgstr "Fehler beim Abmelden"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_NOTIFIED_WFS"
+#~ msgstr "Login"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_PENDING_WFS"
+#~ msgstr "Details des Zertifikats"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_TITLE"
+#~ msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_UPLOAD_FILE_FORM"
+#~ msgstr "Cryptographic Service Provider (freie Eingabe)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_WAITING_FOR_APPROVAL"
+#~ msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CODESIGNING_WAITING_FOR_CODESIGNING_SOAP_SERVER"
+#~ msgstr "Login"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_DAY"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_HOUR"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MINUTE"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MONTH"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_YEAR"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_CERTIFICATE_DESCRIPTION"
+#~ msgstr ""
+#~ "Bitte wählen Sie ein Profil aus, welches zur Zertifikatserstellung "
+#~ "genutzt werden soll."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_CERTIFICATE_TITLE"
+#~ msgstr "Auswählen eines Profils"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_COMPROMISE_TIME_DESCRIPTION"
+#~ msgstr ""
+#~ "Bitte wählen Sie ein Profil aus, welches zur Zertifikatserstellung "
+#~ "genutzt werden soll."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_COMPROMISE_TIME_TITLE"
+#~ msgstr "Auswählen eines Profils"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_REASON_DESCRIPTION"
+#~ msgstr ""
+#~ "Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
+#~ "(CSR) stellen wollen."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_DESCRIPTION"
+#~ msgstr ""
+#~ "Es stehen mehrere Workflows zur Abarbeitung eines Zertifizierungsantrages "
+#~ "zur Verfügung. Bitte wählen Sie einen aus."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_TITLE"
+#~ msgstr "Auswählen eines Workflows"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_IE_PKC"
 #~ msgstr "Cryptographic Service Provider (CSP)"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
-#~ msgstr "Instanzen anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_PROFILE_00_TLS_BASIC_STYLE"
-#~ msgstr "TLS-Server"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_PROFILE_00_USER_BASIC_STYLE"
-#~ msgstr "TLS-Server"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_PROFILE_05_ADVANCED_STYLE"
-#~ msgstr "TLS-Server"
-
-#~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
-#~ msgstr "Mindestens ein Kontext-Eintrag wird benötigt"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_PARAMETER"
-#~ msgstr "Fehlende Funktionalität"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
-#~ msgstr "Typ der Schlüsselerzeugung"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
-#~ msgstr "Aktive Workflow-Instanzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
-#~ msgstr "Auswählen einer Rolle"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
-#~ msgstr "Zusätzliche Informationen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
-#~ msgstr "Beschreibung"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
-#~ msgstr "Letzte Aktualisierung"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_O"
-#~ msgstr "nein"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_OU"
-#~ msgstr "nein"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
-#~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
-#~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
-#~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
-#~ msgstr "Fehlende Funktionalität"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
-#~ msgstr ""
-#~ "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
-#~ "oder auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
-#~ "Dies dient der sichern Identifikation von Personen oder Objekten."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_CERT_TO_STACK"
-#~ msgstr "Adding a certificate"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_CERT_STACK_LOADED"
-#~ msgstr "Node certificates are loaded"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_LEAF_TYPE_AVAILABLE"
-#~ msgstr "Looking for the leaf in LDAP tree"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_MISSING_NODE_DETERMINED"
-#~ msgstr "LDAP node for the given DN is missing"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_NODE_UPDATED"
-#~ msgstr "LDAP node updated"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_OBJECTCLASSES_DETERMINED"
-#~ msgstr "Determine LDAP objectclasses"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_MORE_SUBJECT_ALTERNATIVE_FIELDS"
-#~ msgstr "DNS"
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
+#~ msgstr "Auswahl des Typs des privaten Schlüssels"
 
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DIRNAME"
 #~ msgstr "DirName"
@@ -6507,508 +6514,6 @@ msgstr "ja"
 #~ "Referenz auf weitere Informationsquellen bzgl. Zertifikatsnutzers sein. "
 #~ "Beispiel: www.openxpki.org/~testuser."
 
-#~ msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
-#~ msgstr "Speichern eines privaten Schlüssels"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
-#~ msgstr "DirName"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_ISSUER"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERTIFICATE_SERIAL"
-#~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_ROLE"
-#~ msgstr "Details des Zertifikats"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_TIME"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_CERTIFICATE_DESCRIPTION"
-#~ msgstr ""
-#~ "Bitte wählen Sie ein Profil aus, welches zur Zertifikatserstellung "
-#~ "genutzt werden soll."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_CERTIFICATE_TITLE"
-#~ msgstr "Auswählen eines Profils"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_COMPROMISE_TIME_DESCRIPTION"
-#~ msgstr ""
-#~ "Bitte wählen Sie ein Profil aus, welches zur Zertifikatserstellung "
-#~ "genutzt werden soll."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_COMPROMISE_TIME_TITLE"
-#~ msgstr "Auswählen eines Profils"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_REASON_DESCRIPTION"
-#~ msgstr ""
-#~ "Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
-#~ "(CSR) stellen wollen."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_DESCRIPTION"
-#~ msgstr ""
-#~ "Es stehen mehrere Workflows zur Abarbeitung eines Zertifizierungsantrages "
-#~ "zur Verfügung. Bitte wählen Sie einen aus."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CRR_GET_WORKFLOW_TYPE_TITLE"
-#~ msgstr "Auswählen eines Workflows"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_DESCRIPTION"
-#~ msgstr ""
-#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
-#~ "dann informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_DESCRIPTION"
-#~ msgstr "Die von Ihnen gewünschte Funktion ist derzeit nicht vorhanden."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_SUBJECT"
-#~ msgstr "Fehlende Funktionalität"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_ISSUER"
-#~ msgstr "Fehlende Funktionalität"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_SERIAL"
-#~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_COMPROMISE_TIME"
-#~ msgstr "Web-Schnittstelle des Trustcenters"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"
-#~ msgstr "Datenaustausch"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_CA_COMPROMISE"
-#~ msgstr "Ändern des Zertifikats-Profils"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_CA_KEY_TIME"
-#~ msgstr ""
-#~ "SPKAC ist ursprünglich von Netscape entwickelt. Heute wird dieses Format "
-#~ "von vielen verschiedenen Browsern benutzt. Solche Browser sind zum "
-#~ "Beispiel Netscape, Mozilla, Firefox und Opera. Wenn Sie einen solchen "
-#~ "Browser benutzen und den Schlüssel mit Ihrem Client generieren wollen, "
-#~ "dann ist dies die richtige Option für Sie."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_CERTIFICATE_HOLD"
-#~ msgstr "Dieser Workflow erstellt ein neues Zertifikat."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_CESSATION_OF_OPERATION"
-#~ msgstr ""
-#~ "Die Organisation (o) bestimmt die Einrichtung, auf die sich das "
-#~ "Zertifikat bezieht."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_HOLD_INSTRUCTION"
-#~ msgstr ""
-#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
-#~ "dann informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_KEY_COMPROMISE"
-#~ msgstr "dc"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_KEY_TIME"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_REMOVE_FROM_CRL"
-#~ msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_SUPERSEDED"
-#~ msgstr "Serverseitige Schlüsselgenerierung"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRL_REASON_UNSPECIFIED"
-#~ msgstr "uid"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
-#~ msgstr "Prozesse anzeigen"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYSETTINGS_TITLE"
-#~ msgstr "Auswahl des Typs des privaten Schlüssels"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1"
-#~ msgstr "Elliptische Kurven DSA, benannte Kurve c2tnb191v1"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1_DESC"
-#~ msgstr ""
-#~ "Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
-#~ "Kurve c2tnb191v1. Bitlänge 191 bits (ungefähr äquivalent zu 1022048 RSA-"
-#~ "Schlüsseln)"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1"
-#~ msgstr "Elliptische Kurven DSA, benannte Kurve prime192v1"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1_DESC"
-#~ msgstr ""
-#~ "Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
-#~ "Kurve prime192v1. Bitlänge 192 bits (ungefähr äquivalent zu 1022048 RSA-"
-#~ "Schlüsseln)"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1"
-#~ msgstr "Elliptische Kurven DSA, benannte Kurve prime239v1"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1_DESC"
-#~ msgstr ""
-#~ "Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
-#~ "Kurve prime239v1. Bitlänge 239 bits ."
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024"
-#~ msgstr "RSA, 1024 bits"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024_DESC"
-#~ msgstr ""
-#~ "Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge "
-#~ "von 1024 bit"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048"
-#~ msgstr "RSA, 2048 bits"
-
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048_DESC"
-#~ msgstr ""
-#~ "Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge "
-#~ "von 2048 bit"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_DAY"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_HOUR"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MINUTE"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_MONTH"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_COMPROMISE_YEAR"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ERROR_HANDLING_MESSAGE"
-#~ msgstr "Fehlende Funktionalität"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
-#~ msgstr "Exportieren des Zertifzierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
-#~ msgstr "Speichern des Zertifzierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
-#~ msgstr "Ausdrucken der Seite"
-
-#~ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-#~ msgstr "Zertifizierungsantrag (Online-Teil)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWORD"
-#~ msgstr "Passwort"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_HTML_EMPLOYEENUMBER"
-#~ msgstr "Telefonnummer"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_RENEWAL_NO_VALID_CERTIFICATE_PRESENT"
-#~ msgstr "DirName"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_VALID_SIGNATURE_AND_MATCHING_DNS"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SIGNED_USING_ORIGINAL_CERT"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_ALL_CHILDREN_SUCCESSFULLY_FINISHED"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE"
-#~ msgstr "Fehler beim Abmelden"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_CREATE_CSR"
-#~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_DO_NOTHING"
-#~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_PERSIST_CERTIFICATE"
-#~ msgstr "Speichern des Zertifzierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
-#~ msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
-#~ msgstr "Dieser Workflow erstellt ein neues Zertifikat."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FINISHED_WAITING_FOR_CHILD"
-#~ msgstr "Auf Start wartend"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
-#~ msgstr "Logs exportiert"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_REJECTED"
-#~ msgstr "Abweisen des Zertifizierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
-#~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_FINISHED_WAITING_FOR_CHILD"
-#~ msgstr "Auf Start wartend"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_FORKED"
-#~ msgstr "Logs exportiert"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_PENDING"
-#~ msgstr "Auf Start wartend"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_REJECTED"
-#~ msgstr "Abweisen des Zertifizierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_SLEPT"
-#~ msgstr "Warten"
-
-#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER_ENROLL"
-#~ msgstr "Microsoft Internet Explorer mit passendem privaten Schlüssel"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA_ENROLL"
-#~ msgstr "Installieren eines Zertifikates zu passendem privatem Schlüssel"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CA_SUBJECT"
-#~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_CHAIN_LIST_DESCRIPTION"
-#~ msgstr ""
-#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
-#~ "dann informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_DESCRIPTION"
-#~ msgstr ""
-#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
-#~ "dann informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_SEARCH_CERT_TITLE"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
-#~ msgstr "Bestimmung der ausstellenden CA"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
-#~ msgstr "Entsperren des Ca-Schlüssels"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
-#~ msgstr "Ausstellende CA für das Zertifikat bestimmt"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
-#~ msgstr "Zertifikat erstellt"
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
-#~ msgstr "Start der Zertifikatserstellung"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
-#~ msgstr "Erstellen eines Zertifikates"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_DESCRIPTION"
-#~ msgstr ""
-#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
-#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
-#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
-#~ "dann informieren Sie sich bitte im Info-Menü."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CA_AUTOHANDLER_TITLE"
-#~ msgstr "Web-Schnittstelle des Trustcenters"
-
-#~ msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_ONLINE"
-#~ msgstr ""
-#~ "Dieser Workflow bearbeitet den Online-Teil eines Zertifizierungsantrag."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_GET_CERT_PROFILE"
-#~ msgstr "Ändern des Zertifikats-Profils"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_IMPORT"
-#~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTVITY_DO_NOTHING"
-#~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_DO_NOTHING"
-#~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_DO_NOTHING_2"
-#~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_NOT_USABLE"
-#~ msgstr "Start der CRL-Erstellung"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_USABLE"
-#~ msgstr "Fehler beim Abmelden"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_NOT_USABLE"
-#~ msgstr "Start der CRL-Erstellung"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_USABLE"
-#~ msgstr "Fehler beim Abmelden"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_ISSUING_CA_DETERMINED"
-#~ msgstr "Ausstellende CA für die CRL bestimmt"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_WAITING_FOR_START"
-#~ msgstr "Auf Start wartend"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_ISSUING_CA_DETERMINED"
-#~ msgstr "Ausstellende CA für die CRL bestimmt"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_PREPARED"
-#~ msgstr "Erstellen von CRLs"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST"
-#~ msgstr "Zurücksetzen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MISSING_TMP"
-#~ msgstr "SPKAC"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
-#~ msgstr "Fehlende Funktionalität"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS"
-#~ msgstr "Fehlende Funktionalität"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CRYPTO_PKCS"
-#~ msgstr "SPKAC"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA\n"
-#~ msgstr "Test Dummy CA"
-
-#~ msgid "I18N_OPENXPKI_HTML_GET_PROCESS_INFO"
-#~ msgstr "Anzeigen einer grafischen Übersicht der Instanz"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_FINISHED"
-#~ msgstr "Initialisiere ..."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
-#~ msgstr "Auf Start wartend"
-
-#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
-#~ msgstr "Deutsch"
-
-#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
-#~ msgstr "English"
-
-#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
-#~ msgstr "Russian"
-
 #~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ATTRIBUTE_NO_ASCII"
 #~ msgstr "Das Feld __LABEL__ darf nur mit ASCII-Daten gefüllt werden."
 
@@ -7064,3 +6569,862 @@ msgstr "ja"
 #~ "Der alternative Namenstyp __TYPE__ ist unbekannt. Meistens handelt es "
 #~ "sich hierbei um eine Fehlkonfiguration. Bitte wenden Sie sich an die "
 #~ "Administratoren."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REASON_SUBJECT"
+#~ msgstr "Zurücksetzen"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1"
+#~ msgstr "Elliptische Kurven DSA, benannte Kurve c2tnb191v1"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_C2TNB191V1_DESC"
+#~ msgstr ""
+#~ "Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
+#~ "Kurve c2tnb191v1. Bitlänge 191 bits (ungefähr äquivalent zu 1022048 RSA-"
+#~ "Schlüsseln)"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1"
+#~ msgstr "Elliptische Kurven DSA, benannte Kurve prime192v1"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME192V1_DESC"
+#~ msgstr ""
+#~ "Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
+#~ "Kurve prime192v1. Bitlänge 192 bits (ungefähr äquivalent zu 1022048 RSA-"
+#~ "Schlüsseln)"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1"
+#~ msgstr "Elliptische Kurven DSA, benannte Kurve prime239v1"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ECDSA_PRIME239V1_DESC"
+#~ msgstr ""
+#~ "Ein privater Schlüssel für DSA mit elliptischen Kurven mit der benannten "
+#~ "Kurve prime239v1. Bitlänge 239 bits ."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_ANONYMOUS_MENU_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software verschiedene Zertifizierungsinstanzen "
+#~ "(CAs) unterstützt. Wenn Sie sich nicht sicher sind, dann nutzen Sie den "
+#~ "Info-Bereich im Menü, um sich zu informieren."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_ANONYMOUS_MENU_TITLE"
+#~ msgstr "Anonyme Web-Schnittstelle"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_INFO_MENU_DESCRIPTION"
+#~ msgstr ""
+#~ "Dieses Menü erlaubt den Zugriff auf alle relevanten Informationen über "
+#~ "die benutzte CA. Dies beinhaltet auch CA-Zertifikate und aktuelle CRLs. "
+#~ "Zusätzlich können Sie hier Verweise auf die relevanten Policies und "
+#~ "Certificate Practise Statements (CPS) finden."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_CA_INFO_MENU_TITLE"
+#~ msgstr "CA-Informationen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DATAEXCHANGE_MENU_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DATAEXCHANGE_MENU_TITLE"
+#~ msgstr "Web-Schnittstelle des Trustcenters"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_LANGUAGE_MENU_DESCRIPTION"
+#~ msgstr ""
+#~ "OpenXPKI unterstützt verschiedene sprachen für die Benutzerschnittstelle. "
+#~ "In dem entsprechenden Untermenü können Sie eine Sprache auswählen. "
+#~ "OpenXPKI benutzt generell UTF-8 als Kodierung. Dies bedeutet, dass die "
+#~ "ausgewählte Sprache nicht die individuelle Eingabe von Zeichen "
+#~ "beeinflusst. Sie können also als Sprache auch Russisch wählen und "
+#~ "trotzdem später eine Organisationseinheit mit deutschen Umlauten "
+#~ "eingeben, wenn dies nötig ist."
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_LANGUAGE_MENU_TITLE"
+#~ msgstr "Sprachauswahl"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_RA_OP_MENU_DESCRIPTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_WORKFLOW_MENU_DESCRIPTION"
+#~ msgstr "Beschreibung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_WORKFLOW_MENU_TITLE"
+#~ msgstr "Status des Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_DESCRIPTION"
+#~ msgstr "Die von Ihnen gewünschte Funktion ist derzeit nicht vorhanden."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_MISSING_REASON_SUBJECT"
+#~ msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWORD"
+#~ msgstr "Passwort"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA1024"
+#~ msgstr "RSA, 1024 bits"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048"
+#~ msgstr "RSA, 2048 bits"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RSA2048_DESC"
+#~ msgstr ""
+#~ "Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge "
+#~ "von 2048 bit"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_DESC"
+#~ msgstr "Aktivität nicht implementiert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_ERROR_DESC"
+#~ msgstr "Aktivität nicht implementiert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_ERROR_TITLE"
+#~ msgstr "Aktivität nicht implementiert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_DOWNLOAD_SIGNED_FILE_TITLE"
+#~ msgstr "Aktivität nicht implementiert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CURRENT_EVENT"
+#~ msgstr "Typ der Schlüsselerzeugung"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_DESCRIPTION"
+#~ msgstr "Beschreibung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LIST_ACTIVE_INSTANCES_TITLE"
+#~ msgstr "Aktive Workflow-Instanzen"
+
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_DESCRIPTION"
+#~ msgstr "Suchergebnisse:"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_ISSUER"
+#~ msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_CERTIFICATE_SERIAL"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WRONG_COMPROMISE_TIME"
+#~ msgstr "Web-Schnittstelle des Trustcenters"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_ALREADY_ESTABLISHED"
+#~ msgstr "Wert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_IE_PATCHED"
+#~ msgstr "Auswählen einer Rolle"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_AFFILIATION_CHANGED"
+#~ msgstr "Datenaustausch"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_CA_COMPROMISE"
+#~ msgstr "Ändern des Zertifikats-Profils"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_CA_KEY_TIME"
+#~ msgstr ""
+#~ "SPKAC ist ursprünglich von Netscape entwickelt. Heute wird dieses Format "
+#~ "von vielen verschiedenen Browsern benutzt. Solche Browser sind zum "
+#~ "Beispiel Netscape, Mozilla, Firefox und Opera. Wenn Sie einen solchen "
+#~ "Browser benutzen und den Schlüssel mit Ihrem Client generieren wollen, "
+#~ "dann ist dies die richtige Option für Sie."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_CERTIFICATE_HOLD"
+#~ msgstr "Dieser Workflow erstellt ein neues Zertifikat."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_CESSATION_OF_OPERATION"
+#~ msgstr ""
+#~ "Die Organisation (o) bestimmt die Einrichtung, auf die sich das "
+#~ "Zertifikat bezieht."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_HOLD_INSTRUCTION"
+#~ msgstr ""
+#~ "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte "
+#~ "beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs) "
+#~ "unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, "
+#~ "dann informieren Sie sich bitte im Info-Menü."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_KEY_COMPROMISE"
+#~ msgstr "dc"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_KEY_TIME"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_REMOVE_FROM_CRL"
+#~ msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRL_REASON_UNSPECIFIED"
+#~ msgstr "uid"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS"
+#~ msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_CRYPTO_PKCS"
+#~ msgstr "SPKAC"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA\n"
+#~ msgstr "Test Dummy CA"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_DIR_DOES_NOT_EXIST"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MISSING_TMP"
+#~ msgstr "SPKAC"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_EMPLOYEENUMBER"
+#~ msgstr "Telefonnummer"
+
+#~ msgid "I18N_OPENXPKI_HTML_GET_PROCESS_INFO"
+#~ msgstr "Anzeigen einer grafischen Übersicht der Instanz"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_IE_INSTALL_CERT_BUTTON"
+#~ msgstr "Ausdrucken der Seite"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_CERT_INSTALLATION_TEST_FAILED"
+#~ msgstr "Antrag im OU-Stil"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_LDAP_MISSING_DATA"
+#~ msgstr "Smartcard personalisieren"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_UNKNOWN_CAUSE"
+#~ msgstr "Smartcard personalisieren"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_CHECKING_CONDITIONS_FOR"
+#~ msgstr "Zusätzliche Informationen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_EXECUTING"
+#~ msgstr "Beschreibung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MASON_WORKFLOW_VALIDATING_INPUT_FOR"
+#~ msgstr "Letzte Aktualisierung"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_CA_INFO"
+#~ msgstr "CA-Infos"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MENU_CODESIGNING"
+#~ msgstr "CA-Infos"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_CREATE_CRR"
+#~ msgstr "Rückrufantrag (CRR)"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE"
+#~ msgstr "Datenaustausch"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_EXPORT"
+#~ msgstr "Export"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_DATAEXCHANGE_IMPORT"
+#~ msgstr "Import"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE"
+#~ msgstr "Sprache (Language)"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_DE_DE"
+#~ msgstr "Deutsch"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_EN_GB"
+#~ msgstr "English"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LANGUAGE_RU_RU"
+#~ msgstr "Russian"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LIST_ISSUER"
+#~ msgstr "Liste der CAs"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_LIST_POLICY"
+#~ msgstr "Policy/CPS"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_PKI_REALM_INFO"
+#~ msgstr "PKI Realm"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_REVOKED_CERTS"
+#~ msgstr "Zurückgerufene"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MENU_SHOW_PENDING_REQUESTS"
+#~ msgstr "Abgelaufene"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_CREATE_INSTANCE"
+#~ msgstr "Neue Instanz"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_ACTIVE_INSTANCES"
+#~ msgstr "Instanzen anzeigen"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_INSTANCES"
+#~ msgstr "Instanzen anzeigen"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_LIST_TYPES"
+#~ msgstr "Arten anzeigen"
+
+#~ msgid "I18N_OPENXPKI_HTML_MENU_WORKFLOW_SEARCH_INSTANCES"
+#~ msgstr "Instanzen suchen"
+
+#~ msgid "I18N_OPENXPKI_KEY_DOWNLOAD_OPENSSL_PRIVKEY"
+#~ msgstr "OpenSSL/SSLeay-Format"
+
+#~ msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS12"
+#~ msgstr "PKCS#12"
+
+#~ msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_DER"
+#~ msgstr "PKCS#8 (DER)"
+
+#~ msgid "I18N_OPENXPKI_KEY_DOWNLOAD_PKCS8_PEM"
+#~ msgstr "PKCS#8 (PEM)"
+
+#~ msgid "I18N_OPENXPKI_LIST_NEXT"
+#~ msgstr "Rückwärts"
+
+#~ msgid "I18N_OPENXPKI_LIST_PREV"
+#~ msgstr "Vorwärts"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_OU"
+#~ msgstr "nein"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_00_TLS_BASIC_STYLE"
+#~ msgstr "TLS-Server"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_00_USER_BASIC_STYLE"
+#~ msgstr "TLS-Server"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_PROFILE_05_ADVANCED_STYLE"
+#~ msgstr "TLS-Server"
+
+#~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_NEED_AT_LEAST_ONE_CONTEXT_ENTRY"
+#~ msgstr "Mindestens ein Kontext-Eintrag wird benötigt"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LDAP_MODULE_BROKEN"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_IS_NOT_PENDING"
+#~ msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SCHEMA_QUERY_COLUMNS_MISSING_COLUMNS"
+#~ msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_SOAPCALL_CALL_FAILED"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_SOAPCALL_NEW_MISSING_METHOD_PARAM"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_SOAPCALL_NEW_MISSING_NAMESPACE_PARAM"
+#~ msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_SOAPCALL_NEW_MISSING_WSDL_PARAM"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_SOAPCALL_UNEXPECTED_RESULT_STRUCTURE"
+#~ msgstr "testuser"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_DATAEXCHANGE_BUILD_ARCHIVE_FAILED"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_RETRIEVE_PASSWORD_ID_IS_NEITHER_ARRAY_NOR_SCALAR"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_RETRIEVE_PASSWORD_NO_ENCRYPTED_PASSWORD_PRESENT_FOR_ID"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_RETRIEVE_PASSWORD_TOKEN_NOT_AVAILABLE"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_CERT_NOT_AVAILABLE"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_ID_OR_PASSWORD_UNAVAILABLE"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_INVALID_SAFE_ID"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_MISSING_PKI_REALM_CONFIG"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_NO_SAFE_AVAILABLE"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_TOKEN_NOT_AVAILABLE"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STOR_EPASSWORD_INPUT_DATA_IS_NOT_A_HASHREF"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_SOAPCALL_CONFIGURATION_ERROR_MANDATORY_PARAMETERS_MISSING"
+#~ msgstr "Die ausstellende CA für das Zertifikat ist bestimmt worden."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_SOAPCALL_CONFIGURATION_ERROR_PARAM_MAPPING_INVALID_FORMAT"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_APPROVALNEEDED_NO_APPROVAL_NEEDED"
+#~ msgstr "DirName"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_CORRECT_NUMBER_OF_VALID_CERTS"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CRLSIGNINGCASLEFT_STILL_CAS_LEFT"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_RENEWAL_NO_VALID_CERTIFICATE_PRESENT"
+#~ msgstr "DirName"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISCERTIFICATEISSUANCEPOSSIBLE_ALL_REQUIRED_PARAMS_PRESENT"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_VALID_SIGNATURE_AND_MATCHING_DNS"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SIGNEDUSINGORIGINALCERTORSELFSIGNED_SIGNED_USING_ORIGINAL_CERT"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SOAPCALL_METHOD_RETURNED_FALSE"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCHILDRENSUCCESSFULLYFINISHED_ALL_CHILDREN_SUCCESSFULLY_FINISHED"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_TYPE_NOT_CONFIGURED"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_NO_DATA"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_UNUSED_ID_IS_HAS_BEEN_USED_ALREADY"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_INIT_SESSION_UNKNOWN_COMMAND"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COMMAND_EXECUTION_FAILED"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_COULD_NOT_INSTANTIATE_COMMAND"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ERROR_HANDLING_MESSAGE"
+#~ msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_ILLEGAL_COMMAND_RETURN_VALUE"
+#~ msgstr "Zurücksetzen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_MISSING_SERVICE_MESSAGE"
+#~ msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_COMMAND"
+#~ msgstr ""
+#~ "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
+#~ "oder auch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+#~ "Dies dient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TESTING_ASSUMES_KEY_USABLE"
+#~ msgstr "Fehler beim Abmelden"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+#~ msgstr "Bestimmung der ausstellenden CA"
+
+#~ msgid "I18N_OPENXPKI_WF_ACTION_EXECUTE_CSR"
+#~ msgstr "Zertifikat erstellen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
+#~ msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
+#~ msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD_SHORT"
+#~ msgstr " Wait 2 seconds for other workflow instance"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_SUB"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_CYCLE_TOP"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_IN_SUBSUB"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
+#~ msgstr "Entsperren des Ca-Schlüssels"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_CREATE_CSR"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_DO_NOTHING"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_GET_CERT_PROFILE"
+#~ msgstr "Ändern des Zertifikats-Profils"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_IMPORT"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_PERSIST_CERTIFICATE"
+#~ msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_ACTVITY_DO_NOTHING"
+#~ msgstr "Warten"
+
+#~ msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
+#~ msgstr ""
+#~ "Dieser Zertifizierungsantrag sollte benutzt werden, wenn die CA als "
+#~ "Offline-CA eingesetzt wird."
+
+#~ msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST_ONLINE"
+#~ msgstr ""
+#~ "Dieser Workflow bearbeitet den Online-Teil eines Zertifizierungsantrag."
+
+#~ msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_EXPORT"
+#~ msgstr ""
+#~ "Dieser Workflow dient dem Export von Workflow-Instanzen und Import-Logs "
+#~ "zu anderen Servern."
+
+#~ msgid "I18N_OPENXPKI_WF_DESC_DATAEXCHANGE_IMPORT"
+#~ msgstr ""
+#~ "Dieser Workflow dient dem Import von Workflow-Instanzen und Import-Logs "
+#~ "von anderen Servern."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_DO_NOTHING"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_DO_NOTHING_2"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_APPROVED"
+#~ msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_NOT_USABLE"
+#~ msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CA_KEY_USABLE"
+#~ msgstr "Fehler beim Abmelden"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CA_DETERMINED"
+#~ msgstr "Ausstellende CA für das Zertifikat bestimmt"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_CERTIFICATE_ISSUED"
+#~ msgstr "Zertifikat erstellt"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_INITIAL"
+#~ msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_ISSUANCE_PREPARED"
+#~ msgstr "Erstellen eines Zertifikates"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_IMPORT"
+#~ msgstr "Start des Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_REVOKED_CERTIFICATE"
+#~ msgstr "Zertifizierungsantrag genehmigt"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVED_IMPORT"
+#~ msgstr "Zertifizierungsantrag genehmigt"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_IMPORT"
+#~ msgstr "Start des Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING_IMPORT"
+#~ msgstr "Zertifizierungsantrag in Bearbeitung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PERSISTED_CSR"
+#~ msgstr "Zertifizierungsantrag genehmigt"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_LOGS"
+#~ msgstr "Logs exportiert"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORTED_WORKFLOW_INSTANCES"
+#~ msgstr "Workflow-Instanzen exportiert"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ARCHIVE_READY"
+#~ msgstr "Zu exportierendes Archiv fertig"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_COMPLETED"
+#~ msgstr "Export komplett"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_ENV_READY"
+#~ msgstr "Exportumgebung bereit"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_INITIAL"
+#~ msgstr "Initialisiere ..."
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_SUCCEEDED"
+#~ msgstr "Export erfolgreich"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_EXPORT_WROTE_IMPORT_LOG"
+#~ msgstr "Auf Start wartend"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_READY"
+#~ msgstr "Zu importierendes Archiv fertig"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ARCHIVE_UNPACKED"
+#~ msgstr "Archiv ausgepackt"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_COMPLETED"
+#~ msgstr "Import komplett"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_ENV_READY"
+#~ msgstr "Importumgebung bereit"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_FINISHED"
+#~ msgstr "Initialisiere ..."
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_INITIAL"
+#~ msgstr "Initialisiere ..."
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_LOGS_DONE"
+#~ msgstr "Logs importiert"
+
+#~ msgid "I18N_OPENXPKI_WF_STATE_DATAEXCHANGE_IMPORT_SUCCEEDED"
+#~ msgstr "Import erfolgreich"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_NOT_USABLE"
+#~ msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CA_KEY_USABLE"
+#~ msgstr "Fehler beim Abmelden"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_CERTIFICATE_ISSUED"
+#~ msgstr "Dieser Workflow erstellt ein neues Zertifikat."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FINISHED_WAITING_FOR_CHILD"
+#~ msgstr "Auf Start wartend"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_FORKED"
+#~ msgstr "Logs exportiert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_ISSUING_CA_DETERMINED"
+#~ msgstr "Ausstellende CA für die CRL bestimmt"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_PENDING"
+#~ msgstr "Logs exportiert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_REJECTED"
+#~ msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_SLEPT"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_DESC_WAITING_FOR_START"
+#~ msgstr "Auf Start wartend"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_FINISHED_WAITING_FOR_CHILD"
+#~ msgstr "Auf Start wartend"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_FORKED"
+#~ msgstr "Logs exportiert"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_ISSUING_CA_DETERMINED"
+#~ msgstr "Ausstellende CA für die CRL bestimmt"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_ADD_CERT_TO_STACK"
+#~ msgstr "Adding a certificate"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_CERT_STACK_LOADED"
+#~ msgstr "Node certificates are loaded"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_LEAF_TYPE_AVAILABLE"
+#~ msgstr "Looking for the leaf in LDAP tree"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_MISSING_NODE_DETERMINED"
+#~ msgstr "LDAP node for the given DN is missing"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_NODE_UPDATED"
+#~ msgstr "LDAP node updated"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_LDAP_OBJECTCLASSES_DETERMINED"
+#~ msgstr "Determine LDAP objectclasses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_PREPARED"
+#~ msgstr "Erstellen von CRLs"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_REJECTED"
+#~ msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_CREATED"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_STATE_SLEPT"
+#~ msgstr "Warten"
+
+#~ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_ONLINE"
+#~ msgstr "Zertifizierungsantrag (Online-Teil)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_CODE_SIGNING_REQUEST"
+#~ msgstr "Zertifizierungsantrag"
+
+#~ msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_IMPORT"
+#~ msgstr "Import"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
+#~ msgstr "Erstellen von CRLs"
+
+#~ msgid "I18N_OPENXPKI_WF_TYPE_STORE_PRIVATE_KEY"
+#~ msgstr "Speichern eines privaten Schlüssels"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INCORRECT_ALGORITHM"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_INVALID_SESSION"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_PKI_REALM_UNDEFINED"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_KEY_GENERATE_TOKEN_UNAVAILABLE"
+#~ msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_PARAMETER"
+#~ msgstr "Fehlende Funktionalität"

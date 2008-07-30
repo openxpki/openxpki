@@ -6,14 +6,36 @@ use File::Find;
 
 my $prefix = 'I18N_OPENXPKI_';
 
+my @MANIFEST;
+
 my %tags = ();
+my $basedir = '';
+
 foreach my $dir (@ARGV) {
+    $basedir = $dir;
+    @MANIFEST = ();
+    if (-e "$dir/MANIFEST") {
+        open my $MAN, '<', "$dir/MANIFEST";
+        @MANIFEST = <$MAN>;
+        close $MAN;
+        foreach my $man (@MANIFEST) {
+            chomp $man;
+        }
+    }
     find(\&extract_tags, $dir);
 }
 
 sub extract_tags {
     my $filename = $_;
+    my $rel_name = $File::Find::name;
+    my $dir_name = $File::Find::topdir;
+    $rel_name =~ s/$basedir\///;
     if ($File::Find::name !~ m{ \.svn }xms) {
+        if (scalar @MANIFEST > 0 && ! grep {$_ eq $rel_name} @MANIFEST) {
+            # if we have a MANIFEST file, the file needs to be in it
+            # to be searched for tags
+            return;
+        }
         open my $FILE, '<', $filename;
         while (my $line = <$FILE>) {
             while ($line =~ s{ (I18N_OPENXPKI_[A-Z0-9\_]+) }{}xms) {
