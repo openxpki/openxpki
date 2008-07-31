@@ -1314,11 +1314,10 @@ msgstr ""
 "the comment field."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_ERRORS_TITLE"
-msgstr "Errors"
+msgstr "Errors during CRR creation"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_ERROR_TITLE"
-msgstr "Errors"
+msgstr "Errors during CRR creation"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_INVALIDITY_DATE"
 msgstr "Invalidity date"
@@ -5066,13 +5065,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_NEVER_REGEX"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
-msgstr "The SPKAC string is empty."
+msgstr "The specified invalidity time is later than the certificate's notafter date."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE"
-msgstr "The SPKAC string is empty."
+msgstr "The specified invalidity time is earlier than the certificate's notbefore date."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB"
