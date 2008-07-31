@@ -2,7 +2,7 @@
     $crr  => undef
     $name => undef 
 </%args>
-% if (defined $crr) {
+% if (defined $crr && ref $crr->get_errors() eq 'HASH') {
 %     if (defined $crr->get_errors()->{$name}) {
  class="highlight_error"\
 %     }

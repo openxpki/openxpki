@@ -17,6 +17,7 @@ my %client_of          :ATTR( :init_arg<client> );
 my %invalidity_date_of :ATTR;
 my %errors_of          :ATTR( :get<errors> );
 my %workflow_id_of     :ATTR( :get<workflow_id> );
+my %ignore_errors_of   :ATTR( :init_arg<ignore_errors> :default<0>);
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
@@ -30,7 +31,7 @@ sub START {
             minute => $arg_ref->{invalidity_minute},
         );
     };
-    if ($EVAL_ERROR) {
+    if ($EVAL_ERROR && ! $ignore_errors_of{$ident} ) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_COULD_NOT_CREATE_DATETIME_OBJECT',
         );
@@ -132,18 +133,26 @@ sub validate_invalidity_date : PRIVATE {
 }
 
 sub get_possible_wf_types {
-    my $self = shift;
+    my $self  = shift;
+    my $ident = ident $self;
 
-    return (
-        {
-            VALUE => "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST",
-            LABEL => "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST",
-        },
-        {
-            VALUE => "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA",
-            LABEL => "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA",
-        },
+    my $msg = $client_of{$ident}->send_receive_command_msg(
+        'list_workflow_titles',
     );
+    my @types;
+    if (ref $msg->{PARAMS} eq 'HASH') {
+        @types = keys %{ $msg->{PARAMS} };
+    }
+    my @result;
+    foreach my $type (@types) {
+        if ($type =~ /I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST/) {
+            push @result, {
+                VALUE => $type,
+                LABEL => $type,
+            };
+        }
+    }
+    return @result;
 }
 
 sub get_possible_revocation_reasons {
