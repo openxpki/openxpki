@@ -8,7 +8,6 @@
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>
     <action name="create_csr" 
 	    resulting_state="CREATED">
-      <condition name="ACL::create_csr"/>
     </action>
   </state>
 

@@ -494,6 +494,11 @@ sub create_workflow_instance {
 
     my $wf_title = $args->{WORKFLOW};
 
+    CTX('acl')->authorize_workflow({
+        ACTION => 'create',
+        TYPE   => $wf_title,
+    });
+
     # 'data only certificate request'
     my $workflow = __get_workflow_factory()->create_workflow($wf_title);
 

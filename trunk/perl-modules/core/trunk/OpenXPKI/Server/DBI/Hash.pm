@@ -80,13 +80,17 @@ sub update
         }
     }
 
-    $self->{SQL}->update (TABLE => $table, WHERE => $where, DATA => $data);
+    my $result = $self->{SQL}->update(
+        TABLE => $table,
+        WHERE => $where,
+        DATA => $data
+    );
 
     ## FIXME: to be 100 percent safe it is necessary to protect $data
     $self->__log_write_action (TABLE  => $table,
                                MODE   => "UPDATE",
                                HASH   => {%{$where}, %{$data}});  
-    return 1;
+    return $result;
 }
 
 ########################################################################

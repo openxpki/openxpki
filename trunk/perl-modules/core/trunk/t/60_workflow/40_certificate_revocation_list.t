@@ -80,7 +80,7 @@ else {
     ok(login({
         CLIENT   => $client,
         USER     => 'raop',
-        PASSWORD => 'RA Operator',
+        PASSWORD => 'CA Operator',
       }), 'Logged in successfully');
 
     # New workflow instance

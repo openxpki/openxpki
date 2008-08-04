@@ -47,4 +47,153 @@
     <affected_role>*</affected_role>
     <auth_role>CA Operator</auth_role>
   </permission>
+
+  <workflow_permissions role="Anonymous"> <!-- aka the empty ('') role -->
+      <server name="*">
+          <!-- the anonymous user can create and read CSR and CRR workflows
+               as well as SCEP on all servers -->
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST</type>
+          </create>
+          <read> <!-- read also means list and execute activity (if the ACL condition holds) -->
+              <creator>$self</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
+              <context_filter>
+                  <show>.*</show>
+                  <hide>approvals</hide>
+              </context_filter>
+          </read>
+          <read>
+              <creator>$self</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA</type>
+              <context_filter>
+                  <show>.*</show>
+                  <hide>approvals</hide>
+              </context_filter>
+          </read>
+          <read>
+              <creator>$self</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
+          </read>
+          <read>
+              <creator>$self</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA</type>
+          </read>
+          <read>
+              <creator>$self</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST</type>
+          </read>
+      </server>
+  </workflow_permissions>
+  <workflow_permissions role="User">
+      <!-- someone with a 'User' role can do everything the anonymous
+           user can + smartcard personalization -->
+         <server name="*" super="../../workflow_permissions{role:Anonymous}/server{name:*}">
+            <create>
+                <type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION</type>
+            </create>
+            <read>
+                <creator>$self</creator>
+                <type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION</type>
+                <context_filter>
+                    <show>.*</show>
+                    <hide>approvals</hide>
+                </context_filter>
+            </read>
+            <!-- TODO - possibly needs access to the cert issuance WFs for
+                 smartcard personalization, too -->
+      </server>
+  </workflow_permissions>
+  <workflow_permissions role="RA Operator">
+      <server name="*">
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA</type>
+          </create>
+          <read> 
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
+              <context_filter>
+                  <show>.*</show>
+                  <!-- this is a policy decision, you may want to show the
+                  reg officers who else has approved - or not, so as to not
+                  impair his or her judgement -->
+                  <hide>approvals</hide>
+              </context_filter>
+          </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA</type>
+              <context_filter>
+                  <show>.*</show>
+                  <hide>approvals</hide>
+              </context_filter>
+          </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
+          </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA</type>
+          </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST</type>
+              <context_filter>
+                  <show>.*</show>
+                  <hide>approvals</hide>
+              </context_filter>
+          </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION</type>
+          </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
+          </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
+          </read>
+      </server>
+  </workflow_permissions>
+  <workflow_permissions role="CA Operator">
+      <server name="*" super="../../workflow_permissions{role:RA Operator}/server{name:*}">
+          <!-- the CA operator can do everything the RA Operator can, plus
+            creating CRL and certificate issuance workflows -->
+          <!-- TODO - turn off context filters for CA Operator -->
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
+          </create>
+      </server>
+  </workflow_permissions>
+  <!-- TODO - create role that can only create cert issuance workflow and
+       has the necessary ACL rights to do the issuance and escalate to that
+       role in the CSR workflow forking step. Similarly for LDAP publication
+  -->
 </acl>

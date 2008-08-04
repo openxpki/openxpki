@@ -168,7 +168,8 @@
 
   <action name="I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
           class="OpenXPKI::Server::Workflow::Activity::Tools::ForkWorkflowInstance"
-          workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE">
+          workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
+          role="CA Operator">
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_EXPORT_FINISHED_CSR"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export"

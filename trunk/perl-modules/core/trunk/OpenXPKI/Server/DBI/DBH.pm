@@ -259,7 +259,7 @@ sub do_query
     {
         ##! 4: "execute succeeded (leaving function - $result)"
         ##! 4: "result count: ".$self->{STH}[$sth_nr]->rows()
-        return $result;
+        return $self->{STH}[$sth_nr]->rows();
     } else {
         ##! 4: "execute failed (leaving function)"
         my $err    = $self->{STH}[$sth_nr]->err;

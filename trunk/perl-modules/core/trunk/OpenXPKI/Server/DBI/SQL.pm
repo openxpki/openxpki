@@ -304,10 +304,13 @@ sub update
     ## execute query
 
     my $h = $self->{DBH}->get_next_sth();
-    $self->{DBH}->do_query (QUERY => $sql, BIND_VALUES => \@list);
+    my $result = $self->{DBH}->do_query(
+        QUERY       => $sql,
+        BIND_VALUES => \@list
+    );
     $self->{DBH}->finish_sth($h);
 
-    return 1;
+    return $result;
 }
 
 #######################################################################

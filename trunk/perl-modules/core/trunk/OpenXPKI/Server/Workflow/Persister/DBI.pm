@@ -110,11 +110,8 @@ sub update_workflow {
         ##! 4: "we cannot get the workflow so we try to create it"
         $data{PKI_REALM}          = CTX('session')->get_pki_realm();
 
-	##! 1: "TODO: Workflow versions not yet implemented"
-	$data{WORKFLOW_VERSION} = -1;
-
         $data{WORKFLOW_TYPE}   = $workflow->type();
-	$data{WORKFLOW_SERIAL} = $id;
+        $data{WORKFLOW_SERIAL} = $id;
 
         ##! 1: "inserting data into workflow table"
         $dbi->insert(
@@ -142,17 +139,9 @@ sub update_workflow {
             },
         );
         ##! 128: 'update done'
-    
-        # ... purge any existing context data...
-        $dbi->delete(TABLE => $context_table,
-                     DATA  => {
-                         WORKFLOW_SERIAL => $id,
-                     },
-        );
-        ##! 128: 'context data deleted'
     }
     
-    # ... and write new context
+    # ... and write new context / update it
     my $params = $workflow->context()->param();
 
     ##! 128: 'params from context: ' . Dumper $params
@@ -184,41 +173,81 @@ sub update_workflow {
 		);
 	}
 
-	# check for illegal characters
-	if ($value =~ m{ (?:\p{Unassigned}|\x00) }xms) {
-	    ##! 4: "parameter contains illegal characters"
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_ILLEGAL_DATA",
-		params  => {
-		    WORKFLOW_ID => $id,
-		    CONTEXT_KEY => $key,
-		},
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => [ 'audit', 'system', ],
-		},
-		);
-	}
-	
-	##! 2: "saving context for wf: $id"
- 	$dbi->insert(
- 	    TABLE => $context_table,
- 	    HASH => {
- 		WORKFLOW_SERIAL        => $id,
- 		WORKFLOW_CONTEXT_KEY   => $key,
- 		WORKFLOW_CONTEXT_VALUE => $value
- 	    }
- 	);
-        ##! 128: 'insert done, key: ' . $key . ', value: ' . $value
+        ##! 2: "persisting context parameter: $key"
+        # ignore "volatile" context parameters starting with an underscore
+        next PARAMETER if ($key =~ m{ \A _ }xms);
+
+        # context parameter sanity checks 
+        if (length($value) > $context_value_max_length) {
+            ##! 4: "parameter length exceeded"
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG",
+            params  => {
+                WORKFLOW_ID => $id,
+                CONTEXT_KEY => $key,
+                CONTEXT_VALUE_LENGTH => length($value),
+            },
+            log => {
+                logger => CTX('log'),
+                priority => 'error',
+                facility => 'system',
+            },
+            );
+        }
+
+        # check for illegal characters
+        if ($value =~ m{ (?:\p{Unassigned}|\x00) }xms) {
+            ##! 4: "parameter contains illegal characters"
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_ILLEGAL_DATA",
+            params  => {
+                WORKFLOW_ID => $id,
+                CONTEXT_KEY => $key,
+            },
+            log => {
+                logger => CTX('log'),
+                priority => 'error',
+                facility => [ 'audit', 'system', ],
+            },
+            );
+        }
+        
+        ##! 2: "saving context for wf: $id"
+        ##! 16: 'trying to update context entry'
+        my $rows_changed = $dbi->update(
+            TABLE   => $context_table,
+            DATA    => {
+                WORKFLOW_SERIAL        => $id,
+                WORKFLOW_CONTEXT_KEY   => $key,
+                WORKFLOW_CONTEXT_VALUE => $value,
+            },
+            DYNAMIC => {
+                WORKFLOW_SERIAL      => $id,
+                WORKFLOW_CONTEXT_KEY => $key,
+            },
+        );
+        ##! 128: 'update done, key: ' . $key . ', value: ' . $value
+
+        if ($rows_changed == 0) {
+            ##! 16: 'update did not work, possibly new key, try insert'
+            $dbi->insert(
+                TABLE => $context_table,
+                HASH => {
+                    WORKFLOW_SERIAL        => $id,
+                    WORKFLOW_CONTEXT_KEY   => $key,
+                    WORKFLOW_CONTEXT_VALUE => $value
+                }
+            );
+            ##! 128: 'insert done, key: ' . $key . ', value: ' . $value
+        }
     }
     
     $dbi->commit();
     
     CTX('log')->log(
-	MESSAGE  => "Updated workflow $id",
-	PRIORITY => "info",
-	FACILITY => "system"
+        MESSAGE  => "Updated workflow $id",
+        PRIORITY => "info",
+        FACILITY => "system"
 	);
 
     return 1;

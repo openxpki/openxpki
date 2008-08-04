@@ -305,10 +305,10 @@ sub update
     my $self = shift;
     my $keys = { @_ };
 
-    $self->{hash}->update (TABLE => $keys->{TABLE},
-                           DATA  => $keys->{DATA},
-                           WHERE => $keys->{WHERE});
-    return 1;
+    my $result = $self->{hash}->update (TABLE => $keys->{TABLE},
+                                        DATA  => $keys->{DATA},
+                                        WHERE => $keys->{WHERE});
+    return $result;
 }
 
 ########################################################################
