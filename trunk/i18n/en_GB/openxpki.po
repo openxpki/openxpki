@@ -366,23 +366,21 @@ msgstr "Certificate Signing Request: Approval"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_WITHOUT_SIGNING"
 msgstr "Approve CSR without digital signature"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CRR_APPROVAL_DESCRIPTION"
 msgstr ""
-"Please choose the role for which you would like to request a certificate."
+"By pressing OK, you'll cancel all of the current approvals on the "
+"certificate revocation request."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CRR_APPROVAL_TITLE"
-msgstr "Choose a role"
+msgstr "Cancel CRR approvals"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CSR_APPROVAL_DESCRIPTION"
 msgstr ""
-"Please choose the role for which you would like to request a certificate."
+"By pressing OK, you'll cancel all of the current approvals on the "
+"certificate signing request."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CSR_APPROVAL_TITLE"
-msgstr "Choose a role"
+msgstr "Cancel CSR approvals"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CRR_INVALIDITY_TIME_DESCRIPTION"
@@ -486,29 +484,18 @@ msgstr "Descriptions of the form fields"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_INSERT_CSR_TITLE"
 msgstr "Trustcenter Web Interface"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CRR_DESCRIPTION"
 msgstr ""
-"You are logged in to the web interface of the trustcenter. Please note that "
-"this software support several instances of certification authorities (CAs). "
-"If you are not sure which CA you actually use then please check the info "
-"menu."
+"If you press OK, the certificate revocation request will be rejected."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CRR_TITLE"
-msgstr "Trustcenter Web Interface"
+msgstr "Reject certificate revocation request"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_DESCRIPTION"
-msgstr ""
-"You are logged in to the web interface of the trustcenter. Please note that "
-"this software support several instances of certification authorities (CAs). "
-"If you are not sure which CA you actually use then please check the info "
-"menu."
+msgstr "If you press OK, the certificate signing request will be rejected."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CSR_TITLE"
-msgstr "Trustcenter Web Interface"
+msgstr "Reject certificate signing request"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
 msgstr ""
@@ -5066,10 +5053,13 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_NEVER_REGEX"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
-msgstr "The specified invalidity time is later than the certificate's notafter date."
+msgstr ""
+"The specified invalidity time is later than the certificate's notafter date."
 
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE"
-msgstr "The specified invalidity time is earlier than the certificate's notbefore date."
+msgstr ""
+"The specified invalidity time is earlier than the certificate's notbefore "
+"date."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB"
@@ -5166,90 +5156,57 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COMMAND_MISSING"
-msgstr "The used suject style does not allow the use of a country."
+msgstr "Service error: missing command"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COULD_NOT_INSTANTIATE_COMMAND"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
+msgstr "Service error: could not instantiate command class: __EVAL_ERROR__"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTE_COMMAND_NOT_FOUND"
 msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTION_ERROR"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
+msgstr "Service error: command execution failed: __ERROR__"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_ILLEGAL_COMMAND_RETURN_VALUE"
-msgstr ""
-"The used subject style requires at minimum one organizational unit, one "
-"organization and one country."
+msgstr "Service error: illegal command return value"
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_IMPL_INSTANTIATE_FAILED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND"
-msgstr ""
+msgstr "Service error: invalid command"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PERMISSION_DENIED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
+msgstr "Service error: permission to execute command denied."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PRIVATE_METHOD_REQUESTED"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_AUTHENTICATION_STACK_INVALID_AUTH_STACK_REQUESTED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
+msgstr "Service error: invalid authentication stack requested."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_INVALID_PKI_REALM_REQUESTED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
+msgstr "Service error: invalid PKI realm requested."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
+msgstr "Service error: failed while trying to continue session __ID__."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_MESSAGE_FAILED"
 msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
+"Service error: handling message __MESSAGE_NAME__ failed: __EVAL_ERROR__"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_NO_PKI_REALM_CONFIGURED"
-msgstr ""
-"The used subject style requires at minimum one organizational unit and two "
-"domain components."
+msgstr "Service error: no PKI realm has been configured."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION"
-msgstr ""
+msgstr "Service error: exception during read: __EVAL_ERROR__"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_SESSION_INVALID"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
+msgstr "Service error: invalid session."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE"
-msgstr ""
+msgstr "Service error: unrecognized service message"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_GETCACERT_NO_IDENTIFIER_FOUND"
@@ -5263,9 +5220,8 @@ msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_INVALID_COMMAND"
-msgstr "The used suject style does not allow the use of a country."
+msgstr "SCEP service error: invalid command"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_NO_COMMAND_IMPL"
@@ -5552,6 +5508,10 @@ msgstr "Your username or account, for example 'jdoe'"
 msgid "I18N_OPENXPKI_WF_ACTION_"
 msgstr "Sleep"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_ADD_MISSING_NODE"
+msgstr "Change additional information"
+
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
 msgstr "Approve CRR"
 
@@ -5587,6 +5547,30 @@ msgstr "Change subject alternative name"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Change subject style"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CHILD_FINISHED_FAILURE"
+msgstr "(internal) report child failure"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CHILD_FINISHED_SUCCESSFULLY"
+msgstr "(internal) report child success"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CONTINUE"
+msgstr "Continue"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CONTINUE_ISSUANCE"
+msgstr "Continue with issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CREATE_CRR"
+msgstr "Reject CRR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CREATE_CSR"
+msgstr "Reject CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CREATE_SERVER_CSR"
+msgstr "Approve CSR"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CYCLE_SUB_FORK"
@@ -5626,6 +5610,23 @@ msgstr "Import workflow instances"
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
 msgstr "Prepare environment"
 
+msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+msgstr "(internal) determine issuing CA"
+
+msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_NEXT_CA"
+msgstr "(internal) determine next CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DO_NOTHING2"
+msgstr "Sleep"
+
+msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
+msgstr "Export CRR"
+
 msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CSR"
 msgstr "Export CSR"
 
@@ -5637,13 +5638,112 @@ msgstr "Export CSR"
 msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_FINISHED_CSR"
 msgstr "Export CSR"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_EXTRACT_CSR"
+msgstr "Export CSR"
+
+msgid "I18N_OPENXPKI_WF_ACTION_FAIL_WORKFLOW"
+msgstr "Fail workflow"
+
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
 msgstr "Create a new workflow instance for publishing a certificate using LDAP"
 
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
 msgstr "Create a new workflow instance for certificate issuance"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCES"
+msgstr "Create a new workflow instance for certificate issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GENERATE_KEY"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GENERATE_PKCS10"
+msgstr "Export CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GET_CERT_PROFILE"
+msgstr "Change certificate profile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GET_CRL_PROFILE"
+msgstr "Change certificate profile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GET_LDAP_DATA"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_IMPORT"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_IMPORT_PUBLIC_DATA"
+msgstr "Export CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_ISSUE_CERTIFICATE"
+msgstr "Revoke the certificate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_ISSUE_CRL"
+msgstr "Persist CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_PARENT_FAILURE"
+msgstr "Export CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_PARENT_SUCCESS"
+msgstr "Export CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_CREATION"
+msgstr "Change CRR reason"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_ISSUANCE"
+msgstr "Create a new workflow instance for certificate issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NULL"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NULL2"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NULL3"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CERTIFICATE"
+msgstr "Persist CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
+msgstr "Persist CSR"
+
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
+msgstr "Persist CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSRS"
+msgstr "Persist CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PUBLIC_CERT_LDAP"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PUBLISH_CERTIFICATES"
+msgstr "Revoke the certificate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PUBLISH_CRL"
 msgstr "Persist CSR"
 
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
@@ -5655,14 +5755,62 @@ msgstr "Reject CSR"
 msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
 msgstr "Revoke the certificate"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_CONTEXT_FROM_CSR"
+msgstr "Export CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_CONTEXT_FROM_ORIGINAL_CERT"
+msgstr "Export CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CERT_TEST_FAILED"
+msgstr "Export CSR"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CODE_1"
+msgstr "Wait for other workflow instance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CODE_2"
+msgstr "Wait for other workflow instance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CODE_4"
+msgstr "Wait for other workflow instance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_ISSUANCE_FAILED"
+msgstr "Create a new workflow instance for certificate issuance"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_LDAP"
+msgstr "Sleep"
+
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP"
 msgstr "Sleep"
 
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
 msgstr "Wait for other workflow instance"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILDREN"
+msgstr "Wait for other workflow instance"
+
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
+msgstr "Sleep"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_WRITE_CERTIFICATE_TEST_RESULT"
+msgstr "Revoke the certificate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_WRITE_CERTIFICATE_TO_INSTALL"
+msgstr "Revoke the certificate"
 
 msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 msgstr "Sleep"

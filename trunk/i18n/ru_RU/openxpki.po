@@ -5100,6 +5100,10 @@ msgstr "Имя Вашей учетной записи в информацион�
 msgid "I18N_OPENXPKI_WF_ACTION_"
 msgstr "Пауза"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_ADD_MISSING_NODE"
+msgstr "Изменить дополнительную информацию"
+
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
 msgstr "Утвердить заявку на отзыв сертификата (CRR)"
 
@@ -5135,6 +5139,34 @@ msgstr "Изменить альтернативное имя в заявке"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Изменить способ формирования имени в заявке"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHILD_FINISHED_FAILURE"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHILD_FINISHED_SUCCESSFULLY"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CONTINUE"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CONTINUE_ISSUANCE"
+msgstr "Новая заявка на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CREATE_CRR"
+msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CREATE_CSR"
+msgstr "Отклонить заявку на сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CREATE_SERVER_CSR"
+msgstr "Утвердить заявку на сертификат (CSR)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CYCLE_SUB_FORK"
@@ -5174,6 +5206,26 @@ msgstr "Импорт технологических процессов"
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
 msgstr "Подготовка окружения для обмена данными"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_NEXT_CA"
+msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DO_NOTHING2"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
 msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CSR"
 msgstr "Экспорт заявки на сертификат (CSR)"
 
@@ -5185,13 +5237,113 @@ msgstr "Экспорт заявки на сертификат (CSR)"
 msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_FINISHED_CSR"
 msgstr "Экспорт заявки на сертификат (CSR)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_EXTRACT_CSR"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_FAIL_WORKFLOW"
+msgstr "Пауза"
+
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
 msgstr "Запустить технологический процесс LDAP-публикации сертификата"
 
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
 msgstr "Запустить новый технологический процесс для выдачи сертификата"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCES"
+msgstr "Запустить новый технологический процесс для выдачи сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GENERATE_KEY"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GENERATE_PKCS10"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GET_CERT_PROFILE"
+msgstr "Изменить профиль сертификата "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GET_CRL_PROFILE"
+msgstr "Изменить профиль сертификата "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GET_LDAP_DATA"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_IMPORT"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_IMPORT_PUBLIC_DATA"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_ISSUE_CERTIFICATE"
+msgstr "Отозвать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_ISSUE_CRL"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_PARENT_FAILURE"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_PARENT_SUCCESS"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_CREATION"
+msgstr "Изменить причину отзыва сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_ISSUANCE"
+msgstr "Новая заявка на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NULL"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NULL2"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NULL3"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CERTIFICATE"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSRS"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PUBLIC_CERT_LDAP"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PUBLISH_CERTIFICATES"
+msgstr "Отозвать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PUBLISH_CRL"
 msgstr "Сохранить заявку в базе данных и выдать сертификат"
 
 msgid "I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
@@ -5203,6 +5355,38 @@ msgstr "Отклонить заявку на сертификат"
 msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
 msgstr "Отозвать сертификат"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_CONTEXT_FROM_CSR"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_CONTEXT_FROM_ORIGINAL_CERT"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CERT_TEST_FAILED"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CODE_1"
+msgstr "Ожидание завершения технологического процесса"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CODE_2"
+msgstr "Ожидание завершения технологического процесса"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CODE_4"
+msgstr "Ожидание завершения технологического процесса"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_ISSUANCE_FAILED"
+msgstr "Новая заявка на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_LDAP"
+msgstr "Пауза"
+
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP"
 msgstr "Пауза"
 
@@ -5210,8 +5394,24 @@ msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
 msgstr "Ожидание завершения технологического процесса"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILDREN"
+msgstr "Ожидание завершения технологического процесса"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr "Новая заявка на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_WRITE_CERTIFICATE_TEST_RESULT"
+msgstr "Отозвать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_WRITE_CERTIFICATE_TO_INSTALL"
+msgstr "Отозвать сертификат"
 
 msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 msgstr "Пауза"

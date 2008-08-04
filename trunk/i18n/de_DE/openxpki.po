@@ -5688,6 +5688,10 @@ msgid "I18N_OPENXPKI_WF_ACTION_"
 msgstr "Warten"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_ADD_MISSING_NODE"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
 msgstr "Genehmigen eines Zertifizierungsantrages"
 
@@ -5728,6 +5732,34 @@ msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Ändern des Stils des Namens"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHILD_FINISHED_FAILURE"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHILD_FINISHED_SUCCESSFULLY"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CONTINUE"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CONTINUE_ISSUANCE"
+msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CREATE_CRR"
+msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CREATE_CSR"
+msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CREATE_SERVER_CSR"
+msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CYCLE_SUB_FORK"
 msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
 
@@ -5765,6 +5797,26 @@ msgstr "Importieren der Workflow-Instanzen"
 msgid "I18N_OPENXPKI_WF_ACTION_DATAEXCHANGE_PREPARE_ENV"
 msgstr "Vorbereiten der Umgebung"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_ISSUING_CA"
+msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DETERMINE_NEXT_CA"
+msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_DO_NOTHING2"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
+msgstr "Exportieren des Zertifzierungsantrages"
+
 msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_CSR"
 msgstr "Exportieren des Zertifzierungsantrages"
 
@@ -5777,13 +5829,113 @@ msgid "I18N_OPENXPKI_WF_ACTION_EXPORT_FINISHED_CSR"
 msgstr "Exportieren des Zertifzierungsantrages"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_EXTRACT_CSR"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_FAIL_WORKFLOW"
+msgstr "Warten"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERTIFICATE_LDAP_PUBLISHING_INSTANCE"
 msgstr "Create a new workflow instance for publishing a certificate using LDAP"
 
 msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
 msgstr "Start der Zertifikatserstellung"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCES"
+msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GENERATE_KEY"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GENERATE_PKCS10"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GET_CERT_PROFILE"
+msgstr "Ändern des Zertifikats-Profils"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GET_CRL_PROFILE"
+msgstr "Ändern des Zertifikats-Profils"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_GET_LDAP_DATA"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_IMPORT"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_IMPORT_PUBLIC_DATA"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_ISSUE_CERTIFICATE"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_ISSUE_CRL"
+msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_PARENT_FAILURE"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_PARENT_SUCCESS"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_CREATION"
+msgstr "Ändern der Rolle"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_ISSUANCE"
+msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NULL"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NULL2"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_NULL3"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CERTIFICATE"
+msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
+msgstr "Speichern des Zertifzierungsantrages"
+
 msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
+msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PERSIST_CSRS"
+msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PUBLIC_CERT_LDAP"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PUBLISH_CERTIFICATES"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_PUBLISH_CRL"
 msgstr "Speichern des Zertifzierungsantrages"
 
 #, fuzzy
@@ -5797,14 +5949,62 @@ msgstr "Abweisen des Zertifizierungsantrages"
 msgid "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
 msgstr "Warten"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_CONTEXT_FROM_CSR"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_CONTEXT_FROM_ORIGINAL_CERT"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CERT_TEST_FAILED"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CODE_1"
+msgstr "Auf anderen Workflow warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CODE_2"
+msgstr "Auf anderen Workflow warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_CODE_4"
+msgstr "Auf anderen Workflow warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_ISSUANCE_FAILED"
+msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SET_ERROR_LDAP"
+msgstr "Warten"
+
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP"
 msgstr "Warten"
 
 msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
 msgstr "Auf anderen Workflow warten"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILDREN"
+msgstr "Auf anderen Workflow warten"
+
 msgid "I18N_OPENXPKI_WF_ACTION_SPAWN_CERT_ISSUANCE"
 msgstr "Start der Zertifikatserstellung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_UNLOCK_CA_KEY"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_WRITE_CERTIFICATE_TEST_RESULT"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_WRITE_CERTIFICATE_TO_INSTALL"
+msgstr "Warten"
 
 msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 msgstr "Warten"
