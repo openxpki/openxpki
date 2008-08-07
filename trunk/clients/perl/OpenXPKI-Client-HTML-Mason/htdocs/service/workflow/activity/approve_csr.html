@@ -62,14 +62,14 @@
         else
         {
             # if available, try to persist the CSR now
-            $msg = $context->{client}->send_receive_command_msg(
+            my $act_msg = $context->{client}->send_receive_command_msg(
                 'get_workflow_activities',
                 {
                     WORKFLOW => $type,
                     ID       => $id,
                 },
             );
-            if (grep { $_ eq 'I18N_OPENXPKI_WF_ACTION_PERSIST_CSR' } @{ $msg->{PARAMS} }) {
+            if (grep { $_ eq 'I18N_OPENXPKI_WF_ACTION_PERSIST_CSR' } @{ $act_msg->{PARAMS} }) {
                 $msg = $context->{client}->send_receive_command_msg(
                       'execute_workflow_activity',
                       {
