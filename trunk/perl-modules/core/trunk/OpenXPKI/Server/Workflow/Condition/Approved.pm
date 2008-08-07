@@ -34,7 +34,14 @@ sub _init
 sub evaluate
 {
     my ( $self, $wf ) = @_;
-    my $context = $wf->context();
+    my $config_id = CTX('api')->get_config_id({ ID => $wf->id() });
+    my $realm = CTX('session')->get_pki_realm();
+    my $wf_factory = CTX('workflow_factory')->{$config_id}->{$realm};
+    my $unfiltered_wf = $wf_factory->fetch_unfiltered_workflow(
+        $wf->type(),
+        $wf->id(),
+    );
+    my $context = $unfiltered_wf->context();
 
     ## load config
     my $roles = $self->role();
