@@ -1,11 +1,12 @@
 
 # do not change the order
 # some packages have build dependencies
-PACKAGES=	\
+PACKAGES=			\
 	core			\
 	perl-client-api		\
 	deployment		\
 	mason-html-client	\
+	scep-client		\
 	i18n
 
 EXTERNAL=	\

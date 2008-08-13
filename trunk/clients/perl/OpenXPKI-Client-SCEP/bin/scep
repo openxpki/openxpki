@@ -18,7 +18,9 @@ my $query = new CGI;
 # set config file in the line below
 # TODO: depending on performance, change into a simple
 #       include and use perl syntax in config file.
-my $configfile = $PROGRAM_NAME . '.cfg' || die('Could not read config file');
+my $configfile = -r '/etc/openxpki/scep.conf' ? '/etc/openxpki/scep.conf' : $PROGRAM_NAME . '.cfg';
+die 'Could not read config file' unless (-r $configfile);
+
 read_config $configfile => my %config;
 my $socket  = $config{global}{socket};
 my $realm   = $config{global}{realm};

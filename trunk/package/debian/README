@@ -1,5 +1,5 @@
 How to create these debian packages?
-====================================
+===================================
 
 1. Completely checkout the major subversion trunk area.
 
@@ -30,6 +30,30 @@ How to create a special debian package like libopenxpki-perl?
 2. cd trunk/package/debian/core
 
 3. make
+
+
+How to handle outdated Perl packages?
+=====================================
+
+1. Switch deb-src to an actual distribution.
+
+2. apt-get -y build-dep MODULE
+
+3. apt-get -t testing -b source MODULE
+
+4. dpkg -i libMODULE-perl_*.deb
+
+Example:
+
+apt-get build-dep libclass-std-perl
+apt-get -b source libclass-std-perl
+dpkg -i libclass-std-perl_0.0.9-2_all.deb
+
+or
+
+apt-get -y build-dep libhook-lexwrap-perl
+apt-get -t testing -b source libhook-lexwrap-perl
+dpkg -i libhook-lexwrap-perl_0.20-2_all.deb
 
 How to handle missing Perl packages?
 ====================================

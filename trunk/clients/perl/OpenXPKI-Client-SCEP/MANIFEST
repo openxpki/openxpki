@@ -22,3 +22,4 @@ t/common.pl
 t/http_server.pl
 t/config.xml.diff
 bin/scep
+eg/scep.conf

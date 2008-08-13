@@ -1,0 +1,6 @@
+libopenxpki-client-scep-perl (0.9.20080731-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- jkunkel <jkunkel@aplusg.de>  Thu, 31 Jul 2008 13:48:32 +0200
+
