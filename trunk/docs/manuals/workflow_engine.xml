@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<chapter id="workflowengine">
-  <title>Workflow Engine</title>
-  &wf_overview;
-  &wf_shipped;
-  &wf_custom;
-</chapter>
