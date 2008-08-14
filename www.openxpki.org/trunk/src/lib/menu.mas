@@ -18,6 +18,7 @@
 % }
         <div class="menu_item"><a href="<& /lib/url.mas,
           path => '/download/index.html' &>">Download</a></div>
+        <div class="menu_item"><a href="http://wiki.openxpki.org">Wiki</a></div>
         <div class="menu_item"><a href="<& /lib/url.mas, 
 	  path => '/resources/index.html' &>">Resources</a></div>
 % if ($section eq 'resources') {
