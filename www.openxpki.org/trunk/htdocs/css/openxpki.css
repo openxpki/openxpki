@@ -191,11 +191,13 @@ div.menu_item {
     margin: 0.20em 0.5em 0.20em 0.1em;
     padding: 0.38em 1em;
     text-align: left;
+    /*
     background: #ffaa33;
     border: 1px solid white;
     border-bottom: 1px solid black;
     border-right: 1px solid black;
     color: white;
+    */
     list-style: none;
 }
 
@@ -209,6 +211,12 @@ div.menu_item a {
 
 div.menu_sub_item {
     padding: 0.38em 1em;
+    background: #bbbbbb;
+    background: #bbbbbb;
+    border-left:   1px solid black;
+    border-right:  1px solid white;
+    border-bottom: 1px solid white;
+    border-top:    1px solid black;
     text-indent: 0;
     text-align: right;
     list-style: none;
