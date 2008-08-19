@@ -277,6 +277,8 @@ WriteMakefile(
     'INC'       => "-I. -I$openssl_inc_dir",
     'CCFLAGS'   => '-O2 -g',
     'PREREQ_PM' => {
+    'Class::Accessor::Fast'  => '0.31',
+    'Class::Accessor::Chained::Fast' => 1,
 	'Class::Std'             => '0.0.8',
 	'CGI::Session'           => '3.95',
 	'DBI'                    => 1,
