@@ -8,7 +8,7 @@ Architecture: any
 Recommends:
 Section: perl
 Priority: optional
-Depends: ${perl:Depends}, ${shlibs:Depends}, libopenxpki-client-perl, apache, libhtml-mason-perl, libapache-mod-perl, libapache-request-perl
+Depends: ${perl:Depends}, ${shlibs:Depends}, libwww-mechanize-perl, libopenxpki-client-perl, apache, libhtml-mason-perl, libapache-mod-perl, libapache-request-perl, graphviz, libhttp-server-simple-perl, libdata-page-perl
 Description: OpenXPKI Mason based web frontend
  OpenXPKI is an Open Source PKI project.
  .

@@ -33,7 +33,7 @@ source:
 package:
 	cd /tmp/$(PACKAGE)-*/; \
 	fakeroot dpkg-buildpackage || echo ignoring error - usually signing ...
-	mv /tmp/$(PACKAGE)_* .
+	mv /tmp/$(PACKAGE)_* ../deb/client/
 
 changelog::
 	if [ ! -e changelog.org ]; then mv changelog changelog.org; fi
@@ -52,6 +52,6 @@ source-clean:
 
 clean:	source-clean
 	if [ -e changelog.org ]; then mv changelog.org changelog; fi
-	rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes
+	rm -f *.dsc *.dsc.asc *.tar.gz ../deb/client/$(PACKAGE)_* *.changes
 
 distclean: clean

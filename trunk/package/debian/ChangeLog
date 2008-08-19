@@ -1,0 +1,14 @@
+
+
+
+
+
+08.2008 JKunkel@aplusg.de
+
+	- add scep-client
+	- switch  *.deb *.tar.gz to deb/
+	- add make scan to i18n
+	- update dependency of debian stable and CPAN lib's
+	- update README
+	- add ChangeLog
+
