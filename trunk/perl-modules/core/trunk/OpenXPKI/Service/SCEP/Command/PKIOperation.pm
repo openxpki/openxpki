@@ -186,22 +186,43 @@ sub __pkcs_req : PRIVATE {
             return $pending_msg;
         }
         elsif ($wf_state eq 'SUCCESS') { # the workflow is finished,
-            # get the ID of the issuance child workflow
-            my $child_id_serialized = $wf_info->{WORKFLOW}->{CONTEXT}->{'wf_children_instances'};
-            ##! 16: 'child_id_serialized: ' . $child_id_serialized
-            my $ser = OpenXPKI::Serialization::Simple->new();
-            my $child_id_ref = $ser->deserialize($child_id_serialized);
-            ##! 16: 'child_id_ref: ' . Dumper($child_id_ref)
-            my $child_id = $child_id_ref->[0]->{ID};
-            ##! 16: 'child_id: ' . $child_id
+            # get the CSR serial from the workflow
+            my $csr_serial = $wf_info->{WORKFLOW}->{CONTEXT}->{'csr_serial'};
+            ##! 32: 'csr_serial: ' . $csr_serial
 
-            my $cert_issuance_wf_info = $api->get_workflow_info({
-                WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
-                ID       => $child_id,
+            my $search_result = $api->search_cert({
+                CSR_SERIAL => $csr_serial,
             });
-            my $certificate = $cert_issuance_wf_info->{WORKFLOW}->{CONTEXT}->{certificate};
+            ##! 32: 'search result: ' . Dumper $search_result
+            if (ref $search_result ne 'ARRAY') {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SEARCH_CERT_NO_ARRAYREF',
+                );
+            }
+            if (scalar @{ $search_result } != 1) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SEARCH_CERT_NOT_ONLY_ONE_RESULT',
+                    params  => {
+                        RESULTS => scalar @{ $search_result },
+                    }
+                );
+            }
+            my $cert_identifier = $search_result->[0]->{IDENTIFIER};
 
+            my $certificate = $api->get_cert({
+                IDENTIFIER => $cert_identifier,
+                FORMAT     => 'PEM',
+            });
             ##! 16: 'certificate: ' . $certificate
+
+            if (! defined $certificate) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_GET_CERT_FAILED',
+                    params => {
+                        IDENTIFIER => $cert_identifier,
+                    }
+                );
+            }
 
             my $certificate_msg = $token->command({
                 COMMAND        => 'create_certificate_reply',
@@ -210,11 +231,11 @@ sub __pkcs_req : PRIVATE {
                 ENCRYPTION_ALG => CTX('session')->get_enc_alg(),
             });
 
-	    CTX('log')->log(
-		MESSAGE  => "Delivered certificate via SCEP (issuance workflow id: $child_id)",
-		PRIORITY => 'info',
-		FACILITY => 'system',
-		);
+            CTX('log')->log(
+                MESSAGE  => "Delivered certificate via SCEP ($cert_identifier)",
+                PRIORITY => 'info',
+                FACILITY => 'system',
+            );
 
             return $certificate_msg;
         }
