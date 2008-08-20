@@ -9,7 +9,7 @@ use URI::Escape;
 use Data::Dumper;
 
 use Test::More;
-plan tests => 36;
+plan tests => 35;
 
 my $TEST_PORT = 8099;
 if ($ENV{MASON_TEST_PORT}) {
@@ -115,14 +115,15 @@ $mech->field('text', '');
 $mech->field('type', 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST');
 $mech->click('nosign');
 
-like($mech->response->content, qr/raop\&amp;rarr;RA Operator/, 'Approval present');
+# the approval can no longer be seen because of the workflow ACLs ...
+#like($mech->response->content, qr/raop\&amp;rarr;RA Operator/, 'Approval present');
 
 #$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/persist_csr.html?id=2047;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
 
 ok($mech->response->content =~ qr/WAITING_FOR_CHILD/ || $mech->response->content =~ qr/SUCCESS/, 'WF in state WAITING_FOR_CHILD or SUCCESS after persist') || diag $mech->response->content;
 
 # cert issuance workflow
-$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/show_instance.html?id=5119;__session_id=$session_id&__role=RA%20Operator");
+$mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/search_instances.html?__session_id=$session_id&__role=RA%20Operator&type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE&context_key=&context_value=&__submit=OK");
 my $i = 0;
 while ($i < 60 && $mech->response->content !~ qr/SUCCESS/) {
     $i++;
