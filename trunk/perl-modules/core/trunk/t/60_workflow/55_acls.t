@@ -232,6 +232,3 @@ $msg = $client->send_receive_command_msg(
 ok(! is_error_response($msg), 'Can get workflow info on our own workflow') or diag Dumper $msg;
 
 ok(! exists $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{approvals}, 'Approvals are not present in the workflow context view');
-
-# Kill server
-kill 1, `cat $pidfile`;
