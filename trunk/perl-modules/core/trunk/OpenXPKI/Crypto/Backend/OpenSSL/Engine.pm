@@ -145,11 +145,6 @@ sub online {
 #    return 1;
 #}
 
-sub is_dynamic
-{
-    return 1;
-}
-
 sub get_engine
 {
     return "";
@@ -323,10 +318,6 @@ returns true if the private key is usable.
 =head2 get_mode
 
 returns the operational mode of the engine (standby, session or daemon).
-
-=head2 is_dynamic
-
-returns true if a dynamic OpenSSL engine is used.
 
 =head2 get_engine
 

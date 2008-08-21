@@ -47,11 +47,6 @@ sub new {
     return $self;
 }
 
-sub is_dynamic
-{
-    return 1;
-}
-
 sub get_engine
 {
     return "gost";
@@ -85,10 +80,6 @@ This defines the interface how HSMs are supported by OpenXPKI.
 =head2 new
 
 is a constructor.
-
-=head2 is_dynamic
-
-returns true if a dynamic OpenSSL engine is used.
 
 =head2 get_engine
 

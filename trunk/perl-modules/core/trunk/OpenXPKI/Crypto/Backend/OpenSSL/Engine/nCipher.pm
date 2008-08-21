@@ -49,11 +49,6 @@ sub new {
     return $self;
 }
 
-sub is_dynamic
-{
-    return 0;
-}
-
 sub get_engine
 {
     return "chil";
@@ -138,10 +133,6 @@ The constructor supports the following parameters:
 =item * ENGINE_SECTION (a part of the OpenSSL configuration file for the engine)
 
 =back
-
-=head2 is_dynamic
-
-returns true if a dynamic OpenSSL engine is used.
 
 =head2 get_engine
 
