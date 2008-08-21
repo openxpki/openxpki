@@ -175,12 +175,14 @@
     <td>
       <select name="context_key">
       <option value=""></option>
-%   my @i18n_keys;
+%   my @i18n_keys = ();
 %   # create array of [ translated context key, I18N_KEY ]
-%   foreach my $key (@{$keys_msg->{PARAMS}}) {
-%       push @i18n_keys, [ $m->scomp('/lib/field_to_i18n.mhtml',
-%                                    'field' => $key),
-%                          $key ];
+%   if (exists $keys_msg->{PARAMS}) {
+%       foreach my $key (@{$keys_msg->{PARAMS}}) {
+%           push @i18n_keys, [ $m->scomp('/lib/field_to_i18n.mhtml',
+%                                        'field' => $key),
+%                              $key ];
+%       }
 %   }
 %   # output sorted by translated keys
 %   foreach my $key (sort {lc($a->[0]) cmp lc($b->[0])} @i18n_keys) {

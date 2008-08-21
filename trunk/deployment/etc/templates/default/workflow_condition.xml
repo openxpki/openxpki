@@ -12,6 +12,15 @@
  <!-- TODO: in many cases, param name is useless, one can just read the
       condition name instead. This is only useful if activity is different
       from the ACL name -->
+  <condition name="ACL::store_password" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="store_password"/>
+  </condition>
+  <condition name="ACL::retrieve_password" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="retrieve_password"/>
+  </condition>
+  <condition name="ACL::change_password" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_password"/>
+  </condition>
   <condition name="ACL::create_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="create_csr"/>
   </condition>

@@ -565,6 +565,10 @@ sub __add_token
     {
         $type_path = 'scep';
     }
+    elsif ($type eq 'PASSWORD_SAFE')
+    {
+        $type_path = 'password_safe';
+    }
     elsif ($type eq 'PKCS7')
     {
         $type_path = 'pkcs7';

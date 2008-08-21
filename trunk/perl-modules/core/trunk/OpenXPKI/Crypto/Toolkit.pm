@@ -218,7 +218,7 @@ sub __load_config {
     	    $params_of{$ident}->{uc($key)} = $value;
     }
     }
-    if ($type_path eq 'ca' || $type_path eq 'scep') { # default tokens don't have a certificate
+    if ($type_path eq 'ca' || $type_path eq 'scep' || $type_path eq 'password_safe') { # default tokens don't have a certificate
         # certificate files are no longer defined in token.xml, thus
         # create a temporary file with the certificate in it
         # every time a token is instantiated.

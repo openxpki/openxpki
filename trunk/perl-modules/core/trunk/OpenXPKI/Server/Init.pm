@@ -1413,6 +1413,7 @@ sub get_pki_realms
 
         my $issuing_ca_count = 0;
         my $scep_count = 0;
+        my $password_safe_count = 0;
 
         ISSUINGCA:
         for (my $jj = 0; $jj < $nr_of_ca_entries; $jj++) {
@@ -1664,6 +1665,83 @@ sub get_pki_realms
             $scep_count++;
         }
 
+        # get all PASSWORD_SAFE identifiers for the PKI realm
+        my $nr_of_password_safe_entries = 0;
+        eval { # this might fail because no password safe is defined
+               # at all
+            $nr_of_password_safe_entries = $config->get_xpath_count(
+                XPATH   => ['pki_realm', 'password_safe'],
+                COUNTER => [$i],
+                CONFIG_ID => $cfg_id,
+            );
+        };
+        ##! 16: 'password safe entries: ' . $nr_of_password_safe_entries
+
+        PASSWORD_SAFE:
+        for (my $jj = 0; $jj < $nr_of_password_safe_entries; $jj++) {
+            my $password_safe_id = $config->get_xpath(
+                XPATH =>   ['pki_realm', 'password_safe', 'id'],
+                COUNTER => [$i,          $jj,  0 ],
+                CONFIG_ID => $cfg_id,
+            );
+
+            # cert identifier
+            eval {
+                my $cert_identifier = __get_cert_identifier({
+                    TYPE          => 'password_safe',
+                    REALM_COUNTER => $i,
+                    TYPE_COUNTER  => $jj,
+                    CONFIG_ID     => $cfg_id,
+                });
+                ##! 16: 'identifier: ' . $cert_identifier
+                $realms{$name}->{password_safe}->{id}->{$password_safe_id}->{identifier} = $cert_identifier;
+            };
+            if ($EVAL_ERROR) {
+                ##! 16: 'EVAL_ERROR: ' . $EVAL_ERROR
+                log_wrapper({
+                        MESSAGE  => "Could not determine identifier for password safe '$password_safe_id' (PKI realm $name)",
+                        PRIORITY => "warn",
+                        FACILITY => "system",
+                    });
+
+                log_wrapper({
+                        MESSAGE  => "Password safe '$password_safe_id' (PKI realm $name) is unavailable",
+                        PRIORITY => "warn",
+                        FACILITY => "monitor",
+                    });
+
+                next PASSWORD_SAFE;
+            }
+            my $certificate = __get_certificate({
+                IDENTIFIER => $realms{$name}->{password_safe}->{id}->{$password_safe_id}->{identifier},
+            });
+            my $cert_obj = OpenXPKI::Crypto::X509->new(
+                TOKEN => $defaulttoken,
+                DATA  => $certificate,
+            );
+            my $token = $crypto->get_token(
+                TYPE        => "PASSWORD_SAFE",
+                ID          => $password_safe_id,
+                PKI_REALM   => $name,
+                CERTIFICATE => $certificate,
+                CONFIG_ID   => $cfg_id,
+            );
+            $realms{$name}->{password_safe}->{id}->{$password_safe_id}->{certificate} = $certificate;
+            $realms{$name}->{password_safe}->{id}->{$password_safe_id}->{crypto} = $token;
+            $realms{$name}->{password_safe}->{id}->{$password_safe_id}->{notbefore} = $cert_obj->get_parsed('BODY', 'NOTBEFORE');
+            $realms{$name}->{password_safe}->{id}->{$password_safe_id}->{notafter} = $cert_obj->get_parsed('BODY', 'NOTAFTER');
+            ##! 16: 'notbefore: ' . $realms{$name}->{password_safe}->{id}->{$password_safe_id}->{notbefore}
+            ##! 16: 'notafter: ' . $realms{$name}->{password_safe}->{id}->{$password_safe_id}->{notafter}
+
+            log_wrapper({
+                    MESSAGE  => "Attached password safe token for '$password_safe_id' of PKI realm '$name'",
+                    PRIORITY => "info",
+                    FACILITY => "system",
+                });
+
+            $password_safe_count++;
+        }
+
         log_wrapper(
             {
                 MESSAGE  => "Identified $issuing_ca_count issuing CAs for PKI realm '$name'",
@@ -1674,6 +1752,13 @@ sub get_pki_realms
         log_wrapper(
             {
                 MESSAGE  => "Identified $scep_count SCEP servers for PKI realm '$name'",
+                PRIORITY => "info",
+                FACILITY => "system",
+            });
+
+        log_wrapper(
+            {
+                MESSAGE  => "Identified $password_safe_count password safes for PKI realm '$name'",
                 PRIORITY => "info",
                 FACILITY => "system",
             });

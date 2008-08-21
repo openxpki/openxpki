@@ -69,6 +69,30 @@
     <auth_role>*</auth_role>
   </permission>
 
+  <!-- everybody may store, retrieve and change passwords, the workflow ACL
+       checks that only the owner can get to the workflow (except for
+       the CA Operator -->
+  <permission>
+     <server>*</server>
+     <activity>Workflow::store_password</activity>
+     <affected_role>*</affected_role>
+     <auth_role>*</auth_role>
+  </permission>
+
+  <permission>
+     <server>*</server>
+     <activity>Workflow::retrieve_password</activity>
+     <affected_role>*</affected_role>
+     <auth_role>*</auth_role>
+  </permission>
+
+  <permission>
+     <server>*</server>
+     <activity>Workflow::change_password</activity>
+     <affected_role>*</affected_role>
+     <auth_role>*</auth_role>
+  </permission>
+
   <permission>
      <server>*</server>
      <activity>Workflow::persist_csr</activity>
@@ -129,6 +153,9 @@
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION</type>
           </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
+          </create>
           <read> <!-- read also means list and execute activity (if the ACL condition holds) -->
               <creator>$self</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
@@ -140,6 +167,14 @@
           <read>
               <creator>$self</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
+          </read>
+          <read>
+              <creator>$self</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
+              <context_filter>
+                  <show>.*</show>
+                  <hide>encrypted_.*</hide>
+              </context_filter>
           </read>
           <read>
               <creator>$self</creator>
@@ -170,6 +205,9 @@
           </create>
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
           </create>
           <read> 
               <creator>.*</creator>
@@ -206,6 +244,14 @@
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
           </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
+              <context_filter>
+                  <show>.*</show>
+                  <hide>encrypted_.*</hide>
+              </context_filter>
+          </read>
       </server>
   </workflow_permissions>
   <workflow_permissions role="CA Operator">
@@ -223,6 +269,9 @@
           </create>
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
           </create>
           <read> 
               <creator>.*</creator>
@@ -247,6 +296,10 @@
           <read>
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
+          </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
           </read>
       </server>
   </workflow_permissions>

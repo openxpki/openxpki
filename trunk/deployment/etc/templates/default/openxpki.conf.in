@@ -263,6 +263,7 @@ issuingca: TEST_DUMMY_CA_2
 subsystem: TEST_SCEP_SERVER_1
 subsystem: TEST_SCEP_PKCS7_TOOL_1
 subsystem: TEST_CREATE_JAVAKEYSTORE_1
+subsystem: TEST_PASSWORD_SAFE_1
 profiles:  $(profiles)
 #notifier:  TEST_DUMMY_NOTIFIER_RT_1
 
@@ -297,6 +298,14 @@ type: pkcs7
 shell: $(file.openca_sv)
 backend: OpenXPKI::Crypto::Tool::PKCS7
 dir: $(dir.cadir)/scepdummyserver1
+
+[TEST_PASSWORD_SAFE_1]
+id: passwordsafe1
+cert_alias: passwordsafe1
+type: password_safe
+shell: $(file.openssl)
+backend: OpenXPKI::Crypto::Backend::OpenSSL
+dir: $(dir.cadir)/passwordsafe1
 
 [TEST_CREATE_JAVAKEYSTORE_1]
 id: testcreatejavakeystore

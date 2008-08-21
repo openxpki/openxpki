@@ -40,7 +40,7 @@ my $msg = $client->send_receive_command_msg(
             'cert_subject_parts' => "HASH\n94\n21\ncert_subject_hostname\nSCALAR\n27\nfully.qualified.example.com\n17\ncert_subject_port\nSCALAR\n0\n\n",
             'cert_subject_style' => '00_tls_basic_style',
             'csr_type' => 'spkac',
-            'spkac' => 'MIIBOjCBpDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1Qwkd2oQ2Cds6b0+zT2qGUAFfTRRX5cRHAsbhjsw4PnPSgSJmbw7+9YerrKxfu/SqPjGSpm+yxx+skhb23hR3scGYX2WIbEsyALqkaNr4EYuB9VB7xZoNnolYYmjrR2YfmEpbPppUjnQgI9oGQHF1dh83QtQHGX4pJjonXvQ/I8CAwEAARYAMA0GCSqGSIb3DQEBBAUAA4GBAGdGhX9YgtcaWCHB9+TUdbEPuS5thC/Ox/AswcpE6gp31XTPWNQ0dl3RFq3fRDssvYgWJWeEp+03YpAf+GuW4yyEKiyMuXPlBfeMy9D9s2XZrr7f0R37w5ufFwZIr1dFO5M2K9vN5bFdBFs7xeJbVkPotMvW1Z3koQuHfhKe8rov',
+            'spkac' => 'MIICQDCCASgwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwhJ0O6kts3EHf9iLOthY04jTS89eb2GlWzlf4zDeqmJreABvxMnBomwNYS1KeNmr9VfdSB/EoK3myJ6NuHwzOxvxomWbjMAbVEX9vI7OTy+ZBzdt7Ry0USbLtxtB1cGAeQdLd0mMiazgGumfpMhkHMpDj2peIYJtvpPSGwaCy3spcFXUqht4/ckwR7w20GzPqv2t2WZfEwdSB3Zguc/gTi96Om8ZX+zkuHFx5HLmk7ed4Q2eyrUdetZToAFQaQPEMKm0KhtrCn1nVI/S9meMKXmTUSXNUeoNrKCsciYbmMmsbRGmDB55qKyfrE/TaFnw2kycjTJy25JdMgYn/ZIlTAgMBAAEWADANBgkqhkiG9w0BAQQFAAOCAQEAmOG/rfbvp7pCUT9AG5EnktlDtqEa46Ep5Y/1a3o9VvfrtRkfTE8eSZRX2VWNXrbXBA82k98p9atZPvSz3rz6ilx1zJ+vX2JCBXxMxgwInuMl1ATmeq1NBcUpqxMakOamhhNDnixcmYKQkrV6Cn8NwLHO3cH9+V+lXfp79nVVzXNHrozTrJoz/5dPf5zH4TnSuSDjnJlL1GF/AbfvRa0cmBKRwnqR51WFeXIdtuwWicTTvjZMYeWPlTYNYz2nPwwOIoRTiNKBfRln8XPsKujP2CcirIaXcw3mBoL3ey+hmlhrIuQH66F3gW9wXUeufne8TgB5P3RtS5HywL0xLAX2Mw==',
         },
     },
 );
