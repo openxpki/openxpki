@@ -54,9 +54,12 @@ default:	clean
 	make check
 
 $(EXTERNAL):
+	test -d deb || mkdir deb
+	test -d deb/cpan || mkdir deb/cpan/	
 	cd deb/cpan/ &&  dh-make-perl --build --notest --cpan $(subst __,::,$@)
 
 $(PACKAGES):
+	test -d deb || mkdir deb	
 	cd $@ && PATH=$(PATH):/usr/sbin make $(SUBTARGET)
 
 resultlocal:

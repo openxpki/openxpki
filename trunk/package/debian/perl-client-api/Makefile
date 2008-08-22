@@ -34,6 +34,7 @@ source:
 package:
 	cd /tmp/$(PERLNAME)-*/; \
 	fakeroot dpkg-buildpackage || echo ignoring error - usually signing ...
+	test -d ../deb/client_api || mkdir ../deb/client_api
 	mv /tmp/$(PACKAGE)_* ../deb/client_api/
 
 changelog::
