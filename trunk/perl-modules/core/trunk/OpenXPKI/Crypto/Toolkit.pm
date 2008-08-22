@@ -144,11 +144,10 @@ sub __load_config {
     # any existing key in this hash is considered optional in %token_args
     my %is_optional = ();
 
-    # default tokens don't need key, cert etc...
-    if ($type_path eq "common") {
-	foreach (qw(key secret)) {
-	    $is_optional{uc($_)}++;
-	}
+    # default tokens don't need a key
+    # so do java keystore ones
+    if ($type_path eq 'common' || $type_path eq 'createjavakeystore') {
+        $is_optional{'KEY'} = 1;
     }
     # FIXME: currently unused attributes:
     # openca-sv

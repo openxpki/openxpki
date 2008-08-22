@@ -15,7 +15,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Tool::CreateJavaKeystore - makekeystore wrapper
+OpenXPKI::Crypto::Tool::CreateJavaKeystore - create_javakeystore wrapper
 
 =head1 Description
 
