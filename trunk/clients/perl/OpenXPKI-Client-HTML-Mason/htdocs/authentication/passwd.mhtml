@@ -29,6 +29,7 @@
     my $client     = $context->{client};
 
     ## check that we must handle this message
+    return $msg if (! exists $msg->{SERVICE_MSG});
     return $msg if (exists $msg->{SERVICE_MSG} && 
                            $msg->{SERVICE_MSG} ne "GET_PASSWD_LOGIN");
 
