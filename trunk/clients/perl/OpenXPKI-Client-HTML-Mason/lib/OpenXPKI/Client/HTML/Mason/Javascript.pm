@@ -377,87 +377,123 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
             dim xenroll
             dim nSupportedKeyUsages
 
+            Dim g_objClassFactory
+            Dim obj
+            Dim objPrivateKey
+            Dim g_objRequest
+            Dim g_objRequestCMC
+
             On Error Resume Next
             set theForm = document.OpenXPKI
             set re = new regexp 
-            set xenroll = getXEnroll
 
-            re.Pattern = "__CSP_NAME__"
-            if mode <> "silent" then
-                sProvName=GetSelectedProvName()
-                nProvType=GetSelectedProvType()
-                if Len(nProvType) > 0 then
-                    'MsgBox ("The used Cryptographic Service Provider is " & xenroll.ProviderName)
-                    MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME", xenroll.ProviderName))
-                else
-                    sProvName=""
-                    nProvType=PROV_RSA_FULL
-                    'MsgBox ("The used Cryptographic Service Provider is the default one.")
-                    MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP")
-                end if
-            else
-                sProvName=theForm.csp.value
-                nProvType=PROV_RSA_FULL
-            end if
+            // Windows Vista + IE 7 CSR generation
+            // based on code from
+            // http://wiki.cacert.org/wiki/IE7VistaSource
+            // (c) CAcert Inc. / Philipp Gühring
+            // available under Apache or BSD License
 
-            xenroll.ProviderName=sProvName
-            xenroll.ProviderType=nProvType
-            xenroll.HashAlgorithm = "SHA1"
-            nSupportedKeyUsages=xenroll.GetSupportedKeySpec()
-            if 0=nSupportedKeyUsages then
-                nSupportedKeyUsages=AT_SIGNATURE or AT_KEYEXCHANGE
-            end if
-            if (PROV_DSS=nProvType) or (PROV_DSS_DH=nProvType) or (PROV_DH_SCHANNEL=nProvType) then
-                nSupportedKeyUsages=AT_SIGNATURE
-            end if
+            If Instr(navigator.AppVersion, "Windows NT 6.0") > 0 Then
+                // we are on Vista
+                Set g_objClassFactory = CreateObject("X509Enrollment.CX509EnrollmentWebClassFactory")
+                Set obj = g_objClassFactory.CreateObject("X509Enrollment.CX509Enrollment")
+                Set objPrivateKey = g_objClassFactory.CreateObject("X509Enrollment.CX509PrivateKey")
+                Set objRequest = g_objClassFactory.CreateObject("X509Enrollment.CX509CertificateRequestPkcs10")
+                Set objDN = g_objClassFactory.CreateObject("X509Enrollment.CX500DistinguishedName")
+                objPrivateKey.ProviderName = theForm.csp.value
+                objPrivateKey.ProviderType = "24"
+                objPrivateKey.KeySpec = "1"
+                objRequest.InitializeFromPrivateKey 1, objPrivateKey, ""
+                objDN.Encode("CN=Dummy")
+                objRequest.Subject = objDN
+                obj.InitializeFromRequest(objRequest)
+                obj.CertificateDescription="Description"
+                obj.CertificateFriendlyName="FriendlyName"
+                CSR=obj.CreateRequest(1)
+                theForm.pkcs10.value = CSR
+                If len(CSR) = 0 Then
+                    MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_VISTA_ERROR_DURING_CSR_CREATION")
+                End If
+            Else
+                // XP
+                set xenroll = getXEnroll
 
-            alternate_subject = "cn=unsupported,dc=subject,dc=by,dc=MSIE"
-            szName = theForm.ie_subject.value
-
-            re.Pattern = "__SUBJECT__"
-            'MsgBox ("SUBJECT is " & szName)
-            ' if mode <> "silent" then
-            '    Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT", szName))
-            ' end if
-
-            xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 1)
-            xenroll.KeySpec = 1 ' AT_KEYEXCHANGE
-            sz10 = xenroll.CreatePKCS10(szName, "1.3.6.1.4.1.311.2.1.21")
-            if (0<>Err.Number) and (mode<>"silent") then
-                ' XEnroll failed
-                dim nResult
-                nResult=handleError(Err.Number)
-                if Len(nResult)>0 then
-                    MsgBox(nResult)
-                else
-                    'user canselled request generation
-                    exit function
-                end if
-            end if
-
-            ' try pragmatical failover - we simply set another subject
-            if Len(sz10) = 0 then 
+                re.Pattern = "__CSP_NAME__"
                 if mode <> "silent" then
-                    MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER", alternate_subject))
-                    xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 0)
-                    sz10 = xenroll.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
+                    sProvName=GetSelectedProvName()
+                    nProvType=GetSelectedProvType()
+                    if Len(nProvType) > 0 then
+                        'MsgBox ("The used Cryptographic Service Provider is " & xenroll.ProviderName)
+                        MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME", xenroll.ProviderName))
+                    else
+                        sProvName=""
+                        nProvType=PROV_RSA_FULL
+                        'MsgBox ("The used Cryptographic Service Provider is the default one.")
+                        MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP")
+                    end if
+                else
+                    sProvName=theForm.csp.value
+                    nProvType=PROV_RSA_FULL
+                end if
 
-                    if Len(sz10) = 0 then 
-                        'MsgBox ("The generation of the request failed") 
-                        MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED") 
+                xenroll.ProviderName=sProvName
+                xenroll.ProviderType=nProvType
+                xenroll.HashAlgorithm = "SHA1"
+                nSupportedKeyUsages=xenroll.GetSupportedKeySpec()
+                if 0=nSupportedKeyUsages then
+                    nSupportedKeyUsages=AT_SIGNATURE or AT_KEYEXCHANGE
+                end if
+                if (PROV_DSS=nProvType) or (PROV_DSS_DH=nProvType) or (PROV_DH_SCHANNEL=nProvType) then
+                    nSupportedKeyUsages=AT_SIGNATURE
+                end if
+
+                alternate_subject = "cn=unsupported,dc=subject,dc=by,dc=MSIE"
+                szName = theForm.ie_subject.value
+
+                re.Pattern = "__SUBJECT__"
+                'MsgBox ("SUBJECT is " & szName)
+                ' if mode <> "silent" then
+                '    Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT", szName))
+                ' end if
+
+                xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 1)
+                xenroll.KeySpec = 1 ' AT_KEYEXCHANGE
+                sz10 = xenroll.CreatePKCS10(szName, "1.3.6.1.4.1.311.2.1.21")
+                if (0<>Err.Number) and (mode<>"silent") then
+                    ' XEnroll failed
+                    dim nResult
+                    nResult=handleError(Err.Number)
+                    if Len(nResult)>0 then
+                        MsgBox(nResult)
+                    else
+                        'user canselled request generation
+                        exit function
                     end if
                 end if
-                exit function 
-            end if 
 
-            theForm.pkcs10.value = sz10
-            'MsgBox (theForm.pkcs10.value)
+                ' try pragmatical failover - we simply set another subject
+                if Len(sz10) = 0 then 
+                    if mode <> "silent" then
+                        MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER", alternate_subject))
+                        xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 0)
+                        sz10 = xenroll.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
 
-            'MsgBox ("The certificate service request was successfully generated.")
-            if mode <> "silent" then
-                MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED") 
-            end if
+                        if Len(sz10) = 0 then 
+                            'MsgBox ("The generation of the request failed") 
+                            MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_FAILED") 
+                        end if
+                    end if
+                    exit function 
+                end if 
 
+                theForm.pkcs10.value = sz10
+                'MsgBox (theForm.pkcs10.value)
+
+                'MsgBox ("The certificate service request was successfully generated.")
+                if mode <> "silent" then
+                    MsgBox ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_GENERATION_SUCCEEDED") 
+                end if
+            End If
             theForm.submit 
         End Function
 
@@ -469,49 +505,73 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
             dim nProvType, nOrigProvType, nProvIndex, sProvName
             dim XEnroll
 
-            set xenroll = getXEnroll
-            ' save the original provider type
-            nOrigProvType=XEnroll.ProviderType
-            if 0<>Err.Number then
-                ' XEnroll failed
-                exit sub
-            end if
+            // Windows Vista + IE 7 CSP listing
+            // based on code from
+            // http://wiki.cacert.org/wiki/IE7VistaSource
+            // (c) CAcert Inc. / Philipp Gühring
+            // available under Apache or BSD License
 
-            ' take each of the provider types
-            for nProvType=nMinProvType To nMaxProvType
-                if PROV_RSA_SCHANNEL<>nProvType then
-                    XEnroll.ProviderType=nProvType
-                    ' take each of the providers of the type nProvType
-                    nProvIndex=0
-                    sProvName=""
-                    do
-                        'get provider name
-                        sProvName=XEnroll.enumProviders(nProvIndex, 0)
-                        if &H80070103=Err.Number Then 
-                            ' no more providers of the type nProvType
-                            Err.Clear
-                            exit do
-                        elseIf 0<>Err.Number Then
-                            ' XEnroll failed
-                            exit sub
-                        end if
-                        ' add provider name to the list box
-                        dim oElement
-                        set oElement=document.createElement("Option")
-                        oElement.text=sProvName
-                        oElement.value=nProvType
-
-                        document.OpenXPKI.csp.add(oElement)
-
-                        ' get the next provider number
-                        nProvIndex=nProvIndex+1
-                    loop
+            If Instr(navigator.AppVersion, "Windows NT 6.0") > 0 Then
+                // we are on Vista
+                Set csps = CreateObject("X509Enrollment.CCspInformations")
+                If IsObject(csps) Then
+                    csps.AddAvailableCsps()
+                    //Document.OpenXPKI.keytype.value="VI"
+                    For j = 0 to csps.Count-1
+                        Set oOption = document.createElement("OPTION")
+                        oOption.text = csps.ItemByIndex(j).Name
+                        oOption.value = j
+                        Document.OpenXPKI.csp.add(oOption)
+                    Next
+                Else
+                    MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_VISTA_NO_X509ENROLLMENT_OBJECT")
+                End If
+            Else
+                // Windows 2K / XP using the XEnroll control
+                set xenroll = getXEnroll
+                ' save the original provider type
+                nOrigProvType=XEnroll.ProviderType
+                if 0<>Err.Number then
+                    ' XEnroll failed
+                    exit sub
                 end if
-            next
-            ' restore the original provider type
-            XEnroll.ProviderType=nOrigProvType
-            document.OpenXPKI.elements[0].focus()
-            GetKeyLength()
+
+                ' take each of the provider types
+                for nProvType=nMinProvType To nMaxProvType
+                    if PROV_RSA_SCHANNEL<>nProvType then
+                        XEnroll.ProviderType=nProvType
+                        ' take each of the providers of the type nProvType
+                        nProvIndex=0
+                        sProvName=""
+                        do
+                            'get provider name
+                            sProvName=XEnroll.enumProviders(nProvIndex, 0)
+                            if &H80070103=Err.Number Then 
+                                ' no more providers of the type nProvType
+                                Err.Clear
+                                exit do
+                            elseIf 0<>Err.Number Then
+                                ' XEnroll failed
+                                exit sub
+                            end if
+                            ' add provider name to the list box
+                            dim oElement
+                            set oElement=document.createElement("Option")
+                            oElement.text=sProvName
+                            oElement.value=nProvType
+
+                            document.OpenXPKI.csp.add(oElement)
+
+                            ' get the next provider number
+                            nProvIndex=nProvIndex+1
+                        loop
+                    end if
+                next
+                ' restore the original provider type
+                XEnroll.ProviderType=nOrigProvType
+                document.OpenXPKI.elements[0].focus()
+                GetKeyLength()
+            End If
         end sub
 
         function GetMinMaxKeyLength (bMinMax, bExchange)
@@ -521,24 +581,38 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
             const KEY_LEN_MAX_DEFAULT=4096
             dim sProvName, nProvType, nProvIndex
             dim xenroll
+            dim csps
 
-            set xenroll = getXEnroll
-            
-            sProvName=GetSelectedProvName()
-            nProvType=GetSelectedProvType()
-            xenroll.ProviderName=sProvName
-            xenroll.providerType=nProvType
-
-            GetMinMaxKeyLength=xenroll.GetKeyLen(bMinMax, bExchange)
-            
-            if (0<>Err.Number) or (KEY_LEN_MIN_DEFAULT>GetMinMaxKeyLength) or (KEY_LEN_MAX_DEFAULT<GetMinMaxKeyLength) then
-                if KEY_LEN_MIN=bMinMax then
-                    GetMinMaxKeyLength=KEY_LEN_MIN_DEFAULT
+            If Instr(navigator.AppVersion, "Windows NT 6.0") > 0 Then
+                // we are on Vista
+                // Set csps = CreateObject("X509Enrollment.CCspInformations")
+                Set csps = CreateObject("X509Enrollment.CCspInformation")
+                sProvName = GetSelectedProvName()
+                csps.InitializeFromName(sProvName)
+                if bMinMax = 1 then
+                    GetMinMaxKeyLength = csps.CspAlgorithms.ItemByName("RSA").MinLength
                 else
-                    GetMinMaxKeyLength=KEY_LEN_MAX_DEFAULT
+                    GetMinMaxKeyLength = csps.CspAlgorithms.ItemByName("RSA").MaxLength
                 end if
-            end if
-            
+            Else
+                // XP
+                set xenroll = getXEnroll
+                
+                sProvName=GetSelectedProvName()
+                nProvType=GetSelectedProvType()
+                xenroll.ProviderName=sProvName
+                xenroll.providerType=nProvType
+
+                GetMinMaxKeyLength=xenroll.GetKeyLen(bMinMax, bExchange)
+                
+                if (0<>Err.Number) or (KEY_LEN_MIN_DEFAULT>GetMinMaxKeyLength) or (KEY_LEN_MAX_DEFAULT<GetMinMaxKeyLength) then
+                    if KEY_LEN_MIN=bMinMax then
+                        GetMinMaxKeyLength=KEY_LEN_MIN_DEFAULT
+                    else
+                        GetMinMaxKeyLength=KEY_LEN_MAX_DEFAULT
+                    end if
+                end if
+            End If 
         end function
 
        sub GetKeyLength
@@ -559,8 +633,18 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
                     document.OpenXPKI.bits.remove(0)
                 end if
             loop
+            ' find the smallest power of 2 that is greater or equal then
+            ' the minimal key length (generates much nicer keylengths
+            ' if the minimal key length is for example 384)
+            nPowerSize = 1
+            do
+                if nPowerSize >= nKeyMin then
+                    exit do
+                else
+                    nPowerSize = nPowerSize * 2
+                end if
+            loop
             ' add key length to the list
-            nPowerSize=nKeyMin
             do
                 if nPowerSize>nKeyMax then
                     exit do
