@@ -77,10 +77,9 @@ $FUNCTION{install_cert_ie} = << 'XEOF';
            InstallCertIE = false
         end if
 
-        dim xenroll
-        Set xenroll = getXEnroll   
-
         dim sProvName, nProvType
+        dim xenroll
+        dim enrollObj
 
         if mode <> "silent" then
             sProvName=GetSelectedProvName()
@@ -90,19 +89,43 @@ $FUNCTION{install_cert_ie} = << 'XEOF';
             sProvName = form.csp.value
         end if
 
-        xenroll.ProviderName=sProvName
-        xenroll.acceptPKCS7(form.cert.value)
-        
-        if Err.Number <> 0 then
-            ' perhaps already installed
-            MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR")
-            MsgBox(Err.Number)
-            InstallCertIE = false
-        else
-            if mode <> "silent" then
-                MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS")
+        // Windows Vista + IE 7 certificate installation
+        // based on code from
+        // http://wiki.cacert.org/wiki/IE7VistaSource
+        // (c) CAcert Inc. / Philipp Gühring
+        // available under Apache or BSD License
+        if Instr(navigator.AppVersion, "Windows NT 6.0") > 0 Then
+            // we are on Vista
+            Set enrollObj = CreateObject("X509Enrollment.CX509Enrollment")
+            enrollObj.Initialize(1)
+            enrollObj.InstallResponse 0,form.cert.value,0,""
+            if err.number <> 0 then
+                MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR")
+                MsgBox err.Description
+            else
+                if mode <> "silent" then
+                    MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS")
+                end if
+                InstallCertIE = true
             end if
-            InstallCertIE = true
+        else
+            // XP
+            Set xenroll = getXEnroll   
+
+            xenroll.ProviderName=sProvName
+            xenroll.acceptPKCS7(form.cert.value)
+            
+            if Err.Number <> 0 then
+                ' perhaps already installed
+                MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_ERROR")
+                MsgBox(Err.Number)
+                InstallCertIE = false
+            else
+                if mode <> "silent" then
+                    MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_JAVASCRIPT_INSTALL_SUCCESS")
+                end if
+                InstallCertIE = true
+            end if
         end if
     End Function
 -->
@@ -407,8 +430,6 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
                 objDN.Encode("CN=Dummy")
                 objRequest.Subject = objDN
                 obj.InitializeFromRequest(objRequest)
-                obj.CertificateDescription="Description"
-                obj.CertificateFriendlyName="FriendlyName"
                 CSR=obj.CreateRequest(1)
                 theForm.pkcs10.value = CSR
                 If len(CSR) = 0 Then
