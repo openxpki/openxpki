@@ -193,6 +193,7 @@ OpenXPKI/Server/Workflow/Activity/CertLdapPublish/PublicCertLdap.pm
 OpenXPKI/Server/Workflow/Activity/CSR/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GeneratePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
+OpenXPKI/Server/Workflow/Activity/CSR/ChangeNotBeforeOrAfter.pm
 
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
 
@@ -283,6 +284,7 @@ OpenXPKI/Server/Workflow/Validator/ReasonCode.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectParts.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltNameParts.pm
 OpenXPKI/Server/Workflow/Validator/Bulk.pm
+OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
 
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm

@@ -1,0 +1,5 @@
+<%init>
+    my %params = $m->request_args();
+    $params{'val_type'} = 'notbefore';
+    $m->comp('/service/workflow/activity/change_validity.mhtml', %params);
+</%init>

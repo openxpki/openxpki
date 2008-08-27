@@ -42,6 +42,12 @@
   <condition name="ACL::change_csr_info" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="change_csr_info"/>
   </condition>
+  <condition name="ACL::change_notbefore" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_notbefore"/>
+  </condition>
+  <condition name="ACL::change_notafter" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_notafter"/>
+  </condition>
   <condition name="ACL::approve_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="approve_csr"/>
   </condition>

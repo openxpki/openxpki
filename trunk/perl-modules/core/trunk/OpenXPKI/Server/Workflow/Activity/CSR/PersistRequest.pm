@@ -117,6 +117,25 @@ sub execute
             },
         );
     }
+    foreach my $validity_param qw( notbefore notafter ) {
+        if (defined $context->param($validity_param)) {
+            my $source = $source_ref->{$validity_param};
+            my $attrib_serial = $dbi->get_new_serial(
+                TABLE => 'CSR_ATTRIBUTES',
+            );
+            $dbi->insert(
+                TABLE => 'CSR_ATTRIBUTES',
+                HASH  => {
+                    'ATTRIBUTE_SERIAL' => $attrib_serial,
+                    'PKI_REALM'        => $pki_realm,
+                    'CSR_SERIAL'       => $csr_serial,
+                    'ATTRIBUTE_KEY'    => $validity_param,
+                    'ATTRIBUTE_VALUE'  => $context->param($validity_param),
+                    'ATTRIBUTE_SOURCE' => $source,
+                },
+            );
+        }
+    }
     $dbi->commit();
     $context->param('csr_serial' => $csr_serial);
 }

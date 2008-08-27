@@ -224,10 +224,24 @@ sub get_notbefore
     return $self->{PROFILE}->{NOTBEFORE}->clone();
 }
 
+sub set_notbefore
+{
+    my $self = shift;
+    $self->{PROFILE}->{NOTBEFORE} = shift;
+    return 1;
+}
+
 sub get_notafter
 {
     my $self = shift;
     return $self->{PROFILE}->{NOTAFTER}->clone();
+}
+
+sub set_notafter
+{
+    my $self = shift;
+    $self->{PROFILE}->{NOTAFTER} = shift;
+    return 1;
 }
 
 sub get_digest

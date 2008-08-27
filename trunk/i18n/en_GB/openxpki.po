@@ -383,6 +383,10 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CSR_APPROVAL_TITLE"
 msgstr "Cancel CSR approvals"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_"
+msgstr "Trustcenter Web Interface"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CRR_INVALIDITY_TIME_DESCRIPTION"
 msgstr "Please enter now some additional information."
 
@@ -459,6 +463,38 @@ msgstr "Choose a naming style"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_TITLE"
 msgstr "Creating the name of the certificate"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_DESCRIPTION"
+msgstr ""
+"Use the form below to change the notafter date (i.e. the date where the "
+"certificate expires) of the requested certificate."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_INPUT_NOTAFTER_DATE"
+msgstr "New notafter date"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_NOTAFTER_NOT_YET_DEFINED"
+msgstr ""
+"The notafter date has not yet been changed, thus it currently uses the "
+"default setting for the chosen profile."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_TITLE"
+msgstr "Change notafter date"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_DESCRIPTION"
+msgstr ""
+"Use the form below to change the notbefore date (i.e. the date where the "
+"certificate starts to be valid) of the requested certificate."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_INPUT_NOTBEFORE_DATE"
+msgstr "New notbefore date"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_NOTBEFORE_NOT_YET_DEFINED"
+msgstr ""
+"The notbefore date has not yet been changed, thus it currently uses the "
+"default setting for the chosen profile (this is typically 'now')."
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_TITLE"
+msgstr "Change notbefore date"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CONTINUE_DESCRIPTION"
 msgstr "Descriptions of the form fields"
@@ -485,8 +521,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_INSERT_CSR_TITLE"
 msgstr "Trustcenter Web Interface"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CRR_DESCRIPTION"
-msgstr ""
-"If you press OK, the certificate revocation request will be rejected."
+msgstr "If you press OK, the certificate revocation request will be rejected."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_REJECT_CRR_TITLE"
 msgstr "Reject certificate revocation request"
@@ -1046,6 +1081,9 @@ msgstr "Cryptographic Service Provider"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CSP_FREEFORM"
 msgstr "Cryptographic Service Provider (free-form)"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_DATE"
+msgstr "Date"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_FULL_CERT_INFO_LINK"
 msgstr "Detailed certificate information"
 
@@ -1087,7 +1125,10 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_TITLE"
 msgstr "Wrong certificate format"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_DESCRIPTION"
-msgstr "This PKI site provides different so-called PKI realms, which provide you with an interface to different Certificate Authorities with different settings. Please choose the one you would like to access."
+msgstr ""
+"This PKI site provides different so-called PKI realms, which provide you "
+"with an interface to different Certificate Authorities with different "
+"settings. Please choose the one you would like to access."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_TITLE"
 msgstr "Choose a PKI realm"
@@ -1362,6 +1403,9 @@ msgstr "Value"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS"
 msgstr "Tickets"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TIME"
+msgstr "Time"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
 msgstr ""
@@ -1644,6 +1688,10 @@ msgstr "Unknown error response from browser: __SIGNED_TEXT__"
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_NO_CERTIFICATE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_VISTA_NO_X509ENROLLMENT_OBJECT"
+msgstr "Error during certificate installation"
+
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME"
 msgstr ""
 
@@ -1665,6 +1713,10 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP"
+msgstr "Generating certificate request using default CSP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_VISTA_ERROR_DURING_CSR_CREATION"
 msgstr "Generating certificate request using default CSP"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_MISSING_CAPICOM"
@@ -2172,6 +2224,10 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_CERT"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_CERTFILE"
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 #, fuzzy
@@ -3406,6 +3462,30 @@ msgstr "The SPKAC string is empty."
 
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED"
+msgstr "Service error: permission to execute command denied."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_INTERNAL_ERROR"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_NO_ACCESS_TO_TYPE"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION"
+msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_ACL_LOAD_SERVER_DUPLICATE_ID_FOUND"
@@ -5126,6 +5206,12 @@ msgstr "The SPKAC string is empty."
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT"
 msgstr "The SPKAC string is empty."
 
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_VALIDITYTIME_INVALID_CONTENT"
+msgstr "The entered date/time could not be validated."
+
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_VALIDITYTIME_INVALID_FORMAT"
+msgstr "The entered date/time could not be validated."
+
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_XML_CACHE___GET_SUPER_ENTRY_MORE_THAN_ONE_PATH_AND_NO_ID_SPECIFIED"
 msgstr "testuser"
@@ -5234,6 +5320,10 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_GET_CERT_FAILED"
+msgstr "The used suject style does not allow the use of a country."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_ACTIVITY_FOUND"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -5245,6 +5335,18 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING"
 msgstr "The used suject style does not allow the use of a country."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SEARCH_CERT_NOT_ONLY_ONE_RESULT"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SEARCH_CERT_NO_ARRAYREF"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PRIVATE_METHOD_REQUESTED"
@@ -5524,6 +5626,10 @@ msgstr "Cancel CRR approval"
 msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 msgstr "Cancel CSR approval"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_"
+msgstr "Change additional information"
+
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
 msgstr "Change CRR invalidity time"
 
@@ -5547,6 +5653,12 @@ msgstr "Change subject alternative name"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Change subject style"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_NOTAFTER"
+msgstr "Change notafter date"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_NOTBEFORE"
+msgstr "Change notbefore date"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHILD_FINISHED_FAILURE"
 msgstr "(internal) report child failure"
@@ -5842,6 +5954,10 @@ msgstr "This is the workflow to issue fresh CRLs."
 msgid "I18N_OPENXPKI_WF_DESC_CYCLE_TOP"
 msgstr "SCEP Certificate Signing Request"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_PASSWORD_SAFE"
+msgstr "Issue a certificate revocation list (CRL)"
+
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
 msgstr "Handle a SCEP Certificate Signing Request"
 
@@ -5990,6 +6106,10 @@ msgstr "SCEP Certificate Signing Request"
 
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
 msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
+msgstr "CRL Issuance"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP Certificate Signing Request"

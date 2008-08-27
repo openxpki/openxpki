@@ -359,6 +359,9 @@
             $value = '<div style="font-family: monospace">' . $value . '</div>';
             $untainted{'spkac'} = 1;
         }
+        elsif ($param eq 'notafter' || $param eq 'notbefore') {
+            $value = substr($value, 0, 4) . '-' . substr($value, 4, 2) . '-' . substr($value, 6, 2) . ' ' . substr($value, 8, 2) . ':' . substr($value, 10, 2) . ':' . substr($value, 12, 2) . ' UTC';    
+        }
         elsif ($param eq 'cert_subject') {
             # make certificate subject more breakable
             $value =~ s{,}{, }xmsg;
@@ -488,7 +491,7 @@
     my %basic_details = (
         'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' =>
             [ qw( cert_subject cert_profile cert_role cert_subject_alt_name
-                 cert_info csr_serial wf_children_instances) ],
+                 cert_info csr_serial wf_children_instances notafter notbefore) ],
         'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE' =>
             [ qw( cert_subject cert_profile cert_role cert_subject_alt_name
                  csr_serial workflow_parent_id ) ],

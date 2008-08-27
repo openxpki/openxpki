@@ -31,6 +31,9 @@
   <validator name="CertSubjectAltNameParts"
              class="OpenXPKI::Server::Workflow::Validator::CertSubjectAltNameParts">
   </validator>
+  <validator name="ValidityTime"
+             class="OpenXPKI::Server::Workflow::Validator::ValidityTime">
+  </validator>
   <validator name="SPKAC"
              class="OpenXPKI::Server::Workflow::Validator::SPKAC">
   </validator>

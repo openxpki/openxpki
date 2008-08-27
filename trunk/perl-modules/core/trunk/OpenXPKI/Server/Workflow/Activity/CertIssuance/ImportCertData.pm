@@ -64,6 +64,10 @@ sub execute {
             push @subj_alt_names, 
                 $serializer->deserialize($metadata->{ATTRIBUTE_VALUE});
         }
+        elsif ($metadata->{ATTRIBUTE_KEY} eq 'notafter' ||
+               $metadata->{ATTRIBUTE_KEY} eq 'notbefore') {
+            $context->param($metadata->{ATTRIBUTE_KEY} => $metadata->{ATTRIBUTE_VALUE});
+        }
     }
     $context->param(
       'cert_subject_alt_name' => $serializer->serialize(\@subj_alt_names),

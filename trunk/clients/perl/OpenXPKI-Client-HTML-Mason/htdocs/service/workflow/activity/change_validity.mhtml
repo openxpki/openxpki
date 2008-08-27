@@ -1,0 +1,154 @@
+<%args>
+    $type     => undef
+    $id       => undef
+    $filled   => undef
+    $year     => undef
+    $month    => undef
+    $day      => undef
+    $hour     => undef
+    $minute   => undef
+    $seconds  => undef
+    $val_type => undef
+</%args>
+
+<& /service/open_form.mhtml, action => 'change_' . $val_type . '.html' &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'type',   'value' => $type &>
+<& /lib/html/hidden.mhtml, 'name' => 'id',     'value' => $id &>
+<& /lib/html/hidden.mhtml, 'name' => 'filled', 'value' => '1' &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_' . uc($val_type) . '_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_' . uc($val_type) . '_DESCRIPTION') %>
+</p>
+% if (! defined $notafter_or_before) {
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_' . uc($val_type) . '_' . uc($val_type) . '_NOT_YET_DEFINED') %>
+</p>
+% }
+<table>
+    <tr>
+        <td>
+<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_' . uc($val_type) . '_INPUT_' . uc($val_type) . '_DATE') %>
+        </td>
+        <td>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_DATE') %> (YYYY/MM/DD)
+        <td>
+          <& /lib/html/input.mhtml,
+            'name'   => 'year',
+            'value'  => $year,
+            'width'  => '4',
+          &>
+          /
+          <& /lib/html/input.mhtml,
+            'name'   => 'month',
+            'value'  => $month,
+            'width'  => '2',
+          &>
+          /
+          <& /lib/html/input.mhtml,
+            'name'   => 'day',
+            'value'  => $day,
+            'width'  => '2',
+          &>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TIME') %> (HH:MM:SS)
+        <td>
+          <& /lib/html/input.mhtml,
+            'name'   => 'hour',
+            'value'  => $hour,
+            'width'  => '2',
+          &>
+          :
+          <& /lib/html/input.mhtml,
+            'name'   => 'minute',
+            'value'  => $minute,
+            'width'  => '2',
+          &>
+          :
+          <& /lib/html/input.mhtml,
+            'name'   => 'seconds',
+            'value'  => $seconds,
+            'width'  => '2',
+            &>
+         UTC
+        </td>
+    </tr>
+</table>
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+
+<%init>
+    my @errors = ();
+
+    my $notafter_or_before;
+    if (! $filled) {
+        ## load the workflow and extract the additional infos
+        my $msg = $context->{client}->send_receive_command_msg
+                  (
+                      "get_workflow_info",
+                      {
+                          "WORKFLOW" => $type,
+                          "ID"       => $id
+                      }
+                  );
+
+
+        $notafter_or_before = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$val_type};
+        if (defined $notafter_or_before) {
+            ($year, $month, $day, $hour, $minute, $seconds)
+                = ($notafter_or_before =~ m{ ([0-9]{4})
+                                              ([0-9]{2})
+                                              ([0-9]{2})
+                                              ([0-9]{2})
+                                              ([0-9]{2})
+                                              ([0-9]{2}) }xms);
+        }
+    }
+    else {
+        ## this is the second step - so we have a filled form
+
+        ## fix the workflow
+        my $msg = $context->{client}->send_receive_command_msg (
+              "execute_workflow_activity",
+              {
+                WORKFLOW => $type,
+                ID       => $id,
+                ACTIVITY => 'I18N_OPENXPKI_WF_ACTION_CHANGE_' . uc($val_type),
+                PARAMS   => {
+                    $val_type => sprintf("%04d%02d%02d%02d%02d%02d", $year, $month, $day, $hour, $minute, $seconds),
+                },
+              },
+        );
+        if (exists $msg->{SERVICE_MSG} and
+            $msg->{SERVICE_MSG} eq "ERROR")
+        {
+            @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
+        }
+        else
+        {
+            return $m->comp ('/service/workflow/show_instance.html',
+                             'msg'  => $msg,
+                             'type' => $type,
+                             'id'   => $id);
+        }
+    }
+    ## for the I18N scan
+    ## I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_TITLE
+    ## I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_DESCRIPTION
+    ## I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_NOTAFTER_NOT_YET_DEFINED
+    ## I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_INPUT_NOTAFTER_DATE
+    ## I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_TITLE
+    ## I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_DESCRIPTION
+    ## I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_NOTBEFORE_NOT_YET_DEFINED
+    ## I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_INPUT_NOTBEFORE_DATE
+</%init>

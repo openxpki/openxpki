@@ -110,6 +110,22 @@
       <!-- because this ignores the order of the validators -->
       <field name="cert_subject_style"/>
   </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_NOTBEFORE"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+         source="OPERATOR">
+      <field name="notbefore"/>
+      <validator name="ValidityTime">
+        <arg>$notbefore</arg>
+      </validator>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_NOTAFTER"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+         source="OPERATOR">
+      <field name="notafter"/>
+      <validator name="ValidityTime">
+        <arg>$notafter</arg>
+      </validator>
+  </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="OPERATOR">

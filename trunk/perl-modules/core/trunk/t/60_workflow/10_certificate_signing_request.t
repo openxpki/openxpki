@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 34;
+plan tests => 38;
 
 use OpenXPKI::Tests;
 use OpenXPKI::Client;
@@ -186,6 +186,40 @@ $sources = OpenXPKI::Serialization::Simple->new()->deserialize(
     $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{sources},
 );
 is($sources->{cert_role}, 'OPERATOR', 'Role source has changed to OPERATOR');
+
+# Changing notbefore/notafter date
+
+$msg = $client->send_receive_command_msg(
+    'execute_workflow_activity',
+    {
+          'ACTIVITY' => 'I18N_OPENXPKI_WF_ACTION_CHANGE_NOTBEFORE',
+          'ID' => $wf_id,
+          'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
+          'PARAMS' => {
+                        'notbefore' => '20000101000000',
+           },
+    },
+); 
+
+ok(! is_error_response($msg), 'Successfully changed notbefore date');
+is($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{notbefore}, '20000101000000', 'Changed notbefore date in context')
+    or diag Dumper $msg;
+
+$msg = $client->send_receive_command_msg(
+    'execute_workflow_activity',
+    {
+          'ACTIVITY' => 'I18N_OPENXPKI_WF_ACTION_CHANGE_NOTAFTER',
+          'ID' => $wf_id,
+          'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
+          'PARAMS' => {
+                        'notafter' => '20200101000000',
+           },
+    },
+); 
+
+ok(! is_error_response($msg), 'Successfully changed notafter date');
+is($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{notafter}, '20200101000000', 'Changed notafter date in context')
+    or diag Dumper $msg;
 
 # TODO - change additional info
 

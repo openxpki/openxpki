@@ -9,7 +9,7 @@ use URI::Escape;
 use Data::Dumper;
 
 use Test::More;
-plan tests => 35;
+plan tests => 38;
 
 my $TEST_PORT = 8099;
 if ($ENV{MASON_TEST_PORT}) {
@@ -62,7 +62,7 @@ like($mech->response->content, qr/I18N_OPENXPKI_WF_ACTION_REJECT_CSR/, 'Reject b
 like($mech->response->content, qr/I18N_OPENXPKI_HTML_MASON_CHANGE/, 'Change button(s) present');
 like($mech->response->content, qr/comment/, 'Comment present');
 
-ok($mech->follow_link(text => 'CN=example1.example.com:1234, DC=Test Deployment, DC=OpenXPKI, DC=org', n => '1'), 'Followed link');
+ok($mech->follow_link(text => 'CN=example1.example.com:1234, DC=Test Deployment, DC=OpenXPKI, DC=org', n => '1'), 'Followed link') or diag $mech->response->content;
 like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE/, 'Certificate search result page');
 unlike($mech->response->content, qr/example1.example.com:1234/, 'No prior certificate with same DN present');
 $mech->back();
@@ -105,6 +105,18 @@ like($mech->response->content, qr/comment/, 'Comment present');
 ok($mech->follow_link(text => 'CN=example2.example.com:1234, DC=Test Deployment, DC=OpenXPKI, DC=org', n => '1'), 'Followed link');
 unlike($mech->response->content, qr/example2.example.com:1234/, 'No prior certificate with same DN present');
 $mech->back();
+
+ok($mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/change_notbefore.html?__session_id=$session_id&__role=RA%20Operator&id=2047&type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"), 'Followed notbefore link') or diag $mech->response->content;
+like($mech->response->content, qr/I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_TITLE/, 'Change notbefore title present') or diag $mech->response->content;
+$mech->form_name('OpenXPKI');
+$mech->field('hour', '23');
+$mech->field('seconds', '59');
+$mech->field('minute', '42');
+$mech->field('month', '12');
+$mech->field('day', '13');
+$mech->field('year', '2000');
+$mech->click('__submit');
+like($mech->response->content, qr/2000-12-13 23:42:59/, 'notbefore time present on show_instance page');
 
 $mech->get("http://127.0.0.1:$TEST_PORT/service/workflow/activity/approve_csr.html?id=2047;type=I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST;__session_id=$session_id&__role=RA%20Operator");
 $mech->form_name('OpenXPKI');

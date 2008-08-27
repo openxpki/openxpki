@@ -13,6 +13,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Crypto::X509;
+use OpenXPKI::DateTime;
 
 use Data::Dumper;
 
@@ -50,6 +51,24 @@ sub execute {
     $profile->set_serial($serial);
 
     $profile->set_subject($context->param('cert_subject'));
+
+
+    if (defined $context->param('notbefore')) {
+        $profile->set_notbefore(
+            OpenXPKI::DateTime::get_validity({
+                VALIDITY_FORMAT => 'absolutedate',
+                VALIDITY        => $context->param('notbefore'),
+            })
+        );
+    }
+    if (defined $context->param('notafter')) {
+        $profile->set_notafter(
+            OpenXPKI::DateTime::get_validity({
+                VALIDITY_FORMAT => 'absolutedate',
+                VALIDITY        => $context->param('notafter'),
+            })
+        );
+    }
 
     my $csr;
     my $csr_type = $context->param('csr_type');

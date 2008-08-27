@@ -116,6 +116,9 @@ htdocs/service/workflow/activity/change_csr_subject_style.html
 htdocs/service/workflow/activity/change_csr_subject.html
 htdocs/service/workflow/activity/change_csr_subject_alt_name.html
 htdocs/service/workflow/activity/change_csr_info.html
+htdocs/service/workflow/activity/change_notafter.html
+htdocs/service/workflow/activity/change_notbefore.html
+htdocs/service/workflow/activity/change_validity.mhtml
 htdocs/service/workflow/activity/approve_csr.html
 htdocs/service/workflow/activity/continue.html
 htdocs/service/workflow/activity/continue_issuance.html

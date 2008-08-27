@@ -427,6 +427,10 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CSR_APPROVAL_TITLE"
 msgstr "Auswählen einer Rolle"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_"
+msgstr "Export der Zertifizierungsantrages"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CRR_INVALIDITY_TIME_DESCRIPTION"
 msgstr ""
 "Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
@@ -508,6 +512,42 @@ msgstr "Ändern des Stils des Zertifikatsnamens"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_TITLE"
 msgstr "Ändern des Zertifikatsnamens"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_DESCRIPTION"
+msgstr ""
+"Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
+"(CSR) stellen wollen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_INPUT_NOTAFTER_DATE"
+msgstr "Auswählen einer Rolle"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_NOTAFTER_NOT_YET_DEFINED"
+msgstr "Auswählen einer Rolle"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_TITLE"
+msgstr "Auswählen einer Rolle"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_DESCRIPTION"
+msgstr ""
+"Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag "
+"(CSR) stellen wollen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_INPUT_NOTBEFORE_DATE"
+msgstr "Auswählen einer Rolle"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_NOTBEFORE_NOT_YET_DEFINED"
+msgstr "Auswählen einer Rolle"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_TITLE"
+msgstr "Auswählen einer Rolle"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CONTINUE_DESCRIPTION"
@@ -1269,6 +1309,10 @@ msgstr "Cryptographic Service Provider"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CSP_FREEFORM"
 msgstr "Cryptographic Service Provider (freie Eingabe)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_DATE"
+msgstr "Seite"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_FULL_CERT_INFO_LINK"
 msgstr "Detailierte Zertifikatsinformationen"
 
@@ -1613,6 +1657,10 @@ msgstr "Wert"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS"
 msgstr "Cryptographic Service Provider"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TIME"
+msgstr "Seite"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
 msgstr ""
 "Diese Aktivität ist noch nicht implementiert worden. Eventuell wurde der "
@@ -1915,6 +1963,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_NO_CERTIFICATE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_VISTA_NO_X509ENROLLMENT_OBJECT"
+msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
+
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME"
 msgstr ""
 
@@ -1937,6 +1989,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_VISTA_ERROR_DURING_CSR_CREATION"
+msgstr "Auswählen einer Rolle"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_MISSING_CAPICOM"
 msgstr ""
@@ -2502,6 +2558,10 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_CERT"
+msgstr "Fehlende Funktionalität"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_CERTFILE"
 msgstr "Fehlende Funktionalität"
 
 #, fuzzy
@@ -3811,6 +3871,26 @@ msgstr "Prozesse anzeigen"
 
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_INTERNAL_ERROR"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_NO_ACCESS_TO_TYPE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION"
+msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_ACL_LOAD_SERVER_DUPLICATE_ID_FOUND"
@@ -5316,6 +5396,14 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_VALIDITYTIME_INVALID_CONTENT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_VALIDITYTIME_INVALID_FORMAT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_XML_CACHE___GET_SUPER_ENTRY_MORE_THAN_ONE_PATH_AND_NO_ID_SPECIFIED"
 msgstr "testuser"
 
@@ -5427,6 +5515,10 @@ msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_FAILURE_BUT_NO_ERROR_CODE
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_GET_CERT_FAILED"
+msgstr "Antrag im OU-Stil"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_ACTIVITY_FOUND"
 msgstr "Seriennummer des Workflowprozesses"
 
@@ -5436,6 +5528,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING"
 msgstr "Antrag im OU-Stil"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SEARCH_CERT_NOT_ONLY_ONE_RESULT"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SEARCH_CERT_NO_ARRAYREF"
+msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PRIVATE_METHOD_REQUESTED"
@@ -5706,6 +5806,10 @@ msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 msgstr "Löschen der Genehmigung(en)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
 msgstr "Ändern des Zertifikats-Profils"
 
@@ -5730,6 +5834,14 @@ msgstr "Ändern des alternativen Namens"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Ändern des Stils des Namens"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_NOTAFTER"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_NOTBEFORE"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CHILD_FINISHED_FAILURE"
@@ -6039,6 +6151,10 @@ msgid "I18N_OPENXPKI_WF_DESC_CYCLE_TOP"
 msgstr "SCEP-Zertifizierungsantrag"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_PASSWORD_SAFE"
+msgstr "Dieser Workflow erstellt neue CRLs."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
 msgstr "SCEP-Zertifizierungsantrag"
 
@@ -6195,6 +6311,10 @@ msgstr "SCEP-Zertifizierungsantrag"
 
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
 msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
+msgstr "Erstellen von CRLs"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "SCEP-Zertifizierungsantrag"

@@ -377,6 +377,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CSR_APPROVAL_TITLE"
 msgstr "Отмена утверждения заявки на сертификат"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_"
+msgstr "Веб-интерфейс Удостоверяющего Центра"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CRR_INVALIDITY_TIME_DESCRIPTION"
 msgstr ""
 "Если Вы действительно хотите изменить время прекращения действия "
@@ -445,6 +449,44 @@ msgstr "Выбор способа формирования уникальног�
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CSR_SUBJECT_TITLE"
 msgstr "Изменение имени субъекта в заявке"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_DESCRIPTION"
+msgstr ""
+"Если вы действительно хотите изменить дополнительные сведения в заявке на "
+"сертификат, заполните, пожалуйста, поля новыми значениями и нажмите кнопку "
+"\"Выполнить операцию\"."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_INPUT_NOTAFTER_DATE"
+msgstr "Изменение дополнительных сведений"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_NOTAFTER_NOT_YET_DEFINED"
+msgstr "Изменение дополнительных сведений"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTAFTER_TITLE"
+msgstr "Изменение дополнительных сведений"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_DESCRIPTION"
+msgstr ""
+"Если вы действительно хотите изменить дополнительные сведения в заявке на "
+"сертификат, заполните, пожалуйста, поля новыми значениями и нажмите кнопку "
+"\"Выполнить операцию\"."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_INPUT_NOTBEFORE_DATE"
+msgstr "Изменение дополнительных сведений"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_NOTBEFORE_NOT_YET_DEFINED"
+msgstr "Изменение дополнительных сведений"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_NOTBEFORE_TITLE"
+msgstr "Изменение дополнительных сведений"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CONTINUE_DESCRIPTION"
@@ -1046,6 +1088,10 @@ msgstr "Криптопровайдер"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CSP_FREEFORM"
 msgstr "Криптопровайдер (выбор)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_DATE"
+msgstr "Скрыть"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_FULL_CERT_INFO_LINK"
 msgstr "Просмотреть дополнительную информацию"
 
@@ -1369,6 +1415,10 @@ msgstr "Значение"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS"
 msgstr "Назначено"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TIME"
+msgstr "Скрыть"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
 msgstr ""
 "Данная функция системы  еще не реализована. Обратитесь, пожалуйста, к "
@@ -1658,6 +1708,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_NO_CERTIFICATE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_VISTA_NO_X509ENROLLMENT_OBJECT"
+msgstr "В процессе установки сертификата произошла ошибка"
+
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_CSP_NAME"
 msgstr ""
 
@@ -1677,6 +1731,10 @@ msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT"
 msgstr ""
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_USING_DEFAULT_CSP"
+msgstr "Генерация заявки с использованием криптопровайдера по умолчанию"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_VISTA_ERROR_DURING_CSR_CREATION"
 msgstr "Генерация заявки с использованием криптопровайдера по умолчанию"
 
 msgid "I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_SIGN_FORM_IE_MISSING_CAPICOM"
@@ -2166,6 +2224,11 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_CERT"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_CERTFILE"
+msgstr ""
+"IP-адрес __IP__  некорректен. Поддерживаются адреса стандартов IPv4 и IPv6."
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_KEY"
 msgstr ""
@@ -3294,6 +3357,27 @@ msgstr "SPKAC строка пуста."
 
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_PERMISSION_DENIED"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED"
+msgstr ""
+"Выбранный способ построения имени не позволяет использовать название страны."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_INTERNAL_ERROR"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_NO_ACCESS_TO_TYPE"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION"
+msgstr "SPKAC строка пуста."
 
 msgid "I18N_OPENXPKI_SERVER_ACL_LOAD_SERVER_DUPLICATE_ID_FOUND"
 msgstr ""
@@ -4707,6 +4791,14 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_VALIDITYTIME_INVALID_CONTENT"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_VALIDITYTIME_INVALID_FORMAT"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_XML_CACHE___GET_SUPER_ENTRY_MORE_THAN_ONE_PATH_AND_NO_ID_SPECIFIED"
 msgstr "Тестировщик"
 
@@ -4834,6 +4926,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_FAILURE_BUT_NO_ERROR_CODE"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_GET_CERT_FAILED"
+msgstr ""
+"Выбранный способ построения имени не позволяет использовать название страны."
+
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_ACTIVITY_FOUND"
 msgstr ""
 
@@ -4842,6 +4939,16 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING"
+msgstr ""
+"Выбранный способ построения имени не позволяет использовать название страны."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SEARCH_CERT_NOT_ONLY_ONE_RESULT"
+msgstr ""
+"Выбранный способ построения имени не позволяет использовать название страны."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SEARCH_CERT_NO_ARRAYREF"
 msgstr ""
 "Выбранный способ построения имени не позволяет использовать название страны."
 
@@ -5116,6 +5223,10 @@ msgstr "Отменить утверждение заявки на отзыв с�
 msgid "I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
 msgstr "Отменить утверждение заявки на сертификат (CSR)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_"
+msgstr "Изменить дополнительную информацию"
+
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
 msgstr "Изменить срок отзыва сертификата"
 
@@ -5139,6 +5250,14 @@ msgstr "Изменить альтернативное имя в заявке"
 
 msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
 msgstr "Изменить способ формирования имени в заявке"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_NOTAFTER"
+msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGE_NOTBEFORE"
+msgstr "Изменить дополнительную информацию"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_ACTION_CHILD_FINISHED_FAILURE"
@@ -5444,6 +5563,10 @@ msgid "I18N_OPENXPKI_WF_DESC_CYCLE_TOP"
 msgstr ""
 "Технологические процессы приема заявок на сертификаты по протоколу SCEP"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_DESC_PASSWORD_SAFE"
+msgstr "Технологические процессы выдачи новых списков отзыва"
+
 msgid "I18N_OPENXPKI_WF_DESC_SCEP_REQUEST"
 msgstr ""
 "Технологические процессы приема заявок на сертификаты по протоколу SCEP"
@@ -5597,6 +5720,10 @@ msgstr "Прием заявок на сертификаты по протоко�
 
 msgid "I18N_OPENXPKI_WF_TYPE_DATAEXCHANGE_EXPORT"
 msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST"
 msgstr "Прием заявок на сертификаты по протоколу SCEP"

@@ -33,5 +33,7 @@
         'comment'               => 'I18N_OPENXPKI_COMMENT',
         'current_identifier'    => 'I18N_OPENXPKI_SCEP_CURRENT_ID',
         'current_valid_certificates' => 'I18N_OPENXPKI_SCEP_CURRENT_VALID_CERTIFICATES',
+        'notafter'  => 'I18N_OPENXPKI_CERT_NOTAFTER',
+        'notbefore' => 'I18N_OPENXPKI_CERT_NOTBEFORE',
     );
 </%once>
