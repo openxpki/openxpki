@@ -185,16 +185,21 @@
                 }
             </script>
             <div>
-%           my $gb_url = $current_url;
-%              $gb_url =~ s/__language=[^;]*/__language=en_GB/;
-%           my $ru_url = $current_url;
-%              $ru_url =~ s/__language=[^;]*/__language=ru_RU/;
-%           my $de_url = $current_url;
-%              $de_url =~ s/__language=[^;]*/__language=de_DE/;
-          <a href="<% $gb_url %>"><img src="<% $context->{menu}->get_root() %>/images/gb.png" style="margin-right:-1em"></a>
-          <a href="<% $ru_url %>"><img src="<% $context->{menu}->get_root() %>/images/ru.png" style="margin-right:-1em"></a>
-          <a href="<% $de_url %>"><img src="<% $context->{menu}->get_root() %>/images/de.png" style="margin-right:1em"></a>
-              <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />
+%           my $urls;
+%           foreach my $lang qw( en ru de ) {
+%               $urls->{$lang} = $current_url;
+%           }
+%           $urls->{'en'} =~ s/__language=[^;]*/__language=en_GB/;
+%           $urls->{'ru'} =~ s/__language=[^;]*/__language=ru_RU/;
+%           $urls->{'de'} =~ s/__language=[^;]*/__language=de_DE/;
+%           my @configured_languages = $m->comp('/lib/configured_languages.mhtml');
+%           if (scalar @configured_languages > 1) {
+%               # only show flags if there is a choice ...
+%               foreach my $lang (@configured_languages) {
+                    <a href="<% $urls->{$lang} %>"><img src="<% $context->{menu}->get_root() %>/images/<% $lang %>.png" style="margin-right:-1em"></a>
+%               }
+%           }
+       &nbsp;        <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />
 %   my %menu_hash = $context->{menu}->get_menu_hash();
 %    foreach my $key (keys %menu_hash) {
 %             my $menu_content = $menu_hash{$key} || '';

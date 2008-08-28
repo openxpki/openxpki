@@ -37,6 +37,7 @@ htdocs/lib/get_menu.mhtml
 htdocs/lib/language.mhtml
 htdocs/lib/get_deep_error.mhtml
 htdocs/lib/paging.mhtml
+htdocs/lib/configured_languages.mhtml
 htdocs/lib/html/a.mhtml
 htdocs/lib/html/safe.mhtml
 htdocs/lib/html/hidden.mhtml

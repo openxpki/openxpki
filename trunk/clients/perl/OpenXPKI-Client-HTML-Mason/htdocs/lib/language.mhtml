@@ -25,12 +25,19 @@
     my $browser = $ENV{'HTTP_ACCEPT_LANGUAGE'};
 
     ## supported languages so far
-    my %translations = (
+    my %possible_translations = (
         C  => 'C',     ## this should only be used for debugging and testing
         en => 'en_GB',
         de => 'de_DE',
         ru => 'ru_RU',
     );
+    my %translations = (
+        C  => 'C',
+    );
+    my @configured_translations = $m->comp('/lib/configured_languages.mhtml');
+    foreach my $lang (@configured_translations) {
+        $translations{$lang} = $possible_translations{$lang};
+    }
 
     ## get languages
     ## example firebird:
