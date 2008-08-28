@@ -198,8 +198,6 @@ subject_hash(cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
     CODE:
-        /* FIXME: potential memory hole */
-        /* is this code clean -  memory hole ??? */
 	RETVAL = X509_subject_name_hash(cert);
     OUTPUT:
 	RETVAL
