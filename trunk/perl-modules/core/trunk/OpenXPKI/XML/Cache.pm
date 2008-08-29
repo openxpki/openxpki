@@ -54,8 +54,8 @@ sub new
     $self->{schema}           = $keys->{SCHEMA} if (exists $keys->{SCHEMA});
     $self->{serialized_cache} = $keys->{SERIALIZED_CACHE};
 
-#    memoize('get_xpath',       NORMALIZER => 'normalize_get_xpath');
-#    memoize('get_xpath_count', NORMALIZER => 'normalize_get_xpath');
+    memoize('get_xpath');
+    memoize('get_xpath_count');
 
     return undef if (not $self->init ());
 
