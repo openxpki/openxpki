@@ -2908,6 +2908,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_HTML_MASON_MY_CERTIFICATES_TITLE"
 msgstr "My certificates"
 
+msgid "I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_DESC"
+msgstr ""
+"The webserver was unable to connect to the OpenXPKI server. The cause may "
+"either be a system error or a scheduled maintenance downtime. In case this "
+"error persists, please contact the administrator of the system."
+
+msgid "I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_TITLE"
+msgstr "Error: could not connect to OpenXPKI server"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_DESC"
 msgstr "CSR with DC-style"

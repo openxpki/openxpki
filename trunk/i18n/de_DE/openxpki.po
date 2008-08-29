@@ -3294,6 +3294,14 @@ msgid "I18N_OPENXPKI_HTML_MASON_MY_CERTIFICATES_TITLE"
 msgstr "Zertifikat herunterladen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_DESC"
+msgstr "Serverseitige Schlüsselgenerierung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_TITLE"
+msgstr "Serverseitige Schlüsselgenerierung"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_DESC"
 msgstr "Erfolgreich abgemeldet"
 

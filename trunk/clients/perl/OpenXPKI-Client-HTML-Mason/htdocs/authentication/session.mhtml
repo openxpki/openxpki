@@ -88,11 +88,29 @@
 
   # FIXME: don't use environment but rather a proper configuration
   my $socketfile = $ENV{OPENXPKI_SOCKET_FILE};
-  my $client = OpenXPKI::Client::HTML::Mason->new(
-      {
-          SOCKETFILE   => $socketfile,
-          TIMEOUT      => 120,
-      });
+  my $client;
+  eval {
+      $client = OpenXPKI::Client::HTML::Mason->new(
+          {
+              SOCKETFILE   => $socketfile,
+              TIMEOUT      => 120,
+          });
+  };
+  if (my $exc = OpenXPKI::Exception->caught()) {
+        if ($exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_CONNECTION_FAILED') {
+            # if we can not connect to the server, tell the user so
+            print '<h1>' . i18nGettext('I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_TITLE') . '</h1><p>' . i18nGettext('I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_DESC') . '</p>';
+            return;
+        }
+        else {
+            # otherwise, just rethrow, this is an internal error that the
+            # user is not supposed to see
+            $exc->rethrow();
+        }
+  }
+  elsif ($EVAL_ERROR) {
+    die $EVAL_ERROR;
+  }
 
   my %args;
   if (defined $__session_id) {

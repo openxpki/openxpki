@@ -2812,6 +2812,14 @@ msgstr "Не найдено ни одного сертификата, соотв
 msgid "I18N_OPENXPKI_HTML_MASON_MY_CERTIFICATES_TITLE"
 msgstr "Ваши сертификаты"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_DESC"
+msgstr "Генерация ключа на стороне сервера"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_TITLE"
+msgstr "Генерация ключа на стороне сервера"
+
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_DESC"
 msgstr "В процессе персонализации смарт-карты произошла ошибка."
 
