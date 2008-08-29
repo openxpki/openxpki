@@ -175,12 +175,18 @@
 
   # set the session ID in a cookie, too
   # TODO - specify a better path than /?
-  # TODO - currently, this is a session cookie, we might consider making
-  # it more persistent
+  my $secure = 0;
+  if (exists $ENV{'HTTPS'}) {
+        # we are using HTTPS, so set the secure flag of the cookie to
+        # make sure it is only sent back over HTTPS, too (prevents
+        # against a "Surf Jacking" attack)
+        $secure = 1;
+  }
   my $c = CGI::Cookie->new(
-    -name  => 'openxpki_sessionid',
-    -value => $__session_id,
-    -path  => '/', 
+    -name   => 'openxpki_sessionid',
+    -value  => $__session_id,
+    -path   => '/', 
+    -secure => $secure,
   );
   $r->headers_out->set('Set-Cookie' => $c);
 
