@@ -224,6 +224,9 @@ OpenXPKI/Server/Workflow/Activity/DataExchange/ImportLogs.pm
 OpenXPKI/Server/Workflow/Activity/DataExchange/ImportWorkflowInstances.pm
 OpenXPKI/Server/Workflow/Activity/DataExchange/Cleanup.pm
 
+OpenXPKI/Server/Workflow/Activity/PasswordSafe/RetrievePassword.pm
+OpenXPKI/Server/Workflow/Activity/PasswordSafe/StorePassword.pm
+
 OpenXPKI/Server/Workflow/Activity/SCEP/SetContextFromOriginalCert.pm
 OpenXPKI/Server/Workflow/Activity/SCEP/SetContextFromCSR.pm
 OpenXPKI/Server/Workflow/Activity/SCEP/ExtractCSR.pm
@@ -285,6 +288,7 @@ OpenXPKI/Server/Workflow/Validator/CertSubjectParts.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltNameParts.pm
 OpenXPKI/Server/Workflow/Validator/Bulk.pm
 OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
+OpenXPKI/Server/Workflow/Validator/UnusedID.pm
 
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm
