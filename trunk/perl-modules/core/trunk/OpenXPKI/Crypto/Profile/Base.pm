@@ -243,10 +243,13 @@ sub load_extension
     }
     elsif ($path[$#path] eq "crl_distribution_points")
     {
-        if ($self->{config}->get_xpath_count (XPATH   => [@path, "uri"],
+        my $count = 0;
+        eval {
+            $count = $self->{config}->get_xpath_count (XPATH   => [@path, "uri"],
                                               COUNTER => [@counter, 0],
-                                              CONFIG_ID => $cfg_id))
-        {
+                                              CONFIG_ID => $cfg_id);
+        };
+        if ($count) {
             push @values, @{$self->{config}->get_xpath_list (XPATH   => [@path, "uri"],
                                                              COUNTER => [@counter, 0],
                                                              CONFIG_ID => $cfg_id)};
