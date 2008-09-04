@@ -672,7 +672,7 @@ sub __get_server_config
         $params{server_type} = 'Simple';
     }
     elsif ($self->{TYPE} eq 'Fork') {
-        $params{server_type} = 'Fork';
+        $params{server_type} = 'Fork'; # TODO - try to make it possible to use PreFork
         $params{background}  = 1;
     }
     else {

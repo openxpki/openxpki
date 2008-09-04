@@ -32,6 +32,7 @@ use OpenXPKI::Server::API::Workflow;
 
 my %external_of    :ATTR;
 my %method_info_of :ATTR;
+my %memoization_of :ATTR;
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
@@ -114,11 +115,13 @@ sub BUILD {
             class  => 'Default',
             params => {
             },
+            memoize => 1,
         },
         'list_config_ids' => {
             class  => 'Default',
             params => {
             },
+            memoize => 1,
         },
         'get_config_id' => {
             class  => 'Workflow',
@@ -142,6 +145,7 @@ sub BUILD {
                     regex    => $re_base64_string,
                 },
             },
+            memoize => 1,
         },
         'get_approval_message' => {
             class  => 'Default',
@@ -164,6 +168,7 @@ sub BUILD {
                     regex    => $re_approval_lang,
                 },
             },
+            memoize => 1,
         },
         'get_pki_realm' => {
             class  => 'Default',
@@ -189,6 +194,7 @@ sub BUILD {
                     regex => $re_alpha_string,
                 },
             },
+            memoize => 1,
         },
         'get_param_values' => {
             class  => 'Default',
@@ -202,6 +208,7 @@ sub BUILD {
                     regex => $re_alpha_string,
                 },
             },
+            memoize => 1,
         },
         'get_chain' => {
             class  => 'Default',
@@ -423,6 +430,7 @@ sub BUILD {
                     regex    => $re_base64_string,
                 },
             },
+            memoize => 1,
         },
         'get_roles' => {
             class  => 'Default',
@@ -437,10 +445,12 @@ sub BUILD {
                     regex    => $re_base64_string,
                 },
             },
+            memoize => 1,
         },
         'get_cert_profiles' => {
             class  => 'Default',
             params => { },
+            memoize => 1,
         },
         'get_cert_subject_profiles' => {
             class  => 'Default',
@@ -450,6 +460,7 @@ sub BUILD {
                     regex => $re_alpha_string,
                 },
             },
+            memoize => 1,
         },
         'get_cert_subject_styles' => {
             class  => 'Default',
@@ -469,14 +480,17 @@ sub BUILD {
                     regex    => $re_pkcs10,
                 },
             },
+            memoize => 1,
         },
         'get_servers' => {
             class  => 'Default',
             params => { },
+            memoize => 1,
         },
         'get_export_destinations' => {
             class  => 'Default',
             params => { },
+            memoize => 1,
         },
         'convert_csr' => {
             class  => 'Default',
@@ -588,6 +602,7 @@ sub BUILD {
         'list_workflow_titles' => {
             class  => 'Workflow',
             params => { },
+            memoize => 1,
         },
         'list_context_keys' => {
             class  => 'Workflow',
@@ -743,7 +758,8 @@ sub BUILD {
         },
         'get_secrets' => {
             class  => 'Secret',
-            params => { }
+            params => { },
+            memoize => 1,
         },
         'is_secret_complete' => {
             class  => 'Secret',
@@ -816,6 +832,7 @@ sub AUTOMETHOD {
                 $valid_params,
             );
         }
+
         
         # ACL checking
         if ($external_of{$ident}) { # do ACL checking
@@ -864,6 +881,26 @@ sub AUTOMETHOD {
 	    FACILITY => 'system',
 	    );
     
+        my $memoization_key;
+        if (exists $method_info_of{$ident}->{$method_name}->{memoize} &&
+            $method_info_of{$ident}->{$method_name}->{memoize}) {
+            ##! 128: 'method ' . $method_name . ' may be memoized'
+            $memoization_key = '';
+            foreach my $key (keys %{ $args[0] }) {
+                $memoization_key .= $key . '=' . $args[0]->{$key};
+            }
+            ##! 128: 'args: ' . Dumper \@args
+            if ($memoization_key eq '') {
+                # special key is needed if no arguments are passed
+                $memoization_key = 'no_args'; 
+            }
+            ##! 128: 'memoization key: ' . $memoization_key
+            if (exists $memoization_of{$ident}->{$method_name}->{$memoization_key}) {
+                ##! 128: 'cache hit for method ' . $method_name . ' / memo key: ' . $memoization_key
+                return $memoization_of{$ident}->{$method_name}->{$memoization_key};
+            }
+        }
+        ##! 128: 'cache miss for method ' . $method_name . ' / memo key: ' . $memoization_key
         # call corresponding method
         my $openxpki_class = "OpenXPKI::Server::API::" . $class;
         ##! 64: 'Calling ' . $openxpki_class . '->' . $method_name
@@ -871,6 +908,10 @@ sub AUTOMETHOD {
         my $result = $openxpki_class->$method_name(@args);
         my $t1 = Benchmark->new();
         ##! 64: 'The call of ' . $openxpki_class . '->' . $method_name . ' took ' . timestr(timediff($t1, $t0))
+        if (defined $memoization_key) {
+            # if a memoization key is defined, we want to memoize the result
+            return $memoization_of{$ident}->{$method_name}->{$memoization_key} = $result;
+        }
         return $result;
     };
 }
