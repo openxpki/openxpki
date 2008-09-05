@@ -28,8 +28,9 @@ How to create these debian packages?
 
 11. dpkg -i deb/client/openxpki-i18n_*.deb 				\
 	dpkg -i deb/client/libopenxpki-client-html-mason-perl_*.deb 	\
-	dpkg -i deb/client/libopenxpki-client-scep-perl_*.deb		\
-	dpkg -i deb/client/openxpki-deployment_*.deb                               
+	dpkg -i deb/client/openxpki-deployment_*.deb			\                               
+	dpkg -i deb/client/libopenxpki-client-scep-perl_*.deb		
+	
 The steps 6 to 9 are necessary because the packages libopenxpki-perl and
 libopenxpki-client-perl are required for package builds.
 

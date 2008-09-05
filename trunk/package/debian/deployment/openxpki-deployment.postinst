@@ -47,8 +47,8 @@ case "$1" in
 		echo DONE. >&2
 	fi;
 	## fix var directory
-	chown openxpki:openxpki /var/openxpki/*
-
+	chown -R openxpki:openxpki /var/openxpki
+	chmod 660 /var/openxpki/sqlite.db*
 	if [ ! -e /etc/openxpki/instances/trustcenter1/ca/testdummyca1/cakey.pem ]; then
 
 		# Source debconf library.
