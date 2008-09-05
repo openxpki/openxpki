@@ -89,6 +89,12 @@ case "$1" in
 		db_clear
 		db_stop
 		rm -f key.pem csr.pem cacert.pem cert.pem
+		
+		#permission for default crl
+		touch /etc/openxpki/instances/trustcenter1/ca/testdummyca1/crl.pem
+		chown openxpki:openxpki /etc/openxpki/instances/trustcenter1/ca/testdummyca1/crl.pem
+		chmod 660 /etc/openxpki/instances/trustcenter1/ca/testdummyca1/crl.pem
+
 	fi;
     ;;
 
