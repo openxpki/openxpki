@@ -4620,6 +4620,62 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_RETRIEVE_PASSWORD_ID_IS_NEITHER_ARRAY_NOR_SCALAR"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_RETRIEVE_PASSWORD_NO_ENCRYPTED_PASSWORD_PRESENT_FOR_ID"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_RETRIEVE_PASSWORD_TOKEN_NOT_AVAILABLE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_CERT_NOT_AVAILABLE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_ID_OR_PASSWORD_UNAVAILABLE"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_INVALID_SAFE_ID"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_MISSING_PKI_REALM_CONFIG"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_NO_SAFE_AVAILABLE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_TOKEN_NOT_AVAILABLE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STOR_EPASSWORD_INPUT_DATA_IS_NOT_A_HASHREF"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EXTRACTCSR_PKCS10_UNDEFINED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -5215,6 +5271,10 @@ msgstr "The SPKAC string is empty."
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SPKAC_TOO_SHORT"
 msgstr "The SPKAC string is empty."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_UNUSED_ID_IS_HAS_BEEN_USED_ALREADY"
+msgstr "The SPKAC string is empty."
+
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_VALIDITYTIME_INVALID_CONTENT"
 msgstr "The entered date/time could not be validated."
 
@@ -5280,6 +5340,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_AUTHENTICATION_STACK_INVALID_AUTH_STACK_REQUESTED"
 msgstr "Service error: invalid authentication stack requested."
+
+msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_NON_ASCII_USERNAME_BUG"
+msgstr "Your username contains non-ASCII characters. We currently suffer from a bug that will crash the web interface if non-ASCII characters are used (see #1903037 on our SourceForge tracker), thus we currently prevent those users from logging in. Please make sure that your users do not use non-ASCII characters in their usernames or check back with us to see if the bug has been fixed. Sorry for the inconvenience."
 
 msgid "I18N_OPENXPKI_SERVICE_DEFAULT_GET_PKI_REALM_INVALID_PKI_REALM_REQUESTED"
 msgstr "Service error: invalid PKI realm requested."
