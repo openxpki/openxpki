@@ -24,7 +24,8 @@ How to create these debian packages?
 
 9. dpkg -i deb/client_api/libopenxpki-client-perl*.deb
 
-10. make i18n deployment scep-client mason-html-client 
+10. make i18n && make deployment && make scep-client && \
+	make mason-html-client 
 
 11. dpkg -i deb/client/openxpki-i18n_*.deb 				\
 	dpkg -i deb/client/libopenxpki-client-html-mason-perl_*.deb 	\

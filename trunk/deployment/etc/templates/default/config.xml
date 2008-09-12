@@ -150,6 +150,27 @@
             <search_dn></search_dn>
         </ldap>
         -->
+        <!-- if you do not want to use bind authentication, you can
+             use SASL as well (Authen::SASL is required for that to work)
+
+             as sasl_mechanism, you can for example configure DIGEST-MD5 for
+             MS ADS
+
+             Also note that configuring a hostname (not an IP) is required
+             for MS ADS
+        -->
+        <!--
+        <ldap>
+            <server></server>
+            <port></port>
+            <base_dn></base_dn>
+            <search_dn></search_dn>
+            <sasl>yes</sasl>
+            <sasl_mechanism></sasl_mechanism>
+            <sasl_user></sasl_user>
+            <sasl_pass></sasl_pass>
+        </ldap>
+        -->
       </crl_publication>
       [% END %]
     </ca>

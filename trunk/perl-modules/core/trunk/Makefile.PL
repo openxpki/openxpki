@@ -277,15 +277,15 @@ WriteMakefile(
     'INC'       => "-I. -I$openssl_inc_dir",
     'CCFLAGS'   => '-O2 -g',
     'PREREQ_PM' => {
-    'Class::Accessor::Fast'  => '0.31',
-    'Class::Accessor::Chained::Fast' => 1,
+	'Class::Accessor::Fast'  => '0.31',
+	'Class::Accessor::Chained::Fast' => 1,
 	'Class::Std'             => '0.0.8',
 	'CGI::Session'           => '3.95',
 	'DBI'                    => 1,
-    'Data::Password'         => '1.07',
-    'Data::Serializer'       => '0.44',
+	'Data::Password'         => '1.07',
+	'Data::Serializer'       => '0.44',
 	'DateTime'               => "0.22",
-    'DateTime::Format::DateParse' => '0.04',
+	'DateTime::Format::DateParse' => '0.04',
 	'Digest::MD5'            => 1,
 	'Digest::SHA1'           => 1,
 	'English'                => 1, ## for broken Perl installations like on Ubuntu Drapper
@@ -293,7 +293,7 @@ WriteMakefile(
 	'Filter::Util::Call'     => 1,
         'IO::Prompt'             => '0.099004', # required for deployment tools
 	## includes the version of libintl-perl which includes Locale::Messages
-    'IPC::ShareLite'         => '0.09',
+	'IPC::ShareLite'         => '0.09',
 	'Locale::TextDomain'     => 1,
 	'Log::Log4perl'          => '0.51',
         'Mail::RFC822::Address'  => '0.3',

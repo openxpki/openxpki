@@ -7,6 +7,8 @@ package OpenXPKI::Server::Workflow::Activity::CRLIssuance::PublishCRL;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
+use English;
+
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
@@ -181,11 +183,55 @@ sub execute {
             XPATH     => [ @basepath, 'search_dn' ],
             COUNTER   => [ @basectr , '0'],
         );
-        if (! $ldap_server || ! $ldap_port    || ! $ldap_bind_dn ||
-            ! $ldap_pass   || ! $ldap_base_dn || ! $ldap_search_dn) {
+        my $ldap_sasl;
+        eval {
+            $ldap_sasl = $self->get_xpath(
+                XPATH     => [ @basepath, 'sasl' ],
+                COUNTER   => [ @basectr , '0'],
+            );
+        };
+        my $ldap_sasl_mechanism;
+        eval {
+            $ldap_sasl_mechanism = $self->get_xpath(
+                XPATH     => [ @basepath, 'sasl_mechanism' ],
+                COUNTER   => [ @basectr , '0'],
+            );
+        };
+        my $ldap_sasl_user; 
+        eval {
+            $ldap_sasl_user = $self->get_xpath(
+                XPATH     => [ @basepath, 'sasl_user' ],
+                COUNTER   => [ @basectr , '0'],
+            );
+        };
+        my $ldap_sasl_pass;
+        eval {
+            $ldap_sasl_pass = $self->get_xpath(
+                XPATH     => [ @basepath, 'sasl_pass' ],
+                COUNTER   => [ @basectr , '0'],
+            );
+        };
+        if ( (! $ldap_server  || ! $ldap_port    ||
+              ! $ldap_base_dn || ! $ldap_search_dn)
+              ||
+	         (( !$ldap_bind_dn ||!$ldap_pass) &&
+              (! ($ldap_sasl eq "yes") && ( ! $ldap_sasl_mechanism ||
+               ! $ldap_sasl_user || ! $ldap_sasl_pass )))) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_CONFIGURATION_BROKEN',
-            );
+                params => {
+                    'ldap_server'	 	=> $ldap_server,
+                    'ldap_port'		=> $ldap_port,
+                    'ldap_bind_dn'		=> $ldap_bind_dn,
+                    'ldap_pass'		=> $ldap_pass,
+                    'ldap_base_dn'		=> $ldap_base_dn,
+                    'ldap_search_dn'	=> $ldap_search_dn,
+                    'ldap_sasl'		=> $ldap_sasl,
+                    'ldap_sasl_mechanism'	=> $ldap_sasl_mechanism,
+                    'ldap_sasl_user'	=> $ldap_sasl_user,
+                    'ldap_sasl_pass'	=> $ldap_sasl_pass
+		        },
+	        );
         }
         ##! 2: 'connecting to ldap server ' . $ldap_server . ':' . $ldap_port
         my $ldap = Net::LDAP->new(
@@ -205,32 +251,56 @@ sub execute {
                 },
             );
         }
-
-        my $mesg = $ldap->bind(
-                        $ldap_bind_dn,
-                        password => $ldap_pass
-        );
+	    my $mesg;
+        if ($ldap_sasl eq "yes"){
+            eval {
+                 require Authen::SASL;
+            };
+            if ($EVAL_ERROR) {
+                     OpenXPKI::Exception->throw(
+                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_SASL_AUTH_CONFIGURED_BUT_AUTHEN_SASL_NOT_AVAILABLE',
+                     );
+            }
+            my $sasl = Authen::SASL->new(
+                    mechanism 	=> $ldap_sasl_mechanism,
+                    callback 	=> 	{
+                        user => $ldap_sasl_user,
+                        pass => $ldap_sasl_pass,
+                    },   
+                );
+            $mesg = $ldap->bind(
+                $ldap_base_dn,
+                sasl => $sasl, 
+                version => 3,
+            );
+        }
+        else {
+            $mesg = $ldap->bind(
+                $ldap_bind_dn,
+                password => $ldap_pass
+            );
+        }
         if ($mesg->is_error()) {
-            OpenXPKI::Exception->throw(
+                OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_BIND_FAILED',
                 params  => {
                     ERROR      => $mesg->error(),
                     ERROR_DESC => $mesg->error_desc(),
-                }
-            );
+                    }
+                    );
         }
         ##! 2: 'ldap->bind() done'
-    
+        
         $mesg = $ldap->search(base      => $ldap_base_dn,
-                              filter    => "($ldap_search_dn)",
+                      filter    => "(distinguishedName=$ldap_search_dn)",
         );
         if ($mesg->is_error()) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_SEARCH_FAILED',
-                params  => {
-                    ERROR      => $mesg->error(),
-                    ERROR_DESC => $mesg->error_desc(),
-                }
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_PUBLISHCRL_LDAP_SEARCH_FAILED',
+            params  => {
+                ERROR      => $mesg->error(),
+                ERROR_DESC => $mesg->error_desc(),
+            }
             );
         }
         ##! 2: 'ldap->search() done'

@@ -41,7 +41,9 @@ EXTERNAL=				\
 	Hook__LexWrap			\
 	HTTP__Server__Simple__Mason 	\
 	Test__HTTP__Server__Simple	\
-	Data__SpreadPagination 		
+	Data__SpreadPagination 		\
+	Class__Accessor__Chained	\
+	Class__Accessor
 
 .PHONY : $(PACKAGES) $(EXTERNAL)
 
@@ -57,6 +59,7 @@ $(EXTERNAL):
 	test -d deb || mkdir deb
 	test -d deb/cpan || mkdir deb/cpan/	
 	cd deb/cpan/ &&  dh-make-perl --build --notest --cpan $(subst __,::,$@)
+	#cd deb/cpan/ &&  dh-make-perl --build --cpan $(subst __,::,$@)
 
 $(PACKAGES):
 	test -d deb || mkdir deb	
