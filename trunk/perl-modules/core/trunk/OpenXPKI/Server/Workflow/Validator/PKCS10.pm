@@ -26,12 +26,12 @@ sub validate {
     }
 
     ## check that it is clean
-    if ($pkcs10 !~ m{^-----BEGIN \s CERTIFICATE \s REQUEST-----\s+
+    if ($pkcs10 !~ m{^-----BEGIN \s (NEW)? \s? CERTIFICATE \s REQUEST-----\s+
                     ([0-9A-Za-z\-_=]+\s+)+
-                     -----END \s CERTIFICATE \s REQUEST-----\s*}xs and ## RFC 3548 URL and filename safe
-        $pkcs10 !~ m{^-----BEGIN \s CERTIFICATE \s REQUEST-----\s+
+                     -----END \s (NEW)? \s? CERTIFICATE \s REQUEST-----\s*}xs and ## RFC 3548 URL and filename safe
+        $pkcs10 !~ m{^-----BEGIN \s (NEW)? \s? CERTIFICATE \s REQUEST-----\s+
                     ([0-9A-Za-z+\/=]+\s+)+
-                     -----END \s CERTIFICATE \s REQUEST-----\s*}xs     ## RFC 1421,2045 and 3548
+                     -----END \s (NEW)? \s? CERTIFICATE \s REQUEST-----\s*}xs     ## RFC 1421,2045 and 3548
        )
     {
         ## PKCS#10 is base64 with some header and footer
