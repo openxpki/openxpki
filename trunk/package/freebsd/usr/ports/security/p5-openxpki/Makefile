@@ -77,7 +77,6 @@ MAN3=	OpenXPKI.3 \
 	OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain.3 \
 	OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_sign.3 \
 	OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify.3 \
-	OpenXPKI::Crypto::Backend::OpenSSL::Command::symmetric_cipher.3 \
 	OpenXPKI::Crypto::Backend::OpenSSL::Config.3 \
 	OpenXPKI::Crypto::Backend::OpenSSL::Engine.3 \
 	OpenXPKI::Crypto::Backend::OpenSSL::Engine::GOST.3 \

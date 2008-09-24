@@ -15,6 +15,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
 use MIME::Base64;
+use Crypt::CBC;
 
 # use Smart::Comments;
 
@@ -87,15 +88,14 @@ use MIME::Base64;
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_PARAMETER");
 	}
 	
-	my $encrypted = $token{$ident}->command(
-	    {
-                COMMAND => 'symmetric_cipher',
-                MODE    => 'ENCRYPT',
-		KEY     => $session_key{$ident},
-		IV      => $session_iv{$ident},
-                DATA    => $data,
-            });
-
+    my $cipher = Crypt::CBC->new(
+        -cipher => 'Crypt::OpenSSL::AES',
+        -key    => pack('H*', $session_key{$ident}),
+        -iv     => pack('H*', $session_iv{$ident}),
+        -literal_key => 1,
+        -header => 'none',
+    );
+    my $encrypted = $cipher->encrypt($data);
 	my $blob;
 
 	if ($encoding eq 'base64') {
@@ -172,14 +172,14 @@ use MIME::Base64;
 	    $encrypted_data = MIME::Base64::decode_base64($encrypted_data);
 	}
 
-	return $token{$ident}->command(
-	    {
-                COMMAND => 'symmetric_cipher',
-                MODE    => 'DECRYPT',
-		KEY     => $session_key{$ident},
-		IV      => $session_iv{$ident},
-                DATA    => $encrypted_data,
-            });
+    my $cipher = Crypt::CBC->new(
+        -cipher => 'Crypt::OpenSSL::AES',
+        -key    => pack('H*', $session_key{$ident}),
+        -iv     => pack('H*', $session_iv{$ident}),
+        -literal_key => 1,
+        -header => 'none',
+    );
+	return $cipher->decrypt($encrypted_data);
     }    
     
 	

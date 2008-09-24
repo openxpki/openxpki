@@ -43,7 +43,8 @@ EXTERNAL=				\
 	Test__HTTP__Server__Simple	\
 	Data__SpreadPagination 		\
 	Class__Accessor__Chained	\
-	Class__Accessor
+	Class__Accessor                 \
+	Crypt__OpenSSL__AES
 
 .PHONY : $(PACKAGES) $(EXTERNAL)
 

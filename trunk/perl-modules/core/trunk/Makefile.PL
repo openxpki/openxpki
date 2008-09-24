@@ -281,6 +281,8 @@ WriteMakefile(
 	'Class::Accessor::Chained::Fast' => 1,
 	'Class::Std'             => '0.0.8',
 	'CGI::Session'           => '3.95',
+    'Crypt::CBC'             => '2.29',
+    'Crypt::OpenSSL::AES'    => '0.02',
 	'DBI'                    => 1,
 	'Data::Password'         => '1.07',
 	'Data::Serializer'       => '0.44',
