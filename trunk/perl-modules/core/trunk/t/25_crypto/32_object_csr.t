@@ -1,9 +1,8 @@
 use strict;
 use warnings;
-use utf8;
-binmode STDERR, ":utf8";
 use Test::More;
 use English;
+use Encode;
 
 plan tests => 25;
 
@@ -113,6 +112,7 @@ my @example = (
     "CN=Кузьма Ильич Дурыкин,OU=кафедра квантовой статистики и теории поля,OU=отделение экспериментальной и теоретической физики,OU=физический факультет,O=Московский государственный университет им. М.В.Ломоносова,C=ru",
     "CN=Mäxchen Müller,O=Humboldt-Universität zu Berlin,C=DE"
               );
+@example = map { decode_utf8($_) } @example;
 
 for (my $i=0; $i < scalar @example; $i++)
 {

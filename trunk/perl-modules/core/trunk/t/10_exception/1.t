@@ -1,11 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
-plan tests => 6;
+plan tests => 7;
 
-BEGIN { 
-    use_ok('OpenXPKI::Exception');
-}
+use_ok('OpenXPKI::Exception');
 
 eval
 {

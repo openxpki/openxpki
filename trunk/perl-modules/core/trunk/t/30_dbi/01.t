@@ -2,13 +2,11 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 8;
+plan tests => 9;
 
 diag "OpenXPKI::Server::DBI: Database Initialization\n";
 
-BEGIN {
-    use_ok('OpenXPKI::Server::DBI', 'Using OpenXPKI::Server::DBI');
-}
+use_ok('OpenXPKI::Server::DBI', 'Using OpenXPKI::Server::DBI');
 
 our %config;
 our $dbi;

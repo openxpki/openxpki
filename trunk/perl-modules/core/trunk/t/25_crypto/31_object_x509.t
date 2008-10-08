@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use utf8;
-binmode STDERR, ":utf8";
 use Test::More;
-BEGIN { plan tests => 26 };
+use Encode;
+
+plan tests => 26;
 
 print STDERR "OpenXPKI::Crypto::X509\n";
 
@@ -53,6 +53,9 @@ my $cert = OpenXPKI::Crypto::X509->new (TOKEN => $token, DATA => $data);
 ok(1);
 
 ## test parser
+# TODO - do we want get_parsed to return the bytes (as currently done, see
+# UTF-8 encoded subject below) or a UTF8-decoded perl string with Unicode
+# codepoints?
 ok ($cert->get_parsed("BODY", "SUBJECT") eq "CN=John Dö,DC=OpenXPKI,DC=org");
 ok ($cert->get_parsed("BODY", "KEYSIZE") == 1024);
 my @key_usage = @{ $cert->get_parsed('BODY', 'EXTENSIONS', 'KEYUSAGE') };
@@ -148,6 +151,7 @@ my @example = (
     "CN=Кузьма Ильич Дурыкин,OU=кафедра квантовой статистики и теории поля,OU=отделение экспериментальной и теоретической физики,OU=физический факультет,O=Московский государственный университет им. М.В.Ломоносова,C=ru",
     "CN=Mäxchen Müller,O=Humboldt-Universität zu Berlin,C=DE"
               );
+@example = map { decode_utf8($_) } @example;
 
 for (my $i=0; $i < scalar @example; $i++)
 {
