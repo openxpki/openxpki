@@ -527,19 +527,22 @@ sub __get_extensions
         }
         elsif ($name eq "key_usage")
         {
-            $config .= "keyUsage = $critical";
             my @bits = @{$profile->get_extension("key_usage")};
-            $config .= "digitalSignature," if (grep /digital_signature/, @bits);
-	    $config .= "nonRepudiation,"   if (grep /non_repudiation/,   @bits);
-	    $config .= "keyEncipherment,"  if (grep /key_encipherment/,  @bits);
-            $config .= "dataEncipherment," if (grep /data_encipherment/, @bits);
-            $config .= "keyAgreement,"     if (grep /key_agreement/,     @bits);
-            $config .= "keyCertSign,"      if (grep /key_cert_sign/,     @bits);
-            $config .= "cRLSign,"          if (grep /crl_sign/,          @bits);
-            $config .= "encipherOnly,"     if (grep /encipher_only/,     @bits);
-            $config .= "decipherOnly,"     if (grep /decipher_only/,     @bits);
-            $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
-            $config .= "\n";
+            if (scalar @bits > 0) {
+                # only add keyUsage to config if configuration entries are present
+                $config .= "keyUsage = $critical";
+                $config .= "digitalSignature," if (grep /digital_signature/, @bits);
+            $config .= "nonRepudiation,"   if (grep /non_repudiation/,   @bits);
+            $config .= "keyEncipherment,"  if (grep /key_encipherment/,  @bits);
+                $config .= "dataEncipherment," if (grep /data_encipherment/, @bits);
+                $config .= "keyAgreement,"     if (grep /key_agreement/,     @bits);
+                $config .= "keyCertSign,"      if (grep /key_cert_sign/,     @bits);
+                $config .= "cRLSign,"          if (grep /crl_sign/,          @bits);
+                $config .= "encipherOnly,"     if (grep /encipher_only/,     @bits);
+                $config .= "decipherOnly,"     if (grep /decipher_only/,     @bits);
+                $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
+                $config .= "\n";
+            }
         }
         elsif ($name eq "subject_alt_name")
         {
