@@ -1,5 +1,5 @@
 /*
- * (c) 2005-2006 OpenXPKI
+ * (c) 2005-2008 OpenXPKI
  *
  * the base of this file was the style1.css from the OpenSC project merged
  * together with the original OpenCA style file
@@ -29,17 +29,12 @@ body {
 	padding: 0px;
 }
 
-h1, h2 {
+h1, h2, h3, h4 {
     font-family: Arial, sans-serif;
-    font-weight: normal;
+    font-weight: bold;
     color: black;
 }
 
-h3 {
-    font-family: Arial, sans-serif;
-    font-weight: normal;
-    color: black;
-}
 
 a {
     font-style:  italic;

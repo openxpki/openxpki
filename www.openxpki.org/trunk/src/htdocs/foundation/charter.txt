@@ -23,7 +23,7 @@ board. Otherwise they must return rights and/or ownership.
 OpenXPKI recognises three groups - users, board members
 and active developers.
 
-- Users are all people who use OpenCA.
+- Users are all people who use OpenXPKI.
 - Board members are members of the board as defined in #3.
 - Active developers are people who have been actively developing the 
   OpenXPKI software over the last two years.

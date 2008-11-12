@@ -1,4 +1,4 @@
-Last modified by <% $author %> on <% $change_date %> (based on rev. <% $change_rev %>). &copy; 2005 - 2007  OpenXPKI Foundation
+Last modified by <% $author %> on <% $change_date %> (based on rev. <% $change_rev %>). &copy; 2005 - 2008  OpenXPKI Foundation
 
 <%init>
 use POSIX qw( strftime );
@@ -14,17 +14,8 @@ my $head_rev;
 if (-f $file) {
    $author = $ENV{'SVN_USER_NAME'};
    $change_date = `date -u`;
-   open my $fh, "svn info $file 2>&1 |";
-   while (my $line = <$fh>) {
-       chomp $line;
-       if ($line =~ m{ \A Last\ Changed\ Rev: \s* (.*) \z }xms) {
-           $change_rev = $1;
-       }
-       if ($line =~ m{ \A Revision: \s* (.*) \z }xms) {
-           $head_rev = $1;
-       }
-   }
-   close $fh;
+   $change_rev = `vergen --format SVN_LAST_CHANGED_REVISION`;
+   $head_rev = `vergen --format SVN_REVISION`;
    # whent this HTML tree was generated
    $build_date = strftime("%F %T %z", localtime(time));
 }
