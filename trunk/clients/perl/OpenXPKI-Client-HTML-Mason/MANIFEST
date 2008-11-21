@@ -135,6 +135,7 @@ htdocs/service/workflow/activity/revoke_certificate.html
 htdocs/service/workflow/activity/cancel_crr_approval.html
 htdocs/service/workflow/activity/change_crr_reason.html
 htdocs/service/workflow/activity/change_crr_invalidity_time.html
+htdocs/service/workflow/activity/issue_certificate.html
 
 htdocs/service/create_csr/index.html
 htdocs/service/create_csr/get_workflow_type.mhtml

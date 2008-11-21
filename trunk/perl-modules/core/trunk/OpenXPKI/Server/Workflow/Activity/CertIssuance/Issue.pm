@@ -36,6 +36,15 @@ sub execute {
     my $profile = $context->param('_cert_profile');
     ##! 16: 'profile: ' . $profile
 
+    if (! defined $profile) {
+        # if we are restarted, the '_cert_profile' context entry might
+        # have been lost, we just execute the previous activity to
+        # get it back ...
+        OpenXPKI::Server::Workflow::Activity::CertIssuance::GetCertProfile::execute($self, $workflow);
+        $context = $workflow->context();
+        $profile = $context->param('_cert_profile');
+        ##! 64: 'context: ' . Dumper $context
+    }
     my $cert_subj_alt_name = $context->param('cert_subject_alt_name');
     ##! 16: 'cert_subj_alt_name: ' . $cert_subj_alt_name
     my $subj_alt_name = $serializer->deserialize($cert_subj_alt_name);

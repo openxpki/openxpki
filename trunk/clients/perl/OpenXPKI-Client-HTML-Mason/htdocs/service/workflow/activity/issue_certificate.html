@@ -1,0 +1,34 @@
+<%args>
+    $type   => undef
+    $id     => undef
+</%args>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_ISSUE_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_ISSUE_DESCRIPTION') %>
+</p>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+
+<%init>
+    my @errors = ();
+
+    ## call the 'continue activity'
+    my $msg = $context->{client}->send_receive_command_msg (
+            "execute_workflow_activity",
+            {  WORKFLOW => $type,
+               ID       => $id,
+               ACTIVITY => 'issue_certificate',
+            },
+    );
+    if (exists $msg->{SERVICE_MSG} and
+        $msg->{SERVICE_MSG} eq "ERROR") {
+        @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
+    }
+    else {
+    return $m->comp ('/service/workflow/show_instance.html',
+            'msg'  => $msg,
+            'type' => $type,
+            'id'   => $id);
+    }
+</%init>
