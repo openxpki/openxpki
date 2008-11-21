@@ -1,6 +1,6 @@
 package Bundle::OpenXPKI;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 __END__
@@ -136,6 +136,10 @@ Config::Std v0.0.4
 Convert::ASN1 0.21
 
 Convert::ASN1::parser undef
+
+Crypt::CBC 2.29
+
+Crypt::OpenSSL::AES 0.02
 
 Cwd 3.12
 

@@ -1,5 +1,7 @@
 Revision history for Bundle-OpenXPKI
 
+0.06    2008-11-21
+        - Added Crypt::CBC and Crypt::OpenSSL::AES (needed for VolatileVault)
 0.05    2008-05-28
         - Replaced Date::Parse with DateTime::Format::DateParse (Date::Parse
           is not Y2038 safe!)
