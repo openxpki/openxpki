@@ -202,7 +202,7 @@
     <param name="max" value="2"/>
   </condition>
   <condition name="correct_timing" class="OpenXPKI::Server::Workflow::Condition::CorrectTiming">
-    <param name="difference" value="100d"/> <!-- renewal can only begin 100d before the certificate becomes invalid -->
+    <param name="difference" value="+0003"/> <!-- renewal can only begin 3 months before the certificate becomes invalid -->
   </condition>
   <condition name="signed_using_original_cert" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/>
 
