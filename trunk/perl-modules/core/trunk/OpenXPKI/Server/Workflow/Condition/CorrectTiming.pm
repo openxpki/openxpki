@@ -23,17 +23,17 @@ sub _init {
     # if existent, parse the passed time difference
     if (exists $params->{difference}) {
 
-        # the time difference in the NEW format
+        # the time difference
         my $timeDifference = undef;
 
-        # try to convert the time difference if it was passed in the ***OLD*** format
-        if ($params->{difference} =~ /\A([0-9]+)([mhdw]?)\z/) {			
-			# now read the passed time difference (old format is implicitly converted into new format)
-			$timeDifference = readTimeDifferenceFromOldFormat($params->{difference});
+        # set the time difference if it was passed in the ***OLD*** format
+        if ($params->{difference} =~ m{ \A (\d+) ([mhdw]?) \z }xms) {			
+			# now read the passed time difference in seconds
+			$timeDifference = returnTimeDifferenceFromOldFormatInSeconds($params->{difference});
         }
 
         # set the time difference if it was passed in the ***NEW*** format
-        elsif ($params->{difference} =~ /\A([+\-]?\d+)\z/) {
+        elsif ($params->{difference} =~ m{ \A ([+\-]{1} \d+) \z }xms) {
             # set the time difference
             $timeDifference = $1;
         }
@@ -41,14 +41,14 @@ sub _init {
         # seems like the time difference format was not recognized
         else {
             OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_INIT_INVALID_TIME_DIFFERECE_FORMAT",
+                message => "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_INIT_INVALID_TIME_DIFFERENCE_FORMAT",
                 params  => {
                     MSG => "Time difference format was not recognized"
                 }
             );
         }
 
-        # store the time difference (in the new format) 
+        # store the time difference 
         $self->difference($timeDifference);
     }
 
@@ -68,31 +68,41 @@ sub evaluate {
     my ( $self, $workflow ) = @_;
 
     my $notafter    = $workflow->context()->param('current_notafter');
-    my $validity    = $self->difference();     
-    my $currentDate = DateTime->now();
+    my $validity    = $self->difference();
+	my $currentDate	= DateTime->now();     
+	my $validDate	= undef;
 
-    # create date ('now' + 'difference)
-    my $date = OpenXPKI::DateTime::get_validity({
+	# set validDate if we got the validity in the ***OLD*** format
+    if ($validity =~ m{ \A \d+ \z }xms) {
+        # create date ('now' + 'validity')
+        $validDate = $currentDate->epoch() + $validity;
+    }
+
+	# set validDate if we got the validity in the ***NEW*** format	
+	if ($validity =~ m{ \A [+\-]{1} \d+ \z }xms) {
+	    # create date ('now' + 'validity')
+	    $validDate = OpenXPKI::DateTime::get_validity({
                    REFERENCEDATE => $currentDate,
                    VALIDITY => $validity,
                    VALIDITYFORMAT => 'relativedate',
-               });
+		});
+	}
 
-    # timing is incorrect...
-    # ...if $secondsUntilNotAfter is less than zero or 
-    # ...if $secondsUntilNotAfter is greater than $secondsDifference
-    my $secondsUntilNotAfter   = $notafter - $currentDate->epoch();
-    my $secondsDifference      = $date->epoch() - $currentDate->epoch();
-
-    # thrown an incorrect timing error
-    if ($secondsUntilNotAfter < 0 || $secondsUntilNotAfter > $secondsDifference) {
-        condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_EVALUATE_INCORRECT_TIMING');
-    }
+   	# timing is incorrect...
+   	# ...if $secondsUntilNotAfter is less than zero or 
+   	# ...if $secondsUntilNotAfter is greater than $secondsDifference
+   	my $secondsUntilNotAfter   = $notafter - $currentDate->epoch();
+   	my $secondsDifference      = $validDate->epoch() - $currentDate->epoch();
+    
+	# thrown an incorrect timing error
+	if ($secondsUntilNotAfter < 0 || $secondsUntilNotAfter > $secondsDifference) {
+        	condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_EVALUATE_INCORRECT_TIMING');
+	}
 
     return 1;
 }
 
-sub readTimeDifferenceFromOldFormat {
+sub returnTimeDifferenceFromOldFormatInSeconds {
 	my ( $self ) = @_;
 
 	my $difference = shift;
@@ -100,92 +110,30 @@ sub readTimeDifferenceFromOldFormat {
 	my $number = undef;
 	my $modifier = undef;
 
-	if ($difference =~ /\A([0-9]+)([mhdw]?)\z/) {
+	if ($difference =~ m{ \A ([0-9]+) ([mhdw]?) \z }xms) {
 		$number = $1;
 		$modifier = $2;
 	}
 
-	# temporary values
-	my $timeSource = DateTime->now();
-	my $timeTarget = $timeSource->clone();
-
 	# minutes
 	if ($modifier eq 'm') {
-		$timeTarget->add(minutes => $number);
+		$number = $number * 60;
 	}
 	# hours
 	elsif ($modifier eq 'h') {
-		$timeTarget->add(hours => $number);
+		$number = $number * 60 * 60;
 	}
 	# days
 	elsif ($modifier eq 'd') {
-		$timeTarget->add(days => $number);
+		$number = $number * 60 * 60 * 24;
 	}
 	# weeks
 	elsif ($modifier eq 'w') {
-		$number *= 7;
-		$timeTarget->add(days => $number);
-	}
-	# seconds
-	elsif ($modifier eq '') {
-		$timeTarget->add(seconds => $number);
-	}
-	# this should NOT happen
-	else {
-		OpenXPKI::Exception->throw(
-        	message => "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_READ_TIME_DIFFERENCE_FROM_OLD_FORMAT_SYNTAX_INVALID",
-            params  => {
-            	MSG => "Please use the new syntax for relative dates (+yymmddhhmmss)"
-            }
-        );
-   	}
-	
-	# calculate the time difference
-	my $timeDifference = $timeTarget->subtract_datetime($timeSource);
-
-	# the above function from DateTime does not output hours or years,
-	# so we have to get cute in the following lines (see below)
-	my $differenceSeconds 	= $timeDifference->{seconds};
-	my $differenceMinutes 	= $timeDifference->{minutes};
-	my $differenceHours		= 0;
-	my $differenceDays		= $timeDifference->{days};
-	my $differenceMonths	= $timeDifference->{months};
-	my $differenceYears		= 0;
-
-	# check if we need to convert minutes to hours and months to years (see above)
-	while($differenceMinutes >= 60) {
-		$differenceMinutes -= 60;
-		$differenceHours += 1;
-	}
-	while($differenceMonths >= 12) {
-		$differenceMonths -= 12;
-		$differenceYears += 1;
+		$number = $number * 60 * 60 * 24 * 7;
 	}
 
-	# prepend leading zeros if necessary
-	if($differenceSeconds < 10) {
-		$differenceSeconds = "0$differenceSeconds";
-	}
-	if($differenceMinutes < 10) {
-		$differenceMinutes = "0$differenceMinutes";
-	}
-	if($differenceHours < 10) {
-		$differenceHours = "0$differenceHours";
-	}
-	if($differenceDays < 10) {
-		$differenceDays = "0$differenceDays";
-	}
-	if($differenceMonths < 10) {
-		$differenceMonths = "0$differenceMonths";
-	}
-	if($differenceYears < 10) {
-		$differenceYears = "0$differenceYears";
-	}
-
-	# build the CORRECTLY FORMATTED time difference string (+yymmddHHMMSS)
-	$timeDifference = "+$differenceYears$differenceMonths$differenceDays$differenceHours$differenceMinutes$differenceSeconds";
-	
-	return $timeDifference;
+	# return the time difference in seconds	
+	return $number;
 }
 
 1;

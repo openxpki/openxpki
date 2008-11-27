@@ -24,32 +24,32 @@ my $ct = undef;
 #
 $hash{difference} = "10";
 $ct = OpenXPKI::Server::Workflow::Condition::CorrectTiming->new(\%hash);
-is($ct->difference(), "+000000000010", "difference parsing: 10 seconds");
+is($ct->difference(), "10", "difference parsing: 10 seconds");
 
 #    
 # 2
 #
 $hash{difference} = "20m";
 $ct = OpenXPKI::Server::Workflow::Condition::CorrectTiming->new(\%hash);
-is($ct->difference(), "+0000000020", "difference parsing: 20 minutes");
+is($ct->difference(), "1200", "difference parsing: 20 minutes (1200 seconds)");
 
 #    
-# 3
+# 3 
 #
-$hash{difference} = "3h";
+$hash{difference} = "30h";
 $ct = OpenXPKI::Server::Workflow::Condition::CorrectTiming->new(\%hash);
-is($ct->difference(), "+00000003", "difference parsing: 3 hours");
+is($ct->difference(), "108000", "difference parsing: 30 hours (108000 seconds)");
 
-#    
+#
 # 4
 #
-$hash{difference} = "2d";
+$hash{difference} = "40d";
 $ct = OpenXPKI::Server::Workflow::Condition::CorrectTiming->new(\%hash);
-is($ct->difference(), "+000002", "difference parsing: 2 days");
+is($ct->difference(), "3456000", "difference parsing: 40 days (3456000 seconds)");
 
 #
 # 5
 #
-$hash{difference} = "13w";
+$hash{difference} = "50w";
 $ct = OpenXPKI::Server::Workflow::Condition::CorrectTiming->new(\%hash);
-is($ct->difference(), "+000091", "difference parsing: 13 weeks");
+is($ct->difference(), "30240000", "difference parsing: 50 weeks (30240000 seconds)");
