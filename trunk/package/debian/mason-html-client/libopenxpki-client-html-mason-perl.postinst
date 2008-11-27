@@ -33,7 +33,7 @@ case "$1" in
         invoke-rc.d apache reload
 
         # add apache user to openxpki group (to allow connecting the socket)
-        usermod --groups openxpki --append openxpki www-data
+        usermod -G openxpki www-data
 
         # chown/chmod the mason session directory
         chown www-data.openxpki /var/openxpki/mason_sessions
