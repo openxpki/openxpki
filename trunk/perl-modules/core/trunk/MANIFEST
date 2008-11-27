@@ -112,8 +112,6 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST2001CP.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST94.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST94CP.pm
 
-OpenXPKI/Crypto/Backend/OpenSSL/Command/symmetric_cipher.pm
-
 OpenXPKI/Crypto/Backend/OpenSSL/Command/list_algorithms.pm
 
 ## XS sources
@@ -403,7 +401,6 @@ t/25_crypto/32_object_csr.t
 t/25_crypto/33_object_crr.t
 t/25_crypto/34_object_crl.t
 t/25_crypto/35_object_pkcs7.t
-t/25_crypto/50_symmetric_cipher.t
 t/25_crypto/51_volatile_vault.t
 t/25_crypto/52_object_secret.t
 t/25_crypto/53_is_issuer.t
