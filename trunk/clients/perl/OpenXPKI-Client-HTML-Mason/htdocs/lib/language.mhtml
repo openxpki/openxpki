@@ -27,7 +27,7 @@
     ## supported languages so far
     my %possible_translations = (
         C  => 'C',     ## this should only be used for debugging and testing
-        en => 'en_GB',
+        en => 'en_US',
         de => 'de_DE',
         ru => 'ru_RU',
     );
@@ -75,7 +75,7 @@
     }
 
     ## use the system default language
-    my $default_lang = 'en_GB';
+    my $default_lang = 'en_US';
     set_language($default_lang);
     $session_cache{$session_id}->{language} = $default_lang
         if (defined $session_id);

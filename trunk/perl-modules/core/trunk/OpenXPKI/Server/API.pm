@@ -68,7 +68,7 @@ sub BUILD {
     # for example ...
     my $re_sql_string        = qr{ \A [a-zA-Z0-9\@\-_\.\s\%\*\+\=\,\:\ ]* \z }xms;
     my $re_approval_msg_type = qr{ \A (CSR|CRR) \z }xms;
-    my $re_approval_lang     = qr{ \A (de_DE|en_GB|ru_RU) \z }xms;
+    my $re_approval_lang     = qr{ \A (de_DE|en_US|ru_RU) \z }xms;
     my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
     my $re_pkcs10            = qr{ \A [A-za-z0-9\+/=_\-\r\n\ ]+ \z}xms;
 

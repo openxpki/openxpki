@@ -71,7 +71,7 @@
   <xsd:simpleType name="language_type">
     <xsd:restriction base="xsd:token">
       <xsd:enumeration value="C"/>
-      <xsd:enumeration value="en_GB"/>
+      <xsd:enumeration value="en_US"/>
       <xsd:enumeration value="de_DE"/>
       <xsd:enumeration value="ru_RU"/>
     </xsd:restriction>

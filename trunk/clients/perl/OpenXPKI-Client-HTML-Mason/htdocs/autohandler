@@ -189,7 +189,7 @@
 %           foreach my $lang qw( en ru de ) {
 %               $urls->{$lang} = $current_url;
 %           }
-%           $urls->{'en'} =~ s/__language=[^;]*/__language=en_GB/;
+%           $urls->{'en'} =~ s/__language=[^;]*/__language=en_US/;
 %           $urls->{'ru'} =~ s/__language=[^;]*/__language=ru_RU/;
 %           $urls->{'de'} =~ s/__language=[^;]*/__language=de_DE/;
 %           my @configured_languages = $m->comp('/lib/configured_languages.mhtml');

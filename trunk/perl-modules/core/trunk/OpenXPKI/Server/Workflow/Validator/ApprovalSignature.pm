@@ -93,7 +93,7 @@ sub validate {
 
     my $matched;
   CHECK_MATCH:
-    foreach my $lang (qw(en_GB de_DE ru_RU)) {
+    foreach my $lang (qw(en_US de_DE ru_RU)) {
         ##! 64: 'testing language: ' . $lang
         my $match = CTX('api')->get_approval_message({
             WORKFLOW => $wf_type,
