@@ -219,31 +219,32 @@ msgstr "Public key"
 msgid "I18N_OPENXPKI_CERT_REVOKED"
 msgstr "revoked"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SEARCH_"
-msgstr "Issuer"
+msgstr "Search"
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL"
 msgstr "Certificate serial"
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL_DESCRIPTION"
 msgstr ""
-"The certificate serial is the serial which is directly contained in the "
-"certificate. It is not the internal identifier of the trustcenter system."
+"The certificate serial is directly assigned by the issuer and "
+"contained in the certificate. "
+"If the issuer is known or determible the serial is used for identification "
+"of the certificate. It is not the internal identifier of the trustcenter system."
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL"
 msgstr "Request (CSR) serial"
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL_DESCRIPTION"
 msgstr ""
-"The serial of the certificate signing request (CSR) connects te certificate "
-"with the original request from which the certificate was created."
+"Every certificate signing request (CSR) has its own unique serial which "
+"connects the certificate with the original request from which the certificate was created."
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_EMAIL"
 msgstr "Email address"
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_EMAIL_DESCRIPTION"
-msgstr "The email address(es) to which the certificate belongs."
+msgstr "The email address(es) contained in the certificate."
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_ISSUER"
 msgstr "Issuer"
@@ -255,7 +256,11 @@ msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT"
 msgstr "Subject"
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT_DESCRIPTION"
-msgstr "The subject of the certificate."
+msgstr "The subject of the certificate (also distinguished name (DN))"
+"Example: 'cn=John Q. Public,dc=example,dc=com' oder auch 'cn=www.example.com,"
+"dc=example,dc=com'. Looking for 'John Q. Public' is also possible by typing "
+"'*John Q. Public*' which will yield the same result. "
+"See RFC 2253 for further information about the distinguished name of a certificate"
 
 msgid "I18N_OPENXPKI_CERT_SERIAL"
 msgstr "Serial"
@@ -368,7 +373,7 @@ msgstr "Approve CSR without digital signature"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CRR_APPROVAL_DESCRIPTION"
 msgstr ""
-"By pressing OK, you'll cancel all of the current approvals on the "
+"By pressing OK you will cancel all of the current approvals on the "
 "certificate revocation request."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CANCEL_CRR_APPROVAL_TITLE"
@@ -6213,16 +6218,16 @@ msgid "I18N_OPENXPKI_WORKFLOW_PARENT"
 msgstr "Workflow parent"
 
 msgid "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS"
-msgstr ""
+msgstr "There is already a file with the given file name"
 
 msgid "I18N_OPENXPKI_WRITE_FILE_NO_CONTENT_SPECIFIED"
-msgstr ""
+msgstr "You must specify a content"
 
 msgid "I18N_OPENXPKI_WRITE_FILE_NO_FILENAME_SPECIFIED"
-msgstr ""
+msgstr "You must specify a file name"
 
 msgid "I18N_OPENXPKI_WRITE_FILE_OPEN_FAILED"
-msgstr ""
+msgstr "Could not open the file"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_XML_CACHE_GET_SUPER_ENTRY_PATH_NOT_FOUND"
