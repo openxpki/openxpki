@@ -1034,7 +1034,7 @@ sub get_pki_realms
         my @xpath   = ( 'pki_realm', 'common', 'profiles' );
         my @counter = ( $i,         0,        0 );
         
-        foreach my $entrytype (qw( endentity selfsignedca crl )) {
+        foreach my $entrytype (qw( endentity crl )) {
             ### entrytype: $entrytype
 
             my $nr_of_entries = $config->get_xpath_count(
@@ -2146,22 +2146,6 @@ in the following sample format:
               },
           },
       },
-      selfsignedca => {
-          id => {
-              'INTERNAL_CA_1' => {
-                  validity => {
-                      notbefore => {
-                          format => 'absolutedate',
-                          validity => '20060101',
-                      },
-                      notafter => {
-                          format => 'relativedate',
-                          validity => '+02',
-                      },
-                  },
-              },
-          },
-      },
       crl => {
           id => {
               'default' => {
@@ -2193,10 +2177,9 @@ used here.
 Undefined 'notbefore' dates are interpreted as 'now' during issuance.
 Relative notafter dates relate to the corresponding notbefore date.
 
-Three sections are contained in the hash: 'endentity', 'selfsignedca'
-and 'crl'. 
+Two sections are contained in the hash: 'endentity' and 'crl'
 The ID of endentity validities is the corresponding role (profile). 
-The ID of self-signed CA or CRL validities is the internal CA name.
+The ID of CRL validities is the internal CA name.
 
 
 =head2 Non-Cryptographic Object Initialization

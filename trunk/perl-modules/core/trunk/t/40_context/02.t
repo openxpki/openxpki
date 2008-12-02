@@ -10,7 +10,7 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
-BEGIN { plan tests => 21 };
+BEGIN { plan tests => 19 };
 
 print STDERR "OpenXPKI::Server::Context - pki_realm\n";
 ok(1);
@@ -51,7 +51,7 @@ ok(blessed $realms->{$realm}->{crypto}->{default},
    'OpenXPKI::Crypto::Backend::API');
 
 # profile validities
-foreach my $profiletype (qw( crl endentity selfsignedca )) {
+foreach my $profiletype (qw( crl endentity )) {
     ok(ref $realms->{$realm}->{$profiletype},
        'HASH');
     ok(ref $realms->{$realm}->{$profiletype}->{id},
