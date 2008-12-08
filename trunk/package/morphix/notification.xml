@@ -62,7 +62,7 @@
     <notification_backend type="RT">
       <url>http://openxpkilive/rt</url>
       <username>root</username>
-      <password>password</username>
+      <password>password</password>
       <timeout>10</timeout>
     </notification_backend>
     <notifications super="../../notifications{default}"/>
