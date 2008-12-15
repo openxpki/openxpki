@@ -72,6 +72,9 @@ sub evaluate {
             'IDENTIFIER',
         ],
         DYNAMIC => {
+            # FIXME - the arrayref case is incorrect - this should be
+            # 'AND's rather than 'OR's - if you choose 'O' as a filter_rdn,
+            # you'll end up with a lot of valid certificates otherwise ...
             'SUBJECT'   => $dynamic_subject, # this is either scalar or arrayref!
             'STATUS'    => 'ISSUED',
             'PKI_REALM' => $pki_realm,
