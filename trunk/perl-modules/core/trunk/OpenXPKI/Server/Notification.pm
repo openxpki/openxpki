@@ -554,7 +554,12 @@ sub __apply_template :PRIVATE {
 
     ##! 16: 'template: ' . $template
     my $tt = Template->new();
-    $tt->process(\$template, $vars, \$result);
+    $tt->process(\$template, $vars, \$result) or OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_APPLY_TEMPLATE_PROCESSING_FAILED',
+        params  => {
+            TEMPLATE_ERROR => $tt->error(),
+        },
+    );
     ##! 16: 'result: ' . $result
 
     ##! 1: 'end'
