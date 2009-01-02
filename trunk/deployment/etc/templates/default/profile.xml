@@ -31,6 +31,9 @@
       </validity>
 
       <digest>sha1</digest>
+      <increasing_serials>1</increasing_serials>
+      <randomized_serial_bytes>8</randomized_serial_bytes>
+
       <extensions>
 	<basic_constraints critical="true">
           <ca>false</ca>

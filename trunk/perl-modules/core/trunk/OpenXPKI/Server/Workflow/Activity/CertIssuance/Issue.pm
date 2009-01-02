@@ -16,6 +16,7 @@ use OpenXPKI::Crypto::X509;
 use OpenXPKI::DateTime;
 
 use Data::Dumper;
+use MIME::Base64;
 
 sub execute {
     my $self = shift;
@@ -53,9 +54,24 @@ sub execute {
         $profile->set_subject_alt_name($subj_alt_name);
     }
 
+    my $rand_length = $profile->get_randomized_serial_bytes();
+    my $increasing  = $profile->get_increasing_serials();
+    
+    my $random_data = '';
+    if ($rand_length > 0) {
+        $token->command({
+            COMMAND       => 'create_random',
+            RANDOM_LENGTH => $rand_length,
+        });
+        $random_data = decode_base64($random_data);
+    }
+
     # determine serial number (atomically)
     my $serial = $dbi->get_new_serial(
-        TABLE => 'CERTIFICATE',
+        TABLE         => 'CERTIFICATE',
+        INCREASING    => $increasing,
+        RANDOM_LENGTH => $rand_length,
+        RANDOM_PART   => $random_data,
     );
     $profile->set_serial($serial);
 

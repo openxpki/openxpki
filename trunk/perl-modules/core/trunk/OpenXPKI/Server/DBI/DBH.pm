@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use utf8;
 use English;
+use Math::BigInt;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
@@ -396,8 +397,44 @@ sub commit
 sub get_new_serial
 {
     my $self = shift;
+    my %args = @_;
+    ##! 16: 'args: ' . Dumper \%args
+    my $inc  = $args{'INCREASING'};
+    if (! defined $inc) {
+        # backward compatibility ...
+        $inc = 1;
+    }
+    my $rand        = $args{'RANDOM_PART'};
+    # the length of the random part is passed as an extra argument
+    # so that the leftmost bits do not need to be 0.
+    # this will be used as the width for the random part, so that serial
+    # numbers always have the same length (useful if increasing serial
+    # numbers are used)
+    my $rand_length = $args{'RANDOM_LENGTH'};
 
-    my $serial = $self->{driver}->get_new_serial (DBH => $self, @_);
+    my $serial = Math::BigInt->new('0');
+    if ($inc) {
+        # if incremental serials are requested, get a new one from the
+        # DB layer
+        my $serial_int = $self->{driver}->get_new_serial(
+            DBH   => $self,
+            TABLE => $args{'TABLE'},
+        );
+        $serial = Math::BigInt->new("$serial_int");
+        ##! 16: 'incremental serial: ' . $serial->bstr()
+    }
+    if (length($rand) > 0) {
+        # if a random part is present, left shift the existing serial
+        # (either 0 or the incremental serial from above) by the size of
+        # the random part and add it to the right
+        my $shift_length = $rand_length * 8;
+        my $rand_hex = '0x' . unpack 'H*', $rand;
+        ##! 16: 'random part in hex: ' . $rand_hex
+        $serial->blsft($shift_length);
+        ##! 16: 'bit shifted serial: ' . $serial->bstr()
+        $serial->bior(Math::BigInt->new($rand_hex));
+        ##! 16: 'combined with random part: ' . $serial->bstr()
+    }
 
     my $server_id    = $self->{server_id};
     my $server_shift = $self->{server_shift};
@@ -408,9 +445,12 @@ sub get_new_serial
     $server_id = 2 ** $server_shift - 1 if (not exists $self->{SERVER_ID});
 
     ## shift serial and add server id
-    $serial = ($serial << $server_shift) | $server_id;
+    $serial->blsft($server_shift);
+    ##! 16: 'bit shifted for server id: ' . $serial->bstr()
+    $serial->bior(Math::BigInt->new($server_id));
+    ##! 16: 'combined with server id: ' . $serial->bstr()
 
-    return $serial;
+    return $serial->bstr();
 }
 
 sub sequence_exists

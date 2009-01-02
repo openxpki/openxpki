@@ -162,6 +162,32 @@ sub load_profile
     );
 
 
+    ###########################################################################
+    # determine settings for randomization of serial numbers
+    eval {
+        $self->{PROFILE}->{INCREASING_SERIALS} = $self->{config}->get_xpath (
+             XPATH     => [@profile_path, "increasing_serials"],
+             COUNTER   => [@profile_counter, 0],
+             CONFIG_ID => $cfg_id,
+        );
+        ##! 16: 'increasing serials: ' . $self->{PROFILE}->{INCREASING_SERIALS}
+    };
+    if (! defined $self->{PROFILE}->{INCREASING_SERIALS}) {
+        # the default is to have increasing serials
+        $self->{PROFILE}->{INCREASING_SERIALS} = 1;
+    }
+    eval {
+        $self->{PROFILE}->{RANDOMIZED_SERIAL_BYTES} = $self->{config}->get_xpath (
+             XPATH     => [@profile_path, "randomized_serial_bytes"],
+             COUNTER   => [@profile_counter, 0],
+             CONFIG_ID => $cfg_id,
+        );
+        ##! 16: 'randomized serial bytes: ' . $self->{PROFILE}->{RANDOMIZED_SERIAL_BYTES}
+    };
+    if (! defined $self->{PROFILE}->{RANDOMIZED_SERIAL_BYTES}) {
+        # default is 8 bytes
+        $self->{PROFILE}->{RANDOMIZED_SERIAL_BYTES} = 8;
+    }
 
     ###########################################################################
     # determine certificate validity
@@ -229,6 +255,16 @@ sub set_notbefore
     my $self = shift;
     $self->{PROFILE}->{NOTBEFORE} = shift;
     return 1;
+}
+
+sub get_randomized_serial_bytes {
+    my $self = shift;
+    return $self->{PROFILE}->{RANDOMIZED_SERIAL_BYTES};
+}
+
+sub get_increasing_serials {
+    my $self = shift;
+    return $self->{PROFILE}->{INCREASING_SERIALS};
 }
 
 sub get_notafter
