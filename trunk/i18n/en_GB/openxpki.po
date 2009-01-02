@@ -227,10 +227,10 @@ msgstr "Certificate serial"
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL_DESCRIPTION"
 msgstr ""
-"The certificate serial is directly assigned by the issuer and "
-"contained in the certificate. "
-"If the issuer is known or determible the serial is used for identification "
-"of the certificate. It is not the internal identifier of the trustcenter system."
+"The certificate serial is directly assigned by the issuer and contained in "
+"the certificate. If the issuer is known or determible the serial is used for "
+"identification of the certificate. It is not the internal identifier of the "
+"trustcenter system."
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL"
 msgstr "Request (CSR) serial"
@@ -238,7 +238,8 @@ msgstr "Request (CSR) serial"
 msgid "I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL_DESCRIPTION"
 msgstr ""
 "Every certificate signing request (CSR) has its own unique serial which "
-"connects the certificate with the original request from which the certificate was created."
+"connects the certificate with the original request from which the "
+"certificate was created."
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_EMAIL"
 msgstr "Email address"
@@ -256,11 +257,12 @@ msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT"
 msgstr "Subject"
 
 msgid "I18N_OPENXPKI_CERT_SEARCH_SUBJECT_DESCRIPTION"
-msgstr "The subject of the certificate (also distinguished name (DN))"
-"Example: 'cn=John Q. Public,dc=example,dc=com' oder auch 'cn=www.example.com,"
+msgstr ""
+"The subject of the certificate (also distinguished name (DN))Example: "
+"'cn=John Q. Public,dc=example,dc=com' oder auch 'cn=www.example.com,"
 "dc=example,dc=com'. Looking for 'John Q. Public' is also possible by typing "
-"'*John Q. Public*' which will yield the same result. "
-"See RFC 2253 for further information about the distinguished name of a certificate"
+"'*John Q. Public*' which will yield the same result. See RFC 2253 for "
+"further information about the distinguished name of a certificate"
 
 msgid "I18N_OPENXPKI_CERT_SERIAL"
 msgstr "Serial"
@@ -526,7 +528,9 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_INSERT_CSR_TITLE"
 msgstr "Trustcenter Web Interface"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_ISSUE_DESCRIPTION"
-msgstr "There was an error while issuing the certificate, please see below for details."
+msgstr ""
+"There was an error while issuing the certificate, please see below for "
+"details."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_ISSUE_TITLE"
 msgstr "Error while issuing a certificate"
@@ -1925,6 +1929,9 @@ msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_PKCS7_GET_CHAIN_COULD_NOT_CREATE_CHAIN"
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
+msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_CONFIG_MD5_DIGEST_BROKEN"
+msgstr "The CA has been configured to use the MD5 digest as a hash algorithm for the signature. MD5 has been broken both theoretically and practically and should no longer be used. This is why OpenXPKI prevents you from signing with MD5."
+
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_CANNOT_OPEN_ERRLOG"
 msgstr "reset"
@@ -2330,6 +2337,86 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_GET_PASSWD_UNDEF"
 msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_ERROR"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_FAILED"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_TIMEOUT"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_INVALID_VALUE"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_COMMAND_INVOCATION_ERROR"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_COMMAND_INVOCATION_TIMEOUT"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_EXEC_NFKMINFO_COMMAND_ERROR"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_NO_PRELOADED_OBJECTS_FOUND"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_OBJECT_NOT_PRELOADED"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_SECURITY_WORLD_NOT_INITIALIZED"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_SECURITY_WORLD_NOT_USABLE"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_NFAST_HOME_NOT_ACCESSIBLE"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_ERROR"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_FAILED"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_TIMEOUT"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_HARDSERVER_NOT_OPERATIONAL"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_NO_OPERATIONAL_MODULES_ONLINE"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED"
 msgstr ""
@@ -4229,6 +4316,12 @@ msgid "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE"
 msgstr ""
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_APPLY_TEMPLATE_PROCESSING_FAILED"
+msgstr ""
+"You called an invalid method at the OpenXPKI server. The illegal method name "
+"is __METHOD_NAME__."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NOTIFICATION_COULD_NOT_FIND_CONFIG_ENTRY_FOR_NOTIFICATION"
 msgstr "The SPKAC string is empty."
 
@@ -4968,7 +5061,15 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTNUMBEROFVALIDCERTS_INCORRE
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_INCORRECT_TIMING"
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_EVALUATE_INCORRECT_TIMING"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_INIT_INVALID_TIME_DIFFERENCE_FORMAT"
+msgstr "The SPKAC string is empty."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CORRECTTIMING_INIT_NO_TIME_DIFFERENCE_PARAMETER"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy

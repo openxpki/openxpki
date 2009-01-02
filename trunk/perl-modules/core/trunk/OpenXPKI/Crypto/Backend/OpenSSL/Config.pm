@@ -363,6 +363,12 @@ sub __get_ca
                    "serial            = ".$self->{FILENAME}->{SERIAL}."\n";
     }
 
+    my $digest = $self->{PROFILE}->get_digest();
+    if ($digest =~ /md5/) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_CONFIG_MD5_DIGEST_BROKEN',
+        );
+    }
     $config .= "default_md        = ".$self->{PROFILE}->get_digest()."\n".
                "database          = ".$self->{FILENAME}->{DATABASE}."\n".
                "default_crl_days  = ".$self->{PROFILE}->get_nextupdate_in_days()."\n".
