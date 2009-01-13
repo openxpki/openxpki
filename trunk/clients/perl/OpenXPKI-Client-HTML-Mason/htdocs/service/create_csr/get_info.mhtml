@@ -24,6 +24,14 @@
     <tr>
       <td><% i18nGettext($item->{LABEL}) %></td>
       <td>
+%     if ($item->{TYPE} eq 'select') {
+            <& /lib/html/select.mhtml,
+                'name'    => 'additional_info_' . $item->{ID},
+                'default' => [ $item->{DEFAULT} ],
+                'values'  => $item->{OPTIONS},
+            &>
+%     }
+%     else {
         <& /lib/html/input.mhtml,
             'type'   => $item->{TYPE},
             'name'   => 'additional_info_' . $item->{ID},
@@ -31,6 +39,7 @@
             'height' => $item->{HEIGHT},
             'value'  => $item->{DEFAULT},
          &>
+%    }
       </td>
     </tr>
 % }
