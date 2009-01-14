@@ -12,7 +12,7 @@ use English;
 
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Locale::Messages qw (:locale_h :libintl_h nl_putenv bind_textdomain_filter);
+use Locale::gettext_pp qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
 use Encode;
 
@@ -61,6 +61,8 @@ sub i18nGettext {
     #it's too slow, I try to use "use utf8;"
     #my $i18n_string = pack "U0C*", unpack "C*", gettext ($text);
     my $i18n_string = gettext ($text);
+
+    Encode::_utf8_on ($i18n_string);
 
     if ($i18n_string ne $text)
     {
@@ -139,14 +141,6 @@ sub set_language
     textdomain("openxpki");
     bindtextdomain("openxpki", $locale_prefix);
     bind_textdomain_codeset("openxpki", "UTF-8");
-    bind_textdomain_filter ('openxpki', \&__set_utf8_flag);
-}
-
-sub __set_utf8_flag
-{
-    my $string = shift;
-    Encode::_utf8_on ($string);
-    return $string;
 }
 
 sub get_language
