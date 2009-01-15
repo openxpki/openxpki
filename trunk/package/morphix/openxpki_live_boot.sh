@@ -37,7 +37,8 @@ ln -s /mnt/loop/openxpki_live/etc/openxpki /etc/openxpki
 rm -rf /etc/mysql
 ln -s /mnt/loop/openxpki_live/etc/mysql /etc/mysql
 /etc/init.d/mysql start
-/etc/init.d/openxpkid start
+openxpkictl stop
+openxpkictl start
 echo 'Listen 127.0.0.1:80' >> /etc/apache/httpd.conf
 /etc/init.d/apache stop
 /etc/init.d/apache start
