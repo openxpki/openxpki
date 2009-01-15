@@ -15,7 +15,7 @@
   use HTML::Entities;
   use CGI::Session qw/-ip-match/;
 
-  if (defined $ENV{OPENXPKI_LOCALE_PREFIX}) {
+  if ((defined $ENV{OPENXPKI_LOCALE_PREFIX}) and (-e $ENV{OPENXPKI_LOCALE_PREFIX})) {
     set_locale_prefix($ENV{OPENXPKI_LOCALE_PREFIX});
   }
   $context->{socket_file} = $ENV{OPENXPKI_SOCKET_FILE};

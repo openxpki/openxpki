@@ -3,7 +3,6 @@
   $no_menu      => undef
   $next_comp    => undef
 </%args>
-
 <%perl>
   ## do we have a usable session?
   sub session_id_present {
@@ -16,7 +15,6 @@
           return 0;
       }
   }
-
   my $current_url = $ENV{REQUEST_URI};
 
   ## let's calculate the path of our mason autohandler root
@@ -24,6 +22,31 @@
      $path = substr ($path, 1);
      $path =~ s/[^\/]+/../g;
      $path .= "/" if (length $path);
+
+  ### let's check if i18n is configured correctly 
+  my $i18n_path = $ENV{OPENXPKI_LOCALE_PREFIX};
+  if ((not $i18n_path) or (not -e $i18n_path)) {
+</%perl>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <title>OpenXPKI configuration error</title>
+    <link rel="stylesheet"
+          href="<& /lib/url.mhtml,
+                   path => "${path}css/sinorcaish-screen.css",
+                   no_session => 1 &>"
+          type="text/css" media="screen" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+</head>
+<body>
+    <h1>Variable OPENXPKI_LOCALE_PREFIX is not set or contains non-existent path!</h1>
+    <p>Please set variable OPENXPKI_LOCALE_PREFIX in your Apache configuration file.</p>
+</body>  
+</html>
+<%perl>
+      return;
+  }
 
   if ($m->base_comp()->title() ne '/index.html') {
       if (! defined $next_comp) {
@@ -94,7 +117,6 @@
   ## therefore we initialize the menu separately from the output
   $m->comp ('/lib/init_menu.mhtml') if (not $auth_stuff);
 </%perl>
-
 % if ($m->request_comp()->title() !~ /^\/binary\//) {
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
