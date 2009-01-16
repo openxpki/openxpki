@@ -497,6 +497,7 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
                     if mode <> "silent" then
                         MsgBox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_FAILOVER", alternate_subject))
                         xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 0)
+                        xenroll.KeySpec = 1 ' AT_KEYEXCHANGE
                         sz10 = xenroll.CreatePKCS10(alternate_subject, "1.3.6.1.4.1.311.2.1.21")
 
                         if Len(sz10) = 0 then 
