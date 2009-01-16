@@ -68,10 +68,13 @@
 %                   $params,
 %               );
 %   }
-%   if ($nr_of_results > 0) { # SEARCH RESULT
+%   if (defined $nr_of_results) { # SEARCH RESULT
 %     if (! $notitle) {
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_TITLE') %></h1>
 %     }
+%     if ($nr_of_results <= 0) { # NO INSTANCES
+<p><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_NO_RESULTS') %></p>
+%     } else { # INSTANCES FOUND
 <table>
   <tr>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_TYPE') %></th>
@@ -117,8 +120,10 @@
 %
   </tr>
 %   } # END FOREACH
-% } # END IF
-% elsif (! defined $nr_of_results) { # SEARCH FORM
+</table>
+%    } # END IF INSTANCES FOUND 
+% } # END IF SEARCH RESULTS
+% else { # SEARCH FORM
 %        #### TODO: get all possible context keys (for type) from DB
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_TITLE') %></h1>
 <p>
@@ -126,7 +131,6 @@
 </p>
 <& /service/open_form.mhtml &>
 %   my $msg = $context->{client}->send_receive_command_msg ("list_workflow_titles");
-</select>
 <table>
   <!-- TODO: input field for types -->
   <tr>
@@ -153,6 +157,7 @@
             <option value="<% $a_type %>"><% i18nGettext($a_type) %></option>
 %        }
 %   }
+      </select>
     </td>
   </tr>
 </table>
@@ -225,14 +230,13 @@
     </td>
     <td><& /lib/html/input.mhtml, 'name' => "context_value" &></td>
   </tr>
-<td>
 </table>
 
 %
 % if (not $show_custom_columns) {
-      <a href="<% $context->{menu}->get_root() %>/service/workflow/search_instances.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>&id=<% $msg->{PARAMS}->{WORKFLOW}->{ID} %>&show_custom_columns=1"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_SHOW_CUSTOM_RESULT_COLUMNS') %></a>
+<p><a href="<% $context->{menu}->get_root() %>/service/workflow/search_instances.html?<% $context->{menu}->get_link_params() %>;type=<% $type %>;id=<% $msg->{PARAMS}->{WORKFLOW}->{ID} %>;show_custom_columns=1"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_SHOW_CUSTOM_RESULT_COLUMNS') %></a></p>
 % }
-% else {
+% else { # SHOW CUSTOM COLUMNS
 %
 <table>
   <tr>
@@ -258,12 +262,8 @@
   </tr>
 </table>
 %
-% }
+% } # END IF SHOW CUSTOM COLUMNS
 %
-
-<p>
-<& /service/send_form.mhtml &></td>
+<& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
-% }
-
-</table>
+% } # END IF SEARCH FORM

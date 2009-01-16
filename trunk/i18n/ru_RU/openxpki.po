@@ -1558,6 +1558,10 @@ msgstr "Поиск технологических процессов"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_VALUE"
 msgstr "Значение параметра поиска"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_NO_RESULTS"
+msgstr ""
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_RESULT_TITLE"
 msgstr "Результаты поиска технологических процессов в базе данных"
 
