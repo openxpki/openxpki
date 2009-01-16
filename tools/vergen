@@ -114,10 +114,10 @@ sub get_revision_info {
 	$result->{'last-changed-revision'} ||= $result->{revision};
 	
 	# get git commit hashes
-	$result->{'git-abbreviated-commit-hash'} = `$git show-ref -h -s --abbrev HEAD`;
+	$result->{'git-abbreviated-commit-hash'} = `$git show-ref -s --abbrev HEAD`;
 	chomp $result->{'git-abbreviated-commit-hash'};
 
-	$result->{'git-commit-hash'} = `$git show-ref -h -s HEAD`;
+	$result->{'git-commit-hash'} = `$git show-ref -s HEAD`;
 	chomp $result->{'git-commit-hash'};
 
 	# get git tag information
@@ -171,7 +171,7 @@ sub expand_keyword {
     my $arg = shift;
 
     my $last_arg = "";
-    while ($last_arg ne $arg) {
+    while (defined $arg && ($last_arg ne $arg)) {
         $last_arg = $arg;
 	foreach my $keyword (keys %{$mapping_of->{keyword}}) {
 	    if ($arg =~ m{ $keyword }xms) {
@@ -343,6 +343,10 @@ if (defined $params{'dump'}) {
         ### $dumpformat
         ### @values
 
+        if (! defined $values[1]) {
+            $values[1] = '';
+        }
+        ### @values
         eval "printf(qq($dumpformat), \@values);";
     }
 }
