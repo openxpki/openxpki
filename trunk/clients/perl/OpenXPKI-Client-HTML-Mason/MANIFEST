@@ -30,6 +30,7 @@ htdocs/images/en.png
 htdocs/images/ru.png
 htdocs/images/bug.jpg
 htdocs/lib/debug.mhtml
+htdocs/lib/display_field.mhtml
 htdocs/lib/field_to_i18n.mhtml
 htdocs/lib/javascript.mhtml
 htdocs/lib/url.mhtml

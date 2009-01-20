@@ -1,0 +1,23 @@
+<%args>
+    $field => undef
+</%args>
+
+<%init>
+    use Data::Dumper;
+    use OpenXPKI::Serialization::Simple;
+
+    # if we have an array or a hash, deserialize the data first
+    if($field =~ /^ARRAY/ || $field =~ /^HASH/) {
+        $field = OpenXPKI::Serialization::Simple->new()->deserialize($field);
+    }
+
+    # configure the data dumper
+    $Data::Dumper::Purity = 0;
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Deepcopy = 1;
+
+    # dump the data
+    print Dumper $field;
+
+</%init>
+
