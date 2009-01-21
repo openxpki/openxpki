@@ -268,8 +268,58 @@ sub validate {
              my $template = '[% TAGS [- -] -%]' . $san->{VALUE}->{TEMPLATE};
              my $tt = Template->new();
              my $result = '';
-             $tt->process(\$template, $template_vars, \$result);
-             push @sans, [ $san->{KEY}->{VALUE}, $result ];
+             ##! 64: 'template: ' . $template
+             ##! 64: 'template_vars: ' . Dumper $template_vars
+             # check if template vars contains variables that are arrays,
+             # if so (and the corresponding variable is used in the
+             # template), iterate over them
+             my $iterated = 0;
+             TEMPLATE_VARS:
+             foreach my $key (keys %{ $template_vars }) {
+                 ##! 64: 'key: ' . $key
+                 if (ref $template_vars->{$key} eq 'ARRAY') {
+                     ##! 64: '... is an array.'
+                     if ($template !~ /$key/) {
+                         ##! 64: 'template does not contain ' . $key . ', skipping.'
+                         next TEMPLATE_VARS;
+                     }
+                     $iterated = 1;
+                     # if we have an array, create a temporary template
+                     # vars hash ref that contains one element as a scalar
+                     # and evaluate those
+                     foreach my $value (@{ $template_vars->{$key} }) {
+                         ##! 64: 'iterating, value = ' . $value
+                         # copy the existing template_vars except for the
+                         # non-scalar key:
+                         my $temp_template_vars = {};
+                         COPY:
+                         foreach my $k (keys %{ $template_vars }) {
+                             next COPY if $k eq $key;
+                             $temp_template_vars->{$k} = $template_vars->{$k};
+                         }
+                         # replace the corresponding template var with
+                         # a scalar entry
+                         $temp_template_vars->{$key} = $value;
+                         ##! 64: 'copied template vars: ' . Dumper $temp_template_vars
+                         my $temp_result = '';
+                         $tt->process(\$template, $temp_template_vars, \$temp_result);
+                         if ($temp_result ne '') {
+                             push @sans, [ $san->{KEY}->{VALUE}, $temp_result ];
+                         }
+                     }
+                 }
+             }
+             ##! 64: 'sans after iteration: ' . Dumper \@sans
+
+             if (! $iterated) {
+                 # by default, just process the template with the template
+                 # vars and create (at most) one SAN entry in the @sans
+                 # array:
+                 $tt->process(\$template, $template_vars, \$result);
+                 if ($result ne '') {
+                     push @sans, [ $san->{KEY}->{VALUE}, $result ];
+                 }
+             }
          }
     }
     ##! 64: 'sans after evaluating fixed: ' . Dumper \@sans
