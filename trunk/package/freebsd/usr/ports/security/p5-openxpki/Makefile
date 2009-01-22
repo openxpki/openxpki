@@ -2,11 +2,11 @@
 # Date created:				29 Sep 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki/Makefile,v 1.16 2008/06/29 00:23:54 miwi Exp $
+# $FreeBSD: ports/security/p5-openxpki/Makefile,v 1.18 2009/01/22 02:44:39 araujo Exp $
 #
 
 PORTNAME=	openxpki
-PORTVERSION=	0.9.1267
+PORTVERSION=	0.9.1389
 CATEGORIES=	security perl5
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	${PORTNAME}
@@ -177,6 +177,7 @@ MAN3=	OpenXPKI.3 \
 	OpenXPKI::Server::Workflow::Activity::CRLIssuance::IssueCRL.3 \
 	OpenXPKI::Server::Workflow::Activity::CRLIssuance::PublishCRL.3 \
 	OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest.3 \
+	OpenXPKI::Server::Workflow::Activity::CSR::ChangeNotBeforeOrAfter.3 \
 	OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey.3 \
 	OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10.3 \
 	OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest.3 \
@@ -197,6 +198,8 @@ MAN3=	OpenXPKI.3 \
 	OpenXPKI::Server::Workflow::Activity::DataExchange::ReadArchive.3 \
 	OpenXPKI::Server::Workflow::Activity::DataExchange::UnpackArchive.3 \
 	OpenXPKI::Server::Workflow::Activity::DataExchange::WriteArchive.3 \
+	OpenXPKI::Server::Workflow::Activity::PasswordSafe::RetrievePassword.3 \
+	OpenXPKI::Server::Workflow::Activity::PasswordSafe::StorePassword.3 \
 	OpenXPKI::Server::Workflow::Activity::SCEP::ExtractCSR.3 \
 	OpenXPKI::Server::Workflow::Activity::SCEP::SetContextFromCSR.3 \
 	OpenXPKI::Server::Workflow::Activity::SCEP::SetContextFromOriginalCert.3 \
@@ -262,6 +265,8 @@ MAN3=	OpenXPKI.3 \
 	OpenXPKI::Server::Workflow::Validator::PasswordQuality.3 \
 	OpenXPKI::Server::Workflow::Validator::ReasonCode.3 \
 	OpenXPKI::Server::Workflow::Validator::SPKAC.3 \
+	OpenXPKI::Server::Workflow::Validator::UnusedID.3 \
+	OpenXPKI::Server::Workflow::Validator::ValidityTime.3 \
 	OpenXPKI::Service.3 \
 	OpenXPKI::Service::Default.3 \
 	OpenXPKI::Service::Default::Command.3 \
@@ -280,7 +285,6 @@ MAN3=	OpenXPKI.3 \
 	OpenXPKI::i18n.3
 USE_GMAKE=	yes
 USE_OPENSSL=	yes
-WITH_OPENSSL_BETA=	yes
 PERL_CONFIGURE=	5.8.6+
 
 OPTIONS=	DEVELOPER	"Install development tools for OpenXPKI?" off \
@@ -291,6 +295,13 @@ OPTIONS=	DEVELOPER	"Install development tools for OpenXPKI?" off \
 # compile the collection into HTML or PDF forms.
 # If you want to read OpenXPKI documentation, these tools are not needed.
 # Just visit http://www.openxpki.org/docs/
+
+.include <bsd.port.options.mk>
+
+# needs openssl 0.9.8
+.if ${OSVERSION} < 700019
+WITH_OPENSSL_PORT=	yes
+.endif
 
 .include <bsd.port.pre.mk>
 

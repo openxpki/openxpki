@@ -2,11 +2,11 @@
 # Date created:				03 Oct 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki-client-scep/Makefile,v 1.7 2008/06/29 00:24:07 miwi Exp $
+# $FreeBSD: ports/security/p5-openxpki-client-scep/Makefile,v 1.8 2009/01/22 02:47:14 araujo Exp $
 #
 
 PORTNAME=	openxpki-client-scep
-PORTVERSION=	0.9.1119
+PORTVERSION=	0.9.1313
 CATEGORIES=	security perl5
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	openxpki

@@ -2,11 +2,11 @@
 # Date created:				03 Oct 2006
 # Whom:					svysh
 #
-# $FreeBSD: ports/security/p5-openxpki-deployment/Makefile,v 1.9 2008/06/29 00:23:55 miwi Exp $
+# $FreeBSD: ports/security/p5-openxpki-deployment/Makefile,v 1.10 2009/01/22 02:49:00 araujo Exp $
 #
 
 PORTNAME=	openxpki-deployment
-PORTVERSION=	0.9.1268
+PORTVERSION=	0.9.1386
 CATEGORIES=	security perl5
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	openxpki
