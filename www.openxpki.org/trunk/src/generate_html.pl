@@ -70,6 +70,14 @@ if ($usr_name eq '') {
 
 $ENV{'SVN_USER_NAME'} = $usr_name;
 
+my $mycwd = cwd;
+$ENV{'VERGEN_EXE'} = $mycwd.'/../../../tools/vergen';
+
+if ( ! -e($ENV{'VERGEN_EXE'}) ) {
+  print "File ".$ENV{'VERGEN_EXE'}." not found.\n";
+  exit 0;
+}
+
 my %files_status;
 my @svn_output = `svn status`;
 my $mason_files_changed = 0;
@@ -85,7 +93,7 @@ foreach my $line (@svn_output) {
 $target = File::Spec->rel2abs($target);
 
 my $interp =
-    HTML::Mason::Interp->new( comp_root => File::Spec->rel2abs(cwd) );
+    HTML::Mason::Interp->new( comp_root => File::Spec->rel2abs($mycwd) );
 
 find( \&convert, $source );
 
