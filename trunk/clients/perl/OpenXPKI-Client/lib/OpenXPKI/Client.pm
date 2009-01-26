@@ -324,7 +324,7 @@ sub init_session {
         OpenXPKI::Exception->throw(
 	    message => "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED",
 	    params  => {
-		ERROR => $msg->{ERROR},
+		    MESSAGE_FROM_SERVER => Dumper $msg,
 	    });
     }
     
