@@ -83,7 +83,7 @@ sub deploy_test_server {
     }
 
     my ($pw_name) = getpwuid($EUID);
-    my ($gr_name) = getgrgid($EUID);
+    my ($gr_name) = getgrgid($EGID);
     my %configure_settings = (
         'dir.prefix'        => File::Spec->rel2abs($instancedir),
         'dir.dest'          => File::Spec->rel2abs($instancedir),
