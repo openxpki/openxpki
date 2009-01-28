@@ -30,6 +30,7 @@ dist: dist-clean
 		make dist && \
 		mv *.tar.gz $(RPMBASE)/SOURCES \
 	)
+	tar czf $(RPMBASE)/SOURCES/openxpki-deployment-susefiles.tar.gz etc/
 
 $(PACKAGE).spec: $(PACKAGE).spec.in
 	sed -e 's/_VERSION_/$(VERSION)/g' <$< | \

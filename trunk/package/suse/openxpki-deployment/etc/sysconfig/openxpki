@@ -7,4 +7,10 @@ OPENXPKI_INSTANCE="trustcenter1"
 # e. g.
 # --debug 100
 # --debug OpenXPKI::Server:100
+OPENXPKI_OPTS=""
+# OPENXPKI_OPTS="--debug 128"
 OPENXPKI_OPTS="--cfg /etc/openxpki/instances/$OPENXPKI_INSTANCE/config.xml"
+
+if [ -r /etc/sysconfig/openxpki.local ] ; then
+	. /etc/sysconfig/openxpki.local
+fi

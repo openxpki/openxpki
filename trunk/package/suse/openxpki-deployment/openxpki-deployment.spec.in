@@ -23,13 +23,15 @@ group:     Applications/CPAN
 url:       http://www.openxpki.org
 buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
-source:    openxpki-deployment-%{version}.tar.gz
+source0:   openxpki-deployment-%{version}.tar.gz
+source1:   openxpki-deployment-susefiles.tar.gz
 
 %description
 OpenXPKI deployment and administration tools.
 
 %prep
 %setup -q -n %{pkgname}-%{version} 
+%setup -a 1
 chmod -R u+w %{_builddir}/%{pkgname}-%{version}
 
 %build
@@ -57,8 +59,8 @@ chmod -R u+w %{_builddir}/%{pkgname}-%{version}
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 DESTDIR=%{buildroot} make install
 
-install -D -m 755 -o root -g openxpki etc/initscripts/suse/openxpki.rc %{buildroot}/etc/init.d/openxpki
-install -D -m 644 -o root -g openxpki etc/initscripts/suse/openxpki.sysconfig %{buildroot}/etc/sysconfig/openxpki
+install -D -m 755 etc/init.d/openxpki %{buildroot}/etc/init.d/openxpki
+install -D -m 644 etc/sysconfig/openxpki %{buildroot}/etc/sysconfig/openxpki
 
 cmd=/usr/share/spec-helper/compress_files
 [ -x $cmd ] || cmd=/usr/lib/rpm/brp-compress
