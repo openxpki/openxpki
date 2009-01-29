@@ -17,9 +17,9 @@
 # LSB compatible service control script; see http://www.linuxbase.org/spec/
 # 
 ### BEGIN INIT INFO
-# Provides:          FOO
+# Provides:          openxpki
 # Required-Start:    $syslog $remote_fs
-# Should-Start: $time ypbind sendmail
+# Should-Start: $time ypbind sendmail ncipher
 # Required-Stop:     $syslog $remote_fs
 # Should-Stop: $time ypbind sendmail
 # Default-Start:     3 5
