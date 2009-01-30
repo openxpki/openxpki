@@ -80,7 +80,7 @@ function ToggleAll() {
     <td><% i18nGettext($res->{'PROFILE'}) %></td>
     <td><% i18nGettext($res->{'ROLE'}) %></td>
 %   if ($creator eq '%') {
-<td><a href="<% $context->{menu}->get_root() %>./service/workflow/show_pending_requests.html?creator=<% $res->{'CREATOR'} %>;show_approval_buttons=1;<% $context->{menu}->get_link_params() %>"><% $res->{'CREATOR'} %></a></td>
+<td><a href="<% $context->{menu}->get_root() %>/service/workflow/show_pending_requests.html?creator=<% $res->{'CREATOR'} %>;show_approval_buttons=1;<% $context->{menu}->get_link_params() %>"><% $res->{'CREATOR'} %></a></td>
 %   }
   </tr>
 % }
