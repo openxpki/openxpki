@@ -1336,9 +1336,12 @@ if ($cmd eq 'certificate') {
             exit 1;
         }
 
-	my $cert
-	    = OpenXPKI::Crypto::X509->new(TOKEN => $defaulttoken,
-					  DATA  => $certdata);
+        my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
+
+        my $cert = OpenXPKI::Crypto::X509->new(
+                TOKEN => $defaulttoken,
+                DATA  => $extracted_certdata,
+        );
         #### cert : Dumper($cert)
 
         my $realm;
