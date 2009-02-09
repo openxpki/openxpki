@@ -19,6 +19,9 @@ sub evaluate {
     ##! 16: 'start'
     my ( $self, $workflow ) = @_;
 
+    my $workflow_id = $workflow->id();
+    ##! 64: 'workflow ID: ' . $workflow_id
+
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
     ##! 16: 'accessing shared mem with key: ' . $OpenXPKI::Server::Context::who_forked_me
@@ -45,12 +48,20 @@ sub evaluate {
         $pids = $serializer->deserialize($shared_content);
     }
     ##! 16: 'pids: ' . Dumper $pids
-    delete $pids->{$PID};
+    ##! 16: 'my PID: ' . $PID
+    # FIXME - maybe delete $pids->{$workflow_id}->{$PID} is enough?
+    foreach my $key (keys %{ $pids }) {
+        delete $pids->{$key}->{$PID};
+    }
+
     ##! 16: 'new pids: ' . Dumper $pids
     $share->store(OpenXPKI::Serialization::Simple->new()->serialize($pids));
     $share->unlock();
 
-    if (scalar keys %{ $pids } != 0) {
+    if (scalar keys %{ $pids->{$workflow_id} } != 0) {
+        # the workflow still has more than this child
+        ##! 16: 'still more than one child left, throwing exception'
+        ##! 32: 'pids->{workflow_id}: ' . Dumper $pids->{$workflow_id}
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_INCORRECT_NUMBER_OF_FORKED_CHILDREN',
             params  => {
@@ -59,6 +70,13 @@ sub evaluate {
         );
     }
     else {
+        # clean up
+        ##! 16: 'this was the last child for this workflow, entry deleted, condition returns true'
+        delete $pids->{$workflow_id};
+        ##! 32: 'pids after delete: ' . Dumper $pids
+    }
+    if (scalar keys %{ $pids } == 0) {
+        ##! 16: 'everything is done, destroying shared memory'
         # we are done, destroy shared memory
         $share = new IPC::ShareLite( -key     => getppid(),
                                      -create  => 'no',

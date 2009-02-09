@@ -674,6 +674,8 @@ sub get_workflow_activities {
     );
     my @list = $workflow->get_current_actions();
 
+    ##! 128: 'workflow after get_workflow_activities: ' . Dumper $workflow
+
     ##! 1: "finished"
     return \@list;
 }

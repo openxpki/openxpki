@@ -184,7 +184,8 @@ sub execute {
                 $pids = $serializer->deserialize($shared_content);
             }
             ##! 16: 'pids: ' . Dumper $pids
-            $pids->{$pid} = 1;
+            ##! 64: 'parent workflow id: ' . $workflow->id()
+            $pids->{$workflow->id()}->{$pid} = 1;
             ##! 16: 'new pids: ' . Dumper $pids
 
             $share->store($serializer->serialize($pids));
@@ -325,7 +326,16 @@ sub child_handler {
         # case something goes wrong ...
         if (WIFEXITED($?)) {
             ##! 16: 'exited'
-            delete $pids->{$pid};
+            foreach my $key (keys %{ $pids }) {
+                if (exists $pids->{$key}->{$pid}) {
+                    delete $pids->{$key}->{$pid};
+                }
+            }
+            foreach my $key (keys %{ $pids}) {
+                if (scalar keys %{ $pids->{$key} } == 0) {
+                    delete $pids->{$key};
+                }
+            }
         }
         ##! 16: 'new pids: ' . Dumper $pids
         if (scalar keys %{ $pids } == 0) {
