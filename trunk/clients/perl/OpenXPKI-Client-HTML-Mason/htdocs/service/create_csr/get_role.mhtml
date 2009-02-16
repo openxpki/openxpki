@@ -48,6 +48,7 @@
     if (ref $msg->{PARAMS} eq 'ARRAY') {
         @roles = @{$msg->{PARAMS}};
     }
+    @roles = sort @roles;
     if (ref $msg eq 'ARRAY' && $msg->[0]->{LABEL} ne 'I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS') {
         # an error occured
         push @errors, @{ $msg };
