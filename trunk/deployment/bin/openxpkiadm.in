@@ -1420,7 +1420,7 @@ if ($cmd eq 'certificate') {
         $insert_hash{PKI_REALM}          = $realm;
         $insert_hash{CERTIFICATE_SERIAL} = $cert->get_serial();
         $insert_hash{IDENTIFIER}         = $cert->get_identifier();
-        $insert_hash{DATA}               = $certdata;
+        $insert_hash{DATA}               = $extracted_certdata;
         $insert_hash{SUBJECT}            = $cert->{PARSED}->{BODY}->{SUBJECT};
         $insert_hash{ISSUER_DN}          = $cert->{PARSED}->{BODY}->{ISSUER};
         $insert_hash{ISSUER_IDENTIFIER}  = $issuer_identifier;
