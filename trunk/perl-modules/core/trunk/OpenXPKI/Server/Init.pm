@@ -1404,12 +1404,18 @@ sub get_pki_realms
         # get all CA certificates for PKI realm
         # $realms{$name}->{ca}->{$ca}->{certificate} =
         # get end entity validities
-        my $nr_of_ca_entries
-        = $config->get_xpath_count(
-            XPATH   => ['pki_realm', 'ca'],
-            COUNTER => [$i],
-            CONFIG_ID => $cfg_id,
-        );
+        my $nr_of_ca_entries = 0;
+
+        eval {
+            # it might actually make sense not to have any CAs defined
+            # in a given PKI realm, so don't die if get_xpath_count
+            # fails ...
+            $nr_of_ca_entries = $config->get_xpath_count(
+                    XPATH   => ['pki_realm', 'ca'],
+                    COUNTER => [$i],
+                    CONFIG_ID => $cfg_id,
+            );
+        };
 
         my $issuing_ca_count = 0;
         my $scep_count = 0;
