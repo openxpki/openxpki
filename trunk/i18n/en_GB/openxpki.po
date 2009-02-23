@@ -338,25 +338,20 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT"
 msgstr "A timeout occured while reading data from the CA server."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_DESCRIPTION"
 msgstr ""
-"You are logged in to the web interface of the trustcenter. Please note that "
-"this software support several instances of certification authorities (CAs). "
-"If you are not sure which CA you actually use then please check the info "
-"menu."
+"To approve this certificate revocation request, you can either approve with "
+"out without signature. Please choose the appropriate button to approve the "
+"certificate revocation request."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_SIGNING"
-msgstr "Approve CSR using digital signature"
+msgstr "Approve CRR using digital signature"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_TITLE"
-msgstr "Trustcenter Web Interface"
+msgstr "Certificate Revocation Request: Approval"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_WITHOUT_SIGNING"
-msgstr "Approve CSR without digital signature"
+msgstr "Approve CRR without digital signature"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CSR_DESCRIPTION"
 msgstr ""
@@ -1933,7 +1928,10 @@ msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_PKCS7_GET_CHAIN_COULD_NOT_CR
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 msgid "I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_CONFIG_MD5_DIGEST_BROKEN"
-msgstr "The CA has been configured to use the MD5 digest as a hash algorithm for the signature. MD5 has been broken both theoretically and practically and should no longer be used. This is why OpenXPKI prevents you from signing with MD5."
+msgstr ""
+"The CA has been configured to use the MD5 digest as a hash algorithm for the "
+"signature. MD5 has been broken both theoretically and practically and should "
+"no longer be used. This is why OpenXPKI prevents you from signing with MD5."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_CLI_CANNOT_OPEN_ERRLOG"
@@ -2901,25 +2899,8 @@ msgstr "Hostname"
 msgid "I18N_OPENXPKI_HOSTNAME_DESC"
 msgstr "This is the (fully qualified) hostname"
 
-msgid "I18N_OPENXPKI_HTML_COMMENT"
-msgstr "Comment"
-
-msgid "I18N_OPENXPKI_HTML_COMMENT_DESCRIPTION"
-msgstr "This field can be used for a normal comment."
-
 msgid "I18N_OPENXPKI_HTML_COMMON_NAME"
 msgstr "Common name"
-
-msgid "I18N_OPENXPKI_HTML_COMMON_NAME_DESCRIPTION"
-msgstr ""
-"The common name can be used to identify persons or objects by its name. "
-"Example are John Doe or www.openxpki.org."
-
-msgid "I18N_OPENXPKI_HTML_COUNTRY"
-msgstr "Country"
-
-msgid "I18N_OPENXPKI_HTML_COUNTRY_DESCRIPTION"
-msgstr "The Country (c) is the nothing else then country."
 
 msgid "I18N_OPENXPKI_HTML_CREATE_CSR_DC_STYLE"
 msgstr "CSR with DC-style"
@@ -2941,28 +2922,6 @@ msgstr ""
 "OU-style means that we use the attributes organization and country at the "
 "end of the certifcates name. Such a DN looks like this: cn=John Doe, "
 "o=OpenXPKI, c=DE. Please note that country only allows two letters."
-
-msgid "I18N_OPENXPKI_HTML_DEFAULT_CN"
-msgstr "John Doe"
-
-msgid "I18N_OPENXPKI_HTML_DEFAULT_UID"
-msgstr "testuser"
-
-msgid "I18N_OPENXPKI_HTML_DOMAIN_COMPONENT"
-msgstr "dc"
-
-msgid "I18N_OPENXPKI_HTML_DOMAIN_COMPONENT_DESCRIPTION"
-msgstr ""
-"A domain component is a part of a name from the domain name system (DNS). If "
-"you have a server www.openxpki.org then the domain components are www, "
-"openxpki and org. If you can only enter one component then it must be "
-"usually the last one."
-
-msgid "I18N_OPENXPKI_HTML_FAX_NUMBER"
-msgstr "Fax number"
-
-msgid "I18N_OPENXPKI_HTML_FAX_NUMBER_DESCRIPTION"
-msgstr "The field contains a normal fax number."
 
 msgid "I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO"
 msgstr "Get a graphical workflow overview"
@@ -3104,23 +3063,6 @@ msgstr "Smartcard personalization"
 msgid "I18N_OPENXPKI_HTML_MENU_TASKS"
 msgstr "Tasks"
 
-msgid "I18N_OPENXPKI_HTML_ORGANIZATION"
-msgstr "Organization"
-
-msgid "I18N_OPENXPKI_HTML_ORGANIZATION_DESCRIPTION"
-msgstr ""
-"The Organization (o) simply identifies the organization to which the "
-"certificate belongs."
-
-msgid "I18N_OPENXPKI_HTML_OU"
-msgstr "Organizational Unit"
-
-msgid "I18N_OPENXPKI_HTML_OU_DESCRIPTION"
-msgstr ""
-"The Organizationl Unit (ou) can be used to setup different structures for "
-"different departments (e.g. in companies) or institutes (e.g. in "
-"universites)."
-
 msgid "I18N_OPENXPKI_HTML_PRINT_BUTTON"
 msgstr "Print information"
 
@@ -3193,21 +3135,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_TITLE"
 msgstr "Welcome to the smartcard personalization interface"
-
-msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER"
-msgstr "Telephone number"
-
-msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER_DESCRIPTION"
-msgstr "You can enter here a normal telephone number."
-
-msgid "I18N_OPENXPKI_HTML_UID"
-msgstr "uid"
-
-msgid "I18N_OPENXPKI_HTML_UID_DESCRIPTION"
-msgstr ""
-"The Unique IDentifier (UID) is usually used to place accounts or other "
-"serial numbers into a distinguished name (DN) to associate it safely to a "
-"person or an object."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_I18N_SETLOCALE_LC_MESSAGES_FAILED"
@@ -6403,3 +6330,74 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_YES"
 msgstr "yes"
+
+#~ msgid "I18N_OPENXPKI_HTML_COMMENT"
+#~ msgstr "Comment"
+
+#~ msgid "I18N_OPENXPKI_HTML_COMMENT_DESCRIPTION"
+#~ msgstr "This field can be used for a normal comment."
+
+#~ msgid "I18N_OPENXPKI_HTML_COMMON_NAME_DESCRIPTION"
+#~ msgstr ""
+#~ "The common name can be used to identify persons or objects by its name. "
+#~ "Example are John Doe or www.openxpki.org."
+
+#~ msgid "I18N_OPENXPKI_HTML_COUNTRY"
+#~ msgstr "Country"
+
+#~ msgid "I18N_OPENXPKI_HTML_COUNTRY_DESCRIPTION"
+#~ msgstr "The Country (c) is the nothing else then country."
+
+#~ msgid "I18N_OPENXPKI_HTML_DEFAULT_CN"
+#~ msgstr "John Doe"
+
+#~ msgid "I18N_OPENXPKI_HTML_DEFAULT_UID"
+#~ msgstr "testuser"
+
+#~ msgid "I18N_OPENXPKI_HTML_DOMAIN_COMPONENT"
+#~ msgstr "dc"
+
+#~ msgid "I18N_OPENXPKI_HTML_DOMAIN_COMPONENT_DESCRIPTION"
+#~ msgstr ""
+#~ "A domain component is a part of a name from the domain name system (DNS). "
+#~ "If you have a server www.openxpki.org then the domain components are www, "
+#~ "openxpki and org. If you can only enter one component then it must be "
+#~ "usually the last one."
+
+#~ msgid "I18N_OPENXPKI_HTML_FAX_NUMBER"
+#~ msgstr "Fax number"
+
+#~ msgid "I18N_OPENXPKI_HTML_FAX_NUMBER_DESCRIPTION"
+#~ msgstr "The field contains a normal fax number."
+
+#~ msgid "I18N_OPENXPKI_HTML_ORGANIZATION"
+#~ msgstr "Organization"
+
+#~ msgid "I18N_OPENXPKI_HTML_ORGANIZATION_DESCRIPTION"
+#~ msgstr ""
+#~ "The Organization (o) simply identifies the organization to which the "
+#~ "certificate belongs."
+
+#~ msgid "I18N_OPENXPKI_HTML_OU"
+#~ msgstr "Organizational Unit"
+
+#~ msgid "I18N_OPENXPKI_HTML_OU_DESCRIPTION"
+#~ msgstr ""
+#~ "The Organizationl Unit (ou) can be used to setup different structures for "
+#~ "different departments (e.g. in companies) or institutes (e.g. in "
+#~ "universites)."
+
+#~ msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER"
+#~ msgstr "Telephone number"
+
+#~ msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER_DESCRIPTION"
+#~ msgstr "You can enter here a normal telephone number."
+
+#~ msgid "I18N_OPENXPKI_HTML_UID"
+#~ msgstr "uid"
+
+#~ msgid "I18N_OPENXPKI_HTML_UID_DESCRIPTION"
+#~ msgstr ""
+#~ "The Unique IDentifier (UID) is usually used to place accounts or other "
+#~ "serial numbers into a distinguished name (DN) to associate it safely to a "
+#~ "person or an object."
