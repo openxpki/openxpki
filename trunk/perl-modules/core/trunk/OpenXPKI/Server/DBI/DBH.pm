@@ -423,7 +423,7 @@ sub get_new_serial
         $serial = Math::BigInt->new("$serial_int");
         ##! 16: 'incremental serial: ' . $serial->bstr()
     }
-    if (length($rand) > 0) {
+    if (defined $rand && (length($rand) > 0)) {
         # if a random part is present, left shift the existing serial
         # (either 0 or the incremental serial from above) by the size of
         # the random part and add it to the right

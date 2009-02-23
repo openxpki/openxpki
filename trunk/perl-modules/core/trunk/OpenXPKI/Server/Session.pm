@@ -230,7 +230,7 @@ sub set_secret
 {
     my $self   = shift;
     my $args   = shift;
-    my $group  = $args->{GROUP};
+    my $group  = $args->{GROUP} || '';
     my $secret = $args->{SECRET};
     my $name   = "secret_".sha1_hex($group);
     $self->{session}->param ($name => $secret);
@@ -240,7 +240,7 @@ sub set_secret
 sub get_secret
 {
     my $self  = shift;
-    my $group = shift;
+    my $group = shift || '';
     my $name  = "secret_".sha1_hex($group);
     return $self->{session}->param ($name);
 }
@@ -248,7 +248,7 @@ sub get_secret
 sub clear_secret
 {
     my $self  = shift;
-    my $group = shift;
+    my $group = shift || '';
     my $name  = "secret_".sha1_hex($group);
     $self->{session}->clear ($name);
     $self->{session}->flush();

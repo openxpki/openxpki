@@ -238,9 +238,11 @@ sub search_cert
     my $args = shift;
 
     ##! 2: "fix arguments"
-    $args->{EMAIL}   =~ s/\*/%/g;
-    $args->{SUBJECT} =~ s/\*/%/g;
-    $args->{ISSUER}  =~ s/\*/%/g;
+    foreach my $key (qw( EMAIL SUBJECT ISSUER )) {
+	if (defined $args->{$key}) {
+	    $args->{$key} =~ s/\*/%/g;
+	}
+    }
 
     ##! 2: "initialize arguments"
     my %params = (TABLE => 'CERTIFICATE');
