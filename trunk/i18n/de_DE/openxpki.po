@@ -1250,10 +1250,13 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_TITLE"
 msgstr "PKI Realm"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_DESCRIPTION"
-msgstr ""
+msgstr "Diese Seite listet verschiedene sog. PKI Realms auf, "
+    "die Schnittstellen zu verschiedenen Zertifizierungsstellen "
+    "(engl. Certificate Authorities) mit unterschiedlichen Einstellungen "
+    "darstellen."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_TITLE"
-msgstr ""
+msgstr "Bitte wählen Sie ein PKI Realm"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED_DESC"
 msgstr "Der Download des privaten Schlüssels ist fehlgeschlagen. Sind Sie sicher,"
@@ -1356,9 +1359,8 @@ msgstr "Web-Schnittstelle des Trustcenters"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN"
 msgstr "Login"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN_USING_SIGNATURE"
-msgstr "Login"
+msgstr "Signieren Sie die zufällige Challenge und loggen Sie sich anschließen ein"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr "Dass Abmelden ist fehlgeschlagen. Bitte kontaktieren Sie unbedingt die für"
@@ -3101,13 +3103,14 @@ msgstr "Gefundene Zertifikate"
 msgid "I18N_OPENXPKI_HTML_MASON_MY_CERTIFICATES_TITLE"
 msgstr "Zertifikat herunterladen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_DESC"
-msgstr "Serverseitige Schlüsselgenerierung"
+msgstr "Der Webserver konnte keine Verbindung zum OpenXPKI-Server herstellen. "
+    "Der Grund hierfür können ein Systemfehler oder vorübergehende "
+    "Wartungsarbeiten sein. Sollte der Fehler über einen längeren Zeitraum "
+    "auftreten, wenden Sie sich bitte an den Systemadministrator."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_TITLE"
-msgstr "Serverseitige Schlüsselgenerierung"
+msgstr "Fehler: konnte keine Verbindung zum OpenXPKI-Server herstellen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_FAILURE_DESC"
