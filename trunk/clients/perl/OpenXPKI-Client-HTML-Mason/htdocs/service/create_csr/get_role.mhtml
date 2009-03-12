@@ -6,12 +6,12 @@
 
 % if (! $bulk) {
 <& /service/open_form.mhtml &>
+<& /lib/html/hidden_reqargs.mhtml &>
 % }
 % else {
 <& /service/open_form.mhtml, action => $context->{menu}->get_root() . '/service/create_csr/bulk/profile.html' &>
 % }
 
-<& /lib/html/hidden.mhtml, 'name' => 'workflow_type', 'value' => $workflow_type &>
 
 % if (! $bulk) {
     <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_TITLE') %></h1>
