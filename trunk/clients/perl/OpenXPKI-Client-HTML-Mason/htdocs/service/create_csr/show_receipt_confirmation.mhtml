@@ -1,7 +1,6 @@
 <%args>
     $msg => undef
 </%args>
-<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_TITLE') %></h1>
 % if (exists $msg->{SERVICE_MSG}
 %         && $msg->{SERVICE_MSG} eq 'ERROR') {
 <p>
@@ -9,7 +8,8 @@
 <& /service/create_csr/print_errors.mhtml, 'errors' => $msg &>
 </p>
 % }
-% else {
+% elsif (exists $msg->{PARAMS}->{WORKFLOW}->{ID}) {
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_TITLE') %></h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_DESC') %>
 </p>
