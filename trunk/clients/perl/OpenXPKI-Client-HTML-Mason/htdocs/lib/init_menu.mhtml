@@ -76,7 +76,7 @@
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_SIGNING_REQUEST",
                                    "create_csr", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_PERSONALIZATION",
-                                   "smartcard_personalization", undef ],
+                                   "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_REVOCATION_REQUEST",
                                    "create_crr", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_BULK_CERTIFICATE_SIGNING_REQUEST",
