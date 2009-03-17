@@ -130,6 +130,8 @@ sub new
     CTX('dbi_backend')->disconnect();
     CTX('dbi_log')->disconnect();
     
+    $self->{PARAMS}->{no_client_stdout} = 1;
+
     $self->run(%{$self->{PARAMS}});
 }
 
@@ -414,7 +416,7 @@ sub do_process_request
     while (not $transport)
     {
         my $char;
-        if (not read STDIN, $char, 1)
+        if (! read($self->{server}->{client}, $char, 1))
         {
             print STDOUT "OpenXPKI::Server: Connection closed unexpectly.\n";
             $log->log (MESSAGE  => "Connection closed unexpectly.",
@@ -426,8 +428,10 @@ sub do_process_request
         ## protocol detection
         if ($line eq "start Simple\n")
         {
-            $transport = OpenXPKI::Transport::Simple->new ();
-            print STDOUT "OK\n";
+            $transport = OpenXPKI::Transport::Simple->new ({
+                SOCKET => $self->{server}->{client},
+            });
+            send($self->{server}->{client}, "OK\n", 0);
         }
         elsif ($char eq "\n")
         {
