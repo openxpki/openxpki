@@ -63,25 +63,69 @@ sub evaluate {
 
     my $now = DateTime->now()->epoch();
 
+    my $certs = [];
     # look up valid certificates matching the subject
-    my $certs = $dbi->select(
-        TABLE   => 'CERTIFICATE',
-        COLUMNS => [
-            'NOTBEFORE',
-            'NOTAFTER',
-            'IDENTIFIER',
-        ],
-        DYNAMIC => {
-            # FIXME - the arrayref case is incorrect - this should be
-            # 'AND's rather than 'OR's - if you choose 'O' as a filter_rdn,
-            # you'll end up with a lot of valid certificates otherwise ...
-            'SUBJECT'   => $dynamic_subject, # this is either scalar or arrayref!
-            'STATUS'    => 'ISSUED',
-            'PKI_REALM' => $pki_realm,
-        },
-        REVERSE => 1,
-        VALID_AT => time,
-    );
+    ##! 64: 'dynamic subject: ' . Dumper $dynamic_subject
+    ##! 64: 'ref dynamic subject: ' . ref $dynamic_subject
+    if (! ref $dynamic_subject) {
+        $certs = $dbi->select(
+            TABLE   => 'CERTIFICATE',
+            COLUMNS => [
+                'NOTBEFORE',
+                'NOTAFTER',
+                'IDENTIFIER',
+            ],
+            DYNAMIC => {
+                'SUBJECT'   => $dynamic_subject,
+                'STATUS'    => 'ISSUED',
+                'PKI_REALM' => $pki_realm,
+            },
+            REVERSE => 1,
+            VALID_AT => time,
+        );
+    }
+    elsif (ref $dynamic_subject eq 'ARRAY') {
+        # we need to create a join to be able to use 'AND's between the
+        # filter_rdn parts
+        my @tables;
+        my @valid_at;
+        my @join;
+        my $now = time;
+
+        my $dynamic = {
+            'certificate0.STATUS'    => 'ISSUED',
+            'certificate0.PKI_REALM' => $pki_realm,
+        };
+        for (my $i = 0; $i < scalar @{ $dynamic_subject }; $i++) {
+            my $alias = 'certificate' . $i;
+            push @tables,   [ 'CERTIFICATE' => $alias ]; 
+            push @valid_at, $now;
+            push @join, 'IDENTIFIER';
+            $dynamic->{$alias . '.SUBJECT'} = $dynamic_subject->[$i];
+        }
+        ##! 64: 'tables: ' . Dumper \@tables
+        ##! 64: 'dynamic: ' . Dumper $dynamic
+        $certs = $dbi->select(
+            TABLE   => \@tables,
+            COLUMNS => [
+                'certificate0.NOTBEFORE',
+                'certificate0.NOTAFTER',
+                'certificate0.IDENTIFIER',
+            ],
+            DYNAMIC  => $dynamic,
+            JOIN     => [ \@join ],
+            REVERSE  => 1,
+            VALID_AT => \@valid_at,
+        );
+        ##! 128: 'certs (join): ' . Dumper $certs
+        foreach my $cert (@{ $certs }) {
+            foreach my $key (qw( NOTBEFORE NOTAFTER IDENTIFIER )) {
+                $cert->{$key} = $cert->{'certificate0.' . $key};
+                delete $cert->{'certificate0' . $key};
+            }
+        }
+        ##! 128: 'certs (join), after cleanup: ' . Dumper $certs
+    }
 
     ##! 128: 'certs: ' . Dumper $certs
 
