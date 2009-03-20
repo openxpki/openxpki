@@ -133,6 +133,15 @@
                   <hide>approvals</hide>
               </context_filter>
           </read>
+          <!-- needed for SCEP to lookup the profile of an existing
+               certificate which is to be renewed -->
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
+              <context_filter>
+                  <show>cert_profile</show>
+              </context_filter>
+          </read>
       </server>
   </workflow_permissions>
   <workflow_permissions role="User">

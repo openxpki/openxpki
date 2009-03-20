@@ -137,15 +137,60 @@ sub evaluate {
             # date, so we assume it has the most recent information
             # and can thus be used as a "blueprint" for the new
             # certificate
+            my $identifier = $certs->[0]->{IDENTIFIER};
+
             $context->param(
                 'current_valid_certificates' => scalar @{$certs}
             );
             $context->param(
-                'current_identifier' => $certs->[0]->{IDENTIFIER},
+                'current_identifier' => $identifier,
             );
             $context->param(
                 'current_notafter' => $certs->[0]->{NOTAFTER},
             );
+
+            # also look up the certificate profile from the corresponding
+            # issuance workflow
+            my $workflows = CTX('api')->search_workflow_instances({
+                CONTEXT => [
+                    {
+                        KEY   => 'cert_identifier',
+                        VALUE => $identifier,
+                    },
+                ],
+                TYPE    => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
+            });
+            ##! 64: 'workflows: ' . Dumper $workflows;
+            if (ref $workflows ne 'ARRAY') {
+                # something is wrong, we would like to throw an exception,
+                # but in a condition that would only mean that the condition
+                # is false, i.e. a renewal, we'd rather return 1 instead
+                # so that the request is treated as an initial enrollment ...
+                CTX('log')->log(
+                    MESSAGE  => 'SCEP workflow search for certificate identifier ' . $identifier . ' failed (not an arrayref!).',
+                    PRIORITY => 'error',
+                    FACILITY => 'system',
+                );
+                return 1;
+            }
+            if (scalar @{ $workflows } != 1) {
+                CTX('log')->log(
+                    MESSAGE  => 'SCEP workflow search for certificate identifier ' . $identifier . ' failed - not one result, but ' . scalar @{ $workflows },
+                    PRIORITY => 'error',
+                    FACILITY => 'system',
+                );
+                return 1;
+            }
+            my $wf_id = $workflows->[0]->{'WORKFLOW.WORKFLOW_SERIAL'};
+            my $wf_info = CTX('api')->get_workflow_info({
+                WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
+                ID       => $wf_id,
+            });
+            ##! 64: 'wf_info: ' . Dumper $wf_info
+            $context->param(
+                'cert_profile' => $wf_info->{WORKFLOW}->{CONTEXT}->{'cert_profile'},
+            );
+
             condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_INITIAL_ENROLLMENT_VALID_CERTIFICATE_PRESENT');
     }
     ##! 16: 'end'

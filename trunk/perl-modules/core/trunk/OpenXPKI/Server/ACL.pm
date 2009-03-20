@@ -362,13 +362,14 @@ sub authorize_workflow {
     my $realm    = CTX('session')->get_pki_realm();
     ##! 16: 'realm: ' . $realm
     my $role     = CTX('session')->get_role();
-    ##! 16: 'role: ' . $role
-    my $user     = CTX('session')->get_user();
-    ##! 16: 'user: ' . $user
     if ($role eq '') {
         $role = 'Anonymous';
     }
+    ##! 16: 'role: ' . $role
+    my $user     = CTX('session')->get_user();
+    ##! 16: 'user: ' . $user
 
+    ##! 64: 'ACL_WORKFLOW: ' . Dumper $self->{PKI_REALM}->{$realm}->{ACL_WORKFLOW}
     if ($action eq 'create') {
         my $type = $arg_ref->{TYPE};
         if (! exists $self->{PKI_REALM}->{$realm}->{ACL_WORKFLOW}
