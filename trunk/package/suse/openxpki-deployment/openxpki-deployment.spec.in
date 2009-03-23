@@ -159,6 +159,7 @@ fi;
 
 %files -f %filelist
 %defattr(-,root,root)
+%config(noreplace) %attr(644,root,root) /etc/sysconfig/openxpki
 
 %changelog
 * Mon Nov 27 2006 m.bartosch@cynops.de

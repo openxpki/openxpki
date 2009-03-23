@@ -1,0 +1,50 @@
+## Written 2006 by Martin Bartosch for the OpenXPKI project
+## Copyright (C) 2005-2006 by The OpenXPKI Project
+
+RPMBASE=~/rpmbuild
+OPENXPKI_SVN=../../../..
+
+PACKAGE=perl-openxpki-client-scep
+SRCBASE=$(OPENXPKI_SVN)/trunk/clients/perl/OpenXPKI-Client-SCEP
+SRCNAME=OpenXPKI-Client-SCEP
+
+VERGEN=$(OPENXPKI_SVN)/tools/vergen
+VERSION=$(shell $(VERGEN) --format version --directory $(SRCBASE))
+PERL=$(shell which perl)
+
+ifdef PREFIX
+PERL_MAKEPL_ARGS="PREFIX=$(PREFIX)"
+endif
+
+
+#include ../Makefile.package
+
+all: clean perl-dist package collect
+
+dist-clean:
+	( cd $(SRCBASE) && \
+		rm -f *.tar.gz \
+	)
+
+
+perl-dist: dist-clean
+	( cd $(SRCBASE) && \
+		perl Makefile.PL && \
+		make dist && \
+		mv *.tar.gz $(RPMBASE)/SOURCES \
+	)
+
+$(PACKAGE).spec: $(PACKAGE).spec.in
+	sed -e 's/_VERSION_/$(VERSION)/g' <$< | sed -e 's+_PERL_+$(PERL)+g' | sed -e 's+_MAKEPL_ARGS_+$(PERL_MAKEPL_ARGS)+g' >$@
+
+package: $(PACKAGE).spec
+	rpmbuild -ba $(PACKAGE).spec
+
+collect:
+	mv $(RPMBASE)/SRPMS/$(PACKAGE)-*.rpm .
+	mv $(RPMBASE)/RPMS/*/$(PACKAGE)-*.rpm .
+
+clean:
+	rm -f $(PACKAGE)-*.rpm $(PACKAGE).spec
+
+
