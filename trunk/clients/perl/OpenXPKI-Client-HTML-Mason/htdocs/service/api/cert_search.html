@@ -41,16 +41,19 @@
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 
-<& /service/create_csr/print_descriptions.mhtml, 'descriptions' => \%descriptions &>
+<& /service/create_csr/print_descriptions.mhtml, 'descriptions' => \@descriptions &>
 
 <%init>
-    my %descriptions = ();
+    my @descriptions = ();
     my @raw = ("EMAIL", "SUBJECT", "ISSUER", "CERT_SERIAL", "CSR_SERIAL");
 
     foreach my $key (@raw)
     {
         my $label = "I18N_OPENXPKI_CERT_SEARCH_".uc($key);
-        $descriptions{i18nGettext($label)} = i18nGettext($label."_DESCRIPTION");
+        push @descriptions, [ 
+            i18nGettext($label),
+            i18nGettext($label . '_DESCRIPTION'),
+        ];
     }
 </%init>
 

@@ -48,7 +48,7 @@
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 
-<& /service/create_csr/print_descriptions.mhtml, descriptions => \%descriptions &>
+<& /service/create_csr/print_descriptions.mhtml, descriptions => \@descriptions &>
 
 <%init>
     my $req_args = {};
@@ -91,10 +91,11 @@
         return 1;
     }
     ## ok we have to display the whole stuff
-    my %descriptions = ();
-    foreach my $item (@input)
-    {
-        $descriptions{i18nGettext ($item->{LABEL})} =
-            i18nGettext ($item->{DESCRIPTION});
+    my @descriptions = ();
+    foreach my $item (@input) {
+        push @descriptions, [
+            i18nGettext($item->{LABEL}),
+            i18nGettext($item->{DESCRIPTION})
+        ];
     }
 </%init>
