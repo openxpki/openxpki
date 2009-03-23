@@ -17,23 +17,23 @@
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE') %></th>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_EMAIL') %></td>
-    <td><& /lib/html/input.mhtml, name => 'email' &>
-  </tr>
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_SEARCH_SUBJECT') %></td>
     <td><& /lib/html/input.mhtml, name => 'subject' &>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_SERIAL') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_SEARCH_CERT_SERIAL') %></td>
     <td><& /lib/html/input.mhtml, name => 'cert_serial' &>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CSR_SERIAL') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_SEARCH_EMAIL') %></td>
+    <td><& /lib/html/input.mhtml, name => 'email' &>
+  </tr>
+  <tr>
+      <td><% i18nGettext('I18N_OPENXPKI_CERT_SEARCH_CSR_SERIAL') %></td>
     <td><& /lib/html/input.mhtml, name => 'csr_serial' &>
   </tr>
   <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></td>
+    <td><% i18nGettext('I18N_OPENXPKI_CERT_SEARCH_ISSUER') %></td>
     <td><& /lib/html/input.mhtml, name => 'issuer' &>
   </tr>
 </table>
@@ -45,7 +45,7 @@
 
 <%init>
     my @descriptions = ();
-    my @raw = ("EMAIL", "SUBJECT", "ISSUER", "CERT_SERIAL", "CSR_SERIAL");
+    my @raw = ("SUBJECT", "CERT_SERIAL", "EMAIL", "CSR_SERIAL", "ISSUER");
 
     foreach my $key (@raw)
     {
