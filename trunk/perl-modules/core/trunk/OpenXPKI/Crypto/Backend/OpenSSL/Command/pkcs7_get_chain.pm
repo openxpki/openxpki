@@ -97,6 +97,14 @@ sub get_result
         ##! 16: 'issuer: ' . Dumper $issuer
 
         $cert    =~ s/^.*\n-----BEGIN/-----BEGIN/s;
+        if (exists $certs{$subject} && 
+            $certs{$subject}->{ISSUER} ne $issuer &&
+            $certs{$subject}->{CERT} ne $cert) {
+            ##! 64: 'something funny is going on, the same certificate subject with different issuer or data is present'
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MULTIPLE_SAME_SUBJECTS_WITH_DIFFERENT_DATA',
+            );
+        }
         $certs{$subject}->{ISSUER} = $issuer;
         $certs{$subject}->{CERT}   = $cert;
     }

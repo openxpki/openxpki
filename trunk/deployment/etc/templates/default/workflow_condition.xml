@@ -196,7 +196,7 @@
   <condition name="is_initial_enrollment" class="OpenXPKI::Server::Workflow::Condition::InitialEnrollmentOrRenewal">
     <param name="RDN_filter" value="CN,O"/>
   </condition>
-  <condition name="valid_signature_with_requested_dn" class="OpenXPKI::Server::Workflow::Condition::IsValidSignatureWithRequestedDN"/>
+  <condition name="valid_signature" class="OpenXPKI::Server::Workflow::Condition::IsValidSignature"/>
   <condition name="correct_number_of_valid_certs" class="OpenXPKI::Server::Workflow::Condition::CorrectNumberOfValidCerts"> 
     <param name="min" value="1"/>
     <param name="max" value="2"/>

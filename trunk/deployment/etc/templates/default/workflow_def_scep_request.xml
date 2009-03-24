@@ -13,11 +13,11 @@
   <state name="CSR_EXTRACTED" autorun="yes">
     <action name="null"
             resulting_state="SIGNATURE_OK">
-      <condition name="valid_signature_with_requested_dn"/>
+      <condition name="valid_signature"/>
     </action>
     <action name="set_error_code_1"
             resulting_state="FAILURE">
-      <condition name="!valid_signature_with_requested_dn"/>
+      <condition name="!valid_signature"/>
     </action>
   </state>
 

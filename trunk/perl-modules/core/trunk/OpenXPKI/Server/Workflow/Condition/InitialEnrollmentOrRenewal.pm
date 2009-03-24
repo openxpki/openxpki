@@ -1,6 +1,7 @@
 # OpenXPKI::Server::Workflow::Condition::InitialEnrollmentOrRenewal.pm
 # Written by Alexander Klink for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
+# rewritten by Alexander Klink for the OpenXPKI project in 2009
+# Copyright (c) 2006,2009 by The OpenXPKI Project
 package OpenXPKI::Server::Workflow::Condition::InitialEnrollmentOrRenewal;
 
 use strict;
@@ -16,16 +17,6 @@ use DateTime;
 
 use Data::Dumper;
 
-__PACKAGE__->mk_accessors( 'RDN_filter' );
-
-sub _init
-{
-    my ( $self, $params ) = @_;
-    if (exists $params->{RDN_filter}) {
-        $self->RDN_filter($params->{RDN_filter});
-    }
-}
-
 sub evaluate {
     ##! 16: 'start'
     my ( $self, $workflow ) = @_;
@@ -34,167 +25,128 @@ sub evaluate {
     ##! 64: 'context: ' . Dumper($context)
     my $pki_realm = CTX('session')->get_pki_realm(); 
 
-    my $subject = $context->param('csr_subject');
-    ##! 16: 'subject: ' . $subject
-    my $dn = OpenXPKI::DN->new($subject);
+    my $cfg_id = CTX('api')->get_config_id({ ID => $workflow->id() });
+    ##! 64: 'cfg_id: ' . $cfg_id
 
-    my @rdns = $dn->get_rdns();
-    my @filtered_rdns;
-    if (defined $self->RDN_filter()) { # we have to filter the rdns
-        my @filters = split(/,/, $self->RDN_filter());
-        foreach my $filter (@filters) {
-            ##! 128: 'filter: ' . $filter
-            push @filtered_rdns, grep(/^$filter=/, @rdns);
-        }
-    }
-    my $dynamic_subject;
-    ##! 128: '@filtered_rdns: ' . Dumper \@filtered_rdns
-    if (scalar @filtered_rdns > 0) { # we have filtered RDNs, match them all
-        my @dynamic;
-        foreach my $filtered_rdn (@filtered_rdns) {
-            push @dynamic, "%$filtered_rdn%";
-        }
-        $dynamic_subject = \@dynamic;
-    }
-    else { # match the complete subject
-        $dynamic_subject = $subject;
-    }
-    my $dbi = CTX('dbi_backend');
+    my $pkcs7 = $context->param('pkcs7_content');
+    $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7 . "-----END PKCS7-----\n";
+    ##! 32: 'pkcs7: ' . $pkcs7
 
-    my $now = DateTime->now()->epoch();
+    my $pkcs7tool = $context->param('pkcs7tool');
+    my $pkcs7_token = CTX('crypto_layer')->get_token(
+        TYPE      => 'PKCS7',
+        ID        => $pkcs7tool,
+        PKI_REALM => $pki_realm,
+        CONFIG_ID => $cfg_id,
+    );
+    my $sig_subject = $pkcs7_token->command({
+            COMMAND => 'get_subject',
+            PKCS7   => $pkcs7,
+        });
+    ##! 64: 'sig_subject: ' . $sig_subject
 
-    my $certs = [];
-    # look up valid certificates matching the subject
-    ##! 64: 'dynamic subject: ' . Dumper $dynamic_subject
-    ##! 64: 'ref dynamic subject: ' . ref $dynamic_subject
-    if (! ref $dynamic_subject) {
-        $certs = $dbi->select(
-            TABLE   => 'CERTIFICATE',
-            COLUMNS => [
-                'NOTBEFORE',
-                'NOTAFTER',
-                'IDENTIFIER',
-            ],
-            DYNAMIC => {
-                'SUBJECT'   => $dynamic_subject,
-                'STATUS'    => 'ISSUED',
-                'PKI_REALM' => $pki_realm,
-            },
-            REVERSE => 1,
-            VALID_AT => time,
+    my $default_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm}->{crypto}->{default};
+    
+    my @signer_chain;
+    eval {
+        @signer_chain = $default_token->command({
+            COMMAND        => 'pkcs7_get_chain',
+            PKCS7          => $pkcs7,
+            SIGNER_SUBJECT => $sig_subject,
+        });
+    };
+    ##! 64: 'signer_chain: ' . Dumper \@signer_chain
+    if ($EVAL_ERROR || scalar @signer_chain == 0) {
+        ##! 64: 'could not get chain'
+
+        # something is wrong, we would like to throw an exception,
+        # but in a condition that would only mean that the condition
+        # is false, i.e. a renewal, we'd rather return 1 instead
+        # so that the request is treated as an initial enrollment ... 
+        CTX('log')->log(
+            MESSAGE  => 'SCEP pkcs7_get_chain failed ...',
+            PRIORITY => 'error',
+            FACILITY => 'system',
         );
+        return 1;
     }
-    elsif (ref $dynamic_subject eq 'ARRAY') {
-        # we need to create a join to be able to use 'AND's between the
-        # filter_rdn parts
-        my @tables;
-        my @valid_at;
-        my @join;
-        my $now = time;
+    my $sig_identifier;
+    eval {
+        $sig_identifier = OpenXPKI::Crypto::X509->new(
+            TOKEN => $default_token,
+            DATA  => $signer_chain[0],
+        )->get_identifier();
+    };
+    if ($EVAL_ERROR || ! defined $sig_identifier) {
+        ##! 64: 'could not get signature certificate identifier'
 
-        my $dynamic = {
-            'certificate0.STATUS'    => 'ISSUED',
-            'certificate0.PKI_REALM' => $pki_realm,
-        };
-        for (my $i = 0; $i < scalar @{ $dynamic_subject }; $i++) {
-            my $alias = 'certificate' . $i;
-            push @tables,   [ 'CERTIFICATE' => $alias ]; 
-            push @valid_at, $now;
-            push @join, 'IDENTIFIER';
-            $dynamic->{$alias . '.SUBJECT'} = $dynamic_subject->[$i];
-        }
-        ##! 64: 'tables: ' . Dumper \@tables
-        ##! 64: 'dynamic: ' . Dumper $dynamic
-        $certs = $dbi->select(
-            TABLE   => \@tables,
-            COLUMNS => [
-                'certificate0.NOTBEFORE',
-                'certificate0.NOTAFTER',
-                'certificate0.IDENTIFIER',
-            ],
-            DYNAMIC  => $dynamic,
-            JOIN     => [ \@join ],
-            REVERSE  => 1,
-            VALID_AT => \@valid_at,
+        # something is wrong, we would like to throw an exception,
+        # but in a condition that would only mean that the condition
+        # is false, i.e. a renewal, we'd rather return 1 instead
+        # so that the request is treated as an initial enrollment ... 
+        CTX('log')->log(
+            MESSAGE  => 'SCEP get_identifier on signer cert failed ...',
+            PRIORITY => 'error',
+            FACILITY => 'system',
         );
-        ##! 128: 'certs (join): ' . Dumper $certs
-        foreach my $cert (@{ $certs }) {
-            foreach my $key (qw( NOTBEFORE NOTAFTER IDENTIFIER )) {
-                $cert->{$key} = $cert->{'certificate0.' . $key};
-                delete $cert->{'certificate0' . $key};
-            }
-        }
-        ##! 128: 'certs (join), after cleanup: ' . Dumper $certs
+        return 1;
     }
+    # check whether the signature certificate is already in our database,
+    # if not, this is an initial enrollment, otherwise it is a renewal
+    my $certs = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE',
+        COLUMNS => [
+            'NOTAFTER',
+            'SUBJECT',
+        ],
+        DYNAMIC => {
+            'IDENTIFIER' => $sig_identifier,
+            'PKI_REALM'  => $pki_realm,
+        },
+    );
+    if (! ref $certs eq 'ARRAY') {
+        ##! 64: 'dbi lookup went wrong'
 
-    ##! 128: 'certs: ' . Dumper $certs
-
-    if (defined $certs && scalar @{$certs} > 0) {
-            # this is a renewal, save number of matching certificates
-            # and identifier and notafter date of first one in context
-            # for later use.
-            # the "first" one is the one with the latest notbefore
-            # date, so we assume it has the most recent information
-            # and can thus be used as a "blueprint" for the new
-            # certificate
-            my $identifier = $certs->[0]->{IDENTIFIER};
-
-            $context->param(
-                'current_valid_certificates' => scalar @{$certs}
-            );
-            $context->param(
-                'current_identifier' => $identifier,
-            );
-            $context->param(
-                'current_notafter' => $certs->[0]->{NOTAFTER},
-            );
-
-            # also look up the certificate profile from the corresponding
-            # issuance workflow
-            my $workflows = CTX('api')->search_workflow_instances({
-                CONTEXT => [
-                    {
-                        KEY   => 'cert_identifier',
-                        VALUE => $identifier,
-                    },
-                ],
-                TYPE    => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
-            });
-            ##! 64: 'workflows: ' . Dumper $workflows;
-            if (ref $workflows ne 'ARRAY') {
-                # something is wrong, we would like to throw an exception,
-                # but in a condition that would only mean that the condition
-                # is false, i.e. a renewal, we'd rather return 1 instead
-                # so that the request is treated as an initial enrollment ...
-                CTX('log')->log(
-                    MESSAGE  => 'SCEP workflow search for certificate identifier ' . $identifier . ' failed (not an arrayref!).',
-                    PRIORITY => 'error',
-                    FACILITY => 'system',
-                );
-                return 1;
-            }
-            if (scalar @{ $workflows } != 1) {
-                CTX('log')->log(
-                    MESSAGE  => 'SCEP workflow search for certificate identifier ' . $identifier . ' failed - not one result, but ' . scalar @{ $workflows },
-                    PRIORITY => 'error',
-                    FACILITY => 'system',
-                );
-                return 1;
-            }
-            my $wf_id = $workflows->[0]->{'WORKFLOW.WORKFLOW_SERIAL'};
-            my $wf_info = CTX('api')->get_workflow_info({
-                WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
-                ID       => $wf_id,
-            });
-            ##! 64: 'wf_info: ' . Dumper $wf_info
-            $context->param(
-                'cert_profile' => $wf_info->{WORKFLOW}->{CONTEXT}->{'cert_profile'},
-            );
-
-            condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_INITIAL_ENROLLMENT_VALID_CERTIFICATE_PRESENT');
+        # something is wrong, we would like to throw an exception,
+        # but in a condition that would only mean that the condition
+        # is false, i.e. a renewal, we'd rather return 1 instead
+        # so that the request is treated as an initial enrollment ... 
+        CTX('log')->log(
+            MESSAGE  => 'SCEP DBI lookup on signer identifier failed ...',
+            PRIORITY => 'error',
+            FACILITY => 'system',
+        );
+        return 1;
     }
-    ##! 16: 'end'
-    return 1;
+    if (scalar @{ $certs } == 0) {
+        ##! 64: 'no certificates for identifier ' . $sig_identifier . ' found, this is an initial enrollment'
+        return 1;
+    }
+    $context->param('current_identifier' => $sig_identifier);
+    ##! 16: 'current_notafter: ' . $certs->[0]->{NOTAFTER}
+    $context->param('current_notafter' => $certs->[0]->{NOTAFTER});
+
+    ##! 16: 'current subject: ' . $certs->[0]->{SUBJECT}
+
+    # look up all certificates with the subject of the signer certificates
+    # that are currently valid to save the number of them in the workflow
+    # - will be checked later by the correct_number_of_valid_certs condition
+    my $current_certs = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE',
+        COLUMNS => [
+            'IDENTIFIER',
+        ],
+        DYNAMIC => {
+            'SUBJECT'   => $certs->[0]->{SUBJECT},
+            'STATUS'    => 'ISSUED',
+            'PKI_REALM' => $pki_realm,
+        },
+        VALID_AT => time(),
+    );
+    ##! 64: 'current_certs: ' . Dumper $current_certs
+    $context->param('current_valid_certificates' => scalar @{ $current_certs });
+
+    condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_INITIALENROLLMENTORRENEWAL_NO_INITIAL_ENROLLMENT_VALID_CERTIFICATE_PRESENT');
 }
 
 1;
@@ -216,16 +168,17 @@ OpenXPKI::Server::Workflow::Condition::InitialEnrollmentOrRenewal
 =head1 DESCRIPTION
 
 The condition checks if a SCEP request is an initial enrollment request
-or a renewal. The condition has a configuration parameter "RDNmatch",
-which allows one to specify which parts of the subject DN have to
-match.
-If it is undefined, the whole subject DN is taken as a search criteria.
-It returns true if no valid certificate with the requested DN is found
-in the certificate database and throws a condition_error if at least one
-is found. 
-In this case, it also saves the number of certificates in the context
-parameter 'current_valid_certificates' and the identifier of the one 
-with the longest notafter date in the context parameter
-'current_identifier'.
-The corresponding notafter date is saved in the 'current_notafter'
-context field to be checked later.
+or a renewal.
+
+This is done by looking up the signer certificate from the PKCS#7
+data and checking whether it is already present in the certificate
+database.
+
+If it is, we are dealing with a renewal, if it is not, it is just
+an initial enrollment.
+
+In the renewal case, the condition also saves the signer certificate
+identifier in the context parameter 'current_identifier', as well
+as its notafter date in 'current_notafter'. It also saves the number
+of currently valid certificates with the same DN as the signer certificate
+in the 'current_valid_certificates' parameter.

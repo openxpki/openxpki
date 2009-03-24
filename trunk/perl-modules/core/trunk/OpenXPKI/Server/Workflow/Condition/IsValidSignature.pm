@@ -1,7 +1,7 @@
-# OpenXPKI::Server::Workflow::Condition::IsValidSignatureWithRequestedDN.pm
+# OpenXPKI::Server::Workflow::Condition::IsValidSignature.pm
 # Written by Alexander Klink for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
-package OpenXPKI::Server::Workflow::Condition::IsValidSignatureWithRequestedDN;
+package OpenXPKI::Server::Workflow::Condition::IsValidSignature;
 
 use strict;
 use warnings;
@@ -60,17 +60,9 @@ sub evaluate {
 	    PRIORITY => 'info',
 	    FACILITY => 'audit',
 	    );
-    }
-    else {
-        ##! 16: 'signature valid'
-        $sig_valid = 1;
-    }
-     
-    if (! defined $sig_valid || ($csr_subject ne $sig_subject)) {
-        ##! 16: 'invalid or not matching'
         condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ISVALIDSIGNATUREWITHREQUESTEDDN_INVALID_SIGNATURE_OR_NON_MATCHING_DNS');
     }
-    ##! 16: 'end'
+     
     return 1;
 }
 
@@ -80,13 +72,13 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::IsValidSignatureWithRequestedDN
+OpenXPKI::Server::Workflow::Condition::IsValidSignature
 
 =head1 SYNOPSIS
 
 <action name="do_something">
   <condition name="valid_signature_with_requested_dn"
-             class="OpenXPKI::Server::Workflow::Condition::IsValidSignatureWithRequestedDN">
+             class="OpenXPKI::Server::Workflow::Condition::IsValidSignature">
   </condition>
 </action>
 
