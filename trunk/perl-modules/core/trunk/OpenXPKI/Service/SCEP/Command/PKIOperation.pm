@@ -96,7 +96,7 @@ sub __pkcs_req : PRIVATE {
     my $workflows = $api->search_workflow_instances({
             CONTEXT => [
                 {
-                    KEY   => 'SCEP_TID',
+                    KEY   => 'scep_tid',
                     VALUE => $transaction_id,
                 },
             ],
