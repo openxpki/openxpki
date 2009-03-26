@@ -406,7 +406,8 @@ sub authorize_workflow {
             # it against the workflow creator
             my $wf_creator = $workflow->context()->param()->{creator};
             ##! 16: 'wf_creator: ' . $wf_creator
-            if ($wf_creator !~ qr/$allowed_creator_re/) {
+            if ($wf_creator !~ qr/$allowed_creator_re/ &&
+                $wf_creator ne $allowed_creator_re) {
                 ##! 16: 'workflow creator does not match allowed creator'
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE',
