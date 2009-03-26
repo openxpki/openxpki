@@ -175,7 +175,7 @@
                 my $exec_msg = $context->{client}->send_receive_command_msg(
                     'execute_workflow_activity',
                     {
-                        WORKFLOW => $workflow_type,
+                        WORKFLOW => $params{'workflow_type'},
                         ID       => $workflow_id,
                         ACTIVITY => 'generate_key',
                         PARAMS   => {
