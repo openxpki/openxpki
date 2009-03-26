@@ -26,7 +26,7 @@ sub execute {
     ##! 8: "execute GetCACert"
     my $pki_realm = CTX('session')->get_pki_realm();
 
-    my @ca_cert_chain = $self->__get_ca_certificate_chain();
+    my @ca_cert_chain = $self->__get_ca_certificate_chains();
 
     ##! 16: 'chain: ' . Dumper(\@ca_cert_Chain)
 
@@ -50,7 +50,7 @@ sub execute {
     return $self->command_response($result);
 }
 
-sub __get_ca_certificate_chain : PRIVATE {
+sub __get_ca_certificate_chains : PRIVATE {
     ##! 4: 'start'
     my $self = shift;
 
@@ -71,8 +71,40 @@ sub __get_ca_certificate_chain : PRIVATE {
     });
     ##! 32: 'chain: ' . Dumper($chain)
 
+    my @ca_chains = @{ $chain->{CERTIFICATES} };
+
+    ##! 32: 'ca_chains: ' . Dumper \@ca_chains;
+    
+    # we also need to include (other) known CA certificates (and
+    # their chain) because the SCEP certificate might be issued by
+    # a third party
+
+    my $ca_identifiers = CTX('api')->get_ca_list();
+
+    ##! 32: 'ca identifiers: ' . Dumper $ca_identifiers;
+    
+    foreach my $ca (keys %{ $ca_identifiers }) {
+        ##! 16: 'ca identifier: ' . $ca
+        my $ca_obj = $ca_identifiers->{$ca}->{'cacert'};
+
+        my $ca_chain = $api->get_chain({
+            'START_IDENTIFIER' => $ca_obj->get_identifier(),
+            'OUTFORMAT'        => 'PEM',
+        });
+        ##! 64: 'ca_chain: ' . Dumper $ca_chain
+        foreach my $cert (@{ $ca_chain->{CERTIFICATES} }) {
+            ##! 128: 'cert: ' . $cert
+            if (! grep { $_ eq $cert } @ca_chains) {
+                ##! 32: 'cert is not in ca_chains list, adding it'
+                push @ca_chains, $cert;
+            }
+        }
+    }
+
+    ##! 32: 'ca_chains: ' . Dumper \@ca_chains
+
     ##! 4: 'end'
-    return $chain->{CERTIFICATES};
+    return \@ca_chains;
 }
 1;
 __END__
