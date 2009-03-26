@@ -531,12 +531,26 @@ sub __workflow_to_template_vars :PRIVATE {
     $context_copy->{'META_WF_TYPE'}   = $workflow->type();
     $context_copy->{'META_WF_STATE'}  = $workflow->state();
 
-    my $serializer = OpenXPKI::Serialization::Simple->new();
+    my $serializer      = OpenXPKI::Serialization::Simple->new();
+    my $dash_serializer = OpenXPKI::Serialization::Simple->new({
+        SEPARATOR => '-',
+    });
     foreach my $key (keys %{ $context_copy }) {
         # deserialize if possible
         if ($context_copy->{$key} =~ m{ \A HASH | \A ARRAY }xms) {
-            $context_copy->{$key}
-                = $serializer->deserialize($context_copy->{$key});
+            my $deserialized;
+            eval {
+                $deserialized = $serializer->deserialize($context_copy->{$key});
+            };
+            if ($EVAL_ERROR || ! defined $deserialized) {
+                # some data, such as the key data for a server-side generated
+                # key, is serialized using '-' as a separator, deserialize
+                # accordingly
+                $deserialized = $dash_serializer->deserialize(
+                    $context_copy->{$key},
+                );
+            }
+            $context_copy->{$key} = $deserialized;
         }
     }
 
