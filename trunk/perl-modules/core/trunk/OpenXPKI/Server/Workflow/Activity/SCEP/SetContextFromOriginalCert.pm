@@ -77,6 +77,38 @@ sub execute {
     $context->param('sources' =>
                     $serializer->serialize($sources));
  
+    # also look up the certificate profile from the corresponding
+    # issuance workflow
+    my $workflows = CTX('api')->search_workflow_instances({
+        CONTEXT => [
+            {
+                KEY   => 'cert_identifier',
+                VALUE => $identifier,
+            },
+        ],
+        TYPE    => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
+    });
+    ##! 64: 'workflows: ' . Dumper $workflows;
+    if (ref $workflows ne 'ARRAY') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_SETCONTEXTFROMORIGINALCERT_SEARCH_FOR_ISSUANCE_WORKFLOW_BY_CERT_IDENTIFIER_FAILED',
+        );
+    }
+    if (scalar @{ $workflows } != 1) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_SETCONTEXTFROMORIGINALCERT_SEARCH_FOR_ISSUANCE_WORKFLOW_BY_CERT_IDENTIFIER_MORE_THAN_ONE_HIT',
+        );
+    }
+    my $wf_id = $workflows->[0]->{'WORKFLOW.WORKFLOW_SERIAL'};
+    my $wf_info = CTX('api')->get_workflow_info({
+        WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
+        ID       => $wf_id,
+    });
+    ##! 64: 'wf_info: ' . Dumper $wf_info
+    $context->param(
+        'cert_profile' => $wf_info->{WORKFLOW}->{CONTEXT}->{'cert_profile'},
+    );
+
     return 1;
 }
 
