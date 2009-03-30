@@ -165,7 +165,7 @@ sub get_openssl_dn
     if (not $dn_obj) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_DN_FAILURE",
-            param   => {"DN" => $dn});
+            params   => {"DN" => $dn});
     }
 
     ## this is necessary because OpenSSL needs the utf8 bytes
