@@ -333,25 +333,32 @@ sub __parse_content {
     my @content = split(/\n/, $content);
     my @cc  = ();
     my @bcc = ();
-    my $end_of_header_index = 0;
-   PARSE_HEADER:
-    for (my $i = 0; $i < scalar @content; $i++) {
-        my $line = $content[$i];
-        if ($line eq '') {
-            $end_of_header_index = $i;
-            last PARSE_HEADER;
+    my $body = '';
+    if ($content[0] =~ /:/) {
+        # the content contains a header, parse it
+        my $end_of_header_index = 0;
+       PARSE_HEADER:
+        for (my $i = 0; $i < scalar @content; $i++) {
+            my $line = $content[$i];
+            if ($line eq '') {
+                $end_of_header_index = $i;
+                last PARSE_HEADER;
+            }
+            if ($line =~ m{ \A Cc: (.*) \z}xms) {
+                push @cc, $1;
+            }
+            if ($line =~ m{ \A Bcc: (.*) \z}xms) {
+                push @bcc, $1;
+            }
         }
-        if ($line =~ m{ \A Cc: (.*) \z}xms) {
-            push @cc, $1;
-        }
-        if ($line =~ m{ \A Bcc: (.*) \z}xms) {
-            push @bcc, $1;
+        # create body
+        for (my $i = $end_of_header_index; $i < scalar @content; $i++) {
+            $body .= $content[$i] . "\n";
         }
     }
-    # create body
-    my $body = '';
-    for (my $i = $end_of_header_index; $i < scalar @content; $i++) {
-        $body .= $content[$i] . "\n";
+    else {
+        # the complete content is the body.
+        $body = $content;
     }
     ##! 1: 'end'
     return (\@cc, \@bcc, $body);
