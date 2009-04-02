@@ -1089,11 +1089,37 @@ sub select
 
     if (@order_specs) { # only order if we actually have columns by which
                         # we can order
+        if (exists $args->{ORDER}) {
+            ##! 16: 'order argument exists ...'
+            ##! 64: 'order specs: ' . Dumper \@order_specs
+            if (ref $args->{ORDER} ne 'ARRAY') {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_DBI_SQL_ORDER_IS_NOT_ARRAYREF',
+                );
+            }
+            my @order = @{ $args->{ORDER} };
+            ##! 16: 'order: ' . Dumper \@order
+            @order = map { $self->{schema}->get_column($_) } @order;
+            ##! 16: 'order: ' . Dumper \@order
+            foreach my $entry (@order) {
+                if (! grep { $entry eq $_ } @order_specs) {
+                    # argument entries need to be part of the order_specs
+                    OpenXPKI::Exception->throw(
+                        message => 'I18N_OPENXPKI_SERVER_DBI_SQL_ORDER_INVALID_ENTRY',
+                        params  => {
+                            ENTRY => $entry,
+                        },
+                    );
+                }
+                push @order_specs, $entry;
+            }
+        }
+
         if ($args->{REVERSE})
         {
-            $query .= ' ORDER BY ' . join(' DESC, ', @order_specs) . ' DESC';
+            $query .= ' ORDER BY ' . join(' DESC, ', reverse @order_specs) . ' DESC';
         } else {
-            $query .= ' ORDER BY ' . join(', ', @order_specs);
+            $query .= ' ORDER BY ' . join(', ', reverse @order_specs);
         }
     }
     
