@@ -264,6 +264,7 @@ sub search_cert
         # only search in current realm
         $params{DYNAMIC}->{PKI_REALM}  = CTX('session')->get_pki_realm();
         $params{REVERSE} = 1;
+        $params{ORDER} = [ 'CERTIFICATE_SERIAL' ];
 
     my $result = CTX('dbi_backend')->select(%params);
     if (ref $result ne 'ARRAY') {
