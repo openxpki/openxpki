@@ -292,7 +292,7 @@ sub execute {
         ##! 2: 'ldap->bind() done'
         
         $mesg = $ldap->search(base      => $ldap_base_dn,
-                      filter    => "(distinguishedName=$ldap_search_dn)",
+                      filter    => "($ldap_search_dn)",
         );
         if ($mesg->is_error()) {
             OpenXPKI::Exception->throw(
