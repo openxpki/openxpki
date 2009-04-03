@@ -163,6 +163,8 @@
             if (defined $verify_password
               && $password ne $verify_password) {
                 $m->comp ('/service/create_csr/get_password.mhtml',
+                            'verify_password' => $verify_password,
+                            'error'         => 1,
                             'password_gen'  => $password_gen,
                             'workflow_id'   => $workflow_id,
                             'keytype'       => $keytype,

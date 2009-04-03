@@ -1015,6 +1015,9 @@ msgstr "Copy and paste the password here"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_PASSWORD_GENERATED_PASSWORD"
 msgstr "Password generated for you"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_PASSWORD_VERIFY_PASSWORD_INCORRECT_PASSWORD"
+msgstr "The password could not be verified. Please copy the below password into the input field and note it down - you will need it to access your key once your certificate has beeen issued."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_RECEIPT_CONFIRMATION_DESC"
 msgstr ""
 "Your certificate request has successfully been received by the CA. Depending "
@@ -2283,6 +2286,10 @@ msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_SIGNER_OR_SIGNER_SUBJECT"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MULTIPLE_SAME_SUBJECTS_WITH_DIFFERENT_DATA"
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 #, fuzzy
@@ -4084,6 +4091,14 @@ msgid "I18N_OPENXPKI_SERVER_DBI_SQL_NORMALIZE_VALIDITY_INVALID_ARGUMENT"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_ORDER_INVALID_ENTRY"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_DBI_SQL_ORDER_IS_NOT_ARRAYREF"
+msgstr "The used suject style does not allow the use of an organization."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_ALIAS_NOT_UNIQUE"
 msgstr "The used suject style does not allow the use of an organization."
 
@@ -4697,6 +4712,18 @@ msgstr "The SPKAC string is empty."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EXTRACTCSR_PKCS10_UNDEFINED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_SETCONTEXTFROMORIGINALCERT_SEARCH_FOR_ISSUANCE_WORKFLOW_BY_CERT_IDENTIFIER_FAILED"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_SETCONTEXTFROMORIGINALCERT_SEARCH_FOR_ISSUANCE_WORKFLOW_BY_CERT_IDENTIFIER_MORE_THAN_ONE_HIT"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
