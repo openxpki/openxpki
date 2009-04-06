@@ -59,7 +59,7 @@ sub execute {
     
     my $random_data = '';
     if ($rand_length > 0) {
-        $token->command({
+        $random_data = $token->command({
             COMMAND       => 'create_random',
             RANDOM_LENGTH => $rand_length,
         });
