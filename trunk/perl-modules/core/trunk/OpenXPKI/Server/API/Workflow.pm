@@ -823,6 +823,9 @@ sub search_workflow_instances {
         REVERSE  => 1,
 	    DYNAMIC  => $dynamic,
         DISTINCT => 1,
+        ORDER => [
+            $workflow_table . '.WORKFLOW_SERIAL',
+        ],
         %limit,
     );
     ##! 16: 'result: ' . Dumper $result
