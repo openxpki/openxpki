@@ -1099,9 +1099,21 @@ sub select
             }
             my @order = @{ $args->{ORDER} };
             ##! 16: 'order: ' . Dumper \@order
-            @order = map { $self->{schema}->get_column($_) } @order;
-            ##! 16: 'order: ' . Dumper \@order
-            foreach my $entry (@order) {
+            my @real_order;
+            foreach my $order_arg (@order) {
+	            my ($col, $tab) = 
+		            $self->__get_symbolic_column_and_table($order_arg);
+                $col = $self->{schema}->get_column($col);
+                if ($tab) {
+                    $tab = $self->{schema}->get_table_name($tab);
+                    push @real_order, $tab . '.' . $col;
+                }
+                else {
+                    push @real_order, $col;
+                }
+            }
+            ##! 16: 'order: ' . Dumper \@real_order
+            foreach my $entry (@real_order) {
                 if (! grep { $entry eq $_ } @order_specs) {
                     # argument entries need to be part of the order_specs
                     OpenXPKI::Exception->throw(
