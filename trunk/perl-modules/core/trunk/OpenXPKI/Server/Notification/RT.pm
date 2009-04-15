@@ -36,10 +36,8 @@ sub START {
     $password_of{$ident} = $self->__get_backend_config_value('password');
     $timeout_of{$ident}  = $self->__get_backend_config_value('timeout');
 
-    # instantiate the RT client and login
+    # instantiate the RT client
     $self->__instantiate_rt_client();
-    $self->__login();
-    ##! 4: 'successfully logged in to the RT system'
 
     ##! 1: 'end'
     return 1; 
@@ -55,6 +53,9 @@ sub open {
     my $requestors = $arg_ref->{REQUESTORS};
 
     my $rt_id;
+
+    $self->__login();
+    ##! 4: 'successfully logged in to the RT system'
 
     foreach my $requestor (@{ $requestors }) {
         if ($requestor !~ m{ \A .+ \@ .+ \z }xms) {
@@ -94,6 +95,10 @@ sub ticket_exists {
     ##! 1: 'start'
     my $self   = shift;
     my $ident  = ident $self;
+
+    $self->__login();
+    ##! 4: 'successfully logged in to the RT system'
+
     my $ticket_id = shift;
     my $ticket;
     eval {
@@ -110,6 +115,9 @@ sub correspond {
     my $arg_ref = shift;
     my $content = $arg_ref->{CONTENT};
     my $ticket  = $arg_ref->{TICKET};
+
+    $self->__login();
+    ##! 4: 'successfully logged in to the RT system'
 
     my ($cc, $bcc, $body) = $self->__parse_content($content);
     eval {
@@ -141,6 +149,9 @@ sub comment {
     my $content = $arg_ref->{CONTENT};
     my $ticket  = $arg_ref->{TICKET};
 
+    $self->__login();
+    ##! 4: 'successfully logged in to the RT system'
+
     my ($cc, $bcc, $body) = $self->__parse_content($content);
     eval {
         $rt_of{$ident}->comment(
@@ -171,6 +182,9 @@ sub set_value {
     my $field   = $arg_ref->{FIELD};
     my $value   = $arg_ref->{VALUE};
     my $ticket  = $arg_ref->{TICKET};
+
+    $self->__login();
+    ##! 4: 'successfully logged in to the RT system'
 
     # FIXME - custom fields always fail, looks like an RT bug
     eval {
@@ -205,6 +219,9 @@ sub link_tickets {
     my $link    = $arg_ref->{LINK};
     my $ticket  = $arg_ref->{TICKET};
 
+    $self->__login();
+    ##! 4: 'successfully logged in to the RT system'
+
     eval {
         $rt_of{$ident}->link_tickets(
             src       => $ticket,
@@ -234,6 +251,9 @@ sub close {
     my $ident   = ident $self;
     my $arg_ref = shift;
     my $ticket  = $arg_ref->{TICKET};
+
+    $self->__login();
+    ##! 4: 'successfully logged in to the RT system'
 
     eval {
         $rt_of{$ident}->edit(
