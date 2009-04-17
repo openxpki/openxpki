@@ -199,8 +199,8 @@
                    ACTION => "/service/info",
                    COMP   => $m->request_comp()->title() );
 
-    $params{'role'}
-	 = $context->{client}->send_receive_command_msg('get_role');
+    $params{'ROLE'}
+	 = $context->{client}->send_receive_command_msg('get_role')->{PARAMS};
     foreach my $key ("SESSION_ID", "LANGUAGE")
     {
         $params{$key} = $context->{lc $key} if (exists $context->{lc $key});
