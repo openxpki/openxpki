@@ -51,6 +51,13 @@
             local $INPUT_RECORD_SEPARATOR;
             <$file>;
         };
+
+	if ($pkcs10 =~ m{ \A (?:[0-9A-Za-z+\/=]+\s+)+ \z }xms) {
+	    $pkcs10 = 
+		"-----BEGIN CERTIFICATE REQUEST-----\n"
+		. $pkcs10
+		. "-----END CERTIFICATE REQUEST-----";
+	}
     
         if ($pkcs10 !~ /-----BEGIN/) {
             # assume it is
