@@ -1668,6 +1668,16 @@ sub get_pki_realms
                     FACILITY => "system",
                 });
 
+            # the retry time parameter is optional, so we put it in an eval block
+            eval {
+                $realms{$name}->{scep}->{id}->{$scep_id}->{'retry_time'}
+                    = $config->get_xpath(
+                        XPATH =>   ['pki_realm', 'scep', 'retry_time'],
+                        COUNTER => [$i,          $jj,     0 ],
+                        CONFIG_ID => $cfg_id,
+                    );
+
+            };
             $scep_count++;
         }
 

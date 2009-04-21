@@ -192,6 +192,9 @@
         <identifier>[% $entry.cert_identifier %]</identifier>
       <cert>
       [% END %]
+      [% IF $entry.type == 'scep' %]
+      <retry_time>[% $entry.retry_time %]</retry_time>
+      [% END %]
       <token super="common/token_config/token{[% $entry.id %]}"/>
     </[% $entry.type %]>
     [% END %]

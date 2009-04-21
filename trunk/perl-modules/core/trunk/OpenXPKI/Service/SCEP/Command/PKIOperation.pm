@@ -17,8 +17,10 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::DateTime;
 use Data::Dumper;
 use MIME::Base64;
+use DateTime::Format::DateParse;
 
 sub execute {
     my $self    = shift;
@@ -79,6 +81,8 @@ sub __pkcs_req : PRIVATE {
     my $self = shift;
     my $arg_ref = shift;
     my $api = CTX('api');
+    my $pki_realm = CTX('session')->get_pki_realm();
+    my $server    = CTX('session')->get_server();
     
     my $pkcs7_base64  = $arg_ref->{PKCS7};
     ##! 64: 'pkcs7_base64: ' . $pkcs7_base64
@@ -92,9 +96,6 @@ sub __pkcs_req : PRIVATE {
 
     ##! 16: "transaction ID: $transaction_id"
     # get workflow instance IDs corresponding to transaction ID
-    # TODO -- maybe we want to only get non-FAILURE instances here
-    # to give the client the chance to retry if a failure happened
-    # (has the drawback of maybe filling the DB)
     my $workflows = $api->search_workflow_instances({
             CONTEXT => [
                 {
@@ -104,6 +105,50 @@ sub __pkcs_req : PRIVATE {
             ],
     });
     ##! 16: 'workflows: ' . Dumper $workflows
+    my $failure_retry;
+    if (scalar @{ $workflows } > 0) {
+        if ($workflows->[0]->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE') {
+            # the last workflow is in FAILURE, check the last update
+            # date to see if user is already allowed to retry
+            my $last_update
+                = $workflows->[0]->{'WORKFLOW.WORKFLOW_LAST_UPDATE'};
+            ##! 16: 'FAILURE workflow found, last update: ' . $last_update
+            my $last_update_dt = DateTime::Format::DateParse->parse_datetime($last_update, 'UTC');
+            ##! 32: 'last update dt: ' . Dumper $last_update_dt
+            
+            # determine retry time from config
+            my $retry_time = CTX('pki_realm')->{$pki_realm}->{scep}->{id}->{$server}->{'retry_time'};
+            if (! defined $retry_time) {
+                $retry_time = '000001'; # default is one day
+            }
+            ##! 16: 'retry time: ' . $retry_time
+
+            my $retry_date = OpenXPKI::DateTime::get_validity({
+                REFERENCEDATE  => DateTime->now(),
+                VALIDITY       => '-' . $retry_time,
+                VALIDITYFORMAT => 'relativedate',
+            });
+            ##! 32: 'retry_date: ' . Dumper $retry_date
+            if (DateTime->compare($last_update_dt, $retry_date) == -1) {
+                ##! 64: 'last update is earlier than retry date, allow creation of new WF'
+                # set DB result to empty, so that it looks like no wf is present
+                $workflows = [ ];
+            }
+            else {
+                ##! 64: 'last update is later than retry date, do not allow creation of new WF'
+                # only include the first FAILURE wf in the result -> SCEP failure response
+                $workflows = [ $workflows->[0] ];
+            }
+        }
+    }
+    if (scalar @{ $workflows } > 1) {
+        # if more than one workflow is present, we delete the FAILURE ones
+        # from it
+        my @no_fail_workflows = grep { $_->{'WORKFLOW.WORKFLOW_STATE'} ne 'FAILURE' } @{ $workflows };
+        $workflows = \@no_fail_workflows;
+    }
+    ##! 16: 'workflows after retry checking: ' . Dumper $workflows
+
     my @workflow_ids = map { $_->{'WORKFLOW.WORKFLOW_SERIAL'} } @{$workflows};
     
     if (scalar @workflow_ids == 0) { 

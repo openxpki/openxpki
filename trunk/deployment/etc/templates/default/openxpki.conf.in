@@ -286,6 +286,7 @@ timeout: 10
 
 [TEST_SCEP_SERVER_1]
 id: testscepserver1
+retry_time: 000001
 cert_alias: testscepserver1
 type: scep
 shell: $(file.openca_scep)
