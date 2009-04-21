@@ -440,14 +440,13 @@ sub __getKeyHash {
 
     ##! "get object hash for private key " . $self->{KEY}
     my @cmd = (
-	qq("$self->{NFAST_HOME}/bin/nfkmverify"),
+	qq("$self->{NFAST_HOME}/bin/nfkminfo"),
+	'-k',
 	'hwcrhk',
 	qq("$self->{KEY}"),
 	);
 
-    my $keyid = '';
-    my $keyinfo;
-    my @keys;
+    my $keyhash;
     eval {
 	local $SIG{ALRM} = sub { die "alarm\n" };
 	alarm $self->{CHECKCMDTIMEOUT};
@@ -457,7 +456,7 @@ sub __getKeyHash {
 	##! 2: "exec: $cmd"
 	my $handle;
 	if (! open $handle, $cmd . '|') {
-            ##! 4: "nCipher nfkmverify: could not run command '$cmd'"
+            ##! 4: "nCipher nfkminfo: could not run command '$cmd'"
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_FAILED",
 		params  => { 
@@ -465,31 +464,14 @@ sub __getKeyHash {
 		},
 		);
 	}
-
-	# parse nfkmverify output
+	
+	# parse nfkminfo output
+      INFO:
 	while (<$handle>) {
 	    chomp;
-	    if (m{ \A \*\* \s+ \[Application \  key \  hwcrhk \  (.*) \] }xms) {
-                $keyid = $1;
-	        ##! 4: "key id: $keyid"
-	        push (@keys, $keyid);
-	    } else {
-		if ($keyid ne '') {
-		    if (m{ \A \s* Cardset \  protected: \s+ (\d+) \/ (\d+) \s* (.*?) \s* \[ (\d+)s \s+ `(.*?)' \] }xms) {
-		        $keyinfo->{$keyid}->{OCS}->{QUORUM}->{K} = $1;
-		        $keyinfo->{$keyid}->{OCS}->{QUORUM}->{N} = $2;
-		        $keyinfo->{$keyid}->{OCS}->{TYPE} = $3;
-		        $keyinfo->{$keyid}->{OCS}->{TIMEOUT} = $4;
-		        $keyinfo->{$keyid}->{OCS}->{NAME} = $5;
-		    }
-		    if (m{ \A \s* Cardset \  hash \s+ (.*) }xms) {
-		        $keyinfo->{$keyid}->{OCS}->{HASH} = $1;
-		    }
-		    if (m{ \A \s* Type \s+ (.*) \s+ (\d+) }xms) {
-		        $keyinfo->{$keyid}->{TYPE} = $1;
-		        $keyinfo->{$keyid}->{BIT} = $2;
-		    }
-	        }
+	    if (m{ \A \s* hash \s+ (.*) }xms) {
+		$keyhash = $1;
+		last INFO;
 	    }
         }
         close $handle;
@@ -523,20 +505,8 @@ sub __getKeyHash {
 	    },
 	    );
     }
-    
-    ##! 4: "Key information summary"
-    foreach (@keys) {
-	my $k = $keyinfo->{$_};
-	##! 4: "Key $_:"
-	##! 4: "   Type: $k->{TYPE} ($k->{BIT} bit)"
-	##! 4: "   OCS name: $k->{OCS}->{NAME}"
-	##! 4: "   OCS hash: $k->{OCS}->{HASH}"
-	##! 4: "   OCS type: $k->{OCS}->{TYPE}"
-	##! 4: "   OCS quorum: $k->{OCS}->{QUORUM}->{K}/$k->{OCS}->{QUORUM}->{N}"
-	##! 4: "   OCS timeout: $k->{OCS}->{TIMEOUT}"
-    }
 
-    return $keyinfo->{$keyid}->{OCS}->{HASH};
+    return $keyhash;
 }
 
 memoize('__getKeyHash');
