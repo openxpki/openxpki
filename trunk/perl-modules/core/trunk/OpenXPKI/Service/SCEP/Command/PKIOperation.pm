@@ -27,6 +27,7 @@ sub execute {
     my $result;
     
     my $pkcs7_base64 = $self->get_PARAMS()->{MESSAGE};
+    ##! 64: 'pkcs7_base64: ' . $pkcs7_base64
     my $pkcs7_decoded = decode_base64($pkcs7_base64);
     
     my $api = CTX('api');
@@ -80,6 +81,7 @@ sub __pkcs_req : PRIVATE {
     my $api = CTX('api');
     
     my $pkcs7_base64  = $arg_ref->{PKCS7};
+    ##! 64: 'pkcs7_base64: ' . $pkcs7_base64
     my $pkcs7_decoded = decode_base64($pkcs7_base64);
     my $token         = $arg_ref->{TOKEN};
     
@@ -111,9 +113,19 @@ sub __pkcs_req : PRIVATE {
         # inject newlines if not already present
         # this is necessary for openssl / openca-scep to parse
         # the data correctly
+        ##! 64: 'pkcs7_base64 before sanitizing: __START__' . $pkcs7_base64 . '__END__'
         $pkcs7_base64 =~ s{ \n }{}xmsg;
+        my $divides64;
+        ##! 64: 'length: ' . length($pkcs7_base64)
+        if (length($pkcs7_base64) % 64 == 0) {
+            $divides64 = 1;
+        }
         $pkcs7_base64 =~ s{ (.{64}) }{$1\n}xmsg;
-        $pkcs7_base64 .= "\n";
+        if (! $divides64) {
+            ##! 64: 'pkcs7 length does not divide 64, add an additional newline'
+            $pkcs7_base64 .= "\n";
+        }
+        ##! 64: 'pkcs7_base64 before create_wf_instance: ' . $pkcs7_base64
         my $wf_info = $api->create_workflow_instance({
             WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST',
             PARAMS   => {
