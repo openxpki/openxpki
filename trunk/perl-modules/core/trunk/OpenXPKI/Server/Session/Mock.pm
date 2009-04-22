@@ -23,7 +23,7 @@ my %server    : ATTR( :get<server>    :set<server>    );
 my %enc_alg   : ATTR( :get<enc_alg>   :set<enc_alg>   );
 
 my %id        : ATTR( :get<id>   :default<-1> );
-my %user      : ATTR( :get<user> :default<''> );
+my %user      : ATTR( :get<user> :default<''> :set<user> );
 my %role      : ATTR( :get<role> :set<role> :default<''> );
 my %challenge : ATTR( :get<challenge> :set<challenge> );
 my %authentication_stack : ATTR( :get<authentication_stack> :set<authentication_stack> );

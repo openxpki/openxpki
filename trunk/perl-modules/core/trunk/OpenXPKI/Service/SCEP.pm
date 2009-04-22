@@ -44,6 +44,7 @@ sub init {
     CTX('session')->set_server($server);
     my $encryption_alg = $self->__init_encryption_alg();
     CTX('session')->set_enc_alg($encryption_alg);
+    CTX('session')->set_user($server);
 
     return 1;
 }
