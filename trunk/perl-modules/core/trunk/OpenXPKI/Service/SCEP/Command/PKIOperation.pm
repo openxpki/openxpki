@@ -204,6 +204,9 @@ sub __pkcs_req : PRIVATE {
         });
         my $wf_state = $wf_info->{WORKFLOW}->{STATE};
         if ($wf_state eq 'WAITED_FOR_CHILD') {
+            # TODO - this is legacy code that can possbily removed, the 'WAITED_FOR_CHILD'
+            # state is no longer present
+            #
             # in this state, we have to look for an available activity
             # and execute it. This effectively checks whether the
             # certificate issuance is finished or not
@@ -234,7 +237,40 @@ sub __pkcs_req : PRIVATE {
                 ##! 16: 'new state after triggering activity: ' . $wf_state
             }        
         }
-        if ($wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE') {
+        my $waiting_for_child_success; # indicates whether WAITING_FOR_CHILD should 
+                                       # actually be 'SUCCESS'
+        my $waiting_for_child_failure; # indicates whether WAITING_FOR_CHILD should 
+                                       # actually be 'FAILURE'
+        my $waiting_for_child_pending; # indicates whether WAITING_FOR_CHILD should 
+                                       # actually be 'PENDING'
+        if ($wf_state eq 'WAITING_FOR_CHILD') {
+            # if issuance stops for some reason (CA key not usable, for example),
+            # the workflow sometimes "stops" in this state.
+            # find out whether the workflow child is in state 'SUCCESS' or 'FAILURE'
+            # or something else and delieve the corresponding response
+
+            my $wf_children_instances = $wf_info->{WORKFLOW}->{CONTEXT}->{'wf_children_instances'};
+            ##! 16: 'wf_children_instances: ' . $wf_children_instances;
+            
+            my $children = OpenXPKI::Serialization::Simple->new()->deserialize($wf_children_instances);
+            my $child_id   = $children->[0]->{ID};
+            my $child_type = $children->[0]->{TYPE};
+            my $info = $api->get_workflow_info({
+                WORKFLOW => $child_type,
+                ID       => $child_id,
+            });
+            ##! 16: 'info: ' . Dumper $info
+            if ($info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
+                $waiting_for_child_success = 1;
+            }
+            elsif ($info->{WORKFLOW}->{STATE} eq 'FAILURE') {
+                $waiting_for_child_failure = 1;
+            }
+            else {
+                $waiting_for_child_pending = 1;
+            }
+        }
+        if ($wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE' && ($wf_state ne 'WAITING_FOR_CHILD' || $waiting_for_child_pending)) {
             # we are still pending
             my $pending_msg = $token->command({
                 COMMAND => 'create_pending_reply',
@@ -242,7 +278,7 @@ sub __pkcs_req : PRIVATE {
             });
             return $pending_msg;
         }
-        elsif ($wf_state eq 'SUCCESS') { # the workflow is finished,
+        if ($wf_state eq 'SUCCESS' || $waiting_for_child_success) { # the workflow is finished,
             # get the CSR serial from the workflow
             my $csr_serial = $wf_info->{WORKFLOW}->{CONTEXT}->{'csr_serial'};
             ##! 32: 'csr_serial: ' . $csr_serial
