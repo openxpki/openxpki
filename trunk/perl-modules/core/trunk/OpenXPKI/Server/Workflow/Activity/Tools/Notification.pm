@@ -30,8 +30,8 @@ sub execute {
 
     my $bulk = $context->param('bulk');
     # send notifaction
-    if (! $bulk) {
-        ##! 16: 'bulk not set, notifying'
+    if (! $bulk && $workflow->type() ne 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST') {
+        ##! 16: 'bulk not set and WF type is not SCEP request, notifying'
         # only notify if this is not part of a bulk request - otherwise
         # the user would get a huge number of tickets
         my $ticket = CTX('notification')->notify({
