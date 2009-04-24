@@ -1233,21 +1233,17 @@ msgstr "PKI Realm"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_INSTALL"
 msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC"
-msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
+msgstr "Der angegebene Inhalts-Typ __CONTENT_TYPE__ wird nicht unterstützt."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_TITLE"
-msgstr "Auswählen eines Workflows"
+msgstr "Falscher HTML content-type"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_DESC"
-msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
+msgstr "Das angegebene Format __FORMAT__ wird nicht unterstützt."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_FORMAT_TITLE"
-msgstr "PKI Realm"
+msgstr "Falsches Zertifikat-Format"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_DESCRIPTION"
 msgstr "Diese Seite listet verschiedene sog. PKI Realms auf, "
@@ -1262,9 +1258,8 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED_DESC"
 msgstr "Der Download des privaten Schlüssels ist fehlgeschlagen. Sind Sie sicher,"
 "dass Sie das richtige Passwort eingegeben haben?"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_FAILED_TITLE"
-msgstr "Serverseitige Schlüsselgenerierung"
+msgstr "Fehler beim Herunterladen des privaten Schlüssels"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_PASSWORD_CSP_MANUALLY_ENTERED"
 msgstr "CSP selbst eingeben"
@@ -1272,13 +1267,11 @@ msgstr "CSP selbst eingeben"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_PASSWORD_NO_SPECIAL_CSP"
 msgstr "Keinen CSP angeben"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_WRONG_FORMAT_DESC"
-msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
+msgstr "Das angegebene Format __FORMAT__ wird nicht unterstützt."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_WRONG_FORMAT_TITLE"
-msgstr "PKI Realm"
+msgstr "Falsches Format für den privaten Schlüssel"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_HIDE"
@@ -3148,87 +3141,68 @@ msgstr "Start der CRL-Erstellung"
 msgid "I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE"
 msgstr "Start der CRL-Erstellung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_APPROVAL"
-msgstr "Smartcard personalisieren"
+msgstr "Genehmigung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_BULK_CERTIFICATE_SIGNING_REQUEST"
-msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
+msgstr "Sammelantrag auf Zertifikat-Signierung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_CA_CERTIFICATES"
-msgstr "Gültige"
+msgstr "CA-Zertifikate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_REVOCATION_REQUEST"
-msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
+msgstr "Antrag auf Zertifikat-Widerruf"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_SIGNING_REQUEST"
-msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
+msgstr "Antrag auf Zertifikat-Signierung (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_CRLS"
-msgstr "Aktuelle CRLs"
+msgstr "Zertifikat-Widerruf-Listen (CRLs)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_DOWNLOAD"
-msgstr "Workflow"
+msgstr "Downloads"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_HOME"
-msgstr "Abmelden"
+msgstr "Startseite"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_ISSUE_CRL"
-msgstr "Aktuelle CRLs"
+msgstr "Widerruf-Liste (CRL) erstellen"
 
 msgid "I18N_OPENXPKI_HTML_MENU_LIST_CRL"
-msgstr "Aktuelle CRLs"
+msgstr "Widerruf-Listen (CRLs) anzeigen"
 
 msgid "I18N_OPENXPKI_HTML_MENU_LOGOUT"
 msgstr "Abmelden"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_MY_CERTIFICATES"
-msgstr "Neuer Antrag (CSR)"
+msgstr "Meine Zertifikate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_PENDING_CRRS"
-msgstr "Abgelaufene"
+msgstr "Ausstehende Widerruf-Anträge (CRRs)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_PENDING_CSRS"
-msgstr "Abgelaufene"
+msgstr "Ausstehende Signierungs-Anträge (CSRs)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_POLICY_DOCUMENTS"
-msgstr "Gültige"
+msgstr "Richtlinien-Dokumente"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_REQUEST"
-msgstr "Neuer Antrag (CSR)"
+msgstr "Anträge"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_SEARCH"
-msgstr "Zertifikats-Suche"
+msgstr "Suche"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_SEARCH_CERTIFICATES"
-msgstr "Zertifikats-Suche"
+msgstr "Suche nach Zertifikaten"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_SEARCH_WORKFLOWS"
-msgstr "Workflow"
+msgstr "Suche nach Abläufen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_SMARTCARD_PERSONALIZATION"
-msgstr "Dieser Workflow erstellt neue CRLs."
+msgstr "Smartcard-Personalisierung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HTML_MENU_TASKS"
-msgstr "Aktuelle CRLs"
+msgstr "Aufgaben"
 
 msgid "I18N_OPENXPKI_HTML_ORGANIZATION"
 msgstr "Organisation"
@@ -6181,7 +6155,7 @@ msgstr "Speichern eines privaten Schlüssels"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WORKFLOWS"
-msgstr "Workflow"
+msgstr "Arbeitsabläufe"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_INSERT_CERTIFICATE_TOKEN_UNAVAILABLE"
