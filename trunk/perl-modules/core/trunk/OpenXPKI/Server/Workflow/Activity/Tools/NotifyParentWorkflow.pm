@@ -47,29 +47,14 @@ sub execute {
     if ($result eq 'SUCCESS') {
         # fire and forget, if more than one workflow child is forked,
         # the activity might not be available, but we do not care ...
-        TRIES:
-        for (my $try = 0; $try < 10; $try++) {
-            ##! 64: 'try #' . $try
-            eval {
-                CTX('api')->execute_workflow_activity({
-                    ID       => $parent_id,
-                    WORKFLOW => $parent_wf_type,
-                    ACTIVITY => 'child_finished_successfully',
-                });
-            };
-            ##! 64: 'eval_error from execute_workflow_activity: ' . $EVAL_ERROR
-            if (! $EVAL_ERROR) {
-                ##! 64: 'no eval error, last try'
-                last TRIES;
-            }
-            ##! 16: 'clearing cache ...'
-            CTX('api')->get_workflow_activities({
+        eval {
+            CTX('api')->execute_workflow_activity({
                 ID       => $parent_id,
                 WORKFLOW => $parent_wf_type,
+                ACTIVITY => 'child_finished_successfully',
             });
-            ##! 16: 'cache cleared ...'
-            sleep 1;
-        }
+        };
+        ##! 64: 'eval_error from execute_workflow_activity: ' . Dumper $EVAL_ERROR
     }
     elsif ($result eq 'FAILURE') {
         # no eval because this activity should be present all the time
