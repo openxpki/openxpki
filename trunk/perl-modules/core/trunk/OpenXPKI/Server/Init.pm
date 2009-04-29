@@ -872,7 +872,8 @@ sub get_xml_config {
                 CTX('dbi_workflow')->disconnect();
                 next CONFIG;
             }
-            my $new_identifier = sha1_base64($config->{DATA});
+            my $reserialized_config = $ser_fast->serialize($deserialized_config);
+            my $new_identifier = sha1_base64($reserialized_config);
             ##! 16: 'old_identifier: ' . $old_identifier
             ##! 16: 'new_identifier: ' . $new_identifier
 
@@ -882,7 +883,7 @@ sub get_xml_config {
                 TABLE => 'CONFIG',
                 DATA  => {
                     CONFIG_IDENTIFIER => $new_identifier,
-                    DATA              => $config->{DATA},
+                    DATA              => $reserialized_config,
                 },
                 WHERE => {
                     CONFIG_IDENTIFIER => $old_identifier,
