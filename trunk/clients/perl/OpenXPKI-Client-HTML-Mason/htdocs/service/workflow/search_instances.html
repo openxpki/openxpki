@@ -8,6 +8,7 @@
     $start            => 1
     $page             => undef
     $show_custom_columns   => undef
+    $custom_columns_filter => undef
     @custom_columns        => ()
 </%args>
 <%init>
@@ -114,7 +115,7 @@
 %      # fetch the data to be displayed in the custom column
 %      my $custom_column_data = $workflow_info->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$custom_column};
 %
-    <td><% $m->comp('/lib/display_field.mhtml', 'field' => $custom_column_data ) %></td>
+<td><% $m->comp('/lib/display_field.mhtml', 'column' => $custom_column, 'field' => $custom_column_data, 'filter' => $custom_columns_filter ) %></td>
 %
 %  }
 %

@@ -7,11 +7,21 @@
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_DESCRIPTION') %>
 </p>
   <& /service/workflow/search_instances.html,
-   'notitle'          => 1,
-   'certificate_link' => 1,
-   'limit'            => 5,
-   'context_key'      => [ 'creator' ],
-   'context_value'    => [ $user ],
+   'notitle'               => 1,
+   'certificate_link'      => 1,
+   'limit'                 => 5,
+   'context_key'           => [ 'creator' ],
+   'context_value'         => [ $user ],
+   'show_custom_columns'   => 1,
+   'custom_columns'        => [ 'cert_subject' ],
+   'custom_columns_filter' => sub {
+         my $key  = shift;
+         my $data = shift;
+         if ($key eq 'cert_subject') {
+            ($data) = ($data =~ m{ CN=([^,]+) }xms);
+         }
+         return $data;
+   },
   &>
 % }
 % elsif ($role eq 'RA Operator') {

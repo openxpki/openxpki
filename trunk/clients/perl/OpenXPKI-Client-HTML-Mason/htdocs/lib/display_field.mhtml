@@ -1,5 +1,7 @@
 <%args>
     $field => undef
+    $column => undef
+    $filter => undef
 </%args>
 
 <%init>
@@ -16,8 +18,25 @@
     $Data::Dumper::Terse = 1;
     $Data::Dumper::Deepcopy = 1;
 
+    if (defined $filter && ref $filter eq 'CODE') {
+        # filter can be a coderef that filters the
+        # output given the column name and the data
+        #
+        # this is put in an eval { } block because we'd
+        # rather have it remain the same field then fail
+        # if the filter code is broken
+        eval {
+            $field = &$filter($column, $field);
+        };
+    }
+
     # dump the data
-    print Dumper $field;
+    if (ref $field) {
+        print Dumper $field;
+    }
+    else {
+        print $field;
+    }
 
 </%init>
 
