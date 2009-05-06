@@ -265,6 +265,12 @@ sub search_cert
         $params{DYNAMIC}->{PKI_REALM}  = CTX('session')->get_pki_realm();
         $params{REVERSE} = 1;
         $params{ORDER} = [ 'CERTIFICATE_SERIAL' ];
+        if (defined $args->{VALID_AT}) {
+            $params{VALID_AT} = $args->{VALID_AT};
+        }
+        if (defined $args->{STATUS}) {
+            $params{DYNAMIC}->{STATUS} = $args->{STATUS};
+        }
 
     my $result = CTX('dbi_backend')->select(%params);
     if (ref $result ne 'ARRAY') {
