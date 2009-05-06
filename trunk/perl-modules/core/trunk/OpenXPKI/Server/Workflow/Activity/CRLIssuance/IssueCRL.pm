@@ -182,8 +182,11 @@ sub __prepare_crl_data {
             $reason_code          = $crr->{'REASON_CODE'};
             $invalidity_timestamp = $crr->{'INVALIDITY_TIME'};
             ##! 32: 'last approved crr present: ' . $revocation_timestamp
+            push @cert_timestamps, [ $data, $revocation_timestamp, $reason_code, $invalidity_timestamp ];
         }
-        push @cert_timestamps, [ $data, $revocation_timestamp, $reason_code, $invalidity_timestamp ];
+        else {
+            push @cert_timestamps, [ $data ];
+        }
         # update certificate database:
         my $status = 'REVOKED';
         if ($reason_code eq 'certificateHold') {
