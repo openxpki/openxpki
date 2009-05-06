@@ -79,6 +79,13 @@
             {
                 @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
             }
+            elsif ($msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'SUCCESS') {
+                return $m->comp('/service/create_crr/success.mhtml',
+                    'msg'  => $msg,
+                    'type' => $type,
+                    'id'   => $id,
+                );
+            }
             else {
                 return $m->comp ('/service/workflow/show_instance.html',
                                  'msg'  => $msg,
