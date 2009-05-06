@@ -56,7 +56,7 @@
         }
         else
         {
-            # if available, try to persist the CRR now
+            # if available, try to revoke the cert now
             my $act_msg = $context->{client}->send_receive_command_msg(
                 'get_workflow_activities',
                 {
@@ -64,13 +64,13 @@
                     ID       => $id,
                 },
             );
-            if (grep { $_ eq 'persist_crr' } @{ $act_msg->{PARAMS} }) {
+            if (grep { $_ eq 'revoke_certificate' } @{ $act_msg->{PARAMS} }) {
                 $msg = $context->{client}->send_receive_command_msg(
                       'execute_workflow_activity',
                       {
                         WORKFLOW => $type,
                         ID       => $id,
-                        ACTIVITY => "persist_crr",
+                        ACTIVITY => "revoke_certificate",
                       }
                 );
             }
