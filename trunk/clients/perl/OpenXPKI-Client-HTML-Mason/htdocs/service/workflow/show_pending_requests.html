@@ -62,7 +62,18 @@ function ToggleAll() {
     </td>
     <td><% $res->{'LAST_UPDATE'} %></td>
     <td>
-    <% $res->{'SUBJECT'} %>
+%  if ($res->{'CERT_COUNT'}) {        
+      <& /lib/html/a.mhtml,
+          target => $context->{menu}->get_root() . '/service/api/cert_list.html',
+          label  => $res->{'SUBJECT'},
+          params => [
+                [ 'subject' => $res->{'SUBJECT'} ],
+          ],
+          &> (<% $res->{'CERT_COUNT'} %>)
+%  }
+%  else {
+        <% $res->{'SUBJECT'} %> 
+% }
 %   foreach my $san (@{ $res->{'SUBJECT_ALT_NAMES'} }) {
 %      if ($san =~ m{ \A DNS:(.*) \z }xms) {
 %         if (! gethostbyname($1)) {
@@ -193,6 +204,15 @@ foreach my $instance (@instances) {
             push @tickets, $ticket_entry;
         }
     }
+    my $certs = $context->{client}->send_receive_command_msg(
+        'search_cert_count', 
+        {
+            'SUBJECT'  => $wf_context->{'cert_subject'},
+            'STATUS'   => 'ISSUED',
+            'VALID_AT' => time(),
+        },
+    )->{PARAMS};
+
     push @results, {
         'SERIAL'            => $instance->{'WORKFLOW.WORKFLOW_SERIAL'},
         'LAST_UPDATE'       => $instance->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
@@ -202,6 +222,7 @@ foreach my $instance (@instances) {
         'ROLE'              => $wf_context->{'cert_role'},
         'CREATOR'           => $wf_context->{'creator'},
         'TICKETS'           => \@tickets,
+        'CERT_COUNT'        => $certs,
     };
 }
 </%init>
