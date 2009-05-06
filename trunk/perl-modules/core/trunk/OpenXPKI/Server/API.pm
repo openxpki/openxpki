@@ -360,7 +360,7 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_integer_string,
-                }
+                },
                 STATUS => {
                     type     => SCALAR,
                     optional => 1,
@@ -415,7 +415,7 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_integer_string,
-                }
+                },
                 STATUS => {
                     type     => SCALAR,
                     optional => 1,
