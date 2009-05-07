@@ -83,9 +83,14 @@ sub __get_ca_certificate_chains : PRIVATE {
 
     ##! 32: 'ca identifiers: ' . Dumper $ca_identifiers;
     
+    CA:
     foreach my $ca (keys %{ $ca_identifiers }) {
         ##! 16: 'ca identifier: ' . $ca
         my $ca_obj = $ca_identifiers->{$ca}->{'cacert'};
+
+        next CA if (! defined $ca_obj); # skip if no CA object available,
+                                        # for example if CA has been configured
+                                        # but not yet imported
 
         my $ca_chain = $api->get_chain({
             'START_IDENTIFIER' => $ca_obj->get_identifier(),
