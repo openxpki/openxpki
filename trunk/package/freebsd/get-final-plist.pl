@@ -14,15 +14,16 @@ my $line = "";
 my ${PORT_NAME}=$ARGV[0];
 my ${PKGNAME_PREFIX}="p5-";
 my ${PORT_PATH}=cwd;
+my ${PERL_VERSION} = join('.', map {ord} split('', $^V));
 
 open(SOURCE_FILE,"<${PORT_PATH}/pkg-plist.0");
 open(TARGET_FILE,">${PORT_PATH}/pkg-plist");
 while ($line = <SOURCE_FILE>) {
     chomp($line);
     $line =~ s/\.gz$//;
-    $line =~ s/lib\/perl5\/5.8.8\/man\/man3\//\t/;
+    $line =~ s/lib\/perl5\/${PERL_VERSION}\/man\/man3\//\t/;
     $line =~ s/man\/man1\//\t/;
-    $line =~ s/lib\/perl5\/site_perl\/5.8.8/\%\%SITE_PERL\%\%/;
+    $line =~ s/lib\/perl5\/site_perl\/${PERL_VERSION}/\%\%SITE_PERL\%\%/;
     $line =~ s/\/mach\//\/\%\%PERL_ARCH\%\%\//;
     $line =~ s/share\/${PORT_NAME}/\%\%DATADIR\%\%/;
     $line =~ s/(dirrm)([^t])/$1try$2/;
