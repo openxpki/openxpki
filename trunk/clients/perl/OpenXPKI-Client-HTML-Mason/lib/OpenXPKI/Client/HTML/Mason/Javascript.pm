@@ -519,13 +519,27 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
             theForm.submit 
         End Function
 
-        sub enumCSP
+        function checkCSPPresent(cspToCheck)
+            dim csps
+            csps = enumCSP()
+            for each csp in csps
+                if csp = cspToCheck Then
+                    checkCSPPresent = true
+                    exit function
+                end if
+            next
+            checkCSPPresent = false
+        End function
+
+        function enumCSP
             on Error Resume Next
 
             const nMinProvType=1
             const nMaxProvType=600
             dim nProvType, nOrigProvType, nProvIndex, sProvName
             dim XEnroll
+	    dim cspNames(100)
+	    dim cspIdx
 
             // Windows Vista + IE 7 CSP listing
             // based on code from
@@ -544,20 +558,22 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
                         oOption.text = csps.ItemByIndex(j).Name
                         oOption.value = j
                         Document.OpenXPKI.csp.add(oOption)
+			cspNames(j) = csps.ItemByIndex(j).Name 
                     Next
                 Else
                     MsgBox("I18N_OPENXPKI_CLI_HTML_MASON_UI_HTML_JAVASCRIPT_VISTA_NO_X509ENROLLMENT_OBJECT")
                 End If
             Else
                 // Windows 2K / XP using the XEnroll control
-                set xenroll = getXEnroll
+                set XEnroll = getXEnroll
                 ' save the original provider type
                 nOrigProvType=XEnroll.ProviderType
                 if 0<>Err.Number then
                     ' XEnroll failed
-                    exit sub
+                    exit function
                 end if
 
+                cspIdx = 0
                 ' take each of the provider types
                 for nProvType=nMinProvType To nMaxProvType
                     if PROV_RSA_SCHANNEL<>nProvType then
@@ -574,7 +590,7 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
                                 exit do
                             elseIf 0<>Err.Number Then
                                 ' XEnroll failed
-                                exit sub
+                                exit function
                             end if
                             ' add provider name to the list box
                             dim oElement
@@ -583,6 +599,12 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
                             oElement.value=nProvType
 
                             document.OpenXPKI.csp.add(oElement)
+			    // csp might be hidden var, ignore that it does not support add
+                            if 438 = Err.Number Then
+                                Err.Clear
+                            end if
+			    cspNames(cspIdx) = sProvName 
+                            cspIdx = cspIdx + 1
 
                             ' get the next provider number
                             nProvIndex=nProvIndex+1
@@ -594,7 +616,8 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
                 document.OpenXPKI.elements[0].focus()
                 GetKeyLength()
             End If
-        end sub
+            enumCSP = cspNames
+        end function
 
         function GetMinMaxKeyLength (bMinMax, bExchange)
             on Error Resume Next

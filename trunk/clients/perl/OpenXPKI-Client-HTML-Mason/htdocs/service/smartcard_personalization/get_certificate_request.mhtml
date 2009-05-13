@@ -37,11 +37,17 @@
 
 <& /lib/javascript.mhtml &>
 
+%    my $csp = $wf_info->{CONTEXT}->{client_csp};
+%    my $bitlength = $wf_info->{CONTEXT}->{client_bitlength};
 <script type="text/javascript">
 <!--
     function DisableButtonAndCreateCSR() {
         if (navigator.appName != 'Microsoft Internet Explorer') {
             alert('<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED') %>');
+            return;
+        }
+        if (! checkCSPPresent("<% $csp %>")) {
+            alert('<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MAOSN_SMARTCARD_PERSONALIZATION_CSP_NOT_PRESENT') %>');
             return;
         }
         CreateCSR('silent');
@@ -54,8 +60,6 @@
 % # 'action' is necessary as this might be called from a different
 % # URL, i.e. right after authentication
 <& /service/open_form.mhtml &>
-%    my $csp = $wf_info->{CONTEXT}->{client_csp};
-%    my $bitlength = $wf_info->{CONTEXT}->{client_bitlength};
 <& /lib/html/hidden.mhtml, 'name' => 'csp', 'value' => $csp &>
 <& /lib/html/hidden.mhtml, 'name' => 'bits', 'value' => $bitlength &>
 <& /lib/html/hidden.mhtml, 'name' => 'pkcs10', 'value' => '' &>
