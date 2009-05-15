@@ -40,6 +40,8 @@
     error_code="badCertId"/> 
   <action name="set_context_from_csr"
          class="OpenXPKI::Server::Workflow::Activity::SCEP::SetContextFromCSR"/> 
+  <action name="set_context_from_csr2"
+         class="OpenXPKI::Server::Workflow::Activity::SCEP::SetContextFromCSR"/> 
   <action name="set_context_from_original_cert"
          class="OpenXPKI::Server::Workflow::Activity::SCEP::SetContextFromOriginalCert"/> 
   <!-- Changes -->

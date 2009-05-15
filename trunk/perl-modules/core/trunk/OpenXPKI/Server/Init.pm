@@ -1679,6 +1679,25 @@ sub get_pki_realms
                     );
 
             };
+
+            # the scep_client section is optional, so put it in an eval block as well
+            eval {
+                $realms{$name}->{scep}->{id}->{$scep_id}->{'scep_client'}->{'enrollment_role'} =
+                    $config->get_xpath(
+                        XPATH     => ['pki_realm', 'scep', 'scep_client', 'enrollment_role'],
+                        COUNTER   => [$i,          $jj,     0,             0 ],
+                        CONFIG_ID => $cfg_id,
+                    );
+            };
+
+            eval {
+                $realms{$name}->{scep}->{id}->{$scep_id}->{'scep_client'}->{'autoissuance_role'} =
+                    $config->get_xpath(
+                        XPATH     => ['pki_realm', 'scep', 'scep_client', 'autoissuance_role'],
+                        COUNTER   => [$i,          $jj,     0,             0 ],
+                        CONFIG_ID => $cfg_id,
+                    );
+            };
             $scep_count++;
         }
 

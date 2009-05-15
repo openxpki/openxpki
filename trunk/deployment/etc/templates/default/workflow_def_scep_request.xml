@@ -23,7 +23,7 @@
 
   <state name="SIGNATURE_OK" autorun="yes">
     <action name="null"
-            resulting_state="RENEWAL">
+            resulting_state="RENEWAL_OR_SCEP_CLIENT">
       <condition name="!is_initial_enrollment"/>
     </action>
     <action name="null2"
@@ -42,6 +42,40 @@
 	    resulting_state="FAILURE">
       <condition name="!initial_enrollment_allowed"/>
     </action>
+  </state>
+
+  <state name="RENEWAL_OR_SCEP_CLIENT" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_SCEP_RENEWAL_OR_SCEP_CLIENT</description>
+    <action name="null"
+            resulting_state="RENEWAL">
+            <condition name="!scep_client"/>
+    </action>
+    <action name="null2"
+            resulting_state="SCEP_CLIENT">
+            <condition name="scep_client"/>
+    </action>
+  </state>
+
+  <state name="SCEP_CLIENT" autorun="yes">
+    <action name="set_context_from_csr"
+	    resulting_state="PENDING">
+      <condition name="client_enrollment"/>
+      <condition name="client_cert_valid"/>
+    </action>
+    <action name="set_context_from_csr2"
+	    resulting_state="SCEP_CLIENT_AUTO_ISSUE">
+      <condition name="client_autoissuance"/>
+      <condition name="client_cert_valid"/>
+    </action>
+    <action name="set_error_code_2"
+            resulting_state="FAILURE">
+            <condition name="!client_cert_valid"/>
+    </action>
+  </state>
+
+  <state name="SCEP_CLIENT_AUTO_ISSUE" autorun="yes">
+    <action name="persist_csr"
+        resulting_state="APPROVED"/>
   </state>
 
   <state name="RENEWAL" autorun="yes">

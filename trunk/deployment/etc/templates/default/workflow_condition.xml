@@ -205,6 +205,10 @@
     <param name="difference" value="+0003"/> <!-- renewal can only begin 3 months before the certificate becomes invalid -->
   </condition>
   <condition name="signed_using_original_cert" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/>
+  <condition name="scep_client" class="OpenXPKI::Server::Workflow::Condition::SCEPClient"/>
+  <condition name="client_enrollment" class="OpenXPKI::Server::Workflow::Condition::SCEPClientEnrollment"/>
+  <condition name="client_autoissuance" class="OpenXPKI::Server::Workflow::Condition::SCEPClientAutoIssuance"/>
+  <condition name="client_cert_valid" class="OpenXPKI::Server::Workflow::Condition::SCEPClientCertValid"/>
 
  <!-- conditions for publishing certificates using ldap -->
   <condition name="ACL::certificate_ldap_publishing" class="OpenXPKI::Server::Workflow::Condition::ACL">

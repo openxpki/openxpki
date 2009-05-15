@@ -194,6 +194,12 @@
       [% END %]
       [% IF $entry.type == 'scep' %]
       <retry_time>[% $entry.retry_time %]</retry_time>
+      <!--
+      <scep_client>
+          <enrollment_role>SCEP Client Enrollment</enrollment_role>
+          <autoissuance_role>SCEP Client AutoIssuance</autoissuance_role>
+      </scep_client>
+      -->
       [% END %]
       <token super="common/token_config/token{[% $entry.id %]}"/>
     </[% $entry.type %]>

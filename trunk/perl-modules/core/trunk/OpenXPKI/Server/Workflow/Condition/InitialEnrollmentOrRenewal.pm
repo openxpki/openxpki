@@ -125,6 +125,8 @@ sub evaluate {
     $context->param('current_identifier' => $sig_identifier);
     ##! 16: 'current_notafter: ' . $certs->[0]->{NOTAFTER}
     $context->param('current_notafter' => $certs->[0]->{NOTAFTER});
+    ##! 16: 'current_role: ' . $certs->[0]->{ROLE}
+    $context->param('current_role' => $certs->[0]->{ROLE});
 
     ##! 16: 'current subject: ' . $certs->[0]->{SUBJECT}
 

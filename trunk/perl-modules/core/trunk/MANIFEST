@@ -268,6 +268,10 @@ OpenXPKI/Server/Workflow/Condition/LdapDnAvailable.pm
 OpenXPKI/Server/Workflow/Condition/UseLdap.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
 OpenXPKI/Server/Workflow/Condition/CheckForkedWorkflowChildren.pm
+OpenXPKI/Server/Workflow/Condition/SCEPClient.pm
+OpenXPKI/Server/Workflow/Condition/SCEPClientAutoIssuance.pm
+OpenXPKI/Server/Workflow/Condition/SCEPClientCertValid.pm
+OpenXPKI/Server/Workflow/Condition/SCEPClientEnrollment.pm
 
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm
