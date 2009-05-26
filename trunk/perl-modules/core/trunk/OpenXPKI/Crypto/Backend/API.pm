@@ -54,7 +54,7 @@ sub __init_command_params : PRIVATE {
                           "OUT_PASSWD" => 0,
                           "ENC_ALG"    => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
                           "IN"         => ["RSA","DSA","PKCS8"],
-                          "OUT"        => ["PEM","DER","PKCS8",'OPENSSL_RSA','OPENSSL_EC'],
+                          "OUT"        => ["PEM","DER","PKCS8",'OPENSSL_RSA','OPENSSL_DSA','OPENSSL_EC'],
                           "DATA"       => 1,
                           'DECRYPT'    => 0,
                          },

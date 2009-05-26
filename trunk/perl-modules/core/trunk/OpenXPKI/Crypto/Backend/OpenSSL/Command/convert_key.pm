@@ -78,6 +78,7 @@ sub get_command
         $self->{OUT} ne "DER" &&
         $self->{OUT} ne "PKCS8" && 
         $self->{OUT} ne "OPENSSL_RSA" &&
+        $self->{OUT} ne "OPENSSL_DSA" &&
         $self->{OUT} ne "OPENSSL_EC")
     {
         OpenXPKI::Exception->throw (
@@ -117,6 +118,21 @@ sub get_command
     {
         $command  = "pkcs8 ";
         $command2 = "rsa ";
+        if (! $self->{DECRYPT}) {
+            $command2 .= '-' . $self->{ENC_ALG};
+        }
+        $command2 .= " -in " . $self->{FIRSTOUTFILE};
+        $command2 .= " -out " . $self->{OUTFILE}; 
+        $command2 .= " -engine $engine" if ($engine);
+        if ($self->{OUT_PASSWD}) {
+            $command2 .= " -passout env:outpwd";
+            $self->set_env('outpwd' => $self->{OUT_PASSWD});
+        }
+    }
+    elsif ($self->{OUT} eq 'OPENSSL_DSA')
+    {
+        $command  = "pkcs8 ";
+        $command2 = "dsa ";
         if (! $self->{DECRYPT}) {
             $command2 .= '-' . $self->{ENC_ALG};
         }
