@@ -65,6 +65,10 @@ sub execute {
             'ISSUER_IDENTIFIER' => $ca_identifier,
             'PUBLICATION_DATE'  => -1, # this CRL has not been published yet
         },
+        ORDER => [
+            'LAST_UPDATE',
+        ],
+        REVERSE => 1,
     );
     if (! defined $crl_db) {
 	OpenXPKI::Exception->throw(
