@@ -63,6 +63,15 @@ sub get_url_for_ticket {
     return CTX('notification')->get_url_for_ticket($arg_ref);
 }
 
+sub get_ticket_info {
+    ##! 1: 'start'
+    my $self     = shift;
+    my $arg_ref  = shift;
+    
+    ##! 1: 'end'
+    return CTX('notification')->get_ticket_info($arg_ref);
+}
+
 sub get_ca_cert
 {
     ##! 1: "start, forward and finish"

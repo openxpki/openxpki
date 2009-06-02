@@ -277,6 +277,36 @@ sub close {
     return;
 }
 
+sub get_ticket_info {
+    ##! 1: 'start'
+    my $self      = shift;
+    my $ident     = ident $self;
+    my $ticket    = shift;
+    ##! 16: 'ticket: ' . $ticket
+
+    $self->__login();
+    ##! 4: 'successfully logged in to the RT system'
+
+    my $info;
+    eval {
+        $info = $rt_of{$ident}->show(
+            type => 'ticket',
+            id   => $ticket,
+        );
+    };
+    if (my $err = $EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_RT_SHOW_FAILED',
+            params  => {
+                'ERROR' => $err,
+            },
+        );
+    }
+    ##! 16: 'info: ' . Dumper $info
+
+    return $info;
+}
+
 sub get_url_for_ticket {
     ##! 1: 'start'
     my $self      = shift;

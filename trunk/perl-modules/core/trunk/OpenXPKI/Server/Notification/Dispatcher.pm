@@ -218,6 +218,35 @@ sub notify {
     return $results;
 }
 
+sub get_ticket_info {
+    ##! 1: 'start'
+    my $self      = shift;
+    my $ident     = ident $self;
+    my $arg_ref   = shift;
+    my $notifier  = $arg_ref->{NOTIFIER};
+    my $ticket    = $arg_ref->{TICKET};
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    if (! defined $notifier_of{$ident}->{$pki_realm} ) {
+        return undef;
+    }
+    my $count = scalar (@{ $notifier_of{$ident}->{$pki_realm} });
+
+    # find the right notifier
+    for (my $i = 0; $i < $count; $i++) {
+        my $not = $notifier_of{$ident}->{$pki_realm}->[$i];
+        if ($not->{NAME} eq $notifier) {
+            my $info;
+            eval {
+                # try to get a ticket URL from the notifier
+                $info = $not->{OBJECT}->get_ticket_info($ticket);
+            };
+            return $info;
+        }
+    }
+    return undef;
+}
+
 sub get_url_for_ticket {
     ##! 1: 'start'
     my $self      = shift;
