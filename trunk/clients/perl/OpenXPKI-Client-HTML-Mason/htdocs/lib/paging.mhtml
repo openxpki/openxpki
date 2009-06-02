@@ -30,7 +30,11 @@
 %               $link_url .= ';' . $key . '=' . $m->request_args()->{$key};
 %           }
 %       }
+%      ADDITIONAL_PARAM:
 %       foreach my $key (keys %{ $additional_params }) {
+%           # ignore key if it is already present in the request args
+%           # as it already got added to the URL in the ARGS block above
+%           next ADDITIONAL_PARAM if (exists $m->request_args()->{$key});
 %           if (ref $additional_params->{$key} eq 'ARRAY') {
 %               foreach my $entry (@{ $additional_params->{$key} }) {
 %                   $link_url .= ';' . $key . '=' . $entry;
