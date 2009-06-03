@@ -52,6 +52,9 @@
         {
             $profile = $profiles[0];
         }
+        # only use profiles which have I18N tags, others are "abstract"
+        # ones used only as a blueprint for the concrete ones
+        @profiles = grep { $_ =~ /^I18N/ } @profiles;
     }
 
     if ($filled or scalar @profiles == 1)

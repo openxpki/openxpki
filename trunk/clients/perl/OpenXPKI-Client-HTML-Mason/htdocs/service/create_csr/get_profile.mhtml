@@ -50,6 +50,10 @@
     }
     my @select_values = ();
 
+    # only use profiles which have I18N tags, others are "abstract"
+    # ones used only as a blueprint for the concrete ones
+    @possible_profiles = grep { $_ =~ /^I18N/ } @possible_profiles;
+
     foreach my $profile (@possible_profiles) {
         push @select_values, {
             VALUE => $profile,
