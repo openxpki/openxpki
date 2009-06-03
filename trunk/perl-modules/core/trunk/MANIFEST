@@ -254,6 +254,7 @@ OpenXPKI/Server/Workflow/Condition/WorkflowChildrenSuccessfullyFinished.pm
 OpenXPKI/Server/Workflow/Condition/InitialEnrollmentOrRenewal.pm
 OpenXPKI/Server/Workflow/Condition/CorrectTiming.pm
 OpenXPKI/Server/Workflow/Condition/IsValidSignature.pm
+OpenXPKI/Server/Workflow/Condition/IsValidSignatureWithRequestedDN.pm
 OpenXPKI/Server/Workflow/Condition/CorrectNumberOfValidCerts.pm
 OpenXPKI/Server/Workflow/Condition/SignedUsingOriginalCertOrSelfSigned.pm
 OpenXPKI/Server/Workflow/Condition/MoreCertsToTest.pm
