@@ -31,6 +31,7 @@
 <input type="hidden" name="cert_identifier" value="<% $cert_identifier %>">
 
 <table>
+% if (scalar @wf_types > 1) {
     <tr<& /service/create_crr/highlight_error.mhtml, crr => $crr, name => 'workflow_type' &>>
         <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_WORKFLOW_TYPE') %></td>
         <td>
@@ -40,6 +41,10 @@
                 'values'  => [ @wf_types ] &>
         </td>
     </tr>
+% }
+% else  {
+<input type=hidden name="workflow_type" value="<% $wf_types[0]->{VALUE} %>"/>
+% }
     <tr<& /service/create_crr/highlight_error.mhtml, crr => $crr, name => 'revocation_reason' &>>
         <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_REVOCATION_REASON') %></td>
         <td>
