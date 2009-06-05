@@ -209,7 +209,7 @@
       optional parameter to restrict the roles that can be specified
       by the user in the CSR, if not present, all available roles are
       considered valid.
-      <param name="valid_roles" value="TLS Server,TLS Client"/>
+      <param name="allowed_roles" value="TLS Server,TLS Client"/>
       -->
   </condition>
   
