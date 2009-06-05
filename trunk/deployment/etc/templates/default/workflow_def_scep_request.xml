@@ -61,15 +61,21 @@
 	    resulting_state="PENDING">
       <condition name="client_enrollment"/>
       <condition name="client_cert_valid"/>
+      <condition name="csr_has_valid_role"/>
     </action>
     <action name="set_context_from_csr2"
 	    resulting_state="SCEP_CLIENT_AUTO_ISSUE">
       <condition name="client_autoissuance"/>
       <condition name="client_cert_valid"/>
+      <condition name="csr_has_valid_role"/>
     </action>
     <action name="set_error_code_2"
             resulting_state="FAILURE">
             <condition name="!client_cert_valid"/>
+    </action>
+    <action name="set_error_code_2_too"
+            resulting_state="FAILURE">
+            <condition name="!csr_has_valid_role"/>
     </action>
   </state>
 

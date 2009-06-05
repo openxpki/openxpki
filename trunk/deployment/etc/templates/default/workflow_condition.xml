@@ -191,7 +191,7 @@
   <condition name="auto_renewal_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
 
   <condition name="auto_approval_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
-  
+
   <!-- SCEP internal settings, only change parameters here -->
   <condition name="is_initial_enrollment" class="OpenXPKI::Server::Workflow::Condition::InitialEnrollmentOrRenewal">
     <param name="RDN_filter" value="CN,O"/>
@@ -204,6 +204,15 @@
   <condition name="correct_timing" class="OpenXPKI::Server::Workflow::Condition::CorrectTiming">
     <param name="difference" value="+0003"/> <!-- renewal can only begin 3 months before the certificate becomes invalid -->
   </condition>
+  <condition name="csr_has_valid_role" class="OpenXPKI::Server::Workflow::Condition::SCEPClientCSRValidRole">
+      <!--
+      optional parameter to restrict the roles that can be specified
+      by the user in the CSR, if not present, all available roles are
+      considered valid.
+      <param name="valid_roles" value="TLS Server,TLS Client"/>
+      -->
+  </condition>
+  
   <condition name="signed_using_original_cert" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/>
   <condition name="scep_client" class="OpenXPKI::Server::Workflow::Condition::SCEPClient"/>
   <condition name="client_enrollment" class="OpenXPKI::Server::Workflow::Condition::SCEPClientEnrollment"/>

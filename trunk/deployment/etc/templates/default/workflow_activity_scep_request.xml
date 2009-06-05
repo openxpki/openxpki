@@ -32,6 +32,9 @@
   <action name="set_error_code_2"
          class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
     error_code="badRequest"/> 
+  <action name="set_error_code_2_too"
+         class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
+    error_code="badRequest"/> 
   <action name="reject_csr"
          class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
     error_code="badRequest"/> 

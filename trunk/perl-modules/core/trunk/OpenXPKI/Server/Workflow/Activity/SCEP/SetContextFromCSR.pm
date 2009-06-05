@@ -32,9 +32,12 @@ sub execute {
     ##! 32: 'csr_obj: ' . Dumper $csr_obj
     my $subject = $csr_obj->get_parsed('BODY', 'SUBJECT');
     $context->param('cert_subject' => $subject);
-    $context->param('cert_role' => ''); # FIXME, is this correct?
-                                        # maybe we should make this
-                                        # a config option?
+    if (! defined $context->param('cert_role')) {
+        # only set if it hasn't been set yet (by the user in the CSR,
+        # for example)
+        # FIXME - the role to set should maybe be a config option
+        $context->param('cert_role' => '');
+    }
 
     my @subject_alt_names = $csr_obj->get_subject_alt_names();
 
