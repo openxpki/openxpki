@@ -158,7 +158,7 @@ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
 msgstr "Links for Microsoft Internet Explorer"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA"
-msgstr "Links for Mozilla, Firefox"
+msgstr "Links for Firefox/Mozilla"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
 msgstr "PEM (CRT) format"
@@ -196,7 +196,7 @@ msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
 msgstr "Key algorithm"
 
 msgid "I18N_OPENXPKI_CERT_KEY_EXPONENT"
-msgstr "Key exponent"
+msgstr "Key exponent (for RSA)"
 
 msgid "I18N_OPENXPKI_CERT_KEY_SIZE"
 msgstr "Key size"
@@ -544,31 +544,31 @@ msgstr "Reject certificate signing request"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
 msgstr ""
-"Following you can find the most important information about the selected CA "
-"certificate. Below you will find some links to install the certificate. If "
-"you want a more complete overview about the certificate then please follow "
+"In the following you find the most important information about the selected CA "
+"certificate and some links to install the certificate. If "
+"you want a more complete overview about the certificate, please follow "
 "the link to the detailed certificate information."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
 msgstr "CA certificate"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_DESCRIPTION"
-msgstr "Following you can find all the details of the selected certificate."
+msgstr "Below you find all details of the selected certificate."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
 msgstr "Detailed certificate information"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_CRL_ISSUANCE_PENDING_DESC"
 msgstr ""
-"Revocation has been started for this certificate and it will be included in "
-"the next CRL (Certificate Revocation List). This means it should probably no "
-"longer be used."
+"Revocation has been started for this certificate. It will be included in "
+"the next CRL (Certificate Revocation List) and should probably not "
+"be used any longer."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_REVOKED_DESC"
 msgstr "This certificate has been revoked, it should not be used any longer."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_SUSPENDED_DESC"
-msgstr "This certificate has been suspended and should not be used currently."
+msgstr "This certificate has been suspended and should currently not be used."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE"
 msgstr "Certificate #__SERIAL__"
@@ -1112,9 +1112,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
 msgstr ""
 "Please click on 'Install certificate' to install a certificate for a "
 "corresponding private key with Microsoft Internet Explorer. You can also "
-"choose a Cryptographic Service Provider (CSP) to use for installation. If "
-"you do not have a private key for the selected certificate or you are not "
-"using Internet Explorer then this page is useless for you."
+"choose a Cryptographic Service Provider (CSP) to use for installation."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
 msgstr "Certificate installed successfully"
@@ -1160,13 +1158,11 @@ msgstr "Enter CSP name"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_PASSWORD_NO_SPECIAL_CSP"
 msgstr "Do not embed CSP name"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_WRONG_FORMAT_DESC"
 msgstr "The requested format __FORMAT__ is not supported."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PRIVKEY_WRONG_FORMAT_TITLE"
-msgstr "Wrong certificate format"
+msgstr "Wrong private key format"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_HIDE"
 msgstr "hide"
@@ -1238,7 +1234,7 @@ msgstr "Sign random challenge and login"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
 msgstr ""
-"The logout failed. Please contact immediately the reponsible administrators. "
+"The logout failed. Please contact the reponsible administrators immediately. "
 "If you still want to logout securely then you have to go to another web page "
 "(e.g. http://127.0.0.1) and after this you must delete the cache of your "
 "browser. It is not relevant if the the webpage can be successfully loaded."
@@ -1330,7 +1326,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKI_REALM"
 msgstr "PKI Realm"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET"
-msgstr "reset"
+msgstr "Reset"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"
 msgstr "Serverside key generation"
@@ -1406,7 +1402,7 @@ msgstr ""
 "client then please use the type of key generation."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT"
-msgstr "OK"
+msgstr "Send"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME"
 msgstr "Name"

@@ -136,13 +136,11 @@ msgstr "Zertifikat"
 msgid "I18N_OPENXPKI_CERTIFICATE_IDENTIFIER"
 msgstr "Zertifikats-ID"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_AIA"
-msgstr "Authority Information Access"
+msgstr "CA Informationszugang (Authority Information Access)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_CDPS"
-msgstr "CRL Verteiler"
+msgstr "CRL Verteilerpunkte"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD"
 msgstr "Zertifkat herunterladen"
@@ -154,20 +152,20 @@ msgid "I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL"
 msgstr "Internet Explorer"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_INTERNET_EXPLORER"
-msgstr "Microsoft Internet Explorer"
+msgstr "Links für Microsoft Internet Explorer"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_MOZILLA"
-msgstr "Firefox / Mozilla"
+msgstr "Links für Firefox/Mozilla"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PEM"
-msgstr "PEM-, CRT-Format"
+msgstr "PEM (CRT) Format"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_PRIV_KEY_EXISTS"
 msgstr "Zu diesem Zertifikat können Sie (mit dem richtigen Passwort) den privaten"
 "Schlüssel herunterladen"
 
 msgid "I18N_OPENXPKI_CERT_DOWNLOAD_TXT"
-msgstr "Textformat"
+msgstr "Textformat (txt)"
 
 msgid "I18N_OPENXPKI_CERT_EMAIL"
 msgstr "E-Mailadresse"
@@ -203,7 +201,7 @@ msgid "I18N_OPENXPKI_CERT_NOTAFTER"
 msgstr "Gültig bis"
 
 msgid "I18N_OPENXPKI_CERT_NOTBEFORE"
-msgstr "Gültig von"
+msgstr "Gültig ab"
 
 msgid "I18N_OPENXPKI_CERT_NOT_YET_VALID"
 msgstr "noch nicht gültig"
@@ -270,9 +268,8 @@ msgstr "Status"
 msgid "I18N_OPENXPKI_CERT_SUBJECT"
 msgstr "Name"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_SUBJECT_KEY_IDENTIFIER"
-msgstr "Dieser Workflow erstellt ein neues Zertifikat."
+msgstr "Inhaberschlüssel-ID (Subject Key Identifier)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_SUSPENDED"
@@ -550,7 +547,7 @@ msgstr "Ablehnen des Zertifizierungsantrages"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_DESCRIPTION"
 msgstr "Auf dieser Seiten finden Sie die wichtigsten Informationen über das"
-"ausgewählte CA-Zertifikat. Außerdem gibt es mehrere Links um das CA-"
+"ausgewählte CA-Zertifikat und mehrere Links um das CA-"
 "Zertifikat zu installieren. Wenn Sie mehr Informationen benötigen, dann"
 "folgen Sie dem Link zu der ausführlicheren Zertifikatsseite."
 
@@ -558,13 +555,13 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CA_CERT_INFO_TITLE"
 msgstr "CA-Zertifikat"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_DESCRIPTION"
-msgstr "Hier finden Sie nun alle Details bzgl. des ausgewählten Zertifikats."
+msgstr "Alle Details bzgl. des ausgewählten Zertifikats."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE"
 msgstr "Detailierte Zertifikatsinformationen"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_CRL_ISSUANCE_PENDING_DESC"
-msgstr "Für dieses Zertifikat wurde der Rückrufprozess begonnen, es wird Teil der"
+msgstr "Für dieses Zertifikat wurde der Rückrufprozess gestartet, es wird Teil der"
 "nächsten CRL (Certificate Revocation List) sein. Daher sollte es vermutlich"
 "nicht mehr benutzt werden."
 
@@ -691,7 +688,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_BROWSER_DETECTION"
 msgstr "Automatische Browsererkennung"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO"
-msgstr "Details des Zertifikats"
+msgstr "Information zum Zertifikat"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO_INSTALL_IN_BROWSER"
@@ -1217,21 +1214,19 @@ msgstr "Bitte wählen Sie eine Methode zur Authentifizierung (Anmeldung) aus."
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_AUTHENTICATION_STACK_TITLE"
 msgstr "Auswählen des Anmeldeverfahrens"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_DESC"
-msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
+msgstr "Bitte klicken Sie auf 'Zertifikat installieren', um im Internet Explorer ein Zertifikat mit einem "
+"entsprechenden privaten Schlüssel zu installieren. Sie können für die Installation auch einen einen "
+"Cryptographic Service Provider (CSP) wählen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_INSTALLED_SUCCESSFULLY"
-msgstr "PKI Realm"
+msgstr "Zertifikat erfolgreich installiert"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_ENROLL_TITLE"
-msgstr "PKI Realm"
+msgstr "Microsoft Internet Explorer Zertifikatbeantragung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_IE_INSTALL"
-msgstr "Der DNS-Name __DNS__ enthält einen Syntaxfehler."
+msgstr "Zertifikat installieren"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_GET_CERT_WRONG_CONTENT_TYPE_DESC"
 msgstr "Der angegebene Inhalts-Typ __CONTENT_TYPE__ wird nicht unterstützt."
@@ -1333,18 +1328,16 @@ msgstr "Diese Art der Schlüsselerstellung wird durch den Microsoft Internet Exp
 "benutzt.Wenn Sie diesen benutzen und dien Schlüssel auf Ihrem lokalen"
 "Computer erstellen und speichern wollen, dann ist dies die richtige Auswahl."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_CAOP_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Meine Aufgaben"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_DESCRIPTION"
 msgstr "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Untenstehend"
 "finden Sie eine Übersicht über die zuletzt von Ihnen erstellten Workflows"
 "(falls vorhanden)."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_RAOP_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Meine Aufgaben"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE"
 msgstr "Web-Schnittstelle des Trustcenters"
@@ -1356,7 +1349,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN_USING_SIGNATURE"
 msgstr "Signieren Sie die zufällige Challenge und loggen Sie sich anschließen ein"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_FAILED_DESCRIPTION"
-msgstr "Dass Abmelden ist fehlgeschlagen. Bitte kontaktieren Sie unbedingt die für"
+msgstr "Dass Abmelden ist fehlgeschlagen. Bitte kontaktieren Sie umgehend die für"
 "Sie zuständigen Administratoren. Um sich sicher abzumelden, müssen Sie auf"
 "eine andere Webseite gehen (z.B. http://127.0.0.1) und danach sofort den"
 "Cache Ihres Browsers löschen. Hierbei ist es nicht wichtig, ob das Laden der"
@@ -1369,10 +1362,10 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_NEW_LOGIN"
 msgstr "Erneut anmelden"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_OK"
-msgstr "Das Abmelden war erfolgreich."
+msgstr "Erfolgreich abgemeldet."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_DESCRIPTION"
-msgstr "Das Abmelden war erfolgreich. Wenn Sie sich erneut anmelden wollen, so"
+msgstr "Sie haben sich erfolgreich abgemeldet. Wenn Sie sich erneut anmelden wollen, "
 "benutzen Sie bitte den folgenden Link."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_LOGOUT_SUCCESS_TITLE"
@@ -3184,7 +3177,7 @@ msgid "I18N_OPENXPKI_HTML_MENU_PENDING_CSRS"
 msgstr "Ausstehende Signierungs-Anträge (CSRs)"
 
 msgid "I18N_OPENXPKI_HTML_MENU_POLICY_DOCUMENTS"
-msgstr "Richtlinien-Dokumente"
+msgstr "Policy-Dokumente (Richtlinien)"
 
 msgid "I18N_OPENXPKI_HTML_MENU_REQUEST"
 msgstr "Anträge"
@@ -6170,10 +6163,10 @@ msgid "I18N_OPENXPKI_WORKFLOW_ACTIVITY_CERTIFICATEISSUANCE_ISSUE_UNSUPPORTED_CSR
 msgstr "Zertifikatserstellung vorbereitet"
 
 msgid "I18N_OPENXPKI_WORKFLOW_CHILDREN"
-msgstr "Untergeordnete Abläufe"
+msgstr "Untergeordnete Workflows"
 
 msgid "I18N_OPENXPKI_WORKFLOW_PARENT"
-msgstr "Übergeordneter Ablauf"
+msgstr "Übergeordneter Workflow"
 
 msgid "I18N_OPENXPKI_WRITE_FILE_ALREADY_EXISTS"
 msgstr "Es existiert bereits eine Datei mit dem angegebenen Dateinamen"
