@@ -148,13 +148,14 @@ sub key_usable {
     my $section = '';
     my $worldinfo;
     eval {
-	local $SIG{ALRM} = sub { die "alarm\n" };
+        local $SIG{ALRM} = sub { die "alarm\n" };
 	alarm $self->{CHECKCMDTIMEOUT};
 
 	##! 4: "keyOnline: exec: " . join (' ', @cmd)
 	my $handle;
 	if (! open $handle, join (' ', @cmd) . "|") {
 	    ##! 4: "nCipher nfkminfo: could not run command '" . join (' ', @cmd) . "'"
+	    alarm 0;
 	    OpenXPKI::Exception->throw(
 		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_EXEC_NFKMINFO_COMMAND_ERROR",
 		params  => { 
@@ -184,10 +185,12 @@ sub key_usable {
 	    }
 	}
 	close $handle;
+	alarm 0;
     };
 
     # handle exceptions
     if ($EVAL_ERROR) {
+        alarm 0;
 	if ($EVAL_ERROR ne "alarm\n") {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
@@ -333,6 +336,7 @@ sub online {
 	##! 4: "exec: $cmd"
 	my $handle;
 	if (! open $handle, $cmd . '|') {
+	    alarm 0;
 	    ##! 4: "nCipher enquiry: could not run command '$cmd'"
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_FAILED",
@@ -362,10 +366,12 @@ sub online {
 	    }
 	}
 	close $handle;
+	alarm 0;
     };
 
     # handle exceptions
     if ($EVAL_ERROR) {
+        alarm 0;
 	if ($EVAL_ERROR ne "alarm\n") {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
@@ -456,6 +462,7 @@ sub __getKeyHash {
 	##! 2: "exec: $cmd"
 	my $handle;
 	if (! open $handle, $cmd . '|') {
+	    alarm 0;
             ##! 4: "nCipher nfkminfo: could not run command '$cmd'"
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_FAILED",
@@ -480,6 +487,7 @@ sub __getKeyHash {
     };
     # handle exceptions
     if ($EVAL_ERROR) {
+        alarm 0;
 	if ($EVAL_ERROR ne "alarm\n") {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
