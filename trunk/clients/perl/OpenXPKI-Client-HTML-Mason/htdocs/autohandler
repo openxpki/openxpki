@@ -88,6 +88,14 @@
 %   ## then we try to call it (security especially permission
 %   ## enforcement is managed by the daemon not by the web client)
 %   if ($next_comp) {
+%     # redirect to /service/index.html if next_comp contains authentication or logout page
+%     # if next_comp contains 'authentication' the user after login will either get 
+%     #    'CONNECTION_WORKING' message (with Apache 1.3) or
+%     #    an error message (with Apache 2.x)
+%     # if next_comp contains 'logout.html' the user will be logged out just after login
+%     $next_comp =~ s{\/authentication\/index}{\/service\/index}ms if $next_comp =~ m{\/authentication\/index\.html}ms;
+%     $next_comp =~ s{\/authentication\/dhandler}{\/service\/index\.html}ms if $next_comp =~ m{\/authentication\/dhandler}ms;
+%     $next_comp =~ s{\/logout}{\/index}ms if $next_comp =~ m{logout\.html}ms;
 %     # if next_comp already contains session_id and role then remove these items 
 %     # to prevent mixture with newly received session_id and role
 %     my ($old_session_id) = ($next_comp =~ m{\A .* __session_id=(.+?) & .* \z }xms);
