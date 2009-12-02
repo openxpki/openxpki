@@ -142,7 +142,7 @@
           );
           $client->init_session({SESSION_ID => $__session_id});
       };
-      if ($EVAL_ERROR)
+      if (($EVAL_ERROR) or ($client->is_logged_in() != 1))
       {
           ## kill the session
           ## usually this is a timeout of the session
