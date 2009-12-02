@@ -99,8 +99,7 @@
   if (my $exc = OpenXPKI::Exception->caught()) {
         if ($exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_CONNECTION_FAILED') {
             # if we can not connect to the server, tell the user so
-            print '<h1>' . i18nGettext('I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_TITLE') . '</h1><p>' . i18nGettext('I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_DESC') . '</p>';
-            return;
+            return 'E_'.'<h1>' . i18nGettext('I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_TITLE') . '</h1><p>' . i18nGettext('I18N_OPENXPKI_HTML_MASON_SERVER_DOWN_DESC') . '</p>';
         }
         else {
             # otherwise, just rethrow, this is an internal error that the
@@ -109,7 +108,7 @@
         }
   }
   elsif ($EVAL_ERROR) {
-    die $EVAL_ERROR;
+    return 'E_'.'<p>'.$EVAL_ERROR.'</p>';
   }
 
   my %args;
@@ -154,19 +153,34 @@
             msg   => 'eval error in init_session: ' . $EVAL_ERROR,
           );
           return undef if (not $init);
-          $client = OpenXPKI::Client::HTML::Mason->new(
-                    {
-                        SOCKETFILE => $socketfile,
-                        TIMEOUT    => 120,
-                    });
-          $client->init_session();
+          eval {
+              $client = OpenXPKI::Client::HTML::Mason->new(
+                        {
+                            SOCKETFILE => $socketfile,
+                            TIMEOUT    => 120,
+                       });
+          };
+          if ($EVAL_ERROR) {
+              return 'E_'.'<p>'.$EVAL_ERROR.'</p>';
+          }
+          eval {
+              $client->init_session();
+          };
+          if ($EVAL_ERROR) {
+              return 'E_'.'<p>'.$EVAL_ERROR.'</p>';
+          }
           $m->comp ('/lib/debug.mhtml',
             level => 2,
             msg   => 'init was defined, new client object created and init_session_called',
           );
       }
   } else {
-      $client->init_session();
+      eval {
+          $client->init_session();
+      };
+      if ($EVAL_ERROR) {
+          return 'E_'.'<p>'.$EVAL_ERROR.'</p>';
+      }
   }
   $__session_id = $client->get_session_id();
   $session_cache{$__session_id}->{client} = $client;

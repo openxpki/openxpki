@@ -27,9 +27,20 @@
     );
 
     ## let's init the environment
-    $m->comp('/authentication/session.mhtml',
+    my $result = $m->comp('/authentication/session.mhtml',
              'init'         => 1,
              '__session_id' => $__session_id);
+    if (! (exists $context->{client}) ) {
+        if (defined $result and length $result and ($result =~ m{ \A E_}xms)) {
+            $result =~ s{ \A E_ (.* \z) }{ $1 }xms;
+            $result = i18nGettext($result);
+        } else {
+            $result = '<p>'.i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SESSION_UNKNOWN_ERROR').'</p>';
+        }
+        print $result;
+        return;
+    }
+
     my $session_id = $context->{session_id};
     my $client     = $context->{client};
     if (! defined $client) {
