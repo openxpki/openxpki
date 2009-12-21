@@ -253,16 +253,16 @@
 
     </div> <!-- end of header -->
 
+% if (not $auth_stuff and not $no_menu) {
+%   my $sidebar_html = $m->scomp('/lib/get_menu.mhtml', first_level => 1, nested      => 1, mode        => "LIST");
+%   if ($sidebar_html !~ m{<ul><\/ul>}) {
     <div id="sidebar">
       <div> <!-- this div controls the distance between the list and the window -->
-% if (not $auth_stuff and not $no_menu) {
-        <& /lib/get_menu.mhtml,
-          first_level => 1,
-          nested      => 1,
-          mode        => "LIST" &>
-%}
+<% $sidebar_html | n %>
       </div>
     </div> <!-- end of sidebar -->
+%   }
+% }
 
     <div id="main">
 % } ## end of if not binary
