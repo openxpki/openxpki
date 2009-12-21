@@ -222,11 +222,15 @@
 %           $urls->{'en'} =~ s/__language=[^;]*/__language=en_US/;
 %           $urls->{'ru'} =~ s/__language=[^;]*/__language=ru_RU/;
 %           $urls->{'de'} =~ s/__language=[^;]*/__language=de_DE/;
+%           my $translations;
+%           $translations->{'en'} = 'English';
+%           $translations->{'ru'} = '&#1056;&#1091;&#1089;&#1089;&#1082;&#1080;&#1081;';
+%           $translations->{'de'} = 'Deutsche';
 %           my @configured_languages = $m->comp('/lib/configured_languages.mhtml');
 %           if (scalar @configured_languages > 1) {
 %               # only show flags if there is a choice ...
 %               foreach my $lang (@configured_languages) {
-                    <a href="<% $urls->{$lang} %>"><img src="<% $context->{menu}->get_root() %>/images/<% $lang %>.png" style="margin-right:-1em"></a>
+                    <a href="<% $urls->{$lang} %>"><img src="<% $context->{menu}->get_root() %>/images/<% $lang %>.png" style="margin-right:-1em" alt="<% $translations->{$lang} | n %>" /></a>
 %               }
 %           }
        &nbsp;        <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />

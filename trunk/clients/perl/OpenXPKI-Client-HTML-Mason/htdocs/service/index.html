@@ -26,17 +26,13 @@
 % }
 % elsif ($role eq 'RA Operator') {
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_RAOP_TITLE') %></h1>
-<p>
   <& /service/workflow/show_pending_requests.html,
     'heading' => 2,
   &>
-</p>
 <hr/>
-<p>
   <& /service/workflow/show_pending_crrs.html,
     'heading' => 2,
   &>
-</p>
 % }
 % elsif ($role eq 'CA Operator') {
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_CAOP_TITLE') %></h1>
@@ -50,4 +46,3 @@
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_DESCRIPTION') %>
 </p>
 % }
-</p>
