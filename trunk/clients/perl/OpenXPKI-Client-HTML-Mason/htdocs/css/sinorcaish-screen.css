@@ -446,6 +446,9 @@ table.simple th.right {
 				/* paper.  "floatbox" is used to provide    */
 				/* floating boxes that may appear anywhere  */
 				/* in the main content; they ARE printed.   */
+
+div.clearer  {clear:  both;  line-height:  0;  height:  0; margin: 0; padding: 0;}
+
 .floatbox,
 .navbox {
    overflow:        visible;

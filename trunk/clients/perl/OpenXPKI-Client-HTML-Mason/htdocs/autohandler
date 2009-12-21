@@ -277,6 +277,7 @@
 </%perl>
 
 % if ($m->request_comp()->title() !~ /^\/binary\//) {
+    <div class="clearer">&nbsp;</div>
     </div>  <!-- main -->
 
     <div id="footer"><small>&copy; 2006-2009 <a href="http://www.openxpki.org">The OpenXPKI Project</a></small>
