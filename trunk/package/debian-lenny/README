@@ -1,0 +1,90 @@
+How to create these debian packages?
+===================================
+
+Note: set the environment variable "EMAIL" to the address you
+wish to publish as the packager.
+
+1. Completely checkout the major subversion trunk area.
+
+2. aptitude install libversion-perl libmodule-build-perl \
+	liblog-log4perl-perl libdatetime-perl libexception-class-perl \
+	libapache-request-perl libxml-sax-perl libxml-sax-writer-perl \
+	libtree-dagnode-perl liburi-perl libclass-factory-perl \
+	libxml-simple-perl libdatetime-format-strptime-perl \
+	libhttp-server-simple-perl libdata-page-perl
+
+3. cd trunk/package/debian/
+
+4. make cpan_dependency
+
+5. dpkg -i deb/cpan/*.deb
+
+6. make core
+
+7. dpkg -i deb/core/libopenxpki-perl*.deb
+
+8. make perl-client-api
+
+9. dpkg -i deb/client_api/libopenxpki-client-perl*.deb
+
+10. make i18n && make deployment && make scep-client && \
+	make mason-html-client 
+
+11. dpkg -i deb/client/openxpki-i18n_*.deb 				\
+	dpkg -i deb/client/libopenxpki-client-html-mason-perl_*.deb 	\
+	dpkg -i deb/client/openxpki-deployment_*.deb			\                               
+	dpkg -i deb/client/libopenxpki-client-scep-perl_*.deb		
+	
+The steps 6 to 9 are necessary because the packages libopenxpki-perl and
+libopenxpki-client-perl are required for package builds.
+
+How to create a special debian package like libopenxpki-perl?
+=============================================================
+
+1. Completely checkout the major subversion trunk area.
+
+2. cd trunk/package/debian/core
+
+3. make
+
+
+How to handle outdated Perl packages?
+=====================================
+
+1. Switch deb-src to an actual distribution.
+
+2. apt-get -y build-dep MODULE
+
+3. apt-get -t testing -b source MODULE
+
+4. dpkg -i libMODULE-perl_*.deb
+
+Example:
+
+apt-get build-dep libclass-std-perl
+apt-get -b source libclass-std-perl
+dpkg -i libclass-std-perl_0.0.9-2_all.deb
+
+or
+
+apt-get -y build-dep libhook-lexwrap-perl
+apt-get -t testing -b source libhook-lexwrap-perl
+dpkg -i libhook-lexwrap-perl_0.20-2_all.deb
+
+How to handle missing Perl packages?
+====================================
+
+1. apt-get install dh-make-perl
+
+2. dh-make-perl --build --cpan MODULE (or you use dh-make-perl PERL_SRC_DIR)
+
+3. dpkg -i libMODULE-perl_*.deb
+
+Example:
+
+dh-make-perl --build --cpan XML::Filter::XInclude
+dh-make-perl --build --cpan XML::Validator::Schema
+dh-make-perl --build --cpan Data::Password
+dpkg -i libxml-filter-xinclude-perl_1.0-1_all.deb
+dpkg -i libxml-validator-schema-perl_1.08-1_all.deb
+dpkg -i libdata-password-perl_1.07-1_all.deb
