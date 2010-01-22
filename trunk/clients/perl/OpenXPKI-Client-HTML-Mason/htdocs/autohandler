@@ -48,9 +48,9 @@
       return;
   }
 
-  if ($m->base_comp()->title() ne '/index.html') {
+  if ($m->base_comp()->path() ne '/index.html') {
       if (! defined $next_comp) {
-          $next_comp = $m->base_comp()->title();
+          $next_comp = $m->base_comp()->path();
           if (scalar keys %{ $m ->request_args() } > 0) {
               $next_comp .= '?';
               foreach my $key (keys %{ $m->request_args() }) {
@@ -125,7 +125,7 @@
   ## therefore we initialize the menu separately from the output
   $m->comp ('/lib/init_menu.mhtml') if (not $auth_stuff);
 </%perl>
-% if ($m->request_comp()->title() !~ /^\/binary\//) {
+% if ($m->request_comp()->path() !~ /^\/binary\//) {
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
@@ -158,7 +158,7 @@
       <div class="right">
 % # if (! $m->request_args()->{'no_menu'}  &&
 % if (! $no_menu  &&
-%     $m->request_comp()->title() !~ m{\A /authentication/index.html \z}xms) {
+%     $m->request_comp()->path() !~ m{\A /authentication/index.html \z}xms) {
 % # show search button only if menu is activated
 % # and we are not at the login page
         <span class="hidden">Useful links:</span>
@@ -280,7 +280,7 @@
     }
 </%perl>
 
-% if ($m->request_comp()->title() !~ /^\/binary\//) {
+% if ($m->request_comp()->path() !~ /^\/binary\//) {
     <div class="clearer">&nbsp;</div>
     </div>  <!-- main -->
 
