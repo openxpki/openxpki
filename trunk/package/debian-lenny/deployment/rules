@@ -50,7 +50,7 @@ clean:
 config: config-stamp
 config-stamp:
 	dh_testdir
-	./configure -- --setcfg dir.mandir=/usr/share/man --setcfg dir.sysconfdir=/etc --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 --setcfg dir.localedir=/usr/share/locale --setcfg dir.localstatedir=/var --setcfg server.admgroup=openxpki --setcfg server.pidfile=/var/run/openxpkid.pid
+	./configure -- --setcfg dir.mandir=/usr/share/man --setcfg dir.sysconfdir=/etc --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 --setcfg dir.localedir=/usr/share/locale --setcfg dir.localstatedir=/var --setcfg dir.sitelib=/etc/openxpki/local/lib --setcfg dir.sitehtdoc=/etc/openxpki/local/htdoc --setcfg server.admgroup=openxpki --setcfg server.pidfile=/var/run/openxpkid.pid
 	touch config-stamp
 
 install: install-stamp

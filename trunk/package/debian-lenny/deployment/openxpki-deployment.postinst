@@ -23,6 +23,10 @@
 
 case "$1" in
     configure)
+
+		# Source debconf library.
+		. /usr/share/debconf/confmodule
+
 	# check for already configured trustcenter1
 	if [ -e /etc/openxpki/instances/trustcenter1/openxpki.conf ]; then
 		echo Detected and respect an old deployment. >&2
@@ -38,22 +42,55 @@ case "$1" in
 		openxpki-configure --batch --createdirs >>/var/log/messages
 		echo DONE. >&2
 	fi;
+
 	# check for already initialized database
-	if [ -e /var/openxpki/sqlite.db._backend_ ] || [ -e /var/openxpki/sqlite.db._workflow_ ]; then
-		echo Detected and respect an old database. >&2
-	else
-		echo -n Initialize database ... >&2
-                openxpkiadm initdb --config=/etc/openxpki/instances/trustcenter1/config.xml 2>>/var/log/messages
-		echo DONE. >&2
-	fi;
+    # db_get openxpki-deployment/database_type
+          BACKEND="mysql"
+    case "$BACKEND" in
+        mysql)
+  		  db_get openxpki-deployment/mysql_passwd
+          export MYSQL_PWD="$RET"
+          if ! mysqlshow openxpki; then
+              echo -n Initialize database ... >&2
+              rm -f /etc/openxpki/instances/trustcenter1/database.xml
+              rm -f /etc/openxpki/instances/trustcenter1/log_database.xml
+              openxpki-configure --batch -- \
+                --setcfg database.type=MySQL \
+                --setcfg database.name=openxpki \
+                --setcfg database.host=localhost \
+                --setcfg database.port=3306 \
+                --setcfg database.user=openxpki \
+                --setcfg database.passwd=openxpki
+              /etc/init.d/mysql start
+              mysqladmin create openxpki
+              echo "GRANT ALL PRIVILEGES on openxpki.* TO " \
+                "'openxpki'@'localhost' IDENTIFIED by 'openxpki'" \
+                | mysql mysql
+              openxpkiadm initdb \
+                --config=/etc/openxpki/instances/trustcenter1/config.xml \
+                2>>/var/log/messages
+              echo DONE. >&2
+          fi;
+        ;;
+
+        sqlite)
+    	  if [ -e /var/openxpki/sqlite.db._backend_ ] || [ -e /var/openxpki/sqlite.db._workflow_ ]; then
+    		  echo Detected and respect an old database. >&2
+    	  else
+    		  echo -n Initialize database ... >&2
+                      openxpkiadm initdb --config=/etc/openxpki/instances/trustcenter1/config.xml 2>>/var/log/messages
+	          chmod 660 /var/openxpki/sqlite.db*
+    		  echo DONE. >&2
+    	  fi;
+        ;;
+
+        *)
+          echo "Database not configured automatically" >&2
+        ;;
+    esac
 	## fix var directory
 	chown -R openxpki:openxpki /var/openxpki
-	chmod 660 /var/openxpki/sqlite.db*
 	if [ ! -e /etc/openxpki/instances/trustcenter1/ca/testdummyca1/cakey.pem ]; then
-
-		# Source debconf library.
-		. /usr/share/debconf/confmodule
-
 		# read data from debconf database
 		db_get openxpki-deployment/subject
         	SUBJECT="$RET"

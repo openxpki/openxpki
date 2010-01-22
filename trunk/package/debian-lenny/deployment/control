@@ -1,5 +1,5 @@
 Source: openxpki-deployment
-Maintainer: Michael Bell <michael.bell@web.de>
+Maintainer: Scott T. Hardin <scotty@hnsc.de>
 Priority: optional
 Build-Depends: debhelper (>= 5), perl (>= 5.6.0), libopenxpki-perl, libopenxpki-client-perl, debconf, libversion-perl, libtemplate-perl
 
@@ -9,7 +9,8 @@ Recommends:
 Section: perl
 Priority: optional
 Pre-Depends: adduser, debconf
-Depends: ${perl:Depends}, ${shlibs:Depends}, make, libopenxpki-perl, libopenxpki-client-perl, libdbi-perl, libdbd-sqlite3-perl, libtemplate-perl
+#Depends: ${perl:Depends}, ${shlibs:Depends}, make, libopenxpki-perl, libopenxpki-client-perl, libdbi-perl, libdbd-sqlite3-perl, libtemplate-perl
+Depends: ${perl:Depends}, ${shlibs:Depends}, make, libopenxpki-perl, libopenxpki-client-perl, libdbi-perl, mysql-server, libdbd-mysql-perl, libtemplate-perl
 Description: Deployment software for OpenXPKI Perl core modules
  OpenXPKI is an Open Source PKI project.
  .

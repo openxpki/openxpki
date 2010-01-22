@@ -34,7 +34,6 @@ EXTERNAL=				\
 	Class__Observable 		\
 	Time__Zone			\
 	Date__Parse			\
-	DateTime__Format__DateParse 	\
 	Locale__TextDomain		\
 	HTTP__Server__Simple__Mason	\
 	Sys__SigAction 			\
@@ -46,6 +45,11 @@ EXTERNAL=				\
 # the latest version.
 #
 #	Workflow 			\
+#
+# Put DateTime::Format::DateParse back in EXTERNAL after fixing 
+# the dependencies to Date::Parse
+#
+#	DateTime__Format__DateParse 	\
 		
 # The following were removed from EXTERNAL because lenny provides
 # these as native debian packages:
@@ -67,9 +71,9 @@ EXTERNAL=				\
 #	Class__Accessor                 \
 #	Crypt__OpenSSL__AES
 
-.PHONY : $(PACKAGES) $(EXTERNAL)
+.PHONY : $(PACKAGES) $(EXTERNAL) WORKFLOW DateTime__Format__DateParse
 
-cpan_dependency: $(EXTERNAL)
+cpan_dependency: $(EXTERNAL) WORKFLOW DateTime__Format__DateParse
 
 default:	clean
 	make $(EXTERNAL)
@@ -83,10 +87,18 @@ $(EXTERNAL):
 	test -d deb || mkdir deb
 	test -d deb/cpan || mkdir deb/cpan/	
 	cd deb/cpan/ &&  dh-make-perl --build --notest --cpan $(subst __,::,$@)
+
+WORKFLOW:
+	cd deb/cpan/ && rm -rf Workflow-0.31*
 	cd deb/cpan/ && wget http://search.cpan.org/CPAN/authors/id/J/JO/JONASBN/Workflow-0.31.tar.gz
 	cd deb/cpan/ && tar -xzf Workflow-0.31.tar.gz
 	cd deb/cpan/ && dh-make-perl --build Workflow-0.31/
-	#cd deb/cpan/ &&  dh-make-perl --build --cpan $(subst __,::,$@)
+
+DateTime__Format__DateParse:
+	test -d deb || mkdir deb
+	test -d deb/cpan || mkdir deb/cpan/	
+	cd deb/cpan/ &&  dh-make-perl --build --notest --depends 'libdatetime-timezone-perl, libdatetime-perl, libtimedate-perl' --cpan $(subst __,::,$@)
+
 
 $(PACKAGES):
 	test -d deb || mkdir deb	

@@ -44,7 +44,7 @@ changelog::
 	echo >> changelog
 	echo "  * Daily build." >> changelog
 	echo >> changelog
-	echo " -- Michael Bell <michael.bell@web.de> " `date --rfc-2822` >> changelog
+	echo " -- Scott T Hardin <scotty@hnsc.de> " `date --rfc-2822` >> changelog
 
 source-clean:
 	rm -rf /tmp/$(PERLNAME)-*

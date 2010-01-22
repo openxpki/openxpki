@@ -79,3 +79,18 @@ Description: CA Initialization
  Please note that it is not possible to (re-)configure this package because
  an old CA private key was detected. Please remove this key first or ignore
  this message if you only perform a software update.
+
+Template: openxpki-deployment/mysql_passwd
+Type: password
+Description: MySQL root password:
+ Please enter the password for the root user of your MySQL database. This
+ is needed to add the schema for OpenXPKI to your MySQL.
+
+Template: openxpki-deployment/database_type
+Type: select
+Choices: mysql, sqlite, other
+Default: mysql
+Description: Backend Database:
+ Please select the backend database to use. MySQL is recommended over
+ SQLite due to locking issues. For other databases, choose 'other' and
+ install the database manually.
