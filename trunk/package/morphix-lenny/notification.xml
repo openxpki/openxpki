@@ -1,0 +1,71 @@
+<notification_config>
+  <notifications id="default">
+    <notification id="csr_created">
+      <action type="open">
+        <requestor>[% creator %]</requestor>
+        <queue>General</queue>
+        <subject>CSR for [% cert_subject %]</subject>
+      </action>
+      <action type="comment">
+        <template file="/etc/openxpki/instances/trustcenter1/notification/en/csr_created_comment.txt" lang="en_EN"/>
+      </action>
+      <action type="correspond">
+        <template file="/etc/openxpki/instances/trustcenter1/notification/en/csr_created_correspond.txt" lang="en_EN"/>
+      </action>
+      <action type="set_value">
+        <field>priority</field>
+        <value>2</value>
+      </action>
+    </notification>
+
+    <notification id="csr_approved">
+      <action type="comment">
+        <template file="/etc/openxpki/instances/trustcenter1/notification/en/csr_approved_comment.txt" lang="en_EN"/>
+      </action>
+    </notification>
+
+    <notification id="csr_approvals_canceled">
+      <action type="comment">
+        <template file="/etc/openxpki/instances/trustcenter1/notification/en/csr_approvals_canceled_comment.txt" lang="en_EN"/>
+      </action>
+    </notification>
+
+    <notification id="certificate_issued">
+      <action type="correspond">
+        <template file="/etc/openxpki/instances/trustcenter1/notification/en/certificate_issued_correspond.txt" lang="en_EN"/>
+      </action>
+      <action type="close"/>
+    </notification>
+
+    <notification id="csr_rejected">
+      <action type="correspond">
+        <template file="/etc/openxpki/instances/trustcenter1/notification/en/csr_rejected_correspond.txt" lang="en_EN"/>
+      </action>
+      <action type="close"/>
+    </notification>
+    <notification id="create_bulk_request">
+      <action type="open">
+        <requestor>[% creator %]</requestor>
+        <queue>General</queue>
+        <subject>Bulk request</subject>
+      </action>
+    </notification>
+
+    <notification id="create_bulk_request_workflows">
+      <action type="comment">
+        <template file="/Users/klink/usr/local/etc/openxpki/notification/en/create_bulk_request_comment.txt" lang="en_EN"/>
+      </action>
+    </notification>
+  </notifications>
+
+  <notifier id="rt1">
+    <notification_backend type="RT">
+      <url>http://openxpkilive/rt</url>
+      <username>root</username>
+      <password>password</password>
+      <timeout>10</timeout>
+    </notification_backend>
+    <notifications super="../../notifications{default}"/>
+  </notifier>
+
+</notification_config>

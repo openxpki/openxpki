@@ -1,0 +1,55 @@
+<comps>
+ <group>
+  <version>0.5</version>
+  <id>BareX</id>
+  <name>Morphix BareX</name>
+  <repositorylist>
+   <repository type="debian">http://127.0.0.1/debian</repository>
+   <repository type="debian" suite="lenny/updates">http://127.0.0.1/debian/debian-security/</repository>
+   <repository type="plain">http://www.morphix.org/debian</repository>
+  </repositorylist>
+  <description>Morphix BareX mainmodule</description>
+  <type>mainmod</type>
+  <suite>lenny</suite>
+  <packagelist>
+<!-- remove exim4 exim4-base exim4-config mailx ? -->
+<packagereq>bzip2</packagereq>
+<packagereq>cloop-utils</packagereq>
+<packagereq>dhcp3-client</packagereq>
+<packagereq>euro-support</packagereq>
+<packagereq>ftp</packagereq>
+<packagereq>grub</packagereq>
+<packagereq>hdparm</packagereq>
+<packagereq>less</packagereq>
+<packagereq>linux-wlan-ng</packagereq>
+<packagereq>locales</packagereq><!-- necessary for multiple locales, 10MB unpacked-->
+<packagereq>module-init-tools</packagereq>
+<packagereq>most</packagereq>
+<packagereq>pcmcia-cs</packagereq>
+<packagereq>reiserfsprogs</packagereq>
+<packagereq>sudo</packagereq>
+<packagereq>synaptic</packagereq>
+<packagereq>wget</packagereq>
+<packagereq>wireless-tools</packagereq>
+<packagereq>xfsprogs</packagereq>
+<packagereq>xbase-clients</packagereq>
+<packagereq>xterm</packagereq>
+<packagereq>xutils</packagereq>
+
+
+<!-- Morphix init stuff -->
+<!-- perhaps start X with only an xterm? -->
+<packagereq>xserver-xorg</packagereq>   <!--Include whilst problem upstream in sid with this depends-->
+<packagereq>xorg</packagereq>   <!--Include whilst problem upstream in sid with this depends-->
+<packagereq>morphix-init</packagereq>
+
+<!-- packages that are removed -->
+<packagedel>aptitude</packagedel>
+<packagedel>exim4</packagedel>
+<packagedel>exim4-base</packagedel>
+<packagedel>exim4-daemon-light</packagedel>
+<packagedel>exim4-config</packagedel>
+<packagedel>tcpd</packagedel>
+</packagelist>
+</group>
+</comps>

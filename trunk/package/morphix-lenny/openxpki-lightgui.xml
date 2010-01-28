@@ -1,0 +1,184 @@
+<comps>
+ <group>
+  <version>0.2</version>
+  <id>openxpki-lightgui</id>
+  <name>OpenXPKI Live</name>
+  <repositorylist>
+   <repository type="debian">ftp://ftp.de.debian.org/debian</repository>
+   <repository type="debian" suite="etch">http://www.debian-multimedia.org</repository>
+   <repository type="debian" suite="unstable">http://www.os-works.com/debian</repository>
+   <repository type="plain" suite="unstable">http://www.morphix.org/debian</repository>
+   <repository type="plain" suite="unstable">http://build0.cynops.de/debian</repository>
+  </repositorylist>
+  <description>OpenXPKI Live mainmodule - based on Morphix LightGUI</description>
+  <type>mainmod</type>
+  <suite>lenny</suite>
+  <packagelist>
+
+<packagereq>bzip2</packagereq>
+<packagereq>cloop-utils</packagereq>
+<packagereq>dhcp3-client</packagereq>
+<packagereq>dialog</packagereq>
+<packagereq>euro-support</packagereq>
+<packagereq>ftp</packagereq>
+<packagereq>gksu</packagereq>
+<packagereq>gnupg</packagereq>
+<packagereq>grub</packagereq>
+<packagereq>hdparm</packagereq>
+<packagereq>hotplug</packagereq>
+<packagereq>less</packagereq>
+<packagereq>linux-wlan-ng</packagereq>
+<packagereq>locales</packagereq><!-- necessary for multiple locales, 10MB unpacked-->
+<packagereq>menu</packagereq>
+<packagereq>menu-xdg</packagereq>
+<packagereq>module-init-tools</packagereq> <!-- necessary for kernels 2.5+ -->
+<packagereq>most</packagereq>
+<packagereq>mozilla-firefox</packagereq>
+<packagereq>pcmcia-cs</packagereq>
+<packagereq>pppconfig</packagereq>
+<packagereq>reiserfsprogs</packagereq>
+<packagereq>rsync</packagereq>
+<packagereq>ssh</packagereq>
+<packagereq>sudo</packagereq>
+<packagereq>smbclient</packagereq>
+<packagereq>smbfs</packagereq>
+<packagereq>synaptic</packagereq>
+<packagereq>wget</packagereq>
+<packagereq>vnc-common</packagereq>
+<packagereq>wireless-tools</packagereq>
+<packagereq>wvdial</packagereq>
+<packagereq>xchat</packagereq>
+<!--<packagereq>xdialog</packagereq>-->
+<packagereq>xfce4-themes</packagereq>
+<packagereq>xfce4-utils</packagereq>
+<packagereq>xfdeskmenu4</packagereq>
+<packagereq>xfdesktop4</packagereq>
+<packagereq>xfe</packagereq>
+<packagereq>xffm4</packagereq>
+<packagereq>xfprint4</packagereq>
+<packagereq>xfsprogs</packagereq>
+<packagereq>xloadimage</packagereq> <!-- necessary for xsetbg at boot -->
+<packagereq>xpdf</packagereq>
+<packagereq>xvncviewer</packagereq>
+<packagereq>xbase-clients</packagereq>
+<packagereq>xterm</packagereq>
+<packagereq>xutils</packagereq>
+
+<!-- printing support -->
+   <packagereq>cupsys</packagereq>
+   <packagereq>cupsys-client</packagereq>
+
+<!-- compiler support -->
+   <packagereq>gcc</packagereq>
+   <packagereq>make</packagereq>
+   <packagereq>automake</packagereq>
+   <packagereq>autoconf</packagereq>
+   <packagereq>gdb</packagereq>
+   <packagereq>libc6-dev</packagereq>
+
+<!-- from lightgui burner -->
+   <packagereq>graveman</packagereq>
+
+	 <!-- xfce-plugins -->
+     <packagereq>xfce4-wavelan-plugin</packagereq>
+     <packagereq>xfce4-weather-plugin</packagereq>
+     <packagereq>xfce4-goodies</packagereq>
+     <packagereq>xfce4-notes-plugin</packagereq>
+     <packagereq>xfce4-datetime-plugin</packagereq>
+     <packagereq>xfce4-battery-plugin</packagereq>
+
+
+
+<!--from m.o/debian -->
+   <packagereq>cdpersistent</packagereq>
+   <packagereq>morphixinstaller</packagereq>
+   <packagereq>partitionmorpher</packagereq>
+   <packagereq>mcp</packagereq>
+   <packagereq>xconf</packagereq>
+   <packagereq>networkconf</packagereq>
+   <packagereq>datetimeconf</packagereq>
+   <packagereq>langconf</packagereq>
+   <packagereq>keybconf</packagereq>
+   <packagereq>morphix-background</packagereq>
+   <packagereq>morphing-tools</packagereq>
+   <packagereq>mkminiroot-morphix</packagereq>
+   <packagereq>debootstrap</packagereq>
+   <packagereq>morphix-mmaker</packagereq>
+   <packagereq>xserver-xorg</packagereq>   <!--Include whilst problem upstream in sid with this depends-->
+   <packagereq>xorg</packagereq>   <!--Include whilst problem upstream in sid with this depends-->
+   <packagereq>morphix-init-light</packagereq>
+
+   <!-- OpenXPKI specific packages -->
+   <packagereq>libdevel-stacktrace-perl</packagereq>
+   <packagereq>libclass-data-inheritable-perl</packagereq>
+   <packagereq>libdata-page-perl</packagereq>
+   <packagereq>libmath-round-perl</packagereq>
+   <packagereq>libdata-spreadpagination-perl</packagereq>
+   <packagereq>libcgi-session-perl</packagereq>
+   <packagereq>libclass-std-perl</packagereq>
+   <packagereq>libdbi-perl</packagereq>
+   <packagereq>libdbd-mysql-perl</packagereq>
+   <packagereq>libdata-password-perl</packagereq>
+   <packagereq>libdatetime-perl</packagereq>
+   <packagereq>libdigest-md5</packagereq>
+   <packagereq>libdigest-sha1-perl</packagereq>
+   <packagereq>libexception-class-perl</packagereq>
+   <packagereq>libfilter-util-call-perl</packagereq>
+   <packagereq>libio-prompt-perl</packagereq>
+   <packagereq>libintl-perl</packagereq>
+   <packagereq>liblog-log4perl-perl</packagereq>
+   <packagereq>libmail-rfc822-address-perl</packagereq>
+   <packagereq>perl-modules</packagereq>
+   <packagereq>libnet-ip-perl</packagereq>
+   <packagereq>libnet-ldap-perl</packagereq>
+   <packagereq>libnet-server-perl</packagereq>
+   <packagereq>libparams-validate-perl</packagereq>
+   <packagereq>libproc-process-perl</packagereq>
+   <packagereq>libregexp-common-perl</packagereq>
+   <packagereq>libsys-sigaction-perl</packagereq>
+   <packagereq>libtemplate-perl</packagereq>
+   <packagereq>libtest-pod-perl</packagereq>
+   <packagereq>libtest-pod-coverage-perl</packagereq>
+   <packagereq>libtext-csv-perl</packagereq>
+   <packagereq>libworkflow-perl</packagereq>
+   <packagereq>libxml-filter-xinclude-perl</packagereq>
+   <packagereq>libxml-parser-perl</packagereq>
+   <packagereq>libxml-sax-perl</packagereq>
+   <packagereq>libxml-sax-writer-perl</packagereq>
+   <packagereq>libxml-simple-perl</packagereq>
+   <packagereq>libxml-validator-schema-perl</packagereq>
+   <packagereq>libversion-perl</packagereq>
+   <packagereq>libhtml-mason-perl</packagereq>
+   <packagereq>libhttp-server-simple-perl</packagereq>
+   <packagereq>libhttp-server-simple-mason-perl</packagereq>
+   <packagereq>libtest-http-server-simple-perl</packagereq>
+   <packagereq>libwww-mechanize-perl</packagereq>
+   <packagereq>libdbd-sqlite3-perl</packagereq>
+   <packagereq>libtree-dag-node-perl</packagereq>
+   <packagereq>libclass-accessor-perl</packagereq>
+   <packagereq>libworkflow-perl</packagereq>
+   <packagereq>libclass-observable-perl</packagereq>
+   <packagereq>libclass-factory-perl</packagereq>
+   <packagereq>libcconfig-std-perl</packagereq>
+   <packagereq>libdatetime-format-strptime-perl</packagereq>
+   <packagereq>libconfig-std-perl</packagereq>
+   <packagereq>perl-doc</packagereq>
+   <!-- git packages for developers -->
+   <packagereq>git-core</packagereq>
+   <packagereq>git-doc</packagereq>
+   <packagereq>git-svn</packagereq>
+   <packagereq>git-completion</packagereq>
+   <packagereq>qgit</packagereq>
+   <!-- tools for developers -->
+   <packagereq>socat</packagereq>
+   <packagereq>screen</packagereq>
+   <!-- openxpki core packages -->
+   <packagereq>libopenxpki-perl</packagereq>
+   <packagereq>libopenxpki-client-perl</packagereq>
+   <packagereq>libopenxpki-client-html-mason-perl</packagereq>
+   <packagereq>openxpki-deployment</packagereq>
+   <packagereq>openxpki-i18n</packagereq>
+   <packagereq>mysql-server</packagereq>
+</packagelist>
+</group>
+</comps>
