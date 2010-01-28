@@ -6,6 +6,7 @@
 #
 
 our $VERSION = "[% deployment.version %]";
+use lib qw( [% dir.sitelib %] );
 
 use strict;
 use warnings;
@@ -16,13 +17,14 @@ use File::Spec;
 use File::Copy;
 use File::Path;
 use IO::Prompt;
-
-#use Data::Dumper;
-#use Smart::Comments;
+#use OpenXPKI::XML::Config;
 
 use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
-use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Server::Context qw( CTX );;
+
+#use Data::Dumper;
+#use Smart::Comments;
 
 # settings determined by openxpki-metaconf
 my %config = (
@@ -32,91 +34,87 @@ my %config = (
     sysconfdir      => "[% dir.sysconfdir %]",
     localedir       => "[% dir.localedir %]",
     openxpkiconfdir => "[% dir.openxpkiconfdir %]",
-    );
+);
 
-my $configfile      = "$config{openxpkiconfdir}/config.xml";
+my $configfile = "$config{openxpkiconfdir}/config.xml";
 
 # read configuration from deployed OpenXPKI instance
 sub get_config {
-    my $cfgfile = shift;
+    my $cfgfile          = shift;
     my @additional_tasks = @_;
 
     return OpenXPKI::Server::Init::init(
-	{
-	    CONFIG => $cfgfile,
-	    TASKS  => [ 
-            'current_xml_config', 
-            'i18n', 
-            'dbi_log',
-            'log', 
-            'api',
-            @additional_tasks,
-		],
-        SILENT => 1,
-	});
+        {
+            CONFIG => $cfgfile,
+            TASKS  => [
+                'current_xml_config', 'i18n',
+                'dbi_log',            'log',
+                'api',                @additional_tasks,
+            ],
+            SILENT => 1,
+        }
+    );
 }
 
 sub initdb {
     my $args = shift;
 
     no warnings;
-    my $type = $OpenXPKI::Server::Init::current_xml_config->get_xpath (
-	XPATH    => [ 'common/database/type' ],
-	COUNTER  => [ 0 ]);
+    my $type = $OpenXPKI::Server::Init::current_xml_config->get_xpath(
+        XPATH   => ['common/database/type'],
+        COUNTER => [0]
+    );
     use warnings;
-    
+
     print STDERR "Database type: $type\n";
 
     my @databases = qw( log );
 
     # SQLite needs special treatment: three databases instead of one must
     # be initialized
-    if ($type =~ m{ SQLite }xms) {
-	push @databases, 'workflow', 'backend';
+    if ( $type =~ m{ SQLite }xms ) {
+        push @databases, 'workflow', 'backend';
     }
 
   DB:
     foreach my $db (@databases) {
-	my $params = {};
+        my $params = {};
         $params->{PURPOSE} = $db;
 
-	if (defined $params->{PURPOSE}) {
-	    print STDERR "Setting up database '$db'\n";
-	}
-	my $dbi = OpenXPKI::Server::Init::get_dbi($params);
+        if ( defined $params->{PURPOSE} ) {
+            print STDERR "Setting up database '$db'\n";
+        }
+        my $dbi = OpenXPKI::Server::Init::get_dbi($params);
 
-	eval { 
-	    $dbi->connect() 
-	};
-	if ($EVAL_ERROR)
-	{
-	    print STDERR "ERROR: Could not connect to '$db' database ($EVAL_ERROR)\n";
-	    return;
-	}
-	
-	if ($args->{DRYRUN}) {
-	    print $dbi->init_schema(MODE => 'DRYRUN') . "\n";
-	    last DB;
-	} else {
-	    my %args = ();
-	    if ($args->{FORCE}) {
-		$args{MODE} = 'FORCE';
-	    }
+        eval { $dbi->connect() };
+        if ($EVAL_ERROR) {
+            print STDERR
+              "ERROR: Could not connect to '$db' database ($EVAL_ERROR)\n";
+            return;
+        }
+
+        if ( $args->{DRYRUN} ) {
+            print $dbi->init_schema( MODE => 'DRYRUN' ) . "\n";
+            last DB;
+        }
+        else {
+            my %args = ();
+            if ( $args->{FORCE} ) {
+                $args{MODE} = 'FORCE';
+            }
 
             #### args for init_schema : Dumper(\%args)
-	    eval {
-		$dbi->init_schema(%args);
-	    };
-	    if ($EVAL_ERROR) {
-		print STDERR "ERROR: init_schema on '$db' failed (${EVAL_ERROR})\n";
-		return;
-	    }
-	    print STDERR "Database '$db' initialized.\n";
-	}
+            eval { $dbi->init_schema(%args); };
+            if ($EVAL_ERROR) {
+                print STDERR
+                  "ERROR: init_schema on '$db' failed (${EVAL_ERROR})\n";
+                return;
+            }
+            print STDERR "Database '$db' initialized.\n";
+        }
     }
     return 1;
 }
-
 
 sub deploy {
     my $args = shift;
@@ -124,81 +122,79 @@ sub deploy {
     my $targetdir       = $args->{TARGETDIR};
     my $template_prefix = $args->{TEMPLATE_PREFIX};
     my $template        = $args->{TEMPLATE};
-    my @metaconf_opts   = @{$args->{METACONF_OPTS}};
+    my @metaconf_opts   = @{ $args->{METACONF_OPTS} };
 
-    if (! defined $targetdir || ($targetdir eq '')) {
-	print STDERR "No target directory specified.\n";
-	return;
+    if ( !defined $targetdir || ( $targetdir eq '' ) ) {
+        print STDERR "No target directory specified.\n";
+        return;
     }
 
-    if (! (-d $targetdir 
-	   && -r $targetdir 
-	   && -x $targetdir 
-	   && -w $targetdir)) {
-	print STDERR "Directory $targetdir does not exist or is not writable.\n";
-	return;
+    if ( !( -d $targetdir && -r $targetdir && -x $targetdir && -w $targetdir ) )
+    {
+        print STDERR
+          "Directory $targetdir does not exist or is not writable.\n";
+        return;
     }
 
     print STDERR "Deploying OpenXPKI configuration file set.\n";
     print STDERR "Template set:              $template\n";
     print STDERR "Template source directory: $template_prefix\n";
     print STDERR "Target directory:          $targetdir\n";
-    if (scalar @metaconf_opts) {
-	print STDERR "openxpki-metaconf options: " . join(' ', @metaconf_opts) . "\n";
+    if ( scalar @metaconf_opts ) {
+        print STDERR "openxpki-metaconf options: "
+          . join( ' ', @metaconf_opts ) . "\n";
     }
 
-    if ($args->{DRYRUN}) {
-	return 1;
+    if ( $args->{DRYRUN} ) {
+        return 1;
     }
 
-    if (! -d $template_prefix) {
-	print STDERR "ERROR: template directory $template_prefix not found\n";
-	return;
+    if ( !-d $template_prefix ) {
+        print STDERR "ERROR: template directory $template_prefix not found\n";
+        return;
     }
 
-    my $srcfile = File::Spec->catfile($template_prefix, 
-				      $template, 
-				      'openxpki.conf');
+    my $srcfile =
+      File::Spec->catfile( $template_prefix, $template, 'openxpki.conf' );
 
     # 2006-06-21 Martin Bartosch:
-    # The deployment procedure now will create a new meta configuration 
+    # The deployment procedure now will create a new meta configuration
     # file from the one that is installed in the template directory.
-    
+
     # determine new configuration file directory (below $targetdir)
     my @cmd;
     @cmd = (
-	'openxpki-metaconf',
-	'--config', qq( $srcfile ),
-	'--setcfg', "dir.prefix='$targetdir'",
-	'--getcfg', 'dir.openxpkiconfdir',
-	@metaconf_opts,
-	);
+        'openxpki-metaconf', '--config', qq( $srcfile ), '--setcfg',
+        "dir.prefix='$targetdir'", '--getcfg', 'dir.openxpkiconfdir',
+        @metaconf_opts,
+    );
 
-    my $cmd = join(' ', @cmd);
+    my $cmd = join( ' ', @cmd );
     my $openxpkiconfdir = `$cmd`;
     chomp($openxpkiconfdir);
- 
+
     ### $openxpkiconfdir
-    if (! -d $openxpkiconfdir) {
-	if (! mkpath($openxpkiconfdir, 1, 0750)) {
-	    print STDERR "Could not create configuration directory $openxpkiconfdir\n";
-	    return;
-	}
-    }
-    
-    my $dstfile = File::Spec->catfile($openxpkiconfdir, 'openxpki.conf');
-    
-    if (-e $dstfile) {
-	if (! $args->{FORCE}) {
-	    print STDERR "ERROR: $dstfile already exists\n";
-	    return;
-	}
-	move($dstfile, $dstfile . '.last');
+    if ( !-d $openxpkiconfdir ) {
+        if ( !mkpath( $openxpkiconfdir, 1, 0750 ) ) {
+            print STDERR
+              "Could not create configuration directory $openxpkiconfdir\n";
+            return;
+        }
     }
 
-    if (! -e $srcfile) {
-	print STDERR "ERROR: $srcfile not found\n";
-	return;
+    my $dstfile = File::Spec->catfile( $openxpkiconfdir, 'openxpki.conf' );
+
+    if ( -e $dstfile ) {
+        if ( !$args->{FORCE} ) {
+            print STDERR "ERROR: $dstfile already exists\n";
+            return;
+        }
+        move( $dstfile, $dstfile . '.last' );
+    }
+
+    if ( !-e $srcfile ) {
+        print STDERR "ERROR: $srcfile not found\n";
+        return;
     }
 
     # the new configuration file will reference two types of files/dirs:
@@ -207,22 +203,22 @@ sub deploy {
     # - files/dirs that are shared among ALL installed instances
     #   (e. g. locales)
     #
-    
+
     ### $config{localedir}
     @cmd = (
-	'openxpki-metaconf',
-	'--config', qq( $srcfile ),
-	'--writecfg', qq( $dstfile ),
-	'--setcfg', "dir.prefix='$targetdir'",
-	'--setcfg', "dir.localedir='$config{localedir}'",
-	@metaconf_opts,
-	);
-    
-    if (system(join(' ', @cmd)) != 0) {
-	print STDERR "ERROR: could not deploy target configuration file $dstfile\n";
-	return;
+        'openxpki-metaconf',                  '--config',
+        qq( $srcfile ),                       '--writecfg',
+        qq( $dstfile ),                       '--setcfg',
+        "dir.prefix='$targetdir'",            '--setcfg',
+        "dir.localedir='$config{localedir}'", @metaconf_opts,
+    );
+
+    if ( system( join( ' ', @cmd ) ) != 0 ) {
+        print STDERR
+          "ERROR: could not deploy target configuration file $dstfile\n";
+        return;
     }
-    
+
     print STDERR "wrote $dstfile\n";
 
     return 1;
@@ -230,20 +226,19 @@ sub deploy {
 
 sub list_realms {
     my @realms;
-    my $config = OpenXPKI::XML::Config->new(
-        CONFIG => $configfile,
-    );
+    my $config = OpenXPKI::XML::Config->new( CONFIG => $configfile, );
     my $nr_of_realms = $config->get_xpath_count(
-        XPATH   => [ 'pki_realm' ],
-        COUNTER => [ ],
+        XPATH   => ['pki_realm'],
+        COUNTER => [],
     );
 
     my $realm_index;
-    for (my $i=0; $i < $nr_of_realms; $i++) {
-        push @realms, $config->get_xpath(
-              XPATH    => [ 'pki_realm', 'name' ],
-              COUNTER  => [ $i         , 0 ],
-        );
+    for ( my $i = 0 ; $i < $nr_of_realms ; $i++ ) {
+        push @realms,
+          $config->get_xpath(
+            XPATH   => [ 'pki_realm', 'name' ],
+            COUNTER => [ $i,          0 ],
+          );
     }
     return @realms;
 }
@@ -251,133 +246,143 @@ sub list_realms {
 sub list_keys {
     my $arg_ref = shift;
 
-    my $config = OpenXPKI::XML::Config->new(
-        CONFIG => $configfile,
-    );
+    my $config = OpenXPKI::XML::Config->new( CONFIG => $configfile, );
 
     my $nr_of_realms = $config->get_xpath_count(
-        XPATH   => [ 'pki_realm' ],
-        COUNTER => [ ],
+        XPATH   => ['pki_realm'],
+        COUNTER => [],
     );
 
     # find the realm index we have to use
     my $realm_index;
-    for (my $i=0; $i < $nr_of_realms; $i++) {
-        next if ($arg_ref->{REALM} ne $config->get_xpath(
-                              XPATH    => [ 'pki_realm', 'name' ],
-                              COUNTER  => [ $i         , 0 ]));
+    for ( my $i = 0 ; $i < $nr_of_realms ; $i++ ) {
+        next
+          if (
+            $arg_ref->{REALM} ne $config->get_xpath(
+                XPATH   => [ 'pki_realm', 'name' ],
+                COUNTER => [ $i,          0 ]
+            )
+          );
         $realm_index = $i;
         last;
     }
 
-    foreach my $type qw( ca scep ) { # iterate over ca and scep entries
+    foreach my $type qw( ca scep ) {    # iterate over ca and scep entries
         print uc($type) . " keys:\n";
         my $type_count = $config->get_xpath_count(
             XPATH   => [ 'pki_realm', $type ],
-            COUNTER => [ $realm_index       ],
+            COUNTER => [$realm_index],
         );
 
-        for (my $i = 0; $i < $type_count; $i++) { # iterate over CAs, SCEPs
+        for ( my $i = 0 ; $i < $type_count ; $i++ ) {  # iterate over CAs, SCEPs
             my $type_id = $config->get_xpath(
-                XPATH   => [ 'pki_realm' , $type, 'id' ],
-                COUNTER => [ $realm_index, $i   , 0    ],
+                XPATH   => [ 'pki_realm',  $type, 'id' ],
+                COUNTER => [ $realm_index, $i,    0 ],
             );
-            print '  Key for purpose ' . uc($type) . ' with ID: '
-                . $type_id . "\n";
+            print '  Key for purpose '
+              . uc($type)
+              . ' with ID: '
+              . $type_id . "\n";
 
             my $token_count = $config->get_xpath_count(
-                XPATH   => [ 'pki_realm' , $type, 'token' ],
+                XPATH   => [ 'pki_realm',  $type, 'token' ],
                 COUNTER => [ $realm_index, $i ],
             );
 
             # base path and counter for later use
-            my @token_path    = ( 'pki_realm' , $type, 'token' );
-            my @token_counter = ( $realm_index, $i   , 0       );
+            my @token_path = ( 'pki_realm', $type, 'token' );
+            my @token_counter = ( $realm_index, $i, 0 );
 
             my $key_count = $config->get_xpath_count(
-                    XPATH   => [ @token_path   , 'key' ],
-                    COUNTER => [ @token_counter        ],
-                    );
+                XPATH   => [ @token_path, 'key' ],
+                COUNTER => [@token_counter],
+            );
             my $secret_count = $config->get_xpath_count(
-                    XPATH   => [ @token_path   , 'secret' ],
-                    COUNTER => [ @token_counter           ],
-                    );
+                XPATH   => [ @token_path, 'secret' ],
+                COUNTER => [@token_counter],
+            );
 
-            if ($key_count != 1) { # there should only be one key per token!
+            if ( $key_count != 1 ) {   # there should only be one key per token!
                 print STDERR "    ! Misconfiguration detected: $key_count"
-                           . " keys configured!\n";
+                  . " keys configured!\n";
             }
-            if ($secret_count != 1) { # there should only be one secret
-                                      # definition per token
+            if ( $secret_count != 1 ) {    # there should only be one secret
+                                           # definition per token
                 print STDERR "    ! Misconfiguration detected: $secret_count"
-                           . " secret definitions configured!\n";
+                  . " secret definitions configured!\n";
             }
 
-            if ($key_count == 1 && $secret_count == 1) { # everything is fine
+            if ( $key_count == 1 && $secret_count == 1 ) {  # everything is fine
                 my $key = $config->get_xpath(
-                        XPATH   => [ @token_path   , 'key' ],
-                        COUNTER => [ @token_counter, 0     ],
-                        );
+                    XPATH   => [ @token_path,    'key' ],
+                    COUNTER => [ @token_counter, 0 ],
+                );
                 my $status_flag = '?';
-                if (-e $key && (! -s $key)) {
-                    $status_flag = '0'; # file exists but is of size zero
+                if ( -e $key && ( !-s $key ) ) {
+                    $status_flag = '0';    # file exists but is of size zero
                 }
-                elsif (-e $key) {       # file exists and is non-zero
+                elsif ( -e $key ) {        # file exists and is non-zero
                     $status_flag = '+';
                 }
-                else {                  # file does not exist (yet)
+                else {                     # file does not exist (yet)
                     $status_flag = '!';
                 }
                 print '    ' . $status_flag . ' ' . $key . "\n";
 
                 my $secret_group_name = $config->get_xpath(
-                    XPATH   => [ @token_path   , 'secret' ],
-                    COUNTER => [ @token_counter, 0        ],
+                    XPATH   => [ @token_path,    'secret' ],
+                    COUNTER => [ @token_counter, 0 ],
                 );
-                my @secret_path    = ( 'pki_realm' , 'common', 'secret' );
-                my @secret_counter = ( $realm_index, 0       , 0 );
+                my @secret_path = ( 'pki_realm', 'common', 'secret' );
+                my @secret_counter = ( $realm_index, 0, 0 );
                 my $secret_group_count = $config->get_xpath_count(
-                    XPATH   => [ @secret_path,    'group' ],
-                    COUNTER => [ @secret_counter,         ],
+                    XPATH   => [ @secret_path, 'group' ],
+                    COUNTER => [ @secret_counter, ],
                 );
                 my $group_index;
               SEARCH_GROUP_ID:
-                for (my $i = 0; $i < $secret_group_count; $i++) {
+
+                for ( my $i = 0 ; $i < $secret_group_count ; $i++ ) {
                     my $group_id = $config->get_xpath(
-                        XPATH   => [ @secret_path   , 'group', 'id' ],
-                        COUNTER => [ @secret_counter, $i     , 0    ], 
+                        XPATH   => [ @secret_path,    'group', 'id' ],
+                        COUNTER => [ @secret_counter, $i,      0 ],
                     );
-                    if ($group_id eq $secret_group_name) {
+                    if ( $group_id eq $secret_group_name ) {
                         $group_index = $i;
                         last SEARCH_GROUP_ID;
                     }
                 }
-                if (! defined $group_index) {
-                    print STDERR "Could not find configuration for secret group '$secret_group_name'.\n";
+                if ( !defined $group_index ) {
+                    print STDERR
+"Could not find configuration for secret group '$secret_group_name'.\n";
                     exit 1;
                 }
 
                 my $secret_method = $config->get_xpath(
-                  XPATH   => [ @secret_path   , 'group'     , 'method', 'id' ],
-                  COUNTER => [ @secret_counter, $group_index, 0       , 0  ],
+                    XPATH => [ @secret_path, 'group', 'method', 'id' ],
+                    COUNTER => [ @secret_counter, $group_index, 0, 0 ],
                 );
-                if ($secret_method ne 'literal') { # all others have total_shares
+                if ( $secret_method ne 'literal' )
+                {    # all others have total_shares
                     my $quorum_n = $config->get_xpath(
-                        XPATH   => [ @secret_path   , 'group'     , 'method', 'total_shares' ],
-                        COUNTER => [ @secret_counter, $group_index, 0       , 0                 ],
+                        XPATH =>
+                          [ @secret_path, 'group', 'method', 'total_shares' ],
+                        COUNTER => [ @secret_counter, $group_index, 0, 0 ],
                     );
 
-                    my $quorum_k = __get_required_shares({
-                        CONFIG        => $config,
-                        TOKEN_PATH    => [ @secret_path,    'group'      ],
-                        TOKEN_COUNTER => [ @secret_counter, $group_index ],
-                    });
-                    if (! defined $quorum_k) { # if it is not defined, n is
-                                               # the default value
+                    my $quorum_k = __get_required_shares(
+                        {
+                            CONFIG        => $config,
+                            TOKEN_PATH    => [ @secret_path, 'group' ],
+                            TOKEN_COUNTER => [ @secret_counter, $group_index ],
+                        }
+                    );
+                    if ( !defined $quorum_k ) {    # if it is not defined, n is
+                                                   # the default value
                         $quorum_k = $quorum_n;
                     }
-                    $secret_method .= ' (n = ' . $quorum_n . ', k = ' 
-                        . $quorum_k . ')';
+                    $secret_method .=
+                      ' (n = ' . $quorum_n . ', k = ' . $quorum_k . ')';
                 }
                 print '      Secret group: ' . $secret_group_name . "\n";
                 print '        Secret method: ' . $secret_method . "\n";
@@ -393,306 +398,346 @@ sub generate_keys {
     my $realm             = $arg_ref->{REALM};
     my $secret_group_name = $arg_ref->{GROUP};
 
-    my $config = OpenXPKI::XML::Config->new(
-        CONFIG => $configfile,
-    );
+    my $config = OpenXPKI::XML::Config->new( CONFIG => $configfile, );
 
     my $nr_of_realms = $config->get_xpath_count(
-        XPATH   => [ 'pki_realm' ],
-        COUNTER => [ ],
+        XPATH   => ['pki_realm'],
+        COUNTER => [],
     );
 
     # figure out realm index
     my $realm_index;
-    for (my $i=0; $i < $nr_of_realms; $i++) {
-        next if ($realm ne $config->get_xpath(
-                              XPATH    => [ 'pki_realm', 'name' ],
-                              COUNTER  => [ $i         , 0 ]));
+    for ( my $i = 0 ; $i < $nr_of_realms ; $i++ ) {
+        next
+          if (
+            $realm ne $config->get_xpath(
+                XPATH   => [ 'pki_realm', 'name' ],
+                COUNTER => [ $i,          0 ]
+            )
+          );
         $realm_index = $i;
         last;
     }
+
     # default token which will be used to create the keys
     my $default_token = CTX('crypto_layer')->get_token(
-            TYPE      => 'DEFAULT',
-            PKI_REALM => $realm,
+        TYPE      => 'DEFAULT',
+        PKI_REALM => $realm,
     );
+
     # figure out secret group index
-    my @secret_path    = ( 'pki_realm' , 'common', 'secret' );
-    my @secret_counter = ( $realm_index, 0       , 0 );
+    my @secret_path = ( 'pki_realm', 'common', 'secret' );
+    my @secret_counter = ( $realm_index, 0, 0 );
     my $secret_group_count = $config->get_xpath_count(
-            XPATH   => [ @secret_path,    'group' ],
-            COUNTER => [ @secret_counter,         ],
+        XPATH   => [ @secret_path, 'group' ],
+        COUNTER => [ @secret_counter, ],
     );
     my $group_index;
   SEARCH_GROUP_ID:
-    for (my $i = 0; $i < $secret_group_count; $i++) {
+    for ( my $i = 0 ; $i < $secret_group_count ; $i++ ) {
         my $group_id = $config->get_xpath(
-                XPATH   => [ @secret_path   , 'group', 'id' ],
-                COUNTER => [ @secret_counter, $i     , 0    ], 
+            XPATH   => [ @secret_path,    'group', 'id' ],
+            COUNTER => [ @secret_counter, $i,      0 ],
         );
-        if ($group_id eq $secret_group_name) {
+        if ( $group_id eq $secret_group_name ) {
             $group_index = $i;
             last SEARCH_GROUP_ID;
         }
     }
-    if (! defined $group_index) {
-        print STDERR "Could not find configuration for secret group '$secret_group_name'.\n";
+    if ( !defined $group_index ) {
+        print STDERR
+"Could not find configuration for secret group '$secret_group_name'.\n";
         exit 1;
     }
     my $secret_method = $config->get_xpath(
-        XPATH   => [ @secret_path   , 'group'     , 'method', 'id' ],
-        COUNTER => [ @secret_counter, $group_index, 0       , 0  ],
+        XPATH   => [ @secret_path,    'group',      'method', 'id' ],
+        COUNTER => [ @secret_counter, $group_index, 0,        0 ],
     );
     my $quorum_n;
     my $quorum_k;
     my $display_secret_method = $secret_method;
-    if ($secret_method ne 'literal') { # all others have total_shares
+    if ( $secret_method ne 'literal' ) {    # all others have total_shares
         $quorum_n = $config->get_xpath(
-                XPATH   => [ @secret_path   , 'group'     , 'method', 'total_shares' ],
-                COUNTER => [ @secret_counter, $group_index, 0       , 0                 ]
-       );
+            XPATH => [ @secret_path, 'group', 'method', 'total_shares' ],
+            COUNTER => [ @secret_counter, $group_index, 0, 0 ]
+        );
 
-        $quorum_k = __get_required_shares({
+        $quorum_k = __get_required_shares(
+            {
                 CONFIG        => $config,
-                TOKEN_PATH    => [ @secret_path,    'group'      ],
+                TOKEN_PATH    => [ @secret_path, 'group' ],
                 TOKEN_COUNTER => [ @secret_counter, $group_index ],
-        });
-        if (! defined $quorum_k) { # if it is not defined, n is
-                                   # the default value
+            }
+        );
+        if ( !defined $quorum_k ) {    # if it is not defined, n is
+                                       # the default value
             $quorum_k = $quorum_n;
         }
-        $display_secret_method .= ' (n = ' . $quorum_n
-                                . ', k = ' . $quorum_k . ')';
+        $display_secret_method .=
+          ' (n = ' . $quorum_n . ', k = ' . $quorum_k . ')';
     }
     print "Generating keys for secret group " . $secret_group_name . "\n";
     print "Secret method is: " . $display_secret_method . "\n\n";
 
     my $passwd;
-    if ($secret_method eq 'literal') {
+    if ( $secret_method eq 'literal' ) {
+
         # in the literal case, this is just the config entry
         $passwd = $config->get_xpath(
-            XPATH   => [ @secret_path   , 'group'     , 'method' ],
+            XPATH   => [ @secret_path,    'group',      'method' ],
             COUNTER => [ @secret_counter, $group_index, 0 ],
         );
     }
     else {
         my $crypto_secret;
-    
-        if ($secret_method eq 'plain') {
-            $crypto_secret = OpenXPKI::Crypto::Secret->new({
-                TYPE  => 'Plain',
-                PARTS => $quorum_n,                
-            });
-            for (my $i = 1; $i <= $quorum_n; $i++) {
-                my $secret = __prompt_password("Please enter "
-                    . "password share $i/$quorum_n: ");
-                $crypto_secret->set_secret({
-                    PART   => $i,                    
-                    SECRET => "$secret", # $secret is of type IO::Prompt::Return
-                });
+
+        if ( $secret_method eq 'plain' ) {
+            $crypto_secret = OpenXPKI::Crypto::Secret->new(
+                {
+                    TYPE  => 'Plain',
+                    PARTS => $quorum_n,
+                }
+            );
+            for ( my $i = 1 ; $i <= $quorum_n ; $i++ ) {
+                my $secret = __prompt_password(
+                    "Please enter " . "password share $i/$quorum_n: " );
+                $crypto_secret->set_secret(
+                    {
+                        PART => $i,
+                        SECRET =>
+                          "$secret",    # $secret is of type IO::Prompt::Return
+                    }
+                );
                 print "\n";
             }
             $passwd = $crypto_secret->get_secret();
         }
-        elsif ($secret_method eq 'split') {
-            $crypto_secret = OpenXPKI::Crypto::Secret->new({
-                TYPE   => 'Split',
-                QUORUM => {
-                    N => $quorum_n,
-                    K => $quorum_k,
-                },
-                TOKEN  => $default_token,
-            });
-            my @shares = $crypto_secret->compute(); # TODO: use bitlength
-                                                    # based on chosen algo
-            for (my $i = 0; $i < scalar(@shares); $i++) {
-                my $nr = $i+1;
-                prompt("Please make sure that share holder number $nr is ready"
-                    . " to copy the share,\n"
-                    . "then press enter to view the share.");
-                for (my $j = 0; $j < 500; $j++) {
-                    print "\n"; # pseudo clearscreen
+        elsif ( $secret_method eq 'split' ) {
+            $crypto_secret = OpenXPKI::Crypto::Secret->new(
+                {
+                    TYPE   => 'Split',
+                    QUORUM => {
+                        N => $quorum_n,
+                        K => $quorum_k,
+                    },
+                    TOKEN => $default_token,
+                }
+            );
+            my @shares = $crypto_secret->compute();    # TODO: use bitlength
+                                                       # based on chosen algo
+            for ( my $i = 0 ; $i < scalar(@shares) ; $i++ ) {
+                my $nr = $i + 1;
+                prompt( "Please make sure that share holder number $nr is ready"
+                      . " to copy the share,\n"
+                      . "then press enter to view the share." );
+                for ( my $j = 0 ; $j < 500 ; $j++ ) {
+                    print "\n";                        # pseudo clearscreen
                 }
                 print "Please copy the following share:\n";
                 print $shares[$i] . "\n";
                 print "Press enter to continue (next share will not "
-                    . "yet be shown).\n";
+                  . "yet be shown).\n";
                 prompt();
-                for (my $j = 0; $j < 500; $j++) {
-                    print "\n"; # pseudo clearscreen
+                for ( my $j = 0 ; $j < 500 ; $j++ ) {
+                    print "\n";                        # pseudo clearscreen
                 }
             }
             $passwd = $crypto_secret->get_secret();
         }
     }
-    foreach my $type qw( ca scep ) { # iterate over ca and scep entries
+    foreach my $type qw( ca scep ) {    # iterate over ca and scep entries
         my $type_count = $config->get_xpath_count(
             XPATH   => [ 'pki_realm', $type ],
-            COUNTER => [ $realm_index       ],
+            COUNTER => [$realm_index],
         );
 
-       KEYS:
-        for (my $i = 0; $i < $type_count; $i++) { # iterate over CAs, SCEPs
+      KEYS:
+        for ( my $i = 0 ; $i < $type_count ; $i++ ) {  # iterate over CAs, SCEPs
             my $type_id = $config->get_xpath(
-                XPATH   => [ 'pki_realm' , $type, 'id' ],
-                COUNTER => [ $realm_index, $i   , 0    ],
+                XPATH   => [ 'pki_realm',  $type, 'id' ],
+                COUNTER => [ $realm_index, $i,    0 ],
             );
 
             my $token_count = $config->get_xpath_count(
-                XPATH   => [ 'pki_realm' , $type, 'token' ],
+                XPATH   => [ 'pki_realm',  $type, 'token' ],
                 COUNTER => [ $realm_index, $i ],
             );
 
             # base path and counter for later use
-            my @token_path    = ( 'pki_realm' , $type, 'token' );
-            my @token_counter = ( $realm_index, $i   , 0       );
+            my @token_path = ( 'pki_realm', $type, 'token' );
+            my @token_counter = ( $realm_index, $i, 0 );
 
             my $key_count = $config->get_xpath_count(
-                    XPATH   => [ @token_path   , 'key' ],
-                    COUNTER => [ @token_counter        ],
-                    );
+                XPATH   => [ @token_path, 'key' ],
+                COUNTER => [@token_counter],
+            );
             my $secret_count = $config->get_xpath_count(
-                    XPATH   => [ @token_path   , 'secret' ],
-                    COUNTER => [ @token_counter           ],
-                    );
+                XPATH   => [ @token_path, 'secret' ],
+                COUNTER => [@token_counter],
+            );
 
-            if ($key_count != 1) { # there should only be one key per token!
+            if ( $key_count != 1 ) {   # there should only be one key per token!
                 print STDERR "Misconfiguration detected: $key_count "
-                           . "key files configured for id $type_id, "
-                           . "purpose" . uc $type . "!\n";
+                  . "key files configured for id $type_id, "
+                  . "purpose"
+                  . uc $type . "!\n";
                 exit 1;
             }
-            if ($secret_count != 1) { # there should only be one secret
-                                      # definition per token
+            if ( $secret_count != 1 ) {    # there should only be one secret
+                                           # definition per token
                 print STDERR "Misconfiguration detected: $secret_count "
-                           . "secret groups configured for id $type_id, "
-                           . "purpose" . uc $type . "!\n";
+                  . "secret groups configured for id $type_id, "
+                  . "purpose"
+                  . uc $type . "!\n";
                 exit 1;
             }
 
             my $curr_secret_group_name = $config->get_xpath(
-                XPATH   => [ @token_path   , 'secret' ],
-                COUNTER => [ @token_counter, 0        ],
+                XPATH   => [ @token_path,    'secret' ],
+                COUNTER => [ @token_counter, 0 ],
             );
-            next KEYS if ($curr_secret_group_name ne $secret_group_name);
+            next KEYS if ( $curr_secret_group_name ne $secret_group_name );
 
             my $key_filename = $config->get_xpath(
-                    XPATH   => [ @token_path   , 'key' ],
-                    COUNTER => [ @token_counter, 0     ],
+                XPATH   => [ @token_path,    'key' ],
+                COUNTER => [ @token_counter, 0 ],
             );
-            if (-s $key_filename) {
+            if ( -s $key_filename ) {
                 print STDERR "Key for purpose $type with id $type_id "
-                    . "already exists in $key_filename, cowardly "
-                    . "refusing to overwrite it.\n";
+                  . "already exists in $key_filename, cowardly "
+                  . "refusing to overwrite it.\n";
                 next KEYS;
             }
             my $key;
             my $fu = OpenXPKI::FileUtils->new();
 
             # get possible types and options from token
-            my %command_params = %{$default_token->get_cmd_param('create_key')};
-            print "Choose options for key for purpose '" . uc($type)
-                . "' with id '$type_id'\n";
-        
+            my %command_params =
+              %{ $default_token->get_cmd_param('create_key') };
+            print "Choose options for key for purpose '"
+              . uc($type)
+              . "' with id '$type_id'\n";
+
             print "Please choose one of the following key types:\n";
-            foreach my $possible_type ( @{$command_params{TYPE}} ) {
+            foreach my $possible_type ( @{ $command_params{TYPE} } ) {
                 print "  - $possible_type\n";
             }
             my $type = prompt('Key type: ');
-            my $type_parameters = $command_params{PARAMETERS}->{"TYPE:" . $type};
-        
-            while (! defined $type_parameters) {
-                # no parameter entry in command_params available for the chosen type
+            my $type_parameters =
+              $command_params{PARAMETERS}->{ "TYPE:" . $type };
+
+            while ( !defined $type_parameters ) {
+
+            # no parameter entry in command_params available for the chosen type
                 print "Invalid type chosen, please try again.\n";
                 $type = prompt('Key type: ');
-                $type_parameters = $command_params{PARAMETERS}->{"TYPE:" . $type};
+                $type_parameters =
+                  $command_params{PARAMETERS}->{ "TYPE:" . $type };
             }
-        
-            my $parameters; # parameter hash used in the token command
-                my %already_configured_parameters;
-        
-            if (defined $type_parameters->{KEY_LENGTH}) {
+
+            my $parameters;    # parameter hash used in the token command
+            my %already_configured_parameters;
+
+            if ( defined $type_parameters->{KEY_LENGTH} ) {
+
                 # key length is only possible for some algos
                 print "\nPlease choose one of the following key lengths:\n";
-                my %valid_keylength = ( );
-                foreach my $possible_kl ( @{$type_parameters->{KEY_LENGTH}} ) {
+                my %valid_keylength = ();
+                foreach my $possible_kl ( @{ $type_parameters->{KEY_LENGTH} } )
+                {
                     print "  - $possible_kl\n";
                     $valid_keylength{$possible_kl} = 1;
                 }
-        
+
                 my $key_length = prompt('Key length: ');
-                    while (! defined $valid_keylength{$key_length}) {
+                while ( !defined $valid_keylength{$key_length} ) {
                     print "Invalid key length chosen, please try again.\n";
                     $key_length = prompt('Key length: ');
                 }
+
                 # implicit cast, $key_length is of type IO::Prompt::ReturnVal!
                 $parameters->{KEY_LENGTH} = "$key_length";
-        
+
                 $already_configured_parameters{KEY_LENGTH} = 1;
             }
-        
-            if (defined $type_parameters->{ENC_ALG}) { # currently defined for all,
-                                                       # but you never know
+
+            if ( defined $type_parameters->{ENC_ALG} )
+            {    # currently defined for all,
+                    # but you never know
                 print "\nPlease choose one of the following key encryption "
-                    . "algorithms:\n";
-                my %valid_enc_alg = ( );
-                foreach my $possible_enc_alg ( @{$type_parameters->{ENC_ALG}} ) {
-                    if ($possible_enc_alg eq '__undef') { 
-                        $possible_enc_alg = 'default'; # present __undef as default
+                  . "algorithms:\n";
+                my %valid_enc_alg = ();
+                foreach
+                  my $possible_enc_alg ( @{ $type_parameters->{ENC_ALG} } )
+                {
+                    if ( $possible_enc_alg eq '__undef' ) {
+                        $possible_enc_alg =
+                          'default';    # present __undef as default
                     }
                     print "  - $possible_enc_alg\n";
                     $valid_enc_alg{$possible_enc_alg} = 1;
                 }
                 my $enc_alg = prompt('Encryption algorithm: ');
-                while (! defined $valid_enc_alg{$enc_alg}) {
+                while ( !defined $valid_enc_alg{$enc_alg} ) {
                     print "Invalid encryption algorithm chosen, please try "
-                        . "again.\n";
+                      . "again.\n";
                     $enc_alg = prompt('Encryption algorithm: ');
                 }
-                if ("$enc_alg" ne 'default') { # specific algorithm requested
-                    $parameters->{ENC_ALG} = "$enc_alg"; # implicit type cast!
+                if ( "$enc_alg" ne 'default' ) {  # specific algorithm requested
+                    $parameters->{ENC_ALG} = "$enc_alg";   # implicit type cast!
                 }
                 $already_configured_parameters{ENC_ALG} = 1;
             }
-        
+
             # configure optional parameters
-            foreach my $param (keys %{$type_parameters}) {
-                if (! defined $already_configured_parameters{$param} ) {
+            foreach my $param ( keys %{$type_parameters} ) {
+                if ( !defined $already_configured_parameters{$param} ) {
                     my $optional = 0;
-                    if (ref $type_parameters->{$param} eq '') { # type param is int
-                        if ($type_parameters->{$param} == 0) {
+                    if ( ref $type_parameters->{$param} eq '' )
+                    {                                      # type param is int
+                        if ( $type_parameters->{$param} == 0 ) {
                             $optional = 1;
                         }
                     }
-                    elsif (ref $type_parameters->{$param} eq 'ARRAY') {
-                        $optional = __string_is_in_array({
+                    elsif ( ref $type_parameters->{$param} eq 'ARRAY' ) {
+                        $optional = __string_is_in_array(
+                            {
                                 STRING => '__undef',
                                 ARRAY  => $type_parameters->{$param},
-                        });
+                            }
+                        );
                     }
                     my $want_config = 0;
-                    if ($optional == 1) {
-                        my $answer = prompt "Do you want to configure the optional"
-                            . " parameter $param (y/n)? ", '-y';
-                        if ($answer =~ /^[yY]$/) {
+                    if ( $optional == 1 ) {
+                        my $answer =
+                          prompt "Do you want to configure the optional"
+                          . " parameter $param (y/n)? ", '-y';
+                        if ( $answer =~ /^[yY]$/ ) {
                             $want_config = 1;
                         }
                     }
-                    if ($optional != 1 || $want_config == 1) {
-                        if (ref $type_parameters->{$param} eq 'ARRAY') {
+                    if ( $optional != 1 || $want_config == 1 ) {
+                        if ( ref $type_parameters->{$param} eq 'ARRAY' ) {
                             print "Please choose one of the following values "
-                                . "for $param: \n";
-                            foreach my $elem (@{$type_parameters->{$param}}) {
+                              . "for $param: \n";
+                            foreach my $elem ( @{ $type_parameters->{$param} } )
+                            {
                                 print "  - $elem\n";
                             }
                         }
                         my $param_value = prompt("Value for $param: ");
-                        if (ref $type_parameters->{$param} eq 'ARRAY') { 
+                        if ( ref $type_parameters->{$param} eq 'ARRAY' ) {
+
                             # check validity
-                            while (! __string_is_in_array({
+                            while (
+                                !__string_is_in_array(
+                                    {
                                         STRING => $param_value,
                                         ARRAY  => $type_parameters->{$param},
-                                        })) {
+                                    }
+                                )
+                              )
+                            {
                                 print "Invalid value, please try again.\n";
                                 $param_value = prompt("Value for $param: ");
                             }
@@ -701,32 +746,38 @@ sub generate_keys {
                     }
                 }
             }
-        
+
             print "Creating key, please be patient ...\n";
-        
-            $key = $default_token->command({
-                    COMMAND => 'create_key',
-                    TYPE    => "$type",
-                    PASSWD  => $passwd,
+
+            $key = $default_token->command(
+                {
+                    COMMAND    => 'create_key',
+                    TYPE       => "$type",
+                    PASSWD     => $passwd,
                     PARAMETERS => $parameters,
-            });
-            if ($key ne '') {
+                }
+            );
+            if ( $key ne '' ) {
                 my $key_path = $key_filename;
-                $key_path =~ s/(.*)\/.*/$1/; # perl is greedy, so this is the path
-                if (! -d $key_path) {    # key path does not yet exist, create it
-                    eval { # try to create
+                $key_path =~
+                  s/(.*)\/.*/$1/;    # perl is greedy, so this is the path
+                if ( !-d $key_path ) {  # key path does not yet exist, create it
+                    eval {              # try to create
                         mkpath($key_path);
                     };
                     if ($EVAL_ERROR) {
-                        print STDERR "Could not create key directory: $key_path";
-                        exit 1; 
+                        print STDERR
+                          "Could not create key directory: $key_path";
+                        exit 1;
                     }
                 }
-                $fu->write_file({
-                    FILENAME => $key_filename,
-                    CONTENT  => $key,
-                });
-                if (-s $key_filename) { # key file exists and is nonzero
+                $fu->write_file(
+                    {
+                        FILENAME => $key_filename,
+                        CONTENT  => $key,
+                    }
+                );
+                if ( -s $key_filename ) {    # key file exists and is nonzero
                     print "Key successfully written to $key_filename\n\n\n";
                 }
                 else {
@@ -744,51 +795,54 @@ sub generate_keys {
 }
 
 sub __get_required_shares {
+
     # returns required_shares from config file or undefined if
     # required_shares is not defined in the configuration
-    my $arg_ref = shift;
+    my $arg_ref       = shift;
     my $config        = $arg_ref->{CONFIG};
-    my @token_path    = @{$arg_ref->{TOKEN_PATH}};
-    my @token_counter = @{$arg_ref->{TOKEN_COUNTER}};
+    my @token_path    = @{ $arg_ref->{TOKEN_PATH} };
+    my @token_counter = @{ $arg_ref->{TOKEN_COUNTER} };
 
     my $quorum_k_count;
     my $quorum_k;
-    eval { # This crashes when k is not present!
-        push @token_path   , ( 'method', 'required_shares' );
-        push @token_counter, ( 0       , 0                 );
+    eval {    # This crashes when k is not present!
+        push @token_path,    ( 'method', 'required_shares' );
+        push @token_counter, ( 0,        0 );
         $quorum_k_count = $config->get_xpath_count(
-                XPATH   => [ @token_path ],
-                COUNTER => [ @token_counter ],
+            XPATH   => [@token_path],
+            COUNTER => [@token_counter],
         );
     };
-    if ($EVAL_ERROR) { # k is not present, noticed the hard way
+    if ($EVAL_ERROR) {    # k is not present, noticed the hard way
         $quorum_k_count = 0;
-        $quorum_k = undef;
+        $quorum_k       = undef;
     }
-    if ($quorum_k_count != 0) { # 'k' configured,
+    if ( $quorum_k_count != 0 ) {    # 'k' configured,
         push @token_counter, (0);
         $quorum_k = $config->get_xpath(
-                XPATH   => [ @token_path ],
-                COUNTER => [ @token_counter ],
+            XPATH   => [@token_path],
+            COUNTER => [@token_counter],
         );
     }
     return $quorum_k;
 }
 
 sub __prompt_password {
+
     # prompt for password until verification password and password match
     my $question = shift;
 
     my $passwords_match = 0;
     my $password1;
-    while (! $passwords_match) {
-        $password1 = prompt($question, -echo => '');
-        print "Please enter the same password share again to make sure it was typed correctly.\n";
-        my $password2 = prompt($question, -echo => '');
-        if ($password1 eq $password2) {
+    while ( !$passwords_match ) {
+        $password1 = prompt( $question, -echo => '' );
+        print
+"Please enter the same password share again to make sure it was typed correctly.\n";
+        my $password2 = prompt( $question, -echo => '' );
+        if ( $password1 eq $password2 ) {
             $passwords_match = 1;
         }
-        if (! $passwords_match) {
+        if ( !$passwords_match ) {
             print "Passwords do not match, please try again!\n\n";
         }
     }
@@ -799,10 +853,10 @@ sub __string_is_in_array {
     my $arg_ref = shift;
 
     my $entry = $arg_ref->{STRING};
-    my @array = @{$arg_ref->{ARRAY}};
+    my @array = @{ $arg_ref->{ARRAY} };
 
     foreach my $elem (@array) {
-        if ($entry eq $elem) {
+        if ( $entry eq $elem ) {
             return 1;
         }
     }
@@ -816,13 +870,13 @@ sub __resolve_alias {
     my $realm   = $arg_ref->{REALM};
 
     my $alias = $dbi->first(
-            TABLE   => 'ALIASES',
-            DYNAMIC => {
-            ALIAS      => $name,
-            PKI_REALM  => $realm,
-            },
+        TABLE   => 'ALIASES',
+        DYNAMIC => {
+            ALIAS     => $name,
+            PKI_REALM => $realm,
+        },
     );
-    if (defined $alias) {
+    if ( defined $alias ) {
         return $alias->{IDENTIFIER};
     }
     else {
@@ -833,136 +887,135 @@ sub __resolve_alias {
 ###########################################################################
 
 my @options_spec = qw(
-                     cfg|cfgfile|config|config=s
-                     debug=s@
-                     ); # config is the only global option
+  cfg|cfgfile|config|config=s
+  debug=s@
+  );    # config is the only global option
 
 my $cmd = shift @ARGV || '';
 my $subcmd;
-if ($cmd eq 'certificate' || $cmd eq 'key') { # those have subcommands
+if ( $cmd eq 'certificate' || $cmd eq 'key' ) {    # those have subcommands
     $subcmd = shift @ARGV || '';
 }
-
 # set command/subcommand specific allowed options
-if ($cmd eq 'initdb') {
+if ( $cmd eq 'initdb' ) {
     push @options_spec, qw(
-                          force
-                          dryrun
-                          );
+      force
+      dryrun
+    );
 }
 
-if ($cmd eq 'deploy') {
+if ( $cmd eq 'deploy' ) {
     push @options_spec, qw(
-                          prefix=s
-                          templatedir=s
-                          template=s
-                          force
-                          );
+      prefix=s
+      templatedir=s
+      template=s
+      force
+    );
 }
 
-if ($cmd eq 'key' || $cmd eq 'certificate') {
+if ( $cmd eq 'key' || $cmd eq 'certificate' ) {
     push @options_spec, qw(
-                          realm=s
-                          );
+      realm=s
+    );
 }
 
-if ($cmd eq 'key' && $subcmd eq 'generate') {
+if ( $cmd eq 'key' && $subcmd eq 'generate' ) {
     push @options_spec, qw(
-                          group=s
-                          );
+      group=s
+    );
 }
 
-if ($cmd eq 'key' && $subcmd eq 'import') {
+if ( $cmd eq 'key' && $subcmd eq 'import' ) {
     push @options_spec, qw(
-                         purpose=s
-                         id=s
-                         file=s
-                        );
+      purpose=s
+      id=s
+      file=s
+    );
 }
 
-if ($cmd eq 'key' && $subcmd eq 'use') {
+if ( $cmd eq 'key' && $subcmd eq 'use' ) {
     push @options_spec, qw(
-                         purpose=s
-                         id=s
-                         command=s
-                        );
+      purpose=s
+      id=s
+      command=s
+    );
 }
-if ($cmd eq 'certificate' && $subcmd eq 'import') {
+if ( $cmd eq 'certificate' && $subcmd eq 'import' ) {
     push @options_spec, qw(
-                          file=s
-                          issuer=s
-                          issuer-realm=s
-                          role=s
-                          force-really-self-signed
-                          force-issuer-not-found
-                          force-certificate-already-exists
-                          );
-}
-
-if ($cmd eq 'certificate' && $subcmd eq 'list') {
-    push @options_spec, qw(
-                          all
-                          v+
-                          );
+      file=s
+      issuer=s
+      issuer-realm=s
+      role=s
+      force-really-self-signed
+      force-issuer-not-found
+      force-certificate-already-exists
+    );
 }
 
-if ($cmd eq 'certificate' && $subcmd eq 'alias') {
+if ( $cmd eq 'certificate' && $subcmd eq 'list' ) {
     push @options_spec, qw(
-                          alias=s
-                          identifier=s
-                          force-certificate-not-found
-                          );
+      all
+      v+
+    );
 }
 
-if ($cmd eq 'certificate' && $subcmd eq 'remove') {
+if ( $cmd eq 'certificate' && $subcmd eq 'alias' ) {
     push @options_spec, qw(
-                           name=s
-                           force-is-issuer
-                          );
-}
- 
-if ($cmd eq 'certificate' && $subcmd eq 'chain') {
-    push @options_spec, qw(
-                          issuer=s
-                          issuer-realm=s
-                          name=s
-                          force-certificate-not-found
-                          force-issuer-certificate-not-found
-                          );
+      alias=s
+      identifier=s
+      force-certificate-not-found
+    );
 }
 
+if ( $cmd eq 'certificate' && $subcmd eq 'remove' ) {
+    push @options_spec, qw(
+      name=s
+      force-is-issuer
+    );
+}
+
+if ( $cmd eq 'certificate' && $subcmd eq 'chain' ) {
+    push @options_spec, qw(
+      issuer=s
+      issuer-realm=s
+      name=s
+      force-certificate-not-found
+      force-issuer-certificate-not-found
+    );
+}
 
 my %params;
-GetOptions(\%params, @options_spec) or pod2usage(-verbose => 0);
+GetOptions( \%params, @options_spec ) or pod2usage( -verbose => 0 );
 
-my ($vol, $dir, $file) = File::Spec->splitpath($0);
-if ($cmd eq 'version') {
+my ( $vol, $dir, $file ) = File::Spec->splitpath($0);
+if ( $cmd eq 'version' ) {
     print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
     print "$file Version: $VERSION\n";
     exit 0;
 }
 
-pod2usage(-exitstatus => 0, -verbose => 2) if ($cmd eq 'man');
-pod2usage(-verbose => 99, -sections => 'NAME|USAGE') if ($cmd eq 'help');
-if ($cmd eq '') {
+pod2usage( -exitstatus => 0,  -verbose  => 2 )            if ( $cmd eq 'man' );
+pod2usage( -verbose    => 99, -sections => 'NAME|USAGE' ) if ( $cmd eq 'help' );
+if ( $cmd eq '' ) {
     print STDERR "Usage: $file COMMAND [SUBCOMMAND] [OPTIONS]\n";
     print STDERR "Hint: '$file help'\n";
     exit 0;
 }
 
-if (defined $params{debug}) {
-    @{$params{debug}} = split(m{,}, join(',', @{$params{debug}}));
-    
-    foreach my $param (@{$params{debug}}) {
-        my ($module, $level) = ($param =~ m{ \A (.*?):?(\d*) \z }xms);
-        if ($level eq '') {
+if ( defined $params{debug} ) {
+    @{ $params{debug} } = split( m{,}, join( ',', @{ $params{debug} } ) );
+
+    foreach my $param ( @{ $params{debug} } ) {
+        my ( $module, $level ) = ( $param =~ m{ \A (.*?):?(\d*) \z }xms );
+        if ( $level eq '' ) {
             $level = 1;
         }
-        if ($module eq '') {
+        if ( $module eq '' ) {
+
             # if modules are not specified, debug everything except for
             # XML::Cache and XML::Config (if you really want to debug these,
             # just use --debug .*:<debug level>)
-            $OpenXPKI::Debug::LEVEL{'.*'} = $level;
+            $OpenXPKI::Debug::LEVEL{'.*'}                    = $level;
             $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'}  = 0;
             $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Config'} = 0;
         }
@@ -979,40 +1032,46 @@ require OpenXPKI::XML::Config;
 require OpenXPKI::Crypto::Secret;
 require OpenXPKI::DateTime;
 
-
-if ((($cmd eq 'certificate' || $cmd eq 'key') && $subcmd eq '') ||
-    (($cmd eq 'certificate' || $cmd eq 'key') && substr($subcmd, 0, 1) eq '-')
-   ) {
-        print STDERR "Usage: openxpkiadm $cmd SUBCOMMAND [OPTIONS]\n";
-        exit 0;
+if (
+    ( ( $cmd eq 'certificate' || $cmd eq 'key' ) && $subcmd eq '' )
+    || ( ( $cmd eq 'certificate' || $cmd eq 'key' )
+        && substr( $subcmd, 0, 1 ) eq '-' )
+  )
+{
+    print STDERR "Usage: openxpkiadm $cmd SUBCOMMAND [OPTIONS]\n";
+    exit 0;
 }
 
-if (defined $params{cfg}) {
+if ( defined $params{cfg} ) {
     $configfile = $params{cfg};
 }
-
 
 ###########################################################################
 
 #my $cmd = shift;
 
-if ($cmd eq 'initdb') {
-    if (! get_config($configfile)) {
-	print STDERR "Could not obtain OpenXPKI instance configuration\n";
-	exit 1;
+if ( $cmd eq 'initdb' ) {
+    if ( !get_config($configfile) ) {
+        print STDERR "Could not obtain OpenXPKI instance configuration\n";
+        exit 1;
     }
-    if (! initdb(
-	     {
-		 DRYRUN => $params{dryrun},
-		 FORCE  => $params{force},
-	     })) {
-	print STDERR "Could not initialize database.\n";
-	exit 1;
+    if (
+        !initdb(
+            {
+                DRYRUN => $params{dryrun},
+                FORCE  => $params{force},
+            }
+        )
+      )
+    {
+        print STDERR "Could not initialize database.\n";
+        exit 1;
     }
     exit 0;
-} 
+}
 
-if ($cmd eq 'deploy') {
+if ( $cmd eq 'deploy' ) {
+
     # get arguments following --
     my @metaconf_opts = @ARGV;
 
@@ -1020,31 +1079,35 @@ if ($cmd eq 'deploy') {
 
     # first non-options argument is target prefix
     my $dir;
-    if ($params{prefix}) {
-	$dir = $params{prefix};
+    if ( $params{prefix} ) {
+        $dir = $params{prefix};
     }
 
-    if (! defined $dir) {
-	$dir = $config{prefix};
+    if ( !defined $dir ) {
+        $dir = $config{prefix};
     }
 
-    if ($params{templatedir}) {
-	$config{template_prefix} = $params{templatedir};
+    if ( $params{templatedir} ) {
+        $config{template_prefix} = $params{templatedir};
     }
 
-    my $template = $params{template} || 'default';    
-    
-    if (! deploy(
-	{
-	    TEMPLATE_PREFIX => $config{template_prefix},
-	    TEMPLATE        => $template,
-	    TARGETDIR       => File::Spec->rel2abs($dir),
-	    METACONF_OPTS   => \@metaconf_opts,
-	    FORCE           => $params{force},
-	    DRYRUN          => $params{dryrun},
-	})) {
-	print STDERR "Could not deploy OpenXPKI instance.\n";
-	exit 1;
+    my $template = $params{template} || 'default';
+
+    if (
+        !deploy(
+            {
+                TEMPLATE_PREFIX => $config{template_prefix},
+                TEMPLATE        => $template,
+                TARGETDIR       => File::Spec->rel2abs($dir),
+                METACONF_OPTS   => \@metaconf_opts,
+                FORCE           => $params{force},
+                DRYRUN          => $params{dryrun},
+            }
+        )
+      )
+    {
+        print STDERR "Could not deploy OpenXPKI instance.\n";
+        exit 1;
     }
 
     print STDERR "OpenXPKI instance successfully deployed to $dir.\n";
@@ -1053,230 +1116,227 @@ if ($cmd eq 'deploy') {
     print STDERR "openxpki-configure\n";
 
     exit 0;
-} 
+}
 
-if ($cmd eq 'certificate') {
-    if (! get_config($configfile, qw( dbi_backend xml_config crypto_layer ))) {
-	print STDERR "Could not obtain OpenXPKI instance configuration\n";
-	exit 1;
+if ( $cmd eq 'certificate' ) {
+    if ( !get_config( $configfile, qw( dbi_backend xml_config crypto_layer ) ) )
+    {
+        print STDERR "Could not obtain OpenXPKI instance configuration\n";
+        exit 1;
     }
 
     ## CTX('pki_realm')
 
     # FIXME: compare OpenXPKI::Server::Init, we use the first realm if none
     # is available, this is a completely arbitrary choice!
-    my @realms = list_realms();
+    my @realms     = list_realms();
     my $firstrealm = $realms[0];
-    
+
     my $realm = $params{realm};
-    if (! defined $realm || $realm eq '') {
+    if ( !defined $realm || $realm eq '' ) {
         $realm = $firstrealm;
     }
     my $defaulttoken = CTX('crypto_layer')->get_token(
-	TYPE      => 'DEFAULT',
-	ID        => 'default',
-	PKI_REALM => $realm,
-	);
+        TYPE      => 'DEFAULT',
+        ID        => 'default',
+        PKI_REALM => $realm,
+    );
 
-    if (! defined $defaulttoken) {
-	print STDERR "ERROR: Could not get default token for specified realm\n";
-	exit 1;
+    if ( !defined $defaulttoken ) {
+        print STDERR "ERROR: Could not get default token for specified realm\n";
+        exit 1;
     }
 
     my $dbi = CTX('dbi_backend');
-    if (! defined $dbi) {
+    if ( !defined $dbi ) {
         print STDERR "ERROR: Could not instantiate database backend\n";
         exit 1;
     }
     $dbi->connect();
 
-    if ($subcmd eq 'list') {
+    if ( $subcmd eq 'list' ) {
         my @realms;
-        if (defined $params{realm}) {
+        if ( defined $params{realm} ) {
             push @realms, $params{realm};
         }
         else {
             @realms = list_realms();
-            push @realms, undef; # add the magic empty realm
+            push @realms, undef;    # add the magic empty realm
         }
 
         foreach my $realm (@realms) {
-            if (defined $realm) {
+            if ( defined $realm ) {
                 print "\nCertificates in $realm:\n";
             }
             else {
                 print "\nCertificates in self-signed pseudo-realm:\n";
             }
             my $certificates;
-            if (defined $params{all}) {
+            if ( defined $params{all} ) {
                 $certificates = $dbi->select(
                     TABLE   => 'CERTIFICATE',
-                    DYNAMIC => {
-                        PKI_REALM => $realm,
-                    },
+                    DYNAMIC => { PKI_REALM => $realm, },
                 );
             }
             else {
                 $certificates = $dbi->select(
                     TABLE   => [ 'ALIASES', 'CERTIFICATE' ],
-                    COLUMNS => [ 'ALIASES.ALIAS',
-                                 'ALIASES.IDENTIFIER',
-                                 'CERTIFICATE.SUBJECT',
-                                 'CERTIFICATE.ISSUER_DN',
-                                 'CERTIFICATE.CERTIFICATE_SERIAL',
-                                 'CERTIFICATE.ISSUER_IDENTIFIER',
-                                 'CERTIFICATE.DATA',
-                                 'CERTIFICATE.EMAIL',
-                                 'CERTIFICATE.STATUS',
-                                 'CERTIFICATE.ROLE',
-                                 'CERTIFICATE.PUBKEY',
-                                 'CERTIFICATE.SUBJECT_KEY_IDENTIFIER',
-                                 'CERTIFICATE.AUTHORITY_KEY_IDENTIFIER',
-                                 'CERTIFICATE.NOTAFTER',
-                                 'CERTIFICATE.LOA',
-                                 'CERTIFICATE.NOTBEFORE',
-                                 'CERTIFICATE.CSR_SERIAL',
-                               ],
-                    JOIN    => [
-                                    [ 'IDENTIFIER',
-                                      'IDENTIFIER',
-                                    ],
-                               ],
-                    DYNAMIC => {
-                        'ALIASES.PKI_REALM' => $realm,
-                    },
+                    COLUMNS => [
+                        'ALIASES.ALIAS',
+                        'ALIASES.IDENTIFIER',
+                        'CERTIFICATE.SUBJECT',
+                        'CERTIFICATE.ISSUER_DN',
+                        'CERTIFICATE.CERTIFICATE_SERIAL',
+                        'CERTIFICATE.ISSUER_IDENTIFIER',
+                        'CERTIFICATE.DATA',
+                        'CERTIFICATE.EMAIL',
+                        'CERTIFICATE.STATUS',
+                        'CERTIFICATE.ROLE',
+                        'CERTIFICATE.PUBKEY',
+                        'CERTIFICATE.SUBJECT_KEY_IDENTIFIER',
+                        'CERTIFICATE.AUTHORITY_KEY_IDENTIFIER',
+                        'CERTIFICATE.NOTAFTER',
+                        'CERTIFICATE.LOA',
+                        'CERTIFICATE.NOTBEFORE',
+                        'CERTIFICATE.CSR_SERIAL',
+                    ],
+                    JOIN => [ [ 'IDENTIFIER', 'IDENTIFIER', ], ],
+                    DYNAMIC => { 'ALIASES.PKI_REALM' => $realm, },
                 );
             }
-            for (my $i = 0; $i < scalar @{$certificates}; $i++) {
+            for ( my $i = 0 ; $i < scalar @{$certificates} ; $i++ ) {
                 my $cert = $certificates->[$i];
                 my $identifier;
-                if (defined $params{all}) { # look up aliases
+                if ( defined $params{all} ) {    # look up aliases
                     $identifier = $cert->{IDENTIFIER};
                     my $status = $cert->{STATUS};
-                    if (defined $status && $status eq 'REVOKED') {
-                        print "\n  Identifier: " . $cert->{IDENTIFIER}
-                            . " (REVOKED)\n";
+                    if ( defined $status && $status eq 'REVOKED' ) {
+                        print "\n  Identifier: "
+                          . $cert->{IDENTIFIER}
+                          . " (REVOKED)\n";
                     }
                     else {
                         print "\n  Identifier: " . $cert->{IDENTIFIER} . "\n";
                     }
                     my $aliases = $dbi->select(
                         TABLE   => 'ALIASES',
-                        DYNAMIC => {
-                          IDENTIFIER => $cert->{IDENTIFIER},
-                        },
+                        DYNAMIC => { IDENTIFIER => $cert->{IDENTIFIER}, },
                     );
-                    for (my $j = 0; $j < scalar @{$aliases}; $j++) {
+                    for ( my $j = 0 ; $j < scalar @{$aliases} ; $j++ ) {
                         print "    Alias:\n      "
-                            . $aliases->[$j]->{ALIAS}
-                            . " (in realm: " . $aliases->[$j]->{PKI_REALM}
-                            . ")\n";
+                          . $aliases->[$j]->{ALIAS}
+                          . " (in realm: "
+                          . $aliases->[$j]->{PKI_REALM} . ")\n";
                     }
                 }
                 else {
                     $identifier = $cert->{'ALIASES.IDENTIFIER'};
                     my $status = $cert->{'CERTIFICATE.STATUS'};
-                    if (defined $status && $status eq 'REVOKED') {
+                    if ( defined $status && $status eq 'REVOKED' ) {
                         print "\n  Identifier: "
-                            . $cert->{'ALIASES.IDENTIFIER'} . " (REVOKED)\n";
+                          . $cert->{'ALIASES.IDENTIFIER'}
+                          . " (REVOKED)\n";
                     }
                     else {
-                        print "\n  Identifier: " . $cert->{'ALIASES.IDENTIFIER'}
-                            . "\n";
+                        print "\n  Identifier: "
+                          . $cert->{'ALIASES.IDENTIFIER'} . "\n";
                     }
                     print "    Alias:\n       "
-                        . $cert->{'ALIASES.ALIAS'} . "\n";
+                      . $cert->{'ALIASES.ALIAS'} . "\n";
                 }
                 my $prefix = '';
-                if (!defined $params{all}) {
+                if ( !defined $params{all} ) {
                     $prefix = 'CERTIFICATE.';
                 }
-                if (defined $params{v} && $params{v} > 0) {
+                if ( defined $params{v} && $params{v} > 0 ) {
+
                     # show subject and issuer dn
-                    my $subject   = $cert->{$prefix . 'SUBJECT'};
-                    my $issuer_dn = $cert->{$prefix . 'ISSUER_DN'};
+                    my $subject   = $cert->{ $prefix . 'SUBJECT' };
+                    my $issuer_dn = $cert->{ $prefix . 'ISSUER_DN' };
                     print "    Subject:\n      " . $subject . "\n";
                     print "    Issuer DN:\n      " . $issuer_dn . "\n";
                 }
-                if (defined $params{v} && $params{v} > 1) {
+                if ( defined $params{v} && $params{v} > 1 ) {
+
                     # show chain
                     my $api = CTX('api');
-                    my $chain = $api->get_chain({
-                        START_IDENTIFIER => $identifier,      
-                    });
-                    my $chain_str
-                        = join (' -> ', @{$chain->{IDENTIFIERS}});
+                    my $chain =
+                      $api->get_chain( { START_IDENTIFIER => $identifier, } );
+                    my $chain_str = join( ' -> ', @{ $chain->{IDENTIFIERS} } );
 
                     print "    Chain: $chain_str ";
-                    if ($chain->{COMPLETE} == 1) {
+                    if ( $chain->{COMPLETE} == 1 ) {
                         print "(complete)\n";
                     }
                     else {
                         print "(INcomplete!)\n";
                     }
                 }
-                if (defined $params{v} && $params{v} > 2) {
+                if ( defined $params{v} && $params{v} > 2 ) {
+
                     # show database entry
                     my @fields = qw(
-                                 SUBJECT_KEY_IDENTIFIER
-                                 AUTHORITY_KEY_IDENTIFIER
-                                 CERTIFICATE_SERIAL
-                                 ISSUER_IDENTIFIER
-                                 EMAIL
-                                 STATUS
-                                 ROLE
-                                 NOTAFTER
-                                 NOTBEFORE
-                                 CSR_SERIAL
-                                 LOA
-                                );
-                    if ($params{v} > 3) {
+                      SUBJECT_KEY_IDENTIFIER
+                      AUTHORITY_KEY_IDENTIFIER
+                      CERTIFICATE_SERIAL
+                      ISSUER_IDENTIFIER
+                      EMAIL
+                      STATUS
+                      ROLE
+                      NOTAFTER
+                      NOTBEFORE
+                      CSR_SERIAL
+                      LOA
+                    );
+
+                    if ( $params{v} > 3 ) {
                         push @fields, qw(PUBKEY DATA);
                     }
-        
+
                     foreach my $field (@fields) {
                         my $value;
-                        if (defined $cert->{$prefix . $field}) {
-                            $value = $cert->{$prefix . $field};
+                        if ( defined $cert->{ $prefix . $field } ) {
+                            $value = $cert->{ $prefix . $field };
                         }
                         else {
                             $value = 'NULL';
                         }
-                        print "    $field:\n      " 
-                            . $value . "\n";
-                    } 
+                        print "    $field:\n      " . $value . "\n";
+                    }
                 }
             }
         }
-	exit 0;
+        exit 0;
     }
 
-    if ($subcmd eq 'remove') {
+    if ( $subcmd eq 'remove' ) {
         my $name  = $params{name};
         my $realm = $params{realm};
 
         my $identifier = $name;
-        if (defined $realm) {
-            $identifier = __resolve_alias({
-                    DBI    => $dbi,
-                    NAME   => $name,
-                    REALM  => $realm,
-            });
+        if ( defined $realm ) {
+            $identifier = __resolve_alias(
+                {
+                    DBI   => $dbi,
+                    NAME  => $name,
+                    REALM => $realm,
+                }
+            );
         }
+
         # check if certificate is issuer of something
         my $children_dbi = $dbi->select(
             TABLE   => 'CERTIFICATE',
-            DYNAMIC => {
-                ISSUER_IDENTIFIER => $identifier,
-            },
+            DYNAMIC => { ISSUER_IDENTIFIER => $identifier, },
         );
         my @children = @{$children_dbi};
 
         my $is_issuer = 0;
-        if (scalar @children > 0) {
+        if ( scalar @children > 0 ) {
             $is_issuer = 1;
-            if (scalar @children == 1) {
-                if ($children[0]->{'ISSUER_IDENTIFIER'} eq $identifier) {
+            if ( scalar @children == 1 ) {
+                if ( $children[0]->{'ISSUER_IDENTIFIER'} eq $identifier ) {
+
                     # only self-signed certificate, delete even though
                     # it formally is the issuer of a certificate in the DB
                     $is_issuer = 0;
@@ -1284,139 +1344,149 @@ if ($cmd eq 'certificate') {
             }
         }
 
-        if ($is_issuer && ! defined $params{'force-is-issuer'}) {
-            print STDERR "ERROR: Certificate not deleted because it is referenced as the issuer of " . scalar @children . " certificate(s) in the database.\n";
+        if ( $is_issuer && !defined $params{'force-is-issuer'} ) {
+            print STDERR
+"ERROR: Certificate not deleted because it is referenced as the issuer of "
+              . scalar @children
+              . " certificate(s) in the database.\n";
             exit 1;
         }
         my $certificate = $dbi->first(
             TABLE   => 'CERTIFICATE',
-            DYNAMIC => {
-                IDENTIFIER => $identifier,
-            },
+            DYNAMIC => { IDENTIFIER => $identifier, },
         );
-        if (defined $certificate) {
+        if ( defined $certificate ) {
             $dbi->delete(
                 TABLE => 'CERTIFICATE',
-                DATA  => {
-                    IDENTIFIER => $identifier,
-                },
+                DATA  => { IDENTIFIER => $identifier, },
             );
             $dbi->commit();
             print "Successfully deleted certificate $name "
-                . "(identifier: $identifier) from database.\n";
+              . "(identifier: $identifier) from database.\n";
             exit 0;
         }
         else {
             print STDERR "ERROR: Certificate $name "
-                . "(identifier: $identifier) not found in database.\n";
+              . "(identifier: $identifier) not found in database.\n";
             exit 1;
         }
     }
 
-    if ($subcmd eq 'import') {
-	my $filename = $params{file};
+    if ( $subcmd eq 'import' ) {
+        my $filename = $params{file};
 
-	if (! -r $filename) {
-	    print STDERR "ERROR: filename '$filename' is not readable\n";
-	    exit 1;
-	}
-	
-	my $FileUtils = OpenXPKI::FileUtils->new();
-	my $certdata = $FileUtils->read_file($filename);
-	
-	if (! defined $certdata) {
-	    print STDERR "ERROR: Could not parse certificate data\n";
-	    exit 1;
-	}
+        if ( !-r $filename ) {
+            print STDERR "ERROR: filename '$filename' is not readable\n";
+            exit 1;
+        }
 
-        if ((! defined $params{issuer} || $params{issuer} eq '')
-                                    && (defined $params{realm})) {
+        my $FileUtils = OpenXPKI::FileUtils->new();
+        my $certdata  = $FileUtils->read_file($filename);
+
+        if ( !defined $certdata ) {
+            print STDERR "ERROR: Could not parse certificate data\n";
+            exit 1;
+        }
+
+        if (   ( !defined $params{issuer} || $params{issuer} eq '' )
+            && ( defined $params{realm} ) )
+        {
             print STDERR "ERROR: You have to specify an issuer (or leave "
               . "out --realm for self-signed certificates).\n";
             exit 1;
         }
 
-        my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
+        my ($extracted_certdata) = $certdata =~
+m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
 
         my $cert = OpenXPKI::Crypto::X509->new(
-                TOKEN => $defaulttoken,
-                DATA  => $extracted_certdata,
+            TOKEN => $defaulttoken,
+            DATA  => $extracted_certdata,
         );
         #### cert : Dumper($cert)
 
         my $realm;
         my $issuer_identifier;
-        if (! defined $params{realm} || $params{realm} eq '') {
+        if ( !defined $params{realm} || $params{realm} eq '' ) {
+
             # user wants to import a self-signed
             # cert, let's check if it really is one
             ### subject key id : $cert->get_subject_key_id()
             ### authority key id : $cert->get_authority_key_id()
-            if (defined $cert->get_subject_key_id()
+            if (
+                   defined $cert->get_subject_key_id()
                 && defined $cert->get_authority_key_id()
                 && ref $cert->get_authority_key_id() eq '' # TODO: check if hash
-                && ($cert->get_subject_key_id()
-                   ne $cert->get_authority_key_id())) {
-                if (! defined $params{'force-really-self-signed'}) {
+                && (
+                    $cert->get_subject_key_id() ne $cert->get_authority_key_id()
+                )
+              )
+            {
+                if ( !defined $params{'force-really-self-signed'} ) {
                     print STDERR "ERROR: This is not a self-signed "
-                    . "certificate, "
-                    . "(subject key id and authority key id do not match) "
-                    . "please specify --realm if you want to import a "
-                    . "normal certificate.\n";
+                      . "certificate, "
+                      . "(subject key id and authority key id do not match) "
+                      . "please specify --realm if you want to import a "
+                      . "normal certificate.\n";
                     exit 1;
                 }
             }
-            if (   $cert->{PARSED}->{BODY}->{SUBJECT}
-                ne $cert->{PARSED}->{BODY}->{ISSUER}) {
-                if (! defined $params{'force-really-self-signed'}) {
+            if ( $cert->{PARSED}->{BODY}->{SUBJECT} ne
+                $cert->{PARSED}->{BODY}->{ISSUER} )
+            {
+                if ( !defined $params{'force-really-self-signed'} ) {
                     print STDERR "ERROR: This is not a self-signed "
-                    . "certificate, "
-                    . "(subject and issuer do not match) "
-                    . "please specify --realm if you want to import a "
-                    . "normal certificate.\n";
+                      . "certificate, "
+                      . "(subject and issuer do not match) "
+                      . "please specify --realm if you want to import a "
+                      . "normal certificate.\n";
                     exit 1;
                 }
             }
+
             # we are our own issuer
             $issuer_identifier = $cert->get_identifier();
         }
-        else { # we have a "normal" certificate
-            if (defined $params{'issuer-realm'}) {
+        else {    # we have a "normal" certificate
+            if ( defined $params{'issuer-realm'} ) {
                 $realm = $params{'issuer-realm'};
             }
             else {
                 $realm = $params{realm};
             }
+
             # maybe the issuer name is an alias, try to resolve it
-            $issuer_identifier = __resolve_alias({
-                    DBI    => $dbi,
-                    NAME   => $params{issuer},
-                    REALM  => $realm,
-            });
+            $issuer_identifier = __resolve_alias(
+                {
+                    DBI   => $dbi,
+                    NAME  => $params{issuer},
+                    REALM => $realm,
+                }
+            );
             ### issuer_identifier : $issuer_identifier
             # check whether the certificate is in the DB
             my $issuer = $dbi->first(
-                    TABLE   => 'CERTIFICATE',
-                    DYNAMIC => {
-                        IDENTIFIER => $issuer_identifier,
-                    },
+                TABLE   => 'CERTIFICATE',
+                DYNAMIC => { IDENTIFIER => $issuer_identifier, },
             );
-            if (! defined $issuer &&
-                ! defined $params{'force-issuer-not-found'}) {
+            if (   !defined $issuer
+                && !defined $params{'force-issuer-not-found'} )
+            {
                 print STDERR "ERROR: Issuer '$params{issuer}' not found in "
-                    . "the database.\n";
+                  . "the database.\n";
                 exit 1;
             }
         }
 
-	# make sure the self-signed realm is specified as 'undef'
-	if (defined $realm && ($realm eq '')) {
-	    $realm = undef;
-	}
+        # make sure the self-signed realm is specified as 'undef'
+        if ( defined $realm && ( $realm eq '' ) ) {
+            $realm = undef;
+        }
 
         # compile all relevant data for the database
         # TODO: use $cert->to_db_hash();
         my %insert_hash;
-        $insert_hash{STATUS}             = 'ISSUED'; 
+        $insert_hash{STATUS}             = 'ISSUED';
         $insert_hash{PKI_REALM}          = $realm;
         $insert_hash{CERTIFICATE_SERIAL} = $cert->get_serial();
         $insert_hash{IDENTIFIER}         = $cert->get_identifier();
@@ -1424,42 +1494,50 @@ if ($cmd eq 'certificate') {
         $insert_hash{SUBJECT}            = $cert->{PARSED}->{BODY}->{SUBJECT};
         $insert_hash{ISSUER_DN}          = $cert->{PARSED}->{BODY}->{ISSUER};
         $insert_hash{ISSUER_IDENTIFIER}  = $issuer_identifier;
+
         # combine email addresses
-        if (exists $cert->{PARSED}->{BODY}->{EMAILADDRESSES}) {
+        if ( exists $cert->{PARSED}->{BODY}->{EMAILADDRESSES} ) {
             $insert_hash{EMAIL} = '';
-            foreach my $email (@{$cert->{PARSED}->{BODY}->{EMAILADDRESSES}}) {
-                $insert_hash{EMAIL} .= "," if ($insert_hash{EMAIL} ne '');
+            foreach my $email ( @{ $cert->{PARSED}->{BODY}->{EMAILADDRESSES} } )
+            {
+                $insert_hash{EMAIL} .= "," if ( $insert_hash{EMAIL} ne '' );
                 $insert_hash{EMAIL} .= $email;
             }
         }
-        $insert_hash{PUBKEY}             = $cert->{PARSED}->{BODY}->{PUBKEY};
+        $insert_hash{PUBKEY} = $cert->{PARSED}->{BODY}->{PUBKEY};
+
         # set subject key id and authority key id, if defined.
-        if (defined $cert->get_subject_key_id()) {
-            $insert_hash{SUBJECT_KEY_IDENTIFIER}
-                = $cert->get_subject_key_id();
+        if ( defined $cert->get_subject_key_id() ) {
+            $insert_hash{SUBJECT_KEY_IDENTIFIER} = $cert->get_subject_key_id();
         }
-        if (defined $cert->get_authority_key_id() &&
-            ref $cert->get_authority_key_id() eq '') {
-                # TODO: do we save if authority key id is hash, and if
-                # yes, in which format?
-            $insert_hash{AUTHORITY_KEY_IDENTIFIER}
-                = $cert->get_authority_key_id();
+        if ( defined $cert->get_authority_key_id()
+            && ref $cert->get_authority_key_id() eq '' )
+        {
+
+            # TODO: do we save if authority key id is hash, and if
+            # yes, in which format?
+            $insert_hash{AUTHORITY_KEY_IDENTIFIER} =
+              $cert->get_authority_key_id();
         }
-        if (defined $params{role} && $params{role} ne '') {
+        if ( defined $params{role} && $params{role} ne '' ) {
+
             # TODO: check if role is valid (from acl.xml)
-            $insert_hash{ROLE} = $params{role}
+            $insert_hash{ROLE} = $params{role};
         }
-        
-        $insert_hash{NOTAFTER}           
-            = OpenXPKI::DateTime::convert_date({
+
+        $insert_hash{NOTAFTER} = OpenXPKI::DateTime::convert_date(
+            {
                 DATE      => $cert->{PARSED}->{BODY}->{NOTAFTER},
                 OUTFORMAT => 'epoch',
-        });
-        $insert_hash{NOTBEFORE}
-            = OpenXPKI::DateTime::convert_date({
+            }
+        );
+        $insert_hash{NOTBEFORE} = OpenXPKI::DateTime::convert_date(
+            {
                 DATE      => $cert->{PARSED}->{BODY}->{NOTBEFORE},
                 OUTFORMAT => 'epoch',
-        });
+            }
+        );
+
         # fields which are explicitly NOT set:
         # LOA          (we don't know it)
         # CSR_SERIAL   ( " " )
@@ -1468,13 +1546,12 @@ if ($cmd eq 'certificate') {
         # identifier anywhere
         my $certificate = $dbi->first(
             TABLE   => 'CERTIFICATE',
-            DYNAMIC => {
-                IDENTIFIER => $insert_hash{IDENTIFIER},
-            },
+            DYNAMIC => { IDENTIFIER => $insert_hash{IDENTIFIER}, },
         );
-        if (defined $certificate &&
-            ! defined $params{'force-certificate-already-exists'}) {
-            if ($certificate->{PKI_REALM} ne '') {
+        if ( defined $certificate
+            && !defined $params{'force-certificate-already-exists'} )
+        {
+            if ( $certificate->{PKI_REALM} ne '' ) {
                 print STDERR "ERROR: The same certificate already exists "
                   . "in the $certificate->{PKI_REALM} realm. Use openxpkiadm "
                   . "certificate alias to reference it.\n";
@@ -1486,59 +1563,59 @@ if ($cmd eq 'certificate') {
             }
             exit 1;
         }
-	$dbi->insert(
-	    TABLE => 'CERTIFICATE', # use hash method
-	    HASH  => \%insert_hash,
-        );	
+        $dbi->insert(
+            TABLE => 'CERTIFICATE',    # use hash method
+            HASH  => \%insert_hash,
+        );
         $dbi->commit();
 
         print "Successfully imported certificate into database:\n";
         print "  Subject:    " . $insert_hash{SUBJECT} . "\n";
         print "  Issuer:     " . $insert_hash{ISSUER_DN} . "\n";
         print "  Identifier: " . $insert_hash{IDENTIFIER} . "\n";
-	exit 0;
+        exit 0;
     }
 
-    if ($subcmd eq 'alias') {
+    if ( $subcmd eq 'alias' ) {
         my %insert_hash = ();
 
         $insert_hash{PKI_REALM} = $params{realm};
 
-        if (! exists($params{alias}) || $params{alias} eq '') {
+        if ( !exists( $params{alias} ) || $params{alias} eq '' ) {
             print STDERR "Please specify an alias with --alias\n";
             exit 1;
         }
         else {
             $insert_hash{ALIAS} = $params{alias};
         }
-        if (! exists($params{identifier}) || $params{identifier} eq '') {
+        if ( !exists( $params{identifier} ) || $params{identifier} eq '' ) {
             print STDERR "Please specify an identifier with --identifier\n";
             exit 1;
         }
         else {
             $insert_hash{IDENTIFIER} = $params{identifier};
         }
+
         # TODO: check for --realm?
 
         # query certificate table to check whether --identifer actually exists
         my $certificate = $dbi->first(
             TABLE   => 'CERTIFICATE',
-            DYNAMIC => {
-                IDENTIFIER => $insert_hash{IDENTIFIER},
-            },
+            DYNAMIC => { IDENTIFIER => $insert_hash{IDENTIFIER}, },
         );
-        
-        if (! defined $certificate &&
-            ! defined $params{'force-certificate-not-found'}) { # there is no cert with given identifier
+
+        if (   !defined $certificate
+            && !defined $params{'force-certificate-not-found'} )
+        {    # there is no cert with given identifier
             print STDERR "ERROR: Could not find a certificate with "
-                . "identifier '$insert_hash{IDENTIFIER}', "
-                . "are you sure it is correct?\n";
+              . "identifier '$insert_hash{IDENTIFIER}', "
+              . "are you sure it is correct?\n";
             exit 1;
         }
         #### insert_hash : Dumper(\%insert_hash)
         $dbi->insert(
-                TABLE => 'ALIASES',
-                HASH  => \%insert_hash,
+            TABLE => 'ALIASES',
+            HASH  => \%insert_hash,
         );
         $dbi->commit();
         print "Successfully created alias in realm $params{realm}:\n";
@@ -1547,17 +1624,17 @@ if ($cmd eq 'certificate') {
         exit 0;
     }
 
-    if ($subcmd eq 'chain') {
+    if ( $subcmd eq 'chain' ) {
         my $cert_name;
         my $issuer_name;
-        if (! exists($params{name}) || $params{name} eq '') {
+        if ( !exists( $params{name} ) || $params{name} eq '' ) {
             print STDERR "Please specify a certificate name with --name\n";
             exit 1;
         }
         else {
             $cert_name = $params{name};
         }
-        if (! exists($params{issuer}) || $params{issuer} eq '') {
+        if ( !exists( $params{issuer} ) || $params{issuer} eq '' ) {
             print STDERR "Please specify an issuer name with --issuer\n";
             exit 1;
         }
@@ -1566,11 +1643,14 @@ if ($cmd eq 'certificate') {
         }
 
         # maybe the certificate name is an alias, try to resolve it
-        my $cert_identifier = __resolve_alias({
-            DBI   => $dbi,
-            NAME  => $cert_name,
-            REALM => $params{realm},
-        });
+        my $cert_identifier = __resolve_alias(
+            {
+                DBI   => $dbi,
+                NAME  => $cert_name,
+                REALM => $params{realm},
+            }
+        );
+
         # check whether the certificate is in the DB
         my $certificate = $dbi->first(
             TABLE   => 'CERTIFICATE',
@@ -1579,48 +1659,50 @@ if ($cmd eq 'certificate') {
                 PKI_REALM  => $params{realm}
             },
         );
-        if (! defined $certificate &&
-            ! defined $params{'force-certificate-not-found'}) {
+        if (   !defined $certificate
+            && !defined $params{'force-certificate-not-found'} )
+        {
             print STDERR "ERROR: Certificate '$cert_name' not found in realm "
-                . "$params{realm}.\n";
+              . "$params{realm}.\n";
             exit 1;
         }
-        
+
         my $issuer_identifier;
+
         # maybe the issuer name is an alias, try resolve it
         my $realm;
-        if (defined $params{'issuer-realm'}) {
+        if ( defined $params{'issuer-realm'} ) {
             $realm = $params{'issuer-realm'};
         }
         else {
             $realm = $params{realm};
         }
-        $issuer_identifier = __resolve_alias({
-            DBI   => $dbi,
-            NAME  => $issuer_name,
-            REALM => $realm,
-        });
+        $issuer_identifier = __resolve_alias(
+            {
+                DBI   => $dbi,
+                NAME  => $issuer_name,
+                REALM => $realm,
+            }
+        );
+
         # check whether the issuer is in the DB
         my $issuer = $dbi->first(
             TABLE   => 'CERTIFICATE',
-            DYNAMIC => {
-                IDENTIFIER => $issuer_identifier,
-            },
+            DYNAMIC => { IDENTIFIER => $issuer_identifier, },
         );
-        if (! defined $issuer &&
-            ! defined $params{'force-issuer-certificate-not-found'}) {
+        if (   !defined $issuer
+            && !defined $params{'force-issuer-certificate-not-found'} )
+        {
             print STDERR "ERROR: Issuer certificate '$issuer_name' "
-                . "(identifier: $issuer_identifier) not found in database.\n";
+              . "(identifier: $issuer_identifier) not found in database.\n";
             exit 1;
         }
 
         # set the issuer_identifier for the given certificate
         $dbi->update(
-            TABLE   => 'CERTIFICATE',
-            DATA    => {
-                ISSUER_IDENTIFIER => $issuer_identifier,
-            },
-            WHERE   => {
+            TABLE => 'CERTIFICATE',
+            DATA  => { ISSUER_IDENTIFIER => $issuer_identifier, },
+            WHERE => {
                 CERTIFICATE_SERIAL => $certificate->{CERTIFICATE_SERIAL},
                 IDENTIFIER         => $cert_identifier,
                 PKI_REALM          => $certificate->{PKI_REALM},
@@ -1628,24 +1710,26 @@ if ($cmd eq 'certificate') {
         );
         $dbi->commit();
         print "Successfully set $issuer_name (identifier: $issuer_identifier) "
-            . "as issuer of certificate $cert_name (identifier: "
-            . "$cert_identifier).\n";
+          . "as issuer of certificate $cert_name (identifier: "
+          . "$cert_identifier).\n";
+
         # TODO: maybe don't warn only, but let the user use --force to
         # specify that he knows what he is doing ...?
-        if ($issuer->{SUBJECT_KEY_IDENTIFIER}
-                ne $certificate->{AUTHORITY_KEY_IDENTIFIER}) {
+        if ( $issuer->{SUBJECT_KEY_IDENTIFIER} ne
+            $certificate->{AUTHORITY_KEY_IDENTIFIER} )
+        {
             print STDERR "WARNING: The issuer's subject key identifier "
-                . "extension ($issuer->{SUBJECT_KEY_IDENTIFIER}) does not "
-                . "match the authority key identifier extension contained "
-                . "in the certificate "
-                . "($certificate->{AUTHORITY_KEY_IDENTIFIER}). Are you sure "
-                . "your chain is correct?\n";
+              . "extension ($issuer->{SUBJECT_KEY_IDENTIFIER}) does not "
+              . "match the authority key identifier extension contained "
+              . "in the certificate "
+              . "($certificate->{AUTHORITY_KEY_IDENTIFIER}). Are you sure "
+              . "your chain is correct?\n";
         }
-        if ($issuer->{SUBJECT} ne $certificate->{ISSUER_DN}) {
+        if ( $issuer->{SUBJECT} ne $certificate->{ISSUER_DN} ) {
             print STDERR "WARNING: The issuer's subject ($issuer->{SUBJECT}) "
-                . "does not match the issuer DN contained in the certificate "
-                . "($certificate->{ISSUER_DN}). Are you sure your chain is "
-                . "correct?\n";
+              . "does not match the issuer DN contained in the certificate "
+              . "($certificate->{ISSUER_DN}). Are you sure your chain is "
+              . "correct?\n";
         }
         exit 0;
     }
@@ -1654,318 +1738,346 @@ if ($cmd eq 'certificate') {
     exit 1;
 }
 
-if ($cmd eq 'key') {
-    if (! get_config($configfile, qw( dbi_backend xml_config crypto_layer))) {
-	print STDERR "Could not obtain OpenXPKI instance configuration\n";
-	exit 1;
+if ( $cmd eq 'key' ) {
+    if ( !get_config( $configfile, qw( dbi_backend xml_config crypto_layer) ) )
+    {
+        print STDERR "Could not obtain OpenXPKI instance configuration\n";
+        exit 1;
     }
 
     my @pki_realms = list_realms();
-    if (! defined $params{realm} ||
-        ! grep {$params{realm} eq $_} @pki_realms) {
-	print STDERR "Please specify one of the following PKI realms via --realm:\n";
-	foreach my $realm (@pki_realms) {
-	    print "  $realm\n";
-	}
+    if (   !defined $params{realm}
+        || !grep { $params{realm} eq $_ } @pki_realms )
+    {
+        print STDERR
+          "Please specify one of the following PKI realms via --realm:\n";
+        foreach my $realm (@pki_realms) {
+            print "  $realm\n";
+        }
 
-	exit 1;
+        exit 1;
     }
     ## CTX('pki_realm')
 
     my $defaulttoken = CTX('crypto_layer')->get_token(
-	TYPE      => 'DEFAULT',
-	ID        => 'default',
-	PKI_REALM => $params{realm},
-	);
+        TYPE      => 'DEFAULT',
+        ID        => 'default',
+        PKI_REALM => $params{realm},
+    );
 
-    if (! defined $defaulttoken) {
-	print STDERR "ERROR: Could not get default token for specified realm\n";
-	exit 1;
+    if ( !defined $defaulttoken ) {
+        print STDERR "ERROR: Could not get default token for specified realm\n";
+        exit 1;
     }
 
-    if ($subcmd eq 'list') {
-	my $rc = list_keys(
-	    {
-		REALM => $params{realm},
-	    });
-	exit 0;
+    if ( $subcmd eq 'list' ) {
+        my $rc = list_keys( { REALM => $params{realm}, } );
+        exit 0;
     }
 
-    if ($subcmd eq 'use') {
+    if ( $subcmd eq 'use' ) {
         my $key_id  = $params{id};
         my $purpose = lc $params{purpose};
         my $realm   = $params{realm};
         my $command = $params{command};
-        if (! defined $command) {
+        if ( !defined $command ) {
             $command = '/bin/sh';
         }
         my $default_token = CTX('crypto_layer')->get_token(
-                TYPE      => 'DEFAULT',
-                PKI_REALM => $realm,
+            TYPE      => 'DEFAULT',
+            PKI_REALM => $realm,
         );
 
-        if ($key_id eq '') {
-            print STDERR "Please specify a token ID with --id (see output of key list for a list of possible values).\n";
+        if ( $key_id eq '' ) {
+            print STDERR
+"Please specify a token ID with --id (see output of key list for a list of possible values).\n";
             exit 1;
         }
-        if ($purpose eq '') {
-            print STDERR "Please specify a purpose (CA, SCEP, ...) with --purpose (see output of key list for a list of possible values).\n";
+        if ( $purpose eq '' ) {
+            print STDERR
+"Please specify a purpose (CA, SCEP, ...) with --purpose (see output of key list for a list of possible values).\n";
         }
-        my $config = OpenXPKI::XML::Config->new(
-            CONFIG => $configfile,
-        );
+        my $config = OpenXPKI::XML::Config->new( CONFIG => $configfile, );
 
         my $nr_of_realms = $config->get_xpath_count(
-            XPATH   => [ 'pki_realm' ],
-            COUNTER => [ ],
+            XPATH   => ['pki_realm'],
+            COUNTER => [],
         );
 
         my $realm_index;
-        for (my $i=0; $i < $nr_of_realms; $i++) {
-            next if ($realm ne $config->get_xpath(
-                              XPATH    => [ 'pki_realm', 'name' ],
-                              COUNTER  => [ $i         , 0 ]));
+        for ( my $i = 0 ; $i < $nr_of_realms ; $i++ ) {
+            next
+              if (
+                $realm ne $config->get_xpath(
+                    XPATH   => [ 'pki_realm', 'name' ],
+                    COUNTER => [ $i,          0 ]
+                )
+              );
             $realm_index = $i;
             last;
         }
         my $nr_of_purpose_items = $config->get_xpath_count(
             XPATH   => [ 'pki_realm', $purpose ],
-            COUNTER => [ $realm_index ],
+            COUNTER => [$realm_index],
         );
         my $purpose_index;
-        for (my $i=0; $i < $nr_of_purpose_items; $i++) { # look for matching id
-            next if ($key_id ne $config->get_xpath(
-                            XPATH   => [ 'pki_realm' , $purpose, 'token', 'id' ],
-                            COUNTER => [ $realm_index, $i      , 0      , 0    ],
-            ));
+        for ( my $i = 0 ; $i < $nr_of_purpose_items ; $i++ )
+        {    # look for matching id
+            next
+              if (
+                $key_id ne $config->get_xpath(
+                    XPATH   => [ 'pki_realm',  $purpose, 'token', 'id' ],
+                    COUNTER => [ $realm_index, $i,       0,       0 ],
+                )
+              );
             $purpose_index = $i;
             last;
         }
-        if (! defined($purpose_index)) {
-            print STDERR "Could not find configuration for this ID and purpose.\n";
+        if ( !defined($purpose_index) ) {
+            print STDERR
+              "Could not find configuration for this ID and purpose.\n";
             exit 1;
         }
-        my @token_path    = ( 'pki_realm' , $purpose      , 'token' );
-        my @token_counter = ( $realm_index, $purpose_index, 0       );
+        my @token_path = ( 'pki_realm', $purpose, 'token' );
+        my @token_counter = ( $realm_index, $purpose_index, 0 );
         my $key_filename;
         eval {
             $key_filename = $config->get_xpath(
-                XPATH   => [ @token_path   , 'key' ],
-                COUNTER => [ @token_counter, 0     ],
+                XPATH   => [ @token_path,    'key' ],
+                COUNTER => [ @token_counter, 0 ],
             );
         };
         if ($EVAL_ERROR) {
             print STDERR "Could not read key filename from config file, "
-                . "configuration error?\n";
+              . "configuration error?\n";
             print STDERR "$EVAL_ERROR\n";
             exit 1;
         }
-        if (! -s $key_filename) {
+        if ( !-s $key_filename ) {
             print STDERR "Key file does not exist or is empty\n";
             exit 1;
         }
         my $secret_group_name;
         eval {
             $secret_group_name = $config->get_xpath(
-                XPATH   => [ @token_path   , 'secret' ],
-                COUNTER => [ @token_counter, 0     ],
+                XPATH   => [ @token_path,    'secret' ],
+                COUNTER => [ @token_counter, 0 ],
             );
         };
         if ($EVAL_ERROR) {
             print STDERR "Could not read secret group from config file, "
-                . "configuration error?\n";
+              . "configuration error?\n";
             print STDERR "$EVAL_ERROR\n";
             exit 1;
         }
 
-        my @secret_path    = ( 'pki_realm' , 'common', 'secret' );
-        my @secret_counter = ( $realm_index, 0       , 0        );
+        my @secret_path = ( 'pki_realm', 'common', 'secret' );
+        my @secret_counter = ( $realm_index, 0, 0 );
         my $secret_group_count;
         eval {
             $secret_group_count = $config->get_xpath_count(
-                XPATH   => [ @secret_path   , 'group' ],
-                COUNTER => [ @secret_counter  ],
+                XPATH   => [ @secret_path, 'group' ],
+                COUNTER => [@secret_counter],
             );
         };
         my $group_index;
       SEARCH_GROUP_ID:
-        for (my $i = 0; $i < $secret_group_count; $i++) {
+
+        for ( my $i = 0 ; $i < $secret_group_count ; $i++ ) {
             my $group_id = $config->get_xpath(
-                XPATH   => [ @secret_path   , 'group', 'id' ],
-                COUNTER => [ @secret_counter, $i     , 0    ], 
+                XPATH   => [ @secret_path,    'group', 'id' ],
+                COUNTER => [ @secret_counter, $i,      0 ],
             );
-            if ($group_id eq $secret_group_name) {
+            if ( $group_id eq $secret_group_name ) {
                 $group_index = $i;
                 last SEARCH_GROUP_ID;
             }
         }
-        if (! defined $group_index) {
-            print STDERR "Could not find configuration for secret group '$secret_group_name'.\n";
+        if ( !defined $group_index ) {
+            print STDERR
+"Could not find configuration for secret group '$secret_group_name'.\n";
             exit 1;
         }
         my $secret_method = $config->get_xpath(
-          XPATH   => [ @secret_path   , 'group'     , 'method', 'id' ],
-          COUNTER => [ @secret_counter, $group_index, 0       , 0  ],
+            XPATH   => [ @secret_path,    'group',      'method', 'id' ],
+            COUNTER => [ @secret_counter, $group_index, 0,        0 ],
         );
         my $passphrase;
-        if ($secret_method ne 'literal') { # all others have total_shares
+        if ( $secret_method ne 'literal' ) {    # all others have total_shares
             my $quorum_n = $config->get_xpath(
-             XPATH   => [ @secret_path   , 'group'     , 'method', 'total_shares' ],
-             COUNTER => [ @secret_counter, $group_index, 0       , 0              ],
+                XPATH => [ @secret_path, 'group', 'method', 'total_shares' ],
+                COUNTER => [ @secret_counter, $group_index, 0, 0 ],
             );
 
-            my $quorum_k = __get_required_shares({
-                CONFIG        => $config,
-                TOKEN_PATH    => [ @secret_path,    'group'      ],
-                TOKEN_COUNTER => [ @secret_counter, $group_index ],
-            });
-            if (! defined $quorum_k) { # if it is not defined, n is
-                                       # the default value
+            my $quorum_k = __get_required_shares(
+                {
+                    CONFIG        => $config,
+                    TOKEN_PATH    => [ @secret_path, 'group' ],
+                    TOKEN_COUNTER => [ @secret_counter, $group_index ],
+                }
+            );
+            if ( !defined $quorum_k ) {    # if it is not defined, n is
+                                           # the default value
                 $quorum_k = $quorum_n;
             }
             my $display_secret_method = $secret_method;
-            $display_secret_method .= ' (n = ' . $quorum_n . ', k = ' 
-                . $quorum_k . ')';
+            $display_secret_method .=
+              ' (n = ' . $quorum_n . ', k = ' . $quorum_k . ')';
             print 'Secret method: ' . $display_secret_method . "\n";
             my $secret_method = ucfirst($secret_method);
-            my $secret = OpenXPKI::Crypto::Secret->new({
-                TYPE   => $secret_method,
-                QUORUM => {
-                    K => $quorum_k,
-                    N => $quorum_n,
-                },
-                TOKEN  => $default_token,
-            });
+            my $secret        = OpenXPKI::Crypto::Secret->new(
+                {
+                    TYPE   => $secret_method,
+                    QUORUM => {
+                        K => $quorum_k,
+                        N => $quorum_n,
+                    },
+                    TOKEN => $default_token,
+                }
+            );
           SECRET_INPUT:
-            while (! $secret->is_complete()) {
+            while ( !$secret->is_complete() ) {
                 print "Secret not yet complete, please enter a share.\n";
                 my $part;
-                if ($secret_method eq 'Plain') {
-                    $part   = prompt "Share number: ";
+                if ( $secret_method eq 'Plain' ) {
+                    $part = prompt "Share number: ";
                 }
                 my $share  = prompt('Share:         ');
                 my $share2 = prompt('Share (again): ');
-                if ($share ne $share2) {
+                if ( $share ne $share2 ) {
                     print "Shares input do not match, please try again!\n";
                     next SECRET_INPUT;
                 }
                 else {
-                    if ($secret_method eq 'Plain') {
-                        $secret->set_secret({
-                            PART   => $part,
-                            SECRET => "$share",
-                        });
+                    if ( $secret_method eq 'Plain' ) {
+                        $secret->set_secret(
+                            {
+                                PART   => $part,
+                                SECRET => "$share",
+                            }
+                        );
                     }
-                    elsif ($secret_method eq 'Split') {
+                    elsif ( $secret_method eq 'Split' ) {
                         $secret->set_secret("$share");
                     }
                 }
-                for (my $j = 0; $j < 500; $j++) {
-                    print "\n"; # pseudo clearscreen
+                for ( my $j = 0 ; $j < 500 ; $j++ ) {
+                    print "\n";    # pseudo clearscreen
                 }
             }
             $passphrase = $secret->get_secret();
         }
         else {
             $passphrase = $config->get_xpath(
-                XPATH   => [ @secret_path   , 'group'     , 'method' ],
-                COUNTER => [ @secret_counter, $group_index, 0        ],
+                XPATH   => [ @secret_path,    'group',      'method' ],
+                COUNTER => [ @secret_counter, $group_index, 0 ],
             );
         }
-        $ENV{'passphrase'}   = $passphrase;
-        $ENV{'keyfile'}      = $key_filename;
+        $ENV{'passphrase'} = $passphrase;
+        $ENV{'keyfile'}    = $key_filename;
         delete $ENV{'OPENSSL_CONF'};
         exec $command;
         exit 0;
     }
-    if ($subcmd eq 'import') {
-        my $key_id  = $params{id};
-        my $purpose = lc $params{purpose};
-        my $realm   = $params{realm};
+    if ( $subcmd eq 'import' ) {
+        my $key_id          = $params{id};
+        my $purpose         = lc $params{purpose};
+        my $realm           = $params{realm};
         my $import_filename = $params{file};
 
-        if ($key_id eq '') {
-            print STDERR "Please specify a token ID with --id (see output of key list for a list of possible values).\n";
+        if ( $key_id eq '' ) {
+            print STDERR
+"Please specify a token ID with --id (see output of key list for a list of possible values).\n";
             exit 1;
         }
-        if ($purpose eq '') {
-            print STDERR "Please specify a purpose (CA, SCEP, ...) with --purpose (see output of key list for a list of possible values).\n";
+        if ( $purpose eq '' ) {
+            print STDERR
+"Please specify a purpose (CA, SCEP, ...) with --purpose (see output of key list for a list of possible values).\n";
         }
-        my $config = OpenXPKI::XML::Config->new(
-            CONFIG => $configfile,
-        );
+        my $config = OpenXPKI::XML::Config->new( CONFIG => $configfile, );
 
         my $nr_of_realms = $config->get_xpath_count(
-            XPATH   => [ 'pki_realm' ],
-            COUNTER => [ ],
+            XPATH   => ['pki_realm'],
+            COUNTER => [],
         );
 
         my $realm_index;
-        for (my $i=0; $i < $nr_of_realms; $i++) {
-            next if ($realm ne $config->get_xpath(
-                              XPATH    => [ 'pki_realm', 'name' ],
-                              COUNTER  => [ $i         , 0 ]));
+        for ( my $i = 0 ; $i < $nr_of_realms ; $i++ ) {
+            next
+              if (
+                $realm ne $config->get_xpath(
+                    XPATH   => [ 'pki_realm', 'name' ],
+                    COUNTER => [ $i,          0 ]
+                )
+              );
             $realm_index = $i;
             last;
         }
         my $nr_of_purpose_items = $config->get_xpath_count(
             XPATH   => [ 'pki_realm', $purpose ],
-            COUNTER => [ $realm_index ],
+            COUNTER => [$realm_index],
         );
         my $purpose_index;
-        for (my $i=0; $i < $nr_of_purpose_items; $i++) { # look for matching id
-            next if ($key_id ne $config->get_xpath(
-                            XPATH   => [ 'pki_realm' , $purpose, 'token', 'id' ],
-                            COUNTER => [ $realm_index, $i      , 0      , 0    ],
-            ));
+        for ( my $i = 0 ; $i < $nr_of_purpose_items ; $i++ )
+        {    # look for matching id
+            next
+              if (
+                $key_id ne $config->get_xpath(
+                    XPATH   => [ 'pki_realm',  $purpose, 'token', 'id' ],
+                    COUNTER => [ $realm_index, $i,       0,       0 ],
+                )
+              );
             $purpose_index = $i;
             last;
         }
-        if (! defined($purpose_index)) {
-            print STDERR "Could not find configuration for this ID and purpose.\n";
+        if ( !defined($purpose_index) ) {
+            print STDERR
+              "Could not find configuration for this ID and purpose.\n";
             exit 1;
         }
-        my @token_path    = ( 'pki_realm' , $purpose      , 'token' );
-        my @token_counter = ( $realm_index, $purpose_index, 0       );
+        my @token_path = ( 'pki_realm', $purpose, 'token' );
+        my @token_counter = ( $realm_index, $purpose_index, 0 );
         my $key_filename;
         eval {
             $key_filename = $config->get_xpath(
-                XPATH   => [ @token_path   , 'key' ],
-                COUNTER => [ @token_counter, 0     ],
+                XPATH   => [ @token_path,    'key' ],
+                COUNTER => [ @token_counter, 0 ],
             );
         };
         if ($EVAL_ERROR) {
             print STDERR "Could not read key filename from config file, "
-                . "configuration error?\n";
+              . "configuration error?\n";
             print STDERR "$EVAL_ERROR\n";
             exit 1;
         }
-        if (-s $key_filename) {
+        if ( -s $key_filename ) {
             print STDERR "Key file is non-empty, cowardly refusing to create "
-                . "new key.\n";
+              . "new key.\n";
             exit 1;
         }
         my $key;
         my $fu = OpenXPKI::FileUtils->new();
         $key = $fu->read_file($import_filename);
 
-        if ($key ne '') {
+        if ( $key ne '' ) {
             my $key_path = $key_filename;
-            $key_path =~ s/(.*)\/.*/$1/; # perl is greedy, so this is the path
-                if (! -d $key_path) {    # key path does not yet exist, create it
-                    eval { # try to create
-                        mkpath($key_path);
-                    };
-                    if ($EVAL_ERROR) {
-                        print STDERR "Could not create key directory: $key_path";
-                        exit 1; 
-                    }
+            $key_path =~ s/(.*)\/.*/$1/;   # perl is greedy, so this is the path
+            if ( !-d $key_path ) {    # key path does not yet exist, create it
+                eval {                # try to create
+                    mkpath($key_path);
+                };
+                if ($EVAL_ERROR) {
+                    print STDERR "Could not create key directory: $key_path";
+                    exit 1;
                 }
-            $fu->write_file({
-                FILENAME => $key_filename,
-                CONTENT  => $key,
-            });
-            if (-s $key_filename) { # key file exists and is nonzero
+            }
+            $fu->write_file(
+                {
+                    FILENAME => $key_filename,
+                    CONTENT  => $key,
+                }
+            );
+            if ( -s $key_filename ) {    # key file exists and is nonzero
                 print "Key successfully written to $key_filename\n";
             }
         }
@@ -1976,17 +2088,20 @@ if ($cmd eq 'key') {
         exit 0;
     }
 
-    if ($subcmd eq 'generate') {
+    if ( $subcmd eq 'generate' ) {
         my $secret_group = $params{group};
-        if ($secret_group eq '') {
-            print STDERR "Please specify a secret group with --group (see output of key list for a list of possible values).\n";
+        if ( $secret_group eq '' ) {
+            print STDERR
+"Please specify a secret group with --group (see output of key list for a list of possible values).\n";
             exit 1;
         }
-	my $rc = generate_keys({
-		REALM   => $params{realm},
-                GROUP   => $secret_group,
-	    });
-	exit 0;
+        my $rc = generate_keys(
+            {
+                REALM => $params{realm},
+                GROUP => $secret_group,
+            }
+        );
+        exit 0;
     }
 
     print STDERR "Unknown key subcommand '$subcmd'.\n";

@@ -97,6 +97,10 @@ localedir:        $(dir.datarootdir)/locale
 # temp files
 tmpdir:           $(dir.localstatedir)/tmp
 
+# Site-specific Perl modules and HTML::Mason documents
+sitelib:          $(dir.datadir)/sitelib
+sitehtdoc:        $(dir.datadir)/htdocs
+
 # 
 perllib:
 

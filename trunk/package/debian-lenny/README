@@ -1,52 +1,181 @@
-How to create these debian packages?
-===================================
+------------------------------------------------------------
+OVERVIEW
+------------------------------------------------------------
 
-Note: set the environment variable "EMAIL" to the address you
-wish to publish as the packager.
+The Debian Lenny packages provide a starting point for installing
+OpenXPKI. It uses MySQL as the database and has OpenSSL for software
+encryption (as opposed to an HSM).
 
-1. Completely checkout the major subversion trunk area.
+The instructions here are used to create the debian packages. You'll
+probably have the best results if you follow these steps:
 
-2. aptitude install libversion-perl libmodule-build-perl \
-	liblog-log4perl-perl libdatetime-perl libexception-class-perl \
-	libapache-request-perl libxml-sax-perl libxml-sax-writer-perl \
-	libtree-dagnode-perl liburi-perl libclass-factory-perl \
-	libxml-simple-perl libdatetime-format-strptime-perl \
-	libhttp-server-simple-perl libdata-page-perl
+ - In a VMWare guest, create a pristine OS installation for building.
+ - Install the build prereqs and get OpenXPKI source
+ - Create the packages
+ - Set up APT and, optionally, APT-PROXY
+ - Create a second VMWare guest and install pristine OS for installing
+   OpenXPKI packages
+ - Install OpenXPKI using debian packages created above
 
-3. cd trunk/package/debian/
+------------------------------------------------------------
+CREATING A PRISTINE OS INSTALLATION
+------------------------------------------------------------
 
-4. make cpan_dependency
+Note: this method can be used for both the build system and the
+test system you install OpenXPKI on.
 
-5. dpkg -i deb/cpan/*.deb
+- Download debian-503-i386-netinst.iso (or equivalent) from
+  http://www.debian.org/CD/netinst/
 
-6. make core
+- Create a VMWare guest and install using above image
 
-7. dpkg -i deb/core/libopenxpki-perl*.deb
+	- 2 GB of disk space
+    - 256MB RAM should be sufficient
+    - Specify netinst ISO image as the virtual CD drive
 
-8. make perl-client-api
+- Start the guest VM and go through the installation. Most defaults
+  should be OK. At the package selection, 'Standard' should be
+  enough.
 
-9. dpkg -i deb/client_api/libopenxpki-client-perl*.deb
+- Optional: finish customizing (timezone, openssh-server, sudo, etc.)
+  and take a snapshot in VMWare.
 
-10. make i18n && make deployment && make scep-client && \
-	make mason-html-client 
+------------------------------------------------------------
+INSTALL THE BUILD PREREQS AND GET OpenXPKI SOURCE
+------------------------------------------------------------
 
-11. dpkg -i deb/client/openxpki-i18n_*.deb 				\
-	dpkg -i deb/client/libopenxpki-client-html-mason-perl_*.deb 	\
-	dpkg -i deb/client/openxpki-deployment_*.deb			\                               
-	dpkg -i deb/client/libopenxpki-client-scep-perl_*.deb		
-	
-The steps 6 to 9 are necessary because the packages libopenxpki-perl and
-libopenxpki-client-perl are required for package builds.
+- Set your EMAIL environment variable to reflect the address
+  that should appear in the packages. (Put it in your .profile)
 
-How to create a special debian package like libopenxpki-perl?
-=============================================================
+  export EMAIL="<your-email-address>"
 
-1. Completely checkout the major subversion trunk area.
+- Install Subversion
 
-2. cd trunk/package/debian/core
+  sudo aptitude -y install subversion
 
-3. make
+- Install debian packages that contain build tools
 
+  sudo aptitude -y install dh-make-perl libmodule-build-perl
+
+- Obtain the SVN sources
+
+  mkdir -p ~/openxpki
+  cd ~/openxpki
+  svn co https://openxpki.svn.sourceforge.net/svnroot/openxpki/tools tools
+  svn co https://openxpki.svn.sourceforge.net/svnroot/openxpki/trunk trunk
+
+- Create openxpki/openxpki user and group
+
+  sudo addgroup openxpki
+  sudo adduser --disabled-password --gecos 'OpenXPKI Admin' \
+    --ingroup openxpki openxpki
+
+- Install OpenXPKI prerequisites from debian
+
+  cd ~/openxpki/trunk/package/debian-lenny
+  sudo xargs aptitude -y install < \
+    ~/openxpki/trunk/package/debian-lenny/debian-deps.lst
+
+------------------------------------------------------------
+CREATE PACKAGES
+------------------------------------------------------------
+
+- Create the needed CPAN packages that are not in debian and then
+  install them for the further steps
+
+  cd ~/openxpki/trunk/package/debian-lenny
+  make cpan_dependency
+  sudo dpkg -i deb/cpan/*.deb
+  
+- Create and install the OpenXPKI packages (only the packages
+  needed for following build steps are installed)
+
+  cd ~/openxpki/trunk/package/debian-lenny
+  make core
+  sudo dpkg -i deb/core/*.deb
+    make perl-client-api
+    sudo dpkg -i deb/client_api/*.deb
+    make i18n && make deployment && make scep-client && make mason-html-client
+  
+------------------------------------------------------------
+CREATING APT REPOSITORY
+------------------------------------------------------------
+
+- Enable in Apache, if necessary, by adding the following to
+  the file "/etc/apache2/conf.d/dpkg":
+
+  Alias /dpkg "/home/YOURUSERNAME/openxpki/dpkg/
+  <Directory "/home/YOURUSERNAME/openxpki/dpkg/">
+    Options Indexes FollowSymlinks
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+    AddDefaultCharset off
+  </Directory>
+
+- Restart Apache
+
+  sudo /usr/sbin/apache2ctl restart
+
+- Create repository directories
+
+  mkdir -p ~/openxpki/dpkg/binary/cpan
+  mkdir -p ~/openxpki/dpkg/binary/core
+  mkdir -p ~/openxpki/dpkg/binary/client
+  mkdir -p ~/openxpki/dpkg/binary/client_api
+  > ~/openxpki/dpkg/binary/Release
+  echo "Archive: stable" >> ~/openxpki/dpkg/binary/Release
+  echo "Component: openxpki" >> ~/openxpki/dpkg/binary/Release
+  echo "Origin: openxpki" >> ~/openxpki/dpkg/binary/Release
+  echo "Label: OpenXPKI Debian Repository" >> ~/openxpki/dpkg/binary/Release
+  echo "Architecture: i386" >> ~/openxpki/dpkg/binary/Release
+
+- Copy the freshly-build packages to your Apache directory
+
+  cd ~/openxpki/trunk/package/debian-lenny
+  
+  cp deb/cpan/*.deb ~/openxpki/dpkg/binary/cpan
+  cp deb/core/*.deb ../../../dpkg/binary/core/
+  cp deb/client_api/*.deb ../../../dpkg/binary/client_api/
+  cp deb/client/*.deb ../../../dpkg/binary/client/
+
+  (cd ~/openxpki/dpkg && \
+    (dpkg-scanpackages binary /dev/null | \
+    gzip -9c > binary/Packages.gz) )
+
+------------------------------------------------------------
+INSTALLING ON PRISTINE OS INSTALLATION
+------------------------------------------------------------
+
+- Create pristine OS installation (see above)
+
+- Add the OpenXPKI Debian repository to your APT config:
+
+  sudo wget -O /etc/apt/sources.list.d/openxpki.list \
+    http://YOURBUILDADDRESS/dpkg/openxpki-deb-lenny.list
+  sudo aptitude update
+
+- Confirm APT config (you should see the OpenXPKI packages):
+
+  aptitude search openxpki
+
+- Create the OpenXPKI user/group
+
+  sudo addgroup openxpki
+  sudo adduser --disabled-password --gecos 'OpenXPKI Admin' \
+    --ingroup openxpki openxpki
+
+- Install using following scripts:
+
+  sudo aptitude -y --allow-untrusted install \
+    libopenxpki-client-html-mason-perl \
+    libopenxpki-client-scep-perl \
+    openxpki-i18n \
+    openxpki-deployment
+
+------------------------------------------------------------
+MISC NOTES (possibly outdated/deprecated)
+------------------------------------------------------------
 
 How to handle outdated Perl packages?
 =====================================

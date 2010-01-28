@@ -5,6 +5,7 @@
 #
 
 our $VERSION = "[% deployment.version %]";
+use lib qw( [% dir.sitelib %] );
 
 use strict;
 use warnings;
@@ -366,7 +367,6 @@ if ($params{quiet})
 ## do not migrate this to use statements
 ## this disturbs the debugging
 require OpenXPKI::XML::Config;
-require OpenXPKI::Server;
 
 if (defined $params{cfg}) {
     $configfile = $params{cfg};
@@ -385,6 +385,10 @@ if (! defined $config) {
     print STDERR "ERROR: Could not read configuration file $configfile\n";
     exit 1;
 }
+
+## do not migrate this to use statements
+## this disturbs the debugging
+require OpenXPKI::Server;
 
 my $pidfile;
 eval {
