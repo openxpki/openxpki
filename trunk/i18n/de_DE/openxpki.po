@@ -627,13 +627,12 @@ msgstr "Hier können sie nun alle verfügbaren CA-Zertifkate innerhalb dieses PK
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_ISSUER_LIST_TITLE"
 msgstr "CA-Zertifikate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_KEY_LIST_DESCRIPTION"
-msgstr "Untenstehend finden Sie das Ergebnis Ihrer Suche."
+msgstr "Hier finden Sie eine Liste der verfügbaren Schlüsselgruppen."
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_KEY_LIST_TITLE"
-msgstr "Gefundene Zertifikate"
+msgstr "Schlüsselgruppenverwaltung"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_PKI_REALM_INFO_DESCRIPTION"
 msgstr "Sie befinden sich derzeit im PKI Realm __PKI_REALM__. Ein PKI Realm ist die"
@@ -1183,7 +1182,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REVOCATION_REASON_KEYCOMPROMISE"
 msgstr "Schlüssel kompromittiert"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REVOCATION_REASON_REMOVE_FROM_CRL"
-msgstr "Aus der Revokationsliste löschen"
+msgstr "Aus der Rückrufliste (CRL) löschen"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_REVOCATION_REASON_SUPERSEDED"
 msgstr "Überholt"
@@ -1272,53 +1271,42 @@ msgstr "Falsches Format für den privaten Schlüssel"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_HIDE"
 msgstr "Seite"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_APPROVAL_DESC"
-msgstr "Genehmigungen"
+msgstr "Nutzen Sie die Einträge im linken Menü, um sich Anträge zur Zertifikatsignierung "
+"oder -widerrufung anzeigen zu lassen, die von Ihnen bewilligt werden müssen."
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_APPROVAL_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Bewilligung"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DOWNLOAD_DESC"
-msgstr "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte"
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs)"
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann"
-"informieren Sie sich bitte im Info-Menü."
+msgstr "Hier können Sie von ihnen beantragte Zertifikate, CA-Zertifikate, "
+"Rückruflisten (CRLs) oder Richtlinien-Dokumente (Policy Documents) runterladen."
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_DOWNLOAD_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Download"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_OP_REQUEST_DESC"
-msgstr "Sie sind an der Web-Schnittstelle des Trustcenters angemeldet. Bitte"
-"beachten Sie, dass diese Software mehrere Zertifizierungsinstanzen (CAs)"
-"unterstützt. Wenn Sie nicht sicher sind, welche CA Sie gerade benutzen, dann"
-"informieren Sie sich bitte im Info-Menü."
+msgstr "Wählen Sie einen der Menüeinträge, um einen neuen Antrag zu erstellen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_OP_REQUEST_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Antrag"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_SEARCH_DESC"
-msgstr "Ein privater Schlüssel für den RSA-Algorithmus mit einer Schlüssellänge von"
-"1024 bit"
+msgstr "Sie können sowohl nach Zertifikaten als auch nach Workflows suchen. "
+"Um alle Zertifikate und Workflows angezeigt zu bekommen, lassen Sie einfach das Suchfeld leer."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_SEARCH_TITLE"
-msgstr "Zertifikatssuche"
+msgstr "Suche"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_USER_REQUEST_DESC"
-msgstr "Hier können Sie nun alle verfügbaren Details zu der ausgewählten Instanz des"
-"Workflows sehen."
+msgstr "Wählen Sie einen der Menüeinträge, um einen neuen Antrag zu erstellen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INFO_USER_REQUEST_TITLE"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Antrag"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_INTERNET_EXPLORER"
 msgstr "Microsoft Internet Explorer"
@@ -1471,19 +1459,19 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_INVALIDITY_DATE"
 msgstr "Ungültigkeitsdatum"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_REVOCATION_REASON"
-msgstr "Grund des Rückrufs"
+msgstr "Grund des Widerrufs"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_SEARCH_DESC"
-msgstr "Um einen Zertifikatsrückruf zu beantragen, müssen Sie das Zertifikat"
-"angeben, das Sie zurückrufen möchten. Benutzen Sie bitte das Suchformular,"
+msgstr "Um einen Zertifikatswiderruf zu beantragen, müssen Sie das Zertifikat"
+"angeben, das Sie widerrufen möchten. Benutzen Sie bitte das Suchformular,"
 "um das passende Zertifikat zu finden. Auf der Zertifikatsinformationsseite"
-"finden Sie dann einen Link, mit dem Sie den Rückruf starten können."
+"finden Sie dann einen Link, mit dem Sie den Widerruf starten können."
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_SEARCH_TITLE"
-msgstr "Zertifikatsrückruf - Suche des Zertifikats"
+msgstr "Zertifikatswiderruf - Suche des Zertifikats"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_TITLE"
-msgstr "Erstellen eines neuen Rückrufantrags (CRRs)"
+msgstr "Erstellen eines neuen Antrags auf Zertifikatwiderrufung (CRRs)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_UNKNOWN_ERROR"
@@ -3144,7 +3132,7 @@ msgid "I18N_OPENXPKI_HTML_MENU_CA_CERTIFICATES"
 msgstr "CA-Zertifikate"
 
 msgid "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_REVOCATION_REQUEST"
-msgstr "Antrag auf Zertifikat-Widerruf"
+msgstr "Antrag auf Zertifikatwiderruf"
 
 msgid "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_SIGNING_REQUEST"
 msgstr "Antrag auf Zertifikat-Signierung (CSR)"
@@ -3543,31 +3531,31 @@ msgstr "E-Mailadresse"
 msgid "I18N_OPENXPKI_SCEP_CURRENT_VALID_CERTIFICATES"
 msgstr "Gültige"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_SECRET_ACTION"
-msgstr "E-Mailadresse"
+msgstr "Aktion"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_SECRET_COMPLETE"
-msgstr "Kommentar"
+msgstr "Vollständig"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_SECRET_INCOMPLETE"
-msgstr "Gültig bis"
+msgstr "Unvollständig"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_SECRET_LABEL"
-msgstr "E-Mailadresse"
+msgstr "Name des Geheimnisses"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_SECRET_LOGIN_LINK_LABEL"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Login"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_SECRET_LOGOUT_LINK_LABEL"
-msgstr "Web-Schnittstelle des Trustcenters"
+msgstr "Logout"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_SECRET_STATUS"
 msgstr "Status"
 
@@ -5947,9 +5935,9 @@ msgstr "Dieser Workflow erstellt ein neues Zertifikat."
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_LDAP_PUBLISHING"
 msgstr "Publish a certificate using LDAP"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_REVOCATION_REQUEST"
-msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
+msgstr "Dieser Workflow bearbeitet einen Antrag auf Widerrufung eines Zertifikats."
 
 msgid "I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST"
 msgstr "Dieser Workflow bearbeitet einen Zertifizierungsantrag."
