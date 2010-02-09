@@ -1034,14 +1034,14 @@ msgstr "Bitte wählen Sie ein Profil aus, welches zur Zertifikatserstellung genu
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_PROFILE_TITLE"
 msgstr "Auswählen eines Profils"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_BULK_DESCRIPTION"
-msgstr "Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag"
-"(CSR) stellen wollen."
 
-#, fuzzy
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_BULK_DESCRIPTION"
+msgstr "Bitte wählen Sie eine Rolle aus, mit der Sie einen Zertifierungssammelantrag "
+"stellen möchten. Bitte beachten Sie, dass alle Zertifikate, deren Signierung Sie mit dem "
+"Sammelantrag beantragen, die selbe Rolle und das selbe Profil bekommen."
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_BULK_TITLE"
-msgstr "Auswählen einer Rolle"
+msgstr "Auswählen einer Rolle für Ihren Sammelantrag"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_ROLE_DESCRIPTION"
 msgstr "Bitte wählen Sie eine Rolle aus, für die Sie einen Zertifizierungsantrag"
@@ -1137,9 +1137,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_IE_PKCS10"
 msgstr "Erstellen des Zertifizierugnsantrages"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATOR"
-msgstr "Zurücksetzen"
+msgstr "Erstellt von"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_CRR_COULD_NOT_CREATE_DATETIME_OBJECT"
@@ -1397,9 +1396,8 @@ msgstr "Fehlende Funktionalität"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_OTHER_WORKFLOW_CONTEXT_KEYS"
 msgstr "Status des Workflows"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_OVERVIEW"
-msgstr "Serverseitige Schlüsselgenerierung"
+msgstr "Übersicht"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PAGE"
 msgstr "Seite"
@@ -1407,7 +1405,6 @@ msgstr "Seite"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PASSWD"
 msgstr "Passwort"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10"
 msgstr "PKCS#10"
 
@@ -1510,13 +1507,11 @@ msgstr "Name"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE"
 msgstr "Wert"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS"
-msgstr "Cryptographic Service Provider"
+msgstr "Tickets"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_TIME"
-msgstr "Seite"
+msgstr "Uhrzeit"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_ACTIVITY_NOT_IMPLEMENTED_DESCRIPTION"
 msgstr "Diese Aktivität ist noch nicht implementiert worden. Eventuell wurde der"
@@ -1562,13 +1557,12 @@ msgstr "Neuer Workflow-Instanz"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CREATOR"
 msgstr "Erzeuger des Workflows"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CRR_CERT_SUBJECT"
 msgstr "Name"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CRR_REASON"
-msgstr "Erzeuger des Workflows"
+msgstr "Grund (bitte nur den Code angeben)"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_INFO"
 msgstr "Zusätzliche Informationen"
@@ -1689,53 +1683,41 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DESCRIPTION"
 msgstr "Hier können Sie nun alle verfügbaren Details zu der ausgewählten Instanz des"
 "Workflows sehen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_DETAILS"
-msgstr "Details der Workflowinstanz"
+msgstr "Anzeige der technischen Details des Workflows"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY"
-msgstr "Details der Workflowinstanz"
+msgstr "Anzeige des technischen Workflow-Verlaufs"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_ACTION"
-msgstr "Hier können Sie nun alle verfügbaren Details zu der ausgewählten Instanz des"
-"Workflows sehen."
+msgstr "Aktivität ausgeführt"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_DATE"
-msgstr "Details der Workflowinstanz"
+msgstr "Datum"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_NEW_STATE"
-msgstr "Details der Workflowinstanz"
+msgstr "Neuer Status"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_STATE"
-msgstr "Details der Workflowinstanz"
+msgstr "Status"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_TITLE"
-msgstr "Details der Workflowinstanz"
+msgstr "Workflow-Verlauf"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_HISTORY_USER"
-msgstr "Details der Workflowinstanz"
+msgstr "Benutzer"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE"
-msgstr "Details der Workflowinstanz"
+msgstr "Workflow-Instanz #__ID__(__STATE__)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_CRRS_TITLE"
-msgstr "Details der Workflowinstanz"
+msgstr "Ausstehende Anträge auf Widerruf eines Zertifikates"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_LIMITED_TO_CREATOR"
-msgstr "Details der Workflowinstanz"
+msgstr "Es werden nur die Anträge, die von __CREATOR__ erstellt wurden, angezeigt."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE"
-msgstr "Details der Workflowinstanz"
+msgstr "Ausstehende Anträge"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SPKAC"
 msgstr "SPKAC-Antrag"
@@ -1881,9 +1863,10 @@ msgstr "Ihre Identität wird über eine externes Programm geprüft. Bitte geben 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD"
 msgstr "Bitte geben Sie zur Anmeldung Ihren Account und Ihr Passwort ein."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE"
-msgstr "Bitte geben Sie zur Anmeldung Ihren Account und Ihr Passwort ein."
+msgstr ""
+"Login durch Signieren einer Challenge mit Ihrem Zertifikat und privaten Schlüssel. "
+"Möglich mit IE- oder Mozilla-basierten Browsern."
 
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_ANONYMOUS"
 msgstr "Bitte wählen Sie dieses Anmeldeverfahren, wenn Sie sich nicht"
@@ -1908,13 +1891,12 @@ msgstr "Dies ist das Standardanmeldeverfahren für das betreuende Personal der P
 msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER"
 msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP"
-msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 
-#, fuzzy
+msgid "I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP"
+msgstr "Standardmäßig eingestellte Schlüsselgruppe"
+
 msgid "I18N_OPENXPKI_CRL_ENTRIES"
-msgstr "Seriennummer des Zertifizierungsantrages"
+msgstr "Einträge"
 
 msgid "I18N_OPENXPKI_CRL_FORMAT"
 msgstr "Format"
@@ -1923,21 +1905,17 @@ msgstr "Format"
 msgid "I18N_OPENXPKI_CRL_ISSUANCE_PENDING"
 msgstr "Auf Start wartend"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_ISSUER"
 msgstr "Aussteller"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_LAST_UPDATE"
-msgstr "Serverseitige Schlüsselgenerierung"
+msgstr "Letzte Aktualisierung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_NEXT_UPDATE"
-msgstr "Gültig bis"
+msgstr "Nächste Aktualisierung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_CRL_NUMBER"
-msgstr "Faxnummer"
+msgstr "CRL-Nummer"
 
 msgid "I18N_OPENXPKI_CRYPTO_API_CHECK_COMMAND_PARAM_PARAM_PATH_MISMATCH"
 msgstr ""
@@ -2974,13 +2952,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_GET_SAFE_TMPFILE_MISSING_TMP"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HOSTNAME"
-msgstr "Rückwärts"
+msgstr "Name des Hosts"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_HOSTNAME_DESC"
-msgstr "uid"
+msgstr "Der vollständig angegebene Rechnername"
 
 msgid "I18N_OPENXPKI_HTML_COMMENT"
 msgstr "Kommentar"
@@ -3379,13 +3355,11 @@ msgid "I18N_OPENXPKI_PHONE_DESC"
 msgstr "Eine Telefonummer, unter der Sie für eventuelle Rückfragen bzgl. des"
 "Zertifikats zu erreichen sind."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_PORT"
-msgstr "nein"
+msgstr "Port"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_PORT_DESC"
-msgstr "Zertifikat ist CA"
+msgstr "Der TCP-Port, der bei der Authentifizierung mit dem Zertifikat genutzt wird"
 
 msgid "I18N_OPENXPKI_PRIVKEY_AND_CERT_DOWNLOAD"
 msgstr "Privaten Schlüssel und Zertifkat herunterladen"
