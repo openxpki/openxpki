@@ -29,6 +29,7 @@
     <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></th>
+    <th></th>
   </tr>
 % foreach my $cert (@results) {
 %   my $notbefore = OpenXPKI::DateTime::convert_date({
@@ -66,6 +67,15 @@
   </td>
   <td>
       <% $cert->{'ISSUER_DN'} %>
+  </td>
+  <td>
+% if ($cert->{STATUS} eq 'REVOKED') {
+       <b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CERT_REVOKED') %></font><b>
+% } elsif ($cert->{EXTENDED_STATUS} eq 'NOTYETVALID') {
+       <b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CERT_NOT_YET_VALID') %></font><b>
+% } elsif ($cert->{EXTENDED_STATUS} eq 'EXPIRED') {
+       <b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CERT_EXPIRED') %></font><b>
+% }
   </td>
 </tr>
 % }
@@ -138,6 +148,18 @@
         my %dn_hash = OpenXPKI::DN->new($cert->{SUBJECT})->get_hashed_content();
         $cn = $dn_hash{'CN'}->[0];
         $cert->{CN} = $cn;
+
+       # determine cert status
+       if ($cert->{STATUS} eq 'ISSUED') {
+           # only compute validity if not revoked
+           my $now = time;
+           if ($now < $cert->{NOTBEFORE}) {
+               $cert->{EXTENDED_STATUS} = 'NOTYETVALID';
+           }
+           if ($now > $cert->{NOTAFTER}) {
+               $cert->{EXTENDED_STATUS} = 'EXPIRED';
+           }
+       }
   }
 </%init>
 <%once>
