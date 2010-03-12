@@ -1,5 +1,5 @@
 use Test;
-BEGIN { plan tests => 8 };
+BEGIN { plan tests => 25 };
 
 print STDERR "OpenXPKI::Crypto::VolatileVault\n";
 
@@ -27,6 +27,7 @@ ok (1);
 my $vault = OpenXPKI::Crypto::VolatileVault->new(
     {
 	TOKEN => $token,
+	EXPORTABLE => 2,
     });
 
 my $secret = 'abc123' x 10;
@@ -46,6 +47,32 @@ $tmp = $vault->decrypt($public);
 
 ok($secret, $tmp);
 
+#####
+# exporting keys should work exactly twice
+
+eval {
+    $tmp = $vault->export_key();
+};
+# export worked 1st time
+ok($EVAL_ERROR, '');
+
+eval {
+    $tmp = $vault->export_key();
+};
+# export worked 2nd time
+ok($EVAL_ERROR, '');
+
+
+# save key for later re-initialization of vault
+my $key_backup = $tmp;
+
+# third export is prohibited
+eval {
+    $tmp = $vault->export_key($public);
+};
+ok($EVAL_ERROR, 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_EXPORT_KEY_DENIED');
+
+
 ###########################################################################
 
 # try to decrypt it with another vault instance
@@ -59,8 +86,74 @@ ok(! $othervault->can_decrypt($public));
 eval {
     $tmp = $othervault->decrypt($public);
 };
-if ($EVAL_ERROR) {
-    ok($EVAL_ERROR, 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_VAULT_INSTANCE');
-} else {
-    ok(0);
-}
+ok($EVAL_ERROR, 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_VAULT_INSTANCE');
+
+
+# exporting keys should be prohibited by default
+eval {
+    $tmp = $othervault->export_key();
+};
+ok($EVAL_ERROR, 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_EXPORT_KEY_DENIED');
+
+
+
+###########################################################################
+
+
+# try to decrypt it with reinstantiated vault instance
+my $reused_vault = OpenXPKI::Crypto::VolatileVault->new(
+    {
+	TOKEN => $token,
+	KEY   => $key_backup->{KEY},
+	IV    => $key_backup->{IV},
+	EXPORTABLE => -1,
+    });
+
+ok($reused_vault->can_decrypt($public));
+
+$tmp = undef;
+eval {
+    $tmp = $reused_vault->decrypt($public);
+};
+ok($EVAL_ERROR, '');
+ok($secret, $tmp);
+
+# exporting keys should now be allowed
+$tmp = undef;
+eval {
+    $tmp = $reused_vault->export_key();
+};
+ok($EVAL_ERROR, '');
+ok($key_backup->{KEY}, $tmp->{KEY});
+ok($key_backup->{IV}, $tmp->{IV});
+
+
+# exporting keys should now be allowed
+$tmp = undef;
+eval {
+    $tmp = $reused_vault->export_key();
+};
+ok($EVAL_ERROR, '');
+ok($key_backup->{KEY}, $tmp->{KEY});
+ok($key_backup->{IV}, $tmp->{IV});
+
+
+# exporting keys should now be allowed
+$tmp = undef;
+eval {
+    $tmp = $reused_vault->export_key();
+};
+ok($EVAL_ERROR, '');
+ok($key_backup->{KEY}, $tmp->{KEY});
+ok($key_backup->{IV}, $tmp->{IV});
+
+
+# lock vault
+$reused_vault->lock_vault();
+
+# exporting keys should now be disallowed
+$tmp = undef;
+eval {
+    $tmp = $reused_vault->export_key();
+};
+ok($EVAL_ERROR, 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_EXPORT_KEY_DENIED');
