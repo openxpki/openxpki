@@ -18,7 +18,6 @@ use MIME::Base64;
 use Crypt::CBC;
 use Digest::SHA1 qw( sha1_hex );
 
-use Data::Dumper;
 # use Smart::Comments;
 
 {
@@ -110,6 +109,11 @@ use Data::Dumper;
 	if ($session_iv{$ident} !~ m{ \A [0-9A-F]+ \z }xms) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_IV");
+	}
+
+	if ($algorithm{$ident} ne 'aes-256-cbc') {
+	    OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_UNSUPPORTED_ALGORITHM");
 	}
 
     }
@@ -266,11 +270,18 @@ use Data::Dumper;
     sub get_key_id {
 	my $self = shift;
 	my $ident = ident $self;
+	my $arg = shift;
+
+	my %args;
+	if ($arg->{LONG}) {
+	    $args{LONG} = 1,
+	}
 
 	return $self->_compute_key_id(
 	    {
 		KEY => $session_key{$ident},
 		IV  => $session_iv{$ident},
+		%args,
 	    });
     }
 
@@ -280,15 +291,18 @@ use Data::Dumper;
 	my $ident = ident $self;
 	my $arg = shift;
 
-	print Dumper $arg;
 	if (! ((defined $arg->{IV}) && (defined $arg->{KEY}))) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_COMPUTE_KEY_ID_MISSING_PARAMETERS");
 	}
 	
 	my $digest = sha1_hex($arg->{IV} . ':' . $arg->{KEY});
-	
-	return (substr($digest, 0, 8));
+
+	if ($arg->{LONG}) {
+	    return $digest;
+	} else {
+	    return (substr($digest, 0, 8));
+	}
     }
 }
 
@@ -430,6 +444,9 @@ internally used key.
 Returns a key id which may be used to identify the used symmetric key. The
 returned key id is a truncated SHA1 hash (8 characters) of key and iv.
 Collisions may occur.
+
+If the named argument LONG is set, the returned key id is the full SHA1
+hash of the key (ASCII HEX).
 
 =head2 Advanced usage
 

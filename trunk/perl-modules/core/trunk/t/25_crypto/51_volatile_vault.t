@@ -1,5 +1,5 @@
 use Test;
-BEGIN { plan tests => 25 };
+BEGIN { plan tests => 27 };
 
 print STDERR "OpenXPKI::Crypto::VolatileVault\n";
 
@@ -157,3 +157,9 @@ eval {
     $tmp = $reused_vault->export_key();
 };
 ok($EVAL_ERROR, 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_EXPORT_KEY_DENIED');
+
+#####
+# check if key identifier can be queried
+ok(length($reused_vault->get_key_id()), 8);
+ok(length($reused_vault->get_key_id( { LONG => 1 })), 40);
+
