@@ -45,7 +45,7 @@ my $context = {
     },
 };
 
-our $who_forked_me;
+our %who_forked_me;
 
 # only called statically
 sub CTX {

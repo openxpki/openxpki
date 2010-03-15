@@ -25,15 +25,26 @@ sub evaluate {
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
     ##! 16: 'accessing shared mem with key: ' . $OpenXPKI::Server::Context::who_forked_me
-    if (! defined $OpenXPKI::Server::Context::who_forked_me) {
+    if (! defined $OpenXPKI::Server::Context::who_forked_me{$workflow->id()}){
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_PARENT_UNKNOWN',
         );
     }
 
-    my $share = new IPC::ShareLite( -key     => $OpenXPKI::Server::Context::who_forked_me,
-                                    -create  => 'no',
-                                    -destroy => 'no' );
+    my $my_forker = $OpenXPKI::Server::Context::who_forked_me{$workflow->id()}->[0];
+    my $my_forked = $OpenXPKI::Server::Context::who_forked_me{$workflow->id()}->[1];
+
+    my $share=0;
+    eval {
+        $share = new IPC::ShareLite( -key     => $my_forker,
+                                     -create  => 'no',
+                                     -destroy => 'no' 
+                     );
+    };
+    if ($EVAL_ERROR){
+        undef $share;
+    };
+
     if (! defined $share) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_IPC_SHARE_DOES_NOT_EXIST',
@@ -50,8 +61,16 @@ sub evaluate {
     ##! 16: 'pids: ' . Dumper $pids
     ##! 16: 'my PID: ' . $PID
     # FIXME - maybe delete $pids->{$workflow_id}->{$PID} is enough?
+    if ( !defined  $pids->{$workflow_id}->{$my_forked} ){
+        $share->unlock();
+        undef $share;
+        condition_error(
+            "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CHECKFORKEDWORKFLOWCHILDREN_FALSE_CALL"
+        );
+    };
+
     foreach my $key (keys %{ $pids }) {
-        delete $pids->{$key}->{$PID};
+        delete $pids->{$key}->{$my_forked};
     }
 
     ##! 16: 'new pids: ' . Dumper $pids
@@ -78,10 +97,14 @@ sub evaluate {
     if (scalar keys %{ $pids } == 0) {
         ##! 16: 'everything is done, destroying shared memory'
         # we are done, destroy shared memory
-        $share = new IPC::ShareLite( -key     => getppid(),
-                                     -create  => 'no',
-                                     -destroy => 'yes',
-        );
+        $share=0;
+        eval {
+            $share = new IPC::ShareLite(
+                             -key     => $my_forker,
+                             -create  => 'no',
+                             -destroy => 'yes'
+                         );
+        };
         undef $share;
     }
 

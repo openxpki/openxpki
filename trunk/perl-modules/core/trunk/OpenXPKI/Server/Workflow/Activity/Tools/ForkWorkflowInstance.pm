@@ -209,7 +209,7 @@ sub execute {
             # the correct IPC share later on. This will not work
             # with getppid if the parent dies in the meantime and
             # the child becomes a child of 1 (init).
-            $OpenXPKI::Server::Context::who_forked_me = getppid();
+            $OpenXPKI::Server::Context::who_forked_me{$workflow->id()} = [ getppid(), $PID ];
 
             ### we work in the background, so we don't need/want to
             ### communicate with anyone -> close the socket file
@@ -302,9 +302,15 @@ sub execute {
 
 sub child_handler {
     ##! 16: 'accessing shared mem with key ' . $PID
-    my $share = new IPC::ShareLite( -key     => $PID,
+    my $share=0;
+    eval {
+        $share = new IPC::ShareLite( -key     => $PID,
                                     -create  => 'no',
                                     -destroy => 'no' );
+    };
+    if ($EVAL_ERROR){
+        undef $share;
+    };
     if (defined $share) {
         my $pid = waitpid(-1, &WNOHANG);
         ##! 16: 'pid: ' . $pid
