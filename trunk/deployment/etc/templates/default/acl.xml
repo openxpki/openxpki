@@ -280,6 +280,9 @@
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
           </create>
           <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
+          </create>
+          <create>
               <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
           </create>
           <read> 
@@ -305,6 +308,10 @@
           <read>
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
+          </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
           </read>
           <read>
               <creator>.*</creator>
