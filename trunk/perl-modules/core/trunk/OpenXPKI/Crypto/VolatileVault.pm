@@ -16,7 +16,7 @@ use OpenXPKI::Exception;
 
 use MIME::Base64;
 use Crypt::CBC;
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA1 qw( sha1_base64 );
 
 # use Smart::Comments;
 
@@ -170,7 +170,7 @@ use Digest::SHA1 qw( sha1_hex );
 	}
 
 	return join(';', 
-		    $self->get_key_id(), 
+		    $self->get_key_id(),
 		    $encoding, 
 		    $blob);
     }
@@ -255,6 +255,7 @@ use Digest::SHA1 qw( sha1_hex );
 	return {
 	    KEY => $session_key{$ident},
 	    IV  => $session_iv{$ident},
+	    ALGORITHM => $algorithm{$ident},
 	}
     }
 
@@ -281,22 +282,23 @@ use Digest::SHA1 qw( sha1_hex );
 	    {
 		KEY => $session_key{$ident},
 		IV  => $session_iv{$ident},
+		ALGORITHM => $algorithm{$ident},
 		%args,
 	    });
     }
 
-    # expects named arguments KEY and IV. returns truncated SHA1 hash of concatenated KEY and IV.
+    # expects named arguments KEY and IV. returns truncated base64 encoded SHA1 hash of concatenated KEY and IV.
     sub _compute_key_id : PRIVATE {
 	my $self = shift;
 	my $ident = ident $self;
 	my $arg = shift;
 
-	if (! ((defined $arg->{IV}) && (defined $arg->{KEY}))) {
+	if (! ((defined $arg->{IV}) && (defined $arg->{KEY}) && (defined $arg->{ALGORITHM}))) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_COMPUTE_KEY_ID_MISSING_PARAMETERS");
 	}
 	
-	my $digest = sha1_hex($arg->{IV} . ':' . $arg->{KEY});
+	my $digest = sha1_base64(join(':', $arg->{ALGORITHM}, $arg->{IV}, $arg->{KEY}));
 
 	if ($arg->{LONG}) {
 	    return $digest;
@@ -427,9 +429,9 @@ possible as long as the maximum export counter has not been exceeded.
 (See constructor description.)
 If exporting the key is not explicitly allowed the method throws an
 exception.
-The returned key is returned in a hash reference with KEY and IV
-keys. The corresponding values are hexadecimal (uppercase) numbers
-specifying the key and initialization vector.
+The returned key is returned in a hash reference with KEY, IV and
+ALGORITHM keys. The values for KEY and IV are hexadecimal (uppercase) 
+numbers specifying the key and initialization vector.
 
 =head2 lock_vault()
 
@@ -442,11 +444,11 @@ internally used key.
 =head2 get_key_id()
 
 Returns a key id which may be used to identify the used symmetric key. The
-returned key id is a truncated SHA1 hash (8 characters) of key and iv.
-Collisions may occur.
+returned key id is a truncated base64 encoded SHA1 hash (8 characters) of 
+key and iv. Collisions may occur.
 
-If the named argument LONG is set, the returned key id is the full SHA1
-hash of the key (ASCII HEX).
+If the named argument LONG is set, the returned key id is the full base64
+encoded SHA1 hash of the key.
 
 =head2 Advanced usage
 
