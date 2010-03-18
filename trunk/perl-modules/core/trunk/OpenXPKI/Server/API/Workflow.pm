@@ -879,6 +879,7 @@ sub __get_workflow_factory {
     # this is a hack, because Workflow::Factory does not really
     # support subclassing (although it claims so). For details see
     # Server::Init::__wf_factory_add_config()
+    no warnings 'redefine';
     *Workflow::State::FACTORY   = sub { return $factory };
     *Workflow::Action::FACTORY  = sub { return $factory };
     *Workflow::Factory::FACTORY = sub { return $factory };

@@ -606,6 +606,7 @@ sub __wf_factory_add_config {
                         # this is why we trick Workflow into believing
                         # it is talking to FACTORY, but in fact it is
                         # talking to our factory ...
+			no warnings 'redefine';
                         local *Workflow::State::FACTORY = sub { return $workflow_factory };
                         $workflow_factory->add_config(
                             $workflow_config{$type}->{factory_param} =>
@@ -634,6 +635,7 @@ sub __wf_factory_add_config {
                     ##! 256: 'entry after flattening: ' . Dumper $entry
                     ##! 512: 'workflow_factory: ' . Dumper $workflow_factory
                     # cf. above ...
+		    no warnings 'redefine';
                     local *Workflow::State::FACTORY = sub { return $workflow_factory };
                     $workflow_factory->add_config(
                         $workflow_config{$type}->{factory_param} => $entry,
