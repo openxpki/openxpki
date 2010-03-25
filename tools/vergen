@@ -112,12 +112,15 @@ sub get_revision_info {
 	}
 	# fake last-changed-revision
 	$result->{'last-changed-revision'} ||= $result->{revision};
-	
+
+	# obtain current branch ref
+	my $branch_ref = `$git symbolic-ref HEAD`;
+
 	# get git commit hashes
-	$result->{'git-abbreviated-commit-hash'} = `$git show-ref -s --abbrev HEAD`;
+	$result->{'git-abbreviated-commit-hash'} = `$git show-ref --heads -s --abbrev $branch_ref`;
 	chomp $result->{'git-abbreviated-commit-hash'};
 
-	$result->{'git-commit-hash'} = `$git show-ref -s HEAD`;
+	$result->{'git-commit-hash'} = `$git show-ref --heads -s $branch_ref`;
 	chomp $result->{'git-commit-hash'};
 
 	# get git tag information
@@ -202,6 +205,8 @@ GetOptions(\%params,
               directory=s
               dump
               dumpformat=s
+	      list-formats
+	      list-keywords
 	      )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
@@ -317,6 +322,17 @@ if (defined $params{format}) {
     eval "printf('%s', qq($value));";
 }
 
+
+if (defined $params{'list-formats'}) {
+    print join("\n", sort keys %{$format_of});
+    print "\n";
+}
+
+if (defined $params{'list-keywords'}) {
+    print join("\n", sort keys %{$mapping_of->{keyword}});
+    print "\n";
+}
+
 if (defined $params{'dump'}) {
     foreach my $component (keys %{$mapping_of->{component}}) {
         my $dumpformat = 'KEYWORD=VALUE\n';
@@ -371,6 +387,8 @@ vergen [options] COMMAND
    --dump                dump keyword assignments
    --dumpformat <string> use <string> as dump format 
                          (default: KEYWORD=VALUE\n)
+   --list-formats        lists all user-defined formats available
+   --list-keywords       lists all keywords available in formats
    --verbose             show details about information obtained
 
 =head1 DESCRIPTION
@@ -430,6 +448,14 @@ Useful dump formats:
 
   --dumpformat 'KEYWORD="VALUE"\n'   
   --dumpformat 'export KEYWORD="VALUE"\n'   
+
+=item B<--list-formats>
+
+List all user-defined formats.
+
+=item B<--list-keywords>
+
+List all keywords (can be part of version format of may be referenced directly).
 
 =item B<--verbose>
 
