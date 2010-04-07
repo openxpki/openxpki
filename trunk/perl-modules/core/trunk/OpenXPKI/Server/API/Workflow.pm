@@ -18,6 +18,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
+use OpenXPKI::Server::Workflow::Observer::Log;
 use OpenXPKI::Serialization::Simple;
 
 my $workflow_table = 'WORKFLOW';
@@ -382,6 +383,8 @@ sub execute_workflow_activity {
     );
     $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
     $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
+    $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::Log');
+    $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::Log');
 
     ##! 2: "check parameters"
     my %fields = ();
@@ -511,6 +514,8 @@ sub create_workflow_instance {
     }
     $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
     $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
+    $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::Log');
+    $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::Log');
 
     my $creator = CTX('session')->get_user();
     ##! 2: $creator

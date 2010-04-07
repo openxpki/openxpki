@@ -166,6 +166,7 @@ syslog_facility: local7
 # facility:        $(log_facility_audit)
 # facility:        $(log_facility_monitor)
 # facility:        $(log_facility_system)
+# facility:        $(log_facility_workflow)
 
 # # facilities
 # [log_facility_auth]
@@ -191,6 +192,11 @@ syslog_facility: local7
 # level:           DEBUG
 # appender:        Logfile
 # appender:        Syslog
+
+# [log_facility_workflow]
+# facility:        workflow
+# level:           INFO
+# appender:        Logfile
 
 
 

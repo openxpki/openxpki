@@ -60,7 +60,7 @@ sub init {
     }
 
     ## ensure that all relevant loggers are present
-    foreach my $facility ("auth", "audit", "monitor", "system")
+    foreach my $facility ("auth", "audit", "monitor", "system", "workflow" )
     {
         ## get the relevant logger
         $self->{$facility} = Log::Log4perl->get_logger("openxpki.$facility");
@@ -111,7 +111,7 @@ sub log
 
     $facility = lc($keys->{FACILITY})
         if (exists $keys->{FACILITY} and
-            $keys->{FACILITY} =~ m{ \A (?:auth|audit|monitor|system) \z }xms);
+            $keys->{FACILITY} =~ m{ \A (?:auth|audit|monitor|system|workflow) \z }xms);
 
     $prio = uc($keys->{PRIORITY})
         if (exists $keys->{PRIORITY} and
@@ -207,7 +207,7 @@ parameters:
 
 =item * PRIORITY (debug, info, warn, error, fatal)
 
-=item * FACILITY (auth, audit, monitor, system)
+=item * FACILITY (auth, audit, monitor, system, workflow)
 
 It is possible to specify more than one facility by passing an array
 reference here.

@@ -10,14 +10,39 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 
 sub update {
-    my ($class, $workflow, $action, $old_state, $action_name) = @_;
+
+    #    my ($class, $workflow, $action, $old_state, $action_name) = @_;
+    #    Note: the above params seem to no longer be valid
+    my ( $class, $workflow, $event, $new_state ) = @_;
+    my $prio = 'debug';
+    my $msg = '';
+
+    if ( $event eq 'create' ) {
+        $prio = 'info';
+#        $msg = "Workflow " . $workflow->id() . " created";
+    } elsif ( $event eq 'execute' ) {
+        $prio = 'info';
+    } elsif ( $event eq 'state change' ) {
+        $prio = 'info';
+#    } elsif ( $event eq 'fetch' ) {
+#    } elsif ( $event eq 'save' ) {
+#    } elsif ( $event eq 'add history' ) {
+    }
+
+    if ( $msg eq '' ) {
+        $msg = join('; ',
+            "Workflow ID=" . $workflow->id(),
+            "Type=" . $workflow->type(),
+            "Event=" . $event,
+            "New State: " . $new_state);
+    }
 
     CTX('log')->log(
-	MESSAGE => "Workflow observer triggered, action: $action, workflow id: " . $workflow->id() . ', workflow type: ' . $workflow->type() . ', workflow state: ' . $workflow->state() . ', old state: ' . $old_state . ', action name: ' . $action_name,
-	PRIORITY => 'debug',
-	FACILITY => 'system',
-	);
-    
+        MESSAGE => $msg,
+        PRIORITY => $prio,
+        FACILITY => 'workflow',
+    );
+
     return 1;
 }
 
