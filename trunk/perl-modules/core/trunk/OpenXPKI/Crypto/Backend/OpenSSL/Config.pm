@@ -103,7 +103,7 @@ sub set_cert_list
                 # FIXME - implement code that treats hold instruction
                 # correctly
                 my $invalidity_date = $arrayref->[3];
-                $invalidity_date = DateTime->from_epoch(epoch => $timestamp);
+                $invalidity_date = DateTime->from_epoch(epoch => $invalidity_date);
                 $invalidity_date = OpenXPKI::DateTime::convert_date({
                     DATE      => $invalidity_date,
                     OUTFORMAT => 'openssltime',
