@@ -117,6 +117,11 @@ our %COLUMN = (
     "workflow_history_date"  => "TIMESTAMP",
     "workflow_context_key"   => "TEXT_KEY",
     "workflow_context_value"   => "TEXT",
+
+    "namespace"                => "TEXT_KEY",
+    "datapool_key"             => "TEXT_KEY",
+    "datapool_value"           => "TEXT",
+    "encryption_key"           => "TEXT_KEY",
     
     );
 

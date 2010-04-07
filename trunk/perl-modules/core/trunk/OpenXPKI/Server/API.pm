@@ -576,6 +576,77 @@ sub BUILD {
             },
         },
 
+        'set_data_pool_entry' => {
+            class  => 'Object',
+            params => {
+                'PKI_REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                'NAMESPACE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                'EXPIRATION_DATE' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                    optional => 1,
+                },
+                'ENCRYPT' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                    optional => 1,
+                },
+                'KEY' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                'VALUE' => {
+                    type  => SCALAR | UNDEF,
+                    regex => $re_all,
+                },
+                'FORCE' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                    optional => 1,
+                },
+            },
+        },
+        'get_data_pool_entry' => {
+            class  => 'Object',
+            params => {
+                'PKI_REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                'NAMESPACE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                'KEY' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+            },
+        },
+        'list_data_pool_entries' => {
+            class  => 'Object',
+            params => {
+                'PKI_REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                'NAMESPACE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+            },
+        },
+
         ### Visualization API
         'get_workflow_instance_info' => {
             class  => 'Visualization',

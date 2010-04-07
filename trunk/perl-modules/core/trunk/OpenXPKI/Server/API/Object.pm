@@ -18,7 +18,11 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::CSR;
+use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::FileUtils;
+use DateTime;
+
+use List::Util qw(first);
 
 use MIME::Base64 qw( decode_base64 );
 
@@ -484,6 +488,821 @@ sub get_private_key_for_cert {
     };
 }
 
+
+sub get_data_pool_entry {
+    ##! 1: 'start'
+    my $self = shift;
+    my $arg_ref = shift;
+
+    my $namespace           = $arg_ref->{NAMESPACE};
+    my $key                 = $arg_ref->{KEY};
+
+    my $current_pki_realm   = CTX('session')->get_pki_realm();
+    my $requested_pki_realm = $arg_ref->{PKI_REALM};
+
+    if (! defined $requested_pki_realm) {
+	$requested_pki_realm = $current_pki_realm;
+    }
+
+    # when called from a workflow we only allow the current realm
+    # NOTE: only check direct caller. if workflow is deeper in the caller
+    # chain we assume it's ok.
+    my @caller = caller(1);
+    if ($caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms) {
+	if ($requested_pki_realm ne $current_pki_realm) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_INVALID_PKI_REALM',
+		params  => {
+		    REQUESTED_REALM => $requested_pki_realm,
+		    CURRENT_REALM => $current_pki_realm,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => [ 'audit', 'system', ],
+		},
+		);
+	}
+    }
+
+    CTX('log')->log(
+	MESSAGE  => "Reading data pool entry [$requested_pki_realm:$namespace:$key]",
+	PRIORITY => 'debug',
+	FACILITY => 'system',
+	);
+    
+    my %key = (
+	'PKI_REALM'  => $requested_pki_realm,
+	'NAMESPACE'  => $namespace,
+	'DATAPOOL_KEY' => $key,
+	);
+    
+    my $result = CTX('dbi_backend')->first (
+	TABLE => 'DATAPOOL',
+	DYNAMIC => \%key,
+	);
+    
+    if (! defined $result) {
+	# no entry found, do not raise exception but simply return undef
+	CTX('log')->log(
+	    MESSAGE  => "Requested data pool entry [$requested_pki_realm:$namespace:$key] not available",
+	    PRIORITY => 'debug',
+	    FACILITY => 'system',
+	    );
+	return;
+    }
+    
+    my $value = $result->{DATAPOOL_VALUE};
+    my $encryption_key = $result->{ENCRYPTION_KEY};
+	
+    my $encrypted = 0;
+    if (defined $encryption_key && ($encryption_key ne '')) {
+	CTX('log')->log(
+	    MESSAGE  => "Reading data pool entry [$requested_pki_realm:$namespace:$key]",
+	    PRIORITY => 'debug',
+	    FACILITY => 'system',
+	    );
+	$encrypted = 1;
+
+	my $cfg_id = CTX('api')->get_current_config_id();
+	my $token  = CTX('pki_realm_by_cfg')->{$cfg_id}->{$requested_pki_realm}->{crypto}->{default};
+	
+	if ($encryption_key =~ m{ \A p7:(.*) }xms) {
+	    # asymmetric decryption
+	    my $safe_id = $1;
+	    
+	    my $safe_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$requested_pki_realm}->{password_safe}->{id}->{$safe_id}->{crypto};
+	    if (! defined $safe_token) {
+		OpenXPKI::Exception->throw(
+		    message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_PASSWORD_TOKEN_NOT_AVAILABLE',
+		    params  => {
+			PKI_REALM  => $requested_pki_realm,
+			NAMESPACE  => $namespace,
+			KEY        => $key,
+			SAFE_ID    => $safe_id,
+			CONFIG_ID  => $cfg_id,
+		    },
+		    log => {
+			logger => CTX('log'),
+			priority => 'error',
+			facility => [ 'system', ],
+		    },
+		    );
+	    }
+	    ##! 16: 'asymmetric decryption via passwordsafe ' . $safe_id
+	    eval {
+		$value = $safe_token->command(
+		    {
+			COMMAND => 'pkcs7_decrypt',
+			PKCS7   => $value,
+		    });
+	    };
+	    if (my $exc = OpenXPKI::Exception->caught()) {
+		if ($exc->message()
+		    eq 'I18N_OPENXPKI_TOOLKIT_COMMAND_FAILED') {
+		    
+		    OpenXPKI::Exception->throw(
+			message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_ENCRYPTION_KEY_UNAVAILABLE',
+			params  => {
+			    PKI_REALM  => $requested_pki_realm,
+			    NAMESPACE  => $namespace,
+			    KEY        => $key,
+			    SAFE_ID    => $safe_id,
+			    CONFIG_ID  => $cfg_id,
+			},
+			log => {
+			    logger => CTX('log'),
+			    priority => 'error',
+			    facility => [ 'system', ],
+			},
+			);
+		}
+
+		$exc->rethrow();
+	    }
+
+	} else {
+	    # symmetric decryption
+
+	    # optimization: caching the symmetric key via the server
+	    # volatile vault. if we are asked to decrypt a value via
+	    # a symmetric key, we first check if we have the symmetric 
+	    # key cached by the server instance. if this is the case,
+	    # directly obtain the symmetric key from the volatile vault.
+	    # if not, obtain the symmetric key from the data pool (which
+	    # may result in a chained call of get_data_pool_entry with 
+	    # encrypted values and likely ends with an asymmetric decryption
+	    # via the password safe key).
+	    # once we have obtained the encryption key via the data pool chain
+	    # store it in the server volatile vault for faster access.
+
+	    my $algorithm;
+	    my $key;
+	    my $iv;
+
+	    my $cached_key = CTX('dbi_backend')->first(
+		TABLE => 'SECRET',
+		DYNAMIC => {
+		    PKI_REALM => $requested_pki_realm,
+		    GROUP_ID  => $encryption_key,
+		});
+
+	    if (! defined $cached_key) {
+		##! 16: 'encryption key cache miss'
+		# key was not cached by volatile vault, obtain it the hard
+		# way
+	    
+		# determine encryption key
+		my $key_data = $self->get_data_pool_entry(
+		    {
+			PKI_REALM => $requested_pki_realm,
+			NAMESPACE => 'sys.datapool.keys',
+			KEY       => $encryption_key,
+		    });
+
+		# prepare key
+		($algorithm, $iv, $key) = split(/:/, $key_data->{VALUE});
+
+		# cache encryption key in volatile vault
+		eval {
+ 		    CTX('dbi_backend')->insert (
+			TABLE => 'SECRET',
+			HASH  => 
+			{
+			    DATA      => CTX('volatile_vault')->encrypt($key_data->{VALUE}),
+			    PKI_REALM => $requested_pki_realm,
+			    GROUP_ID  => $encryption_key,
+			},
+			);
+		};
+		
+ 	    } else {
+		# key was cached by volatile vault
+		##! 16: 'encryption key cache hit'
+		
+		my $decrypted_key = CTX('volatile_vault')->decrypt($cached_key->{DATA});
+		($algorithm, $iv, $key) = split(/:/, $decrypted_key);
+	    }
+
+
+	    ##! 16: 'setting up volatile vault for symmetric decryption'
+	    my $vault = OpenXPKI::Crypto::VolatileVault->new(
+		{
+		    ALGORITHM => $algorithm,
+		    KEY       => $key,
+		    IV        => $iv,
+		    TOKEN     => $token,
+		});
+	    
+	    $value = $vault->decrypt($value);
+	}
+    }
+
+
+    my %return_value = (
+	PKI_REALM      => $result->{PKI_REALM},
+	NAMESPACE      => $result->{NAMESPACE},
+	KEY            => $result->{DATAPOOL_KEY},
+	ENCRYPTED      => $encrypted,
+	MTIME          => $result->{DATAPOOL_LAST_UPDATE},
+	VALUE          => $value,
+	);
+
+    if ($encrypted) {
+	$return_value{ENCRYPTION_KEY} = $result->{ENCRYPTION_KEY};
+    }
+    
+    if (defined $result->{NOTAFTER} && ($result->{NOTAFTER} ne '')) {
+	$return_value{EXPIRATION_DATE} = $result->{NOTAFTER};
+    }
+
+    return \%return_value;
+}
+
+
+sub set_data_pool_entry {
+    ##! 1: 'start'
+    my $self = shift;
+    my $arg_ref = shift;
+
+    my $current_pki_realm   = CTX('session')->get_pki_realm();
+
+    if (! defined $arg_ref->{PKI_REALM}) {
+	# modify arguments, as they are passed to the worker method
+	$arg_ref->{PKI_REALM} = $current_pki_realm;
+    }
+    my $requested_pki_realm = $arg_ref->{PKI_REALM};
+
+    # when called from a workflow we only allow the current realm
+    # NOTE: only check direct caller. if workflow is deeper in the caller
+    # chain we assume it's ok.
+    my @caller = caller(1);
+    if ($caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms) {
+	if ($requested_pki_realm ne $current_pki_realm) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_PKI_REALM',
+		params  => {
+		    REQUESTED_REALM => $requested_pki_realm,
+		    CURRENT_REALM => $current_pki_realm,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => [ 'audit', 'system', ],
+		},
+		);
+	}
+	if ($arg_ref->{NAMESPACE} =~ m{ \A sys\. }xms) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_NAMESPACE',
+		params  => {
+		    NAMESPACE => $arg_ref->{NAMESPACE},
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => [ 'audit', 'system', ],
+		},
+		);
+
+	}
+    }
+
+    # forward encryption request to the worker function, use symmetric 
+    # encryption
+    if (exists $arg_ref->{ENCRYPT}) {
+	if ($arg_ref->{ENCRYPT}) {
+	    $arg_ref->{ENCRYPT} = 'current_symmetric_key',
+	} else {
+	    # encrypt key existed, but was boolean false, delete it
+	    delete $arg_ref->{ENCRYPT};
+	}
+    }
+
+    # erase expired entries
+    $self->__cleanup_data_pool();
+
+    return $self->__set_data_pool_entry($arg_ref);
+}
+
+
+
+sub list_data_pool_entries {
+    ##! 1: 'start'
+    my $self = shift;
+    my $arg_ref = shift;
+
+    my $namespace           = $arg_ref->{NAMESPACE};
+    my $values              = $arg_ref->{VALUES};
+
+    my $current_pki_realm   = CTX('session')->get_pki_realm();
+    my $requested_pki_realm = $arg_ref->{PKI_REALM};
+
+    if (! defined $requested_pki_realm) {
+	$requested_pki_realm = $current_pki_realm;
+    }
+
+    # when called from a workflow we only allow the current realm
+    # NOTE: only check direct caller. if workflow is deeper in the caller
+    # chain we assume it's ok.
+    my @caller = caller(1);
+    if ($caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms) {
+	if ($arg_ref->{PKI_REALM} ne $current_pki_realm) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_OBJECT_LIST_DATA_POOL_ENTRIES_INVALID_PKI_REALM',
+		params  => {
+		    REQUESTED_REALM => $requested_pki_realm,
+		    CURRENT_REALM => $current_pki_realm,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => [ 'audit', 'system', ],
+		},
+		);
+	}
+    }
+
+    my %condition = (
+	'PKI_REALM' => $requested_pki_realm,
+	);
+
+    if (defined $namespace) {
+	$condition{NAMESPACE} = $namespace;
+    }
+
+    my $result = CTX('dbi_backend')->select(
+	TABLE => 'DATAPOOL',
+	DYNAMIC => \%condition,
+	ORDER => [ 'DATAPOOL_KEY', 'NAMESPACE' ],
+	);
+
+
+    return [ map { 
+	{ 'NAMESPACE' => $_->{NAMESPACE}, 
+	  'KEY'       => $_->{DATAPOOL_KEY},
+	} } @{$result} ];
+}
+
+
+# internal worker function, accepts more parameters than the API function
+# named attributes:
+# ENCRYPT => 
+#   not set, undefined -> do not encrypt value
+#   'current_symmetric_key' -> encrypt using the current symmetric key 
+#                              associated with the current password safe
+#   'password_safe'         -> encrypt using the current password safe 
+#                              (asymmetrically)
+#
+sub __set_data_pool_entry : PRIVATE {
+    ##! 1: 'start'
+
+    my $self = shift;
+    my $arg_ref = shift;
+
+    my $current_pki_realm   = CTX('session')->get_pki_realm();
+
+    my $requested_pki_realm = $arg_ref->{PKI_REALM};
+    my $namespace           = $arg_ref->{NAMESPACE};
+    my $expiration_date     = $arg_ref->{EXPIRATION_DATE};
+    my $encrypt             = $arg_ref->{ENCRYPT};
+    my $force               = $arg_ref->{FORCE};
+    my $key                 = $arg_ref->{KEY};
+    my $value               = $arg_ref->{VALUE};
+
+    
+    # primary key for database
+    my %key = (
+	'PKI_REALM'  => $requested_pki_realm,
+	'NAMESPACE'  => $namespace,
+	'DATAPOOL_KEY' => $key,
+	);
+
+    # undefined or missing value: delete entry
+    if (! defined $value || ($value eq '')) {
+	eval {
+	    CTX('dbi_backend')->delete(
+		TABLE => 'DATAPOOL',
+		DATA  => {
+		    %key,
+		},
+		);
+	};
+	return 1;
+    }
+
+    # sanitize value to store
+    if (ref $value ne '') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_VALUE_TYPE',
+            params  => {
+		PKI_REALM  => $requested_pki_realm,
+		NAMESPACE  => $namespace,
+		KEY        => $key,
+		VALUE_TYPE => ref $value,
+            },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => [ 'system', ],
+	    },
+	    );
+    }
+
+    # check for illegal characters
+    if ($value =~ m{ (?:\p{Unassigned}|\x00) }xms) {
+	OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ILLEGAL_DATA",
+            params  => {
+		PKI_REALM  => $requested_pki_realm,
+		NAMESPACE  => $namespace,
+		KEY        => $key,
+            },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => [ 'system', ],
+	    },
+            );
+    }
+
+    if (defined $encrypt) {
+	if ($encrypt !~ m{ \A (?:current_symmetric_key|password_safe) \z }xms) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_ENCRYPTION_MODE',
+		params  => {
+		    PKI_REALM  => $requested_pki_realm,
+		    NAMESPACE  => $namespace,
+		    KEY        => $key,
+		    ENCRYPTION_MODE => $encrypt,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => [ 'system', ],
+		},
+		);
+	}
+    }
+
+    if (defined $expiration_date) {
+	if (($expiration_date < 0)
+	    || ($expiration_date > 0 && $expiration_date < time)) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_EXPIRATION_DATE',
+		params  => {
+		    PKI_REALM  => $requested_pki_realm,
+		    NAMESPACE  => $namespace,
+		    KEY        => $key,
+		    EXPIRATION_DATE => $expiration_date,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => [ 'system', ],
+		},
+		);
+	}
+    }
+
+    my $encryption_key_id  = '';
+
+    if ($encrypt) {
+	my $current_password_safe = $self->__get_current_safe_id($current_pki_realm);
+	my $cfg_id = CTX('api')->get_current_config_id();
+	my $token  = CTX('pki_realm_by_cfg')->{$cfg_id}->{$current_pki_realm}->{crypto}->{default};
+
+	if ($encrypt eq 'current_symmetric_key') {
+
+	    my $encryption_key = $self->__get_current_datapool_encryption_key($current_pki_realm);
+	    my $keyid = $encryption_key->{KEY_ID};
+
+	    $encryption_key_id = $keyid;
+	    
+	    ##! 16: 'setting up volatile vault for symmetric encryption'
+	    my $vault = OpenXPKI::Crypto::VolatileVault->new(
+		{
+		    %{$encryption_key},
+		    TOKEN => $token,
+		});
+	    
+	    $value = $vault->encrypt($value);
+
+	} elsif ($encrypt eq 'password_safe') {
+	    # prefix 'p7' for PKCS#7 encryption
+	    $encryption_key_id = 'p7:' . $current_password_safe;
+	    
+	    my $cert = CTX('pki_realm_by_cfg')->{$cfg_id}->{$current_pki_realm}->{password_safe}->{id}->{$current_password_safe}->{certificate};
+	    
+	    ##! 16: 'cert: ' . $cert
+	    if (! defined $cert) {
+		OpenXPKI::Exception->throw(
+		    message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_CERT_NOT_AVAILABLE',
+		    params  => {
+			PKI_REALM  => $requested_pki_realm,
+			NAMESPACE  => $namespace,
+			KEY        => $key,
+			SAFE_ID    => $current_password_safe,
+			CONFIG_ID  => $cfg_id,
+		    },
+		    log => {
+			logger => CTX('log'),
+			priority => 'error',
+			facility => [ 'system', ],
+		    },
+		    );
+	    }
+
+	    ##! 16: 'asymmetric encryption via passwordsafe ' . $current_password_safe
+	    $value = $token->command(
+		{
+		    COMMAND => 'pkcs7_encrypt',
+		    CERT    => $cert,
+		    CONTENT => $value,
+		});
+	}
+    }
+
+
+    my %values = (
+	'DATAPOOL_VALUE'       => $value,
+	'ENCRYPTION_KEY'       => $encryption_key_id,
+	'DATAPOOL_LAST_UPDATE' => time,
+	);
+
+    if (defined $expiration_date) {
+	$values{NOTAFTER} = $expiration_date;
+    }
+
+    
+    my $rows_updated;
+    if ($force) {
+	# force means we can overwrite entries, so first try to update the value.
+        $rows_updated =
+            CTX('dbi_backend')->update(
+                TABLE => 'DATAPOOL',
+                DATA  => {
+		    %values,
+                },
+                WHERE => \%key,
+                );
+        if ($rows_updated) {
+            return 1;
+        }
+	# no rows updated, so no data existed before, continue with insert
+    }
+   
+    eval {
+	CTX('dbi_backend')->insert(
+	    TABLE => 'DATAPOOL',
+	    HASH  => {
+		%key,
+		%values,
+	    },
+	    );
+    };
+    if (my $exc = OpenXPKI::Exception->caught()) {
+	if ($exc->message()
+	    eq 'I18N_OPENXPKI_SERVER_DBI_DBH_EXECUTE_FAILED') {
+	    
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENTRY_EXISTS',
+		params  => {
+		    PKI_REALM  => $requested_pki_realm,
+		    NAMESPACE  => $namespace,
+		    KEY        => $key,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'info',
+		    facility => [ 'system', ],
+		},
+		);
+	}
+	
+	$exc->rethrow();
+    }
+
+    return 1;
+}
+
+
+# private worker function: clean up data pool (delete expired entries)
+sub __cleanup_data_pool : PRIVATE {
+    ##! 1: 'start'
+    my $self = shift;
+    my $arg_ref = shift;
+    
+    CTX('dbi_backend')->delete(
+	TABLE => 'DATAPOOL',
+	DATA => {
+	    NOTAFTER => [ '<', time ],
+	});
+    return 1;
+}
+
+
+# Returns a hashref with KEY, IV and ALGORITHM (directly usable by 
+# VolatileVault) containing the currently used symmetric encryption 
+# key for encrypting data pool values.
+sub __get_current_datapool_encryption_key : PRIVATE {
+    ##! 1: 'start'
+    my $self = shift;
+    my $realm = shift;
+    my $arg_ref = shift;
+
+#    my $realm  = CTX('session')->get_pki_realm();
+    my $cfg_id = CTX('api')->get_current_config_id();
+    my $token  = CTX('pki_realm_by_cfg')->{$cfg_id}->{$realm}->{crypto}->{default};
+
+    # get symbolic name of current password safe (e. g. 'passwordsafe1')
+    my $safe_id = $self->__get_current_safe_id($realm);
+    ##! 16: 'current password safe id: ' . $safe_id
+    
+    # the password safe is only used to encrypt the key for a symmetric key
+    # (volatile vault). using such a key should speed up encryption and
+    # reduce data size.
+    
+    my $associated_vault_key;
+    my $associated_vault_key_id;
+    
+    # check if we already have a symmetric key for this password safe
+    eval {
+	##! 16: 'fetch associated symmetric key for password safe: ' . $safe_id
+	my $data = 
+	    $self->get_data_pool_entry(
+		{
+		    PKI_REALM => $realm,
+		    NAMESPACE => 'sys.datapool.pwsafe',
+		    KEY       => 'p7:' . $safe_id,
+		});
+	$associated_vault_key_id = $data->{VALUE};
+	##! 16: 'got associated vault key: ' . $associated_vault_key_id
+    };
+
+    if (! defined $associated_vault_key_id) {
+	##! 16: 'first use of this password safe, generate a new symmetric key'
+	my $associated_vault = OpenXPKI::Crypto::VolatileVault->new(
+	    {
+		TOKEN => $token,
+		EXPORTABLE => 1,
+	    });
+
+	$associated_vault_key    = $associated_vault->export_key();
+	$associated_vault_key_id = $associated_vault->get_key_id( { LONG => 1 } );
+
+	# prepare return value correctly
+	$associated_vault_key->{KEY_ID} = $associated_vault_key_id;
+
+	# save password safe -> key id mapping
+	$self->__set_data_pool_entry( 
+	    {
+		PKI_REALM => $realm,
+		NAMESPACE => 'sys.datapool.pwsafe',
+		KEY       => 'p7:' . $safe_id,
+		VALUE     => $associated_vault_key_id,
+	    }
+	    );
+
+	# save this key for future use
+	$self->__set_data_pool_entry( 
+	    {
+		PKI_REALM => $realm,
+		NAMESPACE => 'sys.datapool.keys',
+		KEY => $associated_vault_key_id,
+		ENCRYPT => 'password_safe',
+		VALUE => join(':', 
+			      $associated_vault_key->{ALGORITHM}, 
+			      $associated_vault_key->{IV}, 
+			      $associated_vault_key->{KEY}),
+	    }
+	    );
+
+    } else {
+	# symmetric key already exists, check if we have got a cached
+	# version in the SECRET pool
+
+	my $cached_key = CTX('dbi_backend')->first(
+	    TABLE => 'SECRET',
+	    DYNAMIC => {
+		PKI_REALM => $realm,
+		GROUP_ID  => $associated_vault_key_id,
+	    });
+
+	my $algorithm;
+	my $iv;
+	my $key;
+
+	if (defined $cached_key) {
+	    ##! 16: 'decryption key cache hit'
+	    # get key from secret cache
+	    my $decrypted_key = CTX('volatile_vault')->decrypt($cached_key->{DATA});
+	    ($algorithm, $iv, $key) = split(/:/, $decrypted_key);	    
+	} else {
+	    ##! 16: 'decryption key cache miss'
+	    # recover key from password safe
+	    # symmetric key already exists, recover it from password safe
+	    my $data = $self->get_data_pool_entry(
+		{
+		    PKI_REALM => $realm,
+		    NAMESPACE => 'sys.datapool.keys',
+		    KEY       => $associated_vault_key_id,
+		});
+	    
+	    ($algorithm, $iv, $key) = split(/:/, $data->{VALUE});
+	    
+	    # cache encryption key in volatile vault
+	    eval {
+		CTX('dbi_backend')->insert (
+		    TABLE => 'SECRET',
+		    HASH  => 
+		    {
+			DATA      => CTX('volatile_vault')->encrypt($data->{VALUE}),
+			PKI_REALM => $realm,
+			GROUP_ID  => $associated_vault_key_id,
+		    },
+		    );
+	    };
+
+	}
+
+	$associated_vault_key = {
+	    KEY_ID => $associated_vault_key_id,
+	    ALGORITHM => $algorithm,
+	    IV => $iv,
+	    KEY => $key,
+	};
+    }
+
+    return $associated_vault_key;
+}
+
+
+
+# returns the current password safe id (symbolic name from config.xml)
+# for the specified PKI Realm
+# arg: pki realm
+sub __get_current_safe_id {
+    ##! 1: 'start'
+    my $self  = shift;
+    my $realm = shift;
+    # my $realm = CTX('session')->get_pki_realm();
+    my $cfg_id = CTX('api')->get_current_config_id();
+
+    my @possible_safes = ();
+    my $pki_realm_cfg = CTX('pki_realm_by_cfg')->{$cfg_id}->{$realm}->{'password_safe'}->{'id'};
+    if (! defined $pki_realm_cfg || ref $pki_realm_cfg ne 'HASH') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CURRENT_SAFE_ID_MISSING_PKI_REALM_CONFIG',
+            params  => {
+                CONFIG_ID => $cfg_id,
+                REALM     => $realm,
+            },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => [ 'system', ],
+	    },
+        );
+    }
+
+    foreach my $key (keys %{ $pki_realm_cfg }) {
+        ##! 64: 'key: ' . $key
+        push @possible_safes, {
+            'id'        => $key,
+            'notbefore' => $pki_realm_cfg->{$key}->{notbefore},
+            'notafter'  => $pki_realm_cfg->{$key}->{notafter},
+        };
+    }
+    ##! 16: 'possible safes: ' . Dumper \@possible_safes
+    # sort safes by notbefore date (latest earliest)
+    my @sorted_safes = sort { DateTime->compare($b->{notbefore}, $a->{notbefore}) } @possible_safes;
+    ##! 16: 'sorted safes: ' . Dumper \@sorted_safes
+
+    # find the topmost one that is available /now/
+    my $now = DateTime->now();
+
+    ##! 16: 'now: ' . Dumper $now
+    my $current_safe = first
+        {  DateTime->compare($now, $_->{notbefore}) >= 0
+        && DateTime->compare($_->{notafter}, $now) > 0 } @sorted_safes;
+    if (! defined $current_safe) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CURRENT_SAFE_ID_NO_SAFE_AVAILABLE',
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => [ 'system', ],
+	    },
+        );
+    }
+    ##! 16: 'current safe: ' . Dumper $current_safe
+
+    return $current_safe->{id};
+}
+
+
+
 sub __get_chain_certificates {
     ##! 1: 'start'
     my $self       = shift;
@@ -628,4 +1447,98 @@ with the CSR serial. Returns undef if no CA generated private key
 is available.
 
 
+=head1 Data Pools
+
+For a detailed description of the Data Pool feature please read the 
+documentation at http://wiki.openxpki.org/index.php/Development/Data_Pools
+
+=head2 get_data_pool_entry
+
+Searches the specified key in the data pool and returns a data structure
+containing the resulting value and additional information.
+
+Named parameters:
+
+=over
+
+=item * PKI_REALM - PKI Realm to address. If the API is called directly
+  from OpenXPKI::Server::Workflow only the PKI Realm of the currently active
+  session is accepted.
+
+=item * NAMESPACE
+
+=item * KEY
+
+=back
+
+
+Example:
+ $tmpval = 
+  CTX('api')->get_data_pool_entry(
+  {
+    PKI_REALM => $pki_realm,
+    NAMESPACE => 'workflow.foo.bar',
+    KEY => 'myvariable',
+  });
+
+The resulting data structure looks like:
+ {
+   PKI_REALM       => # PKI Realm
+   NAMESPACE       => # Namespace
+   KEY             => # Data pool key
+   ENCRYPTED       => # 1 or 0, depending on if it was encrypted
+   ENCRYPTION_KEY  => # encryption key id used (may not be available)
+   MTIME           => # date of last modification (epoch)
+   EXPIRATION_DATE => # date of expiration (epoch)
+   VALUE           => # value
+ };	
+
+
+=head2 set_data_pool_entry
+
+Writes the specified information to the global data pool, possibly encrypting
+the value using the password safe defined for the PKI Realm.
+
+Named parameters:
+
+=over
+
+=item * PKI_REALM - PKI Realm to address. If the API is called directly
+  from OpenXPKI::Server::Workflow only the PKI Realm of the currently active
+  session is accepted.
+
+=item * NAMESPACE 
+
+=item * KEY
+
+=item * VALUE - Value to store
+
+=item * ENCRYPTED - optional, set to 1 if you wish the entry to be encrypted. Requires a properly set up password safe certificate in the target realm.
+
+=item * FORCE - optional, set to 1 in order to force writing entry to database
+
+=item * EXPIRATION_DATE - optional, seconds since epoch. If entry is older than this value the server may delete the entry.
+
+=back
+
+Side effect: this method automatically wipes all data pool entries whose
+expiration date has passed.
+
+B<NOTE:> Encryption may work even though the private key for the password safe
+is not available (the symmetric encryption key is encrypted for the password
+safe certificate). Retrieving encrypted information will only work if the
+password safe key is available during the first access to the symmetric key.
+
+
+Example:
+ CTX('api')->set_data_pool_entry(
+ {
+   PKI_REALM => $pki_realm,
+   NAMESPACE => 'workflow.foo.bar',
+   KEY => 'myvariable',
+   VALUE => $tmpval,
+   ENCRYPT => 1,
+   FORCE => 1,
+   EXPIRATION_DATE => time + 3600 * 24 * 7,
+ });
 

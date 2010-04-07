@@ -130,6 +130,12 @@ my %COLUMN_of = (
     WORKFLOW_HISTORY_DATE => "workflow_history_date",
     WORKFLOW_CONTEXT_KEY  => "workflow_context_key",
     WORKFLOW_CONTEXT_VALUE => "workflow_context_value",
+
+    NAMESPACE             => "namespace",
+    DATAPOOL_KEY          => "datapool_key",
+    DATAPOOL_VALUE        => "datapool_value",
+    ENCRYPTION_KEY        => "encryption_key",
+    DATAPOOL_LAST_UPDATE  => "last_update",
     );
 
 
@@ -313,6 +319,19 @@ my %TABLE_of = (
         COLUMNS => [ "WORKFLOW_SERIAL", "WORKFLOW_CONTEXT_KEY",
 		     "WORKFLOW_CONTEXT_VALUE",
 	    ]},
+
+    DATAPOOL => {
+        NAME    => "datapool",
+        INDEX   => [ "PKI_REALM", "NAMESPACE", "DATAPOOL_KEY", ],
+        COLUMNS => [ "PKI_REALM",
+		     "NAMESPACE",
+		     "DATAPOOL_KEY",
+		     "DATAPOOL_VALUE",
+		     "ENCRYPTION_KEY",
+		     "NOTAFTER",
+		     "DATAPOOL_LAST_UPDATE",
+	    ]},
+
     );
 
 my %INDEX_of = (
