@@ -101,10 +101,9 @@ sub log
     if (ref $keys->{FACILITY} eq 'ARRAY') {
 	foreach my $entry (@{$keys->{FACILITY}}) {
 	    $self->log(
-		MESSAGE     => $keys->{MESSAGE},
+		%{$keys},
 		FACILITY    => $entry,
-		PRIORITY    => $keys->{PRIORITY},
-		CALLERLEVEL => 1,
+		CALLERLEVEL => $callerlevel + 1,
 		);
 	}
 	return 1;
@@ -136,8 +135,18 @@ sub log
 	$filename_of_package{$package} = $filename;
     }
 
+    # if requested add the subroutine name to the log message
+    my $have_subroutine = 0;
+    if ($keys->{SUBROUTINE}) {
+	$have_subroutine = 1;
+    }
+
     ## build and store message
-    $msg = "[$package (" . (defined $filename ? $filename . ':' : '') . "$line)] $msg";
+    $msg = "[$package"
+	. ($have_subroutine ? '->' . $subroutine : '') 
+	. " (" 
+	. (defined $filename ? $filename . ':' : '') 
+	. "$line)] $msg";
 
     # remove trailing newline characters
     {
