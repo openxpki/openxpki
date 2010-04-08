@@ -546,7 +546,7 @@ sub get_data_pool_entry {
 	# no entry found, do not raise exception but simply return undef
 	CTX('log')->log(
 	    MESSAGE  => "Requested data pool entry [$requested_pki_realm:$namespace:$key] not available",
-	    PRIORITY => 'debug',
+	    PRIORITY => 'info',
 	    FACILITY => 'system',
 	    );
 	return;
@@ -557,11 +557,6 @@ sub get_data_pool_entry {
 	
     my $encrypted = 0;
     if (defined $encryption_key && ($encryption_key ne '')) {
-	CTX('log')->log(
-	    MESSAGE  => "Reading data pool entry [$requested_pki_realm:$namespace:$key]",
-	    PRIORITY => 'debug',
-	    FACILITY => 'system',
-	    );
 	$encrypted = 1;
 
 	my $cfg_id = CTX('api')->get_current_config_id();
@@ -877,6 +872,7 @@ sub __set_data_pool_entry : PRIVATE {
 	'NAMESPACE'  => $namespace,
 	'DATAPOOL_KEY' => $key,
 	);
+    
 
     # undefined or missing value: delete entry
     if (! defined $value || ($value eq '')) {
@@ -1023,6 +1019,12 @@ sub __set_data_pool_entry : PRIVATE {
 	}
     }
 
+    CTX('log')->log(
+	MESSAGE  => "Writing data pool entry [$requested_pki_realm:$namespace:$key]",
+	PRIORITY => 'debug',
+	FACILITY => 'system',
+	);
+
 
     my %values = (
 	'DATAPOOL_VALUE'       => $value,
@@ -1033,7 +1035,6 @@ sub __set_data_pool_entry : PRIVATE {
     if (defined $expiration_date) {
 	$values{NOTAFTER} = $expiration_date;
     }
-
     
     my $rows_updated;
     if ($force) {

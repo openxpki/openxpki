@@ -271,7 +271,9 @@ sub __receive
     {
         ##! 8: "connection closed"
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION");
+	    message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION",
+	    log => undef, # do not log exception
+	    );
     }
     ##! 4: "read message - $msg"
     return $msg;

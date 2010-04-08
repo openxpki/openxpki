@@ -13,6 +13,7 @@ use English;
 
 use Log::Log4perl qw(:easy);
 use Log::Log4perl::Level;
+use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Log::Appender::DBI;
 
@@ -135,18 +136,30 @@ sub log
 	$filename_of_package{$package} = $filename;
     }
 
-    # if requested add the subroutine name to the log message
-    my $have_subroutine = 0;
-    if ($keys->{SUBROUTINE}) {
-	$have_subroutine = 1;
-    }
+    # get session information
+    my $user;
+    my $role = '';
+    my $session_short;
+    eval {
+	$user = CTX('session')->get_user();
+    };
+    eval {
+	$role = '(' . CTX('session')->get_role() . ')';
+    };
+    eval {
+	# first 4 characters of session id are enough to trace flow in sessions
+	$session_short = substr(CTX('session')->get_id(), 0, 4);
+    };
+
 
     ## build and store message
     $msg = "[$package"
-	. ($have_subroutine ? '->' . $subroutine : '') 
 	. " (" 
-	. (defined $filename ? $filename . ':' : '') 
-	. "$line)] $msg";
+	. (defined $filename      ? $filename . ':'      : '') 
+	. "$line)"
+	. (defined $user          ? '; ' . $user . $role : '')
+	. (defined $session_short ? '@' . $session_short : '')
+        . "] $msg";
 
     # remove trailing newline characters
     {

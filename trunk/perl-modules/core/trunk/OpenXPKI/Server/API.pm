@@ -979,7 +979,7 @@ sub AUTOMETHOD {
             }
         }
 
-	CTX('log')->log(
+        CTX('log')->log(
 	    MESSAGE  => "Method '$method_name' called via API",
 	    PRIORITY => 'debug',
 	    FACILITY => 'system',

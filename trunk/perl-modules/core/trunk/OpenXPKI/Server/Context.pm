@@ -54,6 +54,7 @@ sub CTX {
     if (! $context->{initialized}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_NOT_INITIALIZED",
+	    log => undef, # do not log exception
 	    );
     }
 
@@ -98,12 +99,14 @@ sub CTX {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND",
                 params  => {OBJECT => $object},
+		log => undef, # do not log exception message
 		);
 	}
 	if (! defined $context->{exported}->{$object}) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED",
                 params  => {OBJECT => $object},
+		log => undef, # do not log exception message
 		);
 	}
 

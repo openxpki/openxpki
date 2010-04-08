@@ -194,7 +194,7 @@ sub __log_write_action
     ##! 16: 'log: ' . ref $self->{LOG}
 
     $self->{LOG}->log (FACILITY => "audit",
-                           PRIORITY => "info",
+                           PRIORITY => "debug",
                            MESSAGE  => $message,
                            MODULE   => $package,
                            FILENAME => $filename,

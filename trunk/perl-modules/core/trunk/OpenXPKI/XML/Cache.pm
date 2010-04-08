@@ -807,9 +807,17 @@ sub get_xpath
             {
                 OpenXPKI::Exception->throw (
                     message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT",
-                    params  => {"XPATH" =>    $self->__get_serialized_xpath($keys),
-                                "TAG"   =>    $keys->{XPATH}->[$i],
-                                "POSITION" => $keys->{COUNTER}->[$i]});
+                    params  => {
+			"XPATH" =>    $self->__get_serialized_xpath($keys),
+			"TAG"   =>    $keys->{XPATH}->[$i],
+			"POSITION" => $keys->{COUNTER}->[$i]
+		    },
+		    log => {
+			message => 'Missing config element (' . $keys->{XPATH}->[$i] . '; #' . $keys->{COUNTER}->[$i] . ') for xpath (' . $self->__get_serialized_xpath($keys) . ')',
+			facility => 'system',
+			priority => 'debug'
+		    },
+		    );
             }
         }
         $item = $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]];
@@ -873,9 +881,17 @@ sub get_xpath_count
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_XML_CACHE_GET_XPATH_COUNT_MISSING_ELEMENT",
-                params  => {"XPATH"    => $self->__get_serialized_xpath($keys),
-                            "TAG"      => $keys->{XPATH}->[$i],
-                            "POSITION" => $keys->{COUNTER}->[$i]});
+                params  => {
+		    "XPATH"    => $self->__get_serialized_xpath($keys),
+		    "TAG"      => $keys->{XPATH}->[$i],
+		    "POSITION" => $keys->{COUNTER}->[$i]
+		},
+		log => {
+		    message => 'Missing config count (' . $keys->{XPATH}->[$i] . '; #' . $keys->{COUNTER}->[$i] . ') for xpath (' . $self->__get_serialized_xpath($keys) . ')',
+		    facility => 'system',
+		    priority => 'debug'
+		},
+		);
         }
         $item = $item->{$keys->{XPATH}->[$i]}->[$keys->{COUNTER}->[$i]];
     }
@@ -887,6 +903,11 @@ sub get_xpath_count
             params  => {
                 XPATH => $self->__get_serialized_xpath($keys),
             },
+	    log => {
+		message => 'Config entry does not exist for xpath (' . $self->__get_serialized_xpath($keys) . ')',
+		facility => 'system',
+		priority => 'debug'
+	    },
         );
     }
     ##! 2: "at minimum one exists"

@@ -11,6 +11,8 @@ use warnings;
 use utf8;
 
 use OpenXPKI::Debug;
+use OpenXPKI::Server::Context qw( CTX );
+use Log::Log4perl qw( get_logger );
 
 use OpenXPKI::i18n qw( i18nGettext );
 use Exception::Class (
@@ -20,6 +22,7 @@ use Exception::Class (
     }
 );
 
+my $log4perl_logger;
 
 sub full_message
 {
@@ -89,35 +92,67 @@ sub throw {
 
     my $self = $proto->new(%exception_args);
 
-    if (exists $args{log}
-	&& exists $args{log}->{logger}
-	&& (ref $args{log}->{logger} eq 'OpenXPKI::Server::Log')) {
 
-	my $message;
-	if (exists $args{log}->{message}) {
-	    $message = $args{log}->{message};
+    my %logger_args = (
+	MESSAGE     => 'Exception: ' . $self->full_message(%args),
+	FACILITY    => 'system',
+	PRIORITY    => 'debug',
+	CALLERLEVEL => 1,
+	);
+
+    
+    if (exists $args{log}) {
+	# log => undef means: do not log at all
+	if (defined $args{log}) {
+	    if (exists $args{log}->{message}) {
+		$logger_args{MESSAGE} = $args{log}->{message};
+	    }
+	    
+	    if (exists $args{log}->{facility}) {
+		$logger_args{FACILITY} = $args{log}->{facility};
+	    }
+	    
+	    if (exists $args{log}->{priority}) {
+		$logger_args{PRIORITY} = $args{log}->{priority};
+	    }
+	    
+
+	    # logger object was explicitly specified
+	    if (exists $args{log}->{logger}
+		&& (ref $args{log}->{logger} eq 'OpenXPKI::Server::Log')) {
+		
+		$args{log}->{logger}->log(
+		    %logger_args,
+		    );
+		
+		delete $args{log};
+	    } else {
+		# no logger specified, instantiate one
+		CTX('log')->log(
+		    %logger_args,
+		    );
+	    }
 	} else {
-	    $message = 'Exception: ' . $self->full_message(%args);
+	    # no OpenXPKI logger specified, do not log at all
+	    ##! 1: 'suppressed log message: ' . $logger_args{MESSAGE}
 	}
-	
-	my $facility = 'system';
-	if (exists $args{log}->{facility}) {
-	    $facility = $args{log}->{facility};
-	}
-	
-	my $priority = 'debug';
-	if (exists $args{log}->{priority}) {
-	    $priority = $args{log}->{priority};
-	}
+    } else {
+	# exceptions get logged by default
+	my $logger;
+	eval {
+	    $logger = CTX('log');
+	};
 
-	$args{log}->{logger}->log(
-	    MESSAGE     => $message,
-	    FACILITY    => $facility,
-	    PRIORITY    => $priority,
-	    CALLERLEVEL => 1,
-	    );
-
-	delete $args{log};
+	if (defined $logger) {
+	    # we have an OpenXPKI logger available
+	    $logger->log(
+		%logger_args,
+		);
+	} else {
+	    # no system logger found, falling back to Log4perl
+	    $log4perl_logger ||= get_logger('openxpki.system');
+	    $log4perl_logger->debug($logger_args{MESSAGE});
+	}
     }
 
     die $self;

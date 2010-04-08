@@ -78,8 +78,21 @@ my @init_tasks = qw(
 
 my %is_initialized = map { $_ => 0 } @init_tasks;
 
+
+# holds log statements until the logging subsystem has been initialized
+my @log_queue;
+
 sub init {
     my $keys = shift;
+
+    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
+	log_wrapper(
+	    {
+		MESSAGE  => "OpenXPKI initialization",
+		PRIORITY => "info",
+		FACILITY => "system",
+	    });
+    }
 
     my @tasks;
 
@@ -103,7 +116,16 @@ sub init {
 	}
 	next TASK if $is_initialized{$task};
 
-    ##! 16: 'do_init_' . $task
+	##! 16: 'do_init_' . $task
+	if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
+	    log_wrapper(
+		{
+		    MESSAGE  => "Initialization task '$task'",
+		    PRIORITY => "info",
+		    FACILITY => "system",
+		});
+	}
+
 	eval "__do_init_$task(\$keys);";
 	if (my $exc = OpenXPKI::Exception->caught())
 	{
@@ -141,10 +163,19 @@ sub init {
 	    log_wrapper(
 		{
 		    MESSAGE  => "Initialization task '$task' finished",
-		    PRIORITY => "info",
+		    PRIORITY => "debug",
 		    FACILITY => "system",
 		});
 	}
+    }
+
+    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
+	log_wrapper(
+	    {
+		MESSAGE  => "OpenXPKI initialization finished",
+		PRIORITY => "info",
+		FACILITY => "system",
+	    });
     }
     return 1;
 }
@@ -154,11 +185,20 @@ sub log_wrapper {
     my $arg = shift;
 
     if ($is_initialized{'log'}) {
+	if (scalar @log_queue) {
+	    foreach my $entry (@log_queue) {
+		CTX('log')->log(
+		    %{$entry},
+		    );	
+	    }
+	    @log_queue = ();
+	}
 	CTX('log')->log(
 	    %{$arg},
 	    );
     } else {
-	print STDERR $arg->{FACILITY} . '.' . $arg->{PRIORITY} . ': ' . $arg->{MESSAGE} . "\n";
+	# log system not yet prepared, queue log statement 
+	push @log_queue, $arg;
     }
     return 1;
 }
@@ -1885,6 +1925,12 @@ sub __get_cert_identifier {
                     'ALIAS'     => $cert_alias,
                     'PKI_REALM' => $cert_realm,
                 },
+		log => {
+		    logger => CTX('log'),
+		    message => "Alias '$cert_alias' not found in PKI Realm '$cert_realm'",
+		    facility => 'system',
+		    priority => 'warn',
+		}
             );
         }
     }

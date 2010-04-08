@@ -112,6 +112,7 @@ sub collect {
  	if ($EVAL_ERROR eq "alarm\n") {
 	    OpenXPKI::Exception->throw(
 	        message => "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT",
+		log => undef, # do not log this exception
 	    );
  	} else {
 	    # FIXME

@@ -132,6 +132,11 @@ sub new
     
     $self->{PARAMS}->{no_client_stdout} = 1;
 
+    CTX('log')->log(
+	    MESSAGE  => "Server is running",
+	    PRIORITY => "info",
+	    FACILITY => "monitor",
+	);
     $self->run(%{$self->{PARAMS}});
 }
 
@@ -189,6 +194,12 @@ sub post_bind_hook {
                 params  => {
                     SOCKET_OWNER => $self->{PARAMS}->{socket_owner},
                 },
+		log => {
+		    logger => CTX('log'),
+		    message => "Incorrect socket owner '$self->{PARAMS}->{socket_owner}'",
+		    facility => 'system',
+		    priority => 'fatal',
+		},
             );
         }
     }
@@ -201,6 +212,12 @@ sub post_bind_hook {
                 params  => {
                     SOCKET_GROUP => $self->{PARAMS}->{socket_group},
                 },
+		log => {
+		    logger => CTX('log'),
+		    message => "Incorrect socket group '$self->{PARAMS}->{socket_group}'",
+		    facility => 'system',
+		    priority => 'fatal',
+		},
             );
         }
     }
@@ -212,7 +229,7 @@ sub post_bind_hook {
             . (( $socket_owner != -1) ? $socket_owner : 'unchanged' )
             . '/'
             . (( $socket_group != -1) ? $socket_group : 'unchanged' ),
-            PRIORITY => "info",
+            PRIORITY => "debug",
             FACILITY => "system",
         );
 
@@ -224,6 +241,12 @@ sub post_bind_hook {
                     SOCKET_OWNER => $socket_owner,
                     SOCKET_GROUP => $socket_group,
                 },
+		log => {
+		    logger => CTX('log'),
+		    message => "Could not change ownership for socket '$socketfile' to '$socket_owner:$socket_group'",
+		    facility => 'system',
+		    priority => 'fatal',
+		},
             );
         }
     }
@@ -272,7 +295,7 @@ sub pre_loop_hook {
             CTX('log')->log(
                 MESSAGE  => "Setting gid to to " 
                             . $self->{PARAMS}->{process_group},
-                PRIORITY => "info",
+                PRIORITY => "debug",
                 FACILITY => "system",
             );
             set_gid( $self->{PARAMS}->{process_group} );
@@ -285,7 +308,7 @@ sub pre_loop_hook {
             CTX('log')->log(
                 MESSAGE  => "Setting uid to to " 
                     . $self->{PARAMS}->{process_owner},
-                PRIORITY => "info",
+                PRIORITY => "debug",
                 FACILITY => "system",
             );
             set_uid( $self->{PARAMS}->{process_owner} );
@@ -584,8 +607,17 @@ sub __get_user_interfaces
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_TRANSPORT_FAILED",
-                params  => {EVAL_ERROR => $EVAL_ERROR,
-                            MODULE     => $class});
+                params  => {
+		    EVAL_ERROR => $EVAL_ERROR,
+		    MODULE     => $class
+		},
+		log => {
+		    logger => CTX('log'),
+		    message => "Could not initialize configured transport layer '$class': $EVAL_ERROR",
+		    facility => 'system',
+		    priority => 'fatal',
+		},
+		);
         }
     }
 
@@ -604,8 +636,17 @@ sub __get_user_interfaces
             ##! 8: "use $class failed"
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_SERVICE_FAILED",
-                params  => {EVAL_ERROR => $EVAL_ERROR,
-                            MODULE     => $class});
+                params  => {
+		    EVAL_ERROR => $EVAL_ERROR,
+		    MODULE     => $class
+		},
+		log => {
+		    logger => CTX('log'),
+		    message => "Could not initialize configured service layer '$class': $EVAL_ERROR",
+		    facility => 'system',
+		    priority => 'fatal',
+		},
+		);
         }
     }
 
@@ -666,7 +707,16 @@ sub __get_server_config
     if (unpack_sockaddr_un(pack_sockaddr_un($socketfile)) ne $socketfile) {
 	OpenXPKI::Exception->throw (
 	    message => "I18N_OPENXPKI_SERVER_CONFIG_SOCKETFILE_TOO_LONG",
-	    params  => {"SOCKETFILE" => $socketfile});
+	    params  => {
+		"SOCKETFILE" => $socketfile
+	    },
+	    log => {
+		logger => CTX('log'),
+		message => "Socket file '$socketfile' path length exceeds system limits",
+		facility => 'system',
+		priority => 'fatal',
+	    },
+	    );
     }
 
     my %params = ();
@@ -685,6 +735,12 @@ sub __get_server_config
             params  => {
                 TYPE => $self->{TYPE},
             },
+	    log => {
+		logger => CTX('log'),
+		message => "Unknown Net::Server type '$self->{TYPE}'",
+		facility => 'system',
+		priority => 'fatal',
+	    },
         );
     }
     $params{user}       = $config->get_xpath (XPATH => "common/server/user");
@@ -698,7 +754,16 @@ sub __get_server_config
 	if (! defined $params{$param} || $params{$param} eq "") {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_CONFIG_MISSING_PARAMETER",
-		params  => {"PARAMETER" => $param});
+		params  => {
+		    "PARAMETER" => $param,
+		},
+		log => {
+		    logger => CTX('log'),
+		    message => "Missing server configuration parameter '$param'",
+		    facility => 'system',
+		    priority => 'fatal',
+		},
+		);
 	}
     }
 
@@ -707,7 +772,16 @@ sub __get_server_config
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_USER",
-            params  => {"USER" => $params{"user"}});
+            params  => {
+		"USER" => $params{"user"},
+	    },
+	    log => {
+		logger => CTX('log'),
+		message => "Incorrect system user '$params{user}'",
+		facility => 'system',
+		priority => 'fatal',
+	    },
+	    );
     }
     # convert user id to numerical
     $params{user} = __get_numerical_user_id($user);
@@ -718,7 +792,16 @@ sub __get_server_config
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_DAEMON_GROUP",
-            params  => {"GROUP" => $params{"group"}});
+            params  => {
+		"GROUP" => $params{"group"},
+	    },
+	    log => {
+		logger => CTX('log'),
+		message => "Incorrect system group '$params{group}'",
+		facility => 'system',
+		priority => 'fatal',
+	    },
+	    );
     }
     # convert group id to numerical
     $params{group} = __get_numerical_group_id($group);
@@ -740,7 +823,16 @@ sub __get_server_config
 	{
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER",
-		params  => {"SOCKET_OWNER" => $socket_owner});
+		params  => {
+		    "SOCKET_OWNER" => $socket_owner,
+		},
+		log => {
+		    logger => CTX('log'),
+		    message => "Incorrect socket owner '$socket_owner'",
+		    facility => 'system',
+		    priority => 'fatal',
+		},
+		);
 	}
 	$params{socket_owner} = $socket_owner;	
     }
@@ -757,7 +849,16 @@ sub __get_server_config
 	{
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER_GROUP",
-		params  => {"SOCKET_GROUP" => $socket_group});
+		params  => {
+		    "SOCKET_GROUP" => $socket_group,
+		},
+		log => {
+		    logger => CTX('log'),
+		    message => "Incorrect socket group '$socket_group'",
+		    facility => 'system',
+		    priority => 'fatal',
+		},
+		);
 	}
 	$params{socket_group} = $socket_group;	
     };
