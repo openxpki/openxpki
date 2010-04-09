@@ -99,6 +99,21 @@
      <affected_role>*</affected_role>
      <auth_role>*</auth_role>
   </permission>
+  <permission>
+     <server>*</server>
+     <activity>Workflow::create_crr</activity>
+     <affected_role>*</affected_role>
+     <auth_role>*</auth_role>
+  </permission>
+
+  <!-- allow system user to create CRLs -->
+  <permission>
+     <server>*</server>
+     <activity>Workflow::start_crl_issuance</activity>
+     <affected_role>*</affected_role>
+     <auth_role>System</auth_role>
+  </permission>
+
   <!-- Workflow permissions: who can create and read which workflows? -->
   <workflow_permissions role="Anonymous"> <!-- aka the empty ('') role -->
       <server name="*">
@@ -142,6 +157,20 @@
                   <show>cert_profile</show>
               </context_filter>
           </read>
+      <create>
+<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK</type>
+</create>
+      <create>
+<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PUK_UPLOAD</type>
+</create>
+
+<read>
+<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PUK_UPLOAD</type>
+</read>
+<read>
+<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK</type>
+</read>
+	  
       </server>
   </workflow_permissions>
   <workflow_permissions role="User">
@@ -205,6 +234,30 @@
               <creator>$self</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
           </read>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
+              <context_filter>
+                  <show>cert_identifier</show>
+              </context_filter>
+          </read>
+
+	<create>
+		<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK</type>
+	</create>
+	<create>
+		<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PUK_UPLOAD</type>
+	</create>
+	<read>
+		<creator>.*</creator>
+		<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK</type>
+	</read>
+	<read>
+		<creator>.*</creator>
+		<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PUK_UPLOAD</type>
+	</read>
+
+
       </server>
   </workflow_permissions>
   <workflow_permissions role="RA Operator">
@@ -311,11 +364,19 @@
           </read>
           <read>
               <creator>.*</creator>
-              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
+              <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
           </read>
+      </server>
+  </workflow_permissions>
+
+  <workflow_permissions role="System"> <!-- system user (via command line) -->
+      <server name="*">
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
+          </create>
           <read>
               <creator>.*</creator>
-              <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
+              <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
           </read>
       </server>
   </workflow_permissions>

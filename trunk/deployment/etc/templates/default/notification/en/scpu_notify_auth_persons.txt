@@ -1,0 +1,24 @@
+Dear [% auth1_ldap_cn %],
+Dear [% auth2_ldap_cn %],
+
+A request to reset the PIN of the Smartcard belonging to
+
+    [% owner_cn %] < [% owner_mail %] >
+
+has been made.
+
+That person has specified you as one of the authorizing persons and requests
+that you authorize the transaction. To do so, please visit the following
+website to fetch your activation code:
+
+    http://vm2/openxpki/service/reset_token/unblock_pin.html?WF_ID=[% workflow_id %]
+
+Then, give the activation code to [% owner_cn %] so he or she can complete the
+transaction.
+
+If you do not know [% owner_cn %] or otherwise suspect abuse or fraud, do not
+forward the activation code to that person. Instead, please contact your
+security officer immediately.
+
+Note: The request tracking ticket for this notification will be automatically
+closed.

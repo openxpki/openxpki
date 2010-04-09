@@ -81,6 +81,8 @@
                                    "create_crr", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_BULK_CERTIFICATE_SIGNING_REQUEST",
                                    "create_csr_bulk", undef ],
+                        ["ACTION", "Smartcard Unblock",
+                                   "smartcard_unblock", undef ],
                     ],
                     "op_request" =>
                     [
@@ -138,6 +140,10 @@
                     "smartcard_personalization" =>
                     {
                         CMD => "service/smartcard_personalization/index.html"
+                    },
+                    "smartcard_unblock" =>
+                    {
+                        CMD => "service/reset_token/unblock_pin.html"
                     },
                     'show_pending_requests' => {
                         CMD => 'service/workflow/show_pending_requests.html'

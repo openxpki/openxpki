@@ -59,6 +59,22 @@
         <template file="/Users/klink/usr/local/etc/openxpki/notification/en/create_bulk_request_comment.txt" lang="en_EN"/>
       </action>
     </notification>
+
+    <notification id="scpu_notify_auth_persons">
+        <action type="open">
+            <requestor>[% creator %]</requestor>
+            <queue>General</queue>
+            <subject>Activation Codes for Smartcard PIN Unblock Request for [% creator %]</subject>
+        </action>
+      <action type="set_value">
+        <field>cc</field>
+        <value>[% auth1_id %], [% auth2_id %]</value>
+      </action>
+      <action type="correspond">
+            <template file="[- dir.openxpkiconfdir -]/notification/en/scpu_notify_auth_persons.txt" lang="en_EN"/>
+        </action>
+        <action type="close"/>
+    </notification>
   </notifications>
 
 [- FOREACH realmsection = global.pkirealm -]

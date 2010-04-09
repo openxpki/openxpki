@@ -11,34 +11,57 @@ use OpenXPKI::Debug;
 
 sub update {
 
-    #    my ($class, $workflow, $action, $old_state, $action_name) = @_;
-    #    Note: the above params seem to no longer be valid
-    my ( $class, $workflow, $event, $new_state ) = @_;
-    my $prio = 'debug';
-    my $msg = '';
+    # NOTE: The documentation for Workflow.pm does not reflect the actual
+    #       parameters used!
+    #
+
+    my $class    = shift;
+    my $workflow = shift;
+    my $event    = shift;
+    my $type     = $workflow->type();
+    my $id       = $workflow->id();
+    my $state    = $workflow->state();
+    my $prio     = 'debug';
+    my $msg      = '';
 
     if ( $event eq 'create' ) {
         $prio = 'info';
-#        $msg = "Workflow " . $workflow->id() . " created";
-    } elsif ( $event eq 'execute' ) {
+        $msg  = "Workflow $id/$type/$state created";
+    }
+    elsif ( $event eq 'execute' ) {
         $prio = 'info';
-    } elsif ( $event eq 'state change' ) {
+        my ( $old_state, $action_name, $autorun ) = @_;
+        $msg
+            = "Workflow $id/$type/$state executed '$action_name'" . ($autorun
+            ? ' (autorun)'
+            : '') . " in state '$old_state'";
+    }
+    elsif ( $event eq 'state change' ) {
         $prio = 'info';
-#    } elsif ( $event eq 'fetch' ) {
-#    } elsif ( $event eq 'save' ) {
-#    } elsif ( $event eq 'add history' ) {
+        my ( $old_state, $action_name, $autorun ) = @_;
+        $msg = "Workflow $id/$type/$state changed from state '$old_state'";
+    }
+    elsif ( $event eq 'fetch' ) {
+        $msg = "Workflow $id/$type/$state fetched";
+    }
+    elsif ( $event eq 'save' ) {
+        $msg = "Workflow $id/$type/$state saved";
+    }
+    elsif ( $event eq 'add history' ) {
+        $msg = "Workflow $id/$type/$state added history";
     }
 
+    # in case more events are ever added to Workflow
     if ( $msg eq '' ) {
-        $msg = join('; ',
+        $msg = join( '; ',
             "Workflow ID=" . $workflow->id(),
             "Type=" . $workflow->type(),
             "Event=" . $event,
-            "New State: " . $new_state);
+            "Params=" . join( ', ', @_ ) );
     }
 
     CTX('log')->log(
-        MESSAGE => $msg,
+        MESSAGE  => $msg,
         PRIORITY => $prio,
         FACILITY => 'workflow',
     );

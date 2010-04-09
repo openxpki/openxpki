@@ -21,7 +21,6 @@ use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::FileUtils;
 use DateTime;
-
 use List::Util qw(first);
 
 use MIME::Base64 qw( decode_base64 );
@@ -865,7 +864,6 @@ sub __set_data_pool_entry : PRIVATE {
     my $key                 = $arg_ref->{KEY};
     my $value               = $arg_ref->{VALUE};
 
-    
     # primary key for database
     my %key = (
 	'PKI_REALM'  => $requested_pki_realm,
@@ -1035,7 +1033,7 @@ sub __set_data_pool_entry : PRIVATE {
     if (defined $expiration_date) {
 	$values{NOTAFTER} = $expiration_date;
     }
-    
+
     my $rows_updated;
     if ($force) {
 	# force means we can overwrite entries, so first try to update the value.
@@ -1302,8 +1300,6 @@ sub __get_current_safe_id {
     return $current_safe->{id};
 }
 
-
-
 sub __get_chain_certificates {
     ##! 1: 'start'
     my $self       = shift;
@@ -1447,6 +1443,7 @@ extracting the private_key context parameter from the workflow
 with the CSR serial. Returns undef if no CA generated private key
 is available.
 
+=head2 get_data_pool_entry
 
 =head1 Data Pools
 

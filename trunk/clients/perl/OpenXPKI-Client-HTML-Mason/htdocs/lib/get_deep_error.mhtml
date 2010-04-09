@@ -1,13 +1,18 @@
 <%args>
     $msg => undef
 </%args>
+<%once>
+use Data::Dumper();
+</%once>
 <%init>
     return if (not $msg);
     return if (not ref $msg);
     return if ($msg->{SERVICE_MSG} ne "ERROR");
+    $Data::Dumper::Indent = 1;
+    $Data::Dumper::Terse = 1;
 
     ## print Dumper($msg);
-    return get_deep_errors ($msg->{LIST});
+    my @errs = get_deep_errors ($msg->{LIST});
 
     sub get_deep_errors
     {
@@ -26,3 +31,17 @@
         return @error;
     }
 </%init>
+<h1>Error</h1>
+
+% foreach my $err ( @{ $msg->{LIST} } ) { 
+<p><% i18nGettext($err->{LABEL}) %></p>
+<p><em><% $err->{PARAMS}->{ERROR} %></em></p>
+% }
+
+<hr>
+<p>Raw Error Data:</p>
+<font size="-5">
+<pre>
+<% Dumper($msg) %>
+</pre>
+</font>

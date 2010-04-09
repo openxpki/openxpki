@@ -804,6 +804,19 @@ sub BUILD {
                 },
 	    },
         },
+	'get_workflow_activities_params' => {
+		class => 'Workflow',
+		params => {
+			WORKFLOW => {
+				type => SCALAR,
+				regex => $re_alpha_string,
+			},
+			ID => {
+				type => SCALAR,
+				regex => $re_integer_string,
+			},
+		},
+	},
         'search_workflow_instances' => {
             class  => 'Workflow',
             params => {

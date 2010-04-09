@@ -488,6 +488,43 @@ sub execute_workflow_activity {
     return __get_workflow_info($workflow);
 }
 
+sub get_workflow_activities_params {
+	my $self = shift;
+	my $args = shift;
+	my @list = ();
+
+	my $wf_title = $args->{WORKFLOW};
+	my $wf_id = $args-> {ID};
+
+	# Commit to get a current snapshot and avoid old data
+	CTX('dbi_workflow')->commit();
+
+	my $factory = __get_workflow_factory({
+			WORKFLOW_ID => $wf_id,
+		});
+
+	my $workflow = $factory->fetch_workflow(
+		$wf_title,
+		$wf_id,
+	);
+
+	foreach my $action ( $workflow->get_current_actions() ) {
+		my $fields = [];
+		foreach my $field ($workflow->get_action_fields( $action ) ) {
+			push @{ $fields }, {
+				'name'		=> $field->name(),
+				'label'		=> $field->label(),
+				'description'	=> $field->description(),
+				'type'		=> $field->type(),
+				'requirement'	=> $field->requirement(),
+			};
+		};
+		push @list, $action, $fields;
+	}
+	return \@list;
+}
+
+
 sub create_workflow_instance {
     my $self  = shift;
     my $args  = shift;
@@ -891,7 +928,6 @@ sub __get_workflow_factory {
     *Workflow::FACTORY          = sub { return $factory };
     *OpenXPKI::Server::Workflow::Observer::AddExecuteHistory::FACTORY
         = sub { return $factory };
-
     return $factory;
 }
 
