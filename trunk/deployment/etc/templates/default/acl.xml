@@ -21,6 +21,8 @@
   <role>Web Server</role>
   <role>Sub CA</role>
 
+  <role>System</role>
+
   <!-- Permissions                                                -->
   <!--                                                            -->
   <!-- This is the real ACL area. Here we define the              -->

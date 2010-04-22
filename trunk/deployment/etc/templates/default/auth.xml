@@ -30,6 +30,10 @@
       <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER</description>
       <handler>Certificate</handler>
   </stack>
+  <stack name="_System">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_AUTH_SYSTEM</description>
+    <handler>System</handler>
+  </stack>
   <handler name="Certificate" type="ClientX509">
       <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER</description>
       <!-- list the roles that you want to allow to login via this handler here -->
@@ -106,5 +110,8 @@
       <name>PASSWD</name>
       <value>__PASSWD__</value>
     </env>
+  </handler>
+  <handler name="System" type="Anonymous">
+    <role>System</role>
   </handler>
 </auth>

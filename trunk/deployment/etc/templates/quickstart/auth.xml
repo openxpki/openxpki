@@ -9,6 +9,10 @@
     <handler>User Password</handler>
     <!-- <handler>LDAP</handler> -->
   </stack>
+  <stack name="_System">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_DEUBA_AUTH_SYSTEM</description>
+    <handler>System</handler>
+  </stack>
   <handler name="Anonymous" type="Anonymous">
     <role></role>
   </handler>
@@ -31,5 +35,8 @@
       <digest>[% password.generate(scheme => 'ssha', callback => 'sub { print STDERR "*** NOTE: Password for user <raop> is: $_\n" }') %]</digest>
       <role>RA Operator</role>
     </user>
+  </handler>
+  <handler name="System" type="Anonymous">
+    <role>System</role>
   </handler>
 </auth>

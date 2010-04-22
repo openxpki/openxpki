@@ -47,6 +47,7 @@ TOOLS_DST = $(TOOLS_SRC:.in=)
 
 TOOLS =	$(TOOLS_DST) \
 	bin/openxpki-metaconf \
+	bin/openxpkicmd \
 
 TOOLS_MAN1 = $(TOOLS_SRC:.in=.1) \
              bin/openxpki-metaconf.1 \

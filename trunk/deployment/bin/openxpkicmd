@@ -1,0 +1,196 @@
+#!/usr/bin/env perl
+#
+# Written by Martin Bartosch
+# for the OpenXPKI project 2009
+# Copyright (c) 2009 by The OpenXPKI Project
+#
+
+use strict;
+use warnings;
+use English;
+use POSIX qw( strftime );
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+
+use OpenXPKI::Client;
+#use OpenXPKI::Serialization::Simple;
+
+my %params = (
+    authstack => '_System',
+    authuser => undef,
+    authpass => undef,
+    param => [],
+    );
+
+sub debug {
+    my $arg = shift;
+    if ($params{debug}) {
+	print $arg . "\n";
+    }
+}
+
+GetOptions(\%params,
+	   qw(
+	        help|?
+		man
+		socketfile=s
+                realm=s
+                authstack=s
+                authuser=s
+                authpass=s
+                param|set=s@
+                debug
+	     )) or pod2usage(-verbose => 0);
+
+pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
+pod2usage(-verbose => 1) if ($params{help});
+if (scalar @ARGV != 1) {
+    print STDERR "Usage: openxpkicmd [OPTIONS] WF_TYPE\n";
+    exit 0;
+}
+
+my $wf_type = shift;
+
+# expect foo=bar or foo:bar in @param, split at assignment and
+# build hash
+my @wf_parameters = split(/,/, join(',', @{$params{param}}));
+my %wf_parameters;
+foreach my $entry (@wf_parameters) {
+    my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
+    if (! defined $key) {
+	$key = $entry;
+    }
+    $wf_parameters{$key} = $value;
+}
+
+if (! defined $wf_type) {
+    die "No workflow type specified. Stopped";
+}
+
+debug("Socketfile: $params{socketfile}");
+
+my $reply;
+my $client = OpenXPKI::Client->new(
+    {
+	SOCKETFILE => $params{socketfile},
+    });
+
+
+if (! defined $client) {
+    die "Could not instantiate OpenXPKI client. Stopped";
+}
+
+if (! $client->init_session()) {
+    die "Could not initiate OpenXPKI server session. Stopped";
+}
+
+my $session_id = $client->get_session_id();
+debug("Session id: $session_id");
+
+$reply = $client->send_receive_service_msg('PING');
+
+SERVICE_MESSAGE:
+while (1) {
+    debug(Dumper $reply);
+    my $status = $reply->{SERVICE_MSG};
+
+    if ($status eq 'GET_PKI_REALM') {
+	if (! $params{realm}) {
+	    print "Available PKI realms:\n";
+	    foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
+		print "  $entry\n";
+	    }
+	    die "No --realm specified. Stopped";
+	}
+	$reply = $client->send_receive_service_msg('GET_PKI_REALM',
+						   {
+						       PKI_REALM => $params{realm},
+						   });
+	next SERVICE_MESSAGE;
+    }
+
+    if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
+	if (! $params{authstack}) {
+	    print "Available authentication stacks:\n";
+	    foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {
+		print "  $entry\n";
+	    }
+	    die "No --authstack specified. Stopped";
+	}
+	$reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',
+						   {
+						       AUTHENTICATION_STACK => $params{authstack},
+						   });
+	next SERVICE_MESSAGE;
+    }
+
+    if ($reply->{SERVICE_MSG} eq 'GET_PASSWD_LOGIN') {
+	if (! $params{authuser}) {
+	    die "No --authuser specified. Stopped";
+	}
+	$reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN',
+						   {
+						       LOGIN => $params{authuser},
+						       PASSWD => $params{authpass},
+						   });
+	next SERVICE_MESSAGE;
+    }
+
+    if ($reply->{SERVICE_MSG} eq 'SERVICE_READY') {
+	last SERVICE_MESSAGE;
+    }
+
+    print Dumper $reply;
+    die "Unhandled service message. Stopped";
+}
+
+# logged in, now run required commands
+
+$reply = $client->send_receive_service_msg('COMMAND',
+					   {
+					       COMMAND => 'create_workflow_instance',
+					       PARAMS => {
+						   WORKFLOW => $wf_type,
+						   PARAMS => \%wf_parameters,
+					       }
+					   });
+
+
+if ($reply->{SERVICE_MSG} ne 'COMMAND') {
+    print "Error:\n";
+    print Dumper $reply;
+    exit 1;
+}
+
+
+__END__
+
+=head1 NAME
+
+openxpkicmd - command line tool for starting OpenXPKI workflows
+
+=head1 USAGE
+
+openxpkicmd [options] WORKFLOW_TYPE
+
+  Options:
+    --help                brief help message
+    --man                 full documentation
+    --socketfile FILE     OpenXPKI daemon socket file
+    --realm REALM         OpenXPKI realm
+    --authstack STACK     authentication stack to use (optional)
+    --authuser USER       authentication user (optional)
+    --authpass PASS       password for authentication user (optional)
+    --param KEY=VALUE     pass VALUE to WF parameter KEY (optional)
+    --debug               enable debug mode
+
+=head1 INVOCATION
+
+This command may be used to create OpenXPKI workflows to automate internal
+actions, e. g. issuance of CRLs.
+
+=head1 EXAMPLES
+
+openxpkicmd --socketfile /var/openxpki/openxpki.socket --realm "Server CA" I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
+
