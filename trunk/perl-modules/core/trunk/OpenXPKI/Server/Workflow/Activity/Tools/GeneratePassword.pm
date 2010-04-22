@@ -32,7 +32,7 @@ sub execute
     }
 
     
-    #! 16: 'pw length: ' . $password_length
+    ##! 16: 'pw length: ' . $password_length
 
     if ($password_length !~ m{ \A \d+ \z }xms) {
 	OpenXPKI::Exception->throw(
@@ -50,7 +50,7 @@ sub execute
 	 RANDOM_LENGTH => $password_length,
     };
 
-    #! 16: 'command: ' . Dumper $command
+    ##! 16: 'command: ' . Dumper $command
     my $password = $default_token->command($command);
 
 #     CTX('log')->log(

@@ -12,7 +12,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
-use Net::LDAP;
+use Net::LDAPS;
 use Template;
 
 use Data::Dumper;
@@ -40,7 +40,7 @@ sub execute {
       ##! 64: "ldap_attrmap = " . Dumper(\%ldap_attrmap)
 
     ##! 2: 'connecting to ldap server ' . $ldap_server . ':' . $ldap_port
-    my $ldap = Net::LDAP->new(
+    my $ldap = Net::LDAPS->new(
         $ldap_server,
         port    => $ldap_port,
         onerror => undef,

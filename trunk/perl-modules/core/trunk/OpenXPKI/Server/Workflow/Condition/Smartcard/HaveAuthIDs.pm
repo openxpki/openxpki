@@ -20,10 +20,12 @@ use Data::Dumper;
 
 sub evaluate {
 	##! 16: 'start'
+    ##! 128: 'auth1_id_mail  = ' . $context->param('auth1_id_mail')
+    ##! 128: 'auth2_id_mail  = ' . $context->param('auth2_id_mail')
 	my ( $self, $workflow ) = @_;
 	my $context = $workflow->context(); 
 	
-	if ( $context->param('auth1_id') and $context->param('auth2_id') ) {
+	if ( $context->param('auth1_ldap_mail') and $context->param('auth2_ldap_mail') ) {
 		return 1;
 	} else {
 		condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_NO_AUTH_IDS');

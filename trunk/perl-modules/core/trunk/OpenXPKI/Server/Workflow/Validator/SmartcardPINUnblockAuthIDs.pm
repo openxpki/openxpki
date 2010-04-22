@@ -67,8 +67,8 @@ sub validate {
     }
     else {
 
-        ##! 2: 'connecting to ldap server ' . $ldap_server . ':' . $ldap_port
-        my $ldap = Net::LDAP->new(
+        ##! 2: 'connecting to ldap server ' . $self->ldap_server . ':' . $self->ldap_port
+        my $ldap = Net::LDAPS->new(
             $self->ldap_server,
             port    => $self->ldap_port,
             onerror => undef,

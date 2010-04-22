@@ -49,10 +49,10 @@ my %act_test = (
 );
 
 #
-# $client = wfconnect( USER, PASS );
+# $client = wfconnect( USER, PASS [, REALM] );
 #
 sub wfconnect {
-    my ( $u, $p ) = @_;
+    my ( $u, $p, $r ) = @_;
     my $c = OpenXPKI::Client->new(
         {
             TIMEOUT    => 100,

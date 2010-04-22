@@ -66,10 +66,11 @@ sub execute {
     $params->{VALUE} = $context->param($valparam);
 
     CTX('api')->set_data_pool_entry($params);
+    CTX('dbi_backend')->commit();
 
     # TODO: handle return code from set_data_pool_entry()
 
-    return;
+    return 1;
 }
 
 1;
