@@ -1,0 +1,10 @@
+# Mac Stuff
+.DS_Store
+# ignore SVN dirs
+.svn
+# ignore VIM backups and swap files
+*~
+.*.swp
+# xcode project stuff
+*.pbxuser
+*.perspectivev3

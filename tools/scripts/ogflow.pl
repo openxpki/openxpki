@@ -1,4 +1,4 @@
-#!/opt/local/bin/perl -w
+#!/usr/bin/env perl -w
 #
 # ogflow.pl - Convert OmniGraffle File to Workflow Definition
 #
@@ -29,7 +29,7 @@
 # state definitions (<state>)
 #
 #   name = text field from graphics object
-#   autorun =
+#   autorun = set "autorun" to "yes" in the key/value table for the object
 #   description = 'workflow i18n prefix' + name
 #   actions = action objects that this connects to
 #       name = name of action

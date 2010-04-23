@@ -413,7 +413,15 @@ GetOptions(\%params,
 
 if ($params{version}) {
     my ($vol, $dir, $file) = File::Spec->splitpath($0);
-    print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
+    eval { 
+        require OpenXPKI::VERSION;
+        import OpenXPKI::VERSION;
+    };
+    if ( $EVAL_ERROR ) {
+        print "OpenXPKI Core Version: <unavailable>\n";
+    } else {
+        print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
+    }
     exit 0;
 }
 
