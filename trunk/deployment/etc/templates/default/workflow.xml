@@ -12,7 +12,8 @@
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_password_safe.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_pin_unblock.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_puk_upload.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_test_wftools.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_test_tools.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_puk_upload.xml"/>
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
       [% INCLUDE workflow_def_certificate_signing_request.xml FILTER indent(4) %]
       [% INCLUDE workflow_def_certificate_signing_request_offline_ca.xml FILTER indent(4) %]
@@ -29,7 +30,7 @@
       [% INCLUDE workflow_def_password_safe.xml FILTER indent(4) %]
       [% INCLUDE workflow_def_smartcard_pin_unblock.xml FILTER indent(4) %]
       [% INCLUDE workflow_def_smartcard_puk_upload.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_test_wftools.xml FILTER indent(4) %]
+      [% INCLUDE workflow_def_test_ftools.xml FILTER indent(4) %]
     [% END %]
   </workflows>
     
@@ -48,7 +49,7 @@
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_password_safe.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_pin_unblock.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_puk_upload.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_test_wftools.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_test_tools.xml"/>
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
       [% INCLUDE workflow_activity_null.xml FILTER indent(4) %]
       [% INCLUDE workflow_activity_certificate_signing_request.xml FILTER indent(4) %]
@@ -63,7 +64,7 @@
       [% INCLUDE workflow_activity_password_safe.xml FILTER indent(4) %]
       [% INCLUDE workflow_activity_smartcard_pin_unblock.xml FILTER indent(4) %]
       [% INCLUDE workflow_activity_smartcard_puk_upload.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_test_wftools.xml FILTER indent(4) %]
+      [% INCLUDE workflow_activity_test_tools.xml FILTER indent(4) %]
     [% END %]
   </activities>
 
@@ -74,12 +75,14 @@
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_password_safe.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_smartcard_personalization_v3.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_smartcard_pin_unblock.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_test_tools.xml"/>
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
       [% INCLUDE workflow_validator_certificate_signing_request.xml FILTER indent(4) %]
       [% INCLUDE workflow_validator_certificate_revocation_request.xml FILTER indent(4) %]
       [% INCLUDE workflow_validator_password_safe.xml FILTER indent(4) %]
       [% INCLUDE workflow_validator_smartcard_personalization_v3.xml FILTER indent(4) %]
       [% INCLUDE workflow_validator_smartcard_pin_unblock.xml FILTER indent(4) %]
+      [% INCLUDE workflow_validator_test_tools.xml FILTER indent(4) %]
     [% END %]
   </validators>
 
@@ -87,11 +90,11 @@
     [% IF deployment.xmlstyle == 'multi-file' %]
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_smartcard_pin_unblock.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_test_wftools.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_test_tools.xml"/>
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
       [% INCLUDE workflow_condition.xml FILTER indent(4) %]
       [% INCLUDE workflow_condition_smartcard_pin_unblock.xml FILTER indent(4) %]
-      [% INCLUDE workflow_condition_test_wftools.xml FILTER indent(4) %]
+      [% INCLUDE workflow_condition_test_tools.xml FILTER indent(4) %]
     [% END %]
   </conditions>
 

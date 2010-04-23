@@ -45,13 +45,35 @@ sub puk_upload {
     return 1;
 }
 
+sub wfconnect {
+    my ( $u, $p ) = @_;
+    my $c = OpenXPKI::Client->new(
+        {   TIMEOUT    => 100,
+            SOCKETFILE => $instancedir . '/var/openxpki/openxpki.socket',
+        }
+    );
+    croak "Unable to create OpenXPKI::Client instance: $@" unless $c;
+
+    if ($u) {
+    login(
+            {   CLIENT   => $c,
+            USER     => $u,
+            PASSWORD => $p,
+        }
+        ) or croak "Login as $u failed: $@";
+    }
+    else {
+        login_anonymous( { CLIENT => $c } ) or croak "Login as anonymous failed: $@";
+    }
+    return $client = $c;
+}
+
 #
 # usage: my $code = $test->get_code( USER, PASS );
 #
 sub get_code {
     my ( $self, $u, $p ) = @_;
     warn "Entered get_code($u, $p)" if $self->get_verbose();
-
 
     $self->connect( user => $u, password => $p )
         or return;
