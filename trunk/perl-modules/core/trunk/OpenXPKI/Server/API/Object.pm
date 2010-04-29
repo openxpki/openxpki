@@ -653,6 +653,24 @@ sub get_data_pool_entry {
 			NAMESPACE => 'sys.datapool.keys',
 			KEY       => $encryption_key,
 		    });
+		
+		if (! defined $key_data) {
+		    # should not happen, we have no decryption key for this
+		    # encrypted value
+		    OpenXPKI::Exception->throw(
+			message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_SYMMETRIC_ENCRYPTION_KEY_NOT_AVAILABLE',
+			params  => {
+			    REQUESTED_REALM => $requested_pki_realm,
+			    NAMESPACE => 'sys.datapool.keys',
+			    KEY => $encryption_key,
+			},
+			log => {
+			    logger => CTX('log'),
+			    priority => 'fatal',
+			    facility => [ 'system', ],
+			},
+			);
+		}
 
 		# prepare key
 		($algorithm, $iv, $key) = split(/:/, $key_data->{VALUE});
@@ -1126,18 +1144,19 @@ sub __get_current_datapool_encryption_key : PRIVATE {
     my $associated_vault_key_id;
     
     # check if we already have a symmetric key for this password safe
-    eval {
-	##! 16: 'fetch associated symmetric key for password safe: ' . $safe_id
-	my $data = 
-	    $self->get_data_pool_entry(
-		{
-		    PKI_REALM => $realm,
-		    NAMESPACE => 'sys.datapool.pwsafe',
-		    KEY       => 'p7:' . $safe_id,
-		});
+    ##! 16: 'fetch associated symmetric key for password safe: ' . $safe_id
+    my $data = 
+	$self->get_data_pool_entry(
+	    {
+		PKI_REALM => $realm,
+		NAMESPACE => 'sys.datapool.pwsafe',
+		KEY       => 'p7:' . $safe_id,
+	    });
+    
+    if (defined $data) {
 	$associated_vault_key_id = $data->{VALUE};
 	##! 16: 'got associated vault key: ' . $associated_vault_key_id
-    };
+    }
 
     if (! defined $associated_vault_key_id) {
 	##! 16: 'first use of this password safe, generate a new symmetric key'
@@ -1207,6 +1226,24 @@ sub __get_current_datapool_encryption_key : PRIVATE {
 		    NAMESPACE => 'sys.datapool.keys',
 		    KEY       => $associated_vault_key_id,
 		});
+
+	    if (! defined $data) {
+		# should not happen, we have no decryption key for this
+		# encrypted value
+		OpenXPKI::Exception->throw(
+		    message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CURRENT_DATA_POOL_ENCRYPTION_KEY_SYMMETRIC_ENCRYPTION_KEY_NOT_AVAILABLE',
+		    params  => {
+			REQUESTED_REALM => $realm,
+			NAMESPACE => 'sys.datapool.keys',
+			KEY => $associated_vault_key_id,
+		    },
+		    log => {
+			logger => CTX('log'),
+			priority => 'fatal',
+			facility => [ 'system', ],
+		    },
+		    );
+	    }
 	    
 	    ($algorithm, $iv, $key) = split(/:/, $data->{VALUE});
 	    
