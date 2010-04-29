@@ -275,13 +275,7 @@ sub __handle_CONTINUE_SESSION {
         # do not use __change_state here, as we want to have access
         # to the old session in __handle_SESSION_ID_ACCEPTED
         $state_of{$ident} = 'SESSION_ID_SENT_FROM_CONTINUE';
-	
-	CTX('log')->log(
-	    MESSAGE  => 'Continuing existing session',
-	    PRIORITY => 'info',
-	    FACILITY => 'auth',
-	    );
-	
+		
         return {
             SESSION_ID => $session->get_id(),
         };
