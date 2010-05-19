@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 use OpenXPKI::Debug;
-use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Server::Context;
 use Log::Log4perl qw( get_logger );
 
 use OpenXPKI::i18n qw( i18nGettext );
@@ -128,7 +128,7 @@ sub throw {
 		delete $args{log};
 	    } else {
 		# no logger specified, instantiate one
-		CTX('log')->log(
+		OpenXPKI::Server::Context::CTX('log')->log(
 		    %logger_args,
 		    );
 	    }
@@ -140,7 +140,7 @@ sub throw {
 	# exceptions get logged by default
 	my $logger;
 	eval {
-	    $logger = CTX('log');
+	    $logger = OpenXPKI::Server::Context::CTX('log');
 	};
 
 	if (defined $logger) {
