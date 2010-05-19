@@ -141,12 +141,15 @@ sub log
     my $role = '';
     my $session_short;
     eval {
+	no warnings;
 	$user = CTX('session')->get_user();
     };
     eval {
+	no warnings;
 	$role = '(' . CTX('session')->get_role() . ')';
     };
     eval {
+	no warnings;
 	# first 4 characters of session id are enough to trace flow in sessions
 	$session_short = substr(CTX('session')->get_id(), 0, 4);
     };
