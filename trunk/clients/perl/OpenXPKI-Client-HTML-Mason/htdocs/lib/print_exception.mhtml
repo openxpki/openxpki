@@ -1,0 +1,15 @@
+<%args>
+    $exception => undef
+    $details => undef
+</%args>
+% if (ref($exception)) 
+% {
+    <h2>Internal Error</h2>
+%   if ( $details ) {
+    <p><% $details %></p>
+%   }
+    <table>
+    <tr><th>Error</th><td><% $exception->as_string() %></td></tr>
+    <tr><th>Details</th><td><pre><% $exception->full_message() %></pre></td></tr>
+    </table>
+% }

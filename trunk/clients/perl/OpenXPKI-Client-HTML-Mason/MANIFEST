@@ -53,6 +53,8 @@ htdocs/lib/language.mhtml
 htdocs/lib/get_deep_error.mhtml
 htdocs/lib/paging.mhtml
 htdocs/lib/rel2abs.mhtml
+htdocs/lib/print_errors.mhtml
+htdocs/lib/print_exception.mhtml
 htdocs/lib/configured_languages.mhtml
 htdocs/lib/html/a.mhtml
 htdocs/lib/html/safe.mhtml
@@ -201,6 +203,10 @@ htdocs/service/reset_token/reset_pin_certs.html
 htdocs/service/reset_token/reset_pin_result.html
 htdocs/service/reset_token/result.mhtml
 htdocs/service/reset_token/RSATokenPlugin.dll
+
+htdocs/service/smartcard_admin/index.html
+htdocs/service/smartcard_admin/action.html
+htdocs/service/smartcard_admin/fetch.html
 
 htdocs/service/smartcard_personalization/index.html
 htdocs/service/smartcard_personalization/certificate_installed.html

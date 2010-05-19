@@ -36,7 +36,7 @@ sub execute
     ##! 16: 'options: ' . Dumper \%options
     ##! 16: ' parameters: ' . Dumper $self->{PARAMS}
   KEY:
-    foreach my $key (keys %{$self->{PARAMS}}) {
+    foreach my $key (%{$self->{PARAMS}}) {
 	next KEY if ($key eq 'SetContextParameters');
 	my $value = $self->param($key);
 

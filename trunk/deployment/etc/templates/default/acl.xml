@@ -172,6 +172,12 @@
 <read>
 <type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK</type>
 </read>
+      <create>
+        <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+      </create>
+      <read>
+        <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+      </read>
 	  
       </server>
   </workflow_permissions>
@@ -258,6 +264,12 @@
 		<creator>.*</creator>
 		<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PUK_UPLOAD</type>
 	</read>
+      <create>
+        <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+      </create>
+      <read>
+        <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+      </read>
 
 
       </server>
@@ -316,6 +328,12 @@
                   <hide>encrypted_.*</hide>
               </context_filter>
           </read>
+      <create>
+        <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+      </create>
+      <read>
+        <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+      </read>
       </server>
   </workflow_permissions>
   <workflow_permissions role="CA Operator">
@@ -368,6 +386,12 @@
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
           </read>
+      <create>
+        <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+      </create>
+      <read>
+        <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+      </read>
       </server>
   </workflow_permissions>
 
@@ -380,6 +404,12 @@
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
           </read>
+      <create>
+        <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+      </create>
+      <read>
+        <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+      </read>
       </server>
   </workflow_permissions>
   <!-- TODO - create role that can only create cert issuance workflow and

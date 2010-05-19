@@ -10,6 +10,7 @@ use Class::Std;
     #use base qw( Class::Std );
     use Carp qw( confess );
     use OpenXPKI::Debug;
+    use English;
 
     # Storage for object attributes
     my %workflow_of : ATTR( name => 'workflow' );
@@ -43,12 +44,38 @@ use Class::Std;
 
         my $ser = $serializer{$id} = OpenXPKI::Serialization::Simple->new();
 
-        my $context     = $args->{workflow}->{context};
+        my $context
+            = defined $args->{context}
+            ? $args->{context}
+            : $args->{workflow}->{context};
         my $context_key = $args->{context_key};
         my $raw_data = $context->param($context_key);
+        my $context_key = $args->{context_key};
+        my $raw_data    = $context->param($context_key);
 
         if ( defined $raw_data ) {
-            my $data = $ser->deserialize($raw_data);
+            my $data;
+
+            # put this in eval to prevent complete blow-up
+            eval { $data = $ser->deserialize($raw_data); };
+            if ( my $exc = OpenXPKI::Exception->caught() ) {
+
+                # append some details and re-throw exception
+
+                my $params = $exc->params();
+                $params->{MORE_INFO}
+                    = "WFObject had problem deserializing context parameter '"
+                    . $context_key . "'";
+                $exc->params($params);
+                $exc->rethrow();
+
+            }
+            if ($EVAL_ERROR) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_WFOBJECT_DESERIALIZE_ERR',
+                    params  => { 'ERROR' => $EVAL_ERROR }
+                );
+            }
             $data_ref{ ident $self } = $data;
         }
     }

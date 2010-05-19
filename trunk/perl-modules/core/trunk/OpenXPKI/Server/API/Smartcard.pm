@@ -95,6 +95,8 @@ sub sc_analyze_smartcard {
     my $cfg_id   = $arg_ref->{CONFIG_ID};
     ##! 16: 'cfg_id: ' . $cfg_id
 
+    ##! 16: 'sc_analyze_smartcard() wf_types = $wf_types (' . Dumper($wf_types) . ')'
+
     if (defined $wf_types && (ref $wf_types ne 'ARRAY')) {
 	OpenXPKI::Exception->throw(
 	    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_INVALID_WORKFLOW_TYPES_UNEXPECTED_DATA_TYPE',
@@ -118,6 +120,7 @@ sub sc_analyze_smartcard {
     
 
     my $result = {
+        WF_TYPES => $wf_types,
 	OVERALL_STATUS => 'green',
 	SMARTCARD => {
 	    serialnumber => '',

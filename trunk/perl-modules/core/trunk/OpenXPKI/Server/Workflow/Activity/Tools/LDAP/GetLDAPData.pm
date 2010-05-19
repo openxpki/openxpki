@@ -12,7 +12,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
-use Net::LDAPS;
+#use Net::LDAPS;
 use Template;
 
 use Data::Dumper;
@@ -37,24 +37,44 @@ sub execute {
     my $ldap_attributes = $self->param('ldap_attributes');
     my $ldap_attrmap    = $self->param('ldap_attrmap');
     my $ldap_timelimit  = $self->param('ldap_timelimit');
-    my @ldap_attribs    = split( /,/, $ldap_attributes );
-    my %ldap_attrmap
-        = map { split(/\s*[=-]>\s*/) }
-        split( /\s*,\s*/, $ldap_attrmap );
 
-    ##! 2: 'connecting to ldap server ' . $ldap_server . ':' . $ldap_port
-    my $ldap = Net::LDAPS->new(
-        $ldap_server,
-        port => $ldap_port,
+    my @ldap_attribs    = split( /\s*,\s*/, $ldap_attributes );
 
-        #        onerror => undef,
-        onerror => sub {
-            ##! 1: 'Error creating new ldap instance' . join(', ', @_)
-        },
-
-    );
-
-    # TODO: maybe use TLS ($ldap->start_tls())?
+  # LDAPS doesn't seem to like non-ssl, which is useful for test installations
+    my $ldap;
+    eval {
+        if ( $ldap_port == 389 )
+        {
+            require Net::LDAP;
+            import Net::LDAP;
+            $ldap = Net::LDAP->new(
+                $ldap_server,
+                port    => $ldap_port,
+                onerror => undef,
+            );
+        }
+        else {
+            require Net::LDAPS;
+            import Net::LDAPS;
+            $ldap = Net::LDAPS->new(
+                $ldap_server,
+                port    => $ldap_port,
+                onerror => undef,
+            );
+        }
+    };
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message =>
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_NET_LDAP_EVAL_ERR',
+            params => { 'EVAL_ERROR' => $EVAL_ERROR, },
+            log    => {
+                logger   => CTX('log'),
+                priority => 'error',
+                facility => 'monitor',
+            },
+        );
+    }
 
     if ( !defined $ldap ) {
         OpenXPKI::Exception->throw(
@@ -72,7 +92,12 @@ sub execute {
         );
     }
 
+    my %ldap_attrmap = map { split(/\s*[=-]>\s*/) }
+        split( /\s*,\s*/, $ldap_attrmap );
+
     ##! 2: 'ldap object created'
+    # TODO: maybe use TLS ($ldap->start_tls())?
+
     my $mesg = $ldap->bind( $ldap_userdn, password => $ldap_pass );
     if ( $mesg->is_error() ) {
         OpenXPKI::Exception->throw(
@@ -108,11 +133,8 @@ sub execute {
     else {
         $value = $svcparsed;
     }
-    ##! 128: "svc=$svc, svcparsed=$svcparsed, value=$value"
-    ##! 128: " base=$ldap_basedn"
-    ##! 128: " filter=($key=$value)"
-    ##! 128: " attrs=".join(', ', @ldap_attribs)
-    ##! 128: " timelimit=$ldap_timelimit"
+    ##! 128: "svc=$svc, svcparsed=$svcparsed, key=$key, value=$value, basedn=$ldap_basedn"
+    ##! 128: "ldap_attribs=" . join(', ', @ldap_attribs)
 
     $mesg = $ldap->search(
         base      => $ldap_basedn,
@@ -164,6 +186,7 @@ sub execute {
         );
     }
 
+    ##! 128: "LDAP entries returned by search: " . Dumper($mesg->entries)
     foreach my $entry ( $mesg->entries ) {
         ##! 32: "foreach entry: " . Dumper($entry)
         foreach my $attrib ( $entry->attributes ) {
@@ -207,7 +230,19 @@ the values in the workflow context (prefixed with 'ldap_').
 
 =head1 Parameters
 
-=head2 attrmap 
+=head2 display_mapping
+
+I<Note:> doesn't seem to be used at the moment
+
+Comma-separated list used for mapping display names. For example:
+
+  cn -> I18N_OPENXPKI_HTML_SMARTCARD_LDAP_CN, mail -> I18N_OPENXPKI_HTML_SMARTCARD_LDAP_MAIL
+
+=head2 ldap_attributes
+
+List of attributes in the LDAP entry to be returned for each entry that matches the search filter.
+
+=head2 ldap_attrmap 
 
 Map LDAP attribute names to context parameter names, allowing flexible access and assignment of
 data from LDAP into the context. By default, the names of the LDAP attributes returned are 
@@ -223,4 +258,31 @@ found and 'no' supresses the exception. The default is 'yes'.
 Setting this to 'yes' causes an exception to be thrown when more than one
 record is found and 'no' supresses the exception. The default is 'yes'.
 
+=head2 ldap_basedn
 
+The DN that is the base object entry relative to which the search is to be performed.
+
+=head2 ldap_pass
+
+The password for binding to the LDAP server.
+
+=head2 ldap_port
+
+The port that the server listens on.
+
+=head2 ldap_server
+
+The host name or IP address of the LDAP server.
+
+=head2 ldap_timelimit
+
+A timelimit that restricts the maximum time (in seconds) allowed for a search. A value of 0
+means that no timelimit will be requested.
+
+=head2 ldap_userdn
+
+The user DN for binding to the LDAP server.
+
+=head2 search_key
+
+=head2 search_value_context

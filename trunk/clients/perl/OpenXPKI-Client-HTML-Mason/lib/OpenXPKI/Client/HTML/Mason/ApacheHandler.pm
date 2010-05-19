@@ -5,6 +5,7 @@
 package OpenXPKI::Client::HTML::Mason::ApacheHandler;
 
 use strict;
+use lib qw( /etc/openxpki/local/lib );
 
 use HTML::Mason::ApacheHandler;
 eval { require Apache::Request } or { require Apache2::Request };

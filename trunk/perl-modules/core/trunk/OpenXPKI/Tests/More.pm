@@ -124,6 +124,12 @@ use Class::Std;
         return $self->is( $self->param($name), $expected, $testname );
     }
 
+    sub param_isnt {
+        my ( $self, $name, $expected, $testname ) = @_;
+        $testname ||= 'Fetching parameter ' . $name;
+        return $self->is( $self->param($name), $expected, $testname );
+    }
+
     sub state_is {
         my ( $self, $state, $testname ) = @_;
         $testname ||= 'Expecting state ' . $state;
@@ -145,6 +151,12 @@ use Class::Std;
         return $self->is( $currstate, $state, $testname );
     }
 
+    sub error_is {
+        my ( $self, $expected, $testname ) = @_;
+        $testname ||= 'Checking API message error';
+        return $self->is( $self->error(), $expected, $testname );
+    }
+
     ############################################################
     # HELPER METHODS
     ############################################################
@@ -163,7 +175,7 @@ use Class::Std;
                 { PKI_REALM => $realm } );
             $self->set_msg($msg);
             if ( $self->error ) {
-                $self->diag( "Login failed (get pki realm): " . Dumper $msg);
+                $self->diag( "Login failed (get pki realm $realm): " . Dumper $msg);
                 return;
             }
             $msg = $client->send_receive_service_msg( 'PING', );
@@ -278,7 +290,7 @@ use Class::Std;
         if ( $self->error ) {
 
             #            $self->diag(" RETURNING ERROR ");
-            $@ = 'Error creating workflow ' . $wftype;
+            $@ = 'Error creating workflow ' . $wftype . ' - MSG: ' . Dumper($msg);
             return;
         }
         else {
@@ -394,7 +406,7 @@ use Class::Std;
             && exists $msg->{'SERVICE_MSG'}
             && $msg->{'SERVICE_MSG'} eq 'ERROR' )
         {
-            return 1;
+            return $msg->{'LIST'}->[0]->{'LABEL'} || 'Unknown error';
         }
         else {
             return;
@@ -403,6 +415,9 @@ use Class::Std;
 
     sub dump {
         my $self = shift;
+        foreach ( @_ ) {
+            Test::More::diag($_);
+        };
         Test::More::diag("Current Test Instance:");
         foreach my $k (qw( user wfid )) {
             my $acc = 'get_' . $k;
@@ -622,7 +637,8 @@ as a sort block.
 
 =head2 $test->error
 
-Returns a true value if the most recent server call failed.
+Returns the error string if the most recent server call failed. Otherwise, 
+C<undef> is returned.
 
 =head2 $test->set_verbose( 0 | 1 )
 

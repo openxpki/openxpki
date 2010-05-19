@@ -1,3 +1,24 @@
+%# a.mhtml
+%#
+%# HTML::Mason module for displaying an anchor element
+%#
+%# ARGS:
+%#
+%# target   => The target URI to be linked to
+%# label    => Text to display
+%# params   => Additional parameters to be passed
+%#
+%# EXAMPLE:
+%#
+%# <& /lib/html/a.mhtml,
+%#  target => $context->{menu}->get_root() . '/service/other_info.html',
+%#  label => $username,
+%#  params => [
+%#      [ 'userid', $userid ],
+%#  ],
+%# %>
+%#
+%#
 <%args>
     $target => undef
     $params => undef

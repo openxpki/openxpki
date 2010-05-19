@@ -1,0 +1,37 @@
+<%args>
+    $errors => undef
+    $details => undef
+</%args>
+<%once>
+use Data::Dumper();
+</%once>
+<%init>
+my @errs = ();
+
+if ( (ref($errors) eq 'ARRAY') and ( ref($errors->[0]) eq 'ARRAY' ) ) {
+    $errors = $errors->[0];
+}
+</%init>
+    <h2>Internal Error</h2>
+%   if ( $details ) {
+    <p><% $details %></p>
+%   }
+% if (ref $errors eq 'ARRAY' )
+% {
+    <ul>
+%   foreach my $error (@{ $errors })
+%   {
+%     if (ref $error eq 'HASH') {
+        <li><% i18nGettext($error->{LABEL}, %{$error->{PARAMS}}) %></li>
+%     }
+%     elsif (ref $error eq '') {
+        <li><% i18nGettext($error) %></li>
+%     }
+%     else {
+        <li><% Dumper $error %></li>
+%     }
+%   }
+    </ul>
+% } else {
+    <p><% Dumper($errors) %></p>
+% }

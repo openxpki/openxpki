@@ -112,12 +112,14 @@
                     [
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_SIGNING_REQUEST",
                                    "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_PERSONALIZATION",
-                                   "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_REVOCATION_REQUEST",
                                    "create_crr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_ISSUE_CRL",
                                    "issue_crl", 'I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_PERSONALIZATION",
+                                   "smartcard_personalization", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_CARDADM",
+                                   "smartcard_admin", undef ],
                     ],
                     'puk_management' =>
                     [
@@ -179,6 +181,10 @@
                     {
                         CMD => "service/reset_token/index.html"
                     },
+                    "smartcard_unblock" =>
+                    {
+                        CMD => "service/reset_token/unblock_pin.html"
+                    },
                     "upload_puks" =>
                     {
                         CMD => "service/upload_puks/index.html"
@@ -186,6 +192,10 @@
                     "show_available_puks" =>
                     {
                         CMD => "service/upload_puks/show.html"
+                    },
+                    "smartcard_admin" =>
+                    {
+                        CMD => "service/smartcard_admin/index.html"
                     },
                     "workflow_list_types" =>
                     {

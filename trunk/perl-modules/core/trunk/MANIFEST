@@ -224,6 +224,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/LDAP/GetLDAPData.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ResetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
+OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
@@ -248,6 +249,8 @@ OpenXPKI/Server/Workflow/Activity/SCEP/SetContextFromOriginalCert.pm
 OpenXPKI/Server/Workflow/Activity/SCEP/SetContextFromCSR.pm
 OpenXPKI/Server/Workflow/Activity/SCEP/ExtractCSR.pm
 
+OpenXPKI/Server/Workflow/Activity/SmartCard/CardAdm.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/FetchTokens.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/ForkWorkflowInstances.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/PersistCSRs.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/WriteCertificateToInstall.pm
@@ -279,6 +282,15 @@ OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/StoreAuthIDs.pm
 
 OpenXPKI/Server/Workflow/Activity/PasswordSafe/StorePassword.pm
 OpenXPKI/Server/Workflow/Activity/PasswordSafe/RetrievePassword.pm
+
+OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/FetchPUK.pm
+OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/GenerateActivationCode.pm
+OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/GetCodesAndPinFromUser.pm
+OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/GetLDAPByCardID.pm
+OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/Initialize.pm
+OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/NotifyViaRT.pm
+OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/ResetWorkflow.pm
+OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/StoreAuthIDs.pm
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
@@ -321,6 +333,19 @@ OpenXPKI/Server/Workflow/Condition/SCEPClientAutoIssuance.pm
 OpenXPKI/Server/Workflow/Condition/SCEPClientCertValid.pm
 OpenXPKI/Server/Workflow/Condition/SCEPClientEnrollment.pm
 OpenXPKI/Server/Workflow/Condition/SCEPClientCSRValidRole.pm
+OpenXPKI/Server/Workflow/Condition/WorkflowContext.pm
+OpenXPKI/Server/Workflow/Condition/WorkflowContextBulk.pm
+
+OpenXPKI/Server/Workflow/Condition/Smartcard/CardIDMatchesWorkflow.pm
+OpenXPKI/Server/Workflow/Condition/Smartcard/CodesAndPinValid.pm
+OpenXPKI/Server/Workflow/Condition/Smartcard/HaveAuthIDs.pm
+OpenXPKI/Server/Workflow/Condition/Smartcard/HaveBothActHashes.pm
+OpenXPKI/Server/Workflow/Condition/Smartcard/LdapFoundForCardID.pm
+OpenXPKI/Server/Workflow/Condition/Smartcard/MaxIterationsReached.pm
+OpenXPKI/Server/Workflow/Condition/Smartcard/OwnerAbortedWorkflow.pm
+OpenXPKI/Server/Workflow/Condition/Smartcard/RequestedActivationCode.pm
+OpenXPKI/Server/Workflow/Condition/Smartcard/WriteOK.pm
+
 
 OpenXPKI/Server/Workflow/Condition/Smartcard/AuthCodesValid.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/CertificateProperties.pm
@@ -350,6 +375,11 @@ OpenXPKI/Server/Workflow/Validator/CertSubjectAltNameParts.pm
 OpenXPKI/Server/Workflow/Validator/Bulk.pm
 OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
 OpenXPKI/Server/Workflow/Validator/UnusedID.pm
+OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
+
+OpenXPKI/Server/Workflow/WFObject.pm
+OpenXPKI/Server/Workflow/WFObject/WFArray.pm
+OpenXPKI/Server/Workflow/WFObject/WFHash.pm
 
 OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
 
@@ -536,6 +566,7 @@ t/60_workflow/10_certificate_signing_request.t
 t/60_workflow/15_csr_and_certificate_issuance.t
 t/60_workflow/20_certificate_revocation.t
 t/60_workflow/40_certificate_revocation_list.t
+t/60_workflow/45_activity_tools.t
 t/60_workflow/60_ldap_publishing.t
 t/60_workflow/80_forking.t
 t/60_workflow/99_cleanup.t
