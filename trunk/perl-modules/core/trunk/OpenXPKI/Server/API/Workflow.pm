@@ -349,6 +349,8 @@ sub get_workflow_history {
             WORKFLOW_SERIAL => $wf_id,
         },
     );
+    # sort ascending (unsorted within seconds)
+    @{$history} = sort { $a->{WORKFLOW_HISTORY_SERIAL} <=> $b->{WORKFLOW_HISTORY_SERIAL} } @{$history};
     ##! 64: 'history: ' . Dumper $history
 
     return $history;
