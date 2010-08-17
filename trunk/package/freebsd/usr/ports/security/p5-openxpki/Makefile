@@ -311,13 +311,14 @@ WITH_OPENSSL_BASE=      yes
 .include <bsd.port.pre.mk>
 
 .if defined(WITH_DEVELOPER)
-RUN_DEPENDS+=	fop:${PORTSDIR}/textproc/fop \
-		xsltproc:${PORTSDIR}/textproc/libxslt \
+RUN_DEPENDS+=	${LOCALBASE}/bin/fop:${PORTSDIR}/textproc/fop \
+		${LOCALBASE}/bin/xsltproc:${PORTSDIR}/textproc/libxslt \
 		${LOCALBASE}/share/xsl/docbook/html/chunk.xsl:${PORTSDIR}/textproc/docbook-xsl \
 		${LOCALBASE}/share/java/jai/lib/libmlib_jai.so:${PORTSDIR}/java/jai
 .endif
 .if defined(WITH_GRAPHVIZ)
-RUN_DEPENDS+=	${LOCALBASE}/bin/dot:${PORTSDIR}/graphics/graphviz
+RUN_DEPENDS+=	${LOCALBASE}/bin/dot:${PORTSDIR}/graphics/graphviz \
+		${LOCALBASE}/bin/imgsize:${PORTSDIR}/graphics/p5-Image-Size
 .endif
 
 post-install:
