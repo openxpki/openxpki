@@ -53,7 +53,7 @@ ERRORS=0
 echo "Checking required OpenXPKI Perl modules..."
 for module in OpenXPKI OpenXPKI::Client ; do
     echo -n "$module: "
-    if perl -e "use $module;" >/dev/null 2>&1 ; then
+    if perl -e "use $module;" ; then
 	echo "OK"
     else
 	echo "NOT FOUND"
