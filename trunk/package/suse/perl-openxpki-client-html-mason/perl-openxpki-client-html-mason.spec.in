@@ -102,7 +102,7 @@ find %{buildroot}%{_prefix}             \
         $d = $_;
         /\Q$d\E/ && return for reverse sort @INC;
         $d =~ /\Q$_\E/ && return
-            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share|;
+            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share /srv /var |;
 
         $dirs[@dirs] = $_;
         }
