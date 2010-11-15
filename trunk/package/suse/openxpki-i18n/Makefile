@@ -21,6 +21,7 @@ dist-clean:
 
 dist: dist-clean
 	( cd $(SRCBASE)/ && \
+		make scan && \
 		make dist && \
 		mv *.tar.gz $(RPMBASE)/SOURCES \
 	)
@@ -29,7 +30,7 @@ $(PACKAGE).spec: $(PACKAGE).spec.in
 	sed -e 's/_VERSION_/$(VERSION)/g' <$< >$@
 
 package: $(PACKAGE).spec
-	rpm -ba $(PACKAGE).spec
+	rpmbuild -ba $(PACKAGE).spec
 
 collect:
 	mv $(RPMBASE)/SRPMS/$(PACKAGE)-*.rpm .

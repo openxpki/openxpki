@@ -11,6 +11,7 @@ SRCNAME=deployment
 VERGEN=$(OPENXPKI_SVN)/tools/vergen
 VERSION=$(shell $(VERGEN) --format version --directory $(SRCBASE))
 PERL=$(shell which perl)
+PREFIX=/usr
 
 ifdef PREFIX
 CONFIGURE_ARGS=--prefix $(PREFIX)
@@ -39,7 +40,7 @@ $(PACKAGE).spec: $(PACKAGE).spec.in
 	sed -e 's+_PREFIX_+$(PREFIX)+g'  >$@
 
 package: $(PACKAGE).spec
-	rpm -ba $(PACKAGE).spec
+	rpmbuild -ba $(PACKAGE).spec
 
 collect:
 	mv $(RPMBASE)/SRPMS/$(PACKAGE)-*.rpm .

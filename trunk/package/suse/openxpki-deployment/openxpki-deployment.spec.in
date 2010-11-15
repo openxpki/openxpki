@@ -40,7 +40,8 @@ chmod -R u+w %{_builddir}/%{pkgname}-%{version}
     --setcfg dir.openxpkiconfdir=%{instancedir}/%{instance} \
     --setcfg dir.localstatedir=/var \
     --setcfg server.pidfile=/var/run/openxpkid.pid \
-    --setcfg server.admgroup=openxpki \
+    --setcfg server.runuser=openxpki \
+    --setcfg server.rungroup=www
 
 
 # Debian used this (does not take into account %prefix properly)

@@ -53,10 +53,10 @@ CFLAGS="$RPM_OPT_FLAGS"
 
 %{makeinstall} `%{__perl} -MExtUtils::MakeMaker -e ' print \$ExtUtils::MakeMaker::VERSION <= 6.05 ? qq|PREFIX=%{buildroot}%{_prefix}| : qq|DESTDIR=%{buildroot}| '`
 
-install -d -D -m 755 -o root -g openxpki %{buildroot}/srv/www/openxpki/cgi-bin
-install -d -D -m 755 -o root -g openxpki %{buildroot}/srv/www/openxpki/htdocs
-install -d -D -m 755 -o root -g openxpki %{buildroot}/srv/www/openxpki/mason-data
-install -D -m 755 -o root -g openxpki bin/openxpki.cgi %{buildroot}/srv/www/openxpki/cgi-bin/openxpki.cgi
+install -d -D -m 755 %{buildroot}/srv/www/openxpki/cgi-bin
+install -d -D -m 755 %{buildroot}/srv/www/openxpki/htdocs
+install -d -D -m 755 %{buildroot}/srv/www/openxpki/mason-data
+install -D -m 755 bin/openxpki.cgi %{buildroot}/srv/www/openxpki/cgi-bin/openxpki.cgi
 tar cf - htdocs | tar -C %{buildroot}/srv/www/openxpki/ -x -f -
 
 cmd=/usr/share/spec-helper/compress_files
@@ -123,6 +123,11 @@ find %{buildroot}%{_prefix}             \
 
 %files -f %filelist
 %defattr(-,root,root)
+
+%attr(0755,root,openxpki) /srv/www/openxpki/cgi-bin
+%attr(0755,root,openxpki) /srv/www/openxpki/htdocs
+%attr(0755,root,openxpki) /srv/www/openxpki/mason-data
+%attr(0755,root,openxpki) /srv/www/openxpki/cgi-bin/openxpki.cgi
 
 %changelog
 * Mon Nov 27 2006 m.bartosch@cynops.de

@@ -38,7 +38,7 @@ $(PACKAGE).spec: $(PACKAGE).spec.in
 	sed -e 's/_VERSION_/$(VERSION)/g' <$< | sed -e 's+_PERL_+$(PERL)+g' | sed -e 's+_MAKEPL_ARGS_+$(PERL_MAKEPL_ARGS)+g' >$@
 
 package: $(PACKAGE).spec
-	rpm -ba $(PACKAGE).spec
+	rpmbuild -ba $(PACKAGE).spec
 
 collect:
 	mv $(RPMBASE)/SRPMS/$(PACKAGE)-*.rpm .
