@@ -1,0 +1,68 @@
+#!/usr/bin/make -f
+
+PERL ?= /usr/bin/perl
+
+arrange: arrange-stamp
+arrange-stamp: install
+	dh_testdir
+	touch arrange-stamp
+
+binary: binary-stamp
+binary-stamp: binary-indep binary-arch
+	dh_testdir
+	touch binary-stamp
+
+binary-arch: binary-arch-stamp
+binary-arch-stamp: arrange
+	dh_testdir
+	touch binary-arch-stamp
+
+binary-indep: binary-indep-stamp
+binary-indep-stamp: arrange
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_installexamples
+	dh_installchangelogs
+	dh_compress
+	dh_fixperms
+	dh_strip
+	#dh_installdeb
+	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+	touch binary-indep-stamp
+
+build: build-stamp
+build-stamp: config
+	dh_testdir
+	make
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	if [ -e Makefile ]; then $(MAKE) -i distclean; fi
+	dh_clean arrange-stamp binary-stamp binary-arch-stamp binary-indep-stamp build-stamp config-stamp install-stamp build-arch-stamp build-indep-stamp patch-stamp `find -name '*.bak'`
+
+config: config-stamp
+config-stamp:
+	dh_testdir
+	./configure -- --setcfg dir.mandir=/usr/share/man --setcfg dir.sysconfdir=/etc --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 --setcfg dir.localedir=/usr/share/locale --setcfg dir.localstatedir=/var --setcfg dir.sitelib=/etc/openxpki/local/lib --setcfg dir.sitehtdoc=/etc/openxpki/local/htdocs --setcfg server.admgroup=openxpki --setcfg server.pidfile=/var/run/openxpkid.pid
+	touch config-stamp
+
+install: install-stamp
+install-stamp: build
+	dh_testdir
+	dh_installdirs
+	DESTDIR=$(CURDIR)/debian/openxpki-deployment make install
+	#dh_installinit --no-start --init-script=openxpkid
+	dh_installinit --name=openxpkid
+	dh_installdebconf
+	dh_installdeb
+	dh_fixperms -a
+	touch install-stamp
+
+.PHONY: arrange binary binary-arch binary-indep build clean config install

@@ -9,8 +9,6 @@
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_scep_request.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_personalization.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_password_safe.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_pin_unblock.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_puk_upload.xml"/>
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
       [% INCLUDE workflow_def_certificate_signing_request.xml FILTER indent(4) %]
       [% INCLUDE workflow_def_certificate_signing_request_offline_ca.xml FILTER indent(4) %]
@@ -24,8 +22,6 @@
       [% INCLUDE workflow_def_dataexchange_import.xml FILTER indent(4) %]
       [% INCLUDE workflow_def_smartcard_personalization.xml FILTER indent(4) %]
       [% INCLUDE workflow_def_password_safe.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_smartcard_pin_unblock.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_smartcard_puk_upload.xml FILTER indent(4) %]
     [% END %]
   </workflows>
     
@@ -41,8 +37,6 @@
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_dataexchange.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_personalization.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_password_safe.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_pin_unblock.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_puk_upload.xml"/>
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
       [% INCLUDE workflow_activity_null.xml FILTER indent(4) %]
       [% INCLUDE workflow_activity_certificate_signing_request.xml FILTER indent(4) %]
@@ -54,8 +48,6 @@
       [% INCLUDE workflow_activity_dataexchange.xml FILTER indent(4) %]
       [% INCLUDE workflow_activity_smartcard_personalization.xml FILTER indent(4) %]
       [% INCLUDE workflow_activity_password_safe.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_smartcard_pin_unblock.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_smartcard_puk_upload.xml FILTER indent(4) %]
     [% END %]
   </activities>
 
@@ -64,22 +56,18 @@
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_signing_request.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_revocation_request.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_password_safe.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_smartcard_pin_unblock.xml"/>
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
       [% INCLUDE workflow_validator_certificate_signing_request.xml FILTER indent(4) %]
       [% INCLUDE workflow_validator_certificate_revocation_request.xml FILTER indent(4) %]
       [% INCLUDE workflow_validator_password_safe.xml FILTER indent(4) %]
-      [% INCLUDE workflow_validator_smartcard_pin_unblock.xml FILTER indent(4) %]
     [% END %]
   </validators>
 
   <conditions>
     [% IF deployment.xmlstyle == 'multi-file' %]
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_smartcard_pin_unblock.xml"/>
     [% ELSIF deployment.xmlstyle == 'all-in-one' %]
       [% INCLUDE workflow_condition.xml FILTER indent(4) %]
-      [% INCLUDE workflow_condition_smartcard_pin_unblock.xml FILTER indent(4) %]
     [% END %]
   </conditions>
 

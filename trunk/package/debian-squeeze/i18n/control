@@ -1,0 +1,15 @@
+Source: openxpki-i18n
+Maintainer: Scott T Hardin <scotty@hnsc.de>
+Priority: optional
+Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0), libversion-perl
+
+Package: openxpki-i18n
+Architecture: any
+Recommends: libopenxpki-perl
+Section: perl
+Priority: optional
+Depends:
+Description: Translations for OpenXPKI
+ OpenXPKI is an Open Source PKI project.
+ .
+ This package contains the translations for all the software.

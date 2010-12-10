@@ -1,0 +1,152 @@
+#! /bin/sh -e
+# postinst script for openxpki-deployment
+#
+# see: dh_installdeb(1)
+
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see http://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+#
+# quoting from the policy:
+#     Any necessary prompting should almost always be confined to the
+#     post-installation script, and should be protected with a conditional
+#     so that unnecessary prompting doesn't happen if a package's
+#     installation fails and the `postinst' is called with `abort-upgrade',
+#     `abort-remove' or `abort-deconfigure'.
+
+case "$1" in
+    configure)
+
+		# Source debconf library.
+		. /usr/share/debconf/confmodule
+
+	# check for already configured trustcenter1
+	if [ -e /etc/openxpki/instances/trustcenter1/openxpki.conf ]; then
+		echo Detected and respect an old deployment. >&2
+	else
+		for DIR in "/etc/openxpki" "/etc/openxpki/instances" "/etc/openxpki/instances/trustcenter1"; do
+			install -d -m 750 -o root -g openxpki $DIR
+		done
+		echo -n Deploy instance trustcenter1 ... >&2
+		openxpkiadm deploy -- --setcfg dir.openxpkiconfdir=/etc/openxpki/instances/trustcenter1 2>>/var/log/messages
+		echo DONE. >&2
+		cd /etc/openxpki/instances/trustcenter1
+		echo -n Configure instance trustcenter1 ... >&2
+		openxpki-configure --batch --createdirs >>/var/log/messages
+		echo DONE. >&2
+	fi;
+
+	# check for already initialized database
+    # db_get openxpki-deployment/database_type
+          BACKEND="mysql"
+    case "$BACKEND" in
+        mysql)
+  		  db_get openxpki-deployment/mysql_passwd
+          export MYSQL_PWD="$RET"
+          if ! mysqlshow openxpki; then
+              echo -n Initialize database ... >&2
+              rm -f /etc/openxpki/instances/trustcenter1/database.xml
+              rm -f /etc/openxpki/instances/trustcenter1/log_database.xml
+              openxpki-configure --batch -- \
+                --setcfg database.type=MySQL \
+                --setcfg database.name=openxpki \
+                --setcfg database.host=localhost \
+                --setcfg database.port=3306 \
+                --setcfg database.user=openxpki \
+                --setcfg database.passwd=openxpki
+              /etc/init.d/mysql start
+              mysqladmin create openxpki
+              echo "GRANT ALL PRIVILEGES on openxpki.* TO " \
+                "'openxpki'@'localhost' IDENTIFIED by 'openxpki'" \
+                | mysql mysql
+              openxpkiadm initdb \
+                --config=/etc/openxpki/instances/trustcenter1/config.xml \
+                2>>/var/log/messages
+              echo DONE. >&2
+          fi;
+        ;;
+
+        sqlite)
+    	  if [ -e /var/openxpki/sqlite.db._backend_ ] || [ -e /var/openxpki/sqlite.db._workflow_ ]; then
+    		  echo Detected and respect an old database. >&2
+    	  else
+    		  echo -n Initialize database ... >&2
+                      openxpkiadm initdb --config=/etc/openxpki/instances/trustcenter1/config.xml 2>>/var/log/messages
+	          chmod 660 /var/openxpki/sqlite.db*
+    		  echo DONE. >&2
+    	  fi;
+        ;;
+
+        *)
+          echo "Database not configured automatically" >&2
+        ;;
+    esac
+	## fix var directory
+	chown -R openxpki:openxpki /var/openxpki
+	if [ ! -e /etc/openxpki/instances/trustcenter1/ca/testdummyca1/cakey.pem ]; then
+		# read data from debconf database
+		db_get openxpki-deployment/subject
+        	SUBJECT="$RET"
+		db_get openxpki-deployment/email
+        	export email="$RET"
+		db_get openxpki-deployment/passwd
+        	export PASSWD="$RET"
+                if [ "x$PASSWD" == "x" ]; then
+                    export PASSWD="1234567890" # yay, a default password
+                fi
+
+		# create key and certificate
+		# this key is Cisco safe (only 2048 bit key length)
+		mkdir demoCA || echo demoCA already exists from earlier installation
+		touch demoCA/index.txt
+		echo 01 > demoCA/serial
+		echo SUBJECT::="$SUBJECT"
+		openssl req -newkey rsa:2048 -subj "$SUBJECT" -passout env:PASSWD -out csr.pem -keyout key.pem
+		openssl ca  -selfsign -in csr.pem -keyfile key.pem -out cacert.pem -passin env:PASSWD -utf8 -outdir . -subj "$SUBJECT" -policy policy_anything -batch -extensions v3_ca -preserveDN -days 730
+		cat cacert.pem | perl -ne "\$cert = 1 if (\$_ =~ /^-----BEGIN/);next if (not \$cert); print \$_;" > cert.pem
+		cd demoCA
+		rm index.txt  index.txt.attr  index.txt.old  serial  serial.old
+		cd ..
+		rmdir demoCA
+		rm 01.pem
+
+		# import key and certificate to OpenXPKI installation
+                openxpkiadm key import --purpose CA --realm "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA" --id testdummyca1 --file key.pem
+                IDENTIFIER=`openxpkiadm certificate import --file cert.pem | perl -ne "if (\\$_ =~ m{^\s*identifier:\s*.*\$}xmsi) {\\$_ =~ s{^\s*identifier:\s*(.*)\\$}{\\$1}xmsi; print \\$_;}"`
+                openxpkiadm certificate alias --realm "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA" --alias "testdummyca1" --identifier $IDENTIFIER
+
+		# delete passwd from debconf database
+		db_clear
+		db_stop
+		rm -f key.pem csr.pem cacert.pem cert.pem
+		
+		#permission for default crl
+		touch /etc/openxpki/instances/trustcenter1/ca/testdummyca1/crl.pem
+		chown openxpki:openxpki /etc/openxpki/instances/trustcenter1/ca/testdummyca1/crl.pem
+		chmod 660 /etc/openxpki/instances/trustcenter1/ca/testdummyca1/crl.pem
+
+	fi;
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+# dh_installdeb will replace this with shell code automatically
+# generated by other debhelper scripts.
+
+#DEBHELPER#
+
+exit 0
