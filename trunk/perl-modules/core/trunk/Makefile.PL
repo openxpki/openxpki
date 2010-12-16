@@ -99,7 +99,7 @@ if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/) {
 # Now make sure version is 0.9.8
 unless ( ($openssl_version_major == 0) &&
          ($openssl_version_minor == 9) &&
-         ($openssl_version_fix   == 9) ) {
+         ($openssl_version_fix   == 8) ) {
     print STDERR "\n";
     print STDERR "ERROR: OpenSSL 0.9.8 is required.\n";
     print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
