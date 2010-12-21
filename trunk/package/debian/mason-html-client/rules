@@ -40,10 +40,17 @@ build-stamp: config
 	dh_testdir
 	$(PERL) Makefile.PL INSTALLDIRS=vendor
 	$(MAKE) OPTIMIZE="-O2 -g -Wall"
-	sed "s%MasonDataDir\\s.*%MasonDataDir '/var/cache/mason'%" eg/openxpki-mason-mod_perl.conf > eg/openxpki-mason-mod_perl.conf.1
-	sed "s%MasonCompRoot\\s.*%MasonCompRoot '/var/www/openxpki'%" eg/openxpki-mason-mod_perl.conf.1 > eg/openxpki-mason-mod_perl.conf
+	$(PERL) -i.bak -p \
+	-e "s%MasonDataDir\\s.*%MasonDataDir '/var/cache/mason'%;" \
+	-e "s%path_to_htdocs_for_local_customization%/var/www-local/openxpki%;" \
+	-e "s%path_to_htdocs_from_openxpki_installation%/var/www/openxpki%;" \
+   	eg/openxpki-mason-mod_perl.conf
+	# sed "s%MasonDataDir\\s.*%MasonDataDir '/var/cache/mason'%" eg/openxpki-mason-mod_perl.conf > eg/openxpki-mason-mod_perl.conf.1
+	# sed "s%path_to_htdocs_for_local_customization%/var/www-local/openxpki%" eg/openxpki-mason-mod_perl.conf.1 > eg/openxpki-mason-mod_perl.conf
+	# sed "s%path_to_htdocs_from_openxpki_initialization%/var/www/openxpki%" eg/openxpki-mason-mod_perl.conf > eg/openxpki-mason-mod_perl.conf.1
 	echo SetEnv OPENXPKI_SOCKET_FILE \"/var/openxpki/openxpki.socket\" >> eg/openxpki-mason-mod_perl.conf
 	echo SetEnv OPENXPKI_MASON_SESSION_DIR \"/var/openxpki/mason_sessions\" >> eg/openxpki-mason-mod_perl.conf
+	echo SetEnv OPENXPKI_LOCALE_PREFIX \"/usr/share/locale\" >> eg/openxpki-mason-mod_perl.conf
 	# $(MAKE) test
 	touch build-stamp
 
