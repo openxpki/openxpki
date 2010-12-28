@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use base qw( Workflow::Validator );
-use Workflow::Exception qw( validation_error );
+use Workflow::Exception qw( validation_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use Net::LDAP;

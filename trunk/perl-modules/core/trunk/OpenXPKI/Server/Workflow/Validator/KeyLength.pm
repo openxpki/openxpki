@@ -85,9 +85,9 @@ sub validate {
         DATA => $data,
     });
     ##! 16: 'csr_info: ' . Dumper $csr_info
-    my $key_length    = $csr_info->{BODY}->{KEYSIZE};
+    $key_length    = $csr_info->{BODY}->{KEYSIZE};
     ##! 16: 'key_length: ' . $key_length
-    my $key_algorithm = $csr_info->{BODY}->{PUBKEY_ALGORITHM};
+    $key_algorithm = $csr_info->{BODY}->{PUBKEY_ALGORITHM};
     ##! 16: 'key_algorithm: ' . $key_algorithm
 
     if ($self->fail_on_unknown_algorithm && ! exists $self->min()->{$key_algorithm}) {
