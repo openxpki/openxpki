@@ -90,6 +90,19 @@ sub execute {
         ##! 16: 'encrypted password: ' . $encrypted_password
 
         $context->param('encrypted_' . $id => $encrypted_password);
+
+        # DeuBa-specific: retrieve serial number from serialized 'password'
+        # and store it in the serial_$id context parameter:
+        my $ser = OpenXPKI::Serialization::Simple->new({
+            SEPARATOR => '-',
+        });
+        my $puk_data = $ser->deserialize($password);
+        if (! $puk_data->{SerialNumber}) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_SERIALNUMBER_FOR_PUK_MISSING',
+            );
+        }
+        $context->param('serial_' . $id => $puk_data->{SerialNumber});
     }
     my $user = CTX('session')->get_user();
     my $role = CTX('session')->get_role();

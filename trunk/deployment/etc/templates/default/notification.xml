@@ -62,9 +62,9 @@
 
     <notification id="scpu_notify_auth_persons">
         <action type="open">
-            <requestor>[% creator %]</requestor>
+            <requestor>[% ldap_mail %]</requestor>
             <queue>General</queue>
-            <subject>Activation Codes for Smartcard PIN Unblock Request for [% creator %]</subject>
+            <subject>Activation Codes for Smartcard PIN Unblock Request for [% ldap_mail %]</subject>
         </action>
       <action type="set_value">
         <field>cc</field>

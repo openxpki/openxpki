@@ -1,0 +1,23 @@
+<%init>
+use Data::Dumper;
+# Novosec sends the ID with uppercase letters, but the XML file/workflow
+# has it in lowercase
+my $token_id = lc($m->request_args()->{TokenID});
+</%init>
+
+% my $encrypted_puk = $m->comp('/service/reset_token/get_encrypted_puk.mhtml',
+%     token_id => $token_id,
+% );
+% return if (! defined $encrypted_puk); # error message is already shown
+%                                       # by get_encrypted_puk.mhtml
+    <H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_DELETE_NEW_PIN_TITLE') %></H1>
+    <p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_DELETE_NEW_PIN_DESC') %></p>
+<p>
+<& '/service/reset_token/plugin.mhtml',
+    params => {
+        'Request' => 'DeleteToken',
+        'PostURL' => $m->comp('/lib/rel2abs.mhtml', rel => $context->{menu}->get_root() . '/service/reset_token/delete_result.html'),
+        'PUK'     => $encrypted_puk,
+    },
+&>
+</p>

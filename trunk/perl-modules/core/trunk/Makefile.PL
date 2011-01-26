@@ -9,7 +9,7 @@ my $vergen = '../../../../tools/vergen';
 
 ###########################################################################
 # determine OpenSSL version
-## first we have to find a working OpenSSL 0.9.8
+## first we have to find a working OpenSSL 0.9.8 at minimum
 
 # OPENSSL_LIB
 # OPENSSL_INC
@@ -78,30 +78,19 @@ print STDERR "OpenSSL library: $openssl_lib_dir\n";
 print STDERR "OpenSSL headers: $openssl_inc_dir\n";
 print STDERR "OpenSSL binary:  $openssl_binary\n";
 
-# ask the binary for it's version
-# openssl version should produce output like this:
-# OpenSSL 0.9.7l 28 Sep 2006
-# OpenSSL 1.0.0a 1 Jun 2010
-my $openssl_version_string = `$openssl_binary version`;
-my ($openssl_version_major, $openssl_version_minor, $openssl_version_fix, $openssl_version_patch);
-if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/) {
-    $openssl_version_major = $1;
-    $openssl_version_minor = $2;
-    $openssl_version_fix   = $3;
-    $openssl_version_patch = $4;
-    print "OpenSSL version: major=$openssl_version_major, minor=$openssl_version_minor, fix=$openssl_version_fix, patch=$openssl_version_patch\n";
-} else {
-    print "Problem: malformed openssl version string!\n";
-    print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
-    exit 1;
-}
+my $openssl_version = `grep '#define OPENSSL_VERSION_TEXT' $tmp_ver`;
 
-# Now make sure version is 0.9.8
-unless ( ($openssl_version_major == 0) &&
-         ($openssl_version_minor == 9) &&
-         ($openssl_version_fix   == 8) ) {
+$openssl_version =~ s/^.*fips.*$//m;
+$openssl_version =~ s/\n//g;
+$openssl_version =~ s/^[^"]*"([^"]*)".*$/$1/;
+print STDERR "OpenSSL version: $openssl_version\n";
+$openssl_version =~ s/^\s*OpenSSL\s*0\.9\.//i;
+$openssl_version =~ s/^([0-9]+).*$/$1/;
+
+if ($openssl_version < 8)
+{
     print STDERR "\n";
-    print STDERR "ERROR: OpenSSL 0.9.8 is required.\n";
+    print STDERR "ERROR: OpenSSL 0.9.8 or higher is required.\n";
     print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
     exit 1;
 }
@@ -316,6 +305,7 @@ WriteMakefile(
         'Net::Server'            => '0.94',
 	'Params::Validate'       => '0.77',
 	'Proc::ProcessTable'     => '0.43',
+    'Proc::SafeExec'         => '1.4',
 	'Regexp::Common'         => 2,
         'Sys::SigAction'         => '0.06',
         'Template'               => '2.15',

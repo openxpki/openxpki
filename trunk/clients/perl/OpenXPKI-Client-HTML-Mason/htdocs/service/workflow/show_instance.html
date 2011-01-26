@@ -183,14 +183,6 @@
     </tr>
 %     }
 </table>
-  <div class="openxpki_command_list_item">
-    <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/get_workflow_instance_info.html" &>
-    <& /lib/html/hidden.mhtml, 'name' => 'id', 'value' => $id &>
-    <!-- the format is optional -->
-    <& /lib/html/hidden.mhtml, 'name' => 'format', 'value' => 'png' &>
-    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => i18nGettext ('I18N_OPENXPKI_HTML_GET_WORKFLOW_INSTANCE_INFO') &>
-    <& /service/close_form.mhtml &>
-  </div>
 % }
 </p>
 </div>
@@ -266,7 +258,7 @@
                       my $key_i18n = $m->scomp('/lib/field_to_i18n.mhtml', 
                           'field' => $key,
                       );
-                      $ref->{$key} =~ encode_entities($ref->{$key});
+                      $ref->{$key} = encode_entities($ref->{$key});
                       $ref->{$key} =~ s{\n}{<br/>}xmsg;
                       $value .= '<tr><td style="vertical-align: top">' . $key_i18n . '</td><td>' . $ref->{$key} . '<td/></tr>';
                   }

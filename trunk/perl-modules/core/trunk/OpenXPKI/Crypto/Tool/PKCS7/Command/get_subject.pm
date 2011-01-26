@@ -54,8 +54,11 @@ sub get_command {
             FORCE    => 1,
         });
     }
+    $outfile_of{$ident} = $fu_of{$ident}->get_safe_tmpfile({
+        'TMP' => $tmp_of{$ident},
+    });
    
-    my $command = " verify -in $in_filename"; 
+    my $command = " -out $outfile_of{$ident} verify -in $in_filename"; 
     if (defined $data_filename) {
         ##! 16: 'data_filename defined'
         $command .= " -data $data_filename";
@@ -83,7 +86,8 @@ sub get_result
     ##! 1: 'start'
     my $self   = shift;
     my $ident  = ident $self;
-    my $result = shift;
+
+    my $result = $fu_of{$ident}->read_file($outfile_of{$ident});
 
     ##! 16: 'result: ' . $result
     my @lines = split(/\n/, $result);

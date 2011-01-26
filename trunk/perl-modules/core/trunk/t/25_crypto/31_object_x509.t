@@ -56,7 +56,8 @@ ok(1);
 # TODO - do we want get_parsed to return the bytes (as currently done, see
 # UTF-8 encoded subject below) or a UTF8-decoded perl string with Unicode
 # codepoints?
-ok ($cert->get_parsed("BODY", "SUBJECT") eq "CN=John Dö,DC=OpenXPKI,DC=org");
+my $expected_subject = decode_utf8("CN=John Dö,DC=OpenXPKI,DC=org");
+ok ($cert->get_parsed("BODY", "SUBJECT") eq $expected_subject);
 ok ($cert->get_parsed("BODY", "KEYSIZE") == 1024);
 my @key_usage = @{ $cert->get_parsed('BODY', 'EXTENSIONS', 'KEYUSAGE') };
 ok (grep {$_ eq 'Non Repudiation'} @key_usage, 'Key Usage array contains Non Repudation');

@@ -19,18 +19,33 @@ use English;
 use Data::Dumper;
 
 sub evaluate {
-	##! 16: 'start'
-    ##! 128: 'auth1_id_mail  = ' . $context->param('auth1_id_mail')
-    ##! 128: 'auth2_id_mail  = ' . $context->param('auth2_id_mail')
-	my ( $self, $workflow ) = @_;
-	my $context = $workflow->context(); 
-	
-	if ( $context->param('auth1_ldap_mail') and $context->param('auth2_ldap_mail') ) {
-		return 1;
-	} else {
-		condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_NO_AUTH_IDS');
-		return -1;
-	}
+    my ( $self, $workflow ) = @_;
+    my $context = $workflow->context();
+
+    my $auth1 = lc($context->param('auth1_ldap_mail'));
+    my $auth2 = lc($context->param('auth2_ldap_mail'));
+    my $owner = lc($context->param('ldap_mail'));
+    ##! 16: 'start'
+    ##! 128: 'auth1_id_mail  = ' . $auth1
+    ##! 128: 'auth2_id_mail  = ' . $auth2
+    ##! 128: 'ldap_mail  = ' . $owner
+
+    if ( ( not $auth1 ) or ( not $auth2 ) ) {
+        condition_error(
+            'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTH_NOT_SET');
+        return -1;
+    }
+    elsif ( ( $auth1 eq $owner ) or ( $auth2 eq $owner ) ) {
+        condition_error(
+            'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTH_IS_OWNER');
+        return -1;
+    }
+    elsif ( $auth1 eq $auth2 ) {
+        condition_error(
+            'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTHS_NOT_UNIQUE');
+        return -1;
+    }
+    return 1;
 }
 
 1;

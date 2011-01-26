@@ -111,7 +111,7 @@ sub __build_env
     ## determine level
     if (exists $args{"__menu_level"})
     {
-        $self->{LEVEL} = $args{"__menu_level"};
+        $self->{LEVEL} = ref $args{'__menu_level'} eq 'ARRAY' ? $args{'__menu_level'}->[0] : $args{"__menu_level"};
     } else {
         $self->{LEVEL} = 0;
     }
@@ -119,14 +119,15 @@ sub __build_env
     ## determine path
     for (my $i=0; $i < $self->{LEVEL}; $i++)
     {
-        $self->{PATH}->[$i] = $args{"__menu_item_$i"};
+        $self->{PATH}->[$i] = ref $args{"__menu_item_$i"} eq 'ARRAY' ? $args{"__menu_item_$i"}->[0] : $args{"__menu_item_$i"};
     }
 
     ## determine session info
     foreach my $key ("SESSION_ID", "ROLE")
     {
-        $self->{$key} = $args{"__".lc($key)}
-            if (not exists $self->{$key});
+        if (not exists $self->{$key}) {
+            $self->{$key} = ref $args{"__".lc($key)} eq 'ARRAY' ? $args{'__'.lc($key)}->[0] : $args{"__".lc($key)}
+        }
     }
 
     return $self->{LEVEL};

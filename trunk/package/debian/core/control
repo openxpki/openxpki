@@ -1,14 +1,14 @@
 Source: libopenxpki-perl
 Maintainer: Michael Bell <michael.bell@web.de>
 Priority: optional
-Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0-16), libversion-perl, libconfig-std-perl,
+Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0-16), libversion-perl, libconfig-std-perl
 
 Package: libopenxpki-perl
 Architecture: any
 Recommends: libdbd-pg-perl | libdbd-mysql-perl
 Section: perl
 Priority: optional
-Depends: ${perl:Depends}, ${shlibs:Depends}, make, openssl (>= 0.9.8), libauthen-sasl-perl, libcgi-session-perl, libdatetime-perl, libdigest-sha1-perl, libexception-class-perl (>=1.22), libio-prompt-perl, liblog-log4perl-perl, libmail-rfc822-address-perl, libnet-ip-perl, libnet-ldap-perl, libnet-server-perl, libparams-validate-perl, libregexp-common-perl, libtemplate-perl, libtest-pod-perl, libtest-pod-coverage-perl, libtext-csv-perl, libxml-parser-perl, libxml-sax-perl, libxml-sax-writer-perl, libxml-simple-perl, libipc-sharelite-perl, libintl-perl, libfilter-perl, libdata-password-perl, libdata-serializer-perl, libdatetime-format-dateparse-perl, libproc-processtable-perl, libsys-sigaction-perl, libtemplate-perl, libworkflow-perl, libxml-filter-xinclude-perl, libxml-validator-schema-perl, libdbi-perl, libdevel-stacktrace-perl, libclass-accessor-perl, libcrypt-openssl-aes-perl, libcrypt-cbc-perl, libtree-dagnode-perl, libclass-observable-perl, libclass-factory-perl, libconfig-std-perl, libtimedate-perl
+Depends: ${perl:Depends}, ${shlibs:Depends}, make, openssl (>= 0.9.8), libauthen-sasl-perl, libcgi-session-perl, libdatetime-perl, libdigest-sha1-perl, libexception-class-perl (>=1.22), libio-prompt-perl, liblog-log4perl-perl, libmail-rfc822-address-perl, libnet-ip-perl, libnet-ldap-perl, libnet-server-perl, libparams-validate-perl, libregexp-common-perl, libtemplate-perl, libtest-pod-perl, libtest-pod-coverage-perl, libtext-csv-perl, libxml-parser-perl, libxml-sax-perl, libxml-sax-writer-perl, libxml-simple-perl, libipc-sharelite-perl, libintl-perl, libfilter-perl, libdata-password-perl, libdata-serializer-perl, libdatetime-format-dateparse-perl, libproc-processtable-perl, libsys-sigaction-perl, libtemplate-perl, libworkflow-perl, libxml-filter-xinclude-perl, libxml-validator-schema-perl, libdbi-perl, libdevel-stacktrace-perl, libclass-accessor-perl, libcrypt-openssl-aes-perl, libcrypt-cbc-perl
 Description: OpenXPKI Perl core modules
  OpenXPKI is an Open Source PKI project.
  .

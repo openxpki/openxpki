@@ -1,0 +1,8 @@
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_UPLOAD_PUKS_TITLE') %></H1>
+<p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_UPLOAD_PUKS_DESC') %></p>
+<& /service/open_form.mhtml, action => $context->{menu}->get_root() . '/service/upload_puks/import.html' &>
+
+<& /lib/html/input.mhtml, 'type' => 'file', name => 'upload' &>
+
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>

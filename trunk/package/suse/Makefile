@@ -6,6 +6,7 @@ PACKAGES=\
 	perl-openxpki-client \
 	openxpki-deployment \
 	perl-openxpki-client-html-mason \
+	perl-openxpki-client-html-sc \
 	perl-openxpki-client-scep \
 	openxpki-i18n \
 

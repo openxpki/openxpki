@@ -1,0 +1,10 @@
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_RETRIEVING_TOKEN_ID_TITLE') %></H1>
+<p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_RETRIEVING_TOKEN_ID_DESC') %></p>
+<p>
+<& '/service/reset_token/plugin.mhtml',
+    params => {
+        'Request' => 'GetTokenID',
+        'PostURL' => $m->comp('/lib/rel2abs.mhtml', rel => $context->{menu}->get_root() . '/service/reset_token/delete_tokenid.html'),
+    },
+&>
+</p>

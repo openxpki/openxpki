@@ -20,9 +20,10 @@ use DateTime::Format::Strptime;
 
 use Data::Dumper;
 
-my $workflow_table = 'WORKFLOW';
-my $context_table  = 'WORKFLOW_CONTEXT';
-my $history_table  = 'WORKFLOW_HISTORY';
+my $workflow_table          = 'WORKFLOW';
+my $context_table           = 'WORKFLOW_CONTEXT';
+my $history_table           = 'WORKFLOW_HISTORY';
+my $context_bulk_table      = 'WORKFLOW_CONTEXT_BULK';
 
 # limits
 my $context_value_max_length = 32768;
@@ -71,6 +72,7 @@ sub create_workflow {
 sub update_workflow {
     my $self = shift;
     my $workflow = shift;
+    my $workflow_type = $workflow->type();
     
     ##! 1: "update_workflow"
 
@@ -148,30 +150,26 @@ sub update_workflow {
   PARAMETER:
     foreach my $key (keys %{ $params }) {
         my $value = $params->{$key};
-	# parameters with undefined values are not stored
-	next PARAMETER if (! defined $value);
+        # parameters with undefined values are not stored / deleted
+        if (! defined $value) {
+            # TODO - figure out if deletion is really necessary?
+            # HEAD does not have the delete part ...
+            ##! 4: 'value for key ' . $key . ' is undef, try to delete'
+            eval {
+                $dbi->delete(
+                    TABLE => $context_table,
+                    DATA  => {
+                        WORKFLOW_SERIAL        => $id,
+                        WORKFLOW_CONTEXT_KEY   => $key,
+                    },
+                );
+            };
+            next PARAMETER;
+        }
 
 	##! 2: "persisting context parameter: $key"
 	# ignore "volatile" context parameters starting with an underscore
 	next PARAMETER if ($key =~ m{ \A _ }xms);
-
-	# context parameter sanity checks 
-	if (length($value) > $context_value_max_length) {
-	    ##! 4: "parameter length exceeded"
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG",
-		params  => {
-		    WORKFLOW_ID => $id,
-		    CONTEXT_KEY => $key,
-		    CONTEXT_VALUE_LENGTH => length($value),
-		},
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => 'system',
-		},
-		);
-	}
 
         ##! 2: "persisting context parameter: $key"
         # ignore "volatile" context parameters starting with an underscore
@@ -212,33 +210,95 @@ sub update_workflow {
             );
         }
         
-        ##! 2: "saving context for wf: $id"
-        ##! 16: 'trying to update context entry'
-        my $rows_changed = $dbi->update(
-            TABLE   => $context_table,
-            DATA    => {
-                WORKFLOW_SERIAL        => $id,
-                WORKFLOW_CONTEXT_KEY   => $key,
-                WORKFLOW_CONTEXT_VALUE => $value,
-            },
-            DYNAMIC => {
-                WORKFLOW_SERIAL      => $id,
-                WORKFLOW_CONTEXT_KEY => $key,
-            },
-        );
-        ##! 128: 'update done, key: ' . $key . ', value: ' . $value
+        # find out whether the data is supposed to be written to the
+        # bulk context table, or the normal one.
+        my $bulk = 0;
+        if ($key =~ m{ \A bulk_ }xms) {
+            ##! 64: 'key "$key" starts with bulk_, writing to bulk table'
+            # keys beginning with bulk_ are automatically written to
+            # the bulk table
+            $bulk = 1;
+        }
+        elsif (exists CTX('workflow_bulk_keys')->{$workflow_type}->{keys}->{$key}
+            &&        CTX('workflow_bulk_keys')->{$workflow_type}->{keys}->{$key}) {
+            ##! 64: 'key "$key" is marked as bulk, writing to bulk table'
+            # keys in the global list of bulk keys per workflow, too
+            $bulk = 1;
+        }
+        elsif (exists CTX('workflow_bulk_keys')->{$workflow_type}->{regexs} &&
+               ref    CTX('workflow_bulk_keys')->{$workflow_type}->{regexs} eq 'ARRAY') {
+        # we need to check against the regexs in the global list
+            REGEX:
+            foreach my $regex (@{ CTX('workflow_bulk_keys')->{$workflow_type}->{regexs} }) {
+                ##! 64: 'checking against regex: ' . $regex
+                if ($key =~ $regex) {
+                    $bulk = 1;
+                    last REGEX;
+                }
+            }
+        }
+        if ($bulk) {
+            # the key has been tagged as bulk, which means that
+            # the value might get quite large, so we save it
+            # in the bulk table, which does not have an index on it
+            ##! 2: "saving context for wf: $id"
+            ##! 16: 'trying to update context entry, bulk table'
+            my $rows_changed = $dbi->update(
+                TABLE   => $context_bulk_table,
+                DATA    => {
+                    WORKFLOW_SERIAL             => $id,
+                    WORKFLOW_CONTEXT_KEY        => $key,
+                    WORKFLOW_CONTEXT_VALUE_BULK => $value,
+                },
+                DYNAMIC => {
+                    WORKFLOW_SERIAL      => $id,
+                    WORKFLOW_CONTEXT_KEY => $key,
+                },
+            );
+            ##! 128: 'update done, key: ' . $key . ', value: ' . $value
 
-        if ($rows_changed == 0) {
-            ##! 16: 'update did not work, possibly new key, try insert'
-            $dbi->insert(
-                TABLE => $context_table,
-                HASH => {
+            if ($rows_changed == 0) {
+                ##! 16: 'update did not work, possibly new key, try insert'
+                $dbi->insert(
+                    TABLE => $context_bulk_table,
+                    HASH => {
+                        WORKFLOW_SERIAL             => $id,
+                        WORKFLOW_CONTEXT_KEY        => $key,
+                        WORKFLOW_CONTEXT_VALUE_BULK => $value
+                    }
+                );
+                ##! 128: 'insert done, key: ' . $key . ', value: ' . $value
+            }
+        }
+        else {
+            ##! 2: "saving context for wf: $id"
+            ##! 16: 'trying to update context entry, bulk table'
+            my $rows_changed = $dbi->update(
+                TABLE   => $context_table,
+                DATA    => {
                     WORKFLOW_SERIAL        => $id,
                     WORKFLOW_CONTEXT_KEY   => $key,
-                    WORKFLOW_CONTEXT_VALUE => $value
-                }
+                    WORKFLOW_CONTEXT_VALUE => $value,
+                },
+                DYNAMIC => {
+                    WORKFLOW_SERIAL      => $id,
+                    WORKFLOW_CONTEXT_KEY => $key,
+                },
             );
-            ##! 128: 'insert done, key: ' . $key . ', value: ' . $value
+            ##! 128: 'update done, key: ' . $key . ', value: ' . $value
+
+            if ($rows_changed == 0) {
+                ##! 16: 'update did not work, possibly new key, try insert'
+                $dbi->insert(
+                    TABLE => $context_table,
+                    HASH => {
+                        WORKFLOW_SERIAL        => $id,
+                        WORKFLOW_CONTEXT_KEY   => $key,
+                        WORKFLOW_CONTEXT_VALUE => $value
+                    }
+                );
+                ##! 128: 'insert done, key: ' . $key . ', value: ' . $value
+            }
         }
     }
     
@@ -320,19 +380,31 @@ sub fetch_extra_workflow_data {
     my $dbi = CTX('dbi_workflow');
 
     my $result = $dbi->select(
-	TABLE   => $context_table,
-	DYNAMIC => {
-	    WORKFLOW_SERIAL => $id,
-	},
+        TABLE   => $context_table,
+        DYNAMIC => {
+            WORKFLOW_SERIAL => $id,
+        },
 	);
 
     # new empty context
     my $context = Workflow::Context->new();
     foreach my $entry (@{$result}) {
-	$context->param($entry->{WORKFLOW_CONTEXT_KEY} =>
-			$entry->{WORKFLOW_CONTEXT_VALUE});
+        $context->param($entry->{WORKFLOW_CONTEXT_KEY} =>
+                $entry->{WORKFLOW_CONTEXT_VALUE});
     }
     
+    # fetch data from bulk table, too
+    my $result = $dbi->select(
+        TABLE   => $context_bulk_table,
+        DYNAMIC => {
+            WORKFLOW_SERIAL => $id,
+        },
+	);
+    foreach my $entry (@{$result}) {
+        $context->param($entry->{WORKFLOW_CONTEXT_KEY} =>
+                $entry->{WORKFLOW_CONTEXT_VALUE_BULK});
+    }
+
     # merge context to workflow instance
     $workflow->context($context);
 

@@ -39,40 +39,10 @@ sub get_command {
     my $self  = shift;
     my $ident = ident $self;
     
-    my @certs;
-    my @cert_filenames;
-    eval {
-        @certs = @{$certs_of{$ident}};
-    };
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_TOOL_MAKEJAVAKEYSTORE_COMMAND_CREATE_KEYSTORE_COULD_NOT_GET_CERTIFICATE_ARRAY',
-        );
-    }
-    foreach my $cert (@certs) {
-        push @cert_filenames, $fu_of{$ident}->get_safe_tmpfile({
-            'TMP' => $tmp_of{$ident},
-        });
-        ##! 16: 'filename for certificate: ' . $cert_filenames[-1]
-        $fu_of{$ident}->write_file({
-            FILENAME => $cert_filenames[-1],
-            CONTENT  => $cert,
-            FORCE    => 1,
-        });
-    }
-    my $certfiles = '-cert ';
-    $certfiles .= join ' -cert ', @cert_filenames;
-    ##! 16: 'certfiles: ' . $certfiles
-
-    $outfile_of{$ident} = $fu_of{$ident}->get_safe_tmpfile({
-        'TMP' => $tmp_of{$ident},
-    });
     
-    my $stdin_data = 'keystore='  . $outfile_of{$ident}  . "\n";
-    $stdin_data   .= 'storepass=' . $password_of{$ident} . "\n";
-    $stdin_data   .= 'keypass='   . $password_of{$ident} . "\n";
-    $stdin_data   .= "key=key:\n" . $pkcs8_of{$ident}    . "\n";
+    my $stdin_data = '';
 
+    my $certfiles = '';
     ##! 1: 'end' 
     return {
         COMMAND => [ $certfiles . ' -' ],
@@ -105,6 +75,48 @@ sub get_result
     ##! 1: 'start'
     my $self   = shift;
     my $ident  = ident $self;
+
+    ### HACK HACK HACK
+    ### FIXME
+    ### doing the call directly in here is a hack against SuSEs
+    ### STDIN handling problem
+
+    my @certs;
+    my @cert_filenames;
+    eval {
+        @certs = @{$certs_of{$ident}};
+    };
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_TOOL_MAKEJAVAKEYSTORE_COMMAND_CREATE_KEYSTORE_COULD_NOT_GET_CERTIFICATE_ARRAY',
+        );
+    }
+    foreach my $cert (@certs) {
+        push @cert_filenames, $fu_of{$ident}->get_safe_tmpfile({
+            'TMP' => $tmp_of{$ident},
+        });
+        ##! 16: 'filename for certificate: ' . $cert_filenames[-1]
+        $fu_of{$ident}->write_file({
+            FILENAME => $cert_filenames[-1],
+            CONTENT  => $cert,
+            FORCE    => 1,
+        });
+    }
+    my $certfiles = '-cert ';
+    $certfiles .= join ' -cert ', @cert_filenames;
+    ##! 16: 'certfiles: ' . $certfiles
+    $outfile_of{$ident} = $fu_of{$ident}->get_safe_tmpfile({
+        'TMP' => $tmp_of{$ident},
+    });
+    my $stdin_data = 'keystore='  . $outfile_of{$ident}  . "\n";
+    $stdin_data   .= 'storepass=' . $password_of{$ident} . "\n";
+    $stdin_data   .= 'keypass='   . $password_of{$ident} . "\n";
+    $stdin_data   .= "key=KEY:\n" . $pkcs8_of{$ident}    . "\n";
+
+    open my $CREATE, "|/usr/local/bin/create_javakeystore.real -certfiles $certfiles - >$outfile_of{$ident}" or die "could not open create_javakeystore: $!";
+    print $CREATE $stdin_data;
+    close $CREATE;
+
     return $fu_of{$ident}->read_file($outfile_of{$ident});
 }
 

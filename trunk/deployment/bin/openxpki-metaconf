@@ -160,7 +160,7 @@ use Getopt::Long;
 use File::Spec;
 use Config::Std;
 
-use OpenXPKI::VERSION;
+BEGIN { eval { require OpenXPKI::Version; } }
 
 # use Smart::Comments;
 

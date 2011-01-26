@@ -29,6 +29,7 @@ use OpenXPKI::Server::API::Object;
 use OpenXPKI::Server::API::Secret;
 use OpenXPKI::Server::API::Visualization;
 use OpenXPKI::Server::API::Workflow;
+use OpenXPKI::Server::API::Smartcard;
 
 my %external_of    :ATTR;
 my %method_info_of :ATTR;
@@ -74,6 +75,29 @@ sub BUILD {
 
     $method_info_of{$ident} = {
         ### Default API
+        'deuba_list_available_puks' => {
+            class  => 'Default',
+            params => {
+            },
+        },
+        'deuba_aes_encrypt_puk' => {
+            class  => 'Default',
+            params => {
+                'PUK' => {
+                    type  => SCALAR,
+                    regex => $re_base64_string,
+                },
+            },
+        },
+        'deuba_aes_encrypt_parameter' => {
+            class  => 'Default',
+            params => {
+                'DATA' => {
+                    type  => SCALAR,
+                    regex => $re_all,
+                },
+            },
+        },
         'get_cert_identifier' => {
             class  => 'Default',
             params => {
@@ -146,6 +170,20 @@ sub BUILD {
                 },
             },
             memoize => 1,
+        },
+        'determine_issuing_ca' => {
+            class  => 'Default',
+            params => {
+                'PROFILE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+            },
         },
         'get_approval_message' => {
             class  => 'Default',
@@ -631,6 +669,35 @@ sub BUILD {
                 },
             },
         },
+        'modify_data_pool_entry' => {
+            class  => 'Object',
+            params => {
+                'PKI_REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                'NAMESPACE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                'KEY' => {
+                    type  => SCALAR,
+                    regex => qr{ \A \$? [ \w \- \. : \s ]* \z }xms,
+                },
+                'NEWKEY' => {
+                    type  => SCALAR,
+                    regex => qr{ \A \$? [ \w \- \. : \s ]* \z }xms,
+                },
+                'EXPIRATION_DATE' => {
+                    type  => SCALAR | UNDEF,
+		    # allow integers but also empty string (undef...)
+                    regex => qr{ \A $RE{num}{int}* \z }xms,
+                    optional => 1,
+                },
+            },
+        },
         'list_data_pool_entries' => {
             class  => 'Object',
             params => {
@@ -848,6 +915,11 @@ sub BUILD {
                     regex => $re_integer_string,
                     optional => 1,
                 },
+                'BULK_CONTEXT' => {
+                    type     => SCALAR,
+                    regex    => $re_integer_string,
+                    optional => 1,
+                },
             },
         },
         'search_workflow_instances_count' => {
@@ -869,6 +941,11 @@ sub BUILD {
                 #    regex    => $re_alpha_string,
                 #    parameter content is checked in the method itself
                 #    because we can't check the array ref entries here
+                    optional => 1,
+                },
+                'BULK_CONTEXT' => {
+                    type     => SCALAR,
+                    regex    => $re_integer_string,
                     optional => 1,
                 },
             },
@@ -914,6 +991,87 @@ sub BUILD {
                 },
             },
         },
+
+
+
+        ### Smartcard API
+        'sc_analyze_certificate' => {
+            class  => 'Smartcard',
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+                'DATA' => {
+                    type  => SCALAR,
+                    regex => $re_cert_string,
+                },
+                'CERTFORMAT' => {
+                    type  => SCALAR,
+                    regex => $re_cert_string,
+                },
+                'DONTPARSE' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+            },
+        },
+
+        'sc_parse_certificates' => {
+            class  => 'Smartcard',
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+                'CERTS' => {
+                    type  => ARRAYREF,
+                    #regex => qr{ \A [A-Za-z0-9\+/=_\-\ \n]+ \z }xms;,
+                },
+                'CERTFORMAT' => {
+                    type  => SCALAR,
+                    regex => $re_cert_string,
+                    optional => 1,
+                },
+            },
+        },
+
+        'sc_analyze_smartcard' => {
+            class  => 'Smartcard',
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+                'CERTS' => {
+                    type  => ARRAYREF,
+		    #regex => $re_cert_string,
+			   },
+                'CERTFORMAT' => {
+                    type  => SCALAR,
+                    regex => $re_cert_string,
+                    optional => 1,
+                },
+		'SMARTCARDID' => {
+                    type => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+		'USERID' => {
+                    type => SCALAR,
+                    regex => $re_sql_string,
+                    optional => 1,
+                },
+		'WORKFLOW_TYPES' => {
+                    type => ARRAYREF,
+                    optional => 1,
+                },
+            },
+        },
+
     };
 }
 

@@ -22,14 +22,10 @@
 <& /service/close_form.mhtml &>
 
 <dl>
-  <dt><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_INTERNET_EXPLORER") %></dt>
-  <dd><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_INTERNET_EXPLORER_KEYGEN") %></dd>
-  <dt><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC") %></dt>
-  <dd><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC_KEYGEN") %></dd>
-  <dt><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE") %></dt>
-  <dd><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE_KEYGEN") %></dd>
   <dt><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10") %></dt>
   <dd><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10_KEYGEN") %></dd>
+  <dt><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE") %></dt>
+  <dd><% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE_KEYGEN") %></dd>
 </dl>
 
 <%init>
@@ -81,13 +77,13 @@
         {
             push @values, {VALUE => "SPKAC", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_SPKAC"};
         }
-        elsif ($entry eq "SERVERSIDE")
-        {
-            push @values, {VALUE => "SERVERSIDE", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"};
-        }
         elsif ($entry eq "PKCS10")
         {
             push @values, {VALUE => "PKCS10", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_PKCS10"};
+        }
+        elsif ($entry eq "SERVERSIDE")
+        {
+            push @values, {VALUE => "SERVERSIDE", LABEL => "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"};
         }
         elsif ($entry eq "AUTO")
         {

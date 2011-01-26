@@ -1,0 +1,94 @@
+<%init>
+    use CGI;
+    use XML::Simple;
+    use Data::Dumper;
+    use OpenXPKI::Tests;
+    use English;
+
+    my $error;
+    my $file;
+    eval {
+        $file = $r->upload('upload');
+        $file = $file->fh() if (index (ref $file, "::Upload") > -1);
+    };
+    if (! defined $file) {
+        # eval failed, so we are apparently not using mod_perl, do it
+        # 'the CGI way'
+        my %args = $m->request_args();
+        my $query = CGI->new(\%args);
+        $file = $query->upload('upload'); 
+    }
+
+    my $parsed;
+    eval {
+        $parsed = XMLin($file);
+    };
+    # error checking
+    if (! defined $parsed) {
+	$error = "Could not parse XML data file\n";
+    }
+    elsif (ref $parsed ne 'HASH') {
+	$error = "Invalid XML structure\n";
+    }
+    elsif (! defined $parsed->{Name} || ($parsed->{Name} ne 'SID800')) {
+	$error = "WARNING: Input data does not seem to be a SID800 file\n";
+    }
+    elsif ($parsed->{FormatVersion} ne '1.0') {
+	$error = "WARNING: Unsupported format version\n";
+    }
+    elsif (! defined $parsed->{Token} || ref $parsed->{Token} ne 'ARRAY') {
+	$error = "WARNING: Input data does not include Token data\n";
+    }
+
+    my $serializer = OpenXPKI::Serialization::Simple->new({
+        SEPARATOR => '-',
+    });
+    my %data;
+    foreach my $item (@{$parsed->{Token}}) {
+	my $key = $parsed->{Name} . ':' .  $item->{SmartChipSN};
+	delete $item->{SmartChipSN};
+
+	$data{$key} = $serializer->serialize($item);
+    }
+    
+    print Dumper \%data;
+    my $msg = $context->{client}->send_receive_command_msg(
+ 	'create_workflow_instance',
+ 	{
+ 	    WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE',
+ 	    PARAMS => {
+	    },
+ 	},
+ 	);
+    
+    if (is_error_response($msg)) {
+	$error = "Could not create workflow instance\n";
+    }
+    my $wf_id = $msg->{PARAMS}->{WORKFLOW}->{ID};
+
+    $msg = $context->{client}->send_receive_command_msg(
+	'execute_workflow_activity',
+	{
+	    ACTIVITY => 'store_password',
+	    ID       => $wf_id,
+	    PARAMS   => {
+		_input_data => \%data,
+	    },
+	    WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE',
+	},
+    );
+
+    if (is_error_response($msg)) {
+	$error = "Could not insert password data. This error may also occur because of a timeout. In this case, the PUKs will most probably be imported just fine - please check if they have been imported by looking at 'Show available PUK serials' in a few minutes.\n";
+    }
+</%init>
+
+% if ($error) {
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_UPLOAD_PUKS_IMPORT_ERROR_TITLE') %></H1>
+<p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_UPLOAD_PUKS_IMPORT_ERROR_DESC', '__ERROR__' => $error) %></p>
+% }
+% else {
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_UPLOAD_PUKS_UPLOAD_SUCCESSFUL_TITLE') %></H1>
+<p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_UPLOAD_PUKS_UPLOAD_SUCCESSFUL_DESC') %></p>
+% }
+

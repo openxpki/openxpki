@@ -21,8 +21,9 @@ use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 use OpenXPKI::Server::Workflow::Observer::Log;
 use OpenXPKI::Serialization::Simple;
 
-my $workflow_table = 'WORKFLOW';
-my $context_table  = 'WORKFLOW_CONTEXT';
+my $workflow_table         = 'WORKFLOW';
+my $context_table          = 'WORKFLOW_CONTEXT';
+my $context_bulk_table     = 'WORKFLOW_CONTEXT_BULK';
 my $workflow_history_table = 'WORKFLOW_HISTORY';
 
 sub START {
@@ -739,8 +740,42 @@ sub search_workflow_instances_count {
 sub search_workflow_instances {
     my $self     = shift;
     my $arg_ref  = shift;
-    my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
+    my @results;
 
+    $arg_ref->{CONTEXT_TABLE} = $context_table;
+    my $results = $self->__search_workflow_instances($arg_ref);
+    if (! ref $results eq 'ARRAY') {
+        ##! 16: 'ref results: ' . ref $results
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_SEARCH_RESULT_NOT_ARRAYREF',
+        );
+    }
+    @results = @{ $results };
+    ##! 64: 'results after searching with normal context table: ' . Dumper \@results if (scalar @results < 10)
+    if ($arg_ref->{BULK_CONTEXT}) {
+        ##! 16: 'BULK_CONTEXT argument, searching on bulk context as well'
+        # it was requested that we also search the bulk context table
+        $arg_ref->{CONTEXT_TABLE} = $context_bulk_table;
+        my $bulk_results = $self->__search_workflow_instances($arg_ref);
+
+        if (! ref $bulk_results eq 'ARRAY') {
+            ##! 16: 'ref bulk_results: ' . ref $bulk_results
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_BULK_SEARCH_RESULT_NOT_ARRAYREF',
+            );
+        }
+        push @results, @{ $bulk_results };
+        ##! 64: 'results after searching on bulk context table: ' . Dumper \@results if (scalar @results < 10)
+    }
+    return \@results;
+}
+ 
+sub __search_workflow_instances {
+    my $self                 = shift;
+    my $arg_ref              = shift;
+    my $context_table_to_use = $arg_ref->{CONTEXT_TABLE};
+
+    my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
     my $dbi = CTX('dbi_workflow');
     # commit to get a current snapshot of the database in the
     # highest isolation level.
@@ -775,12 +810,17 @@ sub search_workflow_instances {
     # );
     my $i = 0;
     foreach my $context_entry (@context) {
-        my $table_alias = $context_table . '_' . $i;
+        my $table_alias = $context_table_to_use . '_' . $i;
         my $key   = $context_entry->{KEY};
         my $value = $context_entry->{VALUE};
         $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_KEY'}   = $key;
-        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_VALUE'} = $value;
-        push @tables, [ $context_table => $table_alias ];
+        if ($context_table_to_use eq $context_table) {
+            $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_VALUE'} = $value;
+        }
+        elsif ($context_table_to_use eq $context_bulk_table) {
+            $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_VALUE_BULK'} = $value;
+        }
+        push @tables, [ $context_table_to_use => $table_alias ];
         push @joins, 'WORKFLOW_SERIAL';
         $i++;
     }
@@ -875,7 +915,7 @@ sub search_workflow_instances {
     ##! 16: 'result: ' . Dumper $result
     return $result;
 }
- 
+
 ###########################################################################
 # private functions
 

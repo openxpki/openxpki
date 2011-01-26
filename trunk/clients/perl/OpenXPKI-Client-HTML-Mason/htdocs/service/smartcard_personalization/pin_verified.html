@@ -1,0 +1,84 @@
+<%args>
+</%args>
+<%once>
+use Data::Dumper;
+</%once>
+<%init>
+my $wf_type = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2';
+my @errors;
+
+my $wf_id = $m->request_args()->{WF_ID};
+my $pincache = $m->request_args()->{CachedPIN};
+
+my $i_msg = $context->{client}->send_receive_command_msg(
+    'get_workflow_info',
+    {
+	WORKFLOW => $wf_type,
+	ID       => $wf_id,
+    },
+    );
+if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
+    @errors = [ $m->comp('/lib/get_deep_error.mhtml', 'msg' => $i_msg) ] ;
+}
+my $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+my $wf_state = $wf_info->{STATE};
+
+my $comp_args = $m->request_args();
+
+if ($wf_info->{STATE} eq 'PIN_MISSING') {
+    if ($comp_args->{Result} eq 'SUCCESS') {
+	if (defined $comp_args->{CachedPIN}) {
+	    # pin cache is present
+	    $i_msg = $context->{client}->send_receive_command_msg(
+		'execute_workflow_activity',
+		{
+		    WORKFLOW => $wf_type,
+		    ID       => $wf_id,
+		    ACTIVITY => 'pincache',
+		    PARAMS   => {
+			cachedpin => $comp_args->{CachedPIN},
+		    },
+		});
+	} else {
+	    # no pin cache supplied
+	    $i_msg = $context->{client}->send_receive_command_msg(
+		'execute_workflow_activity',
+		{
+		    WORKFLOW => $wf_type,
+		    ID       => $wf_id,
+		    ACTIVITY => 'null',
+		});
+	}
+	if (exists $i_msg->{SERVICE_MSG} and
+	    $i_msg->{SERVICE_MSG} eq "ERROR") {
+	    @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $i_msg);
+	}
+	else 
+	{
+	    $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+	}
+    } elsif ($comp_args->{Result} eq 'CANCEL') {
+	# user pressed cancel
+	$i_msg = $context->{client}->send_receive_command_msg(
+	    'execute_workflow_activity',
+	    {
+		WORKFLOW => $wf_type,
+		ID       => $wf_id,
+		ACTIVITY => 'cancel_workflow',
+	    });
+	if (exists $i_msg->{SERVICE_MSG} and
+	    $i_msg->{SERVICE_MSG} eq "ERROR") {
+	    @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $i_msg);
+	}
+	else 
+	{
+	    $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+	}
+    }
+}
+
+# prepare arguments for page reload
+my $params = "WF_ID=$wf_id";
+
+</%init>
+% $m->redirect("check_status.html?WF_ID=$wf_id");

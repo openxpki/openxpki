@@ -54,9 +54,10 @@ $data = "-----BEGIN HEADER-----\n".
 my $csr = OpenXPKI::Crypto::CSR->new (TOKEN => $token, DATA => $data);
 ok(1);
 
+my $expected_subject = decode_utf8("CN=John Dö,DC=OpenXPKI,DC=org");
 ## test parser
-is ($csr->get_parsed("BODY", "SUBJECT"), "CN=John Dö,DC=OpenXPKI,DC=org");
-is ($csr->get_parsed("SUBJECT"), "CN=John Dö,DC=OpenXPKI,DC=org");
+is ($csr->get_parsed("BODY", "SUBJECT"), $expected_subject);
+is ($csr->get_parsed("SUBJECT"), $expected_subject);
 is ($csr->get_parsed("BODY", "KEYSIZE"), 1024);
 is ($csr->get_parsed("HEADER", "ROLE"), "User");
 is ($csr->get_serial(), 4321);
@@ -68,7 +69,7 @@ is ($csr->get_parsed("HEADER", "GLOBAL_ID"), 1234);
 ## test deep copy for client interfaces
 my $ref = $csr->get_info_hash();
 is (ref $ref, "HASH");
-is ($ref->{BODY}->{SUBJECT}, "CN=John Dö,DC=OpenXPKI,DC=org");
+is ($ref->{BODY}->{SUBJECT}, $expected_subject);
 
 ## test conversion
 ok ($csr->get_converted ("PEM"));

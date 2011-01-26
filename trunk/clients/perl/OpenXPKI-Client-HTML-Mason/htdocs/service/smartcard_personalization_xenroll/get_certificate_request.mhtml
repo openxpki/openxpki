@@ -1,0 +1,166 @@
+<%args>
+    $wf_info => undef
+    $steps   => undef
+    $csp     => undef
+    $bits    => undef
+</%args>
+<%once>
+    use OpenXPKI::Serialization::Simple;
+    my $ser = OpenXPKI::Serialization::Simple->new();
+</%once>
+<%init>
+    my $cert_issuance_data = $wf_info->{CONTEXT}->{cert_issuance_data};
+    my @begins = ($cert_issuance_data =~ m{-----BEGIN\ CERTIFICATE\ REQUEST-----}xmsg); 
+    my $nr_of_already_created_csrs = scalar @begins;
+    my $current_csr = $nr_of_already_created_csrs + 1;
+    my $total_csrs = $wf_info->{CONTEXT}->{nr_of_certs};
+    my $current_step = $current_csr;
+
+    my $loginid = $wf_info->{CONTEXT}->{ldap_dbntloginid};
+    my @login_ids;
+    my @select_values = ();
+    if ($loginid =~ m{\A ARRAY }xms) {
+        # we have a choice
+        @login_ids = @{ $ser->deserialize($loginid) };
+        foreach my $login_id (@login_ids) {
+            push @select_values, {
+                VALUE => $login_id,
+                LABEL => $login_id,
+            };
+        }
+    }
+    my $chosen_loginid = $wf_info->{CONTEXT}->{chosen_loginid};
+</%init>
+
+<& /service/open_form.mhtml &>
+% if ($current_csr > 1) { # it is not the first time we are called, but there are more certificate requests to be generated
+<& /lib/html/hidden.mhtml, 'name' => 'chosen_loginid', 'value' => $chosen_loginid &>
+<div id="text">
+<h1> <% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_MORE_CSRS_TITLE',
+                    '__CURRENTSTEP__' => $current_step,
+                    '__STEPS__' => $steps) %> </h1>
+<p> <% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_MORE_CERTIFICATE_REQUESTS_TO_BE_GENERATED', '__CURRENTCSR__' => $current_csr, '__TOTALCSRS__', $total_csrs) %></p>
+</div>
+<p>
+<div align="center">
+<select style="color: red; font-weight: bolder; font-size: medium; background-color: #ffffff; display: none" id="warning">
+<option><% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_BROWSER_WHITENING_WARNING') %></option>
+</select>
+</div>
+</p>
+% }
+% else { # first page
+<div id="text">
+<h1> <% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_TITLE',
+                    '__CURRENTSTEP__' => $current_step,
+                    '__STEPS__' => $steps) %> </h1>
+<p> <% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_INTRO_TEXT') %> </p>
+<table>
+%     my @map_array = split/, /, $wf_info->{CONTEXT}->{display_mapping};
+%     foreach (@map_array) {
+%        my ($key, $value) = /(.*) -> (.*)/;
+<tr>
+  <td><% i18nGettext($value) %></td>
+  <td><% $wf_info->{CONTEXT}->{'ldap_' . $key} %></td>
+</tr>
+%     }
+</table>
+<p>
+%     if (scalar @login_ids) {
+<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_CHOOSE_PRIMARY_ACCOUNT_DESC') %>
+<p>
+<table>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_PRIMARY_ACCOUNT') %></td>
+    <td>
+<& '/lib/html/select.mhtml', name => 'chosen_loginid', values => \@select_values &>
+    </td>
+  </tr>
+</table>
+%     }
+%     else {
+%         # no choice, just pass the login id in a hidden field
+          <& /lib/html/hidden.mhtml, 'name' => 'chosen_loginid', 'value' => $loginid &>
+%     }
+% }
+<p>
+</div>
+<div align="center">
+<select style="color: red; font-weight: bolder; font-size: medium; background-color: #ffffff; display: none" id="warning">
+<option><% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_BROWSER_WHITENING_WARNING') %></option>
+</select>
+</div>
+</p>
+
+<& /lib/javascript.mhtml &>
+
+%    if (! defined $csp) {
+%        $csp = $wf_info->{CONTEXT}->{client_csp};
+%    }
+%    my $bitlength = $bits;
+%    if (! defined $bitlength) {
+%        $bitlength = $wf_info->{CONTEXT}->{client_bitlength};
+%    }
+<script type="text/javascript">
+<!--
+    function DisableButtonAndCreateCSR() {
+        document.getElementById('text').style.display = 'none';
+        document.OpenXPKI.Submit.style.display = 'none';
+        document.getElementById('warning').style.display = 'inline';
+        if (navigator.appName != 'Microsoft Internet Explorer') {
+            alert('<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_IE_NEEDED') %>');
+            return;
+        }
+        if (! checkCSPPresent("<% $csp %>")) {
+            alert('<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MAOSN_SMARTCARD_PERSONALIZATION_CSP_NOT_PRESENT') %>');
+            return;
+        }
+        CreateCSR('silent');
+        document.OpenXPKI.Submit.disabled = true;
+        //document.OpenXPKI.Submit.style.display = 'none';
+        document.OpenXPKI.submit();
+    }
+-->
+</script>
+% # 'action' is necessary as this might be called from a different
+% # URL, i.e. right after authentication
+<& /service/open_form.mhtml &>
+<& /lib/html/select.mhtml, 
+    'name' => 'csp', 
+    'default' => [ $csp ], 
+    'values' => [
+        {
+	    VALUE => $csp,
+	    LABEL => $csp,
+	},
+        {
+	    VALUE => 'Microsoft Base Smart Card Crypto Provider',
+	    LABEL => 'Microsoft Base Smart Card Crypto Provider',
+	},
+        {
+	    VALUE => 'SafeSign Standard Cryptographic Service Provider',
+	    LABEL => 'SafeSign Standard Cryptographic Service Provider',
+	},
+    ],    
+&>
+<& /lib/html/select.mhtml, 
+    'name' => 'bits', 
+    'default' => [ $bitlength ],
+    'values' => [
+        {
+	    VALUE => '1024',
+	    LABEL => '1024',
+	},
+        {
+	    VALUE => '2048',
+	    LABEL => '2048',
+	},
+    ]
+&>
+<& /lib/html/hidden.mhtml, 'name' => 'pkcs10', 'value' => '' &>
+<& /lib/html/hidden.mhtml, 'name' => 'ie_subject', 'value' => 'dc=dummy,dc=subject,dc=for,cn=MSIE' &>
+<input type="button"
+       name="Submit"
+       value="<% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_CREATE_IE_CSR') %>"
+       onClick="DisableButtonAndCreateCSR()"/>
+<& /service/close_form.mhtml &>

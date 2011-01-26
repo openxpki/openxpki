@@ -108,6 +108,7 @@ sub execute {
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND',
 	    params => {
 		FILTER => "$key=$value",
+                BASEDN => $ldap_basedn,
 	    },
 	    log => {
 		logger => CTX('log'),
@@ -133,11 +134,19 @@ sub execute {
     foreach my $entry ($mesg->entries) {
         ##! 32: 'foreach entry'
         foreach my $attrib ($entry->attributes) {
-            # TODO: handle non-scalar attributes (serialization)
             ##! 32: 'foreach attrib: ' . $attrib
-            $context->param(
-                'ldap_' . $attrib => $entry->get_value($attrib),
-            );
+            my @values = $entry->get_value($attrib);
+            ##! 32: 'attrib values: ' . Dumper \@values
+            if (scalar @values == 1) { # scalar
+                $context->param(
+                    'ldap_' . $attrib => $values[0],
+                );
+            }
+            else { # non-scalar, serialize
+                $context->param(
+                    'ldap_' . $attrib => $serializer->serialize(\@values),
+                );
+            }
         }
     }
 

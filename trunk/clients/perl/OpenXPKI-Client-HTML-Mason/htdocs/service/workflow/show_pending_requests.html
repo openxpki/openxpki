@@ -35,10 +35,10 @@ function ToggleAll() {
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_PROFILE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_ROLE') %></th>
 % if ($creator eq '%') {
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATOR') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TICKET_OWNER') %></th>
 % }
   </tr>
 % foreach my $res (@results) {
@@ -57,7 +57,7 @@ function ToggleAll() {
     </td>
     <td>
 % foreach my $ticket (@{ $res->{'TICKETS'} }) {
-<small><a href="<% $ticket->{URL} %>"><% $ticket->{ID} %></a></small><br>
+<a href="<% $ticket->{URL} %>"><% $ticket->{ID} %></a>
 % }
     </td>
     <td><% $res->{'LAST_UPDATE'} %></td>
@@ -88,11 +88,11 @@ function ToggleAll() {
 %      }
 %   }
     </td>
-    <td><% i18nGettext($res->{'PROFILE'}) %></td>
     <td><% i18nGettext($res->{'ROLE'}) %></td>
 %   if ($creator eq '%') {
 <td><a href="<% $context->{menu}->get_root() %>/service/workflow/show_pending_requests.html?creator=<% $res->{'CREATOR'} %>;show_approval_buttons=1;<% $context->{menu}->get_link_params() %>"><% $res->{'CREATOR'} %></a></td>
 %   }
+  <td><% $res->{TICKETS}->[0]->{INFO}->{Owner} %></td>
   </tr>
 % }
 </table>
@@ -200,7 +200,15 @@ foreach my $instance (@instances) {
                     TICKET   => $tickets->{$key},
                 },
             );
-            $ticket_entry->{URL} = $url_msg->{PARAMS};
+            my $info_msg = $context->{client}->send_receive_command_msg(
+                'get_ticket_info',
+                {
+                    NOTIFIER => $key,
+                    TICKET   => $tickets->{$key},
+                },
+            );
+            $ticket_entry->{INFO} = $info_msg->{PARAMS};
+            $ticket_entry->{URL}  = $url_msg->{PARAMS};
             push @tickets, $ticket_entry;
         }
     }
@@ -213,10 +221,13 @@ foreach my $instance (@instances) {
         },
     )->{PARAMS};
 
+    my $subject = $wf_context->{'cert_subject'};
+    $subject =~ s/,O=Deutsche Bank AG,DC=db,DC=com//;
+
     push @results, {
         'SERIAL'            => $instance->{'WORKFLOW.WORKFLOW_SERIAL'},
         'LAST_UPDATE'       => $instance->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-        'SUBJECT'           => $wf_context->{'cert_subject'},
+        'SUBJECT'           => $subject,
         'SUBJECT_ALT_NAMES' => \@subject_alt_names,
         'PROFILE'           => $wf_context->{'cert_profile'},
         'ROLE'              => $wf_context->{'cert_role'},

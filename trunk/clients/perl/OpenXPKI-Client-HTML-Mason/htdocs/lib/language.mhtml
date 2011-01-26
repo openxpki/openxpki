@@ -2,6 +2,10 @@
     $session_id => undef
 </%args>
 <%init>
+    return set_language('en_GB');
+
+    ## TODO - more translations so that language selection is possible
+    ## again
     ## try to detect the language from a parameter
     my %args = $m->request_args();
     if (exists $args{'__language'} && $args{'__language'})

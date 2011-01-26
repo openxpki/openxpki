@@ -2,30 +2,183 @@ use strict;
 use warnings;
 use Carp;
 use English;
-use Test::More qw(no_plan);
 
-#plan tests => 8;
-
-use OpenXPKI::Tests;
-use OpenXPKI::Client;
 use Data::Dumper;
-use OpenXPKI::Serialization::Simple;
 
-diag("Smartcard Unblock workflow\n");
-our $debug = 0;
+package OpenXPKI::Tests::More::SmartcardUnblock;
+use base qw( OpenXPKI::Tests::More );
+sub wftype { return 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK' }
+
+sub puk_upload {
+    my ( $self, $tok, $puk ) = @_;
+    my ( $id, $msg );
+    my $wf_type_puk = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PUK_UPLOAD';
+
+    if ( !$self->create( $wf_type_puk, { token_id => $tok, _puk => $puk } ) )
+    {
+        $@ = "Error creating puk upload workflow instance: $@";
+        return;
+    }
+    return 1;
+}
+
+#
+# usage: my $code = $test->get_code( USER, PASS );
+#
+sub get_code {
+    my ( $self, $u, $p ) = @_;
+    warn "Entered get_code($u, $p)" if $self->get_verbose();
+
+
+    $self->connect( user => $u, password => $p )
+        or return;
+
+    my $state = $self->state()
+        or return;
+
+    unless ( $state =~ /^(PEND_ACT_CODE|PEND_PIN_CHANGE)$/ ) {
+        $@
+            = "Error: workflow state must be PEND_ACT_CODE or PEND_PIN_CHANGE to get code";
+        return;
+    }
+
+    $self->execute( 'generate_activation_code', {} )
+        or return;
+
+    my $ret = $self->param('_password');
+    $ret = '<undef>' unless defined $ret;
+    $self->diag( $self->get_wfid(), "/$u code: " . $ret );
+
+    $self->disconnect();
+
+    return $ret;
+}
+
+###################################################
+# These routines represent individual tasks
+# done by a user. If there is an error in a single
+# step, undef is returned. The reason is in $@ and
+# on success, $@ contains Dumper($msg) if $msg is
+# not normally returned.
+#
+# Each routine takes care of login and logout.
+###################################################
+
+# create_request covers the steps on the first page of the flowchart
+# document. The user supplies the authorizing persons and the next
+# step is for the authorizing persons to fetch their codes.
+#
+# On error, C<undef> is returned and the reason is in C<$@>.
+#
+# usage: $test->create_request( USER, PASS, TOKENID, AUTH1, AUTH2 );
+#
+sub create_request {
+    my ( $self, $u, $p, $t, $a1, $a2 ) = @_;
+    my ( $id, $msg );
+
+    if ( not $self->connect() ) {
+        $@ = "Failed to connect as anonymous";
+        return;
+    }
+
+    if ( not $self->create( $self->wftype, { token_id => $t } ) ) {
+        $@ = "Error creating workflow instance: ";    # . $self->dump;
+        return;
+    }
+
+    if ( not $self->state eq 'HAVE_TOKEN_OWNER' ) {
+        $@ = "Error - new workflow in wrong state: " . $self->state;
+        return;
+    }
+
+    if (not $self->execute(
+            'store_auth_ids', { auth1_id => $a1, auth2_id => $a2 }
+        )
+        )
+    {
+        $@ = "Error storing auth IDs";    # . $self->dump;
+        return;
+    }
+
+    if ( not $self->state eq 'PEND_ACT_CODE' ) {
+        $@ = "Error - new workflow in wrong state: " . $self->state;
+        return;
+    }
+
+    $self->disconnect();
+
+    return $self;
+}
+
+# Check auth codes
+#
+# usage: $test->verify_codes( USER, PASS, CODE1, CODE2 );
+#
+sub verify_codes {
+    my ( $self, $u, $p, $ac1, $ac2 ) = @_;
+    my ( $ret, $msg, $state );
+
+    if ( not $self->connect() ) {
+        $@ = "Failed to connect as anonymous";
+        return;
+    }
+
+    if ( not $self->state eq 'PEND_PIN_CHANGE' ) {
+        $@ = "Error - wrong state (" . $self->state . ") for pin change";
+        return;
+    }
+
+    if (not $self->execute(
+            'post_codes',
+            {   _auth1_code => $ac1,
+                _auth2_code => $ac2,
+            }
+        )
+        )
+    {
+        $@ = "Error running post_codes: " . $self->dump;
+        return;
+    }
+
+    if ( not $self->state eq 'CAN_FETCH_PUK' ) {
+        $@ = "Error - wrong state (" . $self->state . ") for fetching puk";
+        return;
+    }
+
+    if ( not $self->execute( 'fetch_puk', {} ) ) {
+        $@ = "Error running fetch_puk: " . $self->dump;
+        return;
+    }
+
+    if ( not $self->state eq 'CAN_WRITE_PIN' ) {
+        $@ = "Error - wrong state (" . $self->state . ") for pin change";
+        return;
+    }
+
+    if ( not $self->execute( 'write_pin_ok', {} ) ) {
+        $@ = "Error running write_pin_ok: " . $self->dump;
+        return;
+    }
+
+    if ( not $self->state eq 'SUCCESS' ) {
+        $@ = "Error - wrong state (" . $self->state . ") for finish";
+        return;
+    }
+
+    $self->disconnect();
+
+    return $self;
+}
+
+package main;
+
 my $sleep = 0;    # set to '1' to cause pause between transactions
 
-my $realm = 'User TEST CA';
-
-# reuse the already deployed server
-#my $instancedir = 't/60_workflow/test_instance';
+my $realm       = 'User TEST CA';
 my $instancedir = '';
 my $socketfile  = $instancedir . '/var/openxpki/openxpki.socket';
-my $pidfile     = $instancedir . '/var/openxpki/openxpki.pid';
-
 my $tok_id;
-my $wf_type     = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK';
-my $wf_type_puk = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PUK_UPLOAD';
+my $wf_type = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK';
 my ( $msg, $wf_id, $client );
 
 my %act_test = (
@@ -50,471 +203,174 @@ my %act_test = (
         role => 'User',
         code => '',
     },
+    auth3 => {
+        name => 'CHANGEME@CHANGEME',
+        role => 'User',
+        code => '',
+    },
 );
 
-#
-# $client = wfconnect( USER, PASS );
-#
-sub wfconnect {
-    my ( $u, $p ) = @_;
-    my $c = OpenXPKI::Client->new(
-        {
-            TIMEOUT    => 100,
-            SOCKETFILE => $instancedir . '/var/openxpki/openxpki.socket',
-        }
-    );
-    login(
-        {
-            CLIENT   => $c,
-            USER     => $u,
-            PASSWORD => $p,
-        }
-    ) or croak "Login as $c failed: $@";
-    return $client = $c;
-}
+# DATA FOR USING IN MY VM TEST GUEST
+$act_test{user}->{name}  = 'user002@local';
+$act_test{user}->{token} = 'gem2_002';
+$act_test{user}->{puk}   = '2234';
+$act_test{auth1}->{name} = 'user003@local';
+$act_test{auth2}->{name} = 'user004@local';
+$act_test{auth3}->{name} = 'user005@local';
+$realm                   = undef;
 
-sub wfdisconnect {
-    eval { $client && $client->send_receive_service_msg('LOGOUT'); };
-    $client = undef;
-}
-
-#
-# usage: my $msg = wfexec( ID, ACTIVITY, { PARAMS } );
-#
-sub wfexec {
-    my ( $id, $act, $params ) = @_;
-    my $msg;
-
-    croak("Unable to exec action '$act' on closed connection")
-        unless defined $client;
-
-    $msg = $client->send_receive_command_msg(
-        'execute_workflow_activity',
-        {   'ID'       => $id,
-            'ACTIVITY' => $act,
-            'PARAMS'   => $params,
-            'WORKFLOW' => $wf_type,
-        },
-    );
-    return $msg;
-
-}
-
-#
-# usage: my $state = wfstate( ID );
-# Note: $@ contains either error message or Dumper($msg)
-#
-sub wfstate {
-    my ($id) = @_;
-    my ( $msg, $state );
-    my $disc = 0;
-    $@ = '';
-
-    unless ($client) {
-        $disc++;
-        unless ( $client
-            = wfconnect( $act_test{user}->{name}, $act_test{user}->{role} ) )
-        {
-            $@ = "Failed to connect as " . $act_test{user}->{name};
-            return;
-        }
-    }
-    $msg = $client->send_receive_command_msg( 'get_workflow_info',
-        { 'WORKFLOW' => $wf_type, 'ID' => $id, } );
-    if ( is_error_response($msg) ) {
-        $@ = "Error running get_workflow_info: " . Dumper($msg);
-        return;
-    }
-    $@ = Dumper($msg);
-    if ($disc) {
-        wfdisconnect();
-    }
-    return $msg->{PARAMS}->{WORKFLOW}->{STATE};
-}
-
-#
-# usage: my $param = wfparam( ID, PARAM );
-# Note: $@ contains either error message or Dumper($msg)
-#
-sub wfparam {
-    my ( $id, $name ) = @_;
-    my ( $msg, $state );
-    my $disc = 0;
-    $@ = '';
-
-    unless ($client) {
-        $disc++;
-        unless ( $client
-            = wfconnect( $act_test{user}->{name}, $act_test{user}->{role} ) )
-        {
-            $@ = "Failed to connect as " . $act_test{user}->{name};
-            return;
-        }
-    }
-    $msg = $client->send_receive_command_msg( 'get_workflow_info',
-        { 'WORKFLOW' => $wf_type, 'ID' => $id, } );
-    if ( is_error_response($msg) ) {
-        $@ = "Error running get_workflow_info: " . Dumper($msg);
-        return;
-    }
-    $@ = Dumper($msg);
-    if ($disc) {
-        wfdisconnect();
-    }
-    diag( "msg=" . Dumper($msg) );
-    return $msg->{PARAMS}->{WORKFLOW}->{STATE};
-}
-
-###################################################
-# The wftask_* routines represent individual tasks
-# done by a user. If there is an error in a single
-# step, undef is returned. The reason is in $@ and
-# on success, $@ contains Dumper($msg) if $msg is
-# not normally returned.
-#
-# Each routine takes care of login and logout.
-###################################################
-#
-# usage: my $id = wftask_create( USER, PASS, TOKENID, AUTH1, AUTH2 );
-#
-sub wftask_create {
-    my ( $u, $p, $t, $a1, $a2 ) = @_;
-    my ( $id, $msg );
-
-    unless ( $client = wfconnect( $u, $p ) ) {
-        $@ = "Failed to connect as $u";
-        return;
-    }
-
-    $msg = $client->send_receive_command_msg(
-        'create_workflow_instance',
-        {   PARAMS   => { token_id => $t },
-            WORKFLOW => $wf_type,
-        }
-    );
-    if ( is_error_response($msg) ) {
-        $@ = "Error creating workflow instance: " . Dumper($msg);
-        return;
-    }
-
-    $id = $msg->{PARAMS}->{WORKFLOW}->{ID};
-
-    unless ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'HAVE_TOKEN_OWNER' ) {
-        $@ = "Error - new workflow in wrong state: " . Dumper($msg);
-        return;
-    }
-
-    $msg = wfexec( $id, 'store_auth_ids',
-        { auth1_id => $a1, auth2_id => $a2 } );
-    if ( is_error_response($msg) ) {
-        $@ = "Error storing auth IDs: " . Dumper($msg);
-        return;
-    }
-    unless ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'PEND_ACT_CODE' ) {
-        $@ = "Error - new workflow in wrong state: " . Dumper($msg);
-        return;
-    }
-
-    wfdisconnect();
-
-    #	eval {
-    #	    $msg = $client->send_receive_service_msg('LOGOUT');
-    #	};
-
-    return $id;
-}
-
-sub wftask_puk_upload {
-    my ( $u, $p, $tok, $puk ) = @_;
-    my ( $id, $msg );
-
-    unless ( $client = wfconnect( $u, $p ) ) {
-        $@ = "Failed to connect as $u";
-        return;
-    }
-
-    $msg = $client->send_receive_command_msg(
-        'create_workflow_instance',
-        {   PARAMS   => { token_id => $tok, _puk => $puk },
-            WORKFLOW => $wf_type_puk,
-        }
-    );
-    if ( is_error_response($msg) ) {
-        $@ = "Error creating puk upload workflow instance: " . Dumper($msg);
-        return;
-    }
-    return 1;
-}
-
-#
-# usage: my $code = wftask_getcode( ID, USER, PASS );
-#
-sub wftask_getcode {
-    my ( $id, $u, $p ) = @_;
-
-    my ( $ret, $msg );
-    unless ( $client = wfconnect( $u, $p ) ) {
-        $@ = "Failed to connect as $u";
-        return;
-    }
-    sleep 1 if $sleep;
-
-    $msg = $client->send_receive_command_msg( 'get_workflow_info',
-        { 'WORKFLOW' => $wf_type, 'ID' => $id, } );
-    if ( is_error_response($msg) ) {
-        $@ = "Error running get_workflow_info: " . Dumper($msg);
-        return;
-    }
-    sleep 1 if $sleep;
-
-    unless ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'PEND_ACT_CODE' ) {
-        $@ = "Error: workflow state must be PEND_ACT_CODE to get code";
-        diag( $@, Dumper($msg) );
-        return;
-    }
-
-    #	$msg = wfexec( $id, 'scpu_generate_activation_code', { _user => $u }, );
-    $msg = wfexec( $id, 'scpu_generate_activation_code', {}, );
-    if ( is_error_response($msg) ) {
-        $@ = "Error running scpu_generate_activation_code: " . Dumper($msg);
-        return;
-    }
-    sleep 1 if $sleep;
-
-    $ret = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_password};
-    diag( "$id/$u code: " . $ret );
-    wfdisconnect();
-
-    #	eval {
-    #	    $msg = $client->send_receive_service_msg('LOGOUT');
-    #	};
-    return $ret;
-}
-
-#
-# usage: my $ret = wftask_verifycodes( ID, USER, PASS, CODE1, CODE2, PIN1, PIN2 );
-#
-sub wftask_verifycodes {
-    my ( $id, $u, $p, $ac1, $ac2, $pin1, $pin2 ) = @_;
-    my ( $ret, $msg, $state );
-
-    unless ( $client = wfconnect( $u, $p ) ) {
-        $@ = "Failed to connect as $u";
-        return;
-    }
-
-    $state = wfstate($id) or return;
-
-    unless ( $state eq 'PEND_PIN_CHANGE' ) {
-        $@ = "Error - wrong state ($state) for pin change";
-        return;
-    }
-
-    $msg = wfexec(
-        $id,
-        'post_codes_and_pin',
-        {   _auth1_code => $ac1,
-            _auth2_code => $ac2,
-            _new_pin1   => $pin1,
-            _new_pin2   => $pin2,
-        }
-    );
-    if ( is_error_response($msg) ) {
-        $@ = "Error running post_codes_and_pin: " . Dumper($msg);
-        return;
-    }
-
-    $state = wfstate($wf_id);
-    unless ( $state eq 'CAN_FETCH_PUK' ) {
-        $@ = "Error - wrong state ($state) for fetching puk";
-        return;
-    }
-
-    $msg = wfexec( $wf_id, 'fetch_puk', {} );
-    if ( is_error_response($msg) ) {
-        $@ = "Error running fetch_puk: " . Dumper($msg);
-        return;
-    }
-
-    $state = wfstate($wf_id);
-    unless ( $state eq 'CAN_WRITE_PIN' ) {
-        $@ = "Error - wrong state ($state) for pin change";
-        return;
-    }
-
-    # Wrap it up by changing state to success
-    $msg = wfexec( $wf_id, 'write_pin_ok', {} );
-    if ( is_error_response($msg) ) {
-        $@ = "Error running write_pin_ok: " . Dumper($msg);
-        return;
-    }
-
-    $state = wfstate($wf_id);
-    unless ( $state eq 'SUCCESS' ) {
-        $@ = "Error - wrong state ($state) for finish";
-        return;
-    }
-
-    wfdisconnect();
-
-    #	eval {
-    #	    $msg = $client->send_receive_service_msg('LOGOUT');
-    #	};
-
-    return 1;
-}
+# DATA FOR USING IN MY TEST ON DCA04
+$act_test{user}->{name} = 'martin.bartosch@db.com';
+$act_test{user}->{token} = 'gem2_094F88ECF273ABE6';
+$act_test{user}->{puk} = '2234';
+$act_test{auth1}->{name} = 'scott.hardin@db.com';
+$act_test{auth2}->{name} = 'arkadius.litwinczuk@db.com';
+$act_test{auth3}->{name} = 'martin.sander@db.com';
+my $do_puk_upload = 1;  # not needed in dca04 env
 
 ############################################################
 # START TESTS
 ############################################################
 
-diag('##################################################');
-diag('# Init tests');
-diag('##################################################');
+my $test = OpenXPKI::Tests::More::SmartcardUnblock->new(
+    {   socketfile => $socketfile,
+        realm      => $realm
+    }
+) or die "error creating new test instance: $@";
 
-TODO: {
-    local $TODO = 'need to find path of PID file';
-    ok( -e $pidfile, "PID file exists" );
-}
+$test->plan( tests => 44 );
 
-ok( -e $socketfile, "Socketfile exists" );
+$test->diag('##################################################');
+$test->diag('# Init tests');
+$test->diag('##################################################');
+
+$test->ok( -e $socketfile, "Socketfile exists" );
+
+$test->connect_ok(
+    user     => $act_test{user}->{name},
+    password => $act_test{user}->{role},
+) or die "Need session to continue: $@";
 
 #
 # Add PUKs to datapool
 #
-ok( wftask_puk_upload(
-        $act_test{user}->{name},  $act_test{user}->{role},
-        $act_test{user}->{token}, $act_test{user}->{puk},
-    ),
-    'upload PUK'
-) or die "PUK Upload failed: $@";
+$test->ok(
+    $test->puk_upload( $act_test{user}->{token}, $act_test{user}->{puk}, ),
+    'upload PUK' )
+    or die "PUK Upload failed: $@";
 
-diag('##################################################');
-diag('# Walk through a single workflow session');
-diag('##################################################');
+$test->disconnect();
+
+$test->diag('##################################################');
+$test->diag('# Walk through a single workflow session');
+$test->diag('##################################################');
+
+$test->connect_ok() or die "Need session to continue: $@";
 
 # Note: if anything in this section fails, just die immediately
 # because continuing with the other tests then makes no sense.
+$test->create_ok( $wf_type, { token_id => $act_test{user}->{token}, } )
+    or die( "Unable to create unblock workflow: ", $@ );
 
-ok( $client = wfconnect( $act_test{user}->{name}, $act_test{user}->{role} ),
-    "login successful" ) or die "login not successful";
+$test->state_is( 'HAVE_TOKEN_OWNER', 'Workflow state HAVE_TOKEN_OWNER' )
+    or die( "State after create must be HAVE_TOKEN_OWNER: ", $test->dump() );
 
-$msg = $client->send_receive_command_msg(
-    'create_workflow_instance',
-    {   'PARAMS'   => { token_id => $act_test{user}->{token}, },
-        'WORKFLOW' => $wf_type,
-    },
-);
-
-ok( !is_error_response($msg),
-    'Successfully created unblock workflow for token_id '.
-    $act_test{user}->{role} )
-    or die("Unable to create unblock workflow: ", Dumper($msg));
-
-$wf_id = $msg->{PARAMS}->{WORKFLOW}->{ID};
-
-is( $msg->{PARAMS}->{WORKFLOW}->{STATE},
-    'HAVE_TOKEN_OWNER', 'Workflow state HAVE_TOKEN_OWNER' )
-    or die("State after create must be HAVE_TOKEN_OWNER: ", Dumper($msg));
-
-$msg = wfexec(
-    $wf_id,
+$test->execute_ok(
     'store_auth_ids',
     {   auth1_id => $act_test{auth1}->{name},
         auth2_id => $act_test{auth2}->{name},
-    },
-);
+    }
+) or die( "Error executing store_auth_ids: ", $test->dump() );
 
-ok( !is_error_response($msg), 'Successfully executed store_auth_ids' )
-    or die( "Error executing store_auth_ids: ", Dumper($msg) );
-
-is( $msg->{PARAMS}->{WORKFLOW}->{STATE},
-    'PEND_ACT_CODE', 'Workflow store_auth_ids OK' )
-    or die( "State after store_auth_ids must be PEND_ACT_CODE: ", Dumper($msg) );
+$test->state_is('PEND_ACT_CODE')
+    or die( "State after store_auth_ids must be PEND_ACT_CODE: ",
+    $test->dump() );
 
 # Logout to be able to re-login as the auth users
-wfdisconnect();
+$test->disconnect();
 
+#$test->set_verbose(1);
 foreach my $a (qw( auth1 auth2 )) {
-    my $code = wftask_getcode( $wf_id, $act_test{$a}->{name},
-        $act_test{$a}->{role} );
+    my $code
+        = $test->get_code( $act_test{$a}->{name}, $act_test{$a}->{role} );
     croak "get code for $a failed: $@." unless defined $code;
     $act_test{$a}->{code} = $code;
 }
 
-unless (
-    $client
-    = wfconnect( $act_test{user}->{name}, $act_test{user}->{role} ),
-    "login successful"
-    )
-{
-    croak "Error connecting to server as ", $act_test{user}->{name};
-}
+#$test->set_verbose(0);
 
-is( wfstate($wf_id), 'PEND_PIN_CHANGE', 'State after fetching codes' )
-    or die("State after fetching codes must be PEND_PIN_CHANGE: " . $@);
+$test->connect_ok() or die "Need session to continue: $@";
+
+# At this point, the user has re-started the session and should get
+# the current workflow for the inserted token id
+
+my @workflows = sort {
+    $b->{'WORKFLOW.WORKFLOW_SERIAL'} <=> $a->{'WORKFLOW.WORKFLOW_SERIAL'}
+    }
+    grep { not $_->{'WORKFLOW.WORKFLOW_STATE'} =~ /^(SUCCESS|FAILURE)$/ }
+    $test->search( 'token_id', $act_test{user}->{token} );
+
+# assume that it's the first one!
+$test->is( $workflows[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
+    $test->get_wfid, 'Workflow ID matches our ID' )
+    or
+    die( "Workflow ID returned for token_id does not match our workflow ID: ",
+    $@, $test->dump() );
+
+$test->state_is( 'PEND_PIN_CHANGE', 'State after fetching codes' )
+    or die( "State after fetching codes must be PEND_PIN_CHANGE: " . $@ );
 
 # Provide correct codes and pins
-$msg = wfexec(
-    $wf_id,
-    'post_codes_and_pin',
+$test->execute_ok(
+    'post_codes',
     {   _auth1_code => $act_test{auth1}->{code},
         _auth2_code => $act_test{auth2}->{code},
-        _new_pin1   => '1234',
-        _new_pin2   => '1234',
     }
-);
+) or die( "Error running post_codes: ", $test->dump() );
 
-ok( !is_error_response($msg), 'Successfully ran post_codes_and_pin' )
-    or die( "Error running post_codes_and_pin: ", Dumper($msg) );
+$test->state_is( 'CAN_FETCH_PUK', 'State after post_codes pin' )
+    or die( "State after post_codes must be CAN_FETCH_PUK: " . $@ );
 
-is( wfstate($wf_id), 'CAN_FETCH_PUK', 'Workflow state after correct pin' )
-    or die("State after post_codes_and_pin must be CAN_FETCH_PUK: ", $@, Dumper($msg) );
+$test->execute_ok( 'fetch_puk', {} );
 
-$msg = wfexec( $wf_id, 'fetch_puk', {} );
+$test->param_is(
+    '_puk',
+    $act_test{user}->{puk},
+    'fetched puk should match ours'
+) or die( 'Error from fetch_puk: ', $test->dump() );
 
-my $got_puk = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_puk};
-is( $got_puk, $act_test{user}->{puk}, 'fetched puk should match ours' )
-    or die( "Error from fetch_puk: ", Dumper($msg) );
-
-is( wfstate($wf_id), 'CAN_WRITE_PIN', 'Workflow state after correct pin' )
-    or die("State after fetch_puk must be CAN_WRITE_PIN: ", $@, Dumper($msg) );
-
-#is ( wfparam( $wf_id, '_puk' ), $act_test{user}->{puk},
-#       "check puk returned from datapool") or diag($@);
+$test->state_is( 'CAN_WRITE_PIN', 'Workflow state after fetch_puk' )
+    or
+    die( "State after fetch_puk must be CAN_WRITE_PIN: ", $@, $test->dump() );
 
 # Wrap it up by changing state to success
-$msg = wfexec( $wf_id, 'write_pin_ok', {} );
-ok( !is_error_response($msg), 'Successfully ran write_pin_ok' )
-    or die( "Error write_pin_ok MSG: ", Dumper($msg) );
 
-is( wfstate($wf_id), 'SUCCESS', 'Workflow state after write_pin_ok' )
-    or die("State after write_pin_ok must be SUCCESS:", $@);
+$test->execute_ok( 'write_pin_ok', {} )
+    or die( 'error write_pin_ok: ', $test->dump );
 
+$test->state_is( 'SUCCESS', 'Workflow state after write_pin_ok' )
+    or die( 'State after write_pin_ok must be SUCCESS: ', $test->dump );
 
-diag('##################################################');
-diag('# Test for various possible errors');
-diag('##################################################');
+$test->diag('##################################################');
+$test->diag('# Test for various possible errors');
+$test->diag('##################################################');
 
 ############################################################
 # Create workflow that fails due to invalid token owner
 ############################################################
 
-ok( $client = wfconnect( $act_test{user}->{name}, $act_test{user}->{role} ),
-    "login successful" );
+$test->connect_ok() or die "Need session to continue: $@";
 
 $tok_id = $act_test{user}->{token} . '-1';
 
-$msg = $client->send_receive_command_msg(
-    'create_workflow_instance',
-    {   'PARAMS'   => { token_id => $tok_id, },
-        'WORKFLOW' => $wf_type,
-    },
-);
+$test->create_nok(
+    $wf_type,
+    { token_id => $tok_id, },
+    'Test with invalid token - create() should fail'
+) or die( "Create WF was unexpectedly successful: ", $@ );
 
-ok( is_error_response($msg),
-    'Test with invalid token - msg should be error' );
-is( $msg->{LIST}->[0]->{LABEL},
+$test->is(
+    $test->get_msg()->{LIST}->[0]->{LABEL},
     'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND',
     'Check that login failed due to missing LDAP entry'
 );
@@ -524,85 +380,120 @@ is( $msg->{LIST}->[0]->{LABEL},
 ############################################################
 $tok_id = $act_test{user}->{token};
 
-$msg = $client->send_receive_command_msg(
-    'create_workflow_instance',
-    {   'PARAMS'   => { token_id => $tok_id, },
-        'WORKFLOW' => $wf_type,
-    },
-);
-ok( !is_error_response($msg), 'Successfully created unblock workflow for token_id '. $tok_id ) or
-diag("1 MSG: ", Dumper($msg));
+$test->create_ok( $wf_type, { token_id => $tok_id, }, )
+    or die( "Create WF failed: ", $@ );
 
+$test->state_is('HAVE_TOKEN_OWNER')
+    or die( 'Fresh workflow in wrong state', $test->dump() );
 
-$wf_id = $msg->{PARAMS}->{WORKFLOW}->{ID};
+$test->execute_ok( 'user_abort', { error_code => 'user chickened out' } )
+    or die( 'Error executing user_abort: ', $test->dump() );
 
-#diag("wf_id: ", $wf_id);
-is( $msg->{PARAMS}->{WORKFLOW}->{STATE},
-    'HAVE_TOKEN_OWNER', 'Workflow state HAVE_TOKEN_OWNER' ) or
-diag("MSG: ", Dumper($msg));
-
-$msg = $client->send_receive_command_msg(
-    'execute_workflow_activity',
-    {   'ID'       => $wf_id,
-        'ACTIVITY' => 'user_abort',
-        'PARAMS'   => {},
-        'WORKFLOW' => $wf_type,
-    },
-);
-ok( !is_error_response($msg), 'Successfully executed user_abort' )
-    or diag( "2 MSG: ", Dumper($msg) );
-is( $msg->{PARAMS}->{WORKFLOW}->{STATE}, 'FAILURE', 'Workflow user_abort OK' )
-    or diag( "3 MSG: ", Dumper($msg) );
+$test->state_is( 'FAILURE', 'Check that is correct after user_abort' )
+    or die( 'Wrong state after user_abort', $test->dump() );
 
 ############################################################
 # Provide wrong activation codes
 ############################################################
-$wf_id = wftask_create(
-    $act_test{user}->{name},  $act_test{user}->{role},
-    $act_test{user}->{token}, $act_test{auth1}->{name},
-    $act_test{auth2}->{name}
-);
-croak $@ unless defined $wf_id;
 
-# Get activation codes
+$test->create_request_ok(
+    [   $act_test{user}->{name},  $act_test{user}->{role},
+        $act_test{user}->{token}, $act_test{auth1}->{name},
+        $act_test{auth2}->{name}
+    ],
+    'Create request for wrong act codes'
+) or croak $@;
+
 foreach my $a (qw( auth1 auth2 )) {
-    my $code = wftask_getcode( $wf_id, $act_test{$a}->{name},
-        $act_test{$a}->{role} );
-    croak $@ unless defined $code;
+    my $code
+        = $test->get_code( $act_test{$a}->{name}, $act_test{$a}->{role} );
+    croak "get code for $a failed: $@." unless defined $code;
     $act_test{$a}->{code} = $code;
 }
 
+$test->connect_ok() or die "Need session to continue: $@";
+
 # Purposefully provide wrong activation codes to force error
-ok( !wftask_verifycodes(
-        $wf_id,
-        $act_test{user}->{name},
+$test->verify_codes_nok(
+    [   $act_test{user}->{name},
         $act_test{user}->{role},
         _auth1_code => $act_test{auth2}->{code},
         _auth2_code => $act_test{auth1}->{code},
-        _new_pin1   => $act_test{user}->{newpin},
-        _new_pin2   => $act_test{user}->{newpin},
-    ),
+    ],
     'Purposefully provide wrong codes to force error'
 );
 
-is( wfstate($wf_id), 'PEND_PIN_CHANGE', 'Workflow state after wrong pin' )
-    or diag($@);
+$test->connect_ok() or die "Need session to continue: $@";
+
+$test->state_is( 'PEND_PIN_CHANGE', 'Check that is correct after wrong auth' )
+    or die( 'Wrong state after user_abort', $test->dump() );
 
 # Now, provide the correct details for the post
-ok( wftask_verifycodes(
-        $wf_id,                   $act_test{user}->{name},
-        $act_test{user}->{role},  $act_test{auth1}->{code},
-        $act_test{auth2}->{code}, $act_test{user}->{newpin},
-        $act_test{user}->{newpin},
-    ),
-    'Verify codes and pin using correct codes'
+$test->verify_codes_ok(
+    [   $act_test{user}->{name},  $act_test{user}->{role},
+        $act_test{auth1}->{code}, $act_test{auth2}->{code}
+    ],
+    'Verify codes using correct codes'
 );
 
-is( wfstate($wf_id), 'SUCCESS', 'Workflow state after write_pin_ok' )
-    or diag($@);
+$test->connect_ok() or die "Need session to continue: $@";
+
+$test->state_is( 'SUCCESS', 'Workflow state after correct codes' )
+    or die( 'Workflow state after writing correct codes', $test->dump() );
 
 ############################################################
-# Create new workflow to test failure after three invalid code attempts
+# Create new workflow with card owner == auth user and confirm fail
+############################################################
+$test->create_request_nok(
+    [   $act_test{user}->{name},  $act_test{user}->{role},
+        $act_test{user}->{token}, $act_test{user}->{name},
+        $act_test{auth2}->{name}
+    ],
+    'Workflow should fail if card owner == auth user'
+);
+
+############################################################
+# Create new workflow and test that we can fetch the act codes again
+############################################################
+$test->create_request_ok(
+    [   $act_test{user}->{name},  $act_test{user}->{role},
+        $act_test{user}->{token}, $act_test{auth1}->{name},
+        $act_test{auth2}->{name}
+    ],
+    'Create workflow request'
+) or croak 'Create wf failed: ', $@;
+
+# Get activation codes
+foreach my $a (qw( auth1 auth2 )) {
+    my $code
+        = $test->get_code( $act_test{$a}->{name}, $act_test{$a}->{role} );
+    croak "get code for $a failed: $@." unless defined $code;
+    $act_test{$a}->{code} = $code;
+}
+
+# Get activation codes again
+foreach my $a (qw( auth1 auth2 )) {
+    my $code
+        = $test->get_code( $act_test{$a}->{name}, $act_test{$a}->{role} );
+    croak "get code for $a failed: $@." unless defined $code;
+    $act_test{$a}->{code} = $code;
+}
+
+# Now, provide the correct details for the post
+$test->verify_codes_ok(
+    [   $act_test{user}->{name},  $act_test{user}->{role},
+        $act_test{auth1}->{code}, $act_test{auth2}->{code}
+    ],
+    'Verify codes and pin after re-fetching codes'
+);
+
+$test->connect_ok() or die "Need session to continue: $@";
+
+$test->state_is( 'SUCCESS', 'Workflow state after write_pin_ok' )
+    or die( 'Workflow state after writing write_pin_ok', $test->dump() );
+
+############################################################
+# Create new workflow and test that we can fetch the act codes again
 ############################################################
 $wf_id = wftask_create(
     $act_test{user}->{name},  $act_test{user}->{role},
@@ -618,30 +509,72 @@ foreach my $a (qw( auth1 auth2 )) {
     $act_test{$a}->{code} = $code;
 }
 
+# Get activation codes again
+foreach my $a (qw( auth1 auth2 )) {
+    my $code = wftask_getcode( $wf_id, $act_test{$a}->{name}, 'User' );
+    croak 'get code failed: ', $@ unless defined $code;
+    $act_test{$a}->{code} = $code;
+}
+
+# Now, provide the correct details for the post
+ok( wftask_verifycodes(
+        $wf_id,                   $act_test{user}->{name},
+        $act_test{user}->{role},  $act_test{auth1}->{code},
+        $act_test{auth2}->{code}, $act_test{user}->{newpin},
+        $act_test{user}->{newpin},
+    ),
+    'Verify codes and pin after re-fetching codes'
+);
+
+is( wfstate($wf_id), 'SUCCESS', 'Workflow state after write_pin_ok' )
+    or diag($@);
+
+#diag("4");
+#unless ( $client
+#    = wfconnect( $act_test{user}->{name}, $act_test{user}->{role} ) )
+#{
+#    croak "Failed to connect as " . $act_test{user}->{name};
+#}
+#
+#my $state = wfstate($wf_id)
+#    or croak $@;
+#is( $state, 'FAILURE',
+#    "Workflow $wf_id should fail due to too many pin attempts" );
+
+############################################################
+# Create new workflow to test failure after three invalid code attempts
+############################################################
+$test->create_request_ok(
+    [   $act_test{user}->{name},  $act_test{user}->{role},
+        $act_test{user}->{token}, $act_test{auth1}->{name},
+        $act_test{auth2}->{name}
+    ]
+) or croak 'Create wf failed: ', $@;
+
+# Get activation codes
+foreach my $a (qw( auth1 auth2 )) {
+    my $code
+        = $test->get_code( $act_test{$a}->{name}, $act_test{$a}->{role} );
+    croak "get code for $a failed: $@." unless defined $code;
+    $act_test{$a}->{code} = $code;
+}
+
 # Verify codes and pin -- USING INVALID SWAP OF AUTH CODES
 for ( my $i = 0; $i < 3; $i++ ) {
-    ok( !wftask_verifycodes(
-            $wf_id,                   $act_test{user}->{name},
-            $act_test{user}->{role},  $act_test{auth2}->{code},
-            $act_test{auth1}->{code}, '1234',
-            '1234'
-        ),
+    $test->verify_codes_nok(
+        [   $act_test{user}->{name},  $act_test{user}->{role},
+            $act_test{auth2}->{code}, $act_test{auth1}->{code}
+        ],
         'Verify codes and pin using wrong codes'
     );
 }
 
-#diag("4");
-unless ( $client
-    = wfconnect( $act_test{user}->{name}, $act_test{user}->{role} ) )
-{
-    croak "Failed to connect as " . $act_test{user}->{name};
-}
+$test->connect_ok() or die "Need session to continue: $@";
 
-my $state = wfstate($wf_id)
-    or croak $@;
-is( $state, 'FAILURE',
-    "Workflow $wf_id should fail due to too many pin attempts" );
+$test->state_is( 'FAILURE',
+    'Workflow should fail due to too many auth attempts' )
+    or die( 'Workflow state after writing write_pin_ok', $test->dump() );
 
 # LOGOUT
-wfdisconnect();
+$test->disconnect();
 

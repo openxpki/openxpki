@@ -6,7 +6,7 @@
 
 <script type="text/javascript">
     window.onload = function() {
-        enumCSP();
+        // enumCSP();
 %if (defined $method) {
 %    print $method; 
 % }

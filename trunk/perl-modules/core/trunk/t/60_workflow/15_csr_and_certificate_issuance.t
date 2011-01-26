@@ -27,7 +27,6 @@ ok(login({
     USER     => 'raop',
     PASSWORD => 'RA Operator',
   }), 'Logged in successfully');
-
 my $msg = $client->send_receive_command_msg(
     'create_workflow_instance',
     {
@@ -158,6 +157,30 @@ while ($try <= 60 && $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'} ne 'SUCCES
               'TYPE' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
         },
     ); 
+    ok(! is_error_response($msg), 'get_workflow_info') or diag Dumper $msg;
+    my $cert = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{'certificate'};
+    ok($cert, 'Certificate is present in workflow context');
+
+    open my $TESTCERT, '>', "$instancedir/testcert.pem";
+    print $TESTCERT $cert;
+    close $TESTCERT;
+
+    my $openssl = `cat t/cfg.binary.openssl`;
+    my $openssl_output = `$openssl x509 -noout -text -in $instancedir/testcert.pem`;
+    ok($openssl_output =~ m{
+            Subject:\ DC=org,\ DC=OpenXPKI,\ DC=Test\ Deployment,\ CN=passwordsafe.example.com
+        }xms, 
+        'Parsing certificate using OpenSSL works (subject)') or diag "Certificate: $cert\nOpenSSL output: $openssl_output";
+
+    ok($openssl_output =~ m{ DNS:passwordsafe\.example\.com }xms,
+        'Parsing certificate using OpenSSL works (subject alternative name)') or diag "Certificate: $cert\nOpenSSL output: $openssl_output";
+
+    # LOGOUT
+    eval {
+        $msg = $client->send_receive_service_msg('LOGOUT');
+    };
+    diag "Terminated connection";
+    exit 0;
     if ($ENV{DEBUG}) {
         diag "Try number $try, state: " . $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'};
     }

@@ -212,7 +212,7 @@
                     description="I18N_OPENXPKI_HOSTNAME_DESC"
                     type="freetext"
                     source="CN:([^:]+)"
-                    match="\A [A-Za-z\d\-\.]+ \z"
+                    match="\A [A-Za-z\d-\.]+ \z"
                     width="60"
                     default="fully.qualified.example.com"/>
              <input id="port"

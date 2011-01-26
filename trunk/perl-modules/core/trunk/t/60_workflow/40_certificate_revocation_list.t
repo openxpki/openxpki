@@ -27,6 +27,7 @@ ok(login({
     PASSWORD => 'CA Operator',
   }), 'Logged in successfully');
 
+
 # New workflow instance
 my $msg = $client->send_receive_command_msg(
     'create_workflow_instance',

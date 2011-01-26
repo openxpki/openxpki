@@ -190,7 +190,7 @@ sub validate {
         );
     }
     ##! 16: 'signer subject: ' . $signer_subject
-    $cfg_id = CTX('api')->get_config_id({ ID => $wf->id() });
+    my $cfg_id = CTX('api')->get_config_id({ ID => $wf->id() });
     if (! defined $cfg_id) {
         # as this is called during creation, the cfg id is not defined
         # yet, so we use the current one

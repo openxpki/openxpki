@@ -1,3 +1,4 @@
+<!-- FIXME - integrate DeuBa specific things into menus -->
 <%args>
     $nested      => 0,
     $first_level => undef,
@@ -11,7 +12,7 @@
                 {
                     '' =>
                     {
-                        MENU => "user_menu"
+                        MENU => "anon_menu",
                     },
                     'User' =>
                     {
@@ -24,10 +25,23 @@
                     'CA Operator' =>
                     {
                         MENU => "caop_menu"
-                    }
+                    },
+                    'PUK Manager' =>
+                    {
+                        MENU => 'puk_manager_menu',
+                    },
                 },
                 MENU =>
                 {
+                    'puk_manager_menu' =>
+                    [
+                        ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",
+                                   "ca_info", undef],
+                        ["MENU", "I18N_OPENXPKI_HTML_MENU_PUK_MANAGEMENT",
+                                   "puk_management", 'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE' ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
+                                   "logout", undef ]
+                    ],
                     "user_menu" =>
                     [
                         ['ACTION', 'I18N_OPENXPKI_HTML_MENU_HOME',
@@ -36,8 +50,17 @@
                                    'user_request', undef],
                         ['MENU',   'I18N_OPENXPKI_HTML_MENU_DOWNLOAD',
                                    'download', undef],
-                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_SEARCH',
-                                   'search', undef],
+                        ['ACTION',   'I18N_OPENXPKI_HTML_MENU_SEARCH',
+                                   'cert_search', undef],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
+                                   "logout", undef ]
+                    ],
+                    "anon_menu" =>
+                    [
+                        ['MENU',   'I18N_OPENXPKI_HTML_MENU_DOWNLOAD',
+                                   'download', undef],
+                        ['ACTION',   'I18N_OPENXPKI_HTML_MENU_SEARCH',
+                                   'cert_search', undef],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
                                    "logout", undef ]
                     ],
@@ -53,6 +76,8 @@
                                    'approval', undef],
                         ['MENU',   'I18N_OPENXPKI_HTML_MENU_SEARCH',
                                    'search', undef],
+                        ["MENU", "I18N_OPENXPKI_HTML_MENU_PUK_MANAGEMENT",
+                                   "puk_management", 'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
                                    "logout", undef ]
                     ],
@@ -74,15 +99,14 @@
                     "user_request" =>
                     [
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_SIGNING_REQUEST",
-                                   "create_csr", undef ],
+                                   "create_csr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_PERSONALIZATION",
                                    "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_REVOCATION_REQUEST",
                                    "create_crr", undef ],
+			['ACTION', 'I18N_OPENXPKI_HTML_MENU_RESET_TOKEN', 'reset_token', 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_BULK_CERTIFICATE_SIGNING_REQUEST",
                                    "create_csr_bulk", undef ],
-                        ["ACTION", "Smartcard Unblock",
-                                   "smartcard_unblock", undef ],
                     ],
                     "op_request" =>
                     [
@@ -92,21 +116,22 @@
                                    "smartcard_personalization", 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CERTIFICATE_REVOCATION_REQUEST",
                                    "create_crr", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_BULK_CERTIFICATE_SIGNING_REQUEST",
-                                   "create_csr_bulk", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST', ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_ISSUE_CRL",
                                    "issue_crl", 'I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE' ],
+                    ],
+                    'puk_management' =>
+                    [
+                        [ 'ACTION', 'I18N_OPENXPKI_HTML_MENU_UPLOAD_PUKS', 'upload_puks', undef ],
+                        [ 'ACTION', 'I18N_OPENXPKI_HTML_MENU_SHOW_AVAILABLE_PUKS', 'show_available_puks', undef ],
                     ],
                     "download" =>
                     [
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_MY_CERTIFICATES",
-                                   "my_certificates", undef ],
+                                   "my_certificates", 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CA_CERTIFICATES",
                                    "issuer_list", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_CRLS",
                                    "crl_list", undef ],
-                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_POLICY_DOCUMENTS",
-                                   "policy_list", undef ],
                     ],
                     "approval" =>
                     [
@@ -119,15 +144,24 @@
                     [
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_CERTIFICATES",
                                    "cert_search", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_CERTIFICATES",
+                                   "cert_list", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SEARCH_WORKFLOWS",
                                    "workflow_search_instances", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LIST_WORKFLOWS",
+                                   "workflow_list", undef ],
                     ],
                 },
                 ACTION =>
                 {
                     "create_csr" =>
                     {
-                        CMD => "service/create_csr/index.html"
+                        CMD    => "service/create_csr/index.html",
+                        PARAMS => {
+                            'subject_style' => '00_basic_style',
+		            'keytype'      => 'RSA',
+			    'PARAMETER_ENC_ALG' => 'aes256',
+                        }
                     },
                     "create_csr_bulk" =>
                     {
@@ -141,9 +175,25 @@
                     {
                         CMD => "service/smartcard_personalization/index.html"
                     },
-                    "smartcard_unblock" =>
+                    "reset_token" =>
                     {
-                        CMD => "service/reset_token/unblock_pin.html"
+                        CMD => "service/reset_token/index.html"
+                    },
+                    "upload_puks" =>
+                    {
+                        CMD => "service/upload_puks/index.html"
+                    },
+                    "show_available_puks" =>
+                    {
+                        CMD => "service/upload_puks/show.html"
+                    },
+                    "workflow_list_types" =>
+                    {
+                        CMD => "service/workflow/list_types.html"
+                    },
+                    "workflow_list_instances" =>
+                    {
+                        CMD => "service/workflow/list_instances.html"
                     },
                     'show_pending_requests' => {
                         CMD => 'service/workflow/show_pending_requests.html'
@@ -154,6 +204,13 @@
                     'workflow_search_instances' =>
                      {
                          CMD => 'service/workflow/search_instances.html'
+                     },
+                    'workflow_list' =>
+                     {
+                         CMD    => 'service/workflow/search_instances.html',
+                         PARAMS => {
+                            '__submit' => 1,
+                         },
                      },
                     "issuer_list" =>
                     {
@@ -178,6 +235,10 @@
                     "cert_search" =>
                     {
                         CMD => "service/api/cert_search.html"
+                    },
+                    "cert_list" =>
+                    {
+                        CMD => "service/api/cert_list.html"
                     },
                     "issue_crl" =>
                     {

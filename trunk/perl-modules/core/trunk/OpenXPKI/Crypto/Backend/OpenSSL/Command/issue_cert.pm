@@ -81,26 +81,29 @@ sub get_command
 
     ## build the command
 
-    my $command  = "ca -batch";
-    $command .= ' -subj "'.$self->get_openssl_dn($profile->get_subject()).'"';
-    $command .= " -multivalue-rdn" if ($profile->get_subject() =~ /[^\\](\\\\)*\+/);
-    $command .= " -engine $engine" if ($engine);
-    $command .= " -keyform $keyform" if ($keyform);
-    $command .= " -out ".$self->{OUTFILE};
+    my @command = qw( ca -batch );
+    push @command, (
+        '-subj',
+        $self->get_openssl_dn($profile->get_subject()),
+    );
+    push @command, '-multivalue-rdn' if ($profile->get_subject() =~ /[^\\](\\\\)*\+/);
+    push @command, ('-engine', $engine) if ($engine);
+    push @command, ('-keyform', $keyform) if ($keyform);
+    push @command, ('-out', $self->{OUTFILE});
     if ($spkac)
     {
-        $command .= " -spkac ".$self->{CSRFILE};
+        push @command, ('-spkac', $self->{CSRFILE});
     } else {
-        $command .= " -in ".$self->{CSRFILE};
+        push @command, ('-in', $self->{CSRFILE});
     }
 
     if (defined $passwd)
     {
-        $command .= " -passin env:pwd";
+        push @command, ('-passin', 'env:pwd');
         $self->set_env ("pwd" => $passwd);
     }
 
-    return [ $command ];
+    return [ \@command ];
 }
 
 sub hide_output

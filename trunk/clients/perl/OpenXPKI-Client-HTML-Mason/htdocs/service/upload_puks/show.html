@@ -1,0 +1,15 @@
+<%init>
+    use Data::Dumper;
+    my $msg = $context->{client}->send_receive_command_msg(
+ 	'deuba_list_available_puks',
+ 	{
+ 	},
+    );
+</%init>
+<H1><% i18nGettext('I18N_OPENXPKI_HTML_MASON_UPLOAD_PUK_LIST_PUKS_TITLE') %></H1>
+<P><% i18nGettext('I18N_OPENXPKI_HTML_MASON_UPLOAD_PUK_LIST_PUKS_DESC') %></P>
+<ul>
+% foreach my $range (@{ $msg->{PARAMS} }) {
+  <li><% $range %>
+% }
+</ul>

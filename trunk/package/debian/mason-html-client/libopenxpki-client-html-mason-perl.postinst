@@ -26,10 +26,11 @@ set -e
 case "$1" in
     configure)
         # add mod_env to modules.conf
-# NOTE: starting apache2, there is no apache-modconf
-#        apache-modconf apache enable mod_env
-#        apache-modconf apache enable mod_perl
+        apache-modconf apache enable mod_env
+        apache-modconf apache enable mod_perl
 
+        # restart apache
+        invoke-rc.d apache reload
 
         # add apache user to openxpki group (to allow connecting the socket)
         usermod -G openxpki www-data
@@ -37,9 +38,6 @@ case "$1" in
         # chown/chmod the mason session directory
         chown www-data.openxpki /var/openxpki/mason_sessions
         chmod 0770 /var/openxpki/mason_sessions
-
-        # restart apache
-        /etc/init.d/apache2 restart
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

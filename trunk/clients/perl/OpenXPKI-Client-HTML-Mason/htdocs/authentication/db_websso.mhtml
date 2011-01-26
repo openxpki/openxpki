@@ -1,0 +1,42 @@
+<%args>
+  $msg             => undef
+</%args>
+<%init>
+    my $client     = $context->{client};
+
+    ## check that we must handle this message
+    return $msg if ($msg->{SERVICE_MSG} ne "GET_CLIENT_SSO_LOGIN");
+
+    ## DB WebSSO sets the REMOTE_USER variable to the authenticated
+    ## GD e-mail address
+    my $account     = $ENV{"REMOTE_USER"};
+    my $pseudo_role = ''; # not used with WebSSO, all we have is above
+
+    if (! defined $account) {
+        ## WebSSO grants access to the web server's area
+        ## but WebSSO does not provide us with the username
+        ## ==> ALERT: This is a security issue!
+        print STDERR "WebSSO misconfigured for OpenXPKI!\n";
+        ## hard abort
+        exit 100;
+    }
+
+    $msg = $client->send_receive_service_msg (
+                            'GET_CLIENT_SSO_LOGIN',
+                            {
+                             'LOGIN'       => $account,
+                             'PSEUDO_ROLE' => $pseudo_role,
+                            });
+    if ($msg->{'SERVICE_MSG'} ne 'GET_CLIENT_SSO_LOGIN')
+    {
+        ## successful login
+        return $msg;
+    }
+
+    ## Something on server does not accept the client SSO credentials
+    ## ==> ALERT: This is a security issue!
+    print STDERR "The OpenXPKI daemon does not accept the WebSSO credentials!\n";
+    print STDERR "Login: $account\n";
+    ## hard abort
+    exit 200;
+</%init>

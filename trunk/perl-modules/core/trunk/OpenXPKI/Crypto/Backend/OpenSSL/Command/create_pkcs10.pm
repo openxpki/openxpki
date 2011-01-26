@@ -88,23 +88,21 @@ sub get_command
 
     ## build the command
 
-    my $command  = "req -new";
-    #done by CLI
-    #$command .= " -config $config";
-    $command .= " -subj \"$subject\"";
-    $command .= " -multivalue-rdn" if ($subject =~ /[^\\](\\\\)*\+/);
-    $command .= " -engine $engine" if ($engine);
-    $command .= " -keyform $keyform" if ($keyform);
-    $command .= " -key ".$self->{KEYFILE};
-    $command .= " -out ".$self->{OUTFILE};
+    my @command = qw( req -new );
+    push @command, ('-subj', $subject);
+    push @command, '-multivalue-rdn' if ($subject =~ /[^\\](\\\\)*\+/);
+    push @command, ('-engine', $engine) if ($engine);
+    push @command, ('-keyform', $keyform) if ($keyform);
+    push @command, ('-key', $self->{KEYFILE});
+    push @command, ('-out', $self->{OUTFILE});
 
     if (defined $passwd)
     {
-        $command .= " -passin env:pwd";
+        push @command, ('-passin', 'env:pwd');
         $self->set_env ("pwd" => $passwd);
     }
 
-    return [ $command ];
+    return [ \@command ];
 }
 
 sub __get_used_engine 

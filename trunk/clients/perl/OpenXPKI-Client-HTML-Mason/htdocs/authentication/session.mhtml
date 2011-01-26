@@ -43,6 +43,11 @@
           undef $context->{msg};
       }
   }
+  if (defined $__session_id && ref $__session_id eq 'ARRAY') {
+      # HACK HACK HACK
+      # quickfix for wrong parameters, if session id is present multiple times, try to use the first one
+      $__session_id = $__session_id->[0];
+  }
   ## prepare the context if necessary
   if (defined $__session_id and
       exists $session_cache{$__session_id})

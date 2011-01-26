@@ -35,8 +35,7 @@ sub execute {
     if (! defined $context->param('cert_role')) {
         # only set if it hasn't been set yet (by the user in the CSR,
         # for example)
-        # FIXME - the role to set should maybe be a config option
-        $context->param('cert_role' => '');
+        $context->param('cert_role' => 'SCEP issued');
     }
 
     my @subject_alt_names = $csr_obj->get_subject_alt_names();

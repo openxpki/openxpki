@@ -23,6 +23,8 @@
      $path =~ s/[^\/]+/../g;
      $path .= "/" if (length $path);
 
+  my $session;
+
   ### let's check if i18n is configured correctly 
   my $i18n_path = $ENV{OPENXPKI_LOCALE_PREFIX};
   if ((not $i18n_path) or (not -e $i18n_path)) {
@@ -126,53 +128,94 @@
   $m->comp ('/lib/init_menu.mhtml') if (not $auth_stuff);
 </%perl>
 % if ($m->request_comp()->path() !~ /^\/binary\//) {
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
   <head>
     <title><& SELF:title, %ARGS &></title>
-    <link rel="stylesheet" 
+    <link rel="StyleSheet"
           href="<& /lib/url.mhtml, 
-                   path => "${path}css/sinorcaish-screen.css",
+                   path => "${path}css/deuba.css",
                    no_session => 1 &>" 
-          type="text/css" media="screen" />
-    <link rel="stylesheet" 
-          href="<& /lib/url.mhtml, 
-                   path => "${path}css/sinorcaish-print.css",
-                   no_session => 1 &>" 
-          type="text/css" media="print" />
+          type="text/css" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="Content-Script-Type" content="text/javascript"/>
   </head>
   <body>
-    <!-- For non-visual or non-stylesheet-capable user agents -->
-    <div id="mainlink"><a href="#main">Skip to main content.</a></div>
-
-    <div id="header">
-      <div class="left" style="height: 68px">
-        <a href="http://www.openxpki.org/"><img
-          src="<% ${path} %>images/openxpki_sinorcaish.png" alt="OpenXPKI"
-          width="325" height="68" /></a>
-      </div>
-
+    <base target="_self">
+    <style>
+      body {margin-left: 0px;margin-right:12px;}
+    </style>		
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td valign="top">	
+          <!-- Header Start -->
+          <style>
+            #buehne1 {line-height: 19px; background-image:url(<% $path %>images/buehne_1_intra.gif);padding:0;}
+            #buehne3 {height:58px; background-image:url(<% $path %>images/buehne_3_intra.jpg); text-align:none; padding-left:184px;}
+            #buehne3 span {position:absolute;line-height:1em;margin:40px 0 0 12px}
+            #buehne3 img {float:right; margin-left:80px}
+            #buehne4 {height:11px; background-color:white; text-align:left; background-image:url('<% $path %>images/buehne_4_intra.gif'); background-position:top right;}
+            #buehne5 {background-image:url(<% $path %>images/buehne_5_intra.gif);background-position:right; background-color:#003399;}
+            #buehne5 .horizontal_navi a {height:24px;line-height:24px ;background-image:url(<% $path %>images/div_intra.gif) ;background-repeat:no-repeat; padding: 5px 0 5px 30px}
+            #buehne5 .horizontal_navi a.first {background-image:none;padding-left:0px;}
+            * html #buehne5  .horizontal_navi a {padding: 0 0 0 30px}
+          </style>
+	  <div id="buehne1" class="blue_11">
+	    <a href="http://www.db.com/index_e.htm" class="blue_11" style="margin-left:196px">Deutsche&nbsp;Bank&nbsp;Group</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="https://dbpki.tools.intranet.db.com/?page=Contact" class="blue_11" >Contact</a>&nbsp;&nbsp;
+          </div>
+	  <div id="buehne3"> 
+	    <span class="blue_11">Partners&nbsp;in&nbsp;Performance</span>			
+	    <img src="<% $path %>images/buehne_2_flex_en_intra.gif" border="0" alt="" usemap="#logo">
+	  </div>
+	  <div id="buehne4">
+	    <img src="<% $path %>images/buehne4_gto.jpg" height="11" border="0" alt="">
+	  </div>					
+          <!-- end toplevel autohandler -->
       <div class="right">
-% # if (! $m->request_args()->{'no_menu'}  &&
-% if (! $no_menu  &&
-%     $m->request_comp()->path() !~ m{\A /authentication/index.html \z}xms) {
-% # show search button only if menu is activated
-% # and we are not at the login page
-        <span class="hidden">Useful links:</span>
-<!-- 
-        <a href="index.html">Contacts</a> |
--->
-        <a href="http://www.openxpki.org/resources/index.html">Feedback</a> |
-<!-- 
-        Search |
--->
-        <a href="http://www.openxpki.org">About</a>
+      </div> <!-- end of right -->
+          <!-- no menu present -->
+          <div id="buehne5">
+% if (not $auth_stuff and not $no_menu) {
+            <table cellpadding=0 cellspacing=0 style="height:24px;">
+                <tr>
+                    <td style="white-space: nowrap; padding-left:12px" class="horizontal_navi">
+        <& /lib/get_menu.mhtml,
+          first_level => 0,
+          last_level  => 0,
+          nested      => 0,
+          mode        => "ONELINE",
+          seperator   => '',
+          a_class_first => 'horizontal_navi first',
+          a_class       => 'horizontal_navi',
+          no_div        => 1,
+        &>
+                    </td>
+                    <td style="width:198px; height:18px"></td>
+                </tr>
+            </table>
+% }
+          </div> <!-- do we need this? -->
 
+          <!-- toplevel menu end -->
+	  <map name="logo">
+            <area shape="rect" coords="495,1,706,40" href="http://www.db.com">
+          </map>
+          <!-- Header End -->
+          <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+<!--
+            <tr>
+              <td colspan="2">
+		<div class="breadcrumb breadcrumb_div">
+		</div>
+	      </td>
+            </tr>
+-->
+            <tr>
+              <td>
+                <table border="0" cellspacing="2" cellpadding="0" height="100%">
+                  <tr>
 %   if ($__session_id) {
-%     my $session = CGI::Session->new(
+%     $session = CGI::Session->new(
 %       'id:static',
 %       $__session_id,
 %       {
@@ -186,24 +229,16 @@
 %       $m->comp ('/lib/debug.mhtml',
 %                 'level' => 1,
 %                 'msg'   => "CGI::Session object id: " . $session->id());
-%        my $role = $session->param('role') ? $session->param('role') : 'Anonymous';
-<div><% $session->param('user') . ' | ' . $role %> |
-%        my $root;
-%        eval {
-%            $root = $context->{menu}->get_root();
-%        };
-%        if (defined $root) {
-<a href="<% $root . '/' %>"><% i18nGettext($session->param('pki_realm')) %></a>
-%        }
-%        else {
-<% i18nGettext($session->param('pki_realm')) %>
-%        }
-</div>
-%     }
-%   }
-%   if (exists $context->{menu}) {
-        <div>
+%   if (exists $context->{menu} && $session && $session->param('role') ne 'User' && $session->param('role') ne '') {
+<td>
           <form action="<% $context->{menu}->get_root() %>/service/api/super_search.html" method="post">
+%   my %menu_hash = $context->{menu}->get_menu_hash();
+%    foreach my $key (keys %menu_hash) {
+%             my $menu_content = $menu_hash{$key} || '';
+              <input type="hidden" name="<% $key %>" value="<% $menu_content %>"/>
+%    }
+       &nbsp;        <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />
+              <input type="image" name="submit" src="<% ${path} %>images/search.png" alt="Search" style="position:relative; top:5px" />
             <script type="text/javascript">
               var EmptySearchFieldDone = 0;
               function EmptySearchField(elem) {
@@ -234,7 +269,7 @@
 %               }
 %           }
        &nbsp;        <input type="text" name="q" value="Search" onfocus="EmptySearchField(this)" size="15" maxlength="250" />
-%   my %menu_hash = $context->{menu}->get_menu_hash();
+%   #my %menu_hash = $context->{menu}->get_menu_hash();
 %    foreach my $key (keys %menu_hash) {
 %             my $menu_content = $menu_hash{$key} || '';
               <input type="hidden" name="<% $key %>" value="<% $menu_content %>"/>
@@ -242,41 +277,54 @@
               <input type="image" name="submit" src="<% ${path} %>images/search.png" alt="Search" />
             </div>
           </form>
-        </div>
+        </div></td>
+%   }
+%   else {
+<td></td>
+%   }
+<td align=right><div style="color: #666666; font-size: 10px">
+% if (! $no_menu  &&
+%     $m->request_comp()->title() !~ m{\A /authentication/index.html \z}xms) {
+%        my $role = $session->param('role') ? $session->param('role') : 'Anonymous';
+<div><% $session->param('user') %> | <% $role %> |
+<% i18nGettext($session->param('pki_realm')) %>
+</div>
+%     }
 %   }
 % }
-      </div> <!-- end of right -->
+</div>
+</td>
 
+                  </tr>
+                  <tr>
+                    <td id="page22" height="100%">
+                      <div class="box">
+                      <!-- <div class="box-title">menu title</div> FIXME: menu title -->
+                        <div class="box-data">
+                          <div id="UserMenu" style="display:block;">
 % if (not $auth_stuff and not $no_menu) {
-      <& /lib/get_menu.mhtml,
-          last_level => 0,
-          mode       => "ONELINE" &>
-% } else {
-      <div class="subheader">&nbsp;</div>
+        <& /lib/get_menu.mhtml,
+          first_level => 1,
+          nested      => 1,
+          mode        => "DIV",
+          a_class_first => 'link_menu',
+          a_class       => 'link_menu',
+        &>
 % }
-
-    </div> <!-- end of header -->
-
-% if (not $auth_stuff and not $no_menu) {
-%   my $sidebar_html = $m->scomp('/lib/get_menu.mhtml', first_level => 1, nested      => 1, mode        => "LIST");
-%   if ($sidebar_html !~ m{<ul><\/ul>}) {
-    <div id="sidebar">
-      <div> <!-- this div controls the distance between the list and the window -->
-<% $sidebar_html | n %>
-      </div>
-    </div> <!-- end of sidebar -->
-%   }
-% }
-
-    <div id="main">
+              </td>
+              <!-- menu end -->
+              <td id="page24" width="100%" rowspan="3" colspan=2>
+                <div id="tiki-center"> 
+                  <div class="wikitext">
+                    <!-- content -->
 % } ## end of if not binary
 
 <%perl>
     if (not length $auth_stuff)
     {
-       $m->call_next;
+       $m->call_next(); # content
     } else {
-       print $auth_stuff;
+       $m->comp('/authentication/autohandler', '__session_id' => $__session_id);
     }
 </%perl>
 
@@ -284,8 +332,6 @@
     <div class="clearer">&nbsp;</div>
     </div>  <!-- main -->
 
-    <div id="footer"><small>&copy; 2006-2009 <a href="http://www.openxpki.org">The OpenXPKI Project</a></small>
-    </div>
   </body>
 </html>
 % }
@@ -298,5 +344,24 @@
 </%flags>
 
 <%method title>
-  OpenXPKI
+% my $session;
+% my $realm;
+% if (defined $m->request_args()->{'__session_id'}) {
+%   $session = CGI::Session->new(
+%     'id:static',
+%     $m->request_args()->{'__session_id'},
+%     {
+%       Directory => $ENV{OPENXPKI_MASON_SESSION_DIR},
+%     },
+%   );
+% }
+% if (defined $session) {
+%   $realm = $session->param('pki_realm');
+% }
+% if (defined $realm && $realm ne '') {
+  dbPKI - <% i18nGettext($realm) %>
+% }
+% else {
+  dbPKI
+% }
 </%method>

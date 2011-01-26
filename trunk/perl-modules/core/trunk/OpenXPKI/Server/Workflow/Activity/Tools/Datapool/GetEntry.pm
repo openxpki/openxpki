@@ -1,6 +1,6 @@
 # OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry
-# Written by Alexander Klink for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
+# Written by Scott Hardin for the OpenXPKI project 2010
+# Copyright (c) 2010 by The OpenXPKI Project
 
 package OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry;
 
@@ -68,8 +68,20 @@ sub execute {
 
     my $msg = CTX('api')->get_data_pool_entry($params);
 
-    ##! 1: 'returned from get_data_pool_entry(): ' . Dumper($msg)
-    $context->param($valparam, $msg->{VALUE});
+    my $retval = $msg->{VALUE};
+
+    my $default_value = $self->param('ds_default_value');
+
+    if ( not defined $retval ) {
+        if ( defined $default_value ) {
+            if ( $default_value =~ s/^\$// ) {
+                $default_value = $context->param($default_value);
+            }
+            $retval = $default_value;
+        }
+    }
+
+    $context->param($valparam, $retval);
 
     return;
 }
@@ -112,6 +124,12 @@ datastore entry.
 
 B<Note:> If encryption is enabled, the parameter name must be 
 preceeded with an underscore.
+
+=item ds_default_value
+
+The default value to be returned if no record in the datapool is
+found. If preceeded with a dollar symbol '$', then the workflow
+context variable with the given name will be used.
 
 =back
 

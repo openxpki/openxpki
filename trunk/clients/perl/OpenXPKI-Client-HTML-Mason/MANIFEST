@@ -21,9 +21,20 @@ htdocs/favicon.ico
 htdocs/css/openxpki.css
 htdocs/css/sinorcaish-print.css
 htdocs/css/sinorcaish-screen.css
+htdocs/css/deuba.css
+htdocs/css/deuba_main.css
+htdocs/css/fonts.css
+htdocs/css/header.css
+htdocs/css/styles.css
 htdocs/errors/internal_server_error_en.htm
-htdocs/images/openxpki_logo.png
-htdocs/images/openxpki_sinorcaish.png
+htdocs/images/buehne4_gto.jpg
+htdocs/images/buehne_1_intra.gif
+htdocs/images/buehne_2_flex_en_intra.gif
+htdocs/images/buehne_2_flex_intra.gif
+htdocs/images/buehne_3_intra.jpg
+htdocs/images/buehne_4_intra.gif
+htdocs/images/buehne_5_intra.gif
+htdocs/images/div_intra.gif
 htdocs/images/search.png
 htdocs/images/de.png
 htdocs/images/en.png
@@ -40,6 +51,7 @@ htdocs/lib/get_menu.mhtml
 htdocs/lib/language.mhtml
 htdocs/lib/get_deep_error.mhtml
 htdocs/lib/paging.mhtml
+htdocs/lib/rel2abs.mhtml
 htdocs/lib/configured_languages.mhtml
 htdocs/lib/html/a.mhtml
 htdocs/lib/html/safe.mhtml
@@ -60,6 +72,7 @@ htdocs/authentication/shibboleth.mhtml
 htdocs/authentication/role.mhtml
 htdocs/authentication/open_form.mhtml
 htdocs/authentication/close_form.mhtml
+htdocs/authentication/db_websso.mhtml
 htdocs/authentication/x509.mhtml
 htdocs/authentication/x509_webserver.mhtml
 
@@ -111,6 +124,7 @@ htdocs/service/workflow/show_pending_requests.html
 htdocs/service/workflow/show_pending_crrs.html
 htdocs/service/workflow/bulk_approval.html
 htdocs/service/workflow/show_csr_brief.html
+htdocs/service/workflow/show_escrow_data.html
 htdocs/service/workflow/context_hash.mhtml
 htdocs/service/workflow/activity/dhandler
 htdocs/service/workflow/activity/autohandler
@@ -138,6 +152,7 @@ htdocs/service/workflow/activity/change_crr_reason.html
 htdocs/service/workflow/activity/change_crr_invalidity_time.html
 htdocs/service/workflow/activity/issue_certificate.html
 htdocs/service/workflow/activity/fail_workflow.html
+htdocs/service/workflow/activity/escrow_encryption_certificate.html
 
 htdocs/service/create_csr/index.html
 htdocs/service/create_csr/get_workflow_type.mhtml
@@ -173,14 +188,38 @@ htdocs/service/create_crr/form.html
 htdocs/service/create_crr/error.mhtml
 htdocs/service/create_crr/success.mhtml
 
+htdocs/service/reset_token/delete.html
+htdocs/service/reset_token/delete_gettokenid.html
+htdocs/service/reset_token/delete_result.html
+htdocs/service/reset_token/delete_tokenid.html
+htdocs/service/reset_token/get_encrypted_puk.mhtml
+htdocs/service/reset_token/index.html
+htdocs/service/reset_token/plugin.mhtml
+htdocs/service/reset_token/reset_pin.html
+htdocs/service/reset_token/reset_pin_certs.html
+htdocs/service/reset_token/reset_pin_result.html
+htdocs/service/reset_token/result.mhtml
+htdocs/service/reset_token/RSATokenPlugin.dll
+
 htdocs/service/smartcard_personalization/index.html
-htdocs/service/smartcard_personalization/waiting_for_issuance.mhtml
-htdocs/service/smartcard_personalization/failure.mhtml
-htdocs/service/smartcard_personalization/print_errors.mhtml
-htdocs/service/smartcard_personalization/install_certificate.mhtml
-htdocs/service/smartcard_personalization/success.mhtml
-htdocs/service/smartcard_personalization/get_certificate_request.mhtml
-htdocs/service/smartcard_personalization/waiting_for_approval.mhtml
+htdocs/service/smartcard_personalization/certificate_installed.html
+htdocs/service/smartcard_personalization/certificates_read.html
+htdocs/service/smartcard_personalization/check_status.html
+htdocs/service/smartcard_personalization/pin_verified.html
+htdocs/service/smartcard_personalization/sig_csr_created.html
+
+htdocs/service/smartcard_personalization_xenroll/index.html
+htdocs/service/smartcard_personalization_xenroll/waiting_for_issuance.mhtml
+htdocs/service/smartcard_personalization_xenroll/failure.mhtml
+htdocs/service/smartcard_personalization_xenroll/print_errors.mhtml
+htdocs/service/smartcard_personalization_xenroll/install_certificate.mhtml
+htdocs/service/smartcard_personalization_xenroll/success.mhtml
+htdocs/service/smartcard_personalization_xenroll/get_certificate_request.mhtml
+htdocs/service/smartcard_personalization_xenroll/waiting_for_approval.mhtml
+
+htdocs/service/upload_puks/index.html
+htdocs/service/upload_puks/show.html
+htdocs/service/upload_puks/import.html
 
 htdocs/binary/autohandler
 htdocs/binary/dhandler
@@ -190,6 +229,7 @@ htdocs/binary/get_chain.html
 htdocs/binary/get_crl.html
 htdocs/binary/get_workflow_instance_info.html
 htdocs/binary/get_privkey.html
+htdocs/binary/get_binary.html
 
 t/common.pl
 t/02_pod_syntax.t

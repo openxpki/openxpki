@@ -6,6 +6,7 @@
 
 % if (! $bulk) {
 <& /service/open_form.mhtml &>
+<input type=hidden name="workflow_type" value="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST">
 <& /lib/html/hidden_reqargs.mhtml &>
 % }
 % else {
@@ -31,10 +32,12 @@
    'name'    => "role",
    'default' => [ $role ],
    'values'  => [ @roles ] &>
-</p>
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
+</p>
 <dl>
+
+<& /service/create_csr/print_descriptions.mhtml, descriptions => \@descriptions &>
 
 <& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
 
@@ -67,5 +70,13 @@
         return $roles[0];
     }
 
-    ## ok, we have to ask the user
+    my @descriptions = ();
+    foreach my $role (@roles)
+    {
+        # sanitized role form for I18N_ names
+        my $sanitized_role = $role;
+        $sanitized_role =~ s/ /_/g;
+        $sanitized_role =~ s/\./_/g;
+        push @descriptions, [ $role, i18nGettext('I18N_OPENXPKI_ROLE_DESC_' . uc($sanitized_role)) ];
+    }
 </%init>

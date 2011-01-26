@@ -33,6 +33,7 @@ my $context = {
 	dbi_backend      => undef,
 	dbi_workflow     => undef,
 	dbi_log          => undef,
+    workflow_bulk_keys => undef,
 
 	# user-settable
 	api            => undef,

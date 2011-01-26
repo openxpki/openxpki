@@ -1,0 +1,70 @@
+<%args>
+</%args>
+<%once>
+</%once>
+use Data::Dumper;
+use OpenXPKI::Serialization::Simple;
+<%init>
+my @errors;
+my $debug_msg;
+my $wf_type = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2';
+
+my $serializer = OpenXPKI::Serialization::Simple->new();
+
+my @cert_identifiers = ();
+
+# read certificates from Novosec plugin, get certificate identifier for
+# each sent certificate
+# Novosec sends the ID with uppercase letters, but the XML file/workflow
+# has it in lowercase
+
+my $token_id = lc($m->request_args()->{TokenID});
+
+# work around a bug in the RSA plugin, it includes debug output in the
+# posted token id. after the correct token id it posts two newlines and
+# some debug junk. hence delete anything starting with a whitespace.
+$token_id =~ s{ \s .* \z }{}xms;
+
+foreach my $key (keys %{ $m->request_args() }) {
+    if ($key =~ m{\A cert \d+ \z}xms) {
+        my $cert = $m->request_args()->{$key};
+        $cert =~ s{(.{64})}{$1\n}g;
+        $cert =   "-----BEGIN CERTIFICATE-----\n"
+                . $cert . "\n"
+                . "-----END CERTIFICATE-----\n";
+        $cert =~ s{\n+}{\n}xmsg;
+         my $msg = $context->{'client'}->send_receive_command_msg(
+            'get_cert_identifier',
+            {
+                'CERT' => $cert,
+            },
+        );
+        push @cert_identifiers, $msg->{PARAMS};
+    }
+}
+
+# instantiate the workflow
+my $wf_info;
+
+my $serialized_cert_ids = $serializer->serialize(\@cert_identifiers);
+my $c_msg = $context->{client}->send_receive_command_msg(
+    'create_workflow_instance',
+    {
+	WORKFLOW => $wf_type,
+	PARAMS => {
+	    cert_ids_on_token => $serialized_cert_ids,
+            token_id => $token_id,
+	},
+    },
+    );
+if ($c_msg->{SERVICE_MSG} eq 'ERROR') {
+    @errors = [ $m->comp('/lib/get_deep_error.mhtml', 'msg' => $c_msg) ] ;
+}
+$wf_info = $c_msg->{PARAMS}->{WORKFLOW};
+my $wf_id = $wf_info->{ID};
+
+# store workflow id for later use
+$ARGS{WF_ID} = $wf_id;
+
+</%init>
+% $m->redirect("check_status.html?WF_ID=$wf_id");

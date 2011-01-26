@@ -38,7 +38,3 @@
   ## check that we are in the correct state
   
 </%init>
-
-<%method title>
-  OpenXPKI
-</%method>

@@ -1,0 +1,157 @@
+#!/usr/bin/env perl
+#
+# Written by Martin Bartosch and Alexander Klink
+# for the OpenXPKI project 2007
+# Copyright (c) 2007 by The OpenXPKI Project
+# $Revision: 80 $
+#
+
+our $VERSION = "[% deployment.version %]";
+
+use strict;
+use warnings;
+use English;
+use Getopt::Long;
+use Pod::Usage;
+use File::Spec;
+
+use XML::Simple;
+
+use Data::Dumper;
+#use Smart::Comments;
+
+use OpenXPKI::VERSION;
+use OpenXPKI::Tests;
+use OpenXPKI::Client;
+use OpenXPKI::Serialization::Simple;
+
+my $socketfile = "[% server.socketfile %]";
+
+my %params;
+GetOptions(\%params,
+	   qw(
+               socketfile=s
+               user=s
+               pass=s
+           ),
+    ) or pod2usage(-verbose => 0);
+
+my $cmd = shift @ARGV || '';
+
+my ($vol, $dir, $file) = File::Spec->splitpath($0);
+
+if ($cmd eq 'version') {
+    print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
+    print "$file Version: $VERSION\n";
+    exit 0;
+}
+
+pod2usage(-exitstatus => 0, -verbose => 2) if ($cmd eq 'man');
+pod2usage(-verbose => 99, -sections => 'NAME|USAGE') if ($cmd eq 'help');
+if ($cmd eq '') {
+    print STDERR "Usage: $file COMMAND [SUBCOMMAND] [OPTIONS]\n";
+    print STDERR "Hint: '$file help'\n";
+    exit 0;
+}
+
+ my $client = OpenXPKI::Client->new(
+     {
+	 SOCKETFILE => $params{socketfile} || $socketfile,
+     });
+
+
+
+if (! $client) {
+    print STDERR "ERROR: Could not connect to server process\n";
+    exit 1;
+}
+
+if (! login({
+    CLIENT   => $client,
+    USER     => $params{user},
+    PASSWORD => $params{pass},
+	    })) {
+    print STDERR "ERROR: Login failed\n";
+    exit 1;
+}
+
+if ($cmd eq 'import') {
+    my $file = shift;
+    
+    my $parsed = XMLin($file);
+
+    # error checking
+    if (! defined $parsed) {
+	print STDERR "ERROR: Could not parse XML data file\n";
+	exit 1;
+    }
+
+    if (ref $parsed ne 'HASH') {
+	print STDERR "ERROR: Invalid XML structure\n";
+	exit 1;
+    }
+
+    if (! defined $parsed->{Name} || ($parsed->{Name} ne 'SID800')) {
+	print STDERR "WARNING: Input data does not seem to be a SID800 file\n";
+    }
+
+    if ($parsed->{FormatVersion} ne '1.0') {
+	print STDERR "WARNING: Unsupported format version\n";
+    }
+    
+    if (! defined $parsed->{Token} || ref $parsed->{Token} ne 'ARRAY') {
+	print STDERR "WARNING: Input data does not include Token data\n";
+    }
+
+    my $serializer = OpenXPKI::Serialization::Simple->new({
+        SEPARATOR => '-',
+    });
+    my %data;
+    foreach my $item (@{$parsed->{Token}}) {
+	my $key = $parsed->{Name} . ':' .  $item->{SmartChipSN};
+	delete $item->{SmartChipSN};
+
+	$data{$key} = $serializer->serialize($item);
+    }
+    
+    # print Dumper \%data;
+    my $msg = $client->send_receive_command_msg(
+ 	'create_workflow_instance',
+ 	{
+ 	    WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE',
+ 	    PARAMS => {
+	    },
+ 	},
+ 	);
+    
+    if (is_error_response($msg)) {
+	print Dumper $msg;
+	print STDERR "ERROR: Could not create workflow instance\n";
+	exit 1;
+    }
+    my $wf_id = $msg->{PARAMS}->{WORKFLOW}->{ID};
+    
+
+    $msg = $client->send_receive_command_msg(
+	'execute_workflow_activity',
+	{
+	    ACTIVITY => 'store_password',
+	    ID       => $wf_id,
+	    PARAMS   => {
+		_input_data => \%data,
+	    },
+	    WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE',
+	},
+	);
+
+    if (is_error_response($msg)) {
+	print Dumper $msg;
+	print STDERR "ERROR: Could not insert password data\n";
+	exit 1;
+    }
+    
+    print "Import succeeded.\n";
+}
+
+
+

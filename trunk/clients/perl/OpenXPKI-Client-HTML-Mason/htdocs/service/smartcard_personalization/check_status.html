@@ -1,0 +1,324 @@
+<%args>
+    $chosen_loginid => undef
+</%args>
+<%once>
+use Data::Dumper;
+use OpenXPKI::Serialization::Simple;
+my $ser = OpenXPKI::Serialization::Simple->new();
+
+my $totalsteps = 5;
+# 0. Read token contents
+# 1. Query PIN
+# 2. Generate signature key and request
+# 3. Install encryption certificate
+# 4. Install signature certificate
+# 5. (Cleanup)
+</%once>
+<%init>
+my $wf_type = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2';
+my @errors;
+
+my $wf_id = $m->request_args()->{WF_ID};
+
+my $cert_base64;
+
+my $i_msg = $context->{client}->send_receive_command_msg(
+    'get_workflow_info',
+    {
+	WORKFLOW => $wf_type,
+	ID       => $wf_id,
+    },
+    );
+if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
+    @errors = [ $m->comp('/lib/get_deep_error.mhtml', 'msg' => $i_msg) ] ;
+}
+my $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+
+# handle personalization steps
+if ($wf_info->{STATE} eq 'ENCRYPTION_CERTIFICATE_PREPARED_FOR_INSTALLATION') {
+    $i_msg = $context->{client}->send_receive_command_msg(
+	'execute_workflow_activity',
+	{
+	    WORKFLOW => $wf_type,
+	    ID       => $wf_id,
+	    ACTIVITY => 'retrieve_password_from_passwordsafe',
+	});
+    if (exists $i_msg->{SERVICE_MSG} and
+        $i_msg->{SERVICE_MSG} eq "ERROR") {
+        @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $i_msg);
+    }
+    else 
+    {
+	$wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+    }
+} elsif ($wf_info->{STATE} eq 'SIGNATURE_CERTIFICATE_PREPARED_FOR_INSTALLATION') {
+    $cert_base64 = $wf_info->{CONTEXT}->{certificate};
+    # remove header, footer and newlines
+    $cert_base64 =~ s{ -----BEGIN\ CERTIFICATE----- (.*) -----END\ CERTIFICATE-----}{$1}xms;
+    $cert_base64 =~ s{\s}{}xmsg;
+} elsif ($wf_info->{STATE} eq 'SIGNATURE_CERTIFICATE_MISSING_ON_TOKEN') {
+    if (defined ($wf_info->{CONTEXT}->{cachedpin})) {
+	# cached pin is available, propagate workflow state
+	$i_msg = $context->{client}->send_receive_command_msg(
+	    'execute_workflow_activity',
+	    {
+		WORKFLOW => $wf_type,
+		ID       => $wf_id,
+		ACTIVITY => 'null',
+	    });
+	if (exists $i_msg->{SERVICE_MSG} and
+	    $i_msg->{SERVICE_MSG} eq "ERROR") {
+	    @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $i_msg);
+	}
+	else 
+	{
+	    $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+	}
+    }
+} elsif ($wf_info->{STATE} eq 'LOGIN_ID_MISSING') {
+    if (defined $chosen_loginid) {
+	# set chosen loginid in workflow
+	$i_msg = $context->{client}->send_receive_command_msg(
+	    'execute_workflow_activity',
+	    {
+		WORKFLOW => $wf_type,
+		ID       => $wf_id,
+		ACTIVITY => 'set_loginid',
+		PARAMS => {
+		    chosen_loginid => $chosen_loginid,
+		},
+	    });
+	if (exists $i_msg->{SERVICE_MSG} and
+	    $i_msg->{SERVICE_MSG} eq "ERROR") {
+	    @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $i_msg);
+	}
+	else 
+	{
+	    $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+	}
+    }
+}
+
+my $wf_state = $wf_info->{STATE};
+
+
+my $loginid = $wf_info->{CONTEXT}->{ldap_dbntloginid};
+my @login_ids;
+my @select_values = ();
+if (defined $loginid && ($loginid =~ m{\A ARRAY }xms)) {
+    # we have a choice
+    @login_ids = @{ $ser->deserialize($loginid) };
+    foreach my $login_id (@login_ids) {
+	push @select_values, {
+	    VALUE => $login_id,
+	    LABEL => $login_id,
+	};
+    }
+}
+#my $chosen_loginid = $wf_info->{CONTEXT}->{chosen_loginid};
+
+
+# prepare arguments for page reload
+my $comp_args = $m->request_args();
+
+my $params = "WF_ID=$wf_id";
+
+my @cachedpinargs = ();
+if (defined ($wf_info->{CONTEXT}->{cachedpin})) {
+    @cachedpinargs = ('CachedPIN' => $wf_info->{CONTEXT}->{cachedpin});
+}
+
+my %paramlist = (
+    'PBRange' => $totalsteps * 100,
+    );
+
+</%init>
+% if ($wf_state eq 'ISSUANCE_PENDING') {
+<meta http-equiv="refresh" content="5;url=check_status.html?<% $params %>">
+<h1>
+  <% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_TITLE',
+  ) %>
+</h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_ISSUANCE_DESC_2') %>
+</p>
+% } elsif ($wf_state eq 'LOGIN_ID_MISSING') {
+<h1>
+  <% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_TITLE',
+  ) %>
+</h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_WELCOME_SCREEN_INTRO_TEXT_2',
+		 '__CURRENTSTEP__' => 3,
+		 '__STEPS__' => $totalsteps,
+  ) %>
+</p>
+% #print "Loginid: $chosen_loginid\n";
+<table>
+%     my @map_array = split/, /, $wf_info->{CONTEXT}->{display_mapping};
+%     foreach (@map_array) {
+%        my ($key, $value) = /(.*) -> (.*)/;
+<tr>
+  <td><% i18nGettext($value) %></td>
+  <td><% $wf_info->{CONTEXT}->{'ldap_' . $key} %></td>
+</tr>
+%     }
+</table>
+<p>
+<& /service/open_form.mhtml &>
+    <& /lib/html/hidden.mhtml, 'name' => 'WF_ID', 'value' => $wf_id &>
+%     if (scalar @login_ids) {
+<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_CHOOSE_PRIMARY_ACCOUNT_DESC') %>
+<table>
+  <tr>
+    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SMARTCARD_PERSONALIZATION_PRIMARY_ACCOUNT') %></td>
+    <td>
+<& '/lib/html/select.mhtml', name => 'chosen_loginid', values => \@select_values &>
+<input type="submit"
+       value="<% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_CREATE_IE_CSR') %>"
+       />
+    </td>
+  </tr>
+</table>
+%     }
+%     else {
+%         # no choice, just pass the login id in a hidden field
+          <& /lib/html/hidden.mhtml, 'name' => 'chosen_loginid', 'value' => $loginid &>
+	  <input type="submit"
+	  value="<% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_CREATE_IE_CSR') %>"
+	  />
+%     }
+<& /service/close_form.mhtml &>
+</p>
+% #<pre>
+%  #print Dumper $wf_info;
+% #</pre>
+% } elsif ($wf_state eq 'ENCRYPTION_CERTIFICATE_PREPARED_FOR_INSTALLATION') {
+<h1>
+  <% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION',
+		 '__CURRENTSTEP__' => 3,
+		 '__STEPS__' => $totalsteps,
+  ) %>
+</h1>
+% $paramlist{FilePIN} = $wf_info->{CONTEXT}->{_password};
+% $paramlist{Encrypted} = 'yes';
+<& '/service/reset_token/plugin.mhtml',
+   params => {
+  'Request' => 'ImportP12',
+  'PostURL' => $m->comp('/lib/rel2abs.mhtml', rel => $context->{menu}->get_root() . '/service/smartcard_personalization/certificate_installed.html?' . $params),
+  'Data' => $wf_info->{CONTEXT}->{pkcs12base64},
+  @cachedpinargs
+  },
+  paramlist => {
+      %paramlist,
+      'PBStart' => 300,
+      'FilePIN' => $wf_info->{CONTEXT}->{_password},
+      'Encrypted' => 'yes',
+  },
+&>
+% #<pre>
+% # print Dumper $wf_info;
+% # </pre>
+% } elsif ($wf_state eq 'SIGNATURE_CERTIFICATE_PREPARED_FOR_INSTALLATION') {
+<h1><% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION',
+		 '__CURRENTSTEP__' => 4,
+		 '__STEPS__' => $totalsteps,
+  ) %>
+</h1>
+% #<pre>
+% #print "pubkey hash: -" . $wf_info->{CONTEXT}->{keyid}. "-\n";
+% #print "cert: -" . $cert_base64 . "-\n";
+% #print 'ParamList="KeyID=' . $wf_info->{CONTEXT}->{keyid} . ';Overwrite=yes"';
+% #print 'Data="' .$cert_base64 . '"';
+% #print 'Cached PIN:' . Dumper \@cachedpinargs;
+% #</pre>
+<& '/service/reset_token/plugin.mhtml',
+   params => {
+  'Request' => 'ImportX509',
+  'PostURL' => $m->comp('/lib/rel2abs.mhtml', rel => $context->{menu}->get_root() . '/service/smartcard_personalization/certificate_installed.html?' . $params),
+  'Data' => $cert_base64,
+  @cachedpinargs
+  },
+  paramlist => {
+      %paramlist,
+      'PBStart' => 400,
+      'KeyID' => $wf_info->{CONTEXT}->{keyid},
+      'Overwrite' => 'yes',
+  },
+&>
+% #<pre>
+% #print Dumper $wf_info;
+% #</pre>
+% } elsif ($wf_state eq 'SIGNATURE_CERTIFICATE_MISSING_ON_TOKEN_PIN_CACHED') {
+<h1><% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_CSR_TITLE',
+		 '__CURRENTSTEP__' => 2,
+		 '__STEPS__' => $totalsteps,
+  ) %>
+</h1>
+% #print 'Cached PIN:' . Dumper \@cachedpinargs;
+<& '/service/reset_token/plugin.mhtml',
+   params => {
+  'Request' => 'GenerateKeypair',
+  'PostURL' => $m->comp('/lib/rel2abs.mhtml', rel => $context->{menu}->get_root() . '/service/smartcard_personalization/sig_csr_created.html?' . $params),
+  @cachedpinargs
+  },
+  paramlist => {
+      %paramlist,
+      'PBStart' => 200,
+      'Type' => 'RSA',
+      'Length' => '1024',
+  },
+&>
+% } elsif ($wf_state eq 'PIN_MISSING') {
+<h1><% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_QUERY_SMARTCARD_PIN',
+		 '__CURRENTSTEP__' => 1,
+		 '__STEPS__' => $totalsteps,
+  ) %>
+</h1>
+% #print 'Cached PIN:' . Dumper \@cachedpinargs;
+<& '/service/reset_token/plugin.mhtml',
+   params => {
+  'Request' => 'VerifyPIN',
+  'PostURL' => $m->comp('/lib/rel2abs.mhtml', rel => $context->{menu}->get_root() . '/service/smartcard_personalization/pin_verified.html?' . $params),
+  @cachedpinargs,
+  },
+  paramlist => {
+      %paramlist,
+      'PBStart' => 100,
+  },
+&>
+% } elsif ($wf_state eq 'SUCCESS') {
+<h1><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_TITLE',
+		 '__CURRENTSTEP__' => 5,
+		 '__STEPS__' => $totalsteps,
+  ) %>
+</h1>
+<p>
+<% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_SUCCESS_TEXT',
+  ) %>
+</p>
+% } elsif ($wf_state eq 'FAILURE') {
+<h1><% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_ABORT_TITLE',
+		 '__CURRENTSTEP__' => 5,
+		 '__STEPS__' => $totalsteps,
+  ) %>
+</h1>
+<p>
+<% i18nGettext('I18N_OPENXPKI_HTML_MASON_SMARTCARD_ABORT_TEXT') %>
+</p>
+% } else {
+<meta http-equiv="refresh" content="5;url=check_status.html?<% $params %>">
+<h1><% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_PLEASE_WAIT',
+  ) %>
+</h1>
+% #<p>
+% #Current workflow state:
+% #print $wf_state;
+% #</p>
+% #<pre>
+% #Component arguments:
+% #print Dumper $comp_args;
+% #Workflow information:
+% #% print Dumper $wf_info;
+% #</pre>
+% }

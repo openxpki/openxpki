@@ -119,7 +119,9 @@ Log::Log4perl->easy_init($ERROR);
 ok(OpenXPKI::Server::Init::init(
        {
 	   CONFIG => 't/config_test.xml',
-	   TASKS  => [ 'current_xml_config', 
+	   TASKS  => [ 
+               'workflow_bulk_keys',
+               'current_xml_config', 
 		       'i18n', 
                'dbi_log',
 		       'log', 

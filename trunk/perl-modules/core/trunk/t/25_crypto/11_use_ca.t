@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use English;
+use Encode;
 
 use Test::More;
 plan tests => 20;
@@ -301,6 +302,7 @@ else
 
 ## create CSR
 my $subject = "cn=John Dö,dc=OpenXPKI,dc=org";
+$subject = decode_utf8($subject);
 my $csr = $default_token->command ({COMMAND => "create_pkcs10",
                                     KEY     => $key,
                                     PASSWD  => $passwd,

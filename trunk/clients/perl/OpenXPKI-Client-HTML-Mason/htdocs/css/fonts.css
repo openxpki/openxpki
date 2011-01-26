@@ -1,0 +1,139 @@
+.blue {
+	color: #003399;
+}
+a.blue, a.blue_nu {
+	color: #003399;
+}
+.blue_hl {
+	color: #003399;
+	text-decoration: underline;
+}
+
+.white {
+	color: White;
+}
+a.white {
+	color: White;
+	text-decoration: underline;
+}
+a.white:hover {
+	background-color: transparent;
+}
+a.no_efx {
+	background-color: transparent;
+	text-decoration: none;
+}
+
+blue_10_bold {
+	color: #003399;
+	font-size: 10px;
+	font-weight:bold;
+}
+a.blue_10_bold {
+	color: #003399;
+	font-size: 10px;
+	font-weight:bold;
+}
+
+.blue_11 {
+	color: #003399;
+	font-size: 11px;
+}
+a.blue_11, a.blue_11_nu {
+	color: #003399;
+	font-size: 11px;
+}
+.blue_11_bold {
+	color: #003399;
+	font-size: 11px;
+	font-weight: bold;
+}
+.blue_12 {
+	color: #003399;
+	font-size: 12px;
+}
+.blue_11_bold {
+	color: #003399;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.white_11_bold {
+	font-size: 11px;
+	color: White;
+	font-weight: bold;
+}
+a.white_11_bold {
+	font-size: 11px;
+	color: White;
+	font-weight: bold;
+}
+a.white_11_bold:hover {
+	color: #87A7CE;
+	text-decoration: none;
+}
+.lightblue_11_bold {
+	font-size: 11px;
+	color: #87A7CE;
+	font-weight: bold;
+}
+a.lightblue_11_bold {
+	font-size: 11px;
+	color: #87A7CE;
+	font-weight: bold;
+}
+a.lightblue_11_bold:hover {
+	color: White;
+	text-decoration: none;
+}
+.grey_11 {
+	color: #666666;
+	font-size:11px;
+}
+.grey_11_bold {
+	color: #666666;
+	font-size:11px;
+	font-weight: bold;
+}
+.grey_10 {
+	color: #666666;
+	font-size:10px;
+}
+.grey_10_bold {
+	color: #666666;
+	font-size:10px;
+	font-weight: bold;
+}
+
+.black_10 {
+	color: Black;
+	font-size:10px;
+}
+.black_16_bold {
+	color: Black;
+	font-size:16px;
+	font-weight:bold
+}
+.black_13_bold {
+	color: Black;
+	font-size:13px;
+	font-weight:bold
+}
+
+/* resizable css */
+
+.size10_xsx {font-size: 9px;}
+.size10_xnx {font-size: 10px;}
+.size10_xlx {font-size: 12px;}
+
+.size11_xsx {font-size: 9px;}
+.size11_xnx {font-size: 11px;}
+.size11_xlx {font-size: 13px;}
+
+.size12_xsx {font-size: 10px;}
+.size12_xnx {font-size: 12px;}
+.size12_xlx {font-size: 14px;}
+
+.size13_xsx {font-size: 11px;}
+.size13_xnx {font-size: 13px;}
+.size13_xlx {font-size: 15px;}

@@ -12,9 +12,6 @@
 <h1>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_TITLE') %>
 </h1>
-<p>
-  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_DESCRIPTION') %>
-</p>
 % if (scalar @results == 0) {
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_LIST_NO_CERTIFICATES_FOUND') %>
@@ -25,7 +22,6 @@
   <tr>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_SERIAL') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_HTML_COMMON_NAME') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CERT_EMAIL') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></th>
@@ -35,14 +31,12 @@
 %   my $notbefore = OpenXPKI::DateTime::convert_date({
 %       DATE => DateTime->from_epoch(epoch => $cert->{NOTBEFORE}),
 %   });
-%   $notbefore =~ s/T/ /;
-%   $notbefore .= ' UTC';
+%   $notbefore =~ s/T.+//;
 
 %   my $notafter = OpenXPKI::DateTime::convert_date({
 %       DATE => DateTime->from_epoch(epoch => $cert->{NOTAFTER}),
 %   });
-%   $notafter =~ s/T/ /;
-%   $notafter .= ' UTC';
+%   $notafter =~ s/T.+//;
 <tr>
   <td>
      <& /lib/html/a.mhtml,
@@ -57,16 +51,19 @@
       <% $cert->{CN} %>
   </td>
   <td>
-      <% $cert->{EMAIL} %>
-  </td>
-  <td>
       <% $notbefore %>
   </td>
   <td>
       <% $notafter %>
   </td>
   <td>
-      <% $cert->{'ISSUER_DN'} %>
+% if ($cert->{STATUS} eq 'REVOKED') {
+	<b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CERT_REVOKED') %></font><b>
+% } elsif ($cert->{EXTENDED_STATUS} eq 'NOTYETVALID') {
+	<b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CERT_NOT_YET_VALID') %></font><b>
+% } elsif ($cert->{EXTENDED_STATUS} eq 'EXPIRED') {
+	<b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CERT_EXPIRED') %></font><b>
+% }
   </td>
   <td>
 % if ($cert->{STATUS} eq 'REVOKED') {

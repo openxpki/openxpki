@@ -30,9 +30,18 @@ sub execute {
 	# the workflow instance with this)
 	# Note: do this _before_ we start setting individual params
 	# to make sure we don't accidentally clobber something.
-	foreach my $k ( qw( auth1_id auth2_id auth1_hash auth2_hash
-		auth1_salt auth2_salt
-		_auth1_code _auth2_code _new_pin1 _new_pin2 ) ) {
+	foreach my $k ( qw(
+        auth1_id auth2_id
+        auth1_hash auth2_hash
+        auth1_ldap_mail auth2_ldap_mail
+        auth1_ldap_cn auth2_ldap_cn
+        _auth1_code _auth2_code
+        +auth1_salt +auth2_salt
+        _password
+        ldap_mail ldap_cn
+        ticket
+        _puk
+        ) ) {
 		$context->param($k, '');
 	}
 

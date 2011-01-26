@@ -1,0 +1,24 @@
+<%args>
+  $data => undef
+  $filename => undef
+</%args>
+<%once>
+use MIME::Base64 qw( decode_base64 );
+use English;
+</%once>
+<%init>
+my $data_binary = '';
+if (defined $data) {
+    $data_binary = decode_base64($data);
+}
+eval {
+    $r->header_out('Content-Disposition' => ("attachment; filename=$filename")); 
+};
+if ($EVAL_ERROR) {
+    # mod_perl 2
+    $r->headers_out->add('Content-Disposition' => ("attachment; filename=$filename"));
+}
+$r->content_type ('application/octet-string');
+print $data_binary;
+return 1;
+</%init>

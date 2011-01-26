@@ -168,6 +168,57 @@
   <condition name="certificate_issuance_possible" class="OpenXPKI::Server::Workflow::Condition::IsCertificateIssuancePossible">
     <param name="required" value="%REQUIRED_PARAMS%"/>
   </condition>
+  <condition 
+     name="token_contains_expected_signature_certificate" 
+     class="OpenXPKI::Server::Workflow::Condition::CheckExistingCertificate">
+    <param name="cert_email" value="$creator"/>
+    <param name="cert_profile" value="I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL"/>
+    <param name="expected_cert_identifiers" value="$cert_ids_on_token"/>
+    <param name="min_remaining_validity" value="90"/>
+  </condition>
+  <condition 
+     name="token_contains_expected_encryption_certificate" 
+     class="OpenXPKI::Server::Workflow::Condition::CheckExistingCertificate">
+    <param name="cert_email" value="$creator"/>
+    <param name="cert_profile" value="I18N_OPENXPKI_PROFILE_USER_ENCRYPTION"/>
+    <param name="expected_cert_identifiers" value="$cert_ids_on_token"/>
+    <param name="min_remaining_validity" value="90"/>
+    <param name="export_notafter" value="notafter"/>
+  </condition>
+  <condition 
+     name="usable_signature_certificate_already_exists" 
+     class="OpenXPKI::Server::Workflow::Condition::CheckExistingCertificate">
+    <param name="cert_profile" value="I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL"/>
+    <param name="cert_email" value="$creator"/>
+  </condition>
+  <condition 
+     name="usable_nomail_signature_certificate_already_exists" 
+     class="OpenXPKI::Server::Workflow::Condition::CheckExistingCertificate">
+    <param name="cert_profile" value="I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL"/>
+    <param name="cert_email" value="$creator"/>
+  </condition>
+
+  <condition 
+     name="usable_encryption_certificate_already_exists" 
+     class="OpenXPKI::Server::Workflow::Condition::CheckExistingCertificate">
+    <param name="cert_profile" value="I18N_OPENXPKI_PROFILE_USER_ENCRYPTION"/>
+    <param name="cert_email" value="$creator"/>
+    <param name="min_remaining_validity" value="90"/>
+    <param name="export_notafter" value="notafter"/>
+  </condition>
+  <condition 
+     name="private_key_exists_in_workflow" 
+     class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
+    <param name="context_key" value="private_key"/>
+    <param name="condition" value="notnull"/>
+  </condition>
+
+
+
+
+
+
+
   <!-- internal conditions -->
   <condition name="more_csrs_to_create" class="OpenXPKI::Server::Workflow::Condition::MoreCSRsToCreate">
   </condition>

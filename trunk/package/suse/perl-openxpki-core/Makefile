@@ -1,7 +1,7 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
 
-RPMBASE=/usr/src/packages
+RPMBASE=~/rpmbuild
 OPENXPKI_SVN=../../../..
 
 PACKAGE=perl-openxpki-core

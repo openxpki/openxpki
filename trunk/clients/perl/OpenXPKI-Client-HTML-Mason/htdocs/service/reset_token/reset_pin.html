@@ -1,0 +1,11 @@
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_READING_CERTIFICATES_TITLE') %></H1>
+<p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_READING_CERTIFICATES_DESC') %></p>
+<p>
+
+<& '/service/reset_token/plugin.mhtml',
+    params => {
+        'Request' => 'GetCertificates',
+        'PostURL' => $m->comp('/lib/rel2abs.mhtml', rel => $context->{menu}->get_root() . '/service/reset_token/reset_pin_certs.html'),
+    },
+&>
+</p>

@@ -1,0 +1,92 @@
+<%args>
+</%args>
+<%once>
+use Data::Dumper;
+</%once>
+<%init>
+
+my $wf_type = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2';
+my @errors;
+
+my $wf_id = $m->request_args()->{WF_ID};
+
+my $i_msg = $context->{client}->send_receive_command_msg(
+    'get_workflow_info',
+    {
+	WORKFLOW => $wf_type,
+	ID       => $wf_id,
+    },
+    );
+if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
+    @errors = [ $m->comp('/lib/get_deep_error.mhtml', 'msg' => $i_msg) ] ;
+}
+my $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+my $wf_state = $wf_info->{STATE};
+
+my $comp_args = $m->request_args();
+
+if (($wf_info->{STATE} eq 'ENCRYPTION_CERTIFICATE_PREPARED_FOR_INSTALLATION')
+    || ($wf_info->{STATE} eq 'SIGNATURE_CERTIFICATE_PREPARED_FOR_INSTALLATION')) {
+    if ($comp_args->{Result} eq 'SUCCESS') {
+	my @pincacheargs;
+	if (defined $comp_args->{CachedPIN}) {
+	    @pincacheargs = ('cachedpin' => $comp_args->{CachedPIN});
+	}
+	
+	$i_msg = $context->{client}->send_receive_command_msg(
+	    'execute_workflow_activity',
+	    {
+		WORKFLOW => $wf_type,
+		ID       => $wf_id,
+		ACTIVITY => 'install_certificate',
+		PARAMS   => {
+		    @pincacheargs,
+		},
+	    });
+	if (exists $i_msg->{SERVICE_MSG} and
+	    $i_msg->{SERVICE_MSG} eq "ERROR") {
+	    @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $i_msg);
+	}
+	else 
+	{
+	    $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+	}
+    } elsif ($comp_args->{Result} eq 'CANCEL') {
+	$i_msg = $context->{client}->send_receive_command_msg(
+	    'execute_workflow_activity',
+	    {
+		WORKFLOW => $wf_type,
+		ID       => $wf_id,
+		ACTIVITY => 'cancel_workflow',
+	    });
+	if (exists $i_msg->{SERVICE_MSG} and
+	    $i_msg->{SERVICE_MSG} eq "ERROR") {
+	    @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $i_msg);
+	}
+	else 
+	{
+	    $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+	}
+    }
+}
+
+# prepare arguments for page reload
+my $params = "WF_ID=$wf_id";
+
+</%init>
+<meta http-equiv="refresh" content="5;url=check_status.html?<% $params %>">
+% if ($comp_args->{Result} eq 'SUCCESS') {
+<p><% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLED_SUCCESSFULLY') %></p>
+% } elsif ($comp_args->{Result} eq 'ERROR') {
+%   if ($comp_args->{Reason} eq 'WrongPINError') {
+<h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_WRONG_PIN_ERROR') %></h1>
+%   } else {
+<h1><% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_CERTIFICATE_INSTALLATION_ERROR') %></h1>
+%   }
+% } elsif ($comp_args->{Result} eq 'CANCEL') {
+<h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_CANCEL_PIN_INPUT_CANCELLED') %></h1>
+% }
+% #<pre>
+% # print Dumper $comp_args;
+% # print Dumper $wf_info;
+% #</pre>

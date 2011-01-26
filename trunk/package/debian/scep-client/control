@@ -8,7 +8,7 @@ Architecture: any
 Recommends:
 Section: perl
 Priority: optional
-Depends: ${perl:Depends}, ${shlibs:Depends}, libopenxpki-client-perl, apache2, libapache2-mod-perl2, libapache2-request-perl
+Depends: ${perl:Depends}, ${shlibs:Depends}, libopenxpki-client-perl, apache, libapache-mod-perl, libapache-request-perl
 Description: OpenXPKI SCEP CGI script
  OpenXPKI is an Open Source PKI project.
  .

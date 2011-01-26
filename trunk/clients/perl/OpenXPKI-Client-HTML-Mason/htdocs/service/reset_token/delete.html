@@ -1,0 +1,14 @@
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_DELETE_CONFIRM_TITLE') %></H1>
+<p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_DELETE_CONFIRM_DESC') %></p>
+<p>
+<ul>
+    <li><& '/lib/html/a.mhtml', 
+        target => $context->{menu}->get_root() . '/service/reset_token/delete_gettokenid.html',
+        label => i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_DELETE_CONFIRM_YES'),
+        &>
+    <li><& '/lib/html/a.mhtml', 
+        target => $context->{menu}->get_root() . '/service/reset_token/index.html',
+        label => i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_DELETE_CONFIRM_NO'),
+        &>
+</ul>
+</p>

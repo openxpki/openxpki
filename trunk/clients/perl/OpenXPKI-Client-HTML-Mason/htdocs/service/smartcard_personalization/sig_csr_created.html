@@ -1,0 +1,104 @@
+<%args>
+</%args>
+<%init>
+use Data::Dumper;
+
+my $wf_type = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2';
+my @errors;
+
+my $wf_id = $m->request_args()->{WF_ID};
+
+my $i_msg = $context->{client}->send_receive_command_msg(
+    'get_workflow_info',
+    {
+	WORKFLOW => $wf_type,
+	ID       => $wf_id,
+    },
+    );
+if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
+    @errors = [ $m->comp('/lib/get_deep_error.mhtml', 'msg' => $i_msg) ] ;
+}
+my $wf_info = $i_msg->{PARAMS}->{WORKFLOW};
+my $wf_state = $wf_info->{STATE};
+
+# prepare arguments for page reload
+my $comp_args = $m->request_args();
+
+if ($comp_args->{Result} eq 'SUCCESS') {
+    my $keyid = $comp_args->{KeyID};
+    my $pkcs10 = $comp_args->{PKCS10Request};
+
+    my @pincacheargs;
+    if (defined $comp_args->{CachedPIN}) {
+	@pincacheargs = ('cachedpin' => $comp_args->{CachedPIN});
+    }
+
+    # split line into 76 character long chunks
+    $pkcs10 = join("\n", ($pkcs10 =~ m[.{1,64}]g));
+
+    # add header
+    $pkcs10 = "-----BEGIN CERTIFICATE REQUEST-----\n"
+	. $pkcs10 . "\n"
+	. "-----END CERTIFICATE REQUEST-----";
+    
+    if ($wf_state eq 'SIGNATURE_CERTIFICATE_MISSING_ON_TOKEN_PIN_CACHED') {
+	$i_msg = $context->{client}->send_receive_command_msg(
+	    'execute_workflow_activity',
+	    {
+		WORKFLOW => $wf_type,
+		ID       => $wf_id,
+		ACTIVITY => 'upload_signature_csr',
+		PARAMS   => {
+		    pkcs10 => $pkcs10,
+                    keyid  => $keyid,
+		    @pincacheargs,
+		},
+	    });
+	if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
+	    @errors = [ $m->comp('/lib/get_deep_error.mhtml', 'msg' => $i_msg) ] ;
+	}
+    }
+} elsif ($comp_args->{Result} eq 'CANCEL') {
+    if ($wf_state eq 'SIGNATURE_CERTIFICATE_MISSING_ON_TOKEN_PIN_CACHED') {
+	$i_msg = $context->{client}->send_receive_command_msg(
+	    'execute_workflow_activity',
+	    {
+		WORKFLOW => $wf_type,
+		ID       => $wf_id,
+		ACTIVITY => 'cancel_workflow',
+		PARAMS   => {
+		},
+	    });
+	if ($i_msg->{SERVICE_MSG} eq 'ERROR') {
+	    @errors = [ $m->comp('/lib/get_deep_error.mhtml', 'msg' => $i_msg) ] ;
+	}
+    }
+}
+
+my $params = "WF_ID=$wf_id";
+
+</%init>
+<meta http-equiv="refresh" content="5;url=check_status.html?<% $params %>">
+% if ($comp_args->{Result} eq 'SUCCESS') {
+<h1><% i18nGettext('I18N_OPENXPKI_HTML_SMARTCARD_SIGNATURE_REQUEST_GENERATED',
+  ) %>
+</h1>
+% } elsif ($comp_args->{Result} eq 'ERROR') {
+%   if ($comp_args->{Reason} eq 'WrongPINError') {
+<h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_WRONG_PIN_ERROR',
+  ) %>
+</h1>
+%   } else {
+<h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_UNKNOWN_ERROR',
+  ) %>
+</h1>
+%   }
+% } elsif ($comp_args->{Result} eq 'CANCEL') {
+<h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_CANCEL_PIN_INPUT_CANCELLED',
+  ) %>
+</h1>
+% }
+% #<pre>
+% #print Dumper $comp_args;
+% #print Dumper $wf_info;
+% #</pre>

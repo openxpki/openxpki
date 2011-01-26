@@ -24,6 +24,11 @@ sub execute {
     my $context    = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
+    my $error_when_not_found
+        = lc( $self->param('error_when_not_found') ) eq 'no' ? 0 : 1;
+    my $error_when_not_unique
+        = lc( $self->param('error_when_not_unique') ) eq 'no' ? 0 : 1;
+
     my $ldap_server     = $self->param('ldap_server');
     my $ldap_port       = $self->param('ldap_port');
     my $ldap_userdn     = $self->param('ldap_userdn');
@@ -33,26 +38,28 @@ sub execute {
     my $ldap_attrmap    = $self->param('ldap_attrmap');
     my $ldap_timelimit  = $self->param('ldap_timelimit');
     my @ldap_attribs    = split( /,/, $ldap_attributes );
-    my %ldap_attrmap =
-      map { split(/\s*[=-]>\s*/) }
-      split( /\s*,\s*/, $ldap_attrmap );
-
-      ##! 64: "ldap_attrmap = " . Dumper(\%ldap_attrmap)
+    my %ldap_attrmap
+        = map { split(/\s*[=-]>\s*/) }
+        split( /\s*,\s*/, $ldap_attrmap );
 
     ##! 2: 'connecting to ldap server ' . $ldap_server . ':' . $ldap_port
     my $ldap = Net::LDAPS->new(
         $ldap_server,
-        port    => $ldap_port,
-        onerror => undef,
+        port => $ldap_port,
+
+        #        onerror => undef,
+        onerror => sub {
+            ##! 1: 'Error creating new ldap instance' . join(', ', @_)
+        },
+
     );
 
-    ##! 2: 'ldap object created'
     # TODO: maybe use TLS ($ldap->start_tls())?
 
     if ( !defined $ldap ) {
         OpenXPKI::Exception->throw(
             message =>
-'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_CONNECTION_FAILED',
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_CONNECTION_FAILED',
             params => {
                 'LDAP_SERVER' => $ldap_server,
                 'LDAP_PORT'   => $ldap_port,
@@ -65,11 +72,12 @@ sub execute {
         );
     }
 
+    ##! 2: 'ldap object created'
     my $mesg = $ldap->bind( $ldap_userdn, password => $ldap_pass );
     if ( $mesg->is_error() ) {
         OpenXPKI::Exception->throw(
             message =>
-'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_BIND_FAILED',
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_BIND_FAILED',
             params => {
                 ERROR      => $mesg->error(),
                 ERROR_DESC => $mesg->error_desc(),
@@ -101,6 +109,10 @@ sub execute {
         $value = $svcparsed;
     }
     ##! 128: "svc=$svc, svcparsed=$svcparsed, value=$value"
+    ##! 128: " base=$ldap_basedn"
+    ##! 128: " filter=($key=$value)"
+    ##! 128: " attrs=".join(', ', @ldap_attribs)
+    ##! 128: " timelimit=$ldap_timelimit"
 
     $mesg = $ldap->search(
         base      => $ldap_basedn,
@@ -112,7 +124,7 @@ sub execute {
     if ( $mesg->is_error() ) {
         OpenXPKI::Exception->throw(
             message =>
-'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_SEARCH_FAILED',
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_SEARCH_FAILED',
             params => {
                 ERROR      => $mesg->error(),
                 ERROR_DESC => $mesg->error_desc(),
@@ -127,10 +139,10 @@ sub execute {
     ##! 2: 'ldap->search() done'
     ##! 16: 'mesg->count: ' . $mesg->count
 
-    if ( $mesg->count == 0 ) {
+    if ( $mesg->count == 0 and $error_when_not_found ) {
         OpenXPKI::Exception->throw(
             message =>
-'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND',
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND',
             params => { FILTER => "$key=$value", },
             log    => {
                 logger   => CTX('log'),
@@ -139,10 +151,10 @@ sub execute {
             },
         );
     }
-    elsif ( $mesg->count > 1 ) {
+    elsif ( $mesg->count > 1 and $error_when_not_unique ) {
         OpenXPKI::Exception->throw(
             message =>
-'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_MORE_THAN_ONE_LDAP_ENTRY_FOUND',
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_MORE_THAN_ONE_LDAP_ENTRY_FOUND',
             params => { FILTER => "$key=$value", },
             log    => {
                 logger   => CTX('log'),
@@ -171,11 +183,11 @@ sub execute {
         }
     }
 
-   #    $context->param('display_mapping' => $self->param('display_mapping'));
-   #    $context->param('client_csp' => $self->param('client_csp'));
-   #    $context->param('client_bitlength' => $self->param('client_bitlength'));
+ #    $context->param('display_mapping' => $self->param('display_mapping'));
+ #    $context->param('client_csp' => $self->param('client_csp'));
+ #    $context->param('client_bitlength' => $self->param('client_bitlength'));
 
-   ##! 32: 'context = ' . Dumper($context)
+    ##! 32: 'context = ' . Dumper($context)
 
     ##! 4: 'end'
     return;
@@ -200,3 +212,15 @@ the values in the workflow context (prefixed with 'ldap_').
 Map LDAP attribute names to context parameter names, allowing flexible access and assignment of
 data from LDAP into the context. By default, the names of the LDAP attributes returned are 
 prepended with 'ldap_' and set as context parameters.
+
+=head2 error_when_not_found
+
+Setting this to 'yes' causes an exception to be thrown when no record is
+found and 'no' supresses the exception. The default is 'yes'.
+
+=head2 error_when_not_unique
+
+Setting this to 'yes' causes an exception to be thrown when more than one
+record is found and 'no' supresses the exception. The default is 'yes'.
+
+

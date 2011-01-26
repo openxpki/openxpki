@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="css/sscStyle.css" media="all"/>
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+<meta content="text/html; charset=utf-8" http-equiv="content-type">
+<title>Smartcard Badge | Self-Service Center</title>
+
+<script type="text/javascript" src="js/mootools-1.2.4.js"></script>
+<script type="text/javascript" src="js/mootools-1.2.4.4-more.js"></script>
+<script type="text/javascript" src="js/ssc_model.js"></script>
+<script type="text/javascript" src="js/ssc_view.js"></script>
+<script type="text/javascript" src="js/ssc_controller.js"></script>
+<script type="text/javascript" src="js/ssc_helper.js"></script>
+<script type="text/javascript" src="js/querystring.js"></script>
+<script type="text/javascript" src="js/urlEncode.js"></script>
+</head>
+<body onunload="reset_plugin()">
+
+<div id="outerWrapper">
+  <div id="outerHeaderFrame">
+    <div id="headerFrame">
+      <div id="header">
+        <div id="topHeader"> <a class="wortmarke" href"#"></a>
+          <div id="topMenu">
+            <ul id="topMenuList">
+            </ul>
+          </div>
+          <a class="bildmarke" href"#"></a> </div>
+        
+        <div class="headerTitle">
+        <div id="mainMenu">
+          <ul id="mainMenuList">
+          </ul>
+        </div>
+        </div>
+        <div id="statusBar">
+          
+          <div id="statusLight" class=""></div>
+          <h3 id="statusText"></h3>
+          <div id="overallStatus"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="outerContentFrame">
+    <div id="contentarea_col3">
+    <div><div id="pluginDiv">  </div></div>
+      <div id="wrapper">
+        <div id="main">
+       
+          <div id="infoLeft">
+            <h3 id="infoLeftTitle"></h3>
+            <div id="infoLeftContent"></div>
+          </div>
+          <div id="infoCenter">
+            <h1 id="infoCenterTitle">initializing application</h1>
+                 <div id="infoMore"></div>
+                 <div id="infoPrompt" class="infoCenterSubHeadline"></div>
+                 <div id="actionLine" >
+                     <div id="backActionDiv"></div>
+                     <div id="nextActionDiv"></div>
+                 </div>
+     	  </div>
+          <div id="infoRight">
+          <h3 id="infoRightTitle"></h3>
+             <!--<div id="infoRightTitle"></div> -->
+             <div id="infoRightContent" class="infoRightContent"></div>         
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="outerFooterFrame">
+    <div id="footer">
+      <div id="footerMenu">
+        <ul id="footerMenuList">           
+        </ul>
+      </div>
+      <div>
+        <p id="lastChanges"></p>
+        <p>Copyright &copy; 2010 Deutsche Bank AG, Frankfurt am Main</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="popupFrame">
+  	<div id="popupDiv">
+   		<a id="popupCloser">X</a>
+   		<div id="popupSign"></div>
+   		<div id="popupInfo"></div>
+   		<div id="popupInfo2"></div>
+	</div>
+</div>
+</body>
+</html>

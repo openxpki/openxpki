@@ -26,6 +26,10 @@ sub execute {
     my @cert_profiles = split(/,/, $self->param('cert_profiles'));
     my @cert_roles    = split(/,/, $self->param('cert_roles'));
 
+    # allows to specify explicit usage of a configured profile/role index
+    # in action definition
+    my $forced_index = $self->param('force_profile_index');
+
     my $cert_issuance_data_ser = $context->param('cert_issuance_data');
     my @cert_issuance_data;
     if (defined $cert_issuance_data_ser) {
@@ -35,9 +39,170 @@ sub execute {
     else { # first time, write the number of certificates to the
            # workflow context
         $context->param('nr_of_certs' => scalar @cert_profiles);
+
+	# only retrieve this data if chosen_loginid is set
+	if (defined $context->param('chosen_loginid')) {
+	    # Lookup UPN from AD
+	    my $ad_server;
+	    my $ad_port = 389;
+	    my $ad_userdn     = $self->param('ad_userdn');
+	    my $ad_pass       = $self->param('ad_pass');
+	    my $ad_basedn;
+	    my $ad_timelimit  = $self->param('ad_timelimit');
+
+	    my ($domain, $userid)
+		= ($context->param('chosen_loginid') =~ m{ \A (.+)\\(.+) }xms);
+	    if ($domain =~ m{\A (?:deuba|zzdbe) \z}xmsi) {
+		# test: "yydbe.yyads.db.com";
+		# prod: "dbe.ads.db.com";
+		$ad_server = $self->param('ad_deuba_server');
+		# test: "dc=yydbe,dc=yyads,dc=db,dc=com";
+		# prod: "dc=dbe,dc=ads,dc=db,dc=com";
+		$ad_basedn = $self->param('ad_deuba_basedn');
+	    }
+	    elsif ($domain =~ m{\A dbg \z}xmsi) {
+		# prod: "dbg.ads.db.com";
+		$ad_server = $self->param('ad_dbg_server');
+		# prod: "dc=dbg,dc=ads,dc=db,dc=com";
+		$ad_basedn = $self->param('ad_dbg_basedn');
+	    }
+	    elsif ($domain =~ m{\A itcbod \z}xmsi) {
+		# prod: "itcbod.ads.db.com";
+		$ad_server = $self->param('ad_itcbod_server');
+		# prod: "dc=itcbod,dc=ads,dc=db,dc=com";
+		$ad_basedn = $self->param('ad_itcbod_basedn');
+	    }
+	    elsif ($domain =~ m{\A dblux \z}xmsi) {
+		# prod: ?
+		$ad_server = $self->param('ad_dblux_server');
+		# prod: ?
+		$ad_basedn = $self->param('ad_dblux_basedn');
+		# DBLUX has a different user name and password
+		$ad_userdn = $self->param('ad_dblux_userdn');
+		$ad_pass   = $self->param('ad_dblux_pass');
+	    }
+	    elsif ($domain =~ m{\A dbch \z}xmsi) {
+		$ad_server = $self->param('ad_dbch_server');
+		$ad_basedn = $self->param('ad_dbch_basedn');
+		$ad_userdn = $self->param('ad_dbch_userdn');
+		$ad_pass   = $self->param('ad_dbch_pass');
+	    }
+	    else {
+		OpenXPKI::Exception->throw(
+		    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_CREATESERVERCSR_UNKNOWN_DOMAIN_USED',
+		    params  => {
+			'DOMAIN'  => $domain,
+			'USER'    => $userid,
+			'LOGINID' => $context->param('chosen_loginid'),
+		    },
+		    );
+	    }
+	    
+	    if ($ad_server =~ m{ : }xms) { 
+		($ad_server, $ad_port) = ($ad_server =~ m{ (.+) : (\d+) \z }xms);
+	    }
+	    
+	    $context->param('ad_server' => $ad_server);
+	    $context->param('ad_port'   => $ad_port);
+	    $context->param('ad_basedn' => $ad_basedn);
+	    
+	    ##! 2: 'connecting to ldap server ' . $ad_server. ':' . $ad_port
+	    my $ldap = Net::LDAP->new(
+		$ad_server,
+		port    => $ad_port,
+		onerror => undef,
+		);
+	    
+	    ##! 2: 'ldap object created'
+	    # TODO: maybe use TLS ($ldap->start_tls())?
+	    
+	    if (! defined $ldap) {
+		OpenXPKI::Exception->throw(
+		    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_CREATESERVERCSR_LDAP_CONNECTION_FAILED',
+		    params => {
+			'LDAP_SERVER' => $ad_server,
+			'LDAP_PORT'   => $ad_port,
+		    },
+		    );
+	    }
+	    
+	    my $mesg = $ldap->bind(
+		$ad_userdn,
+		password => $ad_pass,
+		);
+	    if ($mesg->is_error()) {
+		OpenXPKI::Exception->throw(
+		    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_CREATESERVERCSR_LDAP_BIND_FAILED',
+		    params  => {
+			ERROR      => $mesg->error(),
+			ERROR_DESC => $mesg->error_desc(),
+		    },
+		    );
+	    }
+	    ##! 2: 'ldap->bind() done'
+	    
+	    my $filter = "(&(sAMAccountName=$userid) (objectCategory=person))";
+	    
+	    $mesg = $ldap->search(base      => $ad_basedn,
+				  scope     => 'sub',
+				  filter    => $filter,
+				  attrs     => [ 'userPrincipalName' ],
+				  timelimit => $ad_timelimit,
+		);
+	    if ($mesg->is_error()) {
+		OpenXPKI::Exception->throw(
+		    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_CREATESERVERCSR_LDAP_SEARCH_FAILED',
+		    params  => {
+			ERROR      => $mesg->error(),
+			ERROR_DESC => $mesg->error_desc(),
+		    },
+		    );
+	    }
+	    ##! 2: 'ldap->search() done'
+	    ##! 16: 'mesg->count: ' . $mesg->count
+	    
+	    if ($mesg->count == 0) {
+		OpenXPKI::Exception->throw(
+		    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_CREATESERVERCSR_LDAP_ENTRY_NOT_FOUND',
+		    params  => {
+			'BASEDN' => $ad_basedn,
+			'FILTER' => $filter,
+		    },
+		    );
+	    }
+	    elsif ($mesg->count > 1) {
+		OpenXPKI::Exception->throw(
+		    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_CREATESERVERCSR_MORE_THAN_ONE_LDAP_ENTRY_FOUND',
+		    params  => {
+			'BASEDN' => $ad_basedn,
+			'FILTER' => $filter,
+		    },
+		    );
+	    }
+	    
+	    foreach my $entry ($mesg->entries) {
+		##! 32: 'foreach entry'
+		##! 32: 'dn: ' . $entry->dn()
+		$context->param('ad_entrydn' => $entry->dn());
+		foreach my $attrib ($entry->attributes) {
+		    ##! 32: 'foreach attrib: ' . $attrib
+		    my @values = $entry->get_value($attrib);
+		    ##! 32: 'attrib values: ' . Dumper \@values
+		    if (scalar @values == 1) { # scalar
+			$context->param(
+			    'ldap_' . $attrib => $values[0],
+			    );
+		    }
+		    else { # non-scalar!
+			OpenXPKI::Exception->throw(
+			    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_CREATESERVERCSR_UPN_MULTIVALUED',
+			    );
+		    }
+		}
+	    }
+	}
     }
-    my $current_pos = scalar @cert_issuance_data;
-    
+
     # prepare LDAP variable hashref for Template Toolkit
     my $ldap_vars;
     foreach my $param (keys %{ $context->param() }) {
@@ -65,6 +230,14 @@ sub execute {
         $entry = \@tmp_array;
     }
     ##! 16: '@sans: ' . Dumper(\@sans)
+
+    my $current_pos = scalar @cert_issuance_data;
+    if (defined $forced_index) {
+	$current_pos = $forced_index;
+
+	# update number of certs to issue
+        $context->param('nr_of_certs' => (scalar @cert_issuance_data) + 1);
+    }
     
     my $cert_issuance_hash_ref = {
         'pkcs10'                => $context->param('pkcs10'),
@@ -81,6 +254,7 @@ sub execute {
         'cert_issuance_data' => $serializer->serialize(\@cert_issuance_data),
     );
     ##! 4: 'end'
+    ##! 16: 'chosen_loginid: ' . $context->param('chosen_loginid')
     return;
 }
 

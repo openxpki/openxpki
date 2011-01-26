@@ -1,0 +1,68 @@
+<%init>
+use Data::Dumper;
+my @emails = ();
+# read certificates from Novosec plugin, get certificate identifier for
+# each sent certificate
+# Novosec sends the ID with uppercase letters, but the XML file/workflow
+# has it in lowercase
+my $token_id = lc($m->request_args()->{TokenID});
+foreach my $key (keys %{ $m->request_args() }) {
+    if ($key =~ m{\A cert \d+ \z}xms) {
+        my $cert = $m->request_args()->{$key};
+        $cert =~ s{(.{64})}{$1\n}g;
+        $cert =   "-----BEGIN CERTIFICATE-----\n"
+                . $cert . "\n"
+                . "-----END CERTIFICATE-----\n";
+         my $msg = $context->{'client'}->send_receive_command_msg(
+            'get_cert_identifier',
+            {
+                'CERT' => $cert,
+            },
+        );
+        $msg = $context->{'client'}->send_receive_command_msg(
+            'get_cert',
+            {
+                'IDENTIFIER' => $msg->{PARAMS},
+            },
+        );
+        # we are using the email address from the certificate as the user
+        # TODO - decide if this is the way we want to do it, alternatively:
+        # retrieve the creator of the workflow that created the certificate
+        # FIXME - this will fail if a certificate without e-mail address
+        # is on the token - is this what we want?
+        push @emails, $msg->{PARAMS}->{BODY}->{EMAILADDRESSES}->[0];
+    }
+}
+my $user = $context->{client}->send_receive_command_msg('get_user')->{PARAMS};
+
+my $reset_ok = 0;
+my @different_users = grep { $_ ne $user } @emails;
+my $different_users = join q{, }, keys %{{ map { $_ => 1 } @different_users }};
+if (scalar @different_users == 0) {
+    # reset is OK if every certificate email is equal to the username
+    $reset_ok = 1;
+}
+</%init>
+
+% if (! $reset_ok) {
+    <H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_RESET_PIN_PERMISSION_DENIED_TITLE') %></H1>
+    <p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_PIN_PERMISSION_DENIED_DESC', '__USERS__' => $different_users) %></p>
+% }
+% else {
+%   my $encrypted_puk = $m->comp('/service/reset_token/get_encrypted_puk.mhtml',
+%       token_id => $token_id,
+%   );
+%   return if (! defined $encrypted_puk); # error message is already shown
+%                                         # by get_encrypted_puk.mhtml
+    <H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_NEW_PIN_TITLE') %></H1>
+    <p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_NEW_PIN_DESC') %></p>
+<p>
+<& '/service/reset_token/plugin.mhtml',
+    params => {
+        'Request' => 'ResetPIN',
+        'PostURL' => $m->comp('/lib/rel2abs.mhtml', rel => $context->{menu}->get_root() . '/service/reset_token/reset_pin_result.html'),
+        'PUK'     => $encrypted_puk,
+    },
+&>
+</p>
+% }

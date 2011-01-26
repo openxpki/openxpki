@@ -491,6 +491,9 @@ sub authorize
     my $owner    = "";
        $owner    = $keys->{AFFECTED_ROLE} if (exists $keys->{AFFECTED_ROLE} and
                                               defined $keys->{AFFECTED_ROLE});
+    if ($owner eq 'SCEP issued') {
+        $owner = '';
+    }
     my $activity = $keys->{ACTIVITY};
 
     ##! 99: "user:realm:activity:owner - $user:$realm:$activity:$owner"

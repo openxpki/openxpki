@@ -1,0 +1,13 @@
+<%args>
+    $rel => undef
+</%args>
+<%init>
+use URI;
+my $scheme = 'http://';
+if (exists $ENV{HTTPS}) {
+    $scheme = 'https://';
+}
+my $current_url = $scheme . $ENV{SERVER_NAME} . ':' . $ENV{SERVER_PORT} . $ENV{REQUEST_URI};
+my $uri = URI->new_abs($rel, $current_url);
+return $uri->as_string();
+</%init>

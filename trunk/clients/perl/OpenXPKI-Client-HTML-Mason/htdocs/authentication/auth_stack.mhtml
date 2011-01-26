@@ -50,6 +50,19 @@
         }
         #print  STDERR "second: ".$data{'auth_stack'}."\n";
     }
+    elsif (exists $data{'websso_login'}) {
+        # choose authentication stack automatically if websso_login
+        # is set.
+        $msg = $client->send_receive_service_msg(
+            'GET_AUTHENTICATION_STACK',
+            {
+                'AUTHENTICATION_STACK' => 'User',
+            },
+        );
+        if ($msg->{'SERVICE_MSG'} ne 'GET_AUTHENTICATION_STACK') {
+            return $msg;
+        }
+    }
 
     ## ok let's ask the user for the auth stacks
     ## cache the last message in the context

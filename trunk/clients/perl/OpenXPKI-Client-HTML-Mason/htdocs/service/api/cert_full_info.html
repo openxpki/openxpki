@@ -24,10 +24,6 @@
 % }
 <table>
   <tr>
-    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE') %></th>
-  </tr>
-  <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></td>
     <td><% delete $params->{SUBJECT} %></td>
   </tr>
@@ -134,7 +130,7 @@
 % foreach my $policy (@policies) {
     <tr>
         <td><% i18nGettext('I18N_OPENXPKI_CERT_POLICY') %></td>
-        <td><a href="http://www.alvestrand.no/cgi-bin/hta/oidwordsearch?text=<% $policy %>"><% $policy %></a></td>
+        <td><% $policy %></td>
     </tr>
 % }
   <tr>

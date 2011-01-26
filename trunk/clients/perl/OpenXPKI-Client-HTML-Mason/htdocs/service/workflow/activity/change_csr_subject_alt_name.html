@@ -126,7 +126,7 @@
     ## build hash for select fields and descriptions
     my %descriptions = ();
     my @values       = ();
-    my @raw          = ("DNS", "IP", "email", "UPN", "URI", "DirName", "GUID",  "RID");
+    my @raw          = ("DNS", "IP");
 
     foreach my $key (@raw)
     {
@@ -134,4 +134,8 @@
         $descriptions{i18nGettext($label)} = i18nGettext($label."_DESCRIPTION");
         push @values, {LABEL => i18nGettext($label), VALUE => $key};
     }
+    # I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS
+    # I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_DNS_DESCRIPTION
+    # I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP
+    # I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_SUBJECT_ALT_NAME_IP_DESCRIPTION
 </%init>

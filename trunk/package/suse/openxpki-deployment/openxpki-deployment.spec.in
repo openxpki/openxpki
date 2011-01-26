@@ -146,6 +146,7 @@ if [ -e %{instancedir}/%{instance}/openxpki.conf ]; then
 else
     install -d -m 750 -o root -g openxpki %{instancedir}/%{instance}
     install -m 750 -o root -g openxpki %{install_prefix}/share/openxpki/templates/default/openxpki.conf %{instancedir}/%{instance}
+    install -d -m 750 -o openxpki -g www /var/www/openxpki
     echo -n "Deploying instance '%{instance}'... " >&2
     openxpkiadm deploy -- --setcfg dir.openxpkiconfdir=%{instancedir}/%{instance} 2>>/var/log/messages
     echo "DONE." >&2

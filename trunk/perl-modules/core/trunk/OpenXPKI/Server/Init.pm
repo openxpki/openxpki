@@ -54,6 +54,7 @@ our $current_xml_config; # this is an OpenXPKI::XML::Config object
 # init code. the order of the array elements is also the default execution
 # order.
 my @init_tasks = qw(
+  workflow_bulk_keys   
   current_xml_config
   i18n
   dbi_log
@@ -221,6 +222,127 @@ sub get_remaining_init_tasks {
 ###########################################################################
 # init functions to be called during init task processing
 
+sub __do_init_workflow_bulk_keys {
+    OpenXPKI::Server::Context::setcontext({
+        workflow_bulk_keys => {
+            'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' =>
+            {
+                'keys' => {
+                    'cert_info'                   => 1,
+                    'cert_subject_alt_name'       => 1,
+                    'cert_subject_alt_name_parts' => 1,
+                    'cert_subject_parts'          => 1,
+                    'sources'                     => 1,
+                    'spkac'                       => 1,
+                    'pkcs10'                      => 1,
+                    'private_key'                 => 1,
+                },
+            },
+            'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE' =>
+            {
+                'keys' => {
+                    'pkcs10'                      => 1,
+                    'spkac'                       => 1,
+                    'cert_subject_alt_name'       => 1,
+                    'certificate'                 => 1,
+                },
+            },
+            'I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE' =>
+            {
+                'keys' => {
+                    'ca_ids'                      => 1,
+                },
+            },
+            'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING' =>
+            {
+                'keys' => {
+                    'certificate'                 => 1,
+                },
+            },
+            'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' =>
+            {
+		'keys' => {
+		    'sources' => 1,
+                },
+            },
+            'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE' =>
+            {
+                'regexs' => [
+                    qr/ \A encrypted_ /xms,
+                ],
+            },
+            'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST' =>
+            {
+                'keys' => {
+                    'pkcs7_content'         => 1,
+                    'pkcs10'                => 1,
+                    'cert_subject_alt_name' => 1,
+                    'sources'               => 1,
+                },
+            },
+            'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION' =>
+            {
+                'keys' => {
+                    'display_mapping'        => 1,
+                    'cert_issuance_data'     => 1,
+                    'cert_subject_alt_names' => 1,
+                    'certificate'            => 1,
+                    'csr_serial'             => 1,
+                    'pkcs10'                 => 1,
+                    'wf_children_instances'  => 1,
+                    'ad_basedn'              => 1,
+                    'ad_entrydn'             => 1,
+                },
+                'regexs' => [
+                    qr/ \A ldap_ /xms,
+                ],
+            },
+            'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2' =>
+            {
+                'keys' => {
+                    'display_mapping'        => 1,
+                    'cert_issuance_data'     => 1,
+                    'cert_subject_alt_names' => 1,
+                    'certificate'            => 1,
+                    'csr_serial'             => 1,
+                    'pkcs10'                 => 1,
+                    'wf_children_instances'  => 1,
+                    'ad_basedn'              => 1,
+                    'ad_entrydn'             => 1,
+                    'private_key'            => 1,
+		    'pkcs12base64'           => 1,
+                },
+                'regexs' => [
+                    qr/ \A ldap_ /xms,
+                ],
+            },
+            'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3' =>
+	    {
+	        'keys' => {
+		    'certs_on_card'           => 1,
+		    'certificate'             => 1,
+		    'pkcs10'                  => 1,
+                    'cert_issuance_data'      => 1,
+		    'certs_to_install'        => 1,
+		    'certs_to_delete'         => 1,
+		    'certs_to_unpublish'      => 1,
+		    'ldap_dbntloginid'        => 1,
+                    'tmp_queue'               => 1,
+                },
+                'regexs' => [
+                ],
+            },
+            'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING' =>
+            {
+                'keys' => {
+                    'certificate' => 1,
+                },
+            },
+        },
+    });
+    return 1;
+}
+
 sub __do_init_workflow_factory {
     my $keys = shift;
     ##! 1: 'init workflow factory'
@@ -229,6 +351,46 @@ sub __do_init_workflow_factory {
     OpenXPKI::Server::Context::setcontext({
         workflow_factory => $workflow_factory,
     });
+    return 1;
+}
+
+sub __do_init_migrate_workflows {
+    # migrate workflows without config IDs: add the current config ID
+    # for them
+
+    my $current_config_id = CTX('api')->get_current_config_id();
+    CTX('dbi_workflow')->connect();
+    my $wfs = CTX('dbi_workflow')->select(
+        TABLE => 'WORKFLOW',
+        DYNAMIC => {
+            'PKI_REALM' => '%',
+        },
+    );
+    ##! 64: 'wfs: ' . Dumper $wfs
+    foreach my $instance (@{$wfs}) {
+        my $id = $instance->{WORKFLOW_SERIAL};
+        ##! 64: 'id: ' . $id
+        my $config_id = CTX('api')->get_config_id({
+            ID => $id,
+        });
+        if (! defined $config_id) {
+            ##! 64: 'config_id is not defined for workflow ' . $id
+            CTX('dbi_workflow')->insert(
+                TABLE => 'WORKFLOW_CONTEXT',
+                HASH  => {
+                    'WORKFLOW_SERIAL'        => $id,
+                    'WORKFLOW_CONTEXT_KEY'   => 'config_id',
+                    'WORKFLOW_CONTEXT_VALUE' => $current_config_id,
+                },
+            );
+        }
+        else {
+            ##! 64: 'config_id is defined for workflow ' . $id . ': ' . $config_id
+        }
+    }
+    CTX('dbi_workflow')->commit();
+    CTX('dbi_workflow')->disconnect();
+
     return 1;
 }
 

@@ -1,4 +1,4 @@
-eg/openxpki-mason-mod_perl.conf    etc/apache2/conf.d/
+eg/openxpki-mason-mod_perl.conf    etc/apache/conf.d/
 
 htdocs/*                var/www/openxpki/
 htdocs/authentication/* var/www/openxpki/authentication/

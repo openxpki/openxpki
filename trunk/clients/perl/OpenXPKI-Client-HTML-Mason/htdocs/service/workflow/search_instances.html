@@ -150,7 +150,11 @@
     </script>
       <select name="type" onchange="reloadType(this.value)">
       <option value=""><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_WORKFLOW_TYPE_ANY') %></option>
+%   TYPES:
 %   foreach my $a_type (keys %{$msg->{PARAMS}}) {
+%        # do not show password safe type, listing its context keys is
+%        # quite expensive!
+%        next TYPES if ($a_type eq 'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE');
 %        if ($a_type eq $type) {
             <option value="<% $a_type %>" selected><% i18nGettext($a_type) %></option>
 %        }
@@ -168,16 +172,19 @@
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SEARCH_INSTANCES_FORM_VALUE') %></th>
   </tr>
   <tr>
+%     my $keys_msg;
 %     if (!defined $type) {
 %         $type = '';
 %     }
-%     my $keys_msg = $context->{client}->send_receive_command_msg
+%     else {
+%         $keys_msg = $context->{client}->send_receive_command_msg
 %               (
 %                   "list_context_keys",
 %                    {
 %                       'WORKFLOW_TYPE' => $type
 %                    },
 %               );
+%     }
     <td>
       <select name="context_key">
       <option value=""></option>

@@ -5,6 +5,9 @@
 <h1>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_TITLE', __SERIAL__ => $serial) %>
 </h1>
+<h2>
+  <% $cn %>
+</h2>
 % if ($status eq 'REVOKED') {
 <p>
 <b><font color="#FF0000"><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_INFO_REVOKED_DESC') %></font><b>
@@ -22,12 +25,8 @@
 % }
 <table>
   <tr>
-    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_NAME') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TABLE_HEAD_VALUE') %></th>
-  </tr>
-  <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_SUBJECT') %></td>
-    <td><% $subject %></td>
+    <td><b><% $subject %></b></td>
   </tr>
 % if (scalar @subject_alt_names) {
      <tr>
@@ -142,24 +141,6 @@
 </p>
 <hr/>
 <table>
-% if ($private_key eq 'private_key_exists_for_cert' ||
-%     $private_key eq '') {
-    <tr>
-        <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CERT_INFO_INSTALL_IN_BROWSER') %></td>
-        <td>
-            <& /lib/html/a.mhtml,
-             target => '../../binary/get_certificate.html',
-             label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_FIREFOX_INSTALL'),
-             params => [["identifier",   $identifier],
-                        ["content_type", "X509_USER_CERT"],
-                        ["format",       "PEM"]] &> |
-          <& /lib/html/a.mhtml,
-             target => 'cert_enroll_ie.html',
-             label  => i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD_IE_ENROLL'),
-             params => [["identifier",   $identifier]] &>
-        </td>
-    </tr>
-% }
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_DOWNLOAD') %></td>
     <td>
@@ -176,13 +157,6 @@
          params => [["identifier",   $identifier],
                     ["content_type", "DOWNLOAD"],
                     ["format",       "DER"]] &>
-        |
-      <& /lib/html/a.mhtml,
-         target => '../../binary/get_certificate.html',
-         label  => 'TXT',
-         params => [["identifier",   $identifier],
-                    ["content_type", "PLAIN"],
-                    ["format",       "TXT"]] &>
     </td>
   </tr>
 % if ($private_key ne 'private_key_exists_for_cert' &&
@@ -231,17 +205,17 @@
     </td>
   </tr>
 % }
-% if ($revocation) {
+% if ($revocation || $role eq 'RA Operator') {
   <tr>
   </tr>
   <tr>
     <td></td>
     <td>
-      <& /lib/html/a.mhtml,
+      <b><& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/create_crr/form.html',
          label  => i18nGettext('I18N_OPENXPKI_HTML_MASON_CERT_INFO_NEW_CRR'),
          params => [["cert_identifier",   $identifier]],
-      &>
+      &></b>
     </td>
   </tr>
 % }
@@ -255,6 +229,11 @@
 
   my $params      = $msg->{PARAMS}->{BODY};
   my $subject     = $params->{SUBJECT};
+  my $cn = '';
+  eval {
+      my %dn_hash = OpenXPKI::DN->new($subject)->get_hashed_content();
+      $cn = $dn_hash{'CN'}->[0];
+  };
   $subject =~ s/,/, /g;
   my $notbefore   = $params->{NOTBEFORE};
   my $notafter    = $params->{NOTAFTER};
@@ -304,6 +283,9 @@
   );
   my $private_key = $p_msg->{PARAMS};
 
+  my $role = $context->{client}->send_receive_command_msg(
+                    'get_role',
+  )->{PARAMS};
 </%init>
 <%once>
     use Data::Dumper;

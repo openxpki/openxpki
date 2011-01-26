@@ -1,7 +1,7 @@
 <actions>
 	<action name="sc_puk_up_initialize"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
-        ds_namespace="puk_namespace"
+        ds_namespace="smartcard.puk"
         ds_key_param="token_id"
         ds_value_param="_puk"
         ds_encrypt="1"

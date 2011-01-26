@@ -135,6 +135,7 @@
 
 <%once>
   my %css_map = (
-                 "menu_level_0" => "subheader"
+                 "menu_level_0" => "subheader",
+                 'menu_level_1_item_type_action' => 'dbmenuitem'
                 );
 </%once>

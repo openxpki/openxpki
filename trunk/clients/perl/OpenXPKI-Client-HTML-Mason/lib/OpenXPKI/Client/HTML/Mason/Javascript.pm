@@ -477,7 +477,7 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
                 '    Msgbox (re.Replace ("I18N_OPENXPKI_CLI_HTML_MASON_VBSCRIPT_GEN_CSR_SUBJECT", szName))
                 ' end if
 
-                xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 1)
+                xenroll.GenKeyFlags = GetKeyGenFlags(theForm.bits.value, 2, 0)
                 xenroll.KeySpec = 1 ' AT_KEYEXCHANGE
                 sz10 = xenroll.CreatePKCS10(szName, "1.3.6.1.4.1.311.2.1.21")
                 if (0<>Err.Number) and (mode<>"silent") then
@@ -622,7 +622,7 @@ $FUNCTION{gen_csr_ie} = << "XEOF";
         function GetMinMaxKeyLength (bMinMax, bExchange)
             on Error Resume Next
               
-            const KEY_LEN_MIN_DEFAULT=512
+            const KEY_LEN_MIN_DEFAULT=1024
             const KEY_LEN_MAX_DEFAULT=4096
             dim sProvName, nProvType, nProvIndex
             dim xenroll

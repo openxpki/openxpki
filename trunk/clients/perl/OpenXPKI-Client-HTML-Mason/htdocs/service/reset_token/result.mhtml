@@ -1,0 +1,29 @@
+<%init>
+    my $result = $m->request_args()->{'Result'};
+    my $reason = $m->request_args()->{'Reason'};
+    my $error_map = {
+        'CANCEL' => {
+            'UserCancelledPINInput' => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_CANCEL_PIN_INPUT_CANCELLED',
+        },
+        'ERROR' => {
+            'LibraryError'       => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_LIBRARY_ERROR',
+            'PKCS11InitFailed'   => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PKCS11_INIT_FAILED',
+            'TokenIDFailure'     => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_TOKEN_ID_FAILURE',
+            'WrongToken'         => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_WRONG_TOKEN',
+            'TokenInternalError' => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_TOKEN_INTERNAL_ERROR',
+            'PUKInvalid'         => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PUK_INVALID',
+            'PUKError'           => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PUK_ERROR',
+            'TokenDeleteError'   => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_TOKEN_DELETE_ERROR',
+            'PINResetFailed'     => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PIN_RESET_FAILED',
+            'PINChangeError'     => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PIN_CHANGE_ERROR',
+            'WrongPINError'      => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_WRONG_PIN_ERROR',
+            'UnknownPluginCommand' => 'I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_UNKNOWN_PLUGIN_COMMAND',
+        },
+    };
+</%init>
+% if (exists $error_map->{$result}->{$reason}) {
+<p><% i18nGettext($error_map->{$result}->{$reason}) %></p>
+% }
+% elsif ($result ne 'SUCCESS') {
+<p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_UNKNOWN_ERROR', '__RESULT__' => $result, '__REASON__' => $reason) %>
+% }

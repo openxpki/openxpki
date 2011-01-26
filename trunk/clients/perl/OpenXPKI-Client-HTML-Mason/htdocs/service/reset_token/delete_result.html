@@ -1,0 +1,12 @@
+<%init>
+use Data::Dumper;
+</%init>
+% if ($m->request_args->{'Result'} eq 'SUCCESS') {
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_SUCCESSFULLY_DELETED_TITLE') %></H1>
+<p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_SUCCESSFULLY_DELETED_DESC') %></p>
+% }
+% else {
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_DELETE_ERROR_TITLE') %></H1>
+<p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_DELETE_ERROR_DESC') %></p>
+<& '/service/reset_token/result.mhtml' &>
+% }

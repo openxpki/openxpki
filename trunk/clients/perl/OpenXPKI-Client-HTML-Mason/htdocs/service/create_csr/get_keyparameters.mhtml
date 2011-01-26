@@ -17,6 +17,7 @@
 
 <& /lib/html/hidden_reqargs.mhtml, ignore => qr(\A keyparameters \z)xms &>
 <& /lib/html/hidden.mhtml, 'name' => 'FILLED_KEY_PARAMETERS_FORM', 'value' => 1 &>
+<& /lib/html/hidden.mhtml, 'name' => 'workflow_id', 'value' => $workflow_id &>
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_TITLE') %></h1>
 <p>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_DESC') %>
@@ -34,17 +35,20 @@
 %     );
 %     @param_values = sort keys(%{$msg->{PARAMS}});
 %     $param_label = "I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_KEYPARAMETERS_".uc($param_name);
-%     $descriptions{i18nGettext(${param_label})} = i18nGettext(${param_label}."_DESCRIPTION");
-     <tr>
-       <td>
-           <% i18nGettext (${param_label}) %>
-       </td>
-       <td>
-           <& /lib/html/select.mhtml,
-             'name'    => "PARAMETER_".uc(${param_name}),
-             'values'  => \@param_values &>
-       </td>
-     </tr>
+%     if (! exists $m->request_args()->{'PARAMETER_' . uc($param_name)}) {
+%            $descriptions{i18nGettext(${param_label})} = i18nGettext(${param_label}."_DESCRIPTION");
+	     <tr>
+	       <td>
+		   <% i18nGettext (${param_label}) %>
+	       </td>
+	       <td>
+		   <& /lib/html/select.mhtml,
+		     'name'    => "PARAMETER_".uc(${param_name}),
+		     'values'  => \@param_values,
+                     'default' => [ '2048' ], &>
+	       </td>
+	     </tr>
+%     }
 % }
 </table>
 

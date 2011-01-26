@@ -9,9 +9,6 @@
             'no_menu'    => $no_menu,
     &>
     <h1><% i18nGettext ($name) %></h1>
-    <p>
-      <% i18nGettext ($desc) %>
-    </p>
     <table>
       <tr>
         <td><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN') %></td>

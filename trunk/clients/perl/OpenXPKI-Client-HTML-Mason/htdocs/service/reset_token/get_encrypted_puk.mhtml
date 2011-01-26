@@ -1,0 +1,78 @@
+<%args>
+    $token_id => undef
+</%args>
+<%init>
+use OpenXPKI::Serialization::Simple;
+my $ser = OpenXPKI::Serialization::Simple->new({
+    SEPARATOR => '-',
+});
+</%init>
+%   # find the password safe workflow that has encrypted PUK
+%   my $password_id = "SID800:$token_id";
+%   my $msg = $context->{'client'}->send_receive_command_msg(
+%       'search_workflow_instances',
+%       {
+%           CONTEXT      => [
+%               {
+%                   KEY   => 'encrypted_' . $password_id,
+%                   VALUE => '%', 
+%               },
+%           ],
+%           TYPE         => 'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE',
+%           BULK_CONTEXT => 1,
+%       },
+%   );
+
+%   my $workflow_id;
+%   eval {
+%       $workflow_id = $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_SERIAL'};
+%   };
+%   if (! defined $workflow_id) { # PUK not found, fatal ...
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PUK_WORKFLOW_NOT_FOUND_TITLE') %></H1>
+<P><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PUK_WORKFLOW_NOT_FOUND_DESC') %></P>
+%       return;
+%   }
+
+%   # retrieve the PUK from the password safe workflow
+%   $msg = $context->{'client'}->send_receive_command_msg(
+%       'execute_workflow_activity',
+%       {
+%           'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE',
+%           'ID'       => $workflow_id,
+%           'ACTIVITY' => 'retrieve_password',
+%           'PARAMS'   => {
+%               '_id' => $password_id,
+%           },
+%       },
+%   );
+%   my $puk_data;
+%  eval {
+%       $puk_data = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_passwords}->{$password_id};
+%   };
+%   my %puk_data_hash;
+%   eval {
+%       %puk_data_hash = %{ $ser->deserialize($puk_data) };
+%   };
+%   if (! %puk_data_hash) { # PUK could not be retrieved, fatal
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PUK_RETRIEVE_FAILED_TITLE') %></H1>
+<P><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PUK_RETRIEVE_FAILED_DESC') %></P>
+%       return;
+%   }
+%   my $puk = $puk_data_hash{DefaultPUK};
+
+%   my $encrypted_puk;
+%   eval {
+%      $msg = $context->{'client'}->send_receive_command_msg(
+%          'deuba_aes_encrypt_puk',
+%          {
+%             'PUK' => $puk,
+%          },
+%      );
+%      $encrypted_puk = $msg->{PARAMS};
+%   };
+%   if (! defined $encrypted_puk) { # PUK could not be encrypted, fatal
+<H1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PUK_AES_ENCRYPTION_FAILED_TITLE') %></H1>
+<P><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_ERROR_PUK_AES_ENCRYPTION_FAILED_DESC') %></P>
+%       return;
+%   }
+%   return $encrypted_puk;

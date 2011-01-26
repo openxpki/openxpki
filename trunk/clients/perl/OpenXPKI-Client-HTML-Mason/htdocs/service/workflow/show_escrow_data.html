@@ -1,0 +1,71 @@
+<%args>
+    $type => undef
+    $id   => undef
+    $msg  => undef
+</%args>
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_ESCROW_DATA', '__ID__' => $msg->{PARAMS}->{WORKFLOW}->{ID}, '__STATE__' => $msg->{PARAMS}->{WORKFLOW}->{STATE}) %></h1>
+% #<pre>
+% # <% Dumper $msg->{PARAMS} %>
+% # </pre>
+<div class="floatbox" style="width: 30%">
+    <hr/>
+    <p class="title"><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_ACTIVITIES') %></p>
+    <p>
+      <div class="openxpki_command_list">
+	<div class="openxpki_command_list_item">
+	  <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/binary/get_binary.html",
+	    'method' => 'post'
+	    &>
+	    <& /lib/html/hidden.mhtml,
+	       'name'  => 'data',
+	       'value' => $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_pkcs12base64}, 
+	    &>
+	    <& /lib/html/hidden.mhtml,
+	       'name'  => 'filename',
+	       'value' => $filename,
+	    &>
+	    <& /lib/html/input.mhtml, 'type' => 'submit', 'value' => 'PKCS#12' &>
+	    <& /service/close_form.mhtml &>
+	</div>
+	<div class="openxpki_command_list_item">
+	  <input type="button" name="print" value="<% i18nGettext ('I18N_OPENXPKI_HTML_PRINT_BUTTON') %>" onClick="window.print()"/>
+	</div>
+      </div>
+    </p>
+</div>
+
+<div>
+<p>
+<% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_ESCROW_DATA_DESCRIPTION') %>
+</p>
+<p>
+<table>
+<tr>
+  <td><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_ESCROW_DATA_SUBJECT_DESC') %></td>
+  <td><% $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{escrow_subject} %></td>
+</tr>
+<tr>
+  <td><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_ESCROW_DATA_VALIDITY_DESC') %></td>
+  <td><% $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{valid_at} %></td>
+</tr>
+<tr>
+  <td><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_ESCROW_DATA_PASSWORD_DESC') %></td>
+  <td><% $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_password} %></td>
+</tr>
+</table>
+</p>
+</div>
+<%once>
+    use Encode qw(encode decode);
+    use HTML::Entities;
+    use Data::Dumper;
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Sortkeys = 1;
+</%once>
+<%init>
+my $filename = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{escrow_subject};
+$filename =~ s/@.*$//g;
+$filename =~ s/\./_/g;
+$filename =~ s/\W//g;
+$filename .= '.p12';
+</%init>

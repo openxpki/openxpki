@@ -3,6 +3,9 @@
 # Copyright (c) 2006 by The OpenXPKI Project
 package OpenXPKI::Server::Workflow::Condition::IsValidSignatureWithRequestedDN;
 
+# DUMMY file, the same as IsValidSignature.pm, but is needed if old
+# configurations are in place ...
+
 use strict;
 use warnings;
 use base qw( Workflow::Condition );

@@ -18,11 +18,145 @@ use Data::Dumper;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Crypto::X509;
 use OpenXPKI::i18n qw( set_language );
 use Digest::SHA1 qw( sha1_base64 );
+use Crypt::CBC;
+use MIME::Base64;
+use DateTime;
 
 use Workflow;
+
+sub deuba_list_available_puks {
+    my $self    = shift;
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    # - TODO -
+    # this is global to the OpenXPKI instance, do we want this to be
+    # local to a PKI realm only?
+    CTX('dbi_workflow')->commit();
+    my $result = CTX('dbi_workflow')->select(
+        TABLE   => 'WORKFLOW_CONTEXT',
+        DYNAMIC => {
+            WORKFLOW_CONTEXT_KEY => 'serial_SID800_%',
+        },
+    );
+    if (! defined $result || ref $result ne 'ARRAY') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_DEUBA_LIST_AVAILABLE_PUKS_NO_RESULTS',
+        );
+    }
+    my @serials = map { $_->{'WORKFLOW_CONTEXT_VALUE'} } @{ $result };
+
+    my @ranges = $self->__array_to_ranges(\@serials);
+
+    return \@ranges;
+}
+
+sub __array_to_ranges {
+    my $self      = shift;
+    my $array_ref = shift;
+    my @a = sort @{ $array_ref };
+
+    my $start = 0;
+    my $end   = 0;
+    my @ranges = ();
+
+    RANGES:
+    for (my $i = 0; $i < scalar @a; $i++) {
+        if (   ($i + 1 < scalar @a)
+            && ($a[$i+1] == ($a[$i] + 1))) { # this is just the successor, next
+            next RANGES;
+        }
+        else {
+            $end = $i;
+            if ($start != $end) {
+                push @ranges, $a[$start] . '-' . $a[$end];
+            }
+            else {
+                push @ranges, $a[$start];
+            }
+            $start = $i + 1;
+        }
+    }
+    return @ranges;
+}
+
+sub deuba_aes_encrypt_parameter {
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $arg     = $arg_ref->{DATA};
+
+    my $key_file = "/etc/openxpki/aes.key";
+
+    # default token does not actual current config id
+    my $realm  = CTX('session')->get_pki_realm();
+    my $cfg_id = CTX('api')->get_current_config_id();
+    my $default_token  = CTX('pki_realm_by_cfg')->{$cfg_id}->{$realm}->{crypto}->{default};
+
+    
+    # read key
+    open my $KEY, '<', $key_file;
+    my $key = <$KEY>;
+    close $KEY;
+    chomp($key);
+
+    my $random = $default_token->command({
+        COMMAND => 'create_random',
+        RETURN_LENGTH => 16,
+        RANDOM_LENGTH => 16,
+    });
+
+    my $iv = decode_base64($random);
+    $iv = substr($iv . "\x00" x 16, 0, 16);
+
+    my $cipher = Crypt::CBC->new(
+        -cipher => 'Crypt::OpenSSL::AES',
+        -key    => pack('H*', $key),
+        -iv     => $iv,
+        -literal_key => 1,
+        -header => 'none',
+    );
+    my $encrypted_data = $cipher->encrypt($arg);
+
+    my $b64_encrypted_data = encode_base64($iv . $encrypted_data, '');
+
+    return $b64_encrypted_data;
+}
+
+sub deuba_aes_encrypt_puk {
+    my $self    = shift;
+    my $arg_ref = shift;
+    my $puk     = $arg_ref->{PUK};
+    my $pki_realm = CTX('session')->get_pki_realm();
+    my $key_file = "/etc/openxpki/aes.key";
+
+    # read key
+    open my $KEY, '<', $key_file;
+    my $key = <$KEY>;
+    close $KEY;
+    chomp($key);
+
+    # the Novosec plugin needs PUK as 8 bytes + 8 0-bytes ...
+    my $input_data = pack('H*', $puk) . chr(0) x 8;
+
+    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+
+    my $cipher = Crypt::CBC->new(
+        -cipher => 'Crypt::OpenSSL::AES',
+        -key    => pack('H*', $key),
+        -iv     => pack('H*', "00" x 16),
+        -literal_key => 1,
+        -header => 'none',
+    );
+    my $encrypted_data = $cipher->encrypt($input_data);
+
+    my $encrypted_puk = unpack('H32', $encrypted_data);
+
+    return $encrypted_puk;
+}
 
 sub START {
     # somebody tried to instantiate us, but we are just an
@@ -735,6 +869,158 @@ sub get_possible_profiles_for_role {
     }
     ##! 1: 'end'
     return \@profiles;
+}
+
+sub determine_issuing_ca {
+    my $self = shift;
+    my $arg_ref = shift;
+
+    my $profilename = $arg_ref->{PROFILE};
+    ##! 16: 'profilename: ' . $profilename
+
+    my $cfg_id = $arg_ref->{CONFIG_ID};
+
+    ##! 2: "get pki realm configuration"
+    my $realms = CTX('pki_realm_by_cfg')->{$cfg_id}; 
+    if (! defined $cfg_id) {
+        $realms = CTX('pki_realm');
+    }
+    if (!(defined $realms && (ref $realms eq 'HASH'))) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_API_DETERMINE_ISSUING_CA_PKI_REALM_CONFIGURATION_UNAVAILABLE"
+        );
+    }
+
+    ##! 2: "get session's realm"
+    my $thisrealm = CTX('session')->get_pki_realm();
+    ##! 2: "$thisrealm"
+    if (! defined $thisrealm) {
+	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_API_DETERMINE_ISSUING_CA_PKI_REALM_NOT_SET"
+	);
+    }
+
+    my $realm_config = CTX('pki_realm_by_cfg')->{$cfg_id}
+                                              ->{$thisrealm};
+    ##! 128: 'realm_config: ' . Dumper $realm_config
+
+    if (! exists $realm_config->{endentity}->{id}->{$profilename}->{validity}) {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVER_API_DETERMINE_ISSUING_CA_NO_MATCHING_PROFILE",
+            params  => {
+                REQUESTED_PROFILE => $profilename,
+            },
+        );
+    }
+
+    # get validity as specified in the configuration
+    my $entry_validity 
+	    = $realm_config->{endentity}->{id}->{$profilename}->{validity};
+
+    my $requested_notbefore;
+    my $requested_notafter;
+
+    if (! exists $entry_validity->{notbefore}) {
+        # assign default (current timestamp) if notbefore is not specified
+        $requested_notbefore = DateTime->now( time_zone => 'UTC' );
+    } else {
+        $requested_notbefore = OpenXPKI::DateTime::get_validity(
+            {
+                VALIDITY => $entry_validity->{notbefore}->{validity},
+                VALIDITYFORMAT => $entry_validity->{notbefore}->{format},
+            },
+        );
+    }
+
+    $requested_notafter = OpenXPKI::DateTime::get_validity(
+	    {
+            REFERENCEDATE => $requested_notbefore,
+            VALIDITY => $entry_validity->{notafter}->{validity},
+            VALIDITYFORMAT => $entry_validity->{notafter}->{format},
+	    },
+	);
+    ##! 64: 'requested_notbefore: ' . Dumper $requested_notbefore
+    ##! 64: 'request_notafter: ' . Dumper $requested_notafter
+
+
+    # anticipate runtime differences, if the requested notafter is close
+    # to the end a CA validity we might identify an issuing CA that is
+    # not able to issue the certificate anymore when the actual signing
+    # action begins
+    # FIXME: is this acceptable?
+    if ($entry_validity->{notafter}->{format} eq 'relativedate') {
+        $requested_notafter->add( minutes => 5 );
+    }        
+    ##! 64: 'request_notafter (+5m?): ' . Dumper $requested_notafter
+
+    # iterate through all issuing CAs and determine possible candidates
+    # for issuing the requested certificate
+    my $now = DateTime->now( time_zone => 'UTC' );
+    my $intca;
+    my $mostrecent_notbefore;
+  CANDIDATE:
+    foreach my $ca_id (sort keys %{ $realm_config->{ca}->{id} }) {
+        ##! 16: 'ca_id: ' . $ca_id
+
+        my $ca_notbefore = $realm_config->{ca}->{id}->{$ca_id}->{notbefore};
+        ##! 16: 'ca_notbefore: ' . Dumper $ca_notbefore
+
+        my $ca_notafter = $realm_config->{ca}->{id}->{$ca_id}->{notafter};
+        ##! 16: 'ca_notafter: ' . Dumper $ca_notafter
+
+        if (! defined $ca_notbefore || ! defined $ca_notafter) {
+            ##! 16: 'ca_notbefore or ca_notafter undef, skipping'
+            next CANDIDATE;
+        }
+        # check if issuing CA is valid now
+        if (DateTime->compare($now, $ca_notbefore) < 0) {
+            ##! 16: $ca_id . ' is not yet valid, skipping'
+            next CANDIDATE;
+        }
+        if (DateTime->compare($now, $ca_notafter) > 0) {
+            ##! 16: $ca_id . ' is expired, skipping'
+            next CANDIDATE;
+        }
+
+        # check if requested validity fits into the ca validity
+        if (DateTime->compare($requested_notbefore, $ca_notbefore) < 0) {
+            ##! 16: 'requested notbefore does not fit in ca validity'
+            next CANDIDATE;
+        }
+        if (DateTime->compare($requested_notafter, $ca_notafter) > 0) {
+            ##! 16: 'requested notafter does not fit in ca validity'
+            next CANDIDATE;
+        }
+
+        # check if this CA has a more recent NotBefore date
+        if (defined $mostrecent_notbefore)
+        {
+            ##! 16: 'mostrecent_notbefore: ' . Dumper $mostrecent_notbefore
+            if (DateTime->compare($ca_notbefore, $mostrecent_notbefore) > 0)
+            {
+                ##! 16: $ca_id . ' has an earlier notbefore data'
+                $mostrecent_notbefore = $ca_notbefore;
+                $intca = $ca_id;
+            }
+        }
+        else
+        {
+            ##! 16: 'new mostrecent_notbefore'
+            $mostrecent_notbefore = $ca_notbefore;
+            $intca = $ca_id;
+        }
+    }
+
+    if (! defined $intca) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_API_DETERMINE_ISSUING_CA_NO_MATCHING_CA",
+            params  => {
+                REQUESTED_NOTAFTER => $requested_notafter->iso8601(),
+            },
+        );
+    }
+
+    return $intca;
 }
 
 sub get_approval_message {
