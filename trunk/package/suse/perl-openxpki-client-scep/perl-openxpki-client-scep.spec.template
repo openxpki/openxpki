@@ -1,19 +1,19 @@
-## Written 2010 by Martin Bartosch for the OpenXPKI project
-## Copyright (C) 2005-2010 by The OpenXPKI Project
+## Written 2006 by Martin Bartosch for the OpenXPKI project
+## Copyright (C) 2005-2011 by The OpenXPKI Project
 
 #
-#   - OpenXPKI HTML SC client package -
+#   - OpenXPKI HTML Mason client package -
 #
 
-%define pkgname OpenXPKI-Client-HTML-SC
+%define pkgname OpenXPKI-Client-SCEP
 %define filelist %{pkgname}-%{version}-filelist
 %define NVR %{pkgname}-%{version}-%{release}
 %define maketest 0
-%define __perl _PERL_
+%define __perl perl
 
-name:      perl-openxpki-client-html-sc
-summary:   OpenXPKI HTML SC Client - client for Smartcard personalization
-version:   _VERSION_
+name:      perl-openxpki-client-scep
+summary:   OpenXPKI SCEP Client - client module for Perl clients
+version:   [% version %]
 release:   1
 vendor:    OpenXPKI Project
 packager:  Martin Bartosch <m.bartosch@cynops.de>
@@ -22,10 +22,19 @@ group:     Applications/CPAN
 url:       http://www.openxpki.org
 buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
-source:    OpenXPKI-Client-HTML-SC-%{version}.tar.gz
+source:    OpenXPKI-Client-SCEP-%{version}.tar.gz
 
 %description
-None.
+OpenXPKI client implementing a SCEP server.
+
+Packaging information:
+OpenXPKI version       [% version %]
+Git commit hash:       [% GIT_COMMIT_HASH %]
+Git tag:               [%- IF GIT_TAG -%]
+[%- GIT_TAG -%]
+[%- ELSE -%]
+<no tag set>
+[%- END %]
 
 #
 # This package was generated automatically with the cpan2rpm
@@ -53,10 +62,10 @@ CFLAGS="$RPM_OPT_FLAGS"
 
 %{makeinstall} `%{__perl} -MExtUtils::MakeMaker -e ' print \$ExtUtils::MakeMaker::VERSION <= 6.05 ? qq|PREFIX=%{buildroot}%{_prefix}| : qq|DESTDIR=%{buildroot}| '`
 
-install -d -D -m 700 %{buildroot}/var/scfrontend/session
-install -d -D -m 700 %{buildroot}/var/scfrontend/lock
-mkdir -p %{buildroot}/srv/www/htdocs/sc/
-tar -C htdocs -c -f - . | tar -C %{buildroot}/srv/www/htdocs/sc/ -x -f -
+install -d -D -m 755 %{buildroot}/srv/www/openxpki/cgi-bin/scep
+install -D -m 755 bin/scep %{buildroot}/srv/www/openxpki/cgi-bin/scep/scep
+install -D -m 644 eg/scep.conf %{buildroot}/etc/openxpki/scep.conf
+tar cf - htdocs | tar -C %{buildroot}/srv/www/openxpki/ -x -f -
 
 cmd=/usr/share/spec-helper/compress_files
 [ -x $cmd ] || cmd=/usr/lib/rpm/brp-compress
@@ -123,9 +132,11 @@ find %{buildroot}%{_prefix}             \
 %files -f %filelist
 %defattr(-,root,root)
 
-#%attr(0700,wwwown,root) /var/scfrontend/session
-#%attr(0700,wwwown,root) /var/scfrontend/lock
+%attr(0755,root,openxpki) /srv/www/openxpki/cgi-bin/scep/scep
+%config(noreplace) %attr(0644,root,openxpki) /etc/openxpki/scep.conf
 
 %changelog
-* Thu Aug 5 2010 m.bartosch@cynops.de
+* Thu Feb 03 2011 m.bartosch@cynops.de
+- Renovated build process, using generic template mechanism
+* Mon Nov 27 2006 m.bartosch@cynops.de
 - Initial build.

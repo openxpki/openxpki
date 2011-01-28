@@ -1,0 +1,7 @@
+This directory contains common tools for all packaging mechanisms.
+
+Makefile.inc
+  - can be included by any package build Makefile to define an implicit
+    rule for creating a package build manifest from a .template file
+    See Makefile for an example (and demo.template for a demonstration
+    template)

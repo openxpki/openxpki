@@ -1,19 +1,19 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
-## Copyright (C) 2005-2006 by The OpenXPKI Project
+## Copyright (C) 2005-2011 by The OpenXPKI Project
 
 #
-#   - OpenXPKI client package -
+#   - OpenXPKI Core package -
 #
 
-%define pkgname OpenXPKI-Client
+%define pkgname OpenXPKI
 %define filelist %{pkgname}-%{version}-filelist
 %define NVR %{pkgname}-%{version}-%{release}
 %define maketest 0
-%define __perl _PERL_
+%define __perl perl
 
-name:      perl-openxpki-client
-summary:   OpenXPKI Client - base module for Perl clients
-version:   _VERSION_
+name:      perl-openxpki-core
+summary:   OpenXPKI - base module for all OpenXPKI core modules.
+version:   [% version %]
 release:   1
 vendor:    OpenXPKI Project
 packager:  Martin Bartosch <m.bartosch@cynops.de>
@@ -22,10 +22,19 @@ group:     Applications/CPAN
 url:       http://www.openxpki.org
 buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
-source:    OpenXPKI-Client-%{version}.tar.gz
+source:    OpenXPKI-%{version}.tar.gz
 
 %description
-None.
+OpenXPKI server core  modules.
+
+Packaging information:
+OpenXPKI version       [% version %]
+Git commit hash:       [% GIT_COMMIT_HASH %]
+Git tag:               [%- IF GIT_TAG -%]
+[%- GIT_TAG -%]
+[%- ELSE -%]
+<no tag set>
+[%- END %]
 
 #
 # This package was generated automatically with the cpan2rpm
@@ -79,7 +88,7 @@ find %{buildroot}%{_prefix}             \
 
 %{__perl} -MFile::Find -le '
     find({ wanted => \&wanted, no_chdir => 1}, "%{buildroot}");
-    print "%doc  LICENSE README";
+    print "%doc  CHANGES INSTALL LICENSE README";
     for my $x (sort @dirs, @files) {
         push @ret, $x unless indirs($x);
         }
@@ -119,5 +128,7 @@ find %{buildroot}%{_prefix}             \
 %defattr(-,root,root)
 
 %changelog
+* Thu Feb 03 2011 m.bartosch@cynops.de
+- Renovated build process, using generic template mechanism
 * Mon Nov 27 2006 m.bartosch@cynops.de
 - Initial build.

@@ -2,18 +2,18 @@
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
 
 #
-#   - OpenXPKI HTML Mason client package -
+#   - OpenXPKI client package -
 #
 
-%define pkgname OpenXPKI-Client-HTML-Mason
+%define pkgname OpenXPKI-Client
 %define filelist %{pkgname}-%{version}-filelist
 %define NVR %{pkgname}-%{version}-%{release}
 %define maketest 0
-%define __perl _PERL_
+%define __perl perl
 
-name:      perl-openxpki-client-html-mason
-summary:   OpenXPKI HTML Mason Client - client module for Perl clients
-version:   _VERSION_
+name:      perl-openxpki-client
+summary:   OpenXPKI Client - base module for Perl clients
+version:   [% version %]
 release:   1
 vendor:    OpenXPKI Project
 packager:  Martin Bartosch <m.bartosch@cynops.de>
@@ -22,10 +22,19 @@ group:     Applications/CPAN
 url:       http://www.openxpki.org
 buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
-source:    OpenXPKI-Client-HTML-Mason-%{version}.tar.gz
+source:    OpenXPKI-Client-%{version}.tar.gz
 
 %description
-None.
+OpenXPKI Perl Client base module.
+
+Packaging information:
+OpenXPKI version       [% version %]
+Git commit hash:       [% GIT_COMMIT_HASH %]
+Git tag:               [%- IF GIT_TAG -%]
+[%- GIT_TAG -%]
+[%- ELSE -%]
+<no tag set>
+[%- END %]
 
 #
 # This package was generated automatically with the cpan2rpm
@@ -53,12 +62,6 @@ CFLAGS="$RPM_OPT_FLAGS"
 
 %{makeinstall} `%{__perl} -MExtUtils::MakeMaker -e ' print \$ExtUtils::MakeMaker::VERSION <= 6.05 ? qq|PREFIX=%{buildroot}%{_prefix}| : qq|DESTDIR=%{buildroot}| '`
 
-install -d -D -m 755 %{buildroot}/srv/www/openxpki/cgi-bin
-install -d -D -m 755 %{buildroot}/srv/www/openxpki/htdocs
-install -d -D -m 755 %{buildroot}/srv/www/openxpki/mason-data
-install -D -m 755 bin/openxpki.cgi %{buildroot}/srv/www/openxpki/cgi-bin/openxpki.cgi
-tar cf - htdocs | tar -C %{buildroot}/srv/www/openxpki/ -x -f -
-
 cmd=/usr/share/spec-helper/compress_files
 [ -x $cmd ] || cmd=/usr/lib/rpm/brp-compress
 [ -x $cmd ] && $cmd
@@ -85,7 +88,7 @@ find %{buildroot}%{_prefix}             \
 
 %{__perl} -MFile::Find -le '
     find({ wanted => \&wanted, no_chdir => 1}, "%{buildroot}");
-    print "%doc  README";
+    print "%doc  LICENSE README";
     for my $x (sort @dirs, @files) {
         push @ret, $x unless indirs($x);
         }
@@ -102,7 +105,7 @@ find %{buildroot}%{_prefix}             \
         $d = $_;
         /\Q$d\E/ && return for reverse sort @INC;
         $d =~ /\Q$_\E/ && return
-            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share /srv /var |;
+            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share /var |;
 
         $dirs[@dirs] = $_;
         }
@@ -124,11 +127,8 @@ find %{buildroot}%{_prefix}             \
 %files -f %filelist
 %defattr(-,root,root)
 
-%attr(0755,root,openxpki) /srv/www/openxpki/cgi-bin
-%attr(0755,root,openxpki) /srv/www/openxpki/htdocs
-%attr(0755,root,openxpki) /srv/www/openxpki/mason-data
-%attr(0755,root,openxpki) /srv/www/openxpki/cgi-bin/openxpki.cgi
-
 %changelog
+* Thu Feb 03 2011 m.bartosch@cynops.de
+- Renovated build process, using generic template mechanism
 * Mon Nov 27 2006 m.bartosch@cynops.de
 - Initial build.

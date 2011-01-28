@@ -1,0 +1,8 @@
+# files to ignore for SuSE package build
+
+# local modifications to the common Make variables
+Makefile.local
+
+# files generated during the build process
+*.rpm
+*.spec

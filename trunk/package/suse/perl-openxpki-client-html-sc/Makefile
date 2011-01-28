@@ -1,23 +1,16 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
 
-RPMBASE=~/rpmbuild
-OPENXPKI_SVN=../../../..
+TOPDIR=../../../..
 
 PACKAGE=perl-openxpki-client-html-sc
-SRCBASE=$(OPENXPKI_SVN)/trunk/clients/perl/OpenXPKI-Client-HTML-SC
+SRCBASE=$(TOPDIR)/trunk/clients/perl/OpenXPKI-Client-HTML-SC
 SRCNAME=OpenXPKI-Client-HTML-SC
 
-VERGEN=$(OPENXPKI_SVN)/tools/vergen
-VERSION=$(shell $(VERGEN) --format version --directory $(SRCBASE))
-PERL=$(shell which perl)
-
-ifdef PREFIX
-PERL_MAKEPL_ARGS="PREFIX=$(PREFIX)"
-endif
-
-
-#include ../Makefile.package
+# Makefile.inc contains common settings for all packages (checked in)
+include ../Makefile.inc
+# Makefile.local may be used locally to override settings (not checked in)
+-include ../Makefile.local
 
 all: clean perl-dist package collect
 
@@ -34,8 +27,7 @@ perl-dist: dist-clean
 		mv *.tar.gz $(RPMBASE)/SOURCES \
 	)
 
-$(PACKAGE).spec: $(PACKAGE).spec.in
-	sed -e 's/_VERSION_/$(VERSION)/g' <$< | sed -e 's+_PERL_+$(PERL)+g' | sed -e 's+_MAKEPL_ARGS_+$(PERL_MAKEPL_ARGS)+g' >$@
+$(PACKAGE).spec: $(PACKAGE).spec.template
 
 package: $(PACKAGE).spec
 	rpmbuild -ba $(PACKAGE).spec

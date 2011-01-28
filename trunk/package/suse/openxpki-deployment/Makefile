@@ -1,21 +1,25 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
-## Copyright (C) 2005-2006 by The OpenXPKI Project
+## Copyright (C) 2005-2011 by The OpenXPKI Project
 
-RPMBASE=~/rpmbuild
-OPENXPKI_SVN=../../../..
+TOPDIR=../../../..
 
 PACKAGE=openxpki-deployment
-SRCBASE=$(OPENXPKI_SVN)/trunk/deployment
+SRCBASE=$(TOPDIR)/trunk/deployment
 SRCNAME=deployment
 
-VERGEN=$(OPENXPKI_SVN)/tools/vergen
-VERSION=$(shell $(VERGEN) --format version --directory $(SRCBASE))
-PERL=$(shell which perl)
+# Makefile.inc contains common settings for all packages (checked in)
+include ../Makefile.inc
+# Makefile.local may be used locally to override settings (not checked in)
+-include ../Makefile.local
+
 PREFIX=/usr
 
 ifdef PREFIX
 CONFIGURE_ARGS=--prefix $(PREFIX)
 endif
+
+# propagate additional template variables for spec template processing
+TT_EXTRA_SYMBOLS = --define CONFIGURE_ARGS="$(CONFIGURE_ARGS)" --define PREFIX="$(PREFIX)"
 
 default: clean dist package collect
 
@@ -33,11 +37,7 @@ dist: dist-clean
 	)
 	tar czf $(RPMBASE)/SOURCES/openxpki-deployment-susefiles.tar.gz etc/
 
-$(PACKAGE).spec: $(PACKAGE).spec.in
-	sed -e 's/_VERSION_/$(VERSION)/g' <$< | \
-	sed -e 's+_PERL_+$(PERL)+g' | \
-	sed -e 's+_CONFIGURE_ARGS_+$(CONFIGURE_ARGS)+g' | \
-	sed -e 's+_PREFIX_+$(PREFIX)+g'  >$@
+$(PACKAGE).spec: $(PACKAGE).spec.template
 
 package: $(PACKAGE).spec
 	rpmbuild -ba $(PACKAGE).spec

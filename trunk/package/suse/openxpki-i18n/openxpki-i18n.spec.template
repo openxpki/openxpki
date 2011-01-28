@@ -1,19 +1,18 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
-## Copyright (C) 2005-2006 by The OpenXPKI Project
+## Copyright (C) 2005-2011 by The OpenXPKI Project
 
 #
-#   - OpenXPKI Core package -
+#   - OpenXPKI i18n package -
 #
 
-%define pkgname OpenXPKI
+%define pkgname openxpki-i18n
 %define filelist %{pkgname}-%{version}-filelist
 %define NVR %{pkgname}-%{version}-%{release}
 %define maketest 0
-%define __perl _PERL_
 
-name:      perl-openxpki-core
-summary:   OpenXPKI - base module for all OpenXPKI core modules.
-version:   _VERSION_
+name:      openxpki-i18n
+summary:   OpenXPKI Internationalization
+version:   [% version %]
 release:   1
 vendor:    OpenXPKI Project
 packager:  Martin Bartosch <m.bartosch@cynops.de>
@@ -22,27 +21,25 @@ group:     Applications/CPAN
 url:       http://www.openxpki.org
 buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
-source:    OpenXPKI-%{version}.tar.gz
+source:    openxpki-i18n-%{version}.tar.gz
 
 %description
-None.
+OpenXPKI internationalization files.
 
-#
-# This package was generated automatically with the cpan2rpm
-# utility.  To get this software or for more information
-# please visit: http://perl.arix.com/
-#
+Packaging information:
+OpenXPKI version       [% version %]
+Git commit hash:       [% GIT_COMMIT_HASH %]
+Git tag:               [%- IF GIT_TAG -%]
+[%- GIT_TAG -%]
+[%- ELSE -%]
+<no tag set>
+[%- END %]
 
 %prep
 %setup -q -n %{pkgname}-%{version} 
 chmod -R u+w %{_builddir}/%{pkgname}-%{version}
 
 %build
-grep -rsl '^#!.*perl' . |
-grep -v '.bak$' |xargs --no-run-if-empty \
-%__perl -MExtUtils::MakeMaker -e 'MY->fixin(@ARGV)'
-CFLAGS="$RPM_OPT_FLAGS"
-%{__perl} Makefile.PL `%{__perl} -MExtUtils::MakeMaker -e ' print qq|PREFIX=%{buildroot}%{_prefix}| if \$ExtUtils::MakeMaker::VERSION =~ /5\.9[1-6]|6\.0[0-5]/ '` _MAKEPL_ARGS_
 %{__make} 
 %if %maketest
 %{__make} test
@@ -51,7 +48,8 @@ CFLAGS="$RPM_OPT_FLAGS"
 %install
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
-%{makeinstall} `%{__perl} -MExtUtils::MakeMaker -e ' print \$ExtUtils::MakeMaker::VERSION <= 6.05 ? qq|PREFIX=%{buildroot}%{_prefix}| : qq|DESTDIR=%{buildroot}| '`
+%{makeinstall} DESTDIR=%{buildroot}
+
 
 cmd=/usr/share/spec-helper/compress_files
 [ -x $cmd ] || cmd=/usr/lib/rpm/brp-compress
@@ -60,17 +58,10 @@ cmd=/usr/share/spec-helper/compress_files
 # SuSE Linux
 if [ -e /etc/SuSE-release -o -e /etc/UnitedLinux-release ]
 then
-    %{__mkdir_p} %{buildroot}/var/adm/perl-modules
-    %{__cat} `find %{buildroot} -name "perllocal.pod"`  \
-        | %{__sed} -e s+%{buildroot}++g                 \
-        > %{buildroot}/var/adm/perl-modules/%{name}
+	:
 fi
 
 # remove special files
-find %{buildroot} -name "perllocal.pod" \
-    -o -name ".packlist"                \
-    -o -name "*.bs"                     \
-    |xargs -i rm -f {}
 
 # no empty directories
 find %{buildroot}%{_prefix}             \
@@ -79,7 +70,7 @@ find %{buildroot}%{_prefix}             \
 
 %{__perl} -MFile::Find -le '
     find({ wanted => \&wanted, no_chdir => 1}, "%{buildroot}");
-    print "%doc  CHANGES INSTALL LICENSE README";
+    #print "%doc  CHANGES INSTALL LICENSE README";
     for my $x (sort @dirs, @files) {
         push @ret, $x unless indirs($x);
         }
@@ -96,7 +87,7 @@ find %{buildroot}%{_prefix}             \
         $d = $_;
         /\Q$d\E/ && return for reverse sort @INC;
         $d =~ /\Q$_\E/ && return
-            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share /var |;
+            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share|;
 
         $dirs[@dirs] = $_;
         }
@@ -107,17 +98,20 @@ find %{buildroot}%{_prefix}             \
         }
     ' > %filelist
 
+
 [ -z %filelist ] && {
     echo "ERROR: empty %files listing"
     exit -1
     }
 
 %clean
-[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+# [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
 %files -f %filelist
 %defattr(-,root,root)
 
 %changelog
+* Thu Feb 03 2011 m.bartosch@cynops.de
+- Renovated build process, using generic template mechanism
 * Mon Nov 27 2006 m.bartosch@cynops.de
 - Initial build.
