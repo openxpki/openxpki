@@ -9,6 +9,29 @@ package OpenXPKI::Tests::More::SmartcardUnblock;
 use base qw( OpenXPKI::Tests::More );
 sub wftype { return 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK' }
 
+my %act_test = (
+    selfserve => {
+        name => 'selfserve',
+        role => 'User',
+    },
+    user => {
+        name   => 'martin.bartosch@db.com',
+        role   => 'User',
+        newpin => '1234',
+        token  => 'gem2_123456',
+        puk    => '2234',
+    },
+    auth1 => {
+        name => 'scott.hardin@db.com',
+        role => 'User',
+        code => '',
+    },
+    auth2 => {
+        name => 'arkadius.litwinczuk@db.com',
+        role => 'User',
+        code => '',
+    },
+);
 sub puk_upload {
     my ( $self, $tok, $puk ) = @_;
     my ( $id, $msg );

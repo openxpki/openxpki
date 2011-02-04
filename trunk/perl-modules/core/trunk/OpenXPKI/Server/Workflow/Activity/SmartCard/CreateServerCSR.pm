@@ -60,7 +60,7 @@ sub execute {
 		# prod: "dc=dbe,dc=ads,dc=db,dc=com";
 		$ad_basedn = $self->param('ad_deuba_basedn');
 	    }
-	    elsif ($domain =~ m{\A dbg \z}xmsi) {
+	    elsif ($domain =~ m{\A (?:dbg|zzdbg) \z}xmsi) {
 		# prod: "dbg.ads.db.com";
 		$ad_server = $self->param('ad_dbg_server');
 		# prod: "dc=dbg,dc=ads,dc=db,dc=com";

@@ -2,6 +2,7 @@ Changes
 MANIFEST
 Makefile.PL
 README
+VERSION   ## never check this file into SVN (or GIT)
 
 lib/OpenXPKI/Client/HTML/SC.pm
 lib/OpenXPKI/Client/HTML/SC/Pinreset.pm

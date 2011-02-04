@@ -3092,13 +3092,11 @@ msgstr "Domain Component"
 msgid "I18N_OPENXPKI_DEBUG_DEBUG_MESSAGE_IS_NOT_A_CODEREF"
 msgstr "The used suject style does not allow the use of an organization."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_DEPLOYMENT_PROD_SERVER_CA"
-msgstr "Test User CA"
+msgstr "Server CA"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_DEPLOYMENT_PROD_USER_CA"
-msgstr "Test User CA"
+msgstr "User CA"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_DEPLOYMENT_SERVER_UAT_OR_PROD_CA"
@@ -7058,6 +7056,10 @@ msgstr "yes"
 #~ "your client then please use the type of key generation."
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_DEUBA_AUTH_PUK_MANA"
+#~ msgstr "This is the normal user authentication."
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_DEUBA_IBM_USER"
 #~ msgstr "This is the normal user authentication."
 
@@ -7157,7 +7159,36 @@ msgstr "yes"
 #~ "different departments (e.g. in companies) or institutes (e.g. in "
 #~ "universites)."
 
-#~ msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_CN"
+#~ msgstr "Create certificate request"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBCOSTCENTER"
+#~ msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBORGLEVEL1"
+#~ msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBORGLEVEL2"
+#~ msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBORGLEVEL3"
+#~ msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBORGLEVEL4"
+#~ msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_DBORGLEVEL5"
+#~ msgstr "Welcome to the smartcard personalization interface"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_HTML_SMARTCARD_LDAP_TELEPHONENUMBER"
 #~ msgstr "Telephone number"
 
 #~ msgid "I18N_OPENXPKI_HTML_TELEPHONE_NUMBER_DESCRIPTION"
