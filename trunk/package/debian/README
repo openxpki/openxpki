@@ -67,8 +67,8 @@ subversion or git.
   --- using Git
 
   cd ~/
-  sudo aptitude -y install git-svn
-  git svn clone https://openxpki.svn.sourceforge.net/svnroot/openxpki openxpki
+  sudo aptitude -y install git
+  git clone git://openxpki.git.sourceforge.net/gitroot/openxpki/openxpki
 
   --- using Subversion
 
@@ -89,12 +89,11 @@ subversion or git.
 - Create openxpki/openxpki user and group
 
   sudo addgroup openxpki
-  sudo adduser --disabled-password --gecos 'OpenXPKI Admin' \
-    --ingroup openxpki openxpki
-
+  sudo adduser --ingroup openxpki openxpki
+ 
 - Install OpenXPKI prerequisites from debian
 
-  cd ~/openxpki/trunk/package/debian-squeeze
+  cd ~/openxpki/trunk/package/debian
   sudo xargs aptitude -y install < debian-deps.lst
 
 ------------------------------------------------------------
@@ -104,7 +103,7 @@ CREATE PACKAGES
 - Create the needed CPAN packages that are not in debian and then
   install them for the further steps
 
-  cd ~/openxpki/trunk/package/debian-squeeze
+  cd ~/openxpki/trunk/package/debian
   make cpan_dependency
   sudo dpkg -i deb/cpan/*.deb 
 
@@ -114,7 +113,7 @@ CREATE PACKAGES
 - Create and install the OpenXPKI packages (only the packages
   needed for following build steps are installed)
 
-  cd ~/openxpki/trunk/package/debian-squeeze
+  cd ~/openxpki/trunk/package/debian
   make core
   sudo dpkg -i deb/core/*.deb
   make perl-client-api
@@ -128,7 +127,7 @@ CREATING APT REPOSITORY
 - Enable in Apache, if necessary, by adding the following to
   the file "/etc/apache2/conf.d/dpkg":
 
-  Alias /dpkg "/home/YOURUSERNAME/openxpki/dpkg/
+  Alias /dpkg "/home/YOURUSERNAME/openxpki/dpkg/"
   <Directory "/home/YOURUSERNAME/openxpki/dpkg/">
     Options Indexes FollowSymlinks
     AllowOverride None
@@ -143,35 +142,39 @@ CREATING APT REPOSITORY
 
 - Create repository directories
 
-  mkdir -p ~/openxpki/dpkg/squeeze/binary/cpan
-  mkdir -p ~/openxpki/dpkg/squeeze/binary/core
-  mkdir -p ~/openxpki/dpkg/squeeze/binary/client
-  mkdir -p ~/openxpki/dpkg/squeeze/binary/client_api
+  # Debian: squeeze
+  # Ubuntu: lucid
+  # set dist to squeeze or lucid
+  dist=squeeze
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/cpan
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/core
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/client
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/client_api
 
 - Create the APT configuration file to be used by clients
 
-  echo "deb http://YOURBUILDADDRESS/dpkg squeeze/binary/" > \
-    ~/openxpki/dpkg/openxpki-deb-squeeze.list
+  echo "deb http://YOURBUILDADDRESS/dpkg ${dist}/binary/" > \
+    ~/openxpki/dpkg/openxpki-deb-${dist}.list
 
 - Copy the freshly-build packages to your Apache directory
 
-  cd ~/openxpki/trunk/package/debian-squeeze
+  cd ~/openxpki/trunk/package/debian
   
-  cp deb/cpan/*.deb ~/openxpki/dpkg/squeeze/binary/cpan
-  cp deb/core/*.deb ~/openxpki/dpkg/squeeze/binary/core/
-  cp deb/client_api/*.deb ~/openxpki/dpkg/squeeze/binary/client_api/
-  cp deb/client/*.deb ~/openxpki/dpkg/squeeze/binary/client/
+  cp deb/cpan/*.deb ~/openxpki/dpkg/${dist}/binary/cpan
+  cp deb/core/*.deb ~/openxpki/dpkg/${dist}/binary/core/
+  cp deb/client_api/*.deb ~/openxpki/dpkg/${dist}/binary/client_api/
+  cp deb/client/*.deb ~/openxpki/dpkg/${dist}/binary/client/
 
   (cd ~/openxpki/dpkg && \
-    (dpkg-scanpackages squeeze/binary /dev/null | \
-    gzip -9c > squeeze/binary/Packages.gz) )
+    (dpkg-scanpackages ${dist}/binary /dev/null | \
+    gzip -9c > ${dist}/binary/Packages.gz) )
 
-  > ~/openxpki/dpkg/squeeze/binary/Release
-  echo "Archive: stable" >> ~/openxpki/dpkg/squeeze/binary/Release
-  echo "Component: openxpki" >> ~/openxpki/dpkg/squeeze/binary/Release
-  echo "Origin: openxpki" >> ~/openxpki/dpkg/squeeze/binary/Release
-  echo "Label: OpenXPKI Debian Repository" >> ~/openxpki/dpkg/squeeze/binary/Release
-  echo "Architecture: i386" >> ~/openxpki/dpkg/squeeze/binary/Release
+  > ~/openxpki/dpkg/${dist}/binary/Release
+  echo "Archive: stable" >> ~/openxpki/dpkg/${dist}/binary/Release
+  echo "Component: openxpki" >> ~/openxpki/dpkg/${dist}/binary/Release
+  echo "Origin: openxpki" >> ~/openxpki/dpkg/${dist}/binary/Release
+  echo "Label: OpenXPKI Debian Repository" >> ~/openxpki/dpkg/${dist}/binary/Release
+  echo "Architecture: i386" >> ~/openxpki/dpkg/${dist}/binary/Release
 
 ------------------------------------------------------------
 INSTALLING ON PRISTINE OS INSTALLATION
