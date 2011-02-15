@@ -98,10 +98,11 @@ sub start_pinreset {
 #############################################################################
 
     if ( defined $self->param('unblock_wfID') && $self->param('unblock_wfID') ne '') {
-
-        $session->{'unblock_wfID'}      = $self->param('unblock_wfID');
-        $responseData->{'unblock_wfID'} = $session->{'unblock_wfID'};
-		  $responseData->{'configwftype'} = $wf_type;
+			if($self->param('unblock_wfID') =~ /^[0-9]+$/){
+				$session->{'unblock_wfID'}      = $self->param('unblock_wfID');
+				$responseData->{'unblock_wfID'} = $session->{'unblock_wfID'};
+				$responseData->{'configwftype'} = $wf_type;	
+			}
 		 
 		my $oldState = $self->wfstate( $c, $session->{'unblock_wfID'} , $wf_type);
  		
@@ -300,9 +301,10 @@ sub start_pinreset {
 }
     }
     $session->{'unblockWf_state'} =$msg->{PARAMS}->{WORKFLOW}->{STATE} ;
-
+    $session->{'unblock_wfID'} =$msg->{PARAMS}->{WORKFLOW}->{ID};
+    $responseData->{'unblock_wfID'}=$session->{'unblock_wfID'};
     $responseData->{'cardID'} = $session->{'cardID'};
-    $responseData->{'state'}  = $session->{'wfstate'};
+    $responseData->{'state'}  =  $session->{'unblockWf_state'};
 	 $responseData->{'workflowtrace'} = $workflowtrace;
 
 	#$responseData->{'openxPKI_Session_ID'} = $c->get_session_id();   #for testing only FIXME

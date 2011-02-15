@@ -13,7 +13,7 @@
 
 var SSC_MODEL = new Class(
 		{
-			Implements : [ Options, Log ],
+			Implements : [ Options ],
 			Binds : [ 'syncplugin', 'sc_run_command', 'sc_cb_run_command',
 					'sc_cb_getCardStatus', 'sc_getCertificates',
 					'sc_changePIN', 'sc_cb_changePIN', 'processAuthCodes',
@@ -28,7 +28,7 @@ var SSC_MODEL = new Class(
 					'sc_cb_GenerateKeypair', 'sc_GenerateKeypair',
 					'sc_cb_persoSendCardStatus', 'determineRequiredAction',
 					'sc_cb_installx509', 'sc_cb_importP12', 'sc_resetToken',
-					'sc_cb_resetToken' ],
+					'sc_cb_resetToken', 'sc_GetTokenID' , 'sc_cb_GetTokenID' ],
 
 			options : {
 				baseUrl : '/'
@@ -36,7 +36,7 @@ var SSC_MODEL = new Class(
 
 			initialize : function(options) {
 
-				this.enableLog().log(
+				window.dbg.log(
 						'sscModel initialize at ' + new Date().format("db"));
 				// get options
 				this.setOptions(options);
@@ -79,6 +79,8 @@ var SSC_MODEL = new Class(
 				this.stateFilter[5]= 'PKCS12_TO_INSTALL';
 				this.stateFilter[6]= 'HAVE_CERT_TO_DELETE';
 				this.stateFilter[7]= 'HAVE_TOKEN_OWNER';
+				this.stateFilter[7]= 'CAN_WRITE_PIN';
+				
 				//this.stateFilter[8]= 'NON_ESCROW_CSR_AVAIL';
 				// test json
 				
@@ -89,7 +91,7 @@ var SSC_MODEL = new Class(
 
 				var rc = true;
 
-				this.log("start initializeCardReader");
+				window.dbg.log("start initializeCardReader");
 
 				if (!window.ActiveXObject) {
 
@@ -112,7 +114,7 @@ var SSC_MODEL = new Class(
 					// and inject it to start activation
 				 	$("pluginDiv").innerHTML = plugincode;
 
-					this.log("plugin element injected");
+					window.dbg.log("plugin element injected");
 
 					// remember plugin is loaded
 					this.PKCS11Plugin = $('PKCS11Plugin');
@@ -137,13 +139,13 @@ var SSC_MODEL = new Class(
 					
 				}
 
-				this.log("end initializeCardReader rc=" + rc);
+				window.dbg.log("end initializeCardReader rc=" + rc);
 				cb(rc);
 			},
 
 			readCard : function(cb) {
 
-				this.log("readCard - " + this.cardReadCounter);
+				window.dbg.log("readCard - " + this.cardReadCounter);
 
 				// this.cardReadCounter++;
 				/*
@@ -170,7 +172,7 @@ var SSC_MODEL = new Class(
 
 			personalizeAccount : function(account, cb) {
 
-				this.log('sscModel.personalizeAccount');
+				window.dbg.log('sscModel.personalizeAccount');
 				// fs fixme
 
 				// callback
@@ -180,14 +182,14 @@ var SSC_MODEL = new Class(
 
 			processAuthPersons : function(authPerson1, authPerson2, cb) {
 
-				this.log('sscModel.processAuthPersons');
+				window.dbg.log('sscModel.processAuthPersons');
 				this.server_start_resetpin(authPerson1, authPerson2, cb);
 				// cb();
 			},
 
 			processAuthCodes : function(pin, authcode1, authcode2,cb) {
 
-				this.log('sscModel.processAuthCodes');
+				window.dbg.log('sscModel.processAuthCodes');
 				this.server_pinrest_verify(pin, authcode1, authcode2, cb);
 
 				// callback
@@ -195,8 +197,8 @@ var SSC_MODEL = new Class(
 			},
 
 			processPins : function(userpin, newpin, morepin, viewCb) {
-				this.log("viewCb" + viewCb);
-				this.log('sscModel.processPins');
+				window.dbg.log("viewCb" + viewCb);
+				window.dbg.log('sscModel.processPins');
 				// this.server_cb_pinreset_verify(authcode1,authcode2,pin,cb);
 				this.newUserPin = newpin;
 				this.userPin = userpin;
@@ -223,24 +225,27 @@ var SSC_MODEL = new Class(
 					}
 				}).send();
 
-				this.log("translations request send");
+				window.dbg.log("translations request send");
 			},
 
 			syncplugin : function(cb, callback, viewCb) {
-				// this.log ("syncplugin");
+				// window.dbg.log ("syncplugin");
 				var pluginStatus;
 				var timeout = 100;
+				
 
 				try {
 					pluginStatus = this.PKCS11Plugin.PluginStatus;
+					
 				} catch (e) {
-					this.log("catch no plugin status");
+					window.dbg.log("catch no plugin status");
 					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
 					// 'red');
 					sscView.showPopUp('E_ax-failure-accessing-plugin', 'cross',
 							'0004');
 					rc = false;
 				}
+				//window.dbg.log('status:'+this.PKCS11Plugin.PluginStatus);
 				// alert(pluginStatus);
 
 				if (pluginStatus === undefined
@@ -280,7 +285,7 @@ var SSC_MODEL = new Class(
 
 			sc_run_command : function(callback, viewCb) {
 
-				this.log('sc_run_command');
+				window.dbg.log('sc_run_command');
 				sscView.setStatusMsg('I_commSc', "P_pleaseWait", "blue");
 				setTimeout(function() {
 					this.syncplugin(this.sc_cb_run_command, callback, viewCb);
@@ -289,14 +294,14 @@ var SSC_MODEL = new Class(
 
 			sc_cb_run_command : function(cb, viewCb) {
 
-				this.log("sc_cb_run_command");
+				window.dbg.log("sc_cb_run_command");
 				sscView.setStatusMsg("T_idle", ' ', 'idle');
 
 				try {
 					this.cardID = this.PKCS11Plugin.TokenID;
 					this.cardType = this.PKCS11Plugin.CardType;
 				} catch (e) {
-					this.log("Error reading cardID or cardType");
+					window.dbg.log("Error reading cardID or cardType");
 					sscView.showPopUp('E_ax-Error-reading-cardID-or-cardType',
 							'cross', '0005');
 				}
@@ -307,13 +312,13 @@ var SSC_MODEL = new Class(
 
 			sc_getCertificates : function(callback, viewCb) {
 
-				this.log("sc_getCertificates");
+				window.dbg.log("sc_getCertificates");
 				var command = "GetCertificates";
 				var rc = true;
 				try {
 					this.PKCS11Plugin.CardType = this.StdCardType;
 				} catch (e) {
-					this.log("error reading card type - " + e);
+					window.dbg.log("error reading card type - " + e);
 					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
 					// 'red');
 					sscView.showPopUp('E_ax-failure-accessing-plugin', 'cross',
@@ -325,7 +330,7 @@ var SSC_MODEL = new Class(
 					try {
 						this.PKCS11Plugin.Request = command;
 					} catch (e) {
-						this.log("error setting request");
+						window.dbg.log("error setting request");
 						// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
 						// 'red');
 						sscView.showPopUp('E_ax-failure-accessing-plugin',
@@ -348,29 +353,82 @@ var SSC_MODEL = new Class(
 				}
 
 			},
+			
+			sc_GetTokenID: function(callback, viewCb) {
+
+				window.dbg.log("sc_getTokenID");
+				var command = "GetTokenID";
+				var rc = true;
+				try {
+					this.PKCS11Plugin.CardType = this.StdCardType;
+				} catch (e) {
+					window.dbg.log("error reading card type - " + e);
+					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
+					// 'red');
+					sscView.showPopUp('E_ax-failure-accessing-plugin', 'cross',
+							'0004');
+					rc = false;
+				}
+				
+				if (rc) {
+					try {
+						this.PKCS11Plugin.Request = command;
+					} catch (e) {
+						window.dbg.log("error setting request");
+						// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
+						// 'red');
+						sscView.showPopUp('E_ax-failure-accessing-plugin',
+								'cross', '0004');
+						rc = false;
+					}
+				}
+				
+				//Fix if plugin not installed disable status message do not start command
+				if(this.PKCS11Plugin.PluginStatus === undefined ){
+					sscView.setStatusMsg("T_idle", ' ', 'idle');
+				}else{ 
+
+					if (rc) {
+						this.sc_run_command(callback, viewCb);
+					} else {
+						viewCb(rc);
+						return;
+					}
+				}
+
+			},
+			
+			sc_cb_GetTokenID: function(callback, viewCb) {
+
+				window.dbg.log("sc_cb_getTokenID");
+				
+				window.dbg.log("TokenID="+ this.PKCS11Plugin.TokenID + 'Result' + this.PKCS11Plugin.Data );
+	
+			},
+
 
 			sc_cb_getCardStatus : function(viewCb) {
 
 				var rc = true;
-				this.log("sc_cb_getCardStatus");
+				window.dbg.log("sc_cb_getCardStatus");
 				var resData;
 				try {
 					this.cardID = this.PKCS11Plugin.TokenID;
 					resData = this.PKCS11Plugin.Data;
 					// var results = new Querystring(resData);
-					this.log("ID"+this.PKCS11Plugin.TokenID+" Data:"+resData);
+					window.dbg.log("ID"+this.PKCS11Plugin.TokenID+" Data:"+resData);
 				} catch (e) {
 					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
 					// 'red');
 					sscView.showPopUp('E_ax-failure-reading-certificates',
 							'cross', '0100');
-					this.log("error reading certificates");
+					window.dbg.log("error reading certificates");
 					rc = false;
 				}
 				
 				if(this.PKCS11Plugin.TokenID === '' || this.PKCS11Plugin.TokenID === undefined || resData === null || resData === '')
 				{
-					this.log("sc_cb_getCardStatus - empty results retry after pluginreset");
+					window.dbg.log("sc_cb_getCardStatus - empty results retry after pluginreset");
 					
 					//this.PKCS11Plugin.ResetPlugin();
 					
@@ -389,7 +447,7 @@ var SSC_MODEL = new Class(
 			},
 
 			ajax_request : function(targetURL, server_cb, resData, viewCb) {
-				this.log("ajax call - " + targetURL + ' data:' + resData);
+				window.dbg.log("ajax call - " + targetURL + ' data:' + resData);
 				sscView.setStatusMsg("I_commServer", ' ', 'blue');
 
 				var jsonRequest = new Request.JSON( {
@@ -415,7 +473,7 @@ var SSC_MODEL = new Class(
 
 			server_cb_cardstatus : function(data, viewCb) {
 				sscView.setStatusMsg("T_idle", ' ', 'idle');
-				this.log("server_cb_cardstatus");
+				window.dbg.log("server_cb_cardstatus");
 
 				var rc = true;
 
@@ -425,7 +483,7 @@ var SSC_MODEL = new Class(
 					// sscView.setStatusMsg('T_Server_Error','P_ContactAdmin','red');
 					sscView.showPopUp('T_Server_Error', 'cross', '0200');
 					viewCb('error');
-					this.log('server error');
+					window.dbg.log('server error');
 					rc = false;
 					// sscView.showPopUp('T_Server_Error'+error ,'critical');
 				}
@@ -435,7 +493,7 @@ var SSC_MODEL = new Class(
 					var cardholder_givenname;
 					var entity;
 					try {
-						// this.log
+						// window.dbg.log
 						// ('DEBUG:'+data.msg.PARAMS.PARSED_CERTS[0].SUBJECT);
 						this.user.cardholder_surname = data.msg.PARAMS.SMARTCARD.assigned_to.sn;
 						this.user.cardholder_givenname = data.msg.PARAMS.SMARTCARD.assigned_to.givenName;
@@ -453,7 +511,7 @@ var SSC_MODEL = new Class(
 						// JSON SERVER ERROR OR PKI ERROR
 						sscView.showPopUp('E_ajax_backend-Error-status',
 								'cross', '0201');
-						this.log('Error fetching user data');
+						window.dbg.log('Error fetching user data');
 					}
 					try{
 						for (i = 0; i < this.user.parsedCerts.length; i++) {
@@ -483,14 +541,14 @@ var SSC_MODEL = new Class(
 					try {
 						for ( var i = 0; i < data.errors.length; i++) {
 							if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CARDID_NOTACCEPTED') {
-								this.log('Error ' + i + ' ' + data.errors[i]);
+								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 								sscView.showPopUp('E_card_id_error', 'cross',
 										'0222');
 								var PKCS11Plugin = $('PKCS11Plugin');
 								
 								try {
 									// force an exception if PuginStatus not available
-									PKCS11Plugin.StopPlugin();
+									//PKCS11Plugin.StopPlugin();
 								} catch (e) {
 									//alert('not supported');
 								}
@@ -499,7 +557,7 @@ var SSC_MODEL = new Class(
 								
 								viewCb('error');
 							} else {
-								this.log('Error ' + i + ' ' + data.errors[i]);
+								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 								sscView.showPopUp('E_backend-Error', 'cross',
 										'0200');
 								viewCb('error');
@@ -525,7 +583,7 @@ var SSC_MODEL = new Class(
 			},
 
 			determineRequiredAction : function(viewCb, data) {
-				this.log("determineRequiredAction");
+				window.dbg.log("determineRequiredAction");
 				var ret = 0;
 
 				switch (this.user.cardstatus) {
@@ -556,10 +614,10 @@ var SSC_MODEL = new Class(
 				var numWf = null;
 				try {
 					numWf = this.user.workflows.length;
-					this.log('fetching user WFs ' + this.user.workflows.length);
+					window.dbg.log('fetching user WFs ' + this.user.workflows.length);
 
 				} catch (e) {
-					this.log('error fetching Perso WF count');
+					window.dbg.log('error fetching Perso WF count');
 				}
 
 				// ~ var numUnblockWf=null;
@@ -567,7 +625,7 @@ var SSC_MODEL = new Class(
 				// ~
 				// numUnblockWf=this.user.workflows.I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK.length;
 				// ~ }catch(e){
-				// ~ this.log('error fetching Unblock WF count');
+				// ~ window.dbg.log('error fetching Unblock WF count');
 				// ~ }
 
 				var activePersoWf = null;
@@ -576,17 +634,17 @@ var SSC_MODEL = new Class(
 				var lastSuccessUnblockWf = null;
 
 				if (numWf > 0) {
-					this.log('found WFs');
+					window.dbg.log('found WFs');
 					for ( var i = 0; i < numWf; i++) {
-						this.log('fetching wf serial'
+						window.dbg.log('fetching wf serial'
 								+ this.user.workflows[i].WORKFLOW_SERIAL);
-						this.log('fetching wf'
+						window.dbg.log('fetching wf'
 								+ this.user.workflows[i].WORKFLOW_TYPE);
-						this.log('fetching wf'
+						window.dbg.log('fetching wf'
 								+ this.user.workflows[i].WORKFLOW_STATE);
-						this.log('fetching wf'
+						window.dbg.log('fetching wf'
 								+ this.user.workflows[i].WORKFLOW_LAST_UPDATE);
-						this.log('fetching wf'
+						window.dbg.log('fetching wf'
 								+ this.user.workflows[i].LAST_UPDATE_EPOCH);
 						
 						if (this.user.workflows[i].WORKFLOW_TYPE === 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3') {
@@ -599,17 +657,16 @@ var SSC_MODEL = new Class(
 									
 										if (activePersoWf === null) {
 											activePersoWf = this.user.workflows[i];
-											this.log('fetch activePersoWf');
+											window.dbg.log('fetch activePersoWf');
 										} else if (this.user.workflows[i].LAST_UPDATE_EPOCH > activePersoWf.LAST_UPDATE_EPOCH) {
 											activePersoWf = this.user.workflows[i];
-											this.log('fetch newer activePersoWf');
+											window.dbg.log('fetch newer activePersoWf');
 										}
 									}
 								}
 								if ((lastSuccessPersoWf === null || lastSuccessPersoWf.LAST_UPDATE_EPOCH < this.user.workflows[i].LAST_UPDATE_EPOCH)
 										&& (this.user.workflows[i].WORKFLOW_STATE === 'SUCCESS')) {
-									this
-											.log('fetch lastSuccessPersoWf '
+									window.dbg.log('fetch lastSuccessPersoWf '
 													+ this.user.workflows[i].LAST_UPDATE_EPOCH);
 									lastSuccessPersoWf = this.user.workflows[i];
 								}
@@ -625,21 +682,20 @@ var SSC_MODEL = new Class(
 									if (activeUnblockWf === null) {
 										activeUnblockWf = this.user.workflows[i];
 										//this.unblock_wfID = activeUnblockWf.WORKFLOW_SERIAL;
-										this.log('fetch activeUnblockWf');
+										window.dbg.log('fetch activeUnblockWf');
 									} else if (this.user.workflows[i].LAST_UPDATE_EPOCH > activeUnblockWf.LAST_UPDATE_EPOCH) {
 										activeUnblockWf = this.user.workflows[i];
 										//this.unblock_wfID = activeUnblockWf.WORKFLOW_SERIAL;
-										this.log('fetch newer activeUnblockWf');
+										window.dbg.log('fetch newer activeUnblockWf');
 									}
 								}else{
-									this.log('cardID does not match WF token_id '+this.user.workflows[i].TOKEN_ID+" != "+data.id_cardID);
+									window.dbg.log('cardID does not match WF token_id '+this.user.workflows[i].TOKEN_ID+" != "+data.id_cardID);
 								}
 							}
 
 							if ((lastSuccessUnblockWf === null || lastSuccessUnblockWf.LAST_UPDATE_EPOCH < this.user.workflows[i].LAST_UPDATE_EPOCH)
 									&& (this.user.workflows[i].WORKFLOW_STATE === 'SUCCESS')) {
-								this
-										.log('fetch lastSuccessUnblockWf '
+								window.dbg.log('fetch lastSuccessUnblockWf '
 												+ this.user.workflows[i].LAST_UPDATE_EPOCH);
 								lastSuccessUnblockWf = this.user.workflows[i];
 							}
@@ -648,7 +704,7 @@ var SSC_MODEL = new Class(
 
 					}//end for
 				}
-				this.log('determine correct action call view');
+				window.dbg.log('determine correct action call view');
 				if(activeUnblockWf !== null){
 					var validWorkflow = activeUnblockWf;
 					activeUnblockWf = null;
@@ -657,7 +713,7 @@ var SSC_MODEL = new Class(
 					{
 						if(this.stateFilter[i] === validWorkflow.WORKFLOW_STATE)
 						{
-							this.log('valid unblockWf state found '+ validWorkflow.WORKFLOW_STATE);
+							window.dbg.log('valid unblockWf state found '+ validWorkflow.WORKFLOW_STATE);
 							activeUnblockWf = validWorkflow;
 							validWorkflow = null;
 							this.unblock_wfID = activeUnblockWf.WORKFLOW_SERIAL;
@@ -669,7 +725,7 @@ var SSC_MODEL = new Class(
 					
 					if(validWorkflow !== null)
 					{
-						this.log('invalid unblockWf state found '+ validWorkflow.WORKFLOW_STATE);
+						window.dbg.log('invalid unblockWf state found '+ validWorkflow.WORKFLOW_STATE);
 					}
 					
 				}
@@ -681,7 +737,7 @@ var SSC_MODEL = new Class(
 					{
 						if(this.stateFilter[i] === validWorkflow.WORKFLOW_STATE)
 						{
-							this.log('valid persoWf state found '+ validWorkflow.WORKFLOW_STATE);
+							window.dbg.log('valid persoWf state found '+ validWorkflow.WORKFLOW_STATE);
 							activePersoWf = validWorkflow;
 							validWorkflow = null;
 							this.perso_wfID = activePersoWf.WORKFLOW_SERIAL;
@@ -691,7 +747,7 @@ var SSC_MODEL = new Class(
 					
 					if(validWorkflow !== null)
 					{
-						this.log('invalid persoWf state found '+ validWorkflow.WORKFLOW_STATE);
+						window.dbg.log('invalid persoWf state found '+ validWorkflow.WORKFLOW_STATE);
 						
 					}
 					
@@ -699,22 +755,22 @@ var SSC_MODEL = new Class(
 
 				if (lastSuccessPersoWf !== null) {
 					this.user.firstTimePerso = false;
-					this.log('firstTimePerso'+ this.user.firstTimePerso);
+					window.dbg.log('firstTimePerso'+ this.user.firstTimePerso);
 				}
 				if (lastSuccessUnblockWf !== null && lastSuccessPersoWf !== null && lastSuccessUnblockWf.LAST_UPDATE_EPOCH > lastSuccessPersoWf.LAST_UPDATE_EPOCH ) {
 					this.user.cardActivation = false;
-					this.log('cardActivation false');
+					window.dbg.log('cardActivation false');
 				}
 
 				
 				// sscView.setTopMenu(true);
-				this.log('overall state:'+this.overAllStatus);	
+				window.dbg.log('overall state:'+this.overAllStatus);	
 
 
 				if (this.overAllStatus === 'green') {
 					this.user.firstTimePerso = false;
 					if (activePersoWf !== null) {
-						this.log('continue Personalization -active wf found id:'
+						window.dbg.log('continue Personalization -active wf found id:'
 								+ activePersoWf.WORKFLOW_SERIAL);
 						//this.perso_wfID = activePersoWf.WORKFLOW_SERIAL;
 						this.overAllStatus = 'red';
@@ -724,7 +780,7 @@ var SSC_MODEL = new Class(
 					}else{ 
 
 						if (activeUnblockWf !== null) {
-							this.log('continue unblock - active wf found id:'
+							window.dbg.log('continue unblock - active wf found id:'
 									+ activeUnblockWf.WORKFLOW_SERIAL);
 							//this.user.cardActivation = true;
 							this.overAllStatus = 'red';
@@ -740,7 +796,7 @@ var SSC_MODEL = new Class(
 						}
 					}
 
-					this.log('status green');
+					window.dbg.log('status green');
 					//this.user.firstTimePerso = true;
 					
 
@@ -749,40 +805,37 @@ var SSC_MODEL = new Class(
 
 							if (lastSuccessPersoWf.LAST_UPDATE_EPOCH > lastSuccessUnblockWf.LAST_UPDATE_EPOCH
 									|| lastSuccessUnblockWf === null) {
-								this
-										.log('card personalized successfull but not activated - start Unblock');
+								window.dbg.log('card personalized successfull but not activated - start Unblock');
 								this.overAllStatus = 'red';
 								this.user.cardActivation = true;
 								viewCb('enterAuthPersons');
 								return;
 							} else {
-								this
-										.log('card personalized successfull and activated show certificates');
+								window.dbg.log('card personalized successfull and activated show certificates');
 								viewCb('showStatus');
 								return;
 							}
 						} else {
-							this
-									.log('card personalized successfull but not activated - start Unblock');
+							window.dbg.log('card personalized successfull but not activated - start Unblock');
 							this.overAllStatus = 'red';
 							this.user.cardActivation = true;
 							viewCb('enterAuthPersons');
 							return;
 						}
 					} else {
-						this.log('card personalized successfull and activated show certificates');
+						window.dbg.log('card personalized successfull and activated show certificates');
 						sscView.setTopMenu(true);
 						viewCb('showStatus');
 						return;
 					}
 
 				} else if (this.overAllStatus === 'amber') {
-					this.log('status amber');
+					window.dbg.log('status amber');
 					this.user.firstTimePerso = false;
 					this.reCert = true;
 					sscView.setTopMenu(true);
 					if (activePersoWf !== null) {
-						this.log('continue Personalization -active wf found id:'
+						window.dbg.log('continue Personalization -active wf found id:'
 								+ activePersoWf.WORKFLOW_SERIAL);
 						//this.perso_wfID = activePersoWf.WORKFLOW_SERIAL;
 						this.reCert = true;
@@ -791,7 +844,7 @@ var SSC_MODEL = new Class(
 					}else{
 						if (activeUnblockWf !== null) {
 							sscView.setTopMenu(true);
-							this.log('continue unblock - active wf found id:'
+							window.dbg.log('continue unblock - active wf found id:'
 									+ activeUnblockWf.WORKFLOW_SERIAL);
 							this.user.cardActivation = true;
 							this.overAllStatus = 'red';
@@ -807,14 +860,14 @@ var SSC_MODEL = new Class(
 						}	
 					}
 
-					this.log('status amber- start personalization');
+					window.dbg.log('status amber- start personalization');
 					viewCb('startRecert');
 					return;
 				} else if (this.overAllStatus === 'red') {
 					sscView.setTopMenu(false);
-					this.log('status red');
+					window.dbg.log('status red');
 					if (activePersoWf !== null) {
-						this.log('continue Personalization -active wf found id:'
+						window.dbg.log('continue Personalization -active wf found id:'
 								+ activePersoWf.WORKFLOW_SERIAL);
 						//this.perso_wfID = activePersoWf.WORKFLOW_SERIAL;
 						this.reCert = true;
@@ -823,7 +876,7 @@ var SSC_MODEL = new Class(
 					}
 //					else{
 //						if (activeUnblockWf !== null) {
-//							this.log('continue unblock - active wf found id:'
+//							window.dbg.log('continue unblock - active wf found id:'
 //									+ activeUnblockWf.WORKFLOW_SERIAL);
 //							this.user.cardActivation = true;
 //							this.overAllStatus = 'red';
@@ -842,7 +895,7 @@ var SSC_MODEL = new Class(
 					
 					//this.reCert = true;
 					
-					this.log('status red- start personalization');
+					window.dbg.log('status red- start personalization');
 					if(this.user.firstTimePerso)
 					{
 						viewCb('startPerso');
@@ -856,7 +909,7 @@ var SSC_MODEL = new Class(
 			},
 
 			sc_start_personalization : function(viewCb) {
-				this.log("sc_start_personalization");
+				window.dbg.log("sc_start_personalization");
 
 				this.sc_getCertificates(this.sc_cb_persoSendCardStatus, viewCb);
 
@@ -866,7 +919,7 @@ var SSC_MODEL = new Class(
 				sscView.setStatusMsg("T_idle", ' ', 'idle');
 
 				var rc = true;
-				this.log("sc_cb_GetCertificates");
+				window.dbg.log("sc_cb_GetCertificates");
 				var resData;
 				try {
 					this.cardID = this.PKCS11Plugin.TokenID;
@@ -878,7 +931,7 @@ var SSC_MODEL = new Class(
 					// 'red');
 					sscView.showPopUp('E_ax-failure-reading-certificates',
 							'cross', '0100');
-					this.log("error reading certificates");
+					window.dbg.log("error reading certificates");
 					rc = false;
 				}
 
@@ -893,7 +946,7 @@ var SSC_MODEL = new Class(
 			},
 
 			server_status_personalization : function(viewCb) {
-				this.log("server_status_personalization");
+				window.dbg.log("server_status_personalization");
 
 				var resData = "wf_action=get_status&perso_wfID="
 						+ this.perso_wfID;
@@ -905,7 +958,7 @@ var SSC_MODEL = new Class(
 			},
 
 			server_personalization_loop : function(data, viewCb) {
-				this.log("server_personalization_loop");
+				window.dbg.log("server_personalization_loop");
 
 				sscView.setStatusMsg('T_idle', ' ', 'idle');
 
@@ -920,7 +973,7 @@ var SSC_MODEL = new Class(
 					// sscView.setStatusMsg('T_Server_Error','P_ContactAdmin',
 					// 'red');
 					sscView.showPopUp('E_backend-Error-perso', 'cross', '0206');
-					this.log('server json error');
+					window.dbg.log('server json error');
 					rc = false;
 					// sscView.showPopUp('T_Server_Error'+error ,'critical');
 				}
@@ -931,7 +984,7 @@ var SSC_MODEL = new Class(
 					} catch (e) {
 						sscView.showPopUp('E_backend-error-missing-pin',
 								'cross', '0202');
-						this.log("catched error no PIN");
+						window.dbg.log("catched error no PIN");
 						return;
 					}
 					try {
@@ -940,7 +993,7 @@ var SSC_MODEL = new Class(
 					} catch (e) {
 						sscView.showPopUp('E_backend-error-missing-puk',
 								'cross', '0203');
-						this.log("catched error no PUK");
+						window.dbg.log("catched error no PUK");
 						return;
 					}
 
@@ -949,7 +1002,7 @@ var SSC_MODEL = new Class(
 					} catch (e) {
 						sscView.showPopUp('E_backend-error-missing-state',
 								'cross', '0204');
-						this.log("catched error no wf_state");
+						window.dbg.log("catched error no wf_state");
 						return;
 					}
 
@@ -959,7 +1012,7 @@ var SSC_MODEL = new Class(
 							
 						}catch (e)
 						{
-							this.log("Error fetching PIN ");
+							window.dbg.log("Error fetching PIN ");
 						}
 					}
 					
@@ -970,7 +1023,7 @@ var SSC_MODEL = new Class(
 							
 						}catch (e)
 						{
-							this.log("Error fetching PUK");
+							window.dbg.log("Error fetching PUK");
 						}		
 					}
 					
@@ -983,7 +1036,7 @@ var SSC_MODEL = new Class(
 					} catch (e) {
 						sscView.showPopUp('E_backend-error-missing-perso-wfID',
 								'cross', '0205');
-						this.log("E_catched_error_missing_perso_wfID");
+						window.dbg.log("E_catched_error_missing_perso_wfID");
 						return;
 					}
 
@@ -997,7 +1050,7 @@ var SSC_MODEL = new Class(
 
 					}
 
-					this.log('this.state: ' + this.state);
+					window.dbg.log('this.state: ' + this.state);
 
 					if (this.perso_wfID !== 'undefined'
 							&& this.perso_wfID !== null) {
@@ -1005,7 +1058,7 @@ var SSC_MODEL = new Class(
 								|| this.serverPUK === undefined
 								|| this.serverPIN === undefined) {
 							// FIXME next perso step
-							this.log('I_serverPUK_PIN_EMPTY_FETCH_PUK');
+							window.dbg.log('I_serverPUK_PIN_EMPTY_FETCH_PUK');
 
 							var resData = "wf_action=fetch_puk&perso_wfID="
 									+ this.perso_wfID;
@@ -1026,13 +1079,12 @@ var SSC_MODEL = new Class(
 								// action or retry
 								sscView.showPopUp('E_carderror-PUK-invalid',
 										'cross', '0007');
-								this
-										.log('E_ERROR_FETCHING_PUK_CARD_MIGHT_BE_UNUSEABLE');
+								window.dbg.log('E_ERROR_FETCHING_PUK_CARD_MIGHT_BE_UNUSEABLE');
 							}
 
 						} else {
 
-							this.log('E_serverPUK :' + this.serverPUK + 'END'
+							window.dbg.log('E_serverPUK :' + this.serverPUK + 'END'
 									+ typeof (this.serverPUK));
 							if (this.rnd_pin_installed == 0) {
 								
@@ -1046,7 +1098,7 @@ var SSC_MODEL = new Class(
 
 							} else 
 							{
-								this.log('perso State:' + this.state);
+								window.dbg.log('perso State:' + this.state);
 
 								switch (this.state) {
 								case 'NEED_NON_ESCROW_CSR':
@@ -1056,7 +1108,7 @@ var SSC_MODEL = new Class(
 										keysize = data.msg.PARAMS.WORKFLOW.CONTEXT.keysize;
 										// alert("wf_ID:"+wf_ID);
 									} catch (e) {
-										this.log("error keysize catched");
+										window.dbg.log("error keysize catched");
 									}
 
 									if (this.user.accounts.length === 1) {
@@ -1071,7 +1123,7 @@ var SSC_MODEL = new Class(
 
 								case 'CERT_TO_INSTALL':
 									// alert("cert to install");
-									this.log('CERT_TO_INSTALL');
+									window.dbg.log('CERT_TO_INSTALL');
 									var installtype;
 									var keyID;
 									var cert_to_install;
@@ -1079,15 +1131,14 @@ var SSC_MODEL = new Class(
 									// try{
 									// installtype = data.cert_install_type;
 									// }catch(e){
-									// this.log('Error missing certificate
+									// window.dbg.log('Error missing certificate
 									// type'+e);
 									// }
 									command = 'ImportX509';
 									try {
 										cert_to_install = data.cert_to_install;
 									} catch (e) {
-										this
-												.log('Error missing certificate to install'
+										window.dbg.log('Error missing certificate to install'
 														+ e);
 									}
 
@@ -1098,8 +1149,7 @@ var SSC_MODEL = new Class(
 												.showPopUp(
 														'E_backend-error-missing-keyid',
 														'cross', '0207');
-										this
-												.log('Error missing key to install identifier'
+										window.dbg.log('Error missing key to install identifier'
 														+ e);
 									}
 
@@ -1122,7 +1172,7 @@ var SSC_MODEL = new Class(
 
 									break;
 								case 'PKCS12_TO_INSTALL':
-									this.log('PKCS12_TO_INSTALL');
+									window.dbg.log('PKCS12_TO_INSTALL');
 
 									var installtype;
 									var p12;
@@ -1130,7 +1180,7 @@ var SSC_MODEL = new Class(
 									// try{
 									// installtype = data.cert_install_type;
 									// }catch(e){
-									// this.log('Error missing certificate
+									// window.dbg.log('Error missing certificate
 									// type'+e);
 									// }
 
@@ -1145,7 +1195,7 @@ var SSC_MODEL = new Class(
 										sscView.showPopUp(
 												'E_backend-error-missing-p12',
 												'cross', '0208');
-										this.log('Error missing certificate'
+										window.dbg.log('Error missing certificate'
 												+ e);
 									}
 
@@ -1156,7 +1206,7 @@ var SSC_MODEL = new Class(
 										sscView.showPopUp(
 												'E_backend-error-missing-p12p',
 												'cross', '0209');
-										this.log('Error missing p12 password'
+										window.dbg.log('Error missing p12 password'
 												+ e);
 									}
 
@@ -1169,7 +1219,7 @@ var SSC_MODEL = new Class(
 												+ ";UserPIN=" + this.serverPIN
 												+ ';UserPINEncrypted='
 												+ this.puk_pin_encryption + ';';
-										this.log('importp12 para: '
+										window.dbg.log('importp12 para: '
 												+ plugin_parameter);
 										this.PKCS11Plugin.ParamList = plugin_parameter;
 										this.PKCS11Plugin.Data = cert_to_install;
@@ -1179,7 +1229,7 @@ var SSC_MODEL = new Class(
 										this.sc_run_command(
 												this.sc_cb_importP12, viewCb);
 									} else {
-										this.log('error.....pw:' + keyID
+										window.dbg.log('error.....pw:' + keyID
 												+ 'p12:' + cert_to_install);
 									}
 									// }
@@ -1197,8 +1247,7 @@ var SSC_MODEL = new Class(
 												.showPopUp(
 														'E_backend-error-missing-cert-to-delete',
 														'cross', '0210');
-										this
-												.log('Error missing certificate id to delete'
+										window.dbg.log('Error missing certificate id to delete'
 														+ e);
 									}
 
@@ -1211,7 +1260,7 @@ var SSC_MODEL = new Class(
 												+ this.serverPIN
 												+ ';';
 										// alert(plugin_parameter);
-										this.log(plugin_parameter);
+										window.dbg.log(plugin_parameter);
 										this.PKCS11Plugin.ParamList = plugin_parameter;
 										this.PKCS11Plugin.UserPIN = this.serverPIN;
 
@@ -1222,14 +1271,13 @@ var SSC_MODEL = new Class(
 												this.sc_cb_DeleteUserData,
 												viewCb);
 									} else {
-										this.log('error.....pw:' + keyID
+										window.dbg.log('error.....pw:' + keyID
 												+ 'p12:' + cert_to_install);
 									}
 									break;
 
 								case 'SUCCESS':
-									this
-											.log('Success personalization, -unblock card next');
+									window.dbg.log('Success personalization, -unblock card next');
 									sscView.showPersonalizationStatus(3);
 									this.user.cardActivation = true;
 									// Start card activation
@@ -1237,7 +1285,7 @@ var SSC_MODEL = new Class(
 									return;
 									break;
 								case 'FAILIURE':
-									this.log('Failiure personalization');
+									window.dbg.log('Failiure personalization');
 									sscView.showPopUp(
 											'E_process-error-perso-failed',
 											'cross', '0211');
@@ -1258,7 +1306,7 @@ var SSC_MODEL = new Class(
 
 					for ( var i = 0; i < data.errors.length; i++) {
 						if (data.errors[i] === '18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CARDID_NOTACCEPTED') {
-							this.log('Error ' + i + ' ' + data.errors[i]);
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 							sscView.showPopUp('E_card_id_error', 'cross',
 									'0222');
 							viewCb('error');
@@ -1272,7 +1320,7 @@ var SSC_MODEL = new Class(
 			},
 
 			sc_cb_DeleteUserData : function(viewCb) {
-				this.log("sc_cb_DeleteUserData");
+				window.dbg.log("sc_cb_DeleteUserData");
 				var res = this.PKCS11Plugin.Data;
 				var results = new Querystring(res);
 				var pluginStatus = this.PKCS11Plugin.PluginStatus;
@@ -1281,7 +1329,7 @@ var SSC_MODEL = new Class(
 				// alert("sc_cb_delete_cert:"+ res);
 				var reason = results.get("Reason");
 				
-				this.log("Result ="+ set +"-"+reason);
+				window.dbg.log("Result ="+ set +"-"+reason);
 				
 				if (set == "SUCCESS") {
 					
@@ -1307,7 +1355,7 @@ var SSC_MODEL = new Class(
 			},// end sc_cb_DeleteuserData
 
 			sc_cb_installx509 : function(viewCb) {
-				this.log("sc_cb_intsallx509");
+				window.dbg.log("sc_cb_intsallx509");
 				var res = this.PKCS11Plugin.Data;
 				var results = new Querystring(res);
 				var pluginStatus = this.PKCS11Plugin.PluginStatus;
@@ -1336,7 +1384,7 @@ var SSC_MODEL = new Class(
 			},// END sc_cb_installx509
 
 			sc_cb_importP12 : function(viewCb) {
-				this.log("sc_cb_importP12");
+				window.dbg.log("sc_cb_importP12");
 				var res = this.PKCS11Plugin.Data;
 				var results = new Querystring(res);
 				var pluginStatus = this.PKCS11Plugin.PluginStatus;
@@ -1355,7 +1403,7 @@ var SSC_MODEL = new Class(
 							+ "&wf_action=cert_inst_err";
 					var server_cb = this.server_personalization_loop;
 					var targetURL = "functions/personalization/server_personalization";
-					this.log("T_error_import p12:" + res);
+					window.dbg.log("T_error_import p12:" + res);
 
 					sscView.showPopUp('E_sc-error-install-p12-cert-failiure',
 							'cross', '0103');
@@ -1367,7 +1415,7 @@ var SSC_MODEL = new Class(
 			},// END sc_cb_importP12
 
 			sc_installRND_pin : function(viewCb) {
-				this.log("sc_installRND_pin");
+				window.dbg.log("sc_installRND_pin");
 				command = "ResetPIN";
 
 				if (this.serverPUK !== null && this.serverPIN !== null) {
@@ -1375,7 +1423,7 @@ var SSC_MODEL = new Class(
 							+ ";PUKEncrypted=" + this.puk_pin_encryption
 							+ ";NewPIN=" + this.serverPIN + ";NewPINEncrypted="
 							+ this.puk_pin_encryption + ";";
-					this.log("sc_installRND_pin para:" + plugin_parameter);
+					window.dbg.log("sc_installRND_pin para:" + plugin_parameter);
 					this.PKCS11Plugin.ParamList = plugin_parameter;
 					this.PKCS11Plugin.Request = command;
 					this.sc_run_command(this.sc_cb_installRND_pin, viewCb);
@@ -1384,20 +1432,20 @@ var SSC_MODEL = new Class(
 							'E_sc-error-install-rndpin-missing-params',
 							'cross', '0104');
 
-					this.log('E_PUK_OR_PIN_MISSING');
+					window.dbg.log('E_PUK_OR_PIN_MISSING');
 				}
 
 			},// END sc_installRND_pin
 
 			sc_cb_installRND_pin : function(viewCb) {
-				this.log("sc_cb_installRND_pin");
+				window.dbg.log("sc_cb_installRND_pin");
 				var res = this.PKCS11Plugin.Data;
-				this.log(res);
+				window.dbg.log(res);
 				var results = new Querystring(res);
 
 				var set = results.get("Result");
 
-				this.log("sc_cb_installRND_pin :" + res);
+				window.dbg.log("sc_cb_installRND_pin :" + res);
 				if (set == "SUCCESS") {
 					// event_nextStepPerso();
 					this.rnd_pin_installed = 1;
@@ -1415,7 +1463,7 @@ var SSC_MODEL = new Class(
 					} else if (set === 'PUKError') {
 						//sscView.showPopUp('E_sc-error-puk-notaccepted','cross', '0107');
 						//PUK was invalid if two PUKs available try to install PUK and continue
-						this.log("rndPIN install failed - install puk. " + set);
+						window.dbg.log("rndPIN install failed - install puk. " + set);
 						this.sc_installPUK(viewCb);
 						return;
 					} else if (set === 'PUKInvalid') {
@@ -1426,7 +1474,7 @@ var SSC_MODEL = new Class(
 								'cross', '0109');
 					}
 
-					this.log("sc_cb_installRND_pin error reson:" + set);
+					window.dbg.log("sc_cb_installRND_pin error reson:" + set);
 
 					// alert("RndPINInstall Error: "+ res);
 					this.rnd_pin_installed = 0;
@@ -1436,7 +1484,7 @@ var SSC_MODEL = new Class(
 			},// END sc_cb_installRND_pin
 
 			sc_installPUK : function(viewCb) {
-				this.log("sc_installPUK");
+				window.dbg.log("sc_installPUK");
 				command = "ChangePUK";
 				// verify PUK order
 				if (this.serverPUK !== null && this.serverPIN !== null) {
@@ -1445,7 +1493,7 @@ var SSC_MODEL = new Class(
 							+ ";NewPUK=" + this.serverPUK[0]
 							+ ";NewPUKEncrypted=" + this.puk_pin_encryption
 							+ ";";
-					this.log(plugin_parameter);
+					window.dbg.log(plugin_parameter);
 					
 					this.PKCS11Plugin.ParamList = plugin_parameter;
 					this.PKCS11Plugin.Request = command;
@@ -1459,16 +1507,16 @@ var SSC_MODEL = new Class(
 			},// END sc_installPUK
 
 			sc_cb_installPUK : function(viewCb) {
-				this.log("sc_cb_installPUK : "+this.PKCS11Plugin.PluginStatus);
+				window.dbg.log("sc_cb_installPUK : "+this.PKCS11Plugin.PluginStatus);
 		
 				if (this.PKCS11Plugin.PluginStatus === 'FINISHED_SUCCESS' ) {
 					
 					var res = this.PKCS11Plugin.Data;
-					this.log("status : "+this.PKCS11Plugin.PluginStatus);
+					window.dbg.log("status : "+this.PKCS11Plugin.PluginStatus);
 					var results = new Querystring(res);
 
 					var set = results.get("Result");
-					this.log("PUK Install Success: " + res);
+					window.dbg.log("PUK Install Success: " + res);
 					// event_nextStepPerso();
 					if(this.state === 'PUK_TO_INSTALL')
 					{
@@ -1485,12 +1533,12 @@ var SSC_MODEL = new Class(
 				} else {
 					var res = this.PKCS11Plugin.Data;
 					
-					this.log("status : "+this.PKCS11Plugin.PluginStatus);
+					window.dbg.log("status : "+this.PKCS11Plugin.PluginStatus);
 					var results = new Querystring(res);
 
 					var set = results.get("Result");
 					
-					this.log("PUK Install fail - already installed: " + res);
+					window.dbg.log("PUK Install fail - already installed: " + res);
 					var reason = results.get("Reason");
 					if (reason === 'PUKError'){
 						// NO Error reporting if puk instalation failed old PUK
@@ -1508,14 +1556,14 @@ var SSC_MODEL = new Class(
 										viewCb);
 						
 						}else{
-							this.log("PUK already installed continue personalization");
+							window.dbg.log("PUK already installed continue personalization");
 							this.server_status_personalization(viewCb);
 						}
-						this.log("sc_installPUK status="+this.PKCS11Plugin.PluginStatus);
+						window.dbg.log("sc_installPUK status="+this.PKCS11Plugin.PluginStatus);
 		
 					} else {
 						
-						this.log("sc_installPUK status="+this.PKCS11Plugin.PluginStatus);
+						window.dbg.log("sc_installPUK status="+this.PKCS11Plugin.PluginStatus);
 						sscView.showPopUp(
 								'E_sc-error-install-rndpuk ' + reason, 'cross',
 								'0111');
@@ -1525,14 +1573,14 @@ var SSC_MODEL = new Class(
 			},// END sc_cb_installPUK
 
 			personalizeAccount : function(account, viewCb) {
-				this.log("personalizeAccount");
+				window.dbg.log("personalizeAccount");
 				this.selectedAccount = account;
 				this.sc_GenerateKeypair(viewCb);
 
 			},
 
 			sc_GenerateKeypair : function(viewCb) {
-				this.log("sc_GenerateKeypair");
+				window.dbg.log("sc_GenerateKeypair");
 
 				var plugin_parameter = "SubjectCN=" + this.activeUser
 						+ "KeyLength=" + this.keysize + ";UserPIN="
@@ -1549,7 +1597,7 @@ var SSC_MODEL = new Class(
 			},// END sc_GenerateKeypair
 
 			sc_cb_GenerateKeypair : function(viewCb) {
-				this.log("sc_cb_GenerateKeypair");
+				window.dbg.log("sc_cb_GenerateKeypair");
 
 				this.cardID = this.PKCS11Plugin.TokenID;
 				var res = this.PKCS11Plugin.Data;
@@ -1574,7 +1622,7 @@ var SSC_MODEL = new Class(
 
 			// #################################PIN UNBLOCK################
 			server_start_resetpin : function(authPerson1, authPerson2, viewCb) {
-				this.log("server_srart_resetpin " + authPerson1.toLowerCase()
+				window.dbg.log("server_srart_resetpin " + authPerson1.toLowerCase()
 						+ ' ' + authPerson2.toLowerCase());
 
 				var resData = "unblock_wfID=" + this.unblock_wfID + "&email1="
@@ -1587,7 +1635,7 @@ var SSC_MODEL = new Class(
 			},// END server_start_resetpin
 
 			server_cb_start_resetpin : function(data, viewCb) {
-				this.log("server_cb_start_resetpin");
+				window.dbg.log("server_cb_start_resetpin");
 
 				sscView.setStatusMsg('T_idle', '', 'idle');
 
@@ -1606,7 +1654,7 @@ var SSC_MODEL = new Class(
 							'cross', '0214');
 					viewCb('error');
 					return;
-					this.log("Server error missing unblock wfID");
+					window.dbg.log("Server error missing unblock wfID");
 				}
 				var email1;
 				var email2;
@@ -1618,7 +1666,7 @@ var SSC_MODEL = new Class(
 							'cross', '0215');
 					viewCb('error');
 					return;
-					this.log("Server error email1:" + this.unblock_wfID);
+					window.dbg.log("Server error email1:" + this.unblock_wfID);
 				}
 				try {
 					email2 = data.auth2_ldap_mail;
@@ -1628,46 +1676,51 @@ var SSC_MODEL = new Class(
 							'cross', '0216');
 					viewCb('error');
 					return;
-					this.log("Server error email2:" + this.unblock_wfID);
+					window.dbg.log("Server error email2:" + this.unblock_wfID);
 				}
 
 				if (err == "error") {
 					// if error authpersons not accepted FIXME or could NOT
 					// create workflow
+					try{
 					for ( var i = 0; i < data.errors.length; i++) {
 						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_ERROR_CREATE_WORKFLOW_INSTANCE') {
-							this.log('Error ' + i + ' ' + data.errors[i]);
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 						}
 
 						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_ERROR_STATE_HAVE_TOKEN_OWNER_REQUIRED') {
-							this.log('Error ' + i + ' ' + data.errors[i]);
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 						}
 						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_ERROR_STORE_AUTH_IDS') {
-							this.log('Error ' + i + ' ' + data.errors[i]);
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 							// error storing authId's
 							viewCb(true);
 							return;
 						}
 
 						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_ERROR_STATE_PAND_ACT_CODE_REQUIRED') {
-							this.log('Error ' + i + ' ' + data.errors[i]);
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 							// error storing authId's
 //							sscView.showPopUp(
 //									'E_backend-error-creating-workflow',
 //									'cross', '0221');
 							var missing=0;
-							this.log("email1 " + email1 + " " + data.auth1_ldap_mail);
+							window.dbg.log("email1 " + email1 + " " + data.auth1_ldap_mail);
 							if(email1 === null || email1 === undefined ){
 								missing = 1;
 							}
-							this.log("email2 " + email2 + " "+ data.auth2_ldap_mail);
+							window.dbg.log("email2 " + email2 + " "+ data.auth2_ldap_mail);
 							if(email2 === null || email1 === undefined){
 								missing += 2;
 							}		
 							viewCb(true,missing);
 							return;
 						}
-
+						
+					}
+					
+					}catch (e){
+						
 					}
 
 				} else {
@@ -1679,7 +1732,7 @@ var SSC_MODEL = new Class(
 			},
 
 			sc_cb_resetpin : function(viewCb) {
-				this.log("sc_cb_resetpin");
+				window.dbg.log("sc_cb_resetpin");
 				var pluginstatus = this.PKCS11Plugin.PluginStatus;
 				this.cardID = this.PKCS11Plugin.TokenID;
 				var res = this.PKCS11Plugin.Data;
@@ -1705,7 +1758,7 @@ var SSC_MODEL = new Class(
 					// alert("ERROR Pinsetcount="+pinSetCount);
 					command = "ResetPIN";
 					var reason = results.get("Reason");
-					this.log("reason " + reason + ' ' + res);
+					window.dbg.log("reason " + reason + ' ' + res);
 
 					if (reason === 'PUKError') {
 						sscView.showPopUp('E_sc-error-resetpin-puk-error ',
@@ -1714,20 +1767,20 @@ var SSC_MODEL = new Class(
 						return;
 					} else if (reason === 'TokenInternalError') {
 						// Invalid PIN is an user Error no popup here
-						this.log("invalid pin" + reason);
+						window.dbg.log("invalid pin" + reason);
 						viewCb('invalidPin');
 						return;
 					}
 
-					var plugin_parameter = "PUK=" + PUK
-							+ ";PUKEncrypted=no;NewPIN=" + user_pass1
-							+ ";NewPINEncrypted=no;";
-					this.PKCS11Plugin.ParamList = plugin_parameter;
-					this.PKCS11Plugin.Request = command;
-					// alert(this.PKCS11Plugin.Request);
-					// stage == 1;
-
-					this.sc_run_command(this.sc_cb_resetpin);
+//					var plugin_parameter = "PUK=" + this.serverPUK
+//							+ ";PUKEncrypted=no;NewPIN=" + user_pass1
+//							+ ";NewPINEncrypted=no;";
+//					this.PKCS11Plugin.ParamList = plugin_parameter;
+//					this.PKCS11Plugin.Request = command;
+//					// alert(this.PKCS11Plugin.Request);
+//					// stage == 1;
+//
+//					this.sc_run_command(this.sc_cb_resetpin);
 				} else {
 
 					viewCb();
@@ -1741,7 +1794,7 @@ var SSC_MODEL = new Class(
 			},// END sc_cb_resetpin
 
 			server_cb_pinreset_confirm : function(data, viewCb) {
-				this.log("server_cb_pinreset_confitm");
+				window.dbg.log("server_cb_pinreset_confitm");
 				sscView.setStatusMsg('T_idle', '', 'idle');
 
 				try {
@@ -1753,7 +1806,7 @@ var SSC_MODEL = new Class(
 							'cross', '0217');
 					viewCb('error');
 					return;
-					this.log('server json error');
+					window.dbg.log('server json error');
 					// sscView.showPopUp('T_Server_Error'+error ,'critical');
 				}
 				if (data.wfstate === 'SUCCESS') {
@@ -1771,7 +1824,7 @@ var SSC_MODEL = new Class(
 			},// END server_cb_pinreset_confirm
 
 			server_cb_pinreset_verify : function(data, viewCb) {
-				this.log("server_cb_pinreset_verify");
+				window.dbg.log("server_cb_pinreset_verify");
 				try {
 					var err = data.error;
 				} catch (e) {
@@ -1779,7 +1832,7 @@ var SSC_MODEL = new Class(
 					// 'red');
 					sscView.showPopUp('E_backend-Error-unblock-verify',
 							'cross', '0218');
-					this.log('server json error');
+					window.dbg.log('server json error');
 					// sscView.showPopUp('T_Server_Error'+error ,'critical');
 				}
 				if (err !== "error") {
@@ -1795,7 +1848,7 @@ var SSC_MODEL = new Class(
 						}
 
 					} catch (e) {
-						this.log('missing PUK');
+						window.dbg.log('missing PUK');
 						if (this.serverPUK !== null) {
 							PUK = this.serverPUK;
 						}
@@ -1804,24 +1857,24 @@ var SSC_MODEL = new Class(
 					try {
 						PIN = data.pin;
 					} catch (e) {
-						this.log('missing PIN');
+						window.dbg.log('missing PIN');
 					}
 					var forID = null;
 					try {
 						forID = data.id_cardID;
 					} catch (e) {
-						this.log('missing cardID');
+						window.dbg.log('missing cardID');
 					}
 
 					try {
 						this.state = data.wfstate;
 					} catch (e) {
-						this.log('missing ardID');
+						window.dbg.log('missing ardID');
 					}
 					try {
 						this.unblock_wfID = data.unblock_wfID;
 					} catch (e) {
-						this.log('missing wfID');
+						window.dbg.log('missing wfID');
 					}
 					if (this.state === 'FAILURE') {
 						viewCb('failure'); // FIXME return code
@@ -1852,13 +1905,13 @@ var SSC_MODEL = new Class(
 					//if data error 
 					for ( var i = 0; i < data.errors.length; i++) {
 						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_AUTHCODES_INCORRECT') {
-							this.log('Error ' + i + ' ' + data.errors[i]);
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 							viewCb('invalidAuthCode',3); 
 							return;
 						}
 						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_WF_FAILURE') {
-							this.log('Error ' + i + ' ' + data.errors[i]);
-							this.log('Restart Unblock WF failed');
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+							window.dbg.log('Restart Unblock WF failed');
 							this.user.cardActivation = true;
 							viewCb('failure');
 							return;
@@ -1869,23 +1922,23 @@ var SSC_MODEL = new Class(
 					//sscView.setStatusMsg('E_ax-failure','P_ContactAdmin', 'red');
 					sscView.showPopUp('E_backend-Error-unblock-verify-json',
 							'cross', '0219');
-					this.log('server_cb_pinreset_verify server error');
+					window.dbg.log('server_cb_pinreset_verify server error');
 				}
 
 			},//END server_cb_pinreset_verify
 
 			server_pinrest_verify : function(userpin, authcode1, authcode2,
 					viewCb) {
-				this.log("server_pinreset_verify");
-				this.cardID = this.PKCS11Plugin.TokenID;
-				this.cardType = this.PKCS11Plugin.CardType;
+				window.dbg.log("server_pinreset_verify");
+				//this.cardID = this.PKCS11Plugin.TokenID;
+				//this.cardType = this.PKCS11Plugin.CardType;
 
 				//var resData = "unblock_wfID="+this.unblock_wfID+D;
 				var server_cb = this.server_cb_pinreset_verify;
 				var targetURL = "functions/pinreset/pinreset_verify";
 				var resData = 'unblock_wfID=' + this.unblock_wfID
-						+ '&activationCode1=' + authcode1 + '&activationCode2='
-						+ authcode2 + '&userpin=' + $.URLEncode(userpin);
+						+ '&activationCode1=' + $.URLEncode(authcode1) + '&activationCode2='
+						+ $.URLEncode(authcode2) + '&userpin=' + $.URLEncode(userpin);
 
 				this.ajax_request(targetURL, server_cb, resData, viewCb);
 
@@ -1894,15 +1947,15 @@ var SSC_MODEL = new Class(
 			//######################PIN CHANGE#########################	
 			sc_changePIN : function(userpin, newpin, viewCb) {
 				var command = "ChangePIN";
-				this.log("sc_changePIN");
-				this.log("viewCb" + viewCb);
+				window.dbg.log("sc_changePIN");
+				window.dbg.log("viewCb" + viewCb);
 				this.cardID = this.PKCS11Plugin.TokenID;
 				this.cardType = this.PKCS11Plugin.CardType;
 
 				var plugin_parameter = "UserPIN=" + userpin
 						+ ";UserPINEncrypted=no;NewPIN=" + newpin
 						+ ";NewPINEncrypted=no;";
-				this.log(plugin_parameter);
+				window.dbg.log(plugin_parameter);
 				this.PKCS11Plugin.ParamList = plugin_parameter;
 				this.PKCS11Plugin.Request = command;
 
@@ -1912,16 +1965,16 @@ var SSC_MODEL = new Class(
 			},//END sc_changePIN
 
 			sc_cb_login_changePIN : function(viewCb) {
-				this.log("viewCb" + viewCb);
+				window.dbg.log("viewCb" + viewCb);
 				var command = "ChangePIN";
-				this.log("sc_changePIN");
+				window.dbg.log("sc_changePIN");
 				this.cardID = this.PKCS11Plugin.TokenID;
 				this.cardType = this.PKCS11Plugin.CardType;
 
 				this.PKCS11Plugin.NewPIN = this.newUserPin;
 				this.PKCS11Plugin.UserPIN = this.userPin;
 
-				//this.log (plugin_parameter);
+				//window.dbg.log (plugin_parameter);
 				//this.PKCS11Plugin.ParamList = plugin_parameter;
 				//this.PKCS11Plugin.Request = command;
 
@@ -1933,8 +1986,8 @@ var SSC_MODEL = new Class(
 			},//END sc_changePIN
 
 			sc_cb_changePIN : function(viewCb) {
-				this.log("viewCb" + viewCb);
-				this.log("sc_cb_changePIN");
+				window.dbg.log("viewCb" + viewCb);
+				window.dbg.log("sc_cb_changePIN");
 				this.cardID = this.PKCS11Plugin.TokenID;
 				this.cardType = this.PKCS11Plugin.CardType;
 
@@ -1947,7 +2000,7 @@ var SSC_MODEL = new Class(
 				//~ {
 				//~ set.trim();
 				//~ }
-				this.log(res + this.PKCS11Plugin.PluginStatus);
+				window.dbg.log(res + this.PKCS11Plugin.PluginStatus);
 				if (set === "SUCCESS") {
 					viewCb('success');
 
@@ -1955,7 +2008,7 @@ var SSC_MODEL = new Class(
 					//});
 				} else if (set === "ERROR") {
 					var reason = results.get("Reason");
-					this.log("Error: " + reason);
+					window.dbg.log("Error: " + reason);
 
 					if (reason == 'TokenInternalError') {
 						viewCb('newPinError');
@@ -1975,7 +2028,7 @@ var SSC_MODEL = new Class(
 			},//END
 
 			sc_resetToken : function(viewCb) {
-				this.log("sc_resetToken");
+				window.dbg.log("sc_resetToken");
 				this.cardID = this.PKCS11Plugin.TokenID;
 				this.cardType = this.PKCS11Plugin.CardType;
 
@@ -1990,13 +2043,13 @@ var SSC_MODEL = new Class(
 			},//END sc_ResetToken
 
 			sc_cb_resetToken : function(viewCb) {
-				this.log("sc_cb_resetToken");
+				window.dbg.log("sc_cb_resetToken");
 				this.cardID = this.PKCS11Plugin.TokenID;
 				this.cardType = this.PKCS11Plugin.CardType;
 
 				var res = this.PKCS11Plugin.GetResult();
 				var results = new Querystring(res);
-				this.log("sc_resetToken result" + res);
+				window.dbg.log("sc_resetToken result" + res);
 			},//END sc_cb_resetToken
 
 			// fixme: should be in model
@@ -2006,13 +2059,13 @@ var SSC_MODEL = new Class(
 				var wf_ID = qget.get("id");
 				//var foruser = qget.get("foruser");
 
-				this.log('getActivationCode');
+				window.dbg.log('getActivationCode');
 
 				targetURL = this.options.baseUrl
 						+ 'sso/functions/getauthcode/getauthcode' + '?id='
 						+ wf_ID;
 
-				this.log('targetURL =' + targetURL);
+				window.dbg.log('targetURL =' + targetURL);
 
 				var jsonRequest = new Request.JSON(
 						{

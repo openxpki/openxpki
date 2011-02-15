@@ -285,6 +285,11 @@ my $certificate_to_install;
     if ( defined $self->param("perso_wfID") && ( $self->param("perso_wfID") ne 'undefined' ) && ( $self->param("perso_wfID") ne '' ) ) {
 	 # if ( defined $self->param("perso_wfID") ) {
         $wf_ID = $self->param("perso_wfID");
+			if($wf_ID =~ /^[0-9]+$/){
+				
+			}else{
+				$wf_ID = undef;
+			}
        
     }
 

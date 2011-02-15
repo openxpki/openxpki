@@ -1,19 +1,22 @@
+/* SVN FILE: $Id$ */
 /**
- * dbSSC - Smartcard Badge Self Service Center
- * 
- * Frontend View
- * 
- * 
- * @package dbSSC
- * @param
- * @param
- * @return
- * 
- * @constructor
- */
+* dbSSC - Smartcard Badge Self Service Center
+* Frontend View
+* 
+* @package SCC
+* @subpackage SSC_FRONTEND
+* @author $Author$
+* @copyright $Copyright$
+* @version $Revision$
+* @lastrevision $Date$
+* @modifiedby $LastChangedBy$
+* @lastmodified $LastChangedDate$
+* @license $License$
+* @filesource $URL$
+*/
 var SSC_VIEW = new Class(
 		{
-			Implements : [ Options, Log ],
+			Implements : [ Options ],
 
 			/**
 			 * default language
@@ -45,8 +48,8 @@ var SSC_VIEW = new Class(
 			 * @constructor
 			 */
 			initialize : function(options) {
-
-				this.enableLog().log(
+				
+				window.dbg.log(
 						'sscView initialize at ' + new Date().format("db"));
 
 				// get options
@@ -79,8 +82,8 @@ var SSC_VIEW = new Class(
 			 */
 			init_step2 : function(translations) {
 
-				this.log("translations loaded");
-
+				window.dbg.log("translations loaded");
+							
 				// store translations
 				this.translations = translations;
 				
@@ -142,7 +145,7 @@ var SSC_VIEW = new Class(
 			 */
 			init_done : function(cardReaderAvailable) {
 				
-				this.log('init_done - cardReaderAvailable = '+ cardReaderAvailable);
+				window.dbg.log('init_done - cardReaderAvailable = '+ cardReaderAvailable);
 
 				if (cardReaderAvailable) {
 
@@ -158,7 +161,7 @@ var SSC_VIEW = new Class(
 					this.setStatusMsg('T_idle','', 'idle');
 
 				}
-
+				
 			}, // init_done
 			
 
@@ -177,7 +180,7 @@ var SSC_VIEW = new Class(
 			 */
 			processCardInfo : function(status) {
 
-				this.log('processCardInfo status: ' + status);
+				window.dbg.log('processCardInfo status: ' + status);
 				this.setPrompt('');
 				// get user info
 				var user = sscModel.getUserInfo();
@@ -243,6 +246,10 @@ var SSC_VIEW = new Class(
 				
 				case 'enterAuthcodes':
 					// enter authcodes
+					
+					// clear authcodes (myight be saved from prevoius attempt)
+					this.actCode1 = '';
+					this.actCode2 = '';
 					 
 					this.showPinDlg(false);
 					sscView.setInfoRight('IT_Info', 'I_actStep2');
@@ -263,6 +270,9 @@ var SSC_VIEW = new Class(
 				
 				case 'enterAuthPersons':	
 					// do unblock
+					this.actCode1='';
+					this.actCode2='';
+					  
 					this.showAuthPersonDlg();
 					
 					// card activation?
@@ -373,7 +383,7 @@ var SSC_VIEW = new Class(
 			 */
 			processAccountSelection : function(select) {
 
-				this.log('processAccountSelection');
+				window.dbg.log('processAccountSelection');
 
 				this.account = '';
 
@@ -446,7 +456,7 @@ var SSC_VIEW = new Class(
 			 */
 			processAuthPersons : function() {
 
-				this.log('processAuthPersons');
+				window.dbg.log('processAuthPersons');
 				this.setPrompt('');
 
 				var error = false;
@@ -523,7 +533,7 @@ var SSC_VIEW = new Class(
 			 */
 			processAuthPersons_done : function(rc, invalidMail) {
 
-				this.log('auth persons done - ' + status);
+				window.dbg.log('auth persons done - ' + status);
 				
 				// any error
 				if (rc){
@@ -595,7 +605,7 @@ var SSC_VIEW = new Class(
 
 			processPersonalization : function() {
 
-				this.log('processPersonalization');
+				window.dbg.log('processPersonalization');
 				this.setPrompt('');
 				
 				// diff between repersonalization ---> first time
@@ -619,13 +629,13 @@ var SSC_VIEW = new Class(
 				this.setInfoRight('IT_Info','I_persoSuccess');
 				this.setNextAction('T_proceedActivation', 
 							function(){this.processCardInfo('enterAuthPersons');}.bind(this), true);
-				this.log('processPersonalization done');
+				window.dbg.log('processPersonalization done');
 			},
 			
 			
 			processPins : function() {
 
-				this.log('processPins');
+				window.dbg.log('processPins');
 				this.setPrompt('');
 
 				var error = false;
@@ -763,7 +773,7 @@ var SSC_VIEW = new Class(
 			
 			processPins_done : function(status) {
 
-				this.log('processPins done');
+				window.dbg.log('processPins done');
 				
 				// policy error
 				if (status === 'newPinError'){
@@ -802,14 +812,22 @@ var SSC_VIEW = new Class(
 				// card blocked
 				} else if (status === 'cardBlocked'){
 				
-					this.showPinDlg(true);
+					//this.showPinDlg(true);
+					this.showAuthPersonDlg();
 					// set title
-					this.setInfoTitle('T_changePin');
+					this.setInfoTitle('T_ScActivationStepFailureRestartUnblock');
 					// set right info text
-					this.setInfoRight('IT_Info', 'I_cardBlocked');
+					sscView.setInfoRight('IT_Info', 'I_unblock');
 					// set next & back action
-					this.setNextAction('T_cardUnblock', function(){this.processCardInfo('enterAuthPersons');}.bind(this), true);
-					this.setBackAction('T_back', function(){ this.processCardInfo('showStatus');}.bind(this), true);				 
+					this.setNextAction('T_cardUnblock', this.processAuthPersons, true);
+					this.setBackAction('T_back',function(){ this.processCardInfo('showStatus');}.bind(this), true);
+	
+//					this.setInfoTitle('T_changePin');
+//					// set right info text
+//					this.setInfoRight('IT_Info', 'I_cardBlocked');
+//					// set next & back action
+//					this.setNextAction('T_cardUnblock', function(){this.processCardInfo('enterAuthPersons');}.bind(this), true);
+//					this.setBackAction('T_back', function(){ this.processCardInfo('showStatus');}.bind(this), true);				 
 					this.setPrompt('T_cardBlocked');
 				// everything ok
 				} else {
@@ -838,7 +856,7 @@ var SSC_VIEW = new Class(
 			 */
 			processAuthCodes_done : function(status, invalidActCode) {
 
-				this.log('processAuthCode done');
+				window.dbg.log('processAuthCode done');
 				
 				// invalid authcode
 				if (status === 'invalidAuthCode'){
@@ -918,12 +936,12 @@ var SSC_VIEW = new Class(
 			},
 			
 			processRecertification : function(){
-				this.log('processRecertification');
+				window.dbg.log('processRecertification');
 				sscModel.sc_start_personalization(this.processRecertification_done);
 			},
 			
 			processRecertification_done : function(){
-				this.log('processRecertification_done');
+				window.dbg.log('processRecertification_done');
 				
 			},
 			
@@ -965,7 +983,7 @@ var SSC_VIEW = new Class(
 			
 			unblockCard : function() {
 
-				this.log('unblockCard');
+				window.dbg.log('unblockCard');
 				this.setPrompt();
 				this.showAuthPersonDlg();
 				// set title
@@ -984,7 +1002,7 @@ var SSC_VIEW = new Class(
 
 			setButton : function(enable, btn, fnc) {
 
-				this.log('setButton');
+				window.dbg.log('setButton');
 
 				if (!btn.getParent().hasClass('active') && enable) {
 					btn.getParent().addClass('active');
@@ -997,7 +1015,7 @@ var SSC_VIEW = new Class(
 
 			setInfoLeft : function(titleId, textId) {
 
-				this.log('setInfoLeft ' + textId + '-' + titleId);
+				window.dbg.log('setInfoLeft ' + textId + '-' + titleId);
 
 				this.setTranslatedElementText($('infoLeftTitle'), titleId);
 				this.setTranslatedElementText($('infoLeftContent'), textId);
@@ -1006,7 +1024,7 @@ var SSC_VIEW = new Class(
 
 			setInfoRight : function(titleId, textId) {
 
-				this.log('setInfoRight ' + textId + '-' + titleId);
+				window.dbg.log('setInfoRight ' + textId + '-' + titleId);
 
 				this.setTranslatedElementText($('infoRightTitle'), titleId);
 				
@@ -1031,7 +1049,7 @@ var SSC_VIEW = new Class(
 
 			setInfoTitle : function(textId) {
 
-				this.log('setInfoTitle ' + textId);
+				window.dbg.log('setInfoTitle ' + textId);
 				this.setTranslatedElementText($('infoCenterTitle'), textId);
 
 			},
@@ -1039,15 +1057,15 @@ var SSC_VIEW = new Class(
 			
 			setBackAction : function(textId, backAction, active) {
 
-				this.log('setBackAction ' + textId);
+				window.dbg.log('setBackAction ' + textId);
 
 				if (backAction !== undefined
 						&& typeof backAction === 'function') {
 					this.backActionFnc = backAction;
-					this.log('setBackAction Fnc');
+					window.dbg.log('setBackAction Fnc');
 				} else {
 					this.backActionFnc = null;
-					this.log('setBackAction Fnc cleared', true);
+					window.dbg.log('setBackAction Fnc cleared', true);
 				}
 
 				// create link
@@ -1070,15 +1088,15 @@ var SSC_VIEW = new Class(
 			
 			setNextAction : function(textId, nextAction, active) {
 
-				this.log('setNextAction ' + textId);
+				window.dbg.log('setNextAction ' + textId);
 
 				if (nextAction !== undefined
 						&& typeof nextAction === 'function') {
 					this.nextActionFnc = nextAction;
-					this.log('setNextAction Fnc');
+					window.dbg.log('setNextAction Fnc');
 				} else {
 					this.nextActionFnc = null;
-					this.log('setNextAction Fnc cleared', true);
+					window.dbg.log('setNextAction Fnc cleared', true);
 				}
 
 				// create link
@@ -1099,7 +1117,7 @@ var SSC_VIEW = new Class(
 			
 			setNextActionActive: function(active){
 				
-				this.log('setNextActionActive - ' + active);
+				window.dbg.log('setNextActionActive - ' + active);
 				
 				if (active) $('nextActionLnk').addClass('active');
 				else $('nextActionLnk').removeClass('active');
@@ -1107,7 +1125,7 @@ var SSC_VIEW = new Class(
 
 			setPrompt : function(msgId) {
 
-				this.log('setPrompt ' + msgId);
+				window.dbg.log('setPrompt ' + msgId);
 
 				if (msgId !== undefined && msgId !== '') {
 					$('infoPrompt').innerHTML = '<h2 class="tl" id="' + msgId
@@ -1121,7 +1139,7 @@ var SSC_VIEW = new Class(
 			},
 
 			setOverallStatus : function(statusLightClass) {
-				this.log('setOverallStatus ' + statusLightClass);
+				window.dbg.log('setOverallStatus ' + statusLightClass);
 				this.setTranslatedElementText($('overallStatus'),
 						'T_StatusTitle');
 				$('overallStatus').setProperty('class',
@@ -1130,7 +1148,7 @@ var SSC_VIEW = new Class(
 			},
 			setStatusMsg : function(msgId, promptId, statusLightClass) {
 
-				this.log('setStatusMsg ' + msgId + '-' + promptId + '-'
+				window.dbg.log('setStatusMsg ' + msgId + '-' + promptId + '-'
 						+ statusLightClass);
 
 				if (statusLightClass !== undefined) {
@@ -1157,7 +1175,7 @@ var SSC_VIEW = new Class(
 
 			setTopMenu : function(enable) {
 
-				this.log('setTopMenu');
+				window.dbg.log('setTopMenu');
 
 				this.setButton(enable, $('btnChangePin'), this.changePin);
 				this.setButton(enable, $('btnUnblock'), this.unblockCard);
@@ -1183,7 +1201,7 @@ var SSC_VIEW = new Class(
 
 			showAccountDlg : function(accounts) {
 
-				this.log('showAccountDlg');
+				window.dbg.log('showAccountDlg');
 
 				// clear account
 				this.account = '';
@@ -1196,7 +1214,7 @@ var SSC_VIEW = new Class(
 				
 				if (accounts instanceof Array && accounts.length >= 10)
 				{
-					this.log('more than 10 accouts');
+					window.dbg.log('more than 10 accouts');
 					// create form
 					var form = new Element('form', {
 						'id' : 'accountDlgForm'
@@ -1218,7 +1236,7 @@ var SSC_VIEW = new Class(
 					var accountDlgSelect = new Element('select', {
 						'name' : 'accountDlgSelect'
 					});					
-					this.log('more than 10 accouts step1 ');
+					window.dbg.log('more than 10 accouts step1 ');
 					// build selection
 					new Element('option', {
 						'id' : 'account',
@@ -1237,7 +1255,7 @@ var SSC_VIEW = new Class(
 							'value' : accounts[i]
 						}).inject(accountDlgSelect);	
 					}					
-					this.log('more than 10 accouts step2  ');
+					window.dbg.log('more than 10 accouts step2  ');
 					
 					var actionLnk = new Element('a', {
 						'html' : this.tr_('T_selAccount'),
@@ -1248,7 +1266,7 @@ var SSC_VIEW = new Class(
 							}.bind(this)
 						}
 					});
-					this.log('more than 10 accouts step 3 ');
+					window.dbg.log('more than 10 accouts step 3 ');
 					
 					actionLnk.inject(form);
 					// next Action processAccount +Selection
@@ -1257,10 +1275,10 @@ var SSC_VIEW = new Class(
 					
 					// inject form
 					form.inject($('accountDlg'));
-					this.log('more than 10 accouts step4 ');
+					window.dbg.log('more than 10 accouts step4 ');
 					
 				}else if (accounts instanceof Array && accounts.length > 1 ) {
-					this.log('more than one accout');
+					window.dbg.log('more than one accout');
 					// create form
 					var form = new Element('form', {
 						'id' : 'accountDlgForm'
@@ -1335,7 +1353,7 @@ var SSC_VIEW = new Class(
 			
 			showAuthCode : function(code){
 				
-				this.log('showAuthCode');
+				window.dbg.log('showAuthCode');
 				
 				var div = new Element('div',{'class' : 'genCode'});
 						
@@ -1351,7 +1369,7 @@ var SSC_VIEW = new Class(
 			
 			showAuthPersonDlg : function() {
 
-				this.log('showAuthPersonDlg');
+				window.dbg.log('showAuthPersonDlg');
 
 				// clear persons
 				this.authPers1 = this.authPers2 = '';
@@ -1392,7 +1410,7 @@ var SSC_VIEW = new Class(
 
 			showPersonalizationStatus : function(status) {
 
-				this.log('showPersonalizationStatus');
+				window.dbg.log('showPersonalizationStatus');
 
 				var el = $('infoMore');
 				el.empty();
@@ -1440,7 +1458,7 @@ var SSC_VIEW = new Class(
 
 			showPinDlg : function(change) {
 
-				this.log('showPinDlg');
+				window.dbg.log('showPinDlg');
 
 				// clear all pins
 				this.pin = this.pin1 = this.pin2 = '';
@@ -1520,7 +1538,7 @@ var SSC_VIEW = new Class(
 
 			showSmartcardStatus : function() {
 
-				this.log('showSmartcardStatus');
+				window.dbg.log('showSmartcardStatus');
 
 				this.setInfoTitle('T_StatusTitle');
 				var infoHtml = '';
@@ -1562,7 +1580,7 @@ var SSC_VIEW = new Class(
 
 			showPopUp : function(msgId, sign, errorCode) {
 					
-				this.log('showPopUp - ' + msgId + '-' + errorCode );
+				window.dbg.log('showPopUp - ' + msgId + '-' + errorCode );
 				this.showPopUpMsg( errorCode !== undefined 
 						             ? this.tr_(msgId) + '<br/>(Error-Code: #' + errorCode + ')'
 						             : this.tr_(msgId)
@@ -1571,7 +1589,7 @@ var SSC_VIEW = new Class(
 			},
 
 			showPopUpMsg : function(msg, sign) {
-				this.log('showPopUpMsg');
+				window.dbg.log('showPopUpMsg');
 				$('popupInfo').set('html', msg);
 				$('popupInfo2').set('html', this.tr_('T_popupSupportContact'));
 				$('popupSign').setProperty('class', sign);
@@ -1598,7 +1616,7 @@ var SSC_VIEW = new Class(
 				var subject = '';
 				var certType = 0; // 1 = escrow, 2 = nonescrow, 3 = other
 				
-				this.log('certs2Html');
+				window.dbg.log('certs2Html');
 				
 				for (i = 0; i < certs.length; i++) {
 					
@@ -1634,7 +1652,7 @@ var SSC_VIEW = new Class(
 							+ '</td></tr>' + '</table>' 
 							
 							+ '</div>';
-					this.log(html);	
+					window.dbg.log(html);	
 					
 					// setStatus
 					switch(certType){
@@ -1660,7 +1678,7 @@ var SSC_VIEW = new Class(
 					
 					
 				}
-			this.log("leaving certs2Html");
+			window.dbg.log("leaving certs2Html");
 			},
 			
 			
@@ -1684,7 +1702,7 @@ var SSC_VIEW = new Class(
 				$('infoMore').style.display = 'block';
 				$('infoMore').innerHTML = html;
 
-				this.infoAccordion = new Accordion($('infoMore'),
+				this.infoAccordion = new Fx.Accordion($('infoMore'),
 						'img.acc_toggler', 'div.infoCenterSubInfo', {
 							opacity : false,
 							display : -1,
@@ -1705,7 +1723,7 @@ var SSC_VIEW = new Class(
 
 			changeLanguage : function() {
 
-				this.log('changeLanguage');
+				window.dbg.log('changeLanguage');
 
 				// only us and de supported
 				if (this.options.language === 'de')
@@ -1717,16 +1735,29 @@ var SSC_VIEW = new Class(
 				sscModel.getTranslations(this.options.language,
 						this.changeLanguage_step2);
 
-				this.log('changeLanguage');
+				window.dbg.log('changeLanguage');
 			},
 
 			changeLanguage_step2 : function(translations) {
 
-				this.log('changeLanguage_step2');
-
+				window.dbg.log('changeLanguage_step2');
+				/*
+				 * write error msg to log (sorted) 
+				 */
+				
+				// first create a hash from object
+				if (sscDebug === true){
+					var hash = new Hash(translations);
+					// build an array from hash
+					arr = [];
+					hash.each(function(value, key){ arr.push('"'+key+'"' + ':' + '"'+ value + '",'); });
+					// sort the array
+					out = '';
+					arr.sort().each(function(value, key){ window.dbg.log(value + '\n'); });
+				}
 				// store translations
 				this.translations = translations;
-
+			
 				// translate static buttons
 				$$('.btnLang').set('html', this.tr_('T_Lang'));
 				$$('.btnHelp').set('html', this.tr_('T_Help'));
@@ -1737,6 +1768,7 @@ var SSC_VIEW = new Class(
 				$$('.tt').each(function(el) {
 					this.trE_(el.id).replaces(el);
 					}.bind(this));
+		 
 
 			},
 
@@ -1778,7 +1810,7 @@ var SSC_VIEW = new Class(
 
 			initMenues : function(main) {
 
-				this.log('initMenues - ' + main);
+				window.dbg.log('initMenues - ' + main);
 
 				// create Language link/// and inject it
 				var el = new Element('a', {
@@ -1848,7 +1880,7 @@ var SSC_VIEW = new Class(
 
 			performNextAction : function() {
 
-				this.log('performNextAction');
+				window.dbg.log('performNextAction');
 
 				// remember fnc
 				var fnc = this.nextActionFnc;
@@ -1865,7 +1897,7 @@ var SSC_VIEW = new Class(
 			
 			performBackAction : function() {
 
-				this.log('performBackAction');
+				window.dbg.log('performBackAction');
 
 				// remember fnc
 				var fnc = this.backActionFnc;
@@ -1885,7 +1917,7 @@ var SSC_VIEW = new Class(
 		 */
 		handleKeyDown : function(e) {
 			if (e.key === 'enter') {
-				this.log('enter pressed');
+				window.dbg.log('enter pressed');
 				if (this.nextActionFnc !== null) {
 					this.performNextAction();
 				}
@@ -1945,7 +1977,7 @@ var SSC_VIEW = new Class(
 
 			// called with every property and it's value
 			keyvalue2Log : function(key, value) {
-				this.log(key + " : " + value);
+				window.dbg.log(key + " : " + value);
 			},
 
 			// called with every property and it's value
