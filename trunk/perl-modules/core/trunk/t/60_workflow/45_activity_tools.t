@@ -17,6 +17,7 @@ our $debug = 0;
 my $realm = 'User TEST CA';
 $realm = undef;
 
+
 # reuse the already deployed server
 #my $instancedir = 't/60_workflow/test_instance';
 my $instancedir = '';
@@ -72,74 +73,74 @@ diag('##################################################');
 diag('# Run WFArray Tests');
 diag('##################################################');
 
-wfexec_ok( $client, $wf_id, 'test_wfarray', {}) or die "Error executing test_wfarray: $@";
+wfexec_ok( $client, $wf_id, 'wftest_test_wfarray', {}) or die "Error executing wftest_test_wfarray: $@";
 wfstate_is( $client, $wf_id, 'TEST_WFARRAY');
 
 # array is empty
 
-wfexec_ok( $client, $wf_id, 'wfarray_push', { wfarray_val => 'Apples' } );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_push', { wfarray_val => 'Apples' } );
 
 # array contains [ 'Apples' ];
 
-wfexec_ok( $client, $wf_id, 'wfarray_push', { wfarray_val => 'Oranges' } );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_push', { wfarray_val => 'Oranges' } );
 
 # array contains [ 'Apples', 'Oranges' ];
 
-wfexec_ok( $client, $wf_id, 'wfarray_count', {} );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_count', {} );
 
 wfparam_is( $client, $wf_id, 'wfarray_val', '2',
     'Count of array should be 2' );
 
-wfexec_ok( $client, $wf_id, 'wfarray_pop', {} );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_pop', {} );
 
 # array contains [ 'Apples' ];
 
 wfparam_is( $client, $wf_id, 'wfarray_val', 'Oranges',
     'Last entry should be Oranges' );
 
-wfexec_ok( $client, $wf_id, 'wfarray_count', {} );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_count', {} );
 
 wfparam_is( $client, $wf_id, 'wfarray_val', '1',
     'Count of array should be 1' );
 
-wfexec_ok( $client, $wf_id, 'wfarray_unshift', { wfarray_val => 'Lemons' } );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_unshift', { wfarray_val => 'Lemons' } );
 
 # array contains [ 'Lemons', 'Apples' ];
 
-wfexec_ok( $client, $wf_id, 'wfarray_count', {} );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_count', {} );
 
 wfparam_is( $client, $wf_id, 'wfarray_val', '2',
     'Count of array should be 2' );
 
-wfexec_ok( $client, $wf_id, 'wfarray_unshift',
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_unshift',
     { wfarray_val => 'Cherries' } );
 
 # array contains [ 'Cherries', 'Lemons', 'Apples' ];
 
-wfexec_ok( $client, $wf_id, 'wfarray_count', {} );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_count', {} );
 
 wfparam_is( $client, $wf_id, 'wfarray_val', '3',
     'Count of array should be 3' );
 
-wfexec_ok( $client, $wf_id, 'wfarray_shift', {} );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_shift', {} );
 
 # array contains [ 'Lemons', 'Apples' ];
 
 wfparam_is( $client, $wf_id, 'wfarray_val', 'Cherries',
     'Last entry should be Cherries' );
 
-wfexec_ok( $client, $wf_id, 'wfarray_count', {} );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_count', {} );
 
 wfparam_is( $client, $wf_id, 'wfarray_val', '2',
     'Count of array should be 2' );
 
-wfexec_ok( $client, $wf_id, 'wfarray_value', { wfarray_index => '1' } );
+wfexec_ok( $client, $wf_id, 'wftest_wfarray_value', { wfarray_index => '1' } );
 
 wfparam_is( $client, $wf_id, 'wfarray_val', 'Apples',
     'Should find Apples at index 1' );
 
 # Done with WFArray tests
-wfexec_ok( $client, $wf_id, 'subtests_done', {} );
+wfexec_ok( $client, $wf_id, 'wftest_subtests_done', {} );
 wfstate_is( $client, $wf_id, 'INITIALIZED' ) 
     or die( "State after test set must be INITIALIZED: ", Dumper($msg) );
 
@@ -147,7 +148,7 @@ wfstate_is( $client, $wf_id, 'INITIALIZED' )
 # Finish the active workflow
 ############################################################
 
-wfexec_ok( $client, $wf_id, 'tests_done', {} );
+wfexec_ok( $client, $wf_id, 'wftest_tests_done', {} );
 
 wfstate_is( $client, $wf_id, 'SUCCESS' );
 
