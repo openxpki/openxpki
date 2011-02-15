@@ -1,0 +1,236 @@
+<!--
+
+TITLE: Smartcard Admin Interface
+
+PURPOSE: Provide access to some useful utilities needed for managing smartcards
+
+DETAILS: See Workflow-UI-for-smartcard-admin.graffle for details
+
+-->
+
+%# Note: this blindly executes the given action. It is up to the
+%# ACLs and the workflow approvals, if configured, to prevent
+%# mischief and mayhem
+
+<%args>
+</%args>
+<%once>
+use Data::Dumper;
+use OpenXPKI::Serialization::Simple;
+use English;
+my $debug = 1;
+</%once>
+<%init>
+
+############################################################
+# INIT - GLOBAL VARS
+############################################################
+our @errors;
+our $debug_msg;
+our $wf_type = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_CARDADM';
+
+############################################################
+# INIT - SUBROUTINES
+############################################################
+
+############################################################
+# INIT - MAIN BLOCK
+############################################################
+
+my ($token_id, $wf_id, $next_action);	# params passed via GET/POST
+#my ($curr_user);	# param from Mason
+#my ($wf, $c_msg, $wf_state);
+#my ($need_token_id, $req_new_auth);	# state info for displaying page
+
+
+# Novosec sends the ID with uppercase letters, but the XML file/workflow
+# has it in lowercase. Also, the arg name 'TokenID' is hard-coded by them.
+
+$token_id		= lc($m->request_args()->{TokenID});
+$wf_id			= $m->request_args()->{WF_ID};
+#$token_owner	= $m->request_args()->{TOKEN_OWNER};
+$next_action	= $m->request_args()->{NEXT_ACTION};
+#$curr_user		= $context->{client}->send_receive_command_msg('get_user')->{PARAMS};
+my $msg;
+my $wf;
+my @ref_wfs = ();
+#my $ldap_data;
+my $token_status;
+my $person = {};
+my @pers_attrs = qw( cn mail telephoneNumber seeAlso );
+
+my %pmap = (
+    qw(
+        NEW_USER    new_user
+        NEW_STATUS  new_status
+        TARGET_WF   target_wf_id
+        UNBLOCK_CHALLENGE   unblock_challenge
+    )
+);
+
+warn
+	"===== INIT BLOCK OF samartcard_admin/action.mhtml =====\n",
+	"\trequest args = ", join(', ', %{ $m->request_args() }), "\n",
+	"\ttoken_id = '$token_id'\n",
+#	"\twf_id = '$wf_id'\n",
+#	"\ttoken_owner = '$token_owner'\n",
+#	"\tcurr_user = '$curr_user'\n",
+	"\tnext_action = '$next_action'\n",
+	"==========================================\n";
+
+if ( $wf_id ) {
+    my $p = {};
+    foreach my $key ( keys %pmap ) {
+        if ( defined $m->request_args()->{$key} ) {
+            $p->{ $pmap{$key} } = $m->request_args()->{$key};
+        }
+    }
+
+    $msg = $context->{client}->send_receive_command_msg(
+        'execute_workflow_activity',
+        {
+            ID  => $wf_id,
+            ACTIVITY  => $next_action,
+            PARAMS => $p,
+            WORKFLOW    => $wf_type,
+        }
+    );
+}
+
+if ( $msg and $msg->{SERVICE_MSG} ne 'ERROR') {
+
+    $wf = $msg->{PARAMS}->{WORKFLOW};
+
+    $msg = $context->{client}->send_receive_command_msg(
+        'get_workflow_info',
+        { WORKFLOW => $wf_type, ID => $wf_id } );
+    
+    if ( $msg and $msg->{SERVICE_MSG} ne 'ERROR') {
+
+        $wf = $msg->{PARAMS}->{WORKFLOW};
+
+    }
+
+#    # workflows that this card refers to. Each entry is an anonymous hash
+#    # with the keys WORKFLOW.WORKFLOW_STATE WORKFLOW.WORKFLOW_SERIAL
+#    if ( ref( $wf->{CONTEXT}->{workflows} ) eq 'ARRAY' ) {
+#        @ref_wfs = map { @{$_} }
+#            map { values %{$_} }
+#            ( $wf->{CONTEXT}->{workflows} );
+#    }
+#
+#    $ldap_data = $wf->{CONTEXT}->{ldap_data};
+#    # overwrite session param with value from api call
+#    $token_owner = $wf->{CONTEXT}->{ldap_workflow_creator};
+#    $token_status = $wf->{CONTEXT}->{smartcard_status};
+#
+#    # grab details to the person, if available
+#    my $ser = OpenXPKI::Serialization::Simple->new();
+#    foreach my $attr ( @pers_attrs ) {
+#        my $val = $wf->{CONTEXT}->{'ldap_' . $attr};
+#        eval {
+#            $person->{$attr} = $ser->deserialize( $val );
+#        };
+#        if ( $EVAL_ERROR ) {
+#            $person->{$attr} = $val;
+#        }
+#        if ( ref( $person->{$attr} ) eq 'ARRAY' ) {
+#            $person->{$attr} = join(', ', @{ $person->{$attr} });
+#        }
+#    } # foreach attr
+
+} # if not error
+
+############################################################
+# END OF INIT BLOCK
+# 
+# In the following section below, the page is actually presented.
+############################################################
+</%init>
+
+%# There are three cases to deal with on this page:
+%#
+%#  A.  Execute Call Failed
+%#      
+%#      Display error details.
+%#
+%#  B.  Workflow is in state SUCCESS
+%#
+%#      Display details of the results.
+%#
+%#  C.  Workflow is in state FAILURE
+%#
+%#      Display details on failure from Workflow.
+%#
+%#  D.  Workflow is in other state
+%#
+%#      Display current state and some details of attributes
+%#
+%# Note: to a certain extent, B, C and D could probably be
+%# put together in a single block.
+
+%#
+%#  A.  Execute Call Failed
+%#      
+
+
+
+% if ($msg->{SERVICE_MSG} eq 'ERROR') {
+%    my @errs = $m->comp('/lib/get_deep_error.mhtml', 'msg' => $msg, 'print' => 1);
+%    $m->comp('/lib/print_errors.mhtml', 'errors' => \@errs);
+%    return;
+%}
+
+%#
+%# B, C, D: Display status and details of workflow
+%#
+
+% if ( $wf ) {
+<h1>Results</h1>
+
+<table>
+    <tr><th>Token ID</th><td><% $wf->{CONTEXT}->{token_id} %></td></tr>
+    <tr><th>Token Owner</th><td><% $wf->{CONTEXT}->{token_owner} %></td></tr>
+%   if ( $wf->{CONTEXT}->{next_action} eq 'get_unblock_response' ) {
+    <tr><th>Challenge</th><td><% $wf->{CONTEXT}->{unblock_challenge} %></td></tr>
+    <tr><th>Response</th><td><% $wf->{CONTEXT}->{unblock_response} %></td></tr>
+% } # next_action eq get_unblock_response
+% else {
+    <tr><th>Action</th><td><% $wf->{CONTEXT}->{next_action} %></td></tr>
+    <tr><th>Workflow State</th><td><% $wf->{STATE} %></td></tr>
+% } # next_action ne get_unblock_response
+</table
+
+% } # have workflow
+%
+%#
+%#  D.  Unexpected Error
+%#
+%
+% else {
+% 
+<h1>Unexpected Error</h1>
+% my @errs = $m->comp('/lib/get_deep_error.mhtml', 'msg' => $msg);
+% $m->comp('/lib/print_errors.mhtml', 'errors' => \@errs);
+% print 'MSG=', map { s/\n/<br>/g; s/\s{2}/\&nbsp/g; $_ } Dumper($msg);
+% } # closing else
+
+% if ( $debug ) {
+<br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br>
+
+<hr><h1>Debug Details</h1><hr>
+<h2>Request Args</h2>
+% my $reqargs = $m->request_args();
+<pre>
+% print Dumper($reqargs);
+</pre>
+
+<h2>Workflow</h2>
+<pre>
+% print Dumper($wf);
+</pre>
+
+% }
+

@@ -81,6 +81,7 @@ sub execute {
         }
     }
 
+    ##! 1: 'returned from get_data_pool_entry(): ' . Dumper($msg)
     $context->param($valparam, $retval);
 
     return;

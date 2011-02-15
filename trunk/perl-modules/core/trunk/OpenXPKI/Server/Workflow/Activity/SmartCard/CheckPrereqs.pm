@@ -29,18 +29,12 @@ sub execute {
 
 	my @certs = split(/;/, $context->param('certs_on_card'));
 
-	my $wf_types = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
-	    {
-		workflow    => $workflow,
-		context_key => 'workflow_types',
-	    } );
-
 	my $result = CTX('api')->sc_analyze_smartcard(
 	    {
  		CERTS => \@certs,
 		CERTFORMAT => 'BASE64',
 		SMARTCARDID => $context->param('token_id'),
-		WORKFLOW_TYPES => $wf_types->value(),
+		WORKFLOW_TYPES => [ qw( I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERS I18N_OPENXPKI_WF_TYPE_SMARTCARD_UNBLOCK ) ],
 		CONFIG_ID => $self->config_id(),
 		%params,
 	     
@@ -48,6 +42,7 @@ sub execute {
 
 	##! 16: 'smartcard analyzed: ' . Dumper $result
 	
+    $context->param('_workflows', $result->{WORKFLOWS});
 
 	# set cert ids in context
 	my $cert_ids = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
@@ -129,7 +124,7 @@ sub execute {
 		context_key => 'certs_to_delete',
 	    } );
 	$certs_to_delete->push(
-	    map { $_->{IDENTIFIER} } @{$result->{TASKS}->{SMARTCARD}->{PURGE}}
+	    @{$result->{TASKS}->{SMARTCARD}->{PURGE}}
 	    );
 
 	

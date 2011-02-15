@@ -1,0 +1,340 @@
+<!--
+
+TITLE: Smartcard Admin Interface
+
+PURPOSE: Provide access to some useful utilities needed for managing smartcards
+
+DETAILS: See Workflow-UI-for-smartcard-admin.graffle for details
+
+-->
+
+<%args>
+</%args>
+<%once>
+use Data::Dumper;
+use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Workflow::WFObject::WFArray;
+use English;
+
+my $debug = 1;
+</%once>
+<%init>
+
+############################################################
+# INIT - GLOBAL VARS
+############################################################
+our @errors;
+our $debug_msg;
+our $wf_type = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_CARDADM';
+
+############################################################
+# INIT - SUBROUTINES
+############################################################
+
+############################################################
+# INIT - MAIN BLOCK
+############################################################
+
+my ($token_id, $wf_id, $token_owner);	# params passed via GET/POST
+#my ($curr_user);	# param from Mason
+#my ($wf, $c_msg, $wf_state);
+#my ($need_token_id, $req_new_auth);	# state info for displaying page
+
+
+# Novosec sends the ID with uppercase letters, but the XML file/workflow
+# has it in lowercase. Also, the arg name 'TokenID' is hard-coded by them.
+
+$token_id		= lc($m->request_args()->{TokenID});
+#$wf_id			= $m->request_args()->{WF_ID};
+$token_owner	= $m->request_args()->{TOKEN_OWNER};
+#$next_action	= $m->request_args()->{NEXT_ACTION};
+#$curr_user		= $context->{client}->send_receive_command_msg('get_user')->{PARAMS};
+my $wf;
+my @ref_wfs = ();
+my $ldap_data;
+my $token_status;
+my $person = {};
+my @pers_attrs = qw( cn mail telephoneNumber seeAlso );
+
+warn
+	"===== INIT BLOCK OF samartcard_admin/fetch.mhtml =====\n",
+	"\trequest args = ", join(', ', %{ $m->request_args() }), "\n",
+	"\ttoken_id = '$token_id'\n",
+#	"\twf_id = '$wf_id'\n",
+	"\ttoken_owner = '$token_owner'\n",
+#	"\tcurr_user = '$curr_user'\n",
+#	"\tnext_action = '$next_action'\n",
+	"==========================================\n";
+
+my $params = {};
+if ( $token_owner ) {
+    $params->{token_owner} = $token_owner;
+}
+if ( $token_id ) {
+    $params->{token_id} = $token_id;
+}
+
+my $msg = $context->{client}->send_receive_command_msg(
+    'create_workflow_instance',
+    {
+        WORKFLOW => $wf_type,
+        PARAMS => $params,
+    },
+);
+
+warn "MSG=", Dumper($msg);
+
+if ($msg->{SERVICE_MSG} ne 'ERROR') {
+
+    $wf = $msg->{PARAMS}->{WORKFLOW};
+
+
+    # workflows that this card refers to. Note that it is a list per type.
+    my $workflows = $wf->{CONTEXT}->{_workflows};
+    warn "WORKFLOWS=", Dumper($workflows);
+    foreach my $ref_wftype ( values %{ $workflows } ) {
+        push @ref_wfs, @{ $ref_wftype };
+    }
+    
+    $ldap_data = $wf->{CONTEXT}->{_ldap_data};
+    # overwrite session param with value from api call
+    $token_owner = $wf->{CONTEXT}->{ldap_workflow_creator};
+    $token_status = $wf->{CONTEXT}->{smartcard_status};
+
+    # grab details to the person, if available
+    my $ser = OpenXPKI::Serialization::Simple->new();
+    foreach my $attr ( @pers_attrs ) {
+        my $val = $wf->{CONTEXT}->{'ldap_' . $attr};
+        eval {
+            $person->{$attr} = $ser->deserialize( $val );
+        };
+        if ( $EVAL_ERROR ) {
+            $person->{$attr} = $val;
+        }
+        if ( ref( $person->{$attr} ) eq 'ARRAY' ) {
+            $person->{$attr} = join(', ', @{ $person->{$attr} });
+        }
+    } # foreach attr
+} # if not error
+
+############################################################
+# END OF INIT BLOCK
+# 
+# In the following section below, the page is actually presented.
+############################################################
+</%init>
+
+%# There are four cases to deal with on this page:
+%#
+%#  A.  Unique Owner and Token ID (state of WF is 'MAIN'):
+%#      
+%#      Display owner and token details, with fields and
+%#      buttons to update owner or token status. Also,
+%#      list known workflows for token and, where possible,
+%#      associated with a button to kill the workflow.
+%#
+%#  B.  Multiple Users (e.g.: wildcard was entered in LDAP search):
+%#
+%#      Display table of users with details. Also, prepend each
+%#      row with a radio box and below the table, have the
+%#      button "show details for selected user".
+%#
+%#  C.  Unique Owner and Multiple Tokens (e.g.: user has multiple SeeAlso
+%#      entries):
+%#
+%#      Display owner details and a table of the token IDs and status, with 
+%#      radio buttons and a button "show details for selected token".
+%#
+%#  D.  Unexpected Error
+%#
+%#      Shouldn't get here, but show some debug details just in case.
+
+
+%#
+%#  A.  Unique Owner and Token ID (state of WF is 'MAIN'):
+%#      
+
+
+
+% if ($msg->{SERVICE_MSG} eq 'ERROR') {
+%    my @errs = $m->comp('/lib/get_deep_error.mhtml', 'msg' => $msg);
+% $m->comp('/lib/print_errors.mhtml', 'errors' => \@errs);
+%    return;
+%}
+
+%if ( $wf->{STATE} eq 'MAIN' ) {
+<h1>Owner Details</h1>
+<hr>
+<table>
+% foreach my $attr ( @pers_attrs ) {
+<tr><th><% $attr %></th><td><% $person->{$attr} %></td></tr>
+% } # foreach attr
+<tr><th>Token ID</th><td><% $wf->{CONTEXT}->{token_id} %></td></tr>
+</table>
+<hr>
+
+<h1>Modify Token</h1>
+<& /service/open_form.mhtml, action => 'action.html' &>
+<& /lib/html/hidden.mhtml, 'name' => 'NEXT_ACTION', value => 'scadm_modify_user' &>
+<& /lib/html/hidden.mhtml, 'name' => 'WF_ID', value => $wf->{ID} &>
+<table><tr><td>Change Owner</td><td>
+<& /lib/html/input.mhtml,
+    name => 'NEW_USER',
+    value => $token_owner,
+    width => 25,
+&></td></tr>
+</table>
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/open_form.mhtml, action => 'action.html' &>
+<& /lib/html/hidden.mhtml, 'name' => 'NEXT_ACTION', value => 'scadm_modify_status' &>
+<& /lib/html/hidden.mhtml, 'name' => 'WF_ID', value => $wf->{ID} &>
+<table><tr><td>Change Status</td><td>
+<& /lib/html/select.mhtml,
+    name => 'NEW_STATUS',
+    default => [ $token_status ],
+    values => [ qw( initial activated deactivated ) ],
+&></td></tr>
+</table>
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/open_form.mhtml, action => 'action.html' &>
+<& /lib/html/hidden.mhtml, 'name' => 'NEXT_ACTION', value => 'scadm_get_unblock_response' &>
+<& /lib/html/hidden.mhtml, 'name' => 'WF_ID', value => $wf->{ID} &>
+<table><tr><td>Unblock Challenge from User</td><td>
+<& /lib/html/input.mhtml,
+    name => 'UNBLOCK_CHALLENGE',
+    value => '',
+    width => 25,
+&></td></tr>
+</table>
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<hr>
+<h1>Workflow History of Token</h1>
+<table>
+    <tr><th>Workflow ID</th><th>State</th><th>Last Update</th><th>Action</th></tr>
+%       foreach my $ref_wf ( @ref_wfs ) {
+%           my $refstate = $ref_wf->{'WORKFLOW.WORKFLOW_STATE'};
+%           my $refser = $ref_wf->{'WORKFLOW.WORKFLOW_SERIAL'};
+%           my $refupdate = $ref_wf->{'WORKFLOW.WORKFLOW_LAST_UPDATE'};
+%           my $reftype = $ref_wf->{'WORKFLOW.WORKFLOW_TYPE'};
+    <tr>
+        <td>
+            <& /lib/html/a.mhtml,
+            target => $context->{menu}->get_root() . '/service/workflow/show_instance.html',
+            label => $refser,
+            params => [
+                [ 'id' => $refser ],
+            ],
+            &>
+        </td>
+        <td><% $refstate %></td>
+        <td><% $refupdate %></td>
+%       if ( $refstate ne 'SUCCESS' and $refstate ne 'FAILURE' ) {
+        <td><& /lib/html/a.mhtml, 
+            target => 'action.html',
+            label => 'kill',
+            params => [
+                [ TARGET_WF => $refser ],
+                [ NEXT_ACTION => 'scadm_kill_workflow' ],
+                [ WF_ID => $wf->{ID} ],
+            ],
+            &></td>
+%       } else {
+            <td>&nbsp;</td>
+%       }
+        </tr>
+%       } # foreach ref_wfs
+</table>
+% }
+%
+%#
+%#  B.  Multiple Users (e.g.: wildcard was entered in LDAP search):
+%#
+%
+% elsif ( (ref($ldap_data) eq 'ARRAY') and ( @{$ldap_data} > 1) ) {
+<h1>Search Returned Multiple User Records</h1>
+
+<table>
+    <tr><th>Name</th><th>Mail</th><th>Telephone</th><th>Tokens</th></tr>
+%   foreach my $rec ( @{ $ldap_data } ) {
+    <tr>
+        <td><& /lib/html/a.mhtml,
+            target => 'fetch.html',
+            label => $rec->{mail},
+            params => [
+                [ 'TOKEN_OWNER', $rec->{mail} ],
+                ],
+        &></td>
+%       foreach my $fld ( qw( cn telephone seealso ) ) {
+        <td><% $rec->{$fld} %></td>
+%       } # foreach field
+    </tr>
+%   } # foreach ldap record
+</table>
+
+% } # if multiple persons were found in ldap_data
+%
+%#
+%#  C.  Unique Owner and Multiple Tokens (e.g.: user has multiple SeeAlso
+%#      entries):
+%
+% elsif ( ref( $ldap_data ) eq 'ARRAY' and @{ $ldap_data } == 1 and ref( $ldap_data->[0]->{scb} eq 'ARRAY' ) ) {
+
+<h1>Search Returned User with Multiple Tokens</h1>
+ 
+<table>
+% foreach my $attr ( qw( cn mail tel seealso ) ) {
+    <tr><th><% $attr %></th><td><% $wf->{CONTEXT}->{'ldap_' . $attr} %>
+% } # foreach attr
+</table>
+<h1>Modify Token</h1>
+
+<table>
+    <tr><th>Token ID</th><th>Status</th></tr>
+%   foreach my $tok ( @{ $ldap_data->[0]->{scb} } ) {
+%       warn "DEBUG: token contains following data: ", join(', ', %{ $tok });
+<tr><td><% $tok->{scbserialnumber} %></td><td><% $tok->{scbstatus} %></td></tr>
+%   } # foreach token
+
+</table>
+
+
+% } # unique owner and multiple tokens
+%
+%#
+%#  D.  Unexpected Error
+%#
+%
+% else {
+% 
+
+<h1>Unexpected Error</h1>
+% my @errs = $m->comp('/lib/get_deep_error.mhtml', 'msg' => $msg);
+% $m->comp('/lib/print_errors.mhtml', 'errors' => \@errs);
+% print 'MSG=', map { s/\n/<br>/g; s/\s{2}/\&nbsp/g; $_ } Dumper($msg);
+% } # closing else
+
+% if ( $debug ) {
+<br><br><br><br><br><br>
+<br><br><br><br><br><br>
+<br><br><br><br><br><br>
+
+<hr><h1>Debug Details</h1><hr>
+<h2>Request Args</h2>
+% my $reqargs = $m->request_args();
+<pre>
+% print Dumper($reqargs);
+</pre>
+
+<h2>Workflow</h2>
+<pre>
+% print Dumper($wf);
+</pre>
+
+% }
+

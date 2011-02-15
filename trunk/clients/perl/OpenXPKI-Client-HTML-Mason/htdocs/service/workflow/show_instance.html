@@ -231,6 +231,7 @@
         $m->comp('/service/create_csr/print_errors.mhtml', 'errors' => \@errors);
         return;
     }
+
     my %untainted = ();
     my $context_hash = '';
     if ($msg->{PARAMS}->{WORKFLOW}->{TYPE} eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST') {
@@ -238,7 +239,7 @@
             'context' => $msg->{PARAMS}->{WORKFLOW}->{CONTEXT},
         );
     }
-    foreach my $param (keys %{ $msg->{PARAMS}->{WORKFLOW}->{CONTEXT} }) {    
+    foreach my $param (keys %{ $msg->{PARAMS}->{WORKFLOW}->{CONTEXT} }) {
         my $value = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param};
         if ($param eq 'csr_serial' && $value =~ m{\A \d+ \z}xms) {
             # transform a scalar csr_serial into a one-element array
@@ -248,7 +249,29 @@
            {
               ## serialized stuff
               my $ser = OpenXPKI::Serialization::Simple->new();
-              my $ref = $ser->deserialize($value);
+
+              # 
+              # Can't just let an exception go uncaught because
+              # HTML::Mason will die without providing any error
+              # messages in the log files!
+
+              my $ref;
+              eval {
+                  $ref = $ser->deserialize($value);
+              };
+              if ( my $exc = OpenXPKI::Exception->caught() ) {
+                $m->comp('/lib/print_exception.mhtml', 
+                exception => $exc,
+                details => "Error deserializing param '$param' ($value)");
+                return;
+              }
+              if ( $EVAL_ERROR ) {
+                $m->comp('/lib/print_error.mhtml', 
+                error => $EVAL_ERROR,
+                details => "Error deserializing param '$param'");
+                return;
+              }
+              
               if ($param eq "cert_info")
               {
                   ## simple hash
@@ -376,6 +399,11 @@
             $untainted{$param} = 1;
         }
         $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param} = $value;
+    }
+    if ( $EVAL_ERROR ) {
+        print "EVAL ERROR: \n";
+        print "<pre>$EVAL_ERROR</pre>\n";
+        return;
     }
     if (not defined $activities)
     {

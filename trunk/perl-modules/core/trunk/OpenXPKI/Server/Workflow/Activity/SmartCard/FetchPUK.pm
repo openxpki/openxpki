@@ -38,6 +38,9 @@ sub execute {
     
     my $value = $context->param($valparam);
 
+    ##! 32: 'token_id: ' . Dumper($context->param('token_id'));
+    ##! 32: 'value: ' . Dumper($value);
+
     my $ser = OpenXPKI::Serialization::Simple->new();
     # autodetect serialized arrays
     if ($value =~ m{ \A ARRAY }xms) {
