@@ -108,8 +108,8 @@ var SSC_MODEL = new Class(
 							+ 'classid="clsid:4D41494B-7355-4337-834F-4E4F564F5345"'
 							+ 'codebase="dbSignedPKCS11_v1212.cab#Version=1,2,1,3">'
 							+ '<param name="UseJavaScript" value="1">'
-							+ 'Missing Smartcard Maintenance Plugin. '
-							+ 'Please use InternetExplorer and install the required activate ActiveX plugin'
+							+ 'Missing DBSMARTCARD PLUGIN v1.2. '
+							+ 'Please intall via Automatic Software Distribution(ASD) or contact your local help desk.'
 							+ '</object>';
 					// and inject it to start activation
 				 	$("pluginDiv").innerHTML = plugincode;
@@ -1458,6 +1458,9 @@ var SSC_MODEL = new Class(
 						sscView.showPopUp('E_sc-error-pin-not-encrypted',
 								'cross', '0105');
 					} else if (set === 'TokenInternalError') {
+						sscView.showPopUp('E_sc-error-puk-locked',
+								'cross', '0106');
+					} else if (set === 'PUKLockedError') {
 						sscView.showPopUp('E_sc-error-pin-policy-violated',
 								'cross', '0106');
 					} else if (set === 'PUKError') {
@@ -1561,7 +1564,11 @@ var SSC_MODEL = new Class(
 						}
 						window.dbg.log("sc_installPUK status="+this.PKCS11Plugin.PluginStatus);
 		
-					} else {
+					}else if (set === 'PUKLockedError') {
+						sscView.showPopUp('E_sc-error-pin-policy-violated',
+								'cross', '0106');
+					}
+					else {
 						
 						window.dbg.log("sc_installPUK status="+this.PKCS11Plugin.PluginStatus);
 						sscView.showPopUp(

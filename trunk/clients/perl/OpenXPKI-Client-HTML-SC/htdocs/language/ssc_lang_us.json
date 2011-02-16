@@ -29,6 +29,7 @@
       "E_serverError":  "Server Error",
       "E_uneqPins":  "PINs must be equal",
       "E_unknownSmartcard":  "Unknown Card",
+      "E_sc-error-puk-locked":  "The admin key of your dbSmartcard is blocked, this means it is no longer usable. Please contact your local ID pass office and request a new dbSmartcard.",
       "E_wrongBrowser":  "Please use Internet Explorer and install the required activate ActiveX plug-in.",
       "IT_Info":  "Information",
       "I_ReadingCard":  "Reading Smart Card. Please wait.",

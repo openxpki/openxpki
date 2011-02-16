@@ -12,6 +12,7 @@
 "E_noAccount":"kein Konto ausgew&auml;hlt",
 "E_serverError":"Server Fehler",
 "E_uneqPins":"PINs m&uuml;ssen &uuml;bereinstimmen",
+"E_sc-error-puk-locked":  "Der Admin Schlüssel ihrer dbSmartcard ist blockiert und kann nicht mehr personalisiert werden. Bitte kontaktieren Sie ihre Ausweisstelle und beantragen eine neue dbSmartcard.",
 "E_unknownSmartcard":"Die Smartcard ist unbekannt, bitte f&uuml;hren Sie Ihre dbSmartcard ein",
 "E_wrongBrowser":"Bitte benutzen Sie Internet Explorer 7 oder 8 und aktivieren Sie das erforderliche ActiveX plug-in.",
 "IT_Info":"Information",
