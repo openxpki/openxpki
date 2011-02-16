@@ -1458,10 +1458,10 @@ var SSC_MODEL = new Class(
 						sscView.showPopUp('E_sc-error-pin-not-encrypted',
 								'cross', '0105');
 					} else if (set === 'TokenInternalError') {
-						sscView.showPopUp('E_sc-error-puk-locked',
+						sscView.showPopUp('E_sc-error-pin-policy-violated',
 								'cross', '0106');
 					} else if (set === 'PUKLockedError') {
-						sscView.showPopUp('E_sc-error-pin-policy-violated',
+						sscView.showPopUp('E_sc-error-puk-locked',
 								'cross', '0106');
 					} else if (set === 'PUKError') {
 						//sscView.showPopUp('E_sc-error-puk-notaccepted','cross', '0107');
@@ -1565,7 +1565,7 @@ var SSC_MODEL = new Class(
 						window.dbg.log("sc_installPUK status="+this.PKCS11Plugin.PluginStatus);
 		
 					}else if (set === 'PUKLockedError') {
-						sscView.showPopUp('E_sc-error-pin-policy-violated',
+						sscView.showPopUp('E_sc-error-puk-locked',
 								'cross', '0106');
 					}
 					else {
