@@ -154,6 +154,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 %#  A.  Unique Owner and Token ID (state of WF is 'MAIN'):
 %#      
 
+<H1>Card Administration</H1>
 
 
 % if ($msg->{SERVICE_MSG} eq 'ERROR') {
@@ -163,8 +164,8 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 %}
 
 %if ( $wf->{STATE} eq 'MAIN' ) {
-<h1>Owner Details</h1>
 <hr>
+<h2>Owner Details</h2>
 <table>
 % foreach my $attr ( @pers_attrs ) {
 <tr><th><% $attr %></th><td><% $person->{$attr} %></td></tr>
@@ -173,7 +174,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 </table>
 <hr>
 
-<h1>Modify Token</h1>
+<h2>Modify Token</h2>
 <& /service/open_form.mhtml, action => 'action.html' &>
 <& /lib/html/hidden.mhtml, 'name' => 'NEXT_ACTION', value => 'scadm_modify_user' &>
 <& /lib/html/hidden.mhtml, 'name' => 'WF_ID', value => $wf->{ID} &>
@@ -214,7 +215,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 <& /service/close_form.mhtml &>
 
 <hr>
-<h1>Workflow History of Token</h1>
+<h2>Workflow History of Token</h2>
 <table>
     <tr><th>Workflow ID</th><th>State</th><th>Last Update</th><th>Action</th></tr>
 %       foreach my $ref_wf ( @ref_wfs ) {
@@ -257,7 +258,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 %#
 %
 % elsif ( (ref($ldap_data) eq 'ARRAY') and ( @{$ldap_data} > 1) ) {
-<h1>Search Returned Multiple User Records</h1>
+<h2>Search Returned Multiple User Records</h2>
 
 <table>
     <tr><th>Name</th><th>Mail</th><th>Telephone</th><th>Tokens</th></tr>
@@ -285,14 +286,14 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 %
 % elsif ( ref( $ldap_data ) eq 'ARRAY' and @{ $ldap_data } == 1 and ref( $ldap_data->[0]->{scb} eq 'ARRAY' ) ) {
 
-<h1>Search Returned User with Multiple Tokens</h1>
+<h2>Search Returned User with Multiple Tokens</h2>
  
 <table>
 % foreach my $attr ( qw( cn mail tel seealso ) ) {
     <tr><th><% $attr %></th><td><% $wf->{CONTEXT}->{'ldap_' . $attr} %>
 % } # foreach attr
 </table>
-<h1>Modify Token</h1>
+<h2>Modify Token</h2>
 
 <table>
     <tr><th>Token ID</th><th>Status</th></tr>
@@ -313,7 +314,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 % else {
 % 
 
-<h1>Unexpected Error</h1>
+<h2>Unexpected Error</h2>
 % my @errs = $m->comp('/lib/get_deep_error.mhtml', 'msg' => $msg);
 % $m->comp('/lib/print_errors.mhtml', 'errors' => \@errs);
 % print 'MSG=', map { s/\n/<br>/g; s/\s{2}/\&nbsp/g; $_ } Dumper($msg);
@@ -324,7 +325,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 <br><br><br><br><br><br>
 <br><br><br><br><br><br>
 
-<hr><h1>Debug Details</h1><hr>
+<hr><h2>Debug Details</h2><hr>
 <h2>Request Args</h2>
 % my $reqargs = $m->request_args();
 <pre>

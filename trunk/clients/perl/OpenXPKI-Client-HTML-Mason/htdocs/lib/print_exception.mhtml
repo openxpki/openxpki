@@ -4,7 +4,7 @@
 </%args>
 % if (ref($exception)) 
 % {
-    <h2>Internal Error</h2>
+    <h2>Internal Exception Error</h2>
 %   if ( $details ) {
     <p><% $details %></p>
 %   }

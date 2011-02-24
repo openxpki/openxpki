@@ -35,3 +35,11 @@ if ( (ref($errors) eq 'ARRAY') and ( ref($errors->[0]) eq 'ARRAY' ) ) {
 % } else {
     <p><% Dumper($errors) %></p>
 % }
+
+<br>
+<h2>Debug</h2
+<hr>
+<p>
+<pre>
+<% Dumper($errors) %>
+</pre>

@@ -19,7 +19,6 @@ my %tmp_of     :ATTR;
 my %pkcs7_of   :ATTR;
 my %engine_of  :ATTR;
 my %data_of    :ATTR;
-my %outfile_of :ATTR;
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
