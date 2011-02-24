@@ -462,7 +462,9 @@ sub kill_workflow {
         $wf->notify_observers( 'state change', $old_state,
             'administratively kill workflow' );
         $wf_factory->save_workflow($wf);
-        $wf_factory->_commit_transaction($wf);
+        # _commit_transaction doesn't seem to be in all versions of Workflow,
+        # so let's wrap it in an eval
+        eval { $wf_factory->_commit_transaction($wf); } ;
 
     }
     return $self;
