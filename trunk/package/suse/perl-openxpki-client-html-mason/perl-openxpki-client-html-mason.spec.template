@@ -14,7 +14,11 @@
 name:      perl-openxpki-client-html-mason
 summary:   OpenXPKI HTML Mason Client - client module for Perl clients
 version:   [% version %]
+[% IF SUFFIX %]
+release: [% SUFFIX %]
+[% ELSE %]
 release:   1
+[% END %]
 vendor:    OpenXPKI Project
 packager:  Martin Bartosch <m.bartosch@cynops.de>
 license:   Apache
