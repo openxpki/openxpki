@@ -81,3 +81,8 @@ filename:         .VERSION_SUFFIX
 keyword:          SUFFIX
 optional:         yes
 
+# pkgrel is the package release number (synonymous with the release of an RPM pkg)
+[pkgrel]
+filename:         .VERSION_PKGREL
+keyword:          PKGREL
+optional:         yes

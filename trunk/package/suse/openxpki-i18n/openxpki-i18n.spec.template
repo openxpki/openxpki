@@ -13,8 +13,8 @@
 name:      openxpki-i18n
 summary:   OpenXPKI Internationalization
 version:   [% version %]
-[% IF SUFFIX %]
-release: [% SUFFIX %]
+[% IF PKGREL %]
+release: [% PKGREL %]
 [% ELSE %]
 release:   1
 [% END %]
