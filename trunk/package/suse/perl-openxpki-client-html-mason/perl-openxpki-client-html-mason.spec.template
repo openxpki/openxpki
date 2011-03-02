@@ -35,8 +35,8 @@ mod-perl and Apache.
 Packaging information:
 OpenXPKI version       [% version %]
 Git commit hash:       [% GIT_COMMIT_HASH %]
-Git tag:               [%- IF GIT_TAG -%]
-[%- GIT_TAG -%]
+Git tag:               [%- IF GIT_TAGS -%]
+[%- GIT_TAGS -%]
 [%- ELSE -%]
 <no tag set>
 [%- END %]

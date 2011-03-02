@@ -50,6 +50,9 @@ keyword:          GIT_ABBREVIATED_COMMIT_HASH
 keyword:          GIT_TAG
 optional:         yes
 
+[git-tags]
+keyword:          GIT_TAGS
+optional:         yes
 
 # Custom components
 # To create a custom version number component define the following keys:
