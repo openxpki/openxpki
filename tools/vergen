@@ -123,18 +123,29 @@ sub get_revision_info {
 	$result->{'git-commit-hash'} = `$git show-ref --heads -s $branch_ref`;
 	chomp $result->{'git-commit-hash'};
 
+	my $head_commit;
+	open $fh, qq{ $git rev-list --max-count=1 HEAD | };
+	while (my $line = <$fh>) {
+	    chomp $line;
+	    $head_commit ||= $line;
+	}
+	close $fh;
+
 	# get git tag information
-	open $fh, qq{ $git name-rev --tags HEAD | };
+	my @git_tags;
+
+	open $fh, qq{ $git show-ref --tags -d | };
       GITLOGLINE:
 	while (my $line = <$fh>) {
 	    chomp $line;
-	    if ($line =~ m{ \A HEAD \s+ (?: .*?/)?(.*) }xms) {
-		if ($1 ne 'undefined') {
-		    $result->{'git-tag'} ||= $1;
-		}
+	    my ($tag) = ($line =~ m{ \A \w+ \s+ refs/tags/(.*) }xms);
+	    if (defined $tag) {
+		    $result->{'git-tag'} ||= $tag;
+		    push @git_tags, $tag;
 	    }
 	}
 	close $fh;
+	$result->{'git-tags'} = join(', ', @git_tags);
     }
     
     return $result;
@@ -176,7 +187,10 @@ sub expand_keyword {
     my $last_arg = "";
     while (defined $arg && ($last_arg ne $arg)) {
         $last_arg = $arg;
-	foreach my $keyword (keys %{$mapping_of->{keyword}}) {
+	# NB: reverse sorting keys results in "longer" keywords listed
+	# first, avoiding a "greedy" match of shorter but identical patterns
+	# (see 'git-tags' vs. 'git-tag')
+	foreach my $keyword (reverse sort keys %{$mapping_of->{keyword}}) {
 	    if ($arg =~ m{ $keyword }xms) {
 		my $value = $mapping_of->{keyword}->{$keyword}->{entry}->{value};
 		if (! defined $value) {
@@ -252,7 +266,8 @@ foreach my $component (keys %config) {
                                 last-changed-revision |
                                 git-commit-hash | 
                                 git-abbreviated-commit-hash |
-                                git-tag
+                                git-tag |
+                                git-tags
                             ) \z }xms) {
         $revision_info ||= get_revision_info();
 
@@ -555,6 +570,11 @@ version information (if current directory is inside a Git repository).
 
 'git-tag' expands to the first Git tag name found for the current HEAD,
 undefined if the current HEAD is untagged.
+
+=head4 git-tags
+
+'git-tags' expands to the all Git tags found for the current HEAD (comma
+separated), undefined if the current HEAD is untagged.
 
 =head1 Examples
 

@@ -46,7 +46,11 @@ TT_VERSION_SYMBOLS := $(shell \
 # GIT_ABBREVIATED_COMMIT_HASH
 #   - abbreviated git commit hash of the checkout
 # GIT_TAG
-#   - if a git tag is set for this commit the variable contains the git tag
+#   - if a git tag is set for this commit the variable contains the git tag,
+#     if multiple tags are set for this commit it will contain only the first
+#     tag
+# GIT_TAGS
+#   - contains all tags for this commit (comma separated)
 #
 # The following variables follow the Subversion revision
 # SVN_REVISION
@@ -60,6 +64,8 @@ TT_VERSION_SYMBOLS := $(shell \
 #   - Minor product version (administratively set)
 # RELEASE
 #   - Product release (currently identical to SVN_REVISION)
+# PKGREL
+#   - package release number
 # SUFFIX
 #   - Build specific suffix (administratively set)
 #
