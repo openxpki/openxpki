@@ -1,0 +1,40 @@
+This is a demo template which references all of the currently exported
+variables available during in the build process.
+
+Recommended boiler plate code for inclusing in package builds:
+---
+OpenXPKI version       [% version %]
+Git commit hash:       [% GIT_COMMIT_HASH %]
+Git tag:               [%- IF GIT_TAGS -%]
+[%- GIT_TAGS -%]
+[%- ELSE -%]
+<no tag set>
+[%- END %]
+---
+
+This is a complete list of all variables available for templates:
+
+Product version: [% version %]
+Daily snapshot version: [% daily_snapshot %]
+Version with git commit: [% git_commit %]
+Git commit hash: [% GIT_COMMIT_HASH %]
+Git abbreviated commit hash: [% GIT_COMMIT_HASH %]
+Git tag: [% GIT_TAG %]
+Git tags (comma separated): [% GIT_TAGS %]
+Subversion revision: [% SVN_REVISION %]
+Subversion last changed revision: [% SVN_LAST_CHANGED_REVISION %]
+Major version number: [% MAJOR %]
+Minor version number: [% MINOR %]
+Release number: [% RELEASE %]
+Package release: [% PKGREL %]
+Suffix: [% SUFFIX %]
+
+---
+
+If you have set any additional variables via TT_EXTRA_SYMBOLS in the Makefile
+you may use them as well:
+
+It's spelt Raymond Luxury Yacht, but it's pronounced [% LUXURY_YACHT %]
+
+And don't forget our favourite flavour: [% WHIZZO_QUALITY %]
+

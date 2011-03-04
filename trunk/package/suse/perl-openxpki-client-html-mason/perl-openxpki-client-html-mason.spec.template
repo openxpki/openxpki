@@ -1,20 +1,24 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
-## Copyright (C) 2005-2006 by The OpenXPKI Project
+## Copyright (C) 2005-2011 by The OpenXPKI Project
 
 #
 #   - OpenXPKI HTML Mason client package -
 #
 
-%define pkgname OpenXPKI-Client-SCEP
+%define pkgname OpenXPKI-Client-HTML-Mason
 %define filelist %{pkgname}-%{version}-filelist
 %define NVR %{pkgname}-%{version}-%{release}
 %define maketest 0
-%define __perl _PERL_
+%define __perl perl
 
-name:      perl-openxpki-client-scep
-summary:   OpenXPKI SCEP Client - client module for Perl clients
-version:   _VERSION_
+name:      perl-openxpki-client-html-mason
+summary:   OpenXPKI HTML Mason Client - client module for Perl clients
+version:   [% version %]
+[% IF PKGREL %]
+release: [% PKGREL %]
+[% ELSE %]
 release:   1
+[% END %]
 vendor:    OpenXPKI Project
 packager:  Martin Bartosch <m.bartosch@cynops.de>
 license:   Apache
@@ -22,10 +26,20 @@ group:     Applications/CPAN
 url:       http://www.openxpki.org
 buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
-source:    OpenXPKI-Client-SCEP-%{version}.tar.gz
+source:    OpenXPKI-Client-HTML-Mason-%{version}.tar.gz
 
 %description
-None.
+OpenXPKI client implementing a web frontend using HTML::Mason. Requires
+mod-perl and Apache.
+
+Packaging information:
+OpenXPKI version       [% version %]
+Git commit hash:       [% GIT_COMMIT_HASH %]
+Git tag:               [%- IF GIT_TAGS -%]
+[%- GIT_TAGS -%]
+[%- ELSE -%]
+<no tag set>
+[%- END %]
 
 #
 # This package was generated automatically with the cpan2rpm
@@ -53,9 +67,10 @@ CFLAGS="$RPM_OPT_FLAGS"
 
 %{makeinstall} `%{__perl} -MExtUtils::MakeMaker -e ' print \$ExtUtils::MakeMaker::VERSION <= 6.05 ? qq|PREFIX=%{buildroot}%{_prefix}| : qq|DESTDIR=%{buildroot}| '`
 
-install -d -D -m 755 %{buildroot}/srv/www/openxpki/cgi-bin/scep
-install -D -m 755 bin/scep %{buildroot}/srv/www/openxpki/cgi-bin/scep/scep
-install -D -m 644 eg/scep.conf %{buildroot}/etc/openxpki/scep.conf
+install -d -D -m 755 %{buildroot}/srv/www/openxpki/cgi-bin
+install -d -D -m 755 %{buildroot}/srv/www/openxpki/htdocs
+install -d -D -m 755 %{buildroot}/srv/www/openxpki/mason-data
+install -D -m 755 bin/openxpki.cgi %{buildroot}/srv/www/openxpki/cgi-bin/openxpki.cgi
 tar cf - htdocs | tar -C %{buildroot}/srv/www/openxpki/ -x -f -
 
 cmd=/usr/share/spec-helper/compress_files
@@ -101,7 +116,7 @@ find %{buildroot}%{_prefix}             \
         $d = $_;
         /\Q$d\E/ && return for reverse sort @INC;
         $d =~ /\Q$_\E/ && return
-            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share /var /srv |;
+            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share /srv /var |;
 
         $dirs[@dirs] = $_;
         }
@@ -123,9 +138,13 @@ find %{buildroot}%{_prefix}             \
 %files -f %filelist
 %defattr(-,root,root)
 
-%attr(0755,root,openxpki) /srv/www/openxpki/cgi-bin/scep/scep
-%config(noreplace) %attr(0644,root,openxpki) /etc/openxpki/scep.conf
+%attr(0755,root,openxpki) /srv/www/openxpki/cgi-bin
+%attr(0755,root,openxpki) /srv/www/openxpki/htdocs
+%attr(0755,root,openxpki) /srv/www/openxpki/mason-data
+%attr(0755,root,openxpki) /srv/www/openxpki/cgi-bin/openxpki.cgi
 
 %changelog
+* Thu Feb 03 2011 m.bartosch@cynops.de
+- Renovated build process, using generic template mechanism
 * Mon Nov 27 2006 m.bartosch@cynops.de
 - Initial build.

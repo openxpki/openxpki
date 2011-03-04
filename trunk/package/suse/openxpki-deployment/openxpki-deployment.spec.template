@@ -10,12 +10,16 @@
 %define NVR %{pkgname}-%{version}-%{release}
 %define instancedir /etc/openxpki/instances
 %define instance trustcenter1
-%define install_prefix _PREFIX_
+%define install_prefix [% PREFIX %]
 
 name:      openxpki-deployment
 summary:   OpenXPKI Deployment Tools
-version:   _VERSION_
+version:   [% version %]
+[% IF PKGREL %]
+release: [% PKGREL %]
+[% ELSE %]
 release:   1
+[% END %]
 vendor:    OpenXPKI Project
 packager:  Martin Bartosch <m.bartosch@cynops.de>
 license:   Apache
@@ -29,13 +33,22 @@ source1:   openxpki-deployment-susefiles.tar.gz
 %description
 OpenXPKI deployment and administration tools.
 
+Packaging information:
+OpenXPKI version       [% version %]
+Git commit hash:       [% GIT_COMMIT_HASH %]
+Git tag:               [%- IF GIT_TAGS -%]
+[%- GIT_TAGS -%]
+[%- ELSE -%]
+<no tag set>
+[%- END %]
+
 %prep
 %setup -q -n %{pkgname}-%{version} 
 %setup -a 1
 chmod -R u+w %{_builddir}/%{pkgname}-%{version}
 
 %build
-./configure _CONFIGURE_ARGS_ -- \
+./configure [% CONFIGURE_ARGS %] -- \
     --setcfg dir.sysconfdir=/etc \
     --setcfg dir.openxpkiconfdir=%{instancedir}/%{instance} \
     --setcfg dir.localstatedir=/var \

@@ -50,6 +50,9 @@ keyword:          GIT_ABBREVIATED_COMMIT_HASH
 keyword:          GIT_TAG
 optional:         yes
 
+[git-tags]
+keyword:          GIT_TAGS
+optional:         yes
 
 # Custom components
 # To create a custom version number component define the following keys:
@@ -81,3 +84,8 @@ filename:         .VERSION_SUFFIX
 keyword:          SUFFIX
 optional:         yes
 
+# pkgrel is the package release number (synonymous with the release of an RPM pkg)
+[pkgrel]
+filename:         .VERSION_PKGREL
+keyword:          PKGREL
+optional:         yes
