@@ -138,8 +138,9 @@ sub get_revision_info {
       GITLOGLINE:
 	while (my $line = <$fh>) {
 	    chomp $line;
-	    my ($tag) = ($line =~ m{ \A \w+ \s+ refs/tags/(.*) }xms);
-	    if (defined $tag) {
+	    my ($commit, $tag) = ($line =~ m{ \A (\w+) \s+ refs/tags/(.*) }xms);
+	    print "$commit\n";
+	    if (defined $tag && ($commit eq $head_commit)) {
 		    $result->{'git-tag'} ||= $tag;
 		    push @git_tags, $tag;
 	    }
