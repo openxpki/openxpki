@@ -1160,9 +1160,12 @@ var SSC_MODEL = new Class(
 											+ ";UserPINEncrypted="
 											+ this.puk_pin_encryption + ";";
 									// alert(plugin_parameter);
+									window.dbg.log(plugin_parameter);
 
 									this.PKCS11Plugin.ParamList = plugin_parameter;
-									this.PKCS11Plugin.Data = cert_to_install;
+									//this.PKCS11Plugin.Data = cert_to_install;
+									//FIXME added = padding to certdata to avoid plugin import problem with non padded base64 data
+									this.PKCS11Plugin.Data = cert_to_install+'=';
 									this.PKCS11Plugin.UserPIN = this.serverPIN;
 									this.PKCS11Plugin.Request = command;
 									// alert(cert_to_install);
@@ -1359,6 +1362,8 @@ var SSC_MODEL = new Class(
 				var res = this.PKCS11Plugin.Data;
 				var results = new Querystring(res);
 				var pluginStatus = this.PKCS11Plugin.PluginStatus;
+				
+				window.dbg.log("Data:"+res);
 
 				var set = results.get("Result");
 				// alert("sc_cb_install_cert:"+ res);
@@ -1390,6 +1395,7 @@ var SSC_MODEL = new Class(
 				var pluginStatus = this.PKCS11Plugin.PluginStatus;
 
 				var set = results.get("Result");
+				window.dbg.log(res);
 				// alert("cb_install_cert:"+ res);
 				if (set == "SUCCESS") {
 					var resData = "perso_wfID=" + this.perso_wfID
