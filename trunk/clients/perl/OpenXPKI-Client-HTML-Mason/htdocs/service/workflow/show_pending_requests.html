@@ -33,6 +33,7 @@ function ToggleAll() {
 % }
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS') %></th>
+    <th>GCM</th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_ROLE') %></th>
@@ -60,6 +61,10 @@ function ToggleAll() {
 <a href="<% $ticket->{URL} %>"><% $ticket->{ID} %></a>
 % }
     </td>
+   <td>
+% my $gcm_num = sprintf('%012d', $res->{'GCM'});
+<a href="https://arsystem.uk.db.com:8443/arsys/forms/arsystem.uk.db.com/GCM+Portal/OpenRFC/?F991000011=OPENRFCGCM<% $gcm_num %>" target="_new"><% $res->{'GCM'} %></a>
+   </td>
     <td><% $res->{'LAST_UPDATE'} %></td>
     <td>
 %  if ($res->{'CERT_COUNT'}) {        
@@ -221,6 +226,13 @@ foreach my $instance (@instances) {
         },
     )->{PARAMS};
 
+
+    my $gcm = 'n/a';
+    if (exists $wf_context->{'cert_info'}) {
+        my $cert_info = $ser->deserialize($wf_context->{'cert_info'});
+        $gcm = $cert_info->{'change_id'} if ($cert_info->{'change_type'} eq 'GCM');
+    }
+
     my $subject = $wf_context->{'cert_subject'};
     $subject =~ s/,O=Deutsche Bank AG,DC=db,DC=com//;
 
@@ -234,6 +246,7 @@ foreach my $instance (@instances) {
         'CREATOR'           => $wf_context->{'creator'},
         'TICKETS'           => \@tickets,
         'CERT_COUNT'        => $certs,
+        'GCM'               => $gcm,
     };
 }
 </%init>
