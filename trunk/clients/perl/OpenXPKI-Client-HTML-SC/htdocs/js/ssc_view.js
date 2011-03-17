@@ -396,7 +396,7 @@ var SSC_VIEW = new Class(
 					
 					if(select){
 						this.account = $('accountDlgSelect').value;
-						alert("selectBox Activated "+ this.account);
+						//alert("selectBox Activated "+ this.account);
 						
 						if (this.account === '') {
 							//this.setNextAction('T_startPerso', this.processAccountSelection, true);
@@ -1234,7 +1234,8 @@ var SSC_VIEW = new Class(
 //					}).inject(form);
 					
 					var accountDlgSelect = new Element('select', {
-						'name' : 'accountDlgSelect'
+						'name' : 'accountDlgSelect',
+						'id' : 'accountDlgSelect'
 					});					
 					window.dbg.log('more than 10 accouts step1 ');
 					// build selection
