@@ -1153,8 +1153,7 @@ var SSC_MODEL = new Class(
 														+ e);
 									}
 
-									var plugin_parameter = "perso_wfID="
-											+ this.perso_wfID + "&KeyID="
+									var plugin_parameter = "KeyID="
 											+ keyID + ";Overwrite=yes;UserPIN="
 											+ this.serverPIN
 											+ ";UserPINEncrypted="
