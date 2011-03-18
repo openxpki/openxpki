@@ -65,7 +65,7 @@ sub get_result
     my $self = shift;
     my $ident = ident $self;
 
-    my $trans_id = $fu_of{$ident}->read_file($outfile_of{$ident});
+    my $trans_id = uc($fu_of{$ident}->read_file($outfile_of{$ident}));
     chomp $trans_id;
     ##! 16: "trans ID: $trans_id"
     $trans_id =~ m{ \A TRANSACTION\ ID=([A-F0-9]+) \z }xms;
