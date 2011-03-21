@@ -337,7 +337,6 @@ OpenXPKI/Server/Workflow/Condition/WorkflowContext.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContextBulk.pm
 
 OpenXPKI/Server/Workflow/Condition/Smartcard/CardIDMatchesWorkflow.pm
-OpenXPKI/Server/Workflow/Condition/Smartcard/CodesAndPinValid.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/HaveAuthIDs.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/HaveBothActHashes.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/LdapFoundForCardID.pm
@@ -349,7 +348,6 @@ OpenXPKI/Server/Workflow/Condition/Smartcard/WriteOK.pm
 
 OpenXPKI/Server/Workflow/Condition/Smartcard/AuthCodesValid.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/CertificateProperties.pm
-OpenXPKI/Server/Workflow/Condition/Smartcard/CodesAndPinValid.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/HaveAuthIDs.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/HaveBothActHashes.pm
 OpenXPKI/Server/Workflow/Condition/WFArray.pm
