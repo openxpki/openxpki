@@ -11,6 +11,7 @@ version: MAJOR.MINOR.RELEASESUFFIX
 daily_snapshot: %F-MAJOR.MINOR.RELEASESUFFIX
 git_commit: MAJOR.MINOR.RELEASE-GIT_ABBREVIATED_COMMIT_HASH
 git_tag: MAJOR.MINOR.GIT_TAG
+git_branch: GIT_BRANCH
 
 ###########################################################################
 # Version number components
@@ -53,6 +54,11 @@ optional:         yes
 [git-tags]
 keyword:          GIT_TAGS
 optional:         yes
+
+[git-branch]
+keyword:          GIT_BRANCH
+optional:         no
+
 
 # Custom components
 # To create a custom version number component define the following keys:
