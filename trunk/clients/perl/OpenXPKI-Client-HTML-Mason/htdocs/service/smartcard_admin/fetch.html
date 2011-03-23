@@ -216,14 +216,24 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 
 <hr>
 <h2>Workflow History of Token</h2>
+<& /service/open_form.mhtml, 'action' => 'action.html' %>
+
 <table>
-    <tr><th>Workflow ID</th><th>State</th><th>Last Update</th><th>Action</th></tr>
+    <tr><th>&nbsp;</th><th>Workflow ID</th><th>State</th><th>Last Update</th><th>Action</th></tr>
 %       foreach my $ref_wf ( @ref_wfs ) {
 %           my $refstate = $ref_wf->{'WORKFLOW.WORKFLOW_STATE'};
 %           my $refser = $ref_wf->{'WORKFLOW.WORKFLOW_SERIAL'};
 %           my $refupdate = $ref_wf->{'WORKFLOW.WORKFLOW_LAST_UPDATE'};
 %           my $reftype = $ref_wf->{'WORKFLOW.WORKFLOW_TYPE'};
     <tr>
+%       if ( $refstate ne 'SUCCESS' and $refstate ne 'FAILURE' ) {
+        <td>
+            <input type="checkbox" name="wfids"/>
+            <input type="hidden" name="workflows" value="<% $wf->{ID} %>"/>
+        </td>
+% } else {
+        <td>&nbsp;</td>
+% }
         <td>
             <& /lib/html/a.mhtml,
             target => $context->{menu}->get_root() . '/service/workflow/show_instance.html',
@@ -251,6 +261,8 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
         </tr>
 %       } # foreach ref_wfs
 </table>
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
 % }
 %
 %#

@@ -13,6 +13,7 @@ DETAILS: See Workflow-UI-for-smartcard-admin.graffle for details
 %# mischief and mayhem
 
 <%args>
+    @workflows => undef
 </%args>
 <%once>
 use Data::Dumper;
@@ -72,7 +73,8 @@ warn
 	"===== INIT BLOCK OF samartcard_admin/action.mhtml =====\n",
 	"\trequest args = ", join(', ', %{ $m->request_args() }), "\n",
 	"\ttoken_id = '$token_id'\n",
-#	"\twf_id = '$wf_id'\n",
+	"\twf_id = '$wf_id'\n",
+    "\tworkflows = ", join(', ', @workflows), "\n",
 #	"\ttoken_owner = '$token_owner'\n",
 #	"\tcurr_user = '$curr_user'\n",
 	"\tnext_action = '$next_action'\n",
