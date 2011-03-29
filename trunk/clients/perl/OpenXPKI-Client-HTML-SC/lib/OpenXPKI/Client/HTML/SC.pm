@@ -72,15 +72,23 @@ sub start_session {
                     @{$errors},
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CARDID_NOTACCEPTED"
                 );
+                
+                $c = $self->openXPKIConnection(
+                    $session->{'openXPKI_Session_ID'},
+                    $session->{'creator_userID'},
+                    config()->{openxpki}->{role}
+                );
+                $self->disconnect($c);
+               
+                
 
                 $session->{'openxPKI_Session_ID'} = undef;
-                $session->{'creator'}             = $ssousername;
+                $session->{'creator_userID'}	  = undef;
                 $session->{'cardID'}              = $self->param("cardID");
                 $responseData->{'cardID'}         = $session->{'cardID'};
                 $responseData->{'userlogin'}      = $ssousername;
                 $responseData->{'errors'}         = $errors;
                 $responseData->{'workflowtrace'}  = $workflowtrace;
-
             }
         }
         else {
@@ -179,6 +187,7 @@ sub start_session {
         else {
 
             if ( $c != 0 ) {
+            	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
                 $responseData->{'start_msg'} = "OpenXPKISession resumed";
             }
         }
@@ -479,13 +488,13 @@ sub is_error_response {
 }
 
 #Function to wfdisconnect
-#Description:  cclose OpenXPKI connection
+#Description:  close OpenXPKI connection
 # usage:  wfdisconnect( $client )
 #Parameter:
 #		$client 			-OpenXPKI Socket connection
 # usage: wfdisconnect($client);
 #
-sub wfdisconnect {
+sub disconnect {
     my ( $self, $client ) = @_;
     eval { $client && $client->send_receive_service_msg('LOGOUT'); };
     $client = undef;

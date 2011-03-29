@@ -246,7 +246,7 @@ sub server_personalization {
     my @certs;
     my $AUTHUSER  = 'selfservice';
 	 my $wf_ID = undef;
-	 my $wf_action;
+	 my $wf_action = '';
 	 my $activity;
 	 my %params;
     my $serverPIN=undef;
@@ -354,7 +354,7 @@ if( !defined $wf_ID )
 }else
 {
 
-    if ( defined $self->param("wf_action") ) {
+    if ( defined $self->param("wf_action") &&  $self->param("wf_action") ne '' ) {
         $wf_action= $self->param("wf_action");
     }
 

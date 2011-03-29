@@ -17,8 +17,6 @@ eg/sc_frontend.cfg
 
 htdocs/index.html
 
-htdocs/download/dbSignedPKCS11_v1212.cab
-
 htdocs/sso/index.html
 htdocs/sso/ssc_getauthcode.js
 
@@ -72,12 +70,10 @@ htdocs/js/ssc_view.js
 htdocs/js/ssc_controller.js
 htdocs/js/firebug-lite.js
 htdocs/js/ssc_model.js
-htdocs/js/mootools-1.2.4.js
 htdocs/js/mootools-core-1.3-full-noncompat-yc.js
 htdocs/js/mootools-more.js
 htdocs/js/settings.js
 htdocs/js/ssc_helper.js
-htdocs/js/mootools-1.2.4.4-more.js
 htdocs/js/querystring.js
 htdocs/js/urlEncode.js
 

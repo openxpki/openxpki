@@ -79,8 +79,6 @@ sub get_card_status {
         $AUTHUSER = $self->{r}->headers_in()->get('ct-remote-user');
     }
 
-    #$responseData->{'cardID'} = $self->param("cardID");
-    #	$responseData->{'cert0'} = $self->param("cert0");
     $responseData->{'Result'} = $self->param("Result");
 CERTS:
     for ( my $i = 0; $i < 15; $i++ ) {
@@ -115,8 +113,50 @@ CERTS:
             "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_GET_CARD_STATUS" );
 
 	 }
-	  
 
+#########################################################
+
+###close openxpki connection and reopen with  card owner as usernam####
+    
+    $self->disconnect($c);	 
+    
+  
+	$session->{'creator_userID'} = $msg->{PARAMS}->{SMARTCARD}->{assigned_to}->{workflow_creator};
+ 	
+ 	 $c = $self->openXPKIConnection(
+                undef,
+                $session->{'creator_userID'},
+                config()->{openxpki}->{role}
+         );
+     
+     if ( !defined $c ) {
+
+            # die "Could not instantiate OpenXPKI client. Stopped";
+
+            $responseData->{'error'} = "error";
+            push(
+                @{$errors},
+"I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_CONTINUE_FAILED"
+            );
+            $c = 0;
+
+        }
+        else {
+
+            if ( $c != 0 ) {
+            	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
+                $responseData->{'start_new_user_session'} = "OpenXPKISession started new User session";
+            }
+        }
+     
+         
+ 
+ 
+ 
+ #########################################################
+ ##########fetch workflow information ##################
+     
+         
  	my $activeworkflows = $msg->{PARAMS}->{WORKFLOWS} ;
 
 my @activewf;
@@ -229,11 +269,10 @@ foreach my $wf_type (keys %{$activeworkflows}) {
 
 # 	push( @activewf, \%wfinfo );
 	#}
-$session->{'creator_userID'} = $msg->{PARAMS}->{SMARTCARD}->{assigned_to}->{workflow_creator};
 
 $responseData->{'msg'} = $msg;
 
-$responseData->{'creator_userID'} = $session->{'creator_userID'};
+$responseData->{'creator_userID'} = 'set:'.$session->{'creator_userID'};
 $responseData->{'userWF'} = \@activewf;
 $responseData->{'msg'} = $msg;
 

@@ -49,7 +49,7 @@ sub getauthcode {
     #$session->{'errors'}        = $errors;
     #$session->{'workflowtrace'} = $workflowtrace;
     #$session->{'responseData'}  = $responseData;
-    $responseData->{'error'}    = undef;
+    $responseData->{'error'}    = '';
 
     my $c;
 
@@ -164,10 +164,24 @@ sub getauthcode {
 
     }
 
-	if( $responseData->{'error'} ne "error"){
-		$responseData->{'code'} =
-      $self->wftask_getcode( $c,  $responseData->{'wf_ID'}, $userid, '' );
-	}
+	if(defined $responseData->{'error'} && $responseData->{'error'} ne "error"){
+		
+     	my $code =  $self->wftask_getcode( $c,  $responseData->{'wf_ID'}, $userid, '' );
+     	
+     	if( defined $code->{error} &&  $code->{error} eq 'error' )
+     	{
+      	    $responseData->{'error'} = "error";
+            my $r = push(
+                @{$errors},
+				 pop(@{$code->{errors}})
+            );
+    	
+      	}else{
+      		$responseData->{'code'} = $code->{msg};
+      	}
+     
+    }
+     
 
     $responseData->{'errors'} = $errors;
 
@@ -199,12 +213,13 @@ sub wftask_getcode {
     my $sessionID = $self->pnotes->{a2c}{session_id};
     my $session   = $self->pnotes->{a2c}{session};
 # 
-#     my $errors        = $session->{'errors'};
-#     my $workflowtrace = $session->{'workflowtrace'};
-#     my $responseData  = $session->{'responseData'};
+#    my $errors        = $session->{'errors'};
+#    my $workflowtrace = $session->{'workflowtrace'};
+#   my $responseData  = $session->{'responseData'};
 
     my $responseData  = {};
     my $errors        = [];		#Error Array here we push occured erros 
+    $responseData->{'error'} = '';
 
     #   sleep 1 if $sleep;
 
@@ -213,7 +228,6 @@ sub wftask_getcode {
         { 'WORKFLOW' => $wf_type, 'ID' => $id, } );
     if ( $self->is_error_response($msg) ) {
 
-        #$@ = "Error running get_workflow_info: " . Dumper($msg);  #fix me i18n
         $responseData->{'error'} = "error";
         push(
             @{$errors},
@@ -252,21 +266,24 @@ sub wftask_getcode {
             'WORKFLOW' => $wf_type,
         },
     );
+    
+  
 
     if ( $self->is_error_response($msg) ) {
         $responseData->{'error'} = "error";
         push(
             @{$errors},
-"I18N_OPENXPKI_CLIENT_GETAUTHCODE_ERROR_EXECUTING_SCPU_GENERATE_ACTIVATION_CODE"
+		"I18N_OPENXPKI_CLIENT_GETAUTHCODE_ERROR_EXECUTING_SCPU_GENERATE_ACTIVATION_CODE"
         );
-        push( @{$errors}, $msg );
+        #push( @{$errors}, $msg );
+        
 
         # return undef;
     }
-
+        
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         if ( $exc->message() eq
-'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GENACTCODE_USER_NOT_AUTH_PERS '
+	'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GENACTCODE_USER_NOT_AUTH_PERS '
           )
         {
             $responseData->{'error'} = "error";
@@ -288,6 +305,8 @@ sub wftask_getcode {
             #		return undef;
         }
     }
+    
+
 
   #
   #     $msg = wfexec( $id, 'scpu_generate_activation_code', {}, );
@@ -298,15 +317,15 @@ sub wftask_getcode {
     #$session->{'errors'}        = $errors;
 
     #$session->{'responseData'}  = $responseData;
-	 $responseData->{'errors'} = $errors;
+	$responseData->{'errors'} = $errors;
     sleep 1 if $sleep;
 
-    $ret = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_password};
-	 
 
-    #diag( "$id/$u code: " . $ret );
-    $self->wfdisconnect($client);
- 
+
+    $ret = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_password};
+	
+	
+    $self->disconnect($client);
 
     if ( defined  $responseData->{'error'} && $responseData->{'error'} eq 'error' ) {
 		  $responseData->{'msg'} = $ret;
@@ -316,7 +335,8 @@ sub wftask_getcode {
     #	eval {
     #	    $msg = $client->send_receive_service_msg('LOGOUT');
     #	};
-    return $ret;
+    $responseData->{'msg'} = $ret;
+    return $responseData;
 }
 
 1;
