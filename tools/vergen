@@ -113,16 +113,7 @@ sub get_revision_info {
 	# fake last-changed-revision
 	$result->{'last-changed-revision'} ||= $result->{revision};
 
-	# obtain current branch ref
-	my $branch_ref = `$git symbolic-ref HEAD`;
-
-	# get git commit hashes
-	$result->{'git-abbreviated-commit-hash'} = `$git show-ref --heads -s --abbrev $branch_ref`;
-	chomp $result->{'git-abbreviated-commit-hash'};
-
-	$result->{'git-commit-hash'} = `$git show-ref --heads -s $branch_ref`;
-	chomp $result->{'git-commit-hash'};
-
+	# obtain current head commit (may even be a detached branch)
 	my $head_commit;
 	open $fh, qq{ $git rev-list --max-count=1 HEAD | };
 	while (my $line = <$fh>) {
@@ -130,6 +121,27 @@ sub get_revision_info {
 	    $head_commit ||= $line;
 	}
 	close $fh;
+
+	# obtain current head commit (may even be a detached branch)
+	my $abbreviated_head_commit;
+	open $fh, qq{ $git rev-list --abbrev-commit --max-count=1 HEAD | };
+	while (my $line = <$fh>) {
+	    chomp $line;
+	    $abbreviated_head_commit ||= $line;
+	}
+	close $fh;
+	
+	$result->{'git-abbreviated-commit-hash'} = $abbreviated_head_commit;
+	$result->{'git-commit-hash'} = $head_commit;
+	
+	# obtain current branch ref (branch name)
+ 	my $branch_ref = `$git symbolic-ref HEAD 2>/dev/null`;
+ 	if ($CHILD_ERROR != 0) {
+ 	    $branch_ref = '(unnamed branch)';
+ 	}
+	chomp $branch_ref;
+	$branch_ref =~ s{ refs/heads/ }{}xms;
+ 	$result->{'git-branch'} = $branch_ref;
 
 	# get git tag information
 	my @git_tags;
@@ -264,6 +276,7 @@ foreach my $component (keys %config) {
     # built-in components
     if ($component =~ m{ \A (?: revision | 
                                 last-changed-revision |
+                                git-branch |
                                 git-commit-hash | 
                                 git-abbreviated-commit-hash |
                                 git-tag |
@@ -576,6 +589,11 @@ undefined if the current HEAD is untagged.
 'git-tags' expands to the all Git tags found for the current HEAD (comma
 separated), undefined if the current HEAD is untagged.
 
+=head4 git-branch
+
+'git-branch' expands to the current branch name (without leading 'refs/heads/')
+or the string '(unnamed branch)' in case of a detached head.
+
 =head1 Examples
 
 =head2 .VERSION_DEFINITION
@@ -602,6 +620,14 @@ separated), undefined if the current HEAD is untagged.
   [git-tag]
   keyword:          GIT_TAG
   optional:          yes
+
+  [git-tags]
+  keyword:          GIT_TAGS
+  optional:          yes
+
+  [git-branch]
+  keyword:          GIT_BRANCH
+  optional:          no
 
   # Custom components
   [major]
