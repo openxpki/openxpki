@@ -462,6 +462,11 @@ use Class::Std;
         Test::More::plan(@_);
     }
 
+    sub skip {
+        my $self = shift;
+        Test::More::skip(@_);
+    }
+
     sub is ($$;$) {
         my ( $self, $got, $expected, $testname ) = @_;
         return Test::More::is( $got, $expected, $testname );
