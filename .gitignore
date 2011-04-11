@@ -8,3 +8,5 @@
 # xcode project stuff
 *.pbxuser
 *.perspectivev3
+# symlink to ../<cust>-config
+config
