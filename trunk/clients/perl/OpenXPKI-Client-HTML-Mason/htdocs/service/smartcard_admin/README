@@ -1,0 +1,14 @@
+The smartcard admin interface has the following three html files:
+
+index.html
+
+    Presents the initial input fields for user or token ID.
+
+fetch.html
+
+    Fetches and displays the results for the given user or token.
+
+action.html
+
+    Performs the requested action (e.g.: modify LDAP entry for a token
+    or kill a workflow.
