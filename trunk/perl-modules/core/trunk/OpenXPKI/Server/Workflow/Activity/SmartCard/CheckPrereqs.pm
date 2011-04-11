@@ -42,6 +42,10 @@ sub execute {
 
 	##! 16: 'smartcard analyzed: ' . Dumper $result
 	
+    # Save the details on workflows in our context. Note: since complex data
+    # structures cannot be persisted without serializing, use the underscore
+    # prefix to surpress persisting.
+
     $context->param('_workflows', $result->{WORKFLOWS});
 
 	# set cert ids in context
