@@ -79,7 +79,10 @@ var SSC_MODEL = new Class(
 				this.stateFilter[5]= 'PKCS12_TO_INSTALL';
 				this.stateFilter[6]= 'HAVE_CERT_TO_DELETE';
 				this.stateFilter[7]= 'HAVE_TOKEN_OWNER';
-				this.stateFilter[7]= 'CAN_WRITE_PIN';
+				this.stateFilter[8]= 'CAN_WRITE_PIN';
+				this.stateFilter[9]= 'ISSUE_CERT';
+				this.stateFilter[10]= 'HAVE_CERT_TO_PUBLISH';
+				this.stateFilter[11]= 'HAVE_CERT_TO_UNPUBLISH';
 				
 				//this.stateFilter[8]= 'NON_ESCROW_CSR_AVAIL';
 				// test json
@@ -910,7 +913,7 @@ var SSC_MODEL = new Class(
 				var resData;
 				try {
 					this.cardID = this.PKCS11Plugin.TokenID;
-					resData = 'perso_wfID=' + this.perso_wfID + "&"
+					resData = 'wf_action=get_status&perso_wfID=' + this.perso_wfID + "&"
 							+ this.PKCS11Plugin.Data;
 					// var results = new Querystring(resData);
 				} catch (e) {

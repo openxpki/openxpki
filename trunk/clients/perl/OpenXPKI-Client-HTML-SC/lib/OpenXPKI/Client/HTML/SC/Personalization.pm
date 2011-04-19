@@ -279,6 +279,8 @@ my $certificate_to_install;
 
     if ( defined $self->{r}->headers_in()->get('ct-remote-user') ) {
         $AUTHUSER = $self->{r}->headers_in()->get('ct-remote-user');
+    }else{
+    	$AUTHUSER = $session->{'creator_userID'};
     }
 
 	 $responseData->{'found_wf_ID'} =  $self->param("perso_wfID");
@@ -550,10 +552,84 @@ $responseData->{'certs_to_delete_serialized'}=  $certs_to_delete_serialized;
 
 
 }elsif ($wf_action eq 'get_status'){
-		$msg = $self->wf_status( $c,  $wf_ID , $wf_type);
 
-		$responseData->{'wf_state'}  = $msg->{PARAMS}->{WORKFLOW}->{STATE};
-		$responseData->{'msg'}  = $msg;
+
+	$msg = $self->wf_status( $c,  $wf_ID , $wf_type);
+
+	$responseData->{'wf_state'}  = $msg->{PARAMS}->{WORKFLOW}->{STATE};
+	$responseData->{'msg'}  = $msg;
+
+#try to resume workflow that is in state issue cert, e.g. CA was not available  
+	if($responseData->{'wf_state'} eq 'ISSUE_CERT'){
+	      %params = (
+			'ID' => $wf_ID ,
+			'ACTIVITY' => 'scpers_issue_certificate',
+        'WORKFLOW' => $wf_type,
+	     'PARAMS' => {},
+	);
+
+ $msg = $c->send_receive_command_msg( 'execute_workflow_activity', \%params, );
+
+   if (  $self->is_error_response($msg) ) {
+        $responseData->{'error'} = "error";
+        push( @{$errors},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_ISSUE_CERTIFICATE");
+    }else
+	 {
+		  push( @{$workflowtrace},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_ISSUE_CERTIFICATE_OK");
+	 }
+    }
+
+#try to resume workflow that is in state HAVE_CERT_TO_PUBLISH, e.g. active directory was not available  
+	if($responseData->{'wf_state'} eq 'HAVE_CERT_TO_PUBLISH'){
+	      %params = (
+			'ID' => $wf_ID ,
+			'ACTIVITY' => 'scpers_publish_certificate',
+        'WORKFLOW' => $wf_type,
+	     'PARAMS' => {},
+	);
+
+ $msg = $c->send_receive_command_msg( 'execute_workflow_activity', \%params, );
+
+   if (  $self->is_error_response($msg) ) {
+        $responseData->{'error'} = "error";
+        push( @{$errors},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_PUBLISH_CERTIFICATE");
+    }else
+	 {
+		  push( @{$workflowtrace},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_PUBLISH_CERTIFICATE_OK");
+	 }
+    }
+
+#try to resume workflow that is in state HAVE_CERT_TO_UNPUBLISH, e.g. active directory was not available  
+	if($responseData->{'wf_state'} eq 'HAVE_CERT_TO_UNPUBLISH'){
+	      %params = (
+			'ID' => $wf_ID ,
+			'ACTIVITY' => 'scpers_unpublish_certificate',
+        'WORKFLOW' => $wf_type,
+	     'PARAMS' => {},
+	);
+
+ $msg = $c->send_receive_command_msg( 'execute_workflow_activity', \%params, );
+
+   if (  $self->is_error_response($msg) ) {
+        $responseData->{'error'} = "error";
+        push( @{$errors},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_PUBLISH_CERTIFICATE");
+    }else
+	 {
+		  push( @{$workflowtrace},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_PUBLISH_CERTIFICATE_OK");
+	 }
+    }
+
+
+	$msg = $self->wf_status( $c,  $wf_ID , $wf_type);
+
+	$responseData->{'wf_state'}  = $msg->{PARAMS}->{WORKFLOW}->{STATE};
+	$responseData->{'msg'}  = $msg;
 
     if (  $self->is_error_response($msg) ) {
         $responseData->{'error'} = "error";
