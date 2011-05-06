@@ -1,0 +1,46 @@
+# Test Entries
+
+############################################################
+# Test Set - Get user data by token ID with lower-case letters
+############################################################
+
+# 
+dn: userid=testuser01,ou=people,ou=global,dc=dbgroup,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Test User01
+sn: TestUser01
+userid: testuser01
+mail: test.user01@db.com
+seeAlso: scbserialnumber=gem2_001a,ou=smartcards,ou=reference,ou=global,dc=dbgroup,dc=com
+
+# smartcards
+dn: scbserialnumber=gem2_001a,ou=smartcards,ou=reference,ou=global,dc=dbgroup,dc=com
+objectClass: scbentry
+scbserialnumber: gem2_001a
+scbstatus: activated
+
+############################################################
+# Test Set - Get user data by token ID with upper-case letters
+############################################################
+
+# 
+dn: userid=testuser02,ou=people,ou=global,dc=dbgroup,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Test User02
+sn: TestUser02
+userid: testuser02
+mail: test.user02@db.com
+seeAlso: scbserialnumber=gem2_002A,ou=smartcards,ou=reference,ou=global,dc=dbgroup,dc=com
+
+# smartcards
+dn: scbserialnumber=gem2_002A,ou=smartcards,ou=reference,ou=global,dc=dbgroup,dc=com
+objectClass: scbentry
+scbserialnumber: gem2_002A
+scbstatus: activated
+
