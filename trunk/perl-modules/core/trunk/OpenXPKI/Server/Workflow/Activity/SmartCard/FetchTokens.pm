@@ -172,11 +172,16 @@ sub execute {
 #        my $param_base = 'person_' . $i;
 
         foreach my $key (@pers_attrs) {
-            $p->{$key} = $p_entry->get_value($key);
+            if ( $key eq 'seealso' ) {
+                # get value of seealso in list context
+                $p->{$key} = [ $p_entry->get_value($key) ];
+            } else {
+                $p->{$key} = $p_entry->get_value($key);
+            }
 #            $context->param( $param_base . $key, $p->{$key} );
         }
 
-        my $scb_value = $p->{seealso};
+        foreach my $scb_value ( @{ $p->{seealso} } ) {
 
         ##! 16: "token_owner=$email, scb_value=$scb_value"
 
@@ -217,6 +222,7 @@ sub execute {
                 }
             }
         }
+        }
 
     }
 
@@ -226,13 +232,30 @@ sub execute {
 
     $context->param( '_ldap_data', $recs );
 
-    # 
-    # If just one person with just one token was found, put the token id into
-    # the context param 'token_id'
-    #
 
-    if ( @{ $recs } == 1 and ref( $recs->[0]->{scb} ) eq 'ARRAY' and @{ $recs->[0]->{scb} } == 1 ) {
-        $context->param( token_id => $recs->[0]->{scb}->[0]->{scbserialnumber} );
+    # 
+    # If just one person with just one token was found...
+    # 
+
+    if ( @{ @recs } == 1 ) {
+
+        # If just one token was found, put it into context param 'token_id'
+        if ( ref( $recs->[0]->{scb} ) eq 'ARRAY' and @{ $recs->[0]->{scb} } == 1 ) {
+            $context->param( token_id => $recs->[0]->{scb}->[0]->{scbserialnumber} );
+        }
+
+        # If more than one token was found, put them into 'multi_token_ids'
+        if ( ref( $recs->[0]->{scb} ) eq 'ARRAY' and @{ $recs->[0]->{scb} } > 1 ) {
+            my $scbs = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
+                {
+                    workflow => $workflow,
+                    context_key => 'multi_ids',
+                }
+            );
+            foreach my $scb ( @{ $recs->[0]->{scb} } ) {
+                $scbs->push( $scb->{scbserialnumber} );
+            }
+        }
     }
 
 =begin deprecated

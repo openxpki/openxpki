@@ -40,7 +40,7 @@ my ($token_id, $token_owner); #$wf_id, $token_owner, $next_action);	# params pas
 # Novosec sends the ID with uppercase letters, but the XML file/workflow
 # has it in lowercase. Also, the arg name 'TokenID' is hard-coded by them.
 
-$token_id		= lc($m->request_args()->{TokenID});
+$token_id		= $m->request_args()->{TokenID};
 #$wf_id			= $m->request_args()->{WF_ID};
 $token_owner	= $m->request_args()->{TOKEN_OWNER};
 
