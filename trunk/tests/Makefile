@@ -55,6 +55,12 @@ sel-tests: $(TESTS_SELENIUM)
 sel-dtests: $(TESTS_SELENIUM)
 	DESTRUCTIVE_TESTS=1 prove $(PROVE_ARGS) $(TESTS_SELENIUM)
 
+########################################
 # Individual tests used during development of the tests themselves
+########################################
+
 cardadm: 
 	DESTRUCTIVE_TESTS=1 prove $(PROVE_ARGS) --verbose backend/smartcard/01_cardadm.t
+
+exthooks:
+	DESTRUCTIVE_TESTS=1 prove $(PROVE_ARGS) --verbose selenium/uimods/01_exthooks.t

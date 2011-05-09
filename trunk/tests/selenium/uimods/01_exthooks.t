@@ -19,19 +19,13 @@ use lib qw(     /usr/local/lib/perl5/site_perl/5.8.8/x86_64-linux-thread-multi
 use TestCfg;
 
 my $dirname = dirname($0);
-our @cfgpath = ( $dirname . '/../../../config/tests/smartcard', $dirname );
+our @cfgpath = ( $dirname . '/../../../config/tests/uimods', $dirname );
 our %cfg = ();
 
-#my $te
-#my $cfgfile = which( '01_cardadm.cfg', @cfgpath );
-#if ( not $cfgfile ) {
-#    die "ERROR: couldn't find 01_cardadm.cfg in ", join( ', ', @cfgpath );
-#}
-
 my $testcfg = new TestCfg;
-$testcfg->read_config_path( '01_cardadm.cfg', \%cfg, @cfgpath );
+$testcfg->read_config_path( '01_exthooks.cfg', \%cfg, @cfgpath );
 
-$testcfg->load_ldap( '01_cardadm.ldif', @cfgpath );
+#$testcfg->load_ldap( '01_exthooks.ldif', @cfgpath );
 
 my $page_timeout = 60000;
 
@@ -40,10 +34,59 @@ my $sel = Test::WWW::Selenium->new(
     port    => $cfg{selenium}{port}    || 4444,
     browser => $cfg{selenium}{browser} || "*safari",
     browser_url => $cfg{selenium}{browser_url}
-      || "https://ldev-user-ca.tools.intranet.db.com/",
-#      auto_stop => 0
-    auto_stop => (exists $cfg{selenium}{auto_stop} ? $cfg{selenium}{auto_stop} : 1)
+      || "https://ldev-server-ca.tools.intranet.db.com/",
+    auto_stop =>
+      ( exists $cfg{selenium}{auto_stop} ? $cfg{selenium}{auto_stop} : 1 )
 );
+
+############################################################
+# Login as User
+############################################################
+
+$sel->open_ok("/appsso/");
+$sel->select_ok( "auth_stack", "label=External Dynamic" );
+$sel->click_ok("submit");
+$sel->wait_for_page_to_load_ok($page_timeout);
+$sel->type_ok( "login",  $cfg{user1}{name} );
+$sel->type_ok( "passwd", $cfg{user1}{role} );
+$sel->click_ok("submit");
+$sel->wait_for_text_present_ok( 'Request', $page_timeout );
+
+############################################################
+# Navigate to Request Certificate page
+############################################################
+$sel->click_ok("link=Request");
+$sel->wait_for_element_present( 'link=exact:Request Certificate',
+    $page_timeout );
+$sel->click_ok("link=exact:Request Certificate");
+$sel->wait_for_text_present( 'Choose Certificate Type', $page_timeout );
+$sel->click_ok("__submit");
+$sel->wait_for_text_present( 'Choose Key Generation Method', $page_timeout );
+$sel->select_ok( "keygen", "label=02. Server-Side Key Generation" );
+$sel->click_ok("__submit");
+$sel->wait_for_text_present( 'Specify Certificate Name', $page_timeout );
+$sel->type_ok( "cert_subject_hostname", "test.com" );
+$sel->click_ok("__submit");
+$sel->wait_for_text_present( 'Enter Change Request Information',
+    $page_timeout );
+$sel->click_ok("__submit");
+$sel->wait_for_text_present( 'Choose Parameters', $page_timeout );
+$sel->click_ok("__submit");
+$sel->wait_for_text_present( 'Verifying your server-generated password',
+    $page_timeout );
+my $sgpass =
+  $sel->get_table(qw( //div[@id='tiki-center']/div/form/table.0.1 ));
+$sel->type_ok( "password", $sgpass );
+$sel->click_ok("__submit");
+$sel->wait_for_text_present(
+    'Certificate Signing Request Successfully Received',
+    $page_timeout );
+
+############################################################
+# Logout
+############################################################
+$sel->click_ok("link=Logout");
+$sel->wait_for_page_to_load_ok($page_timeout);
 
 ############################################################
 # Login as RA Operator
@@ -57,6 +100,22 @@ $sel->type_ok( "login",  $cfg{ra1}{name} );
 $sel->type_ok( "passwd", $cfg{ra1}{role} );
 $sel->click_ok("submit");
 $sel->wait_for_text_present_ok( 'Request', $page_timeout );
+
+############################################################
+# Check for GCM column
+############################################################
+
+$sel->text_is( qw( //div[@id='tiki-center']/div/table[1]/tbody/tr[1]/th[3] ), 'GCM' );
+
+############################################################
+# Logout
+############################################################
+$sel->click_ok("link=Logout");
+$sel->wait_for_page_to_load_ok($page_timeout);
+
+exit;
+
+__DATA__
 
 ############################################################
 # Navigate to Smartcard Admin page
