@@ -6,7 +6,7 @@
 # The individual sub-modules should populate TESTS_BACKEND
 
 # Add each full sub-module directory here
-MODULES_BACKEND := backend/smartcard
+MODULES_BACKEND := backend/60_workflow backend/smartcard
 
 # include the description for each sub-module
 include $(patsubst %,%/module.mk,$(MODULES_BACKEND))

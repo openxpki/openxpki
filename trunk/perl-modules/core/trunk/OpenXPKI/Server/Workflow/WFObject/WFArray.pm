@@ -63,7 +63,7 @@ sub shift {
 }
 
 sub push {
-    my $self = shift;
+    my $self = CORE::shift;
     my $data = $self->_get_data_ref;
 #    my $data = $data_ref{ ident $self };
 
@@ -82,7 +82,7 @@ sub push {
 }
 
 sub unshift {
-    my $self = shift;
+    my $self = CORE::shift;
     my $data = $self->_get_data_ref;
 #    my $data = $data_ref{ ident $self };
 

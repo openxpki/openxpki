@@ -10,6 +10,7 @@ use Class::Std;
     #use base qw( Class::Std );
     use Carp qw( confess );
     use OpenXPKI::Debug;
+    use Data::Dumper;
     use English;
 
     # Storage for object attributes
@@ -18,6 +19,15 @@ use Class::Std;
     my %need_update : ATTR;
     my %serializer : ATTR;
     my %data_ref : ATTR;
+
+    # IMPORTANT: usually, new() is not overridden when using Class::Std. We
+    # hack this here, however, to be able to "do the right thing" and return
+    # the correct type (e.g.: WFArray) if the parameter already exists.
+    #    sub new2 {
+    #        my $self = shift;
+    #        warn "WFObject: in new2 self='$self'";
+    #        return $self;
+    #    }
 
     # Handle initialization of objects of this class
     sub BUILD {
@@ -44,14 +54,31 @@ use Class::Std;
 
         my $ser = $serializer{$id} = OpenXPKI::Serialization::Simple->new();
 
+        my $context_key = $args->{context_key};
+        my $raw_data;
+
         my $context
             = defined $args->{context}
             ? $args->{context}
             : $args->{workflow}->{context};
-        my $context_key = $args->{context_key};
-        my $raw_data = $context->param($context_key);
-        my $context_key = $args->{context_key};
-        my $raw_data    = $context->param($context_key);
+
+        if ($context) {
+            $raw_data = $context->param($context_key);
+        }
+        elsif ( exists $args->{workflow}->{CONTEXT} ) {
+            $context = $args->{workflow}->{CONTEXT};
+            $raw_data = $context->{$context_key};
+        }
+        else {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_WFOBJECT_DESERIALIZE_ERR',
+                params  => {
+                    'ERROR' => 'WFObject created without workflow context'
+                }
+            );
+            return;
+        }
+
 
         if ( defined $raw_data ) {
             my $data;
@@ -81,25 +108,26 @@ use Class::Std;
     }
 
     sub write {
-        my ( $self ) = @_;
-        my $id = ident $self;
-        my $context = $workflow_of{ $id }->{context};
+        my ($self)  = @_;
+        my $id      = ident $self;
+        my $context = $workflow_of{$id}->{context};
 
-#        if ( $need_update{ $id } ) {
-            my $raw = $serializer{ $id }->serialize( $data_ref{ $id } );
-            $context->param( $context_key_of{ $id }, $raw );
-#        }
+        #        if ( $need_update{ $id } ) {
+        my $raw = $serializer{$id}->serialize( $data_ref{$id} );
+        $context->param( $context_key_of{$id}, $raw );
+
+        #        }
 
     }
 
     # Handle cleanup
     sub DEMOLISH {
         my ( $self, $id ) = @_;
-        my $context = $workflow_of{ $id }->{context};
+        my $context = $workflow_of{$id}->{context};
 
-        if ( $need_update{ $id } ) {
-            my $raw = $serializer{ $id }->serialize( $data_ref{ $id } );
-            $context->param( $context_key_of{ $id }, $raw );
+        if ( $need_update{$id} ) {
+            my $raw = $serializer{$id}->serialize( $data_ref{$id} );
+            $context->param( $context_key_of{$id}, $raw );
         }
     }
 
@@ -167,6 +195,14 @@ Default accessor methods are available for the supported properties,
 depending on how they are declared. 
 
 =over 8
+
+=item new
+
+When creating a new instance, the named-parameter list with the keys
+"workflow" and "context_key" is passed. When creating a new parameter,
+use the corresponding data type (e.g.: WFArray). If the parameter 
+already exists, WFObject will try to determine the current contents
+and return the correct object type.
 
 =item get
 

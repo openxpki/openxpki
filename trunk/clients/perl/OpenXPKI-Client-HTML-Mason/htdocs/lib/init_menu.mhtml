@@ -30,9 +30,22 @@
                     {
                         MENU => 'puk_manager_menu',
                     },
+                    'Card Manager' =>
+                    {
+                        MENU => 'card_manager_menu',
+                    },
                 },
                 MENU =>
                 {
+                    'card_manager_menu' =>
+                    [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_CARDADM",
+                                   "smartcard_admin", undef ],
+#                        ["MENU", "I18N_OPENXPKI_HTML_MENU_CARD_MANAGEMENT",
+#                                   "card_management", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
+                                   "logout", undef ]
+                    ],
                     'puk_manager_menu' =>
                     [
                         ["MENU",   "I18N_OPENXPKI_HTML_MENU_CA_INFO",
@@ -118,6 +131,11 @@
                                    "issue_crl", 'I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE' ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_PERSONALIZATION",
                                    "smartcard_personalization", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_CARDADM",
+                                   "smartcard_admin", undef ],
+                    ],
+                    'card_management' =>
+                    [
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_CARDADM",
                                    "smartcard_admin", undef ],
                     ],

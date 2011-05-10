@@ -565,7 +565,6 @@ t/60_workflow/10_certificate_signing_request.t
 t/60_workflow/15_csr_and_certificate_issuance.t
 t/60_workflow/20_certificate_revocation.t
 t/60_workflow/40_certificate_revocation_list.t
-t/60_workflow/45_activity_tools.t
 t/60_workflow/60_ldap_publishing.t
 t/60_workflow/80_forking.t
 t/60_workflow/99_cleanup.t

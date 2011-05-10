@@ -148,7 +148,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 %#  D.  Unexpected Error
 %#
 %#      Shouldn't get here, but show some debug details just in case.
-
+/
 
 %#
 %#  A.  Unique Owner and Token ID (state of WF is 'MAIN'):
@@ -158,6 +158,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 
 
 % if ($msg->{SERVICE_MSG} eq 'ERROR') {
+    <p>DEBUG: SERVICE_MSG eq ERROR</p>
 %    my @errs = $m->comp('/lib/get_deep_error.mhtml', 'msg' => $msg);
 % $m->comp('/lib/print_errors.mhtml', 'errors' => \@errs);
 %    return;
@@ -296,22 +297,26 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 %#  C.  Unique Owner and Multiple Tokens (e.g.: user has multiple SeeAlso
 %#      entries):
 %
-% elsif ( ref( $ldap_data ) eq 'ARRAY' and @{ $ldap_data } == 1 and ref( $ldap_data->[0]->{scb} eq 'ARRAY' ) ) {
+%# elsif ( ref( $ldap_data ) eq 'ARRAY' and @{ $ldap_data } == 1 and ref( $ldap_data->[0]->{scb} eq 'ARRAY' ) ) {
+% elsif ( $wf->{STATE} eq 'FAILURE' and $wf->{CONTEXT}->{error_code} eq 'Multi Token IDs' ) {
 
-<h2>Search Returned User with Multiple Tokens</h2>
+<p>Search returned multiple tokens for <% $wf->{CONTEXT}->{token_owner} %>:</p>
  
-<table>
-% foreach my $attr ( qw( cn mail tel seealso ) ) {
-    <tr><th><% $attr %></th><td><% $wf->{CONTEXT}->{'ldap_' . $attr} %>
-% } # foreach attr
-</table>
-<h2>Modify Token</h2>
-
 <table>
     <tr><th>Token ID</th><th>Status</th></tr>
 %   foreach my $tok ( @{ $ldap_data->[0]->{scb} } ) {
-%       warn "DEBUG: token contains following data: ", join(', ', %{ $tok });
-<tr><td><% $tok->{scbserialnumber} %></td><td><% $tok->{scbstatus} %></td></tr>
+<tr>
+    <td>
+        <& /lib/html/a.mhtml,
+        target => 'fetch.html',
+        label => $tok->{scbserialnumber},
+        params => [
+            [ 'TokenID', $tok->{scbserialnumber} ], 
+        ],
+        &>
+    </td>
+    <td><% $tok->{scbstatus} %></td>
+</tr>
 %   } # foreach token
 
 </table>

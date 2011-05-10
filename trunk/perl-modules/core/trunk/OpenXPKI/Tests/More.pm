@@ -3,18 +3,18 @@
 
 package OpenXPKI::Tests::More;
 use Test::More;
+use OpenXPKI::Server::Workflow::WFObject::WFArray;
+use OpenXPKI::Client;
+use Data::Dumper;
 use Class::Std;
+
 {
     use strict;
     use warnings;
     use Carp;
 
-    use OpenXPKI::Client;
-
     # don't 'use' Test::More because we override it's methods
     #    require Test::More;
-
-    use Data::Dumper;
 
     # Storage for object attributes
     my %user_of : ATTR( get => 'user', set => 'user' );
@@ -175,7 +175,8 @@ use Class::Std;
                 { PKI_REALM => $realm } );
             $self->set_msg($msg);
             if ( $self->error ) {
-                $self->diag( "Login failed (get pki realm $realm): " . Dumper $msg);
+                $self->diag(
+                    "Login failed (get pki realm $realm): " . Dumper $msg);
                 return;
             }
             $msg = $client->send_receive_service_msg( 'PING', );
@@ -275,7 +276,7 @@ use Class::Std;
     sub create {
         my ( $self, $wftype, $params ) = @_;
         my $client = $self->get_client;
-	$self->set_wftype($wftype);
+        $self->set_wftype($wftype);
 
         my $msg
             = $client->send_receive_command_msg( 'create_workflow_instance',
@@ -290,7 +291,11 @@ use Class::Std;
         if ( $self->error ) {
 
             #            $self->diag(" RETURNING ERROR ");
-            $@ = 'Error creating workflow ' . $wftype . ' - MSG: ' . Dumper($msg);
+            $@
+                = 'Error creating workflow ' 
+                . $wftype
+                . ' - MSG: '
+                . Dumper($msg);
             return;
         }
         else {
@@ -302,7 +307,7 @@ use Class::Std;
         my ( $self, $action, $params ) = @_;
         my $msg;
         my $client = $self->get_client;
-	my $wftype = $self->get_wftype;
+        my $wftype = $self->get_wftype;
         my $wfid   = $self->get_wfid;
 
         if ( not defined $params ) {
@@ -314,9 +319,8 @@ use Class::Std;
 
         $msg = $client->send_receive_command_msg(
             'execute_workflow_activity',
-            {   
-		'ID'       => $wfid,
-		'WORKFLOW' => $wftype,
+            {   'ID'       => $wfid,
+                'WORKFLOW' => $wftype,
                 'ACTIVITY' => $action,
                 'PARAMS'   => $params,
             },
@@ -353,7 +357,38 @@ use Class::Std;
        #                . join( ', ',
        #                sort keys %{ $msg->{PARAMS}->{WORKFLOW}->{CONTEXT} } )
        #        );
-        return $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$name};
+
+        my $val = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$name};
+        return $val;
+    }
+
+    sub array {
+        my ( $self, $name ) = @_;
+        my $wfid   = $self->get_wfid;
+        my $client = $self->get_client;
+        my $msg    = $self->get_msg;
+
+        if ( not $msg ) {
+            $msg = $client->send_receive_command_msg( 'get_workflow_info',
+                { ID => $wfid } );
+        }
+
+        $self->set_msg($msg);
+        if ( $self->error ) {
+            $@ = 'Error getting workflow info: ' . Dumper($msg);
+            return;
+        }
+
+        my $val = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
+            {
+                workflow => $msg->{PARAMS}->{WORKFLOW},
+                context_key => $name,
+            }
+        );
+        if ( not $val ) {
+            $self->diag("WFArray->new($name) failed: $@");
+        }
+        return $val;
     }
 
     sub state {
@@ -415,9 +450,9 @@ use Class::Std;
 
     sub dump {
         my $self = shift;
-        foreach ( @_ ) {
+        foreach (@_) {
             Test::More::diag($_);
-        };
+        }
         Test::More::diag("Current Test Instance:");
         foreach my $k (qw( user wfid )) {
             my $acc = 'get_' . $k;
@@ -569,9 +604,9 @@ it with the expected value EXPECTED.
 
 Optionally, the test name TESTNAME may be specified.
 
-=head2 $test->state_is NAME, EXPECTED, [ TESTNAME ]
+=head2 $test->state_is EXPECTED, [ TESTNAME ]
 
-Fetches the state of the given workflow context parameter NAME and compares
+Fetches the state of the workflow and compares
 it with the expected value EXPECTED.
 
 Optionally, the test name TESTNAME may be specified.
@@ -631,6 +666,11 @@ Returns the workflow ID of the current workflow
 =head2 $test->param NAME
 
 Returns the value of the given context parameter for the current workflow.
+
+=head2 $test->array NAME
+
+Returns a WFArray object instance that is currently stored in the NAME
+workflow context parameter.
 
 =head2 $test->search KEY, VALUE
 

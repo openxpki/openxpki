@@ -199,49 +199,51 @@ sub modify_user {
     }
 
     #
-    # Get new user record
+    # Get new user record (only if new user was set)
     #
 
-    $new_mesg = $ldap->search(
-        base      => $conf->{directory}->{person}->{basedn},
-        scope     => 'sub',
-        filter    => "($pers_key=$new_user)",
-        attrs     => \@pers_attrs,
-        timelimit => $conf->{directory}->{ldap}->{timeout},
-    );
-
-    ##! 64: 'return value from search for new user: ' . Dumper($new_mesg)
-    if ( $new_mesg->is_error() ) {
-        $self->throw(
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_SEARCH_FAILED',
-            {   ERROR      => $new_mesg->error(),
-                ERROR_DESC => $new_mesg->error_desc(),
-            },
+    if ($new_user) {
+        $new_mesg = $ldap->search(
+            base      => $conf->{directory}->{person}->{basedn},
+            scope     => 'sub',
+            filter    => "($pers_key=$new_user)",
+            attrs     => \@pers_attrs,
+            timelimit => $conf->{directory}->{ldap}->{timeout},
         );
-    }
 
-    if ( $new_mesg->count == 0 ) {
-        $self->throw(
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND',
-            { FILTER => "$pers_key=$new_user", },
-        );
-    }
+        ##! 64: 'return value from search for new user: ' . Dumper($new_mesg)
+        if ( $new_mesg->is_error() ) {
+            $self->throw(
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_SEARCH_FAILED',
+                {   ERROR      => $new_mesg->error(),
+                    ERROR_DESC => $new_mesg->error_desc(),
+                },
+            );
+        }
 
-    #
-    # TODO: add check for multiple records matching new user?
-    #
+        if ( $new_mesg->count == 0 ) {
+            $self->throw(
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND',
+                { FILTER => "$pers_key=$new_user", },
+            );
+        }
 
-    #
-    # Check that user record doesn't already have a token assigned to it
-    #
+        #
+        # TODO: add check for multiple records matching new user?
+        #
 
-    $new_entry = $new_mesg->entry(0);
-    my @seeAlso = $new_entry->get_value('seeAlso');
-    if ( grep /^scbserialnumber=/, @seeAlso ) {
-        $self->throw(
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_USER_ALREADY_HAS_TOKEN',
-            { FILTER => "$pers_key=$new_user", },
-        );
+        #
+        # Check that user record doesn't already have a token assigned to it
+        #
+
+        $new_entry = $new_mesg->entry(0);
+        my @seeAlso = $new_entry->get_value('seeAlso');
+        if ( grep /^scbserialnumber=/, @seeAlso ) {
+            $self->throw(
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_USER_ALREADY_HAS_TOKEN',
+                { FILTER => "$pers_key=$new_user", },
+            );
+        }
     }
 
     #
@@ -270,33 +272,35 @@ sub modify_user {
         }
     }
 
-    #
-    # Modify seeAlso attribute of new user record to refer to token
-    #
+#
+# Modify seeAlso attribute of new user record to refer to token (only if new user was given)
+#
 
-    $new_mesg = $ldap->modify(
-        $new_entry,
-        add => {
-                  seeAlso => 'scbserialnumber='
-                . $token_id . ','
-                . $conf->{directory}->{smartcard}->{basedn}
-        },
-    );
-
-    if ( $new_mesg->is_error() ) {
-        OpenXPKI::Exception->throw(
-            message =>
-                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_ADD_SEEALSO_FOR_TOKEN',
-            params => {
-                ERROR      => $new_mesg->error(),
-                ERROR_DESC => $new_mesg->error_desc(),
-            },
-            log => {
-                logger   => CTX('log'),
-                priority => 'error',
-                facility => 'monitor',
+    if ($new_user) {
+        $new_mesg = $ldap->modify(
+            $new_entry,
+            add => {
+                      seeAlso => 'scbserialnumber='
+                    . $token_id . ','
+                    . $conf->{directory}->{smartcard}->{basedn}
             },
         );
+
+        if ( $new_mesg->is_error() ) {
+            OpenXPKI::Exception->throw(
+                message =>
+                    'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_ADD_SEEALSO_FOR_TOKEN',
+                params => {
+                    ERROR      => $new_mesg->error(),
+                    ERROR_DESC => $new_mesg->error_desc(),
+                },
+                log => {
+                    logger   => CTX('log'),
+                    priority => 'error',
+                    facility => 'monitor',
+                },
+            );
+        }
     }
 
 }
@@ -404,7 +408,8 @@ sub kill_workflow {
 
     foreach my $wf_id ( split( /[,:;]/, $wf_ids ) ) {
 
-        my $wf_type = CTX('api')->get_workflow_type_for_id( { ID => $wf_id } );
+        my $wf_type
+            = CTX('api')->get_workflow_type_for_id( { ID => $wf_id } );
 
         # load the workflow
         ##! 64: "Load workflow type=$wf_type, id=$wf_id"
@@ -462,9 +467,10 @@ sub kill_workflow {
         $wf->notify_observers( 'state change', $old_state,
             'administratively kill workflow' );
         $wf_factory->save_workflow($wf);
+
         # _commit_transaction doesn't seem to be in all versions of Workflow,
         # so let's wrap it in an eval
-        eval { $wf_factory->_commit_transaction($wf); } ;
+        eval { $wf_factory->_commit_transaction($wf); };
 
     }
     return $self;
@@ -480,25 +486,24 @@ sub get_unblock_response {
     my $self     = shift;
     my $workflow = shift;
 
-    my $context = $workflow->context();
-    my $token_id  = $context->param('token_id');
-    my $pukraw = $context->param('_puk');
-    my $unblock_challenge  = $context->param('unblock_challenge');
+    my $context           = $workflow->context();
+    my $token_id          = $context->param('token_id');
+    my $pukraw            = $context->param('_puk');
+    my $unblock_challenge = $context->param('unblock_challenge');
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
     # This is the AES key that will be used below in the decrypt
     # of the PUK.
-    
+
     my $key_file = "/etc/openxpki/aes.key";
     my $KEY;
-    if ( not open( $KEY, '<', $key_file) ) {
+    if ( not open( $KEY, '<', $key_file ) ) {
         die "Error opening $key_file: $!";
     }
     my $key = <$KEY>;
     close $KEY;
     chomp($key);
-
 
     # Let me see if I can get this right. When the PUK is
     # fetched from the datapool, but before it is written
@@ -516,43 +521,44 @@ sub get_unblock_response {
     # backwards (and blindfolded)
 
     ##! 64: "raw puk from context: " . Dumper($pukraw)
-    
+
     my $puk = $serializer->deserialize($pukraw);
 
     ##! 64: "raw puk (deserialized) from context: " . Dumper($puk)
-    
+
     if ( not ref($puk) eq 'ARRAY' ) {
+
         # this is a tad harsh, but that's life
         die "FetchPUK should return ARRAY, but got '$puk'";
     }
 
     my @puks = ();
 
-    foreach my $v ( @{ $puk } ) {
+    foreach my $v ( @{$puk} ) {
 
         ##! 64: "\tpuk array entry (encoded base64): " . Dumper($v)
-    
+
         $v = decode_base64($v);
 
         ##! 64: "\tpuk array entry (iv and encoded data): " . Dumper($v)
-    
-        my $iv = substr($v, 0, 16, '');
-       
+
+        my $iv = substr( $v, 0, 16, '' );
+
         ##! 64: "\tiv: " . Dumper($iv) . ', encrypted value: ' . Dumper($v)
         ##! 64: "\tlength of iv: " . length($iv) . ' byte(s)'
 
-        my $packediv = pack('H*', $iv);
-        my $packedkey = pack('H*', $key);
+        my $packediv  = pack( 'H*', $iv );
+        my $packedkey = pack( 'H*', $key );
 
         ##! 64: "\tlength of packed iv: " . length($packediv) . ' byte(s)'
         ##! 64: "\tpacked AES key for decryption: " . $packedkey . ', ' . length($packedkey) . ' byte(s)'
 
         my $cipher = Crypt::CBC->new(
-            -cipher => 'Crypt::OpenSSL::AES',
-            -key    => pack('H*', $key),
-            -iv     => $iv,
+            -cipher      => 'Crypt::OpenSSL::AES',
+            -key         => pack( 'H*', $key ),
+            -iv          => $iv,
             -literal_key => 1,
-            -header => 'none',
+            -header      => 'none',
         );
 
         if ( not $cipher ) {
@@ -576,43 +582,44 @@ sub get_unblock_response {
     # puk as the key. We use Crypt::DES and do the 3DES on it by hand
     # to reduce the number of CPAN dependencies.
     # Also, we only do one block, so don't worry about the mode.
-    my $des = {};
+    my $des    = {};
     my $deskey = $puks[0];
     if ( not $deskey ) {
         $deskey = $context->param('smartcard_default_puk');
     }
 
     ##! 64: 'deskey: ' . $deskey
-    
+
     my $keylen = length($deskey);
 
     ##! 64: 'keylen: ' . $keylen
-    
-    my $key = pack("H$keylen", $deskey);
+
+    my $key = pack( "H$keylen", $deskey );
     for my $i ( 1 .. 3 ) {
-        $des->{"des$i"} = Crypt::DES->new( substr $key, 8 * ( $i - 1 ), 8);
+        $des->{"des$i"} = Crypt::DES->new( substr $key, 8 * ( $i - 1 ), 8 );
     }
 
-    my $blocklen = length( $unblock_challenge );
-    my $block = pack("H$blocklen", $unblock_challenge );
-    my $resp = $des->{des3}->encrypt( $des->{des2}->decrypt( $des->{des1}->encrypt($block)));
+    my $blocklen = length($unblock_challenge);
+    my $block    = pack( "H$blocklen", $unblock_challenge );
+    my $resp     = $des->{des3}
+        ->encrypt( $des->{des2}->decrypt( $des->{des1}->encrypt($block) ) );
 
-    my $hexresp = unpack("H$blocklen", $resp);
+    my $hexresp = unpack( "H$blocklen", $resp );
 
     ##! 16: 'unblock response: ' . $hexresp
 
-    $context->param('unblock_response', $hexresp);
+    $context->param( 'unblock_response', $hexresp );
 
 #    $context->param('verbose', join("\n\t", "DUUDE!!!", "\ttoken_id=$token_id", "pukraw=$pukraw", "puk=$puk", "unblock_challenge=$unblock_challenge",
 #        "keylen=$keylen", "key=$key", "blocklen=$blocklen", "block=$block", "resp=$resp", "hexresp=$hexresp"));
 
     return $self;
 }
-    
+
 sub execute {
-    my $self       = shift;
-    my $workflow   = shift;
-    my $context    = $workflow->context();
+    my $self     = shift;
+    my $workflow = shift;
+    my $context  = $workflow->context();
 
     my $next_action = $context->param('next_action');
     my $token_id    = $context->param('token_id');

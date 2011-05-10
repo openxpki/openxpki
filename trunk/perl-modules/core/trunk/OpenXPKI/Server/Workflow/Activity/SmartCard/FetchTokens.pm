@@ -237,7 +237,7 @@ sub execute {
     # If just one person with just one token was found...
     # 
 
-    if ( @{ @recs } == 1 ) {
+    if ( @{ $recs } == 1 ) {
 
         # If just one token was found, put it into context param 'token_id'
         if ( ref( $recs->[0]->{scb} ) eq 'ARRAY' and @{ $recs->[0]->{scb} } == 1 ) {

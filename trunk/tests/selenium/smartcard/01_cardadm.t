@@ -8,7 +8,7 @@ use Test::More;
 use Test::Exception;
 use File::Basename;
 
-plan tests => 23;
+plan tests => 26;
 
 use lib qw(     /usr/local/lib/perl5/site_perl/5.8.8/x86_64-linux-thread-multi
   /usr/local/lib/perl5/site_perl/5.8.8
@@ -89,6 +89,23 @@ $sel->click_ok("//div[\@id='tiki-center']/div/form[2]/div/span/input");
 $sel->wait_for_page_to_load_ok($page_timeout);
 $sel->text_is( "//div[\@id='tiki-center']/div/table/tbody/tr[2]/td",
     "test.user02\@db.com" );
+
+############################################################
+# Navigate back to Smartcard Admin page
+############################################################
+$sel->click_ok("link=Smartcard Card Admin");
+$sel->wait_for_page_to_load_ok($page_timeout);
+
+############################################################
+# Try to get user data by owner with multiple cards
+############################################################
+$sel->type_ok( "TOKEN_OWNER", $cfg{'t-ldap-uid-4'}{token_owner} );
+$sel->click_ok("__submit");
+$sel->wait_for_page_to_load_ok($page_timeout);
+foreach my $ln ( split(/\s*,\s*/, $cfg{'t-ldap-uid-4'}{token_ids} ) ) {
+    $sel->text_is( 'link=' . $ln, $ln );
+}
+
 
 ############################################################
 # Logout
