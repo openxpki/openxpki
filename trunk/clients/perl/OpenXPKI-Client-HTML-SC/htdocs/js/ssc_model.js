@@ -552,7 +552,29 @@ var SSC_MODEL = new Class(
 								
 								
 								viewCb('error');
-							} else {
+							}else if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER') {
+								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+								sscView.showPopUp('E_card_id_error', 'cross',
+										'0222');
+								var PKCS11Plugin = $('PKCS11Plugin');
+								
+								try {
+									// force an exception if PuginStatus not available
+									//PKCS11Plugin.StopPlugin();
+								} catch (e) {
+									//alert('not supported');
+								}
+								setTimeout(window.location.reload(),2000);
+								
+								
+								viewCb('error');
+							}else if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI') {
+								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+								sscView.showPopUp('E_pki_offline', 'cross',
+										'0222');
+								viewCb('error');
+							}
+							else {
 								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 								sscView.showPopUp('E_backend-Error', 'cross',
 										'0200');
@@ -1271,6 +1293,7 @@ var SSC_MODEL = new Class(
 								case 'SUCCESS':
 									window.dbg.log('Success personalization, -unblock card next');
 									sscView.showPersonalizationStatus(3);
+									this.reCert = false;
 									this.user.cardActivation = true;
 									// Start card activation
 									viewCb('success');
@@ -1302,7 +1325,15 @@ var SSC_MODEL = new Class(
 							sscView.showPopUp('E_card_id_error', 'cross',
 									'0222');
 							viewCb('error');
-						} else {
+						} 
+						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER') {
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+							sscView.showPopUp('E_session_timeout_error', 'cross',
+									'0222');
+							viewCb('error');
+							return;
+						}
+						else {
 							sscView.showPopUp('E_process-unknown-backend-error</br>'
 									+ data.errors[i], 'cross', '0212');
 							viewCb('error');
@@ -1448,6 +1479,12 @@ var SSC_MODEL = new Class(
 					sscView.showPersonalizationStatus(2);
 				} else {
 					var set = results.get("Reason");
+					var card_insert_status = this.PKCS11Plugin.PluginStatus;
+					window.dbg.log("card insert :" + card_insert_status);
+					if(card_insert_status === 'LOOKINGFORTOKEN'){
+						sscView.showPopUp('E_sc-error-card-removed',
+								'cross', '0105');		
+					}
 
 					if (set === 'PINNotEncrypted') {
 						sscView.showPopUp('E_sc-error-pin-not-encrypted',
@@ -1616,8 +1653,17 @@ var SSC_MODEL = new Class(
 					this.ajax_request(targetURL, server_cb, resData, viewCb);
 
 				} else {
-					sscView.showPopUp('E_sc-error-genarate-keypair ', 'cross',
-							'0112');
+					var card_insert_status = this.PKCS11Plugin.PluginStatus;
+					window.dbg.log("card insert :" + card_insert_status);
+					if(card_insert_status === 'LOOKINGFORTOKEN'){
+						sscView.showPopUp('E_sc-error-card-removed',
+								'cross', '0105');		
+					}else{	
+						sscView.showPopUp('E_sc-error-genarate-keypair ', 'cross',
+								'0112');	
+					}
+
+
 				}
 
 			},// END sc_cb_GenerateKeypair
@@ -1697,6 +1743,13 @@ var SSC_MODEL = new Class(
 							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 							// error storing authId's
 							viewCb(true);
+							return;
+						}
+						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER') {
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+							sscView.showPopUp('E_session_timeout_error', 'cross',
+									'0222');
+							viewCb('error');
 							return;
 						}
 
@@ -1796,7 +1849,7 @@ var SSC_MODEL = new Class(
 			},// END sc_cb_resetpin
 
 			server_cb_pinreset_confirm : function(data, viewCb) {
-				window.dbg.log("server_cb_pinreset_confitm");
+				window.dbg.log("server_cb_pinreset_confirm");
 				sscView.setStatusMsg('T_idle', '', 'idle');
 
 				try {
@@ -1811,15 +1864,41 @@ var SSC_MODEL = new Class(
 					window.dbg.log('server json error');
 					// sscView.showPopUp('T_Server_Error'+error ,'critical');
 				}
-				if (data.wfstate === 'SUCCESS') {
-					viewCb();
-					return;
-				} else {
-					sscView.showPopUp('E_server-error-confirming-reset',
-							'cross', '0217');
-					viewCb('error');
-					return;
+				
+				if( err !== 'error'){
+					if (data.wfstate === 'SUCCESS') {
+						window.dbg.log('SUCCESS - show status');
+						viewCb();
+						return;
+					} else {
+						sscView.showPopUp('E_server-error-confirming-reset',
+								'cross', '0217');
+						viewCb('error');
+						return;
+					}	
+						
+				}else{
+					try{
+						for ( var i = 0; i < data.errors.length; i++) {
+							if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER') {
+								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+								sscView.showPopUp('E_session_timeout_error', 'cross',
+										'0222');
+								viewCb('error');
+								return;
+							}else {
+								sscView.showPopUp('E_process-unknown-backend-error</br>'
+										+ data.errors[i], 'cross', '0212');
+								viewCb('error');
+							}
+						}
+					}catch (e){
+						
+					}
+						
+					
 				}
+				
 				// dom_popup('Card unblocked ', "Finished card unblock :"+
 				// data.wfstate, "info" );
 
@@ -1918,6 +1997,12 @@ var SSC_MODEL = new Class(
 							viewCb('failure');
 							return;
 							
+						}
+						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER') {
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+							sscView.showPopUp('E_session_timeout_error', 'cross',
+									'0222');
+							return;
 						}
 
 					}
@@ -2098,7 +2183,13 @@ var SSC_MODEL = new Class(
 												sscView
 														.setPrompt('P_noAuthCode');
 												return;
-											}if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_GETCODE_ERROR_WORKFLOW_FINISHED') {
+											}if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_GETAUTHCODE_ERROR_EXECUTING_SCPU_GENERATE_ACTIVATION_CODE') {
+												//sscView.setPrompt('P_invalidState');
+												sscView
+														.setPrompt('P_noAuthCode');
+												return;
+											}					
+											if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_GETCODE_ERROR_WORKFLOW_FINISHED') {
 												//sscView.setPrompt('P_invalidState');
 												sscView
 														.setPrompt('P_noAuthCode');
