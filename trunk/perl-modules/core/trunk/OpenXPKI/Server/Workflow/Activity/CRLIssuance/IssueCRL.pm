@@ -1,5 +1,6 @@
 # OpenXPKI::Server::Workflow::Activity::CRLIsssuance::IssueCRL
 # Written by Alexander Klink for the OpenXPKI project 2006
+# Optimized for performance by Martin Bartosch for OpenXPKI 2011
 # Copyright (c) 2006 by The OpenXPKI Project
 
 package OpenXPKI::Server::Workflow::Activity::CRLIssuance::IssueCRL;
@@ -75,10 +76,11 @@ sub execute {
 
     my @cert_timestamps; # array with certificate data and timestamp
     my $already_revoked_certs = $dbi->select(
-        TABLE   => 'CERTIFICATE',
+	TABLE   => 'CERTIFICATE',
         COLUMNS => [
+	    'CERTIFICATE_SERIAL',
             'IDENTIFIER',
-            'DATA'
+	    # 'DATA'
         ],
         DYNAMIC => {
             'PKI_REALM'         => $pki_realm,
@@ -95,8 +97,9 @@ sub execute {
     my $certs_to_be_revoked = $dbi->select(
         TABLE   => 'CERTIFICATE',
         COLUMNS => [
+	    'CERTIFICATE_SERIAL',
             'IDENTIFIER',
-            'DATA'
+            # 'DATA'
         ],
         DYNAMIC => {
             'PKI_REALM'         => $pki_realm,
@@ -160,7 +163,8 @@ sub __prepare_crl_data {
 
     foreach my $cert (@{$certs_to_be_revoked}) {
         ##! 32: 'cert to be revoked: ' . Dumper $cert
-        my $data       = $cert->{'DATA'};
+        #my $data       = $cert->{'DATA'};
+        my $serial      = $cert->{'CERTIFICATE_SERIAL'};
         my $revocation_timestamp  = 0; # default if no approval date found
         my $reason_code = '';
         my $invalidity_timestamp = '';
@@ -182,10 +186,10 @@ sub __prepare_crl_data {
             $reason_code          = $crr->{'REASON_CODE'};
             $invalidity_timestamp = $crr->{'INVALIDITY_TIME'};
             ##! 32: 'last approved crr present: ' . $revocation_timestamp
-            push @cert_timestamps, [ $data, $revocation_timestamp, $reason_code, $invalidity_timestamp ];
+            push @cert_timestamps, [ $serial, $revocation_timestamp, $reason_code, $invalidity_timestamp ];
         }
         else {
-            push @cert_timestamps, [ $data ];
+            push @cert_timestamps, [ $serial ];
         }
         # update certificate database:
         my $status = 'REVOKED';

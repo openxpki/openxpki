@@ -1,6 +1,7 @@
 ## OpenXPKI::Crypto::Backend::OpenSSL::Config
 ## Written 2005 and 2006 by Julia Dubenskaya and Michael Bell for the OpenXPKI project
-## (C) Copyright 2005-2006 by The OpenXPKI Project
+## Improved 2011 by Martin Bartosch for the OpenXPKI project
+## (C) Copyright 2005-2011 by The OpenXPKI Project
 	
 use strict;
 use warnings;
@@ -78,11 +79,81 @@ sub set_cert_list
         # default revocation date if none is specified is epoch 0,
         # i.e. 01/01/1970 00:00:00
         my ($cert, $timestamp) = (undef, '700101000000Z');
-        if (not ref $arrayref)
+
+	# Set dummy values for index.txt. These values are not used during
+	# CRL generation.
+	my $subject = '/DC=org/DC=openxpki/CN=Dummy';
+	my $start = '700101000000Z';
+	my $serial;
+
+        if (ref($arrayref) ne 'ARRAY')
         {
             $cert      = $arrayref;
         } else {
             $cert      = $arrayref->[0];
+	}
+
+        if (ref($cert) eq '')
+        {
+	    # scalar string, it may either be a PEM encoded cert or the
+	    # raw certificate serial number (decimal)
+	    
+	    if ($cert =~ m{ \A \d+ \z }xms) {
+		# passed argument is numeric only and hence is the serial
+		# number of the certificate to revoke
+		$serial = $cert;
+		$cert = '';
+	    } else {
+		# PEM encoded certificate, instantiate object
+		eval {
+		    ##! 1: "FIXME: where is the related free_object call?"
+		    ##! 1: "FIXME: this is a memory leak"
+		    $cert = $self->{XS}->get_object({DATA => $cert, TYPE => "X509"});
+		};
+		if (my $exc = OpenXPKI::Exception->caught())
+		{
+		    OpenXPKI::Exception->throw (
+			message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
+			children => [ $exc ]);
+		} elsif ($EVAL_ERROR) {
+		    $EVAL_ERROR->rethrow();
+		}
+	    }
+        }
+
+	if (ref($cert)) {
+	    # cert is available as an object, obtain necessary data from it
+
+            # $timestamp = [ gmtime ($timestamp) ];
+            # $timestamp = POSIX::strftime ("%y%m%d%H%M%S",@{$timestamp})."Z";
+	    ##! 4: "timestamp = $timestamp"
+
+	    ##! 4: "create start time - notbefore"
+	    $start = $self->{XS}->get_object_function ({
+		OBJECT   => $cert,
+		FUNCTION => "notbefore"});
+	    $start = OpenXPKI::DateTime::convert_date(
+		{
+		    DATE      => $start,
+		    OUTFORMAT => 'openssltime',
+		});
+	    ##! 4: "OpenSSL notbefore date: $start"
+
+	    ##! 4: "create OpenSSL subject"
+	    $subject = $self->{XS}->get_object_function ({
+		OBJECT   => $cert,
+		FUNCTION => "subject"});
+	    $subject = OpenXPKI::DN->new ($subject);
+	    $subject = $subject->get_openssl_dn ();
+
+	    ##! 4: "create serials"
+	    $serial = $self->{XS}->get_object_function ({
+		OBJECT   => $cert,
+		FUNCTION => "serial"});
+	}
+	
+
+	if (ref($arrayref) eq 'ARRAY') {
             if (scalar @{$arrayref} > 1) {
                 $timestamp = $arrayref->[1];
                 ##! 4: "create timestamp"
@@ -94,6 +165,16 @@ sub set_cert_list
                 ##! 16: 'revocation date is present: ' . $timestamp
             }
             if (scalar @{$arrayref} > 2) {
+		my $reason_code = $arrayref->[2];
+		
+		if ($reason_code !~ m{ \A (?: unspecified | keyCompromise | CACompromise | affiliationChanged | superseded | cessationOfOperation | certificateHold | removeFromCRL ) \z }xms) {
+		    CTX('log')->log(
+			MESSAGE => "Invalid reason code '" . $reason_code . "' specified",
+			PRIORITY => 'warn',
+			FACILITY => [ 'system' ],
+			);
+		    $reason_code = 'unspecified';
+		}
                 # append reasonCode
                 $timestamp .= ',' . $arrayref->[2];
                 ##! 16: 'reason code is present: ' . $timestamp
@@ -113,50 +194,7 @@ sub set_cert_list
             }
         }
 
-        ##! 4: "get X509 object"
-        if (not ref($cert))
-        {
-            eval {
-                ##! 1: "FIXME: where is the related free_object call?"
-                ##! 1: "FIXME: this is a memory leak"
-                $cert = $self->{XS}->get_object({DATA => $cert, TYPE => "X509"});
-            };
-            if (my $exc = OpenXPKI::Exception->caught())
-            {
-                OpenXPKI::Exception->throw (
-                    message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
-                    children => [ $exc ]);
-            } elsif ($EVAL_ERROR) {
-                $EVAL_ERROR->rethrow();
-            }
-        }
 
-#        $timestamp = [ gmtime ($timestamp) ];
-#        $timestamp = POSIX::strftime ("%y%m%d%H%M%S",@{$timestamp})."Z";
-        ##! 4: "timestamp = $timestamp"
-
-        ##! 4: "create start time - notbefore"
-        my $start = $self->{XS}->get_object_function ({
-                        OBJECT   => $cert,
-                        FUNCTION => "notbefore"});
-        $start = OpenXPKI::DateTime::convert_date(
-                 {
-                     DATE      => $start,
-                     OUTFORMAT => 'openssltime',
-                 });
-        ##! 4: "OpenSSL notbefore date: $start"
-
-        ##! 4: "create OpenSSL subject"
-        my $subject = $self->{XS}->get_object_function ({
-                          OBJECT   => $cert,
-                          FUNCTION => "subject"});
-        $subject = OpenXPKI::DN->new ($subject);
-        $subject = $subject->get_openssl_dn ();
-
-        ##! 4: "create serials"
-        my $serial = $self->{XS}->get_object_function ({
-                         OBJECT   => $cert,
-                         FUNCTION => "serial"});
         $serial = Math::BigInt->new ($serial);
         my $hex = substr ($serial->as_hex(), 2);
         $hex    = "0".$hex if (length ($hex) % 2);
@@ -713,7 +751,77 @@ different section types:
 
 =item - set_profile
 
-=item - set_index_list
+=item - set_cert_list
+
+This method prepares the OpenSSL-specific representation of the certificate
+database (index.txt). The method expects an arrayref containing a list
+of all certificates to revoke.
+
+A single entry in this array may be one of the following:
+
+=over
+
+=item * a single certificate (see below on how to specify a certificate)
+
+=item * an arrayref of the format [ certificate, revocation_timestamp, reason_code, invalidity_timestamp ]
+
+=back
+
+With the exception of the certificate all additional parameters 
+are optional and can be left out.
+
+If a revocation_timestamp is specified, it is used as the revocation
+timestamp in the generated CRL.
+The timestamp is specified in seconds since epoch.
+
+The reason code is accepted literally. It should be one of
+  'unspecified',
+  'keyCompromise',
+  'CACompromise',
+  'affiliationChanged',
+  'superseded',
+  'cessationOfOperation',
+
+The reason codes
+  'certificateHold',
+  'removeFromCRL'.
+are currently not handled correctly and should be avoided. However, they
+will currently simply be passed in the CRL which may not have the desired 
+result.
+
+If the reason code is incorrect, a warning is logged and the reason code
+is set to 'unspecified' in order to make sure the certificate gets revoked
+at all.
+
+If a invalidity_timestamp is specified, it is used as the invalidity
+timestamp in the generated CRL.
+The timestamp is specified in seconds since epoch.
+
+A certificate can be specified as
+
+=over
+
+=item * a PEM encoded X.509v3 certificate (scalar)
+
+=item * a reference to an OpenXPKI::Crypto::Backend::OpenSSL::X509 object
+
+=item * a string containing the serial number of the certificate to revoke
+
+=back
+
+Depending on the way the certificate to revoke was specified the method
+has to perform several actions to deduce the correct information for CRL
+issuance.
+If a PEM encoded certificate is passed, the method is forced to parse
+to parse the certificate before it can build the revocation data list.
+This operation introduces a huge overhead which may influence system
+behaviour if many certificates are to be revoked.
+The lowest possible overhead is introduced by the literal specification
+of the serial number to put on the revocation list.
+
+NOTE: No attempt to verify the validity of the specified serial numbers 
+is done, in particular in the "raw serial number" case there is even 
+no check if such a serial number exists at all.
 
 =item - dump
 
@@ -729,7 +837,6 @@ my $profile = OpenXPKI::Crypto::Backend::OpenSSL::Config->new (
               });
 $profile->set_engine($engine);
 $profile->set_profile($crl_profile);
-$profile->set_index_list(@certlist);
 $profile->dump();
 my $conf = $profile->get_config_filename();
 ... execute an OpenSSL command with "-config $conf" ...

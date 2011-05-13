@@ -130,12 +130,11 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl
 
 =item * REVOKED
 
-This parameter is an ARRAY reference. The elements of this array
-are an ARRAY too which contains the certificate and the timestamp. The
-certificate can be a PEM encoded X.509v3 certificate or it must
-be a reference to an OpenXPKI::Crypto::Backend::OpenSSL::X509 object. The
-timestamp must be a timestamp which is automatically parseable
-by DateTime::Format::DateParse.
+This parameter is an ARRAY reference. The elements of this array enumerate
+all certificates to be placed on the CRL.
+
+For details on the format of this parameter please refer to
+OpenXPKI::Crypto::Backend::OpenSSL::Config::set_cert_list
 
 =back
 
