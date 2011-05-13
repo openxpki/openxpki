@@ -13,6 +13,9 @@ use OpenXPKI::Debug;
 use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
 
+use DateTime;
+
+
 sub execute {
     ##! 1: 'execute'
     my $self       = shift;
@@ -49,13 +52,33 @@ sub execute {
         my $realms = CTX('pki_realm_by_cfg')->{$self->config_id()};
         ##! 64: 'config_id: ' . $self->config_id()
         ##! 64: 'realms: ' . Dumper $realms
+
+	my $now = DateTime->now( time_zone => 'UTC' );
+      CA:
         foreach my $ca_id (@ca_ids) {
             ##! 16: 'ca_id: ' . $ca_id
             ##! 16: Dumper(\$realms->{$pki_realm}->{ca}->{id}->{$ca_id})
-            if (exists $realms->{$pki_realm}->{ca}->{id}->{$ca_id}->{crl_publication}) {
-                ##! 32: 'exists_branch'
-                push @crl_issuing_cas, $ca_id;
-            }
+	    if (! exists $realms->{$pki_realm}->{ca}->{id}->{$ca_id}->{crl_publication}) {
+		##! 32: 'no crl publication configured'
+		next CA;
+	    }
+
+	    my $ca_notbefore = $realms->{$pki_realm}->{ca}->{id}->{$ca_id}->{notbefore};
+	    ##! 16: 'ca_notbefore: ' . Dumper $ca_notbefore
+	    
+	    my $ca_notafter = $realms->{$pki_realm}->{ca}->{id}->{$ca_id}->{notafter};
+	    ##! 16: 'ca_notafter: ' . Dumper $ca_notafter
+
+	    if (DateTime->compare($now, $ca_notbefore) < 0) {
+		##! 16: $ca_id . ' is not yet valid, skipping'
+		next CA;
+	    }
+	    if (DateTime->compare($now, $ca_notafter) > 0) {
+		##! 16: $ca_id . ' is expired, skipping'
+		next CA;
+	    }
+
+	    push @crl_issuing_cas, $ca_id;
         }
         ##! 32: 'crl_issung_cas: ' . Dumper(\@crl_issuing_cas)
         my $ca_ids_serialized = $serializer->serialize(\@crl_issuing_cas);
@@ -112,3 +135,5 @@ This activity creates the list of CRL issuing CAs if it is not present yet and
 saves a serialized form in the context value ca_ids. If it is present, it
 deserializes it, deletes the first entry and saves it to the context again.
 The next CA is thus always the first element of the ca_ids array.
+
+Only CAs which are currently valid are considered for CRL issuance.
