@@ -423,9 +423,7 @@ $responseData->{'certs_to_delete_serialized'}=  $certs_to_delete_serialized;
 
 
 }elsif ($wf_action eq 'get_status'){
-
-
-	$msg = $self->wf_status( $c,  $wf_ID , $wf_type);
+  	$msg = $self->wf_status( $c,  $wf_ID , $wf_type);
 
 	$responseData->{'wf_state'}  = $msg->{PARAMS}->{WORKFLOW}->{STATE};
 	$responseData->{'msg'}  = $msg;
@@ -450,7 +448,8 @@ $responseData->{'certs_to_delete_serialized'}=  $certs_to_delete_serialized;
 		  push( @{$workflowtrace},
             "I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_ISSUE_CERTIFICATE_OK");
 	 }
-    }
+
+    }#end issue certificate
 
 #try to resume workflow that is in state HAVE_CERT_TO_PUBLISH, e.g. active directory was not available  
 	if($responseData->{'wf_state'} eq 'HAVE_CERT_TO_PUBLISH'){
@@ -488,11 +487,11 @@ $responseData->{'certs_to_delete_serialized'}=  $certs_to_delete_serialized;
    if (  $self->is_error_response($msg) ) {
         $responseData->{'error'} = "error";
         push( @{$errors},
-            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_PUBLISH_CERTIFICATE");
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_UNPUBLISH_CERTIFICATE");
     }else
 	 {
 		  push( @{$workflowtrace},
-            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_PUBLISH_CERTIFICATE_OK");
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_UNPUBLISH_CERTIFICATE_OK");
 	 }
     }
 
@@ -626,7 +625,9 @@ $responseData->{'certs_to_delete_serialized'}=  $certs_to_delete_serialized;
 
 }else{
 
-		$msg = $self->wf_status( $c,  $wf_ID , $wf_type);
+
+
+    $msg = $self->wf_status( $c,  $wf_ID , $wf_type);
 
 
    if (  $self->is_error_response($msg) ) {
