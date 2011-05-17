@@ -128,7 +128,7 @@ sub execute {
 		context_key => 'certs_to_delete',
 	    } );
 	$certs_to_delete->push(
-	    @{$result->{TASKS}->{SMARTCARD}->{PURGE}}
+	    map { $_->{IDENTIFIER} } @{$result->{TASKS}->{SMARTCARD}->{PURGE}}
 	    );
 
 	
@@ -138,7 +138,7 @@ sub execute {
 		context_key => 'certs_to_unpublish',
 	    } );
 	$certs_to_unpublish->push(
-	    @{$result->{TASKS}->{DIRECTORY}->{UNPUBLISH}}
+	    map { $_->{IDENTIFIER} } @{$result->{TASKS}->{DIRECTORY}->{UNPUBLISH}}
 	    );
 
 
