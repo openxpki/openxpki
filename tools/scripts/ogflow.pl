@@ -985,7 +985,7 @@ sub parseShapedGraphic {
         # ignore - from overview on main page
     }
 
-    elsif ( $shape eq 'BevelledRectangle' ) {
+    elsif ( ($shape eq 'BevelledRectangle') or ($shape eq 'FlattenedRectangle') ) {
         my ( $name, $args ) = split( /\n/s, $text, 2 );
         $name =~ s/\s/_/g;
         $objs->{$sheetnum}->{$id} = WF::Validator->new;
@@ -1039,7 +1039,7 @@ sub parseShapedGraphic {
 
         # ignore - from overview on main page
     }
-    elsif ( $shape eq 'BevelledRectangle' ) {
+    elsif ( ($shape eq 'BevelledRectangle') or ($shape eq 'FlattenedRectangle') ) {
 
         #        warn "FlatRect: '", $text, "'";
         my ( $name, $args ) = split( /\n/s, $text, 2 );
