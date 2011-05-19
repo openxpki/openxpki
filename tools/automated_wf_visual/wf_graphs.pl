@@ -2,7 +2,6 @@
 #
 # Written by Petr Grigoriev the OpenXPKI project 2007
 # Copyright (c) 2007 by The OpenXPKI Project
-# $Revision$
 #
 
 
