@@ -1,5 +1,3 @@
-$Revision$
-
 Charter of OpenXPKI
 
 1. Mission
