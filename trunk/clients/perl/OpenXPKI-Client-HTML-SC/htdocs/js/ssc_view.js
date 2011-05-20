@@ -580,6 +580,11 @@ var SSC_VIEW = new Class(
 				} else {
 					// enter authcodes
 					this.setPrompt('');
+					
+					// clear authcodes (myight be saved from prevoius attempt)
+					this.actCode1 = '';
+					this.actCode2 = '';
+					 
 					this.showPinDlg(false);
 					
 					// set right info text
@@ -1599,8 +1604,11 @@ var SSC_VIEW = new Class(
 			},
 
 			closePopup : function() {
+				
 				$('popupInfo').set('html', '');
 				$('popupFrame').style.display = 'none';
+				
+				window.location.reload();
 			},
 
 			/*----------------------------------------------------------------------------------*/

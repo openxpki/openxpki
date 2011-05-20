@@ -59,13 +59,25 @@ sub start_pinreset {
     my $msg;
 
 #################################PARAMETER#################################
-    $self->start_session();   #call class helper function to create or reinitialise an OpenXPKI connection, and check for the required parameter cardID and cardtype 
-
+    $self->start_session();   #call class helper function to create or reinitialise an OpenXPKI connection, and check for the required parameter cardID and cardtype
 
     $c            = $session->{"c"};
     $responseData = $session->{"responseData"};
-    $errors				= $session->{"errors"};
- 	 $workflowtrace 	=$session->{"workflowtrace"};
+    $errors	= $session->{"errors"};
+    $workflowtrace 	=$session->{"workflowtrace"};
+
+      if (!defined $c || $c == 0)
+      {
+                $responseData->{'error'} = "error";
+                            push(
+                 @{$errors},
+		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		  );
+
+        $responseData->{'errors'} = $errors;
+        return $self->send_json_respond($responseData);
+
+      }
 
     if ( !defined $self->param("email1") ) {
         $responseData->{'error'} = "error";
@@ -346,6 +358,19 @@ sub list_active_workflows {
 
  	 $responseData->{"wf_type"} = $wf_type;
 
+      if (!defined $c || $c == 0)
+      {
+                $responseData->{'error'} = "error";
+                            push(
+                 @{$errors},
+		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		  );
+
+        $responseData->{'errors'} = $errors;
+        return $self->send_json_respond($responseData);
+
+      }
+
 ####If error occured cancel request and send back error MSGs####
     if ( defined $responseData->{'error'} ) {
         return $self->send_json_respond($responseData);
@@ -446,6 +471,19 @@ sub pinreset_verify {
     $errors				= $session->{"errors"};
  	 $workflowtrace 	=$session->{"workflowtrace"};
     $responseData->{'error'} = undef;
+
+      if (!defined $c || $c == 0)
+      {
+                $responseData->{'error'} = "error";
+                            push(
+                 @{$errors},
+		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		  );
+
+        $responseData->{'errors'} = $errors;
+        return $self->send_json_respond($responseData);
+
+      }
     
 #################################PARAMETER#################################
 # 	if(! defined $self->param("email1") )
@@ -797,6 +835,19 @@ sub pinreset_confirm {
     $errors				= $session->{"errors"};
  	 $workflowtrace 	=$session->{"workflowtrace"};
 	 $responseData->{'error'} = undef;
+
+      if (!defined $c || $c == 0)
+      {
+                $responseData->{'error'} = "error";
+                            push(
+                 @{$errors},
+		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		  );
+
+        $responseData->{'errors'} = $errors;
+        return $self->send_json_respond($responseData);
+
+      }
 
     if ( defined $self->param("unblock_wfID") ) {
         $session->{'wf_ID'}      = $self->param("unblock_wfID");

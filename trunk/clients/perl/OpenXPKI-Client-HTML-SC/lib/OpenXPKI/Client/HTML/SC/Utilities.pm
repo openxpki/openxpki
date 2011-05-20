@@ -65,7 +65,10 @@ sub get_card_status {
     $errors				= $session->{"errors"};
  	 my $workflowtrace 	=$session->{"workflowtrace"};
 #########################################################
-
+#$responseData = $session->{"responseData"};
+# $responseData->{'c'} = Dumper($session->{"c"});
+# $responseData->{'a2csessionid'} = $self->pnotes->{a2c}{session_id};
+# return $self->send_json_respond($responseData);
 #########################Parse Input parameter###########
     # 	if(! defined $self->param("msg") )
     # 	{
@@ -104,6 +107,67 @@ CERTS:
     if ( defined $AUTHUSER ) {
         $params{USERID} = $AUTHUSER;
     }
+if(( !defined $c || $c == 0 || $c eq '' ) && (!defined $session->{'cardOwner'} ||  $session->{'cardOwner'} eq '') ){
+$responseData->{'c'} = Dumper($c);
+$responseData->{'sc'} = Dumper($session->{"c"});
+
+}
+
+  if(( !defined $c || $c == 0 || $c eq '' ) && (!defined $session->{'cardOwner'} ||  $session->{'cardOwner'} eq '') ){
+    $c = $self->openXPKIConnection(
+                     undef,
+                     config()->{openxpki}->{user},
+                     config()->{openxpki}->{role}
+                 );
+    
+     if ( !defined $c ) {
+
+            # die "Could not instantiate OpenXPKI client. Stopped";
+
+            $responseData->{'error'} = "error";
+
+            push(
+                @{$errors},
+"I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_CONTINUE_FAILED"
+            );
+            $c = 0;
+
+        }
+        else {
+
+	    if( $c != 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_OPENXPKICONNECTION_ERROR'){
+
+            if ( $c != 0 ) {
+            	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
+                $responseData->{'start_selfserv_user_session'} = "OpenXPKISession started new selfverv User session";
+            }else{
+	      $responseData->{'error'} = "error";
+	      push(
+		  @{$errors},
+		  "I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI"
+	      );
+	      $c = 0;
+	      $responseData->{'errors'} = $errors;
+	      return $self->send_json_respond($responseData);
+	    }
+
+
+
+	}else
+	{
+	
+	      $responseData->{'error'} = "error";
+            push(
+                @{$errors},
+		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI"
+            );
+            $c = 0;
+	    $responseData->{'errors'} = $errors;
+	    return $self->send_json_respond($responseData);
+
+	}
+        }
+    }
 
     $msg = $c->send_receive_command_msg( 'sc_analyze_smartcard', \%params, );
 
@@ -117,15 +181,17 @@ CERTS:
 #########################################################
 
 ###close openxpki connection and reopen with  card owner as usernam####
-    
+
+if(!defined $session->{'cardOwner'} || $session->{'cardOwner'} eq '') {
     $self->disconnect($c);	 
     
   
 	$session->{'creator_userID'} = $msg->{PARAMS}->{SMARTCARD}->{assigned_to}->{workflow_creator};
- 	
+	$session->{'cardOwner'} = $msg->{PARAMS}->{SMARTCARD}->{assigned_to}->{workflow_creator};
+    
  	 $c = $self->openXPKIConnection(
                 undef,
-                $session->{'creator_userID'},
+                $session->{'cardOwner'},
                 config()->{openxpki}->{role}
          );
      
@@ -148,7 +214,7 @@ CERTS:
                 $responseData->{'start_new_user_session'} = "OpenXPKISession started new User session";
             }
         }
-     
+  }
          
  
  
@@ -273,6 +339,7 @@ foreach my $wf_type (keys %{$activeworkflows}) {
 $responseData->{'msg'} = $msg;
 
 $responseData->{'creator_userID'} = 'set:'.$session->{'creator_userID'};
+$responseData->{'cardOwner'} = $session->{'cardOwner'};	
 $responseData->{'userWF'} = \@activewf;
 $responseData->{'msg'} = $msg;
 

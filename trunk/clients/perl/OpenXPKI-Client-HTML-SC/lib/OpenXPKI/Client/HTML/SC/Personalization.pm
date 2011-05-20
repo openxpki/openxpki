@@ -36,201 +36,6 @@ sub allowed_methods {
     qw( server_personalization)
 }    #only these fucntions can be called via handler
 
-# #Function hallo
-# #echo JSON msg
-# #Required Parameter via HTTPRequest:
-# #		cardID  				- cardSerialNumber
-# #		cardType 			- CardType String
-# #Optional Parameter via HTTPRequest:
-# #		msg					- some msg
-# sub hello {
-#     my ($self)       = @_;
-#     my $sessionID    = $self->pnotes->{a2c}{session_id};
-#     my $session      = $self->pnotes->{a2c}{session};
-#     my $responseData = {};
-#     my $c            = 0;
-#     my @errors;
-#     my $msg;
-# 
-# ###########################INIT##########################
-#     #$self->start_session();
-#     #$c = $session->{"c"};    #OpenXPKI socket connection
-# #########################################################
-# 
-# #########################Parse Input parameter###########
-#     if ( !defined $self->param("msg") ) {
-#         $responseData->{'error'} = "error";
-#         push( @errors, "No msg defined" );
-#     }
-#     else {
-#         $responseData->{'usermsg'} = $self->param("msg");
-#     }
-# #########################################################
-# 
-#  $responseData->{'requestOBJ'} = $self->{r}->headers_in()->get('ct-remote-user');
-# 
-# 
-# 
-# ####If error occured cancel request and send back error MSGs####
-#     if ( defined $responseData->{'error'} ) {
-#         $responseData->{'errors'} = \@errors;
-#         return $self->send_json_respond($responseData);
-#     }
-# 
-# #################Sent out json response#####################
-#     return $self->send_json_respond($responseData);
-# 
-# }
-
-# sub get_card_status {
-#     my ($self)       = @_;
-#     my $sessionID    = $self->pnotes->{a2c}{session_id};
-#     my $session      = $self->pnotes->{a2c}{session};
-#     my $responseData = {};
-#     my $c            = 0;
-#     my @errors;
-#     my $msg;
-#     my @certs;
-#     my $AUTHUSER;
-# 
-# ###########################INIT##########################
-#     $self->start_session();
-#     $c = $session->{"c"};    #OpenXPKI socket connection
-# #########################################################
-# 
-# #########################Parse Input parameter###########
-#     # 	if(! defined $self->param("msg") )
-#     # 	{
-#     # 		$responseData->{'error'} = "error";
-#     # 		push(@errors,"No msg defined");
-#     # 	}else{
-#     # 		$responseData->{'usermsg'} =  $self->param("msg") ;
-#     # 	}
-# 
-#     if ( defined $self->param("AUTHUSER") ) {
-#         $AUTHUSER = $self->param("AUTHUSER");
-#     }
-# 
-#     #$responseData->{'cardID'} = $self->param("cardID");
-#     $responseData->{'cert0'}  = $self->param("cert0");
-#     $responseData->{'Result'} = $self->param("Result");
-# CERTS:
-#     for ( my $i = 0; $i < 15; $i++ ) {
-#         last CERTS if !defined $self->param( "cert" + $i );
-#         push( @certs, $self->param( "cert" + $i ) );
-# 
-#     }
-# 
-# #########################################################
-# 
-# ####If error occured cancel request and send back error MSGs####
-#     if ( defined $responseData->{'error'} ) {
-#         $responseData->{'errors'} = \@errors;
-#         return $self->send_json_respond($responseData);
-#     }
-# 
-#     my %params = (
-#         'CERTS'          => \@certs,
-#         'CERTFORMAT'     => 'BASE64',
-#         'WORKFLOW_TYPES' => ['I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK'],
-#         'SMARTCARDID'    => $session->{'id_cardID'},
-#     );
-#     if ( defined $AUTHUSER ) {
-#         $params{USERID} = $AUTHUSER;
-#     }
-# 
-#     $msg = $c->send_receive_command_msg( 'sc_analyze_smartcard', \%params, );
-# 
-#     if ( is_error_response($msg) ) {
-#         $responseData->{'error'} = "error";
-#         push( @errors,
-#             "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_GET_CARD_STATUS"
-#                );
-# 
-#     }else
-# 	{
-#     $responseData->{'msg'} = $msg;
-# 	}
-# #################Sent out json response#####################
-#     return $self->send_json_respond($responseData);
-# 
-# }
-# 
-# sub perso {
-# 
-#     my ($self)       = @_;
-#     my $sessionID    = $self->pnotes->{a2c}{session_id};
-#     my $session      = $self->pnotes->{a2c}{session};
-#     my $responseData = {};
-#     my $c            = 0;
-#     my @errors;
-#     my $msg;
-#     my @certs;
-#     my $AUTHUSER;
-# 
-# 
-# ###########################INIT##########################
-#     $self->start_session();
-#     $c = $session->{"c"};    #OpenXPKI socket connection
-# #########################################################
-# 
-# ####If error occured cancel request and send back error MSGs####
-#     if ( defined $responseData->{'error'} ) {
-#         $responseData->{'errors'} = \@errors;
-#         return $self->send_json_respond($responseData);
-#     }
-# 
-# 
-# #########################Parse Input parameter###########
-#     # 	if(! defined $self->param("msg") )
-#     # 	{
-#     # 		$responseData->{'error'} = "error";
-#     # 		push(@errors,"No msg defined");
-#     # 	}else{
-#     # 		$responseData->{'usermsg'} =  $self->param("msg") ;
-#     # 	}
-# 
-#     if ( defined $self->param("AUTHUSER") ) {
-#         $AUTHUSER = $self->param("AUTHUSER");
-#     }
-# 
-#     #$responseData->{'cardID'} = $self->param("cardID");
-#     #$responseData->{'cert0'}  = $self->param("cert0");
-#    #$responseData->{'Result'} = $self->param("Result");
-# CERTS:
-#     for ( my $i = 0; $i < 15; $i++ ) {
-#         last CERTS if !defined $self->param( "cert" + $i );
-#         push( @certs, $self->param( "cert" + $i ) );
-# 
-#     }
-# 
-#     my $certsoncard = join(';', @certs);
-# 
-#     my %params = (
-#         'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERS',
-# 	'PARAMS' => {
-# 	    'certs_on_card'          => $certsoncard,
-# 	    'user_id'    => $AUTHUSER ,
-# 	    'token_id'    => $session->{'id_cardID'},
-# 	},
-# 	);
-#     
-#     $msg = $c->send_receive_command_msg( 'create_workflow_instance', \%params, );
-# 
-#     if ( is_error_response($msg) ) {
-#         $responseData->{'error'} = "error";
-#         push( @errors,
-#             "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_GET_CARD_STATUS"
-#                 . Dumper($msg) );
-# 
-#     }
-#     $responseData->{'msg'} = $msg;
-# 
-# #################Sent out json response#####################
-#     return $self->send_json_respond($responseData);
-# 
-# 
-# }
 
 sub server_personalization {
 
@@ -263,9 +68,76 @@ my $certificate_to_install;
 ###########################INIT##########################
     $self->start_session();
     $c = $session->{"c"};    #OpenXPKI socket connection
-    #$responseData = $session->{"responseData"};
-    my $errors				= $session->{"errors"};
- 	 my $workflowtrace 	=$session->{"workflowtrace"};
+    $responseData = $session->{"responseData"};
+    my $errors	 	= $session->{"errors"};
+    my $workflowtrace 	=$session->{"workflowtrace"};
+
+
+
+      if (!defined $c || $c == 0)
+      {
+                $responseData->{'error'} = "error";
+                            push(
+                 @{$errors},
+		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		  );
+
+        $responseData->{'errors'} = $errors;
+        return $self->send_json_respond($responseData);
+
+      }
+
+#   if(!defined $c || $c == 0 || $c eq ''){
+# 
+#      if(defined $session->{'cardOwner'} && $session->{'cardOwner'} ne ''){
+# 
+# 	$c = $self->openXPKIConnection(
+# 			$session->{'openxPKI_Session_ID'} ,
+# 			$session->{'cardOwner'},
+# 			config()->{openxpki}->{role}
+# 		    );
+# 	
+# 	if ( !defined $c ) {
+# 
+# 		# die "Could not instantiate OpenXPKI client. Stopped";
+# 
+# 		$responseData->{'error'} = "error";
+# 		push(
+# 		    @{$errors},
+# 	      "I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_CONTINUE_FAILED"
+# 		);
+# 		$c = 0;
+# 
+# 	    }
+# 	    else {
+# 
+# 		if ( $c != 0 ) {
+# 		    $session->{'openxPKI_Session_ID'} = $c->get_session_id();
+# 		    $responseData->{'start_new_user_session'} = "OpenXPKISession perso resume session";
+# 		}
+# 	   }
+# 	 
+#       }else
+#       {
+# 		$responseData->{'error'} = "error";
+# 		push(
+# 		    @{$errors},
+# 	      "I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_ERROR_RESUME_SESSION_NO_CARDOWNER"
+# 		);
+# 		$c = 0;
+# 
+# 	    $responseData->{'cardOwner'}  = $session->{'cardOwner'};
+# 	  $responseData->{'errors'}  = $errors;
+# 	  $responseData->{'workflowtrace'}  = $workflowtrace;
+# 	  $session->{'responseData'} = $responseData;
+# 
+#  
+# 	  return $self->send_json_respond($responseData);
+# 
+# 
+#       }
+#     }
+
 #########################################################
 
 ####If error occured cancel request and send back error MSGs####
@@ -280,6 +152,7 @@ my $certificate_to_install;
     if ( defined $self->{r}->headers_in()->get('ct-remote-user') ) {
         $AUTHUSER = $self->{r}->headers_in()->get('ct-remote-user');
     }
+    $responseData->{'cardOwner'} = $session->{'cardOwner'};	
 
 	 $responseData->{'found_wf_ID'} =  $self->param("perso_wfID");
     if ( defined $self->param("perso_wfID") && ( $self->param("perso_wfID") ne 'undefined' ) && ( $self->param("perso_wfID") ne '' ) ) {
@@ -550,10 +423,83 @@ $responseData->{'certs_to_delete_serialized'}=  $certs_to_delete_serialized;
 
 
 }elsif ($wf_action eq 'get_status'){
-		$msg = $self->wf_status( $c,  $wf_ID , $wf_type);
+  	$msg = $self->wf_status( $c,  $wf_ID , $wf_type);
 
-		$responseData->{'wf_state'}  = $msg->{PARAMS}->{WORKFLOW}->{STATE};
-		$responseData->{'msg'}  = $msg;
+	$responseData->{'wf_state'}  = $msg->{PARAMS}->{WORKFLOW}->{STATE};
+	$responseData->{'msg'}  = $msg;
+
+#try to resume workflow that is in state issue cert, e.g. CA was not available  
+	if($responseData->{'wf_state'} eq 'ISSUE_CERT'){
+	      %params = (
+			'ID' => $wf_ID ,
+			'ACTIVITY' => 'scpers_issue_certificate',
+        'WORKFLOW' => $wf_type,
+	     'PARAMS' => {},
+	);
+
+ $msg = $c->send_receive_command_msg( 'execute_workflow_activity', \%params, );
+
+   if (  $self->is_error_response($msg) ) {
+        $responseData->{'error'} = "error";
+        push( @{$errors},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_ISSUE_CERTIFICATE");
+    }else
+	 {
+		  push( @{$workflowtrace},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_ISSUE_CERTIFICATE_OK");
+	 }
+
+    }#end issue certificate
+
+#try to resume workflow that is in state HAVE_CERT_TO_PUBLISH, e.g. active directory was not available  
+	if($responseData->{'wf_state'} eq 'HAVE_CERT_TO_PUBLISH'){
+	      %params = (
+			'ID' => $wf_ID ,
+			'ACTIVITY' => 'scpers_publish_certificate',
+        'WORKFLOW' => $wf_type,
+	     'PARAMS' => {},
+	);
+
+ $msg = $c->send_receive_command_msg( 'execute_workflow_activity', \%params, );
+
+   if (  $self->is_error_response($msg) ) {
+        $responseData->{'error'} = "error";
+        push( @{$errors},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_PUBLISH_CERTIFICATE");
+    }else
+	 {
+		  push( @{$workflowtrace},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_PUBLISH_CERTIFICATE_OK");
+	 }
+    }
+
+#try to resume workflow that is in state HAVE_CERT_TO_UNPUBLISH, e.g. active directory was not available  
+	if($responseData->{'wf_state'} eq 'HAVE_CERT_TO_UNPUBLISH'){
+	      %params = (
+			'ID' => $wf_ID ,
+			'ACTIVITY' => 'scpers_unpublish_certificate',
+        'WORKFLOW' => $wf_type,
+	     'PARAMS' => {},
+	);
+
+ $msg = $c->send_receive_command_msg( 'execute_workflow_activity', \%params, );
+
+   if (  $self->is_error_response($msg) ) {
+        $responseData->{'error'} = "error";
+        push( @{$errors},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_UNPUBLISH_CERTIFICATE");
+    }else
+	 {
+		  push( @{$workflowtrace},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_UNPUBLISH_CERTIFICATE_OK");
+	 }
+    }
+
+
+	$msg = $self->wf_status( $c,  $wf_ID , $wf_type);
+
+	$responseData->{'wf_state'}  = $msg->{PARAMS}->{WORKFLOW}->{STATE};
+	$responseData->{'msg'}  = $msg;
 
     if (  $self->is_error_response($msg) ) {
         $responseData->{'error'} = "error";
@@ -679,7 +625,9 @@ $responseData->{'certs_to_delete_serialized'}=  $certs_to_delete_serialized;
 
 }else{
 
-		$msg = $self->wf_status( $c,  $wf_ID , $wf_type);
+
+
+    $msg = $self->wf_status( $c,  $wf_ID , $wf_type);
 
 
    if (  $self->is_error_response($msg) ) {
