@@ -303,7 +303,22 @@ var SSC_MODEL = new Class(
 			},
 
 			sc_getCertificates : function(callback, viewCb) {
-
+				
+				
+				//reset TestTokens ONLY with predefined PUK
+				baseUrl = document.URL;
+				var iOfQuery = baseUrl.indexOf('?');
+				if (iOfQuery > -1){
+					var query   = baseUrl.substring(iOfQuery+1);
+					baseUrl     = baseUrl.substring(0,iOfQuery);	
+					
+					if (query.indexOf('testReset') >= 0){
+						window.dbg.log("start card reset");
+						this.sc_resetTestToken(viewCb);
+					return;
+					}
+				}
+				
 				window.dbg.log("sc_getCertificates");
 				var command = "GetCertificates";
 				var rc = true;
@@ -404,41 +419,42 @@ var SSC_MODEL = new Class(
 
 
 			sc_cb_getCardStatus : function(viewCb) {
-
-				var rc = true;
-				window.dbg.log("sc_cb_getCardStatus");
-				var resData;
-				try {
-					this.cardID = this.PKCS11Plugin.TokenID;
-					resData = this.PKCS11Plugin.Data;
-					// var results = new Querystring(resData);
-					window.dbg.log("ID"+this.PKCS11Plugin.TokenID+" Data:"+resData);
-				} catch (e) {
-					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
-					// 'red');
-					sscView.showPopUp('E_ax-failure-reading-certificates',
-							'cross', '0100');
-					window.dbg.log("error reading certificates");
-					rc = false;
-				}
 				
-				if(this.PKCS11Plugin.TokenID === '' || this.PKCS11Plugin.TokenID === undefined || resData === null || resData === '')
-				{
-					window.dbg.log("sc_cb_getCardStatus - empty results retry after pluginreset");
+				var rc = true;
+					window.dbg.log("sc_cb_getCardStatus");
+					var resData;
+					try {
+						this.cardID = this.PKCS11Plugin.TokenID;
+						resData = this.PKCS11Plugin.Data;
+						// var results = new Querystring(resData);
+						window.dbg.log("ID"+this.PKCS11Plugin.TokenID+" Data:"+resData);
+					} catch (e) {
+						// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
+						// 'red');
+						sscView.showPopUp('E_ax-failure-reading-certificates',
+								'cross', '0100');
+						window.dbg.log("error reading certificates");
+						rc = false;
+					}
 					
-					//this.PKCS11Plugin.ResetPlugin();
+					if(this.PKCS11Plugin.TokenID === '' || this.PKCS11Plugin.TokenID === undefined || resData === null || resData === '')
+					{
+						window.dbg.log("sc_cb_getCardStatus - empty results retry after pluginreset");
+						
+						//this.PKCS11Plugin.ResetPlugin();
+						
+						this.sc_getCertificates(this.sc_cb_getCardStatus, viewCb);
+						
+						rc = false;
+											
+					}
 					
-					this.sc_getCertificates(this.sc_cb_getCardStatus, viewCb);
-					
-					rc = false;
-										
-				}
-				if (rc) {
-
-					var server_cb = this.server_cb_cardstatus;
-					var targetURL = "functions/utilities/get_card_status";
-					this.ajax_request(targetURL, server_cb, resData, viewCb);
-				}
+					if (rc) {
+	
+						var server_cb = this.server_cb_cardstatus;
+						var targetURL = "functions/utilities/get_card_status";
+						this.ajax_request(targetURL, server_cb, resData, viewCb);
+					}
 
 			},
 
@@ -2128,6 +2144,21 @@ var SSC_MODEL = new Class(
 				this.sc_run_command(this.sc_cb_resetToken, viewCb);
 
 			},//END sc_ResetToken
+			
+			sc_resetTestToken : function(viewCb) {
+				window.dbg.log("sc_resetTestToken");
+				this.cardID = this.PKCS11Plugin.TokenID;
+				this.cardType = this.PKCS11Plugin.CardType;
+				sscView.setInfoTitle('T_TestCardReset');
+
+				var command = "ResetToken";
+				var plugin_parameter = "PUK=000000000000000000000000000000000000000000000000;PUKEncrypted=no;NewPIN=1234a;NewPINEncrypted=no;";
+				this.PKCS11Plugin.ParamList = plugin_parameter;
+				this.PKCS11Plugin.Request = command;
+
+				this.sc_run_command(this.sc_cb_resetToken, viewCb);
+
+			},//END sc_ResetToken
 
 			sc_cb_resetToken : function(viewCb) {
 				window.dbg.log("sc_cb_resetToken");
@@ -2136,7 +2167,28 @@ var SSC_MODEL = new Class(
 
 				var res = this.PKCS11Plugin.GetResult();
 				var results = new Querystring(res);
+				
 				window.dbg.log("sc_resetToken result" + res);
+				var r = results.get("Result");
+				if(r === 'SUCCESS'){
+					sscView.setPrompt('I_Token_reset_success');
+				}else{
+					var reason = results.get("Reason");
+					window.dbg.log("Error: " + reason);
+
+					if (reason == 'PUKError') {
+						sscView.showPopUp('E_sc-error-resetToken-puk-error ',
+							'cross', '0113');
+					viewCb('error');
+					return;	
+					}else {
+						sscView.showPopUp('E_sc-error-resetToken-error ',
+								'cross', '0113');
+						viewCb('error');
+						return;			
+					}
+				}
+						
 			},//END sc_cb_resetToken
 
 			// fixme: should be in model
