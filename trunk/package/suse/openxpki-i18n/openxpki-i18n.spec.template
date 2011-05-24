@@ -33,7 +33,8 @@ OpenXPKI internationalization files.
 Packaging information:
 OpenXPKI version       [% version %]
 Git commit hash:       [% GIT_COMMIT_HASH %]
-Git tag:               [%- IF GIT_TAGS -%]
+Git description:       [% GIT_DESCRIPTION %]
+Git tags:              [%- IF GIT_TAGS -%]
 [%- GIT_TAGS -%]
 [%- ELSE -%]
 <no tag set>
