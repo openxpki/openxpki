@@ -217,7 +217,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{0, 769}, {90, 14}}</string>
+					<string>{{0, 769}, {96, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -404,9 +404,9 @@ Smartcard Personalization}</string>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2011-05-20 14:21:29 +0200</string>
+	<string>2011-05-24 11:36:18 +0200</string>
 	<key>Modifier</key>
-	<string>Martin Bartosch</string>
+	<string>Scott Hardin</string>
 	<key>NotesVisible</key>
 	<string>NO</string>
 	<key>OriginVisible</key>
@@ -8424,7 +8424,7 @@ CHECKED FOR USABLE NONESCROW CERT}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{135.582, 633.796}, {14, 14}}</string>
+					<string>{{135.582, 634.197}, {14, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -8502,7 +8502,7 @@ CHECKED FOR USABLE NONESCROW CERT}</string>
 					<real>16.844635009765625</real>
 					<key>Points</key>
 					<array>
-						<string>{142.582, 625.652}</string>
+						<string>{142.582, 626.152}</string>
 						<string>{142.582, 702.208}</string>
 					</array>
 					<key>Style</key>
@@ -9193,7 +9193,7 @@ PREPARE CERT INST}</string>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
 					<key>OrthogonalBarPosition</key>
-					<real>0.8289947509765625</real>
+					<real>0.8292083740234375</real>
 					<key>Points</key>
 					<array>
 						<string>{279.5, 391.5}</string>
@@ -9362,7 +9362,7 @@ PREPARE CERT INST}</string>
 					<real>41.511764526367188</real>
 					<key>Points</key>
 					<array>
-						<string>{279.5, 531.831}</string>
+						<string>{279.5, 531.832}</string>
 						<string>{158.332, 536.729}</string>
 					</array>
 					<key>Style</key>
@@ -10151,7 +10151,7 @@ PREPARE CERT INST}</string>
 					<key>Points</key>
 					<array>
 						<string>{187.582, 369.13}</string>
-						<string>{231.321, 352.252}</string>
+						<string>{231.321, 352.251}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -10517,22 +10517,22 @@ START ACTIONS}</string>
 						<integer>24</integer>
 					</dict>
 					<key>ID</key>
-					<integer>1681</integer>
+					<integer>1682</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
 					<key>OrthogonalBarPosition</key>
-					<real>-1</real>
+					<real>5.0870208740234375</real>
 					<key>Points</key>
 					<array>
-						<string>{300.878, 402.089}</string>
-						<string>{300.578, 435.563}</string>
+						<string>{283.929, 402.089}</string>
+						<string>{300.413, 436.063}</string>
 					</array>
 					<key>Style</key>
 					<dict>
 						<key>stroke</key>
 						<dict>
 							<key>HeadArrow</key>
-							<string>0</string>
+							<string>Arrow</string>
 							<key>LineType</key>
 							<integer>2</integer>
 							<key>TailArrow</key>
@@ -10544,7 +10544,7 @@ START ACTIONS}</string>
 						<key>ID</key>
 						<integer>1398</integer>
 						<key>Info</key>
-						<integer>11</integer>
+						<integer>12</integer>
 					</dict>
 				</dict>
 				<dict>
@@ -10554,6 +10554,13 @@ START ACTIONS}</string>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
 					<integer>24</integer>
+					<key>Magnets</key>
+					<array>
+						<string>{0, 1}</string>
+						<string>{0, -1}</string>
+						<string>{1, 0}</string>
+						<string>{-1, 0}</string>
+					</array>
 					<key>Shape</key>
 					<string>FlattenedRectangle</string>
 					<key>Style</key>
@@ -10567,7 +10574,7 @@ START ACTIONS}</string>
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\b\fs20 \cf0 ChosenLoginID\uc0\u8232 
-\b0 chosen_loginid}</string>
+\b0 $chosen_loginid}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -12432,7 +12439,7 @@ NON ESCROW CERT MISSING ON TOKEN}</string>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
 					<key>OrthogonalBarPosition</key>
-					<real>15.787017822265625</real>
+					<real>15.787002563476562</real>
 					<key>Points</key>
 					<array>
 						<string>{303.918, 308.615}</string>
@@ -40555,7 +40562,7 @@ SUCCESS}</string>
 		<key>FitInWindow</key>
 		<true/>
 		<key>Frame</key>
-		<string>{{593, 154}, {1221, 1024}}</string>
+		<string>{{1962, 176}, {1221, 1024}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
