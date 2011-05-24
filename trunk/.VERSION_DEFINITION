@@ -12,6 +12,35 @@ daily_snapshot: %F-MAJOR.MINOR.RELEASESUFFIX
 git_commit: MAJOR.MINOR.RELEASE-GIT_ABBREVIATED_COMMIT_HASH
 git_tag: MAJOR.MINOR.GIT_TAG
 git_branch: GIT_BRANCH
+git_filtered_branch: GIT_FILTERED_BRANCH
+git_description: GIT_DESCRIPTION
+
+# Tag list.
+#
+# List of tags for which a git description should be computed and stored.
+# the keys of this section are interpreted as git tag names (shell glob
+# style wildcards are ok) and queried via 'git describe --tags --match TAG'.
+# If a value is defined, it will be used as the mapped name of the tag, 
+# otherwise the key name is used as a default.
+# The result of this command is available as an internal component via
+# 'git-description-MAPPING'.
+#
+[GIT_REFERENCE_TAGS]
+# We expect a tag on the root commit called 'inital' to allow vergen to
+# compute the number of commits that happened from that one to the tip of
+# the branch. See below (git-revision).
+initial: root
+
+
+# Custom configuration.
+#
+# Sections that start with an underscore are ignored by vergen. While
+# this is usually not very useful, you might wish to take advantage
+# of this when using a perl expression in your custom components.
+# As an example we use this feature to specify the filter branch name for
+# use in our custom component git-filtered-branch (see below).
+[_CUSTOM_CONFIG]
+branch_filter: master
 
 ###########################################################################
 # Version number components
@@ -33,7 +62,13 @@ git_branch: GIT_BRANCH
 #     tag name of the current checkout (empty string if no tag is defined,
 #     if more than one tags are set for the current head then only the first
 #     tag is reported)
-
+# 'git-tags'
+#     identical to git-tag; if more than one tag is set for the current
+#     checkout all tags are listed (comma separated)
+# 'git-description'
+#     result of git describe --tags
+# 'git-description-XXXX'
+#     see above (GIT_REFRENCE_TAGS section)
 
 [revision]
 keyword:          SVN_REVISION
@@ -59,6 +94,10 @@ optional:         yes
 keyword:          GIT_BRANCH
 optional:         no
 
+[git-description]
+keyword:          GIT_DESCRIPTION
+optional:         no
+
 
 # Custom components
 # To create a custom version number component define the following keys:
@@ -66,6 +105,8 @@ optional:         no
 #                   current directory until it finds the specified file.
 #                   The file contents will be assigned as the component
 #                   value.
+# expression:       Perl expression to evaluate when expanding the keyword.
+#                   Mutually exclusive with filename.
 # keyword:          Symbolic name(s) describing the version component that 
 #                   can be used to reference its value.
 #                   More than one keyword can be used for aliasing the 
@@ -90,7 +131,51 @@ filename:         .VERSION_SUFFIX
 keyword:          SUFFIX
 optional:         yes
 
-# pkgrel is the package release number (synonymous with the release of an RPM pkg)
+[git-revision]
+# the following expression returns the number of git commits between the 
+# tag 'initial' (which is expected to exist on the root commit of the 
+# repository) and the current head. if executed on a clean git-svn branch 
+# this returns one less that the subversion revision number (hence we increment
+# the returned number to compensate).
+# note that this only works on a clean git-svn branch, it will report a
+# different commit count on forked branches, dependin on what happened
+# on this branch. if you use this number (e. g. in a package build) it is
+# highly recommended to also include the branch name to indicate on which
+# branch this number was computed.
+expression:	sub {
+:			my $rev = $revision_info->{'git-description-root'};
+:			my ($count) = ($rev =~ m{ -(\d+)-g[\da-f]+ \z }xms);
+:			return $count + 1;
+:		}
+keyword:	GIT_REVISION
+optional:	no
+
+[git-filtered-branch]
+# The following expression returns the 'filtered' current git branch name. 
+# if the branch name matches the value configured in section _CUSTOM_CONFIG,
+# key 'branch_filter' the value is empty, otherwise the current 
+# branch name is returned. Special characters that might cause problem
+# in file names are replaced by underscore characters.
+# This keyword is intended to be used in package descriptions, describing
+# the "flavour" of the package. The idea is to define a default branch
+# (e. g. master) which is replaced with the empty string. When building
+# a package from this branch the resulting package name is the base name.
+# When building from a different branch, the filtered branch name could
+# be part of the package description, helping people to distinguish
+# the customized package from an upstream one.
+expression:     sub {
+:                       my $branch = $revision_info->{'git-branch'};
+:                       if ($branch ne $config{'_CUSTOM_CONFIG'}->{'branch_filter'}) {
+:                           $branch =~ tr/a-zA-Z0-9@\-\.,/_/c;
+:                           return $branch;
+:                       } else {
+:                           return '';
+:                       } }
+keyword:        GIT_FILTERED_BRANCH
+optional:       no
+
+# pkgrel is the package release number (synonymous with the release of an 
+# RPM pkg)
 [pkgrel]
 filename:         .VERSION_PKGREL
 keyword:          PKGREL

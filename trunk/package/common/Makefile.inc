@@ -51,6 +51,13 @@ TT_VERSION_SYMBOLS := $(shell \
 #     tag
 # GIT_TAGS
 #   - contains all tags for this commit (comma separated)
+# GIT_BRANCH
+#   - current git branch
+# GIT_FILTERED_BRANCH
+#   - empty if on default branch (see .VERSION_DEFINITION), otherwise branch
+#     name with unsafe characters replaced by underscore
+# GIT_DESCRIPTION
+#   - contains the git description for this commit
 #
 # The following variables follow the Subversion revision
 # SVN_REVISION
