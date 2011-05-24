@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # Written by Martin Bartosch for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
+# Copyright (c) 2006-2011 by The OpenXPKI Project
 #
 
 use warnings;
@@ -30,6 +30,7 @@ my $git_svn = 'git-svn';
 my $revision_info;
 my $mapping_of;
 my $format_of;
+my $git_reference_tag_of;
 my $saved_directory;
 
 ###########################################################################
@@ -55,27 +56,25 @@ sub slurp {
 sub get_revision_info {
     my $result = {};
 
-    # first get SVN revision information
     my $fh;
-    if (! open $fh, "$svn info -R 2>/dev/null |") {
-	return $result;
-    }
-
-  SVN_INFO:
-    while (<$fh>) {
-	chomp;
-	if (m{ \A Revision: \s* (\d+) }xms) {
-	    $result->{revision} = $1;
-	    next SVN_INFO;
-	}
-	if (m{ \A Last\ Changed\ Rev: \s* (\d+) }xms) {
-	    if (! exists $result->{'last-changed-revision'} ||
-		($1 > $result->{'last-changed-revision'})) {
-		$result->{'last-changed-revision'} = $1;
+    # first get SVN revision information
+    if (open $fh, "$svn info -R 2>/dev/null |") {
+      SVN_INFO:
+	while (<$fh>) {
+	    chomp;
+	    if (m{ \A Revision: \s* (\d+) }xms) {
+		$result->{revision} = $1;
+		next SVN_INFO;
+	    }
+	    if (m{ \A Last\ Changed\ Rev: \s* (\d+) }xms) {
+		if (! exists $result->{'last-changed-revision'} ||
+		    ($1 > $result->{'last-changed-revision'})) {
+		    $result->{'last-changed-revision'} = $1;
+		}
 	    }
 	}
+	close $fh;
     }
-    close $fh;
 
     # check if we are running in a git checkout
     # getting revision info from SVN did not work, try git
@@ -146,7 +145,7 @@ sub get_revision_info {
 	my @git_tags;
 
 	open $fh, qq{ $git show-ref --tags -d | };
-      GITLOGLINE:
+      GITSHOWREF:
 	while (my $line = <$fh>) {
 	    chomp $line;
 	    my ($commit, $tag) = ($line =~ m{ \A (\w+) \s+ refs/tags/(.*) }xms);
@@ -157,6 +156,36 @@ sub get_revision_info {
 	}
 	close $fh;
 	$result->{'git-tags'} = join(', ', @git_tags);
+
+
+	# get most recent tag information
+
+	foreach my $tag (undef, keys %{ $git_reference_tag_of }) {
+	    my $tag_mapping;
+	    if (defined $tag) {
+		$tag_mapping = $git_reference_tag_of->{$tag} || $tag;
+	    }
+
+	    my $reftag = '';
+	    if (defined $tag) {
+		$reftag = "--match $tag";
+	    }
+
+	    open $fh, qq{ $git describe --tags $reftag 2>/dev/null | };
+
+	    my $description;
+	  GITDESCRIBE:
+	    while (my $line = <$fh>) {
+		chomp $line;
+		$description = $line;
+		last GITDESCRIBE;
+	    }
+	    my $postfix = '';
+	    if (defined $tag_mapping) {
+		$postfix = '-' . $tag_mapping;
+	    }
+	    $result->{'git-description' . $postfix} = $description;
+	}
     }
     
     return $result;
@@ -222,17 +251,17 @@ sub expand_keyword {
 $ENV{LANG} = 'C';
 
 GetOptions(\%params,
-	   qw(
-	      help|?
-	      man
-              verbose
-              format=s
-              directory=s
-              dump
-              dumpformat=s
-	      list-formats
-	      list-keywords
-	      )) or pod2usage(-verbose => 0);
+	   'help|?',
+	   'man',
+	   'verbose',
+	   'format=s',
+	   'directory=s',
+	   'dump',
+	   'dumpformat=s',
+	   'list-formats',
+	   'list-keywords',
+	   'show-revisioninfo',
+    ) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
@@ -256,6 +285,12 @@ if (exists $config{FORMAT_DEFINITIONS}) {
     delete $config{FORMAT_DEFINITIONS};
 }
 
+if (exists $config{GIT_REFERENCE_TAGS}) {
+    $git_reference_tag_of = $config{GIT_REFERENCE_TAGS};
+    delete $config{GIT_REFERENCE_TAGS};
+}
+
+
 ### %config
 ### $format_of
 
@@ -263,15 +298,20 @@ COMPONENT:
 foreach my $component (keys %config) {
     ### $component...
 
+    # ignore components starting with an underscore (custom config)
+    if ($component =~ m{ \A _ }xms) {
+	next COMPONENT;
+    }
+    
     # coerce keyword into arrayref
     if (defined $config{$component}->{keyword}) {
-	if (ref $config{$component}->{keyword} eq '') {
+        if (ref $config{$component}->{keyword} eq '') {
 	    $config{$component}->{keyword} = [ $config{$component}->{keyword} ];
 	}
     } else {
         die "No keyword defined for component $component. Stopped";
     }
-    
+
     # built-in components
     if ($component =~ m{ \A (?: revision | 
                                 last-changed-revision |
@@ -279,12 +319,13 @@ foreach my $component (keys %config) {
                                 git-commit-hash | 
                                 git-abbreviated-commit-hash |
                                 git-tag |
-                                git-tags
+                                git-tags |
+                                git-description.*
                             ) \z }xms) {
         $revision_info ||= get_revision_info();
 
         if (! scalar keys %{$revision_info}) {
-            die "Could not determine revision info. (Hint: is svn installed and in path?)";
+            die "Could not determine revision info. (Hint: svn and/or git executable in path?)";
         }
 
         $mapping_of->{component}->{$component} = {
@@ -299,29 +340,49 @@ foreach my $component (keys %config) {
                     && ($config{$component}{optional} =~ m{ \A (?:yes|true|1) \z }ixms));
     ### $optional
 
-    if (! defined $config{$component}{filename}) {
-        die "No 'filename' defined for component '$component'. Stopped";
+    if (defined $config{$component}{filename}
+	&& defined $config{$component}{expression}) {
+	die "Mutually exclusive sources defined for component '$component'. Stopped";
     }
 
-    my $file = upwards_find_file($config{$component}{filename});
-    my $content = '';
-
-    if (defined $file) {
-        $content = slurp($file);
-        if (! defined $content) {
-            $content = '';
-        }
-        chomp $content;
-    } else {
-        if (! $optional) {
-            die "Could not find version file '$config{$component}{filename}' for component '$component' upwards from here. Stopped";
-        }
-        $content = '';
+    my $value;
+    if (defined $config{$component}{filename}) {
+	my $file = upwards_find_file($config{$component}{filename});
+	
+	if (defined $file) {
+	    $value = slurp($file);
+	    if (! defined $value) {
+		$value = '';
+	    }
+	    chomp $value;
+	} else {
+	    if (! $optional) {
+		die "Could not find version file '$config{$component}{filename}' for component '$component' upwards from here. Stopped";
+	    }
+	    # default: empty
+	    $value = '';
+	}
     }
+    if (defined $config{$component}{expression}) {
+	# allow perl expressions in configuration
+	$value = eval $config{$component}{expression};
+	if ($EVAL_ERROR) {
+	    die "Evaluation error in expression of component '$component':\n" .$EVAL_ERROR;
+	}
+	# and even anonymous subroutines
+	if (ref $value eq 'CODE') {
+	    $value = &{$value};
+	}
+    }
+
+    if (! defined $value && ! $optional) {
+	die "Could not determine value for mandatory component '$component'. Stopped";
+    }
+
 
     $mapping_of->{component}->{$component} = {
         keyword => $config{$component}->{keyword},
-        value   => $content,
+        value   => $value,
         type    => 'component',
     }
 }
@@ -394,6 +455,12 @@ if (defined $params{'dump'}) {
     }
 }
 
+if (defined $params{'show-revisioninfo'}) {
+    foreach my $key (sort keys %{$revision_info}) {
+	print $key . '=' . ($revision_info->{$key} || '') . "\n";
+    }
+}
+
 exit 0;
 
 __END__
@@ -416,6 +483,7 @@ vergen [options] COMMAND
                          (default: KEYWORD=VALUE\n)
    --list-formats        lists all user-defined formats available
    --list-keywords       lists all keywords available in formats
+   --show-revisioninfo   show all revision information available
    --verbose             show details about information obtained
 
 =head1 DESCRIPTION
@@ -484,6 +552,11 @@ List all user-defined formats.
 
 List all keywords (can be part of version format of may be referenced directly).
 
+=item B<--show-revisioninfo>
+
+Show all revision information that could be obtained from revision control 
+tools.
+
 =item B<--verbose>
 
 Show which files are processed for determination of the version number
@@ -509,6 +582,24 @@ Example:
 This configuration defines two named formats called 'simple' and 'advanced'
 that can be used with the --format option. The value following the colon
 is used as the output format in this case.
+
+=head2 Git reference tags
+
+The git reference tags section is started by the [GIT_REFERENCE_TAGS] tag.
+
+Example:
+  [GIT_REFERENCE_TAGS]
+  initial: my-root-commit
+
+This section contains a list of reference tag names which are queried
+using git --describe --tags --match TAG.
+
+Each tag name can optionally be mapped to a symbolic name (my-root-commit in
+the above example). If this mapping is left out it defaults to the tag name.
+
+The git repository is queried via git --describe and the result is made
+available to subsequent processing under the name 'git-description-NAME'
+with NAME being replaced with the tag-mapping.
 
 =head2 Custom component definitions
 
