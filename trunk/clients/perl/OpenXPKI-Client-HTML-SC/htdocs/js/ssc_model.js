@@ -111,8 +111,8 @@ var SSC_MODEL = new Class(
 							+ 'classid="clsid:4D41494B-7355-4337-834F-4E4F564F5345">'
 						//	+ 'codebase="dbSignedPKCS11_v1212.cab#Version=1,2,1,4">'
 							+ '<param name="UseJavaScript" value="1">'
-							+ 'Missing DBSMARTCARD PLUGIN v1.2. '
-							+ 'Please intall via Automatic Software Distribution(ASD) or contact your local help desk.'
+							+ 'Missing DBSMARTCARD PLUGIN v1.3. '
+							+ 'Please install via Automatic Software Distribution(ASD) or contact your local help desk.'
 							+ '</object>';
 					// and inject it to start activation
 				 	$("pluginDiv").innerHTML = plugincode;
