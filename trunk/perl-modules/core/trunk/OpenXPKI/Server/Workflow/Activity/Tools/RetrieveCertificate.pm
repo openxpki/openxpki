@@ -84,7 +84,7 @@ sub execute
 	    return 1;
 	}
 	
-	##! 16: 'searching for certificate identifier ' . $cert_identifier'
+	##! 16: 'searching for certificate identifier ' . $cert_identifier
 	my $cert = $dbi->first(
 	    TABLE   => 'CERTIFICATE',
 	    COLUMNS => [
