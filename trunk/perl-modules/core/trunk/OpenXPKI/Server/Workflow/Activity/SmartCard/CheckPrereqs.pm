@@ -128,7 +128,7 @@ sub execute {
 		context_key => 'certs_to_delete',
 	    } );
 	$certs_to_delete->push(
-	    map { $_->{IDENTIFIER} } @{$result->{TASKS}->{SMARTCARD}->{PURGE}}
+	    map { $_->{MODULUS_HASH} } @{$result->{TASKS}->{SMARTCARD}->{PURGE}}
 	    );
 
 	

@@ -22,6 +22,7 @@ use Net::LDAP;
 use Class::Std;
 use MIME::Base64;
 use Data::Dumper;
+use Digest::SHA1 qw( sha1_hex );
 
 sub START {
     # somebody tried to instantiate us, but we are just an
@@ -831,7 +832,7 @@ sub sc_analyze_smartcard {
 		INDEX      => $index,
 		IDENTIFIER => $entry->{IDENTIFIER},
 		SUBJECT    => $entry->{SUBJECT},
-		KEYID      => $entry->{KEYID},
+		MODULUS_HASH => $entry->{MODULUS_HASH},
 	    };
 	}
     }
@@ -1501,11 +1502,20 @@ sub sc_analyze_certificate {
 		    OUTFORMAT => 'printable',
 		});
     }
+
+    if (defined $x509) {
+	my $modulus = $x509->get_parsed()->{BODY}->{MODULUS};
+	$db_hash->{MODULUS} = $modulus;
+
+	# compute PKCS#11 plugin compatible key id
+	# remove leading null bytes for hash computation
+	$modulus =~ s/^(?:00)+//g;
+	$db_hash->{MODULUS_HASH} = sha1_hex(pack('H*', $modulus));
+    }
     
-    # FIXME: compute key id
-    $db_hash->{KEYID} = 'FIXME, P11 keyid not yet available';
     # Windows UPN
-    $db_hash->{SUBJECT_UPN} = 'FIXME';
+    # FIXME
+    # $db_hash->{SUBJECT_UPN} = 'FIXME';
 
     ##! 16: 'parsed certificate: ' . Dumper $db_hash
     return $db_hash;
