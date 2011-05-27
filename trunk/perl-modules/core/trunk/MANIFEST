@@ -215,6 +215,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RetrieveItemFromPasswordsafe.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/StashItemInPasswordsafe.pm
+OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
