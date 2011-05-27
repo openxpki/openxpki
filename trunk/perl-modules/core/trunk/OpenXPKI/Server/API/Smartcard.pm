@@ -1504,18 +1504,19 @@ sub sc_analyze_certificate {
     }
 
     if (defined $x509) {
-	my $modulus = $x509->get_parsed()->{BODY}->{MODULUS};
-	$db_hash->{MODULUS} = $modulus;
+	my $modulus = $x509->get_parsed('BODY', 'MODULUS');
+	##! 16: 'modulus: ' . $modulus
 
 	# compute PKCS#11 plugin compatible key id
 	# remove leading null bytes for hash computation
 	$modulus =~ s/^(?:00)+//g;
 	$db_hash->{MODULUS_HASH} = sha1_hex(pack('H*', $modulus));
+	##! 16: 'pkcs11 plugin keyid hash: ' . $db_hash->{MODULUS_HASH}
     }
     
     # Windows UPN
     # FIXME
-    # $db_hash->{SUBJECT_UPN} = 'FIXME';
+    $db_hash->{SUBJECT_UPN} = 'FIXME';
 
     ##! 16: 'parsed certificate: ' . Dumper $db_hash
     return $db_hash;
