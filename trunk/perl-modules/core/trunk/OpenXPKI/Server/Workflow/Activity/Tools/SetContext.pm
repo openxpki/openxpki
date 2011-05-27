@@ -11,6 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use English;
 
 use Data::Dumper;
 
@@ -46,8 +47,43 @@ sub execute
 	# compromised.
 	if ($options{extendedsyntax}) {
 	    $value = eval $value;
-	}
 
+	    if ($EVAL_ERROR) {
+		OpenXPKI::Exception->throw(
+		    message =>
+		    'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_SETCONTEXT_INVALID_EXTENDED_SYNTAX',
+		    params => {
+			EVAL_ERROR => $EVAL_ERROR,
+		    },
+		    log => {
+			logger   => CTX('log'),
+			priority => 'error',
+			facility => 'system',
+		    },
+		    );
+	    }
+	    # allow anonymous subroutines in configuration
+	    if (ref $value eq 'CODE') {
+		eval {
+		    $value = &{$value}($workflow);
+		};
+		if ($EVAL_ERROR) {
+		    OpenXPKI::Exception->throw(
+			message =>
+			'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_SETCONTEXT_INVALID_EXTENDED_SYNTAX_CODEREF',
+			params => {
+			    EVAL_ERROR => $EVAL_ERROR,
+			},
+			log => {
+			    logger   => CTX('log'),
+			    priority => 'error',
+			    facility => 'system',
+			},
+			);
+		}
+	    }
+	}
+	
 	my $old = $context->param($key);
 	if (! defined $old) {
 	    ##! 16: "setting context $key: $value"
