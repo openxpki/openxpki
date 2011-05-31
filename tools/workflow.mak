@@ -43,6 +43,9 @@ all: $(xmls)
 clean:
 	rm -f $(xmlins)
 
+cleanall: clean
+	rm -f $(xmls)
+
 debug:
 	@echo "XMLS: $(xmls)"
 	@echo "userca: $(userca)"
