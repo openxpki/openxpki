@@ -3294,7 +3294,7 @@ Smartcard PIN Unblock}</string>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2011-05-25 16:06:09 +0200</string>
+	<string>2011-05-25 16:07:50 +0200</string>
 	<key>Modifier</key>
 	<string>Scott Hardin</string>
 	<key>NotesVisible</key>
@@ -13451,7 +13451,7 @@ Smartcard PIN Unblock}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{270.499, 606.069}, {18, 14}}</string>
+					<string>{{232.033, 618.187}, {18, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -13477,7 +13477,7 @@ Smartcard PIN Unblock}</string>
 						<key>ID</key>
 						<integer>1418</integer>
 						<key>Position</key>
-						<real>0.082260787487030029</real>
+						<real>0.43543845415115356</real>
 						<key>RotationType</key>
 						<integer>0</integer>
 					</dict>
@@ -17159,7 +17159,7 @@ Smartcard PIN Unblock}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>0</integer>
+		<integer>2</integer>
 		<key>ExpandedCanvases</key>
 		<array/>
 		<key>FitInWindow</key>
