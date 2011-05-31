@@ -8,8 +8,6 @@ use Test::More;
 use Test::Exception;
 use File::Basename;
 
-plan tests => 26;
-
 use lib qw(     /usr/local/lib/perl5/site_perl/5.8.8/x86_64-linux-thread-multi
   /usr/local/lib/perl5/site_perl/5.8.8
   /usr/local/lib/perl5/site_perl
@@ -33,6 +31,20 @@ $testcfg->read_config_path( '01_cardadm.cfg', \%cfg, @cfgpath );
 
 $testcfg->load_ldap( '01_cardadm.ldif', @cfgpath );
 
+my $plan = 
+    8   # login as RA
+    +3  # Navigate to Smartcard Admin page
+    +4  # Try to get user data by token ID
+    +2  # Navigate back to Smartcard Admin page
+    +4  # Try to get user data by token ID with upper-case
+    +2  # Navigate back to Smartcard Admin page
+    +3  # owner with multiple cards
+    +$cfg{'t-ldap-uid-4'}{token_cnt}   # check each card of user with multiple cards
+    +2  # final logout
+    ;
+
+plan tests => $plan;
+
 my $page_timeout = 60000;
 
 my $sel = Test::WWW::Selenium->new(
@@ -46,7 +58,7 @@ my $sel = Test::WWW::Selenium->new(
 );
 
 ############################################################
-# Login as RA Operator
+# Login as RA Operator - 8 TESTS
 ############################################################
 
 $sel->open_ok("/appsso/");
@@ -59,7 +71,7 @@ $sel->click_ok("submit");
 $sel->wait_for_text_present_ok( 'Request', $page_timeout );
 
 ############################################################
-# Navigate to Smartcard Admin page
+# Navigate to Smartcard Admin page - 3 TESTS
 ############################################################
 $sel->click_ok("link=Request");
 $sel->wait_for_text_present( 'Smartcard Card Admin', $page_timeout );
@@ -67,7 +79,7 @@ $sel->click_ok("link=Smartcard Card Admin");
 $sel->wait_for_page_to_load_ok($page_timeout);
 
 ############################################################
-# Try to get user data by token ID
+# Try to get user data by token ID - 4 TESTS
 ############################################################
 $sel->type_ok( "TokenID", "gem2_001a" );
 $sel->click_ok("//div[\@id='tiki-center']/div/form[2]/div/span/input");
@@ -76,13 +88,13 @@ $sel->text_is( "//div[\@id='tiki-center']/div/table/tbody/tr[2]/td",
     "test.user01\@db.com" );
 
 ############################################################
-# Navigate back to Smartcard Admin page
+# Navigate back to Smartcard Admin page - 2 TESTS
 ############################################################
 $sel->click_ok("link=Smartcard Card Admin");
 $sel->wait_for_page_to_load_ok($page_timeout);
 
 ############################################################
-# Try to get user data by token ID with upper-case
+# Try to get user data by token ID with upper-case - 4 TESTS
 ############################################################
 $sel->type_ok( "TokenID", "gem2_002A" );
 $sel->click_ok("//div[\@id='tiki-center']/div/form[2]/div/span/input");
@@ -91,13 +103,13 @@ $sel->text_is( "//div[\@id='tiki-center']/div/table/tbody/tr[2]/td",
     "test.user02\@db.com" );
 
 ############################################################
-# Navigate back to Smartcard Admin page
+# Navigate back to Smartcard Admin page - 2 TESTS
 ############################################################
 $sel->click_ok("link=Smartcard Card Admin");
 $sel->wait_for_page_to_load_ok($page_timeout);
 
 ############################################################
-# Try to get user data by owner with multiple cards
+# Try to get user data by owner with multiple cards - 3 + (num token ids) TESTS
 ############################################################
 $sel->type_ok( "TOKEN_OWNER", $cfg{'t-ldap-uid-4'}{token_owner} );
 $sel->click_ok("__submit");
@@ -108,7 +120,7 @@ foreach my $ln ( split(/\s*,\s*/, $cfg{'t-ldap-uid-4'}{token_ids} ) ) {
 
 
 ############################################################
-# Logout
+# Logout - 2 TESTS
 ############################################################
 $sel->click_ok("link=Logout");
 $sel->wait_for_page_to_load_ok($page_timeout);

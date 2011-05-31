@@ -8,7 +8,7 @@ use Test::More;
 use Test::Exception;
 use File::Basename;
 
-plan tests => 23;
+plan tests => 32;
 
 use lib qw(     /usr/local/lib/perl5/site_perl/5.8.8/x86_64-linux-thread-multi
   /usr/local/lib/perl5/site_perl/5.8.8
@@ -40,7 +40,7 @@ my $sel = Test::WWW::Selenium->new(
 );
 
 ############################################################
-# Login as User
+# Login as User - 8 TESTS
 ############################################################
 
 $sel->open_ok("/appsso/");
@@ -53,7 +53,7 @@ $sel->click_ok("submit");
 $sel->wait_for_text_present_ok( 'Request', $page_timeout );
 
 ############################################################
-# Navigate to Request Certificate page
+# Navigate to Request Certificate page - 11 TESTS
 ############################################################
 $sel->click_ok("link=Request");
 $sel->wait_for_element_present( 'link=exact:Request Certificate',
@@ -83,13 +83,13 @@ $sel->wait_for_text_present(
     $page_timeout );
 
 ############################################################
-# Logout
+# Logout - 2 TESTS
 ############################################################
 $sel->click_ok("link=Logout");
 $sel->wait_for_page_to_load_ok($page_timeout);
 
 ############################################################
-# Login as RA Operator
+# Login as RA Operator - 8 TESTS
 ############################################################
 
 $sel->open_ok("/appsso/");
@@ -102,13 +102,13 @@ $sel->click_ok("submit");
 $sel->wait_for_text_present_ok( 'Request', $page_timeout );
 
 ############################################################
-# Check for GCM column
+# Check for GCM column - 1 TEST
 ############################################################
 
 $sel->text_is( qw( //div[@id='tiki-center']/div/table[1]/tbody/tr[1]/th[3] ), 'GCM' );
 
 ############################################################
-# Logout
+# Logout - 2 TESTS
 ############################################################
 $sel->click_ok("link=Logout");
 $sel->wait_for_page_to_load_ok($page_timeout);

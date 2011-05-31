@@ -89,7 +89,7 @@ package OpenXPKI::Tests::More::SmartcardCardadm;
         if ( defined $params{'end_state'} ) {
             $end_state = $params{'end_state'};
             delete $params{'end_state'};
-            $self->diag("DEBUG: setting end_state to '$end_state'");
+#            $self->diag("DEBUG: setting end_state to '$end_state'");
         }
 
         #    warn "# connecting as $u/$p\n";
@@ -781,7 +781,7 @@ SKIP: {
         ],
         "Retrieve new card status for challenge with default puk"
     ) or warn $@;
-    $test->diag( "WFID: " . $test->get_wfid() );
+#    $test->diag( "WFID: " . $test->get_wfid() );
 
     # TEST
     $test->param_is( 'unblock_response', $cfg{'t-unblock-chall-1'}{response},
@@ -798,7 +798,7 @@ SKIP: {
         ],
         "Setting puk for token 2"
     ) or croak $@;
-    $test->diag( "WFID: " . $test->get_wfid() );
+#    $test->diag( "WFID: " . $test->get_wfid() );
 
     # TEST - Fetch cardadm workflow
     $test->get_unblock_response_ok(
@@ -809,7 +809,7 @@ SKIP: {
         ],
         "Retrieve new card status for challenge with other puk"
     ) or warn $@;
-    $test->diag( "WFID: " . $test->get_wfid() );
+#    $test->diag( "WFID: " . $test->get_wfid() );
 
     # TEST
     $test->param_is(
