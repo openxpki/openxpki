@@ -17,7 +17,7 @@ use lib qw(     /usr/local/lib/perl5/site_perl/5.8.8/x86_64-linux-thread-multi
 use TestCfg;
 
 my $dirname = dirname($0);
-our @cfgpath = ( $dirname . '/../../../config/tests/smartcard', $dirname );
+our @cfgpath = ( $dirname . '/../../../config/tests/selenium/smartcard', $dirname );
 our %cfg = ();
 
 #my $te
@@ -81,11 +81,12 @@ $sel->wait_for_page_to_load_ok($page_timeout);
 ############################################################
 # Try to get user data by token ID - 4 TESTS
 ############################################################
-$sel->type_ok( "TokenID", "gem2_001a" );
+$sel->type_ok( "TokenID", $cfg{'t-ldap-uid-1'}{token_id} );
 $sel->click_ok("//div[\@id='tiki-center']/div/form[2]/div/span/input");
 $sel->wait_for_page_to_load_ok($page_timeout);
 $sel->text_is( "//div[\@id='tiki-center']/div/table/tbody/tr[2]/td",
-    "test.user01\@db.com" );
+    $cfg{'t-ldap-uid-1'}{token_owner}
+);
 
 ############################################################
 # Navigate back to Smartcard Admin page - 2 TESTS
@@ -96,11 +97,12 @@ $sel->wait_for_page_to_load_ok($page_timeout);
 ############################################################
 # Try to get user data by token ID with upper-case - 4 TESTS
 ############################################################
-$sel->type_ok( "TokenID", "gem2_002A" );
+$sel->type_ok( "TokenID", $cfg{'t-ldap-uid-uppercase'}{token_id} );
 $sel->click_ok("//div[\@id='tiki-center']/div/form[2]/div/span/input");
 $sel->wait_for_page_to_load_ok($page_timeout);
 $sel->text_is( "//div[\@id='tiki-center']/div/table/tbody/tr[2]/td",
-    "test.user02\@db.com" );
+    $cfg{'t-ldap-uid-uppercase'}{token_owner}
+);
 
 ############################################################
 # Navigate back to Smartcard Admin page - 2 TESTS

@@ -35,7 +35,7 @@ use TestCfg;
 
 my $dirname = dirname($0);
 
-our @cfgpath = ( $dirname . '/../../../config/tests/smartcard', $dirname );
+our @cfgpath = ( $dirname . '/../../../config/tests/backend/smartcard', $dirname );
 our %cfg = ();
 
 my $testcfg = new TestCfg;

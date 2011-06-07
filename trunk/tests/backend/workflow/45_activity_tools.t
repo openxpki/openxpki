@@ -4,6 +4,8 @@
 #
 # Tests misc workflow tools like WFObject, etc.
 #
+# Note: these tests are non-destructive. They create their own instance
+# of the tools workflow, which is exclusively for such test purposes.
 
 use strict;
 use warnings;
@@ -24,7 +26,7 @@ use TestCfg;
 
 my $dirname = dirname($0);
 
-our @cfgpath = ( $dirname . '/../../../config/tests/workflow', $dirname );
+our @cfgpath = ( $dirname . '/../../../config/tests/backend/workflow', $dirname );
 our %cfg = ();
 
 my $testcfg = new TestCfg;
