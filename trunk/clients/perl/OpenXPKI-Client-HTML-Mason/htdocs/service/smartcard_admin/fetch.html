@@ -171,11 +171,10 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 % foreach my $attr ( @pers_attrs ) {
 <tr><th><% $attr %></th><td><% $person->{$attr} %></td></tr>
 % } # foreach attr
-<tr><th>Token ID</th><td><% $wf->{CONTEXT}->{token_id} %></td></tr>
 </table>
 <hr>
 
-<h2>Modify Token</h2>
+<h2>Modify Token <% $wf->{CONTEXT}->{token_id} %></h2>
 <& /service/open_form.mhtml, action => 'action.html' &>
 <& /lib/html/hidden.mhtml, 'name' => 'NEXT_ACTION', value => 'scadm_modify_user' &>
 <& /lib/html/hidden.mhtml, 'name' => 'WF_ID', value => $wf->{ID} &>
