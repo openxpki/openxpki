@@ -54,7 +54,8 @@ my @ref_wfs = ();
 my $ldap_data;
 my $token_status;
 my $person = {};
-my @pers_attrs = qw( cn mail telephoneNumber seeAlso );
+my %pers_map = qw( cn cn mail mail telephoneNumber tel );
+my @pers_attrs = qw( cn mail telephoneNumber );
 
 warn
 	"===== INIT BLOCK OF samartcard_admin/fetch.mhtml =====\n",
@@ -114,7 +115,22 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
         if ( ref( $person->{$attr} ) eq 'ARRAY' ) {
             $person->{$attr} = join(', ', @{ $person->{$attr} });
         }
+        if ( not defined $person->{$attr} ) {
+            delete $person->{$attr};
+        }
     } # foreach attr
+
+    # If the person details weren't found directly in the context
+    # params, look in _ldap_data...
+
+    if ( not %{ $person } ) {
+        foreach my $attr ( keys %pers_map ) {
+        if ( $ldap_data->[0]->{$attr} ) {
+        $person->{$pers_map{$attr}} = 
+        $wf->{CONTEXT}->{'_ldap_data'}->[0]->{$attr};
+        }
+        }
+    }
 } # if not error
 
 ############################################################
@@ -148,11 +164,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 %#  D.  Unexpected Error
 %#
 %#      Shouldn't get here, but show some debug details just in case.
-/
-
 %#
-%#  A.  Unique Owner and Token ID (state of WF is 'MAIN'):
-%#      
 
 <H1>Card Administration</H1>
 
@@ -164,15 +176,24 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 %    return;
 %}
 
-%if ( $wf->{STATE} eq 'MAIN' ) {
-<hr>
+%# If a person is found, regardless of the success of the workflow,
+%# show it.
+
+% if ( %{ $person } ) {
+<hr><hr>
 <h2>Owner Details</h2>
+<p>
 <table>
 % foreach my $attr ( @pers_attrs ) {
 <tr><th><% $attr %></th><td><% $person->{$attr} %></td></tr>
 % } # foreach attr
 </table>
-<hr>
+</p>
+
+<hr><hr>
+%}
+
+%if ( $wf->{STATE} eq 'MAIN' ) {
 
 <h2>Modify Token <% $wf->{CONTEXT}->{token_id} %></h2>
 <& /service/open_form.mhtml, action => 'action.html' &>
@@ -188,6 +209,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 
+<hr>
 <& /service/open_form.mhtml, action => 'action.html' &>
 <& /lib/html/hidden.mhtml, 'name' => 'NEXT_ACTION', value => 'scadm_modify_status' &>
 <& /lib/html/hidden.mhtml, 'name' => 'WF_ID', value => $wf->{ID} &>
@@ -201,6 +223,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 
+<hr>
 <& /service/open_form.mhtml, action => 'action.html' &>
 <& /lib/html/hidden.mhtml, 'name' => 'NEXT_ACTION', value => 'scadm_get_unblock_response' &>
 <& /lib/html/hidden.mhtml, 'name' => 'WF_ID', value => $wf->{ID} &>
@@ -214,10 +237,11 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
 
-<hr>
+<hr><hr>
 <h2>Workflow History of Token</h2>
 <& /service/open_form.mhtml, 'action' => 'action.html' &>
 
+% if ( @ref_wfs ) {
 <table>
     <tr><th>&nbsp;</th><th>Workflow ID</th><th>State</th><th>Last Update</th><th>Action</th></tr>
 %       foreach my $ref_wf ( @ref_wfs ) {
@@ -231,9 +255,9 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
             <input type="checkbox" name="wfids"/>
             <input type="hidden" name="workflows" value="<% $wf->{ID} %>"/>
         </td>
-% } else {
+%       } else {
         <td>&nbsp;</td>
-% }
+%       }
         <td>
             <& /lib/html/a.mhtml,
             target => $context->{menu}->get_root() . '/service/workflow/show_instance.html',
@@ -263,6 +287,9 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 </table>
 <& /service/send_form.mhtml &>
 <& /service/close_form.mhtml &>
+% } else { # @ref_wfs is empty
+<p><em>No workflows found for this token</em></p>
+% } # if @ref_wfs
 % }
 %
 %#
@@ -299,7 +326,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 %# elsif ( ref( $ldap_data ) eq 'ARRAY' and @{ $ldap_data } == 1 and ref( $ldap_data->[0]->{scb} eq 'ARRAY' ) ) {
 % elsif ( $wf->{STATE} eq 'FAILURE' and $wf->{CONTEXT}->{error_code} eq 'Multi Token IDs' ) {
 
-<p>Search returned multiple tokens for <% $wf->{CONTEXT}->{token_owner} %>:</p>
+<p><strong>Warning:</strong> Search returned multiple tokens for <em><% $wf->{CONTEXT}->{token_owner} %></em>:</p>
  
 <table>
     <tr><th>Token ID</th><th>Status</th></tr>
@@ -354,4 +381,3 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 </pre>
 
 % }
-
