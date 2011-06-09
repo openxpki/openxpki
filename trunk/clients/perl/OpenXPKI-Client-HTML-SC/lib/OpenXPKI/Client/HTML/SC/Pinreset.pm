@@ -33,7 +33,7 @@ use Apache2::Const -compile => qw( :http );
 
 #Only these functions can be called via HTTP/Perlmod
 sub allowed_methods {
-    qw( get_auth_code start_pinreset pinreset_verify pinreset_confirm )
+    qw( get_auth_code start_pinreset pinreset_verify pinreset_confirm pinreset_cancel)
 }    #only these fucntions can be called via handler
 
 #Function start_pinreset
@@ -55,8 +55,9 @@ sub start_pinreset {
     my $wf_type      = config()->{openxpki}->{pinunblock};
     my $sleep;
     my $errors;
- 	 my $workflowtrace;
+    my $workflowtrace;
     my $msg;
+    my $wf_ID; 
 
 #################################PARAMETER#################################
     $self->start_session();   #call class helper function to create or reinitialise an OpenXPKI connection, and check for the required parameter cardID and cardtype
@@ -111,12 +112,12 @@ sub start_pinreset {
 
     if ( defined $self->param('unblock_wfID') && $self->param('unblock_wfID') ne '') {
 			if($self->param('unblock_wfID') =~ /^[0-9]+$/){
-				$session->{'unblock_wfID'}      = $self->param('unblock_wfID');
-				$responseData->{'unblock_wfID'} = $session->{'unblock_wfID'};
+				$wf_ID      = $self->param('unblock_wfID');
+				$responseData->{'unblock_wfID'} = $wf_ID;
 				$responseData->{'configwftype'} = $wf_type;	
 			}
 		 
-		my $oldState = $self->wfstate( $c, $session->{'unblock_wfID'} , $wf_type);
+		my $oldState = $self->wfstate( $c, $wf_ID , $wf_type);
  		
 
 		if(defined $oldState &&  $oldState ne "I18N_OPENXPKI_CLIENT_WEBAPI_SC_WFSTATE_ERROR_CANT_GET_WORKFLOW_INFO" && $oldState ne "I18N_OPENXPKI_CLIENT_WEBAPI_SC_WFSTATE_ERROR_WF_ID_REQUIRED" )
@@ -127,19 +128,19 @@ sub start_pinreset {
 						'I18N_OPENXPKI_CLIENT_WEBAPI_SC_WFSTATE_ERROR_CANT_GET_WORKFLOW_INFO')
 					)
 			{
-					$session->{'unblock_wfID'} = 'undefined';
+					$wf_ID = 'undefined';
 	
 	# 			$responseData->{'error'} = "error";
 	# 			push(@{$errors},"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_ERROR_WF_ID_INVALID");
 			}
 		}else
 		{
-			$session->{'unblock_wfID'} = 'undefined';
+			$wf_ID = 'undefined';
 		}
     }
 
-    if (   ( !defined $session->{'unblock_wfID'}  )
-        or ( $session->{'unblock_wfID'} eq 'undefined' ) )
+    if (   ( !defined $wf_ID  )
+        or ( $wf_ID eq 'undefined' ) )
     {
 
         $msg = $c->send_receive_command_msg(
@@ -181,12 +182,9 @@ sub start_pinreset {
             );
         }
 
-        my $wf_id = $msg->{PARAMS}->{WORKFLOW}->{ID};
-        $responseData->{'unblock_wfID'} = $wf_id;
-        if ( defined $wf_id ) {
-            $session->{'unblock_wfID'} = $wf_id;
-        }
-        else {
+        $wf_ID = $msg->{PARAMS}->{WORKFLOW}->{ID};
+        $responseData->{'unblock_wfID'} = $wf_ID;
+        if ( !defined $wf_ID or $wf_ID eq '' ) {
             $responseData->{'error'} = "error";
             push( @{$errors},
                 "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_ERROR_WF_ID_REQUIRED"
@@ -197,7 +195,7 @@ sub start_pinreset {
 
         $msg = $c->send_receive_command_msg(
             'execute_workflow_activity',
-            {   'ID'       => $session->{'unblock_wfID'},
+            {   'ID'       => $wf_ID,
                 'ACTIVITY' => 'scunblock_initialize',
             },
         );
@@ -228,7 +226,7 @@ sub start_pinreset {
 
     }
 
-    if ( $session->{'unblock_wfID'} eq 'undefined' ) {
+    if ( $wf_ID eq 'undefined' ) {
         $responseData->{'error'} = "error";
         push( @{$errors},
             "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_ERROR_WF_ID_REQUIRED"
@@ -241,7 +239,7 @@ sub start_pinreset {
         {
             $msg = $c->send_receive_command_msg(
                 'execute_workflow_activity',
-                {   'ID'       => $session->{'unblock_wfID'},
+                {   'ID'       => $wf_ID,
                     'ACTIVITY' => 'scunblock_store_auth_ids',
                     'PARAMS'   => {
                         auth1_id => $session->{'email1'},
@@ -313,8 +311,8 @@ sub start_pinreset {
 }
     }
     $session->{'unblockWf_state'} =$msg->{PARAMS}->{WORKFLOW}->{STATE} ;
-    $session->{'unblock_wfID'} =$msg->{PARAMS}->{WORKFLOW}->{ID};
-    $responseData->{'unblock_wfID'}=$session->{'unblock_wfID'};
+    $wf_ID =$msg->{PARAMS}->{WORKFLOW}->{ID};
+    $responseData->{'unblock_wfID'}=$wf_ID;
     $responseData->{'cardID'} = $session->{'cardID'};
     $responseData->{'state'}  =  $session->{'unblockWf_state'};
 	 $responseData->{'workflowtrace'} = $workflowtrace;
@@ -345,7 +343,7 @@ sub list_active_workflows {
     my $u = config()->{openxpki}->{user};
     my $p = config()->{openxpki}->{role};
     my $msg;
-    my $wf_id;
+    my $wf_ID;
     my $action;
 	my $workflowtrace;
 	my $errors	;
@@ -420,7 +418,7 @@ sub list_active_workflows {
 # is( $workflows[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
 #    $wf_id, 'Workflow ID matches our ID' )
 #    or die("Workflow ID returned for token_id does not match our workflow ID: ", $@, Dumper($msg) );
-    $wf_id = $workflows[0]->{'WORKFLOW.WORKFLOW_SERIAL'};
+    $wf_ID = $workflows[0]->{'WORKFLOW.WORKFLOW_SERIAL'};
     my $count = @workflows;
     $responseData->{'count_wf_id'}   = $count;
     #$responseData->{'wf_array_item'} = Dumper( $workflows[0] );
@@ -458,7 +456,7 @@ sub pinreset_verify {
     my $wf_type      = config()->{openxpki}->{pinunblock};
     my $u            = config()->{openxpki}->{user};
     my $p            = config()->{openxpki}->{role};
-    my $wf_id;
+    my $wf_ID;
     my $errors;
 	 my $workflowtrace; 
     my $msg;
@@ -544,11 +542,11 @@ my $userpin;
         );
     }else{
 	    
-        $session->{'unblock_wfID'}      = $self->param('unblock_wfID');
-        $responseData->{'unblock_wfID'} = $session->{'unblock_wfID'};
+        $wf_ID      = $self->param('unblock_wfID');
+        $responseData->{'unblock_wfID'} = $wf_ID;
     }
 
-    if ( !defined $session->{'unblock_wfID'} ) {
+    if ( !defined $wf_ID ) {
 
 # At this point, the user has re-started the session and should get
 # 	# the current workflow for the inserted token id
@@ -606,8 +604,7 @@ my $userpin;
 
     }
     else {
-        $responseData->{'unblock_wfID'} = $session->{'unblock_wfID'};
-        $wf_id = $session->{'unblock_wfID'};
+        $responseData->{'unblock_wfID'} = $wf_ID;
     }
 
 ####If error occured cancel request and send back error MSGs####
@@ -617,8 +614,8 @@ my $userpin;
     }
 #############################################################################
 
-    $responseData->{'unblock_wfID'} = $wf_id;
-    my $actual_state = $self->wfstate( $c, $wf_id, $wf_type  );
+    $responseData->{'unblock_wfID'} = $wf_ID;
+    my $actual_state = $self->wfstate( $c, $wf_ID, $wf_type  );
 	
 	if($actual_state eq 'FAILURE' ){
 		$session->{'wfstate'} = $msg->{PARAMS}->{WORKFLOW}->{STATE};
@@ -670,7 +667,7 @@ my $userpin;
 
         $msg = $c->send_receive_command_msg(
             'execute_workflow_activity',
-            {   'ID'       => $session->{'unblock_wfID'},
+            {   'ID'       => $wf_ID,
                 'ACTIVITY' => 'scunblock_post_codes',
                 'PARAMS'   => {
                     _auth1_code => $session->{'activationCode1'},
@@ -713,7 +710,7 @@ my $userpin;
 
         $msg = $c->send_receive_command_msg(
             'execute_workflow_activity',
-            {   'ID'       => $session->{'unblock_wfID'},
+            {   'ID'       => $wf_ID,
                 'ACTIVITY' => 'scunblock_fetch_puk',
                 'PARAMS'   => {},
                 'WORKFLOW' =>  $wf_type ,
@@ -825,7 +822,7 @@ sub pinreset_confirm {
     my $msg;
     my $errors;
 	 my $workflowtrace;
-    my $wf_id;
+    my $wf_ID;
     my $action;
 
 #################################PARAMETER#################################
@@ -953,6 +950,81 @@ sub pinreset_confirm {
 
 }
 
+#Function pinreset_cancel
+#Description: set pinreset workflow state to failiure
+#Required Parameter via HTTPRequest:
+#		cardID  						- cardSerialNumber
+#		cardType 					- CardType String
+#		unblock_wfID				- Workflow ID
+
+sub pinreset_cancel {
+    my ($self)       = @_;
+    my $sessionID    = $self->pnotes->{a2c}{session_id};
+    my $session      = $self->pnotes->{a2c}{session};
+    my $responseData ;
+    my $c            = 0;
+    my $type;
+    my $wf_type = config()->{openxpki}->{pinunblock};   # $wf_pin_unblock ;
+    my $msg;
+    my $wf_ID;
+    my $action;
+	my $workflowtrace;
+	my $errors	;
+
+    $self->start_session();
+    $c            = $session->{"c"};
+    $responseData = $session->{"responseData"};
+    $errors		= $session->{"errors"};
+    $workflowtrace 	=$session->{"workflowtrace"};
+
+ 	 $responseData->{"wf_type"} = $wf_type;
+
+      if (!defined $c || $c == 0)
+      {
+                $responseData->{'error'} = "error";
+                            push(
+                 @{$errors},
+		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		  );
+
+        $responseData->{'errors'} = $errors;
+        return $self->send_json_respond($responseData);
+
+      }
+
+    if ( !defined $self->param("unblock_wfID") || $self->param("unblock_wfID") eq '' ) {
+        $responseData->{'error'} = "error";
+        push( @{$errors},
+            "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_MISSING_PARAMETER_WF_ID"
+        );
+    }else{
+	    
+	$wf_ID     = $self->param('unblock_wfID');
+        $responseData->{'unblock_wfID'} = $wf_ID;
+    }
+
+####If error occured cancel request and send back error MSGs####
+    if ( defined $responseData->{'error'} ) {
+        return $self->send_json_respond($responseData);
+    }
+
+
+
+
+           $msg = $c->send_receive_command_msg(
+            'execute_workflow_activity',
+            {   'ID'       => $wf_ID,
+                'ACTIVITY' => 'scunblock_user_abort',
+                'PARAMS'   => {},
+                'WORKFLOW' =>  $wf_type ,
+            },
+        );
+    
+        $responseData->{'msg'} = $msg;
+        return $self->send_json_respond($responseData);
+
+
+}
 
 
 1;

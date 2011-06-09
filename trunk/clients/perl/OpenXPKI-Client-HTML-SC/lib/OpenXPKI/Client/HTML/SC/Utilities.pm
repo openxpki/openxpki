@@ -336,8 +336,6 @@ foreach my $wf_type (keys %{$activeworkflows}) {
 # 	push( @activewf, \%wfinfo );
 	#}
 
-$responseData->{'msg'} = $msg;
-
 $responseData->{'creator_userID'} = 'set:'.$session->{'creator_userID'};
 $responseData->{'cardOwner'} = $session->{'cardOwner'};	
 $responseData->{'userWF'} = \@activewf;
@@ -346,7 +344,7 @@ $responseData->{'msg'} = $msg;
 
     $session->{"c"}            = $c;
     $responseData->{'errors'}  = $errors;
-	 $responseData->{'workflowtrace'}  = $workflowtrace;
+    $responseData->{'workflowtrace'}  = $workflowtrace;
     $session->{"responseData"} = $responseData;
 		
 

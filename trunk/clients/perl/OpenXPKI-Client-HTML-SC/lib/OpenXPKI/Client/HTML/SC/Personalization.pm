@@ -49,7 +49,7 @@ sub server_personalization {
 
     my $msg;
     my @certs;
-    my $AUTHUSER  = 'selfservice';
+    #my $AUTHUSER  = 'selfservice';
 	 my $wf_ID = undef;
 	 my $wf_action = '';
 	 my $activity;
@@ -149,10 +149,10 @@ my $certificate_to_install;
 
 #########################Parse Input parameter###########
 
-    if ( defined $self->{r}->headers_in()->get('ct-remote-user') ) {
-        $AUTHUSER = $self->{r}->headers_in()->get('ct-remote-user');
-    }
-    $responseData->{'cardOwner'} = $session->{'cardOwner'};	
+#    if ( defined $self->{r}->headers_in()->get('ct-remote-user') ) {
+#        $AUTHUSER = $self->{r}->headers_in()->get('ct-remote-user');
+#    }
+#    $responseData->{'cardOwner'} = $session->{'cardOwner'};	
 
 	 $responseData->{'found_wf_ID'} =  $self->param("perso_wfID");
     if ( defined $self->param("perso_wfID") && ( $self->param("perso_wfID") ne 'undefined' ) && ( $self->param("perso_wfID") ne '' ) ) {
@@ -190,7 +190,7 @@ if( !defined $wf_ID )
         'WORKFLOW' => $wf_type,
 	    'PARAMS' => {
 	    'certs_on_card' => $certsoncard,
-	    'login_id'    => $AUTHUSER ,
+	    'login_id'    => $session->{'cardOwner'} ,
 	    'token_id'    => $session->{'id_cardID'},
 	},
 	);

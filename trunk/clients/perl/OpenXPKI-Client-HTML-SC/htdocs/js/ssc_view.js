@@ -35,7 +35,7 @@ var SSC_VIEW = new Class(
 					'processPersonalization','processPersonalization_done',
 					'processPins', 'processPins_done', 'processAuthCodes_done',
 					'processCardInfo', 'showSmartcardStatus','showAuthCode',
-					'showAuthPersonDlg',
+					'showAuthPersonDlg','processBackUnblock',
 					'init_done', 'unblockCard', 'changePin', 'tr_' ,'setTranslatedElementText',
 					'changeLanguage_step2'],
 
@@ -293,7 +293,8 @@ var SSC_VIEW = new Class(
 						sscView.setInfoRight('IT_Info', 'I_unblock');
 						// set next & back action
 						this.setNextAction('T_cardUnblock', this.processAuthPersons, true);
-						this.setBackAction('T_back',function(){ this.processCardInfo('showStatus');}.bind(this), true);
+						//this.setBackAction('T_back',function(){ this.processCardInfo('showStatus');}.bind(this), true);
+						this.setBackAction('T_back',this.processBackUnblock, true);
 						
 					}
 					break;
@@ -321,8 +322,8 @@ var SSC_VIEW = new Class(
 						sscView.setInfoRight('IT_Info', 'I_unblock');
 						// set next & back action
 						this.setNextAction('T_cardUnblock', this.processAuthPersons, true);
-						this.setBackAction('T_back',function(){ this.processCardInfo('showStatus');}.bind(this), true);
-						
+						//this.setBackAction('T_back',function(){ this.processCardInfo('showStatus');}.bind(this), true);
+						this.setBackAction('T_back',this.processBackUnblock, true);
 					}
 					
 					this.setNextAction('T_startActivation', this.processAuthPersons, true);
@@ -501,7 +502,8 @@ var SSC_VIEW = new Class(
 						
 					} else {
 						// set back action
-						this.setBackAction('T_back',function(){ this.processCardInfo('showStatus');}.bind(this), true);
+						//this.setBackAction('T_back',function(){ this.processCardInfo('showStatus');}.bind(this), true);
+						this.setBackAction('T_back',this.processBackUnblock, true);
 					}
 					
 					
@@ -572,7 +574,8 @@ var SSC_VIEW = new Class(
 						this.setInfoTitle('T_cardUnblock');
 						// set next action
 						this.setNextAction('T_cardUnblock', this.processAuthPersons, true);
-						this.setBackAction('T_back',function(){ this.processCardInfo('showStatus');}.bind(this), true);		
+						//this.setBackAction('T_back',function(){ this.processCardInfo('showStatus');}.bind(this), true);		
+						this.setBackAction('T_back',this.processBackUnblock, true);
 					}
 					
 					
@@ -589,10 +592,9 @@ var SSC_VIEW = new Class(
 					
 					// set right info text
 					sscView.setInfoRight('IT_Info', 'I_actStep2');
-					
-					sscView.setInfoRight('IT_Info', 'I_actStep2');
+					window.dbg.log('cardActivation ? = ' + sscModel.user.cardActivation);
 					// set title
-					if (sscModel.user.cardActivation  === true ){
+					if (sscModel.user.cardActivation === true ){
 						this.setInfoTitle('T_ScActivationStep2');
 						// set next & back action
 						this.setNextAction('T_proceedActStep2', this.processPins, true);
@@ -950,6 +952,12 @@ var SSC_VIEW = new Class(
 				
 			},
 			
+			processBackUnblock : function(){
+				window.dbg.log('processBackUnblock');
+				sscModel.server_cancel_unblock(this.processCardInfo);
+				
+			},
+			
 			// -----------------------------------------------------------
 			// helper
 			// -----------------------------------------------------------
@@ -989,16 +997,19 @@ var SSC_VIEW = new Class(
 			unblockCard : function() {
 
 				window.dbg.log('unblockCard');
-				this.setPrompt();
-				this.showAuthPersonDlg();
-				// set title
-				this.setInfoTitle('T_Unblock');
-				// set right info text
-				sscView.setInfoRight('IT_Info', 'I_authPers');
-				// set next & back action
-				this.setNextAction('T_cardUnblock', this.processAuthPersons, true);  
-				this.setBackAction('T_back', function(){ this.processCardInfo('showStatus');}.bind(this), true);
 				
+				this.processCardInfo('enterAuthPersons');	
+
+//				this.setPrompt();
+//				this.showAuthPersonDlg();
+//				// set title
+//				this.setInfoTitle('T_Unblock');
+//				// set right info text
+//				sscView.setInfoRight('IT_Info', 'I_authPers');
+//				// set next & back action
+//				this.setNextAction('T_cardUnblock', this.processAuthPersons, true);  
+//				this.setBackAction('T_back', function(){ this.processCardInfo('showStatus');}.bind(this), true);
+//				
 			},
 
 			// -----------------------------------------------------------

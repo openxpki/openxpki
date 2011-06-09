@@ -50,6 +50,7 @@ var SSC_MODEL = new Class(
 				this.serverPIN = null;
 				this.state = null;
 				this.rnd_pin_installed = 0;
+				this.new_puk_installed = 0;
 				this.perso_wfID;
 				this.unblock_wfID;
 				this.maxrequests = 0;
@@ -79,10 +80,10 @@ var SSC_MODEL = new Class(
 				this.stateFilter[5]= 'PKCS12_TO_INSTALL';
 				this.stateFilter[6]= 'HAVE_CERT_TO_DELETE';
 				this.stateFilter[7]= 'HAVE_TOKEN_OWNER';
-				this.stateFilter[8]= 'CAN_WRITE_PIN';
-				this.stateFilter[9]= 'ISSUE_CERT';
-				this.stateFilter[10]= 'HAVE_CERT_TO_PUBLISH';
-				this.stateFilter[11]= 'HAVE_CERT_TO_UNPUBLISH';
+				//this.stateFilter[8]= 'CAN_WRITE_PIN';
+				this.stateFilter[8]= 'ISSUE_CERT';
+				this.stateFilter[9]= 'HAVE_CERT_TO_PUBLISH';
+				this.stateFilter[10]= 'HAVE_CERT_TO_UNPUBLISH';
 				
 				//this.stateFilter[8]= 'NON_ESCROW_CSR_AVAIL';
 				// test json
@@ -461,6 +462,7 @@ var SSC_MODEL = new Class(
 			ajax_request : function(targetURL, server_cb, resData, viewCb) {
 				window.dbg.log("ajax call - " + targetURL + ' data:' + resData);
 				sscView.setStatusMsg("I_commServer", ' ', 'blue');
+				this.cardID = this.PKCS11Plugin.TokenID;
 
 				var jsonRequest = new Request.JSON( {
 					method : 'post',
@@ -1286,13 +1288,13 @@ var SSC_MODEL = new Class(
 										var plugin_parameter = 
 												"KeyID="
 												+ cert_to_delete
-												+ ";DeleteCert=yes;DeleteKey=yes;UserPIN="
-												+ this.serverPIN
-												+ ';';
+												+ ";DeleteCert=yes;DeleteKey=yes;"
+												+ ";UserPIN=" + this.serverPIN
+												+ ';UserPINEncrypted=yes';
 										// alert(plugin_parameter);
 										window.dbg.log(plugin_parameter);
 										this.PKCS11Plugin.ParamList = plugin_parameter;
-										this.PKCS11Plugin.UserPIN = this.serverPIN;
+										//this.PKCS11Plugin.UserPIN = this.serverPIN;
 
 										this.PKCS11Plugin.Request = command;
 										// alert(cert_to_install);
@@ -1547,9 +1549,16 @@ var SSC_MODEL = new Class(
 					window.dbg.log(plugin_parameter);
 					
 					this.PKCS11Plugin.ParamList = plugin_parameter;
-					this.PKCS11Plugin.Request = command;
+					if(this.new_puk_installed !== 1){
+						this.PKCS11Plugin.Request = command;
+						this.sc_run_command(this.sc_cb_installPUK, viewCb);
+					}else{
+						sscView.showPopUp(
+								'E_sc-error-currupted_puk_do_not_retry',
+								'cross', '033');
+					}
 					
-					this.sc_run_command(this.sc_cb_installPUK, viewCb);
+					
 				} else {
 					sscView.showPopUp(
 							'E_sc-error-install-rndpuk-missing-params',
@@ -1608,7 +1617,9 @@ var SSC_MODEL = new Class(
 						
 						}else{
 							window.dbg.log("PUK already installed continue personalization");
+							this.new_puk_installed = 1;
 							this.server_status_personalization(viewCb);
+							
 						}
 						window.dbg.log("sc_installPUK status="+this.PKCS11Plugin.PluginStatus);
 		
@@ -2046,6 +2057,62 @@ var SSC_MODEL = new Class(
 				this.ajax_request(targetURL, server_cb, resData, viewCb);
 
 			},//END server_pinrest_verify
+			
+			
+			server_cancel_unblock : function(viewCb) {
+				window.dbg.log("server_cancel_unblock");
+				
+				
+				window.dbg.log("unblock WF id:" + this.unblock_wfID);
+				if(this.unblock_wfID !== undefined){
+							
+				var server_cb = this.server_cb_cancel_unblock;
+				var targetURL = "functions/pinreset/pinreset_cancel";
+				var resData = 'unblock_wfID=' + this.unblock_wfID
+						+ '&TokenID=' + this.cardID + '&CardType='
+						+ this.cardType ;
+				
+				
+				this.ajax_request(targetURL, server_cb, resData, viewCb);
+				
+				}else{
+					window.dbg.log("no active workflow return to status" );
+					viewCb('showStatus');
+				}
+			
+			},
+			
+			server_cb_cancel_unblock : function(data, viewCb) {
+				window.dbg.log("server_cb_cancel_unblock");
+				
+				try {
+					var err = data.error;
+				} catch (e) {
+					// sscView.setStatusMsg('T_Server_Error','P_ContactAdmin',
+					// 'red');
+					sscView.showPopUp('E_backend-Error-unblock-cancel',
+							'cross', '0218');
+					window.dbg.log('server backend error');
+					// sscView.showPopUp('T_Server_Error'+error ,'critical');
+				}
+				for ( var i = 0; i < data.errors.length; i++) {
+					if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER') {
+						window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+						sscView.showPopUp('E_session_timeout_error', 'cross',
+								'0222');
+						return;
+					}
+
+				}
+				this.unblock_wfID = undefined;
+				window.dbg.log("show card status");
+				viewCb('showStatus');
+				sscView.setOverallStatus('green');
+				
+				
+				
+				
+			},
 
 			//######################PIN CHANGE#########################	
 			sc_changePIN : function(userpin, newpin, viewCb) {

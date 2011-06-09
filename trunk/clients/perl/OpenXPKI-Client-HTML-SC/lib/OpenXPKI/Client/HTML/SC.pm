@@ -79,12 +79,15 @@ sub start_session {
                     config()->{openxpki}->{role}
                 );
                 $self->disconnect($c);
+		 $c = 0;
                
                 
 
                 $session->{'openxPKI_Session_ID'} = undef;
                 $session->{'creator_userID'}	  = undef;
 		$session->{'cardOwner'}		  = undef;
+		$session->{'unblock_wfID'} 	  = undef;
+		$session->{'perso_wfID'} 	  = undef;
                 $session->{'cardID'}              = $self->param("cardID");
                 $responseData->{'cardID'}         = $session->{'cardID'};
                 $responseData->{'userlogin'}      = $ssousername;
@@ -185,10 +188,14 @@ sub start_session {
             $c = 0;
 
         }else { 
-             if ( $c != 0 ) {
-             	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
-                $responseData->{'start_msg'} = "OpenXPKISession resumed";
-             }
+
+	     if ( $c ne 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_OPENXPKICONNECTION_ERROR_INIT_CONNECTION_FAILED'){
+
+	      if ( $c != 0 ) {
+		  $session->{'openxPKI_Session_ID'} = $c->get_session_id();
+		  $responseData->{'start_msg'} = "OpenXPKISession resumed";
+	      }
+	    }
 
       }
   }
