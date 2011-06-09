@@ -1,0 +1,14 @@
+The smartcard remote unblock interface has the following three html files:
+
+index.html
+
+    Presents the initial input fields for user or token ID.
+
+fetch.html
+
+    Fetches and displays the results for the given user or token,
+    prompting the user for the challenge string
+
+action.html
+
+    Determines the challenge response and displays it for the user

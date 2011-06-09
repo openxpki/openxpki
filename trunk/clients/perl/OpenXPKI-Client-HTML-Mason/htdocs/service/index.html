@@ -40,8 +40,11 @@
     'heading' => 2,
   &>
 % }
-% elsif ( $role eq 'Card Manager') {
+% elsif ( $role eq 'Card Manager' ) {
 % $m->redirect("smartcard_admin");
+% }
+% elsif ( $role eq 'Card Remote Unblock' ) {
+% $m->redirect("smartcard_remote_unblock");
 % }
 % else {
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_INTRO_TITLE') %></h1>

@@ -34,6 +34,10 @@
                     {
                         MENU => 'card_manager_menu',
                     },
+                    'Card Remote Unblock' =>
+                    {
+                        MENU => 'card_remote_unblock_menu',
+                    },
                 },
                 MENU =>
                 {
@@ -43,6 +47,13 @@
                                    "smartcard_admin", undef ],
 #                        ["MENU", "I18N_OPENXPKI_HTML_MENU_CARD_MANAGEMENT",
 #                                   "card_management", undef ],
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
+                                   "logout", undef ]
+                    ],
+                    'card_remote_unblock_menu' =>
+                    [
+                        ["ACTION", "I18N_OPENXPKI_HTML_MENU_SMARTCARD_CARD_REMOTE_UNBLOCK",
+                                   "smartcard_remote_unblock", undef ],
                         ["ACTION", "I18N_OPENXPKI_HTML_MENU_LOGOUT",
                                    "logout", undef ]
                     ],
@@ -214,6 +225,10 @@
                     "smartcard_admin" =>
                     {
                         CMD => "service/smartcard_admin/index.html"
+                    },
+                    "smartcard_remote_unblock" =>
+                    {
+                        CMD => "service/smartcard_remote_unblock/index.html"
                     },
                     "workflow_list_types" =>
                     {
