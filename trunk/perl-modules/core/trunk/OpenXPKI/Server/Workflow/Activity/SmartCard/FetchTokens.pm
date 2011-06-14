@@ -234,7 +234,7 @@ sub execute {
 
 
     # 
-    # If just one person with just one token was found...
+    # If just one person was found...
     # 
 
     if ( @{ $recs } == 1 ) {

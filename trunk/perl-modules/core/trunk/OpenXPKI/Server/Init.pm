@@ -338,6 +338,13 @@ sub __do_init_workflow_bulk_keys {
                     'certificate' => 1,
                 },
             },
+            'I18N_OPENXPKI_WF_TYPE_SMARTCARD_CARDADM' =>
+            {
+                'keys' => {
+                    'multi_ids' => 1,
+                },
+            },
+
         },
     });
     return 1;
