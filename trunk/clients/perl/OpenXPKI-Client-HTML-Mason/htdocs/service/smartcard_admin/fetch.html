@@ -324,7 +324,7 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 %#      entries):
 %
 %# elsif ( ref( $ldap_data ) eq 'ARRAY' and @{ $ldap_data } == 1 and ref( $ldap_data->[0]->{scb} eq 'ARRAY' ) ) {
-% elsif ( $wf->{STATE} eq 'FAILURE' and $wf->{CONTEXT}->{error_code} eq 'Multi Token IDs' ) {
+% elsif ( $wf->{STATE} eq 'FAILURE' and defined $wf->{CONTEXT}->{multi_ids} ) {
 
 <p><strong>Warning:</strong> Search returned multiple tokens for <em><% $wf->{CONTEXT}->{token_owner} %></em>:</p>
  
