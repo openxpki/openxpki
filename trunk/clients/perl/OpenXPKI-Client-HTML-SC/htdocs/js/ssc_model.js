@@ -462,7 +462,7 @@ var SSC_MODEL = new Class(
 			ajax_request : function(targetURL, server_cb, resData, viewCb) {
 				window.dbg.log("ajax call - " + targetURL + ' data:' + resData);
 				sscView.setStatusMsg("I_commServer", ' ', 'blue');
-				this.cardID = this.PKCS11Plugin.TokenID;
+				//this.cardID = this.PKCS11Plugin.TokenID;
 
 				var jsonRequest = new Request.JSON( {
 					method : 'post',
