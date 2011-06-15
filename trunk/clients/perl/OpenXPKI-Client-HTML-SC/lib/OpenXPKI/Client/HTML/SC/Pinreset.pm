@@ -1015,7 +1015,8 @@ sub pinreset_cancel {
             'execute_workflow_activity',
             {   'ID'       => $wf_ID,
                 'ACTIVITY' => 'scunblock_user_abort',
-                'PARAMS'   => {},
+                'PARAMS'   => {
+		error_code => 'user abort'},
                 'WORKFLOW' =>  $wf_type ,
             },
         );

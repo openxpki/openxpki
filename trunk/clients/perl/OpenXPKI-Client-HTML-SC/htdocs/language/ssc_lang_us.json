@@ -119,7 +119,7 @@
       "T_instDigId":  "Finalizing personalization",
       "T_invalidAuthCode":  "Invalid authorization code(s)",
       "T_invalidPolicy":  "PIN does not meet complexity rules, lower case characters and numbers only (at least 5 characters)",
-      "T_lastChanges":  "Last Changes 11.05.2011",
+      "T_lastChanges":  "Last Changes 15.06.2011",
       "T_newPinError":  "New PIN does not meet the complexity requirements, lower case characters and numbers only (at least 5 characters)",
       "T_persAccount":  "Personalization for account:",
       "T_persAccountSel":  "Choose account to personalize",
