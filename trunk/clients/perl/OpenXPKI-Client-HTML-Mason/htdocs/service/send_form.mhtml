@@ -1,5 +1,12 @@
+<%args>
+    $id => undef
+</%args>
           <div class="form_button_bar">
             <span class="form_button_bar_button">
-              <input type="submit" name="__submit" value="<% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT") %>"/>
+              <input type="submit" name="__submit" value="<% i18nGettext("I18N_OPENXPKI_CLIENT_HTML_MASON_SUBMIT") %>"
+% if (defined $id) {
+id="<% $id %>"
+% }
+/>
             </span>
           </div> <!-- form button bar -->
