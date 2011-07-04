@@ -6,7 +6,7 @@ INSTALL      = install
 LANGS         = en_US en_GB de_DE ru_RU
 PO_SOURCES   = $(LANGS:%=%/openxpki.po)
 MO_TRANSLATIONS = $(LANGS:%=%/$(MO_FILE))
-POT_SOURCES  = ../perl-modules/core/trunk ../clients/perl/OpenXPKI-Client ../clients/perl/OpenXPKI-Client-SCEP ../clients/perl/OpenXPKI-Client-HTML-Mason ../deployment ../../deuba/files
+POT_SOURCES  = ../perl-modules/core/trunk ../clients/perl/OpenXPKI-Client ../clients/perl/OpenXPKI-Client-SCEP ../clients/perl/OpenXPKI-Client-HTML-Mason ../deployment
 VERSION_FILE    = ./VERSION
 
 #---- variable settings above, rules below ----
