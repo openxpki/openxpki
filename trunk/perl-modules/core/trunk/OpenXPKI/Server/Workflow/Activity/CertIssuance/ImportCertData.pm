@@ -52,6 +52,7 @@ sub execute {
     $context->param('cert_role'    => $csr->{ROLE});
 
     my @subj_alt_names;
+    my $cert_info = {};
 
     my $csr_metadata = $dbi->select(
         TABLE   => 'CSR_ATTRIBUTES',
@@ -60,18 +61,31 @@ sub execute {
         },
     );
     foreach my $metadata (@{$csr_metadata}) {
-        if ($metadata->{ATTRIBUTE_KEY} eq 'subject_alt_name') {
+	my $key = $metadata->{ATTRIBUTE_KEY};
+	my $value = $metadata->{ATTRIBUTE_VALUE};
+
+        if ($key eq 'subject_alt_name') {
             push @subj_alt_names, 
-                $serializer->deserialize($metadata->{ATTRIBUTE_VALUE});
+                $serializer->deserialize($value);
         }
-        elsif ($metadata->{ATTRIBUTE_KEY} eq 'notafter' ||
-               $metadata->{ATTRIBUTE_KEY} eq 'notbefore') {
-            $context->param($metadata->{ATTRIBUTE_KEY} => $metadata->{ATTRIBUTE_VALUE});
+	elsif ($key eq 'notafter' ||
+	       $key eq 'notbefore') {
+            $context->param($key => $value);
         }
+	elsif ($key =~ m{ \A custom_(.*) }xms) {
+	    $cert_info->{$1} = $value;
+	}
     }
+
     $context->param(
-      'cert_subject_alt_name' => $serializer->serialize(\@subj_alt_names),
-    );
+	'cert_subject_alt_name' => $serializer->serialize(\@subj_alt_names),
+	);
+
+    # propagate "additional information" stored in the request
+    $context->param(
+	'cert_info' => $serializer->serialize($cert_info),
+	);
+
     ##! 32: 'context: ' . Dumper($context)
     return;
 }

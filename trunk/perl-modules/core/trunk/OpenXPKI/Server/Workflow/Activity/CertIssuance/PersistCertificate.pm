@@ -12,6 +12,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Crypto::X509;
+use OpenXPKI::Serialization::Simple;
+
 
 use Data::Dumper;
 
@@ -73,6 +75,33 @@ sub execute {
             },
         );
     }
+
+    # persist additional (custom) information
+    if (defined $context->param('cert_info')) {
+	my $serializer = OpenXPKI::Serialization::Simple->new();
+
+	my $cert_info = $serializer->deserialize($context->param('cert_info'));
+	##! 16: 'additional certificate information: ' . Dumper $cert_info
+
+	foreach my $key (keys %{$cert_info}) {
+	    my $value = $cert_info->{$key};
+
+	    my $serial = $dbi->get_new_serial(
+		TABLE => 'CERTIFICATE_ATTRIBUTES',
+		);
+	    $dbi->insert(
+		TABLE => 'CERTIFICATE_ATTRIBUTES',
+		HASH  => {
+		    'ATTRIBUTE_SERIAL' => $serial,
+		    'IDENTIFIER'       => $identifier,
+		    'ATTRIBUTE_KEY'    => 'custom_' . $key,
+		    'ATTRIBUTE_VALUE'  => $value,
+		},
+		);
+	}
+	
+    }
+
     $dbi->commit();
 }
 
