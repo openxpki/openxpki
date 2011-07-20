@@ -19,6 +19,8 @@ use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
+use utf8;
+
 my %url_of       :ATTR; # URL of the RT instance
 my %username_of  :ATTR; # RT username
 my %password_of  :ATTR; # RT password
@@ -42,6 +44,38 @@ sub START {
     ##! 1: 'end'
     return 1; 
 }
+
+# FIXME
+# The following subroutine replaces german latin1 and utf8 umlauts with
+# their ASCII representation. This is seemingly necessary because of a
+# double-utf8-encoding bug present in Perl 5.8.8 (but not in Perl 5.10).
+sub asciify {
+    my $self = shift;
+    my $message = shift;
+
+# utf8
+    $message =~ s/\xc3\xa4/ae/g;
+    $message =~ s/\xc3\xb6/oe/g;
+    $message =~ s/\xc3\xbc/ue/g;
+    $message =~ s/\xc3\x84/Ae/g;
+    $message =~ s/\xc3\x96/Oe/g;
+    $message =~ s/\xc3\x9c/Ue/g;
+    $message =~ s/\xc3\x9f/ss/g;
+# latin1
+    $message =~ s/\xe4/ae/g;
+    $message =~ s/\xf6/oe/g;
+    $message =~ s/\xfc/ue/g;
+    $message =~ s/\xc4/Ae/g;
+    $message =~ s/\xd6/Oe/g;
+    $message =~ s/\xdc/Ue/g;
+    $message =~ s/\xdf/ss/g;
+# everything else
+    $message =~ s/[^\x00-\x7f]/?/g;
+
+    return $message;
+}
+
+
 
 sub open {
     ##! 1: 'start'
@@ -108,71 +142,85 @@ sub ticket_exists {
     return (defined $ticket);
 }
 
-sub correspond {
+# worker function that either corresponds or comments on a ticket, depending
+# on the action argument given by the caller
+sub __do_correspond_comment {
     ##! 1: 'start'
     my $self    = shift;
     my $ident   = ident $self;
+    my $action  = shift;
     my $arg_ref = shift;
+
     my $content = $arg_ref->{CONTENT};
     my $ticket  = $arg_ref->{TICKET};
+
+    if (($action ne 'correspond') && ($action ne 'comment')) {
+	OpenXPKI::Exception->throw(
+	    message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_RT_INVALID_ACTION',
+	    params  => {
+		ACTION => $action,
+	    },
+	    ); 
+    }
 
     $self->__login();
     ##! 4: 'successfully logged in to the RT system'
 
     my ($cc, $bcc, $body) = $self->__parse_content($content);
+
+    # try to correspond with the server. on some platforms (e. g. using 
+    # perl 5.8.8) there is a known and hard to track/fix problem with utf8
+    # correspond/comment actions. let's just try it and retry without
+    # a pure ascii message as a fallback
+    
     eval {
-        $rt_of{$ident}->correspond(
+        $rt_of{$ident}->$action(
             ticket_id => $ticket,
             message   => $body,
             cc        => $cc,
             bcc       => $bcc,
         );
-    };
+    }; 
     if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_SET_VALUE_IN_TICKET',
-            params  => {
-                ERROR  => $EVAL_ERROR,
-                TICKET => $ticket,
-            },
-        ); 
+      # retry without any special characters in message (see above)...
+	$body = $self->asciify($body);
+	eval {
+	    $rt_of{$ident}->$action(
+		ticket_id => $ticket,
+		message   => $body,
+		cc        => $cc,
+		bcc       => $bcc,
+		);
+	};
+	if ($EVAL_ERROR) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_SET_VALUE_IN_TICKET',
+		params  => {
+		    ERROR  => $EVAL_ERROR,
+		    TICKET => $ticket,
+		},
+		); 
+	    
+	}
     }
     ##! 1: 'end'
     return;
+}
+
+sub correspond {
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    return $self->__do_correspond_comment('correspond', $arg_ref);
 }
 
 sub comment {
-    ##! 1: 'start'
     my $self    = shift;
-    my $ident   = ident $self;
     my $arg_ref = shift;
-    my $content = $arg_ref->{CONTENT};
-    my $ticket  = $arg_ref->{TICKET};
 
-    $self->__login();
-    ##! 4: 'successfully logged in to the RT system'
-
-    my ($cc, $bcc, $body) = $self->__parse_content($content);
-    eval {
-        $rt_of{$ident}->comment(
-            ticket_id => $ticket,
-            message   => $body,
-            cc        => $cc,
-            bcc       => $bcc,
-        );
-    };
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_RT_COULD_NOT_SET_VALUE_IN_TICKET',
-            params  => {
-                ERROR  => $EVAL_ERROR,
-                TICKET => $ticket,
-            },
-        ); 
-    }
-    ##! 1: 'end'
-    return;
+    return $self->__do_correspond_comment('comment', $arg_ref);
 }
+
 
 sub set_value {
     ##! 1: 'start'

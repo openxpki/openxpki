@@ -249,41 +249,103 @@ sub search_cert
     my $self = shift;
     my $args = shift;
 
+    ##! 16: 'search_cert arguments: ' . Dumper $args
+
+    my %params;
+    $params{TABLE} = [
+	'CERTIFICATE',
+	];
+
+    $params{COLUMNS} = [
+	'CERTIFICATE.ISSUER_DN',
+	'CERTIFICATE.CERTIFICATE_SERIAL',
+	'CERTIFICATE.ISSUER_IDENTIFIER',
+	'CERTIFICATE.IDENTIFIER',
+	'CERTIFICATE.SUBJECT',
+	'CERTIFICATE.EMAIL',
+	'CERTIFICATE.STATUS',
+	'CERTIFICATE.ROLE',
+	'CERTIFICATE.PUBKEY',
+	'CERTIFICATE.SUBJECT_KEY_IDENTIFIER',
+	'CERTIFICATE.AUTHORITY_KEY_IDENTIFIER',
+	'CERTIFICATE.NOTAFTER',
+	'CERTIFICATE.LOA',
+	'CERTIFICATE.NOTBEFORE',
+	'CERTIFICATE.CSR_SERIAL',
+	];
+    $params{JOIN} = [ [ 'IDENTIFIER' ] ];
+    
     ##! 2: "fix arguments"
     foreach my $key (qw( EMAIL SUBJECT ISSUER )) {
 	if (defined $args->{$key}) {
 	    $args->{$key} =~ s/\*/%/g;
+	    # sanitize wildcards (don't overdo it...)
+	    $args->{$key} =~ s/%%+/%/g;
 	}
     }
 
     ##! 2: "initialize arguments"
-    my %params = (TABLE => 'CERTIFICATE');
-       $params{SERIAL}       = $args->{CERT_SERIAL} if ($args->{CERT_SERIAL});
-        if (defined $args->{LIMIT} && ! defined $args->{START}) {
-            $params{'LIMIT'} = $args->{LIMIT};
-        }
-        elsif (defined $args->{LIMIT} && defined $args->{START}) {
-            $params{'LIMIT'} = {
-                AMOUNT => $args->{LIMIT},
-                START  => $args->{START},
-            };
-        }
-        $params{DYNAMIC}->{IDENTIFIER} = $args->{IDENTIFIER} if ($args->{IDENTIFIER});
-        $params{DYNAMIC}->{CSR_SERIAL} = $args->{CSR_SERIAL} if ($args->{CSR_SERIAL});
-        $params{DYNAMIC}->{EMAIL}      = $args->{EMAIL}      if ($args->{EMAIL});
-        $params{DYNAMIC}->{SUBJECT}    = $args->{SUBJECT}    if ($args->{SUBJECT});
-        $params{DYNAMIC}->{ISSUER_DN}  = $args->{ISSUER}     if ($args->{ISSUER});
-        # only search in current realm
-        $params{DYNAMIC}->{PKI_REALM}  = CTX('session')->get_pki_realm();
-        $params{REVERSE} = 1;
-        $params{ORDER} = [ 'CERTIFICATE_SERIAL' ];
-        if (defined $args->{VALID_AT}) {
-            $params{VALID_AT} = $args->{VALID_AT};
-        }
-        if (defined $args->{STATUS}) {
-            $params{DYNAMIC}->{STATUS} = $args->{STATUS};
-        }
+    $params{SERIAL}       = $args->{CERT_SERIAL} if ($args->{CERT_SERIAL});
 
+    if (defined $args->{LIMIT} && ! defined $args->{START}) {
+	$params{'LIMIT'} = $args->{LIMIT};
+    }
+    elsif (defined $args->{LIMIT} && defined $args->{START}) {
+	$params{'LIMIT'} = {
+	    AMOUNT => $args->{LIMIT},
+	    START  => $args->{START},
+	};
+    }
+
+    # only search in current realm
+    $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'}  = CTX('session')->get_pki_realm();
+    $params{REVERSE} = 1;
+    $params{ORDER} = [ 'CERTIFICATE.CERTIFICATE_SERIAL' ];
+
+    foreach my $key (qw( IDENTIFIER CSR_SERIAL EMAIL SUBJECT ISSUER STATUS )) {
+	if ($args->{$key}) {
+	    $params{DYNAMIC}->{'CERTIFICATE.' . $key} = $args->{$key};
+	}
+    }
+
+    if (defined $args->{VALID_AT}) {
+	$params{VALID_AT} = $args->{VALID_AT};
+    }
+
+    # handle certificate attributes (such as SANs)
+    if (defined $args->{CERT_ATTRIBUTES}) {
+	if (ref $args->{CERT_ATTRIBUTES} ne 'ARRAY') {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_INVALID_CERT_ATTRIBUTES_ARGUMENTS',
+		params  => {
+		    'TYPE' => ref $args->{CERT_ATTRIBUTES},
+		},
+		);
+	}
+	
+	# we need to join over the certificate_attributes table
+	my $ii = 0;
+	foreach my $entry (@{$args->{CERT_ATTRIBUTES}}) {
+	    ##! 16: 'certificate attribute: ' . Dumper $entry
+	    my $attr_alias = 'CERT_ATTR_' . $ii;
+
+	    # add join table
+	    push @{$params{TABLE}}, 
+	        [ 'CERTIFICATE_ATTRIBUTES' => $attr_alias ];
+
+	    # add join statement
+	    push @{$params{JOIN}->[0]}, 
+	        'IDENTIFIER';
+
+	    # add search constraint
+	    $params{DYNAMIC}->{$attr_alias . '.ATTRIBUTE_KEY'} = $entry->[0];
+	    $params{DYNAMIC}->{$attr_alias . '.ATTRIBUTE_VALUE'} = $entry->[1];
+	    $ii++;
+	  }
+      }
+
+    ##! 16: 'certificate search arguments: ' . Dumper \%params
+    
     my $result = CTX('dbi_backend')->select(%params);
     if (ref $result ne 'ARRAY') {
         OpenXPKI::Exception->throw(
@@ -295,8 +357,12 @@ sub search_cert
     }
     foreach my $item (@{ $result })
     {
-        ## delete data to minimize transport costs
-        delete $item->{DATA};
+	# remove leading table name from result columns
+	map { 
+	    my $col = substr($_, index($_, '.') + 1);
+	    $item->{$col} = $item->{$_};
+	    delete $item->{$_};
+	} keys %{$item};
     }
 
     ##! 1: "finished"
