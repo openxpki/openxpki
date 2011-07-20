@@ -3,6 +3,7 @@
   $subject     => undef
   $issuer      => undef
   $cert_serial => undef
+  $extra_search => undef
   $csr_serial  => undef
   $limit       => 10
   $start       => 1
@@ -88,7 +89,7 @@
 
   if (!(defined $subject and length $subject)) {
       $subject = '*';
-  }
+}
 
   ## collect params
   my %fields = ();
@@ -97,6 +98,23 @@
   $fields{'ISSUER'}      = "*$issuer*"  if (defined $issuer and length $issuer);
   $fields{'CERT_SERIAL'} = $cert_serial if (defined $cert_serial and length $cert_serial);
   $fields{'CSR_SERIAL'}  = $csr_serial  if (defined $csr_serial and length $csr_serial);
+
+  if (defined $extra_search && (ref($extra_search) eq 'ARRAY')) {
+      foreach my $search_condition (@{$extra_search}) {
+	  my $search_key = $search_condition->[0];
+	  my $search_term = $search_condition->[1];
+	  
+	  if ($search_key eq 'subject_alt_name') {
+	      if ($search_term !~ m{ \A (?:DNS|email|IP|URI|GUID|UPN|DirName|RID|otherName):(.*) }xms) {
+		  $search_term = 'DNS:' . $search_term;
+	      }
+	  }
+	  
+	  push @{$fields{'CERT_ATTRIBUTES'}}, [
+	      $search_key => $search_term,
+	  ];
+      }
+  }
 
   my $result_count = $context->{client}->send_receive_command_msg(
       'search_cert_count', \%fields
@@ -112,7 +130,7 @@
     $fields{'START'}       = $page_info->first - 1;
   }
   if ($fields{'START'} == -1) {
-    $fields{'START'} = 1;
+    $fields{'START'} = 0;
   }
   $fields{'LIMIT'}       = $limit;
 

@@ -407,6 +407,10 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_integer_string,
                 },
+		CERT_ATTRIBUTES => {
+                    type     => ARRAYREF,
+		    optional => 1,
+                },
                 VALID_AT => {
                     type     => SCALAR,
                     optional => 1,
@@ -451,6 +455,10 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_integer_string,
+                },
+		CERT_ATTRIBUTES => {
+                    type     => ARRAYREF,
+		    optional => 1,
                 },
                 LIMIT => {
                     type     => SCALAR,
@@ -549,6 +557,17 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_pkcs10,
+                },
+            },
+            memoize => 1,
+        },
+        'get_additional_information_fields' => {
+            class  => 'Default',
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
                 },
             },
             memoize => 1,

@@ -818,6 +818,75 @@ sub get_cert_subject_styles {
     return $styles;
 }
 
+sub get_additional_information_fields {
+    my $self      = shift;
+    my $arg_ref   = shift;
+    my $cfg_id    = $arg_ref->{CONFIG_ID};
+#    my $profile   = $arg_ref->{PROFILE};
+    ##! 1: 'start'
+
+    my $pki_realm = CTX('session')->get_pki_realm();
+    my $index         = $self->get_pki_realm_index({
+        CONFIG_ID => $cfg_id,
+    });
+
+
+    my $styles = {};
+    my @base_path = ( 'pki_realm', 'common', 'profiles', 'endentity', 'profile' );
+    my @base_ctr  = ( $index     , 0       , 0         , 0           );
+
+    my $profile_count = 
+	CTX('xml_config')->get_xpath_count(
+	    XPATH     => [ @base_path ],
+	    COUNTER   => [ @base_ctr  ],
+	    CONFIG_ID => $cfg_id,
+	);
+
+    ##! 16: 'identified ' . $profile_count . ' profiles'
+
+    my $additional_information = {};
+
+    # iterate through all profile and summarize all additional information
+    # fields (may be redundant and even contradicting, but we only collect
+    # the 'union' of these here; last one wins...)
+    for (my $ii = 0; $ii < $profile_count; $ii++) {
+	##! 16: 'profile # ' . $ii
+	my $add_input_count = 0;
+	eval {
+	    $add_input_count = CTX('xml_config')->get_xpath_count(
+		XPATH     => [ @base_path,           'subject', 'additional_information', 'input' ],
+		COUNTER   => [ @base_ctr , $ii,      0,         0,        ],
+		CONFIG_ID => $cfg_id,
+		);
+	};
+	##! 64: 'additional input count: ' . $add_input_count
+	foreach (my $jj = 0; $jj < $add_input_count; $jj++) {
+            my @input_path = @base_path;
+            push @input_path, (             'subject', 'additional_information', 'input' );
+            my @input_ctr  = @base_ctr;
+            push @input_ctr,  ( $ii,        0,         0,                        $jj     );
+	    
+	    
+            my $id = CTX('xml_config')->get_xpath(
+                XPATH     => [ @input_path, 'id' ],
+                COUNTER   => [ @input_ctr , 0    ],
+                CONFIG_ID => $cfg_id,
+		);
+            my $label = CTX('xml_config')->get_xpath(
+                XPATH     => [ @input_path, 'label' ],
+                COUNTER   => [ @input_ctr , 0    ],
+                CONFIG_ID => $cfg_id,
+		);
+
+	    $additional_information->{ALL}->{$id} = $label;
+	    ##! 16: "additional information: $id (label: $label)"
+	}
+    }
+
+
+    return $additional_information;
+}    
+
 sub get_possible_profiles_for_role {
     my $self      = shift;
     my $arg_ref   = shift;
@@ -1536,6 +1605,7 @@ sub get_cert_subject_profiles {
     return \%profiles;
 }
 
+
 sub get_export_destinations
 {
     ##! 1: "finished"
@@ -1727,3 +1797,24 @@ Returns a hash ref with the following entries:
 Returns an array reference of possible certificate profiles for a given
 certificate role (passed in the named parameter ROLE) taken from the
 configuration.
+
+=head2 get_cert_subject_styles
+
+Returns the configured subject styles for the specified profile.
+
+Parameters:
+
+  PROFILE     name of the profile to query
+  CONFIG_ID   configuration ID
+  PKCS10      certificate request to parse (optional)
+
+Returns a hash ref with the following structure:
+
+
+=head2 get_additional_information_fields
+
+Returns a hash ref containing all additional information fields that are
+configured.
+
+Return structure: hash ref; key is the name of the field, value is the
+corresponding I18N tag.
