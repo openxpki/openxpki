@@ -59,6 +59,10 @@
 	    if (! defined $ARGS{'__remove_search_condition_' . $ii}) {
 		my $condition = $ARGS{'search_' . $ii};
 		my $search_string = $ARGS{'value_' . $ii};
+		
+		# trim search string
+		$search_string =~ s{ \A \s* }{}xms;
+		$search_string =~ s{ \s* \z }{}xms;
 
 		# record parameters for submission to cert_list component
 		if ($condition =~ m{ \A (?:subject|cert_serial) \z}xms) {
