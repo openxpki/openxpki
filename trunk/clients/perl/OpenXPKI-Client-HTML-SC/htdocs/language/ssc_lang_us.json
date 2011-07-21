@@ -75,6 +75,7 @@
       "P_notAuthorized":  "Not authorized please login first",
       "P_pleaseWait":  "Please do not remove your dbSmartcard.",
       "P_success_perso":  "You have successfully personalized your dbSmartcard.",
+      "T_forgotPIN":  "Forgot your PIN?",
       "T_Analyse":  "analyzing dbSmartcard",
       "T_TestCardReset":"dbSmartcard Test Card Reset",
       "T_ChangePin":  "Change PIN",

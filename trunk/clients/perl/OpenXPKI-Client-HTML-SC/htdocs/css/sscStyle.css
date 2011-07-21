@@ -595,6 +595,16 @@ a {
 	line-height:34px;
 	margin-top:10px;
 }
+.btnForgotPIN {
+	border:medium none;
+	clear:both;
+	color: #666666;
+	font-size: 14px;
+	line-height:34px;
+	margin-top:10px;
+}
+
+
 #singleAccount{
 	margin: 20px 0 20px 0;
 }

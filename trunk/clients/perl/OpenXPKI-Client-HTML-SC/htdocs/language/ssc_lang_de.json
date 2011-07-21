@@ -58,6 +58,7 @@
 "P_notAuthorized":"nicht autorisiert, bitte f&uuml;hren Sie ein Login durch",
 "P_pleaseWait":"Bitte entfernen Sie nicht die dbSmartcard.",
 "P_success_perso":"Die Personalisierung Ihrer dbSmartcard war erfolgreich",
+"T_forgotPIN":  "PIN vergessen?",
 "T_Analyse":"dbSmartcard Analyse",
 "T_TestCardReset":"dbSmartcard Test Card Reset",
 "T_ChangePin":"PIN &auml;ndern",

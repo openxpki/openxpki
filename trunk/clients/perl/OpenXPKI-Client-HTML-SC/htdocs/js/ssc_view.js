@@ -1493,9 +1493,24 @@ var SSC_VIEW = new Class(
 						'type' : 'PASSWORD',
 						'value' : this.pin
 					}).inject(form);
+					
 					new Element('label', {
 						'html' : this.tr_('T_pin')
 					}).inject(form);
+					
+					// create unblock link as forgot your PIN link
+					new Element('a', {
+						'html' : this.tr_('T_forgotPIN'),
+						'id' : 'btnForgotPIN',
+						'class' : 'btnForgotPIN',
+							events : {
+								'click' : this.unblockCard.bind(this)
+							}
+					}).inject(form);
+					
+					
+						//this.setButton('true', $('btnForgotPIN'), this.unblockCard);
+
 					
 
 					// activation Code Dialog
