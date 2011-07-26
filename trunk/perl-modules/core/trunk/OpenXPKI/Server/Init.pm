@@ -245,6 +245,7 @@ sub __do_init_workflow_bulk_keys {
                     'spkac'                       => 1,
                     'cert_subject_alt_name'       => 1,
                     'certificate'                 => 1,
+                    'cert_info'                   => 1,
                 },
             },
             'I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE' =>
