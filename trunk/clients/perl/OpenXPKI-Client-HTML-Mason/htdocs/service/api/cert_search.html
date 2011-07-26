@@ -31,11 +31,11 @@
   <tr>
     <td><& /lib/html/select.mhtml, 'name' => "search_$ii", values => \@search_fields, default => [ $search_conditions[$ii]->[0] ]  &></td>
     <td><& /lib/html/input.mhtml, name => "value_$ii", value => $search_conditions[$ii]->[1] &></td>
-    <td><& /lib/html/input.mhtml, 'type' => 'submit', 'name' => '__remove_search_condition_' . $ii, value => 'Remove' &></td>
+    <td><& /lib/html/input.mhtml, 'type' => 'submit', 'name' => '__remove_search_condition_' . $ii, value => i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_REMOVE_SEARCH_CONDITION') &></td>
   </tr>
 % }
   <tr>
-    <td><& /lib/html/input.mhtml, 'type' => 'submit', 'name' => '__add_search_condition', value => 'Add Search Condition' &></td>
+    <td><& /lib/html/input.mhtml, 'type' => 'submit', 'name' => '__add_search_condition', value => i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_SEARCH_CONDITION') &></td>
     <td></td>
     <td></td>
   </tr>
