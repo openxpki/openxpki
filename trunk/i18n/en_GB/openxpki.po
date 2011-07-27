@@ -575,6 +575,12 @@ msgstr "Add search condition"
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_REMOVE_SEARCH_CONDITION"
 msgstr "Remove"
 
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_ADD_SEARCH_CONDITION"
+msgstr "Add search condition"
+
+msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_REMOVE_SEARCH_CONDITION"
+msgstr "Remove"
+
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_API_CHAIN_LIST_DESCRIPTION"
 msgstr "This is the chain of the choosen CA certificate."
 
