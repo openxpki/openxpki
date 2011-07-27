@@ -856,6 +856,101 @@ sub list_data_pool_entries {
 	} } @{$result} ];
 }
 
+sub modify_data_pool_entry {
+    ##! 1: 'start'
+    my $self = shift;
+    my $arg_ref = shift;
+
+    my $namespace           = $arg_ref->{NAMESPACE};
+    my $oldkey              = $arg_ref->{KEY};
+
+    # optional parameters
+    my $newkey              = $arg_ref->{NEWKEY};
+    #my $expiration_date     = $arg_ref->{EXPIRATION_DATE};
+
+    my $current_pki_realm   = CTX('session')->get_pki_realm();
+    my $requested_pki_realm = $arg_ref->{PKI_REALM};
+
+    if (! defined $requested_pki_realm) {
+	$requested_pki_realm = $current_pki_realm;
+    }
+
+    # when called from a workflow we only allow the current realm
+    # NOTE: only check direct caller. if workflow is deeper in the caller
+    # chain we assume it's ok.
+    my @caller = caller(1);
+    if ($caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms) {
+	if ($arg_ref->{PKI_REALM} ne $current_pki_realm) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_OBJECT_LIST_DATA_POOL_ENTRIES_INVALID_PKI_REALM',
+		params  => {
+		    REQUESTED_REALM => $requested_pki_realm,
+		    CURRENT_REALM => $current_pki_realm,
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => [ 'audit', 'system', ],
+		},
+		);
+	}
+    }
+
+    my %condition = (
+	'PKI_REALM' => $requested_pki_realm,
+	'DATAPOOL_KEY'       => $oldkey,
+	);
+
+    if (defined $namespace) {
+	$condition{NAMESPACE} = $namespace;
+    }
+
+    my %values = (
+	'DATAPOOL_LAST_UPDATE' => time,
+	);
+
+    if (exists $arg_ref->{EXPIRATION_DATE}) {
+	if (defined $arg_ref->{EXPIRATION_DATE}) {
+	    my $expiration_date = $arg_ref->{EXPIRATION_DATE};
+	    if (($expiration_date < 0)
+		|| ($expiration_date > 0 && $expiration_date < time)) {
+		OpenXPKI::Exception->throw(
+		    message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_EXPIRATION_DATE',
+		    params  => {
+			PKI_REALM  => $requested_pki_realm,
+			NAMESPACE  => $namespace,
+			KEY        => $oldkey,
+			EXPIRATION_DATE => $expiration_date,
+		    },
+		    log => {
+			logger => CTX('log'),
+			priority => 'error',
+			facility => [ 'system', ],
+		    },
+		    );
+	    }
+	    $values{NOTAFTER} = $expiration_date;
+	} else {
+	    $values{NOTAFTER} = undef;
+	}
+    }
+
+    if (defined $newkey) {
+	$values{DATAPOOL_KEY} = $newkey;
+    }
+    
+    ##! 16: 'update database condition: ' . Dumper \%condition
+    ##! 16: 'update database values: ' . Dumper \%values
+
+    my $result = CTX('dbi_backend')->update(
+	TABLE => 'DATAPOOL',
+	DATA  => \%values,
+	WHERE => \%condition,
+	);
+
+    return 1;
+}
+
 
 # internal worker function, accepts more parameters than the API function
 # named attributes:

@@ -147,6 +147,20 @@ sub BUILD {
             },
             memoize => 1,
         },
+        'determine_issuing_ca' => {
+            class  => 'Default',
+            params => {
+                'PROFILE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+            },
+        },
         'get_approval_message' => {
             class  => 'Default',
             params => {
@@ -628,6 +642,35 @@ sub BUILD {
                 'KEY' => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
+                },
+            },
+        },
+        'modify_data_pool_entry' => {
+            class  => 'Object',
+            params => {
+                'PKI_REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                'NAMESPACE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                'KEY' => {
+                    type  => SCALAR,
+                    regex => qr{ \A \$? [ \w \- \. : \s ]* \z }xms,
+                },
+                'NEWKEY' => {
+                    type  => SCALAR,
+                    regex => qr{ \A \$? [ \w \- \. : \s ]* \z }xms,
+                },
+                'EXPIRATION_DATE' => {
+                    type  => SCALAR | UNDEF,
+		    # allow integers but also empty string (undef...)
+                    regex => qr{ \A $RE{num}{int}* \z }xms,
+                    optional => 1,
                 },
             },
         },
