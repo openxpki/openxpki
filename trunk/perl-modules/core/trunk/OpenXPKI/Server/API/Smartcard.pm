@@ -532,7 +532,7 @@ sub sc_analyze_smartcard {
 
     ###########################################################################
     # smartcard type specific settings
-    if ($tokenid =~ m{ \A (?:rsa_) }xms) {
+    if ($tokenid =~ m{ \A (?:rsa[23]_) }xms) {
 	$result->{PROCESS_FLAGS}->{puk_is_writable} = 0;
 	$result->{SMARTCARD}->{keysize} = 1024;
 	$result->{SMARTCARD}->{default_puk} = undef;
