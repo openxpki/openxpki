@@ -6,7 +6,7 @@
 
     if (!defined $ARGS{'workflow_type'}) {
         # no form data is present, let user search for cert
-        $m->comp('/service/create_crr/search.mhtml');
+        $m->comp('/service/create_crr/search.mhtml', %ARGS);
     }
     else {
         # protect against XSRF by checking for $__session_id (see
