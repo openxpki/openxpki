@@ -1,5 +1,5 @@
 <h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_SEARCH_TITLE') %></h1>
 <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_SERVICE_CREATE_CRR_SEARCH_DESC') %>
 <p>
-<& /service/api/cert_search.html, 'revocation' => 1 &>
+<& /service/api/cert_search.html, %ARGS, 'revocation' => 1 &>
 
