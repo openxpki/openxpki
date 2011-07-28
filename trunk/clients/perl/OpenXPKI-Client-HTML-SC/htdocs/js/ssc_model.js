@@ -323,10 +323,10 @@ var SSC_MODEL = new Class(
 				window.dbg.log("sc_getCertificates");
 				var command = "GetCertificates";
 				var rc = true;
-				window.dbg.log("card type - " + this.StdCardType);
+				//window.dbg.log("card type - " + this.StdCardType);
 				window.dbg.log("Plugin status- " + this.PKCS11Plugin.PluginStatus);
 				try {
-					this.PKCS11Plugin.CardType = this.StdCardType;
+					//this.PKCS11Plugin.CardType = this.StdCardType;
 					//window.dbg.log("card type - " + this.StdCardType);
 				} catch (e) {
 					window.dbg.log("error reading card type - " + e);
@@ -372,7 +372,7 @@ var SSC_MODEL = new Class(
 				var command = "GetTokenID";
 				var rc = true;
 				try {
-					this.PKCS11Plugin.CardType = this.StdCardType;
+					//this.PKCS11Plugin.CardType = this.StdCardType;
 				} catch (e) {
 					window.dbg.log("error reading card type - " + e);
 					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
@@ -621,18 +621,24 @@ var SSC_MODEL = new Class(
 			determineRequiredAction : function(viewCb, data) {
 				window.dbg.log("determineRequiredAction");
 				var ret = 0;
+				var pos = baseUrl.lastIndexOf('/sc/');
 
 				switch (this.user.cardstatus) {
 				case 'unknown':
 					// ERROR Card not registered please contact badge office
 					// sscView.showPopUp('E_unknownSmartcard','cross','0010');
 					viewCb('cardUnknown');
+					
+					if(data.cardtype === 'RSA_2.0'){
+						window.location = this.options.baseUrl.substring(0, pos)+'/appsso';
+					}
 					return;
 					break;
 				case 'initial':
 					// ERROR Card not activated please contact badge office
 					// sscView.showPopUp('E_cardNotActivated','cross','0020');
 					viewCb('cardNotActivated');
+					
 					return;
 					break;
 				case 'deactivated':
@@ -1657,7 +1663,7 @@ var SSC_MODEL = new Class(
 				this.PKCS11Plugin.ParamList = plugin_parameter;
 				var command = "GenerateKeypair";
 
-				this.PKCS11Plugin.CardType = this.StdCardType;
+				//this.PKCS11Plugin.CardType = this.StdCardType;
 				this.PKCS11Plugin.Request = command;
 				this.sc_run_command(this.sc_cb_GenerateKeypair, viewCb);
 			},// END sc_GenerateKeypair
@@ -1681,6 +1687,8 @@ var SSC_MODEL = new Class(
 
 				} else {
 					var card_insert_status = this.PKCS11Plugin.PluginStatus;
+					 
+					window.dbg.log("Result :" + res);
 					window.dbg.log("card insert :" + card_insert_status);
 					if(card_insert_status === 'LOOKINGFORTOKEN'){
 						sscView.showPopUp('E_sc-error-card-removed',
