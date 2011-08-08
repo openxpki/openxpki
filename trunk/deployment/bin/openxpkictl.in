@@ -436,8 +436,10 @@ my $command_table = {
     status  => sub { 
 	if (do_status(@_)) {
 	    print "OpenXPKI Server is running and accepting requests.\n";
+	    exit 0;
 	} else {
 	    print "OpenXPKI server is not running or does not accept requests.\n";
+	    exit 3;
 	}
     },
 };
