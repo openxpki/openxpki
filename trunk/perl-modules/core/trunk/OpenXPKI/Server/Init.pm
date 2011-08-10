@@ -333,9 +333,35 @@ sub __do_init_pki_realm_by_cfg {
     my $pki_realm_by_cfg = {};
     foreach my $config_id (@{ $config_ids }) {
         ##! 4: 'config_id: ' . $config_id
-        $pki_realm_by_cfg->{$config_id} = get_pki_realms({
-            CONFIG_ID => $config_id,
-        });
+	log_wrapper(
+	    {
+		MESSAGE  => 'Instantiating archived configuration ID: ' . $config_id,
+		PRIORITY => 'info',
+		FACILITY => 'system',
+	    });
+	eval {
+	    $pki_realm_by_cfg->{$config_id} = get_pki_realms(
+		{
+		    CONFIG_ID => $config_id,
+		});
+	};
+        if (my $exc = OpenXPKI::Exception->caught()) {
+            # ignore errorneous configuration, but complain about it
+	    log_wrapper(
+		{
+		    MESSAGE => 'Invalid configuration detected, ignoring configuriation ID ' . $config_id,
+		    PRIORITY => 'warn',
+		    FACILITY => 'system',
+		});
+        }
+        elsif ($EVAL_ERROR) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_INIT_PKI_REALMS_BY_CFG',
+                params  => {
+                    'ERROR' => $EVAL_ERROR,
+                },
+		);
+        }
     }
     ##! 4: 'setting context'
     ##! 64: 'pki_realm_by_cfg: ' . Dumper $pki_realm_by_cfg
@@ -850,7 +876,13 @@ sub get_xml_config {
     ##! 16: 'serialized current config: ' . $curr_config_ser
     my $curr_config_id = sha1_base64($curr_config_ser);
     ##! 16: 'curr config ID: ' . $curr_config_id
-
+    log_wrapper(
+	{
+	    MESSAGE  => "Current configuration ID: " . $curr_config_id,
+	    PRIORITY => "info",
+	    FACILITY => "system",
+	});
+    
     # get all current configuration entries from the database
     CTX('dbi_backend')->connect();
     my $config_entries = CTX('dbi_backend')->select(
