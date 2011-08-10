@@ -922,7 +922,8 @@ sub __search_workflow_instances {
 sub __get_workflow_factory {
     ##! 1: 'start'
     my $arg_ref = shift;
-    my $config_id = CTX('api')->get_current_config_id();
+    my $current_config_id = CTX('api')->get_current_config_id();
+    my $config_id = $current_config_id;
     if ($arg_ref->{CONFIG_ID}) {
         $config_id = $arg_ref->{CONFIG_ID};
     }
@@ -952,7 +953,43 @@ sub __get_workflow_factory {
         $pki_realm = $arg_ref->{PKI_REALM};
     }
     ##! 32: 'realm: ' . $pki_realm
-    my $factory = CTX('workflow_factory')->{$config_id}->{$pki_realm};
+
+    # We have now obtained the configuration id that was active during
+    # creation of the workflow instance. However, if for some reason
+    # the matching configuration is not available we have two options:
+    # 1. bail out with an error
+    # 2. accept that there is an error and continue anyway with a different
+    #    configuration
+    # Option 1 is not ideal: if the corresponding configuration has for
+    # some reason be deleted from the database the workflow cannot be
+    # instantiated any longer. This is often not really a problem but
+    # sometimes this will lead to severe problems, e. g. for long 
+    # running workflows. unfortunately, if a workflow cannot be instantiated
+    # it can neither be displayed, nor executed.
+    # In order to make things a bit more robust fall back to using a newer
+    # configuration than the one missing. As we don't have a timestamp
+    # for the configuration, a safe bet is to use the current configuration.
+    # Caveat: the current workflow definition might not be compatible with
+    # the particular workflow instance. There is a risk that the workflow
+    # instance gets stuck in an unreachable state.
+    # In comparison to not being able to even view the workflow this seems
+    # to be an acceptable tradeoff.
+
+    my $factory;
+    if (defined CTX('workflow_factory')->{$config_id}->{$pki_realm}) {
+	# use workflow factory as defined in workflow context
+	$factory = CTX('workflow_factory')->{$config_id}->{$pki_realm};
+    } else {
+ 	# use current workflow definition
+	$factory = CTX('workflow_factory')->{$current_config_id}->{$pki_realm};
+
+	CTX('log')->log(
+	    MESSAGE  => 'Workflow ID ' . $arg_ref->{WORKFLOW_ID} . ' references unavailable config ID ' . $config_id . ' (falling back to current configuration ID ' . $current_config_id . ')',
+	    PRIORITY => 'warn',
+	    FACILITY => 'system',
+	    );
+    }
+    
     ##! 64: 'factory: ' . Dumper $factory
     ##! 64: 'workflow_factory keys: ' . Dumper keys %{ CTX('workflow_factory') }
     if (! defined $factory) {
