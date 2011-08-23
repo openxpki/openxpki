@@ -316,6 +316,7 @@ WriteMakefile(
         'Net::Server'            => '0.94',
 	'Params::Validate'       => '0.77',
 	'Proc::ProcessTable'     => '0.43',
+        'Proc::SafeExec'         => '1.4',
 	'Regexp::Common'         => 2,
         'Sys::SigAction'         => '0.06',
         'Template'               => '2.15',

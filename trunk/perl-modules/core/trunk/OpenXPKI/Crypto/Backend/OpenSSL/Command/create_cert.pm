@@ -27,8 +27,6 @@ sub get_command
     }
     $self->{CONFIG}->set_profile($self->{PROFILE});
 
-    my @result = ();
-
     $self->get_tmpfile ('CSR');
     $self->get_tmpfile ('DUMMYCA');
 
@@ -121,7 +119,7 @@ sub get_command
 
     my @subject = ();
     if ($subject) {
-	push(@subject, '-subj', qq("$subject"));
+	push(@subject, '-subj', $subject);
 
 	if ($subject =~ /[^\\](\\\\)*\+/) {
 	    push(@subject, '-multivalue-rdn');
@@ -130,12 +128,12 @@ sub get_command
 
     my @engine = ();
     if ($engine) {
-	push(@engine, '-engine', qq("$engine"));
+	push(@engine, '-engine', $engine);
     }
 
     my @keyform = ();
     if ($keyform) {
-	push(@keyform, '-keyform', qq("$keyform"));
+	push(@keyform, '-keyform', $keyform);
     }
     
     my @password = ();
@@ -144,26 +142,20 @@ sub get_command
         $self->set_env ("pwd" => $passwd);
     }
 
-    my @cmd;
-    @cmd = (
+    my @cmd1 = (
 	'req',     '-x509',
         # done by CLI
 	# '-config', $config,
 	@subject,
 	@engine,
 	@keyform,
-	'-key',    qq("$self->{KEYFILE}"),
-	'-out',    qq("$self->{DUMMYCAFILE}"),
-	'-in',     qq("$self->{CSRFILE}"),
+	'-key',    $self->{KEYFILE},
+	'-out',    $self->{DUMMYCAFILE},
+	'-in',     $self->{CSRFILE},
 	'-set_serial', $self->{PROFILE}->get_serial(),
 	'-days',   '1',
 	@password,
 	);
-
-
-    ##! 2: "command: " . join(' ', @cmd)
-    push @result, join(' ', @cmd);
-
 
     # STEP 1b: restore serial number (serial file content is incremented
     # by previous OpenSSL command)
@@ -178,7 +170,7 @@ sub get_command
 #     };
 
     # STEP 2: Using the Dummy CA created above issue the actual CA certificate
-    @cmd = (
+    my @cmd2 = (
 	'ca',
 	'-batch',
 	#done by CLI
@@ -186,17 +178,15 @@ sub get_command
 	@subject,
 	@engine,
 	@keyform,
-	'-keyfile', qq("$self->{KEYFILE}"),
-	'-cert',    qq("$self->{DUMMYCAFILE}"),
-	'-out',     qq("$self->{OUTFILE}"),
-	'-ss_cert', qq("$self->{DUMMYCAFILE}"),
+	'-keyfile', $self->{KEYFILE},
+	'-cert',    $self->{DUMMYCAFILE},
+	'-out',     $self->{OUTFILE},
+	'-ss_cert', $self->{DUMMYCAFILE},
 	@password,
 	);
 
     ##! 2: "command: " . join(' ', @cmd)
-    push @result, join(' ', @cmd);
-
-    return \@result;
+    return [ \@cmd1, \@cmd2 ];
 }
 
 sub hide_output
