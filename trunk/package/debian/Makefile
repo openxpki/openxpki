@@ -34,6 +34,7 @@ EXTERNAL=				\
 	Class__Observable 		\
 	Date__Parse			\
 	Locale__TextDomain		\
+	Proc__SafeExec \
 	XML__Filter__XInclude 
 
 EXTERNAL2= \
