@@ -237,7 +237,7 @@ sub execute {
         RETURN_LENGTH => $salt_len,
         RANDOM_LENGTH => $salt_len,
     };
-    $salt = $default_token->command($command);
+    my $salt = $default_token->command($command);
 
     #
     # Add salt to activation code and create the SHA1 hash that is stored in
@@ -251,18 +251,35 @@ sub execute {
     #
     my $found = 0;
     foreach my $a (qw( auth1 auth2 )) {
-        $found++;
         ##! 16: "user=$user, auth=$a, val=" . $context->param($a . '_id')
-        if ( $user eq $context->param( $a . '_id' ) ) {
-            ##! 10: "Setting hash and salt in $a for user $user"
+        if ( lc($user) eq lc($context->param( $a . '_id' )) ) {
+	    $found++;
+	    ##! 10: "Setting hash and salt in $a for user $user"
             # writing hash is easy... just put it in the context
             $context->param( $a . '_hash', $hash );
 
             # For the salt attribute, use the prefix '+' to
             # let the persister know that this value must
             # be encrypted in the database
-            $context->param( '+' . $a . '_salt', $salt );
+            #$context->param( '+' . $a . '_salt', $salt );
+	    # 
+	    # 2010-08-05 Martin Bartosch - FIXME
+	    # encrypt salt and store in context
 
+	    my $handle = $workflow->id() . '_' . $a;
+	    CTX('api')->set_data_pool_entry(
+		{
+		    NAMESPACE => 'smartcard.pinunblock.salt',
+		    KEY       => $handle,
+		    VALUE     => $salt,
+		    # autocleanup of keys which are not crafted into certificates
+		    # later in this process
+		    EXPIRATION_DATE => time + 2 * 24 * 3600,
+		    FORCE     => 1,
+		    ENCRYPT   => 1,
+		});
+	    
+	    CTX('dbi_backend')->commit();
         }
     }
 
