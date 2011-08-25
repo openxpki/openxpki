@@ -45,7 +45,7 @@ sub get_command
     my $command  = "crl";
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -in ".$self->{INFILE};
-    if ($self->{IN} eq 'DER') {
+    if (defined $self->{IN} && ($self->{IN} eq 'DER')) {
         $command .= " -inform DER";
     }
     if ($self->{OUT} eq "DER")

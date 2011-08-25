@@ -795,10 +795,14 @@ sub get_cert_subject_styles {
         if ($pkcs10) {
             # add subject alternative names from CSR if present
             my @pkcs10_sans = ();
-            eval {
-                @pkcs10_sans = split q{, }, $csr_info->{BODY}->{OPENSSL_EXTENSIONS}->{'X509v3 Subject Alternative Name'}->[0];
-            };
-            for (my $ii = $san_count; $ii < ($san_count + scalar @pkcs10_sans); $ii++) {
+
+	    my $tmp = $csr_info->{BODY}->{OPENSSL_EXTENSIONS}->{'X509v3 Subject Alternative Name'}->[0];
+	    if (defined $tmp) {
+		eval {
+		    @pkcs10_sans = split q{, }, $tmp;
+		};
+	    }
+	    for (my $ii = $san_count; $ii < ($san_count + scalar @pkcs10_sans); $ii++) {
                 # add fixed SAN entries for all SANs in the PKCS#10
                 my $san = $pkcs10_sans[$ii - $san_count];
                 ##! 16: 'san: ' . $san

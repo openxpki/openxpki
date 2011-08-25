@@ -482,11 +482,18 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
     ## log in, as this will cause a crash on the web interface. This
     ## is a known bug (#1909037), and this code is here as a workaround
     ## until it is fixed.
-    if (exists $message->{PARAMS}->{LOGIN} &&
-        $message->{PARAMS}->{LOGIN} !~ m{ \A \p{IsASCII}+ \z }xms) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_NON_ASCII_USERNAME_BUG',
-        );
+    if (exists $message->{PARAMS}->{LOGIN}) {
+	if (! defined $message->{PARAMS}->{LOGIN}) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_USERNAME_UNDEFINED',
+		);
+	}
+	
+	if ($message->{PARAMS}->{LOGIN} !~ m{ \A \p{IsASCII}+ \z }xms) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_NON_ASCII_USERNAME_BUG',
+		);
+	}
     }
 
     my ($user, $role, $reply) = CTX('authentication')->login_step({

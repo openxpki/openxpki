@@ -108,7 +108,7 @@ sub execute {
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND',
 	    params => {
 		FILTER => "$key=$value",
-                BASEDN => $ldap_basedn,
+		BASEDN => $ldap_basedn,
 	    },
 	    log => {
 		logger => CTX('log'),

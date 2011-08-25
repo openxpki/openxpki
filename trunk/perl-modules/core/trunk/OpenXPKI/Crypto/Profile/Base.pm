@@ -104,11 +104,19 @@ sub load_extension
 
     ## is this a critical extension?
 
-    my $critical = eval {$self->{config}->get_xpath (
-                             XPATH     => [@path, "critical"],
-                             COUNTER   => [@counter, 0, 0],
-                             CONFIG_ID => $cfg_id)};
-
+    my $critical;
+    eval {
+	$critical = $self->{config}->get_xpath (
+	    XPATH     => [@path, "critical"],
+	    COUNTER   => [@counter, 0, 0],
+	    CONFIG_ID => $cfg_id);
+    };
+    if (! defined $critical) {
+	$critical = 'false';
+	# FIXME: should we generate a warning here that no criticality is
+	# defined?
+    }
+    
     if ($path[$#path] eq "basic_constraints")
     {
         $values[0] = ["CA",
@@ -430,6 +438,36 @@ sub set_extension
     my $name     = $keys->{NAME};
     my $critical = $keys->{CRITICAL};
     my $value    = $keys->{VALUES};
+    
+    if (! defined $name) {
+	OpenXPKI::Exception->throw(
+	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_NAME_NOT_SPECIFIED",
+	    );
+    }
+	
+    if (! defined $value) {
+	OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_VALUE_NOT_SPECIFIED",
+	    );
+    }
+    if (! defined $critical) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_CRITICALITY_NOT_SPECIFIED",
+	    params => {
+		NAME => $name,
+		VALUE => $value,
+	    });
+    }
+    if ($critical !~ m{ \A (?:true|false) }xms) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_INVALID_CRITICALITY",
+	    params => {
+		NAME => $name,
+		VALUE => $value,
+		CRITICALITY => $critical,
+	    });
+    }
+    
     ##! 16: 'name: ' . $name
     ##! 16: 'critical: ' . $critical
     ##! 16: 'value: ' . $value
