@@ -23,6 +23,7 @@ sub execute {
     my $context    = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $role       = $self->param('role');
+    my $sleep      = $self->param('sleep');
     ##! 64: 'role from config file: ' . $role
     my $csr_serials = $context->param('csr_serial');
     if (!defined $csr_serials) {
@@ -32,7 +33,7 @@ sub execute {
     }
     
     my @csr_serials = @{$serializer->deserialize($csr_serials)};
-    
+
     foreach my $serial (@csr_serials) {
         ##! 64: 'csr_serial: ' . $serial
         my $fork_wf_instance = OpenXPKI::Server::Workflow::Activity::Tools::ForkWorkflowInstance->new(
@@ -49,6 +50,10 @@ sub execute {
             },
         );
         ##! 64: 'executed'
+       if (defined $sleep && ($sleep =~ m{ \A \d+ \z }xms)) {
+           ##! 64: 'sleeping ' . $sleep . ' seconds'
+           sleep $sleep;
+       }
     }
     return;
 }
@@ -64,3 +69,7 @@ OpenXPKI::Server::Workflow::Activity::SmartCard::ForkWorkflowInstances
 
 Forks certificate issuance workflows for all csr_serials in the
 context.
+
+parameters:
+
+sleep:           (optional) sleep n seconds after each fork operation
