@@ -205,6 +205,14 @@ OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Sleep.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Notification.pm
 OpenXPKI/Server/Workflow/Activity/Tools/NotifyParentWorkflow.pm
+OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
+OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
+
+OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Datapool/SetEntry.pm
+
+OpenXPKI/Server/Workflow/Activity/Tools/LDAP/GetLDAPData.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
