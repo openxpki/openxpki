@@ -404,7 +404,7 @@ sub __get_action_config_template :PRIVATE {
             COUNTER   => [ @counter, $i        , 0      ],
             CONFIG_ID => $config_id_of{$ident},
         );
-        if ($lang eq $language) {
+        if (defined $language && ($lang eq $language)) {
             $template_index = $i;
             last FIND_LANGUAGE_TEMPLATE;
         }

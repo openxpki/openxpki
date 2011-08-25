@@ -189,7 +189,11 @@ sub __log_write_action
 # TODO: do we really need to log this?
     foreach my $key (keys %index)
     {
-        $message .= "\n".lc($key)."=".$index{$key};
+        my $val = 'n/a';
+        if (exists $index{$key}) {
+	    $val = $index{$key};
+	}
+        $message .= "\n" . lc($key) . "=" . $val;
     }
     ##! 16: 'log: ' . ref $self->{LOG}
 
