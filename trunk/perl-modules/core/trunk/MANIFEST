@@ -176,6 +176,10 @@ OpenXPKI/Workflow/Factory.pm
 
 OpenXPKI/Server/Workflow.pm
 
+OpenXPKI/Server/Workflow/WFObject.pm
+OpenXPKI/Server/Workflow/WFObject/WFArray.pm
+OpenXPKI/Server/Workflow/WFObject/WFHash.pm
+
 OpenXPKI/Server/Workflow/Activity.pm 
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 
@@ -206,6 +210,8 @@ OpenXPKI/Server/Workflow/Activity/Tools/Sleep.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Notification.pm
 OpenXPKI/Server/Workflow/Activity/Tools/NotifyParentWorkflow.pm
 OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
+OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm
+OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
@@ -213,6 +219,8 @@ OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/SetEntry.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/LDAP/GetLDAPData.pm
+OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
+OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
@@ -243,6 +251,10 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/WriteCertificateToInstall.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/GetLDAPData.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/PublishCertificates.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateServerCSR.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm
+
+OpenXPKI/Server/Workflow/Activity/SmartCard/CreateEscrowedKey.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/IssueCert.pm
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
@@ -278,11 +290,16 @@ OpenXPKI/Server/Workflow/Condition/UseLdap.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContext.pm
 OpenXPKI/Server/Workflow/Condition/CheckForkedWorkflowChildren.pm
+OpenXPKI/Server/Workflow/Condition/CheckExistingCertificate.pm
+OpenXPKI/Server/Workflow/Condition/WorkflowContextBulk.pm
 OpenXPKI/Server/Workflow/Condition/SCEPClient.pm
 OpenXPKI/Server/Workflow/Condition/SCEPClientAutoIssuance.pm
 OpenXPKI/Server/Workflow/Condition/SCEPClientCertValid.pm
 OpenXPKI/Server/Workflow/Condition/SCEPClientEnrollment.pm
 OpenXPKI/Server/Workflow/Condition/SCEPClientCSRValidRole.pm
+
+OpenXPKI/Server/Workflow/Condition/WFArray.pm
+OpenXPKI/Server/Workflow/Condition/DatapoolEntry.pm
 
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm
