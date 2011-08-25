@@ -198,6 +198,15 @@ sub __init
                 $val =~ s/\s+$//;
                 $i++;
                 next if $val =~ /^$/;
+		if ($key eq 'X509v3 Subject Alternative Name') {
+		    # when OpenSSL encounters CSR IP Subject Alternative Names
+		    # the parsed output contains "IP Address:d.d.d.d", however
+		    # OpenSSL expects "IP:d.d.d.d" in a config file for
+		    # certificate issuance if you intend to issue a certificate
+		    # we hereby declare that "IP" is the canonical identifier
+		    # for an IP Subject Alternative Name
+		    $val =~ s{ \A IP\ Address: }{IP:}xms;
+		}
                 push(@{$ret->{OPENSSL_EXTENSIONS}->{$key}}, $val);
             }
         } else {
