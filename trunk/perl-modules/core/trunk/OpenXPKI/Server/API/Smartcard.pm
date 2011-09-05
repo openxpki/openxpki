@@ -170,6 +170,9 @@ sub sc_analyze_smartcard {
 	    # policy setting: if set 0 no approval is required for user cert
 	    # issuance
 	    need_wf_approval => 0,
+	    # policy setting: if true the token must be completely purged
+	    # before an unblock operation may happen
+	    purge_token_before_unblock => 0,
 	    # smartcard cleanup is necessary
 	    have_cert_to_delete => 0,
 	    # directory cleanup is necessary
@@ -534,6 +537,8 @@ sub sc_analyze_smartcard {
     # smartcard type specific settings
     if ($tokenid =~ m{ \A (?:rsa[23]_) }xms) {
 	$result->{PROCESS_FLAGS}->{puk_is_writable} = 0;
+	# RSA tokens must be wiped before they can be unblocked
+	$result->{PROCESS_FLAGS}->{purge_token_before_unblock} = 1;
 	$result->{SMARTCARD}->{keysize} = 1024;
 	$result->{SMARTCARD}->{default_puk} = undef;
     } elsif ($tokenid =~ m{ \A (?:gem2_) }xms) {
