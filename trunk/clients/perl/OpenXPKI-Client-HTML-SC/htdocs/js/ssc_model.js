@@ -67,6 +67,7 @@ var SSC_MODEL = new Class(
 				this.user.authEmail1 = 'Auth Person 2';
 				this.user.authEmail2 = 'Auth Person 1';
 				this.overAllStatus = null;
+				this.resetTokenRSA = 0;
 				this.keysize = 2048;
 				this.newUserPin = null;
 				this.selectedAccount = null;
@@ -520,7 +521,9 @@ var SSC_MODEL = new Class(
 						this.user.workflows = data.userWF;
 						this.user.cardstatus = data.msg.PARAMS.SMARTCARD.status;
 						this.overAllStatus = data.msg.PARAMS.OVERALL_STATUS;
-
+						this.resetTokenRSA = data.msg.PARAMS.PROCESS_FLAGS.purge_token_before_unblock; 
+						window.dbg.log('resetToken: ' + this.resetTokenRSA);
+						this.cardType = data.cardtype;
 					} catch (e) {
 						// JSON SERVER ERROR OR PKI ERROR
 						sscView.showPopUp('E_ajax_backend-Error-status',
@@ -629,9 +632,9 @@ var SSC_MODEL = new Class(
 					// sscView.showPopUp('E_unknownSmartcard','cross','0010');
 					viewCb('cardUnknown');
 					
-					if(data.cardtype === 'RSA_2.0'){
-						window.location = this.options.baseUrl.substring(0, pos)+'/appsso';
-					}
+//					if(data.cardtype === 'RSA_2.0'){
+//						window.location = this.options.baseUrl.substring(0, pos)+'/appsso';
+//					}
 					return;
 					break;
 				case 'initial':
@@ -651,7 +654,6 @@ var SSC_MODEL = new Class(
 					ret = 0;
 					break;
 				}
-
 				
 				var numWf = null;
 				try {
@@ -800,7 +802,39 @@ var SSC_MODEL = new Class(
 
 				
 				// sscView.setTopMenu(true);
-				window.dbg.log('overall state:'+this.overAllStatus);	
+				window.dbg.log('overall state:'+this.overAllStatus);
+				window.dbg.log('CardType :'+data.cardtype );
+				
+				if(data.cardtype === 'RSA_2.0'){
+					
+					this.user.cardActivation = true;
+					if(this.resetTokenRSA === '1' )
+					{
+						window.dbg.log('enable reset RSA Token :'+this.resetTokenRSA ) ;
+					}	
+						
+					if (activeUnblockWf !== null) {
+						if (activeUnblockWf !== null) {
+							window.dbg.log('continue unblock - active wf found id:'
+									+ activeUnblockWf.WORKFLOW_SERIAL);
+							//this.user.cardActivation = true;
+							this.overAllStatus = 'red';
+							//this.unblock_wfID = activeUnblockWf.WORKFLOW_SERIAL;
+							if (activeUnblockWf.WORKFLOW_STATE === 'PEND_ACT_CODE'
+									|| activeUnblockWf.WORKFLOW_STATE === 'PEND_PIN_CHANGE') {
+								viewCb('enterAuthcodes');
+							} else {
+								viewCb('enterAuthPersons');
+							}
+						}
+					}else{
+						viewCb('enterAuthPersons');
+					}
+					return;
+					
+				}
+			
+
 
 
 				if (this.overAllStatus === 'green') {
@@ -1900,11 +1934,26 @@ var SSC_MODEL = new Class(
 					// sscView.showPopUp('T_Server_Error'+error ,'critical');
 				}
 				
+				
 				if( err !== 'error'){
 					if (data.wfstate === 'SUCCESS') {
 						window.dbg.log('SUCCESS - show status');
-						viewCb();
-						return;
+						
+						if(this.cardType === 'RSA_2.0')
+						{
+													
+							window.dbg.log("RSA unblock successful");
+							viewCb(); //only to clear the main field Hack ugly 
+								sscView.setOverallStatus('green');
+								sscView.setPrompt('P_RSAunblock');
+								sscView.setNextAction('', null );
+								return;
+								
+						}else{
+							viewCb();
+							return;
+						}
+					
 					} else {
 						sscView.showPopUp('E_server-error-confirming-reset',
 								'cross', '0217');
@@ -1930,8 +1979,6 @@ var SSC_MODEL = new Class(
 					}catch (e){
 						
 					}
-						
-					
 				}
 				
 				// dom_popup('Card unblocked ', "Finished card unblock :"+
@@ -1996,6 +2043,31 @@ var SSC_MODEL = new Class(
 						viewCb('failure'); // FIXME return code
 						return;
 					}
+					
+					
+					if(this.cardType === 'RSA_2.0')
+					{
+						window.dbg.log("start RSA unblock");
+						
+						
+						if(this.resetTokenRSA === 1 )
+							{
+								var command = "ResetToken";
+											
+								var plugin_parameter = "PUK=" + PUK + ";PUKEncrypted="
+								+ this.puk_pin_encryption + ";NewPIN=" + PIN
+								+ ";NewPINEncrypted=" + this.puk_pin_encryption
+								+ ";";
+
+						this.PKCS11Plugin.ParamList = plugin_parameter;
+						this.PKCS11Plugin.Request = command;
+						this.sc_run_command(this.sc_cb_resetpin, viewCb);
+							return;	
+						}
+						
+					
+					}
+					
 
 					var command = "ResetPIN";
 					// alert("PUK:" + data.puk +"\n state"+data.wfstate +" \n
