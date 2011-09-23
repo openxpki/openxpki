@@ -89,7 +89,7 @@ subversion or git.
 - Create openxpki/openxpki user and group
 
   sudo addgroup openxpki
-  sudo adduser --ingroup openxpki openxpki
+  sudo adduser --ingroup openxpki --disabled-password --gecos 'OpenXPKI User' openxpki
  
 - Install OpenXPKI prerequisites from debian
 
@@ -145,7 +145,12 @@ CREATING APT REPOSITORY
   # Debian: squeeze
   # Ubuntu: lucid
   # set dist to squeeze or lucid
-  dist=squeeze
+  if [ -f /etc/lsb-release ]; then
+    . /etc/lsb-release
+    dist="$DISTRIB_CODENAME"
+  else 
+    dist=squeeze
+  fi
   mkdir -p ~/openxpki/dpkg/${dist}/binary/cpan
   mkdir -p ~/openxpki/dpkg/${dist}/binary/core
   mkdir -p ~/openxpki/dpkg/${dist}/binary/client
@@ -160,7 +165,7 @@ CREATING APT REPOSITORY
 
   cd ~/openxpki/trunk/package/debian
   
-  cp deb/cpan/*.deb ~/openxpki/dpkg/${dist}/binary/cpan
+  cp deb/cpan/*.deb ~/openxpki/dpkg/${dist}/binary/cpan/
   cp deb/core/*.deb ~/openxpki/dpkg/${dist}/binary/core/
   cp deb/client_api/*.deb ~/openxpki/dpkg/${dist}/binary/client_api/
   cp deb/client/*.deb ~/openxpki/dpkg/${dist}/binary/client/
