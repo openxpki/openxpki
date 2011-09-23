@@ -9,6 +9,7 @@ CHANGES
 Makefile.PL
 OpenXPKI.pm
 OpenXPKI/VERSION.pm
+OpenXPKI/Config.pm
 OpenXPKI/DateTime.pm
 OpenXPKI/Debug.pm
 OpenXPKI/DN.pm

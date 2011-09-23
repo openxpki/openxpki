@@ -9,7 +9,7 @@ Recommends:
 Section: perl
 Priority: optional
 Pre-Depends: adduser, debconf
-Depends: ${perl:Depends}, ${shlibs:Depends}, make, libopenxpki-perl, libopenxpki-client-perl, libdbi-perl, mysql-server, libdbd-mysql-perl, libtemplate-perl
+Depends: ${perl:Depends}, ${shlibs:Depends}, make, libopenxpki-perl, libopenxpki-client-perl, libdbi-perl, mysql-server, libdbd-mysql-perl, libtemplate-perl, libconfig-merge-perl, libconfig-versioned-perl
 Description: Deployment software for OpenXPKI Perl core modules
  OpenXPKI is an Open Source PKI project.
  .

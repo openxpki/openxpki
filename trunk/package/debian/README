@@ -89,9 +89,9 @@ subversion or git.
 - Create openxpki/openxpki user and group
 
   sudo addgroup openxpki
-  sudo adduser --disabled-password --gecos 'OpenXPKI Admin' \
-    --ingroup openxpki openxpki
 
+  sudo adduser --ingroup openxpki --disabled-password --gecos 'OpenXPKI User' openxpki
+ 
 - Install OpenXPKI prerequisites from debian
 
   cd ~/openxpki/trunk/package/debian-squeeze
@@ -143,10 +143,19 @@ CREATING APT REPOSITORY
 
 - Create repository directories
 
-  mkdir -p ~/openxpki/dpkg/squeeze/binary/cpan
-  mkdir -p ~/openxpki/dpkg/squeeze/binary/core
-  mkdir -p ~/openxpki/dpkg/squeeze/binary/client
-  mkdir -p ~/openxpki/dpkg/squeeze/binary/client_api
+  # Debian: squeeze
+  # Ubuntu: lucid
+  # set dist to squeeze or lucid
+  if [ -f /etc/lsb-release ]; then
+    . /etc/lsb-release
+    dist="$DISTRIB_CODENAME"
+  else 
+    dist=squeeze
+  fi
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/cpan
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/core
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/client
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/client_api
 
 - Create the APT configuration file to be used by clients
 
@@ -157,10 +166,10 @@ CREATING APT REPOSITORY
 
   cd ~/openxpki/trunk/package/debian-squeeze
   
-  cp deb/cpan/*.deb ~/openxpki/dpkg/squeeze/binary/cpan
-  cp deb/core/*.deb ~/openxpki/dpkg/squeeze/binary/core/
-  cp deb/client_api/*.deb ~/openxpki/dpkg/squeeze/binary/client_api/
-  cp deb/client/*.deb ~/openxpki/dpkg/squeeze/binary/client/
+  cp deb/cpan/*.deb ~/openxpki/dpkg/${dist}/binary/cpan/
+  cp deb/core/*.deb ~/openxpki/dpkg/${dist}/binary/core/
+  cp deb/client_api/*.deb ~/openxpki/dpkg/${dist}/binary/client_api/
+  cp deb/client/*.deb ~/openxpki/dpkg/${dist}/binary/client/
 
   (cd ~/openxpki/dpkg && \
     (dpkg-scanpackages squeeze/binary /dev/null | \

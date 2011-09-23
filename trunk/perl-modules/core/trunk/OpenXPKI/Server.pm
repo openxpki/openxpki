@@ -60,7 +60,7 @@ sub new
     # initialize configuration, i18n and log
     OpenXPKI::Server::Init::init({
 	    CONFIG => $self->{CONFIG},
-	    TASKS  => [ 'current_xml_config', 'i18n', 'log' ],
+	    TASKS  => [ 'config_versioned', 'current_xml_config', 'i18n', 'log' ],
         SILENT => $keys->{SILENT},
 	});
 
