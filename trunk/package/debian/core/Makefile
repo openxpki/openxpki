@@ -1,11 +1,21 @@
 # trunk/package/debian/core
+#
 
+TOPDIR=../../../..
+
+SRCBASE=$(TOPDIR)/trunk/perl-modules/core/trunk
 OPENXPKI_SVN=../../../..
 PACKAGE=libopenxpki-perl
 PERLNAME=OpenXPKI
 
+# Makefile.inc contains common settings for all packages (checked in)
+include ../Makefile.inc
+# Makefile.local may be used locally to override settings (not checked in)
+-include ../Makefile.local
+
 default:
 	make clean
+	make control
 	make changelog
 	make openxpki-archive
 	make debian-archive
@@ -14,7 +24,7 @@ default:
 	make source-clean
 
 openxpki-archive:
-	cd ${OPENXPKI_SVN}/trunk/perl-modules/core/trunk; \
+	cd $(SRCBASE); \
 	perl Makefile.PL; \
 	make dist; \
 	mv $(PERLNAME)-*.tar.gz /tmp
@@ -30,6 +40,8 @@ source:
 	mkdir debian; \
 	cd debian; \
 	tar -xzf /tmp/openxpki-debian.tar.gz;
+
+control: control.template
 
 package:
 	cd /tmp/$(PERLNAME)-*/; \
