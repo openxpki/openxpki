@@ -15,3 +15,14 @@ Description: Deployment software for OpenXPKI Perl core modules
  .
  This package contains the software and templates to deploy
  a fresh OpenXPKI instance.
+ .
+ Packaging information:
+ OpenXPKI version       [% version %]
+ Git commit hash:       [% GIT_COMMIT_HASH %]
+ Git description:       [% GIT_DESCRIPTION %]
+ Git tags:              [%- IF GIT_TAGS -%]
+ [%- GIT_TAGS -%]
+[%- ELSE -%]
+ <no tag set>
+[%- END %]
+
