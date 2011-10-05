@@ -13,3 +13,14 @@ Description: Translations for OpenXPKI
  OpenXPKI is an Open Source PKI project.
  .
  This package contains the translations for all the software.
+ .
+ Packaging information:
+ OpenXPKI version       [% version %]
+ Git commit hash:       [% GIT_COMMIT_HASH %]
+ Git description:       [% GIT_DESCRIPTION %]
+ Git tags:              [%- IF GIT_TAGS -%]
+ [%- GIT_TAGS -%]
+[%- ELSE -%]
+ <no tag set>
+[%- END %]
+
