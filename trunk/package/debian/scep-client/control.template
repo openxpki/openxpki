@@ -13,3 +13,14 @@ Description: OpenXPKI SCEP CGI script
  OpenXPKI is an Open Source PKI project.
  .
  This package contains a cgi script to add SCEP functionality for an OpenXPKI server.
+ .
+ Packaging information:
+ OpenXPKI version       [% version %]
+ Git commit hash:       [% GIT_COMMIT_HASH %]
+ Git description:       [% GIT_DESCRIPTION %]
+ Git tags:              [%- IF GIT_TAGS -%]
+ [%- GIT_TAGS -%]
+[%- ELSE -%]
+ <no tag set>
+[%- END %]
+

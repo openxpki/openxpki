@@ -13,3 +13,14 @@ Description: OpenXPKI Mason based web frontend
  OpenXPKI is an Open Source PKI project.
  .
  This package contains a Mason based web frontend for an OpenXPKI server.
+ .
+ Packaging information:
+ OpenXPKI version       [% version %]
+ Git commit hash:       [% GIT_COMMIT_HASH %]
+ Git description:       [% GIT_DESCRIPTION %]
+ Git tags:              [%- IF GIT_TAGS -%]
+ [%- GIT_TAGS -%]
+[%- ELSE -%]
+ <no tag set>
+[%- END %]
+

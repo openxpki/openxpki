@@ -14,4 +14,14 @@ Description: OpenXPKI Perl core modules
  .
  This package contains all core modules which are required to run
  an OpenXPKI trustcenter.
+ .
+ Packaging information:
+ OpenXPKI version       [% version %]
+ Git commit hash:       [% GIT_COMMIT_HASH %]
+ Git description:       [% GIT_DESCRIPTION %]
+ Git tags:              [%- IF GIT_TAGS -%]
+ [%- GIT_TAGS -%]
+[%- ELSE -%]
+ <no tag set>
+[%- END %]
 
