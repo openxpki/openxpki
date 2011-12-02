@@ -2,11 +2,16 @@
 #
 # Makefile for running the tests that use the installed OpenXPKI
 #
+# IMPORTANT: These tests are run against a running OpenXPKI installation.
+# Override the configuration files to adjust to your environment. The defaults
+# are intended to work with the reference installation, but this may not be
+# completely implemented for all tests yet.
+#
 #
 
 MODULES := backend selenium
 
-# each module will add to these
+# each module will add its own targets to these
 TESTS :=
 TESTS_BACKEND :=
 TESTS_SELENIUM :=
@@ -14,9 +19,11 @@ TESTS_SELENIUM :=
 # include the description for each module
 include $(patsubst %,%/module.mk,$(MODULES))
 
-.PHONY: all tests dtests be-tests be-dtests sel-tests sel-dtests cardadm
+.PHONY: all tests dtests be-tests be-dtests sel-tests sel-dtests
 
 PROVE_ARGS := -Ilib
+
+include Makefile.inc
 
 all:
 	@echo " "
