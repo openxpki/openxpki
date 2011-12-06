@@ -33,6 +33,10 @@ all:
 	@echo " "
 	@echo " * requires running Selenium Server"
 
+list:
+	@echo "Tests:"
+	@echo $(TESTS) | sort | xargs -n 1 echo "	" 
+
 
 tests: $(TESTS)
 	prove $(PROVE_ARGS) $(TESTS)
@@ -55,12 +59,7 @@ sel-tests: $(TESTS_SELENIUM)
 sel-dtests: $(TESTS_SELENIUM)
 	DESTRUCTIVE_TESTS=1 prove $(PROVE_ARGS) $(TESTS_SELENIUM)
 
-########################################
+
 # Individual tests used during development of the tests themselves
-########################################
+-include Makefile.post.local
 
-cardadm: 
-	DESTRUCTIVE_TESTS=1 prove $(PROVE_ARGS) --verbose backend/smartcard/01_cardadm.t
-
-exthooks:
-	DESTRUCTIVE_TESTS=1 prove $(PROVE_ARGS) --verbose selenium/uimods/01_exthooks.t

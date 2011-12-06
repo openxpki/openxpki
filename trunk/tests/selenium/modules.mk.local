@@ -1,0 +1,1 @@
+MODULES_SELENIUM := selenium/smartcard selenium/uimods

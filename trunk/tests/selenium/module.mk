@@ -6,7 +6,11 @@
 # The individual sub-modules should populate TESTS_SELENIUM
 
 # Add each full sub-module directory here
-MODULES_SELENIUM := selenium/smartcard selenium/uimods
+MODULES_SELENIUM := 
+
+# For local modules, create module.mk.local and add additional
+# MODULES_BACKEND entries as shown above
+-include module.mk.local
 
 # include the description for each sub-module
 include $(patsubst %,%/module.mk,$(MODULES_SELENIUM))

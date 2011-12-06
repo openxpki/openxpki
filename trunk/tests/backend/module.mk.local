@@ -1,0 +1,7 @@
+# backend/module.mk.local
+#
+# This module file adds the backend tests that are for code that
+# is not yet upstream.
+
+MODULES_BACKEND := backend/smartcard
+
