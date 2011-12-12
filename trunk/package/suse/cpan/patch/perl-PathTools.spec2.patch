@@ -1,0 +1,12 @@
+--- perl-PathTools.spec2	2012-01-09 17:15:01.000000000 +0100
++++ perl-PathTools.spec2.new	2012-01-09 17:16:58.000000000 +0100
+@@ -50,7 +50,8 @@
+ %defattr(-,root,root,-)
+ %doc Changes README COPYING Artistic
+ %{perl_vendorarch}/auto/*
+-%{perl_vendorarch}/PathTools*
++%{perl_vendorarch}/Cwd*
++%{perl_vendorarch}/File*
+ %{_mandir}/man3/*
+ 
+ %changelog

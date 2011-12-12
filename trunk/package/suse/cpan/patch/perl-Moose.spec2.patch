@@ -1,0 +1,12 @@
+--- perl-Moose.spec2	2012-01-03 17:52:45.000000000 +0100
++++ perl-Moose.spec2.new	2012-01-03 17:56:52.000000000 +0100
+@@ -60,7 +60,8 @@
+ %defattr(-,root,root,-)
+ %doc author benchmarks Changes Changes.Class-MOP dist.ini doap.rdf doc eg examples LICENSE META.json README TODO xs
+ %{perl_vendorarch}/auto/*
+-%{perl_vendorarch}/Moose*
++%{_bindir}/*
++%{perl_vendorarch}/*
+ %{_mandir}/man3/*
+ 
+ %changelog

@@ -1,0 +1,10 @@
+--- perl-Params-Validate.spec2	2012-01-03 14:26:05.000000000 +0100
++++ perl-Params-Validate.spec2.new	2012-01-03 14:27:25.000000000 +0100
+@@ -44,6 +44,7 @@
+ %defattr(-,root,root,-)
+ %doc benchmarks c Changes dist.ini LICENSE META.json README TODO
+ %{perl_vendorarch}/auto/*
++%{perl_vendorarch}/Attribute*
+ %{perl_vendorarch}/Params*
+ %{_mandir}/man3/*
+ 
