@@ -1,0 +1,11 @@
+--- perl-podlators.spec2	2012-01-04 12:08:43.000000000 +0100
++++ perl-podlators.spec2.new	2012-01-04 12:09:37.000000000 +0100
+@@ -49,6 +49,8 @@
+ %defattr(-,root,root,-)
+ %doc ChangeLog NOTES README THANKS TODO VERSION COPYING Artistic
+ %{perl_vendorlib}/*
++%{_bindir}/*
++%{_mandir}/man1/*
+ %{_mandir}/man3/*
+ 
+ %changelog

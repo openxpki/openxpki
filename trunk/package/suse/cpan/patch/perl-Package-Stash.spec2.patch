@@ -1,0 +1,10 @@
+--- perl-Package-Stash.spec2	2012-01-03 13:53:30.000000000 +0100
++++ perl-Package-Stash.spec2.new	2012-01-03 13:54:11.000000000 +0100
+@@ -47,6 +47,7 @@
+ %defattr(-,root,root,-)
+ %doc Changes dist.ini LICENSE META.json README weaver.ini
+ %{perl_vendorlib}/*
++%{_bindir}/*
+ %{_mandir}/man3/*
+ 
+ %changelog
