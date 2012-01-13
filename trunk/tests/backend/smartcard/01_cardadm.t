@@ -42,9 +42,9 @@ my $testcfg = new TestCfg;
 $testcfg->read_config_path( '01_cardadm.cfg', \%cfg, @cfgpath );
 $testcfg->load_ldap( '01_cardadm.ldif', @cfgpath );
 
-package OpenXPKI::Tests::More::SmartcardCardadm;
+package OpenXPKI::Test::More::SmartcardCardadm;
 {
-    use base qw( OpenXPKI::Tests::More );
+    use base qw( OpenXPKI::Test::More );
     sub wftype { return 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_CARDADM' }
 
     my ( $msg, $wf_id, $client );
@@ -330,7 +330,7 @@ my $tok_id;
 # START TESTS
 ############################################################
 
-my $test = OpenXPKI::Tests::More::SmartcardCardadm->new(
+my $test = OpenXPKI::Test::More::SmartcardCardadm->new(
     {   socketfile => $socketfile,
         realm      => $realm
     }
