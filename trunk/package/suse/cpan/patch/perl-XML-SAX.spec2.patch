@@ -1,0 +1,16 @@
+--- perl-XML-SAX.spec2	2012-01-04 11:35:45.000000000 +0100
++++ perl-XML-SAX.spec2.new	2012-01-04 11:38:47.000000000 +0100
+@@ -38,6 +38,13 @@
+ 
+ %check || :
+ make test
++# Note: This .ini file is needed in the build directory for
++#       building XML::Validator::Schema. This must be added
++#       *after* running 'make test' because that deletes it.
++cat << EOF > blib/lib/XML/SAX/ParserDetails.ini
++[XML::SAX::PurePerl]
++http://xml.org/sax/features/namespaces = 1
++EOF
+ 
+ %clean
+ rm -rf $RPM_BUILD_ROOT

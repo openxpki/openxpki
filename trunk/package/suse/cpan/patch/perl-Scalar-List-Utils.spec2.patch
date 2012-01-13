@@ -1,0 +1,10 @@
+--- perl-Scalar-List-Utils.spec2	2012-01-03 18:03:32.000000000 +0100
++++ perl-Scalar-List-Utils.spec2.new	2012-01-03 18:04:17.000000000 +0100
+@@ -50,6 +50,7 @@
+ %doc Changes README XS.pp COPYING Artistic
+ %{perl_vendorarch}/auto/*
+ %{perl_vendorarch}/Scalar*
++%{perl_vendorarch}/List*
+ %{_mandir}/man3/*
+ 
+ %changelog

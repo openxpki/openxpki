@@ -1,0 +1,14 @@
+--- perl-ExtUtils-ParseXS.spec2	2012-01-03 14:54:32.000000000 +0100
++++ perl-ExtUtils-ParseXS.spec2.new	2012-01-03 14:58:35.000000000 +0100
+@@ -57,8 +57,9 @@
+ %files
+ %defattr(-,root,root,-)
+ %doc Changes README COPYING Artistic
+-%{perl_vendorarch}/auto/*
+-%{perl_vendorarch}/ExtUtils*
++%{perl_vendorlib}/*
++%{_bindir}/*
++%{_mandir}/man1/*
+ %{_mandir}/man3/*
+ 
+ %changelog

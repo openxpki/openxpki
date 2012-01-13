@@ -1,0 +1,12 @@
+--- perl-Encode.spec2	2012-01-03 17:36:02.000000000 +0100
++++ perl-Encode.spec2.new	2012-01-03 17:43:02.000000000 +0100
+@@ -47,6 +47,9 @@
+ %doc AUTHORS Changes README COPYING Artistic
+ %{perl_vendorarch}/auto/*
+ %{perl_vendorarch}/Encode*
++%{perl_vendorarch}/encoding.pm
++%{_bindir}/*
++%{_mandir}/man1/*
+ %{_mandir}/man3/*
+ 
+ %changelog
