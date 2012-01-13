@@ -1,7 +1,7 @@
 # Written by Scott Hardin for the OpenXPKI Project 2010
 # Copyright (c) 2010 by the OpenXPKI Project
 
-package OpenXPKI::Tests::More;
+package OpenXPKI::Test::More;
 use Test::More;
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
 use OpenXPKI::Client;
@@ -524,12 +524,12 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Tests::More
+OpenXPKI::Test::More
 
 =head1 DESCRIPTION
 
 This is a helper module for the OpenXPKI test suites. In contrast to
-OpenXPKI::Tests, this uses an OOP interface that, hopefully, will
+OpenXPKI::Test, this uses an OOP interface that, hopefully, will
 simplify handling the connection to the OpenXPKI daemon.
 
 Subclassing is supported, so a test script can have an in-line package
@@ -542,8 +542,8 @@ definition to extend this class.
   use strict;
   use warnings;
 
-  package MyWFModuleTests;
-  use base qw( OpenXPKI::Tests::More );
+  package MyWFModuleTest;
+  use base qw( OpenXPKI::Test::More );
 
   # object attributes
   my %myattrs : ATTR;
@@ -557,7 +557,7 @@ definition to extend this class.
 
   ...
 
-  my $test = MyWFModuleTests->new();
+  my $test = MyWFModuleTest->new();
   $test->plan( tests => 3);
 
   $test->connect_ok(user => 'USER', password => 'PASS',
