@@ -32,9 +32,9 @@ our %cfg = ();
 my $testcfg = new TestCfg;
 $testcfg->read_config_path( '45_activity_tools.cfg', \%cfg, @cfgpath );
 
-package OpenXPKI::Tests::More::Workflow::ActivityTools;
+package OpenXPKI::Test::More::Workflow::ActivityTools;
 {
-    use base qw( OpenXPKI::Tests::More );
+    use base qw( OpenXPKI::Test::More );
     sub wftype { return qw( I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS ) };
 
     my ( $msg, $wf_id, $client );
@@ -53,7 +53,7 @@ package OpenXPKI::Tests::More::Workflow::ActivityTools;
 
 package main;
 
-my $test = OpenXPKI::Tests::More::Workflow::ActivityTools->new(
+my $test = OpenXPKI::Test::More::Workflow::ActivityTools->new(
     {
         socketfile => $cfg{instance}{socketfile},
         realm => $cfg{instance}{realm},
