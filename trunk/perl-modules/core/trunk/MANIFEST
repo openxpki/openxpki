@@ -402,7 +402,7 @@ OpenXPKI/Service/SCEP/Command/PKIOperation.pm
 ## test stuff
 
 OpenXPKI/Tests.pm
-OpenXPKI/Tests/More.pm
+OpenXPKI/Test/More.pm
 
 t/config.xml
 
