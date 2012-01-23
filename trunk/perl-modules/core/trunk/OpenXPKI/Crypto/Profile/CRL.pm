@@ -30,6 +30,8 @@ sub new {
     $self->{PKI_REALM} = $keys->{PKI_REALM} if ($keys->{PKI_REALM});
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
     $self->{CONFIG_ID} = $keys->{CONFIG_ID} if ($keys->{CONFIG_ID});
+    $self->{VALIDITY} =  $keys->{VALIDITY} if ($keys->{VALIDITY});
+    
 
     if (not $self->{config})
     {
@@ -118,6 +120,12 @@ sub load_profile
 	    COUNTER   => \@profile_counter,
         CONFIG_ID => $self->{CONFIG_ID},
 	});
+
+    # Override Profile validity with local setting
+    if ($self->{VALIDITY}) {
+        ##! 16: "Override validity: " . $self->{VALIDITY}
+        $entry_validity{notafter} = $self->{VALIDITY};
+    }    
 
     if (! exists $entry_validity{notafter}) {
 	OpenXPKI::Exception->throw (
