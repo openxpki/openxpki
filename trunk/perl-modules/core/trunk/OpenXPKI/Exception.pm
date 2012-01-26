@@ -85,10 +85,10 @@ sub throw {
     # It fakes the Devel::StackTrace calls that are used in
     # Exception::Class to be nearly empty, which massively speeds up
     # Exception throwing
-    local *Devel::StackTrace::new
-        = *OpenXPKI::Exception::__fake_stacktrace_new;
-    local *Devel::StackTrace::frame
-        = *OpenXPKI::Exception::__fake_stacktrace_frame;
+#    local *Devel::StackTrace::new
+#        = *OpenXPKI::Exception::__fake_stacktrace_new;
+#    local *Devel::StackTrace::frame
+#        = *OpenXPKI::Exception::__fake_stacktrace_frame;
 
     my $self = $proto->new(%exception_args);
 
