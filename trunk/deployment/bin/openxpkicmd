@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
 #
 # Written by Martin Bartosch
-# for the OpenXPKI project 2009
-# Copyright (c) 2009 by The OpenXPKI Project
+# extended by Oliver Welter
+# for the OpenXPKI project 2009 - 2012
+# Copyright (c) 2012 by The OpenXPKI Project
 #
 
 use strict;
@@ -20,6 +21,8 @@ my %params = (
     authstack => '_System',
     authuser => undef,
     authpass => undef,
+    wfid => undef,
+    wfaction => undef,        
     param => [],
     );
 
@@ -39,6 +42,8 @@ GetOptions(\%params,
                 authstack=s
                 authuser=s
                 authpass=s
+                wfid=i
+                wfaction=s
                 param|set=s@
                 debug
 	     )) or pod2usage(-verbose => 0);
@@ -147,7 +152,39 @@ while (1) {
 
 # logged in, now run required commands
 
-$reply = $client->send_receive_service_msg('COMMAND',
+if ($params{wfid}) {
+
+	if ($params{wfaction}) {
+         
+		$reply = $client->send_receive_command_msg(	
+			'execute_workflow_activity',
+			{
+				ID => $params{wfid},
+				WORKFLOW => $wf_type,
+				ACTIVITY => $params{wfaction},
+				PARAMS => \%wf_parameters,				
+			}
+		);
+		
+		if ($reply->{SERVICE_MSG} eq 'COMMAND') {
+			printf "New Workflow State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{STATE};
+		}		
+	} else {
+		$reply = $client->send_receive_command_msg( 'get_workflow_activities',
+			{
+				ID => $params{wfid},
+				WORKFLOW => $wf_type,							
+			}
+		);
+		if ($reply->{SERVICE_MSG} eq 'COMMAND') {
+			print "Possible Actions:\n";
+			print join "\n", @{$reply->{PARAMS}};
+			print "\n";
+		}
+	}		
+} else {
+
+	$reply = $client->send_receive_service_msg('COMMAND',
 					   {
 					       COMMAND => 'create_workflow_instance',
 					       PARAMS => {
@@ -155,7 +192,7 @@ $reply = $client->send_receive_service_msg('COMMAND',
 						   PARAMS => \%wf_parameters,
 					       }
 					   });
-
+}
 
 if ($reply->{SERVICE_MSG} ne 'COMMAND') {
     print "Error:\n";
@@ -183,12 +220,17 @@ openxpkicmd [options] WORKFLOW_TYPE
     --authuser USER       authentication user (optional)
     --authpass PASS       password for authentication user (optional)
     --param KEY=VALUE     pass VALUE to WF parameter KEY (optional)
+    --wfid                Pickup WF with this id at its current state
+    --wfaction            Execute action on exisiting workflow
     --debug               enable debug mode
 
 =head1 INVOCATION
 
 This command may be used to create OpenXPKI workflows to automate internal
-actions, e. g. issuance of CRLs.
+actions, e. g. issuance of CRLs..
+
+You can use wfid/wfaction to continue stopped or failed workflows. If you pass
+only wfid and no action, a list of possible actions is shown. 
 
 =head1 EXAMPLES
 
