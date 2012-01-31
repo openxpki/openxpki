@@ -45,6 +45,8 @@ sub start_session {
     my $errors        = [];
     my $workflowtrace = [];
     my $ssousername   = undef;
+    
+    
 
 #################################PARAMETER#################################
     if ( defined $self->{r}->headers_in()->get('ct-remote-user')

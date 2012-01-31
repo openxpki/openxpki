@@ -19,6 +19,12 @@ use OpenXPKI::i18n qw( i18nGettext );
 use Data::Dumper;
 use OpenXPKI::Client::HTML::SC::Dispatcher qw( config );
 use DateTime;
+use Log::Log4perl qw(:easy);
+
+
+
+
+
 
 use base qw(
     Apache2::Controller
@@ -33,7 +39,7 @@ use Apache2::Const -compile => qw( :http );
 
 #Only these functions can be called via HTTP/Perlmod
 sub allowed_methods {
-    qw( get_card_status encrypt_pin)
+    qw( get_card_status encrypt_pin get_server_status)
 }    #only these fucntions can be called via handler
 
 #Function 
@@ -413,6 +419,68 @@ sub encrypt_pin {
 
     return $self->send_json_respond($responseData);
 
+
+}
+
+#echo JSON msg
+#Required Parameter via HTTPRequest:
+#Optional Parameter via HTTPRequest:
+
+sub get_server_status {
+    
+	
+
+    my ($self)    = @_;
+    my $sessionID = $self->pnotes->{a2c}{session_id};
+    my $session   = $self->pnotes->{a2c}{session};
+    my $c            = 0;
+
+###########################INIT##########################
+    #$self->start_session();
+    # $c = $session->{"c"};    #OpenXPKI socket connection
+    my $responseData  = {};
+    my $errors	= $session->{"errors"};  
+    
+    if(Log::Log4perl->initialized()) {
+        # Yes, Log::Log4perl has already been initialized
+        $responseData->{'log4perl init'} = "YES";
+    } else {
+   		 #Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
+        # No, not initialized yet ...
+         $responseData->{'log4perl init'} = "NO";
+    }
+    
+
+   my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+
+   $log->debug("Debug message from get server status ");
+   $responseData->{'logs reached: '} =  $log->info("Info message from get server status");
+	
+	
+	my $in = open(LOADAVG,"<", "/proc/loadavg");
+	if(not defined($in)) {
+		$responseData->{'error'} = "error";
+		push(@{$errors},"I18N_OPENXPKI_CLIENT_WEBAPI_UTILITIES_ERROR_READ_LOADAVG");
+
+	}
+	
+	my $pslist = `ps -fu openxpki | wc -l` ;
+	chomp($pslist);
+	
+	$responseData->{'pslist'} = $pslist;
+	$responseData->{'get_server_status'} = "read server infos";
+	my @in = <LOADAVG>; 
+	foreach my $line (@in)
+	{
+		my @values = split(/\s/ , $line);
+		$responseData->{'loadavg'} = $line;
+		$responseData->{'loadavg 1 min'} = $values[0];
+		$responseData->{'loadavg 5 min'} = $values[1];
+		$responseData->{'loadavg 15 min'} = $values[2];
+	}
+	$responseData->{'get_server_status'} = "Server OK";
+	
+	return $self->send_json_respond($responseData);
 
 }
 

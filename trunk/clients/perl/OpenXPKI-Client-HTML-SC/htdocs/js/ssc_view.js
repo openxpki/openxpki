@@ -211,6 +211,12 @@ var SSC_VIEW = new Class(
 					this.setInfoRight('IT_Info','I_cardBlocked');
 					break;
 					
+				case 'serverbusy':
+					this.setPrompt('P_server_busy');
+					this.setInfoRight('IT_Info','I_server_busy');
+					break;
+					
+					
 				case 'cardNotActivated':
 					this.setPrompt('P_cardNotActivated');
 					this.setInfoRight('IT_Info','I_cardNotActivated');

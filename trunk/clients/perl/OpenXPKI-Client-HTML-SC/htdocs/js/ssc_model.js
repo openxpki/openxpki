@@ -28,7 +28,8 @@ var SSC_MODEL = new Class(
 					'sc_cb_GenerateKeypair', 'sc_GenerateKeypair',
 					'sc_cb_persoSendCardStatus', 'determineRequiredAction',
 					'sc_cb_installx509', 'sc_cb_importP12', 'sc_resetToken',
-					'sc_cb_resetToken', 'sc_GetTokenID' , 'sc_cb_GetTokenID' ],
+					'sc_cb_resetToken', 'sc_GetTokenID' , 'sc_cb_GetTokenID' , 
+					'cb_server_get_status', 'server_get_status'],
 
 			options : {
 				baseUrl : '/'
@@ -159,9 +160,42 @@ var SSC_MODEL = new Class(
 				if (this.test) {
 					this.test_status(cb);
 				} else {
-					this.sc_getCertificates(this.sc_cb_getCardStatus, cb);
+					 //this.sc_getCertificates(this.sc_cb_getCardStatus, cb);
+					
+					this.server_get_status(cb);
 				}
 
+			},
+			
+			server_get_status : function(viewCb) {
+
+				window.dbg.log('get server status ');
+				
+				this.cardID = 'gem2_0000000001337';
+				this.cardType = this.StdCardType; 
+				
+				var server_cb = this.cb_server_get_status;
+
+				var targetURL = "functions/utilities/get_server_status";
+				
+				this.ajax_request(targetURL, server_cb,'', viewCb);
+						
+
+			},
+			
+			cb_server_get_status : function(data, viewCb) {
+
+				window.dbg.log('get server status cb');
+				
+				
+				window.dbg.log('list:' + data.pslist );
+	//			if (data.pslist >= 5 )
+	//				{
+	//					viewCb('serverbusy');
+	//					this.PKCS11Plugin.StopPlugin();
+	//				}else{
+						this.sc_getCertificates(this.sc_cb_getCardStatus, viewCb);
+	//				}
 			},
 
 			personalizeAccount : function(account, cb) {
@@ -457,6 +491,11 @@ var SSC_MODEL = new Class(
 						var targetURL = "functions/utilities/get_card_status";
 						this.ajax_request(targetURL, server_cb, resData, viewCb);
 					}
+					/*
+					if (rc) {
+						window.dbg.log("sc_cb_getCardStatus - call server status ");
+					this.server_get_status(viewCb, resData);
+					}*/
 
 			},
 
