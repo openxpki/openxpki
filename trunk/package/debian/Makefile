@@ -22,7 +22,6 @@ PACKAGES=			\
 	scep-client		\
 	i18n
 
-
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 
 # XML::Filter::XInclude XML::SAX::PurePerl XML::Validator::Schema
@@ -59,8 +58,8 @@ default:	clean
 # compatible with OpenXPKI
 $(EXTERNAL) $(EXTERNAL2):
 	test -d deb || mkdir deb
-	test -d deb/cpan || mkdir deb/cpan/	
-	cd deb/cpan/ &&  DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
+	test -d deb/cpan || mkdir deb/cpan/
+	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
 
 #WORKFLOW:
 #	cd deb/cpan/ && rm -rf Workflow-0.31*
