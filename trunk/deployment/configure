@@ -148,7 +148,7 @@ else
   done
 
   echo "Creating Makefile..."
-  $CFG --config $TEMPLATEDIR/default/openxpki.conf \
+  $CFG --config $TEMPLATEDIR/$TEMPLATE/openxpki.conf \
     --setcfg shell.bash="$BASH_SHELL" \
     --file Makefile.in >Makefile
 
