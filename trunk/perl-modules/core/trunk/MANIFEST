@@ -173,6 +173,7 @@ OpenXPKI/Server/Notification/Dispatcher.pm
 OpenXPKI/Server/Notification.pm
 
 ## SOAP
+OpenXPKI/Server/SOAP.pm
 OpenXPKI/Server/SOAPTest.pm
 
 ## Workflow
