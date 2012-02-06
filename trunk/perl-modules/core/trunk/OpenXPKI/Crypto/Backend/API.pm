@@ -105,6 +105,7 @@ sub __init_command_params : PRIVATE {
     "pkcs7_get_chain" => {"SIGNER" => 1,
                           'SIGNER_SUBJECT' => 0,
                           "PKCS7"  => 1},
+    "pkcs7_get_end_entity" => {"PKCS7"  => 1},                          
     "pkcs7_sign"      => {"PASSWD"  => 0,
                           "KEY"     => 0,
                           "CERT"    => 0,
