@@ -986,14 +986,6 @@ sub select
 		$lhs = $tab . '.';
 	    }
 	    $lhs .= $col;
-
-	    my $comparison_operator;
-	    if ($self->{DBH}->column_is_numeric ($col))
-	    {
-		$comparison_operator = ' = ?';
-	    } else {
-		$comparison_operator = ' like ?';
-	    }
 	    
 	    my @dynamic_values;
 
@@ -1011,26 +1003,35 @@ sub select
 		    });
 	    }
 	    
+	    # We use a "like" statement only if we find a wildcard character (%)
+        # in the parameter, otherwise we use "=" to avoid issues with escape
+        # characters. 
+        my $isNumeric = $self->{DBH}->column_is_numeric ($col);
+            
 	    foreach my $value (@dynamic_values) {
-                ##! 64: 'dynamic value: ' . Dumper $value
-		if (defined $value && ! ref $value) {
-                    # scalar case
-		    push @conditions, $lhs . $comparison_operator;
-		    push @bind_values, $value;
-		}
-                elsif (defined $value && ref $value eq 'ARRAY') {
-                    # the value is an array reference, combine with OR
-                    my @tmp = ();
-                    foreach my $subvalue (@{$value}) {
-                        push @tmp, $lhs . $comparison_operator;
-                        push @bind_values, $subvalue; 
-                    }
-                    push @conditions, \@tmp;
+            ##! 64: 'dynamic value: ' . Dumper $value
+		    if (defined $value && ! ref $value) {
+                # scalar case
+		      push @conditions, $lhs . (($isNumeric || $value !~ /%/) ? ' = ?' : ' like ? ');
+		      push @bind_values, $value;
+            }
+            elsif (defined $value && ref $value eq 'ARRAY') {
+                # the value is an array reference, combine with OR
+                my @tmp = ();
+                foreach my $subvalue (@{$value}) {                    
+                    if (defined $subvalue) {                    
+                        push @tmp, $lhs . (($isNumeric || $subvalue !~ /%/) ? ' = ?' : ' like ? ');
+                        push @bind_values, $subvalue;
+                    } else {
+                        push @tmp, $lhs . ' IS NULL';
+                    } 
                 }
-                else {
-		    # handle queries for NULL
-		    push @conditions, $lhs . ' IS NULL';
-		}
+                push @conditions, \@tmp;
+            }
+            else {
+		        # handle queries for NULL
+		        push @conditions, $lhs . ' IS NULL';
+		    }
 	    }
 	}
     }
