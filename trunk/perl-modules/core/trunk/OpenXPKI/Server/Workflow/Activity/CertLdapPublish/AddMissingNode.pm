@@ -303,7 +303,7 @@ sub execute {
   push @{$add_ldap_args}, 'objectclass';
   push @{$add_ldap_args}, [ keys %seen_object_classes ];
   if( $i < $n_dns-2 ){
-       ##! 129: 'LDAP ADD NODE trying to add a node to $node_dn'
+       ##! 129: 'LDAP ADD NODE trying to add a node to '. $node_dn
        $self->__add_node( $node_dn,$add_ldap_args,$ldap);
   }; 
  };
@@ -319,12 +319,14 @@ sub __add_node {
     my $attr_array      = shift;
     my $ldap_connection = shift;
 
+    ##! 129: 'Add node using attributes ' . Dumper ( $attr_array ) 
+
     my $result = $ldap_connection->add( $cert_dn, attr => $attr_array );
     if ( ! $result->code ) {
-        ##! 129: 'LDAP ADD NODE entry $cert_dn added SUCCESSFULLY' 
+        ##! 129: "LDAP ADD NODE entry $cert_dn added SUCCESSFULLY" 
     }
     else {
-        ##! 129: 'LDAP ADD NODE adding entry $cert_dn FAILED $result->error'
+        ##! 129: "LDAP ADD NODE adding entry $cert_dn FAILED " . $result->error
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CERTLDAPPUBLISH_ADDMISSING_NODE_ADD_FAILED',
             params  => {
@@ -343,7 +345,7 @@ sub __push_to_hash {
     my $attribute_name = lc $_[1];
     my $attribute_value = $_[2];
     if (exists $attr_hash->{lc $attribute_name}) {
-       ##! 129: 'LDAP ADD NODE attribute $attribute_name exists in hash'
+       ##! 129: 'LDAP ADD NODE attribute '.$attribute_name.' exists in hash'
        if ( ref($attr_hash->{$attribute_name}) eq 'ARRAY') {
             push @{$attr_hash->{$attribute_name}} , $attribute_value;
        } else {
