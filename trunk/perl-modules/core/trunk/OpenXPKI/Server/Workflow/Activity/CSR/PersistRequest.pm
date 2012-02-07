@@ -29,25 +29,25 @@ sub execute
     my $type    = $context->param('csr_type');
     if (! defined $type) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDDEFINED',
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDEFINED',
         );
     }
     my $profile = $context->param('cert_profile');
     if (! defined $profile) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_PROFILE_UNDDEFINED',
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_PROFILE_UNDEFINED',
         );
     }
     my $subject = $context->param('cert_subject');
     if (! defined $subject) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_SUBJECT_UNDDEFINED',
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_SUBJECT_UNDEFINED',
         );
     }
     my $role    = $context->param('cert_role');
     if (! defined $role) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_ROLE_UNDDEFINED',
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_ROLE_UNDEFINED',
         );
     }
 
@@ -93,6 +93,7 @@ sub execute
         );
     }
     my $san_source = $source_ref->{'cert_subject_alt_name_parts'};
+    $san_source = $source_ref->{'cert_subject_alt_name'} unless($san_source);
 
     if (! defined $san_source) {
         OpenXPKI::Exception->throw(
