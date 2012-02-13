@@ -52,7 +52,7 @@ sub execute
 	DATA  => $certificate,
 	);
 
-    my $x509_parsed = $x509->get_parsed();
+    my $x509_parsed = $x509->get_parsed_ref();
 
     foreach my $key (keys %cert_attrmap) {
 	if (! exists $x509_parsed->{BODY}->{$key}) {
