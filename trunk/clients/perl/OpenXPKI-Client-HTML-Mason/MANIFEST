@@ -172,6 +172,7 @@ htdocs/service/create_crr/search.mhtml
 htdocs/service/create_crr/form.html
 htdocs/service/create_crr/error.mhtml
 htdocs/service/create_crr/success.mhtml
+htdocs/service/create_crr/cert_info.html
 
 htdocs/service/smartcard_personalization/index.html
 htdocs/service/smartcard_personalization/waiting_for_issuance.mhtml
