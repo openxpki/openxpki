@@ -840,6 +840,22 @@ sub select
 	##
 	# handle validity for joins
 	if (defined $args->{VALID_AT}) {
+	    # according to the documentation for this constraint it may be
+	    # one of the following
+	    # 1. single table query:
+	    #    - SCALAR (single point in time)
+	    #    - ARRAYREF (multiple points in time)
+	    # 2. join query across multiple tables
+	    #    - ARRAYREF containing entries for each single joined table
+	    #      - each containing SCALAR or ARRAYREF, see 1.
+	    # hence for single table queries we need to wrap the argument
+	    # in an arrayref to prepare the input for generalized processing
+	    # below
+	    if (scalar(@symbolic_select_tables) == 1) {
+		$args->{VALID_AT} = [ $args->{VALID_AT} ];
+	    }
+
+	    # sanity checks
 	    if (ref $args->{VALID_AT} ne 'ARRAY') {
 		OpenXPKI::Exception->throw (
 		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_VALIDITY_SPECIFICATION_TYPE_FOR_JOIN");
