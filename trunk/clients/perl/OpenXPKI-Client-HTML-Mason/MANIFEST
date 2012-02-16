@@ -190,6 +190,7 @@ htdocs/service/create_crr/search.mhtml
 htdocs/service/create_crr/form.html
 htdocs/service/create_crr/error.mhtml
 htdocs/service/create_crr/success.mhtml
+htdocs/service/create_crr/cert_info.html
 
 htdocs/service/reset_token/delete.html
 htdocs/service/reset_token/delete_gettokenid.html
