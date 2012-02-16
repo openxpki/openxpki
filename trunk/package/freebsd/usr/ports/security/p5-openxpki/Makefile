@@ -20,6 +20,7 @@ BUILD_DEPENDS=	\
 	p5-Workflow>=0.31:${PORTSDIR}/devel/p5-Workflow \
 	${SITE_PERL}/CGI/Session.pm:${PORTSDIR}/www/p5-CGI-Session \
 	${SITE_PERL}/Date/Format.pm:${PORTSDIR}/devel/p5-TimeDate \
+	${SITE_PERL}/Proc/SafeExec.pm:${PORTSDIR}/devel/p5-Proc-SafeExec \
 	${SITE_PERL}/Locale/Recode.pm:${PORTSDIR}/devel/p5-Locale-libintl \
 	${SITE_PERL}/Net/LDAP.pm:${PORTSDIR}/net/p5-perl-ldap \
 	${SITE_PERL}/Regexp/Common.pm:${PORTSDIR}/textproc/p5-Regexp-Common \
