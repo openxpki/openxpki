@@ -21,6 +21,7 @@ BUILD_DEPENDS=	\
 	${SITE_PERL}/CGI/Session.pm:${PORTSDIR}/www/p5-CGI-Session \
 	${SITE_PERL}/Date/Format.pm:${PORTSDIR}/devel/p5-TimeDate \
 	${SITE_PERL}/Proc/SafeExec.pm:${PORTSDIR}/devel/p5-Proc-SafeExec \
+	${SITE_PERL}/Switch.pm:${PORTSDIR}/lang/p5-Switch \
 	${SITE_PERL}/Locale/Recode.pm:${PORTSDIR}/devel/p5-Locale-libintl \
 	${SITE_PERL}/Net/LDAP.pm:${PORTSDIR}/net/p5-perl-ldap \
 	${SITE_PERL}/Regexp/Common.pm:${PORTSDIR}/textproc/p5-Regexp-Common \
