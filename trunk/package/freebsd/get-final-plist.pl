@@ -14,7 +14,7 @@ my $line = "";
 my ${PORT_NAME}=$ARGV[0];
 my ${PKGNAME_PREFIX}="p5-";
 my ${PORT_PATH}=cwd;
-my ${PERL_VERSION} = printf "%vd\n", $^V;
+my ${PERL_VERSION} = printf "%vd", $^V;
 
 open(SOURCE_FILE,"<${PORT_PATH}/pkg-plist.0");
 open(TARGET_FILE,">${PORT_PATH}/pkg-plist");
