@@ -1,26 +1,22 @@
-# trunk/package/debian/core
+# trunk/package/debian/i18n
 
+TOPDIR=../../../..
+SRCBASE=$(TOPDIR)/trunk/i18n
 OPENXPKI_SVN=../../../..
+PERLNAME=OpenXPKI
 PACKAGE=openxpki-i18n
+PKGDIR=../deb/client
 
-default:
-	make clean
-	make changelog
-	make openxpki-archive
-	make debian-archive
-	make source
-	make package
-	make source-clean
+# Makefile.inc contains common settings for all packages (checked in)
+include ../Makefile.inc
+# Makefile.local may be used locally to override settings (not checked in)
+-include ../Makefile.local
 
 openxpki-archive:
-	cd ${OPENXPKI_SVN}/trunk/i18n/; \
+	cd $(SRCBASE); \
 	make scan; \
 	make dist; \
 	mv $(PACKAGE)-*.tar.gz /tmp
-
-debian-archive:
-	## cd ${OPENXPKI_SVN}/trunk/package/
-	tar -czf /tmp/openxpki-debian.tar.gz .
 
 source:
 	cd /tmp; \
@@ -33,17 +29,8 @@ source:
 package:
 	cd /tmp/$(PACKAGE)-*/; \
 	fakeroot dpkg-buildpackage || echo ignoring error - usually signing ...
-	test -d ../deb/client || mkdir ../deb/client
-	mv /tmp/$(PACKAGE)_* ../deb/client/
-
-changelog::
-	if [ ! -e changelog.org ]; then mv changelog changelog.org; fi
-	echo -n $(PACKAGE) > changelog
-	DATE=`date +'%Y%m%d'` && echo \ \($$DATE\) unstable\; urgency=low >> changelog
-	echo >> changelog
-	echo "  * Daily build." >> changelog
-	echo >> changelog
-	echo " -- Scott T Hardin <scotty@hnsc.de> " `date --rfc-2822` >> changelog
+	test -d $(PKGDIR) || mkdir $(PKGDIR)
+	mv /tmp/$(PACKAGE)_* $(PKGDIR)/
 
 source-clean:
 	rm -rf /tmp/$(PACKAGE)-*
@@ -52,6 +39,5 @@ source-clean:
 
 clean:	source-clean
 	if [ -e changelog.org ]; then mv changelog.org changelog; fi
-	rm -f *.dsc *.dsc.asc *.tar.gz ../deb/client/$(PACKAGE)_* *.changes
+	rm -f *.dsc *.dsc.asc *.tar.gz $(PKGDIR)/$(PACKAGE)_* *.changes
 
-distclean: clean

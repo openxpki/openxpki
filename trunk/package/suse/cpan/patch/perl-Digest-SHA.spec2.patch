@@ -1,0 +1,11 @@
+--- perl-Digest-SHA.spec2	2012-01-07 21:57:44.000000000 +0100
++++ perl-Digest-SHA.spec2.new	2012-01-08 08:18:48.000000000 +0100
+@@ -48,6 +48,8 @@
+ %doc Changes README shasum COPYING Artistic
+ %{perl_vendorarch}/auto/*
+ %{perl_vendorarch}/Digest*
++%{_bindir}/*
++%{_mandir}/man1/*
+ %{_mandir}/man3/*
+ 
+ %changelog

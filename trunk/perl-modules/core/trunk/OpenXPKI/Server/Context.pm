@@ -23,6 +23,7 @@ my $context = {
 
     exported => {
 	# always created by this package
+    config           => undef,
 	xml_config       => undef,
     workflow_factory => undef,
 	crypto_layer     => undef,

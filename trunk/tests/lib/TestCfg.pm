@@ -6,11 +6,8 @@ use Config::Std;
 use Data::Dumper;
 use Class::Std;
 {
-
     # Class attributes
-    my %cfg_of;    # stores the configuration
-
-    my $debug = $ENV{TESTCFG_DEBUG};
+    my %cfg_of; # stores the configuration
 
     # which NAME, DIR ...
     # returns the full path in which the file NAME was found
@@ -21,9 +18,7 @@ use Class::Std;
 
         foreach (@dirs) {
             my $path = $_ . '/' . $name;
-            warn "# TestCfg: checking for $path" if $debug;
             if ( -f $path ) {
-                warn "#\tFound $path" if $debug;
                 return $path;
             }
         }
@@ -35,15 +30,16 @@ use Class::Std;
         my $cfgname = shift;
         my $cfgref  = shift;
 
-       #        warn "cfgname=", Dumper($cfgname), ", cfgref=", Dumper($cfgref),
-       #          ", path=", Dumper( \@_ );
-        my $cfgfile = $self->which( $cfgname, @_ );
+#        warn "cfgname=", Dumper($cfgname), ", cfgref=", Dumper($cfgref),
+#          ", path=", Dumper( \@_ );
+        my $cfgfile = $self->which(
+            $cfgname, @_);
         if ( not $cfgfile ) {
             die "ERROR: couldn't fine $cfgname in ", join( ', ', @_ );
         }
 
         read_config( $cfgfile => %{$cfgref} );
-        $cfg_of{ ident $self} = $cfgref;
+        $cfg_of{ident $self} = $cfgref;
     }
 
  # load_ldap - (re)load LDIF into LDAP, deleting previous records, if necessary.
@@ -51,7 +47,7 @@ use Class::Std;
  # usage: load_ldap( CFGNAME, PATH... );
 
     sub load_ldap {
-        my $self     = shift;
+        my $self    = shift;
         my $ldifname = shift;
 
         if ( not $ENV{DESTRUCTIVE_TESTS} ) {
@@ -59,7 +55,7 @@ use Class::Std;
             return;
         }
 
-        my $cfg = $cfg_of{ ident $self};
+        my $cfg = $cfg_of{ident $self};
         if ( not ref($cfg) ) {
             die "ERROR: must load config before ldap (", Dumper($cfg), ")";
         }
@@ -86,22 +82,21 @@ use Class::Std;
         }
         close $fh;
 
-        #        warn "# DNs found: ", join( "\n#\t", '', @dn ), "\n";
-        #        warn "# Using LDAP config ",
-        join( '/',
+#        warn "# DNs found: ", join( "\n#\t", '', @dn ), "\n";
+#        warn "# Using LDAP config ",
+          join( '/',
             $cfg->{'ldapadmin'}{'user'},
             $cfg->{'ldapadmin'}{'pass'},
             $cfg->{'ldapadmin'}{'url'} ),
           "\n";
         my @cmd = (
             $cfg->{instance}{ldapdelete}, '-x',
-            '-c',                         '-D',
+            '-c',                       '-D',
             $cfg->{'ldapadmin'}{'user'},  '-w',
             $cfg->{'ldapadmin'}{'pass'},  '-H',
             $cfg->{'ldapadmin'}{'url'},   @dn
         );
-
-        #        warn "# cmd: ", join( ', ', @cmd ), "\n";
+#        warn "# cmd: ", join( ', ', @cmd ), "\n";
         my $rcLdapDel = system(@cmd);
         if ( not( $rcLdapDel == 0 or $rcLdapDel == 8192 ) ) {
             die "Error running ldapdelete: $rcLdapDel";
@@ -111,14 +106,13 @@ use Class::Std;
         # Pump LDAP with correct data
         @cmd = (
             $cfg->{instance}{ldapadd}, '-a',
-            '-c',                      '-x',
-            '-D',                      $cfg->{'ldapadmin'}{'user'},
-            '-w',                      $cfg->{'ldapadmin'}{'pass'},
-            '-H',                      $cfg->{'ldapadmin'}{'url'},
-            '-f',                      $ldiffile
+            '-c',                    '-x',
+            '-D',                    $cfg->{'ldapadmin'}{'user'},
+            '-w',                    $cfg->{'ldapadmin'}{'pass'},
+            '-H',                    $cfg->{'ldapadmin'}{'url'},
+            '-f', $ldiffile
         );
-
-        #        warn "# cmd: ", join( ', ', @cmd ), "\n";
+#        warn "# cmd: ", join( ', ', @cmd ), "\n";
         my $rcLdapAdd = system(@cmd);
         if ( $rcLdapAdd != 0 ) {
             die "Error running ldapadd: $rcLdapAdd";

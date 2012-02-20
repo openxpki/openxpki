@@ -1,5 +1,7 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2011 by The OpenXPKI Project
+##
+## Prereq: cpanspec.sourceforge.net
 
 TOPDIR=../../..
 
@@ -99,6 +101,12 @@ ifdef PREFIX
 PERL_MAKEPL_ARGS="PREFIX=$(PREFIX)"
 endif
 
+# Disable implicit rules to make debugging easier. We're using our own rules, anyway.
+
+.SUFFIXES:
+
+.PHONY : $(PACKAGES) cpan fetchcpan
+
 # Makefile.inc contains common settings for all packages (checked in)
 include Makefile.inc
 
@@ -141,6 +149,12 @@ $(EXTERNAL):
 	@test -d rpm || mkdir rpm
 	@test -d rpm/cpan || mkdir rpm/cpan
 	@cd rpm/cpan && cpan2dist --format CPANPLUS::Dist::SUSE --force --install $(subst __,::,$@)
+
+cpan:
+	make --directory=cpan TARGET=cpan
+
+cleancpan:
+	make --directory=cpan TARGET=clean
 
 $(PACKAGES):
 	cd $@ && PATH=$(PATH):/usr/sbin make $(SUBTARGET) $(PERL_MAKEPL_ARGS)
