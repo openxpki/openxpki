@@ -15,6 +15,7 @@ my ${PORT_NAME}=$ARGV[0];
 my ${PKGNAME_PREFIX}="p5-";
 my ${PORT_PATH}=cwd;
 my ${PERL_VERSION} = sprintf "%vd", $^V;
+	# Above works only for perl 5.10 and above 
 
 open(SOURCE_FILE,"<${PORT_PATH}/pkg-plist.0");
 open(TARGET_FILE,">${PORT_PATH}/pkg-plist");
