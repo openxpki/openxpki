@@ -1,16 +1,15 @@
 #! /bin/sh
 ### BEGIN INIT INFO
 # Provides:          openxpkid
-# Required-Start:    $local_fs $webserver
-# Required-Stop:     $local_fs $webserver
+# Required-Start:    $local_fs $webserver mysql
+# Required-Stop:     $local_fs $webserver mysql
 # Default-Start:     2 3 4 5
 # Default-Stop:      S 0 1 6
-# Short-Description: Example initscript
-# Description:       This file should be used to construct scripts to be
-#                    placed in /etc/init.d.
+# Short-Description: Start and stop the OpenXPKI backend daemon
+# Description:       Controls the OpenXPKI backend daemon
 ### END INIT INFO
 
-# Author:	Michael Bell <michael.bell@web.de>.
+# Author:	Scott T. Hardin <scott.hardin@hnsc.de>.
 #
 # Please remove the "Author" lines above and replace them
 # with your own name if you copy and modify this script.
