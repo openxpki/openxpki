@@ -10,15 +10,26 @@ use warnings;
 use base qw( Workflow::Factory );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Server::Workflow;
+use Workflow::Exception qw( configuration_error workflow_error );
 
 sub instance {
     my $class = ref $_[0] || $_[0];
     return bless( {} => $class );
 }
 
-sub fetch_workflow {
+sub create_workflow{
     my $self = shift;
-    my $wf = $self->SUPER::fetch_workflow(@_);
+    my $wf = $self->SUPER::create_workflow(@_);
+    
+    my $oxiWf = OpenXPKI::Server::Workflow->new($wf, $self);
+    
+    return $oxiWf; 
+}
+
+sub fetch_workflow {
+    my ( $self, $wf_type, $wf_id ) = @_;
+    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id);
     # the following both checks whether the user is allowed to
     # read the workflow at all and deletes context entries from $wf if
     # the configuration mandates it
@@ -27,13 +38,24 @@ sub fetch_workflow {
         WORKFLOW => $wf,
         FILTER   => 1,
     });
-
-    return $wf;
+    
+    my $wf_config = $self->_get_workflow_config($wf_type);
+    unless ($wf_config) {
+        workflow_error "No workflow of type '$wf_type' available";
+    }
+    my $persister = $self->get_persister( $wf_config->{persister} );
+    my $wf_info   = $persister->fetch_workflow($wf_id);
+    
+    
+    my $oxiWf = OpenXPKI::Server::Workflow->new($wf,$self,$wf_info);
+    
+    return $oxiWf; 
 }
 
-sub fetch_unfiltered_workflow {
-    my $self = shift;
-    my $wf = $self->SUPER::fetch_workflow(@_);
+sub fetch_unfiltered_workflow {    
+    my ( $self, $wf_type, $wf_id ) = @_;
+    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id);
+    
     CTX('acl')->authorize_workflow({
         ACTION   => 'read',
         WORKFLOW => $wf,
@@ -45,7 +67,17 @@ sub fetch_unfiltered_workflow {
         FACILITY => 'audit',
     );
 
-    return $wf;
+    my $wf_config = $self->_get_workflow_config($wf_type);
+    unless ($wf_config) {
+        workflow_error "No workflow of type '$wf_type' available";
+    }
+    my $persister = $self->get_persister( $wf_config->{persister} );
+    my $wf_info   = $persister->fetch_workflow($wf_id);
+    
+    
+    my $oxiWf = OpenXPKI::Server::Workflow->new($wf,$self,$wf_info);    
+    
+    return $oxiWf; 
 }
 
 1;
@@ -73,3 +105,7 @@ entries. Unfiltered access is possible via fetch_unfiltered_workflow()
 - please note that this is sort of an ACL circumvention and should only
 be used if really necessary (and should only be used to create a temporary
 object that is used to retrieve the relevant entries).
+
+
+All methods return an object of class OpenXPKI::Server::Workflow, which is derived 
+from Workflow base class and implements the pause/resume-features. see there for details.

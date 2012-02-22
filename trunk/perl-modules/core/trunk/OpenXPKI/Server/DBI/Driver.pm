@@ -117,7 +117,15 @@ our %COLUMN = (
     "workflow_history_date"  => "TIMESTAMP",
     "workflow_context_key"   => "TEXT_KEY",
     "workflow_context_value"   => "TEXT",
-
+    
+    "workflow_proc_state"  => "TEXT",
+    "workflow_wakeup_at"  => "TIMESTAMP",
+    "workflow_count_try"  => "BIGINT",
+    "workflow_reap_at"  => "TIMESTAMP",
+    "workflow_session"  => "LONGTEXT",
+    "watchdog_key"  => "TEXT",
+    "watchdog_time"  => "TIMESTAMP",
+        
     "namespace"                => "TEXT_KEY",
     "datapool_key"             => "TEXT_KEY",
     "datapool_value"           => "TEXT",

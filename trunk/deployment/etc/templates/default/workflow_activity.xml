@@ -37,6 +37,18 @@
   <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING3"
  	class="Workflow::Action::Null">
   </action>
+  
+  <action name="I18N_OPENXPKI_WF_ACTION_WORKFLOWTEST"
+ 	class="OpenXPKI::Server::Workflow::Activity::WorkflowTest"
+ 	retry_count="5" retry_interval="+0000000005"> 	
+    <field name="cause"/>
+	<field name="action"/>
+	<field name="reap_at"/>
+	<field name="reap_at_dyn"/>
+	<field name="retry_interval"/>
+  </action>
+  
+   
  
  
 </actions>

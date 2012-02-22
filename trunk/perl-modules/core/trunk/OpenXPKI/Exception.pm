@@ -77,6 +77,11 @@ sub full_message
     return $msg;
 }
 
+sub message_code{
+    my $self = shift;
+    return $self->{message};
+}
+
 sub throw {
     my $proto = shift;
 
@@ -242,6 +247,10 @@ to support other modules with errorcodes if one is available.
 This function is used to build the new errormessages conforming to
 the specifications of OpenXPKI. This means in the first line the
 specification of i18n.
+
+=head2 message_code
+
+returns the untranslated and unmodified i18n-message-code
 
 =head2 Fields
 

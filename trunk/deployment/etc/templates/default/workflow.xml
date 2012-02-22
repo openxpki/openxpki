@@ -5,7 +5,8 @@
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_ldap_publishing.xml"/>    
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_revocation_request.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_crl_issuance.xml"/>    
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_password_safe.xml"/>    
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_password_safe.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_testing.xml"/>        
   </workflows>
     
   <activities>   

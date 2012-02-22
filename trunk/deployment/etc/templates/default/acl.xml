@@ -202,6 +202,17 @@
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
           </create>
+          <!-- TEST WF -->
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_TESTING</type>
+          </create>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_TESTING</type>
+          </read>
           <read> <!-- read also means list and execute activity (if the ACL condition holds) -->
               <creator>$self</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
@@ -353,6 +364,7 @@
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
           </create>
+          
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST</type>
           </create>
@@ -411,6 +423,13 @@
           <read>
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
+          </read>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_TESTING</type>
+          </create>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_TESTING</type>
           </read>
       </server>
   </workflow_permissions>

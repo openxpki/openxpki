@@ -181,6 +181,9 @@ OpenXPKI/Server/Notification.pm
 OpenXPKI/Workflow/Factory.pm
 
 OpenXPKI/Server/Workflow.pm
+OpenXPKI/Server/Workflow/Pause.pm
+OpenXPKI/Server/Watchdog.pm
+OpenXPKI/Server/Watchdog/WorkflowInstance.pm
 
 OpenXPKI/Server/Workflow/WFObject.pm
 OpenXPKI/Server/Workflow/WFObject/WFArray.pm
@@ -188,6 +191,9 @@ OpenXPKI/Server/Workflow/WFObject/WFHash.pm
 
 OpenXPKI/Server/Workflow/Activity.pm 
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
+
+# FIXME: Remove for production
+OpenXPKI/Server/Workflow/Activity/WorkflowTest.pm
 
 OpenXPKI/Server/Workflow/Activity/CertIssuance/ImportCertData.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/Issue.pm
@@ -212,6 +218,7 @@ OpenXPKI/Server/Workflow/Activity/CRR/MarkRevoked.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ForkWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm

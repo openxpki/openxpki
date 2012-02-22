@@ -124,12 +124,22 @@ my %COLUMN_of = (
     WORKFLOW_TYPE         => "workflow_type",
     WORKFLOW_STATE        => "workflow_state",
     WORKFLOW_LAST_UPDATE  => "workflow_last_update",
+    
+    #columns for pause/resume-Feature: 
+    WORKFLOW_PROC_STATE   => "workflow_proc_state",
+    WORKFLOW_WAKEUP_AT    => "workflow_wakeup_at",
+    WORKFLOW_COUNT_TRY    => "workflow_count_try",
+    WORKFLOW_REAP_AT      => "workflow_reap_at",
+        
     WORKFLOW_ACTION       => "workflow_action",
     WORKFLOW_DESCRIPTION  => "workflow_description",
     WORKFLOW_USER         => "workflow_user",
     WORKFLOW_HISTORY_DATE => "workflow_history_date",
     WORKFLOW_CONTEXT_KEY  => "workflow_context_key",
     WORKFLOW_CONTEXT_VALUE => "workflow_context_value",
+    WORKFLOW_SESSION       => "workflow_session",
+    WATCHDOG_KEY          => "watchdog_key",
+    WATCHDOG_TIME         => "watchdog_time",
 
     NAMESPACE             => "namespace",
     DATAPOOL_KEY          => "datapool_key",
@@ -281,6 +291,15 @@ my %TABLE_of = (
                                         # the workflow context
 		     "WORKFLOW_STATE",
 		     "WORKFLOW_LAST_UPDATE",
+
+		     "WORKFLOW_PROC_STATE",
+             "WORKFLOW_WAKEUP_AT",
+             "WORKFLOW_COUNT_TRY",
+             "WORKFLOW_REAP_AT",
+             "WORKFLOW_SESSION",
+             "WATCHDOG_KEY",
+             "WATCHDOG_TIME"
+		     
 	    ]},
 
     CONFIG => {
