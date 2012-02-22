@@ -8,13 +8,15 @@
 PORTNAME=	openxpki
 PORTVERSION=	0.9.1389
 CATEGORIES=	security perl5
-MASTER_SITES=	SF/${PORTNAME}/${PORTNAME}/0.9.1300
+MASTER_SITES=	http://www7.openxpki.org/lastmidnight/ SF/openxpki/openxpki/0.9.1300
 PKGNAMEPREFIX=	p5-
 DISTNAME=	OpenXPKI-${PORTVERSION}
 DIST_SUBDIR=	openxpki
 
 MAINTAINER=	svysh@pn.sinp.msu.ru
 COMMENT=	Perl based trustcenter software for PKI: core for server
+
+LICENSE=	AL2
 
 BUILD_DEPENDS=	\
 	p5-Workflow>=0.31:${PORTSDIR}/devel/p5-Workflow \

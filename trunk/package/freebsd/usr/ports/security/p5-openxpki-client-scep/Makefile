@@ -8,14 +8,15 @@
 PORTNAME=	openxpki-client-scep
 PORTVERSION=	0.9.1313
 CATEGORIES=	security perl5
-MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
-MASTER_SITE_SUBDIR=	openxpki
+MASTER_SITES=	http://www7.openxpki.org/lastmidnight/ SF/openxpki/openxpki/0.9.1300
 PKGNAMEPREFIX=	p5-
 DISTNAME=	OpenXPKI-Client-SCEP-${PORTVERSION}
 DIST_SUBDIR=	openxpki
 
 MAINTAINER=	svysh@pn.sinp.msu.ru
 COMMENT=	Client for SCEP requests to openxpki server
+
+LICENSE=	AL2
 
 BUILD_DEPENDS=	\
 	${SITE_PERL}/Config/Std.pm:${PORTSDIR}/devel/p5-Config-Std \
