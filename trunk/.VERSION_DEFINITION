@@ -70,11 +70,11 @@ branch_filter: master
 # 'git-description-XXXX'
 #     see above (GIT_REFRENCE_TAGS section)
 
-[revision]
-keyword:          SVN_REVISION
+#[revision]
+#keyword:          SVN_REVISION
 
-[last-changed-revision]
-keyword:          SVN_LAST_CHANGED_REVISION
+#[last-changed-revision]
+#keyword:          SVN_LAST_CHANGED_REVISION
 
 [git-commit-hash]
 keyword:          GIT_COMMIT_HASH
@@ -131,7 +131,7 @@ filename:         .VERSION_SUFFIX
 keyword:          SUFFIX
 optional:         yes
 
-[git-revision]
+#[git-revision]
 # the following expression returns the number of git commits between the 
 # tag 'initial' (which is expected to exist on the root commit of the 
 # repository) and the current head. if executed on a clean git-svn branch 
@@ -142,13 +142,13 @@ optional:         yes
 # on this branch. if you use this number (e. g. in a package build) it is
 # highly recommended to also include the branch name to indicate on which
 # branch this number was computed.
-expression:	sub {
-:			my $rev = $revision_info->{'git-description-root'};
-:			my ($count) = ($rev =~ m{ -(\d+)-g[\da-f]+ \z }xms);
-:			return $count + 1;
-:		}
-keyword:	GIT_REVISION
-optional:	no
+#expression:	sub {
+#:			my $rev = $revision_info->{'git-description-root'};
+#:			my ($count) = ($rev =~ m{ -(\d+)-g[\da-f]+ \z }xms);
+#:			return $count + 1;
+#:		}
+#keyword:	GIT_REVISION
+#optional:	no
 
 [git-filtered-branch]
 # The following expression returns the 'filtered' current git branch name. 
