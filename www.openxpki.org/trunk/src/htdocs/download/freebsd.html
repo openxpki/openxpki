@@ -80,10 +80,10 @@ Get/upgrade the entire ports collection as described in
                        path => '/doc/en_US.ISO8859-1/books/handbook/ports-using.html' &>">
               a FreeBSD Handbook</a>.
 </li><li>
-<tt>cd /usr/ports/ports-mgmt/portupgrade &amp;&amp; make reinstall clean</tt><br/>
-<tt>/usr/local/sbin/portupgrade -NrR security/p5-openxpki-client-html-mason</tt><br/>
-<tt>/usr/local/sbin/portupgrade -NrR security/p5-openxpki-deployment</tt><br/>
-<tt>/usr/local/sbin/portupgrade -NrR security/p5-openxpki-i18n</tt><br/>
+<tt>cd /usr/ports/ports-mgmt/portmaster &amp;&amp; make reinstall clean</tt><br/>
+<tt>/usr/local/sbin/portmaster security/p5-openxpki-client-html-mason</tt><br/>
+<tt>/usr/local/sbin/portmaster security/p5-openxpki-deployment</tt><br/>
+<tt>/usr/local/sbin/portmaster security/p5-openxpki-i18n</tt><br/>
 (Appropriate tarballs of openxpki will be fetched automatically.
 Alternatively, you can fetch tarballs of openxpki by hand
 and place them into <tt>/usr/ports/distfiles/openxpki/</tt>)
@@ -102,13 +102,11 @@ Just in case: FreeBSD employs one and the same port collection
 in ALL (stable, current, legacy) versions of FreeBSD.
 </p>
 
-<!--
 <h2>Ports for Last Midnight Snapshot of the OpenXPKI development code</h2>
 <p>
 Are built nightly by an intellectual script.  Awailable from the  
 <a href="../lastmidnight/index.html">Last Midnight Snapshot page</a>.
 </p>
--->
 
 <h2>Ports for current svn snapshot of the OpenXPKI development code</h2>
 <p>
