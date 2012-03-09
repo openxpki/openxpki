@@ -20,11 +20,43 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Crypto::X509;
 use OpenXPKI::i18n qw( set_language );
 use Digest::SHA1 qw( sha1_base64 );
 use DateTime;
 
 use Workflow;
+
+# helper function that collapses array ranges
+sub __array_to_ranges {
+    my $self      = shift;
+    my $array_ref = shift;
+    my @a = sort @{ $array_ref };
+
+    my $start = 0;
+    my $end   = 0;
+    my @ranges = ();
+
+    RANGES:
+    for (my $i = 0; $i < scalar @a; $i++) {
+        if (   ($i + 1 < scalar @a)
+            && ($a[$i+1] == ($a[$i] + 1))) { # this is just the successor, next
+            next RANGES;
+        }
+        else {
+            $end = $i;
+            if ($start != $end) {
+                push @ranges, $a[$start] . '-' . $a[$end];
+            }
+            else {
+                push @ranges, $a[$start];
+            }
+            $start = $i + 1;
+        }
+    }
+    return @ranges;
+}
+
 
 sub START {
     # somebody tried to instantiate us, but we are just an
