@@ -1540,9 +1540,339 @@ This API handles Smartcard specific calls.
 
 =head1 Functions
 
-sc_analyze_smartcard
+=head2 sc_parse_certificates
+
+This function parses the specified certificates and returns the parsed 
+results in the return list.
+
+=head3 Named function parameters
+
+=over 8
+
+=item * CERTS (mandatory)
+
+This parameter is a list of certificates as read from the card.
+
+=item * CERTFORMAT (mandatory)
+
+Supported formats for the CERTS parameter are DER|PEM|BASE64|IDENTIFIER.
+BASE64 will accept degraded formats (i. e. data without whitespace or padding).
+If IDENTIFIER is selected, the function will retrieve the specified
+certificate from the database
+and analyze it.
+
+=back
+
+=head3 Synopsis
+
+The function iterates through all certificates passed to the function
+and parses them.
+
+If the certificate is found in the database it is also
+checked against the desired policy.
+
+Determine the certificate type:
+
+=over 8
+
+=item * If the certificate is not known to the system (not found in 
+the database), the type is set to "FOREIGN"
+
+=item * If the certificate was found in the database, but
+according to the policy should not be found on the
+card the type will be set to "UNEXPECTED"
+
+=item * If the certificate was expected on the certificate
+the type is set to the symbolic name from the policy.
+
+=back
+
+=head3 Function results
+
+The function will return an array reference containing the detailed 
+information about the passed certificates. 
+A single entry of the list has the following structure (not all entries 
+may be set):
+
+=over 8
+
+=item * CERTIFICATE_SERIAL
+
+=item * IDENTIFIER
+
+=item * PKI_REALM
+
+=item * SUBJECT
+
+=item * ISSUER_DN
+
+=item * ISSUER_IDENTIFIER
+
+=item * EMAIL
+
+=item * PUBKEY
+
+=item * SUBJECT_KEY_IDENTIFIER
+
+=item * AUTHORITY_KEY_IDENTIFIER
+
+=item * NOTBEFORE
+
+Seconds since Epoch
+
+=item * NOTBEFORE_ISO
+
+NotBefore date in ISO format
+
+=item * NOTAFTER
+
+Seconds since Epoch
+
+=item * NOTAFTER_ISO
+
+NotAfter date in ISO format
+
+=item * ROLE
+
+=item * STATUS
+
+=item * PROFILE
+
+=item * CERTIFICATE_TYPE
+
+If the type is "FOREIGN" the system does not know this certificate.
+If it is "UNEXPECTED", the system knows the certificate but has decided 
+it should normally not be present on the card. 
+Everything else: the certificate was expected on the card, and the type 
+contains the symbolic purpose name of the certificate as set in the policy.
+
+=item * PRIVATE_KEY_AVAILABLE
+
+This value is set to 1 if the corresponding private key is available 
+in the database.
+
+=item * PREFERRED_PROFILE
+
+This is set to 1 if the profile of this certificate is the most recent 
+of the accepted profiles for the intended purpose.
+
+=item * SMARTCARD_USAGE
+
+This value is a hash ref, with the keys being the intended purposes. 
+If the key NONE is set, the certificate does not fit any purpose 
+according to the configured policy.
+
+=back
+
+=head2 sc_analyze_smartcard
+
+This API function can be called by an OpenXPKI client in order to 
+analyze the state of a given Smartcard.
+
+=head3 Named function parameters
+
+=over 8
+
+=item * SMARTCARDID (mandatory)
+
+This parameter shall be set to the Smartcard chip serial number 
+as read from the card. The API function will query this serial number
+from the associated directory or repository and determine the 
+designated owner of the card.
+
+The parameter format is defined in the Smartcard Interfaces document.
+
+=item * USERID (optional)
+
+If available, the user id of the currently logged in user should be 
+supplied by the caller. This may be different from the actual 
+Smartcard holder.
+
+=item * CERTS (optional)
+
+see sc_parse_certificates
+
+=item * CERTFORMAT (mandatory if CERTS is given)
+
+see sc_parse_certificates
+
+=item * WORKFLOW_TYPES (optional)
+
+This parameter is a list of workflow type names to be queried. If 
+specified, the analyze function will search for existing workflows of 
+the specified types that are owned by the holder of the Smartcard 
+of SMARTCARDID.
+
+This is merely a convenience function that simply wraps the 
+search_workflow_instances API function.
+
+=head3 Function results
+
+The function will return a complex data structure containing the 
+results of the Smartcard analysis.
+
+These results are directly influenced by
+
+=over 8
+
+=item * internal status of the PKI database (e. g. existing certificates
+for the user)
+
+=item * external resources (such as LDAP directory contents)
+
+=item * the passed parameters and
+
+=item * the configured policy
+
+=back
+
+The results of the function can be directly used for decisions on how 
+the actual personalization should happen. 
+
+=head4 Return structure:
+
+=over 8
+
+
+=item * OVERALL_STATUS (scalar)
+
+This is the global status of the Smartcard which can be directly 
+displayed by the frontend.
+
+Possible values: 'green' (default), 'amber', 'red'
+
+
+=item *            - SMARTCARD (hashref)
+
+The referenced structure contains the details of the Smartcard:
+
+=over 8
+
+=item * serialnumber (scalar)
+
+Canonical serial number of the Smartcard
+
+=item * status (scalar)
+
+Smartcard status
+
+=item * assigned_to (scalar)
+
+Designated holder of the Smartcard
+
+=item * keyalg (scalar)
+
+Asymmetric algorith supported (preferred) by this Smartcard
+
+=item * keysize (scalar)
+
+Key size supported (preferred) by this Smartcard
+
+=item * default_puk (scalar)
+
+Default PUK for this Smartcard (may be undefined)
+
+=back
+
+=item * CERT_TYPE (hashref)
+
+symbolic type name (hash, taken from policy configuration, one entry
+for each configured type)
+
+=over 8
+
+=item * usable_cert_exists (scalar, interpreted as boolean)
+
+A usable certificate for this purpose exists in the database.
+
+=item * token_contains_expected_cert (scalar, interpreted as boolean)
+
+The Smartcard contains the expected certificate for this purpose.
+
+=item * escrow_private_key (scalar, interpreted as boolean)
+
+If the Smartcard is missing the certificate, the workflow will 
+install the necessary certificate on the Smartcard. 
+
+If this value is false, the private key shall be generated on the
+Smartcard by the frontend.
+
+If the value is true, the Workflow will generate a private key and store it internally.
+
+=back
+
+=item * CERT_TYPES (array)
+
+Lists all certificate types configured for this Smartcard. This is 
+identical to the keys of CERT_TYPE in the return structure.
+
+=item * WORKFLOWS (hashref)
+
+Returned data is identical to the result of the 
+search_workflow_instances() API function.
+
+=item * PROCESS_FLAGS (hash of scalars, interpreted as booleans)
+
+These flags can be used for decisions in the personalization workflow.
+
+=over 8
+
+=item * allow_personalization
+
+User is allowed to start a personalization workflow (complex decision 
+based on smartcard status, puk availability etc)
+
+=item * will_need_pin
+
+Smartcard PIN is required for following operations (either the user's 
+pin or an autogenerated random pin)
+
+=item * will_need_random_pin
+
+If false the user may select his own pin, otherwise the pin will be 
+selected by the server
+
+=item * allow_user_pin
+
+Allow user to enter existing pin (otherwise autogenerate random 
+pin -> pin unblock needed after completion)
+
+=item * need_wf_approval
+
+Policy setting: if set 0/false no approval is required for user 
+cert issuance
+
+=item * purge_token_before_unblock
+
+Policy setting: if true the token must be completely purged before 
+an unblock operation may happen
+
+=item * have_cert_to_delete
+
+Smartcard cleanup is necessary (at least one certificate must be 
+deleted from the card)
+
+=item * have_cert_to_unpublish
+
+Directory cleanup is necessary (at least one certificate must be 
+deleted from the directory)
+
+=item * puk_is_writable
+
+Smartcard puk can be modified
+
+=item * puk_found_in_datapool
+
+Smartcard puk is available in datapool
+
+=back
+
+
 
 Parsed certificates:
+
+
+
 VISUAL_STATUS:
 'green': certificate is OK
 'amber': certificate is still valid but may be renewed (will expire soon)
