@@ -26,13 +26,43 @@ sub execute {
     my $default_token = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{crypto}->{default};
     my $api           = CTX('api');
 
-    my $ldap_server     = $self->param('ldap_server');
-    my $ldap_port       = $self->param('ldap_port');
+
+    # TODO: CONNECTOR
+    # This portion needs to be generatized using a proper connector.
+    # possibly this operation will be offloaded to a distinct LDAP publish
+    # workflow.
+
+    my $ldap_server     = $context->param('ad_server');
+    my $ldap_port       = $context->param('ad_port');
+    my $ldap_basedn     = $context->param('ad_basedn');
     my $ldap_userdn     = $self->param('ldap_userdn');
     my $ldap_pass       = $self->param('ldap_pass');
-    my $ldap_basedn     = $self->param('ldap_basedn');
     my $ldap_timelimit  = $self->param('ldap_timelimit');
+    my $entrydn         = $context->param('ad_entrydn');
 
+    my $filter_cert_profile  = $self->param('filter_cert_profile');
+    
+    # TODO: CONNECTOR
+    # Here we need to figure out which target directory to choose for
+    # publication of a certificate. The target directory shall be determined
+    # by the domain part in the login ID the user chose to have as Smartcard
+    # login enabled login in their authentication certificate.
+    # 
+
+    my ($domain, $userid)
+        = ($context->param('chosen_loginid') =~ m{ \A (.+)\\(.+) }xms);
+
+    # use a connector here:
+    if ($domain =~ m{\A foo \z}xmsi) {
+        # for the foo AD domain, we need special configuration
+        $ldap_userdn = $self->param('ad_foo_userdn');
+        $ldap_pass   = $self->param('ad_foo_pass');
+    }
+    if ($domain =~ m{\A bar \z}xmsi) {
+        # for bar, we need special configuration
+        $ldap_userdn = $self->param('ad_bar_userdn');
+        $ldap_pass   = $self->param('ad_bar_pass');
+    }
     ##! 2: 'connecting to ldap server ' . $ldap_server . ':' . $ldap_port
     my $ldap = Net::LDAP->new(
         $ldap_server,
@@ -78,58 +108,6 @@ sub execute {
     }
     ##! 2: 'ldap->bind() done'
     
-    my $key   = $self->param('search_key');
-    my $value = $context->param($self->param('search_value_context'));
- 
-    $mesg = $ldap->search(base      => $ldap_basedn,
-                         scope     => 'sub',
-                         filter    => "($key=$value)",
-                         timelimit => $ldap_timelimit,
-    );
-    if ($mesg->is_error()) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_SEARCH_FAILED',
-            params  => {
-                ERROR      => $mesg->error(),
-                ERROR_DESC => $mesg->error_desc(),
-            },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => 'system',
-	    },
-        );
-    }
-    ##! 2: 'ldap->search() done'
-    ##! 16: 'mesg->count: ' . $mesg->count
-
-    if ($mesg->count == 0) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_ENTRY_NOT_FOUND',
-	    params => {
-		FILTER => "$key=$value",
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'warn',
-		facility => 'system',
-	    },
-        );
-    }
-    elsif ($mesg->count > 1) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_MORE_THAN_ONE_LDAP_ENTRY_FOUND',
-	    params => {
-		FILTER => "$key=$value",
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'warn',
-		facility => 'system',
-	    },
-        );
-    }
-
     # get certificates from children workflows
     my $wf_children = $context->param('wf_children_instances');
     if (!defined $wf_children) {
@@ -144,6 +122,7 @@ sub execute {
     }
     my @certs_der;
     my @wf_children = @{$serializer->deserialize($wf_children)};
+  CHILD:
     foreach my $child (@wf_children) {
         my $child_id   = $child->{ID};
         my $child_type = $child->{TYPE};
@@ -152,6 +131,15 @@ sub execute {
             WORKFLOW => $child_type,
             ID       => $child_id,
         });
+
+	if (defined $filter_cert_profile) {
+            ##! 16: 'filtering cert_profile: ' . $filter_cert_profile
+	    if ($filter_cert_profile
+		ne $wf_info->{WORKFLOW}->{CONTEXT}->{cert_profile}) {
+		##! 16: 'skipping unwanted cert_profile ' . $wf_info->{WORKFLOW}->{CONTEXT}->{cert_profile}
+		next CHILD;
+	    }
+	}
     
         my $certificate = $wf_info->{WORKFLOW}->{CONTEXT}->{certificate};
         if (!defined $certificate) {
@@ -196,33 +184,31 @@ sub execute {
     }
 
     # add certificate to LDAP entry
-    foreach my $entry ($mesg->entries) {
-        ##! 32: 'foreach entry'
-        my $mesg = $ldap->modify($entry,
-            add => {
-                'userCertificate;binary' => \@certs_der,
-            }
-        );
-        if ($mesg->is_error()) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_MODIFY_FAILED',
-                params  => {
-                    ERROR      => $mesg->error(),
-                    ERROR_DESC => $mesg->error_desc(),
-                },
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => 'monitor',
-		},
-            );
+    ##! 32: 'modifying ldap entry'
+    my $mesg = $ldap->modify($entrydn,
+        add => {
+            'userCertificate;binary' => \@certs_der,
         }
+    );
+    if ($mesg->is_error()) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_LDAP_MODIFY_FAILED',
+            params  => {
+                ERROR      => $mesg->error(),
+                ERROR_DESC => $mesg->error_desc(),
+            },
+            log => {
+                logger => CTX('log'),
+                priority => 'error',
+                facility => 'monitor',
+            },
+        );
+    }
 	CTX('log')->log(
-	    MESSAGE => 'Successfully published certificate to ' . $entry->dn() . ' on server ' . $ldap_server . ' port ' . $ldap_port,
+	    MESSAGE => 'Successfully published certificate to ' . $entrydn . ' on server ' . $ldap_server . ' port ' . $ldap_port,
 	    PRIORITY => 'info',
 	    FACILITY => 'system',
 	    );
-    }
 
     ##! 4: 'end'
     return;
@@ -239,3 +225,9 @@ OpenXPKI::Server::Workflow::Activity::SmartCard::PublishCertificates
 
 This class publishes the issued certificates in the userCert field of
 the users LDAP entry.
+
+
+Parameters:
+
+filter_cert_profile: If set in activity definition only publish 
+                     certificates with specified role

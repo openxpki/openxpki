@@ -51,17 +51,17 @@ sub validate {
     my $context = $wf->context();
     my $errors  = $context->param('__error');
 
-    my $creator = $context->param('creator');
+    my $owner = $context->param('ldap_mail');
     my $auth1_id = $context->param('auth1_id');
     my $auth2_id = $context->param('auth2_id');
 
     $errors ||= [];
 
-    if (   $creator eq $auth1_id
-        or $creator  eq $auth2_id
+    if (   $owner eq $auth1_id
+        or $owner  eq $auth2_id
         or $auth1_id eq $auth2_id )
     {
-        ##! 1: 'SCOTTY - creator, auth1 and auth2 not unique'
+        ##! 1: 'SCOTTY - owner, auth1 and auth2 not unique'
         push @{$errors},
           ['I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SCPU_INVALID_AUTHID'];
     }
