@@ -136,11 +136,11 @@ if [ "${DIST_ONLY}" != "0" ] ; then
 else
   echo "Configuring for installation in $PREFIX..."
   # create initial configuration with new prefix
-  for TEMPLATE in $TEMPLATEDIR/* ; do
-    echo "Creating template set configuration in $TEMPLATE"
-    if [ -d $TEMPLATE ] ; then
-	$CFG --config $TEMPLATE/openxpki.conf.in \
-	    --writecfg $TEMPLATE/openxpki.conf \
+  for T in $TEMPLATEDIR/* ; do
+    echo "Creating template set configuration in $T"
+    if [ -d $T ] ; then
+	$CFG --config $T/openxpki.conf.in \
+	    --writecfg $T/openxpki.conf \
 	    --force \
 	    --setcfg dir.prefix="$PREFIX" \
 	    $METACONF_OPTS
