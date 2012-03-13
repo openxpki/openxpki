@@ -28,9 +28,6 @@ sub new {
     $params->{dbpath} = '/etc/openxpki/config.git' unless($params->{dbpath});
     $params->{path} = [qw( /etc/openxpki/config.d )] if ( not exists $params->{path} );    
     
-    $params->{dbpath} = 'connector/config/config.git';    
-    $params->{path} = [qw( connector/config/merge/ )];
-    
     $this->SUPER::new($params);
 }
 
@@ -59,9 +56,6 @@ sub parser {
 
     my $tree = $self->cm2tree($cmref);
     
-    use Data::Dumper;
-    print Dumper( $tree );
-
     $params->{comment} = 'import from ' . $dir . ' using Config::Merge';
     $self->commit( $tree, @_, $params );
 }
