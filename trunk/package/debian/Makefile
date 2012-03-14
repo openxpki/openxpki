@@ -20,7 +20,8 @@ PACKAGES=			\
 	deployment		\
 	mason-html-client	\
 	scep-client		\
-	i18n
+	i18n \
+	qatest
 
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 
