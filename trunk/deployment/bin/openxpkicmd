@@ -73,7 +73,14 @@ if (! defined $wf_type) {
     die "No workflow type specified. Stopped";
 }
 
-debug("Socketfile: $params{socketfile}");
+
+
+if(!$params{socketfile}){
+	$params{socketfile} = '/var/openxpki/openxpki.socket';
+	printf("using default socket %s \n", $params{socketfile});
+}
+
+debug(sprintf("Socketfile: %s", $params{socketfile}));
 
 my $reply;
 my $client = OpenXPKI::Client->new(
@@ -181,6 +188,8 @@ if ($params{wfid}) {
 			print join "\n", @{$reply->{PARAMS}};
 			print "\n";
 		}
+		
+		
 	}		
 } else {
 
@@ -192,6 +201,10 @@ if ($params{wfid}) {
 						   PARAMS => \%wf_parameters,
 					       }
 					   });
+	if ($reply->{SERVICE_MSG} eq 'COMMAND') {
+		printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{ID}, $reply->{PARAMS}->{WORKFLOW}->{STATE};
+	}				   
+					   
 }
 
 if ($reply->{SERVICE_MSG} ne 'COMMAND') {
