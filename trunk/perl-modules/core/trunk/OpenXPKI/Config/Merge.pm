@@ -19,14 +19,14 @@ sub new {
     my $class = ref($this) || $this;
     my $params = shift;
 
-    $params->{dbpath} = $ENV{OPENXPKI_CONF_DB} || '/etc/openxpki/config.git';
+    
+    # Set from ENV
+    $params->{dbpath} = $ENV{OPENXPKI_CONF_DB} if ($ENV{OPENXPKI_CONF_DB});
+    $params->{path} = [ split( /:/, $ENV{OPENXPKI_CONF_PATH} ) ] if ( $ENV{OPENXPKI_CONF_PATH} );
 
-    if ( $ENV{OPENXPKI_CONF_PATH} ) {
-        $params->{path} = [ split( /:/, $ENV{OPENXPKI_CONF_PATH} ) ];
-    }
-    elsif ( not exists $params->{path} ) {
-        $params->{path} = [qw( /etc/openxpki/config.d )];
-    }
+    # Set to defaults if nothing is set
+    $params->{dbpath} = '/etc/openxpki/config.git' unless($params->{dbpath});
+    $params->{path} = [qw( /etc/openxpki/config.d )] if ( not exists $params->{path} );    
     
     $params->{dbpath} = 'connector/config/config.git';    
     $params->{path} = [qw( connector/config/merge/ )];
