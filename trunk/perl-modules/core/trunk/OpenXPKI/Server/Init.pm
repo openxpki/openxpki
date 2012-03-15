@@ -18,6 +18,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::i18n qw(set_language set_locale_prefix);
 use OpenXPKI::Exception;
 
+use OpenXPKI::Config;
 use OpenXPKI::XML::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
@@ -54,6 +55,7 @@ our $current_xml_config; # this is an OpenXPKI::XML::Config object
 # init code. the order of the array elements is also the default execution
 # order.
 my @init_tasks = qw(
+  config_versioned
   current_xml_config
   i18n
   dbi_log
@@ -238,6 +240,16 @@ sub __do_init_current_xml_config {
     $current_xml_config = get_current_xml_config(
         CONFIG => $keys->{'CONFIG'},
     );
+    return 1;
+}
+
+sub __do_init_config_versioned {
+    ##! 1: "init OpenXPKI config"
+    my $config = OpenXPKI::Config->new();
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    config => $config,
+	});
     return 1;
 }
 

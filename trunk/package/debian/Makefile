@@ -32,8 +32,11 @@ EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Data__SpreadPagination		\
 	Class__Observable 		\
-	Date__Parse			\
-	Locale__TextDomain		\
+	Test__utf8 \
+	Git__PurePerl \
+	Config__Merge \
+	Config__Versioned \
+	Proc__SafeExec \
 	XML__Filter__XInclude 
 
 EXTERNAL2= \
@@ -57,7 +60,7 @@ default:	clean
 $(EXTERNAL) $(EXTERNAL2):
 	test -d deb || mkdir deb
 	test -d deb/cpan || mkdir deb/cpan/	
-	cd deb/cpan/ &&  dh-make-perl --build --notest --cpan $(subst __,::,$@)
+	cd deb/cpan/ &&  DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
 
 #WORKFLOW:
 #	cd deb/cpan/ && rm -rf Workflow-0.31*

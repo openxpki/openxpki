@@ -1,0 +1,11 @@
+--- perl-File-Find-Rule.spec2	2012-01-03 14:19:39.000000000 +0100
++++ perl-File-Find-Rule.spec2.new	2012-01-03 14:20:46.000000000 +0100
+@@ -50,6 +50,8 @@
+ %defattr(-,root,root,-)
+ %doc Changes findrule COPYING Artistic
+ %{perl_vendorlib}/*
++%{_bindir}/*
++%{_mandir}/man1/*
+ %{_mandir}/man3/*
+ 
+ %changelog

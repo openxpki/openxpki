@@ -1,0 +1,11 @@
+--- perl-Pod-Parser.spec2	2012-01-03 14:21:49.000000000 +0100
++++ perl-Pod-Parser.spec2.new	2012-01-03 14:22:28.000000000 +0100
+@@ -50,6 +50,8 @@
+ %defattr(-,root,root,-)
+ %doc ANNOUNCE CHANGES README TODO COPYING Artistic
+ %{perl_vendorlib}/*
++%{_bindir}/*
++%{_mandir}/man1/*
+ %{_mandir}/man3/*
+ 
+ %changelog
