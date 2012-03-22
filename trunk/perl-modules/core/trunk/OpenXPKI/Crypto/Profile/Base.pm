@@ -82,7 +82,11 @@ sub load_extension
     my @path    = @{$keys->{PATH}};
     my @counter = @{$keys->{COUNTER}};
     my @values  = ();
-    my $cfg_id  = $keys->{CONFIG_ID};
+    
+    # Always pull CONFIG_ID from class
+    #my $cfg_id  = $keys->{CONFIG_ID};
+    my $cfg_id  = $self->{CONFIG_ID};
+    
     ##! 4: 'path: ' . Dumper \@path
     ##! 4: 'counter: ' . Dumper \@counter
     ##! 4: 'cfg_id: ' . $cfg_id

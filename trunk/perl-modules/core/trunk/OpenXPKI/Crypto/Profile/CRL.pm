@@ -185,7 +185,7 @@ sub load_profile
         $self->load_extension(
             PATH      => [@profile_path, $ext],
             COUNTER   => [@profile_counter],
-            CONFIG_ID => $self->{CONFIG_ID},
+            # CONFIG_ID => $self->{CONFIG_ID},  # As in Certificate.pm, CONFIG_ID should be pulled from the class properties
         );
     }
 
