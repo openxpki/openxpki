@@ -286,7 +286,7 @@ WriteMakefile(
     'VERSION'   => $openxpki_version,
     'LIBS'      => ["-L$openssl_lib_dir -lcrypto"],
     'INC'       => "-I. -I$openssl_inc_dir",
-    'CCFLAGS'   => '-O2 -g',
+    'CCFLAGS'   => '-O2 -g '.$Config{ccflags},
     'PREREQ_PM' => {
 	'Class::Accessor::Fast'  => '0.31',
 	'Class::Accessor::Chained::Fast' => undef,
