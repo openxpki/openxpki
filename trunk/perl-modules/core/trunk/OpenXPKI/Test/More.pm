@@ -640,15 +640,15 @@ list, contain the following keys:
 
 The name of the user to log in as. [optional]
 
-=over pass
+=item pass
 
 The password to use. [optional]
 
-=over socketfile
+=item socketfile
 
 The socket file to use for the connection.
 
-=over realm
+=item realm
 
 The PKI Realm to use for the connection. [optional]
 

@@ -237,7 +237,7 @@ sub execute {
         RETURN_LENGTH => $salt_len,
         RANDOM_LENGTH => $salt_len,
     };
-    my $salt = $default_token->command($command);
+    $salt = $default_token->command($command);
 
     #
     # Add salt to activation code and create the SHA1 hash that is stored in
