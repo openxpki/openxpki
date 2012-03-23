@@ -21,13 +21,28 @@ around BUILDARGS => sub {
     my $class = shift;
         
     my $dbpath = $ENV{OPENXPKI_CONF_DB} || '/etc/openxpki/config.git';    
-    $dbpath = 'connector/config/config.git';
+    
+    if (! -d $dbpath) {
+        OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_INIT_TASK_GIT_DBPATH_DOES_NOT_EXIST",
+		params  => {
+		    dbpath => $dbpath,
+		});
+    }
     
     my $cv = Connector::Proxy::Config::Versioned->new(
         {
-            LOCATION  => $dbpath,            
+            LOCATION  => $dbpath,
         }
-    ) or die "Error creating Config: $@";
+    );
+    
+    if (!$cv) {
+        OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_INIT_TASK_CONFIG_LAYER_NOT_INITIALISED",
+		params  => {
+		    dbpath => $dbpath,
+		});
+    }
         
     return $class->$orig( { BASECONNECTOR => $cv } );
 };
