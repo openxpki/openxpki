@@ -11,6 +11,7 @@ use warnings;
 use English;
 use Moose;
 use Connector::Proxy::Config::Versioned;
+use OpenXPKI::Exception;
 
 extends 'Connector::Multi';
 
