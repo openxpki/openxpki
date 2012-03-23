@@ -21,6 +21,7 @@ use Proc::ProcessTable;
 
 use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
+use OpenXPKI::Config::Merge;
 
 # settings determined by openxpki-metaconf
 # not really needed...
@@ -306,6 +307,21 @@ sub do_stop {
     return 1;
 }
 
+sub do_config { 
+
+	if ($params{path}) {
+	   # we set the ENV as this
+	   # a) can split a string 
+	   # b) otherwise an external set ENV will override the parameter 
+	   $ENV{OPENXPKI_CONF_PATH} = $params{path};
+	}
+
+	my $config = OpenXPKI::Config::Merge->new();
+	
+	printf "Current Tree Version: %s\n", $config->version();
+	
+	return 1;
+}
 
 ###########################################################################
 
@@ -315,6 +331,7 @@ GetOptions(\%params,
 	   qw(
 	      help|?
 	      man
+	      path=s
 	      cfg|cfgfile|conf|config=s
               version
               debug=s@
@@ -363,6 +380,15 @@ if ($params{quiet})
 {
     $QUIET = 1;
 }
+
+# for loadcfg
+if ($params{path}) {
+   # we set the ENV as this
+   # a) can split a string
+   # b) otherwise an external set ENV will override the parameter
+   $ENV{OPENXPKI_CONF_PATH} = $params{path};
+}
+
 
 ## do not migrate this to use statements
 ## this disturbs the debugging
@@ -429,6 +455,7 @@ if (-r $pidfile) {
 my $command_table = {
     start   => \&do_start,
     stop    => \&do_stop,
+    loadcfg  => \&do_config,
     restart => sub {
 	do_stop(@_); 
 	do_start(@_);
@@ -481,13 +508,17 @@ openxpkictl [options] COMMAND
                          MODULE defaults to '.*'
                          LEVEL defaults to 1
    --foreground          Uses a non-forking server. This is only
-                         useful for debugging or profiling.
+                         useful for debugging or profiling.                         
+   --path                Used only with loadcfg. You can specify an 
+                         alternate path to the configuration to load.
+                         This is the same as setting ENV{OPENXPKI_CONF_PATH}.
 
  Commands:
    start            Start OpenXPKI daemon
    stop             Stop OpenXPKI daemon
    restart          Restart OpenXPKI daemon
    status           Get OpenXPKI daemon status
+   loadcfg          Load a new config into the versioned repository
 
 
 =head1 ARGUMENTS
@@ -511,6 +542,10 @@ Restarts the OpenXPKI daemon.
 =item B<status>
 
 Checks the OpenXPKI daemon status.
+
+=item B<loadcfg>
+
+Load config into the versioned repository.
 
 =back
 
@@ -565,6 +600,15 @@ Examples:
 Does not fork program away and uses a non-forking server. Pretty much
 useful only for debugging and profiling.
 
+=back
+
+=item B<--path>
+
+Used only with loadcfg. Specify path (or set of path seperated by :) to
+load the config files from. If ommited, the environment is checked for  
+the key I<OPENXPKI_CONF_PATH>, if both are missing the builtin default 
+value of I</etc/openxpki/config.d/> is used.
+ 
 =back
 
 =head1 DESCRIPTION
