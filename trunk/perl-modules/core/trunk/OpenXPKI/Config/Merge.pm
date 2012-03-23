@@ -8,6 +8,7 @@
 ## vim: syntax=perl
 
 use Config::Merge;
+use OpenXPKI::Exception;
 
 package OpenXPKI::Config::Merge;
 
@@ -26,8 +27,9 @@ sub new {
 
     # Set to defaults if nothing is set
     $params->{dbpath} = '/etc/openxpki/config.git' unless($params->{dbpath});
-    $params->{path} = [qw( /etc/openxpki/config.d )] if ( not exists $params->{path} );    
+    $params->{path} = [qw( /etc/openxpki/config.d )] if ( not exists $params->{path} );              
     
+    $params->{autocreate} = 1;    
     $this->SUPER::new($params);
 }
 
