@@ -24,7 +24,7 @@ eval {
 };
 $exc = OpenXPKI::Exception->caught();
 ok(defined $exc, 'exception with params defined');
-is($exc->as_string(), 'test; __param2__ => value2; __param1__ => value1', 'as_string() with params correct');
+is($exc->as_string(), 'test; __param1__ => value1; __param2__ => value2', 'as_string() with params correct');
 
 eval {
     OpenXPKI::Exception->throw(
