@@ -308,14 +308,7 @@ sub do_stop {
 }
 
 sub do_config { 
-
-	if ($params{path}) {
-	   # we set the ENV as this
-	   # a) can split a string 
-	   # b) otherwise an external set ENV will override the parameter 
-	   $ENV{OPENXPKI_CONF_PATH} = $params{path};
-	}
-
+	
 	my $config = OpenXPKI::Config::Merge->new();
 	
 	printf "Current Tree Version: %s\n", $config->version();
