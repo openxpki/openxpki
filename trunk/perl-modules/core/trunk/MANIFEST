@@ -22,6 +22,9 @@ OpenXPKI/XML/Config.pm
 OpenXPKI/i18n.pm
 openxpki.xsd
 
+## Config Layers
+OpenXPKI/Config/Merge.pm 
+
 ## Crypto layer
 
 OpenXPKI/Crypto/API.pm
