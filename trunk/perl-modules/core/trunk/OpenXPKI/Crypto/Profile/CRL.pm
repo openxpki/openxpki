@@ -180,7 +180,7 @@ sub load_profile
     # possibly:
     # RFC 3280, 5.2.5 - issuing_distributing_point (if someone really
     # needs it ...)
-    foreach my $ext qw( authority_info_access authority_key_identifier issuer_alt_name ) {
+    foreach my $ext (qw( authority_info_access authority_key_identifier issuer_alt_name )) {
         ##! 16: 'load extension ' . $ext
         $self->load_extension(
             PATH      => [@profile_path, $ext],
