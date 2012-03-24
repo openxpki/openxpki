@@ -62,6 +62,10 @@ $(EXTERNAL) $(EXTERNAL2):
 	test -d deb/cpan || mkdir deb/cpan/
 	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
 
+# Development Build - load git://github.com/mrscotty/connector.git into deb/cpan/Connector
+Connector:
+	cd deb/cpan/ && DEB_BUILD_OPTIONS=nocheck dh-make-perl --desc Connector --version dev-`date +%Y%m%d`  --build Connector/
+
 #WORKFLOW:
 #	cd deb/cpan/ && rm -rf Workflow-0.31*
 #	cd deb/cpan/ && wget http://search.cpan.org/CPAN/authors/id/J/JO/JONASBN/Workflow-0.31.tar.gz
