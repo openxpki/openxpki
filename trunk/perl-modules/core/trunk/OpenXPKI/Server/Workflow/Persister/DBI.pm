@@ -266,7 +266,7 @@ sub fetch_workflow {
 	TABLE => $workflow_table,
 	SERIAL => $id,
 	DYNAMIC => {
-	    PKI_REALM  => CTX('session')->get_pki_realm(),
+	    PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
 	},
 	);
     ### $result
@@ -322,7 +322,7 @@ sub fetch_extra_workflow_data {
     my $result = $dbi->select(
 	TABLE   => $context_table,
 	DYNAMIC => {
-	    WORKFLOW_SERIAL => $id,
+	    WORKFLOW_SERIAL => {VALUE => $id},
 	},
 	);
 

@@ -100,7 +100,7 @@ sub get_cert
     my $hash = CTX('dbi_backend')->first (
                    TABLE => 'CERTIFICATE',
                    DYNAMIC => {
-                       IDENTIFIER => $identifier,
+                       IDENTIFIER => {VALUE => $identifier},
                    },
                   );
     if (! defined $hash) {
@@ -298,13 +298,18 @@ sub search_cert
     }
 
     # only search in current realm
-    $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'}  = CTX('session')->get_pki_realm();
+    $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'}  = {VALUE => CTX('session')->get_pki_realm()};
     $params{REVERSE} = 1;
     $params{ORDER} = [ 'CERTIFICATE.CERTIFICATE_SERIAL' ];
 
-    foreach my $key (qw( IDENTIFIER CSR_SERIAL EMAIL SUBJECT ISSUER STATUS )) {
+    foreach my $key (qw( IDENTIFIER CSR_SERIAL STATUS )) {
 	if ($args->{$key}) {
-	    $params{DYNAMIC}->{'CERTIFICATE.' . $key} = $args->{$key};
+	    $params{DYNAMIC}->{'CERTIFICATE.' . $key} = {VALUE => $args->{$key}};
+	}
+    }
+    foreach my $key (qw( EMAIL SUBJECT ISSUER )) {
+	if ($args->{$key}) {
+	    $params{DYNAMIC}->{'CERTIFICATE.' . $key} = {VALUE => $args->{$key}, OPERATOR => "LIKE"};
 	}
     }
 
@@ -338,8 +343,8 @@ sub search_cert
 	        'IDENTIFIER';
 
 	    # add search constraint
-	    $params{DYNAMIC}->{$attr_alias . '.ATTRIBUTE_KEY'} = $entry->[0];
-	    $params{DYNAMIC}->{$attr_alias . '.ATTRIBUTE_VALUE'} = $entry->[1];
+	    $params{DYNAMIC}->{$attr_alias . '.ATTRIBUTE_KEY'} = {VALUE => $entry->[0]};
+	    $params{DYNAMIC}->{$attr_alias . '.ATTRIBUTE_VALUE'} = {VALUE => $entry->[1]};
 	    $ii++;
 	  }
       }
@@ -703,8 +708,8 @@ sub get_data_pool_entry {
 	    my $cached_key = CTX('dbi_backend')->first(
 		TABLE => 'SECRET',
 		DYNAMIC => {
-		    PKI_REALM => $requested_pki_realm,
-		    GROUP_ID  => $encryption_key,
+		    PKI_REALM => {VALUE => $requested_pki_realm},
+		    GROUP_ID  => {VALUE => $encryption_key},
 		});
 
 	    if (! defined $cached_key) {
@@ -902,11 +907,11 @@ sub list_data_pool_entries {
     }
 
     my %condition = (
-	'PKI_REALM' => $requested_pki_realm,
+	'PKI_REALM' => {VALUE => $requested_pki_realm},
 	);
 
     if (defined $namespace) {
-	$condition{NAMESPACE} = $namespace;
+	$condition{NAMESPACE} = {VALUE => $namespace};
     }
 
     my $result = CTX('dbi_backend')->select(
@@ -1364,8 +1369,8 @@ sub __get_current_datapool_encryption_key : PRIVATE {
 	my $cached_key = CTX('dbi_backend')->first(
 	    TABLE => 'SECRET',
 	    DYNAMIC => {
-		PKI_REALM => $realm,
-		GROUP_ID  => $associated_vault_key_id,
+		PKI_REALM => {VALUE => $realm},
+		GROUP_ID  => {VALUE => $associated_vault_key_id},
 	    });
 
 	my $algorithm;

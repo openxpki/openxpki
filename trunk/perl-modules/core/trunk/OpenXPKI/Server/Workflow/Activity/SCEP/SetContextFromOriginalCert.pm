@@ -33,9 +33,9 @@ sub execute {
             'ROLE',
         ],
         DYNAMIC => {
-            'IDENTIFIER' => $identifier,
-            'STATUS'    => 'ISSUED',
-            'PKI_REALM' => $pki_realm,
+            'IDENTIFIER' => {VALUE => $identifier},
+            'STATUS'    => {VALUE => 'ISSUED'},
+            'PKI_REALM' => {VALUE => $pki_realm},
         },
     );
 
@@ -49,8 +49,8 @@ sub execute {
             'ATTRIBUTE_VALUE',
         ],
         DYNAMIC => {
-            'ATTRIBUTE_KEY' => 'subject_alt_name',
-            'IDENTIFIER'    => $identifier,
+            'ATTRIBUTE_KEY' => {VALUE => 'subject_alt_name'},
+            'IDENTIFIER'    => {VALUE => $identifier},
         },
     );
 
