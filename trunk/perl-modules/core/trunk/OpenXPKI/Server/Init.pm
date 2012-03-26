@@ -564,7 +564,7 @@ sub get_workflow_factory {
     my $config_entries = CTX('dbi_backend')->select(
         TABLE   => 'CONFIG',
         DYNAMIC => {
-            CONFIG_IDENTIFIER => '%',
+            CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
         },
     );
     CTX('dbi_backend')->disconnect();
@@ -900,7 +900,7 @@ sub get_xml_config {
     my $config_entries = CTX('dbi_backend')->select(
         TABLE   => 'CONFIG',
         DYNAMIC => {
-            CONFIG_IDENTIFIER => '%',
+            CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
         },
     );
     CTX('dbi_backend')->disconnect();
@@ -1000,7 +1000,7 @@ sub get_xml_config {
     my $curr_config_db = CTX('dbi_backend')->first(
         TABLE   => 'CONFIG',
         DYNAMIC => {
-            CONFIG_IDENTIFIER => $curr_config_id,
+            CONFIG_IDENTIFIER => {VALUE => $curr_config_id},
         },
     );
     if (! defined $curr_config_db) {
@@ -1022,7 +1022,7 @@ sub get_xml_config {
     $config_entries = CTX('dbi_backend')->select(
         TABLE   => 'CONFIG',
         DYNAMIC => {
-            CONFIG_IDENTIFIER => '%',
+            CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
         },
     );
     CTX('dbi_backend')->disconnect();
@@ -1901,7 +1901,7 @@ sub __get_certificate {
     my $certificate_db_entry = $dbi->first(
         TABLE   => 'CERTIFICATE',
         DYNAMIC => {
-            IDENTIFIER => $identifier,
+            IDENTIFIER => {VALUE => $identifier},
         },
     );
     $dbi->disconnect();
@@ -1953,8 +1953,8 @@ sub __get_cert_identifier {
         my $cert = $dbi->first(
             TABLE   => 'ALIASES',
             DYNAMIC => {
-                ALIAS     => $cert_alias,
-                PKI_REALM => $cert_realm,
+                ALIAS     => {VALUE => $cert_alias},
+                PKI_REALM => {VALUE => $cert_realm},
             },
         );
         $dbi->disconnect();

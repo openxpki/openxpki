@@ -145,8 +145,8 @@ sub get_config_id {
     my $wf = CTX('dbi_workflow')->first(
         TABLE   => 'WORKFLOW_CONTEXT',
         DYNAMIC => {
-            'WORKFLOW_SERIAL'      => $arg_ref->{ID},
-            'WORKFLOW_CONTEXT_KEY' => 'config_id',
+            'WORKFLOW_SERIAL'      => {VALUE => $arg_ref->{ID}},
+            'WORKFLOW_CONTEXT_KEY' => {VALUE => 'config_id'},
         },
     );
     return $wf->{WORKFLOW_CONTEXT_VALUE};
@@ -172,7 +172,7 @@ sub list_workflow_instances {
     my $instances = $dbi->select(
 	TABLE   => $workflow_table,
 	DYNAMIC => {
-	    PKI_REALM  => CTX('session')->get_pki_realm(),
+	    PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
 	},
         LIMIT   => {
             AMOUNT => $limit,
@@ -203,7 +203,7 @@ sub get_number_of_workflow_instances {
 	TABLE     => [ $workflow_table ],
         JOIN      => [ [ 'WORKFLOW_SERIAL'] ],
 	DYNAMIC   => {
-	    PKI_REALM  => CTX('session')->get_pki_realm(),
+	    PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
 	},
         COLUMNS   => [
             {
@@ -239,8 +239,8 @@ sub list_context_keys {
              $context_table . '.WORKFLOW_CONTEXT_KEY',
         ],
 	    DYNAMIC => {
-            "$workflow_table.WORKFLOW_TYPE" => $arg_ref->{'WORKFLOW_TYPE'}, 
-	        "$workflow_table.PKI_REALM"     => CTX('session')->get_pki_realm(),
+                "$workflow_table.WORKFLOW_TYPE" => {VALUE => $arg_ref->{'WORKFLOW_TYPE'}}, 
+                "$workflow_table.PKI_REALM"     => {VALUE => CTX('session')->get_pki_realm()},
 	    },
         JOIN => [ [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ] ],
         DISTINCT => 1,
@@ -289,7 +289,7 @@ sub get_workflow_type_for_id {
     my $db_result = $dbi->first(
 	TABLE    => $workflow_table,
 	DYNAMIC  => {
-            'WORKFLOW_SERIAL' => $id,
+            'WORKFLOW_SERIAL' => {VALUE => $id},
         },
     );
     if (! defined $db_result) {
@@ -346,7 +346,7 @@ sub get_workflow_history {
     my $history = CTX('dbi_workflow')->select(
         TABLE => $workflow_history_table,
         DYNAMIC => {
-            WORKFLOW_SERIAL => $wf_id,
+            WORKFLOW_SERIAL => {VALUE => $wf_id},
         },
     );
     # sort ascending (unsorted within seconds)
@@ -778,15 +778,15 @@ sub search_workflow_instances {
         my $table_alias = $context_table . '_' . $i;
         my $key   = $context_entry->{KEY};
         my $value = $context_entry->{VALUE};
-        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_KEY'}   = $key;
-        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_VALUE'} = $value;
+        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_KEY'}   = {VALUE => $key};
+        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_VALUE'} = {VALUE => $value};
         push @tables, [ $context_table => $table_alias ];
         push @joins, 'WORKFLOW_SERIAL';
         $i++;
     }
     push @tables, $workflow_table;
     push @joins, 'WORKFLOW_SERIAL';
-    $dynamic->{$workflow_table . '.PKI_REALM'} = $realm;
+    $dynamic->{$workflow_table . '.PKI_REALM'} = {VALUE => $realm};
 
     if (defined $arg_ref->{TYPE}) {
         # do parameter validation (here instead of the API because
@@ -813,7 +813,7 @@ sub search_workflow_instances {
                 }
             }
         }
-        $dynamic->{$workflow_table . '.WORKFLOW_TYPE'} = $arg_ref->{TYPE};
+        $dynamic->{$workflow_table . '.WORKFLOW_TYPE'} = {VALUE => $arg_ref->{TYPE}};
     }
     if (defined $arg_ref->{STATE}) {
         if (! ref $arg_ref->{STATE}) {
@@ -838,7 +838,7 @@ sub search_workflow_instances {
                 }
             }
         }
-        $dynamic->{$workflow_table . '.WORKFLOW_STATE'} = $arg_ref->{STATE};
+        $dynamic->{$workflow_table . '.WORKFLOW_STATE'} = {VALUE => $arg_ref->{STATE}};
     }
     my %limit;
     if (defined $arg_ref->{LIMIT} && !defined $arg_ref->{START}) {
@@ -893,8 +893,8 @@ sub __get_workflow_factory {
         my $wf = CTX('dbi_workflow')->first(
             TABLE   => 'WORKFLOW_CONTEXT',
             DYNAMIC => {
-                'WORKFLOW_SERIAL'      => $arg_ref->{WORKFLOW_ID},
-                'WORKFLOW_CONTEXT_KEY' => 'config_id',
+                'WORKFLOW_SERIAL'      => {VALUE => $arg_ref->{WORKFLOW_ID}},
+                'WORKFLOW_CONTEXT_KEY' => {VALUE => 'config_id'},
             },
         );
         if (! defined $wf) {
