@@ -902,7 +902,7 @@ sub _get_policy {
     foreach my $type ( $policy->get( [ 'certs.type'] ) ) {
     
         my $index = 0;
-        my $allowed_profile_count = $policy->get([  'certs.type', $type, 'allowed_profiles' ]);
+        my $allowed_profile_count = $policy->get([  'certs.type', $type, 'allowed_profiles' ]) || 0;
         for ($index = 0; $index < $allowed_profile_count; $ index++) {  
             my $allowed_profile = $policy->get([  'certs.type', $type, 'allowed_profiles', $index ]);
             
@@ -922,7 +922,7 @@ sub _get_policy {
             $policy->set([ 'xref.type', $type,'policy',$item], $policy->get([  'certs.type', $type, $item ]));         
         }
     
-        my $usage_count = $policy->get([  'certs.type', $type, 'usage' ]);
+        my $usage_count = $policy->get([  'certs.type', $type, 'usage' ]) || 0;
         for ($index = 0; $index < $usage_count; $ index++) {  
             my $usage = $policy->get([  'certs.type', $type, 'usage', $index ]);        
             #$policy->set([ 'xref.usage', $usage, 'type' ], $type ); # Seems not to be in use
