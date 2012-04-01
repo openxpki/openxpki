@@ -55,7 +55,7 @@ sub execute {
     my $csr = CTX('dbi_backend')->first(
         TABLE   => 'CSR',
         DYNAMIC => {
-            'CSR_SERIAL' => $csr_serial,
+            'CSR_SERIAL' => {VALUE => $csr_serial},
         },
     );
     if (! defined $csr) {
@@ -110,7 +110,7 @@ sub execute {
     my $csr_metadata = CTX('dbi_backend')->select(
 	TABLE   => 'CSR_ATTRIBUTES',
         DYNAMIC => {
-            'CSR_SERIAL' => $csr_serial,
+            'CSR_SERIAL' => {VALUE => $csr_serial},
         },
 	);
 

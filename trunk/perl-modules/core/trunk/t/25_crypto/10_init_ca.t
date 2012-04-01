@@ -84,13 +84,24 @@ foreach my $ca_id (qw(INTERNAL_CA_1 INTERNAL_CA_2)) {
     print STDERR "CA CSR: $csr\n" if ($ENV{DEBUG});
     
     ## create profile
-    my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
-	CONFIG    => $cache,
-	PKI_REALM => "Test Root CA",
-	CA        => $ca_id,
-	TYPE      => "SELFSIGNEDCA");
-    $profile->set_serial(1);
-    ok(1);
+    my $profile;
+    eval
+    {
+        $profile = OpenXPKI::Crypto::Profile::Certificate->new (
+            CONFIG    => $cache,
+            PKI_REALM => "Test Root CA",
+            CA        => $ca_id,
+            TYPE      => "SELFSIGNEDCA");
+         $profile->set_serial(1);
+    };
+    if ($EVAL_ERROR)
+    {
+        print STDERR "Exception: ${EVAL_ERROR}\n";
+        ok(0);
+        exit 1;
+    } else {
+        ok (1);
+    }
 
     ### profile: $profile
     

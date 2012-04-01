@@ -78,13 +78,13 @@ sub evaluate
     
 
     if (defined $self->cert_email()) {
-	$conditions{'CERTIFICATE.EMAIL'} = $self->cert_email(),
+	$conditions{'CERTIFICATE.EMAIL'} = {VALUE => $self->cert_email(), OPERATOR => "LIKE"},
     }
     if (defined $self->cert_profile()) {
-	$conditions{'CSR.PROFILE'} = $self->cert_profile(),
+	$conditions{'CSR.PROFILE'} = {VALUE => $self->cert_profile(), OPERATOR => "LIKE"},
     }
     if (defined $self->cert_subject()) {
-	$conditions{'CERTIFICATE.SUBJECT'} = $self->cert_subject(),
+	$conditions{'CERTIFICATE.SUBJECT'} = {VALUE => $self->cert_subject(), OPERATOR => "LIKE"},
     }
 
 
@@ -103,8 +103,8 @@ sub evaluate
 	    [ 'CSR_SERIAL', 'CSR_SERIAL' ],
 	],
 	DYNAMIC => {
-	    'CERTIFICATE.PKI_REALM'  => $pki_realm,
-	    'CERTIFICATE.STATUS'     => 'ISSUED',
+	    'CERTIFICATE.PKI_REALM'  => {VALUE => $pki_realm},
+	    'CERTIFICATE.STATUS'     => {VALUE => 'ISSUED'},
 	    %conditions,
 	},
 	VALID_AT => [ [ @validity ], undef ],

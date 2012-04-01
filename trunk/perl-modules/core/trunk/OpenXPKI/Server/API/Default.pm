@@ -76,11 +76,11 @@ sub list_my_certificates {
             'CERTIFICATE.CERTIFICATE_SERIAL',
         ],
         DYNAMIC => {
-            'context1.WORKFLOW_CONTEXT_KEY'   => 'workflow_parent_id',
-            'context2.WORKFLOW_CONTEXT_KEY'   => 'creator',
-            'context3.WORKFLOW_CONTEXT_KEY'   => 'cert_identifier',
-            'context2.WORKFLOW_CONTEXT_VALUE' => $user,
-            'CERTIFICATE.PKI_REALM'           => $realm,
+            'context1.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'workflow_parent_id'},
+            'context2.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'creator'},
+            'context3.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'cert_identifier'},
+            'context2.WORKFLOW_CONTEXT_VALUE' => {VALUE => $user},
+            'CERTIFICATE.PKI_REALM'           => {VALUE => $realm},
         },
         JOIN => [
             [
@@ -179,7 +179,7 @@ sub list_config_ids {
     my $config_entries = CTX('dbi_backend')->select(
         TABLE   => 'CONFIG',
         DYNAMIC => {
-            CONFIG_IDENTIFIER => '%',
+            CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
         },
     );
     if (! defined $config_entries
@@ -1151,7 +1151,7 @@ sub get_chain {
         my $cert = $dbi->first(
             TABLE   => 'CERTIFICATE',
             DYNAMIC => {
-                IDENTIFIER => $current_identifier,
+                IDENTIFIER => {VALUE => $current_identifier},
             },
         );
         if (! defined $cert) { #certificate not found
