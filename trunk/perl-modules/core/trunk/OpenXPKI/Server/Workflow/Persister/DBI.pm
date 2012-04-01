@@ -221,7 +221,7 @@ sub update_workflow {
                 WORKFLOW_CONTEXT_KEY   => $key,
                 WORKFLOW_CONTEXT_VALUE => $value,
             },
-            DYNAMIC => {
+            WHERE => {
                 WORKFLOW_SERIAL      => $id,
                 WORKFLOW_CONTEXT_KEY => $key,
             },
