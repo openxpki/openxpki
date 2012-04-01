@@ -29,7 +29,7 @@ sub execute {
     my $csr = $dbi->first(
         TABLE   => 'CSR',
         DYNAMIC => {
-            'CSR_SERIAL' => $csr_serial,
+            'CSR_SERIAL' => {VALUE => $csr_serial},
         },
     );
     $context->param('csr_type' => $csr->{TYPE});
@@ -57,7 +57,7 @@ sub execute {
     my $csr_metadata = $dbi->select(
         TABLE   => 'CSR_ATTRIBUTES',
         DYNAMIC => {
-            'CSR_SERIAL' => $csr_serial,
+            'CSR_SERIAL' => {VALUE => $csr_serial},
         },
     );
     foreach my $metadata (@{$csr_metadata}) {

@@ -278,8 +278,8 @@ sub __set_secret_from_cache {
             my $secret_result = CTX('dbi_backend')->first (
                                     TABLE   => "SECRET",
                                     DYNAMIC => {
-                                        PKI_REALM => $realm,
-                                        GROUP_ID  => $group});
+                                        PKI_REALM => {VALUE => $realm},
+                                        GROUP_ID  => {VALUE => $group}});
             $secret = $secret_result->{DATA};
         }
         ##! 16: 'secret: ' . $secret
@@ -407,8 +407,8 @@ sub set_secret_group_part
         my $result = CTX('dbi_backend')->select (
                          TABLE => "SECRET",
                          DYNAMIC => {
-                             PKI_REALM => $realm,
-                             GROUP_ID  => $group});
+                             PKI_REALM => {VALUE => $realm},
+                             GROUP_ID  => {VALUE => $group}});
         if (scalar @{$result})
         {
             ##! 8: "this is an update in daemon mode"
@@ -459,8 +459,8 @@ sub clear_secret_group
         my $result = CTX('dbi_backend')->select (
                          TABLE => "SECRET",
                          DYNAMIC => {
-                             PKI_REALM => $realm,
-                             GROUP_ID  => $group});
+                             PKI_REALM => {VALUE => $realm},
+                             GROUP_ID  => {VALUE => $group}});
         if (scalar @{$result})
         {
             ##! 8: "we have to delete something"

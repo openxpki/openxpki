@@ -155,8 +155,8 @@ sub execute
         my $sig_cert_db = CTX('dbi_backend')->first(
             TABLE    => 'CERTIFICATE',
             DYNAMIC  => {
-                'IDENTIFIER' => $sig_identifier,
-                'STATUS'     => 'ISSUED',
+                'IDENTIFIER' => {VALUE => $sig_identifier},
+                'STATUS'     => {VALUE => 'ISSUED'},
             },
         );
         if (! defined $sig_cert_db) {

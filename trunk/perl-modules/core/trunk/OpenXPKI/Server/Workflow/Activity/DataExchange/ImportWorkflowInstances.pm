@@ -70,10 +70,10 @@ sub execute
                          JOIN    => [ [ 'WORKFLOW_SERIAL',
                                         'WORKFLOW_SERIAL'], ],
                          DYNAMIC => {
-                                     'workflow.WORKFLOW_TYPE'          => $ref->{workflow}->{type},
-                                     'workflow.WORKFLOW_SERIAL'        => $ref->{workflow}->{serial},
-                                     'context1.WORKFLOW_CONTEXT_KEY'   => 'parent_server_id',
-                                     'context1.WORKFLOW_CONTEXT_VALUE' => $hash{parent_server_id},
+                                     'workflow.WORKFLOW_TYPE'          => {VALUE => $ref->{workflow}->{type}},
+                                     'workflow.WORKFLOW_SERIAL'        => {VALUE => $ref->{workflow}->{serial}},
+                                     'context1.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'parent_server_id'},
+                                     'context1.WORKFLOW_CONTEXT_VALUE' => {VALUE => $hash{parent_server_id}},
                                     },
                      );
         ##! 4: "result from dulicate detection: ".scalar @{$result}

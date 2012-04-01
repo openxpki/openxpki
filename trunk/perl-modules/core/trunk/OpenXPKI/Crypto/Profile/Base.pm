@@ -731,9 +731,12 @@ Base class for profiles used in the CA.
 Helper method to parse profile items through template toolkit.
 Expects an array of strings containing one TT Template per line.
 Available variables for substitution are 
-= over
+
+=over
 
 =item ISSUER.x Hash with the subject parts of the issuing certificate. 
 Note that each key is an array itself, even if there is only a single value in it. 
 Therefore you need to write e.g. ISSUER.OU.0 for the (first) OU entry. Its wise 
 to do urlescaping on the output, e.g. [- ISSUER.OU.0 | uri -].
+
+=back

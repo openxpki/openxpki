@@ -46,8 +46,8 @@ sub validate {
             'NOTAFTER',
         ],
         DYNAMIC => {
-            'IDENTIFIER' => $identifier,
-            'PKI_REALM'  => $pki_realm,
+            'IDENTIFIER' => {VALUE => $identifier},
+            'PKI_REALM'  => {VALUE => $pki_realm},
         },
     );
     if (! defined $cert) {

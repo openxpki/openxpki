@@ -62,8 +62,8 @@ sub execute {
     my $crl_db = $dbi->first(
         TABLE   => 'CRL',
         DYNAMIC => {
-            'ISSUER_IDENTIFIER' => $ca_identifier,
-            'PUBLICATION_DATE'  => -1, # this CRL has not been published yet
+            'ISSUER_IDENTIFIER' => {VALUE => $ca_identifier},
+            'PUBLICATION_DATE'  => {VALUE => -1}, # this CRL has not been published yet
         },
         ORDER => [
             'LAST_UPDATE',
