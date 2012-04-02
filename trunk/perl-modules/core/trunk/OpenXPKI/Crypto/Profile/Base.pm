@@ -10,6 +10,9 @@ package OpenXPKI::Crypto::Profile::Base;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use English;
+use Template;
+
+use OpenXPKI::Server::Context qw( CTX );
 
 use DateTime;
 use Data::Dumper;
@@ -82,7 +85,11 @@ sub load_extension
     my @path    = @{$keys->{PATH}};
     my @counter = @{$keys->{COUNTER}};
     my @values  = ();
-    my $cfg_id  = $keys->{CONFIG_ID};
+    
+    # Always pull CONFIG_ID from class
+    #my $cfg_id  = $keys->{CONFIG_ID};
+    my $cfg_id  = $self->{CONFIG_ID};
+    
     ##! 4: 'path: ' . Dumper \@path
     ##! 4: 'counter: ' . Dumper \@counter
     ##! 4: 'cfg_id: ' . $cfg_id
@@ -262,6 +269,10 @@ sub load_extension
                                                              COUNTER => [@counter, 0],
                                                              CONFIG_ID => $cfg_id)};
         }
+               
+        # Parse using Template Toolkit 
+        @values = @{ $self->process_templates(\@values) };
+        
         if (scalar @values)
         {
             $self->set_extension (NAME     => "cdp",
@@ -271,38 +282,43 @@ sub load_extension
     }
     elsif ($path[$#path] eq "authority_info_access")
     {
-	my $ca_issuer_count = 0;
-	eval {
-	    $ca_issuer_count
-		= $self->{config}->get_xpath_count (XPATH   => [@path, "ca_issuers"],
-						    COUNTER => [@counter, 0],
-                            CONFIG_ID => $cfg_id);
-	};
+    	my $ca_issuer_count = 0;
+    	eval {
+    	    $ca_issuer_count
+    		= $self->{config}->get_xpath_count (XPATH   => [@path, "ca_issuers"],
+    						    COUNTER => [@counter, 0],
+                                CONFIG_ID => $cfg_id);
+    	};
         if ($ca_issuer_count > 0) {
-            push @values, ["CA_ISSUERS",
-                           $self->{config}->get_xpath_list (
+            
+            my $ca_issuer_list = $self->{config}->get_xpath_list (
                                XPATH   => [@path, "ca_issuers"],
                                COUNTER => [@counter, 0],
-                               CONFIG_ID => $cfg_id)];
+                               CONFIG_ID => $cfg_id);
+            
+            # Parse using Template Toolkit and push result 
+            push @values, ["CA_ISSUERS", $self->process_templates( $ca_issuer_list ) ];                               
         }
 
-	my $ocsp_count = 0;
-	eval {
-	    $ocsp_count 
-		= $self->{config}->get_xpath_count (XPATH   => [@path, "ocsp"],
-						    COUNTER => [@counter, 0],
-                            CONFIG_ID => $cfg_id);
-	};
-	if ($ocsp_count > 0) {
-	    push @values, ["OCSP",
-			   $self->{config}->get_xpath_list (
-			       XPATH   => [@path, "ocsp"],
-			       COUNTER => [@counter, 0],
-                   CONFIG_ID => $cfg_id)];
-	}
-
-	if (scalar @values)
-	{
+    	my $ocsp_count = 0;
+    	eval {
+    	    $ocsp_count 
+    		= $self->{config}->get_xpath_count (XPATH   => [@path, "ocsp"],
+    						    COUNTER => [@counter, 0],
+                                CONFIG_ID => $cfg_id);
+    	};
+    	if ($ocsp_count > 0) {
+    	    my $ocsp_list = $self->{config}->get_xpath_list (
+    			       XPATH   => [@path, "ocsp"],
+    			       COUNTER => [@counter, 0],
+                       CONFIG_ID => $cfg_id);
+                       
+            # Parse using Template Toolkit and push result 
+            push @values, ["OCSP", $self->process_templates( $ocsp_list ) ];   
+    	}    
+    
+    	if (scalar @values)
+    	{
             $self->set_extension (NAME     => "authority_info_access",
                                   CRITICAL => $critical,
                                   VALUES   => [@values]);
@@ -640,6 +656,48 @@ sub get_entry_validity {
 }
 
 
+sub process_templates {
+    
+    my $self = shift;
+    my $values = shift;    
+    
+    # Add ability to use template toolkit - check if there are tags inside
+        
+    ##! 32: ' Test for TT ' . Dumper ( $values )      
+    if (! scalar(grep /\[.*\]/, @$values) ) {
+        return $values;
+    }
+            
+    ##! 16: 'Tags found - init TT'
+    my $tt = Template->new();            
+
+    # Get Issuer Info from selected ca 
+    my $issuer_info = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{CTX('api')->get_pki_realm()}->{ca}->{id}->{$self->{CA}}
+        ->{cacert}->{PARSED}->{BODY}->{SUBJECT_HASH};
+       
+    my %template_vars = (
+        'ISSUER' => $issuer_info,                                
+    ); 
+    ##! 32: ' Template Vars ' . Dumper ( %template_vars )  
+    
+    my @newvalues;
+    while (my $template = shift @$values) {  
+        if ($template =~ /\[.+\]/) {
+            my $output;
+            $template = '[% TAGS [- -] -%]' .  $template;
+            $tt->process(\$template, \%template_vars, \$output);                    
+            ##! 32: ' Tags found - ' . $template . ' -> '. $output
+            push @newvalues, $output;                                                         
+        } else {
+            push @newvalues, $template;
+        }                
+    }            
+         
+    ##! 64: ' Processed CRL DP ' . Dumper ( @newvalues )        
+    return \@newvalues;
+}
+ 
+
 our $AUTOLOAD;
 sub AUTOLOAD {
     my $self = shift;
@@ -668,4 +726,17 @@ Base class for profiles used in the CA.
 
 =head1 Functions
 
-=head2 ...
+=head2 process_templates
+
+Helper method to parse profile items through template toolkit.
+Expects an array of strings containing one TT Template per line.
+Available variables for substitution are 
+
+=over
+
+=item ISSUER.x Hash with the subject parts of the issuing certificate. 
+Note that each key is an array itself, even if there is only a single value in it. 
+Therefore you need to write e.g. ISSUER.OU.0 for the (first) OU entry. Its wise 
+to do urlescaping on the output, e.g. [- ISSUER.OU.0 | uri -].
+
+=back

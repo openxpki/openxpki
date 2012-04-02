@@ -1,96 +1,62 @@
-## OpenXPKI::Config
-##
-## Written 2011 by Scott Hardin for the OpenXPKI project
-## Copyright (C) 2010, 2011 by The OpenXPKI Project
-##
-## Based on the CPAN module App::Options
-##
-## vim: syntax=perl
-
-use Config::Merge;
+# OpenXPKI::Config
+#
+# Written 2012 by Oliver Welter for the OpenXPKI project
+# Copyright (C) 2012 by The OpenXPKI Project
+#
 
 package OpenXPKI::Config;
 
-use base qw( Config::Versioned );
+use strict;
+use warnings;
+use English;
+use Moose;
+use Connector::Proxy::Config::Versioned;
+use OpenXPKI::Exception;
 
-# override new() to prepend with our config bootstrap
-sub new {
-    my ($this) = shift;
-    my $class = ref($this) || $this;
-    my $params = shift;
+extends 'Connector::Multi';
 
-    $params->{dbpath} = $ENV{OPENXPKI_CONF_DB} || '/etc/openxpki/config.git';
+has '+BASECONNECTOR' => ( required => 0 );
 
-    if ( $ENV{OPENXPKI_CONF_PATH} ) {
-        $params->{path} = [ split( /:/, $ENV{OPENXPKI_CONF_PATH} ) ];
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $class = shift;
+        
+    my $dbpath = $ENV{OPENXPKI_CONF_DB} || '/etc/openxpki/config.git';    
+    
+    if (! -d $dbpath) {
+        OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_INIT_TASK_GIT_DBPATH_DOES_NOT_EXIST",
+		params  => {
+		    dbpath => $dbpath,
+		});
     }
-    elsif ( not exists $params->{path} ) {
-        $params->{path} = [qw( /etc/openxpki/config.d )];
-    }
-
-    $this->SUPER::new($params);
-}
-
-# parser overrides the method in Config::Versioned to use Config::Merge
-# instead of Config::Std
-
-sub parser {
-    my $self   = shift;
-    my $params = shift;
-
-    my $dir = $params->{path}->[0];
-
-    # If the directory was not set or doesn't exist, don't bother
-    # trying to import any configuration
-
-    if ( not $dir or not -d $dir ) {
-        return;
-    }
-
-    my $cm    = Config::Merge->new($dir);
-    my $cmref = $cm->();
-
-    my $tree = $self->cm2tree($cmref);
-
-    $params->{comment} = 'import from ' . $dir . ' using Config::Merge';
-    $self->commit( $tree, @_, $params );
-}
-
-# cm2tree is just a helper routine for recursively traversing the data
-# structure returned by Config::Merge and massaging it into something
-# we can use with Config::Versioned
-
-sub cm2tree {
-    my $self = shift;
-    my $cm   = shift;
-    my $tree = {};
-    if ( ref($cm) eq 'HASH' ) {
-        my $ret = {};
-        foreach my $key ( keys %{$cm} ) {
-            $ret->{$key} = $self->cm2tree( $cm->{$key} );
+    
+    my $cv = Connector::Proxy::Config::Versioned->new(
+        {
+            LOCATION  => $dbpath,
         }
-        return $ret;
+    );
+    
+    if (!$cv) {
+        OpenXPKI::Exception->throw (
+		message => "I18N_OPENXPKI_SERVER_INIT_TASK_CONFIG_LAYER_NOT_INITIALISED",
+		params  => {
+		    dbpath => $dbpath,
+		});
     }
-    elsif ( ref($cm) eq 'ARRAY' ) {
-        my $ret = {};
-        my $i   = 0;
-        foreach my $entry ( @{$cm} ) {
-            $ret->{ $i++ } = $self->cm2tree($entry);
-        }
-        return $ret;
-    }
-    else {
-        return $cm;
-    }
-}
+        
+    return $class->$orig( { BASECONNECTOR => $cv } );
+};
 
-1;    # End of OpenXPKI::Config
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
+1;
 __DATA__
 
 =head1 NAME
 
-OpenXPKI::Config - Simplified access to the configuration data
+OpenXPKI::Config - Connector based configuration layer using Config::Versioned
 
 =head1 SYNOPSIS
 
@@ -102,41 +68,4 @@ OpenXPKI::Config - Simplified access to the configuration data
 
 =head1 DESCRIPTION
 
-OpenXPKI::Config uses Config::Versioned to access versioned configuration
-parameters. It overrides the default behavior of Config::Versioned to use
-the CPAN C<Config::Merge> module instead of C<Config::Std>. In addition,
-the following parameters are also modified:
-
-=head2 dbpath
-
-The C<dbpath> (the storage location for the internal git repository) is
-located in C</etc/openxpki/config.git> by default, but may be overridden
-with the ENV variable C<OPENXPKI_CONF_DB>.
-
-=head2 path
-
-The C<path> is where the configuration files to be read are located and
-is set to C</etc/openxpki/config.d> by default, but may be overridden
-with the ENV variable C<OPENXPKI_CONF_PATH>.
-
-Note: for C<Config::Merge>, only one directory name should be supplied
-and not a colon-separated list.
-
-
-=head1 METHODS
-
-=head2 new()
-
-This overrides the parent class, adding the default locations for the 
-configuration files needed by OpenXPKI.
-
-=head1 MORE INFO
-
-See L<Config::Versioned> for more details on the configuration backend.
-
-See L<Config::Merge> for more details on the configuration file format.
-
-=cut
-
-1;
-
+  

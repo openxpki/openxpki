@@ -78,3 +78,4 @@ libnamespace-autoclean-perl
 libdata-page-perl
 libmath-round-perl
 libtimedate-perl
+libyaml-perl

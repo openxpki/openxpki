@@ -100,8 +100,8 @@ sub evaluate {
             'SUBJECT',
         ],
         DYNAMIC => {
-            'IDENTIFIER' => $sig_identifier,
-            'PKI_REALM'  => $pki_realm,
+            'IDENTIFIER' => {VALUE => $sig_identifier},
+            'PKI_REALM'  => {VALUE => $pki_realm},
         },
     );
     if (! ref $certs eq 'ARRAY') {
@@ -139,9 +139,9 @@ sub evaluate {
             'IDENTIFIER',
         ],
         DYNAMIC => {
-            'SUBJECT'   => $certs->[0]->{SUBJECT},
-            'STATUS'    => 'ISSUED',
-            'PKI_REALM' => $pki_realm,
+            'SUBJECT'   => {VALUE => $certs->[0]->{SUBJECT}},
+            'STATUS'    => {VALUE => 'ISSUED'},
+            'PKI_REALM' => {VALUE => $pki_realm},
         },
         VALID_AT => time(),
     );

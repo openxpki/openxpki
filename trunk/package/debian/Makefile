@@ -20,8 +20,8 @@ PACKAGES=			\
 	deployment		\
 	mason-html-client	\
 	scep-client		\
-	i18n
-
+	i18n \
+	qatest
 
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 
@@ -59,8 +59,12 @@ default:	clean
 # compatible with OpenXPKI
 $(EXTERNAL) $(EXTERNAL2):
 	test -d deb || mkdir deb
-	test -d deb/cpan || mkdir deb/cpan/	
-	cd deb/cpan/ &&  DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
+	test -d deb/cpan || mkdir deb/cpan/
+	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
+
+# Development Build - load git://github.com/mrscotty/connector.git into deb/cpan/Connector
+Connector:
+	cd deb/cpan/ && DEB_BUILD_OPTIONS=nocheck dh-make-perl --desc Connector --version dev-`date +%Y%m%d`  --build Connector/
 
 #WORKFLOW:
 #	cd deb/cpan/ && rm -rf Workflow-0.31*

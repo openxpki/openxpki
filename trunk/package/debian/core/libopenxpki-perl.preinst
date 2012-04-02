@@ -1,5 +1,5 @@
 #! /bin/sh
-# preinst script for openxpki-deployment
+# preinst script for libopenxpki-perl
 #
 # see: dh_installdeb(1)
 
@@ -21,7 +21,7 @@ case "$1" in
     ;;
 
     *)
-        echo "postinst called with unknown argument \`$1'" >&2
+        echo "preinst called with unknown argument \`$1'" >&2
         exit 1
     ;;
 esac

@@ -58,7 +58,16 @@ sub full_message
     my $msg = OpenXPKI::i18n::i18nGettext ($self->{message}, %{$self->{params}});
     if ($msg eq $self->{message})
     {
-        $msg = join ", ", ($msg, %{$self->{params}});
+        # the message was not translated
+        if (scalar keys %{$self->{params}})
+        {
+            # normalize the output => sort keys
+            # otherwise the output is not predictable
+            foreach my $key (sort keys %{$self->{params}})
+            {
+                $msg = $msg.", ".$key." => ".$self->{params}->{$key};
+            }
+        }
     }
     ## this is only for debugging of OpenXPKI::Exception
     ## and creates a lot of noise
@@ -115,7 +124,6 @@ sub throw {
 	    if (exists $args{log}->{priority}) {
 		$logger_args{PRIORITY} = $args{log}->{priority};
 	    }
-	    
 
 	    # logger object was explicitly specified
 	    if (exists $args{log}->{logger}
@@ -127,10 +135,7 @@ sub throw {
 		
 		delete $args{log};
 	    } else {
-		# no logger specified, instantiate one
-		OpenXPKI::Server::Context::CTX('log')->log(
-		    %logger_args,
-		    );
+                __log(%logger_args);
 	    }
 	} else {
 	    # no OpenXPKI logger specified, do not log at all
@@ -138,24 +143,28 @@ sub throw {
 	}
     } else {
 	# exceptions get logged by default
-	my $logger;
-	eval {
-	    $logger = OpenXPKI::Server::Context::CTX('log');
-	};
-
-	if (defined $logger) {
-	    # we have an OpenXPKI logger available
-	    $logger->log(
-		%logger_args,
-		);
-	} else {
-	    # no system logger found, falling back to Log4perl
-	    $log4perl_logger ||= get_logger('openxpki.system');
-	    $log4perl_logger->debug($logger_args{MESSAGE});
-	}
+        __log(%logger_args);
     }
 
     die $self;
+}
+
+sub __log {
+    my %logger_args = ( @_ );
+
+    my $logger;
+    eval {
+        $logger = OpenXPKI::Server::Context::CTX('log');
+    };
+
+    if (defined $logger) {
+        # we have an OpenXPKI logger available
+        $logger->log(%logger_args);
+    } else {
+        # no system logger found, falling back to Log4perl
+        $log4perl_logger ||= get_logger('openxpki.system');
+        $log4perl_logger->debug($logger_args{MESSAGE});
+    }
 }
 
 sub __fake_stacktrace_new {

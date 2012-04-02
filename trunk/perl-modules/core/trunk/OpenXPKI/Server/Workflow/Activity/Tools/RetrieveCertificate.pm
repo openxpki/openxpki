@@ -65,13 +65,13 @@ sub execute
 	);
 
     if (defined $self->cert_email()) {
-	$conditions{'CERTIFICATE.EMAIL'} = $self->cert_email();
+	$conditions{'CERTIFICATE.EMAIL'} = {VALUE => $self->cert_email()};
     }
     if (defined $self->cert_profile()) {
-	$conditions{'CSR.PROFILE'} = $self->cert_profile();
+	$conditions{'CSR.PROFILE'} = {VALUE => $self->cert_profile()};
     }
     if (defined $self->cert_subject()) {
-	$conditions{'CERTIFICATE.SUBJECT'} = $self->cert_subject();
+	$conditions{'CERTIFICATE.SUBJECT'} = {VALUE => $self->cert_subject()};
     }
 
     if (scalar keys(%conditions) == 0) {
@@ -91,9 +91,9 @@ sub execute
 		'DATA',
 	    ],
 	    DYNAMIC => {
-		'IDENTIFIER' => $cert_identifier,
-		'STATUS'    => 'ISSUED',
-		'PKI_REALM' => $pki_realm,
+		'IDENTIFIER' => {VALUE => $cert_identifier},
+		'STATUS'    => {VALUE => 'ISSUED'},
+		'PKI_REALM' => {VALUE => $pki_realm},
 	    },
 	    );
 	
@@ -140,8 +140,8 @@ sub execute
 		[ 'CSR_SERIAL', 'CSR_SERIAL' ],
 	    ],
 	    DYNAMIC => {
-		'CERTIFICATE.PKI_REALM'  => $pki_realm,
-		'CERTIFICATE.STATUS'     => 'ISSUED',
+		'CERTIFICATE.PKI_REALM'  => {VALUE => $pki_realm},
+		'CERTIFICATE.STATUS'     => {VALUE => 'ISSUED'},
 		%conditions,
 	    },
 	    VALID_AT => [ [ @validity ], undef ],

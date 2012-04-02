@@ -19,9 +19,9 @@ $dbi->insert(
     TABLE => 'CERTIFICATE',
     HASH => 
     {
-	  ISSUER_IDENTIFIER        => '1234',
-      CERTIFICATE_SERIAL       => '1',
-      SUBJECT                  => 'CN=Foo,O=Acme\, Inc',
+        ISSUER_IDENTIFIER  => '1234',
+        CERTIFICATE_SERIAL => '1',
+        SUBJECT            => 'CN=Foo,O=Acme\, Inc',
     });
 
 $dbi->commit();
@@ -33,7 +33,7 @@ TODO: {
         TABLE => 'CERTIFICATE',
         DYNAMIC => 
         {
-          SUBJECT                  => 'CN=Foo,O=Acme\, Inc',
+            SUBJECT => {VALUE => 'CN=Foo,O=Acme\, Inc', OPERATOR => "LIKE"},
         }
     );
     is(scalar @{$result}, 1, 'one entry returned');

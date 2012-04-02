@@ -85,11 +85,18 @@ print STDERR "OpenSSL binary:  $openssl_binary\n";
 my $openssl_version_string = `$openssl_binary version`;
 my ($openssl_version_major, $openssl_version_minor, $openssl_version_fix, $openssl_version_patch);
 if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/) {
+    # OpenSSL 0.9
     $openssl_version_major = $1;
     $openssl_version_minor = $2;
     $openssl_version_fix   = $3;
     $openssl_version_patch = $4;
     print "OpenSSL version: major=$openssl_version_major, minor=$openssl_version_minor, fix=$openssl_version_fix, patch=$openssl_version_patch\n";
+} elsif ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)\s+/) {
+    # OpenSSL 1.0
+    $openssl_version_major = $1;
+    $openssl_version_minor = $2;
+    $openssl_version_fix   = $3;
+    print "OpenSSL version: major=$openssl_version_major, minor=$openssl_version_minor, fix=$openssl_version_fix\n";
 } else {
     print "Problem: malformed openssl version string!\n";
     print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
@@ -97,11 +104,13 @@ if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/) {
 }
 
 # Now make sure version is 0.9.8
-unless ( ($openssl_version_major == 0) &&
-         ($openssl_version_minor == 9) &&
-         ($openssl_version_fix   == 8) ) {
+unless ( (($openssl_version_major == 0) &&
+          ($openssl_version_minor == 9) &&
+          ($openssl_version_fix   == 8)) or
+         ($openssl_version_major == 1 &&
+          $openssl_version_minor == 0)) {
     print STDERR "\n";
-    print STDERR "ERROR: OpenSSL 0.9.8 is required.\n";
+    print STDERR "ERROR: OpenSSL 0.9.8  or 1.0 is required.\n";
     print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
     exit 1;
 }
@@ -286,14 +295,16 @@ WriteMakefile(
     'VERSION'   => $openxpki_version,
     'LIBS'      => ["-L$openssl_lib_dir -lcrypto"],
     'INC'       => "-I. -I$openssl_inc_dir",
-    'CCFLAGS'   => '-O2 -g',
+    'CCFLAGS'   => '-O2 -g '.$Config{ccflags},
     'PREREQ_PM' => {
 	'Class::Accessor::Fast'  => '0.31',
 	'Class::Accessor::Chained::Fast' => undef,
 	'Class::Std'             => '0.0.8',
 	'CGI::Session'           => '3.95',
-    'Crypt::CBC'             => '2.29',
-    'Crypt::OpenSSL::AES'    => '0.02',
+	'Config::Merge'          => '1',
+	'Config::Versioned'      => '0.02',
+	'Crypt::CBC'             => '2.29',
+	'Crypt::OpenSSL::AES'    => '0.02',
 	'DBI'                    => 1,
 	'Data::Password'         => '1.07',
 	'Data::Serializer'       => '0.44',
@@ -311,10 +322,12 @@ WriteMakefile(
 	'Log::Log4perl'          => '0.51',
         'Mail::RFC822::Address'  => '0.3',
 	'Math::BigInt'           => 1,
+	'Moose'                  => 1,
         'Net::IP'                => 1,
 	'Net::LDAP'              => "0.32",
         'Net::Server'            => '0.94',
 	'Params::Validate'       => '0.77',
+	'Path::Class'            => '0.25',
 	'Proc::ProcessTable'     => '0.43',
         'Proc::SafeExec'         => '1.4',
 	'Regexp::Common'         => 2,
