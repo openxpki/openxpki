@@ -1041,17 +1041,25 @@ sub BUILD {
                     regex => $re_cert_string,
                     optional => 1,
                 },
-		'SMARTCARDID' => {
+                'SMARTCARDID' => {
                     type => SCALAR,
                     regex => $re_alpha_string,
                     optional => 1,
                 },
-		'USERID' => {
+                'SMARTCHIPID' => {
+                    type => SCALAR,
+                    regex => $re_alpha_string,                    
+                },        
+                'LOGINIDS'  => {
+                    type => ARRAYREF,
+                    optional => 1,
+                },
+                'USERID' => {
                     type => SCALAR,
                     regex => $re_sql_string,
                     optional => 1,
                 },
-		'WORKFLOW_TYPES' => {
+                'WORKFLOW_TYPES' => {
                     type => ARRAYREF,
                     optional => 1,
                 },

@@ -1,6 +1,7 @@
 ## OpenXPKI::Server::API::Smartcard.pm 
 ##
 ## Written 2010 by Martin Bartosch for the OpenXPKI project
+## Redesign using Connector by Oliver Welter 2012
 ## Copyright (C) 2005-2010 by The OpenXPKI Project
 
 package OpenXPKI::Server::API::Smartcard;
@@ -95,6 +96,8 @@ sub sc_analyze_smartcard {
     my $userid   = $arg_ref->{USERID};
     my $wf_types = $arg_ref->{WORKFLOW_TYPES};
     my $cfg_id   = $arg_ref->{CONFIG_ID};
+    my $login_ids  = $arg_ref->{LOGIN_IDS};
+    
     ##! 16: 'cfg_id: ' . $cfg_id
 
     ##! 16: 'sc_analyze_smartcard() wf_types = $wf_types (' . Dumper($wf_types) . ')'
@@ -117,9 +120,9 @@ sub sc_analyze_smartcard {
 
     my $smartcard_holder_login_id;
 
+    ##! 16: ' Load policy map '
     # get policy settings from configuration
     my $policy = $self->_get_policy();
-    
 
     my $result = {
         WF_TYPES => $wf_types,
@@ -186,7 +189,7 @@ sub sc_analyze_smartcard {
     };
 
     my $config = CTX('config');
-    ###########################################################################
+    #########################################################################
     # Info about smartcard is fetched from connector
     # smartcard.cardinfo.resolvers lists the querypoints to ask
     # each querypoint may return undef or a hash structure with the requested
@@ -194,12 +197,14 @@ sub sc_analyze_smartcard {
     
     my $scinfo;
     my $cnt = $config->get( ['smartcard.cardinfo.resolvers'] );
-    for (my $i = 0; $i < $cnt; $i++) {    
+    for (my $i = 0; $i < $cnt; $i++) {            
         my $resolver =  $config->get( [ 'smartcard.cardinfo.resolvers', $i ] );
+        ##! 32: 'Ask Cardinfo Resolver ' . $resolver
         $scinfo = $config->get( [ 'smartcard.cardinfo', $resolver, $tokenid ]);
         last if ($scinfo);
     }
 
+    ##! 32: ' SC Info: ' . Dumper( $scinfo );
     # FIXME: We need to ensure unqiness in the connector!
     # There should never be a match when tokenid ist not an exact match
     # So we can omit the sanity check some lines below..   
@@ -231,6 +236,8 @@ sub sc_analyze_smartcard {
 	
 	$holder_employee_id =  $scinfo->{employeeid};
 
+    ##! 16: 'Employeeid is ' . $holder_employee_id  
+
 	# sanity check: token id must be identical to the one passed
 	# in the api call
 	if ($tokenid 
@@ -249,6 +256,8 @@ sub sc_analyze_smartcard {
 		);
 
 	}
+	
+	#### Step 3 #############################################################
 
     # New in Phase 2: Record or validate SMARTCARDID/SMARTCHIPID mapping.
     # Check datapool if the specified SMARTCHIPID has been recorded for
@@ -267,12 +276,13 @@ sub sc_analyze_smartcard {
     
     # Not found - record it
     if (!$retval) {
+        ##! 16: "Record card/chip relation Chip: $chipid - Token: $tokenid " 
         CTX('api')->set_data_pool_entry( { 
             KEY => $chipid , 
             NAMESPACE => 'smartcard.smartchipid',
-            VALUE => $tokenid 
+            VALUE => $tokenid,
         } );        
-    } elsif( $retval != $tokenid ) {
+    } elsif( $retval ne $tokenid ) {
         OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARDID_MISSMATCHES_RECORDED_VALUE',
         params  => {
@@ -290,7 +300,7 @@ sub sc_analyze_smartcard {
     }
 
         
-    ##### Step 4 #################################################################
+    ##### Step 4 ############################################################
     
     # New in Phase 2: Determine current user by employee ID.
     
@@ -301,23 +311,23 @@ sub sc_analyze_smartcard {
     # case a lookup needs to be implemented with a local configuration 
     # file preceding the LDAP query).
     # 
-    # Key: employee ID (check with Georg Vulcan for the actual LDAP/GD
-    # attribute).
-    # 
     # Values read from the directory:
     # 
     # * givenName
     # * middleInitials
     # * surname
     # * mail
-    # * list of Windows login IDs (dbntloginid)
+    # * list of Windows login IDs
     # 
     # If LOGINID was passed in the call to the function, check each element
     # of this argument against the list of login IDs read from the
-    # directory.
+    # connector.
     # The passed login IDs must be listed in the directory, otherwise this is a
     # security violation.
+    # TODO: Login Id Validation should be configurable 
     #     
+
+    ##! 32: ' Find employee id '
 
     # Connector - Multi-Valued type
     my $employeeinfo;
@@ -325,6 +335,7 @@ sub sc_analyze_smartcard {
     my $cnt = $config->get( ['smartcard.employee.resolvers'] );    
     for (my $i = 0; $i < $cnt; $i++) {    
         $employee_source =  $config->get( [ 'smartcard.employee.resolvers', $i ] );
+        ##! 32: 'Ask Employeeid Resolver ' . $employee_source 
         $employeeinfo = $config->get( [ 'smartcard.employee', $employee_source, $holder_employee_id ]);        
         last if ($employeeinfo);
     }
@@ -383,7 +394,8 @@ sub sc_analyze_smartcard {
     } # end of "if ($scinfo)"
 
 
-    ###########################################################################
+
+    #### Step 5 #############################################################
     # check membership of logged in user (if specified) in configured groups
     if (defined $userid) {
     
@@ -411,7 +423,11 @@ sub sc_analyze_smartcard {
     }
     
     
-    ###########################################################################
+    #### Step 6 #############################################################
+    # Search for active workflows for this user (only if WORKFLOW_TYPES was
+    # passed). This operation is a convenience shortcut for the frontend 
+    # which may wish to continue a stalled personalization workflow.
+
     # search workflows
     if ((defined $wf_types) &&
 	(defined $holder_employee_id)) {
@@ -431,8 +447,24 @@ sub sc_analyze_smartcard {
 	}
     }
 
-    ###########################################################################
-    # check if puk can be found in datapool
+    #### Step 7 ##############################################################
+    # Determine PUK status and possibly other properties of the Smartcard.
+    # Depending on the PUK status set result values. The consumer of this 
+    # function call may need the information if the PUK is known and 
+    # available or if the PUK can be modified.
+    # Here we only get the basic capabilities of the card and the
+    # information on if we know the PUK. We don't fetch the actual PUK here,
+    # this is done when it is actually needed in the workflow.
+    # * boolean flag: PUK in Datapool (custom puk, that was set on the card 
+    #   earlier)
+    # * boolean flag: PUK is writable (some Smartcards do not allow 
+    #   changing the PUK).
+    # * boolean flag: purge token before unblock. if set to true by the API
+    #   function, this indicates that the Smartcard must be completely
+    #   erased (for security reasons) before an unblock operation can
+    #   happen. True for RSA tokens (because we do not necessarily have a 
+    #   token - user assignment during unblock), false for most other cards.
+    # * integer: supported keysize of the card
     
     my $puk_found = CTX('api')->get_data_pool_entry( {
         PKI_REALM => $thisrealm,
@@ -445,7 +477,9 @@ sub sc_analyze_smartcard {
     }
 
     ###########################################################################
-    # smartcard type specific settings - use only prefix for lookup
+    # Load PUK properties based on smartcard type from Config
+    # We assume that the tokenid contains the cardtype as a prefix, seperated 
+    # by an underscore (<type>_<token nummer>)
     # Todo - implement the getHash idea on the base connector
     
     $tokenid =~ m{ \A (?:(\w+\d)_) }xms;
@@ -471,14 +505,24 @@ sub sc_analyze_smartcard {
 	
 	#$result->{SMARTCARD}->{default_puk} = undef;	
 	#$config->get(['smartcard.cardinfo.properties.defaultpuk'])
-    
-
-    ###########################################################################
+        
+    #### Step 8 ###############################################################    
+    # This step prepares an output structure that can be used by the
+    # frontend or the workflow to operate on the details of certificates
+    # already on the card.
+    # The input paramters to the sc_analyze_smartcard function contains a
+    # list of Base64 encoded certificates as read from the Smartcard.
+    # Iterate through this list and parse all certificates, generating a
+    # hash array containing details on every single certificate.
+    # Populate a return structure that contains the parsed version of all
+    # certificates on the Smartcard.
     # analyze contents of the card
+    
+    # Helper to split the certificates based on the form type
     $result->{PARSED_CERTS} = $self->sc_parse_certificates($arg_ref);
 
     ###########################################################################
-    # get existing certificates
+    # sort and index the exisiting certificates
     
     my $user_certs = {
 	by_identifyer => {},
@@ -505,7 +549,14 @@ sub sc_analyze_smartcard {
     $user_certs->{by_profile}->{$profile} = [];
     }
 
-    # For Phase2 we maintain a list of a users certificates in the datapool
+
+    #### Step 9 #############################################################
+    # Get existing certificates for the holder of the current Smartcard.
+    #
+    # The employee ID maps to a user who may have had one or even
+    # more different names and hence person entries before. We need to find
+    # all existing certificates for the user, regardless of previous name.
+    # We maintain a list of a users certificates in the datapool
     # namespace: smartcard.user.certificate
     # key: employee id
     # value: serialized array of certificate identifiers
@@ -593,6 +644,7 @@ sub sc_analyze_smartcard {
 
 	$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
 	$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
+	$result->{CERT_TYPE}->{$type}->{preferred_cert_exists} = 0;
 	
 	my @expected_certs;
 	my $min_certs = $policy->get(['certs.type', $type, 'limits.min_count']);
@@ -634,7 +686,7 @@ sub sc_analyze_smartcard {
 	    }
 	}
 	
-	# propagate flag if at least one escrow certificate exists
+	# propagate flag if at least one certificate exists
 	if (scalar @expected_certs > 0) {
 	    $result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 1;
 	    ##! 16: 'at least one certificate exists for type: ' . $type
@@ -788,7 +840,7 @@ sub sc_analyze_smartcard {
 	my $min_count = $policy->get(['certs.type', $type, 'limits.min_count'])|| 0;
 	##! 16: 'check if expected certificates are present for type ' . $type
 	$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 1;
-
+	
 	my $cert_count = 0;
 	if (exists $certs_on_token_by_type{$type}) {
 	    $cert_count = scalar @{$certs_on_token_by_type{$type}};
@@ -824,17 +876,23 @@ sub sc_analyze_smartcard {
 	next if ($type eq 'FOREIGN');
 
 	if ($policy->get(['certs.type', $type, 'promote_to_preferred_profile'])) {
-	    if (! $preferred_cert_available_by_type{$type}) {
-		$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
+	    if ( $preferred_cert_available_by_type{$type}) {
+            # As the preferred certifiate exists, the check if it is on the
+            # card is done above - so no need to take care of it here.
+	        $result->{CERT_TYPE}->{$type}->{preferred_cert_exists} = 1;
+	    } else {
+		    $result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
+			
 		$result->{OVERALL_STATUS} = $self->_aggregate_visual_status(
 		    $result->{OVERALL_STATUS},
 		    'red',
 		    );
 		$result->{PROCESS_FLAGS}->{will_need_pin} = 1;
-	    }
-	}
+				
+    	}
     }
-
+    }
+       
     # an overall status that is not green indicates that we probably need the
     # pin
     if ($result->{OVERALL_STATUS} ne 'green') {
@@ -888,15 +946,20 @@ sub _get_policy {
     my $arg_ref = shift;
 
     # Policy is now served from conenctor 
-    my $policy = CTX('config')->getWrapper( 'smartcard.policy' );
+    my $config = CTX('config');
+    my $policy = $config->getWrapper( 'smartcard.policy' );
 
+    # This is currently only working inside one execution thread due to forking                
     # We need to run the index only once
     if ($policy->get('xref.cached')) {
+        ##! 8: 'policy already indexed'
         return $policy;
     }
+    
+    
 
     ###########################################################################
-    ##! 16: 'indexing policy'
+    ##! 8: 'indexing policy'
     my $ref;
 
     foreach my $type ( $policy->get( [ 'certs.type'] ) ) {
@@ -930,8 +993,8 @@ sub _get_policy {
         }    
          
     }
-
-    $policy->set('xref.cached', 1);
+   
+    $policy->set('xref.cached', 1);        
     return $policy;
 }
 
