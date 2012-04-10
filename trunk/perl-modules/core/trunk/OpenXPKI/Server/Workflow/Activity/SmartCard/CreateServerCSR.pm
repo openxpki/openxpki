@@ -18,6 +18,11 @@ use Template;
 
 sub execute {
     ##! 1: 'start'
+    
+    # Moved to ApplyCSRPolicy
+    return 1;
+    
+    
     my $self     = shift;
     my $workflow = shift;
     my $context  = $workflow->context();
