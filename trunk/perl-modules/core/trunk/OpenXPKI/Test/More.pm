@@ -128,7 +128,7 @@ use Class::Std;
     sub param_isnt {
         my ( $self, $name, $expected, $testname ) = @_;
         $testname ||= 'Fetching parameter ' . $name;
-        return !$self->is( $self->param($name), $expected, $testname );
+        return $self->isnt( $self->param($name), $expected, $testname );
     }
     
     sub param_like {
@@ -513,6 +513,11 @@ use Class::Std;
     sub is ($$;$) {
         my ( $self, $got, $expected, $testname ) = @_;
         return Test::More::is( $got, $expected, $testname );
+    }
+    
+    sub isnt ($$;$) {
+        my ( $self, $got, $expected, $testname ) = @_;
+        return Test::More::isnt( $got, $expected, $testname );
     }
 
     sub ok ($;$) {
