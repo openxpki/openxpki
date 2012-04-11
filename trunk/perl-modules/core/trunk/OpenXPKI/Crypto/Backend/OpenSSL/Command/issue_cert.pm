@@ -82,6 +82,7 @@ sub get_command
     ## build the command
 
     my @command = qw( ca -batch );
+    push @command, ('-keyfile', $self->{KEYFILE});
     push @command, (
         '-subj',
         $self->get_openssl_dn($profile->get_subject()),
