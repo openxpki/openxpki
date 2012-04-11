@@ -48,46 +48,40 @@ sub execute {
     my $context     = $wf->context();
     my $context_key = $self->context_key();
 
-=begin
-
-    my $hash = OpenXPKI::Server::Workflow::WFObject::WFHash->new(
-        { workflow => $wf, context_key => $self->hash_name } );
-
-    if ( $function eq 'valueForKey' ) {
-        my $ret = $hash->$function( $context->param( $context_key ) );
-        if ( defined $ret ) {
-            $context->param( $context_key, $ret );
-        } else {
-            $context->param( $context_key, $ret );
-            # for testing, indicate an error
-            if ( defined $context->param( $context_key ) )  {
+#    my $hash = OpenXPKI::Server::Workflow::WFObject::WFHash->new(
+#        { workflow => $wf, context_key => $self->hash_name } );
+#
+#    if ( $function eq 'valueForKey' ) {
+#        my $ret = $hash->$function( $context->param( $context_key ) );
+#        if ( defined $ret ) {
+#            $context->param( $context_key, $ret );
+#        } else {
+#            $context->param( $context_key, $ret );
+#            # for testing, indicate an error
+#            if ( defined $context->param( $context_key ) )  {
 #                $context->param( $context_key, '<undef>' );
-            }
-        }
-    }
-    # write operations that take a parameter
-    elsif ( $function =~ m/^(push|unshift)$/ ) {
-        $array->$function( $context->param( $context_key ) );
-    }
-    # other operations
-    elsif ( $function eq 'value' ) {
-        my $index_key = $self->index_key;
-        $context->param( $context_key, $array->$function( $context->param( $index_key ) ) );
-    }
-
-    else {
-        OpenXPKI::Exception->throw(
-            message =>
-                'I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_NSARRAY_MISSING_FUNCTION',
-            params => { name => $function, },
-        );
-    }
-
-    $array = undef;
-
-=end
-
-=cut
+#            }
+#        }
+#    }
+#    # write operations that take a parameter
+#    elsif ( $function =~ m/^(push|unshift)$/ ) {
+#        $array->$function( $context->param( $context_key ) );
+#    }
+#    # other operations
+#    elsif ( $function eq 'value' ) {
+#        my $index_key = $self->index_key;
+#        $context->param( $context_key, $array->$function( $context->param( $index_key ) ) );
+#    }
+#
+#    else {
+#        OpenXPKI::Exception->throw(
+#            message =>
+#                'I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_NSARRAY_MISSING_FUNCTION',
+#            params => { name => $function, },
+#        );
+#    }
+#
+#    $array = undef;
 
     return 1;
 }

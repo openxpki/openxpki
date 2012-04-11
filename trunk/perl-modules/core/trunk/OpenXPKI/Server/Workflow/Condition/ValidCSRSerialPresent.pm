@@ -31,7 +31,7 @@ sub evaluate {
     my $csr = CTX('dbi_backend')->first(
         TABLE   => 'CSR',
         DYNAMIC => {
-            'CSR_SERIAL' => $csr_serial,
+            'CSR_SERIAL' => {VALUE => $csr_serial},
         },
     );
     if (! defined $csr) {

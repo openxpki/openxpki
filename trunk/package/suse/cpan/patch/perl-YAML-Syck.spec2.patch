@@ -1,0 +1,10 @@
+--- perl-YAML-Syck.spec2	2012-01-03 14:11:04.000000000 +0100
++++ perl-YAML-Syck.spec2.new	2012-01-03 14:18:33.000000000 +0100
+@@ -44,6 +44,7 @@
+ %defattr(-,root,root,-)
+ %doc Changes COMPATIBILITY COPYING README
+ %{perl_vendorarch}/auto/*
++%{perl_vendorarch}/JSON*
+ %{perl_vendorarch}/YAML*
+ %{_mandir}/man3/*
+ 

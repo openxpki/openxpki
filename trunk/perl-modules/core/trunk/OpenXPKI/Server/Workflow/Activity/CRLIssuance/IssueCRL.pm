@@ -83,9 +83,9 @@ sub execute {
 	    # 'DATA'
         ],
         DYNAMIC => {
-            'PKI_REALM'         => $pki_realm,
-            'ISSUER_IDENTIFIER' => $ca_identifier,
-            'STATUS'            => 'REVOKED',
+            'PKI_REALM'         => {VALUE => $pki_realm},
+            'ISSUER_IDENTIFIER' => {VALUE => $ca_identifier},
+            'STATUS'            => {VALUE => 'REVOKED'},
         },
     );
     if (defined $already_revoked_certs) {
@@ -102,9 +102,9 @@ sub execute {
             # 'DATA'
         ],
         DYNAMIC => {
-            'PKI_REALM'         => $pki_realm,
-            'ISSUER_IDENTIFIER' => $ca_identifier,
-            'STATUS'            => 'CRL_ISSUANCE_PENDING',
+            'PKI_REALM'         => {VALUE => $pki_realm},
+            'ISSUER_IDENTIFIER' => {VALUE => $ca_identifier},
+            'STATUS'            => {VALUE => 'CRL_ISSUANCE_PENDING'},
         },
     );
     if (defined $certs_to_be_revoked) {
@@ -177,8 +177,8 @@ sub __prepare_crl_data {
                 'INVALIDITY_TIME',
             ],
             DYNAMIC => {
-                'IDENTIFIER' => $identifier,
-                'PKI_REALM'  => $pki_realm,
+                'IDENTIFIER' => {VALUE => $identifier},
+                'PKI_REALM'  => {VALUE => $pki_realm},
             },
         );
         if (defined $crr) {

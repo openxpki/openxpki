@@ -121,7 +121,7 @@ OpenXPKI::Server::Workflow::Condition::Approved
 
 The condition checks if there are enough approvals to continue
 with the next action/activity. The example shows the full available
-power of the class. You need RA Operator and one Privacy Officer
+power of the class. You need two RA Operator and one Privacy Officer
 approval to continue.
 
 If you do not specify a role then the condition is always false.
