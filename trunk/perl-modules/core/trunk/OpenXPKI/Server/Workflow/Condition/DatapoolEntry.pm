@@ -50,47 +50,56 @@ sub evaluate
     my ( $self, $workflow ) = @_;
     my $context     = $workflow->context();
 
-    my $params      = { 
+    my $ds_params      = { 
 	PKI_REALM => CTX('session')->get_pki_realm(),
     };
 
+    my $params = {};
     foreach my $arg (@parameters) {
 	# access workflow context instead of literal value if value starts
-	# with a $
+	# with a $	
 	if (defined $self->$arg() && ($self->$arg() =~ m{ \A \$ (.*) }xms)) {
 	    my $wf_key = $1;
-	    $self->$arg( $context->param($wf_key) )
+	    ##! 32: ' Set Identifier ' . $wf_key . ' - ' . $context->param($wf_key)
+	    $params->{$arg} = $context->param($wf_key);
+	} else {
+	    $params->{$arg} = $self->$arg();
 	}
-	##! 64: 'param: ' . $arg . '; value: ' . $self->$arg()
+	##! 64: 'param: ' . $arg . '; value: ' . $params->{$arg}
     }
 
-    my $condition = $self->condition();
+    my $condition = $params->{condition};
 
-    $params->{NAMESPACE} = $self->datapool_namespace();
-    $params->{KEY}       = $self->datapool_key();
+    $ds_params->{NAMESPACE} = $params->{datapool_namespace};
+    $ds_params->{KEY}       = $params->{datapool_key};
 
-    my $msg = CTX('api')->get_data_pool_entry($params);
+    my $msg = CTX('api')->get_data_pool_entry($ds_params);
 
     my $datapool_value = $msg->{VALUE};
 
     if ($condition eq 'exists') {
 	if (! defined $datapool_value) {
+	    ##! 64: ' value not exist'
 	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOLENTRY_DOES_NOT_EXIST';
 	}
     } elsif ($condition eq 'notnull') {
 	if (! defined $datapool_value || ($datapool_value eq '')) {
+        ##! 64: ' value empty'
 	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOLENTRY_VALUE_EMPTY';
 	}
     } elsif ($condition eq 'equals') {
-	if ($datapool_value ne $self->datapool_value()) {
+	if ($datapool_value ne $params->{datapool_value}) {
+        ##! 64: ' value equality mismatch '	    
 	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOLENTRY_EQUALITY_MISMATCH';
 	}
     } elsif ($condition eq 'regex') {
-	my $regex = qr/$self->datapool_value()/ms;
+	my $regex = qr/$params->{datapool_value}/ms;
 	if ($datapool_value =~ /$regex/) {
+        ##! 64: ' value regex mismatch '        
 	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOL_REGEX_MISMATCH';
 	}
     } else {
+        ##! 64: ' invalid condition '     
 	condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOLENTRY_INVALID_CONDITION';
     }
 
