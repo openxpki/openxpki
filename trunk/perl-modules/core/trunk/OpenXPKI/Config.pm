@@ -48,6 +48,23 @@ around BUILDARGS => sub {
     return $class->$orig( { BASECONNECTOR => $cv } );
 };
 
+sub walkQueryPoints {
+    
+    my $self = shift;
+    my $prefix = shift;
+    my $query = shift;
+    
+    my $result;
+    my $cnt = $self->get( [ $prefix, 'resolvers'] );
+    for (my $i = 0; $i < $cnt; $i++) {            
+        my $resolver =  $self->get( [ $prefix, 'resolvers', $i ] );
+        ##! 32: 'Ask Resolver ' . $prefix.'.'.$resolver.'.'.$query
+        $result = $self->get( [ $prefix, $resolver, $query ]);
+        return { 'value' => $result, 'source' => $resolver } if ($result);
+    }    
+    return;
+}
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 
