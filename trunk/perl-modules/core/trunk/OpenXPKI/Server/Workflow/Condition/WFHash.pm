@@ -12,6 +12,7 @@ use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Workflow::WFObject::WFHash;
 use OpenXPKI::Debug;
+use Data::Dumper;
 use English;
 
 my @parameters = qw(
@@ -59,18 +60,25 @@ sub evaluate {
         $key = $context->param($1);
     }
    
-   ##! 16: ' Key: ' . $key . ' - Value ' . $hash->valueForKey($key)
+   my $val = $hash->valueForKey($key);
+   
+   ##! 16: ' Key: ' . $key . ' - Value ' . Dumper ( $val )
+   
    
     if ($self->condition() eq 'key_defined') {       
-       if (defined $hash->valueForKey($key)) {
+       if (defined $val) {
+           ##! 16: ' Entry is defined '
            return 1;
-       }        
+       }
+       ##! 16: ' Entry not defined '        
        condition_error
         'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFHASH_KEY_NOT_DEFINED';
     } elsif ($self->condition() eq 'key_nonempty') {             
-       if ($hash->valueForKey($key)) {
+       if (defined $val && $val) {
+           ##! 16: ' Entry not empty '           
            return 1;
-       } 
+       }
+       ##! 16: ' Entry is empty '            
        condition_error
         'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFHASH_KEY_IS_EMPTY';   
     } else {
