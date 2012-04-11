@@ -133,6 +133,14 @@ case "$1" in
 		chmod 660 /etc/openxpki/instances/trustcenter1/ca/testdummyca1/crl.pem
 
 	fi;
+	
+	# Initial Dummy Config for Config::Versioned
+	if [ ! -d /etc/openxpki/config.d/ ]; then
+		mkdir -m 0750 /etc/openxpki/config.d/					
+		echo "config=mixed" > /etc/openxpki/config.d/openxpki.ini
+		chown -R root:openxpki /etc/openxpki/config.d/
+		openxpkictl loadcfg		
+	fi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

@@ -30,6 +30,8 @@ sub new {
     $self->{PKI_REALM} = $keys->{PKI_REALM} if ($keys->{PKI_REALM});
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
     $self->{CONFIG_ID} = $keys->{CONFIG_ID} if ($keys->{CONFIG_ID});
+    $self->{VALIDITY} =  $keys->{VALIDITY} if ($keys->{VALIDITY});
+    
 
     if (not $self->{config})
     {
@@ -119,6 +121,12 @@ sub load_profile
         CONFIG_ID => $self->{CONFIG_ID},
 	});
 
+    # Override Profile validity with local setting
+    if ($self->{VALIDITY}) {
+        ##! 16: "Override validity: " . $self->{VALIDITY}
+        $entry_validity{notafter} = $self->{VALIDITY};
+    }    
+
     if (! exists $entry_validity{notafter}) {
 	OpenXPKI::Exception->throw (
 	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
@@ -137,10 +145,12 @@ sub load_profile
 
     # for error handling
     delete $self->{PROFILE}->{DAYS};
+    delete $self->{PROFILE}->{HOURS};
 
     # plain days
     if ($entry_validity{notafter}->{VALIDITYFORMAT} eq "days") {
 	$self->{PROFILE}->{DAYS}  = $entry_validity{notafter}->{VALIDITY};
+	$self->{PROFILE}->{HOURS} = 0;
     }
 
     # handle relative date formats ("+0002" for two months)
@@ -148,9 +158,12 @@ sub load_profile
 	my $notafter = OpenXPKI::DateTime::get_validity(
 	    $entry_validity{notafter});
 
-	my $days = sprintf("%d", ($notafter->epoch() - time) / (24 * 3600));
+	my $hours = sprintf("%d", ($notafter->epoch() - time) / 3600);
+	my $days = sprintf("%d", $hours / 24);
+	$hours = $hours % 24;
 	
 	$self->{PROFILE}->{DAYS}  = $days;
+	$self->{PROFILE}->{HOURS} = $hours;
     }
 
     # only relative dates are allowed for CRLs
@@ -172,12 +185,12 @@ sub load_profile
     # possibly:
     # RFC 3280, 5.2.5 - issuing_distributing_point (if someone really
     # needs it ...)
-    foreach my $ext qw( authority_info_access authority_key_identifier issuer_alt_name ) {
+    foreach my $ext (qw( authority_info_access authority_key_identifier issuer_alt_name )) {
         ##! 16: 'load extension ' . $ext
         $self->load_extension(
             PATH      => [@profile_path, $ext],
             COUNTER   => [@profile_counter],
-            CONFIG_ID => $self->{CONFIG_ID},
+            # CONFIG_ID => $self->{CONFIG_ID},  # As in Certificate.pm, CONFIG_ID should be pulled from the class properties
         );
     }
 
@@ -190,6 +203,12 @@ sub get_nextupdate_in_days
 {
     my $self = shift;
     return $self->{PROFILE}->{DAYS};
+}
+
+sub get_nextupdate_in_hours
+{
+    my $self = shift;
+    return $self->{PROFILE}->{HOURS};
 }
 
 sub get_digest

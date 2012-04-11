@@ -1,0 +1,10 @@
+--- perl-Net-IP.spec2	2012-01-03 18:00:48.000000000 +0100
++++ perl-Net-IP.spec2.new	2012-01-03 18:01:22.000000000 +0100
+@@ -45,6 +45,7 @@
+ %defattr(-,root,root,-)
+ %doc Changes COPYING ipcount iptab README
+ %{perl_vendorlib}/*
++%{_bindir}/*
+ %{_mandir}/man3/*
+ 
+ %changelog

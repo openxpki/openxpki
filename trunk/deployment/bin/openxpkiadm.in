@@ -19,6 +19,7 @@ use File::Path;
 use IO::Prompt;
 #use OpenXPKI::XML::Config;
 
+use OpenXPKI::Config;
 use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );;

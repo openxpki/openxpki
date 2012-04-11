@@ -30,7 +30,7 @@ perl-dist: dist-clean
 $(PACKAGE).spec: $(PACKAGE).spec.template
 
 package: $(PACKAGE).spec
-	rpmbuild -ba $(PACKAGE).spec
+	PERL_LOCAL_LIB_ROOT= PERL_MB_OPT= PERL_MM_OPT= rpmbuild -ba $(PACKAGE).spec
 
 collect:
 	mv $(RPMBASE)/SRPMS/$(PACKAGE)-*.rpm .

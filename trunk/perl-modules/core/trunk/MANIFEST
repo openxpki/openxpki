@@ -9,6 +9,7 @@ CHANGES
 Makefile.PL
 OpenXPKI.pm
 OpenXPKI/VERSION.pm
+OpenXPKI/Config.pm
 OpenXPKI/DateTime.pm
 OpenXPKI/Debug.pm
 OpenXPKI/DN.pm
@@ -20,6 +21,9 @@ OpenXPKI/XML/Cache.pm
 OpenXPKI/XML/Config.pm
 OpenXPKI/i18n.pm
 openxpki.xsd
+
+## Config Layers
+OpenXPKI/Config/Merge.pm 
 
 ## Crypto layer
 
@@ -337,6 +341,7 @@ OpenXPKI/Service/SCEP/Command/PKIOperation.pm
 ## test stuff
 
 OpenXPKI/Tests.pm
+OpenXPKI/Test/More.pm
 
 t/config.xml
 

@@ -231,21 +231,15 @@
     </td>
   </tr>
 % }
+</table>
 % if ($revocation) {
-  <tr>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
+  <hr>
       <& /lib/html/a.mhtml,
          target => $context->{menu}->get_root() . '/service/create_crr/form.html',
          label  => i18nGettext('I18N_OPENXPKI_HTML_MASON_CERT_INFO_NEW_CRR'),
          params => [["cert_identifier",   $identifier]],
       &>
-    </td>
-  </tr>
 % }
-</table>
 
 <%init>
   my $msg  = $context->{client}->send_receive_command_msg (

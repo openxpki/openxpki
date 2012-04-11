@@ -48,6 +48,8 @@ sub validate {
     $subject_alt_name_parts = $ser->deserialize($subject_alt_name_parts);
     $subject_parts          = $ser->deserialize($subject_parts);
 
+    ##! 32: ' subject_alt_name_parts source: ' . Dumper( $subject_alt_name_parts )
+
     my @sans = ();
     # combine key/value pairs into san array
     foreach my $key (grep m{ _key \z }xms, keys %{ $subject_alt_name_parts }) {
@@ -323,6 +325,7 @@ sub validate {
          }
     }
     ##! 64: 'sans after evaluating fixed: ' . Dumper \@sans
+    ##FIXME: A validator schould not write into the context
     $context->param('cert_subject_alt_name' => $ser->serialize(\@sans));
 
     return 1;

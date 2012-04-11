@@ -1,5 +1,6 @@
 <%args>
   $identifier => undef
+  $revocation => undef
 </%args>
 <h1>
   <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_API_CERT_FULL_INFO_TITLE') %>
@@ -173,6 +174,8 @@
     <td><div style="font-family: monospace"><% $pubkey | n %></div></td>
   </tr>
 % }
+
+
 <!--
   <tr>
     <td>... the forgotten things ...</td>
@@ -180,6 +183,14 @@
   </tr>
 -->
 </table>
+% if ($revocation) {
+  <hr>
+      <& /lib/html/a.mhtml,
+         target => $context->{menu}->get_root() . '/service/create_crr/form.html',
+         label  => i18nGettext('I18N_OPENXPKI_HTML_MASON_CERT_INFO_NEW_CRR'),
+         params => [["cert_identifier",   $identifier]],
+      &>
+% }
 <%init>
   ## first we need the issuer identifier and the CSR serial
   my $msg  = $context->{client}->send_receive_command_msg (

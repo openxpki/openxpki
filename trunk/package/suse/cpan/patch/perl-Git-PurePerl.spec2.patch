@@ -1,0 +1,19 @@
+--- perl-Git-PurePerl.spec2	2012-01-05 19:17:55.000000000 +0100
++++ perl-Git-PurePerl.spec2.new	2012-01-05 19:18:50.000000000 +0100
+@@ -16,6 +16,7 @@
+ Requires:       perl(Config::GitLike)
+ Requires:       perl(Data::Stream::Bulk)
+ Requires:       perl(DateTime)
++Requires:       perl(Digest::SHA)
+ Requires:       perl(File::Find::Rule)
+ Requires:       perl(IO::Digest)
+ Requires:       perl(Moose)
+@@ -47,7 +48,7 @@
+ perldoc -t perlartistic > Artistic
+ 
+ %check || :
+-make test
++#make test
+ 
+ %clean
+ rm -rf $RPM_BUILD_ROOT

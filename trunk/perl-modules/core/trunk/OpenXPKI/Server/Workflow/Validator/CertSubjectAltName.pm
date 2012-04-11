@@ -174,6 +174,7 @@ sub validate {
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
+    ## FIXME: A Validator should never to an action!
     ## serialize and store the fixed context
     ## the serialized text must be safe against \n truncation
     my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
