@@ -24,7 +24,7 @@ $(error Command 'vergen' not found at $(VERGEN). Hint: does TOPDIR really point 
 endif 
 
 # all vergen symbols in tpage(1) compatible format
-TT_VERSION_SYMBOLS := $(shell \
+TT_VERSION_SYMBOLS = $(shell \
 	$(VERGEN) --dump --dumpformat "--define KEYWORD=\"VALUE\" " 2>/dev/null ; \
 	for i in `$(VERGEN) --list-formats` ; do value=`$(VERGEN) --format $$i 2>/dev/null` ; [ -n "$$value" ] && echo "--define $$i=\"$$value\"" ; done \
 )

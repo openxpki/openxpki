@@ -140,7 +140,11 @@ emailaddress (csr)
 	OpenXPKI_Crypto_Backend_OpenSSL_PKCS10 csr
     PREINIT:
 	int j, n;
+#if (OPENSSL_VERSION_NUMBER < 0x1000000fL)
         STACK *emlst;
+#else
+        STACK_OF(OPENSSL_STRING) *emlst;
+#endif
 	BIO *out;
 	char *emails;
     CODE:
@@ -148,10 +152,17 @@ emailaddress (csr)
 	emlst = X509_REQ_get1_email(csr);
 	if (emlst != NULL)
 	{
+#if (OPENSSL_VERSION_NUMBER < 0x1000000fL)
 		for (j = 0; j < sk_num(emlst); j++)
 		{
 			BIO_printf(out, "%s", sk_value(emlst, j));
 			if (j+1 != (int)sk_num(emlst))
+#else
+		for (j = 0; j < sk_OPENSSL_STRING_num(emlst); j++)
+		{
+			BIO_printf(out, "%s", sk_OPENSSL_STRING_value(emlst, j));
+			if (j+1 != (int)sk_OPENSSL_STRING_num(emlst))
+#endif
 				BIO_printf(out,"\n");
 		}
 		X509_email_free(emlst);

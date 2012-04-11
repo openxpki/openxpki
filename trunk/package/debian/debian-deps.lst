@@ -66,3 +66,16 @@ libtree-dagnode-perl
 libwww-mechanize-perl
 unzip
 libdatetime-format-strptime-perl
+libconfig-any-perl
+libconfig-gitlike-perl
+libdata-stream-bulk-perl
+libfile-find-rule-perl
+libio-digest-perl
+libmoose-perl
+libmoosex-strictconstructor-perl
+libmoosex-types-path-class-perl
+libnamespace-autoclean-perl
+libdata-page-perl
+libmath-round-perl
+libtimedate-perl
+libyaml-perl

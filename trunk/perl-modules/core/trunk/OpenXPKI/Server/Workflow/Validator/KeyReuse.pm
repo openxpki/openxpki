@@ -59,7 +59,7 @@ sub validate {
     my $cert_with_same_pubkey = CTX('dbi_backend')->first(
         TABLE   => 'CERTIFICATE',
         DYNAMIC => {
-            'PUBKEY' => $pubkey,
+            'PUBKEY' => {VALUE => $pubkey},
             # TODO - decide whether we want this to be globally unique
             # or only unique to the PKI realm?
         },

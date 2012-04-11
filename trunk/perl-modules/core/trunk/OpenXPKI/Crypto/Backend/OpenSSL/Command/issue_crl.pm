@@ -77,6 +77,7 @@ sub get_command
     #done by CLI
     #$command .= " -config $config";
     $command .= " -engine $engine" if ($engine);
+    $command .= " -keyfile ".$self->{KEYFILE};
     $command .= " -keyform $keyform" if ($keyform);
     $command .= " -out ".$self->{OUTFILE};
 

@@ -1,0 +1,10 @@
+--- perl-Config-Versioned.spec2	2012-01-03 14:25:51.000000000 +0100
++++ perl-Config-Versioned.spec2.new	2012-01-03 15:08:49.000000000 +0100
+@@ -53,6 +53,7 @@
+ %defattr(-,root,root,-)
+ %doc build.txt Changes README COPYING Artistic
+ %{perl_vendorlib}/*
++%{_bindir}/*
+ %{_mandir}/man3/*
+ 
+ %changelog

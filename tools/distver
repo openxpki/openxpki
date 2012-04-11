@@ -1,0 +1,68 @@
+#!/usr/bin/perl -w
+#
+# distver - display distro name and version in a parsable format
+#
+# Sad, but true. I needed this script because the authorative file for
+# fetching the version information on SuSE is /etc/SuSE-release, and
+# on two separate systems, I got two completely different outputs:
+#
+# ----------------------
+#   openSUSE 11.3 (i586)
+#   VERSION = 11.3
+# ----------------------
+#
+# ----------------------
+#   SUSE Linux Enterprise Server 10 (x86_64)
+#   VERSION = 10
+#   PATCHLEVEL = 2
+# ----------------------
+#
+# I then decided to make it support a few relevant distributions for my
+# work. There is no attempt in completeness--this is merely a quick hack
+# that gets expanded as I run across a new version.
+#
+# This script tries to "do the right thing", fetching the name, version
+# and patchlevel. With no arguments, it returns a dash-separated string
+# in the format:
+#
+#   name-version-patchlevel
+#
+# Note: the string "SUSE Linux Enterprise Server" will be substituted with
+# the string "SLES".
+
+use strict;
+
+my ( $version, $patchlevel, $name );
+
+if ( open( F, "/etc/SuSE-release" ) ) {
+
+    my @file = <F>;
+    close F;
+
+    if ( $file[0] =~ /^(openSUSE)/ ) {
+        $name = $1;
+        if ( $file[1] =~ /^VERSION = (\d+)\.(\d+)/ ) {
+            $version    = $1;
+            $patchlevel = $2;
+        }
+    }
+    elsif ( $file[0] =~ /^(SUSE Linux Enterprise Server)/ ) {
+        $name = 'SLES';
+        if ( $file[1] =~ /^VERSION = (\d+)/ ) {
+            $version = $1;
+        }
+        if ( $file[2] =~ /^PATCHLEVEL = (\d+)/ ) {
+            $patchlevel = $1;
+        }
+    }
+
+    if ( not defined $name or not defined $version or not defined $patchlevel )
+    {
+        die "SuSE release file has unsupported format";
+    }
+
+} else {
+    die "Unable to determine distribution type";
+}
+
+print join( '-', $name, $version, $patchlevel ), "\n";

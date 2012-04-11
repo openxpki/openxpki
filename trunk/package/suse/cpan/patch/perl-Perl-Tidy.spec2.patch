@@ -1,0 +1,11 @@
+--- perl-Perl-Tidy.spec2	2012-01-03 17:45:45.000000000 +0100
++++ perl-Perl-Tidy.spec2.new	2012-01-03 17:46:49.000000000 +0100
+@@ -44,6 +44,8 @@
+ %defattr(-,root,root,-)
+ %doc BUGS CHANGES COPYING Makefile.npm pm2pl README TODO
+ %{perl_vendorlib}/*
++%{_bindir}/*
++%{_mandir}/man1/*
+ %{_mandir}/man3/*
+ 
+ %changelog

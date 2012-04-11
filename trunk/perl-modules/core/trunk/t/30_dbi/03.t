@@ -187,7 +187,7 @@ is(scalar @{$result}, 1);
 $result = $dbi->select(
     TABLE => 'WORKFLOW_HISTORY',
     DYNAMIC => {
-	WORKFLOW_DESCRIPTION => 'Added context value somekey-3->somevalue: 100043',
+	WORKFLOW_DESCRIPTION => {VALUE => 'Added context value somekey-3->somevalue: 100043'},
     },
     );
 
@@ -198,10 +198,12 @@ is(scalar @{$result}, 1);
 $result = $dbi->select(
     TABLE => 'WORKFLOW_HISTORY',
     DYNAMIC => {
-	WORKFLOW_DESCRIPTION => [ 
-	    'Added context value somekey-3->somevalue:%',
-	    '%100043',
+	WORKFLOW_DESCRIPTION => {
+            VALUE => [ 
+	        'Added context value somekey-3->somevalue:%',
+	        '%100043',
 	    ],
+            OPERATOR => "LIKE"}
     },
     );
 
@@ -232,7 +234,7 @@ $result = $dbi->select(
 	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
     ],
     DYNAMIC => {
-	'WORKFLOW_HISTORY.WORKFLOW_DESCRIPTION' => 'Added context value somekey-3->somevalue: 100043',
+	'WORKFLOW_HISTORY.WORKFLOW_DESCRIPTION' => {VALUE => 'Added context value somekey-3->somevalue: 100043'},
     },
     );
 
@@ -274,10 +276,10 @@ $result = $dbi->select(
 	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
     ],
     DYNAMIC => {
-	'context1.WORKFLOW_CONTEXT_KEY' => 'somekey-5',
-	'context1.WORKFLOW_CONTEXT_VALUE' => 'somevalue: 100045',
-	'context2.WORKFLOW_CONTEXT_KEY' => 'somekey-7',
-	'context2.WORKFLOW_CONTEXT_VALUE' => 'somevalue: 100047',
+	'context1.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'somekey-5'},
+	'context1.WORKFLOW_CONTEXT_VALUE' => {VALUE => 'somevalue: 100045'},
+	'context2.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'somekey-7'},
+	'context2.WORKFLOW_CONTEXT_VALUE' => {VALUE => 'somevalue: 100047'},
     },
     );
 
@@ -314,7 +316,7 @@ $result = $dbi->select(
 	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
     ],
     DYNAMIC => {
-	'WORKFLOW.WORKFLOW_SERIAL' => '10004',
+	'WORKFLOW.WORKFLOW_SERIAL' => {VALUE => '10004'},
     },
     DISTINCT => 1,
     );
@@ -357,7 +359,7 @@ eval {
         [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
         ],
         DYNAMIC => {
-        'WORKFLOW.WORKFLOW_SERIAL' => '10004',
+        'WORKFLOW.WORKFLOW_SERIAL' => {VALUE => '10004'},
         },
         );
 };

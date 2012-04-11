@@ -1,4 +1,4 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Engine 
+## OpenXPKI::Crypto::Backend::OpenSSL::Engine::PKCS11
 ## Copyright (C) 2003-2007 Michael Bell
 
 use strict;

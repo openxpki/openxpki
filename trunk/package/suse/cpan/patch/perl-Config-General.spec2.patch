@@ -1,0 +1,12 @@
+--- perl-Config-General.spec2	2012-01-03 14:04:56.000000000 +0100
++++ perl-Config-General.spec2.new	2012-01-03 14:04:08.000000000 +0100
+@@ -51,8 +51,7 @@
+ %files
+ %defattr(-,root,root,-)
+ %doc Changelog README TODO COPYING Artistic
+-%{perl_vendorarch}/auto/*
+-%{perl_vendorarch}/Config*
++%{perl_vendorlib}/*
+ %{_mandir}/man3/*
+ 
+ %changelog

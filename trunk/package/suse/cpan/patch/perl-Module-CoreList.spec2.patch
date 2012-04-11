@@ -1,0 +1,12 @@
+--- cpan/perl-Module-CoreList.spec2	2012-01-02 15:29:23.000000000 +0100
++++ cpan/perl-Module-CoreList.spec2.new	2012-01-03 13:12:38.000000000 +0100
+@@ -46,7 +46,9 @@
+ %defattr(-,root,root,-)
+ %doc Changes corelist identify-dependencies META.json README COPYING Artistic
+ %{perl_vendorlib}/*
++%{_bindir}/*
+ %{_mandir}/man3/*
++%{_mandir}/man1/*
+ 
+ %changelog
+ * Wed Dec 14 2011 scott@hnsc.de 2.58-1

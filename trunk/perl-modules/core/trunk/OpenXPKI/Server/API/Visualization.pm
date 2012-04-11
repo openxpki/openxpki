@@ -82,7 +82,7 @@ sub get_workflow_instance_info {
     ##! 2: "load the different workflow steps"
 
     $list = CTX('dbi_workflow')->select ( TABLE   => "WORKFLOW_HISTORY",
-                                          DYNAMIC => {"WORKFLOW_SERIAL" => $wf_id});
+                                          DYNAMIC => {"WORKFLOW_SERIAL" => {VALUE => $wf_id}});
 
     my $nodes .= qq{    NEW [label="NEW"]\n};
     my $edges = "";

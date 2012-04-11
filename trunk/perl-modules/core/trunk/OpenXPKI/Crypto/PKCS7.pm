@@ -112,6 +112,21 @@ sub get_chain
     $self->{CHAIN} = [ split /\n\n/, $self->{CHAIN} ];
     return $self->{CHAIN};
 }
+ 
+sub get_end_entity
+{
+    my $self = shift;
+    my $keys = { @_ };
+    if ($self->{CHAIN}) {
+        ## the chain is already sorted
+        $self->{CHAIN} = [ split /\n\n/, $self->{CHAIN} ];
+        return $self->{CHAIN}[0];
+    }        
+        
+    my %params = ();
+    $params{PKCS7} = $self->{PKCS7};
+    return $self->{CHAIN} = $self->{TOKEN}->command({COMMAND => "pkcs7_get_end_entity", %params});
+}
 
 sub get_signer
 {

@@ -207,16 +207,27 @@ emailaddress (cert)
 	OpenXPKI_Crypto_Backend_OpenSSL_X509 cert
     PREINIT:
 	int j, n;
+#if (OPENSSL_VERSION_NUMBER < 0x1000000fL)
         STACK *emlst;
+#else
+        STACK_OF(OPENSSL_STRING) *emlst;
+#endif
 	BIO *out;
 	char *emails;
     CODE:
 	out = BIO_new(BIO_s_mem());
 	emlst = X509_get1_email(cert);
+#if (OPENSSL_VERSION_NUMBER < 0x1000000fL)
 	for (j = 0; j < sk_num(emlst); j++)
 	{
 		BIO_printf(out, "%s", sk_value(emlst, j));
 		if (j+1 != (int)sk_num(emlst))
+#else
+	for (j = 0; j < sk_OPENSSL_STRING_num(emlst); j++)
+	{
+		BIO_printf(out, "%s", sk_OPENSSL_STRING_value(emlst, j));
+		if (j+1 != (int)sk_OPENSSL_STRING_num(emlst))
+#endif
 			BIO_printf(out,"\n");
 	}
 	X509_email_free(emlst);

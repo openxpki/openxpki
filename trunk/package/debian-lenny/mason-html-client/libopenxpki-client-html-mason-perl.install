@@ -1,7 +1,0 @@
-eg/openxpki-mason-mod_perl.conf    etc/apache2/conf.d/
-
-htdocs/*                var/www/openxpki/
-htdocs/authentication/* var/www/openxpki/authentication/
-htdocs/service/*        var/www/openxpki/service/
-htdocs/lib/*            var/www/openxpki/lib/
-htdocs/css/*            var/www/openxpki/css/
