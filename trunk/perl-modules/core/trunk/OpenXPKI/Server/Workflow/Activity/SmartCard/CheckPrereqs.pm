@@ -113,6 +113,11 @@ sub execute {
 	    $context->param('flag_' . $flag => $value);
 	}
 
+    # Resolver name that returned the basic user info
+    # not used at the moment but might be useful
+    $context->param('user_data_source' =>
+        $result->{SMARTCARD}->{user_data_source} );
+
 
 	# propagate LDAP settings to context
 	# TODO Should be renamed as it is no longer "LDAP"
@@ -123,11 +128,11 @@ sub execute {
 		my $queue = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
 		    {
 			workflow    => $workflow,
-			context_key => 'ldap_' . $entry ,
+			context_key => 'userinfo_' . $entry ,
 		    } );
 		$queue->push(@{$value});
 	    } else {
-		$context->param('ldap_' . $entry => 
+		$context->param('userinfo_' . $entry => 
 				$result->{SMARTCARD}->{assigned_to}->{$entry});
 	    }
 	}

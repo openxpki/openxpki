@@ -118,8 +118,6 @@ sub sc_analyze_smartcard {
 
     my $thisrealm = CTX('session')->get_pki_realm();
 
-    my $smartcard_holder_login_id;
-
     ##! 16: ' Load policy map '
     # get policy settings from configuration
     my $policy = $self->_get_policy();
@@ -131,9 +129,10 @@ sub sc_analyze_smartcard {
 	    serialnumber => '',
 	    status => 'unknown',
 	    assigned_to => {},
+	    user_data_source => '',
 	    keyalg => 'RSA',
 	    keysize => 2048,
-	    default_puk => undef,
+	    default_puk => undef,	    
 	},
 	CERT_TYPE => {
 #	    'nonescrow' => {
@@ -317,15 +316,10 @@ sub sc_analyze_smartcard {
     # * middleInitials
     # * surname
     # * mail
-    # * list of Windows login IDs
+    # * list of Windows login IDs (loginids)
     # 
-    # If LOGINID was passed in the call to the function, check each element
-    # of this argument against the list of login IDs read from the
-    # connector.
-    # The passed login IDs must be listed in the directory, otherwise this is a
-    # security violation.
-    # TODO: Login Id Validation should be configurable 
-    #     
+    # The "wanted" Login Ids are no longer passed to this function but 
+    # queried from the frontend (and validated) in ApplyCSRPolicy step 
 
     ##! 32: ' Find employee id '
 
@@ -354,12 +348,14 @@ sub sc_analyze_smartcard {
 	    );
 	}
 	    
-    # FIXME - DN is only avail in LDAP queries - move to connnectors "pkey"
+    # Record the name of the resolver where we got the user info from
+    $result->{SMARTCARD}->{user_data_source} = $employee_source;
     
     # This should be ok as the hash should be correctly assembled by the connector
     $result->{SMARTCARD}->{assigned_to} = $employeeinfo;
 	    
     ##! 16: 'smartcard holder details from connector: ' . Dumper $employeeinfo
+	    
 
     # FIXME 
     # $smartcard_holder_login_id is no longer unique, for the workflows we use the employeeid 
@@ -981,7 +977,7 @@ sub _get_policy {
             $policy->set([ 'xref.type', $type,'limits',$item], $policy->get([  'certs.type', $type, 'limits', $item ]));
         }
             
-        foreach my $item (qw( allow_renewal key_escrow publish purge_invalid purge_valid )) {
+        foreach my $item (qw( allow_renewal escrow_key publish purge_invalid purge_valid )) {
             $policy->set([ 'xref.type', $type,'policy',$item], $policy->get([  'certs.type', $type, $item ]));         
         }
     
