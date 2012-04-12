@@ -1,4 +1,4 @@
-## OpenXPKI::Service::SCEP::Command::GetCACert
+## OpenXPKI::Service::SCEP::Command::GetCACaps
 ##
 ## Written 2010 by Joachim Astel for the OpenXPKI project
 ## (C) Copyright 2010 by The OpenXPKI Project
