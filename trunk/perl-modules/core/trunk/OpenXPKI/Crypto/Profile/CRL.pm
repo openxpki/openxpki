@@ -205,12 +205,6 @@ sub get_nextupdate_in_days
     return $self->{PROFILE}->{DAYS};
 }
 
-sub get_nextupdate_in_hours
-{
-    my $self = shift;
-    return $self->{PROFILE}->{HOURS};
-}
-
 sub get_digest
 {
     my $self = shift;
