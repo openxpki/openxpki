@@ -145,10 +145,12 @@ sub load_profile
 
     # for error handling
     delete $self->{PROFILE}->{DAYS};
+    delete $self->{PROFILE}->{HOURS};
 
     # plain days
     if ($entry_validity{notafter}->{VALIDITYFORMAT} eq "days") {
 	$self->{PROFILE}->{DAYS}  = $entry_validity{notafter}->{VALIDITY};
+	$self->{PROFILE}->{HOURS} = 0;
     }
 
     # handle relative date formats ("+0002" for two months)
@@ -156,9 +158,12 @@ sub load_profile
 	my $notafter = OpenXPKI::DateTime::get_validity(
 	    $entry_validity{notafter});
 
-	my $days = sprintf("%d", ($notafter->epoch() - time) / (24 * 3600));
+	my $hours = sprintf("%d", ($notafter->epoch() - time) / 3600);
+	my $days = sprintf("%d", $hours / 24);
+	$hours = $hours % 24;
 	
 	$self->{PROFILE}->{DAYS}  = $days;
+	$self->{PROFILE}->{HOURS} = $hours;
     }
 
     # only relative dates are allowed for CRLs
@@ -198,6 +203,12 @@ sub get_nextupdate_in_days
 {
     my $self = shift;
     return $self->{PROFILE}->{DAYS};
+}
+
+sub get_nextupdate_in_hours
+{
+    my $self = shift;
+    return $self->{PROFILE}->{HOURS};
 }
 
 sub get_digest
