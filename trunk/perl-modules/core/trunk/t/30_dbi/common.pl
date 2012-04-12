@@ -28,7 +28,7 @@ our %config = (
               NAME   => "t/30_dbi/sqlite.db",
               LOG    => $log
              );
-if ($ENV{'OPENXPKI_TEST_DB'} eq 'MySQL') {
+if (exists $ENV{'OPENXPKI_TEST_DB'} and $ENV{'OPENXPKI_TEST_DB'} eq 'MySQL') {
     my $username = 'openxpki_test';
     my $password = 'openxpki_test'; # yay, a default password :-)
     my $name     = 'openxpki_test';
