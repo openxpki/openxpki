@@ -410,6 +410,7 @@ sub __get_ca
     $config .= "default_md        = ".$self->{PROFILE}->get_digest()."\n".
                "database          = ".$self->{FILENAME}->{DATABASE}."\n".
                "default_crl_days  = ".$self->{PROFILE}->get_nextupdate_in_days()."\n".
+               "default_crl_hours = ".$self->{PROFILE}->get_nextupdate_in_hours()."\n".
                "x509_extensions   = v3ca\n".
                "crl_extensions    = v3ca\n".
                "preserve          = YES\n".
