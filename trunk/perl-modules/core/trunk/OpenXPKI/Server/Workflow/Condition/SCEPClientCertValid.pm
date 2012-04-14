@@ -28,9 +28,9 @@ sub evaluate {
             'IDENTIFIER',
         ],
         DYNAMIC => {
-            'IDENTIFIER' => $signer_identifier,
-            'PKI_REALM'  => $pki_realm,
-            'STATUS'     => 'ISSUED',
+            'IDENTIFIER' => {VALUE => $signer_identifier},
+            'PKI_REALM'  => {VALUE => $pki_realm},
+            'STATUS'     => {VALUE => 'ISSUED'},
         },
         'VALID_AT' => time(),
     );

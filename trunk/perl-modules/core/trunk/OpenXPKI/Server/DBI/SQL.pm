@@ -953,95 +953,150 @@ sub select
 
     ###########################################################################
     ## check dynamic conditions
-    if (exists $args->{DYNAMIC} && ref $args->{DYNAMIC} eq 'HASH')
+
+    if (exists $args->{DYNAMIC} &&
+        (not ref $args->{DYNAMIC} or not ref $args->{DYNAMIC} eq "HASH")
+       )
     {
-	foreach my $dynamic_key (keys %{$args->{DYNAMIC}})
-	{
-	    # for joins the key may be SYMBOLIC_NAME.COLUMN or ALIAS.COLUMN, 
-	    # otherwise we only only get COLUMN
-	    # $dynamic_column always is set to COLUMN, $dynamic_table is
-	    # TABLE if available, otherwise undef
-	    my ($col, $tab) = 
-		$self->__get_symbolic_column_and_table($dynamic_key);
-	    
-	    # leave alias as is, but map symbolic table name to real table name
-	    if (defined $tab && ! exists $alias_map_of{$tab}) {
-		$tab = $self->{schema}->get_table_name($tab);
-	    }
-	    
-	    if (! $col)
-	    {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_WRONG_COLUMN",
-		    params  => {
-			COLUMN => $dynamic_key,
-		    });
-	    }
-	    
-	    $col = $self->{schema}->get_column($col);
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_DYNAMIC_NO_HASH_REFERENCE",
+            params  => {
+            TABLE  => $table_args,
+        });
+    }
+    if (exists $args->{DYNAMIC})
+    {
+        foreach my $dynamic_key (keys %{$args->{DYNAMIC}})
+        {
+            # check the structure
+            if (not ref $args->{DYNAMIC}->{$dynamic_key} or
+                not ref $args->{DYNAMIC}->{$dynamic_key} eq "HASH")
+            {
+                OpenXPKI::Exception->throw (
+        	        message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_DYNAMIC_PARAM_NO_HASH_REFERENCE",
+        	        params  => {
+        		    TABLE  => $table_args,
+        	    });
+            }
+            if (not exists $args->{DYNAMIC}->{$dynamic_key}->{VALUE})
+            {
+                OpenXPKI::Exception->throw (
+        	        message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_DYNAMIC_PARAM_WITHOUT_VALUE",
+        	        params  => {
+        		    TABLE  => $table_args,
+        	    });
+            }
 
-	    # left-hand side
-	    my $lhs = '';
-	    if (defined $tab) {
-		$lhs = $tab . '.';
-	    }
-	    $lhs .= $col;
-
-	    my $comparison_operator;
-	    if ($self->{DBH}->column_is_numeric ($col))
-	    {
-		$comparison_operator = ' = ?';
-	    } else {
-		$comparison_operator = ' like ?';
-	    }
+            # for joins the key may be SYMBOLIC_NAME.COLUMN or ALIAS.COLUMN, 
+            # otherwise we only get COLUMN
+            # $dynamic_column always is set to COLUMN, $dynamic_table is
+            # TABLE if available, otherwise undef
+            my ($col, $tab) = 
+                $self->__get_symbolic_column_and_table($dynamic_key);
 	    
-	    my @dynamic_values;
+            # leave alias as is, but map symbolic table name to real table name
+            if (defined $tab && ! exists $alias_map_of{$tab}) {
+                $tab = $self->{schema}->get_table_name($tab);
+            }
+	    
+            if (! $col)
+            {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_WRONG_COLUMN",
+                    params  => {
+                        COLUMN => $dynamic_key,
+                    });
+            }
+	    
+            $col = $self->{schema}->get_column($col);
 
-	    if (ref $args->{DYNAMIC}->{$dynamic_key} eq '') {
+            # left-hand side
+            my $lhs = '';
+            if (defined $tab) {
+                $lhs = $tab . '.';
+            }
+            $lhs .= $col;
+	    
+            my @dynamic_values;
+
+            if (ref $args->{DYNAMIC}->{$dynamic_key}->{VALUE} eq '') {
                 ##! 64: 'pushing scalar dynamic value for ' . $dynamic_key
-		push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key};
-	    } elsif (ref $args->{DYNAMIC}->{$dynamic_key} eq 'ARRAY') {
+                push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key};
+            } elsif (ref $args->{DYNAMIC}->{$dynamic_key}->{VALUE} eq 'ARRAY') {
                 ##! 64: 'pushing arrayref dynamic value for ' . $dynamic_key
-		push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key};
-	    } else {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_DYNAMIC_QUERY",
-		    params  => {
-			CONDITION => $dynamic_key,
-		    });
-	    }
+                push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key}->{VALUE};
+            } else {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_DYNAMIC_QUERY",
+                    params  => {
+                        CONDITION => $dynamic_key,
+                    });
+            }
 	    
-	    foreach my $value (@dynamic_values) {
+            # We can use a "like" statement only if the column is a string.
+            # Therefore we have to check the column type.
+            my $operator = "=";
+            if ($args->{DYNAMIC}->{$dynamic_key}->{OPERATOR})
+            {
+                if ($args->{DYNAMIC}->{$dynamic_key}->{OPERATOR} eq "EQUAL")
+                {
+                    $operator = "=";
+                }
+                elsif ($args->{DYNAMIC}->{$dynamic_key}->{OPERATOR} eq "LIKE")
+                {
+                    if ($self->{DBH}->column_is_numeric ($col))
+                    {
+                        OpenXPKI::Exception->throw (
+                            message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_LIKE_ON_NUMERIC",
+                            params  => {
+                                CONDITION => $dynamic_key,
+                        });
+                    }
+                    $operator = "like";
+                } else {
+                    OpenXPKI::Exception->throw (
+                        message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_UNKNOWN_OPERATOR",
+                        params  => {
+                            CONDITION => $dynamic_key,
+                    });
+                }
+            }
+            
+            foreach my $value (@dynamic_values) {
                 ##! 64: 'dynamic value: ' . Dumper $value
-		if (defined $value && ! ref $value) {
+                if (defined $value && ! ref $value) {
                     # scalar case
-		    push @conditions, $lhs . $comparison_operator;
-		    push @bind_values, $value;
-		}
+                    push @conditions, $lhs.' '.$operator.' ?';
+                    push @bind_values, $value;
+                }
                 elsif (defined $value && ref $value eq 'ARRAY') {
                     # the value is an array reference, combine with OR
                     my @tmp = ();
-                    foreach my $subvalue (@{$value}) {
-                        push @tmp, $lhs . $comparison_operator;
-                        push @bind_values, $subvalue; 
+                    foreach my $subvalue (@{$value}) {                    
+                        if (defined $subvalue) {                    
+                            push @tmp, $lhs.' '.$operator.' ?';
+                            push @bind_values, $subvalue;
+                        } else {
+                            push @tmp, $lhs . ' IS NULL';
+                        } 
                     }
                     push @conditions, \@tmp;
                 }
                 else {
-		    # handle queries for NULL
-		    push @conditions, $lhs . ' IS NULL';
-		}
-	    }
-	}
+                    # handle queries for NULL
+                    push @conditions, $lhs . ' IS NULL';
+                }
+            }
+        }
     }
 
     # sanity check: there must be a condition
     if (scalar(@conditions) == 0) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_WHERE_CLAUSE",
-	    params  => {
-		TABLE  => $table_args,
-	    });
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_WHERE_CLAUSE",
+            params  => {
+                TABLE  => $table_args,
+            });
     }
 
 
@@ -1375,13 +1430,17 @@ In addition the function supports all table columns except of the
 data columns because they are perhaps too large. Many database do not
 support searching on high volume columns or columns with a flexible
 length. Dynamic parameters may be specified via a hash reference passed
-in as the named parameter DYNAMIC. The argument to DYNAMIC may be a scalar
+in as the named parameter DYNAMIC. The argument to DYNAMIC is a hash
+reference which consists from a parameter VALUE und an optional
+parameter OPERATOR. The parameter VALUE may be a scalar
 or an hash reference. In the latter case multiple conditions are
 created that are logically ANDed. The hash value for each key can
 either be a scalar or an array reference. In the latter case, they
 are combined by a logical OR.
 
 You can use wildcards inside of text fields like subjects or emailaddresses.
+If this is the case the you must specify the parameter OPERATOR
+with the value "LIKE".
 You have to ensure that C<%> is used as wildcard. This module expects SQL
 ready wildcards. It always binds parameters to queries so that SQL
 injection is impossible.
@@ -1451,7 +1510,7 @@ See the example below to get an idea how this is meant to work.
 	# [ undef, 'FOO', 'BAR' ],
     ],
     DYNAMIC => {
-	'WORKFLOW_HISTORY.WORKFLOW_DESCRIPTION' => 'Added context value somekey-3->somevalue: 100043',
+	'WORKFLOW_HISTORY.WORKFLOW_DESCRIPTION' => { VALUE => 'Added context value somekey-3->somevalue: 100043'},
     },
     );
 
@@ -1483,10 +1542,10 @@ This results in the following query:
 	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
     ],
     DYNAMIC => {
-	'context1.WORKFLOW_CONTEXT_KEY' => 'somekey-5',
-	'context1.WORKFLOW_CONTEXT_VALUE' => 'somevalue: 100045',
-	'context2.WORKFLOW_CONTEXT_KEY' => 'somekey-7',
-	'context2.WORKFLOW_CONTEXT_VALUE' => 'somevalue: 100047',
+	'context1.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'somekey-5'},
+	'context1.WORKFLOW_CONTEXT_VALUE' => {VALUE => 'somevalue: 100045'},
+	'context2.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'somekey-7'},
+	'context2.WORKFLOW_CONTEXT_VALUE' => {VALUE => 'somevalue: 100047'},
     },
     );
 
@@ -1570,7 +1629,7 @@ Example:
     #             first table            second table (no notbefore -> undef)
     VALID_AT => [ [ time, time + 3600 ], undef ],
     DYNAMIC => {
-	'CERTIFICATE_ATTRIBUTES.ATTRIBUTE_KEY' => 'somekey-5',
+	'CERTIFICATE_ATTRIBUTES.ATTRIBUTE_KEY' => { VALUE => 'somekey-5'},
     },
     );
 
@@ -1604,7 +1663,7 @@ the column. In this case the value must be one of 'MIN', 'MAX', 'COUNT' or
 	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
     ],
     DYNAMIC => {
-	'WORKFLOW.WORKFLOW_SERIAL' => '10004',
+	'WORKFLOW.WORKFLOW_SERIAL' => { VALUE => '10004'},
     },
     );
 
@@ -1639,7 +1698,7 @@ results in the following query:
 	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
     ],
     DYNAMIC => {
-	'WORKFLOW.WORKFLOW_SERIAL' => '10004',
+	'WORKFLOW.WORKFLOW_SERIAL' => { VALUE => '10004'},
     },
     );
 

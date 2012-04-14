@@ -88,7 +88,11 @@ sub new {
 
     ##! 2: "parameters ok"
 
-    $self->load_profile($self->{CONFIG_ID});
+    # Why do we set CONFIG_ID as a class parameter and add it to an internal method call?
+    # This seems to be braindead for me - looks like load_profile is never used outside from here
+    # so I remove that now. - oliwel
+    # $self->load_profile($self->{CONFIG_ID});
+    $self->load_profile();
     ##! 2: "config loaded"
 
     return $self;
@@ -97,7 +101,8 @@ sub new {
 sub load_profile
 {
     my $self   = shift;
-    my $cfg_id = shift;
+    
+    my $cfg_id = $self->{CONFIG_ID};
 
     ## scan for correct pki realm and ca
 
@@ -235,7 +240,7 @@ sub load_profile
         $self->load_extension(
             PATH    => [@profile_path, $ext],
             COUNTER => [@profile_counter],
-            CONFIG_ID => $cfg_id,
+            # CONFIG_ID => $cfg_id, # As writen above, CONFIG_ID should be pulled from the class properties
         );
     }
 

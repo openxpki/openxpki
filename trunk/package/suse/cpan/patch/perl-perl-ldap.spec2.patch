@@ -1,0 +1,11 @@
+--- perl-perl-ldap.spec2	2012-01-10 20:02:25.000000000 +0100
++++ perl-perl-ldap.spec2.new	2012-01-10 20:03:39.000000000 +0100
+@@ -22,7 +22,7 @@
+ %setup -q -n perl-ldap-%{version}
+ 
+ %build
+-%{__perl} Makefile.PL INSTALL_BASE=/usr/local INSTALLDIRS=vendor
++%{__perl} Makefile.PL INSTALL_BASE=/usr/local INSTALLDIRS=vendor --defaultdeps
+ make %{?_smp_mflags}
+ 
+ %install

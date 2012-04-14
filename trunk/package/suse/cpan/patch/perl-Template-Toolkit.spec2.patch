@@ -1,0 +1,11 @@
+--- perl-Template-Toolkit.spec2	2012-01-10 18:51:15.000000000 +0100
++++ perl-Template-Toolkit.spec2.new	2012-01-10 18:51:56.000000000 +0100
+@@ -25,7 +25,7 @@
+ %setup -q -n Template-Toolkit-%{version}
+ 
+ %build
+-%{__perl} Makefile.PL INSTALL_BASE=/usr/local INSTALLDIRS=vendor OPTIMIZE="$RPM_OPT_FLAGS"
++%{__perl} Makefile.PL INSTALL_BASE=/usr/local INSTALLDIRS=vendor OPTIMIZE="$RPM_OPT_FLAGS"  TT_XS_ENABLE=n TT_XS_DEFAULT=n TT_ACCEPT=y TT_QUIET=n
+ %{__perl} -pi -e 's/^\tLD_RUN_PATH=[^\s]+\s*/\t/' Makefile
+ make %{?_smp_mflags}
+ 
