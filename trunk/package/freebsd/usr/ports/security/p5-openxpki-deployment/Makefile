@@ -8,13 +8,14 @@
 PORTNAME=	openxpki-deployment
 PORTVERSION=	0.9.1386
 CATEGORIES=	security perl5
-MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
-MASTER_SITE_SUBDIR=	openxpki
+MASTER_SITES=	http://www7.openxpki.org/lastmidnight/ SF/openxpki/openxpki/0.9.1300
 PKGNAMEPREFIX=	p5-
 DIST_SUBDIR=	openxpki
 
 MAINTAINER=	svysh@pn.sinp.msu.ru
 COMMENT=	Perl based enterprise class trustcenter software for PKI
+
+LICENSE=	AL2
 
 BUILD_DEPENDS=	\
 	${SITE_PERL}/OpenXPKI/Client.pm:${PORTSDIR}/security/p5-openxpki-client \

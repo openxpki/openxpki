@@ -39,7 +39,9 @@
             $subject_alt_name_parts->{$key} = $m->request_args()->{$key};
         }
         elsif ($key =~ m{ \A cert_subject_ }xms) {
-            $subject_parts->{$key} = $m->request_args()->{$key};
+            my $subject_part_value = $m->request_args()->{$key};
+            Encode::_utf8_on($subject_part_value);
+            $subject_parts->{$key} = $subject_part_value;
         }    
         elsif ($key =~ s{ \A additional_info_ }{}xms) {
             $info->{$key} = $m->request_args()->{'additional_info_' . $key};
@@ -73,3 +75,6 @@
 
     ## ok we have to display the whole stuff
 </%init>
+<%once>
+    use Encode;
+</%once>

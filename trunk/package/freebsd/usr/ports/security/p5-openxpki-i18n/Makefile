@@ -8,13 +8,14 @@
 PORTNAME=	openxpki-i18n
 PORTVERSION=	0.9.1395
 CATEGORIES=	security perl5
-MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
-MASTER_SITE_SUBDIR=	openxpki
+MASTER_SITES=	http://www7.openxpki.org/lastmidnight/ SF/openxpki/openxpki/0.9.1300
 PKGNAMEPREFIX=	p5-
 DIST_SUBDIR=	openxpki
 
 MAINTAINER=	svysh@pn.sinp.msu.ru
 COMMENT=	Perl based trustcenter software for PKI: i18n tools
+
+LICENSE=	AL2
 
 BUILD_DEPENDS=	\
 	${SITE_PERL}/${PERL_ARCH}/OpenXPKI.pm:${PORTSDIR}/security/p5-openxpki

@@ -251,7 +251,7 @@
             </script>
             <div>
 %           my $urls;
-%           foreach my $lang qw( en ru de ) {
+%           foreach my $lang (qw( en ru de )) {
 %               $urls->{$lang} = $current_url;
 %           }
 %           $urls->{'en'} =~ s/__language=[^;]*/__language=en_US/;
