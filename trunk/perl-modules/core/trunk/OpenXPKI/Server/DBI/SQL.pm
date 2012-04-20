@@ -1021,7 +1021,7 @@ sub select
 
             if (ref $args->{DYNAMIC}->{$dynamic_key}->{VALUE} eq '') {
                 ##! 64: 'pushing scalar dynamic value for ' . $dynamic_key
-                push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key};
+                push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key}->{VALUE};
             } elsif (ref $args->{DYNAMIC}->{$dynamic_key}->{VALUE} eq 'ARRAY') {
                 ##! 64: 'pushing arrayref dynamic value for ' . $dynamic_key
                 push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key}->{VALUE};

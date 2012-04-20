@@ -27,6 +27,7 @@ my %api            : ATTR( :get<API> );
 # command registry
 my %allowed_command = map { $_ => 1 } qw(
     GetCACert
+    GetCACaps
     PKIOperation
 );
 
