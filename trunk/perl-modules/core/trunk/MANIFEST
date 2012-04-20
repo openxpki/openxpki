@@ -22,6 +22,9 @@ OpenXPKI/XML/Config.pm
 OpenXPKI/i18n.pm
 openxpki.xsd
 
+## Config Layers
+OpenXPKI/Config/Merge.pm 
+
 ## Crypto layer
 
 OpenXPKI/Crypto/API.pm
@@ -266,15 +269,12 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/PublishSingleCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateServerCSR.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/GetPrivateKey.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/SetupPasswordsafe.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartCard/CheckPrereqs.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/CreateCSRData.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateEscrowedKey.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/GeneratePUK.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/Initialize.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/IssueCert.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/EncryptPKCS12PluginParameter.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/FetchPUK.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/Initialize.pm
@@ -285,9 +285,6 @@ OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/GetLDAPByCardID.pm
 OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/NotifyViaRT.pm
 OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/GenerateActivationCode.pm
 OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/StoreAuthIDs.pm
-
-OpenXPKI/Server/Workflow/Activity/PasswordSafe/StorePassword.pm
-OpenXPKI/Server/Workflow/Activity/PasswordSafe/RetrievePassword.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/FetchPUK.pm
 OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/GenerateActivationCode.pm
@@ -381,12 +378,6 @@ OpenXPKI/Server/Workflow/Validator/CertSubjectAltNameParts.pm
 OpenXPKI/Server/Workflow/Validator/Bulk.pm
 OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
 OpenXPKI/Server/Workflow/Validator/UnusedID.pm
-OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
-
-OpenXPKI/Server/Workflow/WFObject.pm
-OpenXPKI/Server/Workflow/WFObject/WFArray.pm
-OpenXPKI/Server/Workflow/WFObject/WFHash.pm
-
 OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
 
 

@@ -89,6 +89,7 @@ subversion or git.
 - Create openxpki/openxpki user and group
 
   sudo addgroup openxpki
+
   sudo adduser --ingroup openxpki --disabled-password --gecos 'OpenXPKI User' openxpki
  
 - Install OpenXPKI prerequisites from debian

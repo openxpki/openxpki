@@ -1,0 +1,31 @@
+The tests here are intended to be used for QA on a running system, which may
+be a test, integration or production instance. 
+
+Currently, there are two categories of tests:
+
+    backend/    tests the backend components by accessing them directly
+                via command line or API
+
+    selenium/   Uses the Selenium web application testing system (available
+                at http://seleniumhq.org) to run tests via the user interface.
+
+Destructive vs. non-destructive tests:
+
+Many of the tests rely on
+specific system data (e.g.: user names and smartcard token serial numbers) that
+will vary from system to system. For the full tests, an LDIF file is supplied
+that contains the sample data for the openxpki reference test installation. By
+starting the destructive tests, the existing records (only the DNs found in the
+LDIF) are deleted and re-inserted. This is necessary because a few of the tests
+actually modify data in the LDAP directory. Of course, for production systems,
+these tests are skipped.
+
+Customizing:
+
+The configuration is read in using Config::Std and the individual tests (should)
+follow the following path priorities when loading the configuration. The default
+configuration is located in the same directory as the test script itself:
+$GITBASE/trunk/tests/<category>/<subset>/. Additionally, a system-specific 
+configuration file, kept in the config repository, is found in the directory:
+$GITBASE/config/tests/<category>/<subset>/, where $GITBASE/config is a symlink to the
+working config repository.

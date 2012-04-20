@@ -77,6 +77,7 @@ use Class::Std;
             my $ret = $self->$action( $result, $testname );
             return sub { return $ret }
         }
+        # @Fixme: Implement ok/nok and add like        
         return;
 
     }
@@ -127,9 +128,16 @@ use Class::Std;
     sub param_isnt {
         my ( $self, $name, $expected, $testname ) = @_;
         $testname ||= 'Fetching parameter ' . $name;
-        return $self->is( $self->param($name), $expected, $testname );
+        return $self->isnt( $self->param($name), $expected, $testname );
+    }
+    
+    sub param_like {
+        my ( $self, $name, $expected, $testname ) = @_;
+        $testname ||= 'Fetching parameter ' . $name;
+        return $self->like( $self->param($name), $expected, $testname );
     }
 
+    
     sub state_is {
         my ( $self, $state, $testname ) = @_;
         $testname ||= 'Expecting state ' . $state;
@@ -506,6 +514,11 @@ use Class::Std;
         my ( $self, $got, $expected, $testname ) = @_;
         return Test::More::is( $got, $expected, $testname );
     }
+    
+    sub isnt ($$;$) {
+        my ( $self, $got, $expected, $testname ) = @_;
+        return Test::More::isnt( $got, $expected, $testname );
+    }
 
     sub ok ($;$) {
         my ( $self, $test, $name ) = @_;
@@ -515,6 +528,11 @@ use Class::Std;
     sub nok ($;$) {
         my ( $self, $test, $name ) = @_;
         return Test::More::ok( !$test, $name );
+    }
+        
+    sub like ($$;$) {
+        my ( $self, $test, $regexp, $name ) = @_;
+        return Test::More::like( $test, $regexp, $name );
     }
 }
 
@@ -697,6 +715,6 @@ Close the current connection to the OpenXPKI daemon
 
 The following subroutines are wrapped in instance methods of this class:
 
-diag, plan, ok, is
+diag, plan, ok, is, like
 
 
