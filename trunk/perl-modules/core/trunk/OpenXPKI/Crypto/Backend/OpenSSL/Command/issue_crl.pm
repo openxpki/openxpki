@@ -77,7 +77,17 @@ sub get_command
     #done by CLI
     #$command .= " -config $config";
     $command .= " -engine $engine" if ($engine);
+<<<<<<< HEAD
     $command .= " -keyfile ".$self->{KEYFILE};
+=======
+    if ($self->{ENGINE}->get_engine() eq "pkcs11" and
+        (ref $self->{ENGINE}) =~ m{^OpenXPKI::Crypto::Backend::OpenSSL::Engine::SafeNetProtectServer$}xms)
+    {
+        ## The OpenSSL patch for the SafeNet ProtectServer requires
+        ## that the option -keyfile is used.
+        $command .= " -keyfile ".$self->{KEYFILE};
+    }
+>>>>>>> cb41e0840111f0a2ba40f25b32507818be260658
     $command .= " -keyform $keyform" if ($keyform);
     $command .= " -out ".$self->{OUTFILE};
 
