@@ -44,7 +44,7 @@ sub execute {
     my $userinfo;
     foreach my $param (keys %{ $context->param() }) {
         if ($param =~ s{ \A userinfo_ }{}xms) {
-            ##! 64: 'adding param ' . $param . ' to ldap_vars, value: ' . $context->param('ldap_' . $param)            
+            ##! 64: 'adding param ' . $param . ' to userinfo, value: ' . $context->param('userinfo_' . $param)            
             $userinfo->{$param} = $context->param('userinfo_' . $param);            
             # Some entries are arrays
             if ($userinfo->{$param} =~ /\A ARRAY/xms) {            
@@ -147,8 +147,8 @@ sub execute {
                 );
             }
             ##! 16: ' Connctor returned ' . Dumper( $res )
-            push @{$userinfo->{upn}}, $res->{value};
-            $publishing_target{$res->{source}} = 1;
+            push @{$userinfo->{upn}}, $res->{VALUE};
+            $publishing_target{$res->{SOURCE}} = 1;
         }
         
         ##! 16: ' UPNs found ' . Dumper( @{$userinfo->{upn}} )
