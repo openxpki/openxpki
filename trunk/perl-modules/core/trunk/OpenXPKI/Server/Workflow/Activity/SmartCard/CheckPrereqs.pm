@@ -23,13 +23,14 @@ sub execute {
 	my $token_id = $context->param('token_id');
 
 	my %params;
-	if ($context->param('login_id') ne '') {
-	    $params{USERID} = $context->param('login_id');
+	if ($context->param('user_id') ne '') {
+	    $params{USERID} = $context->param('user_id');
 	}
 
 	my @certs = split(/;/, $context->param('certs_on_card'));
 	
 	my $ser = OpenXPKI::Serialization::Simple->new();
+
     my @LOGIN_IDS;
     if ($context->param('login_ids')) {
         @LOGIN_IDS = $ser->deserialize( $context->param('login_ids') )
@@ -40,6 +41,8 @@ sub execute {
  		CERTS => \@certs,
 		CERTFORMAT => 'BASE64',
 		SMARTCARDID => $context->param('token_id'),
+		SMARTCHIPID => $context->param('chip_id'),
+		LOGINIDS => \@LOGIN_IDS,
 		WORKFLOW_TYPES => [ qw( I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK ) ],
 		CONFIG_ID => $self->config_id(),
 		%params,
