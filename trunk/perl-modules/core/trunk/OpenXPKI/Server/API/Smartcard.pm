@@ -194,24 +194,18 @@ sub sc_analyze_smartcard {
     # each querypoint may return undef or a hash structure with the requested
     # attributes: scbserialnumber, scbstatus, employeeid, keyid (optional)
     
-    my $scinfo;
-    my $cnt = $config->get( ['smartcard.cardinfo.resolvers'] );
-    for (my $i = 0; $i < $cnt; $i++) {            
-        my $resolver =  $config->get( [ 'smartcard.cardinfo.resolvers', $i ] );
-        ##! 32: 'Ask Cardinfo Resolver ' . $resolver
-        $scinfo = $config->get( [ 'smartcard.cardinfo', $resolver, $tokenid ]);
-        last if ($scinfo);
-    }
-
-    ##! 32: ' SC Info: ' . Dumper( $scinfo );
+    my $res  = $config->walkQueryPoints('smartcard.cardinfo', $tokenid, 'get_hash');    
+        
+    ##! 32: ' SC Info: ' . Dumper( $res->{VALUE} );
     # FIXME: We need to ensure unqiness in the connector!
     # There should never be a match when tokenid ist not an exact match
     # So we can omit the sanity check some lines below..   
             
     my $holder_employee_id;           
-    if ($scinfo) {
+    if ($res->{VALUE}) {
     # TODO Might it be safe to simply return from here if no info is found? I dont see any usable code below without this data
 
+    my $scinfo = $res->{VALUE};
 	# sanity check, only allow defined smartcard status
 	if ($scinfo->{scbstatus} !~ m{ \A (?:initial|activated|deactivated) \z }xms) {
 	    OpenXPKI::Exception->throw(
@@ -324,15 +318,7 @@ sub sc_analyze_smartcard {
     ##! 32: ' Find employee id '
 
     # Connector - Multi-Valued type
-    my $employeeinfo;
-    my $employee_source; 
-    my $cnt = $config->get( ['smartcard.employee.resolvers'] );    
-    for (my $i = 0; $i < $cnt; $i++) {    
-        $employee_source =  $config->get( [ 'smartcard.employee.resolvers', $i ] );
-        ##! 32: 'Ask Employeeid Resolver ' . $employee_source 
-        $employeeinfo = $config->get( [ 'smartcard.employee', $employee_source, $holder_employee_id ]);        
-        last if ($employeeinfo);
-    }
+    my $employeeinfo = $config->walkQueryPoints( 'smartcard.employee', $holder_employee_id, 'get_hash' );    
 
     if (!$employeeinfo) {
 	    OpenXPKI::Exception->throw(
@@ -349,10 +335,10 @@ sub sc_analyze_smartcard {
 	}
 	    
     # Record the name of the resolver where we got the user info from
-    $result->{SMARTCARD}->{user_data_source} = $employee_source;
+    $result->{SMARTCARD}->{user_data_source} = $employeeinfo->{SOURCE};
     
     # This should be ok as the hash should be correctly assembled by the connector
-    $result->{SMARTCARD}->{assigned_to} = $employeeinfo;
+    $result->{SMARTCARD}->{assigned_to} = $employeeinfo->{VALUE};
 	    
     ##! 16: 'smartcard holder details from connector: ' . Dumper $employeeinfo
 	    
@@ -400,17 +386,15 @@ sub sc_analyze_smartcard {
 
     	##! 16: "userid $userid maps to $lookupid"
 
-	   foreach my $group_alias ($config->get('smartcard.groupinfo.groups')) {
+	   foreach my $group_alias ($config->get_keys('smartcard.groupinfo.groups')) {
 	    
-	       my $group_name = $config->get(['smartcard.groupinfo.groups', $group_alias]);
-
 	       my $process_flag = 'is_' . $group_alias;
 	    
 	       $result->{PROCESS_FLAGS}->{$process_flag} = 0;
 
 	       if (defined $lookupid) {
-        	   ##! 16: 'checking membership for group ' . $group_alias
-        		
+        	    ##! 16: 'checking membership for group ' . $group_alias
+                ## FIXME - Needs testing         		
                 if ($config->get(['smartcard.groupinfo.checkgroup', $group_alias, $lookupid ])) {        		
                     $result->{PROCESS_FLAGS}->{$process_flag} = 1;
                 }
@@ -480,8 +464,9 @@ sub sc_analyze_smartcard {
     
     $tokenid =~ m{ \A (?:(\w+\d)_) }xms;
     my $token_family = $1;
+    my $token_config;
     
-    if (!$token_family || !$config->get(['smartcard.cardinfo.properties',$token_family])) {
+    if (!$token_family || !($token_config = $config->get_hash(['smartcard.cardinfo.properties',$token_family]))) {
         OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_UNSUPPORTED_SMARTCARD_TYPE',
         params  => {
@@ -495,9 +480,9 @@ sub sc_analyze_smartcard {
         );
     }    
     
-	$result->{PROCESS_FLAGS}->{puk_is_writable} = $config->get(['smartcard.cardinfo.properties',$token_family,'puk_is_writable']);
-	$result->{PROCESS_FLAGS}->{purge_token_before_unblock} = $config->get(['smartcard.cardinfo.properties',$token_family, 'purge_token_before_unblock']);
-	$result->{SMARTCARD}->{keysize} = $config->get(['smartcard.cardinfo.properties',$token_family,'keysize']);
+	$result->{PROCESS_FLAGS}->{puk_is_writable} = $token_config->{'puk_is_writable'} || 0;
+	$result->{PROCESS_FLAGS}->{purge_token_before_unblock} = $token_config->{'purge_token_before_unblock'} || 0;
+	$result->{SMARTCARD}->{keysize} = $token_config->{'keysize'};
 	
 	#$result->{SMARTCARD}->{default_puk} = undef;	
 	#$config->get(['smartcard.cardinfo.properties.defaultpuk'])
@@ -535,16 +520,18 @@ sub sc_analyze_smartcard {
 	},
     };
     
-    foreach my $type ($policy->get('certs.type')) {
+    foreach my $type ($policy->get_keys('certs.type')) {
 	next if ($type =~ m{ \A (?:UNEXPECTED|FOREIGN) \z }xms);
 	$user_certs->{by_type}->{$type} = [];
     }
     
-    my @profiles = $policy->get('xref.profile');
-    foreach my $profile (@profiles) {
-    $user_certs->{by_profile}->{$profile} = [];
+    ##! 32: ' Loading Profiles from xref.profile '    
+    my @profiles = $policy->get_keys('xref.profile');
+    foreach my $profile ( @profiles) {
+        $user_certs->{by_profile}->{$profile} = [];
     }
 
+    ##! 32: ' Loaded ' . Dumper ( $user_certs->{by_profile} )
 
     #### Step 9 #############################################################
     # Get existing certificates for the holder of the current Smartcard.
@@ -635,7 +622,7 @@ sub sc_analyze_smartcard {
     ###########################################################################
     # process policy requirements for all user certificates
 
-    foreach my $type ($policy->get('certs.type')) {
+    foreach my $type ($policy->get_keys('certs.type')) {
 	next if ($type =~ m{ \A (?:UNEXPECTED|FOREIGN) \z }xms);
 
 	$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
@@ -958,39 +945,37 @@ sub _get_policy {
     ##! 8: 'indexing policy'
     my $ref;
 
-    foreach my $type ( $policy->get( [ 'certs.type'] ) ) {
+    foreach my $type ( $policy->get_keys( [ 'certs.type'] ) ) {
     
-        my $index = 0;
-        my $allowed_profile_count = $policy->get([  'certs.type', $type, 'allowed_profiles' ]) || 0;
-        for ($index = 0; $index < $allowed_profile_count; $ index++) {  
-            my $allowed_profile = $policy->get([  'certs.type', $type, 'allowed_profiles', $index ]);
-            
+        my $isFirst = 1;       
+        foreach my $allowed_profile ($policy->get_list([  'certs.type', $type, 'allowed_profiles' ])) {    
             $policy->set(['xref.profile', $allowed_profile, 'type'], $type );        
-            if ($index == 0) {
+            if ($isFirst) {
                 # first profile is preferred
-                $policy->set(['xref.profile', $allowed_profile, 'preferred'], 1 );            
+                $policy->set(['xref.profile', $allowed_profile, 'preferred'], 1 );
+                $isFirst = 0;            
             }                
             $policy->set(['xref.type', $type, 'allowed_profile', $allowed_profile ], 1 );
         }
             
         foreach my $item (qw( min_count max_count max_age )) {
-            $policy->set([ 'xref.type', $type,'limits',$item], $policy->get([  'certs.type', $type, 'limits', $item ]));
+            $policy->set([ 'xref.type', $type, 'limits', $item ], $policy->get([ 'certs.type', $type, 'limits', $item ]));
         }
             
         foreach my $item (qw( allow_renewal escrow_key publish purge_invalid purge_valid )) {
             $policy->set([ 'xref.type', $type,'policy',$item], $policy->get([  'certs.type', $type, $item ]));         
         }
     
-        my $usage_count = $policy->get([  'certs.type', $type, 'usage' ]) || 0;
-        for ($index = 0; $index < $usage_count; $ index++) {  
-            my $usage = $policy->get([  'certs.type', $type, 'usage', $index ]);        
+        foreach my $usage ($policy->get_list([  'certs.type', $type, 'usage' ])) {    
             #$policy->set([ 'xref.usage', $usage, 'type' ], $type ); # Seems not to be in use
             $policy->set([ 'xref.type' , $type, 'usage', $usage ], 1 );        
-        }    
-         
+        }             
     }
    
-    $policy->set('xref.cached', 1);        
+    $policy->set('xref.cached', 1);
+    
+    ##! 64: Dumper ( $policy->get_hash('xref.type') )
+            
     return $policy;
 }
 
@@ -1036,9 +1021,9 @@ sub __check_db_hash_against_policy {
 	    # we expect this cert type on the token, and hence export
 	    # the intended usage
 	    
-	    foreach my $usage ($policy->get(['xref.type', $type, 'usage'])) {
-		# export usage to caller
-		$db_hash->{SMARTCARD_USAGE}->{$usage} = 1;
+	    foreach my $usage ($policy->get_list(['xref.type', $type, 'usage'])) {
+    		# export usage to caller
+	       	$db_hash->{SMARTCARD_USAGE}->{$usage} = 1;
 	    }
 
 	    # check if private key is available in the database for
