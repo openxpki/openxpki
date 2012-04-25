@@ -318,7 +318,7 @@ sub sc_analyze_smartcard {
     ##! 32: ' Find employee id '
 
     # Connector - Multi-Valued type
-    my $employeeinfo = $config->walkQueryPoints( 'smartcard.employee', $holder_employee_id, 'get_hash' );    
+    my $employeeinfo = $config->walkQueryPoints( 'smartcard.employee', $holder_employee_id, { call => 'get_hash', deep => 1 } );    
 
     if (!$employeeinfo) {
 	    OpenXPKI::Exception->throw(
@@ -334,12 +334,18 @@ sub sc_analyze_smartcard {
 	    );
 	}
 	    
-    # Record the name of the resolver where we got the user info from
-    $result->{SMARTCARD}->{user_data_source} = $employeeinfo->{SOURCE};
-    
+    # loginids is expected to be an array ref but might be a scalar in result
+    if (ref ($employeeinfo->{VALUE}->{loginids}) eq '') {
+        my $loginid = $employeeinfo->{VALUE}->{loginids};
+        $employeeinfo->{VALUE}->{loginids} = [ $loginid ];
+    } 	    
+	    
     # This should be ok as the hash should be correctly assembled by the connector
     $result->{SMARTCARD}->{assigned_to} = $employeeinfo->{VALUE};
-	    
+
+    # Record the name of the resolver where we got the user info from
+    $result->{SMARTCARD}->{user_data_source} = $employeeinfo->{SOURCE};
+    	    
     ##! 16: 'smartcard holder details from connector: ' . Dumper $employeeinfo
 	    
 
