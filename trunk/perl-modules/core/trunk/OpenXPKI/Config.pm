@@ -53,16 +53,25 @@ sub walkQueryPoints {
     my $self = shift;
     my $prefix = shift;
     my $query = shift;
-    my $call = shift;
+    my $params = shift;
     
-    $call = 'get' unless($call);    
+    my $call;
+        
+    if (ref $params eq 'HASH') {        
+        $call = $params->{call};
+        undef $params->{call};        
+    } elsif ($params) {
+        $call = $params;
+    } else {
+        $call = 'get';    
+    }
     
     ##! 16: " Walk resolvers at $prefix with $call "
     
     my $result;    
     foreach my $resolver (  $self->get_list( [ $prefix, 'resolvers'] ) ) {                
         ##! 32: 'Ask Resolver ' . $prefix.'.'.$resolver.'.'.$query
-        $result = $self->$call( [ $prefix, $resolver, $query ]);
+        $result = $self->$call( [ $prefix, $resolver, $query ], $params );
         return { 'VALUE' => $result, 'SOURCE' => $resolver } if ($result);
     }    
     return;
