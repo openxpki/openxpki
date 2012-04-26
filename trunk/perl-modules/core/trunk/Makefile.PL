@@ -306,6 +306,7 @@ WriteMakefile(
         'Class::Accessor::Chained::Fast' => undef,
         'Class::Std'                     => '0.0.8',
         'CGI::Session'                   => '3.95',
+        'Config::Versioned'              => '0.6',
         'Crypt::CBC'                     => '2.29',
         'Crypt::OpenSSL::AES'            => '0.02',
         'DBI'                            => 1,
