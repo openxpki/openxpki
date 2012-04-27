@@ -61,7 +61,7 @@ my $ser = OpenXPKI::Serialization::Simple->new();
 
 my %wfparam = (        
         user_id => 'oliver.welter@example.com',
-        token_id => 'gem2_123455678',
+        token_id => 'gem2_12345678',
         chip_id => 'chipid1234',
         certs_on_card => '',
         login_id => 'oliwel',
