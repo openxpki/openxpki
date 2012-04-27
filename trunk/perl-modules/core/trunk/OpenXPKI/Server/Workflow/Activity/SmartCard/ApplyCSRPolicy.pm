@@ -39,8 +39,7 @@ sub execute {
         { workflow => $workflow , context_key => 'cert_issuance_data' } );
     
        
-    # prepare LDAP variable hashref for Template Toolkit
-    # TODO should be renamed with other prefix (see CheckPrereqs)
+    # prepare hashref for Template Toolkit based on userinfo context values
     my $userinfo;
     foreach my $param (keys %{ $context->param() }) {
         if ($param =~ s{ \A userinfo_ }{}xms) {
