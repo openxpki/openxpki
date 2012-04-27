@@ -206,62 +206,10 @@ sub sc_analyze_smartcard {
     # There should never be a match when tokenid ist not an exact match
     # So we should be able to omit the sanity check some lines below..   
           
-    if ($res->{VALUE} && $res->{VALUE}->{status}) {
+    if (!$res->{VALUE} || !$res->{VALUE}->{status}) {
         
-        my $scinfo = $res->{VALUE};
-        
-        ##! 64: ' Sanity check token status word ' . $scinfo->{status}  
-    	# sanity check, only allow defined smartcard status
-    	if ($scinfo->{status} !~ m{ \A (?:initial|activated|deactivated) \z }xms) {
-    	    OpenXPKI::Exception->throw(
-    		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_INVALID_SMARTCARD_STATUS',
-    		params  => {
-    		    TOKENID => $tokenid,
-    		    STATUS  => $scinfo->{status},
-    		},
-    		log => {
-    		    logger => CTX('log'),
-    		    priority => 'error',
-    		    facility => [ 'system', ],
-    		},
-    		);
-    	} # Status Check
-
-        ##! 64: ' Sanity check tokenid ' . $scinfo->{serialnumber}
-            	
-        # sanity check: token id must be identical to the one passed
-        # in the api call
-        if ($tokenid ne $scinfo->{serialnumber}) {
-            OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOKENID_MISMATCH',
-            params  => {
-                TOKENID_FROM_API => $tokenid,
-                TOKENID_FROM_CONNECTOR => $scinfo->{serialnumber},
-            },
-            log => {
-                logger => CTX('log'),
-                priority => 'error',
-                facility => [ 'system', ],
-            },
-            );
-    
-        }
-    	
-        # found and valid status - assign to result     
-        foreach my $key qw(status serialnumber keyid) {
-            $result->{SMARTCARD}->{$key} = $scinfo->{$key};       
-        }	
-	
-        ########################################################################
-        # Find the employee id based on the smartcard id
-
-        my $res  = $config->walkQueryPoints('smartcard.card2user', $tokenid, 'get');    
-		     
-    	$holder_employee_id = $res->{VALUE};
-    	
-    	if ( !$holder_employee_id ) {
-    	    OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_NO_EMPLOYEEID_FOR_TOKEN',
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOKEN_NOT_FOUND',
             params  => {
                 TOKENID => $tokenid,                
             },
@@ -270,143 +218,206 @@ sub sc_analyze_smartcard {
                 priority => 'error',
                 facility => [ 'system', ],
             },
-            );    
-    	}
+        );                
+    }
     
-        ##! 16: 'Employeeid is ' . $holder_employee_id  
+    my $scinfo = $res->{VALUE};
     
-    	
-    	#### Step 3 #############################################################
-    
-        # New in Phase 2: Record or validate SMARTCARDID/SMARTCHIPID mapping.
-        # Check datapool if the specified SMARTCHIPID has been recorded for
-        # the given SMARTCARDID.
-        # If not, record the new mapping in the datapool. (Suggested namespace:
-        # 'smartcard.smartchipid', key: SMARTCARDID, value:
-        # SMARTCHIPID. Currently this is not done at all.)
-        # If yes, validate that it matches the input of this call.
-        # If this validation fails, this is a security violation (somebody
-        # probably modified the SMARTCARDID).
-    
-        # Check for existing entry
-        my $msg = CTX('api')->get_data_pool_entry( { KEY => $chipid , NAMESPACE => 'smartcard.smartchipid' } );
-    
-        my $retval = $msg->{VALUE};
-        
-        # Not found - record it
-        if (!$retval) {
-            ##! 16: "Record card/chip relation Chip: $chipid - Token: $tokenid " 
-            CTX('api')->set_data_pool_entry( { 
-                KEY => $chipid , 
-                NAMESPACE => 'smartcard.smartchipid',
-                VALUE => $tokenid,
-            } );        
-        } elsif( $retval ne $tokenid ) {
-            OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARDID_MISSMATCHES_RECORDED_VALUE',
-            params  => {
-                SMARTCHIPID => $chipid,
-                SMARTCARDID => $tokenid,
-                RECORDED_SMARTCARDID => $retval, 
-            },
-            log => {
-                logger => CTX('log'),
-                priority => 'error',
-                facility => [ 'system', ],
-            },
-            );
-            
-        }
-    
-            
-        ##### Step 4 ############################################################
-        
-        # New in Phase 2: Determine current user by employee ID.
-        
-        # From Step 1 we know the employee ID. An employee ID maps to a person.
-        # In order to obtain additional information about the Smartcard holder,
-        # query configured data source (for now and very likely only LDAP
-        # directory, check with tester if artificial data is required, in this 
-        # case a lookup needs to be implemented with a local configuration 
-        # file preceding the LDAP query).
-        # 
-        # Values read from the directory:
-        # 
-        # * givenName
-        # * middleInitials
-        # * surname
-        # * mail
-        # * list of Windows login IDs (loginids)
-        # 
-        # The "wanted" Login Ids are no longer passed to this function but 
-        # queried from the frontend (and validated) in ApplyCSRPolicy step 
-    
-        ##! 32: ' Find employee id '
-    
-        # Connector - Multi-Valued type
-        my $employeeinfo = $config->walkQueryPoints( 'smartcard.employee', $holder_employee_id, { call => 'get_hash', deep => 1 } );    
-    
-        if (!$employeeinfo) {
-    	    OpenXPKI::Exception->throw(
-    		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED',
-    		params  => {
-    		    EMPLOYEEID => $holder_employee_id
-    		},
-    		log => {
-    		    logger => CTX('log'),
-    		    priority => 'error',
-    		    facility => [ 'system', ],
-    		},
-    	    );
-    	}
-    	    
-        # loginids is expected to be an array ref but might be a scalar in result
-        if (ref ($employeeinfo->{VALUE}->{loginids}) eq '') {
-            my $loginid = $employeeinfo->{VALUE}->{loginids};
-            $employeeinfo->{VALUE}->{loginids} = [ $loginid ];
-        } 	    
-    	    
-        # This should be ok as the hash should be correctly assembled by the connector
-        $result->{SMARTCARD}->{assigned_to} = $employeeinfo->{VALUE};
-    
-        # Record the name of the resolver where we got the user info from
-        $result->{SMARTCARD}->{user_data_source} = $employeeinfo->{SOURCE};
-        	    
-        ##! 16: 'smartcard holder details from connector: ' . Dumper $employeeinfo
-    	    
-    
-        # FIXME 
-        # $smartcard_holder_login_id is no longer unique, for the workflows we use the employeeid 
-        # the certificates directly use the mail attribute 
-    
-        $result->{SMARTCARD}->{assigned_to}->{workflow_creator} = $holder_employee_id;
-    
-        my $max_smartcards_per_user = $policy->get( ['cards.max_smartcards_per_user'] );
-    
-        if (defined $max_smartcards_per_user) {
-    
-            # TODO - check if user has too many cards        
-            my $smartcards_this_user = 1;
-            
-            ##! 16: 'checking for max number of smartcards per user'
-    		if ($smartcards_this_user > $max_smartcards_per_user ) {
-    		    OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOO_MANY_SMARTCARDS',
-                    params  => {
-    				    USER => $holder_employee_id,
-    				    SMARTCARD_COUNT => $smartcards_this_user,
-    				    #SMARTCARDS => join(';', map { $_->get_value('seealso') } @smartcard_entries),
-    				},
-    				log => {
-    				    logger => CTX('log'),
-    				    priority => 'error',
-    				    facility => [ 'system', ],
-    				},
-    				);
-    		}	
-        } # end $max_smartcards_per_user
-    } # end of "if ($scinfo)"
+    ##! 64: ' Sanity check token status word ' . $scinfo->{status}  
+	# sanity check, only allow defined smartcard status
+	if ($scinfo->{status} !~ m{ \A (?:initial|activated|deactivated) \z }xms) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_INVALID_SMARTCARD_STATUS',
+		params  => {
+		    TOKENID => $tokenid,
+		    STATUS  => $scinfo->{status},
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => [ 'system', ],
+		},
+		);
+	} # Status Check
 
+    ##! 64: ' Sanity check tokenid ' . $scinfo->{serialnumber}
+        	
+    # sanity check: token id must be identical to the one passed
+    # in the api call
+    if ($tokenid ne $scinfo->{serialnumber}) {
+        OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOKENID_MISMATCH',
+        params  => {
+            TOKENID_FROM_API => $tokenid,
+            TOKENID_FROM_CONNECTOR => $scinfo->{serialnumber},
+        },
+        log => {
+            logger => CTX('log'),
+            priority => 'error',
+            facility => [ 'system', ],
+        },
+        );
+
+    }
+	
+    # found and valid status - assign to result     
+    foreach my $key qw(status serialnumber keyid) {
+        $result->{SMARTCARD}->{$key} = $scinfo->{$key};       
+    }	
+
+    ########################################################################
+    # Find the employee id based on the smartcard id
+
+    my $res  = $config->walkQueryPoints('smartcard.card2user', $tokenid, 'get');    
+	     
+	$holder_employee_id = $res->{VALUE};
+	
+	if ( !$holder_employee_id ) {
+	    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_NO_EMPLOYEEID_FOR_TOKEN',
+        params  => {
+            TOKENID => $tokenid,                
+        },
+        log => {
+            logger => CTX('log'),
+            priority => 'error',
+            facility => [ 'system', ],
+        },
+        );    
+	}
+
+    ##! 16: 'Employeeid is ' . $holder_employee_id  
+
+	
+	#### Step 3 #############################################################
+
+    # New in Phase 2: Record or validate SMARTCARDID/SMARTCHIPID mapping.
+    # Check datapool if the specified SMARTCHIPID has been recorded for
+    # the given SMARTCARDID.
+    # If not, record the new mapping in the datapool. (Suggested namespace:
+    # 'smartcard.smartchipid', key: SMARTCARDID, value:
+    # SMARTCHIPID. Currently this is not done at all.)
+    # If yes, validate that it matches the input of this call.
+    # If this validation fails, this is a security violation (somebody
+    # probably modified the SMARTCARDID).
+
+    # Check for existing entry
+    my $msg = CTX('api')->get_data_pool_entry( { KEY => $chipid , NAMESPACE => 'smartcard.smartchipid' } );
+
+    my $retval = $msg->{VALUE};
+    
+    # Not found - record it
+    if (!$retval) {
+        ##! 16: "Record card/chip relation Chip: $chipid - Token: $tokenid " 
+        CTX('api')->set_data_pool_entry( { 
+            KEY => $chipid , 
+            NAMESPACE => 'smartcard.smartchipid',
+            VALUE => $tokenid,
+        } );        
+    } elsif( $retval ne $tokenid ) {
+        OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARDID_MISSMATCHES_RECORDED_VALUE',
+        params  => {
+            SMARTCHIPID => $chipid,
+            SMARTCARDID => $tokenid,
+            RECORDED_SMARTCARDID => $retval, 
+        },
+        log => {
+            logger => CTX('log'),
+            priority => 'error',
+            facility => [ 'system', ],
+        },
+        );
+        
+    }
+
+        
+    ##### Step 4 ############################################################
+    
+    # New in Phase 2: Determine current user by employee ID.
+    
+    # From Step 1 we know the employee ID. An employee ID maps to a person.
+    # In order to obtain additional information about the Smartcard holder,
+    # query configured data source (for now and very likely only LDAP
+    # directory, check with tester if artificial data is required, in this 
+    # case a lookup needs to be implemented with a local configuration 
+    # file preceding the LDAP query).
+    # 
+    # Values read from the directory:
+    # 
+    # * givenName
+    # * middleInitials
+    # * surname
+    # * mail
+    # * list of Windows login IDs (loginids)
+    # 
+    # The "wanted" Login Ids are no longer passed to this function but 
+    # queried from the frontend (and validated) in ApplyCSRPolicy step 
+
+    ##! 32: ' Find employee id '
+
+    # Connector - Multi-Valued type
+    my $employeeinfo = $config->walkQueryPoints( 'smartcard.employee', $holder_employee_id, { call => 'get_hash', deep => 1 } );    
+
+    if (!$employeeinfo) {
+	    OpenXPKI::Exception->throw(
+		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED',
+		params  => {
+		    EMPLOYEEID => $holder_employee_id
+		},
+		log => {
+		    logger => CTX('log'),
+		    priority => 'error',
+		    facility => [ 'system', ],
+		},
+	    );
+	}
+	    
+    # loginids is expected to be an array ref but might be a scalar in result
+    if (ref ($employeeinfo->{VALUE}->{loginids}) eq '') {
+        my $loginid = $employeeinfo->{VALUE}->{loginids};
+        $employeeinfo->{VALUE}->{loginids} = [ $loginid ];
+    } 	    
+	    
+    # This should be ok as the hash should be correctly assembled by the connector
+    $result->{SMARTCARD}->{assigned_to} = $employeeinfo->{VALUE};
+
+    # Record the name of the resolver where we got the user info from
+    $result->{SMARTCARD}->{user_data_source} = $employeeinfo->{SOURCE};
+    	    
+    ##! 16: 'smartcard holder details from connector: ' . Dumper $employeeinfo
+	    
+
+    # FIXME 
+    # $smartcard_holder_login_id is no longer unique, for the workflows we use the employeeid 
+    # the certificates directly use the mail attribute 
+
+    $result->{SMARTCARD}->{assigned_to}->{workflow_creator} = $holder_employee_id;
+
+    my $max_smartcards_per_user = $policy->get( ['cards.max_smartcards_per_user'] );
+
+    if (defined $max_smartcards_per_user) {
+
+        # TODO - check if user has too many cards        
+        my $smartcards_this_user = 1;
+        
+        ##! 16: 'checking for max number of smartcards per user'
+		if ($smartcards_this_user > $max_smartcards_per_user ) {
+		    OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOO_MANY_SMARTCARDS',
+                params  => {
+				    USER => $holder_employee_id,
+				    SMARTCARD_COUNT => $smartcards_this_user,
+				    #SMARTCARDS => join(';', map { $_->get_value('seealso') } @smartcard_entries),
+				},
+				log => {
+				    logger => CTX('log'),
+				    priority => 'error',
+				    facility => [ 'system', ],
+				},
+				);
+		}	
+    } # end $max_smartcards_per_user
 
 
     #### Step 5 #############################################################
@@ -442,8 +453,7 @@ sub sc_analyze_smartcard {
     # which may wish to continue a stalled personalization workflow.
 
     # search workflows
-    if ((defined $wf_types) &&
-	(defined $holder_employee_id)) {
+    if (defined $wf_types) {
 	# get workflow information (existing workflows for user)
 	foreach my $wf_type (@{$wf_types}) {
 	    $result->{WORKFLOWS}->{$wf_type} =
