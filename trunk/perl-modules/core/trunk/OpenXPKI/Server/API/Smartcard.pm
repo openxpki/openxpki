@@ -973,7 +973,7 @@ sub _get_policy {
 
     # Policy is now served from conenctor 
     my $config = CTX('config');
-    my $policy = $config->getWrapper( 'smartcard.policy' );
+    my $policy = $config->get_wrapper( 'smartcard.policy' );
 
     # This is currently only working inside one execution thread due to forking                
     # We need to run the index only once
