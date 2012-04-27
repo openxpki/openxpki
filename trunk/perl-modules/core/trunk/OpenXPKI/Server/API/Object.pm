@@ -602,9 +602,9 @@ sub get_data_pool_entry {
 	);
     
     my %key = (
-	'PKI_REALM'  => $requested_pki_realm,
-	'NAMESPACE'  => $namespace,
-	'DATAPOOL_KEY' => $key,
+	'PKI_REALM'  => {VALUE => $requested_pki_realm},
+	'NAMESPACE'  => {VALUE => $namespace},
+	'DATAPOOL_KEY' => {VALUE => $key},
 	);
     
     my $result = CTX('dbi_backend')->first (
