@@ -953,7 +953,7 @@ sub select
 
     ###########################################################################
     ## check dynamic conditions
-
+    
     if (exists $args->{DYNAMIC} &&
         (not ref $args->{DYNAMIC} or not ref $args->{DYNAMIC} eq "HASH")
        )
@@ -965,9 +965,21 @@ sub select
         });
     }
     if (exists $args->{DYNAMIC})
-    {
+    {         
         foreach my $dynamic_key (keys %{$args->{DYNAMIC}})
         {
+            # To support the old syntax where only the value was passed as a scalar,
+            # we autoconvert it and issue a warning.
+            if (ref $args->{DYNAMIC}->{$dynamic_key} eq '') {
+                ##! 1: ' UPDATE WARNING - autoconverting to new syntax, please fix! ' . Dumper $args->{DYNAMIC}  
+                $args->{DYNAMIC}->{$dynamic_key} = { VALUE => $args->{DYNAMIC}->{$dynamic_key} };
+                CTX('log')->log(
+                    MESSAGE  => "Old SQL DYNAMIC Syntax found - please fix!",
+                    PRIORITY => 'warn',
+                    FACILITY => 'system',
+                );
+            }
+            
             # check the structure
             if (not ref $args->{DYNAMIC}->{$dynamic_key} or
                 not ref $args->{DYNAMIC}->{$dynamic_key} eq "HASH")
@@ -976,6 +988,7 @@ sub select
         	        message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_DYNAMIC_PARAM_NO_HASH_REFERENCE",
         	        params  => {
         		    TABLE  => $table_args,
+        		    COLUMN => $dynamic_key,
         	    });
             }
             if (not exists $args->{DYNAMIC}->{$dynamic_key}->{VALUE})
