@@ -235,6 +235,8 @@ OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
 OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
 
+OpenXPKI/Server/Workflow/Activity/Tools/Connector/GetValue.pm
+
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/IssueCRL.pm
@@ -269,6 +271,7 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/PublishSingleCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateServerCSR.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/GetPrivateKey.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/SetupPasswordsafe.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartCard/CheckPrereqs.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateEscrowedKey.pm
@@ -276,6 +279,8 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/GeneratePUK.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/Initialize.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/IssueCert.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/FetchPUK.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/ApplyCSRPolicy.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/RenameEscrowedKey.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/Initialize.pm
 OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/ResetWorkflow.pm
@@ -353,11 +358,10 @@ OpenXPKI/Server/Workflow/Condition/Smartcard/CertificateProperties.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/HaveAuthIDs.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/HaveBothActHashes.pm
 OpenXPKI/Server/Workflow/Condition/WFArray.pm
+OpenXPKI/Server/Workflow/Condition/WFHash.pm
 OpenXPKI/Server/Workflow/Condition/DatapoolEntry.pm
 
-
-OpenXPKI/Server/Workflow/Condition/WFArray.pm
-OpenXPKI/Server/Workflow/Condition/DatapoolEntry.pm
+OpenXPKI/Server/Workflow/Condition/Connector/IsValue.pm
 
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm
