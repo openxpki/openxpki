@@ -164,7 +164,9 @@
     my $req_args = {};
     foreach my $key (keys %{ $m->request_args() }) {
         if ($key =~ m{ \A cert_subject_ }xms) {
-            $subject_parts->{$key} = $m->request_args()->{$key};
+            my $subject_part_value = $m->request_args()->{$key};
+            Encode::_utf8_on($subject_part_value);
+            $subject_parts->{$key} = $subject_part_value;
         }
         $req_args->{$key} = $m->request_args()->{$key};
     }
@@ -281,3 +283,6 @@
     ###############################
 
 </%init>
+<%once>
+    use Encode;
+</%once>

@@ -28,6 +28,12 @@ sub execute {
 	}
 
 	my @certs = split(/;/, $context->param('certs_on_card'));
+	
+	my $ser = OpenXPKI::Serialization::Simple->new();
+    my @LOGIN_IDS;
+    if ($context->param('login_ids')) {
+        @LOGIN_IDS = $ser->deserialize( $context->param('login_ids') )
+    } 
 
 	my $result = CTX('api')->sc_analyze_smartcard(
 	    {
@@ -64,22 +70,35 @@ sub execute {
 		workflow    => $workflow,
 		context_key => 'certificate_types',
 	    } );
+	    
+	my @certs_to_create;
 
 	foreach my $type (keys %{$result->{CERT_TYPE}}) {
 	    $cert_types->push($type);
+
+        # oliwel - create a list of wanted certificates in parallel based on 
+        # "preferred_certificate_exists" flag         
+        # Assumption: If new certificates for a type are created, we always use
+        # the first profile
+        if (!$result->{CERT_TYPE}->{$type}->{usable_certificate_exists} || 
+            !$result->{CERT_TYPE}->{$type}->{preferred_cert_exists}) {            
+            #my $preferred_profile = CTX('config')->get( [ 'smartcard.policy.certs.type', $type, 'allowed_profiles.0' ] );
+            ##! 16: 'Add profile to CSR queue ' . $preferred_profile;  
+            #push @certs_to_create, $preferred_profile;
+            push @certs_to_create, $type;                        
+        }
 
 	    foreach my $entry (keys %{$result->{CERT_TYPE}->{$type}}) {
 		# FIXME: find a better way to name the flags properly, currently
 		# the resulting wf keys depend on the configuration (i. e.
 		# configured certificate types)
-		
 		my $value = 'no';
 		if ($result->{CERT_TYPE}->{$type}->{$entry}) {
 		    $value = 'yes';
 		}
 
-		$context->param('flag_' . $type . '_' . $entry
-				=> $value);
+		#$context->param('flag_' . $type . '_' . $entry
+	#			   => $value);
 	    }
 	}
 
@@ -93,8 +112,14 @@ sub execute {
 	    $context->param('flag_' . $flag => $value);
 	}
 
+    # Resolver name that returned the basic user info
+    # not used at the moment but might be useful
+    $context->param('user_data_source' =>
+        $result->{SMARTCARD}->{user_data_source} );
+
 
 	# propagate LDAP settings to context
+	# TODO Should be renamed as it is no longer "LDAP"
       LDAP_ENTRY:
 	foreach my $entry (keys (%{$result->{SMARTCARD}->{assigned_to}})) {
 	    my $value = $result->{SMARTCARD}->{assigned_to}->{$entry};
@@ -102,11 +127,11 @@ sub execute {
 		my $queue = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
 		    {
 			workflow    => $workflow,
-			context_key => 'ldap_' . $entry ,
+			context_key => 'userinfo_' . $entry ,
 		    } );
 		$queue->push(@{$value});
 	    } else {
-		$context->param('ldap_' . $entry => 
+		$context->param('userinfo_' . $entry => 
 				$result->{SMARTCARD}->{assigned_to}->{$entry});
 	    }
 	}
@@ -140,7 +165,17 @@ sub execute {
 	$certs_to_unpublish->push(
 	    map { $_->{IDENTIFIER} } @{$result->{TASKS}->{DIRECTORY}->{UNPUBLISH}}
 	    );
+	    
 
+   ##! 8: ' Certs to create ' . Dumper @certs_to_create
+    my $certs_to_create_wf = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
+        {
+        workflow    => $workflow,
+        context_key => 'certs_to_create',
+        } );
+    $certs_to_create_wf->push(
+        @certs_to_create
+        );
 
 	
 	$context->param('smartcard_status' =>

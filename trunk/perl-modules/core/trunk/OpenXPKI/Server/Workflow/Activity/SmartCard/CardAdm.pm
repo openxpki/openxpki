@@ -1,6 +1,6 @@
 # OpenXPKI::Server::Workflow::Activity::SmartCard::CardAdm
-# Written by Alexander Klink for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
+# Written by Scott Hardin for the OpenXPKI project 2011
+# Copyright (c) 2011 by The OpenXPKI Project
 
 package OpenXPKI::Server::Workflow::Activity::SmartCard::CardAdm;
 

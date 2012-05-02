@@ -32,6 +32,8 @@ EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Data__SpreadPagination		\
 	Class__Observable 		\
+	Date__Parse			\
+	Locale__TextDomain		\
 	Test__utf8 \
 	Git__PurePerl \
 	Config__Merge \

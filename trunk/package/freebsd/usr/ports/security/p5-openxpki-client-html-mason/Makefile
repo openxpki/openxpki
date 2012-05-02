@@ -8,14 +8,15 @@
 PORTNAME=	openxpki-client-html-mason
 PORTVERSION=	0.9.1396
 CATEGORIES=	security perl5
-MASTER_SITES=	${MASTER_SITE_SOURCEFORGE}
-MASTER_SITE_SUBDIR=	openxpki
+MASTER_SITES=	http://www7.openxpki.org/lastmidnight/ SF/openxpki/openxpki/0.9.1300
 PKGNAMEPREFIX=	p5-
 DISTNAME=	OpenXPKI-Client-HTML-Mason-${PORTVERSION}
 DIST_SUBDIR=	openxpki
 
 MAINTAINER=	svysh@pn.sinp.msu.ru
 COMMENT=	Web interface for local openxpki daemon
+
+LICENSE=	AL2
 
 BUILD_DEPENDS=	\
 	${SITE_PERL}/OpenXPKI/Client.pm:${PORTSDIR}/security/p5-openxpki-client \
