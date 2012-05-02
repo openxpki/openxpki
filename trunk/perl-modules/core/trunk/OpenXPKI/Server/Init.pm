@@ -335,7 +335,23 @@ sub __do_init_workflow_bulk_keys {
                 'regexs' => [
                 ],
             },
-            'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING' =>
+            'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4' =>
+	    {
+	        'keys' => {
+		    'certs_on_card'           => 1,
+		    'certificate'             => 1,
+		    'pkcs10'                  => 1,
+                    'cert_issuance_data'      => 1,
+		    'certs_to_install'        => 1,
+		    'certs_to_delete'         => 1,
+		    'certs_to_unpublish'      => 1,
+		    'ldap_dbntloginid'        => 1,
+                    'tmp_queue'               => 1,
+                },
+                'regexs' => [
+                ],
+            },
+             'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING' =>
             {
                 'keys' => {
                     'certificate' => 1,
