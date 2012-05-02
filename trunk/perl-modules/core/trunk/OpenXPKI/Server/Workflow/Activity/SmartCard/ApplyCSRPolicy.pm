@@ -135,7 +135,11 @@ sub execute {
         foreach my $login (@use_logins) {
             # Fetch the UPN for each login
             ##! 32: ' Search UPN for ' . $login
-            my $res = $config->walkQueryPoints('smartcard.upninfo', $login );
+ 
+            # Strip domain and user
+            my ($domain, $user) = split(/\\/, $login);	
+
+            my $res = $config->walkQueryPoints('smartcard.upninfo', $user );
             if (!$res) {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_APPLYCSRPOLICY_NO_UPN_FOUND',
