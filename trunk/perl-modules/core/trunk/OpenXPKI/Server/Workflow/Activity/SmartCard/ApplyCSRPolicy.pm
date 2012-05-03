@@ -127,9 +127,6 @@ sub execute {
             @use_logins = @{$allowed_logins};
         }
 
-   
-        my %publishing_target;
-        
         ##! 32: 'Will use these logins ' . Dumper( @use_logins )
         
         foreach my $login (@use_logins) {
@@ -138,9 +135,22 @@ sub execute {
  
             # Strip domain and user
             my ($domain, $user) = split(/\\/, $login);	
+            $domain = uc($domain);
+ 
+            # If the login has domain/user format, try if there is a special 
+            # query point for that domain
+         
+            my $upn;
+            if ($user && $config->get_meta( [ 'smartcard.upninfo', $domain ] )) {
+                $upn = $config->get(['smartcard.upninfo', $domain, $user ]);
+                ##! 16: ' Direct domain lookup ' . Dumper( $upn )
+            } else {
+                my $res = $config->walkQueryPoints('smartcard.upninfo', $login );
+                $upn = $res->{VALUE};
+                ##! 16: ' Connector walk ' . Dumper( $res )
+            }     
 
-            my $res = $config->walkQueryPoints('smartcard.upninfo', $user );
-            if (!$res) {
+            if (!$upn) {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_APPLYCSRPOLICY_NO_UPN_FOUND',
                     params => {
@@ -149,21 +159,11 @@ sub execute {
                     },
                 );
             }
-            ##! 16: ' Connctor returned ' . Dumper( $res )
-            push @{$userinfo->{upn}}, $res->{VALUE};
-            $publishing_target{$res->{SOURCE}} = 1;
+            push @{$userinfo->{upn}}, $upn;
         }
         
         ##! 16: ' UPNs found ' . Dumper( @{$userinfo->{upn}} )
-        ##! 32: ' Publishing Targets ' . Dumper( keys %publishing_target )
         
-        # The source of the upn queries is used to publish the certificates later
-        my $publishing_target_wf = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
-        {
-            workflow    => $workflow,
-            context_key => 'publishing_target',
-        } );
-        $publishing_target_wf->push( keys %publishing_target );
 
         # Add the chosel logins to the userinfo structure                    
         $userinfo->{chosen_logins} = \@use_logins;
