@@ -267,6 +267,7 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/PersistCSRs.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/WriteCertificateToInstall.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/GetLDAPData.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/PublishCertificates.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/PublishCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/PublishSingleCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateServerCSR.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm
