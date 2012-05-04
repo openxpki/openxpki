@@ -598,7 +598,7 @@ sub sc_analyze_smartcard {
     if ($certificates) {
     
     my $ser = OpenXPKI::Serialization::Simple->new();
-    my @certificate_identifiers = $ser->deserialize($certificates);
+    my @certificate_identifiers = $ser->deserialize($certificates->{VALUE});
 
     my $db_results = CTX('dbi_backend')->select(
 	TABLE => [
@@ -1065,8 +1065,9 @@ sub __check_db_hash_against_policy {
 	} else {
 	    # we expect this cert type on the token, and hence export
 	    # the intended usage
-	    
-	    foreach my $usage ($policy->get_list(['xref.type', $type, 'usage'])) {
+
+	    # 20120504 Martin Bartosch, TODO/REFACTOR: bit mask?
+	    foreach my $usage ($policy->get_keys(['xref.type', $type, 'usage'])) {
     		# export usage to caller
 	       	$db_hash->{SMARTCARD_USAGE}->{$usage} = 1;
 	    }
