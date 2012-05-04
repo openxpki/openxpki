@@ -396,7 +396,7 @@ Smartcard Personalization}</string>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2012-05-04 12:49:14 +0000</string>
+	<string>2012-05-04 14:27:34 +0000</string>
 	<key>Modifier</key>
 	<string>Martin Bartosch</string>
 	<key>NotesVisible</key>
@@ -27417,12 +27417,10 @@ CERTS QUEUED FOR PUBLICATION}</string>
 					<dict>
 						<key>class</key>
 						<string>OpenXPKI::Server::Workflow::Activity::SmartCard::PublishCertificate</string>
-						<key>ldap_pass</key>
-						<string>[% smartcard_ad.ad_pass %]</string>
-						<key>ldap_timelimit</key>
-						<string>[% smartcard_ad.ad_timelimit %]</string>
-						<key>ldap_userdn</key>
-						<string>[% smartcard_ad.ad_userdn %]</string>
+						<key>prefix</key>
+						<string>smartcard.publishing</string>
+						<key>publish_key</key>
+						<string>userinfo_mail</string>
 					</dict>
 				</dict>
 				<dict>
@@ -39021,7 +39019,7 @@ SUCCESS}</string>
 		<key>FitInWindow</key>
 		<true/>
 		<key>Frame</key>
-		<string>{{300, 0}, {1114, 1028}}</string>
+		<string>{{441, 0}, {1114, 1028}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
