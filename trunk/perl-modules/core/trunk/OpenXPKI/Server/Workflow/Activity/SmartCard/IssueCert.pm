@@ -228,6 +228,13 @@ sub execute {
             },
         );
     }
+
+    CTX('api')->set_data_pool_entry( {
+        PKI_REALM => $realm,
+        NAMESPACE => 'smartcard.user.certificate',
+        KEY => $context->param('userinfo_workflow_creator'),
+    } );
+
     CTX('dbi_backend')->commit();
     
 #    $context->param(certificate => $cert);
