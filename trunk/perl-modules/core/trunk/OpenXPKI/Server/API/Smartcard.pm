@@ -268,7 +268,7 @@ sub sc_analyze_smartcard {
     ########################################################################
     # Find the employee id based on the smartcard id
 
-    my $res  = $config->walkQueryPoints('smartcard.card2user', $tokenid, 'get');    
+    $res  = $config->walkQueryPoints('smartcard.card2user', $tokenid, 'get');    
 	     
 	$holder_employee_id = $res->{VALUE};
 	
@@ -301,6 +301,8 @@ sub sc_analyze_smartcard {
     # If this validation fails, this is a security violation (somebody
     # probably modified the SMARTCARDID).
 
+    if ($chipid) {
+
     # Check for existing entry
     my $msg = CTX('api')->get_data_pool_entry( { KEY => $chipid , NAMESPACE => 'smartcard.smartchipid' } );
 
@@ -330,7 +332,7 @@ sub sc_analyze_smartcard {
         );
         
     }
-
+    }
         
     ##### Step 4 ############################################################
     
