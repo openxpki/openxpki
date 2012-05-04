@@ -268,7 +268,7 @@ sub sc_analyze_smartcard {
     ########################################################################
     # Find the employee id based on the smartcard id
 
-    my $res  = $config->walkQueryPoints('smartcard.card2user', $tokenid, 'get');    
+    $res  = $config->walkQueryPoints('smartcard.card2user', $tokenid, 'get');    
 	     
 	$holder_employee_id = $res->{VALUE};
 	
@@ -301,6 +301,8 @@ sub sc_analyze_smartcard {
     # If this validation fails, this is a security violation (somebody
     # probably modified the SMARTCARDID).
 
+    if ($chipid) {
+
     # Check for existing entry
     my $msg = CTX('api')->get_data_pool_entry( { KEY => $chipid , NAMESPACE => 'smartcard.smartchipid' } );
 
@@ -330,7 +332,7 @@ sub sc_analyze_smartcard {
         );
         
     }
-
+    }
         
     ##### Step 4 ############################################################
     
@@ -596,7 +598,7 @@ sub sc_analyze_smartcard {
     if ($certificates) {
     
     my $ser = OpenXPKI::Serialization::Simple->new();
-    my @certificate_identifiers = $ser->deserialize($certificates);
+    my @certificate_identifiers = $ser->deserialize($certificates->{VALUE});
 
     my $db_results = CTX('dbi_backend')->select(
 	TABLE => [
@@ -1063,8 +1065,9 @@ sub __check_db_hash_against_policy {
 	} else {
 	    # we expect this cert type on the token, and hence export
 	    # the intended usage
-	    
-	    foreach my $usage ($policy->get_list(['xref.type', $type, 'usage'])) {
+
+	    # 20120504 Martin Bartosch, TODO/REFACTOR: bit mask?
+	    foreach my $usage ($policy->get_keys(['xref.type', $type, 'usage'])) {
     		# export usage to caller
 	       	$db_hash->{SMARTCARD_USAGE}->{$usage} = 1;
 	    }
