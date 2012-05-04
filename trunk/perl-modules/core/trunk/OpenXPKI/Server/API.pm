@@ -80,24 +80,6 @@ sub BUILD {
             params => {
             },
         },
-        'deuba_aes_encrypt_puk' => {
-            class  => 'Default',
-            params => {
-                'PUK' => {
-                    type  => SCALAR,
-                    regex => $re_base64_string,
-                },
-            },
-        },
-        'deuba_aes_encrypt_parameter' => {
-            class  => 'Default',
-            params => {
-                'DATA' => {
-                    type  => SCALAR,
-                    regex => $re_all,
-                },
-            },
-        },
         'get_cert_identifier' => {
             class  => 'Default',
             params => {
@@ -1074,17 +1056,25 @@ sub BUILD {
                     regex => $re_cert_string,
                     optional => 1,
                 },
-		'SMARTCARDID' => {
+                'SMARTCARDID' => {
                     type => SCALAR,
                     regex => $re_alpha_string,
                     optional => 1,
                 },
-		'USERID' => {
+                'SMARTCHIPID' => {
+                    type => SCALAR,
+                    regex => $re_alpha_string,                    
+                },        
+                'LOGINIDS'  => {
+                    type => ARRAYREF,
+                    optional => 1,
+                },
+                'USERID' => {
                     type => SCALAR,
                     regex => $re_sql_string,
                     optional => 1,
                 },
-		'WORKFLOW_TYPES' => {
+                'WORKFLOW_TYPES' => {
                     type => ARRAYREF,
                     optional => 1,
                 },

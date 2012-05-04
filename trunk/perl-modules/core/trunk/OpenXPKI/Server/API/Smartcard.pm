@@ -1,6 +1,7 @@
 ## OpenXPKI::Server::API::Smartcard.pm 
 ##
 ## Written 2010 by Martin Bartosch for the OpenXPKI project
+## Redesign using Connector by Oliver Welter 2012
 ## Copyright (C) 2005-2010 by The OpenXPKI Project
 
 package OpenXPKI::Server::API::Smartcard;
@@ -91,9 +92,12 @@ sub sc_analyze_smartcard {
     my $arg_ref = shift;
 
     my $tokenid  = $arg_ref->{SMARTCARDID};
+    my $chipid  = $arg_ref->{SMARTCHIPID};    
     my $userid   = $arg_ref->{USERID};
     my $wf_types = $arg_ref->{WORKFLOW_TYPES};
     my $cfg_id   = $arg_ref->{CONFIG_ID};
+    my $login_ids  = $arg_ref->{LOGIN_IDS};
+    
     ##! 16: 'cfg_id: ' . $cfg_id
 
     ##! 16: 'sc_analyze_smartcard() wf_types = $wf_types (' . Dumper($wf_types) . ')'
@@ -114,11 +118,9 @@ sub sc_analyze_smartcard {
 
     my $thisrealm = CTX('session')->get_pki_realm();
 
-    my $smartcard_holder_login_id;
-
+    ##! 16: ' Load policy map '
     # get policy settings from configuration
     my $policy = $self->_get_policy();
-    
 
     my $result = {
         WF_TYPES => $wf_types,
@@ -127,9 +129,10 @@ sub sc_analyze_smartcard {
 	    serialnumber => '',
 	    status => 'unknown',
 	    assigned_to => {},
+	    user_data_source => '',
 	    keyalg => 'RSA',
 	    keysize => 2048,
-	    default_puk => undef,
+	    default_puk => undef,	    
 	},
 	CERT_TYPE => {
 #	    'nonescrow' => {
@@ -184,104 +187,38 @@ sub sc_analyze_smartcard {
 	},
     };
 
-
-    ###########################################################################
-    my $ldap = Net::LDAP->new(
-	$policy->{directory}->{ldap}->{uri},
-	#port => $ldap_settings->{ldap_port},
-	onerror => undef,
-	);
-
-    if (! defined $ldap) {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_CONNECTION_FAILED',
-	    params  => {
-		LDAP_SERVER => $policy->{directory}->{ldap}->{uri},
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'system', ],
-	    },
-	    );
+    my $config = CTX('config');
+    #########################################################################
+    # Info about smartcard is fetched from connector
+    # smartcard.cardinfo.resolvers lists the querypoints to ask
+    # each querypoint may return undef or a hash structure with the requested
+    # attributes: scbserialnumber, scbstatus, employeeid, keyid (optional)
+    
+    my $scinfo;
+    my $cnt = $config->get( ['smartcard.cardinfo.resolvers'] );
+    for (my $i = 0; $i < $cnt; $i++) {            
+        my $resolver =  $config->get( [ 'smartcard.cardinfo.resolvers', $i ] );
+        ##! 32: 'Ask Cardinfo Resolver ' . $resolver
+        $scinfo = $config->get( [ 'smartcard.cardinfo', $resolver, $tokenid ]);
+        last if ($scinfo);
     }
 
-    my $mesg = $ldap->bind(
-	$policy->{directory}->{ldap}->{bind_dn},
-	password => $policy->{directory}->{ldap}->{pass},
-	);
-
-    if ($mesg->is_error()) {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_BIND_FAILED',
-	    params  => {
-		ERROR => $mesg->error(),
-		ERROR_DESC => $mesg->error_desc(),
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'system', ],
-	    },
-	    );
-    }
-
-    # determine smartcard status
-    $mesg = $ldap->search(
-	base => $policy->{directory}->{smartcard}->{basedn},
-	filter => "scbserialnumber=$tokenid",
-	attrs => [ 'scbserialnumber', 'scbstatus' ],
-	);
-
-    if ($mesg->is_error()) {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_SEARCH_TOKENID_FAILED',
-	    params  => {
-		ERROR => $mesg->error(),
-		ERROR_DESC => $mesg->error_desc(),
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'system', ],
-	    },
-	    );
-    }
-
-    my @sc_entries = $mesg->entries();
-    if (scalar @sc_entries > 0) {
-	# smartcard is known to the system, allocate output structure
-
-	##! 16: "smartcard with id $tokenid found in ldap"
-	
-	# check result for uniqueness (multiple results could happen if
-	# a wildcard was specified)
-	if (scalar @sc_entries > 1) {
-	    OpenXPKI::Exception->throw(
-		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_SEARCH_TOKENID_NOT_UNIQUE',
-		params  => {
-		    TOKENID => $tokenid,
-		    COUNT => scalar @sc_entries,
-		},
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => [ 'system', ],
-		},
-		);
-	}
-
-	# unique token found, propagate ldap data to return structure
-	$result->{SMARTCARD}->{status} =
-	    $sc_entries[0]->get_value('scbstatus');
+    ##! 32: ' SC Info: ' . Dumper( $scinfo );
+    # FIXME: We need to ensure unqiness in the connector!
+    # There should never be a match when tokenid ist not an exact match
+    # So we can omit the sanity check some lines below..   
+            
+    my $holder_employee_id;           
+    if ($scinfo) {
+    # TODO Might it be safe to simply return from here if no info is found? I dont see any usable code below without this data
 
 	# sanity check, only allow defined smartcard status
-	if ($result->{SMARTCARD}->{status} !~ m{ \A (?:initial|activated|deactivated) \z }xms) {
+	if ($scinfo->{scbstatus} !~ m{ \A (?:initial|activated|deactivated) \z }xms) {
 	    OpenXPKI::Exception->throw(
-		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_SEARCH_INVALID_SMARTCARD_STATUS',
+		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_INVALID_SMARTCARD_STATUS',
 		params  => {
 		    TOKENID => $tokenid,
-		    STATUS  => $result->{SMARTCARD}->{status},
+		    STATUS  => $scinfo->{scbstatus},
 		},
 		log => {
 		    logger => CTX('log'),
@@ -289,20 +226,23 @@ sub sc_analyze_smartcard {
 		    facility => [ 'system', ],
 		},
 		);
-	}
+	} # Status Check
+	
+    # found and valid status - assign to result     
+    $result->{SMARTCARD}->{status} = $scinfo->{scbstatus};       
+	$result->{SMARTCARD}->{serialnumber} = $scinfo->{scbserialnumber};
+	$result->{SMARTCARD}->{keyid} = $scinfo->{keyid};
+	
+	$holder_employee_id =  $scinfo->{employeeid};
 
-	$result->{SMARTCARD}->{serialnumber} =
-	    $sc_entries[0]->get_value('scbserialnumber');
-
-	my $smartcard_dn = $sc_entries[0]->dn();
-	##! 16: 'associated smartcard dn: ' . $smartcard_dn
+    ##! 16: 'Employeeid is ' . $holder_employee_id  
 
 	# sanity check: token id must be identical to the one passed
 	# in the api call
 	if ($tokenid 
 	    ne $result->{SMARTCARD}->{serialnumber}) {
 	    OpenXPKI::Exception->throw(
-		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_SEARCH_TOKENID_MISMATCH',
+		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOKENID_MISMATCH',
 		params  => {
 		    TOKENID_FROM_API => $tokenid,
 		    TOKENID_FROM_LDAP => $result->{SMARTCARD}->{serialnumber},
@@ -315,22 +255,90 @@ sub sc_analyze_smartcard {
 		);
 
 	}
-
-	# get assigned person
-	##! 16: "searching for seealso=$smartcard_dn in $policy->{directory}->{person}->{basedn}"
-	$mesg = $ldap->search(
-	    base => $policy->{directory}->{person}->{basedn},
-	    scope => 'sub',
-	    filter => "seealso=$smartcard_dn",
-	    attrs => $policy->{directory}->{person}->{attributes},
-	    );
 	
-	if ($mesg->is_error()) {
+	#### Step 3 #############################################################
+
+    # New in Phase 2: Record or validate SMARTCARDID/SMARTCHIPID mapping.
+    # Check datapool if the specified SMARTCHIPID has been recorded for
+    # the given SMARTCARDID.
+    # If not, record the new mapping in the datapool. (Suggested namespace:
+    # 'smartcard.smartchipid', key: SMARTCARDID, value:
+    # SMARTCHIPID. Currently this is not done at all.)
+    # If yes, validate that it matches the input of this call.
+    # If this validation fails, this is a security violation (somebody
+    # probably modified the SMARTCARDID).
+
+    # Check for existing entry
+    my $msg = CTX('api')->get_data_pool_entry( { KEY => $chipid , NAMESPACE => 'smartcard.smartchipid' } );
+
+    my $retval = $msg->{VALUE};
+    
+    # Not found - record it
+    if (!$retval) {
+        ##! 16: "Record card/chip relation Chip: $chipid - Token: $tokenid " 
+        CTX('api')->set_data_pool_entry( { 
+            KEY => $chipid , 
+            NAMESPACE => 'smartcard.smartchipid',
+            VALUE => $tokenid,
+        } );        
+    } elsif( $retval ne $tokenid ) {
+        OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARDID_MISSMATCHES_RECORDED_VALUE',
+        params  => {
+            SMARTCHIPID => $chipid,
+            SMARTCARDID => $tokenid,
+            RECORDED_SMARTCARDID => $retval, 
+        },
+        log => {
+            logger => CTX('log'),
+            priority => 'error',
+            facility => [ 'system', ],
+        },
+        );
+        
+    }
+
+        
+    ##### Step 4 ############################################################
+    
+    # New in Phase 2: Determine current user by employee ID.
+    
+    # From Step 1 we know the employee ID. An employee ID maps to a person.
+    # In order to obtain additional information about the Smartcard holder,
+    # query configured data source (for now and very likely only LDAP
+    # directory, check with tester if artificial data is required, in this 
+    # case a lookup needs to be implemented with a local configuration 
+    # file preceding the LDAP query).
+    # 
+    # Values read from the directory:
+    # 
+    # * givenName
+    # * middleInitials
+    # * surname
+    # * mail
+    # * list of Windows login IDs (loginids)
+    # 
+    # The "wanted" Login Ids are no longer passed to this function but 
+    # queried from the frontend (and validated) in ApplyCSRPolicy step 
+
+    ##! 32: ' Find employee id '
+
+    # Connector - Multi-Valued type
+    my $employeeinfo;
+    my $employee_source; 
+    my $cnt = $config->get( ['smartcard.employee.resolvers'] );    
+    for (my $i = 0; $i < $cnt; $i++) {    
+        $employee_source =  $config->get( [ 'smartcard.employee.resolvers', $i ] );
+        ##! 32: 'Ask Employeeid Resolver ' . $employee_source 
+        $employeeinfo = $config->get( [ 'smartcard.employee', $employee_source, $holder_employee_id ]);        
+        last if ($employeeinfo);
+    }
+
+    if (!$employeeinfo) {
 	    OpenXPKI::Exception->throw(
-		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_SEARCH_PERSON_FAILED',
+		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED',
 		params  => {
-		    ERROR => $mesg->error(),
-		    ERROR_DESC => $mesg->error_desc(),
+		    EMPLOYEEID => $holder_employee_id
 		},
 		log => {
 		    logger => CTX('log'),
@@ -339,75 +347,37 @@ sub sc_analyze_smartcard {
 		},
 	    );
 	}
-
-	my @person_entries = $mesg->entries();
-	##! 16: 'person search: ' . Dumper \@person_entries
-
-	if (scalar(@person_entries) > 0) {
-	    # at least one associated user found
-
-	    if (scalar(@person_entries) > 1) {
-		# smartcard is held by too many users
-		OpenXPKI::Exception->throw(
-		    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_TOO_MANY_SMARTCARD_OWNERS',
-		    params  => {
-			ASSIGNED_TO => join('; ', map { $_->dn() } 
-					    @person_entries),
-		    },
-		    log => {
-			logger => CTX('log'),
-			priority => 'error',
-			facility => [ 'system', ],
-		    },
-		    );
-	    }
-
-	    ##! 16: 'person entry: ' . Dumper $person_entries[0]
-	    ##! 16: 'person dn: ' . $person_entries[0]->dn()
 	    
-	    $result->{SMARTCARD}->{assigned_to}->{dn} = 
-		$person_entries[0]->dn();
+    # Record the name of the resolver where we got the user info from
+    $result->{SMARTCARD}->{user_data_source} = $employee_source;
+    
+    # This should be ok as the hash should be correctly assembled by the connector
+    $result->{SMARTCARD}->{assigned_to} = $employeeinfo;
+	    
+    ##! 16: 'smartcard holder details from connector: ' . Dumper $employeeinfo
 	    
 
-	    foreach my $attr ($person_entries[0]->attributes()) {
-		my %flags = ();
-		if ($attr eq $policy->{directory}->{person}->{loginid_attribute}) {
-		    $flags{asref} = 1;
-		}
-		$result->{SMARTCARD}->{assigned_to}->{$attr} = 
-		    $person_entries[0]->get_value($attr, %flags);
-	    }
+    # FIXME 
+    # $smartcard_holder_login_id is no longer unique, for the workflows we use the employeeid 
+    # the certificates directly use the mail attribute 
 
-	    ##! 16: 'smartcard holder details from ldap: ' . Dumper $result->{SMARTCARD}->{assigned_to}
+    $result->{SMARTCARD}->{assigned_to}->{workflow_creator} = $holder_employee_id;
 
-	    $smartcard_holder_login_id = 
-		$person_entries[0]->get_value(
-		    $policy->{directory}->{person}->{userid_attribute}
-		);
-	    $result->{SMARTCARD}->{assigned_to}->{workflow_creator} = $smartcard_holder_login_id;
+    my $max_smartcards_per_user = $policy->get( ['cards.max_smartcards_per_user'] );
 
-	    if (defined $policy->{directory}->{person}->{max_smartcards_per_user}) {
-		##! 16: 'checking for max number of smartcards per user'
-		
-		foreach my $person (@person_entries) {
-		    my $person_dn = $person->dn();
-		    
-		    $mesg = $ldap->search(
-			base => $policy->{directory}->{person}->{basedn},
-			filter => $person_dn,
-			attrs => [ 'seealso', ],
-			);
-		    if (! $mesg->is_error()) {
-			my @smartcard_entries = $mesg->entries();
-			if (scalar @smartcard_entries 
-			    > $policy->{directory}->{person}->{max_smartcards_per_user}) {
+    if (defined $max_smartcards_per_user) {
 
-			    OpenXPKI::Exception->throw(
-				message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_TOO_MANY_SMARTCARDS',
-				params  => {
-				    USER => $person_dn,
-				    SMARTCARD_COUNT => scalar @smartcard_entries,
-				    SMARTCARDS => join(';', map { $_->get_value('seealso') } @smartcard_entries),
+        # TODO - check if user has too many cards        
+        my $smartcards_this_user = 1;
+        
+        ##! 16: 'checking for max number of smartcards per user'
+		if ($smartcards_this_user > $max_smartcards_per_user ) {
+		    OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOO_MANY_SMARTCARDS',
+                params  => {
+				    USER => $holder_employee_id,
+				    SMARTCARD_COUNT => $smartcards_this_user,
+				    #SMARTCARDS => join(';', map { $_->get_value('seealso') } @smartcard_entries),
 				},
 				log => {
 				    logger => CTX('log'),
@@ -415,93 +385,48 @@ sub sc_analyze_smartcard {
 				    facility => [ 'system', ],
 				},
 				);
-			}
-		    }
-		}
-	    }
-	}
-    }
+		}	
+    } # end $max_smartcards_per_user
+    } # end of "if ($scinfo)"
 
 
-    ###########################################################################
+
+    #### Step 5 #############################################################
     # check membership of logged in user (if specified) in configured groups
     if (defined $userid) {
-	# first get the DN of the logged in user
+    
+    	# Map the userid to a lookup key
+    	my $lookupid = $config->get('smartcard.groupinfo.usertokey');
 
-	my $attribute = $policy->{directory}->{person}->{userid_attribute};
+    	##! 16: "userid $userid maps to $lookupid"
 
-	$mesg = $ldap->search(
-	    base => $policy->{directory}->{person}->{basedn},
-	    scope => 'one',
-	    filter => "$attribute=$userid",
-	    attrs => [ 'dn' ],
-	    );
+	   foreach my $group_alias ($config->get('smartcard.groupinfo.groups')) {
+	    
+	       my $group_name = $config->get(['smartcard.groupinfo.groups', $group_alias]);
 
-	if ($mesg->is_error()) {
-	    OpenXPKI::Exception->throw(
-		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_SEARCH_USERID_FAILED',
-		params  => {
-		    ERROR => $mesg->error(),
-		    ERROR_DESC => $mesg->error_desc(),
-		},
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => [ 'system', ],
-		},
-		);
-	}
-	
-	my $dn;
-	my @entries = $mesg->entries();
-	if (scalar(@entries) > 0) {
-	    if (scalar(@entries) > 1) {
-		OpenXPKI::Exception->throw(
-		    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_LDAP_SEARCH_AMBIGUOUS_USER',
-		    params  => {
-			$attribute => $userid,
-			COUNT => scalar @entries,
-		    },
-		    log => {
-			logger => CTX('log'),
-			priority => 'error',
-			facility => [ 'system', ],
-		    },
-		    );
-	    }
-	    $dn = $entries[0]->dn();
-	}
+	       my $process_flag = 'is_' . $group_alias;
+	    
+	       $result->{PROCESS_FLAGS}->{$process_flag} = 0;
 
-	##! 16: "userid $userid maps to dn $dn"
-
-	foreach my $group_alias (keys %{$policy->{directory}->{groups}}) {
-	    my $ldap_group = $policy->{directory}->{groups}->{$group_alias};
-
-	    my $process_flag = 'is_' . $group_alias;
-	    $result->{PROCESS_FLAGS}->{$process_flag} = 0;
-
-	    if (defined $dn) {
-		# determine smartcard status
-		##! 16: 'checking membership for ldap group ' . $ldap_group
-		$mesg = $ldap->search(
-		    base => $ldap_group,
-		    scope => 'base',
-		    filter => "uniqueMember=$dn",
-		    attrs => [ 'dn' ],
-		    );
-
-		if ($mesg->count() == 1) {
-		    $result->{PROCESS_FLAGS}->{$process_flag} = 1;
-		}
-	    }
-	}
+	       if (defined $lookupid) {
+        	   ##! 16: 'checking membership for group ' . $group_alias
+        		
+                if ($config->get(['smartcard.groupinfo.checkgroup', $group_alias, $lookupid ])) {        		
+                    $result->{PROCESS_FLAGS}->{$process_flag} = 1;
+                }
+            }
+	   }
     }
     
     
-    ###########################################################################
+    #### Step 6 #############################################################
+    # Search for active workflows for this user (only if WORKFLOW_TYPES was
+    # passed). This operation is a convenience shortcut for the frontend 
+    # which may wish to continue a stalled personalization workflow.
+
     # search workflows
     if ((defined $wf_types) &&
-	(defined $smartcard_holder_login_id)) {
+	(defined $holder_employee_id)) {
 	# get workflow information (existing workflows for user)
 	foreach my $wf_type (@{$wf_types}) {
 	    $result->{WORKFLOWS}->{$wf_type} =
@@ -511,78 +436,90 @@ sub sc_analyze_smartcard {
 			CONTEXT => [
 			    {
 				KEY => 'creator',
-				VALUE => $smartcard_holder_login_id,
+				VALUE => $holder_employee_id,
 			    },
 			    ],
 		    });
 	}
     }
 
-    ###########################################################################
-    # check if puk can be found in datapool
-    my $puk_found = CTX('dbi_backend')->first(
-	TABLE => 'DATAPOOL',
-	DYNAMIC => {
-	    PKI_REALM => $thisrealm,
-	    NAMESPACE => 'smartcard.puk',
-	    DATAPOOL_KEY => $tokenid,
-	}
-	);
-
+    #### Step 7 ##############################################################
+    # Determine PUK status and possibly other properties of the Smartcard.
+    # Depending on the PUK status set result values. The consumer of this 
+    # function call may need the information if the PUK is known and 
+    # available or if the PUK can be modified.
+    # Here we only get the basic capabilities of the card and the
+    # information on if we know the PUK. We don't fetch the actual PUK here,
+    # this is done when it is actually needed in the workflow.
+    # * boolean flag: PUK in Datapool (custom puk, that was set on the card 
+    #   earlier)
+    # * boolean flag: PUK is writable (some Smartcards do not allow 
+    #   changing the PUK).
+    # * boolean flag: purge token before unblock. if set to true by the API
+    #   function, this indicates that the Smartcard must be completely
+    #   erased (for security reasons) before an unblock operation can
+    #   happen. True for RSA tokens (because we do not necessarily have a 
+    #   token - user assignment during unblock), false for most other cards.
+    # * integer: supported keysize of the card
+    
+    my $puk_found = CTX('api')->get_data_pool_entry( {
+        PKI_REALM => $thisrealm,
+        NAMESPACE => 'smartcard.puk',
+        KEY => $tokenid,         
+    } );
+    
     if (defined $puk_found) {
-	$result->{PROCESS_FLAGS}->{puk_found_in_datapool} = 1;
+	   $result->{PROCESS_FLAGS}->{puk_found_in_datapool} = 1;
     }
 
     ###########################################################################
-    # smartcard type specific settings
-    if ($tokenid =~ m{ \A (?:rsa[23]_) }xms) {
-	$result->{PROCESS_FLAGS}->{puk_is_writable} = 0;
-	# RSA tokens must be wiped before they can be unblocked
-	$result->{PROCESS_FLAGS}->{purge_token_before_unblock} = 1;
-	$result->{SMARTCARD}->{keysize} = 1024;
-	$result->{SMARTCARD}->{default_puk} = undef;
-    } elsif ($tokenid =~ m{ \A (?:gem2_) }xms) {
-	$result->{PROCESS_FLAGS}->{puk_is_writable} = 1;
-	$result->{SMARTCARD}->{keysize} = 2048;
-	$result->{SMARTCARD}->{default_puk} = '0' x 48;
-    } else {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_UNSUPPORTED_SMARTCARD_TYPE',
-	    params  => {
-		TOKEN_ID => $tokenid,
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'system', ],
-	    },
-	    );
-    }
-
-
-    ###########################################################################
+    # Load PUK properties based on smartcard type from Config
+    # We assume that the tokenid contains the cardtype as a prefix, seperated 
+    # by an underscore (<type>_<token nummer>)
+    # Todo - implement the getHash idea on the base connector
+    
+    $tokenid =~ m{ \A (?:(\w+\d)_) }xms;
+    my $token_family = $1;
+    
+    if (!$token_family || !$config->get(['smartcard.cardinfo.properties',$token_family])) {
+        OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_UNSUPPORTED_SMARTCARD_TYPE',
+        params  => {
+        TOKEN_ID => $tokenid,
+        },
+        log => {
+        logger => CTX('log'),
+        priority => 'error',
+        facility => [ 'system', ],
+        },
+        );
+    }    
+    
+	$result->{PROCESS_FLAGS}->{puk_is_writable} = $config->get(['smartcard.cardinfo.properties',$token_family,'puk_is_writable']);
+	$result->{PROCESS_FLAGS}->{purge_token_before_unblock} = $config->get(['smartcard.cardinfo.properties',$token_family, 'purge_token_before_unblock']);
+	$result->{SMARTCARD}->{keysize} = $config->get(['smartcard.cardinfo.properties',$token_family,'keysize']);
+	
+	#$result->{SMARTCARD}->{default_puk} = undef;	
+	#$config->get(['smartcard.cardinfo.properties.defaultpuk'])
+        
+    #### Step 8 ###############################################################    
+    # This step prepares an output structure that can be used by the
+    # frontend or the workflow to operate on the details of certificates
+    # already on the card.
+    # The input paramters to the sc_analyze_smartcard function contains a
+    # list of Base64 encoded certificates as read from the Smartcard.
+    # Iterate through this list and parse all certificates, generating a
+    # hash array containing details on every single certificate.
+    # Populate a return structure that contains the parsed version of all
+    # certificates on the Smartcard.
     # analyze contents of the card
+    
+    # Helper to split the certificates based on the form type
     $result->{PARSED_CERTS} = $self->sc_parse_certificates($arg_ref);
 
     ###########################################################################
-    # get existing certificates
-
-    ##! 16: 'get existing certificates for user ' . $smartcard_holder_login_id
-    if ($policy->{directory}->{person}->{userid_attribute} ne 'mail') {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_UNSUPPORTED_USERID_ATTRIBUTE',
-	    params  => {
-		USERID_ATTRIBUTE => $policy->{directory}->{person}->{userid_attribute},
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'fatal',
-		facility => [ 'system', ],
-	    },
-	    );
-    }
-
-
+    # sort and index the exisiting certificates
+    
     my $user_certs = {
 	by_identifyer => {},
 	by_type => {},
@@ -597,57 +534,71 @@ sub sc_analyze_smartcard {
 	    },
 	},
     };
-    foreach my $type (keys %{$policy->{certs}->{type}}) {
+    
+    foreach my $type ($policy->get('certs.type')) {
 	next if ($type =~ m{ \A (?:UNEXPECTED|FOREIGN) \z }xms);
 	$user_certs->{by_type}->{$type} = [];
+    }
+    
+    my @profiles = $policy->get('xref.profile');
+    foreach my $profile (@profiles) {
+    $user_certs->{by_profile}->{$profile} = [];
+    }
 
-	##! 16: 'certificates with type: ' . $type
-	foreach my $profile (@{$policy->{certs}->{type}->{$type}->{allowed_profiles}}) {
-	    $user_certs->{by_profile}->{$profile} = [];
-	    ##! 16: 'certificate profile: ' . $profile
 
-	    my $db_results = CTX('dbi_backend')->select(
-		TABLE => [
-		    'CERTIFICATE',
-		    'CSR',
-		],
-		COLUMNS => [
-		    'CSR.PROFILE',
-		    'CERTIFICATE.SUBJECT',
-		    'CERTIFICATE.IDENTIFIER',
-		    'CERTIFICATE.ROLE',
-		    'CERTIFICATE.STATUS',
-		    'CERTIFICATE.DATA',
-		    'CERTIFICATE.NOTBEFORE',
-		    'CERTIFICATE.NOTAFTER',
-		],
-		DYNAMIC => {
-		    'CSR.PROFILE' => $profile,
-		    'CERTIFICATE.PKI_REALM' => $thisrealm,
-		    'CERTIFICATE.EMAIL' => $smartcard_holder_login_id,
-		},
-		JOIN => [
-		    [
-		     'CSR_SERIAL',
-		     'CSR_SERIAL',
-		    ],
-		],
-		);
+    #### Step 9 #############################################################
+    # Get existing certificates for the holder of the current Smartcard.
+    #
+    # The employee ID maps to a user who may have had one or even
+    # more different names and hence person entries before. We need to find
+    # all existing certificates for the user, regardless of previous name.
+    # We maintain a list of a users certificates in the datapool
+    # namespace: smartcard.user.certificate
+    # key: employee id
+    # value: serialized array of certificate identifiers
+    
+     my $certificates = CTX('api')->get_data_pool_entry( {
+        PKI_REALM => $thisrealm,
+        NAMESPACE => 'smartcard.user.certificate',
+        KEY => $holder_employee_id ,         
+    } );
+    
+    if ($certificates) {
+    
+    my $ser = OpenXPKI::Serialization::Simple->new();
+    my @certificate_identifiers = $ser->deserialize($certificates);
+
+    my $db_results = CTX('dbi_backend')->select(
+	TABLE => [
+	    'CERTIFICATE',
+	    'CSR',
+	],
+	COLUMNS => [
+	    'CSR.PROFILE',
+	    'CERTIFICATE.SUBJECT',
+	    'CERTIFICATE.IDENTIFIER',
+	    'CERTIFICATE.ROLE',
+	    'CERTIFICATE.STATUS',
+	    'CERTIFICATE.DATA',
+	    'CERTIFICATE.NOTBEFORE',
+	    'CERTIFICATE.NOTAFTER',
+	],
+	DYNAMIC => {
+	    'CSR.PROFILE' => \@profiles,
+	    'CERTIFICATE.PKI_REALM' => $thisrealm,
+	    'CERTIFICATE.IDENTIFIER' => \@certificate_identifiers,
+	},
+	JOIN => [
+	    [
+	     'CSR_SERIAL',
+	     'CSR_SERIAL',
+	    ],
+	],
+	);
 	    
-	    # entry was found in the database
-	    foreach my $entry (@{$db_results}) {
+	# Loop thru results 
+    foreach my $entry (@{$db_results}) {
 		my $db_hash = {};
-# 		if (0) {
-# 		    ##! 16: 'parsing certificate'
-# 		    my $x509 = OpenXPKI::Crypto::X509->new(
-# 			DATA => $db_results->{'CERTIFICATE.DATA'},
-# 			TOKEN => $default_token,
-# 			);
-		    
-# 		    $db_hash = { 
-# 			$x509->to_db_hash(),
-# 		    };
-# 		}
 		
 		# merge database query results with parsed cert
 		##! 16: 'merging certificate information from database'
@@ -670,34 +621,38 @@ sub sc_analyze_smartcard {
 		# save full certificate details
 		$user_certs->{by_identifier}->{$identifier} = $db_hash;
 		
+		# resolve type from profile using xref, NB: requires that a profile may not be used in two types		
+		my $type = $policy->get(['xref.profile', $db_hash->{PROFILE}, 'type']); 
 		# xrefs
 		push @{$user_certs->{by_type}->{$type}}, 
 		    $user_certs->{by_identifier}->{$identifier};
-		push @{$user_certs->{by_profile}->{$profile}}, 
+		push @{$user_certs->{by_profile}->{$db_hash->{PROFILE}}}, 
 		    $user_certs->{by_identifier}->{$identifier};
-	    }
-	}
-    }
+    } # db loop
+    } # if certificates
     ##! 16: 'certificates already existing for user: ' . Dumper $user_certs
 
     ###########################################################################
     # process policy requirements for all user certificates
 
-    foreach my $type (keys %{$policy->{certs}->{type}}) {
+    foreach my $type ($policy->get('certs.type')) {
 	next if ($type =~ m{ \A (?:UNEXPECTED|FOREIGN) \z }xms);
 
 	$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
 	$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
+	$result->{CERT_TYPE}->{$type}->{preferred_cert_exists} = 0;
 	
 	my @expected_certs;
-	my $max_certs = $policy->{certs}->{type}->{$type}->{limits}->{max_count};
-	my $min_certs = $policy->{certs}->{type}->{$type}->{limits}->{min_count};
+	my $min_certs = $policy->get(['certs.type', $type, 'limits.min_count']);
+	my $max_certs = $policy->get(['certs.type', $type, 'limits.max_count']);
+
 	my $cutoff_date;
-	if (defined $policy->{certs}->{type}->{$type}->{limits}->{max_age}) {
+	my $max_age = $policy->get(['certs.type', $type, 'limits.max_age']);
+	if (defined $max_age) {
 	    $cutoff_date = OpenXPKI::DateTime::get_validity(
 		{
 		    REFERENCEDATE => DateTime->now(),
-		    VALIDITY => $policy->{certs}->{type}->{$type}->{limits}->{max_age},
+		    VALIDITY => $max_age,
 		    VALIDITYFORMAT => 'relativedate',
 		});
 	}
@@ -727,7 +682,7 @@ sub sc_analyze_smartcard {
 	    }
 	}
 	
-	# propagate flag if at least one escrow certificate exists
+	# propagate flag if at least one certificate exists
 	if (scalar @expected_certs > 0) {
 	    $result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 1;
 	    ##! 16: 'at least one certificate exists for type: ' . $type
@@ -749,7 +704,8 @@ sub sc_analyze_smartcard {
 	    # if the latest certificate's private key is not in the database
 	    # this does not qualify as a 'usable' certificate (only for
 	    # certs which should be escrowed)
-	    if ($policy->{certs}->{type}->{$type}->{escrow_key}
+	     
+	    if ($policy->get(['certs.type', $type, 'escrow_key'])
 		&& ! $cert->{PRIVATE_KEY_AVAILABLE}) {
 		##! 16: 'certificate does not qualify because it is supposed to be an escrowed cert and no private key is available'
 		$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
@@ -811,8 +767,8 @@ sub sc_analyze_smartcard {
 	# escalate overall visual status
 	if (defined $cert_visual_status) {
 	    # do not consider certficates which are escrowed (used for
-	    # encyption)
-	    if (! $policy->{certs}->{type}->{$cert_type}->{escrow_key}) {
+	    # encyption)	           
+	    if (! $policy->get(['certs.type', $cert_type, 'escrow_key'])) {
 		$result->{OVERALL_STATUS} = $self->_aggregate_visual_status(
 		    $result->{OVERALL_STATUS},
 		    $cert_visual_status,
@@ -856,11 +812,10 @@ sub sc_analyze_smartcard {
 	# only propagate escrow certificates for recovery
 	if (defined $to_restore{$identifier}) {
 	    ##! 16: 'flagged for recovery'
-
-	    if ($policy->{certs}->{type}->{$cert_type}->{escrow_key}) {
+            
+	    if ($policy->get(['certs.type', $cert_type, 'escrow_key'])) {
 		##! 16: 'is escrow cert, queue for recovery'
-
-		if ($policy->{certs}->{type}->{$cert_type}->{ignore_certificates_with_missing_private_key}) {
+		if ($policy->get(['certs.type', $cert_type, 'ignore_certificates_with_missing_private_key'])) {
 		    ##! 16: 'checking if private key is available for cert identifier ' . $identifier
 		    
 		    if (! $cert->{PRIVATE_KEY_AVAILABLE}) {
@@ -877,11 +832,11 @@ sub sc_analyze_smartcard {
     # check for certificates missing on token
   CERT_TYPE:
     foreach my $type (keys (%missing_certs_on_token_by_type)) {
-	next CERT_TYPE if ($type =~ m{ \A (?:FOREIGN|UNEXPECTED) }xms);
-	my $min_count = $policy->{certs}->{type}->{$type}->{limits}->{min_count} || 0;
+	next CERT_TYPE if ($type =~ m{ \A (?:FOREIGN|UNEXPECTED) }xms);	
+	my $min_count = $policy->get(['certs.type', $type, 'limits.min_count'])|| 0;
 	##! 16: 'check if expected certificates are present for type ' . $type
 	$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 1;
-
+	
 	my $cert_count = 0;
 	if (exists $certs_on_token_by_type{$type}) {
 	    $cert_count = scalar @{$certs_on_token_by_type{$type}};
@@ -916,18 +871,24 @@ sub sc_analyze_smartcard {
     foreach my $type (keys %preferred_cert_available_by_type) {
 	next if ($type eq 'FOREIGN');
 
-	if ($policy->{certs}->{type}->{$type}->{promote_to_preferred_profile}) {
-	    if (! $preferred_cert_available_by_type{$type}) {
-		$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
+	if ($policy->get(['certs.type', $type, 'promote_to_preferred_profile'])) {
+	    if ( $preferred_cert_available_by_type{$type}) {
+            # As the preferred certifiate exists, the check if it is on the
+            # card is done above - so no need to take care of it here.
+	        $result->{CERT_TYPE}->{$type}->{preferred_cert_exists} = 1;
+	    } else {
+		    $result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
+			
 		$result->{OVERALL_STATUS} = $self->_aggregate_visual_status(
 		    $result->{OVERALL_STATUS},
 		    'red',
 		    );
 		$result->{PROCESS_FLAGS}->{will_need_pin} = 1;
-	    }
-	}
+				
+    	}
     }
-
+    }
+       
     # an overall status that is not green indicates that we probably need the
     # pin
     if ($result->{OVERALL_STATUS} ne 'green') {
@@ -980,174 +941,56 @@ sub _get_policy {
     my $self = shift;
     my $arg_ref = shift;
 
-    our $policy =
-    {
-	directory => {
-	    ldap => {
-		uri => 'ldaps://localhost:389',
-		bind_dn => 'cn=admin,dc=example,dc=com',
-		pass => 'changeme',
-	    },
-	    person => {
-		basedn => 'ou=persons,dc=example,dc=com',
-		userid_attribute => 'mail',
-		loginid_attribute => 'ntloginid',
-		max_smartcards_per_user => 1,
-		attributes =>  [ qw( CN givenName initials sn mail ) ],
-	    },
-	    smartcard => {
-		basedn => 'ou=smartcards,dc=example,dc=com',
-	    },
-	    groups => {
-		badge_officer => 'cn=Badge Officer,ou=groups,dc=example,dc=com',
-	    },
-	},
-	certs => {
-	    type => {
-		'nonescrow' => {
-                    # usages are literally reported back to caller
-		    usage => [ 'AUTHENTICATION', 'SIGNATURE' ],
-		    # list allowed profiles, with descending priority (first
-		    # profile preferred) 
-		    allowed_profiles => 
-			[
-			 'I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL',
-			 'I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL',
-			],
-		    # if promote_to_preferred_profile is requested, analysis
-		    # will schedule a certificate for re-issuance with the
-		    # preferred profile from allowed_profiles if an older
-		    # profile is found.
-		    promote_to_preferred_profile => 1,
-		    # if set to true the api function will check if a private
-		    # key exists in the database when building a list of
-		    # expected certificates. certificates with a missing
-		    # private key will not be scheduled for recovery.
-		    # obviously only applicable to escrowed certificates.
-		    ignore_certificates_with_missing_private_key => 0,
-		    # limits for this type of certificates on token 
-		    # min_count: integer, min required number of certs
-		    # max_count: integer
-		    # max_age: string, '-YY', number of years to keep old certs
-		    limits => {
-			min_count => 1,
-			max_count => 1,
-		    },
-		    # allow renewal of this type of certificates before
-		    # expiration (will result in "amber" condition)
-		    allow_renewal => '-0003', # 00 years, 03 months
-		    # force renewal before expiration (will result in
-		    # "red" condition)
-		    force_renewal => '-000014', # 14 days
-		    # if key_escrow is set to 0 the key is generated on the
-		    # token. certificate is not recoverable.
-		    # if key_escrow is set to 1 the key is generated in the
-		    # PKI system. cert and key can be recovered by the user
-		    # (in case of lost or damaged token) or by an escrow
-		    # officer.
-		    # expired certificates with escrow_key = 1 are never 
-		    # purged from the smartcard until limits/max_age or
-		    # limits/max_count is exceeded
-		    escrow_key => 0,
-		    # if publish is set to 1 a newly issued certificate
-		    # of this type is published to the configured directory
-		    publish => 0,
-		    # if purge_invalid is set, only keep valid certificates
-		    # on smartcard
-		    purge_invalid => 1,
-		},
-		'escrow' => {
-		    usage => [ 'ENCRYPTION' ],
-		    allowed_profiles => 
-			[
-			 'I18N_OPENXPKI_PROFILE_USER_ENCRYPTION',
-			 'I18N_OPENXPKI_PROFILE_USER_FSE',
-			],
-		    promote_to_preferred_profile => 1,
-		    ignore_certificates_with_missing_private_key => 1,
-		    limits => {
-			min_count => 1,
-			max_count => 8,
-			max_age => '-10',  # years
-		    },
-		    allow_renewal => '-0003',
-		    force_renewal => undef,
-		    escrow_key => 1,
-		    publish => 1,
-		    purge_invalid => 0,
-	        },
-		# certificates known to our PKI but not explicitly listed above
-		'UNEXPECTED' => {
-		    # if purge_valid is set to 1 a valid certificate of this
-		    # type found on the smartcard will be purged
-		    purge_valid => 0,
-		    # if purge_valid is set to 1 an invalid (e. g. expired) 
-		    # certificate found on the smartcard will be purged
-		    purge_invalid => 0,
-		},
-		# certificates unknown to our PKI
-		'FOREIGN' => {
-		    # if purge_valid is set to 1 a valid certificate of this
-		    # type found on the smartcard will be purged
-		    purge_valid => 1,
-		    # if purge_valid is set to 1 an invalid (e. g. expired) 
-		    # certificate found on the smartcard will be purged
-		    purge_invalid => 0,
-		}
-	    },
-	},
-    };
-    
-    #our $ldap_settings;
+    # Policy is now served from conenctor 
+    my $config = CTX('config');
+    my $policy = $config->getWrapper( 'smartcard.policy' );
 
-    # 2010-10-28 Martin Bartosch: TODO FIXME XXX
-    # This is a really ugly hack to avoid slurping in configuration from
-    # our XML. Needs badly to be rewritten prior to pushing to upstream.
-    # XXXXXXXXXXXXX
-    do '/etc/openxpki/policy.pm' || die "Could not open ldap parameters file.";
-    ##! 16: 'policy: ' . Dumper $policy
+    # This is currently only working inside one execution thread due to forking                
+    # We need to run the index only once
+    if ($policy->get('xref.cached')) {
+        ##! 8: 'policy already indexed'
+        return $policy;
+    }
+    
+    
 
     ###########################################################################
-    ##! 16: 'indexing policy'
+    ##! 8: 'indexing policy'
     my $ref;
-  TYPE:
-    foreach my $type (keys %{$policy->{certs}->{type}}) {
-	my $index = 0;
-	##! 16: "cert type: $type"
 
-	foreach my $allowed_profile (@{$policy->{certs}->{type}->{$type}->{allowed_profiles}}) {
-	    $ref->{profile}->{$allowed_profile}->{type} = $type;
-	    if (! $index++) {
-		# first profile is preferred
-		$ref->{profile}->{$allowed_profile}->{preferred} = 1;
-	    }
-	    
-	    $ref->{type}->{$type}->{allowed_profile}->{$allowed_profile} = 1;
-	}
-
-	foreach my $item (qw( min_count max_count max_age )) {
-	    $ref->{type}->{$type}->{limits}->{$item} 
-	    = $policy->{certs}->{type}->{$type}->{limits}->{$item};
-	}
-
-	foreach my $item (qw( allow_renewal key_escrow publish purge_invalid purge_valid )) {
-	    $ref->{type}->{$type}->{policy}->{$item} 
-	    = $policy->{certs}->{type}->{$type}->{$item};
-	}
-
-	foreach my $usage (@{$policy->{certs}->{type}->{$type}->{usage}}) {
-	    ##! 16: 'usage: ' . $usage
-	    $ref->{usage}->{$usage}->{type} = $type;
-	    $ref->{type}->{$type}->{usage}->{$usage} = 1;
-	}
-
-	##! 16: "certificate type: $type; policy: " . Dumper $policy->{certs}->{type}->{$type}
+    foreach my $type ( $policy->get( [ 'certs.type'] ) ) {
+    
+        my $index = 0;
+        my $allowed_profile_count = $policy->get([  'certs.type', $type, 'allowed_profiles' ]) || 0;
+        for ($index = 0; $index < $allowed_profile_count; $ index++) {  
+            my $allowed_profile = $policy->get([  'certs.type', $type, 'allowed_profiles', $index ]);
+            
+            $policy->set(['xref.profile', $allowed_profile, 'type'], $type );        
+            if ($index == 0) {
+                # first profile is preferred
+                $policy->set(['xref.profile', $allowed_profile, 'preferred'], 1 );            
+            }                
+            $policy->set(['xref.type', $type, 'allowed_profile', $allowed_profile ], 1 );
+        }
+            
+        foreach my $item (qw( min_count max_count max_age )) {
+            $policy->set([ 'xref.type', $type,'limits',$item], $policy->get([  'certs.type', $type, 'limits', $item ]));
+        }
+            
+        foreach my $item (qw( allow_renewal escrow_key publish purge_invalid purge_valid )) {
+            $policy->set([ 'xref.type', $type,'policy',$item], $policy->get([  'certs.type', $type, $item ]));         
+        }
+    
+        my $usage_count = $policy->get([  'certs.type', $type, 'usage' ]) || 0;
+        for ($index = 0; $index < $usage_count; $ index++) {  
+            my $usage = $policy->get([  'certs.type', $type, 'usage', $index ]);        
+            #$policy->set([ 'xref.usage', $usage, 'type' ], $type ); # Seems not to be in use
+            $policy->set([ 'xref.type' , $type, 'usage', $usage ], 1 );        
+        }    
+         
     }
-
-    $policy->{xref} = $ref;
-
-    ##! 16: 'complete policy: ' . Dumper $policy
-
+   
+    $policy->set('xref.cached', 1);        
     return $policy;
 }
 
@@ -1178,8 +1021,8 @@ sub __check_db_hash_against_policy {
     my $type = 'FOREIGN';
     if (defined $profile) {
 	# cert is know to our PKI
-	$type = $policy->{xref}->{profile}->{$profile}->{type};
-	my $is_preferred = $policy->{xref}->{profile}->{$profile}->{preferred} || 0;
+	$type = $policy->get(['xref.profile', $profile, 'type']);
+	my $is_preferred = $policy->get(['xref.profile', $profile, 'preferred']) || 0;
 
 	$db_hash->{CERTIFICATE_TYPE} = $type;
 	
@@ -1192,7 +1035,8 @@ sub __check_db_hash_against_policy {
 	} else {
 	    # we expect this cert type on the token, and hence export
 	    # the intended usage
-	    foreach my $usage (keys %{ $policy->{xref}->{type}->{$type}->{usage}}) {
+	    
+	    foreach my $usage ($policy->get(['xref.type', $type, 'usage'])) {
 		# export usage to caller
 		$db_hash->{SMARTCARD_USAGE}->{$usage} = 1;
 	    }
@@ -1200,8 +1044,8 @@ sub __check_db_hash_against_policy {
 	    # check if private key is available in the database for
 	    # escrowed certificates
 	    $db_hash->{PRIVATE_KEY_AVAILABLE} = 0;
-
-	    if ($policy->{certs}->{type}->{$type}->{escrow_key}) {
+        
+	    if ($policy->get(['certs.type', $type, 'escrow_key'])) {
 		my $identifier = $db_hash->{IDENTIFIER};
 		##! 16: 'checking if private key is available for cert identifier ' . $identifier
 		
@@ -1263,11 +1107,12 @@ sub __check_db_hash_against_policy {
     
     foreach my $entry(qw( allow_renewal force_renewal )) {
 	$validity_properties{$entry} = 0;
-	if (defined $policy->{certs}->{type}->{$type}->{$entry}) {
+	my $validity = $policy->get(['certs.type', $type, $entry]);
+	if (defined $validity) {
 	    my $renewal_date = OpenXPKI::DateTime::get_validity(
 		{
 		    REFERENCEDATE => $notafter,
-		    VALIDITY => $policy->{certs}->{type}->{$type}->{$entry},
+		    VALIDITY => $validity,
 		    VALIDITYFORMAT => 'relativedate',
 		});
 	    
@@ -1284,7 +1129,8 @@ sub __check_db_hash_against_policy {
     # visual status may be 'green' (valid), 'amber' (nearing expiration)
     # or 'red' (expired or revoked)
     
-    if ($policy->{certs}->{type}->{$type}->{purge_invalid}) {
+    
+    if ($policy->get(['certs.type', $type, 'purge_invalid'])) {
 	# only set red status on certs that shall be purged 
 	# after expiration
 	
@@ -1296,7 +1142,7 @@ sub __check_db_hash_against_policy {
 	}
     }
     
-    if ($policy->{certs}->{type}->{$type}->{purge_valid}) {
+    if ($policy->get(['certs.type', $type, 'purge_valid'])) {
 	# policy do not want us to keep this certificate
 	
 	$db_hash->{VISUAL_STATUS} ||= 'red';
@@ -1540,9 +1386,339 @@ This API handles Smartcard specific calls.
 
 =head1 Functions
 
-sc_analyze_smartcard
+=head2 sc_parse_certificates
+
+This function parses the specified certificates and returns the parsed 
+results in the return list.
+
+=head3 Named function parameters
+
+=over 8
+
+=item * CERTS (mandatory)
+
+This parameter is a list of certificates as read from the card.
+
+=item * CERTFORMAT (mandatory)
+
+Supported formats for the CERTS parameter are DER|PEM|BASE64|IDENTIFIER.
+BASE64 will accept degraded formats (i. e. data without whitespace or padding).
+If IDENTIFIER is selected, the function will retrieve the specified
+certificate from the database
+and analyze it.
+
+=back
+
+=head3 Synopsis
+
+The function iterates through all certificates passed to the function
+and parses them.
+
+If the certificate is found in the database it is also
+checked against the desired policy.
+
+Determine the certificate type:
+
+=over 8
+
+=item * If the certificate is not known to the system (not found in 
+the database), the type is set to "FOREIGN"
+
+=item * If the certificate was found in the database, but
+according to the policy should not be found on the
+card the type will be set to "UNEXPECTED"
+
+=item * If the certificate was expected on the certificate
+the type is set to the symbolic name from the policy.
+
+=back
+
+=head3 Function results
+
+The function will return an array reference containing the detailed 
+information about the passed certificates. 
+A single entry of the list has the following structure (not all entries 
+may be set):
+
+=over 8
+
+=item * CERTIFICATE_SERIAL
+
+=item * IDENTIFIER
+
+=item * PKI_REALM
+
+=item * SUBJECT
+
+=item * ISSUER_DN
+
+=item * ISSUER_IDENTIFIER
+
+=item * EMAIL
+
+=item * PUBKEY
+
+=item * SUBJECT_KEY_IDENTIFIER
+
+=item * AUTHORITY_KEY_IDENTIFIER
+
+=item * NOTBEFORE
+
+Seconds since Epoch
+
+=item * NOTBEFORE_ISO
+
+NotBefore date in ISO format
+
+=item * NOTAFTER
+
+Seconds since Epoch
+
+=item * NOTAFTER_ISO
+
+NotAfter date in ISO format
+
+=item * ROLE
+
+=item * STATUS
+
+=item * PROFILE
+
+=item * CERTIFICATE_TYPE
+
+If the type is "FOREIGN" the system does not know this certificate.
+If it is "UNEXPECTED", the system knows the certificate but has decided 
+it should normally not be present on the card. 
+Everything else: the certificate was expected on the card, and the type 
+contains the symbolic purpose name of the certificate as set in the policy.
+
+=item * PRIVATE_KEY_AVAILABLE
+
+This value is set to 1 if the corresponding private key is available 
+in the database.
+
+=item * PREFERRED_PROFILE
+
+This is set to 1 if the profile of this certificate is the most recent 
+of the accepted profiles for the intended purpose.
+
+=item * SMARTCARD_USAGE
+
+This value is a hash ref, with the keys being the intended purposes. 
+If the key NONE is set, the certificate does not fit any purpose 
+according to the configured policy.
+
+=back
+
+=head2 sc_analyze_smartcard
+
+This API function can be called by an OpenXPKI client in order to 
+analyze the state of a given Smartcard.
+
+=head3 Named function parameters
+
+=over 8
+
+=item * SMARTCARDID (mandatory)
+
+This parameter shall be set to the Smartcard chip serial number 
+as read from the card. The API function will query this serial number
+from the associated directory or repository and determine the 
+designated owner of the card.
+
+The parameter format is defined in the Smartcard Interfaces document.
+
+=item * USERID (optional)
+
+If available, the user id of the currently logged in user should be 
+supplied by the caller. This may be different from the actual 
+Smartcard holder.
+
+=item * CERTS (optional)
+
+see sc_parse_certificates
+
+=item * CERTFORMAT (mandatory if CERTS is given)
+
+see sc_parse_certificates
+
+=item * WORKFLOW_TYPES (optional)
+
+This parameter is a list of workflow type names to be queried. If 
+specified, the analyze function will search for existing workflows of 
+the specified types that are owned by the holder of the Smartcard 
+of SMARTCARDID.
+
+This is merely a convenience function that simply wraps the 
+search_workflow_instances API function.
+
+=head3 Function results
+
+The function will return a complex data structure containing the 
+results of the Smartcard analysis.
+
+These results are directly influenced by
+
+=over 8
+
+=item * internal status of the PKI database (e. g. existing certificates
+for the user)
+
+=item * external resources (such as LDAP directory contents)
+
+=item * the passed parameters and
+
+=item * the configured policy
+
+=back
+
+The results of the function can be directly used for decisions on how 
+the actual personalization should happen. 
+
+=head4 Return structure:
+
+=over 8
+
+
+=item * OVERALL_STATUS (scalar)
+
+This is the global status of the Smartcard which can be directly 
+displayed by the frontend.
+
+Possible values: 'green' (default), 'amber', 'red'
+
+
+=item *            - SMARTCARD (hashref)
+
+The referenced structure contains the details of the Smartcard:
+
+=over 8
+
+=item * serialnumber (scalar)
+
+Canonical serial number of the Smartcard
+
+=item * status (scalar)
+
+Smartcard status
+
+=item * assigned_to (scalar)
+
+Designated holder of the Smartcard
+
+=item * keyalg (scalar)
+
+Asymmetric algorith supported (preferred) by this Smartcard
+
+=item * keysize (scalar)
+
+Key size supported (preferred) by this Smartcard
+
+=item * default_puk (scalar)
+
+Default PUK for this Smartcard (may be undefined)
+
+=back
+
+=item * CERT_TYPE (hashref)
+
+symbolic type name (hash, taken from policy configuration, one entry
+for each configured type)
+
+=over 8
+
+=item * usable_cert_exists (scalar, interpreted as boolean)
+
+A usable certificate for this purpose exists in the database.
+
+=item * token_contains_expected_cert (scalar, interpreted as boolean)
+
+The Smartcard contains the expected certificate for this purpose.
+
+=item * escrow_private_key (scalar, interpreted as boolean)
+
+If the Smartcard is missing the certificate, the workflow will 
+install the necessary certificate on the Smartcard. 
+
+If this value is false, the private key shall be generated on the
+Smartcard by the frontend.
+
+If the value is true, the Workflow will generate a private key and store it internally.
+
+=back
+
+=item * CERT_TYPES (array)
+
+Lists all certificate types configured for this Smartcard. This is 
+identical to the keys of CERT_TYPE in the return structure.
+
+=item * WORKFLOWS (hashref)
+
+Returned data is identical to the result of the 
+search_workflow_instances() API function.
+
+=item * PROCESS_FLAGS (hash of scalars, interpreted as booleans)
+
+These flags can be used for decisions in the personalization workflow.
+
+=over 8
+
+=item * allow_personalization
+
+User is allowed to start a personalization workflow (complex decision 
+based on smartcard status, puk availability etc)
+
+=item * will_need_pin
+
+Smartcard PIN is required for following operations (either the user's 
+pin or an autogenerated random pin)
+
+=item * will_need_random_pin
+
+If false the user may select his own pin, otherwise the pin will be 
+selected by the server
+
+=item * allow_user_pin
+
+Allow user to enter existing pin (otherwise autogenerate random 
+pin -> pin unblock needed after completion)
+
+=item * need_wf_approval
+
+Policy setting: if set 0/false no approval is required for user 
+cert issuance
+
+=item * purge_token_before_unblock
+
+Policy setting: if true the token must be completely purged before 
+an unblock operation may happen
+
+=item * have_cert_to_delete
+
+Smartcard cleanup is necessary (at least one certificate must be 
+deleted from the card)
+
+=item * have_cert_to_unpublish
+
+Directory cleanup is necessary (at least one certificate must be 
+deleted from the directory)
+
+=item * puk_is_writable
+
+Smartcard puk can be modified
+
+=item * puk_found_in_datapool
+
+Smartcard puk is available in datapool
+
+=back
+
+
 
 Parsed certificates:
+
+
+
 VISUAL_STATUS:
 'green': certificate is OK
 'amber': certificate is still valid but may be renewed (will expire soon)

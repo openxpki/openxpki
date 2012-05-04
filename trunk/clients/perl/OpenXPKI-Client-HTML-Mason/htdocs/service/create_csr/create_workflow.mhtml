@@ -26,7 +26,11 @@
     $params{"cert_role"}             = $role             if (defined $role);
     $params{"cert_profile"}          = $profile          if (defined $profile);
     $params{"cert_subject_style"}    = $subject_style    if (defined $subject_style);
-    $params{"cert_subject_parts"}    = $ser->serialize($subject_parts)    if (defined $subject_parts);
+    if (defined $subject_parts) {
+        my $cert_subject_parts  = $ser->serialize($subject_parts);
+        Encode::_utf8_on($cert_subject_parts);
+        $params{"cert_subject_parts"}    = $cert_subject_parts;
+    }
     $params{"cert_subject_alt_name_parts"} = $ser->serialize($subject_alt_name_parts) if (defined $subject_alt_name_parts);
     $params{"cert_info"}             = $ser->serialize($info)             if (defined $info);
     $params{"spkac"}                 = $spkac            if (defined $spkac);
@@ -67,4 +71,5 @@
 <%once>
     use OpenXPKI::Serialization::Simple;
     my $ser = OpenXPKI::Serialization::Simple->new();
+    use Encode;
 </%once>

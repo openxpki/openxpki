@@ -11,6 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Workflow::WFObject::WFHash; 
 
 use Data::Dumper;
 
@@ -112,6 +113,16 @@ sub execute {
         $context->param(
             'csr_serial' => $serializer->serialize(\@csr_serials),
         );
+                
+        # Link the escrow key handle to the csr_id 
+        if ($csr_data->{'escrow_key_handle'}) {
+            ##! 16: 'Add escrow key handle ' . $csr_data->{'escrow_key_handle'}
+            my $cert_escrow_handle_context = OpenXPKI::Server::Workflow::WFObject::WFHash->new(
+                { workflow => $workflow , context_key => 'cert_escrow_handle' } );        
+            $cert_escrow_handle_context->setValueForKey( $csr_serial => $csr_data->{'escrow_key_handle'} );
+        }
+        
+        
     }
     return;
 }

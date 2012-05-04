@@ -26,6 +26,9 @@ sub execute {
     my $default_token = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{crypto}->{default};
     my $api           = CTX('api');
 
+
+    # TODO: CONNECTOR
+    # get this information from the connector
     my $ldap_server     = $context->param('ad_server');
     my $ldap_port       = $context->param('ad_port');
     my $ldap_basedn     = $context->param('ad_basedn');
@@ -58,16 +61,23 @@ sub execute {
     my ($domain, $userid)
         = ($login_id =~ m{ \A (.+)\\(.+) }xms);
 
-    if ($domain =~ m{\A dblux \z}xmsi) {
-        # for DBLUX, we need special configuration
-        $ldap_userdn = $self->param('ad_dblux_userdn');
-        $ldap_pass   = $self->param('ad_dblux_pass');
+    # TODO: CONNECTOR
+    # $domain contains the AD domain of the user, $userid is the login id
+    # the actual AD to contact may depend on $domain if there is more than
+    # one AD forest in the orgainization.
+    # We mimic this with the domains foo and bar here, to be replaced
+    # by a decent connector.
+    if ($domain =~ m{\A foo \z}xmsi) {
+        # for AD domain foo, we need special configuration
+        $ldap_userdn = $self->param('ad_foo_userdn');
+        $ldap_pass   = $self->param('ad_foo_pass');
     }
-    if ($domain =~ m{\A dbch \z}xmsi) {
-        # for DBCH, we need special configuration
-        $ldap_userdn = $self->param('ad_dbch_userdn');
-        $ldap_pass   = $self->param('ad_dbch_pass');
+    if ($domain =~ m{\A bar \z}xmsi) {
+        # for AD domain bar, we need special configuration
+        $ldap_userdn = $self->param('ad_bar_userdn');
+        $ldap_pass   = $self->param('ad_bar_pass');
     }
+
     ##! 2: 'connecting to ldap server ' . $ldap_server . ':' . $ldap_port
     my $ldap = Net::LDAP->new(
         $ldap_server,

@@ -32,15 +32,7 @@ sub execute {
 #    my $role       = $self->param('role');
 #    ##! 64: 'role from config file: ' . $role
 
-    my $queue_key = $self->param('csr_queue_key') || 'csr_serial';
-
-    my $csrs = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
-	{ 
-	    workflow => $workflow,
-	    context_key => $queue_key,
-	} );
-
-    my $csr_serial = $csrs->shift();
+    my $csr_serial = $context->param('csr_serial');
 
     ##! 64: 'checking csr serial validity: ' . $csr_serial
     if (! defined $csr_serial) {

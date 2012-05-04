@@ -8,7 +8,7 @@
 PORTNAME=	openxpki
 PORTVERSION=	0.9.1389
 CATEGORIES=	security perl5
-MASTER_SITES=	SF/${PORTNAME}/${PORTNAME}/0.9.1300
+MASTER_SITES=	http://www7.openxpki.org/lastmidnight/ SF/openxpki/openxpki/0.9.1300
 PKGNAMEPREFIX=	p5-
 DISTNAME=	OpenXPKI-${PORTVERSION}
 DIST_SUBDIR=	openxpki
@@ -16,10 +16,14 @@ DIST_SUBDIR=	openxpki
 MAINTAINER=	svysh@pn.sinp.msu.ru
 COMMENT=	Perl based trustcenter software for PKI: core for server
 
+LICENSE=	AL2
+
 BUILD_DEPENDS=	\
 	p5-Workflow>=0.31:${PORTSDIR}/devel/p5-Workflow \
 	${SITE_PERL}/CGI/Session.pm:${PORTSDIR}/www/p5-CGI-Session \
 	${SITE_PERL}/Date/Format.pm:${PORTSDIR}/devel/p5-TimeDate \
+	${SITE_PERL}/Proc/SafeExec.pm:${PORTSDIR}/devel/p5-Proc-SafeExec \
+	${SITE_PERL}/Switch.pm:${PORTSDIR}/lang/p5-Switch \
 	${SITE_PERL}/Locale/Recode.pm:${PORTSDIR}/devel/p5-Locale-libintl \
 	${SITE_PERL}/Net/LDAP.pm:${PORTSDIR}/net/p5-perl-ldap \
 	${SITE_PERL}/Regexp/Common.pm:${PORTSDIR}/textproc/p5-Regexp-Common \
