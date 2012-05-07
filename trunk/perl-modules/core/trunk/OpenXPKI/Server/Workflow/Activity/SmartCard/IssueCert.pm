@@ -238,7 +238,7 @@ sub execute {
 
     my @certificate_identifiers;
     if ($certificates) {
-	@certificate_identifiers = $serializer->deserialize($certificates->{VALUE});
+	   @certificate_identifiers =  @{$serializer->deserialize($certificates->{VALUE})};
     }
     push @certificate_identifiers, $identifier;
     
@@ -247,7 +247,7 @@ sub execute {
 	    PKI_REALM => $realm,
 	    NAMESPACE => 'smartcard.user.certificate',
 	    KEY => $context->param('userinfo_workflow_creator'),
-	    VALUE => $serializer->serialize(@certificate_identifiers),
+	    VALUE => $serializer->serialize(\@certificate_identifiers),
 	    FORCE => 1,
 	} );
 

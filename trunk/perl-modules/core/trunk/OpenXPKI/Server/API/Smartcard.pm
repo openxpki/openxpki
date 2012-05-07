@@ -551,7 +551,7 @@ sub sc_analyze_smartcard {
     # sort and index the exisiting certificates
     
     my $user_certs = {
-	by_identifyer => {},
+	by_identifier => {},
 	by_type => {},
 	by_profile => {},
 	xref => {
@@ -598,7 +598,9 @@ sub sc_analyze_smartcard {
     if ($certificates) {
     
     my $ser = OpenXPKI::Serialization::Simple->new();
-    my @certificate_identifiers = $ser->deserialize($certificates->{VALUE});
+    my @certificate_identifiers = @{$ser->deserialize($certificates->{VALUE})};
+
+    ##! 32: ' Users certificate_identifiers (from datapool) ' . Dumper @certificate_identifiers ; 
 
     my $db_results = CTX('dbi_backend')->select(
 	TABLE => [
@@ -936,6 +938,7 @@ sub sc_analyze_smartcard {
 # input: array of string, allowed values must be one of 'green', 'amber', 'red'
 # output: "maximum" of the passed values
 sub _aggregate_visual_status {
+    
     my $self = shift;
     my @args = @_;
     my %escalation_level_of = (
@@ -947,7 +950,7 @@ sub _aggregate_visual_status {
         keys %escalation_level_of;
 
     my $overall_level = 0;
-    foreach my $status (@args) {
+    foreach my $status (@args) {    
 	if (! exists $escalation_level_of{$status}) {
 	    OpenXPKI::Exception->throw(
 		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_AGGREGATE_VISUAL_STATUS_INVALID_STATUS_CODE',
@@ -964,6 +967,7 @@ sub _aggregate_visual_status {
 	if ($escalation_level_of{$status} > $overall_level) {
 	    $overall_level = $escalation_level_of{$status};
 	}
+	##! 32: ' This status: ' . $status . ' - new overall status ' . $color_of{$overall_level} 
     }
     
     return $color_of{$overall_level};
