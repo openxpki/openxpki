@@ -23,7 +23,7 @@ ogflowopts :=
 #ogflowopts := --verbose
 metaconf := trunk/deployment/bin/openxpki-metaconf
 config := config/workflow.cfg
-workflows := test_tools smartcard_cardadm smartcard_personalization_v3
+workflows := test_tools smartcard_cardadm smartcard_personalization_v4
 
 # config/workflow.inc contains common settings for all customized workflows
 include config/workflow.inc

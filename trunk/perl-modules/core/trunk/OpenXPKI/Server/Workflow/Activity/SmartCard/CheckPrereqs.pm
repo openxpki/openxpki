@@ -23,13 +23,14 @@ sub execute {
 	my $token_id = $context->param('token_id');
 
 	my %params;
-	if ($context->param('login_id') ne '') {
-	    $params{USERID} = $context->param('login_id');
+	if ($context->param('user_id') ne '') {
+	    $params{USERID} = $context->param('user_id');
 	}
 
 	my @certs = split(/;/, $context->param('certs_on_card'));
 	
 	my $ser = OpenXPKI::Serialization::Simple->new();
+
     my @LOGIN_IDS;
     if ($context->param('login_ids')) {
         @LOGIN_IDS = $ser->deserialize( $context->param('login_ids') )
@@ -40,6 +41,8 @@ sub execute {
  		CERTS => \@certs,
 		CERTFORMAT => 'BASE64',
 		SMARTCARDID => $context->param('token_id'),
+		SMARTCHIPID => $context->param('chip_id'),
+		LOGINIDS => \@LOGIN_IDS,
 		WORKFLOW_TYPES => [ qw( I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK ) ],
 		CONFIG_ID => $self->config_id(),
 		%params,
@@ -80,11 +83,8 @@ sub execute {
         # "preferred_certificate_exists" flag         
         # Assumption: If new certificates for a type are created, we always use
         # the first profile
-        if (!$result->{CERT_TYPE}->{$type}->{usable_certificate_exists} || 
+        if (!$result->{CERT_TYPE}->{$type}->{usable_cert_exists} || 
             !$result->{CERT_TYPE}->{$type}->{preferred_cert_exists}) {            
-            #my $preferred_profile = CTX('config')->get( [ 'smartcard.policy.certs.type', $type, 'allowed_profiles.0' ] );
-            ##! 16: 'Add profile to CSR queue ' . $preferred_profile;  
-            #push @certs_to_create, $preferred_profile;
             push @certs_to_create, $type;                        
         }
 
@@ -117,10 +117,8 @@ sub execute {
     $context->param('user_data_source' =>
         $result->{SMARTCARD}->{user_data_source} );
 
-
-	# propagate LDAP settings to context
-	# TODO Should be renamed as it is no longer "LDAP"
-      LDAP_ENTRY:
+    # Propagate the userinfo to the context
+      USERINFO_ENTRY:
 	foreach my $entry (keys (%{$result->{SMARTCARD}->{assigned_to}})) {
 	    my $value = $result->{SMARTCARD}->{assigned_to}->{$entry};
 	    if (ref $value eq 'ARRAY') {

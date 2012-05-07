@@ -39,12 +39,11 @@ sub execute {
         { workflow => $workflow , context_key => 'cert_issuance_data' } );
     
        
-    # prepare LDAP variable hashref for Template Toolkit
-    # TODO should be renamed with other prefix (see CheckPrereqs)
+    # prepare hashref for Template Toolkit based on userinfo context values
     my $userinfo;
     foreach my $param (keys %{ $context->param() }) {
         if ($param =~ s{ \A userinfo_ }{}xms) {
-            ##! 64: 'adding param ' . $param . ' to ldap_vars, value: ' . $context->param('ldap_' . $param)            
+            ##! 64: 'adding param ' . $param . ' to userinfo, value: ' . $context->param('userinfo_' . $param)            
             $userinfo->{$param} = $context->param('userinfo_' . $param);            
             # Some entries are arrays
             if ($userinfo->{$param} =~ /\A ARRAY/xms) {            
@@ -128,16 +127,30 @@ sub execute {
             @use_logins = @{$allowed_logins};
         }
 
-   
-        my %publishing_target;
-        
         ##! 32: 'Will use these logins ' . Dumper( @use_logins )
         
         foreach my $login (@use_logins) {
             # Fetch the UPN for each login
             ##! 32: ' Search UPN for ' . $login
-            my $res = $config->walkQueryPoints('smartcard.upninfo', $login );
-            if (!$res) {
+ 
+            # Strip domain and user
+            my ($domain, $user) = split(/\\/, $login);	
+            $domain = uc($domain);
+ 
+            # If the login has domain/user format, try if there is a special 
+            # query point for that domain
+         
+            my $upn;
+            if ($user && $config->get_meta( [ 'smartcard.upninfo', $domain ] )) {
+                $upn = $config->get(['smartcard.upninfo', $domain, $user ]);
+                ##! 16: ' Direct domain lookup ' . Dumper( $upn )
+            } else {
+                my $res = $config->walkQueryPoints('smartcard.upninfo', $login );
+                $upn = $res->{VALUE};
+                ##! 16: ' Connector walk ' . Dumper( $res )
+            }     
+
+            if (!$upn) {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_APPLYCSRPOLICY_NO_UPN_FOUND',
                     params => {
@@ -146,21 +159,11 @@ sub execute {
                     },
                 );
             }
-            ##! 16: ' Connctor returned ' . Dumper( $res )
-            push @{$userinfo->{upn}}, $res->{value};
-            $publishing_target{$res->{source}} = 1;
+            push @{$userinfo->{upn}}, $upn;
         }
         
         ##! 16: ' UPNs found ' . Dumper( @{$userinfo->{upn}} )
-        ##! 32: ' Publishing Targets ' . Dumper( keys %publishing_target )
         
-        # The source of the upn queries is used to publish the certificates later
-        my $publishing_target_wf = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
-        {
-            workflow    => $workflow,
-            context_key => 'publishing_target',
-        } );
-        $publishing_target_wf->push( keys %publishing_target );
 
         # Add the chosel logins to the userinfo structure                    
         $userinfo->{chosen_logins} = \@use_logins;
