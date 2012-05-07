@@ -50,7 +50,6 @@ a {
 #wrapper {
 	display:block;
 	float:none;
-	overflow:hidden;
 	margin:0;
 	position:relative;
 }
@@ -354,7 +353,10 @@ a {
 	display:block;
 	float:left;
 	width:994px;
+	height: auto;
 	margin-top:18px;
+	position: relative;
+background: #fff;
 }
 
 /*### INFO 0007 ###*/
@@ -392,6 +394,7 @@ a {
 	margin-bottom:20px;
 	padding-bottom:7px;
 	width:100%;
+	position: relative;
 }
 .infoCenterSubHeadline h2 {
 	color:black;
@@ -444,6 +447,34 @@ a {
 	margin-bottom:12px;
 	width:366px;
 }
+
+.selectCardDlg h2 {
+    color: #0018A8;
+    font-size: 21px !important;
+    font-weight: normal;
+    line-height: 28px !important;
+}
+.selectCardDlg label {
+	color:#666666;
+	display:block;
+	float:left;
+	font-size:14px;
+	margin-bottom:12px;
+	width:450px;
+}
+.selectCardDlg fieldset{
+	margin-top: 20px;
+	padding: 10px;
+}
+.selectCardDlg input{
+	clear:both;
+	color:#666666;
+	display:block;
+	float:left;
+	font-size:16px;
+	margin-bottom:12px;
+	margin-right: 10px;
+}
 .genCode{
 	border: solid 2px #0018A8;
 	margin: auto;
@@ -494,6 +525,18 @@ a {
 
 #T_authPersTitle{
 	background:url("../img/persons.gif") no-repeat scroll right 0 transparent;
+	border-bottom:2px dotted #CCCCCC;
+	color:#0018A8;
+	font-weight:normal;
+	margin-bottom:12px;
+	margin-top: 20px;
+	padding-bottom:7px;
+	display:block;
+	float:left;
+	width:100%;
+}
+#T_selectCard{
+	background:url("../img/card-chip-gold-icon.png") no-repeat scroll right 0 transparent;
 	border-bottom:2px dotted #CCCCCC;
 	color:#0018A8;
 	font-weight:normal;
@@ -656,6 +699,14 @@ a {
 	width: 23px;
 	background:url("../img/arrow_down.gif") repeat-x scroll center bottom transparent;
 }
+.acc_toggler{
+	position: absolute;
+	right: 0;
+	padding-left: 480px;
+}
+.acc_toggler:hover{
+	cursor: pointer;
+}
 .accTogglerClose{
 	display: block;
 	float: right;
@@ -708,6 +759,7 @@ a {
 	height:auto;
 	overflow:hidden;
 	padding:20px 10px;
+	width: 200px;
 	/*background: url(../img/master_schatten.gif) no-repeat bottom center;*/
 }
 
@@ -759,58 +811,107 @@ a {
 }
 
 #popupFrame {
-	display:none;
-	height:100%;
-	left:0;
-	position:absolute;
-	top:0;
-	width:100%;
-	z-index:999;
+  left: 219px;
+  display: none;
+  position: absolute;
+  top: 34px;
+  width: 502px;
+  z-index: 999;
 }
+
 #popupDiv {
-	background:none repeat scroll 0 0 #EAF1F6;
+	background:none repeat scroll 0 0 #fafafa; //#EAF1F6;
 	border:1px solid #CCCCCC;
 	display:block;
-	margin:510px auto 0;
-	min-height:230px;
-	opacity:0.88;
-	filter: alpha(opacity=88);
+	float: left;
+	height: auto;
 	padding:20px;
-	width:420px;
+	width:460px;
 }
 
-#popupSign {
-	display:block;
-	float:left;
-	height:110px;
-	margin:0;
-	width:110px;
-}
-
-.cross{
-	background:url("../img/bigCross.png") no-repeat scroll right 0 transparent;
-	
-}
 #popupInfo {
-	color:#000000;
-	float:left;
-	margin:20px;
-	width:260px;
+  background: url("../img/notice-alert.png") no-repeat scroll left 0 transparent;
+  color: #000000;
+  float: left;
+  margin-top: 10px;
+  padding: 7px 20px 20px 39px;
+  width: 390px;
+  min-height: 30px;
+  line-height: 18px;
 }
+#popupInfo span{word-wrap: break-word;}
 #popupInfo2 {
-	color:#000000;
-	float:left;
-	margin: 20px 20px 20px 0;
-	clear: both;
-	width:375px;
+  background: url("../img/notice-info.png") no-repeat scroll left 0 transparent;
+  clear: both;
+  color: #000000;
+  float: left;
+  margin-top: 0px;
+  padding: 7px 20px 20px 39px;
+  width: 375px;
+  min-height: 30px;
+  line-height: 18px;
 }
 #popupCloser {
-	border:1px solid #CCCCCC;
-	color:#666666;
-	display:block;
-	float:right;
-	font-size:11px;
-	font-weight:bold;
-	margin-right:-16px;
-	margin-top:-16px;
+  background: url("../img/x_alt_24x24.png") repeat scroll 0 0 transparent;
+  color: #666666;
+  display: block;
+  float: right;
+  font-size: 11px;
+  font-weight: bold;
+  height: 24px;
+  margin-right: -16px;
+  margin-top: -16px;
+  width: 24px;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
+#popupCloser:hover{opacity: 1;  filter: alpha(opacity=100);}
+.errCodeToggle,
+.errCode, 
+#errCodeToggle,
+#errCode {
+	font-size: 11px;
+	color: #666;
+}
+.errCodeToggle:focus,
+.errCodeToggle:visited,
+.errCodeToggle:active,
+#errCodeToggle:focus,
+#errCodeToggle:visited,
+#errCodeToggle:active{outline: none}
+.errCode,
+#errCode {
+	padding: 10px;
+	border: 1px solid red;
+	margin-top: 10px;
+	word-wrap: break-word;
+	}
+.errCode{
+	border: 1px solid #ccc;
+}
+#I_Hint_1,
+#I_Hint_2,
+#I_Hint_3 {display: block; text-align:center}
+#I_Hint_1 p,
+#I_Hint_2 p,
+#I_Hint_3 p{text-align:left}
+.crdId{width: 450px;}
+
+.crdResult{color: #000}	
+#windowCloser.active {
+  background: url("../img/x_alt_24x24.png") repeat scroll 0 0 transparent;
+  color: #666666;
+  display: block;
+  float: right;
+  font-size: 11px;
+  font-weight: bold;
+  height: 24px;
+  margin-right: 5px;
+  margin-top: 5px;
+  width: 24px;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+#windowCloser.active:hover {  opacity: 1;  filter: alpha(opacity=100);}
+.crdResult span {display: block; width:21px; height: 23px; background: url(../img/cross.gif) no-repeat;}
+.crdResult span.PASS {background: url(../img/haken.gif) no-repeat;}
