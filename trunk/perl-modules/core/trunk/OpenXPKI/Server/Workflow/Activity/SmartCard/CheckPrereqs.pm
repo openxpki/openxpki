@@ -83,11 +83,8 @@ sub execute {
         # "preferred_certificate_exists" flag         
         # Assumption: If new certificates for a type are created, we always use
         # the first profile
-        if (!$result->{CERT_TYPE}->{$type}->{usable_certificate_exists} || 
+        if (!$result->{CERT_TYPE}->{$type}->{usable_cert_exists} || 
             !$result->{CERT_TYPE}->{$type}->{preferred_cert_exists}) {            
-            #my $preferred_profile = CTX('config')->get( [ 'smartcard.policy.certs.type', $type, 'allowed_profiles.0' ] );
-            ##! 16: 'Add profile to CSR queue ' . $preferred_profile;  
-            #push @certs_to_create, $preferred_profile;
             push @certs_to_create, $type;                        
         }
 
@@ -121,10 +118,8 @@ sub execute {
     $context->param('user_data_source' =>
         $result->{SMARTCARD}->{user_data_source} );
 
-
-	# propagate LDAP settings to context
-	# TODO Should be renamed as it is no longer "LDAP"
-      LDAP_ENTRY:
+    # Propagate the userinfo to the context
+      USERINFO_ENTRY:
 	foreach my $entry (keys (%{$result->{SMARTCARD}->{assigned_to}})) {
 	    my $value = $result->{SMARTCARD}->{assigned_to}->{$entry};
 	    if (ref $value eq 'ARRAY') {
