@@ -396,7 +396,7 @@ Smartcard Personalization}</string>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2012-05-07 09:50:06 +0000</string>
+	<string>2012-05-07 11:43:16 +0000</string>
 	<key>Modifier</key>
 	<string>Martin Bartosch</string>
 	<key>NotesVisible</key>
@@ -17890,7 +17890,7 @@ PRE ISSUANCE}</string>
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
 \f0\fs20 \cf0 \expnd0\expndtw0\kerning0
-CERT RETRIEVED}</string>
+KEY ID COMPUTED}</string>
 						<key>VerticalPad</key>
 						<integer>1</integer>
 					</dict>
@@ -18853,7 +18853,7 @@ QUEUE CERTS TO RECOVER}</string>
 					<key>Points</key>
 					<array>
 						<string>{444.74054, 415.9906}</string>
-						<string>{444.74008, 432.4613}</string>
+						<string>{444.74008, 432.46127}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -19108,7 +19108,7 @@ FETCH CERTIFICATE}</string>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{444.74008, 366.99762}</string>
+						<string>{444.74008, 366.99759}</string>
 						<string>{444.74057, 379.9906}</string>
 					</array>
 					<key>Style</key>
@@ -19152,7 +19152,7 @@ FETCH CERTIFICATE}</string>
 					<key>Points</key>
 					<array>
 						<string>{444.74054, 306.00464}</string>
-						<string>{444.74008, 318.99762}</string>
+						<string>{444.74008, 318.99759}</string>
 					</array>
 					<key>Style</key>
 					<dict>
