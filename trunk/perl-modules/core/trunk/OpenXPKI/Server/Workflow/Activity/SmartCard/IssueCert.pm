@@ -233,7 +233,7 @@ sub execute {
 	{
 	    PKI_REALM => $realm,
 	    NAMESPACE => 'smartcard.user.certificate',
-	    KEY => $context->param('userinfo_workflow_creator'),         
+	    KEY => $context->param('userinfo_employee_id'),         
 	} );
 
     my @certificate_identifiers;
@@ -246,7 +246,7 @@ sub execute {
 	{
 	    PKI_REALM => $realm,
 	    NAMESPACE => 'smartcard.user.certificate',
-	    KEY => $context->param('userinfo_workflow_creator'),
+	    KEY => $context->param('userinfo_employee_id'),
 	    VALUE => $serializer->serialize(\@certificate_identifiers),
 	    FORCE => 1,
 	} );
