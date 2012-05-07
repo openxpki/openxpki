@@ -90,6 +90,9 @@ sub execute {
 
     # Get the list of targets
     my @targets = $config->get_keys([ $prefix, 'targets' ]); 
+    
+    # If the data point does not exist, we get a one item undef array
+    return unless ($targets[0]);
 
     ##! 16: 'Publish targets at prefix '. $prefix .' -  ' . Dumper ( @targets )
     ##! 32: 'Data for publication '. Dumper ( $data )
