@@ -5,7 +5,7 @@
 	<key>ApplicationVersion</key>
 	<array>
 		<string>com.omnigroup.OmniGrafflePro</string>
-		<string>138.17.0.133677</string>
+		<string>138.33.0.157554</string>
 	</array>
 	<key>CreationDate</key>
 	<string>2009-12-09 08:18:21 +0000</string>
@@ -14,7 +14,7 @@
 	<key>FileType</key>
 	<string>flat</string>
 	<key>GraphDocumentVersion</key>
-	<integer>6</integer>
+	<integer>8</integer>
 	<key>GuidesLocked</key>
 	<string>NO</string>
 	<key>GuidesVisible</key>
@@ -108,7 +108,7 @@
 			<key>BackgroundGraphic</key>
 			<dict>
 				<key>Bounds</key>
-				<string>{{0, 0}, {559, 783}}</string>
+				<string>{{0, 0}, {614.93414, 837}}</string>
 				<key>Class</key>
 				<string>SolidGraphic</string>
 				<key>ID</key>
@@ -130,7 +130,7 @@
 			<key>CanvasOrigin</key>
 			<string>{0, 0}</string>
 			<key>CanvasSize</key>
-			<string>{559, 783}</string>
+			<string>{614.93414, 837}</string>
 			<key>ColumnAlign</key>
 			<integer>1</integer>
 			<key>ColumnSpacing</key>
@@ -209,7 +209,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{0, 769}, {91, 14}}</string>
+					<string>{{0, 769}, {100, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -344,7 +344,7 @@ Smartcard Personalization}</string>
 			<key>GridInfo</key>
 			<dict/>
 			<key>HPages</key>
-			<integer>1</integer>
+			<integer>2</integer>
 			<key>KeepToScale</key>
 			<false/>
 			<key>Layers</key>
@@ -392,11 +392,11 @@ Smartcard Personalization}</string>
 			<key>UniqueID</key>
 			<integer>1</integer>
 			<key>VPages</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2012-05-04 14:27:34 +0000</string>
+	<string>2012-05-07 09:50:06 +0000</string>
 	<key>Modifier</key>
 	<string>Martin Bartosch</string>
 	<key>NotesVisible</key>
@@ -412,6 +412,11 @@ Smartcard Personalization}</string>
 			<string>float</string>
 			<string>41</string>
 		</array>
+		<key>NSHorizonalPagination</key>
+		<array>
+			<string>int</string>
+			<string>0</string>
+		</array>
 		<key>NSLeftMargin</key>
 		<array>
 			<string>float</string>
@@ -419,8 +424,13 @@ Smartcard Personalization}</string>
 		</array>
 		<key>NSPaperSize</key>
 		<array>
-			<string>size</string>
-			<string>{595, 842}</string>
+			<string>coded</string>
+			<string>BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU1ZhbHVlAISECE5TT2JqZWN0AIWEASqEhAx7X05TU2l6ZT1mZn2WgVMCgUoDhg==</string>
+		</array>
+		<key>NSPrintReverseOrientation</key>
+		<array>
+			<string>int</string>
+			<string>0</string>
 		</array>
 		<key>NSRightMargin</key>
 		<array>
@@ -503,6 +513,8 @@ Smartcard Personalization}</string>
 					<integer>1458</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>362.77285766601562</real>
 					<key>Points</key>
@@ -768,6 +780,8 @@ Smartcard Personalization}</string>
 					<integer>1443</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.0</real>
 					<key>Points</key>
@@ -809,6 +823,8 @@ Smartcard Personalization}</string>
 					<integer>1442</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -1274,6 +1290,8 @@ Smartcard Personalization}</string>
 					<integer>1425</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>17.377288818359375</real>
 					<key>Points</key>
@@ -1805,6 +1823,8 @@ login_id: the preferred login account (ie. windows login) to be used for the aut
 					<integer>1668</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -1846,6 +1866,8 @@ login_id: the preferred login account (ie. windows login) to be used for the aut
 					<integer>1667</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>81.074111938476562</real>
 					<key>Points</key>
@@ -2150,6 +2172,8 @@ OWNER IDENTIFIED}</string>
 					<integer>1662</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>86.39892578125</real>
 					<key>Points</key>
@@ -2191,6 +2215,8 @@ OWNER IDENTIFIED}</string>
 					<integer>1661</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -2920,6 +2946,8 @@ HAVE PREREQS}</string>
 					<integer>1299</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -3333,6 +3361,8 @@ INITIAL}</string>
 					<integer>1671</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>28.685272216796875</real>
 					<key>Points</key>
@@ -3572,6 +3602,8 @@ INITIAL}</string>
 					<integer>1660</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -3652,6 +3684,8 @@ INITIAL}</string>
 					<integer>1659</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>137.80218505859375</real>
 					<key>Points</key>
@@ -3693,6 +3727,8 @@ INITIAL}</string>
 					<integer>1658</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.0</real>
 					<key>Points</key>
@@ -3934,6 +3970,8 @@ INITIAL}</string>
 					<integer>1646</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>34.10003662109375</real>
 					<key>Points</key>
@@ -4173,6 +4211,8 @@ INITIAL}</string>
 					<integer>1622</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>27.750244140625</real>
 					<key>Points</key>
@@ -4412,6 +4452,8 @@ INITIAL}</string>
 					<integer>1621</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>1.475006103515625</real>
 					<key>Points</key>
@@ -4840,6 +4882,8 @@ INITIAL}</string>
 					<integer>1612</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>33.6624755859375</real>
 					<key>Points</key>
@@ -5070,6 +5114,8 @@ INITIAL}</string>
 					<integer>1607</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>18.562515258789062</real>
 					<key>Points</key>
@@ -5300,6 +5346,8 @@ INITIAL}</string>
 					<integer>1592</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>8.2979583740234375</real>
 					<key>Points</key>
@@ -5346,6 +5394,8 @@ INITIAL}</string>
 					<integer>1591</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>1.930023193359375</real>
 					<key>Points</key>
@@ -5522,6 +5572,8 @@ yes}</string>
 					<integer>1639</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>99.9149169921875</real>
 					<key>Points</key>
@@ -5631,6 +5683,8 @@ yes}</string>
 					<integer>1581</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>32.319122314453125</real>
 					<key>Points</key>
@@ -5676,6 +5730,8 @@ yes}</string>
 					<integer>1570</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>227.70001220703125</real>
 					<key>Points</key>
@@ -5755,6 +5811,8 @@ yes}</string>
 					<integer>1557</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>158.19140625</real>
 					<key>Points</key>
@@ -5796,6 +5854,8 @@ yes}</string>
 					<integer>1556</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.0</real>
 					<key>Points</key>
@@ -5902,6 +5962,8 @@ yes}</string>
 					<integer>1554</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>6.1190185546875</real>
 					<key>Points</key>
@@ -6404,6 +6466,8 @@ yes}</string>
 					<integer>1544</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>99.9149169921875</real>
 					<key>Points</key>
@@ -6447,6 +6511,8 @@ yes}</string>
 					<integer>1543</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>109.86422729492188</real>
 					<key>Points</key>
@@ -6544,6 +6610,8 @@ yes}</string>
 					<integer>1348</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>59.312026977539062</real>
 					<key>Points</key>
@@ -6644,6 +6712,8 @@ HAVE PREREQS}</string>
 					<integer>1288</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -6862,6 +6932,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1575</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>145.644287109375</real>
 					<key>Points</key>
@@ -6907,6 +6979,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1611</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>119.9913330078125</real>
 					<key>Points</key>
@@ -6952,6 +7026,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1606</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>6.149200439453125</real>
 					<key>Points</key>
@@ -7118,6 +7194,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1630</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>98.767845153808594</real>
 					<key>Points</key>
@@ -7224,6 +7302,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1626</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>9.8777923583984375</real>
 					<key>Points</key>
@@ -7330,6 +7410,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1622</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -7409,6 +7491,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1620</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -7494,6 +7578,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1605</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -7535,6 +7621,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1588</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -7681,6 +7769,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1585</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>302.90731811523438</real>
 					<key>Points</key>
@@ -7722,6 +7812,8 @@ CERTIFICATE ISSUANCE POSSIBLE}</string>
 					<integer>1584</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -7869,6 +7961,8 @@ PREPARE CERT INST}</string>
 					<integer>1574</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>82.234954833984375</real>
 					<key>Points</key>
@@ -7995,6 +8089,8 @@ START ACTIONS}</string>
 					<integer>1400</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -8225,6 +8321,8 @@ START ACTIONS}</string>
 					<integer>1735</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>19.576812744140625</real>
 					<key>Points</key>
@@ -8331,6 +8429,8 @@ START ACTIONS}</string>
 					<integer>1733</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>2.0745849609375</real>
 					<key>Points</key>
@@ -8438,6 +8538,8 @@ START ACTIONS}</string>
 					<integer>1731</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>30.8551025390625</real>
 					<key>Points</key>
@@ -8584,6 +8686,8 @@ START ACTIONS}</string>
 					<integer>1727</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -8698,6 +8802,8 @@ HAVE NEXT NEED CSR}</string>
 					<integer>1725</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -8790,6 +8896,8 @@ HAVE NEXT NEED CSR}</string>
 					<integer>1721</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -8893,6 +9001,8 @@ HAVE NEXT NEED CSR}</string>
 					<integer>1719</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>8.136199951171875</real>
 					<key>Points</key>
@@ -9002,6 +9112,8 @@ HAVE NEXT NEED CSR}</string>
 					<integer>1715</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>2.0745849609375</real>
 					<key>Points</key>
@@ -9249,6 +9361,8 @@ HAVE NEXT NEED CSR}</string>
 					<integer>1713</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -9490,6 +9604,8 @@ HAVE NEXT NEED CSR}</string>
 					<integer>1707</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>52.228118896484375</real>
 					<key>Points</key>
@@ -9692,6 +9808,8 @@ HAVE NEXT NEED CSR}</string>
 					<integer>1704</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -9731,6 +9849,8 @@ HAVE NEXT NEED CSR}</string>
 					<integer>1703</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>1.60638427734375</real>
 					<key>Points</key>
@@ -10029,6 +10149,8 @@ HAVE NEXT NEED CSR}</string>
 					<integer>1694</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -10351,6 +10473,8 @@ GET NEXT NEED CSR}</string>
 					<integer>1692</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -10511,6 +10635,8 @@ GET NEXT NEED CSR}</string>
 					<integer>1526</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>10.771896362304688</real>
 					<key>Points</key>
@@ -10620,6 +10746,8 @@ GET NEXT NEED CSR}</string>
 					<integer>1524</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -10661,6 +10789,8 @@ GET NEXT NEED CSR}</string>
 					<integer>1690</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -10773,6 +10903,8 @@ BEGIN LOOP NEED CSR}</string>
 					<integer>1688</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -11090,6 +11222,8 @@ BEGIN LOOP NEED CSR}</string>
 					<integer>1680</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>21.734222412109375</real>
 					<key>Points</key>
@@ -11132,6 +11266,8 @@ BEGIN LOOP NEED CSR}</string>
 					<integer>1678</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -11173,6 +11309,8 @@ BEGIN LOOP NEED CSR}</string>
 					<integer>1665</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>25.077499389648438</real>
 					<key>Points</key>
@@ -11215,6 +11353,8 @@ BEGIN LOOP NEED CSR}</string>
 					<integer>1664</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.0</real>
 					<key>Points</key>
@@ -11458,6 +11598,8 @@ BEGIN LOOP NEED CSR}</string>
 					<integer>1658</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>3.439117431640625</real>
 					<key>Points</key>
@@ -11920,6 +12062,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1677</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>1.716461181640625</real>
 					<key>Points</key>
@@ -12049,6 +12193,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1554</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>87.494781494140625</real>
 					<key>Points</key>
@@ -12224,6 +12370,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1564</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>101.4488525390625</real>
 					<key>Points</key>
@@ -12266,6 +12414,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1563</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -12511,6 +12661,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1557</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>74.39501953125</real>
 					<key>Points</key>
@@ -12723,6 +12875,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1555</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>93.95281982421875</real>
 					<key>Points</key>
@@ -12924,6 +13078,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1400</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -13114,6 +13270,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1693</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -13365,6 +13523,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1623</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -13477,6 +13637,8 @@ NEXT CSR TO ISSUE}</string>
 					<integer>1621</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -13518,6 +13680,8 @@ NEXT CSR TO ISSUE}</string>
 					<integer>1620</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -13795,6 +13959,8 @@ NEXT CSR TO ISSUE}</string>
 					<integer>1608</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>2.736480712890625</real>
 					<key>Points</key>
@@ -13837,6 +14003,8 @@ NEXT CSR TO ISSUE}</string>
 					<integer>1607</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -14082,6 +14250,8 @@ NEXT CSR TO ISSUE}</string>
 					<integer>1601</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -14251,6 +14421,8 @@ PREPARE CSRS TO PROCESS}</string>
 					<integer>1598</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>93.851104736328125</real>
 					<key>Points</key>
@@ -14565,6 +14737,8 @@ CERT ISSUED}</string>
 					<integer>1590</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -14679,6 +14853,8 @@ PERSIST CSRS}</string>
 					<integer>1587</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>71.179351806640625</real>
 					<key>Points</key>
@@ -14725,6 +14901,8 @@ PERSIST CSRS}</string>
 					<integer>1586</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.47882080078125</real>
 					<key>Points</key>
@@ -15035,6 +15213,8 @@ PERSIST CSRS}</string>
 					<integer>680</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>3.699981689453125</real>
 					<key>Points</key>
@@ -15078,6 +15258,8 @@ PERSIST CSRS}</string>
 					<integer>676</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -15183,6 +15365,8 @@ PERSIST CSRS}</string>
 					<integer>669</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>154.3282470703125</real>
 					<key>Points</key>
@@ -15265,6 +15449,8 @@ PERSIST CSRS}</string>
 					<integer>1584</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -15512,6 +15698,8 @@ CAN ISSUE}</string>
 					<integer>1570</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>21.511749267578125</real>
 					<key>Points</key>
@@ -15621,6 +15809,8 @@ CAN ISSUE}</string>
 					<integer>1568</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>15.916778564453125</real>
 					<key>Points</key>
@@ -15662,6 +15852,8 @@ CAN ISSUE}</string>
 					<integer>1557</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -16042,6 +16234,8 @@ ISSUE CERT}</string>
 					<integer>1552</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>11.699996948242188</real>
 					<key>Points</key>
@@ -16151,6 +16345,8 @@ ISSUE CERT}</string>
 					<integer>1550</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -16193,6 +16389,8 @@ ISSUE CERT}</string>
 					<integer>1549</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -16405,6 +16603,8 @@ PRE ISSUANCE}</string>
 					<integer>1544</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>1.5800018310546875</real>
 					<key>Points</key>
@@ -16645,6 +16845,8 @@ PRE ISSUANCE}</string>
 					<integer>1538</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>45.7545166015625</real>
 					<key>Points</key>
@@ -16686,6 +16888,8 @@ PRE ISSUANCE}</string>
 					<integer>1537</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>252.46345520019531</real>
 					<key>Points</key>
@@ -16725,6 +16929,8 @@ PRE ISSUANCE}</string>
 					<integer>1536</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>345.57308959960938</real>
 					<key>Points</key>
@@ -17029,6 +17235,8 @@ PRE ISSUANCE}</string>
 					<integer>1581</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>3.60052490234375</real>
 					<key>Points</key>
@@ -17139,6 +17347,8 @@ PRE ISSUANCE}</string>
 					<integer>1524</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -17180,6 +17390,8 @@ PRE ISSUANCE}</string>
 					<integer>1523</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -17566,6 +17778,379 @@ PRE ISSUANCE}</string>
 					<key>Head</key>
 					<dict>
 						<key>ID</key>
+						<integer>1599</integer>
+						<key>Info</key>
+						<integer>2</integer>
+					</dict>
+					<key>ID</key>
+					<integer>1684</integer>
+					<key>OrthogonalBarAutomatic</key>
+					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
+					<key>OrthogonalBarPosition</key>
+					<real>0.2657623291015625</real>
+					<key>Points</key>
+					<array>
+						<string>{444.74054, 529.45428}</string>
+						<string>{445.27206, 547.71991}</string>
+					</array>
+					<key>Style</key>
+					<dict>
+						<key>stroke</key>
+						<dict>
+							<key>HeadArrow</key>
+							<string>Arrow</string>
+							<key>LineType</key>
+							<integer>2</integer>
+							<key>TailArrow</key>
+							<string>0</string>
+						</dict>
+					</dict>
+					<key>Tail</key>
+					<dict>
+						<key>ID</key>
+						<integer>1683</integer>
+						<key>Info</key>
+						<integer>18</integer>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{399.74057, 493.45428}, {90, 36}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
+						<key>Size</key>
+						<real>10</real>
+					</dict>
+					<key>ID</key>
+					<integer>1683</integer>
+					<key>Magnets</key>
+					<array>
+						<string>{-0.56384802, -1.20824}</string>
+						<string>{-0.302973, -1.29845}</string>
+						<string>{0, -1.33333}</string>
+						<string>{0.302973, -1.29845}</string>
+						<string>{0.56384802, -1.20824}</string>
+						<string>{0.84933698, -1.02782}</string>
+						<string>{0.963983, -0.92114902}</string>
+						<string>{1.10115, -0.75182801}</string>
+						<string>{1.21742, -0.54374498}</string>
+						<string>{1.30676, -0.26486501}</string>
+						<string>{1.30011, 0.29577401}</string>
+						<string>{1.20643, 0.56771898}</string>
+						<string>{1.07737, 0.78552401}</string>
+						<string>{0.96398199, 0.92115003}</string>
+						<string>{0.84933603, 1.02782}</string>
+						<string>{0.56384701, 1.20824}</string>
+						<string>{0.30297199, 1.29846}</string>
+						<string>{-6.3578301e-07, 1.33333}</string>
+						<string>{-0.302973, 1.29845}</string>
+						<string>{-0.56384802, 1.20824}</string>
+						<string>{-0.84933698, 1.02782}</string>
+						<string>{-0.96398199, 0.92115003}</string>
+						<string>{-1.10115, 0.75182903}</string>
+						<string>{-1.21742, 0.54374701}</string>
+						<string>{-1.30676, 0.26486799}</string>
+						<string>{-1.30011, -0.29577199}</string>
+						<string>{-1.20643, -0.56771702}</string>
+						<string>{-1.07737, -0.78552198}</string>
+						<string>{-0.963983, -0.92114902}</string>
+						<string>{-0.84933698, -1.02782}</string>
+					</array>
+					<key>Shape</key>
+					<string>RoundRect</string>
+					<key>Style</key>
+					<dict>
+						<key>shadow</key>
+						<dict>
+							<key>Beneath</key>
+							<string>YES</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Pad</key>
+						<integer>1</integer>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
+
+\f0\fs20 \cf0 \expnd0\expndtw0\kerning0
+CERT RETRIEVED}</string>
+						<key>VerticalPad</key>
+						<integer>1</integer>
+					</dict>
+					<key>UserInfo</key>
+					<dict>
+						<key>autorun</key>
+						<string>yes</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>LineGraphic</string>
+					<key>Head</key>
+					<dict>
+						<key>ID</key>
+						<integer>1683</integer>
+						<key>Info</key>
+						<integer>3</integer>
+					</dict>
+					<key>ID</key>
+					<integer>1682</integer>
+					<key>OrthogonalBarAutomatic</key>
+					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
+					<key>OrthogonalBarPosition</key>
+					<real>-1</real>
+					<key>Points</key>
+					<array>
+						<string>{444.74008, 480.4613}</string>
+						<string>{444.74057, 493.45428}</string>
+					</array>
+					<key>Style</key>
+					<dict>
+						<key>stroke</key>
+						<dict>
+							<key>HeadArrow</key>
+							<string>Arrow</string>
+							<key>LineType</key>
+							<integer>2</integer>
+							<key>TailArrow</key>
+							<string>0</string>
+						</dict>
+					</dict>
+					<key>Tail</key>
+					<dict>
+						<key>ID</key>
+						<integer>1677</integer>
+						<key>Info</key>
+						<integer>5</integer>
+					</dict>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>TableGroup</string>
+					<key>Graphics</key>
+					<array>
+						<dict>
+							<key>Bounds</key>
+							<string>{{393.89359, 456.46127}, {101.69299, 12}}</string>
+							<key>Class</key>
+							<string>ShapedGraphic</string>
+							<key>FitText</key>
+							<string>Vertical</string>
+							<key>Flow</key>
+							<string>Resize</string>
+							<key>ID</key>
+							<integer>1678</integer>
+							<key>Shape</key>
+							<string>Rectangle</string>
+							<key>Style</key>
+							<dict>
+								<key>fill</key>
+								<dict>
+									<key>GradientCenter</key>
+									<string>{-0.29411799, -0.26470599}</string>
+								</dict>
+								<key>shadow</key>
+								<dict>
+									<key>Beneath</key>
+									<string>YES</string>
+								</dict>
+							</dict>
+							<key>Text</key>
+							<dict>
+								<key>Align</key>
+								<integer>0</integer>
+								<key>Text</key>
+								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720
+
+\f0\fs20 \cf0 n/a}</string>
+								<key>VerticalPad</key>
+								<integer>0</integer>
+							</dict>
+							<key>TextPlacement</key>
+							<integer>0</integer>
+						</dict>
+						<dict>
+							<key>Bounds</key>
+							<string>{{393.89359, 432.46127}, {101.69299, 12}}</string>
+							<key>Class</key>
+							<string>ShapedGraphic</string>
+							<key>FitText</key>
+							<string>Vertical</string>
+							<key>Flow</key>
+							<string>Resize</string>
+							<key>ID</key>
+							<integer>1679</integer>
+							<key>Shape</key>
+							<string>Rectangle</string>
+							<key>Style</key>
+							<dict>
+								<key>shadow</key>
+								<dict>
+									<key>Beneath</key>
+									<string>YES</string>
+								</dict>
+							</dict>
+							<key>Text</key>
+							<dict>
+								<key>Text</key>
+								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
+
+\f0\b\fs20 \cf0 calculate key id}</string>
+								<key>VerticalPad</key>
+								<integer>0</integer>
+							</dict>
+							<key>TextPlacement</key>
+							<integer>0</integer>
+						</dict>
+						<dict>
+							<key>Bounds</key>
+							<string>{{393.89359, 444.46127}, {101.69299, 12}}</string>
+							<key>Class</key>
+							<string>ShapedGraphic</string>
+							<key>FitText</key>
+							<string>Vertical</string>
+							<key>Flow</key>
+							<string>Resize</string>
+							<key>ID</key>
+							<integer>1680</integer>
+							<key>Shape</key>
+							<string>Rectangle</string>
+							<key>Style</key>
+							<dict>
+								<key>fill</key>
+								<dict>
+									<key>GradientCenter</key>
+									<string>{-0.29411799, -0.26470599}</string>
+								</dict>
+								<key>shadow</key>
+								<dict>
+									<key>Beneath</key>
+									<string>YES</string>
+								</dict>
+							</dict>
+							<key>Text</key>
+							<dict>
+								<key>Align</key>
+								<integer>0</integer>
+								<key>Text</key>
+								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720
+
+\f0\fs20 \cf0 certificate}</string>
+								<key>VerticalPad</key>
+								<integer>0</integer>
+							</dict>
+							<key>TextPlacement</key>
+							<integer>0</integer>
+						</dict>
+						<dict>
+							<key>Bounds</key>
+							<string>{{393.89359, 468.46127}, {101.69299, 12}}</string>
+							<key>Class</key>
+							<string>ShapedGraphic</string>
+							<key>FitText</key>
+							<string>Vertical</string>
+							<key>Flow</key>
+							<string>Resize</string>
+							<key>ID</key>
+							<integer>1681</integer>
+							<key>Shape</key>
+							<string>Rectangle</string>
+							<key>Style</key>
+							<dict>
+								<key>fill</key>
+								<dict>
+									<key>GradientCenter</key>
+									<string>{-0.29411799, -0.26470599}</string>
+								</dict>
+								<key>shadow</key>
+								<dict>
+									<key>Beneath</key>
+									<string>YES</string>
+								</dict>
+							</dict>
+							<key>Text</key>
+							<dict>
+								<key>Align</key>
+								<integer>0</integer>
+								<key>Text</key>
+								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720
+
+\f0\fs20 \cf0 keyid}</string>
+								<key>VerticalPad</key>
+								<integer>0</integer>
+							</dict>
+							<key>TextPlacement</key>
+							<integer>0</integer>
+						</dict>
+					</array>
+					<key>GridH</key>
+					<array>
+						<integer>1679</integer>
+						<integer>1680</integer>
+						<integer>1678</integer>
+						<integer>1681</integer>
+						<array/>
+					</array>
+					<key>GroupConnect</key>
+					<string>YES</string>
+					<key>ID</key>
+					<integer>1677</integer>
+					<key>Magnets</key>
+					<array>
+						<string>{1, 1}</string>
+						<string>{1, -1}</string>
+						<string>{-1, -1}</string>
+						<string>{-1, 1}</string>
+						<string>{0, 1}</string>
+						<string>{0, -1}</string>
+						<string>{1, 0}</string>
+						<string>{-1, 0}</string>
+					</array>
+					<key>UserInfo</key>
+					<dict>
+						<key>class</key>
+						<string>OpenXPKI::Server::Workflow::Activity::Tools::CalculateKeyId</string>
+						<key>output_key</key>
+						<string>keyid</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>LineGraphic</string>
+					<key>Head</key>
+					<dict>
+						<key>ID</key>
 						<integer>1341</integer>
 						<key>Info</key>
 						<integer>12</integer>
@@ -17574,6 +18159,8 @@ PRE ISSUANCE}</string>
 					<integer>1676</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -17615,6 +18202,8 @@ PRE ISSUANCE}</string>
 					<integer>1675</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -17722,7 +18311,7 @@ PRE ISSUANCE}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{438.27206, 596.3822}, {14, 14}}</string>
+					<string>{{438.27206, 596.84399}, {14, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -17796,11 +18385,13 @@ PRE ISSUANCE}</string>
 					<integer>1671</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>5.262054443359375</real>
 					<key>Points</key>
 					<array>
-						<string>{445.27206, 600.53387}</string>
+						<string>{445.27206, 601.03381}</string>
 						<string>{445.83789, 637.33099}</string>
 					</array>
 					<key>Style</key>
@@ -17880,6 +18471,8 @@ X509 PREPARED}</string>
 					<integer>1669</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>2.428009033203125</real>
 					<key>Points</key>
@@ -17921,6 +18514,8 @@ X509 PREPARED}</string>
 					<integer>1668</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -18245,20 +18840,20 @@ QUEUE CERTS TO RECOVER}</string>
 					<key>Head</key>
 					<dict>
 						<key>ID</key>
-						<integer>1599</integer>
-						<key>Info</key>
-						<integer>2</integer>
+						<integer>1677</integer>
 					</dict>
 					<key>ID</key>
 					<integer>1624</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>7.037933349609375</real>
+					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{446.33597, 509.84399}</string>
-						<string>{445.27206, 547.71991}</string>
+						<string>{444.74054, 415.9906}</string>
+						<string>{444.74008, 432.4613}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -18282,7 +18877,7 @@ QUEUE CERTS TO RECOVER}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{401.336, 473.84399}, {90, 36}}</string>
+					<string>{{399.74057, 379.9906}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -18379,12 +18974,14 @@ CERT RETRIEVED}</string>
 					<integer>1622</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{446.40454, 338.46402}</string>
-						<string>{446.336, 363.858}</string>
+						<string>{444.7746, 251.73889}</string>
+						<string>{444.74057, 270.00464}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -18408,7 +19005,7 @@ CERT RETRIEVED}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{401.336, 363.858}, {90, 36}}</string>
+					<string>{{399.74057, 270.00464}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -18505,12 +19102,14 @@ FETCH CERTIFICATE}</string>
 					<integer>1620</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{446.33551, 460.85104}</string>
-						<string>{446.336, 473.84399}</string>
+						<string>{444.74008, 366.99762}</string>
+						<string>{444.74057, 379.9906}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -18546,12 +19145,14 @@ FETCH CERTIFICATE}</string>
 					<integer>1619</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{446.33597, 399.858}</string>
-						<string>{446.33551, 412.85101}</string>
+						<string>{444.74054, 306.00464}</string>
+						<string>{444.74008, 318.99762}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -18580,7 +19181,7 @@ FETCH CERTIFICATE}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{395.55801, 314.46399}, {101.693, 12}}</string>
+							<string>{{393.92807, 227.73889}, {101.69299, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -18623,7 +19224,7 @@ FETCH CERTIFICATE}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{395.55801, 278.46399}, {101.693, 24}}</string>
+							<string>{{393.92807, 191.73889}, {101.69299, 24}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -18659,7 +19260,7 @@ FETCH CERTIFICATE}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{395.55801, 302.46399}, {101.693, 12}}</string>
+							<string>{{393.92807, 215.73889}, {101.69299, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -18702,7 +19303,7 @@ FETCH CERTIFICATE}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{395.55801, 326.46399}, {101.693, 12}}</string>
+							<string>{{393.92807, 239.73889}, {101.69299, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -18790,7 +19391,7 @@ FETCH CERTIFICATE}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{395.48901, 436.85101}, {101.693, 12}}</string>
+							<string>{{393.89359, 342.99759}, {101.69299, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -18833,7 +19434,7 @@ FETCH CERTIFICATE}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{395.48901, 412.85101}, {101.693, 12}}</string>
+							<string>{{393.89359, 318.99759}, {101.69299, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -18869,7 +19470,7 @@ FETCH CERTIFICATE}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{395.48901, 424.85101}, {101.693, 12}}</string>
+							<string>{{393.89359, 330.99759}, {101.69299, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -18912,7 +19513,7 @@ FETCH CERTIFICATE}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{395.48901, 448.85101}, {101.693, 12}}</string>
+							<string>{{393.89359, 354.99759}, {101.69299, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -19052,6 +19653,8 @@ FETCH CERTIFICATE}</string>
 					<integer>1608</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -19093,6 +19696,8 @@ FETCH CERTIFICATE}</string>
 					<integer>1607</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -19530,6 +20135,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1540</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>22.62603759765625</real>
 					<key>Points</key>
@@ -19571,12 +20178,14 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1537</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>0.7965087890625</real>
+					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{445.83801, 253.07098}</string>
-						<string>{446.40454, 278.46399}</string>
+						<string>{444.74008, 171.67816}</string>
+						<string>{444.7746, 191.73889}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -19610,6 +20219,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1530</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -19637,7 +20248,7 @@ ESCROW CERT TO INSTALL}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{166.55453, 543.3399}, {14, 14}}</string>
+					<string>{{172.67572, 543.3399}, {14, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -19713,12 +20324,14 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1526</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>224.30003356933594</real>
+					<real>238.35049438476562</real>
 					<key>Points</key>
 					<array>
 						<string>{121.61737, 550.3399}</string>
-						<string>{445.83801, 217.071}</string>
+						<string>{444.74008, 135.67816}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -19822,6 +20435,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1524</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>19.14605712890625</real>
 					<key>Points</key>
@@ -19863,6 +20478,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1523</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -19947,7 +20564,7 @@ ESCROW CERT TO INSTALL}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{400.83801, 217.071}, {90, 36}}</string>
+					<string>{{399.74008, 135.67816}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -20282,6 +20899,8 @@ CERT INST CHECK}</string>
 					<integer>1720</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -20323,6 +20942,8 @@ CERT INST CHECK}</string>
 					<integer>1661</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>11.002960205078125</real>
 					<key>Points</key>
@@ -20365,6 +20986,8 @@ CERT INST CHECK}</string>
 					<integer>1659</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>16.64178466796875</real>
 					<key>Points</key>
@@ -21024,6 +21647,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1637</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -21065,6 +21690,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1636</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -21395,6 +22022,8 @@ X509 PREPARED}</string>
 					<integer>1583</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>21.508399963378906</real>
 					<key>Points</key>
@@ -21437,6 +22066,8 @@ X509 PREPARED}</string>
 					<integer>1582</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.0</real>
 					<key>Points</key>
@@ -21478,6 +22109,8 @@ X509 PREPARED}</string>
 					<integer>1557</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>20.1109619140625</real>
 					<key>Points</key>
@@ -21716,6 +22349,8 @@ X509 PREPARED}</string>
 					<integer>1551</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>9.83953857421875</real>
 					<key>Points</key>
@@ -21831,6 +22466,8 @@ X509 PREPARED}</string>
 					<integer>1538</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -21870,6 +22507,8 @@ X509 PREPARED}</string>
 					<integer>1536</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>50.686492919921875</real>
 					<key>Points</key>
@@ -22253,6 +22892,8 @@ no}</string>
 					<integer>1725</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>149.19303894042969</real>
 					<key>Points</key>
@@ -22354,6 +22995,8 @@ no}</string>
 					<integer>1723</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -22395,6 +23038,8 @@ no}</string>
 					<integer>1722</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -22578,6 +23223,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1721</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>41.227752685546875</real>
 					<key>Points</key>
@@ -22748,6 +23395,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1719</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>15.0999755859375</real>
 					<key>Points</key>
@@ -22789,6 +23438,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1680</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>30.300003051757812</real>
 					<key>Points</key>
@@ -22831,6 +23482,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1679</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -23468,6 +24121,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1666</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>76.29998779296875</real>
 					<key>Points</key>
@@ -23509,6 +24164,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1660</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>29.052997589111328</real>
 					<key>Points</key>
@@ -23551,6 +24208,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1659</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>9.899993896484375</real>
 					<key>Points</key>
@@ -23592,6 +24251,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1658</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -23631,6 +24292,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1657</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -23672,6 +24335,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1656</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>81.699951171875</real>
 					<key>Points</key>
@@ -23711,6 +24376,8 @@ ESCROW CERT TO INSTALL}</string>
 					<integer>1655</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>137.20892333984375</real>
 					<key>Points</key>
@@ -24246,6 +24913,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1409</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>40.100006103515625</real>
 					<key>Points</key>
@@ -24499,6 +25168,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1727</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -24540,6 +25211,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1721</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -24581,6 +25254,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1720</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -24620,6 +25295,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1718</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -24901,6 +25578,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1706</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>116.12934875488281</real>
 					<key>Points</key>
@@ -24942,6 +25621,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1705</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -24981,6 +25662,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1704</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -25072,6 +25755,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1695</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -25313,6 +25998,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1651</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>64.0999755859375</real>
 					<key>Points</key>
@@ -25354,6 +26041,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1637</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -26085,6 +26774,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>528</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -26405,6 +27096,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1671</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -26446,6 +27139,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1670</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -26738,6 +27433,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1668</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -26779,6 +27476,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1667</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -27085,6 +27784,8 @@ CERTS QUEUED FOR PUBLICATION}</string>
 					<integer>1554</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>4.407501220703125</real>
 					<key>Points</key>
@@ -27183,6 +27884,8 @@ CERTS QUEUED FOR PUBLICATION}</string>
 					<integer>1551</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -27500,6 +28203,8 @@ CERTS QUEUED FOR PUBLICATION}</string>
 					<integer>1538</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -27541,6 +28246,8 @@ CERTS QUEUED FOR PUBLICATION}</string>
 					<integer>1537</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -27792,6 +28499,8 @@ CERTS QUEUED FOR PUBLICATION}</string>
 					<integer>1530</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.283050537109375</real>
 					<key>Points</key>
@@ -27897,6 +28606,8 @@ CERTS QUEUED FOR PUBLICATION}</string>
 					<integer>1526</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>73.199966430664062</real>
 					<key>Points</key>
@@ -28006,6 +28717,8 @@ CERTS QUEUED FOR PUBLICATION}</string>
 					<integer>1524</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>40.092529296875</real>
 					<key>Points</key>
@@ -28043,6 +28756,8 @@ CERTS QUEUED FOR PUBLICATION}</string>
 					<integer>1523</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -28577,6 +29292,8 @@ CERT PUBLISH CHECK}</string>
 					<integer>1684</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>59.93096923828125</real>
 					<key>Points</key>
@@ -28616,6 +29333,8 @@ CERT PUBLISH CHECK}</string>
 					<integer>1683</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>18.037353515625</real>
 					<key>Points</key>
@@ -28657,6 +29376,8 @@ CERT PUBLISH CHECK}</string>
 					<integer>1682</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>23.810501098632812</real>
 					<key>Points</key>
@@ -28903,6 +29624,8 @@ CERT PUBLISH CHECK}</string>
 					<integer>1676</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>24.660995483398438</real>
 					<key>Points</key>
@@ -28944,6 +29667,8 @@ CERT PUBLISH CHECK}</string>
 					<integer>1675</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>6.072998046875</real>
 					<key>Points</key>
@@ -29184,6 +29909,8 @@ CERT PUBLISH CHECK}</string>
 					<integer>1582</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.699981689453125</real>
 					<key>Points</key>
@@ -29825,6 +30552,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1550</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>16.784027099609375</real>
 					<key>Points</key>
@@ -29866,6 +30595,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1549</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>71.889007568359375</real>
 					<key>Points</key>
@@ -30143,6 +30874,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1543</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>74</real>
 					<key>Points</key>
@@ -30188,6 +30921,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1542</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>24.46734619140625</real>
 					<key>Points</key>
@@ -30233,6 +30968,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1541</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>8.326385498046875</real>
 					<key>Points</key>
@@ -30329,6 +31066,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1538</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>227.98348999023438</real>
 					<key>Points</key>
@@ -30371,6 +31110,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1537</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>3.899993896484375</real>
 					<key>Points</key>
@@ -30421,6 +31162,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1536</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>207.19999694824219</real>
 					<key>Points</key>
@@ -30669,6 +31412,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1530</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>76.791732788085938</real>
 					<key>Points</key>
@@ -30710,6 +31455,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1529</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -31145,6 +31892,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1524</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>74</real>
 					<key>Points</key>
@@ -31190,6 +31939,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1523</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>24.46734619140625</real>
 					<key>Points</key>
@@ -31525,6 +32276,8 @@ HAVE PUK}</string>
 					<integer>1407</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>205.97402954101562</real>
 					<key>Points</key>
@@ -31639,6 +32392,8 @@ NEED PUK}</string>
 					<integer>1400</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -31759,6 +32514,8 @@ NEED PUK}</string>
 					<integer>1317</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>8.326385498046875</real>
 					<key>Points</key>
@@ -31976,6 +32733,8 @@ NEED PUK}</string>
 					<integer>1524</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>74</real>
 					<key>Points</key>
@@ -32021,6 +32780,8 @@ NEED PUK}</string>
 					<integer>1687</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -32060,6 +32821,8 @@ NEED PUK}</string>
 					<integer>1686</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -32407,6 +33170,8 @@ CERT DELETE CHECK}</string>
 					<integer>1597</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>1.808502197265625</real>
 					<key>Points</key>
@@ -32451,6 +33216,8 @@ CERT DELETE CHECK}</string>
 					<integer>1596</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>80.826736450195312</real>
 					<key>Points</key>
@@ -32490,6 +33257,8 @@ CERT DELETE CHECK}</string>
 					<integer>1595</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -32847,6 +33616,8 @@ CERT DELETE CHECK}</string>
 					<integer>1578</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -33064,6 +33835,8 @@ CERT DELETE CHECK}</string>
 					<integer>1562</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -33105,6 +33878,8 @@ CERT DELETE CHECK}</string>
 					<integer>1553</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -33210,6 +33985,8 @@ CERT DELETE CHECK}</string>
 					<integer>1545</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>69.20001220703125</real>
 					<key>Points</key>
@@ -33379,6 +34156,8 @@ CERT UNPUB CHECK}</string>
 					<integer>1400</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -33642,6 +34421,8 @@ PRE SUCCESS}</string>
 					<integer>1694</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -33683,6 +34464,8 @@ PRE SUCCESS}</string>
 					<integer>1693</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -33993,6 +34776,8 @@ CERTS DELETED}</string>
 					<integer>1686</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.28307723999023438</real>
 					<key>Points</key>
@@ -34032,6 +34817,8 @@ CERTS DELETED}</string>
 					<integer>1685</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -34073,6 +34860,8 @@ CERTS DELETED}</string>
 					<integer>1684</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -34379,6 +35168,8 @@ CERTS QUEUED FOR  DELETION}</string>
 					<integer>1683</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -34420,6 +35211,8 @@ CERTS QUEUED FOR  DELETION}</string>
 					<integer>1682</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>4.213470458984375</real>
 					<key>Points</key>
@@ -34751,6 +35544,8 @@ CERTS QUEUED FOR  DELETION}</string>
 					<integer>1651</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>5.471466064453125</real>
 					<key>Points</key>
@@ -34795,6 +35590,8 @@ CERTS QUEUED FOR  DELETION}</string>
 					<integer>1650</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -34838,6 +35635,8 @@ CERTS QUEUED FOR  DELETION}</string>
 					<integer>1649</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -35096,6 +35895,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1604</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -35402,6 +36203,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1587</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>4.213470458984375</real>
 					<key>Points</key>
@@ -35917,6 +36720,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1570</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>23.377273559570312</real>
 					<key>Points</key>
@@ -35964,6 +36769,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1537</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -36005,6 +36812,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1536</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.0</real>
 					<key>Points</key>
@@ -36046,6 +36855,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1530</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>-1</real>
 					<key>Points</key>
@@ -36151,6 +36962,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1526</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<false/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>34.5999755859375</real>
 					<key>Points</key>
@@ -36260,6 +37073,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1524</integer>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
 					<real>0.382049560546875</real>
 					<key>Points</key>
@@ -39019,7 +39834,7 @@ SUCCESS}</string>
 		<key>FitInWindow</key>
 		<true/>
 		<key>Frame</key>
-		<string>{{441, 0}, {1114, 1028}}</string>
+		<string>{{176, 0}, {1114, 1028}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
