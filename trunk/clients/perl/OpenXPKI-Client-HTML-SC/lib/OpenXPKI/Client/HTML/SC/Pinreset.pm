@@ -174,7 +174,7 @@ sub start_pinreset {
                 'WORKFLOW' => $wf_type,
             },
         );
-		$log->debug(Dumper( $msg));
+		#$log->debug(Dumper( $msg));
         if ( $self->is_error_response($msg) ) {
             $responseData->{'error'} = "error";
             push( @{$errors},
@@ -223,7 +223,7 @@ sub start_pinreset {
                 'ACTIVITY' => 'scunblock_initialize',
             },
         );
-        $log->debug(Dumper($msg));
+        #$log->debug(Dumper($msg));
        
 
         if ( $self->is_error_response($msg) ) {
@@ -274,7 +274,7 @@ sub start_pinreset {
                     'WORKFLOW' => $wf_type,
                 },
             );
-            $log->debug(Dumper($msg));
+           # $log->debug(Dumper($msg));
 
             if ( $self->is_error_response($msg) ) {
                 $responseData->{'error'} = "error";
@@ -306,8 +306,10 @@ sub start_pinreset {
 #                     . "Successfully executed store_auth_ids'"
 #                     . $session->{'cardID'};
             }
+            
+            my $actual_state = $self->wfstate( $c, $wf_ID, $wf_type  );
 
-            if ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'PEND_ACT_CODE' ) {
+            if ( $actual_state eq 'PEND_ACT_CODE' ) {
 				push( @{$workflowtrace},
 								"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_STATE_PEND_ACT_CODE"
 						);
@@ -500,7 +502,8 @@ sub pinreset_verify {
     my $p            = config()->{openxpki}->{role};
     my $wf_ID;
     my $errors;
-	 my $workflowtrace; 
+	my $workflowtrace; 
+	my $plugincommand;	
     my $msg;
     my $serializer = OpenXPKI::Serialization::Simple->new(); 
 
@@ -743,7 +746,7 @@ sub pinreset_verify {
 	                'WORKFLOW' => $wf_type ,
 	            },
 	        );
-	     $log->debug(Dumper($msg));
+	    # $log->debug(Dumper($msg));
 	
 		if ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'CAN_FETCH_PUK' )
 		{
@@ -768,6 +771,7 @@ sub pinreset_verify {
 
     # Provide correct codes and pins
 
+	
     if ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'CAN_FETCH_PUK' ) {
 #         $responseData->{'msg'}
 #             = $responseData->{'msg'}
@@ -795,7 +799,7 @@ sub pinreset_verify {
 
 	my $PUK     = $serializer->deserialize( $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_puk} );
 
-	my $plugincommand;	
+
 		if(defined  $PUK &&  $PUK ne '')
 		{
 			
@@ -803,7 +807,7 @@ sub pinreset_verify {
 				    'ResetPIN;CardSerial='
 				  . $session->{'cardID'} 
 				  . ';PUK='.$PUK->[0].';';
-
+		 #$log->debug('Pinreset_plugincommand: '. $plugincommand);
 
 		}
       #  $responseData->{'puk'} = $got_puk;
@@ -871,6 +875,19 @@ sub pinreset_verify {
     # is( wfstate($wf_id), 'SUCCESS', 'Workflow state after write_pin_ok' )
     #     or die("State after write_pin_ok must be SUCCESS:", $@);
     #
+    		$log->info(
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_ENCRYPT_OUT_DATA"
+		);
+		#$log->info("Plugin command to enc:".$plugincommand);
+	if ( $plugincommand ne '' ) {
+		
+		eval{
+		$responseData->{'exec'} = $self->session_encrypt($plugincommand) ;
+		};
+		#$log->info('action:'.$responseData->{'action'});
+        $log->info('exec:'.$@.$responseData->{'exec'});
+	}
+    
     $session->{'wfstate'} = $msg->{PARAMS}->{WORKFLOW}->{STATE};
     $responseData->{'wfstate'} = $session->{'wfstate'};
 	$responseData->{'workflowtrace'} = $workflowtrace;

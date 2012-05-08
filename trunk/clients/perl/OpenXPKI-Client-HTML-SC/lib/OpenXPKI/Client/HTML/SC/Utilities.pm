@@ -263,7 +263,7 @@ if(!defined $session->{'cardOwner'} || $session->{'cardOwner'} eq '') {
 	$session->{'outlook_b64'} = config()->{outlook}->{b64};
 	$session->{'outlook_issuerCN'} = config()->{outlook}->{issuerCN};
     $log->debug("Card owner: ". $session->{'cardOwner'} );
-    $log->debug("dbntloginid: ". Dumper( $session->{'dbntloginid'}) );
+   # $log->debug("dbntloginid: ". Dumper( $session->{'dbntloginid'}) );
     #$log->debug("dbntloginid: ". Dumper( $session->{'dbntloginid'}->[0]) );
     
  	 $c = $self->openXPKIConnection(
