@@ -359,7 +359,7 @@ CERTS:
 			},
 		);
 		
-		$log->debug("params:". Dumper(%params));
+		#$log->debug("params:". Dumper(%params));
 	eval{
 		$msg =
 		  $c->send_receive_command_msg( 'execute_workflow_activity', \%params,
@@ -379,7 +379,7 @@ CERTS:
 			);
 			
 			$log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_UPLOAD_CSR");
-			$log->debug("params:". Dumper($msg));
+			#$log->debug("params:". Dumper($msg));
 		}
 		else {
 			push(
@@ -511,7 +511,7 @@ CERTS:
 		
 		my $WFinfo = $self->wf_status( $c, $wf_ID , $wf_type);
 
-		$log->debug(Dumper($WFinfo));
+		#$log->debug(Dumper($WFinfo));
 		
 		$log->info($WFinfo->{PARAMS}->{WORKFLOW}->{STATE});
 		

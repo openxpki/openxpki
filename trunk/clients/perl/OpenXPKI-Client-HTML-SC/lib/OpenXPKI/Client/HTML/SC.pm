@@ -18,6 +18,8 @@ use Config::Std;
 use OpenXPKI::i18n qw( i18nGettext );
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
+use Crypt::CBC ;
+use MIME::Base64;
 use OpenXPKI::Client::HTML::SC::Dispatcher qw( config );
 
 use base qw(
@@ -589,7 +591,7 @@ my $b64enc;
 		#$log->debug('EncIV  B64=' . encode_base64($cipher->get_initialization_vector()));
 		
 		#$log->debug('Enc :'.$enc);
-		my $de = $cipher->decrypt($enc);
+		#my $de = $cipher->decrypt($enc);
 		#$log->debug('\nde:'.$de );
 #		eval{
 #			$log->debug('DeIV :'. $cipher->get_initialization_vector());
