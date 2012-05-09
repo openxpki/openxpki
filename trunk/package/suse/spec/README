@@ -1,0 +1,3 @@
+The trunk/package/suse/spec directory contains spec files for packages
+that need to be manually created using "rpmbuild -bb <specfile>". This 
+includes new modules that haven't made their way up to CPAN.
