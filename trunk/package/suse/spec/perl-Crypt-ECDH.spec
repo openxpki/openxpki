@@ -1,7 +1,7 @@
 %{!?perl_vendorlib: %define perl_vendorlib %(eval "`%{__perl} -V:installvendorlib`"; echo $installvendorlib)}
 
 Name:           perl-Crypt-ECDH
-Version:        0.10
+Version:        0.11
 Release:        1%{?dist}
 Summary:        Inline C elliptic curve Diffi-Hellman implementation using the openSSL lib
 License:        GPL+ or Artistic
@@ -44,7 +44,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc build.mkd Changes commands README COPYING Artistic
+%doc commands README COPYING Artistic
 /usr/local/*
 
 %changelog
