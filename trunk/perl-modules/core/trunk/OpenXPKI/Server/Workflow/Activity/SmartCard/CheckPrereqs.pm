@@ -185,10 +185,11 @@ sub execute {
 
 	$context->param('keyalg' =>
 			$result->{SMARTCARD}->{keyalg});
-	
-	$context->param('smartcard_default_puk' =>
-			$result->{SMARTCARD}->{default_puk});
-	
+
+    # Values are valid, new, mismatch	
+	$context->param('smartcard_token_chipid_match' =>
+			$result->{SMARTCARD}->{token_chipid_match});
+
 
 	##! 1: 'Leaving Initialize::execute()'
 	return 1;
