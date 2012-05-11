@@ -209,7 +209,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{0, 769}, {100, 14}}</string>
+					<string>{{0, 769}, {90, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -396,7 +396,7 @@ Smartcard Personalization}</string>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2012-05-07 13:22:47 +0000</string>
+	<string>2012-05-11 11:47:38 +0000</string>
 	<key>Modifier</key>
 	<string>Martin Bartosch</string>
 	<key>NotesVisible</key>
@@ -1781,7 +1781,7 @@ login_id: the preferred login account (ie. windows login) to be used for the aut
 					<key>Points</key>
 					<array>
 						<string>{525.427, 168.34691}</string>
-						<string>{239.66881, 285.94064}</string>
+						<string>{239.66817, 243.21117}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1869,10 +1869,10 @@ login_id: the preferred login account (ie. windows login) to be used for the aut
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>81.074111938476562</real>
+					<real>81.073768615722656</real>
 					<key>Points</key>
 					<array>
-						<string>{188.82169, 686.28027}</string>
+						<string>{188.82237, 578.64514}</string>
 						<string>{350.96991, 555.18359}</string>
 					</array>
 					<key>Style</key>
@@ -1961,7 +1961,7 @@ OWNER IDENTIFIED}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.97519, 662.28033}, {101.69299, 12}}</string>
+							<string>{{137.97588, 554.64514}, {101.69299, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2004,7 +2004,7 @@ OWNER IDENTIFIED}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.97519, 614.28033}, {101.69299, 24}}</string>
+							<string>{{137.97588, 506.64514}, {101.69299, 24}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2040,7 +2040,7 @@ OWNER IDENTIFIED}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.97519, 638.28033}, {101.69299, 24}}</string>
+							<string>{{137.97588, 530.64514}, {101.69299, 24}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2083,7 +2083,7 @@ OWNER IDENTIFIED}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.97519, 674.28033}, {101.69299, 12}}</string>
+							<string>{{137.97588, 566.64514}, {101.69299, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2178,8 +2178,8 @@ OWNER IDENTIFIED}</string>
 					<real>86.39892578125</real>
 					<key>Points</key>
 					<array>
-						<string>{188.82269, 584.67065}</string>
-						<string>{188.82169, 614.28033}</string>
+						<string>{188.82338, 477.03543}</string>
+						<string>{188.82237, 506.64511}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2221,8 +2221,8 @@ OWNER IDENTIFIED}</string>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{188.8223, 531.56067}</string>
-						<string>{188.82269, 555.18359}</string>
+						<string>{188.823, 423.92545}</string>
+						<string>{188.82338, 447.54843}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2246,7 +2246,7 @@ OWNER IDENTIFIED}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{142.0528, 555.18365}, {93.539803, 29.487}}</string>
+					<string>{{142.05348, 447.54843}, {93.539803, 29.487}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -2362,7 +2362,7 @@ HAVE PREREQS}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.9758, 507.56067}, {101.69301, 12}}</string>
+							<string>{{137.9765, 399.92548}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2405,7 +2405,7 @@ HAVE PREREQS}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.9758, 471.56064}, {101.69301, 24}}</string>
+							<string>{{137.9765, 363.92545}, {101.69301, 24}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2441,7 +2441,7 @@ HAVE PREREQS}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.9758, 495.56064}, {101.69301, 12}}</string>
+							<string>{{137.9765, 387.92548}, {101.69301, 12.000031}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2484,7 +2484,7 @@ HAVE PREREQS}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.9758, 519.56067}, {101.69301, 12}}</string>
+							<string>{{137.9765, 411.92548}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2735,7 +2735,7 @@ HAVE PREREQS}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.9758, 255.94061}, {101.69301, 12}}</string>
+							<string>{{137.97519, 213.21114}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2771,7 +2771,7 @@ HAVE PREREQS}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.9758, 267.94061}, {101.69301, 12}}</string>
+							<string>{{137.97519, 225.21114}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2814,7 +2814,7 @@ HAVE PREREQS}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.9758, 279.94061}, {101.69301, 24}}</string>
+							<string>{{137.97519, 237.21114}, {101.69301, 24}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2857,7 +2857,7 @@ HAVE PREREQS}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{137.9758, 303.94061}, {101.69301, 12}}</string>
+							<string>{{137.97519, 261.21112}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2952,8 +2952,8 @@ HAVE PREREQS}</string>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{188.82169, 379.20465}</string>
-						<string>{188.8223, 471.56064}</string>
+						<string>{188.82106, 336.47513}</string>
+						<string>{188.823, 363.92542}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2981,7 +2981,7 @@ HAVE PREREQS}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{142.05179, 349.71762}, {93.539803, 29.487}}</string>
+					<string>{{142.05116, 306.98813}, {93.539803, 29.487}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -3059,8 +3059,8 @@ INITIALIZED}</string>
 					<integer>1185</integer>
 					<key>Points</key>
 					<array>
-						<string>{188.8223, 315.94061}</string>
-						<string>{188.82169, 349.71762}</string>
+						<string>{188.82169, 273.21112}</string>
+						<string>{188.82106, 306.98813}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -3111,7 +3111,7 @@ INITIALIZED}</string>
 					<key>Points</key>
 					<array>
 						<string>{188.82269, 185.42537}</string>
-						<string>{188.8223, 255.94061}</string>
+						<string>{188.82169, 213.21115}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -3207,7 +3207,7 @@ INITIAL}</string>
 					<key>Points</key>
 					<array>
 						<string>{525.427, 382.76526}</string>
-						<string>{239.66879, 481.56064}</string>
+						<string>{239.66949, 393.92545}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -13275,7 +13275,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<key>Points</key>
 					<array>
 						<string>{159.16263, 416.57074}</string>
-						<string>{159.16263, 442.22693}</string>
+						<string>{159.16261, 442.22693}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -14374,10 +14374,10 @@ NEXT CSR TO ISSUE}</string>
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>37.66143798828125</real>
+					<real>37.661445617675781</real>
 					<key>Points</key>
 					<array>
-						<string>{159.16263, 613.78198}</string>
+						<string>{159.16261, 613.78198}</string>
 						<string>{234.4855, 594.59393}</string>
 						<string>{292.31845, 330.08667}</string>
 					</array>
@@ -14422,7 +14422,7 @@ NEXT CSR TO ISSUE}</string>
 					<key>Points</key>
 					<array>
 						<string>{159.16261, 546.00385}</string>
-						<string>{159.16263, 565.78192}</string>
+						<string>{159.16261, 565.78198}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -14494,7 +14494,7 @@ NEXT CSR TO ISSUE}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{108.31611, 565.78198}, {101.69301, 12.000031}}</string>
+							<string>{{108.31611, 565.78198}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -14668,7 +14668,7 @@ NEXT CSR TO ISSUE}</string>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{159.16263, 490.22696}</string>
+						<string>{159.16261, 490.22696}</string>
 						<string>{159.16261, 510.00385}</string>
 					</array>
 					<key>Style</key>
@@ -29453,12 +29453,163 @@ CERT PUBLISH CHECK}</string>
 			<array>
 				<dict>
 					<key>Class</key>
+					<string>LineGraphic</string>
+					<key>Head</key>
+					<dict>
+						<key>ID</key>
+						<integer>1566</integer>
+						<key>Info</key>
+						<integer>2</integer>
+					</dict>
+					<key>ID</key>
+					<integer>1699</integer>
+					<key>OrthogonalBarAutomatic</key>
+					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
+					<key>OrthogonalBarPosition</key>
+					<real>-1</real>
+					<key>Points</key>
+					<array>
+						<string>{300.9104, 331.78333}</string>
+						<string>{300.92755, 355.5}</string>
+					</array>
+					<key>Style</key>
+					<dict>
+						<key>stroke</key>
+						<dict>
+							<key>HeadArrow</key>
+							<string>Arrow</string>
+							<key>LineType</key>
+							<integer>2</integer>
+							<key>TailArrow</key>
+							<string>0</string>
+						</dict>
+					</dict>
+					<key>Tail</key>
+					<dict>
+						<key>ID</key>
+						<integer>1697</integer>
+						<key>Info</key>
+						<integer>11</integer>
+					</dict>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>LineGraphic</string>
+					<key>Head</key>
+					<dict>
+						<key>ID</key>
+						<integer>1697</integer>
+						<key>Info</key>
+						<integer>2</integer>
+					</dict>
+					<key>ID</key>
+					<integer>1698</integer>
+					<key>OrthogonalBarAutomatic</key>
+					<true/>
+					<key>OrthogonalBarPoint</key>
+					<string>{0, 0}</string>
+					<key>OrthogonalBarPosition</key>
+					<real>-1</real>
+					<key>Points</key>
+					<array>
+						<string>{300.92758, 278.15088}</string>
+						<string>{300.9104, 295.78333}</string>
+					</array>
+					<key>Style</key>
+					<dict>
+						<key>stroke</key>
+						<dict>
+							<key>HeadArrow</key>
+							<string>Arrow</string>
+							<key>LineType</key>
+							<integer>2</integer>
+							<key>TailArrow</key>
+							<string>0</string>
+						</dict>
+					</dict>
+					<key>Tail</key>
+					<dict>
+						<key>ID</key>
+						<integer>1690</integer>
+						<key>Info</key>
+						<integer>8</integer>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{255.9104, 295.78333}, {90, 36}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>Size</key>
+						<real>10</real>
+					</dict>
+					<key>ID</key>
+					<integer>1697</integer>
+					<key>Magnets</key>
+					<array>
+						<string>{-0.440467, -1.25848}</string>
+						<string>{0, -1.33333}</string>
+						<string>{0.44046801, -1.25848}</string>
+						<string>{0.90320897, -0.98081201}</string>
+						<string>{1.10115, -0.75182903}</string>
+						<string>{1.26776, -0.412983}</string>
+						<string>{1.25844, 0.440575}</string>
+						<string>{1.07737, 0.78552198}</string>
+						<string>{0.90320897, 0.98081201}</string>
+						<string>{0.44046801, 1.25848}</string>
+						<string>{0, 1.33333}</string>
+						<string>{-0.440467, 1.25848}</string>
+						<string>{-0.90320897, 0.98081201}</string>
+						<string>{-1.10115, 0.75182903}</string>
+						<string>{-1.26776, 0.412983}</string>
+						<string>{-1.25844, -0.440575}</string>
+						<string>{-1.07737, -0.78552401}</string>
+						<string>{-0.90320897, -0.98081201}</string>
+					</array>
+					<key>Shape</key>
+					<string>RoundRect</string>
+					<key>Style</key>
+					<dict>
+						<key>shadow</key>
+						<dict>
+							<key>Beneath</key>
+							<string>YES</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Pad</key>
+						<integer>1</integer>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
+
+\f0\fs20 \cf0 HAVE COMPUTED PUK}</string>
+						<key>VerticalPad</key>
+						<integer>1</integer>
+					</dict>
+					<key>UserInfo</key>
+					<dict>
+						<key>autorun</key>
+						<string>yes</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Class</key>
 					<string>TableGroup</string>
 					<key>Graphics</key>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{161.05603, 572.7702}, {169.28999, 12}}</string>
+							<string>{{250.08105, 254.15091}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -29466,65 +29617,7 @@ CERT PUBLISH CHECK}</string>
 							<key>Flow</key>
 							<string>Resize</string>
 							<key>ID</key>
-							<integer>1687</integer>
-							<key>ImageID</key>
-							<integer>5</integer>
-							<key>ManualSizeImage</key>
-							<string>YES</string>
-							<key>Scale</key>
-							<real>0.36487001180648804</real>
-							<key>Shape</key>
-							<string>Rectangle</string>
-							<key>Style</key>
-							<dict>
-								<key>image fill</key>
-								<dict>
-									<key>ImageSizing</key>
-									<integer>0</integer>
-									<key>Scale</key>
-									<real>0.36487001180648804</real>
-								</dict>
-								<key>stroke</key>
-								<dict>
-									<key>Color</key>
-									<dict>
-										<key>b</key>
-										<string>0.89145</string>
-										<key>g</key>
-										<string>0.574635</string>
-										<key>r</key>
-										<string>0.366472</string>
-									</dict>
-									<key>Draws</key>
-									<string>NO</string>
-								</dict>
-							</dict>
-							<key>Text</key>
-							<dict>
-								<key>Text</key>
-								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
-
-\f0\fs20 \cf0  }</string>
-								<key>VerticalPad</key>
-								<integer>0</integer>
-							</dict>
-							<key>TextPlacement</key>
-							<integer>0</integer>
-						</dict>
-						<dict>
-							<key>Bounds</key>
-							<string>{{161.05603, 584.7702}, {169.28999, 30}}</string>
-							<key>Class</key>
-							<string>ShapedGraphic</string>
-							<key>FitText</key>
-							<string>Vertical</string>
-							<key>Flow</key>
-							<string>Resize</string>
-							<key>ID</key>
-							<integer>1688</integer>
+							<integer>1691</integer>
 							<key>Shape</key>
 							<string>Rectangle</string>
 							<key>Style</key>
@@ -29534,19 +29627,10 @@ CERT PUBLISH CHECK}</string>
 									<key>GradientCenter</key>
 									<string>{-0.29411799, -0.26470599}</string>
 								</dict>
-								<key>stroke</key>
+								<key>shadow</key>
 								<dict>
-									<key>Color</key>
-									<dict>
-										<key>b</key>
-										<string>0.89145</string>
-										<key>g</key>
-										<string>0.574635</string>
-										<key>r</key>
-										<string>0.366472</string>
-									</dict>
-									<key>Draws</key>
-									<string>NO</string>
+									<key>Beneath</key>
+									<string>YES</string>
 								</dict>
 							</dict>
 							<key>Text</key>
@@ -29559,8 +29643,129 @@ CERT PUBLISH CHECK}</string>
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720
 
-\f0\b\fs16 \cf0 Open Questions:
-\b0 \uc0\u8232 - In activity, do not encrypt (already implemented in feature/smartcard branch)}</string>
+\f0\fs20 \cf0 chip_id}</string>
+								<key>VerticalPad</key>
+								<integer>0</integer>
+							</dict>
+							<key>TextPlacement</key>
+							<integer>0</integer>
+						</dict>
+						<dict>
+							<key>Bounds</key>
+							<string>{{250.08105, 230.15091}, {101.69301, 12}}</string>
+							<key>Class</key>
+							<string>ShapedGraphic</string>
+							<key>FitText</key>
+							<string>Vertical</string>
+							<key>Flow</key>
+							<string>Resize</string>
+							<key>ID</key>
+							<integer>1692</integer>
+							<key>Shape</key>
+							<string>Rectangle</string>
+							<key>Style</key>
+							<dict>
+								<key>shadow</key>
+								<dict>
+									<key>Beneath</key>
+									<string>YES</string>
+								</dict>
+							</dict>
+							<key>Text</key>
+							<dict>
+								<key>Text</key>
+								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
+
+\f0\b\fs20 \cf0 compute puk}</string>
+								<key>VerticalPad</key>
+								<integer>0</integer>
+							</dict>
+							<key>TextPlacement</key>
+							<integer>0</integer>
+						</dict>
+						<dict>
+							<key>Bounds</key>
+							<string>{{250.08105, 242.15091}, {101.69301, 12}}</string>
+							<key>Class</key>
+							<string>ShapedGraphic</string>
+							<key>FitText</key>
+							<string>Vertical</string>
+							<key>Flow</key>
+							<string>Resize</string>
+							<key>ID</key>
+							<integer>1696</integer>
+							<key>Shape</key>
+							<string>Rectangle</string>
+							<key>Style</key>
+							<dict>
+								<key>fill</key>
+								<dict>
+									<key>GradientCenter</key>
+									<string>{-0.29411799, -0.26470599}</string>
+								</dict>
+								<key>shadow</key>
+								<dict>
+									<key>Beneath</key>
+									<string>YES</string>
+								</dict>
+							</dict>
+							<key>Text</key>
+							<dict>
+								<key>Align</key>
+								<integer>0</integer>
+								<key>Text</key>
+								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs20 \cf0 token_id}</string>
+								<key>VerticalPad</key>
+								<integer>0</integer>
+							</dict>
+							<key>TextPlacement</key>
+							<integer>0</integer>
+						</dict>
+						<dict>
+							<key>Bounds</key>
+							<string>{{250.08105, 266.15091}, {101.69301, 12}}</string>
+							<key>Class</key>
+							<string>ShapedGraphic</string>
+							<key>FitText</key>
+							<string>Vertical</string>
+							<key>Flow</key>
+							<string>Resize</string>
+							<key>ID</key>
+							<integer>1694</integer>
+							<key>Shape</key>
+							<string>Rectangle</string>
+							<key>Style</key>
+							<dict>
+								<key>fill</key>
+								<dict>
+									<key>GradientCenter</key>
+									<string>{-0.29411799, -0.26470599}</string>
+								</dict>
+								<key>shadow</key>
+								<dict>
+									<key>Beneath</key>
+									<string>YES</string>
+								</dict>
+							</dict>
+							<key>Text</key>
+							<dict>
+								<key>Align</key>
+								<integer>0</integer>
+								<key>Text</key>
+								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720
+
+\f0\fs20 \cf0 _puk}</string>
 								<key>VerticalPad</key>
 								<integer>0</integer>
 							</dict>
@@ -29570,79 +29775,42 @@ CERT PUBLISH CHECK}</string>
 					</array>
 					<key>GridH</key>
 					<array>
-						<integer>1687</integer>
-						<integer>1688</integer>
+						<integer>1692</integer>
+						<integer>1696</integer>
+						<integer>1691</integer>
+						<integer>1694</integer>
 						<array/>
 					</array>
 					<key>GroupConnect</key>
 					<string>YES</string>
 					<key>ID</key>
-					<integer>1686</integer>
+					<integer>1690</integer>
 					<key>Magnets</key>
 					<array>
-						<string>{-0.7396, -1.1094}</string>
-						<string>{-0.421637, -1.26491}</string>
-						<string>{0, -1.33333}</string>
-						<string>{0.421637, -1.26491}</string>
-						<string>{0.7396, -1.1094}</string>
-						<string>{1.1094, -0.7396}</string>
-						<string>{1.26491, -0.421637}</string>
-						<string>{1.33333, 0}</string>
-						<string>{1.26491, 0.421637}</string>
-						<string>{1.1094, 0.7396}</string>
-						<string>{0.7396, 1.1094}</string>
-						<string>{0.421637, 1.26491}</string>
-						<string>{0, 1.33333}</string>
-						<string>{-0.421637, 1.26491}</string>
-						<string>{-0.7396, 1.1094}</string>
-						<string>{-1.1094, 0.73960102}</string>
-						<string>{-1.26491, 0.421637}</string>
-						<string>{-1.33333, -6.3578301e-07}</string>
-						<string>{-1.26491, -0.421637}</string>
-						<string>{-1.1094, -0.7396}</string>
+						<string>{-0.59628499, -1.19257}</string>
+						<string>{6.3578301e-07, -1.33333}</string>
+						<string>{0.596286, -1.19257}</string>
+						<string>{1.19257, -0.59628397}</string>
+						<string>{1.33333, 1.27157e-06}</string>
+						<string>{1.19257, 0.59628499}</string>
+						<string>{0.59628499, 1.19257}</string>
+						<string>{6.3578199e-07, 1.33333}</string>
+						<string>{-0.59628397, 1.19257}</string>
+						<string>{-1.19257, 0.596286}</string>
+						<string>{-1.33333, 1.27157e-06}</string>
+						<string>{-1.19257, -0.59628397}</string>
 					</array>
-				</dict>
-				<dict>
-					<key>Class</key>
-					<string>LineGraphic</string>
-					<key>Head</key>
+					<key>Notes</key>
+					<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs24 \cf0 Obtain PUK for given Smartcard (possibly only a default value, or a computation based on token_id or chip_id)}</string>
+					<key>UserInfo</key>
 					<dict>
-						<key>ID</key>
-						<integer>1576</integer>
-					</dict>
-					<key>ID</key>
-					<integer>1685</integer>
-					<key>Points</key>
-					<array>
-						<string>{245.70102, 572.7702}</string>
-						<string>{212.955, 519.854}</string>
-					</array>
-					<key>Style</key>
-					<dict>
-						<key>stroke</key>
-						<dict>
-							<key>HeadArrow</key>
-							<string>Arrow</string>
-							<key>HeadScale</key>
-							<real>1.0000001192092896</real>
-							<key>HopLines</key>
-							<true/>
-							<key>HopType</key>
-							<integer>101</integer>
-							<key>LineType</key>
-							<integer>1</integer>
-							<key>Pattern</key>
-							<integer>11</integer>
-							<key>TailArrow</key>
-							<string>0</string>
-						</dict>
-					</dict>
-					<key>Tail</key>
-					<dict>
-						<key>ID</key>
-						<integer>1686</integer>
-						<key>Info</key>
-						<integer>3</integer>
+						<key>class</key>
+						<string>OpenXPKI::Server::Workflow::Activity::SmartCard::ComputePUK</string>
 					</dict>
 				</dict>
 				<dict>
@@ -29662,11 +29830,11 @@ CERT PUBLISH CHECK}</string>
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>59.93096923828125</real>
+					<real>42.772918701171875</real>
 					<key>Points</key>
 					<array>
-						<string>{372.36401, 519.854}</string>
-						<string>{413.38, 663.51599}</string>
+						<string>{371.08252, 592.03558}</string>
+						<string>{417.33301, 701.38147}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -29706,8 +29874,8 @@ CERT PUBLISH CHECK}</string>
 					<real>18.037353515625</real>
 					<key>Points</key>
 					<array>
-						<string>{433.08301, 435.90799}</string>
-						<string>{372.36401, 471.854}</string>
+						<string>{427.23651, 502.35638}</string>
+						<string>{371.08252, 544.03558}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -29744,16 +29912,16 @@ CERT PUBLISH CHECK}</string>
 					<key>OrthogonalBarAutomatic</key>
 					<true/>
 					<key>OrthogonalBarPoint</key>
-					<string>{0, 0}</string>
+					<string>{311.58002, 529.19598}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>23.810501098632812</real>
+					<real>22.955322265625</real>
 					<key>Points</key>
 					<array>
-						<string>{212.955, 519.854}</string>
-						<string>{165.334, 449.73199}</string>
-						<string>{304.19601, 422.85599}</string>
-						<string>{375, 389.70001}</string>
-						<string>{417.33301, 399.90799}</string>
+						<string>{211.67352, 592.03558}</string>
+						<string>{165.76288, 454.73193}</string>
+						<string>{304.78348, 452.0412}</string>
+						<string>{340.65976, 451.14429}</string>
+						<string>{411.48651, 466.35638}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -29782,7 +29950,7 @@ CERT PUBLISH CHECK}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{336.36401, 495.854}, {72, 12}}</string>
+							<string>{{335.08252, 568.03564}, {72, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -29825,7 +29993,7 @@ CERT PUBLISH CHECK}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{336.36401, 471.854}, {72, 12}}</string>
+							<string>{{335.08252, 544.03564}, {72, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -29861,7 +30029,7 @@ CERT PUBLISH CHECK}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{336.36401, 483.854}, {72, 12}}</string>
+							<string>{{335.08252, 556.03564}, {72, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -29904,7 +30072,7 @@ CERT PUBLISH CHECK}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{336.36401, 507.854}, {72, 12}}</string>
+							<string>{{335.08252, 580.03564}, {72, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -29994,13 +30162,13 @@ CERT PUBLISH CHECK}</string>
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>24.660995483398438</real>
+					<real>25.3017578125</real>
 					<key>Points</key>
 					<array>
-						<string>{461.61801, 519.854}</string>
+						<string>{460.33649, 592.03558}</string>
 						<string>{510.94, 538.85602}</string>
-						<string>{504.38101, 380.043}</string>
-						<string>{448.83298, 399.90799}</string>
+						<string>{505.33649, 451.14429}</string>
+						<string>{442.98648, 466.35638}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -30037,11 +30205,11 @@ CERT PUBLISH CHECK}</string>
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>6.072998046875</real>
+					<real>8.9395751953125</real>
 					<key>Points</key>
 					<array>
-						<string>{448.83298, 435.90799}</string>
-						<string>{461.61801, 471.85397}</string>
+						<string>{442.98645, 502.35638}</string>
+						<string>{460.33649, 544.03558}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -30070,7 +30238,7 @@ CERT PUBLISH CHECK}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{416.61801, 495.854}, {90, 12}}</string>
+							<string>{{415.33649, 568.03564}, {90, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -30113,7 +30281,7 @@ CERT PUBLISH CHECK}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{416.61801, 471.854}, {90, 12}}</string>
+							<string>{{415.33649, 544.03564}, {90, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -30149,7 +30317,7 @@ CERT PUBLISH CHECK}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{416.61801, 483.854}, {90, 12}}</string>
+							<string>{{415.33649, 556.03564}, {90, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -30192,7 +30360,7 @@ CERT PUBLISH CHECK}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{416.61801, 507.854}, {90, 12}}</string>
+							<string>{{415.33649, 580.03564}, {90, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -30282,8 +30450,8 @@ CERT PUBLISH CHECK}</string>
 					<real>0.699981689453125</real>
 					<key>Points</key>
 					<array>
-						<string>{395.73184, 434.13211}</string>
-						<string>{212.955, 471.854}</string>
+						<string>{389.88535, 500.58051}</string>
+						<string>{211.67352, 544.03558}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -30312,7 +30480,7 @@ CERT PUBLISH CHECK}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{176.955, 495.854}, {72, 12}}</string>
+							<string>{{175.67352, 568.03564}, {72, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -30355,7 +30523,7 @@ CERT PUBLISH CHECK}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{176.955, 471.854}, {72, 12}}</string>
+							<string>{{175.67352, 544.03564}, {72, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -30391,7 +30559,7 @@ CERT PUBLISH CHECK}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{176.955, 483.854}, {72, 12}}</string>
+							<string>{{175.67352, 556.03564}, {72, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -30434,7 +30602,7 @@ CERT PUBLISH CHECK}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{176.955, 507.854}, {72, 12}}</string>
+							<string>{{175.67352, 580.03564}, {72, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -30526,7 +30694,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{234.5, 226.526}, {90, 36}}</string>
+					<string>{{255.92755, 355.5}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -30588,7 +30756,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{199.812, 655}, {169.28999, 12}}</string>
+							<string>{{198.71683, 678.75549}, {169.28999, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -30646,7 +30814,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{199.812, 667}, {169.28999, 50}}</string>
+							<string>{{198.71683, 690.75549}, {169.28999, 50}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -30746,8 +30914,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<integer>1405</integer>
 					<key>Points</key>
 					<array>
-						<string>{284.457, 655}</string>
-						<string>{395.73184, 434.13211}</string>
+						<string>{283.36182, 678.75549}</string>
+						<string>{389.88535, 500.58051}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -30779,7 +30947,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{424.08301, 345.77701}, {18, 14}}</string>
+					<string>{{451.33649, 427.65582}, {18, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -30805,7 +30973,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 						<key>ID</key>
 						<integer>1550</integer>
 						<key>Position</key>
-						<real>0.34281072020530701</real>
+						<real>0.22727927565574646</real>
 						<key>RotationType</key>
 						<integer>0</integer>
 					</dict>
@@ -30843,7 +31011,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{483.38925, 303.19299}, {14, 14}}</string>
+					<string>{{508.90332, 390.59613}, {14, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -30925,8 +31093,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<real>16.784027099609375</real>
 					<key>Points</key>
 					<array>
-						<string>{433.08301, 328.19299}</string>
-						<string>{433.08301, 399.90799}</string>
+						<string>{460.33649, 415.59613}</string>
+						<string>{427.23651, 466.35641}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -30968,8 +31136,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<real>71.889007568359375</real>
 					<key>Points</key>
 					<array>
-						<string>{433.08301, 193.17}</string>
-						<string>{433.08301, 292.19299}</string>
+						<string>{460.33649, 356.81232}</string>
+						<string>{460.33649, 379.59613}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -30993,7 +31161,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{388.08301, 292.19299}, {90, 36}}</string>
+					<string>{{415.33649, 379.59613}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -31050,7 +31218,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{388.08301, 157.17}, {90, 36}}</string>
+					<string>{{415.33649, 320.81232}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -31101,7 +31269,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{333.505, 225.96014}, {14, 14}}</string>
+					<string>{{352.58038, 366.5}, {14, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -31127,7 +31295,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 						<key>ID</key>
 						<integer>1542</integer>
 						<key>Position</key>
-						<real>0.029357371851801872</real>
+						<real>0.012419412843883038</real>
 						<key>RotationType</key>
 						<integer>0</integer>
 					</dict>
@@ -31165,7 +31333,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{270.5, 263.51401}, {18, 14}}</string>
+					<string>{{355.67795, 396.39999}, {18, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -31191,7 +31359,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 						<key>ID</key>
 						<integer>1543</integer>
 						<key>Position</key>
-						<real>0.33317875862121582</real>
+						<real>0.18575268983840942</real>
 						<key>RotationType</key>
 						<integer>0</integer>
 					</dict>
@@ -31244,11 +31412,11 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>74</real>
+					<real>92.835052490234375</real>
 					<key>Points</key>
 					<array>
-						<string>{279.5, 262.526}</string>
-						<string>{279.5, 286.151}</string>
+						<string>{300.92755, 391.5}</string>
+						<string>{460.33649, 191.24487}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -31294,10 +31462,10 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<real>24.46734619140625</real>
 					<key>Points</key>
 					<array>
-						<string>{324.5, 244.526}</string>
-						<string>{340.505, 134.40199}</string>
-						<string>{534.64398, 586.26202}</string>
-						<string>{444.87994, 663.51599}</string>
+						<string>{345.92755, 373.5}</string>
+						<string>{368.00684, 133.63916}</string>
+						<string>{542.93414, 671.78345}</string>
+						<string>{448.83295, 701.38147}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -31329,7 +31497,9 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<key>Head</key>
 					<dict>
 						<key>ID</key>
-						<integer>1566</integer>
+						<integer>1690</integer>
+						<key>Info</key>
+						<integer>2</integer>
 					</dict>
 					<key>ID</key>
 					<integer>1541</integer>
@@ -31341,8 +31511,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<real>8.326385498046875</real>
 					<key>Points</key>
 					<array>
-						<string>{279.5, 191.495}</string>
-						<string>{279.5, 226.526}</string>
+						<string>{300.92755, 191.495}</string>
+						<string>{300.92758, 230.15088}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -31370,7 +31540,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{234.5, 155.495}, {90, 36}}</string>
+					<string>{{255.92755, 155.495}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -31409,7 +31579,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\fs20 \cf0 NO PUK AVAIL}</string>
+\f0\fs20 \cf0 NO STORED PUK AVAIL}</string>
 						<key>VerticalPad</key>
 						<integer>1</integer>
 					</dict>
@@ -31439,9 +31609,9 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<real>227.98348999023438</real>
 					<key>Points</key>
 					<array>
-						<string>{478.08301, 310.19299}</string>
-						<string>{521.21198, 366.612}</string>
-						<string>{429.12994, 663.51599}</string>
+						<string>{505.33649, 397.59613}</string>
+						<string>{527.05841, 434.63403}</string>
+						<string>{433.08295, 701.38147}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -31483,8 +31653,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<real>3.899993896484375</real>
 					<key>Points</key>
 					<array>
-						<string>{417.33301, 435.90799}</string>
-						<string>{292.6593, 471.854}</string>
+						<string>{411.48651, 502.35638}</string>
+						<string>{291.37787, 544.03564}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -31535,9 +31705,9 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<real>207.19999694824219</real>
 					<key>Points</key>
 					<array>
-						<string>{292.6593, 519.85406}</string>
-						<string>{216.60001, 551.70001}</string>
-						<string>{105.24255, 564.59302}</string>
+						<string>{291.37787, 592.03558}</string>
+						<string>{213.8064, 610.79376}</string>
+						<string>{103.47264, 627.14069}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -31566,7 +31736,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{257.20901, 495.854}, {70.900597, 12}}</string>
+							<string>{{255.92757, 568.03564}, {70.900604, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -31609,7 +31779,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{257.20901, 471.854}, {70.900597, 12}}</string>
+							<string>{{255.92757, 544.03564}, {70.900604, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -31645,7 +31815,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{257.20901, 483.854}, {70.900597, 12}}</string>
+							<string>{{255.92757, 556.03564}, {70.900604, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -31688,7 +31858,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{257.20901, 507.854}, {70.900597, 12}}</string>
+							<string>{{255.92757, 580.03564}, {70.900604, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -31782,11 +31952,11 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>76.791732788085938</real>
+					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{279.49954, 397.53296}</string>
-						<string>{433.08301, 157.17}</string>
+						<string>{460.33652, 298.02866}</string>
+						<string>{460.33649, 320.81232}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -31828,8 +31998,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{279.5, 322.651}</string>
-						<string>{279.49954, 349.53302}</string>
+						<string>{460.33649, 227.24487}</string>
+						<string>{460.33652, 250.02864}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -31856,7 +32026,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{228.653, 373.53299}, {101.693, 12}}</string>
+							<string>{{409.48999, 274.02866}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -31899,7 +32069,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{228.653, 349.53299}, {101.693, 12}}</string>
+							<string>{{409.48999, 250.02866}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -31935,7 +32105,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{228.653, 361.53299}, {101.693, 12}}</string>
+							<string>{{409.48999, 262.02866}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -31978,7 +32148,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{228.653, 385.53299}, {101.693, 12}}</string>
+							<string>{{409.48999, 286.02866}, {101.69301, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -32062,7 +32232,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{44.492599, 315.97198}, {90, 36}}</string>
+					<string>{{44.492599, 258.17819}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -32119,7 +32289,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{139.38243, 326.97198}, {14, 14}}</string>
+					<string>{{138.13739, 269.17819}, {14, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -32183,7 +32353,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{80.492599, 381.88409}, {18, 14}}</string>
+					<string>{{80.492599, 345.28952}, {18, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -32265,8 +32435,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<real>74</real>
 					<key>Points</key>
 					<array>
-						<string>{89.492599, 351.97195}</string>
-						<string>{89.492599, 564.59302}</string>
+						<string>{89.492599, 294.17819}</string>
+						<string>{87.722694, 627.14069}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -32312,8 +32482,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					<real>24.46734619140625</real>
 					<key>Points</key>
 					<array>
-						<string>{134.49265, 333.97198}</string>
-						<string>{279.5, 155.495}</string>
+						<string>{134.49265, 276.17819}</string>
+						<string>{300.92755, 155.495}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -32341,7 +32511,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{388.08301, 399.90799}, {90, 36}}</string>
+					<string>{{382.23651, 466.35638}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -32417,7 +32587,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{384.13, 663.51599}, {90, 36}}</string>
+					<string>{{388.08301, 701.38147}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -32493,7 +32663,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{234.5, 286.151}, {90, 36}}</string>
+					<string>{{415.33649, 191.24487}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -32546,7 +32716,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\fs20 \cf0 HAVE DEFAULT PUK}</string>
+\f0\fs20 \cf0 HAVE WRITABLE PUK}</string>
 						<key>VerticalPad</key>
 						<integer>1</integer>
 					</dict>
@@ -32558,7 +32728,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{44.492599, 564.59302}, {90, 36}}</string>
+					<string>{{42.722694, 627.14069}, {90, 36}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -32649,8 +32819,8 @@ HAVE PUK}</string>
 					<real>205.97402954101562</real>
 					<key>Points</key>
 					<array>
-						<string>{89.492577, 600.59302}</string>
-						<string>{89.492599, 621.07202}</string>
+						<string>{87.722672, 663.14069}</string>
+						<string>{87.722694, 683.61969}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -32674,7 +32844,7 @@ HAVE PUK}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{42.722698, 238.99001}, {93.539803, 29.487}}</string>
+					<string>{{42.722698, 212.41881}, {93.539803, 29.487}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -32766,7 +32936,7 @@ NEED PUK}</string>
 					<key>Points</key>
 					<array>
 						<string>{89.492599, 191.495}</string>
-						<string>{89.492599, 238.99001}</string>
+						<string>{89.492599, 212.41881}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -32829,7 +32999,7 @@ NEED PUK}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{42.722698, 621.07202}, {93.539803, 72}}</string>
+					<string>{{40.952793, 683.61969}, {93.539803, 72}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -32887,8 +33057,8 @@ NEED PUK}</string>
 					<real>8.326385498046875</real>
 					<key>Points</key>
 					<array>
-						<string>{89.492599, 268.47699}</string>
-						<string>{89.492599, 315.97198}</string>
+						<string>{89.492599, 241.90582}</string>
+						<string>{89.492599, 258.17819}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -40201,7 +40371,7 @@ SUCCESS}</string>
 		<key>FitInWindow</key>
 		<true/>
 		<key>Frame</key>
-		<string>{{99, 0}, {1114, 1028}}</string>
+		<string>{{132, 0}, {1114, 1028}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
