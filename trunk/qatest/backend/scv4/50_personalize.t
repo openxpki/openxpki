@@ -54,7 +54,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 28 );
+$test->plan( tests => 24 );
 
 
 $test->connect_ok(
@@ -128,11 +128,11 @@ push @certs, $test->param('certificate');
 $test->execute_ok('scpers_cert_inst_ok');
 
 
-$test->state_is('CERT_PUBLISH_CHECK');
-$test->execute_ok('scpers_queue_certs_for_publication');
+#$test->state_is('CERT_PUBLISH_CHECK');
+#$test->execute_ok('scpers_queue_certs_for_publication');
 
-$test->state_is('CERTS_PUBLISHED');
-$test->execute_ok('scpers_null1');
+#$test->state_is('CERTS_PUBLISHED');
+#$test->execute_ok('scpers_null1');
 
 $test->state_is('SUCCESS'); 
 $test->disconnect();
