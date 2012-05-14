@@ -225,7 +225,7 @@ sub sc_analyze_smartcard {
     
     my $cardstatus = $res->{VALUE};
     
-    ##! 64: ' Sanity check token status word ' . $scinfo->{status}  
+    ##! 64: ' Sanity check token status word ' . $cardstatus  
 	# sanity check, only allow defined smartcard status
 	if ($cardstatus !~ m{ \A (?:initial|activated|deactivated) \z }xms) {
 	    OpenXPKI::Exception->throw(
