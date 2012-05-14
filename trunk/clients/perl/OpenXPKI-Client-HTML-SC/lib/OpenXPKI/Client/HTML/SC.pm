@@ -108,6 +108,7 @@ sub start_session {
 				$session->{'perso_wfID'} 	  = undef;
 				$session->{'perso_wfID'} 	  = undef;
 				$session->{'ECDHPeerPubkey'} =  undef ;
+				$session->{'rndPIN'} = undef ;
 	 			$session->{'ECDHPubkey'} =  undef ;
 	 			$session->{'PEMECKey'} = undef;
 	 			$session->{'ECDHkey'} = undef;

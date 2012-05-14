@@ -676,6 +676,7 @@ background: #fff;
 	float: right;
 	height: 23px;
 	width: 20px;
+	margin-right:25px;
 	background:url("../img/haken.gif") repeat-x scroll center bottom transparent;
 }
 .certStatus_red{
@@ -683,6 +684,7 @@ background: #fff;
 	float: right;
 	height: 23px;
 	width: 23px;
+	margin-right:25px;
 	background:url("../img/cross.gif") repeat-x scroll center bottom transparent;
 }
 .certStatus_amber{
@@ -690,6 +692,7 @@ background: #fff;
 	float: right;
 	height: 23px;
 	width: 20px;
+	margin-right:25px;
 	background:url("../img/haken_yellow.gif") repeat-x scroll center bottom transparent;
 }
 .accTogglerOpen{

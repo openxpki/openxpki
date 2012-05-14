@@ -44,6 +44,7 @@ sub server_personalization {
 	my $c       = 0;
 	my $wf_type = config()->{openxpki}->{personalization};
 	my $keysize = config()->{card}->{keysize};
+	my $serializer = OpenXPKI::Serialization::Simple->new(); 
 	#Default value if not configured 
 	if($keysize eq ''){
 		$keysize = 2048;
@@ -260,6 +261,50 @@ CERTS:
   
 	}
 	
+	if ( $wf_action eq 'select_useraccount' ) {
+		
+		$log->info("wf_action select_useraccount: ".$self->param("userAccount"));
+		
+		my $WFinfo = $self->wf_status( $c, $wf_ID , $wf_type);
+		
+		$log->debug(Dumper($WFinfo));
+		
+		if(defined $self->param("userAccount") && $self->param("userAccount") ne ''  ){
+			
+						%params = (
+			'ID'       => $wf_ID,
+			'ACTIVITY' => 'scpers_apply_csr_policy',
+			'WORKFLOW' => $wf_type,
+			'PARAMS'   => {'login_ids' => $serializer->serialize( [ $self->param("userAccount") ]) } ,
+			);
+			
+		}
+		$msg =
+		  $c->send_receive_command_msg( 'execute_workflow_activity', \%params,
+		  );
+		  
+		if ( $self->is_error_response($msg) ) {
+			$log->debug(Dumper($msg));
+			$responseData->{'error'} = "error";
+			push(
+				@{$errors},
+"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_APPLY_CSR_POLICY"
+			);
+			$log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_APPLY_CSR_POLICY");
+		}
+		else {
+			push(
+				@{$workflowtrace},
+"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_APPLY_CSR_POLICY_OK"
+			);
+			$log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_APPLY_CSR_POLICY_OK");
+		}
+		
+		
+		
+		
+	}
+	
 		
 	if ( $wf_action eq 'install_puk' ) {
 		$log->info("wf_action:".$wf_action);
@@ -359,7 +404,7 @@ CERTS:
 			},
 		);
 		
-		#$log->debug("params:". Dumper(%params));
+		$log->debug("params:". Dumper(%params));
 	eval{
 		$msg =
 		  $c->send_receive_command_msg( 'execute_workflow_activity', \%params,
@@ -528,6 +573,18 @@ CERTS:
 				  . ';KeyLength='.$keysize.';';
 			
 		}
+		
+		if($WFinfo->{PARAMS}->{WORKFLOW}->{STATE} eq 'POLICY_INPUT_REQUIRED')
+		{
+				$responseData->{'action'} = 'select_useraccount';
+				
+				$plugincommand =
+				    'NOCOMMAND';
+			
+		}
+		
+		
+		
 		
 		if($WFinfo->{PARAMS}->{WORKFLOW}->{STATE} eq 'CERT_TO_INSTALL')
 		{
@@ -1132,7 +1189,10 @@ CERTS:
 ##}
 
 ########################### No active random PIN ############################################
-
+	$log->info(
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_GET_PREPARE:" .$session->{'rndPIN'} 
+		);
+		
 	if ( !defined $session->{'rndPIN'} || $session->{'rndPIN'} eq '' ) {
 		$log->info(
 			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_GET_PREPARE"

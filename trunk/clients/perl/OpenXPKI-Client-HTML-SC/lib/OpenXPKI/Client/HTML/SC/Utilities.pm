@@ -215,6 +215,7 @@ $responseData->{'sc'} = Dumper($session->{"c"});
 #########################################################
 
 	if(defined $self->param("ECDHPubkey")){
+		$session->{'rndPIN'} = undef ;
 	
 	 	$log->info("ECDHPeerPubkey:\n " . $self->param("ECDHPubkey") );
 	 	my $ECDHPeerPubkey = $self->param("ECDHPubkey");

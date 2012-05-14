@@ -1,6 +1,6 @@
 {
 "E_session_timeout_error":"Ihre Browser Session ist abgelaufen, bitte laden Sie die Seite neu.",
-"E_ax-failure":"Der Kartenleser konnte nicht initialisiert werden (ActiveX Fehler)",
+"E_ax-failure":"dbSmartcardPlugin nicht gefunden, bitte via ASD installieren.",
 "E_ax-plugin-double":"ActiveX control Fehler - bereits initialisiert",
 "E_ax-plugin-no-status":"ActiveX control Fehler - kein Status",
 "E_cardBlocked":"Die dbSmartcard ist blockiert, der Geb&auml;udezugang ist gesperrt. Wenden Sie sich an Ihre Ausweisstelle.",
@@ -74,6 +74,7 @@
 "T_testPrivateKey":"Smartcard Schl&uuml;ssel-Analyse",
 "T_ChangePin":"PIN &auml;ndern",
 "T_DataPrivacy":"Data Privacy",
+"T_digitalSignature": "Digital Signature",
 "T_DigitalIdentity":"Digital Identity",
 "T_Help":"Kontakt",
 "T_HintTitle":"Hilfreiche Hinweise",
