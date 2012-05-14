@@ -43,7 +43,8 @@ my $testcfg = new TestCfg;
 $testcfg->read_config_path( '5x_personalize.cfg', \%cfg, @cfgpath );
 
 
--f 'sctest.csr' || `openssl req -new -batch -nodes -keyout sctest.key  -out sctest.csr`; 
+-f 'sctest.csr' || `openssl req -new -batch -nodes -keyout sctest.key  -out sctest.csr`;
+-f 'sctest2.csr' || `openssl req -new -batch -nodes -keyout sctest2.key  -out sctest2.csr`;  
 
 my $test = OpenXPKI::Test::More->new(
     {
@@ -104,8 +105,27 @@ if ($test->state_is('POLICY_INPUT_REQUIRED')) {
   $test->execute_ok('scpers_apply_csr_policy', { 'login_ids' => $ser->serialize( [ $login ] ) });
 }
 
+#Nonescrow Type
+$test->state_is('NEED_NON_ESCROW_CSR');
+$test->execute_ok('scpers_fetch_puk');
+$test->state_is('NEED_NON_ESCROW_CSR');
+$test->param_like('_puk','/ARRAY.*/');
+
+open PKCS10, "<sctest2.csr";
+my @lines = <PKCS10>;
+close PKCS10;
+ 
+$test->execute_ok('scpers_post_non_escrow_csr', { pkcs10 => join ("", @lines), keyid => 13 });
+
 my @certs;
 # CSR done - Installs
+$test->state_is('CERT_TO_INSTALL');
+$test->param_is('cert_install_type','x509', 'Check for x509 type parameter');
+$test->param_like('certificate','/-----BEGIN CERTIFICATE.*/','Check for PEM certificate');
+push @certs, $test->param('certificate');             
+$test->execute_ok('scpers_cert_inst_ok');
+
+
 $test->state_is('PKCS12_TO_INSTALL');
 $test->execute_ok('scpers_refetch_p12');
 
