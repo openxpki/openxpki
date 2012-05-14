@@ -67,7 +67,7 @@ my $ser = OpenXPKI::Serialization::Simple->new();
 my %wfparam = (        
         user_id => $cfg{carddata}{frontend_user},
         token_id => $cfg{carddata}{token_id},
-        chip_id => '',
+        chip_id => $cfg{carddata}{chip_id},
         certs_on_card => '',
 );      
 

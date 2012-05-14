@@ -56,7 +56,7 @@ my $certs =  $ser->deserialize( join("",  @lines));
  
 $test->runcmd('sc_analyze_smartcard', {
     'CERTS' => $certs,
-    'SMARTCHIPID' => '',
+    'SMARTCHIPID' => $cfg{carddata}{chip_id},
     'SMARTCARDID' => $cfg{carddata}{token_id},
     'CERTFORMAT' => 'PEM',
 });
