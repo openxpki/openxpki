@@ -1359,6 +1359,8 @@ var SSC_VIEW = new Class(
 				$('infoMore').empty();
 				div.inject($('infoMore'));
 				
+				//set back Action
+				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
 				// and set next action
 				this.setNextAction('T_outlook',this.processConfOutlook, true);
 			},
@@ -1572,7 +1574,7 @@ var SSC_VIEW = new Class(
 				for (var i = 0; i < this.mainMenu.length; i++){
 					this.setButton(enable, $(this.mainMenu[i].id), this.mainMenu[i].fnc);
 				}
-			/*	
+				
 				if(! sscModel.allowOutlook){		
 				
 					this.setButton( 0 , $(this.mainMenu[4].id) , this.mainMenu[4].fnc );				
@@ -1582,22 +1584,25 @@ var SSC_VIEW = new Class(
 					var DomainUser = null;
 	
 					window.dbg.log(res );
+					window.dbg.log("set:" + set  );
 					if (set === "SUCCESS") {
 						//viewCb('success');
-						DomainUser = results.get("DomainUser");
+						DomainUser = res.get("DomainUser");
 						
 						//popup( "PIN changed successfully. <br> Your PIN has been changed please use the new PIN from now on to access your smartcard." , "info", function () { 
 						//});
 					}
-					
+					window.dbg.log("Domainuser: "+DomainUser + " No login ids:"+ sscModel.user.accounts.length );
 					
 					for( var i=0; i < sscModel.user.accounts.length ; i++){
+						window.dbg.log(sscModel.user.accounts[i] + sscModel.user.accounts.length );
+						
 						if( sscModel.user.accounts[i].toLowerCase() === DomainUser.toLowerCase() ){
 							this.setButton( 1 , $(this.mainMenu[4].id) , this.mainMenu[4].fnc );
 						}
 					}
 				}
-				*/
+				
 				
 			},
 
@@ -2094,8 +2099,9 @@ var SSC_VIEW = new Class(
 				var user = sscModel.getUserInfo();
 				
 				this.setPrompt();
-				this.dataPrivacyHtml = this.digitalIdHtml = this.otherCertsHtml = '';
+				this.dataPrivacyHtml = this.digitalSignatureHtml = this.digitalIdHtml = this.otherCertsHtml = '';
 				this.digitalIdStatus = this.otherCertsStatus = 'green';
+				this.digitalSignatureStatus = 'green';
 				this.dataPrivacyStatus = 'red';
 				
 				
@@ -2112,6 +2118,11 @@ var SSC_VIEW = new Class(
 						infoHtml += this._createInfoAccordionEntry(this._tr('T_DataPrivacy'),
 																	  'certStatus_'+this.dataPrivacyStatus,
 																	  this.dataPrivacyHtml);
+					}
+					if (this.digitalSignatureHtml){	
+						infoHtml += this._createInfoAccordionEntry(this._tr('T_digitalSignature'),
+																	  'certStatus_'+this.digitalSignatureStatus,
+																	  this.digitalSignatureHtml);
 					}
 					
 					if ( this.otherCertsHtml){
@@ -2197,15 +2208,12 @@ var SSC_VIEW = new Class(
 					} else if (certs[i].CERTIFICATE_TYPE ===  'escrow'){
 						certType = 1;
 					    title = certs[i].SUBJECT;
-					    subject = '';
-					
-					// todo: digital signature
-					}  else if (certs[i].CERTIFICATE_TYPE ===  'newfs'){
+					    subject = '';	
+					// digital signature
+					}  else if (certs[i].CERTIFICATE_TYPE ===  'signature'){
 						certType = 4;
 					    title = certs[i].SUBJECT;
-					    subject = '';
-					
-					    
+					    subject = '<tr><td>Subject</td><td>'+ certs[i].SUBJECT + '</td></tr>';		    
 					// other certs
 					} else {
 						certType = 3;
@@ -2252,8 +2260,11 @@ var SSC_VIEW = new Class(
 						   // this.otherCertsStatus = certs[i].VISUAL_STATUS;
 						}
 						break;
-					case 4:
-						// todo: handle new type
+					case 4:	
+						this.digitalSignatureHtml += html;
+						if (certs[i].VISUAL_STATUS === 'green' && this.digitalSignatureStatus === 'red'){
+						    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
+						}
 						break;
 					}
 					

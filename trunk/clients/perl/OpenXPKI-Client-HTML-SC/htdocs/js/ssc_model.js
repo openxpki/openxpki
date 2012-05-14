@@ -99,6 +99,7 @@ var SSC_MODEL = new Class(
 				this.stateFilter[8]= 'ISSUE_CERT';
 				this.stateFilter[9]= 'HAVE_CERT_TO_PUBLISH';
 				this.stateFilter[10]= 'HAVE_CERT_TO_UNPUBLISH';
+				//this.stateFilter[11]= 'POLICY_INPUT_REQUIRED';
 				this.ECDH = null;
 				this.allowOutlook = false;
 				this.outlook = {};
@@ -306,13 +307,18 @@ var SSC_MODEL = new Class(
 			},
 
 
-			personalizeAccount : function(account, cb) {
+			personalizeAccount : function(account, viewCb) {
 
 				window.dbg.log('sscModel.personalizeAccount');
-				// fs fixme
-
-				// callback
-				cb();
+				
+				
+				var reqData = "perso_wfID=" + this.perso_wfID
+				+ '&wf_action=select_useraccount&userAccount=' + account ;
+				var server_cb = this.server_personalization_loop;
+				var targetURL = "functions/personalization/server_personalization";
+	
+				this.ajax_request(targetURL,  reqData,  server_cb, viewCb);
+				
 
 			},
 			
@@ -377,15 +383,22 @@ var SSC_MODEL = new Class(
 
 						if (reason === 'PUKError') {
 							sscView.showPopUp('E_sc-error-resetpin-puk-error ',
-									'cross', '0113');
+									'cross', '0110');
 							viewCb('error');
 							this.ajax_log('processAuthCodes: '+r, 'error');
 							return;
-						} else if (reason === 'TokenInternalError') {
+						} else if (reason === 'PINPolicy') {
 							// Invalid PIN is an user Error no popup here
 							window.dbg.log("invalid pin" + reason);
 							this.ajax_log('processAuthCodes: '+r, 'error');
 							viewCb('invalidPin');
+							return;
+						}else{
+							
+							sscView.showPopUp('E_sc-error-resetpin-error ',
+									'cross', '0111');
+							viewCb('error');
+							this.ajax_log('processAuthCodes: '+r, 'error');
 							return;
 						}
 					
@@ -425,7 +438,7 @@ var SSC_MODEL = new Class(
 					var reason = results.get("Reason");
 					window.dbg.log("Error: " + reason);
 
-					if (reason == 'TokenInternalError') {
+					if (reason == 'PINPolicy') {
 						viewCb('newPinError');
 						return;
 					} else if (reason == 'PINLockedError') {
@@ -627,7 +640,7 @@ var SSC_MODEL = new Class(
 						this.user.entity = data.msg.PARAMS.SMARTCARD.assigned_to.dblegalentity;
 						
 						if(this.user.entity === 'undefined')this.user.entity = '';
-						this.user.accounts = data.msg.PARAMS.SMARTCARD.assigned_to.dbntloginid;
+						this.user.accounts = data.msg.PARAMS.SMARTCARD.assigned_to.loginids;
 						this.keysize = data.msg.PARAMS.SMARTCARD.keysize;
 						this.user.parsedCerts = data.msg.PARAMS.PARSED_CERTS;
 						window.dbg.log("parsed certs:"+ this.user.parsedCerts);
@@ -1215,6 +1228,13 @@ var SSC_MODEL = new Class(
 					viewCb('success');
 					return;
 				}
+				
+				if(data.wf_state === 'POLICY_INPUT_REQUIRED')
+				{				
+					sscView.showAccountDlg(this.user.accounts);				
+					return;
+				}
+	
 	
 					if(this.state === 'FAILIURE') {
 						window.dbg.log('Failiure personalization');
