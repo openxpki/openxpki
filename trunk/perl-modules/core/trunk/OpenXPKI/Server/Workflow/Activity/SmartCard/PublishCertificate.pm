@@ -41,7 +41,7 @@ sub execute {
         );
      }
 
-     my $publish_key = $self->param('publish_key');
+     my $publish_key =  $context->param( $self->param('publish_key') );
  
     ##! 16: 'Start publishing - load certificate for identifier ' . $context->param('cert_identifier')
 
@@ -99,6 +99,7 @@ sub execute {
 
     foreach my $target (@targets) {
         ##! 16 : 'Publish at target ' . $target
+        ##! 32: " $prefix.targets.$target.$publish_key " 
         my $res = $config->set( [ $prefix, 'targets', $target, $publish_key ], $data );
     }
 

@@ -75,7 +75,7 @@ sub execute {
         my $puks;
 
         if (not defined $currpuk) {
-            my $defaultpuk = $context->param('smartcard_default_puk');
+            my $defaultpuk = $context->param('_default_puk');
             if ( defined $defaultpuk ) {
                 $currpuk = $defaultpuk;
                 $puks = [ $currpuk ];
@@ -136,6 +136,17 @@ OpenXPKI::Server::Workflow::Activity::SmartCard::GeneratePUK
 Implements the GeneratePUK workflow action.
 
 =head2 Context parameters
+
+=over 12
+
+=item _default_puk
+
+If no datapool entry is found for the token, but this context value is 
+present, it is also added to the datapool.
+ 
+=back
+
+=head2 Activity parameters
 
 Expects the following activity parameters (i.e.: set in XML activity
 definition):

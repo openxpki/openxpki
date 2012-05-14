@@ -193,20 +193,22 @@ sub sc_analyze_smartcard {
     my $holder_employee_id;
     
     #########################################################################
-    # Based on the id of the card we need to obtain the card status and the
-    # assigned employee. 
+    # Based on the id of the card we need to obtain 
+    # * card status 
+    # * assigned employee
+    # each is done in a seperate resolver call
+    # The "lot id" is collected in the FetchPUK activity 
     
     # Info about smartcard status is fetched from connector at
-    # smartcard.cardstatus
-    # attributes: serialnumber, status, keyid (optional)
+    # smartcard.cardstatus (scalar)
     
-    my $res  = $config->walkQueryPoints('smartcard.cardstatus', $tokenid, 'get_hash');    
+    my $res  = $config->walkQueryPoints('smartcard.cardstatus', $tokenid, 'get');    
         
-    ##! 32: ' SC Info: Token Id '.$tokenid.' - Cardinfo ' . Dumper( $res->{VALUE} );
+    ##! 32: ' SC Info: Token Id '.$tokenid.' - cardstatus ' . Dumper( $res->{VALUE} );
     # There should never be a match when tokenid ist not an exact match
     # So we should be able to omit the sanity check some lines below..   
           
-    if (!$res->{VALUE} || !$res->{VALUE}->{status}) {
+    if (!$res->{VALUE}) {
         
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOKEN_NOT_FOUND',
@@ -221,16 +223,16 @@ sub sc_analyze_smartcard {
         );                
     }
     
-    my $scinfo = $res->{VALUE};
+    my $cardstatus = $res->{VALUE};
     
     ##! 64: ' Sanity check token status word ' . $scinfo->{status}  
 	# sanity check, only allow defined smartcard status
-	if ($scinfo->{status} !~ m{ \A (?:initial|activated|deactivated) \z }xms) {
+	if ($cardstatus !~ m{ \A (?:initial|activated|deactivated) \z }xms) {
 	    OpenXPKI::Exception->throw(
 		message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_INVALID_SMARTCARD_STATUS',
 		params  => {
 		    TOKENID => $tokenid,
-		    STATUS  => $scinfo->{status},
+		    STATUS  => $cardstatus,
 		},
 		log => {
 		    logger => CTX('log'),
@@ -239,32 +241,11 @@ sub sc_analyze_smartcard {
 		},
 		);
 	} # Status Check
-
-    ##! 64: ' Sanity check tokenid ' . $scinfo->{serialnumber}
-        	
-    # sanity check: token id must be identical to the one passed
-    # in the api call
-    if ($tokenid ne $scinfo->{serialnumber}) {
-        OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOKENID_MISMATCH',
-        params  => {
-            TOKENID_FROM_API => $tokenid,
-            TOKENID_FROM_CONNECTOR => $scinfo->{serialnumber},
-        },
-        log => {
-            logger => CTX('log'),
-            priority => 'error',
-            facility => [ 'system', ],
-        },
-        );
-
-    }
-	
-    # found and valid status - assign to result     
-    foreach my $key qw(status serialnumber keyid) {
-        $result->{SMARTCARD}->{$key} = $scinfo->{$key};       
-    }	
-
+ 
+    # found and valid status - assign to result  	
+	$result->{SMARTCARD}->{status} = $cardstatus;
+	$result->{SMARTCARD}->{serialnumber} = $tokenid;
+   
     ########################################################################
     # Find the employee id based on the smartcard id
 
