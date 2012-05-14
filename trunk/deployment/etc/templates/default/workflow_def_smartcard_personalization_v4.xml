@@ -85,6 +85,13 @@
         </action>
     </state>
 
+    <state name="CERT_DELETE_CHECK"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERT_DELETE_CHECK</description>
+        <action name="scpers_queue_certs_to_delete" resulting_state="CERTS_QUEUED_FOR_DELETION">
+        </action>
+    </state>
+
     <state name="CERT_INST_CHECK"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERT_INST_CHECK</description>
@@ -93,13 +100,6 @@
         </action>
         <action name="scpers_null2" resulting_state="INSTALL_CERTIFICATE_DONE">
             <condition name="scpers_all_certs_installed"/>
-        </action>
-    </state>
-
-    <state name="CERT_DELETE_CHECK"
-            autorun="yes">
-        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERT_DELETE_CHECK</description>
-        <action name="scpers_queue_certs_to_delete" resulting_state="CERTS_QUEUED_FOR_DELETION">
         </action>
     </state>
 
@@ -125,28 +125,10 @@
         </action>
     </state>
 
-    <state name="HAVE_DEFAULT_PUK"
+    <state name="HAVE_WRITABLE_PUK"
             autorun="yes">
-        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_HAVE_DEFAULT_PUK</description>
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_HAVE_WRITABLE_PUK</description>
         <action name="scpers_generate_puk" resulting_state="HAVE_GENERATED_PUK">
-        </action>
-    </state>
-
-    <state name="NEED_PUK"
-            autorun="yes">
-        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_NEED_PUK</description>
-        <action name="scpers_null1" resulting_state="HAVE_PUK">
-            <condition name="scpers_puk_found_in_datapool"/>
-        </action>
-        <action name="scpers_null2" resulting_state="NO_PUK_AVAIL">
-            <condition name="!scpers_puk_found_in_datapool"/>
-        </action>
-    </state>
-
-    <state name="START_ACTIONS"
-            autorun="yes">
-        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_START_ACTIONS</description>
-        <action name="scpers_null1" resulting_state="PREP_LOOP_NEED_CSR">
         </action>
     </state>
 
@@ -159,6 +141,24 @@
         <action name="scpers_fail_workflow" resulting_state="FAILURE">
         </action>
         <action name="scpers_post_non_escrow_csr" resulting_state="CSR_AVAIL">
+        </action>
+    </state>
+
+    <state name="START_ACTIONS"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_START_ACTIONS</description>
+        <action name="scpers_null1" resulting_state="PREP_LOOP_NEED_CSR">
+        </action>
+    </state>
+
+    <state name="NEED_PUK"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_NEED_PUK</description>
+        <action name="scpers_null1" resulting_state="HAVE_PUK">
+            <condition name="scpers_puk_found_in_datapool"/>
+        </action>
+        <action name="scpers_null2" resulting_state="NO_STORED_PUK_AVAIL">
+            <condition name="!scpers_puk_found_in_datapool"/>
         </action>
     </state>
 
@@ -190,17 +190,17 @@
         </action>
     </state>
 
-    <state name="WHICH_CERT_TO_INSTALL"
-            autorun="yes">
-        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_WHICH_CERT_TO_INSTALL</description>
-        <action name="scpers_fetch_cert_id_to_install" resulting_state="FETCH_CERTIFICATE">
-        </action>
-    </state>
-
     <state name="CERT_TO_DELETE"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERT_TO_DELETE</description>
         <action name="scpers_next_cert_to_delete" resulting_state="HAVE_CERT_TO_DELETE">
+        </action>
+    </state>
+
+    <state name="WHICH_CERT_TO_INSTALL"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_WHICH_CERT_TO_INSTALL</description>
+        <action name="scpers_fetch_cert_id_to_install" resulting_state="FETCH_CERTIFICATE">
         </action>
     </state>
 
@@ -218,21 +218,17 @@
         </action>
     </state>
 
-    <state name="NO_PUK_AVAIL"
-            autorun="yes">
-        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_NO_PUK_AVAIL</description>
-        <action name="scpers_null1" resulting_state="HAVE_DEFAULT_PUK">
-            <condition name="scpers_can_set_puk"/>
-        </action>
-        <action name="scpers_null2" resulting_state="FAILURE">
-            <condition name="!scpers_can_set_puk"/>
-        </action>
-    </state>
-
     <state name="HAVE_CERT_TO_UNPUBLISH"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_HAVE_CERT_TO_UNPUBLISH</description>
         <action name="scpers_unpublish_certificate" resulting_state="CERTS_QUEUED_FOR_DEPUBLICATION">
+        </action>
+    </state>
+
+    <state name="NO_STORED_PUK_AVAIL"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_NO_STORED_PUK_AVAIL</description>
+        <action name="scpers_compute_puk" resulting_state="HAVE_COMPUTED_PUK">
         </action>
     </state>
 
@@ -294,6 +290,13 @@
         </action>
     </state>
 
+    <state name="PIN_CONTINUE"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_PIN_CONTINUE</description>
+        <action name="scpers_null1" resulting_state="START_ACTIONS">
+        </action>
+    </state>
+
     <state name="CERTS_QUEUED_FOR_PUBLICATION"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERTS_QUEUED_FOR_PUBLICATION</description>
@@ -302,13 +305,6 @@
         </action>
         <action name="scpers_null2" resulting_state="CERTS_PUBLISHED">
             <condition name="scpers_all_certs_published"/>
-        </action>
-    </state>
-
-    <state name="PIN_CONTINUE"
-            autorun="yes">
-        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_PIN_CONTINUE</description>
-        <action name="scpers_null1" resulting_state="START_ACTIONS">
         </action>
     </state>
 
@@ -570,6 +566,17 @@
         </action>
         <action name="scpers_null1" resulting_state="POLICY_INPUT_REQUIRED">
             <condition name="scpers_policy_input_required"/>
+        </action>
+    </state>
+
+    <state name="HAVE_COMPUTED_PUK"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_HAVE_COMPUTED_PUK</description>
+        <action name="scpers_null1" resulting_state="HAVE_WRITABLE_PUK">
+            <condition name="scpers_can_set_puk"/>
+        </action>
+        <action name="scpers_null2" resulting_state="FAILURE">
+            <condition name="!scpers_can_set_puk"/>
         </action>
     </state>
 

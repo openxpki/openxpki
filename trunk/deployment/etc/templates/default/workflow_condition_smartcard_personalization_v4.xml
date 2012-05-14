@@ -30,17 +30,17 @@
         <param name="condition" value="equals"/>
     </condition>
 
-    <condition name="scpers_all_certs_issued"
-            class="OpenXPKI::Server::Workflow::Condition::WFArray">
-        <param name="array_name" value="tmp_queue"/>
-        <param name="condition" value="is_empty"/>
-    </condition>
-
     <condition name="scpers_will_need_PIN"
             class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
         <param name="context_key" value="flag_will_need_pin"/>
         <param name="context_value" value="yes"/>
         <param name="condition" value="equals"/>
+    </condition>
+
+    <condition name="scpers_all_certs_issued"
+            class="OpenXPKI::Server::Workflow::Condition::WFArray">
+        <param name="array_name" value="tmp_queue"/>
+        <param name="condition" value="is_empty"/>
     </condition>
 
     <condition name="scpers_generated_puk_ok"
@@ -90,13 +90,13 @@
         <param name="condition" value="equals"/>
     </condition>
 
-    <condition name="scpers_all_certs_deleted"
+    <condition name="scpers_temp_list_empty"
             class="OpenXPKI::Server::Workflow::Condition::WFArray">
         <param name="array_name" value="tmp_queue"/>
         <param name="condition" value="is_empty"/>
     </condition>
 
-    <condition name="scpers_temp_list_empty"
+    <condition name="scpers_all_certs_deleted"
             class="OpenXPKI::Server::Workflow::Condition::WFArray">
         <param name="array_name" value="tmp_queue"/>
         <param name="condition" value="is_empty"/>

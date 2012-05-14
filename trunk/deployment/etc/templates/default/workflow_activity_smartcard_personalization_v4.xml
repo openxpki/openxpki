@@ -16,21 +16,10 @@
             <field name="user_id"/>
     </action>
 
-    <action name="scpers_issue_certificate"
-            class="OpenXPKI::Server::Workflow::Activity::SmartCard::IssueCert"
-            csr_queue_key="tmp_queue"
-            issuance_queue_key="certs_issued">
-            <field name="tmp_queue" is_required="yes"/>
-    </action>
-
-    <action name="scpers_generate_puk"
-            class="OpenXPKI::Server::Workflow::Activity::SmartCard::GeneratePUK">
-            <description>This generates a new puk and shifts it to the front of the array stored in the smartcard.puk namespace that has the key that matches our token id.</description>
-    </action>
-
-    <action name="scpers_check_prereqs_via_api"
-            class="OpenXPKI::Server::Workflow::Activity::SmartCard::CheckPrereqs">
-            <description>This reads the workflow context parameters set in initialize and sets flags that specify what the next steps will be.</description>
+    <action name="scpers_post_non_escrow_csr"
+            class="Workflow::Action::Null">
+            <field name="keyid" is_required="yes"/>
+            <field name="pkcs10" is_required="yes"/>
     </action>
 
     <action name="scpers_escrow_private_key"
@@ -42,15 +31,32 @@
             <field name="cert_identifier" is_required="yes"/>
     </action>
 
-    <action name="scpers_post_non_escrow_csr"
-            class="Workflow::Action::Null">
-            <field name="keyid" is_required="yes"/>
-            <field name="pkcs10" is_required="yes"/>
+    <action name="scpers_issue_certificate"
+            class="OpenXPKI::Server::Workflow::Activity::SmartCard::IssueCert"
+            csr_queue_key="tmp_queue"
+            issuance_queue_key="certs_issued">
+            <field name="tmp_queue" is_required="yes"/>
+    </action>
+
+    <action name="scpers_check_prereqs_via_api"
+            class="OpenXPKI::Server::Workflow::Activity::SmartCard::CheckPrereqs">
+            <description>This reads the workflow context parameters set in initialize and sets flags that specify what the next steps will be.</description>
+    </action>
+
+    <action name="scpers_generate_puk"
+            class="OpenXPKI::Server::Workflow::Activity::SmartCard::GeneratePUK">
+            <description>This generates a new puk and shifts it to the front of the array stored in the smartcard.puk namespace that has the key that matches our token id.</description>
+            <field name="_default_puk"/>
     </action>
 
     <action name="scpers_status_err"
             class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
             error_code="Smartcard state neither activated nor initial">
+    </action>
+
+    <action name="scpers_create_escrowed_key"
+            class="OpenXPKI::Server::Workflow::Activity::SmartCard::CreateEscrowedKey"
+            ds_namespace="certificate.privatekey">
     </action>
 
     <action name="scpers_reject_wf"
@@ -68,11 +74,6 @@
     <action name="scpers_puk_write_ok"
             class="Workflow::Action::Null">
             <description>At the moment, this activity is a no-op, but later, it should expire PUKs in the datapool that are known to be no longer valid.</description>
-    </action>
-
-    <action name="scpers_create_escrowed_key"
-            class="OpenXPKI::Server::Workflow::Activity::SmartCard::CreateEscrowedKey"
-            ds_namespace="certificate.privatekey">
     </action>
 
     <action name="scpers_approve_wf"
@@ -107,18 +108,18 @@
             <field name="certificate" is_required="yes"/>
     </action>
 
+    <action name="scpers_apply_csr_policy"
+            class="OpenXPKI::Server::Workflow::Activity::SmartCard::ApplyCSRPolicy">
+            <field name="login_ids"/>
+            <field name="pkcs10" is_required="yes"/>
+    </action>
+
     <action name="scpers_add_escrow_cert_to_publish_queue"
             class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
             array_name="certs_to_publish"
             context_key="cert_identifier"
             function="push">
             <field name="cert_identifier" is_required="yes"/>
-    </action>
-
-    <action name="scpers_apply_csr_policy"
-            class="OpenXPKI::Server::Workflow::Activity::SmartCard::ApplyCSRPolicy">
-            <field name="login_ids"/>
-            <field name="pkcs10" is_required="yes"/>
     </action>
 
     <action name="scpers_cert_inst_err"
@@ -166,18 +167,18 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             <field name="cert_issuance_data" is_required="yes"/>
     </action>
 
-    <action name="scpers_next_cert_to_delete"
-            class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
-            array_name="tmp_queue"
-            context_key="keyid"
-            function="shift">
-            <field name="tmp_queue" is_required="yes"/>
-    </action>
-
     <action name="scpers_get_next_need_csr"
             class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
             array_name="tmp_queue"
             context_key="csr_cert_type"
+            function="shift">
+            <field name="tmp_queue" is_required="yes"/>
+    </action>
+
+    <action name="scpers_next_cert_to_delete"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
+            array_name="tmp_queue"
+            context_key="keyid"
             function="shift">
             <field name="tmp_queue" is_required="yes"/>
     </action>
@@ -189,19 +190,19 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             <field name="csr_serial" is_required="yes"/>
     </action>
 
+    <action name="scpers_set_workflow_creator"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::SetContext"
+            SetContextParameters="overwritecontext,extendedsyntax"
+            creator="$context->param('userinfo_workflow_creator')">
+            <field name="userinfo_workflow_creator" is_required="yes"/>
+    </action>
+
     <action name="scpers_queue_issued_certs_for_installation"
             class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
             array_name="tmp_queue"
             context_key="certs_issued"
             function="pusharray">
             <field name="certs_issued"/>
-    </action>
-
-    <action name="scpers_set_workflow_creator"
-            class="OpenXPKI::Server::Workflow::Activity::Tools::SetContext"
-            SetContextParameters="overwritecontext,extendedsyntax"
-            creator="$context->param('userinfo_workflow_creator')">
-            <field name="userinfo_workflow_creator" is_required="yes"/>
     </action>
 
     <action name="scpers_fetch_certificate"
@@ -228,14 +229,11 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             error_code="User would not enter password">
     </action>
 
-    <action name="scpers_cleanup_workflow"
+    <action name="scpers_set_p12_parameters"
             class="OpenXPKI::Server::Workflow::Activity::Tools::SetContext"
             SetContextParameters="overwritecontext"
             _keypassword="OpenXPKI"
-            cert_install_type=""
-            certificate=""
-            pkcs10=""
-            temp_key_handle="">
+            cert_install_type="p12">
     </action>
 
     <action name="scpers_set_cert_type_to_x509"
@@ -244,11 +242,14 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             cert_install_type="x509">
     </action>
 
-    <action name="scpers_set_p12_parameters"
+    <action name="scpers_cleanup_workflow"
             class="OpenXPKI::Server::Workflow::Activity::Tools::SetContext"
             SetContextParameters="overwritecontext"
             _keypassword="OpenXPKI"
-            cert_install_type="p12">
+            cert_install_type=""
+            certificate=""
+            pkcs10=""
+            temp_key_handle="">
     </action>
 
     <action name="scpers_auth_err"
@@ -274,14 +275,6 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             <field name="certs_to_publish"/>
     </action>
 
-    <action name="scpers_queue_certs_to_recover_for_installation"
-            class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
-            array_name="tmp_queue"
-            context_key="certs_to_install"
-            function="pusharray">
-            <field name="certs_to_install" is_required="yes"/>
-    </action>
-
     <action name="scpers_queue_certs_to_delete"
             class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
             array_name="tmp_queue"
@@ -296,6 +289,14 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             context_key="certs_to_delete"
             function="pusharray">
             <field name="certs_to_unpublish"/>
+    </action>
+
+    <action name="scpers_queue_certs_to_recover_for_installation"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
+            array_name="tmp_queue"
+            context_key="certs_to_install"
+            function="pusharray">
+            <field name="certs_to_install" is_required="yes"/>
     </action>
 
     <action name="scpers_login_id_err"
@@ -331,6 +332,13 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
     <action name="scpers_create_pkcs12_password"
             class="OpenXPKI::Server::Workflow::Activity::Tools::GeneratePassword"
             password_length="20">
+    </action>
+
+    <action name="scpers_compute_puk"
+            class="OpenXPKI::Server::Workflow::Activity::SmartCard::ComputePUK">
+            <description>Obtain PUK for given Smartcard (possibly only a default value, or a computation based on token_id or chip_id)</description>
+            <field name="chip_id"/>
+            <field name="token_id" is_required="yes"/>
     </action>
 
     <action name="scpers_queue_csr_to_issue"
