@@ -292,46 +292,37 @@ sub sc_analyze_smartcard {
 	#### Step 3 #############################################################
 
     # New in Phase 2: Record or validate SMARTCARDID/SMARTCHIPID mapping.
-    # Check datapool if the specified SMARTCHIPID has been recorded for
-    # the given SMARTCARDID.
-    # If not, record the new mapping in the datapool. (Suggested namespace:
-    # 'smartcard.smartchipid', key: SMARTCARDID, value:
-    # SMARTCHIPID. Currently this is not done at all.)
+    # Check datapool if a mapping exist (prevent card forgery)
+    # If not, record the new mapping in the datapool. 
+    # Namespace: 'smartcard.smartchipid', key: SMARTCHIPID, value:SMARTCARDID. 
+    # Currently this is not done at all.)
     # If yes, validate that it matches the input of this call.
-    # If this validation fails, this is a security violation (somebody
-    # probably modified the SMARTCARDID).
-
-    if ($chipid) {
+    # If this validation fails, log to the audit log
+    # Result is also available in $result->{SMARTCARD}->{token_chipid_match}
+    # Values are valid, new, mismatch 
 
     # Check for existing entry
-    my $msg = CTX('api')->get_data_pool_entry( { KEY => $chipid , NAMESPACE => 'smartcard.smartchipid' } );
+    my $msg = CTX('api')->get_data_pool_entry( { KEY => $tokenid , NAMESPACE => 'smartcard.smartchipid' } );
 
     my $retval = $msg->{VALUE};
+    $result->{SMARTCARD}->{token_chipid_match} = 'valid';
     
     # Not found - record it
     if (!$retval) {
         ##! 16: "Record card/chip relation Chip: $chipid - Token: $tokenid " 
         CTX('api')->set_data_pool_entry( { 
-            KEY => $chipid , 
+            KEY => $tokenid, 
             NAMESPACE => 'smartcard.smartchipid',
-            VALUE => $tokenid,
-        } );        
+            VALUE => $chipid ,
+        } );
+        $result->{SMARTCARD}->{token_chipid_match} = 'new';        
     } elsif( $retval ne $tokenid ) {
-        OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARDID_MISSMATCHES_RECORDED_VALUE',
-        params  => {
-            SMARTCHIPID => $chipid,
-            SMARTCARDID => $tokenid,
-            RECORDED_SMARTCARDID => $retval, 
-        },
-        log => {
-            logger => CTX('log'),
-            priority => 'error',
-            facility => [ 'system', ],
-        },
-        );
-        
-    }
+        $result->{SMARTCARD}->{token_chipid_match} = 'mismatch';        
+        CTX('log')->log(
+            MESSAGE => "Chip Id of presented token mismatches recorded value! Token: $tokenid, Expected: $chipid, Presented: $retval",
+            PRIORITY => 'warn',
+            FACILITY => [ 'audit', 'system', ],
+        );        
     }
         
     ##### Step 4 ############################################################
@@ -505,6 +496,7 @@ sub sc_analyze_smartcard {
     #   token - user assignment during unblock), false for most other cards.
     # * integer: supported keysize of the card
     
+    # Check Datapool for exisiting puk and check for default puk if not 
     my $puk_found = CTX('api')->get_data_pool_entry( {
         PKI_REALM => $thisrealm,
         NAMESPACE => 'smartcard.puk',
@@ -512,15 +504,14 @@ sub sc_analyze_smartcard {
     } );
     
     if (defined $puk_found) {
-	   $result->{PROCESS_FLAGS}->{puk_found_in_datapool} = 1;
-    }
-
+       $result->{PROCESS_FLAGS}->{puk_found_in_datapool} = 1;
+    } 
+        
     ###########################################################################
     # Load PUK properties based on smartcard type from Config
     # We assume that the tokenid contains the cardtype as a prefix, seperated 
     # by an underscore (<type>_<token nummer>)
-    # Todo - implement the getHash idea on the base connector
-    
+   
     $tokenid =~ m{ \A (?:(\w+\d)_) }xms;
     my $token_family = $1;
     my $token_config;
@@ -542,10 +533,7 @@ sub sc_analyze_smartcard {
 	$result->{PROCESS_FLAGS}->{puk_is_writable} = $token_config->{'puk_is_writable'} || 0;
 	$result->{PROCESS_FLAGS}->{purge_token_before_unblock} = $token_config->{'purge_token_before_unblock'} || 0;
 	$result->{SMARTCARD}->{keysize} = $token_config->{'keysize'};
-	
-	#$result->{SMARTCARD}->{default_puk} = undef;	
-	#$config->get(['smartcard.cardinfo.properties.defaultpuk'])
-        
+
     #### Step 8 ###############################################################    
     # This step prepares an output structure that can be used by the
     # frontend or the workflow to operate on the details of certificates
