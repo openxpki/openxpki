@@ -72,12 +72,12 @@ sub evaluate
 	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_VALUE_EMPTY';
 	}
     } elsif ($condition eq 'equals') {
-	my $context_value = $context->param($context_key);
+	my $context_value = $context->param($context_key) || '';
 	if ($context_value ne $self->context_value()) {
 	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_EQUALITY_MISMATCH';
 	}
     } elsif ($condition eq 'regex') {
-	my $context_value = $context->param($context_key);
+	my $context_value = $context->param($context_key)  || '';
 	my $regex = qr/$self->context_value()/ms;
 	if ($context_value =~ /$regex/) {
 	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_REGEX_MISMATCH';
