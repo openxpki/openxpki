@@ -1,0 +1,14 @@
+I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL:
+    subject: cn=[% givenname %][% IF initials %] [% initials %][% END %] [% sn %],dc=My Company,dc=com
+    subject_alternative_names: email=[% mail %][% FOREACH entry = upn %],otherName=1.3.6.1.4.1.311.20.2.3;UTF8:[% entry %][% END %]
+
+I18N_OPENXPKI_PROFILE_USER_SIGNATURE:
+    subject: cn=[% givenname %][% IF initials %] [% initials %][% END %] [% sn %],dc=My Company,dc=com
+    subject_alternative_names: email=[% mail %]
+
+I18N_OPENXPKI_PROFILE_USER_ENCRYPTION:
+    subject: cn=[% givenname %][% IF initials %] [% initials %][% END %] [% sn %],dc=My Company,dc=com
+    subject_alternative_names: email=[% mail %]
+    validity:
+       notafter: +0006
+

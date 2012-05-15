@@ -98,9 +98,10 @@ sub execute {
     ##! 32: 'Data for publication '. Dumper ( $data )
 
     foreach my $target (@targets) {
-        ##! 16 : 'Publish at target ' . $target
+       
         ##! 32: " $prefix.targets.$target.$publish_key " 
         my $res = $config->set( [ $prefix, 'targets', $target, $publish_key ], $data );
+        ##! 16 : 'Publish at target ' . $target . ' - Result: ' . $res
     }
 
     ##! 4: 'end'

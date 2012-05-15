@@ -283,9 +283,8 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/GeneratePUK.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/Initialize.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/IssueCert.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/FetchPUK.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/ApplyCSRPolicy.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/RenameEscrowedKey.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/EncryptPKCS12PluginParameter.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/ComputePUK.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartCard/ApplyCSRPolicy.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/PublishCertificate.pm
