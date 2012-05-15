@@ -20,10 +20,9 @@ use Data::Dumper;
 use OpenXPKI::Client::HTML::SC::Dispatcher qw( config );
 use DateTime;
 use Log::Log4perl qw(:easy);
-
-
-
-
+use Digest::SHA qw (sha256_hex);
+use Crypt::ECDH;
+use Crypt::OpenSSL::AES;
 
 
 use base qw(
@@ -39,7 +38,7 @@ use Apache2::Const -compile => qw( :http );
 
 #Only these functions can be called via HTTP/Perlmod
 sub allowed_methods {
-    qw( get_card_status encrypt_pin get_server_status)
+    qw( get_card_status encrypt_pin get_server_status server_log)
 }    #only these fucntions can be called via handler
 
 #Function 
@@ -55,14 +54,12 @@ sub get_card_status {
     my ($self)    = @_;
     my $sessionID = $self->pnotes->{a2c}{session_id};
     my $session   = $self->pnotes->{a2c}{session};
-
-
-
     my $c = 0;
     my $errors;
     my $msg;
     my @certs;
     my $AUTHUSER;
+    my $chipserial;
 
 ###########################INIT##########################
     $self->start_session();
@@ -83,17 +80,36 @@ sub get_card_status {
     # 	}else{
     # 		$responseData->{'usermsg'} =  $self->param("msg") ;
     # 	}
+    if(Log::Log4perl->initialized()) {
+        # Yes, Log::Log4perl has already been initialized
+        $responseData->{'log4perl init'} = "YES";
+    } else {
+   		 Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
+        # No, not initialized yet ...
+         $responseData->{'log4perl init'} = "NO";
+    }
+    
 
+   my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+   $log->info("Get smartcard status " . $session->{'id_cardID'} );
+   
     if ( defined $self->{r}->headers_in()->get('ct-remote-user') && $self->{r}->headers_in()->get('ct-remote-user') ne '') {
         $AUTHUSER = $self->{r}->headers_in()->get('ct-remote-user');
+    }
+    
+    $log->info("smartcard chipserial " . $self->param("ChipSerial") );
+    if ( defined $self->param("ChipSerial") ) {
+    	
+    	$chipserial = $self->param("ChipSerial"); 
+    
     }
 
     $responseData->{'Result'} = $self->param("Result");
 CERTS:
     for ( my $i = 0; $i < 15; $i++ ) {
-        last CERTS if !defined $self->param( "cert$i" );
-        push( @certs, $self->param( "cert$i" ) );
-
+    	my $index = sprintf("%02d", $i);
+        last CERTS if !defined $self->param( "cert$index" );
+        push(@certs , $self->param( "cert$index" ) );
     }
 
 #########################################################
@@ -107,8 +123,10 @@ CERTS:
     my %params = (
         'CERTS'          => \@certs,
         'CERTFORMAT'     => 'BASE64',
-        'WORKFLOW_TYPES' => ['I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK', 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3' ],
+        'WORKFLOW_TYPES' => [config()->{openxpki}->{pinunblock}, config()->{openxpki}->{personalization} ],
         'SMARTCARDID'    => $session->{'id_cardID'},
+        'SMARTCHIPID'    => $chipserial,
+        
     );
     if ( defined $AUTHUSER ) {
         $params{USERID} = $AUTHUSER;
@@ -118,6 +136,7 @@ $responseData->{'c'} = Dumper($c);
 $responseData->{'sc'} = Dumper($session->{"c"});
 
 }
+
 
   if(( !defined $c || $c == 0 || $c eq '' ) && (!defined $session->{'cardOwner'} ||  $session->{'cardOwner'} eq '') ){
     $c = $self->openXPKIConnection(
@@ -141,7 +160,7 @@ $responseData->{'sc'} = Dumper($session->{"c"});
         }
         else {
 
-	    if( $c != 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_OPENXPKICONNECTION_ERROR'){
+	    if( $c ne 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_OPENXPKICONNECTION_ERROR'){
 
             if ( $c != 0 ) {
             	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
@@ -152,6 +171,7 @@ $responseData->{'sc'} = Dumper($session->{"c"});
 		  @{$errors},
 		  "I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI"
 	      );
+	      $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI" .$session->{'id_cardID'} );
 	      $c = 0;
 	      $responseData->{'errors'} = $errors;
 	      return $self->send_json_respond($responseData);
@@ -167,6 +187,7 @@ $responseData->{'sc'} = Dumper($session->{"c"});
                 @{$errors},
 		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI"
             );
+             $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI"); 
             $c = 0;
 	    $responseData->{'errors'} = $errors;
 	    return $self->send_json_respond($responseData);
@@ -174,17 +195,61 @@ $responseData->{'sc'} = Dumper($session->{"c"});
 	}
         }
     }
-
+    
+	eval{
     $msg = $c->send_receive_command_msg( 'sc_analyze_smartcard', \%params, );
-
+    	};
+    	
+   # $log->info("label:" . Dumper($msg->{LIST})  ); 	
+	# $log->info(Dumper($msg)); 
+	
     if ( $self->is_error_response($msg) ) {
         $responseData->{'error'} = "error";
         push( @{$errors},
             "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_GET_CARD_STATUS" );
+        $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_GET_CARD_STATUS"); 
 
 	 }
-
+	 
+	
 #########################################################
+
+	if(defined $self->param("ECDHPubkey")){
+		$session->{'rndPIN'} = undef ;
+	
+	 	$log->info("ECDHPeerPubkey:\n " . $self->param("ECDHPubkey") );
+	 	my $ECDHPeerPubkey = $self->param("ECDHPubkey");
+	 	$ECDHPeerPubkey =~ s/^\s+//;
+		$ECDHPeerPubkey =~ s/\s+$//;
+	   # $log->info("ECDHPeerPubkey:\n " . $ECDHPeerPubkey );
+
+	    my $ecdhkey;
+		eval{
+	 		$ecdhkey =  Crypt::ECDH::get_ecdh_key($ECDHPeerPubkey);
+	 	};
+	 	if( $@ ne ''){
+	 			$log->error("Crypt::ECDH::get_ecdh_key:" . $@ );
+	 	}
+	 	
+	 	$log->info("ECDHPubkey:\n " . $ecdhkey->{'PEMECPubKey'} );
+	 	$session->{'ECDHPeerPubkey'} =  $ECDHPeerPubkey ;
+	 	$session->{'ECDHPubkey'} =  $ecdhkey->{'PEMECPubKey'} ;
+	 	$session->{'PEMECKey'} = $ecdhkey->{'PEMECKey'};
+	 	$session->{'ECDHkey'} = $ecdhkey->{'ECDHKey'};
+	 	
+	 	
+	 	$responseData->{'ecdhpubkey'} = $ecdhkey->{'PEMECPubKey'};
+	 	
+	 	$session->{'aeskey'} = sha256_hex($ecdhkey->{'ECDHKey'});
+	 	
+	 	#$log->debug("AESKey:\n ".$session->{'aeskey'} );
+
+	}
+
+
+
+
+
 
 ###close openxpki connection and reopen with  card owner as usernam####
 
@@ -194,6 +259,13 @@ if(!defined $session->{'cardOwner'} || $session->{'cardOwner'} eq '') {
   
 	$session->{'creator_userID'} = $msg->{PARAMS}->{SMARTCARD}->{assigned_to}->{workflow_creator};
 	$session->{'cardOwner'} = $msg->{PARAMS}->{SMARTCARD}->{assigned_to}->{workflow_creator};
+	$session->{'dbntloginid'} = $msg->{PARAMS}->{SMARTCARD}->{assigned_to}->{loginids};
+	$session->{'outlook_displayname'} = config()->{outlook}->{displayname};
+	$session->{'outlook_b64'} = config()->{outlook}->{b64};
+	$session->{'outlook_issuerCN'} = config()->{outlook}->{issuerCN};
+    $log->debug("Card owner: ". $session->{'cardOwner'} );
+   # $log->debug("dbntloginid: ". Dumper( $session->{'dbntloginid'}) );
+    #$log->debug("dbntloginid: ". Dumper( $session->{'dbntloginid'}->[0]) );
     
  	 $c = $self->openXPKIConnection(
                 undef,
@@ -211,6 +283,7 @@ if(!defined $session->{'cardOwner'} || $session->{'cardOwner'} eq '') {
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_CONTINUE_FAILED"
             );
             $c = 0;
+                    $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_CONTINUE_FAILED"); 
 
         }
         else {
@@ -254,13 +327,14 @@ foreach my $wf_type (keys %{$activeworkflows}) {
 			time_zone => 'UTC',
 		);
 
-		if($newentry{'WORKFLOW_TYPE'} eq 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK')
+		if($newentry{'WORKFLOW_TYPE'} eq config()->{openxpki}->{pinunblock})
 		{
 			if( ($newentry{'WORKFLOW_STATE'} ne 'SUCCESS') and ( $newentry{'WORKFLOW_STATE'} ne 'FAILURE' ) ){
 
 			my $unblock_msg =
 				$c->send_receive_command_msg( 'get_workflow_info',
-				{ 'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK' , 'ID' => $newentry{'WORKFLOW_SERIAL'} } );
+				{ 'WORKFLOW' => config()->{openxpki}->{pinunblock}  , 'ID' => $newentry{'WORKFLOW_SERIAL'} } );
+			
 			if ( $self->is_error_response($msg) ) {
 		
 				#$@ = "Error running get_workflow_info: " . Dumper($msg);  #fix me i18n
@@ -280,13 +354,13 @@ foreach my $wf_type (keys %{$activeworkflows}) {
 			
 		}
 
-		if($newentry{'WORKFLOW_TYPE'} eq 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3')
+		if($newentry{'WORKFLOW_TYPE'} eq config()->{openxpki}->{personalization})
 		{
 			if( ($newentry{'WORKFLOW_STATE'} ne 'SUCCESS') and ( $newentry{'WORKFLOW_STATE'} ne 'FAILURE' ) ){
 
 			my $perso_msg =
 				$c->send_receive_command_msg( 'get_workflow_info',
-				{ 'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3' , 'ID' => $newentry{'WORKFLOW_SERIAL'} } );
+				{ 'WORKFLOW' => config()->{openxpki}->{personalization} , 'ID' => $newentry{'WORKFLOW_SERIAL'} } );
 
 				if ( $self->is_error_response($perso_msg) ) {
 			
@@ -306,9 +380,6 @@ foreach my $wf_type (keys %{$activeworkflows}) {
 			
 		}
 
-
-
-
 		if (! defined $last_update) {
 			next ENTRY;
 		}
@@ -317,8 +388,6 @@ foreach my $wf_type (keys %{$activeworkflows}) {
 		push @activewf, \%newentry;
 	}
 }
-		
-
 
 	#foreach my $foundWf (sort keys $activeworkflows->{$key}){
 # 
@@ -346,6 +415,9 @@ $responseData->{'creator_userID'} = 'set:'.$session->{'creator_userID'};
 $responseData->{'cardOwner'} = $session->{'cardOwner'};	
 $responseData->{'userWF'} = \@activewf;
 $responseData->{'msg'} = $msg;
+$responseData->{'outlook_displayname'} = config()->{outlook}->{displayname};
+$responseData->{'outlook_b64'} = config()->{outlook}->{b64settings};
+$responseData->{'outlook_issuerCN'} = config()->{outlook}->{issuerCN};
 
 
     $session->{"c"}            = $c;
@@ -427,8 +499,6 @@ sub encrypt_pin {
 #Optional Parameter via HTTPRequest:
 
 sub get_server_status {
-    
-	
 
     my ($self)    = @_;
     my $sessionID = $self->pnotes->{a2c}{session_id};
@@ -444,13 +514,15 @@ sub get_server_status {
     if(Log::Log4perl->initialized()) {
         # Yes, Log::Log4perl has already been initialized
         $responseData->{'log4perl init'} = "YES";
+        
     } else {
    		 #Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
         # No, not initialized yet ...
          $responseData->{'log4perl init'} = "NO";
     }
     
-
+   $responseData->{'is initialized log4perl: '} = Log::Log4perl->initialized();
+   
    my $log = Log::Log4perl->get_logger("openxpki.smartcard");
 
    $log->debug("Debug message from get server status ");
@@ -482,6 +554,42 @@ sub get_server_status {
 	
 	return $self->send_json_respond($responseData);
 
+}
+
+#Function server_log
+#Description: Writes a messege to the server log
+#Required Parameter via HTTPRequest:
+#		cardID  					- cardSerialNumber
+#		cardType 					- CardType String
+#		message 					- log message
+#		logtype 					- log level
+sub server_log {
+    my ($self)    = @_;
+    my $sessionID = $self->pnotes->{a2c}{session_id};
+    my $session   = $self->pnotes->{a2c}{session};
+    my $c            = 0;
+    my $loglevel = undef;
+
+    if(Log::Log4perl->initialized()) {
+        # Yes, Log::Log4perl has already boeen initialized
+       #$responseData->{'log4perl init'} = "YES";
+    } else {
+   		Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
+        # No, not initialized yet ...
+        # $responseData->{'log4perl init'} = "NO";
+    }
+     
+    my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+	$log->info('msg:'.$self->param("message"). '  lvl:'.$self->param("log") );
+
+	if($self->param("log") =~ /(info|debug|error|warn)/  ){
+		
+		$loglevel = $self->param("log");
+		$log->$loglevel($self->param("message"));
+	}else{
+		$log->info($self->param("message"));
+	}
+	return;
 }
 
 1;

@@ -1,0 +1,8 @@
+    groups:
+        badge_officer: cn=Badge Officer,dc=mycompany,dc=com
+ 
+    usertokey: none
+    
+    checkgroup: none
+ 
+

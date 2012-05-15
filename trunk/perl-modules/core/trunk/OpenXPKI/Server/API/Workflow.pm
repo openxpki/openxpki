@@ -433,6 +433,12 @@ sub execute_workflow_activity {
         $workflow->execute_action($wf_activity);
     };
     if ($EVAL_ERROR) {
+	CTX('log')->log(
+			MESSAGE  => "Error executing workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title'): $EVAL_ERROR",
+			PRIORITY => 'info',
+			FACILITY => 'system',
+			);
+
         my $eval = $EVAL_ERROR;
 	my $log = {
 	    logger => CTX('log'),

@@ -17,6 +17,9 @@ use OpenXPKI::Client;
 use Config::Std;
 use OpenXPKI::i18n qw( i18nGettext );
 use Data::Dumper;
+use Log::Log4perl qw(:easy);
+use Crypt::CBC ;
+use MIME::Base64;
 use OpenXPKI::Client::HTML::SC::Dispatcher qw( config );
 
 use base qw(
@@ -49,12 +52,25 @@ sub start_session {
     
 
 #################################PARAMETER#################################
+
     if ( defined $self->{r}->headers_in()->get('ct-remote-user')
         && $self->{r}->headers_in()->get('ct-remote-user') ne '' )
     {
         $ssousername = $self->{r}->headers_in()->get('ct-remote-user');
         $session->{'creator_userID'} = $ssousername;
     }
+    
+    
+    
+    if(Log::Log4perl->initialized()) {
+
+    } else {
+   		 Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
+    }
+   	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+
+	$log->info("httpsessionid: ". $self->pnotes->{a2c}{session_id});
+
 
     if ( !defined $self->param("cardID") ) {
         $responseData->{'error'} = "error";
@@ -87,9 +103,15 @@ sub start_session {
 
                 $session->{'openxPKI_Session_ID'} = undef;
                 $session->{'creator_userID'}	  = undef;
-		$session->{'cardOwner'}		  = undef;
-		$session->{'unblock_wfID'} 	  = undef;
-		$session->{'perso_wfID'} 	  = undef;
+				$session->{'cardOwner'}		  = undef;
+				$session->{'unblock_wfID'} 	  = undef;
+				$session->{'perso_wfID'} 	  = undef;
+				$session->{'perso_wfID'} 	  = undef;
+				$session->{'ECDHPeerPubkey'} =  undef ;
+				$session->{'rndPIN'} = undef ;
+	 			$session->{'ECDHPubkey'} =  undef ;
+	 			$session->{'PEMECKey'} = undef;
+	 			$session->{'ECDHkey'} = undef;
                 $session->{'cardID'}              = $self->param("cardID");
                 $responseData->{'cardID'}         = $session->{'cardID'};
                 $responseData->{'userlogin'}      = $ssousername;
@@ -515,6 +537,75 @@ sub disconnect {
     my ( $self, $client ) = @_;
     eval { $client && $client->send_receive_service_msg('LOGOUT'); };
     $client = undef;
+}
+
+#Function to wfdisconnect
+#Description:  close OpenXPKI connection
+# usage:  wfdisconnect( $client )
+#Parameter:
+#		$client 			-OpenXPKI Socket connection
+# usage: wfdisconnect($client);
+#
+sub session_encrypt {
+	my ($self)    = shift;
+	my $session = $self->pnotes->{a2c}{session};
+	my $data = shift;
+	
+my $cipher;
+my $iv;	
+my $b64enc;	  
+
+    if(Log::Log4perl->initialized()) {
+		;
+    } else {
+   		 Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
+    }
+   	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+
+		$log->debug('AES_KEY'.length($session->{'aeskey'}). ':' . $session->{'aeskey'} );
+		eval{
+		$cipher = Crypt::CBC->new( -key    =>  pack('H*', $session->{'aeskey'}),
+                             -cipher => 'Crypt::OpenSSL::AES' );
+		};
+#		eval{
+#		  $iv     = Crypt::CBC->random_bytes(16);
+#		  $cipher = Crypt::CBC->new(-literal_key => 1,
+#                           -key         =>  pack('H*', $session->{'aeskey'}),
+#                           -iv          => $iv,
+#                           -header      => 'none',
+#                           -cipher => 'Crypt::OpenSSL::AES',
+#                           -keysize     => 32 );
+#		};
+#		
+		if($@ ne ''){
+				$log->debug('Eval Error:'.$@);
+		}
+	
+  		
+	my $enc;
+		#$log->debug('Clear :'.$data);
+		eval{
+			$enc = $cipher->encrypt($data);
+		};
+		
+		#$log->debug('EncIV :'. $cipher->get_initialization_vector());
+		#$log->debug('EncIV  B64=' . encode_base64($cipher->get_initialization_vector()));
+		
+		#$log->debug('Enc :'.$enc);
+		#my $de = $cipher->decrypt($enc);
+		#$log->debug('\nde:'.$de );
+#		eval{
+#			$log->debug('DeIV :'. $cipher->get_initialization_vector());
+#			$log->debug('DeIV B64=' . encode_base64($cipher->get_initialization_vector()));
+#		};
+
+		
+		$b64enc = encode_base64($enc);
+ 		#$log->debug('Eval Error:'.$@);
+        #$log->debug('exec:'.$b64enc );
+       
+       	return $b64enc ;
+	
 }
 
 1;

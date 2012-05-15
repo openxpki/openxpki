@@ -66,6 +66,22 @@ sub start_pinreset {
     $responseData = $session->{"responseData"};
     $errors	= $session->{"errors"};
     $workflowtrace 	=$session->{"workflowtrace"};
+    
+ #################################LOG4PERL###################################
+    if ( Log::Log4perl->initialized() ) {
+
+		# Yes, Log::Log4perl has already been initialized
+		$responseData->{'log4perl init'} = "YES";
+	}
+	else {
+		Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
+
+		# No, not initialized yet ...
+		$responseData->{'log4perl init'} = "NO";
+	}
+	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+##############################################################################
+	
 
       if (!defined $c || $c == 0)
       {
@@ -74,6 +90,9 @@ sub start_pinreset {
                  @{$errors},
 		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
 		  );
+
+		$log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER");
+
 
         $responseData->{'errors'} = $errors;
         return $self->send_json_respond($responseData);
@@ -89,7 +108,7 @@ sub start_pinreset {
     else {
         $session->{'email1'}      = $self->param('email1');
         $responseData->{'email1'} = $session->{'email1'};
-
+		$log->debug($session->{'email1'});
     }
 
     if ( !defined $self->param("email2") ) {
@@ -101,6 +120,7 @@ sub start_pinreset {
     else {
         $session->{'email2'}      = $self->param('email2');
         $responseData->{'email2'} = $session->{'email2'};
+        $log->debug($session->{'email2'});
     }
 
 ####If error occured cancel request and send back error MSGs####
@@ -115,9 +135,11 @@ sub start_pinreset {
 				$wf_ID      = $self->param('unblock_wfID');
 				$responseData->{'unblock_wfID'} = $wf_ID;
 				$responseData->{'configwftype'} = $wf_type;	
+				$log->debug('posted UnblockWF ID:'.$wf_ID );
 			}
 		 
 		my $oldState = $self->wfstate( $c, $wf_ID , $wf_type);
+		$log->debug('posted UnblockWF state:'.$oldState );
  		
 
 		if(defined $oldState &&  $oldState ne "I18N_OPENXPKI_CLIENT_WEBAPI_SC_WFSTATE_ERROR_CANT_GET_WORKFLOW_INFO" && $oldState ne "I18N_OPENXPKI_CLIENT_WEBAPI_SC_WFSTATE_ERROR_WF_ID_REQUIRED" )
@@ -139,6 +161,9 @@ sub start_pinreset {
 		}
     }
 
+    $log->info('Unblock wfID:'.$wf_ID);
+
+
     if (   ( !defined $wf_ID  )
         or ( $wf_ID eq 'undefined' ) )
     {
@@ -149,7 +174,7 @@ sub start_pinreset {
                 'WORKFLOW' => $wf_type,
             },
         );
-
+		#$log->debug(Dumper( $msg));
         if ( $self->is_error_response($msg) ) {
             $responseData->{'error'} = "error";
             push( @{$errors},
@@ -160,20 +185,19 @@ sub start_pinreset {
 				push( @{$workflowtrace},
 						"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_SUCCESS_CREATE_WORKFLOW_INSTANCE"
 				);
-#             $responseData->{'msg'}
-#                 = $responseData->{'msg'}
-#                 . "Successfully created unblock workflow for token_id"
-#                 . $session->{'cardID'};
+
+				$log->info("I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_SUCCESS_CREATE_WORKFLOW_INSTANCE");
+
         }
 
         if ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'HAVE_TOKEN_OWNER' ) {
 				push( @{$workflowtrace},
 						"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_STATE_HAVE_TOKEN_OWNER"
 				);
-#             $responseData->{'msg'}
-#                 = $responseData->{'msg'}
-#                 . "State :"
-#                 . $msg->{PARAMS}->{WORKFLOW}->{STATE};
+
+
+				$log->info("I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_STATE_HAVE_TOKEN_OWNER");
+
         }
         else {
             $responseData->{'error'} = "error";
@@ -199,6 +223,8 @@ sub start_pinreset {
                 'ACTIVITY' => 'scunblock_initialize',
             },
         );
+        #$log->debug(Dumper($msg));
+       
 
         if ( $self->is_error_response($msg) ) {
             $responseData->{'error'} = "error";
@@ -233,7 +259,7 @@ sub start_pinreset {
         );
     }
     else {
-
+		$log->info("WFState:".$msg->{PARAMS}->{WORKFLOW}->{STATE});
         if ((  $msg->{PARAMS}->{WORKFLOW}->{STATE} ) eq 
                 'HAVE_TOKEN_OWNER')
         {
@@ -248,6 +274,7 @@ sub start_pinreset {
                     'WORKFLOW' => $wf_type,
                 },
             );
+           # $log->debug(Dumper($msg));
 
             if ( $self->is_error_response($msg) ) {
                 $responseData->{'error'} = "error";
@@ -259,27 +286,30 @@ sub start_pinreset {
 #                 );
 
 
-# 		if($msg->{LIST}->[0]->{LABEL} eq "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SCPU_INVALID_AUTHID")
-# 		{
-# 			$responseData->{'popup_msg'} = "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_ERROR_INVALID_USER ".$msg->{LIST}->[1]->{LABEL} ;
-#
-# 		}
-
             }
             else {
 
 				push( @{$workflowtrace},
 								"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_SUCCESS_STORE_AUTHIDS"
 						);
+
                  $responseData->{'auth1_ldap_mail'} = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{auth1_ldap_mail};
 					  $responseData->{'auth2_ldap_mail'} = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{auth2_ldap_mail};
+
+				$log->info("I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_SUCCESS_STORE_AUTHIDS");
+				$log->info('AuthID1Stored:'.$msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{auth1_ldap_mail});
+				$log->info('AuthID2Stored:'.$msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{auth2_ldap_mail});
+            $responseData->{'auth1_ldap_mail'} = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{auth1_ldap_mail};
+			$responseData->{'auth2_ldap_mail'} = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{auth2_ldap_mail};
 
 #                     = $responseData->{'msg'}
 #                     . "Successfully executed store_auth_ids'"
 #                     . $session->{'cardID'};
             }
+            
+            my $actual_state = $self->wfstate( $c, $wf_ID, $wf_type  );
 
-            if ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'PEND_ACT_CODE' ) {
+            if ( $actual_state eq 'PEND_ACT_CODE' ) {
 				push( @{$workflowtrace},
 								"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_STATE_PEND_ACT_CODE"
 						);
@@ -347,6 +377,20 @@ sub list_active_workflows {
     my $action;
 	my $workflowtrace;
 	my $errors	;
+	 #################################LOG4PERL###################################
+    if ( Log::Log4perl->initialized() ) {
+
+		# Yes, Log::Log4perl has already been initialized
+		$responseData->{'log4perl init'} = "YES";
+	}
+	else {
+		Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
+
+		# No, not initialized yet ...
+		$responseData->{'log4perl init'} = "NO";
+	}
+	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+##############################################################################
 
     $self->start_session();
     $c            = $session->{"c"};
@@ -458,7 +502,8 @@ sub pinreset_verify {
     my $p            = config()->{openxpki}->{role};
     my $wf_ID;
     my $errors;
-	 my $workflowtrace; 
+	my $workflowtrace; 
+	my $plugincommand;	
     my $msg;
     my $serializer = OpenXPKI::Serialization::Simple->new(); 
 
@@ -467,8 +512,24 @@ sub pinreset_verify {
     $c            = $session->{"c"};
     $responseData = $session->{"responseData"};
     $errors				= $session->{"errors"};
- 	 $workflowtrace 	=$session->{"workflowtrace"};
+ 	$workflowtrace 	=$session->{"workflowtrace"};
     $responseData->{'error'} = undef;
+    
+ #################################LOG4PERL###################################
+    if ( Log::Log4perl->initialized() ) {
+
+		# Yes, Log::Log4perl has already been initialized
+		$responseData->{'log4perl init'} = "YES";
+	}
+	else {
+		Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
+
+		# No, not initialized yet ...
+		$responseData->{'log4perl init'} = "NO";
+	}
+	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+##############################################################################    
+    
 
       if (!defined $c || $c == 0)
       {
@@ -477,7 +538,7 @@ sub pinreset_verify {
                  @{$errors},
 		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
 		  );
-
+		$log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER");
         $responseData->{'errors'} = $errors;
         return $self->send_json_respond($responseData);
 
@@ -501,12 +562,13 @@ sub pinreset_verify {
 # 		$session->{'email2'} = $self->param('email2');
 # 		$responseData->{'email2'} = $session->{'email2'};
 # 	}
-my $userpin;
+#my $userpin;
     if ( !defined $self->param("activationCode1") ) {
         $responseData->{'error'} = "error";
         push( @{$errors},
             "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_MISSING_PARAMETER_ACTIVATIONCODE1"
         );
+        $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_MISSING_PARAMETER_ACTIVATIONCODE1");
     }
     else {
         $session->{'activationCode1'}      = $self->param('activationCode1');
@@ -518,21 +580,23 @@ my $userpin;
         push( @{$errors},
             "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_MISSING_PARAMETER_ACTIVATIONCODE2"
         );
+       $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_MISSING_PARAMETER_ACTIVATIONCODE2");
+        
     }
     else {
         $session->{'activationCode2'}      = $self->param('activationCode2');
         $responseData->{'activationCode2'} = $session->{'activationCode2'};
     }
 
-    if ( !defined $self->param("userpin") ) {
-        $responseData->{'error'} = "error";
-        push( @{$errors},
-            "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_MISSING_PARAMETER_USERPIN"
-        );
-    }
-    else {
-        $userpin = $self->param('userpin');
-    }
+#    if ( !defined $self->param("userpin") ) {
+#        $responseData->{'error'} = "error";
+#        push( @{$errors},
+#            "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_MISSING_PARAMETER_USERPIN"
+#        );
+#    }
+#    else {
+#        $userpin = $self->param('userpin');
+#    }
 
 
     if ( !defined $self->param("unblock_wfID") || $self->param("unblock_wfID") eq '' ) {
@@ -540,10 +604,13 @@ my $userpin;
         push( @{$errors},
             "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_MISSING_PARAMETER_WF_ID"
         );
+          $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_MISSING_PARAMETER_WF_ID");
+    
     }else{
 	    
         $wf_ID      = $self->param('unblock_wfID');
         $responseData->{'unblock_wfID'} = $wf_ID;
+        $log->info("unblock_wfID: ".$wf_ID );
     }
 
     if ( !defined $wf_ID ) {
@@ -599,6 +666,7 @@ my $userpin;
         push( @{$errors},
             "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_WF_ID_REQUIRED"
         );
+        $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_WF_ID_REQUIRED");
 
         # 	}
 
@@ -616,7 +684,7 @@ my $userpin;
 
     $responseData->{'unblock_wfID'} = $wf_ID;
     my $actual_state = $self->wfstate( $c, $wf_ID, $wf_type  );
-	
+	$log->info('UnblockWF State:'.$actual_state);
 	if($actual_state eq 'FAILURE' ){
 		$session->{'wfstate'} = $msg->{PARAMS}->{WORKFLOW}->{STATE};
 	
@@ -626,6 +694,8 @@ my $userpin;
         push( @{$errors},
             "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_WF_FAILURE"
         );
+        $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_WF_FAILURE");
+        
 
 	
 		if ( defined $responseData->{'error'} ) {
@@ -636,72 +706,72 @@ my $userpin;
 
 	}
 
-	if($actual_state eq 'CAN_WRITE_PIN' ){
-	#user already fatched puk and wants only to encrypt an other PIN 
-
-			$userpin .= "\00";
-			
-				my $encrypted = $c->send_receive_command_msg( 'deuba_aes_encrypt_parameter' ,{
-				DATA => $userpin,
-			});
-			
- 			#FIX ME maybe handle possible exception
-			$responseData->{'pin'}  = $encrypted->{PARAMS};
-			$responseData->{'puk'}  = undef;
-	
-		$session->{'wfstate'} = $msg->{PARAMS}->{WORKFLOW}->{STATE};
-	
-		$responseData->{'workflowtrace'} = $workflowtrace;
-	
-		if ( defined $responseData->{'error'} ) {
-			$responseData->{'errors'} = $errors;
-		}
-
-    	return $self->send_json_respond($responseData);
-     }
+#	if($actual_state eq 'CAN_WRITE_PIN' ){
+#	#user already fatched puk and wants only to encrypt an other PIN 
+#
+#			$userpin .= "\00";
+#			
+#				my $encrypted = $c->send_receive_command_msg( 'deuba_aes_encrypt_parameter' ,{
+#				DATA => $userpin,
+#			});
+#			
+# 			#FIX ME maybe handle possible exception
+#			$responseData->{'pin'}  = $encrypted->{PARAMS};
+#			$responseData->{'puk'}  = undef;
+#	
+#		$session->{'wfstate'} = $msg->{PARAMS}->{WORKFLOW}->{STATE};
+#	
+#		$responseData->{'workflowtrace'} = $workflowtrace;
+#	
+#		if ( defined $responseData->{'error'} ) {
+#			$responseData->{'errors'} = $errors;
+#		}
+#
+#    	return $self->send_json_respond($responseData);
+#     }
 
 
     if (   ( $actual_state eq 'PEND_PIN_CHANGE' )
         or ( $actual_state eq 'PEND_ACT_CODE' ) )
-    {
-
-        $msg = $c->send_receive_command_msg(
-            'execute_workflow_activity',
-            {   'ID'       => $wf_ID,
-                'ACTIVITY' => 'scunblock_post_codes',
-                'PARAMS'   => {
-                    _auth1_code => $session->{'activationCode1'},
-                    _auth2_code => $session->{'activationCode2'},
-                },
-                'WORKFLOW' => $wf_type ,
-            },
-        );
-
-
-	if ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'CAN_FETCH_PUK' )
-	{
-		push( @{$workflowtrace},
-			"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_SUCCESS_VERIFY_AUTHCODES_STATE_CAN_FATCH_PUK");
-	}else{
-		$responseData->{'error'} = "error";
-		push( @{$errors},
-			"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_AUTHCODES_INCORRECT");
-		push( @{$errors},$msg);
-	}
-
-
-
-		
-        
-    }else {
+	    {
+	
+	        $msg = $c->send_receive_command_msg(
+	            'execute_workflow_activity',
+	            {   'ID'       => $wf_ID,
+	                'ACTIVITY' => 'scunblock_post_codes',
+	                'PARAMS'   => {
+	                    _auth1_code => $session->{'activationCode1'},
+	                    _auth2_code => $session->{'activationCode2'},
+	                },
+	                'WORKFLOW' => $wf_type ,
+	            },
+	        );
+	    # $log->debug(Dumper($msg));
+	
+		if ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'CAN_FETCH_PUK' )
+		{
+			push( @{$workflowtrace},
+				"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_SUCCESS_VERIFY_AUTHCODES_STATE_CAN_FATCH_PUK");
+			  $log->info('I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_SUCCESS_VERIFY_AUTHCODES_STATE_CAN_FATCH_PUK');
+		}else{
+			$responseData->{'error'} = "error";
+			push( @{$errors},
+				"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_AUTHCODES_INCORRECT");
+			
+		$log->error('I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_AUTHCODES_INCORRECT');
+			
+		}
+       
+	    }else {
         $responseData->{'error'} = "error";
         push( @{$errors},
             "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_STATE_PEND_PIN_CHANGE_REQUIRED");
-
+		$log->error('I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_STATE_PEND_PIN_CHANGE_REQUIRED');
     }
 
     # Provide correct codes and pins
 
+	
     if ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'CAN_FETCH_PUK' ) {
 #         $responseData->{'msg'}
 #             = $responseData->{'msg'}
@@ -716,6 +786,9 @@ my $userpin;
                 'WORKFLOW' =>  $wf_type ,
             },
         );
+        
+      $log->debug(Dumper($msg));
+
 
         my $got_puk = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_puk};
         #$session->{'puk'}      = $got_puk;
@@ -723,6 +796,19 @@ my $userpin;
 		if(defined $got_puk && $got_puk ne '')
 		{
 			 $responseData->{'puk'} = $serializer->deserialize($got_puk);
+
+	my $PUK     = $serializer->deserialize( $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_puk} );
+
+
+		if(defined  $PUK &&  $PUK ne '')
+		{
+			
+				$plugincommand =
+				    'ResetPIN;CardSerial='
+				  . $session->{'cardID'} 
+				  . ';PUK='.$PUK->[0].';';
+		 #$log->debug('Pinreset_plugincommand: '. $plugincommand);
+
 		}
       #  $responseData->{'puk'} = $got_puk;
 
@@ -743,6 +829,7 @@ my $userpin;
         }
 
     }
+    }
     else {
         $responseData->{'error'} = "error";
         push( @{$errors},
@@ -750,31 +837,31 @@ my $userpin;
                  );
     }
 
-    if ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'CAN_WRITE_PIN' ) {
-			push( @{$workflowtrace},
-								"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_SUCCESS_CAN_WRITE_PIN");
-			
-			# append 0 byte
-			$userpin .= "\00";
-			
-				my $encrypted = $c->send_receive_command_msg( 'deuba_aes_encrypt_parameter' ,{
-				DATA => $userpin,
-			});
+#    if ( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'CAN_WRITE_PIN' ) {
+#			push( @{$workflowtrace},
+#								"I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_SUCCESS_CAN_WRITE_PIN");
+#			
+#			# append 0 byte
+#			$userpin .= "\00";
+#			
+#				my $encrypted = $c->send_receive_command_msg( 'deuba_aes_encrypt_parameter' ,{
+#				DATA => $userpin,
+#			});
 			
  			#FIX ME maybe handle possible exception
-			$responseData->{'pin'}  = $encrypted->{PARAMS};
+#			$responseData->{'pin'}  = $encrypted->{PARAMS};
  			
 #         $responseData->{'msg'}
 #             = $responseData->{'msg'}
 #             . "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_SUCCESS_CAN_WRITE_PIN"
 #             . $session->{'cardID'};
-    }
-    else {
-        $responseData->{'error'} = "error";
-        push( @{$errors},
-            "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_STATE_CAN_WRITE_PIN_REQUIRED"
-                 );
-    }
+#    }
+ #   else {
+ #       $responseData->{'error'} = "error";
+ #       push( @{$errors},
+ #           "I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_PINRESET_VERIFY_ERROR_STATE_CAN_WRITE_PIN_REQUIRED"
+ #                );
+ #   }
 
     #is ( wfparam( $wf_id, '_puk' ), $act_test{user}->{puk},
     #       "check puk returned from datapool") or diag($@);
@@ -788,6 +875,19 @@ my $userpin;
     # is( wfstate($wf_id), 'SUCCESS', 'Workflow state after write_pin_ok' )
     #     or die("State after write_pin_ok must be SUCCESS:", $@);
     #
+    		$log->info(
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_ENCRYPT_OUT_DATA"
+		);
+		#$log->info("Plugin command to enc:".$plugincommand);
+	if ( $plugincommand ne '' ) {
+		
+		eval{
+		$responseData->{'exec'} = $self->session_encrypt($plugincommand) ;
+		};
+		#$log->info('action:'.$responseData->{'action'});
+        $log->info('exec:'.$@.$responseData->{'exec'});
+	}
+    
     $session->{'wfstate'} = $msg->{PARAMS}->{WORKFLOW}->{STATE};
     $responseData->{'wfstate'} = $session->{'wfstate'};
 	$responseData->{'workflowtrace'} = $workflowtrace;
@@ -832,6 +932,21 @@ sub pinreset_confirm {
     $errors				= $session->{"errors"};
  	 $workflowtrace 	=$session->{"workflowtrace"};
 	 $responseData->{'error'} = undef;
+	 
+#################################LOG4PERL###################################
+    if ( Log::Log4perl->initialized() ) {
+
+		# Yes, Log::Log4perl has already been initialized
+		$responseData->{'log4perl init'} = "YES";
+	}
+	else {
+		Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
+
+		# No, not initialized yet ...
+		$responseData->{'log4perl init'} = "NO";
+	}
+	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+##############################################################################  
 
       if (!defined $c || $c == 0)
       {

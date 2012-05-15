@@ -6,8 +6,8 @@
 <meta content="text/html; charset=utf-8" http-equiv="content-type">
 <title>dbSmartcard | Self-Service Center</title>
 
-<script type="text/javascript" src="js/mootools-core-1.3-full-nocompat-yc.js"></script>
-<script type="text/javascript" src="js/mootools-more.js"></script>
+<script type="text/javascript" src="js/mootools-core-1.4.5.js"></script>
+<script type="text/javascript" src="js/mootools-more-1.4.0.1.js"></script>
 <script type="text/javascript" src="js/ssc_model.js"></script>
 <script type="text/javascript" src="js/ssc_view.js"></script>
 <script type="text/javascript" src="js/ssc_controller.js"></script>
@@ -32,6 +32,7 @@
         <div id="mainMenu">
           <ul id="mainMenuList">
           </ul>
+            <span id="windowCloser"></span>
         </div>
         </div>
         <div id="statusBar">
@@ -62,6 +63,13 @@
                      <div id="nextActionDiv"></div>
                  </div>
      	  </div>
+     	  <div id="popupFrame">
+			  	<div id="popupDiv">
+			   		<a id="popupCloser"></a>
+			   		<div id="popupInfo"></div>
+			   		<div id="popupInfo2"></div>
+				</div>
+		  </div>
           <div id="infoRight">
           <h3 id="infoRightTitle"></h3>
              <!--<div id="infoRightTitle"></div> -->
@@ -83,13 +91,6 @@
     </div>
   </div>
 </div>
-<div id="popupFrame">
-  	<div id="popupDiv">
-   		<a id="popupCloser">X</a>
-   		<div id="popupSign"></div>
-   		<div id="popupInfo"></div>
-   		<div id="popupInfo2"></div>
-	</div>
-</div>
+
 </body>
 </html>

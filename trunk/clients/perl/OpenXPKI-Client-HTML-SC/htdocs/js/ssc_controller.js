@@ -15,6 +15,7 @@
 var testTimeout = 2000;
 var sscDebug = false;
 var baseUrl = '';
+var query = '';
 
 function reset_plugin()
 {
@@ -23,7 +24,6 @@ function reset_plugin()
 	try {
 		// force an exception if PuginStatus not available
 		//alert('release');
-		PKCS11Plugin.StopPlugin();
 		
 	} catch (e) {
 		//alert('not supported');
@@ -88,7 +88,7 @@ window.addEvent('domready', function() {
 	
 	// handle query string if any
 	if (iOfQuery > -1){
-		var query   = baseUrl.substring(iOfQuery+1);
+		query   = baseUrl.substring(iOfQuery+1);
 		baseUrl     = baseUrl.substring(0,iOfQuery);	
 			
 		// include firebug light for ie
@@ -137,10 +137,6 @@ function startProcessing(enableDbg){
 	// only german and english supported 
 	if (lang !== 'de') lang = 'us';
 
-		
-	// instantiate model
-	sscModel = new SSC_MODEL({ 'baseUrl' :  baseUrl});
-		
 	// instantiate view
-	sscView   = new SSC_VIEW({'language' : lang , 'baseUrl' : baseUrl});
+	sscView   = new SSC_VIEW({'language' : lang , 'baseUrl' : baseUrl, 'query' : query});
 }

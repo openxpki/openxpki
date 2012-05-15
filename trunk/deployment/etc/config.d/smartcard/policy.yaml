@@ -1,0 +1,139 @@
+certs:
+    type:
+        nonescrow:
+            usage: 
+            - AUTHENTICATION
+            allowed_profiles:
+            - I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL
+            - I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL
+            promote_to_preferred_profile: 1
+            ignore_certificates_with_missing_private_key: 0
+            limits:
+                min_count: 1
+                max_count: 1
+            allow_renewal: -0003
+            force_renewal: -000014
+            escrow_key: 0
+            publish: 0
+            purge_invalid: 0
+            max_login: 1
+
+        signature:
+            usage: 
+            - SIGNATURE
+            allowed_profiles:
+            - I18N_OPENXPKI_PROFILE_USER_SIGNATURE
+            promote_to_preferred_profile: 1
+            ignore_certificates_with_missing_private_key: 0
+            limits:
+                min_count: 1
+                max_count: 1
+            allow_renewal: -0003
+            force_renewal: -000014
+            escrow_key: 0
+            publish: 0
+            purge_invalid: 0
+            max_login: 1
+
+        escrow:
+            usage:
+            - ENCRYPTION
+            allowed_profiles:
+            - I18N_OPENXPKI_PROFILE_USER_ENCRYPTION
+            - I18N_OPENXPKI_PROFILE_USER_FSE
+            promote_to_preferred_profile: 1
+            ignore_certificates_with_missing_private_key: 1
+            limits:
+                min_count: 1
+                max_count: 8
+                max_age: -10
+            allow_renewal: -0003
+            force_renewal: -000014
+            lead_validity: 1
+            escrow_key: 1
+            publish: 1
+            purge_invalid: 0
+
+        UNEXPECTED:
+            purge_valid: 0
+            purge_invalid: 0
+
+        FOREIGN:
+            purge_valid: 0
+            purge_invalid: 1
+
+#xref@: connector:smartcard.policy.cache           
+xref:
+   cached: 1
+   profile:
+     I18N_OPENXPKI_PROFILE_USER_SIGNATURE:
+       type: signature
+     I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL:
+       type: nonescrow
+     I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL:
+       preferred: 1
+       type: nonescrow
+     I18N_OPENXPKI_PROFILE_USER_ENCRYPTION:
+       preferred: 1
+       type: escrow
+     I18N_OPENXPKI_PROFILE_USER_FSE:
+       type: escrow
+   type:
+     FOREIGN:
+       policy:
+         purge_invalid: '1'
+         purge_valid: '0'
+     UNEXPECTED:
+       policy:
+         purge_invalid: '0'
+         purge_valid: '0'
+     escrow:
+       allowed_profile:
+         I18N_OPENXPKI_PROFILE_USER_ENCRYPTION: 1
+         I18N_OPENXPKI_PROFILE_USER_FSE: 1
+       limits:
+         max_age: '-10'
+         max_count: '8'
+         min_count: '1'
+       policy:
+         allow_renewal: '-0003'
+         publish: '1'
+         purge_invalid: '0'
+         escrow_key: 1
+       usage:
+         ENCRYPTION: 1
+     signature:
+       allowed_profile:
+         I18N_OPENXPKI_PROFILE_USER_SIGNATURE: 1
+       limits:
+         max_count: '1'
+         min_count: '1'
+       policy:
+         allow_renewal: '-0003'
+         publish: '0'
+         purge_invalid: '0'
+         escrow_key: 0
+       usage:
+         SIGNATURE: 1
+     nonescrow:
+       allowed_profile:
+         I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL: 1
+         I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL: 1
+       limits:
+         max_count: '1'
+         min_count: '1'
+       policy:
+         allow_renewal: '-0003'
+         publish: '0'
+         purge_invalid: '0'
+         escrow_key: 0
+       usage:
+         AUTHENTICATION: 1
+    
+
+cards:
+    max_smartcards_per_user: 1
+
+cache:
+    class: Connector::Builtin::Memory
+ 

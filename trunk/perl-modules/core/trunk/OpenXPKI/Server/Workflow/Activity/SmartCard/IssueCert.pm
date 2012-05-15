@@ -228,6 +228,29 @@ sub execute {
             },
         );
     }
+
+    my $certificates = CTX('api')->get_data_pool_entry(
+	{
+	    PKI_REALM => $realm,
+	    NAMESPACE => 'smartcard.user.certificate',
+	    KEY => $context->param('userinfo_employee_id'),         
+	} );
+
+    my @certificate_identifiers;
+    if ($certificates) {
+	   @certificate_identifiers =  @{$serializer->deserialize($certificates->{VALUE})};
+    }
+    push @certificate_identifiers, $identifier;
+    
+    CTX('api')->set_data_pool_entry( 
+	{
+	    PKI_REALM => $realm,
+	    NAMESPACE => 'smartcard.user.certificate',
+	    KEY => $context->param('userinfo_employee_id'),
+	    VALUE => $serializer->serialize(\@certificate_identifiers),
+	    FORCE => 1,
+	} );
+
     CTX('dbi_backend')->commit();
     
 #    $context->param(certificate => $cert);
