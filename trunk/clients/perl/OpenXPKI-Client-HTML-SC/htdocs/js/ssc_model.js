@@ -344,6 +344,7 @@ var SSC_MODEL = new Class(
 			processAuthCodes : function(pin, authcode1, authcode2,cb) {
 
 				window.dbg.log('sscModel.processAuthCodes');
+				this.userPIN = pin;
 				
 				if(this.pinResetRetry === null ){
 					window.dbg.log('sscModel.processAuthCodes verify authcodes');
@@ -393,6 +394,12 @@ var SSC_MODEL = new Class(
 							this.ajax_log('processAuthCodes: '+r, 'error');
 							viewCb('invalidPin');
 							return;
+						}else if (reason === 'PINChangeError') {
+						// Invalid PIN is an user Error no popup here
+						window.dbg.log("invalid pin" + reason);
+						this.ajax_log('processAuthCodes: '+r, 'error');
+						viewCb('invalidPin');
+						return;
 						}else{
 							
 							sscView.showPopUp('E_sc-error-resetpin-error ',
@@ -511,8 +518,21 @@ var SSC_MODEL = new Class(
 					sscView.setStatusMsg("T_idle", ' ', 'idle');	
 		
 					this.ajax_log('processAuthCodes: '+r, 'error');
-				}				
+				}
 				
+				var results = new Querystring(r);
+				var set = results.get("Result");
+
+				window.dbg.log(r);
+				if (set === "SUCCESS") {
+					
+					 viewCb(r);
+	
+				} else {
+					
+					
+				}
+
 				window.dbg.log("sc_test_all_keypairs: "+ r);
 				viewCb(r);
 	

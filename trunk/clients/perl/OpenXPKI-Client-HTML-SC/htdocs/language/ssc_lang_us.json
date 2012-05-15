@@ -151,7 +151,8 @@
 "I_confOutlook": "The secure e-mail certificates which are stored on your dbSmartcard are going to be associated with the local MS Outlook profile for the user which is currently logged-in to this Computer. Caution: Only perform this action on your own computer / DoD and only if you are the owner of the inserted dbSmartcard. The configuration has to be repeated for every computer / DoD which you are using with MS Outlook.",
 "T_keyPair": "key pair",
 "T_Card_Out": "Card removed",
-"T_seekingCard": "seeking smartcard..."
+"T_seekingCard": "seeking smartcard...",
+"E_IE-Error_Protected": ""
 
 
 }
