@@ -289,7 +289,6 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/ComputePUK.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/ApplyCSRPolicy.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/PublishCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/RenameEscrowedKey.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/ComputePUK.pm
 
 
 OpenXPKI/Server/Workflow/Activity/SmartcardPINUnblock/Initialize.pm
