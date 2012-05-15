@@ -24,6 +24,7 @@ sub execute {
     
     $context->param( policy_input_required => '');
     
+    
     # The certifiacte type of the current loop is in csr_cert_type
     my $cert_type = $context->param('csr_cert_type');
     ##! 8: ' Prepare CSR for cert type ' . $cert_type 
@@ -38,6 +39,35 @@ sub execute {
     my $cert_issuance_data_context = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
         { workflow => $workflow , context_key => 'cert_issuance_data' } );
     
+    # Do validity calcluation
+    # If max_validity is not in context, check if the current cert_type has the lead_validity flag set    
+    my $max_validity = $context->param('max_validity');    
+    if (!$max_validity && $config->get("smartcard.policy.certs.type.$cert_type.lead_validity")) {
+    
+        # Check for testing override
+        my $validity = $config->get("testing.smartcard.max_validity");
+        if ($validity) {
+            CTX('log')->log(
+                MESSAGE => "Smartcard validity override for testing",
+                PRIORITY => 'info',
+                FACILITY => [ 'audit', 'system', ],
+            );               
+        }  else {        
+            # Fetch validity from profile if no testing value is set        
+            $validity = $config->get("profile.$cert_profile.validity.notafter");
+        }
+
+        my $notafter = OpenXPKI::DateTime::convert_date({           
+            OUTFORMAT => 'terse',
+            DATE =>  OpenXPKI::DateTime::get_validity({            
+                VALIDITY => $validity,
+                VALIDITYFORMAT => 'relativedate',
+            })
+        });
+        ##! 32: ' Set notafter date due to lead_validity flag to ' .$notafter
+        $context->param('notafter' => $notafter);
+        $context->param('max_validity' => $notafter);
+    }
        
     # prepare hashref for Template Toolkit based on userinfo context values
     my $userinfo;

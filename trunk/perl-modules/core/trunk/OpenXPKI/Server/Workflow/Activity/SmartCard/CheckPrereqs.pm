@@ -73,9 +73,12 @@ sub execute {
 		workflow    => $workflow,
 		context_key => 'certificate_types',
 	    } );
-	    
+	    	
+	
+    
+    my $config = CTX('config');       
 	my @certs_to_create;
-
+	
 	foreach my $type (keys %{$result->{CERT_TYPE}}) {
 	    $cert_types->push($type);
 
@@ -84,8 +87,10 @@ sub execute {
         # Assumption: If new certificates for a type are created, we always use
         # the first profile
         if (!$result->{CERT_TYPE}->{$type}->{usable_cert_exists} || 
-            !$result->{CERT_TYPE}->{$type}->{preferred_cert_exists}) {            
-            push @certs_to_create, $type;                        
+            !$result->{CERT_TYPE}->{$type}->{preferred_cert_exists}) {                                    
+           
+            push @certs_to_create, $type;
+                     
         }
 
 	    foreach my $entry (keys %{$result->{CERT_TYPE}->{$type}}) {
@@ -190,6 +195,16 @@ sub execute {
 	$context->param('smartcard_token_chipid_match' =>
 			$result->{SMARTCARD}->{token_chipid_match});
 
+    # Record the max validity - sc_analyse returns an epoch, we need a terse date    
+    if ($result->{VALIDITY}->{set_to_value}) {
+        my $max_validity = OpenXPKI::DateTime::convert_date({
+            DATE      => DateTime->from_epoch( epoch => $result->{VALIDITY}->{set_to_value} ),
+            OUTFORMAT => 'terse',
+        });
+        $context->param('max_validity' => $max_validity);
+    } else {
+        $context->param('max_validity' => 0);
+    }
 
 	##! 1: 'Leaving Initialize::execute()'
 	return 1;

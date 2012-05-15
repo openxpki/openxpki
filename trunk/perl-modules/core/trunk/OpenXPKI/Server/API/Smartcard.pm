@@ -186,6 +186,10 @@ sub sc_analyze_smartcard {
 	    # smartcard puk is available in datapool
 	    puk_found_in_datapool => 0,
 	},
+	VALIDITY => {
+	    set_to_value => undef,
+	    set_by_type => undef,
+	}
     };
 
     my $config = CTX('config');
@@ -645,6 +649,8 @@ sub sc_analyze_smartcard {
 		    $user_certs->{by_identifier}->{$identifier};
 		push @{$user_certs->{by_profile}->{$db_hash->{PROFILE}}}, 
 		    $user_certs->{by_identifier}->{$identifier};
+		    
+		    
     } # db loop
     } # if certificates
     ##! 16: 'certificates already existing for user: ' . Dumper $user_certs
@@ -707,6 +713,10 @@ sub sc_analyze_smartcard {
     	    # if the latest certficate has been revoked or is valid
     	    # for less than the configured threshold, we propagate
     	    # that we have no usable certificate
+    	    
+    	    # FIXME: oliwel 2012-05-15 - is this really a valid assumption?
+            # Are there situatuions where the second certificate is still ok
+            # even if the first ist not? 
     	    my $cert_id = $expected_certs[0];
     	    my $cert = $user_certs->{by_identifier}->{$cert_id};
     	    
@@ -727,8 +737,17 @@ sub sc_analyze_smartcard {
     		##! 16: 'certificate does not qualify because it is supposed to be an escrowed cert and no private key is available'
     		$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
     	    }
+    	    
+            # Validity calculation - reuse the usable_cert_exists logic from above
+            # set_by_type is undef and the type is marked as "lead_validity" or the type is already selected
+            if (( (!$result->{VALIDITY}->{set_by_type} && $policy->get("certs.type.$type.lead_validity")) ||
+                ($result->{VALIDITY}->{set_by_type} eq $type)) &&                             
+                $result->{CERT_TYPE}->{$type}->{usable_cert_exists}) {
+                    ##! 32: ' Set overall validity by cert '.$cert_id.' to ' . $cert->{NOTAFTER};
+                    $result->{VALIDITY}->{set_by_type} = $type;
+                    $result->{VALIDITY}->{set_to_value} = $cert->{NOTAFTER};                      
+            }
     	}
-        
     	
     	# index by type
     	$user_certs->{xref}->{expected_certs}->{type}->{$type}->{list} = \@expected_certs;
@@ -994,7 +1013,7 @@ sub _get_policy {
             $policy->set([ 'xref.type', $type, 'limits', $item ], $policy->get([ 'certs.type', $type, 'limits', $item ]));
         }
             
-        foreach my $item (qw( allow_renewal escrow_key publish purge_invalid purge_valid )) {
+        foreach my $item (qw( allow_renewal escrow_key publish purge_invalid purge_valid lead_validity)) {
             $policy->set([ 'xref.type', $type,'policy',$item], $policy->get([  'certs.type', $type, $item ]));         
         }
     
