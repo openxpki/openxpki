@@ -1221,12 +1221,37 @@ var SSC_VIEW = new Class(
 			},
 			
 			processTestPrivateKey : function(){
+				
 			   var pin = $('pin').value;
+			   if(pin === null || pin === ''){
+				   this.setPrompt('T_pinError');
+				   this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);				 
+				   this.setNextAction('T_testPrivateKey',this.processTestPrivateKey, true);
+				   return;
+			   }
+			  
 			   sscModel.sc_test_card(pin,this.testPrivateKeyCB);
 			},
 			
 			testPrivateKeyCB : function(r){
 				window.dbg.log('testPrivateKeyCB');
+				
+				var results = new Querystring(r);
+				var set = results.get("Result");
+				var reason = results.get("Reason");  
+
+				window.dbg.log(r);
+				if (set === "ERROR"  && reason === "WrongPINError" ){
+					 this.setPrompt('T_pinError');
+					 this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);				 
+					 this.setNextAction('T_testPrivateKey',this.processTestPrivateKey, true);
+					   return;
+				}else{
+					this.setPrompt('');
+				}
+					
+	
+				
 				var result= 'PASS';
 				var str = r.split('&');
 				str = str[3].split('=');
@@ -2213,12 +2238,12 @@ var SSC_VIEW = new Class(
 					}  else if (certs[i].CERTIFICATE_TYPE ===  'signature'){
 						certType = 4;
 					    title = certs[i].SUBJECT;
-					    subject = '<tr><td>Subject</td><td>'+ certs[i].SUBJECT + '</td></tr>';		    
+					   // subject = '<tr><td>Subject</td><td>'+ certs[i].SUBJECT + '</td></tr>';		    
 					// other certs
 					} else {
 						certType = 3;
 						title = certs[i].SUBJECT;
-						subject = '<tr><td>Subject</td><td>'+ certs[i].SUBJECT + '</td></tr>';
+						//subject = '<tr><td>Subject</td><td>'+ certs[i].SUBJECT + '</td></tr>';
 					}
 					
 					
