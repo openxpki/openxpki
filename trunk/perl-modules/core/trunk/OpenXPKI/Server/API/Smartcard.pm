@@ -656,7 +656,7 @@ sub sc_analyze_smartcard {
     ##! 16: 'certificates already existing for user: ' . Dumper $user_certs
 
     ###########################################################################
-    # process policy requirements for all user certificates
+    # process policy requirements for all user certificates (from database)
 
     foreach my $type ($policy->get_keys('certs.type')) {
     	next if ($type =~ m{ \A (?:UNEXPECTED|FOREIGN) \z }xms);
@@ -861,6 +861,12 @@ sub sc_analyze_smartcard {
 		}
 		push @{$result->{TASKS}->{SMARTCARD}->{INSTALL}}, $identifier;
 		$result->{PROCESS_FLAGS}->{will_need_pin} = 1;
+		
+		# Check if the restored certificate matches the preferred profile  
+		 
+				
+		$preferred_cert_available_by_type{$cert_type} ||= 
+			$policy->get(['xref.profile', $cert->{PROFILE}, 'preferred']);
 	    }
 	}
     }
@@ -1668,6 +1674,11 @@ for each configured type)
 
 A usable certificate for this purpose exists in the database.
 
+=item * preferred_cert_exists (scalar, interpreted as boolean)
+
+The preferred certificate for this purpose is already on the token
+or is scheduled to be restored (escrow certificate).  
+
 =item * token_contains_expected_cert (scalar, interpreted as boolean)
 
 The Smartcard contains the expected certificate for this purpose.
@@ -1750,6 +1761,22 @@ Smartcard puk is available in datapool
 
 =back
 
+
+=item * VALIDITY (hashref)
+
+Store information about forced notafter/validity setting 
+
+=over 8
+
+=item * set_to_value 
+
+Epoch timestamp which should be used as notafter date
+
+=item * set_by_type
+
+Certificate type which was used to determine the value
+	
+=back
 
 
 Parsed certificates:
