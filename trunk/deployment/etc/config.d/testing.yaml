@@ -4,6 +4,6 @@ connectors:
     smartcard:
         class: Connector::Proxy::YAML
         LOCATION: /home/pkiadm/config/testing.yaml
-        prefix: smardcard
+        PREFIX: smartcard
 
 
