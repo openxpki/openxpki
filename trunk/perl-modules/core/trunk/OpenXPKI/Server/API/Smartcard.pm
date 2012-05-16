@@ -664,6 +664,7 @@ sub sc_analyze_smartcard {
     	$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
     	$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
     	$result->{CERT_TYPE}->{$type}->{preferred_cert_exists} = 0;
+    	$result->{CERT_TYPE}->{$type}->{recoverable_cert_exists} = 0;
     	
     	my @expected_certs;
     	my $min_certs = $policy->get(['certs.type', $type, 'limits.min_count']);
@@ -732,10 +733,13 @@ sub sc_analyze_smartcard {
     	    # this does not qualify as a 'usable' certificate (only for
     	    # certs which should be escrowed)
     	     
-    	    if ($policy->get(['certs.type', $type, 'escrow_key'])
-    		&& ! $cert->{PRIVATE_KEY_AVAILABLE}) {
-    		##! 16: 'certificate does not qualify because it is supposed to be an escrowed cert and no private key is available'
-    		$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
+    	    if ($policy->get(['certs.type', $type, 'escrow_key'])) {
+    			if ($cert->{PRIVATE_KEY_AVAILABLE}) {
+					$result->{CERT_TYPE}->{$type}->{recoverable_cert_exists} = 1;
+    			} else {
+		    		##! 16: 'certificate does not qualify because it is supposed to be an escrowed cert and no private key is available'
+    				$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
+    			}
     	    }
     	    
             # Validity calculation - reuse the usable_cert_exists logic from above
@@ -1672,6 +1676,8 @@ for each configured type)
 
 =item * usable_cert_exists (scalar, interpreted as boolean)
 
+# FIXME - need to declare if an escrow certificate w/o key is usable or 
+not and where we have assumptions based on this 
 A usable certificate for this purpose exists in the database.
 
 =item * preferred_cert_exists (scalar, interpreted as boolean)
@@ -1682,6 +1688,10 @@ or is scheduled to be restored (escrow certificate).
 =item * token_contains_expected_cert (scalar, interpreted as boolean)
 
 The Smartcard contains the expected certificate for this purpose.
+
+=item * recoverable_cert_exists
+
+The certificate and its key are in the database and can be recovered.
 
 =item * escrow_private_key (scalar, interpreted as boolean)
 

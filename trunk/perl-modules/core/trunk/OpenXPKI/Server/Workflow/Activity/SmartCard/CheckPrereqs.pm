@@ -82,17 +82,23 @@ sub execute {
 	foreach my $type (keys %{$result->{CERT_TYPE}}) {
 	    $cert_types->push($type);
 
+##! 32: ' Cert Type Flags ' . Dumper $result->{CERT_TYPE}->{$type}
+
         # oliwel - create a list of wanted certificates 
         # based on the usable_cert_exists flag and preferred_cert_exists
         # if promote_to_preferred_profile is requested         
         # Assumption: If new certificates for a type are created, we always use
         # the first = preferred profile
-        if (!$result->{CERT_TYPE}->{$type}->{usable_cert_exists} ||         	
-        	($config->get("smartcard.policy.certs.type.$type.promote_to_preferred_profile" && 
-        	!$result->{CERT_TYPE}->{$type}->{preferred_cert_exists}))) {                                    
-           
-            push @certs_to_create, $type;
-                     
+        if (!$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} 
+        	&& !$result->{CERT_TYPE}->{$type}->{recoverable_cert_exists}) {
+        	##! 32: 'No recoverable certificate for ' . $type
+        	push @certs_to_create, $type;
+        } elsif($config->get("smartcard.policy.certs.type.$type.promote_to_preferred_profile") && 
+        	!$result->{CERT_TYPE}->{$type}->{preferred_cert_exists}) {                                    
+        	##! 32: 'Promote to current profile for ' . $type
+        	push @certs_to_create, $type;
+		} else {
+        	##! 32: 'All fine for ' . $type			
         }
 
 	    foreach my $entry (keys %{$result->{CERT_TYPE}->{$type}}) {
