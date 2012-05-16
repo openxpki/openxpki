@@ -82,12 +82,14 @@ sub execute {
 	foreach my $type (keys %{$result->{CERT_TYPE}}) {
 	    $cert_types->push($type);
 
-        # oliwel - create a list of wanted certificates in parallel based on 
-        # "preferred_certificate_exists" flag         
+        # oliwel - create a list of wanted certificates 
+        # based on the usable_cert_exists flag and preferred_cert_exists
+        # if promote_to_preferred_profile is requested         
         # Assumption: If new certificates for a type are created, we always use
-        # the first profile
-        if (!$result->{CERT_TYPE}->{$type}->{usable_cert_exists} || 
-            !$result->{CERT_TYPE}->{$type}->{preferred_cert_exists}) {                                    
+        # the first = preferred profile
+        if (!$result->{CERT_TYPE}->{$type}->{usable_cert_exists} ||         	
+        	($config->get("smartcard.policy.certs.type.$type.promote_to_preferred_profile" && 
+        	!$result->{CERT_TYPE}->{$type}->{preferred_cert_exists}))) {                                    
            
             push @certs_to_create, $type;
                      
