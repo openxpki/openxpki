@@ -225,6 +225,10 @@ htdocs/service/smartcard_personalization_xenroll/success.mhtml
 htdocs/service/smartcard_personalization_xenroll/get_certificate_request.mhtml
 htdocs/service/smartcard_personalization_xenroll/waiting_for_approval.mhtml
 
+htdocs/service/smartcard_remote_unblock/index.html
+htdocs/service/smartcard_remote_unblock/action.html
+htdocs/service/smartcard_remote_unblock/fetch.html
+
 htdocs/service/upload_puks/index.html
 htdocs/service/upload_puks/show.html
 htdocs/service/upload_puks/import.html
