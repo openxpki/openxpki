@@ -301,7 +301,7 @@ sub sc_analyze_smartcard {
             VALUE => $chipid ,
         } );
         $result->{SMARTCARD}->{token_chipid_match} = 'new';        
-    } elsif( $retval ne $tokenid ) {
+    } elsif( $retval ne $chipid ) {
         $result->{SMARTCARD}->{token_chipid_match} = 'mismatch';        
         CTX('log')->log(
             MESSAGE => "Chip Id of presented token mismatches recorded value! Token: $tokenid, Expected: $chipid, Presented: $retval",
