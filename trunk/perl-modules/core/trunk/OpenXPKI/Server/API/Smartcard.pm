@@ -135,26 +135,7 @@ sub sc_analyze_smartcard {
 	    default_puk => undef,
 	    keyid => undef
 	},
-	CERT_TYPE => {
-#	    'nonescrow' => {
-#		usable_cert_exists => 0,
-#		token_contains_expected_cert => 0,
-#	    },
-	  # 2010-09-17 MB FIXME: the following section disables escrow 
-	  # certificate generation, cleanup and remove!
-	    'escrow' => {
-		usable_cert_exists => 1,
-		token_contains_expected_cert => 1,
-	    },
-	    # certificates known to our PKI system but not expected on card
-	    # (should be purged)
-	    #'OTHER' => {
-	    #
-	    #},
-	    # 3rd party certificates, keep on card
-	    #'FOREIGN' => {
-	    #    
-	    #},
+	CERT_TYPE => { 
 	},
 	WORKFLOWS => undef,
 	PROCESS_FLAGS => {
@@ -188,7 +169,10 @@ sub sc_analyze_smartcard {
 	},
 	VALIDITY => {
 	    set_to_value => undef,
-	    set_by_type => undef,
+	    set_by_type => '',
+	},
+	PKI => {
+		REVOKE => []
 	}
     };
 
@@ -934,6 +918,41 @@ sub sc_analyze_smartcard {
     	}
     }
     }
+    
+    # Post process - schedule unused certificates for revocation if configured
+    # We loop through all certificates found in the database and check them one by one
+	foreach my $type (keys %{$user_certs->{by_type}}) {	
+		next unless ($policy->get(['certs.type', $type, 'revoke_unused']));	
+		##! 32: ' Look for unused certificates to revoke of type ' . $type
+		foreach my $entry (@{$user_certs->{by_type}->{$type}}) {
+		
+			# Check if the certificate is valid	
+			if (!$entry->{VALIDITY_PROPERTIES}->{not_revoked} || 
+				!$entry->{VALIDITY_PROPERTIES}->{within_validity_period}) {
+				##! 64: ' Cert is not valid - skipping '. $entry->{IDENTIFIER}
+				next; 		
+			}
+
+			# Check if the certificate is still in use
+			
+			# is it on the token?
+			if (grep  $entry->{IDENTIFIER}, @{$certs_on_token_by_type{$type}}) {
+				# Not scheduled to be purged
+				if (!$entry->{PROCESS_FLAGS}->{PURGE}) {
+					##! 64: ' Cert is on the token - skipping '. $entry->{IDENTIFIER}
+					next					
+				} elsif (grep  $entry->{IDENTIFIER}, @{$result->{TASKS}->{SMARTCARD}->{INSTALL}}) {
+					##! 64: ' Cert is scheduled for install - skipping '. $entry->{IDENTIFIER}
+					next;
+				}
+			}
+			
+			# If we are here - the certificate is no longer in use
+			##! 64: ' Schedule revocation for '. $entry->{IDENTIFIER}			
+			push @{$result->{PKI}->{REVOKE}}, $entry->{IDENTIFIER}; 			
+		}
+	}
+    
        
     # an overall status that is not green indicates that we probably need the
     # pin
@@ -1599,6 +1618,8 @@ of SMARTCARDID.
 This is merely a convenience function that simply wraps the 
 search_workflow_instances API function.
 
+=back 
+
 =head3 Function results
 
 The function will return a complex data structure containing the 
@@ -1788,14 +1809,25 @@ Certificate type which was used to determine the value
 	
 =back
 
+=item * PKI (hashref)
+
+Store information about actions necessary on the internal PKI 
+
+=over 8
+
+=item * REVOKE (array ref)
+
+List of certifiacte identifiers that should be revoked.
+A certificate is revoked if it is not on card after the current 
+personalization and the revoke_unused flag is set for its type.
+
+=back
 
 Parsed certificates:
-
-
 
 VISUAL_STATUS:
 'green': certificate is OK
 'amber': certificate is still valid but may be renewed (will expire soon)
 'red': certificate is expired or revoked
 
-Expired certificates with 
+ 
