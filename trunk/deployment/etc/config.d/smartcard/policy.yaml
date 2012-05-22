@@ -16,6 +16,7 @@ certs:
             escrow_key: 0
             publish: 0
             purge_invalid: 0
+            revoke_unused: 1
             max_login: 1
 
         signature:
@@ -33,6 +34,7 @@ certs:
             escrow_key: 0
             publish: 0
             purge_invalid: 0
+            revoke_unused: 1
             max_login: 1
 
         escrow:

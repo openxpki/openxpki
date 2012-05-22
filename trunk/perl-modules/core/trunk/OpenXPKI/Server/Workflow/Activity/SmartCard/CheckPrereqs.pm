@@ -188,6 +188,16 @@ sub execute {
         @certs_to_create
         );
 
+    my $certs_to_revoke_wf = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
+        {
+        workflow    => $workflow,
+        context_key => 'certs_to_revoke',
+        } );
+        
+    $certs_to_revoke_wf->push(
+        @{$result->{PKI}->{REVOKE}}
+        );
+
 	
 	$context->param('smartcard_status' =>
 			$result->{SMARTCARD}->{status});
