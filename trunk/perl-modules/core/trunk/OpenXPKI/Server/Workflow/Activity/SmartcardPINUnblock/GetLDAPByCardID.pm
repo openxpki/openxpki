@@ -1,5 +1,7 @@
 # OpenXPKI::Server::Workflow::Activity::SmartcardPINUnblock::GetLDAPByCardID
-# Written by Scott Hardin for the OpenXPKI project 2005
+# Written by Scott Hardin and Martin Bartosch for the OpenXPKI project 2012
+#
+# Obtain owner of a given Smartcard using the Connector infrastructure
 #
 # Based on OpenXPKI::Server::Workflow::Activity::Skeleton,
 # written by Martin Bartosch for the OpenXPKI project 2005
@@ -18,57 +20,73 @@ use OpenXPKI::Debug;
 use Data::Dumper;
 
 sub execute {
-	##! 1: 'Entered GetLDAPByCardID::execute()'
+    ##! 1: 'Entered GetLDAPByCardID::execute()'
     my $self = shift;
     my $workflow = shift;
-	my $context = $workflow->context();
+    my $context = $workflow->context();
 
-	##! 1: 'stubbing execute()'
-	return $self;
+    my $config = CTX('config');
 
-    $self->SUPER::execute($workflow,
-			  {
-			      # CHOOSE one of the following:
-			      # CA: CA operation (default)
-			      # RA: RA operation
-			      # PUBLIC: publicly available operation
-			      #ACTIVITYCLASS => 'CA',
-			      PARAMS => {
-#				  # accept_from values (first match wins):
-#				  # 'context': accept workflow context values
-#				  # 'config':  accept workflow config values
-#				  # 'default': accept defaults in source code
-# 				  _myvolatile => {
-#				      # accept_from => [ 'config', 'default' ],
-# 				      # default => '',
-# 				      # required => 1,
-# 				  },
-# 				  mypersistent => {
-#				      # accept_from => [ 'context', 'config', 'default' ],
-# 				      # default => '',
-# 				      # required => 1,
-# 				  },
-			      },
-			  });    
+    my $tokenid = $context->param('token_id');
 
+    # get holder from connector
+    my $res = $config->walkQueryPoints('smartcard.card2user', $tokenid, 'get');
+    my $holder_id = $res->{VALUE};
 
-    # you may wish to use these shortcuts
-#     my $context      = $workflow->context();
-#     my $activity     = $self->{ACTIVITY};
-#     my $pki_realm    = $self->{PKI_REALM};
-#     my $session      = $self->{SESSION};
-#     my $defaulttoken = $self->{TOKEN_DEFAULT};
-
-
-    $workflow->add_history(
-        Workflow::History->new({
-            action      => 'My action description',
-            description => sprintf( "My log message"
-		),
-            user        => $self->param('creator'),
-			       })
-	);
+    if (! $holder_id) {
+	OpenXPKI::Exception->throw(
+	    message =>
+	    'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARDPINUNBLOCK_GETLDAPBYCARDID',
+	    params => {
+		TOKEN_ID => $tokenid,
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => [ 'workflow', ],
+	    },
+	    );
+    }
     
+    # now get required user data entries for this user
+    my $employeeinfo = $config->walkQueryPoints( 'smartcard.employee', 
+						 $holder_id, 
+						 { 
+						     call => 'get_hash', 
+						     deep => 1 } );    
+
+    if (! $employeeinfo) {
+	OpenXPKI::Exception->throw(
+	    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARDPINUNBLOCK_GETLDAPBYCARDID_SEARCH_PERSON_FAILED',
+	    params  => {
+		EMPLOYEEID => $holder_employee_id,
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => [ 'workflow', ],
+	    },
+	    );
+    }
+    
+    if (! $employeeinfo->{VALUE}->{mail}) {
+	OpenXPKI::Exception->throw(
+	    message => 'I18N_OPENXPKISERVER_WORKFLOW_ACTIVITY_SMARTCARDPINUNBLOCK_GETLDAPBYCARDID_PERSON_ENTRY_DOES_NOT_HAVE_MAIL_ATTRIBUTE',
+	    params  => {
+		EMPLOYEEINFO =>  $employeeinfo->{VALUE}
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'error',
+		facility => [ 'workflow', ],
+	    },
+	    );
+    }
+    
+    $context->param('ldap_mail' => $employeeinfo->{VALUE}->{mail});
+    $context->param('ldap_cn' => $employeeinfo->{VALUE}->{cn});
+
+    return;
 }
 
 
@@ -77,11 +95,12 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Skeleton
+OpenXPKI::Server::Workflow::Activity::SmartcardPINUnblock::GetLDAPByCardID
 
 =head1 Description
 
-Implements the FIXME workflow action.
+Obtain the holder of a Smartcard (by querying the connector) and based
+on this information query the 
 
 =head2 Context parameters
 
