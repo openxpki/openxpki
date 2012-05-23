@@ -562,7 +562,7 @@ my $b64enc;
     }
    	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
 
-		$log->debug('AES_KEY'.length($session->{'aeskey'}). ':' . $session->{'aeskey'} );
+		#$log->debug('AES_KEY'.length($session->{'aeskey'}). ':' . $session->{'aeskey'} );
 		eval{
 		$cipher = Crypt::CBC->new( -key    =>  pack('H*', $session->{'aeskey'}),
                              -cipher => 'Crypt::OpenSSL::AES' );

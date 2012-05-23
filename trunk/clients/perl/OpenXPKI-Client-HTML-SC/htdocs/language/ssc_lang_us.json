@@ -115,7 +115,7 @@
 "T_instDigId":"Finalising personalisation",
 "T_invalidAuthCode":"Invalid authorisation code(s)",
 "T_invalidPolicy":"PIN does not meet complexity rules. The dbSmartcard PIN needs to be at least 5 characters long, must contain digits and lower case characters. No upper case or special characters are allowed.",
-"T_lastChanges":"Last Changes 22.09.2011",
+"T_lastChanges":"Last Changes 22.05.2012",
 "T_newPinError":"New PIN does not meet the complexity requirements. The dbSmartcard PIN needs to be at least 5 characters long, must contain digits and lower case characters. No upper case or special characters are allowed.",
 "T_persAccount":"Personalisation for account:",
 "T_persAccountSel":"Choose an account to personalise",
@@ -123,7 +123,7 @@
 "T_pin":"Current PIN",
 "T_pin1":"New PIN",
 "T_pin2":"New PIN confirmation",
-"T_pinError":"PIN invalid",
+"T_pinError":"current PIN invalid",
 "T_pinTitle":"Enter new PIN",
 "T_popupSupportContact":"Please contact your local help-desk.",
 "T_proceedActStep2":"Finalise activation",
@@ -151,8 +151,9 @@
 "I_confOutlook": "The secure e-mail certificates which are stored on your dbSmartcard are going to be associated with the local MS Outlook profile for the user which is currently logged-in to this Computer. Caution: Only perform this action on your own computer / DoD and only if you are the owner of the inserted dbSmartcard. The configuration has to be repeated for every computer / DoD which you are using with MS Outlook.",
 "T_keyPair": "key pair",
 "T_Card_Out": "Card removed",
-"T_seekingCard": "seeking smartcard...",
-"E_IE-Error_Protected": ""
+"T_seekingCard": "Seeking smartcard...",
+"E_IE-Error_Protected": "no access to smartcard reader possible",
+"T_pinTitle2": "Enter current PIN"
 
 
 }

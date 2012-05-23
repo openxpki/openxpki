@@ -122,7 +122,7 @@
 "T_instDigId":"Abschluss der Personalisierung",
 "T_invalidAuthCode":"ung&uuml;ltige(r) Autorisierungscode(s)",
 "T_invalidPolicy":"Neue PIN erf&uuml;llt nicht die Komplexit&auml;tsregeln,<\/br> Die dbSmartcard PIN muss mindestens 5 Zeichen lang sein und darf nur aus Zahlen und Kleinbuchstaben bestehen. Gro&szlig;buchstaben oder Sonderzeichen sind nicht erlaubt.",
-"T_lastChanges":"Letzte &Auml;nderungen am 22.09.2011",
+"T_lastChanges":"Letzte &Auml;nderungen am 22.05.2012",
 "T_newPinError":"Neue PIN erf&uuml;llt nicht die Komplexit&auml;tsregeln.<\/br> Die dbSmartcard PIN muss mindestens 5 Zeichen lang sein und darf nur aus Zahlen und Kleinbuchstaben bestehen. Gro&szlig;buchstaben oder Sonderzeichen sind nicht erlaubt.",
 "T_persAccount":"Personalisierung f&uuml;r Konto:",
 "T_persAccountSel":"Bitte w&auml;hlen Sie ein Konto aus:",
@@ -130,7 +130,7 @@
 "T_pin":"Aktuelle PIN",
 "T_pin1":"Neue PIN eingeben",
 "T_pin2":"Neue PIN best&auml;tigen",
-"T_pinError":"PIN ung&uuml;ltig",
+"T_pinError":"aktuelle PIN ung&uuml;ltig",
 "T_pinTitle":"Bitte geben Sie Ihre neue PIN ein",
 "T_popupSupportContact":"<\/br><\/br> Bitte wenden Sie sich an Ihren lokalen Help-Desk. Dieser wird Sie gerne unterst&uuml;tzen",
 "T_pinTitle2":"Bitte geben Sie Ihre PIN ein",
@@ -161,7 +161,8 @@
 "I_confOutlook": "Die auf Ihrer dbSmartcard enthaltenen Zertifikate f&uuml;r sichere E-Mail werden mit dem lokalen MS Outlook Profil des auf diesem Rechner angemeldeten Benutzers verkn&uuml;pft. Achtung: Bitte f&uuml;hren Sie diese Aktion nur von Ihrem eigenen Rechner / DoD aus und nur, wenn Sie Besitzer der eingesteckten dbSmartcard ind. Die Konfiguration muss an jedem Rechner / DoD wiederholt werden, an dem Sie MS Outlook verwenden.",
 "T_keyPair": "key pair",
 "T_Card_Out": "Karte entfernt",
-"T_seekingCard": "suche smartcard..."
+"T_seekingCard": "suche smartcard...",
+"T_pinTitle2": "Aktuelle PIN eingeben"
 
 
 }

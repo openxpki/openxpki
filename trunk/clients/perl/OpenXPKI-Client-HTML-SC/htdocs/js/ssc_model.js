@@ -322,7 +322,7 @@ var SSC_MODEL = new Class(
 
 			},
 			
-			configureOutlook : function(cb) {
+			configureOutlook : function(viewCb) {
 
 				window.dbg.log('sscModel.configureOutlook');
 				// fs fixme
@@ -330,7 +330,9 @@ var SSC_MODEL = new Class(
 				var result = this.PKCS11Plugin.ConfigureOutlook( this.cardID, this.outlook.displayname, this.outlook.b64, this.outlook.issuerCN);
 				window.dbg.log('sscModel.configureOutlook' + result);
 				// callback
-				cb(result);
+				
+				if (typeof viewCb !== 'function') alert('fnc: sscModel.configureOutlook - wrong params');
+				viewCb(result);
 
 			},
 
@@ -611,6 +613,7 @@ var SSC_MODEL = new Class(
 					rc = false;
 					// sscView.showPopUp('T_Server_Error'+error ,'critical');
 				}
+
 				
 				var r ;
 
@@ -742,6 +745,15 @@ var SSC_MODEL = new Class(
 								
 								
 								viewCb('error');
+							}else if (data.errors[i] === 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED') {
+								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+								//sscView.showPopUp('E_smartcard_unknown', 'cross','0223');
+								
+								this.ajax_log('I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED', 'error');
+
+								viewCb('cardUnknown');
+								
+							
 							}else if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI') {
 								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 								sscView.showPopUp('E_pki_offline', 'cross',
@@ -1243,6 +1255,8 @@ var SSC_MODEL = new Class(
 					window.dbg.log('Success personalization, -unblock card next');
 					sscView.showPersonalizationStatus(3);
 					this.reCert = false;
+					
+					this.perso_wfID =  null;
 					this.user.cardActivation = true;
 					// Start card activation
 					viewCb('success');

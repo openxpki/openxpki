@@ -39,7 +39,7 @@ var SSC_VIEW = new Class(
 					'showAuthPersonDlg','processBackUnblock',
 					'init_step3', 'init_step4', 'init_step5', 'unblockCard', 'changePin', '_tr' ,'setTranslatedElementText',
 					'_changeLanguage_step2','cardObserver','cardObserverCB','testPrivateKey','enableSSO', 'confOutlook', 'showHints',
-					'processTestPrivateKey','testPrivateKeyCB', 'cleanUpCard', 'setButton' , 'handleKeyDown'],
+					'processTestPrivateKey','testPrivateKeyCB', 'cleanUpCard', 'setButton' , 'handleKeyDown' , 'processConfOutlook_done' ,'processConfOutlook'],
 			
 			/*
 			 * chain of command params
@@ -169,6 +169,8 @@ var SSC_VIEW = new Class(
 									
 				{status: 'showStatusActSuccess', handler: function(){
 									this.setInfoRight('IT_Info','I_fullyOperational');
+									this.setInfoTitle('T_Analyse');
+									this.setPrompt('P_insertCard');								
 									sscModel.readCard(sscModel.cardID ,this.handleStatus);}},
 			   
 				
@@ -1027,6 +1029,9 @@ var SSC_VIEW = new Class(
 				} else {
 					this.setPrompt('T_changePinSuccess');
 					// set right info text
+					$('pin1').value = '';
+					$('pin2').value = '';
+					$('pin').value = '';
 					this.setInfoRight('IT_Info', 'I_changePin');
 					// set next & back action
 					this.setNextAction('T_enterPins', this.processPins, true);
@@ -1601,7 +1606,7 @@ var SSC_VIEW = new Class(
 				}
 				
 				if(! sscModel.allowOutlook){		
-				
+					
 					this.setButton( 0 , $(this.mainMenu[4].id) , this.mainMenu[4].fnc );				
 					var r = $('PKCS11Plugin').GetDomainUser();
 					var res = new Querystring(r);
@@ -1618,14 +1623,16 @@ var SSC_VIEW = new Class(
 						//});
 					}
 					window.dbg.log("Domainuser: "+DomainUser + " No login ids:"+ sscModel.user.accounts.length );
-					
-					for( var i=0; i < sscModel.user.accounts.length ; i++){
-						window.dbg.log(sscModel.user.accounts[i] + sscModel.user.accounts.length );
-						
-						if( sscModel.user.accounts[i].toLowerCase() === DomainUser.toLowerCase() ){
-							this.setButton( 1 , $(this.mainMenu[4].id) , this.mainMenu[4].fnc );
+					if(sscModel.overAllStatus == 'green'){
+						for( var i=0; i < sscModel.user.accounts.length ; i++){
+							window.dbg.log(sscModel.user.accounts[i] + sscModel.user.accounts.length );
+							
+							if( sscModel.user.accounts[i].toLowerCase() === DomainUser.toLowerCase() ){
+								this.setButton( 1 , $(this.mainMenu[4].id) , this.mainMenu[4].fnc );
+							}
 						}
 					}
+					
 				}
 				
 				
@@ -1870,6 +1877,7 @@ var SSC_VIEW = new Class(
 				new Element('h2', {
 					'html' : this._tr('T_pinTitle2')
 				}).inject(div);
+
 				new Element('h2', {
 					'html' : this._tr('')
 				}).inject(form);
@@ -1878,6 +1886,11 @@ var SSC_VIEW = new Class(
 					'type' : 'PASSWORD',
 					'value' : ''
 				}).inject(form);
+				
+				new Element('label', {
+					'html' : this._tr('T_pin')
+				}).inject(form);
+				
 				// inject form
 				form.inject(div);
 				
@@ -2287,7 +2300,7 @@ var SSC_VIEW = new Class(
 						break;
 					case 4:	
 						this.digitalSignatureHtml += html;
-						if (certs[i].VISUAL_STATUS === 'green' && this.digitalSignatureStatus === 'red'){
+						if (certs[i].VISUAL_STATUS === 'green' && this.digitalSignatureStatus !== 'red'){
 						    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
 						}
 						break;

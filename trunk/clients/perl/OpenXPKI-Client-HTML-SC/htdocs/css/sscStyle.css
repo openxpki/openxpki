@@ -579,6 +579,19 @@ background: #fff;
 	width:100%;
 }
 
+#T_pinTitle2 {
+	background:url("../img/keys.gif") no-repeat scroll right 0 transparent;
+	border-bottom:2px dotted #CCCCCC;
+	color:#0018A8;
+	font-weight:normal;
+	margin-bottom:12px;
+	margin-top: 20px;
+	padding-bottom:7px;
+	display:block;
+	float:left;
+	width:100%;
+}
+
 #T_pinTitle {
 	background:url("../img/padlock.gif") no-repeat scroll right 0 transparent;
 	border-bottom:2px dotted #CCCCCC;
