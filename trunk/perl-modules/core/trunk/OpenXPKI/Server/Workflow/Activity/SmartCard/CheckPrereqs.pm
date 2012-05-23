@@ -26,6 +26,9 @@ sub execute {
 	if ($context->param('user_id') ne '') {
 	    $params{USERID} = $context->param('user_id');
 	}
+	if ($context->param('chip_id') ne '') {
+	    $params{SMARTCHIPID} = $context->param('chip_id');
+	}
 
 	my @certs = split(/;/, $context->param('certs_on_card'));
 	
@@ -41,7 +44,6 @@ sub execute {
  		CERTS => \@certs,
 		CERTFORMAT => 'BASE64',
 		SMARTCARDID => $context->param('token_id'),
-		SMARTCHIPID => $context->param('chip_id'),
 		LOGINIDS => \@LOGIN_IDS,
 		WORKFLOW_TYPES => [ qw( I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK ) ],
 		CONFIG_ID => $self->config_id(),
