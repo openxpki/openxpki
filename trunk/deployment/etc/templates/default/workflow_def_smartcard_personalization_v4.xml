@@ -106,22 +106,29 @@
     <state name="HAVE_PREREQS"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_HAVE_PREREQS</description>
+        <action name="scpers_chip_id_mismatch_err" resulting_state="FAILURE">
+            <condition name="scpers_smartchip_id_mismatch"/>
+        </action>
         <action name="scpers_null1" resulting_state="CERTIFICATE_ISSUANCE_POSSIBLE">
             <condition name="scpers_smartcard_status_activated"/>
+            <condition name="!scpers_smartchip_id_mismatch"/>
         </action>
         <action name="scpers_null2" resulting_state="CERTIFICATE_ISSUANCE_POSSIBLE">
             <condition name="scpers_is_badge_officer"/>
             <condition name="scpers_smartcard_status_initial"/>
             <condition name="!scpers_smartcard_status_activated"/>
+            <condition name="!scpers_smartchip_id_mismatch"/>
         </action>
         <action name="scpers_auth_err" resulting_state="FAILURE">
             <condition name="!scpers_is_badge_officer"/>
             <condition name="scpers_smartcard_status_initial"/>
             <condition name="!scpers_smartcard_status_activated"/>
+            <condition name="!scpers_smartchip_id_mismatch"/>
         </action>
         <action name="scpers_status_err" resulting_state="FAILURE">
             <condition name="!scpers_smartcard_status_initial"/>
             <condition name="!scpers_smartcard_status_activated"/>
+            <condition name="!scpers_smartchip_id_mismatch"/>
         </action>
     </state>
 
@@ -222,6 +229,13 @@
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_HAVE_CERT_TO_UNPUBLISH</description>
         <action name="scpers_unpublish_certificate" resulting_state="CERTS_QUEUED_FOR_DEPUBLICATION">
+        </action>
+    </state>
+
+    <state name="HAVE_CERT_TO_REVOKE"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_HAVE_CERT_TO_REVOKE</description>
+        <action name="scpers_revoke_certificate" resulting_state="CERTS_QUEUED_FOR_REVOCATION">
         </action>
     </state>
 
@@ -330,6 +344,17 @@
         </action>
     </state>
 
+    <state name="CERTS_QUEUED_FOR_REVOCATION"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERTS_QUEUED_FOR_REVOCATION</description>
+        <action name="scpers_cleanup_workflow" resulting_state="SUCCESS">
+            <condition name="scpers_all_certs_revoked"/>
+        </action>
+        <action name="scpers_null1" resulting_state="CERT_TO_REVOKE">
+            <condition name="!scpers_all_certs_revoked"/>
+        </action>
+    </state>
+
     <state name="HAVE_CERT_TO_DELETE">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_HAVE_CERT_TO_DELETE</description>
         <action name="scpers_fail_workflow" resulting_state="FAILURE">
@@ -385,6 +410,13 @@
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERT_TO_UNPUBLISH</description>
         <action name="scpers_next_cert_to_unpublish" resulting_state="HAVE_CERT_TO_UNPUBLISH">
+        </action>
+    </state>
+
+    <state name="CERT_TO_REVOKE"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERT_TO_REVOKE</description>
+        <action name="scpers_next_cert_to_revoke" resulting_state="HAVE_CERT_TO_REVOKE">
         </action>
     </state>
 
@@ -533,13 +565,6 @@
         </action>
     </state>
 
-    <state name="CERTS_DELETED"
-            autorun="yes">
-        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERTS_DELETED</description>
-        <action name="scpers_cleanup_workflow" resulting_state="SUCCESS">
-        </action>
-    </state>
-
     <state name="BEGIN_LOOP_NEED_CSR"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_BEGIN_LOOP_NEED_CSR</description>
@@ -566,6 +591,13 @@
         </action>
         <action name="scpers_null1" resulting_state="POLICY_INPUT_REQUIRED">
             <condition name="scpers_policy_input_required"/>
+        </action>
+    </state>
+
+    <state name="CERTS_DELETED"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERTS_DELETED</description>
+        <action name="scpers_queue_certs_to_revoke" resulting_state="CERTS_QUEUED_FOR_REVOCATION">
         </action>
     </state>
 

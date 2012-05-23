@@ -8,6 +8,11 @@
             <field name="cert_identifier" is_required="yes"/>
     </action>
 
+    <action name="scpers_revoke_certificate"
+            class="Workflow::Action::Null">
+            <field name="cert_identifier" is_required="yes"/>
+    </action>
+
     <action name="scpers_initialize"
             class="Workflow::Action::Null">
             <field name="certs_on_card"/>
@@ -162,6 +167,14 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             <field name="tmp_queue" is_required="yes"/>
     </action>
 
+    <action name="scpers_next_cert_to_revoke"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
+            array_name="tmp_queue"
+            context_key="cert_identifier"
+            function="shift">
+            <field name="tmp_queue" is_required="yes"/>
+    </action>
+
     <action name="scpers_persist_csrs"
             class="OpenXPKI::Server::Workflow::Activity::SmartCard::PersistCSRs">
             <field name="cert_issuance_data" is_required="yes"/>
@@ -299,9 +312,17 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             <field name="certs_to_install" is_required="yes"/>
     </action>
 
-    <action name="scpers_login_id_err"
+    <action name="scpers_queue_certs_to_revoke"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
+            array_name="tmp_queue"
+            context_key="certs_to_revoke"
+            function="pusharray">
+            <field name="certs_to_revoke"/>
+    </action>
+
+    <action name="scpers_chip_id_mismatch_err"
             class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
-            error_code="Smartcard state neither activated nor initial">
+            error_code="Smartcard chip id mismatch">
     </action>
 
     <action name="scpers_refetch_p12"
