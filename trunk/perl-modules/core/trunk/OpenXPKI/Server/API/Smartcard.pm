@@ -261,6 +261,9 @@ sub sc_analyze_smartcard {
 	#### Step 3 #############################################################
 
     # New in Phase 2: Record or validate SMARTCARDID/SMARTCHIPID mapping.
+    #
+    # NOTE: If no chip ID was passed, just skip this whole block.
+    #
     # Check datapool if a mapping exist (prevent card forgery)
     # If not, record the new mapping in the datapool. 
     # Namespace: 'smartcard.smartchipid', key: SMARTCHIPID, value:SMARTCARDID. 
@@ -268,32 +271,36 @@ sub sc_analyze_smartcard {
     # If yes, validate that it matches the input of this call.
     # If this validation fails, log to the audit log
     # Result is also available in $result->{SMARTCARD}->{token_chipid_match}
-    # Values are valid, new, mismatch 
+    # Values are valid, new, unknown, mismatch
 
-    # Check for existing entry
-    my $msg = CTX('api')->get_data_pool_entry( { KEY => $tokenid , NAMESPACE => 'smartcard.smartchipid' } );
+    if( defined $chipid ) {
+        # Check for existing entry
+        my $msg = CTX('api')->get_data_pool_entry( { KEY => $tokenid , NAMESPACE => 'smartcard.smartchipid' } );
 
-    my $retval = $msg->{VALUE};
-    $result->{SMARTCARD}->{token_chipid_match} = 'valid';
-    
-    # Not found - record it
-    if (!$retval) {
-        ##! 16: "Record card/chip relation Chip: $chipid - Token: $tokenid " 
-        CTX('api')->set_data_pool_entry( { 
-            KEY => $tokenid, 
-            NAMESPACE => 'smartcard.smartchipid',
-            VALUE => $chipid ,
-        } );
-        $result->{SMARTCARD}->{token_chipid_match} = 'new';        
-    } elsif( $retval ne $chipid ) {
-        $result->{SMARTCARD}->{token_chipid_match} = 'mismatch';        
-        CTX('log')->log(
-            MESSAGE => "Chip Id of presented token mismatches recorded value! Token: $tokenid, Expected: $chipid, Presented: $retval",
-            PRIORITY => 'warn',
-            FACILITY => [ 'audit', 'system', ],
-        );        
+        my $retval = $msg->{VALUE};
+        $result->{SMARTCARD}->{token_chipid_match} = 'valid';
+
+        # Not found - record it
+        if (!$retval) {
+            ##! 16: "Record card/chip relation Chip: $chipid - Token: $tokenid "
+            CTX('api')->set_data_pool_entry( {
+                KEY => $tokenid,
+                NAMESPACE => 'smartcard.smartchipid',
+                VALUE => $chipid ,
+            } );
+            $result->{SMARTCARD}->{token_chipid_match} = 'new';
+        } elsif( $retval ne $chipid ) {
+            $result->{SMARTCARD}->{token_chipid_match} = 'mismatch';
+            CTX('log')->log(
+                MESSAGE => "Chip Id of presented token mismatches recorded value! Token: $tokenid, Expected: $chipid, Presented: $retval",
+                PRIORITY => 'warn',
+                FACILITY => [ 'audit', 'system', ],
+            );
+        }
+    } else {
+        $result->{SMARTCARD}->{token_chipid_match} = 'unknown';
     }
-        
+
     ##### Step 4 ############################################################
     
     # New in Phase 2: Determine current user by employee ID.

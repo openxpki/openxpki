@@ -1059,11 +1059,11 @@ sub BUILD {
                 'SMARTCARDID' => {
                     type => SCALAR,
                     regex => $re_alpha_string,
-                    optional => 1,
                 },
                 'SMARTCHIPID' => {
                     type => SCALAR,
                     regex => $re_alpha_string,                    
+                    optional => 1,
                 },        
                 'LOGINIDS'  => {
                     type => ARRAYREF,
