@@ -118,6 +118,14 @@ use Class::Std;
         return $self->ok( scalar( $self->execute( $action, $params ) ),
             $testname );
     }
+    sub execute_nok {
+        my ( $self, $action, $params, $testname ) = @_;
+        $testname ||= 'Executing action ' . $action;
+        my $result = scalar $self->execute( $action, $params );
+        $result = ($result)?0:1;
+        
+        return $self->ok( $result,$testname );
+    }
 
     sub param_is {
         my ( $self, $name, $expected, $testname ) = @_;
@@ -162,7 +170,9 @@ use Class::Std;
     sub error_is {
         my ( $self, $expected, $testname ) = @_;
         $testname ||= 'Checking API message error';
-        return $self->is( $self->error(), $expected, $testname );
+        my $error = $self->error();
+        $error ||= '';#avoid undef
+        return $self->is($error , $expected, $testname );
     }
 
     ############################################################
@@ -355,9 +365,11 @@ use Class::Std;
         }
 
         $self->set_msg($msg);
+        
+        
         if ( $self->error ) {
             $@ = 'Error getting workflow info: ' . Dumper($msg);
-            return;
+            return sprintf('ERROR %s',$self->error);
         }
 
        #        $self->diag(
@@ -366,7 +378,7 @@ use Class::Std;
        #                sort keys %{ $msg->{PARAMS}->{WORKFLOW}->{CONTEXT} } )
        #        );
 
-        my $val = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$name};
+        my $val = (defined $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$name})?$msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$name}:'UNDEFINED';
         return $val;
     }
 
@@ -441,10 +453,16 @@ use Class::Std;
 
         return @{ $msg->{PARAMS} };
     }
-
+    
+    sub reset{
+        my $self = shift;
+        $self->set_msg(undef);
+    }
+    
     sub error {
         my $self = shift;
         my $msg  = $self->get_msg;
+
         if (   $msg
             && exists $msg->{'SERVICE_MSG'}
             && $msg->{'SERVICE_MSG'} eq 'ERROR' )
@@ -615,6 +633,12 @@ TESTNAME is optional.
 Executes the given ACTION on the current workflow, passing the PARAMSREF.
 TESTNAME is optional.
 
+=head2 $test->execute_nok ACTION, PARAMSREF, [ TESTNAME ]
+
+Executes the given ACTION on the current workflow, passing the PARAMSREF.
+An execution error is expected (i.e.: if the execution is successful, this test fails)
+TESTNAME is optional.
+
 =head2 $test->param_is NAME, EXPECTED, [ TESTNAME ]
 
 Fetches the value of the given workflow context parameter NAME and compares
@@ -684,6 +708,11 @@ Returns the workflow ID of the current workflow
 =head2 $test->param NAME
 
 Returns the value of the given context parameter for the current workflow.
+
+=head2 $test->reset
+
+resets the internal cached workflow info. can be used to force  "fresh" workflow data from server. 
+usefull if execution results in an (expected) error and you want to check some workflow property (e.g. context param)
 
 =head2 $test->array NAME
 
