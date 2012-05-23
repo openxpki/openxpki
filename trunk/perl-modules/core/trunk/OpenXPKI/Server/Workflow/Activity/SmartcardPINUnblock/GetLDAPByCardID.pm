@@ -59,7 +59,7 @@ sub execute {
 	OpenXPKI::Exception->throw(
 	    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARDPINUNBLOCK_GETLDAPBYCARDID_SEARCH_PERSON_FAILED',
 	    params  => {
-		EMPLOYEEID => $holder_employee_id,
+		EMPLOYEEID => $holder_id,
 	    },
 	    log => {
 		logger => CTX('log'),
