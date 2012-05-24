@@ -45,6 +45,9 @@ my $cfg = XMLin('/etc/openxpki/instances/level2/notification.xml');
 # must be one of these entries.
 my %allowed_services = map { $_, 1 } qw( pki-soap unit-test-tls-client soap-auth );
 
+# 20120524 Martin Bartosch - FIXME: client authentication disabled for now
+$allowed_services{''} = 1;
+
 my ( $rt_queue, $rt_server, $rt_user, $rt_pass, $rt_timeout );
 my $backend;
 
