@@ -69,6 +69,7 @@ xref:
    cached: 1
    profile:
      I18N_OPENXPKI_PROFILE_USER_SIGNATURE:
+       preferred: 1
        type: signature
      I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL:
        type: nonescrow
