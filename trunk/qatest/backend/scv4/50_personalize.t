@@ -27,6 +27,8 @@ use English;
 use Data::Dumper;
 use Config::Std;
 use File::Basename;
+use File::Slurp;
+  
 
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
@@ -42,9 +44,13 @@ our %cfg = ();
 my $testcfg = new TestCfg;
 $testcfg->read_config_path( '5x_personalize.cfg', \%cfg, @cfgpath );
 
+my $cert_dir = $cfg{instance}{certdir};
+if ($cert_dir !~ '^/') {
+	$cert_dir = $dirname.'/'.$cert_dir;
+}
 
--f 'sctest.csr' || `openssl req -new -batch -nodes -keyout sctest.key  -out sctest.csr`;
--f 'sctest2.csr' || `openssl req -new -batch -nodes -keyout sctest2.key  -out sctest2.csr`;  
+-d $cert_dir || die "Please create certificate directory $cert_dir " ;
+-w $cert_dir || die "Please make certificate directory $cert_dir writable" ; 
 
 my $test = OpenXPKI::Test::More->new(
     {
@@ -53,10 +59,9 @@ my $test = OpenXPKI::Test::More->new(
     }
 ) or die "Error creating new test instance: $@";
 
+my $number_of_tests = 3;
+
 $test->set_verbose($cfg{instance}{verbose});
-
-$test->plan( tests => 24 );
-
 
 $test->connect_ok(
     user => $cfg{user}{name},
@@ -65,11 +70,25 @@ $test->connect_ok(
 
 my $ser = OpenXPKI::Serialization::Simple->new();
 
+# Slurp in the certificates
+my @paths = read_dir( $cert_dir ) ;
+
+my @certflat;
+foreach my $cert_file (@paths) {   
+   next unless ($cert_file =~ /\.crt$/);      
+   my $cert = read_file( "$cert_dir/$cert_file" );
+   $cert =~ s/-----.*?-----//g;
+   $cert =~ s/\n//g;
+   push @certflat, $cert;     
+}
+
+$test->diag("Found ".scalar(@certflat)." exisiting certificates");
+
 my %wfparam = (        
         user_id => $cfg{carddata}{frontend_user},
         token_id => $cfg{carddata}{token_id},
         chip_id => $cfg{carddata}{chip_id},
-        certs_on_card => '',
+		certs_on_card => join(";",  @certflat),
 );      
 
 	
@@ -77,89 +96,91 @@ $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4' , \%wfpar
  or die "Workflow Create failed: $@";
 
  
-# Fetch PUK
-if ($test->state_is('PUK_TO_INSTALL')) {
+# First Time PUK ?
+if ($test->state() eq 'PUK_TO_INSTALL') {
+	$number_of_tests += 5;
+	$test->diag("Need to install PUK");
     $test->execute_ok('scpers_fetch_puk');
     $test->state_is('PUK_TO_INSTALL');
     $test->param_like('_puk','/ARRAY.*/');
     $test->execute_ok('scpers_puk_write_ok'); 
 }
 
-$test->state_is('NEED_NON_ESCROW_CSR');
-$test->execute_ok('scpers_fetch_puk');
-$test->state_is('NEED_NON_ESCROW_CSR');
-$test->param_like('_puk','/ARRAY.*/');
+# Loop here as long as we are not in the install procedure 
 
-open PKCS10, "<sctest.csr";
-my @lines = <PKCS10>;
-close PKCS10;
- 
-$test->execute_ok('scpers_post_non_escrow_csr', { pkcs10 => join ("", @lines), keyid => 13 });
-
-if ($test->state_is('POLICY_INPUT_REQUIRED')) {
-  $test->param_is('policy_input_required','login_ids', 'Check what to do');
-  $test->param_is('policy_max_login_ids','1', 'Read Policy Setting (max_login_ids)');
-
-  my $login = shift @{ $ser->deserialize($test->param('policy_login_ids'))};
-
-  $test->execute_ok('scpers_apply_csr_policy', { 'login_ids' => $ser->serialize( [ $login ] ) });
+while ($test->state() eq 'NEED_NON_ESCROW_CSR' || $test->state() eq 'POLICY_INPUT_REQUIRED') {
+		
+	if ($test->state() eq 'NEED_NON_ESCROW_CSR') {
+		$test->diag("Non escrow csr requested ($test->param('csr_cert_type'))");
+	
+		$number_of_tests += 5;	
+		$test->state_is('NEED_NON_ESCROW_CSR');
+		$test->execute_ok('scpers_fetch_puk');
+		$test->state_is('NEED_NON_ESCROW_CSR');
+		$test->param_like('_puk','/ARRAY.*/');	 
+		$test->execute_ok('scpers_post_non_escrow_csr', { pkcs10 => makeCSR(), keyid => 13 });
+	}
+	
+	if ($test->state() eq 'POLICY_INPUT_REQUIRED') {
+ 		$test->diag("Policy input required");
+		$number_of_tests += 3; 		
+	  	$test->param_is('policy_input_required','login_ids', 'Check what to do');
+	  	$test->param_is('policy_max_login_ids','1', 'Read Policy Setting (max_login_ids)');	
+	  	my $login = shift @{ $ser->deserialize($test->param('policy_login_ids'))};	
+	  	$test->execute_ok('scpers_apply_csr_policy', { 'login_ids' => $ser->serialize( [ $login ] ) });
+	}
+	
 }
 
-#Nonescrow Type
-$test->state_is('NEED_NON_ESCROW_CSR');
-$test->execute_ok('scpers_fetch_puk');
-$test->state_is('NEED_NON_ESCROW_CSR');
-$test->param_like('_puk','/ARRAY.*/');
-
-open PKCS10, "<sctest2.csr";
-my @lines = <PKCS10>;
-close PKCS10;
- 
-$test->execute_ok('scpers_post_non_escrow_csr', { pkcs10 => join ("", @lines), keyid => 13 });
-
-my @certs;
 # CSR done - Installs
-$test->state_is('CERT_TO_INSTALL');
-$test->param_is('cert_install_type','x509', 'Check for x509 type parameter');
-$test->param_like('certificate','/-----BEGIN CERTIFICATE.*/','Check for PEM certificate');
-push @certs, $test->param('certificate');             
-$test->execute_ok('scpers_cert_inst_ok');
+while ($test->state() =~ /TO_INSTALL/) {
 
+	if ($test->state() eq 'CERT_TO_INSTALL') {
+ 		$test->diag("Certificate to install");
+ 		$number_of_tests += 4; 			
+		$test->state_is('CERT_TO_INSTALL');
+		$test->param_is('cert_install_type','x509', 'Check for x509 type parameter');
+		
+	} elsif ($test->state() eq 'PKCS12_TO_INSTALL') {
+ 		$test->diag("PKCS12 to install");
+ 		$number_of_tests += 6;		
+		$test->state_is('PKCS12_TO_INSTALL');
+		$test->execute_ok('scpers_refetch_p12');
+		#$test->param_isnt('_keypassword','', 'Check for keypassword');
+		$test->param_isnt('_password','', 'Check for password');				
+		$test->param_isnt('_pkcs12base64','', 'Check for P12');           
+		my $cert_identifier = $test->param('cert_identifier');		
+		open P12, ">$cert_dir/$cert_identifier.p12";
+		print P12 $test->param('_pkcs12base64');
+		close P12;   					
+		
+		my $pass = $test->param('_password');
+	 	`cat $cert_dir/$cert_identifier.p12 | base64 -d | openssl pkcs12  -passin pass:$pass -nodes -nocerts > $cert_dir/$cert_identifier.key` 
+		
+	}
+	
+	$test->param_like('certificate','/-----BEGIN CERTIFICATE.*/','Check for PEM certificate');		 	
+	my $cert_identifier = $test->param('cert_identifier');		
+	open PEM, ">$cert_dir/$cert_identifier.crt";
+	print PEM $test->param('certificate');
+	close PEM;
+	
+	$test->execute_ok('scpers_cert_inst_ok');
+}
 
-$test->state_is('PKCS12_TO_INSTALL');
-$test->execute_ok('scpers_refetch_p12');
-
-#$test->param_isnt('_keypassword','', 'Check for keypassword');
-#$test->param_isnt('_password','', 'Check for password');
-$test->param_isnt('_pkcs12base64','', 'Check for P12'); 
-push @certs, $test->param('certificate');
-
-open PKCS10, ">sctest.p12";
-print PKCS10 $test->param('_pkcs12base64');
-close PKCS10;
-
-$test->execute_ok('scpers_cert_inst_ok');
-
-
-$test->state_is('CERT_TO_INSTALL');
-$test->param_is('cert_install_type','x509', 'Check for x509 type parameter');
-$test->param_like('certificate','/-----BEGIN CERTIFICATE.*/','Check for PEM certificate');
-push @certs, $test->param('certificate');             
-$test->execute_ok('scpers_cert_inst_ok');
-
-
-#$test->state_is('CERT_PUBLISH_CHECK');
-#$test->execute_ok('scpers_queue_certs_for_publication');
-
-#$test->state_is('CERTS_PUBLISHED');
-#$test->execute_ok('scpers_null1');
-
+$test->diag("Install done");
+ 
 $test->state_is('SUCCESS'); 
 $test->disconnect();
 
+$test->plan( tests => $number_of_tests );
+ 
+sub makeCSR {
+	my $cert_type = $test->param('csr_cert_type');
+	my $csr_file = "$cert_dir/$cert_type.csr"; 
+	my $key_file = "$cert_dir/$cert_type.key";
+	`openssl req -new -batch -nodes -keyout $key_file -out $csr_file 2>/dev/null`;
+	return scalar read_file($csr_file);
+}
 
-open(CERT, ">$cfg{instance}{buffer}");
-print CERT $ser->serialize( \@certs ); 
-close CERT; 
 
-  
