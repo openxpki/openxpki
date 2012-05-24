@@ -115,6 +115,13 @@ sub sc_analyze_smartcard {
 	    },
 	    );
     }
+    
+    CTX('log')->log(
+    	MESSAGE => "Start analyze, ChipId: $chipid, TokenId: $tokenid",
+        PRIORITY => 'info',
+        FACILITY => [ 'system' ],
+	);
+    
 
     my $thisrealm = CTX('session')->get_pki_realm();
 
@@ -257,6 +264,14 @@ sub sc_analyze_smartcard {
 
     ##! 16: 'Employeeid is ' . $holder_employee_id  
 
+	 
+    CTX('log')->log(
+    	MESSAGE => "card is assigned to $holder_employee_id - status is $cardstatus",
+        PRIORITY => 'debug',
+        FACILITY => [ 'system' ],
+	);
+ 
+	
 	
 	#### Step 3 #############################################################
 
@@ -373,6 +388,12 @@ sub sc_analyze_smartcard {
     	    
     ##! 16: 'smartcard holder details from connector: ' . Dumper $employeeinfo
 	    
+	CTX('log')->log(
+    	MESSAGE => "Holder Details: Name: $employeeinfo->{VALUE}->{cn}, Mail: $employeeinfo->{VALUE}->{mail}",
+        PRIORITY => 'debug',
+        FACILITY => [ 'system' ],
+	);
+ 	    	    
     # We use the mail address for the workflows
     my $workflow_creator = $employeeinfo->{VALUE}->{mail};
     $result->{SMARTCARD}->{assigned_to}->{workflow_creator} = $workflow_creator;
@@ -481,6 +502,13 @@ sub sc_analyze_smartcard {
     
     if (defined $puk_found) {
        $result->{PROCESS_FLAGS}->{puk_found_in_datapool} = 1;
+       
+		CTX('log')->log(
+	    	MESSAGE => "PUK for the card was found in datapool (TokenId $tokenid)",
+	        PRIORITY => 'debug',
+	        FACILITY => [ 'system' ],
+		);
+       
     } 
         
     ###########################################################################
@@ -640,7 +668,12 @@ sub sc_analyze_smartcard {
 		    $user_certs->{by_identifier}->{$identifier};
 		push @{$user_certs->{by_profile}->{$db_hash->{PROFILE}}}, 
 		    $user_certs->{by_identifier}->{$identifier};
-		    
+
+		CTX('log')->log(
+	    	MESSAGE => "DB Cert: $identifier, Type: $type, Status: $db_hash->{VISUAL_STATUS}",
+	        PRIORITY => 'info',
+	        FACILITY => [ 'system' ],
+		);		    
 		    
     } # db loop
     } # if certificates
@@ -671,6 +704,12 @@ sub sc_analyze_smartcard {
     		    VALIDITYFORMAT => 'relativedate',
     		});
     	}
+    	
+    	CTX('log')->log(
+	    	MESSAGE => "Check certs for type $type - Min: $min_certs, Max: $max_certs, Age: $max_age ",
+	        PRIORITY => 'info',
+	        FACILITY => [ 'system' ],
+		);
     
     	# sort certificates by notbefore date (descending)
     	@{$user_certs->{by_type}->{$type}} 
@@ -682,18 +721,41 @@ sub sc_analyze_smartcard {
     	foreach my $entry (@{$user_certs->{by_type}->{$type}}) {
     	    if (defined $max_certs && 
     		(scalar @expected_certs >= $max_certs)) {
-    		##! 16: 'max number of certificates to retain reached: ' . $max_certs
-    		last CERT_TO_RETAIN;
+    			##! 16: 'max number of certificates to retain reached: ' . $max_certs
+    		
+    			CTX('log')->log(
+			    	MESSAGE => "max number of certificates to retain reached",
+			        PRIORITY => 'info',
+			        FACILITY => [ 'system' ],
+				);
+    		
+    			last CERT_TO_RETAIN;
     	    }
     	    
     	    if (defined $cutoff_date) {
-    		##! 16: 'checking for maximum age: ' . Dumper $cutoff_date
-    		my $notbefore = DateTime->from_epoch( epoch => $entry->{NOTBEFORE} );
-    		if (DateTime->compare($notbefore, $cutoff_date) > 0) {
-    		    push @expected_certs, $entry->{IDENTIFIER};
-    		}
+	    		##! 16: 'checking for maximum age: ' . Dumper $cutoff_date
+	    		my $notbefore = DateTime->from_epoch( epoch => $entry->{NOTBEFORE} );
+	    		if (DateTime->compare($notbefore, $cutoff_date) > 0) {
+	    		    push @expected_certs, $entry->{IDENTIFIER};
+	    		    CTX('log')->log(
+				    	MESSAGE => "Add as expected cert " . $entry->{IDENTIFIER},
+				        PRIORITY => 'info',
+				        FACILITY => [ 'system' ],
+					);
+	    		} else {
+	    			CTX('log')->log(
+				    	MESSAGE => "Cert is beyond cutoff date" . $entry->{IDENTIFIER},
+				        PRIORITY => 'info',
+				        FACILITY => [ 'system' ],
+					);
+	    		}
     	    } else {
-    		push @expected_certs, $entry->{IDENTIFIER};
+	    		push @expected_certs, $entry->{IDENTIFIER};
+	    		CTX('log')->log(
+				  MESSAGE => "Add as expected cert " . $entry->{IDENTIFIER},
+				  PRIORITY => 'info',
+				  FACILITY => [ 'system' ],
+				);
     	    }
     	}
     	
@@ -761,6 +823,13 @@ sub sc_analyze_smartcard {
     }
     ##! 16: 'certificates sorted, by type: ' . Dumper $user_certs->{by_type}
     
+    CTX('log')->log(
+		MESSAGE => "List of expected certificates: " . join("; ", @{$user_certs->{xref}->{expected_certs}->{all}->{list}}),
+		PRIORITY => 'debug',
+		FACILITY => [ 'system' ],
+	);                                          
+    
+    
     ##! 16: 'xref: ' . Dumper $user_certs->{xref}
     ###########################################################################
     # analyze certificates on card
@@ -807,6 +876,13 @@ sub sc_analyze_smartcard {
     	    }
     	}
     
+        CTX('log')->log(
+			MESSAGE => "Cert on Card: $identifier, Type: $cert_type, Preferred: $is_preferred_profile, Status: $cert_visual_status",
+			PRIORITY => 'info',
+			FACILITY => [ 'system' ],
+		);     
+    
+    
     	# remove cert from the list of expected certs
     	delete $missing_certs_on_token_by_type{$cert_type}->{identifier}->{$identifier};
     	
@@ -826,6 +902,12 @@ sub sc_analyze_smartcard {
     		SUBJECT    => $entry->{SUBJECT},
     		MODULUS_HASH => $entry->{MODULUS_HASH},
     	    };
+    	    
+	        CTX('log')->log(
+				MESSAGE => "Schedule cert $identifier to be removed from card",
+				PRIORITY => 'debug',
+				FACILITY => [ 'system' ],
+			);     
     	}
     }
     ##! 16: 'missing certs: ' . Dumper \%missing_certs_on_token_by_type
@@ -846,19 +928,30 @@ sub sc_analyze_smartcard {
             
 	    if ($policy->get(['certs.type', $cert_type, 'escrow_key'])) {
 		##! 16: 'is escrow cert, queue for recovery'
+		 	    
+        CTX('log')->log(
+			MESSAGE => "Schedule cert $identifier to be restored on card",
+			PRIORITY => 'debug',
+			FACILITY => [ 'system' ],
+		);     
+		
 		if ($policy->get(['certs.type', $cert_type, 'ignore_certificates_with_missing_private_key'])) {
 		    ##! 16: 'checking if private key is available for cert identifier ' . $identifier
 		    
 		    if (! $cert->{PRIVATE_KEY_AVAILABLE}) {
 			##! 16: 'private key not in datapool for cert identifier ' . $identifier
+			CTX('log')->log(
+				MESSAGE => "Unable to restore $identifier - private key requested but missing",
+				PRIORITY => 'debug',
+				FACILITY => [ 'system' ],
+			);
 			next CERT_TO_RESTORE;
 		    }
 		}
 		push @{$result->{TASKS}->{SMARTCARD}->{INSTALL}}, $identifier;
 		$result->{PROCESS_FLAGS}->{will_need_pin} = 1;
 		
-		# Check if the restored certificate matches the preferred profile  
-		 
+		# Check if the restored certificate matches the preferred profile  		 
 				
 		$preferred_cert_available_by_type{$cert_type} ||= 
 			$policy->get(['xref.profile', $cert->{PROFILE}, 'preferred']);
@@ -881,7 +974,13 @@ sub sc_analyze_smartcard {
 
 	# check for minimum number of certs
 	if ($cert_count < $min_count) {
-	    ##! 16: "too few certs on token for type $type (found $cert_count, expected $min_count)"
+	    ##! 16: "too few certs on token for type $type (found $cert_count, expected $min_count)"	    
+	    CTX('log')->log(
+			MESSAGE => "too few certs on token for type $type (found $cert_count, expected $min_count)",
+			PRIORITY => 'debug',
+			FACILITY => [ 'system' ],
+		);
+	    
 	    $result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
 	    
 	    $result->{OVERALL_STATUS} = $self->_aggregate_visual_status(
@@ -893,6 +992,13 @@ sub sc_analyze_smartcard {
 
 	if (scalar keys %{$missing_certs_on_token_by_type{$type}->{identifier}} > 0) {
 	    ##! 16: 'certs missing on token: ' . Dumper $missing_certs_on_token_by_type{$type}->{identifier}
+	    	    
+	    CTX('log')->log(
+			MESSAGE => 'certs missing on token: ' . join "; ", $missing_certs_on_token_by_type{$type}->{identifier},
+			PRIORITY => 'debug',
+			FACILITY => [ 'system' ],
+		);
+	    
 	    $result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
 
 	    $result->{OVERALL_STATUS} = $self->_aggregate_visual_status(
@@ -913,7 +1019,17 @@ sub sc_analyze_smartcard {
             # As the preferred certifiate exists, the check if it is on the
             # card is done above - so no need to take care of it here.
 	        $result->{CERT_TYPE}->{$type}->{preferred_cert_exists} = 1;
+	        CTX('log')->log(
+				MESSAGE => "Preferred cert for type $type is available",
+				PRIORITY => 'debug',
+				FACILITY => [ 'system' ],
+			);
 	    } else {
+	    	CTX('log')->log(
+				MESSAGE => "Preferred cert for type $type is missing",
+				PRIORITY => 'debug',
+				FACILITY => [ 'system' ],
+			);
 		    $result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
 			
 		$result->{OVERALL_STATUS} = $self->_aggregate_visual_status(
@@ -937,6 +1053,11 @@ sub sc_analyze_smartcard {
 			if (!$entry->{VALIDITY_PROPERTIES}->{not_revoked} || 
 				!$entry->{VALIDITY_PROPERTIES}->{within_validity_period}) {
 				##! 64: ' Cert is not valid - skipping '. $entry->{IDENTIFIER}
+				CTX('log')->log(
+					MESSAGE => "No need to revoke $entry->{IDENTIFIER} (not valid)",
+					PRIORITY => 'debug',
+					FACILITY => [ 'system' ],
+				);
 				next; 		
 			}
 
@@ -947,11 +1068,33 @@ sub sc_analyze_smartcard {
 				# Not scheduled to be purged
 				if (!$entry->{PROCESS_FLAGS}->{PURGE}) {
 					##! 64: ' Cert is on the token - skipping '. $entry->{IDENTIFIER}
+					CTX('log')->log(
+						MESSAGE => "No need to revoke $entry->{IDENTIFIER} (already on token)",
+						PRIORITY => 'debug',
+						FACILITY => [ 'system' ],
+					);
 					next					
 				} elsif (grep  $entry->{IDENTIFIER}, @{$result->{TASKS}->{SMARTCARD}->{INSTALL}}) {
 					##! 64: ' Cert is scheduled for install - skipping '. $entry->{IDENTIFIER}
+					CTX('log')->log(
+						MESSAGE => "No need to revoke $entry->{IDENTIFIER} (to be restored)",
+						PRIORITY => 'debug',
+						FACILITY => [ 'system' ],
+					);
 					next;
+				} else {
+					CTX('log')->log(
+						MESSAGE => "Certificate $entry->{IDENTIFIER} is revoked and purged from card",
+						PRIORITY => 'debug',
+						FACILITY => [ 'system' ],
+					);
 				}
+			} else {
+				CTX('log')->log(
+					MESSAGE => "Certificate $entry->{IDENTIFIER} is is not on card and needs to be revoked",
+					PRIORITY => 'debug',
+					FACILITY => [ 'system' ],
+				);
 			}
 			
 			# If we are here - the certificate is no longer in use
@@ -1098,6 +1241,13 @@ sub __check_db_hash_against_policy {
 
 	$db_hash->{CERTIFICATE_TYPE} = $type;
 	
+	CTX('log')->log(
+		MESSAGE => "Check policy on $db_hash->{IDENTIFIER}, type: $type, profile: $profile, Status: $db_hash->{STATUS}",
+		PRIORITY => 'debug',
+		FACILITY => [ 'system' ],
+	);
+	
+	
 	if (! defined $type) {
 	    $type = 'UNEXPECTED';
 	    # but it is not expected on the token (incorrect profile)
@@ -1178,21 +1328,40 @@ sub __check_db_hash_against_policy {
 	0 + ((DateTime->compare($notbefore, $now) < 0) &&
 	     (DateTime->compare($now, $notafter) < 0));
     
+    if (!$validity_properties{within_validity_period}) {
+	    CTX('log')->log(
+			MESSAGE => "Certificate is outside validity period ($db_hash->{NOTBEFORE} to $db_hash->{NOTAFTER})",
+			PRIORITY => 'debug',
+			FACILITY => [ 'system' ],
+		);
+    }
+    
     foreach my $entry(qw( allow_renewal force_renewal )) {
-	$validity_properties{$entry} = 0;
-	my $validity = $policy->get(['certs.type', $type, $entry]);
-	if (defined $validity) {
-	    my $renewal_date = OpenXPKI::DateTime::get_validity(
-		{
-		    REFERENCEDATE => $notafter,
-		    VALIDITY => $validity,
-		    VALIDITYFORMAT => 'relativedate',
-		});
-	    
-	    if (DateTime->compare($now, $renewal_date) > 0) {
-		$validity_properties{$entry} = 1;
-	    }
-	}
+		$validity_properties{$entry} = 0;
+		my $validity = $policy->get(['certs.type', $type, $entry]);
+		if (defined $validity) {
+		    my $renewal_date = OpenXPKI::DateTime::get_validity(
+			{
+			    REFERENCEDATE => $notafter,
+			    VALIDITY => $validity,
+			    VALIDITYFORMAT => 'relativedate',
+			});
+		    
+		    if (DateTime->compare($now, $renewal_date) > 0) {
+				$validity_properties{$entry} = 1;
+				CTX('log')->log(
+					MESSAGE => "Validity: $entry is scheduled for $renewal_date - exceeded",
+					PRIORITY => 'debug',
+					FACILITY => [ 'system' ],
+				);
+		    } else {
+		    	CTX('log')->log(
+					MESSAGE => "Validity: $entry is scheduled for $renewal_date - still ok",
+					PRIORITY => 'debug',
+					FACILITY => [ 'system' ],
+				);
+		    }
+		}
     }
     
     # propagate information to result structure
@@ -1216,18 +1385,25 @@ sub __check_db_hash_against_policy {
     }
     
     if ($policy->get(['certs.type', $type, 'purge_valid'])) {
-	# policy do not want us to keep this certificate
-	
-	$db_hash->{VISUAL_STATUS} ||= 'red';
-	$db_hash->{PROCESS_FLAGS}->{PURGE} = 1;
+    
+    	# policy do not want us to keep this certificate	
+    	CTX('log')->log(
+			MESSAGE => "purge_valid requested on this type ($type) - force removal",
+			PRIORITY => 'debug',
+			FACILITY => [ 'system' ],
+		);
+		
+		$db_hash->{VISUAL_STATUS} ||= 'red';
+		$db_hash->{PROCESS_FLAGS}->{PURGE} = 1;
     }
 
     if ($validity_properties{force_renewal}) {
-	$db_hash->{VISUAL_STATUS} ||= 'red';
+		$db_hash->{VISUAL_STATUS} ||= 'red';
     }
     if ($validity_properties{allow_renewal}) {
-	$db_hash->{VISUAL_STATUS} ||= 'amber';
+		$db_hash->{VISUAL_STATUS} ||= 'amber';
     }
+    
     # TODO: check if profile should be propagated to preferred profile
     
     # if nothing has been set, assume it's ok
