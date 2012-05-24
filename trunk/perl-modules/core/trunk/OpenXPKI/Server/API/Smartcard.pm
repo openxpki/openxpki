@@ -774,36 +774,74 @@ sub sc_analyze_smartcard {
     	    my $cert_id = $expected_certs[0];
     	    my $cert = $user_certs->{by_identifier}->{$cert_id};
     	    
-    	    if ($cert->{VALIDITY_PROPERTIES}->{allow_renewal}
-    		|| $cert->{VALIDITY_PROPERTIES}->{force_renewal}
-    		|| (!$cert->{VALIDITY_PROPERTIES}->{within_validity_period})
-    		|| (!$cert->{VALIDITY_PROPERTIES}->{not_revoked})) {
-    		##! 16: 'certificate does not qualify because of its validity properties: ' . Dumper $cert->{VALIDITY_PROPERTIES}
-    		$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
-    	    }
-    
-    	    # if the latest certificate's private key is not in the database
-    	    # this does not qualify as a 'usable' certificate (only for
-    	    # certs which should be escrowed)
-    	     
-    	    if ($policy->get(['certs.type', $type, 'escrow_key'])) {
-    			if ($cert->{PRIVATE_KEY_AVAILABLE}) {
-					$result->{CERT_TYPE}->{$type}->{recoverable_cert_exists} = 1;
-    			} else {
-		    		##! 16: 'certificate does not qualify because it is supposed to be an escrowed cert and no private key is available'
-    				$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
-    			}
-    	    }
+    	    CTX('log')->log(
+				MESSAGE => "Usable cert for type $type exists ($cert_id) ",
+				PRIORITY => 'info',
+				FACILITY => [ 'system' ],
+			);
     	    
-            # Validity calculation - reuse the usable_cert_exists logic from above
-            # set_by_type is undef and the type is marked as "lead_validity" or the type is already selected
-            if (( (!$result->{VALIDITY}->{set_by_type} && $policy->get("certs.type.$type.lead_validity")) ||
-                ($result->{VALIDITY}->{set_by_type} eq $type)) &&                             
-                $result->{CERT_TYPE}->{$type}->{usable_cert_exists}) {
-                    ##! 32: ' Set overall validity by cert '.$cert_id.' to ' . $cert->{NOTAFTER};
-                    $result->{VALIDITY}->{set_by_type} = $type;
-                    $result->{VALIDITY}->{set_to_value} = $cert->{NOTAFTER};                      
-            }
+			my $validity_properties_failed = '';
+    	    $validity_properties_failed .= ' force_renewal' if ($cert->{VALIDITY_PROPERTIES}->{force_renewal});
+    	    $validity_properties_failed .= ' not_valid' unless($cert->{VALIDITY_PROPERTIES}->{within_validity_period});
+    	    $validity_properties_failed .= ' revoked' unless($cert->{VALIDITY_PROPERTIES}->{not_revoked});
+    		
+			if ($validity_properties_failed) {    			
+	    		##! 16: 'certificate does not qualify because of its validity properties: ' . Dumper $cert->{VALIDITY_PROPERTIES}
+    			$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
+    			$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
+    			CTX('log')->log(
+					MESSAGE => "Cert $cert_id for type $type not usable: $validity_properties_failed ",
+					PRIORITY => 'info',
+					FACILITY => [ 'system' ],
+				);
+    	    } else {
+        	    
+	    	    # Allow renewal resets the token_contains_expected_cert but keeps usable_cert_exists
+	    	    # This will force a new certificate to be created but not enforce the personalization 
+	    	    if ($cert->{VALIDITY_PROPERTIES}->{allow_renewal}) {
+	    	    	##! 16: "certificate requests 'soft' renewal (allow_renewal)"	    			
+	    			$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 0;
+	    			CTX('log')->log(
+						MESSAGE => "Cert $cert_id for type $type has allow_renewal set (soft renewal)",
+						PRIORITY => 'info',
+						FACILITY => [ 'system' ],
+					);
+	    	    }
+    
+    			# Check this branch only if the certificate is valid!    			
+	    	    # if the latest certificate's private key is not in the database
+	    	    # this does not qualify as a 'usable' certificate (only for
+	    	    # certs which should be escrowed)
+	    	     
+	    	    if ($policy->get(['certs.type', $type, 'escrow_key'])) {
+	    			if ($cert->{PRIVATE_KEY_AVAILABLE}) {
+						$result->{CERT_TYPE}->{$type}->{recoverable_cert_exists} = 1;
+	    			} else {
+			    		##! 16: 'certificate does not qualify because it is supposed to be an escrowed cert and no private key is available'
+	    				$result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 0;
+	    				CTX('log')->log(
+							MESSAGE => " Cert $cert_id for type $type not usable as escrowed key is not available",
+							PRIORITY => 'info',
+							FACILITY => [ 'system' ],
+						);
+	    			}
+	    	    }
+	    	    
+	            # Validity calculation - reuse the usable_cert_exists logic from above
+	            # set_by_type is undef and the type is marked as "lead_validity" or the type is already selected
+	            if (( (!$result->{VALIDITY}->{set_by_type} && $policy->get("certs.type.$type.lead_validity")) ||
+	                ($result->{VALIDITY}->{set_by_type} eq $type)) &&                             
+	                $result->{CERT_TYPE}->{$type}->{usable_cert_exists}) {
+	                    ##! 32: ' Set overall validity by cert '.$cert_id.' to ' . $cert->{NOTAFTER};
+	                    $result->{VALIDITY}->{set_by_type} = $type;
+	                    $result->{VALIDITY}->{set_to_value} = $cert->{NOTAFTER};                    
+	                    CTX('log')->log(
+							MESSAGE => "Set validity based on $cert_id to " . DateTime->from_epoch( epoch => $cert->{NOTAFTER} )->strftime("%F %T"),
+							PRIORITY => 'info',
+							FACILITY => [ 'system' ],
+						);                                          
+	            }
+    	    }
     	}
     	
     	# index by type
@@ -874,6 +912,12 @@ sub sc_analyze_smartcard {
     		    $cert_visual_status,
     		    );
     	    }
+    	    
+    	    # Assume token is ok on green status - exceptions reset the flag later
+    	    if ($cert_visual_status eq 'green') { 
+    	    	$result->{CERT_TYPE}->{$cert_type}->{token_contains_expected_cert} = 1;
+    	    }
+    	    
     	}
     
         CTX('log')->log(
@@ -965,7 +1009,10 @@ sub sc_analyze_smartcard {
 	next CERT_TYPE if ($type =~ m{ \A (?:FOREIGN|UNEXPECTED) }xms);	
 	my $min_count = $policy->get(['certs.type', $type, 'limits.min_count'])|| 0;
 	##! 16: 'check if expected certificates are present for type ' . $type
-	$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 1;
+	
+	
+	# FIXME? Now set earlier!
+	#$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} = 1;
 	
 	my $cert_count = 0;
 	if (exists $certs_on_token_by_type{$type}) {
@@ -1882,7 +1929,9 @@ for each configured type)
 
 # FIXME - need to declare if an escrow certificate w/o key is usable or 
 not and where we have assumptions based on this 
-A usable certificate for this purpose exists in the database.
+A usable certificate for this purpose exists in the database. The 
+certificate must be valid and must not be within the forced_renewal period.
+For escrow certificates, the private key must be present.
 
 =item * preferred_cert_exists (scalar, interpreted as boolean)
 
@@ -1892,6 +1941,7 @@ or is scheduled to be restored (escrow certificate).
 =item * token_contains_expected_cert (scalar, interpreted as boolean)
 
 The Smartcard contains the expected certificate for this purpose.
+Certificates within allow_renewal period are considered as B<NOT> expecrted.
 
 =item * recoverable_cert_exists
 
