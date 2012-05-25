@@ -398,7 +398,7 @@ sub sc_analyze_smartcard {
     my $workflow_creator = $employeeinfo->{VALUE}->{mail};
     $result->{SMARTCARD}->{assigned_to}->{workflow_creator} = $workflow_creator;
 
-    my $max_smartcards_per_user = $policy->get( ['cards.max_smartcards_per_user'] );
+    my $max_smartcards_per_user = $policy->get("cards.max_smartcards_per_user");
 
     if (defined $max_smartcards_per_user) {
 
@@ -443,7 +443,7 @@ sub sc_analyze_smartcard {
 	       if (defined $lookupid) {
         	    ##! 16: 'checking membership for group ' . $group_alias
                 ## FIXME - Needs testing         		
-                if ($config->get(['smartcard.groupinfo.checkgroup', $group_alias, $lookupid ])) {        		
+                if ($config->get("smartcard.groupinfo.checkgroup.$group_alias.$lookupid")) {        		
                     $result->{PROCESS_FLAGS}->{$process_flag} = 1;
                 }
             }
@@ -520,7 +520,7 @@ sub sc_analyze_smartcard {
     my $token_family = $1;
     my $token_config;
     
-    if (!$token_family || !($token_config = $config->get_hash(['smartcard.cardinfo.properties',$token_family]))) {
+    if (!$token_family || !($token_config = $config->get_hash("smartcard.cardinfo.properties.$token_family"))) {
         OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_UNSUPPORTED_SMARTCARD_TYPE',
         params  => {
@@ -662,7 +662,7 @@ sub sc_analyze_smartcard {
 		$user_certs->{by_identifier}->{$identifier} = $db_hash;
 		
 		# resolve type from profile using xref, NB: requires that a profile may not be used in two types		
-		my $type = $policy->get(['xref.profile', $db_hash->{PROFILE}, 'type']); 
+		my $type = $policy->get("xref.profile.$db_hash->{PROFILE}.type"); 
 		# xrefs
 		push @{$user_certs->{by_type}->{$type}}, 
 		    $user_certs->{by_identifier}->{$identifier};
@@ -691,11 +691,11 @@ sub sc_analyze_smartcard {
     	$result->{CERT_TYPE}->{$type}->{recoverable_cert_exists} = 0;
     	
     	my @expected_certs;
-    	my $min_certs = $policy->get(['certs.type', $type, 'limits.min_count']);
-    	my $max_certs = $policy->get(['certs.type', $type, 'limits.max_count']);
+    	my $min_certs = $policy->get("certs.type.$type.limits.min_count");
+    	my $max_certs = $policy->get("certs.type.$type.limits.max_count");
     
     	my $cutoff_date;
-    	my $max_age = $policy->get(['certs.type', $type, 'limits.max_age']);
+    	my $max_age = $policy->get("certs.type.$type.limits.max_age");
     	if (defined $max_age) {
     	    $cutoff_date = OpenXPKI::DateTime::get_validity(
     		{
@@ -813,7 +813,7 @@ sub sc_analyze_smartcard {
 	    	    # this does not qualify as a 'usable' certificate (only for
 	    	    # certs which should be escrowed)
 	    	     
-	    	    if ($policy->get(['certs.type', $type, 'escrow_key'])) {
+	    	    if ($policy->get("certs.type.$type.escrow_key")) {
 	    			if ($cert->{PRIVATE_KEY_AVAILABLE}) {
 						$result->{CERT_TYPE}->{$type}->{recoverable_cert_exists} = 1;
 	    			} else {
@@ -906,7 +906,7 @@ sub sc_analyze_smartcard {
     	if (defined $cert_visual_status) {
     	    # do not consider certficates which are escrowed (used for
     	    # encyption)	           
-    	    if (! $policy->get(['certs.type', $cert_type, 'escrow_key'])) {
+    	    if (! $policy->get("certs.type.$cert_type.escrow_key")) {
     		$result->{OVERALL_STATUS} = $self->_aggregate_visual_status(
     		    $result->{OVERALL_STATUS},
     		    $cert_visual_status,
@@ -970,7 +970,7 @@ sub sc_analyze_smartcard {
 	if (defined $to_restore{$identifier}) {
 	    ##! 16: 'flagged for recovery'
             
-	    if ($policy->get(['certs.type', $cert_type, 'escrow_key'])) {
+	    if ($policy->get("certs.type.$cert_type.escrow_key")) {
 		##! 16: 'is escrow cert, queue for recovery'
 		 	    
         CTX('log')->log(
@@ -979,7 +979,7 @@ sub sc_analyze_smartcard {
 			FACILITY => [ 'system' ],
 		);     
 		
-		if ($policy->get(['certs.type', $cert_type, 'ignore_certificates_with_missing_private_key'])) {
+		if ($policy->get("certs.type.$cert_type.ignore_certificates_with_missing_private_key")) {
 		    ##! 16: 'checking if private key is available for cert identifier ' . $identifier
 		    
 		    if (! $cert->{PRIVATE_KEY_AVAILABLE}) {
@@ -998,7 +998,7 @@ sub sc_analyze_smartcard {
 		# Check if the restored certificate matches the preferred profile  		 
 				
 		$preferred_cert_available_by_type{$cert_type} ||= 
-			$policy->get(['xref.profile', $cert->{PROFILE}, 'preferred']);
+			$policy->get("xref.profile.$cert->{PROFILE}.preferred");
 	    }
 	}
     }
@@ -1007,7 +1007,7 @@ sub sc_analyze_smartcard {
   CERT_TYPE:
     foreach my $type (keys (%missing_certs_on_token_by_type)) {
 	next CERT_TYPE if ($type =~ m{ \A (?:FOREIGN|UNEXPECTED) }xms);	
-	my $min_count = $policy->get(['certs.type', $type, 'limits.min_count'])|| 0;
+	my $min_count = $policy->get("certs.type.$type.limits.min_count")|| 0;
 	##! 16: 'check if expected certificates are present for type ' . $type
 	
 	
@@ -1061,7 +1061,7 @@ sub sc_analyze_smartcard {
     foreach my $type (keys %preferred_cert_available_by_type) {
 	next if ($type eq 'FOREIGN');
 
-	if ($policy->get(['certs.type', $type, 'promote_to_preferred_profile'])) {
+	if ($policy->get("certs.type.$type.promote_to_preferred_profile")) {
 	    if ( $preferred_cert_available_by_type{$type}) {
             # As the preferred certifiate exists, the check if it is on the
             # card is done above - so no need to take care of it here.
@@ -1092,7 +1092,7 @@ sub sc_analyze_smartcard {
     # Post process - schedule unused certificates for revocation if configured
     # We loop through all certificates found in the database and check them one by one
 	foreach my $type (keys %{$user_certs->{by_type}}) {	
-		next unless ($policy->get(['certs.type', $type, 'revoke_unused']));	
+		next unless ($policy->get("certs.type.$type.revoke_unused"));	
 		##! 32: ' Look for unused certificates to revoke of type ' . $type
 		foreach my $entry (@{$user_certs->{by_type}->{$type}}) {
 		
@@ -1227,36 +1227,20 @@ sub _get_policy {
     ##! 8: 'indexing policy'
     my $ref;
 
-    foreach my $type ( $policy->get_keys( [ 'certs.type'] ) ) {
+    foreach my $type ( $policy->get_keys('certs.type') ) {
     
         my $isFirst = 1;       
-        foreach my $allowed_profile ($policy->get_list([  'certs.type', $type, 'allowed_profiles' ])) {    
+        foreach my $allowed_profile ($policy->get_list("certs.type.$type.allowed_profiles")) {    
             $policy->set(['xref.profile', $allowed_profile, 'type'], $type );        
             if ($isFirst) {
                 # first profile is preferred
                 $policy->set(['xref.profile', $allowed_profile, 'preferred'], 1 );
                 $isFirst = 0;            
-            }                
-            $policy->set(['xref.type', $type, 'allowed_profile', $allowed_profile ], 1 );
+            }                            
         }
-            
-        foreach my $item (qw( min_count max_count max_age )) {
-            $policy->set([ 'xref.type', $type, 'limits', $item ], $policy->get([ 'certs.type', $type, 'limits', $item ]));
-        }
-            
-        foreach my $item (qw( allow_renewal escrow_key publish purge_invalid purge_valid lead_validity)) {
-            $policy->set([ 'xref.type', $type,'policy',$item], $policy->get([  'certs.type', $type, $item ]));         
-        }
-    
-        foreach my $usage ($policy->get_list([  'certs.type', $type, 'usage' ])) {    
-            #$policy->set([ 'xref.usage', $usage, 'type' ], $type ); # Seems not to be in use
-            $policy->set([ 'xref.type' , $type, 'usage', $usage ], 1 );        
-        }             
     }
    
     $policy->set('xref.cached', 1);
-    
-    ##! 64: Dumper ( $policy->get_hash('xref.type') )
             
     return $policy;
 }
@@ -1288,8 +1272,8 @@ sub __check_db_hash_against_policy {
     my $type = 'FOREIGN';
     if (defined $profile) {
 	# cert is know to our PKI
-	$type = $policy->get(['xref.profile', $profile, 'type']);
-	my $is_preferred = $policy->get(['xref.profile', $profile, 'preferred']) || 0;
+	$type = $policy->get("xref.profile.$profile.type");
+	my $is_preferred = $policy->get("xref.profile.$profile.preferred") || 0;
 
 	$db_hash->{CERTIFICATE_TYPE} = $type;
 	
@@ -1310,8 +1294,8 @@ sub __check_db_hash_against_policy {
 	    # we expect this cert type on the token, and hence export
 	    # the intended usage
 
-	    # 20120504 Martin Bartosch, TODO/REFACTOR: bit mask?
-	    foreach my $usage ($policy->get_keys(['xref.type', $type, 'usage'])) {
+	    # 20120504 Martin Bartosch, TODO/REFACTOR: bit mask?	    
+	    foreach my $usage ($policy->get_keys("certs.type.$type.usage")) {
     		# export usage to caller
 	       	$db_hash->{SMARTCARD_USAGE}->{$usage} = 1;
 	    }
@@ -1320,7 +1304,7 @@ sub __check_db_hash_against_policy {
 	    # escrowed certificates
 	    $db_hash->{PRIVATE_KEY_AVAILABLE} = 0;
         
-	    if ($policy->get(['certs.type', $type, 'escrow_key'])) {
+	    if ($policy->get("certs.type.$type.escrow_key")) {
 		my $identifier = $db_hash->{IDENTIFIER};
 		##! 16: 'checking if private key is available for cert identifier ' . $identifier
 		
@@ -1390,7 +1374,7 @@ sub __check_db_hash_against_policy {
     
     foreach my $entry(qw( allow_renewal force_renewal )) {
 		$validity_properties{$entry} = 0;
-		my $validity = $policy->get(['certs.type', $type, $entry]);
+		my $validity = $policy->get("certs.type.$type.$entry");
 		if (defined $validity) {
 		    my $renewal_date = OpenXPKI::DateTime::get_validity(
 			{
@@ -1420,7 +1404,7 @@ sub __check_db_hash_against_policy {
     $db_hash->{VALIDITY_PROPERTIES} = \%validity_properties;
     
         
-	if ($policy->get(['certs.type', $type, 'revoke_unused']) &&
+	if ($policy->get("certs.type.$type.revoke_unused") &&
 	    ($validity_properties{force_renewal} ||
     	$validity_properties{allow_renewal})) {
 			$db_hash->{PROCESS_FLAGS}->{REVOKE} = 1;   
@@ -1428,7 +1412,7 @@ sub __check_db_hash_against_policy {
     
     # visual status may be 'green' (valid), 'amber' (nearing expiration)
     # or 'red' (expired or revoked)
-    if ($policy->get(['certs.type', $type, 'purge_invalid'])) {
+    if ($policy->get("certs.type.$type.purge_invalid")) {
 		# only set red status on certs that shall be purged 
 		# after expiration
 		
@@ -1441,7 +1425,7 @@ sub __check_db_hash_against_policy {
 		}			
     }
     
-    if ($policy->get(['certs.type', $type, 'purge_valid'])) {
+    if ($policy->get("certs.type.$type.purge_valid")) {
     
     	# policy do not want us to keep this certificate	
     	CTX('log')->log(

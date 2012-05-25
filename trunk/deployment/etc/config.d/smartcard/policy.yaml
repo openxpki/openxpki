@@ -64,7 +64,7 @@ certs:
             purge_valid: 0
             purge_invalid: 1
 
-#xref@: connector:smartcard.policy.cache           
+xref2@: connector:smartcard.policy.cache           
 xref:
    cached: 1
    profile:
@@ -81,57 +81,6 @@ xref:
        type: escrow
      I18N_OPENXPKI_PROFILE_USER_FSE:
        type: escrow
-   type:
-     FOREIGN:
-       policy:
-         purge_invalid: '1'
-         purge_valid: '0'
-     UNEXPECTED:
-       policy:
-         purge_invalid: '0'
-         purge_valid: '0'
-     escrow:
-       allowed_profile:
-         I18N_OPENXPKI_PROFILE_USER_ENCRYPTION: 1
-         I18N_OPENXPKI_PROFILE_USER_FSE: 1
-       limits:
-         max_age: '-10'
-         max_count: '8'
-         min_count: '1'
-       policy:
-         allow_renewal: '-0003'
-         publish: '1'
-         purge_invalid: '0'
-         escrow_key: 1
-       usage:
-         ENCRYPTION: 1
-     signature:
-       allowed_profile:
-         I18N_OPENXPKI_PROFILE_USER_SIGNATURE: 1
-       limits:
-         max_count: '1'
-         min_count: '1'
-       policy:
-         allow_renewal: '-0003'
-         publish: '0'
-         purge_invalid: '0'
-         escrow_key: 0
-       usage:
-         SIGNATURE: 1
-     nonescrow:
-       allowed_profile:
-         I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL: 1
-         I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL: 1
-       limits:
-         max_count: '1'
-         min_count: '1'
-       policy:
-         allow_renewal: '-0003'
-         publish: '0'
-         purge_invalid: '0'
-         escrow_key: 0
-       usage:
-         AUTHENTICATION: 1
     
 
 cards:
