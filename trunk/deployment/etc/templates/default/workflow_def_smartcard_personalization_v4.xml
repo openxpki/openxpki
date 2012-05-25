@@ -388,7 +388,7 @@
     <state name="PREPARE_CERT_INST"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_PREPARE_CERT_INST</description>
-        <action name="scpers_queue_issued_certs_for_installation" resulting_state="QUEUE_CERTS_TO_RECOVER">
+        <action name="scpers_register_user_information" resulting_state="USER_INFO_REGISTERED">
         </action>
     </state>
 
@@ -598,6 +598,13 @@
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERTS_DELETED</description>
         <action name="scpers_queue_certs_to_revoke" resulting_state="CERTS_QUEUED_FOR_REVOCATION">
+        </action>
+    </state>
+
+    <state name="USER_INFO_REGISTERED"
+            autorun="yes">
+        <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_USER_INFO_REGISTERED</description>
+        <action name="scpers_queue_issued_certs_for_installation" resulting_state="QUEUE_CERTS_TO_RECOVER">
         </action>
     </state>
 
