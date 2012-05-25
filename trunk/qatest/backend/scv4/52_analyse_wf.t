@@ -14,6 +14,8 @@ use English;
 use Data::Dumper;
 use Config::Std;
 use File::Basename;
+use File::Slurp;
+
 
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
@@ -42,25 +44,33 @@ $test->set_verbose($cfg{instance}{verbose});
 
 $test->plan( tests => 3 );
 
+my $cert_dir = $cfg{instance}{certdir};
+if ($cert_dir !~ '^/') {
+	$cert_dir = $dirname.'/'.$cert_dir;
+}
 
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{role},
-) or die "Error - connect failed: $@";
+-d $cert_dir || die "Please create certificate directory $cert_dir " ;
+-w $cert_dir || die "Please make certificate directory $cert_dir writable" ; 
 
-open(CERT, "<$cfg{instance}{buffer}");
-my @lines = <CERT>;
-close CERT;
-
-my $certs = $ser->deserialize( join("",  @lines));
+# Slurp in the certificates
+my @paths = read_dir( $cert_dir ) ;
+ 
 my @certflat;
-foreach my $cert (@{$certs}) {
-   
+foreach my $cert_file (@paths) {   
+   next unless ($cert_file =~ /\.crt$/);      
+   my $cert = read_file( "$cert_dir/$cert_file" );
    $cert =~ s/-----.*?-----//g;
    $cert =~ s/\n//g;
    push @certflat, $cert;     
 }
 
+$test->diag("Found ".scalar(@certflat)." exisiting certificates");
+
+$test->connect_ok(
+    user => $cfg{user}{name},
+    password => $cfg{user}{role},
+) or die "Error - connect failed: $@";
+  
 my %wfparam = (        
         user_id =>  $cfg{carddata}{frontend_user},
         token_id =>  $cfg{carddata}{token_id},
