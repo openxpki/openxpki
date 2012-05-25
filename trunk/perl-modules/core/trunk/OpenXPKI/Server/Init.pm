@@ -294,11 +294,7 @@ sub __do_init_prepare_daemon {
     open STDIN, "/dev/null" or
 	die "unable to read from /dev/null!: $!";
     
-    # FIXME: if we change to / the daemon works properly in production but
-    # our tests fail (because there are a lot of relative path names in the
-    # test configuration).
-    # FIXME RECONSIDER uncommenting this in the future.
-    # chdir '/';
+    chdir '/';
 
     # we redirect stderr to our debug log file, so don't do it here:
     # open STDERR, '>&STDOUT' or
