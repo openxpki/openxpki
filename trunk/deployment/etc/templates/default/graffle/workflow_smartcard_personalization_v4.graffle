@@ -209,7 +209,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{0, 769}, {97, 14}}</string>
+					<string>{{0, 769}, {91, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -396,7 +396,7 @@ Smartcard Personalization}</string>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2012-05-22 15:17:26 +0000</string>
+	<string>2012-05-25 11:11:59 +0000</string>
 	<key>Modifier</key>
 	<string>Martin Bartosch</string>
 	<key>NotesVisible</key>
@@ -40979,7 +40979,7 @@ CERTS DELETED}</string>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{82.335693, 338.33334}</string>
+						<string>{82.335693, 338.33337}</string>
 						<string>{82.335693, 356.71637}</string>
 					</array>
 					<key>Style</key>
@@ -44694,6 +44694,11 @@ CERTS QUEUED FOR REVOCATION}</string>
 						<string>{1, 0}</string>
 						<string>{-1, 0}</string>
 					</array>
+					<key>UserInfo</key>
+					<dict>
+						<key>class</key>
+						<string>OpenXPKI::Server::Workflow::Activity::SmartCard::RevokeCertificate</string>
+					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
@@ -47779,7 +47784,7 @@ SUCCESS}</string>
 		<key>FitInWindow</key>
 		<true/>
 		<key>Frame</key>
-		<string>{{158, 0}, {1114, 1028}}</string>
+		<string>{{319, 0}, {1114, 1028}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
