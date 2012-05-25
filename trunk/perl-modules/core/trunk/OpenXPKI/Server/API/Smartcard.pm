@@ -1108,10 +1108,15 @@ sub sc_analyze_smartcard {
 				next; 		
 			}
 
-			# Check if the certificate is still in use
-			
-			# is it on the token?
-			if (grep  $entry->{IDENTIFIER}, @{$certs_on_token_by_type{$type}}) {
+			# Explicit revoke always wins
+			if ($entry->{PROCESS_FLAGS}->{REVOKE}) {
+				CTX('log')->log(
+					MESSAGE => "Certificate $entry->{IDENTIFIER} has explicit revoke flag set",
+					PRIORITY => 'debug',
+					FACILITY => [ 'system' ],
+				);			
+			#  Check if the certificate is still in use - is it on the token?
+			} elsif (grep  $entry->{IDENTIFIER}, @{$certs_on_token_by_type{$type}}) {
 				# Not scheduled to be purged
 				if (!$entry->{PROCESS_FLAGS}->{PURGE}) {
 					##! 64: ' Cert is on the token - skipping '. $entry->{IDENTIFIER}
@@ -1414,21 +1419,26 @@ sub __check_db_hash_against_policy {
     # propagate information to result structure
     $db_hash->{VALIDITY_PROPERTIES} = \%validity_properties;
     
+        
+	if ($policy->get(['certs.type', $type, 'revoke_unused']) &&
+	    ($validity_properties{force_renewal} ||
+    	$validity_properties{allow_renewal})) {
+			$db_hash->{PROCESS_FLAGS}->{REVOKE} = 1;   
+	}
     
     # visual status may be 'green' (valid), 'amber' (nearing expiration)
     # or 'red' (expired or revoked)
-    
-    
     if ($policy->get(['certs.type', $type, 'purge_invalid'])) {
-	# only set red status on certs that shall be purged 
-	# after expiration
-	
-	if ((! $validity_properties{within_validity_period})
-	    || (! $validity_properties{not_revoked})) {
-	    # expired or revoked
-	    $db_hash->{VISUAL_STATUS} ||= 'red';
-	    $db_hash->{PROCESS_FLAGS}->{PURGE} = 1;
-	}
+		# only set red status on certs that shall be purged 
+		# after expiration
+		
+		if ((! $validity_properties{within_validity_period})
+		    || (! $validity_properties{not_revoked}) ||
+		    $db_hash->{PROCESS_FLAGS}->{REVOKE}) {
+		    # expired or revoked
+		    $db_hash->{VISUAL_STATUS} ||= 'red';
+		    $db_hash->{PROCESS_FLAGS}->{PURGE} = 1;
+		}			
     }
     
     if ($policy->get(['certs.type', $type, 'purge_valid'])) {
@@ -1445,10 +1455,11 @@ sub __check_db_hash_against_policy {
     }
 
     if ($validity_properties{force_renewal}) {
-		$db_hash->{VISUAL_STATUS} ||= 'red';
-    }
-    if ($validity_properties{allow_renewal}) {
-		$db_hash->{VISUAL_STATUS} ||= 'amber';
+		$db_hash->{VISUAL_STATUS} ||= 'red';		
+    } 
+
+	if ($validity_properties{allow_renewal}) {
+		$db_hash->{VISUAL_STATUS} ||= 'amber';		
     }
     
     # TODO: check if profile should be propagated to preferred profile
