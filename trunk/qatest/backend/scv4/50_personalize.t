@@ -28,7 +28,7 @@ use Data::Dumper;
 use Config::Std;
 use File::Basename;
 use File::Slurp;
-  
+use Digest::SHA1 qw(sha1_hex);
 
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
@@ -40,6 +40,9 @@ my $dirname = dirname($0);
 
 our @cfgpath = ( $dirname );
 our %cfg = ();
+
+sub makeCSR;
+sub getModulus($);
 
 my $testcfg = new TestCfg;
 $testcfg->read_config_path( '5x_personalize.cfg', \%cfg, @cfgpath );
@@ -74,7 +77,7 @@ my $ser = OpenXPKI::Serialization::Simple->new();
 my @paths = read_dir( $cert_dir ) ;
 
 my @certflat;
-foreach my $cert_file (@paths) {   
+foreach my $cert_file (@paths) { 
    next unless ($cert_file =~ /\.crt$/);      
    my $cert = read_file( "$cert_dir/$cert_file" );
    $cert =~ s/-----.*?-----//g;
@@ -111,7 +114,7 @@ if ($test->state() eq 'PUK_TO_INSTALL') {
 while ($test->state() eq 'NEED_NON_ESCROW_CSR' || $test->state() eq 'POLICY_INPUT_REQUIRED') {
 		
 	if ($test->state() eq 'NEED_NON_ESCROW_CSR') {
-		$test->diag("Non escrow csr requested ($test->param('csr_cert_type'))");
+		$test->diag("Non escrow csr requested - ".$test->param('csr_cert_type'));
 	
 		$number_of_tests += 5;	
 		$test->state_is('NEED_NON_ESCROW_CSR');
@@ -141,6 +144,14 @@ while ($test->state() =~ /TO_INSTALL/) {
 		$test->state_is('CERT_TO_INSTALL');
 		$test->param_is('cert_install_type','x509', 'Check for x509 type parameter');
 		
+		$test->param_like('certificate','/-----BEGIN CERTIFICATE.*/','Check for PEM certificate');		 	
+		my $cert_identifier = $test->param('cert_identifier');
+		write_file("$cert_dir/$cert_identifier.crt", $test->param('certificate'));
+		
+		my $modulus = getModulus("$cert_dir/$cert_identifier.crt");
+		rename "$cert_dir/$modulus.csr", "$cert_dir/$cert_identifier.csr"; 
+		rename "$cert_dir/$modulus.key", "$cert_dir/$cert_identifier.key";		
+		
 	} elsif ($test->state() eq 'PKCS12_TO_INSTALL') {
  		$test->diag("PKCS12 to install");
  		$number_of_tests += 6;		
@@ -150,25 +161,56 @@ while ($test->state() =~ /TO_INSTALL/) {
 		$test->param_isnt('_password','', 'Check for password');				
 		$test->param_isnt('_pkcs12base64','', 'Check for P12');           
 		my $cert_identifier = $test->param('cert_identifier');		
+		
 		open P12, ">$cert_dir/$cert_identifier.p12";
 		print P12 $test->param('_pkcs12base64');
 		close P12;   					
 		
 		my $pass = $test->param('_password');
-	 	`cat $cert_dir/$cert_identifier.p12 | base64 -d | openssl pkcs12  -passin pass:$pass -nodes -nocerts > $cert_dir/$cert_identifier.key` 
-		
+	 	`cat $cert_dir/$cert_identifier.p12 | base64 -d | openssl pkcs12  -passin pass:$pass -nodes -nocerts > $cert_dir/$cert_identifier.key`; 
+	
+		$test->param_like('certificate','/-----BEGIN CERTIFICATE.*/','Check for PEM certificate');		 				
+		open PEM, ">$cert_dir/$cert_identifier.crt";
+		print PEM $test->param('certificate');
+		close PEM;
+			
 	}
 	
-	$test->param_like('certificate','/-----BEGIN CERTIFICATE.*/','Check for PEM certificate');		 	
-	my $cert_identifier = $test->param('cert_identifier');		
-	open PEM, ">$cert_dir/$cert_identifier.crt";
-	print PEM $test->param('certificate');
-	close PEM;
 	
 	$test->execute_ok('scpers_cert_inst_ok');
 }
 
 $test->diag("Install done");
+ 
+if ($test->state() eq "HAVE_CERT_TO_DELETE") {
+
+	my %modulus_map;	
+	# Loop thru all files in the certs dir and calculate the modulus
+	foreach my $cert_file (@paths) { 
+   		next unless ($cert_file =~ /\.crt$/);	    	    
+	    $modulus_map{ getModulus("$cert_dir/$cert_file") } = "$cert_dir/$cert_file";	      
+    }
+ 	
+	while ($test->state() eq "HAVE_CERT_TO_DELETE") {	
+		my $modulus = $test->param('keyid');	 
+		if ($test->ok($modulus_map{$modulus}, "Look for key file with modulus $modulus")) {
+			$test->execute_ok('scpers_cert_del_ok');			
+			unlink ($modulus_map{$modulus});
+			# test to unlink p12, csr and key file
+			$modulus_map{$modulus} =~ s/\.crt$/.p12/;
+			-f $modulus_map{$modulus} && unlink ($modulus_map{$modulus});
+			$modulus_map{$modulus} =~ s/\.p12$/.key/;
+			-f $modulus_map{$modulus} && unlink ($modulus_map{$modulus});
+			$modulus_map{$modulus} =~ s/\.key$/.csr/;
+			-f $modulus_map{$modulus} && unlink ($modulus_map{$modulus});
+			undef $modulus_map{$modulus};
+		} else {
+			$test->execute_ok('scpers_cert_del_err');
+		}
+	}
+	
+	$test->diag("certificates deleted");	
+}
  
 $test->state_is('SUCCESS'); 
 $test->disconnect();
@@ -180,7 +222,23 @@ sub makeCSR {
 	my $csr_file = "$cert_dir/$cert_type.csr"; 
 	my $key_file = "$cert_dir/$cert_type.key";
 	`openssl req -new -batch -nodes -keyout $key_file -out $csr_file 2>/dev/null`;
-	return scalar read_file($csr_file);
+	
+	my $modulus = getModulus($key_file);
+	rename $csr_file, "$cert_dir/$modulus.csr"; 
+	rename $key_file, "$cert_dir/$modulus.key";		
+	return scalar read_file("$cert_dir/$modulus.csr");
 }
 
-
+sub getModulus($) {
+	my $file = shift;
+	
+	my $cert_modulus;
+	if ($file =~ /\.key$/) {
+		$cert_modulus = `openssl rsa -in $file -modulus -noout  | cut -f2 -d=`;	
+	} else {
+		$cert_modulus = `openssl x509 -in $file -modulus -noout  | cut -f2 -d=`;
+	}	 
+	chomp $cert_modulus;
+	$cert_modulus =~ s/^(?:00)+//g; 
+	return sha1_hex(pack("H*", $cert_modulus));	
+}

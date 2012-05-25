@@ -9,7 +9,7 @@
     </action>
 
     <action name="scpers_revoke_certificate"
-            class="Workflow::Action::Null">
+            class="OpenXPKI::Server::Workflow::Activity::SmartCard::RevokeCertificate">
             <field name="cert_identifier" is_required="yes"/>
     </action>
 
