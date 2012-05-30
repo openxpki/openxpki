@@ -362,6 +362,16 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             <field name="token_id" is_required="yes"/>
     </action>
 
+    <action name="scpers_register_user_information"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
+            ds_force="1"
+            ds_key_param="userinfo_employee_id"
+            ds_namespace="smartcard.user.currentid"
+            ds_value_param="userinfo_currentid">
+            <field name="userinfo_currentid" is_required="yes"/>
+            <field name="userinfo_employee_id" is_required="yes"/>
+    </action>
+
     <action name="scpers_queue_csr_to_issue"
             class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
             array_name="csrs_to_issue"
