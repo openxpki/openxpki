@@ -98,6 +98,9 @@ sub sc_analyze_smartcard {
     my $cfg_id   = $arg_ref->{CONFIG_ID};
     my $login_ids  = $arg_ref->{LOGIN_IDS};
     
+    
+    my $ser = OpenXPKI::Serialization::Simple->new();
+    
     ##! 16: 'cfg_id: ' . $cfg_id
 
     ##! 16: 'sc_analyze_smartcard() wf_types = $wf_types (' . Dumper($wf_types) . ')'
@@ -398,6 +401,43 @@ sub sc_analyze_smartcard {
     my $workflow_creator = $employeeinfo->{VALUE}->{mail};
     $result->{SMARTCARD}->{assigned_to}->{workflow_creator} = $workflow_creator;
 
+	# If a person changes his name or mail adress, we want to issue new certificates
+	# We have the relevant info into the datapool as smartcard.user.currentid
+	my $current_employee_info_dp = CTX('api')->get_data_pool_entry( {
+        PKI_REALM => $thisrealm,
+        NAMESPACE => 'smartcard.user.currentid',
+        KEY => $holder_employee_id,
+    } );
+	
+	my $employee_data_has_changed = '';
+	my $current_employee_info;		
+	if ($current_employee_info_dp) {		
+    	$current_employee_info = $ser->deserialize($current_employee_info_dp->{VALUE});
+		foreach my $key qw(givenname sn mail) {
+			if ($employeeinfo->{VALUE}->{$key} ne $current_employee_info->{$key}) {
+				$employee_data_has_changed .= " $key: ".$current_employee_info->{$key}." -> ".$employeeinfo->{VALUE}->{$key};
+				$current_employee_info->{$key} = $employeeinfo->{VALUE}->{$key}; 
+			}
+    	}		
+		
+		if ($employee_data_has_changed) {		
+			CTX('log')->log(
+		    	MESSAGE => "Holder Details have changed $employee_data_has_changed",
+		        PRIORITY => 'info',
+		        FACILITY => [ 'system' ],
+			);
+		}			
+	} else {		
+		foreach my $key qw(givenname sn mail) {			
+			$current_employee_info->{$key} = $employeeinfo->{VALUE}->{$key}; 
+    	}
+	}   
+	
+	# We put the serialized form directly here as the whole hash goes into the context 
+	$result->{SMARTCARD}->{assigned_to}->{currentid} = $ser->serialize( $current_employee_info );
+	
+	##! 64: 'Recorded employee info (fingerprint) ' . Dumper $current_employee_info 
+    
     my $max_smartcards_per_user = $policy->get("cards.max_smartcards_per_user");
 
     if (defined $max_smartcards_per_user) {
@@ -603,8 +643,7 @@ sub sc_analyze_smartcard {
     
     if ($certificates) {
     
-    my $ser = OpenXPKI::Serialization::Simple->new();
-    my @certificate_identifiers = @{$ser->deserialize($certificates->{VALUE})};
+	my @certificate_identifiers = @{$ser->deserialize($certificates->{VALUE})};
 
     ##! 32: ' Users certificate_identifiers (from datapool) ' . Dumper @certificate_identifiers ; 
 
@@ -759,7 +798,6 @@ sub sc_analyze_smartcard {
     	    }
     	}
     	
-    	# propagate flag if at least one certificate exists
     	if (scalar @expected_certs > 0) {
     	    $result->{CERT_TYPE}->{$type}->{usable_cert_exists} = 1;
     	    ##! 16: 'at least one certificate exists for type: ' . $type
