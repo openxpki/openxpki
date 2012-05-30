@@ -810,13 +810,7 @@ sub sc_analyze_smartcard {
             # Are there situatuions where the second certificate is still ok
             # even if the first ist not? 
     	    my $cert_id = $expected_certs[0];
-    	    my $cert = $user_certs->{by_identifier}->{$cert_id};
-    	    
-    	    CTX('log')->log(
-				MESSAGE => "Usable cert for type $type exists ($cert_id) ",
-				PRIORITY => 'info',
-				FACILITY => [ 'system' ],
-			);
+    	    my $cert = $user_certs->{by_identifier}->{$cert_id};    	    
     	    
 			my $validity_properties_failed = '';
     	    $validity_properties_failed .= ' force_renewal' if ($cert->{VALIDITY_PROPERTIES}->{force_renewal});
@@ -879,7 +873,15 @@ sub sc_analyze_smartcard {
 							FACILITY => [ 'system' ],
 						);                                          
 	            }
-    	    }
+    	    }    	
+    	
+	    	if ( $result->{CERT_TYPE}->{$type}->{usable_cert_exists} ) {
+	    	    CTX('log')->log(
+					MESSAGE => "Usable cert for type $type exists ($cert_id) ",
+					PRIORITY => 'info',
+					FACILITY => [ 'system' ],
+				);
+	    	}
     	}
     	
     	# index by type
@@ -1074,6 +1076,7 @@ sub sc_analyze_smartcard {
 		);
 	    $result->{PROCESS_FLAGS}->{will_need_pin} = 1;
 	}
+	
 
 	if (scalar keys %{$missing_certs_on_token_by_type{$type}->{identifier}} > 0) {
 	    ##! 16: 'certs missing on token: ' . Dumper $missing_certs_on_token_by_type{$type}->{identifier}
@@ -1093,6 +1096,7 @@ sub sc_analyze_smartcard {
 	    $result->{PROCESS_FLAGS}->{will_need_pin} = 1;
 	}
     }
+
 
     # check if preferred profile is available on token and possibly tell
     # workflow to upgrade certificate
@@ -1126,6 +1130,20 @@ sub sc_analyze_smartcard {
     	}
     }
     }
+    
+    
+    # If expired/invalid certs are left on the token (e.g encryption)
+    # none of the two above checks raises the "red" flag - check that now
+    foreach my $type (keys %{$result->{CERT_TYPE}}) {
+    	if (!$result->{CERT_TYPE}->{$type}->{usable_cert_exists}) {
+    		$result->{OVERALL_STATUS} = $self->_aggregate_visual_status('red');
+    		$result->{PROCESS_FLAGS}->{will_need_pin} = 1;    		
+    	} elsif (!$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert}) {
+    		# soft renewal
+    		$result->{OVERALL_STATUS} = $self->_aggregate_visual_status($result->{OVERALL_STATUS}, 'amber');
+    	}
+    }
+    
     
     # Post process - schedule unused certificates for revocation if configured
     # We loop through all certificates found in the database and check them one by one
