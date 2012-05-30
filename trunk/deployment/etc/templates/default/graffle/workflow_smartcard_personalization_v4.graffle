@@ -209,7 +209,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{0, 769}, {91, 14}}</string>
+					<string>{{0, 769}, {101, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -396,7 +396,7 @@ Smartcard Personalization}</string>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2012-05-25 14:29:50 +0000</string>
+	<string>2012-05-30 15:21:27 +0000</string>
 	<key>Modifier</key>
 	<string>Martin Bartosch</string>
 	<key>NotesVisible</key>
@@ -24398,6 +24398,8 @@ USER INFO REGISTERED}</string>
 					<dict>
 						<key>class</key>
 						<string>OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry</string>
+						<key>ds_encrypt</key>
+						<string>0</string>
 						<key>ds_force</key>
 						<string>1</string>
 						<key>ds_key_param</key>
@@ -26339,7 +26341,7 @@ FETCH CERTIFICATE}</string>
 					<key>Points</key>
 					<array>
 						<string>{73.715477, 207.68112}</string>
-						<string>{73.7155, 222.70566}</string>
+						<string>{73.7155, 222.70564}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -48163,7 +48165,7 @@ SUCCESS}</string>
 		<key>FitInWindow</key>
 		<true/>
 		<key>Frame</key>
-		<string>{{124, 0}, {1114, 1028}}</string>
+		<string>{{114, 0}, {1114, 1028}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
