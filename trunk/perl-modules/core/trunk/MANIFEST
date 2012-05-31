@@ -80,6 +80,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Engine/GOST.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/nCipher.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/OpenSSL.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/PKCS11.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Engine/SafeNetProtectServer.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Config.pm
 OpenXPKI/Crypto/Backend/OpenSSL/XS.pm
 
