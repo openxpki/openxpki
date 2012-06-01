@@ -170,7 +170,7 @@ var SSC_VIEW = new Class(
 				{status: 'showStatusActSuccess', handler: function(){
 									this.setInfoRight('IT_Info','I_fullyOperational');
 									this.setInfoTitle('T_Analyse');
-									this.setPrompt('P_insertCard');								
+									this.setPrompt('P_wait');								
 									sscModel.readCard(sscModel.cardID ,this.handleStatus);}},
 			   
 				
@@ -1377,7 +1377,7 @@ var SSC_VIEW = new Class(
 						 
 						 this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);				 
 						 this.setNextAction('T_testPrivateKey',this.processTestPrivateKey, true);
-						 alert("stop right here");
+						 
 						 return;
 					}else if(res === "PINLockedError"){
 						this.showAuthPersonDlg();
@@ -1472,7 +1472,7 @@ var SSC_VIEW = new Class(
 				window.dbg.log('cleanUpCard ');
 				var self = this;
 				sscModel.sc_card_cleanup(function(rc){
-											if (rc === 'success'){self.setInfoTitle('T_cleanupSuccess');} 
+											if (rc === 'SUCCESS'){self.setInfoTitle('T_cleanupSuccess');} 
 											else {self.setInfoTitle('T_cleanupFailed');}
 											self.setNextAction('',null, false);
 											$('infoMore').empty();

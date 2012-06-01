@@ -182,15 +182,16 @@ CERTS:
 			},
 		);
 
-		$msg =
-		  $c->send_receive_command_msg( 'create_workflow_instance', \%params, );
-
+		
+		$msg = $c->send_receive_command_msg( 'create_workflow_instance', \%params, );
+		$log->error( Dumper($msg) ); 
 		if ( $self->is_error_response($msg) ) {
 			$responseData->{'error'} = "error";
 			push(
 				@{$errors},
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_CREATE_PERSONALIZATION_WORKFLOW"
 			);
+			$responseData->{'ERRORLIST'} = $msg;
 			$log->error(
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_CREATE_PERSONALIZATION_WORKFLOW"
 			);
@@ -267,7 +268,7 @@ CERTS:
 		
 		my $WFinfo = $self->wf_status( $c, $wf_ID , $wf_type);
 		
-		$log->debug(Dumper($WFinfo));
+		#$log->debug(Dumper($WFinfo));
 		
 		if(defined $self->param("userAccount") && $self->param("userAccount") ne ''  ){
 			
@@ -284,7 +285,8 @@ CERTS:
 		  );
 		  
 		if ( $self->is_error_response($msg) ) {
-			$log->debug(Dumper($msg));
+			#$log->debug(Dumper($msg));
+			$responseData->{'ERRORLIST'} = $msg;
 			$responseData->{'error'} = "error";
 			push(
 				@{$errors},
@@ -334,6 +336,7 @@ CERTS:
 
 		if ( $self->is_error_response($msg) ) {
 			$responseData->{'error'} = "error";
+			$responseData->{'ERRORLIST'} = $msg;
 			push(
 				@{$errors},
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_WRITE_PUK_STATUS"
@@ -418,6 +421,7 @@ CERTS:
 
 		if ( $self->is_error_response($msg) ) {
 			$responseData->{'error'} = "error";
+			$responseData->{'ERRORLIST'} = $msg;
 			push(
 				@{$errors},
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_UPLOAD_CSR"
@@ -476,6 +480,7 @@ CERTS:
 
 		if ( $self->is_error_response($msg) ) {
 			$responseData->{'error'} = "error";
+			$responseData->{'ERRORLIST'} = $msg;
 			push(
 			@{$errors},
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_CERT_INST_OK"
@@ -528,6 +533,7 @@ CERTS:
 	
 			if ( $self->is_error_response($msg) ) {
 				$responseData->{'error'} = "error";
+				$responseData->{'ERRORLIST'} = $msg;
 				push(
 					@{$errors},
 	"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_CERT_DEL_STATUS"
@@ -651,6 +657,7 @@ CERTS:
 	
 				if ( $self->is_error_response($msg) ) {
 					$responseData->{'error'} = "error";
+					$responseData->{'ERRORLIST'} = $msg;
 					push(
 						@{$errors},
 	"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCH_P12_PW"
@@ -1244,11 +1251,13 @@ CERTS:
 	
 			if ( $self->is_error_response($msg) ) {
 				$responseData->{'error'} = "error";
+				$responseData->{'ERRORLIST'} = $msg;
 				push(
 					@{$errors},
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCHPUK"
 				);
 				push( @{$errors}, $msg );
+				 $responseData->{'ERRORLIST'} = $msg;
 				$log->error(
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCHPUK"
 				);
