@@ -31,11 +31,11 @@ html, body {
 	padding:0;
 }
 a.active, a:hover {
-	
+
 	text-decoration:none;
 }
 a {
-	
+
 	text-decoration:none;
 	cursor:pointer;
 }
@@ -67,7 +67,7 @@ a {
 	margin:0 auto;
 	width:994px;
 	position: relative;
-	
+
 }
 #header {
 	position:relative;
@@ -76,7 +76,7 @@ a {
 	height:458px;
 	width:994px;
 	background:url("../img/bar_shadow.gif") no-repeat scroll 0 bottom #FFFFFF;
-	
+
 }
 #topHeader {
 	display:block;
@@ -92,7 +92,7 @@ a {
 	height:216px;
 	padding-left:44px;
 	padding-top:84px;
-	width:950px; 
+	width:950px;
 }
 */
 .headerTitle {
@@ -368,11 +368,11 @@ background: #fff;
 	margin-left: 24px;
 }
 #infoLeftTitle{
-	
+
 }
 
 #infoLeftContent{
-	
+
 }
 
 #infoPrompt{
@@ -483,12 +483,12 @@ background: #fff;
 }
 
 .genCode h2{
-	
+
 	color: #0018A8;
 	text-align: center;
 	width: 300px;
 	line-height: 50px;
-	
+
 }
 
 #actCode1, #actCode2{
@@ -606,8 +606,8 @@ background: #fff;
 	width:100%;
 }
 #T_pin, #T_pin1, #T_pin2{
-	
-	
+
+
 }
 #actionLine {
 	display:block;
@@ -615,8 +615,8 @@ background: #fff;
 	font-size: 18px;
 	width:100%;
 	margin-top:20px;
-	
-	
+
+
 }
 #nextActionDiv{float: right;}
 #backActionDiv{float:left;}
@@ -641,7 +641,7 @@ background: #fff;
 	color: darkred;
 }
 #nextAction a:hover{
-	
+
 	color: #0098DB;
 }
 
@@ -658,6 +658,7 @@ background: #fff;
 	font-size: 14px;
 	line-height:34px;
 	margin-top:10px;
+	display:block;
 }
 
 
@@ -741,7 +742,7 @@ background: #fff;
 }
 .certDetails{
 	font-size: 13px;
-	
+
 }
 .certDetails td{ vertical-align: text-top;}
 .certDetails td:first-child {width: 100px;}
@@ -753,7 +754,7 @@ background: #fff;
 	width:220px;
 	background-color:#FFFFFF;
 	color:#666666;
-	
+
 }
 #infoRightTitle {
 	background: url(../img/dots.gif) repeat-x center bottom;
@@ -768,7 +769,7 @@ background: #fff;
 #infoRightContent {
 	padding: 7px 0px;
 	font-size:13px;
-	
+
 }
 .infoRightContent {
 	font-size:13px;
@@ -883,7 +884,7 @@ background: #fff;
 }
 #popupCloser:hover{opacity: 1;  filter: alpha(opacity=100);}
 .errCodeToggle,
-.errCode, 
+.errCode,
 #errCodeToggle,
 #errCode {
 	font-size: 11px;
@@ -913,7 +914,7 @@ background: #fff;
 #I_Hint_3 p{text-align:left}
 .crdId{width: 450px;}
 
-.crdResult{color: #000}	
+.crdResult{color: #000}
 #windowCloser.active {
   background: url("../img/x_alt_24x24.png") repeat scroll 0 0 transparent;
   color: #666666;

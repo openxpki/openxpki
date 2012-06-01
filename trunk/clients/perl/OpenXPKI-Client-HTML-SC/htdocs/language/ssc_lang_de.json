@@ -60,6 +60,7 @@
 "P_cardNotActivated":"dbSmartcard ist nicht aktiviert",
 "P_cardUnknown":"Smartcard ist unbekannt",
 "P_insertCard":"Bitte f&uuml;hren Sie Ihre dbSmartcard in den Kartenleser ein.",
+"P_wait":"Please wait...",
 "P_insertUePins":"Bitte geben Sie eine andere PIN ein.",
 "P_invalidState":"ung&uuml;ltiger Status",
 "P_noAuthCode":  "Kein Autorisierungscode verf&uuml;gbar",
@@ -73,9 +74,9 @@
 "T_TestCardReset":"dbSmartcard Test Card Reset",
 "T_testPrivateKey":"Smartcard Schl&uuml;ssel-Analyse",
 "T_ChangePin":"PIN &auml;ndern",
-"T_DataPrivacy":"Data Privacy",
-"T_digitalSignature": "Digital Signature",
-"T_DigitalIdentity":"Digital Identity",
+"T_DataPrivacy":"Daten Verschl&uuml;sselung",
+"T_digitalSignature": "Digitale Signatur",
+"T_DigitalIdentity":"Authentifizierung",
 "T_Help":"Kontakt",
 "T_HintTitle":"Hilfreiche Hinweise",
 "T_HintTitleR":"Abschluss der Einrichtung",
@@ -161,8 +162,9 @@
 "I_confOutlook": "Die auf Ihrer dbSmartcard enthaltenen Zertifikate f&uuml;r sichere E-Mail werden mit dem lokalen MS Outlook Profil des auf diesem Rechner angemeldeten Benutzers verkn&uuml;pft. Achtung: Bitte f&uuml;hren Sie diese Aktion nur von Ihrem eigenen Rechner / DoD aus und nur, wenn Sie Besitzer der eingesteckten dbSmartcard ind. Die Konfiguration muss an jedem Rechner / DoD wiederholt werden, an dem Sie MS Outlook verwenden.",
 "T_keyPair": "key pair",
 "T_Card_Out": "Karte entfernt",
-"T_seekingCard": "suche smartcard...",
-"T_pinTitle2": "Aktuelle PIN eingeben"
+"T_seekingCard": "Suche dbSmartcard...",
+"T_pinTitle2": "Aktuelle PIN eingeben",
+"T_OtherKeysTitle": "getestete schl&uuml;ssel ohne Zertifikat"
 
 
 }

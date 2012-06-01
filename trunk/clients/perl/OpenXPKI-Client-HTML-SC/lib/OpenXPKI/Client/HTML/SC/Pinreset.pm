@@ -274,7 +274,7 @@ sub start_pinreset {
                     'WORKFLOW' => $wf_type,
                 },
             );
-           # $log->debug(Dumper($msg));
+           $log->debug(Dumper($msg));
 
             if ( $self->is_error_response($msg) ) {
                 $responseData->{'error'} = "error";

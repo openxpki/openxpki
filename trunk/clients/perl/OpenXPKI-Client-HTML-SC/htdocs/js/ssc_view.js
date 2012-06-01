@@ -319,6 +319,7 @@ var SSC_VIEW = new Class(
 					
 					// set title
 					this.setInfoTitle('T_seekingCard');
+					this.setPrompt('P_insertCard');
 				
 					// set status and info message
 					this.setStatusMsg("I_StartUp", "P_pleaseWait", 'blue');
@@ -650,6 +651,7 @@ var SSC_VIEW = new Class(
 					$('authPers1').style.backgroundColor = "red";
 					$('authPers1').focus();
 					$('authPers1').addEvent('keydown', this._resetInputErr);
+					this.setPrompt('E_Email1Invalid');
 					error = true;
 
 				} else {
@@ -664,15 +666,31 @@ var SSC_VIEW = new Class(
 					if (!error)
 						$('authPers2').focus();
 					error = true;
+					this.setPrompt('E_Email2Invalid');
 
 				} else {
 					$('authPers2').style.backgroundColor = "white";
 				}
+				
+				if (this.authPers1 === this.authPers2 ) {
+
+					$('authPers2').style.backgroundColor = "red";
+					$('authPers2').addEvent('keydown', this._resetInputErr);
+					if (!error)
+						$('authPers2').focus();
+					error = true;
+					this.setPrompt('E_EmailEqual');
+
+				} else {
+					$('authPers2').style.backgroundColor = "white";
+				}
+				
+				
 
 				if (error) {
 					this.setStatusMsg('T_idle','', 'idle');
 					this.setOverallStatus('red');
-					this.setPrompt('E_invalidEmail');
+					
 					// same action again
 					
 					if (sscModel.user.cardActivation){
@@ -852,6 +870,7 @@ var SSC_VIEW = new Class(
 						if (!error)
 							$('pin').focus();
 						error = true;
+						this.setPrompt('E_currentPinInvalid');
 					} else {
 						$('pin').style.backgroundColor = "white";
 					}
@@ -874,12 +893,16 @@ var SSC_VIEW = new Class(
 				// save pin 1...
 				this.pin1 = $('pin1').value;
 				// ... and check length
-				if (this.pin1.length < 4) {
+				if (this.pin1.length < 4  ) {
 					$('pin1').style.backgroundColor = "red";
 					$('pin1').addEvent('keydown', this._resetInputErr);
 					if (!error)
 						$('pin1').focus();
-					error = true;
+					
+					if(!error){
+						this.setPrompt('E_Pin1Invalid');
+					}
+					error = true;		
 				} else {
 					$('pin1').style.backgroundColor = "white";
 				}
@@ -892,7 +915,10 @@ var SSC_VIEW = new Class(
 					$('pin2').addEvent('keydown', this._resetInputErr);
 					if (!error)
 						$('pin2').focus();
-					error = true;
+					if(!error){
+						this.setPrompt('E_Pin2Invalid');
+					}
+					error = true;					
 				} else {
 					$('pin2').style.backgroundColor = "white";
 				}
@@ -901,7 +927,7 @@ var SSC_VIEW = new Class(
 				if (error) {
 					this.setStatusMsg('T_idle','', 'idle');
 					this.setOverallStatus('red');
-					this.setPrompt('E_invalidPins');
+					
 					// same action again
 					this.setNextAction('T_enterPins', this.processPins, true);
 					this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
@@ -1238,9 +1264,144 @@ var SSC_VIEW = new Class(
 			   sscModel.sc_test_card(pin,this.testPrivateKeyCB);
 			},
 			
-			testPrivateKeyCB : function(r){
+			testPrivateKeyCB : function(testresults, res){
 				window.dbg.log('testPrivateKeyCB');
 				
+				this.setInfoTitle('T_StatusTitle');
+				var infoHtml = '';
+				
+				var user = sscModel.getUserInfo();
+				var enableReset = false;
+				
+				this.setPrompt();
+				this.dataPrivacyHtml = this.digitalSignatureHtml = this.digitalIdHtml = this.otherCertsHtml = this.testedKeysHtml = '';
+				this.digitalIdStatus = this.otherCertsStatus = this.digitalSignatureStatus =  this.dataPrivacyStatus = this.OtherKeyStatus = 'green';
+		
+				
+				if (res === "SUCCESS") {
+				//if (user !== undefined && user.certs !== undefined && user.certs.length > 0){
+					this._certs2Html(user.parsedCerts,true);
+					
+					if (this.digitalIdHtml){				
+						infoHtml += this._createInfoAccordionEntry(this._tr('T_DigitalIdentity'),
+																	  'certStatus_'+this.digitalIdStatus,
+																	  this.digitalIdHtml);
+					}
+					
+					if (this.dataPrivacyHtml){	
+						infoHtml += this._createInfoAccordionEntry(this._tr('T_DataPrivacy'),
+																	  'certStatus_'+this.dataPrivacyStatus,
+																	  this.dataPrivacyHtml);
+					}
+					if (this.digitalSignatureHtml){	
+						infoHtml += this._createInfoAccordionEntry(this._tr('T_digitalSignature'),
+																	  'certStatus_'+this.digitalSignatureStatus,
+																	  this.digitalSignatureHtml);
+					}
+					
+					if ( this.otherCertsHtml){
+							infoHtml += this._createInfoAccordionEntry(this._tr('T_OtherCerts'),
+									 								 'certStatus_'+this.otherCertsStatus,
+																	  this.otherCertsHtml);
+					}
+					
+			
+					var otherKeysHtml = '';
+					
+					for(var i=0; i < testresults.length ; i++ ){
+						window.dbg.log('testresults[i].CERT_FOUND '+ testresults[i].CERT_FOUND);
+						if(testresults[i].CERT_FOUND === false){
+							otherKeysHtml   =  otherKeysHtml + '<tr><td>'+ testresults[i].PRIVATE_KEY_TEST_RESULT + ' </td><td>' + testresults[i].MODULUS_HASH
+							+ '</td></tr>' ;
+							if(testresults[i].PRIVATE_KEY_TEST_RESULT !== 'PASS_NOCERT' ){
+								this.OtherKeyStatus = 'red';
+							}
+						}
+						
+						if( testresults[i].PRIVATE_KEY_TEST_RESULT !== 'PASS' ){
+							window.dbg.log('enable fixcard PRIVATE_KEY_TEST_RESULT '+ testresults[i].PRIVATE_KEY_TEST_RESULT);
+							enableReset = true;
+						}
+							
+					}
+					window.dbg.log('otherKeysHtml:'+otherKeysHtml+'  end');
+					
+					if(otherKeysHtml !== '' ){
+						
+						
+						html   = '<div class="certInfo">'
+							+ '<div class="certSubject">' 
+							+ this._tr('T_OtherKeysTitle') 
+							+ '</div>'
+
+							+ '<table class="certDetails">'
+						//	+ subject
+						//	+ '<tr><td>Validity</td><td>'
+							+ otherKeysHtml ;
+		
+							
+							html  = html + '</table>' + '</div>'; ;
+
+							this.testedKeysHtml = html;
+						
+					}
+					
+					if ( this.testedKeysHtml !== ''){
+						infoHtml += this._createInfoAccordionEntry(this._tr('T_OtherKeys'),
+								 								 'certStatus_'+this.OtherKeyStatus,
+																  this.testedKeysHtml);
+					}
+
+					this._createInfoAccordion(infoHtml);
+					
+					if(!enableReset){
+						this.setPrompt('T_Private_keys_working');
+						this.setInfoRight('IT_Info', 'I_workingKeys');
+						this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true)
+						
+					}else{
+						this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true)
+						this.setInfoRight('IT_Info', 'I_brokenKey');
+						this.setNextAction('P_cleanupCard', this.cleanUpCard, true);
+					}
+					
+					
+				}else{
+					
+					if (res === "WrongPINError" ){
+						 this.setPrompt('T_pinError');
+							$('pin').style.backgroundColor = "red";
+							$('pin').focus();
+							$('pin').addEvent('keydown', this._resetInputErr);
+							
+						 
+						 this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);				 
+						 this.setNextAction('T_testPrivateKey',this.processTestPrivateKey, true);
+						 alert("stop right here");
+						 return;
+					}else if(res === "PINLockedError"){
+						this.showAuthPersonDlg();
+						// set title
+						this.setInfoTitle('T_ScActivationStepFailureRestartUnblock');
+						// set right info text
+						sscView.setInfoRight('IT_Info', 'I_unblock');
+						// set next & back action
+						this.setNextAction('T_cardUnblock', this.processAuthPersons, true);
+						this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
+	 
+						this.setPrompt('T_cardBlocked');
+						
+						
+						
+					}else{
+						this.setPrompt('');
+					}
+					
+					
+				}
+				
+				
+	/*			
 				var results = new Querystring(r);
 				var set = results.get("Result");
 				var reason = results.get("Reason");  
@@ -1300,14 +1461,10 @@ var SSC_VIEW = new Class(
 						});
 				});
 				
-				if(result === 'PASS'){
-					this.setInfoRight('IT_Info', 'I_workingKeys');
-					this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true)
-					
-				}else{
-					this.setInfoRight('IT_Info', 'I_brokenKey');
-					this.setNextAction('P_cleanupCard', this.cleanUpCard, true);
-				}
+				
+		
+				
+				*/
 
 			},
 			
@@ -2197,12 +2354,12 @@ var SSC_VIEW = new Class(
 				$('popupFrame').style.display = 'block';
 				var el = $('errCodeToggle');
 				if (el){
-					console.log(el);
+					window.dbg.log(el);
 					var mySlide = new Fx.Slide('errCode');
 					mySlide.hide();
 					el.addEvent('click', function(event){
 											event.stop();
-											console.log('click');
+											window.dbg.log('click');
 											mySlide.toggle();
 					});
 				}
@@ -2225,7 +2382,7 @@ var SSC_VIEW = new Class(
 			// -----------------------------------------------------------
 			// formater methods
 			// -----------------------------------------------------------
-			_certs2Html : function(certs) {
+			_certs2Html : function(certs, privatekeytest) {
 				
 				var html = '';
 				var title = '';
@@ -2273,40 +2430,83 @@ var SSC_VIEW = new Class(
 							+ '<tr><td>Serial</td><td>'
 							+ certs[i].CERTIFICATE_SERIAL + '</td></tr>'
 							+ '<tr><td>Issuer</td><td>' + certs[i].ISSUER_DN
-							+ '</td></tr>' + '</table>' 
-							
-							+ '</div>';
-					window.dbg.log(html);	
+							+ '</td></tr>' ;
+					if(typeof certs[i].PRIVATE_KEY_TEST_RESULT === 'string' ){
+						html   =  html + '<tr><td>'+ certs[i].PRIVATE_KEY_TEST_RESULT + ' </td><td>' + certs[i].MODULUS_HASH
+								+ '</td></tr>' ;
+					}		
 					
+							
+							html  = html + '</table>' + '</div>'; ;
+							
+							
+					window.dbg.log(html);	
+					if(!privatekeytest){
 					// setStatus
 					switch(certType){
 					case 1:
 						this.dataPrivacyHtml += html;
+						window.dbg.log("dataPrivacyStatus:"+ certs[i].VISUAL_STATUS);	
 						if (certs[i].VISUAL_STATUS === 'green' && this.dataPrivacyStatus === 'red'){
 						    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
 						}
 						break;
 					case 2:
 						this.digitalIdHtml += html;
+						window.dbg.log("digitalIdStatus:"+ certs[i].VISUAL_STATUS);	
 						if (certs[i].VISUAL_STATUS !== 'green' && this.digitalIdStatus !== 'red'){
 						    this.digitalIdStatus = certs[i].VISUAL_STATUS;
 						}
 						break;
 					case 3:
 						this.otherCertsHtml += html;
+						window.dbg.log("otherCertsHtml:"+ certs[i].VISUAL_STATUS);	
 						if (certs[i].VISUAL_STATUS !== 'green' && this.otherCertsStatus !== 'red'){
 						   // this.otherCertsStatus = certs[i].VISUAL_STATUS;
 						}
 						break;
 					case 4:	
 						this.digitalSignatureHtml += html;
+						window.dbg.log("dataPrivacyStatus:"+ certs[i].VISUAL_STATUS);	
 						if (certs[i].VISUAL_STATUS === 'green' && this.digitalSignatureStatus !== 'red'){
-						    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
+						    this.digitalSignatureStatus = certs[i].VISUAL_STATUS;
 						}
 						break;
 					}
-					
-					
+					}else{
+						// setStatus for private key test , different logic whenever a certificate was red mark section as red 
+						switch(certType){
+						case 1:
+							this.dataPrivacyHtml += html;
+							window.dbg.log("dataPrivacyStatus:"+ certs[i].VISUAL_STATUS);	
+							if (certs[i].VISUAL_STATUS !== 'green' && this.dataPrivacyStatus === 'green'){
+							    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
+							}
+							break;
+						case 2:
+							this.digitalIdHtml += html;
+							window.dbg.log("digitalIdStatus:"+ certs[i].VISUAL_STATUS);	
+							if (certs[i].VISUAL_STATUS !== 'green' && this.digitalIdStatus === 'green'){
+							    this.digitalIdStatus = certs[i].VISUAL_STATUS;
+							}
+							break;
+						case 3:
+							this.otherCertsHtml += html;
+							window.dbg.log("otherCertsHtml:"+ certs[i].VISUAL_STATUS);	
+							if (certs[i].VISUAL_STATUS !== 'green' && this.otherCertsStatus === 'green'){
+							    this.otherCertsStatus = certs[i].VISUAL_STATUS;
+							}
+							break;
+						case 4:	
+							this.digitalSignatureHtml += html;
+							window.dbg.log("dataPrivacyStatus:"+ certs[i].VISUAL_STATUS);	
+							if (certs[i].VISUAL_STATUS !== 'green' && this.digitalSignatureStatus === 'green'){
+							    this.digitalSignatureStatus = certs[i].VISUAL_STATUS;
+							}
+						}
+						
+						
+					}//end privatekey test status
 				}
 			window.dbg.log("leaving _certs2Html");
 			},
