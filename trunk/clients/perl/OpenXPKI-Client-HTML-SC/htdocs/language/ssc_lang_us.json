@@ -146,7 +146,7 @@
 "I_enableSSO": "If your dbSmartcards supports this and cardSSO gets enabled successfully, it reduces the number of times you need to enter your PIN during one windows session. ",
 "T_outlook": "Enable Secure E-mail",
 "P_outlook": "Associate your dbSmartcard with MS Outlook",
-"IT_confOutlook": "Enable secure e-mail",
+"IT_confOutlook": "Enable db-SecureEmail",
 "P_privatekeyresults": "Private Key Test Results",
 "P_cleanupCard": "fix dbSmartcard",
 "I_confOutlook": "The secure e-mail certificates which are stored on your dbSmartcard are going to be associated with the local MS Outlook profile for the user which is currently logged-in to this Computer. Caution: Only perform this action on your own computer / DoD and only if you are the owner of the inserted dbSmartcard. The configuration has to be repeated for every computer / DoD which you are using with MS Outlook.",

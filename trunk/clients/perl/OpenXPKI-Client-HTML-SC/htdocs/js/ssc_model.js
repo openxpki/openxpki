@@ -784,10 +784,15 @@ var SSC_MODEL = new Class(
 					// '<br>' + data.errors[i] ; }
 					// I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_GET_CARD_STATUS
 					var errorList =null;
+					try{
+						errorList = data.msg.LIST;
+					}catch(e){
+						errorList = ["no error msg found"];
+					}
 					
 					
 					try {
-						errorList = data.msg.LIST;
+						
 						window.dbg.log("server_cb_cardstatus error");
 						
 						
@@ -1689,8 +1694,17 @@ var SSC_MODEL = new Class(
 					
 					
 				} else {
-
+					var errorList =null;
 					for ( var i = 0; i < data.errors.length; i++) {
+						
+						
+						
+						try {
+							errorList = data.ERRORLIST.LIST;
+						}catch (e){
+							
+						}
+						
 						if (data.errors[i] === '18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CARDID_NOTACCEPTED') {
 							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 							sscView.showPopUp('E_card_id_error', 'cross',
@@ -1706,8 +1720,8 @@ var SSC_MODEL = new Class(
 						}
 						else {
 							this.ajax_log('server_personalization_loop: '+ data.errors[i], 'error');
-							sscView.showPopUp('E_process-unknown-backend-error</br>'
-									+ data.errors[i], 'cross', '0212');
+													
+							sscView.showPopUp('E_process-unknown-backend-error</br>', 'cross',this.errors2htmlstring(errorList) );
 							this.ajax_log('server_personalization_loop: '+data.errors[i], 'error');
 							viewCb('error');
 						}
@@ -1735,19 +1749,20 @@ var SSC_MODEL = new Class(
 			
 			sc_card_cleanup : function (viewCB){
 				window.dbg.log("sc_card_cleanup");
-				alert("missing plugin function");
-		/*
-				var res = this.PKCS11Plugin.CheckCardPresence(this.cardID);
+	
+				var res = this.PKCS11Plugin.ResetToken(cardID,this.userPIN, "" );
 				
 				var results = new Querystring(res);
 
 				var set = results.get("Result");
 				if (set == "SUCCESS"){
+					viewCB(set);
 					return true;
 				}else{
+					viewCB(set);
 					return false;
 				}
-	*/		
+			
 				
 			},
 
@@ -2711,6 +2726,9 @@ var SSC_MODEL = new Class(
 			},
 			
 			errors2htmlstring: function (list){
+				
+				window.dbg.log(typeof list);
+				if(list !== null  || list !== '' )
 				var html = '';
 				for ( var i = 0; i < list.length; i++) {
 					html = html + list[i].LABEL + '<br />';

@@ -18,6 +18,7 @@ use OpenXPKI::Client;
 use Config::Std;
 use OpenXPKI::i18n qw( i18nGettext );
 use Data::Dumper;
+use Log::Log4perl qw(:easy);
 use OpenXPKI::Client::HTML::SC::Dispatcher qw( config );
 
 use base qw(
@@ -56,6 +57,18 @@ sub getauthcode {
     # DB WebSSO sets an environment variable according to the logged in user
     my $userid = $self->{r}->headers_in()->get('ct-remote-user');
     $responseData->{'userlogin'} = $userid;
+        if(Log::Log4perl->initialized()) {
+        # Yes, Log::Log4perl has already been initialized
+        $responseData->{'log4perl init'} = "YES";
+    } else {
+   		 Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
+        # No, not initialized yet ...
+         $responseData->{'log4perl init'} = "NO";
+    }
+    
+
+   my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+   $log->info("getauthcode user: " . $userid  );
 
     if ( !defined $userid || $userid eq '' ) {
         push(
@@ -102,6 +115,7 @@ sub getauthcode {
         #             $responseData->{'error'} = $responseData->{'error'}
         #               . "I18N_OPENXPKI_CLIENT_ERROR_CANT_CONNECT_TO_PKI";
         $responseData->{'error'} = "error";
+        $log->error("getauthcode  " . Dumper( $c )  );
         my $r = push(
             @{$errors},
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI"
@@ -121,6 +135,7 @@ sub getauthcode {
 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_WFSTATUS_ERROR_CANT_GET_WORKFLOW_INFO'
               )
             {
+            	  $log->error("getauthcode  " . Dumper( $msg )  );
                 $responseData->{'error'} = "error";
                 push(
                     @{$errors},
@@ -171,6 +186,7 @@ sub getauthcode {
      	if( defined $code->{error} &&  $code->{error} eq 'error' )
      	{
       	    $responseData->{'error'} = "error";
+      	      $log->error("getauthcode  " . Dumper( $code )  );
             my $r = push(
                 @{$errors},
 				 pop(@{$code->{errors}})
