@@ -57,7 +57,8 @@
 "P_cardBlocked":"dbSmartcard is blocked",
 "P_cardNotActivated":"dbSmartcard is not activated",
 "P_cardUnknown":"Smartcard is unknown",
-"P_insertCard":"Please wait...",
+"P_wait":"Please wait...",
+"P_insertCard":"Please insert your dbSmartcard.",
 "P_insertUePins":"Please enter a different PIN",
 "P_invalidState":"Invalid state",
 "P_noAuthCode":"No authcode available",
@@ -72,8 +73,8 @@
 "T_TestCardReset":"dbSmartcard Test Card Reset",
 "T_ChangePin":"Change PIN",
 "T_digitalSignature": "Digital Signature",
-"T_DataPrivacy":"Data Privacy",
-"T_DigitalIdentity":"Digital Identity",
+"T_DataPrivacy":"Data Encryption",
+"T_DigitalIdentity":"Authentication",
 "T_Help":"Contact",
 "T_HintTitle":"Helpfull Hints",
 "T_Info":"Information",
@@ -153,7 +154,9 @@
 "T_Card_Out": "Card removed",
 "T_seekingCard": "Seeking smartcard...",
 "E_IE-Error_Protected": "no access to smartcard reader possible",
-"T_pinTitle2": "Enter current PIN"
+"T_pinTitle2": "Enter current PIN",
+"T_OtherKeysTitle": "tested keys without a certificate"
+
 
 
 }

@@ -201,11 +201,11 @@ $responseData->{'sc'} = Dumper($session->{"c"});
     	};
     	
    # $log->info("label:" . Dumper($msg->{LIST})  ); 	
-	# $log->info(Dumper($msg)); 
+	
 	
     if ( $self->is_error_response($msg) ) {
-    	
-    	$log->info("label: ". $msg->{LIST}->[0]->{'LABEL'});
+    	#$log->info(Dumper($msg)); 
+    	#$log->error("label: ". $msg->{LIST}->[0]->{'LABEL'});
     	
     	if( $msg->{LIST}->[0]->{'LABEL'} eq "I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED" ){
         	        push( @{$errors},
@@ -215,9 +215,8 @@ $responseData->{'sc'} = Dumper($session->{"c"});
         }else{
         	$responseData->{'error'} = "error";
       
-        	push( @{$errors},
-            "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_GET_CARD_STATUS" );
-        	$log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_GET_CARD_STATUS");
+        	push( @{$errors}, $msg->{LIST}->[0]->{'LABEL'} );
+        	$log->error($msg->{LIST}->[0]->{'LABEL'});
         }      
         
   
