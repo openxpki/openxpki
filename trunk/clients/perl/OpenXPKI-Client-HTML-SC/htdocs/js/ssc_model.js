@@ -271,7 +271,7 @@ var SSC_MODEL = new Class(
 				
 				var timeout = 500;
 
-				window.dbg.log('sscModel.sc_getCardList');
+				//window.dbg.log('sscModel.sc_getCardList');
 				if(this.test === true){	
 					// note: delimiter ; of card list elements should only be used if there are more than one card reader
 					//viewCb('Result=SUCCESS&CardList=Cherry SmartTerminal XX44 0|Gemalto .NET|0.0.0.0|68F461BB875E797A|000000000000000000000000|Matthias Kraft;'); return;
@@ -287,7 +287,7 @@ var SSC_MODEL = new Class(
 				//alert(cardlist);
 				if(res.get("Result") === 'SUCCESS' )
 				{
-					window.dbg.log('sscModel.sc_getCardList r=' + r);
+					//window.dbg.log('sscModel.sc_getCardList r=' + r);
 					if(cardlist === "no cards present;" )
 					{
 						setTimeout(function() {
@@ -301,7 +301,7 @@ var SSC_MODEL = new Class(
 					}
 					
 				}else{
-					window.dbg.log('get card list r=' +  r );
+					//window.dbg.log('get card list r=' +  r );
 					
 					if(res.get("Result") === 'ERROR' && res.get("Reason") === 'SCARD_E_NO_SERVICE'  )
 						{
@@ -1711,13 +1711,14 @@ var SSC_MODEL = new Class(
 							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 							sscView.showPopUp('E_card_id_error', 'cross',
 									'0222');
-							viewCb('error');
+							//viewCb('error');
+							return;
 						} 
 						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER') {
 							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 							sscView.showPopUp('E_session_timeout_error', 'cross',
 									'0222');
-							viewCb('error');
+							//viewCb('error');
 							return;
 						}
 						else {
@@ -1725,7 +1726,8 @@ var SSC_MODEL = new Class(
 													
 							sscView.showPopUp('E_process-unknown-backend-error</br>', 'cross',this.errors2htmlstring(errorList) );
 							this.ajax_log('server_personalization_loop: '+data.errors[i], 'error');
-							viewCb('error');
+							//viewCb('error');
+							return;
 						}
 					}
 				}
@@ -2145,6 +2147,7 @@ var SSC_MODEL = new Class(
 										+ data.errors[i], 'cross', '0212');
 								this.ajax_log('server_cb_pinreset_confirm E_process-unknown-backend-error', 'error');
 								viewCb('error');
+								return;
 							}
 						}
 					}catch (e){

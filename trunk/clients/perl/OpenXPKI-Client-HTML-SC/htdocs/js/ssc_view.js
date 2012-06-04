@@ -514,9 +514,7 @@ var SSC_VIEW = new Class(
 					this.stopCardObserver();
 					$('infoMore').empty();
 					this.showPopUp('T_Card_Out', '', '0906 - card ejected', true);
-					this.setPrompt('');
-					
-					
+					this.setPrompt('P_insertCard');
 					this.setInfoTitle('T_seekingCard');
 					$('infoPrompt').style.display = 'block';
 					
