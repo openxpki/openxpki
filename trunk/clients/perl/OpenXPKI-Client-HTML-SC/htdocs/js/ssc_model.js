@@ -152,7 +152,7 @@ var SSC_MODEL = new Class(
 					this.PKCS11Plugin = $('PKCS11Plugin');
 					// check for funtion GetCardList, should return unknown if plugin is loaded, otherwise undefined
 					if (typeof this.PKCS11Plugin.GetCardList === 'undefined'){
-						sscView.showPopUp('E_ax-failure', 'cross', '0001');
+						sscView.showPopUp('E_ax-failure', 'cross', '0001' , false);
 						rc = false;
 						
 					} else if (this.PKCS11Plugin === null || this.PKCS11Plugin === 0) {
@@ -794,10 +794,9 @@ var SSC_MODEL = new Class(
 					try {
 						
 						window.dbg.log("server_cb_cardstatus error");
-						
-						
+								
 						for ( var i = 0; i < data.errors.length; i++) {
-							I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CARDID_NOTACCEPTED
+						
 							if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CARDID_NOTACCEPTED') {
 								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 								//sscView.showPopUp('E_card_id_error', 'cross',	'0222');
@@ -855,7 +854,10 @@ var SSC_MODEL = new Class(
 								viewCb('error');
 							}
 						}
+						
 					} catch (e) {
+						window.dbg.log('Error handling failed');
+						
 					}
 
 					//sscView.showPopUp('E_backend-Error', 'cross', '0200');
