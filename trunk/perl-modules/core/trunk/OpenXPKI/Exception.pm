@@ -7,7 +7,6 @@ package OpenXPKI::Exception;
 
 use strict;
 use warnings;
-#use diagnostics;
 use utf8;
 
 use OpenXPKI::Debug;
@@ -215,7 +214,7 @@ This is the basic exception class of OpenXPKI.
 =head1 Intended use
 
 OpenXPKI::Exception->throw (message => "I18N_OPENXPKI_FAILED",
-                            child   => $other_exception,
+                            children  => [$other_exception],#opt.
                             params  => {FILENAME => $file});
 
 if (my $exc = OpenXPKI::Exception->caught())
