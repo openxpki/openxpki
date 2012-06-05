@@ -14,6 +14,7 @@ use utf8;
 # use Smart::Comments;
 
 use English;
+use Errno;
 use OpenXPKI::Debug;
 use OpenXPKI::i18n qw(set_language set_locale_prefix);
 use OpenXPKI::Exception;
@@ -30,7 +31,7 @@ use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Dispatcher;
 use OpenXPKI::Workflow::Factory;
-
+use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Context qw( CTX );
                 
 use OpenXPKI::Crypto::X509;
@@ -75,8 +76,10 @@ my @init_tasks = qw(
   authentication
   notification
   server
+  watchdog
+  
 );
-
+#
 
 my %is_initialized = map { $_ => 0 } @init_tasks;
 
@@ -280,6 +283,8 @@ sub __do_init_log {
 }
 
 
+
+
 sub __do_init_prepare_daemon {
     ##! 1: "init prepare daemon"
 
@@ -462,6 +467,7 @@ sub __do_init_dbi_log {
     CTX('dbi_log')->connect();
 }
 
+
 sub __do_init_acl {
     ### init acl...
     OpenXPKI::Server::Context::setcontext(
@@ -498,6 +504,7 @@ sub __do_init_authentication {
 sub __do_init_server {
     my $keys = shift;
     ### init server ref...
+    ##! 16: '__do_init_server: ' . Dumper($keys)
     if (defined $keys->{SERVER}) {
 	OpenXPKI::Server::Context::setcontext(
 	    {
@@ -514,6 +521,16 @@ sub __do_init_notification {
     });
     return 1;
 }
+
+sub __do_init_watchdog{
+    my $keys = shift;
+    
+    my $Watchdog = OpenXPKI::Server::Watchdog->new( $keys );
+    $Watchdog->run();
+    
+    
+}
+
 
 ###########################################################################
 
