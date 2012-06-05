@@ -345,6 +345,7 @@ sub __do_init_workflow_bulk_keys {
 		    'certs_to_install'        => 1,
 		    'certs_to_delete'         => 1,
 		    'certs_to_unpublish'      => 1,
+		    'certs_to_revoke'         => 1,
 		    'ldap_dbntloginid'        => 1,
                     'tmp_queue'               => 1,
                 },
