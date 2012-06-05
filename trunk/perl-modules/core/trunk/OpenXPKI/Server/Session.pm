@@ -12,12 +12,15 @@ use utf8;
 use English;
 use OpenXPKI::Exception;
 use OpenXPKI::i18n;
-
+use OpenXPKI::Serialization::Simple;
 ## switch off IP checks
 use CGI::Session qw/-ip-match/;
 use Digest::SHA1 qw( sha1_hex );;
 
 ## constructor and destructor stuff
+
+
+
 
 sub new {
     my $that = shift;
@@ -95,6 +98,48 @@ sub new {
 
     return $self;
 }
+
+sub export_serialized_info{
+    my $self = shift;
+    my %info;
+    my @import_keys = $self->_get_import_keys();
+    foreach my $key (@import_keys){
+        $info{$key} = $self->{session}->param($key);
+    }
+    return $self->_get_serializer()->serialize(\%info);
+}
+
+sub import_serialized_info{
+    my $self = shift;
+    my $serialized_string = shift;
+    unless($serialized_string){
+        OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_SESSION_IMPORT_SERIALIZED_STRING_CAN_NOT_BE_EMPTY"
+                );
+    }
+    my $info = $self->_get_serializer()->deserialize($serialized_string);
+    
+    unless(ref $info eq 'HASH'){
+        OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_SESSION_IMPORT_SERIALIZED_STRING_MUST_BE_HASH",
+                params  => {INPUT       => $serialized_string,OUTPUT => $info}
+                );
+    }
+    my @import_keys = $self->_get_import_keys();
+    
+    foreach my $key (@import_keys){
+        $self->{session}->param($key, $info->{$key});
+    }
+}
+
+sub _get_serializer{
+    return OpenXPKI::Serialization::Simple->new();
+}
+
+sub _get_import_keys{
+    return qw(user role);
+}
+
 
 sub delete
 {
