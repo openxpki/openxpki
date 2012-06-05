@@ -393,6 +393,11 @@ sub authorize_workflow {
                           ->{READ}->{$type}) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_NO_ACCESS_TO_TYPE',
+                params  => {
+                    'REALM'   => $realm,
+                    'ROLE'    => $role,
+                    'WF_TYPE' => $type,
+                },
             );
         }
         my $allowed_creator_re = $self->{PKI_REALM}->{$realm}->{ACL_WORKFLOW}->{$role}->{READ}->{$type}->{CREATOR};
