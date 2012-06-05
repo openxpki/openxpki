@@ -115,6 +115,8 @@ sub new
 	    $self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
 	    delete $self->{PARAMS}->{group};
     }
+    
+    
 
     unlink ($self->{PARAMS}->{socketfile});
     CTX('log')->log(
@@ -903,8 +905,9 @@ sub __log_and_die {
     my $log_message;
     if (ref $error eq 'OpenXPKI::Exception') {
         ##! 16: 'error is exception'
+        $error->show_trace(1);
         my $msg = $error->full_message();
-        $log_message = "Exception during $when: $msg";
+        $log_message = "Exception during $when: $msg ($error)";
     }
     else {
         ##! 16: 'error is something else'
