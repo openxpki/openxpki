@@ -61,7 +61,6 @@ sub server_personalization {
 	my $serverPIN = undef;
 	my $serverPUK = undef;
 	my $oldState;
-	my $serializer     = OpenXPKI::Serialization::Simple->new();
 	my $local_wf_state = '';
 	my $plugincommand = '';
 
@@ -184,7 +183,7 @@ CERTS:
 
 		
 		$msg = $c->send_receive_command_msg( 'create_workflow_instance', \%params, );
-		$log->error( Dumper($msg) ); 
+		#$log->error( Dumper($msg) ); 
 		if ( $self->is_error_response($msg) ) {
 			$responseData->{'error'} = "error";
 			push(
@@ -561,12 +560,13 @@ CERTS:
 		
 		
 		my $WFinfo = $self->wf_status( $c, $wf_ID , $wf_type);
-
+		$local_wf_state = $WFinfo->{PARAMS}->{WORKFLOW}->{STATE}; 
 		#$log->debug(Dumper($WFinfo));
 		
 		$log->info($WFinfo->{PARAMS}->{WORKFLOW}->{STATE});
 		
 		$responseData->{'wf_state'} = $WFinfo->{PARAMS}->{WORKFLOW}->{STATE};
+	
 		
 		if($WFinfo->{PARAMS}->{WORKFLOW}->{STATE} eq 'NEED_NON_ESCROW_CSR')
 		{
@@ -1272,22 +1272,24 @@ CERTS:
 
 		my $PUK     = $serializer->deserialize( $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_puk} );
 				
+		my $WFinfo = $self->wf_status( $c, $wf_ID , $wf_type);
+		$local_wf_state = $WFinfo->{PARAMS}->{WORKFLOW}->{STATE}; 
 		
-		
+		$log->debug('local_wf_state:' . $local_wf_state	);
 		
 		if ( $local_wf_state eq 'PUK_TO_INSTALL' ) {
-			
+			$log->debug('PUK_TO_INSTALL cmd '. Dumper($PUK)	);
 				$responseData->{'action'} = 'install_puk';
 				
 				$plugincommand =
 				    'ChangePUK;CardSerial='
 				  . $session->{'cardID'} . ';PUK='
-				  . $PUK->[1]  . 'NewPUK=' .$PUK->[0]
+				  . $PUK->[1]  . ';NewPUK=' .$PUK->[0]
 				  . ';';
 	
 		}
 		else {
-	#			$log->debug('PUK:' . Dumper($PUK)	);
+				$log->debug('rndPIN cmd PUK:' . Dumper($PUK)	);
 	#			$log->debug('PUK:' . $PUK->[0]	);
 				$plugincommand =
 				    'ResetPIN;CardSerial='
