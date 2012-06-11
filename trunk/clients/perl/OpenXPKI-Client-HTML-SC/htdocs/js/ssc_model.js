@@ -370,9 +370,8 @@ var SSC_MODEL = new Class(
 					this.server_pinrest_verify(pin, authcode1, authcode2, cb);
 				}else{
 					window.dbg.log('sscModel.processAuthCodes invalid PIN retry ' + this.pinResetRetry );
-					sscView.setStatusMsg('I_commSc', "P_pleaseWait", "blue");
-					
-					var r = this.PKCS11Plugin.SimonSays(data.exec,true,"",this.userPIN);
+					sscView.setStatusMsg('I_commSc', "P_pleaseWait", "blue");					
+					var r = this.PKCS11Plugin.SimonSays(this.pinResetRetry,true,this.userPIN);					
 					sscView.setStatusMsg("T_idle", ' ', 'idle');
 					
 					var results = new Querystring(r);
@@ -385,11 +384,11 @@ var SSC_MODEL = new Class(
 						pinSetCount = 0;
 
 						var reqData = "unblock_wfID=" + this.unblock_wfID + "&"
-								+ res;
+								+ r;
 						var server_cb = this.server_cb_pinreset_confirm;
 						var targetURL = "functions/pinreset/pinreset_confirm";
 
-						this.ajax_request(targetURL,  reqData,  server_cb, viewCb);
+						this.ajax_request(targetURL,  reqData,  server_cb, cb);
 						// this.ajax_request("sc/functions/pinreset/pinreset_confirm",server_cb_pinreset_confirm,
 						// res );
 
@@ -399,12 +398,12 @@ var SSC_MODEL = new Class(
 						// alert("ERROR Pinsetcount="+pinSetCount);
 						
 						var reason = results.get("Reason");
-						window.dbg.log("reason " + reason + ' ' + res);
+						window.dbg.log("reason " + reason + ' ' + r);
 
 						if (reason === 'PUKError') {
 							sscView.showPopUp('E_sc-error-resetpin-puk-error ',
 									'cross', '0110');
-							viewCb('error');
+							cb('error');
 							this.ajax_log('processAuthCodes: '+r, 'error');
 							return;
 						} else if (reason === 'PINPolicy') {
@@ -417,13 +416,13 @@ var SSC_MODEL = new Class(
 						// Invalid PIN is an user Error no popup here
 						window.dbg.log("invalid pin" + reason);
 						this.ajax_log('processAuthCodes: '+r, 'error');
-						viewCb('invalidPin');
+						cb('invalidPin');
 						return;
 						}else{
 							
 							sscView.showPopUp('E_sc-error-resetpin-error ',
 									'cross', '0111');
-							viewCb('error');
+							cb('error');
 							this.ajax_log('processAuthCodes: '+r, 'error');
 							return;
 						}
@@ -2203,6 +2202,7 @@ var SSC_MODEL = new Class(
 					var PUK = null;
 					try {	
 							exec = data.exec ;
+							
 						
 					} catch (e) {
 						window.dbg.log('missing data.exec');
