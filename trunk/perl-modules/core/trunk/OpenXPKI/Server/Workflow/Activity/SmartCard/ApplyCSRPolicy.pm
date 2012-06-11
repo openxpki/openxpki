@@ -33,6 +33,11 @@ sub execute {
     my $cert_profile = $config->get( [ 'smartcard.policy.certs.type', $cert_type, 'allowed_profiles.0' ] );
     my $cert_role = $config->get( [ 'smartcard.policy.certs.type', $cert_type, 'role' ] ) || 'User';
     ##! 8: ' Prepare CSR for profile '. $cert_profile .' with role '. $cert_role 
+    CTX('log')->log(
+		    MESSAGE => "Preparing CSR for profile '$cert_profile' with role '$cert_role'",
+		    PRIORITY => 'info',
+		    FACILITY => [ 'workflow' ],
+		    );               
 
     # cert_issuance_data is an array of hashes, one entry per certificate
     
@@ -43,18 +48,28 @@ sub execute {
     # If max_validity is not in context, check if the current cert_type has the lead_validity flag set    
     my $max_validity = $context->param('max_validity');    
     if (!$max_validity && $config->get("smartcard.policy.certs.type.$cert_type.lead_validity")) {
-    
+	CTX('log')->log(
+			MESSAGE => "Certificate of type '$cert_type' is a lead certificate",
+			PRIORITY => 'info',
+			FACILITY => [ 'workflow' ],
+			);               
+	
         # Check for testing override
         my $validity = $config->get("testing.smartcard.max_validity");
         if ($validity) {
             CTX('log')->log(
-                MESSAGE => "Smartcard validity override for testing",
+                MESSAGE => "Certificate validity override for testing: $validity",
                 PRIORITY => 'info',
-                FACILITY => [ 'audit', 'system', ],
+                FACILITY => [ 'audit', 'workflow', ],
             );               
         }  else {        
             # Fetch validity from profile if no testing value is set        
             $validity = $config->get("profile.$cert_profile.validity.notafter");
+            CTX('log')->log(
+                MESSAGE => "Certificate validity configured for profile '$cert_profile': $validity",
+                PRIORITY => 'info',
+                FACILITY => [ 'workflow', ],
+            );               
         }
 
         my $notafter = OpenXPKI::DateTime::convert_date({           
@@ -65,6 +80,11 @@ sub execute {
             })
         });
         ##! 32: ' Set notafter date due to lead_validity flag to ' .$notafter
+	CTX('log')->log(
+			MESSAGE => "Force notafter date to $notafter",
+			PRIORITY => 'info',
+			FACILITY => [ 'workflow' ],
+			);               
         $context->param('notafter' => $notafter);
         $context->param('max_validity' => $notafter);
     }

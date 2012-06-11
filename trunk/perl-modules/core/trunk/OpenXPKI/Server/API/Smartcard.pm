@@ -763,7 +763,7 @@ sub sc_analyze_smartcard {
     			##! 16: 'max number of certificates to retain reached: ' . $max_certs
     		
     			CTX('log')->log(
-			    	MESSAGE => "max number of certificates to retain reached",
+			    	MESSAGE => "Maximum number of certificates to retain reached",
 			        PRIORITY => 'info',
 			        FACILITY => [ 'system' ],
 				);
