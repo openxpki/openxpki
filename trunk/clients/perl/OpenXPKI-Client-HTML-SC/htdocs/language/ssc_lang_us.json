@@ -1,6 +1,6 @@
 {
 "E_session_timeout_error":"Your browser session timed out, please reload the page.",
-"E_ax-failure":"Missing dbSmartcard Plugin, please install via ASD.",
+"E_ax-failure":"Could not find dbSmartcard Plugin V2. Please request via ASD.",
 "E_ax-plugin-double":"ActiveX control already in use",
 "E_ax-plugin-no-status":"ActiveX control load error",
 "E_cardBlocked":"Card blocked, physical access to buildings is disabled. Please contact your ID pass office.",

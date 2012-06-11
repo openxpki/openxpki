@@ -211,6 +211,7 @@ $responseData->{'sc'} = Dumper($session->{"c"});
         	        push( @{$errors},
             "I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED" );
         $log->error("I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED"); 
+        $responseData->{'error'} = "error";
         
         }else{
         	$responseData->{'error'} = "error";

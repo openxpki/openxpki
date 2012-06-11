@@ -253,7 +253,13 @@ var SSC_MODEL = new Class(
 
 				window.dbg.log('get server status cb');
 				sscView.setStatusMsg("T_idle", ' ', 'idle');
-				window.dbg.log(data);
+				try{
+					window.dbg.log(data);
+				}catch (e)
+				{
+					
+				}
+				
 
 				window.dbg.log('skip since there is no criteria avaiable at the moment');
 				viewCb('ok'); 				
@@ -814,16 +820,9 @@ var SSC_MODEL = new Class(
 										'0222');
 								var PKCS11Plugin = $('PKCS11Plugin');
 								this.ajax_log('I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER', 'error');
-								try {
-									// force an exception if PuginStatus not available
-									//PKCS11Plugin.StopPlugin();
-								} catch (e) {
-									//alert('not supported');
-								}
-								//setTimeout(window.location.reload(),2000);
+					
 								
-								
-								viewCb('error');
+								//viewCb('error');I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED
 							}else if (data.errors[i] === 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED') {
 								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 								sscView.showPopUp('E_backend_error', 'cross',this.errors2htmlstring(errorList) );
@@ -839,13 +838,30 @@ var SSC_MODEL = new Class(
 										'0222');
 								this.ajax_log( data.errors[i], 'error');
 								viewCb('error');
+								
+							}else if (data.errors[i] === 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_INVALID_SMARTCARD_STATUS') {
+								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+								sscView.showPopUp('E_card_blocked', 'cross',this.errors2htmlstring(errorList) );
+								this.ajax_log( data.errors[i], 'error');
+								//viewCb('error');
+								
+								
+								
+							}else if (data.errors[i] === 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_NO_EMPLOYEEID_FOR_TOKEN') {
+								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+								//sscView.showPopUp('E_smartcard_unknown', 'cross','0223');
+								
+								this.ajax_log('I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_NO_EMPLOYEEID_FOR_TOKEN', 'error');
+								sscView.showPopUp('E_card_not_assigned', 'cross',this.errors2htmlstring(errorList) );
+								//viewCb('cardUnknown');
+															
 							}else if (data.errors[i] === 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOKEN_NOT_FOUND') {
 								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 								//sscView.showPopUp('E_smartcard_unknown', 'cross','0223');
 								
-								this.ajax_log('I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_SEARCH_PERSON_FAILED', 'error');
-								//sscView.showPopUp('E_backend_error', 'cross',this.errors2htmlstring(errorList) );
-								viewCb('cardUnknown');
+								this.ajax_log('I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_TOKEN_NOT_FOUND', 'error');
+								sscView.showPopUp('E_card_not_registered', 'cross',this.errors2htmlstring(errorList) );
+								//viewCb('cardUnknown');
 								
 							}else {
 								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
@@ -1714,6 +1730,14 @@ var SSC_MODEL = new Class(
 							//viewCb('error');
 							return;
 						} 
+						if (data.errors[i] === 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_SMARTCARD_INVALID_SMARTCARD_STATUS') {
+							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+							sscView.showPopUp('E_smartcard_deactivated', 'cross',this.errors2htmlstring(errorList) );
+							//viewCb('error');
+							return;
+						} 
+						
+						
 						if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER') {
 							window.dbg.log('Error ' + i + ' ' + data.errors[i]);
 							sscView.showPopUp('E_session_timeout_error', 'cross',
@@ -2268,7 +2292,7 @@ var SSC_MODEL = new Class(
 									'cross', '0113');
 							viewCb('error');
 							return;
-						} else if (reason === 'TokenInternalError') {
+						} else if (reason === 'PINPolicy') {
 							// Invalid PIN is an user Error no popup here
 							window.dbg.log("invalid pin" + reason);
 							
@@ -2734,11 +2758,16 @@ var SSC_MODEL = new Class(
 				
 				window.dbg.log(typeof list);
 				if(list !== null  || list !== '' )
-				var html = '';
-				for ( var i = 0; i < list.length; i++) {
-					html = html + list[i].LABEL + '<br />';
+				{
+					var html = '';
+					for ( var i = 0; i < list.length; i++) {
+						html = html + list[i].LABEL + '<br />';
+					}
+					return html;
+				}else{
+					return "Error parsing backend error msg";
 				}
-				return html;	
+				
 				
 			}
 			

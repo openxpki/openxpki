@@ -1,6 +1,6 @@
 {
 "E_session_timeout_error":"Ihre Browser Session ist abgelaufen, bitte laden Sie die Seite neu.",
-"E_ax-failure":"dbSmartcardPlugin nicht gefunden, bitte via ASD installieren.",
+"E_ax-failure":"Das dbSmartcard Plugin V2 wurde nicht gefunden. Bitte bestellen Sie es &uuml;ber ASD.",
 "E_ax-plugin-double":"ActiveX control Fehler - bereits initialisiert",
 "E_ax-plugin-no-status":"ActiveX control Fehler - kein Status",
 "E_cardBlocked":"Die dbSmartcard ist blockiert, der Geb&auml;udezugang ist gesperrt. Wenden Sie sich an Ihre Ausweisstelle.",
