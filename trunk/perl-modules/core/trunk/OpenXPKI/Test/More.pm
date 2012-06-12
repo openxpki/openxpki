@@ -6,32 +6,35 @@ use Test::More;
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
 use OpenXPKI::Client;
 use Data::Dumper;
-use Class::Std;
+use Moose;
 
 {
     use strict;
     use warnings;
+    use constant LOG_COMMENT_CHAR => '#';
+
     use Carp;
 
     # don't 'use' Test::More because we override it's methods
     #    require Test::More;
 
     # Storage for object attributes
-    my %user_of : ATTR( get => 'user', set => 'user' );
-    my %password : ATTR( get => 'password', set => 'password' );
-    my %socketfile :
-        ATTR(get => 'socketfile', set => 'socketfile', init_arg => 'socketfile' );
-    my %realm : ATTR(get => 'realm', set => 'realm', init_arg => 'realm' );
-    my %wfid : ATTR(get => 'wfid', set => 'wfid' );
-    my %wftype : ATTR(get => 'wftype', set => 'wftype' );
-    my %client : ATTR(get => 'client', set => 'client' );
-    my %msg : ATTR(get => 'msg', set => 'msg');
-    my %verbose : ATTR(get => 'verbose', set => 'verbose');
+    has user       => ( is => 'rw' );
+    has password   => ( is => 'rw' );
+    has socketfile => ( is => 'rw' );
+    has realm      => ( is => 'rw' );
+    has wfid       => ( is => 'rw' );
+    has wftype     => ( is => 'rw' );
+    has client     => ( is => 'rw' );
+    has msg        => ( is => 'rw' );
+    has verbose    => ( is => 'rw' );
 
-    # Handle initialization
-    #    sub BUILD {
-    #        my ( $self, $id, $args ) = @_;
-    #    }
+    # stuff needed for the test groups
+    has reqid       => ( is => 'rw' );
+    has description => ( is => 'rw' );
+    has setup       => ( is => 'rw' );
+    has teardown    => ( is => 'rw' );
+    has tests       => ( is => 'rw' );
 
     ############################################################
     # TEST METHODS
@@ -77,7 +80,8 @@ use Class::Std;
             my $ret = $self->$action( $result, $testname );
             return sub { return $ret }
         }
-        # @Fixme: Implement ok/nok and add like        
+
+        # @Fixme: Implement ok/nok and add like
         return;
 
     }
@@ -130,14 +134,13 @@ use Class::Std;
         $testname ||= 'Fetching parameter ' . $name;
         return $self->isnt( $self->param($name), $expected, $testname );
     }
-    
+
     sub param_like {
         my ( $self, $name, $expected, $testname ) = @_;
         $testname ||= 'Fetching parameter ' . $name;
         return $self->like( $self->param($name), $expected, $testname );
     }
 
-    
     sub state_is {
         my ( $self, $state, $testname ) = @_;
         $testname ||= 'Expecting state ' . $state;
@@ -151,7 +154,7 @@ use Class::Std;
             $state = '<undef>';
         }
 
-        if ( $self->get_verbose ) {
+        if ( $self->verbose ) {
             $self->diag("\tstate=$state");
             $self->diag("\ttestname=$testname");
             $self->diag("\tcurrstate=$currstate");
@@ -168,12 +171,43 @@ use Class::Std;
     ############################################################
     # HELPER METHODS
     ############################################################
+
+    sub group {
+        my $self = shift;
+        my %args = @_;
+
+        my $reqid = $args{reqid} || 'NO_ID';
+        $self->reqid($reqid);
+        my $desc = $args{description} || 'generic test';
+        $self->description($desc);
+        my $block = $args{tests} || die "Error: test() - no tests set";
+
+        print "\n"
+            . LOG_COMMENT_CHAR
+            . '----- '
+            . $reqid . ': '
+            . $desc . "\n";
+        if ( ref( $args{setup} ) eq 'CODE' ) {
+            $args{setup}->($self);
+        }
+        elsif ( $args{setup} and $self->can( $args{setup} ) ) {
+            $self->( $args{setup} ) ();
+        }
+        $block->($self);
+        if ( ref( $args{teardown} ) eq 'CODE' ) {
+            $args{teardown}->($self);
+        }
+        elsif ( $args{teardown} and $self->can( $args{teardown} ) ) {
+            $self->( $args{teardown} ) ();
+        }
+    }
+
     sub login {
         my $self   = shift;
-        my $client = $self->get_client;
-        my $user   = $self->get_user;
-        my $pass   = $self->get_password;
-        my $realm  = $self->get_realm;
+        my $client = $self->client;
+        my $user   = $self->user;
+        my $pass   = $self->password;
+        my $realm  = $self->realm;
         my $msg;
 
         $client->init_session();
@@ -181,14 +215,14 @@ use Class::Std;
         if ($realm) {
             $msg = $client->send_receive_service_msg( 'GET_PKI_REALM',
                 { PKI_REALM => $realm } );
-            $self->set_msg($msg);
+            $self->msg($msg);
             if ( $self->error ) {
                 $self->diag(
                     "Login failed (get pki realm $realm): " . Dumper $msg);
                 return;
             }
             $msg = $client->send_receive_service_msg( 'PING', );
-            $self->set_msg($msg);
+            $self->msg($msg);
             if ( $self->error ) {
                 $self->diag( "Login failed (ping): " . Dumper $msg);
                 return;
@@ -201,7 +235,7 @@ use Class::Std;
                 'GET_AUTHENTICATION_STACK',
                 { 'AUTHENTICATION_STACK' => 'External Dynamic', },
                 );
-            $self->set_msg($msg);
+            $self->msg($msg);
             if ( $self->error ) {
                 $self->diag(
                     "Login failed (stack selection): " . Dumper $msg);
@@ -214,7 +248,7 @@ use Class::Std;
                     'PASSWD' => $pass,
                 },
             );
-            $self->set_msg($msg);
+            $self->msg($msg);
             if ( $self->error ) {
                 $self->diag( "Login failed: " . Dumper $msg);
                 return;
@@ -226,7 +260,7 @@ use Class::Std;
                 'GET_AUTHENTICATION_STACK',
                 { 'AUTHENTICATION_STACK' => 'Anonymous', },
                 );
-            $self->set_msg($msg);
+            $self->msg($msg);
             if ( $self->error ) {
                 $self->diag(
                     "Login failed (stack selection): " . Dumper $msg);
@@ -248,43 +282,43 @@ use Class::Std;
 
         foreach my $k (qw( user password socketfile realm )) {
             if ( exists $params{$k} ) {
-                my $accessor = 'set_' . $k;
+                my $accessor = $k;
                 $self->$accessor( $params{$k} );
             }
         }
 
         my $c = OpenXPKI::Client->new(
             {   TIMEOUT    => 100,
-                SOCKETFILE => $self->get_socketfile
+                SOCKETFILE => $self->socketfile
             }
         );
         if ( not $c ) {
             croak "Unable to create OpenXPKI::Client instance: $@";
         }
 
-        $self->set_client($c);
+        $self->client($c);
 
-        if ( $self->get_user ) {
+        if ( $self->user ) {
             $self->login(
                 {   CLIENT   => $c,
-                    USER     => $self->get_user,
-                    PASSWORD => $self->get_password,
-                    REALM    => $self->get_realm,
+                    USER     => $self->user,
+                    PASSWORD => $self->password,
+                    REALM    => $self->realm,
                 }
-            ) or croak "Login as ", $self->get_user(), " failed: $@";
+            ) or croak "Login as ", $self->user(), " failed: $@";
         }
         else {
-            $self->login( { CLIENT => $c, REALM => $self->get_realm } )
+            $self->login( { CLIENT => $c, REALM => $self->realm } )
                 or croak "Login as anonymous failed: $@";
         }
-        $self->set_msg(undef);
+        $self->msg(undef);
         return $self;
     }
 
     sub create {
         my ( $self, $wftype, $params ) = @_;
-        my $client = $self->get_client;
-        $self->set_wftype($wftype);
+        my $client = $self->client;
+        $self->wftype($wftype);
 
         my $msg
             = $client->send_receive_command_msg( 'create_workflow_instance',
@@ -293,9 +327,9 @@ use Class::Std;
 
         $self->diag(
             "Command create_workflow_instance returned MSG: " . Dumper($msg) )
-            if $self->get_verbose;
-        $self->set_msg($msg);
-        $self->set_wfid( $msg->{PARAMS}->{WORKFLOW}->{ID} );
+            if $self->verbose;
+        $self->msg($msg);
+        $self->wfid( $msg->{PARAMS}->{WORKFLOW}->{ID} );
         if ( $self->error ) {
 
             #            $self->diag(" RETURNING ERROR ");
@@ -310,13 +344,13 @@ use Class::Std;
             return $self;
         }
     }
-    
+
     sub execute {
         my ( $self, $action, $params ) = @_;
         my $msg;
-        my $client = $self->get_client;
-        my $wftype = $self->get_wftype;
-        my $wfid   = $self->get_wfid;
+        my $client = $self->client;
+        my $wftype = $self->wftype;
+        my $wfid   = $self->wfid;
 
         if ( not defined $params ) {
             $params = {};
@@ -333,9 +367,9 @@ use Class::Std;
                 'PARAMS'   => $params,
             },
         );
-        $self->set_msg($msg);
+        $self->msg($msg);
         $self->diag( "Command $action returned MSG: " . Dumper($msg) )
-            if $self->get_verbose;
+            if $self->verbose;
         if ( $self->error ) {
             $@ = 'Error executing ' . $action . ': ' . Dumper($msg);
             return;
@@ -346,8 +380,8 @@ use Class::Std;
     sub runcmd {
         my ( $self, $action, $params ) = @_;
         my $msg;
-        my $client = $self->get_client;
-        
+        my $client = $self->client;
+
         if ( not defined $params ) {
             $params = {};
         }
@@ -355,12 +389,10 @@ use Class::Std;
         croak("Unable to exec action '$action' on closed connection")
             unless defined $client;
 
-        $msg = $client->send_receive_command_msg(
-            $action, $params            
-        );
-        $self->set_msg($msg);
+        $msg = $client->send_receive_command_msg( $action, $params );
+        $self->msg($msg);
         $self->diag( "Command $action returned MSG: " . Dumper($msg) )
-            if $self->get_verbose;
+            if $self->verbose;
         if ( $self->error ) {
             $@ = 'Error executing ' . $action . ': ' . Dumper($msg);
             return;
@@ -370,16 +402,16 @@ use Class::Std;
 
     sub param {
         my ( $self, $name ) = @_;
-        my $wfid   = $self->get_wfid;
-        my $client = $self->get_client;
-        my $msg    = $self->get_msg;
+        my $wfid   = $self->wfid;
+        my $client = $self->client;
+        my $msg    = $self->msg;
 
         if ( not $msg ) {
-            $msg = $client->send_receive_command_msg( 'get_workflow_info',
+            $msg = $client->send_receive_command_msg( 'workflow_info',
                 { ID => $wfid } );
         }
 
-        $self->set_msg($msg);
+        $self->msg($msg);
         if ( $self->error ) {
             $@ = 'Error getting workflow info: ' . Dumper($msg);
             return;
@@ -397,24 +429,23 @@ use Class::Std;
 
     sub array {
         my ( $self, $name ) = @_;
-        my $wfid   = $self->get_wfid;
-        my $client = $self->get_client;
-        my $msg    = $self->get_msg;
+        my $wfid   = $self->wfid;
+        my $client = $self->client;
+        my $msg    = $self->msg;
 
         if ( not $msg ) {
-            $msg = $client->send_receive_command_msg( 'get_workflow_info',
+            $msg = $client->send_receive_command_msg( 'workflow_info',
                 { ID => $wfid } );
         }
 
-        $self->set_msg($msg);
+        $self->msg($msg);
         if ( $self->error ) {
             $@ = 'Error getting workflow info: ' . Dumper($msg);
             return;
         }
 
         my $val = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
-            {
-                workflow => $msg->{PARAMS}->{WORKFLOW},
+            {   workflow    => $msg->{PARAMS}->{WORKFLOW},
                 context_key => $name,
             }
         );
@@ -426,18 +457,18 @@ use Class::Std;
 
     sub state {
         my ($self) = @_;
-        my $wfid   = $self->get_wfid;
-        my $client = $self->get_client;
-        my $msg    = $self->get_msg;
+        my $wfid   = $self->wfid;
+        my $client = $self->client;
+        my $msg    = $self->msg;
 
         if ( defined $msg and defined $msg->{PARAMS}->{WORKFLOW}->{STATE} ) {
             return $msg->{PARAMS}->{WORKFLOW}->{STATE};
         }
 
-        $msg = $client->send_receive_command_msg( 'get_workflow_info',
+        $msg = $client->send_receive_command_msg( 'workflow_info',
             { ID => $wfid } );
 
-        $self->set_msg($msg);
+        $self->msg($msg);
         if ( $self->error ) {
             $@ = 'Error getting workflow info: ' . Dumper($msg);
             return;
@@ -450,7 +481,7 @@ use Class::Std;
 
     sub search {
         my ( $self, $key, $value ) = @_;
-        my $client = $self->get_client;
+        my $client = $self->client;
 
         my $msg = $client->send_receive_command_msg(
             'search_workflow_instances',
@@ -459,7 +490,7 @@ use Class::Std;
                         VALUE => $value,
                     },
                 ],
-                TYPE => $self->get_wftype(),
+                TYPE => $self->wftype(),
             },
             )
             or die "Error running search_workflow_instances: " . $self->dump;
@@ -469,7 +500,7 @@ use Class::Std;
 
     sub error {
         my $self = shift;
-        my $msg  = $self->get_msg;
+        my $msg  = $self->msg;
         if (   $msg
             && exists $msg->{'SERVICE_MSG'}
             && $msg->{'SERVICE_MSG'} eq 'ERROR' )
@@ -488,14 +519,14 @@ use Class::Std;
         }
         Test::More::diag("Current Test Instance:");
         foreach my $k (qw( user wfid )) {
-            my $acc = 'get_' . $k;
+            my $acc = $k;
             my $v   = $self->$acc();
             if ( not defined $v ) {
                 $v = '<undef>';
             }
             Test::More::diag("\t$k: $v");
         }
-        my $msg = $self->get_msg;
+        my $msg = $self->msg;
         if ($msg) {
             Test::More::diag('Contents of $msg:');
             Test::More::diag( Dumper($msg) );
@@ -504,10 +535,59 @@ use Class::Std;
 
     sub disconnect {
         my $self   = shift;
-        my $client = $self->get_client;
+        my $client = $self->client;
         eval { $client && $client->send_receive_service_msg('LOGOUT'); };
-        $self->set_client(undef);
-        $self->set_msg(undef);
+        $self->client(undef);
+        $self->msg(undef);
+    }
+
+    # This is the higher-level task for creating a workflow instance
+    # $tests->initialize_workflow( USER, PASS, PARAMS );
+
+    sub initialize_workflow {
+        my $self   = shift;
+        my $user   = shift;
+        my $pass   = shift;
+        my %params = @_;
+
+        $@ = 'No errors';
+
+   #    $self->diag("fetch_card_info() disconnecting previous connection...");
+        $self->disconnect();
+
+        #    $self->diag("fetch_card_info() connecting as $user/$pass...");
+        if ( not $self->connect( user => $user, password => $pass ) ) {
+            $@ = "Error connecting as '$user': $@";
+            return;
+        }
+
+        #    $self->diag("fetch_card_info() creating workflow instance...");
+        if ( not $self->create( $self->wftype, {%params} ) ) {
+            $@ = "Error creating workflow instance: " . $@;
+
+#            $self->diag( "Error creating workflow in fetch_card_info(): params=", join( ', ', %params ) );
+            return;
+        }
+
+        return $self;
+    }
+
+    sub initialize_workflow_ok {
+        my $self     = shift;
+        my $params   = shift || [];
+        my $testname = shift || 'initialize workflow';
+
+        my $result = $self->initialize_workflow( @{$params} );
+        return $self->ok( $result, $testname );
+    }
+
+    sub initialize_workflow_nok {
+        my $self     = shift;
+        my $params   = shift || [];
+        my $testname = shift || 'initialize workflow';
+
+        my $result = $self->initialize_workflow( @{$params} );
+        return $self->ok( ( not $result ), $testname );
     }
 
     # Handle cleanup
@@ -539,7 +619,7 @@ use Class::Std;
         my ( $self, $got, $expected, $testname ) = @_;
         return Test::More::is( $got, $expected, $testname );
     }
-    
+
     sub isnt ($$;$) {
         my ( $self, $got, $expected, $testname ) = @_;
         return Test::More::isnt( $got, $expected, $testname );
@@ -554,7 +634,7 @@ use Class::Std;
         my ( $self, $test, $name ) = @_;
         return Test::More::ok( !$test, $name );
     }
-        
+
     sub like ($$;$) {
         my ( $self, $test, $regexp, $name ) = @_;
         return Test::More::like( $test, $regexp, $name );
@@ -610,6 +690,20 @@ definition to extend this class.
   $test->disconnect();
 
 
+Alternatively, you can use the XUnit type calls to organize the
+groups of tests. Note: this is still experimental.
+
+    $test->group(
+        id          => 'PRD_REQ_01',
+        description => 'Short description of test group',
+        setup       => undef,
+        tests       => sub {
+            my $self = shift;
+            # ... your code here ...
+        },
+        teardown    => undef,
+    );
+
 =head1 TEST METHODS
 
 These test subroutines act as test methods similar to those found in
@@ -658,6 +752,51 @@ Optionally, the test name TESTNAME may be specified.
 
 The helper subroutines provide functionality that doesn't result in
 a test (e.g.: "1... ok") entry for harness.
+
+=head2 $test->group
+
+Describes a set of tests to be run, allowing for meta information to be
+captured while running through sets of tests.
+
+The following attributes are passed as named-parameters.
+
+=over 8
+
+=item id
+
+String used to identify the set of tests. This is used to refer back
+to the original requirements document. Default is 'NO_ID'.
+
+=item description
+
+A short description of the set of tests. Default is 'generic test'.
+
+=item tests
+
+A code block (e.g.: sub { ... }) containing the actual tests to run.
+
+=item setup
+
+A code block (e.g.: sub { ...}) used to set up the test scenario before
+any actual tests are run. Default is C<undef>, in which case no set up 
+code is run.
+
+=item teardown
+
+A code block (e.g.: sub { ...}) used to tear down the test scenario after
+any actual tests are run. Default is C<undef>, in which case no tear down
+code is run.
+
+=back
+
+Note: when the above code blocks are run, a reference to the current instance
+is passed as the first argument. So if you want to use the test instance within
+such a block, do something like the following:
+
+    tests => sub {
+        my $self = shift;
+        $self->...;
+    }
 
 =head2 $test->connect
 
@@ -728,7 +867,7 @@ as a sort block.
 Returns the error string if the most recent server call failed. Otherwise, 
 C<undef> is returned.
 
-=head2 $test->set_verbose( 0 | 1 )
+=head2 $test->verbose( 0 | 1 )
 
 Sets the verbosity off or on.
 

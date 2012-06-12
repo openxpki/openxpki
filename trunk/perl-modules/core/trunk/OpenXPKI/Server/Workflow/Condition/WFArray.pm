@@ -31,34 +31,39 @@ sub _init {
         }
     }
     if ( !( defined $self->array_name() ) ) {
-        configuration_error
-            "Missing parameter 'array_name' in " .
-            "declaration of condition " . $self->name();
+        configuration_error "Missing parameter 'array_name' in "
+            . "declaration of condition "
+            . $self->name();
     }
 }
-
 
 sub evaluate {
     my ( $self, $wf ) = @_;
     my $context = $wf->context();
 
-
     my $array = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
-	{ 
-	    workflow => $wf,
-	    context_key => $self->array_name(),
-	} );
+        {   workflow    => $wf,
+            context_key => $self->array_name(),
+        }
+    );
 
-    if ($self->condition() eq 'is_empty') {
-	if ($array->count() == 0) {
-	    return 1;
-	}
-	condition_error
-	    'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFARRAY_ARRAY_NOT_EMPTY';
-    } else {
-        configuration_error
-            "Invalid condition " . $self->condition() . " in " .
-            "declaration of condition " . $self->name();
+    if ( $self->condition() eq 'is_empty' ) {
+        if ( $array->count() == 0 ) {
+            return 1;
+        }
+        condition_error
+            'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFARRAY_ARRAY_NOT_EMPTY';
+    }
+    elsif ( $self->condition() eq 'count_is' ) {
+        if ( $array->count() == $self->operand() ) {
+            return 1;
+        }
+    }
+    else {
+        configuration_error "Invalid condition "
+            . $self->condition() . " in "
+            . "declaration of condition "
+            . $self->name();
     }
 }
 
@@ -99,6 +104,20 @@ The following conditions are supported:
 
 Condition is true if the array is either non-existent or is empty.
 
+=item count_is
+
+Condition is true if the number of elements matches the value set in C<operand>.
+
+=item count_ne
+
+Condition is true if the number of elements does not match the value set in C<operand>.
+
 =back
+
+head2 operand
+
+Value of the operand for the given condition operator.
+
+
 
 

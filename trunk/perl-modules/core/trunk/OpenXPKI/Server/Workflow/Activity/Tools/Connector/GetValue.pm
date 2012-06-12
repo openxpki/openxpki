@@ -64,6 +64,11 @@ sub execute {
             )
         }        
     }
+
+    my $keyname = $self->param('ds_key_name');
+    if ( not $connector_key && defined $keyname ) {
+        $connector_key = $keyname;
+    }
     
     if ( not $connector_key ) {
         OpenXPKI::Exception->throw( message =>
@@ -131,6 +136,9 @@ OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetEntry
 
 This activity reads a value from the config connector into the context. 
 
+There are three ways to specify the name of the key to use in the connector:
+by parameter, by template and by name. See the parameters below for details.
+
 =head1 Configuration
 
 =head2 Parameters
@@ -151,6 +159,10 @@ A template toolkit pattern to create the the key for the connector lookup
 from. You can refer to every value in the context with C<CONTEXT.<param name>>
 and the name of the current realm with C<PK_REALM>.
 This is effective only if ds_key_param or the named context value is not set.
+
+=item ds_key_name
+
+The literal name of the key for the connector lookup operation.
 
 =item ds_value_param
 
