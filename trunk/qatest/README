@@ -25,7 +25,7 @@ Customizing:
 The configuration is read in using Config::Std and the individual tests (should)
 follow the following path priorities when loading the configuration. The default
 configuration is located in the same directory as the test script itself:
-$GITBASE/trunk/tests/<category>/<subset>/. Additionally, a system-specific 
+$GITBASE/trunk/qatest/<category>/<subset>/. Additionally, a system-specific 
 configuration file, kept in the config repository, is found in the directory:
-$GITBASE/config/tests/<category>/<subset>/, where $GITBASE/config is a symlink to the
+$GITBASE/config/qatest/<category>/<subset>/, where $GITBASE/config is a symlink to the
 working config repository.
