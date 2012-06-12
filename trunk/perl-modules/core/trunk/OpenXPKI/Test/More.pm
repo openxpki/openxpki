@@ -8,7 +8,7 @@ use OpenXPKI::Client;
 use Data::Dumper;
 use Moose;
 
-{
+#{
     use strict;
     use warnings;
     use constant LOG_COMMENT_CHAR => '#';
@@ -126,7 +126,8 @@ use Moose;
     sub param_is {
         my ( $self, $name, $expected, $testname ) = @_;
         $testname ||= 'Fetching parameter ' . $name;
-        return $self->is( $self->param($name), $expected, $testname );
+        my $got = $self->param($name);
+        return $self->is( $got, $expected, $testname );
     }
 
     sub param_isnt {
@@ -610,36 +611,41 @@ use Moose;
         Test::More::plan(@_);
     }
 
+    sub done_testing {
+        my $self = shift;
+        Test::More::done_testing(@_);
+    }
+
     sub skip {
         my $self = shift;
         Test::More::skip(@_);
     }
 
-    sub is ($$;$) {
+    sub is {
         my ( $self, $got, $expected, $testname ) = @_;
         return Test::More::is( $got, $expected, $testname );
     }
 
-    sub isnt ($$;$) {
+    sub isnt {
         my ( $self, $got, $expected, $testname ) = @_;
         return Test::More::isnt( $got, $expected, $testname );
     }
 
-    sub ok ($;$) {
+    sub ok {
         my ( $self, $test, $name ) = @_;
         return Test::More::ok( $test, $name );
     }
 
-    sub nok ($;$) {
+    sub nok {
         my ( $self, $test, $name ) = @_;
         return Test::More::ok( !$test, $name );
     }
 
-    sub like ($$;$) {
+    sub like {
         my ( $self, $test, $regexp, $name ) = @_;
         return Test::More::like( $test, $regexp, $name );
     }
-}
+#}
 
 1;
 

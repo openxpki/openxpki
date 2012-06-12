@@ -1,14 +1,7 @@
 #!/usr/bin/perl
 #
-# 01_cardadm.t - tests for cardadm workflow
+# 01_remote_unblock.t - tests for remote unblock workflow
 #
-#
-# The Smartcard Admin workflow is used to manage the details of a card
-# as stored in LDAP. The following actions are supported
-#
-# modify_user   Create, modify or delete the association of a user to a card
-# modify_status Modify the status of the card
-# fail_workflow Set the state of a workflow to FAILURE
 #
 # Note: this workflow assumes that a card may belong to no more than 1
 # individual.
@@ -30,20 +23,19 @@ use English;
 use Data::Dumper;
 use Config::Std;
 use File::Basename;
-use OpenXPKI::Test::Smartcard::PUKUpload;
 
 use TestCfg;
 
 my $dirname = dirname($0);
 
-our @cfgpath = ( $dirname . '/../../../config/tests/backend/smartcard', $dirname );
+our @cfgpath = ( $dirname . '/../../../config/qatest/backend/smartcard', $dirname );
 our %cfg = ();
 
 my $testcfg = new TestCfg;
-$testcfg->read_config_path( '01_cardadm.cfg', \%cfg, @cfgpath );
-$testcfg->load_ldap( '01_cardadm.ldif', @cfgpath );
+$testcfg->read_config_path( '01_remote_unblock.cfg', \%cfg, @cfgpath );
+$testcfg->load_ldap( '01_remote_unblock.ldif', @cfgpath );
 
-package OpenXPKI::Test::More::SmartcardCardadm;
+package OpenXPKI::Test::More::SmartcardRemoteUnblock;
 {
     use base qw( OpenXPKI::Test::More );
     sub wftype { return 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_CARDADM' }

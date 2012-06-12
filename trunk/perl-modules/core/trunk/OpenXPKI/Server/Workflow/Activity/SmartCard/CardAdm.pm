@@ -1,6 +1,13 @@
 # OpenXPKI::Server::Workflow::Activity::SmartCard::CardAdm
 # Written by Scott Hardin for the OpenXPKI project 2011
 # Copyright (c) 2011 by The OpenXPKI Project
+#
+# STATUS:
+#
+# This module is currently being re-worked. It originally was hard-coded
+# to work with a single LDAP server. With the Connector handling multiple
+# data sources, the modification commands have been disabled until we
+# implement updates in the LDAP Connector.
 
 package OpenXPKI::Server::Workflow::Activity::SmartCard::CardAdm;
 
@@ -40,33 +47,7 @@ sub _get_conf {
     my $self    = shift;
     my $arg_ref = shift;
 
-    our $policy = {
-        directory => {
-            ldap => {
-                uri     => 'ldap://localhost:389',
-                bind_dn => 'cn=admin,dc=example,dc=com',
-                pass    => 'changeme',
-            },
-            person => {
-                basedn                  => 'ou=persons,dc=example,dc=com',
-                userid_attribute        => 'mail',
-                loginid_attribute       => 'ntloginid',
-                max_smartcards_per_user => 1,
-                attributes => [qw( CN givenName initials sn mail )],
-            },
-            smartcard => { basedn => 'ou=smartcards,dc=example,dc=com', },
-        },
-    };
-
-    # 2010-11-02 Scott Hardin: TODO FIXME XXX
-    # Some bad habits seem to get repeated, don't they.
-    #
-    # This is just a kludge to get the LDAP code up-n-running
-    # without tackling the whole issue of configuration.
-    do '/etc/openxpki/policy.pm'
-        or die "Could not open ldap parameters file.";
-
-    return $policy;
+    return CTX('config');
 }
 
 sub _get_ldap_conn {
@@ -148,6 +129,11 @@ sub _get_ldap_conn {
 sub modify_user {
     my $self     = shift;
     my $workflow = shift;
+    
+    # SORRY, BUT WE JUST BAIL AT THE MOMENT
+    $self->throw( "modify_user() has been temporarily disabled", {}, 'error', 'monitor' );
+
+=begin DISABLED
 
     my $conf = $self->_get_conf();
     my $ldap = $self->_get_ldap_conn($conf);
@@ -303,6 +289,10 @@ sub modify_user {
         }
     }
 
+=end DISABLED
+
+=cut
+
 }
 
 # This works as follows:
@@ -315,6 +305,11 @@ sub modify_user {
 sub modify_status {
     my $self     = shift;
     my $workflow = shift;
+    
+    # SORRY, BUT WE JUST BAIL AT THE MOMENT
+    $self->throw( "modify_status() has been temporarily disabled", {}, 'error', 'monitor' );
+
+=begin DISABLED
 
     my $conf = $self->_get_conf();
     my $ldap = $self->_get_ldap_conn($conf);
@@ -387,6 +382,11 @@ sub modify_status {
             },
         );
     }
+
+=end DISABLED
+
+=cut
+
 }
 
 # This works as follows:
@@ -489,42 +489,12 @@ sub get_unblock_response {
     my $context           = $workflow->context();
     my $token_id          = $context->param('token_id');
     my $pukraw            = $context->param('_puk');
-    my $unblock_challenge = $context->param('unblock_challenge');
+    my $unblock_challenge = uc($context->param('unblock_challenge'));
+
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    # This is the AES key that will be used below in the decrypt
-    # of the PUK.
-
-    my $key_file = "/etc/openxpki/aes.key";
-    my $KEY;
-    if ( not open( $KEY, '<', $key_file ) ) {
-        die "Error opening $key_file: $!";
-    }
-    my $key = <$KEY>;
-    close $KEY;
-    chomp($key);
-
-    # Let me see if I can get this right. When the PUK is
-    # fetched from the datapool, but before it is written
-    # to the workflow context, the following steps take place:
-    #
-    # - if not already an array, make it one
-    # - encrypt each array element
-    #   - append "\00" to end of data
-    #   - encrypt using aes.key and iv (16 bytes random data)
-    #   - prepend iv to encrypted data string
-    #   - encode in base64
-    # - serialize using OpenXPKI::Serialization::Simple
-    #
-    # So let's see if we can walk through these steps
-    # backwards (and blindfolded)
-
-    ##! 64: "raw puk from context: " . Dumper($pukraw)
-
     my $puk = $serializer->deserialize($pukraw);
-
-    ##! 64: "raw puk (deserialized) from context: " . Dumper($puk)
 
     if ( not ref($puk) eq 'ARRAY' ) {
 
@@ -532,58 +502,12 @@ sub get_unblock_response {
         die "FetchPUK should return ARRAY, but got '$puk'";
     }
 
-    my @puks = ();
-
-    foreach my $v ( @{$puk} ) {
-
-        ##! 64: "\tpuk array entry (encoded base64): " . Dumper($v)
-
-        $v = decode_base64($v);
-
-        ##! 64: "\tpuk array entry (iv and encoded data): " . Dumper($v)
-
-        my $iv = substr( $v, 0, 16, '' );
-
-        ##! 64: "\tiv: " . Dumper($iv) . ', encrypted value: ' . Dumper($v)
-        ##! 64: "\tlength of iv: " . length($iv) . ' byte(s)'
-
-        my $packediv  = pack( 'H*', $iv );
-        my $packedkey = pack( 'H*', $key );
-
-        ##! 64: "\tlength of packed iv: " . length($packediv) . ' byte(s)'
-        ##! 64: "\tpacked AES key for decryption: " . $packedkey . ', ' . length($packedkey) . ' byte(s)'
-
-        my $cipher = Crypt::CBC->new(
-            -cipher      => 'Crypt::OpenSSL::AES',
-            -key         => pack( 'H*', $key ),
-            -iv          => $iv,
-            -literal_key => 1,
-            -header      => 'none',
-        );
-
-        if ( not $cipher ) {
-            die "Error creating AES cipher: $@";
-        }
-
-        $v = $cipher->decrypt($v);
-
-        ##! 64: "\tdecrypted value: " . Dumper($v)
-
-        $v =~ s/\00$//;
-
-        ##! 64: "\tdecrypted value without null termination: " . Dumper($v)
-
-        push @puks, $v;
-    }
-
-    ##! 16: 'list of puks found: ' . Dumper(\@puk)
-
     # do magic, which is to encrypt the challenge with 3DES using the
     # puk as the key. We use Crypt::DES and do the 3DES on it by hand
     # to reduce the number of CPAN dependencies.
     # Also, we only do one block, so don't worry about the mode.
     my $des    = {};
-    my $deskey = $puks[0];
+    my $deskey = $puk->[0];
     if ( not $deskey ) {
         $deskey = $context->param('smartcard_default_puk');
     }

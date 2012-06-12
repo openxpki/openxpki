@@ -84,6 +84,11 @@ smartcard_fetch_puk: $(userca)/workflow_activity_smartcard_fetch_puk.xml
 smartcard_fetch_puk: $(userca)/workflow_condition_smartcard_fetch_puk.xml
 smartcard_fetch_puk: $(userca)/workflow_validator_smartcard_fetch_puk.xml
 
+test_tools: $(userca)/workflow_def_test_tools.xml
+test_tools: $(userca)/workflow_activity_test_tools.xml
+test_tools: $(userca)/workflow_condition_test_tools.xml
+test_tools: $(userca)/workflow_validator_test_tools.xml
+
 .SECONDARY:
 
 # Process the local mods for this test server

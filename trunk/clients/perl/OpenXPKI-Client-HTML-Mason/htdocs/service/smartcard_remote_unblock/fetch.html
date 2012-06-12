@@ -35,7 +35,7 @@ our $wf_type = 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_CARDADM';
 # INIT - MAIN BLOCK
 ############################################################
 
-my ($token_id, $wf_id, $token_owner);	# params passed via GET/POST
+my ($token_id, $wf_id, $token_owner, $smartchip_id);	# params passed via GET/POST
 #my ($curr_user);	# param from Mason
 #my ($wf, $c_msg, $wf_state);
 #my ($need_token_id, $req_new_auth);	# state info for displaying page
@@ -45,13 +45,14 @@ my ($token_id, $wf_id, $token_owner);	# params passed via GET/POST
 # has it in lowercase. Also, the arg name 'TokenID' is hard-coded by them.
 
 $token_id		= $m->request_args()->{TokenID};
+$smartchip_id		= $m->request_args()->{SmartchipID};
 #$wf_id			= $m->request_args()->{WF_ID};
 $token_owner	= $m->request_args()->{TOKEN_OWNER};
 #$next_action	= $m->request_args()->{NEXT_ACTION};
 #$curr_user		= $context->{client}->send_receive_command_msg('get_user')->{PARAMS};
 my $wf;
 my @ref_wfs = ();
-my $ldap_data;
+my $userinfo_data;
 my $token_status;
 my $person = {};
 my %pers_map = qw( cn cn mail mail telephoneNumber tel );
@@ -61,6 +62,7 @@ warn
 	"===== INIT BLOCK OF smartcard_admin/fetch.mhtml =====\n",
 	"\trequest args = ", join(', ', %{ $m->request_args() }), "\n",
 	"\ttoken_id = '$token_id'\n",
+	"\tsmartchip_id = '$smartchip_id'\n",
 #	"\twf_id = '$wf_id'\n",
 	"\ttoken_owner = '$token_owner'\n",
 #	"\tcurr_user = '$curr_user'\n",
@@ -74,6 +76,8 @@ if ( $token_owner ) {
 if ( $token_id ) {
     $params->{token_id} = $token_id;
 }
+    $params->{chip_id} = '000000000000000000000000';
+
 
 my $msg = $context->{client}->send_receive_command_msg(
     'create_workflow_instance',
@@ -95,15 +99,15 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
         push @ref_wfs, @{ $ref_wftype };
     }
     
-    $ldap_data = $wf->{CONTEXT}->{_ldap_data};
+#    $userinfo_data = $wf->{CONTEXT}->{_ldap_data};
     # overwrite session param with value from api call
-    $token_owner = $wf->{CONTEXT}->{ldap_workflow_creator};
+    $token_owner = $wf->{CONTEXT}->{userinfo_workflow_creator};
     $token_status = $wf->{CONTEXT}->{smartcard_status};
 
     # grab details to the person, if available
     my $ser = OpenXPKI::Serialization::Simple->new();
     foreach my $attr ( @pers_attrs ) {
-        my $val = $wf->{CONTEXT}->{'ldap_' . $attr};
+        my $val = $wf->{CONTEXT}->{'userinfo_' . $attr};
         eval {
             $person->{$attr} = $ser->deserialize( $val );
         };
@@ -118,17 +122,17 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
         }
     } # foreach attr
 
-    # If the person details weren't found directly in the context
-    # params, look in _ldap_data...
-
-    if ( not %{ $person } ) {
-        foreach my $attr ( keys %pers_map ) {
-        if ( $ldap_data->[0]->{$attr} ) {
-        $person->{$pers_map{$attr}} = 
-        $wf->{CONTEXT}->{'_ldap_data'}->[0]->{$attr};
-        }
-        }
-    }
+#    # If the person details weren't found directly in the context
+#    # params, look in _ldap_data...
+#
+#    if ( not %{ $person } ) {
+#        foreach my $attr ( keys %pers_map ) {
+#        if ( $ldap_data->[0]->{$attr} ) {
+#        $person->{$pers_map{$attr}} = 
+#        $wf->{CONTEXT}->{'_ldap_data'}->[0]->{$attr};
+#        }
+#        }
+#    }
 } # if not error
 
 ############################################################
@@ -186,6 +190,9 @@ if ($msg->{SERVICE_MSG} ne 'ERROR') {
 </table>
 </p>
 
+<hr><hr>
+%} else {
+<h2>DEBUG: no person found</h2>
 <hr><hr>
 %}
 

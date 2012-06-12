@@ -12,6 +12,7 @@ use English;
 use Moose;
 use Connector::Proxy::Config::Versioned;
 use OpenXPKI::Debug;
+use Data::Dumper;
 
 extends 'Connector::Multi';
 
@@ -71,7 +72,24 @@ sub walkQueryPoints {
     my $result;    
     foreach my $resolver (  $self->get_list( [ $prefix, 'resolvers'] ) ) {                
         ##! 32: 'Ask Resolver ' . $prefix.'.'.$resolver.'.'.$query
-        $result = $self->$call( [ $prefix, $resolver, $query ], $params );
+        if ( $call eq 'get_list' ) {
+            my @result = $self->$call( [ $prefix, $resolver, $query ], $params );
+            ##! 32: '  resolver called get_list(), which returned ' . Dumper(\@result)
+
+            # If get_list() returns an empty list, we need to coerce $result into
+            # a scalar with a 'false' value. Otherwise, the foreach loop will not
+            # exit correctly. As a 'buggah', the get_list returns undef rather than
+            # just returning, which is a mistake illustrated back in the Camel Books.
+            # We'll add a work-around for that error for now.
+            if ( @result and not ( scalar @result == 1 && not defined $result[0] ) ) {
+                $result = [ @result ];
+            } else {
+                $result = undef;
+            }
+
+        } else {
+            $result = $self->$call( [ $prefix, $resolver, $query ], $params );
+        }
         return { 'VALUE' => $result, 'SOURCE' => $resolver } if ($result);
     }    
     return;
