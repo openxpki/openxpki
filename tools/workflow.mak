@@ -23,7 +23,7 @@ ogflowopts :=
 #ogflowopts := --verbose
 metaconf := trunk/deployment/bin/openxpki-metaconf
 config := config/workflow.cfg
-workflows := test_tools smartcard_cardadm smartcard_personalization_v4
+workflows := test_tools smartcard_fetch_puk smartcard_cardadm smartcard_personalization_v4
 
 # config/workflow.inc contains common settings for all customized workflows
 include config/workflow.inc
@@ -73,6 +73,16 @@ $(userca)/workflow_validator_%.xml.in: $(defaultxml)/graffle/workflow_%.graffle 
 	$(ogflow) $(ogflowopts) --outtype=validators --outfile="$@" --infile="$<"
 
 .PHONY: all test debug clean
+
+smartcard_cardadm: $(userca)/workflow_def_smartcard_cardadm.xml
+smartcard_cardadm: $(userca)/workflow_activity_smartcard_cardadm.xml
+smartcard_cardadm: $(userca)/workflow_condition_smartcard_cardadm.xml
+smartcard_cardadm: $(userca)/workflow_validator_smartcard_cardadm.xml
+
+smartcard_fetch_puk: $(userca)/workflow_def_smartcard_fetch_puk.xml
+smartcard_fetch_puk: $(userca)/workflow_activity_smartcard_fetch_puk.xml
+smartcard_fetch_puk: $(userca)/workflow_condition_smartcard_fetch_puk.xml
+smartcard_fetch_puk: $(userca)/workflow_validator_smartcard_fetch_puk.xml
 
 .SECONDARY:
 

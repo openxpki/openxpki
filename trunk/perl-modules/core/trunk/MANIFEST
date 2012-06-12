@@ -410,6 +410,9 @@ OpenXPKI/Service/SCEP/Command/PKIOperation.pm
 
 OpenXPKI/Tests.pm
 OpenXPKI/Test/More.pm
+OpenXPKI/Test/Smartcard/CardAdm.pm
+OpenXPKI/Test/Smartcard/FetchPUK.pm
+OpenXPKI/Test/Smartcard/PUKUpload.pm
 
 t/config.xml
 
