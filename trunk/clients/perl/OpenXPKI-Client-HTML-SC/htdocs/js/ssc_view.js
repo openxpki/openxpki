@@ -1204,7 +1204,7 @@ var SSC_VIEW = new Class(
 			insertCard : function(cardId) {
 				window.dbg.log('insertCard', cardId);
 				this.setInfoTitle('T_Analyse');
-				this.setPrompt('P_insertCard');
+				this.setPrompt('P_wait');
 				
 				// call model to read card with callback 
 				sscModel.readCard(cardId,this.handleStatus);
@@ -2441,36 +2441,36 @@ var SSC_VIEW = new Class(
 					window.dbg.log(html);	
 					if(!privatekeytest){
 					// setStatus
-					switch(certType){
-					case 1:
-						this.dataPrivacyHtml += html;
-						window.dbg.log("dataPrivacyStatus:"+ certs[i].VISUAL_STATUS);	
-						if (certs[i].VISUAL_STATUS === 'green' && this.dataPrivacyStatus === 'red'){
-						    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
+						switch(certType){
+						case 1:
+							this.dataPrivacyHtml += html;
+							window.dbg.log("dataPrivacyStatus:"+ certs[i].VISUAL_STATUS);	
+							if (certs[i].VISUAL_STATUS === 'green' && this.dataPrivacyStatus === 'red'){
+							    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
+							}
+							break;
+						case 2:
+							this.digitalIdHtml += html;
+							window.dbg.log("digitalIdStatus:"+ certs[i].VISUAL_STATUS);	
+							if (certs[i].VISUAL_STATUS !== 'green' && this.digitalIdStatus === 'green'){
+							    this.digitalIdStatus = certs[i].VISUAL_STATUS;
+							}
+							break;
+						case 3:
+							this.otherCertsHtml += html;
+							window.dbg.log("otherCertsHtml:"+ certs[i].VISUAL_STATUS);	
+							if (certs[i].VISUAL_STATUS !== 'green' && this.otherCertsStatus !== 'red'){
+							   // this.otherCertsStatus = certs[i].VISUAL_STATUS;
+							}
+							break;
+						case 4:	
+							this.digitalSignatureHtml += html;
+							window.dbg.log("digitalSignatureStatus:"+ certs[i].VISUAL_STATUS);	
+							if (certs[i].VISUAL_STATUS !== 'green' && this.digitalSignatureStatus === 'green'){
+							    this.digitalSignatureStatus = certs[i].VISUAL_STATUS;
+							}
+							break;
 						}
-						break;
-					case 2:
-						this.digitalIdHtml += html;
-						window.dbg.log("digitalIdStatus:"+ certs[i].VISUAL_STATUS);	
-						if (certs[i].VISUAL_STATUS !== 'green' && this.digitalIdStatus !== 'red'){
-						    this.digitalIdStatus = certs[i].VISUAL_STATUS;
-						}
-						break;
-					case 3:
-						this.otherCertsHtml += html;
-						window.dbg.log("otherCertsHtml:"+ certs[i].VISUAL_STATUS);	
-						if (certs[i].VISUAL_STATUS !== 'green' && this.otherCertsStatus !== 'red'){
-						   // this.otherCertsStatus = certs[i].VISUAL_STATUS;
-						}
-						break;
-					case 4:	
-						this.digitalSignatureHtml += html;
-						window.dbg.log("dataPrivacyStatus:"+ certs[i].VISUAL_STATUS);	
-						if (certs[i].VISUAL_STATUS === 'green' && this.digitalSignatureStatus !== 'red'){
-						    this.digitalSignatureStatus = certs[i].VISUAL_STATUS;
-						}
-						break;
-					}
 					}else{
 						// setStatus for private key test , different logic whenever a certificate was red mark section as red 
 						switch(certType){
