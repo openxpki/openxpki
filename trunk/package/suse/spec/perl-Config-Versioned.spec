@@ -1,7 +1,7 @@
 %{!?perl_vendorlib: %define perl_vendorlib %(eval "`%{__perl} -V:installvendorlib`"; echo $installvendorlib)}
 
 Name:           perl-Config-Versioned
-Version:        0.7
+Version:        0.8
 Release:        1%{?dist}
 Summary:        Simple, versioned access to configuration data
 License:        GPL+ or Artistic

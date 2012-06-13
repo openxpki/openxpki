@@ -1,7 +1,7 @@
 %{!?perl_vendorlib: %define perl_vendorlib %(eval "`%{__perl} -V:installvendorlib`"; echo $installvendorlib)}
 
 Name:           perl-Connector
-Version:        0.7
+Version:        0.11
 Release:        1%{?dist}
 Summary:        Generic connection to data sets
 License:        GPL+ or Artistic
