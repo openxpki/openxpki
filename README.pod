@@ -1,0 +1,9 @@
+=head1 OpenXPKI Project
+
+The OpenXPKI Project aims at creating an enterprise-grade PKI/Trustcenter software supporting well established infrastructure components like RDBMS and Hardware Security Modules.
+
+=head2 NICE 
+
+NICE is the projects codename for a new API Layer, that should provide an easy 
+way to connect different certificate issuing backends to an OpenXPKI 
+installation.

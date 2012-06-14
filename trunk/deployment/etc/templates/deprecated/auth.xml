@@ -1,0 +1,117 @@
+[% USE password = RandomPassword -%]
+<auth>
+  <stack name="Anonymous">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_ANONYMOUS</description>
+    <handler>Anonymous</handler>
+  </stack>
+  <stack name="User">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER</description>
+    <handler>User Password</handler>
+    <!-- <handler>LDAP</handler> -->
+  </stack>
+  <stack name="Operator">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_OPERATOR</description>
+    <!-- <handler>Signing</handler> -->
+    <handler>Operator Password</handler>
+  </stack>
+  <stack name="External Dynamic">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_DYNAMIC</description>
+    <handler>External Dynamic Role</handler>
+  </stack>
+  <stack name="External Static">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_STATIC</description>
+    <handler>External Static Role</handler>
+  </stack>
+  <stack name="Certificate Challenge/Response">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE</description>
+    <handler>Signature</handler>
+  </stack>
+  <stack name="Certificate via Webserver">
+      <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER</description>
+      <handler>Certificate</handler>
+  </stack>
+  <stack name="_System">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_AUTH_SYSTEM</description>
+    <handler>System</handler>
+  </stack>
+  <handler name="Certificate" type="ClientX509">
+      <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER</description>
+      <!-- list the roles that you want to allow to login via this handler here -->
+      <allowed_role>User</allowed_role>
+      <allowed_role>RA Operator</allowed_role>
+      <allowed_role>CA Operator</allowed_role>
+  </handler>
+  <handler name="Signature" type="X509">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE</description>
+    <trust_anchors>your,identifiers,or,realms,here</trust_anchors>
+    <pkcs7tool>testsceppkcs7tool1</pkcs7tool>
+    <challenge_length>256</challenge_length>
+  </handler>
+  <handler name="Anonymous" type="Anonymous">
+    <role></role>
+  </handler>
+  <handler name="User Password" type="Password">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD</description>
+    <!-- howto generate sha1 passphrases?                     -->
+    <!-- echo -n root | openssl sha1 -binary | openssl base64 -->
+    <user>
+      <name>John Doe</name>
+      <digest>[% password.generate(scheme => 'ssha', callback => 'sub { print STDERR "*** NOTE: Password for user <John Doe> is: $_\n" }') %]</digest>
+      <role>User</role>
+    </user>
+  </handler>
+  <handler name="Operator Password" type="Password">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD</description>
+    <user>
+      <name>root</name>
+      <digest>[% password.generate(scheme => 'ssha', callback => 'sub { print STDERR "*** NOTE: Password for user <root> is: $_\n" }') %]</digest>
+      <role>CA Operator</role>
+    </user>
+    <user>
+      <name>raop</name>
+      <digest>[% password.generate(scheme => 'ssha', callback => 'sub { print STDERR "*** NOTE: Password for user <raop> is: $_\n" }') %]</digest>
+      <role>RA Operator</role>
+    </user>
+  </handler>
+  <handler name="External Dynamic Role" type="External">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL</description>
+    <!-- please note this is only a test configuration !!! -->
+    <!-- we use the passphrase to set the role             -->
+    <!-- never do this in real environments !!!            -->
+    <command>echo -n $PASSWD</command>
+    <!-- if this field is empty then the role is determined dynamically -->
+    <role></role>
+    <pattern>x</pattern>
+    <replacement>x</replacement>
+    <env>
+      <name>LOGIN</name>
+      <value>__USER__</value>
+    </env>
+    <env>
+      <name>PASSWD</name>
+      <value>__PASSWD__</value>
+    </env>
+  </handler>
+  <handler name="External Static Role" type="External">
+    <description>I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL</description>
+    <!-- please note this is only a test configuration !!! -->
+    <!-- we use the passphrase to set the role             -->
+    <!-- never do this in real environments !!!            -->
+    <command>echo -n $PASSWD</command>
+    <!-- if this field is empty then the role is determined dynamically -->
+    <role>RA Operator</role>
+    <pattern>x</pattern>
+    <replacement>x</replacement>
+    <env>
+      <name>LOGIN</name>
+      <value>__USER__</value>
+    </env>
+    <env>
+      <name>PASSWD</name>
+      <value>__PASSWD__</value>
+    </env>
+  </handler>
+  <handler name="System" type="Anonymous">
+    <role>System</role>
+  </handler>
+</auth>

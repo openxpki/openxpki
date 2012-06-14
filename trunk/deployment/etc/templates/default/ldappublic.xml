@@ -57,7 +57,7 @@
          <objectclass>organizationalRole</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiCA</objectclass>
        </auxiliary>
      </rdn>
@@ -77,7 +77,7 @@
          <objectclass>organizationalRole</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiCA</objectclass>
        </auxiliary>
      </rdn>
@@ -97,7 +97,7 @@
          <objectclass>organizationalRole</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiCA</objectclass>
        </auxiliary>
      </rdn>
@@ -117,7 +117,7 @@
          <objectclass>organizationalRole</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiCA</objectclass>
        </auxiliary>
      </rdn>
@@ -142,7 +142,7 @@
          <objectclass>inetOrgPerson</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -175,8 +175,7 @@
        <structural>
          <objectclass>device</objectclass>
        </structural>
-       <auxiliary>
-         <objectclass>opencaSCEPDevice</objectclass>
+       <auxiliary>         
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -197,7 +196,6 @@
          <objectclass>device</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaSCEPDevice</objectclass>
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -303,8 +301,6 @@
          <objectclass>inetOrgPerson</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
-         <objectclass>opencaUniquelyIdentifiedUser</objectclass>
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -328,7 +324,7 @@
          <objectclass>inetOrgPerson</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -352,7 +348,7 @@
          <objectclass>inetOrgPerson</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -376,7 +372,7 @@
          <objectclass>inetOrgPerson</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -400,7 +396,7 @@
          <objectclass>inetOrgPerson</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -425,7 +421,7 @@
          <objectclass>inetOrgPerson</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -458,7 +454,6 @@
          <objectclass>device</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaSCEPDevice</objectclass>
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -479,7 +474,6 @@
          <objectclass>device</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaSCEPDevice</objectclass>
          <objectclass>pkiUser</objectclass>
        </auxiliary>
      </rdn>
@@ -627,7 +621,7 @@
          <objectclass>organizationalRole</objectclass>
        </structural>
        <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+         
          <objectclass>pkiCA</objectclass>
        </auxiliary>
      </rdn>
@@ -646,8 +640,7 @@
        <structural>
          <objectclass>organizationalRole</objectclass>
        </structural>
-       <auxiliary>
-         <objectclass>opencaEmailAddress</objectclass>
+       <auxiliary>         
          <objectclass>pkiCA</objectclass>
        </auxiliary>
      </rdn>

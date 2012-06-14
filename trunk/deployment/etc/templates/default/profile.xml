@@ -10,14 +10,16 @@
       <extensions>
       </extensions>
     </profile>
-
+<!-- 
 [% FOREACH realmsection = global.pkirealm %]
     [% FOREACH ca = $realmsection.issuingca %]
     [% THROW config "No 'id' defined for issuing CA $ca" IF ! $ca.id.defined %]
     <profile id="[% $ca.id %]"
 	     super="../profile{default}"/>
     [% END %]
-[% END %]
+[% END %]  -->
+  <profile id="testdummyca1" super="../profile{default}"/>
+  <profile id="testdummyca2" super="../profile{default}"/>
   </crl>
 
   <!-- endentity profiles -->
@@ -324,18 +326,34 @@
       </template>
       <dn>CN=[- CN -][- IF OU -][- FOREACH entry = OU -],OU=[- entry -][- END -][- END -][- IF O -],O=[- O -][- END -][- FOREACH entry = DC -],DC=[- entry -][- END -][- IF C -],C=[- C -][- END -]</dn> 
       <additional_information>
+      	<input id="requestor_gname" 
+      		label="I18N_OPENXPKI_REQUESTOR_FIRSTNAME" 
+      		description="I18N_OPENXPKI_REQUESTOR_FIRSTNAME_DESC" 
+      		type="freetext" 
+      		width="40" />
+        <input id="requestor_name" 
+        	label="I18N_OPENXPKI_REQUESTOR_LASTNAME" 
+        	description="I18N_OPENXPKI_REQUESTOR_LASTNAME_DESC" 
+        	type="freetext" 
+        	width="40"/>
+        <input id="requestor_email" 
+        	label="I18N_OPENXPKI_REQUESTOR_EMAIL" 
+        	description="I18N_OPENXPKI_REQUESTOR_EMAIL_DESC" 
+        	type="freetext" 
+        	width="40" 
+        	match=".+@.+" />        
         <input id="phone"
-               label="I18N_OPENXPKI_PHONE"
-               description="I18N_OPENXPKI_PHONE_DESC"
-               type="freetext"
-               width="20"
-               default=""/>
+            label="I18N_OPENXPKI_PHONE"
+            description="I18N_OPENXPKI_PHONE_DESC"
+            type="freetext"
+            width="20"
+            default=""/>
         <input id="comment"
-               label="I18N_OPENXPKI_COMMENT"
-               description="I18N_OPENXPKI_COMMENT_DESC"
-               type="textarea"
-               width="40"
-               height="10"/>
+            label="I18N_OPENXPKI_COMMENT"
+            description="I18N_OPENXPKI_COMMENT_DESC"
+            type="textarea"
+            width="40"
+            height="10"/>                      
       </additional_information>
       <subject_alternative_names>
           <san id="choice">

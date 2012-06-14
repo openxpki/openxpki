@@ -1,0 +1,107 @@
+<!-- Conditions for refactored naming scheme
+  normal conditions start with  I18N_OPENXPKI_WF_COND_
+  acl conditions should use the special prefix I18N_OPENXPKI_WF_ACL_ 
+  The name should reflect or be inspired by the implementing class to avoid naming conflicts
+  -->
+<conditions>
+ <!-- TODO: in many cases, param name is useless, one can just read the
+      condition name instead. This is only useful if activity is different
+      from the ACL name -->
+  <condition name="I18N_OPENXPKI_WF_ACL_STORE_PASSWORD" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="store_password"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_RETRIEVE_PASSWORD" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="retrieve_password"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_PASSWORD" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_password"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_FAIL_WORKFLOW" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="fail_workflow"/>
+  </condition>
+
+  <!-- ACL Checks for Certificate Issuance
+ 	Note: It would make perhaps more sense to refactor the names to reflect a tree like structure
+	so, out CSR as the first part of the name  -->
+  <condition name="I18N_OPENXPKI_WF_ACL_CREATE_CSR" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="create_csr"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_ROLE" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_role"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_PROFILE" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_profile"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_SUBJECT_STYLE" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_subject_style"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_SUBJECT" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_subject"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_SUBJECT_ALT_NAME" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_subject_alt_name"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_INFO" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_csr_info"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_NOTBEFORE" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_notbefore"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_NOTAFTER" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_notafter"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_APPROVE_CSR" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="approve_csr"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CANCEL_CSR_APPROVAL" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="cancel_csr_approval"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_INSERT_CSR" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="insert_csr"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_PERSIST_CSR" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="persist_csr"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_REJECT_CSR" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="reject_csr"/>
+  </condition>
+  
+  <!--  Smartcard -->
+  <condition name="I18N_OPENXPKI_WF_ACL_SMARTCARD_PERSONALIZATION" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="smartcard_personalization"/>
+  </condition>
+  
+  <!-- LDAP Publication -->
+  <condition name="I18N_OPENXPKI_WF_ACL_CERTIFICATE_LDAP_PUBLISHING" 
+  	class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="certificate_ldap_publishing"/>
+  </condition>
+  
+  <!-- Revocation -->
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_CREATE" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="create_crr"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_INVALIDITY_TIME" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_crr_invalidity_time"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_REASON" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="change_crr_reason"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_APPROVE" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="approve_crr"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_CANCEL_APPROVAL" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="cancel_crr_approval"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_REVOKE_CERTIFICATE" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="revoke_certificate"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_INSERT" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="insert_crr"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_REJECT" class="OpenXPKI::Server::Workflow::Condition::ACL">
+    <param name="activity" value="reject_crr"/>
+  </condition>
+
+  
+ </conditions>

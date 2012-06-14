@@ -1,25 +1,22 @@
 <actions>
-  <action name="determine_next_ca"
+
+	<action name="I18N_OPENXPKI_WF_ACTION_NICE_INIT_ISSUE_CRL"
+		class="Workflow::Action::Null">
+		<field name="crl_validity"/>
+		<field name="delta_crl"/>
+		
+		<validator name="I18N_OPENXPKI_WF_VAL_RELATIVEDATE">
+          <arg>$crl_validity</arg>
+      	</validator>
+	</action>
+
+  <action name="I18N_OPENXPKI_WF_ACTION_DETERMINE_NEXT_CA"
 	  class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::DetermineNextCA">
   </action>
 
-  <action name="get_crl_profile"
-	  class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::GetCRLProfile"> 
-  </action>
-
-  <action name="continue"
-	  class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::GetCRLProfile"> 
-  </action>
-
-  <action name="issue_crl"
-	class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::IssueCRL">
-  </action>
-
-  <action name="publish_crl"
+ 
+  <action name="I18N_OPENXPKI_WF_ACTION_PUBLISH_CRL"
         class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::PublishCRL">
   </action>
 
-  <action name="null"
-	  class="Workflow::Action::Null">
-  </action>
 </actions>

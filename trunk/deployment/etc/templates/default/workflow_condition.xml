@@ -1,232 +1,72 @@
+<!-- Conditions for refactored naming scheme
+  normal conditions start with  I18N_OPENXPKI_WF_COND_
+  acl conditions should use the special prefix I18N_OPENXPKI_WF_ACL_ 
+  The name should reflect or be inspired by the implementing class to avoid naming conflicts
+  -->
 <conditions>
-
-  <!-- always write the ACL conditions first followed by the normal conditions -->
-
-  <!-- general CSR conditions -->
-
-  <condition name="server_key_generation" class="OpenXPKI::Server::Workflow::Condition::IsServerKeyGeneration">
-  </condition>
-
-  <condition name="workflow_creator" class="OpenXPKI::Server::Workflow::Condition::WorkflowCreator"/>
-
- <!-- TODO: in many cases, param name is useless, one can just read the
-      condition name instead. This is only useful if activity is different
-      from the ACL name -->
-  <condition name="ACL::store_password" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="store_password"/>
-  </condition>
-  <condition name="ACL::retrieve_password" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="retrieve_password"/>
-  </condition>
-  <condition name="ACL::change_password" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_password"/>
-  </condition>
-  <condition name="ACL::create_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="create_csr"/>
-  </condition>
-  <condition name="ACL::change_csr_role" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_csr_role"/>
-  </condition>
-  <condition name="ACL::change_csr_profile" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_csr_profile"/>
-  </condition>
-  <condition name="ACL::change_csr_subject_style" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_csr_subject_style"/>
-  </condition>
-  <condition name="ACL::change_csr_subject" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_csr_subject"/>
-  </condition>
-  <condition name="ACL::change_csr_subject_alt_name" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_csr_subject_alt_name"/>
-  </condition>
-  <condition name="ACL::change_csr_info" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_csr_info"/>
-  </condition>
-  <condition name="ACL::change_notbefore" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_notbefore"/>
-  </condition>
-  <condition name="ACL::change_notafter" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_notafter"/>
-  </condition>
-  <condition name="ACL::approve_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="approve_csr"/>
-  </condition>
-  <condition name="ACL::cancel_csr_approval" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="cancel_csr_approval"/>
-  </condition>
-  <condition name="ACL::insert_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="insert_csr"/>
-  </condition>
-  <condition name="ACL::persist_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="persist_csr"/>
-  </condition>
-  <condition name="ACL::reject_csr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="reject_csr"/>
-  </condition>
-  <condition name="ACL::smartcard_personalization" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="smartcard_personalization"/>
-  </condition>
-  <condition name="ACL::fail_workflow" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="fail_workflow"/>
-  </condition>
-
-  <condition name="Condition::check_csr_approvals" class="OpenXPKI::Server::Workflow::Condition::Approved">
+  
+  <!-- general CSR conditions --> 
+  <condition name="I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR" 
+  	class="OpenXPKI::Server::Workflow::Condition::WorkflowCreator"/>
+  	
+  <!-- Request and Issuance -->	
+  <condition name="I18N_OPENXPKI_WF_COND_SERVER_KEY_GENERATION" 
+  	class="OpenXPKI::Server::Workflow::Condition::IsServerKeyGeneration" />
+  
+  <condition name="I18N_OPENXPKI_WF_COND_CHECK_CSR_APPROVALS" 
+  	class="OpenXPKI::Server::Workflow::Condition::Approved">
     <param name="role" value="RA Operator"/>
   </condition>
+   				 
+  <condition name="I18N_OPENXPKI_WF_COND_SUBJECT_MATCHES_PKCS10"  			   
+		class="OpenXPKI::Server::Workflow::Condition::SubjectMatchesPKCS10">
+  </condition>
 
-  <!-- general CRR conditions -->
+  <!--  revocation -->
+  <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_REVOCATION_CRL_ISSUANCE_PENDING" 
+  	class="OpenXPKI::Server::Workflow::Condition::CertificateHasStatus">    
+    <param name="expected_status" value="CRL_ISSUANCE_PENDING"/>
+  </condition>
+  
+  <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED" 
+  	class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">    
+    <param name="crl_issuance_pending_accept" value="0"/>
+  </condition>
 
-  <condition name="certificate_not_yet_revoked" class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">
+  <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING" 
+  	class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">
     <!-- here you can set whether you want accept more CRRs while the
          certificate is still in state CRL_ISSUANCE_PENDING (as compared
          to REVOKED) or not -->
     <param name="crl_issuance_pending_accept" value="1"/>
   </condition>
-  <condition name="ACL::create_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="create_crr"/>
-  </condition>
-  <condition name="ACL::change_crr_invalidity_time" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_crr_invalidity_time"/>
-  </condition>
-  <condition name="ACL::change_crr_reason" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="change_crr_reason"/>
-  </condition>
-  <condition name="ACL::approve_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="approve_crr"/>
-  </condition>
-  <condition name="ACL::cancel_crr_approval" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="cancel_crr_approval"/>
-  </condition>
-  <condition name="ACL::revoke_certificate" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="revoke_certificate"/>
-  </condition>
-  <condition name="ACL::insert_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="insert_crr"/>
-  </condition>
-  <condition name="ACL::reject_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="reject_crr"/>
-  </condition>
 
-  <condition name="Condition::check_crr_approvals" class="OpenXPKI::Server::Workflow::Condition::Approved">
+  <condition name="I18N_OPENXPKI_WF_COND_CHECK_CRR_APPROVALS" 
+  	class="OpenXPKI::Server::Workflow::Condition::Approved">
     <param name="role" value="RA Operator"/>
   </condition>
 
-  <!-- if you use an online and an offline server then you need this for CSRs too -->
-
-  <condition name="ACL::export_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="export_crr"/>
-  </condition>
-  <condition name="ACL::import_crr" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="import_crr"/>
+  <condition name="I18N_OPENXPKI_WF_COND_CHECK_FOR_REVOCATION_CHECKS_LEFT" 
+  	class="OpenXPKI::Server::Workflow::Condition::MaxIterationsNotReached">
+  	<param name="iterator_name" value="crr_max_checks"/>
+  	<param name="max_count" value="5"/>
   </condition>
 
-
-  <!-- check for system-instantiated workflow -->
-  <condition name="ACL::start_certificate_issuance" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="certificate_issuance_start"/>
-  </condition>
-
-  <!-- key online checks -->
-  <condition name="ca_key_usable" class="OpenXPKI::Server::Workflow::Condition::Key"> 
-    <!-- FIXME: insert proper arguments here -->
-    <param name="key" value="ca"/>
-    <!-- use condition name ($self->name) to determine what we want to do -->
-    <param name="status" value="usable"/>
-  </condition>
-
-  <!-- conditions relevant for CRL issuance -->
-  <condition name="ACL::start_crl_issuance" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="start_crl_issuance"/>
-  </condition>
-  <condition name="crl_signing_cas_left" class="OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft">
-    <!-- use condition name ($self->name) to determine what we want to do -->
-  </condition>
-
-  <condition name="valid_csr_serial_present" class="OpenXPKI::Server::Workflow::Condition::ValidCSRSerialPresent">
-  </condition>
-
-  <!-- conditions for child workflow control -->
-  <!-- obsolete ... -->
-  <condition name="wf_child_instance_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
-  </condition>
-  <condition name="wf_children_instances_finished" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
-  </condition>
-  <condition name="wf_child_instance_success" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenSuccessfullyFinished">
-  </condition>
-  <condition name="wf_child_instance_failure" class="OpenXPKI::Server::Workflow::Condition::WorkflowChildrenFailure">
-  </condition>
-
-  <!-- new -->
-  <condition name="all_wf_children_instances_finished" class="OpenXPKI::Server::Workflow::Condition::CheckForkedWorkflowChildren">
-  </condition>
-
-  <!-- conditions for smartcard personalization -->
-  <!-- policy settings -->
-  <condition name="approval_needed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue">
-  </condition>
-  <!-- user settable parameters -->
-  <condition name="certificate_issuance_possible" class="OpenXPKI::Server::Workflow::Condition::IsCertificateIssuancePossible">
-    <param name="required" value="%REQUIRED_PARAMS%"/>
-  </condition>
-  <!-- internal conditions -->
-  <condition name="more_csrs_to_create" class="OpenXPKI::Server::Workflow::Condition::MoreCSRsToCreate">
-  </condition>
-  <condition name="more_certs_to_test" class="OpenXPKI::Server::Workflow::Condition::MoreCertsToTest">
-  </condition>
-  <condition name="test_result_ok" class="OpenXPKI::Server::Workflow::Condition::CheckCertTestResult"> 
-  </condition>
-
-  <!-- conditions for the data exchange -->
-  <condition name="ACL::dataexchange_export" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="dataexchange_export"/>
-  </condition>
-  <condition name="ACL::dataexchange_import" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="dataexchange_import"/>
-  </condition>
-
-  <!-- SCEP conditions -->
-  <!-- policy settings, set them to your liking -->
-  <condition name="initial_enrollment_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
-
-  <condition name="auto_renewal_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
-
-  <condition name="auto_approval_allowed" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
-
-  <!-- SCEP internal settings, only change parameters here -->
-  <condition name="is_initial_enrollment" class="OpenXPKI::Server::Workflow::Condition::InitialEnrollmentOrRenewal">
-    <param name="RDN_filter" value="CN,O"/>
-  </condition>
-  <condition name="valid_signature" class="OpenXPKI::Server::Workflow::Condition::IsValidSignature"/>
-  <condition name="correct_number_of_valid_certs" class="OpenXPKI::Server::Workflow::Condition::CorrectNumberOfValidCerts"> 
-    <param name="min" value="1"/>
-    <param name="max" value="2"/>
-  </condition>
-  <condition name="correct_timing" class="OpenXPKI::Server::Workflow::Condition::CorrectTiming">
-    <param name="difference" value="+0003"/> <!-- renewal can only begin 3 months before the certificate becomes invalid -->
-  </condition>
-  <condition name="csr_has_valid_role" class="OpenXPKI::Server::Workflow::Condition::SCEPClientCSRValidRole">
-      <!--
-      optional parameter to restrict the roles that can be specified
-      by the user in the CSR, if not present, all available roles are
-      considered valid.
-      <param name="allowed_roles" value="TLS Server,TLS Client"/>
-      -->
+  
+  <!-- CRL Issue -->
+  <condition name="I18N_OPENXPKI_WF_COND_CRL_SIGNING_CAS_LEFT" 
+  	class="OpenXPKI::Server::Workflow::Condition::CRLSigningCAsLeft">    
   </condition>
   
-  <condition name="signed_using_original_cert" class="OpenXPKI::Server::Workflow::Condition::SignedUsingOriginalCertOrSelfSigned"/>
-  <condition name="scep_client" class="OpenXPKI::Server::Workflow::Condition::SCEPClient"/>
-  <condition name="client_enrollment" class="OpenXPKI::Server::Workflow::Condition::SCEPClientEnrollment"/>
-  <condition name="client_autoissuance" class="OpenXPKI::Server::Workflow::Condition::SCEPClientAutoIssuance"/>
-  <condition name="client_cert_valid" class="OpenXPKI::Server::Workflow::Condition::SCEPClientCertValid"/>
-
- <!-- conditions for publishing certificates using ldap -->
-  <condition name="ACL::certificate_ldap_publishing" class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="certificate_ldap_publishing"/>
-  </condition>
-  <condition name="use_ldap" class="OpenXPKI::Server::Workflow::Condition::UseLdap">
-  </condition>
-  <condition name="ldap_dn_available" class="OpenXPKI::Server::Workflow::Condition::LdapDnAvailable">
+  
+  <!-- LDAP Publish -->
+  <condition name="I18N_OPENXPKI_WF_COND_LDAP_DN_AVAILABLE" 
+  	class="OpenXPKI::Server::Workflow::Condition::LdapDnAvailable">    
+  </condition>   
+  <condition name="I18N_OPENXPKI_WF_COND_LDAP_USE_LDAP" 
+  	class="OpenXPKI::Server::Workflow::Condition::UseLdap">
   </condition>
 
+  
+  
 </conditions>
-

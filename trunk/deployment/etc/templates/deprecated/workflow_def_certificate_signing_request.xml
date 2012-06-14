@@ -1,0 +1,137 @@
+<workflow>
+  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
+  <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST</description>
+  <persister>OpenXPKI</persister>
+  <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>
+
+  <state name="INITIAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>
+    <action name="create_csr" 
+	    resulting_state="CREATED">
+    </action>
+  </state>
+
+  <state name="CREATED" autorun="yes">
+    <action name="notify_user_of_creation"
+            resulting_state="PENDING">
+        <condition name="!server_key_generation"/>
+    </action>
+
+    <action name="null2"
+            resulting_state="SERVER_KEY_GENERATION">
+        <condition name="server_key_generation"/>
+    </action>
+  </state>
+
+  <state name="SERVER_KEY_GENERATION">
+    <action name="generate_key"
+            resulting_state="KEY_GENERATED">
+    </action>
+  </state>
+
+  <state name="KEY_GENERATED" autorun="yes">
+    <action name="generate_pkcs10"
+            resulting_state="PKCS10_GENERATED">
+    </action>
+  </state>
+
+  <state name="PKCS10_GENERATED" autorun="yes">
+    <action name="notify_user_of_creation"
+            resulting_state="PENDING">
+    </action>
+  </state>
+
+  <state name="PENDING">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_csr_role"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_csr_profile"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_csr_subject"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_csr_subject_alt_name"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_csr_info"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_NOTBEFORE"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_notbefore"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_NOTAFTER"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_notafter"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+	    resulting_state="APPROVAL">
+      <condition name="ACL::approve_csr"/>
+      <condition name="!workflow_creator"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+	    resulting_state="REJECTED">
+      <condition name="ACL::reject_csr"/>
+    </action>
+  </state>
+
+  <state name="APPROVAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVAL</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
+	    resulting_state="SPAWNING_CERT_ISSUANCE">
+      <condition name="ACL::insert_csr"/>
+      <condition name="Condition::check_csr_approvals"/>
+    </action>
+    <!-- perhaps we need more than one approval or                 -->
+    <!-- perhaps the first approval was from a not authorized role -->
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+	    resulting_state="APPROVAL">
+      <condition name="ACL::approve_csr"/>
+      <condition name="!workflow_creator"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
+	    resulting_state="PENDING">
+      <condition name="ACL::cancel_csr_approval"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+	    resulting_state="REJECTED">
+      <condition name="ACL::reject_csr"/>
+    </action>
+  </state>
+
+  <state name="SPAWNING_CERT_ISSUANCE" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
+	    resulting_state="WAITING_FOR_CHILD">
+    </action>
+  </state>
+  
+  <state name="WAITING_FOR_CHILD">
+    <action name="child_finished_successfully"
+	    resulting_state="CHILD_FINISHED_SUCCESS">
+      <condition name="all_wf_children_instances_finished"/>
+    </action>
+    <action name="child_finished_failure"
+	    resulting_state="FAILURE">
+    </action>
+  </state>
+
+  <state name="CHILD_FINISHED_SUCCESS" autorun="yes">
+      <action name="notify_user_of_issuance"
+              resulting_state="SUCCESS"/>
+  </state>
+
+  <state name="REJECTED" autorun="yes">
+    <action name="null"
+            resulting_state="FAILURE">
+    </action>
+  </state>
+  <state name="FAILURE" />
+  <state name="SUCCESS" />
+</workflow>

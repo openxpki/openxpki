@@ -1,0 +1,25 @@
+<database>
+  <debug>[% global.debug %]</debug>
+  [% FOREACH tag = ['server_id' 'server_shift' 'type' 'name' 'host' 'port' 'user' 'passwd' 'namespace' ] %]
+    [% IF database.$tag.defined %]
+    <[% tag %]>[% database.$tag %]</[% tag %]>
+    [% END %]
+  [% END %]
+  <environment>
+    <vendor>
+      <type>[%- IF database.type == 'PostgreSQL' -%]
+Pg
+            [%- ELSIF database.type == 'MySQL' -%]
+mysql
+            [%- ELSE -%]
+              [%- database.type -%]
+            [%- END -%]</type>
+      [% FOREACH option = database.options.keys %]
+      <option>
+        <name>[% option %]</name>
+        <value>[% database.options.$option %]</value>
+      </option>
+      [% END %]
+    </vendor>
+  </environment>
+</database>
