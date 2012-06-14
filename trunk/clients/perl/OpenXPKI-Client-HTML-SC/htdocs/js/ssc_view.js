@@ -2445,7 +2445,10 @@ var SSC_VIEW = new Class(
 						case 1:
 							this.dataPrivacyHtml += html;
 							window.dbg.log("dataPrivacyStatus:"+ certs[i].VISUAL_STATUS);	
-							if (certs[i].VISUAL_STATUS === 'green' && this.dataPrivacyStatus === 'red'){
+							if (certs[i].VISUAL_STATUS === 'green' && this.dataPrivacyStatus === 'red'  ){
+							    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
+							}
+							if (certs[i].VISUAL_STATUS === 'amber' && this.dataPrivacyStatus === 'red'  ){
 							    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
 							}
 							break;
