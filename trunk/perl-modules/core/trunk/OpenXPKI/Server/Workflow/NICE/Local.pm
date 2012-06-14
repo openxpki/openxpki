@@ -206,11 +206,11 @@ sub revokeCertificate {
     
    my $self       = shift;
    my $crr  = shift;
-	 
-   #$self->_set_context_param('cert_identifier', $crr->{IDENTIFIER});
-   #$self->_set_context_param('reason_code', $crr->{REASON_CODE});
-   $self->_set_context_param('crl_check_retries', 0);
-   
+	
+   # We need the cert_identifier to check for revocation later
+   # usually it is already there
+   $self->_set_context_param('cert_identifier', $crr->{IDENTIFIER}) if (!$self->_get_context_param('cert_identifier'));
+      
    return;
 }
 
@@ -219,23 +219,25 @@ sub checkForRevocation{
 	my $self = shift;
 	   
 	# As the local crl issuance process will set the state in the certificate
-	# Table directly, we just check the retry counter and throw an exception	
+	# table directly, we get the certificate status from the local table
+
+    ##! 16: 'Checking revocation status'	
+    my $cert = CTX('dbi_backend')->first (
+        TABLE => 'CERTIFICATE',
+        COLUMNS => ['STATUS'],
+        DYNAMIC => {
+            IDENTIFIER => {VALUE => $self->_get_context_param('cert_identifier')},
+        }
+    );
 	
-	##! 1: 'start'
-	
-	my $retries = $self->_get_context_param( 'crl_check_retries');
-    ##! 8: 'Retries: ' . $retries	
-	if ($retries < 2) {			
-		$self->_set_context_param( 'crl_check_retries', ++$retries);
-		#sleep ( 2**$retries * 60 );
-		sleep 5;			
-	} else {
-	    ##! 8: 'Retries exeeded '	
-		# Exception stops the Workflow
-		OpenXPKI::Exception->throw(
-			message => "I18N_OPENXPKI_SERVER_NICE_CHECK_FOR_REVOCATION_MAX_COUNT_REACHED",			
-		);	
-	}    
+	if ($cert->{STATUS} eq 'REVOKED') {
+	   ##! 32: 'certificate revoked'	
+       return 1;
+	}
+ 
+	# If the certificate is not revoked, trigger pause
+	##! 32: 'Revocation is pending - going to pause'
+	$self->_get_activity()->pause('I18N_OPENXPKI_SERVER_NICE_LOCAL_REVOCATION_PENDING');
 	
 	return;
 }

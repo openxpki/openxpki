@@ -13,9 +13,9 @@
   
   <!-- Do NOT set autorun as this will cause the parent (issue) process to hang until we finish
   	We need the new workflow engine to pick this up automatic -->
-  <state name="WAITING_FOR_START">
+  <state name="WAITING_FOR_START" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_WAITING_FOR_START</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+    <action name="I18N_OPENXPKI_WF_ACTION_TOOLS_DISCONNECT"
              resulting_state="CHECK_DN_AVAILABLE">
 		<condition name="I18N_OPENXPKI_WF_ACL_CERTIFICATE_LDAP_PUBLISHING"/>
    	</action>

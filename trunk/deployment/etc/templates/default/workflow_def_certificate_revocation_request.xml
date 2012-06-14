@@ -74,25 +74,15 @@
 	    resulting_state="CHECK_FOR_REVOCATION" />          
   </state>
   
-
-  <state name="CHECK_FOR_REVOCATION" autorun="yes">
-   	<action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
-            resulting_state="SUCCESS"> 
-	     <condition name="!I18N_OPENXPKI_WF_COND_CERTIFICATE_REVOCATION_CRL_ISSUANCE_PENDING"/>
-	     <condition name="!I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED" />
-    </action>    
-    <!-- Loop as long as the certificate is not revoked or max checks is reached -->
+  <state name="CHECK_FOR_REVOCATION" autorun="yes">   	
+    <!-- Loop as long as the certificate is not revoked or max checks is reached 
+       All the loop magic is done by the workflow engine, the activity wont proceed 
+       as long as the certificate is not revoked   -->
   	<action name="I18N_OPENXPKI_WF_ACTION_NICE_CHECK_FOR_REVOCATION"
-  		resulting_state="CHECK_FOR_REVOCATION">
-  		<condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_REVOCATION_CRL_ISSUANCE_PENDING"/>
-  		<condition name="I18N_OPENXPKI_WF_COND_CHECK_FOR_REVOCATION_CHECKS_LEFT"/>
- 	</action> 	
- 	<!-- we are no longer in pending but also not revoked, so something is wrong -->
- 	<!-- Might happen if we have hold/unhold and revoke workflows running in parallel  -->  	 	
- 	<action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING2"
-  		resulting_state="FAILURE">
-		<condition name="!I18N_OPENXPKI_WF_COND_CHECK_FOR_REVOCATION_CHECKS_LEFT"/>
- 	</action>
+  		resulting_state="SUCCESS"
+  		retry_count="30"     
+  		retry_interval="+000000000015">       	  		
+ 	</action> 	 	
   </state>
  
   <state name="REJECTED" autorun="yes">

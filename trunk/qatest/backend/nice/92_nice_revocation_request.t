@@ -99,6 +99,13 @@ printf "UPDATE certificate SET status = 'REVOKED' WHERE identifier = '%s';\n\n",
 
 $test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_START_REVOCATION' );
 
+my $i=0; 
+while ($test->state() eq 'CHECK_FOR_REVOCATION' && $i++ < 10) {    
+    print ".";        
+    sleep 10;
+    $test->reset(); # Test::More caches the last response!
+}
+
 $test->state_is('SUCCESS');
 
 $test->disconnect();
