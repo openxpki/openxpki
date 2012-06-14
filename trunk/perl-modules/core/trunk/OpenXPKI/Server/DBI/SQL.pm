@@ -15,6 +15,7 @@ use Regexp::Common;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;
+use OpenXPKI::Server::Context qw( CTX );
 
 # use Smart::Comments;
 
