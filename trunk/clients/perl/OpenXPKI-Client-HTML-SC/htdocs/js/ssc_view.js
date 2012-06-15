@@ -39,7 +39,8 @@ var SSC_VIEW = new Class(
 					'showAuthPersonDlg','processBackUnblock',
 					'init_step3', 'init_step4', 'init_step5', 'unblockCard', 'changePin', '_tr' ,'setTranslatedElementText',
 					'_changeLanguage_step2','cardObserver','cardObserverCB','testPrivateKey','enableSSO', 'confOutlook', 'showHints',
-					'processTestPrivateKey','testPrivateKeyCB', 'cleanUpCard', 'setButton' , 'handleKeyDown' , 'processConfOutlook_done' ,'processConfOutlook'],
+					'processTestPrivateKey','testPrivateKeyCB', 'cleanUpCard', 'setButton' , 'handleKeyDown' ,
+					'processEnableSSO_done',  'processConfOutlook_done' ,'processConfOutlook'],
 			
 			/*
 			 * chain of command params
@@ -1511,14 +1512,23 @@ var SSC_VIEW = new Class(
 			
 			processEnableSSO : function(){
 				window.dbg.log('processEnableSSO');
-				var self = this;
-				sscModel.sc_enable_sso(function(rc){
-							if (rc === 'success'){self.setInfoTitle('T_enableSsoSuccess');} 
-							else {self.setInfoTitle('T_enableSsoFailed');}
-							self.setNextAction('',null, false);
-							$('infoMore').empty();
-					}
-				);
+				window.dbg.log(sscView.processEnableSSO_done);
+				sscModel.sc_enable_sso( function(){ this.processEnableSSO_done  ;}.bind(this)  );
+			},
+			
+			processEnableSSO_done : function(rc){
+				window.dbg.log('processEnableSSO_done');
+				if (rc === 'SUCCESS'){
+					this.setInfoTitle('T_enableSsoSuccess');
+					this.setPrompt('P_enableSsoSuccess');
+				}else{
+					this.setInfoTitle('T_enableSsoFailed');
+					this.setPrompt('P_enableSsoFailed');
+				}
+				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
+				this.setNextAction('',null, false);
+				$('infoMore').empty();
+				
 			},
 			
 			confOutlook : function(){
@@ -2445,7 +2455,10 @@ var SSC_VIEW = new Class(
 						case 1:
 							this.dataPrivacyHtml += html;
 							window.dbg.log("dataPrivacyStatus:"+ certs[i].VISUAL_STATUS);	
-							if (certs[i].VISUAL_STATUS === 'green' && this.dataPrivacyStatus === 'red'){
+							if (certs[i].VISUAL_STATUS === 'green' && this.dataPrivacyStatus === 'red'  ){
+							    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
+							}
+							if (certs[i].VISUAL_STATUS === 'amber' && this.dataPrivacyStatus === 'red'  ){
 							    this.dataPrivacyStatus = certs[i].VISUAL_STATUS;
 							}
 							break;

@@ -427,7 +427,7 @@ CERTS:
 			);
 			
 			$log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_UPLOAD_CSR");
-			#$log->debug("params:". Dumper($msg));
+			$log->debug(Dumper($msg));
 		}
 		else {
 			push(
