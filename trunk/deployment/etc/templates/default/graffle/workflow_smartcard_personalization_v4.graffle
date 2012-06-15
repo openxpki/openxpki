@@ -396,7 +396,7 @@ Smartcard Personalization}</string>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2012-06-14 15:44:51 +0000</string>
+	<string>2012-06-14 20:18:55 +0000</string>
 	<key>Modifier</key>
 	<string>Martin Bartosch</string>
 	<key>NotesVisible</key>
@@ -29084,6 +29084,8 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
 					</array>
 					<key>UserInfo</key>
 					<dict>
+						<key>certstatus</key>
+						<string>ANY</string>
 						<key>class</key>
 						<string>OpenXPKI::Server::Workflow::Activity::Tools::RetrieveCertificate</string>
 					</dict>
@@ -43188,13 +43190,13 @@ SUCCESS}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>10</integer>
+		<integer>0</integer>
 		<key>ExpandedCanvases</key>
 		<array/>
 		<key>FitInWindow</key>
 		<true/>
 		<key>Frame</key>
-		<string>{{118, 0}, {1114, 1028}}</string>
+		<string>{{122, 0}, {1114, 1028}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
