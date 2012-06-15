@@ -45,7 +45,7 @@ sub execute
 	}
     }
 
-    my $status_filter = $context->param('certstatus');
+    my $status_filter = $self->param('certstatus');
 
     if (! defined $status_filter) {
 	$status_filter = 'ISSUED';
