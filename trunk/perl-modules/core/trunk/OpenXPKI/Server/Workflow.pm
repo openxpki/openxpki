@@ -73,6 +73,7 @@ sub new {
 
     #we need the Factory for commiting the curent proc-state:
     $self->{_FACTORY} = $Factory;
+    $self->{_WORKFLOW} = $BaseWorkflow;    
     $self->{_CURRENT_ACTION} = '';
     
 
@@ -382,7 +383,7 @@ sub _set_proc_state{
     my $self = shift;
     my $proc_state = shift;
 
-    ##! 20: sprintf('_set_proc_state from %s to %s', $self->proc_state(), $proc_state);
+    ##! 20: sprintf('_set_proc_state from %s to %s, Wfl State: %s', $self->proc_state(), $proc_state, $self->{_WORKFLOW}->state());
     
     if(!$known_proc_states{$proc_state}){
             OpenXPKI::Exception->throw (
@@ -391,9 +392,11 @@ sub _set_proc_state{
             );
         
     }
+    
     $self->proc_state($proc_state);
-    #save current proc-state immediately to DB:
+    # save current proc-state immediately to DB 
     $self->_save();
+    
 }
 
 sub _proc_state_exception {
@@ -465,6 +468,18 @@ sub _get_next_state {
 sub _save{
     my $self = shift;
     ##! 20: 'save workflow!'
+    
+    # do not save if we are in the startup phase of a workflow
+    # Some niffy tasks create broken workflows for validating
+    # parameters and we will get tons of init/exception entries
+    my $proc_state = $self->proc_state;
+    if ($self->{_WORKFLOW}->state() eq 'INITIAL' &&
+        ($proc_state eq 'init' || $proc_state || 'running'  || $proc_state eq'exception' )) {
+    
+        ##! 20: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
+        return; 
+    } 
+    
     $self->{_FACTORY}->save_workflow($self);
     
     # If using a DBI persister with no autocommit, commit here.
