@@ -35,6 +35,7 @@ sub dispatch_map {
         'personalization' => 'OpenXPKI::Client::HTML::SC::Personalization',
         'utilities'       => 'OpenXPKI::Client::HTML::SC::Utilities',
         'getauthcode'     => 'OpenXPKI::Client::HTML::SC::Getauthcode',
+        'changepolicy'     => 'OpenXPKI::Client::HTML::SC::Changecardpolicy',
     #    'dev'             => 'OpenXPKI::Client::HTML::SC::APITest',
      #   'language'     => 'OpenXPKI::Client::HTML::SC::Language',
     };

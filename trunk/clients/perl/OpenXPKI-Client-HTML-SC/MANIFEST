@@ -11,6 +11,8 @@ lib/OpenXPKI/Client/HTML/SC/Personalization.pm
 lib/OpenXPKI/Client/HTML/SC/Dispatcher.pm
 lib/OpenXPKI/Client/HTML/SC/Utilities.pm
 lib/OpenXPKI/Client/HTML/SC/Session.pm
+lib/OpenXPKI/Client/HTML/SC/Changecardpolicy
+
 
 eg/apache-sc-frontend.conf
 eg/sc_frontend.cfg
@@ -65,19 +67,15 @@ htdocs/img/name_db.gif
 htdocs/img/statusOrange1.png
 htdocs/img/info.gif
 htdocs/css/sscStyle.css
-htdocs/download/dbSignedPKCS11_v1212.cab
 htdocs/js/ssc_model.js
 htdocs/js/mootools-more.js
 htdocs/js/ssc_view.js
-htdocs/js/mootools-1.2.4.4-more.js
 htdocs/js/mootools-more-1.4.0.1.js
 htdocs/js/ssc_helper.js
 htdocs/js/querystring.js
 htdocs/js/settings.js
-htdocs/js/mootools-1.2.4.js
 htdocs/js/mootools-core-1.4.5.js
 htdocs/js/ssc_controller.js
-htdocs/js/mootools-core-1.3-full-nocompat-yc.js
 htdocs/js/urlEncode.js
 htdocs/js/firebug-lite.js
 htdocs/language/ssc_lang_us.json

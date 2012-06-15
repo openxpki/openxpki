@@ -795,21 +795,20 @@ sub pinreset_verify {
 	
 		if(defined $got_puk && $got_puk ne '')
 		{
-			 $responseData->{'puk'} = $serializer->deserialize($got_puk);
 
-	my $PUK     = $serializer->deserialize( $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_puk} );
+			my $PUK     = $serializer->deserialize( $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_puk} );
 
 
-		if(defined  $PUK &&  $PUK ne '')
-		{
-			
-				$plugincommand =
-				    'ResetPIN;CardSerial='
-				  . $session->{'cardID'} 
-				  . ';PUK='.$PUK->[0].';';
-		 #$log->debug('Pinreset_plugincommand: '. $plugincommand);
-
-		}
+			if(defined  $PUK &&  $PUK ne '')
+			{
+				
+					$plugincommand =
+					    'ResetPIN;CardSerial='
+					  . $session->{'cardID'} 
+					  . ';PUK='.$PUK->[0].';';
+			 #$log->debug('Pinreset_plugincommand: '. $plugincommand);
+	
+			}
       #  $responseData->{'puk'} = $got_puk;
 
         if ( $self->is_error_response($msg) ) {

@@ -29,7 +29,8 @@ var SSC_MODEL = new Class(
 					'sc_cb_persoSendCardStatus', 'determineRequiAction',
 					'sc_cb_installx509', 'sc_cb_importP12', 'sc_resetToken',
 					'sc_cb_resetToken', 'sc_GetTokenID' , 'sc_cb_GetTokenID' , 
-					'cb_server_get_status','sc_getCardList', 'server_get_status' , 'sc_checkCardPresence'],
+					'cb_server_get_status','sc_getCardList', 'server_get_status' ,
+					'sc_checkCardPresence' ,'server_cb_get_card_policy', 'server_cb_get_card_policy_confirm','sc_enable_sso' ],
 
 			options : {
 				baseUrl : '/'
@@ -1114,9 +1115,10 @@ var SSC_MODEL = new Class(
 				}
 			
 
-
+				window.dbg.log('debug point 1 ' );
 
 				if (this.overAllStatus === 'green') {
+					window.dbg.log('debug point 2 ' );
 					this.user.firstTimePerso = false;
 					if (activePersoWf !== null) {
 						window.dbg.log('continue Personalization -active wf found id:'
@@ -1179,6 +1181,7 @@ var SSC_MODEL = new Class(
 					}
 
 				} else if (this.overAllStatus === 'amber') {
+					window.dbg.log('debug point 3 ' );
 					window.dbg.log('status amber');
 					this.user.firstTimePerso = false;
 					this.reCert = true;
@@ -1212,7 +1215,8 @@ var SSC_MODEL = new Class(
 					window.dbg.log('status amber- start personalization');
 					viewCb('startRecert');
 					return;
-				} else if (this.overAllStatus === '') {
+				} else if (this.overAllStatus === 'red') {
+					window.dbg.log('debug pint 4 ' );
 					sscView.setTopMenu(false);
 					window.dbg.log('status ');
 					if (activePersoWf !== null) {
@@ -1243,7 +1247,7 @@ var SSC_MODEL = new Class(
 					
 					
 					//this.reCert = true;
-					
+					window.dbg.log('debug pint 3 ' );
 					window.dbg.log('status - start personalization');
 					if(this.user.firstTimePerso)
 					{
@@ -1254,6 +1258,8 @@ var SSC_MODEL = new Class(
 					}
 					return;
 				}
+				
+				
 					
 			},
 
@@ -1261,6 +1267,213 @@ var SSC_MODEL = new Class(
 				window.dbg.log("sc_start_personalization");
 
 				this.sc_getCertificates(this.sc_cb_persoSendCardStatus, viewCb);
+
+			},
+			
+			server_cb_get_card_policy : function(data,  viewCb ) {
+				window.dbg.log("server_cb_get_card_policy");
+				window.dbg.log(viewCb);
+				sscView.setStatusMsg('T_idle', '', 'idle');
+
+				try {
+					var err = data.error;
+					window.dbg.log('server_cb_get_card_policy try ');
+					
+				} catch (e) {
+					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
+					// '');
+					sscView.showPopUp('E_server-error-get-card-policy',
+							'cross', '0356');
+					//viewCb('error');
+					this.ajax_log('E_server-error-get-card-policy', 'error');
+					return;
+					window.dbg.log('server json error');
+					// sscView.showPopUp('T_Server_Error'+error ,'critical');
+				}
+				try {
+					var exec = data.exec;
+					window.dbg.log('server_cb_get_card_policy try exec ');
+					
+				} catch (e) {
+					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
+					// '');
+					sscView.showPopUp('E_server-error-get-card-policy',
+							'cross', '0356');
+					//viewCb('error');
+					this.ajax_log('E_server-error-get-card-policy', 'error');
+					return;
+					window.dbg.log('server json error');
+					// sscView.showPopUp('T_Server_Error'+error ,'critical');
+				}
+				
+				try {
+					var exec = data.changecardpolicy_wfID;
+					window.dbg.log('server_cb_get_card_policy try exec ');
+					
+				} catch (e) {
+					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
+					// '');
+					sscView.showPopUp('E_server-error-get-card-policy-missing_wfID',
+							'cross', '0356');
+					//viewCb('error');
+					this.ajax_log('E_server-error-get-card-policy-missing_wfID', 'error');
+					return;
+					window.dbg.log('server json error');
+					// sscView.showPopUp('T_Server_Error'+error ,'critical');
+				}
+				
+				
+				if( err !== 'error'){
+					
+					window.dbg.log('this.state: ' + this.state);		
+					sscView.setStatusMsg('I_commSc', "P_pleaseWait", "blue");
+					window.dbg.log('exec: ' + data.exec );
+					var r = this.PKCS11Plugin.SimonSays(data.exec,true,"");
+					sscView.setStatusMsg("T_idle", ' ', 'idle');
+					
+					var results = new Querystring(r);
+					window.dbg.log("SimanSays Res:"+r);
+
+					var set = results.get("Result");
+					
+					//alert("Res:"+ r);
+			//		if (set == "SUCCESS") {
+					
+
+						var reqData = "changecardpolicy_wfID=" + data.changecardpolicy_wfID + "&" + r;
+						var server_cb = this.server_cb_get_card_policy_confirm;
+						var targetURL = "functions/changepolicy/confirm_policy_change";
+
+						this.ajax_request(targetURL,  reqData,  server_cb, viewCb);
+						
+//						// this.ajax_request("sc/functions/pinreset/pinreset_confirm",server_cb_pinreset_confirm,
+//						// res );
+//
+//					} else if (set == "ERROR") {
+//						this.pinSetCount++;
+//						// alert("ERROR Pinsetcount="+pinSetCount);
+//						
+//						var reason = results.get("Reason");
+//						window.dbg.log("reason " + reason + ' '+ r);
+//						this.ajax_log('server_cb_pinreset_verify'+ r, 'error');
+//						
+//
+//						if (reason === 'PUKError') {
+//							sscView.showPopUp('E_sc-error-resetpin-puk-error ',
+//									'cross', '0113');
+//							viewCb('error');
+//							return;
+//						} else if (reason === 'PINPolicy') {
+//							// Invalid PIN is an user Error no popup here
+//							window.dbg.log("invalid pin" + reason);
+//							
+//							this.pinResetRetry = data.exec ; 
+//							viewCb('invalidPin');
+//							return;
+//						}
+//
+////						var plugin_parameter = "PUK=" + this.serverPUK
+////								+ ";PUKEncrypted=no;NewPIN=" + user_pass1
+////								+ ";NewPINEncrypted=no;";
+////						this.PKCS11Plugin.ParamList = plugin_parameter;
+////						this.PKCS11Plugin.Request = command;
+////						// alert(this.PKCS11Plugin.Request);
+////						// stage == 1;
+//	//
+////						this.sc_run_command(this.sc_cb_resetpin);
+					
+
+						
+				}else{
+					try{
+						for ( var i = 0; i < data.errors.length; i++) {
+							if (data.errors[i] === 'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER') {
+								window.dbg.log('Error ' + i + ' ' + data.errors[i]);
+								sscView.showPopUp('E_session_timeout_error', 'cross',
+										'0222');
+								viewCb('error');
+								return;
+							}else {
+								sscView.showPopUp('E_process-unknown-backend-error</br>'
+										+ data.errors[i], 'cross', '0212');
+								this.ajax_log('server_cb_pinreset_confirm E_process-unknown-backend-error', 'error');
+								viewCb('error');
+								return;
+							}
+						}
+					}catch (e){
+						
+					}
+				}
+				
+
+			},
+			
+			
+			server_cb_get_card_policy_confirm : function(data,  viewCb ) {
+				window.dbg.log("server_cb_get_card_policy");
+				window.dbg.log(viewCb);
+				sscView.setStatusMsg('T_idle', '', 'idle');
+
+				try {
+					var err = data.error;
+					window.dbg.log('server_cb_get_card_policy try ');
+					
+				} catch (e) {
+					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
+					// '');
+					sscView.showPopUp('E_server-error-get-card-policy',
+							'cross', '0356');
+					//viewCb('error');
+					this.ajax_log('E_server-error-get-card-policy', 'error');
+					return;
+					window.dbg.log('server json error');
+					// sscView.showPopUp('T_Server_Error'+error ,'critical');
+				}
+				try {
+					var exec = data.state;
+					window.dbg.log('server_cb_get_card_policy try state ');
+					
+				} catch (e) {
+					// sscView.setStatusMsg('E_ax-failure','P_ContactAdmin',
+					// '');
+					sscView.showPopUp('E_server-error-get-card-policy-state',
+							'cross', '0356');
+					//viewCb('error');
+					this.ajax_log('E_server-error-get-card-policy', 'error');
+					return;
+					window.dbg.log('server json error');
+					// sscView.showPopUp('T_Server_Error'+error ,'critical');
+				}
+				
+				window.dbg.log("state:"+ data.state);
+				if(data.state  === 'SUCCESS'){
+					window.dbg.log("SUCCESS:"+ data.state);
+					sscView.processEnableSSO_done('SUCCESS');
+				}else{
+					window.dbg.log("SUCCESS:"+ data.state);
+					sscView.processEnableSSO_done(data.state);
+					viewCb(data.state);
+				}
+				
+			},
+			
+			sc_enable_sso : function( viewCb ) {
+				//sscView.setStatusMsg("T_idle", ' ', 'idle');
+
+				var rc = true;
+				window.dbg.log("sc_enable_sso");
+				window.dbg.log(viewCb);
+				var reqData;
+
+				reqData = ''; 
+
+				if (rc) {
+					
+					var server_cb = this.server_cb_get_card_policy;
+					var targetURL = 'functions/changepolicy/get_card_policy';
+					this.ajax_request(targetURL,  reqData,  server_cb, viewCb);
+				}
 
 			},
 
