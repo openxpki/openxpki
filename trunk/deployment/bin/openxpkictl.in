@@ -36,6 +36,7 @@ my $configfile      = "$openxpkiconfdir/config.xml";
 our $QUIET = 0;
 
 my $MAX_ATTEMPTS = 300;
+my %params;
 
 $| = 1;
 
@@ -316,10 +317,47 @@ sub do_config {
 	return 1;
 }
 
+sub do_getconfig {
+    # pass empty path so no import takes place
+    my $config = OpenXPKI::Config->new();
+
+    if ($config->can('version')) {
+    	printf "Current Tree Version: %s\n", $config->version();
+    }
+
+    my $key = $params{key};
+
+    if ( $key ) {
+        my $meta = $config->get_meta( $key );
+        foreach my $k ( keys %{ $meta } ) {
+            print "\t$k = ", $meta->{$k}, "\n";
+        }
+        my $type = $meta->{TYPE} || '';
+        if ( $type eq 'hash' ) {
+            my @keys = $config->get_keys( $key );
+            print "\tVALUES: ", join(', ', @keys), "\n";
+        } elsif ( $type eq 'list' ) {
+            my @keys = $config->get_list( $key );
+            print "\tVALUES: ", join(', ', @keys), "\n";
+        } else {
+            my $res = $config->get($key);
+            if ( not defined $res ) {
+                $res = '<undef>';
+            }
+            print "\t$key = $res\n";
+        }
+    }
+    else {
+        print "\tError - no key specified\n";
+        return;
+    }
+	
+	return 1;
+}
+
 ###########################################################################
 
 
-my %params;
 GetOptions(\%params,
 	   qw(
 	      help|?
@@ -330,6 +368,7 @@ GetOptions(\%params,
               debug=s@
               quiet
               fg|foreground
+          key=s
 	      )) or pod2usage(-verbose => 0);
 
 if ($params{version}) {
@@ -449,6 +488,7 @@ my $command_table = {
     start   => \&do_start,
     stop    => \&do_stop,
     loadcfg  => \&do_config,
+    getcfg  => \&do_getconfig,
     restart => sub {
 	do_stop(@_); 
 	do_start(@_);
@@ -505,6 +545,7 @@ openxpkictl [options] COMMAND
    --path                Used only with loadcfg. You can specify an 
                          alternate path to the configuration to load.
                          This is the same as setting ENV{OPENXPKI_CONF_PATH}.
+   --key KEYNAME         Key of configuration value to get. See ``getcfg''.
 
  Commands:
    start            Start OpenXPKI daemon
@@ -512,6 +553,7 @@ openxpkictl [options] COMMAND
    restart          Restart OpenXPKI daemon
    status           Get OpenXPKI daemon status
    loadcfg          Load a new config into the versioned repository
+   getcfg           Gets a config value
 
 
 =head1 ARGUMENTS
@@ -539,6 +581,10 @@ Checks the OpenXPKI daemon status.
 =item B<loadcfg>
 
 Load config into the versioned repository.
+
+=item B<getcfg>
+
+Gets a config value from the internal configuration data.
 
 =back
 
@@ -593,8 +639,6 @@ Examples:
 Does not fork program away and uses a non-forking server. Pretty much
 useful only for debugging and profiling.
 
-=back
-
 =item B<--path>
 
 Used only with loadcfg. Specify path (or set of path seperated by :) to
@@ -602,6 +646,10 @@ load the config files from. If ommited, the environment is checked for
 the key I<OPENXPKI_CONF_PATH>, if both are missing the builtin default 
 value of I</etc/openxpki/config.d/> is used.
  
+=item B<--key>
+
+Used with getcfg. Specify key name of config parameter to fetch.
+
 =back
 
 =head1 DESCRIPTION
