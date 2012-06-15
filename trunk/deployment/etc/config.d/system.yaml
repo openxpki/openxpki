@@ -1,0 +1,8 @@
+watchdog:
+    max_fork_redo: 5
+    max_exception_threshhold: 10
+    max_tries_hanging_workflows:  3
+    interval_wait_initial: 30
+    interval_loop_idle: 15
+    interval_loop_run: 1
+

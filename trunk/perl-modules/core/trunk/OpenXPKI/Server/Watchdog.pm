@@ -13,40 +13,76 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Watchdog::WorkflowInstance;
 use OpenXPKI::DateTime;
 
+
+use Moose;
+
 use Data::Dumper;
 
-my $workflow_table = 'WORKFLOW';
 
-my $max_fork_redo = 5;
-my $max_exception_threshhold = 10;
-my $max_tries_hanging_workflows = 3;
-my $interval_wait_initial = 10;
-my $interval_loop_idle = 5;#seconds
-my $interval_between_searches = 1;#seconds
+has workflow_table => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'WORKFLOW',
+);
 
-sub new {
-    my $that = shift;
-    my $class = ref($that) || $that;
+has max_fork_redo => (
+    is => 'rw',
+    isa => 'Int',
+    default =>  5
+);
+has max_exception_threshhold => (
+    is => 'rw',
+    isa => 'Int',
+    default =>  10
+);
+has max_tries_hanging_workflows => (
+    is => 'rw',
+    isa => 'Int',
+    default =>  3
+);
+# All timers in seconds    
+has interval_wait_initial => (
+    is => 'rw',
+    isa => 'Int',
+    default =>  60
+);
     
+has interval_loop_idle => (
+    is => 'rw',
+    isa => 'Int',
+    default =>  5
+);
+
+has interval_loop_run => (
+    is => 'rw',
+    isa => 'Int',
+    default =>  1
+);
+ 
+around BUILDARGS => sub {
+     
+    my $orig = shift;
+    my $class = shift;
+
+    # Properties from init system - not used 
+    my $args = @_;
+
+    my $config = CTX('config')->get_hash('system.watchdog');
     
-    my $self = {};
-
-    bless $self, $class;
-
-    #these are the keys of OpenXPKI::Server::Init:
-    my $keys = {@_};
-
-    return $self;
-
-}
-
+    $config = {} unless($config); # Moose complains on null
+    # This automagically sets all entries from the config 
+    # to the corresponding class attributes
+    return $class->$orig($config);
+    
+};
+           
 sub run {
     my $self = shift;
 
     my $pid;
     my $redo_count = 0;
     
-    while ( !defined $pid && $redo_count < $max_fork_redo ) {
+    while ( !defined $pid && $redo_count < $self->max_fork_redo() ) {
         ##! 16: 'trying to fork'
         $pid = fork();
         ##! 16: 'pid: ' . $pid
@@ -104,8 +140,16 @@ sub run {
         $0 .= ' watchdog (forked daemon)';
 
         #wait some time for server startup...
-        ##! 16: sprintf('watchdog: original PID %d, initail wait for %d seconds', $self->{original_pid} , $interval_wait_initial);
-        sleep($interval_wait_initial);
+        ##! 16: sprintf('watchdog: original PID %d, initail wait for %d seconds', $self->{original_pid} , $self->interval_wait_initial());
+        
+        CTX('log')->log(
+            MESSAGE  => sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"', 
+                $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ),
+            PRIORITY => "info",
+            FACILITY => "system",
+        );
+        
+        sleep($self->interval_wait_initial());
 
         ### TODO: maybe we should measure the count of exception in a certain time interval?
         my $exception_count = 0;
@@ -135,8 +179,8 @@ sub run {
                 print STDERR $error_msg, "\n";
                 $exception_count++;
             }
-            if ( $exception_count > $max_exception_threshhold ) {
-                my $msg = "Watchdog: max exception limit reached: $max_exception_threshhold errors, exit watchdog!";
+            if ( $exception_count > $self->max_exception_threshhold() ) {
+                my $msg = "Watchdog: max exception limit reached: $self->max_exception_threshhold() errors, exit watchdog!";
                 CTX('log')->log(
                     MESSAGE  => $msg,
                     PRIORITY => "fatal",
@@ -147,8 +191,8 @@ sub run {
                 exit;
             }
 
-            ##! 80: sprintf('watchdog sleeps %d secs',$interval_loop_idle)
-            sleep($interval_loop_idle);
+            ##! 80: sprintf('watchdog sleeps %d secs',$self->interval_loop_idle())
+            sleep($self->interval_loop_idle());
 
         }
 
@@ -191,7 +235,7 @@ sub run {
         }
 
         #select again:
-        my $db_result = $self->__fetch_marked_workflow_again( $wf_id, $rand_key );
+        $db_result = $self->__fetch_marked_workflow_again( $wf_id, $rand_key );
         if ( !defined $db_result ) {
             ##! 16: sprintf('some other process took wf %s, return',$wf_id)
             return;
@@ -231,7 +275,7 @@ sub run {
         }
         
         #if we have found a workflow, we sleep a bit and search another paused wf
-        sleep($interval_between_searches);
+        sleep($self->interval_loop_run());
         $self->_scan_for_paused_workflows();
     }
 
@@ -241,7 +285,7 @@ sub run {
         my $self = shift;
         my ( $wf_id, $rand_key ) = @_;
         my $db_result = $self->{dbi}->first(
-            TABLE   => $workflow_table,
+            TABLE   => $self->workflow_table(),
             COLUMNS => ['WORKFLOW_SERIAL'],
             DYNAMIC => {
                 'WORKFLOW_PROC_STATE' => { VALUE => 'pause' },
@@ -282,7 +326,7 @@ sub run {
         # the API (via factory::save_workflow()), which happens immediately, when the action is executed
         # (see OpenXPKI::Server::Workflow::Persister::DBI::update_workflow())
         my $update_ok = $self->{dbi}->update(
-            TABLE => $workflow_table,
+            TABLE => $self->workflow_table(),
             DATA  => { WATCHDOG_KEY => $rand_key, WATCHDOG_TIME => $now, WORKFLOW_LAST_UPDATE => $now },
             WHERE => {
                 WATCHDOG_KEY        => $old_key,
@@ -306,7 +350,7 @@ sub run {
         my $now  = DateTime->now->strftime('%Y-%m-%d %H:%M:%S');
 
         return $self->{dbi}->first(
-            TABLE   => $workflow_table,
+            TABLE   => $self->workflow_table(),
             COLUMNS => ['WORKFLOW_SERIAL'],
             DYNAMIC => {
                 'WORKFLOW_PROC_STATE' => { VALUE => 'pause' },
@@ -328,7 +372,7 @@ sub run {
         )->datetime();
 
         my $db_result = $self->{dbi}->first(
-            TABLE   => $workflow_table,
+            TABLE   => $self->workflow_table(),
             COLUMNS => ['WORKFLOW_SERIAL'],
             DYNAMIC => {
                 'WORKFLOW_PROC_STATE' => { VALUE => 'pause' },
@@ -343,7 +387,7 @@ sub run {
             my $wf_id = $db_result->{WORKFLOW_SERIAL};
 
             $self->{hanging_workflows}{$wf_id}++;
-            if ( $self->{hanging_workflows}{$wf_id} > $max_tries_hanging_workflows) {
+            if ( $self->{hanging_workflows}{$wf_id} > $self->max_tries_hanging_workflows()) {
                 ##! 16: 'hanged to often!'
 
                 $db_result = undef;
@@ -399,4 +443,43 @@ sub run {
     }
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 1;
+__END__
+
+=head1 NAME
+
+The watchdog thread
+
+=head1 DESCRIPTION
+
+The watchdog is forked away on startup and takes care of paused workflows.
+The system has a default configuration but you can override it via the system
+configuration.
+
+The namespace is I<system.watchdog>. The properties are: 
+
+=over 
+=item max_fork_redo
+ 
+default: 5
+
+=item max_exception_threshhold
+default: 10
+
+=item max_tries_hanging_workflows
+default:  3
+
+=item interval_wait_initial
+Seconds to wait after server start before the watchdog starts scanning. 
+default: 60;
+    
+=item interval_loop_idle
+Seconds between two scan runs if no result was found on last run.
+default: 5
+
+=item interval_loop_run
+Seconds between two scan runs if a result was found on last run.
+default: 1
