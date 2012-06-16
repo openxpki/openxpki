@@ -92,6 +92,18 @@ sub fetch_puk_ok {
     return $self->ok( $result, $testname );
 }
 
+
+# $obj->fetch_puk_nok( [ PARAMS ], TESTNAME );
+sub fetch_puk_nok {
+    my $self     = shift;
+    my $params   = shift || [];
+    my $testname = shift || 'fetch puk';
+
+#    $self->diag("fetch_puk_ok(): params=", join(', ', @{ $params } ));
+    my $result = $self->fetch_puk( @{$params} );
+    return $self->ok( !$result, $testname );
+}
+
 sub nack_fetch_puk {
     my $self = shift;
     my %params = @_;

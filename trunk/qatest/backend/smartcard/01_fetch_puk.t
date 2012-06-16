@@ -76,16 +76,16 @@ $test_pukupload->group(
             @testnames = split( /\s*,\s*/, $testsval );
         }
         foreach my $testname (@testnames) {
-#            $self->diag( "PUK Upload: user="
-#                    . $cfg{pukupload}{user}
-#                    . " role="
-#                    . $cfg{pukupload}{role} );
-            $self->puk_upload_ok(
-                [   $cfg{pukupload}{user},     $cfg{pukupload}{role},
-                    $cfg{$testname}{token_id}, $cfg{$testname}{token_set_puk},
-                ],
-                "Setting PUK for token " . $cfg{$testname}{token_id}
-            ) or croak $@;
+            if ( defined $cfg{$testname}{token_set_puk} ) {
+                $self->puk_upload_ok(
+                    [   $cfg{pukupload}{user},
+                        $cfg{pukupload}{role},
+                        $cfg{$testname}{token_id},
+                        $cfg{$testname}{token_set_puk},
+                    ],
+                    "Setting PUK for token " . $cfg{$testname}{token_id}
+                ) or croak $@;
+            }
         }
     }
 );
@@ -114,11 +114,20 @@ $test->group(
             or $self->diag($@);
 
         my $puks = $self->array('_puk');
-#        $self->diag('$puks=' . $puks);
 
-        $self->is($puks->count(), $cfg{test_01}{token_puk_count}, 'Number of puks for test_01');
-        for(my $i = 0; $i < $puks->count(); $i++ ) {
-            $self->is($puks->value($i), $cfg{test_01}{'token_puk_' . $i}, "Value of puk $i for test_01");
+        #        $self->diag('$puks=' . $puks);
+
+        $self->is(
+            $puks->count(),
+            $cfg{test_01}{token_puk_count},
+            'Number of puks for test_01'
+        );
+        for ( my $i = 0; $i < $puks->count(); $i++ ) {
+            $self->is(
+                $puks->value($i),
+                $cfg{test_01}{ 'token_puk_' . $i },
+                "Value of puk $i for test_01"
+            );
         }
 
         $self->ack_fetch_puk_ok( [ $cfg{test_01}{user}, $cfg{test_01}{role} ],
@@ -129,7 +138,6 @@ $test->group(
             or $self->diag($@);
     }
 );
-
 
 $test->group(
     reqid       => 'SC_FP_02',
@@ -151,47 +159,92 @@ $test->group(
             or $self->diag($@);
 
         my $puks = $self->array('_puk');
-#        $self->diag('$puks=' . $puks);
 
-        $self->is($puks->count(), $cfg{test_01}{token_puk_count}, 'Number of puks for test_01');
-        for(my $i = 0; $i < $puks->count(); $i++ ) {
-            $self->is($puks->value($i), $cfg{test_01}{'token_puk_' . $i}, "Value of puk $i for test_01");
+        #        $self->diag('$puks=' . $puks);
+
+        $self->is(
+            $puks->count(),
+            $cfg{test_01}{token_puk_count},
+            'Number of puks for test_01'
+        );
+        for ( my $i = 0; $i < $puks->count(); $i++ ) {
+            $self->is(
+                $puks->value($i),
+                $cfg{test_01}{ 'token_puk_' . $i },
+                "Value of puk $i for test_01"
+            );
         }
 
-        $self->nack_fetch_puk_ok( [ $cfg{test_01}{user}, $cfg{test_01}{role}, error_reason => $error_reason ],
-            'Nack fetch PUK test_01' )
-            or $self->diag($@);
+        $self->nack_fetch_puk_ok(
+            [   $cfg{test_01}{user}, $cfg{test_01}{role},
+                error_reason => $error_reason
+            ],
+            'Nack fetch PUK test_01'
+        ) or $self->diag($@);
 
         $self->state_is( 'FAILURE', 'State of test_01 is FAILURE' )
             or $self->diag($@);
 
-        $self->param_is('error_reason', $error_reason);
-        
+        $self->param_is( 'error_reason', $error_reason );
+
     }
 );
 
 $test->group(
-    reqid       => 'SC_FP_03',
-    description => 'WF returns empty _puk list when no puk is available in backend',
-    setup       => undef,
-    tests       => sub {
+    reqid => 'SC_FP_03',
+    description =>
+        'WF hangs at INITIALIZED when the token_id is unknown',
+    setup => undef,
+    tests => sub {
         my $self = shift;
 
-        $self->fetch_puk_ok(
+        $self->fetch_puk_nok(
             [   $cfg{test_03}{user}, $cfg{test_03}{role},
                 token_id => $cfg{test_03}{token_id}
             ],
             'Fetch PUK test_03'
         ) or $self->diag($@);
 
-        $self->state_is( 'MAIN', 'State of test_03 is MAIN' )
+        $self->state_is( 'INITIALIZED', 'State of test_03 is INITIALIZED' )
+            or $self->diag($@);
+
+    }
+);
+
+$test->group(
+    reqid       => 'SC_FP_04',
+    description => 'Fail when workflow creator differs from token owner',
+    setup       => undef,
+    tests       => sub {
+        my $self = shift;
+
+        $self->fetch_puk_ok(
+            [   $cfg{test_04}{user}, $cfg{test_04}{role},
+                token_id => $cfg{test_04}{token_id}
+            ],
+            'Fetch PUK test_04'
+        ) or $self->diag($@);
+
+        $self->state_is( 'FAILURE', 'State of test_04 is FAILURE' )
             or $self->diag($@);
 
         my $puks = $self->array('_puk');
 
-        $self->is($puks->count(), 1, 'Number of puks for test_03 should be 1') or
-            $self->diag("contents of puk: '" . join(', ', @{ $puks->values() } ) . "'");
-        $self->is($puks->value(0), undef, 'First value for test_03 should be undef');
+        #        $self->diag('$puks=' . $puks);
+
+        $self->is(
+            $puks->count(),
+            $cfg{test_04}{token_puk_count},
+            'Number of puks for test_04'
+        );
+        for ( my $i = 0; $i < $puks->count(); $i++ ) {
+            $self->is(
+                $puks->value($i),
+                $cfg{test_01}{ 'token_puk_' . $i },
+                "Value of puk $i for test_04"
+            );
+        }
+
     }
 );
 
