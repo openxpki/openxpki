@@ -526,9 +526,11 @@ sub __do_init_watchdog{
     my $keys = shift;
     
     my $Watchdog = OpenXPKI::Server::Watchdog->new( $keys );
-    $Watchdog->run();
-    
-    
+    $Watchdog->run();    
+    OpenXPKI::Server::Context::setcontext({        
+        watchdog => $Watchdog
+    });
+    return 1;    
 }
 
 

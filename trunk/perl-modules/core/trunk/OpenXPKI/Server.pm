@@ -362,6 +362,10 @@ sub sig_term {
         alarm(1);
     }
     $stop_soon = 1;
+
+    # FIXME - implement    
+    CTX('watchdog')->terminate();
+    
     ##! 1: 'end'
 }
 
@@ -375,6 +379,8 @@ sub sig_hup {
     );
     
     CTX('config')->update_head();
+    # FIXME - implement
+    CTX('watchdod')->reload();
     
 }
 
