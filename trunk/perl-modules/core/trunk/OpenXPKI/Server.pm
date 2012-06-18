@@ -365,6 +365,19 @@ sub sig_term {
     ##! 1: 'end'
 }
 
+sub sig_hup {
+
+    ##! 1: 'start'
+    CTX('log')->log(
+        MESSAGE  => "SIGHUP received - reloading config ",
+        PRIORITY => "info",
+        FACILITY => "system",
+    );
+    
+    CTX('config')->update_head();
+    
+}
+
 sub process_request {
     my $rc;
     my $msg;

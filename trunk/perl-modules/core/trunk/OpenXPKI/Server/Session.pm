@@ -13,6 +13,8 @@ use English;
 use OpenXPKI::Exception;
 use OpenXPKI::i18n;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Context qw( CTX );
+
 ## switch off IP checks
 use CGI::Session qw/-ip-match/;
 use Digest::SHA1 qw( sha1_hex );;
@@ -92,6 +94,8 @@ sub new {
                             DIRECTORY => $self->{DIRECTORY}});
         }
         $self->{session}->param ("status" => "invalid");
+        $self->{session}->param ("config_version" => CTX('config')->get_version() );
+        
     }
     $self->{session}->expire($self->{LIFETIME});
     $self->{session}->flush();
@@ -102,7 +106,7 @@ sub new {
 sub export_serialized_info{
     my $self = shift;
     my %info;
-    my @import_keys = $self->_get_import_keys();
+    my @import_keys = $self->_get_persitence_keys();
     foreach my $key (@import_keys){
         $info{$key} = $self->{session}->param($key);
     }
@@ -125,7 +129,7 @@ sub import_serialized_info{
                 params  => {INPUT       => $serialized_string,OUTPUT => $info}
                 );
     }
-    my @import_keys = $self->_get_import_keys();
+    my @import_keys = $self->_get_persitence_keys();
     
     foreach my $key (@import_keys){
         $self->{session}->param($key, $info->{$key});
@@ -136,8 +140,8 @@ sub _get_serializer{
     return OpenXPKI::Serialization::Simple->new();
 }
 
-sub _get_import_keys{
-    return qw(user role);
+sub _get_persitence_keys{
+    return qw(user role config_version);
 }
 
 
@@ -312,6 +316,20 @@ sub get_state
     return $self->{session}->param ("state");
 }
 
+sub set_config_version
+{
+    my $self = shift;
+    $self->{session}->param ("config_version" => shift);
+    $self->{session}->flush();
+}
+
+sub get_config_version
+{
+    my $self = shift;
+    return $self->{session}->param ("config_version");
+}
+
+
 1;
 __END__
 
@@ -321,7 +339,7 @@ OpenXPKI::Server::Session
 
 =head1 Description
 
-This module implements the coomplete session mechanism for the
+This module implements the complete session mechanism for the
 OpenXPKI core code. This include some mechanisms to support the
 authentication phase which means that it is possible to operate
 a session in a mode which is not valid.
@@ -376,6 +394,25 @@ if the session is not valid.
 
 returns a challenge string if such a string was set in the past.
 
+=head2 Session persistence 
+
+The session module supports persistence across the lifetime of the
+originating process. You can use C<export_serialized_info> to get a hash
+representing the current state of the session and  C<import_serialized_info>
+to make a new session impersonate those state.
+You can define what keys are persisted in C<_get_persitence_keys>.
+   
+=head3 _get_persitence_keys
+Returns the keys that should be used when persisting the session.
+Currently the fields are user role config_version.
+
+=head3 export_serialized_info
+Return a key/value hash with the keys named in _get_persitence_keys.  
+
+=head3 import_serialized_info
+Reset the values of the current session to the values of the passed
+hash.
+
 =head2 Set/Get functions
 
 =over
@@ -405,6 +442,10 @@ returns a challenge string if such a string was set in the past.
 =item * get_state
 
 =item * set_state
+
+=item * get_config_version
+
+=item * set_config_version
 
 =item * delete_secret
 
