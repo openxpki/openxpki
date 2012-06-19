@@ -1218,6 +1218,12 @@ sub sc_analyze_smartcard {
 	$result->{PROCESS_FLAGS}->{will_need_pin} = 1;
     }
 
+    CTX('log')->log(
+	   MESSAGE => "Overall card status is " . $result->{OVERALL_STATUS},
+		PRIORITY => 'debug',
+		FACILITY => [ 'system' ],
+    );
+
     ##! 16: 'analysis result: ' . Dumper $result
     return $result;
 }
@@ -1458,14 +1464,7 @@ sub __check_db_hash_against_policy {
     
     # propagate information to result structure
     $db_hash->{VALIDITY_PROPERTIES} = \%validity_properties;
-    
         
-	if ($policy->get("certs.type.$type.revoke_unused") &&
-	    ($validity_properties{force_renewal} ||
-    	$validity_properties{allow_renewal})) {
-			$db_hash->{PROCESS_FLAGS}->{REVOKE} = 1;   
-	}
-    
     # visual status may be 'green' (valid), 'amber' (nearing expiration)
     # or 'red' (expired or revoked)
     if ($policy->get("certs.type.$type.purge_invalid")) {
@@ -1479,8 +1478,8 @@ sub __check_db_hash_against_policy {
 		    $db_hash->{VISUAL_STATUS} ||= 'red';
 		    $db_hash->{PROCESS_FLAGS}->{PURGE} = 1;
 		}			
-    }
-    
+    }    
+        
     if ($policy->get("certs.type.$type.purge_valid")) {
     
     	# policy do not want us to keep this certificate	
@@ -1495,11 +1494,18 @@ sub __check_db_hash_against_policy {
     }
 
     if ($validity_properties{force_renewal}) {
-		$db_hash->{VISUAL_STATUS} ||= 'red';		
-    } 
-
+		$db_hash->{VISUAL_STATUS} ||= 'red';
+				        
+        if ($policy->get("certs.type.$type.revoke_unused")) {
+			$db_hash->{PROCESS_FLAGS}->{REVOKE} = 1;   
+        }
+	}
+    
 	if ($validity_properties{allow_renewal}) {
-		$db_hash->{VISUAL_STATUS} ||= 'amber';		
+		$db_hash->{VISUAL_STATUS} ||= 'amber';
+		if ($policy->get("certs.type.$type.revoke_unused")) {
+			$db_hash->{PROCESS_FLAGS}->{REVOKE} = 1;   
+        }		
     }
     
     # TODO: check if profile should be propagated to preferred profile
