@@ -25,7 +25,7 @@ sub getHandler {
 	shift; # Pull of class
 	my $activity = shift;
 
-	my $backend = CTX('config')->get('server.nice.default.backend');
+	my $backend = CTX('config')->get('nice.backend');
 	
 	$backend = 'Local' unless( $backend );
 	
