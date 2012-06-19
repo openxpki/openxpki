@@ -153,57 +153,16 @@ sub start_session {
 #########################OpenXPKI Session#############################
 
      if ( defined $session->{'openxPKI_Session_ID'} && defined $session->{'cardOwner'}){
-#             if (
-#                 defined $session->{'cardOwner'}
-#                 && $session->{'cardOwner'}
-#                 ne ''
-#               )
-#             {
+
                 $c = $self->openXPKIConnection(
                     $session->{'openXPKI_Session_ID'},
                     $session->{'cardOwner'},
                     config()->{openxpki}->{role}
                 );
-#             }
-# #             else {
-# #                 $c = $self->openXPKIConnection(
-# #                     $session->{'openXPKI_Session_ID'},
-# #                     config()->{openxpki}->{user},
-# #                     config()->{openxpki}->{role}
-# #                 );
-# #             }
-#         }else{
-#  			if (
-#                 defined $session->{'cardOwner'}
-#                 && $session->{'cardOwner'}
-#                 ne ''
-#               )
-#             {
-#                 $c = $self->openXPKIConnection(
-#                     undef,
-#                     $session->{'cardOwner'},
-#                     config()->{openxpki}->{role}
-#                 );
-#             }
-# #             else {
-# #                 $c = $self->openXPKIConnection(
-# #                     undef,
-# #                     config()->{openxpki}->{user},
-# #                     config()->{openxpki}->{role}
-# #                 );
-# #             }
-# 
-# 	}
-# 
-#         #         $responseData->{'msg'} =
-#         #             $responseData->{'msg'}
-#         #           . $session->{'openxPKI_Session_ID'}
-#         #           . "Connected ";
-# 
+
          if ( !defined $c ) {
  
              # die "Could not instantiate OpenXPKI client. Stopped";
-# 
              $responseData->{'error'} = "error";
              push(
                  @{$errors},
@@ -223,72 +182,7 @@ sub start_session {
 
       }
   }
-# 
-#  
-#     if ( $c == 0 ) {
-# 
-#         if ( defined $session->{'cardOwner'}
-#              && $session->{'cardOwner'}
-#              ne '' 
-#             )  
-#          {
-#             $c = $self->openXPKIConnection(
-#                 undef,
-#                 $session->{'cardOwner'},
-#                 config()->{openxpki}->{role}
-#             );
-# 
-#         }
-# #         else {
-# #             $c = $self->openXPKIConnection(
-# #                 undef,
-# #                 config()->{openxpki}->{user},
-# #                 config()->{openxpki}->{role}
-# #             );
-# #         }
-# 
-#         #		$self->print("c".Dumper($c).$c->get_session_id());
-#         if ( !defined $c ) {
-# 
-#             # die "Could not instantiate OpenXPKI client. Stopped";
-#             #             $responseData->{'error'} = $responseData->{'error'}
-#             #               . "I18N_OPENXPKI_CLIENT_ERROR_CANT_CONNECT_TO_PKI";
-#             $responseData->{'error'} = "error";
-#             my $r = push(
-#                 @{$errors},
-# "I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI"
-#             );
-# 
-#             #$self->print("Could not instantiate OpenXPKI client. Stopped");
-#         }else {
-#             if ( $c != 0 ) {
-# 
-#                 $session->{'openxPKI_Session_ID'} = $c->get_session_id()  ;
-# 
-# 		
-# #                 $c = $self->openXPKIConnection(
-# #                     undef,
-# #                     config()->{openxpki}->{user},
-# #                     config()->{openxpki}->{role}
-# #                 );
-# #             };
-# 		
-#                 $responseData->{'start_msg'} = "OpenXPKISession started";
-# 
-#                 #$self->print("\nSession ". $c->get_session_id());
-#                 #$responseData->{'start_msg'} =
-#                 #  "New SessionID:" . $c->get_session_id() . Dumper($c);
-#             }
-#             else {
-#                 $responseData->{'error'} = "error";
-#                 my $r = push(
-#                     @{$errors},
-# "I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI"
-#                 );
-# 
-#             }
-#         }
-#     }
+
 
 
     $responseData->{'errors'}        = $errors;
