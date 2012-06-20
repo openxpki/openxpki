@@ -32,12 +32,8 @@ sub evaluate
     }
 
     ## get local server_id
-    my $server_id = CTX('xml_config')->get_xpath (
-                        XPATH     => [ 'common/database/server_id' ],
-                        COUNTER   => [ 0 ],
-                        CONFIG_ID => $config_id,
-    );
-
+    my $server_id = CTX('config')->get('system.server.node.id');
+    
     ## search for a matching server_id
     my $grant = 0;
     foreach my $id (@{$server_ids})

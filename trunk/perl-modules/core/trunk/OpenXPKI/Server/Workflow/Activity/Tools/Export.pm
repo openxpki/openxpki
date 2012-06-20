@@ -21,9 +21,11 @@ sub execute
     my $context = $workflow->context();
     my $dest    = $self->param('export_destination');
     my $state   = $self->param('export_state');
-    my $server  = CTX('xml_config')->get_xpath (
-                      XPATH   => [ 'common/database/server_id' ],
-                      COUNTER => [ 0 ]);
+    
+    my $config = CTX('config');
+    
+    my $server = $config->get('system.server.node.id');
+                
     my $dir = CTX('xml_config')->get_xpath (
                       XPATH   => [ 'common/data_exchange/export/dir' ],
                       COUNTER => [ 0 ]);

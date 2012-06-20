@@ -46,9 +46,8 @@ sub execute
     $context->param ('archive_filename' => "export.tar.gz");
 
     ## who am I
-    $context->param ('who_am_i' => CTX('xml_config')->get_xpath (
-                      XPATH   => [ 'common/database/server_id' ],
-                      COUNTER => [ 0 ]));
+    $context->param ('who_am_i' => CTX('config')->get('system.server.node.id') );
+                
 }
 
 1;
