@@ -1266,8 +1266,8 @@ var SSC_VIEW = new Class(
 				// get overall status and display it
 				this.setOverallStatus(sscModel.getOverAllStatus());
 				this.setStatusMsg('T_idle','', 'idle');
-				this.setInfoTitle('T_testPrivateKey');
-				this.setInfoRight('IT_info', 'I_privatekeytest');
+				this.setInfoTitle('T_TitletestPrivateKey');
+				this.setInfoRight('IT_Info', 'I_privatekeytest');
 				
 				this.showGetPinDlg();			
 				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);				 
@@ -1568,11 +1568,11 @@ var SSC_VIEW = new Class(
 				window.dbg.log('processEnableSSO_done');
 				if (rc === 'SUCCESS'){
 					this.setInfoRight('IT_Info', 'I_enableSsoSuccess');
-					this.setInfoTitle('T_enableSsoSuccess');
+					//this.setInfoTitle('T_enableSsoSuccess');
 					this.setPrompt('P_enableSsoSuccess');
 				}else{
 					this.setInfoRight('IT_Info', 'I_enableSsoFailed');
-					this.setInfoTitle('T_enableSsoFailed');
+					//this.setInfoTitle('T_enableSsoFailed');
 					this.setPrompt('P_enableSsoFailed');
 				}
 				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
@@ -1592,11 +1592,11 @@ var SSC_VIEW = new Class(
 				window.dbg.log('processDisableSSO_done');
 				if (rc === 'SUCCESS'){
 					this.setInfoRight('IT_Info', 'I_disableSsoSuccess');
-					this.setInfoTitle('T_disableSsoSuccess');
+					//this.setInfoTitle('T_disableSsoSuccess');
 					this.setPrompt('P_disableSsoSuccess');
 				}else{
 					this.setInfoRight('IT_Info', 'I_DisableSsoFailed');
-					this.setInfoTitle('T_disableSsoFailed');
+					//this.setInfoTitle('T_disableSsoFailed');
 					this.setPrompt('P_disableSsoFailed');
 				}
 				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);

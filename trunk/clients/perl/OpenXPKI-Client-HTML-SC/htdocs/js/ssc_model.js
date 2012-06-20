@@ -1576,7 +1576,7 @@ var SSC_MODEL = new Class(
 					return;
 				}
 				
-				if(data.wf_state === 'POLICY_INPUT_REQUI')
+				if(data.wf_state === 'POLICY_INPUT_REQUIRED')
 				{				
 					sscView.showAccountDlg(this.user.accounts);				
 					return;
