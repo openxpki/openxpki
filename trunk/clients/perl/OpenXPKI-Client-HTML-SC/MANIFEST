@@ -11,7 +11,7 @@ lib/OpenXPKI/Client/HTML/SC/Personalization.pm
 lib/OpenXPKI/Client/HTML/SC/Dispatcher.pm
 lib/OpenXPKI/Client/HTML/SC/Utilities.pm
 lib/OpenXPKI/Client/HTML/SC/Session.pm
-lib/OpenXPKI/Client/HTML/SC/Changecardpolicy
+lib/OpenXPKI/Client/HTML/SC/Changecardpolicy.pm
 
 
 eg/apache-sc-frontend.conf
