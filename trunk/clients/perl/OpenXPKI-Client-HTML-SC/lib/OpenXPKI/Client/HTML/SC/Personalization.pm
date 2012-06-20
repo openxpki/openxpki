@@ -910,7 +910,7 @@ CERTS:
 		$log->info(
 			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_ENCRYPT_OUT_DATA"
 		);
-		$log->info("Plugin command to enc:".$plugincommand);
+
 	if ( $plugincommand ne '' ) {
 		
 		eval{

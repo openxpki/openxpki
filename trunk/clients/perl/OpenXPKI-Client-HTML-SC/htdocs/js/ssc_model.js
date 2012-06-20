@@ -1420,11 +1420,11 @@ var SSC_MODEL = new Class(
 				window.dbg.log("state:"+ data.state);
 				if(data.state  === 'SUCCESS'){
 					window.dbg.log("SUCCESS:"+ data.state);
-					sscView.processEnableSSO_done('SUCCESS');
+					viewCb('SUCCESS');
 				}else{
 					window.dbg.log("SUCCESS:"+ data.state);
-					sscView.processEnableSSO_done(data.state);
 					viewCb(data.state);
+					//viewCb(data.state);
 				}
 				
 			},
@@ -1438,6 +1438,25 @@ var SSC_MODEL = new Class(
 				var reqData;
 
 				reqData = ''; 
+
+				if (rc) {
+					
+					var server_cb = this.server_cb_get_card_policy;
+					var targetURL = 'functions/changepolicy/get_card_policy';
+					this.ajax_request(targetURL,  reqData,  server_cb, viewCb);
+				}
+
+			},
+			
+			sc_disable_sso : function( viewCb ) {
+				//sscView.setStatusMsg("T_idle", ' ', 'idle');
+
+				var rc = true;
+				window.dbg.log("sc_disable_sso");
+				window.dbg.log(viewCb);
+				var reqData;
+
+				reqData = 'disable=true'; 
 
 				if (rc) {
 					

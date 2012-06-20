@@ -40,7 +40,8 @@ var SSC_VIEW = new Class(
 					'init_step3', 'init_step4', 'init_step5', 'unblockCard', 'changePin', '_tr' ,'setTranslatedElementText',
 					'_changeLanguage_step2','cardObserver','cardObserverCB','testPrivateKey','enableSSO', 'confOutlook', 'showHints',
 					'processTestPrivateKey','testPrivateKeyCB', 'cleanUpCard', 'setButton' , 'handleKeyDown' ,
-					'processEnableSSO_done',  'processConfOutlook_done' ,'processConfOutlook'],
+					'processEnableSSO_done', 'processDisableSSO_done' , 'processDisableSSO', 
+					'processConfOutlook_done' ,'processConfOutlook'],
 			
 			/*
 			 * chain of command params
@@ -122,13 +123,15 @@ var SSC_VIEW = new Class(
 			     {status: 'enterAuthcodes', handler: function(){
 									this.actCode1 = this.actCode2 = ''; // clear authcodes 
 									this.showPinDlg(false);
-									this.setInfoRight('IT_Info', 'I_actStep2');
+									
 									if (sscModel.user.cardActivation  === true ){
 										this.setInfoTitle('T_ScActivationStep2');
+										this.setInfoRight('IT_Info', 'I_activation_step2');
 										this.setNextAction('T_proceedActStep2', this.processPins, true);
 										this.setBackAction('T_chooseAuthPers', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
 									}else{
-										this.setInfoTitle('T_cardUnblock');
+										this.setInfoTitle('T_cardUnblock_step2');
+										this.setInfoRight('IT_Info', 'I_unblock_step2');
 										this.setNextAction('T_cardUnblock', this.processPins, true);
 										this.setBackAction('T_chooseAuthPers', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
 								
@@ -140,11 +143,11 @@ var SSC_VIEW = new Class(
 				 					this.showAuthPersonDlg();
 									if (sscModel.user.cardActivation === true){
 										this.setInfoTitle('T_ScActivationStep1');
-										this.setInfoRight('IT_Info', 'I_authPers');
+										this.setInfoRight('IT_Info', 'I_activation_step1');
 										this.setNextAction('T_startActivation', this.processAuthPersons, true);
 									} else {
-										this.setInfoTitle('T_cardUnblock');
-										this.setInfoRight('IT_Info', 'I_unblock');
+										this.setInfoTitle('T_cardUnblock_step1');
+										this.setInfoRight('IT_Info', 'I_unblock_step1');
 										this.setNextAction('T_cardUnblock', this.processAuthPersons, true);
 										this.setBackAction('T_back',this.processBackUnblock, true);
 									}}},
@@ -153,11 +156,11 @@ var SSC_VIEW = new Class(
 									this.showAuthPersonDlg();
 									if (sscModel.user.cardActivation === true){
 										this.setInfoTitle('T_ScActivationStepFailureRestartUnblock');
-										this.setInfoRight('IT_Info', 'I_authPers');
+										this.setInfoRight('IT_Info', 'I_activation_step1');
 										this.setNextAction('T_startActivation', this.processAuthPersons, true);
 									} else {
 										this.setInfoTitle('T_ScActivationStepFailureRestartUnblock');
-										this.setInfoRight('IT_Info', 'I_unblock');
+										this.setInfoRight('IT_Info', 'I_unblock_step1');
 										this.setNextAction('T_cardUnblock', this.processAuthPersons, true);
 										this.setBackAction('T_back',this.processBackUnblock, true);
 									}
@@ -169,6 +172,17 @@ var SSC_VIEW = new Class(
 									this.setInfoRight('IT_Info','I_server_busy');}},
 									
 				{status: 'showStatusActSuccess', handler: function(){
+					
+									var user = sscModel.getUserInfo();
+									// display user info at left side
+									this.setInfoLeft(user.firstTimePerso ? 'T_regFor' : 'T_persoFor' , 
+													 user.cardholder_givenname  
+											         + ' ' 
+											         + user.cardholder_surname
+											         +'<br />' + user.entity);
+									this.userId = user.cardholder_givenname + ' ' + user.cardholder_surname;
+					
+									$('infoMore').empty();
 									this.setInfoRight('IT_Info','I_fullyOperational');
 									this.setInfoTitle('T_Analyse');
 									this.setPrompt('P_wait');								
@@ -404,6 +418,7 @@ var SSC_VIEW = new Class(
 			init_step5 : function(cardList) {
 				
 				window.dbg.log('init_step5 - cardList = '+ cardList);
+				this.setPrompt('');
 				var queries = cardList.split('&');
 				// get rc
 				var rc = queries[0].split('=')[1];
@@ -514,7 +529,7 @@ var SSC_VIEW = new Class(
 				if (!sscModel.sc_checkCardPresence()){
 					this.stopCardObserver();
 					$('infoMore').empty();
-					this.showPopUp('T_Card_Out', '', '0906 - card ejected', true);
+					this.showPopUp('T_Card_Out', '', '0906 - card ejected');
 					this.setPrompt('P_insertCard');
 					this.setInfoTitle('T_seekingCard');
 					$('infoPrompt').style.display = 'block';
@@ -735,18 +750,23 @@ var SSC_VIEW = new Class(
 					// this.showAuthPersonDlg();
 					this.setStatusMsg('T_idle','', 'idle');
 					this.setOverallStatus('red');
-					this.setPrompt('E_invalidEmail');
+					
 					if (invalidMail !== undefined){
 						if (invalidMail === 1 || invalidMail === 3){
+							this.setPrompt('E_Email1Invalid');
 							$('authPers1').style.backgroundColor = "red";
 							$('authPers1').focus();
 							$('authPers1').addEvent('keydown', this._resetInputErr);
 						}
 						if (invalidMail === 2 || invalidMail === 3){
+							
 							$('authPers2').style.backgroundColor = "red";
 							$('authPers2').focus();
 							$('authPers2').addEvent('keydown', this._resetInputErr);
 						}
+					}else{
+						this.setPrompt('E_invalidEmail');
+						
 					}
 					// FIX END
 					
@@ -754,14 +774,16 @@ var SSC_VIEW = new Class(
 					
 					
 					// set right info text
-					sscView.setInfoRight('IT_Info', 'I_authPers');
+					
 					var user = sscModel.getUserInfo();
 					if (user.cardActivation === true){
 						this.setInfoTitle('T_ScActivationStep1');
+						sscView.setInfoRight('IT_Info', 'I_activation_step1');
 						// set next action
 						this.setNextAction('T_startActivation', this.processAuthPersons, true); 
 					} else {
-						this.setInfoTitle('T_cardUnblock');
+						this.setInfoTitle('T_cardUnblock_step1');
+						sscView.setInfoRight('IT_Info', 'I_unblock_step1');
 						// set next action
 						this.setNextAction('T_cardUnblock', this.processAuthPersons, true);
 						//this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);		
@@ -780,17 +802,20 @@ var SSC_VIEW = new Class(
 					 
 					this.showPinDlg(false);
 					
-					// set right info text
-					sscView.setInfoRight('IT_Info', 'I_actStep2');
+				
 					window.dbg.log('cardActivation ? = ' + sscModel.user.cardActivation);
 					// set title
 					if (sscModel.user.cardActivation === true ){
 						this.setInfoTitle('T_ScActivationStep2');
+						// set right info text
+						sscView.setInfoRight('IT_Info', 'I_unblock_step2');
 						// set next & back action
 						this.setNextAction('T_proceedActStep2', this.processPins, true);
 						this.setBackAction('T_chooseAuthPers', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
 					}else{
-						this.setInfoTitle('T_cardUnblock');
+						this.setInfoTitle('T_cardUnblock_step2');
+						// set right info text
+						sscView.setInfoRight('IT_Info', 'I_activation_step2');
 						// set next & back action
 						this.setNextAction('T_cardUnblock', this.processPins, true);
 						this.setBackAction('T_chooseAuthPers', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
@@ -863,7 +888,7 @@ var SSC_VIEW = new Class(
 					this.pin = $('pin').value;
 
 					// and check it
-					if (this.pin.length < 4) {
+					if (this.pin.length <= 0 ) {
 						$('pin').style.backgroundColor = "red";
 						$('pin').addEvent('keydown', this._resetInputErr);
 						if (!error)
@@ -892,14 +917,14 @@ var SSC_VIEW = new Class(
 				// save pin 1...
 				this.pin1 = $('pin1').value;
 				// ... and check length
-				if (this.pin1.length < 4  ) {
+				if (this.pin1.length <= 0  ) {
 					$('pin1').style.backgroundColor = "red";
 					$('pin1').addEvent('keydown', this._resetInputErr);
 					if (!error)
 						$('pin1').focus();
 					
 					if(!error){
-						this.setPrompt('E_Pin1Invalid');
+						this.setPrompt('E_NewPin1Invalid');
 					}
 					error = true;		
 				} else {
@@ -909,13 +934,13 @@ var SSC_VIEW = new Class(
 				// save pin2...
 				this.pin2 = $('pin2').value;
 				// ...check length
-				if (this.pin2.length < 4) {
+				if (this.pin2.length <= 0) {
 					$('pin2').style.backgroundColor = "red";
 					$('pin2').addEvent('keydown', this._resetInputErr);
 					if (!error)
 						$('pin2').focus();
 					if(!error){
-						this.setPrompt('E_Pin2Invalid');
+						this.setPrompt('E_NewPin2Invalid');
 					}
 					error = true;					
 				} else {
@@ -963,7 +988,7 @@ var SSC_VIEW = new Class(
 							this.setNextAction('T_proceedActStep2', this.processPins, true);
 							this.setBackAction('T_chooseAuthPers', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
 						}else{
-							this.setInfoTitle('T_cardUnblock');
+							this.setInfoTitle('T_cardUnblock_step2');
 							// set next & back action
 							this.setNextAction('T_cardUnblock', this.processPins, true);
 							this.setBackAction('T_chooseAuthPers', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
@@ -972,11 +997,11 @@ var SSC_VIEW = new Class(
 					}
 					this.setOverallStatus('red');
 					this.setPrompt('E_uneqPins');
+					$('pin1').style.backgroundColor = "red";
+					$('pin1').addEvent('keydown', this._resetInputErr);
 					$('pin2').style.backgroundColor = "red";
 					$('pin2').addEvent('keydown', this._resetInputErr);
-					$('pin2').focus();
-
-
+					$('pin1').focus();
 				} else {
 					this.setStatusMsg();
 					if ($('pin')) {
@@ -1038,7 +1063,7 @@ var SSC_VIEW = new Class(
 					// set title
 					this.setInfoTitle('T_ScActivationStepFailureRestartUnblock');
 					// set right info text
-					sscView.setInfoRight('IT_Info', 'I_unblock');
+					sscView.setInfoRight('IT_Info', 'I_unblock_step1');
 					// set next & back action
 					this.setNextAction('T_cardUnblock', this.processAuthPersons, true);
 					this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
@@ -1111,7 +1136,7 @@ var SSC_VIEW = new Class(
 						this.setNextAction('T_proceedActStep2', this.processPins, true);
 						this.setBackAction('T_chooseAuthPers', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
 					}else{
-						this.setInfoTitle('T_cardUnblock');
+						this.setInfoTitle('T_cardUnblock_step2');
 						// set next & back action
 						this.setNextAction('T_cardUnblock', this.processPins, true);
 						this.setBackAction('T_chooseAuthPers', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
@@ -1119,7 +1144,7 @@ var SSC_VIEW = new Class(
 					
 				// invalid pin	
 				} else if (status === 'invalidPin'){
-					this.setPrompt('T_invalidPolicy');
+					this.setPrompt('P_invalidPolicy');
 					//this.showPinDlg(false);
 					$('pin1').style.backgroundColor = "red";
 					$('pin1').focus();
@@ -1242,7 +1267,7 @@ var SSC_VIEW = new Class(
 				this.setOverallStatus(sscModel.getOverAllStatus());
 				this.setStatusMsg('T_idle','', 'idle');
 				this.setInfoTitle('T_testPrivateKey');
-				this.setInfoRight('IT_privatekeytest', 'I_privatekeytest');
+				this.setInfoRight('IT_info', 'I_privatekeytest');
 				
 				this.showGetPinDlg();			
 				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);				 
@@ -1266,11 +1291,11 @@ var SSC_VIEW = new Class(
 			testPrivateKeyCB : function(testresults, res){
 				window.dbg.log('testPrivateKeyCB');
 				
-				this.setInfoTitle('T_StatusTitle');
+				this.setInfoTitle('T_Private_keyTest');
 				var infoHtml = '';
 				
-				var user = sscModel.getUserInfo();
-				var enableReset = false;
+				var user = sscModel.privatekeytestresults ;
+				var enableReset = "no";
 				
 				this.setPrompt();
 				this.dataPrivacyHtml = this.digitalSignatureHtml = this.digitalIdHtml = this.otherCertsHtml = this.testedKeysHtml = '';
@@ -1319,7 +1344,7 @@ var SSC_VIEW = new Class(
 						
 						if( testresults[i].PRIVATE_KEY_TEST_RESULT !== 'PASS' ){
 							window.dbg.log('enable fixcard PRIVATE_KEY_TEST_RESULT '+ testresults[i].PRIVATE_KEY_TEST_RESULT);
-							enableReset = true;
+							enableReset = "broken_keys";
 						}
 							
 					}
@@ -1349,18 +1374,26 @@ var SSC_VIEW = new Class(
 						infoHtml += this._createInfoAccordionEntry(this._tr('T_OtherKeys'),
 								 								 'certStatus_'+this.OtherKeyStatus,
 																  this.testedKeysHtml);
+						enableReset = "other_keys";
 					}
 
 					this._createInfoAccordion(infoHtml);
 					
-					if(!enableReset){
+					if(enableReset === 'no'){
 						this.setPrompt('T_Private_keys_working');
 						this.setInfoRight('IT_Info', 'I_workingKeys');
-						this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true)
+						this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
 						
+					}else if(enableReset === 'other_keys'){
+						this.setPrompt('T_other_Private_keys_found');
+						this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
+						this.setInfoRight('IT_Info', 'I_OtherKeys');
+						this.setNextAction('P_cleanupCard', this.cleanUpCard, true);
+					
 					}else{
-						this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true)
-						this.setInfoRight('IT_Info', 'I_brokenKey');
+						this.setPrompt('T_broken_Private_keys_found');
+						this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
+						this.setInfoRight('IT_Info', 'I_BrokenKey');
 						this.setNextAction('P_cleanupCard', this.cleanUpCard, true);
 					}
 					
@@ -1471,10 +1504,24 @@ var SSC_VIEW = new Class(
 				window.dbg.log('cleanUpCard ');
 				var self = this;
 				sscModel.sc_card_cleanup(function(rc){
-											if (rc === 'SUCCESS'){self.setInfoTitle('T_cleanupSuccess');} 
-											else {self.setInfoTitle('T_cleanupFailed');}
-											self.setNextAction('',null, false);
-											$('infoMore').empty();
+										sscView.setPrompt('');
+										$('infoMore').empty();
+											if (rc === 'SUCCESS'){
+												sscView.setInfoTitle('T_cleanupSuccess');
+												
+												sscView.setInfoRight('IT_Info','I_Recert');
+											
+												sscView.setNextAction('T_startRecert',sscView.processPersonalization, true);
+											
+											}else {
+												sscView.showPopUp('E_card_cleanup_failed',
+														'cross', '1500');
+												sscView.setInfoTitle('T_cleanupFailed');
+												//sscView.setBackAction('T_back',function(){ sscView.handleStatus('showStatus');}.bind(this), true);      
+											}
+											//sscView.setNextAction('',null, false);
+											//$('infoMore').empty();
+											
 											}
 				);
 			},
@@ -1492,7 +1539,7 @@ var SSC_VIEW = new Class(
 				this.setOverallStatus(sscModel.getOverAllStatus());
 				this.setStatusMsg('T_idle','', 'idle');
 				this.setInfoTitle('T_EnableSSO');
-				this.setInfoRight('IT_enableSSO', 'I_enableSSO');
+				this.setInfoRight('IT_Info', 'I_enableSSO');
 				
 				
 				var div = new Element('div', {
@@ -1513,23 +1560,51 @@ var SSC_VIEW = new Class(
 			processEnableSSO : function(){
 				window.dbg.log('processEnableSSO');
 				window.dbg.log(sscView.processEnableSSO_done);
-				sscModel.sc_enable_sso( function(){ this.processEnableSSO_done  ;}.bind(this)  );
+			//	sscModel.sc_enable_sso( function(){ this.processEnableSSO_done  ;}.bind(this)  );
+				sscModel.sc_enable_sso( sscView.processEnableSSO_done   );
 			},
 			
 			processEnableSSO_done : function(rc){
 				window.dbg.log('processEnableSSO_done');
 				if (rc === 'SUCCESS'){
+					this.setInfoRight('IT_Info', 'I_enableSsoSuccess');
 					this.setInfoTitle('T_enableSsoSuccess');
 					this.setPrompt('P_enableSsoSuccess');
 				}else{
+					this.setInfoRight('IT_Info', 'I_enableSsoFailed');
 					this.setInfoTitle('T_enableSsoFailed');
 					this.setPrompt('P_enableSsoFailed');
 				}
 				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
-				this.setNextAction('',null, false);
+				this.setNextAction('T_DisableSSO',this.processDisableSSO, true);
 				$('infoMore').empty();
 				
 			},
+			
+			processDisableSSO : function(){
+				window.dbg.log('processDisableSSO');
+				window.dbg.log(sscView.processDisableSSO_done);
+			//	sscModel.sc_enable_sso( function(){ this.processEnableSSO_done  ;}.bind(this)  );
+				sscModel.sc_disable_sso( sscView.processDisableSSO_done   );
+			},
+			
+			processDisableSSO_done : function(rc){
+				window.dbg.log('processDisableSSO_done');
+				if (rc === 'SUCCESS'){
+					this.setInfoRight('IT_Info', 'I_disableSsoSuccess');
+					this.setInfoTitle('T_disableSsoSuccess');
+					this.setPrompt('P_disableSsoSuccess');
+				}else{
+					this.setInfoRight('IT_Info', 'I_DisableSsoFailed');
+					this.setInfoTitle('T_disableSsoFailed');
+					this.setPrompt('P_disableSsoFailed');
+				}
+				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
+				this.setNextAction('T_EnableSSO',this.processEnableSSO, true);
+				$('infoMore').empty();
+				
+			},
+			
 			
 			confOutlook : function(){
 				window.dbg.log('Configure outlook');
@@ -1571,9 +1646,9 @@ var SSC_VIEW = new Class(
 				var results = new Querystring(r);
 				var set = results.get("Result");
 				if(set === 'SUCCESS'){
-					this.setPrompt('T_outlook_conf_success');
+					this.setPrompt('P_outlook_conf_success');
 				}else{
-					this.setPrompt('T_outlook_conf_error');
+					this.setPrompt('P_outlook_conf_error');
 				}
 				
 				//configureOutlookResult=ERROR&Reason=SeekError&CardType=Gemalto .NET&TokenID=857E976B742FE5CB
@@ -1730,7 +1805,7 @@ var SSC_VIEW = new Class(
 			setOverallStatus : function(statusLightClass) {
 				window.dbg.log('setOverallStatus ' + statusLightClass);
 				this.setTranslatedElementText($('overallStatus'),
-						'T_StatusTitle');
+						'T_OverallStatusTitle');
 				$('overallStatus').setProperty('class',
 						statusLightClass + 'OaS');
 
@@ -2121,7 +2196,7 @@ var SSC_VIEW = new Class(
 				this.setInfoTitle('T_HintTitle');
 				this.setInfoTitle('T_cardActivationSuccess');
 				this.setInfoLeft('','');
-				this.setInfoRight('T_HintTitleR','I_HintInfoR');
+				this.setInfoRight('IT_Info','I_HintInfoR');
 				var infoHtml = '';
 				
 				infoHtml += this._createInfoAccordionEntry(this._tr('T_HintSubTitle1'),
@@ -2340,23 +2415,24 @@ var SSC_VIEW = new Class(
 				//}
 			},
 
-			showPopUp : function(msgId, sign, errorCode, noSupportMsg) {
+			showPopUp : function(msgId, sign, errorCode, SupportMsg) {
 					
 				window.dbg.log('showPopUp - ' + msgId + '-' + errorCode );
 				this.showPopUpMsg( errorCode !== undefined 
 						             ? this._tr(msgId) + '<br/><a id="errCodeToggle" href="#">' + this._tr('...') + '</a><br /><div id="errCode">' + errorCode + '</div>'
 						             : this._tr(msgId)
-						             , sign , noSupportMsg !== undefined ? true : undefined);
+						             , sign , SupportMsg );
 
 			},
 
-			showPopUpMsg : function(msg, sign, noSupportMsg) {
+			showPopUpMsg : function(msg, sign, SupportMsg) {
 				window.dbg.log('showPopUpMsg');
 				$('popupInfo').set('html', msg);
-				if (noSupportMsg === undefined ){
+				if (SupportMsg === undefined ){
 				   $('popupInfo2').set('html', this._tr('T_popupSupportContact'));
 				} else {
-				   $('popupInfo2').hide();
+					$('popupInfo2').set('html', this._tr(SupportMsg));
+				   //$('popupInfo2').hide();
 				}
 				//$('popupSign').setProperty('class', sign);
 				$('popupFrame').style.display = 'block';
