@@ -89,7 +89,7 @@ $test->connect_ok(
 ) or die "Error - connect failed: $@";
 
 
-$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_CRR_APPROVE' );
+$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_APPROVE_CRR' );
 
 $test->state_is('APPROVAL');
 
@@ -97,7 +97,7 @@ print "\nYou need to make the certificate show up as revoked in the database now
 
 printf "UPDATE certificate SET status = 'REVOKED' WHERE identifier = '%s';\n\n", $test->param('cert_identifier');
 
-$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_START_REVOCATION' );
+$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE' );
 
 my $i=0; 
 while ($test->state() eq 'CHECK_FOR_REVOCATION' && $i++ < 10) {    
@@ -105,6 +105,7 @@ while ($test->state() eq 'CHECK_FOR_REVOCATION' && $i++ < 10) {
     sleep 10;
     $test->reset(); # Test::More caches the last response!
 }
+   print "\n";
 
 $test->state_is('SUCCESS');
 

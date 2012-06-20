@@ -7,7 +7,7 @@
 
  <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_INITIAL</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_CRR_CREATE"
+    <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CRR"
 	    resulting_state="PENDING">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_CREATE"/>
     </action>
@@ -15,20 +15,20 @@
 
   <state name="PENDING">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_PENDING</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_CRR_CHANGE_INVALIDITY_TIME"
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
 	    resulting_state="PENDING">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_INVALIDITY_TIME"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_CRR_CHANGE_REASON"
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
 	    resulting_state="PENDING">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_REASON"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_CRR_APPROVE"
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
 	    resulting_state="APPROVAL">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_APPROVE"/>
       <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_CRR_REJECT"
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
 	    resulting_state="REJECTED">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_REJECT"/>
     </action>
@@ -36,30 +36,30 @@
 
   <state name="APPROVAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_START_REVOCATION"
+    <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
 	    resulting_state="CRR_PERSIST">
       <condition name="I18N_OPENXPKI_WF_ACL_REVOKE_CERTIFICATE"/>
       <condition name="I18N_OPENXPKI_WF_COND_CHECK_CRR_APPROVALS"/>
     </action>
     <!-- perhaps we need more than one approval or                 -->
     <!-- perhaps the first approval was from a not authorized role -->
-    <action name="I18N_OPENXPKI_WF_ACTION_CRR_APPROVE"
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
 	    resulting_state="APPROVAL">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_APPROVE"/>
       <condition name="!workflow_creator"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_APPROVAL"
+    <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
 	    resulting_state="PENDING">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_CANCEL_APPROVAL"/>
     </action>
-    <action name="I18N_OPENXPKI_WF_ACTION_CRR_REJECT"
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
 	    resulting_state="REJECTED">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_REJECT"/>
     </action>
   </state>
          
   <state name="CRR_PERSIST" autorun="yes">
-    <action name="I18N_OPENXPKI_WF_ACTION_CRR_PERSIST"
+    <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
 	    resulting_state="NICE_DISPATCH_REVOKE">
           <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
     </action>
