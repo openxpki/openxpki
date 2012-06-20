@@ -89,6 +89,7 @@ sub run {
     my $pid;
     my $redo_count = 0;
     
+    $SIG{'CHLD'} = sub { wait; };    
     while ( !defined $pid && $redo_count < $self->max_fork_redo() ) {
         ##! 16: 'trying to fork'
         $pid = fork();
