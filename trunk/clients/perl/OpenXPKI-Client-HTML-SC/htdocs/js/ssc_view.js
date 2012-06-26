@@ -740,7 +740,7 @@ var SSC_VIEW = new Class(
 			 */
 			processAuthPersons_done : function(rc, invalidMail) {
 
-				window.dbg.log('auth persons done - ' + status);
+				window.dbg.log('auth persons done - ' + invalidMail);
 				
 				// any error
 				if (rc){
@@ -759,7 +759,7 @@ var SSC_VIEW = new Class(
 							$('authPers1').addEvent('keydown', this._resetInputErr);
 						}
 						if (invalidMail === 2 || invalidMail === 3){
-							
+							this.setPrompt('E_Email2Invalid');
 							$('authPers2').style.backgroundColor = "red";
 							$('authPers2').focus();
 							$('authPers2').addEvent('keydown', this._resetInputErr);
