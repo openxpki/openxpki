@@ -1,14 +1,14 @@
 <validators>
-  <validator name="Creator"
+  <validator name="I18N_OPENXPKI_WF_VAL_CREATOR"
              class="OpenXPKI::Server::Workflow::Validator::Creator">
   </validator>
-  <validator name="InvalidityTime"
+  <validator name="I18N_OPENXPKI_WF_VAL_INVALIDITYTIME"
              class="OpenXPKI::Server::Workflow::Validator::InvalidityTime">
   </validator>
-  <validator name="ReasonCode"
+  <validator name="I18N_OPENXPKI_WF_VAL_REASONCODE"
              class="OpenXPKI::Server::Workflow::Validator::ReasonCode">
   </validator>
-  <validator name="ValidApprovalSignatureCRR"
+  <validator name="I18N_OPENXPKI_WF_VAL_VALIDAPPROVALSIGNATURECRR"
              class="OpenXPKI::Server::Workflow::Validator::ApprovalSignature">
       <!-- if you set the following parameter to 1, you can enforce
            signatures on all CSR approvals -->

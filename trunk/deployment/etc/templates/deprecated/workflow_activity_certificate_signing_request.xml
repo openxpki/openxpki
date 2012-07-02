@@ -1,0 +1,222 @@
+<actions>
+  <!-- this action name has not to be human readable      -->
+  <!-- because it is only used to initialize the workflow -->
+  <action name="create_csr"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+         source="USER">
+      <field name="cert_role"/>
+      <field name="cert_profile"/>
+      <field name="cert_subject_style"/>
+      <field name="cert_subject_parts"/>
+      <field name="cert_subject_alt_name_parts"/>
+      <field name="cert_info"/>
+      <field name="csr_type"/>
+      <field name="spkac"/>
+      <field name="pkcs10"/>
+      <field name="bulk"/>
+
+      <validator name="KeyLength"/>
+
+      <validator name="Bulk">
+          <arg>$bulk</arg>
+      </validator>
+
+      <validator name="KeyReuse">
+        <arg>$csr_type</arg>
+        <arg>$pkcs10</arg>
+        <arg>$spkac</arg>
+      </validator>
+
+      <!-- do not use field with is_required                -->
+      <!-- because this ignores the order of the validators -->
+      <validator name="HasRequiredField">
+        <arg>cert_role</arg>
+      </validator>
+      <validator name="CertRole">
+        <arg>$cert_role</arg>
+      </validator>
+      <validator name="HasRequiredField">
+        <arg>cert_profile</arg>
+      </validator>
+      <validator name="CertProfile">
+        <arg>$cert_profile</arg>
+        <arg>$cert_profile_id</arg>
+        <arg>$cert_role</arg>
+      </validator>
+      <validator name="HasRequiredField">
+        <arg>cert_subject_style</arg>
+        <arg>cert_subject_parts</arg>
+      </validator>
+      <validator name="CertSubjectParts">
+        <arg>$cert_profile</arg>
+        <arg>$cert_profile_id</arg>
+        <arg>$cert_subject_style</arg>
+        <arg>$cert_subject_parts</arg>
+      </validator>
+      <validator name="HasRequiredField">
+        <arg>cert_subject_alt_name_parts</arg>
+      </validator>
+      <validator name="CertSubjectAltNameParts">
+        <arg>$cert_profile</arg>
+        <arg>$cert_subject_style</arg>
+        <arg>$cert_subject_parts</arg>
+        <arg>$cert_subject_alt_name_parts</arg>
+      </validator>
+      <validator name="HasRequiredField">
+        <arg>cert_info</arg>
+        <arg>csr_type</arg>
+      </validator>
+      <validator name="SPKAC">
+        <arg>$csr_type</arg>
+        <arg>$spkac</arg>
+      </validator>
+      <validator name="PKCS10">
+        <arg>$csr_type</arg>
+        <arg>$pkcs10</arg>
+      </validator>
+  </action>
+  <action name="notify_user_of_creation"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::Notification"
+          message="csr_created">
+      <validator name="KeyLength"/>
+  </action>
+  <action name="notify_user_of_issuance"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::Notification"
+          message="certificate_issued">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+         source="OPERATOR">
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_role"/>
+      <validator name="CertRole">
+        <arg>$cert_role</arg>
+      </validator>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+         source="OPERATOR">
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_profile"/>
+      <validator name="CertProfile">
+        <arg>$cert_profile</arg>
+      </validator>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
+	  class="Workflow::Action::Null">
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_subject_style"/>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_NOTBEFORE"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+         source="OPERATOR">
+      <field name="notbefore"/>
+      <validator name="ValidityTime">
+        <arg>$notbefore</arg>
+      </validator>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_NOTAFTER"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+         source="OPERATOR">
+      <field name="notafter"/>
+      <validator name="ValidityTime">
+        <arg>$notafter</arg>
+      </validator>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+         source="OPERATOR">
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_subject"/>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+         source="OPERATOR">
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_subject_alt_name"/>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
+	  class="Workflow::Action::Null">
+      <!-- do not use field with is_required="yes"          -->
+      <!-- because this ignores the order of the validators -->
+      <field name="cert_info"/>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve"
+          pkcs7tool="testsceppkcs7tool1"
+          multi_role_approval="0"
+          check_creator="0">
+          <!-- if multi_role_approval is set to 1, a user is allowed
+               to approve the certificate request with different
+               session roles -->
+      <field name="_check_hash"/>
+      <field name="_signature"/>
+      <field name="_signature_text"/>
+      <validator name="ValidApprovalSignatureCSR">
+        <arg>$_signature</arg>
+        <arg>$_signature_text</arg>
+     </validator>
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_EXPORT_CSR"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export"
+          export_destination="0"
+          export_state="INITIAL_IMPORT">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
+	  class="OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::Notification"
+          message="csr_rejected">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_SLEEP_FOR_CHILD"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"
+          time="10">
+  </action>
+
+  <action name="I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::ForkWorkflowInstance"
+          workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
+          role="CA Operator">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_EXPORT_FINISHED_CSR"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export"
+          export_destination="0"
+          export_state="SUCCESS">
+  </action>
+  <action name="I18N_OPENXPKI_WF_ACTION_EXPORT_FAILED_CSR"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export"
+          export_destination="0"
+          export_state="FAILURE">
+  </action>
+  <action name="null"
+          class="Workflow::Action::Null">
+  </action>
+  <action name="generate_key"
+          class="OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey">
+      <field name="_key_type"/>
+      <field name="_key_gen_params"/>
+      <field name="_password"/>
+      <validator name="PasswordQuality">
+        <arg>$_password</arg>
+      </validator>
+  </action>
+  <action name="generate_pkcs10"
+          class="OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10">
+  </action>
+
+  <action name="child_finished_successfully"
+      class="Workflow::Action::Null"/>
+
+  <action name="child_finished_failure"
+      class="Workflow::Action::Null"/>
+</actions>
+

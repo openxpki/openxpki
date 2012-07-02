@@ -913,6 +913,15 @@ sub __get_workflow_factory {
         $pki_realm = $arg_ref->{PKI_REALM};
     }
     ##! 32: 'realm: ' . $pki_realm
+    
+    unless($pki_realm){
+        OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_NO_PKI_REALM_GIVEN',
+                params  => {
+                    WORKFLOW_ID => $arg_ref->{WORKFLOW_ID},
+                },
+            );
+    }
 
     # We have now obtained the configuration id that was active during
     # creation of the workflow instance. However, if for some reason
@@ -984,6 +993,10 @@ sub __get_workflow_info {
 	    TYPE        => $workflow->type(),
 	    DESCRIPTION => $workflow->description(),
 	    LAST_UPDATE => $workflow->last_update(),
+	    PROC_STATE  => $workflow->proc_state(),
+	    COUNT_TRY  => $workflow->count_try(),
+	    WAKE_UP_AT  => $workflow->wakeup_at(),
+	    REAP_AT  => $workflow->reap_at(),
 	    CONTEXT => { 
 		%{$workflow->context()->param()} 
 	    },

@@ -1,5 +1,5 @@
 <validators>
-  <validator name="KeyLength"
+  <validator name="I18N_OPENXPKI_WF_VAL_KEYLENGTH"
              class="OpenXPKI::Server::Workflow::Validator::KeyLength">
       <param name="min" value="rsaEncryption: 1024, dsaEncryption: 1024, id-ecPublicKey: 191"/>
       <!-- the following is optional, if you want your users to be able
@@ -10,37 +10,37 @@
       <param name="fail_on_unknown_algorithm" value="1"/>
   </validator>
 
-  <validator name="Bulk"
+  <validator name="I18N_OPENXPKI_WF_VAL_BULK"
              class="OpenXPKI::Server::Workflow::Validator::Bulk">
   </validator>
-  <validator name="KeyReuse"
+  <validator name="I18N_OPENXPKI_WF_VAL_KEYREUSE"
              class="OpenXPKI::Server::Workflow::Validator::KeyReuse">
   </validator>
-  <validator name="HasRequiredField"
+  <validator name="I18N_OPENXPKI_WF_VAL_HASREQUIREDFIELD"
              class="Workflow::Validator::HasRequiredField">
   </validator>
-  <validator name="CertRole"
+  <validator name="I18N_OPENXPKI_WF_VAL_CERTROLE"
              class="OpenXPKI::Server::Workflow::Validator::CertRole">
   </validator>
-  <validator name="CertProfile"
+  <validator name="I18N_OPENXPKI_WF_VAL_CERTPROFILE"
              class="OpenXPKI::Server::Workflow::Validator::CertProfile">
   </validator>
-  <validator name="CertSubjectParts"
+  <validator name="I18N_OPENXPKI_WF_VAL_CERTSUBJECTPARTS"
              class="OpenXPKI::Server::Workflow::Validator::CertSubjectParts">
   </validator>
-  <validator name="CertSubjectAltNameParts"
+  <validator name="I18N_OPENXPKI_WF_VAL_CERTSUBJECTALTNAMEPARTS"
              class="OpenXPKI::Server::Workflow::Validator::CertSubjectAltNameParts">
   </validator>
-  <validator name="ValidityTime"
+  <validator name="I18N_OPENXPKI_WF_VAL_VALIDITYTIME"
              class="OpenXPKI::Server::Workflow::Validator::ValidityTime">
   </validator>
-  <validator name="SPKAC"
+  <validator name="I18N_OPENXPKI_WF_VAL_SPKAC"
              class="OpenXPKI::Server::Workflow::Validator::SPKAC">
   </validator>
-  <validator name="PKCS10"
+  <validator name="I18N_OPENXPKI_WF_VAL_PKCS10"
              class="OpenXPKI::Server::Workflow::Validator::PKCS10">
   </validator>
-  <validator name="PasswordQuality"
+  <validator name="I18N_OPENXPKI_WF_VAL_PASSWORDQUALITY"
              class="OpenXPKI::Server::Workflow::Validator::PasswordQuality">
         <param name="DICTIONARY" value="5"/>
         <param name="FOLLOWING" value="3"/>
@@ -52,7 +52,7 @@
         <param name="DICTIONARIES" value="/usr/share/dict/ngerman,/usr/share/dict/american-english"/>
         -->
   </validator>
-  <validator name="ValidApprovalSignatureCSR"
+  <validator name="I18N_OPENXPKI_WF_VAL_VALIDAPPROVALSIGNATURECSR"
              class="OpenXPKI::Server::Workflow::Validator::ApprovalSignature">
       <!-- if you set the following parameter to 1, you can enforce
            signatures on all CSR approvals -->

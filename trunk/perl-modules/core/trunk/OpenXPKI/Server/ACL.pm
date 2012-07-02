@@ -101,11 +101,8 @@ sub __load_server
     # get the ID of the server that we are on
     # (for some reason, this ID lives in the database part of the
     #  configuration)
-    my $our_server_id = CTX('xml_config')->get_xpath (
-         XPATH   => ['common', 'database', 'server_id'],
-         COUNTER => [0, 0, 0],
-         CONFIG_ID => $cfg_id,
-    );
+    my $our_server_id =  CTX('config')->get('system.server.node.id');
+    
     my $servers = CTX('xml_config')->get_xpath_count (
                       XPATH   => ['pki_realm', 'acl', 'server'],
                       COUNTER => [$pkiid, 0],
@@ -393,6 +390,11 @@ sub authorize_workflow {
                           ->{READ}->{$type}) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_NO_ACCESS_TO_TYPE',
+                params  => {
+                    'REALM'   => $realm,
+                    'ROLE'    => $role,
+                    'WF_TYPE' => $type,
+                },
             );
         }
         my $allowed_creator_re = $self->{PKI_REALM}->{$realm}->{ACL_WORKFLOW}->{$role}->{READ}->{$type}->{CREATOR};

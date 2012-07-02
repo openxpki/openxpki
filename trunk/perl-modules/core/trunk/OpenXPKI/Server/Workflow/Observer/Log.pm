@@ -50,6 +50,11 @@ sub update {
     elsif ( $event eq 'add history' ) {
         $msg = "Workflow $id/$type/$state added history";
     }
+    elsif ( $event eq 'pause' ) {
+        my (  $action_name, $cause ) = @_;
+        $prio = 'info';
+        $msg = "Workflow $id/$type/$state paused at action $action_name, cause: $cause";
+    }
 
     # in case more events are ever added to Workflow
     if ( $msg eq '' ) {

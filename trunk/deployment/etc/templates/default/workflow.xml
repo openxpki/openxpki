@@ -1,74 +1,35 @@
 <workflow_config id="default">
-  <workflows>
-    [% IF deployment.xmlstyle == 'multi-file' %]
+  <workflows>    
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_signing_request.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_issuance.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_ldap_publishing.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_renewal_request.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_ldap_publishing.xml"/>    
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_revocation_request.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_crl_issuance.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_scep_request.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_personalization.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_crl_issuance.xml"/>    
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_password_safe.xml"/>
-    [% ELSIF deployment.xmlstyle == 'all-in-one' %]
-      [% INCLUDE workflow_def_certificate_signing_request.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_certificate_signing_request_offline_ca.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_certificate_issuance.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_certificate_ldap_publishing.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_certificate_revocation_request.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_certificate_revocation_request_offline_ca.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_crl_issuance.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_scep_request.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_dataexchange_export.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_dataexchange_import.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_smartcard_personalization.xml FILTER indent(4) %]
-      [% INCLUDE workflow_def_password_safe.xml FILTER indent(4) %]
-    [% END %]
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_testing.xml"/>        
   </workflows>
     
-  <activities>
-    [% IF deployment.xmlstyle == 'multi-file' %]
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_null.xml"/>
+  <activities>   
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_signing_request.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_issuance.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_renewal_request.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_ldap_publishing.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_revocation_request.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_crl_issuance.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_scep_request.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_dataexchange.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_personalization.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_crl_issuance.xml"/>    
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_password_safe.xml"/>
-    [% ELSIF deployment.xmlstyle == 'all-in-one' %]
-      [% INCLUDE workflow_activity_null.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_certificate_signing_request.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_certificate_issuance.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_certificate_ldap_publishing.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_certificate_revocation_request.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_crl_issuance.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_scep_request.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_dataexchange.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_smartcard_personalization.xml FILTER indent(4) %]
-      [% INCLUDE workflow_activity_password_safe.xml FILTER indent(4) %]
-    [% END %]
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_nice.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity.xml"/>
   </activities>
 
   <validators>
-    [% IF deployment.xmlstyle == 'multi-file' %]
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_signing_request.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_revocation_request.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_password_safe.xml"/>
-    [% ELSIF deployment.xmlstyle == 'all-in-one' %]
-      [% INCLUDE workflow_validator_certificate_signing_request.xml FILTER indent(4) %]
-      [% INCLUDE workflow_validator_certificate_revocation_request.xml FILTER indent(4) %]
-      [% INCLUDE workflow_validator_password_safe.xml FILTER indent(4) %]
-    [% END %]
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator.xml"/>    
   </validators>
 
   <conditions>
-    [% IF deployment.xmlstyle == 'multi-file' %]
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition.xml"/>
-    [% ELSIF deployment.xmlstyle == 'all-in-one' %]
-      [% INCLUDE workflow_condition.xml FILTER indent(4) %]
-    [% END %]
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_acl.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_nice.xml"/>
   </conditions>
 
 </workflow_config>

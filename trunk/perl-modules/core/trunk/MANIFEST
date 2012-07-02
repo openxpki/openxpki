@@ -108,6 +108,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_encrypt.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_decrypt.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_verify.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_chain.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_end_entity.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/RSA.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/DSA.pm
@@ -180,6 +181,9 @@ OpenXPKI/Server/Notification.pm
 OpenXPKI/Workflow/Factory.pm
 
 OpenXPKI/Server/Workflow.pm
+OpenXPKI/Server/Workflow/Pause.pm
+OpenXPKI/Server/Watchdog.pm
+OpenXPKI/Server/Watchdog/WorkflowInstance.pm
 
 OpenXPKI/Server/Workflow/WFObject.pm
 OpenXPKI/Server/Workflow/WFObject/WFArray.pm
@@ -188,10 +192,16 @@ OpenXPKI/Server/Workflow/WFObject/WFHash.pm
 OpenXPKI/Server/Workflow/Activity.pm 
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 
+# FIXME: Remove for production
+OpenXPKI/Server/Workflow/Activity/WorkflowTest.pm
+
 OpenXPKI/Server/Workflow/Activity/CertIssuance/ImportCertData.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/Issue.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/GetCertProfile.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/PersistCertificate.pm
+OpenXPKI/Server/Workflow/Activity/CertIssuance/PublishCertificate.pm
+
+OpenXPKI/Server/Workflow/Activity/CertRenewal/FetchOrgCertData.pm
 
 OpenXPKI/Server/Workflow/Activity/CertLdapPublish/AddMissingNode.pm
 OpenXPKI/Server/Workflow/Activity/CertLdapPublish/ImportPublicData.pm
@@ -203,10 +213,12 @@ OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
 OpenXPKI/Server/Workflow/Activity/CSR/ChangeNotBeforeOrAfter.pm
 
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
+OpenXPKI/Server/Workflow/Activity/CRR/MarkRevoked.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ForkWorkflowInstance.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
@@ -226,6 +238,8 @@ OpenXPKI/Server/Workflow/Activity/Tools/Datapool/SetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/LDAP/GetLDAPData.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
+
+OpenXPKI/Server/Workflow/Activity/Tools/GetCertificateIdentifier.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
@@ -306,6 +320,11 @@ OpenXPKI/Server/Workflow/Condition/SCEPClientCSRValidRole.pm
 OpenXPKI/Server/Workflow/Condition/WFArray.pm
 OpenXPKI/Server/Workflow/Condition/DatapoolEntry.pm
 
+OpenXPKI/Server/Workflow/Condition/CertificateHasStatus.pm
+OpenXPKI/Server/Workflow/Condition/MaxIterationsNotReached.pm
+OpenXPKI/Server/Workflow/Condition/WFValue.pm
+OpenXPKI/Server/Workflow/Condition/SubjectMatchesPKCS10.pm
+
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
@@ -325,6 +344,24 @@ OpenXPKI/Server/Workflow/Validator/Bulk.pm
 OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
 OpenXPKI/Server/Workflow/Validator/UnusedID.pm
 
+OpenXPKI/Server/Workflow/Validator/RelativeDate.pm
+
+## Packages for new NICE API
+OpenXPKI/Server/Workflow/NICE.pm
+OpenXPKI/Server/Workflow/NICE/Factory.pm
+OpenXPKI/Server/Workflow/NICE/Local.pm
+
+OpenXPKI/Server/Workflow/Activity/NICE/CheckForRevocation.pm
+OpenXPKI/Server/Workflow/Activity/NICE/FetchCertificate.pm
+OpenXPKI/Server/Workflow/Activity/NICE/IssueCRL.pm
+OpenXPKI/Server/Workflow/Activity/NICE/IssueCertificate.pm
+OpenXPKI/Server/Workflow/Activity/NICE/RenewCertificate.pm
+OpenXPKI/Server/Workflow/Activity/NICE/RevokeCertificate.pm
+OpenXPKI/Server/Workflow/Activity/NICE/UnrevokeCertificate.pm
+
+OpenXPKI/Server/Workflow/Condition/NICE/IsCertificateIssued.pm
+OpenXPKI/Server/Workflow/Condition/NICE/IsCertificatePending.pm
+
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm
 OpenXPKI/Serialization/Simple.pm
@@ -342,7 +379,6 @@ OpenXPKI/Service/SCEP/Command/PKIOperation.pm
 ## test stuff
 
 OpenXPKI/Tests.pm
-OpenXPKI/Test/More.pm
 
 t/config.xml
 
@@ -544,3 +580,6 @@ t/99_cleanup/28_log.t
 t/99_cleanup/30_dbi.t
 t/99_cleanup/50_auth.t
 t/99_cleanup/65_ui.t
+
+## New testing environment
+OpenXPKI/Test/More.pm

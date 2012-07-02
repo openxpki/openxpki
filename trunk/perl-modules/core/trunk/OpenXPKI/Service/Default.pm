@@ -770,6 +770,7 @@ sub run
     my $args  = shift;
 
     $SIG{'TERM'} = \&OpenXPKI::Server::sig_term;
+    $SIG{'HUP'} = \&OpenXPKI::Server::sig_hup;
   MESSAGE:
     while (1) {
         my $msg;

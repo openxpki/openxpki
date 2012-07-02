@@ -14,6 +14,7 @@ use utf8;
 # use Smart::Comments;
 
 use English;
+use Errno;
 use OpenXPKI::Debug;
 use OpenXPKI::i18n qw(set_language set_locale_prefix);
 use OpenXPKI::Exception;
@@ -30,7 +31,7 @@ use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Dispatcher;
 use OpenXPKI::Workflow::Factory;
-
+use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Context qw( CTX );
                 
 use OpenXPKI::Crypto::X509;
@@ -75,8 +76,10 @@ my @init_tasks = qw(
   authentication
   notification
   server
+  watchdog
+  
 );
-
+#
 
 my %is_initialized = map { $_ => 0 } @init_tasks;
 
@@ -280,6 +283,8 @@ sub __do_init_log {
 }
 
 
+
+
 sub __do_init_prepare_daemon {
     ##! 1: "init prepare daemon"
 
@@ -462,6 +467,7 @@ sub __do_init_dbi_log {
     CTX('dbi_log')->connect();
 }
 
+
 sub __do_init_acl {
     ### init acl...
     OpenXPKI::Server::Context::setcontext(
@@ -498,6 +504,7 @@ sub __do_init_authentication {
 sub __do_init_server {
     my $keys = shift;
     ### init server ref...
+    ##! 16: '__do_init_server: ' . Dumper($keys)
     if (defined $keys->{SERVER}) {
 	OpenXPKI::Server::Context::setcontext(
 	    {
@@ -514,6 +521,18 @@ sub __do_init_notification {
     });
     return 1;
 }
+
+sub __do_init_watchdog{
+    my $keys = shift;
+    
+    my $Watchdog = OpenXPKI::Server::Watchdog->new( $keys );
+    $Watchdog->run();    
+    OpenXPKI::Server::Context::setcontext({        
+        watchdog => $Watchdog
+    });
+    return 1;    
+}
+
 
 ###########################################################################
 
@@ -2008,107 +2027,41 @@ sub get_dbi
 
     ##! 1: "start"
 
-    my $config = $current_xml_config;
-
+    my $config = CTX('config');
     my %params;
 
-    my $dbpath = 'database';
+    my $dbpath = 'system.database.main';
     if (exists $args->{PURPOSE} && $args->{PURPOSE} eq 'log') {
         ##! 16: 'purpose: log'
-        $dbpath = 'log_database';
+        # if there is a logging section we use it        
+        if ($config->get_meta('system.database.logging')) {
+            ##! 16: 'use logging section'            
+            $dbpath = 'system.database.logging';
+        }
         %params = (LOG => OpenXPKI::Server::Log::NOOP->new());
     }
     else {
         %params = (LOG => CTX('log'));
     }
 
-    ## setup of the environment
-
-    ## determine database vendor
-    $params{TYPE} = $config->get_xpath (
-                   XPATH     => [ "common/$dbpath/type" ],
-                   COUNTER   => [ 0 ],
-                   CONFIG_ID => 'default',
-    );
-    ##! 16: 'type: ' . $params{TYPE}
-
-    ## determine configuration for infrastructure
-    $params{SERVER_ID} = $config->get_xpath (
-                   XPATH    => [ "common/$dbpath/server_id" ],
-                   COUNTER  => [ 0 ],
-                   CONFIG_ID => 'default',
-    );
-    $params{SERVER_SHIFT} = $config->get_xpath (
-                   XPATH     => [ "common/$dbpath/server_shift" ],
-                   COUNTER   => [ 0 ],
-                   CONFIG_ID => 'default',
-    );
-
-    ##! 16: 'server id: ' . $params{SERVER_ID}
-    ##! 16: 'server shift: ' . $params{SERVER_ID}
-    ## find configuration and detect number of options
-    my ($vendor_name, $vendor_number, $vendor_envs) = ("", -1, 0);
-    my $vendor_count = $config->get_xpath_count (
-                            XPATH     => [ "common/$dbpath/environment/vendor" ],
-                            COUNTER   => [],
-                            CONFIG_ID => 'default',
-    );
-    for (my $k = 0; $k<$vendor_count; $k++)
-    {
-        $vendor_name = $config->get_xpath (
-                            XPATH     => [ "common/$dbpath/environment/vendor", "type" ],
-                            COUNTER   => [ $k, 0 ],
-                            CONFIG_ID => 'default',
-        );
-        next if ($vendor_name ne $params{TYPE});
-        $vendor_number = $k;
-        eval { $vendor_envs = $config->get_xpath_count (
-		   XPATH    => [ "common/$dbpath/environment/vendor", "option" ],
-		   COUNTER  => [ $k ],
-           CONFIG_ID => 'default',
-       );
-	};
+    my $db_config = $config->get_hash($dbpath);
+    
+    foreach my $key qw(server_id server_shift type name namespace host port user passwd) {
+        ##! 16: "dbi: $key => " . $db_config->{$key}
+        $params{uc($key)} = $db_config->{$key}; 
+    }     
+        
+   $params{SERVER_ID} = $config->get('system.server.node.id');
+   $params{SERVER_SHIFT} = $config->get('system.server.shift');  
+        
+    # environment 
+    my @env_names = $config->get_keys("$dbpath.environment");
+    
+    foreach my $env_name (@env_names) {    
+        my $env_value = $config->get_keys("$dbpath.environment.$env_name");
+        $ENV{$env_name} = $env_value;        
+        ##! 4: "DBI Environment: $env_name => $env_value"
     }
-    ##! 16: 'vendor_envs: ' . $vendor_envs
-
-    ## load environment
-    for (my $i = 0; $i<$vendor_envs; $i++)
-    {
-        my $env_name = $config->get_xpath (
-                           XPATH    => [ "common/$dbpath/environment/vendor", "option", "name" ],
-                           COUNTER  => [ $vendor_number, $i, 0 ],
-                           CONFIG_ID => 'default');
-        my $env_value = $config->get_xpath (
-                           XPATH    => [ "common/$dbpath/environment/vendor", "option", "value" ],
-                           COUNTER  => [ $vendor_number, $i, 0 ],
-                           CONFIG_ID => 'default');
-        $ENV{$env_name} = $env_value;
-        ##! 4: "NUMBER: $i"
-        ##! 4: "OPTION: $env_name"
-        ##! 4: "VALUE:  $env_value"
-    }
-
-    ## load database config
-    $params{NAME} = $config->get_xpath (
-                   XPATH    => [ "common/$dbpath/name" ],
-                   COUNTER  => [ 0 ],
-                   CONFIG_ID => 'default');
-    ##! 16: 'name: ' . $params{NAME}
-    eval{ $params{HOST} = $config->get_xpath (
-                   XPATH    => [ "common/$dbpath/host" ],
-                   COUNTER  => [ 0 ], CONFIG_ID => 'default') };
-    eval{ $params{PORT} = $config->get_xpath (
-                   XPATH    => [ "common/$dbpath/port" ],
-                   COUNTER  => [ 0 ], CONFIG_ID => 'default') };
-    eval{ $params{USER} = $config->get_xpath (
-                   XPATH    => [ "common/$dbpath/user" ],
-                   COUNTER  => [ 0 ], CONFIG_ID => 'default') };
-    eval{ $params{PASSWD} = $config->get_xpath (
-                   XPATH    => [ "common/$dbpath/passwd" ],
-                   COUNTER  => [ 0 ], CONFIG_ID => 'default') };
-    eval{ $params{NAMESPACE} = $config->get_xpath (
-                   XPATH    => [ "common/$dbpath/namespace" ],
-                   COUNTER  => [ 0 ], CONFIG_ID => 'default') };
 
     # special handling for SQLite databases
     if ($params{TYPE} eq "SQLite") {

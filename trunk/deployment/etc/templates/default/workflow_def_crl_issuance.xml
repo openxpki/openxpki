@@ -5,58 +5,45 @@
 
   <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_INITIAL</description>
-    <action name="determine_next_ca" 
+    <action name="I18N_OPENXPKI_WF_ACTION_NICE_INIT_ISSUE_CRL" 
+	    resulting_state="DETERMINE_NEXT_CA">      
+    </action>
+  </state>  
+  
+  <state name="DETERMINE_NEXT_CA" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_DETERMINE_NEXT_CA</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_DETERMINE_NEXT_CA" 
 	    resulting_state="NEXT_CA_DETERMINED">
-      <condition name="ACL::start_crl_issuance"/>
+      <!--  <condition name="ACL::start_crl_issuance"/> -->
     </action>
   </state>
   
   <state name="NEXT_CA_DETERMINED" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_NEXT_CA_DETERMINED</description>
-    <action name="get_crl_profile" 
-	    resulting_state="PROFILE_PREPARED">
-    </action>
-  </state>
-
-  <state name="PROFILE_PREPARED" autorun="yes">
-     <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PROFILE_PREPARED</description>
-    <action name="issue_crl"
+    <action name="I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CRL"
             resulting_state="CRL_ISSUED">
-      <condition name="ca_key_usable"/> 
-    </action>
-
-    <action name="null"
-            resulting_state="CA_KEY_NOT_USABLE">
-       <condition name="!ca_key_usable"/>
-    </action>
-  </state>
-
-  <state name="CA_KEY_NOT_USABLE">
-    <!-- continue = get_crl_profile -->
-    <action name="continue" 
-	    resulting_state="PROFILE_PREPARED">
-        <condition name="ca_key_usable"/>
-    </action>
+    </action>    
   </state>
 
   <state name="CRL_ISSUED" autorun="yes">
      <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSUED</description>
-     <action name="publish_crl"
+     <action name="I18N_OPENXPKI_WF_ACTION_PUBLISH_CRL"
              resulting_state="CRL_PUBLISHED">
      </action>
   </state>
 
   <state name="CRL_PUBLISHED" autorun="yes">
      <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_PUBLISHED</description>
-     <action name="determine_next_ca"
+     <action name="I18N_OPENXPKI_WF_ACTION_DETERMINE_NEXT_CA"
              resulting_state="NEXT_CA_DETERMINED">
-        <condition name="crl_signing_cas_left"/>
+        <condition name="I18N_OPENXPKI_WF_COND_CRL_SIGNING_CAS_LEFT"/>
      </action>
-     <action name="null"
+     <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
              resulting_state="SUCCESS">
-        <condition name="!crl_signing_cas_left"/>
+        <condition name="!I18N_OPENXPKI_WF_COND_CRL_SIGNING_CAS_LEFT"/>
      </action>
   </state>
+
   <state name="SUCCESS"/>
 
 </workflow>

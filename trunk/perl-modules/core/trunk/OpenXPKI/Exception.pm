@@ -7,7 +7,6 @@ package OpenXPKI::Exception;
 
 use strict;
 use warnings;
-#use diagnostics;
 use utf8;
 
 use OpenXPKI::Debug;
@@ -76,6 +75,11 @@ sub full_message
     ##! 1: "exception thrown: $msg"
 
     return $msg;
+}
+
+sub message_code{
+    my $self = shift;
+    return $self->{message};
 }
 
 sub throw {
@@ -215,7 +219,7 @@ This is the basic exception class of OpenXPKI.
 =head1 Intended use
 
 OpenXPKI::Exception->throw (message => "I18N_OPENXPKI_FAILED",
-                            child   => $other_exception,
+                            children  => [$other_exception],#opt.
                             params  => {FILENAME => $file});
 
 if (my $exc = OpenXPKI::Exception->caught())
@@ -243,6 +247,10 @@ to support other modules with errorcodes if one is available.
 This function is used to build the new errormessages conforming to
 the specifications of OpenXPKI. This means in the first line the
 specification of i18n.
+
+=head2 message_code
+
+returns the untranslated and unmodified i18n-message-code
 
 =head2 Fields
 

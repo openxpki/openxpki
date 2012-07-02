@@ -73,7 +73,7 @@
 
   <!-- everybody may store, retrieve and change passwords, the workflow ACL
        checks that only the owner can get to the workflow (except for
-       the CA Operator -->
+       the CA Operator -->  
   <permission>
      <server>*</server>
      <activity>Workflow::store_password</activity>
@@ -107,8 +107,8 @@
      <affected_role>*</affected_role>
      <auth_role>*</auth_role>
   </permission>
-
-  <!-- allow system user to create CRLs -->
+  
+  <!-- allow system user to create CRLs -->  
   <permission>
      <server>*</server>
      <activity>Workflow::start_crl_issuance</activity>
@@ -123,6 +123,9 @@
                as well as SCEP on all servers -->
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST</type>
           </create>
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
@@ -185,6 +188,9 @@
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
           </create>
           <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST</type>
+          </create>
+          <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
           </create>
           <create>
@@ -196,9 +202,28 @@
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
           </create>
+          <!-- TEST WF -->
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_TEST_WFTOOLS</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_TESTING</type>
+          </create>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_TESTING</type>
+          </read>
           <read> <!-- read also means list and execute activity (if the ACL condition holds) -->
               <creator>$self</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
+              <context_filter>
+                  <show>.*</show>
+                  <hide>approvals</hide>
+              </context_filter>
+          </read>
+          <read> <!-- read also means list and execute activity (if the ACL condition holds) -->
+              <creator>$self</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST</type>
               <context_filter>
                   <show>.*</show>
                   <hide>approvals</hide>
@@ -268,6 +293,16 @@
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
           </create>
           <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST</type>
+          </create>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
+          </create>
+          <read> 
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST</type>
+          </read>
+          <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
           </create>
           <create>
@@ -283,6 +318,14 @@
                   impair his or her judgement -->
                   <hide>approvals</hide>
               </context_filter>
+          </read>          
+          <read> 
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST</type>
+          </read>
+          <read> 
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
           </read>
           <read>
               <creator>.*</creator>
@@ -303,10 +346,6 @@
           <read>
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
-          </read>
-          <read>
-              <creator>.*</creator>
-              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
           </read>
           <read>
               <creator>.*</creator>
@@ -325,14 +364,15 @@
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
           </create>
+          
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST</type>
+          </create>
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
           </create>
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
-          </create>
-          <create>
-              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
           </create>
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
@@ -344,9 +384,17 @@
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
           </read>
+          <read> 
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST</type>
+          </read>
           <read>
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
+          </read>
+          <read> 
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
           </read>
           <read>
               <creator>.*</creator>
@@ -359,10 +407,6 @@
           <read>
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
-          </read>
-          <read>
-              <creator>.*</creator>
-              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
           </read>
           <read>
               <creator>.*</creator>
@@ -379,6 +423,13 @@
           <read>
               <creator>.*</creator>
               <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
+          </read>
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_TESTING</type>
+          </create>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_TESTING</type>
           </read>
       </server>
   </workflow_permissions>

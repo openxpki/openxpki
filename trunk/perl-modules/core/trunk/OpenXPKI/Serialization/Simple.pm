@@ -170,6 +170,15 @@ sub __write_undef {
 sub deserialize {
     my $self = shift;
     my $msg  = shift;
+    
+    unless(defined $msg){
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_DESERIALIZE_NO_ARG_GIVEN"
+        );
+    }
+    
+    
+    
     Encode::_utf8_off($msg);
 
     my $ret = $self->__read_data($msg);

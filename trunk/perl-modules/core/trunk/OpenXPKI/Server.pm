@@ -115,6 +115,8 @@ sub new
 	    $self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
 	    delete $self->{PARAMS}->{group};
     }
+    
+    
 
     unlink ($self->{PARAMS}->{socketfile});
     CTX('log')->log(
@@ -360,7 +362,26 @@ sub sig_term {
         alarm(1);
     }
     $stop_soon = 1;
+
+    # FIXME - implement    
+    CTX('watchdog')->terminate();
+    
     ##! 1: 'end'
+}
+
+sub sig_hup {
+
+    ##! 1: 'start'
+    CTX('log')->log(
+        MESSAGE  => "SIGHUP received - reloading config ",
+        PRIORITY => "info",
+        FACILITY => "system",
+    );
+    
+    CTX('config')->update_head();
+    # FIXME - implement
+    CTX('watchdod')->reload();
+    
 }
 
 sub process_request {
@@ -903,8 +924,9 @@ sub __log_and_die {
     my $log_message;
     if (ref $error eq 'OpenXPKI::Exception') {
         ##! 16: 'error is exception'
+        $error->show_trace(1);
         my $msg = $error->full_message();
-        $log_message = "Exception during $when: $msg";
+        $log_message = "Exception during $when: $msg ($error)";
     }
     else {
         ##! 16: 'error is something else'

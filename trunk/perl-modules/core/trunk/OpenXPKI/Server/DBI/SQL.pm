@@ -15,15 +15,15 @@ use Regexp::Common;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::DBI::Schema;
 use OpenXPKI::Server::DBI::DBH;
+use OpenXPKI::Server::Context qw( CTX );
 
 # use Smart::Comments;
 
 use Data::Dumper;
 
-sub new
-{
+sub new {
     shift;
-    my $self = { @_ };
+    my $self = {@_};
     bless $self, "OpenXPKI::Server::DBI::SQL";
     $self->{schema} = OpenXPKI::Server::DBI::Schema->new();
     return $self;
@@ -31,28 +31,26 @@ sub new
 
 #######################################################################
 
-sub get_new_serial
-{
+sub get_new_serial {
     my $self = shift;
-    return $self->{DBH}->get_new_serial (@_);
+    return $self->{DBH}->get_new_serial(@_);
 }
 
 #######################################################################
 
-sub table_exists
-{
+sub table_exists {
     my $self = shift;
-    my $keys = { @_ };
+    my $keys = {@_};
     my $name = $keys->{NAME};
 
     ##! 2: "name: $name"
 
     # get constant value from the table (avoid full table scan)
-    my $command = "select 1 from ".$self->{schema}->get_table_name ($name);
+    my $command = "select 1 from " . $self->{schema}->get_table_name($name);
 
     ##! 2: "command: $command"
 
-    eval { $self->{DBH}->do_query ( QUERY => $command ); };
+    eval { $self->{DBH}->do_query( QUERY => $command ); };
     if ($EVAL_ERROR) {
         ##! 4: "query failed return"
         return 0;
@@ -62,25 +60,23 @@ sub table_exists
     }
 }
 
-sub create_table
-{
-    my $self = shift;
-    my $keys = { @_ };
+sub create_table {
+    my $self  = shift;
+    my $keys  = {@_};
     my $table = $keys->{NAME};
     my $mode  = $keys->{MODE};
- 
+
     ##! 2: "table: $table; mode: $mode"
- 
+
     my $command = "";
 
-    $command = "create table ".$self->{schema}->get_table_name($table)." (";
-    foreach my $col (@{$self->{schema}->get_table_columns ($table)})
-    {
-        my $column = $self->{schema}->get_column ($col);
-        my $type   = $self->{DBH}->get_column_type ($column);
+    $command = "create table " . $self->{schema}->get_table_name($table) . " (";
+    foreach my $col ( @{ $self->{schema}->get_table_columns($table) } ) {
+        my $column = $self->{schema}->get_column($col);
+        my $type   = $self->{DBH}->get_column_type($column);
         $command .= "$column $type";
-        if ($self->{DBH}->get_abstract_column_type ($column) ne "SERIAL" and
-            scalar grep /^${col}$/, @{$self->{schema}->get_table_index($table)})
+        if ( $self->{DBH}->get_abstract_column_type($column) ne "SERIAL" and scalar grep /^${col}$/,
+            @{ $self->{schema}->get_table_index($table) } )
         {
             ## we need this extra handling of SERIAL primary key columns
             ## because there is no standard related to such auto_increment
@@ -96,144 +92,128 @@ sub create_table
     ## a SERIAL column can contain a primary key statement
     ## because some databases have really poor SQL capabilities
     ## an example of such a poor SQL dialect is SQLite
-    if ($command !~ /primary\s+key/i)
-    {
+    if ( $command !~ /primary\s+key/i ) {
         $command .= "PRIMARY KEY (";
-        foreach my $col (@{$self->{schema}->get_table_index($table)})
-        {
-            $command .= $self->{schema}->get_column ($col);
+        foreach my $col ( @{ $self->{schema}->get_table_index($table) } ) {
+            $command .= $self->{schema}->get_column($col);
             $command .= ", ";
         }
-        $command = substr ($command, 0, length($command)-2); ## erase the last ,
+        $command = substr( $command, 0, length($command) - 2 );    ## erase the last ,
         $command .= ")";
     } else {
-        $command = substr ($command, 0, length($command)-2); ## erase the last ,
+        $command = substr( $command, 0, length($command) - 2 );    ## erase the last ,
     }
 
     $command .= ")";
-    $command .= " ".$self->{DBH}->get_table_option();
+    $command .= " " . $self->{DBH}->get_table_option();
 
     ##! 2: "command: $command"
 
-    if ($mode eq "DRYRUN")
-    {
-        return $command.";";
+    if ( $mode eq "DRYRUN" ) {
+        return $command . ";";
     } else {
-        $self->{DBH}->do_query ( QUERY => $command );
+        $self->{DBH}->do_query( QUERY => $command );
         $self->{DBH}->finish_sth();
         return 1;
     }
 }
 
-sub create_index
-{
+sub create_index {
     my $self = shift;
-    my $keys = { @_ };
+    my $keys = {@_};
     my $name = $keys->{NAME};
     my $mode = $keys->{MODE};
 
     ##! 2: "name: $name, mode: $mode"
 
-    my $index = $self->{schema}->get_index_name ($name);
-    my $table = $self->{schema}->get_index_table ($name);
-       $table = $self->{schema}->get_table_name ($table);
+    my $index = $self->{schema}->get_index_name($name);
+    my $table = $self->{schema}->get_index_table($name);
+    $table = $self->{schema}->get_table_name($table);
 
     my $command = "create index $index on $table (";
-    foreach my $col (@{$self->{schema}->get_index_columns($name)})
-    {
-        $command .= $self->{schema}->get_column ($col);
+    foreach my $col ( @{ $self->{schema}->get_index_columns($name) } ) {
+        $command .= $self->{schema}->get_column($col);
         $command .= ", ";
     }
-    $command = substr ($command, 0, length($command)-2); ## erase the last ,
+    $command = substr( $command, 0, length($command) - 2 );    ## erase the last ,
     $command .= ")";
 
     ##! 2: "command: $command"
 
-    if ($mode eq "DRYRUN")
-    {
-        return $command.";";
+    if ( $mode eq "DRYRUN" ) {
+        return $command . ";";
     } else {
-        $self->{DBH}->do_query ( QUERY => $command );
+        $self->{DBH}->do_query( QUERY => $command );
         $self->{DBH}->finish_sth();
         return 1;
     }
 }
 
-
-sub drop_table
-{
-    my $self = shift;
-    my $keys = { @_ };
+sub drop_table {
+    my $self  = shift;
+    my $keys  = {@_};
     my $table = $keys->{NAME};
     my $mode  = $keys->{MODE};
- 
+
     ##! 2: "table: $table; mode: $mode"
- 
+
     my $command = "";
 
     $command = "drop table " . $self->{schema}->get_table_name($table);
 
-    if ($mode eq "DRYRUN")
-    {
-        return $command.";";
-    } elsif ($mode eq 'FORCE') {
-        $self->{DBH}->do_query ( QUERY => $command );
+    if ( $mode eq "DRYRUN" ) {
+        return $command . ";";
+    } elsif ( $mode eq 'FORCE' ) {
+        $self->{DBH}->do_query( QUERY => $command );
         $self->{DBH}->finish_sth();
         return 1;
     } else {
-	## must be forced...
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_TABLE_NOT_FORCED",
-	    params  => 
-	    {
-		"TABLE"  => $table,
-	    });
+        ## must be forced...
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_TABLE_NOT_FORCED",
+            params  => { "TABLE" => $table, }
+        );
     }
 }
 
-sub drop_index
-{
+sub drop_index {
     my $self = shift;
-    my $keys = { @_ };
+    my $keys = {@_};
     my $name = $keys->{NAME};
     my $mode = $keys->{MODE};
 
     ##! 2: "name: $name, mode: $mode"
 
-    my $index = $self->{schema}->get_index_name ($name);
-    my $table = $self->{schema}->get_index_table ($name);
-       $table = $self->{schema}->get_table_name ($table);
+    my $index = $self->{schema}->get_index_name($name);
+    my $table = $self->{schema}->get_index_table($name);
+    $table = $self->{schema}->get_table_name($table);
 
     my $command = "drop index $index on $table";
 
-    if ($mode eq "DRYRUN")
-    {
-        return $command.";";
-    } elsif ($mode eq 'FORCE') {
-        $self->{DBH}->do_query ( QUERY => $command );
+    if ( $mode eq "DRYRUN" ) {
+        return $command . ";";
+    } elsif ( $mode eq 'FORCE' ) {
+        $self->{DBH}->do_query( QUERY => $command );
         $self->{DBH}->finish_sth();
         return 1;
     } else {
-	## must be forced...
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_INDEX_NOT_FORCED",
-	    params  => 
-	    {
-		"NAME"   => $name,
-	    });
+        ## must be forced...
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVER_DBI_SQL_DROP_INDEX_NOT_FORCED",
+            params  => { "NAME" => $name, }
+        );
     }
 }
 
 #######################################################################
 
-sub insert
-{
+sub insert {
     my $self  = shift;
-    my $keys  = { @_ };
+    my $keys  = {@_};
     my $table = $keys->{TABLE};
     my $hash  = $keys->{DATA};
 
-    my $sql = "insert into ".$self->{schema}->get_table_name ($table);
+    my $sql = "insert into " . $self->{schema}->get_table_name($table);
 
     my $names  = "";
     my $values = "";
@@ -241,12 +221,11 @@ sub insert
 
     ## prepare query
 
-    foreach my $col (@{$self->{schema}->get_table_columns($table)})
-    {
-        next if (not exists $hash->{$col});
-        $names  .= ", " if (length($names));
-        $values .= ", " if (length($values));
-        $names  .= $self->{schema}->get_column ($col);
+    foreach my $col ( @{ $self->{schema}->get_table_columns($table) } ) {
+        next if ( not exists $hash->{$col} );
+        $names  .= ", " if ( length($names) );
+        $values .= ", " if ( length($values) );
+        $names  .= $self->{schema}->get_column($col);
         $values .= "?";
         push @list, $hash->{$col};
     }
@@ -255,7 +234,7 @@ sub insert
     ## execute query
 
     my $h = $self->{DBH}->get_next_sth();
-    $self->{DBH}->do_query (QUERY => $sql, BIND_VALUES => \@list);
+    $self->{DBH}->do_query( QUERY => $sql, BIND_VALUES => \@list );
     $self->{DBH}->finish_sth($h);
 
     return 1;
@@ -263,15 +242,14 @@ sub insert
 
 #######################################################################
 
-sub update
-{
+sub update {
     my $self  = shift;
-    my $keys  = { @_ };
+    my $keys  = {@_};
     my $table = $keys->{TABLE};
     my $hash  = $keys->{DATA};
     my $where = $keys->{WHERE};
 
-    my $sql = "update ".$self->{schema}->get_table_name ($table);
+    my $sql = "update " . $self->{schema}->get_table_name($table);
 
     my @data  = ();
     my @where = ();
@@ -279,31 +257,28 @@ sub update
 
     ## prepare data update
 
-    foreach my $col (@{$self->{schema}->get_table_columns($table)})
-    {
-        next if (not exists $hash->{$col});
-        push @data, $self->{schema}->get_column ($col)." = ?";
+    foreach my $col ( @{ $self->{schema}->get_table_columns($table) } ) {
+        next if ( not exists $hash->{$col} );
+        push @data, $self->{schema}->get_column($col) . " = ?";
         push @list, $hash->{$col};
     }
-    if (! scalar @data) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_DBI_SQL_UPDATE_NO_DATA_PRESENT',
-        );
+    if ( !scalar @data ) {
+        OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_DBI_SQL_UPDATE_NO_DATA_PRESENT', );
     }
-    $sql .= " set ".join ", ", @data;
+    $sql .= " set " . join ", ", @data;
 
     ## prepare where clause
 
-    foreach my $key (keys %{$where})
-    {
-        push @where, $self->{schema}->get_column ($key)." = ?";
-        push @list, $where->{$key};
+    foreach my $key ( keys %{$where} ) {
+        push @where, $self->{schema}->get_column($key) . " = ?";
+        push @list,  $where->{$key};
     }
-    $sql .= " where ".join " and ", @where;
+    $sql .= " where " . join " and ", @where;
 
     ## execute query
+    ##! 2: "execute do_query: $sql with bind values ".Dumper(\@list)
 
-    my $h = $self->{DBH}->get_next_sth();
+    my $h      = $self->{DBH}->get_next_sth();
     my $result = $self->{DBH}->do_query(
         QUERY       => $sql,
         BIND_VALUES => \@list
@@ -315,67 +290,69 @@ sub update
 
 #######################################################################
 
-sub delete
-{
+sub delete {
     my $self  = shift;
-    my $keys  = { @_ };
+    my $keys  = {@_};
     my $table = $keys->{TABLE};
     my $hash  = $keys->{DATA};
     my $all   = $keys->{ALL};
 
     my $sql = "delete from " . $self->{schema}->get_table_name($table);
 
-    if (!defined $hash && $all) {
+    if ( !defined $hash && $all ) {
+
         # delete everything
-        $hash = {};  # so that foreach below works 
-    }
-    else {
+        $hash = {};    # so that foreach below works
+    } else {
         $sql .= ' where ';
     }
 
-    my @list   = ();
+    my @list = ();
 
     ## prepare query
 
-    my @cols = @{$self->{schema}->get_table_columns($table)};
-    foreach my $col (keys %{$hash})
-    {
-        next if (not exists $hash->{$col}); ## empty hash?
-        if (not grep /$col/, @cols)
-        {
+    my @cols = @{ $self->{schema}->get_table_columns($table) };
+    foreach my $col ( keys %{$hash} ) {
+        next if ( not exists $hash->{$col} );    ## empty hash?
+        if ( not grep /$col/, @cols ) {
             ## illegal column
-            OpenXPKI::Exception->throw (
+            OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_SERVER_DBI_SQL_DELETE_WRONG_COLUMN",
-                params  => {"TABLE"  => $table,
-                            "COLUMN" => $col});
+                params  => {
+                    "TABLE"  => $table,
+                    "COLUMN" => $col
+                }
+            );
         }
-        my ($val, $op) = (undef, "=");
-        if (ref ($hash->{$col}))
-        {
+        my ( $val, $op ) = ( undef, "=" );
+        if ( ref( $hash->{$col} ) ) {
             ## value and operator
             $op  = $hash->{$col}->[0];
             $val = $hash->{$col}->[1];
-            if ($op ne "="  and
-                $op ne "<=" and $op ne ">=" and
-                $op ne "<"  and $op ne ">")
+            if (    $op ne "="
+                and $op ne "<="
+                and $op ne ">="
+                and $op ne "<"
+                and $op ne ">" )
             {
-                OpenXPKI::Exception->throw (
+                OpenXPKI::Exception->throw(
                     message => "I18N_OPENXPKI_SERVER_DBI_SQL_DELETE_WRONG_OPERATOR",
-                    params  => {"OPERATOR" => $op});
+                    params  => { "OPERATOR" => $op }
+                );
             }
         } else {
             ## value only
             $val = $hash->{$col};
         }
-        $sql .= " and " if (scalar @list);
-        $sql .= $self->{schema}->get_column ($col).$op."?";
+        $sql .= " and " if ( scalar @list );
+        $sql .= $self->{schema}->get_column($col) . $op . "?";
         push @list, $val;
     }
 
     ## execute query
 
     my $h = $self->{DBH}->get_next_sth();
-    $self->{DBH}->do_query (QUERY => $sql, BIND_VALUES => \@list);
+    $self->{DBH}->do_query( QUERY => $sql, BIND_VALUES => \@list );
     $self->{DBH}->finish_sth($h);
 
     return 1;
@@ -383,54 +360,50 @@ sub delete
 
 #######################################################################
 
-# split 
+# split
 sub __get_symbolic_column_and_table {
     my $self = shift;
-    my $arg = shift;
+    my $arg  = shift;
 
-    my ($symbolic_column, $symbolic_table) 
-	= reverse split(m{\.}xms, $arg);
+    my ( $symbolic_column, $symbolic_table ) = reverse split( m{\.}xms, $arg );
 
-    return ($symbolic_column, $symbolic_table);
+    return ( $symbolic_column, $symbolic_table );
 }
-
-
 
 sub get_symbolic_query_columns {
     my $self = shift;
     my $keys = shift;
 
     my $table = $keys->{TABLE};
-    
+
     my @select_list;
-    
-    if (ref $table eq '') {
-	@select_list = @{$self->{schema}->get_table_columns($table)};
-    } elsif (ref $table eq 'ARRAY') {
-	## ensure a schema compatible result
-	if (! exists $keys->{COLUMNS} ||
-	    ref $keys->{COLUMNS} ne 'ARRAY') {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SYMBOLIC_QUERY_COLUMNS_MISSING_COLUMNS");
-	}
 
-	foreach my $column (@{$keys->{COLUMNS}}) {
-	    if (ref $column eq 'HASH') {
-		$column = $column->{COLUMN};
-	    }
+    if ( ref $table eq '' ) {
+        @select_list = @{ $self->{schema}->get_table_columns($table) };
+    } elsif ( ref $table eq 'ARRAY' ) {
+        ## ensure a schema compatible result
+        if (  !exists $keys->{COLUMNS}
+            || ref $keys->{COLUMNS} ne 'ARRAY' )
+        {
+            OpenXPKI::Exception->throw( message => "I18N_OPENXPKI_SERVER_DBI_SQL_GET_SYMBOLIC_QUERY_COLUMNS_MISSING_COLUMNS" );
+        }
 
-	    my ($col, $tab) = $self->__get_symbolic_column_and_table($column);
-	    
-	    if (! defined $tab) {
-		push @select_list, $col;
-	    } else {
-		push @select_list, $tab . '.' . $col;
-	    }
-	}
+        foreach my $column ( @{ $keys->{COLUMNS} } ) {
+            if ( ref $column eq 'HASH' ) {
+                $column = $column->{COLUMN};
+            }
+
+            my ( $col, $tab ) = $self->__get_symbolic_column_and_table($column);
+
+            if ( !defined $tab ) {
+                push @select_list, $col;
+            } else {
+                push @select_list, $tab . '.' . $col;
+            }
+        }
     }
     return @select_list;
 }
-
 
 # if a non-arrayref is passed, returns an arrayref containing the argument
 # if an arrayref is passed, returns the same arrayref
@@ -438,10 +411,10 @@ sub __normalize_scalar_or_arrayref {
     my $self = shift;
     my $args = shift;
 
-    if (ref $args eq 'ARRAY') {
-	return $args;
+    if ( ref $args eq 'ARRAY' ) {
+        return $args;
     } else {
-	return [ $args ];
+        return [$args];
     }
 }
 
@@ -452,86 +425,74 @@ sub __normalize_validity {
 
     $args = $self->__normalize_scalar_or_arrayref($args);
 
-    if (! defined $args) {
-	return;
+    if ( !defined $args ) {
+        return;
     }
-    
-    foreach my $element (@{$args}) {
-	if (ref $element eq 'DateTime') {
-	    $element = $element->epoch;
-	}
 
-	if ($element !~ m{ \A \d+ \z }xms) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_DBI_SQL_NORMALIZE_VALIDITY_INVALID_ARGUMENT",
-		params => {
-		    VALIDITY_SPEC => @{$args},
-		}) ;
-	}
+    foreach my $element ( @{$args} ) {
+        if ( ref $element eq 'DateTime' ) {
+            $element = $element->epoch;
+        }
+
+        if ( $element !~ m{ \A \d+ \z }xms ) {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_SERVER_DBI_SQL_NORMALIZE_VALIDITY_INVALID_ARGUMENT",
+                params  => { VALIDITY_SPEC => @{$args}, }
+            );
+        }
     }
 
     return $args;
 }
-
-
 
 sub __get_validity_conditions {
     my $self = shift;
     my $args = shift;
 
     my $table         = $args->{TABLE};
-    my $validity_args = $self->__normalize_validity($args->{VALID_AT});
-    
+    my $validity_args = $self->__normalize_validity( $args->{VALID_AT} );
+
     my @conditions;
 
-    if (! defined $validity_args) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_GET_VALIDITY_CONDITION_INCORRECT_VALIDITY_ARGUMENTS",
-	    params => {
-		VALID_AT => $args->{VALID_AT},
-	    }) ;
+    if ( !defined $validity_args ) {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVER_DBI_SQL_GET_VALIDITY_CONDITION_INCORRECT_VALIDITY_ARGUMENTS",
+            params  => { VALID_AT => $args->{VALID_AT}, }
+        );
     }
-	    
+
     my $notbefore = $self->{schema}->get_column('NOTBEFORE');
     my $notafter  = $self->{schema}->get_column('NOTAFTER');
 
-    if (defined $table) {
-	$notbefore = $table . '.' . $notbefore;
-	$notafter  = $table . '.' . $notafter;
+    if ( defined $table ) {
+        $notbefore = $table . '.' . $notbefore;
+        $notafter  = $table . '.' . $notafter;
     }
-    
-    foreach my $validity (@{$validity_args}) {
-	push @conditions, 
-	$validity
-	    . '>=' 
-	    . $notbefore;
-	
-	push @conditions, 
-	$validity
-	    . '<=' 
-	    . $notafter;
+
+    foreach my $validity ( @{$validity_args} ) {
+        push @conditions, $validity . '>=' . $notbefore;
+
+        push @conditions, $validity . '<=' . $notafter;
     }
-    
+
     return \@conditions;
 }
 
-
-sub select
-{
+sub select {
     ##! 1: "start"
-    my $self  = shift;
-    my $args  = { @_ };
+    my $self = shift;
+    my $args = {@_};
 
     ##! 128: 'args: ' . Dumper $args
-    
+
     ##! 2: "initialize variables"
     my %operator_of = (
-	'FROM'          => '>=',
-	'TO'            => '<=',
-
-	'LESS_THAN'     => '<',
-	'GREATER_THAN'  => '>',
-	);
+        'FROM' => '>=',
+        'TO'   => '<=',
+        'NOT_EQUAL' => '<>',
+        'LESS_THAN'    => '<',
+        'GREATER_THAN' => '>',
+    );
 
     my $pivot_column;
 
@@ -544,6 +505,7 @@ sub select
     my @symbolic_select_tables;
 
     my @select_list;
+
     # select_list semantics:
     # [
     #    {
@@ -560,371 +522,357 @@ sub select
 
     ##! 2: "setup table joins"
 
-    if (! defined $table_args)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_TABLE");
-    } elsif (ref $table_args eq '') {
-	### single table queries...
+    if ( !defined $table_args ) {
+        OpenXPKI::Exception->throw( message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_TABLE" );
+    } elsif ( ref $table_args eq '' ) {
+        ### single table queries...
 
-	# use table index serial column as default selector
-	$pivot_column = $table_args . '_SERIAL';
-	
-	@select_list = map {
-	    {
-		COLUMN => $self->{schema}->get_column($_),
-	    }
-	} @{$self->{schema}->get_table_columns($table_args)};
+        # use table index serial column as default selector
+        $pivot_column = $table_args . '_SERIAL';
 
-	push @symbolic_select_tables,
-	{
-	    SYMBOLIC_NAME => $table_args,
-	    SQL_NAME => $self->{schema}->get_table_name($table_args),
-	};
+        @select_list =
+          map { { COLUMN => $self->{schema}->get_column($_), } } @{ $self->{schema}->get_table_columns($table_args) };
 
+        push @symbolic_select_tables,
+          {
+            SYMBOLIC_NAME => $table_args,
+            SQL_NAME      => $self->{schema}->get_table_name($table_args),
+          };
 
+        # handle validity specification for single tables
+        if ( exists $args->{VALID_AT} ) {
 
-	# handle validity specification for single tables
-	if (exists $args->{VALID_AT}) {
+            # check if table contains NOTBEFORE/NOTAFTER
+            my $columns = $self->{schema}->get_table_columns($table_args);
+            ### $columns
+            if ( !( grep( m{ \A NOTBEFORE \z }xms, @{$columns} ) && grep( m{ \A NOTAFTER \z }xms, @{$columns} ) ) ) {
+                OpenXPKI::Exception->throw(
+                    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_TABLE_FOR_VALIDITY_CONSTRAINT",
+                    params  => { TABLE => $table_args, }
+                );
+            }
 
-	    # check if table contains NOTBEFORE/NOTAFTER
-	    my $columns = $self->{schema}->get_table_columns($table_args);
-	    ### $columns
-	    if (! (grep(m{ \A NOTBEFORE \z }xms, @{$columns}) 
-		   && grep(m{ \A NOTAFTER \z }xms, @{$columns}))) {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_TABLE_FOR_VALIDITY_CONSTRAINT",
-		    params => {
-			TABLE => $table_args,
-		    });
-	    }
+            push @conditions, @{ $self->__get_validity_conditions( { VALID_AT => $args->{VALID_AT}, } ) };
 
-	    push @conditions,
-	    @{$self->__get_validity_conditions(
-		{
-		    VALID_AT => $args->{VALID_AT},
-		})};
-	    
- 	}
+        }
 
-    } elsif (ref $table_args eq 'ARRAY') {
-	### natural join...
+    } elsif ( ref $table_args eq 'ARRAY' ) {
+        ### natural join...
 
-	if (! exists $args->{COLUMNS} ||
-	    ref $args->{COLUMNS} ne 'ARRAY') {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_COLUMNS");
-	}
+        if (  !exists $args->{COLUMNS}
+            || ref $args->{COLUMNS} ne 'ARRAY' )
+        {
+            OpenXPKI::Exception->throw( message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_COLUMNS" );
+        }
 
-	# collect tables to join
-	# - scalar value: join on this symbolic table name
-	# - arrayref: expect exactly two values (fat comma syntax suggested),
-	#     first is the symbolic table name, the second the alias name
-	#     to use in the query. you must use the second, alias name
-	#     to reference the table in the conditions if this syntax is used.
-	my $ii = -1;
+        # collect tables to join
+        # - scalar value: join on this symbolic table name
+        # - arrayref: expect exactly two values (fat comma syntax suggested),
+        #     first is the symbolic table name, the second the alias name
+        #     to use in the query. you must use the second, alias name
+        #     to reference the table in the conditions if this syntax is used.
+        my $ii = -1;
       TABLE:
-	foreach my $entry (@{$table_args}) {
-	    $ii++;
-	    if (ref $entry eq '') {
-		### literal table name...
-		# the argument is the symbolic table name
-		push @symbolic_select_tables, 
-		{
-		    SYMBOLIC_NAME => $entry,
-		    SQL_NAME => $self->{schema}->get_table_name($entry),
-		};
-		next TABLE;
-	    }
-	    if (ref $entry eq 'ARRAY') {
-		### aliased table name...
-		### $entry
-		# [ 'symbolic_table_name', 'alias_name' ] or
-		# [ 'symbolic_table_name' => 'alias_name' ]
-		if (scalar @{$entry} != 2) {
-		    OpenXPKI::Exception->throw (
-			message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_NUMBER_OF_SYMBOLIC_TABLE_ENTRIES",
-			params => {
-			    TABLE_REF => ref $entry,
-			    TABLE_INDEX => $ii,
-			});
-		}
-		my ($symbolic_table_name, $alias) = @{$entry};
-		### $symbolic_table_name
-		### $alias
-		# select on the alias name
+        foreach my $entry ( @{$table_args} ) {
+            $ii++;
+            if ( ref $entry eq '' ) {
+                ### literal table name...
+                # the argument is the symbolic table name
+                push @symbolic_select_tables,
+                  {
+                    SYMBOLIC_NAME => $entry,
+                    SQL_NAME      => $self->{schema}->get_table_name($entry),
+                  };
+                next TABLE;
+            }
+            if ( ref $entry eq 'ARRAY' ) {
+                ### aliased table name...
+                ### $entry
+                # [ 'symbolic_table_name', 'alias_name' ] or
+                # [ 'symbolic_table_name' => 'alias_name' ]
+                if ( scalar @{$entry} != 2 ) {
+                    OpenXPKI::Exception->throw(
+                        message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_NUMBER_OF_SYMBOLIC_TABLE_ENTRIES",
+                        params  => {
+                            TABLE_REF   => ref $entry,
+                            TABLE_INDEX => $ii,
+                        }
+                    );
+                }
+                my ( $symbolic_table_name, $alias ) = @{$entry};
+                ### $symbolic_table_name
+                ### $alias
+                # select on the alias name
 
-		# make sure the alias is unique
-		if (exists $alias_map_of{$alias}) {
-		    OpenXPKI::Exception->throw (
-			message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_ALIAS_NOT_UNIQUE",
-			params => {
-			    SYMBOLIC_NAME => $symbolic_table_name,
-			    ALIAS => $alias,
-			});
-		}
+                # make sure the alias is unique
+                if ( exists $alias_map_of{$alias} ) {
+                    OpenXPKI::Exception->throw(
+                        message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_ALIAS_NOT_UNIQUE",
+                        params  => {
+                            SYMBOLIC_NAME => $symbolic_table_name,
+                            ALIAS         => $alias,
+                        }
+                    );
+                }
 
-		# remember the mapping
-		$alias_map_of{$alias} = {
-		    SYMBOLIC_NAME => $symbolic_table_name,
-		    SQL_NAME => $self->{schema}->get_table_name($symbolic_table_name),
-		};
+                # remember the mapping
+                $alias_map_of{$alias} = {
+                    SYMBOLIC_NAME => $symbolic_table_name,
+                    SQL_NAME      => $self->{schema}->get_table_name($symbolic_table_name),
+                };
 
-		push @symbolic_select_tables, 
-		{
-		    ALIAS => $alias,
-		    %{$alias_map_of{$alias}},
-		};
-		next TABLE;
-	    }
+                push @symbolic_select_tables,
+                  {
+                    ALIAS => $alias,
+                    %{ $alias_map_of{$alias} },
+                  };
+                next TABLE;
+            }
 
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_TABLE_SPECIFICATION",
-		params => {
-		    TABLE_REF => ref $entry,
-		    TABLE_INDEX => $ii,
-		});
-	}
-
-	# build column specification
-	### $keys->{COLUMNS}
-	$ii = -1;
-	foreach my $entry (@{$args->{COLUMNS}}) {
-	    $ii++;
-
-	    my $column;
-	    my %column_specification;
-
-	    if (ref $entry eq 'HASH') {
-		$column = $entry->{COLUMN};
-
-		if (defined $entry->{AGGREGATE}) {
-		    $column_specification{AGGREGATE} = $entry->{AGGREGATE};
-
-		    if ($column_specification{AGGREGATE} !~ 
-			m{ \A (?: MIN | MAX | AVG | COUNT ) \z }xms) {
-			
-			OpenXPKI::Exception->throw (
-			    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_AGGREGATE_SPECIFICATION",
-			    params => {
-				COLUMN_REF => ref $entry,
-				COLUMN_INDEX => $ii,
-				COLUMN => $column,
-				AGGREGATE => $column_specification{AGGREGATE},
-			    });
-		    }
-		}
-	    } elsif (ref $entry eq '') {
-		# scalar value
-		$column = $entry;
-
-	    } else {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_COLUMN_DATA_TYPE",
-		    params => {
-			COLUMN_REF => ref $entry,
-			COLUMN_INDEX => $ii,
-		    });
-	    }
-	    
-	    if (! defined $column) {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_COLUMN_NOT_SPECIFIED",
-		    params => {
-			COLUMN_REF => ref $column,
-			COLUMN_INDEX => $ii,
-		    });
-	    }
-	    
-
-	    my ($col, $tab) = $self->__get_symbolic_column_and_table($column);
-
-	    # convert this into schema compatible column
-	    $col = $self->{schema}->get_column($col);
-
-	    if (defined $tab) {
-		# if this is an alias leave it this way
-		if (! exists $alias_map_of{$tab}) {
-		    $tab = $self->{schema}->get_table_name($tab);
-		}
-		$column_specification{COLUMN} = $tab . '.' . $col;
-
-	    } else {
-		$column_specification{COLUMN} = $col;
-	    }
-	    
-	    push @select_list, \%column_specification;
-	}
-
-
-	# use first column as pivot column
-	if (! defined $pivot_column) {
-	    $pivot_column = $symbolic_select_tables[0]->{SYMBOLIC_NAME} . '_SERIAL';
-	}
-
-
-	######################################################################
-	# handle joins
-	if (! exists $args->{JOIN} ||
-	    ref $args->{JOIN} ne 'ARRAY') {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_JOIN");
-	}
-	
-	foreach my $join (@{$args->{JOIN}}) {
-	    ### $join
-	    if (ref $join ne 'ARRAY' ||
-		    scalar(@{$join}) != scalar(@symbolic_select_tables)) {
-		    OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_JOIN_SPECIFICATION_MISMATCH",
-                params => {
-                    TABLES => [ @symbolic_select_tables ],
-                    JOIN => Dumper $join,
-                },
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_TABLE_SPECIFICATION",
+                params  => {
+                    TABLE_REF   => ref $entry,
+                    TABLE_INDEX => $ii,
+                }
             );
-	    }
+        }
 
-	    ### add join condition...
+        # build column specification
+        ### $keys->{COLUMNS}
+        $ii = -1;
+        foreach my $entry ( @{ $args->{COLUMNS} } ) {
+            $ii++;
 
-	    my $join_index;
-	  JOIN_COLUMN:
-	    for (my $ii = 0; $ii < scalar(@symbolic_select_tables); $ii++) {
-		next JOIN_COLUMN if (! defined $join->[$ii]);
-		### $ii
+            my $column;
+            my %column_specification;
 
-		# skip column if undef'd
-		if (defined $join_index) {
-		    # combine the current join column with the previous one
-		    
-		    # use alias if available, otherwise symbolic name
-		    my $left_table;
-		    if (exists $symbolic_select_tables[$join_index]->{ALIAS}) {
-			# use alias literally
-			$left_table = $symbolic_select_tables[$join_index]->{ALIAS};
-		    } else {
-			# map symbolic name to real table name
-			$left_table = $self->{schema}->get_table_name(
-			    $symbolic_select_tables[$join_index]->{SYMBOLIC_NAME}
-			    );
-		    }
+            if ( ref $entry eq 'HASH' ) {
+                $column = $entry->{COLUMN};
 
-		    my $right_table;
-		    if (exists $symbolic_select_tables[$ii]->{ALIAS}) {
-			# use alias literally
-			$right_table = $symbolic_select_tables[$ii]->{ALIAS};
-		    } else {
-			# map symbolic name to real table name
-			$right_table = $self->{schema}->get_table_name(
-			    $symbolic_select_tables[$ii]->{SYMBOLIC_NAME}
-			    );
-		    }
-		    
-		    my $left = 
-			$left_table 
-			. '.' 
-			. $self->{schema}->get_column($join->[$join_index]);
+                if ( defined $entry->{AGGREGATE} ) {
+                    $column_specification{AGGREGATE} = $entry->{AGGREGATE};
 
-		    my $right = 
-			$right_table 
-			. '.' 
-			. $self->{schema}->get_column($join->[$ii]);
+                    if ( $column_specification{AGGREGATE} !~ m{ \A (?: MIN | MAX | AVG | COUNT ) \z }xms ) {
 
-		    ### $left
-		    ### $right
-		    push @conditions, $left . '=' . $right;
-		}
-		$join_index = $ii;
-	    }
-	}
-	
-	##
-	# handle validity for joins
-	if (defined $args->{VALID_AT}) {
-	    # according to the documentation for this constraint it may be
-	    # one of the following
-	    # 1. single table query:
-	    #    - SCALAR (single point in time)
-	    #    - ARRAYREF (multiple points in time)
-	    # 2. join query across multiple tables
-	    #    - ARRAYREF containing entries for each single joined table
-	    #      - each containing SCALAR or ARRAYREF, see 1.
-	    # hence for single table queries we need to wrap the argument
-	    # in an arrayref to prepare the input for generalized processing
-	    # below
-	    if (scalar(@symbolic_select_tables) == 1) {
-		$args->{VALID_AT} = [ $args->{VALID_AT} ];
-	    }
+                        OpenXPKI::Exception->throw(
+                            message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_AGGREGATE_SPECIFICATION",
+                            params  => {
+                                COLUMN_REF   => ref $entry,
+                                COLUMN_INDEX => $ii,
+                                COLUMN       => $column,
+                                AGGREGATE    => $column_specification{AGGREGATE},
+                            }
+                        );
+                    }
+                }
+            } elsif ( ref $entry eq '' ) {
 
-	    # sanity checks
-	    if (ref $args->{VALID_AT} ne 'ARRAY') {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_VALIDITY_SPECIFICATION_TYPE_FOR_JOIN");
-	    }
-	    
-	    if (scalar(@{$args->{VALID_AT}}) != scalar(@symbolic_select_tables)) {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_VALIDITY_SPECIFICATION_MISMATCH_FOR_JOIN",
-		    params => {
-			TABLES   => [ @symbolic_select_tables ],
-			VALID_AT => $args->{VALID_AT},
-		    });
-	    }
+                # scalar value
+                $column = $entry;
 
-	    ### add validity conditions...
-	    
-	    my $validity_index;
-	  VALIDITY:
-	    for (my $ii = 0; $ii < scalar(@symbolic_select_tables); $ii++) {
-		next VALIDITY if (! defined $args->{VALID_AT}->[$ii]);
-		
-		# use alias if available, otherwise symbolic name
-		my $table;
-		if (exists $symbolic_select_tables[$ii]->{ALIAS}) {
-		    ### use alias literally...
-		    $table = $symbolic_select_tables[$ii]->{ALIAS};
-		} else {
-		    ### map symbolic name to real table name...
-		    $table = $self->{schema}->get_table_name(
-			$symbolic_select_tables[$ii]->{SYMBOLIC_NAME}
-			);
-		}
-		
-		# check if table contains NOTBEFORE/NOTAFTER
-		my $columns = 
-		    $self->{schema}->get_table_columns($symbolic_select_tables[$ii]->{SYMBOLIC_NAME});
+            } else {
+                OpenXPKI::Exception->throw(
+                    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_COLUMN_DATA_TYPE",
+                    params  => {
+                        COLUMN_REF   => ref $entry,
+                        COLUMN_INDEX => $ii,
+                    }
+                );
+            }
 
-		if (! (grep(m{ \A NOTBEFORE \z }xms, @{$columns}) 
-		       && grep(m{ \A NOTAFTER \z }xms, @{$columns}))) {
-		    OpenXPKI::Exception->throw (
-			message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_TABLE_FOR_VALIDITY_CONSTRAINT",
-			params => {
-			    TABLE => $symbolic_select_tables[$ii]->{SYMBOLIC_NAME},
-			});
-		}
+            if ( !defined $column ) {
+                OpenXPKI::Exception->throw(
+                    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_COLUMN_NOT_SPECIFIED",
+                    params  => {
+                        COLUMN_REF   => ref $column,
+                        COLUMN_INDEX => $ii,
+                    }
+                );
+            }
 
-		### table: $table
-		push @conditions,
-		@{$self->__get_validity_conditions(
-		      {
-			  VALID_AT => $args->{VALID_AT}->[$ii],
-			  TABLE    => $table,
-		      })};
-	    }
-	}
+            my ( $col, $tab ) = $self->__get_symbolic_column_and_table($column);
+
+            # convert this into schema compatible column
+            $col = $self->{schema}->get_column($col);
+
+            if ( defined $tab ) {
+
+                # if this is an alias leave it this way
+                if ( !exists $alias_map_of{$tab} ) {
+                    $tab = $self->{schema}->get_table_name($tab);
+                }
+                $column_specification{COLUMN} = $tab . '.' . $col;
+
+            } else {
+                $column_specification{COLUMN} = $col;
+            }
+
+            push @select_list, \%column_specification;
+        }
+
+        # use first column as pivot column
+        if ( !defined $pivot_column ) {
+            $pivot_column = $symbolic_select_tables[0]->{SYMBOLIC_NAME} . '_SERIAL';
+        }
+
+        ######################################################################
+        # handle joins
+        if (  !exists $args->{JOIN}
+            || ref $args->{JOIN} ne 'ARRAY' )
+        {
+            OpenXPKI::Exception->throw( message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_JOIN" );
+        }
+
+        foreach my $join ( @{ $args->{JOIN} } ) {
+            ### $join
+            if ( ref $join ne 'ARRAY'
+                || scalar( @{$join} ) != scalar(@symbolic_select_tables) )
+            {
+                OpenXPKI::Exception->throw(
+                    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_JOIN_SPECIFICATION_MISMATCH",
+                    params  => {
+                        TABLES => [@symbolic_select_tables],
+                        JOIN   => Dumper $join,
+                    },
+                );
+            }
+
+            ### add join condition...
+
+            my $join_index;
+          JOIN_COLUMN:
+            for ( my $ii = 0; $ii < scalar(@symbolic_select_tables); $ii++ ) {
+                next JOIN_COLUMN if ( !defined $join->[$ii] );
+                ### $ii
+
+                # skip column if undef'd
+                if ( defined $join_index ) {
+
+                    # combine the current join column with the previous one
+
+                    # use alias if available, otherwise symbolic name
+                    my $left_table;
+                    if ( exists $symbolic_select_tables[$join_index]->{ALIAS} ) {
+
+                        # use alias literally
+                        $left_table = $symbolic_select_tables[$join_index]->{ALIAS};
+                    } else {
+
+                        # map symbolic name to real table name
+                        $left_table = $self->{schema}->get_table_name( $symbolic_select_tables[$join_index]->{SYMBOLIC_NAME} );
+                    }
+
+                    my $right_table;
+                    if ( exists $symbolic_select_tables[$ii]->{ALIAS} ) {
+
+                        # use alias literally
+                        $right_table = $symbolic_select_tables[$ii]->{ALIAS};
+                    } else {
+
+                        # map symbolic name to real table name
+                        $right_table = $self->{schema}->get_table_name( $symbolic_select_tables[$ii]->{SYMBOLIC_NAME} );
+                    }
+
+                    my $left = $left_table . '.' . $self->{schema}->get_column( $join->[$join_index] );
+
+                    my $right = $right_table . '.' . $self->{schema}->get_column( $join->[$ii] );
+
+                    ### $left
+                    ### $right
+                    push @conditions, $left . '=' . $right;
+                }
+                $join_index = $ii;
+            }
+        }
+
+        ##
+        # handle validity for joins
+        if ( defined $args->{VALID_AT} ) {
+
+            # according to the documentation for this constraint it may be
+            # one of the following
+            # 1. single table query:
+            #    - SCALAR (single point in time)
+            #    - ARRAYREF (multiple points in time)
+            # 2. join query across multiple tables
+            #    - ARRAYREF containing entries for each single joined table
+            #      - each containing SCALAR or ARRAYREF, see 1.
+            # hence for single table queries we need to wrap the argument
+            # in an arrayref to prepare the input for generalized processing
+            # below
+            if ( scalar(@symbolic_select_tables) == 1 ) {
+                $args->{VALID_AT} = [ $args->{VALID_AT} ];
+            }
+
+            # sanity checks
+            if ( ref $args->{VALID_AT} ne 'ARRAY' ) {
+                OpenXPKI::Exception->throw(
+                    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INCORRECT_VALIDITY_SPECIFICATION_TYPE_FOR_JOIN" );
+            }
+
+            if ( scalar( @{ $args->{VALID_AT} } ) != scalar(@symbolic_select_tables) ) {
+                OpenXPKI::Exception->throw(
+                    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_VALIDITY_SPECIFICATION_MISMATCH_FOR_JOIN",
+                    params  => {
+                        TABLES   => [@symbolic_select_tables],
+                        VALID_AT => $args->{VALID_AT},
+                    }
+                );
+            }
+
+            ### add validity conditions...
+
+            my $validity_index;
+          VALIDITY:
+            for ( my $ii = 0; $ii < scalar(@symbolic_select_tables); $ii++ ) {
+                next VALIDITY if ( !defined $args->{VALID_AT}->[$ii] );
+
+                # use alias if available, otherwise symbolic name
+                my $table;
+                if ( exists $symbolic_select_tables[$ii]->{ALIAS} ) {
+                    ### use alias literally...
+                    $table = $symbolic_select_tables[$ii]->{ALIAS};
+                } else {
+                    ### map symbolic name to real table name...
+                    $table = $self->{schema}->get_table_name( $symbolic_select_tables[$ii]->{SYMBOLIC_NAME} );
+                }
+
+                # check if table contains NOTBEFORE/NOTAFTER
+                my $columns = $self->{schema}->get_table_columns( $symbolic_select_tables[$ii]->{SYMBOLIC_NAME} );
+
+                if ( !( grep( m{ \A NOTBEFORE \z }xms, @{$columns} ) && grep( m{ \A NOTAFTER \z }xms, @{$columns} ) ) ) {
+                    OpenXPKI::Exception->throw(
+                        message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_TABLE_FOR_VALIDITY_CONSTRAINT",
+                        params  => { TABLE => $symbolic_select_tables[$ii]->{SYMBOLIC_NAME}, }
+                    );
+                }
+
+                ### table: $table
+                push @conditions,
+                  @{
+                    $self->__get_validity_conditions(
+                        {
+                            VALID_AT => $args->{VALID_AT}->[$ii],
+                            TABLE    => $table,
+                        }
+                    )
+                  };
+            }
+        }
     }
 
     # sanity check: there must be a where clause
-    if (scalar(@select_list) == 0) {
- 	OpenXPKI::Exception->throw (
- 	    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_COLUMNS_SELECTED",
- 	    params  => {
- 		TABLE  => $table_args,
- 	    });
+    if ( scalar(@select_list) == 0 ) {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_COLUMNS_SELECTED",
+            params  => { TABLE => $table_args, }
+        );
     }
-    
+
     # allow to override pivot columnn
-    if (exists $args->{PIVOT_COLUMN}) {
-	$pivot_column = $args->{PIVOT_COLUMN};
+    if ( exists $args->{PIVOT_COLUMN} ) {
+        $pivot_column = $args->{PIVOT_COLUMN};
     }
 
     ###########################################################################
@@ -932,37 +880,31 @@ sub select
 
     ##! 128: '@conditions: ' . Dumper \@conditions
   OPERATOR:
-    foreach my $keyword (keys %operator_of)
-    {
-	next OPERATOR if (! exists $args->{$keyword});
-	push @conditions, $self->{schema}->get_column ($pivot_column) . " " . $operator_of{$keyword} . " ?";
-	push @bind_values, $args->{$keyword};
+    foreach my $keyword ( keys %operator_of ) {
+        next OPERATOR if ( !exists $args->{$keyword} );
+        push @conditions,  $self->{schema}->get_column($pivot_column) . " " . $operator_of{$keyword} . " ?";
+        push @bind_values, $args->{$keyword};
     }
     ##! 128: '@conditions: ' . Dumper \@conditions
-
 
   INDEX_MATCH:
-    foreach my $key (qw( KEY SERIAL ))
-    {
-	next INDEX_MATCH if (! exists $args->{$key});
-	push @conditions, $self->{schema}->get_column($pivot_column) . " = ?";
-	push @bind_values, $args->{$key};
+    foreach my $key (qw( KEY SERIAL )) {
+        next INDEX_MATCH if ( !exists $args->{$key} );
+        push @conditions,  $self->{schema}->get_column($pivot_column) . " = ?";
+        push @bind_values, $args->{$key};
     }
     ##! 128: '@conditions: ' . Dumper \@conditions
-
 
     ###########################################################################
     ## check dynamic conditions
-    
     if (exists $args->{DYNAMIC} &&
         (not ref $args->{DYNAMIC} or not ref $args->{DYNAMIC} eq "HASH")
        )
     {
-        OpenXPKI::Exception->throw (
+        OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_DYNAMIC_NO_HASH_REFERENCE",
-            params  => {
-            TABLE  => $table_args,
-        });
+            params  => { TABLE => $table_args, }
+        );
     }
     if (exists $args->{DYNAMIC})
     {         
@@ -981,8 +923,8 @@ sub select
             }
             
             # check the structure
-            if (not ref $args->{DYNAMIC}->{$dynamic_key} or
-                not ref $args->{DYNAMIC}->{$dynamic_key} eq "HASH")
+            if (   not ref $args->{DYNAMIC}->{$dynamic_key}
+                or not ref $args->{DYNAMIC}->{$dynamic_key} eq "HASH" )
             {
                 OpenXPKI::Exception->throw (
         	        message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_DYNAMIC_PARAM_NO_HASH_REFERENCE",
@@ -991,111 +933,102 @@ sub select
         		    COLUMN => $dynamic_key,
         	    });
             }
-            if (not exists $args->{DYNAMIC}->{$dynamic_key}->{VALUE})
-            {
-                OpenXPKI::Exception->throw (
-        	        message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_DYNAMIC_PARAM_WITHOUT_VALUE",
-        	        params  => {
-        		    TABLE  => $table_args,
-        	    });
+            if ( not exists $args->{DYNAMIC}->{$dynamic_key}->{VALUE} ) {
+                OpenXPKI::Exception->throw(
+                    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_DYNAMIC_PARAM_WITHOUT_VALUE",
+                    params  => { TABLE => $table_args, }
+                );
             }
 
-            # for joins the key may be SYMBOLIC_NAME.COLUMN or ALIAS.COLUMN, 
+            # for joins the key may be SYMBOLIC_NAME.COLUMN or ALIAS.COLUMN,
             # otherwise we only get COLUMN
             # $dynamic_column always is set to COLUMN, $dynamic_table is
             # TABLE if available, otherwise undef
-            my ($col, $tab) = 
-                $self->__get_symbolic_column_and_table($dynamic_key);
-	    
+            my ( $col, $tab ) = $self->__get_symbolic_column_and_table($dynamic_key);
+
             # leave alias as is, but map symbolic table name to real table name
-            if (defined $tab && ! exists $alias_map_of{$tab}) {
+            if ( defined $tab && !exists $alias_map_of{$tab} ) {
                 $tab = $self->{schema}->get_table_name($tab);
             }
-	    
-            if (! $col)
-            {
-                OpenXPKI::Exception->throw (
+
+            if ( !$col ) {
+                OpenXPKI::Exception->throw(
                     message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_WRONG_COLUMN",
-                    params  => {
-                        COLUMN => $dynamic_key,
-                    });
+                    params  => { COLUMN => $dynamic_key, }
+                );
             }
-	    
+
             $col = $self->{schema}->get_column($col);
 
             # left-hand side
             my $lhs = '';
-            if (defined $tab) {
+            if ( defined $tab ) {
                 $lhs = $tab . '.';
             }
             $lhs .= $col;
-	    
+
             my @dynamic_values;
 
-            if (ref $args->{DYNAMIC}->{$dynamic_key}->{VALUE} eq '') {
+            if ( ref $args->{DYNAMIC}->{$dynamic_key}->{VALUE} eq '' ) {
                 ##! 64: 'pushing scalar dynamic value for ' . $dynamic_key
                 push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key}->{VALUE};
-            } elsif (ref $args->{DYNAMIC}->{$dynamic_key}->{VALUE} eq 'ARRAY') {
+            } elsif ( ref $args->{DYNAMIC}->{$dynamic_key}->{VALUE} eq 'ARRAY' ) {
                 ##! 64: 'pushing arrayref dynamic value for ' . $dynamic_key
                 push @dynamic_values, $args->{DYNAMIC}->{$dynamic_key}->{VALUE};
             } else {
-                OpenXPKI::Exception->throw (
+                OpenXPKI::Exception->throw(
                     message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_INVALID_DYNAMIC_QUERY",
-                    params  => {
-                        CONDITION => $dynamic_key,
-                    });
+                    params  => { CONDITION => $dynamic_key, }
+                );
             }
-	    
+
             # We can use a "like" statement only if the column is a string.
             # Therefore we have to check the column type.
             my $operator = "=";
-            if ($args->{DYNAMIC}->{$dynamic_key}->{OPERATOR})
-            {
-                if ($args->{DYNAMIC}->{$dynamic_key}->{OPERATOR} eq "EQUAL")
-                {
+            my $op_key = $args->{DYNAMIC}->{$dynamic_key}->{OPERATOR};
+            if ( $op_key ) {
+                if ( $op_key eq "EQUAL" ) {
                     $operator = "=";
-                }
-                elsif ($args->{DYNAMIC}->{$dynamic_key}->{OPERATOR} eq "LIKE")
-                {
-                    if ($self->{DBH}->column_is_numeric ($col))
-                    {
-                        OpenXPKI::Exception->throw (
+                } elsif ( $op_key eq "LIKE" ) {
+                    if ( $self->{DBH}->column_is_numeric($col) ) {
+                        OpenXPKI::Exception->throw(
                             message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_LIKE_ON_NUMERIC",
-                            params  => {
-                                CONDITION => $dynamic_key,
-                        });
+                            params  => { CONDITION => $dynamic_key, }
+                        );
                     }
                     $operator = "like";
-                } else {
-                    OpenXPKI::Exception->throw (
+                } elsif($operator_of{$op_key}){
+                    $operator = $operator_of{$op_key};
+                }else {
+                    OpenXPKI::Exception->throw(
                         message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_UNKNOWN_OPERATOR",
-                        params  => {
-                            CONDITION => $dynamic_key,
-                    });
+                        params  => { CONDITION => $dynamic_key, OPERATOR => $op_key}
+                    );
                 }
             }
-            
+
             foreach my $value (@dynamic_values) {
                 ##! 64: 'dynamic value: ' . Dumper $value
-                if (defined $value && ! ref $value) {
+                if ( defined $value && !ref $value ) {
+
                     # scalar case
-                    push @conditions, $lhs.' '.$operator.' ?';
+                    push @conditions,  $lhs . ' ' . $operator . ' ?';
                     push @bind_values, $value;
-                }
-                elsif (defined $value && ref $value eq 'ARRAY') {
+                } elsif ( defined $value && ref $value eq 'ARRAY' ) {
+
                     # the value is an array reference, combine with OR
                     my @tmp = ();
-                    foreach my $subvalue (@{$value}) {                    
-                        if (defined $subvalue) {                    
-                            push @tmp, $lhs.' '.$operator.' ?';
+                    foreach my $subvalue ( @{$value} ) {
+                        if ( defined $subvalue ) {
+                            push @tmp,         $lhs . ' ' . $operator . ' ?';
                             push @bind_values, $subvalue;
                         } else {
                             push @tmp, $lhs . ' IS NULL';
-                        } 
+                        }
                     }
                     push @conditions, \@tmp;
-                }
-                else {
+                } else {
+
                     # handle queries for NULL
                     push @conditions, $lhs . ' IS NULL';
                 }
@@ -1104,152 +1037,148 @@ sub select
     }
 
     # sanity check: there must be a condition
-    if (scalar(@conditions) == 0) {
-        OpenXPKI::Exception->throw (
+    if ( scalar(@conditions) == 0 ) {
+        OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_NO_WHERE_CLAUSE",
-            params  => {
-                TABLE  => $table_args,
-            });
+            params  => { TABLE => $table_args, }
+        );
     }
-
 
     ###########################################################################
     # compose column specifications
     my @select_column_specs;
     my @order_specs;
     foreach my $entry (@select_list) {
-	my $select_column = $entry->{COLUMN};
+        my $select_column = $entry->{COLUMN};
 
-	if (defined $entry->{AGGREGATE}) {
-	    $select_column = $entry->{AGGREGATE} . '(' . $select_column . ')';
-	}
+        if ( defined $entry->{AGGREGATE} ) {
+            $select_column = $entry->{AGGREGATE} . '(' . $select_column . ')';
+        }
 
-	push @select_column_specs, $select_column;
+        push @select_column_specs, $select_column;
 
-	# only order by column if no aggregate or distinct is applied to it
-	if ($select_column eq $entry->{COLUMN}) {
-	    # don't order by TEXT and LONGTEXT columns
-	    my ($col, $tab) = 
-		$self->__get_symbolic_column_and_table($select_column);
+        # only order by column if no aggregate or distinct is applied to it
+        if ( $select_column eq $entry->{COLUMN} ) {
 
-	    my $type = $self->{DBH}->get_abstract_column_type($col);
-	    if (($type ne 'TEXT') && ($type ne 'LONGTEXT')) {
-		push @order_specs, $select_column;
-	    }
-	}
+            # don't order by TEXT and LONGTEXT columns
+            my ( $col, $tab ) = $self->__get_symbolic_column_and_table($select_column);
+
+            my $type = $self->{DBH}->get_abstract_column_type($col);
+            if ( ( $type ne 'TEXT' ) && ( $type ne 'LONGTEXT' ) ) {
+                push @order_specs, $select_column;
+            }
+        }
     }
 
     ###########################################################################
     # compose table specifications
     my @table_specs;
     foreach my $entry (@symbolic_select_tables) {
-	# real table name
-	my $table = $entry->{SQL_NAME};
 
-	if (exists $entry->{ALIAS}) {
-	    # aliased table
-	    $table = $entry->{SQL_NAME} . ' ' . $entry->{ALIAS};
-	}
+        # real table name
+        my $table = $entry->{SQL_NAME};
 
-	push @table_specs, $table;
+        if ( exists $entry->{ALIAS} ) {
+
+            # aliased table
+            $table = $entry->{SQL_NAME} . ' ' . $entry->{ALIAS};
+        }
+
+        push @table_specs, $table;
     }
 
     ###########################################################################
     ## execute query
     foreach my $condition (@conditions) {
-        if (ref $condition eq 'ARRAY') {
-            $condition = '(' . join(' OR ', @{$condition}) . ')';
+        if ( ref $condition eq 'ARRAY' ) {
+            $condition = '(' . join( ' OR ', @{$condition} ) . ')';
         }
     }
     my $distinct = '';
-    if ($args->{DISTINCT}) {
+    if ( $args->{DISTINCT} ) {
         $distinct = 'DISTINCT';
     }
-    my $query = 'SELECT ' . $distinct . ' '
-      . join(', ', @select_column_specs)
-	  . ' FROM ' . join(', ', @table_specs)
-	  . ' WHERE '
-	  . join(' AND ', @conditions);
+    my $query =
+        'SELECT '
+      . $distinct . ' '
+      . join( ', ', @select_column_specs )
+      . ' FROM '
+      . join( ', ', @table_specs )
+      . ' WHERE '
+      . join( ' AND ', @conditions );
 
-    if (@order_specs) { # only order if we actually have columns by which
-                        # we can order
-        if (exists $args->{ORDER}) {
+    if (@order_specs) {    # only order if we actually have columns by which
+                           # we can order
+        if ( exists $args->{ORDER} ) {
             ##! 16: 'order argument exists ...'
             ##! 64: 'order specs: ' . Dumper \@order_specs
-            if (ref $args->{ORDER} ne 'ARRAY') {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_DBI_SQL_ORDER_IS_NOT_ARRAYREF',
-                );
+            if ( ref $args->{ORDER} ne 'ARRAY' ) {
+                OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_DBI_SQL_ORDER_IS_NOT_ARRAYREF', );
             }
             my @order = @{ $args->{ORDER} };
             ##! 16: 'order: ' . Dumper \@order
             my @real_order;
             foreach my $order_arg (@order) {
-	            my ($col, $tab) = 
-		            $self->__get_symbolic_column_and_table($order_arg);
+                my ( $col, $tab ) = $self->__get_symbolic_column_and_table($order_arg);
                 $col = $self->{schema}->get_column($col);
                 if ($tab) {
                     $tab = $self->{schema}->get_table_name($tab);
                     push @real_order, $tab . '.' . $col;
-                }
-                else {
+                } else {
                     push @real_order, $col;
                 }
             }
             ##! 16: 'order: ' . Dumper \@real_order
             foreach my $entry (@real_order) {
-                if (! grep { $entry eq $_ } @order_specs) {
+                if ( !grep { $entry eq $_ } @order_specs ) {
+
                     # argument entries need to be part of the order_specs
                     OpenXPKI::Exception->throw(
                         message => 'I18N_OPENXPKI_SERVER_DBI_SQL_ORDER_INVALID_ENTRY',
-                        params  => {
-                            ENTRY => $entry,
-                        },
+                        params  => { ENTRY => $entry, },
                     );
                 }
                 push @order_specs, $entry;
             }
         }
 
-        if ($args->{REVERSE})
-        {
-            $query .= ' ORDER BY ' . join(' DESC, ', reverse @order_specs) . ' DESC';
+        if ( $args->{REVERSE} ) {
+            $query .= ' ORDER BY ' . join( ' DESC, ', reverse @order_specs ) . ' DESC';
         } else {
-            $query .= ' ORDER BY ' . join(', ', reverse @order_specs);
+            $query .= ' ORDER BY ' . join( ', ', reverse @order_specs );
         }
     }
-    
+
     ### $query
-    ##! 2: "execute do_query: $query"
-    $self->{DBH}->do_query (QUERY       => $query,
-                            BIND_VALUES => \@bind_values,
-                            LIMIT       => $args->{LIMIT});
+    ##! 2: "execute do_query: $query with bind values ".Dumper(\@bind_values)
+    $self->{DBH}->do_query(
+        QUERY       => $query,
+        BIND_VALUES => \@bind_values,
+        LIMIT       => $args->{LIMIT}
+    );
 
     ##! 2: "build an array to return it"
 
     my @result = ();
-    my $sth = $self->{DBH}->get_sth();
-    while ( (my $item =  $sth->fetchrow_arrayref) ) {
+    my $sth    = $self->{DBH}->get_sth();
+    while ( ( my $item = $sth->fetchrow_arrayref ) ) {
         my @tab = ();
-        for (my $i = 0; $i < scalar @{$item}; $i++)
-        {
-            if (not defined $item->[$i])
-            {
+        for ( my $i = 0; $i < scalar @{$item}; $i++ ) {
+            if ( not defined $item->[$i] ) {
                 push @tab, undef;
             } else {
                 ## this is only a method to make a normale string a utf8 string
                 ## decoding is necessary because at minimum SQLite returns no utf8
-                push @tab, pack ("U0C*", unpack "C*", $item->[$i]);
+                push @tab, pack( "U0C*", unpack "C*", $item->[$i] );
             }
         }
-        push @result, [ @tab ];
+        push @result, [@tab];
     }
     $self->{DBH}->finish_sth();
 
     ##! 1: "return ".scalar (@result)." results"
-    return [ @result ];
+    return [@result];
 }
-
 
 1;
 __END__

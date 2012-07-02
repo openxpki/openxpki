@@ -211,7 +211,7 @@
                     my $i_msg = $context->{client}->send_receive_command_msg(
                         'get_workflow_info',
                       {
-                        WORKFLOW => $workflow_type,
+                        WORKFLOW => $params{workflow_type},
                         ID       => $workflow_id,
                       },
                     );

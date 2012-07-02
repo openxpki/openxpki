@@ -18,7 +18,7 @@ __PACKAGE__->mk_accessors( 'crl_issuance_pending_accept' );
 sub _init
 {
     my ( $self, $params ) = @_;
-    unless ( $params->{'crl_issuance_pending_accept'} )
+    unless ( defined $params->{'crl_issuance_pending_accept'}  )    
     {
         configuration_error
              "You must define one value for 'crl_issuance_pending_accept' in ",

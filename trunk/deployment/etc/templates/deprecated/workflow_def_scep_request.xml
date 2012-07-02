@@ -1,0 +1,223 @@
+<workflow>
+  <type>I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST</type>
+  <description>I18N_OPENXPKI_WF_DESC_SCEP_REQUEST</description>
+  <persister>OpenXPKI</persister>
+
+  <state name="INITIAL">
+    <description>I18N_OPENXPKI_WF_STATE_SCEP_REQUEST_INITIAL</description>
+    <action name="extract_csr" 
+            resulting_state="CSR_EXTRACTED">
+    </action>
+  </state>
+
+  <state name="CSR_EXTRACTED" autorun="yes">
+    <action name="null"
+            resulting_state="SIGNATURE_OK">
+      <condition name="valid_signature"/>
+    </action>
+    <action name="set_error_code_1"
+            resulting_state="FAILURE">
+      <condition name="!valid_signature"/>
+    </action>
+  </state>
+
+  <state name="SIGNATURE_OK" autorun="yes">
+    <action name="null"
+            resulting_state="RENEWAL_OR_SCEP_CLIENT">
+      <condition name="!is_initial_enrollment"/>
+    </action>
+    <action name="null2"
+            resulting_state="INITIAL_ENROLLMENT">
+      <condition name="is_initial_enrollment"/>
+    </action>
+  </state>
+
+  <state name="INITIAL_ENROLLMENT" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_SCEP_INITIAL_ENROLLMENT</description>
+    <action name="set_context_from_csr"
+	    resulting_state="PENDING">
+      <condition name="initial_enrollment_allowed"/>
+    </action>
+    <action name="set_error_code_4"
+	    resulting_state="FAILURE">
+      <condition name="!initial_enrollment_allowed"/>
+    </action>
+  </state>
+
+  <state name="RENEWAL_OR_SCEP_CLIENT" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_SCEP_RENEWAL_OR_SCEP_CLIENT</description>
+    <action name="null"
+            resulting_state="RENEWAL">
+            <condition name="!scep_client"/>
+    </action>
+    <action name="null2"
+            resulting_state="SCEP_CLIENT">
+            <condition name="scep_client"/>
+    </action>
+  </state>
+
+  <state name="SCEP_CLIENT" autorun="yes">
+    <action name="set_context_from_csr"
+	    resulting_state="PENDING">
+      <condition name="client_enrollment"/>
+      <condition name="client_cert_valid"/>
+      <condition name="csr_has_valid_role"/>
+    </action>
+    <action name="set_context_from_csr2"
+	    resulting_state="SCEP_CLIENT_AUTO_ISSUE">
+      <condition name="client_autoissuance"/>
+      <condition name="client_cert_valid"/>
+      <condition name="csr_has_valid_role"/>
+    </action>
+    <action name="set_error_code_2"
+            resulting_state="FAILURE">
+            <condition name="!client_cert_valid"/>
+    </action>
+    <action name="set_error_code_2_too"
+            resulting_state="FAILURE">
+            <condition name="!csr_has_valid_role"/>
+    </action>
+  </state>
+
+  <state name="SCEP_CLIENT_AUTO_ISSUE" autorun="yes">
+    <action name="persist_csr"
+        resulting_state="APPROVED"/>
+  </state>
+
+  <state name="RENEWAL" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_SCEP_RENEWAL</description>
+    <action name="null"
+	    resulting_state="RENEWAL_ALLOWED">
+      <condition name="auto_renewal_allowed"/>
+    </action>
+    <action name="set_error_code_2"
+	    resulting_state="FAILURE">
+      <condition name="!auto_renewal_allowed"/>
+    </action>
+  </state>
+
+  <state name="RENEWAL_ALLOWED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_SCEP_RENEWAL_ALLOWED</description>
+    <action name="null"
+            resulting_state="NUMBER_OF_VALID_CERTS_CORRECT">
+      <condition name="correct_number_of_valid_certs"/>
+    </action>
+    <action name="set_error_code_2"
+            resulting_state="FAILURE">
+      <condition name="!correct_number_of_valid_certs"/>
+    </action>
+  </state>
+
+  <state name="NUMBER_OF_VALID_CERTS_CORRECT" autorun="yes">
+    <action name="set_context_from_original_cert"
+            resulting_state="TIMING_CORRECT">
+        <condition name="correct_timing"/>
+    </action>
+    <action name="set_error_code_2"
+            resulting_state="FAILURE">
+        <condition name="!correct_timing"/>
+    </action>
+  </state>
+
+  <state name="TIMING_CORRECT" autorun="yes">
+    <action name="persist_csr"
+            resulting_state="APPROVED">
+      <condition name="ACL::persist_csr"/>
+      <condition name="auto_approval_allowed"/>
+      <condition name="signed_using_original_cert"/>
+    </action>
+    <action name="null"
+            resulting_state="PENDING">
+      <condition name="auto_approval_allowed"/>
+      <condition name="!signed_using_original_cert"/> <!-- this is equivalent to self-signed -->
+    </action>
+    <action name="null2"
+            resulting_state="PENDING">
+      <condition name="!auto_approval_allowed"/>
+      <condition name="!signed_using_original_cert"/>
+    </action>
+    <action name="null3"
+            resulting_state="PENDING">
+      <condition name="!auto_approval_allowed"/>
+      <condition name="signed_using_original_cert"/>
+    </action>
+  </state>
+
+
+  <state name="PENDING">
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_csr_role"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_csr_profile"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_STYLE"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_csr_subject_style"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_csr_subject"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
+	    resulting_state="PENDING">
+      <condition name="ACL::change_csr_subject_alt_name"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+	    resulting_state="APPROVAL">
+      <condition name="ACL::approve_csr"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+	    resulting_state="FAILURE">
+      <condition name="ACL::reject_csr"/>
+    </action>
+  </state>
+
+  <state name="APPROVAL">
+    <description>I18N_OPENXPKI_WF_STATE_DESC_APPROVAL</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
+	    resulting_state="APPROVED">
+      <condition name="ACL::persist_csr"/>
+      <condition name="Condition::check_csr_approvals"/>
+    </action>
+    <!-- perhaps we need more than one approval or                 -->
+    <!-- perhaps the first approval was from a not authorized role -->
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+	    resulting_state="APPROVAL">
+      <condition name="ACL::approve_csr"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL"
+	    resulting_state="PENDING">
+      <condition name="ACL::cancel_csr_approval"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+	    resulting_state="FAILURE">
+      <condition name="ACL::reject_csr"/>
+    </action>
+  </state>
+
+  <state name="APPROVED" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_DESC_APPROVED</description>
+    <action name="fork_cert_issuance_instance"
+	    resulting_state="WAITING_FOR_CHILD">
+    </action>
+  </state>
+
+  <!-- if no autorun is available here, we are stuck in this state.
+       Every time a corresponding SCEP request comes in, the service
+       checks if we have an available action to execute and executes it -->
+  <state name="WAITING_FOR_CHILD">
+    <action name="child_finished_successfully"
+            resulting_state="SUCCESS">
+      <condition name="all_wf_children_instances_finished"/>
+    </action>
+    <!-- = set_error_code_2 -->
+    <action name="child_finished_failure"
+            resulting_state="FAILURE">
+    </action>
+  </state>
+  <state name="FAILURE" />
+  <state name="SUCCESS" />
+</workflow>

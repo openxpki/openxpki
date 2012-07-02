@@ -11,11 +11,21 @@ use warnings;
 use English;
 use Moose;
 use Connector::Proxy::Config::Versioned;
+use OpenXPKI::Exception;
 use OpenXPKI::Debug;
+use OpenXPKI::Server::Context qw( CTX );
+use Data::Dumper;
 
 extends 'Connector::Multi';
 
 has '+BASECONNECTOR' => ( required => 0 );
+
+has '_head_version' => (
+    is => 'rw',
+    isa => 'Str',
+    required => 0,        
+);
+
 
 around BUILDARGS => sub {
     my $orig = shift;
@@ -44,9 +54,66 @@ around BUILDARGS => sub {
 		    dbpath => $dbpath,
 		});
     }
-        
-    return $class->$orig( { BASECONNECTOR => $cv } );
+    ##! 16: "Init config system - head version " . $cv->version()        
+    return $class->$orig( { BASECONNECTOR => $cv, _head_version => $cv->version() } );
 };
+
+before '_route_call' => sub {
+    
+    my $self = shift;
+    my $call = shift;
+    my $location = shift;
+
+    ##! 16: "_route_call interception on $location "            
+    # system is global and never has a prefix or version
+    if ( substr ($location, 0, 6) eq 'system' ) {
+        ##! 16: "_route_call: system value, reset connector offsets"
+        $self->_config()->{''}->PREFIX('');
+        $self->_config()->{''}->version( $self->_head_version() );
+    } else {
+        my $session = CTX('session');
+        my $cfg_ver = $session->get_config_version();
+        ##! 16: "_route_call: set config version to " . $cfg_ver         
+        $self->_config()->{''}->version( $cfg_ver );
+            
+        my $pki_realm = $session->get_pki_realm();            
+        ##! 16: "_route_call: realm value, set prefix to " . $pki_realm        
+        $self->_config()->{''}->PREFIX( $pki_realm );
+    }    
+};
+
+sub get_version {
+    my $self = shift;
+    ##! 16: 'Config version requested ' . Dumper( $self->BASECONNECTOR()->version() ) 
+    return $self->BASECONNECTOR()->version();
+}
+
+sub update_head {     
+    my $self = shift;    
+    my $head_id = $self->BASECONNECTOR()->fetch_head_commit();
+    
+    # if the head version has evolved, update the session context
+    ##! 32: sprintf 'My head: %s,  Repo head: %s ',  $self->_head_version(), $head_id   
+    if ( $self->_head_version() ne $head_id ) {
+        ##! 16: 'Advance to head commit ' . $head_id 
+        $self->_head_version( $head_id );
+        
+        # Set new commit id in session for workflows
+        # is there ever a session in this context?
+        eval {
+            CTX('session')->set_config_version( $head_id );
+        };
+        
+        CTX('log')->log(
+            MESSAGE  => "system config advanced to new head commit: $head_id",
+            PRIORITY => "info",
+            FACILITY => "system",
+        );
+         
+        return 1;
+    }
+    return;    
+}
 
 sub walkQueryPoints {
     
@@ -97,7 +164,37 @@ OpenXPKI::Config - Connector based configuration layer using Config::Versioned
 
 =head1 DESCRIPTION
 
+The new config layer can be seen as a three dimensional system, where the
+axes are path, version and realm. The path is passed in as parameter to the
+I<get_*> methods inherited from the parent class Connector::Multi.
+
+Version and realm are automagically set from the session context. 
+The version equals to the commit hash of the Config::Versioned base 
+repository. The realm is prepended to the path.
+
+Therefore,a call to I<subsystem1.group1.param1> is resolved to the node
+I18N_OPENXPKI_DEPLOYMENT_MY_REALM_ID.subsystem1.group1.param1.
+
+Exception: The namespace B<system> is a reserved word and is not affected by
+version/realm mangling. A call to a value below system is always executed on
+the current head version and the root context.
+
 =head1 Methods
+
+=head2 update_head
+
+The commit id of the head is determined at startup. Changes to the config 
+repository during runtime are not visible to the connector. This method 
+updates the internal head pointer to the current head of the underlying 
+repository.
+
+Returns true if the head has changed, false otherwise. 
+
+=head2 get_version
+
+Return the sha1 value of the current head of the config tree.
+This is the version which is used, when you dont pass a version or 
+when you query a value in the C<system> namespace.
 
 =head2 walkQueryPoints
 

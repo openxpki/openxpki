@@ -19,6 +19,9 @@
 % foreach my $action (sort keys %actions)
 % {
 %   my $filename = lc($actions{$action});
+
+%	next if ($filename =~ /nice_check_for_revocation/);
+
 %      $filename =~ s/i18n_openxpki_wf_[^_]*_//;
 %   # because of this hack, we need to specify all variants of this in
 %   # the source, not the best solution here ... :-/

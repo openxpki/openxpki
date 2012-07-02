@@ -77,8 +77,16 @@ sub update_workflow {
     my $id   = $workflow->id();
     my $dbi  = CTX('dbi_workflow');
     my %data = (
-	WORKFLOW_STATE       => $workflow->state(),
-	WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),
+	   WORKFLOW_STATE       => $workflow->state(),
+	   WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),
+	   
+	   WORKFLOW_PROC_STATE  => $workflow->proc_state(),
+	   
+	   WORKFLOW_WAKEUP_AT   => $workflow->wakeup_at(),
+	   WORKFLOW_COUNT_TRY   => $workflow->count_try(),
+	   WORKFLOW_REAP_AT     => $workflow->reap_at(),
+	   WORKFLOW_SESSION     => $workflow->session_info(),
+	   WATCHDOG_KEY         => '',#always reset the watchdog key, if the workflow is updated from within the API/Factory
 	);
     
     
@@ -109,9 +117,9 @@ sub update_workflow {
 	
         ##! 4: "we cannot get the workflow so we try to create it"
         $data{PKI_REALM}          = CTX('session')->get_pki_realm();
-
         $data{WORKFLOW_TYPE}   = $workflow->type();
         $data{WORKFLOW_SERIAL} = $id;
+        
 
         ##! 1: "inserting data into workflow table"
         $dbi->insert(
@@ -303,11 +311,17 @@ sub fetch_workflow {
 	    },
 	    );
     }
-
-    return({
-	state       => $result->{WORKFLOW_STATE},
-	last_update => $parser->parse_datetime($result->{WORKFLOW_LAST_UPDATE}),
-	   });
+    
+    my $return = {
+	       state       => $result->{WORKFLOW_STATE},
+	       last_update => $parser->parse_datetime($result->{WORKFLOW_LAST_UPDATE}),
+	       proc_state  => $result->{WORKFLOW_PROC_STATE},
+	       count_try  => $result->{WORKFLOW_COUNT_TRY},
+	   };
+    
+    ##! 1: "return ".Dumper($return);
+    
+    return $return;
 }
 
 
