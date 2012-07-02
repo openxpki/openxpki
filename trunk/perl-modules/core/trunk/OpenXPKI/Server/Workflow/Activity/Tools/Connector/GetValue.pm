@@ -54,7 +54,7 @@ sub execute {
         
         ##! 32: ' Template Vars ' . Dumper ( %template_vars )  
         
-        $keytemplate = '[% TAGS [- -] -%]' .  $keytemplate;
+        #$keytemplate = '[% TAGS [- -] -%]' .  $keytemplate;
         my $tt = Template->new();        
         $tt->process(\$keytemplate, \%template_vars, \$connector_key);                    
 

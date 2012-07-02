@@ -82,6 +82,13 @@ sub get_validity {
         $refdate = DateTime->now( time_zone => 'UTC' );
     }
     
+    if ($validityformat eq 'detect') {
+        if ($validity =~ m{\A [+\-]}xms) {
+            $validityformat = 'relativedate';
+        } else {
+            $validityformat = 'absolutedate';
+        }
+    }
 
     if ($validityformat eq 'days') {
 	if ($validity !~ m{ \A [+\-]?\d+ \z }xms) {
@@ -187,6 +194,11 @@ sub _parse_date_utc{
     		);
 }
 
+
+sub is_relative {
+    my $datestring = shift;
+    return $datestring =~ m{\A [+\-]}xms;
+}
 
 1;
 __END__
@@ -312,3 +324,7 @@ is added to the offset which is 2 months in the future from now.
 
 Helpermethod. Passes the given parameter $date_string  to Date::Parse::strptime and constructs from the return an UTC DateTime object
 
+=head2 is_relative
+
+Static helper, check if a datestring looks like a relative format.
+(Check if the first character is a +/-). 

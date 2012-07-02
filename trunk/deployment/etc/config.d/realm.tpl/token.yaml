@@ -1,0 +1,18 @@
+testdummyca1:
+    key: /etc/openxpki/instances/trustcenter1/ca/testdummyca1/cakey.pem
+    secret: default
+    backend: OpenXPKI::Crypto::Backend::OpenSSL
+
+    # possible values are OpenSSL, nCipher, LunaCA
+    engine: OpenSSL
+    key_store: OPENXPKI
+
+    # OpenSSL binary location
+    shell: /usr/bin/openssl
+
+    # OpenSSL binary call gets wrapped with this command
+    wrapper: ''
+
+    # random file to use for OpenSSL
+    randfile: /var/openxpki/rand
+

@@ -9,6 +9,8 @@ package OpenXPKI::Crypto::Profile::CRL;
 
 use base qw(OpenXPKI::Crypto::Profile::Base);
 
+use OpenXPKI::Server::Context qw( CTX );
+
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use English;
@@ -26,18 +28,9 @@ sub new {
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{config}    = $keys->{CONFIG}    if ($keys->{CONFIG});
     $self->{PKI_REALM} = $keys->{PKI_REALM} if ($keys->{PKI_REALM});
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
-    $self->{CONFIG_ID} = $keys->{CONFIG_ID} if ($keys->{CONFIG_ID});
     $self->{VALIDITY} =  $keys->{VALIDITY} if ($keys->{VALIDITY});
-    
-
-    if (not $self->{config})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_NEW_MISSING_XML_CONFIG");
-    }
 
     if (not $self->{PKI_REALM})
     {
@@ -62,136 +55,82 @@ sub load_profile
 {
     my $self = shift;
 
-    ## scan for correct pki realm and ca
-
-    my %result = $self->get_path($self->{CONFIG_ID});
-    my $pki_realm = $result{PKI_REALM};
-    my $ca        = $result{CA};
-
-    ## scan for correct profile
- 
-    my @profile_path    = ("pki_realm", "common", "profiles", "crl");
-    my @profile_counter = ($pki_realm, 0, 0, 0);
-
-    my $requested_id = $self->{CA};
-
-    push @profile_path, "profile";
-
-
-    my $nr_of_profiles = $self->{config}->get_xpath_count(
-        XPATH     => [ @profile_path    ],
-		COUNTER   => [ @profile_counter ],
-        CONFIG_ID => $self->{CONFIG_ID},
-    );
-    my $found = 0;
-  FINDPROFILE:
-    for (my $ii = 0; $ii < $nr_of_profiles; $ii++)
-    {
-        if ($self->{config}->get_xpath(
-            XPATH     => [@profile_path, "id"],
-            COUNTER   => [@profile_counter, $ii, 0],
-            CONFIG_ID => $self->{CONFIG_ID})
-            eq $requested_id)
-        {
-            push @profile_counter, $ii;
-            $found = 1;
-            last FINDPROFILE;
-        }
+    my $config = CTX('config');
+    
+    my $ca_profile_name = $self->{CA};
+    
+    my $path;
+    my $validity;
+    
+    # Check if there is a named profile, otherwise use default
+    if (!$config->get_meta("crl.$ca_profile_name")) {
+        $ca_profile_name = 'default';
     }
     
-    if (! $found) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_UNDEFINED_PROFILE");
-    }
+    $path = "crl.default";    
+   
+    ##! 16: "Using config at $path"; 
+ 
+    $self->{PROFILE}->{DIGEST} = $config->get("$path.digest");
 
-    ## now we have a correct starting point to load the profile
-
-    ## load general parameters
-
-    $self->{PROFILE}->{DIGEST} = $self->{config}->get_xpath(
-        XPATH     => [@profile_path, "digest"],
-        COUNTER   => [@profile_counter, 0],
-        CONFIG_ID => $self->{CONFIG_ID},
-    );
-
-    my %entry_validity = $self->get_entry_validity(
-	{
-	    XPATH     => \@profile_path,
-	    COUNTER   => \@profile_counter,
-        CONFIG_ID => $self->{CONFIG_ID},
-	});
-
-    # Override Profile validity with local setting
+    # use local setting for validity
     if ($self->{VALIDITY}) {
         ##! 16: "Override validity: " . $self->{VALIDITY}
-        $entry_validity{notafter} = $self->{VALIDITY};
+        $validity = $self->{VALIDITY};
+    } else {        
+        $validity = {
+            VALIDITYFORMAT => 'relativedate',
+            VALIDITY       => $config->get("$path.validity"),
+        };        
     }    
 
-    if (! exists $entry_validity{notafter}) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
-	    );
-    }
-
-    # notbefore is not applicable for CRLs (and may lead to incorrect
-    # datetime calculation for relative dates below)
-    if (exists $entry_validity{notbefore}) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_NOTBEFORE_SPECIFIED",
-	    params => $entry_validity{notbefore},
-	    );
-    }
-    
-
+    if (!$validity || !$validity->{VALIDITY}) {
+	   OpenXPKI::Exception->throw (
+	       message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
+	   );
+    } 
+        
     # for error handling
     delete $self->{PROFILE}->{DAYS};
     delete $self->{PROFILE}->{HOURS};
 
     # plain days
-    if ($entry_validity{notafter}->{VALIDITYFORMAT} eq "days") {
-	$self->{PROFILE}->{DAYS}  = $entry_validity{notafter}->{VALIDITY};
-	$self->{PROFILE}->{HOURS} = 0;
+    if ($validity->{VALIDITYFORMAT} eq "days") {
+	   $self->{PROFILE}->{DAYS}  = $validity->{VALIDITY};
+	   $self->{PROFILE}->{HOURS} = 0;
     }
 
     # handle relative date formats ("+0002" for two months)
-    if ($entry_validity{notafter}->{VALIDITYFORMAT} eq "relativedate") {
-	my $notafter = OpenXPKI::DateTime::get_validity(
-	    $entry_validity{notafter});
+    if ($validity->{VALIDITYFORMAT} eq "relativedate") {
+        my $notafter = OpenXPKI::DateTime::get_validity($validity);
 
-	my $hours = sprintf("%d", ($notafter->epoch() - time) / 3600);
-	my $days = sprintf("%d", $hours / 24);
-	$hours = $hours % 24;
+	    my $hours = sprintf("%d", ($notafter->epoch() - time) / 3600);
+	    my $days = sprintf("%d", $hours / 24);
+	   
+        $hours = $hours % 24;
 	
-	$self->{PROFILE}->{DAYS}  = $days;
-	$self->{PROFILE}->{HOURS} = $hours;
+        $self->{PROFILE}->{DAYS}  = $days;
+        $self->{PROFILE}->{HOURS} = $hours;
     }
 
     # only relative dates are allowed for CRLs
     if (! exists $self->{PROFILE}->{DAYS}) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_INVALID_VALIDITY_FORMAT",
-	    params => $entry_validity{notafter},
+        OpenXPKI::Exception->throw (
+	       message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_INVALID_VALIDITY_FORMAT",
+	       params => $validity,
 	    );
     }
 
-    
-
-    ## load extensions
-    #
-    push @profile_path,    'extensions';
-    push @profile_counter, 0;
-    
     # TODO - implement crl_number (but not here ...)
     # possibly:
     # RFC 3280, 5.2.5 - issuing_distributing_point (if someone really
     # needs it ...)
     foreach my $ext (qw( authority_info_access authority_key_identifier issuer_alt_name )) {
         ##! 16: 'load extension ' . $ext
-        $self->load_extension(
-            PATH      => [@profile_path, $ext],
-            COUNTER   => [@profile_counter],
-            # CONFIG_ID => $self->{CONFIG_ID},  # As in Certificate.pm, CONFIG_ID should be pulled from the class properties
-        );
+        $self->load_extension({
+            PATH => $path,
+            EXT  => $ext,            
+        });
     }
 
     ##! 2: Dumper($self->{PROFILE})
@@ -216,6 +155,7 @@ sub get_digest
     my $self = shift;
     return $self->{PROFILE}->{DIGEST};
 }
+ 
 
 # FIXME: this is not really needed, in fact it can damage the initial
 # validity computation

@@ -18,52 +18,24 @@ sub validate {
     ## prepare the environment
     my $context = $wf->context();
     my $api     = CTX('api');
-    my $config  = CTX('xml_config');
+    my $config  = CTX('config');
     my $errors  = $context->param ("__error");
        $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
     return if (not defined $profile);
-
-    ##! 16: 'wf->id(): ' . $wf->id()
-    my $cfg_id = $api->get_config_id({ ID => $wf->id() });
-    ##! 16: 'cfg_id: ' . $cfg_id
-    if (! defined $cfg_id) {
-        # as this is called during creation, the cfg id is not defined
-        # yet, so we use the current one
-        $cfg_id = $api->get_current_config_id();
-    }
-    ##! 16: 'cfg_id: ' . $cfg_id
-
-    ## first calculate the expected index
-    my $realm = $api->get_pki_realm_index({
-        CONFIG_ID => $cfg_id,
-    });
-    my $index = undef;
-    my $count = $config->get_xpath_count (
-        XPATH     => ["pki_realm", "common", "profiles", "endentity", "profile"],
-        COUNTER   => [$realm, 0, 0, 0],
-        CONFIG_ID => $cfg_id,
-    );
-    for (my $i=0; $i <$count; $i++)
-    {
-        my $id = $config->get_xpath (
-            XPATH     => ["pki_realm", "common", "profiles", "endentity", "profile", "id"],
-            COUNTER   => [$realm, 0, 0, 0, $i, 0],
-            CONFIG_ID => $cfg_id,
-        );
-        next if ($id ne $profile);
-        $index = $i;
-    }
-
-    ## the specified profile id has no cert profile
-    if (not defined $index)
+    
+    
+    my @roles = $config->get_list("profile.$profile.role");
+            
+    ## check the cert profile
+    if (!$roles[0])
     {
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_UNSUPPORTED_PROFILE',
                          {PROFILE      => $profile} ];
         $context->param ("__error" => $errors);
 	
-	CTX('log')->log(
+       CTX('log')->log(
 	    MESSAGE => "Unsupported certificate profile '$profile'",
 	    PRIORITY => 'error',
 	    FACILITY => 'system',
@@ -71,45 +43,14 @@ sub validate {
 	
         validation_error ($errors->[scalar @{$errors} -1]);
     }
-
-    ## check the cert profile
-    if (defined $profile_id)
-    {
-        ## compare the calculated and the set cert_profile
-        if ($profile_id ne $index)
-        {
-            ## the stored cert_profile and the needed profile id by the profile mismatch
-            ## this can happen because of wrong code or
-            ## this can happen because of a configuration change
-            ## nevertheless this issue is critical
-            push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_PROFILE_ID_MISMATCH',
-                             {PROFILE      => $profile} ];
-            $context->param ("__error" => $errors);
-
-	    CTX('log')->log(
-		MESSAGE => "Certificate profile id mismatch for profile '$profile'",
-		PRIORITY => 'error',
-		FACILITY => 'system',
-		);
-
-            validation_error ($errors->[scalar @{$errors} -1]);
-        }
-    } else {
-        ## set the cert profile
-        $context->param ("cert_profile_id" => $index);
-    }
+ 
     if (defined $role) {
         ## check that it is an allowed profile for a given role
         ##! 64: 'role: ' . $role
-        ##! 64: 'profile: ' . $role
-        my @possible_profiles = @{
-            CTX('api')->get_possible_profiles_for_role({
-                ROLE => $role,
-                CONFIG_ID => $cfg_id,
-            })
-        };
-        ##! 64: 'possible profiles: ' . Dumper \@possible_profiles
-        if (! grep { $profile eq $_ } @possible_profiles) {
+        ##! 64: 'profile: ' . $profile
+        ##! 64: 'Roles in profile ' . Dumper ( @roles )
+    
+        if (! grep /$role/, @roles ) { 
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERTPROFILE_PROFILE_NOT_VALID_FOR_ROLE',
                 params  => {
@@ -120,6 +61,7 @@ sub validate {
         }
     }
 
+    $context->param ("cert_profile_id" => 1);
     return 1;
 }
 
@@ -149,3 +91,5 @@ for the profile is already set then the index will be verified.
 
 B<NOTE>: If you have no profile id set then we check for the profile and then we
 calculate the profile index from the PKI realm and the profile.
+
+FIXME: As we no longer have profile ids, we just put a 1 for it!

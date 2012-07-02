@@ -291,6 +291,27 @@ use Class::Std;
         return $self;
     }
 
+    sub command {
+        
+        my ( $self, $name ) = @_;        
+        my $client = $self->get_client;
+        my $command = shift;
+        my $params = shift;
+
+        my $msg = $client->send_receive_service_msg( $command , $params );
+
+        $self->set_msg($msg);
+        
+        if ( $self->error ) {
+            $@ = 'Error getting workflow info: ' . Dumper($msg);
+            return sprintf('ERROR %s',$self->error);
+        }
+
+        return $msg->{PARAMS};
+    }
+
+
+
     sub create {
         my ( $self, $wftype, $params ) = @_;
         my $client = $self->get_client;

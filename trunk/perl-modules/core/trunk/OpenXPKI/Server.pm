@@ -379,7 +379,7 @@ sub sig_hup {
     
     CTX('config')->update_head();
     # FIXME - implement
-    CTX('watchdod')->reload();
+    CTX('watchdog')->reload();
     
 }
 

@@ -48,6 +48,7 @@ sub get_config {
         {
             CONFIG => $cfgfile,
             TASKS  => [
+                'config_versioned',
                 'current_xml_config', 'i18n',
                 'dbi_log',            'log',
                 'api',                @additional_tasks,
@@ -60,23 +61,17 @@ sub get_config {
 sub initdb {
     my $args = shift;
 
+
+    my $db_config = CTX('config')->get_hash('system.database.main'); 
     no warnings;
-    my $type = $OpenXPKI::Server::Init::current_xml_config->get_xpath(
-        XPATH   => ['common/database/type'],
-        COUNTER => [0]
-    );
+    my $type = $db_config->{'type'}; 
+
     use warnings;
 
     print STDERR "Database type: $type\n";
 
-    my @databases = qw( log );
-
-    # SQLite needs special treatment: three databases instead of one must
-    # be initialized
-    if ( $type =~ m{ SQLite }xms ) {
-        push @databases, 'workflow', 'backend';
-    }
-
+    my @databases = qw( backend );
+    
   DB:
     foreach my $db (@databases) {
         my $params = {};
@@ -905,6 +900,13 @@ if ( $cmd eq 'initdb' ) {
     );
 }
 
+if ( $cmd eq 'loadcfg' ) {
+    push @options_spec, qw(
+      path=s
+      noload      
+    );
+}
+
 if ( $cmd eq 'deploy' ) {
     push @options_spec, qw(
       prefix=s
@@ -1050,6 +1052,26 @@ if ( defined $params{cfg} ) {
 ###########################################################################
 
 #my $cmd = shift;
+
+if ( $cmd eq 'loadcfg' ) {
+    
+    if ($params{path}) {
+        # we set the ENV as this
+        # a) can split a string
+        # b) otherwise an external set ENV will override the parameter
+        $ENV{OPENXPKI_CONF_PATH} = $params{path};
+    }
+    
+    my $config = OpenXPKI::Config::Merge->new();    
+    printf "Current Tree Version: %s\n", $config->version();
+    
+    if (!$params{noload}) {
+        my $pid = `cat /var/run/openxpkid.pid`;
+        kill HUP => $pid if($pid); 
+    }       
+    exit 0;
+}
+
 
 if ( $cmd eq 'initdb' ) {
     if ( !get_config($configfile) ) {
@@ -2133,6 +2155,7 @@ openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
    initdb                Initialize database
    key                   Manage keys
    certificate           Manage certificates
+   loadcfg               Import updated config from the filesystem      
 
 =head1 ARGUMENTS
 
@@ -2457,6 +2480,20 @@ Specify template directory to use for configuration files.
 Specify template to use during deployment.
 
 =back
+
+=head2 loadcfg
+
+Command options:
+
+   --path DIR    Use specified path for config instead of the default
+   --noload      Do not update the config of the running daemon      
+
+Read the files found at the config directory (defaults to
+[% dir.openxpkiconfdir %]/config.d) and load them into the internal config
+system. If I<noload> is not given, and the openxpki daemon is running, the
+daemon will use the new configuration for all new requests.   
+Note: Even if I<noload> is passed, the config becomes active on the next
+server start!
 
 =head1 DESCRIPTION
 

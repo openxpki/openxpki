@@ -515,10 +515,10 @@ sub __get_extensions
             $config .= "certificatePolicies = $critical\@cert_policies\n";
             $sections .= "\n[ cert_policies ]\n";
             my $i = 0;
-            my @oids = @{ $profile->get_extension('policy_identifier')->[0] };
+            my @oids = @{ $profile->get_extension('policy_identifier') };
             ##! 16: '@oids: ' . Dumper \@oids
             if (scalar @oids) {
-                $sections .= "policyIdentifier = " . $oids[0];
+                $sections .= "policyIdentifier = " . join (", ", @oids);
                 $sections .= "\n";
             }
             my @user_notices;
@@ -609,20 +609,20 @@ sub __get_extensions
             $config .= "hash" if (grep /hash/, @bits);
             $config .= "\n";
         }
-        elsif ($name eq "netscape/ca_cdp")
+        elsif ($name eq "netscape.ca_cdp")
         {
             $config .= "nsCaRevocationUrl = $critical".
-                       join ("", @{$profile->get_extension("netscape/ca_cdp")})."\n";
+                       join ("", @{$profile->get_extension("netscape.ca_cdp")})."\n";
         }
-        elsif ($name eq "netscape/cdp")
+        elsif ($name eq "netscape.cdp")
         {
             $config .= "nsRevocationUrl = $critical".
-                       join ("", @{$profile->get_extension("netscape/cdp")})."\n";
+                       join ("", @{$profile->get_extension("netscape.cdp")})."\n";
         }
-        elsif ($name eq "netscape/certificate_type")
+        elsif ($name eq "netscape.certificate_type")
         {
             $config .= "nsCertType = $critical";
-            my @bits = @{$profile->get_extension("netscape/certificate_type")};
+            my @bits = @{$profile->get_extension("netscape.certificate_type")};
             $config .= "client,"  if (grep /ssl_client/, @bits);
             $config .= "objsign," if (grep /object_signing/, @bits);
             $config .= "email,"   if (grep /smime_client/, @bits);
@@ -632,10 +632,10 @@ sub __get_extensions
             $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
             $config .= "\n";
         }
-        elsif ($name eq "netscape/comment")
+        elsif ($name eq "netscape.comment")
         {
             $config .= "nsComment = $critical\"";
-            my $string =  join ("", @{$profile->get_extension("netscape/comment")});
+            my $string =  join ("", @{$profile->get_extension("netscape.comment")});
 	    # FIXME: this inserts a literal \n - is this intended?
 	    $string =~ s/\n/\\\\n/g;
             $config .= "$string\"\n";

@@ -56,6 +56,7 @@ sub CTX {
     if (! $context->{initialized}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_NOT_INITIALIZED",
+            params => { 'objects' => join ":", @objects },
 	    log => undef, # do not log exception
 	    );
     }

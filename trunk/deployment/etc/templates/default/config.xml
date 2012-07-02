@@ -98,11 +98,6 @@
       [% END %]
       </notification>
 
-      [% IF deployment.xmlstyle == 'multi-file' %]
-      <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="profile.xml"/>
-      [% ELSIF deployment.xmlstyle == 'all-in-one' %]
-        [% INCLUDE profile.xml FILTER indent(6) %]
-      [% END %]
       <!-- LDAP addition  -->
       <!-- WARNING: keep "ldap_enable" set to "no" to avoid surprises  -->      
       [% IF deployment.xmlstyle == 'multi-file' %]

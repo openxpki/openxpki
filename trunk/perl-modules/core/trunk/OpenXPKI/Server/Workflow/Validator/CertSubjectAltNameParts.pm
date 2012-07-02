@@ -267,7 +267,7 @@ sub validate {
     }
     foreach my $san (@{ $styles->{$subj_style}->{SUBJECT_ALTERNATIVE_NAMES} }) {
          if ($san->{KEY}->{TYPE} eq 'fixed') {
-             my $template = '[% TAGS [- -] -%]' . $san->{VALUE}->{TEMPLATE};
+             my $template = $san->{VALUE}->{TEMPLATE};
              my $tt = Template->new();
              my $result = '';
              ##! 64: 'template: ' . $template

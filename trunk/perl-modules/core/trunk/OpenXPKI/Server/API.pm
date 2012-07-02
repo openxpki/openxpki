@@ -474,19 +474,7 @@ sub BUILD {
                 },
             },
         },
-        'get_pki_realm_index' => { # TODO: find out if this is actually used
-                                   # externally or if it is only an internal
-                                   # helper function
-            class  => 'Default',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-            },
-            memoize => 1,
-        },
+        #'get_pki_realm_index' # Removed with profile migration. No occurences found outside.
         'get_roles' => {
             class  => 'Default',
             params => { },

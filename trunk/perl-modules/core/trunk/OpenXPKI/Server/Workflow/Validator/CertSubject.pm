@@ -22,8 +22,6 @@ sub validate {
     return if (not defined $style);
     return if (not defined $subject);
 
-    my $index   = $api->get_pki_realm_index();
-
     ## check correctness of subject
     eval {
         my $object = OpenXPKI::DN->new ($subject);#
@@ -40,36 +38,11 @@ sub validate {
 
         validation_error ($errors->[scalar @{$errors} -1]);
     }
-
-    ## find subject specification
-    my $count = $config->get_xpath_count (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject"],
-                    COUNTER => [$index, 0, 0, 0, $profile_id]);
-    for (my $i=0; $i <$count; $i++)
-    {
-        my $id = $config->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "id"],
-                    COUNTER => [$index, 0, 0, 0, $profile_id, $i, 0]);
-        if ($id eq $style)
-        {
-            $style = $i;
-            last;
-        }
-    }
-    ## $type is now an index
-
-    ## check always block
-    $count = $config->get_xpath_count (
-                 XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
-                 COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0]);
-    for (my $i=0; $i <$count; $i++)
-    {
-        my $regex = $config->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex"],
-                    COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0, $i]);
-        my $label = CTX('xml_config')->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "always", "regex", "label"],
-                    COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0, $i, 0]);
+ 
+    my $always = CTX('config')->get_hash("profile.$profile_id.style.$style.always");
+ 
+    foreach my $label (keys %{$always}) {
+        my $regex = $always->{$label};      
         if (not $subject =~ m{$regex}xs)
         {
             push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_ALWAYS_REGEX',
@@ -79,18 +52,10 @@ sub validate {
         }
     }
 
-    ## check never block
-    $count = CTX('xml_config')->get_xpath_count (
-                 XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
-                 COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0]);
-    for (my $i=0; $i <$count; $i++)
-    {
-        my $regex = CTX('xml_config')->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex"],
-                    COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0, $i]);
-        my $label = CTX('xml_config')->get_xpath (
-                    XPATH   => ["pki_realm", "common", "profiles", "endentity", "profile", "subject", "never", "regex", "label"],
-                    COUNTER => [$index, 0, 0, 0, $profile_id, $style, 0, $i, 0]);
+    my $never = CTX('config')->get_hash("profile.$profile_id.style.$style.never");
+ 
+    foreach my $label (keys %{$never}) {
+        my $regex = $never->{$label};      
         if (not $subject !~ m{$regex}xs)
         {
             push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_SUBJECT_FAILED_NEVER_REGEX',

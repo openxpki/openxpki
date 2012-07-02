@@ -9,6 +9,8 @@ package OpenXPKI::Crypto::Profile::Certificate;
 
 use base qw(OpenXPKI::Crypto::Profile::Base);
 
+use OpenXPKI::Server::Context qw( CTX );
+
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
@@ -104,144 +106,87 @@ sub load_profile
     
     my $cfg_id = $self->{CONFIG_ID};
 
-    ## scan for correct pki realm and ca
-
-    my %result    = $self->get_path($cfg_id);
-    my $pki_realm = $result{PKI_REALM};
-
-    ## scan for correct profile
- 
-    my @profile_path    = ("pki_realm", "common", "profiles");
-    my @profile_counter = ($pki_realm, 0, 0);
-
-    my $requested_id = $self->{ID};
+    my $config = CTX('config');
+    
+    my $profile_name = $self->{ID};
 
     if ($self->{TYPE} eq "SELFSIGNEDCA")
     {
-        push @profile_path, "selfsignedca";
-        push @profile_counter, 0;
+        # FIXME - check if required and implement if necessary
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_MIGRATION_FEATURE_INCOMPLETE"
+        );    	
+    }  
 
-	$requested_id = $self->{CA};
-    } else {
-        push @profile_path, "endentity";
-        push @profile_counter, 0;
-    };
-
-    push @profile_path, "profile";
-
-    my $nr_of_profiles = $self->{config}->get_xpath_count(
-            XPATH     => [@profile_path],
-			COUNTER   => [@profile_counter],
-            CONFIG_ID => $cfg_id,
-    );
-    my $found = 0;
-  FINDPROFILE:
-    for (my $ii = 0; $ii < $nr_of_profiles; $ii++)
-    {
-        if ($self->{config}->get_xpath(
-            XPATH   => [@profile_path, "id"],
-            COUNTER => [@profile_counter, $ii, 0],
-            CONFIG_ID => $cfg_id)
-            eq $requested_id)
-        {
-            push @profile_counter, $ii;
-            $found = 1;
-            last FINDPROFILE;
-        }
-    }
-    
-    if (! $found) {
+    if (!$config->get_meta("profile.$profile_name")) {       
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_UNDEFINED_PROFILE");
     }
 
-    ## now we have a correct starting point to load the profile
-
-    ## load general parameters
-
-
-    $self->{PROFILE}->{DIGEST} = $self->{config}->get_xpath (
-         XPATH     => [@profile_path, "digest"],
-         COUNTER   => [@profile_counter, 0],
-         CONFIG_ID => $cfg_id,
-    );
-
-
-    ###########################################################################
-    # determine settings for randomization of serial numbers
-    eval {
-        $self->{PROFILE}->{INCREASING_SERIALS} = $self->{config}->get_xpath (
-             XPATH     => [@profile_path, "increasing_serials"],
-             COUNTER   => [@profile_counter, 0],
-             CONFIG_ID => $cfg_id,
-        );
-        ##! 16: 'increasing serials: ' . $self->{PROFILE}->{INCREASING_SERIALS}
+    # Init defaults
+    $self->{PROFILE} = {
+        DIGEST => 'sha1',
+        INCREASING_SERIALS => 1,
+        RANDOMIZED_SERIAL_BYTES => 8, 
     };
-    if (! defined $self->{PROFILE}->{INCREASING_SERIALS}) {
-        # the default is to have increasing serials
-        $self->{PROFILE}->{INCREASING_SERIALS} = 1;
+    
+    ## check if those are overriden in config
+    foreach my $key (keys %{$self->{PROFILE}} ) {
+        my $value = $config->get("profile.$profile_name.".lc($key));
+        if ($value) {
+            $self->{PROFILE}->{$key} = $value;
+            ##! 16: "Override $key from profile with $value" 
+        }        
     }
-    eval {
-        $self->{PROFILE}->{RANDOMIZED_SERIAL_BYTES} = $self->{config}->get_xpath (
-             XPATH     => [@profile_path, "randomized_serial_bytes"],
-             COUNTER   => [@profile_counter, 0],
-             CONFIG_ID => $cfg_id,
-        );
-        ##! 16: 'randomized serial bytes: ' . $self->{PROFILE}->{RANDOMIZED_SERIAL_BYTES}
-    };
-    if (! defined $self->{PROFILE}->{RANDOMIZED_SERIAL_BYTES}) {
-        # default is 8 bytes
-        $self->{PROFILE}->{RANDOMIZED_SERIAL_BYTES} = 8;
-    }
-
+    
     ###########################################################################
     # determine certificate validity
 
-    my %entry_validity = $self->get_entry_validity(
-	{
-	    XPATH     => \@profile_path,
-	    COUNTER   => \@profile_counter,
-        CONFIG_ID => $cfg_id,
-	});
-
-    if (! exists $entry_validity{notafter}) {
+     
+    my $notbefore = $config->get("profile.$profile_name.validity.notbefore");
+    if ($notbefore) {              
+        $self->{PROFILE}->{NOTBEFORE} = OpenXPKI::DateTime::get_validity({
+            VALIDITYFORMAT => 'detect',
+            VALIDITY       => $notbefore,
+        });
+    } else {
+        $self->{PROFILE}->{NOTBEFORE} = DateTime->now( time_zone => 'UTC' );
+    }
+ 
+    my $notafter = $config->get("profile.$profile_name.validity.notafter");
+    if (! $notafter) {
 	OpenXPKI::Exception->throw (
 	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
 	    );
-	
     }
 
-    if (! exists $entry_validity{notbefore}) {
-	# assign default (current timestamp) if notbefore is not specified
-	$self->{PROFILE}->{NOTBEFORE} = DateTime->now( time_zone => 'UTC' );
+    if (OpenXPKI::DateTime::is_relative($notafter)) {
+        # relative notafter is always relative to notbefore        
+        $self->{PROFILE}->{NOTAFTER} = OpenXPKI::DateTime::get_validity({
+            REFERENCEDATE => $self->{PROFILE}->{NOTBEFORE},
+            VALIDITYFORMAT => 'relativedate',
+            VALIDITY       => $notafter,
+        });
     } else {
-	$self->{PROFILE}->{NOTBEFORE} = OpenXPKI::DateTime::get_validity(
-	    $entry_validity{notbefore});
+        $self->{PROFILE}->{NOTAFTER} = OpenXPKI::DateTime::get_validity({            
+            VALIDITYFORMAT => 'absolutedate',
+            VALIDITY       => $notafter,
+        });
     }
-
-    # relative notafter is always relative to notbefore
-    $entry_validity{notafter}->{REFERENCEDATE} = $self->{PROFILE}->{NOTBEFORE};
-    $self->{PROFILE}->{NOTAFTER} = OpenXPKI::DateTime::get_validity(
-        $entry_validity{notafter},
-	);
-
     
     ## load extensions
-
-    push @profile_path, "extensions";
-    push @profile_counter, 0;
 
     foreach my $ext ("basic_constraints", "key_usage", "extended_key_usage",
                      "subject_key_identifier", "authority_key_identifier",
                      "issuer_alt_name", "crl_distribution_points", "authority_info_access",
                      "user_notice", "policy_identifier", "oid",
-                     "netscape/comment", "netscape/certificate_type", "netscape/cdp")
+                     "netscape.comment", "netscape.certificate_type", "netscape.cdp")
     {
-        $self->load_extension(
-            PATH    => [@profile_path, $ext],
-            COUNTER => [@profile_counter],
-            # CONFIG_ID => $cfg_id, # As writen above, CONFIG_ID should be pulled from the class properties
-        );
+        ##! 16: "Load extension $profile_name, $ext" 
+        $self->load_extension({
+            PATH => "profile.$profile_name",
+            EXT => $ext,            
+        });
     }
 
     ##! 2: Dumper($self->{PROFILE})

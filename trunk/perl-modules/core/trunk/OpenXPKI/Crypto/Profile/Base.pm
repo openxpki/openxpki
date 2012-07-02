@@ -19,222 +19,118 @@ use Data::Dumper;
 
 # use Smart::Comments;
 
-sub get_path
-{
-    my $self      = shift;
-    my $config_id = shift;
-
-    ## scan for correct pki realm
-
-    my $pki_realm = $self->{config}->get_xpath_count(
-        XPATH => "pki_realm",
-        CONFIG_ID => $config_id,
-    );
-    for (my $i=0; $i < $pki_realm; $i++)
-    {
-        if ($self->{config}->get_xpath (XPATH   => ["pki_realm", "name"],
-                                        COUNTER => [$i, 0],
-                                        CONFIG_ID => $config_id,
-                                       )
-              eq $self->{PKI_REALM})
-        {
-            $pki_realm = $i;
-        } else {
-            if ($pki_realm == $i+1)
-            {
-                OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_GET_PATH_WRONG_PKI_REALM");
-            }
-        }
-    }
-
-    ## scan for correct ca
- 
-    my $ca = $self->{config}->get_xpath_count (
-        XPATH   => ["pki_realm", "ca"],
-        COUNTER => [$pki_realm],
-        CONFIG_ID => $config_id,
-    );
-    for (my $i=0; $i < $ca; $i++)
-    {
-        if ($self->{config}->get_xpath (XPATH   => ["pki_realm", "ca", "id"],
-                                        COUNTER => [$pki_realm, $i, 0],
-                                        CONFIG_ID => $config_id,
-                                       )
-              eq $self->{CA})
-        {
-            $ca = $i;
-        } else {
-            if ($ca == $i+1)
-            {
-                OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_GET_PATH_WRONG_CA");
-            }
-        }
-    }
-
-    ## return result
-    return (PKI_REALM => $pki_realm, CA => $ca);
-}
-
 sub load_extension
 {
     ##! 1: 'start'
-    my $self    = shift;
-    my $keys    = { @_ };
-    my @path    = @{$keys->{PATH}};
-    my @counter = @{$keys->{COUNTER}};
+    my $self  = shift;
+    my $args  = shift;
+    my $profile_path = $args->{PATH};    
+    my $ext = $args->{EXT};
     my @values  = ();
     
+    ##! 32: Dumper ( $args )
+    
+    my $config = CTX('config');
+           
     # Always pull CONFIG_ID from class
     #my $cfg_id  = $keys->{CONFIG_ID};
     my $cfg_id  = $self->{CONFIG_ID};
     
-    ##! 4: 'path: ' . Dumper \@path
-    ##! 4: 'counter: ' . Dumper \@counter
-    ##! 4: 'cfg_id: ' . $cfg_id
+    ##! 4: "Profile: $profile_path, Extension: $ext"
+    my $path = "$profile_path.extensions.$ext";
+    
+    ##! 16: 'path: ' . $path
 
+    my $ext_type = $config->get_meta($path);
     ## is the extension used at all?
-
-    ##! 16: 'check whether extension is present in config'
-    my $scan = eval {
-        $self->{config}->get_xpath_count(
-            XPATH     => [@path],
-            COUNTER   => [@counter],
-            CONFIG_ID => $cfg_id,
-        );
-    };
-    ##! 16: 'EVAL_ERROR: ' . $EVAL_ERROR
-    ##! 16: 'scan' . $scan
-    return 0 if ($EVAL_ERROR or not $scan);
-    ##! 16: 'extension is present in config'
+    if (!$ext_type) {
+        ##! 16: "Extension $ext is not used"        
+        return 0;
+    }
 
     ## is this a critical extension?
 
-    my $critical;
-    eval {
-	$critical = $self->{config}->get_xpath (
-	    XPATH     => [@path, "critical"],
-	    COUNTER   => [@counter, 0, 0],
-	    CONFIG_ID => $cfg_id);
-    };
-    if (! defined $critical) {
-	$critical = 'false';
-	# FIXME: should we generate a warning here that no criticality is
-	# defined?
+    my $critical = $config->get("$path.critical");
+    
+    if ($critical) {
+        $critical = 'true';
+    } else {
+        # FIXME: No flag in OID
+        if (! defined $critical) {
+            CTX('log')->log(
+                MESSAGE  => "Critical flag is not set for $ext in profile $profile_path!",
+                PRIORITY => 'warn',
+                FACILITY => 'system',
+            );
+        }
+        $critical = 'false';
     }
     
-    if ($path[$#path] eq "basic_constraints")
+    if ($ext eq "basic_constraints")
     {
-        $values[0] = ["CA",
-                      $self->{config}->get_xpath (XPATH   => [@path, "ca"],
-                                                  COUNTER => [@counter, 0, 0],
-                                                  CONFIG_ID => $cfg_id)];
-        my $path_length;
-        eval {
-            $path_length = $self->{config}->get_xpath(
-                XPATH   => [@path, "path_length"],
-                COUNTER => [@counter, 0, 0],
-                CONFIG_ID => $cfg_id
-            );
-        }; 
+        $values[0] = ["CA", ($config->get("$path.ca") || 0) ];
+        my $path_length = $config->get("$path.path_length");
         if (defined $path_length) 
         {
-            $values[1] = ["PATH_LENGTH",
-                          $self->{config}->get_xpath (XPATH   => [@path, "path_length"],
-                                                      COUNTER => [@counter, 0, 0],
-                                                      CONFIG_ID => $cfg_id)];
+            $values[1] = ["PATH_LENGTH", $path_length];
         }
         $self->set_extension (NAME     => "basic_constraints",
                               CRITICAL => $critical,
                               VALUES   => [@values]);
     }
-    elsif ($path[$#path] eq "key_usage")
+    elsif ($ext eq "key_usage")
     {
         my @bits = ( "digital_signature", "non_repudiation", "key_encipherment",
                      "data_encipherment", "key_agreement", "key_cert_sign",
                      "crl_sign", "encipher_only", "decipher_only" );
-        for (my $i=0; $i < scalar @bits; $i++)
-        {
-            my $bit = $self->{config}->get_xpath (XPATH   => [@path, $bits[$i]],
-                                                  COUNTER => [@counter, 0, 0],
-                                                  CONFIG_ID => $cfg_id);
-            $bit =~ s/\s+//g;
-            $bit = "1" if ($bit eq "true");
-            $bit = "0" if ($bit eq "false");
-            push @values, $bits[$i] if ($bit);
-        }
+                     
+        foreach my $bit (@bits) {
+            push @values, $bit if ($config->get("$path.$bit"));    
+        }                     
+                              
         $self->set_extension (NAME     => "key_usage",
                               CRITICAL => $critical,
                               VALUES   => [@values]);
     }
-    elsif ($path[$#path] eq "extended_key_usage")
+    elsif ($ext eq "extended_key_usage")
     {
+        my $bits_set = $config->get_hash("$path");
+        ##! 16: "ext key usage bits: ". Dumper $bits_set
         my @bits = ( "client_auth", "email_protection" );
-        for (my $i=0; $i < scalar @bits; $i++)
-        {
-            my $config_value;
-            eval {
-               $config_value
-                    = $self->{config}->get_xpath (XPATH   => [@path, $bits[$i]],
-                                                  COUNTER => [@counter, 0, 0],
-                                                  CONFIG_ID => $cfg_id);
-            };
-            if (defined $config_value &&
-                   ($config_value eq 'true' || $config_value eq '1')) {
-                push @values, $bits[$i];
+        foreach my $bit (@bits) {
+            push @values, $bit if ( $bits_set->{$bit} );    
+        }
+         
+        # check keys of hash for numeric oids
+        foreach my $oid (keys %{$bits_set}) {
+            if ($oid =~ /^\d+(\.\d+)+$/) {
+                push @values, $oid;    
             }
-        }
-	my $oid_count = 0;
-	eval {
-	    $oid_count 
-		= $self->{config}->get_xpath_count (XPATH   => [@path, "oid"],
-						    COUNTER => [@counter, 0],
-                            CONFIG_ID => $cfg_id);
-	};
-        if ($oid_count > 0)
-        {
-            push @values, @{$self->{config}->get_xpath_list (XPATH   => [@path, "oid"],
-                                                             COUNTER => [@counter, 0],
-                                                             CONFIG_ID => $cfg_id)};
-        }
-	if (scalar @values)
+        }          
+    	            
+        if (scalar @values)
         {
             $self->set_extension (NAME     => "extended_key_usage",
                                   CRITICAL => $critical,
                                   VALUES   => [@values]);
         }
     }
-    elsif ($path[$#path] eq "subject_key_identifier")
-    {
-        my $hash = $self->{config}->get_xpath (XPATH   => [@path, "hash"],
-                                               COUNTER => [@counter, 0, 0],
-                                               CONFIG_ID => $cfg_id);
-        $hash = "1" if ($hash eq "true");
-        $hash = "0" if ($hash eq "false");
-        if ($hash)
+    elsif ($ext eq "subject_key_identifier")
+    {        
+        if ($config->get("$path.hash"))
         {
             $self->set_extension (NAME     => "subject_key_identifier",
                                   CRITICAL => $critical,
                                   VALUES   => ["hash"]);
         }
     }
-    elsif ($path[$#path] eq "authority_key_identifier")
+    elsif ($ext eq "authority_key_identifier")
     {
-        my $keyid = $self->{config}->get_xpath (XPATH   => [@path, "keyid"],
-                                                COUNTER => [@counter, 0, 0],
-                                                CONFIG_ID => $cfg_id);
-        $keyid = "1" if ($keyid eq "true");
-        $keyid = "0" if ($keyid eq "false");
-        push @values, "keyid" if ($keyid);
-
-        my $issuer = $self->{config}->get_xpath (XPATH   => [@path, "issuer"],
-                                              COUNTER => [@counter, 0, 0],
-                                              CONFIG_ID => $cfg_id);
-        $issuer = "1" if ($issuer eq "true");
-        $issuer = "0" if ($issuer eq "false");
-        push @values, "issuer" if ($issuer);
-
+        
+        my @bits = ( "keyid", "issuer" );
+        foreach my $bit (@bits) {
+            push @values, $bit if (  $config->get("$path.$bit") );    
+        } 
         if (scalar @values)
         {
             $self->set_extension (NAME     => "authority_key_identifier",
@@ -242,36 +138,28 @@ sub load_extension
                                   VALUES   => [@values]);
         }
     }
-    elsif ($path[$#path] eq "issuer_alt_name")
-    {
-        my $copy = $self->{config}->get_xpath (XPATH   => [@path, "copy"],
-                                               COUNTER => [@counter, 0, 0],
-                                               CONFIG_ID => $cfg_id);
-        $copy = "1" if ($copy eq "true");
-        $copy = "0" if ($copy eq "false");
-        if ($copy)
+    elsif ($ext eq "issuer_alt_name")
+    {        
+        if ($config->get("$path.copy") )
         {
             $self->set_extension (NAME     => "issuer_alt_name",
                                   CRITICAL => $critical,
                                   VALUES   => ["copy"]);
         }
     }
-    elsif ($path[$#path] eq "crl_distribution_points")
+    elsif ($ext eq "crl_distribution_points")
     {
-        my $count = 0;
-        eval {
-            $count = $self->{config}->get_xpath_count (XPATH   => [@path, "uri"],
-                                              COUNTER => [@counter, 0],
-                                              CONFIG_ID => $cfg_id);
-        };
-        if ($count) {
-            push @values, @{$self->{config}->get_xpath_list (XPATH   => [@path, "uri"],
-                                                             COUNTER => [@counter, 0],
-                                                             CONFIG_ID => $cfg_id)};
+        
+        my @uri;
+        my $meta = $config->get_meta("$path.uri");
+        if ($meta && $meta->{TYPE} eq 'list') {                
+            @uri = $config->get_list("$path.uri");
+        } else {
+            @uri = ( $config->get("$path.uri") );
         }
-               
+        
         # Parse using Template Toolkit 
-        @values = @{ $self->process_templates(\@values) };
+        @values = @{ $self->process_templates(\@uri) };
         
         if (scalar @values)
         {
@@ -280,43 +168,27 @@ sub load_extension
                                   VALUES   => [@values]);
         }
     }
-    elsif ($path[$#path] eq "authority_info_access")
+    elsif ($ext eq "authority_info_access")
     {
-    	my $ca_issuer_count = 0;
-    	eval {
-    	    $ca_issuer_count
-    		= $self->{config}->get_xpath_count (XPATH   => [@path, "ca_issuers"],
-    						    COUNTER => [@counter, 0],
-                                CONFIG_ID => $cfg_id);
-    	};
-        if ($ca_issuer_count > 0) {
-            
-            my $ca_issuer_list = $self->{config}->get_xpath_list (
-                               XPATH   => [@path, "ca_issuers"],
-                               COUNTER => [@counter, 0],
-                               CONFIG_ID => $cfg_id);
-            
+        
+        my @bits = ( "keyid", "issuer" );
+        foreach my $bit (qw(ca_issuers ocsp)) {
+        
+            my @template_list; 
+            my $meta = $config->get_meta("$path.$bit");
+            if ($meta && $meta->{TYPE} eq 'list') {
+                @template_list = $config->get_list("$path.$bit");
+            } else {
+                my $template = $config->get("$path.$bit");
+                push @template_list, $template if ($template);
+            }
+                     
             # Parse using Template Toolkit and push result 
-            push @values, ["CA_ISSUERS", $self->process_templates( $ca_issuer_list ) ];                               
+            if (scalar @template_list) {
+                push @values, [uc($bit), $self->process_templates( \@template_list ) ];
+            }                               
         }
-
-    	my $ocsp_count = 0;
-    	eval {
-    	    $ocsp_count 
-    		= $self->{config}->get_xpath_count (XPATH   => [@path, "ocsp"],
-    						    COUNTER => [@counter, 0],
-                                CONFIG_ID => $cfg_id);
-    	};
-    	if ($ocsp_count > 0) {
-    	    my $ocsp_list = $self->{config}->get_xpath_list (
-    			       XPATH   => [@path, "ocsp"],
-    			       COUNTER => [@counter, 0],
-                       CONFIG_ID => $cfg_id);
-                       
-            # Parse using Template Toolkit and push result 
-            push @values, ["OCSP", $self->process_templates( $ocsp_list ) ];   
-    	}    
-    
+ 
     	if (scalar @values)
     	{
             $self->set_extension (NAME     => "authority_info_access",
@@ -324,25 +196,26 @@ sub load_extension
                                   VALUES   => [@values]);
         }
     }
-    elsif ($path[$#path] eq "user_notice")
+    elsif ($ext eq "user_notice")
     {
-        push @values,  $self->{config}->get_xpath (XPATH   => [@path],
-                                                   COUNTER => [@counter, 0],
-                                                   CONFIG_ID => $cfg_id);
-        $self->set_extension (NAME     => "user_notice",
+        my $meta = $config->get_meta("$path");
+        if ($meta && $meta->{TYPE} eq 'list') {
+            @values = $config->get_list("$path");
+        } else {
+            @values = ( $config->get("$path") );
+        }
+        
+        if (scalar @values) {
+            $self->set_extension (NAME     => "user_notice",
                               CRITICAL => $critical,
                               VALUES   => [@values]);
-    }
-    elsif ($path[$#path] eq "policy_identifier")
-    {
-        if ($self->{config}->get_xpath_count (XPATH   => [@path, "oid"],
-                                              COUNTER => [@counter, 0],
-                                              CONFIG_ID => $cfg_id))
-        {
-            push @values, $self->{config}->get_xpath_list (XPATH   => [@path, "oid"],
-                                                           COUNTER => [@counter, 0],
-                                                           CONFIG_ID => $cfg_id);
         }
+                              
+    }
+    elsif ($ext eq "policy_identifier")
+    {
+        
+        @values = $config->get_scalar_as_list("$path.oid");                        
         if (scalar @values)
         {
             $self->set_extension (NAME     => "policy_identifier",
@@ -350,16 +223,15 @@ sub load_extension
                                   VALUES   => [@values]);
         }
     }
-    elsif ($path[$#path] eq "cps")
-    {
-        if ($self->{config}->get_xpath_count (XPATH   => [@path, "uri"],
-                                              COUNTER => [@counter, 0],
-                                              CONFIG_ID => $cfg_id))
-        {
-            push @values, $self->{config}->get_xpath_list (XPATH   => [@path, "uri"],
-                                                 COUNTER => [@counter, 0],
-                                                 CONFIG_ID => $cfg_id);
+    elsif ($ext eq "cps")
+    {        
+        my $meta = $config->get_meta("$path.uri");
+        if ($meta && $meta->{TYPE} eq 'list') {
+            @values = $config->get_list("$path.uri");
+        } else {
+            @values = ( $config->get("$path.uri") );
         }
+
         if (scalar @values)
         {
             $self->set_extension (NAME     => "cps",
@@ -367,80 +239,69 @@ sub load_extension
                                   VALUES   => [@values]);
         }
     }
-    elsif ($path[$#path] eq "oid")
+    elsif ($ext eq "oid")
     {
-        my $count = $self->{config}->get_xpath_count (XPATH   => [@path],
-                                                      COUNTER => [@counter],
-                                                      CONFIG_ID => $cfg_id);
-        for (my $i=0; $i<$count; $i++)
-        {
-            my $oid = $self->{config}->get_xpath (XPATH   => [@path, "numeric"],
-                                                  COUNTER => [@counter, $i, 0],
-                                                  CONFIG_ID => $cfg_id);
-            $values[0] = ["FORMAT",
-                          $self->{config}->get_xpath (XPATH   => [@path, "format"],
-                                                      COUNTER => [@counter, $i, 0],
-                                                      CONFIG_ID => $cfg_id)];
-            $values[1] = ["ENCODING",
-                          $self->{config}->get_xpath (XPATH   => [@path, "encoding"],
-                                                      COUNTER => [@counter, $i, 0],
-                                                      CONFIG_ID => $cfg_id)];
-            $values[2] = ["CONTENT",
-                          $self->{config}->get_xpath (XPATH   => [@path],
-                                                      COUNTER => [@counter, $i],
-                                                      CONFIG_ID => $cfg_id)];
+            
+        # The numeric value is used as key, the content is a hash below
+        my @oids = $config->get_keys("$path");    
+
+        foreach my $oid (@oids) { 
+            $values[0] = ["FORMAT", $config->get("$path.$oid.format") ];
+            $values[1] = ["ENCODING", $config->get("$path.$oid.encoding") ];
+            $values[2] = ["CONTENT", $config->get("$path.$oid.value") ];
             $self->set_extension (NAME     => $oid,
-                                  CRITICAL => $critical,
+                                  CRITICAL => $config->get("$path.$oid.critical") ? 'true' : 'false',
                                   VALUES   => [@values]);
         }
     }
-    elsif ($path[$#path] eq "netscape/comment")
+    elsif ($ext eq "netscape.comment")
     {
-        push @values, $self->{config}->get_xpath (XPATH   => [@path],
-                                                   COUNTER => [@counter, 0],
-                                                  CONFIG_ID => $cfg_id);
-        $self->set_extension (NAME     => "netscape/comment",
+        my $comment = $config->get("$path.text");
+        if ($comment) 
+        { 
+            $self->set_extension (NAME     => "netscape.comment",
                               CRITICAL => $critical,
-                              VALUES   => [@values]);
+                              VALUES   => [ $comment ]);
+        }
     }
-    elsif ($path[$#path] eq "netscape/certificate_type")
+    elsif ($ext eq "netscape.certificate_type")
     {
         my @bits = ( "ssl_client", "smime_client", "object_signing",
-                     "ssl_ca", "smime_ca", "object_signing_ca" );
-        for (my $i=0; $i < scalar @bits; $i++)
-        {
-            my $bit = $self->{config}->get_xpath (XPATH   => [@path, $bits[$i]],
-                                                  COUNTER => [@counter, 0, 0],
-                                                  CONFIG_ID => $cfg_id);
-            $bit = "1" if ($bit eq "true");
-            $bit = "0" if ($bit eq "false");
-            push @values, $bits[$i] if ($bit);
-        }
-        $self->set_extension (NAME     => "netscape/certificate_type",
-                              CRITICAL => $critical,
-                              VALUES   => [@values]);
-    }
-    elsif ($path[$#path] eq "netscape/cdp")
-    {
-        my $cdp = $self->{config}->get_xpath (XPATH   => [@path, "url"],
-                                              COUNTER => [@counter, 0, 0],
-                                              CONFIG_ID => $cfg_id);
-        $self->set_extension (NAME     => "netscape/cdp",
-                              CRITICAL => $critical,
-                              VALUES   => [$cdp]);
+                     "ssl_client_ca", "smime_client_ca", "object_signing_ca" );
+ 
+        foreach my $bit (@bits) {
+            push @values, $bit if (  $config->get("$path.$bit") );    
+        }                      
 
-        $cdp = $self->{config}->get_xpath (XPATH   => [@path, "ca_url"],
-                                           COUNTER => [@counter, 0, 0],
-                                           CONFIG_ID => $cfg_id);
-        $self->set_extension (NAME     => "netscape/ca_cdp",
+        if (scalar @values) {
+            $self->set_extension (NAME     => "netscape.certificate_type",
+              CRITICAL => $critical,
+              VALUES   => [@values]);
+        }
+                              
+    }
+    elsif ($ext eq "netscape.cdp")
+    {
+        
+        my $cdp = $config->get("$path.uri");
+        if ($cdp) {            
+            $self->set_extension (NAME     => "netscape.cdp",
+                  CRITICAL => $critical,
+                  VALUES   => [$cdp]);
+        }
+
+        my $ca_cdp = $config->get("$path.ca_uri");
+        if ($ca_cdp) {
+            $self->set_extension (NAME     => "netscape.ca_cdp",
                               CRITICAL => $critical,
-                              VALUES   => [$cdp]);
+                              VALUES   => [$ca_cdp]);
+        }
     }
     else
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_EXTENSION_UNKNOWN_NAME",
-            params  => {NAME => $path[$#path]});
+            params  => {NAME => $ext, PATH => $path});
     }
 
     return 1;
@@ -486,7 +347,7 @@ sub set_extension
     
     ##! 16: 'name: ' . $name
     ##! 16: 'critical: ' . $critical
-    ##! 16: 'value: ' . $value
+    ##! 16: 'value: ' . Dumper ( $value )
 
     $critical = 0 if ($critical eq "false");
     $critical = 1 if ($critical eq "true");
@@ -561,98 +422,13 @@ sub get_serial
 sub get_oid_extensions
 {
     my $self = shift;
-    return grep /\./, keys %{$self->{PROFILE}->{EXTENSIONS}};
+    return grep /\d+\./, keys %{$self->{PROFILE}->{EXTENSIONS}};
 }
 
 sub get_named_extensions
 {
     my $self = shift;
-    return grep /^[^.]+$/, keys %{$self->{PROFILE}->{EXTENSIONS}};
-}
-
-
-sub get_entry_validity {
-    my $self = shift;
-    my $params = shift;
-
-    if ((! exists $params->{XPATH}) || (ref $params->{XPATH} ne "ARRAY")) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_GET_ENTRY_VALIDITY_MISSING_PARAMETER",
-	    params  => {
-		PARAMETER => 'XPATH',
-	    });
-    }
-
-    if ((! exists $params->{COUNTER}) || (ref $params->{COUNTER} ne "ARRAY")) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_GET_ENTRY_VALIDITY_MISSING_PARAMETER",
-	    params  => {
-		PARAMETER => 'COUNTER',
-	    });
-    }
-
-    if (! exists $params->{CONFIG_ID}) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_GET_ENTRY_VALIDITY_MISSING_PARAMETER",
-	    params  => {
-		PARAMETER => 'CONFIG_ID',
-	    });
-    }
-    
-    my %entry_validity = ();
-
-    foreach my $validitytype (qw( notbefore notafter )) {
-	
-	# parse validity entry
-	### $validitytype
-	my $validity;
-	my $format;
-	eval {
-	    $format = $self->{config}->get_xpath(
-            XPATH     => [ @{$params->{XPATH}},   'validity', $validitytype, 'format' ],
-            COUNTER   => [ @{$params->{COUNTER}}, 0,          0,             0 ],
-            CONFIG_ID => $params->{CONFIG_ID},
-		);
-	    
-	    ### $format
-	    $validity = $self->{config}->get_xpath(
-            XPATH     => [ @{$params->{XPATH}},   'validity', $validitytype ],
-            COUNTER   => [ @{$params->{COUNTER}}, 0,          0 ],
-            CONFIG_ID => $params->{CONFIG_ID},
-		);
-	    ### $validity
-	    
-	};
-	if (my $exc = OpenXPKI::Exception->caught()) {
-	    # ignore exception for missing 'notbefore' entry
-	    if (($exc->message() 
-		 eq "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT")
-		&& ($validitytype eq "notbefore")) {
-		# default: "now"
-		$validity = undef;
-	    }
-	    else
-	    {
-		$exc->rethrow();
-	    }
-	} elsif ($EVAL_ERROR && (ref $EVAL_ERROR)) {
-	    $EVAL_ERROR->rethrow();
-	}
-	
-	### got format: $format
-	### got validity: $validity
-	
-	if ((defined $format) &&
-	    (defined $validity)) {
-	    $entry_validity{$validitytype} = {
-		VALIDITYFORMAT => $format,
-		VALIDITY       => $validity,
-	    };
-	}
-	
-    }
-    
-    return %entry_validity;
+    return grep /[^(\d+\.)]/, keys %{$self->{PROFILE}->{EXTENSIONS}};
 }
 
 
@@ -684,10 +460,12 @@ sub process_templates {
     while (my $template = shift @$values) {  
         if ($template =~ /\[.+\]/) {
             my $output;
-            $template = '[% TAGS [- -] -%]' .  $template;
+            #$template = '[% TAGS [- -] -%]' .  $template;
             $tt->process(\$template, \%template_vars, \$output);                    
             ##! 32: ' Tags found - ' . $template . ' -> '. $output
-            push @newvalues, $output;                                                         
+            if($output) {
+                push @newvalues, $output;
+            }                                                         
         } else {
             push @newvalues, $template;
         }                
@@ -696,7 +474,6 @@ sub process_templates {
     ##! 64: ' Processed CRL DP ' . Dumper ( @newvalues )        
     return \@newvalues;
 }
- 
 
 our $AUTOLOAD;
 sub AUTOLOAD {
@@ -740,3 +517,22 @@ Therefore you need to write e.g. ISSUER.OU.0 for the (first) OU entry. Its wise
 to do urlescaping on the output, e.g. [- ISSUER.OU.0 | uri -].
 
 =back
+
+=head2 load_extension
+
+Load data from the extensions section
+
+=head3 named parameters
+
+=item * PROFILE (certificates only)
+
+Name of the profile to get the extension from.
+
+=item * CA (crl only)
+
+Name of the CA to get the extension from.
+
+=item * EXT
+
+Name of the extension to load.
+

@@ -231,7 +231,7 @@
     }
     foreach my $san (@sans) {
         if ($san->{KEY}->{TYPE} eq 'fixed') {
-            my $template = '[% TAGS [- -] -%]' . $san->{VALUE}->{TEMPLATE};
+            my $template = $san->{VALUE}->{TEMPLATE};
             my $tt = Template->new();
             my $result = '';
             $tt->process(\$template, $template_vars, \$result);

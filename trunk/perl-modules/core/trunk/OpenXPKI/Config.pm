@@ -63,7 +63,7 @@ before '_route_call' => sub {
     my $self = shift;
     my $call = shift;
     my $location = shift;
-
+    
     ##! 16: "_route_call interception on $location "            
     # system is global and never has a prefix or version
     if ( substr ($location, 0, 6) eq 'system' ) {
@@ -73,7 +73,8 @@ before '_route_call' => sub {
     } else {
         my $session = CTX('session');
         my $cfg_ver = $session->get_config_version();
-        ##! 16: "_route_call: set config version to " . $cfg_ver         
+        ##! 16: "_route_call: set config version to " . $cfg_ver
+        $cfg_ver = $self->_head_version() unless($cfg_ver);         
         $self->_config()->{''}->version( $cfg_ver );
             
         my $pki_realm = $session->get_pki_realm();            

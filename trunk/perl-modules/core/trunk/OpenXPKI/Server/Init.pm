@@ -146,7 +146,7 @@ sub init {
 		    PRIORITY => "fatal",
 		    FACILITY => "system",
 		});
-
+print "Exception during initialization task '$task': " . $msg;
 	    $exc->rethrow();
 	}
 	elsif ($EVAL_ERROR)
@@ -256,10 +256,10 @@ sub __do_init_current_xml_config {
 
 sub __do_init_config_versioned {
     ##! 1: "init OpenXPKI config"
-    my $config = OpenXPKI::Config->new();
+    my $xml_config = OpenXPKI::Config->new();
     OpenXPKI::Server::Context::setcontext(
 	{
-	    config => $config,
+	    config => $xml_config,
 	});
     return 1;
 }
@@ -348,33 +348,33 @@ sub __do_init_pki_realm_by_cfg {
     ##! 1: 'init pki_realm_by_cfg'
     CTX('dbi_backend')->connect();
     CTX('dbi_backend')->commit();
-    my $config_ids = CTX('api')->list_config_ids();
+    my $xml_config_ids = CTX('api')->list_config_ids();
     CTX('dbi_backend')->disconnect();
-    if (! defined $config_ids || ref $config_ids ne 'ARRAY') {
+    if (! defined $xml_config_ids || ref $xml_config_ids ne 'ARRAY') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_INIT_DO_INIT_PKI_REALM_BY_CFG_CONFIG_IDS_NOT_FOUND',
         );
     }
     my $pki_realm_by_cfg = {};
-    foreach my $config_id (@{ $config_ids }) {
-        ##! 4: 'config_id: ' . $config_id
+    foreach my $xml_config_id (@{ $xml_config_ids }) {
+        ##! 4: 'config_id: ' . $xml_config_id
 	log_wrapper(
 	    {
-		MESSAGE  => 'Instantiating archived configuration ID: ' . $config_id,
+		MESSAGE  => 'Instantiating archived configuration ID: ' . $xml_config_id,
 		PRIORITY => 'info',
 		FACILITY => 'system',
 	    });
 	eval {
-	    $pki_realm_by_cfg->{$config_id} = get_pki_realms(
+	    $pki_realm_by_cfg->{$xml_config_id} = get_pki_realms(
 		{
-		    CONFIG_ID => $config_id,
+		    CONFIG_ID => $xml_config_id,
 		});
 	};
         if (my $exc = OpenXPKI::Exception->caught()) {
             # ignore errorneous configuration, but complain about it
 	    log_wrapper(
 		{
-		    MESSAGE => 'Invalid configuration detected, ignoring configuriation ID ' . $config_id,
+		    MESSAGE => 'Invalid configuration detected, ignoring configuriation ID ' . $xml_config_id,
 		    PRIORITY => 'warn',
 		    FACILITY => 'system',
 		});
@@ -588,7 +588,7 @@ sub get_workflow_factory {
  	);
 
     CTX('dbi_backend')->connect();
-    my $config_entries = CTX('dbi_backend')->select(
+    my $xml_config_entries = CTX('dbi_backend')->select(
         TABLE   => 'CONFIG',
         DYNAMIC => {
             CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
@@ -596,17 +596,17 @@ sub get_workflow_factory {
     );
     CTX('dbi_backend')->disconnect();
 
-    if (! defined $config_entries
-        || ref $config_entries ne 'ARRAY'
-        || scalar @{ $config_entries } == 0) {
+    if (! defined $xml_config_entries
+        || ref $xml_config_entries ne 'ARRAY'
+        || scalar @{ $xml_config_entries } == 0) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_INIT_GET_WORKFLOW_FACTORY_NO_CONFIG_IDENTIFIERS_IN_DB',
         );
     }
 
     my $workflow_factories = {};
-    foreach my $config (@{ $config_entries }) {
-        my $id = $config->{CONFIG_IDENTIFIER};
+    foreach my $xml_config (@{ $xml_config_entries }) {
+        my $id = $xml_config->{CONFIG_IDENTIFIER};
         ##! 16: 'id: ' . $id
         my $pki_realm_count = CTX('xml_config')->get_xpath_count(
             XPATH     => "pki_realm",
@@ -642,8 +642,8 @@ sub __wf_factory_add_config {
     my $workflow_factory = $arg_ref->{FACTORY};
     my $idx              = $arg_ref->{REALM_IDX};
     ##! 4: 'idx: ' . $idx
-    my $config_id        = $arg_ref->{CONFIG_ID};
-    ##! 4: 'config_id: ' . $config_id
+    my $xml_config_id        = $arg_ref->{CONFIG_ID};
+    ##! 4: 'config_id: ' . $xml_config_id
     my %workflow_config  = %{ $arg_ref->{WF_CONFIG_MAP} };
     my $xml_config       = CTX('xml_config');
 
@@ -657,7 +657,7 @@ sub __wf_factory_add_config {
                              $type           , $workflow_config{$type}->{config_key} ],
                 COUNTER   => [ $idx            , 0,
                              0 ],
-                CONFIG_ID => $config_id,
+                CONFIG_ID => $xml_config_id,
             );
         };
         if (defined $toplevel_count) {
@@ -687,7 +687,7 @@ sub __wf_factory_add_config {
                         $secondlevel_count = $xml_config->get_xpath_count(
                             XPATH     => [ @base_path, $iterator ],
                             COUNTER   => [ @base_ctr ],
-                            CONFIG_ID => $config_id,
+                            CONFIG_ID => $xml_config_id,
                         );
                     };
                     ##! 16: 'secondlevel_count: ' . $secondlevel_count
@@ -695,7 +695,7 @@ sub __wf_factory_add_config {
                         my $entry = $xml_config->get_xpath_hashref(
                             XPATH     => [ @base_path, $iterator ],
                             COUNTER   => [ @base_ctr , $iii      ],
-                            CONFIG_ID => $config_id,
+                            CONFIG_ID => $xml_config_id,
                         );
                         ##! 32: 'entry ' . $ii . '/' . $iii . ': ' . Dumper $entry
                         # '__flatten_content()' turns our XMLin
@@ -727,7 +727,7 @@ sub __wf_factory_add_config {
                     my $entry = $xml_config->get_xpath_hashref(
                         XPATH     => [ @base_path ],
                         COUNTER   => [ @base_ctr  ],
-                        CONFIG_ID => $config_id,
+                        CONFIG_ID => $xml_config_id,
                     );
                     ##! 256: "entry: " . Dumper $entry
                     # Flatten some attributes because
@@ -761,7 +761,7 @@ sub __wf_factory_add_config {
             $count = $xml_config->get_xpath_count(
                 XPATH     => [ 'pki_realm', 'workflow_config', $type, 'configfile' ],
                 COUNTER   => [ $idx       , 0                , 0 ],
-                CONFIG_ID => $config_id,
+                CONFIG_ID => $xml_config_id,
             );
         };
         if (my $exc = OpenXPKI::Exception->caught()) {
@@ -796,7 +796,7 @@ sub __wf_factory_add_config {
             my $entry = $xml_config->get_xpath (
                 XPATH     => [ 'pki_realm', 'workflow_config', $type, 'configfile' ],
                 COUNTER   => [ $idx       , 0,            0,     $ii ],
-                CONFIG_ID => $config_id,
+                CONFIG_ID => $xml_config_id,
             );
             # cf. above ...
             local *Workflow::State::FACTORY = sub { return $workflow_factory };
@@ -924,7 +924,7 @@ sub get_xml_config {
     
     # get all current configuration entries from the database
     CTX('dbi_backend')->connect();
-    my $config_entries = CTX('dbi_backend')->select(
+    my $xml_config_entries = CTX('dbi_backend')->select(
         TABLE   => 'CONFIG',
         DYNAMIC => {
             CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
@@ -932,8 +932,8 @@ sub get_xml_config {
     );
     CTX('dbi_backend')->disconnect();
 
-    if (! defined $config_entries
-        || ref $config_entries ne 'ARRAY') {
+    if (! defined $xml_config_entries
+        || ref $xml_config_entries ne 'ARRAY') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_INIT_GET_XML_CONFIG_CONFIG_DB_ERROR',
         );
@@ -942,15 +942,15 @@ sub get_xml_config {
     ### migration from old serialization format to new one ...
 
    CONFIG:
-    foreach my $config (@{ $config_entries }) {
+    foreach my $xml_config (@{ $xml_config_entries }) {
         # the database entry _might_ still use the old Serialization::Simple
         # format, so we check for this and convert if necessary ...
-        if ($config->{DATA} =~ m{ \A HASH }xms) {
-            my $old_identifier = $config->{CONFIG_IDENTIFIER};
+        if ($xml_config->{DATA} =~ m{ \A HASH }xms) {
+            my $old_identifier = $xml_config->{CONFIG_IDENTIFIER};
             my $ser_simple = OpenXPKI::Serialization::Simple->new();
             my $ser_fast   = OpenXPKI::Serialization::Fast->new();
 
-            my $deserialized_config = $ser_simple->deserialize($config->{DATA});
+            my $deserialized_config = $ser_simple->deserialize($xml_config->{DATA});
             ##! 128: 'deserialized config: ' . Dumper $deserialized_config
 
             my $xs = $current_xml_config->xml_simple();
@@ -1046,7 +1046,7 @@ sub get_xml_config {
 
     # get the new list of config entries
     CTX('dbi_backend')->connect();
-    $config_entries = CTX('dbi_backend')->select(
+    $xml_config_entries = CTX('dbi_backend')->select(
         TABLE   => 'CONFIG',
         DYNAMIC => {
             CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
@@ -1054,16 +1054,16 @@ sub get_xml_config {
     );
     CTX('dbi_backend')->disconnect();
 
-    if (! defined $config_entries
-        || ref $config_entries ne 'ARRAY'
-        || scalar @{ $config_entries } == 0) {
+    if (! defined $xml_config_entries
+        || ref $xml_config_entries ne 'ARRAY'
+        || scalar @{ $xml_config_entries } == 0) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_INIT_NO_CONFIG_ENTRIES_IN_DB',
         );
     }
-    foreach my $config (@{ $config_entries }) {
-        ##! 128: 'config->{DATA}: ' . $config->{DATA}
-        push @serializations, $config->{DATA};
+    foreach my $xml_config (@{ $xml_config_entries }) {
+        ##! 128: 'config->{DATA}: ' . $xml_config->{DATA}
+        push @serializations, $xml_config->{DATA};
     }
     ##! 16: '# of serializations: ' . scalar @serializations
 
@@ -1110,14 +1110,16 @@ sub get_pki_realms
     my $cfg_id = $arg_ref->{CONFIG_ID};
     ##! 16: 'cfg_id: ' . $cfg_id
 
-    my $config = CTX('xml_config');
+    my $config = CTX('config');
+    my $xml_config = CTX('xml_config');
     my $crypto = CTX('crypto_layer');
 
     ##! 16: 'crypto + config'
     
+    
     ### get all PKI realms
     my %realms = ();
-    my $count = $config->get_xpath_count(
+    my $count = $xml_config->get_xpath_count(
         XPATH     => "pki_realm",
         CONFIG_ID => $cfg_id,
     );
@@ -1126,7 +1128,7 @@ sub get_pki_realms
     {
         ## prepare crypto stuff for every PKI realm
 
-        my $name = $config->get_xpath (
+        my $name = $xml_config->get_xpath (
             XPATH    => [ 'pki_realm', 'name' ],
             COUNTER  => [ $i, 0 ],
             CONFIG_ID => $cfg_id,
@@ -1144,99 +1146,84 @@ sub get_pki_realms
             PRIORITY => "info",
             FACILITY => "system",
         });
+
+        # Fake Session for Config!
+        CTX('session')->set_pki_realm( $name );
+
+        # FIXME: I do not find any place where this is used...
+        # Get validity for endentity certificates 
+        
+        my @profiles = $config->get_keys('profile');
+        
+        foreach my $profile (@profiles) {            
+            next if ($profile eq 'template');
+            
+            my $validity = $config->get_hash("profile.$profile.validity");
+            foreach my $validitytype (keys %{$validity}) {
+                my $value = $validity->{$validitytype};
+                if ($value) {
+                    my $format =  OpenXPKI::DateTime::is_relative($value) ? 'relativedate' : 'absolutedate';
+                    $realms{$name}->{endentity}->{id}->{$profile}->{validity}->{$validitytype} = 
+                        {
+                            'format' => $format,
+                            'validity' => $value,
+                        };
+                                                 
+                    log_wrapper({
+                        MESSAGE  => "Accepted '$profile' $validitytype validity ($format: $validity) for PKI realm '$name'",
+                        PRIORITY => "info",
+                        FACILITY => "system",
+                    });
+                }
+            }
+            
+            if (!$realms{$name}->{endentity}->{id}->{$profile}->{validity}->{notafter}) {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_VALIDITY_ERROR",
+                    params => { REALM => $name, PROFILE => $profile}
+                );
+            }
+        }
+             
+        
+        # Get validity for crl certificates
+        my @crls = $config->get_keys('crl');
+        
+        foreach my $crl (@crls) {
+                        
+            my $validity = $config->get("crl.$crl.validity");
+            if (!$validity || !OpenXPKI::DateTime::is_relative($validity)) {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_VALIDITY_ERROR",
+                    params => { REALM => $name, CRL => $crl, VALIDITY => $validity}
+                );
+            }
+            
+            $realms{$name}->{crl}->{id}->{$crl}->{validity}->{notafter} = 
+                {
+                    'format' => 'relativedate',
+                    'validity' => $validity,
+                };
+
+            log_wrapper({
+                    MESSAGE  => "Accepted '$crl' validity ($validity) for PKI realm '$name'",
+                    PRIORITY => "info",
+                    FACILITY => "system",
+                });
+        }
+
 	
         my @xpath   = ( 'pki_realm', 'common', 'profiles' );
         my @counter = ( $i,         0,        0 );
         
-        foreach my $entrytype (qw( endentity crl )) {
-            ### entrytype: $entrytype
 
-            my $nr_of_entries = $config->get_xpath_count(
-                XPATH     => [ @xpath,   $entrytype, 'profile' ],
-                COUNTER   => [ @counter, 0 ],
-                CONFIG_ID => $cfg_id,
-            );
-	    
-            ### entries: $nr_of_entries
-            foreach (my $jj = 0; $jj < $nr_of_entries; $jj++) {
-                my $entryid = $config->get_xpath(
-                    XPATH   => [ @xpath,   $entrytype, 'profile', 'id' ],
-                    COUNTER => [ @counter, 0,          $jj,       0 ],
-                    CONFIG_ID => $cfg_id,
-                );
-
-                VALIDITYTYPE:
-                foreach my $validitytype (qw( notbefore notafter )) {
-                    next VALIDITYTYPE if (($entrytype eq "crl") &&
-                        ($validitytype eq "notbefore"));
-
-                    ### validitytype: $validitytype
-
-                    my $validity;
-                    my $format;
-                    # parse validity entry
-                    eval {
-                        $format = $config->get_xpath(
-                            XPATH     => [ @xpath,   $entrytype, 'profile', 'validity', $validitytype, 'format' ],
-                            COUNTER   => [ @counter, 0,          $jj,       0,          0,             0 ],
-                            CONFIG_ID => $cfg_id,
-                        );
-
-                        $validity = $config->get_xpath(
-                            XPATH   => [ @xpath,   $entrytype, 'profile', 'validity', $validitytype ],
-                            COUNTER => [ @counter, 0,          $jj,        0,         0 ],
-                            CONFIG_ID => $cfg_id,
-                        );
-
-                    };
-                    if (my $exc = OpenXPKI::Exception->caught()) {
-                        # ignore exception for missing 'notbefore' entry
-                        if (($exc->message() 
-                                eq "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT")
-                            && ($validitytype eq "notbefore")) {
-                            # default: "now"
-                            $validity = undef;
-                        }
-                        else
-                        {
-                            $exc->rethrow();
-                        }
-                    } elsif ($EVAL_ERROR) {
-                        OpenXPKI::Exception->throw (
-                            message => "I18N_OPENXPKI_SERVER_INIT_GET_PKI_REALMS_VALIDITY_ERROR",
-                            params  => {
-                                EVAL_ERROR => $EVAL_ERROR,
-                            });
-                    }
-
-                    ### got format: $format
-                    ### got validity: $validity
-
-                    if (defined $validity) {
-                        $realms{$name}->{$entrytype}->{id}->{$entryid}->{validity}->{$validitytype} = 
-                        {
-                            'format' => $format,
-                            'validity' => $validity,
-                        };
-
-                        log_wrapper(
-                            {
-                                MESSAGE  => "Accepted '$entryid' $entrytype $validitytype validity ($format: $validity) for PKI realm '$name'",
-                                PRIORITY => "info",
-                                FACILITY => "system",
-                            });
-
-                    }
-                }
-            }
-        }
         #############################################################
         ##! 129: '--------------------------------- get ldap options'  
 	#
         my @ldap_path   = ('pki_realm', 'common/ldap_options');
         my @ldap_counter= (         $i,             0);
         eval {
-         $realms{$name}->{ldap_enable} = $config->get_xpath(
+         $realms{$name}->{ldap_enable} = $xml_config->get_xpath(
 	        XPATH   => [  @ldap_path   ,'ldap_enable' ],
   	        COUNTER => [  @ldap_counter,           0  ],
               CONFIG_ID => $cfg_id,
@@ -1252,13 +1239,13 @@ sub get_pki_realms
 	}
 	if($realms{$name}->{ldap_enable} eq "yes"){
         ##! 129: 'LDAP LOADED, STATUS '.$realms{$name}->{ldap_enable}
-	  $realms{$name}->{ldap_excluded_roles} = $config->get_xpath(
+	  $realms{$name}->{ldap_excluded_roles} = $xml_config->get_xpath(
                 XPATH   => [  @ldap_path   ,'ldap_excluded_roles' ],
                 COUNTER => [  @ldap_counter,                    0 ],
 	      CONFIG_ID => $cfg_id,
 	  );
           $realms{$name}->{ldap_suffix}=[];
-          my $suffix_count = $config->get_xpath_count(
+          my $suffix_count = $xml_config->get_xpath_count(
                 XPATH   => [  @ldap_path    ,
 	                     'ldap_suffixes','ldap_suffix' ],
                 COUNTER => [  @ldap_counter,           0   ],
@@ -1268,7 +1255,7 @@ sub get_pki_realms
 	          $suffix_counter < $suffix_count;
 	          $suffix_counter++){
 	       my $ldap_suffix =
-                  $config->get_xpath(
+                  $xml_config->get_xpath(
                         XPATH   => [  @ldap_path    ,
 	                             'ldap_suffixes','ldap_suffix' ],
                         COUNTER => [  @ldap_counter, 
@@ -1277,30 +1264,30 @@ sub get_pki_realms
 	       );
 	       push @{$realms{$name}->{ldap_suffix}}, $ldap_suffix;
           };
-	  $realms{$name}->{ldap_server} = $config->get_xpath(
+	  $realms{$name}->{ldap_server} = $xml_config->get_xpath(
                 XPATH   => [  @ldap_path   ,'ldap_server' ],
                 COUNTER => [  @ldap_counter,           0  ],
 	      CONFIG_ID => $cfg_id,
 	  );
-	  $realms{$name}->{ldap_port} = $config->get_xpath(
+	  $realms{$name}->{ldap_port} = $xml_config->get_xpath(
                 XPATH   => [  @ldap_path   ,'ldap_port' ],
                 COUNTER => [  @ldap_counter,         0  ],
 	      CONFIG_ID => $cfg_id,
 	  );
-	  $realms{$name}->{ldap_version} = $config->get_xpath(
+	  $realms{$name}->{ldap_version} = $xml_config->get_xpath(
                 XPATH   => [  @ldap_path   ,'ldap_version' ],
                 COUNTER => [  @ldap_counter,            0  ],
 	      CONFIG_ID => $cfg_id,
 	  );
 	  #--- TLS block
-          $realms{$name}->{ldap_tls} = $config->get_xpath(
+          $realms{$name}->{ldap_tls} = $xml_config->get_xpath(
                 XPATH   => [  @ldap_path   ,'ldap_tls','use_tls' ],
                 COUNTER => [  @ldap_counter,         0,       0  ],
 	      CONFIG_ID => $cfg_id,
 	  );
           if($realms{$name}->{ldap_tls} eq "yes"){
              $realms{$name}->{ldap_client_cert} = 
-	         $config->get_xpath(
+	         $xml_config->get_xpath(
                      XPATH   => [  @ldap_path   ,'ldap_tls',
      	                         'client_cert'],
                      COUNTER => [  @ldap_counter,         0,0],
@@ -1308,7 +1295,7 @@ sub get_pki_realms
 	         );
 
              $realms{$name}->{ldap_client_key} = 
-		 $config->get_xpath(
+		 $xml_config->get_xpath(
                      XPATH   => [  @ldap_path   ,'ldap_tls',
      	                          'client_key'],
                      COUNTER => [  @ldap_counter,         0,0],
@@ -1316,7 +1303,7 @@ sub get_pki_realms
 	         );
 
              $realms{$name}->{ldap_ca_cert} = 
-	         $config->get_xpath(
+	         $xml_config->get_xpath(
 	             XPATH   => [  @ldap_path   ,'ldap_tls',
 	                             'ca_cert'],
                      COUNTER => [  @ldap_counter,         0,0],
@@ -1326,14 +1313,14 @@ sub get_pki_realms
 	  #--- end of TLS block    
 	  
 	  #--- SASL block
-	  $realms{$name}->{ldap_sasl} = $config->get_xpath(
+	  $realms{$name}->{ldap_sasl} = $xml_config->get_xpath(
                 XPATH   => [  @ldap_path   ,'ldap_sasl','use_sasl'],
                 COUNTER => [  @ldap_counter,          0,        0 ],
 	      CONFIG_ID => $cfg_id,
 	  );
           if($realms{$name}->{ldap_sasl} eq "yes"){
              $realms{$name}->{ldap_sasl_mech} = 
-	         $config->get_xpath(
+	         $xml_config->get_xpath(
                      XPATH   => [ @ldap_path   ,'ldap_sasl',
 		                  'sasl_mech'                ],
                      COUNTER => [ @ldap_counter,          0,0],
@@ -1342,13 +1329,13 @@ sub get_pki_realms
           };
 	  #--- end of SASL block
 	  
-	  $realms{$name}->{ldap_login} = $config->get_xpath(
+	  $realms{$name}->{ldap_login} = $xml_config->get_xpath(
                 XPATH   => [  @ldap_path   ,'ldap_login'],
                 COUNTER => [  @ldap_counter,           0],
 	      CONFIG_ID => $cfg_id,
 	  );
 
-          $realms{$name}->{ldap_password} = $config->get_xpath(
+          $realms{$name}->{ldap_password} = $xml_config->get_xpath(
                 XPATH   => [  @ldap_path   ,'ldap_password'],
                 COUNTER => [  @ldap_counter,           0   ],
 	      CONFIG_ID => $cfg_id,
@@ -1370,7 +1357,7 @@ sub get_pki_realms
           ##! 129: 'block: default, certificate, ca'
           foreach my $cert_type (@cert_types) { 
            ##! 129: 'load_schema: LOADING '.$cert_type.' BLOCK'
-           $rdn_count = $config->get_xpath_count(
+           $rdn_count = $xml_config->get_xpath_count(
                 XPATH   => [ @schema_prefix,$cert_type,'rdn' ],
                 COUNTER => [ @schema_counter, 0 ],
 	      CONFIG_ID => $cfg_id,
@@ -1381,7 +1368,7 @@ sub get_pki_realms
 	   ##! 129: 'block: rdns'
            for ($rdn=0; $rdn < $rdn_count; $rdn++){
             ##! 129: 'attributetype'
-            $attr_type = $config->get_xpath (
+            $attr_type = $xml_config->get_xpath (
               XPATH    => [ @schema_prefix, $cert_type,'rdn',
 	                    'attributetype'],
               COUNTER  => [ @schema_counter,0,          $rdn, 0 ],
@@ -1392,7 +1379,7 @@ sub get_pki_realms
              $attr_type;
             $attr_type = lc ($attr_type);
             ##! 129: 'load_schema: loading attributetype '.$attr_type 
-            $must_count = $config->get_xpath_count (
+            $must_count = $xml_config->get_xpath_count (
                XPATH    => [ @schema_prefix, $cert_type,'rdn',
 	                   "must/attributetype" ],
                COUNTER  => [ @schema_counter,0,          $rdn ],
@@ -1407,7 +1394,7 @@ sub get_pki_realms
 	            $attribute_count < $must_count;
 	            $attribute_count++){ 
              $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{must}->[$attribute_count] =
-              $config->get_xpath (
+              $xml_config->get_xpath (
                 XPATH    => [ @schema_prefix, $cert_type,'rdn',
 	                     "must/attributetype" ],
                 COUNTER  => [ @schema_counter,0,          $rdn,
@@ -1418,7 +1405,7 @@ sub get_pki_realms
             }
 	    ##! 129: 'end of block: must'
             eval {
-             $may_count = $config->get_xpath_count (
+             $may_count = $xml_config->get_xpath_count (
                XPATH    => [ @schema_prefix, $cert_type,'rdn',
 	                     "may/attributetype" ],
                COUNTER  => [ @schema_counter,0        ,$rdn ],
@@ -1436,7 +1423,7 @@ sub get_pki_realms
 	          $attribute_count < $may_count; 
 	          $attribute_count++){ 
               $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{may}->[$attribute_count] =
-               $config->get_xpath (
+               $xml_config->get_xpath (
                  XPATH    => [ @schema_prefix, $cert_type,'rdn',
 	                       "may/attributetype" ],
                  COUNTER  => [ @schema_counter,0,          $rdn,
@@ -1448,7 +1435,7 @@ sub get_pki_realms
              }
             };
 	    ##  129: 'end of block: may'
-            $structural_count = $config->get_xpath_count (
+            $structural_count = $xml_config->get_xpath_count (
               XPATH    => [ @schema_prefix, $cert_type,'rdn',
                            "structural/objectclass" ],
               COUNTER  => [ @schema_counter,0        ,$rdn ],
@@ -1462,7 +1449,7 @@ sub get_pki_realms
  	         $attribute_count < $structural_count; 
  		 $attribute_count++){
              $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{structural}->[$attribute_count] =
-              $config->get_xpath (
+              $xml_config->get_xpath (
                 XPATH    => [ @schema_prefix, $cert_type,'rdn',
 	                     "structural/objectclass" ],
                 COUNTER  => [ @schema_counter,0,          $rdn,
@@ -1474,7 +1461,7 @@ sub get_pki_realms
             } 
             ##! 129: 'end of block: structural'
             eval {
-             $auxiliary_count = $config->get_xpath_count (
+             $auxiliary_count = $xml_config->get_xpath_count (
                XPATH    => [ @schema_prefix, $cert_type,'rdn',
    	                     "auxiliary/objectclass" ],
                COUNTER  => [ @schema_counter,0          ,$rdn ],
@@ -1492,7 +1479,7 @@ sub get_pki_realms
 	          $attribute_count < $auxiliary_count; 
  	          $attribute_count++){
               $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{auxiliary}->[$attribute_count] =
-               $config->get_xpath (
+               $xml_config->get_xpath (
                  XPATH    => [ @schema_prefix, $cert_type,'rdn',
 	                    "auxiliary/objectclass" ],
                  COUNTER  => [ @schema_counter,0,          $rdn,
@@ -1524,7 +1511,7 @@ sub get_pki_realms
             # it might actually make sense not to have any CAs defined
             # in a given PKI realm, so don't die if get_xpath_count
             # fails ...
-            $nr_of_ca_entries = $config->get_xpath_count(
+            $nr_of_ca_entries = $xml_config->get_xpath_count(
                     XPATH   => ['pki_realm', 'ca'],
                     COUNTER => [$i],
                     CONFIG_ID => $cfg_id,
@@ -1537,24 +1524,28 @@ sub get_pki_realms
 
         ISSUINGCA:
         for (my $jj = 0; $jj < $nr_of_ca_entries; $jj++) {
-            my $ca_id = $config->get_xpath(
+            my $ca_id = $xml_config->get_xpath(
                 XPATH =>   ['pki_realm', 'ca', 'id'],
                 COUNTER => [$i,          $jj,  0 ],
                 CONFIG_ID => $cfg_id,
             );
 
-
             # sanity check: there must be a CRL validity configuration
             # for this issuing CA
-            if (! exists $realms{$name}->{crl}->{id}->{$ca_id}->{validity}) {
-                OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_SERVER_INIT_PKI_REALMS_NO_CRL_VALIDITY",
-                    params => {
-                        CAID   => $ca_id,
-                    },
-                );
+            if (! exists $realms{$name}->{crl}->{id}->{$ca_id}->{validity}) {                
+                # Allow use of default ca profile
+                if (exists $realms{$name}->{crl}->{id}->{default}->{validity}) {
+                    ##! 16: "No crl profile for $ca_id - fall back to default"
+                    $realms{$name}->{crl}->{id}->{$ca_id}->{validity} = $realms{$name}->{crl}->{id}->{default}->{validity};
+                } else {
+                    OpenXPKI::Exception->throw (
+                        message => "I18N_OPENXPKI_SERVER_INIT_PKI_REALMS_NO_CRL_VALIDITY",
+                        params => {
+                            CAID   => $ca_id,
+                        },
+                    );
+                }
             }
-
 
             # record this issuing CA as potentially present in the 
             # PKI Realm configuration
@@ -1681,7 +1672,7 @@ sub get_pki_realms
             my @base_path = ('pki_realm', 'ca', 'crl_publication');
             my @base_ctr  = ($i,          $jj,   0);
             eval {
-                my $crl_publication_id = $config->get_xpath(
+                my $crl_publication_id = $xml_config->get_xpath(
                     XPATH   => [ @base_path ],
                     COUNTER => [ @base_ctr  ],
                     CONFIG_ID => $cfg_id,
@@ -1689,7 +1680,7 @@ sub get_pki_realms
                 $realms{$name}->{ca}->{id}->{$ca_id}->{crl_publication} = 1; # only executed if get_xpath does not crash
             };
             eval {
-                my $number_of_files = $config->get_xpath_count(
+                my $number_of_files = $xml_config->get_xpath_count(
                     XPATH   => [ @base_path, 'file'],
                     COUNTER => [ @base_ctr ],
                     CONFIG_ID => $cfg_id,
@@ -1697,13 +1688,13 @@ sub get_pki_realms
                 my @files;
                 ##! 16: 'nr_of_files: ' . $number_of_files
                 for (my $kkk = 0; $kkk < $number_of_files; $kkk++) {
-                    my $filename = $config->get_xpath(
+                    my $filename = $xml_config->get_xpath(
                         XPATH   => [ @base_path, 'file', 'filename' ],
                         COUNTER => [ @base_ctr, $kkk   , 0          ],
                         CONFIG_ID => $cfg_id,
                     );
                     ##! 16: 'filename: ' . $filename
-                    my $format = $config->get_xpath(
+                    my $format = $xml_config->get_xpath(
                         XPATH   => [ @base_path, 'file', 'format'   ],
                         COUNTER => [ @base_ctr, $kkk   , 0          ],
                         CONFIG_ID => $cfg_id,
@@ -1724,7 +1715,7 @@ sub get_pki_realms
         my $nr_of_scep_entries = 0;
         eval { # this might fail because no scep server is defined
             # at all
-            $nr_of_scep_entries = $config->get_xpath_count(
+            $nr_of_scep_entries = $xml_config->get_xpath_count(
                 XPATH   => ['pki_realm', 'scep'],
                 COUNTER => [$i],
                 CONFIG_ID => $cfg_id,
@@ -1733,7 +1724,7 @@ sub get_pki_realms
 
         SCEP_SERVER:
         for (my $jj = 0; $jj < $nr_of_scep_entries; $jj++) {
-            my $scep_id = $config->get_xpath(
+            my $scep_id = $xml_config->get_xpath(
                 XPATH =>   ['pki_realm', 'scep', 'id'],
                 COUNTER => [$i,          $jj,  0 ],
                 CONFIG_ID => $cfg_id,
@@ -1785,7 +1776,7 @@ sub get_pki_realms
             # the retry time parameter is optional, so we put it in an eval block
             eval {
                 $realms{$name}->{scep}->{id}->{$scep_id}->{'retry_time'}
-                    = $config->get_xpath(
+                    = $xml_config->get_xpath(
                         XPATH =>   ['pki_realm', 'scep', 'retry_time'],
                         COUNTER => [$i,          $jj,     0 ],
                         CONFIG_ID => $cfg_id,
@@ -1796,7 +1787,7 @@ sub get_pki_realms
             # the scep_client section is optional, so put it in an eval block as well
             eval {
                 $realms{$name}->{scep}->{id}->{$scep_id}->{'scep_client'}->{'enrollment_role'} =
-                    $config->get_xpath(
+                    $xml_config->get_xpath(
                         XPATH     => ['pki_realm', 'scep', 'scep_client', 'enrollment_role'],
                         COUNTER   => [$i,          $jj,     0,             0 ],
                         CONFIG_ID => $cfg_id,
@@ -1805,7 +1796,7 @@ sub get_pki_realms
 
             eval {
                 $realms{$name}->{scep}->{id}->{$scep_id}->{'scep_client'}->{'autoissuance_role'} =
-                    $config->get_xpath(
+                    $xml_config->get_xpath(
                         XPATH     => ['pki_realm', 'scep', 'scep_client', 'autoissuance_role'],
                         COUNTER   => [$i,          $jj,     0,             0 ],
                         CONFIG_ID => $cfg_id,
@@ -1818,7 +1809,7 @@ sub get_pki_realms
         my $nr_of_password_safe_entries = 0;
         eval { # this might fail because no password safe is defined
                # at all
-            $nr_of_password_safe_entries = $config->get_xpath_count(
+            $nr_of_password_safe_entries = $xml_config->get_xpath_count(
                 XPATH   => ['pki_realm', 'password_safe'],
                 COUNTER => [$i],
                 CONFIG_ID => $cfg_id,
@@ -1828,7 +1819,7 @@ sub get_pki_realms
 
         PASSWORD_SAFE:
         for (my $jj = 0; $jj < $nr_of_password_safe_entries; $jj++) {
-            my $password_safe_id = $config->get_xpath(
+            my $password_safe_id = $xml_config->get_xpath(
                 XPATH =>   ['pki_realm', 'password_safe', 'id'],
                 COUNTER => [$i,          $jj,  0 ],
                 CONFIG_ID => $cfg_id,
@@ -1912,7 +1903,7 @@ sub get_pki_realms
                 FACILITY => "system",
             });
     }
-
+    
     ### realms: %realms
     return \%realms;
 }
@@ -1948,12 +1939,12 @@ sub __get_cert_identifier {
     ##! 16: 'jj: ' . $jj
     my $cfg_id  = $arg_ref->{CONFIG_ID};
     ##! 16: 'cfg_id: ' . $cfg_id
-    my $config  = CTX('xml_config');
+    my $xml_config  = CTX('xml_config');
 
     my $cert_identifier;
     eval {
         ##! 128: 'eval'
-        $cert_identifier = $config->get_xpath(
+        $cert_identifier = $xml_config->get_xpath(
             XPATH   => [ 'pki_realm', $type, 'cert', 'identifier' ],
             COUNTER => [ $i,           $jj, 0     , 0            ],
             CONFIG_ID => $cfg_id,
@@ -1963,12 +1954,12 @@ sub __get_cert_identifier {
         # fallback, check if alias and realm are defined and retrieve
         # corresponding identifier from alias DB
         ##! 128: 'undefined'
-        my $cert_alias = $config->get_xpath(
+        my $cert_alias = $xml_config->get_xpath(
             XPATH   => [ 'pki_realm', $type, 'cert', 'alias' ],
             COUNTER => [ $i,          $jj,  0     , 0       ],
             CONFIG_ID => $cfg_id,
         );
-        my $cert_realm = $config->get_xpath(
+        my $cert_realm = $xml_config->get_xpath(
             XPATH   => [ 'pki_realm', $type, 'cert', 'realm' ],
             COUNTER => [ $i,          $jj,  0     , 0       ],
             CONFIG_ID => $cfg_id,
@@ -2035,14 +2026,14 @@ sub get_dbi
 
     ##! 1: "start"
 
-    my $config = CTX('config');
+    my $xml_config = CTX('config');
     my %params;
 
     my $dbpath = 'system.database.main';
     if (exists $args->{PURPOSE} && $args->{PURPOSE} eq 'log') {
         ##! 16: 'purpose: log'
         # if there is a logging section we use it        
-        if ($config->get_meta('system.database.logging')) {
+        if ($xml_config->get_meta('system.database.logging')) {
             ##! 16: 'use logging section'            
             $dbpath = 'system.database.logging';
         }
@@ -2052,21 +2043,21 @@ sub get_dbi
         %params = (LOG => CTX('log'));
     }
 
-    my $db_config = $config->get_hash($dbpath);
+    my $db_config = $xml_config->get_hash($dbpath);
     
     foreach my $key qw(server_id server_shift type name namespace host port user passwd) {
         ##! 16: "dbi: $key => " . $db_config->{$key}
         $params{uc($key)} = $db_config->{$key}; 
     }     
         
-   $params{SERVER_ID} = $config->get('system.server.node.id');
-   $params{SERVER_SHIFT} = $config->get('system.server.shift');  
+   $params{SERVER_ID} = $xml_config->get('system.server.node.id');
+   $params{SERVER_SHIFT} = $xml_config->get('system.server.shift');  
         
     # environment 
-    my @env_names = $config->get_keys("$dbpath.environment");
+    my @env_names = $xml_config->get_keys("$dbpath.environment");
     
     foreach my $env_name (@env_names) {    
-        my $env_value = $config->get_keys("$dbpath.environment.$env_name");
+        my $env_value = $xml_config->get_keys("$dbpath.environment.$env_name");
         $ENV{$env_name} = $env_value;        
         ##! 4: "DBI Environment: $env_name => $env_value"
     }
@@ -2085,9 +2076,9 @@ sub get_dbi
 sub get_log
 {
     ##! 1: "start"
-    my $config = $current_xml_config;
+    my $xml_config = $current_xml_config;
 
-    $config = $config->get_xpath (
+    $xml_config = $xml_config->get_xpath (
                   XPATH    => [ 'common/log_config' ],
                   COUNTER  => [ 0 ],
                   CONFIG_ID => 'default');
@@ -2095,7 +2086,7 @@ sub get_log
     ## init logging
     ##! 64: 'before Log->new'
 
-    my $log = OpenXPKI::Server::Log->new (CONFIG => $config);
+    my $log = OpenXPKI::Server::Log->new (CONFIG => $xml_config);
 
     ##! 64: 'log during get_log: ' . $log
 
@@ -2105,9 +2096,9 @@ sub get_log
 sub redirect_stderr
 {
     ##! 1: "start"
-    my $config = $current_xml_config;
+    my $xml_config = $current_xml_config;
 
-    my $stderr = $config->get_xpath(
+    my $stderr = $xml_config->get_xpath(
         XPATH     => "common/server/stderr",
         CONFIG_ID => 'default',
     );

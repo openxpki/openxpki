@@ -194,7 +194,7 @@ sub validate {
     }
     ##! 64: 'template_vars: ' . Dumper $template_vars
 
-    my $template = '[% TAGS [- -] -%]' . $styles->{$style}->{DN};
+    my $template = $styles->{$style}->{DN}; #'[% TAGS [- -] -%]' . 
     my $tt = Template->new();
     my $cert_subject = '';
     $tt->process(\$template, $template_vars, \$cert_subject);
