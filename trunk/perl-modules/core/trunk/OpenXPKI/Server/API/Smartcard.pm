@@ -611,9 +611,8 @@ sub sc_analyze_smartcard {
 	},
     };
     
-    foreach my $type ($policy->get_keys('certs.type')) {
-	next if ($type =~ m{ \A (?:UNEXPECTED|FOREIGN) \z }xms);
-	$user_certs->{by_type}->{$type} = [];
+    foreach my $type ($policy->get_keys('certs.type')) {	   
+	   $user_certs->{by_type}->{$type} = [];
     }
     
     ##! 32: ' Loading Profiles from xref.profile '    
@@ -640,10 +639,40 @@ sub sc_analyze_smartcard {
         NAMESPACE => 'smartcard.user.certificate',
         KEY => $holder_employee_id,         
     } );
+        
+    my @certificate_identifiers;
+    if ($certificates) {    
+    	@certificate_identifiers = @{$ser->deserialize($certificates->{VALUE})};
+    }
+
+    # Migration Helper - certificates which are on the card and known
+    # by the pki are added to the datapool entry if they are missing    
+    my $has_updates = 0;
+    foreach my $entry (@{$result->{PARSED_CERTS}}) {        
+        ##! 32: ' check assignment ' . $entry->{IDENTIFIER} ;
+        if (! (grep /$entry->{IDENTIFIER}/, @certificate_identifiers) ) {
+            ##! 32: ' Add unassigned certificate to datapool ' . $entry->{IDENTIFIER} ;             
+            push @certificate_identifiers, $entry->{IDENTIFIER};
+            $has_updates = 1; 
+        }
+    }
     
-    if ($certificates) {
+    if ($has_updates) {
+        CTX('api')->set_data_pool_entry( {
+            PKI_REALM => $thisrealm,
+            NAMESPACE => 'smartcard.user.certificate',
+            KEY => $holder_employee_id,
+            VALUE => $ser->serialize( \@certificate_identifiers ),
+            FORCE => 1
+        } );
+        CTX('log')->log(
+            MESSAGE => "Found unassigned certificates, updating datapool.",
+            PRIORITY => 'info',
+            FACILITY => [ 'system' ],
+        );                   
+    }
     
-	my @certificate_identifiers = @{$ser->deserialize($certificates->{VALUE})};
+    if (scalar (@certificate_identifiers)) {
 
     ##! 32: ' Users certificate_identifiers (from datapool) ' . Dumper @certificate_identifiers ; 
 
@@ -663,7 +692,7 @@ sub sc_analyze_smartcard {
 	    'CERTIFICATE.NOTAFTER',
 	],
 	DYNAMIC => {
-	    'CSR.PROFILE' => \@profiles,
+#	    'CSR.PROFILE' => \@profiles, # We need to get the "unexpected" ones
 	    'CERTIFICATE.PKI_REALM' => $thisrealm,
 	    'CERTIFICATE.IDENTIFIER' => \@certificate_identifiers,
 	},
@@ -701,7 +730,7 @@ sub sc_analyze_smartcard {
 		$user_certs->{by_identifier}->{$identifier} = $db_hash;
 		
 		# resolve type from profile using xref, NB: requires that a profile may not be used in two types		
-		my $type = $policy->get("xref.profile.$db_hash->{PROFILE}.type"); 
+		my $type = $policy->get("xref.profile.$db_hash->{PROFILE}.type") || 'UNEXPECTED'; 
 		# xrefs
 		push @{$user_certs->{by_type}->{$type}}, 
 		    $user_certs->{by_identifier}->{$identifier};
@@ -930,10 +959,10 @@ sub sc_analyze_smartcard {
 
     foreach my $entry (@{$result->{PARSED_CERTS}}) {
     	my $identifier = $entry->{IDENTIFIER};
-    	my $cert = $user_certs->{by_identifier}->{$identifier};
-    	my $cert_type = $cert->{CERTIFICATE_TYPE} || 'FOREIGN';
-    	my $cert_visual_status = $cert->{VISUAL_STATUS};
-    	my $is_preferred_profile = $cert->{PREFERRED_PROFILE};
+    	#my $cert = $user_certs->{by_identifier}->{$identifier};
+    	my $cert_type = $entry->{CERTIFICATE_TYPE} || 'FOREIGN';
+    	my $cert_visual_status = $entry->{VISUAL_STATUS};
+    	my $is_preferred_profile = $entry->{PREFERRED_PROFILE};
     
     	##! 16: 'identifier: ' . $identifier
     	##! 16: 'type: ' . $cert_type
@@ -1172,7 +1201,7 @@ sub sc_analyze_smartcard {
 					FACILITY => [ 'system' ],
 				);			
 			#  Check if the certificate is still in use - is it on the token?
-			} elsif (grep  $entry->{IDENTIFIER}, @{$certs_on_token_by_type{$type}}) {
+			} elsif (grep  /$entry->{IDENTIFIER}/, @{$certs_on_token_by_type{$type}}) {
 				# Not scheduled to be purged
 				if (!$entry->{PROCESS_FLAGS}->{PURGE}) {
 					##! 64: ' Cert is on the token - skipping '. $entry->{IDENTIFIER}
@@ -1182,7 +1211,7 @@ sub sc_analyze_smartcard {
 						FACILITY => [ 'system' ],
 					);
 					next					
-				} elsif (grep  $entry->{IDENTIFIER}, @{$result->{TASKS}->{SMARTCARD}->{INSTALL}}) {
+				} elsif (grep  /$entry->{IDENTIFIER}/, @{$result->{TASKS}->{SMARTCARD}->{INSTALL}}) {
 					##! 64: ' Cert is scheduled for install - skipping '. $entry->{IDENTIFIER}
 					CTX('log')->log(
 						MESSAGE => "No need to revoke $entry->{IDENTIFIER} (to be restored)",
@@ -1332,74 +1361,74 @@ sub __check_db_hash_against_policy {
     # '...':
     #   certificate is expected on the card
     my $type = 'FOREIGN';
-    if (defined $profile) {
-	# cert is know to our PKI
-	$type = $policy->get("xref.profile.$profile.type");
-	my $is_preferred = $policy->get("xref.profile.$profile.preferred") || 0;
-
-	$db_hash->{CERTIFICATE_TYPE} = $type;
-	
-	CTX('log')->log(
-		MESSAGE => "Check policy on $db_hash->{IDENTIFIER}, type: $type, profile: $profile, Status: $db_hash->{STATUS}",
-		PRIORITY => 'debug',
-		FACILITY => [ 'system' ],
-	);
-	
-	
-	if (! defined $type) {
-	    $type = 'UNEXPECTED';
-	    # but it is not expected on the token (incorrect profile)
-	    $db_hash->{SMARTCARD_USAGE} = { 
-		'NONE' => 1 
-	    };
-	} else {
-	    # we expect this cert type on the token, and hence export
-	    # the intended usage
-
-	    # 20120504 Martin Bartosch, TODO/REFACTOR: bit mask?	    
-	    foreach my $usage ($policy->get_keys("certs.type.$type.usage")) {
-    		# export usage to caller
-	       	$db_hash->{SMARTCARD_USAGE}->{$usage} = 1;
-	    }
-
-	    # check if private key is available in the database for
-	    # escrowed certificates
-	    $db_hash->{PRIVATE_KEY_AVAILABLE} = 0;
-        
-	    if ($policy->get("certs.type.$type.escrow_key")) {
-		my $identifier = $db_hash->{IDENTIFIER};
-		##! 16: 'checking if private key is available for cert identifier ' . $identifier
-		
-		my $private_key_found = CTX('dbi_backend')->first (
-		    TABLE => 'DATAPOOL',
-		    DYNAMIC => {
-			PKI_REALM    => $thisrealm,
-			NAMESPACE    => 'certificate.privatekey',
-			DATAPOOL_KEY => $identifier,
-		    },
-		    );
-		
-		if (defined $private_key_found) {
-		    $db_hash->{PRIVATE_KEY_AVAILABLE} = 1;
-		} else {
-		    ##! 16: 'private key not in datapool for cert identifier ' . $identifier
-		    CTX('log')->log(
-			MESSAGE  => "Private key not found for escrow certificate [$identifier], dequeueing",
-			PRIORITY => 'info',
-			FACILITY => 'system',
-			);
-		}
-	    }
-	    
-	    $db_hash->{PREFERRED_PROFILE} = $is_preferred;
-	}
-	
-	# todo: check against database if this particular cert
-	# is expected
+    if ($profile) {
+    	# cert is know to our PKI
+    	$type = $policy->get("xref.profile.$profile.type") || 'UNEXPECTED';
+    	my $is_preferred = $policy->get("xref.profile.$profile.preferred") || 0;
+    
+    	$db_hash->{CERTIFICATE_TYPE} = $type;
+    	
+    	CTX('log')->log(
+    		MESSAGE => "Check policy on $db_hash->{IDENTIFIER}, type: $type, profile: $profile, Status: $db_hash->{STATUS}",
+    		PRIORITY => 'debug',
+    		FACILITY => [ 'system' ],
+    	);
+    	
+    	
+    	if (! defined $type) {
+    	    $type = 'UNEXPECTED';
+    	    # but it is not expected on the token (incorrect profile)
+    	    $db_hash->{SMARTCARD_USAGE} = { 
+    		'NONE' => 1 
+    	    };
+    	} else {
+    	    # we expect this cert type on the token, and hence export
+    	    # the intended usage
+    
+    	    # 20120504 Martin Bartosch, TODO/REFACTOR: bit mask?	    
+    	    foreach my $usage ($policy->get_keys("certs.type.$type.usage")) {
+        		# export usage to caller
+    	       	$db_hash->{SMARTCARD_USAGE}->{$usage} = 1;
+    	    }
+    
+    	    # check if private key is available in the database for
+    	    # escrowed certificates
+    	    $db_hash->{PRIVATE_KEY_AVAILABLE} = 0;
+            
+    	    if ($policy->get("certs.type.$type.escrow_key")) {
+    		my $identifier = $db_hash->{IDENTIFIER};
+    		##! 16: 'checking if private key is available for cert identifier ' . $identifier
+    		
+    		my $private_key_found = CTX('dbi_backend')->first (
+    		    TABLE => 'DATAPOOL',
+    		    DYNAMIC => {
+    			PKI_REALM    => $thisrealm,
+    			NAMESPACE    => 'certificate.privatekey',
+    			DATAPOOL_KEY => $identifier,
+    		    },
+    		    );
+    		
+    		if (defined $private_key_found) {
+    		    $db_hash->{PRIVATE_KEY_AVAILABLE} = 1;
+    		} else {
+    		    ##! 16: 'private key not in datapool for cert identifier ' . $identifier
+    		    CTX('log')->log(
+    			MESSAGE  => "Private key not found for escrow certificate [$identifier], dequeueing",
+    			PRIORITY => 'info',
+    			FACILITY => 'system',
+    			);
+    		}
+    	    }
+    	    
+    	    $db_hash->{PREFERRED_PROFILE} = $is_preferred;
+    	}
+    	
+	# todo: check against database if this particular cert is expected
+	# FOREIGN - not know by the PKI (can happen with imported certs)
     } else {
-	$db_hash->{SMARTCARD_USAGE} = { 
-	    'UNKNOWN' => 1,
-	};
+      $db_hash->{SMARTCARD_USAGE} = { 
+        'UNKNOWN' => 1,
+	   };
     }
     
     
@@ -1497,14 +1526,22 @@ sub __check_db_hash_against_policy {
 		$db_hash->{VISUAL_STATUS} ||= 'red';
 				        
         if ($policy->get("certs.type.$type.revoke_unused")) {
-			$db_hash->{PROCESS_FLAGS}->{REVOKE} = 1;   
+			$db_hash->{PROCESS_FLAGS}->{REVOKE} = 1;
+			
+			if ($policy->get("certs.type.$type.purge_invalid")) {
+			    $db_hash->{PROCESS_FLAGS}->{PURGE} = 1;
+			}			   
         }
 	}
     
 	if ($validity_properties{allow_renewal}) {
 		$db_hash->{VISUAL_STATUS} ||= 'amber';
 		if ($policy->get("certs.type.$type.revoke_unused")) {
-			$db_hash->{PROCESS_FLAGS}->{REVOKE} = 1;   
+			$db_hash->{PROCESS_FLAGS}->{REVOKE} = 1;
+			
+			if ($policy->get("certs.type.$type.purge_invalid")) {
+                $db_hash->{PROCESS_FLAGS}->{PURGE} = 1;
+            }      
         }		
     }
     
