@@ -26,12 +26,6 @@ sub execute {
     my $default_token = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{crypto}->{default};
     my $api           = CTX('api');
 
-
-    # TODO: CONNECTOR
-    # This portion needs to be generatized using a proper connector.
-    # possibly this operation will be offloaded to a distinct LDAP publish
-    # workflow.
-
     my $ldap_server     = $context->param('ad_server');
     my $ldap_port       = $context->param('ad_port');
     my $ldap_basedn     = $context->param('ad_basedn');
@@ -41,27 +35,19 @@ sub execute {
     my $entrydn         = $context->param('ad_entrydn');
 
     my $filter_cert_profile  = $self->param('filter_cert_profile');
-    
-    # TODO: CONNECTOR
-    # Here we need to figure out which target directory to choose for
-    # publication of a certificate. The target directory shall be determined
-    # by the domain part in the login ID the user chose to have as Smartcard
-    # login enabled login in their authentication certificate.
-    # 
+
 
     my ($domain, $userid)
         = ($context->param('chosen_loginid') =~ m{ \A (.+)\\(.+) }xms);
-
-    # use a connector here:
-    if ($domain =~ m{\A foo \z}xmsi) {
-        # for the foo AD domain, we need special configuration
-        $ldap_userdn = $self->param('ad_foo_userdn');
-        $ldap_pass   = $self->param('ad_foo_pass');
+    if ($domain =~ m{\A dblux \z}xmsi) {
+        # for DBLUX, we need special configuration
+        $ldap_userdn = $self->param('ad_dblux_userdn');
+        $ldap_pass   = $self->param('ad_dblux_pass');
     }
-    if ($domain =~ m{\A bar \z}xmsi) {
-        # for bar, we need special configuration
-        $ldap_userdn = $self->param('ad_bar_userdn');
-        $ldap_pass   = $self->param('ad_bar_pass');
+    if ($domain =~ m{\A dbch \z}xmsi) {
+        # for DBCH, we need special configuration
+        $ldap_userdn = $self->param('ad_dbch_userdn');
+        $ldap_pass   = $self->param('ad_dbch_pass');
     }
     ##! 2: 'connecting to ldap server ' . $ldap_server . ':' . $ldap_port
     my $ldap = Net::LDAP->new(

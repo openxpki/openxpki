@@ -18,11 +18,6 @@ use Template;
 
 sub execute {
     ##! 1: 'start'
-    
-    # Moved to ApplyCSRPolicy
-    return 1;
-    
-    
     my $self     = shift;
     my $workflow = shift;
     my $context  = $workflow->context();
@@ -45,41 +40,6 @@ sub execute {
            # workflow context
         $context->param('nr_of_certs' => scalar @cert_profiles);
 
-	# TODO: CONNECTOR
-	# In order to create a proper CSR this class may need some meta
-	# data:
-	# - certificate profile
-	# - certificate role
-	#   Profile and role influence the key usage bits of the generated
-	#   certificate. Will be determined by the smartcard analyze function
-	#   and will come from the context.
-	# - certificate subject
-	#   Certificate subject is constructed from the ldap meta data
-	#   read from the directory for the user. e. g. it might be 
-	#   constructed from givenname, sn and possibly middle initials
-	# - certificate subject alternative names
-	#   Some of the SANs may come from the same source than the rest
-	#   of the person meta data, e. g. the email address
-	#   For some purposes we need the UPN in a SAN to enable the
-	#   certificate for Windows Smartcard login. 
-	#   This information may come from a different source, e. g. a
-	#   second directory (commonly the Active Directory). In some cases
-	#   all user information may reside in AD, but this is not necessarily
-	#   the case.
-	#   In order to construct the SAN with the UPN we need to do the
-	#   following:
-	#   - the user needs to choose which Windows Login ID(s) should be
-	#     used for Smartcard Login. This information will have the format
-	#     DOMAIN\USERID.
-	#   - for each DOMAIN there may be a distinct Active Directory to
-	#     query.
-	#   - depending on DOMAIN we query the responsible Active Directory
-	#     and ask for the userPrincipalName for the filter
-	#     (&(sAMAccountName=$userid) (objectCategory=person))
-	#   - the resulting userPrincipalName is the value that must be
-	#     included as a SAN in the login certificate.
-
-	# the following code needs to be replaced with proper connectors:
 	# only retrieve this data if chosen_loginid is set
 	if (defined $context->param('chosen_loginid')) {
 	    # Lookup UPN from AD
@@ -92,26 +52,40 @@ sub execute {
 
 	    my ($domain, $userid)
 		= ($context->param('chosen_loginid') =~ m{ \A (.+)\\(.+) }xms);
-	    if ($domain =~ m{\A foo \z}xmsi) {
-		$ad_server = $self->param('ad_foo_server');
-		$ad_basedn = $self->param('ad_foo_basedn');
+	    if ($domain =~ m{\A (?:deuba|zzdbe) \z}xmsi) {
+		# test: "yydbe.yyads.db.com";
+		# prod: "dbe.ads.db.com";
+		$ad_server = $self->param('ad_deuba_server');
+		# test: "dc=yydbe,dc=yyads,dc=db,dc=com";
+		# prod: "dc=dbe,dc=ads,dc=db,dc=com";
+		$ad_basedn = $self->param('ad_deuba_basedn');
 	    }
-	    elsif ($domain =~ m{\A bar \z}xmsi) {
-		$ad_server = $self->param('ad_bar_server');
-		$ad_basedn = $self->param('ad_bar_basedn');
+	    elsif ($domain =~ m{\A (?:dbg|zzdbg) \z}xmsi) {
+		# prod: "dbg.ads.db.com";
+		$ad_server = $self->param('ad_dbg_server');
+		# prod: "dc=dbg,dc=ads,dc=db,dc=com";
+		$ad_basedn = $self->param('ad_dbg_basedn');
 	    }
-	    elsif ($domain =~ m{\A baz \z}xmsi) {
-		$ad_server = $self->param('ad_baz_server');
-		$ad_basedn = $self->param('ad_baz_basedn');
+	    elsif ($domain =~ m{\A itcbod \z}xmsi) {
+		# prod: "itcbod.ads.db.com";
+		$ad_server = $self->param('ad_itcbod_server');
+		# prod: "dc=itcbod,dc=ads,dc=db,dc=com";
+		$ad_basedn = $self->param('ad_itcbod_basedn');
 	    }
-	    elsif ($domain =~ m{\A blurb \z}xmsi) {
+	    elsif ($domain =~ m{\A dblux \z}xmsi) {
 		# prod: ?
-		$ad_server = $self->param('ad_blurb_server');
+		$ad_server = $self->param('ad_dblux_server');
 		# prod: ?
-		$ad_basedn = $self->param('ad_blurb_basedn');
-		# blurb has a different user name and password
-		$ad_userdn = $self->param('ad_blurb_userdn');
-		$ad_pass   = $self->param('ad_blurb_pass');
+		$ad_basedn = $self->param('ad_dblux_basedn');
+		# DBLUX has a different user name and password
+		$ad_userdn = $self->param('ad_dblux_userdn');
+		$ad_pass   = $self->param('ad_dblux_pass');
+	    }
+	    elsif ($domain =~ m{\A dbch \z}xmsi) {
+		$ad_server = $self->param('ad_dbch_server');
+		$ad_basedn = $self->param('ad_dbch_basedn');
+		$ad_userdn = $self->param('ad_dbch_userdn');
+		$ad_pass   = $self->param('ad_dbch_pass');
 	    }
 	    else {
 		OpenXPKI::Exception->throw(
