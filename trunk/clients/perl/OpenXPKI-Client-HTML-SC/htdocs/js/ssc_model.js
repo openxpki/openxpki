@@ -64,8 +64,8 @@ var SSC_MODEL = new Class(
 				this.state = null;
 				this.rnd_pin_installed = 0;
 				this.new_puk_installed = 0;
-				this.perso_wfID;
-				this.unblock_wfID;
+				this.perso_wfID = null;
+				this.unblock_wfID = null;
 				this.userPIN = null;
 				this.maxrequests = 0;
 				this.user = {};
@@ -98,10 +98,10 @@ var SSC_MODEL = new Class(
 				this.stateFilter[6]= 'HAVE_CERT_TO_DELETE';
 				this.stateFilter[7]= 'HAVE_TOKEN_OWNER';
 				//this.stateFilter[8]= 'CAN_WRITE_PIN';
-				this.stateFilter[8]= 'ISSUE_CERT';
-				this.stateFilter[9]= 'HAVE_CERT_TO_PUBLISH';
-				this.stateFilter[10]= 'HAVE_CERT_TO_UNPUBLISH';
-				this.stateFilter[11]= 'POLICY_INPUT_REQUIRED';
+				//this.stateFilter[8]= 'ISSUE_CERT';
+				this.stateFilter[8]= 'HAVE_CERT_TO_PUBLISH';
+				this.stateFilter[9]= 'HAVE_CERT_TO_UNPUBLISH';
+				this.stateFilter[10]= 'POLICY_INPUT_REQUIRED';
 				this.ECDH = null;
 				this.allowOutlook = false;
 				this.outlook = {};
@@ -1087,12 +1087,9 @@ var SSC_MODEL = new Class(
 					return;
 					
 				}
-			
-
-				window.dbg.log('debug point 1 ' );
-
+	
 				if (this.overAllStatus === 'green') {
-					window.dbg.log('debug point 2 ' );
+				
 					this.user.firstTimePerso = false;
 					if (activePersoWf !== null) {
 						window.dbg.log('continue Personalization -active wf found id:'
@@ -1155,7 +1152,6 @@ var SSC_MODEL = new Class(
 					}
 
 				} else if (this.overAllStatus === 'amber') {
-					window.dbg.log('debug point 3 ' );
 					window.dbg.log('status amber');
 					this.user.firstTimePerso = false;
 					this.reCert = true;
@@ -1190,7 +1186,7 @@ var SSC_MODEL = new Class(
 					viewCb('startRecert');
 					return;
 				} else if (this.overAllStatus === 'red') {
-					window.dbg.log('debug pint 4 ' );
+
 					sscView.setTopMenu(false);
 					window.dbg.log('status ');
 					if (activePersoWf !== null) {
@@ -1218,11 +1214,9 @@ var SSC_MODEL = new Class(
 //
 //						}	
 //					}
-					
-					
+							
 					//this.reCert = true;
-					window.dbg.log('debug pint 3 ' );
-					window.dbg.log('status - start personalization');
+
 					if(this.user.firstTimePerso)
 					{
 						viewCb('startPerso');
@@ -1911,6 +1905,7 @@ var SSC_MODEL = new Class(
 								return;
 								
 						}else{
+							this.unblock_wfID = undefined;
 							viewCb();
 							return;
 						}
@@ -2438,8 +2433,8 @@ var SSC_MODEL = new Class(
 						server_cb(data, viewCb);
 					},
 					onFailure : function() {
-						this.ajax_log('ajax request error','error');
-						sscView.showPopUp('AJAX Request Error', 'cross', '#0001 - ' + url);
+						//this.ajax_log('ajax request error','error');
+						sscView.showPopUp('E_Ajax_Failure', 'cross', '#0001 - ' + url);
 						sscView.setStatusMsg("E_comm", ' ', '');
 					}
 				}).send();

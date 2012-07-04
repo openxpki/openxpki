@@ -82,22 +82,57 @@ sub start_pinreset {
 	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
 ##############################################################################
 	
+#####################################check OpenXPKI connection######################################
+	if ( !defined $c || $c == 0 ) {
+		$responseData->{'error'} = "error";
+		push(
+			@{$errors},
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		);
 
-      if (!defined $c || $c == 0)
-      {
-                $responseData->{'error'} = "error";
-                            push(
-                 @{$errors},
-		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
-		  );
+		$log->error( $session->{'id_cardID'}
+			  . "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		);
 
-		$log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER");
+		$responseData->{'errors'} = $errors;
+		return $self->send_json_respond($responseData);
 
+	}
 
-        $responseData->{'errors'} = $errors;
-        return $self->send_json_respond($responseData);
-
-      }
+    my $ping_msg = $c->send_receive_service_msg('PING');
+    if ($ping_msg->{SERVICE_MSG} eq 'SERVICE_READY') {
+		$log->debug( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RECONNECT_SUCCESS");
+    }
+    ## check the message
+    if (! defined $ping_msg &&
+        $c->get_communication_state ne "can_receive" &&
+        ! $c->is_connected()
+    ) {
+    	
+    	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_OPENXPKI_CONNECT_RESET");
+    	$c = $self->openXPKIConnection(
+	                undef,
+	                $session->{'cardOwner'},
+	                config()->{openxpki}->{role}
+	         );
+     
+	     if ( !defined $c ) {
+	            $responseData->{'error'} = "error";
+	            push(
+	                @{$errors},
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"
+	            );
+	            $c = 0;
+	            $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"); 
+	        }else{
+	
+	            if ( $c != 0 ) {
+	            	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
+	                $responseData->{'start_new_user_session'} = "OpenXPKISession started new User session";
+	                 $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RESTART_SESSION");
+	            }
+	        }
+    }
 
     if ( !defined $self->param("email1") ) {
         $responseData->{'error'} = "error";
@@ -274,7 +309,7 @@ sub start_pinreset {
                     'WORKFLOW' => $wf_type,
                 },
             );
-           $log->debug(Dumper($msg));
+           #$log->debug(Dumper($msg));
 
             if ( $self->is_error_response($msg) ) {
                 $responseData->{'error'} = "error";
@@ -400,18 +435,57 @@ sub list_active_workflows {
 
  	 $responseData->{"wf_type"} = $wf_type;
 
-      if (!defined $c || $c == 0)
-      {
-                $responseData->{'error'} = "error";
-                            push(
-                 @{$errors},
-		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
-		  );
+#####################################check OpenXPKI connection######################################
+	if ( !defined $c || $c == 0 ) {
+		$responseData->{'error'} = "error";
+		push(
+			@{$errors},
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		);
 
-        $responseData->{'errors'} = $errors;
-        return $self->send_json_respond($responseData);
+		$log->error( $session->{'id_cardID'}
+			  . "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		);
 
-      }
+		$responseData->{'errors'} = $errors;
+		return $self->send_json_respond($responseData);
+
+	}
+
+    my $ping_msg = $c->send_receive_service_msg('PING');
+    if ($ping_msg->{SERVICE_MSG} eq 'SERVICE_READY') {
+		$log->debug( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RECONNECT_SUCCESS");
+    }
+    ## check the message
+    if (! defined $ping_msg &&
+        $c->get_communication_state ne "can_receive" &&
+        ! $c->is_connected()
+    ) {
+    	
+    	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_OPENXPKI_CONNECT_RESET");
+    	$c = $self->openXPKIConnection(
+	                undef,
+	                $session->{'cardOwner'},
+	                config()->{openxpki}->{role}
+	         );
+     
+	     if ( !defined $c ) {
+	            $responseData->{'error'} = "error";
+	            push(
+	                @{$errors},
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"
+	            );
+	            $c = 0;
+	            $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"); 
+	        }else{
+	
+	            if ( $c != 0 ) {
+	            	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
+	                $responseData->{'start_new_user_session'} = "OpenXPKISession started new User session";
+	                 $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RESTART_SESSION");
+	            }
+	        }
+    }
 
 ####If error occured cancel request and send back error MSGs####
     if ( defined $responseData->{'error'} ) {
@@ -529,20 +603,57 @@ sub pinreset_verify {
 	}
 	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
 ##############################################################################    
-    
+#####################################check OpenXPKI connection######################################
+	if ( !defined $c || $c == 0 ) {
+		$responseData->{'error'} = "error";
+		push(
+			@{$errors},
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		);
 
-      if (!defined $c || $c == 0)
-      {
-                $responseData->{'error'} = "error";
-                            push(
-                 @{$errors},
-		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
-		  );
-		$log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER");
-        $responseData->{'errors'} = $errors;
-        return $self->send_json_respond($responseData);
+		$log->error( $session->{'id_cardID'}
+			  . "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		);
 
-      }
+		$responseData->{'errors'} = $errors;
+		return $self->send_json_respond($responseData);
+
+	}
+
+    my $ping_msg = $c->send_receive_service_msg('PING');
+    if ($ping_msg->{SERVICE_MSG} eq 'SERVICE_READY') {
+		$log->debug( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RECONNECT_SUCCESS");
+    }
+    ## check the message
+    if (! defined $ping_msg &&
+        $c->get_communication_state ne "can_receive" &&
+        ! $c->is_connected()
+    ) {
+    	
+    	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_OPENXPKI_CONNECT_RESET");
+    	$c = $self->openXPKIConnection(
+	                undef,
+	                $session->{'cardOwner'},
+	                config()->{openxpki}->{role}
+	         );
+     
+	     if ( !defined $c ) {
+	            $responseData->{'error'} = "error";
+	            push(
+	                @{$errors},
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"
+	            );
+	            $c = 0;
+	            $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"); 
+	        }else{
+	
+	            if ( $c != 0 ) {
+	            	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
+	                $responseData->{'start_new_user_session'} = "OpenXPKISession started new User session";
+	                 $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RESTART_SESSION");
+	            }
+	        }
+    }
     
 #################################PARAMETER#################################
 # 	if(! defined $self->param("email1") )
@@ -787,7 +898,7 @@ sub pinreset_verify {
             },
         );
         
-      $log->debug(Dumper($msg));
+      #$log->debug(Dumper($msg));
 
 
         my $got_puk = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_puk};
@@ -947,18 +1058,57 @@ sub pinreset_confirm {
 	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
 ##############################################################################  
 
-      if (!defined $c || $c == 0)
-      {
-                $responseData->{'error'} = "error";
-                            push(
-                 @{$errors},
-		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
-		  );
+#####################################check OpenXPKI connection######################################
+	if ( !defined $c || $c == 0 ) {
+		$responseData->{'error'} = "error";
+		push(
+			@{$errors},
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		);
 
-        $responseData->{'errors'} = $errors;
-        return $self->send_json_respond($responseData);
+		$log->error( $session->{'id_cardID'}
+			  . "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		);
 
-      }
+		$responseData->{'errors'} = $errors;
+		return $self->send_json_respond($responseData);
+
+	}
+
+    my $ping_msg = $c->send_receive_service_msg('PING');
+    if ($ping_msg->{SERVICE_MSG} eq 'SERVICE_READY') {
+		$log->debug( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RECONNECT_SUCCESS");
+    }
+    ## check the message
+    if (! defined $ping_msg &&
+        $c->get_communication_state ne "can_receive" &&
+        ! $c->is_connected()
+    ) {
+    	
+    	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_OPENXPKI_CONNECT_RESET");
+    	$c = $self->openXPKIConnection(
+	                undef,
+	                $session->{'cardOwner'},
+	                config()->{openxpki}->{role}
+	         );
+     
+	     if ( !defined $c ) {
+	            $responseData->{'error'} = "error";
+	            push(
+	                @{$errors},
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"
+	            );
+	            $c = 0;
+	            $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"); 
+	        }else{
+	
+	            if ( $c != 0 ) {
+	            	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
+	                $responseData->{'start_new_user_session'} = "OpenXPKISession started new User session";
+	                 $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RESTART_SESSION");
+	            }
+	        }
+    }
 
     if ( defined $self->param("unblock_wfID") ) {
         $session->{'wf_ID'}      = $self->param("unblock_wfID");
@@ -1093,19 +1243,72 @@ sub pinreset_cancel {
 
  	 $responseData->{"wf_type"} = $wf_type;
 
-      if (!defined $c || $c == 0)
-      {
-                $responseData->{'error'} = "error";
-                            push(
-                 @{$errors},
-		"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
-		  );
+#################################LOG4PERL###################################
+    if ( Log::Log4perl->initialized() ) {
 
-        $responseData->{'errors'} = $errors;
-        return $self->send_json_respond($responseData);
+		# Yes, Log::Log4perl has already been initialized
+		$responseData->{'log4perl init'} = "YES";
+	}
+	else {
+		Log::Log4perl->init_once("/var/applications/apache/pki/conf/log.conf");
 
-      }
+		# No, not initialized yet ...
+		$responseData->{'log4perl init'} = "NO";
+	}
+	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+##############################################################################
 
+#####################################check OpenXPKI connection######################################
+	if ( !defined $c || $c == 0 ) {
+		$responseData->{'error'} = "error";
+		push(
+			@{$errors},
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		);
+
+		$log->error( $session->{'id_cardID'}
+			  . "I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_RESUME_SESSION_NO_CARDOWNER"
+		);
+
+		$responseData->{'errors'} = $errors;
+		return $self->send_json_respond($responseData);
+
+	}
+
+    my $ping_msg = $c->send_receive_service_msg('PING');
+    if ($ping_msg->{SERVICE_MSG} eq 'SERVICE_READY') {
+		$log->debug( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RECONNECT_SUCCESS");
+    }
+    ## check the message
+    if (! defined $ping_msg &&
+        $c->get_communication_state ne "can_receive" &&
+        ! $c->is_connected()
+    ) {
+    	
+    	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_OPENXPKI_CONNECT_RESET");
+    	$c = $self->openXPKIConnection(
+	                undef,
+	                $session->{'cardOwner'},
+	                config()->{openxpki}->{role}
+	         );
+     
+	     if ( !defined $c ) {
+	            $responseData->{'error'} = "error";
+	            push(
+	                @{$errors},
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"
+	            );
+	            $c = 0;
+	            $log->error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"); 
+	        }else{
+	
+	            if ( $c != 0 ) {
+	            	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
+	                $responseData->{'start_new_user_session'} = "OpenXPKISession started new User session";
+	                 $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RESTART_SESSION");
+	            }
+	        }
+    }
     if ( !defined $self->param("unblock_wfID") || $self->param("unblock_wfID") eq '' ) {
         $responseData->{'error'} = "error";
         push( @{$errors},

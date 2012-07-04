@@ -1026,7 +1026,7 @@ var SSC_VIEW = new Class(
 					
 					this.showPinDlg(true);
 					// set title
-					this.setInfoTitle('T_changePin');
+					this.setInfoTitle('T_ChangePin');
 					this.setInfoRight('IT_Info', 'I_userPinPolicy');
 					$('pin1').style.backgroundColor = "red";
 					$('pin1').focus();
@@ -1045,7 +1045,7 @@ var SSC_VIEW = new Class(
 					
 					this.showPinDlg(true);
 					// set title
-					this.setInfoTitle('T_changePin');
+					this.setInfoTitle('T_ChangePin');
 					// set right info text
 					this.setInfoRight('IT_Info', 'I_userPinWrong');
 					$('pin').style.backgroundColor = "red";
@@ -1067,13 +1067,7 @@ var SSC_VIEW = new Class(
 					// set next & back action
 					this.setNextAction('T_cardUnblock', this.processAuthPersons, true);
 					this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
-	
-//					this.setInfoTitle('T_changePin');
-//					// set right info text
-//					this.setInfoRight('IT_Info', 'I_cardBlocked');
-//					// set next & back action
-//					this.setNextAction('T_cardUnblock', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
-//					this.setBackAction('T_back', function(){ this.handleStatus('showStatus');}.bind(this), true);				 
+ 
 					this.setPrompt('T_cardBlocked');
 				// everything ok
 				} else {
@@ -1160,7 +1154,7 @@ var SSC_VIEW = new Class(
 						this.setNextAction('T_proceedActStep2', this.processPins, true);
 						this.setBackAction('T_chooseAuthPers', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
 					}else{
-						this.setInfoTitle('T_cardUnblock');
+						this.setInfoTitle('T_cardUnblock_step1');
 						// set next & back action
 						this.setNextAction('T_cardUnblock', this.processPins, true);
 						this.setBackAction('T_chooseAuthPers', function(){this.handleStatus('enterAuthPersons');}.bind(this), true);
@@ -1212,7 +1206,7 @@ var SSC_VIEW = new Class(
 
 				this.showPinDlg(true);
 				// set title
-				this.setInfoTitle('T_changePin');
+				this.setInfoTitle('T_ChangePin');
 				this.setPrompt();
 				// set right info text
 				this.setInfoRight('IT_Info', 'I_changePin');
@@ -1541,7 +1535,7 @@ var SSC_VIEW = new Class(
 				this.setInfoTitle('T_EnableSSO');
 				this.setInfoRight('IT_Info', 'I_enableSSO');
 				
-				
+/*				
 				var div = new Element('div', {
 					'class' : 'selectCardDlg'
 				});
@@ -1553,6 +1547,7 @@ var SSC_VIEW = new Class(
 				// inject div into info
 				$('infoMore').empty();
 				div.inject($('infoMore'));
+*/
 				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
 				this.setNextAction('T_EnableSSO',this.processEnableSSO, true);
 			},
@@ -1645,6 +1640,10 @@ var SSC_VIEW = new Class(
 				
 				var results = new Querystring(r);
 				var set = results.get("Result");
+				//set back Action
+				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
+				
+				
 				if(set === 'SUCCESS'){
 					this.setPrompt('P_outlook_conf_success');
 				}else{
