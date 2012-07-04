@@ -2194,7 +2194,6 @@ var SSC_VIEW = new Class(
 			showHints : function(){
 				
 				window.dbg.log('showHints');
-				this.setInfoTitle('T_HintTitle');
 				this.setInfoTitle('T_cardActivationSuccess');
 				this.setInfoLeft('','');
 				this.setInfoRight('IT_Info','I_HintInfoR');
