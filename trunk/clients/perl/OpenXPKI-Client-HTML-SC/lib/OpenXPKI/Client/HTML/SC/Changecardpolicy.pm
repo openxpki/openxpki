@@ -133,6 +133,7 @@ sub get_card_policy {
 	
 	            if ( $c != 0 ) {
 	            	$session->{'openxPKI_Session_ID'} = $c->get_session_id();
+	            	$session->{"c"}            = $c;
 	                $responseData->{'start_new_user_session'} = "OpenXPKISession started new User session";
 	                 $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_OPENXPKI_RESTART_SESSION");
 	            }

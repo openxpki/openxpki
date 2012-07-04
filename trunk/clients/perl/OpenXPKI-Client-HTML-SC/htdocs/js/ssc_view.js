@@ -1535,7 +1535,7 @@ var SSC_VIEW = new Class(
 				this.setInfoTitle('T_EnableSSO');
 				this.setInfoRight('IT_Info', 'I_enableSSO');
 				
-/*				
+				
 				var div = new Element('div', {
 					'class' : 'selectCardDlg'
 				});
@@ -1547,7 +1547,7 @@ var SSC_VIEW = new Class(
 				// inject div into info
 				$('infoMore').empty();
 				div.inject($('infoMore'));
-*/
+
 				this.setBackAction('T_back',function(){ this.handleStatus('showStatus');}.bind(this), true);
 				this.setNextAction('T_EnableSSO',this.processEnableSSO, true);
 			},
@@ -1645,8 +1645,10 @@ var SSC_VIEW = new Class(
 				
 				
 				if(set === 'SUCCESS'){
+					this.setInfoRight('IT_Info', 'I_confOutlook');
 					this.setPrompt('P_outlook_conf_success');
 				}else{
+					this.setInfoRight('IT_Info', 'I_confOutlookError');
 					this.setPrompt('P_outlook_conf_error');
 				}
 				
