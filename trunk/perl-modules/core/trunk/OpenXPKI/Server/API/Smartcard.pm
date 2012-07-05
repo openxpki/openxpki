@@ -37,6 +37,7 @@ sub START {
 # CERTFORMAT => DER|PEM|IDENTIFIER|BASE64 (allows degraded formats, 
 #   e. g. without newlines)
 # CERTS => arrayref, entries contain raw cert data
+# NOPOLICY => see sc_analyze_certificate
 sub sc_parse_certificates {
     ##! 1: 'init'
     my $self = shift;
@@ -68,6 +69,7 @@ sub sc_parse_certificates {
 		CONFIG_ID  => $cfg_id,
 		DATA       => $entry,
 		CERTFORMAT => $arg_ref->{CERTFORMAT},
+	    NOPOLICY => $arg_ref->{NOPOLICY},    		
 	    });
 
 	##! 16: 'parsed certificate: ' . Dumper $data
@@ -144,9 +146,7 @@ sub sc_analyze_smartcard {
 	    keysize => 2048,
 	    default_puk => undef,
 	    keyid => undef
-	},
-	CERT_TYPE => { 
-	},
+	}, 
 	WORKFLOWS => undef,
 	PROCESS_FLAGS => {
 	    # user is allowed to start a personalization workflow (complex
@@ -181,9 +181,6 @@ sub sc_analyze_smartcard {
 	    set_to_value => undef,
 	    set_by_type => '',
 	},
-	PKI => {
-		REVOKE => []
-	}
     };
 
     my $config = CTX('config');
@@ -413,7 +410,7 @@ sub sc_analyze_smartcard {
 	my $current_employee_info;		
 	if ($current_employee_info_dp) {		
     	$current_employee_info = $ser->deserialize($current_employee_info_dp->{VALUE});
-		foreach my $key qw(givenname sn mail) {
+		foreach my $key (qw(givenname sn mail)) {
 			if ($employeeinfo->{VALUE}->{$key} ne $current_employee_info->{$key}) {
 				$employee_data_has_changed .= " $key: ".$current_employee_info->{$key}." -> ".$employeeinfo->{VALUE}->{$key};
 				$current_employee_info->{$key} = $employeeinfo->{VALUE}->{$key}; 
@@ -428,7 +425,7 @@ sub sc_analyze_smartcard {
 			);
 		}			
 	} else {		
-		foreach my $key qw(givenname sn mail) {			
+		foreach my $key (qw(givenname sn mail)) {			
 			$current_employee_info->{$key} = $employeeinfo->{VALUE}->{$key}; 
     	}
 	}   
@@ -588,11 +585,340 @@ sub sc_analyze_smartcard {
     # hash array containing details on every single certificate.
     # Populate a return structure that contains the parsed version of all
     # certificates on the Smartcard.
-    # analyze contents of the card
-    
-    # Helper to split the certificates based on the form type
-    $result->{PARSED_CERTS} = $self->sc_parse_certificates($arg_ref);
 
+    #### Rewrite starts here #################################################
+    # The main hash which holds all informationen is $user_certs which has three
+    # sections by_identifier, by_type, by_profile. Each section has an array ref
+    # which contain (shared) instance of the approprate certificates
+    
+    my $user_certs = {
+        by_identifier => {},
+        by_type => { UNEXPECTED => [], FOREIGN => [] },
+        by_profile => { UNKNOWN => [] },
+        on_card => [],
+    };
+    
+    # Initialize the lists with profiles and types from the configuration
+    foreach my $type ($policy->get_keys('certs.type')) {       
+       $user_certs->{by_type}->{$type} = [];
+    }
+    
+    ##! 32: ' Loading Profiles from xref.profile '    
+    my @profiles = $policy->get_keys('xref.profile');
+    foreach my $profile ( @profiles) {
+        $user_certs->{by_profile}->{$profile} = [];
+    }
+    
+    
+    #### Analyse Step 1 #####################################################
+    # Parse certificates from card  
+    my $certs_on_card = $self->sc_parse_certificates({ 
+        CERTS => $arg_ref->{CERTS}, 
+        CERTFORMAT => $arg_ref->{CERTFORMAT}, 
+        NOPOLICY => 1,
+        CONFIG_ID => $cfg_id,
+    });
+
+    # Map $certs_on_card into the user_cert hash
+    foreach my $cert (@$certs_on_card) {
+        ##! 16: " Add certificate from card " . $cert->{IDENTIFIER}
+        $cert->{ANALYZE} = { ONCARD => 1 }; 
+        ##! 64: Dumper ($cert)        
+        $user_certs->{by_identifier}->{$cert->{IDENTIFIER}} = $cert;
+        # Need to export them for SC API Call
+        push @{$user_certs->{on_card}}, $cert;
+    } 
+    
+    CTX('log')->log(
+        MESSAGE => "Certificates found on card: " . join(', ', keys %{$user_certs->{by_identifier}}),
+        PRIORITY => 'info',
+        FACILITY => [ 'system' ],
+    );      
+    
+    #### Analyse Step 2 #####################################################    
+    # Get list of the users certificates (identifiers) from the datapool
+    my $users_certificate_identifiers = CTX('api')->get_data_pool_entry( {
+        PKI_REALM => $thisrealm,
+        NAMESPACE => 'smartcard.user.certificate',
+        KEY => $holder_employee_id,
+    });
+        
+    my @certs_in_datapool;
+    if ($users_certificate_identifiers) {    
+        @certs_in_datapool = @{$ser->deserialize($users_certificate_identifiers->{VALUE})};
+    }
+
+    ##! 32: ' User has ' . scalar @certs_in_datapool . ' certs registered in datapool '
+    
+    my @certs_to_load_from_db;
+    CERT_FROM_DATAPOOL:
+    foreach my $cert_id (@certs_in_datapool) {
+        if ($user_certs->{by_identifier}->{$cert_id}) {
+            ##! 64: " Certificate is already on card " . $cert_id
+            next CERT_FROM_DATAPOOL;
+        }
+        ##! 64: "Certificate not on card " . $cert_id        
+        # Schedule certificate to load it from the database
+        push @certs_to_load_from_db, $cert_id;                    
+    } 
+
+    ##! 32: 'Need to load ' . scalar @certs_to_load_from_db . ' from database '
+    CTX('log')->log(
+        MESSAGE => "Certificates to load from database: " . join(', ', @certs_to_load_from_db),
+        PRIORITY => 'info',
+        FACILITY => [ 'system' ],
+    );  
+
+    if (scalar (@certs_to_load_from_db)) {
+        my $db_results = CTX('dbi_backend')->select(
+            TABLE => [
+                'CERTIFICATE',
+                'CSR',
+            ],
+            COLUMNS => [
+                'CSR.PROFILE',
+                'CERTIFICATE.SUBJECT',
+                'CERTIFICATE.IDENTIFIER',
+                'CERTIFICATE.ROLE',
+                'CERTIFICATE.STATUS',
+                'CERTIFICATE.DATA',
+                'CERTIFICATE.NOTBEFORE',
+                'CERTIFICATE.NOTAFTER',
+            ],
+            DYNAMIC => {
+                'CERTIFICATE.PKI_REALM' => $thisrealm,
+                'CERTIFICATE.IDENTIFIER' => \@certs_to_load_from_db,
+            },
+            JOIN => [
+                [
+                 'CSR_SERIAL',
+                 'CSR_SERIAL',
+                ],
+            ],
+        );
+            
+        # Push certificate to the user_cert hash
+        foreach my $entry (@{$db_results}) {
+            my $identifier = $entry->{'CERTIFICATE.IDENTIFIER'};
+            ##! 16: " Add certificate from database " . $identifier
+            $user_certs->{by_identifier}->{$identifier} = {
+                IDENTIFIER => $identifier,
+                PROFILE    => $entry->{'CSR.PROFILE'},
+                ROLE       => $entry->{'CERTIFICATE.ROLE'},
+                SUBECT     => $entry->{'CERTIFICATE.SUBJECT'},
+                STATUS     => $entry->{'CERTIFICATE.STATUS'},
+                NOTBEFORE  => $entry->{'CERTIFICATE.NOTBEFORE'},
+                NOTAFTER   => $entry->{'CERTIFICATE.NOTAFTER'},
+                ANALYZE    => { ONCARD => 0 }
+            };
+            ##! 64: Dumper ($user_certs->{by_identifier}->{$identifier})             
+            
+        }
+    }
+
+         
+    #### Analyse Step 3 #####################################################        
+    # The user_cert hash now contains all certificates that are either assigned 
+    # to the user via datapool or that were found on the card.
+    # Now we populate the cross ref lists by type and profile 
+    foreach my $identifier (keys %{$user_certs->{by_identifier}}) {
+       
+        my $cert = $user_certs->{by_identifier}->{$identifier};
+        
+        # Try to get the type based on the profile, NB: requires that a profile may not be used in two types        
+        $cert->{TYPE} = $policy->get("xref.profile.$cert->{PROFILE}.type") if ($cert->{PROFILE}); 
+
+        # Force the profile to be "UNKNOWN" if it is not in the current map
+        if (!$cert->{TYPE}) {
+            if ($cert->{PROFILE}) {
+                $cert->{TYPE} = 'UNEXPECTED';
+                $cert->{PROFILE} = 'INVALID';    
+            } else {
+                $cert->{TYPE} = 'FOREIGN';
+                $cert->{PROFILE} = 'UNKNOWN';
+            }                       
+        }
+
+        push @{$user_certs->{by_type}->{$cert->{TYPE}}}, 
+            $user_certs->{by_identifier}->{$identifier};
+            
+        push @{$user_certs->{by_profile}->{$cert->{PROFILE}}}, 
+            $user_certs->{by_identifier}->{$identifier};
+
+        ##! 64: "Certificate $identifier has profile $cert->{PROFILE} and type $cert->{TYPE}"
+        CTX('log')->log(
+            MESSAGE => "Certificate $identifier has profile $cert->{PROFILE} and type $cert->{TYPE}",
+            PRIORITY => 'debug',
+            FACILITY => [ 'system' ],
+        );
+    }
+    
+    #### Analyse Step 4 #####################################################        
+    # Iterate over the certificates grouped by type and set the status flags
+    # according to the policy settings
+        
+    $result->{TASKS} = {
+        PURGE => [],
+        INSTALL => [],        
+        REVOKE => [],
+        CREATE => [],
+        SOFT => 1,
+    };
+    
+    foreach my $type (keys %{$user_certs->{by_type}}) {
+        
+        # Sort the list by NOTBEFORE date
+        @{$user_certs->{by_type}->{$type}} 
+            = sort { $b->{NOTBEFORE} <=> $a->{NOTBEFORE} } 
+                @{$user_certs->{by_type}->{$type}};
+                
+        # Fetch the policy settings for that type
+        my $type_policy = {};
+        foreach my $key (qw(promote_to_preferred_profile ignore_certificates_with_missing_private_key 
+            lead_validity required max_count 
+            allow_renewal force_renewal escrow_key
+            publish purge_valid purge_invalid revoke_unused)) {
+           
+            $type_policy->{$key} = $policy->get("certs.type.$type.$key") || 0;
+        }        
+        $type_policy->{max_count} ||= 1;
+        $type_policy->{preferred_profile} = $policy->get("certs.type.$type.allowed_profiles.0") || '';        
+        
+        ##! 32: "Policy Settings for $type: " . Dumper($type_policy)
+        
+        # Top check the limits
+        my $cert_on_card_count = 0;
+        
+        # No certificates of that type
+        if (scalar(@{$user_certs->{by_type}->{$type}}) == 0 && $type_policy->{preferred_profile})  {
+            push @{$result->{TASKS}->{CREATE}}, $type;
+            $result->{TASKS}->{SOFT} = 0;            
+            CTX('log')->log(
+                MESSAGE => "create initial certificate of $type",
+                PRIORITY => 'info',
+                FACILITY => [ 'system' ],
+            );
+        } 
+                        
+        CERT_ANALYZE_LOOP: 
+        foreach my $cert (@{$user_certs->{by_type}->{$type}}) {
+            
+            my $identifier = $cert->{IDENTIFIER};
+            ##! 16: 'Process '  . $identifier      
+            $self->__check_against_policy({ CERT => $cert, POLICY => $type_policy});
+
+            # If this is the topmost certificate, we check the status to see if we need 
+            # to create a new certificate
+            if ($cert_on_card_count == 0 && $cert->{VISUAL_STATUS} ne "green" && $type_policy->{preferred_profile}) {
+                push @{$result->{TASKS}->{CREATE}}, $type;
+                $result->{TASKS}->{SOFT} &&= $cert->{ANALYZE}->{SOFT};    
+                $cert_on_card_count++;               
+                CTX('log')->log(
+                    MESSAGE => "add certificate of $type",
+                    PRIORITY => 'info',
+                    FACILITY => [ 'system' ],
+                );
+            }
+             
+            # More than allowed certificates on card (including created ones)
+            if ($cert_on_card_count >= $type_policy->{max_count}) {
+                $self->__check_actions_on_discard_candidate({ CERT => $cert, POLICY => $type_policy});       
+                
+                ##! 128: 'Discarding - result: ' . Dumper ($cert)
+                
+                if ($cert->{PROCESS_FLAGS}->{REVOKE}) {                
+                    push @{$result->{TASKS}->{REVOKE}}, $cert;
+                    ##! 64: "max_count for type $type reached, certificate will be revoked"
+                    CTX('log')->log(
+                        MESSAGE => "max_count for type $type reached, certificate $identifier will be revoked",
+                        PRIORITY => 'debug',
+                        FACILITY => [ 'system' ],
+                    );
+                }
+                
+                if ($cert->{PROCESS_FLAGS}->{PURGE}) {                
+                    push @{$result->{TASKS}->{PURGE}}, $cert;
+                    ##! 64: "max_count for type $type reached, certificate will be purged"
+                    CTX('log')->log(
+                        MESSAGE => "max_count for type $type reached, certificate $identifier will be purged",
+                        PRIORITY => 'debug',
+                        FACILITY => [ 'system' ],
+                    );                    
+                }
+                
+                # Set the soft flag
+                $result->{TASKS}->{SOFT} &&= $cert->{PROCESS_FLAGS}->{SOFT};                
+                next CERT_ANALYZE_LOOP;                               
+            }
+            
+            # If we are here, there are slots left to install suited certificates            
+            $self->__check_actions_on_install_candidate({ CERT => $cert, POLICY => $type_policy});
+            
+            ##! 128: 'Candidate - result: ' . Dumper ($cert)
+            # Set the soft flag
+            $result->{TASKS}->{SOFT} &&= $cert->{PROCESS_FLAGS}->{SOFT};
+            
+            foreach my $action (qw(INSTALL REVOKE PURGE)) {               
+                if ($cert->{PROCESS_FLAGS}->{$action}) {                
+                    push @{$result->{TASKS}->{$action}}, $cert;
+                    ##! 64: "certificate will be $action 'ed due to policy"
+                    CTX('log')->log(
+                        MESSAGE => "certificate $identifier of type $type will be $action 'ed due to policy",
+                        PRIORITY => 'debug',
+                        FACILITY => [ 'system' ],
+                    );                    
+                }
+            }
+                
+            if ($cert->{FINAL_STATE}->{ONCARD}) {
+                $cert_on_card_count++;     
+            }
+            
+            # The first certificate deployed on card is used for the lead validity computation
+            if ($cert_on_card_count == 1 && $type_policy->{lead_validity} && !$result->{VALIDITY}->{set_by_type}) {
+                ##! 32: ' Set overall validity by cert '.$identifier.' to ' . $cert->{NOTAFTER};
+                $result->{VALIDITY}->{set_by_type} = $type;
+                $result->{VALIDITY}->{set_to_value} = $cert->{NOTAFTER};                    
+                CTX('log')->log(
+                    MESSAGE => "Set validity based on $identifier to " . DateTime->from_epoch( epoch => $cert->{NOTAFTER} )->strftime("%F %T"),
+                    PRIORITY => 'info',
+                    FACILITY => [ 'system' ],
+                );                                          
+            }
+                        
+        }        
+    } # foreach type loop
+
+    if (!$result->{TASKS}->{SOFT}) {
+        $result->{OVERALL_STATUS} = 'red';    
+    } else {
+        $result->{OVERALL_STATUS} = 'green';
+        # Overall status is not green if there is any action pending
+        foreach my $action (qw(INSTALL REVOKE PURGE CREATE)) {
+            if (scalar ( @{$result->{TASKS}->{$action}} ) ) {
+                $result->{OVERALL_STATUS} = 'amber';
+                last;
+            }
+        }
+    } 
+
+    ##! 16: 'overall status: ' . $result->{OVERALL_STATUS}
+    CTX('log')->log(
+        MESSAGE => "Overall Status is $result->{OVERALL_STATUS}",
+        PRIORITY => 'info',
+        FACILITY => [ 'system' ],
+    );         
+
+    # SC UI needs info about the certs on card
+    $result->{PARSED_CERTS} = $user_certs->{on_card};
+    
+
+    ##! 32: 'analysis result: ' . Dumper $result
+    return $result;
+    
+    ###########################################################################
+    ###########################################################################    
+    ###########################################################################
     ###########################################################################
     # sort and index the exisiting certificates
     
@@ -1321,7 +1647,8 @@ sub _get_policy {
     foreach my $type ( $policy->get_keys('certs.type') ) {
     
         my $isFirst = 1;       
-        foreach my $allowed_profile ($policy->get_list("certs.type.$type.allowed_profiles")) {    
+        foreach my $allowed_profile ( $policy->get_list("certs.type.$type.allowed_profiles") ) {
+            ##! 16: "Profile: $allowed_profile"    
             $policy->set(['xref.profile', $allowed_profile, 'type'], $type );        
             if ($isFirst) {
                 # first profile is preferred
@@ -1336,6 +1663,325 @@ sub _get_policy {
     return $policy;
 }
 
+# Die Statusflags entsprechen den Policy-Flags allow_renewal/force_renewal/escrow_key. Dazu bauen wir uns noch drei Hilfsflags:
+# valid: nicht revoked, nicht innerhalb allow/force_renewal, preferred
+# usable: auf der Karte oder escrow und key vorhanden
+# soft: invalid kommt aus "allow_renewal" oder profile promotion
+sub __check_against_policy {
+    my $self = shift;
+    my $args = shift;
+    my $cert = $args->{CERT};
+    my $policy = $args->{POLICY};
+        
+    my $identifier = $cert->{IDENTIFIER};
+    
+    ##! 16: 'Do policy check on ' . $identifier    
+    $cert->{ANALYZE} = {
+        %{$cert->{ANALYZE}}, # Has ONCARD already set
+        # States             
+        VALID => 1, # not revoked and in validity period
+        EXPECTED => 1, # preferred and not expiring       
+        USABLE => 0, # on card or restorable to card
+        ALLOW_RENEWAL => 0, # weather period is met
+        FORCE_RENEWAL => 0, # weather period is met
+        PREFERRED => 0, # profile matches the preferred one 
+        SOFT => 1, # soft error (allow renewal, profile upgrade)           
+    };
+    my $analyze = $cert->{ANALYZE}; 
+        
+    # cert is known by PKI and not in ISSUED state  
+    if (defined $cert->{STATUS} && ($cert->{STATUS} ne 'ISSUED')) {
+       ##! 64: ' Certificate is not in issued status '
+       $analyze->{VALID} = 0;
+       $analyze->{SOFT} = 0;
+    }
+    
+    # Check if it is the preferred profile
+    if ($cert->{PROFILE} eq $policy->{preferred_profile}) {
+        ##! 64: ' Certificate is of preferred profile' 
+       $analyze->{PREFERRED} = 1;       
+    } elsif ($policy->{promote_to_preferred_profile}) {
+        ##! 64: ' Certificate needs profile update' 
+        # Promote is only a "soft" validity exception 
+        $analyze->{EXPECTED} = 0;             
+        CTX('log')->log(
+            MESSAGE => "Certificate $identifier needs profile update ($cert->{PROFILE} to $policy->{preferred_profile})",
+            PRIORITY => 'debug',
+            FACILITY => [ 'system' ],
+        );
+    }
+    
+    # Check if cert is usable (on card or escrow key exists)
+    if ($analyze->{ONCARD}) {
+         ##! 64: ' Certificate is on card' 
+        $analyze->{USABLE} = 1;
+    } elsif ($policy->{escrow_key}) {
+        
+        ##! 16: 'checking if private key is available for cert identifier ' . $identifier
+        
+        my $private_key_found = CTX('dbi_backend')->first (
+            TABLE => 'DATAPOOL',
+            DYNAMIC => {
+                PKI_REALM    => CTX('session')->get_pki_realm(),
+                NAMESPACE    => 'certificate.privatekey',
+                DATAPOOL_KEY => $identifier,
+            },
+        );
+            
+        if (defined $private_key_found) {
+            ##! 16: 'private key found - certificate can be restored'            
+            $analyze->{USABLE} = 1;           
+        } else {
+            ##! 16: 'private key not in datapool '
+            CTX('log')->log(
+                MESSAGE  => "Private key not found for escrow certificate [$identifier], dequeueing",
+                PRIORITY => 'info',
+                FACILITY => 'system',
+            );
+        }
+    } else {
+        ##! 64: 'Certificate is unusable as not on card and not escrowed'
+    }
+    
+    
+    # check if cert is within validity period
+    my $now = DateTime->now();
+    my $cert_notbefore = DateTime->from_epoch( epoch => $cert->{NOTBEFORE} );
+    my $cert_notafter = DateTime->from_epoch( epoch => $cert->{NOTAFTER} );
+        
+    if (!((DateTime->compare($cert_notbefore, $now) < 0) && (DateTime->compare($now, $cert_notafter) < 0))) {
+        $analyze->{VALID} = 0;
+        $analyze->{SOFT} = 0;
+
+        ##! 64: ' Certificate is not in validity period'    
+        CTX('log')->log(
+            MESSAGE => "Certificate $identifier is outside validity period ($cert->{NOTBEFORE} to $cert->{NOTAFTER})",
+            PRIORITY => 'debug',
+            FACILITY => [ 'system' ],
+        );
+    } else {
+        ##! 64: ' Certificate is in validity period, check renewals'    
+        # Check for renewal - only possible during validity period 
+        foreach my $entry (qw( allow_renewal force_renewal )) {        
+            my $validity = $policy->{$entry};
+            if ($validity) {                   
+                my $renewal_date = OpenXPKI::DateTime::get_validity(
+                {
+                    REFERENCEDATE => $cert_notafter,
+                    VALIDITY => $validity,
+                    VALIDITYFORMAT => 'relativedate',
+                });
+                
+                if (DateTime->compare($now, $renewal_date) > 0) {
+                    $analyze->{uc($entry)} = 1;
+                    $analyze->{EXPECTED} = 0;
+                    # Soft only for allow_renewal
+                    $analyze->{SOFT} = 0 if ($entry eq 'force_renewal');
+                    ##! 64: "Validity: $entry is scheduled for $renewal_date - exceeded"                    
+                    CTX('log')->log(
+                        MESSAGE => "Validity: $entry is scheduled for $renewal_date - exceeded",
+                        PRIORITY => 'debug',
+                        FACILITY => [ 'system' ],
+                    );
+                } else {
+                    ##! 64: "Validity: $entry is scheduled for $renewal_date - still valid"                     
+                    CTX('log')->log(
+                        MESSAGE => "Validity: $entry is scheduled for $renewal_date - still ok",
+                        PRIORITY => 'debug',
+                        FACILITY => [ 'system' ],
+                    );
+                }
+            }
+        } 
+    }
+        
+    if ($analyze->{VALID} && $analyze->{EXPECTED} && $analyze->{USABLE}) {
+        $cert->{VISUAL_STATUS} = 'green';    
+    } elsif($analyze->{SOFT}) {
+        $cert->{VISUAL_STATUS} = 'amber';
+    } else {
+        $cert->{VISUAL_STATUS} = 'red';
+    }     
+    
+    ##! 16: "Certificate $identifier analyzed, visual status is $cert->{VISUAL_STATUS}"
+     CTX('log')->log(
+        MESSAGE => "Certificate $identifier analyzed, visual status is $cert->{VISUAL_STATUS}",
+        PRIORITY => 'info',
+        FACILITY => [ 'system' ],
+    );
+    
+    ##! 32: "Analyze result of $identifier: " . Dumper( $cert->{ANALYZE} )
+}
+
+sub __check_actions_on_install_candidate {
+    my $self = shift;
+    my $args = shift;
+    my $cert = $args->{CERT};
+    my $policy = $args->{POLICY};
+    my $discard = $args->{DISCARD} || 0;
+    
+    my $analyze = $cert->{ANALYZE}; 
+    
+    ##! 16: 'Check candidate actions on ' . $cert->{IDENTIFIER} . ' with analyze result ' . Dumper ($cert->{ANALYZE})
+    
+    $cert->{PROCESS_FLAGS} = {
+        INSTALL => 0,        
+        PURGE => 0,
+        REVOKE => 0,
+        SOFT => $analyze->{SOFT},
+    };
+    
+    $cert->{FINAL_STATE} = {
+        ONCARD => $analyze->{ONCARD},
+        VALID => $analyze->{VALID},
+    };
+    
+    my $flags = $cert->{PROCESS_FLAGS};              
+
+    # Purge certifiates from card
+    IF_PURGE: {   
+    if ($analyze->{ONCARD}) {
+        
+        # Purge valid certifiates - always a hard requirement
+        if ($policy->{purge_valid} && $analyze->{VALID}) {
+            CTX('log')->log(
+                MESSAGE => "Certificate $cert->{IDENTIFIER} is valid and purged from card",
+                PRIORITY => 'debug',
+                FACILITY => [ 'system' ],
+            );
+            $flags->{PURGE} = 1;
+            $flags->{SOFT} = 0;
+            last IF_PURGE;
+        } 
+
+        if ($policy->{purge_invalid} && !$analyze->{VALID}) {            
+            # Purge invalid certifiates - soft requirement       
+            $flags->{PURGE} = 1;
+            CTX('log')->log(
+                MESSAGE => "Certificate $cert->{IDENTIFIER} is invalid and purged from card",
+                PRIORITY => 'debug',
+                FACILITY => [ 'system' ],
+            );
+            last IF_PURGE;
+        }
+        
+        # Look into the future - this certificate is superseeded by the current workflow
+        if ($policy->{purge_invalid} && ($policy->{revoke_unused} && !$analyze->{EXPECTED})) {
+            $flags->{PURGE} = 1;
+            CTX('log')->log(
+                MESSAGE => "Certificate $cert->{IDENTIFIER} will be superseeded and is purged from card",
+                PRIORITY => 'debug',
+                FACILITY => [ 'system' ],
+            );
+            last IF_PURGE;
+        }        
+    }  
+    } # /IF_PURGE
+    
+    
+    # Check if certificate needs to be revoked (not usable or not expected)
+    if ($policy->{revoke_unused} && $analyze->{VALID}) {
+        if (!$analyze->{USABLE}) {
+            $flags->{REVOKE} = 1;            
+            CTX('log')->log(
+                MESSAGE => "Certificate $cert->{IDENTIFIER} is not usable and will be revoked",
+                PRIORITY => 'debug',
+                FACILITY => [ 'system' ],
+            );
+        } elsif (!$analyze->{EXPECTED}) {
+            $flags->{REVOKE} = 1;
+            CTX('log')->log(
+                MESSAGE => "Certificate $cert->{IDENTIFIER} is not expected and will be revoked",
+                PRIORITY => 'debug',
+                FACILITY => [ 'system' ],
+            );
+        }
+    }
+    
+    # Install stuff
+    IF_INSTALL:{
+    if (!$analyze->{ONCARD}) {
+        
+        # We never install unusable certificates
+        if (!$analyze->{USABLE}) {
+            last IF_INSTALL;
+        }
+        
+        # Valid = restorable escrow certificate        
+        if (!$policy->{purge_valid} && ($analyze->{VALID} && !$flags->{REVOKE})) {
+            $flags->{INSTALL} = 1;
+            CTX('log')->log(
+                MESSAGE => "Certificate $cert->{IDENTIFIER} is valid/usable and restored to card",
+                PRIORITY => 'debug',
+                FACILITY => [ 'system' ],
+            );
+            last IF_INSTALL;        
+        }
+
+        # If purge_invalid is not requested, we install also invalid certificates
+        # (former escrow certificates)         
+        if (!$policy->{purge_invalid} && (!$analyze->{VALID} || $flags->{REVOKE})) {
+            $flags->{INSTALL} = 1;
+            CTX('log')->log(
+                MESSAGE => "Certificate $cert->{IDENTIFIER} is invalid and restored to card",
+                PRIORITY => 'debug',
+                FACILITY => [ 'system' ],
+            );
+            last IF_INSTALL;
+        }
+        
+    }} #IF_INSTALL
+ 
+    # Determine the final result    
+    $cert->{FINAL_STATE}->{ONCARD} = 0 if ($flags->{PURGE}) ;
+    $cert->{FINAL_STATE}->{ONCARD} = 1 if ($flags->{INSTALL}) ;    
+    $cert->{FINAL_STATE}->{VALID} = 0 if ($flags->{REVOKE}) ; 
+ 
+    ##! 32: 'Process result ' . Dumper ($cert->{PROCESS_FLAGS}) . Dumper ($cert->{FINAL_STATE})
+}
+
+sub __check_actions_on_discard_candidate {
+    my $self = shift;
+    my $args = shift;
+    my $cert = $args->{CERT};
+    my $policy = $args->{POLICY};
+    
+    my $analyze = $cert->{ANALYZE}; 
+    
+    ##! 16: 'Check discard actions on ' . $cert->{IDENTIFIER} . ' with analyze result ' . Dumper ($cert->{ANALYZE})
+    
+    $cert->{PROCESS_FLAGS} = {
+        INSTALL => 0,        
+        PURGE => 0,
+        REVOKE => 0,
+        SOFT => $analyze->{SOFT},
+    };
+    my $flags = $cert->{PROCESS_FLAGS};              
+
+    # Purge certifiate from card      
+    if ($analyze->{ONCARD}) {
+         $flags->{PURGE} = 1;         
+         CTX('log')->log(
+            MESSAGE => "Certificate $cert->{IDENTIFIER} is discarded and purged from card",
+            PRIORITY => 'debug',
+            FACILITY => [ 'system' ],
+        );
+    } 
+    
+    # Check if certificate needs to be revoked
+    if ($policy->{revoke_unused} && $analyze->{VALID}) {
+        $flags->{REVOKE} = 1;
+        CTX('log')->log(
+            MESSAGE => "Certificate $cert->{IDENTIFIER} is not expected and will be revoked",
+            PRIORITY => 'debug',
+            FACILITY => [ 'system' ],
+        );        
+    }
+    
+    # Final result    
+    $cert->{FINAL_STATE} = { ONCARD => 0, VALID => ( $analyze->{VALID} && !$flags->{REVOKE} ) };  
+    ##! 32: 'Process result ' . Dumper ($cert->{PROCESS_FLAGS}) . Dumper ($cert->{FINAL_STATE})
+}
 
 sub __check_db_hash_against_policy {
     my $self = shift;
@@ -1435,13 +2081,13 @@ sub __check_db_hash_against_policy {
     ####################################################################
     # determine certificate properties
     my %validity_properties = (
-	not_revoked => 1,
+	   not_revoked => 1,
 	);
     
     # cert is not scheduled for revocation (or has unknown revocation 
     # status)
     if (defined $db_hash->{STATUS} && ($db_hash->{STATUS} ne 'ISSUED')) {
-	$validity_properties{not_revoked} = 0;
+	   $validity_properties{not_revoked} = 0;
     }
     
     # validity computations
@@ -1449,11 +2095,9 @@ sub __check_db_hash_against_policy {
     my $now = DateTime->now();
     my $notbefore = DateTime->from_epoch( epoch => $db_hash->{NOTBEFORE} );
     my $notafter = DateTime->from_epoch( epoch => $db_hash->{NOTAFTER} );
-    
-    
+        
     $validity_properties{within_validity_period} =
-	0 + ((DateTime->compare($notbefore, $now) < 0) &&
-	     (DateTime->compare($now, $notafter) < 0));
+	   0 + ((DateTime->compare($notbefore, $now) < 0) && (DateTime->compare($now, $notafter) < 0));
     
     if (!$validity_properties{within_validity_period}) {
 	    CTX('log')->log(
@@ -1568,6 +2212,9 @@ sub __check_db_hash_against_policy {
 #   Only acceptable for cert format 'IDENTIFIER'. If set, the certificate
 #   fetched from the database will not be parsed, but only the cert information
 #   from the database (CSR and CERTIFICATE table entries) will be propagated.
+#
+# NOPOLICY: 0 (optional)
+#   Skip check against the policy and just return the certificate information 
 # 
 # returns data structure with parsed certificate information, augmented
 # with results from policy settings (if applicable)
@@ -1577,6 +2224,7 @@ sub sc_analyze_certificate {
 
     my $certformat = $arg_ref->{CERTFORMAT};
     my $dontparse  = $arg_ref->{DONTPARSE};
+    my $nopolicy = $arg_ref->{NOPOLICY};    
     my $data       = $arg_ref->{DATA};
     my $cfg_id  = $arg_ref->{CONFIG_ID};
     ##! 16: 'cfg_id: ' . $cfg_id
@@ -1586,81 +2234,81 @@ sub sc_analyze_certificate {
     my $default_token;
 
     if (defined $cfg_id) {
-	$default_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$thisrealm}->{crypto}->{default};
+	   $default_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$thisrealm}->{crypto}->{default};
     } else {
-	$default_token = CTX('pki_realm')->{$thisrealm}->{crypto}->{default};
+	   $default_token = CTX('pki_realm')->{$thisrealm}->{crypto}->{default};
     }
-
     ##! 16: 'default token obtained'
+    
     if ($dontparse && ($certformat ne 'IDENTIFIER')) {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_CERT_PARSING_REQUIRED_FOR_CERTFORMAT',
-	    params  => {
-		CERTFORMAT => $certformat,
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'system', ],
-	    },
+	   OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_CERT_PARSING_REQUIRED_FOR_CERTFORMAT',
+            params  => {
+                CERTFORMAT => $certformat,
+            },
+            log => {
+                logger => CTX('log'),
+                priority => 'error',
+                facility => [ 'system', ],
+           },
 	    );
     }
     
     if ($certformat eq 'BASE64') {
-	$data = MIME::Base64::decode_base64($data);
-	$certformat = 'DER';
+    	$data = MIME::Base64::decode_base64($data);
+        $certformat = 'DER';
     }
     if (! defined $data) {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_CERT_INVALID_DATA',
-	    params  => {
-		CERT => $data,
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'system', ],
-	    },
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_CERT_INVALID_DATA',
+            params  => {
+		      CERT => $data,
+            },
+	       log => {
+		      logger => CTX('log'),
+		      priority => 'error',
+		      facility => [ 'system', ],
+	       },
 	    );
     }
+    
     if ($certformat eq 'DER') {
-	##! 16: 'converting DER to PEM'
-	$data = $default_token->command(
-	    {
-		COMMAND => 'convert_cert',
-		IN      => $certformat,
-		OUT     => 'PEM',
-		DATA    => $data,
+    	##! 16: 'converting DER to PEM'
+        $data = $default_token->command({
+    		COMMAND => 'convert_cert',
+    		IN      => $certformat,
+    		OUT     => 'PEM',
+    		DATA    => $data,
 	    });
-	$certformat = 'PEM';
+	   $certformat = 'PEM';
     }
 
     my $x509;
     my $db_hash = {};
     my $identifier;
     if ($certformat eq 'PEM') {
-	##! 16: 'PEM Data: ' . $data
-	$x509 = OpenXPKI::Crypto::X509->new(
-	    DATA => $data,
-	    TOKEN => $default_token,
+    	##! 16: 'PEM Data: ' . $data
+        $x509 = OpenXPKI::Crypto::X509->new(
+	       DATA => $data,
+	       TOKEN => $default_token,
 	    );
-	$db_hash = { 
-	    $x509->to_db_hash(),
-	};
-	$identifier = $db_hash->{IDENTIFIER};
+        $db_hash = { 
+	       $x509->to_db_hash(),
+        };
+        $identifier = $db_hash->{IDENTIFIER};
     } elsif ($certformat eq 'IDENTIFIER') {
-	$identifier = $data;
+	    $identifier = $data;
     } else {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_CERT_INVALID_CERTFORMAT',
-	    params  => {
-		CERTFORMAT => $arg_ref->{CERTFORMAT},
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'system', ],
-	    },
+	    OpenXPKI::Exception->throw(
+	       message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_ANALYZE_CERT_INVALID_CERTFORMAT',
+	       params  => {
+		    CERTFORMAT => $arg_ref->{CERTFORMAT},
+	       },
+	       log => {
+		      logger => CTX('log'),
+	          priority => 'error',
+		      facility => [ 'system', ],
+	       },
 	    );
     }
     
@@ -1695,39 +2343,39 @@ sub sc_analyze_certificate {
 
     # entry was found in the database
     if (defined $db_results) {
-	if (! (defined $x509 || $dontparse)) {
-	    # cert raw data was not supplied as an argument (but found in
-	    # the database)
-	    ##! 16: 'parsing certificate'
-	    $x509 = OpenXPKI::Crypto::X509->new(
-		DATA => $db_results->{'CERTIFICATE.DATA'},
-		TOKEN => $default_token,
-		);
-
-	    $db_hash = { 
-		$x509->to_db_hash(),
-	    };
-	}
-	
-	# merge database query results with parsed cert
-	##! 16: 'merging certificate information from database'
-	$db_hash = {
-	    %{$db_hash},
-	    IDENTIFIER        => $identifier,
-	    PKI_REALM         => $db_results->{'CERTIFICATE.PKI_REALM'},
-	    ISSUER_IDENTIFIER => $db_results->{'CERTIFICATE.ISSUER_IDENTIFIER'},
-	    ROLE              => $db_results->{'CERTIFICATE.ROLE'},
-	    STATUS            => $db_results->{'CERTIFICATE.STATUS'},
-	    PROFILE           => $db_results->{'CSR.PROFILE'},
-	    NOTBEFORE         => $db_results->{'CERTIFICATE.NOTBEFORE'},
-	    NOTAFTER          => $db_results->{'CERTIFICATE.NOTAFTER'},
-	};
-
-	##! 16: 'cert data: ' . Dumper $db_hash
-
-	# cert was found in database, so we can check it against the policy
-	# determine certificate profile and possibly certificate usage
-	$db_hash = $self->__check_db_hash_against_policy($db_hash);
+    	if (! (defined $x509 || $dontparse)) {
+    	    # cert raw data was not supplied as an argument (but found in
+    	    # the database)
+    	    ##! 16: 'parsing certificate'
+    	    $x509 = OpenXPKI::Crypto::X509->new(
+    		  DATA => $db_results->{'CERTIFICATE.DATA'},
+    		  TOKEN => $default_token,
+    		);
+    
+    	    $db_hash = { 
+    		  $x509->to_db_hash(),
+    	    };
+    	}
+    	
+    	# merge database query results with parsed cert
+    	##! 16: 'merging certificate information from database'
+    	$db_hash = {
+    	    %{$db_hash},
+    	    IDENTIFIER        => $identifier,
+    	    PKI_REALM         => $db_results->{'CERTIFICATE.PKI_REALM'},
+    	    ISSUER_IDENTIFIER => $db_results->{'CERTIFICATE.ISSUER_IDENTIFIER'},
+    	    ROLE              => $db_results->{'CERTIFICATE.ROLE'},
+    	    STATUS            => $db_results->{'CERTIFICATE.STATUS'},
+    	    PROFILE           => $db_results->{'CSR.PROFILE'},
+    	    NOTBEFORE         => $db_results->{'CERTIFICATE.NOTBEFORE'},
+    	    NOTAFTER          => $db_results->{'CERTIFICATE.NOTAFTER'},
+    	};
+    
+    	##! 16: 'cert data: ' . Dumper $db_hash
+    
+    	# cert was found in database, so we can check it against the policy
+    	# determine certificate profile and possibly certificate usage
+        $db_hash = $self->__check_db_hash_against_policy($db_hash) if (!$nopolicy);
     }
 
     # remove raw cert data from output
@@ -1745,14 +2393,14 @@ sub sc_analyze_certificate {
     }
 
     if (defined $x509) {
-	my $modulus = $x509->get_parsed('BODY', 'MODULUS');
-	##! 16: 'modulus: ' . $modulus
+	    my $modulus = $x509->get_parsed('BODY', 'MODULUS');
+    	##! 16: 'modulus: ' . $modulus
 
-	# compute PKCS#11 plugin compatible key id
-	# remove leading null bytes for hash computation
-	$modulus =~ s/^(?:00)+//g;
-	$db_hash->{MODULUS_HASH} = sha1_hex(pack('H*', $modulus));
-	##! 16: 'pkcs11 plugin keyid hash: ' . $db_hash->{MODULUS_HASH}
+    	# compute PKCS#11 plugin compatible key id
+    	# remove leading null bytes for hash computation
+    	$modulus =~ s/^(?:00)+//g;
+    	$db_hash->{MODULUS_HASH} = sha1_hex(pack('H*', $modulus));
+    	##! 16: 'pkcs11 plugin keyid hash: ' . $db_hash->{MODULUS_HASH}
     }
     
     # Windows UPN
@@ -1797,6 +2445,10 @@ If IDENTIFIER is selected, the function will retrieve the specified
 certificate from the database
 and analyze it.
 
+=item * NOPOLICY (optional)
+
+Do not check the certificate against the policy settings.  
+
 =back
 
 =head3 Synopsis
@@ -1805,7 +2457,7 @@ The function iterates through all certificates passed to the function
 and parses them.
 
 If the certificate is found in the database it is also
-checked against the desired policy.
+checked against the desired policy (set NOPOLICY to skip checks)
 
 Determine the certificate type:
 

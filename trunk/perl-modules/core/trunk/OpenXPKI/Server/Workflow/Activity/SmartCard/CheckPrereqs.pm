@@ -66,7 +66,7 @@ sub execute {
 		context_key => 'certids_on_card',
 	    } );
 	$cert_ids->push(
-	    map { $_->{IDENTIFIER} } @{$result->{CERTS}}
+	    map { $_->{IDENTIFIER} } @{$result->{PARSED_CERTS}}
 	    );
 	
 	
@@ -76,33 +76,12 @@ sub execute {
 		context_key => 'certificate_types',
 	    } );
 	    	
-	
     
     my $config = CTX('config');       
-	my @certs_to_create;
 	
 	foreach my $type (keys %{$result->{CERT_TYPE}}) {
 	    $cert_types->push($type);
-
-##! 32: ' Cert Type Flags ' . Dumper $result->{CERT_TYPE}->{$type}
-
-        # oliwel - create a list of wanted certificates 
-        # based on the usable_cert_exists flag and preferred_cert_exists
-        # if promote_to_preferred_profile is requested         
-        # Assumption: If new certificates for a type are created, we always use
-        # the first = preferred profile
-        if (!$result->{CERT_TYPE}->{$type}->{token_contains_expected_cert} 
-        	&& !$result->{CERT_TYPE}->{$type}->{recoverable_cert_exists}) {
-        	##! 32: 'No recoverable certificate for ' . $type
-        	push @certs_to_create, $type;
-        } elsif($config->get("smartcard.policy.certs.type.$type.promote_to_preferred_profile") && 
-        	!$result->{CERT_TYPE}->{$type}->{preferred_cert_exists}) {                                    
-        	##! 32: 'Promote to current profile for ' . $type
-        	push @certs_to_create, $type;
-		} else {
-        	##! 32: 'All fine for ' . $type			
-        }
-
+ 
 	    foreach my $entry (keys %{$result->{CERT_TYPE}->{$type}}) {
 		# FIXME: find a better way to name the flags properly, currently
 		# the resulting wf keys depend on the configuration (i. e.
@@ -158,7 +137,7 @@ sub execute {
 		context_key => 'certs_to_install',
 	    } );
 	$certs_to_install->push(
-	    @{$result->{TASKS}->{SMARTCARD}->{INSTALL}}
+	    map { $_->{IDENTIFIER} } @{$result->{TASKS}->{INSTALL}}
 	    );
 
 	my $certs_to_delete = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
@@ -167,7 +146,7 @@ sub execute {
 		context_key => 'certs_to_delete',
 	    } );
 	$certs_to_delete->push(
-	    map { $_->{MODULUS_HASH} } @{$result->{TASKS}->{SMARTCARD}->{PURGE}}
+	    map { $_->{MODULUS_HASH} } @{$result->{TASKS}->{PURGE}}
 	    );
 
 	
@@ -181,14 +160,13 @@ sub execute {
 	    );
 	    
 
-   ##! 8: ' Certs to create ' . Dumper @certs_to_create
     my $certs_to_create_wf = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
         {
         workflow    => $workflow,
         context_key => 'certs_to_create',
         } );
     $certs_to_create_wf->push(
-        @certs_to_create
+        @{$result->{TASKS}->{CREATE}}
         );
 
     my $certs_to_revoke_wf = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
@@ -198,7 +176,7 @@ sub execute {
         } );
         
     $certs_to_revoke_wf->push(
-        @{$result->{PKI}->{REVOKE}}
+        map { $_->{IDENTIFIER} } @{$result->{TASKS}->{REVOKE}}
         );
 
 	
