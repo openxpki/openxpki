@@ -63,6 +63,7 @@ sub server_personalization {
 	my $oldState;
 	my $local_wf_state = '';
 	my $plugincommand = '';
+	
 
 	my $certs_to_install_serialized;
 	my $certs_to_delete_serialized;
@@ -365,13 +366,25 @@ CERTS:
 			);
 
 		}else{
-			$log->info("wf_action reason: ".$self->param("Reason"));
-						%params = (
-			'ID'       => $wf_ID,
-			'ACTIVITY' => 'scpers_puk_write_err',
-			'WORKFLOW' => $wf_type,
-			'PARAMS'   => {},
-			);
+			
+			if( ( defined $session->{"install_puk_try"} )&& ( $session->{"install_puk_try"} == 1 ) ){
+				$log->info("install PUK failed try one more time ");
+				#PUK failed to install if it was the first try stay in the state and try one more time 
+				
+			}else{
+				$log->error("install PUK failed FATAL ");
+					$log->info("wf_action reason: ".$self->param("Reason"));
+								%params = (
+					'ID'       => $wf_ID,
+					'ACTIVITY' => 'scpers_puk_write_err',
+					'WORKFLOW' => $wf_type,
+					'PARAMS'   => {},
+					);	
+				
+				
+			}
+			
+
 			
 		}
 		$msg =
@@ -819,14 +832,39 @@ CERTS:
 		$log->debug('local_wf_state:' . $local_wf_state	);
 		
 		if ( $local_wf_state eq 'PUK_TO_INSTALL' ) {
-			#$log->debug('PUK_TO_INSTALL cmd '. Dumper($PUK)	);
-				$responseData->{'action'} = 'install_puk';
+			
+				if( ( defined $session->{"install_puk_try"} )&& ( $session->{"install_puk_try"} == 1 ) ){
+						$log->info(
+			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_PUK_TO_INSTALL_RECOVERY_TRY_1"
+				);
+		
+					$responseData->{'action'} = 'install_puk';
+					$session->{"install_puk_try"} = 2;
+					
+					$plugincommand =
+					    'ChangePUK;CardSerial='
+					  . $session->{'cardID'} . ';PUK='
+					  . $PUK->[0]  . ';NewPUK=' .$PUK->[1]
+					  . ';';
+					
 				
-				$plugincommand =
-				    'ChangePUK;CardSerial='
-				  . $session->{'cardID'} . ';PUK='
-				  . $PUK->[1]  . ';NewPUK=' .$PUK->[0]
-				  . ';';
+				}else{
+					$log->info(
+					"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_PUK_TO_INSTALL"
+						);
+							$responseData->{'action'} = 'install_puk';
+					$session->{"install_puk_try"} = 1;
+					
+					$plugincommand =
+					    'ChangePUK;CardSerial='
+					  . $session->{'cardID'} . ';PUK='
+					  . $PUK->[1]  . ';NewPUK=' .$PUK->[0]
+					  . ';';
+					
+				}
+				
+			
+	
 	
 		}
 		else {

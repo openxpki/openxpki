@@ -112,6 +112,7 @@ sub start_session {
 	 			$session->{'ECDHPubkey'} =  undef ;
 	 			$session->{'PEMECKey'} = undef;
 	 			$session->{'ECDHkey'} = undef;
+	 			$session->{"install_puk_try"} = undef;
                 $session->{'cardID'}              = $self->param("cardID");
                 $responseData->{'cardID'}         = $session->{'cardID'};
                 $responseData->{'userlogin'}      = $ssousername;

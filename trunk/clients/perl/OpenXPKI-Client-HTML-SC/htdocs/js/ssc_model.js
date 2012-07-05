@@ -1634,8 +1634,15 @@ var SSC_MODEL = new Class(
 							
 							//FIXME add resume support for a not installed PUK
 							window.dbg.log("rndPIN install failed - install puk. " + set);
-							//this.sc_installPUK(viewCb);
+							
+								var reqData = "perso_wfID=" + this.perso_wfID
+								+ "&wf_action=" +action+ '&' + r;
+							var server_cb = this.server_personalization_loop;
+							var targetURL = "functions/personalization/server_personalization";
+							this.ajax_request(targetURL,  reqData,  server_cb, viewCb);
 							return;
+							//this.sc_installPUK(viewCb);
+					
 						} else if (re === 'PUKInvalid') {
 							sscView.showPopUp('E_sc-error-puk-invalid', 'cross',
 									'0108');
@@ -1650,7 +1657,8 @@ var SSC_MODEL = new Class(
 							+ "&wf_action=" +action+ '&' + r;
 						var server_cb = this.server_personalization_loop;
 						var targetURL = "functions/personalization/server_personalization";
-
+						this.ajax_request(targetURL,  reqData,  server_cb, viewCb);
+						
 						sscView.showPopUp('E_sc-perso_error ',
 								'cross', '0102');
 						
