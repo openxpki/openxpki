@@ -362,8 +362,7 @@ sub sig_term {
         alarm(1);
     }
     $stop_soon = 1;
-
-    # FIXME - implement    
+    #terminate the watchdog
     CTX('watchdog')->terminate();
     
     ##! 1: 'end'

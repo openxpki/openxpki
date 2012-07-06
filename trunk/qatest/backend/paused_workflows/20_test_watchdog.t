@@ -73,9 +73,10 @@ $test->execute_ok(
     'I18N_OPENXPKI_WF_ACTION_WORKFLOWTEST', {action=> 'pause',retry_interval=>'+0000000000'}
 ) or die "Error executing 1st I18N_OPENXPKI_WF_ACTION_WORKFLOWTEST: $@";
 
-$test->state_is( 'STEP2', "Paused : state should remain STEP2, sleep now 10 secs..." );
 $test->proc_state_is('pause', 'Proc-State should be "pause"');  
-sleep(10);
+$test->state_is( 'STEP2', "Paused : state should remain STEP2, sleep now 30 secs..." );
+
+sleep(30);
 $test->reset();#enforce fresh wf info
 $test->state_is( 'STEP3','watchdog should have executet paused WF');
 $test->param_is( 'test_job_is_done', 1, 'activity has done its job' );

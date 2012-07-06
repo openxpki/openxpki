@@ -84,21 +84,26 @@ sub run {
         
         # append fork info to process name
         $0 .= sprintf( ' watchdog reinstantiating %d', $wf_id );
-
+        
+        # the wf instance child processs should ALWAYS exit properly and not let bubble up his exceptions up to Watchdog::_scan_for_paused_workflows
         eval { $self->__wake_up_workflow($db_result); };
+        my $error_msg;
         if ( my $exc = OpenXPKI::Exception->caught() ) {
 
-            OpenXPKI::Exception->throw(
-                message  => "'I18N_OPENXPKI_SERVER_WATCHDOG_WAKE_UP_WORKFLOW_FAILED",
-                children => [$exc],
-            );
+            $exc->show_trace(1);
+            $error_msg = "OpenXPKI::Server::Watchdog::WorkflowInstance: Exception caught while executing _wake_up_workflow: $exc";
 
         } elsif ($EVAL_ERROR) {
-            OpenXPKI::Exception->throw(
-                message => "'I18N_OPENXPKI_SERVER_WATCHDOG_WAKE_UP_WORKFLOW_FAILED",
-                params  => { EVAL_ERROR => $EVAL_ERROR, },
+            $error_msg = "OpenXPKI::Server::Watchdog::WorkflowInstance: Fatal error while executing _wake_up_workflow:" . $EVAL_ERROR;
+        }
+        if ($error_msg) {
+            CTX('log')->log(
+                MESSAGE  => $error_msg,
+                PRIORITY => "fatal",
+                FACILITY => "workflow"
             );
         }
+        #ALWAYS exit  child process
         exit;
     }
 }
@@ -144,42 +149,40 @@ sub __wake_up_workflow {
     );
     ##! 16: 'child: wf_info fetched'
     ##! 16: Dumper($wf_info)
-    # get possible activities and try to execute if there is
-    # only one available (same as "autorun" does, only
-    # manually)
-    ##! 16: 'getting activities for ' . $wf_type . '/' . $wf_id
-    my $activities = $api->get_workflow_activities(
+    
+    my $wf_history = $api->get_workflow_history({ID => $wf_id});
+    ##! 80: Dumper($wf_history)
+    
+    unless(@$wf_history){
+        OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_HISTORY_AVAILABLE',
+                params  => { WF_ID => $wf_id, WF_INFO => $wf_info }
+            );
+    }
+    
+    my $last_history = pop(@$wf_history);
+    ##! 16: 'last history '.Dumper($last_history)
+    my $last_action = $last_history->{WORKFLOW_ACTION};
+    ##! 16: 'last action '.$last_action
+    unless($last_action){
+        OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_LAST_ACTIVITY',
+                params  => { WF_ID => $wf_id, WF_INFO => $wf_info }
+            );
+    }
+    my $new_wf_info = $api->execute_workflow_activity(
         {
             WORKFLOW => $wf_type,
             ID       => $wf_id,
+            ACTIVITY => $last_action,
         }
     );
-    ##! 16: 'activities: ' . Dumper($activities)
-    my $state;
-    if ( scalar @{$activities} == 0 ) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_ACTIVITIES_AVAILABLE',
-            params  => { WF_ID => $wf_id, WF_INFO => $wf_info }
-        );
-    } elsif ( scalar @{$activities} > 1 ) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_MORE_THAN_ONE_ACTIVITY_AVAILABLE',
-            params  => { WF_ID => $wf_id, WF_INFO => $wf_info }
-        );
-    } else {
-        $state = $api->execute_workflow_activity(
-            {
-                WORKFLOW => $wf_type,
-                ID       => $wf_id,
-                ACTIVITY => $activities->[0],
-            }
-        );
-        ##! 16: 'new state: ' . $state
-    }
-
+    ##! 16: 'new wf info: ' .Dumper( $new_wf_info )
+    
+    
 }
 
-sub __check_session{
+sub __check_session {
     #my $self = shift;
     my $session;
     eval{
@@ -194,7 +197,24 @@ sub __check_session{
                    LIFETIME  => CTX('xml_config')->get_xpath(XPATH => "common/server/session_lifetime"),
    });
    OpenXPKI::Server::Context::setcontext({'session' => $session});
-   ##! 4: sprintf(" session %d created" , $session->get_id()) 
+   ##! 4: sprintf(" session %s created" , $session->get_id()) 
 }
+
+1;
+
+=head1 NAME
+
+The workflow instance thread 
+
+=head1 DESCRIPTION
+
+This class is responsible for waking up paused workflows. Its run-method is called from OpenXPKI::Server::Watchdog and 
+recieves the db resultset as only argument. Immediately a child process will be created via fork() and _wake_up_workflow is called within the child.
+ 
+_wake_up_workflow reads all necessary infos from the resultset (representing one row from workflow table)
+the serialized session infos are imported in the current (watchdog's) session, so that the wqorkflow is executed within its original environment.
+
+the last performed action is retrieved from workflow history, than executed again (via OpenXPKI::Server::API::Workflow)
+
 
 1;

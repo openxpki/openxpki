@@ -44,7 +44,7 @@ has max_tries_hanging_workflows => (
 has interval_wait_initial => (
     is => 'rw',
     isa => 'Int',
-    default =>  60
+    default =>  10
 );
     
 has interval_loop_idle => (
@@ -106,6 +106,7 @@ sub run {
                 OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_INIT_WATCHDOG_FORK_FAILED', );
             }
         }
+        
     }
     if ( !defined $pid ) {
         OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_INIT_WATCHDOG_FORK_FAILED', );
@@ -128,7 +129,7 @@ sub run {
         CTX('dbi_backend')->connect();
         # get new database handles
         ##! 16: 'parent: DB handles reconnected'
-            
+    
     } else {
         ##! 16: 'child here'
         CTX('dbi_log')->new_dbh();
@@ -162,14 +163,15 @@ sub run {
         );
         
         sleep($self->interval_wait_initial());
-
+        
         ### TODO: maybe we should measure the count of exception in a certain time interval?
         my $exception_count = 0;
         
+        ##! 16: 'watchdog: start looping'
+        
         while (1) {
             
-            ##! 80: 'watchdog: start loop'
-            ##! 4: '.'
+            ##! 80: 'watchdog: do loop'
             #ensure that we have a valid session
             $self->__check_session();
             
@@ -214,20 +216,25 @@ sub run {
     
 sub reload {
     my $self = shift;
-    
-    #FIXME - need implementation - what it necessary to do?
     # reload is called if the config changes
-    
+    CTX('config')->update_head();
+    #force new session
+    $self->__check_session(1);
 }
   
 sub terminate {
     my $self = shift;
-
-    # Unset my ref so I hopefully get killed by the garbage collection
-    # Fixme - might be wise to clean up my childs?    
+   
+    
+    #terminate childs:
+    my $children = $self->children();
+    kill 'TERM', @$children;
+    
+    # Unset my ref so I hopefully get killed by the garbage collection    
     OpenXPKI::Server::Context::setcontext({        
         watchdog => undef
     });
+    
     return 1;    
 }
 
@@ -283,10 +290,16 @@ sub _scan_for_paused_workflows {
     );
     $self->{dbi}->commit();
     
+    
+    
     eval{
+        #this command effectively creates an forked child process which "wakes up the workflow" 
         my $Instance = OpenXPKI::Server::Watchdog::WorkflowInstance->new();
         $Instance->run($db_result);
     };
+    
+    # all exceptions/fatals which occur in the forked child will be handled there
+    # if an error/exception occurs here, it must be within the main (watchdog) process, so we log it as "system" error
     my $error_msg;
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         $exc->show_trace(1);
@@ -298,12 +311,12 @@ sub _scan_for_paused_workflows {
         CTX('log')->log(
             MESSAGE  => $error_msg,
             PRIORITY => "fatal",
-            FACILITY => "workflow"
+            FACILITY => "system"
         );
     }
     
-    #for child processes no further than here!
-    if($self->{original_pid} ne $PID){
+    #security measure: for child processes no further than here! (all childprocesses in WorkflowInstance shourl exit properly and handle their exceptions on their own... but just in case...)
+    if($self->{original_pid} ne $PID){#$self->{original_pid} == PID of Watchdog process
         ##! 16: sprintf('exit this process: actual pid %s is not original pid %s' , $PID, $self->{original_pid});
         exit;
     }
@@ -452,21 +465,21 @@ sub _fetch_and_check_for_orphaned_workflows {
 }
 
 sub __check_session{
-    #my $self = shift;
+    my $self = shift;
+    my ($force_new) = @_;
     my $session;
-    eval{
-       $session = CTX('session');
-    };
-    if($session ){
-        return;
+    unless($force_new){
+        eval{$session = CTX('session');};
+        return if $session;
     }
+    
     ##! 4: "create new session"
     $session = OpenXPKI::Server::Session->new({
                    DIRECTORY => CTX('xml_config')->get_xpath(XPATH => "common/server/session_dir"),
                    LIFETIME  => CTX('xml_config')->get_xpath(XPATH => "common/server/session_lifetime"),
    });
-   OpenXPKI::Server::Context::setcontext({'session' => $session});
-   ##! 4: sprintf(" session %d created" , $session->get_id()) 
+   OpenXPKI::Server::Context::setcontext({'session' => $session,'force'=> $force_new});
+   ##! 4: sprintf(" session %s created" , $session->get_id()) 
 }
 
 
