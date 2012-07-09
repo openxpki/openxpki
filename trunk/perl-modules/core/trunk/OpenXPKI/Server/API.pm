@@ -1050,10 +1050,6 @@ sub BUILD {
                     regex => $re_alpha_string,                    
                     optional => 1,
                 },        
-                'LOGINIDS'  => {
-                    type => ARRAYREF,
-                    optional => 1,
-                },
                 'USERID' => {
                     type => SCALAR,
                     regex => $re_sql_string,

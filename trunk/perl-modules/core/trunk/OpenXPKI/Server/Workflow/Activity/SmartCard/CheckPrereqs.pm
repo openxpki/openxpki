@@ -34,17 +34,11 @@ sub execute {
 	
 	my $ser = OpenXPKI::Serialization::Simple->new();
 
-    my @LOGIN_IDS;
-    if ($context->param('login_ids')) {
-        @LOGIN_IDS = $ser->deserialize( $context->param('login_ids') )
-    } 
-
 	my $result = CTX('api')->sc_analyze_smartcard(
 	    {
  		CERTS => \@certs,
 		CERTFORMAT => 'BASE64',
 		SMARTCARDID => $context->param('token_id'),
-		LOGINIDS => \@LOGIN_IDS,
 		WORKFLOW_TYPES => [ qw( I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK ) ],
 		CONFIG_ID => $self->config_id(),
 		%params,

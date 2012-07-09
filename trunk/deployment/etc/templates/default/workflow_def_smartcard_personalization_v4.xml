@@ -52,11 +52,11 @@
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERTIFICATE_ISSUANCE_POSSIBLE</description>
         <action name="scpers_null1" resulting_state="NEED_PUK">
-            <condition name="scpers_need_random_PIN"/>
+            <condition name="!scpers_allow_user_PIN"/>
             <condition name="scpers_will_need_PIN"/>
         </action>
         <action name="scpers_null2" resulting_state="PIN_MISSING">
-            <condition name="!scpers_need_random_PIN"/>
+            <condition name="scpers_allow_user_PIN"/>
             <condition name="scpers_will_need_PIN"/>
         </action>
         <action name="scpers_null3" resulting_state="PIN_CONTINUE">

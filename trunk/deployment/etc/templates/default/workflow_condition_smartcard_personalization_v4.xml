@@ -5,7 +5,7 @@
 
     <condition name="scpers_workflow_approval_needed"
             class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
-        <param name="context_key" value="flag_need_wf_approval"/>
+        <param name="context_key" value="flag_need_approval"/>
         <param name="context_value" value="yes"/>
         <param name="condition" value="equals"/>
     </condition>
@@ -70,9 +70,9 @@
         <param name="condition" value="equals"/>
     </condition>
 
-    <condition name="scpers_need_random_PIN"
+    <condition name="scpers_allow_user_PIN"
             class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
-        <param name="context_key" value="flag_will_need_random_pin"/>
+        <param name="context_key" value="flag_allow_user_pin"/>
         <param name="context_value" value="yes"/>
         <param name="condition" value="equals"/>
     </condition>
@@ -161,6 +161,20 @@
             class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
         <param name="context_key" value="policy_input_required"/>
         <param name="condition" value="notnull"/>
+    </condition>
+
+
+    <condition name="scpers_purge_token_before_personalization"
+            class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
+        <param name="context_key" value="flag_purge_token_before_personalization"/>
+        <param name="context_value" value="yes"/>
+        <param name="condition" value="equals"/>
+    </condition>
+
+    <condition name="scpers_card_is_empty"
+            class="OpenXPKI::Server::Workflow::Condition::WFArray">
+        <param name="array_name" value="certids_on_card"/>
+        <param name="condition" value="is_empty"/>
     </condition>
 
 </conditions>
