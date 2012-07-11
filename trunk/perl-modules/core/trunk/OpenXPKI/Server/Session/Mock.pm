@@ -21,6 +21,7 @@ my %pki_realm : ATTR( :get<pki_realm> :set<pki_realm> );
 my %profile   : ATTR( :get<profile>   :set<profile>   );
 my %server    : ATTR( :get<server>    :set<server>    );
 my %enc_alg   : ATTR( :get<enc_alg>   :set<enc_alg>   );
+my %config_version : ATTR( :get<config_version> :set<config_version> );
 
 my %id        : ATTR( :get<id>   :default<-1> );
 my %user      : ATTR( :get<user> :default<''> :set<user> );

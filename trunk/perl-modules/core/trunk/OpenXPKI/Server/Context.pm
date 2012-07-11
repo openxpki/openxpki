@@ -196,6 +196,12 @@ sub setcontext {
     return 1;
 }
 
+
+sub killsession {
+    $context->{exported}->{session} = undef;
+    return 1;
+} 
+
 1;
 __END__
 

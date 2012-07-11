@@ -33,6 +33,7 @@ use OpenXPKI::Server::Notification::Dispatcher;
 use OpenXPKI::Workflow::Factory;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Server::Session::Mock;
                 
 use OpenXPKI::Crypto::X509;
 
@@ -76,8 +77,7 @@ my @init_tasks = qw(
   authentication
   notification
   server
-  watchdog
-  
+  watchdog  
 );
 #
 
@@ -108,6 +108,11 @@ sub init {
     }
 
     delete $keys->{TASKS};
+
+    # We need a valid session to access the realm parts of the config 
+    my $session = OpenXPKI::Server::Session::Mock->new();
+    OpenXPKI::Server::Context::setcontext({'session' => $session});
+    
     
   TASK:
     foreach my $task (@tasks) {
@@ -182,6 +187,9 @@ sub init {
 		FACILITY => "system",
 	    });
     }
+    
+    OpenXPKI::Server::Context::killsession();
+    
     return 1;
 }
 
