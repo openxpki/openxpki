@@ -144,6 +144,20 @@ sub walkQueryPoints {
     return;
 }
 
+sub get_scalar_as_list {
+    my $self = shift;
+    my $path = shift;
+    my @values;
+    my $meta = $self->get_meta( $path );
+    if ($meta && $meta->{TYPE} eq 'list') {
+        @values = $self->get_list( $path );
+    } else {
+        @values = ( $self->get( $path ) );
+    }   
+    return @values;
+}
+
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 
