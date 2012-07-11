@@ -13,6 +13,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Watchdog::WorkflowInstance;
 use OpenXPKI::DateTime;
 
+use Net::Server::Daemonize qw( set_uid set_gid );
 
 use Moose;
 
@@ -65,6 +66,12 @@ has children => (
     isa => 'ArrayRef',
     default  => sub { return []; }
 );
+
+has disabled => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 0,    
+);
  
 around BUILDARGS => sub {
      
@@ -88,8 +95,17 @@ sub run {
 
     my $pid;
     my $redo_count = 0;
-       
-    $SIG{'CHLD'} = sub { wait; };    
+    
+    if ($self->disabled()) {
+        CTX('log')->log(
+            MESSAGE  => 'Watchdog is disabled - will not start worker.', 
+            PRIORITY => "warn",
+            FACILITY => "system",
+        );
+        return 1;
+    }
+    
+    $SIG{CHLD} = 'IGNORE';
     while ( !defined $pid && $redo_count < $self->max_fork_redo() ) {
         ##! 16: 'trying to fork'
         $pid = fork();
@@ -111,11 +127,10 @@ sub run {
     if ( !defined $pid ) {
         OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_INIT_WATCHDOG_FORK_FAILED', );
     } elsif ( $pid != 0 ) {
-        
+                
         my $children = $self->children();
         push @{ $children }, $pid;       
         $self->children( $children );        
-        
         ##! 16: 'parent here - process group: ' . getpgrp(0)
         # we have forked successfully and have nothing to do any more except for getting a new database handle
         CTX('dbi_log')->new_dbh();
@@ -129,8 +144,8 @@ sub run {
         CTX('dbi_backend')->connect();
         # get new database handles
         ##! 16: 'parent: DB handles reconnected'
-    
     } else {
+        
         ##! 16: 'child here'
         CTX('dbi_log')->new_dbh();
         ##! 16: 'new child dbi_log dbh'
@@ -148,13 +163,19 @@ sub run {
         $self->{hanging_workflows_warned} = {};
         $self->{original_pid}             = $PID;
         
+        # set process name
+                
+        $0 = sprintf ('openxpki watchdog ( %s )', CTX('config')->get('system.server.name') || 'main');
 
-        # append fork info to process name
-        $0 .= ' watchdog (forked daemon)';
-
+        set_gid(1001);
+        set_uid(1001);
+        
         #wait some time for server startup...
         ##! 16: sprintf('watchdog: original PID %d, initail wait for %d seconds', $self->{original_pid} , $self->interval_wait_initial());
-        
+ 
+        # Force new session as the initialized session is a Mock-Session which we can not use!
+        $self->__check_session(1);
+ 
         CTX('log')->log(
             MESSAGE  => sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"', 
                 $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ),
@@ -211,15 +232,19 @@ sub run {
         }
 
     }
+    ##! 4: 'End of run'
 }
 
     
 sub reload {
     my $self = shift;
     # reload is called if the config changes
-    CTX('config')->update_head();
-    #force new session
-    $self->__check_session(1);
+    # FIXME - I guess this relods the parent but not the forked child...check that!
+    
+    return if ($self->disabled());
+    
+     
+    CTX('config')->update_head();    
 }
   
 sub terminate {
@@ -473,10 +498,13 @@ sub __check_session{
         return if $session;
     }
     
-    ##! 4: "create new session"
+    my $directory = CTX('config')->get("system.server.session.directory");
+    my $lifetime  = CTX('config')->get("system.server.session.lifetime");
+    
+    ##! 4: "create new session dir: $directory, lifetime: $lifetime "
     $session = OpenXPKI::Server::Session->new({
-        DIRECTORY => CTX('config')->get("system.server.session.directory"),
-        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
+        DIRECTORY => $directory,
+        LIFETIME  => $lifetime,
     });
     OpenXPKI::Server::Context::setcontext({'session' => $session,'force'=> $force_new});
     ##! 4: sprintf(" session %s created" , $session->get_id()) 

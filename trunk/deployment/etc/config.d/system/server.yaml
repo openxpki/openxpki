@@ -1,3 +1,6 @@
+# Shown in the processlist to distinguish multiple instances
+name: main
+
 # this is the former server_id/server_shift from the database config
 shift: 8
 node:    

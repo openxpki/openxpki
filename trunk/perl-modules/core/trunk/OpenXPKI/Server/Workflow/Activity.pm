@@ -57,6 +57,8 @@ sub pause{
     #max retries can NOT be modified ioa method arguments:
     my $max_retries = $self->get_max_allowed_retries();
     
+    $cause ||= '';
+    
     if($self->{CURRENT_WORKFLOW}){
         $self->{CURRENT_WORKFLOW}->pause($cause,$max_retries,$retry_interval);
     }

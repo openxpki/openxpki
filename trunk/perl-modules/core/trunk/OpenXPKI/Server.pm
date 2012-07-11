@@ -19,7 +19,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-
+use OpenXPKI::Server::Watchdog;
 use Data::Dumper;
 
 our $stop_soon = 0;
@@ -276,6 +276,10 @@ sub pre_loop_hook {
 
     ### drop privileges
     eval{
+        
+        # Set verbose process name        
+        $0 = "openxpki server ( $self->{PARAMS}->{alias} )";
+        
         if( $self->{PARAMS}->{process_group} ne $) ){
             $self->log(
                 2,
@@ -334,6 +338,7 @@ sub pre_loop_hook {
         # (for example when doing external dynamic authentication) ...
         $SIG{CHLD} = 'DEFAULT';
     }
+    
 }
 
 sub sig_term {
@@ -364,8 +369,7 @@ sub sig_hup {
         FACILITY => "system",
     );
     
-    CTX('config')->update_head();
-    # FIXME - implement
+    CTX('config')->update_head();  
     CTX('watchdog')->reload();
     
 }
@@ -726,6 +730,7 @@ sub __get_server_config
     }
 
     my %params = ();
+    $params{alias} = $config->get('system.server.name') || 'main';    
     $params{socketfile} = $socketfile;
     $params{proto}      = "unix";
     if ($self->{TYPE} eq 'Simple') {

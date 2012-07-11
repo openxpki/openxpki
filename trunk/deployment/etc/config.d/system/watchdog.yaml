@@ -1,4 +1,5 @@
 # Custom settings for the watchdog
+disabled: 0
 max_fork_redo: 5
 max_exception_threshhold: 10
 max_tries_hanging_workflows:  3

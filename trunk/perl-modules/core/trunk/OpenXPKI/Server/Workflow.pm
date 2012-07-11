@@ -474,7 +474,7 @@ sub _save{
     # parameters and we will get tons of init/exception entries
     my $proc_state = $self->proc_state;
     if ($self->{_WORKFLOW}->state() eq 'INITIAL' &&
-        ($proc_state eq 'init' || $proc_state || 'running'  || $proc_state eq'exception' )) {
+        ($proc_state eq 'init' || $proc_state eq 'running'  || $proc_state eq'exception' )) {
     
         ##! 20: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
         return; 

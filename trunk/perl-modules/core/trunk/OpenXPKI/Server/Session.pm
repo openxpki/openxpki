@@ -21,9 +21,6 @@ use Digest::SHA1 qw( sha1_hex );;
 
 ## constructor and destructor stuff
 
-
-
-
 sub new {
     my $that = shift;
     my $class = ref($that) || $that;
