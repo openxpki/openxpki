@@ -51,7 +51,8 @@ var SSC_MODEL = new Class(
 				//
 				// change plugin classid here
 				//
-				this.plgIn_classId = "clsid:223cee4f-3655-4223-b738-9c80718fc04d";
+				//this.plgIn_classId = "clsid:223cee4f-3655-4223-b738-9c80718fc04d";
+				this.plgIn_classId = "clsid:baf17d97-92dc-4107-9935-6fcaea14c033";
 				this.puk_pin_encryption = 'yes';
 				this.cardReadCounter = 0;
 				this.PKCS11Plugin = $('PKCS11Plugin');
@@ -2436,7 +2437,7 @@ var SSC_MODEL = new Class(
 				var jsonRequest = new Request.JSON( {
 					method : 'post',
 					noCache : true,
-					timeout : 120000,
+					timeout : 180000,
 					url : url,
 					data : reqData,
 					onSuccess : function(data) {
@@ -2444,12 +2445,14 @@ var SSC_MODEL = new Class(
 					},
 					onFailure : function() {
 						//this.ajax_log('ajax request error','error');
+						sscModel.ajax_log('E_Ajax_Failure','error');
 						sscView.showPopUp('E_Ajax_Failure', 'cross', '#0001 - ' + url);
 						sscView.setStatusMsg("E_comm", ' ', '');
 					},
 					onTimeout : function() {
 						//this.ajax_log('ajax request error','error');
-						sscView.showPopUp('E_Ajax_Failure', 'cross', '#0001 - ' + url);
+						sscModel.ajax_log('E_server_timeout_error','error');
+						sscView.showPopUp('E_server_timeout', 'cross', '#0002 - ' + url);
 						sscView.setStatusMsg("E_comm", ' ', '');
 					}
 				}).send();
