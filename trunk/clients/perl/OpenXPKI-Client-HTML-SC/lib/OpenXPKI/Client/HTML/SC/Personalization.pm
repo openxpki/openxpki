@@ -71,7 +71,7 @@ sub server_personalization {
 	my $certs_to_delete;
 	my $certificate_to_install;
 	my $chipserial;
-	my $ssousername;
+	my $ssousername = undef;
 
 ###########################INIT##########################
 	$self->start_session();
@@ -99,7 +99,7 @@ sub server_personalization {
     	$ssousername = $self->{r}->headers_in()->get('ct-remote-user');
 
     }
-
+	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_CALL");
 
 #####################################check OpenXPKI connection######################################
 	if ( !defined $c || $c == 0 ) {
@@ -164,6 +164,7 @@ sub server_personalization {
 
 ####If error occured cancel request and send back error MSGs####
 	if ( defined $responseData->{'error'} ) {
+		$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_RETURN_ERROR");
 		$responseData->{'errors'} = @{$errors};
 		return $self->send_json_respond($responseData);
 	}
@@ -1016,6 +1017,7 @@ CERTS:
 
 
 #################Sent out json response#####################
+$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_RETURN_RESPONSE");
 	return $self->send_json_respond($responseData);
 
 }

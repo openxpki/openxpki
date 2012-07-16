@@ -57,7 +57,7 @@ sub start_session {
         && $self->{r}->headers_in()->get('ct-remote-user') ne '' )
     {
         $ssousername = $self->{r}->headers_in()->get('ct-remote-user');
-        $session->{'creator_userID'} = $ssousername;
+        $session->{'SSO_userID'} = $ssousername;
     }
     
     
@@ -108,6 +108,7 @@ sub start_session {
 				$session->{'perso_wfID'} 	  = undef;
 				$session->{'perso_wfID'} 	  = undef;
 				$session->{'ECDHPeerPubkey'} =  undef ;
+				$session->{'SSO_userID'} = undef;
 				$session->{'rndPIN'} = undef ;
 	 			$session->{'ECDHPubkey'} =  undef ;
 	 			$session->{'PEMECKey'} = undef;

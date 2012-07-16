@@ -2435,12 +2435,19 @@ var SSC_MODEL = new Class(
 							  + this.cardID + '&cardtype=' + this.cardType;
 				var jsonRequest = new Request.JSON( {
 					method : 'post',
+					noCache : true,
+					timeout : 120000,
 					url : url,
 					data : reqData,
 					onSuccess : function(data) {
 						server_cb(data, viewCb);
 					},
 					onFailure : function() {
+						//this.ajax_log('ajax request error','error');
+						sscView.showPopUp('E_Ajax_Failure', 'cross', '#0001 - ' + url);
+						sscView.setStatusMsg("E_comm", ' ', '');
+					},
+					onTimeout : function() {
 						//this.ajax_log('ajax request error','error');
 						sscView.showPopUp('E_Ajax_Failure', 'cross', '#0001 - ' + url);
 						sscView.setStatusMsg("E_comm", ' ', '');

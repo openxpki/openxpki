@@ -16,7 +16,6 @@ use OpenXPKI::Client;
 #use OpenXPKI::Tests;
 use Config::Std;
 use OpenXPKI::i18n qw( i18nGettext );
-use Data::Dumper;
 use OpenXPKI::Client::HTML::SC::Dispatcher qw( config );
 use OpenXPKI::Serialization::Simple;
 
@@ -186,7 +185,6 @@ sub get_card_policy {
                 'WORKFLOW' => $wf_type,
             },
         );
-		$log->debug(Dumper( $msg));
 		
         if ( $self->is_error_response($msg) ) {
             $responseData->{'error'} = "error";
@@ -435,9 +433,6 @@ sub confirm_policy_change {
 	    );
     }
     $log->info("action $action");
-
-
-	#	$log->debug(Dumper( $msg));
 		
         if ( $self->is_error_response($msg) ) {
             $responseData->{'error'} = "error";
