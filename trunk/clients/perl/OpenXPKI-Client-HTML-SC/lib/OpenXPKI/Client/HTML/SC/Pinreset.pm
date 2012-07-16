@@ -16,7 +16,7 @@ use OpenXPKI::Client;
 #use OpenXPKI::Tests;
 use Config::Std;
 use OpenXPKI::i18n qw( i18nGettext );
-use Data::Dumper;
+#use Data::Dumper;
 use OpenXPKI::Client::HTML::SC::Dispatcher qw( config );
 use OpenXPKI::Serialization::Simple;
 
@@ -80,6 +80,7 @@ sub start_pinreset {
 		$responseData->{'log4perl init'} = "NO";
 	}
 	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_STARTRESET_CALL");
 ##############################################################################
 	
 #####################################check OpenXPKI connection######################################
@@ -388,6 +389,7 @@ sub start_pinreset {
     if ( defined $responseData->{'error'} ) {
         $responseData->{'errors'} = $errors;
     }
+$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_STARTRESET_RESPONSE");
 
     return $self->send_json_respond($responseData);
 
@@ -604,6 +606,7 @@ sub pinreset_verify {
 		$responseData->{'log4perl init'} = "NO";
 	}
 	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PINRESETVERIFY_CALL");
 ##############################################################################    
 #####################################check OpenXPKI connection######################################
 	if ( !defined $c || $c == 0 ) {
@@ -1008,7 +1011,7 @@ sub pinreset_verify {
     if ( defined $responseData->{'error'} ) {
         $responseData->{'errors'} = $errors;
     }
-
+$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PINRESETVERIFY_RESPONSE");
     return $self->send_json_respond($responseData);
 
 }
@@ -1059,6 +1062,7 @@ sub pinreset_confirm {
 		$responseData->{'log4perl init'} = "NO";
 	}
 	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PINRESETCONFIRM_CALL");
 ##############################################################################  
 
 #####################################check OpenXPKI connection######################################
@@ -1213,7 +1217,7 @@ sub pinreset_confirm {
     if ( defined $responseData->{'error'} ) {
         $responseData->{'errors'} = $errors;
     }
-
+	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PINRESETCONFIRM_RESPONSE");
     return $self->send_json_respond($responseData);
 
 }
@@ -1260,6 +1264,7 @@ sub pinreset_cancel {
 		$responseData->{'log4perl init'} = "NO";
 	}
 	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PINRESETCANCEL_CALL");
 ##############################################################################
 
 #####################################check OpenXPKI connection######################################
@@ -1342,7 +1347,7 @@ sub pinreset_cancel {
                 'WORKFLOW' =>  $wf_type ,
             },
         );
-    
+    	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PINRESETCANCEL_RESPONSE");
         $responseData->{'msg'} = $msg;
         return $self->send_json_respond($responseData);
 

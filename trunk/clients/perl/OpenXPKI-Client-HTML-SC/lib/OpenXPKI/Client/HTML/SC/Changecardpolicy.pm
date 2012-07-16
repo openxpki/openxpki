@@ -326,6 +326,7 @@ sub confirm_policy_change {
 		$responseData->{'log4perl init'} = "NO";
 	}
 	my $log = Log::Log4perl->get_logger("openxpki.smartcard");
+	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_CHANGECARDPOLICY_CALL");
 	my $audit = Log::Log4perl->get_logger("openxpki.audit");
 ##############################################################################
 	
@@ -401,6 +402,7 @@ sub confirm_policy_change {
 
 ####If error occured cancel request and send back error MSGs####
     if ( defined $responseData->{'error'} ) {
+    	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_CHANGECARDPOLICY_ERROR_RESPONSE");
         $responseData->{'errors'} = $errors;
         return $self->send_json_respond($responseData);
     }
@@ -470,7 +472,7 @@ sub confirm_policy_change {
     if ( defined $responseData->{'error'} ) {
         $responseData->{'errors'} = $errors;
     }
-
+	$log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_CHANGECARDPOLICY_RESPONSE");
     return $self->send_json_respond($responseData);
 
 }

@@ -346,11 +346,7 @@ CERTS:
 "I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_APPLY_CSR_POLICY_OK"
 			);
 			$log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_APPLY_CSR_POLICY_OK");
-		}
-		
-		
-		
-		
+		}	
 	}
 	
 		
@@ -380,13 +376,8 @@ CERTS:
 					'ACTIVITY' => 'scpers_puk_write_err',
 					'WORKFLOW' => $wf_type,
 					'PARAMS'   => {},
-					);	
-				
-				
-			}
-			
-
-			
+					);				
+			}	
 		}
 		$msg =
 		  $c->send_receive_command_msg( 'execute_workflow_activity', \%params,
@@ -427,22 +418,21 @@ CERTS:
 	if ( defined $self->param('KeyID') ) {
 		$keyid = $self->param('KeyID');
 	}
-	$log->debug("choosen_login". $chosenLoginID);
-	if ( defined $self->param('chosenLoginID') ) {
-		$chosenLoginID = $self->param('chosenLoginID');
-	}
+#	$log->debug("choosen_login". $chosenLoginID);
+#	if ( defined $self->param('chosenLoginID') ) {
+#		$chosenLoginID = $self->param('chosenLoginID');
+#	}
 	
-	if( defined $session->{'dbntloginid'} ){
-		eval{
-			  $log->info("LoginID:". $session->{'dbntloginid'});
-			 # $log->info("LoginID:". Dumper($session->{'dbntloginid'}));
-			  $log->info("LoginID:". $session->{'dbntloginid'}->{0});
-		};
-		##FIXME Always use first ID regardless of number of ID'S
-		$chosenLoginID = $session->{'dbntloginid'}->[0]; 
-				
-		
-	}
+#	if( defined $session->{'dbntloginid'} ){
+#		eval{
+#			  $log->info("LoginID:". $session->{'dbntloginid'});
+#			 # $log->info("LoginID:". Dumper($session->{'dbntloginid'}));
+#			  $log->info("LoginID:". $session->{'dbntloginid'}->{0});
+#		};
+#		##FIXME Always use first ID regardless of number of ID'S
+#		$chosenLoginID = $session->{'dbntloginid'}->[0]; 		
+#	}
+
 	
 #		# split line into 76 character long chunks
 		$csr = join( "\n", ( $csr =~ m[.{1,64}]g ) );
@@ -461,7 +451,7 @@ CERTS:
 			'PARAMS'   => {
 				'pkcs10'         => $csr,
 				'keyid'          => $keyid,
-	#			'chosen_loginid' => $chosenLoginID
+		#		'chosen_loginid' => $chosenLoginID
 			},
 		);
 		
@@ -845,7 +835,7 @@ CERTS:
 					$plugincommand =
 					    'ChangePUK;CardSerial='
 					  . $session->{'cardID'} . ';PUK='
-					  . $PUK->[0]  . ';NewPUK=' .$PUK->[1]
+					  . $PUK->[0]  . ';NewPUK=' .$PUK->[0]
 					  . ';';
 					
 				
