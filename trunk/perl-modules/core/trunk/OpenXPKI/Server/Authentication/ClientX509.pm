@@ -90,13 +90,11 @@ sub login_step {
     ##! 2: "username: $username"
     ##! 2: "certificate: $certificate"
 
-    my $realm = CTX('session')->get_pki_realm();
-
     my $x509;
     eval {
         $x509 = OpenXPKI::Crypto::X509->new(
             DATA  => $certificate,
-            TOKEN => CTX('pki_realm')->{$realm}->{crypto}->{default},
+            TOKEN => CTX('api')->get_default_token(),
         );
     };
     if (! defined $x509) {

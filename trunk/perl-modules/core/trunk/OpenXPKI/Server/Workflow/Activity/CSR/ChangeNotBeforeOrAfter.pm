@@ -18,9 +18,7 @@ sub execute
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $default_token = CTX('pki_realm_by_cfg')->
-                           {$self->config_id()}->
-                           {$self->{PKI_REALM}}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
 
     my $key_type = $context->param('_key_type');
     ##! 16: 'key_type: ' . $key_type

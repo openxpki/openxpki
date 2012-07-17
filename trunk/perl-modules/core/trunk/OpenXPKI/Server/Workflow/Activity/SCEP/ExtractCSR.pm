@@ -52,7 +52,7 @@ sub execute {
     # extract subject from CSR and add a context entry for it
     my $csr_obj = OpenXPKI::Crypto::CSR->new(
         DATA  => $pkcs10,
-        TOKEN => CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm}->{crypto}->{default},
+        TOKEN => CTX('api')->get_default_token(),
     );
     ##! 32: 'csr_obj: ' . Dumper $csr_obj
     my $subject = $csr_obj->get_parsed('BODY', 'SUBJECT');

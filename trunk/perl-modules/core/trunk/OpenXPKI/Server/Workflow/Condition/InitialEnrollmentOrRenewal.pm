@@ -45,7 +45,7 @@ sub evaluate {
         });
     ##! 64: 'sig_subject: ' . $sig_subject
 
-    my $default_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     
     my @signer_chain;
     eval {

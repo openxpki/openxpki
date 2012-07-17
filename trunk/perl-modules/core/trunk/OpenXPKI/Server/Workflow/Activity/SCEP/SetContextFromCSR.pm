@@ -19,7 +19,6 @@ sub execute {
     ##! 1: 'start'
     my $self       = shift;
     my $workflow   = shift;
-    my $pki_realm  = CTX('session')->get_pki_realm();
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
     my $context   = $workflow->context();
@@ -27,7 +26,7 @@ sub execute {
 
     my $csr_obj = OpenXPKI::Crypto::CSR->new(
         DATA  => $csr,
-        TOKEN => CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{crypto}->{default},
+        TOKEN => CTX('api')->get_default_token(),
     );
     ##! 32: 'csr_obj: ' . Dumper $csr_obj
     my $subject = $csr_obj->get_parsed('BODY', 'SUBJECT');

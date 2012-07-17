@@ -129,8 +129,7 @@ sub get_cert_identifier {
     my $self      = shift;
     my $arg_ref   = shift;
     my $cert      = $arg_ref->{CERT};
-    my $pki_realm = CTX('session')->get_pki_realm();
-    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     ##! 64: 'cert: ' . $cert
 
     my $x509 = OpenXPKI::Crypto::X509->new(
@@ -686,9 +685,8 @@ sub get_random {
     my $arg_ref = shift;
     my $length  = $arg_ref->{LENGTH};
     ##! 4: 'length: ' . $length
-    my $pki_realm = CTX('session')->get_pki_realm();
 
-    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     my $random = $default_token->command({
         COMMAND => 'create_random',
         RETURN_LENGTH => $length,
@@ -700,9 +698,8 @@ sub get_random {
 
 sub get_alg_names {
     my $self    = shift;
-    my $pki_realm = CTX('session')->get_pki_realm();
 
-    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     my $alg_names = $default_token->command ({COMMAND => "list_algorithms", FORMAT => "alg_names"});
     return $alg_names;
 }
@@ -711,9 +708,8 @@ sub get_param_names {
     my $self    = shift;
     my $arg_ref = shift;
     my $keytype = $arg_ref->{KEYTYPE};
-    my $pki_realm = CTX('session')->get_pki_realm();
 
-    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     my $param_names = $default_token->command ({COMMAND => "list_algorithms",
                                                 FORMAT  => "param_names",
                                                 ALG     => $keytype});
@@ -725,9 +721,8 @@ sub get_param_values {
     my $arg_ref = shift;
     my $keytype = $arg_ref->{KEYTYPE};
     my $param_name = $arg_ref->{PARAMNAME};
-    my $pki_realm = CTX('session')->get_pki_realm();
 
-    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     my $param_values = $default_token->command ({COMMAND => "list_algorithms",
                                                 FORMAT  => "param_values",
                                                 ALG     => $keytype,
@@ -742,8 +737,7 @@ sub get_chain {
     my $default_token;
 
     eval {
-        my $pki_realm     = CTX('session')->get_pki_realm();
-        $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+        $default_token = CTX('api')->get_default_token();
     };
     # ignore if this fails, as this is only needed within the
     # server if a user is connected. openxpkiadm -v -v uses this
@@ -1050,8 +1044,7 @@ sub convert_csr {
     my $self    = shift;
     my $arg_ref = shift;
 
-    my $realm   = CTX('session')->get_pki_realm();
-    my $default_token = CTX('pki_realm')->{$realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     my $data = $default_token->command({
         COMMAND => 'convert_pkcs10',
         IN      => $arg_ref->{IN},
@@ -1064,9 +1057,8 @@ sub convert_csr {
 sub convert_certificate {
     my $self    = shift;
     my $arg_ref = shift;
-
-    my $realm   = CTX('session')->get_pki_realm();
-    my $default_token = CTX('pki_realm')->{$realm}->{crypto}->{default};
+    
+    my $default_token = CTX('api')->get_default_token();
     my $data = $default_token->command({
         COMMAND => 'convert_cert',
         IN      => $arg_ref->{IN},
@@ -1101,6 +1093,26 @@ sub create_bulk_request_ticket {
     });
 
     return $ticket;
+}
+
+sub get_default_token {
+    
+    ##! 1: 'start'
+    my $self = shift;
+    my $keys = shift;
+
+    my $pki_realm = $keys->{PKI_REALM};
+    if (!$pki_realm)
+    {
+        $pki_realm = CTX('session')->get_pki_realm();        
+    }
+
+    return CTX('crypto_layer')->get_token (
+        TYPE      => "DEFAULT",
+        ID        => "default",
+        PKI_REALM => $pki_realm,
+        CONFIG_ID =>  CTX('api')->get_current_config_id(),        
+    );
 }
 
 1;

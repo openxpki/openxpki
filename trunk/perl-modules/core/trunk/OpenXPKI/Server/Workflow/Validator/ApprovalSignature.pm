@@ -196,7 +196,7 @@ sub validate {
         # yet, so we use the current one
         $cfg_id = CTX('api')->get_current_config_id();
     }
-    my $default_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     my @signer_chain = $default_token->command({
         COMMAND        => 'pkcs7_get_chain',
         PKCS7          => $pkcs7,

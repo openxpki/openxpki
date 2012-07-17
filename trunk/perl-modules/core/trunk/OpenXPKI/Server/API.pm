@@ -161,6 +161,16 @@ sub BUILD {
                 },
             },
         },
+        'get_default_token' => {
+            class  => 'Default',
+            params => {
+                'PKI_REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+            },
+        },
         'get_approval_message' => {
             class  => 'Default',
             params => {

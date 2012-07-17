@@ -166,8 +166,7 @@ sub execute {
     my $workflow      = shift;
     my $context       = $workflow->context();
     my $user          = CTX('session')->get_user();
-    my $default_token = CTX('pki_realm_by_cfg')->{ $self->config_id() }
-        ->{ $self->{PKI_REALM} }->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
 
     my $code = '';
     my $salt = '';

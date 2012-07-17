@@ -39,9 +39,7 @@ sub get_csr_info_hash_from_data {
     my $args  = shift;
 
     my $data   = $args->{DATA};
-    my $realm  = CTX('session')->get_pki_realm();
-    my $cfg_id = CTX('api')->get_current_config_id();
-    my $token  = CTX('pki_realm_by_cfg')->{$cfg_id}->{$realm}->{crypto}->{default};
+    my $token  = CTX('api')->get_default_token();    
     my $obj    = OpenXPKI::Crypto::CSR->new (DATA => $data, TOKEN => $token);
 
     ##! 1: "finished"
@@ -111,8 +109,8 @@ sub get_cert
             },
         );
     }
-    my $realm = CTX('session')->get_pki_realm();
-    my $token = CTX('pki_realm')->{$realm}->{crypto}->{default};
+    
+    my $token = CTX('api')->get_default_token();
     my $obj   = OpenXPKI::Crypto::X509->new(TOKEN => $token,
     		    			    DATA  => $hash->{DATA});
 
@@ -193,9 +191,8 @@ sub get_crl
     my $output;
 
     if ($published_format ne $format) {
-        # we still have to convert the CRL
-        my $pki_realm = CTX('session')->get_pki_realm();
-        my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+        # we still have to convert the CRL        
+        my $default_token = CTX('api')->get_default_token();
         ##! 16: 'convert from ' . $fileset->{FORMAT} . ' to ' . $format
         if ($format eq 'DER' || $format eq 'TXT') {
             $output = $default_token->command({
@@ -440,9 +437,8 @@ sub get_private_key_for_cert {
     my $identifier = $arg_ref->{IDENTIFIER};
     my $format     = $arg_ref->{FORMAT};
     my $password   = $arg_ref->{PASSWORD};
-    
-    my $pki_realm = CTX('session')->get_pki_realm();
-    my $default_token = CTX('pki_realm')->{$pki_realm}->{crypto}->{default};
+                   
+    my $default_token = CTX('api')->get_default_token();
     ##! 4: 'identifier: ' . $identifier
     ##! 4: 'format: ' . $format
 
@@ -512,6 +508,7 @@ sub get_private_key_for_cert {
         }
     }
     elsif ($format eq 'JAVA_KEYSTORE') {
+        my $pki_realm = CTX('session')->get_pki_realm();
         my $tm = CTX('crypto_layer');
         my $token = $tm->get_token(
             TYPE      => 'CreateJavaKeystore',
@@ -630,7 +627,7 @@ sub get_data_pool_entry {
 	$encrypted = 1;
 
 	my $cfg_id = CTX('api')->get_current_config_id();
-	my $token  = CTX('pki_realm_by_cfg')->{$cfg_id}->{$requested_pki_realm}->{crypto}->{default};
+	my $token  = CTX('api')->get_default_token({ PKI_REALM => $requested_pki_realm });
 	
 	if ($encryption_key =~ m{ \A p7:(.*) }xms) {
 	    # asymmetric decryption
@@ -1148,7 +1145,7 @@ sub __set_data_pool_entry : PRIVATE {
     if ($encrypt) {
 	my $current_password_safe = $self->__get_current_safe_id($current_pki_realm);
 	my $cfg_id = CTX('api')->get_current_config_id();
-	my $token  = CTX('pki_realm_by_cfg')->{$cfg_id}->{$current_pki_realm}->{crypto}->{default};
+	my $token  = CTX('api')->get_default_token();
 
 	if ($encrypt eq 'current_symmetric_key') {
 
@@ -1296,7 +1293,7 @@ sub __get_current_datapool_encryption_key : PRIVATE {
 
 #    my $realm  = CTX('session')->get_pki_realm();
     my $cfg_id = CTX('api')->get_current_config_id();
-    my $token  = CTX('pki_realm_by_cfg')->{$cfg_id}->{$realm}->{crypto}->{default};
+    my $token  = CTX('api')->get_default_token({ PKI_REALM => $realm });
 
     # get symbolic name of current password safe (e. g. 'passwordsafe1')
     my $safe_id = $self->__get_current_safe_id($realm);

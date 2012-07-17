@@ -32,7 +32,7 @@ sub validate {
         # yet, so we use the current one
         $cfg_id = $api->get_current_config_id();
     }
-    my $default_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
 
     # if nothing is there to validate yet, we can return
     return if (! defined $pkcs10 && ! defined $spkac);

@@ -1,3 +1,6 @@
+default:
+    backend: OpenXPKI::Crypto::Backend::OpenSSL
+    
 testdummyca1:
     key: /etc/openxpki/instances/trustcenter1/ca/testdummyca1/cakey.pem
     secret: default

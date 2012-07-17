@@ -70,9 +70,9 @@ my @init_tasks = qw(
   workflow_factory
   crypto_layer
   pki_realm
-  volatile_vault
-  acl
   api
+  volatile_vault
+  acl  
   pki_realm_by_cfg
   authentication
   notification
@@ -411,7 +411,8 @@ sub __do_init_volatile_vault {
             message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_PKI_REALM");
 	
     }
-    my $token =  $realms->{$firstrealm}->{crypto}->{default};
+    
+    my $token = CTX('api')->get_default_token({PKI_REALM => $firstrealm});
 
     if (! defined $token) {
         OpenXPKI::Exception->throw (

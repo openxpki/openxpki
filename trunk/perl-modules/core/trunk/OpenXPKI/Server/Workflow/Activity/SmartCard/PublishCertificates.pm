@@ -23,7 +23,7 @@ sub execute {
     my $context  = $workflow->context();
     my $serializer    = OpenXPKI::Serialization::Simple->new();
     my $pki_realm     = CTX('session')->get_pki_realm();
-    my $default_token = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     my $api           = CTX('api');
 
     my $ldap_server     = $self->param('ldap_server');

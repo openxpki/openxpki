@@ -27,9 +27,7 @@ sub execute
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $dbi         = CTX('dbi_backend');
-    my $default_token = CTX('pki_realm_by_cfg')->
-                           {$self->config_id()}->
-                           {$self->{PKI_REALM}}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
 
     ##! 16: 'ParseCert'
     my %contextentry_of = (

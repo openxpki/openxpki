@@ -130,7 +130,7 @@ sub execute
             );
         }
         ##! 16: 'signer subject: ' . $signer_subject
-        my $default_token = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{crypto}->{default};
+        my $default_token = CTX('api')->get_default_token();
         my @signer_chain = $default_token->command({
             COMMAND        => 'pkcs7_get_chain',
             PKCS7          => $pkcs7,

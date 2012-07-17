@@ -41,7 +41,7 @@ sub execute {
         );
     }
     ##! 16: 'password_safe: ' . Dumper CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$realm}
-    my $default_token = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     if (! defined $default_token) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_STORE_PASSWORD_TOKEN_NOT_AVAILABLE',
