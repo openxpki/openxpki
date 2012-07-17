@@ -30,17 +30,11 @@ sub execute
     }
 
     ## dirs of dataexchange
-    $context->param ('local_export_dir' => CTX('xml_config')->get_xpath (
-                     XPATH   => [ 'common/data_exchange/export/dir' ],
-                     COUNTER => [ 0 ]));
-    $context->param ('local_import_dir' => CTX('xml_config')->get_xpath (
-                     XPATH   => [ 'common/data_exchange/import/dir' ],
-                     COUNTER => [ 0 ]));
+    $context->param ('local_export_dir' => CTX('config')->get('system.server.data_exchange.export') );
+    $context->param ('local_import_dir' => CTX('config')->get('system.server.data_exchange.import') );
 
     ## name of archive and export directory
-    my $filename = CTX('xml_config')->get_xpath (
-                       XPATH   => [ 'common/server/tmpdir' ],
-                       COUNTER => [ 0 ]);
+    my $filename = CTX('config')->get('system.server.tmpdir');
     $context->param ('archive_directory' => $self->get_safe_tmpdir ({TMP => $filename}));
     $context->param ('tmpdir'  => $self->get_safe_tmpdir ({TMP => $filename}));
     $context->param ('archive_filename' => "export.tar.gz");

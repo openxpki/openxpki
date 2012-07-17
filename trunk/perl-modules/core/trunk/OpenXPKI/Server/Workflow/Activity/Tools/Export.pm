@@ -26,9 +26,7 @@ sub execute
     
     my $server = $config->get('system.server.node.id');
                 
-    my $dir = CTX('xml_config')->get_xpath (
-                      XPATH   => [ 'common/data_exchange/export/dir' ],
-                      COUNTER => [ 0 ]);
+    my $dir = CTX('config')->get('system.server.data_exchange.export'); 
        $dir =~ s{/\s*$}{}xs;
 
     ## check the parameters

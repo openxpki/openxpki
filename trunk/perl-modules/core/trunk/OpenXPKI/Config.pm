@@ -79,7 +79,7 @@ before '_route_call' => sub {
             
         my $pki_realm = $session->get_pki_realm();            
         ##! 16: "_route_call: realm value, set prefix to " . $pki_realm        
-        $self->_config()->{''}->PREFIX( $pki_realm );
+        $self->_config()->{''}->PREFIX( "realm.$pki_realm" );
     }    
 };
 

@@ -1078,14 +1078,16 @@ sub init_i18n
     my $keys = { @_ };
     ##! 1: "start"
 
-    if (not $keys->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_I18N_MISSING_CONFIG");
+    my $prefix = CTX('config')->get('system.server.i18n.locale_directory');
+    if (!$prefix) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_INIT_LOCALE_DIRECTORY_MISSING',
+        );
     }
-
-    set_locale_prefix ($keys->{CONFIG}->get_xpath (XPATH => "common/i18n/locale_directory", CONFIG_ID => 'default'));
-    set_language      ($keys->{CONFIG}->get_xpath (XPATH => "common/i18n/default_language", CONFIG_ID => 'default'));
+    my $language = CTX('config')->get('system.server.i18n.default_language') || 'C';
+     
+    set_locale_prefix ($prefix);
+    set_language      ($language);
 
     binmode STDOUT, ":utf8";
     binmode STDIN,  ":utf8";
@@ -1116,13 +1118,14 @@ sub get_pki_realms
 
     ##! 16: 'crypto + config'
     
-    
+     
     ### get all PKI realms
     my %realms = ();
     my $count = $xml_config->get_xpath_count(
         XPATH     => "pki_realm",
         CONFIG_ID => $cfg_id,
     );
+
     ##! 16: 'number of PKI realms: ' . $count
     for (my $i = 0 ; $i < $count ; $i++)
     {
@@ -1211,296 +1214,6 @@ sub get_pki_realms
                     FACILITY => "system",
                 });
         }
-
-	
-        my @xpath   = ( 'pki_realm', 'common', 'profiles' );
-        my @counter = ( $i,         0,        0 );
-        
-
-        #############################################################
-        ##! 129: '--------------------------------- get ldap options'  
-	#
-        my @ldap_path   = ('pki_realm', 'common/ldap_options');
-        my @ldap_counter= (         $i,             0);
-        eval {
-         $realms{$name}->{ldap_enable} = $xml_config->get_xpath(
-	        XPATH   => [  @ldap_path   ,'ldap_enable' ],
-  	        COUNTER => [  @ldap_counter,           0  ],
-              CONFIG_ID => $cfg_id,
-	 );
-	};
-        if ($EVAL_ERROR) {
-         log_wrapper({
-    	  MESSAGE  => "No LDAP options found, LDAP turned off",
-    	  PRIORITY => "warn",
-    	  FACILITY => "system",
-	 });
-	 $realms{$name}->{ldap_enable} = "no";
-	}
-	if($realms{$name}->{ldap_enable} eq "yes"){
-        ##! 129: 'LDAP LOADED, STATUS '.$realms{$name}->{ldap_enable}
-	  $realms{$name}->{ldap_excluded_roles} = $xml_config->get_xpath(
-                XPATH   => [  @ldap_path   ,'ldap_excluded_roles' ],
-                COUNTER => [  @ldap_counter,                    0 ],
-	      CONFIG_ID => $cfg_id,
-	  );
-          $realms{$name}->{ldap_suffix}=[];
-          my $suffix_count = $xml_config->get_xpath_count(
-                XPATH   => [  @ldap_path    ,
-	                     'ldap_suffixes','ldap_suffix' ],
-                COUNTER => [  @ldap_counter,           0   ],
-	      CONFIG_ID => $cfg_id,
-	  );
-          for (my $suffix_counter=0; 
-	          $suffix_counter < $suffix_count;
-	          $suffix_counter++){
-	       my $ldap_suffix =
-                  $xml_config->get_xpath(
-                        XPATH   => [  @ldap_path    ,
-	                             'ldap_suffixes','ldap_suffix' ],
-                        COUNTER => [  @ldap_counter, 
-		                                  0,$suffix_counter],
-		      CONFIG_ID => $cfg_id,
-	       );
-	       push @{$realms{$name}->{ldap_suffix}}, $ldap_suffix;
-          };
-	  $realms{$name}->{ldap_server} = $xml_config->get_xpath(
-                XPATH   => [  @ldap_path   ,'ldap_server' ],
-                COUNTER => [  @ldap_counter,           0  ],
-	      CONFIG_ID => $cfg_id,
-	  );
-	  $realms{$name}->{ldap_port} = $xml_config->get_xpath(
-                XPATH   => [  @ldap_path   ,'ldap_port' ],
-                COUNTER => [  @ldap_counter,         0  ],
-	      CONFIG_ID => $cfg_id,
-	  );
-	  $realms{$name}->{ldap_version} = $xml_config->get_xpath(
-                XPATH   => [  @ldap_path   ,'ldap_version' ],
-                COUNTER => [  @ldap_counter,            0  ],
-	      CONFIG_ID => $cfg_id,
-	  );
-	  #--- TLS block
-          $realms{$name}->{ldap_tls} = $xml_config->get_xpath(
-                XPATH   => [  @ldap_path   ,'ldap_tls','use_tls' ],
-                COUNTER => [  @ldap_counter,         0,       0  ],
-	      CONFIG_ID => $cfg_id,
-	  );
-          if($realms{$name}->{ldap_tls} eq "yes"){
-             $realms{$name}->{ldap_client_cert} = 
-	         $xml_config->get_xpath(
-                     XPATH   => [  @ldap_path   ,'ldap_tls',
-     	                         'client_cert'],
-                     COUNTER => [  @ldap_counter,         0,0],
-	           CONFIG_ID => $cfg_id,
-	         );
-
-             $realms{$name}->{ldap_client_key} = 
-		 $xml_config->get_xpath(
-                     XPATH   => [  @ldap_path   ,'ldap_tls',
-     	                          'client_key'],
-                     COUNTER => [  @ldap_counter,         0,0],
-	           CONFIG_ID => $cfg_id,
-	         );
-
-             $realms{$name}->{ldap_ca_cert} = 
-	         $xml_config->get_xpath(
-	             XPATH   => [  @ldap_path   ,'ldap_tls',
-	                             'ca_cert'],
-                     COUNTER => [  @ldap_counter,         0,0],
-	           CONFIG_ID => $cfg_id,
-	         );
-          };
-	  #--- end of TLS block    
-	  
-	  #--- SASL block
-	  $realms{$name}->{ldap_sasl} = $xml_config->get_xpath(
-                XPATH   => [  @ldap_path   ,'ldap_sasl','use_sasl'],
-                COUNTER => [  @ldap_counter,          0,        0 ],
-	      CONFIG_ID => $cfg_id,
-	  );
-          if($realms{$name}->{ldap_sasl} eq "yes"){
-             $realms{$name}->{ldap_sasl_mech} = 
-	         $xml_config->get_xpath(
-                     XPATH   => [ @ldap_path   ,'ldap_sasl',
-		                  'sasl_mech'                ],
-                     COUNTER => [ @ldap_counter,          0,0],
-	           CONFIG_ID => $cfg_id,
-	         );
-          };
-	  #--- end of SASL block
-	  
-	  $realms{$name}->{ldap_login} = $xml_config->get_xpath(
-                XPATH   => [  @ldap_path   ,'ldap_login'],
-                COUNTER => [  @ldap_counter,           0],
-	      CONFIG_ID => $cfg_id,
-	  );
-
-          $realms{$name}->{ldap_password} = $xml_config->get_xpath(
-                XPATH   => [  @ldap_path   ,'ldap_password'],
-                COUNTER => [  @ldap_counter,           0   ],
-	      CONFIG_ID => $cfg_id,
-	  );
-
-          ##! 129: 'ldap: loading schema'
-          my @schema_prefix    = ('pki_realm','common/ldap_options/schema');
-          my @schema_counter   = ( $i        , 0                          );
-          my @cert_types = ("default", "certificate", "ca");
-	  my $rdn;
-          my $rdn_count;
-	  my $attribute_count;
-          my $attr_type;
-	  my $must_count;
-	  my $may_count;
-	  my $structural_count;
-	  my $auxiliary_count;
-
-          ##! 129: 'block: default, certificate, ca'
-          foreach my $cert_type (@cert_types) { 
-           ##! 129: 'load_schema: LOADING '.$cert_type.' BLOCK'
-           $rdn_count = $xml_config->get_xpath_count(
-                XPATH   => [ @schema_prefix,$cert_type,'rdn' ],
-                COUNTER => [ @schema_counter, 0 ],
-	      CONFIG_ID => $cfg_id,
-	   );
-
-           ##! 129: 'load_schema: '.$cert_type.' rdns:'. $rdn_count
-           next if (not $rdn_count);
-	   ##! 129: 'block: rdns'
-           for ($rdn=0; $rdn < $rdn_count; $rdn++){
-            ##! 129: 'attributetype'
-            $attr_type = $xml_config->get_xpath (
-              XPATH    => [ @schema_prefix, $cert_type,'rdn',
-	                    'attributetype'],
-              COUNTER  => [ @schema_counter,0,          $rdn, 0 ],
-	     CONFIG_ID => $cfg_id,
-	    );
-
-            $realms{$name}->{schema}->{$cert_type}->{lc ($attr_type)}->{attributetype} =
-             $attr_type;
-            $attr_type = lc ($attr_type);
-            ##! 129: 'load_schema: loading attributetype '.$attr_type 
-            $must_count = $xml_config->get_xpath_count (
-               XPATH    => [ @schema_prefix, $cert_type,'rdn',
-	                   "must/attributetype" ],
-               COUNTER  => [ @schema_counter,0,          $rdn ],
-	      CONFIG_ID => $cfg_id,
-	    );
-
-            ##! 129: 'load_schema: must: count: '.$must_count
-            $must_count = 0 if (not $must_count);
-
-            ##! 129: 'block: must'
-            for (my $attribute_count=0; 
-	            $attribute_count < $must_count;
-	            $attribute_count++){ 
-             $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{must}->[$attribute_count] =
-              $xml_config->get_xpath (
-                XPATH    => [ @schema_prefix, $cert_type,'rdn',
-	                     "must/attributetype" ],
-                COUNTER  => [ @schema_counter,0,          $rdn,
-	                         $attribute_count ],
-	       CONFIG_ID => $cfg_id,
-	      );
-             ##! 129: 'load_schema: must'
-            }
-	    ##! 129: 'end of block: must'
-            eval {
-             $may_count = $xml_config->get_xpath_count (
-               XPATH    => [ @schema_prefix, $cert_type,'rdn',
-	                     "may/attributetype" ],
-               COUNTER  => [ @schema_counter,0        ,$rdn ],
-	      CONFIG_ID => $cfg_id,
-	     );
-            };
-	    if ($EVAL_ERROR) {
-             ##! 129: 'load_schema: may: count: ZERO'
-             $may_count = 0;
-            }
-            else {
-             ##! 129: 'block: may'
-             ##! 129: 'load_schema: may: count: '.$may_count 
-	     for ($attribute_count=0; 
-	          $attribute_count < $may_count; 
-	          $attribute_count++){ 
-              $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{may}->[$attribute_count] =
-               $xml_config->get_xpath (
-                 XPATH    => [ @schema_prefix, $cert_type,'rdn',
-	                       "may/attributetype" ],
-                 COUNTER  => [ @schema_counter,0,          $rdn,
-	                          $attribute_count ],
-	        CONFIG_ID => $cfg_id,
-	       );
-
-            ##! 129: 'load_schema: may'
-             }
-            };
-	    ##  129: 'end of block: may'
-            $structural_count = $xml_config->get_xpath_count (
-              XPATH    => [ @schema_prefix, $cert_type,'rdn',
-                           "structural/objectclass" ],
-              COUNTER  => [ @schema_counter,0        ,$rdn ],
-	     CONFIG_ID => $cfg_id,
-	    );
-
-            ##! 129: 'load_schema: count: '.$count
-            $structural_count = 0 if (not $structural_count);
-            ## 129: 'block: structural'
-            for ($attribute_count=0; 
- 	         $attribute_count < $structural_count; 
- 		 $attribute_count++){
-             $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{structural}->[$attribute_count] =
-              $xml_config->get_xpath (
-                XPATH    => [ @schema_prefix, $cert_type,'rdn',
-	                     "structural/objectclass" ],
-                COUNTER  => [ @schema_counter,0,          $rdn,
-	                            $attribute_count ],
-	       CONFIG_ID => $cfg_id,
-	      );
-
-            ##! 129: 'load_schema: structural'
-            } 
-            ##! 129: 'end of block: structural'
-            eval {
-             $auxiliary_count = $xml_config->get_xpath_count (
-               XPATH    => [ @schema_prefix, $cert_type,'rdn',
-   	                     "auxiliary/objectclass" ],
-               COUNTER  => [ @schema_counter,0          ,$rdn ],
-	      CONFIG_ID => $cfg_id,
-	     );
-            };
-	    if ($EVAL_ERROR) {
-             ##! 129 : 'load_schema: auxiliary: count: ZERO'
-             $auxiliary_count = 0;
-            }
-            else {
-             ##! 129 : 'load_schema: auxiliary: count: '.$count
-             ##! 129 : 'block: auxiliary'
-             for ($attribute_count=0; 
-	          $attribute_count < $auxiliary_count; 
- 	          $attribute_count++){
-              $realms{$name}->{schema}->{$cert_type}->{$attr_type}->{auxiliary}->[$attribute_count] =
-               $xml_config->get_xpath (
-                 XPATH    => [ @schema_prefix, $cert_type,'rdn',
-	                    "auxiliary/objectclass" ],
-                 COUNTER  => [ @schema_counter,0,          $rdn,
-	                           $attribute_count ],
-	        CONFIG_ID => $cfg_id,
-	       );
-              ##! 129: 'load_schema: auxiliary'
-             };
-            }; 
-	    ##! 129: 'end of block: auxiliary'
-           }; 
-	   ##! 129: 'end of block: rdns'
-          }; 
-	  ##! 129: 'end of block: default, certificate, ca'
-        }; 
-	##! 129: 'end of block: ldap_enable=yes'
-        ##! 129: '-------------------------------------The End of ldap section'
-        ################################################################
-
-
-        ### %realms
 
         # get all CA certificates for PKI realm
         # $realms{$name}->{ca}->{$ca}->{certificate} =
@@ -2076,17 +1789,12 @@ sub get_dbi
 sub get_log
 {
     ##! 1: "start"
-    my $xml_config = $current_xml_config;
-
-    $xml_config = $xml_config->get_xpath (
-                  XPATH    => [ 'common/log_config' ],
-                  COUNTER  => [ 0 ],
-                  CONFIG_ID => 'default');
+    my $config_file = CTX('config')->get('system.server.log4perl');
 
     ## init logging
     ##! 64: 'before Log->new'
 
-    my $log = OpenXPKI::Server::Log->new (CONFIG => $xml_config);
+    my $log = OpenXPKI::Server::Log->new (CONFIG => $config_file);
 
     ##! 64: 'log during get_log: ' . $log
 
@@ -2096,12 +1804,7 @@ sub get_log
 sub redirect_stderr
 {
     ##! 1: "start"
-    my $xml_config = $current_xml_config;
-
-    my $stderr = $xml_config->get_xpath(
-        XPATH     => "common/server/stderr",
-        CONFIG_ID => 'default',
-    );
+    my $stderr = CTX('config')->get('system.server.stderr');
     if (not $stderr)
     {
         OpenXPKI::Exception->throw (

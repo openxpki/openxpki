@@ -253,22 +253,9 @@ sub post_bind_hook {
         }
     }
 
-    my $environment_count = 0;
-    eval {
-        $environment_count = CTX('xml_config')->get_xpath_count(
-            XPATH => 'common/server/environment',
-        );
-    };
-    ##! 16: 'environment count: ' . $environment_count
-    for (my $i = 0; $i < $environment_count; $i++) {
-        my $var = CTX('xml_config')->get_xpath(
-            XPATH   => [ 'common', 'server', 'environment', 'variable' ],
-            COUNTER => [ 0       , 0       , $i           , 0          ],
-        );
-        my $value = CTX('xml_config')->get_xpath(
-            XPATH   => [ 'common', 'server', 'environment', 'value' ],
-            COUNTER => [ 0       , 0       , $i           , 0       ],
-        );
+    my $env = CTX('config')->get_hash('system.server.environment');
+    foreach my $var (keys %{$env}) {
+        my $value = $env->{$var};        
         ##! 16: "ENV{$var} = $value"
         $ENV{$var} = $value;
     }
@@ -611,17 +598,16 @@ sub __get_user_interfaces
     
     ##! 1: "start"
     
-    my $config = CTX('xml_config');
+    my $config = CTX('config');
 
     ##! 2: "init transport protocols"
 
-    my $count = $config->get_xpath_count (XPATH => "common/server/transport");
-    for (my $i=0; $i < $count; $i++)
-    {
-        my $class = $config->get_xpath (
-	    XPATH   => "common/server/transport",
-	    COUNTER => $i);
-	$class = "OpenXPKI::Transport::".$class;
+    my $transport = $config->get_hash("system.server.transport");
+    foreach my $class (keys %{$transport}) {
+        
+        next unless ($transport->{$class});
+            
+        $class = "OpenXPKI::Transport::".$class;
         eval "use $class;";
         if ($EVAL_ERROR)
         {
@@ -643,13 +629,13 @@ sub __get_user_interfaces
 
     ##! 2: "init services"
 
-    $count = $config->get_xpath_count (XPATH => "common/server/service");
-    for (my $i=0; $i < $count; $i++)
-    {
-        my $class = $config->get_xpath (
-	    XPATH   => "common/server/service",
-	    COUNTER => $i);
-	$class = "OpenXPKI::Service::".$class;
+    my @services = $config->get_keys("system.server.service");
+    foreach my $class (@services) {
+        
+        next unless ($config->get("system.server.service.$class.enabled"));
+
+        ##! 4: "init $class"                
+        $class = "OpenXPKI::Service::".$class;
         eval "use $class;";
         if ($EVAL_ERROR)
         {
@@ -719,9 +705,9 @@ sub __get_server_config
 
     ##! 1: "start"
 
-    my $config = CTX('xml_config');
+    my $config = CTX('config');
 
-    my $socketfile = $config->get_xpath (XPATH => "common/server/socket_file");
+    my $socketfile = $config->get('system.server.socket_file');
 
     # check if socket filename is too long
     if (unpack_sockaddr_un(pack_sockaddr_un($socketfile)) ne $socketfile) {
@@ -763,10 +749,10 @@ sub __get_server_config
 	    },
         );
     }
-    $params{user}       = $config->get_xpath (XPATH => "common/server/user");
-    $params{group}      = $config->get_xpath (XPATH => "common/server/group");
+    $params{user}       = $config->get('system.server.user');
+    $params{group}      = $config->get('system.server.group');
     $params{port}       = $socketfile . '|unix';
-    $params{pid_file}   = $config->get_xpath (XPATH => "common/server/pid_file");
+    $params{pid_file}   = $config->get('system.server.pid_file');
     
     ## check daemon user
 
@@ -828,59 +814,52 @@ sub __get_server_config
 
     # check if we have different ownership settings for the socket
 
-    my $socket_owner;
-    my $socket_group;
-
-    eval {
-	$socket_owner = $config->get_xpath (XPATH => "common/server/socket_owner");
-    };
+    my $socket_owner = $config->get('system.server.socket_owner');
 
     if (defined $socket_owner) {
-	# convert user id to numerical
-	$params{socket_owner} = __get_numerical_user_id($socket_owner);
-
-	if (! defined $params{socket_owner} || ($params{socket_owner} eq ''))
-	{
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER",
-		params  => {
-		    "SOCKET_OWNER" => $socket_owner,
-		},
-		log => {
-		    logger => CTX('log'),
-		    message => "Incorrect socket owner '$socket_owner'",
-		    facility => 'system',
-		    priority => 'fatal',
-		},
-		);
-	}
-	$params{socket_owner} = $socket_owner;	
+    	# convert user id to numerical
+    	$params{socket_owner} = __get_numerical_user_id($socket_owner);
+    
+    	if (! defined $params{socket_owner} || ($params{socket_owner} eq ''))
+    	{
+    	    OpenXPKI::Exception->throw (
+    		message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER",
+    		params  => {
+    		    "SOCKET_OWNER" => $socket_owner,
+    		},
+    		log => {
+    		    logger => CTX('log'),
+    		    message => "Incorrect socket owner '$socket_owner'",
+    		    facility => 'system',
+    		    priority => 'fatal',
+    		},
+    		);
+    	}
+    	$params{socket_owner} = $socket_owner;	
     }
 
-    eval {
-	$socket_group = $config->get_xpath (XPATH => "common/server/socket_group");
-    };
-
+    my $socket_group = $config->get('system.server.socket_group');
+    
     if (defined $socket_group) {
-	# convert group id to numerical
-	$params{socket_group} = __get_numerical_group_id($socket_group);
-
-	if (! defined $params{socket_group} || ($params{socket_group} eq ''))
-	{
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER_GROUP",
-		params  => {
-		    "SOCKET_GROUP" => $socket_group,
-		},
-		log => {
-		    logger => CTX('log'),
-		    message => "Incorrect socket group '$socket_group'",
-		    facility => 'system',
-		    priority => 'fatal',
-		},
-		);
-	}
-	$params{socket_group} = $socket_group;	
+    	# convert group id to numerical
+    	$params{socket_group} = __get_numerical_group_id($socket_group);
+    
+    	if (! defined $params{socket_group} || ($params{socket_group} eq ''))
+    	{
+    	    OpenXPKI::Exception->throw (
+    		message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER_GROUP",
+    		params  => {
+    		    "SOCKET_GROUP" => $socket_group,
+    		},
+    		log => {
+    		    logger => CTX('log'),
+    		    message => "Incorrect socket group '$socket_group'",
+    		    facility => 'system',
+    		    priority => 'fatal',
+    		},
+    		);
+    	}
+    	$params{socket_group} = $socket_group;	
     };
 
     return \%params;

@@ -147,7 +147,7 @@ sub get_workflow_instance_info {
     {
         ##! 4: "create image"
         my $fu = OpenXPKI::FileUtils->new();
-        my $filename = $fu->get_safe_tmpfile({TMP => CTX('xml_config')->get_xpath(XPATH => 'common/server/tmpdir')});
+        my $filename = $fu->get_safe_tmpfile({TMP => CTX('config')->get('system.server.tmpdir')});
         if (not open FH, "|dot -T$format > $filename")
         {
             OpenXPKI::Exception->throw (

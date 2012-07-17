@@ -40,13 +40,8 @@ sub init {
 
     # timeout idle clients
     
-    my $timeout = 120;
-    eval {
-	$timeout = CTX('xml_config')->get_xpath(
-	    XPATH => "common/server/connection_timeout"
-	);
-    };
-
+    my $timeout = CTX('config')->get("system.server.service.default.timeout") || 120;
+	
     $self->set_timeout($timeout);
     
     $state_of{$ident} = 'NEW';
@@ -194,14 +189,8 @@ sub __handle_NEW_SESSION : PRIVATE {
 
     ##! 4: "new session"
     my $session = OpenXPKI::Server::Session->new({
-                       DIRECTORY => CTX('xml_config')->get_xpath
-                                    (
-                                        XPATH => "common/server/session_dir"
-                                    ),
-                       LIFETIME  => CTX('xml_config')->get_xpath
-                                    (
-                                        XPATH => "common/server/session_lifetime"
-                                    ),
+        DIRECTORY => CTX('config')->get("system.server.session.directory"),
+        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),                       
     });
 
     if (exists $msg->{LANGUAGE}) {
@@ -239,15 +228,9 @@ sub __handle_CONTINUE_SESSION {
     ##! 4: "try to continue session"
     eval {
         $session = OpenXPKI::Server::Session->new({
-                           DIRECTORY => CTX('xml_config')->get_xpath
-                                        (
-                                            XPATH => "common/server/session_dir"
-                                        ),
-                           LIFETIME  => CTX('xml_config')->get_xpath
-                                        (
-                                            XPATH => "common/server/session_lifetime"
-                                        ),
-                           ID        => $msg->{SESSION_ID}
+            DIRECTORY => CTX('config')->get("system.server.session.directory"),
+            LIFETIME  => CTX('config')->get("system.server.session.lifetime"),                                            
+            ID        => $msg->{SESSION_ID}
         });
     };
     if ($EVAL_ERROR) {

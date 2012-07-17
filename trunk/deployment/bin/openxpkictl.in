@@ -21,6 +21,7 @@ use Proc::ProcessTable;
 
 use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
+use OpenXPKI::Config;
 use OpenXPKI::Config::Merge;
 
 # settings determined by openxpki-metaconf
@@ -398,10 +399,10 @@ if (defined $params{fg}) {
 
 $configfile = File::Spec->rel2abs($configfile);
 
-my $config = OpenXPKI::XML::Config->new(CONFIG => $configfile);
+my $config = OpenXPKI::Config->new();
 
 if (! defined $config) {
-    print STDERR "ERROR: Could not read configuration file $configfile\n";
+    print STDERR "ERROR: Could not initalize configuration\n";
     exit 1;
 }
 
@@ -409,31 +410,19 @@ if (! defined $config) {
 ## this disturbs the debugging
 require OpenXPKI::Server;
 
-my $pidfile;
-eval {
-    $pidfile = $config->get_xpath (
-	XPATH   => ["common", "server", "pid_file"],
-	COUNTER => [0, 0, 0],
-	);
-};
-if ($EVAL_ERROR)
+my $pidfile = $config->get('system.server.pid_file');
+if (!$pidfile)
 {
-    print STDERR "ERROR: Could not determine PID file from configuration: " . $EVAL_ERROR->as_string() . "\n";
+    print STDERR "ERROR: Could not determine PID file from configuration.\n";
     exit 1;
 }
 
 ### $pidfile
 
-my $socketfile;
-eval {
-    $socketfile = $config->get_xpath (
-	XPATH   => ["common", "server", "socket_file"],
-	COUNTER => [0, 0, 0],
-	);
-};
-if ($EVAL_ERROR)
+my $socketfile = $config->get('system.server.socket_file');
+if (!$socketfile)
 {
-    print STDERR "ERROR: Could not determine socket file from configuration: " . $EVAL_ERROR->as_string() . "\n";
+    print STDERR "ERROR: Could not determine socket file from configuration\n";
     exit 1;
 }
 

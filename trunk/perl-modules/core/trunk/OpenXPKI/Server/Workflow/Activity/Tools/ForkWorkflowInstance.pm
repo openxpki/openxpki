@@ -215,10 +215,9 @@ sub execute {
             ### communicate with anyone -> close the socket file
             ### note that if we don't, the child waits for a communication
             ### timeout in the Default service.
-            my $socket_file = $self->get_xpath(
-                XPATH     => [ 'common', 'server', 'socket_file' ],
-                COUNTER   => [ 0       , 0       , 0            ],
-            );
+            
+            my $socket_file = CTX('config')->get('system.server.socket_file');
+            
             ##! 16: 'socket file: ' . $socket_file
             close($socket_file);
     

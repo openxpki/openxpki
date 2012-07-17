@@ -475,11 +475,11 @@ sub __check_session{
     
     ##! 4: "create new session"
     $session = OpenXPKI::Server::Session->new({
-                   DIRECTORY => CTX('xml_config')->get_xpath(XPATH => "common/server/session_dir"),
-                   LIFETIME  => CTX('xml_config')->get_xpath(XPATH => "common/server/session_lifetime"),
-   });
-   OpenXPKI::Server::Context::setcontext({'session' => $session,'force'=> $force_new});
-   ##! 4: sprintf(" session %s created" , $session->get_id()) 
+        DIRECTORY => CTX('config')->get("system.server.session.directory"),
+        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
+    });
+    OpenXPKI::Server::Context::setcontext({'session' => $session,'force'=> $force_new});
+    ##! 4: sprintf(" session %s created" , $session->get_id()) 
 }
 
 

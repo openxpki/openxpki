@@ -1009,12 +1009,8 @@ sub get_export_destinations
     my $pki_realm = CTX('session')->get_pki_realm();
 
     ##! 2: "load destination numbers"
-    my $export = CTX('xml_config')->get_xpath (
-                     XPATH   => [ 'common/data_exchange/export/dir' ],
-                     COUNTER => [ 0 ]);
-    my $import = CTX('xml_config')->get_xpath (
-                     XPATH   => [ 'common/data_exchange/import/dir' ],
-                     COUNTER => [ 0 ]);
+    my $export = CTX('config')->get('system.server.data_exchange.export'); 
+    my $import = CTX('config')->get('system.server.data_exchange.import');
     my @list = ();
     foreach my $dir ($import, $export)
     {
