@@ -231,7 +231,6 @@ sub get_card_policy {
 				}
 			}
         }
-
     if ( $wf_ID eq 'undefined' ) {
         $responseData->{'error'} = "error";
         push( @{$errors},
