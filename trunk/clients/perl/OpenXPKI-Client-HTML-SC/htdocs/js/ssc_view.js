@@ -1590,7 +1590,7 @@ var SSC_VIEW = new Class(
 					//this.setInfoTitle('T_disableSsoSuccess');
 					this.setPrompt('P_disableSsoSuccess');
 				}else{
-					this.setInfoRight('IT_Info', 'I_DisableSsoFailed');
+					this.setInfoRight('IT_Info', 'I_disableSsoFailed');
 					//this.setInfoTitle('T_disableSsoFailed');
 					this.setPrompt('P_disableSsoFailed');
 				}
