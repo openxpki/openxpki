@@ -467,3 +467,8 @@ msgstr "NAR Instance ID"
 msgid "I18N_OPENXPKI_NAR_INSTANCE_ID_DESC"
 msgstr "Please enter the NAR Instance ID of the application which uses this certificate. The ITPM of this NAR Instance will become owner of this certificate and is responsible for its renewal."
 
+msgid "I18N_OPENXPKI_PROFILE_AS2_THIRD_PARTY"
+msgstr "AS2 for Third Party end entities"
+
+msgid "I18N_OPENXPKI_PROFILE_TLS_CLIENT_SERVER_EXTERNAL_STYLE"
+msgstr "External party naming style"
