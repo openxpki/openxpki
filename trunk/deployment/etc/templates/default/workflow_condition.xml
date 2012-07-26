@@ -59,14 +59,4 @@
   </condition>
   
   
-  <!-- LDAP Publish -->
-  <condition name="I18N_OPENXPKI_WF_COND_LDAP_DN_AVAILABLE" 
-  	class="OpenXPKI::Server::Workflow::Condition::LdapDnAvailable">    
-  </condition>   
-  <condition name="I18N_OPENXPKI_WF_COND_LDAP_USE_LDAP" 
-  	class="OpenXPKI::Server::Workflow::Condition::UseLdap">
-  </condition>
-
-  
-  
 </conditions>

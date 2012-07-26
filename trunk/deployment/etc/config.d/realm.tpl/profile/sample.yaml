@@ -17,6 +17,9 @@ digest: sha1
 increasing_serials: 1
 randomized_serial_bytes: 8
 
+# weather to publish the certificate
+publish: 1
+
 style:
     00_tls_basic_style:
         label: I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE

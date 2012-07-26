@@ -71,12 +71,6 @@
     <param name="activity" value="smartcard_personalization"/>
   </condition>
   
-  <!-- LDAP Publication -->
-  <condition name="I18N_OPENXPKI_WF_ACL_CERTIFICATE_LDAP_PUBLISHING" 
-  	class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="certificate_ldap_publishing"/>
-  </condition>
-  
   <!-- Revocation -->
   <condition name="I18N_OPENXPKI_WF_ACL_CRR_CREATE" class="OpenXPKI::Server::Workflow::Condition::ACL">
     <param name="activity" value="create_crr"/>

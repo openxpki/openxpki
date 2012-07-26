@@ -97,15 +97,6 @@
         <notifier>[% notifier %]</notifier>
       [% END %]
       </notification>
-
-      <!-- LDAP addition  -->
-      <!-- WARNING: keep "ldap_enable" set to "no" to avoid surprises  -->      
-      [% IF deployment.xmlstyle == 'multi-file' %]
-      <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ldappublic.xml"/>
-      [% ELSIF deployment.xmlstyle == 'all-in-one' %]
-        [% INCLUDE ldappublic.xml FILTER indent(6) %]
-      [% END %]
-      <!-- end of LDAP addition  -->
     </common>
 
     <!-- Issuing CAs defined for this realm -->

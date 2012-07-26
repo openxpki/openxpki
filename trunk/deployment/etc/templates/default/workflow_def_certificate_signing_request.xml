@@ -145,7 +145,7 @@
               resulting_state="SUCCESS">		
 	</action>	
   </state>
-    
+
   <state name="REJECTED" autorun="yes">
     <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
             resulting_state="FAILURE">

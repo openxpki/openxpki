@@ -193,10 +193,8 @@
   </action>
   
   <action name="I18N_OPENXPKI_WF_ACTION_PUBLISH_CERTIFICATE"
-	  class="OpenXPKI::Server::Workflow::Activity::CertIssuance::PublishCertificate">
+	  class="OpenXPKI::Server::Workflow::Activity::CertIssuance::PublishCertificate"
+	  workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING"
+	  >
   </action>
-  
-  
-  
-  
 </actions>

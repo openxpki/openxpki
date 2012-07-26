@@ -296,7 +296,7 @@
               <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST</type>
           </create>
           <create>
-              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING</type>
           </create>
           <read> 
               <creator>.*</creator>
@@ -325,7 +325,7 @@
           </read>
           <read> 
               <creator>.*</creator>
-              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING</type>
           </read>
           <read>
               <creator>.*</creator>
@@ -375,7 +375,7 @@
               <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
           </create>
           <create>
-              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING</type>
           </create>
           <create>
               <type>I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE</type>
@@ -394,7 +394,7 @@
           </read>
           <read> 
               <creator>.*</creator>
-              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING</type>
+              <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING</type>
           </read>
           <read>
               <creator>.*</creator>

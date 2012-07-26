@@ -15,7 +15,6 @@ OpenXPKI/Debug.pm
 OpenXPKI/DN.pm
 OpenXPKI/Exception.pm
 OpenXPKI/FileUtils.pm
-OpenXPKI/LdapUtils.pm
 OpenXPKI/Template/Plugin/RandomPassword.pm
 OpenXPKI/XML/Cache.pm
 OpenXPKI/XML/Config.pm
@@ -203,10 +202,6 @@ OpenXPKI/Server/Workflow/Activity/CertIssuance/PublishCertificate.pm
 
 OpenXPKI/Server/Workflow/Activity/CertRenewal/FetchOrgCertData.pm
 
-OpenXPKI/Server/Workflow/Activity/CertLdapPublish/AddMissingNode.pm
-OpenXPKI/Server/Workflow/Activity/CertLdapPublish/ImportPublicData.pm
-OpenXPKI/Server/Workflow/Activity/CertLdapPublish/PublicCertLdap.pm
-
 OpenXPKI/Server/Workflow/Activity/CSR/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GeneratePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
@@ -230,6 +225,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
+OpenXPKI/Server/Workflow/Activity/Tools/PublishCertificate.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
@@ -267,9 +263,7 @@ OpenXPKI/Server/Workflow/Activity/SCEP/ExtractCSR.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/ForkWorkflowInstances.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/PersistCSRs.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/WriteCertificateToInstall.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/GetLDAPData.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/PublishCertificates.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/CreateServerCSR.pm
+
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateEscrowedKey.pm
@@ -304,8 +298,7 @@ OpenXPKI/Server/Workflow/Condition/ValidCSRSerialPresent.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowChildrenFailure.pm
 OpenXPKI/Server/Workflow/Condition/IsServerKeyGeneration.pm
 OpenXPKI/Server/Workflow/Condition/CertificateNotYetRevoked.pm
-OpenXPKI/Server/Workflow/Condition/LdapDnAvailable.pm
-OpenXPKI/Server/Workflow/Condition/UseLdap.pm
+
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContext.pm
 OpenXPKI/Server/Workflow/Condition/CheckForkedWorkflowChildren.pm

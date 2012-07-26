@@ -20,49 +20,36 @@ sub execute {
     my $self = shift;
     my $workflow = shift;
     my $context = $workflow->context();
-    
-    
-    # Copied legacy stuff - should probably be refactored  
-    my $pki_realm = CTX('api')->get_pki_realm();
-    my $cfg_id = $self->config_id();
-    my $realm_config = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm};
 
-    ##! 16: 'Check if LDAP is enabled'  
-    if ($realm_config->{ldap_enable} ne 'yes') {
-     ##! 16: 'LDAP not set - no publication'
-     return 1;
+    my $workflow_type = $self->param('workflow_type');
+    if (!$workflow_type) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_CERTISSUANCE_PUBLISH_CERTIFICATE_WORKFLOW_TYPE_NOT_GIVEN'
+        );
     }
     
-    my $cert_identifier = $context->param('cert_identifier'); 
+    my $cert_identifier = $context->param('cert_identifier');             
+    my $cert_profile = $context->param('cert_profile');
     
-    ##! 16: 'searching for certificate identifier ' . $cert_identifier
-	my $cert = CTX('dbi_backend')->first(
-	    TABLE   => 'CERTIFICATE',
-	    COLUMNS => [
-		  'DATA', 'ROLE'
-	    ],
-	    DYNAMIC => {
-    		'IDENTIFIER' => $cert_identifier,
-    		'STATUS'    => 'ISSUED',
-    		'PKI_REALM' => $pki_realm,
-	    },
-	);
-
-    ##! 32: 'certificate loaded: ' . Dumper( $cert ) 
-    
-    # Create a LDAP publishing workflow
+    ##! 16: 'check if publishing is enabled for profile ' . $cert_profile     
+     
+    if (!CTX('config')->get("profile.$cert_profile.publish")) {
+        ##! 32: 'Publishing not enabled for profile ' . $cert->{CSR.PROFILE}
+        return 1;
+    }
+                
+    # Create publishing workflow
     my $wf_info = CTX('api')->create_workflow_instance({
-        WORKFLOW      => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_LDAP_PUBLISHING',
+        WORKFLOW      => $workflow_type,
         FILTER_PARAMS => 0,
         PARAMS        => { 
-            certificate =>  $cert->{DATA},
-            cert_role =>  $cert->{ROLE},
+            cert_identifier =>  $cert_identifier,
         },
     });
         
-    ##! 16: 'LDAP Workflow created with id ' . $wf_info->{WORKFLOW}->{ID}
+    ##! 16: 'Publishing Workflow created with id ' . $wf_info->{WORKFLOW}->{ID}
         
-    $context->param('workflow_publish_ldap', $wf_info->{WORKFLOW}->{ID} );
+    $context->param('workflow_publish_id', $wf_info->{WORKFLOW}->{ID} );
     
     return 1;
     
@@ -79,7 +66,16 @@ OpenXPKI::Server::Workflow::Activity::Certificate::PublishCertificate
 =head1 Description
 
 Trigger publication to the configured backends by starting (unwatched)
-workflows. Uses the old LDAP publicaton mechanism at the moment.
+workflows. The name of the workflow must be given in the activity definition.
+The workflow is started only if I<publish: 1> is found in the profile definition.
+
+The new workflow must accept the single parameter cert_identifier.
+
+=head2 Activity parameters
+
+=item workflow_type 
+
+Name of the workflow that should be created
 
 =head2 Context parameters
 
