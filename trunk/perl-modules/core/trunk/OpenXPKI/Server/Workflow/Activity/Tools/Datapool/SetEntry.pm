@@ -14,7 +14,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 use DateTime;
-use Net::LDAP;
 use Template;
 
 use Data::Dumper;

@@ -231,7 +231,6 @@ OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/SetEntry.pm
 
-OpenXPKI/Server/Workflow/Activity/Tools/LDAP/GetLDAPData.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
 
@@ -292,13 +291,11 @@ OpenXPKI/Server/Workflow/Condition/CorrectNumberOfValidCerts.pm
 OpenXPKI/Server/Workflow/Condition/SignedUsingOriginalCertOrSelfSigned.pm
 OpenXPKI/Server/Workflow/Condition/MoreCertsToTest.pm
 OpenXPKI/Server/Workflow/Condition/MoreCSRsToCreate.pm
-OpenXPKI/Server/Workflow/Condition/IsCertificateIssuancePossible.pm
 OpenXPKI/Server/Workflow/Condition/CheckCertTestResult.pm
 OpenXPKI/Server/Workflow/Condition/ValidCSRSerialPresent.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowChildrenFailure.pm
 OpenXPKI/Server/Workflow/Condition/IsServerKeyGeneration.pm
 OpenXPKI/Server/Workflow/Condition/CertificateNotYetRevoked.pm
-
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContext.pm
 OpenXPKI/Server/Workflow/Condition/CheckForkedWorkflowChildren.pm
