@@ -472,3 +472,9 @@ msgstr "AS2 for Third Party end entities"
 
 msgid "I18N_OPENXPKI_PROFILE_TLS_CLIENT_SERVER_EXTERNAL_STYLE"
 msgstr "External party naming style"
+
+msgid "I18N_OPENXPKI_USER_ID"
+msgstr "User ID"
+
+msgid "I18N_OPENXPKI_USER_ID_NAME_DESC"
+msgstr "User ID associated with the certificate"
