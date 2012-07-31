@@ -11,7 +11,7 @@ use OpenXPKI::Exception;
 use English;
 
 use DateTime;
-
+use Date::Parse;
 
 # static function
 sub convert_date {
@@ -57,8 +57,6 @@ sub convert_date {
  }
 
 
-
-
 sub get_validity {
     my $params = shift;
 
@@ -73,10 +71,24 @@ sub get_validity {
           : 'relativedate';
 
     # referencedate is used for relative date computations
-    my $refdate 
-	= defined $params->{REFERENCEDATE} 
-          ? $params->{REFERENCEDATE}->clone()
-          : DateTime->now( time_zone => 'UTC' );
+    my $refdate;
+    if(defined $params->{REFERENCEDATE} && ref $params->{REFERENCEDATE}){
+        $refdate = $params->{REFERENCEDATE}->clone()
+    }elsif($params->{REFERENCEDATE}){
+        #parse from string
+        $refdate = _parse_date_utc($params->{REFERENCEDATE});
+        
+    }else{
+        $refdate = DateTime->now( time_zone => 'UTC' );
+    }
+    
+    if ($validityformat eq 'detect') {
+        if ($validity =~ m{\A [+\-]}xms) {
+            $validityformat = 'relativedate';
+        } else {
+            $validityformat = 'absolutedate';
+        }
+    }
 
     if ($validityformat eq 'days') {
 	if ($validity !~ m{ \A [+\-]?\d+ \z }xms) {
@@ -162,7 +174,31 @@ sub get_validity {
 	);
 }
 
+sub _parse_date_utc{
+    my $date_string = shift;
+    
+    my ($ss,$mm,$hh,$day,$month,$year,$zone) = strptime($date_string);
+    $month++;
+    $year+= 1900;
+    return DateTime->new(
+    		(
+    		  year       => $year,
+              month      => $month,
+              day        => $day,
+              hour       => $hh,
+              minute     => $mm,
+              second     => $ss,
+              time_zone  => $zone,
+    		),
+    		time_zone => 'UTC',
+    		);
+}
 
+
+sub is_relative {
+    my $datestring = shift;
+    return $datestring =~ m{\A [+\-]}xms;
+}
 
 1;
 __END__
@@ -233,9 +269,9 @@ terse date string.
 If a relative validity is specified the duration is added to a reference
 date that defaults to the current time (UTC).
 
-If the named parameter REFERENCEDATE is specified and contains a DateTime
-object this date is taken as the basis for calculating the relative
-date.
+If the named parameter REFERENCEDATE is specified, this date is taken as the basis for calculating the relative
+date. The parameter could either contain a DateTime object or a parsable date string 
+(i.e. '2012-05-24T08:33:47' see Date::Parse for a list of valid strings) which will be converted to an UTC DateTime object.
 
 =head3 Terse date strings
 
@@ -283,3 +319,12 @@ Examples:
 After this has been executed a date should be printed that is 2 years
 and 7 months in the future: the relative validity 2 years, 5 months
 is added to the offset which is 2 months in the future from now.
+
+=head2 _parse_date_utc
+
+Helpermethod. Passes the given parameter $date_string  to Date::Parse::strptime and constructs from the return an UTC DateTime object
+
+=head2 is_relative
+
+Static helper, check if a datestring looks like a relative format.
+(Check if the first character is a +/-). 

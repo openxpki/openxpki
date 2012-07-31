@@ -7,16 +7,15 @@ certs:
             - I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL
             - I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL
             promote_to_preferred_profile: 1
-            ignore_certificates_with_missing_private_key: 0
-            limits:
-                min_count: 1
-                max_count: 1
+            required: 1
+            max_count: 1
+            max_age: -03
             allow_renewal: -0003
             force_renewal: -000014
             escrow_key: 0
             publish: 0
             purge_invalid: 0
-            revoke_unused: 1
+            revoke_unused: 0
             max_login: 1
 
         signature:
@@ -25,10 +24,8 @@ certs:
             allowed_profiles:
             - I18N_OPENXPKI_PROFILE_USER_SIGNATURE
             promote_to_preferred_profile: 1
-            ignore_certificates_with_missing_private_key: 0
-            limits:
-                min_count: 1
-                max_count: 1
+            required: 1
+            max_count: 1
             allow_renewal: -0003
             force_renewal: -000014
             escrow_key: 0
@@ -44,11 +41,9 @@ certs:
             - I18N_OPENXPKI_PROFILE_USER_ENCRYPTION
             - I18N_OPENXPKI_PROFILE_USER_FSE
             promote_to_preferred_profile: 1
-            ignore_certificates_with_missing_private_key: 1
-            limits:
-                min_count: 1
-                max_count: 8
-                max_age: -10
+            required: 1
+            max_count: 3
+            max_age: -20
             allow_renewal: -0003
             force_renewal: -000014
             lead_validity: 1
@@ -64,24 +59,7 @@ certs:
             purge_valid: 0
             purge_invalid: 1
 
-xref2@: connector:smartcard.policy.cache           
-xref:
-   cached: 1
-   profile:
-     I18N_OPENXPKI_PROFILE_USER_SIGNATURE:
-       preferred: 1
-       type: signature
-     I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL:
-       type: nonescrow
-     I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL:
-       preferred: 1
-       type: nonescrow
-     I18N_OPENXPKI_PROFILE_USER_ENCRYPTION:
-       preferred: 1
-       type: escrow
-     I18N_OPENXPKI_PROFILE_USER_FSE:
-       type: escrow
-    
+xref@: connector:smartcard.policy.cache
 
 cards:
     max_smartcards_per_user: 1
@@ -89,3 +67,13 @@ cards:
 cache:
     class: Connector::Builtin::Memory
  
+# Set if you want to enable manual approval of CSRs
+need_approval: 0
+
+# Let the user choose a PIN for new keys
+allow_user_pin: 0
+
+# Only reasonable if you have "old" certs on the card
+autodiscover_certificates: 1
+
+
