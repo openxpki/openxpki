@@ -73,6 +73,11 @@ sub run {
         ##! 16: 'parent: DB handles reconnected'        
        
     } else {
+        
+        # We need to unset the child reaper (waitpid) as the universal waitpid 
+        # causes problems with Proc::SafeExec  
+        $SIG{CHLD} = 'DEFAULT';
+        
         ##! 16: 'fork_workflow_execution: child here'
         CTX('dbi_log')->new_dbh();
         CTX('dbi_workflow')->new_dbh();
