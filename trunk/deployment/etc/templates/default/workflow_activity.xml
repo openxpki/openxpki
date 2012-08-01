@@ -47,7 +47,11 @@
 	<field name="reap_at_dyn"/>
 	<field name="retry_interval"/>
   </action>
-   
+ 
+ <action name="I18N_OPENXPKI_WF_ACTION_TEST"
+    class="OpenXPKI::Server::Workflow::Activity::Test">
+ </action>
+    
   <action name="I18N_OPENXPKI_WF_ACTION_TOOLS_DISCONNECT"
 	class="OpenXPKI::Server::Workflow::Activity::Tools::Disconnect"> 	
   </action>  

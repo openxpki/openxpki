@@ -25,10 +25,16 @@
     DS: geht!
      -->
     <action name="I18N_OPENXPKI_WF_ACTION_WORKFLOWTEST" 
-	    resulting_state="STEP3"
+	    resulting_state="DOTEST"
 		retry_count="3" >      
     </action>
 
+  </state>
+  
+  <state name="DOTEST" autorun="yes">
+  <action name="I18N_OPENXPKI_WF_ACTION_TEST" 
+        resulting_state="STEP3">      
+    </action>
   </state>
   
    <state name="STEP3">
