@@ -329,21 +329,20 @@ $test->group(
             );
 
             # TEST
-            $self->puk_upload_ok(
-                [   $cfg{cm1}{name},
-                    $cfg{cm1}{role},
-                    $cfg{'t-unblock-chall-2'}{token},
-                    $cfg{'t-unblock-chall-2'}{puk},
-                ],
-                "Setting puk for token 2"
-            ) or croak $@;
-
-            #    $self->diag( "WFID: " . $self->get_wfid() );
+#            $self->puk_upload_ok(
+#                [   $cfg{cm1}{name},
+#                    $cfg{cm1}{role},
+#                    $cfg{'t-unblock-chall-2'}{token},
+#                    $cfg{'t-unblock-chall-2'}{puk},
+#                ],
+#                "Setting puk for token 2"
+#            ) or croak $@;
+#
 
             # TEST - Fetch cardadm workflow
             $self->get_unblock_response_ok(
-                [   $cfg{cm1}{name},
-                    $cfg{cm1}{role},
+                [   $cfg{user}{name},
+                    $cfg{user}{role},
                     $cfg{'t-unblock-chall-2'}{token},
                     $cfg{'t-unblock-chall-2'}{challenge},
                 ],
@@ -357,6 +356,24 @@ $test->group(
                 'unblock_response',
                 $cfg{'t-unblock-chall-2'}{response},
                 "Confirm unblock response for challenge with other puk"
+            );
+
+            $self->get_unblock_response_ok(
+                [   $cfg{user}{name},
+                    $cfg{user}{role},
+                    $cfg{'t-unblock-chall-2'}{token},
+                    uc($cfg{'t-unblock-chall-2'}{challenge}),
+                ],
+                "Retrieve new card status for upper-case challenge with other puk"
+            ) or warn $@;
+
+            #    $self->diag( "WFID: " . $self->get_wfid() );
+
+            # TEST
+            $self->param_is(
+                'unblock_response',
+                $cfg{'t-unblock-chall-2'}{response},
+                "Confirm unblock response for upper-case challenge with other puk"
             );
         },
     );

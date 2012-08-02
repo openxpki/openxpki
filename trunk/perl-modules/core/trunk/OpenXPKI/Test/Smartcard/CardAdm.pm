@@ -316,6 +316,15 @@ sub get_unblock_response {
     return $self;
 }
 
+sub get_unblock_response_ok {
+    my $self     = shift;
+    my $params   = shift || [];
+    my $testname = shift || 'get unblock response';
+
+    my $result = $self->get_unblock_response( @{$params} );
+    return $self->ok( $result, $testname );
+}
+
 # user_abort - a graceful way of saying "Thanks, but no thanks!"
 #
 sub user_abort {
