@@ -339,6 +339,7 @@ sub __do_init_workflow_bulk_keys {
 	    {
 	        'keys' => {
 		    'certs_on_card'           => 1,
+		    'certids_on_card'         => 1,
 		    'certificate'             => 1,
 		    'pkcs10'                  => 1,
                     'cert_issuance_data'      => 1,
