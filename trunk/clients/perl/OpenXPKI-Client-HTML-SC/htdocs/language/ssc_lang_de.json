@@ -88,7 +88,7 @@
 "I_contactAdmin":"Ein unerwarteter Fehler trat auf. Bitte kontaktieren Sie Ihren lokalen Help-Desk.",
 "I_disableSso":"Sie k&ouml;nnen die Funktion CardSSO jederzeit wieder deaktivieren. Hierzu klicken Sie zun&auml;chst auf CardSSO aktivieren, und erhalten dann die M&ouml;glichkeit zur Deaktivierung.<br/><br/>Um CardSSO jetzt zu deaktivieren, klicken Sie einfach auf CardSSO deaktivieren.",
 "I_enableSSO":"Bei CardSSO handelt es sich um eine optionale Komfortfunktion, welche von dbSmartcards der ersten Generation nicht unterst&uuml;tzt wird.<br/><br/>Wenn Sie CardSSO f&uuml;r Ihre dbSmartcard aktivieren, dann werden Sie, nachdem Sie sich mit Ihrer dbSmartcard an Windows 7 angemeldet haben, von vielen Applikationen (z.B. dbRASnet, dbFSE) nicht mehr nach Ihrer PIN gefragt.<br/><br/>Sie k&ouml;nnen die Funktion CardSSO jederzeit wieder deaktivieren. Hierzu klicken Sie zun&auml;chst auf CardSSO aktivieren, und erhalten dann die M&ouml;glichkeit zur Deaktivierung.",
-"I_enableSsoFailed":"CardSSO konnte auf Ihrer dbSmartcard nicht aktiviert werden. Die CardSSO-Funktion wird von dbSmartcards der ersten Generation nicht unterst&uuml;tzt. Das betrifft insbesondere alle Karten, die vor August 2012 durch die Frankfurter Ausweisstelle ausgegeben wurden.",
+"I_enableSsoFailed":"CardSSO konnte auf Ihrer dbSmartcard nicht aktiviert werden. Die CardSSO-Funktion wird von dbSmartcards der ersten Generation nicht unterst&uuml;tzt. Das betrifft insbesondere alle Karten, die vor September 2012 durch die Frankfurter Ausweisstelle ausgegeben wurden.",
 "I_enableSsoSuccess":"CardSSO wurde auf Ihrer dbSmartcard aktiviert. Sie k&ouml;nnen die Funktion jederzeit deaktivieren, indem Sie auf diese Seite zur&uuml:ckkehren und zun&auml;chst auf CardSSO Aktivieren klicken. Anschlie&szlig;end bekommen Sie die M&ouml;glichkeit zur Deaktivierung angezeigt.",
 "I_expired":"Ihre dbSmartcard ist nicht voll funktionsf&auml;hig. Um Ihre dbSmartcard weiterhin nutzen zu k&ouml;nnen, muss dieses Problem gel&ouml;st werden.<br  /><br  />Beachten Sie, dass die Rezertifizierung bis zu f&uuml;nf Minuten dauern kann.",
 "I_expiresSoon":"Ihre dbSmartcard l&auml;uft bald ab. Sie k&ouml;nnen jetzt oder zu einem sp&auml;teren Zeitpunkt Ihre dbSmartcard rezertifizieren.",
@@ -223,8 +223,9 @@
 "T_proceed":"Weiter",
 "P_disableSsoFailed":"CardSSO konnte nicht deaktiviert werden",
 "P_disableSsoSuccess":"CardSSO wurde deaktiviert",
+"S_unpersonalized":"dbSmartcard nicht personalisiert",
 "I_disableSsoSuccess":"CardSSO wurde auf Ihrer dbSmartcard deaktiviert. Sie k&ouml;nnen die Funktion jederzeit aktivieren, indem Sie auf diese Seite zur&uuml;ckkehren und auf CardSSO Aktivieren klicken.",
-"I_disableSsoFailed":"CardSSO konnte auf Ihrer dbSmartcard nicht deaktiviert werden. Die CardSSO-Funktion wird von dbSmartcards der ersten Generation nicht unterst&uuml;tzt. Das betrifft insbesondere alle Karten, die vor August 2012 durch die Frankfurter Ausweisstelle ausgegeben wurden.",
+"I_disableSsoFailed":"CardSSO konnte auf Ihrer dbSmartcard nicht deaktiviert werden. Die CardSSO-Funktion wird von dbSmartcards der ersten Generation nicht unterst&uuml;tzt. Das betrifft insbesondere alle Karten, die vor September 2012 durch die Frankfurter Ausweisstelle ausgegeben wurden.",
 "E_Ajax_Failure":"W&auml;hrend der Kommunikation mit dem Backend-System ist ein Fehler aufgetreten. Der Web Server reagiert nicht. Bitte starten Sie Ihren Internet Explorer neu und laden Sie die Seite noch einmal. Sollte das Problem bestehen, wenden Sie sich bitte an Ihren Help-Desk.",
 "I_confOutlookError":"Konfiguration fehlgeschlagen. Bitte trennen / verbinden Sie Ihre dbSmartcard und starten Sie den Vorgang neu. Bitte &uuml;berpr&uuml;fen Sie dass Ihr E-Mail Postfach korrekt in Outlook eingerichtet ist oder rufen Sie Ihren lokalen Help-Desk an."
 }

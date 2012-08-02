@@ -88,7 +88,7 @@
 "I_contactAdmin":"An unexpected Error occurred. Please contact your local help-desk.",
 "I_disableSso":"You can always deactivate CardSSO. In order to do that, you first click on 'Enable CardSSO' and then see the option to deactivate it again.<br/><br/>If you want to deactivate CardSSO now, just click 'Deactivate CardSSO'.",
 "I_enableSSO":"CardSSO is an optional comfort function which is not supported by the 1st generation of dbSmartcards.<br/><br/>If you activate CardSSO for your dbSmartcard, various applications (e.g. dbRASnet, dbFSE) will not ask you for your PIN after you have used your dbSmartcard to logon to Windows 7.<br/><br/>You can always deactivate CardSSO. In order to do that, you first click on 'Enable CardSSO' and then see the option to deactivate it again.",
-"I_enableSsoFailed":"CardSSO could not be activated on your dbSmartcard. The CardSSO feature is not available for 1st generation dbSmartcards. This applies particularly to cards which have been issued by the ID card center in Frankfurt prior to August 2012.",
+"I_enableSsoFailed":"CardSSO could not be activated on your dbSmartcard. The CardSSO feature is not available for 1st generation dbSmartcards. This applies particularly to cards which have been issued by the ID card center in Frankfurt prior to September 2012.",
 "I_enableSsoSuccess":"CardSSO has been activated on your dbSmartcard. You can always deactivate this feature by re-visiting this page and clicking on Enable CardSSO. Subsequent to that you will see the option to deactivate it.",
 "I_expired":"Your dbSmartcard is not fully functional. In order to be able to use your dbSmartcard, we need to fix this issue. Please be aware that this action may take up to five minutes to complete.",
 "I_expiresSoon":"Your dbSmartcard is due to expire soon. You may recertify your dbSmartcard now, or do this later.",
@@ -223,8 +223,9 @@
 "T_proceed":"Proceed",
 "P_disableSsoFailed":"CardSSO could not be deactivated",
 "P_disableSsoSuccess":"CardSSO has been deactivated",
+"S_unpersonalized":"dbSmartcard not personalised",
 "I_disableSsoSuccess":"CardSSO has been deactivated on your dbSmartcard. You can always reactivate the feature by re-visiting this page and clicking on Enable CardSSO.",
-"I_disableSsoFailed":"CardSSO could not be deactivated on your dbSmartcard. The CardSSO feature is not available for 1st generation dbSmartcards. This applies particularly to cards which have been issued by the ID card center in Frankfurt prior to August 2012.",
+"I_disableSsoFailed":"CardSSO could not be deactivated on your dbSmartcard. The CardSSO feature is not available for 1st generation dbSmartcards. This applies particularly to cards which have been issued by the ID card center in Frankfurt prior to September 2012.",
 "E_Ajax_Failure":"An error occurred while communicating with the backend system. The web server does not respond. Please restart your Internet Explorer and load this page again. Should the issue persist, please contact your local help-desk.",
 "I_confOutlookError":"Outlook Configuration failed. Please remove / re-insert your dbSmartcard and try again. Please check that your e-mail account is configured correctly in Outlook or call your local help-desk."
 }

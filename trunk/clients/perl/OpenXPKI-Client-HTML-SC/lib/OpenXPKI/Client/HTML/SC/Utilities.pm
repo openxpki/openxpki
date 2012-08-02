@@ -120,6 +120,7 @@ CERTS:
         return $self->send_json_respond($responseData);
     }
 
+
     my %params = (
         'CERTS'          => \@certs,
         'CERTFORMAT'     => 'BASE64',
@@ -128,6 +129,9 @@ CERTS:
         'SMARTCHIPID'    => $chipserial,
         
     );
+    
+    $log->info("Analyze: " . Dumper(%params)  );
+    
     if ( defined $AUTHUSER ) {
         $params{USERID} = $AUTHUSER;
     }

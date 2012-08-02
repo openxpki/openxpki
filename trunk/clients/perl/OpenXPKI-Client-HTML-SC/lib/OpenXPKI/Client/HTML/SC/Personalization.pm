@@ -745,137 +745,144 @@ CERTS:
 			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_GET_PREPARE"
 		);
 		
-	if ( !defined $session->{'rndPIN'} || $session->{'rndPIN'} eq '' ) {
-		$log->info(
-			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_GET_PREPARE"
-		);
-		
-			my $rnd;
-			my $count = 0;
-
-			do {
-				my $rndmsg =
-				  $c->send_receive_command_msg( 'get_random',
-					{ 'LENGTH' => 15 } );
-
-				if ( $self->is_error_response($rndmsg) ) {
-					push(
-						@{$errors},
-"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_GETRNDPIN"
-					);
-					$log->error(
-'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_GETRNDPIN'
-					);
-				}
-
-				$rnd = lc( $rndmsg->{PARAMS} );
-				$rnd =~ tr{[a-z0-9]}{}cd;
-				$count++;
-
-			} while ( length($rnd) < 8 && $count < 3 );
-			$rnd = substr( $rnd, 0, 8 );
-
-			# in order to satisfy the smartcard pin policy even in
-			# pathologic cases of the above random output generation we
-			# append a semi-random digit and character to the pin string
-			$rnd .= int( rand(10) );
-			$rnd .= chr( 97 + rand(26) );
-			$session->{'tmp_rndPIN'} = $rnd;
-
-			%params = (
-				'ID'       => $wf_ID,
-				'ACTIVITY' => 'scpers_fetch_puk',
-				'WORKFLOW' => $wf_type,
-				'PARAMS'   => {},
-					);
-
-			$msg =
-			  $c->send_receive_command_msg( 'execute_workflow_activity',
-				\%params, );
-				
-	
-			if ( $self->is_error_response($msg) ) {
-				$responseData->{'error'} = "error";
-				$responseData->{'ERRORLIST'} = $msg;
-				push(
-					@{$errors},
-"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCHPUK"
-				);
-				push( @{$errors}, $msg );
-				 $responseData->{'ERRORLIST'} = $msg;
-				$log->error(
-"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCHPUK"
-				);
-
-			}
-			else {
-
-				push(
-					@{$workflowtrace},
-"I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCHPUK"
-				);
-
-		my $PUK     = $serializer->deserialize( $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_puk} );
-				
-		my $WFinfo = $self->wf_status( $c, $wf_ID , $wf_type);
+	my $WFinfo = $self->wf_status( $c, $wf_ID , $wf_type);
 		$local_wf_state = $WFinfo->{PARAMS}->{WORKFLOW}->{STATE}; 
 		
-		$log->debug('local_wf_state:' . $local_wf_state	);
-		
-		if ( $local_wf_state eq 'PUK_TO_INSTALL' ) {
+	if($local_wf_state ne 'SUCCESS'	){
+	
+		if ( !defined $session->{'rndPIN'} || $session->{'rndPIN'} eq '' ) {
+			$log->info(
+				"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_GET_PREPARE"
+			);
 			
-				if( ( defined $session->{"install_puk_try"} )&& ( $session->{"install_puk_try"} == 1 ) ){
-						$log->info(
-			"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_PUK_TO_INSTALL_RECOVERY_TRY_1"
-				);
-		
-					$responseData->{'action'} = 'install_puk';
-					$session->{"install_puk_try"} = 2;
-					
-					$plugincommand =
-					    'ChangePUK;CardSerial='
-					  . $session->{'cardID'} . ';PUK='
-					  . $PUK->[0]  . ';NewPUK=' .$PUK->[0]
-					  . ';';
-					
-				
-				}else{
-					$log->info(
-					"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_PUK_TO_INSTALL"
+				my $rnd;
+				my $count = 0;
+	
+				do {
+					my $rndmsg =
+					  $c->send_receive_command_msg( 'get_random',
+						{ 'LENGTH' => 15 } );
+	
+					if ( $self->is_error_response($rndmsg) ) {
+						push(
+							@{$errors},
+	"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_GETRNDPIN"
 						);
-							$responseData->{'action'} = 'install_puk';
-					$session->{"install_puk_try"} = 1;
-					
-					$plugincommand =
-					    'ChangePUK;CardSerial='
-					  . $session->{'cardID'} . ';PUK='
-					  . $PUK->[1]  . ';NewPUK=' .$PUK->[0]
-					  . ';';
-					
-				}
-				
+						$log->error(
+	'I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_GETRNDPIN'
+						);
+					}
+	
+					$rnd = lc( $rndmsg->{PARAMS} );
+					$rnd =~ tr{[a-z0-9]}{}cd;
+					$count++;
+	
+				} while ( length($rnd) < 8 && $count < 3 );
+				$rnd = substr( $rnd, 0, 8 );
+	
+				# in order to satisfy the smartcard pin policy even in
+				# pathologic cases of the above random output generation we
+				# append a semi-random digit and character to the pin string
+				$rnd .= int( rand(10) );
+				$rnd .= chr( 97 + rand(26) );
+				$session->{'tmp_rndPIN'} = $rnd;
+	
+				%params = (
+					'ID'       => $wf_ID,
+					'ACTIVITY' => 'scpers_fetch_puk',
+					'WORKFLOW' => $wf_type,
+					'PARAMS'   => {},
+						);
 			
+				$msg =
+				  $c->send_receive_command_msg( 'execute_workflow_activity',
+					\%params, );
+					
+		
+				if ( $self->is_error_response($msg) ) {
+					$responseData->{'error'} = "error";
+					$responseData->{'ERRORLIST'} = $msg;
+					push(
+						@{$errors},
+	"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCHPUK"
+					);
+					push( @{$errors}, $msg );
+					 $responseData->{'ERRORLIST'} = $msg;
+					$log->error(
+	"I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCHPUK"
+					);
 	
+				}
+				else {
 	
-		}
-		else {
-				#$log->debug('rndPIN cmd PUK:' . Dumper($PUK)	);
-	#			$log->debug('PUK:' . $PUK->[0]	);
-				$plugincommand =
-				    'ResetPIN;CardSerial='
-				  . $session->{'cardID'}
-				  . ';PUK='
-				  . $PUK->[0]
-				  . ';NewPIN='
-				  . $session->{'tmp_rndPIN'} . ';';
-				  
-			    $responseData->{'action'} = 'prepare';
-
+					push(
+						@{$workflowtrace},
+	"I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCHPUK"
+					);
+	
+			my $PUK     = $serializer->deserialize( $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_puk} );
+					
+			my $WFinfo = $self->wf_status( $c, $wf_ID , $wf_type);
+			$local_wf_state = $WFinfo->{PARAMS}->{WORKFLOW}->{STATE}; 
+			
+			$log->debug('local_wf_state:' . $local_wf_state	);
+			
+			if ( $local_wf_state eq 'PUK_TO_INSTALL' ) {
+				
+					if( ( defined $session->{"install_puk_try"} )&& ( $session->{"install_puk_try"} == 1 ) ){
+							$log->info(
+				"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_PUK_TO_INSTALL_RECOVERY_TRY_1"
+					);
+			
+						$responseData->{'action'} = 'install_puk';
+						$session->{"install_puk_try"} = 2;
+						
+						$plugincommand =
+						    'ChangePUK;CardSerial='
+						  . $session->{'cardID'} . ';PUK='
+						  . $PUK->[0]  . ';NewPUK=' .$PUK->[0]
+						  . ';';
+						
+					
+					}else{
+						$log->info(
+						"I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_PUK_TO_INSTALL"
+							);
+								$responseData->{'action'} = 'install_puk';
+						$session->{"install_puk_try"} = 1;
+						
+						$plugincommand =
+						    'ChangePUK;CardSerial='
+						  . $session->{'cardID'} . ';PUK='
+						  . $PUK->[1]  . ';NewPUK=' .$PUK->[0]
+						  . ';';
+						
+					}
+					
+				
+		
+		
 			}
-
+			else {
+					#$log->debug('rndPIN cmd PUK:' . Dumper($PUK)	);
+		#			$log->debug('PUK:' . $PUK->[0]	);
+					$plugincommand =
+					    'ResetPIN;CardSerial='
+					  . $session->{'cardID'}
+					  . ';PUK='
+					  . $PUK->[0]
+					  . ';NewPIN='
+					  . $session->{'tmp_rndPIN'} . ';';
+					  
+				    $responseData->{'action'} = 'prepare';
+	
+				}
+	
+			}
+	
 		}
-
-	}
+		
+}#end if WF success
 
 #count how many actions certiinstalation, or deletion  are still pending to finish this personalization
 #	my $count;

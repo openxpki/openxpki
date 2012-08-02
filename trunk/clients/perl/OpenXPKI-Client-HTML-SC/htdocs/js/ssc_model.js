@@ -50,8 +50,8 @@ var SSC_MODEL = new Class(
 			init_env: function (){
 				//
 				// change plugin classid here
-				//
-				this.plgIn_classId = "clsid:223cee4f-3655-4223-b738-9c80718fc04d";
+				//this.plgIn_classId = "clsid:223cee4f-3655-4223-b738-9c80718fc04d"; //Plugin 2.0 class ID		
+				this.plgIn_classId = "clsid:baf17d97-92dc-4107-9935-6fcaea14c033"; //Plugin 2.1 class ID
 				this.puk_pin_encryption = 'yes';
 				this.cardReadCounter = 0;
 				this.PKCS11Plugin = $('PKCS11Plugin');
@@ -852,6 +852,7 @@ var SSC_MODEL = new Class(
 						
 					} catch (e) {
 						window.dbg.log('Error handling failed');
+						this.ajax_log('Error handling failed', 'error');
 						
 					}
 
