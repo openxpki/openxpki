@@ -32,6 +32,7 @@ sub execute {
             reason_code => 'superseded',
         	comment => '',
         	invalidity_time => time(),
+	    flag_crr_auto_approval => 'yes',
         },
     });
         
