@@ -209,7 +209,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{0, 769}, {94, 14}}</string>
+					<string>{{0, 769}, {95, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -396,7 +396,7 @@ Smartcard Personalization}</string>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2012-06-14 20:18:55 +0000</string>
+	<string>2012-08-02 09:20:51 +0000</string>
 	<key>Modifier</key>
 	<string>Martin Bartosch</string>
 	<key>NotesVisible</key>
@@ -5753,7 +5753,7 @@ INITIAL}</string>
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\fs16 \cf0 need random PIN?}</string>
+\f0\fs16 \cf0 allow user PIN?}</string>
 						<key>VerticalPad</key>
 						<integer>1</integer>
 					</dict>
@@ -5764,14 +5764,14 @@ INITIAL}</string>
 						<key>condition</key>
 						<string>equals</string>
 						<key>context_key</key>
-						<string>flag_will_need_random_pin</string>
+						<string>flag_allow_user_pin</string>
 						<key>context_value</key>
 						<string>yes</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{453.39221, 355.52185}, {18, 14}}</string>
+					<string>{{455.39221, 354.62494}, {14, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -5799,7 +5799,7 @@ INITIAL}</string>
 						<key>ID</key>
 						<integer>1639</integer>
 						<key>Position</key>
-						<real>0.3256152868270874</real>
+						<real>0.29280248284339905</real>
 						<key>RotationType</key>
 						<integer>0</integer>
 					</dict>
@@ -5829,7 +5829,7 @@ INITIAL}</string>
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
 
 \f0\fs20 \cf0 \expnd0\expndtw0\kerning0
-yes}</string>
+no}</string>
 						<key>VerticalPad</key>
 						<integer>1</integer>
 					</dict>
@@ -5885,7 +5885,7 @@ yes}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{405.17316, 328.62146}, {14, 14}}</string>
+					<string>{{403.17316, 328.62146}, {18, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -5940,7 +5940,7 @@ yes}</string>
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
 
-\f0\fs20 \cf0 no}</string>
+\f0\fs20 \cf0 yes}</string>
 						<key>VerticalPad</key>
 						<integer>1</integer>
 					</dict>
@@ -17811,7 +17811,7 @@ ISSUE CERT}</string>
 						<key>condition</key>
 						<string>equals</string>
 						<key>context_key</key>
-						<string>flag_need_wf_approval</string>
+						<string>flag_need_approval</string>
 						<key>context_value</key>
 						<string>yes</string>
 					</dict>
@@ -43196,7 +43196,7 @@ SUCCESS}</string>
 		<key>FitInWindow</key>
 		<true/>
 		<key>Frame</key>
-		<string>{{122, 0}, {1114, 1028}}</string>
+		<string>{{366, 0}, {1114, 1028}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -43210,7 +43210,7 @@ SUCCESS}</string>
 		<key>SidebarWidth</key>
 		<integer>239</integer>
 		<key>VisibleRegion</key>
-		<string>{{-106, 0}, {771.34015, 782.99994}}</string>
+		<string>{{0, 0}, {771.34015, 782.99994}}</string>
 		<key>Zoom</key>
 		<real>1.1149425506591797</real>
 		<key>ZoomValues</key>
