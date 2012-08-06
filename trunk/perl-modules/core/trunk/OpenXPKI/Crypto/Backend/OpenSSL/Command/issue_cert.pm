@@ -34,10 +34,12 @@ sub get_command
 
     my ($engine, $keyform, $passwd, $key) = ("", "", undef);
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
-    $engine  = $self->{ENGINE}->get_engine()
-        if ($self->{ENGINE}->get_engine() and
-            (($engine_usage =~ m{ ALWAYS }xms) or
-             ($engine_usage =~ m{ PRIV_KEY_OPS }xms)));
+    
+    if ($self->{ENGINE}->get_engine() and
+        (($engine_usage =~ m{ ALWAYS }xms) or ($engine_usage =~ m{ PRIV_KEY_OPS }xms))) {
+            $engine  = $self->{ENGINE}->get_engine();
+    }
+    
     $keyform = $self->{ENGINE}->get_keyform();
     $passwd  = $self->{ENGINE}->get_passwd();
     $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
@@ -50,13 +52,12 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_MISSING_KEYFILE");
     }
     my $key_store = $self->{ENGINE}->get_key_store();
-    if ( (uc($self->{TOKEN_TYPE}) ne 'CA') or ($key_store ne 'ENGINE'))
-    {
-        if (not -e $self->{KEYFILE})
-        {
+    if ($key_store ne 'ENGINE' && not -e $self->{KEYFILE}) {
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_KEYFILE_DOES_NOT_EXIST");
-        }
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_KEYFILE_DOES_NOT_EXIST",
+                params => { 
+                    KEYFILE => $self->{KEYFILE}
+                });
     }
     if (not $self->{CSR})
     {

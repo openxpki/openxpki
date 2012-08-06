@@ -22,11 +22,7 @@ sub get_command
 
     my ($engine, $passwd, $keyform);
     my $key_store = $self->{ENGINE}->get_key_store();
-    ##! 16: 'token type: ' . $self->{TOKEN_TYPE}
-    if ((   uc($self->{TOKEN_TYPE}) eq 'CA'
-         || uc($self->{TOKEN_TYPE}) eq 'PASSWORD_SAFE'
-        )
-        && ($key_store eq 'ENGINE')) {
+    if ($key_store eq 'ENGINE') {
         ##! 16: 'token type ca or password_safe and keystore in engine'
         ## CA token signature
         $engine  = $self->{ENGINE}->get_engine();
@@ -34,11 +30,10 @@ sub get_command
         $passwd  = $self->{ENGINE}->get_passwd();
         $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
         $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
-    }
-    else {
-        ## external signature
-        if ($self->{PASSWD} or $self->{KEY})
-        {
+    }    
+    ## external signature
+    elsif ($self->{PASSWD} or $self->{KEY})
+    {
             ##! 16: 'external signature, key or password provided'
             ## user signature
             # check minimum requirements
@@ -71,25 +66,17 @@ sub get_command
             $self->write_file (FILENAME => $self->{CERTFILE},
                                CONTENT  => $self->{CERT},
 	                       FORCE    => 1);
-        } else {
-            ##! 16: 'external signature, token type ca or password_safe'
-            if (   uc($self->{TOKEN_TYPE}) eq 'CA'
-                || uc($self->{TOKEN_TYPE}) eq 'PASSWORD_SAFE') {
-                ## CA external signature
-                $engine  = $self->__get_used_engine();
-                ##! 16: 'engine: ' . $engine
-                $passwd  = $self->{ENGINE}->get_passwd();
-                ##! 16: 'password: ' . $passwd
-                $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
-                ##! 16: 'certfile: ' . $self->{CERTFILE}
-                $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
-                ##! 16: 'keyfile: ' . $self->{KEYFILE}
-            }
-            else {
-                OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_PASSWD_OR_KEY");
-            }
-        }
+    } else {
+            ##! 16: 'external signature '
+            ## CA external signature
+            $engine  = $self->__get_used_engine();
+            ##! 16: 'engine: ' . $engine
+            $passwd  = $self->{ENGINE}->get_passwd();
+            ##! 16: 'password: ' . $passwd
+            $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
+            ##! 16: 'certfile: ' . $self->{CERTFILE}
+            $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
+            ##! 16: 'keyfile: ' . $self->{KEYFILE}            
     }
 
     ## check parameters

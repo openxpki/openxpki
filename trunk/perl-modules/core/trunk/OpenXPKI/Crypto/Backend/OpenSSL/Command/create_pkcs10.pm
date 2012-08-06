@@ -20,51 +20,29 @@ sub get_command
     ## normal CSR: engine (optional), passwd, key
 
     my ($engine, $keyform, $passwd, $key) = ("", "", undef);
-    if (uc($self->{TOKEN_TYPE}) eq 'CA')
+    
+    ## user CSR generation
+
+    # check minimum requirements
+    if (not exists $self->{PASSWD})
     {
-        ## CA CSR generation
-        $passwd  = $self->{ENGINE}->get_passwd();
-        my $key_store = $self->{ENGINE}->get_key_store();
-        if ($key_store eq 'ENGINE') {
-            ## token CA CSR generation
-            $engine  = $self->{ENGINE}->get_engine();
-            $keyform = $self->{ENGINE}->get_keyform();
-        }
-        else {
-            ## external CA CSR generation
-            $engine = $self->__get_used_engine();
-            # check minimum requirements
-            if (not $passwd)
-            {
-                OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD");
-            }
-        }
-        $self->{KEYFILE} = $self->{ENGINE}->get_keyfile();
-    } else {
-        ## user CSR generation
-
-        # check minimum requirements
-        if (not exists $self->{PASSWD})
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD");
-        }
-        if (not exists $self->{KEY})
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEY");
-        }
-
-        # prepare parameters
-        $passwd = $self->{PASSWD};
-        $engine = $self->__get_used_engine();
-        $self->get_tmpfile ('KEY');
-        $self->write_file (FILENAME => $self->{KEYFILE},
-                           CONTENT  => $self->{KEY},
-                           FORCE    => 1);
-
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD");
     }
+    if (not exists $self->{KEY})
+    {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEY");
+    }
+
+    # prepare parameters
+    $passwd = $self->{PASSWD};
+    $engine = $self->__get_used_engine();
+    $self->get_tmpfile ('KEY');
+    $self->write_file (FILENAME => $self->{KEYFILE},
+                       CONTENT  => $self->{KEY},
+                       FORCE    => 1);
+
 
     $self->get_tmpfile ('OUT');
 

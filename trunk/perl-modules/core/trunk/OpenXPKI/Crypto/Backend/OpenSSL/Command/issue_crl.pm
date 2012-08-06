@@ -55,13 +55,9 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_MISSING_KEYFILE");
     }
     my $key_store = $self->{ENGINE}->get_key_store();
-    if ( (uc($self->{TOKEN_TYPE}) ne 'CA') or ($key_store ne 'ENGINE'))
-    {
-        if (not -e $self->{KEYFILE})
-        {
+    if ($key_store ne 'ENGINE' && not -e $self->{KEYFILE}) {
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_CERT_KEYFILE_DOES_NOT_EXIST");
-        }
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_KEYFILE_DOES_NOT_EXIST");        
     }
 
     ## prepare data

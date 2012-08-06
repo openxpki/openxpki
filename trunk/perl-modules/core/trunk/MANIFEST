@@ -86,7 +86,6 @@ OpenXPKI/Crypto/Backend/OpenSSL/XS.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_random.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs10.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_cert.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs12.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/get_pkcs8_keytype.pm
