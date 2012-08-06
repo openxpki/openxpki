@@ -24,67 +24,41 @@ sub new {
 
     bless $self, $class;
 
-    my $keys = shift;
     ##! 1: "start"
 
-    my $config = CTX('xml_config');
+    my $path = shift;
+    my $config = CTX('config');
 
     ##! 2: "load name and description for handler"
 
-    $self->{DESC} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "description" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
-    $self->{NAME} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "name" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
+    $self->{DESC} = $config->get("$path.description");
+    $self->{NAME} = $config->get("$path.label"); 
 
     ##! 2: "load command"
-    $self->{COMMAND} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "command" ],
-                                           COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
-    ##! 2: "command: ".$self->{COMMAND}
+    $self->{COMMAND} = $config->get("$path.command"); 
 
-    $self->{ROLE} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "role" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
+    ##! 2: "command: ".$self->{COMMAND}
+    
+    $self->{ROLE} = $config->get("$path.role"); 
+    
     ##! 2: "role: ".$self->{ROLE}
-    if (not length ($self->{ROLE}))
+    
+    if (not length $self->{ROLE})
     {
         delete $self->{ROLE};
-        $self->{PATTERN} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "pattern" ],
-                                               COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                               CONFIG_ID => $keys->{CONFIG_ID},
-        );
-        $self->{REPLACE} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "replacement" ],
-                                               COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                               CONFIG_ID => $keys->{CONFIG_ID},
-        );
+        $self->{PATTERN} = $config->get("$path.pattern"); 
+        $self->{REPLACE} = $config->get("$path.replacement");
     }
 
     # get environment settings
     ##! 2: "loading environment variable settings"
 
     my @clearenv;
-    my $count = $config->get_xpath_count (XPATH    => [ @{$keys->{XPATH}}, 'env' ],
-                                          COUNTER  => $keys->{COUNTER},
-                                          CONFIG_ID => $keys->{CONFIG_ID},
-    );
-		
-    for (my $i = 0; $i < $count; $i++)
-    {
-        my $name = $config->get_xpath (XPATH    => [ @{$keys->{XPATH}},   'env', 'name' ],
-                                       COUNTER  => [ @{$keys->{COUNTER}}, $i,    0 ],
-                                       CONFIG_ID => $keys->{CONFIG_ID},
-        );
-        my $value = $config->get_xpath (XPATH    => [ @{$keys->{XPATH}},   'env', 'value' ],
-                                        COUNTER  => [ @{$keys->{COUNTER}}, $i,    0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-        );
-        $self->{ENV}->{$name} = $value;
+    my $environment = $config->get_hash("$path.env");
+    	
+    foreach my $name (keys %{$environment}) {
+        
+        $self->{ENV}->{$name} = $environment->{$name};
         if (exists $self->{CLEARENV})
         {
             push @{$self->{CLEARENV}}, $name;

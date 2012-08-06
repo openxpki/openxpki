@@ -26,92 +26,43 @@ sub new {
 
     bless $self, $class;
 
-    my $keys = shift;
-    ##! 1: "start"
+    my $path = shift;
+    my $config = CTX('config');
 
-    my $config = CTX('xml_config');
+    ##! 2: "load name and description for handler"
 
-    $self->{DESC} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "description" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
-    $self->{NAME} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "name" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
+    $self->{DESC} = $config->get("$path.description");
+    $self->{NAME} = $config->get("$path.label"); 
+    $self->{CHALLENGE_LENGTH} = $config->get("$path.challenge_length");
 
-    my $trust_anchors;
-    my @trust_anchors;
-    my @temp_trust_anchors;
-    eval {
-        $trust_anchors = $config->get_xpath(
-            XPATH    => [ @{$keys->{XPATH}},   "trust_anchors" ],
-            COUNTER  => [ @{$keys->{COUNTER}}, 0 ],
-            CONFIG_ID => $keys->{CONFIG_ID},
-        );
-        @temp_trust_anchors = split(q{,}, $trust_anchors);
-    };
-    if (! scalar @temp_trust_anchors || $EVAL_ERROR) {
+    my @trusted_realms = $config->get_scalar_as_list("$path.realm");
+    my @trusted_certs = $config->get_scalar_as_list("$path.cacert");
+
+    my @trust_anchors;   
+    if (@trusted_certs) {
+        @trust_anchors = @trusted_certs;
+    }     
+    
+    foreach my $trust_realm (@trusted_realms) {
+        ## FIXME - find all ca certs in that realm and add them        
+    }
+    
+    if (! scalar @trust_anchors ) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_TRUST_ANCHOR_CONFIGURATION',
-            params  => {
-                TRUST_ANCHORS => $trust_anchors,
-                EVAL_ERROR    => $EVAL_ERROR,
-            },
-        );
-    }
-    my $realms = CTX('pki_realm');
-    my @pki_realms = keys %{ $realms };
-    ##! 16: 'pki_realms: ' . Dumper \@pki_realms
-    foreach my $trust_anchor (@temp_trust_anchors) {
-        if (grep { $_ eq $trust_anchor } @pki_realms) {
-            ##! 16: $trust_anchor . ' is a PKI realm'
-            # this trust anchor is not an identifier, but a PKI realm,
-            # we'll have to replace it by all defined CAs for that realm
-            my @ca_ids = keys %{ $realms->{$trust_anchor}->{ca}->{id} };
-            foreach my $ca_id (@ca_ids) {
-              ##! 16: 'ca_id: ' . $ca_id
-              push @trust_anchors, 
-                $realms->{$trust_anchor}->{ca}->{id}->{$ca_id}->{identifier};
+            params => {
+                PKI_REALM => CTX('session')->get_pki_realm() 
             }
-        }
-        else {
-            ##! 16: $trust_anchor . ' seems to be an identifier'
-            # just your regular identifier
-            push @trust_anchors, $trust_anchor;
-        }
-    }
+        );
+   }
+        
     ##! 16: 'trust_anchors: ' . Dumper \@trust_anchors
 
     $self->{TRUST_ANCHORS} = \@trust_anchors;
-    eval {
-        $self->{PKCS7TOOL} = $config->get_xpath(
-            XPATH    => [ @{$keys->{XPATH}},   "pkcs7tool" ],
-            COUNTER  => [ @{$keys->{COUNTER}}, 0 ],
-            CONFIG_ID => $keys->{CONFIG_ID},
-        );
-    };
-    if ($EVAL_ERROR) {
+       
+    if (!$self->{CHALLENGE_LENGTH}) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_PKCS7TOOL_CONFIGURATION',
-            params  => {
-                EVAL_ERROR    => $EVAL_ERROR,
-            },
-        );
-    }
-    eval {
-        $self->{CHALLENGE_LENGTH} = $config->get_xpath(
-            XPATH     => [ @{$keys->{XPATH}},   "challenge_length" ],
-            COUNTER   => [ @{$keys->{COUNTER}}, 0 ],
-            CONFIG_ID => $keys->{CONFIG_ID},
-        );
-    };
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_CHALLENGE_LENGTH_CONFIGURATION',
-            params  => {
-                EVAL_ERROR    => $EVAL_ERROR,
-            },
+            message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_CHALLENGE_LENGTH_CONFIGURATION',            
         );
     }
 
@@ -178,16 +129,12 @@ sub login_step {
                 message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_SIGNATURE_IS_NOT_BASE64',
             );
         }
-        my $tm = CTX('crypto_layer');
         my $pkcs7 =
               '-----BEGIN PKCS7-----' . "\n"
             . $signature
             . '-----END PKCS7-----';
-        my $pkcs7_token = $tm->get_token(
-            TYPE      => 'PKCS7',
-            ID        => $self->{PKCS7TOOL},
-            PKI_REALM => $pki_realm,
-        );
+        my $pkcs7_token = CTX('crypto_layer')->get_system_token( TYPE => "PKCS7" );
+            
         eval {
             $pkcs7_token->command({
                 COMMAND => 'verify',

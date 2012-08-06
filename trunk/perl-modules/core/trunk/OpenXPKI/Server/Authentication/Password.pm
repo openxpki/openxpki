@@ -29,69 +29,50 @@ sub new {
 
     bless $self, $class;
 
-    my $keys = shift;
-    ##! 1: "start"
-
-    my $config = CTX('xml_config');
+    my $path = shift;
+    my $config = CTX('config');
 
     ##! 2: "load name and description for handler"
 
-    $self->{DESC} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "description" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
-    $self->{NAME} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "name" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
+    $self->{DESC} = $config->get("$path.description");
+    $self->{NAME} = $config->get("$path.label"); 
 
     ## load user database
 
-    my $count = $config->get_xpath_count (XPATH   => [@{$keys->{XPATH}}, "user"],
-                                          COUNTER => $keys->{COUNTER},
-                                          CONFIG_ID => $keys->{CONFIG_ID},
-    );
+    my $count = $config->get_size("$path.user");
     for (my $i=0; $i<$count; $i++)
     {
-        my $name      = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "name" ],
-                                            COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ],
-                                            CONFIG_ID => $keys->{CONFIG_ID},
-        );
-        my $encrypted = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "digest" ],
-                                            COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ],
-                                            CONFIG_ID => $keys->{CONFIG_ID},
-        );
-        my $role      = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "user", "role" ],
-                                            COUNTER => [ @{$keys->{COUNTER}}, $i, 0 ],
-                                            CONFIG_ID => $keys->{CONFIG_ID},
-        );
+        
+        my $user = $config->get_hash("$path.user.$i");    
+        my $name = $user->{name};   
+        my $encrypted = $user->{digest};
 
-	my $scheme;
-	# digest specified in RFC 2307 userPassword notation?
-	if ($encrypted =~ m{ \{ (\w+) \} (.*) }xms) {
-	    ##! 8: "database uses RFC2307 password syntax"
-	    $scheme = lc($1);
-	    $encrypted = $2;
-	}
-
-	if (! defined $scheme) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_MISSING_SCHEME_SPECIFICATION",
-		params  => {
-		    USER => $name, 
-		},
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => 'system',
-		},
-		)
-	}
-	
+    	my $scheme;
+    	 
+    	# digest specified in RFC 2307 userPassword notation?
+    	if ($encrypted =~ m{ \{ (\w+) \} (.*) }xms) {
+    	    ##! 8: "database uses RFC2307 password syntax"
+    	    $scheme = lc($1);
+    	    $encrypted = $2;
+    	}
+    
+    	if (! defined $scheme) {
+    	    OpenXPKI::Exception->throw (
+    		message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_MISSING_SCHEME_SPECIFICATION",
+    		params  => {
+    		    USER => $user->{name}, 
+    		},
+    		log => {
+    		    logger => CTX('log'),
+    		    priority => 'error',
+    		    facility => 'system',
+    		},
+    		)
+    	}
 
         $self->{DATABASE}->{$name}->{ENCRYPTED} = $encrypted;
         $self->{DATABASE}->{$name}->{SCHEME}    = $scheme;
-        $self->{DATABASE}->{$name}->{ROLE}      = $role;
+        $self->{DATABASE}->{$name}->{ROLE}      = $user->{role};
         ##! 4: "scanned user ... "
         ##! 4: "    (name, encrypted, scheme, role) => "
         ##! 4: "    ($name, $encrypted, $scheme, $role)"
@@ -101,15 +82,14 @@ sub new {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_SCHEME",
                 params  => {
-		    USER => $name, 
-		    SCHEME => $scheme,
-		},
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => 'system',
-		},
-		);
+        		USER => $name, 
+		        SCHEME => $scheme,
+    	       	},
+    		    log => {
+    		      logger => CTX('log'),
+    		      priority => 'error',
+    		      facility => 'system',
+		    });
         }
     }
 

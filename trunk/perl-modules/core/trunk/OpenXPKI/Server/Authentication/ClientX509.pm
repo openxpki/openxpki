@@ -25,40 +25,21 @@ sub new {
 
     bless $self, $class;
 
-    my $keys = shift;
     ##! 1: "start"
-
-    my $config = CTX('xml_config');
+    
+    my $path = shift;
+    my $config = CTX('config');
 
     ##! 2: "load name and description for handler"
 
-    $self->{DESC} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "description" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
-    $self->{NAME} = $config->get_xpath (XPATH   => [ @{$keys->{XPATH}},   "name" ],
-                                        COUNTER => [ @{$keys->{COUNTER}}, 0 ],
-                                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
-
+    $self->{DESC} = $config->get("$path.description");
+    $self->{NAME} = $config->get("$path.label");
+    
     ##! 2: "load allowed roles"
-    my $nr_of_roles = $config->get_xpath_count(
-        XPATH     => [ @{ $keys->{XPATH} }, 'allowed_role' ],
-        COUNTER   => [ @{ $keys->{COUNTER} } ],
-        CONFIG_ID => $keys->{CONFIG_ID},
-    );
-    ##! 16: 'nr_of_roles: ' . $nr_of_roles
-    $self->{ROLES} = [];
-    for (my $i = 0; $i < $nr_of_roles; $i++) {
-        $self->{ROLES}->[$i] = $config->get_xpath(
-            XPATH     => [ @{ $keys->{XPATH} }  , 'allowed_role' ],
-            COUNTER   => [ @{ $keys->{COUNTER} }, $i             ],
-            CONFIG_ID => $keys->{CONFIG_ID},
-        );
-        ##! 16: 'allowed role: ' . $self->{ROLES}->[$i]
-    }
+    my @roles  = $config->get_scalar_as_list("$path.allowed_role");    
+    $self->{ROLES} = \@roles;
+    
     ##! 2: "finished"
-
     return $self;
 }
 

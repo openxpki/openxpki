@@ -23,14 +23,10 @@ sub new {
 
     bless $self, $class;
 
-    my $keys = shift;
-    ##! 1: "start"
-
-    $self->{ROLE} = CTX('xml_config')->get_xpath (
-                        XPATH   => [@{$keys->{XPATH}},   "role"],
-                        COUNTER => [@{$keys->{COUNTER}}, 0],
-                        CONFIG_ID => $keys->{CONFIG_ID},
-    );
+    my $path = shift;
+    ##! 1: "start" 
+    
+    $self->{ROLE} = CTX('config')->get("$path.role");
 
     ##! 2: "role: ".$self->{ROLE}
 
