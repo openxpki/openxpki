@@ -87,7 +87,7 @@ sub get_token_alias_by_type {
         );
     }
     
-    ##! 32: "Lookup group for type $type"
+    ##! 32: "Lookup group for type $keys->{TYPE}"
     $keys->{GROUP} = CTX('config')->get("crypto.type.".$keys->{TYPE});
     delete $keys->{TYPE};
 
@@ -96,8 +96,10 @@ sub get_token_alias_by_type {
             message => 'I18N_OPENXPKI_API_TOKEN_ALIAS_BY_TYPE_NO_GROUP_FOUND',
         );
     }
+    
+    ##! 32: " Found keys " . Dumper ($keys) 
 
-    return get_token_alias_by_group($keys);
+    return $self->get_token_alias_by_group($keys);
 }
 
 
@@ -119,16 +121,67 @@ sub get_token_alias_by_group {
     my $self = shift;
     my $keys = shift;
 
-    my $alias      = $keys->{ALIAS};
-        
-    #FIXME - find, create and return token.
+    my $group  = $keys->{GROUP};    
+    
+    if (!$group) {
+        OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_GROUP',
+        );        
+    }
 
+    ##! 16: "Find token for group $group in realm $pki_realm"
+ 
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    my %validity;             
+    foreach my $key (qw(notbefore notafter) ) {
+        if ($keys->{VALIDITY}->{NOTBEFORE}) {
+            $validity{$key} = $keys->{VALIDITY}->{uc($key)}->epoch();
+        } else {
+            $validity{$key} = time();
+        }
+    }
+      
+    my $alias = CTX('dbi_backend')->first(    
+        TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
+        COLUMNS => [ 
+            'CERTIFICATE.NOTBEFORE', # Necessary to use the column in ordering - FIXME: Pimp SQL Layer           
+            'ALIASES.ALIAS',              
+        ],
+        JOIN => [
+            [ 'IDENTIFIER', 'IDENTIFIER' ],
+        ],
+        DYNAMIC => {
+            'ALIASES.PKI_REALM' => $pki_realm,
+            'ALIASES.GROUP_ID' => $group,              
+            'CERTIFICATE.NOTBEFORE' => { VALUE => $validity{notbefore}, OPERATOR => 'LESS_THAN' },
+            'CERTIFICATE.NOTAFTER' => { VALUE => $validity{notafter}, OPERATOR => 'GREATER_THAN' },                          
+        },
+        'ORDER' => [ 'CERTIFICATE.NOTBEFORE' ],
+        'REVERSE' => 1,
+    );
+
+    if (!$alias->{'ALIASES.ALIAS'}) {
+        OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_RESULT',
+            params => {
+                'GROUP' => $group,
+                'NOTBEFORE' => $validity{notbefore}, 
+                'NOAFTER' => $validity{notafter}, 
+                'PKI_REALM' => $pki_realm  
+            }
+        );
+    }
+    
+    ##! 16: "Suggesting $alias->{'ALIASES.ALIAS'} as best match"      
+    return $alias->{'ALIASES.ALIAS'};
+    
 }
 
-=head2
+=head2 get_certificate_for_alias( { ALIAS } )
 
 Find the certificate for the give alias. Returns a hashref with the 
-PEM encoded certificate (CERTIFICATE) and the Subject (SUBJECT).
+PEM encoded certificate (DATA), Subject (SUBJECT) and Identifier (IDENTIFIER).
 
 =cut
 

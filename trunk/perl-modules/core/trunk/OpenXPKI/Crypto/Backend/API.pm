@@ -151,6 +151,8 @@ sub START {
     
     ##! 16: 'after __init_command_params()'
     ##! 16: 'get_command_params() child: ' . Dumper($self->get_command_params())
+    ##FIXME - create useful checks
+    if (0) {
     if (not exists $arg_ref->{NAME}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_NAME");
@@ -166,6 +168,7 @@ sub START {
     if (not exists $arg_ref->{TOKEN_INDEX}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_TOKEN_INDEX");
+    }
     }
 
     delete $arg_ref->{CLASS};

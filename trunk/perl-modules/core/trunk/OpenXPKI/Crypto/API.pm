@@ -20,7 +20,11 @@ my %instance_of       :ATTR( :get<instance> );
 my %command_params_of :ATTR( :get<command_params> :set<command_params> );
 
 sub START {
+    ##! 16: 'start'
+    
     my ($self, $ident, $arg_ref) = @_;
+
+    ##! 32: 'Args ' . Dumper ( $arg_ref )
 
     if (ref $self eq 'OpenXPKI::Crypto::API') {
         # somebody tried to instantiate us, but we are supposed to be abstract.

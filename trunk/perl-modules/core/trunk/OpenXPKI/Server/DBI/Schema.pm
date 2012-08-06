@@ -146,6 +146,9 @@ my %COLUMN_of = (
     DATAPOOL_VALUE        => "datapool_value",
     ENCRYPTION_KEY        => "encryption_key",
     DATAPOOL_LAST_UPDATE  => "last_update",
+    
+    # generation id for alias groups
+    GENERATION          => "generation",     
     );
 
 
@@ -228,9 +231,9 @@ my %TABLE_of = (
 
 
     ALIASES => {
-	NAME    => 'aliases',
-	INDEX   => [ 'IDENTIFIER', 'PKI_REALM', ],
-	COLUMNS => [ 'IDENTIFIER', 'PKI_REALM', 'ALIAS', ],
+	   NAME    => 'aliases',
+	   INDEX   => [ 'IDENTIFIER', 'PKI_REALM', ],
+	   COLUMNS => [ 'IDENTIFIER', 'PKI_REALM', 'ALIAS', 'GROUP_ID','GENERATION' ],
     },
 
     CRL => {

@@ -29,46 +29,29 @@ sub new {
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{config}    = $keys->{CONFIG}    if ($keys->{CONFIG});
-    $self->{PKI_REALM} = $keys->{PKI_REALM} if ($keys->{PKI_REALM});
     $self->{TYPE}      = $keys->{TYPE}      if ($keys->{TYPE});
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
     $self->{ID}        = $keys->{ID}        if ($keys->{ID});
-    $self->{CONFIG_ID} = $keys->{CONFIG_ID} if ($keys->{CONFIG_ID});
-
-    if (not $self->{config})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_XML_CONFIG");
-    }
-
-    if (! defined $self->{PKI_REALM})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_PKI_REALM");
-    }
 
     if (! defined $self->{TYPE}
 	|| (($self->{TYPE} ne 'ENDENTITY') 
 	    && ($self->{TYPE} ne 'SELFSIGNEDCA'))) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_INCORRECT_TYPE",
-	    params => {
-		TYPE      => $keys->{TYPE},
-		PKI_REALM => $keys->{PKI_REALM},
-		CA        => $keys->{CA},
-		ID        => $keys->{ID},
-	    },
-	    );
+            OpenXPKI::Exception->throw (
+               message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_INCORRECT_TYPE",
+	           params => {
+            		TYPE      => $keys->{TYPE},
+            		CA        => $keys->{CA},
+            		ID        => $keys->{ID},
+        	    },
+	       );
     }
 
     if (! defined $self->{CA}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_CA",
 	    params => {
-		TYPE      => $keys->{TYPE},
-		PKI_REALM => $keys->{PKI_REALM},
-		ID        => $keys->{ID},
+    		TYPE      => $keys->{TYPE},
+    		ID        => $keys->{ID},
 	    },
 	    );
     }
@@ -93,7 +76,6 @@ sub new {
     # Why do we set CONFIG_ID as a class parameter and add it to an internal method call?
     # This seems to be braindead for me - looks like load_profile is never used outside from here
     # so I remove that now. - oliwel
-    # $self->load_profile($self->{CONFIG_ID});
     $self->load_profile();
     ##! 2: "config loaded"
 
@@ -104,8 +86,6 @@ sub load_profile
 {
     my $self   = shift;
     
-    my $cfg_id = $self->{CONFIG_ID};
-
     my $config = CTX('config');
     
     my $profile_name = $self->{ID};

@@ -32,10 +32,6 @@ sub load_extension
     
     my $config = CTX('config');
            
-    # Always pull CONFIG_ID from class
-    #my $cfg_id  = $keys->{CONFIG_ID};
-    my $cfg_id  = $self->{CONFIG_ID};
-    
     ##! 4: "Profile: $profile_path, Extension: $ext"
     my $path = "$profile_path.extensions.$ext";
     
@@ -447,9 +443,17 @@ sub process_templates {
     ##! 16: 'Tags found - init TT'
     my $tt = Template->new();            
 
-    # Get Issuer Info from selected ca 
-    my $issuer_info = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{CTX('api')->get_pki_realm()}->{ca}->{id}->{$self->{CA}}
-        ->{cacert}->{PARSED}->{BODY}->{SUBJECT_HASH};
+    # FIXME - this might be improves using some caching
+    my $certificate = CTX('api')->get_certificate_for_alias( { 'ALIAS' => $self->{CA} });
+    my $default_token = CTX('api')->get_default_token();
+    
+    my $x509 = OpenXPKI::Crypto::X509->new(
+        DATA  => $certificate->{DATA},
+        TOKEN => $default_token,
+    );
+        
+    # Get Issuer Info from selected ca    
+    my $issuer_info = $x509->{PARSED}->{BODY}->{SUBJECT_HASH};
        
     my %template_vars = (
         'ISSUER' => $issuer_info,                                

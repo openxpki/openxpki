@@ -35,55 +35,27 @@ sub issueCertificate {
 	##! 1: 'Starting '	
 	my $serializer = OpenXPKI::Serialization::Simple->new();
     my $realm = CTX('session')->get_pki_realm();
+    my $config = CTX('config');
 	my $config_id = $self->config_id();
-	
 	
 	my $csr_serial = $csr->{CSR_SERIAL};
 
 	##! 8: 'csr serial  ' . $csr_serial
-	
-	# Code taken and rewriten for NICE from OpenXPKI::Server::Workflow::Activity::SmartCard::IssueCert 
 
     my $cert_profile = $csr->{PROFILE};
     ##! 64: 'certificate profile: ' . $cert_profile
-
-    my $issuing_ca = CTX('api')->determine_issuing_ca(
-	{
-	    PROFILE => $cert_profile,
-	    CONFIG_ID => $config_id,
-	});
-    ##! 32: 'issuing ca: ' . $issuing_ca
     
-    my $ca_token = CTX('pki_realm_by_cfg')->{$config_id}->{$realm}->{ca}->{id}->{$issuing_ca}->{crypto};
-
-    if (!defined $ca_token) {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_TOKEN_UNAVAILABLE',
-        );
-    }
-
-    my $profile = OpenXPKI::Crypto::Profile::Certificate->new(
-		CONFIG    => CTX('xml_config'),
-		PKI_REALM => CTX('api')->get_pki_realm(),
-		CA        => $issuing_ca,
-		ID        => $cert_profile,
-		TYPE      => 'ENDENTITY', # no self-signed CA certs here(?)
-		CONFIG_ID => $config_id,
-    );
-
-    ##! 64: 'propagating cert subject: ' . $csr->{SUBJECT}
-    $profile->set_subject( $csr->{SUBJECT} );
-
+    # Determine the expected validity of the certificate to find the right ca 
+    # Requries that we load the CSR attributes
+    my ($notbefore, $notafter);    
     my @subject_alt_names;
+    
     my $csr_metadata = CTX('dbi_backend')->select(
-	TABLE   => 'CSR_ATTRIBUTES',
+    TABLE   => 'CSR_ATTRIBUTES',
         DYNAMIC => {
             'CSR_SERIAL' => $csr_serial,
         },
-	);
-
-    my $notbefore;
-    my $notafter;
+    );
     ##! 50: ' Size of csr_metadata '. scalar( @{$csr_metadata} )
     
     foreach my $metadata (@{$csr_metadata}) {
@@ -91,11 +63,79 @@ sub issueCertificate {
         if ($metadata->{ATTRIBUTE_KEY} eq 'subject_alt_name') {
             push @subject_alt_names,  $serializer->deserialize($metadata->{ATTRIBUTE_VALUE});
         } elsif ($metadata->{ATTRIBUTE_KEY} eq 'notbefore') {
-	       $notbefore = $metadata->{ATTRIBUTE_VALUE};
-	   } elsif ($metadata->{ATTRIBUTE_KEY} eq 'notafter') {
-	        $notafter = $metadata->{ATTRIBUTE_VALUE};
-    	}
+            $notbefore = OpenXPKI::DateTime::get_validity({
+                VALIDITY_FORMAT => 'absolutedate',
+                VALIDITY        => $metadata->{ATTRIBUTE_VALUE},
+            });                      
+       } elsif ($metadata->{ATTRIBUTE_KEY} eq 'notafter') {
+            $notafter = OpenXPKI::DateTime::get_validity({
+                VALIDITY_FORMAT => 'absolutedate',
+                VALIDITY        => $metadata->{ATTRIBUTE_VALUE},
+            });          
+        }
     }
+    
+    # Set notbefore/notafter according to profile settings if it was not set in csr
+    my $profile_validity = $config->get_hash("profile.$cert_profile.validity");
+    
+    if (not $notbefore) {
+        if ($profile_validity->{notbefore}) {
+            $notbefore = OpenXPKI::DateTime::get_validity({
+                VALIDITY => $profile_validity->{notbefore},
+                VALIDITYFORMAT => 'detect',
+            });
+        } else {
+            # assign default (current timestamp) if notbefore is not specified
+            $notbefore = DateTime->now( time_zone => 'UTC' );
+        }
+    }
+    if (not $notafter) {
+        if (not $profile_validity->{notafter}) {     
+           OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_ISSUE_NOT_AFTER_NOT_SET",
+            params  => {
+                PROFILE => $cert_profile,
+                CSR => $csr_serial
+            });
+        }         
+        $notafter = OpenXPKI::DateTime::get_validity({
+            REFERENCEDATE => $notbefore,
+            VALIDITY => $profile_validity->{notafter},
+            VALIDITYFORMAT => 'detect',
+        });        
+    }
+    
+    # Determine issuing ca
+    my $issuing_ca = CTX('api')->get_token_alias_by_type( { 
+        TYPE => 'certsign',
+        VALIDITY => {
+            NOTBEFORE => $notbefore,
+            NOTAFTER => $notafter,  
+        }, 
+    });
+
+    ##! 32: 'issuing ca: ' . $issuing_ca
+    
+    my $default_token = CTX('api')->get_default_token();
+    my $ca_token = CTX('crypto_layer')->get_token({
+        TYPE => 'certsign',
+        NAME => $issuing_ca
+    });
+
+    if (!defined $ca_token) {
+	    OpenXPKI::Exception->throw(
+	       message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_TOKEN_UNAVAILABLE',
+        );
+    }
+
+    my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
+		CA        => $issuing_ca,
+		ID        => $cert_profile,
+		TYPE      => 'ENDENTITY', # FIXME - should be useless
+    );
+
+    ##! 64: 'propagating cert subject: ' . $csr->{SUBJECT}
+    $profile->set_subject( $csr->{SUBJECT} );
 
     ##! 51: 'SAN List ' . Dumper ( @subject_alt_names )  
     if (scalar @subject_alt_names) {       
@@ -108,7 +148,7 @@ sub issueCertificate {
     
     my $random_data = '';
     if ($rand_length > 0) {
-        $random_data = $ca_token->command({
+        $random_data = $default_token->command({
             COMMAND       => 'create_random',
             RANDOM_LENGTH => $rand_length,
         });
@@ -126,23 +166,13 @@ sub issueCertificate {
     $profile->set_serial($serial);
 
     if (defined $notbefore) {
-	##! 64: 'propagating notbefore date: ' . $notbefore
-        $profile->set_notbefore(
-            OpenXPKI::DateTime::get_validity({
-                VALIDITY_FORMAT => 'absolutedate',
-                VALIDITY        => $notbefore,
-            })
-        );
+        ##! 64: 'propagating notbefore date: ' . $notbefore
+        $profile->set_notbefore($notbefore);
     }
 
     if (defined $notafter) {
-	##! 32: 'propagating notafter date: ' . $notafter
-        $profile->set_notafter(
-            OpenXPKI::DateTime::get_validity({
-                VALIDITY_FORMAT => 'absolutedate',
-                VALIDITY        => $notafter,
-            })
-        );
+    	##! 32: 'propagating notafter date: ' . $notafter
+        $profile->set_notafter($notafter);
     }
 
     ##! 16: 'performing key online test'
@@ -165,7 +195,7 @@ sub issueCertificate {
     # SPKAC Requests return binary format - so we need to convert that
     if ($certificate !~ m{\A -----BEGIN }xms) {
         ##! 32: 'Certificate seems to be binary - conveting it'
-        $certificate = $ca_token->command({
+        $certificate = $default_token->command({
             COMMAND => "convert_cert",
             DATA    => $certificate,
             OUT     => "PEM",
@@ -179,12 +209,15 @@ sub issueCertificate {
 	   FACILITY => [ 'audit', 'system', ],
 	);
 	
+	# We might get that from the ca token....
+	#my $ca_identifier = CTX('api')->get_certificate_for_alias( { ALIAS => $issuing_ca } );
+	
     ##! 64: 'cert: ' . $certificate
 
     my $cert_identifier = $self->__persistCertificateInformation(
         {
             certificate => $certificate,
-            ca_identifier => CTX('pki_realm_by_cfg')->{$config_id}->{CTX('api')->get_pki_realm()}->{ca}->{id}->{$issuing_ca}->{identifier},
+            ca_identifier => $ca_token->get_instance()->get_cert_identifier(),
             cert_role => $csr->{ROLE},
             csr_serial  => $csr_serial
         }, 

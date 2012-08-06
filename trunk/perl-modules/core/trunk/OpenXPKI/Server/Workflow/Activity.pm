@@ -201,25 +201,6 @@ sub _get_wf_action_param{
     return $value
 }
 
-
-sub get_xpath {
-    my $self = shift;
-    ##! 1: 'start, proxying to xml_config with config ID: ' . $self->{CONFIG_ID}
-    return CTX('xml_config')->get_xpath(
-        @_,
-        CONFIG_ID => $self->config_id(),
-    );
-}
-
-sub get_xpath_count {
-    my $self = shift;
-    ##! 1: 'start, proxying to xml_config with config ID: ' . $self->{CONFIG_ID}
-    return CTX('xml_config')->get_xpath_count(
-        @_,
-        CONFIG_ID => $self->config_id(),
-    );
-}
-
 sub config_id {
     my $self = shift;
 

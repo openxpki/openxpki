@@ -436,6 +436,10 @@ sub determine_issuing_ca {
     my $self = shift;
     my $arg_ref = shift;
 
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_SERVER_API_DETERMINE_ISSUING_CA_IS_DEPRECATED"
+    );
+
     my $profilename = $arg_ref->{PROFILE};
     ##! 16: 'profilename: ' . $profilename
 

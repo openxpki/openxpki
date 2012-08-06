@@ -101,7 +101,7 @@ extensions:
         critical: 0
         uri:
         - http://localhost/cacrl.crt
-        - ldap://localhost/cn=My%20CA,dc=OpenXPKI,dc=org
+        - ldap://localhost/cn=[% ISSUER.CN.0 %],dc=OpenXPKI,dc=org
 
     authority_info_access:
         critical: 0

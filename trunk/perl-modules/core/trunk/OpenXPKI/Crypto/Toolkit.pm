@@ -31,6 +31,7 @@ my %params_of         :ATTR( :get<params> ); # a hash reference of parameters
 my %command_params_of :ATTR( :get<command_params> ); # params for Command classes
 my %base_class_of     :ATTR; # the current class we are in
 my %shell_of          :ATTR( :get<shell> );
+my %cert_identifier_of :ATTR( :get<cert_identifier> ); # the cert_idenfifier of the attached certificate
 
 sub START {
     ##! 16: 'Toolkit start'
@@ -78,7 +79,14 @@ sub START {
     $command_params_of{$ident} = {};
 
     $self->__init_local();
-    $self->__load_config($arg_ref);
+    
+    # We have tow kinds of tokens with different config style
+    # where system tokens do not have a "name" set.
+    if ($arg_ref->{NAME}){ 
+        $self->__load_config_realm_token($arg_ref); 
+    } else { 
+        $self->__load_config_system_token($arg_ref); 
+    }    
     $self->__init_engine();
     $self->__init_shell();
     $self->__init_command();
@@ -87,160 +95,121 @@ sub START {
 sub __init_local { # to be implemented in the children
 }
 
-sub __load_config {
+=head2 __load_config_system_token () 
+
+Initialize system token
+
+=cut
+
+sub __load_config_system_token {
+    ##! 16: 'start'
+    my $self = shift;
+    my $ident = ident $self;
+    my $arg_ref = shift;
+          
+    my $type = $token_type_of{$ident};
+
+    $params_of{$ident}->{TMP} = $tmp_dir_of{$ident};
+
+    my $config = CTX('config');
+
+    ##! 16: "Load system token $type"
+    # FIXME - most of this params are useless for system tokens but creates errors when not set in the Backend::OpenSSL class
+    foreach my $key (qw(backend
+                    engine     shell         wrapper 
+                    randfile                        
+                    engine_section engine_usage
+                    key_store)) {
+                        
+        $params_of{$ident}->{uc($key)} = $config->get("system.crypto.token.$type.$key") || '';
+    }        
+            
+}
+
+=head2 __load_config_realm_token ( { NAME, SECRET }) 
+
+Initialize realm token defined by NAME (full alias as registered in the alias 
+table). SECRET can be omitted if the key is not protected by a passphrase.
+
+=cut
+
+sub __load_config_realm_token {
     ##! 16: 'start'
     my $self = shift;
     my $ident = ident $self;
     my $arg_ref = shift;
 
-    my $name        = $arg_ref->{NAME};
-    my $realm_index = $arg_ref->{PKI_REALM_INDEX};
-    my $type_path   = $arg_ref->{TOKEN_TYPE};
-    my $type_index  = $arg_ref->{TOKEN_INDEX};
-    my $certificate = $arg_ref->{CERTIFICATE};
-    $params_of{$ident}->{SECRET} = $arg_ref->{SECRET};
-    my $config_id   = $arg_ref->{CONFIG_ID};
-
-    my $realm;
-    my $type_id;
+    my $name = $arg_ref->{NAME};
+            
+    my $type = $token_type_of{$ident};
 
     $params_of{$ident}->{TMP} = $tmp_dir_of{$ident};
 
+    my $config = CTX('config');
+    # Load "real" crypto tokens (those with key material)
+    ##! 16: "Load realm token of type $type, name $name"
+        
+    # Add the secret    
+    $params_of{$ident}->{SECRET} = $arg_ref->{SECRET} if ($arg_ref->{SECRET});
+        
+    my @keylist = (qw(backend engine shell wrapper randfile                        
+                    engine_section engine_usage key key_store));
 
-    eval {
-        $realm = CTX('xml_config')->get_xpath(
-            XPATH     => [ 'pki_realm' , 'name' ],
-            COUNTER   => [ $realm_index, 0      ],
-            CONFIG_ID => $config_id,
-        );
-    };
-    if (! defined $realm) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_COULD_NOT_READ_REALM_FROM_CONFIG',
-            params => {
-                'EVAL_ERROR' => $EVAL_ERROR,
-            },
-        );
-    }
-    ##! 16: 'realm: ' . $realm
-
-    eval {
-        $type_id = CTX('xml_config')->get_xpath(
-            XPATH     => [ 'pki_realm' , $type_path , 'id' ],
-            COUNTER   => [ $realm_index, $type_index, 0    ],
-            CONFIG_ID => $config_id,
-        );
-    };
-    if (! defined $type_id) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_COULD_NOT_READ_TYPE_ID_FROM_CONFIG',
-            params => {
-                'EVAL_ERROR' => $EVAL_ERROR,
-            },
-        );
-    }
-    ##! 16: 'type_id: ' . $type_id
-
-    # any existing key in this hash is considered optional in %token_args
-    my %is_optional = ();
-
-    # default tokens don't need a key
-    # so do java keystore ones
-    if ($type_path eq 'common' || $type_path eq 'createjavakeystore') {
-        $is_optional{'KEY'} = 1;
-    }
-    # FIXME: currently unused attributes:
-    # openca-sv
-    # FIXME: engine_section is OpenSSL-specific
-    foreach my $key (qw(backend
-                        engine     shell         wrapper 
-                        randfile
-                        key
-                        engine_section
-                        key_store  engine_usage
-                       )) {
-
-	my $attribute_count;
-	eval {
-	    ##! 8: "try to get attribute_count"
-	    $attribute_count = CTX('xml_config')->get_xpath_count (
-            XPATH     => [ 'pki_realm', $type_path, 'token', $key ],
-            COUNTER   => [ $realm_index, $type_index, 0 ],
-            CONFIG_ID => $config_id,
-        );
-	    ##! 8: "attribute_count ::= ".$attribute_count
-	};
-
-	if (my $exc = OpenXPKI::Exception->caught()) {
-	    ##! 8: "caught exception while reading config attribute $key"
-	    # only pass exception if attribute is not optional
-	    if (! $is_optional{uc($key)}) {
-		##! 16: "argument $key is not optional, escalating"
-		OpenXPKI::Exception->throw(
-		    message  => "I18N_OPENXPKI_CRYPTO_TOOLKIT_INCOMPLETE_CONFIGURATION",
-		    children => [ $exc ],
-		    params   => {"NAME" => $name, 
-			 	 "TYPE" => $type_path, 
-			 	 "ATTRIBUTE" => $key,
-		    },
-		    );
-	    }
-	    $attribute_count = 0;
-	}
-        elsif ($EVAL_ERROR) {
-	    ##! 8: "caught system exception while reading config attribute $key"
-	    # FIXME: should we really throw an OpenXPKI exception here?
-            OpenXPKI::Exception->throw (
-                message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_LOAD_CONFIG_EVAL_ERROR',
-                params  => { 'EVAL_ERROR' => $EVAL_ERROR,
-                           },
-            );
+    # The token config uses inheritance 
+    # $config_name is set to the instance we are processing            
+    my $config_name = $name;  
+    do {     
+        ##! 32: "Add token config with config name $config_name"
+        foreach my $key (@keylist) {
+            if (not defined $params_of{$ident}->{uc($key)}) {
+                my $value = $config->get("crypto.token.$config_name.$key");
+                $params_of{$ident}->{uc($key)} = $value if (defined $value);
+                ##! 32: "Set $key -> $value"    
+            }
         }
-
-	# multivalue attributes are not desired/supported
-	if ($attribute_count > 1) {
-	    OpenXPKI::Exception->throw(
-		message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_LOAD_CONFIG_DUPLICATE_ATTRIBUTE',
-		params  => {'NAME' => $name, 
-			    'TYPE' => $type_path, 
-			    'ATTRIBUTE' => $key,
-		           },
-            );
-	}
-
-	if ($attribute_count == 1) {
-	    my $value = CTX('xml_config')->get_xpath(
-            XPATH    => [ 'pki_realm', $type_path, 'token', $key ],
-            COUNTER  => [ $realm_index, $type_index, 0, 0 ],
-            CONFIG_ID => $config_id,
-        );
-    	    $params_of{$ident}->{uc($key)} = $value;
-    }
-    }
-    if ($type_path eq 'ca' || $type_path eq 'scep' || $type_path eq 'password_safe') { # default tokens don't have a certificate
-        # certificate files are no longer defined in token.xml, thus
-        # create a temporary file with the certificate in it
-        # every time a token is instantiated.
-        # TODO: maybe just forget about the file and pass the certificate
-        # as data where needed.
-        if (!defined $certificate) {
+        $config_name = $config->get("crypto.token.$config_name.inherit");
+    } while ( $config_name );    
+        
+    # FIXME - most of this params are not usefull for all tokens, need a better error checking concept
+    foreach my $key (@keylist) {                    
+        if (not defined $params_of{$ident}->{uc($key)}) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CERTIFICATE_NOT_DEFINED',
-            );
-        }
-        ##! 16: 'certificate: ' . $certificate
-        my $fu = OpenXPKI::FileUtils->new();
-        my $cert_filename = $fu->get_safe_tmpfile({
-            TMP => $tmp_dir_of{$ident},
-        });
-        $fu->write_file({
-            FILENAME => $cert_filename,
-            CONTENT  => $certificate,
-            FORCE    => 1,
-        });
-        chmod 0644, $cert_filename;
-        $params_of{$ident}->{CERT} = $cert_filename;
+                message  => "I18N_OPENXPKI_CRYPTO_TOOLKIT_INCOMPLETE_CONFIGURATION",                
+                params   => {
+                    "NAME" => $name, 
+                    "TYPE" => $type, 
+                    "ATTRIBUTE" => $key,
+            });
+        }                                    
+    }               
+
+    # Load the PEM certificate through the alias table
+    my $certificate = CTX('api')->get_certificate_for_alias({ ALIAS => $name });
+    
+    if (!defined $certificate || !$certificate->{DATA}) {
+        # Should never show up if the api is not broken 
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CERTIFICATE_NOT_DEFINED',
+        );
     }
+    
+    $cert_identifier_of{$ident} = $certificate->{IDENTIFIER};
+    
+    ##! 16: 'certificate subject: ' . $certificate->{SUBJECT}
+    ##! 64: 'certificate pem: ' .$certificate->{DATA}
+    
+    my $fu = OpenXPKI::FileUtils->new();
+    my $cert_filename = $fu->get_safe_tmpfile({
+        TMP => $tmp_dir_of{$ident},
+    });
+    $fu->write_file({
+        FILENAME => $cert_filename,
+        CONTENT  => $certificate->{DATA},
+        FORCE    => 1,
+    });
+    chmod 0644, $cert_filename;
+    $params_of{$ident}->{CERT} = $cert_filename;
+
     ##! 1: 'end'
 }
 

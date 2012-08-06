@@ -131,6 +131,7 @@ our %COLUMN = (
     "datapool_value"           => "TEXT",
     "encryption_key"           => "TEXT_KEY",
     
+    "generation"        => "NUMERIC"
     );
 
 sub new

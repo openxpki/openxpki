@@ -278,19 +278,19 @@ sub __handle_PING : PRIVATE {
             SERVICE_MSG => 'SERVICE_READY',
         };
     }
-    elsif ($state_of{$ident} eq 'WAITING_FOR_PKI_REALM') {
-        my %realms =();
-        my @list = sort keys %{CTX('pki_realm')};
-        foreach my $realm (@list) {
-            $realms{$realm}->{NAME}        = $realm;
+    elsif ($state_of{$ident} eq 'WAITING_FOR_PKI_REALM') {        
+        my @realm_names = CTX('config')->get_keys("system.realms");        
+        my %realms =();      
+        foreach my $realm (sort @realm_names) {
+            $realms{$realm}->{NAME} = $realm;
             ## FIXME: we should add a description to every PKI realm
-            $realms{$realm}->{DESCRIPTION} = $realm;
+            $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.label");
         }
         return {
-	    SERVICE_MSG => 'GET_PKI_REALM',
-	    PARAMS => {
-		    'PKI_REALMS' => \%realms,
-	    },
+	       SERVICE_MSG => 'GET_PKI_REALM',
+	       PARAMS => {
+		      'PKI_REALMS' => \%realms,
+	       },
         };
     }
     elsif ($state_of{$ident} eq 'WAITING_FOR_AUTHENTICATION_STACK') {
@@ -331,21 +331,21 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
     if ($pki_realm_choice
         && $state_of{$ident} =~ m{\A SESSION_ID_SENT.* \z}xms) {
         ##! 2: "build hash with ID, name and description"
-        my %realms =();
-        my @list = sort keys %{CTX('pki_realm')};
-        foreach my $realm (@list) {
-            $realms{$realm}->{NAME}        = $realm;
+        my @realm_names = CTX('config')->get_keys("system.realms");        
+        my %realms =();      
+        foreach my $realm (sort @realm_names) {
+            $realms{$realm}->{NAME} = $realm;
             ## FIXME: we should add a description to every PKI realm
-            $realms{$realm}->{DESCRIPTION} = $realm;
+            $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.label");
         }
         $self->__change_state({
             STATE => 'WAITING_FOR_PKI_REALM',
         });
         return {
-	    SERVICE_MSG => 'GET_PKI_REALM',
-	    PARAMS => {
-		    'PKI_REALMS' => \%realms,
-	    },
+    	    SERVICE_MSG => 'GET_PKI_REALM',
+    	    PARAMS => {
+    		    'PKI_REALMS' => \%realms,
+    	    },
         };
     }
 
@@ -675,7 +675,8 @@ sub __pki_realm_choice_available : PRIVATE {
     return $realm if defined $realm;
 
     ##! 2: "check if there is more than one realm"
-    my @list = sort keys %{CTX('pki_realm')};
+    
+    my @list = CTX('config')->get_keys('system.realms');
     if (scalar @list < 1) {
         ##! 4: "no PKI realm configured"
         OpenXPKI::Exception->throw(
@@ -723,7 +724,7 @@ sub __is_valid_pki_realm : PRIVATE {
     my $ident   = ident $self;
     my $realm   = shift;
 
-    return exists CTX('pki_realm')->{$realm};
+    return defined CTX('config')->get_meta("system.realms.$realm");
 }
 
 sub __change_state : PRIVATE {
