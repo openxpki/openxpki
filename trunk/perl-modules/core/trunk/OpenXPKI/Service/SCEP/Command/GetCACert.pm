@@ -29,12 +29,8 @@ sub execute {
     my @ca_cert_chain = $self->__get_ca_certificate_chains();
 
     ##! 16: 'chain: ' . Dumper(\@ca_cert_Chain)
-
-    my $token_manager = CTX('crypto_layer');
-    my $token = $token_manager->get_token(
-        TYPE      => 'DEFAULT',
-        PKI_REALM => $pki_realm,
-    );
+    
+    my $token = CTX('api')->get_default_token();
 
     # use Crypto API to convert CA certificate chain from
     # an array of PEM strings to a PKCS#7 container.

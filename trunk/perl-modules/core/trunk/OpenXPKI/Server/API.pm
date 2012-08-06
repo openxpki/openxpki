@@ -27,6 +27,7 @@ use OpenXPKI::DN;
 use OpenXPKI::Server::API::Default;
 use OpenXPKI::Server::API::Object;
 use OpenXPKI::Server::API::Secret;
+use OpenXPKI::Server::API::Token;
 use OpenXPKI::Server::API::Visualization;
 use OpenXPKI::Server::API::Workflow;
 
@@ -162,13 +163,43 @@ sub BUILD {
             },
         },
         'get_default_token' => {
-            class  => 'Default',
+            class  => 'Token',
+            params => {                
+            },
+        },
+        'get_token_alias_by_type' => {
+            class  => 'Token',
             params => {
-                'PKI_REALM' => {
+                'TYPE' => {
                     type  => SCALAR,
-                    regex => $re_alpha_string,
+                    regex => $re_alpha_string,                    
+                },
+                'VALIDITY'  => {
+                    type  => HASHREF,                    
                     optional => 1,
                 },
+            },
+        },
+        'get_token_alias_by_group' => {
+            class  => 'Token',
+            params => {
+                'GROUP' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,                    
+                },
+                'VALIDITY'  => {
+                    type  => HASHREF,                    
+                    optional => 1,
+                },
+            },
+        },
+        'get_certificate_for_alias' => {
+            class  => 'Token',
+            params => {
+                'ALIAS' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,                    
+                },                
             },
         },
         'get_approval_message' => {

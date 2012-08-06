@@ -1095,26 +1095,6 @@ sub create_bulk_request_ticket {
     return $ticket;
 }
 
-sub get_default_token {
-    
-    ##! 1: 'start'
-    my $self = shift;
-    my $keys = shift;
-
-    my $pki_realm = $keys->{PKI_REALM};
-    if (!$pki_realm)
-    {
-        $pki_realm = CTX('session')->get_pki_realm();        
-    }
-
-    return CTX('crypto_layer')->get_token (
-        TYPE      => "DEFAULT",
-        ID        => "default",
-        PKI_REALM => $pki_realm,
-        CONFIG_ID =>  CTX('api')->get_current_config_id(),        
-    );
-}
-
 1;
 
 __END__

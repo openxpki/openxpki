@@ -87,12 +87,8 @@ sub execute {
         if ($format eq 'PEM') {
             $content = $crl;
         }
-        elsif ($format eq 'DER') {
-            my $tm = CTX('crypto_layer');
-            my $default_token = $tm->get_token(
-                TYPE      => 'DEFAULT',
-                PKI_REALM => $pki_realm,
-            );
+        elsif ($format eq 'DER') {            
+            my $default_token = CTX('api')->get_default_token();
             $content = $default_token->command({
                 COMMAND => 'convert_crl',
                 DATA    => $crl,

@@ -36,12 +36,8 @@ sub evaluate {
             PKCS7   => $pkcs7,
         });
     ##! 64: 'signer_cert: ' . $signer_cert
-
-    my $tm = CTX('crypto_layer');
-    my $default_token = $tm->get_token(
-        TYPE      => 'DEFAULT',
-        PKI_REALM => $pki_realm,
-    );
+    
+    my $default_token = CTX('api')->get_default_token();
 
     my $x509 = OpenXPKI::Crypto::X509->new(
         TOKEN => $default_token,

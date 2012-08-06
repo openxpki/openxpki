@@ -32,13 +32,7 @@ sub evaluate {
     }
 
     # parse PKCS#10 request
-    my $cryptolayer = CTX('crypto_layer');
-    my $pki_realm = CTX('api')->get_pki_realm();
-
-    my $default_token = $cryptolayer->get_token(
-        TYPE      => 'DEFAULT',
-        PKI_REALM => $pki_realm,
-    );
+    my $default_token = CTX('api')->get_default_token();
 
     if (! defined $default_token) {
         OpenXPKI::Exception->throw (

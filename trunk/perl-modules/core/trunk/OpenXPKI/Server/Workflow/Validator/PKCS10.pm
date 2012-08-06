@@ -64,14 +64,8 @@ sub validate {
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
-    # parse PKCS#10 request
-    my $cryptolayer = CTX('crypto_layer');
-    my $pki_realm = CTX('api')->get_pki_realm();
-
-    my $default_token = $cryptolayer->get_token(
-        TYPE      => 'DEFAULT',
-        PKI_REALM => $pki_realm,
-    );
+    # parse PKCS#10 request 
+    my $default_token = CTX('api')->get_default_token();
 
     if (! defined $default_token) {
         OpenXPKI::Exception->throw (

@@ -155,6 +155,7 @@ OpenXPKI/Server/API.pm
 OpenXPKI/Server/API/Default.pm
 OpenXPKI/Server/API/Object.pm
 OpenXPKI/Server/API/Secret.pm
+OpenXPKI/Server/API/Token.pm
 OpenXPKI/Server/API/Visualization.pm
 OpenXPKI/Server/API/Workflow.pm
 OpenXPKI/Server/Context.pm

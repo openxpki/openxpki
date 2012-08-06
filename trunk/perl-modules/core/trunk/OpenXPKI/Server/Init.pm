@@ -69,11 +69,9 @@ my @init_tasks = qw(
   xml_config
   workflow_factory
   crypto_layer
-  pki_realm
-  api
+  api  
   volatile_vault
-  acl  
-  pki_realm_by_cfg
+  acl    
   authentication
   notification
   server
@@ -398,21 +396,7 @@ sub __do_init_pki_realm_by_cfg {
 sub __do_init_volatile_vault {
     ##! 1: "init volatile vault"
 
-    my $realms = CTX('pki_realm');
-    
-    # get a default token
-    # FIXME: We use the first PKI realm's default token. This is an 
-    # arbitrary choice - we should consider to have a "global" default 
-    # token that is not bound to a specific realm.
-
-    my $firstrealm = (sort keys %{$realms})[0];
-    if (! defined $firstrealm) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_PKI_REALM");
-	
-    }
-    
-    my $token = CTX('api')->get_default_token({PKI_REALM => $firstrealm});
+    my $token = CTX('api')->get_default_token();
 
     if (! defined $token) {
         OpenXPKI::Exception->throw (
@@ -1138,10 +1122,7 @@ sub get_pki_realms
             CONFIG_ID => $cfg_id,
         );
 
-        my $defaulttoken = __get_default_crypto_token (
-            PKI_REALM => $name,
-            CONFIG_ID => $cfg_id,
-        );
+        my $defaulttoken = CTX('api')->get_default_token(); 
 
         $realms{$name}->{crypto}->{default} = $defaulttoken;
         log_wrapper(
@@ -1711,27 +1692,6 @@ sub __get_cert_identifier {
         }
     }
     return $cert_identifier;
-}
-
-sub __get_default_crypto_token
-{
-    my $keys = { @_ };
-    ##! 1: "start"
-
-    my $crypto = CTX('crypto_layer');
-
-    if (not $keys->{PKI_REALM})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DEFAULT_CRYPTO_TOKEN_MISSING_PKI_REALM");
-    }
-
-    return $crypto->get_token (
-        TYPE      => "DEFAULT",
-		ID        => "default",
-		PKI_REALM => $keys->{PKI_REALM},
-        CONFIG_ID => $keys->{CONFIG_ID},
-    );
 }
 
 sub get_dbi
