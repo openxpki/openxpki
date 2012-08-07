@@ -281,11 +281,7 @@ Hook method. Will be called if Workflow::execute_action() is called after proc-s
 =head2 runtime_exception
 
 Hook method. Will be called if Workflow::execute_action() is called with an proc-state which is not appropriate (e.g. "finished" or "running")  The current workflow is given as argument.
-
-=head2 get_xpath
-
-Calls CTX('xml_config')->get_xpath() with the workflow's config ID.
-
+ 
 =head2 config_id
 
 Returns the config identifier for the workflow or the current config

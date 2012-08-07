@@ -175,9 +175,10 @@ via an external program. The parameters are passed as a hash reference.
 
 =head2 new
 
-is the constructor. The supported parameters are XPATH and COUNTER.
+is the constructor. It requires the config prefix as single argument.
+
 This is the minimum parameter set for any authentication class.
-The XML configuration includes a command tag and a role or a regular expression
+The configuration includes a command tag and a role or a regular expression
 configuration (pattern and replacement). Additionally it is possible to
 specify environment variables. The tag env must include a name and a value
 parameter. Please note that the strings __USER__ and __PASSWORD__ in the value

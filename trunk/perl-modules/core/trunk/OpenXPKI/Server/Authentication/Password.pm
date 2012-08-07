@@ -218,7 +218,7 @@ authentication method. The parameters are passed as a hash reference.
 
 =head2 new
 
-is the constructor. The supported parameters are XPATH and COUNTER.
+is the constructor. It requires the config prefix as single argument.
 This is the minimum parameter set for any authentication class.
 Every user block in the configuration must include a name, digest and role.
 The digest must have the format

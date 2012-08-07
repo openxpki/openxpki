@@ -67,8 +67,7 @@ authentication method. The parameters are passed as a hash reference.
 
 =head2 new
 
-is the constructor. The supported parameters are XPATH and COUNTER.
-This is the minimum parameter set for any authentication class.
+is the constructor. It requires the config prefix as single argument.
 
 =head2 login_step
 

@@ -264,7 +264,7 @@ authentication method. The parameters are passed as a hash reference.
 
 =head2 new
 
-is the constructor. The supported parameters are XPATH and COUNTER.
+is the constructor. It requires the config prefix as single argument.
 This is the minimum parameter set for any authentication class.
 The parameters which are taken from the configuration are trust_anchors
 and pkcs7tool, which works in the same way as in the approval signature

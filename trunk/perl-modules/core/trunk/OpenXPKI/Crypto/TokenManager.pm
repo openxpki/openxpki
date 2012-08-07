@@ -643,55 +643,6 @@ sub __add_token
     ##! 2: "$type token $name for $realm successfully added"
     return $self->{TOKEN}->{$realm}->{$type}->{$name};
 }
-
-sub __get_list_member_by_id
-{
-    ##! 1: "start"
-    my $self = shift;
-    my $args = shift;
-    my $xpath    = $args->{XPATH};
-    my $counter  = $args->{COUNTER};
-    my $id_label = $args->{ID_LABEL};
-    my $id_value = $args->{ID_VALUE};
-    my $cfg_id   = $args->{CONFIG_ID};
-    ##! 64: 'cfg_id: ' . $cfg_id
-
-    ##! 2: "get matching list member"
-
-    my $count = CTX('xml_config')->get_xpath_count (
-        XPATH     => $xpath,
-        COUNTER   => $counter,
-        CONFIG_ID => $cfg_id,
-    );
-    my $index = undef;
-    for (my $i=0; $i<$count; $i++)
-    {
-        ##! 4: "checking id"
-        next if ($id_value ne CTX('xml_config')->get_xpath (
-                                  XPATH     => [ @{$xpath}, $id_label ],
-                                  COUNTER   => [ @{$counter}, $i, 0 ],
-                                  CONFIG_ID => $cfg_id));
-        ##! 4: "pki_realm ok"
-        $index = $i;
-        last;
-    }
-    if (not defined $index)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_LIST_MEMBER_BY_ID_NOT_FOUND",
-            params  => {
-                "XPATH" => join (", ", @{$xpath}),
-                COUNTER  => $args->{COUNTER},
-                ID_LABEL => $args->{ID_LABEL},
-                ID_VALUE => $args->{ID_VALUE},
-                CFG_ID   => $args->{CONFIG_ID},
-            }
-        );
-    }
-
-    ##! 1: "finished: $index"
-    return $index;
-}
  
 sub __use_token
 {
