@@ -1,4 +1,4 @@
-# OpenXPKI::DateTime.pm 
+# OpenXPKI::DateTime.pm
 # Written by Martin Bartosch for the OpenXPKI project
 # Copyright (C) 2005-2006 by The OpenXPKI Project
 
@@ -16,184 +16,187 @@ use Date::Parse;
 # static function
 sub convert_date {
     my $params = shift;
-    
-    my $outformat = exists $params->{OUTFORMAT} 
-        ? $params->{OUTFORMAT} 
-        : 'iso8601';
+
+    my $outformat =
+      exists $params->{OUTFORMAT}
+      ? $params->{OUTFORMAT}
+      : 'iso8601';
 
     my $date = $params->{DATE};
 
-    if (! defined $date) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_DATE",
-	    );
+    if ( !defined $date ) {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_DATE", );
     }
 
     # convert to UTC
-    eval {
-	$date->set_time_zone('UTC');
-    };
+    eval { $date->set_time_zone('UTC'); };
     if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
+        OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_DATE",
-	    params => {
-		ERROR => $EVAL_ERROR,
-	    },
-	    );
+            params  => { ERROR => $EVAL_ERROR, },
+        );
     }
 
-    return $date->epoch()                   if ($outformat eq 'epoch');
-    return $date->iso8601()                 if ($outformat eq 'iso8601');
-    return $date->strftime("%y%m%d%H%M%SZ") if ($outformat eq 'openssltime');
-    return $date->strftime("%Y%m%d%H%M%S")  if ($outformat eq 'terse');
-    return $date->strftime("%F %T")         if ($outformat eq 'printable');
+    return $date->epoch()                   if ( $outformat eq 'epoch' );
+    return $date->iso8601()                 if ( $outformat eq 'iso8601' );
+    return $date->strftime("%y%m%d%H%M%SZ") if ( $outformat eq 'openssltime' );
+    return $date->strftime("%Y%m%d%H%M%S")  if ( $outformat eq 'terse' );
+    return $date->strftime("%F %T")         if ( $outformat eq 'printable' );
 
-    OpenXPKI::Exception->throw (
-	message => "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_FORMAT",
-	params => {
-	    OUTFORMAT => $outformat,
-	}
-	);
- }
-
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_DATETIME_CONVERT_DATE_INVALID_FORMAT",
+        params  => { OUTFORMAT => $outformat, }
+    );
+}
 
 sub get_validity {
     my $params = shift;
 
-    my $validity         
-	= defined $params->{VALIDITY}
-          ? $params->{VALIDITY}
-          : "";
+    my $validity =
+      defined $params->{VALIDITY}
+      ? $params->{VALIDITY}
+      : "";
 
-    my $validityformat   
-	= defined $params->{VALIDITYFORMAT}
-          ? $params->{VALIDITYFORMAT}
-          : 'relativedate';
+    my $validityformat =
+      defined $params->{VALIDITYFORMAT}
+      ? $params->{VALIDITYFORMAT}
+      : 'relativedate';
 
     # referencedate is used for relative date computations
     my $refdate;
-    if(defined $params->{REFERENCEDATE} && ref $params->{REFERENCEDATE}){
-        $refdate = $params->{REFERENCEDATE}->clone()
-    }elsif($params->{REFERENCEDATE}){
+    if ( defined $params->{REFERENCEDATE} && ref $params->{REFERENCEDATE} ) {
+        $refdate = $params->{REFERENCEDATE}->clone();
+    }
+    elsif ( $params->{REFERENCEDATE} ) {
+
         #parse from string
-        $refdate = _parse_date_utc($params->{REFERENCEDATE});
-        
-    }else{
+        $refdate = _parse_date_utc( $params->{REFERENCEDATE} );
+
+    }
+    else {
         $refdate = DateTime->now( time_zone => 'UTC' );
     }
-    
-    if ($validityformat eq 'detect') {
-        if ($validity =~ m{\A [+\-]}xms) {
+
+    if ( $validityformat eq 'detect' ) {
+        if ( $validity =~ m{\A [+\-]}xms ) {
             $validityformat = 'relativedate';
-        } else {
+        }
+        else {
             $validityformat = 'absolutedate';
         }
     }
 
-    if ($validityformat eq 'days') {
-	if ($validity !~ m{ \A [+\-]?\d+ \z }xms) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY",
-		params  => {
-		    VALIDITYFORMAT => $validityformat,
-		    VALIDITY => $validity,
-		},
-		);
-	}
-	$refdate->add( days => $validity );
-
-	return $refdate;
+    if ( $validityformat eq 'epoch' ) {
+         return DateTime->from_epoch( epoch => $validity );
     }
-    
-    if (($validityformat eq 'absolutedate') ||
-	($validityformat eq 'relativedate')) {
 
-	my $relative = "";
-	if ($validityformat eq 'relativedate') {
-	    ($relative, $validity) 
-		= ( $validity =~ m{ \A ([+\-]?)(\d+) \z }xms );
-	}
-	
-	if ((! defined $validity) || ($validity eq "")) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY",
-		params  => {
-		    VALIDITYFORMAT => $validityformat,
-		    VALIDITY => $params->{VALIDITY},
-		},
-		);
-	}
-	
-	my %date;
-	# get year
-	my $datelength = ( $relative eq "" ) ? 4 : 2;
-	( $date{year}, $validity ) = 
-	    ( $validity =~ m{ \A (\d{$datelength}) (\d*) \z }xms );
-	
-	# month, day, hour, minute, second
-	foreach my $item (qw ( month day hour minute second ) ) {
-	    if (defined $validity) {
-		my $value;
-		( $value, $validity ) = ( $validity =~ m{ \A (\d{2}) (\d*) \z }xms );
-		if (defined $value) {
-		    $date{$item} = $value;
-		}
-	    }
-	}
-	
-	# absolute validity
-	if ($relative eq "") {
-	    return DateTime->new(
-		%date,
-		time_zone => 'UTC',
-		);
-	}
-	else
-	{
-	    # append an 's' character to the has keys (year -> years)
-	    %date = map { $_ . 's' => $date{$_} } keys %date;
-	    
-	    if ($relative eq "+") {
-		$refdate->add( %date );
-		return $refdate;
-	    }
-	    
-	    if ($relative eq "-") {
-		$refdate->subtract( %date );
-		return $refdate;
-	    }
-	}
+    if ( $validityformat eq 'days' ) {
+        if ( $validity !~ m{ \A [+\-]?\d+ \z }xms ) {
+            OpenXPKI::Exception->throw(
+                message =>
+                  "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY",
+                params => {
+                    VALIDITYFORMAT => $validityformat,
+                    VALIDITY       => $validity,
+                },
+            );
+        }
+        $refdate->add( days => $validity );
+
+        return $refdate;
     }
-    
-    OpenXPKI::Exception->throw (
-	message => "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT",
-	params  => {
-	    VALIDITYFORMAT => $validityformat,
-	    VALIDITY => $validity,
-	},
-	);
+
+    if (   ( $validityformat eq 'absolutedate' )
+        || ( $validityformat eq 'relativedate' ) )
+    {
+
+        my $relative = "";
+        if ( $validityformat eq 'relativedate' ) {
+            ( $relative, $validity ) =
+              ( $validity =~ m{ \A ([+\-]?)(\d+) \z }xms );
+        }
+
+        if ( ( !defined $validity ) || ( $validity eq "" ) ) {
+            OpenXPKI::Exception->throw(
+                message =>
+                  "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY",
+                params => {
+                    VALIDITYFORMAT => $validityformat,
+                    VALIDITY       => $params->{VALIDITY},
+                },
+            );
+        }
+
+        my %date;
+
+        # get year
+        my $datelength = ( $relative eq "" ) ? 4 : 2;
+        ( $date{year}, $validity ) =
+          ( $validity =~ m{ \A (\d{$datelength}) (\d*) \z }xms );
+
+        # month, day, hour, minute, second
+        foreach my $item (qw ( month day hour minute second )) {
+            if ( defined $validity ) {
+                my $value;
+                ( $value, $validity ) =
+                  ( $validity =~ m{ \A (\d{2}) (\d*) \z }xms );
+                if ( defined $value ) {
+                    $date{$item} = $value;
+                }
+            }
+        }
+
+        # absolute validity
+        if ( $relative eq "" ) {
+            return DateTime->new( %date, time_zone => 'UTC', );
+        }
+        else {
+
+            # append an 's' character to the has keys (year -> years)
+            %date = map { $_ . 's' => $date{$_} } keys %date;
+
+            if ( $relative eq "+" ) {
+                $refdate->add(%date);
+                return $refdate;
+            }
+
+            if ( $relative eq "-" ) {
+                $refdate->subtract(%date);
+                return $refdate;
+            }
+        }
+    }
+
+    OpenXPKI::Exception->throw(
+        message =>
+          "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT",
+        params => {
+            VALIDITYFORMAT => $validityformat,
+            VALIDITY       => $validity,
+        },
+    );
 }
 
-sub _parse_date_utc{
+sub _parse_date_utc {
     my $date_string = shift;
-    
-    my ($ss,$mm,$hh,$day,$month,$year,$zone) = strptime($date_string);
-    $month++;
-    $year+= 1900;
-    return DateTime->new(
-    		(
-    		  year       => $year,
-              month      => $month,
-              day        => $day,
-              hour       => $hh,
-              minute     => $mm,
-              second     => $ss,
-              time_zone  => $zone,
-    		),
-    		time_zone => 'UTC',
-    		);
-}
 
+    my ( $ss, $mm, $hh, $day, $month, $year, $zone ) = strptime($date_string);
+    $month++;
+    $year += 1900;
+    return DateTime->new(
+        (
+            year      => $year,
+            month     => $month,
+            day       => $day,
+            hour      => $hh,
+            minute    => $mm,
+            second    => $ss,
+            time_zone => $zone,
+        ),
+        time_zone => 'UTC',
+    );
+}
 
 sub is_relative {
     my $datestring = shift;
@@ -261,6 +264,10 @@ terse date string.
 
 'days': the specified validity is interpreted as an integer number of days
 (positive or negative) as an offset to the reference date.
+
+=item * 
+
+'epoch': the specified validity is a unix epoch, used as absolute date.
 
 =back
 
