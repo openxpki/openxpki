@@ -9,7 +9,7 @@ use OpenXPKI::Client;
 use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
 
-diag("Certificate revocation request workflow\n");
+diag("Certificate revocation request workflow\n") if $ENV{VERBOSE};
 
 # reuse the already deployed server
 my $instancedir = 't/60_workflow/test_instance';

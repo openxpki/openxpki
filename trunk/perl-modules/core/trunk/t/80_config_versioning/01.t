@@ -16,7 +16,7 @@ my $NUMBER_OF_TESTS = 26;
 # do not use test numbers because forking destroys all order
 Test::More->builder()->use_numbers(0);
 
-diag("Config versioning\n");
+diag("Config versioning\n") if $ENV{VERBOSE};
 print "1..$NUMBER_OF_TESTS\n";
 
 my $instancedir = 't/80_config_versioning/test_instance';
@@ -318,6 +318,6 @@ else {
     eval {
         $msg = $client->send_receive_service_msg('LOGOUT');
     };
-    diag "Terminated connection";
+    diag "Terminated connection" if $ENV{VERBOSE};
     exit 0;
 }

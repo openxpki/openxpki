@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 plan tests => 6;
 
-diag "OpenXPKI::Server::DBI: Performance (planned)\n";
+diag "OpenXPKI::Server::DBI: Performance (planned)\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::DBI;
 

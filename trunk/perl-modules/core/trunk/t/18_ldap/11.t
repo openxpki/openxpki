@@ -43,7 +43,7 @@ $realm->{ldap_password} = 'secret';
 
 plan tests => 2;
 
-diag "LDAP CONNECT/DISCONNECT VALIDATION\n";
+diag "LDAP CONNECT/DISCONNECT VALIDATION\n" if $ENV{VERBOSE};
 
 
  my $utils = OpenXPKI::LdapUtils->new();

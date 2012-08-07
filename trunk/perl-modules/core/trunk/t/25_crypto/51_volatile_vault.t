@@ -1,7 +1,7 @@
-use Test;
+use Test::More;
 BEGIN { plan tests => 27 };
 
-print STDERR "OpenXPKI::Crypto::VolatileVault\n";
+print STDERR "OpenXPKI::Crypto::VolatileVault\n" if $ENV{VERBOSE};
 
 use English;
 

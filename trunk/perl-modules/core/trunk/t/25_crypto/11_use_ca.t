@@ -5,7 +5,7 @@ use English;
 use Test::More;
 plan tests => 20;
 
-diag "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n";
+diag "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
@@ -26,6 +26,9 @@ our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
 is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 19 if $EVAL_ERROR;
 
 ## parameter checks for TokenManager init
 
@@ -370,5 +373,7 @@ eval
                           FORCE    => 1);
 };
 ok($crl, 'CRL creation') or diag "Exception: $EVAL_ERROR";
+
+}
 
 1;

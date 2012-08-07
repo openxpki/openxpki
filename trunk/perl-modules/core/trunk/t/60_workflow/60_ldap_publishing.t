@@ -80,7 +80,7 @@ if( !( -f $semaphore_file) ) {
     plan tests =>  $test_number;
 };
 
-diag("LDAP Publishing\n");
+diag("LDAP Publishing\n") if $ENV{VERBOSE};
 
 
 # here we stop the SERVER launched before
@@ -304,7 +304,7 @@ $testldap->unbind;
 eval {
     $msg = $client->send_receive_service_msg('LOGOUT');
 };
-diag "Terminated connection";
+diag "Terminated connection" if $ENV{VERBOSE};
 
 
 #   Here we stop the server

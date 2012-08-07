@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 plan tests => 6;
 
-diag "OpenXPKI::Server::DBI: Quoting bug\n";
+diag "OpenXPKI::Server::DBI: Quoting bug\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::DBI;
 use OpenXPKI::Crypto::X509;

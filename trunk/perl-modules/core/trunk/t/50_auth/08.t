@@ -4,7 +4,7 @@ use English;
 use Test::More;
 plan tests => 7;
 
-diag "OpenXPKI::Server::ACL Performance\n";
+diag "OpenXPKI::Server::ACL Performance\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
@@ -56,7 +56,7 @@ ok (1);
 my $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $items / $result;
 $result =~ s/\..*$//;
-diag " - $result checks/second (minimum: 10.000 per second)\n";
+diag " - $result checks/second (minimum: 10.000 per second)\n" if $ENV{VERBOSE};
 ok($result);
 
 1;

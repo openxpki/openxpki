@@ -2,10 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 use Encode;
+use English;
 
 plan tests => 26;
 
-print STDERR "OpenXPKI::Crypto::X509\n";
+print STDERR "OpenXPKI::Crypto::X509\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::X509;
@@ -20,7 +21,12 @@ our $cacert;
 our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 25 if $EVAL_ERROR;
+
+
 
 ## parameter checks for TokenManager init
 
@@ -142,7 +148,7 @@ ok (1);
 my $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $items / $result;
 $result =~ s/\..*$//;
-print STDERR " - $result certs/second (minimum: 100 per second)\n";
+print STDERR " - $result certs/second (minimum: 100 per second)\n" if $ENV{VERBOSE};
 ## ok ($result > 100);
 ok($result);
 
@@ -173,4 +179,5 @@ for (my $i=0; $i < scalar @example; $i++)
     }
 }
 
+}
 1;

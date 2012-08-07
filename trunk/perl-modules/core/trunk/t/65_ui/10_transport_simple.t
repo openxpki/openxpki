@@ -1,11 +1,11 @@
 
 use strict;
 use warnings;
-use Test;
+use Test::More;
 
 BEGIN { plan tests => 7 };
 
-print STDERR "OpenXPKI::Transport::Simple\n";
+print STDERR "OpenXPKI::Transport::Simple\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Transport::Simple;
 ok(1);

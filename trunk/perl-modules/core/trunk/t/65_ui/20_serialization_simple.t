@@ -8,7 +8,7 @@ use utf8; # otherwise the utf8 tests does not work
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::Simple' ); }
 
-print STDERR "OpenXPKI::Serialization::Simple\n";
+print STDERR "OpenXPKI::Serialization::Simple\n" if $ENV{VERBOSE};
 
 # test illegal separators
 eval

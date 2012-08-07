@@ -98,7 +98,7 @@ my $test_number = scalar (keys %cert_dns);
 plan tests => $test_number;
 
 
-diag "GET SUFFIX VALIDATION\n";
+diag "GET SUFFIX VALIDATION\n" if $ENV{VERBOSE};
 
 if($ENV{DEBUG}){
     diag( "NUMBER OF TESTS >" . $test_number . "<\n");

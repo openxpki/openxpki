@@ -12,7 +12,7 @@ use OpenXPKI;
 
 plan tests => 1;
 
-diag "BASE CONFIG: REPAIR CONFIG\n";
+diag "BASE CONFIG: REPAIR CONFIG\n" if $ENV{VERBOSE};
 
 ## fix configuration files if needed
 

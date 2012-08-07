@@ -60,7 +60,7 @@ plan tests =>  $test_number;
 #		     - dummy realm creation for tests without ldap
 my $index=1;
 
-diag "Ldap server initialization\n";
+diag "Ldap server initialization\n" if $ENV{VERBOSE};
 
 
 #### START of SKIP block - we skip the rest if something goes wrong

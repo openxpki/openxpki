@@ -4,7 +4,7 @@ use English;
 use Test::More;
 plan tests => 8;
 
-diag "OpenXPKI::Server::Authentication::Password\n";
+diag "OpenXPKI::Server::Authentication::Password\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {

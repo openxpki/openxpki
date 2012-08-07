@@ -6,7 +6,7 @@ plan tests => 20;
 
 use_ok('OpenXPKI::Debug');
 
-diag "Use without specifying package name";
+diag "Use without specifying package name" if $ENV{VERBOSE};
 # check that everything works the same without specifying our name in
 # use OpenXPKI::Debug ...
 my $stderr = `perl -It/08_debug t/08_debug/main.pl TestModuleUseWithout.pm 1 2>&1`;

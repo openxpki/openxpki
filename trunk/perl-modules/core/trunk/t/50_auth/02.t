@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use English;
-use Test;
+use Test::More;
 BEGIN { plan tests => 2 };
 
-print STDERR "OpenXPKI::Server::Authentication\n";
+print STDERR "OpenXPKI::Server::Authentication\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;

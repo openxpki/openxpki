@@ -116,7 +116,7 @@ diag( "NUMBER OF TESTS >" . $test_number . "<\n");
 
 plan tests => $test_number;
 
-diag "ADD LDAP NODE VALIDATION\n";
+diag "ADD LDAP NODE VALIDATION\n" if $ENV{VERBOSE};
 
 #------------------- Call utils -----------------------------------------
 

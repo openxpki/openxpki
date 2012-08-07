@@ -4,7 +4,7 @@ use English;
 use Test::More;
 plan tests => 3;
 
-diag "OpenXPKI::Server::Authentication::Anonymous\n";
+diag "OpenXPKI::Server::Authentication::Anonymous\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;

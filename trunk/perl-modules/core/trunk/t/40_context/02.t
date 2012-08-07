@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test;
+use Test::More;
 use Data::Dumper;
 use Scalar::Util qw( blessed );
 
@@ -12,7 +12,7 @@ use OpenXPKI::Exception;
 
 BEGIN { plan tests => 19 };
 
-print STDERR "OpenXPKI::Server::Context - pki_realm\n";
+print STDERR "OpenXPKI::Server::Context - pki_realm\n" if $ENV{VERBOSE};
 ok(1);
 
 ## init Context

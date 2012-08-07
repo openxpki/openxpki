@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
+use English;
 plan tests => 16;
 
-print STDERR "OpenXPKI::Crypto::CRL\n";
+print STDERR "OpenXPKI::Crypto::CRL\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::CRL;
@@ -14,7 +15,12 @@ our $cacert;
 our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 15 if $EVAL_ERROR;
+
+
 
 ## parameter checks for TokenManager init
 
@@ -71,8 +77,9 @@ ok (1);
 my $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $items / $result;
 $result =~ s/\..*$//;
-print STDERR " - $result CRLs/second (minimum: 100 per second)\n";
+print STDERR " - $result CRLs/second (minimum: 100 per second)\n" if $ENV{VERBOSE};
 #ok ($result > 100);
 ok ($result);
 
+}
 1;

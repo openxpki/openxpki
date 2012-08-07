@@ -11,7 +11,7 @@ use OpenXPKI::Serialization::Simple;
 use File::Copy;
 use Cwd;
 
-diag("Certificate signing workflow\n");
+diag("Certificate signing workflow\n") if $ENV{VERBOSE};
 
 my $instancedir = 't/60_workflow/test_instance';
 my $socketfile = $instancedir . '/var/openxpki/openxpki.socket';

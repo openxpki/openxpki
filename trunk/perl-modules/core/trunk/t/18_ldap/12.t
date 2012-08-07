@@ -214,7 +214,7 @@ if($ENV{DEBUG}){
 
 plan tests => $test_number;
 
-diag " LDAP ADD BRANCH VALIDATION\n";
+diag " LDAP ADD BRANCH VALIDATION\n" if $ENV{VERBOSE};
 
 #------------------------------------------------------------------ Go
  my $utils = OpenXPKI::LdapUtils->new();

@@ -57,7 +57,7 @@ if($ENV{DEBUG}){
 
 plan tests => $test_number;
 
-diag "CHECK LDAP NODE VALIDATION\n";
+diag "CHECK LDAP NODE VALIDATION\n" if $ENV{VERBOSE};
 
 #------------------------------------------------------------------ Go
  my $utils = OpenXPKI::LdapUtils->new();

@@ -8,7 +8,7 @@ use English;
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::JSON' ); }
 
-print STDERR "OpenXPKI::Serialization::JSON\n";
+print STDERR "OpenXPKI::Serialization::JSON\n" if $ENV{VERBOSE};
 
 SKIP: {
     my $ref = OpenXPKI::Serialization::JSON->new();

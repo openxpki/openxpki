@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use Test;
+use Test::More;
 use OpenXPKI::DN;
 use Time::HiRes;
 
@@ -21,7 +21,7 @@ my @example = (
 
 BEGIN { plan tests => 11 };
 
-print STDERR "PERFORMANCE VALIDATION\n";
+print STDERR "PERFORMANCE VALIDATION\n" if $ENV{VERBOSE};
 
 print "Loading configuration ...\n";
 my $debug = 0;
@@ -72,7 +72,7 @@ test($debug, $count);
 my $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $tests / $result;
 $result =~ s/\..*$//;
-print STDERR " - $result names/second (minimum: 1000 per second)\n";
+print STDERR " - $result names/second (minimum: 1000 per second)\n" if $ENV{VERBOSE};
 #if ($result < 1000)
 if ($result)
 {

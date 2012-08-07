@@ -14,7 +14,7 @@ use Time::HiRes;
 use Data::Dumper;
 #use GraphViz::Data::Structure;
 
-diag "RELATIVE CONFIGURATION INHERITANCE\n";
+diag "RELATIVE CONFIGURATION INHERITANCE\n" if $ENV{VERBOSE};
 
 ## create new object
 my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/relative.xml");

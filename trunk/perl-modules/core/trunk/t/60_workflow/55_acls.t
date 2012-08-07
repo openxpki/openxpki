@@ -9,7 +9,7 @@ use OpenXPKI::Client;
 use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
 
-diag("Workflow ACL enforcement\n");
+diag("Workflow ACL enforcement\n") if $ENV{VERBOSE};
 
 # reuse the already deployed server
 my $instancedir = 't/60_workflow/test_instance';
@@ -19,7 +19,7 @@ my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
 start_test_server({
         DIRECTORY  => $instancedir,
 });
-diag "Server started";
+diag "Server started" if $ENV{VERBOSE};
 
 CHECK_SOCKET:
 foreach my $i (1..60) {
@@ -198,7 +198,7 @@ eval {
     $msg = $client->send_receive_service_msg('LOGOUT');
 };
 undef $client;
-diag "Terminated connection";
+diag "Terminated connection" if $ENV{VERBOSE};
 
 # Login as user again and check whether we can see the approval in the context
 $client = OpenXPKI::Client->new({

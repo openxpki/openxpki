@@ -183,7 +183,7 @@ if($ENV{DEBUG}){
 
 plan tests => $test_number;
 
-diag "GET EXISTING PATH VALIDATION\n";
+diag "GET EXISTING PATH VALIDATION\n" if $ENV{VERBOSE};
 
 #------------------------------------------------------------------ Go
 

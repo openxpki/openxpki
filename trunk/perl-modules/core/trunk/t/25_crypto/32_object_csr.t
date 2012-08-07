@@ -6,7 +6,7 @@ use Encode;
 
 plan tests => 25;
 
-print STDERR "OpenXPKI::Crypto::CSR\n";
+print STDERR "OpenXPKI::Crypto::CSR\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
@@ -24,7 +24,12 @@ our $cacert;
 our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 19 if $EVAL_ERROR;
+
+
 
 ## parameter checks for TokenManager init
 
@@ -103,7 +108,7 @@ ok (1);
 my $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $items / $result;
 $result =~ s/\..*$//;
-print STDERR " - $result CSRs/second (minimum: 100 per second)\n";
+print STDERR " - $result CSRs/second (minimum: 100 per second)\n" if $ENV{VERBOSE};
 #ok ($result > 100);
 ok ($result);
 
@@ -144,4 +149,5 @@ for (my $i=0; $i < scalar @example; $i++)
     }
 }
 
+}
 1;

@@ -12,7 +12,7 @@ use OpenXPKI::Exception;
 
 plan tests => 11;
 
-diag "OpenXPKI::Server::Context - global context entries\n";
+diag "OpenXPKI::Server::Context - global context entries\n" if $ENV{VERBOSE};
 
 ## init Context
 ok(OpenXPKI::Server::Init::init(

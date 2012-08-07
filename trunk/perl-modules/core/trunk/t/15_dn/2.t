@@ -7,7 +7,7 @@
 
 use strict;
 use warnings;
-use Test;
+use Test::More;
 use OpenXPKI::DN;
 
 my %example = (
@@ -64,7 +64,7 @@ my %example = (
 
 BEGIN { plan tests => 42 };
 
-print STDERR "OUTPUT VALIDATION\n";
+print STDERR "OUTPUT VALIDATION\n" if $ENV{VERBOSE};
 
 foreach my $dn (keys %example)
 {

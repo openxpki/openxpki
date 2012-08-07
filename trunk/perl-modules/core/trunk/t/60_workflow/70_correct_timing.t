@@ -6,7 +6,7 @@ use DateTime;
 
 use OpenXPKI::Server::Workflow::Condition::CorrectTiming;
 
-print "Running tests for CorrectTiming...\n";
+print "Running tests for CorrectTiming...\n" if $ENV{VERBOSE};
 
 plan tests => 5;
 

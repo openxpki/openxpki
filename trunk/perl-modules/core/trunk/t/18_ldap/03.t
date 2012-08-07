@@ -292,7 +292,7 @@ foreach my $schema_profile ( @{$schema_profiles} ) {
 
     plan tests => $test_number;
 
-    diag "LDAP NODE ATTRIBUTES BUILDING VALIDATION\n";
+    diag "LDAP NODE ATTRIBUTES BUILDING VALIDATION\n" if $ENV{VERBOSE};
 
     for( my $i=0; $i < $test_number ;$i++) {
 

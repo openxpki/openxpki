@@ -56,7 +56,7 @@ foreach my $cadir (qw( ca1 ca2 cagost canciph )) {
 ## 2 * number of files
 plan tests => (scalar @files) * 2;
 
-diag "OpenXPKI::Crypto Cleanup\n";
+diag "OpenXPKI::Crypto Cleanup\n" if $ENV{VERBOSE};
 
 foreach my $filename (@files)
 {

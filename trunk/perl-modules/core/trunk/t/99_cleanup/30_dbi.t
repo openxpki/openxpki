@@ -11,7 +11,7 @@ my @files = qw( t/30_dbi/sqlite.db
 
 plan tests => (scalar @files) * 2;
 
-diag "OpenXPKI::Server::DBI Cleanup\n";
+diag "OpenXPKI::Server::DBI Cleanup\n" if $ENV{VERBOSE};
 
 foreach my $filename (@files)
 {

@@ -4,7 +4,7 @@ use English;
 use Test::More;
 plan tests => 4;
 
-diag "OpenXPKI::Server::Authentication::External (static role)\n";
+diag "OpenXPKI::Server::Authentication::External (static role)\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;

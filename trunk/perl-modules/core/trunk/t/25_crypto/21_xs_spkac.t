@@ -4,7 +4,7 @@ use English;
 use Test::More;
 plan tests => 13;
 
-diag "OpenXPKI::Crypto::Backend::OpenSSL::SPKAC\n";
+diag "OpenXPKI::Crypto::Backend::OpenSSL::SPKAC\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
@@ -18,7 +18,10 @@ our $basedir;
 our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
-is($EVAL_ERROR, '', 'common.pl evaluation');
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 12 if $EVAL_ERROR;
 
 ## parameter checks for TokenManager init
 
@@ -61,4 +64,5 @@ foreach my $func ("pubkey_algorithm", "pubkey", "keysize", "modulus", "exponent"
     diag "$func: $result\n" if ($ENV{DEBUG});
 }
 
+}
 1;

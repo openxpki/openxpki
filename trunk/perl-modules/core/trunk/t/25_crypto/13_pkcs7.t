@@ -1,9 +1,10 @@
 use strict;
 use warnings;
-use Test;
+use Test::More;
+use English;
 BEGIN { plan tests => 10 };
 
-print STDERR "OpenXPKI::Crypto::Command: PKCS#7 tests\n";
+print STDERR "OpenXPKI::Crypto::Command: PKCS#7 tests\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Debug;
 ##$OpenXPKI::Debug::LEVEL{'.*'} = 100;
@@ -15,7 +16,10 @@ our $basedir;
 our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 9 if $EVAL_ERROR;
 
 ## parameter checks for TokenManager init
 
@@ -90,4 +94,5 @@ $result = $token->command ({COMMAND => "pkcs7_get_chain",
 ok(1);
 print STDERR "PKCS#7 get_chain: $result\n" if ($ENV{DEBUG});
 
+}
 1;

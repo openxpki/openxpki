@@ -1,9 +1,10 @@
 use strict;
 use warnings;
-use Test;
+use Test::More;
+use English;
 BEGIN { plan tests => 24 };
 
-print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::X509\n";
+print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::X509\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
 
@@ -12,7 +13,10 @@ our $basedir;
 our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 23 if $EVAL_ERROR;
 
 ## parameter checks for TokenManager init
 
@@ -63,4 +67,5 @@ foreach my $func ("version", "serial", "subject", "openssl_subject", "issuer",
     }
 }
 
+}
 1;

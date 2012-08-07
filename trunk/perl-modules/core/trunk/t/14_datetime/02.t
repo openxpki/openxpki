@@ -5,7 +5,7 @@ use Test::More;
 
 plan tests => 19;
 
-diag "DATETIME FUNCTIONS: VALIDITY COMPUTATION\n";
+diag "DATETIME FUNCTIONS: VALIDITY COMPUTATION\n" if $ENV{VERBOSE};
 
 use DateTime;
 use OpenXPKI::DateTime;

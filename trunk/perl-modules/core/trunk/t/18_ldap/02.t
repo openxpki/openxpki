@@ -136,7 +136,7 @@ my $utils=OpenXPKI::LdapUtils->new();
 
 plan tests => $test_number + 2 +      2 +       1;
 
-diag "CONNECT TO LDAP SERVER VALIDATION\n";
+diag "CONNECT TO LDAP SERVER VALIDATION\n" if $ENV{VERBOSE};
 
 #--------------------------------------------------REGULAR CONNECTIONS
 foreach my $connection_type ( @{$connections} ){

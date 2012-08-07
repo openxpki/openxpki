@@ -10,7 +10,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::X509;
 
-diag("Password safe workflow\n");
+diag("Password safe workflow\n") if $ENV{VERBOSE};
 
 # reuse the already deployed server
 my $instancedir = 't/60_workflow/test_instance';
@@ -141,4 +141,4 @@ is($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{_passwords}->{'test'}, 'dummy2', 'Pas
 eval {
     $msg = $client->send_receive_service_msg('LOGOUT');
 };
-diag "Terminated connection";
+diag "Terminated connection" if $ENV{VERBOSE};

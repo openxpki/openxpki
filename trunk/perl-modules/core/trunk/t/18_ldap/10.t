@@ -43,7 +43,7 @@ $realm->{ldap_password} = 'secret';
 
 plan tests => 2;
 
-diag "RESET ERROR VALIDATION\n";
+diag "RESET ERROR VALIDATION\n" if $ENV{VERBOSE};
 
 
  my $utils = OpenXPKI::LdapUtils->new();

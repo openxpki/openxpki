@@ -6,7 +6,7 @@ use English;
 
 plan tests => 50;
 
-diag "OpenXPKI::Server::DBI: Queries with constraints and joins\n";
+diag "OpenXPKI::Server::DBI: Queries with constraints and joins\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::DBI;
 # use Smart::Comments;

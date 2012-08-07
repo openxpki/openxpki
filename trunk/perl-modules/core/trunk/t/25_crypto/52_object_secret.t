@@ -2,7 +2,7 @@ use Test::More tests => 31;
 use OpenXPKI::Crypto::TokenManager;
 use Data::Dumper;
 
-print STDERR "OpenXPKI::Crypto::Secret\n";
+print STDERR "OpenXPKI::Crypto::Secret\n" if $ENV{VERBOSE};
 
 use English;
 

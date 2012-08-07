@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test;
+use Test::More;
 use Data::Dumper;
 
 # use Smart::Comments;
@@ -18,7 +18,7 @@ use OpenXPKI::Exception;
 
 BEGIN { plan tests => 11 };
 
-print STDERR "OpenXPKI::Server::Context\n";
+print STDERR "OpenXPKI::Server::Context\n" if $ENV{VERBOSE};
 ok(1);
 
 `cp t/30_dbi/sqlite.db t/30_dbi/sqlite.db._backend_`;

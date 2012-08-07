@@ -73,7 +73,7 @@ my %example = (
 
 BEGIN { plan tests => 66 };
 
-diag "SYNTAX VALIDATION\n";
+diag "SYNTAX VALIDATION\n" if $ENV{VERBOSE};
 
 foreach my $dn (keys %example)
 {

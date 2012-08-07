@@ -31,7 +31,7 @@ if( !( -f $semaphore_file) ) {
     plan skip_all => "No ldap server for testing";
 };
 
-diag "OpenXPKI::Server::Authentication::LDAP\n";
+diag "OpenXPKI::Server::Authentication::LDAP\n" if $ENV{VERBOSE};
 
 # search prefix
 my $search_prefix        = 'OpenXPKI User '; 

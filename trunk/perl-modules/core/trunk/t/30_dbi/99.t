@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 plan tests => 2;
 
-diag "Cleanup\n";
+diag "Cleanup\n" if $ENV{VERBOSE};
 # FIXME: this does NOT clean up, but do we actually want
 # to clean up? We need the DB later for the server start ...
 unlink ("t/dbi/sqlite.db");

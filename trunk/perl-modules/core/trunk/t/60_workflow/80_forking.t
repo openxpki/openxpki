@@ -75,7 +75,7 @@ else
     plan tests =>  $test_number;
 };
 
-    diag("Workflow subforking\n");
+    diag("Workflow subforking\n") if $ENV{VERBOSE};
 
 # here we stop the SERVER launched before
 # 1 
@@ -269,6 +269,6 @@ is($top_flag,
 eval {
     $msg = $client->send_receive_service_msg('LOGOUT');
 };
-diag "Terminated connection";
+diag "Terminated connection" if $ENV{VERBOSE};
 
 

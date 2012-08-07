@@ -1,10 +1,11 @@
 use strict;
 use warnings;
 use English;
-use Test;
-BEGIN { plan tests => 5 };
+use Test::More;
+#BEGIN { plan tests => 5 };
+BEGIN { plan skip_all => 'SQLite is no longer in scope' };
 
-print STDERR "OpenXPKI::Server::Log: Database Initialization\n";
+print STDERR "OpenXPKI::Server::Log: Database Initialization\n" if $ENV{VERBOSE};
 
 our $dbi;
 require 't/28_log/common.pl';

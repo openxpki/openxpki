@@ -8,7 +8,7 @@ use Time::HiRes;
 
 plan tests => 4;
 
-print STDERR "SCHEMA VALIDATION\n";
+print STDERR "SCHEMA VALIDATION\n" if $ENV{VERBOSE};
 
 TODO: {
     local $TODO = 'Schema is outdated, see #1702814';

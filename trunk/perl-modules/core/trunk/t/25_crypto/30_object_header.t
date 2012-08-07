@@ -1,9 +1,10 @@
 use strict;
 use warnings;
-use Test;
+use Test::More;
+use English;
 BEGIN { plan tests => 11 };
 
-print STDERR "OpenXPKI::Crypto::Header\n";
+print STDERR "OpenXPKI::Crypto::Header\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Header;
@@ -12,7 +13,11 @@ our $cache;
 our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 10 if $EVAL_ERROR;
+
 
 ## parameter checks for TokenManager init
 
@@ -60,4 +65,5 @@ ok($header->set_attribute ("NEW_MULTI" => "abc\ndef"));
 ok($header->get_attribute ("NEW_SINGLE") eq "abc");
 ok($header->get_attribute ("NEW_MULTI") eq "abc\ndef");
 
+}
 1;

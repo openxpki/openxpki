@@ -11,7 +11,7 @@ use OpenXPKI::Client;
 use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
 
-diag("Smartcard Unblock workflow\n");
+diag("Smartcard Unblock workflow\n") if $ENV{VERBOSE};
 our $debug = 0;
 my $sleep = 0;    # set to '1' to cause pause between transactions
 

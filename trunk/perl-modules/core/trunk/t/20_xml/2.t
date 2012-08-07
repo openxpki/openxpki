@@ -1,12 +1,12 @@
 
 use strict;
 use warnings;
-use Test;
+use Test::More;
 use OpenXPKI::XML::Config;
 use Time::HiRes;
 
 BEGIN { plan tests => 4 };
-print STDERR "PERFORMANCE VALIDATION\n";
+print STDERR "PERFORMANCE VALIDATION\n" if $ENV{VERBOSE};
 ok(1);
 
 ## create new object
@@ -32,7 +32,7 @@ ok (1);
 my $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $items / $result;
 $result =~ s/\..*$//;
-print STDERR " - $result xpaths/second (minimum: 1000 per second)\n";
+print STDERR " - $result xpaths/second (minimum: 1000 per second)\n" if $ENV{VERBOSE};
 if ($result < 1000)
 {
     ok (0);

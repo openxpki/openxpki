@@ -16,7 +16,7 @@ if( not exists $ENV{NCIPHER_LIBRARY} or
 else
 {
     plan tests => 20;
-    print STDERR "OpenXPKI::Crypto::Command: Create CA and user certs and issue a CRL with nCipher\n";
+    print STDERR "OpenXPKI::Crypto::Command: Create CA and user certs and issue a CRL with nCipher\n" if $ENV{VERBOSE};
 }
 
 use OpenXPKI qw( read_file write_file );
@@ -198,7 +198,7 @@ ok (1);
 $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $items / $result;
 $result *= 60.0; 
-print STDERR " = $result signatures/minute (minimum: 5 per minute)\n";
+print STDERR " = $result signatures/minute (minimum: 5 per minute)\n" if $ENV{VERBOSE};
 #ok ($result > 17);
 ok ($result);
 

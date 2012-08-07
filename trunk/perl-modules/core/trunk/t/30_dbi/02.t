@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
-plan tests => 13;
+#plan tests => 13;
+plan skip_all => 'SQLite has been deprecated';
 
-diag "OpenXPKI::Server::DBI: CA setup and empty CRL\n";
+diag "OpenXPKI::Server::DBI: CA setup and empty CRL\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::DBI;
 use OpenXPKI::Crypto::X509;

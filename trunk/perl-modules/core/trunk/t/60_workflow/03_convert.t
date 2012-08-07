@@ -14,7 +14,7 @@ if ($ENV{DEBUG}) {
 }
 require OpenXPKI::Server::Init;
 
-diag "Testing conversion of our XML cache to Workflow XMLin datastructure";
+diag "Testing conversion of our XML cache to Workflow XMLin datastructure" if $ENV{VERBOSE};
 
 my $our_xs = XML::Simple->new(
     ForceArray   => 1,

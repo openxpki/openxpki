@@ -3,10 +3,11 @@ use warnings;
 use utf8;
 binmode STDERR, ":utf8";
 binmode STDOUT, ":utf8";
-use Test;
+use Test::More;
+use English;
 BEGIN { plan tests => 20 };
 
-print STDERR "OpenXPKI::Crypto::Command: Create user certs and issue CRLs with UTF-8 characters\n";
+print STDERR "OpenXPKI::Crypto::Command: Create user certs and issue CRLs with UTF-8 characters\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
@@ -17,7 +18,10 @@ our $cacert;
 our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 19 if $EVAL_ERROR;
 
 ## parameter checks for TokenManager init
 
@@ -125,4 +129,5 @@ for (my $i=0; $i < scalar @example; $i++)
     OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.crl.pem", CONTENT => $crl, FORCE => 1);
 }
 
+}
 1;

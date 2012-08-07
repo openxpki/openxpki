@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 binmode STDERR, ":utf8";
-use Test;
+use Test::More;
 use OpenXPKI::DN;
 
 my %example = (
@@ -38,7 +38,7 @@ my %example = (
 
 BEGIN { plan tests => 18 };
 
-print STDERR "UTF-8 VALIDATION\n";
+print STDERR "UTF-8 VALIDATION\n" if $ENV{VERBOSE};
 
 foreach my $dn (keys %example)
 {

@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
+use English;
 plan tests => 16;
 
-diag "OpenXPKI::Crypto::Command: Conversion tests\n";
+diag "OpenXPKI::Crypto::Command: Conversion tests\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (read_file);
@@ -13,7 +14,10 @@ our $basedir;
 our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 15 if $EVAL_ERROR;
 
 ## parameter checks for TokenManager init
 
@@ -125,4 +129,5 @@ $token->command ({COMMAND => "convert_crl",
                   OUT     => "TXT"});
 ok(1);
 
+}
 1;

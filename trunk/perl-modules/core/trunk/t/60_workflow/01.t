@@ -2,14 +2,14 @@ use strict;
 use warnings;
 use English;
 use Data::Dumper;
-use Test;
+use Test::More;
 
 # use Smart::Comments;
 
 
 BEGIN { plan tests => 38 };
 
-print STDERR "OpenXPKI::Server::Workflow - Persistence\n";
+print STDERR "OpenXPKI::Server::Workflow - Persistence\n" if $ENV{VERBOSE};
 
 our $basedir;
 

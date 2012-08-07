@@ -8,7 +8,7 @@ use Net::Ping;
 
 BEGIN { plan tests => 6 };
 
-diag "CONFIGURATION INHERITANCE\n";
+diag "CONFIGURATION INHERITANCE\n" if $ENV{VERBOSE};
 
 ## create new object
 my $obj;

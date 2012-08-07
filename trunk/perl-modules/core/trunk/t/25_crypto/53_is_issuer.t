@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-plan tests => 7;
+plan tests => 8;
 
 use English;
 
@@ -10,6 +10,12 @@ use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
 eval `cat t/25_crypto/common.pl`;
+
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 7 if $EVAL_ERROR;
+
 
 my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
 ok(defined $mgmt, 'TokenManager defined');
@@ -63,3 +69,4 @@ $result = $token->command({
 
 ok($result, 'CA 1 is self-signed');
 
+}

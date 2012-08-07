@@ -2,14 +2,15 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 6;
+#plan tests => 6;
+plan skip_all => 'SQLite is no longer in scope';
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
 }
 
-diag "OpenXPKI::Server::Log: interface of log function\n";
+diag "OpenXPKI::Server::Log: interface of log function\n" if $ENV{VERBOSE};
 use OpenXPKI::Server::Log;
 
 our $log;

@@ -7,7 +7,7 @@ use Data::Dumper;
 
 plan tests => 5;
 
-diag "get_xpath_hashref\n";
+diag "get_xpath_hashref\n" if $ENV{VERBOSE};
 
 ## create new object
 my $obj;

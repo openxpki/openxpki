@@ -1,13 +1,13 @@
 
 use strict;
 use warnings;
-use Test;
+use Test::More;
 use OpenXPKI::XML::Config;
 use Time::HiRes;
 
 BEGIN { plan tests => 3 };
 
-print STDERR "SYNTAX VALIDATION\n";
+print STDERR "SYNTAX VALIDATION\n" if $ENV{VERBOSE};
 ok(1);
 
 ## create new object

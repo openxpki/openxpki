@@ -4,7 +4,7 @@ use English;
 use Test::More;
 plan tests => 5;
 
-diag "OpenXPKI::Server::ACL Correctness\n";
+diag "OpenXPKI::Server::ACL Correctness\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;

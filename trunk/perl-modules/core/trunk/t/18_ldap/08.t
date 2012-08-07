@@ -109,7 +109,7 @@ if($ENV{DEBUG}){
 };
 plan tests => $test_number;
 
-diag "DELETE NODE ERROR MESSAGES VALIDATION\n";
+diag "DELETE NODE ERROR MESSAGES VALIDATION\n" if $ENV{VERBOSE};
 
 #------------------- Call utils -----------------------------------------
 

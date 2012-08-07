@@ -11,7 +11,7 @@ require OpenXPKI::XML::Config;
 
 plan tests => 8;
 
-print STDERR "XINCLUDE SUPPORT\n";
+print STDERR "XINCLUDE SUPPORT\n" if $ENV{VERBOSE};
 
 ## create new object
 my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/top.xml");

@@ -210,7 +210,7 @@ if($ENV{DEBUG}){
 
 plan tests => $test_number;
 
-diag "ADD NODE ERROR MESSAGES VALIDATION\n";
+diag "ADD NODE ERROR MESSAGES VALIDATION\n" if $ENV{VERBOSE};
 
 #------------------- Call utils -----------------------------------------
 

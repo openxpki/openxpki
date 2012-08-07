@@ -1,9 +1,10 @@
 use strict;
 use warnings;
-use Test;
+use Test::More;
+use English;
 BEGIN { plan tests => 12 };
 
-print STDERR "OpenXPKI::Crypto::PKCS7\n";
+print STDERR "OpenXPKI::Crypto::PKCS7\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (read_file);
@@ -15,7 +16,12 @@ our $cacert;
 our $basedir;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+
+SKIP: {
+    skip 'crypt init failed', 11 if $EVAL_ERROR;
+
+
 
 ## parameter checks for TokenManager init
 
@@ -97,8 +103,9 @@ ok (1);
 $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $items / $result;
 $result =~ s/\..*$//;
-print STDERR " - $result signatures/second (minimum: 1000 per minute)\n";
+print STDERR " - $result signatures/second (minimum: 1000 per minute)\n" if $ENV{VERBOSE};
 #ok ($result > 17);
 ok ($result);
 
+}
 1;

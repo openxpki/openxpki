@@ -4,7 +4,7 @@ use English;
 use Test::More;
 plan tests => 4;
 
-print STDERR "OpenXPKI::Server::Authentication::External (dynamic role)\n";
+print STDERR "OpenXPKI::Server::Authentication::External (dynamic role)\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;

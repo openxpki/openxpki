@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use English;
-use Test;
+use Test::More;
 BEGIN { plan tests => 24 };
 
-print STDERR "OpenXPKI::Server::Session\n";
+print STDERR "OpenXPKI::Server::Session\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::Session;
 ok(1);

@@ -4,12 +4,12 @@ use Test::More 'no_plan';
 eval "use Test::Pod::Coverage 1.00";
 plan skip_all => "Test::Pod::Coverage 1.00 required for testing POD coverage" if $@;
 my @files = Test::Pod::Coverage::all_modules();
-diag "Check the POD coverage in ".scalar @files." files\n";
+diag "Check the POD coverage in ".scalar @files." files\n" if $ENV{VERBOSE};
 
 TODO: {
     local $TODO = 'We need a lot more code documentation ...';
     foreach my $module (@files) {
-            diag "Testing POD coverage for $module";
+            diag "Testing POD coverage for $module" if $ENV{VERBOSE};
             pod_coverage_ok($module, "$module is covered" );
     }
 }

@@ -10,7 +10,7 @@ use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
 
 # this is needed because we need to manually output the number of tests run
-diag("CSR with cert issuance workflow forking\n");
+diag("CSR with cert issuance workflow forking\n") if $ENV{VERBOSE};
 
 # reuse the already deployed server
 my $instancedir = 't/60_workflow/test_instance';

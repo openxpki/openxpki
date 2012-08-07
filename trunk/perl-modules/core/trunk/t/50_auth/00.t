@@ -62,7 +62,7 @@ plan tests =>  $test_number;
 #------------------- $index will store the number of performed tests.
 my $index=0;
 
-diag "Ldap server initialization\n";
+diag "Ldap server initialization\n" if $ENV{VERBOSE};
 
 
 #### START of SKIP block - we skip the rest if something goes wrong
