@@ -54,8 +54,9 @@ $test->connect_ok(
 
 
 my %wfparam = (
-    crl_validity=>'+0001',
-    delta_crl => 0	
+    #crl_validity=>'+000014',
+    force_issue => 1,
+    delta_crl => 0, # not supported yet	
 );
     
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE' , \%wfparam, 'Create CRL Workflow')

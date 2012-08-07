@@ -452,20 +452,16 @@ status field of the certificate status table back to ISSUED immediately.
 
 =item cert_identifier
 
-
 =head2 issueCRL
 
 Trigger issue of the crl and write it into the "crl" parameter.
-crl_validity must be a valid OpenXPKI::DateTime specification. The parameter 
-is optional and defaults to the one given in the ca profile.    
+The parameter ca_alias contains the alias name of the ca token.
 
 =head3 Input
 
 =over
 
-=item crl_validity
-
-=item delta_crl (boolean)
+=item ca_alias
 
 =back
 

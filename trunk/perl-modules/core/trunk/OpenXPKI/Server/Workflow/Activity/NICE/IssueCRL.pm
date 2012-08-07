@@ -25,7 +25,14 @@ sub execute {
 
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
     
-    my $set_context = $nice_backend->issueCRL( $context->param( 'crl_validity' ), $context->param( 'delta_crl' ) );
+    my $ca_alias = $context->param( 'ca_alias' );
+    if (!$ca_alias) {
+       OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_NICE_CRLISSUANCE_NO_CA_ID",
+        );
+    }
+       
+    my $set_context = $nice_backend->issueCRL( $ca_alias );
         
     ##! 64: 'Setting Context ' . Dumper $set_context       
     while (my ($key, $value) = each(%$set_context)) {

@@ -181,7 +181,8 @@ sub get_token_alias_by_group {
 =head2 get_certificate_for_alias( { ALIAS } )
 
 Find the certificate for the give alias. Returns a hashref with the 
-PEM encoded certificate (DATA), Subject (SUBJECT) and Identifier (IDENTIFIER).
+PEM encoded certificate (DATA), Subject (SUBJECT), Identifier (IDENTIFIER)
+and NOTBEFORE/NOTAFTER as epoch
 
 =cut
 
@@ -204,7 +205,9 @@ sub get_certificate_for_alias {
         COLUMNS => [
             'CERTIFICATE.DATA', 
             'CERTIFICATE.SUBJECT',
-            'CERTIFICATE.IDENTIFIER'            
+            'CERTIFICATE.IDENTIFIER',
+            'CERTIFICATE.NOTBEFORE',
+            'CERTIFICATE.NOTAFTER',
         ],
         JOIN => [
             [ 'IDENTIFIER', 'IDENTIFIER' ],
@@ -228,9 +231,77 @@ sub get_certificate_for_alias {
     return { 
         DATA => $certificate->{"CERTIFICATE.DATA"}, 
         SUBJECT => $certificate->{"CERTIFICATE.SUBJECT"},
-        IDENTIFIER => $certificate->{"CERTIFICATE.IDENTIFIER"} 
+        IDENTIFIER => $certificate->{"CERTIFICATE.IDENTIFIER"}, 
+        NOTBEFORE => $certificate->{'CERTIFICATE.NOTBEFORE'},
+        NOTAFTER => $certificate->{'CERTIFICATE.NOTAFTER'},
     };
  
+}
+
+=head2 list_active_aliases( { GROUP, VALIDITY } )
+
+Get an arrayref with all tokens from the given group, which are/were valid within 
+the validity period given by the VALIDITY parameter.
+Each entry of the list is a hashref holding the full alias name and the 
+certificate identifier. The list is sorted by notbefore date, starting with 
+the newest date. See get_token_alias_by_group how validity works.
+  
+=cut
+
+sub list_active_aliases {
+    
+    ##! 1: 'start'
+    my $self = shift;
+    my $keys = shift;
+    
+    my $group  = $keys->{GROUP};    
+    
+    if (!$group) {
+        OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_GROUP',
+        );        
+    }
+    
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    my %validity;             
+    foreach my $key (qw(notbefore notafter) ) {
+        if ($keys->{VALIDITY}->{NOTBEFORE}) {
+            $validity{$key} = $keys->{VALIDITY}->{uc($key)}->epoch();
+        } else {
+            $validity{$key} = time();
+        }
+    }
+      
+    my $db_results = CTX('dbi_backend')->select(
+        TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
+        COLUMNS => [ 
+            #  Necessary to use the column in ordering - FIXME: Pimp SQL Layer
+            'CERTIFICATE.NOTBEFORE',            
+            'ALIASES.ALIAS',              
+            'ALIASES.IDENTIFIER',
+        ],
+        JOIN => [
+            [ 'IDENTIFIER', 'IDENTIFIER' ],
+        ],
+        DYNAMIC => {
+            'ALIASES.PKI_REALM' => $pki_realm,
+            'ALIASES.GROUP_ID' => $group,              
+            'CERTIFICATE.NOTBEFORE' => { VALUE => $validity{notbefore}, OPERATOR => 'LESS_THAN' },
+            'CERTIFICATE.NOTAFTER' => { VALUE => $validity{notafter}, OPERATOR => 'GREATER_THAN' },                          
+        },
+        'ORDER' => [ 'CERTIFICATE.NOTBEFORE' ],
+        'REVERSE' => 1,
+    );
+    
+    my @token;
+    foreach my $entry (@{ $db_results }) {
+        push @token, { ALIAS => $entry->{'ALIASES.ALIAS'}, IDENTIFIER => $entry->{'ALIASES.IDENTIFIER'}};
+    }
+    ##! 32: "Found tokens " . Dumper @token
+    
+    return \@token;
+    
 }
 
 1;

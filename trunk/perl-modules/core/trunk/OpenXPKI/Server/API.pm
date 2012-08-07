@@ -193,6 +193,19 @@ sub BUILD {
                 },
             },
         },
+        'list_active_aliases' => {
+            class  => 'Token',
+            params => {
+                'GROUP' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,                    
+                },
+                'VALIDITY'  => {
+                    type  => HASHREF,                    
+                    optional => 1,
+                },
+            },
+        }, 
         'get_certificate_for_alias' => {
             class  => 'Token',
             params => {

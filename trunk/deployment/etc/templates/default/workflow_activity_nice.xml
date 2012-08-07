@@ -19,9 +19,6 @@
   <action name="I18N_OPENXPKI_WF_ACTION_NICE_CHECK_FOR_REVOCATION"
 	  class="OpenXPKI::Server::Workflow::Activity::NICE::CheckForRevocation">
   </action>    
-    
-  <action name="I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CRL"
-	  class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCRL">
-  </action>    
+
 
 </actions>

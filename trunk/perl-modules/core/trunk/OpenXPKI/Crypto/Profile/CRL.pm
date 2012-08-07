@@ -2,6 +2,10 @@
 # Written 2005 by Michael Bell for the OpenXPKI project
 # Copyright (C) 2005-2006 by The OpenXPKI Project
 
+=head1 Name
+OpenXPKI::Crypto::Profile::CRL - cryptographic profile for CRLs.
+=cut
+
 use strict;
 use warnings;
 
@@ -19,6 +23,29 @@ use DateTime;
 use Data::Dumper;
 #use Smart::Comments;
 
+
+=head2 new ( { CA, VALIDITY, CA_VALIDITY } )
+
+Create a new profile instance.
+
+=item CA
+ 
+The alias of the ca token to be used (from the alias table) 
+=item VALIDITY 
+
+optional, override validity from profile definition. 
+Must be a hashref useable with OpenXPKI::DateTime::get_validity.
+Only relative dates are supported.
+
+=item CA_VALIDITY
+
+optional, if given the computed nextupdate is checked if it exceeds the 
+ca validity and uses the validity set in I<crl.<profile>.lastcrl>.
+Absolute dates are supported but the actual timestamp in the crl might 
+differ as it is converted to "hours from now".
+ 
+=cut
+
 sub new {
     my $that = shift;
     my $class = ref($that) || $that;
@@ -28,15 +55,10 @@ sub new {
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{PKI_REALM} = $keys->{PKI_REALM} if ($keys->{PKI_REALM});
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
     $self->{VALIDITY} =  $keys->{VALIDITY} if ($keys->{VALIDITY});
-
-    if (not $self->{PKI_REALM})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_NEW_MISSING_PKI_REALM");
-    }
+    $self->{CA_VALIDITY} =  $keys->{CA_VALIDITY} if ($keys->{CA_VALIDITY});
+  
     if (not $self->{CA})
     {
         OpenXPKI::Exception->throw (
@@ -45,19 +67,25 @@ sub new {
 
     ##! 2: "parameters ok"
 
-    $self->load_profile ();
+    $self->__load_profile ();
     ##! 2: "config loaded"
 
     return $self;
 }
 
-sub load_profile
+
+=head2 __load_profile
+Load the profile, called from constructor
+=cut
+
+sub __load_profile
 {
     my $self = shift;
 
     my $config = CTX('config');
     
     my $ca_profile_name = $self->{CA};
+    my $pki_realm = CTX('session')->get_pki_realm();
     
     my $path;
     my $validity;
@@ -80,7 +108,7 @@ sub load_profile
     } else {        
         $validity = {
             VALIDITYFORMAT => 'relativedate',
-            VALIDITY       => $config->get("$path.validity"),
+            VALIDITY       => $config->get("$path.validity.nextupdate"),
         };        
     }    
 
@@ -93,16 +121,20 @@ sub load_profile
     # for error handling
     delete $self->{PROFILE}->{DAYS};
     delete $self->{PROFILE}->{HOURS};
-
+    
+    my $notafter;
     # plain days
     if ($validity->{VALIDITYFORMAT} eq "days") {
 	   $self->{PROFILE}->{DAYS}  = $validity->{VALIDITY};
 	   $self->{PROFILE}->{HOURS} = 0;
+	   
+	   $notafter = DateTime->now( time_zone => 'UTC' )->add( days => $validity->{VALIDITY} );
     }
 
     # handle relative date formats ("+0002" for two months)
     if ($validity->{VALIDITYFORMAT} eq "relativedate") {
-        my $notafter = OpenXPKI::DateTime::get_validity($validity);
+        
+        $notafter = OpenXPKI::DateTime::get_validity($validity);
 
 	    my $hours = sprintf("%d", ($notafter->epoch() - time) / 3600);
 	    my $days = sprintf("%d", $hours / 24);
@@ -111,8 +143,10 @@ sub load_profile
 	
         $self->{PROFILE}->{DAYS}  = $days;
         $self->{PROFILE}->{HOURS} = $hours;
+        
+        
     }
-
+ 
     # only relative dates are allowed for CRLs
     if (! exists $self->{PROFILE}->{DAYS}) {
         OpenXPKI::Exception->throw (
@@ -120,6 +154,36 @@ sub load_profile
 	       params => $validity,
 	    );
     }
+    
+      
+    # Check if the CA would be valid at the next update or if its time for the "End of Life" CRL  
+    my $ca_validity = OpenXPKI::DateTime::get_validity($self->{CA_VALIDITY});
+    if ($ca_validity && $notafter > $ca_validity) {
+         my $last_crl_validity = $config->get("$path.validity.lastcrl");
+         if (!$last_crl_validity) {
+                 CTX('log')->log(
+                    MESSAGE => 'CRL for CA ' . $self->{CA}. ' in realm ' . $pki_realm . ' will be end of life before next update is scheduled!',
+                    PRIORITY => 'warn',
+                    FACILITY => [ 'monitor','audit' ],
+                );
+         } else {
+            $notafter = OpenXPKI::DateTime::get_validity({
+                VALIDITYFORMAT => 'detect',
+                VALIDITY       => $last_crl_validity,
+            });
+            my $hours = sprintf("%d", ($notafter->epoch() - time) / 3600);
+            my $days = sprintf("%d", $hours / 24);           
+            $hours = $hours % 24;        
+            $self->{PROFILE}->{DAYS}  = $days;
+            $self->{PROFILE}->{HOURS} = $hours;
+            CTX('log')->log(
+                MESSAGE => 'CRL for CA ' . $self->{CA} . ' in realm ' . $pki_realm . ' nearly EOL - will issue with last crl interval!',
+                PRIORITY => 'info',
+                FACILITY => [ 'monitor','audit' ],
+            );                
+         }
+    } 
+ 
 
     # TODO - implement crl_number (but not here ...)
     # possibly:
@@ -168,8 +232,4 @@ sub get_digest
 
 1;
 __END__
-
-=head1 Name
-
-OpenXPKI::Crypto::Profile::CRL - cryptographic profile for CRLs.
 

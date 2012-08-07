@@ -2,6 +2,12 @@
 # Written 2005 by Michael Bell for the OpenXPKI project
 # Copyright (C) 2005-2006 by The OpenXPKI Project
 
+=head1 Name
+
+OpenXPKI::Crypto::Profile::Certificate - cryptographic profile for certifcates.
+
+=cut 
+
 use strict;
 use warnings;
 
@@ -20,6 +26,19 @@ use DateTime;
 use Data::Dumper;
 # use Smart::Comments;
 
+
+=head2 new ( { CA, ID, TYPE } )
+
+Create a new profile instance, all parameters are required.
+
+=item CA 
+The alias of the ca token to be used (from the alias table) 
+=item ID 
+The name of the profile (as given in the realm.profile configuration)
+=item TYPE 
+Must be set to I<ENDENTITY>
+  
+=cut
 sub new {
     my $that = shift;
     my $class = ref($that) || $that;
@@ -33,56 +52,48 @@ sub new {
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
     $self->{ID}        = $keys->{ID}        if ($keys->{ID});
 
-    if (! defined $self->{TYPE}
-	|| (($self->{TYPE} ne 'ENDENTITY') 
-	    && ($self->{TYPE} ne 'SELFSIGNEDCA'))) {
-            OpenXPKI::Exception->throw (
-               message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_INCORRECT_TYPE",
-	           params => {
-            		TYPE      => $keys->{TYPE},
-            		CA        => $keys->{CA},
-            		ID        => $keys->{ID},
-        	    },
-	       );
+    if ($self->{TYPE} ne 'ENDENTITY') {
+        OpenXPKI::Exception->throw (
+           message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_INCORRECT_TYPE",
+           params => {
+        		TYPE      => $keys->{TYPE},
+        		CA        => $keys->{CA},
+        		ID        => $keys->{ID},
+    	    },
+       );
     }
 
     if (! defined $self->{CA}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_CA",
-	    params => {
+	        params => {
     		TYPE      => $keys->{TYPE},
     		ID        => $keys->{ID},
-	    },
-	    );
+	    });
     }
-
-
-    if ($self->{TYPE} eq 'ENDENTITY') {
+    
 	if (! defined $self->{ID}) {
 	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_ID");
+		message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_ID"
+		);
 	}
-    }
-    if ($self->{TYPE} eq 'SELFSIGNEDCA') {
-	if (defined $self->{ID}) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_ID_SPECIFIED_FOR_SELFSIGNED_CA");
-	}
-    }
-
+    
 
     ##! 2: "parameters ok"
 
-    # Why do we set CONFIG_ID as a class parameter and add it to an internal method call?
-    # This seems to be braindead for me - looks like load_profile is never used outside from here
-    # so I remove that now. - oliwel
-    $self->load_profile();
+    $self->__load_profile();
     ##! 2: "config loaded"
 
     return $self;
 }
 
-sub load_profile
+=head2 __load_profile
+
+Load the profile, called from constructor
+
+=cut
+
+sub __load_profile
 {
     my $self   = shift;
     
@@ -249,8 +260,4 @@ sub set_subject_alt_name {
 }
 1;
 __END__
-
-=head1 Name
-
-OpenXPKI::Crypto::Profile::Certificate - cryptographic profile for certifcates.
 

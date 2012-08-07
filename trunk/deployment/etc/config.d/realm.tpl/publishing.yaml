@@ -27,8 +27,9 @@ connectors:
                     sn: copy:self
                     ou: IT Department
 
-# FIXME                
     cdp:
-        class: Connector::Proxy::Net::LDAP::Single
-        LOCATION: ldap://localhost:389
+        class: Connector::Builtin::File::Path
+        LOCATION: /tmp/
+        file: "[% ARGS %].crl"
+        content: "[% pem %]"
 

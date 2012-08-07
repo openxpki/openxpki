@@ -2,6 +2,14 @@
 # Written 2005 by Michael Bell for the OpenXPKI project
 # Copyright (C) 2005-2006 by The OpenXPKI Project
 
+=head1 Name
+OpenXPKI::Crypto::Profile::Base - base class for cryptographic profiles
+for certificates and CRLs.
+
+=head1 Description
+Base class for profiles used in the CA.
+=cut
+
 use strict;
 use warnings;
 
@@ -19,6 +27,26 @@ use Data::Dumper;
 
 # use Smart::Comments;
 
+
+=head1 Functions
+
+=head2 load_extension
+Load data from the extensions section
+
+=over
+=item * PROFILE (certificates only)
+
+Name of the profile to get the extension from.
+
+=item * CA (crl only)
+
+Name of the CA to get the extension from.
+
+=item * EXT
+
+Name of the extension to load.
+=back
+=cut
 sub load_extension
 {
     ##! 1: 'start'
@@ -427,7 +455,23 @@ sub get_named_extensions
     return grep /[^(\d+\.)]/, keys %{$self->{PROFILE}->{EXTENSIONS}};
 }
 
+=head2 process_templates
 
+Helper method to parse profile items through template toolkit.
+Expects an array of strings containing one TT Template per line.
+Available variables for substitution are 
+
+=over
+
+=item ISSUER.x Hash with the subject parts of the issuing certificate. 
+Note that each key is an array itself, even if there is only a single value in it. 
+Therefore you need to write e.g. ISSUER.OU.0 for the (first) OU entry. Its wise 
+to do urlescaping on the output, e.g. [- ISSUER.OU.0 | uri -].
+
+=item CAALIAS Alias name of the used ca (as given in the alias table)
+
+=back
+=cut
 sub process_templates {
     
     my $self = shift;
@@ -456,7 +500,8 @@ sub process_templates {
     my $issuer_info = $x509->{PARSED}->{BODY}->{SUBJECT_HASH};
        
     my %template_vars = (
-        'ISSUER' => $issuer_info,                                
+        'ISSUER' => $issuer_info,
+        'CAALIAS' => $self->{CA},
     ); 
     ##! 32: ' Template Vars ' . Dumper ( %template_vars )  
     
@@ -492,51 +537,4 @@ sub AUTOLOAD {
 1;
 __END__
 
-=head1 Name
-
-OpenXPKI::Crypto::Profile::Base - base class for cryptographic profiles
-for certificates and CRLs.
-
-=head1 Description
-
-Base class for profiles used in the CA.
-
-=head2 Subclassing
-
-...
-
-=head1 Functions
-
-=head2 process_templates
-
-Helper method to parse profile items through template toolkit.
-Expects an array of strings containing one TT Template per line.
-Available variables for substitution are 
-
-=over
-
-=item ISSUER.x Hash with the subject parts of the issuing certificate. 
-Note that each key is an array itself, even if there is only a single value in it. 
-Therefore you need to write e.g. ISSUER.OU.0 for the (first) OU entry. Its wise 
-to do urlescaping on the output, e.g. [- ISSUER.OU.0 | uri -].
-
-=back
-
-=head2 load_extension
-
-Load data from the extensions section
-
-=head3 named parameters
-
-=item * PROFILE (certificates only)
-
-Name of the profile to get the extension from.
-
-=item * CA (crl only)
-
-Name of the CA to get the extension from.
-
-=item * EXT
-
-Name of the extension to load.
-
+ 

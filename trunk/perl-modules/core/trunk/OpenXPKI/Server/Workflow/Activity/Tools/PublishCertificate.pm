@@ -26,7 +26,7 @@ sub execute {
 
     if (!$self->param('prefix')) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISH_CERTIFICATE_NO_PREFIX'
+            message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATE_NO_PREFIX'
         );
     }
      

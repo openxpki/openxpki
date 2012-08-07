@@ -2,7 +2,17 @@
 # You can have a profile for each ca, if no profile with the name
 # of the ca is found, we fall back to this default profile
 
-validity: +000014
+# Validity control for the crl
+validity: 
+    # validity interval used while the ca is active (relative date!)
+    nextupdate: +000014
+    
+    # how long before next update a new crl should be issued
+    renewal: +0003
+
+    # validity of last crl issued before ca is end of life    
+    lastcrl: 20301231235900
+
 digest: sha1
 extensions:
     authority_info_access:

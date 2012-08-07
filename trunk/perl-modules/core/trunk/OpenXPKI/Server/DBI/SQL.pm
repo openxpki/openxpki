@@ -721,7 +721,7 @@ sub select {
         if (  !exists $args->{JOIN}
             || ref $args->{JOIN} ne 'ARRAY' )
         {
-            OpenXPKI::Exception->throw( message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_JOIN" );
+            OpenXPKI::Exception->throw( message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_MISSING_JOIN", params => { JOIN => $args->{JOIN} } );
         }
 
         foreach my $join ( @{ $args->{JOIN} } ) {

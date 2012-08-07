@@ -6,44 +6,43 @@
   <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_INITIAL</description>
     <action name="I18N_OPENXPKI_WF_ACTION_NICE_INIT_ISSUE_CRL" 
-	    resulting_state="DETERMINE_NEXT_CA">      
+	    resulting_state="CREATE_QUEUE">      
     </action>
   </state>  
   
-  <state name="DETERMINE_NEXT_CA" autorun="yes">
-    <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_DETERMINE_NEXT_CA</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_DETERMINE_NEXT_CA" 
-	    resulting_state="NEXT_CA_DETERMINED">
-      <!--  <condition name="ACL::start_crl_issuance"/> -->
+  <state name="CREATE_QUEUE" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CREATE_QUEUE</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_CREATE_QUEUE" 
+	    resulting_state="LOAD_NEXT_CA">      
     </action>
   </state>
-  
-  <state name="NEXT_CA_DETERMINED" autorun="yes">
-    <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_NEXT_CA_DETERMINED</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CRL"
-            resulting_state="CRL_ISSUED">
-    </action>    
-  </state>
 
-  <state name="CRL_ISSUED" autorun="yes">
-     <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_ISSUED</description>
-     <action name="I18N_OPENXPKI_WF_ACTION_PUBLISH_CRL"
-             resulting_state="CRL_PUBLISHED">
-     </action>
-  </state>
-
-  <state name="CRL_PUBLISHED" autorun="yes">
-     <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_CRL_PUBLISHED</description>
-     <action name="I18N_OPENXPKI_WF_ACTION_DETERMINE_NEXT_CA"
-             resulting_state="NEXT_CA_DETERMINED">
-        <condition name="I18N_OPENXPKI_WF_COND_CRL_SIGNING_CAS_LEFT"/>
+  <state name="LOAD_NEXT_CA" autorun="yes">  
+     <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_LOAD_NEXT_CA</description>
+     <action name="I18N_OPENXPKI_WF_ACTION_GET_NEXT_CA"
+             resulting_state="ISSUE_CRL">
+        <condition name="!I18N_OPENXPKI_WF_COND_CRL_SIGNING_NO_CAS_LEFT"/>
      </action>
      <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
              resulting_state="SUCCESS">
-        <condition name="!I18N_OPENXPKI_WF_COND_CRL_SIGNING_CAS_LEFT"/>
+        <condition name="I18N_OPENXPKI_WF_COND_CRL_SIGNING_NO_CAS_LEFT"/>
      </action>
   </state>
+     
+  <state name="ISSUE_CRL" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_ISSUE_CRL</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CRL"
+            resulting_state="PUBLISH_CRL">
+    </action>    
+  </state>
 
+  <state name="PUBLISH_CRL" autorun="yes">
+     <description>I18N_OPENXPKI_WF_STATE_CRL_ISSUANCE_PUBLISH_CRL</description>
+     <action name="I18N_OPENXPKI_WF_ACTION_CRL_ISSUANCE_PUBLISH_CRL"
+             resulting_state="LOAD_NEXT_CA">
+     </action>
+  </state>
+ 
   <state name="SUCCESS"/>
 
 </workflow>

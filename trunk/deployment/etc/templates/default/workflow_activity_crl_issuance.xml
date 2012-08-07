@@ -2,21 +2,35 @@
 
 	<action name="I18N_OPENXPKI_WF_ACTION_NICE_INIT_ISSUE_CRL"
 		class="Workflow::Action::Null">
+		<!-- flags not implemented yet! -->		
 		<field name="crl_validity"/>
+		<field name="force_issue"/>
 		<field name="delta_crl"/>
-		
 		<validator name="I18N_OPENXPKI_WF_VAL_RELATIVEDATE">
           <arg>$crl_validity</arg>
-      	</validator>
+        </validator>		
 	</action>
 
-  <action name="I18N_OPENXPKI_WF_ACTION_DETERMINE_NEXT_CA"
-	  class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::DetermineNextCA">
+  <action name="I18N_OPENXPKI_WF_ACTION_CREATE_QUEUE"
+	  class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::CreateQueue">
   </action>
-
- 
-  <action name="I18N_OPENXPKI_WF_ACTION_PUBLISH_CRL"
-        class="OpenXPKI::Server::Workflow::Activity::CRLIssuance::PublishCRL">
+    
+  <action name="I18N_OPENXPKI_WF_ACTION_GET_NEXT_CA"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
+          array_name="ca_alias_list"
+          context_key="ca_alias"
+          function="shift">
+          <field name="ca_alias_list"/>
+  </action>
+    
+  <action name="I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CRL"
+      class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCRL">
+  </action>
+  
+  <action name="I18N_OPENXPKI_WF_ACTION_CRL_ISSUANCE_PUBLISH_CRL"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL"
+        prefix="publishing.crl">
+       <field name="ca_alias" is_required="yes"/>
   </action>
 
 </actions>

@@ -226,6 +226,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCertificate.pm
+OpenXPKI/Server/Workflow/Activity/Tools/PublishCRL.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
@@ -236,10 +237,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/GetCertificateIdentifier.pm
 
-OpenXPKI/Server/Workflow/Activity/CRLIssuance/DetermineNextCA.pm
-OpenXPKI/Server/Workflow/Activity/CRLIssuance/GetCRLProfile.pm
-OpenXPKI/Server/Workflow/Activity/CRLIssuance/IssueCRL.pm
-OpenXPKI/Server/Workflow/Activity/CRLIssuance/PublishCRL.pm
+OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 
 OpenXPKI/Server/Workflow/Activity/DataExchange/PrepareEnv.pm
 OpenXPKI/Server/Workflow/Activity/DataExchange/ExportLogs.pm

@@ -36,7 +36,6 @@ sub issueCertificate {
 	my $serializer = OpenXPKI::Serialization::Simple->new();
     my $realm = CTX('session')->get_pki_realm();
     my $config = CTX('config');
-	my $config_id = $self->config_id();
 	
 	my $csr_serial = $csr->{CSR_SERIAL};
 
@@ -51,7 +50,7 @@ sub issueCertificate {
     my @subject_alt_names;
     
     my $csr_metadata = CTX('dbi_backend')->select(
-    TABLE   => 'CSR_ATTRIBUTES',
+        TABLE   => 'CSR_ATTRIBUTES',
         DYNAMIC => {
             'CSR_SERIAL' => $csr_serial,
         },
@@ -209,8 +208,6 @@ sub issueCertificate {
 	   FACILITY => [ 'audit', 'system', ],
 	);
 	
-	# We might get that from the ca token....
-	#my $ca_identifier = CTX('api')->get_certificate_for_alias( { ALIAS => $issuing_ca } );
 	
     ##! 64: 'cert: ' . $certificate
 
@@ -279,12 +276,15 @@ sub checkForRevocation{
 sub issueCRL {
         
     my $self = shift;	
-	my $crl_validity = shift;	 
-	my $delta_crl = shift;
+	my $ca_alias = shift;	 
 	
 	my $pki_realm = CTX('session')->get_pki_realm();
 	my $dbi = CTX('dbi_backend');
-	    		
+	    	
+	# FIXME - we want to have a context free api....	
+	my $crl_validity = $self->_get_context_param('crl_validity');
+	my $delta_crl = $self->_get_context_param('delta_crl');
+	
 	if ($delta_crl) {
 	    OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_CRL_NO_DELTA_CRL_SUPPORT",
@@ -293,43 +293,37 @@ sub issueCRL {
     	    
     my $serializer = OpenXPKI::Serialization::Simple->new();
     
-    my $ca_id = $self->_get_context_param('ca');		
-    my $config_id = $self->config_id();
-           
-    if (!$ca_id) {
-	   OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_NICE_CRLISSUANCE_NO_CA_ID",
+    # Build Profile (from ..Workflow::Activity::CRLIssuance::GetCRLProfile)
+    my %profile = (
+        CA  => $ca_alias,        
+    );                
+    $profile{VALIDITY} = { VALIDITYFORMAT => 'relativedate', VALIDITY => $crl_validity } if($crl_validity);
+         
+    # Load meta data of CA from the database         
+    my $ca_info = CTX('api')->get_certificate_for_alias( { ALIAS => $ca_alias } );
+                  
+    # We need the validity to check for the necessity of a "End of Life" CRL                                    
+    $profile{CA_VALIDITY} = { VALIDITYFORMAT => 'epoch', VALIDITY => $ca_info->{NOTAFTER} };
+    
+    # Get the certificate identifier to filter in the database    
+    my $ca_identifier = $ca_info->{IDENTIFIER};
+ 
+         
+    my $crl_profile = OpenXPKI::Crypto::Profile::CRL->new( %profile );    
+    ##! 16: 'profile: ' . Dumper( $crl_profile )
+    
+    my $ca_token = CTX('crypto_layer')->get_token({
+        TYPE => 'certsign',
+        NAME => $ca_alias
+    });
+
+    if (!defined $ca_token) {
+        OpenXPKI::Exception->throw(
+           message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_TOKEN_UNAVAILABLE',
         );
     }
     
-    # Build Profile (from ..Workflow::Activity::CRLIssuance::GetCRLProfile)
-    my %profile = (
-        CONFIG    => CTX('xml_config'),
-        PKI_REALM => $pki_realm,
-        CA        => $ca_id,
-        CONFIG_ID => $config_id,
-    );            
-    
-    $profile{VALIDITY} = { VALIDITYFORMAT => 'relativedate', VALIDITY => $crl_validity } if($crl_validity);
-     
-    ##! 16: 'pki_realm: ' . $pki_realm
-    my $crl_profile = OpenXPKI::Crypto::Profile::CRL->new( %profile );
-    
-    ##! 16: 'profile: ' . Dumper( $crl_profile )
-
-    # Issue (copied from ..Workflow::Activity::CRLIssuance::IssueCRL)    
-    
-    my $ca_identifier = CTX('pki_realm_by_cfg')->{$config_id}->{$pki_realm}->{ca}->{id}->{$ca_id}->{identifier};
-    my $ca_certificate = CTX('pki_realm_by_cfg')->{$config_id}->{$pki_realm}->{ca}->{id}->{$ca_id}->{certificate};
-    ##! 16: 'ca_identifier: ' . $ca_identifier
-    my $tm = CTX('crypto_layer');
-    my $ca_token = $tm->get_token(
-        TYPE      => 'CA',
-        ID        => $ca_id,
-        PKI_REALM => $pki_realm,
-        CERTIFICATE => $ca_certificate,
-    );
-   
+ 
     # we want all identifiers and data for certificates that are
     # already in the certificate database with status 'REVOKED'
 
@@ -346,9 +340,9 @@ sub issueCRL {
 
     my @cert_timestamps; # array with certificate data and timestamp
     my $already_revoked_certs = $dbi->select(
-	TABLE   => 'CERTIFICATE',
-        COLUMNS => [
-	    'CERTIFICATE_SERIAL',
+	   TABLE   => 'CERTIFICATE',
+       COLUMNS => [
+	       'CERTIFICATE_SERIAL',
             'IDENTIFIER',
 	    # 'DATA'
         ],
@@ -396,15 +390,15 @@ sub issueCRL {
     });
 
     my $crl_obj = OpenXPKI::Crypto::CRL->new(
-            TOKEN => $ca_token,
+            TOKEN => CTX('api')->get_default_token(),
             DATA  => $crl,
     );
     ##! 128: 'crl: ' . Dumper($crl)
 
     CTX('log')->log(
-	MESSAGE => 'CRL issued for CA ' . $ca_id . ' in realm ' . $pki_realm,
-	PRIORITY => 'info',
-	FACILITY => [ 'audit', 'system' ],
+    	MESSAGE => 'CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm,
+    	PRIORITY => 'info',
+    	FACILITY => [ 'audit', 'system' ],
 	);
 
 
