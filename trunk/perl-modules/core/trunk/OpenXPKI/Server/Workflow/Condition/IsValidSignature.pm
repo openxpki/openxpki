@@ -27,19 +27,14 @@ sub evaluate {
 
     my $csr_subject = $context->param('csr_subject');
     ##! 16: 'csr_subject: ' . $csr_subject
-
-     my $tm = CTX('crypto_layer');
- 
+    
      my $pkcs7 = $context->param('pkcs7_content');
      $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7 . "-----END PKCS7-----\n";
 
      ##! 32: 'pkcs7: ' . $pkcs7
-     my $pkcs7_token = $tm->get_token(
-         TYPE      => 'PKCS7',
-         ID        => $pkcs7tool,
-         PKI_REALM => $pki_realm,
-         CONFIG_ID => $config_id,
-     );
+     
+     my $pkcs7_token = CTX('crypto_layer')->get_system_token({ TYPE => 'PKCS7' });
+
      my $sig_subject = $pkcs7_token->command({
          COMMAND => 'get_subject',
          PKCS7   => $pkcs7,

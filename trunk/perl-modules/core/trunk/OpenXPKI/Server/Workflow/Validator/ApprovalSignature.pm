@@ -122,9 +122,6 @@ sub validate {
         );
     }
 
-    # Check that the signature is valid
-    my $tm = CTX('crypto_layer');
-
     my $pkcs7 = "-----BEGIN PKCS7-----\n"
               . $sig
               . "-----END PKCS7-----\n";
@@ -142,12 +139,8 @@ sub validate {
 
     my $cfg_id = CTX('api')->get_config_id({ ID => $wf_id });
     ##! 32: 'pkcs7: ' . $pkcs7
-    my $pkcs7_token = $tm->get_token(
-        TYPE      => 'PKCS7',
-        ID        => $self->pkcs7tool(),
-        PKI_REALM => $pki_realm,
-        CONFIG_ID => $cfg_id,
-    );
+    my $pkcs7_token = CTX('crypto_layer')->get_system_token({ TYPE => 'PKCS7' });
+
     $sig_text = encode('utf8', $sig_text);
     eval {
         $pkcs7_token->command({

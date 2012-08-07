@@ -455,8 +455,7 @@ sub get_token
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_TYPE");
     }
-    $name = "default" if ($type  eq "DEFAULT");
-    $name = "testcreatejavakeystore" if ($type eq 'CreateJavaKeystore');
+        
     if (not $name)
     {
         OpenXPKI::Exception->throw (
@@ -551,7 +550,7 @@ sub get_system_token {
     return $self->{TOKEN}->{system}->{$type};
     
 }
-
+ 
 sub __add_token
 {
     my $self = shift;

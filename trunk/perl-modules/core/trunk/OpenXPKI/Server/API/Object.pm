@@ -508,11 +508,8 @@ sub get_private_key_for_cert {
         }
     }
     elsif ($format eq 'JAVA_KEYSTORE') {
-        my $pki_realm = CTX('session')->get_pki_realm();
-        my $tm = CTX('crypto_layer');
-        my $token = $tm->get_token(
-            TYPE      => 'CreateJavaKeystore',
-            PKI_REALM => $pki_realm,
+        my $token = CTX('crypto_layer')->get_system_token(
+            TYPE => 'javaks',            
         );
         # get decrypted private key to pass on to create_keystore
         my @chain = $self->__get_chain_certificates({

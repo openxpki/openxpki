@@ -95,17 +95,13 @@ sub execute
         ##! 64: 'sig: ' . $sig
         ##! 64: 'sig_text: ' . $sig_text
 
-        my $tm = CTX('crypto_layer');
-
         my $pkcs7 = "-----BEGIN PKCS7-----\n"
                 . $sig
                 . "-----END PKCS7-----\n";
 
         ##! 32: 'pkcs7: ' . $pkcs7
-        my $pkcs7_token = $tm->get_token(
-            TYPE      => 'PKCS7',
-            ID        => $self->param('pkcs7tool'),
-            PKI_REALM => $pki_realm,
+        my $pkcs7_token = CTX('crypto_layer')->get_system_token(
+            TYPE      => 'PKCS7',            
         );
 
         my $signer_subject;

@@ -28,15 +28,16 @@ sub execute {
         'pkcs7tool' => $self->param('pkcs7tool'),
     );
 
-    my $tm = CTX('crypto_layer');
-
     my $pkcs7 = $context->param('pkcs7_content');
     chomp($pkcs7);
     $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7 . "\n-----END PKCS7-----\n";
     ##! 32: 'pkcs7: ' . $pkcs7
 
-    my $scep_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$pki_realm}->{scep}->{id}->{$server}->{crypto}; 
-
+    my $scep_token = CTX('crypto_layer')->get_token({
+        TYPE => 'scep',
+        NAME => CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } )
+    });
+     
     my $pkcs10 = $scep_token->command({
         COMMAND => 'get_pkcs10',
         PKCS7   => $pkcs7,

@@ -25,7 +25,6 @@ sub execute {
     my $api = CTX('api');
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $pki_realm = CTX('api')->get_pki_realm();
-    my $tm = CTX('crypto_layer');
 
     my $certs_installed = 0;
     if (defined $context->param('certs_installed')) {
