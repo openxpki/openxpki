@@ -1,3 +1,9 @@
+!!!!!!!!!!!!!
+!!!!!!!!!!!!! IMPORTANT
+!!!!!!!!!!!!!
+!!!!!!!!!!!!! OpenXPKI::Client has moved to the core
+!!!!!!!!!!!!!
+
 OpenXPKI-Client version 0.0.1
 
 This module provides a base class for communicating with the 

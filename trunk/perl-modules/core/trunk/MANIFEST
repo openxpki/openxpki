@@ -21,6 +21,10 @@ OpenXPKI/XML/Config.pm
 OpenXPKI/i18n.pm
 openxpki.xsd
 
+## Client
+OpenXPKI/Client.pm
+OpenXPKI/Client/API.pm
+
 ## Config Layers
 OpenXPKI/Config/Merge.pm 
 
