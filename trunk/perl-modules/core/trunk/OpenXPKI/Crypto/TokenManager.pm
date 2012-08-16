@@ -7,6 +7,7 @@ use strict;
 use warnings;
 use Switch;
 
+use Carp;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -456,6 +457,10 @@ sub get_token
     my $self = shift;
     my $keys = shift;
     ##! 1: "start"
+
+    if ( ref($keys) ne 'HASH' ) {
+        croak("parameter must be hash ref, but got '$keys'");
+    }
 
     #my $name   = $keys->{ID};        
     my $type   = $keys->{TYPE};
