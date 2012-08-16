@@ -10,7 +10,6 @@ use utf8;
 use strict;
 use warnings;
 use Test::More;
-use OpenXPKI::LdapUtils;
 use File::Spec;
 
 #--- check permission to run test
@@ -22,6 +21,8 @@ my $semaphore_file = File::Spec->catfile(
 if( !( -f $semaphore_file) ) {
     plan skip_all => "No ldap server for testing";
 };
+
+use_ok( 'OpenXPKI::LdapUtils' );
 
 #---------------------- C O N F I G U R A T I O N -------------------------
 my $realm={};

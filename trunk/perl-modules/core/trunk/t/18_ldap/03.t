@@ -13,7 +13,6 @@ use Test::More;
 use XML::Simple;
 use Data::Dumper;
 use File::Spec;
-use OpenXPKI::LdapUtils;
 
 #--- check permission to run test
 my $test_directory = File::Spec->catfile( 't', '18_ldap');
@@ -25,6 +24,7 @@ if( !( -f $semaphore_file) ) {
     plan skip_all => "No ldap server for testing";
 };
 
+use_ok( 'OpenXPKI::LdapUtils' );
 
 my  $utils=OpenXPKI::LdapUtils->new();
 

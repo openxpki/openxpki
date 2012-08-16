@@ -10,7 +10,6 @@ use warnings;
 use utf8;
 use File::Spec;
 use Test::More;
-use OpenXPKI::LdapUtils;
 
 #--- check permission to run test
 my $test_directory = File::Spec->catfile( 't', '18_ldap');
@@ -21,6 +20,8 @@ my $semaphore_file = File::Spec->catfile(
 if( !( -f $semaphore_file) ) {
     plan skip_all => "No ldap server for testing";
 };
+
+use_ok( 'OpenXPKI::LdapUtils' );
 
 # A hash with DN-s for tests:
 #		$dn => suffix index in @{$suffixes} ( - 1 if not found )
