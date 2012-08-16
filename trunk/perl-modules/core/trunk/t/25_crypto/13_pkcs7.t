@@ -25,10 +25,12 @@ ok(1);
 ## parameter checks for get_token
 
 my $token = $mgmt->get_token (
-    TYPE => "CA", 
-    ID => "INTERNAL_CA_1", 
-    PKI_REALM => "Test Root CA",
-    CERTIFICATE => $cacert,
+    {
+        TYPE => "CA", 
+        ID => "INTERNAL_CA_1", 
+        PKI_REALM => "Test Root CA",
+        CERTIFICATE => $cacert,
+    }
 );
 ok(1);
 

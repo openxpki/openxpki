@@ -26,8 +26,10 @@ close $TESTCERT;
 eval `cat t/25_crypto/common.pl`;
 my $tm = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
 my $default_token = $tm->get_token(
-    TYPE      => 'DEFAULT',
-    PKI_REALM => 'Test Root CA',
+    {
+        TYPE      => 'DEFAULT',
+        PKI_REALM => 'Test Root CA',
+    }
 );
 my $x509 = OpenXPKI::Crypto::X509->new(
     TOKEN => $default_token,

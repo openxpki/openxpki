@@ -34,14 +34,21 @@ ok(defined $mgmt, 'new TokenManager defined');
 
 ## parameter checks for get_token
 
-my $ca_token      = $mgmt->get_token (TYPE      => "CA",
-                                      ID        => "INTERNAL_CA_1",
-                                      PKI_REALM => "Test Root CA",
-                                      CERTIFICATE => $cacert,
+my $ca_token      = $mgmt->get_token (
+    {
+        TYPE      => "CA",
+        ID        => "INTERNAL_CA_1",
+        PKI_REALM => "Test Root CA",
+        CERTIFICATE => $cacert,
+    }
 );
 ok(defined $ca_token, 'CA Token defined');
-my $default_token = $mgmt->get_token (TYPE      => "DEFAULT",
-                                      PKI_REALM => "Test Root CA");
+my $default_token = $mgmt->get_token (
+    {
+        TYPE      => "DEFAULT",
+        PKI_REALM => "Test Root CA",
+    }
+);
 ok(defined $default_token, 'Default Token defined');
 
 ## create PIN (128 bit == 16 byte)

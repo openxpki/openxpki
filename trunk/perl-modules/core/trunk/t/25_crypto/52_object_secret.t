@@ -22,8 +22,12 @@ my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
 ok (1);
 
 
-my $default_token = $mgmt->get_token (TYPE      => "DEFAULT",
-                                      PKI_REALM => "Test Root CA");
+my $default_token = $mgmt->get_token(
+    {
+        TYPE      => "DEFAULT",
+        PKI_REALM => "Test Root CA",
+    }
+);
 ###########################################################################
 # plain secrets
 my $secret = OpenXPKI::Crypto::Secret->new();

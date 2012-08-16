@@ -17,8 +17,11 @@ ok(defined $mgmt, 'TokenManager defined');
 ## parameter checks for get_token
 
 my $token = $mgmt->get_token (
-    TYPE => "DEFAULT", 
-    PKI_REALM => "Test Root CA");
+    {
+        TYPE => "DEFAULT", 
+        PKI_REALM => "Test Root CA",
+    }
+);
 ok(defined $token, 'Default token defined');
 
 open my $CACERT1, '<', 't/25_crypto/ca1/cacert.pem';

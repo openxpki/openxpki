@@ -41,11 +41,14 @@ $cn =~ s{ INTERNAL_ }{}xms;
 my $dir = lc($cn);
 $dir =~ s{ _ }{}xms;
 
-my $ca_token = $mgmt->get_token (TYPE => "CA", 
-  		                 ID => $ca_id, 
-		                 PKI_REALM => "Test GOST Root CA",
-                                 CERTIFICATE => "dummy"
-	);
+my $ca_token = $mgmt->get_token (
+    {
+        TYPE => "CA", 
+  		ID => $ca_id, 
+		PKI_REALM => "Test GOST Root CA",
+        CERTIFICATE => "dummy",
+    }
+);
 ok (1, 'CA token');
 
 ## create CA GOST94 key (use passwd from token.xml)
@@ -122,8 +125,12 @@ if (not -e "$basedir/$dir/cacert.pem")
 #------------------------- GOST 94 -----------------------------------------
 
 ## parameter checks for get_token
-my $token = $mgmt->get_token (TYPE => "DEFAULT",
-                              PKI_REALM => "Test GOST Root CA");
+my $token = $mgmt->get_token (
+    {
+        TYPE => "DEFAULT",
+        PKI_REALM => "Test GOST Root CA",
+    }
+);
 ok (1);
 
 ## create PIN - just want to check if filter_stdout works correctly

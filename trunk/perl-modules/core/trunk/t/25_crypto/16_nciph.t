@@ -52,19 +52,26 @@ ok(-e "$basedir/$dir/certs/cacert.pem");
 my $fu = OpenXPKI::FileUtils->new();
 my $ca_cert = $fu->read_file("$basedir/$dir/certs/cacert.pem"); 
 
-my $ca_token = $mgmt->get_token (TYPE => "CA", 
-  		                 ID => $ca_id, 
-		                 PKI_REALM => "Test nCipher Root CA",
-				 CERTIFICATE => $ca_cert,
-	);
+my $ca_token = $mgmt->get_token (
+    {
+        TYPE => "CA", 
+  		ID => $ca_id, 
+		PKI_REALM => "Test nCipher Root CA",
+		CERTIFICATE => $ca_cert,
+    }
+);
 ok (1);
 
 
 #----------------------USER-----------------------------------------------
 
 ## parameter checks for get_token
-my $token = $mgmt->get_token (TYPE => "DEFAULT",
-                              PKI_REALM => "Test nCipher Root CA");
+my $token = $mgmt->get_token (
+    {
+        TYPE => "DEFAULT",
+        PKI_REALM => "Test nCipher Root CA",
+    }
+);
 ok (1);
 
 ## create PIN - just want to check if filter_stdout works correctly

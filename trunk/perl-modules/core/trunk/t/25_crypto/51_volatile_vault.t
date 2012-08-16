@@ -20,8 +20,11 @@ ok (1);
 ## parameter checks for get_token
 
 my $token = $mgmt->get_token (
-    TYPE => "DEFAULT", 
-    PKI_REALM => "Test Root CA");
+    {
+        TYPE => "DEFAULT", 
+        PKI_REALM => "Test Root CA",
+    }
+);
 ok (1);
 
 my $vault = OpenXPKI::Crypto::VolatileVault->new(

@@ -9,9 +9,12 @@ our $cache;
 require 't/25_crypto/common.pl';
 my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
 our $token = $mgmt->get_token (
-    TYPE => "DEFAULT", 
-    ID => "default", 
-    PKI_REALM => "Test Root CA");
+    {
+        TYPE => "DEFAULT", 
+        ID => "default", 
+        PKI_REALM => "Test Root CA",
+    }
+);
 ok($token, 'Default token initialized');
 
 ## prepare log system
