@@ -20,7 +20,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Server::Authentication::Anonymous;
 use OpenXPKI::Server::Authentication::External;
-use OpenXPKI::Server::Authentication::LDAP;
+#use OpenXPKI::Server::Authentication::LDAP;
 use OpenXPKI::Server::Authentication::Password;
 use OpenXPKI::Server::Authentication::X509;
 use OpenXPKI::Server::Authentication::ClientSSO;
