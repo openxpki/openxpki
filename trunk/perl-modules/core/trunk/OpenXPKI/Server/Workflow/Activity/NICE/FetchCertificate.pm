@@ -51,4 +51,8 @@ See OpenXPKI::Server::Workflow::NICE::fetchCertificate for details
 
 =head2 Output
 
+=over
+
 =item cert_identifier - the identifier of the issued certificate
+
+=back

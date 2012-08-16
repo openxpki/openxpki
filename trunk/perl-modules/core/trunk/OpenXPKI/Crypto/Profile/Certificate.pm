@@ -31,14 +31,24 @@ use Data::Dumper;
 
 Create a new profile instance, all parameters are required.
 
+=over
+
 =item CA 
+
 The alias of the ca token to be used (from the alias table) 
+
 =item ID 
+
 The name of the profile (as given in the realm.profile configuration)
+
 =item TYPE 
+
 Must be set to I<ENDENTITY>
-  
+ 
+=back
+
 =cut
+
 sub new {
     my $that = shift;
     my $class = ref($that) || $that;

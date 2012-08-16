@@ -58,10 +58,18 @@ See OpenXPKI::Server::Workflow::NICE::issueCRL for details
 
 =head2 Input
 
+=over
+
 =item crl_validity - DateTime Spec for CRL Validity, optional
 
 =item delta_crl (bool) - Issue a delta CRL (Delta CRL Support is untestet!)
 
+=back
+
 =head2 Output
 
+=over
+
 =item crl_serial - the serial number of the issued crl or I<pending>
+
+=back

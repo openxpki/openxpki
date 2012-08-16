@@ -80,10 +80,18 @@ See OpenXPKI::Server::Workflow::NICE::issueCertificate for details
 
 =head2 Input
 
+=over
+
 =item csr_serial - the serial number of the certificate signing request
 
 =item org_cert_identifier - identifier of the originating certificate
 
+=back
+
 =head2 Output
 
+=over
+
 =item cert_identifier - the identifier of the issued certificate or I<pending>
+
+=back

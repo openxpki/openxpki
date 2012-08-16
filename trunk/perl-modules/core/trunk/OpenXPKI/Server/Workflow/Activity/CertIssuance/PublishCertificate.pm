@@ -73,9 +73,13 @@ The new workflow must accept the single parameter cert_identifier.
 
 =head2 Activity parameters
 
+=over
+
 =item workflow_type 
 
 Name of the workflow that should be created
+
+=back
 
 =head2 Context parameters
 

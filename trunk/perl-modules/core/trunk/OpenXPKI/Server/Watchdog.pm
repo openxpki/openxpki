@@ -537,24 +537,32 @@ configuration.
 The namespace is I<system.watchdog>. The properties are: 
 
 =over 
+
 =item max_fork_redo
  
 default: 5
 
 =item max_exception_threshhold
+
 default: 10
 
 =item max_tries_hanging_workflows
+
 default:  3
 
 =item interval_wait_initial
+
 Seconds to wait after server start before the watchdog starts scanning. 
 default: 60;
     
 =item interval_loop_idle
+
 Seconds between two scan runs if no result was found on last run.
 default: 5
 
 =item interval_loop_run
+
 Seconds between two scan runs if a result was found on last run.
 default: 1
+
+=back

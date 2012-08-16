@@ -172,7 +172,7 @@ and I<subject> (issuer subject) holding the appropriate strings and
 I<issuer> which is the issuer subject parsed into a hash as used in the 
 template processing when issuing the certificates.  
 
-=head Configuration
+=head1 Configuration
 
 Set the C<prefix> paramater to tell the activity where to find the connector
     <action name="PUBLISH_CRL"

@@ -119,7 +119,7 @@ with the keys I<pem>, I<der> and I<subject> (full dn of the cert)
 Publication is done using the connector using a list of
 repositories. The com  
 
-=head Configuration
+=head1 Configuration
 
 Set the C<prefix> paramater to tell the activity where to find the connector
     <action name="publish_certificate"

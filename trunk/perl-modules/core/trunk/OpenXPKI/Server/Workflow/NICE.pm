@@ -369,11 +369,19 @@ See documentation of the used backend for details.
 
 =head3 Input
 
+=over
+
 =item csr - hashref containing the database entry from the csr table
+
+=back
 
 =head3 Output
 
+=over
+
 =item cert_identifier - the identifier of the issued certificate or I<pending>
+
+=back
 
 =head3 csr attributes
 
@@ -400,13 +408,21 @@ second parameter.
 
 =head3 Input
 
+=over
+
 =item csr - hashref containing the database entry from the csr table
 
 =item cert_identifier - identifier of the originating certificate
 
+=back
+
 =head3 Output
 
+=over
+
 =item cert_identifier - the identifier of the issued certificate or I<pending>
+
+=back
 
 =head2 fetchCertificate
 
@@ -418,7 +434,11 @@ If the fetch finally failed, it should unset the cert_identifier.
  	
 =head3 Output
 
+=over
+
 =item cert_identifier - the identifier of the issued certificate
+
+=back
 
 =head2 revokeCertificate
 
@@ -428,7 +448,11 @@ supported by the backend, "unspecified" should be used.
 
 =head3 Input
 
+=over
+
 =item crr_serial - the serial number of the certificate revocation request
+
+=back
 
 =head2 checkForRevocation
 
@@ -440,7 +464,11 @@ CRL or OCSP.
 
 =head3 Input
 
+=over
+
 =item cert_identifier
+
+=back
 
 =head2 unrevokeCertificate
 
@@ -450,7 +478,11 @@ status field of the certificate status table back to ISSUED immediately.
 
 =head3 Input
 
+=over
+
 =item cert_identifier
+
+=back
 
 =head2 issueCRL
 
@@ -467,8 +499,12 @@ The parameter ca_alias contains the alias name of the ca token.
 
 =head3 Output
 
+=over
+
 =item crl_serial - the serial number (key of the crl database) of the created 
 crl or I<pending>
+
+=back
 
 =head2 fetchCRL
 
@@ -497,10 +533,17 @@ in the datapool and can be retrieved later using C<__fetchPersistedCertificateIn
 
 =head3 certificate_information
 
+=over
+
 =item certificate - the PEM encoded certificate
+
 =item ca_identifier - the identifier of the issuing ca
+
 =item cert_role - the used role
+
 =item csr_serial - serial number of the processed csr
+
+=back
 
 The certificate is expected to be a x509 structure. A pkcs7 container with
 the entity certificate and its chain is also accepted.
@@ -525,7 +568,7 @@ can ommit the implementation of the second steps.
 The activity definitions in OpenXPKI::Server::Workflow::Activity::NICE::*
 show the expected usage of the API functions.
 
-=head issue/renew Certificate
+=head1 issue/renew Certificate
 
 The request information must be taken from the csr and csr_attributes t 
 

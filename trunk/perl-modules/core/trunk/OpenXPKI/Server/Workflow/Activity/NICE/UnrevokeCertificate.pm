@@ -46,4 +46,8 @@ See OpenXPKI::Server::Workflow::NICE::unrevokeCertificate for details
 
 =head2 Input
 
+=over
+
 =item cert_identifier - identifier of the certificate
+
+=back

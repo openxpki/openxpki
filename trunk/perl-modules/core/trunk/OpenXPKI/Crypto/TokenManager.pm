@@ -60,6 +60,7 @@ sub new {
 Initialize all secrets configured for current realm
 
 =cut
+
 sub __load_secret_groups
 {
     ##! 1: "start"
@@ -86,6 +87,7 @@ sub __load_secret_groups
 Initialize the secret for the requested group
 
 =cut
+
 sub __load_secret
 {
     ##! 1: "start"
@@ -166,6 +168,7 @@ sub __load_secret
 Load all secrets in the current realm from the cache
 
 =cut
+
 sub __set_secret_from_cache {
     my $self    = shift;
     my $arg_ref = shift;
@@ -231,6 +234,7 @@ sub __set_secret_from_cache {
 List type and name of all secret groups in the current realm
 
 =cut
+
 sub get_secret_groups
 {
     ##! 1: "start"
@@ -284,6 +288,7 @@ sub reload_all_secret_groups_from_cache {
 Check if the secret group is complete (all passwords loaded)
 
 =cut
+
 sub is_secret_group_complete
 {
     ##! 1: "start"
@@ -430,13 +435,22 @@ sub clear_secret_group
 
 Get a crypto token to execute commands for the current realm 
 
-=item TYPE: Determines the used API, one of the values given in 
-   system.crypto.tokenapi (certsign, crlsign, datasafe....)
+=over
+
+=item TYPE
+
+Determines the used API, one of the values given in 
+system.crypto.tokenapi (certsign, crlsign, datasafe....)
    
-=item NAME: The name of the token to initialize, for versioned tokens 
-  including the generation identifier, e.g. server-ca-2.  
+=item NAME
+
+The name of the token to initialize, for versioned tokens 
+including the generation identifier, e.g. server-ca-2.  
+
+=back
 
 =cut
+
 sub get_token
 {
     my $self = shift;
@@ -498,6 +512,7 @@ The tokens are defined in the system.crypto.token namespace.
 Common tokens are default, pkcs7 and javaks.
  
 =cut
+
 sub get_system_token {
     
     my $self = shift;

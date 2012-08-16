@@ -3,7 +3,9 @@
 # Copyright (C) 2005-2006 by The OpenXPKI Project
 
 =head1 Name
+
 OpenXPKI::Crypto::Profile::CRL - cryptographic profile for CRLs.
+
 =cut
 
 use strict;
@@ -28,9 +30,12 @@ use Data::Dumper;
 
 Create a new profile instance.
 
+=over
+
 =item CA
  
 The alias of the ca token to be used (from the alias table) 
+
 =item VALIDITY 
 
 optional, override validity from profile definition. 
@@ -44,6 +49,8 @@ ca validity and uses the validity set in I<crl.<profile>.lastcrl>.
 Absolute dates are supported but the actual timestamp in the crl might 
 differ as it is converted to "hours from now".
  
+=back
+
 =cut
 
 sub new {
@@ -75,7 +82,9 @@ sub new {
 
 
 =head2 __load_profile
+
 Load the profile, called from constructor
+
 =cut
 
 sub __load_profile

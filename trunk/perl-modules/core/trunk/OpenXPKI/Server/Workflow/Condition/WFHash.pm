@@ -126,8 +126,6 @@ The following conditions are supported:
 Condition is true if the key has a value.
 The key must be given with the "key" param.
 
-=back
-
 =item key_nonempty
 
 Condition is true if the key has a non-empty value
