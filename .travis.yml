@@ -3,7 +3,7 @@ language: perl
 # Note: language-pack-de is needed for the i18n test
 before_install:
 #    - sudo apt-get update -qq
-    - sudo apt-get install -qq expat libexpat-dev openssl libssl libssl-dev language-pack-de
+    - sudo apt-get install -qq expat libexpat-dev openssl libssl-dev language-pack-de
 
 # Try to get debug from inst stuff
 install:
