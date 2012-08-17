@@ -5,6 +5,9 @@ use strict;
 use warnings;
 use Test::More;
 
+use Log::Log4Perl qw( :easy );
+Log::Log4Perl->easy_init($FATAL);
+
 use OpenXPKI::i18n;
 
 plan tests => 2;

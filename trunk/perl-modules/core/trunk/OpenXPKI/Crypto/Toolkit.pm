@@ -80,7 +80,7 @@ sub START {
 
     $self->__init_local();
     
-    # We have tow kinds of tokens with different config style
+    # We have two kinds of tokens with different config style
     # where system tokens do not have a "name" set.
     if ($arg_ref->{NAME}){ 
         $self->__load_config_realm_token($arg_ref); 
@@ -126,10 +126,14 @@ sub __load_config_system_token {
             
 }
 
-=head2 __load_config_realm_token ( { NAME, SECRET }) 
+=head2 __load_config_realm_token ( { NAME, SECRET, CERTIFICATE }) 
 
 Initialize realm token defined by NAME (full alias as registered in the alias 
 table). SECRET can be omitted if the key is not protected by a passphrase.
+CERTIFICATE is usually omitted and resolved internally by calling 
+get_certificate_for_alias. For situation where the alias can not be resolved 
+(testing), you can provide the result structure of the API call in the 
+CERTIFICATE parameter.
 
 =cut
 
@@ -183,9 +187,8 @@ sub __load_config_realm_token {
         }                                    
     }               
 
-    # Load the PEM certificate through the alias table
-    my $certificate = CTX('api')->get_certificate_for_alias({ ALIAS => $name });
-    
+    my $certificate = $arg_ref->{CERTIFICATE};
+    $certificate = CTX('api')->get_certificate_for_alias({ALIAS => $name}) unless($certificate);    
     if (!defined $certificate || !$certificate->{DATA}) {
         # Should never show up if the api is not broken 
         OpenXPKI::Exception->throw(

@@ -496,14 +496,15 @@ sub process_templates {
     }
             
     ##! 16: 'Tags found - init TT'
-    my $tt = Template->new();            
+    my $tt = Template->new();
 
-    # FIXME - this might be improves using some caching
-    my $certificate = CTX('api')->get_certificate_for_alias( { 'ALIAS' => $self->{CA} });
-    my $default_token = CTX('api')->get_default_token();
+    if (not $self->{CACERTIFICATE}) {    
+        $self->{CACERTIFICATE} = CTX('api')->get_certificate_for_alias( { 'ALIAS' => $self->{CA} });
+    }
+    my $default_token = CTX('crypto_layer')->get_system_token({ TYPE => "DEFAULT" });    
     
     my $x509 = OpenXPKI::Crypto::X509->new(
-        DATA  => $certificate->{DATA},
+        DATA  => $self->{CACERTIFICATE}->{DATA},
         TOKEN => $default_token,
     );
         

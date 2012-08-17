@@ -197,10 +197,10 @@ sub get_certificate_for_alias {
             message => 'I18N_OPENXPKI_API_TOKEN_GET_CERTIFICATE_NO_ALIAS_GIVEN',
         );
     }
-    
-    ##! 32: "Search for alias $keys->{ALIAS}"  
-    
-    my $certificate = CTX('dbi_backend')->first(
+     
+    my $pki_realm = CTX('session')->get_pki_realm();    
+    ##! 32: "Search for alias $keys->{ALIAS}"      
+    $certificate = CTX('dbi_backend')->first(
         TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
         COLUMNS => [
             'CERTIFICATE.DATA', 
@@ -213,7 +213,8 @@ sub get_certificate_for_alias {
             [ 'IDENTIFIER', 'IDENTIFIER' ],
         ],
         DYNAMIC => {
-            'ALIASES.ALIAS' => $keys->{ALIAS} 
+            'ALIASES.ALIAS' => $keys->{ALIAS},
+            'PKI_REALM' => $pki_realm, 
         }
     );
  

@@ -42,7 +42,7 @@ sub START {
     delete $arg_ref->{CLASS};
 
     eval "require $class";
-    if ($EVAL_ERROR ne '') {
+    if ($EVAL_ERROR ne '') {        
         ##! 4: "compilation of driver " . $class . " failed\n$EVAL_ERROR"
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_API_EVAL_ERROR',

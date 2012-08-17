@@ -8,10 +8,9 @@ print STDERR "OpenXPKI::Crypto::TokenManager\n";
 
 use OpenXPKI::Crypto::TokenManager;
 
-our $cache;
 eval `cat t/25_crypto/common.pl`;
 
-ok(1);
+is($@, '', 'seems that init succeeded');
 
 my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
 ok (1);
@@ -19,10 +18,8 @@ ok (1);
 ## parameter checks for get_token
 
 my $token = $mgmt->get_token ( {
-   TYPE => "CA", 
-   ID => "INTERNAL_CA_1", 
-   PKI_REALM => "Test Root CA",
-   CERTIFICATE => "DUMMY",
+   TYPE => "certsign", 
+   NAME => "server-ca"
    }
 );
 ok (defined $token);

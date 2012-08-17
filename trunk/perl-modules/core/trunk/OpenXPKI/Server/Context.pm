@@ -22,23 +22,23 @@ my $context = {
     initialized => 0,
 
     exported => {
-	# always created by this package
-    config           => undef,
-    watchdog         => undef,
-	xml_config       => undef,
-    workflow_factory => undef,
-	crypto_layer     => undef,
-	pki_realm        => undef,
-    pki_realm_by_cfg => undef,
-	volatile_vault   => undef,
-	log              => undef,
-	dbi_backend      => undef,
-	dbi_workflow     => undef,
-	dbi_log          => undef,
-
-	# user-settable
-	api            => undef,
-	server         => undef,
+    	# always created by this package
+        config           => undef,
+        watchdog         => undef,
+    	xml_config       => undef,
+        workflow_factory => undef,
+    	crypto_layer     => undef,
+    	pki_realm        => undef,
+        pki_realm_by_cfg => undef,
+    	volatile_vault   => undef,
+    	log              => undef,
+    	dbi_backend      => undef,
+    	dbi_workflow     => undef,
+    	dbi_log          => undef,
+    
+    	# user-settable
+    	api            => undef,
+    	server         => undef,
         service        => undef,
         acl            => undef,
         session        => undef,
@@ -53,14 +53,18 @@ our %who_forked_me;
 sub CTX {
     my @objects = @_;
     
+    # not needed as we would get an exception if the requested object is not
+    # defined anyway. Removed as it affects the new auto mock objects for testing
+    if (0) {
     if (! $context->{initialized}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_NOT_INITIALIZED",
             params => { 'objects' => join ":", @objects },
-	    log => undef, # do not log exception
+	        log => undef, # do not log exception
 	    );
-    }
+    }}
 
+# FIXME - I guess that is obsolte as pki_realm is no longer used
     if (grep { $_ eq 'pki_realm' } @objects) {
         # if pki_realm is requested, check whether it was from the
         # workflow namespace. As workflows depend on config versioning
@@ -97,35 +101,48 @@ sub CTX {
 
     my @return;
     foreach my $object (@objects) {
-	
-	if (! exists $context->{exported}->{$object}) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND",
-                params  => {OBJECT => $object},
-		log => undef, # do not log exception message
-		);
-	}
-	if (! defined $context->{exported}->{$object}) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED",
-                params  => {OBJECT => $object},
-		log => undef, # do not log exception message
-		);
-	}
-
-	# FIXME: handle objects properly?
-	#push @return, dclone($context->{exported}->{$object});
-	push @return, $context->{exported}->{$object};
+    	
+    	if (! exists $context->{exported}->{$object}) {
+    	    OpenXPKI::Exception->throw (
+    		message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND",
+                    params  => {OBJECT => $object},
+    		log => undef, # do not log exception message
+    		);
+    	}
+    	if (! defined $context->{exported}->{$object}) {
+    	    
+    	    # FIXME - should add some code to check if this is a test script!
+    	    # For testing, we serve Mock Objects for logger and session without prior init
+    	    if ($object eq "session") {
+    	        use OpenXPKI::Server::Session::Mock;
+    	        my $session = OpenXPKI::Server::Session::Mock->new();
+                OpenXPKI::Server::Context::setcontext({'session' => $session});
+                $session->set_pki_realm('I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA');	        	        
+    	    } elsif ($object eq 'log') {
+    	        warn "Auto-Init of NOOP-Logger";
+    	        use OpenXPKI::Server::Log::NOOP;
+    	        OpenXPKI::Server::Context::setcontext({'log' => OpenXPKI::Server::Log::NOOP->new()});    	        
+    	    } else {        	   
+        	    OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED",
+                    params  => {OBJECT => $object},
+                    log => undef, # do not log exception message
+        		);
+    	    }
+    	}    
+    	# FIXME: handle objects properly?
+    	#push @return, dclone($context->{exported}->{$object});
+    	push @return, $context->{exported}->{$object};
     }
 
     if (wantarray) {
-	return @return;
+	   return @return;
     } else {
-	if (scalar @return) {
-	    return $return[0];
-	} else {
-	    return;
-	}
+	   if (scalar @return) {
+	       return $return[0];
+	   } else {
+	       return;
+	   }
     }
 }
 
@@ -159,7 +176,7 @@ sub setcontext {
     ##! 16: 'force: ' . $force
 
     if (not $context->{initialized}) {
-	$context->{initialized} = 1;
+	   $context->{initialized} = 1;
     }
 
     foreach my $key (keys %{$params}) {

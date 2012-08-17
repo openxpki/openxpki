@@ -30,7 +30,7 @@ sub new {
 
     bless $self, $class;
 
-    my $keys = { @_ };
+    my $keys = shift;
     $self->{tmp} = $keys->{TMPDIR} if ($keys->{TMPDIR});
 
     $self->{called_from_testscript} = 1 if ($keys->{'IGNORE_CHECK'});
@@ -142,7 +142,7 @@ sub __load_secret
                         K => $config->get("crypto.secret.$group.required_shares"), 
                         N => $config->get("crypto.secret.$group.total_shares"),  
                     },
-                    TOKEN  => CTX('api')->get_default_token(),
+                    TOKEN  => $self->get_system_token({ TYPE => 'default'}),
             });
         }
         else {
@@ -205,7 +205,7 @@ sub __set_secret_from_cache {
     } else {
         ## daemon mode
         ##! 4: "let's get the serialized secret from the database"
-        if (! $self->{called_from_testscript}
+        if (!$self->{called_from_testscript}
             && CTX('dbi_backend')->is_connected()) {
             # do this only if the database is already connected
             # i.e. not during server startup
@@ -432,7 +432,7 @@ sub clear_secret_group
 ##                     slot management                              ##
 ######################################################################
 
-=head2 get_token( { TYPE, NAME } )
+=head2 get_token( { TYPE, NAME, CERTIFICATE } )
 
 Get a crypto token to execute commands for the current realm 
 
@@ -447,6 +447,11 @@ system.crypto.tokenapi (certsign, crlsign, datasafe....)
 
 The name of the token to initialize, for versioned tokens 
 including the generation identifier, e.g. server-ca-2.  
+
+=item CERTIFICATE
+
+A hashref as returned by API::Token::get_certificate_for_alias.
+Can be omitted, if the API can resolve the given name.
 
 =back
 
@@ -488,10 +493,7 @@ sub get_token
     ##! 2: "$realm: $type -> $name"
 
     if (not $self->{TOKEN}->{$realm}->{$type}->{$name}) {
-        $self->__add_token({
-            TYPE        => $type,
-            NAME        => $name,
-        });
+        $self->__add_token($keys);
     }
     ##! 2: "token added"
 
@@ -530,7 +532,7 @@ sub get_system_token {
     if (not $type)
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_TYPE");
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SYSTEM_TOKEN_MISSING_TYPE");
     }
     
     my $config = CTX('config');
@@ -538,7 +540,7 @@ sub get_system_token {
     
     if (not $backend) {    
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SYSTEM_TOKENUNKNOWN_TYPE",
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SYSTEM_TOKEN_UNKNOWN_TYPE",
             params => { TYPE => $type }    
         );   
     }
@@ -633,6 +635,7 @@ sub __add_token
                     NAME  => $name,
                     TOKEN_TYPE => $type,
                     SECRET     => $secret,
+                    CERTIFICATE => $keys->{CERTIFICATE},
                 });
     };
     if (my $exc = OpenXPKI::Exception->caught())
@@ -647,7 +650,7 @@ sub __add_token
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_EVAL_ERROR',
             params => {
-                'EVAL_ERROR' => $EVAL_ERROR,
+                'EVAL_ERROR' => Dumper $EVAL_ERROR,
             }
         );
     }

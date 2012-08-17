@@ -7,12 +7,14 @@ use strict;
 use warnings;
 use English;
 use OpenXPKI;
-use OpenXPKI::XML::Config;
 use OpenXPKI::Server::Context qw( CTX );
 use File::Spec;
 use OpenXPKI::FileUtils;
-
-our $cache;
+use OpenXPKI::Config::Test;
+use OpenXPKI::Server::Session::Mock;
+use OpenXPKI::Server::Log::NOOP;
+use OpenXPKI::Server::API;
+use OpenXPKI::Server::Init;
 
 our $basedir = File::Spec->catfile('t', '25_crypto');
 
@@ -24,15 +26,25 @@ foreach my $dir ("t/25_crypto/ca1/certs",
     `mkdir -p $dir` if (not -d $dir);
 }
 
-$cache = eval { OpenXPKI::XML::Config->new(CONFIG => "t/config_test.xml") };
-die $EVAL_ERROR."\n" if ($EVAL_ERROR and not ref $EVAL_ERROR);
-die $EVAL_ERROR->as_string()."\n" if ($EVAL_ERROR);
-die "Could not init XML config. Stopped" if (not $cache);
 
 ## create context
 OpenXPKI::Server::Context::setcontext({
-    xml_config => $cache,
+    config => OpenXPKI::Config::Test->new(),
 });
+
+OpenXPKI::Server::Context::setcontext({
+   log => OpenXPKI::Server::Log::NOOP->new(),
+});
+
+
+OpenXPKI::Server::Init::__do_init_api();
+OpenXPKI::Server::Init::__do_init_dbi_backend();
+
+
+# Create Mock session (necessary to get current realm)
+my $session = OpenXPKI::Server::Session::Mock->new();
+OpenXPKI::Server::Context::setcontext({'session' => $session});
+$session->set_pki_realm('I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA');
 
 our $cacert;
 my $cacertfile = "$basedir/ca1/cacert.pem";

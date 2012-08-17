@@ -59,8 +59,14 @@ sub new {
 
     my $keys = { @_ };
     $self->{TYPE}      = $keys->{TYPE}      if ($keys->{TYPE});
-    $self->{CA}        = $keys->{CA}        if ($keys->{CA});
+    $self->{CA}        = $keys->{CA}        if ($keys->{CA});    
     $self->{ID}        = $keys->{ID}        if ($keys->{ID});
+    
+    # hash as returned by API::Token::get_certificate_for_alias
+    # if not given, the class will call the API function to get the data if needed
+    # this is mainly for testing (when API is not functional) or when working with
+    # certificates unknown to the alias system    
+    $self->{CACERTIFICATE} = $keys->{CACERTIFICATE} if ($keys->{CACERTIFICATE});
 
     if ($self->{TYPE} ne 'ENDENTITY') {
         OpenXPKI::Exception->throw (
