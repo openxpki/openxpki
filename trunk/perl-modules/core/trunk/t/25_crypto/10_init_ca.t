@@ -1,7 +1,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 24;
+use Test::More; # tests => 24;
 use English;
 # use Smart::Comments;
 
@@ -18,9 +18,15 @@ use OpenXPKI qw( read_file );
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
 
+our $cacert;
 our $cache;
 our $basedir;
-require 't/25_crypto/common.pl';
+
+eval `cat t/25_crypto/common.pl`;
+
+plan skip_all => "No CA setup for testing" unless($cacert);
+
+is($@, '', 'seems that init succeeded'); 
 
 ok($cache, 'cache created - seems that init succeeded');
 

@@ -37,9 +37,7 @@ token:
   # key generation  
   server-ca:
     inherit: default # Load all settings from default which are not defined here
-    key: /etc/openxpki/token/ncipher-fake-tree/
-    engine: nCipher # Use Engine for main key
-    
+ 
   server-crl-signer:
     inherit: default
      

@@ -1,5 +1,5 @@
 use Test::More;
-BEGIN { plan tests => 27 };
+BEGIN {  plan skip_all => "No CA setup for testing"; plan tests => 27 };
 
 print STDERR "OpenXPKI::Crypto::VolatileVault\n" if $ENV{VERBOSE};
 
@@ -14,15 +14,14 @@ eval `cat t/25_crypto/common.pl`;
 
 ok(1);
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok (1);
 
 ## parameter checks for get_token
 
-my $token = $mgmt->get_token (
+my $token = $mgmt->get_system_token (
     {
         TYPE => "DEFAULT", 
-        PKI_REALM => "Test Root CA",
     }
 );
 ok (1);

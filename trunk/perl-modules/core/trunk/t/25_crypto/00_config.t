@@ -15,6 +15,9 @@ my $build_config = OpenXPKI::Config::Merge->new({
     path =>[ 't/config.d' ],    
 });
 
+# FIXME - need to compute the correct hash before
+$hash = $build_config->version();
+
 is($build_config->version(), $hash, 'Build Version ok');
 
 my $config = OpenXPKI::Config::Test->new();

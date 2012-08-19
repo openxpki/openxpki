@@ -18,14 +18,13 @@ ok(1);
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok (1);
 
 
-my $default_token = $mgmt->get_token(
+my $default_token = $mgmt->get_system_token(
     {
         TYPE      => "DEFAULT",
-        PKI_REALM => "Test Root CA",
     }
 );
 ###########################################################################

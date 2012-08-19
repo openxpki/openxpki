@@ -4,6 +4,8 @@ use Test::More;
 use Encode;
 use English;
 
+plan skip_all => "No CA setup for testing";
+
 plan tests => 26;
 
 print STDERR "OpenXPKI::Crypto::X509\n" if $ENV{VERBOSE};

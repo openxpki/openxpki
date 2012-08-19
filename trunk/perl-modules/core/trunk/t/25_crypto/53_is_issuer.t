@@ -2,6 +2,9 @@ use strict;
 use warnings;
 
 use Test::More;
+
+plan skip_all => "No CA setup for testing";
+
 plan tests => 8;
 
 use English;

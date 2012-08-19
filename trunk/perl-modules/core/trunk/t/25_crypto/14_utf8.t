@@ -5,7 +5,9 @@ binmode STDERR, ":utf8";
 binmode STDOUT, ":utf8";
 use Test::More;
 use English;
-BEGIN { plan tests => 20 };
+plan skip_all => "No CA setup for testing";
+
+plan tests => 20;
 
 print STDERR "OpenXPKI::Crypto::Command: Create user certs and issue CRLs with UTF-8 characters\n" if $ENV{VERBOSE};
 

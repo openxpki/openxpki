@@ -2,7 +2,10 @@ use strict;
 use warnings;
 use Test::More;
 use English;
-BEGIN { plan tests => 24 };
+
+plan skip_all => "No CA setup for testing";
+
+plan tests => 24;
 
 print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::X509\n" if $ENV{VERBOSE};
 

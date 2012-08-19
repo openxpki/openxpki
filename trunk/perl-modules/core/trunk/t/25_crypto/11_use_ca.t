@@ -3,6 +3,9 @@ use warnings;
 use English;
 
 use Test::More;
+
+plan skip_all => "No CA setup for testing";
+
 plan tests => 20;
 
 diag "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n" if $ENV{VERBOSE};

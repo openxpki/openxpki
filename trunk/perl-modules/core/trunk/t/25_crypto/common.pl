@@ -6,7 +6,6 @@
 use strict;
 use warnings;
 use English;
-use OpenXPKI;
 use OpenXPKI::Server::Context qw( CTX );
 use File::Spec;
 use OpenXPKI::FileUtils;
@@ -33,18 +32,8 @@ OpenXPKI::Server::Context::setcontext({
 });
 
 OpenXPKI::Server::Context::setcontext({
-   log => OpenXPKI::Server::Log::NOOP->new(),
+    api => OpenXPKI::Server::API->new(),
 });
-
-
-OpenXPKI::Server::Init::__do_init_api();
-OpenXPKI::Server::Init::__do_init_dbi_backend();
-
-
-# Create Mock session (necessary to get current realm)
-my $session = OpenXPKI::Server::Session::Mock->new();
-OpenXPKI::Server::Context::setcontext({'session' => $session});
-$session->set_pki_realm('I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA');
 
 our $cacert;
 my $cacertfile = "$basedir/ca1/cacert.pem";

@@ -2,7 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 use English;
+
+plan skip_all => "No CA setup for testing";
+
 plan tests => 16;
+
 
 diag "OpenXPKI::Crypto::Command: Conversion tests\n" if $ENV{VERBOSE};
 

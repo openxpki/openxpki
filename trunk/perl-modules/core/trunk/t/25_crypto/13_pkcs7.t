@@ -2,7 +2,10 @@ use strict;
 use warnings;
 use Test::More;
 use English;
-BEGIN { plan tests => 10 };
+
+plan skip_all => "No CA setup for testing";
+
+plan tests => 10;
 
 print STDERR "OpenXPKI::Crypto::Command: PKCS#7 tests\n" if $ENV{VERBOSE};
 

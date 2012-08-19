@@ -2,6 +2,9 @@ use strict;
 use warnings;
 use English;
 use Test::More;
+
+plan skip_all => "No CA setup for testing";
+
 plan tests => 13;
 
 diag "OpenXPKI::Crypto::Backend::OpenSSL::SPKAC\n" if $ENV{VERBOSE};
