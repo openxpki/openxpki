@@ -27,7 +27,7 @@ use Data::Dumper;
 # use Smart::Comments;
 
 
-=head2 new ( { CA, ID, TYPE } )
+=head2 new ( { CA, ID, TYPE, [CACERTIFICATE] } )
 
 Create a new profile instance, all parameters are required.
 
@@ -44,6 +44,12 @@ The name of the profile (as given in the realm.profile configuration)
 =item TYPE 
 
 Must be set to I<ENDENTITY>
+
+=item CACERTIFICATE
+
+PEM encoded ca certificate to use. This is mainly for testing, in regular 
+operation the certificate is determined using the API.
+  
  
 =back
 

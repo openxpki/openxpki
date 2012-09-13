@@ -26,7 +26,7 @@ use Data::Dumper;
 #use Smart::Comments;
 
 
-=head2 new ( { CA, VALIDITY, CA_VALIDITY } )
+=head2 new ( { CA, [VALIDITY, CA_VALIDITY, CACERTIFICATE] } )
 
 Create a new profile instance.
 
@@ -48,6 +48,11 @@ optional, if given the computed nextupdate is checked if it exceeds the
 ca validity and uses the validity set in I<crl.<profile>.lastcrl>.
 Absolute dates are supported but the actual timestamp in the crl might 
 differ as it is converted to "hours from now".
+ 
+=item CACERTIFICATE
+
+PEM encoded ca certificate to use. This is mainly for testing, in regular 
+operation the certificate is determined using the API.
  
 =back
 
@@ -166,7 +171,8 @@ sub __load_profile
     
       
     # Check if the CA would be valid at the next update or if its time for the "End of Life" CRL  
-    my $ca_validity = OpenXPKI::DateTime::get_validity($self->{CA_VALIDITY});
+    my $ca_validity;
+    $ca_validity = OpenXPKI::DateTime::get_validity($self->{CA_VALIDITY}) if ($self->{CA_VALIDITY});
     if ($ca_validity && $notafter > $ca_validity) {
          my $last_crl_validity = $config->get("$path.validity.lastcrl");
          if (!$last_crl_validity) {

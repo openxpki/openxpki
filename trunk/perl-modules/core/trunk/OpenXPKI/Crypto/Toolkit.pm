@@ -131,7 +131,7 @@ sub __load_config_system_token {
 Initialize realm token defined by NAME (full alias as registered in the alias 
 table). SECRET can be omitted if the key is not protected by a passphrase.
 CERTIFICATE is usually omitted and resolved internally by calling 
-get_certificate_for_alias. For situation where the alias can not be resolved 
+get_certificate_for_alias. For situations where the alias can not be resolved 
 (testing), you can provide the result structure of the API call in the 
 CERTIFICATE parameter.
 
