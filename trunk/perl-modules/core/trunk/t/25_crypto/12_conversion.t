@@ -36,12 +36,12 @@ my $token = $mgmt->get_token ({
 ok (1);
 
 ## load data
-my $passwd = OpenXPKI->read_file ("$basedir/test-ca/tmp/passwd.txt");
-my $dsa    = OpenXPKI->read_file ("$basedir/test-ca/tmp/dsa.pem");
-my $rsa    = OpenXPKI->read_file ("$basedir/test-ca/tmp/rsa.pem");
-my $csr    = OpenXPKI->read_file ("$basedir/test-ca/tmp/pkcs10.pem");
-my $cert   = OpenXPKI->read_file ("$basedir/test-ca/tmp/cert.pem");
-my $crl    = OpenXPKI->read_file ("$basedir/test-ca/tmp/crl.pem");
+my $passwd = OpenXPKI->read_file ("$basedir/test-ca/passwd.txt");
+my $dsa    = OpenXPKI->read_file ("$basedir/test-ca/dsa.pem");
+my $rsa    = OpenXPKI->read_file ("$basedir/test-ca/rsa.pem");
+my $csr    = OpenXPKI->read_file ("$basedir/test-ca/pkcs10.pem");
+my $cert   = OpenXPKI->read_file ("$basedir/test-ca/cert.pem");
+my $crl    = OpenXPKI->read_file ("$basedir/test-ca/crl.pem");
 ok($passwd and $dsa and $rsa and $csr and $cert and $crl);
 
 ## DSA KEY: PEM --> DER

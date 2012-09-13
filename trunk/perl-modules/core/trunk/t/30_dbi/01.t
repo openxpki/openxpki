@@ -2,8 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-#plan tests => 9;
-plan skip_all => 'SQLite is deprecated';
+plan tests => 9;
 
 diag "OpenXPKI::Server::DBI: Database Initialization\n" if $ENV{VERBOSE};
 

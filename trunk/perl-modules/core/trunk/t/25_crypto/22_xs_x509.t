@@ -36,7 +36,7 @@ my $token = $mgmt->get_token ({
 ok (defined $token, 'Parameter checks for get_token');
  
 ## create cert
-my $cert = OpenXPKI->read_file ("$basedir/test-ca/tmp/cert.pem");
+my $cert = OpenXPKI->read_file ("$basedir/test-ca/cert.pem");
 ok(1);
 
 ## get object

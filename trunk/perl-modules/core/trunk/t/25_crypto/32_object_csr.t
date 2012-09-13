@@ -47,7 +47,7 @@ ok (defined $token, 'Parameter checks for get_token');
 
 
 ## load CSR
-my $data = OpenXPKI->read_file ("$basedir/test-ca/tmp/pkcs10.pem");
+my $data = OpenXPKI->read_file ("$basedir/test-ca/pkcs10.pem");
 ok(1);
 $data = "-----BEGIN HEADER-----\n".
         "ROLE=User\n".
@@ -121,7 +121,7 @@ my @example = (
 
 for (my $i=0; $i < scalar @example; $i++)
 {
-    $data = OpenXPKI->read_file ("$basedir/test-ca/tmp/utf8.$i.pkcs10.pem");
+    $data = OpenXPKI->read_file ("$basedir/test-ca/utf8.$i.pkcs10.pem");
     $data = "-----BEGIN HEADER-----\n".
             "ROLE=User\n".
             "SERIAL=4321\n".

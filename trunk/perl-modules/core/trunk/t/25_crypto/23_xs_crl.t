@@ -37,7 +37,7 @@ ok (defined $token, 'Parameter checks for get_token');
 
 
 ## create CRL
-my $crl = OpenXPKI->read_file ("$basedir/test-ca/tmp/crl.pem");
+my $crl = OpenXPKI->read_file ("$basedir/test-ca/crl.pem");
 ok(1);
 
 ## get object

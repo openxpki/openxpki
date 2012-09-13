@@ -41,9 +41,9 @@ ok (defined $token, 'Parameter checks for get_token');
 
 ## load data
 
-my $passwd = OpenXPKI->read_file ("$basedir/test-ca/tmp/passwd.txt");
-my $rsa    = OpenXPKI->read_file ("$basedir/test-ca/tmp/rsa.pem");
-my $cert   = OpenXPKI->read_file ("$basedir/test-ca/tmp/cert.pem");
+my $passwd = OpenXPKI->read_file ("$basedir/test-ca/passwd.txt");
+my $rsa    = OpenXPKI->read_file ("$basedir/test-ca/rsa.pem");
+my $cert   = OpenXPKI->read_file ("$basedir/test-ca/cert.pem");
 my $content = "This is for example a passprase.";
 ok($passwd and $rsa and $cert);
 

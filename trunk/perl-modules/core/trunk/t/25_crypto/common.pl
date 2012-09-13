@@ -17,7 +17,7 @@ use OpenXPKI::Server::Init;
 
 our $basedir = File::Spec->catfile('t', '25_crypto');
 
-foreach my $dir ("t/25_crypto/test-ca/tmp",                 
+foreach my $dir ("t/25_crypto/test-ca",                 
                  "t/25_crypto/canciph/certs",
                  "t/25_crypto/cagost/certs")
 {

@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-#plan tests => 13;
-plan skip_all => 'SQLite has been deprecated';
+plan tests => 11;
 
 diag "OpenXPKI::Server::DBI: CA setup and empty CRL\n" if $ENV{VERBOSE};
 
@@ -20,16 +19,14 @@ require 't/30_dbi/common.pl';
 
 ok(1);
 
-my $cert = OpenXPKI->read_file ("t/25_crypto/ca1/cacert.pem");
-my $cert2 = OpenXPKI->read_file ("t/25_crypto/ca2/cacert.pem");
+my $cert = OpenXPKI->read_file ("t/25_crypto/test-ca/cacert.pem");
 $cert = OpenXPKI::Crypto::X509->new (DATA => $cert, TOKEN => $token);
-$cert2 = OpenXPKI::Crypto::X509->new (DATA => $cert2, TOKEN => $token);
-my $crl = OpenXPKI->read_file ("t/25_crypto/ca1/crl.pem");
+my $crl = OpenXPKI->read_file ("t/25_crypto/test-ca/crl.pem");
 $crl = OpenXPKI::Crypto::CRL->new (DATA => $crl, TOKEN => $token);
-$cert->set_header_attribute (PKI_REALM => "Test Root CA",
-                             CA        => "INTERNAL_CA_1");
-$crl->set_header_attribute (PKI_REALM => "Test Root CA",
-                            CA        => "INTERNAL_CA_1");
+$cert->set_header_attribute (PKI_REALM => "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA",
+                             CA        => "test-ca");
+$crl->set_header_attribute (PKI_REALM => "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA",
+                            CA        => "test-ca");
 
 ok($cert and $crl);
 
@@ -65,32 +62,7 @@ ok(1);
 if ($ENV{DEBUG}) {
     diag "Certificate with identifier " . $cert->get_identifier()
         . " inserted.\n";
-}
-
-%hash = $cert2->to_db_hash();
-$hash{'ISSUER_IDENTIFIER'} = 'dummy';
-$hash{PKI_REALM} = '';
-$serial = $dbi->get_new_serial(
-    TABLE => 'CERTIFICATE',
-);
-$hash{'CERTIFICATE_SERIAL'} = $serial;
-
-$dbi->insert (TABLE => "CERTIFICATE", HASH => \%hash);
-$dbi->insert(
-    TABLE => 'CERTIFICATE_ATTRIBUTES',
-    HASH => 
-    {
-	IDENTIFIER               => $cert2->get_identifier(),
-	ATTRIBUTE_KEY            => 'dummy key',
-	ATTRIBUTE_VALUE          => 'dummy value',
-	ATTRIBUTE_SERIAL         => $attribute_serial++,
-    });
-$dbi->commit();
-ok(1);
-if ($ENV{DEBUG}) {
-    diag "Certificate with identifier " . $cert2->get_identifier()
-        . " inserted.\n";
-}
+} 
 
 # insert aliases
 
@@ -98,27 +70,17 @@ $dbi->insert(
     TABLE => 'ALIASES',
     HASH  => {
         IDENTIFIER => $cert->get_identifier(),
-        PKI_REALM  => 'Test Root CA',
-        ALIAS      => 'INTERNAL_CA_1',
+        PKI_REALM  => 'I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA',
+        ALIAS      => 'test-ca',
     },
 );
 $dbi->commit();
 ok(1);
 
-$dbi->insert(
-    TABLE => 'ALIASES',
-    HASH  => {
-        IDENTIFIER => $cert2->get_identifier(),
-        PKI_REALM  => 'Test Root CA',
-        ALIAS      => 'INTERNAL_CA_2',
-    },
-);
-$dbi->commit();
-ok(1);
 # insert first CRL
 
 my %db_hash = $crl->to_db_hash();
-$db_hash{PKI_REALM} = 'Test Root CA';
+$db_hash{PKI_REALM} = 'I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA';
 $db_hash{ISSUER_IDENTIFIER} = $cert->get_identifier();
 $serial = $dbi->get_new_serial(
         TABLE => 'CRL',

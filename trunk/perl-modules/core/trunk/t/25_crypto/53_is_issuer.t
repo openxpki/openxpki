@@ -41,7 +41,7 @@ my $cacert1 = do {
 close($CACERT1);
 ok($cacert1, 'Read in CA certificate 1');
 
-open my $CERT, '<', 't/25_crypto/test-ca/tmp/cert.pem';
+open my $CERT, '<', 't/25_crypto/test-ca/cert.pem';
 my $cert = do {
     local $INPUT_RECORD_SEPARATOR;
     <$CERT>;

@@ -57,7 +57,7 @@ my $passwd = $default_token->command ({COMMAND       => "create_random",
                                        
 ok($passwd, 'Random password created');
 diag "passwd: $passwd\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/passwd.txt",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/passwd.txt",
                       CONTENT  => $passwd,
                       FORCE    => 1);
 
@@ -70,7 +70,7 @@ my $key = $default_token->command ({COMMAND    => "create_key",
                                         ENC_ALG    => "aes256"}});
 ok ($key, 'DSA key created');
 diag "DSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/dsa.pem",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/dsa.pem",
                       CONTENT  => $key,
                       FORCE    => 1);
 
@@ -83,7 +83,7 @@ $key = $default_token->command ({COMMAND    => "create_key",
                                      ENC_ALG    => "aes256"}});
 ok ($key, 'EC key created');
 diag "EC: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/ec.pem",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/ec.pem",
                       CONTENT  => $key,
                       FORCE    => 1);
 
@@ -96,7 +96,7 @@ $key = $default_token->command ({COMMAND    => "create_key",
                                      ENC_ALG    => "aes256"}});
 ok ($key, 'RSA key created');
 diag "RSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/rsa.pem",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/rsa.pem",
                       CONTENT  => $key,
                       FORCE    => 1);
 
@@ -317,7 +317,7 @@ my $csr = $default_token->command ({COMMAND => "create_pkcs10",
                                     SUBJECT => $subject});
 ok($csr, 'PKCS#10 creation');
 diag "CSR: $csr\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/pkcs10.pem",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/pkcs10.pem",
                       CONTENT  => $csr,
                       FORCE    => 1);
 
@@ -340,7 +340,7 @@ my $cert = $ca_token->command ({COMMAND => "issue_cert",
 ok($cert =~ /^-----BEGIN CERTIFICATE-----/, 'Certificate issue');
 
 diag "cert: $cert\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/cert.pem",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/cert.pem",
                       CONTENT  => $cert,
                       FORCE    => 1);
 
@@ -374,7 +374,7 @@ eval
                                    REVOKED => [$cert],
                                    PROFILE => $profile});
     diag "CRL: $crl\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/crl.pem",
+    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/crl.pem",
                           CONTENT  => $crl,
                           FORCE    => 1);
 };

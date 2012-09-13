@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-plan tests => 6;
+plan tests => 7;
 
 diag "OpenXPKI::Server::DBI: Quoting bug\n" if $ENV{VERBOSE};
 
@@ -26,6 +26,17 @@ $dbi->insert(
 
 $dbi->commit();
 ok(1, 'Inserted entry');
+
+
+my $result = $dbi->select(
+    TABLE => 'CERTIFICATE',
+    DYNAMIC => 
+    {
+        SUBJECT => {VALUE => 'CN=Foo,O=Acme\, Inc' },
+    }
+);
+is(scalar @{$result}, 1, 'one entry returned (equal)');
+
 
 TODO: {
     local $TODO = 'MySQL seems to have a problem with quoting, see #1951540';

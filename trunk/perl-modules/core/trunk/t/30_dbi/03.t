@@ -28,7 +28,7 @@ foreach my $ii (10001 .. 10005) {
 	HASH => 
 	{
 	    WORKFLOW_SERIAL         => $ii,
-	    PKI_REALM               => 'Test Root CA',
+	    PKI_REALM               => 'I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA',
 	    WORKFLOW_TYPE           => 'Dummy Workflow',
 	    WORKFLOW_VERSION_SERIAL => -1,
 	    WORKFLOW_STATE          => 'INITIAL',
@@ -78,9 +78,7 @@ foreach my $ii (10001 .. 10005) {
 
 
 # insert dummy certificates
-# please note that previous tests insert two additional certificates:
-# valid -2 years to now and
-# valid now to +2 years
+# valid -2 days to now and -1 day to +1 day 
 
 my $cert_serial = 1;
 my $attribute_serial = 1;
@@ -102,7 +100,7 @@ $dbi->insert(
     HASH => 
     {
 	IDENTIFIER               => "dummy_identifier_$cert_serial",
-	PKI_REALM                => 'Test Root CA',
+	PKI_REALM                => 'I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA',
 	ISSUER_IDENTIFIER        => 'issuer_dummy_identifier',
 	ISSUER_DN                => 'n/a',
 	DATA                     => 'n/a',
@@ -113,7 +111,7 @@ $dbi->insert(
 	PUBKEY                   => 'n/a',
 	SUBJECT_KEY_IDENTIFIER   => 'n/a',
 	AUTHORITY_KEY_IDENTIFIER => 'n/a',
-	NOTBEFORE                => $now - 86400,
+	NOTBEFORE                => $now - 86400 * 2,
 	NOTAFTER                 => $now - 1,
 	LOA                      => 'n/a',
 	CSR_SERIAL               => 'n/a',
@@ -136,7 +134,7 @@ $dbi->insert(
     HASH => 
     {
 	IDENTIFIER               => "dummy_identifier_$cert_serial",
-	PKI_REALM                => 'Test Root CA',
+	PKI_REALM                => 'I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA',
 	ISSUER_IDENTIFIER        => 'issuer_dummy_identifier',
 	ISSUER_DN                => 'n/a',
 	DATA                     => 'n/a',
@@ -365,38 +363,39 @@ eval {
 };
 ### $result
 
-TODO: {
-    local $TODO = 'Fails on MySQL, see bug #1951532';
+#TODO: {
+#    local $TODO = 'Fails on MySQL, see bug #1951532';
     ok(! $EVAL_ERROR) or diag "ERROR: $EVAL_ERROR"; 
     is(ref $result eq 'ARRAY' && scalar @{$result}, 1);
     is(ref $result eq 'ARRAY' && $result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'}, 10004);
     is(ref $result eq 'ARRAY' && $result->[0]->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}, 'somekey-9');
-}
+#}
 
 
 
 ###########################################################################
 # validity tests (uses certificates and CRLs from 02.t)
 
-
+# TODO - Test Cases should be reviewed
 my @validity_specs = (
     # spec                                           expected hits
     # single time                                    03.t + 02.t
-    [ time - (7 * 24 * 3600),                        0 + 1 ],
-    [ time - (     1 * 3600),                        2 + 1 ],
-    [ time,                                          1 + 2 ],
-    [ DateTime->now,                                 1 + 2 ],
+    [ $now - (1.5 * 86400),                          1 + 0 ],
+    [ $now - ( 86400 ),                              2 + 0 ],
+    [ $now,                                          1 + 1 ],
+    [ DateTime->now,                                 1 + 1 ],
 
     # multiple points in time
     # note that 02.t certs are not matched (because they have no 
     # certificate_attribute entry)
-    [ [ DateTime->now, time - 3600 ],                1 + 1 ],
-    [ [ time - 3600, time + 3600 ],                  1 + 1 ],
-    [ [ time - 3600, time - 7200 ],                  2 + 1 ],
-    [ [ time - 3600, time - 7200, time - 14400 ],    2 + 1 ],
+    [ [ DateTime->now, $now - 3600 ],                1 + 0 ],
+    [ [ $now - 3600, $now + 3600 ],                  1 + 0 ],
+    [ [ $now - 86400, $now - 2*86400 ],              1 + 0 ],
+    [ [ $now - 3600, $now - 86400, $now - 2*86400 ],    1 + 0 ],
     );
 
 ### simple validity...
+my $i = 1;
 foreach my $spec (@validity_specs) {
     ### $spec
     $result = $dbi->select(
@@ -404,7 +403,7 @@ foreach my $spec (@validity_specs) {
 	VALID_AT => $spec->[0],
 	);
 
-    is(scalar @{$result}, $spec->[1]);
+    is(scalar @{$result}, $spec->[1] );
 }
 
 

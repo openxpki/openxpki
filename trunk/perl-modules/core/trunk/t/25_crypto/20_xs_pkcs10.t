@@ -36,7 +36,7 @@ my $token = $mgmt->get_token ({
 ok (defined $token, 'Parameter checks for get_token');
 
 ## create PKCS#10 request
-my $csr = OpenXPKI->read_file ("$basedir/test-ca/tmp/pkcs10.pem");
+my $csr = OpenXPKI->read_file ("$basedir/test-ca/pkcs10.pem");
 ok(1);
 
 ## get object

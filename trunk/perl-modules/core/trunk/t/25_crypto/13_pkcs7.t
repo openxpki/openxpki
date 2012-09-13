@@ -39,9 +39,9 @@ ok(1);
 
 ## load data
 
-my $passwd = OpenXPKI->read_file ("$basedir/test-ca/tmp/passwd.txt");
-my $rsa    = OpenXPKI->read_file ("$basedir/test-ca/tmp/rsa.pem");
-my $cert   = OpenXPKI->read_file ("$basedir/test-ca/tmp/cert.pem");
+my $passwd = OpenXPKI->read_file ("$basedir/test-ca/passwd.txt");
+my $rsa    = OpenXPKI->read_file ("$basedir/test-ca/rsa.pem");
+my $cert   = OpenXPKI->read_file ("$basedir/test-ca/cert.pem");
 ok($passwd and $rsa and $cert);
 
 my $content = "This is for example a passprase.";

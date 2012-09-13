@@ -39,7 +39,7 @@ ok (defined $token, 'Parameter checks for get_token');
 
 
 ## load CRL
-my $data = OpenXPKI->read_file ("$basedir/test-ca/tmp/crl.pem");
+my $data = OpenXPKI->read_file ("$basedir/test-ca/crl.pem");
 ok(1);
 $data = "-----BEGIN HEADER-----\n".
         "GLOBAL_ID=1234\n".

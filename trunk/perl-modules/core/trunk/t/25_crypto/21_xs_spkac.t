@@ -41,11 +41,11 @@ my $token = $mgmt->get_token ({
 ok (defined $token, 'Parameter checks for get_token');
 
 ## create SPKAC request
-$ENV{pwd} = OpenXPKI->read_file ("$basedir/test-ca/tmp/passwd.txt");
+$ENV{pwd} = OpenXPKI->read_file ("$basedir/test-ca/passwd.txt");
 ok($ENV{pwd}, 'Password reading from file');
 
 my $shell_path = `cat t/cfg.binary.openssl`; # openssl executable to use
-my $spkac = `$shell_path spkac -key $basedir/test-ca/tmp/rsa.pem -passin env:pwd`;
+my $spkac = `$shell_path spkac -key $basedir/test-ca/rsa.pem -passin env:pwd`;
 ok($spkac, 'OpenSSL SPKAC conversion');
 
 # SPKAC needs the raw SPKAC data without the SPKAC= openssl 'header'

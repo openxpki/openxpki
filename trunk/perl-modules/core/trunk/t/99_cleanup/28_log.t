@@ -2,9 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-my @files = (
-             "t/28_log/sqlite.db",
-             "t/28_log/sqlite_log.db",
+my @files = (             
              "t/28_log/openxpki.log",
             );
 

@@ -48,7 +48,7 @@ my $data;
 
 ###########################################################################
 ## load end entity certificate
-$data = OpenXPKI->read_file ("$basedir/test-ca/tmp/cert.pem");
+$data = OpenXPKI->read_file ("$basedir/test-ca/cert.pem");
 ok(1);
 $data = "-----BEGIN HEADER-----\n".
            "ROLE=User\n".
@@ -165,7 +165,7 @@ my @example = (
 
 for (my $i=0; $i < scalar @example; $i++)
 {
-    $data = OpenXPKI->read_file ("$basedir/test-ca/tmp/utf8.$i.cert.pem");
+    $data = OpenXPKI->read_file ("$basedir/test-ca/utf8.$i.cert.pem");
     $data = "-----BEGIN HEADER-----\n".
             "ROLE=User\n".
             "-----END HEADER-----\n".

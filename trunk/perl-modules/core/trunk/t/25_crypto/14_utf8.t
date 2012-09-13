@@ -52,8 +52,8 @@ ok(defined $default_token, 'Default Token defined');
 ## create DSA key
 ## create RSA key
 
-my $passwd = OpenXPKI->read_file ("$basedir/test-ca/tmp/passwd.txt");
-my $key    = OpenXPKI->read_file ("$basedir/test-ca/tmp/rsa.pem");
+my $passwd = OpenXPKI->read_file ("$basedir/test-ca/passwd.txt");
+my $key    = OpenXPKI->read_file ("$basedir/test-ca/rsa.pem");
 ok (1);
 
 ######################################
@@ -77,7 +77,7 @@ for (my $i=0; $i < scalar @example; $i++)
                                 SUBJECT => $dn});
     ok (1);
     print STDERR "CSR: $csr\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/utf8.$i.pkcs10.pem", CONTENT => $csr, FORCE => 1);
+    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/utf8.$i.pkcs10.pem", CONTENT => $csr, FORCE => 1);
 
     ## create profile
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
@@ -95,7 +95,7 @@ for (my $i=0; $i < scalar @example; $i++)
                                  PROFILE => $profile});
     ok (1);
     print STDERR "cert: $cert\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/utf8.$i.cert.pem", CONTENT => $cert, FORCE => 1);
+    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/utf8.$i.cert.pem", CONTENT => $cert, FORCE => 1);
 
     ## build the PKCS#12 file
     my @chain = [ $cacert ];
@@ -124,7 +124,7 @@ for (my $i=0; $i < scalar @example; $i++)
                                 PROFILE => $profile});
     ok (1);
     print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/utf8.$i.crl.pem", CONTENT => $crl, FORCE => 1);
+    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/utf8.$i.crl.pem", CONTENT => $crl, FORCE => 1);
 }
 
 }
