@@ -200,7 +200,7 @@ sub get_certificate_for_alias {
      
     my $pki_realm = CTX('session')->get_pki_realm();    
     ##! 32: "Search for alias $keys->{ALIAS}"      
-    $certificate = CTX('dbi_backend')->first(
+    my $certificate = CTX('dbi_backend')->first(
         TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
         COLUMNS => [
             'CERTIFICATE.DATA', 
