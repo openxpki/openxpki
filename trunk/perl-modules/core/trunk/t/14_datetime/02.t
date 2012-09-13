@@ -3,7 +3,7 @@ use warnings;
 use Data::Dumper;
 use Test::More;
 
-plan tests => 19;
+plan tests => 21;
 
 diag "DATETIME FUNCTIONS: VALIDITY COMPUTATION\n" if $ENV{VERBOSE};
 
@@ -274,6 +274,32 @@ is(OpenXPKI::DateTime::convert_date(
    }),
    "2006-03-16T18:21:57", 'get_validity() absolutedate 200603182157');
 
+
+# Autodetect
+###########################################################################
+$now = DateTime->now( time_zone => 'UTC' ); 
+$dt = OpenXPKI::DateTime::get_validity(
+    {
+    VALIDITY => "-0000000030",
+    VALIDITYFORMAT => 'detect',
+    });
+
+$offset = $dt - $now;
+is($offset->in_units('minutes'), -30, 'autodetect relativedate ');
+
+
+###########################################################################
+$dt = OpenXPKI::DateTime::get_validity(
+    {
+    VALIDITY => "2006",
+    VALIDITYFORMAT => 'detect',
+    });
+
+is(OpenXPKI::DateTime::convert_date(
+   {
+       DATE => $dt,
+   }),
+   "2006-01-01T00:00:00", 'autodetect absolutedate');
 
 
 1;
