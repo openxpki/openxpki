@@ -5,8 +5,8 @@ use strict;
 use warnings;
 use Test::More;
 
-use Log::Log4Perl qw( :easy );
-Log::Log4Perl->easy_init($FATAL);
+use Log::Log4perl qw( :easy );
+Log::Log4perl->easy_init($FATAL);
 
 use OpenXPKI::i18n;
 
@@ -19,7 +19,7 @@ my $language;
 $language = "C";
 ok(OpenXPKI::i18n::set_language($language), 'Setting language to C succeeds');
 
-$language = "de_DE";
-ok(OpenXPKI::i18n::set_language($language), 'Setting language to de_DE succeeds');
+$language = "en_US";
+ok(OpenXPKI::i18n::set_language($language), 'Setting language to en_US succeeds');
 
 1;
