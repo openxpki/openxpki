@@ -4,7 +4,6 @@ use Test::More;
 use English;
 
 BEGIN { 
-    plan skip_all => "No CA setup for testing";    
     plan tests => 10 
 };
 
@@ -26,21 +25,19 @@ SKIP: {
 
 
 ## parameter checks for TokenManager init
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
-ok (1);
+my $token = $mgmt->get_token ({
+   TYPE => 'certsign',
+   NAME => 'test-ca',
+   CERTIFICATE => {
+        DATA => $cacert,
+        IDENTIFIER => 'ignored',
+   }
+});
 
-## parameter checks for get_token
-
-my $token = $mgmt->get_token (
-    {
-        TYPE => "CA", 
-        ID => "INTERNAL_CA_1", 
-        PKI_REALM => "Test Root CA",
-        CERTIFICATE => $cacert,
-    }
-);
-ok (1);
+ok (defined $token, 'Parameter checks for get_token');
 
 ## load CRR
 my $data = "-----BEGIN HEADER-----\n".

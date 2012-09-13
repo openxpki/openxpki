@@ -1,20 +1,17 @@
 use strict;
 use warnings;
 use English;
-
+use utf8;
+ 
 use Test::More;
-
-plan skip_all => "No CA setup for testing";
-
-plan tests => 20;
+ 
+plan tests => 21;
 
 diag "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
-    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;
-    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Config'} = 0;
 }
 
 use OpenXPKI::Crypto::TokenManager;
@@ -33,36 +30,34 @@ is($EVAL_ERROR, '', 'common.pl evaluated correctly');
 SKIP: {
     skip 'crypt init failed', 19 if $EVAL_ERROR;
 
-## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
-ok(defined $mgmt, 'new TokenManager defined');
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-## parameter checks for get_token
+my $ca_token = $mgmt->get_token ({
+   TYPE => 'certsign',
+   NAME => 'test-ca',
+   CERTIFICATE => {
+        DATA => $cacert,
+        IDENTIFIER => 'ignored',
+   }
+});
 
-my $ca_token      = $mgmt->get_token (
-    {
-        TYPE      => "CA",
-        ID        => "INTERNAL_CA_1",
-        PKI_REALM => "Test Root CA",
-        CERTIFICATE => $cacert,
-    }
-);
 ok(defined $ca_token, 'CA Token defined');
-my $default_token = $mgmt->get_token (
-    {
-        TYPE      => "DEFAULT",
-        PKI_REALM => "Test Root CA",
-    }
-);
+
+my $default_token = $mgmt->get_system_token ({
+        TYPE      => "DEFAULT",        
+});
+
 ok(defined $default_token, 'Default Token defined');
 
 ## create PIN (128 bit == 16 byte)
 my $passwd = $default_token->command ({COMMAND       => "create_random",
                                        RANDOM_LENGTH => 16});
+                                       
 ok($passwd, 'Random password created');
 diag "passwd: $passwd\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/passwd.txt",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/passwd.txt",
                       CONTENT  => $passwd,
                       FORCE    => 1);
 
@@ -75,7 +70,7 @@ my $key = $default_token->command ({COMMAND    => "create_key",
                                         ENC_ALG    => "aes256"}});
 ok ($key, 'DSA key created');
 diag "DSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/dsa.pem",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/dsa.pem",
                       CONTENT  => $key,
                       FORCE    => 1);
 
@@ -88,7 +83,7 @@ $key = $default_token->command ({COMMAND    => "create_key",
                                      ENC_ALG    => "aes256"}});
 ok ($key, 'EC key created');
 diag "EC: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/ec.pem",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/ec.pem",
                       CONTENT  => $key,
                       FORCE    => 1);
 
@@ -101,7 +96,7 @@ $key = $default_token->command ({COMMAND    => "create_key",
                                      ENC_ALG    => "aes256"}});
 ok ($key, 'RSA key created');
 diag "RSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/rsa.pem",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/rsa.pem",
                       CONTENT  => $key,
                       FORCE    => 1);
 
@@ -314,23 +309,24 @@ else
 
 ## create CSR
 my $subject = "cn=John Dö,dc=OpenXPKI,dc=org";
+ok(Encode::is_utf8($subject), 'utf8 String ok');
+print "Subject: $subject\n";
 my $csr = $default_token->command ({COMMAND => "create_pkcs10",
                                     KEY     => $key,
                                     PASSWD  => $passwd,
                                     SUBJECT => $subject});
 ok($csr, 'PKCS#10 creation');
 diag "CSR: $csr\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/pkcs10.pem",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/pkcs10.pem",
                       CONTENT  => $csr,
                       FORCE    => 1);
 
 ## create profile
-my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
-                  CONFIG    => $cache,
-                  PKI_REALM => "Test Root CA",
-                  TYPE      => "ENDENTITY",
-                  CA        => "INTERNAL_CA_1",
-                  ID        => "User",
+my $profile = OpenXPKI::Crypto::Profile::Certificate->new (                  
+                  TYPE  => "ENDENTITY",                                    
+                  ID    => "I18N_OPENXPKI_PROFILE_USER",
+                  CA    => "test-ca",
+                  CACERTIFICATE => $cacert,
 		  );
 $profile->set_serial  (1);
 $profile->set_subject ($subject);
@@ -340,9 +336,11 @@ ok($profile, 'Certificate profile');
 my $cert = $ca_token->command ({COMMAND => "issue_cert",
                                 CSR     => $csr,
                                 PROFILE => $profile});
-ok ($cert, 'Certificate issuance');
+
+ok($cert =~ /^-----BEGIN CERTIFICATE-----/, 'Certificate issue');
+
 diag "cert: $cert\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/ca1/cert.pem",
+OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/cert.pem",
                       CONTENT  => $cert,
                       FORCE    => 1);
 
@@ -358,9 +356,14 @@ diag "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
 
 ### create CRL profile...
 $profile = OpenXPKI::Crypto::Profile::CRL->new (
-                  CONFIG    => $cache,
-                  PKI_REALM => "Test Root CA",
-                  CA        => "INTERNAL_CA_1");
+                  CA    => "test-ca",
+                  VALIDITY => {
+                        VALIDITYFORMAT => 'relativedate',
+                        VALIDITY    => "+000014",
+                  },
+                  CACERTIFICATE => $cacert,
+                  );
+                  
 ## otherwise test 34 fails
 $profile->set_serial (23);
 ### issue crl...
@@ -371,7 +374,7 @@ eval
                                    REVOKED => [$cert],
                                    PROFILE => $profile});
     diag "CRL: $crl\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/ca1/crl.pem",
+    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/crl.pem",
                           CONTENT  => $crl,
                           FORCE    => 1);
 };

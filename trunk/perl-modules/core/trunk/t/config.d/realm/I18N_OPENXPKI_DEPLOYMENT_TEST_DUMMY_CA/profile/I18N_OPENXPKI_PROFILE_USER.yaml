@@ -1,7 +1,7 @@
 # The name of the file equals the name of the profile
 
 validity:
-    notafter: +03
+    notafter: +0006
 
 digest: sha1
 increasing_serials: 1

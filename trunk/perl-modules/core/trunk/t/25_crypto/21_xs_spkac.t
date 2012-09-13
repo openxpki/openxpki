@@ -3,8 +3,6 @@ use warnings;
 use English;
 use Test::More;
 
-plan skip_all => "No CA setup for testing";
-
 plan tests => 13;
 
 diag "OpenXPKI::Crypto::Backend::OpenSSL::SPKAC\n" if $ENV{VERBOSE};
@@ -28,27 +26,26 @@ SKIP: {
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
-ok ($mgmt, 'TokenManager creation');
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-## parameter checks for get_token
+my $token = $mgmt->get_token ({
+   TYPE => 'certsign',
+   NAME => 'test-ca',
+   CERTIFICATE => {
+        DATA => $cacert,
+        IDENTIFIER => 'ignored',
+   }
+});
 
-my $token = $mgmt->get_token (
-    {
-        TYPE => "CA", 
-        ID => "INTERNAL_CA_1", 
-        PKI_REALM => "Test Root CA",
-        CERTIFICATE => $cacert,
-    }
-);
-ok ($mgmt, 'get_token()');
+ok (defined $token, 'Parameter checks for get_token');
 
 ## create SPKAC request
-$ENV{pwd} = OpenXPKI->read_file ("$basedir/ca1/passwd.txt");
+$ENV{pwd} = OpenXPKI->read_file ("$basedir/test-ca/tmp/passwd.txt");
 ok($ENV{pwd}, 'Password reading from file');
 
 my $shell_path = `cat t/cfg.binary.openssl`; # openssl executable to use
-my $spkac = `$shell_path spkac -key $basedir/ca1/rsa.pem -passin env:pwd`;
+my $spkac = `$shell_path spkac -key $basedir/test-ca/tmp/rsa.pem -passin env:pwd`;
 ok($spkac, 'OpenSSL SPKAC conversion');
 
 # SPKAC needs the raw SPKAC data without the SPKAC= openssl 'header'

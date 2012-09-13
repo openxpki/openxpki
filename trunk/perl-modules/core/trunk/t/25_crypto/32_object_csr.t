@@ -3,8 +3,7 @@ use warnings;
 use Test::More;
 use English;
 use Encode;
-
-plan skip_all => "No CA setup for testing";
+use utf8;
 
 plan tests => 25;
 
@@ -13,8 +12,6 @@ print STDERR "OpenXPKI::Crypto::CSR\n" if $ENV{VERBOSE};
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
-    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;
-    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Config'} = 0;
 }
 
 use OpenXPKI::Crypto::TokenManager;
@@ -34,24 +31,23 @@ SKIP: {
 
 
 ## parameter checks for TokenManager init
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
-ok (1);
+my $token = $mgmt->get_token ({
+   TYPE => 'certsign',
+   NAME => 'test-ca',
+   CERTIFICATE => {
+        DATA => $cacert,
+        IDENTIFIER => 'ignored',
+   }
+});
 
-## parameter checks for get_token
+ok (defined $token, 'Parameter checks for get_token');
 
-my $token = $mgmt->get_token (
-    {
-        TYPE => "CA", 
-        ID => "INTERNAL_CA_1", 
-        PKI_REALM => "Test Root CA",
-        CERTIFICATE => $cacert,
-    }
-);
-ok (1);
 
 ## load CSR
-my $data = OpenXPKI->read_file ("$basedir/ca1/pkcs10.pem");
+my $data = OpenXPKI->read_file ("$basedir/test-ca/tmp/pkcs10.pem");
 ok(1);
 $data = "-----BEGIN HEADER-----\n".
         "ROLE=User\n".
@@ -125,7 +121,7 @@ my @example = (
 
 for (my $i=0; $i < scalar @example; $i++)
 {
-    $data = OpenXPKI->read_file ("$basedir/ca1/utf8.$i.pkcs10.pem");
+    $data = OpenXPKI->read_file ("$basedir/test-ca/tmp/utf8.$i.pkcs10.pem");
     $data = "-----BEGIN HEADER-----\n".
             "ROLE=User\n".
             "SERIAL=4321\n".

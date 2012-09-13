@@ -18,7 +18,7 @@ ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
-   NAME => 'server-ca-1',
+   NAME => 'test-ca',
    CERTIFICATE => {
         DATA => '-----BEGIN CERTIFICATE-----',
         IDENTIFIER => 'abcde',

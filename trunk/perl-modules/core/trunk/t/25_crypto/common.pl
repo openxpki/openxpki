@@ -17,8 +17,7 @@ use OpenXPKI::Server::Init;
 
 our $basedir = File::Spec->catfile('t', '25_crypto');
 
-foreach my $dir ("t/25_crypto/ca1/certs",
-                 "t/25_crypto/ca2/certs",
+foreach my $dir ("t/25_crypto/test-ca/tmp",                 
                  "t/25_crypto/canciph/certs",
                  "t/25_crypto/cagost/certs")
 {
@@ -36,7 +35,7 @@ OpenXPKI::Server::Context::setcontext({
 });
 
 our $cacert;
-my $cacertfile = "$basedir/ca1/cacert.pem";
+my $cacertfile = "$basedir/test-ca/cacert.pem";
 my $fu = OpenXPKI::FileUtils->new();
 if (-e $cacertfile) { # if the CA certificate exists, make it available globally
                       # for use with CA tokens

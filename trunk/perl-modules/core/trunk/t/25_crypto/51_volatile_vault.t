@@ -1,5 +1,5 @@
 use Test::More;
-BEGIN {  plan skip_all => "No CA setup for testing"; plan tests => 27 };
+BEGIN {  plan tests => 27 };
 
 print STDERR "OpenXPKI::Crypto::VolatileVault\n" if $ENV{VERBOSE};
 
@@ -56,13 +56,13 @@ eval {
     $tmp = $vault->export_key();
 };
 # export worked 1st time
-ok($EVAL_ERROR, '');
+is($EVAL_ERROR, '');
 
 eval {
     $tmp = $vault->export_key();
 };
 # export worked 2nd time
-ok($EVAL_ERROR, '');
+is($EVAL_ERROR, '');
 
 
 # save key for later re-initialization of vault
@@ -117,7 +117,7 @@ $tmp = undef;
 eval {
     $tmp = $reused_vault->decrypt($public);
 };
-ok($EVAL_ERROR, '');
+is($EVAL_ERROR, '');
 ok($secret, $tmp);
 
 # exporting keys should now be allowed
@@ -125,7 +125,7 @@ $tmp = undef;
 eval {
     $tmp = $reused_vault->export_key();
 };
-ok($EVAL_ERROR, '');
+is($EVAL_ERROR, '');
 ok($key_backup->{KEY}, $tmp->{KEY});
 ok($key_backup->{IV}, $tmp->{IV});
 
@@ -135,7 +135,7 @@ $tmp = undef;
 eval {
     $tmp = $reused_vault->export_key();
 };
-ok($EVAL_ERROR, '');
+is($EVAL_ERROR, '');
 ok($key_backup->{KEY}, $tmp->{KEY});
 ok($key_backup->{IV}, $tmp->{IV});
 
@@ -145,7 +145,7 @@ $tmp = undef;
 eval {
     $tmp = $reused_vault->export_key();
 };
-ok($EVAL_ERROR, '');
+is($EVAL_ERROR, '');
 ok($key_backup->{KEY}, $tmp->{KEY});
 ok($key_backup->{IV}, $tmp->{IV});
 
@@ -162,6 +162,6 @@ ok($EVAL_ERROR, 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_EXPORT_KEY_DENIED');
 
 #####
 # check if key identifier can be queried
-ok(length($reused_vault->get_key_id()), 8);
+is(length($reused_vault->get_key_id()), 8);
 ok(length($reused_vault->get_key_id( { LONG => 1 })) > 20);
 

@@ -5,7 +5,6 @@ binmode STDERR, ":utf8";
 binmode STDOUT, ":utf8";
 use Test::More;
 use English;
-plan skip_all => "No CA setup for testing";
 
 plan tests => 20;
 
@@ -27,36 +26,34 @@ SKIP: {
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
-ok (1);
 
-## parameter checks for get_token
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-my $token = $mgmt->get_token (
-    {
-        TYPE => "CA", 
-        ID => "INTERNAL_CA_1", 
-        PKI_REALM => "Test Root CA",
-        CERTIFICATE => $cacert,
-    }
-);
-ok (1);
+my $token = $mgmt->get_token ({
+   TYPE => 'certsign',
+   NAME => 'test-ca',
+   CERTIFICATE => {
+        DATA => $cacert,
+        IDENTIFIER => 'ignored',
+   }
+});
 
-my $default_token = $mgmt->get_token (
-    {
-        TYPE      => "DEFAULT",
-        PKI_REALM => "Test Root CA",
-    }
-);
-ok (1);
+ok(defined $token, 'CA Token defined');
+
+my $default_token = $mgmt->get_system_token ({
+        TYPE      => "DEFAULT",        
+});
+
+ok(defined $default_token, 'Default Token defined');
 
 ## the following operations are already performed by other tests
 ## create PIN (128 bit == 16 byte)
 ## create DSA key
 ## create RSA key
 
-my $passwd = OpenXPKI->read_file ("$basedir/ca1/passwd.txt");
-my $key    = OpenXPKI->read_file ("$basedir/ca1/rsa.pem");
+my $passwd = OpenXPKI->read_file ("$basedir/test-ca/tmp/passwd.txt");
+my $key    = OpenXPKI->read_file ("$basedir/test-ca/tmp/rsa.pem");
 ok (1);
 
 ######################################
@@ -80,15 +77,14 @@ for (my $i=0; $i < scalar @example; $i++)
                                 SUBJECT => $dn});
     ok (1);
     print STDERR "CSR: $csr\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.pkcs10.pem", CONTENT => $csr, FORCE => 1);
+    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/utf8.$i.pkcs10.pem", CONTENT => $csr, FORCE => 1);
 
     ## create profile
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
-                      CONFIG    => $cache,
-                      PKI_REALM => "Test Root CA",
-		      TYPE      => "ENDENTITY",
-                      CA        => "INTERNAL_CA_1",
-                      ID        => "User");
+            TYPE  => "ENDENTITY",                                    
+            ID    => "I18N_OPENXPKI_PROFILE_USER",
+            CA    => "test-ca",
+            CACERTIFICATE => $cacert);
     $profile->set_serial  (1);
     $profile->set_subject ($dn);
     ok(1);
@@ -99,7 +95,7 @@ for (my $i=0; $i < scalar @example; $i++)
                                  PROFILE => $profile});
     ok (1);
     print STDERR "cert: $cert\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.cert.pem", CONTENT => $cert, FORCE => 1);
+    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/utf8.$i.cert.pem", CONTENT => $cert, FORCE => 1);
 
     ## build the PKCS#12 file
     my @chain = [ $cacert ];
@@ -128,7 +124,7 @@ for (my $i=0; $i < scalar @example; $i++)
                                 PROFILE => $profile});
     ok (1);
     print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/ca1/utf8.$i.crl.pem", CONTENT => $crl, FORCE => 1);
+    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/tmp/utf8.$i.crl.pem", CONTENT => $crl, FORCE => 1);
 }
 
 }

@@ -3,7 +3,6 @@ use warnings;
 use Test::More;
 use English;
 
-plan skip_all => "No CA setup for testing";
 plan tests => 16;
 
 print STDERR "OpenXPKI::Crypto::CRL\n" if $ENV{VERBOSE};
@@ -23,26 +22,24 @@ SKIP: {
     skip 'crypt init failed', 15 if $EVAL_ERROR;
 
 
-
 ## parameter checks for TokenManager init
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
-ok (1);
+my $token = $mgmt->get_token ({
+   TYPE => 'certsign',
+   NAME => 'test-ca',
+   CERTIFICATE => {
+        DATA => $cacert,
+        IDENTIFIER => 'ignored',
+   }
+});
 
-## parameter checks for get_token
+ok (defined $token, 'Parameter checks for get_token');
 
-my $token = $mgmt->get_token (
-    {
-        TYPE => "CA", 
-        ID => "INTERNAL_CA_1", 
-        PKI_REALM => "Test Root CA",
-        CERTIFICATE => $cacert,
-    }
-);
-ok (1);
 
 ## load CRL
-my $data = OpenXPKI->read_file ("$basedir/ca1/crl.pem");
+my $data = OpenXPKI->read_file ("$basedir/test-ca/tmp/crl.pem");
 ok(1);
 $data = "-----BEGIN HEADER-----\n".
         "GLOBAL_ID=1234\n".
@@ -54,7 +51,7 @@ my $crl = OpenXPKI::Crypto::CRL->new (TOKEN => $token, DATA => $data);
 ok(1);
 
 ## test parser
-ok ($crl->get_parsed("BODY", "ISSUER") eq "CN=CA_1,DC=OpenXPKI,DC=info");
+is ($crl->get_parsed("BODY", "ISSUER"), "DC=test,DC=openxpki,CN=test-ca");
 is ($crl->get_parsed("BODY", "SERIAL"), 23, 'get_parsed() -> serial');
 is ($crl->get_serial(), 23, 'get_serial()');
 ok ($crl->get_parsed("HEADER", "GLOBAL_ID") == 1234);

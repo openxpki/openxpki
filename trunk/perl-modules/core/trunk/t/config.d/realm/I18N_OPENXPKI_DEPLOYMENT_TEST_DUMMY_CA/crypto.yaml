@@ -2,7 +2,7 @@
 # The left side are fixed aliases used in the code, the right side
 # are aribtrary chosen names, referencing the tokens below.
 type:
-  certsign: server-ca            
+  certsign: test-ca
   crlsign:  server-crl-signer   
   datasafe: server-vault   
   scep: my-scep-server-token  
@@ -35,25 +35,10 @@ token:
 
   # These are "group" definitons which are automagically expanded for each 
   # key generation  
-  server-ca:
+  test-ca:
+    key: /usr/local/src/tests/trunk/perl-modules/core/trunk/t/25_crypto/test-ca/cakey.pem
     inherit: default # Load all settings from default which are not defined here
- 
-  server-crl-signer:
-    inherit: default
-     
-  my-scep-server-token:
-    inherit: default
-    backend: OpenXPKI::Crypto::Tool::SCEP
-    shell: /usr/bin/openca-scep
   
-  # Generation 1 of the ca token was not in hardware and needs special config
-  # This inherits from default but NOT from server-ca and therefore has now 
-  # knowledge of the nCipher Setup.
-  server-ca-1:
-    inherit: default
-    backend: OpenXPKI::Crypto::Backend::OpenSSL
-    secret: default
-    key: /etc/openxpki/instances/trustcenter1/ca/testdummyca1/cakey.pem
     
 # Define the secret groups. The mapping between secret and token is done on 
 # key import and recorded in the alias table. Default value can be set in the
@@ -62,33 +47,10 @@ secret:
   default:     
     label: Default secret group of this realm
     method: literal
-    value: root
+    value: secret
     cache: 
       type: daemon
       usage_count: -1
-    
-  gen1key:
-    label: Secret for old keys
-    method: literal
-    cache: 
-      type: daemon
-      usage_count: -1
-    
-  ngkey:     
-    label: New split secret used for current generations
-    method: split
-    total_shares: 5 
-    required_shares: 3
-    cache: 
-      type: daemon
-      usage_count: -1
-    
-# Structure for Alias Table    
-#identifier: cert identifiert
-#realm: realm
-#alias: group name from the map (e.g. server-ca)
-#generation: increasing integer - automanaged by importer
-#secret: secret group to use, set with import command, may be empty
-
+     
 
 

@@ -3,8 +3,6 @@ use warnings;
 use Test::More;
 use English;
 
-plan skip_all => "No CA setup for testing";
-
 plan tests => 16;
 
 
@@ -23,30 +21,27 @@ is($EVAL_ERROR, '', 'common.pl evaluated correctly');
 SKIP: {
     skip 'crypt init failed', 15 if $EVAL_ERROR;
 
-## parameter checks for TokenManager init
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
-ok (1);
+my $token = $mgmt->get_token ({
+   TYPE => 'certsign',
+   NAME => 'test-ca',
+   CERTIFICATE => {
+        DATA => $cacert,
+        IDENTIFIER => 'ignored',
+   }
+});
 
-## parameter checks for get_token
-
-my $token = $mgmt->get_token (
-    {
-        TYPE => "CA",
-        ID => "INTERNAL_CA_1",
-        PKI_REALM => "Test Root CA",
-        CERTIFICATE => $cacert,
-    }
-);
 ok (1);
 
 ## load data
-my $passwd = OpenXPKI->read_file ("$basedir/ca1/passwd.txt");
-my $dsa    = OpenXPKI->read_file ("$basedir/ca1/dsa.pem");
-my $rsa    = OpenXPKI->read_file ("$basedir/ca1/rsa.pem");
-my $csr    = OpenXPKI->read_file ("$basedir/ca1/pkcs10.pem");
-my $cert   = OpenXPKI->read_file ("$basedir/ca1/cert.pem");
-my $crl    = OpenXPKI->read_file ("$basedir/ca1/crl.pem");
+my $passwd = OpenXPKI->read_file ("$basedir/test-ca/tmp/passwd.txt");
+my $dsa    = OpenXPKI->read_file ("$basedir/test-ca/tmp/dsa.pem");
+my $rsa    = OpenXPKI->read_file ("$basedir/test-ca/tmp/rsa.pem");
+my $csr    = OpenXPKI->read_file ("$basedir/test-ca/tmp/pkcs10.pem");
+my $cert   = OpenXPKI->read_file ("$basedir/test-ca/tmp/cert.pem");
+my $crl    = OpenXPKI->read_file ("$basedir/test-ca/tmp/crl.pem");
 ok($passwd and $dsa and $rsa and $csr and $cert and $crl);
 
 ## DSA KEY: PEM --> DER

@@ -3,8 +3,6 @@ use warnings;
 
 use Test::More;
 
-plan skip_all => "No CA setup for testing";
-
 plan tests => 8;
 
 use English;
@@ -12,6 +10,7 @@ use English;
 use OpenXPKI::Crypto::TokenManager;
 
 our $cache;
+our $cacert;
 eval `cat t/25_crypto/common.pl`;
 
 is($EVAL_ERROR, '', 'common.pl evaluated correctly');
@@ -20,20 +19,21 @@ SKIP: {
     skip 'crypt init failed', 7 if $EVAL_ERROR;
 
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
-ok(defined $mgmt, 'TokenManager defined');
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-## parameter checks for get_token
+my $token = $mgmt->get_token ({
+   TYPE => 'certsign',
+   NAME => 'test-ca',
+   CERTIFICATE => {
+        DATA => $cacert,
+        IDENTIFIER => 'ignored',
+   }
+});
 
-my $token = $mgmt->get_token (
-    {
-        TYPE => "DEFAULT", 
-        PKI_REALM => "Test Root CA",
-    }
-);
-ok(defined $token, 'Default token defined');
+ok (defined $token, 'Parameter checks for get_token');
 
-open my $CACERT1, '<', 't/25_crypto/ca1/cacert.pem';
+open my $CACERT1, '<', 't/25_crypto/test-ca/cacert.pem';
 my $cacert1 = do {
     local $INPUT_RECORD_SEPARATOR;
     <$CACERT1>;
@@ -41,7 +41,7 @@ my $cacert1 = do {
 close($CACERT1);
 ok($cacert1, 'Read in CA certificate 1');
 
-open my $CERT, '<', 't/25_crypto/ca1/cert.pem';
+open my $CERT, '<', 't/25_crypto/test-ca/tmp/cert.pem';
 my $cert = do {
     local $INPUT_RECORD_SEPARATOR;
     <$CERT>;

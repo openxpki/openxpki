@@ -3,8 +3,6 @@ use warnings;
 use Test::More;
 use English;
 
-plan skip_all => "No CA setup for testing";
-
 plan tests => 10;
 
 print STDERR "OpenXPKI::Crypto::Command: PKCS#7 tests\n" if $ENV{VERBOSE};
@@ -24,28 +22,26 @@ is($EVAL_ERROR, '', 'common.pl evaluated correctly');
 SKIP: {
     skip 'crypt init failed', 9 if $EVAL_ERROR;
 
-## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
-ok(1);
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-## parameter checks for get_token
+my $token = $mgmt->get_token ({
+   TYPE => 'certsign',
+   NAME => 'test-ca',
+   CERTIFICATE => {
+        DATA => $cacert,
+        IDENTIFIER => 'ignored',
+   }
+});
 
-my $token = $mgmt->get_token (
-    {
-        TYPE => "CA", 
-        ID => "INTERNAL_CA_1", 
-        PKI_REALM => "Test Root CA",
-        CERTIFICATE => $cacert,
-    }
-);
 ok(1);
 
 ## load data
 
-my $passwd = OpenXPKI->read_file ("$basedir/ca1/passwd.txt");
-my $rsa    = OpenXPKI->read_file ("$basedir/ca1/rsa.pem");
-my $cert   = OpenXPKI->read_file ("$basedir/ca1/cert.pem");
+my $passwd = OpenXPKI->read_file ("$basedir/test-ca/tmp/passwd.txt");
+my $rsa    = OpenXPKI->read_file ("$basedir/test-ca/tmp/rsa.pem");
+my $cert   = OpenXPKI->read_file ("$basedir/test-ca/tmp/cert.pem");
 ok($passwd and $rsa and $cert);
 
 my $content = "This is for example a passprase.";
