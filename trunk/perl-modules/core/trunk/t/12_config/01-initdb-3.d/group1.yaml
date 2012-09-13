@@ -1,5 +1,0 @@
-ldap1:
-    uri: ldaps://example1.org
-    user: openxpki1
-    password: secret1
-

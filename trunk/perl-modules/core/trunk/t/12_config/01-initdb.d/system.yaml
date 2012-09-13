@@ -1,0 +1,3 @@
+database:
+    user: openxpki
+    pass: oldpassword
