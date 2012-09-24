@@ -55,7 +55,7 @@ sub do_step {
     
     if (defined $args{EXPECTED_STATE}) {
 	### expected state: $args{EXPECTED_STATE}
-	ok($workflow->state(), $args{EXPECTED_STATE});
+	is($workflow->state(), $args{EXPECTED_STATE});
     } 
     else
     {
@@ -66,7 +66,7 @@ sub do_step {
 	my @actions = $workflow->get_current_actions();
 
 	# verify if the requested action count matches
-	ok(scalar(@actions), scalar(@{$args{EXPECTED_ACTIONS}}));
+	is(scalar(@actions), scalar(@{$args{EXPECTED_ACTIONS}}));
 
 	my %action_flag = map { $_ => 1 } @{$args{EXPECTED_ACTIONS}};
 
@@ -77,7 +77,7 @@ sub do_step {
 		warn "unexpected action $action";
 	    }
 	}
-	ok($fail, 0, "Available actions: " . join(", ", @actions));
+	is($fail, 0, "Available actions: " . join(", ", @actions));
     }
     else
     {
@@ -117,22 +117,18 @@ Log::Log4perl->easy_init($ERROR);
 
 ### initialize context
 ok(OpenXPKI::Server::Init::init(
-       {
-	   CONFIG => 't/config_test.xml',
-	   TASKS  => [ 'current_xml_config', 
-		       'i18n', 
-               'dbi_log',
-		       'log', 
-#		       'redirect_stderr', 
-		       'dbi_backend', 
-		       'dbi_workflow',
-               'xml_config',
-		       'crypto_layer',
-		       'pki_realm', 
-		       'volatile_vault',
-               'acl',
-               'api',
-               'authentication',
+       {	   
+	   TASKS  => [
+            'config_test', 
+	       'i18n',
+	       'api', 
+           'dbi_log',
+	       'log',  
+	       'dbi_backend', 
+	       'dbi_workflow',
+	       'crypto_layer',
+	       'volatile_vault',           
+           'authentication',
                ],
 	   SILENT => 1,
        }));
@@ -149,7 +145,7 @@ ok($dbi->connect());
 my $session = OpenXPKI::Server::Session->new ({
                   DIRECTORY => "t/60_workflow/",
                   LIFETIME  => 100});
-$session->set_pki_realm ("Test Root CA");
+$session->set_pki_realm ("I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA");
 $session->set_role ("CA Operator");
 $session->make_valid ();
 ok(OpenXPKI::Server::Context::setcontext ({session => $session}));

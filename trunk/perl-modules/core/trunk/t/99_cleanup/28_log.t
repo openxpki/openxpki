@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 my @files = (             
-             "t/28_log/openxpki.log",
+             "t/28_log/openxpki.log",             
             );
 
 ## 2 * number of files

@@ -12,7 +12,7 @@ use English;
 if ($ENV{DEBUG}) {
     $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Init'} = 128;
 }
-require OpenXPKI::Server::Init;
+require OpenXPKI::Workflow::Handler;
 
 diag "Testing conversion of our XML cache to Workflow XMLin datastructure" if $ENV{VERBOSE};
 
@@ -26,7 +26,7 @@ my $our_xs = XML::Simple->new(
 my $force_array = [ 'action', 'field', 'source_list', 'param', 'validator', 'arg' ];
 
 my $our_xml = $our_xs->XMLin('t/60_workflow/test_action.xml');
-$our_xml = OpenXPKI::Server::Init::__flatten_content($our_xml, $force_array);
+$our_xml = OpenXPKI::Workflow::Handler::__flatten_content($our_xml, $force_array);
 
 my $workflow_xs = XML::Simple->new(
     ForceArray   => $force_array,
@@ -42,7 +42,7 @@ if ($ENV{DEBUG}) {
 is_deeply($workflow_xml, $our_xml, 'Converted our XML to workflow structure');
 
 eval {
-    $our_xml = OpenXPKI::Server::Init::__flatten_content($our_xml, $force_array);
+    $our_xml = OpenXPKI::Workflow::Handler::__flatten_content($our_xml, $force_array);
 };
 is($EVAL_ERROR, '', 'Calling __flatten_content twice creates no error');
 is_deeply($workflow_xml, $our_xml, 'Calling __flatten_content twice does not change structure');

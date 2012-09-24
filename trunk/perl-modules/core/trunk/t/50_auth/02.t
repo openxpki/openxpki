@@ -12,15 +12,16 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
 ok(1);
 
+
+## create context
+
 ## init XML cache
 OpenXPKI::Server::Init::init(
-    {
-	CONFIG => 't/config_test.xml',
+    {	
 	TASKS => [
-        'current_xml_config',
+	    'config_test',     
         'log',
-        'dbi_backend',
-        'xml_config',
+        'dbi_backend',        
     ],
 	SILENT => 1,
     });

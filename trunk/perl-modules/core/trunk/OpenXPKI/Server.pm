@@ -148,8 +148,10 @@ sub pre_server_close_hook {
 
     # remove pid and socketfile on destruction - they are no longer useful
     # if the server is not running ...
+    ##! 8: 'unlink socketfile ' . $self->{PARAMS}->{socketfile}
     unlink ($self->{PARAMS}->{socketfile});
     ##! 4: 'socketfile removed'
+    ##! 8: 'unlink pid file ' . $self->{PARAMS}->{pid_file}    
     unlink ($self->{PARAMS}->{pid_file});
     ##! 4: 'pid_file removed'
 

@@ -7,21 +7,21 @@ node:
     id: 0
 
 # Location of the log4perl configuration
-log4perl: /etc/openxpki/instances/trustcenter1/log.conf
+log4perl: t/28_log/log4perl.conf
 
 # Daemon settings
 user:         openxpki
 group:        openxpki
-socket_file:  /var/openxpki/openxpki.socket
-pid_file:     /var/run/openxpkid.pid
-stderr:       /var/openxpki/stderr.log
+socket_file:  t/var/openxpki/openxpki.socket
+pid_file:     t/var/openxpki/openxpkid.pid
+stderr:       t/var/openxpki/stderr.log
 tmpdir:       /var/tmp
 environment:
 #    key: value
 
 # Session
 session:
-    directory: /var/openxpki/session
+    directory: t/var/openxpki/session
     lifetime: 1200
 
 # Which transport to initialize    

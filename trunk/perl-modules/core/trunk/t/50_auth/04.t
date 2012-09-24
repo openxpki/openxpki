@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 8;
+plan tests => 10;
 
 diag "OpenXPKI::Server::Authentication::Password\n" if $ENV{VERBOSE};
 
@@ -21,21 +21,16 @@ require OpenXPKI::Server::Authentication;
 ## init XML cache
 OpenXPKI::Server::Init::init(
     {
-	CONFIG => 't/config_test.xml',
 	TASKS => [
-        'current_xml_config',
+        'config_test',
         'log',
         'dbi_backend',
-        'xml_config',
     ],
 	SILENT => 1,
     });
 
 ## load authentication configuration
-my $auth = OpenXPKI::Server::Authentication::Password->new ({
-        XPATH   => ['pki_realm', 'auth', 'handler' ], 
-        COUNTER => [ 0         , 0     , 1         ],
-});
+my $auth = OpenXPKI::Server::Authentication::Password->new ('auth.handler.User Password');
 ok($auth);
 
 ## perform authentication
@@ -69,13 +64,41 @@ ok($user eq 'Foo');
 ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');    
 
 
+# Exisiting user - wrong password
+eval {
+($user, $role, $reply) = $auth->login_step({
+    STACK   => 'Foo',
+    MESSAGE => {
+        'SERVICE_MSG' => 'GET_PASSWD_LOGIN',
+        'PARAMS'      => {
+            'LOGIN'  => 'Foo',
+            'PASSWD' => 'wrongpassword',
+        },
+    },
+});
+};
+like($@, "/I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED/");
+
+
+# Non-Exisiting user
+eval {
+($user, $role, $reply) = $auth->login_step({
+    STACK   => 'Foo',
+    MESSAGE => {
+        'SERVICE_MSG' => 'GET_PASSWD_LOGIN',
+        'PARAMS'      => {
+            'LOGIN'  => 'Bar',
+            'PASSWD' => 'anything',
+        },
+    },
+});
+};
+like($@, "/I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED/");
+
 
 $auth = undef;
 ## load authentication configuration
-$auth = OpenXPKI::Server::Authentication::Password->new ({
-        XPATH   => ['pki_realm', 'auth', 'handler' ], 
-        COUNTER => [ 0         , 0     , 2         ],
-});
+$auth = OpenXPKI::Server::Authentication::Password->new ('auth.handler.Operator Password');
 ok($auth);
 
 ## perform authentication

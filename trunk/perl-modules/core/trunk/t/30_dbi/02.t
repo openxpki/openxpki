@@ -23,8 +23,9 @@ my $cert = OpenXPKI->read_file ("t/25_crypto/test-ca/cacert.pem");
 $cert = OpenXPKI::Crypto::X509->new (DATA => $cert, TOKEN => $token);
 my $crl = OpenXPKI->read_file ("t/25_crypto/test-ca/crl.pem");
 $crl = OpenXPKI::Crypto::CRL->new (DATA => $crl, TOKEN => $token);
-$cert->set_header_attribute (PKI_REALM => "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA",
-                             CA        => "test-ca");
+# FIXME: Crashes OpenSSL parsing later - what is this for?
+#$cert->set_header_attribute (PKI_REALM => "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA",
+#                             CA        => "test-ca");
 $crl->set_header_attribute (PKI_REALM => "I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA",
                             CA        => "test-ca");
 
@@ -72,6 +73,7 @@ $dbi->insert(
         IDENTIFIER => $cert->get_identifier(),
         PKI_REALM  => 'I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA',
         ALIAS      => 'test-ca',
+        GROUP_ID => 'test-ca',
     },
 );
 $dbi->commit();

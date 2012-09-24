@@ -28,7 +28,7 @@ sub validate {
     if (not grep /^$role$/, @roles)
     {
         push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CERT_ROLE_INVALID',
-                         {ROLE => $role} ];
+                         {ROLE => $role, ROLES => @roles } ];
         $context->param ("__error" => $errors);
 	CTX('log')->log(
 	    MESSAGE => "Invalid certificate role '$role'",

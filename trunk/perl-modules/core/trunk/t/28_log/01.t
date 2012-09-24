@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 6;
+plan tests => 7;
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
@@ -12,7 +12,10 @@ if ($ENV{DEBUG_LEVEL}) {
 diag "OpenXPKI::Server::Log: interface of log function\n" if $ENV{VERBOSE};
 use OpenXPKI::Server::Log;
 
-my $filename = "t/28_log/openxpki.log";
+`mkdir -p 't/var/openxpki/session/'`;
+ok (-d 't/var/openxpki/session/');
+
+my $filename = "t/var/openxpki/openxpki.log";
 ok (!-e $filename || unlink ($filename), 'Remove old logfile if any');
 
 my $log = OpenXPKI::Server::Log->new( CONFIG => 't/28_log/log4perl.conf' );
@@ -22,7 +25,7 @@ ok (! $log->log (FACILITY => "auth",
                PRIORITY => "debug",
                MESSAGE  => "Test."), 'Test message');
 
-ok (! -s 't/28_log/openxpki.log', 'Log file has zero size');
+ok (! -s $filename, 'Log file has zero size');
 
 # error
 eval {
@@ -36,6 +39,6 @@ ok ($log->log (FACILITY => "auth",
                PRIORITY => "info",
                MESSAGE  => "Test."), 'Test message');
 
-ok (-s 't/28_log/openxpki.log', 'Log file exists and is non-empty');
+ok (-s $filename, 'Log file exists and is non-empty');
 
 1;

@@ -1,6 +1,6 @@
 # OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL
 # Written by Oliver Welter for the OpenXPKI project 2012
-# Copyright (c) 2009 by The OpenXPKI Project
+# Copyright (c) 2012 by The OpenXPKI Project
 
 package OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL;
 
@@ -128,7 +128,7 @@ sub execute {
     ##! 32: 'Data for publication '. Dumper ( $data )      
     foreach my $target (@targets) {       
         ##! 32: " $prefix.$target . " . $data->{issuer}{CN}[0] 
-        my $res = $config->set( [ $prefix, $target, $data->{issuer}{CN}[0] ], $data );
+        my $res = $config->set( [ "$prefix.$target.", $data->{issuer}{CN}[0] ], $data );
         ##! 16 : 'Publish at target ' . $target . ' - Result: ' . $res
         
         CTX('log')->log(

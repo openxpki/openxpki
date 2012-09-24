@@ -21,23 +21,15 @@ BEGIN { plan tests => 11 };
 print STDERR "OpenXPKI::Server::Context\n" if $ENV{VERBOSE};
 ok(1);
 
-`cp t/30_dbi/sqlite.db t/30_dbi/sqlite.db._backend_`;
+$ENV{OPENXPKI_CONF_DB} = 't/config.git/';
 
 ## init XML cache
 ok(OpenXPKI::Server::Init::init(
-       {
-	   CONFIG => 't/config_test.xml',
-	   TASKS  => [ 'current_xml_config', 
-		       'i18n', 
-               'dbi_log',
+       {	   
+	   TASKS  => [ 'api',
+	           'config_versioned', 		                      
 		       'log', 
-#		       'redirect_stderr', 
-		       'dbi_backend', 
-		       'dbi_workflow',
-               'xml_config',
-		       'crypto_layer',
-		       'pki_realm', 
-		       'volatile_vault',
+		       'dbi_backend', 		       
                ],
        }));
    
@@ -124,7 +116,7 @@ if (my $exc = OpenXPKI::Exception->caught()) {
 my $var1;
 my $var2;
 eval {
-    ($var1, $var2)  = CTX('log', 'xml_config');
+    ($var1, $var2)  = CTX('log', 'config');
 };
 if (my $exc = OpenXPKI::Exception->caught()) {
     ok(0);
@@ -132,7 +124,7 @@ if (my $exc = OpenXPKI::Exception->caught()) {
 } else {
     my $tmp = CTX('log');
     ok($var1 == $tmp);
-    $tmp = CTX('xml_config');
+    $tmp = CTX('config');
     ok($var2 == $tmp);
 }
 

@@ -33,7 +33,10 @@ User Password:
     # echo -n root | openssl sha1 -binary | openssl base64
     user:
       - name: John Doe
-        digest: "{SSHA}TZXM/aqflDDQAmSWVxSDVWnH+NhxNU5w"
+        digest: "{SHA}yUetMg5m/GSZjoalXA2iEMjB2Bo="
+        role: User
+      - name: Foo
+        digest: "{SMD5}vVc3uduHQQ6RTzYhGYsguw=="
         role: User
 
 Operator Password:
@@ -42,7 +45,7 @@ Operator Password:
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
     user:
       - name: root
-        digest: "{SSHA}+u48F1BajP3ycfY/azvTBqprsStuUnhM"
+        digest: "{SSHA}dBJOqe34FoFHlldtTYG9tG4H/utneFJY"
         role: CA Operator
       - name: raop
         digest: "{SSHA}ejZpY22dFwjVI48z14y2jYuToPRjOXRP"
@@ -53,7 +56,7 @@ External Dynamic Role:
     label: External Dynamic Role
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL
     command: echo -n $PASSWD
-    # if this field is empty then the role is determined dynamically -->
+    # if this field is empty then the role is determined dynamically
     role: ''
     pattern: x
     replacement: x

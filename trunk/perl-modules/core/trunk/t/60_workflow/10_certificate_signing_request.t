@@ -13,15 +13,13 @@ use Cwd;
 
 diag("Certificate signing workflow\n") if $ENV{VERBOSE};
 
-my $instancedir = 't/60_workflow/test_instance';
-my $socketfile = $instancedir . '/var/openxpki/openxpki.socket';
-my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
-my $configfile = cwd()."/$instancedir/openssl.cnf";
+my $socketfile = 't/var/openxpki/openxpki.socket'; 
+my $pidfile = 't/var/openxpki/openxpkid.pid';
 
 ok(-e $pidfile, "PID file exists");
 ok(-e $socketfile, "Socketfile exists");
 my $client = OpenXPKI::Client->new({
-    SOCKETFILE => $instancedir . '/var/openxpki/openxpki.socket',
+    SOCKETFILE => $socketfile
 });
 ok(login({
     CLIENT   => $client,
@@ -74,7 +72,7 @@ eval {
 diag "Terminated connection";
 
 $client = OpenXPKI::Client->new({
-    SOCKETFILE => $instancedir . '/var/openxpki/openxpki.socket',
+    SOCKETFILE => $socketfile,
 });
 ok(login({
     CLIENT   => $client,
@@ -250,7 +248,7 @@ is($msg->{PARAMS}->{WORKFLOW}->{STATE}, 'APPROVAL', 'New state is APPROVAL');
 $msg = $client->send_receive_command_msg(
     'execute_workflow_activity',
     {
-          'ACTIVITY' => 'I18N_OPENXPKI_WF_ACTION_CANCEL_CSR_APPROVAL',
+          'ACTIVITY' => 'I18N_OPENXPKI_WF_ACTION_CANCEL_APPROVAL',
           'ID' => $wf_id,
           'PARAMS' => {
                       },

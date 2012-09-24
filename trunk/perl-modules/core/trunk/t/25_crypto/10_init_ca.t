@@ -27,7 +27,7 @@ is($@, '', 'seems that init succeeded');
 my $fu = OpenXPKI::FileUtils->new();
 
 # We create the CA using OpenSSL directly
-`openssl req -new -newkey rsa:2048 -keyout $basedir/test-ca/cakey.pem -out $basedir/test-ca/cacert.pem -x509 -subj "/CN=test-ca/DC=openxpki/DC=test" -passout pass:secret 2>&1 1>/dev/null`;
+`openssl req -new -days 3650 -newkey rsa:2048 -keyout $basedir/test-ca/cakey.pem -out $basedir/test-ca/cacert.pem -x509 -subj "/CN=test-ca/DC=openxpki/DC=test" -passout pass:secret 2>&1 1>/dev/null`;
 
 $cacert = $fu->read_file("$basedir/test-ca/cacert.pem");
 

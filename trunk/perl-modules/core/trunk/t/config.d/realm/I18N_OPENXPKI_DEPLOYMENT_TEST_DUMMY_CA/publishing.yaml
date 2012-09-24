@@ -29,7 +29,7 @@ connectors:
 
     cdp:
         class: Connector::Builtin::File::Path
-        LOCATION: /tmp/
+        LOCATION: /var/tmp/
         file: "[% ARGS %].crl"
         content: "[% pem %]"
 

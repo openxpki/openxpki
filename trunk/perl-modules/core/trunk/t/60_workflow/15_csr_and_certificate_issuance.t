@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 24;
+plan tests => 20;
 
 use OpenXPKI::Tests;
 use OpenXPKI::Client;
@@ -13,20 +13,24 @@ use OpenXPKI::Serialization::Simple;
 diag("CSR with cert issuance workflow forking\n") if $ENV{VERBOSE};
 
 # reuse the already deployed server
-my $instancedir = 't/60_workflow/test_instance';
-my $socketfile = $instancedir . '/var/openxpki/openxpki.socket';
-my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
+my $socketfile = 't/var/openxpki/openxpki.socket';
+my $pidfile    = 't/var/openxpki/openxpkid.pid';
 
 ok(-e $pidfile, "PID file exists");
 ok(-e $socketfile, "Socketfile exists");
 my $client = OpenXPKI::Client->new({
-    SOCKETFILE => $instancedir . '/var/openxpki/openxpki.socket',
+    SOCKETFILE => $socketfile,
 });
 ok(login({
     CLIENT   => $client,
     USER     => 'raop',
     PASSWORD => 'RA Operator',
   }), 'Logged in successfully');
+
+my $cert_subject_alt_name_parts = OpenXPKI::Serialization::Simple->new()->serialize({    
+    'cert_subject_alt_name_choice_key' => ['DNS'],
+    'cert_subject_alt_name_choice_value' => ['fully.qualified.example.com'],    
+});
 
 my $msg = $client->send_receive_command_msg(
     'create_workflow_instance',
@@ -36,7 +40,7 @@ my $msg = $client->send_receive_command_msg(
             'cert_info' => "HASH\n0\n",
             'cert_profile' => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
             'cert_role' => 'Web Server',
-            'cert_subject_alt_name_parts' => "HASH\n0\n",
+            'cert_subject_alt_name_parts' => $cert_subject_alt_name_parts,
             'cert_subject_parts' => "HASH\n94\n21\ncert_subject_hostname\nSCALAR\n27\nfully.qualified.example.com\n17\ncert_subject_port\nSCALAR\n0\n\n",
             'cert_subject_style' => '00_tls_basic_style',
             'csr_type' => 'spkac',
@@ -52,7 +56,7 @@ eval {
 diag "Terminated connection";
 
 $client = OpenXPKI::Client->new({
-    SOCKETFILE => $instancedir . '/var/openxpki/openxpki.socket',
+    SOCKETFILE => $socketfile
 });
 ok(login({
     CLIENT   => $client,
@@ -111,78 +115,28 @@ $msg = $client->send_receive_command_msg(
     },
 ); 
 ok(! is_error_response($msg), 'Successfully persisted CSR') or diag Dumper $msg;
-ok(
-       ($msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'WAITING_FOR_CHILD')
-    || ($msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'SUCCESS'),
-    'State is WAITING_FOR_CHILD or SUCCESS'
-) or diag Dumper $msg;
+ok( $msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'SUCCESS', 'Certificate issuance workflow is in state SUCCESS') or diag Dumper $msg;
+
+my $cert_identifier = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{'cert_identifier'};
+ok($cert_identifier, 'Certificate Identifier is present in workflow context');
 
 $msg = $client->send_receive_command_msg(
-    'search_workflow_instances',
+    'get_cert',
     {
-          'TYPE' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
-    },
-); 
-ok(! is_error_response($msg), 'search_workflow_instances') or diag Dumper $msg;
-is(scalar @{ $msg->{PARAMS} }, 1, 'One workflow instance present');
-my $try = 1;
-while ($try <= 60 && $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'} ne 'SUCCESS') {
-    # wait up to 60 seconds for cert issuance state to become SUCCESS
-    $msg = $client->send_receive_command_msg(
-        'search_workflow_instances',
-        {
-              'TYPE' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
-        },
-    ); 
-    if ($ENV{DEBUG}) {
-        diag "Try number $try, state: " . $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'};
+        IDENTIFIER => $cert_identifier,
+        FORMAT => 'PEM'        
     }
-    sleep 1;
-    $try++;
-}
-is($msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'}, 'SUCCESS', 'Certificate issuance workflow is in state SUCCESS') or diag Dumper $msg;
-my $cert_iss_wfid = $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_SERIAL'},
-# once the cert issuance workflow is in state 'SUCCESS', the CSR workflow should be, too
-$msg = $client->send_receive_command_msg(
-    'search_workflow_instances',
-    {
-          'TYPE' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-    },
-); 
-$try = 1;
-while ($try <= 60 && $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'} ne 'SUCCESS') {
-    # wait up to 60 seconds for CSR state to become SUCCESS
-    $msg = $client->send_receive_command_msg(
-        'search_workflow_instances',
-        {
-              'TYPE' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-        },
-    ); 
-    if ($ENV{DEBUG}) {
-        diag "Try number $try, state: " . $msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'};
-    }
-    sleep 1;
-    $try++;
-}
-is($msg->{PARAMS}->[0]->{'WORKFLOW.WORKFLOW_STATE'}, 'SUCCESS', 'CSR workflow is in state SUCCESS') or diag Dumper $msg;
+);
 
-$msg = $client->send_receive_command_msg(
-    'get_workflow_info',
-    {
-          'ID'       => $cert_iss_wfid,
-          'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE',
-    },
-); 
-ok(! is_error_response($msg), 'get_workflow_info') or diag Dumper $msg;
-my $cert = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{'certificate'};
-ok($cert, 'Certificate is present in workflow context');
+my $cert = $msg->{PARAMS};
+like($cert, '/^-----BEGIN CERTIFICATE-----.*/', 'PEM Certificate loaded');
 
-open my $TESTCERT, '>', "$instancedir/testcert.pem";
+open my $TESTCERT, '>', "/var/tmp/testcert.pem";
 print $TESTCERT $cert;
 close $TESTCERT;
 
 my $openssl = `cat t/cfg.binary.openssl`;
-my $openssl_output = `$openssl x509 -noout -text -in $instancedir/testcert.pem`;
+my $openssl_output = `$openssl x509 -noout -text -in /var/tmp/testcert.pem`;
 ok($openssl_output =~ m{
         Subject:\ DC=org,\ DC=OpenXPKI,\ DC=Test\ Deployment,\ CN=fully.qualified.example.com
     }xms, 

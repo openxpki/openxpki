@@ -12,7 +12,8 @@ ok(1);
 ## create new session
 my $session = OpenXPKI::Server::Session->new ({
                   DIRECTORY => "t/50_auth/",
-                  LIFETIME  => 2});
+                  LIFETIME  => 2,
+                  VERSION => 'ignored'});
 ok($session);
 
 ## get ID
@@ -86,7 +87,8 @@ ok($EVAL_ERROR);
 ## create new session
 $session = OpenXPKI::Server::Session->new ({
                DIRECTORY => "t/50_auth/",
-               LIFETIME  => 2});
+               LIFETIME  => 2,
+               VERSION => 'ignored'});
 ok($session);
 $id = $session->get_id();
 ok($id);

@@ -10,34 +10,33 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
-plan tests => 11;
+plan tests => 10;
 
 diag "OpenXPKI::Server::Context - global context entries\n" if $ENV{VERBOSE};
 
+$ENV{OPENXPKI_CONF_DB} = 't/config.git/';
+
 ## init Context
 ok(OpenXPKI::Server::Init::init(
-       {
-	   CONFIG => 't/config_test.xml',
-	   TASKS  => [ 'current_xml_config', 
+       {	   
+	   TASKS  => [ 
+                'api',
+               'config_versioned',   
 		       'i18n', 
                'dbi_log',
 		       'log', 
-#		       'redirect_stderr', 
 		       'dbi_backend', 
-		       'dbi_workflow',
-               'xml_config',
+		       'dbi_workflow',               
 		       'crypto_layer',
-		       'pki_realm', 
 		       'volatile_vault',
-               'acl',
-               'api',
+#               'acl',               
                'authentication',
                ],
        }));
 
 
-is(ref CTX('xml_config'), 
-    'OpenXPKI::XML::Config', "CTX('xml_config')");
+is(ref CTX('config'), 
+    'OpenXPKI::Config', "CTX('config')");
 
 is(ref CTX('crypto_layer'),
     'OpenXPKI::Crypto::TokenManager', "CTX('crypto_layer')");
@@ -54,10 +53,6 @@ is(ref CTX('dbi_backend'),
 
 is(ref CTX('dbi_workflow'),
    'OpenXPKI::Server::DBI', "CTX('dbi_workflow')"
-);
-
-is(ref CTX('acl'),
-   'OpenXPKI::Server::ACL', "CTX('acl')"
 );
 
 is(ref CTX('api'),

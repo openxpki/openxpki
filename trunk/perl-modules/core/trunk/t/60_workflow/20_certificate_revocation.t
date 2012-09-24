@@ -12,14 +12,13 @@ use OpenXPKI::Serialization::Simple;
 diag("Certificate revocation request workflow\n") if $ENV{VERBOSE};
 
 # reuse the already deployed server
-my $instancedir = 't/60_workflow/test_instance';
-my $socketfile = $instancedir . '/var/openxpki/openxpki.socket';
-my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
+my $socketfile = 't/var/openxpki/openxpki.socket';
+my $pidfile    = 't/var/openxpki/openxpkid.pid';
 
 ok(-e $pidfile, "PID file exists");
 ok(-e $socketfile, "Socketfile exists");
 my $client = OpenXPKI::Client->new({
-    SOCKETFILE => $instancedir . '/var/openxpki/openxpki.socket',
+    SOCKETFILE => $socketfile,
 });
 ok(login({
     CLIENT   => $client,
@@ -119,6 +118,8 @@ my @valid_reason_codes = (
     'superseded',
     'cessationOfOperation',
 );
+
+my @crr_workflow;
 foreach my $reason_code (@valid_reason_codes) {
     $msg = $client->send_receive_command_msg(
         'create_workflow_instance',
@@ -133,8 +134,11 @@ foreach my $reason_code (@valid_reason_codes) {
         },
     );
     ok(! is_error_response($msg), 'Successfully created CRR workflow with reason code ' . $reason_code);
+    
+    # removeFromCRL works only if the certificate is "on hold"
+    # at the moment we can create the request at any time but it will fail on persistance
+    push @crr_workflow, $msg->{PARAMS}->{WORKFLOW}->{ID} if ($reason_code ne 'removeFromCRL');
 }
-my $wf_id = $msg->{PARAMS}->{WORKFLOW}->{ID};
 
 # LOGOUT
 eval {
@@ -143,13 +147,15 @@ eval {
 diag "Terminated connection";
 
 $client = OpenXPKI::Client->new({
-    SOCKETFILE => $instancedir . '/var/openxpki/openxpki.socket',
+    SOCKETFILE => $socketfile
 });
 ok(login({
     CLIENT   => $client,
     USER     => 'raop2',
     PASSWORD => 'RA Operator',
   }), 'Logged in (as raop2) successfully');
+
+my $wf_id = pop  @crr_workflow;
 
 $msg = $client->send_receive_command_msg(
     'get_workflow_info',
@@ -159,30 +165,31 @@ $msg = $client->send_receive_command_msg(
     },
 );
 
-ok(! is_error_response($msg), 'Successfully got workflow instance info')
+ok(! is_error_response($msg), "Successfully got workflow instance info ( $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{reason_code} )")
     or diag Dumper $msg;
 
 $msg = $client->send_receive_command_msg(
     'execute_workflow_activity',
     {
-          'ACTIVITY' => 'approve_crr',
+          'ACTIVITY' => 'I18N_OPENXPKI_WF_ACTION_APPROVE_CRR',
           'ID' => $wf_id,
           'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST',
     },
 ); 
 ok(! is_error_response($msg), 'Successfully approved') or diag Dumper $msg;
 is($msg->{PARAMS}->{WORKFLOW}->{STATE}, 'APPROVAL', 'Workflow in state APPROVAL');
-
+        
 $msg = $client->send_receive_command_msg(
     'execute_workflow_activity',
     {
-          'ACTIVITY' => 'revoke_certificate',
+          'ACTIVITY' => 'I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE',
           'ID' => $wf_id,
           'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST',
     },
 ); 
 ok(! is_error_response($msg), 'Successfully revoked') or diag Dumper $msg;
-is($msg->{PARAMS}->{WORKFLOW}->{STATE}, 'SUCCESS', 'Workflow in state SUCCESS');
+is($msg->{PARAMS}->{WORKFLOW}->{STATE}, 'CHECK_FOR_REVOCATION', 'Workflow in state CHECK_FOR_REVOCATION');
+
 
 # LOGOUT
 eval {

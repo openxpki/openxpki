@@ -13,22 +13,17 @@ use OpenXPKI::Server::Authentication;
 
 ## init XML cache
 OpenXPKI::Server::Init::init(
-    {
-	CONFIG => 't/config_test.xml',
+    {	
 	TASKS => [
-        'current_xml_config',
+        'config_test',
         'log',
-        'dbi_backend',
-        'xml_config',
+        'dbi_backend',        
     ],
 	SILENT => 1,
     });
 
 ## load authentication configuration
-my $auth = OpenXPKI::Server::Authentication::External->new({
-        XPATH   => ['pki_realm', 'auth', 'handler' ], 
-        COUNTER => [ 0         , 0     , 3         ],
-});
+my $auth = OpenXPKI::Server::Authentication::External->new("auth.handler.External Dynamic Role");
 ok($auth, 'Auth object creation');
 
 my ($user, $role, $reply) = $auth->login_step({

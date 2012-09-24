@@ -1,0 +1,14 @@
+# Hints on testing
+
+The test system requires a working setup of the new conenctor config. The config
+is in t/config.d and can be adjusted to your test system if required.
+
+These are the prerequisites for running all tests:
+* write access to /var/tmp
+* write access to t/var/openxpki (autocreated if not present)
+* running mysql server on localhost with a user named "openxpki",   
+  password "openxpki" and access to the database named "openxpki"
+
+Until the modifications to Workflow.pm are upstream, you need to use
+a patched copied available from https://github.com/oliwel/perl-workflow.git
+

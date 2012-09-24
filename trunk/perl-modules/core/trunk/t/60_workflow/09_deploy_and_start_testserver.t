@@ -1,29 +1,38 @@
 use strict;
 use warnings;
 use English;
+use OpenXPKI::Debug;
+use OpenXPKI::Control;
+use OpenXPKI::Server::Context qw( CTX );
+use Data::Dumper;
 
 use Test::More;
-plan tests => 5;
+plan tests => 4;
 
-use OpenXPKI::Tests;
+#use OpenXPKI::Tests;
 use File::Copy;
 
 diag("Deploying OpenXPKI test instance\n");
 
-my $instancedir = 't/60_workflow/test_instance';
-my $socketfile = $instancedir . '/var/openxpki/openxpki.socket';
-my $pidfile    = $instancedir . '/var/openxpki/openxpki.pid';
+# The server tests relys on the ca and database which is setup 
+# in the earlier tests
 
-ok(deploy_test_server({
-        DIRECTORY  => $instancedir,
-    }), 'Test server deployed successfully');
-copy("t/60_workflow/openssl.cnf", "$instancedir/openssl.cnf");
-ok(create_ca_cert({
-        DIRECTORY => $instancedir,
-    }), 'CA certificate created and installed successfully');
-ok(start_test_server({
-        DIRECTORY  => $instancedir,
-    }), 'Test server started successfully');
+`mkdir -p t/var/openxpki/session/`;
+
+my $socketfile = 't/var/openxpki/openxpki.socket'; 
+my $pidfile = 't/var/openxpki/openxpkid.pid';
+
+-e $socketfile && die "Socketfile exists - please stop server/remove socket";
+
+-e $pidfile && unlink($pidfile);
+
+use OpenXPKI::Server;
+
+$ENV{OPENXPKI_CONF_DB} = 't/config.git';
+
+# FIXME - prove becomes defunct - seems to be some issue with stdout/stderr
+#OpenXPKI::Control::start({ SILENT => 0, DEBUG =>  0 });
+ok(!system('OPENXPKI_CONF_DB="t/config.git" perl t/60_workflow/start.pl >/dev/null 2>/dev/null'));
 
 # wait for server startup
 CHECK_SOCKET:
@@ -38,3 +47,4 @@ foreach my $i (1..60) {
 ok(-e $pidfile, "PID file exists");
 ok(-e $socketfile, "Socketfile exists");
 
+ok(OpenXPKI::Control::status({ SOCKETFILE => $socketfile}));

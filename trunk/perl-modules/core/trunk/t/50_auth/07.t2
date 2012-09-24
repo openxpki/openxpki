@@ -13,13 +13,11 @@ use OpenXPKI::Server::ACL;
 
 ## init XML cache
 OpenXPKI::Server::Init::init(
-    {
-	CONFIG => 't/config.xml',
+    {	
 	TASKS => [
-        'current_xml_config',
+        'config_test',
         'log',
         'dbi_backend',
-        'xml_config',
     ],
 	SILENT => 1,
     });

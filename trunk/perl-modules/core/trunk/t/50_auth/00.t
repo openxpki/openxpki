@@ -5,6 +5,8 @@ use Template;
 use Test::More;
 use Cwd;
 
+plan skip_all => 'No LDAP configured'; 
+
 use utf8;
 use Digest::MD5;
 use Digest::SHA1;

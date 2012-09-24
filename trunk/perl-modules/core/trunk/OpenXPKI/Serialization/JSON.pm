@@ -39,7 +39,7 @@ sub serialize
 {
     my $self = shift;
 
-    return $self->{JSON}->objToJson(shift);
+    return $self->{JSON}->encode(shift);
 }
 
 
@@ -47,7 +47,7 @@ sub deserialize
 {
     my $self = shift;
     
-    return $self->{JSON}->jsonToObj(shift);
+    return $self->{JSON}->decode(shift);
 }
 
 1;

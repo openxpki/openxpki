@@ -30,6 +30,7 @@ my    $main_config    = 'config_test.xml';
 my    $token_template = 'token.xml';
 my    $token_config   = 'token_test.xml';
 
+my $rundir = '/var/openxpki';
 
 my $make_main_config_command = 
         'cp ' . 

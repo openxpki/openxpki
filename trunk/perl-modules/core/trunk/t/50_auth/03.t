@@ -14,21 +14,16 @@ ok(1);
 
 ## init XML cache
 OpenXPKI::Server::Init::init(
-    {
-	CONFIG => 't/config_test.xml',
+    {	
 	TASKS => [
-        'current_xml_config',
+        'config_test',
         'log',
         'dbi_backend',
-        'xml_config',
     ],
 	SILENT => 1,
     });
 
-my $auth = OpenXPKI::Server::Authentication::Anonymous->new({
-        XPATH   => ['pki_realm', 'auth', 'handler' ], 
-        COUNTER => [ 0         , 0     , 0         ],
-});
+my $auth = OpenXPKI::Server::Authentication::Anonymous->new('auth.handler.Anonymous');
 # perform authentication
 my ($user, $role, $reply) =  $auth->login_step({
     STACK   => 'Anonymous',

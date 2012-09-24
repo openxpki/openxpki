@@ -5,13 +5,19 @@
 
   <state name="INITIAL">
     <description>Initial state for workflow test</description>
-    <action name="null"
+    <action name="noop"
 	    resulting_state="state1" />
   </state>
 
   <state name="state1">
     <description>State 1</description>
-    <action name="null"
+    <action name="noop"
+        resulting_state="state2"/>
+  </state>
+
+  <state name="state2">
+    <description>State 2</description>
+    <action name="noop"
 	    resulting_state="FINISHED"/>
   </state>
 

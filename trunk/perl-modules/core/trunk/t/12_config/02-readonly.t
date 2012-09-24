@@ -9,6 +9,9 @@ use warnings;
 use DateTime;
 use Path::Class;
 
+use Log::Log4perl qw( :easy );
+Log::Log4perl->easy_init($ERROR);
+
 my $tpath = dir($0)->parent;
 my $gitdb = $tpath . '/01-initdb.git';
 my ( $ver1, $ver2, $ver3 );

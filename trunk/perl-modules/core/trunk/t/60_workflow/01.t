@@ -7,9 +7,11 @@ use Test::More;
 # use Smart::Comments;
 
 
-BEGIN { plan tests => 38 };
+BEGIN { plan tests => 40 };
 
 print STDERR "OpenXPKI::Server::Workflow - Persistence\n" if $ENV{VERBOSE};
+
+use_ok("Workflow 1.35");
 
 our $basedir;
 
@@ -19,21 +21,18 @@ require 't/60_workflow/common.pl';
 # in its BEGIN block, hence require it here
 require Workflow::Factory;
 
-`cp t/30_dbi/sqlite.db t/30_dbi/sqlite.db._workflow_`;
-ok(not $CHILD_ERROR);
-
-
 my $debug = $ENV{DEBUG};
 ### Debug: $debug
 
-my $factory = Workflow::Factory->instance();
+# We need to use the OXI Factory as the persister requires the extended Workflow object
+my $factory = OpenXPKI::Workflow::Factory->new();
 
-### reading Workflow configuration...
+# Symbol Table hacking, see OpenXPKI::Workflow::Handler::__get_instance
 $factory->add_config_from_file(
     workflow  => "$basedir/01_workflow.xml",
     action    => "$basedir/01_workflow_activity.xml",
     persister => "$basedir/01_workflow_persister.xml",
-    );
+);
 
 
 ### instantiate new basic request workflow instance...
@@ -48,6 +47,17 @@ my $workflow_id = $workflow->id();
 $workflow->context()->param(foo  => 'barbaz');
 $workflow->context()->param(pkirealm  => 'Test Root CA');
 
+### check if context entries are available...
+ok($workflow->context()->param('foo'), 'barbaz');
+ok($workflow->context()->param('pkirealm'), 'Test Root CA');
+
+do_step($workflow, 
+    EXPECTED_STATE => 'INITIAL',
+    EXPECTED_ACTIONS => [ 'noop' ],
+    EXECUTE_ACTION => "noop",
+    PASS_EXCEPTION => 1,
+);
+
 # create some binary data (16 KB)
 my $binary_data = pack "C*", (0 .. 255) x (4 * 16);
 $workflow->context()->param(binarydata => $binary_data);
@@ -59,27 +69,22 @@ foreach my $unicode_index (1 .. 32768) {
     # chr returns the unicode character here
     my $char = chr($unicode_index);
     if (length($char) and $char =~ m{ \A \p{Assigned} \z }xms) {
-	$data .= $char;
+    $data .= $char;
     }
 }
 
 $workflow->context()->param(bulkdata  => $data);
 
-
-### check if context entries are available...
-ok($workflow->context()->param('foo'), 'barbaz');
-ok($workflow->context()->param('pkirealm'), 'Test Root CA');
-
-
 ### try to execute action (expect exception because of the binary data)
 eval {
     do_step($workflow, 
-	    EXPECTED_STATE => 'INITIAL',
-	    EXPECTED_ACTIONS => [ 'null' ],
-	    EXECUTE_ACTION => 'null',
+	    EXPECTED_STATE => 'state1',
+	    EXPECTED_ACTIONS => [ 'noop' ],
+	    EXECUTE_ACTION => 'noop',
 	    PASS_EXCEPTION => 1,
 	);
 };
+
 if (my $exc = OpenXPKI::Exception->caught()) {
     ### got expected exception
     ok($exc->message(), 
@@ -89,24 +94,23 @@ if (my $exc = OpenXPKI::Exception->caught()) {
     ok(0);
 }
 
-
 ### now delete the offending parameter...
 # work around a bug in Workflow::Base::param() that does not allow to
 # set reset a single parameter. It works when called with a hash ref, though.
 $workflow->context()->param({ binarydata => undef });
 
-
 ### create a volatile data object
 $workflow->context()->param(_binarydata => $binary_data);
 ok($workflow->context()->param('_binarydata') eq $binary_data);
 
-### execute null action
-do_step($workflow, 
-	EXPECTED_STATE => 'INITIAL',
-	EXPECTED_ACTIONS => [ 'null' ],
-	EXECUTE_ACTION => 'null',
-    );
 
+do_step($workflow, 
+    EXPECTED_STATE => 'state1',
+    EXPECTED_ACTIONS => [ 'noop' ],
+    EXECUTE_ACTION => 'noop',
+    PASS_EXCEPTION => 1,
+);
+ 
 ### expect that the volatile object is still around
 ok($workflow->context()->param('_binarydata') eq $binary_data);
 
@@ -116,22 +120,22 @@ $workflow = undef;
 $workflow = $factory->fetch_workflow('dummy workflow', $workflow_id);
 
 ### check if we got the correct workflow back...
-ok($workflow->id(), $workflow_id);
+is($workflow->id(), $workflow_id);
 
 ### expect that the volatile object is now gone
-ok($workflow->context()->param('_binarydata'), undef);
+is($workflow->context()->param('_binarydata'), undef);
 
 # check if context entries are persistent
-ok($workflow->context()->param('foo'), 'barbaz');
-ok($workflow->context()->param('pkirealm'), 'Test Root CA');
+is($workflow->context()->param('foo'), 'barbaz');
+is($workflow->context()->param('pkirealm'), 'Test Root CA');
 ok($workflow->context()->param('bulkdata') eq $data);
 
 ### do_step
 do_step($workflow, 
-	EXPECTED_STATE => 'state1',
-	EXPECTED_ACTIONS => [ 'null' ],
-	EXECUTE_ACTION => 'null',
-    );
+	EXPECTED_STATE => 'state2',
+	EXPECTED_ACTIONS => [ 'noop' ],
+	EXECUTE_ACTION => 'noop',
+);
 
 # delete context instance
 $workflow = undef;
@@ -139,11 +143,11 @@ $workflow = undef;
 $workflow = $factory->fetch_workflow('dummy workflow', $workflow_id);
 
 # check if we got the correct workflow back
-ok($workflow->id(), $workflow_id);
+is($workflow->id(), $workflow_id);
 
 # check if context entries are persistent
-ok($workflow->context()->param('foo'), 'barbaz');
-ok($workflow->context()->param('pkirealm'), 'Test Root CA');
+is($workflow->context()->param('foo'), 'barbaz');
+is($workflow->context()->param('pkirealm'), 'Test Root CA');
 ok($workflow->context()->param('bulkdata') eq $data);
 
 ### do_step
@@ -158,11 +162,11 @@ $workflow = undef;
 $workflow = $factory->fetch_workflow('dummy workflow', $workflow_id);
 
 # check if we got the correct workflow back
-ok($workflow->id(), $workflow_id);
+is($workflow->id(), $workflow_id);
 
 # check if context entries are persistent
-ok($workflow->context()->param('foo'), 'barbaz');
-ok($workflow->context()->param('pkirealm'), 'Test Root CA');
+is($workflow->context()->param('foo'), 'barbaz');
+is($workflow->context()->param('pkirealm'), 'Test Root CA');
 ok($workflow->context()->param('bulkdata') eq $data);
 
 

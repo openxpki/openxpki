@@ -115,12 +115,13 @@ sub get_safe_tmpfile {
     my $template = $self->__get_safe_template ($arg_ref);
 
     ##! 2: 'build tmp file'
-    my ($fh, $filename) = File::Temp::mkstemp($template);
+    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );      
     if (! $fh) {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MAKE_FAILED',
-            params  => {'FILENAME' => $filename});
+            message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MAKE_FAILED'
+        );
     }
+    my $filename = $fh->filename;
     close $fh;
 
     ##! 2: 'fix mode'
