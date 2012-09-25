@@ -25,13 +25,6 @@ sub validate {
 
     my $api       = CTX('api');
     my $pki_realm = CTX('session')->get_pki_realm();
-    my $cfg_id = $api->get_config_id({ ID => $wf->id() });
-    ##! 16: 'cfg_id: ' . $cfg_id
-    if (! defined $cfg_id) {
-        # as this is called during creation, the cfg id is not defined
-        # yet, so we use the current one
-        $cfg_id = $api->get_current_config_id();
-    }
     my $default_token = CTX('api')->get_default_token();
 
     # if nothing is there to validate yet, we can return

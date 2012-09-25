@@ -7,7 +7,7 @@ use Test::More;
 # use Smart::Comments;
 
 
-BEGIN { plan tests => 40 };
+BEGIN { plan tests => 41 };
 
 print STDERR "OpenXPKI::Server::Workflow - Persistence\n" if $ENV{VERBOSE};
 
@@ -34,6 +34,8 @@ $factory->add_config_from_file(
     persister => "$basedir/01_workflow_persister.xml",
 );
 
+
+is_deeply($factory->list_workflow_titles(), {'dummy workflow' => {'description' => 'Workflow Base Test'}} );
 
 ### instantiate new basic request workflow instance...
 my $workflow = $factory->create_workflow('dummy workflow');

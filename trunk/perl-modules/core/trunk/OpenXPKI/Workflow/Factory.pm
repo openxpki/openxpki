@@ -7,20 +7,34 @@ package OpenXPKI::Workflow::Factory;
 use strict;
 use warnings;
 
+use Workflow 1.35;
 use base qw( Workflow::Factory );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow;
+use OpenXPKI::Workflow::Instance;
 use Workflow::Exception qw( configuration_error workflow_error );
+use Data::Dumper; 
 
-sub instance {
+sub new {
     my $class = ref $_[0] || $_[0];
     return bless( {} => $class );
 }
 
-sub create_workflow{
+sub instance {    
+    # To stay compatible to the Workflow Module, accept instance on exisiting instances
     my $self = shift;
-    my $wf = $self->SUPER::create_workflow(@_);
+    return $self if (ref $self);
+     
+    # use "new", not instance to create a new one
+    OpenXPKI::Exception->throw (message => "I18N_OPENXPKI_WORKFLOW_FACTORY_INSTANCE_METHOD_NOT_SUPPORTED");    
+}
+
+sub create_workflow{
+    
+    my ( $self, $wf_type, $context ) = @_;    
+    
+    my $wf = $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Workflow::Instance' );
     
     my $oxiWf = OpenXPKI::Server::Workflow->new($wf, $self);
     
@@ -29,11 +43,14 @@ sub create_workflow{
 
 sub fetch_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
-    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id);
+    
+    
+    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Workflow::Instance' );
     # the following both checks whether the user is allowed to
     # read the workflow at all and deletes context entries from $wf if
     # the configuration mandates it
-    CTX('acl')->authorize_workflow({
+    # FIXME-MIG - Need to replace ACL 
+    0 && CTX('acl')->authorize_workflow({
         ACTION   => 'read',
         WORKFLOW => $wf,
         FILTER   => 1,
@@ -61,6 +78,7 @@ sub fetch_unfiltered_workflow {
         WORKFLOW => $wf,
         FILTER   => 0,
     });
+
     CTX('log')->log(
         MESSAGE  => 'Unfiltered access to workflow ' . $wf->id . ' by ' . CTX('session')->get_user() . ' with role ' . CTX('session')->get_role(),
         PRIORITY => 'info',
@@ -78,6 +96,24 @@ sub fetch_unfiltered_workflow {
     my $oxiWf = OpenXPKI::Server::Workflow->new($wf,$self,$wf_info);    
     
     return $oxiWf; 
+}
+
+sub list_workflow_titles {
+    
+    my $self = shift;
+
+    my $result = {};
+    # Nothing initialised
+    if (ref $self->{_workflow_config} ne 'HASH') {
+        return $result;
+    }
+        
+    foreach my $item (keys %{$self->{_workflow_config}}) {
+        my $type = $self->{_workflow_config}->{$item}->{type};
+        my $desc = $self->{_workflow_config}->{$item}->{description};
+        $result->{$type} = { description => $desc }
+    }    
+    return $result;
 }
 
 1;

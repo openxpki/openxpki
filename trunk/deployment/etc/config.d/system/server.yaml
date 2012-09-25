@@ -7,7 +7,7 @@ node:
     id: 0
 
 # Location of the log4perl configuration
-log4perl: /etc/openxpki/instances/trustcenter1/log.conf
+log4perl: /etc/openxpki/log.conf
 
 # Daemon settings
 user:         openxpki

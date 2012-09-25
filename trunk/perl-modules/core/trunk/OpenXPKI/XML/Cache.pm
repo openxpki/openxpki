@@ -122,6 +122,7 @@ sub init
             params  => {"FILE"   => $filename,
                         "ERRVAL" => $msg});
     }
+    
     $self->{cache} = $xml->{openxpki}->[0];
     ##! 64: 'cache: ' . Dumper $self->{cache}
 

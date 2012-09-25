@@ -1,0 +1,24 @@
+<actions>
+
+  <action name="I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CERTIFICATE"
+  	class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate">  
+  </action>
+   
+  <action name="I18N_OPENXPKI_WF_ACTION_NICE_RENEW_CERTIFICATE"
+  	class="OpenXPKI::Server::Workflow::Activity::NICE::RenewCertificate">  
+  </action>
+  
+  <action name="I18N_OPENXPKI_WF_ACTION_NICE_FETCH_CERTIFICATE"
+  	class="OpenXPKI::Server::Workflow::Activity::NICE::FetchCertificate">
+  </action>
+  
+ <action name="I18N_OPENXPKI_WF_ACTION_NICE_REVOKE_CERTIFICATE"
+ 	class="OpenXPKI::Server::Workflow::Activity::NICE::RevokeCertificate">
+ </action>
+  
+  <action name="I18N_OPENXPKI_WF_ACTION_NICE_CHECK_FOR_REVOCATION"
+	  class="OpenXPKI::Server::Workflow::Activity::NICE::CheckForRevocation">
+  </action>    
+
+
+</actions>

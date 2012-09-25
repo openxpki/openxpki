@@ -58,24 +58,22 @@ sub new
 
     # we need to get a usable logger as soon as possible, hence:
     # initialize configuration, i18n and log
-    OpenXPKI::Server::Init::init({
-	    CONFIG => $self->{CONFIG},
-	    TASKS  => [ 'config_versioned', 'current_xml_config', 'i18n', 'log' ],
+    OpenXPKI::Server::Init::init({	    
+	    TASKS  => [ 'config_versioned', 'i18n', 'log' ],
         SILENT => $keys->{SILENT},
 	});
-
+	
     # from now on we can assume that we have CTX('log') available
-
     # perform the rest of the initialization
+    
     eval
     {
 	    OpenXPKI::Server::Init::init(
-	    {
-		    CONFIG => $self->{CONFIG},
+	    {		    
             SILENT => $keys->{SILENT}
 	    });
-    };
-    if ($EVAL_ERROR) {
+    };    
+    if ($EVAL_ERROR) {        
         $self->__log_and_die($EVAL_ERROR, 'server initialization');
     }
 
@@ -125,9 +123,6 @@ sub new
 	    FACILITY => "system",
 	);
     
-    # clean up process list
-    $0 = "openxpkid -c $self->{CONFIG}";
-    
     CTX('dbi_workflow')->disconnect();
     CTX('dbi_backend')->disconnect();
     CTX('dbi_log')->disconnect();
@@ -138,8 +133,10 @@ sub new
 	    MESSAGE  => "Server is running",
 	    PRIORITY => "info",
 	    FACILITY => "monitor",
-	);
+	);	
     $self->run(%{$self->{PARAMS}});
+    
+    return $self;
 }
 
 sub pre_server_close_hook {

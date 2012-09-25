@@ -1,0 +1,63 @@
+<!-- Conditions for refactored naming scheme
+  normal conditions start with  I18N_OPENXPKI_WF_COND_
+  acl conditions should use the special prefix I18N_OPENXPKI_WF_ACL_ 
+  The name should reflect or be inspired by the implementing class to avoid naming conflicts
+  -->
+<conditions>
+  
+  <!-- general CSR conditions --> 
+  <condition name="I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR" 
+  	class="OpenXPKI::Server::Workflow::Condition::WorkflowCreator"/>
+  	
+  <!-- Request and Issuance -->	
+  <condition name="I18N_OPENXPKI_WF_COND_SERVER_KEY_GENERATION" 
+  	class="OpenXPKI::Server::Workflow::Condition::IsServerKeyGeneration" />
+  
+  <condition name="I18N_OPENXPKI_WF_COND_CHECK_CSR_APPROVALS" 
+  	class="OpenXPKI::Server::Workflow::Condition::Approved">
+    <param name="role" value="RA Operator"/>
+  </condition>
+   				 
+  <condition name="I18N_OPENXPKI_WF_COND_SUBJECT_MATCHES_PKCS10"  			   
+		class="OpenXPKI::Server::Workflow::Condition::SubjectMatchesPKCS10">
+  </condition>
+
+  <!--  revocation -->
+  <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_REVOCATION_CRL_ISSUANCE_PENDING" 
+  	class="OpenXPKI::Server::Workflow::Condition::CertificateHasStatus">    
+    <param name="expected_status" value="CRL_ISSUANCE_PENDING"/>
+  </condition>
+  
+  <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED" 
+  	class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">    
+    <param name="crl_issuance_pending_accept" value="0"/>
+  </condition>
+
+  <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING" 
+  	class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">
+    <!-- here you can set whether you want accept more CRRs while the
+         certificate is still in state CRL_ISSUANCE_PENDING (as compared
+         to REVOKED) or not -->
+    <param name="crl_issuance_pending_accept" value="1"/>
+  </condition>
+
+  <condition name="I18N_OPENXPKI_WF_COND_CHECK_CRR_APPROVALS" 
+  	class="OpenXPKI::Server::Workflow::Condition::Approved">
+    <param name="role" value="RA Operator"/>
+  </condition>
+
+  <condition name="I18N_OPENXPKI_WF_COND_CHECK_FOR_REVOCATION_CHECKS_LEFT" 
+  	class="OpenXPKI::Server::Workflow::Condition::MaxIterationsNotReached">
+  	<param name="iterator_name" value="crr_max_checks"/>
+  	<param name="max_count" value="5"/>
+  </condition>
+
+  
+  <!-- CRL Issue -->
+  <condition name="I18N_OPENXPKI_WF_COND_CRL_SIGNING_NO_CAS_LEFT" 
+        class="OpenXPKI::Server::Workflow::Condition::WFArray">
+    <param name="array_name" value="ca_alias_list"/>
+    <param name="condition" value="is_empty"/>
+  </condition>
+  
+</conditions>

@@ -622,24 +622,23 @@ sub get_data_pool_entry {
     my $encrypted = 0;
     if (defined $encryption_key && ($encryption_key ne '')) {
 	$encrypted = 1;
-
-	my $cfg_id = CTX('api')->get_current_config_id();
-	my $token  = CTX('api')->get_default_token({ PKI_REALM => $requested_pki_realm });
+	
+	my $token  = CTX('api')->get_default_token();
 	
 	if ($encryption_key =~ m{ \A p7:(.*) }xms) {
 	    # asymmetric decryption
 	    my $safe_id = $1;
-	    
-	    my $safe_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$requested_pki_realm}->{password_safe}->{id}->{$safe_id}->{crypto};
+	    	    
+        # FIXME-MIG - this needs testing	    	    
+	    my $safe_token = CTX('api')->get_token_alias_by_type('datasafe');
 	    if (! defined $safe_token) {
 		OpenXPKI::Exception->throw(
 		    message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_PASSWORD_TOKEN_NOT_AVAILABLE',
 		    params  => {
-			PKI_REALM  => $requested_pki_realm,
-			NAMESPACE  => $namespace,
-			KEY        => $key,
-			SAFE_ID    => $safe_id,
-			CONFIG_ID  => $cfg_id,
+    			PKI_REALM  => $requested_pki_realm,
+    			NAMESPACE  => $namespace,
+    			KEY        => $key,
+    			SAFE_ID    => $safe_id,			
 		    },
 		    log => {
 			logger => CTX('log'),
@@ -667,7 +666,6 @@ sub get_data_pool_entry {
 			    NAMESPACE  => $namespace,
 			    KEY        => $key,
 			    SAFE_ID    => $safe_id,
-			    CONFIG_ID  => $cfg_id,
 			},
 			log => {
 			    logger => CTX('log'),
@@ -1041,7 +1039,7 @@ sub __set_data_pool_entry : PRIVATE {
     my $force               = $arg_ref->{FORCE};
     my $key                 = $arg_ref->{KEY};
     my $value               = $arg_ref->{VALUE};
-
+$encrypt = undef;
     # primary key for database
     my %key = (
 	'PKI_REALM'  => $requested_pki_realm,
@@ -1140,9 +1138,9 @@ sub __set_data_pool_entry : PRIVATE {
     my $encryption_key_id  = '';
 
     if ($encrypt) {
-	my $current_password_safe = $self->__get_current_safe_id($current_pki_realm);
-	my $cfg_id = CTX('api')->get_current_config_id();
+	my $current_password_safe = 0;
 	my $token  = CTX('api')->get_default_token();
+	my $safe_token = CTX('api')->get_token_alias_by_type('datasafe');
 
 	if ($encrypt eq 'current_symmetric_key') {
 
@@ -1164,7 +1162,7 @@ sub __set_data_pool_entry : PRIVATE {
 	    # prefix 'p7' for PKCS#7 encryption
 	    $encryption_key_id = 'p7:' . $current_password_safe;
 	    
-	    my $cert = CTX('pki_realm_by_cfg')->{$cfg_id}->{$current_pki_realm}->{password_safe}->{id}->{$current_password_safe}->{certificate};
+	    my $cert;# = CTX('pki_realm_by_cfg')->{$cfg_id}->{$current_pki_realm}->{password_safe}->{id}->{$current_password_safe}->{certificate};
 	    
 	    ##! 16: 'cert: ' . $cert
 	    if (! defined $cert) {
@@ -1174,8 +1172,7 @@ sub __set_data_pool_entry : PRIVATE {
 			PKI_REALM  => $requested_pki_realm,
 			NAMESPACE  => $namespace,
 			KEY        => $key,
-			SAFE_ID    => $current_password_safe,
-			CONFIG_ID  => $cfg_id,
+			SAFE_ID    => $current_password_safe,		
 		    },
 		    log => {
 			logger => CTX('log'),
@@ -1288,9 +1285,7 @@ sub __get_current_datapool_encryption_key : PRIVATE {
     my $realm = shift;
     my $arg_ref = shift;
 
-#    my $realm  = CTX('session')->get_pki_realm();
-    my $cfg_id = CTX('api')->get_current_config_id();
-    my $token  = CTX('api')->get_default_token({ PKI_REALM => $realm });
+    my $token  = CTX('api')->get_default_token();
 
     # get symbolic name of current password safe (e. g. 'passwordsafe1')
     my $safe_id = $self->__get_current_safe_id($realm);
@@ -1431,70 +1426,6 @@ sub __get_current_datapool_encryption_key : PRIVATE {
     }
 
     return $associated_vault_key;
-}
-
-
-
-# returns the current password safe id (symbolic name from config.xml)
-# for the specified PKI Realm
-# arg: pki realm
-sub __get_current_safe_id {
-    ##! 1: 'start'
-    my $self  = shift;
-    my $realm = shift;
-    # my $realm = CTX('session')->get_pki_realm();
-    my $cfg_id = CTX('api')->get_current_config_id();
-
-    my @possible_safes = ();
-    my $pki_realm_cfg = CTX('pki_realm_by_cfg')->{$cfg_id}->{$realm}->{'password_safe'}->{'id'};
-    if (! defined $pki_realm_cfg || ref $pki_realm_cfg ne 'HASH') {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CURRENT_SAFE_ID_MISSING_PKI_REALM_CONFIG',
-            params  => {
-                CONFIG_ID => $cfg_id,
-                REALM     => $realm,
-            },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'system', ],
-	    },
-        );
-    }
-
-    foreach my $key (keys %{ $pki_realm_cfg }) {
-        ##! 64: 'key: ' . $key
-        push @possible_safes, {
-            'id'        => $key,
-            'notbefore' => $pki_realm_cfg->{$key}->{notbefore},
-            'notafter'  => $pki_realm_cfg->{$key}->{notafter},
-        };
-    }
-    ##! 16: 'possible safes: ' . Dumper \@possible_safes
-    # sort safes by notbefore date (latest earliest)
-    my @sorted_safes = sort { DateTime->compare($b->{notbefore}, $a->{notbefore}) } @possible_safes;
-    ##! 16: 'sorted safes: ' . Dumper \@sorted_safes
-
-    # find the topmost one that is available /now/
-    my $now = DateTime->now();
-
-    ##! 16: 'now: ' . Dumper $now
-    my $current_safe = first
-        {  DateTime->compare($now, $_->{notbefore}) >= 0
-        && DateTime->compare($_->{notafter}, $now) > 0 } @sorted_safes;
-    if (! defined $current_safe) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CURRENT_SAFE_ID_NO_SAFE_AVAILABLE',
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'system', ],
-	    },
-        );
-    }
-    ##! 16: 'current safe: ' . Dumper $current_safe
-
-    return $current_safe->{id};
 }
 
 sub __get_chain_certificates {

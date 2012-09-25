@@ -146,10 +146,10 @@ sub login_step {
 	}
 	if ($scheme eq 'ssha') {
 	    my $salt = substr(decode_base64($encrypted), 20);
- 	    my $ctx = Digest::SHA1->new();
+ 	    my $ctx = Digest::SHA1->new(); 	     	    
  	    $ctx->add($passwd);
 	    $ctx->add($salt);
-	    $computed_secret = encode_base64($ctx->digest() . $salt, '');
+	    $computed_secret = encode_base64($ctx->digest() . $salt, '');	    
 	}
 	if ($scheme eq 'md5') {
  	    my $ctx = Digest::MD5->new();

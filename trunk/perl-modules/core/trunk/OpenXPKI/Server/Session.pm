@@ -91,7 +91,9 @@ sub new {
                             DIRECTORY => $self->{DIRECTORY}});
         }
         $self->{session}->param ("status" => "invalid");
-        $self->{session}->param ("config_version" => CTX('config')->get_version() );
+        
+        $self->{session}->param ("config_version" => $keys->{VERSION} );
+        $self->{session}->param ("config_version" => CTX('config')->get_version() ) unless ($self->{session}->param ("config_version"));
         
     }
     $self->{session}->expire($self->{LIFETIME});
@@ -110,7 +112,7 @@ sub export_serialized_info{
     return $self->_get_serializer()->serialize(\%info);
 }
 
-sub import_serialized_info{
+sub import_serialized_info {
     my $self = shift;
     my $serialized_string = shift;
     unless($serialized_string){
@@ -132,6 +134,16 @@ sub import_serialized_info{
         $self->{session}->param($key, $info->{$key});
     }
 }
+
+sub parse_serialized_info {
+    
+    my $self = shift;
+    my $serialized_string = shift;
+    return unless ($serialized_string);
+     
+    return $self->_get_serializer()->deserialize($serialized_string);    
+}
+    
 
 sub _get_serializer{
     return OpenXPKI::Serialization::Simple->new();
@@ -409,6 +421,10 @@ Return a key/value hash with the keys named in _get_persitence_keys.
 =head3 import_serialized_info
 Reset the values of the current session to the values of the passed
 hash.
+
+=head3 parse_serialized_info
+
+Parse a serialized session blob and return as hash.
 
 =head2 Set/Get functions
 

@@ -23,6 +23,7 @@ use OpenXPKI::Config;
 use OpenXPKI::XML::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
+use OpenXPKI::Server;
 use OpenXPKI::Server::DBI;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::NOOP;
@@ -30,7 +31,7 @@ use OpenXPKI::Server::ACL;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Dispatcher;
-use OpenXPKI::Workflow::Factory;
+use OpenXPKI::Workflow::Handler;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Session::Mock;
@@ -45,33 +46,25 @@ use Data::Dumper;
 use Test::More;
 
 use Digest::SHA1 qw( sha1_base64 );
-
-our $current_xml_config; # this is an OpenXPKI::XML::Config object
-                         # containing the current on-disk configuration.
-                         # It is needed only during initialization.
-                         # (openxpkiadm uses it as a package variable
-                         # to access the database configuration during
-                         # initdb)
-
+ 
 # define an array of hash refs mapping the task id to the corresponding
 # init code. the order of the array elements is also the default execution
 # order.
 my @init_tasks = qw(
   config_versioned
-  current_xml_config
+  config_test  
   i18n
   dbi_log
   log
   redirect_stderr
   prepare_daemon
   dbi_backend
-  dbi_workflow
-  xml_config
-  workflow_factory
-  crypto_layer
+  dbi_workflow  
+  crypto_layer  
   api  
+  workflow_factory
+  acl
   volatile_vault
-  acl    
   authentication
   notification
   server
@@ -87,6 +80,15 @@ my @log_queue;
 
 sub init {
     my $keys = shift;
+
+    # We need a valid session to access the realm parts of the config
+    if (!OpenXPKI::Server::Context::hascontext('session')) { 
+        my $session = OpenXPKI::Server::Session::Mock->new();
+        OpenXPKI::Server::Context::setcontext({'session' => $session});        
+        if (OpenXPKI::Server::Context::hascontext('config')) {
+            CTX('session')->set_config_version( CTX('config')->get_head_version() );
+        }        
+    }    
 
     if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
 	log_wrapper(
@@ -107,14 +109,11 @@ sub init {
 
     delete $keys->{TASKS};
 
-    # We need a valid session to access the realm parts of the config 
-    my $session = OpenXPKI::Server::Session::Mock->new();
-    OpenXPKI::Server::Context::setcontext({'session' => $session});
     
     
   TASK:
     foreach my $task (@tasks) {
-        ##! 16: 'task: ' . $task
+        ##! 16: 'task: ' . $task        
 	if (! exists $is_initialized{$task}) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
@@ -144,7 +143,7 @@ sub init {
 		    PRIORITY => "fatal",
 		    FACILITY => "system",
 		});
-print "Exception during initialization task '$task': " . $msg;
+        print "Exception during initialization task '$task': " . $msg;
 	    $exc->rethrow();
 	}
 	elsif ($EVAL_ERROR)
@@ -236,45 +235,42 @@ sub __do_init_workflow_factory {
     my $keys = shift;
     ##! 1: 'init workflow factory'
     
-    my $workflow_factory = get_workflow_factory();
+    my $workflow_factory = OpenXPKI::Workflow::Handler->new();
+    $workflow_factory->load_default_factories(); 
     OpenXPKI::Server::Context::setcontext({
         workflow_factory => $workflow_factory,
     });
     return 1;
 }
 
-sub __do_init_current_xml_config {
-    my $keys = shift;
-    ##! 1: 'init current xml config'
-    $current_xml_config = get_current_xml_config(
-        CONFIG => $keys->{'CONFIG'},
-    );
-    return 1;
-}
-
 sub __do_init_config_versioned {
     ##! 1: "init OpenXPKI config"
-    my $xml_config = OpenXPKI::Config->new();
+    my $config = OpenXPKI::Config->new();
     OpenXPKI::Server::Context::setcontext(
 	{
-	    config => $xml_config,
+	    config => $config,
 	});
+	# Otherwise the init all routine tries to instantiate the test config
+	$is_initialized{config_test} = 1;
     return 1;
 }
 
-sub __do_init_xml_config {
-    ##! 1: "init xml config"
-    my $xml_config = get_xml_config();
+
+# Special init for test cases
+sub __do_init_config_test {
+    ##! 1: "init OpenXPKI config"
+    use OpenXPKI::Config::Test;
+    my $xml_config = OpenXPKI::Config::Test->new();
     OpenXPKI::Server::Context::setcontext(
-	{
-	    xml_config => $xml_config,
-	});
+    {
+        config => $xml_config,
+    });
     return 1;
 }
-
+ 
 sub __do_init_i18n {
     ##! 1: "init i18n"
-    init_i18n(CONFIG => $current_xml_config);
+    init_i18n();
 }
 
 sub __do_init_log {
@@ -287,8 +283,6 @@ sub __do_init_log {
 	});
     ##! 64: 'log during init: ' . ref $log
 }
-
-
 
 
 sub __do_init_prepare_daemon {
@@ -304,7 +298,7 @@ sub __do_init_prepare_daemon {
 	die "unable to write to /dev/null!: $!";
     open STDIN, "/dev/null" or
 	die "unable to read from /dev/null!: $!";
-    
+
     # FIXME: if we change to / the daemon works properly in production but
     # our tests fail (because there are a lot of relative path names in the
     # test configuration).
@@ -444,9 +438,7 @@ sub __do_init_server {
 
 sub __do_init_notification {
     OpenXPKI::Server::Context::setcontext({
-        notification => OpenXPKI::Server::Notification::Dispatcher->new({
-            CONFIG_ID => 'default',
-        }),
+        notification => OpenXPKI::Server::Notification::Dispatcher->new(),
     });
     return 1;
 }
@@ -454,8 +446,13 @@ sub __do_init_notification {
 sub __do_init_watchdog{
     my $keys = shift;
     
+    my $config = CTX('config');
+        
     my $Watchdog = OpenXPKI::Server::Watchdog->new( $keys );
-    $Watchdog->run();    
+    $Watchdog->run({
+        user => OpenXPKI::Server::__get_numerical_user_id( $config->get('system.server.user') ),
+        group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') )        
+    });    
     OpenXPKI::Server::Context::setcontext({        
         watchdog => $Watchdog
     });
@@ -464,535 +461,6 @@ sub __do_init_watchdog{
 
 
 ###########################################################################
-
-sub get_workflow_factory {
-    ##! 1: 'start'
-    my $args  = shift;
-
-     my %workflow_config = (
-         # how we name it in our XML configuration file
-         workflows => {
-             # how the parameter is called for Workflow::Factory 
-             factory_param => 'workflow',
-             # if this key exists, we assume that no <configfile>
-             # is specified but the XML config is included directly
-             # and iterate over it to obtain the configuration which
-             # we pass to Workflow::Factory->add_config()
-             config_key    => 'workflow',
-             # the ForceArray XML::Simple option used in Workflow
-             # that we have to recreate using __flatten_content()
-             # the content is taken from Workflow::Config::XML
-             force_array   => [ 'extra_data', 'state', 'action',  'resulting_state', 'condition', 'observer' ],
-         },
-         activities => {
-             factory_param   => 'action',
-             config_key      => 'actions',
-             # if this key is present, we iterate over two levels:
-             # first over all config_keys and then over all
-             # config_iterators and add the corresponding structure
-             # to the Workflow factory using add_config()
-             config_iterator => 'action',
-             force_array     => [ 'action', 'field', 'source_list', 'param', 'validator', 'arg' ],
-         },
-         validators => {
-             factory_param   => 'validator',
-             config_key      => 'validators',
-             config_iterator => 'validator',
-             force_array     => [ 'validator', 'param' ],
-         },
-         conditions => {
-             factory_param   => 'condition',
-             config_key      => 'conditions',
-             config_iterator => 'condition',
-             force_array     => [ 'condition', 'param' ],
-         },
- 	);
-
-    CTX('dbi_backend')->connect();
-    my $xml_config_entries = CTX('dbi_backend')->select(
-        TABLE   => 'CONFIG',
-        DYNAMIC => {
-            CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
-        },
-    );
-    CTX('dbi_backend')->disconnect();
-
-    if (! defined $xml_config_entries
-        || ref $xml_config_entries ne 'ARRAY'
-        || scalar @{ $xml_config_entries } == 0) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_INIT_GET_WORKFLOW_FACTORY_NO_CONFIG_IDENTIFIERS_IN_DB',
-        );
-    }
-
-    my $workflow_factories = {};
-    foreach my $xml_config (@{ $xml_config_entries }) {
-        my $id = $xml_config->{CONFIG_IDENTIFIER};
-        ##! 16: 'id: ' . $id
-        my $pki_realm_count = CTX('xml_config')->get_xpath_count(
-            XPATH     => "pki_realm",
-            CONFIG_ID => $id,
-        );
-        ##! 16: 'pki_realm_count: ' . $pki_realm_count
-        for (my $i = 0; $i < $pki_realm_count; $i++) {
-            ##! 16: 'i: ' . $i
-            my $realm = CTX('xml_config')->get_xpath(
-                XPATH     => [ 'pki_realm', 'name' ],
-                COUNTER   => [ $i         , 0      ],
-                CONFIG_ID => $id,
-            );
-            ##! 16: 'realm: ' . $realm
-            my $workflow_factory = OpenXPKI::Workflow::Factory->instance();
-            ##! 16: 'initialized new and empty WF factory'
-            __wf_factory_add_config({
-                FACTORY       => $workflow_factory,
-                REALM_IDX     => $i,
-                CONFIG_ID     => $id,
-                WF_CONFIG_MAP => \%workflow_config,
-            });
-            $workflow_factories->{$id}->{$realm} = $workflow_factory;
-            ##! 16: 'added factory for ' . $id . '/' . $realm
-        }
-    }
-    return $workflow_factories;
-}
-
-sub __wf_factory_add_config {
-    ##! 1: 'start'
-    my $arg_ref          = shift;
-    my $workflow_factory = $arg_ref->{FACTORY};
-    my $idx              = $arg_ref->{REALM_IDX};
-    ##! 4: 'idx: ' . $idx
-    my $xml_config_id        = $arg_ref->{CONFIG_ID};
-    ##! 4: 'config_id: ' . $xml_config_id
-    my %workflow_config  = %{ $arg_ref->{WF_CONFIG_MAP} };
-    my $xml_config       = CTX('xml_config');
-
-  ADD_CONFIG:
-    foreach my $type (qw( conditions validators activities workflows )) {
-        ##! 2: "getting workflow '$type' configuration files"
-        my $toplevel_count;
-        eval {
-            $toplevel_count = $xml_config->get_xpath_count(
-                XPATH     => [ 'pki_realm'     , 'workflow_config',
-                             $type           , $workflow_config{$type}->{config_key} ],
-                COUNTER   => [ $idx            , 0,
-                             0 ],
-                CONFIG_ID => $xml_config_id,
-            );
-        };
-        if (defined $toplevel_count) {
-            ##! 16: 'direct XML config exists'
-            # we have configuration directly in the XML file, not
-            # just a <configfile> reference, use it
-            for (my $ii = 0; $ii < $toplevel_count; $ii++) {
-                my @base_path = (
-                    'pki_realm',
-                    'workflow_config',
-                    $type,
-                    $workflow_config{$type}->{config_key},
-                );
-                my @base_ctr  = (
-                    $idx,
-                    0,
-                    0,
-                    $ii,
-                );
-                if (exists $workflow_config{$type}->{'config_iterator'}) {
-                    # we need to iterate over a second level
-                    my $iterator
-                        = $workflow_config{$type}->{'config_iterator'};
-
-                    my $secondlevel_count;
-                    eval {
-                        $secondlevel_count = $xml_config->get_xpath_count(
-                            XPATH     => [ @base_path, $iterator ],
-                            COUNTER   => [ @base_ctr ],
-                            CONFIG_ID => $xml_config_id,
-                        );
-                    };
-                    ##! 16: 'secondlevel_count: ' . $secondlevel_count
-                    for (my $iii = 0; $iii < $secondlevel_count; $iii++) {
-                        my $entry = $xml_config->get_xpath_hashref(
-                            XPATH     => [ @base_path, $iterator ],
-                            COUNTER   => [ @base_ctr , $iii      ],
-                            CONFIG_ID => $xml_config_id,
-                        );
-                        ##! 32: 'entry ' . $ii . '/' . $iii . ': ' . Dumper $entry
-                        # '__flatten_content()' turns our XMLin
-                        # structure into the one compatible to Workflow
-
-                        # Hacking the symbol table ... again.
-                        # In add_config(), new Workflow::State objects
-                        # are created for every state. Those in turn create
-                        # condition objects from the FACTORY. But hell,
-                        # not from our factory, but from the factory
-                        # obtained using
-                        # use Workflow::Factory qw( FACTORY );
-                        # this is why we trick Workflow into believing
-                        # it is talking to FACTORY, but in fact it is
-                        # talking to our factory ...
-			no warnings 'redefine';
-                        local *Workflow::State::FACTORY = sub { return $workflow_factory };
-                        $workflow_factory->add_config(
-                            $workflow_config{$type}->{factory_param} =>
-                                __flatten_content(
-                                    $entry,
-                                    $workflow_config{$type}->{'force_array'}
-                                ),
-                        );
-                        ##! 256: 'workflow_factory: ' . Dumper $workflow_factory
-                    }
-                }
-                else {
-                    my $entry = $xml_config->get_xpath_hashref(
-                        XPATH     => [ @base_path ],
-                        COUNTER   => [ @base_ctr  ],
-                        CONFIG_ID => $xml_config_id,
-                    );
-                    ##! 256: "entry: " . Dumper $entry
-                    # Flatten some attributes because
-                    # Workflow.pm expects these to be scalars and not
-                    # a one-element arrayref with a content hashref ...
-                    $entry = __flatten_content(
-                        $entry,
-                        $workflow_config{$type}->{force_array}
-                    );
-                    ##! 256: 'entry after flattening: ' . Dumper $entry
-                    ##! 512: 'workflow_factory: ' . Dumper $workflow_factory
-                    # cf. above ...
-		    no warnings 'redefine';
-                    local *Workflow::State::FACTORY = sub { return $workflow_factory };
-                    $workflow_factory->add_config(
-                        $workflow_config{$type}->{factory_param} => $entry,
-                    );
-                    ##! 256: 'workflow_factory: ' . Dumper $workflow_factory
-                }
-                ##! 16: 'config ' . $ii . ' added to workflow_factory'
-            }
-
-            # ignore the <configfile> parsing, we got what we came for
-            next ADD_CONFIG;
-        }
-
-        # this is now legacy code for parsing the old-style 
-        # <configfile> references ...
-        my $count;
-        eval {
-            $count = $xml_config->get_xpath_count(
-                XPATH     => [ 'pki_realm', 'workflow_config', $type, 'configfile' ],
-                COUNTER   => [ $idx       , 0                , 0 ],
-                CONFIG_ID => $xml_config_id,
-            );
-        };
-        if (my $exc = OpenXPKI::Exception->caught()) {
-            # ignore missing configuration
-            if (($exc->message() 
-             eq "I18N_OPENXPKI_XML_CACHE_GET_XPATH_MISSING_ELEMENT")
-            && (($type eq 'validators') || ($type eq 'conditions'))) {
-                $count = 0;
-            }
-            else
-            {
-                $exc->rethrow();
-            }
-        } 
-        elsif ($EVAL_ERROR) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_INIT_WF_FACTORY_ADD_CONFIG_EVAL_ERROR_DURING_CONFIGFILE_PARSING',
-                params  => {
-                    'ERROR' => $EVAL_ERROR,
-                },
-            );
-        }
-        if (! defined $count) {
-            OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_API_GET_WORKFLOW_FACTORY_MISSING_WORKFLOW_CONFIGURATION",
-            params => {
-                configtype => $type,
-            });
-        }
-
-        for (my $ii = 0; $ii < $count; $ii++) {
-            my $entry = $xml_config->get_xpath (
-                XPATH     => [ 'pki_realm', 'workflow_config', $type, 'configfile' ],
-                COUNTER   => [ $idx       , 0,            0,     $ii ],
-                CONFIG_ID => $xml_config_id,
-            );
-            # cf. above ...
-            local *Workflow::State::FACTORY = sub { return $workflow_factory };
-            ##! 4: "config file: $entry"
-            $workflow_factory->add_config_from_file(
-                $workflow_config{$type}->{factory_param}  => $entry,
-            );
-        }
-    }
-    ##! 64: 'config added completely'
-
-    my $workflow_table = 'WORKFLOW';
-    my $workflow_history_table = 'WORKFLOW_HISTORY';
-    # persister configuration should not be user-configurable and is
-    # static and identical throughout OpenXPKI
-    $workflow_factory->add_config(
-        persister => {
-            name           => 'OpenXPKI',
-            class          => 'OpenXPKI::Server::Workflow::Persister::DBI',
-            workflow_table => $workflow_table,
-            history_table  => $workflow_history_table,
-        },
-    );
-
-    ##! 1: 'end'
-    return 1;
-}
-
-sub __flatten_content {
-    my $entry       = shift;
-    my $force_array = shift;
-    # as this method calls itself a large number of times recursively,
-    # the debug levels are /a bit/ higher than usual ...
-    ##! 256: 'entry: ' . Dumper $entry
-    ##! 256: 'force_array: ' . Dumper $force_array;
-
-    foreach my $key (keys %{$entry}) {
-        if (ref $entry->{$key} eq 'ARRAY' &&
-            scalar @{ $entry->{$key} } == 1 &&
-            ref $entry->{$key}->[0] eq 'HASH' &&
-            exists $entry->{$key}->[0]->{'content'} &&
-            scalar keys %{ $entry->{$key}->[0] } == 1) {
-            ##! 256: 'key: ' . $key . ', flattening (deleting array)'
-            if (grep {$_ eq $key} @{ $force_array}) {
-                ##! 256: 'force array'
-                $entry->{$key} = [ $entry->{$key}->[0]->{'content'} ];
-            }
-            else {
-                ##! 256: 'no force array - replacing array by scalar'
-                $entry->{$key} = $entry->{$key}->[0]->{'content'};
-            }
-        }
-        elsif (ref $entry->{$key} eq 'ARRAY') {
-            ##! 256: 'entry is array but more than one element'
-            for (my $i = 0; $i < scalar @{ $entry->{$key} }; $i++) {
-                ##! 256: 'i: ' . $i
-                if (ref $entry->{$key}->[$i] eq 'HASH') {
-                    if (exists $entry->{$key}->[$i]->{'content'}) {
-                        ##! 256: 'entry #' . $i . ' has content key, flattening'
-                        $entry->{$key}->[$i] 
-                            = $entry->{$key}->[$i]->{'content'};
-                    }
-                    else {
-                        ##! 256: 'entry #' . $i . ' does not have content key'
-                        ##! 512: ref $entry->{$key}->[$i]
-                        if (ref $entry->{$key}->[$i] eq 'HASH') {
-                            # no need to flatten scalars any more
-                            ##! 256: 'recursively flattening more ...'
-                            $entry->{$key}->[$i] = __flatten_content(
-                                $entry->{$key}->[$i],
-                                $force_array
-                            );
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return $entry;
-}
-
-sub get_current_xml_config
-{
-    my $keys = { @_ };
-
-    ##! 1: "start"
-
-    if (not $keys->{CONFIG})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_XML_CONFIG_MISSING_CONFIG");
-    }
-    if (not -e $keys->{"CONFIG"})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_XML_CONFIG_FILE_DOES_NOT_EXIST",
-            params  => {"FILENAME" => $keys->{CONFIG}});
-    }
-    if (not -r $keys->{"CONFIG"})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_XML_CONFIG_FILE_NOT_READABLE",
-            params  => {"FILENAME" => $keys->{CONFIG}});
-    }
-
-    return OpenXPKI::XML::Config->new (CONFIG => $keys->{"CONFIG"});
-}
-
-sub get_xml_config {
-    my $keys = { @_ };
-
-    ##! 1: "start"
-    my @serializations = ();
-
-    my $curr_config_ser = $current_xml_config->get_serialized();
-    ##! 16: 'serialized current config: ' . $curr_config_ser
-    my $curr_config_id = sha1_base64($curr_config_ser);
-    ##! 16: 'curr config ID: ' . $curr_config_id
-    log_wrapper(
-	{
-	    MESSAGE  => "Current configuration ID: " . $curr_config_id,
-	    PRIORITY => "info",
-	    FACILITY => "system",
-	});
-    
-    # get all current configuration entries from the database
-    CTX('dbi_backend')->connect();
-    my $xml_config_entries = CTX('dbi_backend')->select(
-        TABLE   => 'CONFIG',
-        DYNAMIC => {
-            CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
-        },
-    );
-    CTX('dbi_backend')->disconnect();
-
-    if (! defined $xml_config_entries
-        || ref $xml_config_entries ne 'ARRAY') {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_INIT_GET_XML_CONFIG_CONFIG_DB_ERROR',
-        );
-    }
-
-    ### migration from old serialization format to new one ...
-
-   CONFIG:
-    foreach my $xml_config (@{ $xml_config_entries }) {
-        # the database entry _might_ still use the old Serialization::Simple
-        # format, so we check for this and convert if necessary ...
-        if ($xml_config->{DATA} =~ m{ \A HASH }xms) {
-            my $old_identifier = $xml_config->{CONFIG_IDENTIFIER};
-            my $ser_simple = OpenXPKI::Serialization::Simple->new();
-            my $ser_fast   = OpenXPKI::Serialization::Fast->new();
-
-            my $deserialized_config = $ser_simple->deserialize($xml_config->{DATA});
-            ##! 128: 'deserialized config: ' . Dumper $deserialized_config
-
-            my $xs = $current_xml_config->xml_simple();
-            ##! 128: 'xs: ' . Dumper $xs
-
-            if (Test::More::_deep_check($deserialized_config, $xs)) {
-                ##! 16: 'current config found in db, deleting it'
-                # this is the current config, just delete it, it will
-                # be added again anyways ...
-                CTX('dbi_backend')->connect();
-                CTX('dbi_backend')->delete(
-                    TABLE => 'CONFIG',
-                    DATA  => {
-                        'CONFIG_IDENTIFIER' => $old_identifier,
-                    },
-                );
-                CTX('dbi_backend')->commit();
-                CTX('dbi_backend')->disconnect();
-                # update references in workflow_context
-                CTX('dbi_workflow')->connect();
-                CTX('dbi_workflow')->update(
-                    TABLE => 'WORKFLOW_CONTEXT',
-                    DATA  => {
-                        'WORKFLOW_CONTEXT_VALUE' => $curr_config_id,
-                    },
-                    WHERE => {
-                        'WORKFLOW_CONTEXT_KEY'   => 'config_id',
-                        'WORKFLOW_CONTEXT_VALUE' => $old_identifier,
-                    },
-                );
-                CTX('dbi_workflow')->commit();
-                CTX('dbi_workflow')->disconnect();
-                next CONFIG;
-            }
-            my $reserialized_config = $ser_fast->serialize($deserialized_config);
-            my $new_identifier = sha1_base64($reserialized_config);
-            ##! 16: 'old_identifier: ' . $old_identifier
-            ##! 16: 'new_identifier: ' . $new_identifier
-
-            # update config database
-            CTX('dbi_backend')->connect();
-            CTX('dbi_backend')->update(
-                TABLE => 'CONFIG',
-                DATA  => {
-                    CONFIG_IDENTIFIER => $new_identifier,
-                    DATA              => $reserialized_config,
-                },
-                WHERE => {
-                    CONFIG_IDENTIFIER => $old_identifier,
-                },
-            );
-            CTX('dbi_backend')->commit();
-            CTX('dbi_backend')->disconnect();
-
-            # update references in workflow_context
-            CTX('dbi_workflow')->connect();
-            CTX('dbi_workflow')->update(
-                TABLE => 'WORKFLOW_CONTEXT',
-                DATA  => {
-                    'WORKFLOW_CONTEXT_VALUE' => $new_identifier,
-                },
-                WHERE => {
-                    'WORKFLOW_CONTEXT_KEY'   => 'config_id',
-                    'WORKFLOW_CONTEXT_VALUE' => $old_identifier,
-                },
-            );
-            CTX('dbi_workflow')->commit();
-            CTX('dbi_workflow')->disconnect();
-        }
-    }
-
-    # check whether current config is already in database, if not, add it
-    CTX('dbi_backend')->connect();
-    my $curr_config_db = CTX('dbi_backend')->first(
-        TABLE   => 'CONFIG',
-        DYNAMIC => {
-            CONFIG_IDENTIFIER => {VALUE => $curr_config_id},
-        },
-    );
-    if (! defined $curr_config_db) {
-        ##! 16: 'current configuration is not yet in database, adding it'
-        # TODO - log?
-        CTX('dbi_backend')->insert(
-            TABLE => 'CONFIG',
-            HASH  => {
-                CONFIG_IDENTIFIER => $curr_config_id,
-                DATA              => $curr_config_ser,
-            },
-        );
-        CTX('dbi_backend')->commit();
-    }
-    CTX('dbi_backend')->disconnect();
-
-    # get the new list of config entries
-    CTX('dbi_backend')->connect();
-    $xml_config_entries = CTX('dbi_backend')->select(
-        TABLE   => 'CONFIG',
-        DYNAMIC => {
-            CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
-        },
-    );
-    CTX('dbi_backend')->disconnect();
-
-    if (! defined $xml_config_entries
-        || ref $xml_config_entries ne 'ARRAY'
-        || scalar @{ $xml_config_entries } == 0) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_INIT_NO_CONFIG_ENTRIES_IN_DB',
-        );
-    }
-    foreach my $xml_config (@{ $xml_config_entries }) {
-        ##! 128: 'config->{DATA}: ' . $xml_config->{DATA}
-        push @serializations, $xml_config->{DATA};
-    }
-    ##! 16: '# of serializations: ' . scalar @serializations
-
-    return OpenXPKI::XML::Config->new(
-        SERIALIZED_CACHES => \@serializations,
-        DEFAULT           => $curr_config_id,
-    );
-}
 
 sub init_i18n
 {
@@ -1049,7 +517,7 @@ sub get_dbi
 
     my $db_config = $xml_config->get_hash($dbpath);
     
-    foreach my $key qw(server_id server_shift type name namespace host port user passwd) {
+    foreach my $key qw(type name namespace host port user passwd) {
         ##! 16: "dbi: $key => " . $db_config->{$key}
         $params{uc($key)} = $db_config->{$key}; 
     }     

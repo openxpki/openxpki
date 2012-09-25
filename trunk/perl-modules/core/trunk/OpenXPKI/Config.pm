@@ -89,6 +89,11 @@ sub get_version {
     return $self->BASECONNECTOR()->version();
 }
 
+sub get_head_version {
+    my $self = shift;
+    return $self->_head_version();
+}
+
 sub update_head {     
     my $self = shift;    
     my $head_id = $self->BASECONNECTOR()->fetch_head_commit();
@@ -210,6 +215,10 @@ Returns true if the head has changed, false otherwise.
 Return the sha1 value of the current head of the config tree.
 This is the version which is used, when you dont pass a version or 
 when you query a value in the C<system> namespace.
+
+=head2 get_head_version
+
+Return the sha1 value of the latest commit of the config tree.
 
 =head2 walkQueryPoints
 

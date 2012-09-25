@@ -169,7 +169,9 @@ sub get_workflow_ids_for_cert {
 
 sub get_current_config_id {
     my $self = shift;
-    return CTX('xml_config')->get_current_config_id();
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CURRENT_CONFIG_ID',
+    );   
 }
 
 sub list_config_ids {
@@ -431,166 +433,7 @@ sub get_possible_profiles_for_role {
     ##! 1: 'end'
     return \@matching_profiles;
 }
-
-sub determine_issuing_ca {
-    my $self = shift;
-    my $arg_ref = shift;
-
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVER_API_DETERMINE_ISSUING_CA_IS_DEPRECATED"
-    );
-
-    my $profilename = $arg_ref->{PROFILE};
-    ##! 16: 'profilename: ' . $profilename
-
-    my $config = CTX('config');
-
-    my $cfg_id = $arg_ref->{CONFIG_ID};
-    
-    #FIXME: How should that look with the new config system?
-    
-    ##! 2: "get pki realm configuration"
-    my $realms = CTX('pki_realm_by_cfg')->{$cfg_id}; 
-    if (! defined $cfg_id) {
-        $realms = CTX('pki_realm');
-    }
-    if (!(defined $realms && (ref $realms eq 'HASH'))) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_DETERMINE_ISSUING_CA_PKI_REALM_CONFIGURATION_UNAVAILABLE"
-        );
-    }
-
-    ##! 2: "get session's realm"
-    my $thisrealm = CTX('session')->get_pki_realm();
-    ##! 2: "$thisrealm"
-    if (! defined $thisrealm) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_DETERMINE_ISSUING_CA_PKI_REALM_NOT_SET"
-	);
-    }
-
-    my $realm_config = CTX('pki_realm_by_cfg')->{$cfg_id}
-                                              ->{$thisrealm};
-    ##! 128: 'realm_config: ' . Dumper $realm_config
-
  
-    my $entry_validity = $config->get_hash("profile.$profilename.validity");
-    if (! $entry_validity) {
-        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_SERVER_API_DETERMINE_ISSUING_CA_NO_MATCHING_PROFILE",
-            params  => {
-                REQUESTED_PROFILE => $profilename,
-            },
-        );
-    }
-
-    my $requested_notbefore;
-    my $requested_notafter;
-
-    if (! exists $entry_validity->{notbefore}) {
-        # assign default (current timestamp) if notbefore is not specified
-        $requested_notbefore = DateTime->now( time_zone => 'UTC' );
-    } else {
-        $requested_notbefore = OpenXPKI::DateTime::get_validity(
-            {
-                VALIDITY => $entry_validity->{notbefore},
-                VALIDITYFORMAT => 'detect',
-            },
-        );
-    }
-
-    $requested_notafter = OpenXPKI::DateTime::get_validity(
-	    {
-            REFERENCEDATE => $requested_notbefore,
-            VALIDITY => $entry_validity->{notafter},
-            VALIDITYFORMAT => 'detect',
-	    },
-	);
-    ##! 64: 'requested_notbefore: ' . Dumper $requested_notbefore
-    ##! 64: 'request_notafter: ' . Dumper $requested_notafter
-
-
-    # anticipate runtime differences, if the requested notafter is close
-    # to the end a CA validity we might identify an issuing CA that is
-    # not able to issue the certificate anymore when the actual signing
-    # action begins
-    # FIXME: is this acceptable?
-    # FIXME: I dont see any benefit, esp. as the signing can be hours or days from now - oliwel
-    if ($entry_validity->{notafter} =~ /^\+/) {
-        $requested_notafter->add( minutes => 5 );
-    }        
-    ##! 64: 'request_notafter (+5m?): ' . Dumper $requested_notafter
-
-    # iterate through all issuing CAs and determine possible candidates
-    # for issuing the requested certificate
-    my $now = DateTime->now( time_zone => 'UTC' );
-    my $intca;
-    my $mostrecent_notbefore;
-  CANDIDATE:
-    foreach my $ca_id (sort keys %{ $realm_config->{ca}->{id} }) {
-        ##! 16: 'ca_id: ' . $ca_id
-
-        my $ca_notbefore = $realm_config->{ca}->{id}->{$ca_id}->{notbefore};
-        ##! 16: 'ca_notbefore: ' . Dumper $ca_notbefore
-
-        my $ca_notafter = $realm_config->{ca}->{id}->{$ca_id}->{notafter};
-        ##! 16: 'ca_notafter: ' . Dumper $ca_notafter
-
-        if (! defined $ca_notbefore || ! defined $ca_notafter) {
-            ##! 16: 'ca_notbefore or ca_notafter undef, skipping'
-            next CANDIDATE;
-        }
-        # check if issuing CA is valid now
-        if (DateTime->compare($now, $ca_notbefore) < 0) {
-            ##! 16: $ca_id . ' is not yet valid, skipping'
-            next CANDIDATE;
-        }
-        if (DateTime->compare($now, $ca_notafter) > 0) {
-            ##! 16: $ca_id . ' is expired, skipping'
-            next CANDIDATE;
-        }
-
-        # check if requested validity fits into the ca validity
-        if (DateTime->compare($requested_notbefore, $ca_notbefore) < 0) {
-            ##! 16: 'requested notbefore does not fit in ca validity'
-            next CANDIDATE;
-        }
-        if (DateTime->compare($requested_notafter, $ca_notafter) > 0) {
-            ##! 16: 'requested notafter does not fit in ca validity'
-            next CANDIDATE;
-        }
-
-        # check if this CA has a more recent NotBefore date
-        if (defined $mostrecent_notbefore)
-        {
-            ##! 16: 'mostrecent_notbefore: ' . Dumper $mostrecent_notbefore
-            if (DateTime->compare($ca_notbefore, $mostrecent_notbefore) > 0)
-            {
-                ##! 16: $ca_id . ' has an earlier notbefore data'
-                $mostrecent_notbefore = $ca_notbefore;
-                $intca = $ca_id;
-            }
-        }
-        else
-        {
-            ##! 16: 'new mostrecent_notbefore'
-            $mostrecent_notbefore = $ca_notbefore;
-            $intca = $ca_id;
-        }
-    }
-
-    if (! defined $intca) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_API_DETERMINE_ISSUING_CA_NO_MATCHING_CA",
-            params  => {
-                REQUESTED_NOTAFTER => $requested_notafter->iso8601(),
-            },
-        );
-    }
-
-    return $intca;
-}
-
 sub get_approval_message {
     my $self      = shift;
     my $arg_ref   = shift;
@@ -823,55 +666,6 @@ sub get_chain {
         $return_ref->{CERTIFICATES} = \@certs;
     }
     return $return_ref;
-}
-
-# get one or more CA certificates
-# FIXME: this still assumes we have files in the config
-sub get_ca_certificate {
-    my %response;
-
-    ##! 2: "get pki realm configuration"
-    my $realms = CTX('pki_realm');
-    if (!(defined $realms && (ref $realms eq 'HASH'))) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_GET_CA_CERTIFICATES_PKI_REALM_CONFIGURATION_UNAVAILABLE"
-        );
-    }
-
-    ##! 2: "get session's realm"
-    my $thisrealm = CTX('session')->get_pki_realm();
-    ##! 2: "$thisrealm"
-    if (! defined $thisrealm) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_GET_CA_CERTIFICATES_PKI_REALM_NOT_SET"
-	);
-    }
-
-    if (exists $realms->{$thisrealm}->{ca}) {
-	# if no ca certificates could be found this key will not exist
-        ##! 4: "ca cert exists"
-	foreach my $caid (keys %{$realms->{$thisrealm}->{ca}->{id}}) {
-            my $notbefore = $realms->{$thisrealm}->{ca}->{id}->{$caid}->{notbefore};
-            my $notafter  = $realms->{$thisrealm}->{ca}->{id}->{$caid}->{notafter};
-	    $response{$caid} = 
-	    {
-		notbefore => OpenXPKI::DateTime::convert_date(
-		    {
-			DATE => $notbefore,
-			OUTFORMAT => 'printable',
-		    }),
-		notafter => OpenXPKI::DateTime::convert_date(
-		    {
-			DATE => $notafter,
-			OUTFORMAT => 'printable',
-		    }),
-		cacert => $realms->{$thisrealm}->{ca}->{id}->{$caid}->{crypto}->get_certfile(),
-
-	    };
-	}
-    }
-    ##! 64: "response: " . Dumper(%response)
-    return \%response;
 }
 
 sub list_ca_ids {
@@ -1141,29 +935,6 @@ Get PKI realm for this session.
 Returns a list of all issuing CA IDs that are available.
 Return structure:
   CA_ID => array ref of CA IDs
-
-=head2 get_ca_certificate
-
-Returns CA certificate details.
-Expects named parameter 'CA_ID' which can be either a scalar or an 
-array ref indicating which CA certificates to fetch.
-If named paramter 'OUTFORM' is specified, it must be one of 'PEM' or
-'DER'. In this case the returned structure will return the CA certificate
-in the specified format.
-
-Returns an array ref containing the CA certificate information in the
-order that was requested.
-
-Return structure:
-  CACERT => [
-    {
-        CA_ID => CA ID (as requested)
-        NOTBEFORE => certifiate notbefore (ISO8601)
-        NOTAFTER => certifiate notafter  (ISO8601)
-        CERTIFICATE => certificate data (only if OUTFORM was specified)
-    }
-
-  ]
 
 =head2 get_chain
 

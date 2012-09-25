@@ -47,6 +47,11 @@ sub __load_config
     my $self = shift;
     ##! 1: "start"
 
+
+    # TODO - migration needed
+    return 1;
+
+
     my $keys   = shift;
     my $cfg_id = $keys->{CONFIG_ID};
 
@@ -352,6 +357,9 @@ sub __load_workflow_permissions {
 ########################################################################
 
 sub authorize_workflow {
+    
+    return 1;
+    
     my $self     = shift;
     my $arg_ref  = shift;
     my $action   = $arg_ref->{ACTION};
@@ -482,6 +490,7 @@ sub authorize
     my $self = shift;
     my $keys = shift;
 
+return 1;
     ## we need the following things:
     ##     - PKI realm
     ##     - auth_role
@@ -607,7 +616,7 @@ sub authorize
 sub get_roles
 {
     my $self  = shift;
-    return keys %{$self->{PKI_REALM}->{CTX('session')->get_pki_realm()}->{ROLES}};
+    return CTX('config')->get_keys('auth.roles');   
 }
 
 sub get_servers

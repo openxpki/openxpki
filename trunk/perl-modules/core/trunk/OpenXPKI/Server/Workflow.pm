@@ -337,7 +337,7 @@ sub _resume {
                 }
             )
         );
-        $self->_set_proc_state('resume');#saves wf data
+        $self->_set_proc_state('resume');#saves wf data        
         $action->resume($self,$old_state);
         
     };
@@ -499,6 +499,11 @@ sub set {
     $self->{$prop} = $value;
 }
 
+sub factory {
+    my $self = shift;
+    return $self->{_FACTORY};
+}
+
 1;
 __END__
 
@@ -591,6 +596,10 @@ true, if the workflow is running(i.e. the proc state is "running")
 
 overwritten from parent Workflow class. handles the special case "pause", otherwise it calls super::_get_next_state()
 
+=head2 factory
+
+return a ref to the workflows factory
+
 =head2 _save
 
 calls $self->{_FACTORY}->save_workflow($self);
@@ -606,7 +615,6 @@ OpenXPKI::Server::Workflow::Persister::DBI::update_workflow()
 for limitations that exist for data stored in Workflow Contexts.
 
 =head2 Activities
-
 
 =head3 Creating new activities
 

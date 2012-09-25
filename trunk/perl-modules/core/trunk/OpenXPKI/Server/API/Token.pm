@@ -152,8 +152,8 @@ sub get_token_alias_by_group {
             [ 'IDENTIFIER', 'IDENTIFIER' ],
         ],
         DYNAMIC => {
-            'ALIASES.PKI_REALM' => $pki_realm,
-            'ALIASES.GROUP_ID' => $group,              
+            'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
+            'ALIASES.GROUP_ID' => { VALUE => $group },              
             'CERTIFICATE.NOTBEFORE' => { VALUE => $validity{notbefore}, OPERATOR => 'LESS_THAN' },
             'CERTIFICATE.NOTAFTER' => { VALUE => $validity{notafter}, OPERATOR => 'GREATER_THAN' },                          
         },
@@ -213,8 +213,8 @@ sub get_certificate_for_alias {
             [ 'IDENTIFIER', 'IDENTIFIER' ],
         ],
         DYNAMIC => {
-            'ALIASES.ALIAS' => $keys->{ALIAS},
-            'PKI_REALM' => $pki_realm, 
+            'ALIASES.ALIAS' => { VALUE => $keys->{ALIAS} },
+            'ALIASES.PKI_REALM' => { VALUE => $pki_realm }, 
         }
     );
  

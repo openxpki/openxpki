@@ -153,22 +153,15 @@ sub START {
     ##! 16: 'get_command_params() child: ' . Dumper($self->get_command_params())
     ##FIXME - create useful checks
     if (0) {
-    if (not exists $arg_ref->{NAME}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_NAME");
-    }
-    if (not exists $arg_ref->{PKI_REALM_INDEX}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_PKI_REALM_INDEX");
-    }
-    if (not exists $arg_ref->{TOKEN_TYPE}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_TOKEN_TYPE");
-    }
-    if (not exists $arg_ref->{TOKEN_INDEX}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_TOKEN_INDEX");
-    }
+        if (not exists $arg_ref->{NAME}) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_NAME");
+        }
+        
+        if (not exists $arg_ref->{TOKEN_TYPE}) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_TOKEN_TYPE");
+        }
     }
 
     delete $arg_ref->{CLASS};
@@ -176,8 +169,7 @@ sub START {
     foreach my $key (keys %{$arg_ref})
     {
         next if (grep /^$key$/, ("TMP", "NAME",
-                                 "PKI_REALM_INDEX",
-                                 "TOKEN_TYPE", "TOKEN_INDEX",
+                                 "TOKEN_TYPE", 
                                  "CERTIFICATE", "SECRET", 'CONFIG_ID'));
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_ILLEGAL_PARAMETER",

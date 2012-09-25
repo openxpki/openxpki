@@ -253,23 +253,7 @@ sub list_context_keys {
 
 sub list_workflow_titles {
     ##! 1: "list_workflow_titles"
-    my $factory = __get_workflow_factory();
-
-    # FIXME: we are poking into Workflow::Factory's internal data
-    # structures here to get the required information.
-    # There really should be accessor methods for this instead in the
-    # Workflow class.
-    my $result = {};
-    if (ref $factory->{_workflow_config} eq 'HASH') {
-	foreach my $item (keys %{$factory->{_workflow_config}}) {
-	    my $type = $factory->{_workflow_config}->{$item}->{type};
-	    my $desc = $factory->{_workflow_config}->{$item}->{description};
-	    $result->{$type} = {
-		description => $desc,
-	    },
-	}
-    }
-    return $result;
+    return __get_workflow_factory()->list_workflow_titles();
 }
 
 sub get_workflow_type_for_id {
@@ -563,15 +547,6 @@ sub create_workflow_instance {
     }
 
     $workflow->context->param(creator => $creator);
-
-    my $config_id = CTX('api')->get_current_config_id();
-    if (! defined $config_id) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_CREATE_WORKFLOW_CONFIG_ID_UNDEFINED',
-        );
-    }
-
-    $workflow->context->param(config_id => $config_id);
 
     # our convention is that every workflow MUST have the following properties:
     # - it must have an activity called 'create'
@@ -881,48 +856,43 @@ sub search_workflow_instances {
 
 sub __get_workflow_factory {
     ##! 1: 'start'
-    my $arg_ref = shift;
-    my $current_config_id = CTX('api')->get_current_config_id();
-    my $config_id = $current_config_id;
-    if ($arg_ref->{CONFIG_ID}) {
-        $config_id = $arg_ref->{CONFIG_ID};
-    }
-    if ($arg_ref->{WORKFLOW_ID}) {
-        ##! 16: 'determine factory for workflow ' . $arg_ref->{WORKFLOW_ID}
-        # determine workflow's config ID and set config_id accordingly
-        my $wf = CTX('dbi_workflow')->first(
-            TABLE   => 'WORKFLOW_CONTEXT',
-            DYNAMIC => {
-                'WORKFLOW_SERIAL'      => {VALUE => $arg_ref->{WORKFLOW_ID}},
-                'WORKFLOW_CONTEXT_KEY' => {VALUE => 'config_id'},
-            },
-        );
-        if (! defined $wf) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_CONFIG_ID_CONTEXT_ENTRY_COULD_NOT_BE_FOUND',
-                params  => {
-                    WORKFLOW_ID => $arg_ref->{WORKFLOW_ID},
-                },
-            );
-        }
-        $config_id = $wf->{WORKFLOW_CONTEXT_VALUE};
-    }
-    ##! 32: 'config_id: ' . $config_id
-    my $pki_realm = CTX('session')->get_pki_realm();
-    if ($arg_ref->{PKI_REALM}) {
-        $pki_realm = $arg_ref->{PKI_REALM};
-    }
-    ##! 32: 'realm: ' . $pki_realm
     
-    unless($pki_realm){
-        OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_NO_PKI_REALM_GIVEN',
-                params  => {
-                    WORKFLOW_ID => $arg_ref->{WORKFLOW_ID},
-                },
-            );
+    my $arg_ref = shift;
+    
+    # No Workflow - just get the standard factory
+    if (!$arg_ref->{WORKFLOW_ID}) {
+        ##! 16: 'No workflow id - create factory from session info'
+        return CTX('workflow_factory')->get_factory();
     }
 
+    # Fetch the serialized session from the workflow table        
+    ##! 16: 'determine factory for workflow ' . $arg_ref->{WORKFLOW_ID}
+    # determine workflow's config ID and set config_id accordingly
+    my $wf = CTX('dbi_workflow')->first(
+        TABLE   => 'WORKFLOW',
+        KEY => $arg_ref->{WORKFLOW_ID}                            
+    );
+    if (! defined $wf) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_UNABLE_TO_LOAD_WORKFLOW_INFO',
+            params  => {
+                WORKFLOW_ID => $arg_ref->{WORKFLOW_ID},
+            },
+        );
+    }
+    my $pki_realm = $wf->{PKI_REALM};    
+    my $wf_session_info = CTX('session')->parse_serialized_info($wf->{WORKFLOW_SESSION});
+    if (!$wf_session_info || ref $wf_session_info ne 'HASH' || !$wf_session_info->{config_version}) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_UNABLE_TO_PARSE_WORKFLOW_INFO',
+            params  => {
+                WORKFLOW_ID => $arg_ref->{WORKFLOW_ID},
+                WORKFLOW_SESSION => $wf->{WORKFLOW_SESSION}
+            },
+        );
+    }
+   
+     
     # We have now obtained the configuration id that was active during
     # creation of the workflow instance. However, if for some reason
     # the matching configuration is not available we have two options:
@@ -945,37 +915,34 @@ sub __get_workflow_factory {
     # to be an acceptable tradeoff.
 
     my $factory;
-    if (defined CTX('workflow_factory')->{$config_id}->{$pki_realm}) {
-	# use workflow factory as defined in workflow context
-	$factory = CTX('workflow_factory')->{$config_id}->{$pki_realm};
-    } else {
- 	# use current workflow definition
-	$factory = CTX('workflow_factory')->{$current_config_id}->{$pki_realm};
-
-	CTX('log')->log(
-	    MESSAGE  => 'Workflow ID ' . $arg_ref->{WORKFLOW_ID} . ' references unavailable config ID ' . $config_id . ' (falling back to current configuration ID ' . $current_config_id . ')',
-	    PRIORITY => 'warn',
-	    FACILITY => 'system',
-	    );
+    eval {
+        $factory = CTX('workflow_factory')->get_factory({ 
+            PKI_REALM => $pki_realm, 
+            VERSION => $wf_session_info->{config_version} 
+        });
+    };
+    my $exc = OpenXPKI::Exception->caught();
+    # We were unsuccessful in restoring the factory for an older version - try to get it for the head version
+    if (defined $exc && $exc->message() eq 'I18N_OPENXPKI_WORKFLOW_HANDLER_GET_FACTORY_UNKNOWN_VERSION_REQUESTED') {
+        $factory = CTX('workflow_factory')->get_factory({ 
+            PKI_REALM => $pki_realm, 
+            VERSION => CTX('config')->get_head_version()
+        });        
+        
+        CTX('log')->log(
+            MESSAGE  => 'Workflow ID ' . $arg_ref->{WORKFLOW_ID} . ' references unavailable config version ' . $wf_session_info->{config_version} . ' (falling back to current head ' . CTX('config')->get_head_version() . ')',
+            PRIORITY => 'warn',
+            FACILITY => 'system',
+        );
     }
     
-    ##! 64: 'factory: ' . Dumper $factory
-    ##! 64: 'workflow_factory keys: ' . Dumper keys %{ CTX('workflow_factory') }
+    ##! 64: 'factory: ' . Dumper $factory    
     if (! defined $factory) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_FACTORY_FACTORY_NOT_DEFINED',
         );
     }
-    # this is a hack, because Workflow::Factory does not really
-    # support subclassing (although it claims so). For details see
-    # Server::Init::__wf_factory_add_config()
-    no warnings 'redefine';
-    *Workflow::State::FACTORY   = sub { return $factory };
-    *Workflow::Action::FACTORY  = sub { return $factory };
-    *Workflow::Factory::FACTORY = sub { return $factory };
-    *Workflow::FACTORY          = sub { return $factory };
-    *OpenXPKI::Server::Workflow::Observer::AddExecuteHistory::FACTORY
-        = sub { return $factory };
+    
     return $factory;
 }
 
@@ -1124,3 +1091,8 @@ If given, defines the offset of the returned workflow (use with LIMIT).
 Works exactly the same as search_workflow_instances, but returns the
 number of results instead of the results themselves.
 
+
+=head2 __get_workflow_factory
+
+Get a suitable factory from handler. If a workflow id is given, the config 
+version and realm are extracted from the workflow system. 

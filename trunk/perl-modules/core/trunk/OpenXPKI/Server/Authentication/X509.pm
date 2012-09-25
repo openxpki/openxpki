@@ -44,7 +44,7 @@ sub new {
     }     
     
     foreach my $trust_realm (@trusted_realms) {
-        ## FIXME - find all ca certs in that realm and add them        
+        ## FIXME-MIG - find all ca certs in that realm and add them        
     }
     
     if (! scalar @trust_anchors ) {

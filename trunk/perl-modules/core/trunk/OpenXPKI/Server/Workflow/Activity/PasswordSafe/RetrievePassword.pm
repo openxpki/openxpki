@@ -21,15 +21,16 @@ sub execute
     my $context    = $workflow->context();
     my $id         = $context->param('_id');
     my $safe_id    = $context->param('safe_id');
-    my $realm      = CTX('session')->get_pki_realm();
+    
 
-    my $wf_factory = CTX('workflow_factory')->{$self->{CONFIG_ID}}->{$realm};
+    my $wf_factory = $workflow->factory();
     my $unfiltered_wf = $wf_factory->fetch_unfiltered_workflow(
         'I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE',
         $workflow->id(),
     );
     ##! 16: 'password_safe: ' . Dumper CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$realm}
-    my $safe_token = CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$realm}->{password_safe}->{id}->{$safe_id}->{crypto};
+    my $safe_token = CTX('api')->get_token_by_alias('datasafe');
+    # ;CTX('pki_realm_by_cfg')->{$self->{CONFIG_ID}}->{$realm}->{password_safe}->{id}->{$safe_id}->{crypto};
     if (! defined $safe_token) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PASSWORD_SAFE_RETRIEVE_PASSWORD_TOKEN_NOT_AVAILABLE',

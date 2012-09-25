@@ -1,4 +1,5 @@
-<workflow_config id="default">
+<openxpki>
+ <workflow_config id="default">
   <workflows>    
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_signing_request.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_renewal_request.xml"/>
@@ -33,3 +34,4 @@
   </conditions>
 
 </workflow_config>
+</openxpki>

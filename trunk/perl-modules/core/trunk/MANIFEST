@@ -18,7 +18,6 @@ OpenXPKI/Exception.pm
 OpenXPKI/FileUtils.pm
 OpenXPKI/Template/Plugin/RandomPassword.pm
 OpenXPKI/XML/Cache.pm
-OpenXPKI/XML/Config.pm
 OpenXPKI/i18n.pm
 openxpki.xsd
 
@@ -183,6 +182,9 @@ OpenXPKI/Server/Notification.pm
 
 ## Workflow
 OpenXPKI/Workflow/Factory.pm
+OpenXPKI/Workflow/Handler.pm
+# Development Helper - should be refactored before release
+OpenXPKI/Workflow/Instance.pm
 
 OpenXPKI/Server/Workflow.pm
 OpenXPKI/Server/Workflow/Pause.pm
@@ -195,6 +197,8 @@ OpenXPKI/Server/Workflow/WFObject/WFHash.pm
 
 OpenXPKI/Server/Workflow/Activity.pm 
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
+
+OpenXPKI/Server/Workflow/Activity/Noop.pm
 
 # FIXME: Remove for production
 OpenXPKI/Server/Workflow/Activity/WorkflowTest.pm
@@ -217,7 +221,6 @@ OpenXPKI/Server/Workflow/Activity/CRR/MarkRevoked.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
-OpenXPKI/Server/Workflow/Activity/Tools/DetermineIssuingCA.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ForkWorkflowInstance.pm
@@ -269,7 +272,6 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/WriteCertificateToInstall.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateEscrowedKey.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/IssueCert.pm
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm

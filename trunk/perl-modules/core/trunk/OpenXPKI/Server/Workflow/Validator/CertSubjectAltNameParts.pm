@@ -33,15 +33,7 @@ sub validate {
     return if (not defined $subject_alt_name_parts);
 
     ##! 16: 'wf->id(): ' . $wf->id()
-    my $cfg_id = $api->get_config_id({ ID => $wf->id() });
-    ##! 16: 'cfg_id: ' . $cfg_id
-    if (! defined $cfg_id) {
-        # as this is called during creation, the cfg id is not defined
-        # yet, so we use the current one
-        $cfg_id = $api->get_current_config_id();
-    }
-
-    ##! 16: 'cfg_id: ' . $cfg_id
+  
     Encode::_utf8_off ($subject_alt_name_parts);
     Encode::_utf8_off ($subject_parts);
     my $ser = OpenXPKI::Serialization::Simple->new();
@@ -247,14 +239,12 @@ sub validate {
     if (defined $pkcs10) {
         $styles = CTX('api')->get_cert_subject_styles({
             PROFILE   => $profile,
-            CONFIG_ID => $cfg_id,
             PKCS10    => $pkcs10,
         });
     }
     else {
         $styles = CTX('api')->get_cert_subject_styles({
             PROFILE   => $profile,
-            CONFIG_ID => $cfg_id,
         });
     }
     ##! 64: 'styles: ' . Dumper $styles
@@ -325,7 +315,7 @@ sub validate {
          }
     }
     ##! 64: 'sans after evaluating fixed: ' . Dumper \@sans
-    ##FIXME: A validator schould not write into the context
+    ##FIXME: A validator should not write into the context
     $context->param('cert_subject_alt_name' => $ser->serialize(\@sans));
 
     return 1;

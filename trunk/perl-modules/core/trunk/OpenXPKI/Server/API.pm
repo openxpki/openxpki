@@ -112,12 +112,6 @@ sub BUILD {
                  },
             },
         },
-        'get_current_config_id' => {
-            class  => 'Default',
-            params => {
-            },
-            memoize => 1,
-        },
         'list_config_ids' => {
             class  => 'Default',
             params => {
@@ -147,21 +141,7 @@ sub BUILD {
                 },
             },
             memoize => 1,
-        },
-        'determine_issuing_ca' => {
-            class  => 'Default',
-            params => {
-                'PROFILE' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                },
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-            },
-        },
+        },        
         'get_default_token' => {
             class  => 'Token',
             params => {                
@@ -512,23 +492,6 @@ sub BUILD {
                 },
             },
         },
-        ## loks like some outdated stuff
-        #'get_ca_certificate' => {
-        #    class  => 'Default',
-        #    params => { },
-        #},
-        ## do we really need this?
-        'list_ca_ids' => {
-            class  => 'Default',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-            },
-        },
-        #'get_pki_realm_index' # Removed with profile migration. No occurences found outside.
         'get_roles' => {
             class  => 'Default',
             params => { },

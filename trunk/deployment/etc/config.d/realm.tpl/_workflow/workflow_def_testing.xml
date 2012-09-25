@@ -1,0 +1,39 @@
+<workflow>
+<type>I18N_OPENXPKI_WF_TYPE_TESTING</type>
+  <description></description>
+  <persister>OpenXPKI</persister>
+
+  <state name="INITIAL"> 
+    <description></description>
+    <action name="I18N_OPENXPKI_WF_ACTION_WORKFLOWTEST" 
+	    resulting_state="STEP2">      
+    </action>
+  </state>
+  
+  <state name="STEP2">
+    <description></description>
+    <!-- Das wäre super wenn man hier die Werte in der Activity Definition 
+    nochmal überschreiben könnte, ist aber "Nice to Have" wenns einfach geht
+    
+    DS: geht!
+     -->
+    <action name="I18N_OPENXPKI_WF_ACTION_WORKFLOWTEST" 
+	    resulting_state="STEP3"
+		retry_count="3" >      
+    </action>
+
+  </state>
+   
+  
+   <state name="STEP3">
+    <description></description>
+    
+    <action name="I18N_OPENXPKI_WF_ACTION_WORKFLOWTEST" 
+	    resulting_state="SUCCESS" retry_interval="+0000000015">      
+    </action>
+
+  </state>
+
+  <state name="SUCCESS"/>
+
+</workflow>

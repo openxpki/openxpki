@@ -92,7 +92,8 @@ around BUILDARGS => sub {
            
 sub run {
     my $self = shift;
-
+    my $args = shift;
+    
     my $pid;
     my $redo_count = 0;
     
@@ -167,8 +168,8 @@ sub run {
                 
         $0 = sprintf ('openxpki watchdog ( %s )', CTX('config')->get('system.server.name') || 'main');
 
-        set_gid(1001);
-        set_uid(1001);
+        set_gid($args->{group}) if( $args->{group} );
+        set_uid($args->{user}) if( $args->{user} );
         
         #wait some time for server startup...
         ##! 16: sprintf('watchdog: original PID %d, initail wait for %d seconds', $self->{original_pid} , $self->interval_wait_initial());
@@ -239,7 +240,7 @@ sub run {
 sub reload {
     my $self = shift;
     # reload is called if the config changes
-    # FIXME - I guess this relods the parent but not the forked child...check that!
+    # FIXME-MIG - I guess this relods the parent but not the forked child...check that!
     
     return if ($self->disabled());
     

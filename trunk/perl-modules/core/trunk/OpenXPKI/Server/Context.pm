@@ -119,7 +119,7 @@ sub CTX {
                 OpenXPKI::Server::Context::setcontext({'session' => $session});
                 $session->set_pki_realm('I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA');	        	        
     	    } elsif ($object eq 'log') {
-    	        warn "Auto-Init of NOOP-Logger";
+    	        #warn "Auto-Init of NOOP-Logger";
     	        use OpenXPKI::Server::Log::NOOP;
     	        OpenXPKI::Server::Context::setcontext({'log' => OpenXPKI::Server::Log::NOOP->new()});    	        
     	    } else {        	   
@@ -214,8 +214,12 @@ sub setcontext {
     return 1;
 }
 
+sub hascontext {
+    my $key = shift;
+    return defined ($context->{exported}->{$key});
+}
 
-sub killsession {
+sub killsession {    
     $context->{exported}->{session} = undef;
     return 1;
 } 
@@ -333,4 +337,11 @@ Usage:
     api    => OpenXPKI::Server::API->new(),
   });
 
+=head2 hascontext 
 
+Check if the requested entry is available from the context.
+
+=head2 killsession
+
+Delete the recorded session from the context. Used during server startup 
+where we start with a mock session and need a real one later. 

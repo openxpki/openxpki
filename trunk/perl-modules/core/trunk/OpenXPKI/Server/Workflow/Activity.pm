@@ -203,19 +203,7 @@ sub _get_wf_action_param{
 
 sub config_id {
     my $self = shift;
-
-    if (defined $self->{CONFIG_ID}) {
-        return $self->{CONFIG_ID};
-    }
-    else {
-        # this (only) happens when the activity is called as the first
-        # activity in the workflow ...
-        # as the config_id is only written to the context once the workflow
-        # has been created (which is technically not the case while the
-        # first activity is still running), we need to get the current
-        # config ID, which will be the workflow's config ID anyways ...
-        return CTX('api')->get_current_config_id();
-    }
+    return;
 }
 
 1;

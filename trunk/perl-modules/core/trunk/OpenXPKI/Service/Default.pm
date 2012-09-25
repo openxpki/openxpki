@@ -283,7 +283,7 @@ sub __handle_PING : PRIVATE {
         my %realms =();      
         foreach my $realm (sort @realm_names) {
             $realms{$realm}->{NAME} = $realm;
-            ## FIXME: we should add a description to every PKI realm
+            ## FIXME-MIG: we should add a description to every PKI realm
             $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.label");
         }
         return {
@@ -335,7 +335,7 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
         my %realms =();      
         foreach my $realm (sort @realm_names) {
             $realms{$realm}->{NAME} = $realm;
-            ## FIXME: we should add a description to every PKI realm
+            ## FIXME-MIG: we should add a description to every PKI realm
             $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.label");
         }
         $self->__change_state({

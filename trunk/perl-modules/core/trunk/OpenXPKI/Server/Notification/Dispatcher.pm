@@ -26,6 +26,9 @@ sub START {
     my $ident   = shift;
     my $arg_ref = shift;
     my $cfg_id  = $arg_ref->{CONFIG_ID};
+    
+    # TODO - needs migration
+    return 1;
 
     my $config = CTX('xml_config');
 
