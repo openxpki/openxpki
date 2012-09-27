@@ -1128,7 +1128,9 @@ sub get_xml_config {
             my $xs = $current_xml_config->xml_simple();
             ##! 128: 'xs: ' . Dumper $xs
 
-            if (Test::More::_deep_check($deserialized_config, $xs)) {
+            my $MIGRATE_OLD_CFG_SER = 0;    # Disable auto-migrate of old serialize data
+
+            if ($MIGRATE_OLD_CFG_SER && Test::More::_deep_check($deserialized_config, $xs)) {
                 ##! 16: 'current config found in db, deleting it'
                 # this is the current config, just delete it, it will
                 # be added again anyways ...
