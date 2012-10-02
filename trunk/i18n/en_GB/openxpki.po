@@ -1524,7 +1524,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET_TOKEN_UNKNOWN_ERROR"
 msgstr "Errors"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"
-msgstr "02. Server-Side Key Generation"
+msgstr "02. Key Generation on PKI"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE_KEYGEN"
 msgstr ""
