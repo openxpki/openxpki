@@ -1121,7 +1121,7 @@ msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_RESET"
 msgstr "Reset"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE"
-msgstr "Serverside key generation"
+msgstr "Key generation on PKI"
 
 msgid "I18N_OPENXPKI_CLIENT_HTML_MASON_SERVERSIDE_KEYGEN"
 msgstr "If you are unsure about what to do or you do not know if your client environment will be the same until you get the certificate from the trustcenter then please use this way of key generation. The key is still no readable by any administrator because you are the only one who knows the passphrase of the key."
