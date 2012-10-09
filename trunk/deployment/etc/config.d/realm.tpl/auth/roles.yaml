@@ -1,6 +1,16 @@
-# This is a placeholder
-User : User
-RA Operator : RA Operator
-CA Operator : CA Operator
-Web Server : Web Server 
+# This is a placeholder - list all AAA Roles here (no "profile roles")
+# These must be a superset of the roles used in wfacl
+# Default customer role
+User: User
 
+# operator personel
+RA Operator: RA Operator
+
+# operator with ca key access
+CA Operator: CA Operator
+
+# system user, anything which is running on the shell
+System: System
+
+# the anon role - anything unauth'd
+Anonymous: Anonymous

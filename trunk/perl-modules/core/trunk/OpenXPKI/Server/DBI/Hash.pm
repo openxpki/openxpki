@@ -190,9 +190,9 @@ sub __log_write_action
     foreach my $key (keys %index)
     {
         my $val = 'n/a';
-        if (exists $index{$key}) {
-	    $val = $index{$key};
-	}
+        if (defined $index{$key}) {
+	       $val = $index{$key};
+        }
         $message .= "\n" . lc($key) . "=" . $val;
     }
     ##! 16: 'log: ' . ref $self->{LOG}

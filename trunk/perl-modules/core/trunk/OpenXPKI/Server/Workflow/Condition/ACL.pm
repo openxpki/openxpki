@@ -12,6 +12,10 @@ __PACKAGE__->mk_accessors( 'activity' );
 
 sub _init
 {
+    
+    #FIXME - ACL
+    configuration_error('ACL not implemented');
+    
     my ( $self, $params ) = @_;
     unless ( $params->{activity} )
     {

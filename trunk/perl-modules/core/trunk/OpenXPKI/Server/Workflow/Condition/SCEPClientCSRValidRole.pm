@@ -15,6 +15,8 @@ use Data::Dumper;
 
 __PACKAGE__->mk_accessors( 'allowed_roles' );
 
+#FIXME This class needs to be refactored and will not work
+
 sub _init {
     my ( $self, $params ) = @_;
 

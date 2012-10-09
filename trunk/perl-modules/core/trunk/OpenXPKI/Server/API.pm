@@ -499,10 +499,9 @@ sub BUILD {
         'get_available_cert_roles' => {
             class  => 'Default',
             params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
+                PROFILES => {
+                    type     => ARRAYREF,
+                    optional => 1,                    
                 },
             },
             memoize => 1,
@@ -888,7 +887,7 @@ sub BUILD {
             class  => 'Workflow',
             params => {
                 CONTEXT => {
-                    type     => ARRAYREF,
+                    type     => ARRAYREF | UNDEF,
                     optional => 1,
                 },
                 TYPE => {
@@ -921,7 +920,7 @@ sub BUILD {
             class  => 'Workflow',
             params => {
                 CONTEXT => {
-                    type     => ARRAYREF,
+                    type     => ARRAYREF | UNDEF,
                     optional => 1,
                 },
                 TYPE => {
@@ -1018,8 +1017,8 @@ sub AUTOMETHOD {
         }
 
         
-        # ACL checking
-        if ($external_of{$ident}) { # do ACL checking
+        # ACL checking - FIXME - ACL - need implementation
+        if (0 && $external_of{$ident}) { # do ACL checking
             my $affected_role
                 = $method_info_of{$ident}->{$method_name}->{affected_role};
             my $acl_hashref = {
@@ -1031,8 +1030,9 @@ sub AUTOMETHOD {
                 $acl_hashref->{AFFECTED_ROLE} = $affected_role;
             }
             eval {
-                CTX('acl')->authorize($acl_hashref);
-		# logging is done in ACL class
+                #FIXME - ACL checking is disabled
+                #CTX('acl')->authorize($acl_hashref);
+    		# logging is done in ACL class
             };
         
             if (my $exc = OpenXPKI::Exception->caught()) {

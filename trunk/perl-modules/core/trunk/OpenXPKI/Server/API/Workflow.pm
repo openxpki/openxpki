@@ -520,11 +520,6 @@ sub create_workflow_instance {
 
     my $wf_title = $args->{WORKFLOW};
 
-    CTX('acl')->authorize_workflow({
-        ACTION => 'create',
-        TYPE   => $wf_title,
-    });
-
     # 'data only certificate request'
     my $workflow = __get_workflow_factory()->create_workflow($wf_title);
 
@@ -753,8 +748,10 @@ sub search_workflow_instances {
         my $table_alias = $context_table . '_' . $i;
         my $key   = $context_entry->{KEY};
         my $value = $context_entry->{VALUE};
+        my $operator = '=';
+        $operator = $context_entry->{OPERATOR} if($context_entry->{OPERATOR});
         $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_KEY'}   = {VALUE => $key};
-        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_VALUE'} = {VALUE => $value};
+        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_VALUE'} = {VALUE => $value, OPERATOR  => $operator };
         push @tables, [ $context_table => $table_alias ];
         push @joins, 'WORKFLOW_SERIAL';
         $i++;

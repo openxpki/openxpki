@@ -42,9 +42,10 @@
                       }
                   );
         $role = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_role};
+        my $profile = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_profile};
 
         ## read all roles from the server
-        $msg = $context->{client}->send_receive_command_msg("get_roles");
+        $msg = $context->{client}->send_receive_command_msg("get_available_cert_roles", { PROFILES => [ $profile ]});
         @roles = @{$msg->{PARAMS}};
 
         ## if there is only one option then there is no choice

@@ -174,7 +174,7 @@ OpenXPKI/Server/Authentication/LDAP.pm
 OpenXPKI/Server/Authentication/Password.pm
 OpenXPKI/Server/Authentication/X509.pm
 OpenXPKI/Server/Authentication/ClientX509.pm
-OpenXPKI/Server/ACL.pm
+#OpenXPKI/Server/ACL.pm
 
 OpenXPKI/Server/Notification/RT.pm
 OpenXPKI/Server/Notification/Dispatcher.pm
@@ -280,7 +280,7 @@ OpenXPKI/Server/Workflow/Observer/AddExecuteHistory.pm
 OpenXPKI/Server/Workflow/Observer/Debug.pm
 OpenXPKI/Server/Workflow/Observer/Log.pm
 
-OpenXPKI/Server/Workflow/Condition/ACL.pm
+#OpenXPKI/Server/Workflow/Condition/ACL.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysFalse.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysTrue.pm
 OpenXPKI/Server/Workflow/Condition/Approved.pm

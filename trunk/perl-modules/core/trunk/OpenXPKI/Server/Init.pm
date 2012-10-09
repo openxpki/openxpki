@@ -27,7 +27,6 @@ use OpenXPKI::Server;
 use OpenXPKI::Server::DBI;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::NOOP;
-use OpenXPKI::Server::ACL;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Dispatcher;
@@ -63,7 +62,6 @@ my @init_tasks = qw(
   crypto_layer  
   api  
   workflow_factory
-  acl
   volatile_vault
   authentication
   notification
@@ -395,9 +393,7 @@ sub __do_init_acl {
     ### init acl...
     OpenXPKI::Server::Context::setcontext(
 	{
-	    acl => OpenXPKI::Server::ACL->new({
-            CONFIG_ID => 'default',
-        }),
+	    acl => 1
 	});
 }
 

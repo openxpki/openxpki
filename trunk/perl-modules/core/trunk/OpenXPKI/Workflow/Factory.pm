@@ -34,6 +34,11 @@ sub create_workflow{
     
     my ( $self, $wf_type, $context ) = @_;    
     
+    $self->__authorize_workflow({
+        ACTION => 'create',
+        TYPE   => $wf_type,
+    });
+    
     my $wf = $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Workflow::Instance' );
     
     my $oxiWf = OpenXPKI::Server::Workflow->new($wf, $self);
@@ -49,9 +54,8 @@ sub fetch_workflow {
     # the following both checks whether the user is allowed to
     # read the workflow at all and deletes context entries from $wf if
     # the configuration mandates it
-    # FIXME-MIG - Need to replace ACL 
-    0 && CTX('acl')->authorize_workflow({
-        ACTION   => 'read',
+    $self->__authorize_workflow({
+        ACTION   => 'access',
         WORKFLOW => $wf,
         FILTER   => 1,
     });
@@ -73,8 +77,8 @@ sub fetch_unfiltered_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
     my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id);
     
-    CTX('acl')->authorize_workflow({
-        ACTION   => 'read',
+    $self->__authorize_workflow({
+        ACTION   => 'access',
         WORKFLOW => $wf,
         FILTER   => 0,
     });
@@ -115,6 +119,153 @@ sub list_workflow_titles {
     }    
     return $result;
 }
+
+sub __authorize_workflow {
+        
+    my $self     = shift;
+    my $arg_ref  = shift;
+    
+    my $config = CTX('config');
+    
+    # Action = create or access
+    # Type = Name of the workflow
+    # workflow = workflow instance (access)
+    # Filter = 0/1 weather to apply filter
+    
+    my $action   = $arg_ref->{ACTION};
+    ##! 16: 'action: ' . $action
+    
+    my $filter   = $arg_ref->{ACTION};
+    ##! 16: 'filter: ' . $filter
+       
+    my $realm    = CTX('session')->get_pki_realm();
+    ##! 16: 'realm: ' . $realm
+    
+    my $role     = CTX('session')->get_role();    
+    $role = 'Anonymous' unless($role);       
+    ##! 16: 'role: ' . $role
+    
+    my $user     = CTX('session')->get_user();
+    ##! 16: 'user: ' . $user
+
+    
+    if ($action eq 'create') {
+        my $type = $arg_ref->{TYPE};
+       
+        my %allowed_workflows = map { $_ => 1 } ($config->get_list("auth.wfacl.$role.create")); 
+        
+        if (! exists $allowed_workflows{$type} ) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED',
+                params  => {
+                    'REALM'   => $realm,
+                    'ROLE'    => $role,
+                    'WF_TYPE' => $type,
+                },
+            );
+        }
+        return 1;
+    } 
+    elsif ($action eq 'access') {
+        my $workflow = $arg_ref->{WORKFLOW};
+        my $filter   = $arg_ref->{FILTER};
+        my $type     = $workflow->type();
+        
+        my $allowed_creator_re = $config->get("auth.wfacl.$role.access.$type.creator"); 
+        
+        if (! defined $allowed_creator_re) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_NO_ACCESS_TO_TYPE',
+                params  => {
+                    'REALM'   => $realm,
+                    'ROLE'    => $role,
+                    'WF_TYPE' => $type,
+                },
+            );
+        }
+        
+        if ($allowed_creator_re eq 'self') {
+            # this is a meta name, replace by current user name
+            $allowed_creator_re = $user;
+        }
+        if ($allowed_creator_re) {
+            ##! 16: 'allowed_creator_re: ' . $allowed_creator_re
+            # check it against the workflow creator
+            my $wf_creator = $workflow->context()->param('creator');
+            ##! 16: 'wf_creator: ' . $wf_creator
+            if ($wf_creator !~ qr/$allowed_creator_re/ &&
+                $wf_creator ne $allowed_creator_re) {
+                ##! 16: 'workflow creator does not match allowed creator'
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE',
+                );
+            }
+        }
+        
+         
+        my $context_filter = $config->get_hash("auth.wfacl.$role.access.$type.context");                
+        if ($filter &&  $context_filter) {
+            # context filtering is defined for this type, so
+            # iterate over the context parameters and check them against
+            # the show/hide configuration values
+            my $show = $context_filter->{show};
+            if (! defined $show) {
+                $show = ''; # paranoid default: do not show anything
+            }
+            ##! 16: 'show: ' . $show
+            
+            my $hide = $context_filter->{hide};
+            if (! defined $hide) {
+                $hide = ''; # liberal default: do not hide anything
+            }
+            my %original_params = %{ $workflow->context()->param() };
+            # clear workflow context so that we can add the ones
+            # that the user is allowed to see to it again ...
+            $workflow->context()->clear_params();
+
+            ##! 64: 'original_params before filtering: ' . Dumper \%original_params
+            foreach my $key (keys %original_params) {
+                ##! 64: 'key: ' . $key
+                my $add = 1;
+                if ($show) {
+                    ##! 16: 'show present, checking against it'
+                    if ($key !~ qr/$show/) {
+                        ##! 16: 'key ' . $key . ' did not match ' . $show
+                        $add = 0;
+                    }
+                }
+                if ($hide) {
+                    ##! 16: 'hide present, checking against it'
+                    if ($key =~ qr/$hide/) {
+                        ##! 16: 'key ' . $key . ' matches ' . $hide
+                        $add = 0;
+                    }
+                }
+                if ($add) {
+                    ##! 16: 'adding key: ' . $key
+                    $workflow->context()->param(
+                        $key => $original_params{$key},
+                    );
+                }
+            }
+            ##! 64: 'workflow_context after filtering: ' . Dumper $workflow->context->param()
+        }
+        return 1;
+    }
+    else {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION',
+            params  => {
+                'ACTION' => $action,
+            },
+        );
+    }
+    # this code should be unreachable. In case it is not, throw an exception
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_INTERNAL_ERROR',
+    );
+}
+
 
 1;
 __END__

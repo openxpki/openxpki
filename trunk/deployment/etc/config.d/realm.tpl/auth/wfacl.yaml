@@ -1,0 +1,141 @@
+Anonymous:
+    create:
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
+
+    access:            
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST:
+            creator: self
+        
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST:
+            creator: self
+        
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST:
+            creator: self                
+
+
+System:
+    create:
+    - I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
+    - I18N_OPENXPKI_WF_TYPE_TESTING
+
+    access:        
+        I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE:
+            creator: .*
+        
+        I18N_OPENXPKI_WF_TYPE_TESTING:
+            creator: .*
+            context:
+                show: .*
+        
+        
+User:
+    create:
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE
+
+    access:            
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST:
+            creator: self
+            context:
+                show: .*
+                hide: approvals
+        
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST:
+            creator: self
+        
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST:
+            creator: self
+            context:
+                show: .*
+                hide: approvals
+         
+        I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE:
+            creator: self
+            context:
+                show: .*
+                hide: encrypted_.*       
+
+
+RA Operator:
+    create:
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
+    - I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE
+    - I18N_OPENXPKI_WF_TYPE_TESTING
+
+    access:
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING:
+            creator: .*
+            context:
+                show: .*
+            
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST:
+            creator: .*
+        
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST:
+            creator: .*
+        
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST:
+            creator: .*
+            context:
+                show: .*
+                # this is a policy decision, you may want to show the
+                # reg officers who else has approved - or not, so as 
+                # to not impair his or her judgement
+                hide: approvals
+        
+        I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE:
+            creator: .*
+        
+        I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE:
+            creator: .*
+            context:
+                show: .*
+                hide: encrypted_.*
+        
+        I18N_OPENXPKI_WF_TYPE_TESTING:
+            creator: .*
+            context:
+                show: .*
+        
+CA Operator:
+    create:
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
+    - I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE
+    - I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_TESTING
+
+    access:
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING:
+            creator: .*
+            
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST:
+            creator: .*
+        
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST:
+            creator: .*
+        
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST:
+            creator: .*
+        
+        I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE:
+            creator: .*
+        
+        I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE:
+            creator: .*
+        
+        I18N_OPENXPKI_WF_TYPE_TESTING:
+            creator: .*
+        
+

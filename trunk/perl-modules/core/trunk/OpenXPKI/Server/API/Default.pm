@@ -730,8 +730,9 @@ sub get_pki_realm_index {
     );    
 }
 
-sub get_roles {
-    return [ CTX('acl')->get_roles() ];
+sub get_roles {    
+    #FIXME-ACL - should go with the new acl system
+    return CTX('config')->get_keys('auth.roles');
 }
 
 sub get_available_cert_roles {
@@ -741,11 +742,15 @@ sub get_available_cert_roles {
     my %available_roles = ();
 
     ##! 1: 'start'
-
-    my $config = CTX('config');    
-    my @profiles = $config->get_keys('profile');
-    ##! 16: 'Profiles ' .join " ", @profiles 
+    my $config = CTX('config');
+    my @profiles; 
+    if ($arg_ref->{PROFILES}) {
+        @profiles = @{$arg_ref->{PROFILES}};
+    } else {
+        @profiles = $config->get_keys('profile');    
+    }
     
+    ##! 16: 'Profiles ' .join " ", @profiles     
     foreach my $profile (@profiles) {
         my @roles = $config->get_list("profile.$profile.role");
         ##! 16: 'Roles ' .join " ", @roles
@@ -792,7 +797,7 @@ sub get_cert_subject_profiles {
     return \%styles;
 }
 
-
+# FIXME - needs migration
 sub get_export_destinations
 {
     ##! 1: "finished"
@@ -834,8 +839,9 @@ sub get_export_destinations
     return \%result;
 }
 
+# FIXME - needs migration
 sub get_servers {
-    return CTX('acl')->get_servers();
+    return {};
 }
 
 sub convert_csr {
@@ -963,7 +969,6 @@ Returns the configured subject styles for the specified profile.
 Parameters:
 
   PROFILE     name of the profile to query
-  CONFIG_ID   configuration ID
   PKCS10      certificate request to parse (optional)
 
 Returns a hash ref with the following structure:
@@ -980,7 +985,12 @@ corresponding I18N tag.
 
 =head2 get_available_cert_roles
 
-Scan through all profiles and find all roles inside them. 
+Parameters:
+
+  PROFILES  arrayref of profiles to query
+
+Scan through profiles and find all roles inside them.
+If PROFILES is given, scan only through those profiles. 
 Return the role names as arrarref. 
 
 =head2 get_cert_profiles

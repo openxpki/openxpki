@@ -103,15 +103,18 @@ function ToggleAll() {
 
 <%init>
 use OpenXPKI::Serialization::Simple;
-use Data::Dumper;
 
 my $ser = OpenXPKI::Serialization::Simple->new();
-my $search_context = [
+
+
+my $search_context;
+if ($creator ne '%') {
+    $search_context = [
     {
         KEY   => 'creator',
         VALUE => $creator,
-    }
-];
+    }];
+}
 my @results;
 
 my $nr_msg = $context->{client}->send_receive_command_msg(
@@ -122,6 +125,10 @@ my $nr_msg = $context->{client}->send_receive_command_msg(
                      'STATE'   => [ 'PENDING', 'APPROVAL' ],
               },
 );
+
+
+use Data::Dumper;
+
 my $count = $nr_msg->{PARAMS};
 
 my $pageInfo;
@@ -139,6 +146,7 @@ if (defined $pageInfo) {
     $optional_params{LIMIT} = $limit;
     $optional_params{START} = $pageInfo->first - 1;
 }
+
 
 my $msg = $context->{client}->send_receive_command_msg(
               "search_workflow_instances",

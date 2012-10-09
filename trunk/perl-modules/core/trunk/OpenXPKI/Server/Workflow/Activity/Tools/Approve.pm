@@ -38,6 +38,7 @@ sub execute
        CONTEXT:
         foreach my $key (sort keys %{ $context->param() }) {
             next CONTEXT if ($key =~ m{ \A _ }xms);
+            next CONTEXT if ($key =~ m{ \A wf_ }xms);
             $current_context->{$key} = $context->param($key);
         }
         ##! 16: 'current_context: ' . Dumper $current_context;

@@ -17,12 +17,12 @@ sub validate {
        $errors  = [] if (not defined $errors);
     my $old_errors = scalar @{$errors};
 
+    return 1;
     return if (not defined $role);
 
-    ## get all available roles
-    my $realm = CTX('session')->get_pki_realm();
-    my @roles = CTX('acl')->get_roles();
-
+    ## get available roles    
+    my @roles = CTX('api')->get_available_cert_roles();
+    
     ## the specified role must be in the ACL specification
     if (not grep /^$role$/, @roles)
     {

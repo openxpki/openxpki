@@ -248,13 +248,11 @@ sub __handle_CONTINUE_SESSION {
 	}
     }
     if (defined $session) {
-        eval {
-            my $s = CTX('session');
-        };
-        if ($EVAL_ERROR) {
-            # session is not yet defined, set it
-            OpenXPKI::Server::Context::setcontext({'session' => $session});
-        }
+        
+        # There might be an exisiting session if the child did some work before
+        # we therefore use force to overwrite exisiting entries        
+        OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
+            
         # do not use __change_state here, as we want to have access
         # to the old session in __handle_SESSION_ID_ACCEPTED
         $state_of{$ident} = 'SESSION_ID_SENT_FROM_CONTINUE';
@@ -317,6 +315,8 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
 
     if ($state_of{$ident} eq 'SESSION_ID_SENT_FROM_CONTINUE') {
         ##! 4: 'existing session detected'
+        my $session = CTX('session');
+        ##! 8: 'Session ' . Dumper $session   
         $self->__change_state({
             STATE => CTX('session')->get_state(),
         });
@@ -570,10 +570,11 @@ sub __handle_COMMAND : PRIVATE {
     if (exists $data->{PARAMS}->{COMMAND}) {
         ##! 16: "executing access control before doing anything else"
         eval {
-            CTX('acl')->authorize ({
-                    ACTIVITY      => "Service::".$data->{PARAMS}->{COMMAND},
-                    AFFECTED_ROLE => "",
-            });
+            # FIXME - ACL
+            #CTX('acl')->authorize ({
+            #        ACTIVITY      => "Service::".$data->{PARAMS}->{COMMAND},
+            #        AFFECTED_ROLE => "",
+            #});
         };
         if ($EVAL_ERROR) {
             ##! 1: "Permission denied for Service::".$data->{PARAMS}->{COMMAND}."."

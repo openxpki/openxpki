@@ -27,6 +27,7 @@
                 push @search_context, {
                     KEY   => $context_key->[$i],
                     VALUE => $context_value->[$i],
+                    OPERATOR => 'LIKE'
                 };
             }
         }

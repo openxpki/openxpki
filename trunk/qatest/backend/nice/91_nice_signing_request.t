@@ -44,7 +44,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 11 );
+$test->plan( tests => 13 );
 
 $test->connect_ok(
     user => $cfg{user}{name},
@@ -100,10 +100,12 @@ $test->execute_ok( 'generate_key', {
 	_key_type => "RSA",
     _key_gen_params => $param_serializer->serialize( { KEY_LENGTH => 2048, ENC_ALG => "aes128" } ),
     _password => "m4#bDf7m3abd" } ) or die "Error - keygen failed: $@";
- 	
+ 	 	
 
 $test->state_is('PENDING');
 
+# ACL Test - should not be allowed to user 
+$test->execute_nok( 'I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE', {  cert_role => $cfg{csr}{role}}, 'Disallow change role' );
 
 $test->disconnect();
  
@@ -113,6 +115,7 @@ $test->connect_ok(
     password => $cfg{operator}{role},
 ) or die "Error - connect failed: $@";
 
+$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE', {  cert_role => $cfg{csr}{role}} );
 
 $test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_APPROVE_CSR' );
 

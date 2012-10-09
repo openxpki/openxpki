@@ -1,0 +1,4 @@
+Known Issues
+
+API->search_workflow_instances has problems with new SQL Syntax. 
+The "like" fix now colides with wildcard searches.
