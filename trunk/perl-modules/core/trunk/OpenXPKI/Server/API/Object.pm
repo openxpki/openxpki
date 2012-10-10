@@ -752,6 +752,7 @@ sub get_data_pool_entry {
 			    GROUP_ID  => $encryption_key,
 			},
 			);
+		    CTX('dbi_backend')->commit();
 		};
 		
  	    } else {
@@ -1013,6 +1014,7 @@ sub modify_data_pool_entry {
 	DATA  => \%values,
 	WHERE => \%condition,
 	);
+    CTX('dbi_backend')->commit();
 
     return 1;
 }
@@ -1060,6 +1062,7 @@ sub __set_data_pool_entry : PRIVATE {
 		    %key,
 		},
 		);
+	    CTX('dbi_backend')->commit();
 	};
 	return 1;
     }
@@ -1225,6 +1228,7 @@ sub __set_data_pool_entry : PRIVATE {
                 WHERE => \%key,
                 );
         if ($rows_updated) {
+	    CTX('dbi_backend')->commit();
             return 1;
         }
 	# no rows updated, so no data existed before, continue with insert
@@ -1238,6 +1242,7 @@ sub __set_data_pool_entry : PRIVATE {
 		%values,
 	    },
 	    );
+	CTX('dbi_backend')->commit();
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
 	if ($exc->message()
@@ -1276,6 +1281,7 @@ sub __cleanup_data_pool : PRIVATE {
 	DATA => {
 	    NOTAFTER => [ '<', time ],
 	});
+    CTX('dbi_backend')->commit();
     return 1;
 }
 
@@ -1419,6 +1425,7 @@ sub __get_current_datapool_encryption_key : PRIVATE {
 			GROUP_ID  => $associated_vault_key_id,
 		    },
 		    );
+		CTX('dbi_backend')->commit();
 	    };
 
 	}
