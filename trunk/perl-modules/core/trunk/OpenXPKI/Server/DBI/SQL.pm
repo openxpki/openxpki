@@ -1176,6 +1176,14 @@ sub select
         }
         push @result, [ @tab ];
     }
+    if (defined $sth->err) {
+	OpenXPKI::Exception->throw(
+				   message => 'I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_FETCHROW_RETURNED_ERROR',
+				   params  => {
+				       ERROR => $sth->errstr,
+				   },
+				   );
+    }
     $self->{DBH}->finish_sth();
 
     ##! 1: "return ".scalar (@result)." results"
