@@ -40,15 +40,17 @@ sub new
         # serialized XML::Simple objects were passed, create a
         # cache object for each of them. They are identified by their
         # SHA1 hash.
+	my @available_config_ids;
         foreach my $serialization (@{ $keys->{SERIALIZED_CACHES} }) {
             ##! 64: 'serialization: ' . $serialization
             my $config_id = sha1_base64($serialization);
+	    push @available_config_ids, $config_id;
             ##! 16: 'config id: ' . $config_id
             $self->{CACHE}->{$config_id} = OpenXPKI::XML::Cache->new(
                 SERIALIZED_CACHE => $serialization,
             );
         }
-        if (! exists $keys->{DEFAULT}) {
+	if (! exists $keys->{DEFAULT}) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_XML_CONFIG_NEW_SERIALIZED_CACHES_BUT_NO_DEFAULT_PASSED',
             );
@@ -58,7 +60,11 @@ sub new
         $self->{CURRENT_CONFIG_ID} = $keys->{DEFAULT};
         if (! defined $self->{CACHE}->{default}) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_XML_CONFIG_NEW_INCORRECT_DEFAULT_CACHE',
+	        message => 'I18N_OPENXPKI_XML_CONFIG_NEW_INCORRECT_DEFAULT_CACHE',
+		params  => {
+		    'AVAILABLE_CONFIG_IDS' => join(', ', @available_config_ids),
+		    'DEFAULT_CONFIG_ID' => $keys->{DEFAULT},
+		}
             );
         }
     }
