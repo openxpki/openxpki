@@ -76,10 +76,16 @@ before '_route_call' => sub {
         ##! 16: "_route_call: set config version to " . $cfg_ver
         $cfg_ver = $self->_head_version() unless($cfg_ver);         
         $self->_config()->{''}->version( $cfg_ver );
-            
-        my $pki_realm = $session->get_pki_realm();            
-        ##! 16: "_route_call: realm value, set prefix to " . $pki_realm        
-        $self->_config()->{''}->PREFIX( "realm.$pki_realm" );
+                        
+        # We also allow direct access to the realm tree 
+        if (substr ($location, 0, 6) eq 'realm.' ) {
+            ##! 16: "_route_call: direct realm access " 
+            $self->_config()->{''}->PREFIX( "" );
+        } else {
+            my $pki_realm = $session->get_pki_realm();            
+            ##! 16: "_route_call: realm value, set prefix to " . $pki_realm        
+            $self->_config()->{''}->PREFIX( "realm.$pki_realm" );            
+        }
     }    
 };
 
