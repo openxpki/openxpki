@@ -594,6 +594,7 @@ sub __add_token
     # FIXME - Need to put this somewhere for general use
     my $config_name = $name;    
     do {
+        ##! 32: 'Testing config crypto.token.' . $config_name
         $backend_class = $config->get("crypto.token.$config_name.backend");                                
         $config_name = $config->get("crypto.token.$config_name.inherit");
     } while ( defined $config_name && not $backend_class);

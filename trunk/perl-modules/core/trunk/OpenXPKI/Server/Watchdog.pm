@@ -238,13 +238,13 @@ sub run {
 
     
 sub reload {
+        
+    ##! 1: 'reloading'      
     my $self = shift;
-    # reload is called if the config changes
-    # FIXME-MIG - I guess this relods the parent but not the forked child...check that!
     
     return if ($self->disabled());
-    
-     
+           
+    ##! 4: 'run update head'
     CTX('config')->update_head();    
 }
   
@@ -255,12 +255,7 @@ sub terminate {
     #terminate childs:
     my $children = $self->children();
     kill 'TERM', @$children;
-    
-    # Unset my ref so I hopefully get killed by the garbage collection    
-    OpenXPKI::Server::Context::setcontext({        
-        watchdog => undef
-    });
-    
+        
     return 1;    
 }
 

@@ -46,7 +46,7 @@ sub BUILD {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER",
 		params => {
-		    ERROR => $error,
+		    ERROR => $error,		    
 		});
 	},
     );

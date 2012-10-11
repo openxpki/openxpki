@@ -5,6 +5,13 @@
 ##   for the OpenXPKI project
 ## (C) Copyright 2007 by The OpenXPKI Project
 
+## BIG FAT WARNING: This class works using so called compile time filters
+# The decission weather to apply debugging to a class or not is made based
+# on the %FILTER hash at the time the module is included for the first time
+# In turn, if you load a module before you set up the %FILTER hash, the 
+# module will not be decorated with debug output!
+# The fastest way to ruin the story is "use" in the head of your start scripts. 
+
 use strict;
 use warnings;
 
@@ -13,6 +20,7 @@ package OpenXPKI::Debug;
 use POSIX;
 use English;
 use Filter::Util::Call;
+use Data::Dumper;
 
 our %LEVEL;
 our $USE_COLOR = 0;
@@ -27,10 +35,11 @@ sub import
         # import function (which is the normal use anyways)
         $module = (caller(0))[0];
     }
-#     foreach my $key (keys %LEVEL)
-#     {
-#         print STDERR "Debugging module(s) '$key' with level $LEVEL{$key}.\n";
-#     }
+    
+     #foreach my $key (keys %LEVEL)
+     #{
+     #   print STDERR "Debugging module(s) '$key' with level $LEVEL{$key}.\n";
+     #}
 
     ## import only be called to specify the different levels
     return if (not defined $module);
@@ -39,17 +48,19 @@ sub import
         use Term::ANSIColor;
     }
     ## only for debugging of this module
-    ## print STDERR "OpenXPKI::Debug: Checking module $module ...\n";
+    print STDERR "OpenXPKI::Debug: Checking module $module ...\n";
+    #print STDERR Dumper %LEVEL;
 
     ## perhaps a regex was used in the LEVEL spec
     if (not exists $LEVEL{$module})
     {
         foreach my $regex (keys %LEVEL)
         {
-	    if ($module =~ /^$regex$/) {
-		print STDERR "Debugging module(s) '$module' with level $LEVEL{$regex}.\n";
-		$LEVEL{$module} = $LEVEL{$regex};
-	    }
+            #print STDERR "Regex $regex ~ $module\n";
+	       if ($module =~ /^$regex$/) {
+		      print STDERR "Debugging module(s) '$module' with level $LEVEL{$regex}.\n";
+		      $LEVEL{$module} = $LEVEL{$regex};
+	       }
         }
     }
 

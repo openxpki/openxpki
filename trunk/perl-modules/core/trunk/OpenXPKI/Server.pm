@@ -368,7 +368,11 @@ sub sig_hup {
         FACILITY => "system",
     );
     
-    CTX('config')->update_head();  
+    ##! 8: 'forward head'
+    CTX('config')->update_head();
+
+    ##! 8: 'watchdog'
+    ##! 16: 'watchdog pids ' . Dumper CTX('watchdog')->children();
     CTX('watchdog')->reload();
     
 }

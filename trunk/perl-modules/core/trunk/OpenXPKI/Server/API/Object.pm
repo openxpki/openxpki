@@ -1,4 +1,4 @@
-## OpenXPKI::Server::API::Object.pm 
+## OpenXPKI::Server::API::Object.pm
 ##
 ## Written 2005 by Michael Bell and Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
