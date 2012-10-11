@@ -129,10 +129,10 @@ sub get_token_alias_by_group {
         );        
     }
 
-    ##! 16: "Find token for group $group in realm $pki_realm"
- 
     my $pki_realm = CTX('session')->get_pki_realm();
 
+    ##! 16: "Find token for group $group in realm $pki_realm"
+ 
     my %validity;             
     foreach my $key (qw(notbefore notafter) ) {
         if ($keys->{VALIDITY}->{NOTBEFORE}) {
@@ -239,13 +239,14 @@ sub get_certificate_for_alias {
  
 }
 
-=head2 list_active_aliases( { GROUP, VALIDITY } )
+=head2 list_active_aliases( { GROUP, VALIDITY, REALM } )
 
 Get an arrayref with all tokens from the given group, which are/were valid within 
 the validity period given by the VALIDITY parameter.
 Each entry of the list is a hashref holding the full alias name and the 
 certificate identifier. The list is sorted by notbefore date, starting with 
 the newest date. See get_token_alias_by_group how validity works.
+REALM is optional and defaults to the session's realm.
   
 =cut
 
@@ -263,8 +264,9 @@ sub list_active_aliases {
         );        
     }
     
-    my $pki_realm = CTX('session')->get_pki_realm();
-
+    my $pki_realm = $keys->{REALM};
+    $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
+    
     my %validity;             
     foreach my $key (qw(notbefore notafter) ) {
         if ($keys->{VALIDITY}->{NOTBEFORE}) {

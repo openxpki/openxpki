@@ -167,6 +167,11 @@ sub get_workflow_ids_for_cert {
     return $workflow_ids;
 }
 
+sub get_head_version_id {
+    my $self = shift;
+    return CTX('config')->get_head_version();
+}
+
 sub get_current_config_id {
     my $self = shift;
     OpenXPKI::Exception->throw(

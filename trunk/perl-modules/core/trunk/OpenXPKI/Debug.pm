@@ -69,6 +69,7 @@ sub import
     return if (not exists $LEVEL{$module} or
                $LEVEL{$module} < 1);
 
+    #print STDERR "Add Debug in $module\n";
     ## activate debugging for this module
     $self = bless {MODULE => $module}, $self;
     filter_add($self) ;

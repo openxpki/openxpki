@@ -184,6 +184,11 @@ sub BUILD {
                     type  => HASHREF,                    
                     optional => 1,
                 },
+                'REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
             },
         }, 
         'get_certificate_for_alias' => {
@@ -218,6 +223,10 @@ sub BUILD {
             },
             memoize => 1,
         },
+        'get_head_version_id'  => {
+            class  => 'Default',
+            params => { },
+        }, 
         'get_pki_realm' => {
             class  => 'Default',
             params => { },
@@ -644,6 +653,11 @@ sub BUILD {
                     regex => $re_all,
                 },
                 'FORCE' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                    optional => 1,
+                },
+                'COMMIT' => {
                     type  => SCALAR,
                     regex => $re_integer_string,
                     optional => 1,

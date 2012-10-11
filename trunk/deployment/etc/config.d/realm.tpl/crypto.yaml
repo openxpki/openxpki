@@ -40,6 +40,10 @@ token:
     key: /etc/openxpki/token/ncipher-fake-tree/
     engine: nCipher # Use Engine for main key
     
+  server-vault-1:
+    inherit: default
+    key: /etc/openxpki/instances/trustcenter1/ca/testdummyca1/vault.pem
+        
   server-crl-signer:
     inherit: default
      

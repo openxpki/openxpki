@@ -45,6 +45,11 @@ sub new {
     
     foreach my $trust_realm (@trusted_realms) {
         ## FIXME-MIG - find all ca certs in that realm and add them        
+        # Look up the group name used for the ca certificates in the given realm
+        my $ca_group_name = CTX('config')->get("realm.$trust_realm.type.certsign");      
+        if (!$ca_group_name) { next; }    
+        my $ca_certs = CTX('api')->list_active_aliases({ GROUP => $ca_group_name, REALM => $trust_realm });        
+        push @trust_anchors, map { $_->{IDENTIFIER} } $ca_certs;
     }
     
     if (! scalar @trust_anchors ) {
