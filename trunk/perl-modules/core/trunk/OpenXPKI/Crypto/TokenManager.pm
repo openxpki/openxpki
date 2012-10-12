@@ -416,6 +416,7 @@ sub clear_secret_group
                 DATA  => {
                     PKI_REALM => $realm,
                     GROUP_ID  => $group});
+	    CTX('dbi_backend')->commit();
         }
     }
     delete $self->{SECRET}->{$realm}->{$group};
