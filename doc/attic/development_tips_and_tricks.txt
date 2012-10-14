@@ -1,0 +1,393 @@
+2011-01-13 17:30:23 Scotty (Talk | contribs | block)
+2009-12-17 13:07:45 Scotty (Talk | contribs | block) (New page with a tip)
+
+=Ad Hoc Tips and Tricks=
+
+Stuff mentioned here should be considered ''work in progress'' at the moment.
+
+This page is a staging area for tips and tricks that are jotted down while tackling other development tasks. As a block here matures, it should be merged into the main documentation tree. 
+
+==Installation==
+
+The Debian packages and the Live CD are currently being worked-over and updated for Debian Squeeze.
+
+* [[Best_Practices/Operating_systems/Debian/Debian_Package_Installation|Installation on Debian using Packages]]
+* [[Live_CD|Live CD]]
+
+==Configuration==
+
+The following components, while not integral parts of OpenXPKI, may be used in various workflows. To assist in setting up test and reference installations, their installation on a system using the Debian packages is documented here.
+
+* [[LDAP_Integration|LDAP Integration]]
+* [[RT_Integration|RT Integration]]
+
+==Workflows==
+
+===Passing Parameters to a Workflow===
+
+When writing a new workflow, the custom fields (i.e. user-defined) of a workflow are not defined in the <nowiki><workflow></nowiki> entity. Instead, they are defined as fields in the <nowiki><action></nowiki> entities. To pass values to custom fields when creating a workflow, your initial state should contain an action for initializing:
+<pre>
+...
+<state name="INITIAL">
+  <description>Initial State of My Workflow</description>
+  <action name="initialize" resulting_state="INITIALIZED"/>
+<state>
+...
+<action name="initialize"
+  class="OpenXPKI::Server::Workflow::Activity::MyWorkflow::Initialize">
+  <description>Initialize MyWorkflow</description>
+  <field name="myfield"
+    label="My Field"
+    description="This is just an example field"
+    is_required="yes"/>
+</action>
+...
+</pre>
+
+The class definition is located in OpenXPKI/Server/Workflow/Activity/MyWorkflow/Initialize.pm and looks something like this:
+
+<pre>
+package OpenXPKI::Server::Workflow::Activity::MyWorkflow::Initialize;
+use strict;
+use base qw( OpenXPKI::Server::Workflow::Activity );
+
+use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Exception;
+use OpenXPKI::Debug;
+
+# At the moment, this is just a stub
+sub execute {
+    my $self = shift;
+    my $workflow = shift;
+    my $context = $workflow->context();
+    return $self;
+}
+1;
+</pre>
+
+In the HTML::Mason page, the value for the custom field is passed when creating the workflow:
+
+<pre>
+my $wf_type = 'MyWorkflow';
+my $c_msg = $context->{client}->send_receive_command_msg(
+  'create_workflow_instance',
+  {
+    WORKFLOW => $wf_type,
+    PARAMS => { myfield => $myfield },
+  },
+);
+if ($c_msg->{SERVICE_MSG} eq 'ERROR') {
+  $m->comp('/lib/get_deep_error.mhtml', 'msg' => $c_msg);
+  return;
+}
+$workflow = $c_msg->{PARAMS}->{WORKFLOW};
+</pre>
+
+===Creating Reusable Workflow Actions===
+
+When creating new perl classes for workflow actions, it is relatively 
+easy to design them to be easily reused. 
+
+There are two types of properties that may be passed to actions:
+class properties and context properties. 
+
+====Our Example====
+
+To illustrate the concepts here, we will create a perl class that
+is used to access an array stored in the workflow context. While it
+is possible for an action to access such data structures directly,
+having a generic action class allows us to quickly add and remove
+items from the array directly in the workflow logic. 
+
+The full code, including extra logic for debugging and enforcing
+parameters, can be seen in the repository at 
+
+.../OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
+
+This reusable action class will then be used to manage a queue
+in our fictive workflow.
+
+<pre>
+package OpenXPKI::Server::Workflow::Activity::Tools::WFArray;
+use strict;
+use base qw( OpenXPKI::Server::Workflow::Activity );
+use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Exception;
+use OpenXPKI::Serialization::Simple;
+</pre>
+
+====Class Properties====
+
+In the workflow XML definition, class properties are declared in the 
+attributes of the <action> tag. These properties are available to
+the action instance when new() is called. Basically, these values
+are static for all instances of this specific action, defining the general
+path of logic that the class executes for all workflow instances using
+this action. 
+
+In our example, we will implement a minimal subset of array functions
+to provide just a basic support. It will be possible to add and remove 
+an entry (e.g.: pop, unpop, shift, unshift) as well as retrieve a
+specific entry or information without modifying the list (e.g.: value, count).
+
+To implement this, we will need three class properties. The 'array_name'
+will contain the name of the workflow context parameter that contains
+our array. The 'function' is the name of the function to execute (one of 
+pop, unpop, shift, unshift, head and tail). The 'context_key' contains 
+the name of the workflow context parameter that is read from or written
+to when removing, reading or adding elements.
+
+<pre>
+my @PROPS = qw( array_name function context_key index_key ); 
+__PACKAGE__->mk_accessors(@PROPS);
+
+sub new {
+    my ($class, $wf, $params) = @_;
+    my $self = $class->SUPER::new($wf, $params);
+    # set only our extra properties from action class def
+    foreach my $prop (@PROPS) {
+        next if ( defined $self->$prop );
+        $self->$prop( $params->{$prop} );
+    }
+    return $self;
+}
+</pre>
+
+====Context Properties====
+
+In the workflow XML definition, context properties may be declared 
+with <field> tags in the action element. When passed, the value is
+set in the workflow context and becomes available to the entire
+workflow instance. The 'name' attribute of the field specifies the
+name to use for the context parameter. Context properties, in contrast
+to the class properties, allow for processing based on the context
+of the current workflow. These values are usually fetched in the execute subroutine.
+
+To continue our example, we will write the 'execute' subroutine that
+is called by the Workflow engine.  
+We start by deserializing the contents of the array. Then, depending on the
+function name (here, we only list 'push' and 'pop'), we call the corresponding perl code.
+
+Note that regardless of whether we are reading or writing the context parameter, 
+the 'context_key' is used to find the right one.
+
+<pre>
+sub execute
+{
+    my ($self, $wf)       = @_;
+    my $context    = $wf->context();
+    my $needupdate = 0;
+
+    my $array_raw = $context->param( $self->array_name );
+    my @array = ();
+
+    if ( defined $array_raw ) {
+        @array = @{ $ser->deserialize( $array_raw ) };
+    }
+
+    if ( $self->function eq 'push' ) {
+        push @array, $context->param( $self->context_key );
+        $needupdate++;
+    } elsif ( $self->function eq 'pop' ) {
+        $context->param( $self->context_key, pop @array );
+    }
+
+    if ( $needupdate ) {
+        $array_raw = $ser->serialize( \@array );
+        $context->param( $self->array_name, $array_raw );
+    }
+
+    return 1;
+}
+</pre>
+
+====Conclusion====
+
+By taking advantage of the class properties in addition to the context properties, 
+it becomes easy to create Workflow action classes that can be re-used in
+the same or multiple workflows.
+
+===Using Custom Fields in Workflow Actions===
+
+Custom fields are not declared explicitly in the Workflow XML. In the action declarations, the field entities merely define which parameters may or must be passed when calling the action. To create and access custom fields, just access them via the Workflow context. The execute subroutine in Initialize.pm, listed above, can be appended with the following code:
+
+<pre>
+...
+# set the value
+$context->param('myfield2', $value);
+...
+# get the value
+my $fld3 = $context->param('myfield3');
+...
+</pre>
+
+Reading the field can be done by just omitting the $value parameter.
+
+===The 'creator' Workflow Field===
+
+The 'creator' field contains the name of the user that created the workflow. If the user is not authenticated (i.e. is logged in as 'anonymous'), the field is an empty string. This field may be modified using the same method as described above.
+
+===Checking a Field in a Workflow Condition===
+
+When checking the contents or existence of a field in a Workflow Condition, use the class OpenXPKI::Server::Workflow::Condition::WorkflowContext. Here is an example:
+
+<pre>
+  <condition 
+     name="myfield_not_empty" 
+     class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
+    <param name="context_key" value="myfield"/>
+    <param name="condition" value="exists"/>
+  </condition>
+
+  <condition 
+     name="profile_contains_encryption" 
+     class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
+    <param name="context_key" value="cert_profile"/>
+    <param name="condition" value="regex"/>
+    <param name="context_value" value=".*ENCRYPTION.*"/>
+  </condition>
+</pre>
+
+===Creating an RT Ticket===
+
+Basically, the action definitions are made in notifications.xml. ''More details to follow after I cross this bridge in my current project.''
+
+===Evaluating Results of a Workflow Action===
+
+Although there is no possibility in the Workflow XML to specify conditions based on the results of a Workflow Action, if an action fails, the Workflow instance is rolled back to the current state.
+
+==Password Safe==
+
+A Password Safe is a place to store sensitive information that needs to be accessible by a workflow, but not visible in the database or to the user. The value to be stored is encrypted using the HSM or OpenSSL.
+
+===Further Details===
+
+See the workflow modules in OpenXPKI/Server/Workflow/Activity/PasswordSafe/ for more details.
+
+===Creating a Software-Based Password Safe===
+
+To create a software-based Password Safe, the following steps are required:
+
+====Creating the Certificate====
+
+# Login with 'user' role, and go to 'Request->Certificate signing Request'
+# Choose the role "Web Server" and press "Send"
+# Choose "Basic TLS style" and press "Send"
+# Choose "Serverside key generation" and press "Send"
+# Enter the "Hostname" and press "Send"
+# For "Additional information", just press "Send"
+# Choose "RSA" for the key type and press "Send"
+# For the encryption algorithm, any value will suffice, so just press "Send"
+# Remember the password:  	<save yours to a text file> and press "Send"
+# Logout and login again with 'RA Operator' role, the request should show up in "My Tasks"
+# Click on the workflow serial number
+# Click "Approve CSR"
+# Click "Approve CSR without digital signature"
+# Logout and login using the original user id
+# The CSR should show up in your home page, click "download certificate" and then "Download private key (OpenSSL PEM)" at the bottom of the page
+# Copy the key to /etc/openxpki/instances/trustcenter1/ca/passwordsafe1/
+# reencrypt the key with new passphrase that matches the one you set for your CA Cert (for convenience in the test environment)
+   openssl rsa -in key.pem -aes256 -out key.pem
+
+====Assign Alias using openxpkiadm====
+
+To continue, you will need the certificate ID as set in the context details of the issuance workflow. On the workflow for the certificate, click on "Certificate issuance workflow #..." (in the "Related Workflows" section) and then on "Show (technical) workflow details ...".
+<pre>
+openxpkiadm certificate alias \
+  --config /etc/openxpki/instances/trustcenter1/config.xml \
+  --identifier <CERT ID> \
+  --alias passwordsafe1 \
+  --realm I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA
+</pre>
+
+Restart the server
+
+====Add token to XML Configuration====
+
+In config.xml:
+<pre>
+<pki_realm>
+ ...
+    <password_safe id="passwordsafe1">
+      <cert>
+        <alias>passwordsafe1</alias>
+        <realm>I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA</realm>
+      </cert>
+      <token super="common/token_config/token{passwordsafe1}"/>
+    </password_safe>
+ ...
+</pki_realm>
+</pre>
+
+In token.xml:
+
+<pre>
+    <token id="passwordsafe1" super="../token{default}">
+        <!-- Backend class -->
+        <backend>OpenXPKI::Crypto::Backend::OpenSSL</backend>
+
+        <!-- Backend shell command -->
+        <shell>/usr/bin/openssl</shell>
+        <!-- Private key (PEM encoded) -->
+        <key>/etc/openxpki/instances/trustcenter1/ca/passwordsafe1/key.pem</key>
+
+        <!-- CA passphrase -->
+        <secret>default</secret>
+    </token>
+</pre>
+
+==Performance Data==
+
+Note: the code for this section hasn't been checked into SVN yet. I'm just documenting as I code at the moment.
+
+To support benchmarking and give insight on the overall health of an OpenXPKI installation, the server collects performance data that can be graphed with RRD.
+
+The internal data is stored and fetched using the OpenXPKI::Stats instance, which is accessible via the server context CTX('stats').
+
+===Data Parameters===
+
+;activereqs
+:Number of requests currently active.
+;scpersreqs
+:Number of Smartcard Personalization workflow instances started
+;scpersreqsok
+:Number of Smartcard Personalization workflow instances that succeeded
+;scpersreqsnok
+:Number of Smartcard Personalization workflow instances that failed
+
+===Internals===
+
+In OpenXPKI::Server::Init::__do_init_stats(), the parameter names for data collection are defined and initialized at server start. In the beginning of OpenXPKI::Server::Init, 'stats' is added to the @init_tasks list.
+
+In OpenXPKI::Server::process_request(), the 'activereqs' parameter is incremented to indicate a new child process has started. The 'activereqs' is then decremented in OpenXPKI::Server::DESTROY() when the instance is destroyed.
+
+For tracking data parameters in workflows, either use the OpenXPKI::Stats instance from CTX('stats') or create a state that uses OpenXPKI::Server::Workflow::Activity::Tools::Stats, setting the parameter "counter" in the activity definition to the name of the data parameter. In the definition workflow, for example, add the following two state definitions:
+
+  <state name="PRE_FAILURE" autorun="yes">
+    <action name="count_reqnok"
+        resulting_state="FAILURE">
+    </action>
+  </state>
+
+  <state name="PRE_SUCCESS" autorun="yes">
+    <action name="count_reqok"
+        resulting_state="SUCCESS">
+        <condition name="!ACL::fail_workflow"/>
+    </action>
+    <action name="fail_workflow"
+            resulting_state="PRE_FAILURE">
+        <condition name="ACL::fail_workflow"/>
+    </action>
+  </state>
+
+In the activity definitions, it looks like the following:
+
+  <action name="count_reqnok"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::Stats"
+          counter="scpersreqsnok"/>
+
+  <action name="count_reqok"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::Stats"
+          counter="scpersreqsok"/>
+
+

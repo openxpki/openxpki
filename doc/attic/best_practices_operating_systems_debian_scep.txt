@@ -1,0 +1,36 @@
+2010-04-16 11:29:16 Mbartosch (Talk | contribs | block)
+2008-09-04 14:57:51 Jkunkel (Talk | contribs | block)
+
+== Configure SCEP ==
+
+The libopenxpki-client-scep-perl includes
+
+#a configuration '''/etc/openxpki/scep.conf'''
+#a CGI script '''/usr/lib/cgi-bin/openxpki/scep''' 
+#a perl class '''OpenXPKI::Client::SCEP'''
+
+We have to configure /etc/openxpki/scep.conf
+ [global]
+ socket=/var/openxpki/openxpki.socket		# Socket
+ realm=I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA	# PKI Realm
+ iprange=0.0.0.0/0				# allowed IP-Networks
+ profile=I18N_OPENXPKI_PROFILE_TLS_SERVER	# used profile from profile.xml
+ servername=testscepserver1			# SCEP-servername 
+ encryption_algorithm=3DES 			# used algorithmus 3DES/DES 
+
+Create a tls Webserver certificate and download the pkcs#12 file.
+Export the private key and take attention. The PEM pass phrase has to be the same one as the CA key's PEM pass phrase, or you have to switch the secret group in token.xml and add a new secret group in the PKI object.
+ openXpki:/etc/openxpki\# openssl pkcs12  -in scep.p12 -out scep.pem -nocerts
+ Enter Import Password: +++topsecret+++
+ MAC verified OK
+ Enter PEM pass phrase: +++passphrase+++
+ Verifying - Enter PEM pass phrase: +++passphrase+++
+
+Import the private key into OpenXPKI
+ openxpkiadm key import --realm I18N\_OPENXPKI\_DEPLOYMENT\_TEST\_DUMMY\_CA  --id testscepserver1 --purpose SCEP --file scep.pem
+
+Find the identifier of the used certificate
+ openxpkiadm certificate list --all
+Set an alias
+ openxpkiadm certificate  alias --realm I18N\_OPENXPKI\_DEPLOYMENT\_TEST\_DUMMY\_CA --alias testscepserver1 --identifier zx1g4fRLrIYNuoIsuJZwO08qAQY
+

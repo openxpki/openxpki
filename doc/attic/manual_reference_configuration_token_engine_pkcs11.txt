@@ -1,0 +1,38 @@
+2010-03-03 11:18:47 Achim (Talk | contribs | block)
+2010-03-03 11:15:03 Achim (Talk | contribs | block)
+
+== Example for SafeNet ExternalServer ==
+
+SafeNet has two product lines as HSMs: SafeNet Luna SA (former Chrysalis) and SafeNet ExternalServer (former Eracom)
+
+For the SafeNet ExternalServer here's a configuration template for [[Manual/Reference/Configuration/token.xml|token.xml]]:
+
+the following example is untested yet:
+<pre>
+<token id="testdummyca1" super="../token(default)">
+    <backend>OpenXPKI::Crypto::Backend::OpenSSL</backend>
+    <engine>PKCS11</engine>
+    <shell>/usr/bin/openssl</shell>
+    <wrapper></wrapper>
+    <randfile></randfile>
+    <!-- This is the OpenSSL configuration to use the SafeNet API together with OpenSC and the SafeNet PKCS11 library (/opt/PTK)
+         use /usr/lib/ instead of /usr/lib64/ if you use a 32-bit operating system -->
+    <engine_section>
+         pkcs11 = pkcs11_section
+
+         [pkcs11_section]
+         engine_id = pkcs11
+         dynamic_path = /usr/lib64/engines/engine_pkcs11.so
+         MODULE_PATH = /opt/PTK/lib/libcryptoki.so
+         init = 0
+    </engine_section>
+    <!-- Use engine not for RAND (because i didn't have the time to test the OpenXPKI engine against this feature -->
+    <engine_usage>PRIV_KEY_OPS</engine_usage>
+    <key_store>ENGINE</key_store>
+    <!-- Use SafeNet ExternalServer Slot "0" and Token "DemoRoot0" -->
+    <key>slot_0-token_DemoRoot0</key>
+    <!-- You can leave out the PIN here to type it in manually each time from HTML Mason -->
+    <pin>123456</pin>
+</token>
+</pre>
+

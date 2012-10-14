@@ -1,0 +1,119 @@
+2010-02-04 18:55:47 Scotty (Talk | contribs | block)
+2009-10-20 17:13:49 Seus (Talk | contribs | block)
+
+== General steps to request and approve CA ==
+
+at the web interface:
+
+1) raise csr as '''User'''
+
+2) login as '''CA Operator''', check that CA key is logged on, login ca key if not
+
+3) login as '''RA Operator'''  (when you login as '''RA Operator''' you have to see the configured CA)
+
+4) check if you see cert request under "Tasks" or "Approval -> CSRs"
+
+5) approve cert request
+
+6) check "Search" - "List Workflows" and find out if certificate was issued
+
+7) if cert was not issued, have a look at the workflow and click "Workflow History". check the actions done on the workflow and the current status of the workflow
+
+==Smartcard Personalization==
+
+''Note: this text is from a post that Alex made to the mailing list and is based on the first version from 2006.''
+
+This workflow allows you to create certificate requests and
+install the issued certificates pretty easily using Microsoft Internet
+Explorer. Here is a bit on how it works and what configuration you need
+to do to try it out.
+
+===LDAP Access===
+
+In the first step, the LDAP data for the user is retrieved from an
+LDAP directory. The configuration for this takes place at
+workflow_activity_smartcard_personalization.xml. Except for all the
+network configuration, the most interesting configuration part is
+probably hidden in search_key and search_value. search_key is the LDAP
+attribute for which we filter, while search_value is the workflow
+context entry which should match. The most useful is probably setting
+search_key to mail and search_value to creator if you have user accounts
+with e-mail addresses (you can easily use the 'External static' login
+for testing if you don't).
+
+In this activity, you can also select which LDAP attributes you want
+to have (these are saved in the context with a prefix of ldap_) and
+which ones you want to display. For this, ldap_attributes and
+display_mapping are to be set. Display mapping is probably easiest
+understood in an example, so here is my local config for it:
+display_mapping="cn -> I18N_OPENXPKI_HTML_COMMON_NAME, mail ->
+I18N_OPENXPKI_HTML_MAIL, employeeNumber -> I18N_OPENXPKI_HTML_EMPLOYEE_NR".
+These fields are displayed in the user interface for the user to make
+sure he is logged in correctly. The table consists of the I18N-string
+(the right side of each "a -> b" display mapping) and the value of the
+corresponding LDAP entry.
+In this activity, you should also set the client CSP and the client
+bitlength, which are used later in the creation of the certificate
+request.
+
+===Creating Data for Certificates===
+
+The next step is creating the data which is needed for issuing the
+certificates. Note that we do not want to take the data from the user
+generated CSR (except for the key, of course), but take the data from
+the LDAP to fill the certificate.
+This is why you can configure profiles, roles, subject and subject
+alternative names in the create_server_csr activity. Why plural?
+Because we can easily issue more than one certificate in one go. So if
+you want to issue a user and a TLS certificate for example, you can
+put I18N_OPENXPKI_PROFILE_USER,I18N_OPENXPKI_PROFILE_TLS_SERVER in the cert_profiles attribute of the create_server_csr action in workflow_activity_smartcard_personalization.xml. The profiles are defined in profile.xml.
+
+The most interesting part in this step is the cert_subject, which is
+used to set the subject of the certificate. Here, data from the LDAP
+can be used in the following way: say I set cert_subject to
+'cn=%cn%,dc=cynops,dc=de', then the CN part of the certificate is taken
+from the workflow context entry ldap_cn (which corresponds to the
+LDAP attribute). The configuration for the subject alternative names
+works pretty much the same, so you could for example set email=%mail%
+to get a subject alternative name that contains the e-mail address
+from the LDAP server.
+
+So you'll probably need something from the LDAP to make sure that
+the certificates are different from each other. Make sure to
+put those in the REQUIRED_PARAMS part in the workflow_condition.xml
+file, so that the workflow can check whether they are actually
+available on the LDAP server.
+
+Note that these subjects and subject alternative names are the same
+for all issued certificates - if someone needs them to be different,
+I can implement this as well, I just skipped it because we don't need
+it around here.
+
+===Choose Between Automatic Issuance and Manual Approval===
+
+Once all data for the certificates is complied, we have to choose
+whether we want to enable automatic issuance or whether we still
+need approval (this probably depends a lot on how strong your
+authentication for using the interface is). This is (similarly to
+SCEP) an entry in the workflow_condition file setting up
+AlwaysTrue and AlwaysFalse conditions. This gives the added
+flexibility that I can be changed to decide dynamically later on.
+
+If automatic issuance is possible, the CSRs are persisted to the
+database and issuance workflows are forked. Once all of these are
+finished successfully, we end up in the 'INSTALL_CERTIFICATE' state,
+where the user installs them on the smartcard. For each certificate,
+the result of a test (which currently is just the return value of
+the installation code) is sent to the server to be tested. If
+possible, I'd like to improve that to actually test if the certificate
+is usable by signing something or decrypting something later on.
+
+===Conclusion===
+
+If all certificates have been installed successfully, they are
+published in the user's LDAP entry in the userCert attribute, which
+concludes the workflow.
+
+From a user interface point of view, this only requires a few clicks
+(sometimes we even run some code automatically on loading the page).
+

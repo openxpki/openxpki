@@ -1,0 +1,116 @@
+2010-04-22 15:35:08 Mbartosch (Talk | contribs | block) 
+2008-08-13 13:22:43 Alech (Talk | contribs | block)
+
+= OpenXPKI Manual =
+
+== Introduction ==
+
+=== Abstract ===
+
+* [[Manual/Introduction/Abstract|Abstract]]
+** [[Manual/Introduction/Abstract#Key_features|Key features]]
+
+=== Resources ===
+
+* [[Manual/Introduction/Resources|Resources]]
+** [[Manual/Introduction/Resources#Website|Website]]
+** [[Manual/Introduction/Resources#Sourceforge|Sourceforge]]
+** [[Manual/Introduction/Resources#Mailing_lists|Mailing lists]]
+** [[Manual/Introduction/Resources#IRC|IRC]]
+** [[Manual/Introduction/Resources#Consulting_Services_and_Commercial_Support|Consulting Services and Commercial Support]]
+
+=== Overview ===
+
+* [[Manual/Introduction/Overview|Overview]]
+** [[Manual/Introduction/Overview#Server_Architecture|Server Architecture]]
+** [[Manual/Introduction/Overview#OpenXPKI_Clients|OpenXPKI Clients]]
+** [[Manual/Introduction/Overview#PKI_Realms|PKI Realms]]
+** [[Manual/Introduction/Overview#PKI|Public Key Infrastructure (PKI)]]
+
+== Quickstart ==
+
+=== Installation ===
+
+* [[Manual/Quickstart/Installation|Installation]]
+** [[Manual/Quickstart/Installation#Compilation_and_Module_installation|Compilation and Module installation]]
+** [[Manual/Quickstart/Installation#Initial_(pre-deployment)_configuration|Initial (pre-deployment) configuration]]
+** [[Manual/Quickstart/Installation#Deployment|Deployment]]
+** [[Manual/Quickstart/Installation#Setting_up_the_web_interface|Setting up the web interface]]
+** [[Manual/Quickstart/Installation#Setting_up_the_CA_certificate_and_key|Setting up the CA certificate and key]]
+
+=== Configuration ===
+
+* [[Manual/Quickstart/Configuration|Configuration]]
+** [[Manual/Quickstart/Configuration#Meta_configuration|Meta-Configuration]]
+
+=== Administration ===
+
+* [[Manual/Quickstart/Administration|Administration]]
+** [[Manual/Quickstart/Administration#PKI_realm_setup|PKI Realm Setup]]
+** [[Manual/Quickstart/Administration#User_administration|User Administration]]
+
+=== Running OpenXPKI ===
+
+* [[Manual/Quickstart/Running|Running OpenXPKI]]
+** [[Manual/Quickstart/Running#Server_startup|Server startup]]
+** [[Manual/Quickstart/Running#Client_test|Client test]]
+
+== Workflow Engine ==
+
+=== Overview ===
+
+* [[Manual/Workflow_Engine/Overview|Overview]]
+
+=== Shipped workflow implementations ===
+
+* [[Manual/Workflow_Engine/Shipped|Shipped workflow implementations]]
+** [[Manual/Workflow_Engine/Shipped#Certificate_Signing_Request|Certificate Signing Request]]
+** [[Manual/Workflow_Engine/Shipped#Certificate_Issuance|Certificate Issuance]]
+** [[Manual/Workflow_Engine/Shipped#Certificate_Revocation_Request|Certificate Revocation Request]]
+** [[Manual/Workflow_Engine/Shipped#Smartcard_Personalization|Smartcard Personalization]]
+** [[Manual/Workflow_Engine/Shipped#SCEP|Simple Certificate Enrollment Protocol (SCEP)]]
+
+=== Custom workflows ===
+
+* [[Manual/Workflow_Engine/Custom|Custom workflows]]
+** [[Manual/Workflow_Engine/Custom#Definition|Definition (XML configuration)]]
+** [[Manual/Workflow_Engine/Custom#Implementation|Implementation (Perl modules)]]
+
+(see also: [http://www.openxpki.org/docs/custom_workflows.html Steps to create a new custom workflow] on the OpenXPKI web page)
+
+== Reference ==
+
+=== Configuration ===
+
+* [[Manual/Reference/Configuration|Configuration]]
+** [[Manual/Reference/Configuration#Base_configuration|Base configuration]]
+** [[Manual/Reference/Configuration#Database|Database]]
+** [[Manual/Reference/Configuration#Cryptographic_Settings|Cryptographic_Settings]]
+** [[Manual/Reference/Configuration#Workflow_configuration|Workflow configuration]]
+** [[Manual/Reference/Configuration#Access_Control|Access Control]]
+** Commented sample configuration files
+*** [[Manual/Reference/Configuration/config.xml|config.xml]]
+*** [[Manual/Reference/Configuration/token.xml|token.xml]]
+
+=== Administration tools ===
+
+* [[Manual/Reference/Administration_tools|Administration tools]]
+** [[Manual/Reference/Administration_tools#openxpkiadm|openxpkiadm]]
+** [[Manual/Reference/Administration_tools#openxpkictl|openxpkictl]]
+** [[Manual/Reference/Administration_tools#openxpkicmd|openxpkicmd]]
+
+=== Deployment tools ===
+
+* [[Manual/Reference/Deployment_tools|Deployment tools]]
+** [[Manual/Reference/Deployment_tools#openxpki-configure|openxpki-configure]]
+
+=== Troubleshooting ===
+
+* [[Manual/Reference/Troubleshooting|Troubleshooting]]
+** [[Manual/Reference/Troubleshooting#Log_files|Log files]]
+** [[Manual/Reference/Troubleshooting#Debugging|Debugging]]
+
+== Glossary ==
+
+* [[Manual/Glossary|Glossary]]
+

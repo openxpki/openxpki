@@ -1,0 +1,84 @@
+2010-11-15 08:40:24 Mbartosch
+2008-08-26 12:03:28 Jkunkel (Talk | contribs | block)
+
+== List of possible commands to send to the server ==
+
+
+
+'''send_command_msg'''
+
+Send a service command message.  The first argument must be a string identifying the command to send.  The (optional) second argument is a hash reference containing the arguments to be sent along with the command message.
+
+'''send_receive_command_msg'''
+
+Send a service command message, reads the response and returns it.  See send_command_msg.
+
+e.g.
+ $msg = $client->send_receive_command_msg('set_secret_part',
+ {
+ 		'SECRET' => 'default',
+ 		'PART'   => 1,
+ 		'VALUE'  => 1234567890,
+ },
+ );
+
+;List of possible commands
+:clear_secret
+:convert_certificate
+:convert_csr
+:count_my_certificates
+:create_bulk_request_ticket
+:create_workflow_instance
+:execute_workflow_activity
+:get_alg_names
+:get_approval_message
+:get_available_cert_roles
+:get_ca_cert
+:get_ca_certificate
+:get_ca_list
+:get_cert
+:get_cert_identifier
+:get_cert_identifier_by_csr_wf
+:get_cert_profiles
+:get_cert_subject_profiles
+:get_cert_subject_styles
+:get_chain
+:get_config_id
+:get_crl
+:get_csr_info_hash_from_data
+:get_current_config_id
+:get_export_destinations
+:get_number_of_workflow_instances
+:get_param_names
+:get_param_values
+:get_pki_realm
+:get_pki_realm_index
+:get_possible_profiles_for_role
+:get_private_key_for_cert
+:get_random
+:get_role
+:get_roles
+:get_secrets
+:get_servers
+:get_url_for_ticket
+:get_user
+:get_workflow_activities
+:get_workflow_history
+:get_workflow_ids_for_cert
+:get_workflow_info
+:get_workflow_instance_info
+:get_workflow_type_for_id
+:is_secret_complete
+:list_ca_ids
+:list_config_ids
+:list_context_keys
+:list_my_certificates
+:list_workflow_instances
+:list_workflow_titles
+:private_key_exists_for_cert
+:search_cert
+:search_cert_count
+:search_workflow_instances
+:search_workflow_instances_count
+:set_secret_part
+

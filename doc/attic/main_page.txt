@@ -1,0 +1,21 @@
+2011-07-21 15:19:40 Aleibl (Talk | contribs | block)
+2008-08-13 11:24:37 Alech (Talk | contribs | block) 
+
+Welcome to the [http://www.openxpki.org OpenXPKI] wiki. You will find all kinds of documentation on OpenXPKI, the open source trustcenter software here. Please feel free to contribute and edit the wiki pages.
+
+== User documentation ==
+* [[Manual/Index|OpenXPKI Manual]]
+
+== Installation ==
+Before upgrading your OpenXPKI installation please read the [[Development/Release_Notes|Release Notes]].
+
+Please check out our [[Best_Practices|Best Practices page]] which documents actual implementation specific solutions.
+
+== Developer information ==
+Developers should check out the [[Development|OpenXPKI developer section]] which contains organizational and technical information on OpenXPKI.
+
+== New features ==
+There is a [[Development|New features section]] which contains whitepapers and proposals for future development.
+
+__NOTOC__
+

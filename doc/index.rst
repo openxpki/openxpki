@@ -1,22 +1,55 @@
 .. OpenXPKI documentation master file, created by
-   sphinx-quickstart on Tue Sep 18 21:55:37 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+   sphinx-quickstart.
 
-Welcome to OpenXPKI's documentation!
-====================================
+============
+  OpenXPKI
+============
 
-Contents:
+*An open, enterprise-grade PKI/Trustcenter*
+
+Table of Contents:
+------------------
 
 .. toctree::
    :maxdepth: 2
 
+   introduction
+   quickstart
+   architecture/connectors
+   architecture/workflows
+   architecture/datapool
+   architecture/subsystems/scep
+   admin/installation/building
+   admin/installation/packages
+   admin/installation/deployment
+   admin/configuration/concepts
+   admin/configuration/scep
+   admin/configuration/smartcard
+   admin/administration
+   admin/bestpractices
+   admin/operation/maintenance
+   admin/operation/troubleshooting
+   reference/configuration/introduction
+   reference/configuration/server
+   reference/configuration/realm
+   reference/configuration/workflows/certrequest
+   reference/configuration/workflows/certrevocation
+   reference/configuration/workflows/crlissuance
+   reference/configuration/workflows/scep
+   reference/configuration/workflows/smartcard
+   reference/tools/openxpkiadm
+   reference/tools/openxpkictl
+   reference/tools/openxpkicmd
+   reference/interfaces
+   reference/developer/conventions
+   reference/developer/coding
+   reference/developer/api
+   glossary
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 

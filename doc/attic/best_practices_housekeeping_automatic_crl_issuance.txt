@@ -1,0 +1,13 @@
+2010-04-22 16:02:17 Mbartosch (Talk | contribs | block)
+
+== Automate CRL issuance ==
+
+In order to issue and publish a CRL normally a CRL Issuance Workflow must be instantiated. This is normally done by a CA operator via the web frontend, but it can also be automated via the [[Manual/Reference/Administration_tools#openxpkicmd|openxpkicmd]] command
+
+To automate CRL issuance, the system must be set up properly to allow the the system user creation of the CRL issuance workflow. See [[Manual/Reference/Administration_tools#openxpkicmd|openxpkicmd]] for details.
+
+<pre>
+openxpkicmd --socketfile /var/openxpki/openxpki.socket --realm "User CA" I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
+</pre>
+
+

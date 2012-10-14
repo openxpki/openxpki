@@ -1,0 +1,26 @@
+2010-04-14 20:38:10 Mbartosch (Talk | contribs | block)
+2010-04-07 10:03:24 Mbartosch (Talk | contribs | block)
+
+== Development Roadmap ==
+
+=== Tasks for Version 1.0 ===
+* Basic user documentation; minimum requirements:
+** Installation
+** Basic configuration: config.xml, token.xml, profile.xml, auth.xml
+** Setup (openxpkiadm)
+** Operation (openxpkictl)
+** Troubleshooting
+
+* Core
+** Error logging improvements: Add error logging statements to workflow engine and system core. Goal: make it possible for users to determine cause of problems from the log file without having to enable debugging.  (mostly done)
+** OpenSSL 1.0 support
+** Consolidate cryptography abstraction (realign core and workflow with non-western cryptography requirements)
+** Review workflow forking mechanism (address dangling wf instances, ipc issues)
+** Review (broken) core tests
+
+* Interface
+** Review I18N translations
+
+=== Version 1.1 ===
+* New web interface
+

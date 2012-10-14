@@ -1,0 +1,12 @@
+2009-10-19 16:53:57 Seus (Talk | contribs | block)
+
+''(in general)''
+
+as the role '''User''' you may request certificates (either by uploading a CSR or by choosing server side key generation). 
+
+After you have submitted a cert request, log in as '''RA Operator''' as a '''''different (!)''''' user. (Different user because by default it is not allowed to approve one's own cert requests.) The new cert request should appear on the "Home" page of the RA Operator. You can click on the workflow serial to get details about the request, modify anything to your liking. Once you click '''Approve CSR''' your certificate will be issued. 
+
+A precondition for issuance is that you '''activated the CA private key first'''. Depending on your configuation this may mean you need to log in as '''CA Operator''' before you can issue certificates. If you log in as "CA Operator" on the home page you can see all configured CA key "groups" and their status. You can then login (enable) the necessary CA keys so the CA will be able to use the private key.
+
+If your system complains that it has no usable CAs you need to create a CA certificate and configure it in OpenXPKI. (Creation of the CA certificate and the corresponding private key will normally happen outside of OpenXPKI, e. g. manuall via OpenSSL.)
+

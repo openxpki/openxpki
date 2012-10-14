@@ -1,0 +1,44 @@
+2010-04-22 17:04:45 Mbartosch (Talk | contribs | block) 
+2010-04-22 16:16:18 Mbartosch (Talk | contribs | block)
+
+== Cleanup shared memory ==
+
+The current implementation requires IPC Shared Memory for communication between concurrently running OpenXPKI daemons (e. g. during certificate issuance). Sometimes the shared memory does not get cleaned up properly.
+
+The following shell script checks if the maximum threshold of shm segments is exceeded. If this is the case it shuts down the server, cleans all shm segments and starts the server again. Make sure this script is run during quit hours. Possibly add a check if only the main daemon is running (i. e. no logged in user).
+
+Developed and tested on a Linux system. Assumes OpenXPKI runs as user openxpki.
+
+<pre>
+#!/bin/bash
+#
+# clean up left-over shm
+
+SH_LIMIT=100
+
+NR_OF_SEM=`ipcs -s | grep openxpki | wc -l`
+NR_OF_SHM=`ipcs -m | grep openxpki | wc -l`
+
+DO_CLEANUP=0
+if [ $NR_OF_SEM -gt $SH_LIMIT ] ; then
+    logger "detected $NR_OF_SEM semaphores"
+    DO_CLEANUP=1
+fi
+
+if [ $NR_OF_SHM -gt $SH_LIMIT ] ; then
+    logger "detected $NR_OF_SHM shared memory segments"
+    DO_CLEANUP=1
+fi
+
+if [ "$DO_CLEANUP" = "1" ] ; then
+    logger "stopping OpenXPKI"
+    /etc/init.d/openxpki stop >/dev/null 2>&1
+    logger "removing leftover shared memory segments"
+    ipcs -m | grep openxpki | awk '{ print $2 }' | while read m ; do ipcrm -m $m ; done
+    logger "removing leftover semaphores"
+    ipcs -s | grep openxpki | awk '{ print $2 }' | while read m ; do ipcrm -s $m ; done
+    logger "starting OpenXPKI"
+    /etc/init.d/openxpki start >/dev/null 2>&1
+fi
+</pre>
+

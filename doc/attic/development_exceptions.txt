@@ -1,0 +1,49 @@
+2010-11-17 16:13:33 Scotty (Talk | contribs | block) 
+
+= Exception Handling =
+
+'''''Note: This is work-in-progress'''''
+
+== Throwing Exceptions ==
+
+== Catching Exceptions ==
+
+When catching exceptions, the following code can be used as a template:
+
+<pre>
+eval {
+ 
+  # code that may throw exceptions goes here
+
+};
+if ( my $exc = OpenXPKI::Exception->caught() ) {
+
+  # In this block, you can handle specific errors
+
+  if ( $exc->message() eq "I18N_OPENXPKI_ERROR_TO_CATCH" ) {
+
+    # In this block, elegantly handle that specific error
+
+  } else {
+
+    # If the error is something else, re-throw it
+
+    $exc->rethrow();
+
+  } elsif ( $EVAL_ERROR ) {
+
+    # In this block, there was no exception thrown, but the eval failed
+    # anyway, so a new exception should be thrown
+
+    OpenXPKI::Exception->throw(
+      message => 'I18N_OPENXPKI_OTHER_ERROR_IN_EVAL',
+      params => {
+        'ERROR' => $EVAL_ERROR,
+      }
+    );
+  }
+} 
+</pre>
+
+''Note:'' Don't forget to "use English;" to have access to "$EVAL_ERROR".
+

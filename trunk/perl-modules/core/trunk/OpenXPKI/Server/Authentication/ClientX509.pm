@@ -3,6 +3,8 @@
 ## Written in 2007 by Alexander Klink
 ## (C) Copyright 2007 by The OpenXPKI Project
 
+#FIXME-MIG: Need refactoring to resolve role
+
 package OpenXPKI::Server::Authentication::ClientX509;
 
 use strict;

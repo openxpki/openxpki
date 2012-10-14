@@ -1,0 +1,205 @@
+2010-03-01 14:25:17 Scotty (Talk | contribs | block)
+2010-02-25 14:01:38 Scotty (Talk | contribs | block) 
+
+=RT Integration=
+
+Note: this is work in progress. It is planned to integrate these steps in the OpenXPKI debian packages and Live CD. Specifically, the configuration of the attributes (display mapping and required fields) were just hacks to get things running for the tests I needed to run. I'll polish the examples as I continue with testing.
+
+==Installing RT (optional)==
+
+On Debian, install the RT Server and Tools using aptitude:
+
+ aptitude -y install rt3.6-apache2 rt3.6-clients rt3.6-db-mysql request-tracker3.6
+
+Note: details on further installation steps may also be found in /usr/share/doc/request-tracker3.6/NOTES.Debian.gz after the request-tracker3.6 package has been installed.
+
+In /etc/apache2/sites-enabled/, copy the file 000-default to 001-rt and add the following "Include" line just before the last XML line:
+
+ Include /etc/request-tracker3.6/apache2-modperl2.conf
+
+Enable the Rewrite module:
+
+  (cd /etc/apache2/mods-enabled && \
+    ln -s ../mods-available/rewrite.load)
+
+In /etc/apache2/ports.conf, add the following lines:
+
+  NameVirtualHost *:81
+  Listen 81
+
+Lastly, move the openxpki config in apache from /etc/apache2/conf.d to be included in the default file found in /etc/apache2/sites-enabled
+
+Restart the Apache server:
+
+  apache2ctl restart
+
+===Additional Software From CPAN===
+
+The module RT::Client::REST is needed from CPAN. This will be added to the list of prereqs automatically added by the debian packages, but for now, it needs to be installed manually.
+
+http://search.cpan.org/~dmitri/RT-Client-REST-0.37/
+
+===Site Configuration===
+
+The configuration snippets are located in /etc/request-tracker3.6/RT_SiteConfig.d/. (The defaults are sufficient for using with our reference Debian Lenny installation.)
+
+If you add any files to the config directory, run the following:
+
+  update-rt-siteconfig-3.6
+
+===Adding Technical User to RT===
+
+To allow OpenXPKI to create tickets in RT, a technical user must be added. When adding the entry, the following fields are needed:
+
+  user: openxpki
+  password: secret
+  let this user access RT: checked
+  let this user be granted rights: checked
+
+In addition, modify the group rights to the "General" queue to allow tickets to be created. The groups are very flexible in RT and thus can be confusing at times. For test purposes, I suggest just adding the following rights to the "Privileged" group in the queue "General":
+
+* AssignCustomFields
+* CreateTicket
+* ModifyQueueWatchers
+* ModifyTicket
+* SeeQueue
+* ShowOutgoingEmail
+* ShowScrips
+* ShowTemplate
+* ShowTicket
+* Watch
+
+==Integrating RT into OpenXPKI==
+
+In the notification.xml file (when using the debian pacakges, it is located in /etc/openxpki/instances/trustcenter1), add the following block just before the last closing tag </notification_change>:
+
+  <notifier id="rt">
+    <notification_backend type="RT">
+      <url>http://localhost:81/rt/</url>
+      <username>openxpki</username>
+      <password>secret</password>
+      <timeout>20></timeout>
+    </notification_backend>
+    <notifications super="../../notifications{default}"/>
+  </notifier>
+
+For the workflow that I am developing, I need a notification that sends a template to two additional persons involved in a request. In notification.xml, I added the following block inside the <notifications>:
+
+  <notification id="notify_auth_persons">
+    <action type="open">
+      <requestor>[% creator %]</requestor>
+      <queue>General</queue>
+      <subject>Notification of Request for Authorizing Person</subject>
+    </action>
+  </notification>
+
+Also, in config.xml, add the following to the <pki_realm><common> section:
+
+  <notification>
+    <notifier>rt</notifier>
+  </notification>
+
+==Background Information==
+
+''The following is Alex's post to the devel mailing list and will be updated as I work through integration of RT notification into my own workflow.''
+
+Hi,
+
+on Friday, I've successfully did a POC on combining OpenXPKI with
+Request Tracker (RT), a widely used tracking system (see
+http://bestpractical.com/rt/). This would be really useful for people
+who have a lot of certificate requests and lots of E-Mail communication
+related to them.
+Martin and I just had a quick brainstorming session how to abstract this
+kind of thing a "notification" layer. Our idea is the following:
+Within the workflow activities, CTX('api')->notify() is called, for
+example when a CSR is created with CTX('api')->notify('csr_created').
+The server then looks at its config file. In the PKI realm definition,
+it finds zero or more notifiers, for example like this:
+
+ <notification>
+   <notifier>I18N_OPENXPKI_DEPLOYMENT_TEST_NOTIFIER_RT</notifier>
+ </notification>
+
+The notifiers are defined in notification.xml, which might look similar
+to the following:
+
+ <notification_backend type="RT" id="default">
+  <url>...</url>
+  <username>...</username>
+  <password>...</password>
+ </notification_backend>
+  
+ <notification_backend type="email" id="default">
+  <from>...</from>
+  <comment>admin@example.com</comment>
+ </notification_backend>
+  
+ <notifications id="default">
+  <notification id="csr_created">
+    <action type="open" requestor="[% creator %]"/>
+    <action type="comment">
+      <template file="/path/to/filename" lang="de_DE"/> <!-- TT -->
+    </action>
+    <action type="communication">
+        <template file="/path/to/other_file" lang="de_DE"/>
+        <!-- like e-mail: key: value pairs, separated by \n, body starts at \n\n, comments using # -->
+    </action>
+    <action type="set_value" field="workflow_id" value="[% workflow_id %]">
+    <action type="set_value" field="priority" value="9"/>
+  </notification>
+  
+  <notification id="...">
+  </notification>
+  
+  ...
+ </notifications>
+  
+ <notifier id="I18N_OPENXPKI_DEPLOYMENT_TEST_NOTIFIER_RT">
+  <notification_backend type="RT" super="default">
+    <queue>...</queue>
+  </notification_backend>
+  <notifications super="default">
+    <!-- already has some notification from parent has it -->
+    <!-- additional notification -->
+    <notification id="certificate_issued"/>
+        <action type="communication">
+            <template file="/path/to/file" lang="en_EN"/>
+        </action>
+        <action type="close"/>
+    </notification>
+  </notifications>
+ </notifier>
+
+So a notifier both has a notification_backend, which could for example
+be RT, a simple e-mail class, or a driver for a different ticketing
+system. It also has a list of possible notifications with corresponding
+actions. If a notification is requested using CTX('api')->notify(), the
+actions are executed (for example, a new ticket is opened, a comment is
+attached to the ticket, communication is sent out to the user, etc.).
+
+Most of these will use variable data, which can be input into the system
+using Template::Toolkit (with the possibility to use all context
+variables, similar to the code I recently checked in for smartcard
+personalization). Templates may have a header consisting of key/value pairs,
+which can be typical e-mail headers such as To, CC, etc., but may also
+consist of custom fields that are then communicated to the backend
+(RT for example allows for custom fields, which can be used to
+create a link to the CSR, certificate identifier, etc.)
+
+In systems where certain actions do not have a valid meaning (such as
+opening a ticket in an e-mail-only system), they may just have an empty
+implementation.
+
+As usual, XML inheritance is used to inherit from some sane default.
+
+Please let us know what you think about this structure. Is it flexible
+enough for the future? Are we missing something? Any ideas for better
+names?
+
+Regards,
+    Alex
+-- 
+Dipl.-Math. Alexander Klink | IT-Security Engineer
+        ak-ml2006@cynops.de | working @ urn:oid:1.3.6.1.4.1.11417
+

@@ -1,0 +1,186 @@
+2010-04-29 10:56:29 Scotty (Talk | contribs | block) 
+2010-03-31 11:41:27 Scotty (Talk | contribs | block)
+
+{| border="1" cellpadding="20" cellspacing="0"
+|+ align="bottom" style="color:#e76700;" |
+|-
+|'''Important note:''' these guidelines are currently ''being discussed'' and upon consensus, will be established as the criteria for developers contributing to the OpenXPKI project.
+|}
+
+
+=Guiding Statements=
+
+The following statements are the values that shall guide us while establishing the guidelines for the project. They are what we would like OpenXPKI to be and shall effect our decisions when writing and updating this document.
+
+* Trustable
+* Interoperable 
+* Usable
+* Understandable
+* Extendable
+
+=Documentation=
+
+''Discuss in the mailing list, document in the wiki...''
+
+=Coding Style=
+
+''Use Perl Best Practices by Damian Conway as basis. Use perltidy to coerce compliance, where possible.''
+
+==Style Policies==
+
+''List recommended policies here''
+
+==Style Enforcement==
+
+===About PerlTidy===
+
+The perltidy (http://perltidy.sourceforge.net/) script is a filter that, when given an input Perl file, produces output that is consistently formatted using a settings file. It can be used either on the command line or integrated into your favorite editor. To use the policy file for OpenXPKI, create a symbolic link in your home directory that points to the .perltidyrc file in your SVN directory. This configuration file is based on the recommendations made in Perl Best Practices.
+
+In addition, Perl::Critic is used to enforce any remaining policies not covered by perltidy.
+
+''Include setup and usage examples''
+
+=Logging=
+
+OpenXPKI uses Log::Log4perl for logging. The Log4perl configuration file is kept outside of OpenXPKI's own XML configuration.
+
+The messages to be logged are categorized in facilities and priorities. The prudent choice of where and to which facility and priority messages should be logged effects how easy it will be for a programmer, administrator or user to filter the messages and quickly find the pertinent information. 
+
+;Facility
+:auth
+::user authentication and session information
+:audit
+::Certificate Approval
+::CRL Issuance
+:monitor
+::statistics and subsystem status
+:system
+::Daemon initialization
+::API calls
+::core modules
+:workflow
+::state changes
+::actions/activities
+::conditions
+::validations
+::workflow exceptions and errors
+;Priority
+:debug
+::relevant for programmer or for troubleshooting non-trivial configuration errors
+:info
+::relevant for system administrator or auditor
+:warn
+::non-critical problems or issues
+:error
+::conditions that prevent portions of the OpenXPKI server from functioning correctly
+:fatal
+::conditions that prevent the OpenXPKI server as a whole from functioning correctly
+
+==Using Logging==
+
+===Explicit log statements===
+
+A log statement can be explicitly included with the following code fragment:
+
+  CTX('log')->log(
+     MESSAGE  => "Method '$method_name' called via API",
+     PRIORITY => 'info',
+     FACILITY => 'system',
+  );
+
+Facility may also be an arrayref containing multiple facilities. In this case the message is logged to all specified facilities.
+
+It is possible to include the originating function or method name by adding the SUBROUTINE flag:
+
+  CTX('log')->log(
+     MESSAGE  => "Method '$method_name' called via API",
+     PRIORITY => 'info',
+     FACILITY => 'system',
+     SUBROUTINE => 1,
+  );
+
+===Implicit logging via the Exception wrapper===
+
+When throwing an exception it is possible to let the Exception class generate a corresponding log message automatically. This is done by passing an additional "log" argument to the throw() call.
+
+Here's an example of logging an exception in the server core:
+
+<pre>	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_FETCH_WORKFLOW_INCORRECT_WORKFLOW_INSTANCE",
+	    params  => {
+		REQUESTED_ID => $id,
+		RETURNED_ID  => $result->{WORKFLOW_SERIAL},
+	    },
+	    log => {
+		logger => CTX('log'),
+		priority => 'warn',
+		facility => 'system',
+	    },
+	    );
+</pre>
+
+In this case the log message is automatically composed by the OpenPKI::Exception class. In order to use a custom message add a 'message' to the log statement:
+
+<pre>	OpenXPKI::Exception->throw (
+	    message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_FETCH_WORKFLOW_INCORRECT_WORKFLOW_INSTANCE",
+	    params  => {
+		REQUESTED_ID => $id,
+		RETURNED_ID  => $result->{WORKFLOW_SERIAL},
+	    },
+	    log => {
+		logger => CTX('log'),
+                message => 'System botched completely',
+		priority => 'warn',
+		facility => 'system',
+	    },
+	    );
+</pre>
+
+=Debugging=
+
+Developer debugging can be enabled though the OpenXPKI::Debug class. This class implements a source filter that adds log statements to the source code during compile time. If debugging is disabled, the debug statements are considered comments by the Perl interpreter, and hence do not slow down execution.
+
+==Using OpenXPKI debugging==
+
+Include
+
+  use OpenXPKI::Debug;
+
+in the source module.
+
+==Writing debug statements==
+
+A debug statement can be included anywhere in the source code using
+
+  ##! n: EXPRESSION
+
+The integer n denotes the desired debug level, commonly powers of 2 are currently used (1, 2, 4, 8, 16, 32, 64), but generally any integer value is acceptable.
+
+EXPRESSION is any Perl expression. The scalar interpretation of this expression is written to Stdout if the debugging level is met. 
+
+Example:
+
+  ##! 16: 'foobar: ' . Dumper $baz
+
+=Revision Tracking and Release Management=
+
+* Changes that affect configuration and/or database setup must be documented in the [[Development/Release_Notes|Release Notes]]
+* Release planning for major releases is documented in the project [[Development/Roadmap|Roadmap]]
+
+=Cryptography=
+
+==Modularity==
+
+''It is important to support both western and eastern cryptography''
+
+=User Interfaces=
+
+==Daemon Management and Administration==
+
+==Graphical User Interface==
+
+''requirements for browser compatibility?''
+''goal should be a positive user experience''
+
+==CLI / Utilities==
+

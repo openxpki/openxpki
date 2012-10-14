@@ -1,0 +1,85 @@
+2008-09-10 11:41:33 Jkunkel (Talk | contribs | block)
+2008-09-10 10:03:08 Jkunkel (Talk | contribs | block)
+
+The workflow includes following subsections.
+
+* '''get LDAP data''' the server contacts a LDAP repository and fetch defined data
+* '''create CSR''' with this LDAP data and the active session data, the workflow creates a CSR
+* '''wait for CA''' the CA signs the CSR 
+* '''write certificate to install''' the workflow installs the certificate into the HSM
+* '''publish certificate''' the workflow search the creators LDAP account and adds the certificate
+
+
+
+'''workflow_activity_smartcard_personalization.xml'''
+ <action name="get_ldap_data"
+           class="OpenXPKI::Server::Workflow::Activity::SmartCard::GetLDAPData"
+           ldap_server="'''192.168.90.104'''"
+           ldap_port="'''389'''"
+           ldap_userdn="'''cn=openxpki,cn=Users,dc=test-ag,dc=test,dc=de'''" 
+           ldap_pass="'''openxpki'''"
+           ldap_basedn="'''dc=test-ag,dc=test,dc=de'''" 
+           ldap_timelimit="'''10'''"
+           ldap_attributes="'''distinguishedName,cn,telephoneNumber,physicalDelivery,OfficeName,title,mail'''"
+           search_key="'''sAMAccountName'''"
+           search_value_context="'''creator'''"
+           display_mapping="'''distinguishedName -> dn, cn -> I18N_OPENXPKI_HTML_COMMON_NAME, mail -> eMail, OfficeName -> Room number , telephoneNumber -> Phone'''"
+           client_csp="'''eToken Base Cryptographic Provider'''"
+           client_bitlength="'''1024'''">
+ </action>
+We have to configure the LDAP connection settings for fetching data...
+* '''display_mapping''' is to show something colored on the WEB
+* '''client_csp''' is the name of the alternative client CSP. e.g."''eToken Base Cryptographic Provider''" for Aladdin eToken and "''RSA Sign-on Manager CSP''" for RSA token
+*'''client_bitlength''' is the length of the private key to create
+
+
+'''workflow_activity_smartcard_personalization.xml'''
+ <action name="create_server_csr"
+           class="OpenXPKI::Server::Workflow::Activity::SmartCard::CreateServerCSR"
+           cert_profiles="'''I18N_OPENXPKI_PROFILE_USER'''"
+           cert_roles="'''User'''"
+           cert_subject="'''[% distinguishedName %]'''"
+           cert_subject_alt_names="'''email=[% mail %]'''">
+      <field name="pkcs10"/>
+ </action>
+Now we have to map our catched data to the CSR.
+
+
+'''workflow_activity_smartcard_personalization.xml'''
+ <action name="publish_certificates"
+           class="OpenXPKI::Server::Workflow::Activity::SmartCard::PublishCertificates"
+           ldap_server="'''192.168.90.104'''"
+           ldap_port="'''389'''"
+           ldap_userdn="'''cn=openxpki,cn=Users,dc=test-ag,dc=test,dc=de'''"
+           ldap_pass="'''openxpki'''"
+           ldap_basedn="'''dc=test-ag,dc=test,dc=de'''"
+           ldap_timelimit="'''10'''"
+           search_key="'''sAMAccountName'''"
+           search_value_context="'''creator'''">
+ </action>
+At last, we have to configure the LDAP connection for searching the creator's LDAP account and adding the certificate as "userCertificate".
+
+
+
+'''workflow_condition.xml''' 
+ <!-- conditions for smartcard personalization -->
+   <!-- policy settings -->
+   <condition name="approval_needed" class="OpenXPKI::Server::Workflow::Condition::'''AlwaysFalse'''">
+   </condition>
+AlwaysFalse (RA Operator do not act in workflow) or AlwaysTrue (RA Operator have to act in workflow)
+
+'''workflow_condition.xml''' 
+ <!-- user settable parameters -->
+  <condition name="certificate_issuance_possible" class="OpenXPKI::Server::Workflow::Condition::IsCertificateIssuancePossible">
+    <param name="required" value="'''cn,dn'''"/>
+  </condition>
+This are the required values for cert requesting.
+
+
+Now we could check the userCertificate in ADS.
+ ldapsearch -h '''192.168.90.104'''  -x -D "'''cn=openxpki,cn=Users,dc=test-ag,dc=test,dc=de'''" -W  -b "'''dc=test-ag,dc=test,dc=de'''" "(sAMAccountName='''herbert''')" userCertificate
+
+
+
+publish CRL into ADS [http://wiki.openxpki.org/index.php/ADS_publish_crl]
+

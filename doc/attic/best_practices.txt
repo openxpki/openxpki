@@ -1,0 +1,36 @@
+2010-12-09 12:01:32 Scotty (Talk | contribs | block) (→Debian GNU/Linux)
+2010-04-16 11:13:02 Mbartosch (Talk | contribs | block)
+
+verview ==
+This page contains specific information gained from running OpenXPKI in production environments. It describes installation and configuration details which we found work well in our environment. They may serve as a good starting point for your own installation. However, please do not adopt them blindly, as they may contain assumptions on particular production environment which may not be appropriate for your situation.
+
+== Databases ==
+
+=== Choosing a database ===
+Although technically supported by OpenXPKI, '''SQLite should not be used for production systems'''. Erratic behaviour can happen if OpenXPKI is used with SQLite in a multiuser environment where multiple connections are simultaneously opened to the database.
+
+=== MySQL ===
+
+=== Oracle ===
+* [[Best_Practices/Database/Oracle/Database_Schema|Database schema for Oracle installations (including privilege separation)]]
+
+== Operating systems and distributions  ==
+=== Debian GNU/Linux ===
+* [[Best_Practices/Operating_systems/Debian/Debian_Package_Installation|Debian Package Installation]] (Install on Debian using pre-built packages)
+* [[Best_Practices/Operating_systems/Debian/Debian_Etch_installation|Debian Etch Installation]] (old)
+* [[Best_Practices/Operating_systems/Debian/Debian_using_MYSQL_as_DBlayer|Configuring OpenXPKI to use MySQL on Debian]] (old - package installation uses MySQL by default)
+* [[Best_Practices/Operating_systems/Debian/Debian_SCEP|Setting up an SCEP server on Debian]]
+
+== Housekeeping ==
+
+This section describes proven ways to periodically clean up system resources and automate routine PKI jobs in an OpenXPKI installation. The jobs described are designed to run without user interaction, making it possible to invoke them regularly by the system scheduler (e. g. cron).
+
+=== Automating core PKI tasks ===
+* [[Best_Practices/Housekeeping/Automatic_CRL_issuance|Automatically issue and publish CRLs]] (e. g. via cron)
+
+=== Cleaning up system resources  ===
+* [[Best_Practices/Housekeeping/Cleanup_Shared_Memory|Clean up shared memory]]
+* [[Best_Practices/Housekeeping/Cleanup_Temp_Files|Clean up left-over temporary files]]
+* [[Best_Practices/Housekeeping/Cleanup_Superfluous_Workflows|Delete superfluous workflow instances and related data]]
+
+

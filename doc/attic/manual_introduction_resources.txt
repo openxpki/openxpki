@@ -1,0 +1,38 @@
+2008-08-13 14:15:10 Alech (Talk | contribs | block) 
+2008-08-13 14:08:03 Alech (Talk | contribs | block)
+
+= Resources =
+
+== Website ==
+The official OpenXPKI website is at [http://www.openxpki.org http://www.openxpki.org]. There, you can find all relevant information on OpenXPKI, i.e. news, documentation, security advisories as well as the software itself. Furthermore, the website provides legacy documentation for the OpenCA software.
+
+== Sourceforge ==
+
+All of the development efforts take place on [http://www.sourceforge.net Sourceforge.net], a collaborative software development platform. There, you can browse our Subversion source repository, download the latest release from one of many mirrors, report bugs or file requests for new features. 
+It also hosts the various mailing list the project uses. The project page is at [http://www.sourceforge.net/projects/openxpki/ http://www.sourceforge.net/projects/openxpki/].
+
+=== Checking out the source using subversion ===
+If you are interested in helping out with developing or want to check out the latest development, you may want to download the latest development version using Subversion. To do so, simple type "svn co https://svn.sourceforge.net/svnroot/openxpki openxpki" into your favourite shell.
+
+== Mailing lists ==
+
+Development discussions and support mostly take place on one of the project's mailing lists. These currently are:
+
+* '''openxpki-devel:''' Here, development issues are discussed among the developers, but source-related or very technical questions are welcome here as well.
+* '''openxpki-users:''' This is the mailing list for the users of OpenXPKI and the place where you should post if you still get stuck after looking up things in the manual
+* '''openxpki-svn:''' This is the place where all Subversion checkins are sent to. It is thus only relevant/useful for developers.
+
+To post to one of the lists, send a mail to ''listname''@lists.sourceforge.net.
+If you want to subscribe to one of the lists, email to '''listname'''-request@lists.sourceforge.net with a subject of "subscribe". <!-- TODO: check if this is correct -->
+
+== IRC ==
+
+Developers and users can meet at #openxpki on the [http://www.freenode.net Freenode network] (irc.freenode.net, for example).
+
+== Consulting Services and Commercial Support ==
+
+OpenXPKI users are invited to use the mailing lists to get free support. However, our software is admittedly complex and it is not always possible to solve complicated requirements via email. Hence if you plan to deploy OpenXPKI in your organization, you may be in need of professional support in order to attain your project goals.
+
+Currently, commercial support and OpenXPKI consultancy is offered by the following companies:
+* '''[https://www.cynops.de Cynops GmbH] - network security engineering'''. Cynops is an IT security consulting and development company which has been heavily involved in OpenXPKI development from the very beginning and is committed to supporting the project. A considerable part of OpenXPKI's system architecture and project source code has been contributed by Cynops employees. The company has experience in customization, deployment and integration of open source PKIs (OpenCA, OpenXPKI) in enterprise environments.
+

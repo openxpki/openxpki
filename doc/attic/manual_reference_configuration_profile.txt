@@ -1,0 +1,385 @@
+2008-12-02 18:35:00 Alech (Talk | contribs | block)
+2008-09-10 11:27:12 Jkunkel (Talk | contribs | block)
+
+= Example commented profile.xml =
+
+This is a commented version of the default profile.xml file in which both CRL and certificate profiles are dfined.
+
+<pre>
+
+<profiles id="default_profiles">
+  <!-- the Certificate Revocation List profiles, one per CA identifier -->
+
+  <crl>
+    <profile id="default">
+      <validity>
+	<!-- notbefore is not applicable here -->
+        <!-- standard validity of a CRL is 14 days -->
+	<notafter  format="relativedate">+000014</notafter>
+      </validity>
+
+      <!-- SHA-1 is used as the digest by default -->
+      <digest>sha1</digest>
+
+      <!-- no CRL extensions by default, possible extensions are
+           - authority_info_access
+           - authority_key_identifier or
+           - issuer_alt_name -->
+      <extensions>
+      </extensions>
+    </profile>
+
+    <!-- just use the default profile for the Test CAs -->
+    <profile id="testdummyca1"
+	     super="../profile{default}"/>
+    <profile id="testdummyca2"
+	     super="../profile{default}"/>
+  </crl>
+
+  <!-- endentity profiles -->
+  <endentity>
+
+  <!-- Certificate profiles -->
+
+    <!-- default certificate profile -->
+    <profile id="default">
+      <validity>
+	<!-- notbefore defaults to 'now' -->
+	<notafter  format="relativedate">+01</notafter>
+      </validity>
+
+      <digest>sha1</digest>
+      <extensions>
+	<basic_constraints critical="true">
+          <ca>false</ca>
+	</basic_constraints>
+	<key_usage critical="false">
+          <digital_signature>0</digital_signature>
+          <non_repudiation>  0</non_repudiation>
+          <key_encipherment> 0</key_encipherment>
+          <data_encipherment>0</data_encipherment>
+          <key_agreement>    0</key_agreement>
+          <key_cert_sign>    0</key_cert_sign>
+          <crl_sign>         0</crl_sign>
+          <encipher_only>    0</encipher_only>
+          <decipher_only>    0</decipher_only>
+	</key_usage>
+	<extended_key_usage critical="false">
+          <!-- these are OIDs                     -->
+          <!-- some OIDs are known and have names -->
+          <client_auth>     0</client_auth>
+          <email_protection>0</email_protection>
+	</extended_key_usage>
+	<subject_key_identifier   critical="false" hash="true"/>
+	<authority_key_identifier critical="false" keyid="true" issuer="true"/>
+        <!-- If the issuer has no subject alternative name, copying returns
+             an empty extension, which is problematic with both RSA SecurId
+             tokens and Cisco devices! 
+	<issuer_alt_name          critical="false" copy="true"/>
+         -->
+	<crl_distribution_points critical="false">
+          <uri>http://localhost/cacrl.crt</uri>
+          <uri>ldap://localhost/cn=My%20CA,dc=OpenXPKI,dc=org</uri>
+	</crl_distribution_points>
+	<authority_info_access critical="false">
+          <ca_issuers>http://localhost/cacert.crt</ca_issuers>
+          <ocsp>http://ocsp.openxpki.org/</ocsp>
+	</authority_info_access>
+	<policy_identifier critical="false">
+          <!--                     WARNING                     -->
+          <!-- if use_loa is set to yes                        -->
+          <!-- then policy_identifier and cps will be extended -->
+          <!-- by the values in the appropriate loa tag        -->
+          <oid>1.2.3.4</oid>
+	</policy_identifier>
+	<cps critical="false">
+          <!--                     WARNING                     -->
+          <!-- if use_loa is set to yes                        -->
+          <!-- then policy_identifier and cps will be extended -->
+          <!-- by the values in the appropriate loa tag        -->
+          <uri>http://localhost/cps.html</uri>
+	</cps>
+	<netscape>
+          <comment critical="false">This is a generic certificate.
+	    Generated with OpenXPKI trustcenter software.</comment>
+          <certificate_type critical="false">
+            <ssl_client>       false</ssl_client>
+            <smime_client>     false</smime_client>
+            <object_signing>   false</object_signing>
+            <ssl_ca>           false</ssl_ca>
+            <smime_ca>         false</smime_ca>
+            <object_signing_ca>false</object_signing_ca>
+          </certificate_type>
+          <cdp critical="false">
+            <url>http://localhost/cacrl.crt</url>
+            <ca_url>http://localhost/cacrl.crt</ca_url>
+          </cdp>
+	</netscape>
+      </extensions>
+    </profile>
+
+    <!-- User profile -->
+    <profile id="I18N_OPENXPKI_PROFILE_USER"
+	     super="../profile{default}">
+
+      <subject id="00_user_basic_style">
+        <label>I18N_OPENXPKI_PROFILE_USER_BASIC_STYLE</label>
+        <description>I18N_OPENXPKI_PROFILE_USER_BASIC_DESC</description>
+        <template>
+             <!-- default: min=1, max=1 -->
+             <!-- note that the regex is pretty restrictive, one might
+                  want to change that to something more liberal -->
+             <input id="username"
+                    label="I18N_OPENXPKI_USERNAME"
+                    description="I18N_OPENXPKI_USERNAME_DESC"
+                    type="freetext"
+                    match="\A [A-Za-z]+ \z"
+                    width="20"
+                    default="testuser"/>
+             <input id="realname"
+                    label="I18N_OPENXPKI_REALNAME"
+                    description="I18N_OPENXPKI_REALNAME_DESC"
+                    type="freetext"
+                    match=".+"
+                    width="40"
+                    default=""/>
+             <input id="email"
+                    label="I18N_OPENXPKI_EMAILADDRESS"
+                    description="I18N_OPENXPKI_EMAILADDRESS_DESC"
+                    type="freetext"
+                    match=".+@.+"
+                    width="30"
+                    default=""/>
+        </template>
+        <dn>CN=[- realname -]+UID=[- username -],DC=Test Deployment,DC=OpenXPKI,DC=org</dn> 
+        <additional_information super="../../../subject{05_advanced_style}/additional_information"/>
+        <subject_alternative_names>
+            <san id="dns">
+                <key type="fixed">email</key>
+                <value type="fixed">[- email -]</value>
+            </san>
+        </subject_alternative_names>
+      </subject>
+      <subject super="../../subject{05_advanced_style}"/>
+
+      <role>User</role>
+      <role>RA Operator</role>
+      <role>CA Operator</role>
+
+      <validity>
+	<notafter format="relativedate">+0006</notafter>
+      </validity>
+      
+      <extensions>
+	<key_usage critical="false">
+          <digital_signature>1</digital_signature>
+          <non_repudiation>  1</non_repudiation>
+          <key_encipherment> 1</key_encipherment>
+          <data_encipherment>1</data_encipherment>
+          <key_agreement>    1</key_agreement>
+          <key_cert_sign>    0</key_cert_sign>
+          <crl_sign>         0</crl_sign>
+          <encipher_only>    0</encipher_only>
+          <decipher_only>    0</decipher_only>
+	</key_usage>
+	<extended_key_usage critical="false">
+          <!-- these are OIDs                     -->
+          <!-- some OIDs are known and have names -->
+          <client_auth>     1</client_auth>
+          <email_protection>1</email_protection>
+          <oid>1.3.6.1.4.1.311.20.2.2</oid>
+	</extended_key_usage>
+	<!-- Microsoft Certificate Template "SmartcardUser" (bmp string) -->
+	<oid critical="false" numeric="1.3.6.1.4.1.311.20.2" format="DER" encoding="HEX">
+          1e:1a:00:53:00:6d:00:61:00:72:00:74:00:63:00:61:00:72:00:64:00:55:00:73:00:65:00:72
+	</oid>
+	<netscape>
+          <comment critical="false">This is a user certificate.
+	    Generated with OpenXPKI trustcenter software.</comment>
+          <certificate_type critical="false">
+            <ssl_client>       true </ssl_client>
+            <smime_client>     true </smime_client>
+            <object_signing>   false</object_signing>
+            <ssl_ca>           false</ssl_ca>
+            <smime_ca>         false</smime_ca>
+            <object_signing_ca>false</object_signing_ca>
+          </certificate_type>
+	</netscape>
+      </extensions>
+    </profile>
+
+
+    <!-- TLS Server profile -->
+    <profile id="I18N_OPENXPKI_PROFILE_TLS_SERVER"
+	     super="../profile{default}">
+
+      <role>Web Server</role>
+
+      <subject id="00_tls_basic_style">
+        <label>I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE</label>
+        <description>I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC</description>
+        <template>
+             <!-- not that the regex is not exact, this might still not
+                  be a valid hostname -->
+             <!-- default: min=1, max=1 -->
+             <input id="hostname"
+                    label="I18N_OPENXPKI_HOSTNAME"
+                    description="I18N_OPENXPKI_HOSTNAME_DESC"
+                    type="freetext"
+                    source="CN:([^:]+)"
+                    match="\A [A-Za-z\d-\.]+ \z"
+                    width="60"
+                    default="fully.qualified.example.com"/>
+             <input id="port"
+                    label="I18N_OPENXPKI_PORT"
+                    description="I18N_OPENXPKI_PORT_DESC"
+                    type="freetext"
+                    source="CN:.+:(.+)"
+                    match="\A \d+ \z"
+                    width="5"
+                    min="0"
+                    default=""/>
+        </template>
+        <dn>CN=[- hostname -][- IF port AND port != 443 -]:[- port -][- END -],DC=Test Deployment,DC=OpenXPKI,DC=org</dn> 
+        <additional_information super="../../../subject{05_advanced_style}/additional_information"/>
+        <subject_alternative_names>
+            <san id="dns">
+                <key type="fixed">DNS</key>
+                <value type="fixed">[- hostname -]</value>
+            </san>
+        </subject_alternative_names>
+      </subject>
+      <subject super="../../subject{05_advanced_style}"/>
+      <validity>
+	<notafter format="relativedate">+0003</notafter>
+      </validity>
+      
+      <extensions>
+	<key_usage critical="false">
+          <digital_signature>0</digital_signature>
+          <non_repudiation>  0</non_repudiation>
+          <key_encipherment> 1</key_encipherment>
+          <data_encipherment>0</data_encipherment>
+          <key_agreement>    0</key_agreement>
+          <key_cert_sign>    0</key_cert_sign>
+          <crl_sign>         0</crl_sign>
+          <encipher_only>    0</encipher_only>
+          <decipher_only>    0</decipher_only>
+	</key_usage>
+	<extended_key_usage critical="false">
+          <!-- these are OIDs                     -->
+          <!-- some OIDs are known and have names -->
+          <!-- at least for server_auth, this is not true (server_auth
+               is not found within the whole source tree except for here
+          <server_auth>     1</server_auth>
+          -->
+          <oid>1.3.6.1.5.5.7.3.1</oid> <!-- = serverAuth -->
+	</extended_key_usage>
+	<netscape>
+          <comment critical="false">This is a TLS Server certificate.
+	    Generated with OpenXPKI trustcenter software.</comment>
+          <certificate_type critical="false">
+            <ssl_client>       false</ssl_client>
+            <smime_client>     false</smime_client>
+            <object_signing>   false</object_signing>
+            <ssl_ca>           false</ssl_ca>
+            <smime_ca>         false</smime_ca>
+            <object_signing_ca>false</object_signing_ca>
+          </certificate_type>
+	</netscape>
+      </extensions>
+    </profile>
+      
+    <subject id="05_advanced_style">
+      <label>I18N_OPENXPKI_PROFILE_ADVANCED_STYLE</label>
+      <description>I18N_OPENXPKI_PROFILE_ADVANCED_DESC</description>
+      <bulk>1</bulk> <!-- this is the subject style for bulk requests -->
+      <template>
+           <!-- not that the regex is not exact, this might still not
+                be a valid hostname -->
+           <!-- default: min=1, max=1 -->
+           <input id="CN"
+                  label="CN"
+                  description="I18N_OPENXPKI_CN_DESC"
+                  type="freetext"
+                  source="CN:(.+)"
+                  width="60"
+                  default=""/>
+           <input id="O"
+                  label="O"
+                  description="I18N_OPENXPKI_O_DESC"
+                  type="freetext"
+                  source="O:(.+)"
+                  min="0"
+                  max="1"
+                  width="40"/>
+           <input id="OU"
+                  label="OU"
+                  description="I18N_OPENXPKI_OU_DESC"
+                  type="freetext"
+                  source="OU:(.+)"
+                  width="40"
+                  min="0"
+                  max="1000"/> <!-- if min or max is present, result is an arrayref -->
+           <input id="DC"
+                  label="DC"
+                  description="I18N_OPENXPKI_DC_DESC"
+                  type="freetext"
+                  width="40"
+                  min="0"
+                  max="1000"/>
+          <input id="C"
+                 label="C"
+                  description="I18N_OPENXPKI_C_DESC"
+                  type="freetext"
+                  width="2"
+                  source="C:(.+)"
+                  min="0"
+                  max="1"/>
+      </template>
+      <dn>CN=[- CN -][- IF OU -][- FOREACH entry = OU -],OU=[- entry -][- END -][- END -][- IF O -],O=[- O -][- END -][- FOREACH entry = DC -],DC=[- entry -][- END -][- IF C -],C=[- C -][- END -]</dn> 
+      <additional_information>
+        <input id="phone"
+               label="I18N_OPENXPKI_PHONE"
+               description="I18N_OPENXPKI_PHONE_DESC"
+               type="freetext"
+               width="20"
+               default=""/>
+        <input id="comment"
+               label="I18N_OPENXPKI_COMMENT"
+               description="I18N_OPENXPKI_COMMENT_DESC"
+               type="textarea"
+               width="40"
+               height="10"/>
+      </additional_information>
+      <subject_alternative_names>
+          <san id="choice">
+              <key type="select" max="1000">
+                  <option label="I18N_OPENXPKI_SAN_EMAIL"
+                          description="I18N_OPENXPKI_SAN_EMAIL_DESCRIPTION">email</option>
+                  <option label="I18N_OPENXPKI_SAN_DNS"
+                          description="I18N_OPENXPKI_SAN_DNS_DESCRIPTION">DNS</option>
+                  <option label="I18N_OPENXPKI_SAN_IP"
+                          description="I18N_OPENXPKI_SAN_IP_DESCRIPTION">IP</option>
+                  <option label="I18N_OPENXPKI_SAN_URI"
+                          description="I18N_OPENXPKI_SAN_URI_DESCRIPTION">URI</option>
+                  <option label="I18N_OPENXPKI_SAN_GUID"
+                          description="I18N_OPENXPKI_SAN_GUID_DESCRIPTION">GUID</option>
+                  <option label="I18N_OPENXPKI_SAN_UPN"
+                          description="I18N_OPENXPKI_SAN_UPN_DESCRIPTION">UPN</option>
+                  <option label="I18N_OPENXPKI_SAN_RID"
+                          description="I18N_OPENXPKI_SAN_RID_DESCRIPTION">RID</option>
+              </key>
+              <value type="freetext" width="40"/>
+          </san>
+          <san id="oid">
+              <key type="oid" max="1000" width="20"/>
+              <value type="freetext" width="40"/>
+          </san>
+      </subject_alternative_names>
+    </subject>
+  </endentity>
+
+</profiles>
+</pre>
+

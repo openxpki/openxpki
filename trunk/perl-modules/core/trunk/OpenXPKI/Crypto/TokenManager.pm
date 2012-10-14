@@ -518,6 +518,7 @@ dependend tokens which dont have key material attached.
 
 The tokens are defined in the system.crypto.token namespace. 
 Common tokens are default, pkcs7 and javaks.
+You neeed to specify at least C<api> and C<backend> for all tokens.
  
 =cut
 

@@ -3,5 +3,4 @@
 
 I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA:
     label: Verbose name of this realm
-    online: 1
     

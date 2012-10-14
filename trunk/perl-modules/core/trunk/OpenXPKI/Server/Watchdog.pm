@@ -535,15 +535,20 @@ The namespace is I<system.watchdog>. The properties are:
 =over 
 
 =item max_fork_redo
- 
+
+Retry this often to fork away the initial watchdog process before 
+failing finally. 
 default: 5
 
 =item max_exception_threshhold
 
+There are situations (database locks, no free resources) where a watchdog 
+can not fork away a new worker. After I<max_exception_threshhold> errors
+occured, we kill the watchdog. This is a fatal error that must be handled!   
 default: 10
 
 =item max_tries_hanging_workflows
-
+Try to restarted stale workflows this often before failing them.
 default:  3
 
 =item interval_wait_initial

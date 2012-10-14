@@ -1,0 +1,71 @@
+2008-08-13 17:35:51 Alech (Talk | contribs | block)
+2008-08-13 15:56:08 Mbartosch (Talk | contribs | block)
+
+= Server Architecture =
+
+OpenXPKI is designed to run as a Unix server daemon.
+
+During startup the server process reads
+its XML configuration file and performs several sanity checks
+on the configuration. It will fail to startup properly if any
+fatal errors are found. Once server startup is complete, it
+listens on a Unix Domain Socket for incoming connections from
+OpenXPKI clients. All communication with the server is done
+via this socket file.
+
+A client in OpenXPKI terminology is an interface implementation
+that offers PKI services to users and/or systems and 
+accesses the OpenXPKI server
+process via the communication socket. The server configuration
+determines which clients are enabled for a particular OpenXPKI
+installation.
+
+Whenever a new client connects to the socket, the server process
+forks and creates a worker copy of itself that is responsible
+for communicating with this particular client. The worker process
+will terminate if the client closes the connection or after
+a configurable timeout.
+
+Separating user frontends (i. e. clients) from the server
+allows to easily support various interfaces to
+PKI services without having to modify the server itself.
+
+= OpenXPKI Clients =
+Clients implement frontends for OpenXPKI, the most important
+possibly being the web interface that allows users and PKI 
+administrators to interact with the PKI system using a web browser.
+
+At the moment, the following clients are available:
+* HTML-Mason: the web interface client that allows users to talk to the PKI system via a web browser
+* SCEP: the Simple Certificate Enrollment (SCEP) client provides PKI services via HTTP and can be used for automatic renewal (for example using [http://www.cynops.de/oss/CertNanny/ CertNanny])
+* Perl client: can be used to develop scripts which talk to the PKI system
+
+= PKI Realms =
+It is often desired to have multiple independent PKIs for different
+purposes, e. g. for separating mandators, distinguishing between
+internally used certificates and external partners or for
+CA hierarchy separation.
+
+To address this requirement OpenXPKI supports definition 
+of an arbitrary number of PKI realms.
+A PKI Realm encompasses a complete PKI configuration set.
+Each PKI Realm may consist of an arbitrary number (zero or more) 
+of issuing CAs. All these CAs should be capable of issuing 
+certificates for the namespace defined by the PKI Realm.
+
+All CAs in a PKI Realm share the same configuration and 
+end entity certificate profiles.
+In particular, each CA uses its own CA certificate and private key. 
+A unique PKI Realm Identifier is assigned to each PKI Realm that is 
+used to distinguish between the individual PKIs. 
+Since each PKI Realm provides its own independent name space in 
+terms of profile, common name, serial number, access control etc., 
+this makes it possible to run different and completely independent 
+PKIs in one single installation without having to install 
+multiple program installations. 
+Selection between PKI Realms for end users and administrator 
+staff is delegated to either the web server running the 
+CA installation (e. g. by using different URLs or port numbers 
+for instance distinction) or alternatively may be performed by a 
+selection mechanism on the PKI login screen.
+

@@ -1,0 +1,18 @@
+2010-04-22 16:19:36 Mbartosch (Talk | contribs | block)
+
+== Cleaning up left-over temp files ==
+
+Temporary files OpenXPKI creates are sometimes not properly removed after use. In order to clean up left-over files regularly you can use the following script. The script assumes OpenXPKI is running as unix user openxpki and the web server is running as wwwown.
+
+<pre>
+#!/bin/bash
+# cleanup old and unused files
+
+logger "Cleaning up old tmp files"
+find /var/tmp/ -name 'openxpki*' -user openxpki -type f -mtime +10 -exec rm {} \;
+find /var/tmp/ -name '[0-9A-F]*.pem' -user openxpki -type f -mtime +10 -exec rm {} \;
+logger "Cleaning up old OpenXPKI session files"
+find /var/openxpki/session/ -user openxpki -name 'cgisess*' -type f -mtime +10 -exec rm {} \; 
+find /tmp -name 'cgisess*' -user wwwown -type f -mtime +10 -exec rm {} \; 
+</pre>
+

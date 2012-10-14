@@ -1,0 +1,38 @@
+2011-08-08 16:27:28 Achim (Talk | contribs | block)
+
+== Auto-Approval of CERT requests ==
+
+Q: Microsoft CA services provides a feature "Auto Certificate Approval". In this
+feature, if we request a certificate then it is automatically approved. Please
+guide me that how can we use OpenXPKI for automatic certificate approval as give
+n in Microsoft CA services?
+
+A: If you wish to enable auto-approval for normal cert requests (done via the web i
+nterface) you need to modify the workflow definition:
+
+=== workflow_def_certificate_signing_request.xml ===
+
+Bypass the cert request edit and approval states. Original (from default config):
+  ...
+  <state name="PKCS10_GENERATED" autorun="yes">
+    <action name="notify_user_of_creation"
+            resulting_state="PENDING">
+    </action>
+  </state>
+  ...
+Change the resulting_state to PERSIST_CSR:                                      
+  ...
+  <state name="PKCS10_GENERATED" autorun="yes">
+    <action name="notify_user_of_creation"
+            resulting_state="PERSIST_CSR">
+    </action>
+  </state>
+  ...
+After this state add a new state to the workflow definition:
+  <state name="PERSIST_CSR" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
+            resulting_state="SPAWNING_CERT_ISSUANCE">
+    </action>
+  </state>
+Leave the rest as it is. Restart the daemon to activate the change.
+

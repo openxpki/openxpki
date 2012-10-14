@@ -1,0 +1,14 @@
+2010-02-02 11:06:27 Scotty (Talk | contribs | block) 
+
+==Using the Live CD==
+
+'''Note: this is work-in-progress, so your mileage may vary'''
+
+'''Note 2: during initial testing, the Debian packages are on build0.cynops.de, which is a development host and has no SLAs. After testing, the packages will move to a more appropriate location.'''
+
+The Live CD provides a simple start for testing and evaluating OpenXPKI. In addition, it may be customized for use as an offline Root CA.
+
+==Customizing the Live CD==
+
+The Live CD is based on Morphix (http://www.morphix.org), which itself is based on Debian (http://www.debian.org). In the main SVN trunk, see trunk/package/morphix-lenny/README for more details.
+

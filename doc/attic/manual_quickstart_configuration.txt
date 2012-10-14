@@ -1,0 +1,185 @@
+2010-03-22 16:42:08 Mbartosch (Talk | contribs | block)
+2009-10-20 17:04:00 Seus (Talk | contribs | block)
+
+= Configuration and setup walkthrough =
+
+== CA Setup ==
+
+Each OpenXPKI [[PKI Realm]] can contain an arbitrary number of [[Issuing CA]] certificates. All [[Issuing CA]] certificates are assumed to be capable of issuing certificates for the [[PKI Realm]] they are "living" in.
+
+In order to get a working CA installation you need to configure at least one [[Issuing CA]]. The configuration of a new [[Issuing CA]] in OpenXPKI is done as follows:
+
+=== Creating a new CA key ===
+
+TBD
+
+=== Configuring the CA token ===
+
+OpenXPKI uses [[Token|Tokens]] to handle [[Private Key|Private Keys]] (not only for CAs, but also for all other components that need asymmetric private keys). Each CA needs a corresponding [[Private Key]] [[Token]] which has to be configured in token.xml.
+
+'''Example (from token.xml):'''
+
+<code>
+  <token_config>
+  ...
+    <token id="dummycakey01" super="../token{default}">
+        <!-- CA key (PEM encoded) -->
+        <key>/etc/openxpki/instances/trustcenter1/ca/dummycakey01/cakey.pem</key>
+        <!-- CA passphrase fragments -->
+        <secret>default</secret>
+    </token>
+  </token_config>
+</code>
+
+This code snippet configures a token with the symbolic name "dummycakey01" as a descendant from the [[Default Token]]. The specified <key/> is the path to the encrypted PEM-formatted [[Private Key]]. The <secret/> section specifies how OpenXPKI should obtain the [[Private Key]] for the configured key. In this case the [[Key Group]] "default" is used to unlock the [[Private Key]].
+
+
+=== Configuring the Secret ===
+
+TBD
+
+=== Configuring the Issuing CA ===
+
+In order to add an [[Issuing CA]] to a [[PKI Realm]], simply add a <ca/> section to the [[PKI Realm]] definition:
+
+'''Example (from config.xml):'''
+
+<code>
+  <pki_realm name="I18N_OPENXPKI_DUMMY_CA" id="I18N_OPENXPKI_DUMMY_CA">
+  ...
+    <!-- Issuing CAs defined for this realm -->
+    <!-- 'id' is the internal CA identifier -->
+    <ca id="dummyca01">
+      <token super="common/token_config/token{dummycakey01}"/>
+      <cert>
+          <alias>dummyca01</alias>
+          <realm>I18N_OPENXPKI_DUMMY_CA</realm>
+      </cert>
+      <crl_publication>
+        <file>
+            <filename>/var/openxpki/crl-dummyca01.pem</filename>
+            <format>PEM</format>
+        </file>
+      </crl_publication>
+    </ca>
+  </pki_realm>
+</code>
+
+In this section we have configured an [[Issuing CA]] with the internal identifier "dummyca01" for the [[PKI Realm]]. The CA uses the [[Private Key]] protected by the [[Token]] "dummycakey01" (see above). The [[CA Certificate]] is referenced by the <cert/> section. Typically the certificate is addressed by a [[Certificate Alias]], in this case the alias is "dummyca01" in the same [[PKI Realm]].
+
+The optional <crl_publication/> section allows to configure where created [[CRL|CRLs]] should be published. In this case we only write the generated [[CRL]] to the local file system with the specified file name (PEM format). (Make sure that the OpenXPKI daemon has write permissions for this directory).
+
+== Creation or import of the Issuing CA Certificate ==
+
+Creation: TBD, describe CSR generation from password-protected CA token.
+
+=== Using CA Certificates issued internally (by OpenXPKI itself) ===
+
+If the [[Issuing CA]] certificate was issued by OpenXPKI itself (possibly in a different PKI Realm), the certificate is already present in the database. In this case you only need to create a [[Certificate Alias]] in the target PKI Realm.
+
+TBD
+
+=== Using externally generated CA Certificates ===
+
+If the [[Issuing CA]] certificate was created outside of OpenXPKI you need to import the [[Issuing CA]] certificate (and if necessary the certificates belonging to the corresponding CA Certificate Chain up to the root) in OpenXPKI. This is done via the openxpkiadm command line tool.
+
+TBD
+
+
+== Fully Automatic CA Rollover ==
+
+One of the key features of OpenXPKI is the fully automatic CA rollover. Basically this feature allows you to painlessly extend the life time of your CA installation beyond the validity of the [[Issuing CA]] certificate. The idea is to have multiple [[Issuing CA]] certificates with overlapping validity that are capable of issuing certificates for the same logical CA namespace (aka PKI Realm).
+
+To set up fully automatic CA rollover you simply need to add a new CA [[Token]] and [[Issuing CA]] section to the configuration. After a OpenXPKI daemon restart the daemon will automatically start using the new CA once it becomes valid.
+
+Example configuration:
+
+'''Example (from token.xml):'''
+
+<code>
+  <token_config>
+  ...
+    <token id="dummycakey01" super="../token{default}">
+        <!-- CA key (PEM encoded) -->
+        <key>/etc/openxpki/instances/trustcenter1/ca/dummycakey01/cakey.pem</key>
+        <!-- CA passphrase fragments -->
+        <secret>default</secret>
+    </token>
+    <token id="dummycakey02" super="../token{default}">
+        <!-- CA key (PEM encoded) -->
+        <key>/etc/openxpki/instances/trustcenter1/ca/dummycakey02/cakey.pem</key>
+        <!-- CA passphrase fragments -->
+        <secret>default</secret>
+    </token>
+  </token_config>
+</code>
+
+Here we added an additional CA token (dummycakey02), protected by the same [[Key Group]].
+
+'''Example (from config.xml):'''
+
+<code>
+  <pki_realm name="I18N_OPENXPKI_DUMMY_CA" id="I18N_OPENXPKI_DUMMY_CA">
+  ...
+    <!-- Issuing CAs defined for this realm -->
+    <!-- 'id' is the internal CA identifier -->
+    <ca id="dummyca01">
+      <token super="common/token_config/token{dummycakey01}"/>
+      <cert>
+          <alias>dummyca01</alias>
+          <realm>I18N_OPENXPKI_DUMMY_CA</realm>
+      </cert>
+      <crl_publication>
+        <file>
+            <filename>/var/openxpki/crl-dummyca01.pem</filename>
+            <format>PEM</format>
+        </file>
+      </crl_publication>
+    </ca>
+    <ca id="dummyca02">
+      <token super="common/token_config/token{dummycakey02}"/>
+      <cert>
+          <alias>dummyca02</alias>
+          <realm>I18N_OPENXPKI_DUMMY_CA</realm>
+      </cert>
+      <crl_publication>
+        <file>
+            <filename>/var/openxpki/crl-dummyca02.pem</filename>
+            <format>PEM</format>
+        </file>
+      </crl_publication>
+    </ca>
+  </pki_realm>
+</code>
+
+Similarly, the CA section is extended by a second issuing CA "dummyca02". You can configure an arbitrary number of [[Issuing CA]] certificates this way.
+
+This configuration setup will influence the OpenXPKI behaviour as follows:
+
+Whenever a certificate is issued:
+
+* examine all configured [[Issuing CA|Issuing CAs]]
+* ignore all invalid CAs (i. e. not yet valid or expired)
+* from the set of remaining [[Issuing CA]] certificates choose the one with the lowest NotBefore date
+* issue the certificate with this [[Issuing CA]] certificate
+
+Whenever CRL issuance is requested:
+
+* examine all configured [[Issuing CA]] certificates
+* ignore all invalid CAs (i. e. not yet valid or expired)
+* issue CRLs for all currently valid [[Issuing CA|Issuing CAs]] and publish them as configured
+
+Now, in order to prepare for fully automatic CA rollover, simply issue the new CA certificate(s) with a NotBefore date in the future. (You may even prepare multiple "future" CAs with stacked NotBefore/NotAfter dates, the [[Issuing CA]] certificates will be used sequentially according to the algorithm described above.)
+
+The nice thing about automatic CA rollover is that you can preconfigure your new issuing CA (with a NotBefore date in the future) any time you like. You pick your own maintenance window, install the configuration changes, and restart the OpenXPKI daemon. 
+Once the NotBefore date of the new [[Issuing CA]] is reached, the new CA will become effective automatically.
+
+Please note that if you configure a new [[Issuing CA]] that is already valid, the OpenXPKI daemon will start to use it immediately after the server restart (conforming to the above algorithm).
+
+Revocation of certificates still works as expected, the responsible [[Issuing CA]] will continue to publish CRLs for certificates issued by it until the CA expires.
+
+
+== Password safe setup ==
+
+== SCEP Server setup ==
+

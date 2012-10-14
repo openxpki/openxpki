@@ -1,0 +1,28 @@
+2010-04-07 09:21:51 Mbartosch (Talk | contribs | block)
+2010-03-01 12:39:13 Mbartosch (Talk | contribs | block)
+
+= Encrypted workflow context entries =
+
+'''Status: idea, open for discussion, not yet implemented. Concept has serious deficiencies (see below)'''
+
+== Motivation ==
+Workflow context entries are persisted in the database in cleartext. When dealing with sensitive data it is sometimes desirable that administrators with read access to the database are not able to access certain information handled by the workflow engine by looking at the raw database tables.
+
+== Proposed solution ==
+The workflow persister will be extended to treat certain workflow context entries as sensitive data. Such data is transparently encrypted/decrypted when accessing the database.
+
+Similar to volatile context entries which are identified by a leading '_' character, encrypted context keys are prefixed with a leading '+'. When dealing with such context entries the persister automatically encrypts and decrypts the data before writing to database and after reading the encrypted value.
+
+=== Encrypted context entry access ===
+Encrypted workflow context entries are handled transparently by the workflow persister and are therefore available unencrypted in the OpenXPKI server instance. A workflow implementation commonly needs to access and process these values internally.
+However, due to the sensitive nature of encrypted workflow context values it is undesirable that OpenXPKI clients get direct access to transparently encrypted context entries. To avoid compromise of sensitive information, encrypted context entries are filtered from the workflow context when accessed by a Client via the API. If encrypted data should be made available to the Client, it is recommended to copy the decrypted value to a volatile context value (identified by a leading '_').
+
+==== Requirements ====
+Processing encrypted workflow context entries requires the necessary encryption keys to be prepared and available in the server. A precondition for this is a proper crypto configuration enabling this feature. In addition, the necessary keys must have been enabled (i. e. logged in) before encrypted workflow context entries can be processed.
+
+==== Run time behaviour ====
+A workflow implementation using encrypted context entries must be prepared to receive an exception during storage or retrieval of encrypted data. Such an exception indicates that the necessary key material for accessing the encrypted information is not accessible.
+
+== Deficiencies ==
+Transparent encryption is not possible without proper setup. Unavailable encryption keys can lead to situations that cannot be automatically covered.
+

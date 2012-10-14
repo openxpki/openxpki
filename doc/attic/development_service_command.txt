@@ -1,0 +1,121 @@
+2010-04-07 10:53:36 Mbartosch (Talk | contribs | block) 
+2008-08-26 12:09:36 Jkunkel (Talk | contribs | block)
+
+==  List of possible service commands to send to the server ==
+
+'''send_service_msg'''
+
+Send a service message.  The first argument must be a string identifying the service command to send.  The (optional) second argument is a hash
+reference containing the arguments to be sent along with the service message.  The caller must assure that this argument is properly specified.
+
+
+'''send_receive_service_msg'''
+
+Send a service message, reads the response and returns it.  See send_service_msg.
+
+e.g.
+ use OpenXPKI::Client;
+ use Data::Dumper;
+ my $client = OpenXPKI::Client->new({ SOCKETFILE => '/path/to/openxpki.socket' });
+ my $msg = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',
+ {
+ 		'AUTHENTICATION_STACK' => 'External Dynamic',
+ },
+ );
+ print Dumper $msg;
+
+e.g.
+ $msg = $client->send_receive_service_msg('GET_PASSWD_LOGIN',
+ {
+ 		'LOGIN'  => 'root',
+ 		'PASSWD' => 'CA Operator',
+ },
+ );
+ print Dumper $msg;
+
+
+There are different states in which the communication with the client can be (as seen from the server side). Depending on the state, you may send different commands:
+
+== In any state ==
+
+=== PING ===
+
+PING tests whether the connection is still available, just replies with a 'SERVICE_READY' service message.
+
+=== CONTINUE_SESSION ===
+
+Used to continue an existing session. Has a 'SESSION_ID' parameter specifying the session you would like to continue. This is typically the first message if you open a new connection to the server and want to continue an earlier session.
+
+
+== State 'NEW' ==
+
+NEW is the initial state after a connection to the server is created.
+
+=== NEW_SESSION ===
+
+NEW_SESSION is used to create a new session. Has an optional parameter of 'LANGUAGE', with which you can specify the language used for the session.
+
+== State 'SESSION_ID_SENT' ==
+
+This is the state if a session ID has been sent to the client after a 'NEW_SESSION' command.
+
+=== SESSION_ID_ACCEPTED ===
+
+SESSION_ID_ACCEPTED is used to indicate that you accept the session ID sent by the server.
+
+== State 'SESSION_ID_SENT_FROM_CONTINUE' ==
+
+This is the state if a session ID has been sent to the client after a 'CONTINUE_SESSION' command. Accepts 'SESSION_ID_ACCEPTED' as well (cf. 'SESSION_ID_SENT').
+
+== State 'WAITING_FOR_PKI_REALM' ==
+
+This is the state after the session ID has been accepted from the client and selection of a PKI realm is required (i.e. there are more than one PKI realms).
+
+=== GET_PKI_REALM ===
+
+This is used to indicate which PKI realm you want to use in this session. Takes a parameter 'PKI_REALM'.
+
+== State 'WAITING_FOR_AUTHENTICATION_REALM' ==
+
+This is the state were an authentication realm choice is required from the client.
+
+=== GET_AUTHENTICATION_STACK ===
+
+GET_AUTHENTICATION_STACK is used to indicate the authentication stack you would like to use.
+
+== WAITING_FOR_LOGIN ==
+
+This is the state after an authentication stack has been chosen and login information is required from the client
+
+=== GET_PASSWD_LOGIN ===
+
+GET_PASSWD_LOGIN is used for the password authentication stack and requires a username (parameter 'LOGIN') and password (parameter 'PASSWD') to be sent.
+
+=== GET_CLIENT_SSO_LOGIN ===
+
+GET_CLIENT_SSO_LOGIN is used for the client-based single-sign-on login. As the authentication is done on the client (e.g. the webserver), only the 'LOGIN' parameter is required to indicate the username that has been authenticated.
+
+=== GET_CLIENT_X509_LOGIN ===
+
+GET_CLIENT_X509_LOGIN is used for an X.509 based authentication, where the session ID is used as a challenge and has to be signed using a trusted certificate on the client. The parameters to send are 'CHALLENGE' (which is the session ID) and 'SIGNATURE', which is the PKCS#7-signature on the session ID.
+
+=== GET_X509_LOGIN ===
+
+GET_X509_LOGIN is used for client-based X.509 authentication (e.g. on the webserver). The 'LOGIN' parameter (which should be the DN of the used certificate) and the 'CERTIFICATE' parameter (which is the PEM-encoded certificate) should be sent, the user role is determined based on the certificate role stored in the database.
+
+== MAIN_LOOP ==
+
+MAIN_LOOP is the state which is entered after successful authentication, where commands to the server can be sent.
+
+=== STATUS ===
+
+STATUS takes no parameters and returns the role and username of the current session.
+
+=== COMMAND ===
+
+This is probably the most-used service command, which is used to execute API methods on the server (see [[Command]] for which methods are available). Takes a 'COMMAND' parameter to specify which method is to be executed and a 'PARAMS' method which specifies the parameters for the method.
+
+=== LOGOUT ===
+
+Logout takes no parameters, logs the user out and deletes the current session.
+

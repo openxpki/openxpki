@@ -1,0 +1,81 @@
+2008-09-10 12:51:33 Jkunkel (Talk | contribs | block)
+2008-09-09 11:12:35 Jkunkel (Talk | contribs | block)
+
+In this mini HOWTO all '''bold''' words have to be adapted.
+
+== prepare Microsoft AD ==
+
+You need a user with the privilege "schema-admin" and adapt the following file.
+
+
+'''/tmp/ads.ldif'''
+ # ldif for ADS publish crl 
+ # jkunkel 2008
+ # container for the CRL's
+ dn: '''CN=OpenXPKI-CRL,DC=test-ag,DC=test,DC=de'''
+ objectClass: top
+ objectClass: container
+ cn: '''OpenXPKI-CRL'''
+ distinguishedName: '''CN=OpenXPKI-CRL,DC=test-ag,DC=test,DC=de'''
+ instanceType: 4
+ showInAdvancedViewOnly: TRUE
+ name: '''OpenXPKI-CRL'''
+ objectCategory: CN=Container,CN=Schema,CN=Configuration,DC=test-ag,DC=test,DC=de
+ 
+ # example of a CRL object
+ dn: '''CN=Trustcenter1,CN=OpenXPKI-CRL,DC=test-ag,DC=test,DC=de'''
+ objectClass: top
+ objectClass: cRLDistributionPoint
+ cn: Trustcenter1
+ distinguishedName: '''CN=Trustcenter1,CN=OpenXPKI-CRL,DC=test-ag,DC=test,DC=de'''
+ instanceType: 4
+ showInAdvancedViewOnly: TRUE
+ name: '''Trustcenter1'''
+ objectCategory: CN=CRL-Distribution-Point,CN=Schema,CN=Configuration,DC=test-ag,DC=test,DC=de
+
+add '''ldif''' to ADS
+ /$ ldapadd -h '''192.168.90.104'''  -x -D "'''cn=openxpki,cn=Users,dc=test-ag,dc=test,dc=de'''" -W  -f '''/tmp/ads.ldif''' -v -F
+
+Now there is a new container with a CRL-Distribution-Point object. You can add CRL-Distribution-Point objects as mutch as you need. Now I hope you remove the privilege "schema-admin" and switch to overwrite privileges only for the cRLDistributionPoint objects. The easyest way to switch the privileges is to use Microsoft's ''C:\WINDOWS\system32\dsa.msc''.
+
+
+== Configure OpenXPKI ==
+
+
+Now you have to activate LDAP CRL publishing in config.xml
+       <crl_publication>
+         <file>
+             <filename>/etc/openxpki/instances/trustcenter1/ca/testdummyca1/crl.pem</filename>
+             <format>PEM</format>
+         </file>
+         <ldap>
+             <server>'''192.168.90.104'''</server>
+             <port>'''389'''</port>
+             <bind_dn>'''cn=openxpki,cn=Users,dc=test-ag,dc=test,dc=de'''</bind_dn>
+             <pass>'''openxpki'''</pass>
+             <base_dn>'''dc=test-ag,dc=test,dc=de'''</base_dn>
+             <search_dn>'''cn=Trustcenter1,CN=OpenXPKI-CRL,dc=test-ag,dc=test,dc=de'''</search_dn>
+         </ldap>
+       </crl_publication>
+
+Create a  Certificate Revocation Request (CRR) , approve CRR with an other user and other role, revoke the certificate and create a new certificate revocation list (CRL).
+
+Now you can check if everything works fine.
+
+ /$ ldapsearch  -h '''192.168.90.104''' -x -D "'''cn=openxpki,cn=Users,dc=test-ag,dc=test,dc=de'''" -W -b "'''CN=OpenXPKI-CRL,DC=test-ag,DC=test,DC=de'''"
+
+
+
+
+== ADS-FIX for /CRLIssuance/PublishCRL.pm ==
+
+ diff --git a/trunk/perl-modules/core/trunk/OpenXPKI/Server/Workflow/Activity/CRLIssuance/PublishCRL.pm b/trunk/perl-modules/core/trunk/OpenXPKI/Server/Work
+ index 6cf4829..d8ee002 100644
+ --- a/trunk/perl-modules/core/trunk/OpenXPKI/Server/Workflow/Activity/CRLIssuance/PublishCRL.pm
+ +++ b/trunk/perl-modules/core/trunk/OpenXPKI/Server/Workflow/Activity/CRLIssuance/PublishCRL.pm
+ @@ -222,7 +222,7 @@ sub execute {
+          ##! 2: 'ldap->bind() done'
+          $mesg = $ldap->search(base      => $ldap_base_dn,
+ -                              filter    => "($ldap_search_dn)",
+ +                              filter    => "(distinguishedName=$ldap_search_dn)",
+

@@ -1,0 +1,80 @@
+2010-04-16 11:28:53 Mbartosch (Talk | contribs | block)
+2008-09-04 14:27:05 Jkunkel (Talk | contribs | block)
+
+== MySQL integration | '''debian ETCH''' ==
+
+First we have to install the mySQL server.
+ aptitude install mysql-server
+
+Now we have to set a root password.
+ mysqladmin --user=root password freiheit 
+
+Edit the configurationfiles
+
+
+/etc/openxpki/instances/trustcenter1/database.xml
+ <database>
+     <debug>0</debug>
+     <server_id>0</server_id>
+     <server_shift>8</server_shift>
+     <type>MySQL</type>
+     <name>openxpki</name>
+     <host>localhost</host>
+     <port>3306</port>
+     <user>openxpki</user>
+     <passwd>openxpki</passwd>
+     <environment>
+         <vendor>
+             <type>mysql</type>
+         </vendor>
+     </environment>
+ </database>
+/etc/openxpki/instances/trustcenter1/log_database.xml
+ <log_database>
+     <debug>0</debug>
+     <server_id>0</server_id>
+     <server_shift>8</server_shift>
+     <type>MySQL</type>
+     <name>openxpki</name>
+     <host>localhost</host>
+     <port>3306</port>
+     <user>openxpki</user>
+     <passwd>openxpki</passwd>
+     <environment>
+         <vendor>
+             <type>mysql</type>
+         </vendor>
+     </environment>
+ </log_database>
+
+Create a database user, create a database and set the permissions.
+
+ # create database
+ mysqladmin -u root -p create openxpki
+ Enter password: freiheit
+ # create user and set permissions
+ mysql -u root -p
+ Enter password: freiheit
+ mysql> CREATE USER 'openxpki'@'localhost' IDENTIFIED BY 'openxpki';
+ mysql> CREATE DATABASE IF NOT EXISTS `openxpki` ;
+ mysql> GRANT ALL PRIVILEGES ON `openxpki` . * TO 'openxpki'@'localhost';
+ mysql> FLUSH PRIVILEGES;
+ mysql> quit
+ # test database
+ mysql -u openxpki -p openxpki
+ Enter password: openxpki
+ mysql> quit
+
+Now we have a clean DB and need a DB schema.
+ openxpkiadm initdb
+
+With 
+
+openxpkictl [start|stop|restart]
+
+/etc/init.d/openxpkid [start|stop|restart|force-reload]
+
+we can start the OpenXPKI.
+
+'''PLEASE do not forget to import the CA-KEY and the CA-CERT.'''
+
