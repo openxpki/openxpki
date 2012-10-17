@@ -191,7 +191,7 @@ sub __authorize_workflow {
         if ($allowed_creator_re) {
             ##! 16: 'allowed_creator_re: ' . $allowed_creator_re
             # check it against the workflow creator
-            my $wf_creator = $workflow->context()->param('creator');
+            my $wf_creator = $workflow->context()->param('creator') || '';
             ##! 16: 'wf_creator: ' . $wf_creator
             if ($wf_creator !~ qr/$allowed_creator_re/ &&
                 $wf_creator ne $allowed_creator_re) {
@@ -210,7 +210,7 @@ sub __authorize_workflow {
             # the show/hide configuration values
             my $show = $context_filter->{show};
             if (! defined $show) {
-                $show = ''; # paranoid default: do not show anything
+                $show = ''; # will not filter anything! 
             }
             ##! 16: 'show: ' . $show
             

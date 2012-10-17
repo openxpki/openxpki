@@ -2,13 +2,11 @@ Certificate:
     type: ClientX509
     label: Certificate
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
-    # list the roles that you want to allow to login via this handler here
-    allowed_role:
-    - User
-    - RA Operator
-    - CA Operator
-
-#FIXME - clarified syntax, need implementation
+    role: 
+        default: ''
+        handler@: auth.roledb
+        argument: dn
+        
 Signature:
     type: X509
     label: Signature
@@ -19,6 +17,10 @@ Signature:
     cacert:
     - list of cacert identifiers
     challenge_length: 256
+    role: 
+        default: ''
+        handler@: auth.roledb
+        argument: dn
 
 Anonymous:
     type: Anonymous
@@ -32,9 +34,9 @@ User Password:
     # howto generate sha1 passphrases? 
     # echo -n root | openssl sha1 -binary | openssl base64
     user:
-      - name: John Doe
-        digest: "{SSHA}TZXM/aqflDDQAmSWVxSDVWnH+NhxNU5w"
-        role: User
+        John Doe:
+            digest: "{SSHA}TZXM/aqflDDQAmSWVxSDVWnH+NhxNU5w"
+            role: User
 
 Operator Password:
     type: Password

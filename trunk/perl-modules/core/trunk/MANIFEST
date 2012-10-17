@@ -282,6 +282,7 @@ OpenXPKI/Server/Workflow/Condition/AlwaysTrue.pm
 OpenXPKI/Server/Workflow/Condition/Approved.pm
 OpenXPKI/Server/Workflow/Condition/Key.pm
 OpenXPKI/Server/Workflow/Condition/Server.pm
+OpenXPKI/Server/Workflow/Condition/HasRole.pm
 OpenXPKI/Server/Workflow/Condition/CRLSigningCAsLeft.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowChildrenSuccessfullyFinished.pm
 OpenXPKI/Server/Workflow/Condition/InitialEnrollmentOrRenewal.pm

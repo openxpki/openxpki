@@ -159,6 +159,8 @@ sub __load_config_realm_token {
     my @keylist = (qw(backend engine shell wrapper randfile                        
                     engine_section engine_usage key key_store));
 
+    # TODO Fix the inheritance stuff
+
     # The token config uses inheritance 
     # $config_name is set to the instance we are processing            
     my $config_name = $name;  
@@ -186,6 +188,11 @@ sub __load_config_realm_token {
             });
         }                                    
     }               
+
+    # diretory to file conversion for inheritance expansion on keyfiles
+    if (-d $params_of{$ident}->{KEY})  {
+        $params_of{$ident}->{KEY} = File::Spec->catfile( $params_of{$ident}->{KEY}, $name.'.pem' );          
+    }
 
     my $certificate = $arg_ref->{CERTIFICATE};
     $certificate = CTX('api')->get_certificate_for_alias({ALIAS => $name}) unless($certificate);    

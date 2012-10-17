@@ -178,21 +178,20 @@ sub __set_secret_from_cache {
     my $realm = CTX('session')->get_pki_realm();    
 
     my $config = CTX('config');
-    my $cache_config = $config->get_hash("crypto.secret.$group.cache");
+    my $cache_config = $config->get("crypto.secret.$group.cache");
 
     ##! 2: "load cache configuration"
-    if (!$cache_config || ($cache_config->{type} ne "session" and
-        $cache_config->{type} ne "daemon"))
+    if ($cache_config ne "session" and $cache_config ne "daemon")
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_CACHE_TYPE",
                   params  => {
-                      TYPE => $cache_config->{type},
+                      TYPE => $cache_config,
                       GROUP => $group
                   });
     }
     
-    $self->{SECRET}->{$realm}->{$group}->{CACHE} = $cache_config->{type}; 
+    $self->{SECRET}->{$realm}->{$group}->{CACHE} = $cache_config; 
         
     ##! 2: "check for the cache"
     my $secret = "";

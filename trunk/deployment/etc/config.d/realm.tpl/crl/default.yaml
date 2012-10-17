@@ -8,7 +8,7 @@ validity:
     nextupdate: +000014
     
     # how long before next update a new crl should be issued
-    renewal: +0003
+    renewal: +000003
 
     # validity of last crl issued before ca is end of life    
     lastcrl: 20301231235900

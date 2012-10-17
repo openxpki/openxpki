@@ -24,6 +24,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Workflow::Factory;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
+use OpenXPKI::XML::Cache;
 use Data::Dumper;
 
 has '_cache' => (

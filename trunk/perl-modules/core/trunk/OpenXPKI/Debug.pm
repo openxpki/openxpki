@@ -48,7 +48,7 @@ sub import
         use Term::ANSIColor;
     }
     ## only for debugging of this module
-    print STDERR "OpenXPKI::Debug: Checking module $module ...\n";
+    #print STDERR "OpenXPKI::Debug: Checking module $module ...\n";
     #print STDERR Dumper %LEVEL;
 
     ## perhaps a regex was used in the LEVEL spec
