@@ -1,0 +1,25 @@
+RA Operator:
+    create:
+    - I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
+    
+    access:
+        I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE:
+            creator: .*
+
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST:
+            creator: .*
+         
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST:
+            creator: .*
+            
+            
+CA Operator:
+    create:
+    - dummy workflow
+
+    access:
+        dummy workflow:
+            creator: .*
+                        

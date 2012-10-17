@@ -10,11 +10,18 @@ This is a static helper class that collects some common methods
 to interact with the OpenXPKI system.
 
 Parameters common to all methods:
- =item CONFIG 
- filesystem path to the config git repository
+
+=over 
+
+=item CONFIG 
+
+filesystem path to the config git repository
  
- =item SILENT 
- set to 1 to surpress any output
+=item SILENT 
+
+set to 1 to surpress any output
+
+=back 
  
 All methods are static and return 0 on success, 1 on configuration
 errors and 2 on system errors.
@@ -51,6 +58,8 @@ Start the server.
 
 Parameters:
 
+=over
+
 =item PID
 Pid to check for a running server
 
@@ -62,6 +71,8 @@ Weather to restart a running server
 
 =item DEBUG
 single scalar as global debug level or hashref of module => level
+
+=back 
 
 =cut
 
@@ -85,7 +96,6 @@ sub start {
         if ($debug > 0) {
             $OpenXPKI::Debug::LEVEL{'.*'} = $debug;
             $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'}  = 0;
-            $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Config'} = 0;
         }        
     } elsif(ref $debug eq 'HASH') {                
         foreach my $module (keys %{$debug}) {        
@@ -242,7 +252,11 @@ Stop the server
 
 Parameters:
 
+=over 
+
 =item PID or PIDFILE
+
+=back 
 
 =cut
 
@@ -323,9 +337,13 @@ Check if the server is running
 
 Parameters:
 
+=over
+
 =item SLEEP
 
 Wait I<sleep> seconds before testing  
+
+=back 
 
 =cut
 
@@ -370,7 +388,11 @@ Reload the server (forwards the config pointer)
 
 Parameters:
 
+=over 
+
 =item PID or PIDFILE
+
+=back 
 
 =cut
 

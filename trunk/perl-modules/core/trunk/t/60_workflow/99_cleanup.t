@@ -14,7 +14,7 @@ my $socketfile = 't/var/openxpki/openxpki.socket';
 my $pidfile = 't/var/openxpki/openxpkid.pid';
  
 if (-e $pidfile) { 
-    ok(OpenXPKI::Control::stop({ PIDFILE => $pidfile}));
+    ok(!OpenXPKI::Control::stop({ PIDFILE => $pidfile}));
 } else {
     ok(1, 'No pid file - skip server stop');
 } 

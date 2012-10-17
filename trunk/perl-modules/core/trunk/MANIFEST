@@ -170,7 +170,7 @@ OpenXPKI/Server/Authentication.pm
 OpenXPKI/Server/Authentication/Anonymous.pm
 OpenXPKI/Server/Authentication/ClientSSO.pm
 OpenXPKI/Server/Authentication/External.pm
-OpenXPKI/Server/Authentication/LDAP.pm
+#OpenXPKI/Server/Authentication/LDAP.pm
 OpenXPKI/Server/Authentication/Password.pm
 OpenXPKI/Server/Authentication/X509.pm
 OpenXPKI/Server/Authentication/ClientX509.pm
@@ -203,10 +203,6 @@ OpenXPKI/Server/Workflow/Activity/Noop.pm
 # FIXME: Remove for production
 OpenXPKI/Server/Workflow/Activity/WorkflowTest.pm
 
-OpenXPKI/Server/Workflow/Activity/CertIssuance/ImportCertData.pm
-OpenXPKI/Server/Workflow/Activity/CertIssuance/Issue.pm
-OpenXPKI/Server/Workflow/Activity/CertIssuance/GetCertProfile.pm
-OpenXPKI/Server/Workflow/Activity/CertIssuance/PersistCertificate.pm
 OpenXPKI/Server/Workflow/Activity/CertIssuance/PublishCertificate.pm
 
 OpenXPKI/Server/Workflow/Activity/CertRenewal/FetchOrgCertData.pm
@@ -462,9 +458,7 @@ t/25_crypto/canciph_scripts/create_cacert.sh
 t/25_crypto/canciph_scripts/openssl.cnf
 t/25_crypto/common.pl
 t/25_crypto/profile.xml
-t/25_crypto/test.pl
 t/25_crypto/test_profile.xml
-t/25_crypto/token_test.xml
 t/25_crypto/token.xml
 
 t/28_log/01.t
@@ -499,7 +493,6 @@ t/50_auth/10.t2
 t/50_auth/11.t2
 t/50_auth/99_clean.t
 t/50_auth/acl.xml
-t/50_auth/auth_test.xml
 t/50_auth/auth.xml
 t/50_auth/create_certs.pl
 
@@ -597,7 +590,6 @@ t/config.d/system/realms.yaml
 t/config.d/system/server.yaml
 t/config.d/system/watchdog.yaml
 
-t/config_test.xml
 t/config.xml
 t/tests.mk
 

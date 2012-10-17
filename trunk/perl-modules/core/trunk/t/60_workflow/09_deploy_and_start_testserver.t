@@ -31,8 +31,8 @@ use OpenXPKI::Server;
 $ENV{OPENXPKI_CONF_DB} = 't/config.git';
 
 # FIXME - prove becomes defunct - seems to be some issue with stdout/stderr
-#OpenXPKI::Control::start({ SILENT => 0, DEBUG =>  0 });
-ok(!system('OPENXPKI_CONF_DB="t/config.git" perl t/60_workflow/start.pl >/dev/null 2>/dev/null'));
+#ok!(OpenXPKI::Control::start({ SILENT => 0, DEBUG =>  0 }));
+ok(!system('OPENXPKI_CONF_DB="t/config.git" perl t/60_workflow/start.pl 2>/dev/null 1>/dev/null'));
 
 # wait for server startup
 CHECK_SOCKET:
@@ -47,4 +47,4 @@ foreach my $i (1..60) {
 ok(-e $pidfile, "PID file exists");
 ok(-e $socketfile, "Socketfile exists");
 
-ok(OpenXPKI::Control::status({ SOCKETFILE => $socketfile}));
+ok(OpenXPKI::Control::status({ SOCKETFILE => $socketfile, SILENT => 1}) == 0);

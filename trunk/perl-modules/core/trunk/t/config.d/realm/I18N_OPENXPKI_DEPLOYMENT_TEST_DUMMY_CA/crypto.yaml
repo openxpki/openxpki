@@ -36,7 +36,7 @@ token:
   # These are "group" definitons which are automagically expanded for each 
   # key generation  
   test-ca:
-    key: /usr/local/src/tests/trunk/perl-modules/core/trunk/t/25_crypto/test-ca/cakey.pem
+    key: t/25_crypto/test-ca/cakey.pem
     inherit: default # Load all settings from default which are not defined here
   
     
@@ -48,9 +48,5 @@ secret:
     label: Default secret group of this realm
     method: literal
     value: secret
-    cache: 
-      type: daemon
-      usage_count: -1
+    cache: daemon
      
-
-

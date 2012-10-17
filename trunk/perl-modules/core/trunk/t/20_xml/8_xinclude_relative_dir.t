@@ -7,17 +7,17 @@ use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
 }
-require OpenXPKI::XML::Config;
+require OpenXPKI::XML::Cache;
 
 plan tests => 6;
 
 print STDERR "XINCLUDE SUPPORT\n" if $ENV{VERBOSE};
 
 ## create new object
-my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/top3.xml");
+my $obj = OpenXPKI::XML::Cache->new(CONFIG => "t/20_xml/top3.xml");
 
 ok(defined $obj, 'Config object is defined');
-is(ref $obj, 'OpenXPKI::XML::Config', 'Config object has correct type');
+is(ref $obj, 'OpenXPKI::XML::Cache', 'Config object has correct type');
 
 my $msg = qq/name --> config
   name --> content
@@ -29,12 +29,12 @@ my $msg = qq/name --> config
 /;
 is ($obj->dump(''), $msg, 'dump() works correctly');
 
-my $xpath = "config";
-is ($obj->get_xpath (COUNTER => 0, XPATH => $xpath),
+my $xpath = ["config"];
+is ($obj->get_xpath (COUNTER => [0], XPATH => $xpath),
     "before xi", 'get_xpath works correctly _before_ xinclude');
-is ($obj->get_xpath (COUNTER => 1, XPATH => $xpath),
+is ($obj->get_xpath (COUNTER => [1], XPATH => $xpath),
     "after xi", 'get_xpath works correctly _after_ xinclude');
-is ($obj->get_xpath (COUNTER => 2, XPATH => $xpath),
+is ($obj->get_xpath (COUNTER => [2], XPATH => $xpath),
     "testdata", 'get_xpath works correctly _in_ xinclude');
 
 1;

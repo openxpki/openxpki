@@ -17,10 +17,10 @@ my $gitdb = $tpath . '/01-initdb.git';
 my ( $ver1, $ver2, $ver3 );
 
 if ( $tpath eq 't/12_config' ) {
-    $ver3 = '64510ebec38db5581cb2f18001c9307d6595cf08';
+    $ver3 = '6f4174802f28e61ac23274f5adae0f3dcd681573';
 }
 elsif ( $tpath eq '12_config' ) {
-    $ver3 = '3cb0ae44ae1422c9e5b189495ae228191bdd797c';
+    $ver3 = '931c7a4cf2b0454cce67276605551eb47bc62997';
 }
  
 

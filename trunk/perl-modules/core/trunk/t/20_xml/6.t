@@ -8,7 +8,7 @@ use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
 }
-require OpenXPKI::XML::Config;
+require OpenXPKI::XML::Cache;
 
 use Time::HiRes;
 use Data::Dumper;
@@ -17,7 +17,7 @@ use Data::Dumper;
 diag "RELATIVE CONFIGURATION INHERITANCE\n" if $ENV{VERBOSE};
 
 ## create new object
-my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/relative.xml");
+my $obj = OpenXPKI::XML::Cache->new(CONFIG => "t/20_xml/relative.xml");
 ok($obj) or diag "Error: ${EVAL_ERROR}\n";
 
 ## try to discover the ca token of the first realm
@@ -80,7 +80,7 @@ $item = $obj->get_xpath(
 is($item, 'test');
 
 ## create new object
-$obj = OpenXPKI::XML::Config->new(CONFIG => "t/25_crypto/test_profile.xml");
+$obj = OpenXPKI::XML::Cache->new(CONFIG => "t/25_crypto/test_profile.xml");
 ok($obj) or diag "Error: ${EVAL_ERROR}\n";
 
 unlike($obj->dump(), qr/name --> super\n/, 'No mention of super in the dump');
@@ -107,7 +107,7 @@ eval {
 ok ($EVAL_ERROR, 'Super entry did not inherit from caller');
 
 ## create new object
-$obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/test_profile2.xml");
+$obj = OpenXPKI::XML::Cache->new(CONFIG => "t/20_xml/test_profile2.xml");
 ok($obj) or diag "Error: ${EVAL_ERROR}\n";
 
 unlike($obj->dump(), qr/name --> super\n/, 'No mention of super in the dump');
@@ -124,7 +124,7 @@ is ($result, '+01', 'get_xpath returns the correct result (inheritance overwriti
 
 ## create new object
 undef $obj;
-$obj = OpenXPKI::XML::Config->new(CONFIG => 't/20_xml/test_acl.xml');
+$obj = OpenXPKI::XML::Cache->new(CONFIG => 't/20_xml/test_acl.xml');
 ok($obj, 'XML file parsed correctly') or diag "Error: $EVAL_ERROR\n";
 
 eval {

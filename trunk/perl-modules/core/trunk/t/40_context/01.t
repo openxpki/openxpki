@@ -8,8 +8,7 @@ use Data::Dumper;
 use OpenXPKI::Debug;
 if ($ENV{DEBUG}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = 128;
-    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;
-    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Config'} = 0;
+    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;    
 }
 
 require OpenXPKI::Server::Init;

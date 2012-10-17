@@ -24,14 +24,14 @@ my $gitdb = $tpath . '/01-initdb.git';
 my ( $ver1, $ver2, $ver3 );
 
 if ( $tpath eq 't/12_config' ) {
-    $ver1 = '99e79dbe0e2d0560cd5ab3be93e56ecba1b709cc';
-    $ver2 = '179c9b7b30306b44617483a2af6875013796a144';
-    $ver3 = '64510ebec38db5581cb2f18001c9307d6595cf08';
+    $ver1 = 'c1a902266a0cd399f165ad5db95886a2c06c7283';
+    $ver2 = 'ae46bf124020dc5c9e7769c1b43669c5b3d6280b';
+    $ver3 = '6f4174802f28e61ac23274f5adae0f3dcd681573';
 }
 elsif ( $tpath eq '12_config' ) {
-    $ver1 = 'c52317a1beacaaec5b51b90dbf2e0006d5a614ff';
-    $ver2 = 'a489ae574608006e97ba88932523d6b06f1e50b5';
-    $ver3 = '3cb0ae44ae1422c9e5b189495ae228191bdd797c';
+    $ver1 = '38a933ee946889eb8ac3b5e19e34894e463fedd2';
+    $ver2 = '2cae7e512aef64f7618b9ba1ce87d592a179f8a7';
+    $ver3 = '931c7a4cf2b0454cce67276605551eb47bc62997';
 }
  
 

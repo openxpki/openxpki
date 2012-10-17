@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Test::More;
-use OpenXPKI::XML::Config;
+use OpenXPKI::XML::Cache;
 use Time::HiRes;
 
 BEGIN { plan tests => 3 };
@@ -11,7 +11,7 @@ print STDERR "SYNTAX VALIDATION\n" if $ENV{VERBOSE};
 ok(1);
 
 ## create new object
-my $obj = OpenXPKI::XML::Config->new(CONFIG => "t/20_xml/test.xml");
+my $obj = OpenXPKI::XML::Cache->new(CONFIG => "t/20_xml/test.xml");
 
 if ($obj)
 {
@@ -23,8 +23,8 @@ if ($obj)
 
 my $msg = $obj->dump("");
 
-my $xpath = "config";
-my $counter = 0;
+my $xpath = ["config"];
+my $counter = [0];
 my $answer = $obj->get_xpath (COUNTER => $counter, XPATH => $xpath);
 ok ($answer, "Yeah, what a nice testfile!");
 

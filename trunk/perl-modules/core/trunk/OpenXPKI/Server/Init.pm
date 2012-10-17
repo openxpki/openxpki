@@ -20,7 +20,6 @@ use OpenXPKI::i18n qw(set_language set_locale_prefix);
 use OpenXPKI::Exception;
 
 use OpenXPKI::Config;
-use OpenXPKI::XML::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Server;
@@ -257,7 +256,7 @@ sub __do_init_config_versioned {
 # Special init for test cases
 sub __do_init_config_test {
     ##! 1: "init OpenXPKI config"
-    use OpenXPKI::Config::Test;
+    require OpenXPKI::Config::Test;
     my $xml_config = OpenXPKI::Config::Test->new();
     OpenXPKI::Server::Context::setcontext(
     {

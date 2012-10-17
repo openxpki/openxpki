@@ -23,7 +23,7 @@ my $client = OpenXPKI::Client->new({
 ok(login({
     CLIENT   => $client,
     USER     => 'raop',
-    PASSWORD => 'CA Operator',
+    PASSWORD => 'RA Operator',
   }), 'Logged in successfully');
 
 # New workflow instance

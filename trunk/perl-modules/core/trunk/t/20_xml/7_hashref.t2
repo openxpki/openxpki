@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-use OpenXPKI::XML::Config;
+use OpenXPKI::XML::Cache;
 use Data::Dumper;
 
 plan tests => 5;
@@ -12,7 +12,7 @@ diag "get_xpath_hashref\n" if $ENV{VERBOSE};
 ## create new object
 my $obj;
 eval {
-    $obj = OpenXPKI::XML::Config->new(CONFIG => "t/config_test.xml");           
+    $obj = OpenXPKI::XML::Cache->new(CONFIG => "t/config_test.xml");           
 };
 ok(defined $obj, 'Config object defined') or diag "Error: $EVAL_ERROR";
 
