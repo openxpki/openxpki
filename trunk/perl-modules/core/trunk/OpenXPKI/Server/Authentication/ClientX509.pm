@@ -3,7 +3,7 @@
 ## Written in 2007 by Alexander Klink
 ## (C) Copyright 2007 by The OpenXPKI Project
 
-#FIXME-MIG: Need refactoring to resolve role
+#FIXME-MIG: Need testing
 
 package OpenXPKI::Server::Authentication::ClientX509;
 
@@ -33,13 +33,16 @@ sub new {
     my $config = CTX('config');
 
     ##! 2: "load name and description for handler"
-
     $self->{DESC} = $config->get("$path.description");
     $self->{NAME} = $config->get("$path.label");
     
-    ##! 2: "load allowed roles"
-    my @roles  = $config->get_scalar_as_list("$path.allowed_role");    
-    $self->{ROLES} = \@roles;
+    $self->{ROLE} = $config->get("$path.role.default");    
+    $self->{ROLEARG} = $config->get("$path.role.argument");
+    
+    if ($config->get("$path.role.handler")) {        
+        my @path = split /\./, "$path.role.handler";
+        $self->{ROLEHANDLER} = \@path;     
+    }
     
     ##! 2: "finished"
     return $self;
@@ -89,6 +92,10 @@ sub login_step {
             },
         );
     }
+    
+    # FIXME - this makes only sense with known certificates, 
+    # but we might want to use external cas as well
+    
     my $identifier = $x509->get_identifier();
     ##! 16: 'identifier: ' . $identifier
 
@@ -135,24 +142,30 @@ sub login_step {
             },
         );
     }
+          
+            
+    # Assign default role            
+    my $role;    
+    # Ask connector    
+    if ($self->{ROLEHANDLER}) {               
+        if ($self->{ROLEARG} eq "cn") {
+            # FIXME - how to get that fastest?
+        } elsif ($self->{ROLEARG} eq "subject") {    
+            $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509->{PARSED}->{BODY}->{SUBJECT} ]);                    
+        } elsif ($self->{ROLEARG} eq "serial") {
+            $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509->{PARSED}->{BODY}->{SERIAL} ]);            
+        }
+    }    
+      
+    $role = $self->{ROLE} unless($role);
 
-    my $role = $cert_info->{ROLE};
     ##! 16: 'role: ' . $role
-    if (! grep {$_ eq $role} @{ $self->{ROLES} }) {
-        ##! 16: 'certificate role is not acceptable'
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
-            params  => {
-                USER => $username,
-            },
-        );
+    if (!defined $role) {
+        ##! 16: 'no certificate role found'
+        return (undef, undef, {}); 
     }
-    $self->{ROLE} = $role;
-    $self->{USER} = $username;
-
-    return (
-        $self->{USER},
-        $self->{ROLE},
+    
+    return ( $username, $role,
         {
             SERVICE_MSG => 'SERVICE_READY',
         },
@@ -187,3 +200,34 @@ the +ExportCertData SSLOption is set.
 The certificate is checked for validity at login, the certificate
 role is read from the database and compared to the list of acceptable
 roles from the configuration.
+
+
+=head1 configuration
+    
+Signature:
+    type: ClientX509
+    label: External X509
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
+    role:             
+        handler: @auth.roledb
+        argument: dn
+        default: ''
+
+=head2 parameters
+
+=over
+
+=item role.handler
+
+A connector that returns a role for a give user 
+
+=item role.argument
+
+Argument to use with hander to query for a role. Supported values are I<cn> (common name), I<subject>, I<serial>
+
+=item role.default
+
+The default role to assign to a user if no result is found using the handler.
+If you do not specify a handler but a default role, you get a static role assignment for any matching certificate.  
+
+=back

@@ -32,24 +32,24 @@ User Password:
     # howto generate sha1 passphrases? 
     # echo -n root | openssl sha1 -binary | openssl base64
     user:
-      - name: John Doe
-        digest: "{SHA}yUetMg5m/GSZjoalXA2iEMjB2Bo="
-        role: User
-      - name: Foo
-        digest: "{SMD5}vVc3uduHQQ6RTzYhGYsguw=="
-        role: User
+        John Doe:
+            digest: "{SHA}yUetMg5m/GSZjoalXA2iEMjB2Bo="
+            role: User
+        Foo:
+            digest: "{SMD5}vVc3uduHQQ6RTzYhGYsguw=="
+            role: User
 
 Operator Password:
     type: Password
     label: Operator Password
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
     user:
-      - name: root
-        digest: "{SSHA}dBJOqe34FoFHlldtTYG9tG4H/utneFJY"
-        role: CA Operator
-      - name: raop
-        digest: "{SSHA}ejZpY22dFwjVI48z14y2jYuToPRjOXRP"
-        role: RA Operator
+        root:
+            digest: "{SSHA}dBJOqe34FoFHlldtTYG9tG4H/utneFJY"
+            role: CA Operator
+        raop:
+            digest: "{SSHA}ejZpY22dFwjVI48z14y2jYuToPRjOXRP"
+            role: RA Operator
         
 External Dynamic Role:
     type: External

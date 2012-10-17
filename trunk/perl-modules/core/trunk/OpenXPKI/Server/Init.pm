@@ -407,9 +407,7 @@ sub __do_init_api {
 
 sub __do_init_authentication {
     ### init authentication...
-    my $obj = OpenXPKI::Server::Authentication->new({
-        CONFIG_ID => 'default',
-    });
+    my $obj = OpenXPKI::Server::Authentication->new();
     if (! defined $obj) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_INSTANTIATION_FAILURE");

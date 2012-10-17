@@ -371,6 +371,8 @@ sub sig_hup {
     ##! 8: 'forward head'
     CTX('config')->update_head();
 
+    # FIXME - reload authentication handlers (cached!)
+
     ##! 8: 'watchdog'
     ##! 16: 'watchdog pids ' . Dumper CTX('watchdog')->children();
     CTX('watchdog')->reload();

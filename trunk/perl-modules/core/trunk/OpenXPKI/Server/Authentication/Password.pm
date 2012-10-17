@@ -4,7 +4,8 @@
 ## Updated to use new Service::Default semantics 2007 by Alexander Klink
 ## Updated to support seeded SHA1 and RFC 2307 password notatation 
 ##   2007 by Martin Bartosch
-## (C) Copyright 2006, 2007 by The OpenXPKI Project
+# Refactored for connector syntax 2012 by Oliver Welter
+## (C) Copyright 2006 to 2012 by The OpenXPKI Project
 
 package OpenXPKI::Server::Authentication::Password;
 
@@ -34,64 +35,11 @@ sub new {
 
     ##! 2: "load name and description for handler"
 
+    my @path = split /\./, $path;
+    push @path, 'user';    
+    $self->{PREFIX} = \@path;
     $self->{DESC} = $config->get("$path.description");
     $self->{NAME} = $config->get("$path.label"); 
-
-    ## load user database
-
-    my $count = $config->get_size("$path.user");
-    for (my $i=0; $i<$count; $i++)
-    {
-        
-        my $user = $config->get_hash("$path.user.$i");    
-        my $name = $user->{name};   
-        my $encrypted = $user->{digest};
-
-    	my $scheme;
-    	 
-    	# digest specified in RFC 2307 userPassword notation?
-    	if ($encrypted =~ m{ \{ (\w+) \} (.*) }xms) {
-    	    ##! 8: "database uses RFC2307 password syntax"
-    	    $scheme = lc($1);
-    	    $encrypted = $2;
-    	}
-    
-    	if (! defined $scheme) {
-    	    OpenXPKI::Exception->throw (
-    		message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_MISSING_SCHEME_SPECIFICATION",
-    		params  => {
-    		    USER => $user->{name}, 
-    		},
-    		log => {
-    		    logger => CTX('log'),
-    		    priority => 'error',
-    		    facility => 'system',
-    		},
-    		)
-    	}
-
-        $self->{DATABASE}->{$name}->{ENCRYPTED} = $encrypted;
-        $self->{DATABASE}->{$name}->{SCHEME}    = $scheme;
-        $self->{DATABASE}->{$name}->{ROLE}      = $user->{role};
-        ##! 4: "scanned user ... "
-        ##! 4: "    (name, encrypted, scheme, role) => "
-        ##! 4: "    ($name, $encrypted, $scheme, $role)"
-
-        if ($scheme !~ /^(sha1|sha|ssha|md5|smd5|crypt)$/)
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_UNSUPPORTED_SCHEME",
-                params  => {
-        		USER => $name, 
-		        SCHEME => $scheme,
-    	       	},
-    		    log => {
-    		      logger => CTX('log'),
-    		      priority => 'error',
-    		      facility => 'system',
-		    });
-        }
-    }
 
     return $self;
 }
@@ -117,27 +65,68 @@ sub login_step {
             },
         );
     }
-    else {
-        ##! 2: 'login data received'
-        my $account = $msg->{PARAMS}->{LOGIN};
-        my $passwd  = $msg->{PARAMS}->{PASSWD};
-
-        ##! 2: "account ... $account"
-
-        ## check account
-
-        if (! exists $self->{DATABASE}->{$account}) {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
-                params  => {
-		    USER => $account,
-		},
-		);
-        }
-        my $encrypted = $self->{DATABASE}->{$account}->{ENCRYPTED};
-        my $scheme    = $self->{DATABASE}->{$account}->{SCHEME};
-        my $role      = $self->{DATABASE}->{$account}->{ROLE};
     
+    
+    ##! 2: 'login data received'
+    my $account = $msg->{PARAMS}->{LOGIN};
+    my $passwd  = $msg->{PARAMS}->{PASSWD};
+
+    ##! 2: "account ... $account"
+
+    ## check account - the handler config has a connector at .user 
+    # that returns password and role for a requested username
+
+    my $user_info = CTX('config')->get_hash( [ $self->{PREFIX}, $account ] );
+   
+    if (!$user_info) {
+        ##! 4: "No such user: $account"
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
+            params  => {
+              USER => $account,
+            },
+        );
+    }
+   
+   
+    my $encrypted;
+    my $scheme;
+    
+    # digest specified in RFC 2307 userPassword notation?
+    if ($user_info->{digest} =~ m{ \{ (\w+) \} (.*) }xms) {
+        ##! 8: "database uses RFC2307 password syntax"
+        $scheme = lc($1);
+        $encrypted = $2;
+    }
+
+    if (! defined $scheme) {
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_MISSING_SCHEME_SPECIFICATION",
+        params  => {
+            USER => $account, 
+        },
+        log => {
+            logger => CTX('log'),
+            priority => 'error',
+            facility => 'system',
+        },
+        )
+    }
+ 
+    if ($scheme !~ /^(sha1|sha|ssha|md5|smd5|crypt)$/) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_UNSUPPORTED_SCHEME",
+            params  => {
+                USER => $name, 
+                SCHEME => $scheme,
+            },
+            log => {
+                logger => CTX('log'),
+                priority => 'error',
+                facility => 'system',
+        });
+    }
+      
 	my $computed_secret;
 	if ($scheme eq 'sha') {
  	    my $ctx = Digest::SHA1->new();
@@ -167,36 +156,36 @@ sub login_step {
 	    $computed_secret = crypt($passwd, $encrypted);
 	}
 
-        if (! defined $computed_secret) {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_UNSUPPORTED_SCHEME",
-                params  => {
-		    USER => $account,
-		},
+    if (! defined $computed_secret) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_UNSUPPORTED_SCHEME",
+            params  => {
+		      USER => $account,
+            },
 		);
-        }
+    }
 
-        ##! 2: "ident user ::= $account and digest ::= $computed_secret"
+    ##! 2: "ident user ::= $account and digest ::= $computed_secret"
 	$computed_secret =~ s{ =+ \z }{}xms;
 	$encrypted       =~ s{ =+ \z }{}xms;
     
-        ## compare passphrases
-        if ($computed_secret ne $encrypted) {
-            ##! 4: "mismatch with digest in database ($encrypted)"
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
-                params  => {
-		    USER => $account,
-		},
+    ## compare passphrases
+    if ($computed_secret ne $encrypted) {
+        ##! 4: "mismatch with digest in database ($encrypted)"
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
+            params  => {
+		      USER => $account,
+            },
 		);
-        }
-        else { # hash is fine, return user, role, service ready message
-            return ($account, $role,
-                {
-                    SERVICE_MSG => 'SERVICE_READY',
-                },
-            ); 
-        } 
+    }
+    else { # hash is fine, return user, role, service ready message    
+        return ($account, $user_info->{role},
+            {
+                SERVICE_MSG => 'SERVICE_READY',
+            },
+        ); 
+      
     }
     return (undef, undef, {});
 }

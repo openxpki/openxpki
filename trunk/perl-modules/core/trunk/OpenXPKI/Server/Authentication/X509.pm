@@ -34,6 +34,15 @@ sub new {
     $self->{DESC} = $config->get("$path.description");
     $self->{NAME} = $config->get("$path.label"); 
     $self->{CHALLENGE_LENGTH} = $config->get("$path.challenge_length");
+    
+    $self->{ROLE} = $config->get("$path.role.default");    
+    $self->{ROLEARG} = $config->get("$path.role.argument");
+    
+    if ($config->get("$path.role.handler")) {        
+        my @path = split /\./, "$path.role.handler";
+        $self->{ROLEHANDLER} = \@path;     
+    }
+    
 
     my @trusted_realms = $config->get_scalar_as_list("$path.realm");
     my @trusted_certs = $config->get_scalar_as_list("$path.cacert");
@@ -175,10 +184,12 @@ sub login_step {
         });
         ##! 64: 'signer_chain: ' . Dumper \@signer_chain
 
-        my $sig_identifier = OpenXPKI::Crypto::X509->new(
+        my $x509_signer = OpenXPKI::Crypto::X509->new(
             TOKEN => $default_token,
             DATA  => $signer_chain[0],
-        )->get_identifier();
+        );
+        my $sig_identifier = $x509_signer->get_identifier();
+                
         if (! defined $sig_identifier || $sig_identifier eq '') {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CERTIFICATE_IDENTIFIER',
@@ -238,12 +249,29 @@ sub login_step {
             );
         } 
         my $user = $signer_subject;
-        my $role = $cert_db->{ROLE};
-        if (! defined $role) {
-            # if the role is not defined in the certificate database,
-            # we just set it to '' (Anonymous)
-            $role = '';
+            
+        # Assign default role            
+        my $role;    
+        # Ask connector    
+        if ($self->{ROLEHANDLER}) {               
+            if ($self->{ROLEARG} eq "cn") {
+                # FIXME - how to get that fastest?
+            } elsif ($self->{ROLEARG} eq "subject") {    
+                $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509_signer->{PARSED}->{BODY}->{SUBJECT} ]);                    
+            } elsif ($self->{ROLEARG} eq "serial") {
+                $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509_signer->{PARSED}->{BODY}->{SERIAL} ]);            
+            }
+        }    
+        
+        $role = $self->{ROLE} unless($role);
+        
+        ##! 16: 'role: ' . $role
+        if (!defined $role) {
+            ##! 16: 'no certificate role found'
+            return (undef, undef, {}); 
         }
+              
+
         return ($user, $role,
             {
                 SERVICE_MSG => 'SERVICE_READY',
@@ -271,12 +299,56 @@ authentication method. The parameters are passed as a hash reference.
 
 is the constructor. It requires the config prefix as single argument.
 This is the minimum parameter set for any authentication class.
-The parameters which are taken from the configuration are trust_anchors
-and pkcs7tool, which works in the same way as in the approval signature
-case. Furthermore, the challenge_length is taken to define the length
-(in bytes) of the random challenge that is being created.
 
 =head2 login_step
 
 returns a pair of (user, role, response_message) for a given login
 step. If user and role are undefined, the login is not yet finished.
+
+=head1 configuration
+    
+Signature:
+    type: X509
+    label: Signature
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
+    challenge_length: 256
+    role:             
+        handler: @auth.roledb
+        argument: dn
+        default: ''
+    # trust anchors
+    realm:
+    - my_client_auth_realm
+    cacert:
+    - cert_identifier of external ca cert
+
+=head2 parameters
+
+=over
+
+=item challenge_length
+
+Length of the random challenge in bytes
+
+=item role.handler
+
+A connector that returns a role for a give user 
+
+=item role.argument
+
+Argument to use with hander to query for a role. Supported values are I<cn> (common name), I<subject>, I<serial>
+
+=item role.default
+
+The default role to assign to a user if no result is found using the handler.
+If you do not specify a handler but a default role, you get a static role assignment for any matching certificate.  
+
+=item cacert
+
+A list of certificate identifiers to be used as trust anchors
+
+=item realm
+
+A list of realm names to be used as trust anchors (this loads all ca certificates from the given realm into the list of trusted ca certs).
+
+=back
