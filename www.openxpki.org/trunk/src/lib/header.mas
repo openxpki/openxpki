@@ -1,5 +1,0 @@
-<a href="<& /lib/url.mas, path => '/' &>">
-  <img src="<& /lib/url.mas, 
-             path => '/images/openxpki_logo.png' &>"
-     alt="OpenXPKI Project"/>
-</a>
