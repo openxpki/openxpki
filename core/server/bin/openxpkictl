@@ -96,8 +96,7 @@ if ($cmd eq 'status') {
             }
         }
     }
-        
-    print "Goin to start now....\n";    
+              
     exit OpenXPKI::Control::start( $args );
 
 } elsif ($cmd eq 'stop') {

@@ -46,7 +46,7 @@
     <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
 	    resulting_state="APPROVAL">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_APPROVE"/>
-      <condition name="!workflow_creator"/>
+      <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/>
     </action>
     <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
 	    resulting_state="PENDING">

@@ -16,12 +16,9 @@
 # some packages have build dependencies
 PACKAGES=			\
 	core			\
-	perl-client-api		\
-	deployment		\
-	mason-html-client	\
-	scep-client		\
-	i18n \
-	qatest
+	i18n 			\
+	mason-html-client	
+	
 
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 
@@ -40,8 +37,8 @@ EXTERNAL=				\
 	XML__Filter__XInclude 
 
 EXTERNAL2= \
-	Workflow
-
+	Workflow \
+	Connector
 
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) DateTime__Format__DateParse
 
@@ -62,15 +59,15 @@ $(EXTERNAL) $(EXTERNAL2):
 	test -d deb/cpan || mkdir deb/cpan/
 	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
 
-# Development Build - load git://github.com/mrscotty/connector.git into deb/cpan/Connector
-Connector:
-	cd deb/cpan/ && DEB_BUILD_OPTIONS=nocheck dh-make-perl --desc Connector --version dev-`date +%Y%m%d`  --build Connector/
 
-#WORKFLOW:
-#	cd deb/cpan/ && rm -rf Workflow-0.31*
-#	cd deb/cpan/ && wget http://search.cpan.org/CPAN/authors/id/J/JO/JONASBN/Workflow-0.31.tar.gz
-#	cd deb/cpan/ && tar -xzf Workflow-0.31.tar.gz
-#	cd deb/cpan/ && dh-make-perl --build Workflow-0.31/
+# Development Builds from git repos
+Connector:
+	test -d deb/cpan/Connector || git clone git://github.com/oliwel/connector.git  deb/cpan/Connector
+	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --desc Connector --version dev-`date +%Y%m%d`  --build Connector/
+
+Workflow:
+	test -d deb/cpan/perl-workflow || git clone -b tag/1.99 git://github.com/oliwel/perl-workflow deb/cpan/perl-workflow
+	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl  --version dev-1.99 --build perl-workflow/
 
 DateTime__Format__DateParse:
 	test -d deb || mkdir deb

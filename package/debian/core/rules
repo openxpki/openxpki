@@ -21,7 +21,7 @@ binary-indep: binary-indep-stamp
 binary-indep-stamp: arrange
 	dh_testdir
 	dh_testroot
-	dh_installdocs
+	dh_installdocs	
 	dh_installexamples
 	dh_installchangelogs
 	dh_compress
@@ -57,9 +57,11 @@ config-stamp:
 install: install-stamp
 install-stamp: build
 	dh_testdir
+	dh_install
 	dh_installdirs
 	$(MAKE) install PREFIX=$(CURDIR)/debian/libopenxpki-perl/usr
 	dh_makeshlibs
+	dh_installinit --no-start --no-restart-on-upgrade --noscripts --name=openxpkid 
 	touch install-stamp
 
 .PHONY: arrange binary binary-arch binary-indep build clean config install

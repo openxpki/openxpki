@@ -26,9 +26,27 @@ set -e
 case "$1" in
     configure)
 	set +e
-        invoke-rc.d --quiet openxpkid restart
-        if [ $? -gt 0 -a $? -eq 100 ]; then exit $?; fi
+	    # TODO - check for a running daemon
+        #invoke-rc.d --quiet openxpkid restart
+        #if [ $? -gt 0 -a $? -eq 100 ]; then exit $?; fi
 	set -e
+	
+	   # Fix directory permissions
+	   chown -R openxpki:openxpki /var/openxpki
+	   chown -R openxpki:root /etc/openxpki/ssl/
+	   chmod -R 750 /etc/openxpki/ssl/
+	   
+	   # log config
+	   test -e /etc/openxpki/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/log.conf /etc/openxpki/ 
+	   
+	   # No config - load sample config       
+	   if [ ! -e /etc/openxpki/config.d/ ]; then
+	       mkdir -m 750 /etc/openxpki/config.d	             
+	       tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/basic.tgz -C /etc/openxpki/config.d/ 
+	       chown -R openxpki:root /etc/openxpki/config.d/
+	       openxpkiadm loadcfg 2>/dev/null
+	   fi	   
+	
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

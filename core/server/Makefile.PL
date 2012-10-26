@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 use File::Spec;
 
-my $vergen = '../../../../tools/vergen';
+my $vergen = '../../tools/vergen';
 
 ###########################################################################
 # determine OpenSSL version
@@ -363,5 +363,6 @@ WriteMakefile(
                               't/28_log/openxpki.log',
                               't/cfg.binary.openssl']},
     'XSPROTOARG' => '-noprototypes',
+    'EXE_FILES' => [ 'bin/openxpkictl','bin/openxpkicmd', 'bin/openxpkiadm'],    
     %flags,
 );

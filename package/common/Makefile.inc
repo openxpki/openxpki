@@ -9,7 +9,7 @@
 
 # NOTE: a Makefile including this snippet MUST set the variable TOPDIR
 # correctly, such as:
-# TOPDIR := ../../..
+# TOPDIR := ../..
 
 ifndef TOPDIR
 $(error Makefile must set TOPDIR must be set to the top level directory of the repository (using relative notation))
@@ -21,7 +21,7 @@ PERL   := $(shell which perl)
 # test if vergen is found and executable
 ifneq (EXISTS, $(shell test -x $(VERGEN) && echo "EXISTS"))
 $(error Command 'vergen' not found at $(VERGEN). Hint: does TOPDIR really point to the top of this repository?)
-endif 
+endif
 
 # all vergen symbols in tpage(1) compatible format
 TT_VERSION_SYMBOLS = $(shell \
@@ -64,7 +64,7 @@ TT_VERSION_SYMBOLS = $(shell \
 #   - contains the Subversion revision of the checkout
 # SVN_LAST_CHANGED_REVISION
 #   - Subversion last changed revision
-# 
+#
 # MAJOR
 #   - Major product version (administratively set)
 # MINOR
@@ -87,7 +87,7 @@ TT_VERSION_SYMBOLS = $(shell \
 #
 # In calling Makefiles you can set TT_EXTRA_SYMBOLS to set additional
 # template variables.
-# 
+#
 %:: %.template
 	cat $< | tpage $(TT_VERSION_SYMBOLS) $(TT_EXTRA_SYMBOLS) >$@
 

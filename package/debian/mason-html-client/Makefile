@@ -1,8 +1,8 @@
 # trunk/package/debian/mason-html-client
 
-TOPDIR=../../../..
+TOPDIR=../../..
 PERLNAME=OpenXPKI-Client-HTML-Mason
-SRCBASE=$(TOPDIR)/trunk/clients/perl/$(PERLNAME)
+SRCBASE=$(TOPDIR)/clients/perl/$(PERLNAME)
 PACKAGE=libopenxpki-client-html-mason-perl
 PKGDIR=../deb/client
 

@@ -1,13 +1,18 @@
-This package was debianized by Michael Bell <michael.bell@web.de> on
-Mon, 24 Apr 2006 11:21:23 +0200.
+This package was debianized by OpenXPKI Team <debian@openxpki.org>
 
-It was downloaded from svn at http://www.openxpki.org/
+It was downloaded from https://github.com/openxpki/openxpki/
 
 Upstream Authors: 
 Martin Bartosch
 Michael Bell
 Dmitry Belyavsky
 Julia Dubenskaya
+Scott Hardin
+Alexander Klink
+Arkadius Litwinczuk
+Andreas Leibl
+Sergei Vyshenski
+Oliver Welter
 (list copied from CREDITS file)
 
 Copyright:

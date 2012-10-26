@@ -1,11 +1,10 @@
 # trunk/package/debian/i18n
 
-TOPDIR=../../../..
-SRCBASE=$(TOPDIR)/trunk/i18n
-OPENXPKI_SVN=../../../..
+TOPDIR=../../..
+SRCBASE=$(TOPDIR)/core/i18n
 PERLNAME=OpenXPKI
 PACKAGE=openxpki-i18n
-PKGDIR=../deb/client
+PKGDIR=../deb/core
 
 # Makefile.inc contains common settings for all packages (checked in)
 include ../Makefile.inc

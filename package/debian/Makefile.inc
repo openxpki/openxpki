@@ -14,8 +14,8 @@
 #
 # Here's an example:
 #
-#   TOPDIR=../../../..
-#   SRCBASE=$(TOPDIR)/trunk/perl-modules/core/trunk
+#   TOPDIR=../..
+#   SRCBASE=$(TOPDIR)/core/server
 #   PACKAGE=libopenxpki-perl
 #   PERLNAME=OpenXPKI
 #   PKGDIR=../deb/core
@@ -27,7 +27,7 @@
 
 
 # common includes for package builds
-include $(TOPDIR)/trunk/package/common/Makefile.inc
+include $(TOPDIR)/package/common/Makefile.inc
 
 ifdef PREFIX
 PERL_MAKEPL_ARGS="PREFIX=$(PREFIX)"
@@ -57,8 +57,11 @@ default:
 	make openxpki-archive
 	make debian-archive
 	make source
+ifdef EXAMPLE
+	make examples
+endif
 	make package
-	make source-clean
+#make source-clean
 
 openxpki-archive:
 	cd $(SRCBASE); \
@@ -92,7 +95,7 @@ changelog::
 	echo >> changelog
 	echo "  * Daily build." >> changelog
 	echo >> changelog
-	echo " -- Scott T Hardin <scotty@hnsc.de> " `date --rfc-2822` >> changelog
+	echo " -- OpenXPKI Foundation <debian@openxpki.org> " `date --rfc-2822` >> changelog
 
 source-clean:
 	rm -rf /tmp/$(PERLNAME)-*
@@ -100,6 +103,7 @@ source-clean:
 
 clean:	source-clean
 	if [ -e changelog.org ]; then mv changelog.org changelog; fi
+	if [ -d ../examples ]; then rm -rf ../examples; fi
 	rm -f *.dsc *.dsc.asc *.tar.gz $(PKGDIR)/$(PACKAGE)_* *.changes
 
 distclean: clean

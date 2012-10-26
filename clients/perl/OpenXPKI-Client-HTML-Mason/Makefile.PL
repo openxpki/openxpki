@@ -3,7 +3,7 @@ use warnings;
 use English;
 use ExtUtils::MakeMaker;
 
-my $vergen = '../../../../tools/vergen';
+my $vergen = '../../../tools/vergen';
 my $version;
 
 if ( -e($vergen) ) {

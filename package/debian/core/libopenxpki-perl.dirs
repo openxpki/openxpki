@@ -1,0 +1,4 @@
+var/openxpki
+var/openxpki/session 
+etc/openxpki
+etc/openxpki/ssl/ca-one

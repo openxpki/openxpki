@@ -9,11 +9,8 @@
 # Description:       Controls the OpenXPKI backend daemon
 ### END INIT INFO
 
-# Author:	Scott T. Hardin <scott.hardin@hnsc.de>.
+# Author:	OpenXPKI Foundation <debian@openxpki.org>.
 #
-# Please remove the "Author" lines above and replace them
-# with your own name if you copy and modify this script.
-
 # Do NOT "set -e"
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
@@ -31,10 +28,10 @@ SCRIPTNAME=/etc/init.d/openxpkid
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
 # Load the VERBOSE setting and other rcS variables
-[ -f /etc/default/rcS ] && . /etc/default/rcS
+. /lib/init/vars.sh
 
 # Define LSB log_* functions.
-# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+# Depend on lsb-base (>= 3.2-14) to ensure that this file is present.
 . /lib/lsb/init-functions
 
 #
@@ -156,7 +153,7 @@ case "$1" in
 	;;
   *)
 	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
-	echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
 	exit 3
 	;;
 esac
