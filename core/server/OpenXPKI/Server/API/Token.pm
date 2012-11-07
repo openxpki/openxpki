@@ -307,4 +307,103 @@ sub list_active_aliases {
     
 }
 
+=head2 get_ca_list( {REALM} )
+
+List all items in the certsign group of the requested REALM.
+REALM is optional and defaults to the session realm.
+Each entry of the list is a hashref holding the full alias name (ALIAS), 
+the certificate identifier (IDENTIFIER), the notbefore/notafter date, 
+the subject and the verbose status of the token. The status is returned as 
+I18 token I18N_OPENXPKI_TOKEN_STATUS_xxx, where xx is out of 
+EXPIRED, ONLINE, OFFLINE OR UNKNOWN.
+
+The list is sorted by notbefore date, starting with the newest date. 
+
+=cut 
+
+sub get_ca_list {
+    ##! 1: "start"
+        
+    my $self = shift;
+    my $keys = shift;
+    
+    my $pki_realm = $keys->{REALM};
+    $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
+
+    ##! 32: "Lookup group name for certsign"
+    my $group = CTX('config')->get("realm.$pki_realm.crypto.type.certsign");
+             
+    my $db_results = CTX('dbi_backend')->select(
+        TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
+        COLUMNS => [             
+            'CERTIFICATE.NOTBEFORE',            
+            'CERTIFICATE.NOTAFTER',
+            'CERTIFICATE.DATA',
+            'CERTIFICATE.SUBJECT',
+            'ALIASES.ALIAS',              
+            'ALIASES.IDENTIFIER',
+        ],
+        JOIN => [
+            [ 'IDENTIFIER', 'IDENTIFIER' ],
+        ],
+        DYNAMIC => {
+            'ALIASES.PKI_REALM' => $pki_realm,
+            'ALIASES.GROUP_ID' => $group,                                           
+        },
+        'ORDER' => [ 'CERTIFICATE.NOTBEFORE' ],
+        'REVERSE' => 1,
+    );
+    
+    my @token;
+    foreach my $entry (@{ $db_results }) {
+        
+        my $item = {
+            ALIAS => $entry->{'ALIASES.ALIAS'}, 
+            IDENTIFIER => $entry->{'ALIASES.IDENTIFIER'},
+            SUBJECT => $entry->{'CERTIFICATE.SUBJECT'},
+            NOTBEFORE => $entry->{'CERTIFICATE.NOTBEFORE'},            
+            NOTAFTER => $entry->{'CERTIFICATE.NOTAFTER'},
+            STATUS => 'I18N_OPENXPKI_TOKEN_STATUS_UNKNOWN'
+        };
+        
+        # Check if the token is still valid - dates are already unix timestamps        
+        my $now = time();
+        if ($entry->{'CERTIFICATE.NOTBEFORE'} > $now || $entry->{'CERTIFICATE.NOTAFTER'} < $now) {
+            $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_EXPIRED';     
+        } else {            
+            # Check if the key is usable
+            my $token;
+            eval {
+                $token = CTX('crypto_layer')->get_token({ 
+                    TYPE => 'certsign', 
+                    'NAME' => $entry->{'ALIASES.ALIAS'}, 
+                    'CERTIFICATE' => {
+                        DATA => $entry->{'CERTIFICATE.DATA'},
+                        IDENTIFIER => $entry->{'CERTIFICATE.IDENTIFIER'}, 
+                    } 
+                } );
+                if ($token->key_usable()) {
+                    $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_ONLINE';
+                } else {
+                    $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_OFFLINE';
+                }
+            };   
+            if ($EVAL_ERROR) {
+                                
+                CTX('log')->log(
+                    MESSAGE  => 'I18N_OPENXPKI_API_TOKEN_GET_CA_LIST_TOKEN_STATUS_EVAL_ERROR',
+                    PRIORITY => "error",
+                    FACILITY => "system",
+                );    
+            }         
+        }        
+        push @token, $item; 
+    }
+    ##! 32: "Found tokens " . Dumper @token
+    
+    ##! 1: 'Finished'
+    return \@token;
+}
+
+
 1;

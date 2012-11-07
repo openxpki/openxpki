@@ -1,6 +1,6 @@
 <%args>
-  $ca_id        => undef
-  $filename     => undef
+  $serial        => undef
+  $filename      => undef    
   $format       => "PEM"
   $content_type => undef
 </%args>
@@ -36,12 +36,23 @@
   ## now request the certificate from the server
   my $msg  = $context->{client}->send_receive_command_msg (
                   "get_crl",
-                  {'CA_ID'    => $ca_id,
-                   'FILENAME' => $filename,
+                  {'SERIAL'    => $serial,                   
                    'FORMAT'   => $format});
   my $item = $msg->{PARAMS};
+  
+  # If filename is given, sanitize it
+  if ($filename) {
+    $filename =~ s/[^A-Za-z0-9\s_-]//g;
+  }
+  
+  # If no filename is given, get the name of the realm as filename
+  # FIXME - I guess that info is already somewhere in the session but I can find how to access it....
+  if (!$filename) {
+     $msg = $context->{client}->send_receive_command_msg ('get_pki_realm');
+     $filename = $msg->{PARAMS};     
+  }
 
-  my $download_filename = $ca_id . '.' . $extension;
+  my $download_filename = $filename . '.' . $extension;
   ## now send the stuff
   eval {
     $r->header_out('Content-Disposition' => ("attachment; filename=$download_filename")); 

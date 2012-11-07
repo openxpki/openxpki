@@ -62,7 +62,7 @@ sub BUILD {
     my $re_filename_string   = qr{ \A [A-Za-z0-9\+/=_\-\.]* \z }xms;
     my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
     my $re_cert_format       = qr{ \A (PEM|DER|TXT|PKCS7) \z }xms;
-    my $re_crl_format        = qr{ \A (PEM|DER|TXT|HASH) \z }xms;
+    my $re_crl_format        = qr{ \A (PEM|DER|TXT|HASH|RAW) \z }xms;
     my $re_privkey_format    = qr{ \A (PKCS8_PEM|PKCS8_DER|OPENSSL_PRIVKEY|PKCS12|JAVA_KEYSTORE) \z }xms;
     # TODO - consider opening up re_sql_string even more, currently this means
     # that we can not search for unicode characters in certificate subjects,
@@ -282,7 +282,7 @@ sub BUILD {
             },
         },
         'get_ca_list' => {
-            class  => 'Object',
+            class  => 'Token',
             params => { },
         },
         'get_ca_cert' => {
@@ -342,9 +342,9 @@ sub BUILD {
         'get_crl' => {
             class  => 'Object',
             params => {
-                CA_ID => {
+                SERIAL => {
                     type     => SCALAR,
-                    regex    => $re_base64_string,
+                    regex    => $re_integer_string,
                 },
                 FILENAME => {
                     type     => SCALAR,
@@ -352,6 +352,31 @@ sub BUILD {
                     regex    => $re_filename_string,
                 },
                 FORMAT => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_crl_format,
+                },
+                PKI_REALM => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+            },
+        },
+        'get_crl_list' => {
+            class  => 'Object',
+            params => {
+                'ISSUER' => {
+                    type     => SCALAR,
+                    regex    => $re_base64_string,
+                    optional => 1,
+                },                              
+                'PKI_REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                'FORMAT' => {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_crl_format,

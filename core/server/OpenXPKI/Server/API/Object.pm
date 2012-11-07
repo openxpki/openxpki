@@ -3,6 +3,23 @@
 ## Written 2005 by Michael Bell and Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
 
+=head1 Name
+
+OpenXPKI::Server::API::Object
+
+=head1 Description
+
+This is the object interface which should be used by all user interfaces of OpenXPKI.
+A user interface MUST NOT access the server directly. The only allowed
+access is via this API. Any function which is not available in this API is
+not for public use.
+The API gets access to the server via the 'server' context object. This
+object must be set before instantiating the API.
+
+=head1 Functions
+
+=cut 
+
 package OpenXPKI::Server::API::Object;
 
 use strict;
@@ -13,7 +30,7 @@ use English;
 use Data::Dumper;
 
 use Class::Std;
-
+use Encode;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -33,6 +50,14 @@ sub START {
           'I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED', );
 }
 
+
+=head2 get_csr_info_hash_from_data
+
+return a hash reference which includes all parsed informations from
+the CSR. The only accepted parameter is DATA which includes the plain CSR.
+
+=cut 
+
 sub get_csr_info_hash_from_data {
     ##! 1: "start"
     my $self = shift;
@@ -44,14 +69,6 @@ sub get_csr_info_hash_from_data {
 
     ##! 1: "finished"
     return $obj->get_info_hash();
-}
-
-sub get_ca_list {
-    ##! 1: "start"
-    my $realm = CTX('session')->get_pki_realm();
-
-    ##! 1: "finished"
-    return CTX('pki_realm')->{$realm}->{ca}->{id};
 }
 
 sub get_url_for_ticket {
@@ -72,12 +89,42 @@ sub get_ticket_info {
     return CTX('notification')->get_ticket_info($arg_ref);
 }
 
+=head2 get_ca_cert
+
+returns the certificate of one CA. This is a wrapper around get_cert to make
+the access control more fine granular if necessary.
+
+=cut
+
 sub get_ca_cert {
     ##! 1: "start, forward and finish"
     my $self = shift;
     my $args = shift;
     return $self->get_cert($args);
 }
+
+
+=head2 get_cert
+
+returns the requested certificate. The supported arguments are IDENTIFIER and
+FORMAT. IDENTIFIER is required whilst FORMAT is optional. FORMAT can have the
+following values:
+
+=over
+
+=item * PEM
+
+=item * DER
+
+=item * PKCS7 - without the usual hash mark
+
+=item * TXT
+
+=item * HASH - the default value
+
+=back
+
+=cut 
 
 sub get_cert {
     ##! 1: "start"
@@ -98,8 +145,7 @@ sub get_cert {
     );
     if ( !defined $hash ) {
         OpenXPKI::Exception->throw(
-            message =>
-'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB',
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB',
             params => { 'IDENTIFIER' => $identifier, },
         );
     }
@@ -128,8 +174,21 @@ sub get_cert {
     }
 
     ##! 1: "finished"
-    return $obj->get_converted($format);
+    
+    #FIXME - this is stupid but at least on perl 5.10 it helps with the "double utf8 encoded downloads"
+    my $utf8fix = $obj->get_converted($format);
+    Encode::_utf8_on($utf8fix );
+    return $utf8fix ;
 }
+
+=head2 get_crl
+
+returns a CRL. The possible parameters are SERIAL, FORMAT and PKI_REALM. 
+SERIAL is the serial of the database table, the realm defaults to the 
+current realm and the default format is PEM. Other formats are DER, TXT 
+and HASH. HASH returns the result of OpenXPKI::Crypto::CRL::get_parsed_ref. 
+ 
+=cut 
 
 sub get_crl {
     ##! 1: "start"
@@ -137,90 +196,187 @@ sub get_crl {
     my $args = shift;
 
     ##! 2: "initialize arguments"
-    my $ca_id    = $args->{CA_ID};
-    my $filename = $args->{FILENAME};
+    my $serial    = $args->{SERIAL};
+    my $pki_realm = $args->{PKI_REALM};
     my $format   = "PEM";
+    
     $format = $args->{FORMAT} if ( exists $args->{FORMAT} );
+    $pki_realm =  CTX('session')->get_pki_realm() unless( $args->{PKI_REALM} );
 
-    ##! 2: "checks the parameters for correctness"
-    my $realm = CTX('session')->get_pki_realm();
-    if ( not exists CTX('pki_realm')->{$realm} ) {
-        OpenXPKI::Exception->throw( message =>
-'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_PKI_REALM_CONFIG',
-        );
-    }
-    if ( not exists CTX('pki_realm')->{$realm}->{ca}->{id}->{$ca_id} ) {
-        OpenXPKI::Exception->throw( message =>
-              'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_CA_CONFIG', );
-    }
-    if (
-        not CTX('pki_realm')->{$realm}->{ca}->{id}->{$ca_id}
-        ->{crl_publication} )
-    {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_PUBLIC', );
-    }
+    ##! 16: 'Load crl by serial ' . $serial
 
-    ##! 2: "check the specified file"
-    my $files   = CTX('pki_realm')->{$realm}->{ca}->{id}->{$ca_id}->{crl_files};
-    my $correct = 0;
-    my $published_format;
-    foreach my $fileset ( @{$files} ) {
-        next if ( $fileset->{FILENAME} ne $filename );
-        $correct          = 1;
-        $published_format = $fileset->{FORMAT};
-        last;
-    }
-    if ( not $correct ) {
+    my $db_results = CTX('dbi_backend')->first(
+        TABLE   => 'CRL',
+        COLUMNS => [ 
+            'DATA',
+            'PKI_REALM'
+        ],
+        KEY => $serial,        
+    );
+    
+    ##! 32: 'DB Result ' . Dumper $db_results 
+    
+    if ( not $db_results ) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_FOUND', );
     }
-    my $fu           = OpenXPKI::FileUtils->new();
-    my $file_content = $fu->read_file($filename);
-    my $output;
+    
+    if ($pki_realm ne $db_results->{PKI_REALM}) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_IN_REALM', );
+    }
 
-    if ( $published_format ne $format ) {
-
-        # we still have to convert the CRL
-        my $default_token = CTX('api')->get_default_token();
-        ##! 16: 'convert from ' . $fileset->{FORMAT} . ' to ' . $format
-        if ( $format eq 'DER' || $format eq 'TXT' ) {
-            $output = $default_token->command(
-                {
-                    COMMAND => 'convert_crl',
-                    OUT     => $format,
-                    IN      => $published_format,
-                    DATA    => $file_content,
-                }
+    # Is this really useful ?
+    #OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_PUBLIC' );
+    
+    my $pem_crl= $db_results->{DATA};
+  
+    my $output;     
+    if ($format eq 'PEM') {
+        $output = $pem_crl;
+    } 
+    elsif ( $format eq 'DER' || $format eq 'TXT' ) {
+        # convert the CRL
+        my $default_token = CTX('api')->get_default_token();    
+        $output = $default_token->command({
+            COMMAND => 'convert_crl',
+            OUT     => $format,
+            IN      => 'PEM',
+            DATA    => $pem_crl,
+        });        
+        if (!$output) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_UNABLE_TO_CONVERT', 
             );
         }
-        elsif ( $format eq 'HASH' ) {
-
-            # parse CRL using OpenXPKI::Crypto::CRL
-            my $pem_crl = $default_token->command(
-                {
-                    COMMAND => 'convert_crl',
-                    OUT     => 'PEM',
-                    IN      => $published_format,
-                    DATA    => $file_content,
-                }
-            );
-            my $crl_obj = OpenXPKI::Crypto::CRL->new(
-                TOKEN => $default_token,
-                DATA  => $pem_crl,
-            );
-            $output = $crl_obj->get_parsed_ref();
-            ##! 16: 'output: ' . Dumper $output
-        }
+        # FIXME - this is stupid but at least on perl 5.10 it helps with the "double utf8 encoded downloads"
+        Encode::_utf8_on($output);
     }
-    else {
-
-        # we can use the data from the file directly
-        $output = $file_content;
-    }
-    ##! 2: "load the file and return it (finished)"
+    elsif ( $format eq 'HASH' ) {
+        # parse CRL using OpenXPKI::Crypto::CRL
+        my $default_token = CTX('api')->get_default_token();            
+        my $crl_obj = OpenXPKI::Crypto::CRL->new(
+            TOKEN => $default_token,
+            DATA  => $pem_crl,
+        );
+        $output = $crl_obj->get_parsed_ref();
+        
+    }   
+    ##! 16: 'output: ' . Dumper $output
     return $output;
 }
+
+=head2 get_crl_list( { PKI_REALM, ISSUER, FORMAT } )
+
+List all CRL issued in the given realm. If no realm is given, use the 
+realm of the current session. You can add an ISSUER (cert_identifier)
+in which case you get only the CRLs issued by this issuer.
+The result is an arrayref of matching entries ordered by last_update, 
+newest first.
+The FORMAT parameter determines the return format:
+
+=over
+ 
+=item RAW
+
+Bare lines from the database
+
+=item HASH 
+
+The result of OpenXPKI::Crypto::CRL::get_parsed_ref
+
+=item TXT|PEM|DER
+
+The data blob in the requested format.
+
+=back 
+
+=cut 
+
+sub get_crl_list {
+    ##! 1: "start"
+        
+    my $self = shift;
+    my $keys = shift;
+    
+    my $pki_realm = $keys->{PKI_REALM};
+    $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
+    
+    
+    my $format = $keys->{FORMAT};                      
+             
+    my %dynamic = (
+        'PKI_REALM' => { VALUE => $pki_realm },      
+    );             
+    
+    if ($keys->{ISSUER}) {
+        $dynamic{'ISSUER_IDENTIFIER'} = { VALUE => $keys->{ISSUER} };        
+    }
+             
+    my $db_results = CTX('dbi_backend')->select(
+        TABLE   => 'CRL',
+        COLUMNS => [ 
+            'ISSUER_IDENTIFIER',                        
+            'DATA',
+            'LAST_UPDATE',
+            'NEXT_UPDATE',
+            'PUBLICATION_DATE',
+        ],
+        DYNAMIC => \%dynamic,
+        'ORDER' => [ 'LAST_UPDATE' ],
+        'REVERSE' => 1,
+    );
+    
+    my @result;
+    
+    if ($format eq 'HASH') {
+        my $default_token = CTX('api')->get_default_token();        
+        foreach my $entry (@{ $db_results }) {           
+            my $crl_obj = OpenXPKI::Crypto::CRL->new(
+                TOKEN => $default_token,
+                DATA  => $entry->{DATA},
+            );                        
+            push @result, $crl_obj->get_parsed_ref();
+        }
+
+    } elsif ( $format eq 'DER' || $format eq 'TXT' ) {
+        my $default_token = CTX('api')->get_default_token();
+        foreach my $entry (@{ $db_results }) {        
+            my $output = $default_token->command({
+                COMMAND => 'convert_crl',
+                OUT     => $format,
+                IN      => 'PEM',
+                DATA    => $entry->{DATA},
+            });                
+            if (!$output) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_CA_CONFIG',
+                    params => { DATA => $entry->{DATA}, SERIAL => $entry->{SERIAL} }
+                        
+                );
+            }
+            push @result, $output;
+        }
+                
+    } elsif($format eq 'PEM') {
+        foreach my $entry (@{ $db_results }) {
+            push @result, $entry->{DATA};
+        }
+              
+    } else {
+        foreach my $entry (@{ $db_results }) {
+            push @result, $entry;
+        }    
+    }               
+        
+                  
+    ##! 32: "Found crl " . Dumper @result
+    
+    ##! 1: 'Finished'
+    return \@result;
+}
+
+
 
 sub search_cert_count {
     ##! 1: 'start'
@@ -235,6 +391,36 @@ sub search_cert_count {
     }
     return 0;
 }
+
+=head2 search_cert
+
+supports a facility to search certificates. It supports the following parameters:
+
+=over
+
+=item * CERT_SERIAL
+
+=item * LIMIT
+
+=item * LAST
+
+=item * FIRST
+
+=item * CSR_SERIAL
+
+=item * EMAIL
+
+=item * SUBJECT
+
+=item * ISSUER
+
+=back
+
+The result is an array of hashes. The hashes do not contain the data field
+of the database to reduce the transport costs an avoid parser implementations
+on the client.
+
+=cut
 
 sub search_cert {
     ##! 1: "start"
@@ -315,8 +501,7 @@ sub search_cert {
     if ( defined $args->{CERT_ATTRIBUTES} ) {
         if ( ref $args->{CERT_ATTRIBUTES} ne 'ARRAY' ) {
             OpenXPKI::Exception->throw(
-                message =>
-'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_INVALID_CERT_ATTRIBUTES_ARGUMENTS',
+                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_INVALID_CERT_ATTRIBUTES_ARGUMENTS',
                 params => { 'TYPE' => ref $args->{CERT_ATTRIBUTES}, },
             );
         }
@@ -348,8 +533,7 @@ sub search_cert {
     my $result = CTX('dbi_backend')->select(%params);
     if ( ref $result ne 'ARRAY' ) {
         OpenXPKI::Exception->throw(
-            message =>
-'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY',
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY',
             params => { 'TYPE' => ref $result, },
         );
     }
@@ -367,6 +551,14 @@ sub search_cert {
     return $result;
 }
 
+=head2 private_key_exists_for_cert
+
+Checks whether a corresponding CA-generated private key exists for
+the given certificate identifier (named parameter IDENTIFIER).
+Returns true if there is a private key, false otherwise.
+
+=cut 
+
 sub private_key_exists_for_cert {
     my $self       = shift;
     my $arg_ref    = shift;
@@ -376,6 +568,16 @@ sub private_key_exists_for_cert {
       $self->__get_private_key_from_db( { IDENTIFIER => $identifier, } );
     return ( defined $privkey );
 }
+
+=head2 __get_private_key_from_db
+
+Gets a private key from the database for a given certificate
+identifier by looking up the CSR serial of the certificate and
+extracting the private_key context parameter from the workflow
+with the CSR serial. Returns undef if no CA generated private key
+is available.
+
+=cut 
 
 sub __get_private_key_from_db {
     my $self       = shift;
@@ -427,6 +629,31 @@ sub __get_private_key_from_db {
     }
     return;
 }
+
+=head2 get_private_key_for_cert
+
+returns an ecrypted private key for a certificate if the private
+key was generated on the CA during the certificate request process.
+Supports the following parameters:
+
+=over
+
+=item * IDENTIFIER - the identifier of the certificate
+
+=item * FORMAT - the output format
+
+=item * PASSWORD - the private key password
+
+=back
+
+The format can be either PKCS8_PEM (PKCS#8 in PEM format), PKCS8_DER
+(PKCS#8 in DER format), PKCS12 (PKCS#12 in DER format), OPENSSL_PRIVKEY
+(the OpenSSL encrypted key format in PEM), or JAVA_KEYSTORE (for a
+Java keystore).
+The password has to match the one used during the generation or nothing
+is returned at all.
+
+=cut
 
 sub get_private_key_for_cert {
     my $self    = shift;
@@ -559,6 +786,51 @@ sub get_private_key_for_cert {
 
     return { PRIVATE_KEY => $result, };
 }
+
+
+=head2 get_data_pool_entry
+
+Searches the specified key in the data pool and returns a data structure
+containing the resulting value and additional information.
+
+Named parameters:
+
+=over
+
+=item * PKI_REALM - PKI Realm to address. If the API is called directly
+  from OpenXPKI::Server::Workflow only the PKI Realm of the currently active
+  session is accepted. Realm defaults to the current realm if omitted.
+
+=item * NAMESPACE
+
+=item * KEY
+
+=back
+
+Example:
+ $tmpval = 
+  CTX('api')->get_data_pool_entry(
+  {
+    PKI_REALM => $pki_realm,
+    NAMESPACE => 'workflow.foo.bar',
+    KEY => 'myvariable',
+  });
+
+The resulting data structure looks like:
+ {
+   PKI_REALM       => # PKI Realm
+   NAMESPACE       => # Namespace
+   KEY             => # Data pool key
+   ENCRYPTED       => # 1 or 0, depending on if it was encrypted
+   ENCRYPTION_KEY  => # encryption key id used (may not be available)
+   MTIME           => # date of last modification (epoch)
+   EXPIRATION_DATE => # date of expiration (epoch)
+   VALUE           => # value
+ }; 
+
+
+
+=cut
 
 sub get_data_pool_entry {
     ##! 1: 'start'
@@ -817,6 +1089,56 @@ sub get_data_pool_entry {
     return \%return_value;
 }
 
+=head2 set_data_pool_entry
+
+Writes the specified information to the global data pool, possibly encrypting
+the value using the password safe defined for the PKI Realm.
+
+Named parameters:
+
+=over
+
+=item * PKI_REALM - PKI Realm to address. If the API is called directly
+  from OpenXPKI::Server::Workflow only the PKI Realm of the currently active
+  session is accepted. If no realm is passed, the current realm is used.
+
+=item * NAMESPACE 
+
+=item * KEY
+
+=item * VALUE - Value to store
+
+=item * ENCRYPTED - optional, set to 1 if you wish the entry to be encrypted. Requires a properly set up password safe certificate in the target realm.
+
+=item * FORCE - optional, set to 1 in order to force writing entry to database
+
+=item * EXPIRATION_DATE - optional, seconds since epoch. If entry is older than this value the server may delete the entry.
+
+=back
+
+Side effect: this method automatically wipes all data pool entries whose
+expiration date has passed.
+
+B<NOTE:> Encryption may work even though the private key for the password safe
+is not available (the symmetric encryption key is encrypted for the password
+safe certificate). Retrieving encrypted information will only work if the
+password safe key is available during the first access to the symmetric key.
+
+
+Example:
+ CTX('api')->set_data_pool_entry(
+ {
+   PKI_REALM => $pki_realm,
+   NAMESPACE => 'workflow.foo.bar',
+   KEY => 'myvariable',
+   VALUE => $tmpval,
+   ENCRYPT => 1,
+   FORCE => 1,
+   EXPIRATION_DATE => time + 3600 * 24 * 7,
+ });
+
+=cut
+
 sub set_data_pool_entry {
     ##! 1: 'start'
     my $self    = shift;
@@ -884,14 +1206,30 @@ sub set_data_pool_entry {
     return 1;
 }
 
+=head2 list_data_pool_entries 
+
+List all keys in the datapool in a given namespace. 
+
+
+=over 
+
+=item * NAMESPACE
+
+=item * PKI_REALM, optional, see get_data_pool_entry for details.
+
+=back
+
+Returns an arrayref of Namespace and key of all entries found. 
+ 
+=cut
+
 sub list_data_pool_entries {
     ##! 1: 'start'
     my $self    = shift;
     my $arg_ref = shift;
 
     my $namespace = $arg_ref->{NAMESPACE};
-    my $values    = $arg_ref->{VALUES};
-
+    
     my $current_pki_realm   = CTX('session')->get_pki_realm();
     my $requested_pki_realm = $arg_ref->{PKI_REALM};
 
@@ -937,6 +1275,28 @@ sub list_data_pool_entries {
           @{$result}
     ];
 }
+
+=head2 modify_data_pool_entry 
+
+This method has two purposes, both require NAMESPACE and KEY.
+B<This method does not modify the value of the entry>.
+
+=over 
+
+=item Change the entries key  
+
+Used to update the key of entry. Pass the name of the new key in NEWKEY.
+I<Commonly used to deal with temporary keys> 
+
+=item Change expiration information
+
+Set the new EXPIRATION_DATE, if you set the parameter to undef, the expiration
+date is set to infity. 
+
+=back
+ 
+
+=cut
 
 sub modify_data_pool_entry {
     ##! 1: 'start'
@@ -1294,6 +1654,7 @@ sub __cleanup_data_pool : PRIVATE {
 # Returns a hashref with KEY, IV and ALGORITHM (directly usable by
 # VolatileVault) containing the currently used symmetric encryption
 # key for encrypting data pool values.
+
 sub __get_current_datapool_encryption_key : PRIVATE {
     ##! 1: 'start'
     my $self    = shift;
@@ -1476,224 +1837,3 @@ sub __get_chain_certificates {
 }
 
 1;
-__END__
-
-=head1 Name
-
-OpenXPKI::Server::API::Object
-
-=head1 Description
-
-This is the object interface which should be used by all user interfaces of OpenXPKI.
-A user interface MUST NOT access the server directly. The only allowed
-access is via this API. Any function which is not available in this API is
-not for public use.
-The API gets access to the server via the 'server' context object. This
-object must be set before instantiating the API.
-
-=head1 Functions
-
-=head2 get_csr_info_hash_from_data
-
-return a hash reference which includes all parsed informations from
-the CSR. The only accepted parameter is DATA which includes the plain CSR.
-
-=head2 get_ca_list
-
-returns a list of all available CAs in the used PKI realm.
-
-=head2 get_ca_cert
-
-returns the certificate of one CA. This is a wrapper around get_cert to make
-the access control more fine granular if necessary.
-
-=head2 get_cert
-
-returns the requested certificate. The supported arguments are IDENTIFIER and
-FORMAT. IDENTIFIER is required whilst FORMAT is optional. FORMAT can have the
-following values:
-
-=over
-
-=item * PEM
-
-=item * DER
-
-=item * PKCS7 - without the usual hash mark
-
-=item * TXT
-
-=item * HASH - the default value
-
-=back
-
-=head2 search_cert
-
-supports a facility to search certificates. It supports the following parameters:
-
-=over
-
-=item * CERT_SERIAL
-
-=item * LIMIT
-
-=item * LAST
-
-=item * FIRST
-
-=item * CSR_SERIAL
-
-=item * EMAIL
-
-=item * SUBJECT
-
-=item * ISSUER
-
-=back
-
-The result is an array of hashes. The hashes do not contain the data field
-of the database to reduce the transport costs an avoid parser implementations
-on the client.
-
-=head2 get_crl
-
-returns a CRL. The required parameters are CA_ID, FILENAME and FORMAT. CA_ID is
-the configured ID of the CA in the PKI realm configuration. FILENAME and FORMAT
-are from the configuration too and must match a configured CRL. Both parameters
-will be checked against the configuration. So there it is not possible to attack
-the system with this filename because we validate it.
-
-=head2 get_private_key_for_cert
-
-returns an ecrypted private key for a certificate if the private
-key was generated on the CA during the certificate request process.
-Supports the following parameters:
-
-=over
-
-=item * IDENTIFIER - the identifier of the certificate
-
-=item * FORMAT - the output format
-
-=item * PASSWORD - the private key password
-
-=back
-
-The format can be either PKCS8_PEM (PKCS#8 in PEM format), PKCS8_DER
-(PKCS#8 in DER format), PKCS12 (PKCS#12 in DER format), OPENSSL_PRIVKEY
-(the OpenSSL encrypted key format in PEM), or JAVA_KEYSTORE (for a
-Java keystore).
-The password has to match the one used during the generation or nothing
-is returned at all.
-
-=head2 private_key_exists_for_cert
-
-Checks whether a corresponding CA-generated private key exists for
-the given certificate identifier (named parameter IDENTIFIER).
-Returns true if there is a private key, false otherwise.
-
-=head2 __get_private_key_from_db
-
-Gets a private key from the database for a given certificate
-identifier by looking up the CSR serial of the certificate and
-extracting the private_key context parameter from the workflow
-with the CSR serial. Returns undef if no CA generated private key
-is available.
-
-=head2 get_data_pool_entry
-
-=head1 Data Pools
-
-For a detailed description of the Data Pool feature please read the 
-documentation at http://wiki.openxpki.org/index.php/Development/Data_Pools
-
-=head2 get_data_pool_entry
-
-Searches the specified key in the data pool and returns a data structure
-containing the resulting value and additional information.
-
-Named parameters:
-
-=over
-
-=item * PKI_REALM - PKI Realm to address. If the API is called directly
-  from OpenXPKI::Server::Workflow only the PKI Realm of the currently active
-  session is accepted.
-
-=item * NAMESPACE
-
-=item * KEY
-
-=back
-
-
-Example:
- $tmpval = 
-  CTX('api')->get_data_pool_entry(
-  {
-    PKI_REALM => $pki_realm,
-    NAMESPACE => 'workflow.foo.bar',
-    KEY => 'myvariable',
-  });
-
-The resulting data structure looks like:
- {
-   PKI_REALM       => # PKI Realm
-   NAMESPACE       => # Namespace
-   KEY             => # Data pool key
-   ENCRYPTED       => # 1 or 0, depending on if it was encrypted
-   ENCRYPTION_KEY  => # encryption key id used (may not be available)
-   MTIME           => # date of last modification (epoch)
-   EXPIRATION_DATE => # date of expiration (epoch)
-   VALUE           => # value
- };	
-
-
-=head2 set_data_pool_entry
-
-Writes the specified information to the global data pool, possibly encrypting
-the value using the password safe defined for the PKI Realm.
-
-Named parameters:
-
-=over
-
-=item * PKI_REALM - PKI Realm to address. If the API is called directly
-  from OpenXPKI::Server::Workflow only the PKI Realm of the currently active
-  session is accepted.
-
-=item * NAMESPACE 
-
-=item * KEY
-
-=item * VALUE - Value to store
-
-=item * ENCRYPTED - optional, set to 1 if you wish the entry to be encrypted. Requires a properly set up password safe certificate in the target realm.
-
-=item * FORCE - optional, set to 1 in order to force writing entry to database
-
-=item * EXPIRATION_DATE - optional, seconds since epoch. If entry is older than this value the server may delete the entry.
-
-=back
-
-Side effect: this method automatically wipes all data pool entries whose
-expiration date has passed.
-
-B<NOTE:> Encryption may work even though the private key for the password safe
-is not available (the symmetric encryption key is encrypted for the password
-safe certificate). Retrieving encrypted information will only work if the
-password safe key is available during the first access to the symmetric key.
-
-
-Example:
- CTX('api')->set_data_pool_entry(
- {
-   PKI_REALM => $pki_realm,
-   NAMESPACE => 'workflow.foo.bar',
-   KEY => 'myvariable',
-   VALUE => $tmpval,
-   ENCRYPT => 1,
-   FORCE => 1,
-   EXPIRATION_DATE => time + 3600 * 24 * 7,
- });
-

@@ -13,37 +13,29 @@
     <th><% i18nGettext('I18N_OPENXPKI_CA_CHAIN') %></th>
   </tr>
 <%perl>
-  foreach my $ca (sort keys %{$list})
-  {
+  foreach my $ca (@list) {  
     print "  <tr>\n";
     print "    <td>\n";
 </%perl>
         <& /lib/html/a.mhtml,
            'target' => "ca_cert_info.html",
-           'params' => [["identifier", $list->{$ca}->{'identifier'}]],
-           'label'  => $list->{$ca}->{CN} &>
+           'params' => [["identifier", $ca->{'IDENTIFIER'}]],
+           'label'  => $ca->{CN} &>
 <%perl>
     print "    </td>\n";
+    print "    <td> ". i18nGettext($ca->{'STATUS'}) ."</td>\n";
     print "    <td>\n";
-    if ($list->{$ca}->{'status'})
-    {
-        print "      ".i18nGettext('I18N_OPENXPKI_CA_STATUS_USABLE')."\n";
-    } else {
-        print "      ".i18nGettext('I18N_OPENXPKI_CA_STATUS_UNUSABLE')."\n";
-    }
+    print "      ".join (" ", split "T", $ca->{'NOTBEFORE'})." UTC\n";
     print "    </td>\n";
     print "    <td>\n";
-    print "      ".join (" ", split "T", $list->{$ca}->{'notbefore'})." UTC\n";
-    print "    </td>\n";
-    print "    <td>\n";
-    print "      ".join (" ", split "T", $list->{$ca}->{'notafter'})." UTC\n";
+    print "      ".join (" ", split "T", $ca->{'NOTAFTER'})." UTC\n";
     print "    </td>\n";
     print "    <td>\n";
 </%perl>
         <& /lib/html/a.mhtml,
            'target' => "chain_list.html",
-           'params' => [["identifier", $list->{$ca}->{'identifier'}]],
-           'label'  => $list->{$ca}->{CN} &>
+           'params' => [["identifier", $ca->{'IDENTIFIER'}]],
+           'label'  => $ca->{CN} &>
 <%perl>
     print "    </td>\n";
   }
@@ -51,27 +43,24 @@
 </table>
 <%init>
   my $msg  = $context->{client}->send_receive_command_msg ("get_ca_list");
-  my $list = $msg->{PARAMS};
-
-  CA:
-  foreach my $ca (keys %{ $list }) {
-    my $id = $list->{$ca}->{identifier};
-    if (! defined $id) {
-        delete $list->{$ca};
-        next CA;
-    }
-    my $msg = $context->{client}->send_receive_command_msg('get_cert',
-        {
-            IDENTIFIER => $id,
-        },
-    );
-    my $subject = $msg->{PARAMS}->{BODY}->{SUBJECT};
-    my $cn = '';
-    my %dn_hash = OpenXPKI::DN->new($subject)->get_hashed_content();
-    $cn = $dn_hash{'CN'}->[0];
-    $list->{$ca}->{CN} = $cn;
+   
+  my @list;
+  foreach my $ca ( @{ $msg->{PARAMS} } ) {
+            
+        my %dn_hash = OpenXPKI::DN->new( $ca->{SUBJECT} )->get_hashed_content();
+        my $cn = $dn_hash{'CN'}->[0];
+        $ca->{CN} = $cn;
+                          
+        my $dt = DateTime->from_epoch(epoch => $ca->{'NOTBEFORE'});        
+        $ca->{'NOTBEFORE'} = $dt->strftime("%Y-%m-%d %H:%M:%S UTC");
+        
+        $dt = DateTime->from_epoch(epoch => $ca->{'NOTAFTER'});
+        $ca->{'NOTAFTER'} = $dt->strftime("%Y-%m-%d %H:%M:%S UTC");
+          
+        push @list, $ca;      
   }
 </%init>
 <%once>
     use OpenXPKI::DN;
+    use DateTime;    
 </%once>

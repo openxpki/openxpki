@@ -283,7 +283,7 @@ sub reload_all_secret_groups_from_cache {
     return 1;
 }
 
-=head2
+=head2 is_secret_group_complete( group )
 
 Check if the secret group is complete (all passwords loaded)
 

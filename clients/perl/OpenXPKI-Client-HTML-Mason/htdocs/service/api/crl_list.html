@@ -22,8 +22,7 @@
         <!-- this is safe because filename and format are only hash keys -->
         <& /lib/html/a.mhtml,
            'target' => "../../binary/get_crl.html",
-           'params' => [["ca_id",    $item->{LABEL}],
-                        ["filename", $item->{FILENAME}],
+           'params' => [["serial",    $item->{NUMBER}],
                         ["format",   $format]],
            'label'  => $format &>
         </td>
@@ -36,51 +35,41 @@
 % }
 </table>
 <%init>
-  my $msg  = $context->{client}->send_receive_command_msg ("get_ca_list");
+  my $msg  = $context->{client}->send_receive_command_msg ("get_crl_list", { FORMAT => 'HASH'});
   my @list = ();
-  foreach my $ca (sort keys %{$msg->{PARAMS}}) {
-    next if (not $msg->{PARAMS}->{$ca}->{crl_publication});
-    foreach my $crl (@{$msg->{PARAMS}->{$ca}->{crl_files}}) {
-        my $crl_msg = $context->{client}->send_receive_command_msg(
-            'get_crl',
-            {
-                'CA_ID'    => $ca,
-                'FILENAME' => $crl->{FILENAME},
-                'FORMAT'   => 'HASH',
-            },
-        );
-        my $issuer = $crl_msg->{PARAMS}->{BODY}->{ISSUER};
+  
+  foreach my $crl ( @{$msg->{PARAMS}} ) {
+    
+        my $issuer = $crl->{BODY}->{ISSUER};
         # make issuer better breakable
         $issuer =~ s/,/, /g;
 
         my $last_update;
-        if (exists $crl_msg->{PARAMS}->{BODY}->{LAST_UPDATE}) {
-            $last_update = $crl_msg->{PARAMS}->{BODY}->{LAST_UPDATE};
+        if (exists $crl->{BODY}->{LAST_UPDATE}) {
+            $last_update = $crl->{BODY}->{LAST_UPDATE};
             my $dt = DateTime->from_epoch(epoch => $last_update);
             $last_update = $dt->strftime("%Y-%m-%d %H:%M:%S UTC");
         }
 
         my $next_update;
-        if (exists $crl_msg->{PARAMS}->{BODY}->{NEXT_UPDATE}) {
-            $next_update = $crl_msg->{PARAMS}->{BODY}->{NEXT_UPDATE};
+        if (exists $crl->{BODY}->{NEXT_UPDATE}) {
+            $next_update = $crl->{BODY}->{NEXT_UPDATE};
             my $dt = DateTime->from_epoch(epoch => $next_update);
             $next_update = $dt->strftime("%Y-%m-%d %H:%M:%S UTC");
         }
 
         if (defined $last_update) {
-            push @list, {
-               'LABEL'    => $ca,
-               'FILENAME' => $crl->{FILENAME},
+            push @list, {                             
                'ISSUER'   => $issuer,
-               'NUMBER'   => $crl_msg->{PARAMS}->{BODY}->{SERIAL},
+               'NUMBER'   => $crl->{BODY}->{SERIAL},
                'LAST_UPDATE' => $last_update,
                'NEXT_UPDATE' => $next_update,
-               'ENTRIES'     => ref $crl_msg->{PARAMS}->{LIST} eq 'ARRAY' ? scalar @{ $crl_msg->{PARAMS}->{LIST} } : '-',
+               'ENTRIES'     => ref $crl->{LIST} eq 'ARRAY' ? scalar @{ $crl->{LIST} } : '-',
             };
-        }
-    }
+        }    
   }
 </%init>
 <%once>
     use DateTime;
+    use Data::Dumper;
 </%once>
