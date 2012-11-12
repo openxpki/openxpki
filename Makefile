@@ -34,7 +34,7 @@ perlbrew:
 	. $(PERLBREW_RC) && perlbrew install $(PERLBREW_STABLE)
 	. $(PERLBREW_RC) && perlbrew use $(PERLBREW_STABLE)
 	. $(PERLBREW_RC) && perl --version
-	. $(PERLBREW_RC) && curl -L http://cpanmin.us | perl - App::cpanminus
+	. $(PERLBREW_RC) && perlbrew install-cpanm
 
 # Install the packages needed for building CPAN prereqs, etc.
 # Note: Travis-CI does this already in the before_install target.
