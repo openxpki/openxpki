@@ -45,3 +45,11 @@ and a user/email certificate. This directory contains additional profiles.
 To use a profile, just copy it to your realm's profile directory.
 A brief description of each profile is given inline with each file.
 
+Workflow Definitions in OmniGraffle (graffle)
+---------------------------------------------
+
+Some of the recent, more complex workflows have been modelled using
+OmniGraffle. The script in ./tools/scripts/ogflow.pl may be used to
+convert from .graffle to the .xml files. Unfortunately, OmniGraffle
+is NOT an open source tool. It was used to "scratch an itch", but 
+we have not found an open source alternative.
