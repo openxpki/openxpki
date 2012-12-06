@@ -13,6 +13,7 @@ We publish build packages from the development head, it "should work" but some s
 Add our deb-repository to your source list::
 
     echo "deb http://packages.openxpki.org/debian/ squeeze/binary/" > /etc/apt/sources.list.d/openxpki.list
+    aptitude update   
 
 As the init script uses mysql as default, but does not force it as a dependancy, it is crucial that you have the mysql server installed before you pull the OpenXPKI package::
 

@@ -12,6 +12,13 @@ use Errno;
 use File::Spec;
 use Proc::ProcessTable;
 
+# For the password hasher
+use IO::Prompt;
+use Digest::SHA1;
+use Digest::MD5;
+use Proc::SafeExec;
+use MIME::Base64;
+
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -806,6 +813,63 @@ sub key_list {
     return 0;
 }
 
+sub hash_password {
+    
+    print 'Please type your password, end with return: ';        
+    my $passwd = prompt -echo => '*';
+    
+    print "Please re-type your password: ";        
+    my $retype = prompt -echo => '*';
+    
+    chomp $passwd;
+    chomp $retype;
+    
+    if (!$passwd) {        
+        return 0;
+    }
+        
+    if ($passwd ne $retype) {
+        print "Sorry, the passwords do not match\n";
+        return 0;
+    }
+    
+    # Use openssl to create the salt     
+    my @exec = ('openssl','rand','-base64','3');
+    my ($salt, undef) = Proc::SafeExec::backtick(@exec);
+    chomp $salt;
+    
+    my $computed_secret;
+    if ($params{scheme} eq 'sha') {
+        my $ctx = Digest::SHA1->new();
+        $ctx->add($passwd);
+        $computed_secret = $ctx->b64digest();
+    } elsif ($params{scheme} eq 'ssha') {
+        my $ctx = Digest::SHA1->new();              
+        $ctx->add($passwd);
+        $ctx->add($salt);
+        $computed_secret = encode_base64( $ctx->digest() . $salt, '');       
+    } elsif ($params{scheme} eq 'md5') {
+        my $ctx = Digest::MD5->new();
+        $ctx->add($passwd);
+        $computed_secret = $ctx->b64digest();
+    } elsif ($params{scheme} eq 'smd5') {        
+        my $ctx = Digest::MD5->new();
+        $ctx->add($passwd);
+        $ctx->add($salt);
+        $computed_secret = encode_base64($ctx->digest() . $salt, '');
+    } elsif ($params{scheme} eq 'crypt') {
+        $computed_secret = crypt($passwd, $salt);
+    }
+    
+    if (!$computed_secret) {
+        die "Unable to compute hash\n";
+    }
+    
+    printf "Your hashed password is: {%s}%s\n", $params{scheme}, $computed_secret;
+    
+    return 0;
+}
+
 sub __get_dbi {
     
     my $dbi = CTX('dbi_backend');
@@ -981,7 +1045,22 @@ if ($cmd eq 'initdb') {
         $ret = key_list();
             
     }
+} elsif ($cmd eq 'hashpwd') {
+
+    push @options_spec, qw(
+          scheme|s=s          
+    );
+    __init();
+    
+    if (!$params{scheme}) {
+        $params{scheme} = 'ssha';
+    } elsif ($params{scheme} !~ /^(sha|ssha|md5|smd5|crypt)$/) {
+        die "Unsupported scheme - supported values: sha|ssha|md5|smd5|crypt\n";
+    }
+    
+    $ret = hash_password();
 }
+
 
 if ($ret) {
     pod2usage( -verbose => 0 );
@@ -1014,7 +1093,8 @@ openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
    initdb                Initialize database
    key                   Manage keys
    certificate           Manage certificates
-   loadcfg               Import updated config from the filesystem      
+   loadcfg               Import updated config from the filesystem 
+   hashpwd               Create the salted hash for a password     
 
 =head1 ARGUMENTS
 
@@ -1299,6 +1379,19 @@ If I<reload> is given and the openxpki daemon is running, the daemon is send
 a reload signal and will start using the new configuration for new requests.   
 Note: Even if I<reload> is not passed, the config becomes active on the next
 server start!
+
+=head2 hashpwd
+
+Create the hash of a given password to be used with the internal user database.
+
+Command options:
+
+  --scheme   The hashing scheme to use, allowed values are 
+             ssha|sha|smd5|md5|crypt, default is ssha
+             see also OpenXPKI::Server::Authentication::Password
+
+Prompts for the password and prints the hashed value including the used
+ scheme as defined in RFC2307.
 
 =head1 DESCRIPTION
 

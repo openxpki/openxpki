@@ -25,31 +25,32 @@ Signature:
 Anonymous:
     type: Anonymous
     label: Anonymous
-    
 
+# Note - both password handlers are tied together by the auth stack
+# The naming does not imply any meaning for the users rights. 
+# You are free to add Operators to the external database.
+# Note the difference: Adding users to the external file does NOT require
+# a server reload while changing the values in the config requires a config
+# reload and creates a new datapoint in the config repository.
 User Password:
     type: Password
     label: User Password
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
-    # howto generate sha1 passphrases? 
-    # echo -n root | openssl sha1 -binary | openssl base64
-    user:
-        John Doe:
-            digest: "{SSHA}TZXM/aqflDDQAmSWVxSDVWnH+NhxNU5w"
-            role: User
+    # Users are taken from a yaml file using a connector
+    user@: connector:auth.connector.userdb
 
 Operator Password:
     type: Password
     label: Operator Password
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
     user:
-      - name: root
-        digest: "{SSHA}+u48F1BajP3ycfY/azvTBqprsStuUnhM"
-        role: CA Operator
-      - name: raop
-        digest: "{SSHA}ejZpY22dFwjVI48z14y2jYuToPRjOXRP"
-        role: RA Operator
-        
+        root:
+            digest: "{MD5}Y6nw6nu5gFB5a2SehUgYRQ"
+            role: CA Operator
+        raop:
+            digest: "{SSHA}ejZpY22dFwjVI48z14y2jYuToPRjOXRP"
+            role: RA Operator
+ 
 External Dynamic Role:
     type: External
     label: External Dynamic Role

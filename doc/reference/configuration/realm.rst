@@ -125,7 +125,7 @@ The password database handler allows to specify user/password/role pairs directl
                 digest: "{SSHA}ejZpY22dFwjVI48z14y2jYuToPRjOXRP"
                 role: RA Operator
 
-The passwords are hashed, the used hash algorithm is given as prefix inside the curly brackets. You should use only *SSHA* which is "salted sha1". For compatibility we support plain sha1, md5, smd5 (salted md5) and crypt. You can created the salted passwords using the openxpkiadm CLI tool.
+The passwords are hashed, the used hash algorithm is given as prefix inside the curly brackets. You should use only *SSHA* which is "salted sha1". For compatibility we support plain sha (sha1), md5, smd5 (salted md5) and crypt. You can created the salted passwords using the openxpkiadm CLI tool.
 
 If you plan to use static passwords for a larger amount of users, you should consider to use a connector instead::
 
@@ -133,13 +133,15 @@ If you plan to use static passwords for a larger amount of users, you should con
         type: Password
         label: User Password
         description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
-        user@: auth.userdb        
+        user@: auth.connector.userdb
+        
+Define the user database file inside auth.connector.yaml::                 
         
     userdb:
         class: Connector::Proxy::YAML
-        LOCATION: /home/pkiadm/userdb.yaml       
+        LOCATION: /home/pkiadm/ca-one-userdb.yaml       
 
-The user file has the same structure then the *user* section above.
+The user file has the same structure as the *user* section above. You can share a user database file within realms.
 
 **external authentication**
 

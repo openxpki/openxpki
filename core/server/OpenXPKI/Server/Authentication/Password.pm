@@ -113,7 +113,7 @@ sub login_step {
         )
     }
  
-    if ($scheme !~ /^(sha1|sha|ssha|md5|smd5|crypt)$/) {
+    if ($scheme !~ /^(sha|ssha|md5|smd5|crypt)$/) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_UNSUPPORTED_SCHEME",
             params  => {
@@ -127,14 +127,14 @@ sub login_step {
         });
     }
       
-	my $computed_secret;
+	my ($computed_secret, $salt);
 	if ($scheme eq 'sha') {
  	    my $ctx = Digest::SHA1->new();
  	    $ctx->add($passwd);
 	    $computed_secret = $ctx->b64digest();
 	}
 	if ($scheme eq 'ssha') {
-	    my $salt = substr(decode_base64($encrypted), 20);
+	    $salt = substr(decode_base64($encrypted), 20);
  	    my $ctx = Digest::SHA1->new(); 	     	    
  	    $ctx->add($passwd);
 	    $ctx->add($salt);
@@ -146,7 +146,7 @@ sub login_step {
 	    $computed_secret = $ctx->b64digest();
 	}
 	if ($scheme eq 'smd5') {
-	    my $salt = substr(decode_base64($encrypted), 16);
+	    $salt = substr(decode_base64($encrypted), 16);
  	    my $ctx = Digest::MD5->new();
  	    $ctx->add($passwd);
 	    $ctx->add($salt);
@@ -171,7 +171,7 @@ sub login_step {
     
     ## compare passphrases
     if ($computed_secret ne $encrypted) {
-        ##! 4: "mismatch with digest in database ($encrypted)"
+        ##! 4: "mismatch with digest in database ($encrypted, $salt)"
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
             params  => {
@@ -214,8 +214,8 @@ The digest must have the format
 
 {SCHEME}encrypted_string
 
-SCHEME is one of sha (SHA1), md5 (MD5), crypt (Unix crypt(3)) or 
-ssha (seeded SHA1).
+SCHEME is one of sha (SHA1), md5 (MD5), crypt (Unix crypt), smd5 (salted 
+MD5) or ssha (salted SHA1).
 
 =head2 login_step
 
