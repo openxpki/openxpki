@@ -550,7 +550,7 @@ sub get_system_token {
         
         my $backend_api_class = CTX('config')->get("system.crypto.token.$type.api");
         
-        ##! 16: 'instantiating token, API class: ' . $backend_api_class
+        ##! 16: 'instantiating token, API:' . $backend_api_class . ' - Backend: ' .$backend 
         $self->{TOKEN}->{system}->{$type} =
                 $backend_api_class->new ({
                     CLASS => $backend,

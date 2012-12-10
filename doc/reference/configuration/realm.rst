@@ -67,32 +67,36 @@ If no role is provided, you get the anonymous role. **Do never set any other rol
 
 **x509 client-based authentication**
 
+*Note: OpenXPKI uses a third party tool named openca-sv to check the x509 signature. You need to build that by your own and put it into /usr/bin. The source is availale at http://www.openca.org/projects/openca/tools-sources.shtml.*  
+
 The ClientX509 handler uses the certificate information provided by the connecting client to perform authorization only. It's left to the client to perform the authentication step and ensure that the passed cert is controlled by the user. The handler checks the validity of the certificate and uses a connector to assign the user a role. This is a typical setup when you use Apache SSL with mutual authentication. ::
 
     Certificate:
         type: ClientX509
         label: Certificate
         description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
-        role: 
-            default: ''
-            handler@: auth.roledb
-            argument: dn
+        role:
+            default: User
+            handler@: connector:auth.connector.role
+            argument: username
             
-The role assignment is done by querying the connector specified by *handler* using the certificates component *argument*. Possible arguments are "cn", "subject" and "serial". The value given by *default* is assigned if no match is found by the handler. If you do not specify a handler but a default role, you get a static role assignment for any matching certifiacate.
+The role assignment is done by querying the connector specified by *handler* using the certificates component *argument*. Possible arguments are "username" (filled by the client, SSL_CLIENT_S_DN_CN for the current Mason frontend), "subject" and "serial". The value given by *default* is assigned if no match is found by the handler. If you do not specify a handler but a default role, you get a static role assignment for any matching certifiacate.
         
 **x509 Authentication**
 
-Perform x509 based authentication with challenge/response. The  ::
+*chain management is broken on subjects having multi-valued entries, so this will not work if you have such certificates*
 
+Perform x509 based authentication with challenge/response. ::
+  
     Signature:
         type: X509
         label: Signature
         description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
         challenge_length: 256
         role: 
-            default: ''
-            handler@: auth.roledb
-            argument: dn
+            default: User
+            handler@: connector:auth.connector.role
+            argument: username
         # define your trust anchors here
         realm:
         - my_client_auth_realm

@@ -121,10 +121,11 @@ sub login_step {
             },
         );
     }
+    
     my $notbefore = $cert_info->{BODY}->{NOTBEFORE};
     my $notafter  = $cert_info->{BODY}->{NOTAFTER};
     my $now = DateTime->now();
-    if (DateTime->compare($now, $notbefore) == -1) {
+    if (DateTime->compare($now, OpenXPKI::DateTime::_parse_date_utc($notbefore)) == -1) {
         ##! 16: 'certificate is not yet valid'
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
@@ -133,7 +134,7 @@ sub login_step {
             },
         );
     }
-    if (DateTime->compare($now, $notafter) == 1) {
+    if (DateTime->compare($now, OpenXPKI::DateTime::_parse_date_utc($notafter)) == 1) {
         ##! 16: 'certificate is no longer valid'
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
@@ -148,8 +149,8 @@ sub login_step {
     my $role;    
     # Ask connector    
     if ($self->{ROLEHANDLER}) {               
-        if ($self->{ROLEARG} eq "cn") {
-            # FIXME - how to get that fastest?
+        if ($self->{ROLEARG} eq "username") {
+            $role = CTX('config')->get( [ $self->{ROLEHANDLER}, $username ]);
         } elsif ($self->{ROLEARG} eq "subject") {    
             $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509->{PARSED}->{BODY}->{SUBJECT} ]);                    
         } elsif ($self->{ROLEARG} eq "serial") {
@@ -201,7 +202,6 @@ The certificate is checked for validity at login, the certificate
 role is read from the database and compared to the list of acceptable
 roles from the configuration.
 
-
 =head1 configuration
     
 Signature:
@@ -219,11 +219,11 @@ Signature:
 
 =item role.handler
 
-A connector that returns a role for a give user 
+A connector that returns a role for the given role argument. 
 
 =item role.argument
 
-Argument to use with hander to query for a role. Supported values are I<cn> (common name), I<subject>, I<serial>
+Argument to use with hander to query for a role. Supported values are I<username> (as passed by the client), I<subject>, I<serial>
 
 =item role.default
 

@@ -61,8 +61,7 @@ sub list_my_certificates {
     }
     my @results;
     my $db_results = CTX('dbi_backend')->select(
-        TABLE => [
-            [ 'WORKFLOW_CONTEXT' => 'context1' ],
+        TABLE => [            
             [ 'WORKFLOW_CONTEXT' => 'context2' ],
             [ 'WORKFLOW_CONTEXT' => 'context3' ],
             'CERTIFICATE',
@@ -75,29 +74,20 @@ sub list_my_certificates {
             'CERTIFICATE.STATUS',
             'CERTIFICATE.CERTIFICATE_SERIAL',
         ],
-        DYNAMIC => {
-            'context1.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'workflow_parent_id'},
+        DYNAMIC => {            
             'context2.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'creator'},
             'context3.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'cert_identifier'},
             'context2.WORKFLOW_CONTEXT_VALUE' => {VALUE => $user},
             'CERTIFICATE.PKI_REALM'           => {VALUE => $realm},
         },
-        JOIN => [
+        JOIN => [            
             [
-                'WORKFLOW_CONTEXT_VALUE',
-                'WORKFLOW_SERIAL',
-                undef,
-                undef,
-            ],
-            [
-                undef,
                 undef,
                 'WORKFLOW_CONTEXT_VALUE',
                 'IDENTIFIER',
             ],
             [
                 'WORKFLOW_SERIAL',
-		undef,
                 'WORKFLOW_SERIAL',
                 undef,
             ],

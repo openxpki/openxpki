@@ -739,7 +739,7 @@ sub get_private_key_for_cert {
         }
     }
     elsif ( $format eq 'JAVA_KEYSTORE' ) {
-        my $token = CTX('crypto_layer')->get_system_token( TYPE => 'javaks', );
+        my $token = CTX('crypto_layer')->get_system_token({ TYPE => 'javaks' });
 
         # get decrypted private key to pass on to create_keystore
         my @chain = $self->__get_chain_certificates(

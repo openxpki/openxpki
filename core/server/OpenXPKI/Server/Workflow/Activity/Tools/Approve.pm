@@ -101,9 +101,9 @@ sub execute
                 . "-----END PKCS7-----\n";
 
         ##! 32: 'pkcs7: ' . $pkcs7
-        my $pkcs7_token = CTX('crypto_layer')->get_system_token(
+        my $pkcs7_token = CTX('crypto_layer')->get_system_token({
             TYPE      => 'PKCS7',            
-        );
+        });
 
         my $signer_subject;
         eval {

@@ -147,7 +147,10 @@ sub login_step {
               '-----BEGIN PKCS7-----' . "\n"
             . $signature
             . '-----END PKCS7-----';
-        my $pkcs7_token = CTX('crypto_layer')->get_system_token( TYPE => "PKCS7" );
+        my $pkcs7_token = CTX('crypto_layer')->get_system_token({ TYPE => "PKCS7" });
+          
+        ##! 64: ' Signature blob: ' . $pkcs7
+        ##! 64: ' Challenge: ' . $challenge          
             
         eval {
             $pkcs7_token->command({

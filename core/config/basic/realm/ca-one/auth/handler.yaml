@@ -2,10 +2,10 @@ Certificate:
     type: ClientX509
     label: Certificate
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
-    role: 
-        default: ''
-        handler@: auth.roledb
-        argument: dn
+    role:
+        default: User
+        handler@: connector:auth.connector.role
+        argument: username
         
 Signature:
     type: X509
@@ -19,8 +19,9 @@ Signature:
     challenge_length: 256
     role: 
         default: ''
-        handler@: auth.roledb
-        argument: dn
+        handler@: auth.connector.role
+        argument: username
+        
 
 Anonymous:
     type: Anonymous

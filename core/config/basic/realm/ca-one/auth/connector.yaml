@@ -10,3 +10,7 @@ userdb:
     class: Connector::Proxy::YAML
     LOCATION: /home/pkiadm/ca-one-userdb.yaml
 
+role:
+    class: Connector::Proxy::YAML
+    LOCATION: /home/pkiadm/ca-one-x509-roles.yaml
+
