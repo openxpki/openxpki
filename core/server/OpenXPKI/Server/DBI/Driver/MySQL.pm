@@ -25,7 +25,7 @@ our $DBI_OPTION = {
 		   mysql_bind_type_guessing => 1,
                    AutoCommit => 0};
 
-our $TABLE_OPTION = "TYPE=InnoDB";
+our $TABLE_OPTION = "Engine=InnoDB";
 
 our $LIMIT      = "__QUERY__ LIMIT __MAXITEMS__";
 our $LIMITSTART = "__QUERY__ LIMIT __START__,__MAXITEMS__";
@@ -107,7 +107,7 @@ sub create_sequence
     my $seq = $self->{schema}->get_sequence_name ($keys->{NAME});
     my $mode = $keys->{MODE};
 
-    my $query = "CREATE TABLE $seq (seq_number BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT, dummy INT) TYPE=InnoDB";
+    my $query = "CREATE TABLE $seq (seq_number BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT, dummy INT) Engine=InnoDB";
     return $query if ($mode and $mode eq "DRYRUN");
     $dbh->do_query (QUERY => $query);
     $dbh->finish_sth();
