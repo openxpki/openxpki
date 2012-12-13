@@ -79,3 +79,4 @@ libdata-page-perl
 libmath-round-perl
 libtimedate-perl
 libyaml-perl
+libmodule-install-perl

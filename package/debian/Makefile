@@ -25,6 +25,9 @@ PACKAGES=			\
 # XML::Filter::XInclude XML::SAX::PurePerl XML::Validator::Schema
 # Exception::Class 1.22 Added Exception::Class::Base->caught() 
 
+# On Ubuntu 12.04 the Digest::SHA1 is renamed to  Digest::SHA which leeds to missing modules.
+# This is a quick hack to have the old module available on such systems
+
 EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Data__SpreadPagination		\
@@ -34,7 +37,8 @@ EXTERNAL=				\
 	Config__Merge \
 	Config__Versioned \
 	Proc__SafeExec \
-	XML__Filter__XInclude 
+	XML__Filter__XInclude \
+	Digest__SHA1 
 
 EXTERNAL2= \
 	Workflow \
@@ -59,15 +63,11 @@ $(EXTERNAL) $(EXTERNAL2):
 	test -d deb/cpan || mkdir deb/cpan/
 	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
 
-
 # Development Builds from git repos
 Connector:
+	test -d deb || mkdir deb
 	test -d deb/cpan/Connector || git clone git://github.com/oliwel/connector.git  deb/cpan/Connector
-	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --desc Connector --version dev-`date +%Y%m%d`  --build Connector/
-
-Workflow:
-	test -d deb/cpan/perl-workflow || git clone -b tag/1.99 git://github.com/oliwel/perl-workflow deb/cpan/perl-workflow
-	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl  --version dev-1.99 --build perl-workflow/
+	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --desc Connector --version 0.`date +%Y%m%d`  --build Connector/
 
 DateTime__Format__DateParse:
 	test -d deb || mkdir deb

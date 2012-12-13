@@ -3,17 +3,24 @@
 Quickstart guide
 ================
 
-**Use a debian squeeze US install or install en_US.utf8 locale as the mason client will crash otherwise!**
+Debian/Ubuntu Development Builds
+---------------------------------
 
-Debian Development Builds
---------------------------
+**Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the mason client will crash otherwise!**
 
-We publish build packages from the development head, it "should work" but some stuff needs a bit of manual tweaking.
+You can find packages for Debian Squeeze and Ubuntu 12.04 at http://packages.openxpki.org/.
 
-Add our deb-repository to your source list::
+Packages are build from the development head, it "should work" but some stuff might need a bit of manual tweaking.
+
+Add the repository to your source list (squeeze)::
 
     echo "deb http://packages.openxpki.org/debian/ squeeze/binary/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update   
+    
+or ubuntu::
+
+    echo "deb http://packages.openxpki.org/ubuntu/ precise/binary/" > /etc/apt/sources.list.d/openxpki.list
+    aptitude update
 
 As the init script uses mysql as default, but does not force it as a dependancy, it is crucial that you have the mysql server installed before you pull the OpenXPKI package::
 
