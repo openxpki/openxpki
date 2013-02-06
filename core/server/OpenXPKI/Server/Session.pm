@@ -10,6 +10,7 @@ use warnings;
 use utf8;
 
 use English;
+ 
 use OpenXPKI::Exception;
 use OpenXPKI::i18n;
 use OpenXPKI::Serialization::Simple;
@@ -143,7 +144,6 @@ sub parse_serialized_info {
      
     return $self->_get_serializer()->deserialize($serialized_string);    
 }
-    
 
 sub _get_serializer{
     return OpenXPKI::Serialization::Simple->new();
@@ -338,6 +338,36 @@ sub get_config_version
     return $self->{session}->param ("config_version");
 }
 
+# For SCEP - FIXME - move whole Session to Moose
+sub set_profile {
+    my $self = shift;    
+    $self->{profile} = shift;    
+}
+
+sub get_profile {
+    my $self = shift;
+    return $self->{profile};
+}
+
+sub set_server {
+    my $self = shift;    
+    $self->{server} = shift;    
+}
+
+sub get_server {
+    my $self = shift;
+    return $self->{server};
+}
+
+sub set_enc_alg {
+    my $self = shift;    
+    $self->{enc_alg} = shift;    
+}
+
+sub get_enc_alg {
+    my $self = shift;
+    return $self->{enc_alg};
+}
 
 1;
 __END__

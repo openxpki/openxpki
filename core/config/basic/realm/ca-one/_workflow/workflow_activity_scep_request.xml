@@ -117,6 +117,21 @@
 
   <action name="child_finished_failure"
          class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
-    error_code="badRequest"/> 
+    error_code="badRequest"/>
+    
+  <!-- copied from smartcardv4 -->  
+  <action name="enroll_next_cert_to_revoke"
+           class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
+           array_name="tmp_queue"
+           context_key="cert_identifier"
+           function="shift">
+           <field name="tmp_queue" is_required="yes"/>
+   </action>
+   
+   <action name="enroll_revoke_certificate"
+           class="OpenXPKI::Server::Workflow::Activity::SmartCard::RevokeCertificate">
+           <field name="cert_identifier" is_required="yes"/>
+   </action>
+     
 </actions>
 

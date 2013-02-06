@@ -102,9 +102,11 @@ sub execute_action {
     
      $self->set_reap_at_interval($default_reap_at_interval);
     
-    my $session_info = CTX('session')->export_serialized_info();
+    my $session =  CTX('session');
+    my $session_info = $session->export_serialized_info();
     ##! 32: 'session_info: '.$session_info
     $self->session_info($session_info);
+    
     
     #set "reap at" info
     my $action = $self->_get_action($action_name);

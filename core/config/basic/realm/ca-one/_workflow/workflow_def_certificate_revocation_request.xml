@@ -7,8 +7,8 @@
 
  <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_INITIAL</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CRR"
-	    resulting_state="PENDING">
+    <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CRR"	    
+	    resulting_state="CRR_PERSIST">	    
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_CREATE"/>
     </action>
   </state>

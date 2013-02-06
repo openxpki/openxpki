@@ -514,6 +514,11 @@ sub do_process_request
 
     ##! 2: "service detector"
     my $data = $serializer->deserialize ($transport->read());
+
+    # By the way, if you're adding support for a new service here,
+    # You need to add a matching entry in system/server.yaml
+    # below the "service" key.
+    # For the old XML config touch config.xml!  
     if ($data eq "Default")
     {
         OpenXPKI::Server::Context::setcontext
@@ -531,6 +536,18 @@ sub do_process_request
         OpenXPKI::Server::Context::setcontext
         ({
             "service" => OpenXPKI::Service::SCEP->new
+                         ({
+                            TRANSPORT     => $transport,
+                            SERIALIZATION => $serializer,
+                         })
+        });
+        $transport->write($serializer->serialize('OK'));
+    }
+    elsif ($data eq 'SCEPv2')
+    {
+        OpenXPKI::Server::Context::setcontext
+        ({
+            "service" => OpenXPKI::Service::SCEPv2->new
                          ({
                             TRANSPORT     => $transport,
                             SERIALIZATION => $serializer,

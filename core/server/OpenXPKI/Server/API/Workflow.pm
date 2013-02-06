@@ -748,7 +748,7 @@ sub search_workflow_instances {
         my $table_alias = $context_table . '_' . $i;
         my $key   = $context_entry->{KEY};
         my $value = $context_entry->{VALUE};
-        my $operator = '=';
+        my $operator = 'EQUAL';
         $operator = $context_entry->{OPERATOR} if($context_entry->{OPERATOR});
         $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_KEY'}   = {VALUE => $key};
         $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_VALUE'} = {VALUE => $value, OPERATOR  => $operator };

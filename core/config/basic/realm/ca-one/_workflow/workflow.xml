@@ -7,6 +7,7 @@
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_revocation_request.xml"/>
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_crl_issuance.xml"/>    
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_password_safe.xml"/>
+	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_enrollment.xml" />
 	    <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_testing.xml"/> -->        
 	  </workflows>
 	    
@@ -19,6 +20,7 @@
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_password_safe.xml"/>
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_nice.xml"/>
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity.xml"/>
+	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_enrollment.xml" />	    
 	    <!--  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_testing.xml"/> -->
 	  </activities>
 	
@@ -32,7 +34,11 @@
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition.xml"/>
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_acl.xml"/>
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_nice.xml"/>
+	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_enrollment.xml" />	    
 	  </conditions>
 	
 	</workflow_config>
 </openxpki>
+
+
+

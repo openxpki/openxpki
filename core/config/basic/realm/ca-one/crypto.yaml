@@ -40,7 +40,7 @@ token:
     inherit: default
     key: /etc/openxpki/ssl/ca-one/ca-one-vault-1.pem
              
-  ca-one-scep:
+  ca-one-scep-1:
     inherit: default
     backend: OpenXPKI::Crypto::Tool::SCEP
     shell: /usr/bin/openca-scep

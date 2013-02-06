@@ -15,6 +15,12 @@ sub evaluate
 
     my $context = $wf->context();
     my $ca      = $context->param('ca');
+
+    $context->param('todo_kludge_wf_cond_key', 'workflow condition Key.pm is forced to return true');
+    return 1;
+
+=begin temporarily_disabled
+
     my $realm   = CTX('session')->get_pki_realm();
 
     my $cfg_id = CTX('api')->get_config_id({ ID => $wf->id() });
@@ -33,6 +39,11 @@ sub evaluate
     }
     ##! 1: 'end'
     return 1;
+
+=end
+
+=cut
+
 }
 
 1;

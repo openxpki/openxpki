@@ -2,7 +2,7 @@
 # Written by Alexander Klink for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
 
-package OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest;
+package OpenXPKI::Server::Workflow::Activity::SCEPv2::PersistRequest;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
@@ -43,14 +43,7 @@ sub execute
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_SUBJECT_UNDEFINED',
         );
-    }
-    my $role    = $context->param('cert_role') || '';
-    # Role is no longer mandatory
-    #if (! defined $role) {
-    #    OpenXPKI::Exception->throw(
-    #        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_ROLE_UNDEFINED',
-    #    );
-    #}
+    } 
 
     my $data;
     if ($type eq 'spkac') {
@@ -78,7 +71,7 @@ sub execute
             'DATA'       => $data,
             'PROFILE'    => $profile,
             'SUBJECT'    => $subject,
-            'ROLE'       => $role,
+            'ROLE'       => '',
         },
     );
 
@@ -90,9 +83,9 @@ sub execute
     }
     
     my $san_serialized = $context->param('cert_subject_alt_name');
-    if ($san_serialized) {
-        my $subj_alt_names = $serializer->deserialize($san_serialized);
-    
+    if($san_serialized) {
+        
+        my $subj_alt_names = $serializer->deserialize($san_serialized);   
         my @subj_alt_names = @{$subj_alt_names};
         ##! 16: '$subj_alt_names: ' . Dumper($subj_alt_names)
         ##! 16: '@subj_alt_names: ' . Dumper(\@subj_alt_names)
@@ -123,7 +116,7 @@ sub execute
                 },
             );
         }
-    }
+    } # end SAN
     
     foreach my $validity_param (qw( notbefore notafter )) {
         if (defined $context->param($validity_param)) {
@@ -147,25 +140,25 @@ sub execute
     
     # process additional information (user configurable in profile)
     if (defined $context->param('cert_info')) {
-	my $cert_info = $serializer->deserialize($context->param('cert_info'));
-	##! 16: 'additional certificate information: ' . Dumper $cert_info
-	
-	foreach my $custom_key (keys %{$cert_info}) {
-	    my $attrib_serial = $dbi->get_new_serial(
-		TABLE => 'CSR_ATTRIBUTES',
-		);
-	    $dbi->insert(
-		TABLE => 'CSR_ATTRIBUTES',
-		HASH  => {
-		    'ATTRIBUTE_SERIAL' => $attrib_serial,
-		    'PKI_REALM'        => $pki_realm,
-		    'CSR_SERIAL'       => $csr_serial,
-		    'ATTRIBUTE_KEY'    => 'custom_' . $custom_key,
-		    'ATTRIBUTE_VALUE'  => $cert_info->{$custom_key},
-		    'ATTRIBUTE_SOURCE' => $source_ref->{'cert_info'},
-		},
-		);
-	}
+    	my $cert_info = $serializer->deserialize($context->param('cert_info'));
+    	##! 16: 'additional certificate information: ' . Dumper $cert_info
+    	
+    	foreach my $custom_key (keys %{$cert_info}) {
+    	    my $attrib_serial = $dbi->get_new_serial(
+    		TABLE => 'CSR_ATTRIBUTES',
+    		);
+    	    $dbi->insert(
+    		TABLE => 'CSR_ATTRIBUTES',
+    		HASH  => {
+    		    'ATTRIBUTE_SERIAL' => $attrib_serial,
+    		    'PKI_REALM'        => $pki_realm,
+    		    'CSR_SERIAL'       => $csr_serial,
+    		    'ATTRIBUTE_KEY'    => 'custom_' . $custom_key,
+    		    'ATTRIBUTE_VALUE'  => $cert_info->{$custom_key},
+    		    'ATTRIBUTE_SOURCE' => $source_ref->{'cert_info'},
+    		},
+    		);
+    	}
     }
 
     $dbi->commit();

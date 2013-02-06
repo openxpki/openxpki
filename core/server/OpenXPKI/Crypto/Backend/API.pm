@@ -288,7 +288,7 @@ sub get_object_function {
     {
         @functions = ("subject", "version", "signature_algorithm",
                       "pubkey", "pubkey_hash", "keysize", "pubkey_algorithm",
-                      "exponent", "modulus", "extensions");
+                      "exponent", "modulus", "extensions","attributes");
     }
     elsif ($type eq "SPKAC")
     {

@@ -51,7 +51,7 @@ sub START {
         $self->set_secret($session_obj->get_secret());
         $self->set_state($session_obj->get_state());
     }
-}
+} 
 
 1;
 __END__

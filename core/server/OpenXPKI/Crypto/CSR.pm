@@ -90,7 +90,7 @@ sub __init
     } else {
         @attrlist = ("subject", "version", "signature_algorithm",
                      "pubkey", "pubkey_hash", "keysize", "pubkey_algorithm",
-                     "exponent", "modulus", "extensions");
+                     "exponent", "modulus", "extensions","attributes");
     }
     foreach my $attr (@attrlist)
     {
@@ -102,6 +102,18 @@ sub __init
         ##! 16: 'result: ' . $self->{PARSED}->{BODY}->{uc($attr)}
     }
     $self->{TOKEN}->free_object ($self->{csr});
+    
+    # Reformat Request Attributes
+    # If I understand that code in the XS Binding correctly, 
+    # all printable attributes are returned as one large string,
+    # attributes seperated by newline, key/value seperated by colon
+    # Keys are shown as 25 char block (padded or truncated)
+    # For the moment we are just interessted in the challengePassword
+    if ($self->{PARSED}->{BODY}->{'ATTRIBUTES'} =~ /challengePassword\s*?:(.*)/) {
+        $self->{PARSED}->{BODY}->{'CHALLENGEPASSWORD'} = $1;
+    }    
+    delete $self->{PARSED}->{BODY}->{'ATTRIBUTES'};
+    
     delete $self->{csr};
     ##! 2: "loaded CSR attributes"
     my $ret = $self->{PARSED}->{BODY};
