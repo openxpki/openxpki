@@ -304,6 +304,7 @@ WriteMakefile(
     'Config::Std'            => undef,
 	'Config::Merge'          => '1',
 	'Config::Versioned'      => '0.02',
+    'Connector'              => '1.0',
 	'Crypt::CBC'             => '2.29',
 	'Crypt::OpenSSL::AES'    => '0.02',
 	'DBI'                    => 1,

@@ -54,12 +54,11 @@ inst-pkgs:
 # Note: Config::Std is a prereq for running 'perl Makefile.PL'
 cpanm:
 	. $(PERLBREW_RC) && cpanm --installdeps --notest --verbose --no-interactive Class::Std Config::Std
-	. $(PERLBREW_RC) && cd trunk/perl-modules/core/trunk && $(CPANM_INST) 
-	. $(PERLBREW_RC) && cd trunk/clients/perl/OpenXPKI-Client && $(CPANM_INST)
+	. $(PERLBREW_RC) && cd core/server && $(CPANM_INST) 
 
 .PHONY: clean-core
 clean-core:
-	(cd trunk/perl-modules/core/trunk && \
+	(cd core/server && \
 		rm -rf Makefile OpenXPKI.bs OpenXPKI.c OpenXPKI.o blib pm_to_blib \
 	)
 
@@ -70,6 +69,6 @@ test: clean-core
 	mkdir -p $(TESTLOGDIR)
 	rm -f test.err
 	. $(PERLBREW_RC) && \
-		(cd trunk/perl-modules/core/trunk && perl Makefile.PL && make test) || touch test.err 2>&1 | \
+		(cd core/server && perl Makefile.PL && make test) || touch test.err 2>&1 | \
 		tee $(TESTLOG)
 	! test -f test.err
