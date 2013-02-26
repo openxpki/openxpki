@@ -101,7 +101,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-02-22 10:42:17 +0000</string>
+	<string>2013-02-26 09:48:13 +0000</string>
 	<key>Modifier</key>
 	<string>Scott Hardin</string>
 	<key>NotesVisible</key>
@@ -6512,7 +6512,7 @@ FINISHED PERSIST}</string>
 					<key>UserInfo</key>
 					<dict>
 						<key>class</key>
-						<string>Workflow::Action::Null</string>
+						<string>OpenXPKI::Server::Workflow::Activity::SCEPv2::LoadRecentCertificate</string>
 					</dict>
 				</dict>
 				<dict>
@@ -23568,13 +23568,13 @@ Enrollment Workflow}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>5</integer>
+		<integer>2</integer>
 		<key>ExpandedCanvases</key>
 		<array/>
 		<key>FitInWindow</key>
 		<true/>
 		<key>Frame</key>
-		<string>{{819, 145}, {903, 1009}}</string>
+		<string>{{597, 50}, {903, 1008}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -23588,9 +23588,9 @@ Enrollment Workflow}</string>
 		<key>SidebarWidth</key>
 		<integer>175</integer>
 		<key>VisibleRegion</key>
-		<string>{{-41, 0}, {641.69996940136105, 782.99996266365224}}</string>
+		<string>{{-42, 0}, {642.43844432447736, 783.00001138565335}}</string>
 		<key>Zoom</key>
-		<real>1.1111111640930176</real>
+		<real>1.1098339557647705</real>
 		<key>ZoomValues</key>
 		<array>
 			<array>
