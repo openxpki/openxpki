@@ -52,6 +52,9 @@ sub __init_command_params : PRIVATE {
         'get_signer_cert' => {
             'PKCS7' => 1,
         },
+        'get_getcert_serial' => {
+            'PKCS7' => 1,
+        },
     });
 }
 

@@ -20,6 +20,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 use Data::Dumper;
 use MIME::Base64;
+use Math::BigInt;
 use DateTime::Format::DateParse;
 
 sub execute {
@@ -50,6 +51,8 @@ sub execute {
         }
     );
 
+    ##! 32: 'PKI msg ' . Dumper $message_type_ref
+
     if ( $message_type_ref->{MESSAGE_TYPE_NAME} eq 'PKCSReq' ) {
         $result = $self->__pkcs_req(
             {   TOKEN => $token,
@@ -68,6 +71,17 @@ sub execute {
             }
         );
     }
+    elsif ( $message_type_ref->{MESSAGE_TYPE_NAME} eq 'GetCert' ) {
+
+        ##! 32: 'PKCS7 GetCert ' . $pkcs7_base64
+        $result = $self->__send_cert(
+            {   TOKEN => $token,
+                PKCS7 => $pkcs7_decoded,
+                PARAMS => $url_params,                
+            }
+        );
+
+    }    
     else {
         $result = $token->command(
             {   COMMAND      => 'create_error_reply',
@@ -85,6 +99,77 @@ sub execute {
 # handle multiple workflow types, but we'll just leave it static for now.
 sub __get_workflow_type : PRIVATE {
     return 'I18N_OPENXPKI_WF_TYPE_ENROLLMENT';
+}
+
+sub __send_cert : PRIVATE {
+    my $self      = shift;
+    my $arg_ref   = shift;
+    
+    my $token = $arg_ref->{TOKEN};
+    my $pkcs7_decoded = $arg_ref->{PKCS7};
+    
+    my $requested_serial_hex = $token->command({   
+        COMMAND => 'get_getcert_serial',
+        PKCS7   => $pkcs7_decoded,
+    });
+
+    # Serial is in Hex Format - we need decimal!
+    my $mbi = Math::BigInt->from_hex( "0x$requested_serial_hex" );       
+    my $requested_serial_dec = scalar $mbi->bstr();
+    
+    ##! 16: 'Found serial - hex: ' . $requested_serial_hex . ' - dec: ' . $requested_serial_dec
+                    
+    my $cert_result = CTX('api')->search_cert({ 'CERT_SERIAL' => $requested_serial_dec });
+    
+    ##! 32: 'Search result ' . Dumper $cert_result 
+    my $cert_count = scalar @{$cert_result};
+    
+    # more than one - no usable result
+    if ($cert_count > 1) {
+        OpenXPKI::Exception->throw(
+            message =>
+                "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_GETCERT_MORE_THAN_ONE_CERTIFICATE_FOUND",
+            params => {
+                COUNT => $cert_count,
+                SERIAL_HEX => $requested_serial_hex,
+                SERIAL_DEC => $requested_serial_dec,
+            },
+            log => {
+                logger => CTX('log'),
+                priority => 'error',
+                facility => 'system',
+            },
+        );          
+    }
+    
+    if ($cert_count == 0) {
+         CTX('log')->log(
+            MESSAGE => "SCEP getcert - no certificate found for serial $requested_serial_hex",
+            PRIORITY => 'info',
+            FACILITY => 'system',
+        );             
+        
+        return $token->command(
+            {   COMMAND      => 'create_error_reply',
+                PKCS7        => $pkcs7_decoded,
+                'ERROR_CODE' => 'badCertId',
+            }
+        );  
+    }
+    
+    my $cert_identifier  = $cert_result->[0]->{'IDENTIFIER'};
+    ##! 16: 'Load Cert Identifier ' . $cert_identifier 
+    my $cert_pem = CTX('api')->get_cert({ 'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'PEM' });
+
+    ##! 16: 'cert data ' . Dumper $cert_pem
+    my $result = $token->command(
+        {   COMMAND        => 'create_certificate_reply',
+            PKCS7          => $pkcs7_decoded,
+            CERTIFICATE    => $cert_pem,
+            ENCRYPTION_ALG => CTX('session')->get_enc_alg(),
+        }
+    );
+    return $result;
 }
 
 sub __pkcs_req : PRIVATE {
@@ -268,12 +353,12 @@ foreach my $wf ( @{ $workflows } ) {
 
 
         # The maximum age until the workflow is considered outdated 
-        my $expiry = CTX('config')->get("scep.$server.workflow_expiry");
+        #my $expiry = CTX('config')->get("scep.$server.workflow_expiry");
         
-        my $expirydate = OpenXPKI::DateTime::get_validity({            
-            VALIDITY => '+'.$expiry,
-            VALIDITYFORMAT => 'relativedate',
-        });
+        #my $expirydate = OpenXPKI::DateTime::get_validity({            
+        #    VALIDITY => '+'.$expiry,
+        #    VALIDITYFORMAT => 'relativedate',
+        #});
         
         $wf_info = $api->create_workflow_instance(
             {   WORKFLOW => $self->__get_workflow_type(),
