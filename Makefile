@@ -72,3 +72,12 @@ test: clean-core
 		(cd core/server && perl Makefile.PL && make test) || touch test.err 2>&1 | \
 		tee $(TESTLOG)
 	! test -f test.err
+
+############################################################
+# Workflow XML
+# 
+# Recent workflows have been modeled (mis)using OmniGraffle. The resulting
+# .plist files are then converted to XML. 
+############################################################
+workflow:
+	$(MAKE) -f tools/workflow.mak

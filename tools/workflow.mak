@@ -79,20 +79,20 @@ $(xmldir)/workflow_validator_%.xml: $(graffledir)/workflow_%.graffle $(ogflow)
 
 .PHONY: all test debug clean
 
-smartcard_cardadm: $(xmldir)/workflow_def_smartcard_cardadm.xml
-smartcard_cardadm: $(xmldir)/workflow_activity_smartcard_cardadm.xml
-smartcard_cardadm: $(xmldir)/workflow_condition_smartcard_cardadm.xml
-smartcard_cardadm: $(xmldir)/workflow_validator_smartcard_cardadm.xml
-
-smartcard_fetch_puk: $(xmldir)/workflow_def_smartcard_fetch_puk.xml
-smartcard_fetch_puk: $(xmldir)/workflow_activity_smartcard_fetch_puk.xml
-smartcard_fetch_puk: $(xmldir)/workflow_condition_smartcard_fetch_puk.xml
-smartcard_fetch_puk: $(xmldir)/workflow_validator_smartcard_fetch_puk.xml
-
-test_tools: $(xmldir)/workflow_def_test_tools.xml
-test_tools: $(xmldir)/workflow_activity_test_tools.xml
-test_tools: $(xmldir)/workflow_condition_test_tools.xml
-test_tools: $(xmldir)/workflow_validator_test_tools.xml
+#smartcard_cardadm: $(xmldir)/workflow_def_smartcard_cardadm.xml
+#smartcard_cardadm: $(xmldir)/workflow_activity_smartcard_cardadm.xml
+#smartcard_cardadm: $(xmldir)/workflow_condition_smartcard_cardadm.xml
+#smartcard_cardadm: $(xmldir)/workflow_validator_smartcard_cardadm.xml
+#
+#smartcard_fetch_puk: $(xmldir)/workflow_def_smartcard_fetch_puk.xml
+#smartcard_fetch_puk: $(xmldir)/workflow_activity_smartcard_fetch_puk.xml
+#smartcard_fetch_puk: $(xmldir)/workflow_condition_smartcard_fetch_puk.xml
+#smartcard_fetch_puk: $(xmldir)/workflow_validator_smartcard_fetch_puk.xml
+#
+#test_tools: $(xmldir)/workflow_def_test_tools.xml
+#test_tools: $(xmldir)/workflow_activity_test_tools.xml
+#test_tools: $(xmldir)/workflow_condition_test_tools.xml
+#test_tools: $(xmldir)/workflow_validator_test_tools.xml
 
 enrollment: $(xmldir)/workflow_def_enrollment.xml
 enrollment: $(xmldir)/workflow_activity_enrollment.xml

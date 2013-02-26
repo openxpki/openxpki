@@ -1328,12 +1328,22 @@ chomp($gitdir);
 chdir($gitdir) || die "Error CD'ing to '$gitdir': $!";
 my $gitinfo = `git rev-parse HEAD`;
 chomp($gitinfo);
-my $gitstatus = `git status --porcelain -- '$infile'`;
-chomp($gitstatus);
-warn "GITINFO: $gitinfo";
-warn "GITSTATUS: $gitstatus";
-
-$gitstatus =~ s/^\s+([MADRCU])\s+.+/$1/;
+#warn "GITINFO: $gitinfo";
+my $gitstatus;
+my $git;
+open($git, "git status --porcelain|");
+if ( not $git ) {
+    die "Error running git: $!";
+}
+while (my $line = <$git>) {
+    my ($fstat, $fname) = ($line =~ m/^\s*(\S+)\s+(.+)$/);
+    if ( $fname eq $infile ) {
+        $gitstatus = $fstat;
+        last;
+    }
+}
+close $git;
+#warn "GITSTATUS of '$infile': ", $gitstatus;
 
 my %gitlabels = (
     M   => 'modified',
