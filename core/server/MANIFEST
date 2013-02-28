@@ -24,6 +24,7 @@ openxpki.xsd
 ## Client
 OpenXPKI/Client.pm
 OpenXPKI/Client/API.pm
+OpenXPKI/Client/SCEPv2.pm
 
 ## Config Layers
 OpenXPKI/Config/Merge.pm 
@@ -58,6 +59,7 @@ OpenXPKI/Crypto/Tool/SCEP/Command/create_certificate_reply.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/get_pkcs10.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/create_pending_reply.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/get_signer_cert.pm
+OpenXPKI/Crypto/Tool/SCEP/Command/get_getcert_serial.pm
 OpenXPKI/Crypto/Tool/SCEP/Engine/OpenSSL.pm
 OpenXPKI/Crypto/Tool/PKCS7.pm
 OpenXPKI/Crypto/Tool/PKCS7/CLI.pm
@@ -219,18 +221,20 @@ OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
-OpenXPKI/Server/Workflow/Activity/Tools/ForkWorkflowInstance.pm
+
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Sleep.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Notification.pm
-OpenXPKI/Server/Workflow/Activity/Tools/NotifyParentWorkflow.pm
+
 OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCRL.pm
+
+OpenXPKI/Server/Workflow/Activity/Tools/Connector/GetValue.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
@@ -257,16 +261,22 @@ OpenXPKI/Server/Workflow/Activity/DataExchange/Cleanup.pm
 OpenXPKI/Server/Workflow/Activity/PasswordSafe/RetrievePassword.pm
 OpenXPKI/Server/Workflow/Activity/PasswordSafe/StorePassword.pm
 
-OpenXPKI/Server/Workflow/Activity/SCEP/SetContextFromOriginalCert.pm
-OpenXPKI/Server/Workflow/Activity/SCEP/SetContextFromCSR.pm
-OpenXPKI/Server/Workflow/Activity/SCEP/ExtractCSR.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateChallenge.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateSignerTrust.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateEligibility.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/SerializeUniqueId.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/RevokeExistingCerts.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/LoadRecentCertificate.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/CalcApprovals.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/FetchGroupPolicy.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/PersistRequest.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/ExtractCSR.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartCard/ForkWorkflowInstances.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/PersistCSRs.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/RevokeCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/WriteCertificateToInstall.pm
-
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm
-
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateEscrowedKey.pm
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
@@ -276,46 +286,37 @@ OpenXPKI/Server/Workflow/Observer/AddExecuteHistory.pm
 OpenXPKI/Server/Workflow/Observer/Debug.pm
 OpenXPKI/Server/Workflow/Observer/Log.pm
 
+# @todo  A lot of those are unused - check what is really needed 
 #OpenXPKI/Server/Workflow/Condition/ACL.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysFalse.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysTrue.pm
 OpenXPKI/Server/Workflow/Condition/Approved.pm
 OpenXPKI/Server/Workflow/Condition/Key.pm
-OpenXPKI/Server/Workflow/Condition/Server.pm
 OpenXPKI/Server/Workflow/Condition/HasRole.pm
-OpenXPKI/Server/Workflow/Condition/CRLSigningCAsLeft.pm
-OpenXPKI/Server/Workflow/Condition/WorkflowChildrenSuccessfullyFinished.pm
-OpenXPKI/Server/Workflow/Condition/InitialEnrollmentOrRenewal.pm
-OpenXPKI/Server/Workflow/Condition/CorrectTiming.pm
-OpenXPKI/Server/Workflow/Condition/IsValidSignature.pm
-OpenXPKI/Server/Workflow/Condition/IsValidSignatureWithRequestedDN.pm
-OpenXPKI/Server/Workflow/Condition/CorrectNumberOfValidCerts.pm
-OpenXPKI/Server/Workflow/Condition/SignedUsingOriginalCertOrSelfSigned.pm
-OpenXPKI/Server/Workflow/Condition/MoreCertsToTest.pm
-OpenXPKI/Server/Workflow/Condition/MoreCSRsToCreate.pm
-OpenXPKI/Server/Workflow/Condition/CheckCertTestResult.pm
+
+
 OpenXPKI/Server/Workflow/Condition/ValidCSRSerialPresent.pm
-OpenXPKI/Server/Workflow/Condition/WorkflowChildrenFailure.pm
+
 OpenXPKI/Server/Workflow/Condition/IsServerKeyGeneration.pm
 OpenXPKI/Server/Workflow/Condition/CertificateNotYetRevoked.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContext.pm
-OpenXPKI/Server/Workflow/Condition/CheckForkedWorkflowChildren.pm
+
 OpenXPKI/Server/Workflow/Condition/CheckExistingCertificate.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContextBulk.pm
-OpenXPKI/Server/Workflow/Condition/SCEPClient.pm
-OpenXPKI/Server/Workflow/Condition/SCEPClientAutoIssuance.pm
-OpenXPKI/Server/Workflow/Condition/SCEPClientCertValid.pm
-OpenXPKI/Server/Workflow/Condition/SCEPClientEnrollment.pm
-OpenXPKI/Server/Workflow/Condition/SCEPClientCSRValidRole.pm
 
 OpenXPKI/Server/Workflow/Condition/WFArray.pm
+OpenXPKI/Server/Workflow/Condition/WFHash.pm
+OpenXPKI/Server/Workflow/Condition/WFValue.pm
 OpenXPKI/Server/Workflow/Condition/DatapoolEntry.pm
 
 OpenXPKI/Server/Workflow/Condition/CertificateHasStatus.pm
 OpenXPKI/Server/Workflow/Condition/MaxIterationsNotReached.pm
-OpenXPKI/Server/Workflow/Condition/WFValue.pm
 OpenXPKI/Server/Workflow/Condition/SubjectMatchesPKCS10.pm
+
+OpenXPKI/Server/Workflow/Condition/Connector/IsValue.pm
+
+OpenXPKI/Server/Workflow/Condition/SCEPv2/ValidSCEPTID.pm
 
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm
@@ -363,10 +364,11 @@ OpenXPKI/Service.pm
 OpenXPKI/Service/Default.pm
 OpenXPKI/Service/Default/Command.pm
 OpenXPKI/Service/Default/Command/nop.pm
-OpenXPKI/Service/SCEP.pm
-OpenXPKI/Service/SCEP/Command.pm
-OpenXPKI/Service/SCEP/Command/GetCACert.pm
-OpenXPKI/Service/SCEP/Command/PKIOperation.pm
+
+OpenXPKI/Service/SCEPv2.pm
+OpenXPKI/Service/SCEPv2/Command/PKIOperation.pm
+OpenXPKI/Service/SCEPv2/Command/GetCACert.pm
+OpenXPKI/Service/SCEPv2/Command.pm
 
 ## test stuff
 
