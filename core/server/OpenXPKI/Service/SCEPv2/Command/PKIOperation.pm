@@ -41,8 +41,6 @@ sub execute {
     my $pki_realm = CTX('session')->get_pki_realm();
     my $server    = CTX('session')->get_server();
 
-    ##! 16: 'pki_realm scep: ' . Dumper(CTX('pki_realm')->{$pki_realm}->{scep})
-   
     my $token = $self->__get_token();    
 
     my $message_type_ref = $token->command(

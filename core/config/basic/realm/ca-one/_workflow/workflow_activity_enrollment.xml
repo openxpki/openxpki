@@ -34,7 +34,7 @@
     </action>
 
     <action name="enroll_issue_cert"
-            class="OpenXPKI::Server::Workflow::Activity::SCEPv2::IssueCert">
+            class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate">
     </action>
 
     <action name="enroll_revoke_existing_certs"

@@ -36,8 +36,6 @@ sub execute {
     my $pki_realm = CTX('session')->get_pki_realm();
     my $server = CTX('session')->get_server();
 
-    ##! 16: 'pki_realm scep: ' . Dumper(CTX('pki_realm')->{$pki_realm}->{scep})
-
     # get a crypto token of type 'SCEP'
     my $token = CTX('pki_realm')->{$pki_realm}->{scep}->{id}->{$server}->{crypto};
     
