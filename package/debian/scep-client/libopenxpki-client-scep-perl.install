@@ -1,2 +1,2 @@
-eg/scep.conf		etc/openxpki
-bin/scep                usr/lib/cgi-bin
+eg/scepv2.conf		etc/openxpki
+cgi-bin/scepv2          usr/lib/cgi-bin

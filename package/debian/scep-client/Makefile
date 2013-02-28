@@ -1,8 +1,8 @@
 # trunk/package/debian/scep-client
 
-TOPDIR=../../../..
-PERLNAME=OpenXPKI-Client-SCEP
-SRCBASE=$(TOPDIR)/trunk/clients/perl/$(PERLNAME)
+TOPDIR=../../..
+PERLNAME=OpenXPKI-Client-SCEPv2
+SRCBASE=$(TOPDIR)/clients/perl/$(PERLNAME)
 PACKAGE=libopenxpki-client-scep-perl
 PKGDIR=../deb/client
 

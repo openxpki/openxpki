@@ -17,8 +17,8 @@
 PACKAGES=			\
 	core			\
 	i18n 			\
-	mason-html-client	
-	
+	mason-html-client \
+	scep-client
 
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 

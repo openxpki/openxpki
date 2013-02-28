@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+README
+VERSION  ## never check in this file to SVN !!!
+lib/OpenXPKI/Client/SCEPv2.pm
+cgi-bin/scepv2
+eg/scepv2.conf
