@@ -104,6 +104,46 @@ Testdrive
 #. After some seconds, your first certificate is ready :)
 #. You can now login with your username and fetch the certificate 
 
+Enabling the SCEP service
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First, install the scep cgi client script::
+
+    aptitude install libopenxpki-client-scep-perl
+    
+The package installs a perl script into /usr/lib/cgi-bin/ and a config file
+at /etc/openxpki/scepv2.conf. For a testdrive, there is no need for any 
+configuration.    
+
+The system currently supports getcacert, getcert and enroll - the test workflow
+is configured to create a certificate on each enrollment request that has a 
+challenge password set (the value of the password is irrelevant).
+
+The best way for testing the service is the sscep command line tool (available at
+e.g. https://github.com/certnanny/sscep).  
+
+Check if the service is working properly at all::
+
+    mkdir tmp
+    ./sscep getca -c tmp/cacert -u http://yourhost/cgi-bin/scepv2
+    
+Should show and download a list of the root certificates to the tmp folder.
+
+To test an enrollment::
+
+    openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:2048 -nodes
+    ./sscep enroll -u http://yourhost/cgi-bin/scepv2 \
+        -k tmp/scep-test.key -r tmp/scep-test.csr \
+        -c tmp/cacert-0 \
+        -l tmp/scep-test.crt \ 
+        -t 10 -n 1
+
+Make sure you set any non empty value for the challenge password when prompted.
+On current desktop hardware the issue workflow will take approx. 15 seconds to 
+finish and you should end up with a certificate matching your request in the tmp 
+folder.      
+
+
 Starting from scratch
 ---------------------
 
