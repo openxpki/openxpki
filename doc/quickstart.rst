@@ -47,6 +47,11 @@ Create a key for the internal datasafe (not exposed externally)::
 
     openssl req -newkey rsa:2048 -new -days 400 -x509 -keyout ca-one-vault-1.pem -out ca-one-vault-1.crt -passout pass:root
 
+If you plan to use the SCEP service, you need another certificate::    
+
+    openssl req -newkey rsa:2048 -new -days 400 -x509 -keyout ca-one-scep-1.pem -out ca-one-scep-1.crt -passout pass:root
+
+
 **Note:** The sample config uses the fixed passphrase *root* as password for both keys, please change this for your production deployment!
 
 The following creates the initial configuration repository, inits the database schema and imports the certificates into the database:: 
@@ -59,6 +64,9 @@ The following creates the initial configuration repository, inits the database s
     
     openxpkiadm certificate import  --file /etc/openxpki/ssl/ca-one/ca-one-vault-1.crt 
     openxpkiadm alias --realm ca-one --token datasafe --identifier <identifier from import>
+    
+    openxpkiadm certificate import  --file /etc/openxpki/ssl/ca-one/ca-one-scep-1.crt 
+    openxpkiadm alias --realm ca-one --token scep --identifier <identifier from import>
     
 Now it is time to see if anything is fine::
 
