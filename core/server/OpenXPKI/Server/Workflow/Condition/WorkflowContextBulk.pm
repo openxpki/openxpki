@@ -11,7 +11,6 @@ use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use English;
-use OpenXPKI::Exception;
 use Data::Dumper;
 
 my @parameters = qw(

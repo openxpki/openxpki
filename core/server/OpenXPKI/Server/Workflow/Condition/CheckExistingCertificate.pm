@@ -12,7 +12,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Debug;
 use English;
-use OpenXPKI::Exception;
 use Data::Dumper;
 
 

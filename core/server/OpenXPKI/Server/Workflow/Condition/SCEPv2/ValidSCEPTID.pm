@@ -28,10 +28,9 @@ use warnings;
 
 use base qw( Workflow::Condition );
 
-#use Workflow::Exception qw( condition_error configuration_error );
-#use OpenXPKI::Server::Context qw( CTX );
+use Workflow::Exception qw( condition_error );
+use OpenXPKI::Server::Context qw( CTX );
 #use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use English;
 
 sub evaluate {
@@ -50,12 +49,13 @@ sub evaluate {
         return 1;
     }
 
-    OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SCEPCLIENT_INVALID_TID',
-            params => {
-                SCEP_TID => (defined $scep_tid ? $scep_tid : '<undef>'),
-                SCEP_TIT_LEN => length($scep_tid),
-            }
+    condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SCEPCLIENT_INVALID_TID');
+    CTX('log')->log(
+        MESSAGE => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SCEPCLIENT_INVALID_TID',
+        PARAMS => {
+            SCEP_TID => (defined $scep_tid ? $scep_tid : '<undef>'),
+            SCEP_TIT_LEN => length($scep_tid),
+        }
     );
 
 }
