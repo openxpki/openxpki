@@ -8,17 +8,29 @@
  <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_INITIAL</description>
     <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CRR"	    
-	    resulting_state="CRR_PERSIST">	    
+	    resulting_state="AUTOAPPROVAL">	    
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_CREATE"/>
+    </action>    
+  </state>
+  
+  <state name="AUTOAPPROVAL" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_AUTOAPPROVAL</description>  
+    <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+        resulting_state="CRR_PERSIST">        
+        <condition name="I18N_OPENXPKI_WF_COND_IS_AUTOAPPROVAL"/>
+    </action>    
+    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+        resulting_state="PENDING">        
+        <condition name="!I18N_OPENXPKI_WF_COND_IS_AUTOAPPROVAL"/>
     </action>
   </state>
 
   <state name="PENDING">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_PENDING</description>
     <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
-	    resulting_state="PENDING">
+        resulting_state="PENDING">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_INVALIDITY_TIME"/>
-    </action>
+    </action>        
     <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
 	    resulting_state="PENDING">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_REASON"/>

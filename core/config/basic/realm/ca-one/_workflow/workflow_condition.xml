@@ -52,6 +52,11 @@
   	<param name="max_count" value="5"/>
   </condition>
 
+  <condition name="I18N_OPENXPKI_WF_COND_IS_AUTOAPPROVAL" 
+            class="Workflow::Condition::Evaluate">
+        <param name="test" value="$context-&gt;{flag_crr_auto_approval}" />
+    </condition>
+
   
   <!-- CRL Issue -->
   <condition name="I18N_OPENXPKI_WF_COND_CRL_SIGNING_NO_CAS_LEFT" 

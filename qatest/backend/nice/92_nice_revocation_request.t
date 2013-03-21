@@ -44,7 +44,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 9 );
+$test->plan( tests => 12 );
  
 my $buffer = do { # slurp
 	local $INPUT_RECORD_SEPARATOR;
@@ -67,18 +67,29 @@ $test->connect_ok(
     password => $cfg{user}{role},
 ) or die "Error - connect failed: $@";
 
+# First try an autoapproval request
 
 my %wfparam = (
 	cert_identifier => $cert_identifier,
-	reason_code => 'keyCompromise',
+	reason_code => 'unspecified',
     comment => 'Automated Test',
-    invalidity_time => time() 
+    invalidity_time => time(),
+    flag_crr_auto_approval => 'yes',     
 );
     
+$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Auto-Revoke Workflow')
+ or die "Workflow Create failed: $@";
+
+$test->state_is('CHECK_FOR_REVOCATION');
+
+# Now try manual approval
+delete ($wfparam{flag_crr_auto_approval});
+
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Revoke Workflow')
  or die "Workflow Create failed: $@";
 
 $test->state_is('PENDING');
+
 
 $test->disconnect();
  
@@ -88,7 +99,8 @@ $test->connect_ok(
     password => $cfg{operator}{role},
 ) or die "Error - connect failed: $@";
 
-
+$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON', { reason_code => 'keyCompromise' } );
+ 
 $test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_APPROVE_CRR' );
 
 $test->state_is('APPROVAL');
