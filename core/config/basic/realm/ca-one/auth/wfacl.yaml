@@ -95,7 +95,7 @@ RA Operator:
                 # this is a policy decision, you may want to show the
                 # reg officers who else has approved - or not, so as 
                 # to not impair his or her judgement
-                hide: approvals
+                #hide: approvals
         
         I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE:
             creator: .*

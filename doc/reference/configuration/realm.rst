@@ -521,17 +521,18 @@ You first need to configure the SMTP backend parameters::
         username: smtpuser
         password: smtpsecret
         debug: 0
+        use_html: 0
                 
 Class is the only mandatory parameter, the default is localhost:25 without 
 authentication. Debug enables the Debug option from Net::SMTP writing to the
-stderr.log which can help you to test/debug mail delivery. To enable html
-formatted mails, you need to install *Mime::Lite* and change the class to
-*OpenXPKI::Server::Notification::SMTP_HTML*.
+stderr.log which can help you to test/debug mail delivery. To use html
+formatted mails, you need to install *MIME::Lite* and set *use_html: 1*.
+The handler will fall back to plain text if MIME::Lite can not be loaded.
         
 The mail templates are read from disk from, you need to set a base directory::
         
     template:
-        dir:   /home/pkiadm/ca-one/mails/
+        dir:   /home/pkiadm/ca-one/email/
 
 Below is the complete message configuration as shipped with the default 
 issuance workflow::
@@ -548,7 +549,10 @@ issuance workflow::
                 template: csr_created_user
                 subject: CSR for [% cert_subject %]
                 prefix: PKI-Ticket [% meta_wf_id %]
-            
+                images:
+                    banner: head.png
+                    footer: foot.png
+                    
             raop:      # Another internal handle for a second thread
                 template: csr_created_raop  # Suffix .txt is always added!
                 to: reg-office@mycompany.com
@@ -570,7 +574,7 @@ issuance workflow::
 The *default* section is not necessary but useful to keep your config short and 
 readable. These options are merged with the local ones, so any local variable is 
 possible and you can overwrite any default at the local configuration (to clear 
-a setting use an empty string).
+a setting use an empty string, the images hash is NOT merged recursively).
 
 **the idea of threads**
 
@@ -603,15 +607,41 @@ The subject is parsed using TT. If you have specified a prefix, it is automatica
 
 The body of a message is read from the filename specified by *template*, where the
 suffix '.txt' is always apppended. So the full path for the message at 
-``messages.csr_created.user`` is */home/pkiadm/ca-one/mails/csr_created_user.txt*.
-
+``messages.csr_created.user`` is */home/pkiadm/ca-one/email/csr_created_user.txt*.
 
 **html messages**
 
 If you use the html backend, the template for the html part is read from
 *csr_created_user.html*. It is allowed to provide either a text or a html 
 template, if both files are found you will get a multipart message with both
-message parts set. Make sure that the content is the same to avoid funny issues ;) 
+message parts set. Make sure that the content is the same to avoid funny issues ;)
+
+It is possible to use inline images by listing the image files with the *images* 
+key as key/value list. The key is the internal identifier, to be used in the html 
+template, the value is the name of the image file on disk.
+
+With a config of::
+    
+    user:
+        template: csr_created_user
+        ....
+        images:
+            banner: head.png
+            footer: foot.png
+                    
+You need to reference the image in the html template like this::
+
+    <body>
+        <img src="cid:banner" title="My Company Logo Banner" />
+        .....
+        <img src="cid:footer" title="My Company Logo Footer" />
+    </body>        
+
+The images are pulled from the folder *images* below the template directory, 
+e.g. */home/pkiadm/ca-one/email/images/head.png*. The files must end on
+gif/png/jpg as the suffix is used to detect the correct image type.
+
+ 
 
 RT Request Tracker
 ^^^^^^^^^^^^^^^^^^

@@ -80,10 +80,17 @@ extends 'OpenXPKI::Server::Notification::Base';
 #use namespace::autoclean; # Comnflicts with Debugger
 
 # Attribute Setup
-has 'transport' => (
+has 'mime_transport' => (
 	is  => 'ro',
-    isa => 'Object',
-    reader => '_get_transport',  
+    isa => 'ArrayRef',     
+    builder => '_init_mime_transport',
+    lazy => 1,  
+);
+
+has 'transport' => (
+    is  => 'ro',
+    # Object with Net::SMTP, Array with MIME::Lite  
+    isa => 'Object',     
     builder => '_init_transport',
     lazy => 1,  
 );
@@ -103,15 +110,27 @@ has 'template_dir' => (
     lazy => 1,
 );
 
+has 'use_html' => (
+    is  => 'ro',
+    isa => 'Bool',     
+    builder => '_init_use_html',
+    lazy => 1,
+);
+
+has 'is_smtp_open' => (
+    is  => 'rw',
+    isa => 'Bool',            
+);
+
+
 sub _init_transport {    
     my $self = shift;
     
-    ##! 8: 'creating transport'
+    ##! 8: 'creating Net::SMTP transport'
     my $cfg = CTX('config')->get_hash( $self->config() . '.backend' );
-
+ 
     my %smtp = (
         Host => $cfg->{host} || 'localhost',
-        Debug => 1        
     );
     
     $smtp{'Port'} = $cfg->{port} if ($cfg->{port});
@@ -120,8 +139,28 @@ sub _init_transport {
     $smtp{'Timeout'} = $cfg->{timeout} if ($cfg->{timeout});
     $smtp{'Debug'} = 1 if ($cfg->{debug});
 
+    $self->is_smtp_open(1);
     my $transport = Net::SMTP->new( %smtp );
     return $transport;
+        
+}
+
+sub _init_mime_transport {    
+    my $self = shift;
+    
+    ##! 8: 'creating mime transport'
+    my $cfg = CTX('config')->get_hash( $self->config() . '.backend' );
+
+    my @args = ( 'smtp' );
+        
+    push @args, $cfg->{host} || 'localhost';    
+    push @args, ('Port' => $cfg->{port}) if ($cfg->{port});    
+    push @args, ('User' => $cfg->{username}) if ($cfg->{username});
+    push @args, ('Password' => $cfg->{password}) if ($cfg->{password});
+    push @args, ('Timeout' => $cfg->{timeout}) if ($cfg->{timeout});
+    push @args, ('Debug' => 1) if ($cfg->{debug});
+    
+    return \@args;
     
 }
 
@@ -129,6 +168,12 @@ sub _init_default_envelope {
     my $self = shift;    
     
     my $envelope = CTX('config')->get_hash( $self->config() . '.default' );
+    
+    if ($self->use_html() && $envelope->{images}) {
+        # Depending on the connector this is already a hash
+        $envelope->{images} = CTX('config')->get_hash( $self->config() . '.default.images' ) if (ref $envelope->{images} ne 'HASH');
+    }
+    
     ##! 8: 'Envelope data ' . Dumper $envelope
     
     return $envelope;       
@@ -140,7 +185,33 @@ sub _init_template_dir {
     $template_dir .= '/' unless($template_dir =~ /\/$/);
     return $template_dir;
 }
- 
+
+sub _init_use_html {
+    
+    my $self = shift;
+    
+    ##! 8: 'Test for HTML '
+    my $html = CTX('config')->get( $self->config() . '.backend.use_html' );
+    
+    if ($html) {
+        
+        # Try to load the Mime class        
+        eval "use MIME::Lite;1";
+                        
+        if ($EVAL_ERROR) {
+            CTX('log')->log(
+                MESSAGE  => "Initialization of MIME::Lite failed, falling back to plain text",
+                PRIORITY => "error",
+                FACILITY => "system",
+            );
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+    return 0;    
+}
+  
 
 =head1 Functions
 =head2 notify
@@ -178,8 +249,6 @@ sub notify {
     
     my $default_envelope = $self->default_envelope();
     
-    my $smtp = $self->_get_transport();
-
     # Walk through the handles
     MAIL_HANDLE:
     foreach my $handle (@handles) {
@@ -188,6 +257,12 @@ sub notify {
     
         # Fetch the config 
         my $cfg = CTX('config')->get_hash( "$msgconfig.$handle" );
+        
+        # look for images if using HTML        
+        if ($self->use_html() && $cfg->{images}) {
+           # Depending on the connector this is already a hash
+            $cfg->{images} = CTX('config')->get_hash( "$msgconfig.$handle.images" ) if (ref $cfg->{images} ne 'HASH');
+        }
         
         ##! 16: 'Local config ' . Dumper $cfg
         
@@ -244,12 +319,17 @@ sub notify {
             $vars{$key} = $pi->{$key}; 
         }            
         
-        $self->_send( $cfg, \%vars );
+        if ($self->use_html()) {
+            $self->_send_html( $cfg, \%vars );
+        } else {
+            $self->_send_plain( $cfg, \%vars );
+        }
                
         
     } 
-      
+
     $self->_cleanup();
+    
     return $token;
     
 }
@@ -284,10 +364,12 @@ sub _render_receipient {
 }
 
 
-=head2
+=head2 _send_plain
+
+Send the message using Net::SMTP
 
 =cut
-sub _send {
+sub _send_plain {
     
     my $self = shift;
     my $cfg = shift;
@@ -312,7 +394,7 @@ sub _send {
 
     ##! 64: "SMTP Msg --------------------\n$smtpmsg\n ----------------------------------";        
     
-    my $smtp = $self->_get_transport();
+    my $smtp = $self->transport();
 
     $smtp->mail( $cfg->{from} );
     $smtp->to( $vars->{to} );
@@ -342,15 +424,143 @@ sub _send {
     
 }
 
-=head2
+=head2 _send_html
+
+Send the message using MIME::Lite
 
 =cut
+
+
+sub _send_html {
+    
+    my $self = shift;
+    my $cfg = shift;
+    my $vars = shift;
+            
+    my $tt = Template->new();
+
+    require MIME::Lite;
+
+    # Parse the templates - txt and html 
+    my $plain = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.txt', $vars );
+    my $html = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.html', $vars );
+
+
+    if (!$plain && !$html) {
+        CTX('log')->log(
+            MESSAGE  => "Both mail parts are empty ($cfg->{template})",
+            PRIORITY => "error",
+            FACILITY => "system",
+        );
+        return 0;
+    }
+    
+    
+    # Parse the subject
+    my $subject = $self->_render_template($cfg->{subject}, $vars); 
+            
+    my @args = (
+        From    => $cfg->{from},
+        To      => $vars->{to},        
+        Subject => "$vars->{prefix} $subject",
+        Type    =>'multipart/alternative',                    
+    );
+    
+    push @args, (Cc => join(",", @{$vars->{cc}})) if ($vars->{cc});
+    push @args, ("Reply-To" => $cfg->{reply}) if ($cfg->{reply});
+              
+    my $msg = MIME::Lite->new( @args );
+
+    # Plain part
+    $msg->attach(
+        Type     =>'text/plain',
+        Data     => $plain
+    ) if ($plain);
+
+    
+    # look for images - makes the mail a bit complicated as we need to build a second mime container
+    if ($html && $cfg->{images}) {
+        
+        my $html_part = MIME::Lite->new(
+            'Type' => 'multipart/related',
+        );
+        
+        # The HTML Body
+        $html_part->attach(
+            Type        =>'text/html',
+            Data        => $html
+        );
+        
+        # The hash contains the image id and the filename
+        ATTACH_IMAGE:
+        foreach my $imgid (keys(%{$cfg->{images}})) {
+            my $imgfile = $self->template_dir().'images/'.$cfg->{images}->{$imgid};            
+            if (! -e $imgfile) {
+                CTX('log')->log(
+                    MESSAGE  => sprintf("HTML Notify - imagefile not found (%s)", $imgfile),
+                    PRIORITY => "error",
+                    FACILITY => "system",
+                );
+                next ATTACH_IMAGE;
+            }
+            
+            $cfg->{images}->{$imgid} =~ /\.(gif|png|jpg)$/i;
+            my $mime = lc($1);
+            
+            if (!$mime) {
+                CTX('log')->log(
+                    MESSAGE  => sprintf("HTML Notify - invalid image extension", $imgfile),,
+                    PRIORITY => "error",
+                    FACILITY => "system",
+                );
+                next ATTACH_IMAGE;
+            }            
+            
+            $html_part->attach(
+                Type => 'image/'.$mime,
+                Id   => $imgid,
+                Path => $imgfile,
+            );
+        }
+        
+        $msg->attach($html_part);
+        
+    } elsif ($html) {
+        ## Add the html part:
+        $msg->attach(
+            Type        =>'text/html',
+            Data        => $html
+        );
+    } 
+    
+        
+    my $transport = $self->mime_transport(); 
+    
+    if( $msg->send( @{$transport} ) ) {        
+        CTX('log')->log(
+            MESSAGE  => sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject),
+            PRIORITY => "error",
+            FACILITY => "system",
+        );
+        return 0;
+    }
+    
+    CTX('log')->log(
+        MESSAGE  => sprintf("Notification was send (%s, %s)", $vars->{to}, $subject),
+        PRIORITY => "info",
+        FACILITY => "system",
+    );
+    
+}
+
 sub _cleanup {
     
     my $self = shift;
+        
+    if ($self->is_smtp_open()) {
+        $self->transport()->quit();
+    }
     
-    my $smtp = $self->_get_transport();    
-    $smtp->quit();
     return;
 }
  
