@@ -28,7 +28,7 @@ sub execute
 	PRIORITY => 'info',
 	FACILITY => 'audit',
     );
-
+=cut
     my $bulk = $context->param('bulk');
     if (! $bulk) {
         # only notify if this is not part of a bulk request - otherwise
@@ -38,6 +38,7 @@ sub execute
             WORKFLOW => $workflow,
         });
     }
+=cut    
     return 1;
 }
 

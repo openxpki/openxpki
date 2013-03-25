@@ -75,7 +75,7 @@
       <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_NOTAFTER"/>
     </action>
     <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
-	    resulting_state="APPROVAL">
+	    resulting_state="NOTIFY_APPROVAL">
       <condition name="I18N_OPENXPKI_WF_ACL_APPROVE_CSR"/>
       <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/>
     </action>
@@ -84,7 +84,7 @@
       <condition name="I18N_OPENXPKI_WF_ACL_REJECT_CSR"/>
     </action>
   </state>
-
+  
   <state name="APPROVAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVAL</description>
     <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
@@ -95,7 +95,7 @@
     <!-- perhaps we need more than one approval or                 -->
     <!-- perhaps the first approval was from a not authorized role -->
     <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
-	    resulting_state="APPROVAL">
+	    resulting_state="NOTIFY_APPROVAL">
       <condition name="I18N_OPENXPKI_WF_ACL_APPROVE_CSR"/>
       <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/>
     </action>
@@ -106,6 +106,12 @@
     <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
 	    resulting_state="REJECTED">
       <condition name="I18N_OPENXPKI_WF_ACL_REJECT_CSR"/>
+    </action>
+  </state>  
+  
+  <state name="NOTIFY_APPROVAL" autorun="yes">
+  <action name="I18N_OPENXPKI_WF_ACTION_NOTIFY_APPROVAL"
+        resulting_state="APPROVAL">      
     </action>
   </state>  
 

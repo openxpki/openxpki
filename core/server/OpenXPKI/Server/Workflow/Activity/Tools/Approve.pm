@@ -233,6 +233,7 @@ sub execute
 
     $context->param ('approvals' => $approvals);
 
+=cut
     my $bulk = $context->param('bulk');
     if (! $bulk && $workflow->type eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST') {
         # only notify if this is not part of a bulk request - otherwise
@@ -242,6 +243,7 @@ sub execute
             WORKFLOW => $workflow,
         });
     }
+=cut    
     return 1;
 }
 

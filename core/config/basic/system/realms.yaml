@@ -3,4 +3,4 @@
 
 ca-one:
     label: Verbose name of this realm
-    
+    baseurl: http://192.168.168.103:80/openxpki/

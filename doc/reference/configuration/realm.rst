@@ -493,6 +493,289 @@ The default configuration comes with a text-file publisher for the crl::
 
 If the dn of your current ca certificate is like "cn=My CA1,ou=ca,o=My Company,c=us", this connector writes the PEM encoded crl to the file */var/www/openxpki/myrealm/crls/My CA1.crl* 
 
+
+Notification
+------------
+
+Notifications are triggered from within a workflow. The workflow just calls the
+notification layer with the name of the message which should be send, which can
+result in no message or multiple messages on different communication channels.
+
+The configuration is done per realm at ``notification``. Supported connectors 
+are Mail via SMTP (plain and html) and RT Request Tracker  
+(using the RT::Client::REST module from CPAN). You can use an arbitrary number
+of backends, where each one has its own configuration at ``notification.mybackend``.
+
+Most parts of the messages are customized using the Template Toolkit. The list 
+of available variables is given at the end of this section.
+
+Sending mails using SMTP
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+You first need to configure the SMTP backend parameters::
+         
+    backend:
+        class: OpenXPKI::Server::Notification::SMTP        
+        host: localhost
+        port: 25
+        username: smtpuser
+        password: smtpsecret
+        debug: 0
+                
+Class is the only mandatory parameter, the default is localhost:25 without 
+authentication. Debug enables the Debug option from Net::SMTP writing to the
+stderr.log which can help you to test/debug mail delivery. To enable html
+formatted mails, you need to install *Mime::Lite* and change the class to
+*OpenXPKI::Server::Notification::SMTP_HTML*.
+        
+The mail templates are read from disk from, you need to set a base directory::
+        
+    template:
+        dir:   /home/pkiadm/ca-one/mails/
+
+Below is the complete message configuration as shipped with the default 
+issuance workflow::
+                  
+    default:
+        from: no-reply@mycompany.com
+        reply: helpdesk@mycompany.com
+        to: "[% cert_info.requestor_email %]"
+        cc: helpdesk@mycompany.com        
+        
+    message:
+        csr_created:   # The message Id as referenced in the activity
+            user:   # The internal handle for this thread
+                template: csr_created_user
+                subject: CSR for [% cert_subject %]
+                prefix: PKI-Ticket [% meta_wf_id %]
+            
+            raop:      # Another internal handle for a second thread
+                template: csr_created_raop  # Suffix .txt is always added!
+                to: reg-office@mycompany.com
+                cc: ''
+                reply: "[% cert_info.requestor_email %]"
+                subject: CSR for [% cert_subject %]
+                        
+        csr_rejected:
+            user:
+                template: csr_rejected
+                subject: CSR rejected for [% cert_subject %]
+            
+        cert_issued:
+            user:
+                template: cert_issued
+                subject: certificate issued for [% cert_subject %]                
+         
+
+The *default* section is not necessary but useful to keep your config short and 
+readable. These options are merged with the local ones, so any local variable is 
+possible and you can overwrite any default at the local configuration (to clear 
+a setting use an empty string).
+
+**the idea of threads**
+
+You might have recognized that there are two blocks below ``messages.csr_created``. 
+Those are so called *threads*, which combine messages sent at different times
+to share some common settings. With the first message of a thread the values given
+for to, cc and prefix are persisted so you can ensure that all messages
+that belong to a certain thread go to the same receipients using the same subject
+prefix. **Note, that settings to those options in later messages are ignored!**
+
+**receipient information**
+
+The primary receipient and a from address are mandatory:
+
+- to: The primary receipient, single value, parsed using TT
+- from: single value, NOT parsed
+
+Additional receipients and a seperate Reply-To header are optional:
+
+- cc: comma seperated list, parsed using TT
+- reply: single value, NOT parsed
+
+All values need to be rfc822 compliant full addresses.  
+
+**composing the subject**
+
+The subject is parsed using TT. If you have specified a prefix, it is automatically prepended.
+
+**composing the message body**
+
+The body of a message is read from the filename specified by *template*, where the
+suffix '.txt' is always apppended. So the full path for the message at 
+``messages.csr_created.user`` is */home/pkiadm/ca-one/mails/csr_created_user.txt*.
+
+
+**html messages**
+
+If you use the html backend, the template for the html part is read from
+*csr_created_user.html*. It is allowed to provide either a text or a html 
+template, if both files are found you will get a multipart message with both
+message parts set. Make sure that the content is the same to avoid funny issues ;) 
+
+RT Request Tracker
+^^^^^^^^^^^^^^^^^^
+
+The RT handler can open, modify and close tickets in a remote RT system using the 
+REST interface. You need to install RT::Client::REST from CPAN and setup the connection::
+             
+    backend:
+        class: OpenXPKI::Server::Notification::RT        
+        server: http://rt.mycompany.com/
+        username: pkiuser
+        password: secret
+        timeout: 30
+
+The timeout value is optional with a default of 30 seconds. 
+        
+As the SMTP backend, it uses templates on disk to build the ticket contents, so
+we also need to set the template directory::
+    
+    template:
+        dir:   /home/pkiadm/ca-one/rt/
+        
+You can share the templates for SMTP and RT handler and reuse most parts of your configuration, 
+but note that the syntax is slightly different from SMTP. Here is the complete 
+message configuration as shipped with the default issuance workflow::
+    
+    message:        
+        csr_created:  # The message Id as referenced in the activity
+            main:     # The internal handle for this ticket
+                - action: open
+                  queue: PKI
+                  owner: pki-team
+                  subject: New CSR for [% cert_subject %]                  
+                  to: "[% cert_info.requestor_email %]"  
+                  template: csr_created            
+                  priority: 1
+                  
+                - action: comment
+                  template: csr_created_comment
+                  status: open
+                  
+        csr_approved:
+            main:
+                - action: update
+                  status: working
+                  
+        csr_rejected:
+            main:
+                - action: correspond
+                  template: csr_rejected
+                  priority: 10              
+    
+        cert_issued:
+            main:
+                - action: comment
+                  template: cert_issued_internals
+                                
+                - action: correspond
+                  template: cert_issued
+                  status: resolved
+
+
+The RT handler also makes use of threads, where each thread is equal to one 
+ticket in the RT system. The example uses only one thread = one ticket.
+Each message can have multiple threads and each thread consists of at least
+one action.   
+
+**Create a new ticket**
+
+You should make sure that a ticket is created before you work with it!   
+The minimum information required to open a ticket is::
+
+    action: open
+    queue: PKI
+    owner: pki-team
+    subject: New CSR for [% cert_subject %]    
+    to: "[% cert_info.requestor_email %]"  
+
+The *to* field must be an email address, which is used to fill the *requestor*
+field in RT.
+
+Additional fields are:      
+        
+- cc: comma sep. list of email addresses to be assigned to the ticket, parsed with TT
+- template: filename for a TT template, used as inital text for the ticket (.txt suffix is added)
+- priority: priority level, usually a numeric value
+- status: ticket status, usually one of "new", "open", "resolved", "stalled", "rejected", and "deleted".  
+
+**comment or correspond to a ticket**
+
+The maximum configuration is::
+
+    action:   comment  # or "correspond"
+    status:   open     # optional
+    priority: 5        # optional
+    template: csr_created_comment  # .txt is added
+
+For *comment* the result of the parsed template is added to the ticket history.
+
+For *correspond* the result is also mailed to the ticket receipients (this 
+is a feature of RT, we dont send any mails).
+
+Note: If the template parser returns an empty string, no operation is done on the ticket.  
+
+**update status/priority without text**
+
+The *update* action allows you to set status/priority without creating a text 
+entry in the history::
+
+    action: update
+    status: stalled
+    priority: 0              
+
+You can call update with either status or priority or both.
+
+**setting custom fields**
+
+You can set custom field values using the update action. Any key/value pair in 
+the block (except the ones above) is considered to be a custom field. The values
+are parsed using TT::
+
+    action: update  
+    priority: 3
+    custom-field1: My custom value
+    custom-field2: My other custom value      
+
+Note: This feature is untested!
+
+**closing a ticket**
+
+You can close a ticket with the above commands by setting the status-flag.
+For convenience there is a shortcut, setting the status to "resolved"::
+
+    action: close
+
+
+Template Variables
+^^^^^^^^^^^^^^^^^^
+
+**realm info**
+
+- meta_pki_realm (key of the current realm)
+- meta_label (verbose realm name as defined at ``system.realms.$realm.label``)
+- meta_baseurl (baseurl as defined at ``system.realms.$realm.baseurl``)
+    
+**request related context values (scalars)** 
+
+- csr_serial
+- cert_subject
+- cert_identifier
+- cert_profile
+
+**request related context values (hashes)**
+
+- cert_subject_parts
+- cert_subject_alt_name
+- cert_info
+- approvals
+    
+**misc**
+ 
+- creator
+- requestor (real name of the requestor, if available assembled from cert_info.requestor_gname + requestor_name, otherwise the word "unknown")     
+
         
 Workflow
 --------

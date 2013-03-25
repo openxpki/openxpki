@@ -62,8 +62,9 @@ my %cert_subject_parts = (
 );
 
 my %cert_info = (
-	requestor_gname => "Andreas",
-	requestor_name => "Anders",
+    requestor_gname => "Andreas",
+    requestor_name => "Anders",
+    requestor_email => "andreas.anders\@mycompany.local",	
 );
 
 my %cert_subject_alt_name_parts = (

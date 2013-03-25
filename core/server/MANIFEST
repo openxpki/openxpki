@@ -180,6 +180,11 @@ OpenXPKI/Server/Authentication/ClientX509.pm
 OpenXPKI/Server/Notification/RT.pm
 OpenXPKI/Server/Notification/Dispatcher.pm
 OpenXPKI/Server/Notification.pm
+OpenXPKI/Server/Notification/Base.pm
+OpenXPKI/Server/Notification/Handler.pm
+OpenXPKI/Server/Notification/SMTP.pm
+OpenXPKI/Server/Notification/SMTP_HTML.pm
+
 
 ## Workflow
 OpenXPKI/Workflow/Factory.pm
@@ -224,7 +229,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Sleep.pm
-OpenXPKI/Server/Workflow/Activity/Tools/Notification.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Notify.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm

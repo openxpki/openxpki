@@ -427,7 +427,7 @@ sub __do_init_server {
 
 sub __do_init_notification {
     OpenXPKI::Server::Context::setcontext({
-        notification => OpenXPKI::Server::Notification::Dispatcher->new(),
+        notification => OpenXPKI::Server::Notification::Handler->new(),
     });
     return 1;
 }
