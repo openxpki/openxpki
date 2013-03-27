@@ -11,7 +11,7 @@
     # When OpenXPKI is behaving normally, this should be the case anyhow
     # as it is included in the open_form.mhtml
     if ($m->request_args->{'filled'} && ! $m->request_args->{'__session_id'}) {
-        die "This looks like an XSRF attack to me ...";
+        #die "This looks like an XSRF attack to me ...";
     }
     $m->call_next();
 </%init>

@@ -2,7 +2,7 @@
   $msg             => undef
 </%args>
 
-    <& '/authentication/open_form.mhtml', 'session_id' => $session_id &>
+    <& '/authentication/open_form.mhtml' &>
     <div class="title">
     <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_TITLE') %>
     </div>

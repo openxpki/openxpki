@@ -4,7 +4,6 @@
   $no_menu         => undef
 </%args>
     <& '/authentication/open_form.mhtml',
-            'session_id' => $session_id,
             'next_comp'  => $next_comp,
             'no_menu'    => $no_menu,
     &>

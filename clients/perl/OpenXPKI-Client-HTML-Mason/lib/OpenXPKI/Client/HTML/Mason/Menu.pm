@@ -333,7 +333,7 @@ sub get_menu_hash
     my %link   = ();
 
     ## add basic path
-    $link{__session_id} = $self->{SESSION_ID};
+    #$link{__session_id} = $self->{SESSION_ID};
     $link{__role}       = $self->{ROLE};
     $link{__language}   = $self->{LANGUAGE} if (exists $self->{LANGUAGE});
     $link{__menu_level} = $level;

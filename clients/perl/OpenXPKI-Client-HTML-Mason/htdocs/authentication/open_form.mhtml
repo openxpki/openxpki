@@ -8,19 +8,9 @@
 %    $title =~ s/[^\/]+\//..\//g;
 %    $title =~ s/\/[^\/]*$/\//;
 %    $title =~ s/^\///;
-%# TODO: do we need to remove the following lines?
-%# Seems that these lines are not needed any more,
-%# the main autohandler does the job
-%#    if (($next_comp) and ("$next_comp" ne "")) {
-%#        my ($old_session_id) = ($next_comp =~ m{\A .* __session_id=(.+?) ; .* \z }xms);
-%#        $m->comp('/lib/debug.mhtml', level => 1, 'msg' => 'old_session_id: ' . $old_session_id);
-%#        $next_comp = "" if (($old_session_id) and ($session_id ne $old_session_id));
-%#        $m->comp('/lib/debug.mhtml', level => 1, 'msg' => 'next_comp: ' . $next_comp);
-%#    }
 % $next_comp = '' if (! defined $next_comp);
 % $no_menu = '' if (! defined $no_menu);
         <form action="<% $title %>authentication/index.html" name="<% $name %>" method="post">
-          <input type="hidden" name="__session_id" value="<% $session_id %>"/>
           <input type="hidden" name="next_comp" value="<% $next_comp %>"/>
           <input type="hidden" name="no_menu" value="<% $no_menu %>"/>
 
