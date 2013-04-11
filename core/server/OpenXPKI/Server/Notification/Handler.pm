@@ -107,12 +107,16 @@ sub _init_backends_for_realm {
     return $backends_loaded;   
 }
  
-=head2 notify({MESSAGE, WORKFLOW, TOKEN})
+=head2 notify({MESSAGE, WORKFLOW, TOKEN, DATA})
 
 Public method to trigger a notification. MESSAGE is the name of
 the message to be triggered, WORKFLOW is a reference to the workflow object
 and TOKEN can contain persisted information from earlier calls of the same
-notification thread.
+notification thread. DATA can contain additional info to be passed to the template.
+
+The vars hash passed to the templates is composed from the data extracted from the
+workflow (@see _prepare_template_vars) and the data from the DATA variable, which 
+is added under the key "data".
 
 =cut 
 sub notify {
@@ -124,6 +128,8 @@ sub notify {
     
     my $workflow = $params->{WORKFLOW};
     my $token =  $params->{TOKEN};
+    my $data =  $params->{DATA};
+    $data = {} unless ($data);    
         
     ##! 16: 'Got token ' . Dumper $token
             
@@ -132,7 +138,9 @@ sub notify {
 
     if (!$backends) { return; }
 
-    my $vars = $self->_prepare_template_vars( $workflow );        
+    my $vars = $self->_prepare_template_vars( $workflow );
+    $vars->{data} = $data;
+            
     ##! 16: 'Got backends ' . Dumper $backends    
     foreach my $backend (keys %{$backends}) {
 
