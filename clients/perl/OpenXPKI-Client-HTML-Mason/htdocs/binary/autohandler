@@ -1,4 +1,0 @@
-% $m->call_next();
-<%flags>
-    inherit => '/syshandler'
-</%flags>

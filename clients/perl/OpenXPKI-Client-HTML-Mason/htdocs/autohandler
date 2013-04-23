@@ -125,7 +125,7 @@
   ## therefore we initialize the menu separately from the output
   $m->comp ('/lib/init_menu.mhtml') if (not $auth_stuff);
 </%perl>
-% if ($m->request_comp()->path() !~ /^\/binary\//) {
+% if ($auth_stuff || $m->request_comp()->path() !~ /^\/binary\//) {
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
@@ -270,7 +270,6 @@
 
     <div id="main">
 % } ## end of if not binary
-
 <%perl>
     if (not length $auth_stuff)
     {
@@ -279,8 +278,7 @@
        print $auth_stuff;
     }
 </%perl>
-
-% if ($m->request_comp()->path() !~ /^\/binary\//) {
+% if ($auth_stuff ||  $m->request_comp()->path() !~ /^\/binary\//) {
     <div class="clearer">&nbsp;</div>
     </div>  <!-- main -->
 
@@ -289,14 +287,11 @@
   </body>
 </html>
 % }
-
 <%init>
 </%init>
-
 <%flags>
   inherit => '/syshandler'
 </%flags>
-
 <%method title>
   OpenXPKI
 </%method>
