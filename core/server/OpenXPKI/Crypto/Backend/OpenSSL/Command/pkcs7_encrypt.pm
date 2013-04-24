@@ -25,13 +25,27 @@ sub get_command
             ($engine_usage =~ m{ ALWAYS }xms));
 
     $self->{ENC_ALG}  = "aes256" if (not exists $self->{ENC_ALG});
+    
+    $self->{OUTFORM}  = "PEM" if (not exists $self->{OUTFORM});
 
     if ($self->{CERT})
-    {
-        $self->get_tmpfile ('CERT');
-        $self->write_file (FILENAME => $self->{CERTFILE},
-                           CONTENT  => $self->{CERT},
-	                   FORCE    => 1);
+    {    	
+	  	# Its possible to have a list of certs
+    	if (ref $self->{CERT} eq "ARRAY") {
+    		my $names = '';
+    		my $i=0;
+    		foreach my $cert (@{$self->{CERT}}) {
+    			$i++;
+    			$self->get_tmpfile('CERT'.$i);
+	        	$self->write_file (FILENAME => $self->{'CERT'.$i.'FILE'}, CONTENT  => $cert, FORCE    => 1);				
+				$names .= ' ' . $self->{'CERT'.$i.'FILE'};
+    		} 
+    		# Set CERTFILE to the list of tmpnames
+    		$self->{CERTFILE} = $names; 		
+    	} else {    	
+	        $self->get_tmpfile ('CERT');
+	        $self->write_file (FILENAME => $self->{CERTFILE}, CONTENT  => $self->{CERT}, FORCE    => 1);
+    	}    
     } else {
         $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
     }
@@ -71,7 +85,7 @@ sub get_command
     $command .= " -engine $engine" if ($engine);
     $command .= " -in ".$self->{CONTENTFILE};
     $command .= " -out ".$self->{OUTFILE};
-    $command .= " -outform PEM";
+    $command .= " -outform " . $self->{OUTFORM};
     $command .= " -".$self->{ENC_ALG};
     $command .= " ".$self->{CERTFILE};
 
@@ -116,6 +130,8 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_encrypt
 =item * CERT (optional)
 
 =item * ENC_ALG (optional)
+
+=item * OUTFORM (optional)
 
 =back
 

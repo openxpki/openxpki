@@ -414,6 +414,10 @@ supports a facility to search certificates. It supports the following parameters
 
 =item * ISSUER
 
+=item * PKI_REALM (default is the sessions realm)
+
+=item * VALID_AT
+
 =back
 
 The result is an array of hashes. The hashes do not contain the data field
@@ -480,7 +484,8 @@ sub search_cert {
     $params{REVERSE} = 1;
     $params{ORDER}   = ['CERTIFICATE.CERTIFICATE_SERIAL'];
 
-    foreach my $key (qw( IDENTIFIER CSR_SERIAL STATUS )) {
+	# PKI_REALM overwrites the session realm if it is present
+    foreach my $key (qw( IDENTIFIER CSR_SERIAL STATUS PKI_REALM )) {
         if ( $args->{$key} ) {
             $params{DYNAMIC}->{ 'CERTIFICATE.' . $key } =
               { VALUE => $args->{$key} };
@@ -1217,6 +1222,8 @@ List all keys in the datapool in a given namespace.
 
 =item * PKI_REALM, optional, see get_data_pool_entry for details.
 
+=item * MAXCOUNT, optional, max number of entries returned
+
 =back
 
 Returns an arrayref of Namespace and key of all entries found. 
@@ -1229,6 +1236,7 @@ sub list_data_pool_entries {
     my $arg_ref = shift;
 
     my $namespace = $arg_ref->{NAMESPACE};
+    my $limit = $arg_ref->{MAXCOUNT};
     
     my $current_pki_realm   = CTX('session')->get_pki_realm();
     my $requested_pki_realm = $arg_ref->{PKI_REALM};
@@ -1242,7 +1250,7 @@ sub list_data_pool_entries {
     # chain we assume it's ok.
     my @caller = caller(1);
     if ( $caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms ) {
-        if ( $arg_ref->{PKI_REALM} ne $current_pki_realm ) {
+        if ( $requested_pki_realm ne $current_pki_realm ) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_API_OBJECT_LIST_DATA_POOL_ENTRIES_INVALID_PKI_REALM',
                 params => {
@@ -1268,6 +1276,7 @@ sub list_data_pool_entries {
         TABLE   => 'DATAPOOL',
         DYNAMIC => \%condition,
         ORDER   => [ 'DATAPOOL_KEY', 'NAMESPACE' ],
+        LIMIT	=> $limit
     );
 
     return [

@@ -451,6 +451,11 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_integer_string,
                 },
+                'PKI_REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
 		CERT_ATTRIBUTES => {
                     type     => ARRAYREF,
 		    optional => 1,
@@ -499,6 +504,11 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_integer_string,
+                },
+                'PKI_REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
                 },
 		CERT_ATTRIBUTES => {
                     type     => ARRAYREF,
@@ -749,6 +759,11 @@ sub BUILD {
                     regex => $re_alpha_string,
                     optional => 1,
                 },
+                'LIMIT'  => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                    optional => 1,
+                },                 
             },
         },
 
