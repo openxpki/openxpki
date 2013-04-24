@@ -161,11 +161,13 @@ sub get_scalar_as_list {
     my $path = shift;
     my @values;
     my $meta = $self->get_meta( $path );
+    ##! 16: 'node meta ' . Dumper $meta
     if ($meta && $meta->{TYPE} eq 'list') {
         @values = $self->get_list( $path );
     } else {
         @values = ( $self->get( $path ) );
     }   
+    ##! 16: 'values ' . Dumper @values
     return @values;
 }
 

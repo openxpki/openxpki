@@ -475,6 +475,9 @@ sub _save{
     # Some niffy tasks create broken workflows for validating
     # parameters and we will get tons of init/exception entries
     my $proc_state = $self->proc_state;
+    
+    # TODO - the state on the base Workflow seems to have some "lag" and sticks in INITIAL
+    # even if the excpetion is somewhere later. Should be gone after moving to direct subclassing
     if ($self->{_WORKFLOW}->state() eq 'INITIAL' &&
         ($proc_state eq 'init' || $proc_state eq 'running'  || $proc_state eq'exception' )) {
     

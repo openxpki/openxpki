@@ -244,7 +244,7 @@ sub notify {
             PRIORITY => "debug",
             FACILITY => "system",
         );  
-        return 0;
+        return undef;
     }
     
     my $default_envelope = $self->default_envelope();
