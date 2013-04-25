@@ -79,17 +79,11 @@ extends 'OpenXPKI::Server::Notification::Base';
 
 #use namespace::autoclean; # Comnflicts with Debugger
 
-# Attribute Setup
-has 'mime_transport' => (
-	is  => 'ro',
-    isa => 'ArrayRef',     
-    builder => '_init_mime_transport',
-    lazy => 1,  
-);
+# Attribute Setup 
 
 has 'transport' => (
     is  => 'ro',
-    # Object with Net::SMTP, Array with MIME::Lite  
+    # Net::SMTP Object   
     isa => 'Object',     
     builder => '_init_transport',
     lazy => 1,  
@@ -144,26 +138,7 @@ sub _init_transport {
     return $transport;
         
 }
-
-sub _init_mime_transport {    
-    my $self = shift;
-    
-    ##! 8: 'creating mime transport'
-    my $cfg = CTX('config')->get_hash( $self->config() . '.backend' );
-
-    my @args = ( 'smtp' );
-        
-    push @args, $cfg->{host} || 'localhost';    
-    push @args, ('Port' => $cfg->{port}) if ($cfg->{port});    
-    push @args, ('User' => $cfg->{username}) if ($cfg->{username});
-    push @args, ('Password' => $cfg->{password}) if ($cfg->{password});
-    push @args, ('Timeout' => $cfg->{timeout}) if ($cfg->{timeout});
-    push @args, ('Debug' => 1) if ($cfg->{debug});
-    
-    return \@args;
-    
-}
-
+ 
 sub _init_default_envelope {    
     my $self = shift;    
     
@@ -196,11 +171,10 @@ sub _init_use_html {
     if ($html) {
         
         # Try to load the Mime class        
-        eval "use MIME::Lite;1";
-                        
+        eval "use MIME::Entity;1";                                   
         if ($EVAL_ERROR) {
             CTX('log')->log(
-                MESSAGE  => "Initialization of MIME::Lite failed, falling back to plain text",
+                MESSAGE  => "Initialization of MIME::Entity failed, falling back to plain text",
                 PRIORITY => "error",
                 FACILITY => "system",
             );
@@ -426,7 +400,7 @@ sub _send_plain {
 
 =head2 _send_html
 
-Send the message using MIME::Lite
+Send the message using MIME::Tools
 
 =cut
 
@@ -439,7 +413,7 @@ sub _send_html {
             
     my $tt = Template->new();
 
-    require MIME::Lite;
+    require MIME::Entity;
 
     # Parse the templates - txt and html 
     my $plain = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.txt', $vars );
@@ -466,22 +440,31 @@ sub _send_html {
         Type    =>'multipart/alternative',                    
     );
     
-    push @args, (Cc => join(",", @{$vars->{cc}})) if ($vars->{cc});
-    push @args, ("Reply-To" => $cfg->{reply}) if ($cfg->{reply});
+    #push @args, (Cc => join(",", @{$vars->{cc}})) if ($vars->{cc});
+    #push @args, ("Reply-To" => $cfg->{reply}) if ($cfg->{reply});
+    
+    ##! 16: 'Building with args: ' . Dumper @args
               
-    my $msg = MIME::Lite->new( @args );
-
+    my $msg = MIME::Entity->build( @args );
+    
     # Plain part
-    $msg->attach(
-        Type     =>'text/plain',
-        Data     => $plain
-    ) if ($plain);
+    if ($plain) {
+    	##! 16: ' Attach plain text'
+    	$msg->attach(
+        	Type     =>'text/plain',
+        	Data     => $plain
+	    );
+    } 
 
+    
+    ##! 16: 'base created'
     
     # look for images - makes the mail a bit complicated as we need to build a second mime container
     if ($html && $cfg->{images}) {
+    	
+		##! 16: ' Multipart html + image'
         
-        my $html_part = MIME::Lite->new(
+        my $html_part = MIME::Entity->build(
             'Type' => 'multipart/related',
         );
         
@@ -523,9 +506,10 @@ sub _send_html {
             );
         }
         
-        $msg->attach($html_part);
+        $msg->add_part($html_part);
         
     } elsif ($html) {
+		##! 16: ' html without image'
         ## Add the html part:
         $msg->attach(
             Type        =>'text/html',
@@ -533,10 +517,11 @@ sub _send_html {
         );
     } 
     
-        
-    my $transport = $self->mime_transport(); 
+	# a reusable Net::SMTP object
+    my $transport = $self->transport(); 
     
-    if( $msg->send( @{$transport} ) ) {        
+    # Host accepts a Net::SMTP object 
+    if( $msg->smtpsend( Host => $transport, MailFrom => $cfg->{from} ) ) {        
         CTX('log')->log(
             MESSAGE  => sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject),
             PRIORITY => "error",
