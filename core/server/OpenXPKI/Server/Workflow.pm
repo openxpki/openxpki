@@ -19,9 +19,7 @@ use OpenXPKI::DateTime;
 
 use Data::Dumper;
 
-my @FIELDS = qw( proc_state count_try wakeup_at reap_at session_info);
-__PACKAGE__->mk_accessors(@FIELDS);
-
+__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info) );
 
 my $default_reap_at_interval = '+0000000005';
 
@@ -57,43 +55,39 @@ my %known_proc_states = (
 
 );
 
+sub init {
+    
+    ##! 1: 'start'
+    
+    my ( $self, $id, $current_state, $config, $wf_state_objects, $factory ) = @_;     
 
-sub new {
-    my ( $class, $BaseWorkflow, $Factory, $wfData ) = @_;
-    my $self = bless {}, $class;
-
-    $wfData = {} unless ref $wfData;
-
-    #take over all properties from (original) base workflow
-    while ( my ( $key, $val ) = each %{$BaseWorkflow} ) {
-        $self->{$key} = $val;
-    }
-    ##! 1: 'Workflow::new: '. $self->id
-    ##! 128: 'DB-data: '. Dumper($wfData)
-
-    #we need the Factory for commiting the curent proc-state:
-    $self->{_FACTORY} = $Factory;
-    $self->{_WORKFLOW} = $BaseWorkflow;    
+	$self->SUPER::init( $id, $current_state, $config, $wf_state_objects, $factory );
+    
     $self->{_CURRENT_ACTION} = '';
     
-
-    #additional infos from database:
-    my $count_try = (defined($wfData->{count_try}))?$wfData->{count_try}:0;
-    $self->count_try($count_try);
-    ##! 16: 'count try: '.$count_try
-
+    my $proc_state = 'init';
+    my $count_try =  0;
     
-    #ensure that 'proc_state' is always defined:
-    my $proc_state = ($wfData->{proc_state})?$wfData->{proc_state}:'init';
+    # For existing workflows - check for the watchdog extra fields
+    if ($id) {
+	    my $persister = $self->_factory()->get_persister( $config->{persister} );
+	    my $wf_info   = $persister->fetch_workflow($id);
+	
+	    # fetch additional infos from database:
+	    $count_try = $wf_info->{count_try} if ($wf_info->{count_try});
+	    $proc_state = $wf_info->{proc_state} if ($wf_info->{proc_state});
+    }
+	
+	##! 16: 'count try: '.$count_try    
+	$self->count_try( $count_try );	
     $self->proc_state($proc_state);
+    
     if($proc_state eq 'init'){
-        $self->_set_proc_state( $proc_state );#saves wf state to DB
+        $self->_set_proc_state( $proc_state ); #saves wf state to DB
     }
     
     return $self;
 }
-
-
 
 
 sub execute_action {
@@ -385,7 +379,7 @@ sub _set_proc_state{
     my $self = shift;
     my $proc_state = shift;
 
-    ##! 20: sprintf('_set_proc_state from %s to %s, Wfl State: %s', $self->proc_state(), $proc_state, $self->{_WORKFLOW}->state());
+    ##! 20: sprintf('_set_proc_state from %s to %s, Wfl State: %s', $self->proc_state(), $proc_state, $self->state());
     
     if(!$known_proc_states{$proc_state}){
             OpenXPKI::Exception->throw (
@@ -478,17 +472,17 @@ sub _save{
     
     # TODO - the state on the base Workflow seems to have some "lag" and sticks in INITIAL
     # even if the excpetion is somewhere later. Should be gone after moving to direct subclassing
-    if ($self->{_WORKFLOW}->state() eq 'INITIAL' &&
+    if ($self->state() eq 'INITIAL' &&
         ($proc_state eq 'init' || $proc_state eq 'running'  || $proc_state eq'exception' )) {
     
         ##! 20: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
         return; 
     } 
     
-    $self->{_FACTORY}->save_workflow($self);
+    $self->_factory()->save_workflow($self);
     
     # If using a DBI persister with no autocommit, commit here.
-    $self->{_FACTORY}->_commit_transaction($self);
+    $self->_factory()->_commit_transaction($self);
 }
 
 # Override from Class::Accessor so only certain callers can set
@@ -506,7 +500,7 @@ sub set {
 
 sub factory {
     my $self = shift;
-    return $self->{_FACTORY};
+    return $self->_factory();
 }
 
 1;
@@ -607,7 +601,7 @@ return a ref to the workflows factory
 
 =head2 _save
 
-calls $self->{_FACTORY}->save_workflow($self);
+calls $self->_factory()->save_workflow($self);
 
 =head2 set
 

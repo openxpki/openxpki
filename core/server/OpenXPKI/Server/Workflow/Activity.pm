@@ -14,7 +14,7 @@ use OpenXPKI::Server::Workflow::Pause;
 use Workflow::Exception qw( workflow_error );
 use Data::Dumper;
 
-__PACKAGE__->mk_accessors( 'resulting_state' );
+__PACKAGE__->mk_accessors( qw( resulting_state workflow ) );
 
 sub init {
     my ( $self, $wf, $params ) = @_;
@@ -36,7 +36,7 @@ sub init {
     $self->{CONFIG_ID} = CTX('api')->get_config_id({ ID => $wf->id() });
     ##! 16: 'self->{CONFIG_ID} = ' . $self->{CONFIG_ID}
     
-    $self->{CURRENT_WORKFLOW} = $wf;
+    $self->workflow( $wf );
     
     
     # call Workflow::Action's init()
@@ -59,8 +59,8 @@ sub pause{
     
     $cause ||= '';
     
-    if($self->{CURRENT_WORKFLOW}){
-        $self->{CURRENT_WORKFLOW}->pause($cause,$max_retries,$retry_interval);
+    if($self->workflow()){
+        $self->workflow()->pause($cause,$max_retries,$retry_interval);
     }
     #disrupt the execution of the run-method: 
     OpenXPKI::Server::Workflow::Pause->throw( cause => $cause);
@@ -119,9 +119,9 @@ sub set_reap_at_intervall{
     #if execution of action already has begun, the workflow has already retrieved, set and stored the reap_at timestamp
     ##! 16: sprintf('set reap at intervall to %s',$intervall)
     
-    if($self->{CURRENT_WORKFLOW} && $self->{CURRENT_WORKFLOW}->is_running()){
+    if($self->workflow() && $self->workflow()->is_running()){
         ##! 16: 'pass retry interval over to workflow!'
-        $self->{CURRENT_WORKFLOW}->set_reap_at_interval($intervall);
+        $self->workflow()->set_reap_at_interval($intervall);
     }else{
          ##! 16: 'wf not running yet'
     }
@@ -191,8 +191,8 @@ sub _get_wf_action_param{
     my $key = shift;
     my $value = undef;
     
-    if($self->{CURRENT_WORKFLOW}){
-        my $wf_state = $self->{CURRENT_WORKFLOW}->_get_workflow_state();
+    if($self->workflow()){
+        my $wf_state = $self->workflow()->_get_workflow_state();
         my $action = $wf_state->{_actions}->{$self->name};
         if(defined $action->{$key}){
             $value = $action->{$key};
@@ -227,12 +227,12 @@ Is called during the creation of the activity class. Initializes
 $self->{CONFIG_ID}, which is the config ID of the workflow.
 Also sets $self->{PKI_REALM} to CTX('session')->get_pki_realm()
 
-Sets $self->{CURRENT_WORKFLOW} as a reference to the current workflow.
+Sets $self->workflow() as a reference to the current workflow.
 
 =head2 pause
 
 immediately ends the execution of current action. this is achieved via throwing an exception of class OpenXPKI::Server::Workflow::Pause.
-before that, $self->{CURRENT_WORKFLOW}->pause() will be called, which stores away all necessary informations.
+before that, $self->workflow()->pause() will be called, which stores away all necessary informations.
 
 =head2 get_max_allowed_retries
 

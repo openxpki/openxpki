@@ -26,7 +26,7 @@ sub update {
         })
     );
     ## save this history entry
-    $workflow->{_FACTORY}->save_workflow( $workflow );
+    $workflow->factory()->save_workflow( $workflow );
     
 }
 

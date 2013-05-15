@@ -70,7 +70,7 @@ around BUILDARGS => sub {
 
 sub _init_workflow {
 	my $self = shift;	
-	return $self->_get_activity->{CURRENT_WORKFLOW};
+	return $self->_get_activity->workflow();
 } 
 
 sub _init_context {

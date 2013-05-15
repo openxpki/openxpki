@@ -7,14 +7,15 @@ package OpenXPKI::Workflow::Factory;
 use strict;
 use warnings;
 
-use Workflow 1.35;
+use Workflow 1.36;
 use base qw( Workflow::Factory );
 use OpenXPKI::Exception;
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow;
-use OpenXPKI::Workflow::Instance;
 use Workflow::Exception qw( configuration_error workflow_error );
 use Data::Dumper; 
+
 
 sub new {
     my $class = ref $_[0] || $_[0];
@@ -39,43 +40,33 @@ sub create_workflow{
         TYPE   => $wf_type,
     });
     
-    my $wf = $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Workflow::Instance' );
-    
-    my $oxiWf = OpenXPKI::Server::Workflow->new($wf, $self);
-    
-    return $oxiWf; 
+    return $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Server::Workflow' );     
 }
 
 sub fetch_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
     
     
-    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Workflow::Instance' );
+    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' );
     # the following both checks whether the user is allowed to
     # read the workflow at all and deletes context entries from $wf if
     # the configuration mandates it
+    
+	##! 16: 'Fetch Wfl: ' . Dumper $wf;
+	    
     $self->__authorize_workflow({
         ACTION   => 'access',
         WORKFLOW => $wf,
         FILTER   => 1,
     });
     
-    my $wf_config = $self->_get_workflow_config($wf_type);
-    unless ($wf_config) {
-        workflow_error "No workflow of type '$wf_type' available";
-    }
-    my $persister = $self->get_persister( $wf_config->{persister} );
-    my $wf_info   = $persister->fetch_workflow($wf_id);
-    
-    
-    my $oxiWf = OpenXPKI::Server::Workflow->new($wf,$self,$wf_info);
-    
-    return $oxiWf; 
+    return $wf; 
+     
 }
 
 sub fetch_unfiltered_workflow {    
     my ( $self, $wf_type, $wf_id ) = @_;
-    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id);
+    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' );
     
     $self->__authorize_workflow({
         ACTION   => 'access',
@@ -89,17 +80,8 @@ sub fetch_unfiltered_workflow {
         FACILITY => 'audit',
     );
 
-    my $wf_config = $self->_get_workflow_config($wf_type);
-    unless ($wf_config) {
-        workflow_error "No workflow of type '$wf_type' available";
-    }
-    my $persister = $self->get_persister( $wf_config->{persister} );
-    my $wf_info   = $persister->fetch_workflow($wf_id);
-    
-    
-    my $oxiWf = OpenXPKI::Server::Workflow->new($wf,$self,$wf_info);    
-    
-    return $oxiWf; 
+	return $wf;
+
 }
 
 sub list_workflow_titles {
