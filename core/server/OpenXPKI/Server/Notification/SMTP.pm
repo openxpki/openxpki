@@ -293,6 +293,15 @@ sub notify {
             $vars{$key} = $pi->{$key}; 
         }            
         
+        if (!$vars{to}) {        	
+        	CTX('log')->log(
+            	MESSAGE  => "Failed sending notification - no receipient",
+            	PRIORITY => "error",
+            	FACILITY => "system",
+	        );
+	        return 0;        	
+        }
+        
         if ($self->use_html()) {
             $self->_send_html( $cfg, \%vars );
         } else {

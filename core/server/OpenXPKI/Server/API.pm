@@ -646,6 +646,20 @@ sub BUILD {
                 },
             },
         },
+        'send_notification' => {
+            class  => 'Default',
+            params => {
+            	MESSAGE => {
+					type  => SCALAR,
+                    regex => $re_alpha_string,
+            	},
+                PARAMS => {
+                    type   => HASHREF,
+                    optional => 1,
+                },
+            },
+        },
+        
 
         ### Object API
         'get_csr_info_hash_from_data' => {

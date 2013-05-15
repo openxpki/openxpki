@@ -898,6 +898,21 @@ sub create_bulk_request_ticket {
     return $ticket;
 }
 
+sub send_notification {
+    ##! 1: 'start'
+    my $self      = shift;
+    my $arg_ref   = shift;
+    
+    my $message = $arg_ref->{MESSAGE};
+    my $vars = $arg_ref->{PARAMS}; 
+    
+    return CTX('notification')->notify({
+        MESSAGE => $message,
+        DATA => $vars
+    });
+	
+}
+
 1;
 
 __END__
