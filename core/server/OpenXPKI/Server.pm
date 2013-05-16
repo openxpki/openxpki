@@ -97,7 +97,7 @@ sub new
     if ($EVAL_ERROR) {
         $self->__log_and_die($EVAL_ERROR, 'server daemon setup');
     }
-
+    
     # Net::Server does not provide a hook that lets us change the
     # ownership of the created socket properly: it chowns the socket
     # file itself just before set_uid/set_gid. hence we make Net::Server
@@ -948,6 +948,11 @@ sub __log_and_die {
         PRIORITY => "fatal",
         FACILITY => "system",
     );
+    
+    # Check if watchdog was already started and kill
+    if (OpenXPKI::Server::Context::hascontext('watchdog')) {
+    	CTX('watchdog')->terminate();
+    }    
 
  	# die gracefully
  	$ERRNO = 1;

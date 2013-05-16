@@ -245,16 +245,28 @@ sub reload {
     return if ($self->disabled());
            
     ##! 4: 'run update head'
-    CTX('config')->update_head();    
+    CTX('config')->update_head();
+    
+    CTX('log')->log(
+    	MESSAGE  => 'Watchdog reloaded',
+		PRIORITY => "info",
+        FACILITY => "system",
+	);    
 }
   
 sub terminate {
-    my $self = shift;
    
-    
+    my $self = shift;
+       
     #terminate childs:
     my $children = $self->children();
     kill 'TERM', @$children;
+        
+ 	CTX('log')->log(
+    	MESSAGE  => 'Watchdog terminated',
+		PRIORITY => "info",
+        FACILITY => "system",
+	);        
         
     return 1;    
 }

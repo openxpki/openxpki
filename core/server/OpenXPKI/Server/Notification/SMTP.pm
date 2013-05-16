@@ -299,7 +299,7 @@ sub notify {
             	PRIORITY => "error",
             	FACILITY => "system",
 	        );
-	        return 0;        	
+	        return undef;        	
         }
         
         if ($self->use_html()) {
