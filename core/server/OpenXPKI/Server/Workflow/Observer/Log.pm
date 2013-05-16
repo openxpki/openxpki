@@ -54,7 +54,12 @@ sub update {
         my (  $action_name, $cause ) = @_;
         $prio = 'info';
         $msg = "Workflow $id/$type/$state paused at action $action_name, cause: $cause";
+    } elsif ( $event eq 'autofail' ) {
+        my (  $last_state, $action_name, $exception ) = @_;
+        $prio = 'error';
+        $msg = "Workflow $id/$type/$state failed on $action_name from $last_state, error: $exception";
     }
+    
 
     # in case more events are ever added to Workflow
     if ( $msg eq '' ) {

@@ -157,7 +157,13 @@ sub execute_action {
     if ($EVAL_ERROR) {
         my $error = $EVAL_ERROR;
         $self->_proc_state_exception($error);
-
+                
+        # Look into the workflow definiton weather to autofail
+        if ($self->_get_workflow_state()->{_actions}->{$action_name}->{autofail} =~ /(yes|1)/i) {
+		    ##! 16: 'execute failed and has autofail set'         	
+        	$self->_autofail($error);
+        }
+        
         # Don't use 'workflow_error' here since $error should already
         # be a Workflow::Exception object or subclass
         croak $error;
@@ -435,6 +441,53 @@ sub _proc_state_exception {
 
     };
     
+}
+
+sub _autofail {
+	
+	my $self      = shift;	
+    my $error = shift;    
+
+	eval{    
+	    $self->state('FAILURE');
+		$self->_set_proc_state('finished'); 
+		$self->notify_observers( 'autofail', $self->state, $self->{_CURRENT_ACTION}, $error);	    
+        $self->add_history(
+            Workflow::History->new(
+                {
+                    action      => $self->{_CURRENT_ACTION},
+                    description => 'AUTOFAIL',
+                    user        => CTX('session')->get_user(),
+                }
+            )
+        );
+        $self->_save();
+    };
+	
+}
+
+
+sub _skip {
+	
+	my $self = shift;	
+    my $error = shift;    
+
+	eval{    
+	    $self->state('FAILURE');
+		$self->_set_proc_state('finished'); 
+		$self->notify_observers( 'autofail', $self->state, $self->{_CURRENT_ACTION}, $error);	    
+        $self->add_history(
+            Workflow::History->new(
+                {
+                    action      => $self->{_CURRENT_ACTION},
+                    description => 'NEW_STATE: FAILURE',
+                    user        => CTX('session')->get_user(),
+                }
+            )
+        );
+        $self->_save();
+    };
+	
 }
 
 sub is_running(){

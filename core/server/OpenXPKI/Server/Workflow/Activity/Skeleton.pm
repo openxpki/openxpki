@@ -1,5 +1,5 @@
 # OpenXPKI::Server::Workflow::Activity::Skeleton
-# Written by Martin Bartosch for the OpenXPKI project 2005
+# Written by Oliver Welter for the OpenXPKI project 2013
 # Copyright (c) 2005 by The OpenXPKI Project
 
 package OpenXPKI::Server::Workflow::Activity::Skeleton;
@@ -14,52 +14,43 @@ use OpenXPKI::Exception;
 sub execute {
     my $self = shift;
     my $workflow = shift;
-
-    $self->SUPER::execute($workflow,
-			  {
-			      # CHOOSE one of the following:
-			      # CA: CA operation (default)
-			      # RA: RA operation
-			      # PUBLIC: publicly available operation
-			      #ACTIVITYCLASS => 'CA',
-			      PARAMS => {
-#				  # accept_from values (first match wins):
-#				  # 'context': accept workflow context values
-#				  # 'config':  accept workflow config values
-#				  # 'default': accept defaults in source code
-# 				  _myvolatile => {
-#				      # accept_from => [ 'config', 'default' ],
-# 				      # default => '',
-# 				      # required => 1,
-# 				  },
-# 				  mypersistent => {
-#				      # accept_from => [ 'context', 'config', 'default' ],
-# 				      # default => '',
-# 				      # required => 1,
-# 				  },
-			      },
-			  });    
-
-
-    # you may wish to use these shortcuts
-#     my $context      = $workflow->context();
-#     my $activity     = $self->{ACTIVITY};
-#     my $pki_realm    = $self->{PKI_REALM};
-#     my $session      = $self->{SESSION};
-#     my $defaulttoken = $self->{TOKEN_DEFAULT};
-
-
-    $workflow->add_history(
-        Workflow::History->new({
-            action      => 'My action description',
-            description => sprintf( "My log message"
-		),
-            user        => $self->param('creator'),
-			       })
-	);
+  
+    my $context = $workflow->context();
+  
+  	# do some work
+  	if ($need_to_wait) {
+  		# The text is written to the logs and is optional
+  		$self->pause('Waiting');
+  	}
     
 }
 
+sub resume{
+	
+    my $self = shift;
+    my ($workflow, $resume_from) = @_;
+	
+	if ($resume_from eq "retry_exceeded") {
+		# This code gets executed if you restart the workflow after
+		# the configured number of retries was exceeded 
+		
+	}
+
+	# Put any code here you need to run after you resumed this
+	# activity after it crashed with an exception	
+
+		
+	
+}
+
+sub wake_up{
+    my $self     = shift;
+    my ($workflow) = @_;
+
+	# This code gets executed when the watchdog reruns the activity 
+	# while the set retry_count is not reached.
+    
+}
 
 1;
 __END__
@@ -103,3 +94,17 @@ Description...
 =head2 execute
 
 Executes the action.
+
+=head2 wake_up
+
+Method to prepare after returning from pause
+
+=head2 resume
+
+Method to prepare after returning from an exception.
+Reason for laying down passed as second parameter (exception or retry_exceeded).
+
+
+
+
+

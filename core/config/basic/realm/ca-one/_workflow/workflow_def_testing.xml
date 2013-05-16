@@ -19,7 +19,7 @@
      -->
     <action name="I18N_OPENXPKI_WF_ACTION_WORKFLOWTEST" 
 	    resulting_state="STEP3"
-		retry_count="3" >      
+		retry_count="3">      
     </action>
 
   </state>
@@ -29,7 +29,8 @@
     <description></description>
     
     <action name="I18N_OPENXPKI_WF_ACTION_WORKFLOWTEST" 
-	    resulting_state="SUCCESS" retry_interval="+0000000015">      
+	    resulting_state="SUCCESS" retry_interval="+0000000015"
+	    autofail="yes">      
     </action>
 
   </state>

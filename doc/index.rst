@@ -22,6 +22,7 @@ Table of Contents:
    admin/installation/building
    admin/installation/packages
    admin/installation/deployment
+   admin/customization/workflow/activity
    admin/configuration/concepts
    admin/configuration/scep
    admin/configuration/smartcard
@@ -40,6 +41,7 @@ Table of Contents:
    reference/tools/openxpkiadm
    reference/tools/openxpkictl
    reference/tools/openxpkicmd
+   reference/tools/openxpkicli   
    reference/interfaces
    reference/developer/conventions
    reference/developer/coding

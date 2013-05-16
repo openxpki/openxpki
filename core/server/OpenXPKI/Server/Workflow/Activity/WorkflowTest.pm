@@ -126,11 +126,12 @@ Test Activity for Workflow Development
 
 =head2 Configuration 
 
-Retry 5 times with a 15 minute pause interval
+Retry 5 times with a 15 minute pause interval and terminate workflow with 
+FAILURE state if the retries are exceeded.
 
   <action name="I18N_OPENXPKI_WF_ACTION_TEST_ACTIVITY"
  	class="OpenXPKI::Server::Workflow::Activity::WorkflowTest"
- 	retry_count="5" retry_interval="+0000000015"> 	
+ 	retry_count="5" retry_interval="+0000000015" autofail="yes"> 	
   </action>    
   
 Retry Interval is a OpenXPKI::DateTime specification

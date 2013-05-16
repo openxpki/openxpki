@@ -154,14 +154,16 @@ sub get_retry_intervall{
     return "+0000000005";
 }
 
-sub set_retry_intervall{
+sub set_retry_intervall {
     my $self     = shift;
     my $retry_intervall = shift;
     # TODO syntax validation (or sanitation), should be OpenXPKI DateTime String
     $self->{RETRY_INTERVALL} = (defined $retry_intervall)?$retry_intervall:undef;
-    
-    
-    
+}
+
+sub get_retry_count {
+    my $self     = shift;    
+    return $self->workflow()->count_try();
 }
 
 sub wake_up{
@@ -216,9 +218,36 @@ OpenXPKI::Server::Workflow::Activity
 =head1 Description
 
 Base class for OpenXPKI Activities. Deriving from this class is
-not mandatory, this class only provides some helper functions that
-make Activity implementation easier.
+mandatory if you use the extended flow control features.
 
+=head2 Configuration parameters
+
+To use the flow control features, you can set several parameters in the
+workflow configuration. The retry params can be set in either the activity 
+or in the state block. If both are given, those in the state block are 
+superior. The autofail parameter is allowed only in the state block.  
+
+=over
+
+=item retry_count
+
+Integer value, how many times the system will redo the action after pause is called.
+If the given value is exceeded, the action stops with an error state. 
+
+=item retry_interval (default 5 minutes)
+
+The amount of time to sleep after pause is called, before a new retry is done.
+The value needs to be parsable as a relative OpenXPKI DateTime string.
+Note that this is a minimum amount of time that needs to elapse, after which 
+the watchdog is allowed to pick up the job. Depending on your load and watchdog
+settings, the actual time can be much greater! 
+
+=item autofail      
+
+If set to "yes", the workflow is moved directly to the FAILURE state and
+set to finished in case of an error. This also affects a retry_exceeded
+situation!
+    
 =head1 Functions
 
 =head2 init
@@ -254,9 +283,13 @@ sets the retry intervall (relative OpenXPKI DateTime String e.g. "+0000000005")
 
 returns the reap_at intervall (relative OpenXPKI DateTime String). default: "+0000000005"
 
-=head2 set__reap_at_intervall($string)
+=head2 set_reap_at_intervall($string)
 
 sets the reap_at intervall (relative OpenXPKI DateTime String, e.g. "+0000000005")
+
+=head2 get_retry_count
+
+Return the value of the retry counter.
 
 =head2 wake_up
 
@@ -264,7 +297,8 @@ Hook method. Will be called if Workflow::execute_action() is called after proc-s
 
 =head2 resume
 
-Hook method. Will be called if Workflow::execute_action() is called after proc-state "exception". The current workflow is given as argument.
+Hook method. Will be called if Workflow::execute_action() is called after proc-state "exception" or "retry_exceeded". 
+The current workflow is given as first argument, the process state to recover from as second.
 
 =head2 runtime_exception
 
@@ -272,6 +306,4 @@ Hook method. Will be called if Workflow::execute_action() is called with an proc
  
 =head2 config_id
 
-Returns the config identifier for the workflow or the current config
-identifier if the config ID is not yet set (this happens in the very
-first workflow activity)
+Deprecated, returns undef.
