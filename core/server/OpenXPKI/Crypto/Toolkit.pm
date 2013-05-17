@@ -200,7 +200,10 @@ sub __load_config_realm_token {
     }               
 
     # diretory to file conversion for inheritance expansion on keyfiles
-    if (-d $params_of{$ident}->{KEY})  {
+    # If the name is not absolute or not an exisiting directory, it is likely a symbolic name 
+    # hopefully solves issue #27 without the need for a new parameter
+    # Perhaps we can use the Engine setting here to get a better solution     
+    if (File::Spec->file_name_is_absolute( $params_of{$ident}->{KEY} ) && -d $params_of{$ident}->{KEY})  {
         $params_of{$ident}->{KEY} = File::Spec->catfile( $params_of{$ident}->{KEY}, $name.'.pem' );          
     }
 
